@@ -54,6 +54,7 @@ export interface MetricLineage extends AuditFields, ClubScoped {
   id: EntityId;
   outputRecordId: EntityId;
   definitionId: EntityId;
+  definitionVersion: string;
   inputRecordIds: EntityId[];
   computedAt: ISODateTimeString;
 }
@@ -156,6 +157,7 @@ export function derivePlayerMetricRecord(input: {
       clubId: input.clubId,
       outputRecordId: input.outputRecordId,
       definitionId: input.definition.id,
+      definitionVersion: input.definition.version,
       inputRecordIds: usableRecords.map((record) => record.id),
       computedAt: input.now,
       createdAt: input.now,

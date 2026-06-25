@@ -53,6 +53,7 @@ export function findScheduleConflicts(
 ): ScheduleConflict[] {
   return existing
     .filter((item) => item.clubId === candidate.clubId && item.subjectId === candidate.subjectId)
+    .filter((item) => item.eventId !== candidate.eventId)
     .filter((item) => timeRangesOverlap(item.timeRange, candidate.timeRange))
     .map((item) => ({
       clubId: candidate.clubId,

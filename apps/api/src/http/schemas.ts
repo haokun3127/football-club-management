@@ -122,6 +122,167 @@ export const schemas = {
       },
     },
   },
+  clubTeamParams: {
+    params: {
+      type: "object",
+      additionalProperties: false,
+      required: ["clubId", "teamId"],
+      properties: {
+        clubId: { type: "string", minLength: 1 },
+        teamId: { type: "string", minLength: 1 },
+      },
+    },
+  },
+  clubEventParams: {
+    params: {
+      type: "object",
+      additionalProperties: false,
+      required: ["clubId", "eventId"],
+      properties: {
+        clubId: { type: "string", minLength: 1 },
+        eventId: { type: "string", minLength: 1 },
+      },
+    },
+  },
+  createTeam: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["name", "ageGroup", "level"],
+      properties: {
+        name: { type: "string", minLength: 1 },
+        ageGroup: { type: "string", minLength: 1 },
+        level: { type: "string", minLength: 1 },
+        defaultCoachId: { type: "string" },
+        defaultLocationId: { type: "string" },
+      },
+    },
+    response: {
+      403: errorResponse,
+    },
+  },
+  joinTeam: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["studentId", "startsAt"],
+      properties: {
+        studentId: { type: "string", minLength: 1 },
+        startsAt: { type: "string", minLength: 1 },
+        endsAt: { type: "string" },
+        isPrimaryTeam: { type: "boolean" },
+        status: { type: "string" },
+      },
+    },
+    response: {
+      403: errorResponse,
+    },
+  },
+  createCalendarEvent: {
+    body: {
+      type: "object",
+      additionalProperties: true,
+      required: ["type", "title", "startsAt", "endsAt"],
+      properties: {
+        type: { type: "string", enum: ["training", "match", "other"] },
+        title: { type: "string", minLength: 1 },
+        startsAt: { type: "string", minLength: 1 },
+        endsAt: { type: "string", minLength: 1 },
+      },
+    },
+    response: {
+      403: errorResponse,
+    },
+  },
+  eventParticipants: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["participants"],
+      properties: {
+        participants: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["studentId"],
+            properties: {
+              studentId: { type: "string", minLength: 1 },
+              status: { type: "string" },
+              note: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    response: {
+      403: errorResponse,
+    },
+  },
+  scheduleConflicts: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["startsAt", "endsAt"],
+      properties: {
+        eventId: { type: "string" },
+        startsAt: { type: "string", minLength: 1 },
+        endsAt: { type: "string", minLength: 1 },
+        coachId: { type: "string" },
+        studentIds: { type: "array", items: { type: "string" } },
+      },
+    },
+    response: {
+      403: errorResponse,
+    },
+  },
+  createTrainingSession: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["eventId", "kind"],
+      properties: {
+        eventId: { type: "string", minLength: 1 },
+        kind: { type: "string", minLength: 1 },
+        sessionPlanId: { type: "string" },
+        intensity: { type: "string" },
+      },
+    },
+    response: {
+      403: errorResponse,
+    },
+  },
+  recordMatch: {
+    body: {
+      type: "object",
+      additionalProperties: true,
+      required: ["eventId", "matchType", "status"],
+      properties: {
+        eventId: { type: "string", minLength: 1 },
+        matchType: { type: "string", minLength: 1 },
+        status: { type: "string", minLength: 1 },
+      },
+    },
+    response: {
+      403: errorResponse,
+    },
+  },
+  recordAssessment: {
+    body: {
+      type: "object",
+      additionalProperties: true,
+      required: ["studentId", "templateId", "assessedByCoachId", "scores"],
+      properties: {
+        studentId: { type: "string", minLength: 1 },
+        templateId: { type: "string", minLength: 1 },
+        assessedByCoachId: { type: "string", minLength: 1 },
+        scores: { type: "array", minItems: 1, items: { type: "object", additionalProperties: true } },
+      },
+    },
+    response: {
+      403: errorResponse,
+    },
+  },
   clubsResponse: {
     response: {
       200: {

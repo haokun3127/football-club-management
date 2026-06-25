@@ -67,6 +67,23 @@ export interface SessionDelivery extends AuditFields, ClubScoped {
   summary?: string;
 }
 
+export type SessionObservationSourceReference =
+  | {
+      kind: "calendar_event";
+      eventId: EntityId;
+    }
+  | {
+      kind: "match_event";
+      matchEventId: EntityId;
+    }
+  | {
+      kind: "metric_record";
+      metricRecordId: EntityId;
+    }
+  | {
+      kind: "manual";
+    };
+
 export interface SessionObservation extends AuditFields, ClubScoped {
   id: EntityId;
   trainingSessionId: EntityId;
@@ -76,4 +93,5 @@ export interface SessionObservation extends AuditFields, ClubScoped {
   rating?: 1 | 2 | 3 | 4 | 5;
   tags: string[];
   note?: string;
+  sourceReference?: SessionObservationSourceReference;
 }

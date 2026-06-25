@@ -40,6 +40,10 @@ describe("derivePlayerMetricRecord", () => {
       definition,
       inputRecords: [
         record("record-goals", "metric-goals", 2),
+        {
+          ...record("record-foreign-goals", "metric-goals", 9),
+          clubId: "club-other",
+        },
         record("record-assists", "metric-assists", 1),
       ],
       outputRecordId: "record-attacking-contribution",
@@ -53,5 +57,6 @@ describe("derivePlayerMetricRecord", () => {
     expect(result.record.clubId).toBe("club-demo");
     expect(result.record.value).toEqual({ kind: "measurement", value: 1.67, unit: "score" });
     expect(result.lineage.inputRecordIds).toEqual(["record-goals", "record-assists"]);
+    expect(result.lineage.definitionVersion).toBe("1.0.0");
   });
 });
