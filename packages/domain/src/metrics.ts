@@ -1,0 +1,160 @@
+import type { AuditFields, EntityId, ISODateTimeString } from "./primitives.js";
+
+export type MetricValueKind = "rating_1_5" | "count" | "duration_minutes" | "measurement" | "tag" | "text";
+export type MetricSourceKind = "training_observation" | "match_event" | "assessment" | "fitness_test" | "manual_adjustment" | "algorithm";
+export type DerivedMetricMethod = "weighted_average" | "recent_average" | "sum" | "trend";
+
+export interface AbilityMetric extends AuditFields {
+  id: EntityId;
+  code: string;
+  name: string;
+  dimensionId: EntityId;
+  valueKind: MetricValueKind;
+  unit?: string;
+  description?: string;
+}
+
+export type MetricValue =
+  | { kind: "rating_1_5"; score: 1 | 2 | 3 | 4 | 5 }
+  | { kind: "count"; count: number }
+  | { kind: "duration_minutes"; minutes: number }
+  | { kind: "measurement"; value: number; unit: string }
+  | { kind: "tag"; tag: string }
+  | { kind: "text"; text: string };
+
+export interface PlayerMetricRecord extends AuditFields {
+  id: EntityId;
+  studentId: EntityId;
+  metricId: EntityId;
+  value: MetricValue;
+  source: MetricSourceKind;
+  occurredAt: ISODateTimeString;
+  eventId?: EntityId;
+  recordedByCoachId?: EntityId;
+  confidence?: number;
+  note?: string;
+  lineageId?: EntityId;
+}
+
+export interface DerivedMetricDefinition extends AuditFields {
+  id: EntityId;
+  code: string;
+  name: string;
+  outputMetricId: EntityId;
+  method: DerivedMetricMethod;
+  inputMetricIds: EntityId[];
+  version: string;
+  weights?: Record<EntityId, number>;
+  inputWindowDays?: number;
+  outputUnit?: string;
+}
+
+export interface MetricLineage extends AuditFields {
+  id: EntityId;
+  outputRecordId: EntityId;
+  definitionId: EntityId;
+  inputRecordIds: EntityId[];
+  computedAt: ISODateTimeString;
+}
+
+export interface DerivedMetricResult {
+  record: PlayerMetricRecord;
+  lineage: MetricLineage;
+}
+
+export function getNumericMetricValue(value: MetricValue): number | null {
+  switch (value.kind) {
+    case "rating_1_5":
+      return value.score;
+    case "count":
+      return value.count;
+    case "duration_minutes":
+      return value.minutes;
+    case "measurement":
+      return value.value;
+    case "tag":
+    case "text":
+      return null;
+  }
+}
+
+export function derivePlayerMetricRecord(input: {
+  definition: DerivedMetricDefinition;
+  inputRecords: PlayerMetricRecord[];
+  outputRecordId: EntityId;
+  lineageId: EntityId;
+  studentId: EntityId;
+  now: ISODateTimeString;
+}): DerivedMetricResult {
+  const usableRecords = input.inputRecords.filter((record) =>
+    record.studentId === input.studentId
+    && input.definition.inputMetricIds.includes(record.metricId)
+    && getNumericMetricValue(record.value) !== null,
+  );
+
+  if (usableRecords.length === 0) {
+    throw new Error(`No numeric input records for derived metric ${input.definition.code}.`);
+  }
+
+  const numericValues = usableRecords.map((record) => ({
+    record,
+    value: getNumericMetricValue(record.value) ?? 0,
+    weight: input.definition.weights?.[record.metricId] ?? 1,
+  }));
+
+  let result: number;
+
+  switch (input.definition.method) {
+    case "weighted_average": {
+      const weightedTotal = numericValues.reduce((sum, item) => sum + item.value * item.weight, 0);
+      const weightTotal = numericValues.reduce((sum, item) => sum + item.weight, 0);
+      result = weightedTotal / weightTotal;
+      break;
+    }
+    case "recent_average": {
+      const total = numericValues.reduce((sum, item) => sum + item.value, 0);
+      result = total / numericValues.length;
+      break;
+    }
+    case "sum":
+      result = numericValues.reduce((sum, item) => sum + item.value, 0);
+      break;
+    case "trend": {
+      const sorted = [...numericValues].sort((left, right) =>
+        Date.parse(left.record.occurredAt) - Date.parse(right.record.occurredAt),
+      );
+      result = sorted[sorted.length - 1]!.value - sorted[0]!.value;
+      break;
+    }
+  }
+
+  const rounded = Number(result.toFixed(2));
+
+  return {
+    record: {
+      id: input.outputRecordId,
+      studentId: input.studentId,
+      metricId: input.definition.outputMetricId,
+      value: {
+        kind: "measurement",
+        value: rounded,
+        unit: input.definition.outputUnit ?? "score",
+      },
+      source: "algorithm",
+      occurredAt: input.now,
+      createdAt: input.now,
+      updatedAt: input.now,
+      lineageId: input.lineageId,
+      note: `${input.definition.code}@${input.definition.version}`,
+    },
+    lineage: {
+      id: input.lineageId,
+      outputRecordId: input.outputRecordId,
+      definitionId: input.definition.id,
+      inputRecordIds: usableRecords.map((record) => record.id),
+      computedAt: input.now,
+      createdAt: input.now,
+      updatedAt: input.now,
+    },
+  };
+}
