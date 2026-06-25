@@ -21,3 +21,5 @@ This repository uses Git for source control. Keep generated files, dependency fo
 - [MVP 范围说明](docs/mvp-scope.md)
 - [架构骨架](docs/architecture.md)
 - [多俱乐部解耦分析](docs/multi-club-decoupling.md)
+- [架构骨架质量评测](docs/architecture-quality-assessment.md)
+- [功能设计与技术开发计划](docs/development-plan.md)
