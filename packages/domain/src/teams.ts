@@ -1,9 +1,10 @@
 import type { AuditFields, EntityId } from "./primitives.js";
+import type { ClubScoped } from "./clubs.js";
 
 export type TeamLevel = "introductory" | "development" | "advanced" | "elite";
 export type TeamMemberStatus = "active" | "paused" | "graduated" | "left";
 
-export interface Team extends AuditFields {
+export interface Team extends AuditFields, ClubScoped {
   id: EntityId;
   name: string;
   ageGroup: string;
@@ -13,7 +14,7 @@ export interface Team extends AuditFields {
   status: "active" | "inactive";
 }
 
-export interface TeamMember extends AuditFields {
+export interface TeamMember extends AuditFields, ClubScoped {
   id: EntityId;
   teamId: EntityId;
   studentId: EntityId;
@@ -23,7 +24,7 @@ export interface TeamMember extends AuditFields {
   status: TeamMemberStatus;
 }
 
-export interface CoachAssignment extends AuditFields {
+export interface CoachAssignment extends AuditFields, ClubScoped {
   id: EntityId;
   coachId: EntityId;
   teamId?: EntityId;

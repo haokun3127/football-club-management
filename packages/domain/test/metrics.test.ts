@@ -6,6 +6,7 @@ const now = "2026-06-25T10:00:00.000Z";
 function record(id: string, metricId: string, value: number): PlayerMetricRecord {
   return {
     id,
+    clubId: "club-demo",
     studentId: "student-1",
     metricId,
     value: { kind: "count", count: value },
@@ -20,6 +21,7 @@ describe("derivePlayerMetricRecord", () => {
   it("creates an algorithm-sourced metric record with lineage", () => {
     const definition: DerivedMetricDefinition = {
       id: "derived-attacking-contribution",
+      catalogScope: { scope: "system" },
       code: "attacking_contribution",
       name: "Attacking Contribution",
       outputMetricId: "metric-attacking-contribution",
@@ -42,11 +44,13 @@ describe("derivePlayerMetricRecord", () => {
       ],
       outputRecordId: "record-attacking-contribution",
       lineageId: "lineage-1",
+      clubId: "club-demo",
       studentId: "student-1",
       now,
     });
 
     expect(result.record.source).toBe("algorithm");
+    expect(result.record.clubId).toBe("club-demo");
     expect(result.record.value).toEqual({ kind: "measurement", value: 1.67, unit: "score" });
     expect(result.lineage.inputRecordIds).toEqual(["record-goals", "record-assists"]);
   });

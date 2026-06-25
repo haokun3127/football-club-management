@@ -6,10 +6,12 @@
 
 核心判断：
 
+- `Club` 是租户边界，俱乐部内业务事实数据必须带 `clubId`。
 - `CalendarEvent` 是业务主轴，训练、比赛、其他活动都先进入统一活动日历。
 - `EventParticipant` 是学员实际参与的事实记录，不能只依赖球队成员关系。
+- `CatalogScope` 区分系统级目录和俱乐部级目录，训练体系、指标和评测模板可以共享也可以覆盖。
 - `PlayerMetricRecord` 是球员数据资产的最小单元，训练观察、比赛事件、周期评测、体测和算法派生都写入同一种记录。
-- `DomainEvent` 是未来运营扩展的接口，后续 CRM、通知、内容分发、AI 报告可以订阅这些事件，而不侵入核心训练业务。
+- `DomainEvent` 带 `clubId`，后续 CRM、通知、内容分发、AI 报告可以订阅这些事件，而不侵入核心训练业务。
 
 ## 工作区结构
 
@@ -23,6 +25,8 @@
 
 ### 身份与组织
 
+- `Club`
+- `ClubUserMembership`
 - `UserAccount`
 - `ParentProfile`
 - `StudentProfile`
@@ -31,6 +35,8 @@
 - `TeamMember`
 
 学员可以属于多个球队，球队成员关系记录周期、状态和主队标记。私教和小班课不强行建队，通过活动参与关系组织。
+
+`UserAccount` 是全局登录账号；家长、教练、学员资料是俱乐部内资料。这样同一个手机号或用户未来可以加入多个俱乐部，但各俱乐部的训练、评测和运营数据保持隔离。
 
 ### 活动日历
 
@@ -88,6 +94,14 @@ MVP 只做单场比赛记录，包括出场、比分、进球、助攻和教练�
 
 派生指标通过 `MetricLineage` 保留输入记录和算法版本，方便未来追踪和重算。
 
+### 俱乐部差异配置
+
+- `ClubFeatureFlag`
+- `ClubPolicy`
+- `CustomFieldDefinition`
+
+不同俱乐部的业务差异优先通过功能开关、策略配置、自定义字段和俱乐部级目录承载。详见 [多俱乐部解耦分析](multi-club-decoupling.md)。
+
 ## 运营扩展方式
 
 未来运营能力不要直接改核心表，而是优先通过这些方式扩展：
@@ -115,10 +129,12 @@ MVP 只做单场比赛记录，包括出场、比分、进球、助攻和教练�
 当前 `apps/api` 只提供内存数据接口，用来验证领域骨架：
 
 - `GET /health`
-- `GET /calendar/events`
-- `GET /students/:studentId/timeline`
-- `GET /catalog/ability-metrics`
-- `GET /students/:studentId/metrics`
-- `POST /students/:studentId/derived-metrics/attacking-contribution`
+- `GET /clubs`
+- `GET /clubs/:clubId/config`
+- `GET /clubs/:clubId/calendar/events`
+- `GET /clubs/:clubId/students/:studentId/timeline`
+- `GET /clubs/:clubId/catalog/ability-metrics`
+- `GET /clubs/:clubId/students/:studentId/metrics`
+- `POST /clubs/:clubId/students/:studentId/derived-metrics/attacking-contribution`
 
 正式开发数据库前，先用这些接口验证领域模型和前端信息结构。

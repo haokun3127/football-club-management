@@ -1,6 +1,7 @@
 import type { AuditFields, EntityId } from "./primitives.js";
+import type { CatalogScoped, ClubScoped } from "./clubs.js";
 
-export interface AssessmentTemplate extends AuditFields {
+export interface AssessmentTemplate extends AuditFields, CatalogScoped {
   id: EntityId;
   name: string;
   ageGroup?: string;
@@ -9,7 +10,7 @@ export interface AssessmentTemplate extends AuditFields {
   status: "active" | "inactive";
 }
 
-export interface PlayerAssessment extends AuditFields {
+export interface PlayerAssessment extends AuditFields, ClubScoped {
   id: EntityId;
   studentId: EntityId;
   templateId: EntityId;
@@ -19,7 +20,7 @@ export interface PlayerAssessment extends AuditFields {
   summary?: string;
 }
 
-export interface AssessmentScore extends AuditFields {
+export interface AssessmentScore extends AuditFields, ClubScoped {
   id: EntityId;
   assessmentId: EntityId;
   metricId: EntityId;
@@ -27,7 +28,7 @@ export interface AssessmentScore extends AuditFields {
   comment?: string;
 }
 
-export interface PlayerDevelopmentGoal extends AuditFields {
+export interface PlayerDevelopmentGoal extends AuditFields, ClubScoped {
   id: EntityId;
   studentId: EntityId;
   metricId?: EntityId;

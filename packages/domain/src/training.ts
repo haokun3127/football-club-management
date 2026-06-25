@@ -1,16 +1,17 @@
 import type { AuditFields, EntityId } from "./primitives.js";
+import type { CatalogScoped, ClubScoped } from "./clubs.js";
 
 export type TrainingSessionKind = "team" | "small_group" | "private" | "specialty";
 export type DrillDifficulty = "introductory" | "standard" | "advanced";
 
-export interface DevelopmentDimension extends AuditFields {
+export interface DevelopmentDimension extends AuditFields, CatalogScoped {
   id: EntityId;
   code: string;
   name: string;
   description?: string;
 }
 
-export interface TrainingObjective extends AuditFields {
+export interface TrainingObjective extends AuditFields, CatalogScoped {
   id: EntityId;
   dimensionId: EntityId;
   code: string;
@@ -18,7 +19,7 @@ export interface TrainingObjective extends AuditFields {
   description?: string;
 }
 
-export interface TrainingDrill extends AuditFields {
+export interface TrainingDrill extends AuditFields, CatalogScoped {
   id: EntityId;
   name: string;
   objectiveIds: EntityId[];
@@ -40,7 +41,7 @@ export interface SessionPlanBlock {
   notes?: string;
 }
 
-export interface SessionPlan extends AuditFields {
+export interface SessionPlan extends AuditFields, CatalogScoped {
   id: EntityId;
   name: string;
   objectiveIds: EntityId[];
@@ -49,7 +50,7 @@ export interface SessionPlan extends AuditFields {
   estimatedMinutes: number;
 }
 
-export interface TrainingSession extends AuditFields {
+export interface TrainingSession extends AuditFields, ClubScoped {
   id: EntityId;
   eventId: EntityId;
   kind: TrainingSessionKind;
@@ -57,7 +58,7 @@ export interface TrainingSession extends AuditFields {
   intensity?: "low" | "medium" | "high";
 }
 
-export interface SessionDelivery extends AuditFields {
+export interface SessionDelivery extends AuditFields, ClubScoped {
   id: EntityId;
   trainingSessionId: EntityId;
   deliveredBlockIds: EntityId[];
@@ -66,7 +67,7 @@ export interface SessionDelivery extends AuditFields {
   summary?: string;
 }
 
-export interface SessionObservation extends AuditFields {
+export interface SessionObservation extends AuditFields, ClubScoped {
   id: EntityId;
   trainingSessionId: EntityId;
   studentId: EntityId;

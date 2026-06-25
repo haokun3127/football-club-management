@@ -6,6 +6,7 @@ describe("findScheduleConflicts", () => {
     const conflicts = findScheduleConflicts(
       [
         {
+          clubId: "club-demo",
           subjectId: "student-1",
           eventId: "event-training",
           timeRange: {
@@ -15,6 +16,7 @@ describe("findScheduleConflicts", () => {
         },
       ],
       {
+        clubId: "club-demo",
         subjectId: "student-1",
         eventId: "event-private",
         timeRange: {
@@ -26,10 +28,38 @@ describe("findScheduleConflicts", () => {
 
     expect(conflicts).toEqual([
       {
+        clubId: "club-demo",
         subjectId: "student-1",
         existingEventId: "event-training",
         candidateEventId: "event-private",
       },
     ]);
+  });
+
+  it("does not flag overlap across different clubs", () => {
+    const conflicts = findScheduleConflicts(
+      [
+        {
+          clubId: "club-a",
+          subjectId: "student-1",
+          eventId: "event-training-a",
+          timeRange: {
+            startsAt: "2026-07-01T09:00:00.000Z",
+            endsAt: "2026-07-01T10:30:00.000Z",
+          },
+        },
+      ],
+      {
+        clubId: "club-b",
+        subjectId: "student-1",
+        eventId: "event-training-b",
+        timeRange: {
+          startsAt: "2026-07-01T09:30:00.000Z",
+          endsAt: "2026-07-01T10:30:00.000Z",
+        },
+      },
+    );
+
+    expect(conflicts).toEqual([]);
   });
 });

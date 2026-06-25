@@ -1,10 +1,11 @@
 import type { AuditFields, EntityId } from "./primitives.js";
+import type { ClubScoped } from "./clubs.js";
 
 export type MatchType = "internal" | "friendly" | "league" | "cup";
 export type MatchStatus = "scheduled" | "completed" | "cancelled";
 export type MatchEventType = "goal" | "assist" | "save" | "tackle" | "yellow_card" | "red_card" | "penalty" | "own_goal";
 
-export interface Match extends AuditFields {
+export interface Match extends AuditFields, ClubScoped {
   id: EntityId;
   eventId: EntityId;
   matchType: MatchType;
@@ -14,7 +15,7 @@ export interface Match extends AuditFields {
   status: MatchStatus;
 }
 
-export interface MatchRoster extends AuditFields {
+export interface MatchRoster extends AuditFields, ClubScoped {
   id: EntityId;
   matchId: EntityId;
   studentId: EntityId;
@@ -24,7 +25,7 @@ export interface MatchRoster extends AuditFields {
   position?: string;
 }
 
-export interface MatchEvent extends AuditFields {
+export interface MatchEvent extends AuditFields, ClubScoped {
   id: EntityId;
   matchId: EntityId;
   type: MatchEventType;
@@ -34,7 +35,7 @@ export interface MatchEvent extends AuditFields {
   note?: string;
 }
 
-export interface MatchPlayerNote extends AuditFields {
+export interface MatchPlayerNote extends AuditFields, ClubScoped {
   id: EntityId;
   matchId: EntityId;
   studentId: EntityId;

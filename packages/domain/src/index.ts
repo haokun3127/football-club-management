@@ -2,6 +2,7 @@ export * from "./activities.js";
 export * from "./actors.js";
 export * from "./assessment.js";
 export * from "./calendar.js";
+export * from "./clubs.js";
 export * from "./events.js";
 export * from "./match.js";
 export * from "./metrics.js";

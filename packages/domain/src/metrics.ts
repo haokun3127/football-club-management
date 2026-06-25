@@ -1,10 +1,11 @@
 import type { AuditFields, EntityId, ISODateTimeString } from "./primitives.js";
+import type { CatalogScoped, ClubScoped } from "./clubs.js";
 
 export type MetricValueKind = "rating_1_5" | "count" | "duration_minutes" | "measurement" | "tag" | "text";
 export type MetricSourceKind = "training_observation" | "match_event" | "assessment" | "fitness_test" | "manual_adjustment" | "algorithm";
 export type DerivedMetricMethod = "weighted_average" | "recent_average" | "sum" | "trend";
 
-export interface AbilityMetric extends AuditFields {
+export interface AbilityMetric extends AuditFields, CatalogScoped {
   id: EntityId;
   code: string;
   name: string;
@@ -22,7 +23,7 @@ export type MetricValue =
   | { kind: "tag"; tag: string }
   | { kind: "text"; text: string };
 
-export interface PlayerMetricRecord extends AuditFields {
+export interface PlayerMetricRecord extends AuditFields, ClubScoped {
   id: EntityId;
   studentId: EntityId;
   metricId: EntityId;
@@ -36,7 +37,7 @@ export interface PlayerMetricRecord extends AuditFields {
   lineageId?: EntityId;
 }
 
-export interface DerivedMetricDefinition extends AuditFields {
+export interface DerivedMetricDefinition extends AuditFields, CatalogScoped {
   id: EntityId;
   code: string;
   name: string;
@@ -49,7 +50,7 @@ export interface DerivedMetricDefinition extends AuditFields {
   outputUnit?: string;
 }
 
-export interface MetricLineage extends AuditFields {
+export interface MetricLineage extends AuditFields, ClubScoped {
   id: EntityId;
   outputRecordId: EntityId;
   definitionId: EntityId;
@@ -83,11 +84,13 @@ export function derivePlayerMetricRecord(input: {
   inputRecords: PlayerMetricRecord[];
   outputRecordId: EntityId;
   lineageId: EntityId;
+  clubId: EntityId;
   studentId: EntityId;
   now: ISODateTimeString;
 }): DerivedMetricResult {
   const usableRecords = input.inputRecords.filter((record) =>
-    record.studentId === input.studentId
+    record.clubId === input.clubId
+    && record.studentId === input.studentId
     && input.definition.inputMetricIds.includes(record.metricId)
     && getNumericMetricValue(record.value) !== null,
   );
@@ -133,6 +136,7 @@ export function derivePlayerMetricRecord(input: {
   return {
     record: {
       id: input.outputRecordId,
+      clubId: input.clubId,
       studentId: input.studentId,
       metricId: input.definition.outputMetricId,
       value: {
@@ -149,6 +153,7 @@ export function derivePlayerMetricRecord(input: {
     },
     lineage: {
       id: input.lineageId,
+      clubId: input.clubId,
       outputRecordId: input.outputRecordId,
       definitionId: input.definition.id,
       inputRecordIds: usableRecords.map((record) => record.id),

@@ -1,4 +1,5 @@
 import type { AuditFields, EntityId } from "./primitives.js";
+import type { ClubScoped } from "./clubs.js";
 
 export type UserRole = "admin" | "coach" | "parent" | "student";
 
@@ -10,14 +11,14 @@ export interface UserAccount extends AuditFields {
   status: "active" | "inactive";
 }
 
-export interface ParentProfile extends AuditFields {
+export interface ParentProfile extends AuditFields, ClubScoped {
   id: EntityId;
   userId: EntityId;
   name: string;
   phone: string;
 }
 
-export interface StudentProfile extends AuditFields {
+export interface StudentProfile extends AuditFields, ClubScoped {
   id: EntityId;
   name: string;
   birthDate: string;
@@ -27,7 +28,7 @@ export interface StudentProfile extends AuditFields {
   notes?: string;
 }
 
-export interface StudentGuardianBinding extends AuditFields {
+export interface StudentGuardianBinding extends AuditFields, ClubScoped {
   id: EntityId;
   studentId: EntityId;
   parentId: EntityId;
@@ -35,7 +36,7 @@ export interface StudentGuardianBinding extends AuditFields {
   isPrimaryContact: boolean;
 }
 
-export interface CoachProfile extends AuditFields {
+export interface CoachProfile extends AuditFields, ClubScoped {
   id: EntityId;
   userId: EntityId;
   name: string;

@@ -20,13 +20,29 @@ describe("api server", () => {
     const app = buildServer(undefined, { logger: false });
     const response = await app.inject({
       method: "POST",
-      url: "/students/student-1/derived-metrics/attacking-contribution",
+      url: "/clubs/club-demo/students/student-1/derived-metrics/attacking-contribution",
     });
 
     const body = response.json();
 
     expect(response.statusCode).toBe(200);
     expect(body.record.source).toBe("algorithm");
+    expect(body.record.clubId).toBe("club-demo");
     expect(body.lineage.inputRecordIds).toEqual(["metric-record-goal-1", "metric-record-assist-1"]);
+  });
+
+  it("returns club-specific configuration", async () => {
+    const app = buildServer(undefined, { logger: false });
+    const response = await app.inject({
+      method: "GET",
+      url: "/clubs/club-demo/config",
+    });
+
+    const body = response.json();
+
+    expect(response.statusCode).toBe(200);
+    expect(body.club.id).toBe("club-demo");
+    expect(body.featureFlags.some((item: { feature: string }) => item.feature === "matches")).toBe(true);
+    expect(body.customFields.some((item: { key: string }) => item.key === "school")).toBe(true);
   });
 });

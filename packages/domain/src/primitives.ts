@@ -1,5 +1,7 @@
 export type EntityId = string;
 export type ISODateTimeString = string;
+export type JsonPrimitive = string | number | boolean | null;
+export type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
 
 export interface TimeRange {
   startsAt: ISODateTimeString;

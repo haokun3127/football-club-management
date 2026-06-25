@@ -11,6 +11,7 @@ export type DomainEventName =
 
 export interface DomainEvent<TName extends DomainEventName = DomainEventName, TPayload = Record<string, unknown>> {
   id: EntityId;
+  clubId: EntityId;
   name: TName;
   occurredAt: ISODateTimeString;
   payload: TPayload;

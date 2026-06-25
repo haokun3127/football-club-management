@@ -1,4 +1,9 @@
-import { derivePlayerMetricRecord, type DerivedMetricResult, type EntityId } from "@football-club/domain";
+import {
+  derivePlayerMetricRecord,
+  isCatalogVisibleToClub,
+  type DerivedMetricResult,
+  type EntityId,
+} from "@football-club/domain";
 import { createSeedData, type SeedData } from "./seed.js";
 
 export class InMemoryStore {
@@ -15,35 +20,62 @@ export class InMemoryStore {
     };
   }
 
-  listCalendarEvents() {
-    return this.data.events.map((event) => ({
-      ...event,
-      participants: this.data.participants.filter((participant) => participant.eventId === event.id),
-      trainingSession: this.data.trainingSessions.find((session) => session.eventId === event.id) ?? null,
-      match: this.data.matches.find((match) => match.eventId === event.id) ?? null,
-    }));
+  listClubs() {
+    return this.data.clubs;
   }
 
-  getStudentTimeline(studentId: EntityId) {
+  getClubConfig(clubId: EntityId) {
+    const club = this.data.clubs.find((item) => item.id === clubId);
+
+    if (!club) {
+      return null;
+    }
+
+    return {
+      club,
+      featureFlags: this.data.featureFlags.filter((item) => item.clubId === clubId),
+      policies: this.data.policies.filter((item) => item.clubId === clubId && item.active),
+      customFields: this.data.customFields.filter((item) => item.clubId === clubId && item.active),
+    };
+  }
+
+  listCalendarEvents(clubId: EntityId) {
+    return this.data.events
+      .filter((event) => event.clubId === clubId)
+      .map((event) => ({
+        ...event,
+        participants: this.data.participants.filter((participant) =>
+          participant.clubId === clubId && participant.eventId === event.id,
+        ),
+        trainingSession:
+          this.data.trainingSessions.find((session) => session.clubId === clubId && session.eventId === event.id)
+          ?? null,
+        match: this.data.matches.find((match) => match.clubId === clubId && match.eventId === event.id) ?? null,
+      }));
+  }
+
+  getStudentTimeline(clubId: EntityId, studentId: EntityId) {
     const eventIds = new Set(
       this.data.participants
-        .filter((participant) => participant.studentId === studentId)
+        .filter((participant) => participant.clubId === clubId && participant.studentId === studentId)
         .map((participant) => participant.eventId),
     );
 
-    return this.listCalendarEvents().filter((event) => eventIds.has(event.id));
+    return this.listCalendarEvents(clubId).filter((event) => eventIds.has(event.id));
   }
 
-  listAbilityMetrics() {
-    return this.data.metrics;
+  listAbilityMetrics(clubId: EntityId) {
+    return this.data.metrics.filter((metric) => isCatalogVisibleToClub(metric, clubId));
   }
 
-  getStudentMetrics(studentId: EntityId) {
-    return this.data.metricRecords.filter((record) => record.studentId === studentId);
+  getStudentMetrics(clubId: EntityId, studentId: EntityId) {
+    return this.data.metricRecords.filter((record) => record.clubId === clubId && record.studentId === studentId);
   }
 
-  computeAttackingContribution(studentId: EntityId): DerivedMetricResult {
-    const definition = this.data.derivedMetricDefinitions.find((item) => item.code === "attacking_contribution");
+  computeAttackingContribution(clubId: EntityId, studentId: EntityId): DerivedMetricResult {
+    const definition = this.data.derivedMetricDefinitions.find((item) =>
+      item.code === "attacking_contribution" && isCatalogVisibleToClub(item, clubId),
+    );
 
     if (!definition) {
       throw new Error("Missing attacking_contribution derived metric definition.");
@@ -52,9 +84,10 @@ export class InMemoryStore {
     const now = new Date().toISOString();
     const result = derivePlayerMetricRecord({
       definition,
-      inputRecords: this.getStudentMetrics(studentId),
-      outputRecordId: `metric-record-${studentId}-attacking-contribution`,
-      lineageId: `lineage-${studentId}-attacking-contribution`,
+      inputRecords: this.getStudentMetrics(clubId, studentId),
+      outputRecordId: `metric-record-${clubId}-${studentId}-attacking-contribution`,
+      lineageId: `lineage-${clubId}-${studentId}-attacking-contribution`,
+      clubId,
       studentId,
       now,
     });

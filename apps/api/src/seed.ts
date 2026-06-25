@@ -1,7 +1,12 @@
 import type {
   AbilityMetric,
   CalendarEvent,
+  Club,
+  ClubFeatureFlag,
+  ClubPolicy,
+  ClubUserMembership,
   CoachProfile,
+  CustomFieldDefinition,
   DevelopmentDimension,
   DerivedMetricDefinition,
   EventParticipant,
@@ -22,8 +27,16 @@ import type {
 } from "@football-club/domain";
 
 const now = "2026-06-25T00:00:00.000Z";
+const clubId = "club-demo";
+const systemCatalog = { scope: "system" } as const;
+const clubCatalog = { scope: "club", clubId } as const;
 
 export interface SeedData {
+  clubs: Club[];
+  clubMemberships: ClubUserMembership[];
+  featureFlags: ClubFeatureFlag[];
+  policies: ClubPolicy[];
+  customFields: CustomFieldDefinition[];
   users: UserAccount[];
   parents: ParentProfile[];
   students: StudentProfile[];
@@ -48,6 +61,18 @@ export interface SeedData {
 
 export function createSeedData(): SeedData {
   return {
+    clubs: [
+      {
+        id: clubId,
+        name: "Demo Football Academy",
+        code: "demo",
+        timezone: "Asia/Hong_Kong",
+        locale: "zh-CN",
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
     users: [
       {
         id: "user-coach-1",
@@ -66,9 +91,74 @@ export function createSeedData(): SeedData {
         updatedAt: now,
       },
     ],
+    clubMemberships: [
+      {
+        id: "club-member-coach-1",
+        clubId,
+        userId: "user-coach-1",
+        roles: ["coach"],
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: "club-member-parent-1",
+        clubId,
+        userId: "user-parent-1",
+        roles: ["parent"],
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
+    featureFlags: [
+      {
+        id: "feature-matches",
+        clubId,
+        feature: "matches",
+        enabled: true,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: "feature-private-lessons",
+        clubId,
+        feature: "private_lessons",
+        enabled: true,
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
+    policies: [
+      {
+        id: "policy-match-event-types",
+        clubId,
+        key: "match_event_types",
+        value: ["goal", "assist", "save", "tackle"],
+        version: "1.0.0",
+        active: true,
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
+    customFields: [
+      {
+        id: "custom-student-school",
+        clubId,
+        target: "student",
+        key: "school",
+        label: "School",
+        valueKind: "text",
+        required: false,
+        active: true,
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
     parents: [
       {
         id: "parent-1",
+        clubId,
         userId: "user-parent-1",
         name: "Li Parent",
         phone: "13800000000",
@@ -79,6 +169,7 @@ export function createSeedData(): SeedData {
     students: [
       {
         id: "student-1",
+        clubId,
         name: "Li Ming",
         birthDate: "2015-05-01",
         gender: "male",
@@ -91,6 +182,7 @@ export function createSeedData(): SeedData {
     guardianBindings: [
       {
         id: "guardian-1",
+        clubId,
         studentId: "student-1",
         parentId: "parent-1",
         relationship: "father",
@@ -102,6 +194,7 @@ export function createSeedData(): SeedData {
     coaches: [
       {
         id: "coach-1",
+        clubId,
         userId: "user-coach-1",
         name: "Chen Coach",
         specialties: ["technical", "U10"],
@@ -113,6 +206,7 @@ export function createSeedData(): SeedData {
     teams: [
       {
         id: "team-u10-dev",
+        clubId,
         name: "U10 Development",
         ageGroup: "U10",
         level: "development",
@@ -123,6 +217,7 @@ export function createSeedData(): SeedData {
       },
       {
         id: "team-weekend-select",
+        clubId,
         name: "Weekend Select",
         ageGroup: "U10-U12",
         level: "advanced",
@@ -135,6 +230,7 @@ export function createSeedData(): SeedData {
     teamMembers: [
       {
         id: "team-member-1",
+        clubId,
         teamId: "team-u10-dev",
         studentId: "student-1",
         startsAt: "2026-06-01",
@@ -145,6 +241,7 @@ export function createSeedData(): SeedData {
       },
       {
         id: "team-member-2",
+        clubId,
         teamId: "team-weekend-select",
         studentId: "student-1",
         startsAt: "2026-06-15",
@@ -157,6 +254,7 @@ export function createSeedData(): SeedData {
     dimensions: [
       {
         id: "dimension-technical",
+        catalogScope: systemCatalog,
         code: "technical",
         name: "Technical",
         createdAt: now,
@@ -164,6 +262,7 @@ export function createSeedData(): SeedData {
       },
       {
         id: "dimension-match",
+        catalogScope: systemCatalog,
         code: "match",
         name: "Match Performance",
         createdAt: now,
@@ -173,6 +272,7 @@ export function createSeedData(): SeedData {
     objectives: [
       {
         id: "objective-finishing",
+        catalogScope: systemCatalog,
         dimensionId: "dimension-technical",
         code: "finishing",
         name: "Finishing",
@@ -183,6 +283,7 @@ export function createSeedData(): SeedData {
     metrics: [
       {
         id: "metric-finishing",
+        catalogScope: systemCatalog,
         code: "finishing_rating",
         name: "Finishing Rating",
         dimensionId: "dimension-technical",
@@ -192,6 +293,7 @@ export function createSeedData(): SeedData {
       },
       {
         id: "metric-goals",
+        catalogScope: systemCatalog,
         code: "match_goals",
         name: "Match Goals",
         dimensionId: "dimension-match",
@@ -202,6 +304,7 @@ export function createSeedData(): SeedData {
       },
       {
         id: "metric-assists",
+        catalogScope: systemCatalog,
         code: "match_assists",
         name: "Match Assists",
         dimensionId: "dimension-match",
@@ -212,6 +315,7 @@ export function createSeedData(): SeedData {
       },
       {
         id: "metric-attacking-contribution",
+        catalogScope: systemCatalog,
         code: "attacking_contribution",
         name: "Attacking Contribution",
         dimensionId: "dimension-match",
@@ -224,6 +328,7 @@ export function createSeedData(): SeedData {
     drills: [
       {
         id: "drill-finishing-1",
+        catalogScope: systemCatalog,
         name: "First-touch finishing from cutback",
         objectiveIds: ["objective-finishing"],
         metricIds: ["metric-finishing"],
@@ -241,6 +346,7 @@ export function createSeedData(): SeedData {
     sessionPlans: [
       {
         id: "session-plan-finishing",
+        catalogScope: clubCatalog,
         name: "U10 Finishing Basics",
         objectiveIds: ["objective-finishing"],
         metricIds: ["metric-finishing"],
@@ -260,6 +366,7 @@ export function createSeedData(): SeedData {
     events: [
       {
         id: "event-training-1",
+        clubId,
         type: "training",
         title: "U10 Development Training",
         timeRange: {
@@ -274,6 +381,7 @@ export function createSeedData(): SeedData {
       },
       {
         id: "event-match-1",
+        clubId,
         type: "match",
         title: "U10 Friendly Match",
         timeRange: {
@@ -290,6 +398,7 @@ export function createSeedData(): SeedData {
     participants: [
       {
         id: "participant-training-1",
+        clubId,
         eventId: "event-training-1",
         studentId: "student-1",
         status: "confirmed",
@@ -298,6 +407,7 @@ export function createSeedData(): SeedData {
       },
       {
         id: "participant-match-1",
+        clubId,
         eventId: "event-match-1",
         studentId: "student-1",
         status: "present",
@@ -308,6 +418,7 @@ export function createSeedData(): SeedData {
     trainingSessions: [
       {
         id: "training-session-1",
+        clubId,
         eventId: "event-training-1",
         kind: "team",
         sessionPlanId: "session-plan-finishing",
@@ -319,6 +430,7 @@ export function createSeedData(): SeedData {
     matches: [
       {
         id: "match-1",
+        clubId,
         eventId: "event-match-1",
         matchType: "friendly",
         opponentName: "City School U10",
@@ -332,6 +444,7 @@ export function createSeedData(): SeedData {
     matchRosters: [
       {
         id: "match-roster-1",
+        clubId,
         matchId: "match-1",
         studentId: "student-1",
         teamId: "team-u10-dev",
@@ -345,6 +458,7 @@ export function createSeedData(): SeedData {
     matchEvents: [
       {
         id: "match-event-goal-1",
+        clubId,
         matchId: "match-1",
         type: "goal",
         studentId: "student-1",
@@ -355,6 +469,7 @@ export function createSeedData(): SeedData {
       },
       {
         id: "match-event-assist-1",
+        clubId,
         matchId: "match-1",
         type: "assist",
         studentId: "student-1",
@@ -367,6 +482,7 @@ export function createSeedData(): SeedData {
     metricRecords: [
       {
         id: "metric-record-goal-1",
+        clubId,
         studentId: "student-1",
         metricId: "metric-goals",
         value: { kind: "count", count: 1 },
@@ -379,6 +495,7 @@ export function createSeedData(): SeedData {
       },
       {
         id: "metric-record-assist-1",
+        clubId,
         studentId: "student-1",
         metricId: "metric-assists",
         value: { kind: "count", count: 1 },
@@ -393,6 +510,7 @@ export function createSeedData(): SeedData {
     derivedMetricDefinitions: [
       {
         id: "derived-attacking-contribution",
+        catalogScope: systemCatalog,
         code: "attacking_contribution",
         name: "Attacking Contribution",
         outputMetricId: "metric-attacking-contribution",

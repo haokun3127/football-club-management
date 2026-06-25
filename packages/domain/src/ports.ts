@@ -1,9 +1,14 @@
 import type { DomainEvent } from "./events.js";
+import type { ClubScoped } from "./clubs.js";
 import type { EntityId, ISODateTimeString } from "./primitives.js";
 
 export interface Repository<TEntity> {
   getById(id: EntityId): Promise<TEntity | null>;
   save(entity: TEntity): Promise<void>;
+}
+
+export interface ClubScopedRepository<TEntity extends ClubScoped> extends Repository<TEntity> {
+  listByClub(clubId: EntityId): Promise<TEntity[]>;
 }
 
 export interface DomainEventPublisher {
