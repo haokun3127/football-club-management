@@ -255,12 +255,58 @@ export const schemas = {
   recordMatch: {
     body: {
       type: "object",
-      additionalProperties: true,
+      additionalProperties: false,
       required: ["eventId", "matchType", "status"],
       properties: {
         eventId: { type: "string", minLength: 1 },
         matchType: { type: "string", minLength: 1 },
         status: { type: "string", minLength: 1 },
+        opponentName: { type: "string" },
+        homeScore: { type: "number" },
+        awayScore: { type: "number" },
+        rosters: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["studentId", "started"],
+            properties: {
+              studentId: { type: "string", minLength: 1 },
+              teamId: { type: "string" },
+              started: { type: "boolean" },
+              minutesPlayed: { type: "number" },
+              position: { type: "string" },
+            },
+          },
+        },
+        events: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["studentId", "type"],
+            properties: {
+              studentId: { type: "string", minLength: 1 },
+              type: { type: "string", minLength: 1 },
+              minute: { type: "number" },
+              note: { type: "string" },
+              linkedMetricId: { type: "string" },
+            },
+          },
+        },
+        notes: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["studentId", "coachId", "note"],
+            properties: {
+              studentId: { type: "string", minLength: 1 },
+              coachId: { type: "string", minLength: 1 },
+              note: { type: "string", minLength: 1 },
+            },
+          },
+        },
       },
     },
     response: {

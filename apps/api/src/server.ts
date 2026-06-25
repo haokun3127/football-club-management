@@ -17,6 +17,11 @@ export interface ServerOptions {
 export function buildServer(store: ApiStore = new InMemoryStore(), options: ServerOptions = {}) {
   const app = Fastify({
     logger: options.logger ?? true,
+    ajv: {
+      customOptions: {
+        removeAdditional: false,
+      },
+    },
   });
   const context = createRouteContext(store, options.membershipResolver);
 

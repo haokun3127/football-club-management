@@ -135,6 +135,27 @@ describe("api server", () => {
     ]);
   });
 
+  it("rejects misspelled match roster payloads", async () => {
+    const app = buildServer(undefined, { logger: false });
+    const response = await app.inject({
+      method: "POST",
+      url: "/clubs/club-demo/matches",
+      payload: {
+        eventId: "event-match-1",
+        matchType: "friendly",
+        status: "completed",
+        roster: [
+          {
+            studentId: "student-1",
+            started: true,
+          },
+        ],
+      },
+    });
+
+    expect(response.statusCode).toBe(400);
+  });
+
   it("records an assessment score and writes assessment metric records", async () => {
     const app = buildServer(undefined, { logger: false });
     const response = await app.inject({
