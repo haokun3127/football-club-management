@@ -23,3 +23,4 @@ This repository uses Git for source control. Keep generated files, dependency fo
 - [多俱乐部解耦分析](docs/multi-club-decoupling.md)
 - [架构骨架质量评测](docs/architecture-quality-assessment.md)
 - [功能设计与技术开发计划](docs/development-plan.md)
+- [开发窗口评估](docs/development-window-evaluation.md)
