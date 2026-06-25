@@ -4,29 +4,37 @@ import {
   type DerivedMetricResult,
   type EntityId,
 } from "@football-club/domain";
+import type { PlatformRepositories } from "./persistence/platform-persistence.js";
 import { createSeedData, type SeedData } from "./seed.js";
 
-export class InMemoryStore {
-  private readonly data: SeedData;
+export interface ApiStore {
+  getHealth(): Promise<{ status: "ok"; service: "@football-club/api" }> | { status: "ok"; service: "@football-club/api" };
+  listClubs(): unknown[] | Promise<unknown[]>;
+  getClubConfig(clubId: EntityId): unknown | null | Promise<unknown | null>;
+  listCalendarEvents(clubId: EntityId): unknown[] | Promise<unknown[]>;
+  getStudentTimeline(clubId: EntityId, studentId: EntityId): unknown[] | Promise<unknown[]>;
+  listAbilityMetrics(clubId: EntityId): unknown[] | Promise<unknown[]>;
+  getStudentMetrics(clubId: EntityId, studentId: EntityId): unknown[] | Promise<unknown[]>;
+  computeAttackingContribution(clubId: EntityId, studentId: EntityId): DerivedMetricResult | Promise<DerivedMetricResult>;
+}
+
+export abstract class SeedBackedStore implements ApiStore {
+  protected readonly data: SeedData;
 
   constructor(data: SeedData = createSeedData()) {
     this.data = data;
   }
 
-  getHealth() {
+  getHealth(): { status: "ok"; service: "@football-club/api" } {
     return {
       status: "ok",
       service: "@football-club/api",
     };
   }
 
-  listClubs() {
-    return this.data.clubs;
-  }
+  abstract listClubs(): unknown[] | Promise<unknown[]>;
 
-  getClubConfig(clubId: EntityId) {
-    const club = this.data.clubs.find((item) => item.id === clubId);
-
+  protected getSeedClubConfig(clubId: EntityId, club: unknown | null) {
     if (!club) {
       return null;
     }
@@ -38,6 +46,8 @@ export class InMemoryStore {
       customFields: this.data.customFields.filter((item) => item.clubId === clubId && item.active),
     };
   }
+
+  abstract getClubConfig(clubId: EntityId): unknown | null | Promise<unknown | null>;
 
   listCalendarEvents(clubId: EntityId) {
     return this.data.events
@@ -93,5 +103,44 @@ export class InMemoryStore {
     });
 
     return result;
+  }
+}
+
+export class InMemoryStore extends SeedBackedStore {
+  override listClubs() {
+    return this.data.clubs;
+  }
+
+  override getClubConfig(clubId: EntityId) {
+    const club = this.data.clubs.find((item) => item.id === clubId) ?? null;
+
+    return this.getSeedClubConfig(clubId, club);
+  }
+}
+
+export class PersistentApiStore extends SeedBackedStore {
+  constructor(
+    private readonly repositories: PlatformRepositories,
+    data: SeedData = createSeedData(),
+  ) {
+    super(data);
+  }
+
+  override async listClubs() {
+    return this.repositories.clubs.list();
+  }
+
+  override async getClubConfig(clubId: EntityId) {
+    const club = await this.repositories.clubs.getById(clubId);
+
+    return this.getSeedClubConfig(clubId, club);
+  }
+
+  async listStudents(clubId: EntityId) {
+    return this.repositories.students.listByClub(clubId);
+  }
+
+  async listTeams(clubId: EntityId) {
+    return this.repositories.teams.listByClub(clubId);
   }
 }

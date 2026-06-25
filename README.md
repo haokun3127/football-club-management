@@ -7,6 +7,7 @@ New project workspace for a football club management application.
 ```bash
 pnpm install
 pnpm check
+pnpm --filter @football-club/api db:migrate
 pnpm dev:api
 ```
 
@@ -24,3 +25,4 @@ This repository uses Git for source control. Keep generated files, dependency fo
 - [架构骨架质量评测](docs/architecture-quality-assessment.md)
 - [功能设计与技术开发计划](docs/development-plan.md)
 - [开发窗口评估](docs/development-window-evaluation.md)
+- [持久化基础](docs/persistence.md)
