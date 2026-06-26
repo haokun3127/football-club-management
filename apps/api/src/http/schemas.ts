@@ -196,6 +196,88 @@ const successArray = (items: unknown) => ({
   403: errorResponse,
 } as const);
 
+const lessonLedgerEntry = {
+  type: "object",
+  additionalProperties: true,
+  required: ["id", "clubId", "studentId", "occurredAt", "entryType", "lessonDelta", "source", "createdAt", "updatedAt"],
+  properties: {
+    id: { type: "string" },
+    clubId: { type: "string" },
+    studentId: { type: "string" },
+    teamId: { type: "string" },
+    eventId: { type: "string" },
+    paymentEventId: { type: "string" },
+    occurredAt: { type: "string" },
+    entryType: { type: "string", enum: ["credit", "debit", "adjustment", "external_snapshot"] },
+    lessonDelta: { type: "number" },
+    balanceAfter: { type: "number" },
+    source: { type: "string" },
+    sourceId: { type: "string" },
+    actorUserId: { type: "string" },
+    note: { type: "string" },
+    ...auditFields,
+  },
+} as const;
+
+const lessonLedgerSummary = {
+  type: "object",
+  additionalProperties: false,
+  required: ["studentId", "clubId", "balance", "entries"],
+  properties: {
+    studentId: { type: "string" },
+    clubId: { type: "string" },
+    balance: { type: "number" },
+    entries: { type: "array", items: lessonLedgerEntry },
+  },
+} as const;
+
+const insurancePolicy = {
+  type: "object",
+  additionalProperties: true,
+  required: ["id", "clubId", "studentId", "expiresAt", "reviewStatus", "currentStatus", "source", "createdAt", "updatedAt"],
+  properties: {
+    id: { type: "string" },
+    clubId: { type: "string" },
+    studentId: { type: "string" },
+    purchasedAt: { type: "string" },
+    expiresAt: { type: "string" },
+    policyNumber: { type: "string" },
+    provider: { type: "string" },
+    sport: { type: "string" },
+    approved: { type: "boolean" },
+    reviewStatus: { type: "string", enum: ["pending", "approved", "rejected"] },
+    currentStatus: { type: "string", enum: ["active", "expired", "pending", "unknown"] },
+    source: { type: "string" },
+    sourceId: { type: "string" },
+    actorUserId: { type: "string" },
+    externalRef: { type: "string" },
+    note: { type: "string" },
+    ...auditFields,
+  },
+} as const;
+
+const insurancePolicySummary = {
+  type: "object",
+  additionalProperties: false,
+  required: ["studentId", "clubId", "current", "policies"],
+  properties: {
+    studentId: { type: "string" },
+    clubId: { type: "string" },
+    current: {
+      type: "object",
+      additionalProperties: false,
+      required: ["status"],
+      properties: {
+        status: { type: "string", enum: ["active", "expired", "pending", "unknown"] },
+        expiresAt: { type: "string" },
+        policyNumber: { type: "string" },
+        reviewStatus: { type: "string", enum: ["pending", "approved", "rejected"] },
+      },
+    },
+    policies: { type: "array", items: insurancePolicy },
+  },
+} as const;
+
 export const schemas = {
   health: {
     response: {
@@ -378,6 +460,88 @@ export const schemas = {
   operationalStudentDetail: {
     response: {
       200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  studentOperationalStatusSummary: {
+    response: {
+      200: {
+        type: "object",
+        additionalProperties: false,
+        required: ["studentId", "clubId", "insurance"],
+        properties: {
+          studentId: { type: "string" },
+          clubId: { type: "string" },
+          lessonBalance: { type: "number" },
+          insurance: insurancePolicySummary.properties.current,
+        },
+      },
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  lessonLedger: {
+    response: {
+      200: lessonLedgerSummary,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  lessonAdjustment: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["entryType", "lessonDelta", "source"],
+      properties: {
+        entryType: { type: "string", enum: ["credit", "debit", "adjustment"] },
+        lessonDelta: { type: "number" },
+        source: { type: "string", enum: ["offline_recharge", "attendance", "manual_adjustment"] },
+        sourceId: { type: "string", minLength: 1 },
+        eventId: { type: "string", minLength: 1 },
+        teamId: { type: "string", minLength: 1 },
+        occurredAt: { type: "string", minLength: 1 },
+        actorUserId: { type: "string", minLength: 1 },
+        amount: { type: "number" },
+        paymentType: { type: "string", minLength: 1 },
+        note: { type: "string" },
+      },
+    },
+    response: {
+      201: lessonLedgerSummary,
+      400: errorResponse,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  insurancePolicies: {
+    response: {
+      200: insurancePolicySummary,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  createInsurancePolicy: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["expiresAt", "reviewStatus"],
+      properties: {
+        purchasedAt: { type: "string", minLength: 1 },
+        expiresAt: { type: "string", minLength: 1 },
+        policyNumber: { type: "string", minLength: 1 },
+        provider: { type: "string", minLength: 1 },
+        sport: { type: "string", minLength: 1 },
+        reviewStatus: { type: "string", enum: ["pending", "approved", "rejected"] },
+        source: { type: "string", enum: ["offline_insurance", "external_import", "manual_review"] },
+        sourceId: { type: "string", minLength: 1 },
+        actorUserId: { type: "string", minLength: 1 },
+        note: { type: "string" },
+      },
+    },
+    response: {
+      201: insurancePolicySummary,
+      400: errorResponse,
       403: errorResponse,
       404: errorResponse,
     },

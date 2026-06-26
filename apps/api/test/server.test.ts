@@ -35,6 +35,10 @@ describe("api server", () => {
     expect(body.paths["/clubs/{clubId}/admin/imports/excel/preview"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/students"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/students/{studentId}"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/admin/students/{studentId}/lesson-ledger"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/admin/students/{studentId}/lesson-adjustments"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/admin/students/{studentId}/insurance-policies"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/students/{studentId}/status-summary"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/sync-runs/{syncRunId}"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/coach/today"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/training/sessions/{trainingSessionId}/observations"]).toBeDefined();
@@ -350,6 +354,214 @@ describe("api server", () => {
     expect(previewResponse.json()).toEqual({
       records: [expect.objectContaining({ id: "external-raw-student-cq-talent", reviewStatus: "confirmed" })],
     });
+  });
+
+  it("records lesson credit, attendance debit, and manual adjustment with balance", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    const creditResponse = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/students/student-1/lesson-adjustments",
+      headers: { "x-user-id": "user-admin-1" },
+      payload: {
+        entryType: "credit",
+        lessonDelta: 12,
+        source: "offline_recharge",
+        sourceId: "offline-payment-1",
+        actorUserId: "user-admin-1",
+        amount: 2400,
+        paymentType: "offline_bank_transfer",
+        note: "Offline recharge confirmed",
+      },
+    });
+    const attendanceResponse = await app.inject({
+      method: "PUT",
+      url: "/clubs/club-chongqing-talent/admin/calendar/events/event-training-1/participants",
+      headers: { "x-user-id": "user-coach-1" },
+      payload: {
+        participants: [{ studentId: "student-1", status: "present" }],
+      },
+    });
+    const adjustmentResponse = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/students/student-1/lesson-adjustments",
+      headers: { "x-user-id": "user-admin-1" },
+      payload: {
+        entryType: "adjustment",
+        lessonDelta: 2,
+        source: "manual_adjustment",
+        sourceId: "manual-adjustment-1",
+        actorUserId: "user-admin-1",
+        note: "Correct offline ledger",
+      },
+    });
+    const ledgerResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/admin/students/student-1/lesson-ledger",
+      headers: { "x-user-id": "user-admin-1" },
+    });
+
+    const ledger = ledgerResponse.json() as {
+      balance: number;
+      entries: Array<{ entryType: string; lessonDelta: number; source: string; sourceId?: string; paymentEventId?: string }>;
+    };
+
+    expect(creditResponse.statusCode).toBe(201);
+    expect(attendanceResponse.statusCode).toBe(200);
+    expect(adjustmentResponse.statusCode).toBe(201);
+    expect(ledgerResponse.statusCode).toBe(200);
+    expect(ledger.balance).toBe(13);
+    expect(ledger.entries).toEqual(expect.arrayContaining([
+      expect.objectContaining({ entryType: "credit", lessonDelta: 12, source: "offline_recharge", sourceId: "offline-payment-1" }),
+      expect.objectContaining({ entryType: "debit", lessonDelta: -1, source: "attendance", sourceId: "event-training-1-student-1" }),
+      expect.objectContaining({ entryType: "adjustment", lessonDelta: 2, source: "manual_adjustment", sourceId: "manual-adjustment-1" }),
+    ]));
+    expect(ledger.entries.find((entry) => entry.entryType === "credit")?.paymentEventId).toBeTruthy();
+
+    await app.close();
+    persistence.database.close();
+  });
+
+  it("keeps insurance renewal history and derives current status", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    const expiredResponse = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/students/student-1/insurance-policies",
+      headers: { "x-user-id": "user-admin-1" },
+      payload: {
+        purchasedAt: "2025-01-01",
+        expiresAt: "2025-12-31",
+        policyNumber: "POLICY-OLD",
+        provider: "Offline Insurance Co",
+        reviewStatus: "approved",
+        source: "offline_insurance",
+        sourceId: "insurance-old",
+        actorUserId: "user-admin-1",
+      },
+    });
+    const renewalResponse = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/students/student-1/insurance-policies",
+      headers: { "x-user-id": "user-admin-1" },
+      payload: {
+        purchasedAt: "2026-06-26",
+        expiresAt: "2027-06-26",
+        policyNumber: "POLICY-NEW",
+        provider: "Offline Insurance Co",
+        reviewStatus: "approved",
+        source: "offline_insurance",
+        sourceId: "insurance-renewal",
+        actorUserId: "user-admin-1",
+      },
+    });
+    const policiesResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/admin/students/student-1/insurance-policies",
+      headers: { "x-user-id": "user-admin-1" },
+    });
+    const summaryResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/students/student-1/status-summary",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+
+    const policies = policiesResponse.json() as {
+      current: { status: string; policyNumber?: string; expiresAt?: string };
+      policies: Array<{ policyNumber?: string; currentStatus: string }>;
+    };
+    const summary = summaryResponse.json() as { insurance: { status: string; policyNumber?: string } };
+
+    expect(expiredResponse.statusCode).toBe(201);
+    expect(renewalResponse.statusCode).toBe(201);
+    expect(policiesResponse.statusCode).toBe(200);
+    expect(policies.current).toEqual(expect.objectContaining({
+      status: "active",
+      policyNumber: "POLICY-NEW",
+      expiresAt: "2027-06-26",
+    }));
+    expect(policies.policies).toHaveLength(2);
+    expect(policies.policies).toEqual(expect.arrayContaining([
+      expect.objectContaining({ policyNumber: "POLICY-OLD", currentStatus: "expired" }),
+      expect.objectContaining({ policyNumber: "POLICY-NEW", currentStatus: "active" }),
+    ]));
+    expect(summaryResponse.statusCode).toBe(200);
+    expect(summary.insurance).toEqual(expect.objectContaining({ status: "active", policyNumber: "POLICY-NEW" }));
+
+    await app.close();
+    persistence.database.close();
+  });
+
+  it("rejects parent and coach writes to lesson recharge and insurance flows", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    const parentLessonWrite = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/students/student-1/lesson-adjustments",
+      headers: { "x-user-id": "user-parent-1" },
+      payload: {
+        entryType: "credit",
+        lessonDelta: 4,
+        source: "offline_recharge",
+      },
+    });
+    const coachLessonWrite = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/students/student-1/lesson-adjustments",
+      headers: { "x-user-id": "user-coach-1" },
+      payload: {
+        entryType: "credit",
+        lessonDelta: 4,
+        source: "offline_recharge",
+      },
+    });
+    const parentInsuranceWrite = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/students/student-1/insurance-policies",
+      headers: { "x-user-id": "user-parent-1" },
+      payload: {
+        expiresAt: "2027-06-26",
+        reviewStatus: "approved",
+      },
+    });
+    const coachInsuranceWrite = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/students/student-1/insurance-policies",
+      headers: { "x-user-id": "user-coach-1" },
+      payload: {
+        expiresAt: "2027-06-26",
+        reviewStatus: "approved",
+      },
+    });
+
+    expect(parentLessonWrite.statusCode).toBe(403);
+    expect(coachLessonWrite.statusCode).toBe(403);
+    expect(parentInsuranceWrite.statusCode).toBe(403);
+    expect(coachInsuranceWrite.statusCode).toBe(403);
+
+    await app.close();
+    persistence.database.close();
   });
 
   it("creates a training session through the training route", async () => {

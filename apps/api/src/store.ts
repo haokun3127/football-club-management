@@ -51,11 +51,18 @@ import type {
   ExternalSyncRun,
   ImportPreview,
   ImportPreviewFilters,
+  InsurancePolicy,
+  InsurancePolicyInput,
+  InsurancePolicySummary,
+  LessonAdjustmentInput,
+  LessonLedgerEntry,
+  LessonLedgerSummary,
   StageExternalImportInput,
   StageExternalImportResult,
   StudentDetail,
   StudentListFilters,
   StudentListItem,
+  StudentOperationalStatusSummary,
   SyncRunDetail,
 } from "./data-capability/types.js";
 import { createApiServices } from "./application/services.js";
@@ -75,6 +82,11 @@ export interface ApiStore {
   getExternalSyncRunDetail(clubId: EntityId, syncRunId: EntityId): SyncRunDetail | null | Promise<SyncRunDetail | null>;
   listOperationalStudents(clubId: EntityId, filters?: StudentListFilters): StudentListItem[] | Promise<StudentListItem[]>;
   getOperationalStudentDetail(clubId: EntityId, studentId: EntityId): StudentDetail | null | Promise<StudentDetail | null>;
+  getStudentOperationalStatusSummary(clubId: EntityId, studentId: EntityId): StudentOperationalStatusSummary | null | Promise<StudentOperationalStatusSummary | null>;
+  getLessonLedger(clubId: EntityId, studentId: EntityId): LessonLedgerSummary | null | Promise<LessonLedgerSummary | null>;
+  recordLessonAdjustment(clubId: EntityId, studentId: EntityId, input: LessonAdjustmentInput): LessonLedgerSummary | Promise<LessonLedgerSummary>;
+  listInsurancePolicies(clubId: EntityId, studentId: EntityId): InsurancePolicySummary | null | Promise<InsurancePolicySummary | null>;
+  createInsurancePolicy(clubId: EntityId, studentId: EntityId, input: InsurancePolicyInput): InsurancePolicySummary | Promise<InsurancePolicySummary>;
   confirmExternalRecord(
     clubId: EntityId,
     rawRecordId: EntityId,
@@ -273,6 +285,56 @@ function buildClubCapabilities(
       latestSyncRuns: latestSyncRuns.slice(0, 10),
     },
   };
+}
+
+function deriveLessonBalance(entries: LessonLedgerEntry[]): number {
+  return [...entries]
+    .sort((left, right) => Date.parse(left.occurredAt) - Date.parse(right.occurredAt) || left.id.localeCompare(right.id))
+    .reduce((balance, entry) => entry.balanceAfter ?? balance + entry.lessonDelta, 0);
+}
+
+function deriveInsuranceCurrentStatus(policy: Pick<InsurancePolicy, "expiresAt" | "reviewStatus"> | undefined, now = new Date()): InsurancePolicy["currentStatus"] {
+  if (!policy) {
+    return "unknown";
+  }
+
+  if (policy.reviewStatus !== "approved") {
+    return "pending";
+  }
+
+  return Date.parse(policy.expiresAt) >= Date.parse(now.toISOString().slice(0, 10)) ? "active" : "expired";
+}
+
+function sortInsurancePolicies(policies: InsurancePolicy[]): InsurancePolicy[] {
+  return [...policies].sort((left, right) =>
+    Date.parse(right.expiresAt) - Date.parse(left.expiresAt) || Date.parse(right.createdAt) - Date.parse(left.createdAt),
+  );
+}
+
+function validateLessonAdjustment(input: LessonAdjustmentInput): void {
+  if (input.entryType === "credit" && input.source !== "offline_recharge") {
+    throw new Error("Lesson credits must come from confirmed offline recharge.");
+  }
+
+  if (input.entryType === "debit" && input.source !== "attendance") {
+    throw new Error("Lesson debits must come from confirmed attendance.");
+  }
+
+  if (input.entryType === "adjustment" && input.source !== "manual_adjustment") {
+    throw new Error("Manual lesson corrections must use manual_adjustment source.");
+  }
+
+  if (input.entryType === "credit" && input.lessonDelta <= 0) {
+    throw new Error("Lesson credit delta must be positive.");
+  }
+
+  if (input.entryType === "debit" && input.lessonDelta >= 0) {
+    throw new Error("Lesson debit delta must be negative.");
+  }
+
+  if (input.entryType === "adjustment" && input.lessonDelta === 0) {
+    throw new Error("Lesson adjustment delta cannot be zero.");
+  }
 }
 
 export abstract class SeedBackedStore implements ApiStore {
@@ -726,6 +788,13 @@ export abstract class SeedBackedStore implements ApiStore {
       ),
     );
 
+    const lessonLedger = this.data.lessonLedger.filter((entry) => entry.clubId === clubId && entry.studentId === studentId);
+    const insurancePolicies = sortInsurancePolicies(
+      this.data.insurancePolicies.filter((policy) => policy.clubId === clubId && policy.studentId === studentId)
+        .map((policy) => ({ ...policy, currentStatus: deriveInsuranceCurrentStatus(policy) })),
+    );
+    const currentInsurance = insurancePolicies[0];
+
     return {
       id: student.id,
       clubId: student.clubId,
@@ -741,11 +810,163 @@ export abstract class SeedBackedStore implements ApiStore {
       contacts: primaryContact
         ? [{ id: primaryContact.id, name: primaryContact.name, phone: primaryContact.phone, relationship: "guardian" }]
         : [],
-      lessonBalance: undefined,
-      lessonLedger: [],
-      insuranceStatus: {},
-      insurancePolicies: [],
-      attendanceSnapshot: {},
+      lessonBalance: lessonLedger.length ? deriveLessonBalance(lessonLedger) : undefined,
+      lessonLedger,
+      insuranceStatus: {
+        status: currentInsurance?.currentStatus ?? "unknown",
+        expiresAt: currentInsurance?.expiresAt,
+        policyNumber: currentInsurance?.policyNumber,
+        reviewStatus: currentInsurance?.reviewStatus,
+      },
+      insurancePolicies,
+      attendanceSnapshot: {
+        lessonBalance: lessonLedger.length ? deriveLessonBalance(lessonLedger) : undefined,
+      },
+    };
+  }
+
+  getStudentOperationalStatusSummary(clubId: EntityId, studentId: EntityId): StudentOperationalStatusSummary | null {
+    const student = this.data.students.find((item) => item.clubId === clubId && item.id === studentId);
+    if (!student) {
+      return null;
+    }
+
+    const lessonLedger = this.data.lessonLedger.filter((entry) => entry.clubId === clubId && entry.studentId === studentId);
+    const insurance = this.listInsurancePolicies(clubId, studentId);
+
+    return {
+      clubId,
+      studentId,
+      lessonBalance: lessonLedger.length ? deriveLessonBalance(lessonLedger) : undefined,
+      insurance: insurance?.current ?? { status: "unknown" },
+    };
+  }
+
+  getLessonLedger(clubId: EntityId, studentId: EntityId): LessonLedgerSummary | null {
+    const student = this.data.students.find((item) => item.clubId === clubId && item.id === studentId);
+    if (!student) {
+      return null;
+    }
+
+    const entries = this.data.lessonLedger
+      .filter((entry) => entry.clubId === clubId && entry.studentId === studentId)
+      .sort((left, right) => Date.parse(right.occurredAt) - Date.parse(left.occurredAt) || right.id.localeCompare(left.id));
+
+    return {
+      clubId,
+      studentId,
+      balance: deriveLessonBalance(entries),
+      entries,
+    };
+  }
+
+  recordLessonAdjustment(clubId: EntityId, studentId: EntityId, input: LessonAdjustmentInput): LessonLedgerSummary {
+    const student = this.data.students.find((item) => item.clubId === clubId && item.id === studentId);
+    if (!student) {
+      throw new Error("Student not found for club.");
+    }
+
+    validateLessonAdjustment(input);
+    const now = this.now();
+    const paymentEventId = input.entryType === "credit" ? this.nextId("payment-event") : undefined;
+    const id = input.sourceId ? `lesson-ledger-${input.entryType}-${input.sourceId}` : this.nextId(`lesson-ledger-${input.entryType}`);
+    const existingEntry = this.data.lessonLedger.find((entry) => entry.clubId === clubId && entry.id === id);
+    if (existingEntry) {
+      return this.getLessonLedger(clubId, studentId) ?? {
+        clubId,
+        studentId,
+        balance: existingEntry.balanceAfter ?? 0,
+        entries: [existingEntry],
+      };
+    }
+    const existingEntries = this.data.lessonLedger.filter((entry) => entry.clubId === clubId && entry.studentId === studentId);
+    const balanceAfter = deriveLessonBalance(existingEntries) + input.lessonDelta;
+    const entry: LessonLedgerEntry = {
+      id,
+      clubId,
+      studentId,
+      teamId: input.teamId,
+      eventId: input.eventId,
+      paymentEventId,
+      occurredAt: input.occurredAt ?? now,
+      entryType: input.entryType,
+      lessonDelta: input.lessonDelta,
+      balanceAfter,
+      source: input.source,
+      sourceId: input.sourceId,
+      actorUserId: input.actorUserId,
+      note: input.note,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    upsertById(this.data.lessonLedger, entry);
+    return this.getLessonLedger(clubId, studentId) ?? {
+      clubId,
+      studentId,
+      balance: balanceAfter,
+      entries: [entry],
+    };
+  }
+
+  listInsurancePolicies(clubId: EntityId, studentId: EntityId): InsurancePolicySummary | null {
+    const student = this.data.students.find((item) => item.clubId === clubId && item.id === studentId);
+    if (!student) {
+      return null;
+    }
+
+    const policies = sortInsurancePolicies(
+      this.data.insurancePolicies.filter((policy) => policy.clubId === clubId && policy.studentId === studentId)
+        .map((policy) => ({ ...policy, currentStatus: deriveInsuranceCurrentStatus(policy) })),
+    );
+    const current = policies[0];
+
+    return {
+      clubId,
+      studentId,
+      current: {
+        status: current?.currentStatus ?? "unknown",
+        expiresAt: current?.expiresAt,
+        policyNumber: current?.policyNumber,
+        reviewStatus: current?.reviewStatus,
+      },
+      policies,
+    };
+  }
+
+  createInsurancePolicy(clubId: EntityId, studentId: EntityId, input: InsurancePolicyInput): InsurancePolicySummary {
+    const student = this.data.students.find((item) => item.clubId === clubId && item.id === studentId);
+    if (!student) {
+      throw new Error("Student not found for club.");
+    }
+
+    const now = this.now();
+    const policy: InsurancePolicy = {
+      id: this.nextId("insurance-policy"),
+      clubId,
+      studentId,
+      purchasedAt: input.purchasedAt,
+      expiresAt: input.expiresAt,
+      policyNumber: input.policyNumber,
+      provider: input.provider,
+      sport: input.sport,
+      approved: input.reviewStatus === "approved" ? true : input.reviewStatus === "rejected" ? false : undefined,
+      reviewStatus: input.reviewStatus,
+      currentStatus: deriveInsuranceCurrentStatus({ expiresAt: input.expiresAt, reviewStatus: input.reviewStatus }),
+      source: input.source ?? "offline_insurance",
+      sourceId: input.sourceId,
+      actorUserId: input.actorUserId,
+      note: input.note,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    this.data.insurancePolicies.push(policy);
+    return this.listInsurancePolicies(clubId, studentId) ?? {
+      clubId,
+      studentId,
+      current: { status: policy.currentStatus, expiresAt: policy.expiresAt, policyNumber: policy.policyNumber, reviewStatus: policy.reviewStatus },
+      policies: [policy],
     };
   }
 
@@ -899,7 +1120,24 @@ export abstract class SeedBackedStore implements ApiStore {
     eventId: EntityId,
     participants: Parameters<ReturnType<typeof createApiServices>["recordEventParticipants"]>[2],
   ) {
-    return this.activityServices.recordEventParticipants(clubId, eventId, participants);
+    const result = this.activityServices.recordEventParticipants(clubId, eventId, participants);
+    for (const participant of result) {
+      if (participant.status !== "present" && participant.status !== "late") {
+        continue;
+      }
+
+      this.recordLessonAdjustment(clubId, participant.studentId, {
+        entryType: "debit",
+        lessonDelta: -1,
+        source: "attendance",
+        sourceId: `${eventId}-${participant.studentId}`,
+        eventId,
+        occurredAt: participant.updatedAt,
+        note: `Attendance ${participant.status}`,
+      });
+    }
+
+    return result;
   }
 
   checkScheduleConflicts(
@@ -1208,6 +1446,38 @@ export class PersistentApiStore extends SeedBackedStore {
 
   override getOperationalStudentDetail(clubId: EntityId, studentId: EntityId) {
     return this.repositories.dataCapability.getStudentDetail(clubId, studentId);
+  }
+
+  override getStudentOperationalStatusSummary(clubId: EntityId, studentId: EntityId) {
+    return this.repositories.dataCapability.getStudentOperationalStatusSummary(clubId, studentId);
+  }
+
+  override getLessonLedger(clubId: EntityId, studentId: EntityId) {
+    return this.repositories.dataCapability.getLessonLedger(clubId, studentId);
+  }
+
+  override recordLessonAdjustment(clubId: EntityId, studentId: EntityId, input: LessonAdjustmentInput) {
+    const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const id = input.sourceId ? `lesson-ledger-${input.entryType}-${input.sourceId}` : `lesson-ledger-${input.entryType}-${suffix}`;
+    const paymentEventId = input.entryType === "credit" ? `payment-event-${suffix}` : undefined;
+
+    return this.repositories.dataCapability.recordLessonAdjustment(clubId, studentId, input, {
+      id,
+      paymentEventId,
+      now: new Date().toISOString(),
+    });
+  }
+
+  override listInsurancePolicies(clubId: EntityId, studentId: EntityId) {
+    return this.repositories.dataCapability.listInsurancePolicies(clubId, studentId);
+  }
+
+  override createInsurancePolicy(clubId: EntityId, studentId: EntityId, input: InsurancePolicyInput) {
+    const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    return this.repositories.dataCapability.createInsurancePolicy(clubId, studentId, input, {
+      id: `insurance-policy-${suffix}`,
+      now: new Date().toISOString(),
+    });
   }
 
   override stageExternalImport(clubId: EntityId, input: StageExternalImportInput): StageExternalImportResult {

@@ -13,6 +13,7 @@ describe("platform persistence", () => {
     expect(first.applied).toEqual([
       "0001_platform_foundation.sql",
       "0002_data_capability_foundation.sql",
+      "0003_status_flow_audit_fields.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);
