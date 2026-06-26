@@ -7,6 +7,7 @@ import { InMemoryStore, type ApiStore } from "./store.js";
 import { registerAssessmentRoutes } from "./routes/assessment.routes.js";
 import { registerCalendarRoutes } from "./routes/calendar.routes.js";
 import { createRouteContext } from "./routes/context.js";
+import { registerDataCapabilityRoutes } from "./routes/data-capability.routes.js";
 import { registerMatchRoutes } from "./routes/match.routes.js";
 import { registerMetricsRoutes } from "./routes/metrics.routes.js";
 import { registerPlatformRoutes } from "./routes/platform.routes.js";
@@ -48,6 +49,7 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
   app.get("/openapi.json", async () => buildOpenApiDocument());
 
   void app.register(registerPlatformRoutes, context);
+  void app.register(registerDataCapabilityRoutes, context);
   void app.register(registerCalendarRoutes, context);
   void app.register(registerTrainingRoutes, context);
   void app.register(registerMatchRoutes, context);

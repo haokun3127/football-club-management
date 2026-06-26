@@ -1,5 +1,6 @@
 import type { DatabaseSync } from "node:sqlite";
 import { createSeedData, type SeedData } from "../seed.js";
+import { DataCapabilityRepository } from "./data-capability-repositories.js";
 import {
   ClubRepository,
   ClubUserMembershipRepository,
@@ -21,6 +22,7 @@ export interface PlatformRepositories {
   coaches: CoachProfileRepository;
   teams: TeamRepository;
   teamMembers: TeamMemberRepository;
+  dataCapability: DataCapabilityRepository;
 }
 
 export interface PlatformPersistence {
@@ -38,6 +40,7 @@ export function createPlatformRepositories(database: DatabaseSync): PlatformRepo
     coaches: new CoachProfileRepository(database),
     teams: new TeamRepository(database),
     teamMembers: new TeamMemberRepository(database),
+    dataCapability: new DataCapabilityRepository(database),
   };
 }
 
@@ -72,6 +75,26 @@ export async function seedPlatformData(repositories: PlatformRepositories, data:
 
   for (const teamMember of data.teamMembers) {
     await repositories.teamMembers.save(teamMember);
+  }
+
+  for (const connection of data.externalConnections) {
+    repositories.dataCapability.saveExternalConnection(connection);
+  }
+
+  for (const tableMapping of data.externalTableMappings) {
+    repositories.dataCapability.saveExternalTableMapping(tableMapping);
+  }
+
+  for (const fieldMapping of data.externalFieldMappings) {
+    repositories.dataCapability.saveExternalFieldMapping(fieldMapping);
+  }
+
+  for (const syncRun of data.externalSyncRuns) {
+    repositories.dataCapability.saveExternalSyncRun(syncRun);
+  }
+
+  for (const rawRecord of data.externalRawRecords) {
+    repositories.dataCapability.saveExternalRawRecord(rawRecord);
   }
 }
 

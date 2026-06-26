@@ -40,6 +40,14 @@ import type {
   TrainingSession,
   UserAccount,
 } from "@football-club/domain";
+import type {
+  ExternalFieldMapping,
+  ExternalRawRecord,
+  ExternalRecordLink,
+  ExternalSyncRun,
+  ExternalSystemConnection,
+  ExternalTableMapping,
+} from "../data-capability/types.js";
 
 export const seedNow = "2026-06-25T00:00:00.000Z";
 export const demoClubId = "club-demo";
@@ -87,4 +95,10 @@ export interface SeedData {
   metricRecords: PlayerMetricRecord[];
   metricLineages: MetricLineage[];
   derivedMetricDefinitions: DerivedMetricDefinition[];
+  externalConnections: ExternalSystemConnection[];
+  externalTableMappings: ExternalTableMapping[];
+  externalFieldMappings: ExternalFieldMapping[];
+  externalSyncRuns: ExternalSyncRun[];
+  externalRawRecords: ExternalRawRecord[];
+  externalRecordLinks: ExternalRecordLink[];
 }

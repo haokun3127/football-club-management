@@ -36,6 +36,11 @@ export const errorResponse = {
   },
 } as const;
 
+const flexibleObject = {
+  type: "object",
+  additionalProperties: true,
+} as const;
+
 const metricValue = {
   oneOf: [
     {
@@ -187,6 +192,66 @@ export const schemas = {
         clubId: { type: "string", minLength: 1 },
         eventId: { type: "string", minLength: 1 },
       },
+    },
+  },
+  clubRawRecordParams: {
+    params: {
+      type: "object",
+      additionalProperties: false,
+      required: ["clubId", "rawRecordId"],
+      properties: {
+        clubId: { type: "string", minLength: 1 },
+        rawRecordId: { type: "string", minLength: 1 },
+      },
+    },
+  },
+  importPreviewQuery: {
+    querystring: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        connectionId: { type: "string", minLength: 1 },
+        tableMappingId: { type: "string", minLength: 1 },
+        reviewStatus: { type: "string", enum: ["pending", "confirmed", "rejected", "linked"] },
+      },
+    },
+  },
+  dataCapabilityConfig: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+    },
+  },
+  importPreview: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+    },
+  },
+  syncRuns: {
+    response: {
+      200: {
+        type: "array",
+        items: flexibleObject,
+      },
+      403: errorResponse,
+    },
+  },
+  confirmExternalRecord: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["targetType", "targetId"],
+      properties: {
+        targetType: { type: "string", minLength: 1 },
+        targetId: { type: "string", minLength: 1 },
+        confirmedBy: { type: "string", minLength: 1 },
+      },
+    },
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
     },
   },
   createTeam: {

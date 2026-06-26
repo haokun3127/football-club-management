@@ -78,6 +78,76 @@ describe("api server", () => {
     expect(body.customFields.some((item: { key: string }) => item.key === "school")).toBe(true);
   });
 
+  it("returns data capability config and staged import status", async () => {
+    const app = buildServer(undefined, { logger: false });
+    const configResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-demo/admin/data/config",
+    });
+    const previewResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-demo/admin/import-preview?reviewStatus=pending",
+    });
+    const syncRunsResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-demo/admin/sync-runs",
+    });
+
+    const config = configResponse.json() as {
+      metricGraphVersions: Array<{ id: string }>;
+      assessmentTemplateVersions: Array<{ id: string; graphVersionId?: string }>;
+      externalConnections: Array<{ provider: string }>;
+    };
+    const preview = previewResponse.json() as { records: Array<{ id: string; reviewStatus: string }> };
+    const syncRuns = syncRunsResponse.json() as Array<{ id: string; status: string }>;
+
+    expect(configResponse.statusCode).toBe(200);
+    expect(config.metricGraphVersions).toEqual([expect.objectContaining({ id: "metric-graph-version-demo" })]);
+    expect(config.assessmentTemplateVersions).toEqual([
+      expect.objectContaining({
+        id: "assessment-template-version-technical-1",
+        graphVersionId: "metric-graph-version-demo",
+      }),
+    ]);
+    expect(config.externalConnections).toEqual([expect.objectContaining({ provider: "wps" })]);
+    expect(preview.records).toEqual([
+      expect.objectContaining({
+        id: "external-raw-student-demo",
+        reviewStatus: "pending",
+      }),
+    ]);
+    expect(syncRuns).toEqual([expect.objectContaining({ id: "external-sync-run-demo", status: "completed" })]);
+  });
+
+  it("confirms staged external records without realtime external sync", async () => {
+    const app = buildServer(undefined, { logger: false });
+    const confirmResponse = await app.inject({
+      method: "POST",
+      url: "/clubs/club-demo/admin/external-records/external-raw-student-demo/confirm",
+      payload: {
+        targetType: "student",
+        targetId: "student-1",
+        confirmedBy: "user-coach-1",
+      },
+    });
+    const previewResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-demo/admin/import-preview?reviewStatus=confirmed",
+    });
+
+    expect(confirmResponse.statusCode).toBe(200);
+    expect(confirmResponse.json()).toEqual(expect.objectContaining({
+      clubId: "club-demo",
+      rawRecordId: "external-raw-student-demo",
+      targetType: "student",
+      targetId: "student-1",
+      linkStatus: "confirmed",
+    }));
+    expect(previewResponse.json()).toEqual({
+      records: [expect.objectContaining({ id: "external-raw-student-demo", reviewStatus: "confirmed" })],
+    });
+  });
+
   it("creates a training session through the training route", async () => {
     const app = buildServer(undefined, { logger: false });
 

@@ -216,8 +216,8 @@ CREATE INDEX IF NOT EXISTS idx_communication_logs_club_student
 
 CREATE TABLE IF NOT EXISTS ability_metrics (
   id TEXT PRIMARY KEY,
-  scope TEXT NOT NULL CHECK (scope IN ('system', 'club')),
-  club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
+  catalog_scope TEXT NOT NULL CHECK (catalog_scope IN ('system', 'club')),
+  scope_club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
   base_item_id TEXT,
   code TEXT NOT NULL,
   name TEXT NOT NULL,
@@ -232,27 +232,27 @@ CREATE TABLE IF NOT EXISTS ability_metrics (
   description TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
-  CHECK ((scope = 'system' AND club_id IS NULL) OR (scope = 'club' AND club_id IS NOT NULL)),
-  UNIQUE (scope, club_id, code, version)
+  CHECK ((catalog_scope = 'system' AND scope_club_id IS NULL) OR (catalog_scope = 'club' AND scope_club_id IS NOT NULL)),
+  UNIQUE (catalog_scope, scope_club_id, code, version)
 );
 
 CREATE TABLE IF NOT EXISTS metric_graph_versions (
   id TEXT PRIMARY KEY,
-  scope TEXT NOT NULL CHECK (scope IN ('system', 'club')),
-  club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
+  catalog_scope TEXT NOT NULL CHECK (catalog_scope IN ('system', 'club')),
+  scope_club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
   base_item_id TEXT,
   name TEXT NOT NULL,
   version TEXT NOT NULL,
   status TEXT NOT NULL CHECK (status IN ('draft', 'active', 'archived')),
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
-  CHECK ((scope = 'system' AND club_id IS NULL) OR (scope = 'club' AND club_id IS NOT NULL))
+  CHECK ((catalog_scope = 'system' AND scope_club_id IS NULL) OR (catalog_scope = 'club' AND scope_club_id IS NOT NULL))
 );
 
 CREATE TABLE IF NOT EXISTS metric_dependencies (
   id TEXT PRIMARY KEY,
-  scope TEXT NOT NULL CHECK (scope IN ('system', 'club')),
-  club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
+  catalog_scope TEXT NOT NULL CHECK (catalog_scope IN ('system', 'club')),
+  scope_club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
   base_item_id TEXT,
   graph_version_id TEXT NOT NULL REFERENCES metric_graph_versions(id) ON DELETE CASCADE,
   output_metric_id TEXT NOT NULL REFERENCES ability_metrics(id) ON DELETE CASCADE,
@@ -263,7 +263,7 @@ CREATE TABLE IF NOT EXISTS metric_dependencies (
   sort_order INTEGER NOT NULL,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
-  CHECK ((scope = 'system' AND club_id IS NULL) OR (scope = 'club' AND club_id IS NOT NULL))
+  CHECK ((catalog_scope = 'system' AND scope_club_id IS NULL) OR (catalog_scope = 'club' AND scope_club_id IS NOT NULL))
 );
 
 CREATE INDEX IF NOT EXISTS idx_metric_dependencies_graph_output
@@ -271,21 +271,21 @@ CREATE INDEX IF NOT EXISTS idx_metric_dependencies_graph_output
 
 CREATE TABLE IF NOT EXISTS metric_views (
   id TEXT PRIMARY KEY,
-  scope TEXT NOT NULL CHECK (scope IN ('system', 'club')),
-  club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
+  catalog_scope TEXT NOT NULL CHECK (catalog_scope IN ('system', 'club')),
+  scope_club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
   base_item_id TEXT,
   graph_version_id TEXT NOT NULL REFERENCES metric_graph_versions(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   status TEXT NOT NULL CHECK (status IN ('draft', 'active', 'archived')),
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
-  CHECK ((scope = 'system' AND club_id IS NULL) OR (scope = 'club' AND club_id IS NOT NULL))
+  CHECK ((catalog_scope = 'system' AND scope_club_id IS NULL) OR (catalog_scope = 'club' AND scope_club_id IS NOT NULL))
 );
 
 CREATE TABLE IF NOT EXISTS metric_view_nodes (
   id TEXT PRIMARY KEY,
-  scope TEXT NOT NULL CHECK (scope IN ('system', 'club')),
-  club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
+  catalog_scope TEXT NOT NULL CHECK (catalog_scope IN ('system', 'club')),
+  scope_club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
   base_item_id TEXT,
   view_id TEXT NOT NULL REFERENCES metric_views(id) ON DELETE CASCADE,
   metric_id TEXT REFERENCES ability_metrics(id) ON DELETE SET NULL,
@@ -294,13 +294,13 @@ CREATE TABLE IF NOT EXISTS metric_view_nodes (
   sort_order INTEGER NOT NULL,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
-  CHECK ((scope = 'system' AND club_id IS NULL) OR (scope = 'club' AND club_id IS NOT NULL))
+  CHECK ((catalog_scope = 'system' AND scope_club_id IS NULL) OR (catalog_scope = 'club' AND scope_club_id IS NOT NULL))
 );
 
 CREATE TABLE IF NOT EXISTS assessment_templates (
   id TEXT PRIMARY KEY,
-  scope TEXT NOT NULL CHECK (scope IN ('system', 'club')),
-  club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
+  catalog_scope TEXT NOT NULL CHECK (catalog_scope IN ('system', 'club')),
+  scope_club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
   base_item_id TEXT,
   name TEXT NOT NULL,
   age_group TEXT,
@@ -308,7 +308,7 @@ CREATE TABLE IF NOT EXISTS assessment_templates (
   status TEXT NOT NULL CHECK (status IN ('active', 'inactive')),
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
-  CHECK ((scope = 'system' AND club_id IS NULL) OR (scope = 'club' AND club_id IS NOT NULL))
+  CHECK ((catalog_scope = 'system' AND scope_club_id IS NULL) OR (catalog_scope = 'club' AND scope_club_id IS NOT NULL))
 );
 
 CREATE TABLE IF NOT EXISTS assessment_template_versions (
@@ -420,8 +420,8 @@ CREATE INDEX IF NOT EXISTS idx_player_metric_records_club_student
 
 CREATE TABLE IF NOT EXISTS derived_metric_definitions (
   id TEXT PRIMARY KEY,
-  scope TEXT NOT NULL CHECK (scope IN ('system', 'club')),
-  club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
+  catalog_scope TEXT NOT NULL CHECK (catalog_scope IN ('system', 'club')),
+  scope_club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
   base_item_id TEXT,
   code TEXT NOT NULL,
   name TEXT NOT NULL,
@@ -437,7 +437,7 @@ CREATE TABLE IF NOT EXISTS derived_metric_definitions (
   output_unit TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
-  CHECK ((scope = 'system' AND club_id IS NULL) OR (scope = 'club' AND club_id IS NOT NULL))
+  CHECK ((catalog_scope = 'system' AND scope_club_id IS NULL) OR (catalog_scope = 'club' AND scope_club_id IS NOT NULL))
 );
 
 CREATE TABLE IF NOT EXISTS metric_lineages (
@@ -457,76 +457,94 @@ CREATE TABLE IF NOT EXISTS external_system_connections (
   club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
   provider TEXT NOT NULL,
   name TEXT NOT NULL,
-  status TEXT NOT NULL CHECK (status IN ('active', 'inactive')),
-  credentials_ref TEXT,
-  settings_json TEXT,
+  status TEXT NOT NULL CHECK (status IN ('draft', 'active', 'paused', 'disabled')),
+  config_json TEXT NOT NULL,
+  last_synced_at TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
+
+CREATE INDEX IF NOT EXISTS idx_external_system_connections_club_status
+  ON external_system_connections (club_id, status);
 
 CREATE TABLE IF NOT EXISTS external_table_mappings (
   id TEXT PRIMARY KEY,
   club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
   connection_id TEXT NOT NULL REFERENCES external_system_connections(id) ON DELETE CASCADE,
-  source_table_key TEXT NOT NULL,
-  target_kind TEXT NOT NULL,
-  version TEXT NOT NULL,
-  active INTEGER NOT NULL CHECK (active IN (0, 1)),
+  external_table_key TEXT NOT NULL,
+  target_type TEXT NOT NULL,
+  mapping_version TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('draft', 'active', 'archived')),
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
-  UNIQUE (club_id, connection_id, source_table_key, version)
+  UNIQUE (club_id, connection_id, external_table_key, mapping_version)
 );
+
+CREATE INDEX IF NOT EXISTS idx_external_table_mappings_club_connection
+  ON external_table_mappings (club_id, connection_id, status);
 
 CREATE TABLE IF NOT EXISTS external_field_mappings (
   id TEXT PRIMARY KEY,
   club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
   table_mapping_id TEXT NOT NULL REFERENCES external_table_mappings(id) ON DELETE CASCADE,
-  source_field TEXT NOT NULL,
-  target_field TEXT NOT NULL,
-  value_kind TEXT,
+  external_field_key TEXT NOT NULL,
+  target_field_key TEXT NOT NULL,
+  target_field_kind TEXT NOT NULL,
   required INTEGER NOT NULL CHECK (required IN (0, 1)),
   transform_json TEXT,
-  sort_order INTEGER NOT NULL,
   created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL
+  updated_at TEXT NOT NULL,
+  UNIQUE (club_id, table_mapping_id, external_field_key)
 );
+
+CREATE INDEX IF NOT EXISTS idx_external_field_mappings_club_table
+  ON external_field_mappings (club_id, table_mapping_id);
 
 CREATE TABLE IF NOT EXISTS external_sync_runs (
   id TEXT PRIMARY KEY,
   club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
-  connection_id TEXT REFERENCES external_system_connections(id) ON DELETE SET NULL,
+  connection_id TEXT NOT NULL REFERENCES external_system_connections(id) ON DELETE CASCADE,
   table_mapping_id TEXT REFERENCES external_table_mappings(id) ON DELETE SET NULL,
-  source_version TEXT,
-  status TEXT NOT NULL CHECK (status IN ('pending', 'running', 'completed', 'failed')),
-  started_at TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('queued', 'running', 'completed', 'failed', 'cancelled')),
+  started_at TEXT,
   finished_at TEXT,
-  created_count INTEGER NOT NULL DEFAULT 0,
-  updated_count INTEGER NOT NULL DEFAULT 0,
-  skipped_count INTEGER NOT NULL DEFAULT 0,
-  failed_count INTEGER NOT NULL DEFAULT 0,
+  total_records INTEGER NOT NULL DEFAULT 0,
+  imported_records INTEGER NOT NULL DEFAULT 0,
+  failed_records INTEGER NOT NULL DEFAULT 0,
   error_json TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
 
+CREATE INDEX IF NOT EXISTS idx_external_sync_runs_club_connection
+  ON external_sync_runs (club_id, connection_id, created_at);
+
 CREATE INDEX IF NOT EXISTS idx_external_sync_runs_club_status
-  ON external_sync_runs (club_id, status, started_at);
+  ON external_sync_runs (club_id, status, created_at);
 
 CREATE TABLE IF NOT EXISTS external_raw_records (
   id TEXT PRIMARY KEY,
   club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
-  sync_run_id TEXT NOT NULL REFERENCES external_sync_runs(id) ON DELETE CASCADE,
+  connection_id TEXT NOT NULL REFERENCES external_system_connections(id) ON DELETE CASCADE,
   table_mapping_id TEXT REFERENCES external_table_mappings(id) ON DELETE SET NULL,
-  external_record_id TEXT,
-  row_number INTEGER,
-  row_hash TEXT NOT NULL,
-  raw_json TEXT NOT NULL,
-  status TEXT NOT NULL CHECK (status IN ('pending', 'mapped', 'skipped', 'failed')),
-  error_json TEXT,
+  sync_run_id TEXT REFERENCES external_sync_runs(id) ON DELETE SET NULL,
+  external_record_id TEXT NOT NULL,
+  payload_json TEXT NOT NULL,
+  payload_hash TEXT NOT NULL,
+  review_status TEXT NOT NULL CHECK (review_status IN ('pending', 'confirmed', 'rejected', 'linked')),
+  validation_errors_json TEXT,
+  normalized_preview_json TEXT,
+  imported_at TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
-  UNIQUE (club_id, sync_run_id, row_hash)
+  UNIQUE (connection_id, external_record_id, payload_hash)
 );
+
+CREATE INDEX IF NOT EXISTS idx_external_raw_records_club_status
+  ON external_raw_records (club_id, review_status, created_at);
+
+CREATE INDEX IF NOT EXISTS idx_external_raw_records_club_sync_run
+  ON external_raw_records (club_id, sync_run_id);
 
 CREATE TABLE IF NOT EXISTS external_record_links (
   id TEXT PRIMARY KEY,
@@ -534,8 +552,15 @@ CREATE TABLE IF NOT EXISTS external_record_links (
   raw_record_id TEXT NOT NULL REFERENCES external_raw_records(id) ON DELETE CASCADE,
   target_type TEXT NOT NULL,
   target_id TEXT NOT NULL,
-  link_kind TEXT NOT NULL,
+  link_status TEXT NOT NULL CHECK (link_status IN ('confirmed', 'rejected', 'superseded')),
+  confirmed_by TEXT REFERENCES user_accounts(id) ON DELETE SET NULL,
+  confirmed_at TEXT NOT NULL,
   created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL,
-  UNIQUE (club_id, raw_record_id, target_type, target_id, link_kind)
+  updated_at TEXT NOT NULL
 );
+
+CREATE INDEX IF NOT EXISTS idx_external_record_links_club_raw
+  ON external_record_links (club_id, raw_record_id, link_status);
+
+CREATE INDEX IF NOT EXISTS idx_external_record_links_club_target
+  ON external_record_links (club_id, target_type, target_id);

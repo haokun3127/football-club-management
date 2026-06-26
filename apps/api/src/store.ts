@@ -21,6 +21,10 @@ import {
   type MatchPlayerNote,
   type MatchRoster,
   type MetricLineage,
+  type MetricGraphVersion,
+  type MetricDependency,
+  type MetricView,
+  type MetricViewNode,
   type MetricSourceKind,
   type OtherActivity,
   type PlayerAssessment,
@@ -34,6 +38,15 @@ import {
   type TeamMember,
   type TrainingSession,
 } from "@football-club/domain";
+import type {
+  ConfirmExternalRecordInput,
+  DataCapabilityConfig,
+  ExternalRawRecord,
+  ExternalRecordLink,
+  ExternalSyncRun,
+  ImportPreview,
+  ImportPreviewFilters,
+} from "./data-capability/types.js";
 import { createApiServices } from "./application/services.js";
 import type { PlatformRepositories } from "./persistence/platform-persistence.js";
 import { createSeedData, type SeedData } from "./seed.js";
@@ -43,9 +56,21 @@ export interface ApiStore {
   listClubs(): Club[] | Promise<Club[]>;
   getClubById(clubId: EntityId): Club | null;
   getClubConfig(clubId: EntityId): unknown | null | Promise<unknown | null>;
+  getDataCapabilityConfig(clubId: EntityId): DataCapabilityConfig | Promise<DataCapabilityConfig>;
+  getImportPreview(clubId: EntityId, filters?: ImportPreviewFilters): ImportPreview | Promise<ImportPreview>;
+  listExternalSyncRuns(clubId: EntityId): ExternalSyncRun[] | Promise<ExternalSyncRun[]>;
+  confirmExternalRecord(
+    clubId: EntityId,
+    rawRecordId: EntityId,
+    input: ConfirmExternalRecordInput,
+  ): ExternalRecordLink | null | Promise<ExternalRecordLink | null>;
   listCalendarEvents(clubId: EntityId): unknown[];
   getStudentTimeline(clubId: EntityId, studentId: EntityId): unknown[];
   listAbilityMetrics(clubId: EntityId): unknown[];
+  listMetricGraphVersions(clubId: EntityId): MetricGraphVersion[];
+  listMetricDependencies(clubId: EntityId): MetricDependency[];
+  listMetricViews(clubId: EntityId): MetricView[];
+  listMetricViewNodes(clubId: EntityId): MetricViewNode[];
   getStudentMetrics(clubId: EntityId, studentId: EntityId, source?: MetricSourceKind | MetricSourceKind[]): PlayerMetricRecord[];
   computeAttackingContribution(clubId: EntityId, studentId: EntityId): Promise<DerivedMetricResult>;
   createTeam(input: Parameters<ReturnType<typeof createApiServices>["createTeam"]>[0]): Team;
@@ -290,6 +315,22 @@ export abstract class SeedBackedStore implements ApiStore {
     return this.data.metrics.filter((item) => isCatalogVisibleToClub(item, clubId));
   }
 
+  listMetricGraphVersions(clubId: EntityId): MetricGraphVersion[] {
+    return this.data.metricGraphVersions.filter((item) => isCatalogVisibleToClub(item, clubId));
+  }
+
+  listMetricDependencies(clubId: EntityId): MetricDependency[] {
+    return this.data.metricDependencies.filter((item) => isCatalogVisibleToClub(item, clubId));
+  }
+
+  listMetricViews(clubId: EntityId): MetricView[] {
+    return this.data.metricViews.filter((item) => isCatalogVisibleToClub(item, clubId));
+  }
+
+  listMetricViewNodes(clubId: EntityId): MetricViewNode[] {
+    return this.data.metricViewNodes.filter((item) => isCatalogVisibleToClub(item, clubId));
+  }
+
   listDerivedMetricDefinitions(clubId: EntityId): DerivedMetricDefinition[] {
     return this.data.derivedMetricDefinitions.filter((item) => isCatalogVisibleToClub(item, clubId));
   }
@@ -312,6 +353,76 @@ export abstract class SeedBackedStore implements ApiStore {
 
   listMetricRecords(clubId: EntityId) {
     return this.data.metricRecords.filter((item) => item.clubId === clubId);
+  }
+
+  getDataCapabilityConfig(clubId: EntityId): DataCapabilityConfig {
+    return {
+      featureFlags: this.listFeatureFlags(clubId),
+      policies: this.listPolicies(clubId),
+      customFields: this.listCustomFields(clubId),
+      metricGraphVersions: this.listMetricGraphVersions(clubId),
+      metricDependencies: this.listMetricDependencies(clubId),
+      metricViews: this.listMetricViews(clubId),
+      metricViewNodes: this.listMetricViewNodes(clubId),
+      assessmentTemplateVersions: this.data.assessmentTemplateVersions.filter((item) => item.clubId === clubId),
+      assessmentMetricBindings: this.data.assessmentMetricBindings.filter((item) => item.clubId === clubId),
+      externalConnections: this.data.externalConnections.filter((item) => item.clubId === clubId),
+      tableMappings: this.data.externalTableMappings.filter((item) => item.clubId === clubId),
+      fieldMappings: this.data.externalFieldMappings.filter((item) => item.clubId === clubId),
+    };
+  }
+
+  getImportPreview(clubId: EntityId, filters: ImportPreviewFilters = {}): ImportPreview {
+    return {
+      records: this.filterExternalRawRecords(clubId, filters),
+    };
+  }
+
+  listExternalSyncRuns(clubId: EntityId): ExternalSyncRun[] {
+    return this.data.externalSyncRuns
+      .filter((item) => item.clubId === clubId)
+      .sort((left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt));
+  }
+
+  confirmExternalRecord(
+    clubId: EntityId,
+    rawRecordId: EntityId,
+    input: ConfirmExternalRecordInput,
+  ): ExternalRecordLink | null {
+    const rawRecord = this.data.externalRawRecords.find((item) => item.clubId === clubId && item.id === rawRecordId);
+
+    if (!rawRecord) {
+      return null;
+    }
+
+    const now = this.now();
+    upsertById<ExternalRawRecord>(this.data.externalRawRecords, {
+      ...rawRecord,
+      reviewStatus: "confirmed",
+      updatedAt: now,
+    });
+
+    return upsertById(this.data.externalRecordLinks, {
+      id: this.nextId("external-record-link"),
+      clubId,
+      rawRecordId,
+      targetType: input.targetType,
+      targetId: input.targetId,
+      linkStatus: "confirmed",
+      confirmedBy: input.confirmedBy,
+      confirmedAt: now,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+
+  private filterExternalRawRecords(clubId: EntityId, filters: ImportPreviewFilters): ExternalRawRecord[] {
+    return this.data.externalRawRecords
+      .filter((item) => item.clubId === clubId)
+      .filter((item) => (filters.connectionId ? item.connectionId === filters.connectionId : true))
+      .filter((item) => (filters.tableMappingId ? item.tableMappingId === filters.tableMappingId : true))
+      .filter((item) => (filters.reviewStatus ? item.reviewStatus === filters.reviewStatus : true))
+      .sort((left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt));
   }
 
   private eventDetail(event: CalendarEvent) {
@@ -514,5 +625,34 @@ export class PersistentApiStore extends SeedBackedStore {
     const club = await this.repositories.clubs.getById(clubId);
 
     return this.getSeedClubConfig(clubId, club);
+  }
+
+  override getDataCapabilityConfig(clubId: EntityId) {
+    return this.repositories.dataCapability.getConfig(clubId, {
+      featureFlags: this.listFeatureFlags(clubId),
+      policies: this.listPolicies(clubId),
+      customFields: this.listCustomFields(clubId),
+    });
+  }
+
+  override getImportPreview(clubId: EntityId, filters: ImportPreviewFilters = {}) {
+    return this.repositories.dataCapability.getImportPreview(clubId, filters);
+  }
+
+  override listExternalSyncRuns(clubId: EntityId) {
+    return this.repositories.dataCapability.listSyncRuns(clubId);
+  }
+
+  override confirmExternalRecord(
+    clubId: EntityId,
+    rawRecordId: EntityId,
+    input: ConfirmExternalRecordInput,
+  ) {
+    const now = new Date().toISOString();
+
+    return this.repositories.dataCapability.confirmExternalRecord(clubId, rawRecordId, input, {
+      linkId: `external-record-link-${Date.now()}`,
+      now,
+    });
   }
 }

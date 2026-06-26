@@ -1,4 +1,5 @@
 import { createAssessmentSeed } from "./assessment.js";
+import { createDataCapabilitySeed } from "./data-capability.js";
 import { createMatchSeed } from "./match.js";
 import { createPlatformSeed } from "./platform.js";
 import { createTrainingSeed } from "./training.js";
@@ -12,5 +13,6 @@ export function createSeedData(): SeedData {
     ...createTrainingSeed(),
     ...createMatchSeed(),
     ...createAssessmentSeed(),
+    ...createDataCapabilitySeed(),
   };
 }

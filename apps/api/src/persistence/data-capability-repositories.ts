@@ -1,0 +1,630 @@
+import type {
+  AssessmentMetricBinding,
+  AssessmentTemplateVersion,
+  CatalogScope,
+  EntityId,
+  MetricDependency,
+  MetricGraphVersion,
+  MetricView,
+  MetricViewNode,
+} from "@football-club/domain";
+import type { DatabaseSync } from "node:sqlite";
+import type {
+  ConfirmExternalRecordInput,
+  DataCapabilityConfig,
+  ExternalFieldMapping,
+  ExternalRawRecord,
+  ExternalRecordLink,
+  ExternalSyncRun,
+  ExternalSystemConnection,
+  ExternalTableMapping,
+  ImportPreview,
+  ImportPreviewFilters,
+} from "../data-capability/types.js";
+
+type SqlRow = Record<string, unknown>;
+
+function requireString(row: SqlRow, key: string): string {
+  const value = row[key];
+
+  if (typeof value !== "string") {
+    throw new Error(`Expected ${key} to be a string.`);
+  }
+
+  return value;
+}
+
+function optionalString(row: SqlRow, key: string): string | undefined {
+  const value = row[key];
+
+  if (value === null || value === undefined) {
+    return undefined;
+  }
+
+  if (typeof value !== "string") {
+    throw new Error(`Expected ${key} to be a string.`);
+  }
+
+  return value;
+}
+
+function optionalNumber(row: SqlRow, key: string): number | undefined {
+  const value = row[key];
+
+  if (value === null || value === undefined) {
+    return undefined;
+  }
+
+  if (typeof value !== "number") {
+    throw new Error(`Expected ${key} to be a number.`);
+  }
+
+  return value;
+}
+
+function numberFromSql(row: SqlRow, key: string): number {
+  const value = row[key];
+
+  if (typeof value !== "number") {
+    throw new Error(`Expected ${key} to be a number.`);
+  }
+
+  return value;
+}
+
+function booleanFromSql(value: unknown): boolean {
+  return value === 1 || value === true;
+}
+
+function jsonObject(value: string | undefined): Record<string, unknown> | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  const parsed: unknown = JSON.parse(value);
+
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error("Expected JSON object.");
+  }
+
+  return parsed as Record<string, unknown>;
+}
+
+function jsonArray(value: string | undefined): unknown[] | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  const parsed: unknown = JSON.parse(value);
+
+  if (!Array.isArray(parsed)) {
+    throw new Error("Expected JSON array.");
+  }
+
+  return parsed;
+}
+
+function catalogScope(row: SqlRow): CatalogScope {
+  const scope = requireString(row, "catalog_scope") as CatalogScope["scope"];
+
+  if (scope === "club") {
+    return {
+      scope,
+      clubId: requireString(row, "scope_club_id"),
+    };
+  }
+
+  return { scope: "system" };
+}
+
+export class DataCapabilityRepository {
+  constructor(private readonly database: DatabaseSync) {}
+
+  listExternalConnections(clubId: EntityId): ExternalSystemConnection[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM external_system_connections
+      WHERE club_id = ?
+      ORDER BY name
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapExternalConnection);
+  }
+
+  listExternalTableMappings(clubId: EntityId): ExternalTableMapping[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM external_table_mappings
+      WHERE club_id = ?
+      ORDER BY external_table_key, mapping_version
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapExternalTableMapping);
+  }
+
+  listExternalFieldMappings(clubId: EntityId): ExternalFieldMapping[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM external_field_mappings
+      WHERE club_id = ?
+      ORDER BY table_mapping_id, external_field_key
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapExternalFieldMapping);
+  }
+
+  listSyncRuns(clubId: EntityId): ExternalSyncRun[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM external_sync_runs
+      WHERE club_id = ?
+      ORDER BY created_at DESC
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapExternalSyncRun);
+  }
+
+  getImportPreview(clubId: EntityId, filters: ImportPreviewFilters = {}): ImportPreview {
+    const rows = this.database.prepare(`
+      SELECT * FROM external_raw_records
+      WHERE club_id = ?
+        AND (? IS NULL OR connection_id = ?)
+        AND (? IS NULL OR table_mapping_id = ?)
+        AND (? IS NULL OR review_status = ?)
+      ORDER BY created_at DESC
+    `).all(
+      clubId,
+      filters.connectionId ?? null,
+      filters.connectionId ?? null,
+      filters.tableMappingId ?? null,
+      filters.tableMappingId ?? null,
+      filters.reviewStatus ?? null,
+      filters.reviewStatus ?? null,
+    ) as SqlRow[];
+
+    return {
+      records: rows.map(mapExternalRawRecord),
+    };
+  }
+
+  confirmExternalRecord(
+    clubId: EntityId,
+    rawRecordId: EntityId,
+    input: ConfirmExternalRecordInput,
+    options: { linkId: EntityId; now: string },
+  ): ExternalRecordLink | null {
+    const existing = this.database.prepare(`
+      SELECT * FROM external_raw_records
+      WHERE club_id = ? AND id = ?
+    `).get(clubId, rawRecordId) as SqlRow | undefined;
+
+    if (!existing) {
+      return null;
+    }
+
+    this.database.prepare(`
+      UPDATE external_raw_records
+      SET review_status = 'confirmed', updated_at = ?
+      WHERE club_id = ? AND id = ?
+    `).run(options.now, clubId, rawRecordId);
+
+    const link: ExternalRecordLink = {
+      id: options.linkId,
+      clubId,
+      rawRecordId,
+      targetType: input.targetType,
+      targetId: input.targetId,
+      linkStatus: "confirmed",
+      confirmedBy: input.confirmedBy,
+      confirmedAt: options.now,
+      createdAt: options.now,
+      updatedAt: options.now,
+    };
+
+    this.saveExternalRecordLink(link);
+
+    return link;
+  }
+
+  getConfig(clubId: EntityId, base: Pick<DataCapabilityConfig, "featureFlags" | "policies" | "customFields">): DataCapabilityConfig {
+    return {
+      ...base,
+      metricGraphVersions: this.listMetricGraphVersions(clubId),
+      metricDependencies: this.listMetricDependencies(clubId),
+      metricViews: this.listMetricViews(clubId),
+      metricViewNodes: this.listMetricViewNodes(clubId),
+      assessmentTemplateVersions: this.listAssessmentTemplateVersions(clubId),
+      assessmentMetricBindings: this.listAssessmentMetricBindings(clubId),
+      externalConnections: this.listExternalConnections(clubId),
+      tableMappings: this.listExternalTableMappings(clubId),
+      fieldMappings: this.listExternalFieldMappings(clubId),
+    };
+  }
+
+  listMetricGraphVersions(clubId: EntityId): MetricGraphVersion[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM metric_graph_versions
+      WHERE catalog_scope = 'system' OR scope_club_id = ?
+      ORDER BY name, version
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapMetricGraphVersion);
+  }
+
+  listMetricDependencies(clubId: EntityId): MetricDependency[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM metric_dependencies
+      WHERE catalog_scope = 'system' OR scope_club_id = ?
+      ORDER BY graph_version_id, output_metric_id, sort_order
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapMetricDependency);
+  }
+
+  listMetricViews(clubId: EntityId): MetricView[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM metric_views
+      WHERE catalog_scope = 'system' OR scope_club_id = ?
+      ORDER BY graph_version_id, name
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapMetricView);
+  }
+
+  listMetricViewNodes(clubId: EntityId): MetricViewNode[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM metric_view_nodes
+      WHERE catalog_scope = 'system' OR scope_club_id = ?
+      ORDER BY view_id, parent_view_node_id, sort_order
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapMetricViewNode);
+  }
+
+  listAssessmentTemplateVersions(clubId: EntityId): AssessmentTemplateVersion[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM assessment_template_versions
+      WHERE club_id = ?
+      ORDER BY template_id, version
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapAssessmentTemplateVersion);
+  }
+
+  listAssessmentMetricBindings(clubId: EntityId): AssessmentMetricBinding[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM assessment_metric_bindings
+      WHERE club_id = ?
+      ORDER BY template_version_id, sort_order
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapAssessmentMetricBinding);
+  }
+
+  saveExternalConnection(entity: ExternalSystemConnection): void {
+    this.database.prepare(`
+      INSERT INTO external_system_connections (
+        id, club_id, provider, name, status, config_json, last_synced_at, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        provider = excluded.provider,
+        name = excluded.name,
+        status = excluded.status,
+        config_json = excluded.config_json,
+        last_synced_at = excluded.last_synced_at,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.provider,
+      entity.name,
+      entity.status,
+      JSON.stringify(entity.config),
+      entity.lastSyncedAt ?? null,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  saveExternalTableMapping(entity: ExternalTableMapping): void {
+    this.database.prepare(`
+      INSERT INTO external_table_mappings (
+        id, club_id, connection_id, external_table_key, target_type, mapping_version, status, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        external_table_key = excluded.external_table_key,
+        target_type = excluded.target_type,
+        mapping_version = excluded.mapping_version,
+        status = excluded.status,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.connectionId,
+      entity.externalTableKey,
+      entity.targetType,
+      entity.mappingVersion,
+      entity.status,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  saveExternalFieldMapping(entity: ExternalFieldMapping): void {
+    this.database.prepare(`
+      INSERT INTO external_field_mappings (
+        id, club_id, table_mapping_id, external_field_key, target_field_key, target_field_kind,
+        required, transform_json, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        external_field_key = excluded.external_field_key,
+        target_field_key = excluded.target_field_key,
+        target_field_kind = excluded.target_field_kind,
+        required = excluded.required,
+        transform_json = excluded.transform_json,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.tableMappingId,
+      entity.externalFieldKey,
+      entity.targetFieldKey,
+      entity.targetFieldKind,
+      entity.required ? 1 : 0,
+      entity.transform ? JSON.stringify(entity.transform) : null,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  saveExternalSyncRun(entity: ExternalSyncRun): void {
+    this.database.prepare(`
+      INSERT INTO external_sync_runs (
+        id, club_id, connection_id, table_mapping_id, status, started_at, finished_at,
+        total_records, imported_records, failed_records, error_json, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        status = excluded.status,
+        started_at = excluded.started_at,
+        finished_at = excluded.finished_at,
+        total_records = excluded.total_records,
+        imported_records = excluded.imported_records,
+        failed_records = excluded.failed_records,
+        error_json = excluded.error_json,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.connectionId,
+      entity.tableMappingId ?? null,
+      entity.status,
+      entity.startedAt ?? null,
+      entity.finishedAt ?? null,
+      entity.totalRecords,
+      entity.importedRecords,
+      entity.failedRecords,
+      entity.error ? JSON.stringify(entity.error) : null,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  saveExternalRawRecord(entity: ExternalRawRecord): void {
+    this.database.prepare(`
+      INSERT INTO external_raw_records (
+        id, club_id, connection_id, table_mapping_id, sync_run_id, external_record_id,
+        payload_json, payload_hash, review_status, validation_errors_json, normalized_preview_json,
+        imported_at, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        payload_json = excluded.payload_json,
+        payload_hash = excluded.payload_hash,
+        review_status = excluded.review_status,
+        validation_errors_json = excluded.validation_errors_json,
+        normalized_preview_json = excluded.normalized_preview_json,
+        imported_at = excluded.imported_at,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.connectionId,
+      entity.tableMappingId ?? null,
+      entity.syncRunId ?? null,
+      entity.externalRecordId,
+      JSON.stringify(entity.payload),
+      entity.payloadHash,
+      entity.reviewStatus,
+      entity.validationErrors ? JSON.stringify(entity.validationErrors) : null,
+      entity.normalizedPreview ? JSON.stringify(entity.normalizedPreview) : null,
+      entity.importedAt ?? null,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  private saveExternalRecordLink(entity: ExternalRecordLink): void {
+    this.database.prepare(`
+      INSERT INTO external_record_links (
+        id, club_id, raw_record_id, target_type, target_id, link_status,
+        confirmed_by, confirmed_at, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.rawRecordId,
+      entity.targetType,
+      entity.targetId,
+      entity.linkStatus,
+      entity.confirmedBy ?? null,
+      entity.confirmedAt,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+}
+
+function mapExternalConnection(row: SqlRow): ExternalSystemConnection {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    provider: requireString(row, "provider"),
+    name: requireString(row, "name"),
+    status: requireString(row, "status") as ExternalSystemConnection["status"],
+    config: jsonObject(requireString(row, "config_json")) ?? {},
+    lastSyncedAt: optionalString(row, "last_synced_at"),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapExternalTableMapping(row: SqlRow): ExternalTableMapping {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    connectionId: requireString(row, "connection_id"),
+    externalTableKey: requireString(row, "external_table_key"),
+    targetType: requireString(row, "target_type"),
+    mappingVersion: requireString(row, "mapping_version"),
+    status: requireString(row, "status") as ExternalTableMapping["status"],
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapExternalFieldMapping(row: SqlRow): ExternalFieldMapping {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    tableMappingId: requireString(row, "table_mapping_id"),
+    externalFieldKey: requireString(row, "external_field_key"),
+    targetFieldKey: requireString(row, "target_field_key"),
+    targetFieldKind: requireString(row, "target_field_kind"),
+    required: booleanFromSql(row.required),
+    transform: jsonObject(optionalString(row, "transform_json")),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapExternalSyncRun(row: SqlRow): ExternalSyncRun {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    connectionId: requireString(row, "connection_id"),
+    tableMappingId: optionalString(row, "table_mapping_id"),
+    status: requireString(row, "status") as ExternalSyncRun["status"],
+    startedAt: optionalString(row, "started_at"),
+    finishedAt: optionalString(row, "finished_at"),
+    totalRecords: numberFromSql(row, "total_records"),
+    importedRecords: numberFromSql(row, "imported_records"),
+    failedRecords: numberFromSql(row, "failed_records"),
+    error: jsonObject(optionalString(row, "error_json")),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapExternalRawRecord(row: SqlRow): ExternalRawRecord {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    connectionId: requireString(row, "connection_id"),
+    tableMappingId: optionalString(row, "table_mapping_id"),
+    syncRunId: optionalString(row, "sync_run_id"),
+    externalRecordId: requireString(row, "external_record_id"),
+    payload: jsonObject(requireString(row, "payload_json")) ?? {},
+    payloadHash: requireString(row, "payload_hash"),
+    reviewStatus: requireString(row, "review_status") as ExternalRawRecord["reviewStatus"],
+    validationErrors: jsonArray(optionalString(row, "validation_errors_json")),
+    normalizedPreview: jsonObject(optionalString(row, "normalized_preview_json")),
+    importedAt: optionalString(row, "imported_at"),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapMetricGraphVersion(row: SqlRow): MetricGraphVersion {
+  return {
+    id: requireString(row, "id"),
+    catalogScope: catalogScope(row),
+    name: requireString(row, "name"),
+    version: requireString(row, "version"),
+    status: requireString(row, "status") as MetricGraphVersion["status"],
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapMetricDependency(row: SqlRow): MetricDependency {
+  return {
+    id: requireString(row, "id"),
+    catalogScope: catalogScope(row),
+    graphVersionId: requireString(row, "graph_version_id"),
+    outputMetricId: requireString(row, "output_metric_id"),
+    inputMetricId: requireString(row, "input_metric_id"),
+    formulaId: optionalString(row, "formula_id"),
+    weight: optionalNumber(row, "weight"),
+    role: optionalString(row, "role") as MetricDependency["role"],
+    sortOrder: numberFromSql(row, "sort_order"),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapMetricView(row: SqlRow): MetricView {
+  return {
+    id: requireString(row, "id"),
+    catalogScope: catalogScope(row),
+    graphVersionId: requireString(row, "graph_version_id"),
+    name: requireString(row, "name"),
+    status: requireString(row, "status") as MetricView["status"],
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapMetricViewNode(row: SqlRow): MetricViewNode {
+  return {
+    id: requireString(row, "id"),
+    catalogScope: catalogScope(row),
+    viewId: requireString(row, "view_id"),
+    metricId: optionalString(row, "metric_id"),
+    parentViewNodeId: optionalString(row, "parent_view_node_id"),
+    label: requireString(row, "label"),
+    sortOrder: numberFromSql(row, "sort_order"),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapAssessmentTemplateVersion(row: SqlRow): AssessmentTemplateVersion {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    templateId: requireString(row, "template_id"),
+    graphVersionId: optionalString(row, "graph_version_id"),
+    version: requireString(row, "version"),
+    status: requireString(row, "status") as AssessmentTemplateVersion["status"],
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapAssessmentMetricBinding(row: SqlRow): AssessmentMetricBinding {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    templateVersionId: requireString(row, "template_version_id"),
+    metricId: requireString(row, "metric_id"),
+    role: requireString(row, "role") as AssessmentMetricBinding["role"],
+    formulaId: optionalString(row, "formula_id"),
+    testItemId: optionalString(row, "test_item_id"),
+    maxScore: optionalNumber(row, "max_score"),
+    weight: optionalNumber(row, "weight"),
+    sortOrder: numberFromSql(row, "sort_order"),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
