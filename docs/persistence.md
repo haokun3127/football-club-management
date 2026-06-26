@@ -69,11 +69,18 @@ DATABASE_URL=apps/api/data/dev.sqlite pnpm --filter @football-club/api db:migrat
 - `player_assessments`
 - `assessment_scores`
 - `ability_metrics`
+- `metric_graph_versions`
+- `metric_dependencies`
+- `metric_views`
+- `metric_view_nodes`
+- `assessment_metric_bindings`
+- `assessment_test_items`
+- `assessment_raw_results`
 - `player_metric_records`
 - `derived_metric_definitions`
 - `metric_lineages`
 
-收费、保险、出勤和评测不要只存汇总字段。列表需要的余额、保险到期和签到次数可以作为快照，但权威来源应是事实表和流水表。
+收费、保险、出勤和评测不要只存汇总字段。列表需要的余额、保险到期和签到次数可以作为快照，但权威来源应是事实表和流水表。评测指标关系应按图谱存储，展示层级放在视图表，计算关系放在依赖表和公式定义中。
 
 MVP 中 `payment_events`、`payment_reviews`、`lesson_credit_ledger` 和 `insurance_policies` 主要用于保存外部同步和线下确认后的状态，不代表平台已经提供线上收费、在线投保或自动财务流程。
 

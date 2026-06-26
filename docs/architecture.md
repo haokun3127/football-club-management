@@ -81,6 +81,10 @@ MVP 只做单场比赛记录，包括出场、比分、进球、助攻和教练�
 ### 能力指标
 
 - `AbilityMetric`
+- `MetricGraphVersion`
+- `MetricDependency`
+- `MetricView`
+- `MetricViewNode`
 - `AssessmentTestItem`
 - `AssessmentRawResult`
 - `PlayerMetricRecord`
@@ -88,7 +92,7 @@ MVP 只做单场比赛记录，包括出场、比分、进球、助攻和教练�
 - `MetricLineage`
 - `AssessmentTemplate`
 - `AssessmentTemplateVersion`
-- `AssessmentTemplateNode`
+- `AssessmentMetricBinding`
 - `PlayerAssessment`
 - `AssessmentScore`
 
@@ -103,7 +107,7 @@ MVP 只做单场比赛记录，包括出场、比分、进球、助攻和教练�
 
 派生指标通过 `MetricLineage` 保留输入记录和算法版本，方便未来追踪和重算。
 
-评测模板需要支持指标树、模板版本、测试项目、原始结果、标准化得分和分层公式。第一个俱乐部评分表的具体要求见 [学员能力评估体系分析](assessment-system-analysis.md)。
+评测模板需要支持指标图谱、依赖边、模板版本、视图展示、测试项目、原始结果、标准化得分和任意指标公式。树状层级只是某个模板或报告的展示视图，不是底层指标关系。第一个俱乐部评分表的具体要求见 [学员能力评估体系分析](assessment-system-analysis.md)。
 
 ### 俱乐部差异配置
 
