@@ -49,6 +49,8 @@ export function createDataCapabilitySeed(): Pick<
   | "externalSyncRuns"
   | "externalRawRecords"
   | "externalRecordLinks"
+  | "lessonLedger"
+  | "insurancePolicies"
 > {
   const externalConnections: ExternalSystemConnection[] = [
     {
@@ -272,6 +274,8 @@ export function createDataCapabilitySeed(): Pick<
     externalSyncRuns,
     externalRawRecords,
     externalRecordLinks,
+    lessonLedger: [],
+    insurancePolicies: [],
   };
 }
 

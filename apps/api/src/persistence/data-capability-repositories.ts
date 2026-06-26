@@ -22,11 +22,18 @@ import type {
   ExternalSyncPolicy,
   ExternalSystemConnection,
   ExternalTableMapping,
+  InsurancePolicy,
+  InsurancePolicyInput,
+  InsurancePolicySummary,
   ImportPreview,
   ImportPreviewFilters,
+  LessonAdjustmentInput,
+  LessonLedgerEntry,
+  LessonLedgerSummary,
   StudentDetail,
   StudentListFilters,
   StudentListItem,
+  StudentOperationalStatusSummary,
   SyncRunDetail,
 } from "../data-capability/types.js";
 
@@ -82,6 +89,78 @@ function numberFromSql(row: SqlRow, key: string): number {
 
 function booleanFromSql(value: unknown): boolean {
   return value === 1 || value === true;
+}
+
+function booleanToSql(value: boolean | undefined): number | null {
+  if (value === undefined) {
+    return null;
+  }
+
+  return value ? 1 : 0;
+}
+
+function deriveLessonBalance(entries: LessonLedgerEntry[]): number {
+  return [...entries]
+    .sort((left, right) => Date.parse(left.occurredAt) - Date.parse(right.occurredAt) || left.id.localeCompare(right.id))
+    .reduce((balance, entry) =>
+      entry.entryType === "external_snapshot" && entry.balanceAfter !== undefined
+        ? entry.balanceAfter
+        : balance + entry.lessonDelta,
+    0);
+}
+
+function insuranceReviewStatus(row: SqlRow): InsurancePolicy["reviewStatus"] {
+  const explicit = optionalString(row, "review_status");
+  if (explicit === "pending" || explicit === "approved" || explicit === "rejected") {
+    return explicit;
+  }
+
+  if (row.approved === null || row.approved === undefined) {
+    return "pending";
+  }
+
+  return booleanFromSql(row.approved) ? "approved" : "rejected";
+}
+
+function deriveInsuranceCurrentStatus(
+  policy: Pick<InsurancePolicy, "expiresAt" | "reviewStatus"> | undefined,
+  now = new Date(),
+): InsurancePolicy["currentStatus"] {
+  if (!policy) {
+    return "unknown";
+  }
+
+  if (policy.reviewStatus !== "approved") {
+    return "pending";
+  }
+
+  return Date.parse(policy.expiresAt) >= Date.parse(now.toISOString().slice(0, 10)) ? "active" : "expired";
+}
+
+function validateLessonAdjustment(input: LessonAdjustmentInput): void {
+  if (input.entryType === "credit" && input.source !== "offline_recharge") {
+    throw new Error("Lesson credits must come from confirmed offline recharge.");
+  }
+
+  if (input.entryType === "debit" && input.source !== "attendance") {
+    throw new Error("Lesson debits must come from confirmed attendance.");
+  }
+
+  if (input.entryType === "adjustment" && input.source !== "manual_adjustment") {
+    throw new Error("Manual lesson corrections must use manual_adjustment source.");
+  }
+
+  if (input.entryType === "credit" && input.lessonDelta <= 0) {
+    throw new Error("Lesson credit delta must be positive.");
+  }
+
+  if (input.entryType === "debit" && input.lessonDelta >= 0) {
+    throw new Error("Lesson debit delta must be negative.");
+  }
+
+  if (input.entryType === "adjustment" && input.lessonDelta === 0) {
+    throw new Error("Lesson adjustment delta cannot be zero.");
+  }
 }
 
 function jsonObject(value: string | undefined): Record<string, unknown> | undefined {
@@ -365,6 +444,207 @@ export class DataCapabilityRepository {
         stage: op?.communicationStage,
       },
     };
+  }
+
+  getStudentOperationalStatusSummary(clubId: EntityId, studentId: EntityId): StudentOperationalStatusSummary | null {
+    const student = this.database.prepare(`
+      SELECT id FROM student_profiles
+      WHERE club_id = ? AND id = ?
+    `).get(clubId, studentId) as SqlRow | undefined;
+
+    if (!student) {
+      return null;
+    }
+
+    const lessonLedger = this.getLessonLedger(clubId, studentId);
+    const insurance = this.listInsurancePolicies(clubId, studentId);
+
+    return {
+      clubId,
+      studentId,
+      lessonBalance: lessonLedger ? lessonLedger.balance : undefined,
+      insurance: insurance?.current ?? { status: "unknown" },
+    };
+  }
+
+  getLessonLedger(clubId: EntityId, studentId: EntityId): LessonLedgerSummary | null {
+    const student = this.database.prepare(`
+      SELECT id FROM student_profiles
+      WHERE club_id = ? AND id = ?
+    `).get(clubId, studentId) as SqlRow | undefined;
+
+    if (!student) {
+      return null;
+    }
+
+    const rows = this.database.prepare(`
+      SELECT * FROM lesson_credit_ledger
+      WHERE club_id = ? AND student_id = ?
+      ORDER BY occurred_at DESC, id DESC
+    `).all(clubId, studentId) as SqlRow[];
+    const entries = rows.map(mapLessonLedger);
+
+    return {
+      clubId,
+      studentId,
+      balance: deriveLessonBalance(entries),
+      entries,
+    };
+  }
+
+  recordLessonAdjustment(clubId: EntityId, studentId: EntityId, input: LessonAdjustmentInput, options: { id: EntityId; paymentEventId?: EntityId; now: string }): LessonLedgerSummary {
+    const student = this.database.prepare(`
+      SELECT id FROM student_profiles
+      WHERE club_id = ? AND id = ?
+    `).get(clubId, studentId) as SqlRow | undefined;
+
+    if (!student) {
+      throw new Error("Student not found for club.");
+    }
+
+    validateLessonAdjustment(input);
+    const existing = this.database.prepare(`
+      SELECT * FROM lesson_credit_ledger
+      WHERE club_id = ? AND id = ?
+    `).get(clubId, options.id) as SqlRow | undefined;
+
+    if (existing) {
+      return this.getLessonLedger(clubId, studentId) as LessonLedgerSummary;
+    }
+
+    const current = this.getLessonLedger(clubId, studentId);
+    const balanceAfter = (current?.balance ?? 0) + input.lessonDelta;
+    const occurredAt = input.occurredAt ?? options.now;
+    const eventId = input.eventId && this.existsByClubId("calendar_events", clubId, input.eventId) ? input.eventId : undefined;
+    const teamId = input.teamId && this.existsByClubId("teams", clubId, input.teamId) ? input.teamId : undefined;
+    let paymentEventId: EntityId | undefined;
+
+    if (input.entryType === "credit") {
+      paymentEventId = options.paymentEventId ?? `${options.id}-payment`;
+      this.database.prepare(`
+        INSERT INTO payment_events (
+          id, club_id, student_id, occurred_at, payment_type, amount, lesson_hours,
+          status, external_ref, note, created_at, updated_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'confirmed_offline', ?, ?, ?, ?)
+      `).run(
+        paymentEventId,
+        clubId,
+        studentId,
+        occurredAt,
+        input.paymentType ?? null,
+        input.amount ?? null,
+        input.lessonDelta,
+        input.sourceId ?? null,
+        input.note ?? null,
+        options.now,
+        options.now,
+      );
+    }
+
+    this.database.prepare(`
+      INSERT INTO lesson_credit_ledger (
+        id, club_id, student_id, team_id, event_id, payment_event_id, occurred_at,
+        entry_type, lesson_delta, balance_after, source, source_id, actor_user_id,
+        note, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      options.id,
+      clubId,
+      studentId,
+      teamId ?? null,
+      eventId ?? null,
+      paymentEventId ?? null,
+      occurredAt,
+      input.entryType,
+      input.lessonDelta,
+      balanceAfter,
+      input.source,
+      input.sourceId ?? null,
+      input.actorUserId ?? null,
+      input.note ?? null,
+      options.now,
+      options.now,
+    );
+    this.upsertStudentOperationalProfile({ id: input.sourceId ?? options.id, clubId, normalizedPreview: {} } as ExternalRawRecord, studentId, options.now, {
+      lessonBalance: balanceAfter,
+    });
+
+    return this.getLessonLedger(clubId, studentId) as LessonLedgerSummary;
+  }
+
+  listInsurancePolicies(clubId: EntityId, studentId: EntityId): InsurancePolicySummary | null {
+    const student = this.database.prepare(`
+      SELECT id FROM student_profiles
+      WHERE club_id = ? AND id = ?
+    `).get(clubId, studentId) as SqlRow | undefined;
+
+    if (!student) {
+      return null;
+    }
+
+    const policies = (this.database.prepare(`
+      SELECT * FROM insurance_policies
+      WHERE club_id = ? AND student_id = ?
+      ORDER BY expires_at DESC, created_at DESC, id DESC
+    `).all(clubId, studentId) as SqlRow[]).map(mapInsurancePolicy);
+    const current = policies[0];
+
+    return {
+      clubId,
+      studentId,
+      current: {
+        status: current?.currentStatus ?? "unknown",
+        expiresAt: current?.expiresAt,
+        policyNumber: current?.policyNumber,
+        reviewStatus: current?.reviewStatus,
+      },
+      policies,
+    };
+  }
+
+  createInsurancePolicy(clubId: EntityId, studentId: EntityId, input: InsurancePolicyInput, options: { id: EntityId; now: string }): InsurancePolicySummary {
+    const student = this.database.prepare(`
+      SELECT id FROM student_profiles
+      WHERE club_id = ? AND id = ?
+    `).get(clubId, studentId) as SqlRow | undefined;
+
+    if (!student) {
+      throw new Error("Student not found for club.");
+    }
+
+    this.database.prepare(`
+      INSERT INTO insurance_policies (
+        id, club_id, student_id, purchased_at, expires_at, policy_number, provider,
+        sport, approved, review_status, source, source_id, actor_user_id,
+        external_ref, note, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      options.id,
+      clubId,
+      studentId,
+      input.purchasedAt ?? null,
+      input.expiresAt,
+      input.policyNumber ?? null,
+      input.provider ?? null,
+      input.sport ?? null,
+      booleanToSql(input.reviewStatus === "approved" ? true : input.reviewStatus === "rejected" ? false : undefined),
+      input.reviewStatus,
+      input.source ?? "offline_insurance",
+      input.sourceId ?? null,
+      input.actorUserId ?? null,
+      input.sourceId ?? null,
+      input.note ?? null,
+      options.now,
+      options.now,
+    );
+    this.upsertStudentOperationalProfile({ id: input.sourceId ?? options.id, clubId, normalizedPreview: {} } as ExternalRawRecord, studentId, options.now, {
+      insuranceExpiresAt: input.expiresAt,
+    });
+
+    return this.listInsurancePolicies(clubId, studentId) as InsurancePolicySummary;
   }
 
   getImportPreview(clubId: EntityId, filters: ImportPreviewFilters = {}): ImportPreview {
@@ -1451,6 +1731,16 @@ export class DataCapabilityRepository {
 
     return optionalString(row ?? {}, "id");
   }
+
+  private existsByClubId(tableName: "calendar_events" | "teams", clubId: EntityId, id: EntityId): boolean {
+    const row = this.database.prepare(`
+      SELECT id FROM ${tableName}
+      WHERE club_id = ? AND id = ?
+      LIMIT 1
+    `).get(clubId, id) as SqlRow | undefined;
+
+    return Boolean(row);
+  }
 }
 
 function textValue(preview: Record<string, unknown>, key: string): string | undefined {
@@ -1575,18 +1865,21 @@ function mapLessonLedger(row: SqlRow) {
     eventId: optionalString(row, "event_id"),
     paymentEventId: optionalString(row, "payment_event_id"),
     occurredAt: requireString(row, "occurred_at"),
-    entryType: requireString(row, "entry_type"),
+    entryType: requireString(row, "entry_type") as LessonLedgerEntry["entryType"],
     lessonDelta: numberFromSql(row, "lesson_delta"),
     balanceAfter: optionalNumber(row, "balance_after"),
     source: requireString(row, "source"),
+    sourceId: optionalString(row, "source_id"),
+    actorUserId: optionalString(row, "actor_user_id"),
     note: optionalString(row, "note"),
     createdAt: requireString(row, "created_at"),
     updatedAt: requireString(row, "updated_at"),
-  };
+  } satisfies LessonLedgerEntry;
 }
 
 function mapInsurancePolicy(row: SqlRow) {
-  return {
+  const reviewStatus = insuranceReviewStatus(row);
+  const policy = {
     id: requireString(row, "id"),
     clubId: requireString(row, "club_id"),
     studentId: requireString(row, "student_id"),
@@ -1596,10 +1889,20 @@ function mapInsurancePolicy(row: SqlRow) {
     provider: optionalString(row, "provider"),
     sport: optionalString(row, "sport"),
     approved: row.approved === null || row.approved === undefined ? undefined : booleanFromSql(row.approved),
+    reviewStatus,
+    currentStatus: "unknown" as InsurancePolicy["currentStatus"],
+    source: optionalString(row, "source") ?? "external_import",
+    sourceId: optionalString(row, "source_id"),
+    actorUserId: optionalString(row, "actor_user_id"),
     externalRef: optionalString(row, "external_ref"),
     note: optionalString(row, "note"),
     createdAt: requireString(row, "created_at"),
     updatedAt: requireString(row, "updated_at"),
+  } satisfies InsurancePolicy;
+
+  return {
+    ...policy,
+    currentStatus: deriveInsuranceCurrentStatus(policy),
   };
 }
 

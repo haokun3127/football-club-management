@@ -208,8 +208,107 @@ export interface StudentListItem {
 
 export interface StudentDetail extends StudentListItem {
   contacts: Array<Record<string, unknown>>;
-  lessonLedger: Array<Record<string, unknown>>;
-  insurancePolicies: Array<Record<string, unknown>>;
+  lessonLedger: LessonLedgerEntry[];
+  insurancePolicies: InsurancePolicy[];
+}
+
+export type LessonLedgerEntryType = "credit" | "debit" | "adjustment" | "external_snapshot";
+export type LessonLedgerSource = "offline_recharge" | "attendance" | "manual_adjustment" | "external_import";
+
+export interface LessonLedgerEntry {
+  id: EntityId;
+  clubId: EntityId;
+  studentId: EntityId;
+  teamId?: EntityId;
+  eventId?: EntityId;
+  paymentEventId?: EntityId;
+  occurredAt: string;
+  entryType: LessonLedgerEntryType;
+  lessonDelta: number;
+  balanceAfter?: number;
+  source: LessonLedgerSource | string;
+  sourceId?: EntityId;
+  actorUserId?: EntityId;
+  note?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LessonLedgerSummary {
+  studentId: EntityId;
+  clubId: EntityId;
+  balance: number;
+  entries: LessonLedgerEntry[];
+}
+
+export interface LessonAdjustmentInput {
+  entryType: Exclude<LessonLedgerEntryType, "external_snapshot">;
+  lessonDelta: number;
+  source: Exclude<LessonLedgerSource, "external_import">;
+  sourceId?: EntityId;
+  eventId?: EntityId;
+  teamId?: EntityId;
+  occurredAt?: string;
+  actorUserId?: EntityId;
+  amount?: number;
+  paymentType?: string;
+  note?: string;
+}
+
+export type InsuranceCurrentStatus = "active" | "expired" | "pending" | "unknown";
+export type InsuranceReviewStatus = "pending" | "approved" | "rejected";
+
+export interface InsurancePolicy {
+  id: EntityId;
+  clubId: EntityId;
+  studentId: EntityId;
+  purchasedAt?: string;
+  expiresAt: string;
+  policyNumber?: string;
+  provider?: string;
+  sport?: string;
+  approved?: boolean;
+  reviewStatus: InsuranceReviewStatus;
+  currentStatus: InsuranceCurrentStatus;
+  source: string;
+  sourceId?: EntityId;
+  actorUserId?: EntityId;
+  externalRef?: string;
+  note?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InsurancePolicyInput {
+  purchasedAt?: string;
+  expiresAt: string;
+  policyNumber?: string;
+  provider?: string;
+  sport?: string;
+  reviewStatus: InsuranceReviewStatus;
+  source?: "offline_insurance" | "external_import" | "manual_review";
+  sourceId?: EntityId;
+  actorUserId?: EntityId;
+  note?: string;
+}
+
+export interface InsurancePolicySummary {
+  studentId: EntityId;
+  clubId: EntityId;
+  current: {
+    status: InsuranceCurrentStatus;
+    expiresAt?: string;
+    policyNumber?: string;
+    reviewStatus?: InsuranceReviewStatus;
+  };
+  policies: InsurancePolicy[];
+}
+
+export interface StudentOperationalStatusSummary {
+  studentId: EntityId;
+  clubId: EntityId;
+  lessonBalance?: number;
+  insurance: InsurancePolicySummary["current"];
 }
 
 export interface SyncRunDetail {

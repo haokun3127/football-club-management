@@ -200,6 +200,152 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
   app.get<{
     Params: {
       clubId: string;
+      studentId: string;
+    };
+  }>(
+    "/clubs/:clubId/students/:studentId/status-summary",
+    {
+      schema: {
+        ...schemas.clubStudentParams,
+        ...schemas.studentOperationalStatusSummary,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireStudentAccess(request, reply, request.params.clubId, request.params.studentId)) {
+        return reply;
+      }
+
+      const summary = await context.store.getStudentOperationalStatusSummary(request.params.clubId, request.params.studentId);
+
+      if (!summary) {
+        return context.sendError(reply, 404, "not_found", "Student not found");
+      }
+
+      return summary;
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      studentId: string;
+    };
+  }>(
+    "/clubs/:clubId/admin/students/:studentId/lesson-ledger",
+    {
+      schema: {
+        ...schemas.clubStudentParams,
+        ...schemas.lessonLedger,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      const ledger = await context.store.getLessonLedger(request.params.clubId, request.params.studentId);
+
+      if (!ledger) {
+        return context.sendError(reply, 404, "not_found", "Student not found");
+      }
+
+      return ledger;
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+      studentId: string;
+    };
+    Body: Parameters<RouteContext["store"]["recordLessonAdjustment"]>[2];
+  }>(
+    "/clubs/:clubId/admin/students/:studentId/lesson-adjustments",
+    {
+      schema: {
+        ...schemas.clubStudentParams,
+        ...schemas.lessonAdjustment,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      try {
+        const ledger = await context.store.recordLessonAdjustment(request.params.clubId, request.params.studentId, request.body);
+        return reply.code(201).send(ledger);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Lesson adjustment failed";
+        const statusCode = message.includes("Student not found") ? 404 : 400;
+        const code = statusCode === 404 ? "not_found" : "invalid_lesson_adjustment";
+        return context.sendError(reply, statusCode, code, message);
+      }
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      studentId: string;
+    };
+  }>(
+    "/clubs/:clubId/admin/students/:studentId/insurance-policies",
+    {
+      schema: {
+        ...schemas.clubStudentParams,
+        ...schemas.insurancePolicies,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      const policies = await context.store.listInsurancePolicies(request.params.clubId, request.params.studentId);
+
+      if (!policies) {
+        return context.sendError(reply, 404, "not_found", "Student not found");
+      }
+
+      return policies;
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+      studentId: string;
+    };
+    Body: Parameters<RouteContext["store"]["createInsurancePolicy"]>[2];
+  }>(
+    "/clubs/:clubId/admin/students/:studentId/insurance-policies",
+    {
+      schema: {
+        ...schemas.clubStudentParams,
+        ...schemas.createInsurancePolicy,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      try {
+        const policies = await context.store.createInsurancePolicy(request.params.clubId, request.params.studentId, request.body);
+        return reply.code(201).send(policies);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Insurance policy creation failed";
+        const statusCode = message.includes("Student not found") ? 404 : 400;
+        const code = statusCode === 404 ? "not_found" : "invalid_insurance_policy";
+        return context.sendError(reply, statusCode, code, message);
+      }
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
     };
   }>(
     "/clubs/:clubId/admin/data/config",

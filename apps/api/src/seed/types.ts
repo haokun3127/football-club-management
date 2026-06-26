@@ -49,6 +49,8 @@ import type {
   ExternalSyncPolicy,
   ExternalSystemConnection,
   ExternalTableMapping,
+  InsurancePolicy,
+  LessonLedgerEntry,
 } from "../data-capability/types.js";
 
 export const seedNow = "2026-06-25T00:00:00.000Z";
@@ -105,4 +107,6 @@ export interface SeedData {
   externalSyncRuns: ExternalSyncRun[];
   externalRawRecords: ExternalRawRecord[];
   externalRecordLinks: ExternalRecordLink[];
+  lessonLedger: LessonLedgerEntry[];
+  insurancePolicies: InsurancePolicy[];
 }

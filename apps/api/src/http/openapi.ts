@@ -147,6 +147,34 @@ export function buildOpenApiDocument() {
       "/clubs/{clubId}/admin/students/{studentId}": {
         get: operation("GET", "/clubs/{clubId}/admin/students/{studentId}", schemas.operationalStudentDetail),
       },
+      "/clubs/{clubId}/students/{studentId}/status-summary": {
+        get: operation("GET", "/clubs/{clubId}/students/{studentId}/status-summary", {
+          ...schemas.clubStudentParams,
+          ...schemas.studentOperationalStatusSummary,
+        }),
+      },
+      "/clubs/{clubId}/admin/students/{studentId}/lesson-ledger": {
+        get: operation("GET", "/clubs/{clubId}/admin/students/{studentId}/lesson-ledger", {
+          ...schemas.clubStudentParams,
+          ...schemas.lessonLedger,
+        }),
+      },
+      "/clubs/{clubId}/admin/students/{studentId}/lesson-adjustments": {
+        post: operation("POST", "/clubs/{clubId}/admin/students/{studentId}/lesson-adjustments", {
+          ...schemas.clubStudentParams,
+          ...schemas.lessonAdjustment,
+        }),
+      },
+      "/clubs/{clubId}/admin/students/{studentId}/insurance-policies": {
+        get: operation("GET", "/clubs/{clubId}/admin/students/{studentId}/insurance-policies", {
+          ...schemas.clubStudentParams,
+          ...schemas.insurancePolicies,
+        }),
+        post: operation("POST", "/clubs/{clubId}/admin/students/{studentId}/insurance-policies", {
+          ...schemas.clubStudentParams,
+          ...schemas.createInsurancePolicy,
+        }),
+      },
       "/clubs/{clubId}/admin/import-preview": {
         get: operation("GET", "/clubs/{clubId}/admin/import-preview", schemas.importPreview),
       },
