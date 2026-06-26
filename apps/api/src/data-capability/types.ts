@@ -187,10 +187,30 @@ export interface ClubCapabilities {
     eventTypes: string[];
     participantStatuses: string[];
   };
+  match: {
+    eventTypes: string[];
+  };
   operations: {
     standardFields: Array<{ key: string; label: string; source: "core" | "operational" | "custom" }>;
     customFields: CustomFieldDefinition[];
     offlineStatuses: Array<{ key: string; label: string }>;
+    statusDisplay: {
+      lesson: { showBalance: boolean; showUpdatedAt: boolean; showSource: boolean };
+      insurance: { showPolicyNumber: boolean; showUpdatedAt: boolean; showSource: boolean };
+    };
+  };
+  visibility: {
+    parent: {
+      metricScope: string;
+      showLessonBalance: boolean;
+      showInsurancePolicyNumber: boolean;
+      showStatusUpdatedAt: boolean;
+      showStatusSource: boolean;
+    };
+  };
+  defaultTemplates: {
+    features: Record<string, boolean>;
+    appClientVisibility: Record<string, unknown>;
   };
   assessment: {
     graphVersions: MetricGraphVersion[];
@@ -350,7 +370,34 @@ export interface StudentOperationalStatusSummary {
   studentId: EntityId;
   clubId: EntityId;
   lessonBalance?: number;
-  insurance: InsurancePolicySummary["current"];
+  lesson?: {
+    balance?: number;
+    updatedAt?: string;
+    source?: string;
+    status: "unknown" | "synced" | "confirmed" | "pending";
+  };
+  insurance: InsurancePolicySummary["current"] & {
+    updatedAt?: string;
+    source?: string;
+    sourceId?: EntityId;
+  };
+  sync?: {
+    latestRun?: {
+      id: EntityId;
+      status: ExternalSyncRun["status"];
+      updatedAt: string;
+    };
+  };
+}
+
+export interface HttpIdempotencyRecord {
+  key: string;
+  fingerprint: string;
+  statusCode: number;
+  payload: string;
+  contentType?: string;
+  createdAt: string;
+  expiresAt: string;
 }
 
 export interface SyncRunDetail {

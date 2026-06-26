@@ -58,6 +58,7 @@ import type {
   ExternalSyncPolicy,
   ExternalSystemConnection,
   ExternalTableMapping,
+  HttpIdempotencyRecord,
   ImportPreview,
   ImportPreviewFilters,
   InsurancePolicy,
@@ -85,6 +86,9 @@ import { createSeedData, type SeedData } from "./seed.js";
 
 export interface ApiStore {
   getHealth(): { status: "ok"; service: "@football-club/api" };
+  getHttpIdempotencyRecord(key: string): HttpIdempotencyRecord | null | Promise<HttpIdempotencyRecord | null>;
+  saveHttpIdempotencyRecord(record: HttpIdempotencyRecord): void | Promise<void>;
+  pruneHttpIdempotencyRecords(now: string): void | Promise<void>;
   listClubs(): Club[] | Promise<Club[]>;
   getClubById(clubId: EntityId): Club | null;
   getClubConfig(clubId: EntityId): unknown | null | Promise<unknown | null>;
@@ -144,6 +148,12 @@ export interface ApiStore {
     clubId: EntityId,
     input: Parameters<ReturnType<typeof createApiServices>["createTrainingSession"]>[1],
   ): TrainingSession;
+  getTrainingSessionByEvent(clubId: EntityId, eventId: EntityId): TrainingSession | null | Promise<TrainingSession | null>;
+  ensureTrainingSessionForEvent(
+    clubId: EntityId,
+    eventId: EntityId,
+    input?: Partial<Parameters<ReturnType<typeof createApiServices>["createTrainingSession"]>[1]>,
+  ): TrainingSession | Promise<TrainingSession>;
   recordTrainingObservation(
     clubId: EntityId,
     trainingSessionId: EntityId,
@@ -164,6 +174,19 @@ export interface ApiStore {
     notes: MatchPlayerNote[];
     metricRecords: PlayerMetricRecord[];
   }>;
+  getMatchDetailByEvent(clubId: EntityId, eventId: EntityId): {
+    match: Match;
+    rosters: MatchRoster[];
+    events: MatchEvent[];
+    notes: MatchPlayerNote[];
+    metricRecords: PlayerMetricRecord[];
+  } | null | Promise<{
+    match: Match;
+    rosters: MatchRoster[];
+    events: MatchEvent[];
+    notes: MatchPlayerNote[];
+    metricRecords: PlayerMetricRecord[];
+  } | null>;
   recordAssessment(input: RecordAssessmentInput): Promise<{
     assessment: PlayerAssessment;
     rawResults: AssessmentRawResult[];
@@ -231,6 +254,25 @@ function buildClubCapabilities(
     ...Object.fromEntries(config.featureFlags.map((flag) => [flag.feature, flag.enabled])),
     ...(client?.featureOverrides ?? {}),
   };
+  const matchEventTypes = stringArrayPolicy(config.policies, "match_event_types", [
+    "goal",
+    "assist",
+    "save",
+    "tackle",
+    "yellow_card",
+    "red_card",
+    "penalty",
+    "own_goal",
+  ]);
+  const parentVisibilityPolicy = objectPolicy(config.policies, "parent_visibility");
+  const clientVisibility = client?.visibility ?? {};
+  const parentVisibility = {
+    metricScope: stringValue(clientVisibility.parentMetricScope) ?? stringValue(parentVisibilityPolicy.metricScope) ?? "published_summary",
+    showLessonBalance: booleanValue(clientVisibility.showLessonBalance) ?? booleanValue(parentVisibilityPolicy.showLessonBalance) ?? true,
+    showInsurancePolicyNumber: booleanValue(clientVisibility.showInsurancePolicyNumber) ?? booleanValue(parentVisibilityPolicy.showInsurancePolicyNumber) ?? false,
+    showStatusUpdatedAt: booleanValue(clientVisibility.showStatusUpdatedAt) ?? booleanValue(parentVisibilityPolicy.showStatusUpdatedAt) ?? true,
+    showStatusSource: booleanValue(clientVisibility.showStatusSource) ?? booleanValue(parentVisibilityPolicy.showStatusSource) ?? false,
+  };
 
   return {
     club: {
@@ -281,6 +323,9 @@ function buildClubCapabilities(
       eventTypes: ["training", "match", "other"],
       participantStatuses: ["invited", "confirmed", "present", "absent", "late", "leave_requested", "excused"],
     },
+    match: {
+      eventTypes: matchEventTypes,
+    },
     operations: {
       standardFields: [
         { key: "student.identityNumber", label: "身份证号", source: "operational" },
@@ -314,6 +359,41 @@ function buildClubCapabilities(
         { key: "insurance_review_status", label: "线下保险确认状态" },
         { key: "attendance_sync_status", label: "到课同步状态" },
       ],
+      statusDisplay: {
+        lesson: {
+          showBalance: parentVisibility.showLessonBalance,
+          showUpdatedAt: parentVisibility.showStatusUpdatedAt,
+          showSource: parentVisibility.showStatusSource,
+        },
+        insurance: {
+          showPolicyNumber: parentVisibility.showInsurancePolicyNumber,
+          showUpdatedAt: parentVisibility.showStatusUpdatedAt,
+          showSource: parentVisibility.showStatusSource,
+        },
+      },
+    },
+    visibility: {
+      parent: parentVisibility,
+    },
+    defaultTemplates: {
+      features: {
+        training: true,
+        matches: true,
+        assessments: true,
+        derived_metrics: true,
+        private_lessons: true,
+        payments: false,
+        crm: false,
+        media_distribution: false,
+        venue_management: false,
+      },
+      appClientVisibility: {
+        parentMetricScope: "published_summary",
+        showLessonBalance: true,
+        showInsurancePolicyNumber: false,
+        showStatusUpdatedAt: true,
+        showStatusSource: false,
+      },
     },
     assessment: {
       graphVersions: config.metricGraphVersions,
@@ -330,6 +410,24 @@ function buildClubCapabilities(
       latestSyncRuns: latestSyncRuns.slice(0, 10),
     },
   };
+}
+
+function stringArrayPolicy(policies: ClubPolicy[], key: ClubPolicy["key"], fallback: string[]): string[] {
+  const value = policies.find((policy) => policy.key === key && policy.active)?.value;
+  return Array.isArray(value) && value.every((item) => typeof item === "string") ? value : fallback;
+}
+
+function objectPolicy(policies: ClubPolicy[], key: ClubPolicy["key"]): Record<string, unknown> {
+  const value = policies.find((policy) => policy.key === key && policy.active)?.value;
+  return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+function stringValue(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
+
+function booleanValue(value: unknown): boolean | undefined {
+  return typeof value === "boolean" ? value : undefined;
 }
 
 function deriveLessonBalance(entries: LessonLedgerEntry[]): number {
@@ -389,6 +487,7 @@ function validateLessonAdjustment(input: LessonAdjustmentInput): void {
 export abstract class SeedBackedStore implements ApiStore {
   protected readonly data: SeedData;
   private readonly counters = new Map<string, number>();
+  private readonly httpIdempotencyRecords = new Map<string, HttpIdempotencyRecord>();
 
   constructor(data: SeedData = createSeedData()) {
     this.data = data;
@@ -437,6 +536,31 @@ export abstract class SeedBackedStore implements ApiStore {
       status: "ok",
       service: "@football-club/api",
     };
+  }
+
+  getHttpIdempotencyRecord(key: string): HttpIdempotencyRecord | null {
+    const record = this.httpIdempotencyRecords.get(key);
+    if (!record || Date.parse(record.expiresAt) <= Date.now()) {
+      if (record) {
+        this.httpIdempotencyRecords.delete(key);
+      }
+      return null;
+    }
+
+    return record;
+  }
+
+  saveHttpIdempotencyRecord(record: HttpIdempotencyRecord): void {
+    this.httpIdempotencyRecords.set(record.key, record);
+  }
+
+  pruneHttpIdempotencyRecords(now: string): void {
+    const cutoff = Date.parse(now);
+    for (const [key, record] of this.httpIdempotencyRecords.entries()) {
+      if (Date.parse(record.expiresAt) <= cutoff) {
+        this.httpIdempotencyRecords.delete(key);
+      }
+    }
   }
 
   listClubs(): Club[] | Promise<Club[]> {
@@ -1061,12 +1185,32 @@ export abstract class SeedBackedStore implements ApiStore {
 
     const lessonLedger = this.data.lessonLedger.filter((entry) => entry.clubId === clubId && entry.studentId === studentId);
     const insurance = this.listInsurancePolicies(clubId, studentId);
+    const latestLessonEntry = [...lessonLedger].sort((left, right) =>
+      Date.parse(right.updatedAt) - Date.parse(left.updatedAt) || Date.parse(right.occurredAt) - Date.parse(left.occurredAt),
+    )[0];
+    const latestSyncRun = this.listExternalSyncRuns(clubId)[0];
 
     return {
       clubId,
       studentId,
       lessonBalance: lessonLedger.length ? deriveLessonBalance(lessonLedger) : undefined,
-      insurance: insurance?.current ?? { status: "unknown" },
+      lesson: {
+        balance: lessonLedger.length ? deriveLessonBalance(lessonLedger) : undefined,
+        updatedAt: latestLessonEntry?.updatedAt,
+        source: latestLessonEntry?.source,
+        status: latestLessonEntry
+          ? latestLessonEntry.source === "external_import" ? "synced" : "confirmed"
+          : "unknown",
+      },
+      insurance: {
+        ...(insurance?.current ?? { status: "unknown" as const }),
+        updatedAt: insurance?.policies[0]?.updatedAt,
+        source: insurance?.policies[0]?.source,
+        sourceId: insurance?.policies[0]?.sourceId,
+      },
+      sync: latestSyncRun
+        ? { latestRun: { id: latestSyncRun.id, status: latestSyncRun.status, updatedAt: latestSyncRun.updatedAt } }
+        : undefined,
     };
   }
 
@@ -1436,6 +1580,23 @@ export abstract class SeedBackedStore implements ApiStore {
     return this.activityServices.createTrainingSession(clubId, input);
   }
 
+  getTrainingSessionByEvent(clubId: EntityId, eventId: EntityId): TrainingSession | null {
+    return this.data.trainingSessions.find((session) => session.clubId === clubId && session.eventId === eventId) ?? null;
+  }
+
+  ensureTrainingSessionForEvent(
+    clubId: EntityId,
+    eventId: EntityId,
+    input: Partial<Parameters<ReturnType<typeof createApiServices>["createTrainingSession"]>[1]> = {},
+  ): TrainingSession {
+    return this.createTrainingSession(clubId, {
+      eventId,
+      kind: input.kind ?? "team",
+      sessionPlanId: input.sessionPlanId,
+      intensity: input.intensity,
+    });
+  }
+
   recordTrainingObservation(
     clubId: EntityId,
     trainingSessionId: EntityId,
@@ -1598,6 +1759,21 @@ export abstract class SeedBackedStore implements ApiStore {
     return service.recordMatchSummary(input);
   }
 
+  getMatchDetailByEvent(clubId: EntityId, eventId: EntityId) {
+    const match = this.data.matches.find((item) => item.clubId === clubId && item.eventId === eventId);
+    if (!match) {
+      return null;
+    }
+
+    return {
+      match,
+      rosters: this.data.matchRosters.filter((item) => item.clubId === clubId && item.matchId === match.id),
+      events: this.data.matchEvents.filter((item) => item.clubId === clubId && item.matchId === match.id),
+      notes: this.data.matchPlayerNotes.filter((item) => item.clubId === clubId && item.matchId === match.id),
+      metricRecords: this.data.metricRecords.filter((item) => item.clubId === clubId && item.eventId === eventId && item.source === "match_event"),
+    };
+  }
+
   recordAssessment(input: RecordAssessmentInput) {
     this.ensureStudentInClub(input.clubId, input.studentId);
     this.ensureCoachInClub(input.clubId, input.assessedByCoachId);
@@ -1676,6 +1852,18 @@ export class PersistentApiStore extends SeedBackedStore {
     data: SeedData = createSeedData(),
   ) {
     super(data);
+  }
+
+  override getHttpIdempotencyRecord(key: string) {
+    return this.repositories.dataCapability.getHttpIdempotencyRecord(key);
+  }
+
+  override saveHttpIdempotencyRecord(record: HttpIdempotencyRecord) {
+    this.repositories.dataCapability.saveHttpIdempotencyRecord(record);
+  }
+
+  override pruneHttpIdempotencyRecords(now: string) {
+    this.repositories.dataCapability.pruneHttpIdempotencyRecords(now);
   }
 
   override async listClubs() {

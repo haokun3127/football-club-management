@@ -287,7 +287,18 @@ export function buildOpenApiDocument() {
         post: operation("POST", "/clubs/{clubId}/admin/calendar/conflicts", schemas.scheduleConflicts),
       },
       "/clubs/{clubId}/training/sessions": {
+        get: operation("GET", "/clubs/{clubId}/training/sessions", {
+          ...schemas.clubParams,
+          ...schemas.trainingSessionQuery,
+          ...schemas.trainingSessionList,
+        }),
         post: operation("POST", "/clubs/{clubId}/training/sessions", schemas.createTrainingSession),
+      },
+      "/clubs/{clubId}/training/sessions/ensure": {
+        post: operation("POST", "/clubs/{clubId}/training/sessions/ensure", {
+          ...schemas.clubParams,
+          ...schemas.ensureTrainingSession,
+        }),
       },
       "/clubs/{clubId}/training/sessions/{trainingSessionId}/observations": {
         post: operation(
@@ -296,7 +307,14 @@ export function buildOpenApiDocument() {
           schemas.recordTrainingObservation,
         ),
       },
-      "/clubs/{clubId}/matches": { post: operation("POST", "/clubs/{clubId}/matches", schemas.recordMatch) },
+      "/clubs/{clubId}/matches": {
+        get: operation("GET", "/clubs/{clubId}/matches", {
+          ...schemas.clubParams,
+          ...schemas.matchDetailQuery,
+          ...schemas.matchDetail,
+        }),
+        post: operation("POST", "/clubs/{clubId}/matches", schemas.recordMatch),
+      },
       "/clubs/{clubId}/assessments": { post: operation("POST", "/clubs/{clubId}/assessments", schemas.recordAssessment) },
       "/clubs/{clubId}/catalog/ability-metrics": {
         get: operation("GET", "/clubs/{clubId}/catalog/ability-metrics", schemas.abilityMetrics),

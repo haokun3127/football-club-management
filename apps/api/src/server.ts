@@ -30,7 +30,7 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
     },
   });
   const context = createRouteContext(store, options.membershipResolver);
-  registerHttpRequestContracts(app);
+  registerHttpRequestContracts(app, store);
 
   app.setErrorHandler((error: FastifyError, _request, reply) => {
     if (error.validation) {

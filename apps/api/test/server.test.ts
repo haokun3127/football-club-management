@@ -58,7 +58,10 @@ describe("api server", () => {
     expect(body.paths["/clubs/{clubId}/students/{studentId}/status-summary"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/sync-runs/{syncRunId}"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/coach/today"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/training/sessions"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/training/sessions/ensure"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/training/sessions/{trainingSessionId}/observations"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/matches"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/assessments"]).toBeDefined();
   });
 
@@ -95,6 +98,10 @@ describe("api server", () => {
         roleEntrypoints: Record<string, string[]>;
       };
       features: Record<string, boolean>;
+      match: { eventTypes: string[] };
+      visibility: { parent: { metricScope: string; showLessonBalance: boolean; showStatusUpdatedAt: boolean } };
+      operations: { statusDisplay: { lesson: { showUpdatedAt: boolean }; insurance: { showPolicyNumber: boolean } } };
+      defaultTemplates: { features: Record<string, boolean>; appClientVisibility: Record<string, unknown> };
     };
     const appClients = adminClientsResponse.json() as Array<{ id: string; channel: string; clientKey: string }>;
     const resolved = resolvedResponse.json() as {
@@ -114,6 +121,14 @@ describe("api server", () => {
     expect(miniProgramBody.client.navigation.map((item) => item.key)).toEqual(expect.arrayContaining(["calendar", "attendance", "assessment"]));
     expect(miniProgramBody.client.roleEntrypoints.parent).toEqual(expect.arrayContaining(["calendar", "status"]));
     expect(miniProgramBody.features.payments).toBe(false);
+    expect(miniProgramBody.match.eventTypes).toEqual(["goal", "assist", "save", "tackle"]);
+    expect(miniProgramBody.visibility.parent).toEqual(expect.objectContaining({
+      metricScope: "published_summary",
+      showLessonBalance: true,
+      showStatusUpdatedAt: true,
+    }));
+    expect(miniProgramBody.operations.statusDisplay.insurance.showPolicyNumber).toBe(true);
+    expect(miniProgramBody.defaultTemplates.features.payments).toBe(false);
     expect(adminClientsResponse.statusCode).toBe(200);
     expect(appClients).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "app-client-cq-talent-wechat-main", channel: "wechat_miniprogram" }),
@@ -370,6 +385,9 @@ describe("api server", () => {
         ],
       },
     });
+    const idempotencyRows = persistence.database.prepare(`
+      SELECT status_code, payload, expires_at FROM http_idempotency_records
+    `).all() as Array<{ status_code: number; payload: string; expires_at: string }>;
 
     expect(readResponse.statusCode).toBe(200);
     expect(readResponse.headers["cache-control"]).toBe("private, max-age=30, stale-while-revalidate=60");
@@ -384,6 +402,12 @@ describe("api server", () => {
     expect(replayedWrite.body).toBe(firstWrite.body);
     expect(conflictingWrite.statusCode).toBe(409);
     expect(conflictingWrite.json().error.code).toBe("idempotency_conflict");
+    expect(idempotencyRows).toHaveLength(1);
+    expect(idempotencyRows[0]).toEqual(expect.objectContaining({
+      status_code: 200,
+      payload: firstWrite.body,
+    }));
+    expect(Date.parse(idempotencyRows[0]?.expires_at ?? "")).toBeGreaterThan(Date.now());
 
     await app.close();
     persistence.database.close();
@@ -948,11 +972,17 @@ describe("api server", () => {
       url: "/clubs/club-chongqing-talent/admin/students/student-1/lesson-ledger",
       headers: { "x-user-id": "user-admin-1" },
     });
+    const summaryResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/students/student-1/status-summary",
+      headers: { "x-user-id": "user-parent-1" },
+    });
 
     const ledger = ledgerResponse.json() as {
       balance: number;
       entries: Array<{ entryType: string; lessonDelta: number; source: string; sourceId?: string; paymentEventId?: string }>;
     };
+    const summary = summaryResponse.json() as { lesson?: { balance?: number; status: string; updatedAt?: string; source?: string } };
 
     expect(creditResponse.statusCode).toBe(201);
     expect(attendanceResponse.statusCode).toBe(200);
@@ -965,6 +995,13 @@ describe("api server", () => {
       expect.objectContaining({ entryType: "adjustment", lessonDelta: 2, source: "manual_adjustment", sourceId: "manual-adjustment-1" }),
     ]));
     expect(ledger.entries.find((entry) => entry.entryType === "credit")?.paymentEventId).toBeTruthy();
+    expect(summaryResponse.statusCode).toBe(200);
+    expect(summary.lesson).toEqual(expect.objectContaining({
+      balance: 13,
+      status: "confirmed",
+      source: "manual_adjustment",
+    }));
+    expect(summary.lesson?.updatedAt).toBeTruthy();
 
     await app.close();
     persistence.database.close();
@@ -1025,7 +1062,9 @@ describe("api server", () => {
       current: { status: string; policyNumber?: string; expiresAt?: string };
       policies: Array<{ policyNumber?: string; currentStatus: string }>;
     };
-    const summary = summaryResponse.json() as { insurance: { status: string; policyNumber?: string } };
+    const summary = summaryResponse.json() as {
+      insurance: { status: string; policyNumber?: string; updatedAt?: string; source?: string; sourceId?: string };
+    };
 
     expect(expiredResponse.statusCode).toBe(201);
     expect(renewalResponse.statusCode).toBe(201);
@@ -1041,7 +1080,13 @@ describe("api server", () => {
       expect.objectContaining({ policyNumber: "POLICY-NEW", currentStatus: "active" }),
     ]));
     expect(summaryResponse.statusCode).toBe(200);
-    expect(summary.insurance).toEqual(expect.objectContaining({ status: "active", policyNumber: "POLICY-NEW" }));
+    expect(summary.insurance).toEqual(expect.objectContaining({
+      status: "active",
+      policyNumber: "POLICY-NEW",
+      source: "offline_insurance",
+      sourceId: "insurance-renewal",
+    }));
+    expect(summary.insurance.updatedAt).toBeTruthy();
 
     await app.close();
     persistence.database.close();
@@ -1266,6 +1311,44 @@ describe("api server", () => {
     ]));
   });
 
+  it("reads and ensures training sessions by event", async () => {
+    const app = buildServer(undefined, { logger: false });
+    const listResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/training/sessions?eventId=event-training-1",
+    });
+    const ensureResponse = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/training/sessions/ensure",
+      payload: {
+        eventId: "event-training-1",
+        kind: "team",
+        intensity: "high",
+      },
+    });
+    const invalidResponse = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/training/sessions/ensure",
+      payload: {
+        eventId: "event-match-1",
+      },
+    });
+
+    const sessions = listResponse.json() as Array<{ id: string; eventId: string; intensity?: string }>;
+    const ensured = ensureResponse.json() as { id: string; eventId: string; intensity?: string };
+
+    expect(listResponse.statusCode).toBe(200);
+    expect(sessions).toEqual([expect.objectContaining({ id: "training-session-1", eventId: "event-training-1" })]);
+    expect(ensureResponse.statusCode).toBe(201);
+    expect(ensured).toEqual(expect.objectContaining({
+      id: "training-session-1",
+      eventId: "event-training-1",
+      intensity: "high",
+    }));
+    expect(invalidResponse.statusCode).toBe(400);
+    expect(invalidResponse.json().error.message).toBe("Training session must link to a training event.");
+  });
+
   it("records match events and writes match metric records", async () => {
     const app = buildServer(undefined, { logger: false });
     const response = await app.inject({
@@ -1298,6 +1381,34 @@ describe("api server", () => {
     expect(body.metricRecords).toEqual([
       expect.objectContaining({ source: "match_event", metricId: "metric-goals" }),
     ]);
+  });
+
+  it("reads match detail by event for submitted results", async () => {
+    const app = buildServer(undefined, { logger: false });
+    const response = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/matches?eventId=event-match-1",
+    });
+
+    const body = response.json() as {
+      match: { id: string; eventId: string };
+      rosters: Array<{ studentId: string }>;
+      events: Array<{ type: string; studentId: string }>;
+      notes: Array<{ studentId: string }>;
+      metricRecords: Array<{ source: string; eventId: string }>;
+    };
+
+    expect(response.statusCode).toBe(200);
+    expect(body.match).toEqual(expect.objectContaining({ id: "match-1", eventId: "event-match-1" }));
+    expect(body.rosters).toEqual([expect.objectContaining({ studentId: "student-1" })]);
+    expect(body.events).toEqual(expect.arrayContaining([
+      expect.objectContaining({ type: "goal", studentId: "student-1" }),
+      expect.objectContaining({ type: "assist", studentId: "student-1" }),
+    ]));
+    expect(body.notes).toEqual([expect.objectContaining({ studentId: "student-1" })]);
+    expect(body.metricRecords).toEqual(expect.arrayContaining([
+      expect.objectContaining({ source: "match_event", eventId: "event-match-1" }),
+    ]));
   });
 
   it("records repeated scoring and assist events as separate count metric records", async () => {

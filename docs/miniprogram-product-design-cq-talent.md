@@ -578,8 +578,8 @@ sequenceDiagram
 | 保险/课时状态 | `GET /clubs/:clubId/app-clients/:clientId/parent/students/:studentId/home` | `GET /clubs/:clubId/students/:studentId/status-summary` 用于局部刷新 |
 | 教练今日课表 | `GET /clubs/:clubId/app-clients/:clientId/coach/home?date=...` | 教练周课表 BFF |
 | 活动点名 | `GET /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/workbench`、`PUT /clubs/:clubId/admin/calendar/events/:eventId/participants` | 写入建议携带 `Idempotency-Key` |
-| 训练观察 | `GET /clubs/:clubId/catalog/ability-metrics`、`POST /clubs/:clubId/training/sessions/:trainingSessionId/observations` | 训练 session 自动创建/读取接口 |
-| 比赛事件记录 | `POST /clubs/:clubId/matches` | 比赛详情读取/编辑接口 |
+| 训练观察 | `GET /clubs/:clubId/training/sessions?eventId=...`、`POST /clubs/:clubId/training/sessions/ensure`、`POST /clubs/:clubId/training/sessions/:trainingSessionId/observations` | 写入建议携带 `Idempotency-Key` |
+| 比赛事件记录 | `GET /clubs/:clubId/matches?eventId=...`、`POST /clubs/:clubId/matches` | 已提交结果只读展示；编辑需后续 PATCH 策略 |
 | 评测录入 | `GET /clubs/:clubId/app-clients/:clientId/coach/assessments/templates/:templateId/form`、`POST /clubs/:clubId/assessments` | 写入建议携带 `Idempotency-Key` |
 
 ## 通用权限与状态处理
@@ -644,26 +644,20 @@ sequenceDiagram
 - 教练今日工作台：`GET /clubs/:clubId/app-clients/:clientId/coach/home`
 - 教练单活动工作台：`GET /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/workbench`
 - 按模板读取评测表单：`GET /clubs/:clubId/app-clients/:clientId/coach/assessments/templates/:templateId/form`
+- 训练 session 按 event 读取/初始化：`GET /clubs/:clubId/training/sessions?eventId=...`、`POST /clubs/:clubId/training/sessions/ensure`
+- 比赛详情读取：`GET /clubs/:clubId/matches?eventId=...`
+- 写入幂等：持久 store 使用 `http_idempotency_records`，重复写入建议携带 `Idempotency-Key`
+- 状态更新时间和来源：`status-summary` 返回 lesson/insurance 的 `updatedAt`、`source`，并包含 latest sync run 摘要
 
-1. 训练 session 读取/初始化接口
-   - 需求：教练从训练活动进入观察页时能获得 `trainingSessionId`，必要时按 event 初始化。
-   - 建议形态：`GET /clubs/:clubId/training/sessions?eventId=...` 或后端在训练活动创建时保证 session 存在。
-   - 原因：现有 observation 写入依赖 `trainingSessionId`，但小程序不应自行创建或猜测。
+1. 比赛编辑/覆盖策略接口
+   - 需求：若允许教练修改已提交比赛记录，需要明确版本/并发/审计策略。
+   - 建议形态：`PATCH /clubs/:clubId/matches/:matchId`，并要求 `Idempotency-Key` 和版本字段。
+   - 原因：当前已支持读取和首次提交，编辑会影响已生成指标和家长可见历史，应单独设计。
 
-2. 比赛详情读取/编辑策略接口
-   - 需求：读取已提交比赛记录；若允许编辑，需要明确编辑接口和版本/并发策略。
-   - 建议形态：`GET /clubs/:clubId/matches?eventId=...`、`PATCH /clubs/:clubId/matches/:matchId`。
-   - 原因：现有 `POST /clubs/:clubId/matches` 适合首次写入，但页面需要展示已提交结果和避免重复覆盖。
-
-3. 状态摘要增加更新时间和来源级别
-   - 需求：`status-summary` 返回 lesson/insurance 的 `updatedAt`、`sourceKind` 或“同步中/待确认”状态。
-   - 建议形态：扩展现有响应字段。
-   - 原因：家长端需要区分未知、未同步、已确认和可能过期数据。
-
-4. capability 中明确 match event types 和 parent visibility
+2. capability 中明确更多俱乐部级展示策略
     - 需求：提供比赛事件类型目录、家长可见字段策略、保险/课时展示策略。
-    - 建议形态：补充 `capabilities.match.eventTypes` 和 `capabilities.client.visibility.parent`。
-    - 原因：小程序不能写死重庆天才的比赛事件和家长可见范围。
+    - 当前已补充：`capabilities.match.eventTypes`、`capabilities.visibility.parent`、`operations.statusDisplay`。
+    - 后续可扩展：不同俱乐部对教练评语、原始分、比赛事件明细的精细可见规则。
 
 ## 明确不做
 

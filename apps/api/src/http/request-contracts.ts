@@ -1,19 +1,11 @@
 import crypto from "node:crypto";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import type { ApiStore } from "../store.js";
 import { apiError } from "./errors.js";
 
-interface IdempotencyEntry {
-  fingerprint: string;
-  statusCode: number;
-  payload: string;
-  contentType?: string;
-  createdAt: number;
-}
-
-const idempotencyStore = new Map<string, IdempotencyEntry>();
 const idempotencyTtlMs = 1000 * 60 * 30;
 
-export function registerHttpRequestContracts(app: FastifyInstance) {
+export function registerHttpRequestContracts(app: FastifyInstance, store: ApiStore) {
   app.addHook("preHandler", async (request, reply) => {
     applyPrivateCacheHeaders(request, reply);
 
@@ -26,14 +18,14 @@ export function registerHttpRequestContracts(app: FastifyInstance) {
       return;
     }
 
-    pruneIdempotencyStore();
+    await store.pruneHttpIdempotencyRecords(new Date().toISOString());
     const cacheKey = buildIdempotencyCacheKey(request, idempotencyKey);
     const fingerprint = hashStable({
       method: request.method,
       url: request.url,
       body: request.body ?? null,
     });
-    const existing = idempotencyStore.get(cacheKey);
+    const existing = await store.getHttpIdempotencyRecord(cacheKey);
 
     if (!existing) {
       request.idempotency = { cacheKey, fingerprint };
@@ -73,12 +65,15 @@ export function registerHttpRequestContracts(app: FastifyInstance) {
       && reply.statusCode < 500
       && typeof payload === "string"
     ) {
-      idempotencyStore.set(request.idempotency.cacheKey, {
+      const now = new Date();
+      await store.saveHttpIdempotencyRecord({
+        key: request.idempotency.cacheKey,
         fingerprint: request.idempotency.fingerprint,
         statusCode: reply.statusCode,
         payload,
         contentType: reply.getHeader("content-type")?.toString(),
-        createdAt: Date.now(),
+        createdAt: now.toISOString(),
+        expiresAt: new Date(now.getTime() + idempotencyTtlMs).toISOString(),
       });
       reply.header("Idempotency-Status", "stored");
     }
@@ -119,16 +114,6 @@ function buildIdempotencyCacheKey(request: FastifyRequest, idempotencyKey: strin
     userId: headerValue(request.headers["x-user-id"]) ?? "anonymous",
     authorization: headerValue(request.headers.authorization) ?? "",
   });
-}
-
-function pruneIdempotencyStore() {
-  const cutoff = Date.now() - idempotencyTtlMs;
-
-  for (const [key, entry] of idempotencyStore.entries()) {
-    if (entry.createdAt < cutoff) {
-      idempotencyStore.delete(key);
-    }
-  }
 }
 
 function hashStable(value: unknown) {

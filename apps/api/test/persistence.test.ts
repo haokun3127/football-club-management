@@ -15,6 +15,7 @@ describe("platform persistence", () => {
       "0001_platform_foundation.sql",
       "0002_data_capability_foundation.sql",
       "0003_status_flow_audit_fields.sql",
+      "0004_http_idempotency_records.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);
@@ -36,6 +37,7 @@ describe("platform persistence", () => {
           'external_sync_runs',
           'external_raw_records',
           'external_record_links',
+          'http_idempotency_records',
           'metric_graph_versions',
           'metric_dependencies',
           'metric_views',
@@ -64,6 +66,7 @@ describe("platform persistence", () => {
       "external_sync_runs",
       "external_system_connections",
       "external_table_mappings",
+      "http_idempotency_records",
       "metric_dependencies",
       "metric_graph_versions",
       "metric_view_nodes",

@@ -23,6 +23,7 @@ import type {
   ExternalSyncPolicy,
   ExternalSystemConnection,
   ExternalTableMapping,
+  HttpIdempotencyRecord,
   InsurancePolicy,
   InsurancePolicyInput,
   InsurancePolicySummary,
@@ -253,6 +254,46 @@ function catalogScopeValues(scope: CatalogScope): [CatalogScope["scope"], string
 
 export class DataCapabilityRepository {
   constructor(private readonly database: DatabaseSync) {}
+
+  getHttpIdempotencyRecord(key: string): HttpIdempotencyRecord | null {
+    const row = this.database.prepare(`
+      SELECT * FROM http_idempotency_records
+      WHERE key = ? AND expires_at > ?
+    `).get(key, new Date().toISOString()) as SqlRow | undefined;
+
+    return row ? mapHttpIdempotencyRecord(row) : null;
+  }
+
+  saveHttpIdempotencyRecord(record: HttpIdempotencyRecord): void {
+    this.database.prepare(`
+      INSERT INTO http_idempotency_records (
+        key, fingerprint, status_code, payload, content_type, created_at, expires_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(key) DO UPDATE SET
+        fingerprint = excluded.fingerprint,
+        status_code = excluded.status_code,
+        payload = excluded.payload,
+        content_type = excluded.content_type,
+        created_at = excluded.created_at,
+        expires_at = excluded.expires_at
+    `).run(
+      record.key,
+      record.fingerprint,
+      record.statusCode,
+      record.payload,
+      record.contentType ?? null,
+      record.createdAt,
+      record.expiresAt,
+    );
+  }
+
+  pruneHttpIdempotencyRecords(now: string): void {
+    this.database.prepare(`
+      DELETE FROM http_idempotency_records
+      WHERE expires_at <= ?
+    `).run(now);
+  }
 
   listExternalConnections(clubId: EntityId): ExternalSystemConnection[] {
     const rows = this.database.prepare(`
@@ -535,12 +576,30 @@ export class DataCapabilityRepository {
 
     const lessonLedger = this.getLessonLedger(clubId, studentId);
     const insurance = this.listInsurancePolicies(clubId, studentId);
+    const latestLessonEntry = lessonLedger?.entries[0];
+    const latestSyncRun = this.listSyncRuns(clubId)[0];
 
     return {
       clubId,
       studentId,
       lessonBalance: lessonLedger ? lessonLedger.balance : undefined,
-      insurance: insurance?.current ?? { status: "unknown" },
+      lesson: {
+        balance: lessonLedger?.balance,
+        updatedAt: latestLessonEntry?.updatedAt,
+        source: latestLessonEntry?.source,
+        status: latestLessonEntry
+          ? latestLessonEntry.source === "external_import" ? "synced" : "confirmed"
+          : "unknown",
+      },
+      insurance: {
+        ...(insurance?.current ?? { status: "unknown" as const }),
+        updatedAt: insurance?.policies[0]?.updatedAt,
+        source: insurance?.policies[0]?.source,
+        sourceId: insurance?.policies[0]?.sourceId,
+      },
+      sync: latestSyncRun
+        ? { latestRun: { id: latestSyncRun.id, status: latestSyncRun.status, updatedAt: latestSyncRun.updatedAt } }
+        : undefined,
     };
   }
 
@@ -2215,6 +2274,18 @@ function mapMetricView(row: SqlRow): MetricView {
     status: requireString(row, "status") as MetricView["status"],
     createdAt: requireString(row, "created_at"),
     updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapHttpIdempotencyRecord(row: SqlRow): HttpIdempotencyRecord {
+  return {
+    key: requireString(row, "key"),
+    fingerprint: requireString(row, "fingerprint"),
+    statusCode: numberFromSql(row, "status_code"),
+    payload: requireString(row, "payload"),
+    contentType: optionalString(row, "content_type"),
+    createdAt: requireString(row, "created_at"),
+    expiresAt: requireString(row, "expires_at"),
   };
 }
 

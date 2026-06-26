@@ -47,6 +47,12 @@ The first WeChat mini-program uses:
   - Returns a single activity workbench with event detail, roster context, workflow flags, training/match state, and assessment config.
 - `GET /clubs/:clubId/app-clients/:clientId/coach/assessments/templates/:templateId/form`
   - Returns the configured assessment template version and ordered input/output fields with metric and test item metadata.
+- `GET /clubs/:clubId/training/sessions?eventId=...`
+  - Reads the training session bound to a training event.
+- `POST /clubs/:clubId/training/sessions/ensure`
+  - Initializes or updates the training session for a training event, returning the stable session id.
+- `GET /clubs/:clubId/matches?eventId=...`
+  - Reads submitted match detail for an event, including roster, events, notes, and generated match metric records.
 
 Each route validates the active `ClubAppClient` and the relevant role entrypoint. For example, the 重庆天才 admin portal client cannot be used to call parent mini-program APIs.
 
@@ -71,4 +77,12 @@ Recommended frontend startup:
 - Private cache variation includes `Authorization`, `X-User-Id`, and `X-App-Id`, so parent/coach responses are not shared across users.
 - Mutating requests may send `Idempotency-Key`. The server replays the previous response when the same user, method, URL, key, and payload are repeated.
 - Reusing the same `Idempotency-Key` with a different payload returns `409 idempotency_conflict`.
-- Current idempotency storage is in-process for MVP development. Production multi-instance deployment should move this store to Redis or a database table keyed by club, user, method, URL, and idempotency key.
+- Persistent API stores `Idempotency-Key` responses in `http_idempotency_records`, keyed by user-scoped method/URL/key fingerprint.
+- In-memory API stores still use a process-local map for fast tests and local development.
+- Production multi-instance deployment can keep this database table or replace the `ApiStore` idempotency methods with Redis.
+
+## Status Freshness
+
+- Student status summaries include `lesson.updatedAt`, `lesson.source`, `insurance.updatedAt`, `insurance.source`, and `sync.latestRun` when available.
+- Frontends should distinguish missing status from zero balance or expired insurance.
+- WPS sync state remains backend-owned; mini-programs only read summarized status and latest sync information.

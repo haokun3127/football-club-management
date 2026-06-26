@@ -272,6 +272,9 @@ const insurancePolicySummary = {
         expiresAt: { type: "string" },
         policyNumber: { type: "string" },
         reviewStatus: { type: "string", enum: ["pending", "approved", "rejected"] },
+        updatedAt: { type: "string" },
+        source: { type: "string" },
+        sourceId: { type: "string" },
       },
     },
     policies: { type: "array", items: insurancePolicy },
@@ -516,6 +519,24 @@ export const schemas = {
       properties: {
         clubId: { type: "string", minLength: 1 },
         trainingSessionId: { type: "string", minLength: 1 },
+      },
+    },
+  },
+  trainingSessionQuery: {
+    querystring: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        eventId: { type: "string", minLength: 1 },
+      },
+    },
+  },
+  matchDetailQuery: {
+    querystring: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        eventId: { type: "string", minLength: 1 },
       },
     },
   },
@@ -806,7 +827,19 @@ export const schemas = {
           studentId: { type: "string" },
           clubId: { type: "string" },
           lessonBalance: { type: "number" },
+          lesson: {
+            type: "object",
+            additionalProperties: false,
+            required: ["status"],
+            properties: {
+              balance: { type: "number" },
+              updatedAt: { type: "string" },
+              source: { type: "string" },
+              status: { type: "string", enum: ["unknown", "synced", "confirmed", "pending"] },
+            },
+          },
           insurance: insurancePolicySummary.properties.current,
+          sync: flexibleObject,
         },
       },
       403: errorResponse,
@@ -1081,10 +1114,35 @@ export const schemas = {
         eventId: { type: "string", minLength: 1 },
         kind: { type: "string", minLength: 1 },
         sessionPlanId: { type: "string" },
-        intensity: { type: "string" },
+        intensity: { type: "string", enum: ["low", "medium", "high"] },
       },
     },
     response: {
+      403: errorResponse,
+    },
+  },
+  trainingSessionList: {
+    response: {
+      200: { type: "array", items: domainObject },
+      400: errorResponse,
+      403: errorResponse,
+    },
+  },
+  ensureTrainingSession: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["eventId"],
+      properties: {
+        eventId: { type: "string", minLength: 1 },
+        kind: { type: "string", enum: ["team", "small_group", "private", "specialty"] },
+        sessionPlanId: { type: "string" },
+        intensity: { type: "string", enum: ["low", "medium", "high"] },
+      },
+    },
+    response: {
+      201: domainObject,
+      400: errorResponse,
       403: errorResponse,
     },
   },
@@ -1189,6 +1247,25 @@ export const schemas = {
       },
       400: errorResponse,
       403: errorResponse,
+    },
+  },
+  matchDetail: {
+    response: {
+      200: {
+        type: "object",
+        additionalProperties: false,
+        required: ["match", "rosters", "events", "notes", "metricRecords"],
+        properties: {
+          match: domainObject,
+          rosters: { type: "array", items: domainObject },
+          events: { type: "array", items: domainObject },
+          notes: { type: "array", items: domainObject },
+          metricRecords: { type: "array", items: playerMetricRecord },
+        },
+      },
+      400: errorResponse,
+      403: errorResponse,
+      404: errorResponse,
     },
   },
   recordAssessment: {
