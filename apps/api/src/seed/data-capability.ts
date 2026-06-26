@@ -3,6 +3,7 @@ import type {
   ExternalRawRecord,
   ExternalRecordLink,
   ExternalSyncRun,
+  ExternalSyncPolicy,
   ExternalSystemConnection,
   ExternalTableMapping,
 } from "../data-capability/types.js";
@@ -44,6 +45,7 @@ export function createDataCapabilitySeed(): Pick<
   | "externalConnections"
   | "externalTableMappings"
   | "externalFieldMappings"
+  | "externalSyncPolicies"
   | "externalSyncRuns"
   | "externalRawRecords"
   | "externalRecordLinks"
@@ -171,6 +173,24 @@ export function createDataCapabilitySeed(): Pick<
     ]),
   ];
 
+  const externalSyncPolicies: ExternalSyncPolicy[] = [
+    {
+      id: "external-sync-policy-wps-cq-talent-manual",
+      clubId,
+      connectionId,
+      tableMappingId: "external-table-full-users-cq-talent",
+      name: "重庆天才 WPS 手动入站同步",
+      status: "active",
+      triggerMode: "manual",
+      direction: "inbound",
+      applyPolicy: "manual_confirm",
+      conflictPolicy: "manual_review",
+      writebackPolicy: "disabled",
+      createdAt: now,
+      updatedAt: now,
+    },
+  ];
+
   const externalSyncRuns: ExternalSyncRun[] = [
     {
       id: "external-sync-run-cq-talent",
@@ -248,6 +268,7 @@ export function createDataCapabilitySeed(): Pick<
     externalConnections,
     externalTableMappings,
     externalFieldMappings,
+    externalSyncPolicies,
     externalSyncRuns,
     externalRawRecords,
     externalRecordLinks,

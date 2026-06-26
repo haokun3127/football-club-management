@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createSeedData } from "../src/seed.js";
 import { createPlatformRepositories, seedPlatformData } from "../src/persistence/platform-persistence.js";
 import { migrate, openSqliteDatabase } from "../src/persistence/sqlite.js";
+import { PersistentApiStore } from "../src/store.js";
 
 describe("platform persistence", () => {
   it("runs migrations idempotently", () => {
@@ -29,6 +30,7 @@ describe("platform persistence", () => {
           'external_system_connections',
           'external_table_mappings',
           'external_field_mappings',
+          'external_sync_policies',
           'external_sync_runs',
           'external_raw_records',
           'external_record_links',
@@ -55,6 +57,7 @@ describe("platform persistence", () => {
       "external_field_mappings",
       "external_raw_records",
       "external_record_links",
+      "external_sync_policies",
       "external_sync_runs",
       "external_system_connections",
       "external_table_mappings",
@@ -65,6 +68,84 @@ describe("platform persistence", () => {
       "student_contacts",
       "student_operational_profiles",
     ]);
+
+    database.close();
+  });
+
+  it("persists WPS sync policies and runs deterministic staging through the store", async () => {
+    const database = openSqliteDatabase(":memory:");
+    migrate(database);
+
+    const repositories = createPlatformRepositories(database);
+    await seedPlatformData(repositories, createSeedData());
+    const store = new PersistentApiStore(repositories);
+
+    const seededPolicies = repositories.dataCapability.listExternalSyncPolicies("club-chongqing-talent");
+    const created = store.createExternalSyncPolicy("club-chongqing-talent", {
+      connectionId: "external-connection-wps-cq-talent",
+      tableMappingId: "external-table-payment-events-cq-talent",
+      name: "Payment WPS Manual Sync",
+      status: "active",
+      triggerMode: "manual",
+      direction: "inbound",
+      applyPolicy: "manual_confirm",
+      conflictPolicy: "manual_review",
+      writebackPolicy: "disabled",
+    });
+    const updated = store.updateExternalSyncPolicy("club-chongqing-talent", created.id, {
+      name: "Payment WPS Manual Sync Updated",
+      conflictPolicy: "external_wins",
+    });
+    const firstRun = store.runExternalSyncPolicy("club-chongqing-talent", created.id);
+    const secondRun = store.runExternalSyncPolicy("club-chongqing-talent", created.id);
+    const rawRecords = repositories.dataCapability.getImportPreview("club-chongqing-talent", {
+      tableMappingId: "external-table-payment-events-cq-talent",
+    }).records.filter((record) => record.externalRecordId.startsWith("wps:payment_events"));
+    const rawRecordCount = database.prepare(`
+      SELECT COUNT(*) AS count FROM external_raw_records
+      WHERE club_id = ? AND table_mapping_id = ? AND external_record_id LIKE 'wps:payment_events%'
+    `).get("club-chongqing-talent", "external-table-payment-events-cq-talent") as Record<string, unknown>;
+    const outbound = store.createExternalSyncPolicy("club-chongqing-talent", {
+      connectionId: "external-connection-wps-cq-talent",
+      tableMappingId: "external-table-payment-events-cq-talent",
+      name: "Outbound Disabled Run",
+      status: "active",
+      triggerMode: "manual",
+      direction: "outbound",
+      applyPolicy: "manual_confirm",
+      conflictPolicy: "manual_review",
+      writebackPolicy: "disabled",
+    });
+
+    expect(seededPolicies).toEqual([expect.objectContaining({
+      id: "external-sync-policy-wps-cq-talent-manual",
+      direction: "inbound",
+      applyPolicy: "manual_confirm",
+    })]);
+    expect(created).toEqual(expect.objectContaining({
+      clubId: "club-chongqing-talent",
+      tableMappingId: "external-table-payment-events-cq-talent",
+      status: "active",
+    }));
+    expect(updated).toEqual(expect.objectContaining({
+      name: "Payment WPS Manual Sync Updated",
+      conflictPolicy: "external_wins",
+    }));
+    expect(firstRun).toEqual(expect.objectContaining({
+      policy: expect.objectContaining({ id: created.id }),
+      syncRun: expect.objectContaining({ status: "completed", totalRecords: 1 }),
+      records: [expect.objectContaining({
+        tableMappingId: "external-table-payment-events-cq-talent",
+        normalizedPreview: expect.objectContaining({
+          "student.identityNumber": "500000201505010000",
+          "payment.courseHours": 24,
+        }),
+      })],
+    }));
+    expect(secondRun?.records[0]?.id).toBe(firstRun?.records[0]?.id);
+    expect(rawRecordCount.count).toBe(1);
+    expect(rawRecords).toHaveLength(1);
+    expect(() => store.runExternalSyncPolicy("club-chongqing-talent", outbound.id)).toThrow("Only inbound sync policies can be run in MVP.");
 
     database.close();
   });

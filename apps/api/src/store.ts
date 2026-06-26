@@ -45,20 +45,27 @@ import type {
   ClubCapabilities,
   ConfirmExternalRecordInput,
   DataCapabilityConfig,
+  CreateExternalSyncPolicyInput,
   ExternalFieldMapping,
   ExternalRawRecord,
   ExternalRecordLink,
   ExternalSyncRun,
+  ExternalSyncPolicy,
+  ExternalSystemConnection,
+  ExternalTableMapping,
   ImportPreview,
   ImportPreviewFilters,
+  RunExternalSyncPolicyResult,
   StageExternalImportInput,
   StageExternalImportResult,
   StudentDetail,
   StudentListFilters,
   StudentListItem,
   SyncRunDetail,
+  UpdateExternalSyncPolicyInput,
 } from "./data-capability/types.js";
 import { createApiServices } from "./application/services.js";
+import { DeterministicWpsStubConnector } from "./integration/wps-connector.js";
 import type { PlatformRepositories } from "./persistence/platform-persistence.js";
 import { createSeedData, type SeedData } from "./seed.js";
 
@@ -69,6 +76,11 @@ export interface ApiStore {
   getClubConfig(clubId: EntityId): unknown | null | Promise<unknown | null>;
   getClubCapabilities(clubId: EntityId): ClubCapabilities | null | Promise<ClubCapabilities | null>;
   getDataCapabilityConfig(clubId: EntityId): DataCapabilityConfig | Promise<DataCapabilityConfig>;
+  listExternalConnections(clubId: EntityId): ExternalSystemConnection[] | Promise<ExternalSystemConnection[]>;
+  listExternalSyncPolicies(clubId: EntityId): ExternalSyncPolicy[] | Promise<ExternalSyncPolicy[]>;
+  createExternalSyncPolicy(clubId: EntityId, input: CreateExternalSyncPolicyInput): ExternalSyncPolicy | Promise<ExternalSyncPolicy>;
+  updateExternalSyncPolicy(clubId: EntityId, policyId: EntityId, input: UpdateExternalSyncPolicyInput): ExternalSyncPolicy | null | Promise<ExternalSyncPolicy | null>;
+  runExternalSyncPolicy(clubId: EntityId, policyId: EntityId): RunExternalSyncPolicyResult | null | Promise<RunExternalSyncPolicyResult | null>;
   getImportPreview(clubId: EntityId, filters?: ImportPreviewFilters): ImportPreview | Promise<ImportPreview>;
   stageExternalImport(clubId: EntityId, input: StageExternalImportInput): StageExternalImportResult | Promise<StageExternalImportResult>;
   listExternalSyncRuns(clubId: EntityId): ExternalSyncRun[] | Promise<ExternalSyncRun[]>;
@@ -268,6 +280,7 @@ function buildClubCapabilities(
     },
     integration: {
       connections: config.externalConnections,
+      syncPolicies: config.syncPolicies,
       tableMappings: config.tableMappings,
       fieldMappings: config.fieldMappings,
       latestSyncRuns: latestSyncRuns.slice(0, 10),
@@ -578,9 +591,75 @@ export abstract class SeedBackedStore implements ApiStore {
       assessmentTemplateVersions: this.data.assessmentTemplateVersions.filter((item) => item.clubId === clubId),
       assessmentMetricBindings: this.data.assessmentMetricBindings.filter((item) => item.clubId === clubId),
       externalConnections: this.data.externalConnections.filter((item) => item.clubId === clubId),
+      syncPolicies: this.data.externalSyncPolicies.filter((item) => item.clubId === clubId),
       tableMappings: this.data.externalTableMappings.filter((item) => item.clubId === clubId),
       fieldMappings: this.data.externalFieldMappings.filter((item) => item.clubId === clubId),
     };
+  }
+
+  listExternalConnections(clubId: EntityId): ExternalSystemConnection[] {
+    return this.data.externalConnections.filter((item) => item.clubId === clubId);
+  }
+
+  listExternalSyncPolicies(clubId: EntityId): ExternalSyncPolicy[] {
+    return this.data.externalSyncPolicies.filter((item) => item.clubId === clubId);
+  }
+
+  createExternalSyncPolicy(clubId: EntityId, input: CreateExternalSyncPolicyInput): ExternalSyncPolicy {
+    this.ensureExternalPolicyReferences(clubId, input.connectionId, input.tableMappingId);
+    const now = this.now();
+
+    return upsertById(this.data.externalSyncPolicies, {
+      id: this.nextId("external-sync-policy"),
+      clubId,
+      ...input,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+
+  updateExternalSyncPolicy(
+    clubId: EntityId,
+    policyId: EntityId,
+    input: UpdateExternalSyncPolicyInput,
+  ): ExternalSyncPolicy | null {
+    const existing = this.data.externalSyncPolicies.find((item) => item.clubId === clubId && item.id === policyId);
+    if (!existing) {
+      return null;
+    }
+
+    this.ensureExternalPolicyReferences(
+      clubId,
+      input.connectionId ?? existing.connectionId,
+      input.tableMappingId === undefined ? existing.tableMappingId : input.tableMappingId,
+    );
+
+    return upsertById(this.data.externalSyncPolicies, {
+      ...existing,
+      ...input,
+      clubId,
+      id: policyId,
+      updatedAt: this.now(),
+    });
+  }
+
+  runExternalSyncPolicy(clubId: EntityId, policyId: EntityId): RunExternalSyncPolicyResult | null {
+    const policy = this.data.externalSyncPolicies.find((item) => item.clubId === clubId && item.id === policyId);
+    if (!policy) {
+      return null;
+    }
+
+    const { connection, tableMapping } = this.resolveRunnableSyncPolicy(policy);
+    const connector = new DeterministicWpsStubConnector();
+    const records = connector.fetchRows({ clubId, connection, tableMapping });
+    const result = this.stageExternalImport(clubId, {
+      connectionId: connection.id,
+      tableMappingId: tableMapping.id,
+      sourceName: `wps:${tableMapping.externalTableKey}`,
+      records,
+    });
+
+    return { policy, ...result };
   }
 
   getImportPreview(clubId: EntityId, filters: ImportPreviewFilters = {}): ImportPreview {
@@ -799,6 +878,60 @@ export abstract class SeedBackedStore implements ApiStore {
       .filter((item) => (filters.tableMappingId ? item.tableMappingId === filters.tableMappingId : true))
       .filter((item) => (filters.reviewStatus ? item.reviewStatus === filters.reviewStatus : true))
       .sort((left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt));
+  }
+
+  private ensureExternalPolicyReferences(clubId: EntityId, connectionId: EntityId, tableMappingId?: EntityId): void {
+    const connection = this.data.externalConnections.find((item) => item.clubId === clubId && item.id === connectionId);
+    if (!connection) {
+      throw new Error(`External connection ${connectionId} is not configured for club ${clubId}.`);
+    }
+
+    if (!tableMappingId) {
+      return;
+    }
+
+    const tableMapping = this.data.externalTableMappings.find((item) =>
+      item.clubId === clubId && item.id === tableMappingId && item.connectionId === connectionId,
+    );
+    if (!tableMapping) {
+      throw new Error(`External table mapping ${tableMappingId} is not configured for club ${clubId}.`);
+    }
+  }
+
+  private resolveRunnableSyncPolicy(policy: ExternalSyncPolicy): {
+    connection: ExternalSystemConnection;
+    tableMapping: ExternalTableMapping;
+  } {
+    if (policy.status !== "active") {
+      throw new Error("Only active sync policies can be run.");
+    }
+
+    if (policy.direction !== "inbound") {
+      throw new Error("Only inbound sync policies can be run in MVP.");
+    }
+
+    const connection = this.data.externalConnections.find((item) =>
+      item.clubId === policy.clubId && item.id === policy.connectionId,
+    );
+    if (!connection) {
+      throw new Error(`External connection ${policy.connectionId} is not configured for club ${policy.clubId}.`);
+    }
+
+    if (connection.provider !== "wps") {
+      throw new Error(`Provider ${connection.provider} does not have a sync connector.`);
+    }
+
+    const tableMapping = this.data.externalTableMappings.find((item) =>
+      item.clubId === policy.clubId
+        && item.connectionId === connection.id
+        && item.status === "active"
+        && (policy.tableMappingId ? item.id === policy.tableMappingId : true),
+    );
+    if (!tableMapping) {
+      throw new Error("No active table mapping is configured for this sync policy.");
+    }
+
+    return { connection, tableMapping };
   }
 
   private eventDetail(event: CalendarEvent) {
@@ -1190,6 +1323,98 @@ export class PersistentApiStore extends SeedBackedStore {
     });
   }
 
+  override listExternalConnections(clubId: EntityId) {
+    return this.repositories.dataCapability.listExternalConnections(clubId);
+  }
+
+  override listExternalSyncPolicies(clubId: EntityId) {
+    return this.repositories.dataCapability.listExternalSyncPolicies(clubId);
+  }
+
+  override createExternalSyncPolicy(clubId: EntityId, input: CreateExternalSyncPolicyInput) {
+    this.ensurePersistentExternalPolicyReferences(clubId, input.connectionId, input.tableMappingId);
+    const now = new Date().toISOString();
+    const policy: ExternalSyncPolicy = {
+      id: `external-sync-policy-${Date.now()}`,
+      clubId,
+      ...input,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    this.repositories.dataCapability.saveExternalSyncPolicy(policy);
+    return policy;
+  }
+
+  override updateExternalSyncPolicy(
+    clubId: EntityId,
+    policyId: EntityId,
+    input: UpdateExternalSyncPolicyInput,
+  ) {
+    const existing = this.repositories.dataCapability.getExternalSyncPolicy(clubId, policyId);
+    if (!existing) {
+      return null;
+    }
+
+    this.ensurePersistentExternalPolicyReferences(
+      clubId,
+      input.connectionId ?? existing.connectionId,
+      input.tableMappingId === undefined ? existing.tableMappingId : input.tableMappingId,
+    );
+
+    const policy: ExternalSyncPolicy = {
+      ...existing,
+      ...input,
+      clubId,
+      id: policyId,
+      updatedAt: new Date().toISOString(),
+    };
+    this.repositories.dataCapability.saveExternalSyncPolicy(policy);
+    return policy;
+  }
+
+  override runExternalSyncPolicy(clubId: EntityId, policyId: EntityId): RunExternalSyncPolicyResult | null {
+    const policy = this.repositories.dataCapability.getExternalSyncPolicy(clubId, policyId);
+    if (!policy) {
+      return null;
+    }
+
+    const config = this.getDataCapabilityConfig(clubId);
+    const connection = config.externalConnections.find((item) => item.id === policy.connectionId);
+    const tableMapping = config.tableMappings.find((item) =>
+      item.connectionId === policy.connectionId
+        && item.status === "active"
+        && (policy.tableMappingId ? item.id === policy.tableMappingId : true),
+    );
+
+    if (policy.status !== "active") {
+      throw new Error("Only active sync policies can be run.");
+    }
+    if (policy.direction !== "inbound") {
+      throw new Error("Only inbound sync policies can be run in MVP.");
+    }
+    if (!connection) {
+      throw new Error(`External connection ${policy.connectionId} is not configured for club ${clubId}.`);
+    }
+    if (connection.provider !== "wps") {
+      throw new Error(`Provider ${connection.provider} does not have a sync connector.`);
+    }
+    if (!tableMapping) {
+      throw new Error("No active table mapping is configured for this sync policy.");
+    }
+
+    const connector = new DeterministicWpsStubConnector();
+    const records = connector.fetchRows({ clubId, connection, tableMapping });
+    const result = this.stageExternalImport(clubId, {
+      connectionId: connection.id,
+      tableMappingId: tableMapping.id,
+      sourceName: `wps:${tableMapping.externalTableKey}`,
+      records,
+    });
+
+    return { policy, ...result };
+  }
+
   override getImportPreview(clubId: EntityId, filters: ImportPreviewFilters = {}) {
     return this.repositories.dataCapability.getImportPreview(clubId, filters);
   }
@@ -1289,5 +1514,25 @@ export class PersistentApiStore extends SeedBackedStore {
       linkId: `external-record-link-${Date.now()}`,
       now,
     });
+  }
+
+  private ensurePersistentExternalPolicyReferences(clubId: EntityId, connectionId: EntityId, tableMappingId?: EntityId): void {
+    const config = this.getDataCapabilityConfig(clubId);
+    const connection = config.externalConnections.find((item) => item.id === connectionId);
+
+    if (!connection) {
+      throw new Error(`External connection ${connectionId} is not configured for club ${clubId}.`);
+    }
+
+    if (!tableMappingId) {
+      return;
+    }
+
+    const tableMapping = config.tableMappings.find((item) =>
+      item.id === tableMappingId && item.connectionId === connectionId,
+    );
+    if (!tableMapping) {
+      throw new Error(`External table mapping ${tableMappingId} is not configured for club ${clubId}.`);
+    }
   }
 }

@@ -35,6 +35,10 @@ describe("api server", () => {
     expect(body.paths["/clubs/{clubId}/admin/imports/excel/preview"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/students"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/students/{studentId}"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/admin/integrations/connections"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/admin/integrations/sync-policies"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/admin/integrations/sync-policies/{policyId}"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/admin/integrations/sync-policies/{policyId}/run"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/sync-runs/{syncRunId}"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/coach/today"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/training/sessions/{trainingSessionId}/observations"]).toBeDefined();
@@ -321,6 +325,102 @@ describe("api server", () => {
     }));
     expect(first.records[0]?.validationErrors).toBeUndefined();
     expect(second.records[0]?.id).toBe(first.records[0]?.id);
+  });
+
+  it("manages WPS sync policies and runs deterministic stub syncs", async () => {
+    const app = buildServer(undefined, { logger: false });
+
+    const connectionsResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/admin/integrations/connections",
+    });
+    const policiesResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/admin/integrations/sync-policies",
+    });
+    const createResponse = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/integrations/sync-policies",
+      payload: {
+        connectionId: "external-connection-wps-cq-talent",
+        tableMappingId: "external-table-insurance-policies-cq-talent",
+        name: "Insurance WPS Manual Sync",
+        status: "active",
+        triggerMode: "manual",
+        direction: "inbound",
+        applyPolicy: "manual_confirm",
+        conflictPolicy: "manual_review",
+        writebackPolicy: "disabled",
+      },
+    });
+    const created = createResponse.json() as { id: string };
+    const updateResponse = await app.inject({
+      method: "PATCH",
+      url: `/clubs/club-chongqing-talent/admin/integrations/sync-policies/${created.id}`,
+      payload: {
+        name: "Insurance WPS Manual Sync Updated",
+      },
+    });
+    const runResponse = await app.inject({
+      method: "POST",
+      url: `/clubs/club-chongqing-talent/admin/integrations/sync-policies/${created.id}/run`,
+    });
+    const secondRunResponse = await app.inject({
+      method: "POST",
+      url: `/clubs/club-chongqing-talent/admin/integrations/sync-policies/${created.id}/run`,
+    });
+    const outboundResponse = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/integrations/sync-policies",
+      payload: {
+        connectionId: "external-connection-wps-cq-talent",
+        tableMappingId: "external-table-insurance-policies-cq-talent",
+        name: "Outbound Insurance Sync",
+        status: "active",
+        triggerMode: "manual",
+        direction: "bidirectional",
+        applyPolicy: "manual_confirm",
+        conflictPolicy: "manual_review",
+        writebackPolicy: "disabled",
+      },
+    });
+    const outbound = outboundResponse.json() as { id: string };
+    const rejectedRunResponse = await app.inject({
+      method: "POST",
+      url: `/clubs/club-chongqing-talent/admin/integrations/sync-policies/${outbound.id}/run`,
+    });
+
+    const connections = connectionsResponse.json() as Array<{ provider: string }>;
+    const policies = policiesResponse.json() as Array<{ id: string; direction: string; applyPolicy: string }>;
+    const run = runResponse.json() as {
+      syncRun: { status: string; totalRecords: number };
+      records: Array<{ id: string; normalizedPreview: Record<string, unknown> }>;
+    };
+    const secondRun = secondRunResponse.json() as { records: Array<{ id: string }> };
+
+    expect(connectionsResponse.statusCode).toBe(200);
+    expect(connections).toEqual([expect.objectContaining({ provider: "wps" })]);
+    expect(policiesResponse.statusCode).toBe(200);
+    expect(policies).toEqual([expect.objectContaining({
+      id: "external-sync-policy-wps-cq-talent-manual",
+      direction: "inbound",
+      applyPolicy: "manual_confirm",
+    })]);
+    expect(createResponse.statusCode).toBe(201);
+    expect(updateResponse.statusCode).toBe(200);
+    expect(updateResponse.json()).toEqual(expect.objectContaining({ name: "Insurance WPS Manual Sync Updated" }));
+    expect(runResponse.statusCode).toBe(201);
+    expect(run.syncRun).toEqual(expect.objectContaining({ status: "completed", totalRecords: 1 }));
+    expect(run.records).toEqual([expect.objectContaining({
+      normalizedPreview: expect.objectContaining({
+        "insurance.policyNo": "WPS-STUB-POLICY-001",
+      }),
+    })]);
+    expect(secondRunResponse.statusCode).toBe(201);
+    expect(secondRun.records[0]?.id).toBe(run.records[0]?.id);
+    expect(outboundResponse.statusCode).toBe(201);
+    expect(rejectedRunResponse.statusCode).toBe(400);
+    expect(rejectedRunResponse.json().error.message).toBe("Only inbound sync policies can be run in MVP.");
   });
 
   it("confirms staged external records without realtime external sync", async () => {

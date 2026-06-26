@@ -35,6 +35,23 @@ export interface ExternalTableMapping {
   updatedAt: string;
 }
 
+export interface ExternalSyncPolicy {
+  id: EntityId;
+  clubId: EntityId;
+  connectionId: EntityId;
+  tableMappingId?: EntityId;
+  name: string;
+  status: "draft" | "active" | "paused" | "disabled";
+  triggerMode: "manual" | "scheduled";
+  schedule?: Record<string, unknown>;
+  direction: "inbound" | "outbound" | "bidirectional";
+  applyPolicy: "manual_confirm" | "auto_apply_valid";
+  conflictPolicy: "manual_review" | "external_wins" | "system_wins";
+  writebackPolicy: "disabled" | "status_only";
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ExternalFieldMapping {
   id: EntityId;
   clubId: EntityId;
@@ -105,6 +122,7 @@ export interface DataCapabilityConfig {
   assessmentTemplateVersions: AssessmentTemplateVersion[];
   assessmentMetricBindings: AssessmentMetricBinding[];
   externalConnections: ExternalSystemConnection[];
+  syncPolicies: ExternalSyncPolicy[];
   tableMappings: ExternalTableMapping[];
   fieldMappings: ExternalFieldMapping[];
 }
@@ -141,6 +159,7 @@ export interface ClubCapabilities {
   };
   integration: {
     connections: ExternalSystemConnection[];
+    syncPolicies: ExternalSyncPolicy[];
     tableMappings: ExternalTableMapping[];
     fieldMappings: ExternalFieldMapping[];
     latestSyncRuns: ExternalSyncRun[];
@@ -204,6 +223,16 @@ export interface SyncRunDetail {
     confirmedRecords: number;
     rejectedRecords: number;
   };
+}
+
+export type CreateExternalSyncPolicyInput = Omit<ExternalSyncPolicy, "id" | "clubId" | "createdAt" | "updatedAt">;
+
+export type UpdateExternalSyncPolicyInput = Partial<Omit<ExternalSyncPolicy, "id" | "clubId" | "createdAt" | "updatedAt">>;
+
+export interface RunExternalSyncPolicyResult {
+  policy: ExternalSyncPolicy;
+  syncRun: ExternalSyncRun;
+  records: ExternalRawRecord[];
 }
 
 export interface StageExternalImportRecord {
