@@ -6,6 +6,7 @@ import {
   type AssessmentMetricBinding,
   type AssessmentScore,
   type AssessmentTemplate,
+  type AssessmentTemplateVersion,
   type CalendarEvent,
   type Club,
   type ClubFeatureFlag,
@@ -64,6 +65,7 @@ export interface ApiStore {
     rawRecordId: EntityId,
     input: ConfirmExternalRecordInput,
   ): ExternalRecordLink | null | Promise<ExternalRecordLink | null>;
+  isGuardianOfStudent(clubId: EntityId, userId: EntityId, studentId: EntityId): boolean;
   listCalendarEvents(clubId: EntityId): unknown[];
   getStudentTimeline(clubId: EntityId, studentId: EntityId): unknown[];
   listAbilityMetrics(clubId: EntityId): unknown[];
@@ -193,6 +195,17 @@ export abstract class SeedBackedStore implements ApiStore {
     return this.getSeedClubConfig(clubId, this.getClubById(clubId));
   }
 
+  isGuardianOfStudent(clubId: EntityId, userId: EntityId, studentId: EntityId): boolean {
+    const parent = this.data.parents.find((item) => item.clubId === clubId && item.userId === userId);
+    if (!parent) {
+      return false;
+    }
+
+    return this.data.guardianBindings.some((binding) =>
+      binding.clubId === clubId && binding.parentId === parent.id && binding.studentId === studentId,
+    );
+  }
+
   listFeatureFlags(clubId: EntityId): ClubFeatureFlag[] {
     return this.data.featureFlags.filter((item) => item.clubId === clubId);
   }
@@ -203,6 +216,33 @@ export abstract class SeedBackedStore implements ApiStore {
 
   listCustomFields(clubId: EntityId): CustomFieldDefinition[] {
     return this.data.customFields.filter((item) => item.clubId === clubId && item.active);
+  }
+
+  private ensureTeamInClub(clubId: EntityId, teamId?: EntityId) {
+    if (!teamId) {
+      return;
+    }
+
+    const team = this.getTeam(teamId);
+    if (!team || team.clubId !== clubId) {
+      throw new Error("Team not found for club.");
+    }
+  }
+
+  private ensureCoachInClub(clubId: EntityId, coachId?: EntityId) {
+    if (!coachId || this.listCoaches(clubId).some((item) => item.id === coachId)) {
+      return;
+    }
+
+    throw new Error("Coach not found for club.");
+  }
+
+  private ensureStudentInClub(clubId: EntityId, studentId?: EntityId) {
+    if (!studentId || this.listStudents(clubId).some((item) => item.id === studentId)) {
+      return;
+    }
+
+    throw new Error("Student not found for club.");
   }
 
   listTeams(clubId: EntityId) {
@@ -505,6 +545,23 @@ export abstract class SeedBackedStore implements ApiStore {
       template.id === templateId && isCatalogVisibleToClub(template, clubId),
     ) ?? null;
 
+  private findTemplateVersion = (
+    clubId: EntityId,
+    templateId: EntityId,
+    templateVersionId?: EntityId,
+  ): AssessmentTemplateVersion | null =>
+    this.data.assessmentTemplateVersions.find((version) =>
+      version.clubId === clubId
+      && version.templateId === templateId
+      && version.status === "active"
+      && (!templateVersionId || version.id === templateVersionId),
+    ) ?? null;
+
+  private findMetricGraphVersion = (clubId: EntityId, graphVersionId: EntityId): MetricGraphVersion | null =>
+    this.data.metricGraphVersions.find((version) =>
+      version.id === graphVersionId && isCatalogVisibleToClub(version, clubId),
+    ) ?? null;
+
   private listTemplateMetricBindings = (
     clubId: EntityId,
     templateId: EntityId,
@@ -528,7 +585,31 @@ export abstract class SeedBackedStore implements ApiStore {
       definition.code === code && isCatalogVisibleToClub(definition, clubId),
     ) ?? null;
 
+  private listMetricGraphDependencies = (clubId: EntityId, graphVersionId: EntityId) =>
+    this.data.metricDependencies.filter((dependency) =>
+      dependency.graphVersionId === graphVersionId && isCatalogVisibleToClub(dependency, clubId),
+    );
+
   recordMatchSummary(input: RecordMatchInput) {
+    const event = this.getCalendarEvent(input.eventId);
+    if (!event || event.clubId !== input.clubId) {
+      throw new Error("Event not found for club.");
+    }
+
+    for (const roster of input.rosters ?? []) {
+      this.ensureStudentInClub(input.clubId, roster.studentId);
+      this.ensureTeamInClub(input.clubId, roster.teamId);
+    }
+
+    for (const eventInput of input.events ?? []) {
+      this.ensureStudentInClub(input.clubId, eventInput.studentId);
+    }
+
+    for (const note of input.notes ?? []) {
+      this.ensureStudentInClub(input.clubId, note.studentId);
+      this.ensureCoachInClub(input.clubId, note.coachId);
+    }
+
     const service = createMatchService({
       clock: this.clock,
       ids: this.ids,
@@ -559,12 +640,26 @@ export abstract class SeedBackedStore implements ApiStore {
   }
 
   recordAssessment(input: RecordAssessmentInput) {
+    this.ensureStudentInClub(input.clubId, input.studentId);
+    this.ensureCoachInClub(input.clubId, input.assessedByCoachId);
+    if (input.eventId) {
+      const event = this.getCalendarEvent(input.eventId);
+      if (!event || event.clubId !== input.clubId) {
+        throw new Error("Event not found for club.");
+      }
+    }
+
     const service = createAssessmentService({
       clock: this.clock,
       ids: this.ids,
       catalog: {
         findTemplateById: this.findTemplateById,
+        findTemplateVersion: this.findTemplateVersion,
+        findMetricGraphVersion: this.findMetricGraphVersion,
         listTemplateMetricBindings: this.listTemplateMetricBindings,
+        listMetricGraphDependencies: this.listMetricGraphDependencies,
+        listAbilityMetrics: (clubId) => this.listAbilityMetrics(clubId),
+        listDerivedMetricDefinitions: (clubId) => this.listDerivedMetricDefinitions(clubId),
       },
       store: {
         saveAssessment: async (assessment) => {
@@ -575,6 +670,9 @@ export abstract class SeedBackedStore implements ApiStore {
         },
         saveMetricRecord: async (record) => {
           upsertById(this.data.metricRecords, record);
+        },
+        saveMetricLineage: async (lineage) => {
+          upsertById(this.data.metricLineages, lineage);
         },
       },
     });

@@ -38,11 +38,13 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
       ));
     }
 
-    const statusCode = error.statusCode ?? 500;
+    const statusCode = error.statusCode && error.statusCode >= 400 && error.statusCode < 600
+      ? error.statusCode
+      : 400;
 
     return reply.code(statusCode).send(apiError(
       statusCode < 500 ? "bad_request" : "internal_error",
-      error.message,
+      statusCode < 500 ? error.message : "Internal server error",
     ));
   });
 

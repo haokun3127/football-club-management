@@ -1,5 +1,6 @@
 import {
   findScheduleConflicts,
+  expandRecurringTimeRanges,
   isCatalogVisibleToClub,
   type AbilityMetric,
   type CalendarEvent,
@@ -15,6 +16,7 @@ import {
   type MatchType,
   type OtherActivity,
   type ParticipantStatus,
+  type RecurrenceRuleInput,
   type ScheduleConflict,
   type ScheduledCommitment,
   type SessionDelivery,
@@ -67,6 +69,7 @@ interface CreateCalendarEventInput {
   status?: CalendarEventStatus;
   notes?: string;
   participants?: EventParticipantInput[];
+  recurrence?: RecurrenceRuleInput;
   trainingSession?: {
     kind: TrainingSessionKind;
     sessionPlanId?: EntityId;
@@ -298,7 +301,7 @@ export function createApiServices(store: ApiStore, ids: IdSource, clock: TimeSou
         updatedAt: now,
       });
     },
-    createCalendarEvent: (clubId: EntityId, input: CreateCalendarEventInput) => {
+    createCalendarEvent: (clubId: EntityId, input: CreateCalendarEventInput): EventDetail | EventDetail[] => {
       ensureClubExists(clubId);
       ensureTeamInClub(clubId, input.primaryTeamId);
       ensureCoachInClub(clubId, input.ownerCoachId);
@@ -306,68 +309,70 @@ export function createApiServices(store: ApiStore, ids: IdSource, clock: TimeSou
         ensureStudentInClub(clubId, participant.studentId);
       }
       const now = clock.now();
-      const event: CalendarEvent = {
-        id: ids.next("event"),
-        clubId,
-        type: input.type,
-        title: input.title,
-        timeRange: {
-          startsAt: input.startsAt,
-          endsAt: input.endsAt,
-        },
-        locationId: input.locationId,
-        primaryTeamId: input.primaryTeamId,
-        ownerCoachId: input.ownerCoachId,
-        status: input.status ?? "scheduled",
-        notes: input.notes,
-        createdAt: now,
-        updatedAt: now,
-      };
-
-      store.saveCalendarEvent(event);
-
-      if (input.trainingSession) {
-        store.saveTrainingSession({
-          id: ids.next("training-session"),
+      const ranges = expandRecurringTimeRanges({
+        startsAt: input.startsAt,
+        endsAt: input.endsAt,
+        recurrence: input.recurrence,
+      });
+      const events = ranges.map((timeRange, index) => {
+        const event: CalendarEvent = {
+          id: ids.next("event"),
           clubId,
-          eventId: event.id,
-          kind: input.trainingSession.kind,
-          sessionPlanId: input.trainingSession.sessionPlanId,
-          intensity: input.trainingSession.intensity,
+          type: input.type,
+          title: input.recurrence ? `${input.title} #${index + 1}` : input.title,
+          timeRange,
+          locationId: input.locationId,
+          primaryTeamId: input.primaryTeamId,
+          ownerCoachId: input.ownerCoachId,
+          status: input.status ?? "scheduled",
+          notes: input.notes,
           createdAt: now,
           updatedAt: now,
-        });
-      }
+        };
 
-      if (input.match) {
-        store.saveMatch({
-          id: ids.next("match"),
-          clubId,
-          eventId: event.id,
-          matchType: input.match.matchType,
-          opponentName: input.match.opponentName,
-          homeScore: input.match.homeScore,
-          awayScore: input.match.awayScore,
-          status: input.match.status ?? "scheduled",
-          createdAt: now,
-          updatedAt: now,
-        });
-      }
+        store.saveCalendarEvent(event);
 
-      if (input.otherActivity) {
-        store.saveOtherActivity({
-          id: ids.next("other-activity"),
-          clubId,
-          eventId: event.id,
-          category: input.otherActivity.category,
-          description: input.otherActivity.description,
-          createdAt: now,
-          updatedAt: now,
-        });
-      }
+        if (input.trainingSession) {
+          store.saveTrainingSession({
+            id: ids.next("training-session"),
+            clubId,
+            eventId: event.id,
+            kind: input.trainingSession.kind,
+            sessionPlanId: input.trainingSession.sessionPlanId,
+            intensity: input.trainingSession.intensity,
+            createdAt: now,
+            updatedAt: now,
+          });
+        }
 
-      if (input.participants?.length) {
-        for (const participant of input.participants) {
+        if (input.match) {
+          store.saveMatch({
+            id: ids.next("match"),
+            clubId,
+            eventId: event.id,
+            matchType: input.match.matchType,
+            opponentName: input.match.opponentName,
+            homeScore: input.match.homeScore,
+            awayScore: input.match.awayScore,
+            status: input.match.status ?? "scheduled",
+            createdAt: now,
+            updatedAt: now,
+          });
+        }
+
+        if (input.otherActivity) {
+          store.saveOtherActivity({
+            id: ids.next("other-activity"),
+            clubId,
+            eventId: event.id,
+            category: input.otherActivity.category,
+            description: input.otherActivity.description,
+            createdAt: now,
+            updatedAt: now,
+          });
+        }
+
+        for (const participant of input.participants ?? []) {
           store.saveEventParticipant({
             id: ids.next("participant"),
             clubId,
@@ -379,9 +384,11 @@ export function createApiServices(store: ApiStore, ids: IdSource, clock: TimeSou
             updatedAt: now,
           });
         }
-      }
 
-      return detailFromEvent(event);
+        return detailFromEvent(event);
+      });
+
+      return input.recurrence ? events : events[0]!;
     },
     listCalendarEvents: (clubId: EntityId) => store.listCalendarEvents(clubId).map(detailFromEvent),
     recordEventParticipants: (

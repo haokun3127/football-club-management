@@ -6,9 +6,10 @@ const now = "2026-06-25T10:00:00.000Z";
 describe("createAssessmentService", () => {
   it("records assessment scores and emits assessment metric records", async () => {
     const saved = {
-      assessments: [],
-      scores: [],
-      metricRecords: [],
+      assessments: [] as unknown[],
+      scores: [] as unknown[],
+      metricRecords: [] as unknown[],
+      lineages: [] as unknown[],
     };
 
     const catalog: AssessmentCatalogLookup = {
@@ -28,6 +29,25 @@ describe("createAssessmentService", () => {
           updatedAt: now,
         };
       },
+      findTemplateVersion: async () => ({
+        id: "assessment-template-version-technical-1",
+        clubId: "club-demo",
+        templateId: "assessment-template-technical",
+        graphVersionId: "metric-graph-version-demo",
+        version: "1.0.0",
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+      }),
+      findMetricGraphVersion: async () => ({
+        id: "metric-graph-version-demo",
+        catalogScope: { scope: "system" as const },
+        name: "Demo Metric Graph",
+        version: "1.0.0",
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+      }),
       listTemplateMetricBindings: async () => [
         {
           id: "assessment-binding-finishing",
@@ -41,12 +61,16 @@ describe("createAssessmentService", () => {
           updatedAt: now,
         },
       ],
+      listMetricGraphDependencies: async () => [],
+      listAbilityMetrics: async () => [],
+      listDerivedMetricDefinitions: async () => [],
     };
 
     const store: AssessmentStore = {
       saveAssessment: async (assessment) => saved.assessments.push(assessment),
       saveScore: async (score) => saved.scores.push(score),
       saveMetricRecord: async (record) => saved.metricRecords.push(record),
+      saveMetricLineage: async (lineage) => saved.lineages.push(lineage),
     };
 
     let idCounter = 0;

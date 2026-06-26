@@ -31,6 +31,14 @@ export function createPlatformSeed(): Pick<
     ],
     users: [
       {
+        id: "user-admin-1",
+        displayName: "Admin Wang",
+        roles: ["admin"],
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
         id: "user-coach-1",
         displayName: "Coach Chen",
         roles: ["coach"],
@@ -48,6 +56,15 @@ export function createPlatformSeed(): Pick<
       },
     ],
     clubMemberships: [
+      {
+        id: "club-member-admin-1",
+        clubId,
+        userId: "user-admin-1",
+        roles: ["admin"],
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+      },
       {
         id: "club-member-coach-1",
         clubId,

@@ -18,7 +18,7 @@ export async function registerAssessmentRoutes(app: FastifyInstance, context: Ro
       },
     },
     async (request, reply) => {
-      if (!await context.requireClubMembership(request, reply, request.params.clubId)) {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
         return reply;
       }
 

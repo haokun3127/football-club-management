@@ -9,9 +9,14 @@ export async function registerCalendarRoutes(app: FastifyInstance, context: Rout
     };
   }>(
     "/clubs/:clubId/calendar/events",
-    { schema: schemas.clubParams },
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.calendarEvents,
+      },
+    },
     async (request, reply) => {
-      if (!await context.requireClubMembership(request, reply, request.params.clubId)) {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach", "parent"])) {
         return reply;
       }
 
@@ -26,9 +31,14 @@ export async function registerCalendarRoutes(app: FastifyInstance, context: Rout
     };
   }>(
     "/clubs/:clubId/students/:studentId/timeline",
-    { schema: schemas.clubStudentParams },
+    {
+      schema: {
+        ...schemas.clubStudentParams,
+        ...schemas.studentTimeline,
+      },
+    },
     async (request, reply) => {
-      if (!await context.requireClubMembership(request, reply, request.params.clubId)) {
+      if (!await context.requireStudentAccess(request, reply, request.params.clubId, request.params.studentId)) {
         return reply;
       }
 
@@ -50,7 +60,7 @@ export async function registerCalendarRoutes(app: FastifyInstance, context: Rout
       },
     },
     async (request, reply) => {
-      if (!await context.requireClubMembership(request, reply, request.params.clubId)) {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
         return reply;
       }
 
@@ -75,7 +85,7 @@ export async function registerCalendarRoutes(app: FastifyInstance, context: Rout
       },
     },
     async (request, reply) => {
-      if (!await context.requireClubMembership(request, reply, request.params.clubId)) {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
         return reply;
       }
 
@@ -101,7 +111,7 @@ export async function registerCalendarRoutes(app: FastifyInstance, context: Rout
       },
     },
     async (request, reply) => {
-      if (!await context.requireClubMembership(request, reply, request.params.clubId)) {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
         return reply;
       }
 

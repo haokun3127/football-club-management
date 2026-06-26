@@ -48,7 +48,7 @@ export async function registerPlatformRoutes(app: FastifyInstance, context: Rout
       },
     },
     async (request, reply) => {
-      if (!await context.requireClubMembership(request, reply, request.params.clubId)) {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
 
@@ -74,7 +74,7 @@ export async function registerPlatformRoutes(app: FastifyInstance, context: Rout
       },
     },
     async (request, reply) => {
-      if (!await context.requireClubMembership(request, reply, request.params.clubId)) {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
 

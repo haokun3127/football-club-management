@@ -8,6 +8,7 @@ export * from "./events.js";
 export * from "./match-services.js";
 export * from "./match.js";
 export * from "./metrics.js";
+export * from "./metric-graph-services.js";
 export * from "./metric-services.js";
 export * from "./ports.js";
 export * from "./primitives.js";

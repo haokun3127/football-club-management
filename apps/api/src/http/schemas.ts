@@ -30,7 +30,7 @@ export const errorResponse = {
       properties: {
         code: { type: "string" },
         message: { type: "string" },
-        details: { type: "array", items: { type: "object", additionalProperties: true } },
+        details: {},
       },
     },
   },
@@ -136,6 +136,65 @@ const metricValue = {
     },
   ],
 } as const;
+
+const domainObject = {
+  type: "object",
+  additionalProperties: true,
+  required: ["id", "clubId", "createdAt", "updatedAt"],
+  properties: {
+    id: { type: "string" },
+    clubId: { type: "string" },
+    ...auditFields,
+  },
+} as const;
+
+const playerMetricRecord = {
+  type: "object",
+  additionalProperties: true,
+  required: ["id", "clubId", "studentId", "metricId", "value", "source", "occurredAt", "createdAt", "updatedAt"],
+  properties: {
+    id: { type: "string" },
+    clubId: { type: "string" },
+    studentId: { type: "string" },
+    metricId: { type: "string" },
+    value: metricValue,
+    source: { type: "string" },
+    occurredAt: { type: "string" },
+    ...auditFields,
+  },
+} as const;
+
+const calendarEventDetail = {
+  type: "object",
+  additionalProperties: true,
+  required: ["id", "clubId", "type", "title", "timeRange", "status", "participants", "trainingSession", "match", "otherActivity", "createdAt", "updatedAt"],
+  properties: {
+    id: { type: "string" },
+    clubId: { type: "string" },
+    type: { type: "string", enum: ["training", "match", "other"] },
+    title: { type: "string" },
+    timeRange: {
+      type: "object",
+      additionalProperties: false,
+      required: ["startsAt", "endsAt"],
+      properties: {
+        startsAt: { type: "string" },
+        endsAt: { type: "string" },
+      },
+    },
+    status: { type: "string" },
+    participants: { type: "array", items: domainObject },
+    trainingSession: { anyOf: [domainObject, { type: "null" }] },
+    match: { anyOf: [domainObject, { type: "null" }] },
+    otherActivity: { anyOf: [domainObject, { type: "null" }] },
+    ...auditFields,
+  },
+} as const;
+
+const successArray = (items: unknown) => ({
+  200: { type: "array", items },
+  403: errorResponse,
+} as const);
 
 export const schemas = {
   health: {
@@ -291,16 +350,87 @@ export const schemas = {
   createCalendarEvent: {
     body: {
       type: "object",
-      additionalProperties: true,
+      additionalProperties: false,
       required: ["type", "title", "startsAt", "endsAt"],
       properties: {
         type: { type: "string", enum: ["training", "match", "other"] },
         title: { type: "string", minLength: 1 },
         startsAt: { type: "string", minLength: 1 },
         endsAt: { type: "string", minLength: 1 },
+        locationId: { type: "string", minLength: 1 },
+        primaryTeamId: { type: "string", minLength: 1 },
+        ownerCoachId: { type: "string", minLength: 1 },
+        status: { type: "string", enum: ["scheduled", "cancelled", "completed"] },
+        notes: { type: "string" },
+        recurrence: {
+          type: "object",
+          additionalProperties: false,
+          required: ["frequency"],
+          properties: {
+            frequency: { type: "string", enum: ["daily", "weekly", "monthly"] },
+            interval: { type: "integer", minimum: 1 },
+            count: { type: "integer", minimum: 1, maximum: 60 },
+            until: { type: "string" },
+            byWeekday: {
+              type: "array",
+              items: { type: "string", enum: ["MO", "TU", "WE", "TH", "FR", "SA", "SU"] },
+            },
+          },
+        },
+        participants: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["studentId"],
+            properties: {
+              studentId: { type: "string", minLength: 1 },
+              status: { type: "string" },
+              note: { type: "string" },
+            },
+          },
+        },
+        trainingSession: {
+          type: "object",
+          additionalProperties: false,
+          required: ["kind"],
+          properties: {
+            kind: { type: "string", minLength: 1 },
+            sessionPlanId: { type: "string", minLength: 1 },
+            intensity: { type: "string" },
+          },
+        },
+        match: {
+          type: "object",
+          additionalProperties: false,
+          required: ["matchType"],
+          properties: {
+            matchType: { type: "string", minLength: 1 },
+            opponentName: { type: "string" },
+            homeScore: { type: "number", minimum: 0 },
+            awayScore: { type: "number", minimum: 0 },
+            status: { type: "string" },
+          },
+        },
+        otherActivity: {
+          type: "object",
+          additionalProperties: false,
+          required: ["category"],
+          properties: {
+            category: { type: "string", minLength: 1 },
+            description: { type: "string" },
+          },
+        },
       },
     },
     response: {
+      200: {
+        anyOf: [
+          calendarEventDetail,
+          { type: "array", items: calendarEventDetail },
+        ],
+      },
+      400: errorResponse,
       403: errorResponse,
     },
   },
@@ -420,13 +550,26 @@ export const schemas = {
       },
     },
     response: {
+      201: {
+        type: "object",
+        additionalProperties: false,
+        required: ["match", "rosters", "events", "notes", "metricRecords"],
+        properties: {
+          match: domainObject,
+          rosters: { type: "array", items: domainObject },
+          events: { type: "array", items: domainObject },
+          notes: { type: "array", items: domainObject },
+          metricRecords: { type: "array", items: playerMetricRecord },
+        },
+      },
+      400: errorResponse,
       403: errorResponse,
     },
   },
   recordAssessment: {
     body: {
       type: "object",
-      additionalProperties: true,
+      additionalProperties: false,
       required: ["studentId", "templateId", "assessedByCoachId", "scores"],
       properties: {
         studentId: { type: "string", minLength: 1 },
@@ -434,6 +577,7 @@ export const schemas = {
         templateVersionId: { type: "string", minLength: 1 },
         assessedByCoachId: { type: "string", minLength: 1 },
         assessedAt: { type: "string", minLength: 1 },
+        eventId: { type: "string", minLength: 1 },
         summary: { type: "string" },
         scores: {
           type: "array",
@@ -454,6 +598,17 @@ export const schemas = {
       },
     },
     response: {
+      201: {
+        type: "object",
+        additionalProperties: false,
+        required: ["assessment", "scores", "metricRecords"],
+        properties: {
+          assessment: domainObject,
+          scores: { type: "array", items: domainObject },
+          metricRecords: { type: "array", items: playerMetricRecord },
+        },
+      },
+      400: errorResponse,
       403: errorResponse,
     },
   },
@@ -481,6 +636,30 @@ export const schemas = {
       403: errorResponse,
       404: errorResponse,
     },
+  },
+  calendarEvents: {
+    response: successArray(calendarEventDetail),
+  },
+  studentTimeline: {
+    response: successArray(calendarEventDetail),
+  },
+  abilityMetrics: {
+    response: successArray(domainObject),
+  },
+  studentMetrics: {
+    querystring: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        source: {
+          anyOf: [
+            { type: "string" },
+            { type: "array", items: { type: "string" } },
+          ],
+        },
+      },
+    },
+    response: successArray(playerMetricRecord),
   },
   derivedMetric: {
     response: {
@@ -520,6 +699,7 @@ export const schemas = {
           },
         },
       },
+      400: errorResponse,
       403: errorResponse,
     },
   },

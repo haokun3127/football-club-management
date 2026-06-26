@@ -11,6 +11,11 @@
       "import": "./dist/index.js"
     }
   },
+  "dependencies": {
+    "@dagrejs/graphlib": "^2.2.4",
+    "@js-temporal/polyfill": "^0.5.1",
+    "rrule": "^2.8.1"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "vitest run --passWithNoTests",

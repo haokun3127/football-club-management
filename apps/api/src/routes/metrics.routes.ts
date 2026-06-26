@@ -10,9 +10,14 @@ export async function registerMetricsRoutes(app: FastifyInstance, context: Route
     };
   }>(
     "/clubs/:clubId/catalog/ability-metrics",
-    { schema: schemas.clubParams },
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.abilityMetrics,
+      },
+    },
     async (request, reply) => {
-      if (!await context.requireClubMembership(request, reply, request.params.clubId)) {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach", "parent"])) {
         return reply;
       }
 
@@ -30,9 +35,14 @@ export async function registerMetricsRoutes(app: FastifyInstance, context: Route
     };
   }>(
     "/clubs/:clubId/students/:studentId/metrics",
-    { schema: schemas.clubStudentParams },
+    {
+      schema: {
+        ...schemas.clubStudentParams,
+        ...schemas.studentMetrics,
+      },
+    },
     async (request, reply) => {
-      if (!await context.requireClubMembership(request, reply, request.params.clubId)) {
+      if (!await context.requireStudentAccess(request, reply, request.params.clubId, request.params.studentId)) {
         return reply;
       }
 
@@ -54,7 +64,7 @@ export async function registerMetricsRoutes(app: FastifyInstance, context: Route
       },
     },
     async (request, reply) => {
-      if (!await context.requireClubMembership(request, reply, request.params.clubId)) {
+      if (!await context.requireStudentAccess(request, reply, request.params.clubId, request.params.studentId, { write: true })) {
         return reply;
       }
 
