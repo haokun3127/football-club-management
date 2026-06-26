@@ -75,6 +75,8 @@ DATABASE_URL=apps/api/data/dev.sqlite pnpm --filter @football-club/api db:migrat
 
 收费、保险、出勤和评测不要只存汇总字段。列表需要的余额、保险到期和签到次数可以作为快照，但权威来源应是事实表和流水表。
 
+MVP 中 `payment_events`、`payment_reviews`、`lesson_credit_ledger` 和 `insurance_policies` 主要用于保存外部同步和线下确认后的状态，不代表平台已经提供线上收费、在线投保或自动财务流程。
+
 ### 3. 扩展与同步表
 
 - `custom_field_definitions`
