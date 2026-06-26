@@ -3,6 +3,7 @@ import {
   createMatchService,
   createMetricService,
   isCatalogVisibleToClub,
+  type AssessmentMetricBinding,
   type AssessmentScore,
   type AssessmentTemplate,
   type CalendarEvent,
@@ -393,6 +394,24 @@ export abstract class SeedBackedStore implements ApiStore {
       template.id === templateId && isCatalogVisibleToClub(template, clubId),
     ) ?? null;
 
+  private listTemplateMetricBindings = (
+    clubId: EntityId,
+    templateId: EntityId,
+    templateVersionId?: EntityId,
+  ): AssessmentMetricBinding[] => {
+    const versions = this.data.assessmentTemplateVersions.filter((version) =>
+      version.clubId === clubId
+      && version.templateId === templateId
+      && version.status === "active"
+      && (!templateVersionId || version.id === templateVersionId),
+    );
+    const versionIds = new Set(versions.map((version) => version.id));
+
+    return this.data.assessmentMetricBindings.filter((binding) =>
+      binding.clubId === clubId && versionIds.has(binding.templateVersionId),
+    );
+  };
+
   private findDerivedDefinitionByCode = (clubId: EntityId, code: string) =>
     this.data.derivedMetricDefinitions.find((definition) =>
       definition.code === code && isCatalogVisibleToClub(definition, clubId),
@@ -434,6 +453,7 @@ export abstract class SeedBackedStore implements ApiStore {
       ids: this.ids,
       catalog: {
         findTemplateById: this.findTemplateById,
+        listTemplateMetricBindings: this.listTemplateMetricBindings,
       },
       store: {
         saveAssessment: async (assessment) => {

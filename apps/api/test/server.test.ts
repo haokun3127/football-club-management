@@ -164,13 +164,15 @@ describe("api server", () => {
       payload: {
         studentId: "student-1",
         templateId: "assessment-template-technical",
+        templateVersionId: "assessment-template-version-technical-1",
         assessedByCoachId: "coach-1",
         assessedAt: "2026-06-25T09:30:00.000Z",
         summary: "Mid-cycle technical assessment",
         scores: [
           {
             metricId: "metric-finishing",
-            score: 4,
+            value: { kind: "rating_1_5", score: 4 },
+            normalizedScore: 4,
             comment: "Composed in front of goal.",
           },
         ],
@@ -178,12 +180,18 @@ describe("api server", () => {
     });
 
     const body = response.json() as {
-      scores: Array<{ metricId: string; score: number }>;
+      scores: Array<{ metricId: string; value: { kind: string; score: number }; normalizedScore: number }>;
       metricRecords: Array<{ source: string; value: { kind: string; score: number } }>;
     };
 
     expect(response.statusCode).toBe(201);
-    expect(body.scores).toEqual([expect.objectContaining({ metricId: "metric-finishing", score: 4 })]);
+    expect(body.scores).toEqual([
+      expect.objectContaining({
+        metricId: "metric-finishing",
+        value: expect.objectContaining({ kind: "rating_1_5", score: 4 }),
+        normalizedScore: 4,
+      }),
+    ]);
     expect(body.metricRecords).toEqual([
       expect.objectContaining({
         source: "assessment",

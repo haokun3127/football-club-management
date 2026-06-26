@@ -41,6 +41,15 @@ const metricValue = {
     {
       type: "object",
       additionalProperties: false,
+      required: ["kind", "score"],
+      properties: {
+        kind: { type: "string", const: "score_0_100" },
+        score: { type: "number", minimum: 0, maximum: 100 },
+      },
+    },
+    {
+      type: "object",
+      additionalProperties: false,
       required: ["kind", "count"],
       properties: {
         kind: { type: "string", const: "count" },
@@ -50,10 +59,37 @@ const metricValue = {
     {
       type: "object",
       additionalProperties: false,
+      required: ["kind", "percentage"],
+      properties: {
+        kind: { type: "string", const: "percentage" },
+        percentage: { type: "number" },
+      },
+    },
+    {
+      type: "object",
+      additionalProperties: false,
       required: ["kind", "minutes"],
       properties: {
         kind: { type: "string", const: "duration_minutes" },
         minutes: { type: "number" },
+      },
+    },
+    {
+      type: "object",
+      additionalProperties: false,
+      required: ["kind", "seconds"],
+      properties: {
+        kind: { type: "string", const: "duration_seconds" },
+        seconds: { type: "number" },
+      },
+    },
+    {
+      type: "object",
+      additionalProperties: false,
+      required: ["kind", "meters"],
+      properties: {
+        kind: { type: "string", const: "distance_meters" },
+        meters: { type: "number" },
       },
     },
     {
@@ -321,8 +357,26 @@ export const schemas = {
       properties: {
         studentId: { type: "string", minLength: 1 },
         templateId: { type: "string", minLength: 1 },
+        templateVersionId: { type: "string", minLength: 1 },
         assessedByCoachId: { type: "string", minLength: 1 },
-        scores: { type: "array", minItems: 1, items: { type: "object", additionalProperties: true } },
+        assessedAt: { type: "string", minLength: 1 },
+        summary: { type: "string" },
+        scores: {
+          type: "array",
+          minItems: 1,
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["metricId", "value"],
+            properties: {
+              metricId: { type: "string", minLength: 1 },
+              value: metricValue,
+              normalizedScore: { type: "number" },
+              rawResultId: { type: "string", minLength: 1 },
+              comment: { type: "string" },
+            },
+          },
+        },
       },
     },
     response: {

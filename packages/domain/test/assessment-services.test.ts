@@ -23,12 +23,24 @@ describe("createAssessmentService", () => {
           name: "Technical Basics Assessment",
           ageGroup: "U10",
           teamLevel: "development",
-          metricIds: ["metric-finishing"],
           status: "active",
           createdAt: now,
           updatedAt: now,
         };
       },
+      listTemplateMetricBindings: async () => [
+        {
+          id: "assessment-binding-finishing",
+          clubId: "club-demo",
+          templateVersionId: "assessment-template-version-technical-1",
+          metricId: "metric-finishing",
+          role: "input",
+          maxScore: 5,
+          sortOrder: 1,
+          createdAt: now,
+          updatedAt: now,
+        },
+      ],
     };
 
     const store: AssessmentStore = {
@@ -51,13 +63,15 @@ describe("createAssessmentService", () => {
       clubId: "club-demo",
       studentId: "student-1",
       templateId: "assessment-template-technical",
+      templateVersionId: "assessment-template-version-technical-1",
       assessedByCoachId: "coach-1",
       assessedAt: "2026-06-25T09:30:00.000Z",
       summary: "Mid-cycle technical assessment",
       scores: [
         {
           metricId: "metric-finishing",
-          score: 4,
+          value: { kind: "rating_1_5", score: 4 },
+          normalizedScore: 4,
           comment: "Composed in front of goal.",
         },
       ],
@@ -67,6 +81,7 @@ describe("createAssessmentService", () => {
     expect(result.scores).toHaveLength(1);
     expect(result.metricRecords[0]?.source).toBe("assessment");
     expect(result.metricRecords[0]?.value).toEqual({ kind: "rating_1_5", score: 4 });
+    expect(result.metricRecords[0]?.templateVersionId).toBe("assessment-template-version-technical-1");
     expect(saved.metricRecords).toHaveLength(1);
   });
 });

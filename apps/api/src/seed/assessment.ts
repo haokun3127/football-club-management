@@ -3,9 +3,56 @@ import { demoClubId as clubId, seedNow as now, systemCatalog } from "./types.js"
 
 export function createAssessmentSeed(): Pick<
   SeedData,
-  "assessmentTemplates" | "playerAssessments" | "assessmentScores" | "metricRecords" | "metricLineages" | "derivedMetricDefinitions"
+  | "assessmentTemplates"
+  | "assessmentTemplateVersions"
+  | "assessmentMetricBindings"
+  | "assessmentTestItems"
+  | "playerAssessments"
+  | "assessmentScores"
+  | "metricGraphVersions"
+  | "metricDependencies"
+  | "metricViews"
+  | "metricViewNodes"
+  | "metricRecords"
+  | "metricLineages"
+  | "derivedMetricDefinitions"
 > {
   return {
+    metricGraphVersions: [
+      {
+        id: "metric-graph-version-demo",
+        catalogScope: systemCatalog,
+        name: "Demo Metric Graph",
+        version: "1.0.0",
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
+    metricDependencies: [],
+    metricViews: [
+      {
+        id: "metric-view-technical-basics",
+        catalogScope: systemCatalog,
+        graphVersionId: "metric-graph-version-demo",
+        name: "Technical Basics View",
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
+    metricViewNodes: [
+      {
+        id: "metric-view-node-finishing",
+        catalogScope: systemCatalog,
+        viewId: "metric-view-technical-basics",
+        metricId: "metric-finishing",
+        label: "Finishing",
+        sortOrder: 1,
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
     assessmentTemplates: [
       {
         id: "assessment-template-technical",
@@ -13,18 +60,44 @@ export function createAssessmentSeed(): Pick<
         name: "Technical Basics Assessment",
         ageGroup: "U10",
         teamLevel: "development",
-        metricIds: ["metric-finishing"],
         status: "active",
         createdAt: now,
         updatedAt: now,
       },
     ],
+    assessmentTemplateVersions: [
+      {
+        id: "assessment-template-version-technical-1",
+        clubId,
+        templateId: "assessment-template-technical",
+        graphVersionId: "metric-graph-version-demo",
+        version: "1.0.0",
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
+    assessmentMetricBindings: [
+      {
+        id: "assessment-binding-finishing",
+        clubId,
+        templateVersionId: "assessment-template-version-technical-1",
+        metricId: "metric-finishing",
+        role: "input",
+        maxScore: 5,
+        sortOrder: 1,
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
+    assessmentTestItems: [],
     playerAssessments: [
       {
         id: "assessment-1",
         clubId,
         studentId: "student-1",
         templateId: "assessment-template-technical",
+        templateVersionId: "assessment-template-version-technical-1",
         assessedByCoachId: "coach-1",
         assessedAt: "2026-07-06T10:00:00.000Z",
         summary: "Assessment day technical check",
@@ -38,7 +111,8 @@ export function createAssessmentSeed(): Pick<
         clubId,
         assessmentId: "assessment-1",
         metricId: "metric-finishing",
-        score: 4,
+        value: { kind: "rating_1_5", score: 4 },
+        normalizedScore: 4,
         comment: "Clean first touch and composed finish.",
         createdAt: now,
         updatedAt: now,
@@ -94,6 +168,8 @@ export function createAssessmentSeed(): Pick<
         source: "assessment",
         occurredAt: "2026-07-06T10:00:00.000Z",
         eventId: "event-training-1",
+        assessmentId: "assessment-1",
+        templateVersionId: "assessment-template-version-technical-1",
         recordedByCoachId: "coach-1",
         createdAt: now,
         updatedAt: now,

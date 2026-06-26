@@ -1,7 +1,10 @@
 import type {
   AbilityMetric,
+  AssessmentMetricBinding,
   AssessmentScore,
   AssessmentTemplate,
+  AssessmentTemplateVersion,
+  AssessmentTestItem,
   CalendarEvent,
   Club,
   ClubFeatureFlag,
@@ -17,6 +20,10 @@ import type {
   MatchPlayerNote,
   MatchRoster,
   MetricLineage,
+  MetricDependency,
+  MetricGraphVersion,
+  MetricView,
+  MetricViewNode,
   OtherActivity,
   ParentProfile,
   PlayerAssessment,
@@ -56,8 +63,15 @@ export interface SeedData {
   objectives: TrainingObjective[];
   metrics: AbilityMetric[];
   assessmentTemplates: AssessmentTemplate[];
+  assessmentTemplateVersions: AssessmentTemplateVersion[];
+  assessmentMetricBindings: AssessmentMetricBinding[];
+  assessmentTestItems: AssessmentTestItem[];
   playerAssessments: PlayerAssessment[];
   assessmentScores: AssessmentScore[];
+  metricGraphVersions: MetricGraphVersion[];
+  metricDependencies: MetricDependency[];
+  metricViews: MetricView[];
+  metricViewNodes: MetricViewNode[];
   drills: TrainingDrill[];
   sessionPlans: SessionPlan[];
   events: CalendarEvent[];

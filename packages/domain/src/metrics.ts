@@ -1,9 +1,21 @@
 import type { AuditFields, EntityId, ISODateTimeString } from "./primitives.js";
 import type { CatalogScoped, ClubScoped } from "./clubs.js";
 
-export type MetricValueKind = "rating_1_5" | "count" | "duration_minutes" | "measurement" | "tag" | "text";
+export type MetricValueKind =
+  | "rating_1_5"
+  | "score_0_100"
+  | "count"
+  | "percentage"
+  | "duration_minutes"
+  | "duration_seconds"
+  | "distance_meters"
+  | "measurement"
+  | "tag"
+  | "text";
 export type MetricSourceKind = "training_observation" | "match_event" | "assessment" | "fitness_test" | "manual_adjustment" | "algorithm";
-export type DerivedMetricMethod = "weighted_average" | "recent_average" | "sum" | "trend";
+export type DerivedMetricMethod = "weighted_average" | "normalized_weighted_sum" | "recent_average" | "sum" | "trend";
+export type MetricKind = "atomic" | "computed" | "composite" | "view_only";
+export type MetricDependencyRole = "primary" | "supporting" | "normalizer" | "context";
 
 export interface AbilityMetric extends AuditFields, CatalogScoped {
   id: EntityId;
@@ -11,17 +23,60 @@ export interface AbilityMetric extends AuditFields, CatalogScoped {
   name: string;
   dimensionId: EntityId;
   valueKind: MetricValueKind;
+  metricKind: MetricKind;
   unit?: string;
+  maxScore?: number;
+  sourceKinds?: MetricSourceKind[];
+  version?: string;
+  status?: "active" | "inactive";
   description?: string;
 }
 
 export type MetricValue =
   | { kind: "rating_1_5"; score: 1 | 2 | 3 | 4 | 5 }
+  | { kind: "score_0_100"; score: number }
   | { kind: "count"; count: number }
+  | { kind: "percentage"; percentage: number }
   | { kind: "duration_minutes"; minutes: number }
+  | { kind: "duration_seconds"; seconds: number }
+  | { kind: "distance_meters"; meters: number }
   | { kind: "measurement"; value: number; unit: string }
   | { kind: "tag"; tag: string }
   | { kind: "text"; text: string };
+
+export interface MetricGraphVersion extends AuditFields, CatalogScoped {
+  id: EntityId;
+  name: string;
+  version: string;
+  status: "draft" | "active" | "archived";
+}
+
+export interface MetricDependency extends AuditFields, CatalogScoped {
+  id: EntityId;
+  graphVersionId: EntityId;
+  outputMetricId: EntityId;
+  inputMetricId: EntityId;
+  formulaId?: EntityId;
+  weight?: number;
+  role?: MetricDependencyRole;
+  sortOrder: number;
+}
+
+export interface MetricView extends AuditFields, CatalogScoped {
+  id: EntityId;
+  graphVersionId: EntityId;
+  name: string;
+  status: "draft" | "active" | "archived";
+}
+
+export interface MetricViewNode extends AuditFields, CatalogScoped {
+  id: EntityId;
+  viewId: EntityId;
+  metricId?: EntityId;
+  parentViewNodeId?: EntityId;
+  label: string;
+  sortOrder: number;
+}
 
 export interface PlayerMetricRecord extends AuditFields, ClubScoped {
   id: EntityId;
@@ -31,7 +86,12 @@ export interface PlayerMetricRecord extends AuditFields, ClubScoped {
   source: MetricSourceKind;
   occurredAt: ISODateTimeString;
   eventId?: EntityId;
+  assessmentId?: EntityId;
+  templateVersionId?: EntityId;
+  rawResultId?: EntityId;
+  sourceRecordId?: EntityId;
   recordedByCoachId?: EntityId;
+  visibility?: "internal" | "coach" | "parent";
   confidence?: number;
   note?: string;
   lineageId?: EntityId;
@@ -46,6 +106,9 @@ export interface DerivedMetricDefinition extends AuditFields, CatalogScoped {
   inputMetricIds: EntityId[];
   version: string;
   weights?: Record<EntityId, number>;
+  inputScale?: number;
+  maxScore?: number;
+  rounding?: "none" | "integer" | "two_decimals";
   inputWindowDays?: number;
   outputUnit?: string;
 }
@@ -68,10 +131,18 @@ export function getNumericMetricValue(value: MetricValue): number | null {
   switch (value.kind) {
     case "rating_1_5":
       return value.score;
+    case "score_0_100":
+      return value.score;
     case "count":
       return value.count;
+    case "percentage":
+      return value.percentage;
     case "duration_minutes":
       return value.minutes;
+    case "duration_seconds":
+      return value.seconds;
+    case "distance_meters":
+      return value.meters;
     case "measurement":
       return value.value;
     case "tag":
@@ -113,6 +184,11 @@ export function derivePlayerMetricRecord(input: {
       const weightedTotal = numericValues.reduce((sum, item) => sum + item.value * item.weight, 0);
       const weightTotal = numericValues.reduce((sum, item) => sum + item.weight, 0);
       result = weightedTotal / weightTotal;
+      break;
+    }
+    case "normalized_weighted_sum": {
+      const weightedTotal = numericValues.reduce((sum, item) => sum + item.value * item.weight, 0);
+      result = weightedTotal / (input.definition.inputScale ?? 100) * (input.definition.maxScore ?? 1);
       break;
     }
     case "recent_average": {

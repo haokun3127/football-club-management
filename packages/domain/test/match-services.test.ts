@@ -11,6 +11,7 @@ function metric(id: string, code: string) {
     name: code,
     dimensionId: "dimension-match",
     valueKind: "count" as const,
+    metricKind: "atomic" as const,
     createdAt: now,
     updatedAt: now,
   };

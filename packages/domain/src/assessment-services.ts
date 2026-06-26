@@ -1,11 +1,13 @@
-import type { AssessmentScore, AssessmentTemplate, PlayerAssessment } from "./assessment.js";
-import type { PlayerMetricRecord } from "./metrics.js";
+import type { AssessmentMetricBinding, AssessmentScore, AssessmentTemplate, PlayerAssessment } from "./assessment.js";
+import { getNumericMetricValue, type MetricValue, type PlayerMetricRecord } from "./metrics.js";
 import type { EntityId } from "./primitives.js";
 import type { Clock, IdGenerator } from "./ports.js";
 
 export interface AssessmentScoreInput {
   metricId: EntityId;
-  score: 1 | 2 | 3 | 4 | 5;
+  value: MetricValue;
+  normalizedScore?: number;
+  rawResultId?: EntityId;
   comment?: string;
 }
 
@@ -13,6 +15,7 @@ export interface RecordAssessmentInput {
   clubId: EntityId;
   studentId: EntityId;
   templateId: EntityId;
+  templateVersionId?: EntityId;
   assessedByCoachId: EntityId;
   assessedAt?: string;
   eventId?: EntityId;
@@ -28,6 +31,11 @@ export interface AssessmentStore {
 
 export interface AssessmentCatalogLookup {
   findTemplateById(clubId: EntityId, templateId: EntityId): Promise<AssessmentTemplate | null> | AssessmentTemplate | null;
+  listTemplateMetricBindings(
+    clubId: EntityId,
+    templateId: EntityId,
+    templateVersionId?: EntityId,
+  ): Promise<AssessmentMetricBinding[]> | AssessmentMetricBinding[];
 }
 
 export interface AssessmentServiceDependencies {
@@ -55,7 +63,19 @@ export function createAssessmentService(dependencies: AssessmentServiceDependenc
         throw new Error(`Assessment template ${input.templateId} is not active.`);
       }
 
-      const invalidMetricId = input.scores.find((score) => !template.metricIds.includes(score.metricId));
+      const bindings = await dependencies.catalog.listTemplateMetricBindings(
+        input.clubId,
+        template.id,
+        input.templateVersionId,
+      );
+      const allowedMetricIds = new Set(bindings
+        .filter((binding) => binding.role === "input" || binding.role === "output")
+        .map((binding) => binding.metricId));
+      if (allowedMetricIds.size === 0) {
+        throw new Error(`Assessment template ${template.id} has no metric bindings.`);
+      }
+
+      const invalidMetricId = input.scores.find((score) => !allowedMetricIds.has(score.metricId));
       if (invalidMetricId) {
         throw new Error(`Metric ${invalidMetricId.metricId} is not part of template ${template.id}.`);
       }
@@ -67,6 +87,7 @@ export function createAssessmentService(dependencies: AssessmentServiceDependenc
         clubId: input.clubId,
         studentId: input.studentId,
         templateId: input.templateId,
+        templateVersionId: input.templateVersionId,
         assessedByCoachId: input.assessedByCoachId,
         assessedAt,
         eventId: input.eventId,
@@ -86,7 +107,9 @@ export function createAssessmentService(dependencies: AssessmentServiceDependenc
           clubId: input.clubId,
           assessmentId: assessment.id,
           metricId: scoreInput.metricId,
-          score: scoreInput.score,
+          value: scoreInput.value,
+          normalizedScore: scoreInput.normalizedScore,
+          rawResultId: scoreInput.rawResultId,
           comment: scoreInput.comment,
           createdAt: now,
           updatedAt: now,
@@ -99,11 +122,15 @@ export function createAssessmentService(dependencies: AssessmentServiceDependenc
           clubId: input.clubId,
           studentId: input.studentId,
           metricId: scoreInput.metricId,
-          value: { kind: "rating_1_5", score: scoreInput.score },
+          value: scoreInput.value,
           source: "assessment",
           occurredAt: assessedAt,
           eventId: input.eventId,
+          assessmentId: assessment.id,
+          templateVersionId: input.templateVersionId,
+          rawResultId: scoreInput.rawResultId,
           recordedByCoachId: input.assessedByCoachId,
+          confidence: scoreInput.normalizedScore ?? getNumericMetricValue(scoreInput.value) ?? undefined,
           createdAt: now,
           updatedAt: now,
           note: scoreInput.comment ?? input.summary ?? `assessment:${template.id}`,
