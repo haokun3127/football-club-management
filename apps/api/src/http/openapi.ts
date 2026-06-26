@@ -125,6 +125,12 @@ export function buildOpenApiDocument() {
           ...schemas.createSyncPolicy,
         }),
       },
+      "/clubs/{clubId}/admin/integrations/sync-policies/due": {
+        get: operation("GET", "/clubs/{clubId}/admin/integrations/sync-policies/due", {
+          ...schemas.clubParams,
+          ...schemas.dueSyncPolicies,
+        }),
+      },
       "/clubs/{clubId}/admin/integrations/sync-policies/{policyId}": {
         patch: operation("PATCH", "/clubs/{clubId}/admin/integrations/sync-policies/{policyId}", {
           ...schemas.clubSyncPolicyParams,
@@ -135,6 +141,12 @@ export function buildOpenApiDocument() {
         post: operation("POST", "/clubs/{clubId}/admin/integrations/sync-policies/{policyId}/run", {
           ...schemas.clubSyncPolicyParams,
           ...schemas.runSyncPolicy,
+        }),
+      },
+      "/clubs/{clubId}/admin/integrations/wps/webhook": {
+        post: operation("POST", "/clubs/{clubId}/admin/integrations/wps/webhook", {
+          ...schemas.clubParams,
+          ...schemas.wpsWebhook,
         }),
       },
       "/clubs/{clubId}/admin/students": {

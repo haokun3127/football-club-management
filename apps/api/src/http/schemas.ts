@@ -278,6 +278,30 @@ const insurancePolicySummary = {
   },
 } as const;
 
+const syncSchedule = {
+  anyOf: [
+    {
+      type: "object",
+      additionalProperties: false,
+      required: ["kind", "intervalMinutes"],
+      properties: {
+        kind: { type: "string", const: "interval_minutes" },
+        intervalMinutes: { type: "integer", minimum: 1 },
+      },
+    },
+    {
+      type: "object",
+      additionalProperties: false,
+      required: ["kind", "time"],
+      properties: {
+        kind: { type: "string", const: "daily_time" },
+        time: { type: "string", pattern: "^\\d{2}:\\d{2}$" },
+        timezone: { type: "string", minLength: 1 },
+      },
+    },
+  ],
+} as const;
+
 export const schemas = {
   health: {
     response: {
@@ -481,7 +505,7 @@ export const schemas = {
         name: { type: "string", minLength: 1 },
         status: { type: "string", enum: ["draft", "active", "paused", "disabled"] },
         triggerMode: { type: "string", enum: ["manual", "scheduled"] },
-        schedule: flexibleObject,
+        schedule: syncSchedule,
         direction: { type: "string", enum: ["inbound", "outbound", "bidirectional"] },
         applyPolicy: { type: "string", enum: ["manual_confirm", "auto_apply_valid"] },
         conflictPolicy: { type: "string", enum: ["manual_review", "external_wins", "system_wins"] },
@@ -504,7 +528,7 @@ export const schemas = {
         name: { type: "string", minLength: 1 },
         status: { type: "string", enum: ["draft", "active", "paused", "disabled"] },
         triggerMode: { type: "string", enum: ["manual", "scheduled"] },
-        schedule: flexibleObject,
+        schedule: syncSchedule,
         direction: { type: "string", enum: ["inbound", "outbound", "bidirectional"] },
         applyPolicy: { type: "string", enum: ["manual_confirm", "auto_apply_valid"] },
         conflictPolicy: { type: "string", enum: ["manual_review", "external_wins", "system_wins"] },
@@ -524,6 +548,41 @@ export const schemas = {
       400: errorResponse,
       403: errorResponse,
       404: errorResponse,
+    },
+  },
+  dueSyncPolicies: {
+    querystring: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        now: { type: "string", minLength: 1 },
+      },
+    },
+    response: {
+      200: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
+    },
+  },
+  wpsWebhook: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["eventType", "connectionId", "tableMappingId"],
+      properties: {
+        eventId: { type: "string", minLength: 1 },
+        eventType: { type: "string", minLength: 1 },
+        connectionId: { type: "string", minLength: 1 },
+        tableMappingId: { type: "string", minLength: 1 },
+        policyId: { type: "string", minLength: 1 },
+        occurredAt: { type: "string", minLength: 1 },
+        payload: flexibleObject,
+      },
+    },
+    response: {
+      202: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
     },
   },
   syncRunDetail: {

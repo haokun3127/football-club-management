@@ -838,14 +838,15 @@ export class DataCapabilityRepository {
   saveExternalTableMapping(entity: ExternalTableMapping): void {
     this.database.prepare(`
       INSERT INTO external_table_mappings (
-        id, club_id, connection_id, external_table_key, target_type, mapping_version, status, created_at, updated_at
+        id, club_id, connection_id, external_table_key, target_type, mapping_version, status, config_json, created_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         external_table_key = excluded.external_table_key,
         target_type = excluded.target_type,
         mapping_version = excluded.mapping_version,
         status = excluded.status,
+        config_json = excluded.config_json,
         updated_at = excluded.updated_at
     `).run(
       entity.id,
@@ -855,6 +856,7 @@ export class DataCapabilityRepository {
       entity.targetType,
       entity.mappingVersion,
       entity.status,
+      entity.config ? JSON.stringify(entity.config) : null,
       entity.createdAt,
       entity.updatedAt,
     );
@@ -1944,6 +1946,7 @@ function mapExternalTableMapping(row: SqlRow): ExternalTableMapping {
     targetType: requireString(row, "target_type"),
     mappingVersion: requireString(row, "mapping_version"),
     status: requireString(row, "status") as ExternalTableMapping["status"],
+    config: jsonObject(optionalString(row, "config_json")),
     createdAt: requireString(row, "created_at"),
     updatedAt: requireString(row, "updated_at"),
   };

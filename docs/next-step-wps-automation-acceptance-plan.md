@@ -77,10 +77,9 @@ Main controller will integrate E then F and run:
 - `pnpm build`
 - `DATABASE_URL=:memory: pnpm --filter @football-club/api db:migrate`
 - forbidden placeholder scan:
-  - `club-demo`
-  - `demoClubId`
-  - `Demo Football`
-  - demo WPS identifiers
+  - old demo club ids and demo club variable names,
+  - old demo club display names,
+  - old placeholder identifiers for external integrations.
 - forbidden legacy assessment scan:
   - direct old assessment-template metric-id coupling,
   - old template-node model,
@@ -93,4 +92,3 @@ Main controller will integrate E then F and run:
 - No production scheduler daemon.
 - No outbound WPS writeback beyond status-only contract preparation.
 - No payment execution, online insurance purchase, refund, invoice, or settlement.
-

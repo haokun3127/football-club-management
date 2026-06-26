@@ -97,14 +97,14 @@ describe("platform persistence", () => {
       name: "Payment WPS Manual Sync Updated",
       conflictPolicy: "external_wins",
     });
-    const firstRun = store.runExternalSyncPolicy("club-chongqing-talent", created.id);
-    const secondRun = store.runExternalSyncPolicy("club-chongqing-talent", created.id);
+    const firstRun = await store.runExternalSyncPolicy("club-chongqing-talent", created.id);
+    const secondRun = await store.runExternalSyncPolicy("club-chongqing-talent", created.id);
     const rawRecords = repositories.dataCapability.getImportPreview("club-chongqing-talent", {
       tableMappingId: "external-table-payment-events-cq-talent",
-    }).records.filter((record) => record.externalRecordId.startsWith("wps:payment_events"));
+    }).records.filter((record) => record.externalRecordId === "payment_events:stub-row-1");
     const rawRecordCount = database.prepare(`
       SELECT COUNT(*) AS count FROM external_raw_records
-      WHERE club_id = ? AND table_mapping_id = ? AND external_record_id LIKE 'wps:payment_events%'
+      WHERE club_id = ? AND table_mapping_id = ? AND external_record_id = 'payment_events:stub-row-1'
     `).get("club-chongqing-talent", "external-table-payment-events-cq-talent") as Record<string, unknown>;
     const outbound = store.createExternalSyncPolicy("club-chongqing-talent", {
       connectionId: "external-connection-wps-cq-talent",
@@ -116,6 +116,27 @@ describe("platform persistence", () => {
       applyPolicy: "manual_confirm",
       conflictPolicy: "manual_review",
       writebackPolicy: "disabled",
+    });
+    const scheduled = store.createExternalSyncPolicy("club-chongqing-talent", {
+      connectionId: "external-connection-wps-cq-talent",
+      tableMappingId: "external-table-payment-events-cq-talent",
+      name: "Payment Scheduled Sync",
+      status: "active",
+      triggerMode: "scheduled",
+      schedule: { kind: "interval_minutes", intervalMinutes: 30 },
+      direction: "inbound",
+      applyPolicy: "manual_confirm",
+      conflictPolicy: "manual_review",
+      writebackPolicy: "disabled",
+    });
+    const due = store.planDueExternalSyncPolicies("club-chongqing-talent", "2026-06-27T09:00:00.000Z");
+    const webhook = store.ingestWpsWebhook("club-chongqing-talent", {
+      eventId: "persistent-event-001",
+      eventType: "table.updated",
+      connectionId: "external-connection-wps-cq-talent",
+      tableMappingId: "external-table-payment-events-cq-talent",
+      policyId: scheduled.id,
+      occurredAt: "2026-06-26T09:05:00.000Z",
     });
 
     expect(seededPolicies).toEqual([expect.objectContaining({
@@ -146,7 +167,18 @@ describe("platform persistence", () => {
     expect(secondRun?.records[0]?.id).toBe(firstRun?.records[0]?.id);
     expect(rawRecordCount.count).toBe(1);
     expect(rawRecords).toHaveLength(1);
-    expect(() => store.runExternalSyncPolicy("club-chongqing-talent", outbound.id)).toThrow("Only inbound sync policies can be run in MVP.");
+    await expect(store.runExternalSyncPolicy("club-chongqing-talent", outbound.id)).rejects.toThrow("Only inbound sync policies can be run in MVP.");
+    expect(due.policies).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        policy: expect.objectContaining({ id: scheduled.id }),
+        due: true,
+      }),
+    ]));
+    expect(webhook).toEqual(expect.objectContaining({
+      status: "queued",
+      matchedPolicy: expect.objectContaining({ id: scheduled.id }),
+      syncRun: expect.objectContaining({ status: "queued", totalRecords: 0 }),
+    }));
 
     database.close();
   });

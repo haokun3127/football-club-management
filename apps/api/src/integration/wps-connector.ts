@@ -1,30 +1,363 @@
 import { createHash } from "node:crypto";
 import type { EntityId } from "@football-club/domain";
-import type { ExternalSystemConnection, ExternalTableMapping, StageExternalImportRecord } from "../data-capability/types.js";
+import type {
+  ExternalSystemConnection,
+  ExternalTableMapping,
+  StageExternalImportRecord,
+} from "../data-capability/types.js";
+
+export type WpsConnectionMode = "manual_import" | "stub" | "http";
+export type WpsTableKind = "online_sheet" | "data_table" | "lightweight_table";
+
+export interface WpsConnectionConfig {
+  mode: WpsConnectionMode;
+  apiBaseUrl?: string;
+  credentialRef?: string;
+  credentialStatus?: string;
+  documentToken?: string;
+  fileToken?: string;
+  pageSize?: number;
+}
+
+export interface WpsTableMappingConfig {
+  sheetId?: string;
+  tableId?: string;
+  tableKind: WpsTableKind;
+  pageSize?: number;
+}
+
+export interface WpsCredential {
+  authorizationHeader: string;
+  status?: string;
+}
+
+export type WpsCredentialResolver = (credentialRef: string) => WpsCredential | Promise<WpsCredential>;
+
+export type WpsFetch = (
+  url: string,
+  init: { headers?: Record<string, string> },
+) => Promise<{
+  ok: boolean;
+  status: number;
+  json(): Promise<unknown>;
+  text?(): Promise<string>;
+}>;
 
 export interface WpsConnector {
   fetchRows(input: {
     clubId: EntityId;
     connection: ExternalSystemConnection;
     tableMapping: ExternalTableMapping;
-  }): StageExternalImportRecord[];
+  }): Promise<StageExternalImportRecord[]>;
+}
+
+export interface WpsConnectorFactoryOptions {
+  fetch?: WpsFetch;
+  credentialResolver?: WpsCredentialResolver;
+}
+
+export function createWpsConnector(
+  connection: ExternalSystemConnection,
+  options: WpsConnectorFactoryOptions = {},
+): WpsConnector {
+  const config = parseWpsConnectionConfig(connection.config);
+
+  if (config.mode !== "http") {
+    return new DeterministicWpsStubConnector();
+  }
+
+  const fetchImpl = options.fetch ?? defaultFetch();
+  if (!fetchImpl) {
+    throw new Error("WPS HTTP connector requires an injected fetch implementation.");
+  }
+  if (!options.credentialResolver) {
+    throw new Error("WPS HTTP connector requires an injected credential resolver.");
+  }
+
+  return new HttpWpsConnector(fetchImpl, options.credentialResolver);
+}
+
+export function parseWpsConnectionConfig(config: Record<string, unknown>): WpsConnectionConfig {
+  const mode = optionalString(config, "mode") ?? "manual_import";
+  if (mode !== "manual_import" && mode !== "stub" && mode !== "http") {
+    throw new Error("WPS connection config mode must be manual_import, stub, or http.");
+  }
+
+  const parsed: WpsConnectionConfig = {
+    mode,
+    apiBaseUrl: optionalString(config, "apiBaseUrl"),
+    credentialRef: optionalString(config, "credentialRef"),
+    credentialStatus: optionalString(config, "credentialStatus"),
+    documentToken: optionalString(config, "documentToken"),
+    fileToken: optionalString(config, "fileToken"),
+    pageSize: optionalPositiveInteger(config, "pageSize"),
+  };
+
+  if (mode === "http") {
+    if (!parsed.apiBaseUrl) {
+      throw new Error("WPS HTTP connection config requires apiBaseUrl.");
+    }
+    if (!parsed.credentialRef) {
+      throw new Error("WPS HTTP connection config requires credentialRef.");
+    }
+    if (!parsed.documentToken && !parsed.fileToken) {
+      throw new Error("WPS HTTP connection config requires documentToken or fileToken.");
+    }
+  }
+
+  return parsed;
+}
+
+export function parseWpsTableMappingConfig(config: Record<string, unknown> | undefined): WpsTableMappingConfig {
+  if (!config) {
+    throw new Error("WPS table mapping config is required for HTTP sync.");
+  }
+
+  const tableKind = optionalString(config, "tableKind");
+  if (tableKind !== "online_sheet" && tableKind !== "data_table" && tableKind !== "lightweight_table") {
+    throw new Error("WPS table mapping config tableKind must be online_sheet, data_table, or lightweight_table.");
+  }
+
+  const parsed: WpsTableMappingConfig = {
+    sheetId: optionalString(config, "sheetId"),
+    tableId: optionalString(config, "tableId"),
+    tableKind,
+    pageSize: optionalPositiveInteger(config, "pageSize"),
+  };
+
+  if (tableKind === "online_sheet" && !parsed.sheetId) {
+    throw new Error("WPS online_sheet mapping requires sheetId.");
+  }
+  if ((tableKind === "data_table" || tableKind === "lightweight_table") && !parsed.tableId) {
+    throw new Error("WPS data table mapping requires tableId.");
+  }
+
+  return parsed;
+}
+
+export function sanitizeExternalConnection(connection: ExternalSystemConnection): ExternalSystemConnection {
+  return {
+    ...connection,
+    config: connection.provider === "wps"
+      ? sanitizeWpsConnectionConfig(connection.config)
+      : sanitizeGenericConfig(connection.config),
+  };
+}
+
+export function sanitizeWpsConnectionConfig(config: Record<string, unknown>): Record<string, unknown> {
+  const sanitized: Record<string, unknown> = {};
+  for (const key of ["mode", "apiBaseUrl", "credentialRef", "credentialStatus", "documentToken", "fileToken", "pageSize"]) {
+    if (config[key] !== undefined) {
+      sanitized[key] = config[key];
+    }
+  }
+
+  return sanitized;
 }
 
 export class DeterministicWpsStubConnector implements WpsConnector {
-  fetchRows(input: {
+  async fetchRows(input: {
     clubId: EntityId;
     connection: ExternalSystemConnection;
     tableMapping: ExternalTableMapping;
-  }): StageExternalImportRecord[] {
+  }): Promise<StageExternalImportRecord[]> {
     const raw = stubRowForTable(input.tableMapping.externalTableKey);
-    const canonical = JSON.stringify(Object.keys(raw).sort().map((key) => [key, raw[key]]));
+    const externalRecordId = `${input.tableMapping.externalTableKey}:stub-row-1`;
 
     return [{
       rowNumber: 1,
-      rowHash: createHash("sha256").update(`${input.connection.id}:${input.tableMapping.id}:${canonical}`).digest("hex"),
+      externalRecordId,
+      rowHash: stableWpsRowHash(input.connection.id, input.tableMapping.id, externalRecordId, raw),
       raw,
     }];
   }
+}
+
+export class HttpWpsConnector implements WpsConnector {
+  constructor(
+    private readonly fetchImpl: WpsFetch,
+    private readonly credentialResolver: WpsCredentialResolver,
+  ) {}
+
+  async fetchRows(input: {
+    clubId: EntityId;
+    connection: ExternalSystemConnection;
+    tableMapping: ExternalTableMapping;
+  }): Promise<StageExternalImportRecord[]> {
+    const connectionConfig = parseWpsConnectionConfig(input.connection.config);
+    const tableConfig = parseWpsTableMappingConfig(input.tableMapping.config);
+    const credential = await this.credentialResolver(connectionConfig.credentialRef ?? "");
+    const rows: StageExternalImportRecord[] = [];
+    let pageToken: string | undefined;
+
+    do {
+      const response = await this.fetchImpl(buildRecordsUrl(connectionConfig, tableConfig, pageToken), {
+        headers: { authorization: credential.authorizationHeader },
+      });
+
+      if (!response.ok) {
+        const body = response.text ? await response.text() : "";
+        throw new Error(`WPS records request failed with status ${response.status}${body ? `: ${body}` : ""}`);
+      }
+
+      const page = parseWpsRecordsPage(await response.json());
+      for (const [pageIndex, record] of page.records.entries()) {
+        const rowNumber = record.rowNumber ?? (record.rowIndex !== undefined ? record.rowIndex + 1 : rows.length + pageIndex + 1);
+        const externalRecordId = record.id ?? `${input.tableMapping.externalTableKey}:row-${rowNumber}`;
+        rows.push({
+          rowNumber,
+          externalRecordId,
+          rowHash: stableWpsRowHash(input.connection.id, input.tableMapping.id, externalRecordId, record.fields),
+          raw: record.fields,
+        });
+      }
+      pageToken = page.nextPageToken;
+    } while (pageToken);
+
+    return rows;
+  }
+}
+
+export function stableWpsRowHash(
+  connectionId: EntityId,
+  tableMappingId: EntityId,
+  externalRecordId: string,
+  raw: Record<string, unknown>,
+): string {
+  return createHash("sha256")
+    .update(`${connectionId}:${tableMappingId}:${externalRecordId}:${canonicalJson(raw)}`)
+    .digest("hex");
+}
+
+function buildRecordsUrl(
+  connection: WpsConnectionConfig,
+  tableMapping: WpsTableMappingConfig,
+  pageToken: string | undefined,
+): string {
+  const url = new URL("/v1/records", connection.apiBaseUrl);
+  if (connection.documentToken) {
+    url.searchParams.set("documentToken", connection.documentToken);
+  }
+  if (connection.fileToken) {
+    url.searchParams.set("fileToken", connection.fileToken);
+  }
+  if (tableMapping.sheetId) {
+    url.searchParams.set("sheetId", tableMapping.sheetId);
+  }
+  if (tableMapping.tableId) {
+    url.searchParams.set("tableId", tableMapping.tableId);
+  }
+  url.searchParams.set("tableKind", tableMapping.tableKind);
+  url.searchParams.set("pageSize", String(tableMapping.pageSize ?? connection.pageSize ?? 100));
+  if (pageToken) {
+    url.searchParams.set("pageToken", pageToken);
+  }
+
+  return url.toString();
+}
+
+function parseWpsRecordsPage(value: unknown): {
+  records: Array<{ id?: string; rowNumber?: number; rowIndex?: number; fields: Record<string, unknown> }>;
+  nextPageToken?: string;
+} {
+  const source = objectValue(value);
+  if (!source) {
+    throw new Error("WPS records response must be an object.");
+  }
+
+  const data = objectValue(source.data) ?? source;
+  const rawRecords = arrayValue(data.records);
+
+  return {
+    records: rawRecords.map((record) => {
+      const row = objectValue(record);
+      if (!row) {
+        throw new Error("WPS record must be an object.");
+      }
+
+      const fields = objectValue(row.fields) ?? objectValue(row.values) ?? objectValue(row.payload);
+      if (!fields) {
+        throw new Error("WPS record requires fields.");
+      }
+
+      return {
+        id: optionalString(row, "id") ?? optionalString(row, "recordId") ?? optionalString(row, "rowId"),
+        rowNumber: optionalNumber(row, "rowNumber"),
+        rowIndex: optionalNumber(row, "rowIndex"),
+        fields,
+      };
+    }),
+    nextPageToken: optionalString(data, "nextPageToken") ?? optionalString(data, "next") ?? undefined,
+  };
+}
+
+function defaultFetch(): WpsFetch | undefined {
+  return typeof fetch === "function"
+    ? ((url, init) => fetch(url, init))
+    : undefined;
+}
+
+function canonicalJson(value: unknown): string {
+  if (Array.isArray(value)) {
+    return `[${value.map(canonicalJson).join(",")}]`;
+  }
+  if (value && typeof value === "object") {
+    const object = value as Record<string, unknown>;
+    return `{${Object.keys(object).sort().map((key) => `${JSON.stringify(key)}:${canonicalJson(object[key])}`).join(",")}}`;
+  }
+
+  return JSON.stringify(value);
+}
+
+function objectValue(value: unknown): Record<string, unknown> | undefined {
+  return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
+}
+
+function arrayValue(value: unknown): unknown[] {
+  if (!Array.isArray(value)) {
+    throw new Error("WPS records response requires records array.");
+  }
+
+  return value;
+}
+
+function optionalString(row: Record<string, unknown>, key: string): string | undefined {
+  const value = row[key];
+  if (value === undefined || value === null || value === "") {
+    return undefined;
+  }
+  if (typeof value !== "string") {
+    throw new Error(`Expected ${key} to be a string.`);
+  }
+
+  return value;
+}
+
+function optionalNumber(row: Record<string, unknown>, key: string): number | undefined {
+  const value = row[key];
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+  if (typeof value !== "number" || !Number.isInteger(value)) {
+    throw new Error(`Expected ${key} to be an integer.`);
+  }
+
+  return value;
+}
+
+function optionalPositiveInteger(row: Record<string, unknown>, key: string): number | undefined {
+  const value = optionalNumber(row, key);
+  if (value !== undefined && value <= 0) {
+    throw new Error(`Expected ${key} to be a positive integer.`);
+  }
+
+  return value;
+}
+
+function sanitizeGenericConfig(config: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(config).filter(([key]) => !/secret|token|password|credential/i.test(key)),
+  );
 }
 
 function stubRowForTable(externalTableKey: string): Record<string, unknown> {

@@ -5,6 +5,7 @@ import type {
   ImportPreviewFilters,
   StudentListFilters,
   UpdateExternalSyncPolicyInput,
+  WpsWebhookIngestionInput,
 } from "../data-capability/types.js";
 import { schemas } from "../http/schemas.js";
 import { readExcelWorksheetRecords } from "../integration/excel-import.js";
@@ -77,6 +78,66 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       } catch (error) {
         const message = error instanceof Error ? error.message : "Sync policy creation failed";
         return context.sendError(reply, 400, "invalid_sync_policy", message);
+      }
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+    };
+    Querystring: {
+      now?: string;
+    };
+  }>(
+    "/clubs/:clubId/admin/integrations/sync-policies/due",
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.dueSyncPolicies,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      try {
+        return await context.store.planDueExternalSyncPolicies(
+          request.params.clubId,
+          request.query.now ?? new Date().toISOString(),
+        );
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Due sync policy planning failed";
+        return context.sendError(reply, 400, "invalid_sync_schedule", message);
+      }
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+    };
+    Body: WpsWebhookIngestionInput;
+  }>(
+    "/clubs/:clubId/admin/integrations/wps/webhook",
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.wpsWebhook,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      try {
+        const result = await context.store.ingestWpsWebhook(request.params.clubId, request.body);
+        return reply.code(202).send(result);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "WPS webhook ingestion failed";
+        return context.sendError(reply, 400, "invalid_wps_webhook", message);
       }
     },
   );

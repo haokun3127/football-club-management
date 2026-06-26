@@ -37,8 +37,10 @@ describe("api server", () => {
     expect(body.paths["/clubs/{clubId}/admin/students/{studentId}"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/integrations/connections"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/integrations/sync-policies"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/admin/integrations/sync-policies/due"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/integrations/sync-policies/{policyId}"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/integrations/sync-policies/{policyId}/run"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/admin/integrations/wps/webhook"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/students/{studentId}/lesson-ledger"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/students/{studentId}/lesson-adjustments"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/students/{studentId}/insurance-policies"]).toBeDefined();
@@ -393,6 +395,55 @@ describe("api server", () => {
       method: "POST",
       url: `/clubs/club-chongqing-talent/admin/integrations/sync-policies/${outbound.id}/run`,
     });
+    const invalidScheduledResponse = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/integrations/sync-policies",
+      payload: {
+        connectionId: "external-connection-wps-cq-talent",
+        tableMappingId: "external-table-insurance-policies-cq-talent",
+        name: "Invalid Scheduled Sync",
+        status: "active",
+        triggerMode: "scheduled",
+        direction: "inbound",
+        applyPolicy: "manual_confirm",
+        conflictPolicy: "manual_review",
+        writebackPolicy: "disabled",
+      },
+    });
+    const scheduledResponse = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/integrations/sync-policies",
+      payload: {
+        connectionId: "external-connection-wps-cq-talent",
+        tableMappingId: "external-table-insurance-policies-cq-talent",
+        name: "Insurance Scheduled Sync",
+        status: "active",
+        triggerMode: "scheduled",
+        schedule: { kind: "interval_minutes", intervalMinutes: 30 },
+        direction: "inbound",
+        applyPolicy: "manual_confirm",
+        conflictPolicy: "manual_review",
+        writebackPolicy: "disabled",
+      },
+    });
+    const scheduled = scheduledResponse.json() as { id: string };
+    const dueResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/admin/integrations/sync-policies/due?now=2026-06-27T09:00:00.000Z",
+    });
+    const webhookResponse = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/integrations/wps/webhook",
+      payload: {
+        eventId: "event-001",
+        eventType: "table.updated",
+        connectionId: "external-connection-wps-cq-talent",
+        tableMappingId: "external-table-insurance-policies-cq-talent",
+        policyId: scheduled.id,
+        occurredAt: "2026-06-26T09:05:00.000Z",
+        payload: { changedRows: 2 },
+      },
+    });
 
     const connections = connectionsResponse.json() as Array<{ provider: string }>;
     const policies = policiesResponse.json() as Array<{ id: string; direction: string; applyPolicy: string }>;
@@ -425,6 +476,58 @@ describe("api server", () => {
     expect(outboundResponse.statusCode).toBe(201);
     expect(rejectedRunResponse.statusCode).toBe(400);
     expect(rejectedRunResponse.json().error.message).toBe("Only inbound sync policies can be run in MVP.");
+    expect(invalidScheduledResponse.statusCode).toBe(400);
+    expect(scheduledResponse.statusCode).toBe(201);
+    expect(dueResponse.statusCode).toBe(200);
+    expect(dueResponse.json()).toEqual(expect.objectContaining({
+      clubId: "club-chongqing-talent",
+      policies: expect.arrayContaining([
+        expect.objectContaining({
+          policy: expect.objectContaining({ id: scheduled.id }),
+          due: true,
+          runnable: true,
+        }),
+      ]),
+    }));
+    expect(webhookResponse.statusCode).toBe(202);
+    expect(webhookResponse.json()).toEqual(expect.objectContaining({
+      status: "queued",
+      matchedPolicy: expect.objectContaining({ id: scheduled.id }),
+      syncRun: expect.objectContaining({ status: "queued", totalRecords: 0 }),
+    }));
+  });
+
+  it("rejects non-admin access to WPS automation controls", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    const coachDueResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/admin/integrations/sync-policies/due",
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    const parentWebhookResponse = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/integrations/wps/webhook",
+      headers: { "x-user-id": "user-parent-1" },
+      payload: {
+        eventType: "table.updated",
+        connectionId: "external-connection-wps-cq-talent",
+        tableMappingId: "external-table-full-users-cq-talent",
+      },
+    });
+
+    expect(coachDueResponse.statusCode).toBe(403);
+    expect(parentWebhookResponse.statusCode).toBe(403);
+
+    await app.close();
+    persistence.database.close();
   });
 
   it("confirms staged external records without realtime external sync", async () => {

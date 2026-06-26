@@ -31,6 +31,7 @@ export interface ExternalTableMapping {
   targetType: string;
   mappingVersion: string;
   status: "draft" | "active" | "archived";
+  config?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
 }
@@ -51,6 +52,10 @@ export interface ExternalSyncPolicy {
   createdAt: string;
   updatedAt: string;
 }
+
+export type ExternalSyncSchedule =
+  | { kind: "interval_minutes"; intervalMinutes: number }
+  | { kind: "daily_time"; time: string; timezone?: string };
 
 export interface ExternalFieldMapping {
   id: EntityId;
@@ -334,9 +339,41 @@ export interface RunExternalSyncPolicyResult {
   records: ExternalRawRecord[];
 }
 
+export interface DueExternalSyncPolicy {
+  policy: ExternalSyncPolicy;
+  lastRunAt?: string;
+  nextRunAt?: string;
+  due: boolean;
+  runnable: boolean;
+  notRunnableReason?: string;
+}
+
+export interface DueExternalSyncPoliciesResult {
+  clubId: EntityId;
+  now: string;
+  policies: DueExternalSyncPolicy[];
+}
+
+export interface WpsWebhookIngestionInput {
+  eventId?: string;
+  eventType: string;
+  connectionId: EntityId;
+  tableMappingId: EntityId;
+  policyId?: EntityId;
+  occurredAt?: string;
+  payload?: Record<string, unknown>;
+}
+
+export interface WpsWebhookIngestionResult {
+  status: "queued";
+  matchedPolicy: ExternalSyncPolicy;
+  syncRun: ExternalSyncRun;
+}
+
 export interface StageExternalImportRecord {
   rowNumber: number;
   rowHash: string;
+  externalRecordId?: string;
   raw: Record<string, unknown>;
 }
 

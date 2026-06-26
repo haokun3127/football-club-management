@@ -475,6 +475,7 @@ CREATE TABLE IF NOT EXISTS external_table_mappings (
   target_type TEXT NOT NULL,
   mapping_version TEXT NOT NULL,
   status TEXT NOT NULL CHECK (status IN ('draft', 'active', 'archived')),
+  config_json TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
   UNIQUE (club_id, connection_id, external_table_key, mapping_version)
