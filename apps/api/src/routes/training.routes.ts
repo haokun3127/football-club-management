@@ -24,4 +24,31 @@ export async function registerTrainingRoutes(app: FastifyInstance, context: Rout
       return context.store.createTrainingSession(request.params.clubId, request.body);
     },
   );
+
+  app.post<{
+    Params: {
+      clubId: string;
+      trainingSessionId: string;
+    };
+    Body: Parameters<RouteContext["store"]["recordTrainingObservation"]>[2];
+  }>(
+    "/clubs/:clubId/training/sessions/:trainingSessionId/observations",
+    {
+      schema: {
+        ...schemas.clubTrainingSessionParams,
+        ...schemas.recordTrainingObservation,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+
+      return reply.code(201).send(context.store.recordTrainingObservation(
+        request.params.clubId,
+        request.params.trainingSessionId,
+        request.body,
+      ));
+    },
+  );
 }

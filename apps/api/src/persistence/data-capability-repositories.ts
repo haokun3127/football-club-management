@@ -11,7 +11,7 @@ import type {
   MetricView,
   MetricViewNode,
 } from "@football-club/domain";
-import type { DatabaseSync } from "node:sqlite";
+import type { DatabaseSync, SQLInputValue } from "node:sqlite";
 import type {
   ConfirmExternalRecordInput,
   DataCapabilityConfig,
@@ -207,7 +207,7 @@ export class DataCapabilityRepository {
 
   listStudents(clubId: EntityId, filters: StudentListFilters = {}): StudentListItem[] {
     const where = ["s.club_id = ?"];
-    const params: unknown[] = [clubId];
+    const params: SQLInputValue[] = [clubId];
 
     if (filters.studentStatus) {
       where.push("op.student_status = ?");

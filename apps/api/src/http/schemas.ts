@@ -253,6 +253,17 @@ export const schemas = {
       },
     },
   },
+  clubTrainingSessionParams: {
+    params: {
+      type: "object",
+      additionalProperties: false,
+      required: ["clubId", "trainingSessionId"],
+      properties: {
+        clubId: { type: "string", minLength: 1 },
+        trainingSessionId: { type: "string", minLength: 1 },
+      },
+    },
+  },
   clubRawRecordParams: {
     params: {
       type: "object",
@@ -387,6 +398,19 @@ export const schemas = {
       400: errorResponse,
       403: errorResponse,
       404: errorResponse,
+    },
+  },
+  coachToday: {
+    querystring: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        date: { type: "string", minLength: 10 },
+      },
+    },
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
     },
   },
   createTeam: {
@@ -568,6 +592,35 @@ export const schemas = {
       403: errorResponse,
     },
   },
+  recordTrainingObservation: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["studentId", "coachId", "metricId"],
+      properties: {
+        studentId: { type: "string", minLength: 1 },
+        coachId: { type: "string", minLength: 1 },
+        metricId: { type: "string", minLength: 1 },
+        rating: { type: "integer", minimum: 1, maximum: 5 },
+        value: metricValue,
+        tags: { type: "array", items: { type: "string" } },
+        note: { type: "string" },
+      },
+    },
+    response: {
+      201: {
+        type: "object",
+        additionalProperties: false,
+        required: ["observation", "metricRecord"],
+        properties: {
+          observation: domainObject,
+          metricRecord: playerMetricRecord,
+        },
+      },
+      400: errorResponse,
+      403: errorResponse,
+    },
+  },
   recordMatch: {
     body: {
       type: "object",
@@ -646,7 +699,7 @@ export const schemas = {
     body: {
       type: "object",
       additionalProperties: false,
-      required: ["studentId", "templateId", "assessedByCoachId", "scores"],
+      required: ["studentId", "templateId", "assessedByCoachId"],
       properties: {
         studentId: { type: "string", minLength: 1 },
         templateId: { type: "string", minLength: 1 },
@@ -671,15 +724,36 @@ export const schemas = {
             },
           },
         },
+        rawResults: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["testItemId", "value"],
+            properties: {
+              testItemId: { type: "string", minLength: 1 },
+              metricId: { type: "string", minLength: 1 },
+              value: metricValue,
+              normalizedScore: { type: "number" },
+              note: { type: "string" },
+              comment: { type: "string" },
+            },
+          },
+        },
       },
+      anyOf: [
+        { required: ["scores"] },
+        { required: ["rawResults"] },
+      ],
     },
     response: {
       201: {
         type: "object",
         additionalProperties: false,
-        required: ["assessment", "scores", "metricRecords"],
+        required: ["assessment", "rawResults", "scores", "metricRecords"],
         properties: {
           assessment: domainObject,
+          rawResults: { type: "array", items: domainObject },
           scores: { type: "array", items: domainObject },
           metricRecords: { type: "array", items: playerMetricRecord },
         },

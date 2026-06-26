@@ -36,6 +36,8 @@ describe("api server", () => {
     expect(body.paths["/clubs/{clubId}/admin/students"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/students/{studentId}"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/sync-runs/{syncRunId}"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/coach/today"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/training/sessions/{trainingSessionId}/observations"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/assessments"]).toBeDefined();
   });
 
@@ -111,7 +113,10 @@ describe("api server", () => {
       expect.objectContaining({ key: "billing.courseBalance", label: "剩余课时" }),
     ]));
     expect(body.assessment.views).toEqual([expect.objectContaining({ name: "天才精英队评分视图" })]);
-    expect(body.assessment.viewNodes).toEqual([expect.objectContaining({ label: "射门终结" })]);
+    expect(body.assessment.viewNodes).toEqual(expect.arrayContaining([
+      expect.objectContaining({ label: "射门终结" }),
+      expect.objectContaining({ label: "技术综合指数" }),
+    ]));
     expect(body.integration.tableMappings.map((mapping) => mapping.externalTableKey).sort()).toEqual([
       "attendance_2025_2026_spring_summer",
       "full_users",
@@ -123,6 +128,62 @@ describe("api server", () => {
       expect.objectContaining({ externalFieldKey: "身份证号" }),
       expect.objectContaining({ externalFieldKey: "推荐训练项目" }),
     ]));
+  });
+
+  it("returns coach today workbench scoped to coach-owned events", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    const coachResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/coach/today?date=2026-07-01",
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    const parentResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/coach/today?date=2026-07-01",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+
+    const body = coachResponse.json() as {
+      date: string;
+      coachId: string;
+      events: Array<{
+        id: string;
+        ownerCoachId: string;
+        teams: Array<{ id: string }>;
+        students: Array<{ id: string }>;
+        workflow: { pendingAttendance: boolean; pendingRecord: boolean; pendingAssessment: boolean };
+      }>;
+    };
+
+    expect(coachResponse.statusCode).toBe(200);
+    expect(body.date).toBe("2026-07-01");
+    expect(body.coachId).toBe("coach-1");
+    expect(body.events).toEqual([
+      expect.objectContaining({
+        id: "event-training-1",
+        ownerCoachId: "coach-1",
+        teams: [expect.objectContaining({ id: "team-u10-dev" })],
+        students: [expect.objectContaining({ id: "student-1" })],
+        workflow: expect.objectContaining({
+          pendingAttendance: true,
+          pendingRecord: false,
+          pendingAssessment: true,
+        }),
+      }),
+    ]);
+    expect(parentResponse.statusCode).toBe(403);
+    expect(parentResponse.json().error.code).toBe("forbidden");
+
+    await app.close();
+    persistence.database.close();
   });
 
   it("returns data capability config and staged import status", async () => {
@@ -379,6 +440,79 @@ describe("api server", () => {
     expect(conflicts.some((conflict) => conflict.existingEventId === events[1]?.id && conflict.subjectKind === "student")).toBe(true);
   });
 
+  it("updates attendance statuses and detects multi-team private lesson conflicts", async () => {
+    const app = buildServer(undefined, { logger: false });
+    const attendanceResponse = await app.inject({
+      method: "PUT",
+      url: "/clubs/club-chongqing-talent/admin/calendar/events/event-training-1/participants",
+      payload: {
+        participants: [
+          { studentId: "student-1", status: "present", note: "arrived on time" },
+        ],
+      },
+    });
+    const conflictResponse = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/calendar/conflicts",
+      payload: {
+        startsAt: "2026-07-01T09:30:00.000Z",
+        endsAt: "2026-07-01T10:15:00.000Z",
+        coachId: "coach-1",
+        studentIds: ["student-1"],
+      },
+    });
+
+    const attendance = attendanceResponse.json() as Array<{ studentId: string; status: string; note?: string }>;
+    const conflicts = conflictResponse.json() as Array<{ existingEventId: string; subjectKind: string }>;
+
+    expect(attendanceResponse.statusCode).toBe(200);
+    expect(attendance).toEqual([
+      expect.objectContaining({ studentId: "student-1", status: "present", note: "arrived on time" }),
+    ]);
+    expect(conflictResponse.statusCode).toBe(200);
+    expect(conflicts).toEqual(expect.arrayContaining([
+      expect.objectContaining({ existingEventId: "event-training-1", subjectKind: "coach" }),
+      expect.objectContaining({ existingEventId: "event-training-1", subjectKind: "student" }),
+    ]));
+  });
+
+  it("records training observations and writes training metric records", async () => {
+    const app = buildServer(undefined, { logger: false });
+    const response = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/training/sessions/training-session-1/observations",
+      payload: {
+        studentId: "student-1",
+        coachId: "coach-1",
+        metricId: "metric-finishing",
+        rating: 5,
+        tags: ["finishing"],
+        note: "Excellent first touch before finishing.",
+      },
+    });
+    const metricsResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/students/student-1/metrics?source=training_observation",
+    });
+
+    const body = response.json() as {
+      observation: { metricId: string; rating: number };
+      metricRecord: { id: string; source: string; metricId: string; value: { kind: string; score: number } };
+    };
+    const metrics = metricsResponse.json() as Array<{ id: string; source: string; value: { kind: string; score: number } }>;
+
+    expect(response.statusCode).toBe(201);
+    expect(body.observation).toEqual(expect.objectContaining({ metricId: "metric-finishing", rating: 5 }));
+    expect(body.metricRecord).toEqual(expect.objectContaining({
+      source: "training_observation",
+      metricId: "metric-finishing",
+      value: { kind: "rating_1_5", score: 5 },
+    }));
+    expect(metrics).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: body.metricRecord.id, source: "training_observation" }),
+    ]));
+  });
+
   it("records match events and writes match metric records", async () => {
     const app = buildServer(undefined, { logger: false });
     const response = await app.inject({
@@ -411,6 +545,39 @@ describe("api server", () => {
     expect(body.metricRecords).toEqual([
       expect.objectContaining({ source: "match_event", metricId: "metric-goals" }),
     ]);
+  });
+
+  it("records repeated scoring and assist events as separate count metric records", async () => {
+    const app = buildServer(undefined, { logger: false });
+    const response = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/matches",
+      payload: {
+        eventId: "event-match-1",
+        matchType: "friendly",
+        status: "completed",
+        events: [
+          { studentId: "student-1", type: "goal", minute: 8 },
+          { studentId: "student-1", type: "goal", minute: 21 },
+          { studentId: "student-1", type: "assist", minute: 34 },
+        ],
+      },
+    });
+
+    const body = response.json() as {
+      events: Array<{ type: string; linkedMetricId?: string }>;
+      metricRecords: Array<{ metricId: string; source: string; value: { kind: string; count: number } }>;
+    };
+
+    expect(response.statusCode).toBe(201);
+    expect(body.events.map((event) => event.linkedMetricId)).toEqual([
+      "metric-goals",
+      "metric-goals",
+      "metric-assists",
+    ]);
+    expect(body.metricRecords.filter((record) => record.metricId === "metric-goals")).toHaveLength(2);
+    expect(body.metricRecords.filter((record) => record.metricId === "metric-assists")).toHaveLength(1);
+    expect(body.metricRecords.every((record) => record.source === "match_event" && record.value.count === 1)).toBe(true);
   });
 
   it("rejects misspelled match roster payloads", async () => {
@@ -519,12 +686,80 @@ describe("api server", () => {
         normalizedScore: 4,
       }),
     ]);
-    expect(body.metricRecords).toEqual([
+    expect(body.metricRecords).toEqual(expect.arrayContaining([
       expect.objectContaining({
         source: "assessment",
         value: expect.objectContaining({ kind: "rating_1_5", score: 4 }),
       }),
+      expect.objectContaining({
+        source: "algorithm",
+        metricId: "metric-technical-index",
+        value: expect.objectContaining({ kind: "measurement", value: 80 }),
+      }),
+    ]));
+  });
+
+  it("records assessment raw results, scores, metric records, and graph lineage", async () => {
+    const app = buildServer(undefined, { logger: false });
+    const response = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/assessments",
+      payload: {
+        studentId: "student-1",
+        templateId: "assessment-template-technical",
+        templateVersionId: "assessment-template-version-technical-1",
+        assessedByCoachId: "coach-1",
+        assessedAt: "2026-07-07T09:30:00.000Z",
+        rawResults: [
+          {
+            testItemId: "assessment-test-finishing-cq-talent",
+            value: { kind: "rating_1_5", score: 5 },
+            note: "Recommended drill metadata stays on the test item protocol.",
+          },
+        ],
+      },
+    });
+
+    const body = response.json() as {
+      rawResults: Array<{ id: string; testItemId: string; metricId: string }>;
+      scores: Array<{ rawResultId?: string; metricId: string; value: { kind: string; score: number } }>;
+      metricRecords: Array<{
+        id: string;
+        metricId: string;
+        source: string;
+        rawResultId?: string;
+        lineageId?: string;
+        value: { kind: string; score?: number; value?: number };
+      }>;
+    };
+
+    expect(response.statusCode).toBe(201);
+    expect(body.rawResults).toEqual([
+      expect.objectContaining({
+        testItemId: "assessment-test-finishing-cq-talent",
+        metricId: "metric-finishing",
+      }),
     ]);
+    expect(body.scores).toEqual([
+      expect.objectContaining({
+        rawResultId: body.rawResults[0]?.id,
+        metricId: "metric-finishing",
+        value: { kind: "rating_1_5", score: 5 },
+      }),
+    ]);
+    expect(body.metricRecords).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        source: "assessment",
+        metricId: "metric-finishing",
+        rawResultId: body.rawResults[0]?.id,
+      }),
+      expect.objectContaining({
+        source: "algorithm",
+        metricId: "metric-technical-index",
+        value: expect.objectContaining({ kind: "measurement", value: 100 }),
+      }),
+    ]));
+    expect(body.metricRecords.find((record) => record.metricId === "metric-technical-index")?.lineageId).toBeTruthy();
   });
 
   it("rejects club-scoped requests without active membership", async () => {
@@ -623,12 +858,47 @@ describe("api server", () => {
         "x-user-id": "user-parent-1",
       },
     });
+    const observationWrite = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/training/sessions/training-session-1/observations",
+      headers: {
+        "x-user-id": "user-parent-1",
+      },
+      payload: {
+        studentId: "student-1",
+        coachId: "coach-1",
+        metricId: "metric-finishing",
+        rating: 4,
+      },
+    });
+    const assessmentWrite = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/assessments",
+      headers: {
+        "x-user-id": "user-parent-1",
+      },
+      payload: {
+        studentId: "student-1",
+        templateId: "assessment-template-technical",
+        assessedByCoachId: "coach-1",
+        rawResults: [
+          {
+            testItemId: "assessment-test-finishing-cq-talent",
+            value: { kind: "rating_1_5", score: 4 },
+          },
+        ],
+      },
+    });
 
     expect(ownMetrics.statusCode).toBe(200);
     expect(otherMetrics.statusCode).toBe(403);
     expect(otherMetrics.json().error.code).toBe("forbidden");
     expect(writeResponse.statusCode).toBe(403);
     expect(writeResponse.json().error.code).toBe("forbidden");
+    expect(observationWrite.statusCode).toBe(403);
+    expect(observationWrite.json().error.code).toBe("forbidden");
+    expect(assessmentWrite.statusCode).toBe(403);
+    expect(assessmentWrite.json().error.code).toBe("forbidden");
 
     await app.close();
     persistence.database.close();

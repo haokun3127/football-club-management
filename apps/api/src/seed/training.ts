@@ -93,6 +93,18 @@ export function createTrainingSeed(): Pick<
         createdAt: now,
         updatedAt: now,
       },
+      {
+        id: "metric-technical-index",
+        catalogScope: systemCatalog,
+        code: "technical_index",
+        name: "技术综合指数",
+        dimensionId: "dimension-technical",
+        valueKind: "measurement",
+        metricKind: "computed",
+        unit: "score",
+        createdAt: now,
+        updatedAt: now,
+      },
     ],
     drills: [
       {

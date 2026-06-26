@@ -1,6 +1,7 @@
 import type {
   AbilityMetric,
   AssessmentMetricBinding,
+  AssessmentRawResult,
   AssessmentScore,
   AssessmentTemplate,
   AssessmentTemplateVersion,
@@ -75,6 +76,7 @@ export interface SeedData {
   assessmentMetricBindings: AssessmentMetricBinding[];
   assessmentTestItems: AssessmentTestItem[];
   playerAssessments: PlayerAssessment[];
+  assessmentRawResults: AssessmentRawResult[];
   assessmentScores: AssessmentScore[];
   metricGraphVersions: MetricGraphVersion[];
   metricDependencies: MetricDependency[];

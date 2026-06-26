@@ -4,6 +4,7 @@ import {
   createMetricService,
   isCatalogVisibleToClub,
   type AssessmentMetricBinding,
+  type AssessmentRawResult,
   type AssessmentScore,
   type AssessmentTemplate,
   type AssessmentTemplateVersion,
@@ -27,6 +28,7 @@ import {
   type MetricView,
   type MetricViewNode,
   type MetricSourceKind,
+  type MetricValue,
   type OtherActivity,
   type PlayerAssessment,
   type PlayerMetricRecord,
@@ -88,6 +90,7 @@ export interface ApiStore {
   listMetricViewNodes(clubId: EntityId): MetricViewNode[];
   getStudentMetrics(clubId: EntityId, studentId: EntityId, source?: MetricSourceKind | MetricSourceKind[]): PlayerMetricRecord[];
   computeAttackingContribution(clubId: EntityId, studentId: EntityId): Promise<DerivedMetricResult>;
+  getCoachToday(clubId: EntityId, input: { date: string; userId: EntityId; roles: string[] }): unknown;
   createTeam(input: Parameters<ReturnType<typeof createApiServices>["createTeam"]>[0]): Team;
   joinTeam(input: Parameters<ReturnType<typeof createApiServices>["joinTeam"]>[0]): TeamMember;
   createCalendarEvent(clubId: EntityId, input: Parameters<ReturnType<typeof createApiServices>["createCalendarEvent"]>[1]): unknown;
@@ -104,6 +107,19 @@ export interface ApiStore {
     clubId: EntityId,
     input: Parameters<ReturnType<typeof createApiServices>["createTrainingSession"]>[1],
   ): TrainingSession;
+  recordTrainingObservation(
+    clubId: EntityId,
+    trainingSessionId: EntityId,
+    input: {
+      studentId: EntityId;
+      coachId: EntityId;
+      metricId: EntityId;
+      rating?: 1 | 2 | 3 | 4 | 5;
+      value?: MetricValue;
+      tags?: string[];
+      note?: string;
+    },
+  ): { observation: SessionObservation; metricRecord: PlayerMetricRecord };
   recordMatchSummary(input: RecordMatchInput): Promise<{
     match: Match;
     rosters: MatchRoster[];
@@ -113,6 +129,7 @@ export interface ApiStore {
   }>;
   recordAssessment(input: RecordAssessmentInput): Promise<{
     assessment: PlayerAssessment;
+    rawResults: AssessmentRawResult[];
     scores: AssessmentScore[];
     metricRecords: PlayerMetricRecord[];
   }>;
@@ -819,6 +836,52 @@ export abstract class SeedBackedStore implements ApiStore {
       .sort((left, right) => Date.parse(right.occurredAt) - Date.parse(left.occurredAt));
   }
 
+  getCoachToday(clubId: EntityId, input: { date: string; userId: EntityId; roles: string[] }) {
+    const isAdmin = input.roles.some((role) => role === "owner" || role === "admin" || role === "operator");
+    const coach = this.listCoaches(clubId).find((item) => item.userId === input.userId);
+    const events = this.listCalendarEvents(clubId)
+      .filter((event) => event.timeRange.startsAt.slice(0, 10) === input.date)
+      .filter((event) => isAdmin || (coach ? event.ownerCoachId === coach.id : false));
+
+    return {
+      clubId,
+      date: input.date,
+      coachId: coach?.id,
+      events: events.map((event) => {
+        const participantStudentIds = new Set(event.participants.map((participant) => participant.studentId));
+        const teams = event.primaryTeamId
+          ? this.listTeams(clubId).filter((team) => team.id === event.primaryTeamId)
+          : this.listTeams(clubId).filter((team) =>
+            this.listTeamMembers(clubId).some((member) => member.teamId === team.id && participantStudentIds.has(member.studentId)),
+          );
+        const pendingAttendance = event.participants.some((participant) =>
+          participant.status === "invited" || participant.status === "confirmed",
+        );
+        const pendingRecord = event.type === "training"
+          ? !event.trainingSession || !this.listSessionObservations(clubId).some((observation) =>
+            observation.trainingSessionId === event.trainingSession?.id,
+          )
+          : event.type === "match" && !this.data.matchEvents.some((matchEvent) =>
+            matchEvent.clubId === clubId && event.match && matchEvent.matchId === event.match.id,
+          );
+        const pendingAssessment = event.type === "training" && !this.data.playerAssessments.some((assessment) =>
+          assessment.clubId === clubId && assessment.eventId === event.id,
+        );
+
+        return {
+          ...event,
+          teams,
+          students: this.listStudents(clubId).filter((student) => participantStudentIds.has(student.id)),
+          workflow: {
+            pendingAttendance,
+            pendingRecord,
+            pendingAssessment,
+          },
+        };
+      }),
+    };
+  }
+
   createTeam(input: Parameters<ReturnType<typeof createApiServices>["createTeam"]>[0]) {
     return this.activityServices.createTeam(input);
   }
@@ -851,6 +914,60 @@ export abstract class SeedBackedStore implements ApiStore {
     input: Parameters<ReturnType<typeof createApiServices>["createTrainingSession"]>[1],
   ) {
     return this.activityServices.createTrainingSession(clubId, input);
+  }
+
+  recordTrainingObservation(
+    clubId: EntityId,
+    trainingSessionId: EntityId,
+    input: {
+      studentId: EntityId;
+      coachId: EntityId;
+      metricId: EntityId;
+      rating?: 1 | 2 | 3 | 4 | 5;
+      value?: MetricValue;
+      tags?: string[];
+      note?: string;
+    },
+  ) {
+    const metric = this.findMetricById(clubId, input.metricId);
+    if (!metric) {
+      throw new Error("Metric not found for club.");
+    }
+
+    const observation = this.activityServices.recordSessionObservation(clubId, trainingSessionId, {
+      studentId: input.studentId,
+      coachId: input.coachId,
+      metricId: input.metricId,
+      rating: input.rating,
+      tags: input.tags,
+      note: input.note,
+      sourceReference: { kind: "manual" },
+    });
+    const session = this.getTrainingSession(trainingSessionId);
+    const event = session ? this.getCalendarEvent(session.eventId) : null;
+    const now = this.now();
+    const value = input.value ?? (input.rating ? { kind: "rating_1_5" as const, score: input.rating } : null);
+
+    if (!value) {
+      throw new Error("Training observation requires either rating or value.");
+    }
+
+    const metricRecord: PlayerMetricRecord = upsertById(this.data.metricRecords, {
+      id: this.nextId("metric-record"),
+      clubId,
+      studentId: input.studentId,
+      metricId: input.metricId,
+      value,
+      source: "training_observation",
+      occurredAt: event?.timeRange.endsAt ?? now,
+      eventId: event?.id,
+      recordedByCoachId: input.coachId,
+      createdAt: now,
+      updatedAt: now,
+      note: input.note,
+    });
+
+    return { observation, metricRecord };
   }
 
   private findMetricById = (clubId: EntityId, metricId: EntityId) =>
@@ -908,6 +1025,9 @@ export abstract class SeedBackedStore implements ApiStore {
     this.data.metricDependencies.filter((dependency) =>
       dependency.graphVersionId === graphVersionId && isCatalogVisibleToClub(dependency, clubId),
     );
+
+  private listAssessmentTestItems = (clubId: EntityId) =>
+    this.data.assessmentTestItems.filter((item) => item.clubId === clubId);
 
   recordMatchSummary(input: RecordMatchInput) {
     const event = this.getCalendarEvent(input.eventId);
@@ -977,12 +1097,16 @@ export abstract class SeedBackedStore implements ApiStore {
         findMetricGraphVersion: this.findMetricGraphVersion,
         listTemplateMetricBindings: this.listTemplateMetricBindings,
         listMetricGraphDependencies: this.listMetricGraphDependencies,
+        listAssessmentTestItems: this.listAssessmentTestItems,
         listAbilityMetrics: (clubId) => this.listAbilityMetrics(clubId),
         listDerivedMetricDefinitions: (clubId) => this.listDerivedMetricDefinitions(clubId),
       },
       store: {
         saveAssessment: async (assessment) => {
           upsertById(this.data.playerAssessments, assessment);
+        },
+        saveRawResult: async (rawResult: AssessmentRawResult) => {
+          upsertById(this.data.assessmentRawResults, rawResult);
         },
         saveScore: async (score) => {
           upsertById(this.data.assessmentScores, score);

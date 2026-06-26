@@ -1,6 +1,8 @@
 import type {
   AssessmentMetricBinding,
+  AssessmentRawResult,
   AssessmentScore,
+  AssessmentTestItem,
   AssessmentTemplate,
   AssessmentTemplateVersion,
   PlayerAssessment,
@@ -27,6 +29,15 @@ export interface AssessmentScoreInput {
   comment?: string;
 }
 
+export interface AssessmentRawResultInput {
+  testItemId: EntityId;
+  metricId?: EntityId;
+  value: MetricValue;
+  normalizedScore?: number;
+  note?: string;
+  comment?: string;
+}
+
 export interface RecordAssessmentInput {
   clubId: EntityId;
   studentId: EntityId;
@@ -36,11 +47,13 @@ export interface RecordAssessmentInput {
   assessedAt?: string;
   eventId?: EntityId;
   summary?: string;
-  scores: AssessmentScoreInput[];
+  scores?: AssessmentScoreInput[];
+  rawResults?: AssessmentRawResultInput[];
 }
 
 export interface AssessmentStore {
   saveAssessment(assessment: PlayerAssessment): Promise<void> | void;
+  saveRawResult(rawResult: AssessmentRawResult): Promise<void> | void;
   saveScore(score: AssessmentScore): Promise<void> | void;
   saveMetricRecord(record: PlayerMetricRecord): Promise<void> | void;
   saveMetricLineage(lineage: MetricLineage): Promise<void> | void;
@@ -59,6 +72,7 @@ export interface AssessmentCatalogLookup {
     templateId: EntityId,
     templateVersionId?: EntityId,
   ): Promise<AssessmentMetricBinding[]> | AssessmentMetricBinding[];
+  listAssessmentTestItems(clubId: EntityId): Promise<AssessmentTestItem[]> | AssessmentTestItem[];
   listMetricGraphDependencies(clubId: EntityId, graphVersionId: EntityId): Promise<MetricDependency[]> | MetricDependency[];
   listAbilityMetrics(clubId: EntityId): Promise<AbilityMetric[]> | AbilityMetric[];
   listDerivedMetricDefinitions(clubId: EntityId): Promise<DerivedMetricDefinition[]> | DerivedMetricDefinition[];
@@ -73,6 +87,7 @@ export interface AssessmentServiceDependencies {
 
 export interface AssessmentResult {
   assessment: PlayerAssessment;
+  rawResults: AssessmentRawResult[];
   scores: AssessmentScore[];
   metricRecords: PlayerMetricRecord[];
 }
@@ -110,7 +125,27 @@ export function createAssessmentService(dependencies: AssessmentServiceDependenc
         throw new Error(`Assessment template ${template.id} has no metric bindings.`);
       }
 
-      const invalidMetricId = input.scores.find((score) => !allowedMetricIds.has(score.metricId));
+      const testItems = await dependencies.catalog.listAssessmentTestItems(input.clubId);
+      const rawScoreInputs = (input.rawResults ?? []).map((rawResult) => {
+        const testItem = testItems.find((item) => item.id === rawResult.testItemId);
+        if (!testItem) {
+          throw new Error(`Assessment test item ${rawResult.testItemId} not found.`);
+        }
+
+        return {
+          metricId: rawResult.metricId ?? testItem.metricId,
+          value: rawResult.value,
+          normalizedScore: rawResult.normalizedScore ?? getNumericMetricValue(rawResult.value) ?? undefined,
+          rawResult,
+          comment: rawResult.comment ?? rawResult.note,
+        };
+      });
+      const scoreInputs = [
+        ...(input.scores ?? []).map((score) => ({ ...score, rawResult: undefined })),
+        ...rawScoreInputs,
+      ];
+
+      const invalidMetricId = scoreInputs.find((score) => !allowedMetricIds.has(score.metricId));
       if (invalidMetricId) {
         throw new Error(`Metric ${invalidMetricId.metricId} is not part of template ${template.id}.`);
       }
@@ -134,9 +169,30 @@ export function createAssessmentService(dependencies: AssessmentServiceDependenc
       await dependencies.store.saveAssessment(assessment);
 
       const scores: AssessmentScore[] = [];
+      const rawResults: AssessmentRawResult[] = [];
       const metricRecords: PlayerMetricRecord[] = [];
 
-      for (const scoreInput of input.scores) {
+      for (const scoreInput of scoreInputs) {
+        let rawResultId = "rawResultId" in scoreInput ? scoreInput.rawResultId : undefined;
+
+        if (scoreInput.rawResult) {
+          const rawResult: AssessmentRawResult = {
+            id: dependencies.ids.next("assessment-raw-result"),
+            clubId: input.clubId,
+            assessmentId: assessment.id,
+            testItemId: scoreInput.rawResult.testItemId,
+            metricId: scoreInput.metricId,
+            value: scoreInput.value,
+            recordedByCoachId: input.assessedByCoachId,
+            note: scoreInput.rawResult.note,
+            createdAt: now,
+            updatedAt: now,
+          };
+          rawResultId = rawResult.id;
+          rawResults.push(rawResult);
+          await dependencies.store.saveRawResult(rawResult);
+        }
+
         const score: AssessmentScore = {
           id: dependencies.ids.next("assessment-score"),
           clubId: input.clubId,
@@ -144,7 +200,7 @@ export function createAssessmentService(dependencies: AssessmentServiceDependenc
           metricId: scoreInput.metricId,
           value: scoreInput.value,
           normalizedScore: scoreInput.normalizedScore,
-          rawResultId: scoreInput.rawResultId,
+          rawResultId,
           comment: scoreInput.comment,
           createdAt: now,
           updatedAt: now,
@@ -163,7 +219,7 @@ export function createAssessmentService(dependencies: AssessmentServiceDependenc
           eventId: input.eventId,
           assessmentId: assessment.id,
           templateVersionId: templateVersion.id,
-          rawResultId: scoreInput.rawResultId,
+          rawResultId,
           recordedByCoachId: input.assessedByCoachId,
           confidence: scoreInput.normalizedScore ?? getNumericMetricValue(scoreInput.value) ?? undefined,
           createdAt: now,
@@ -204,7 +260,7 @@ export function createAssessmentService(dependencies: AssessmentServiceDependenc
         }
       }
 
-      return { assessment, scores, metricRecords };
+      return { assessment, rawResults, scores, metricRecords };
     },
   };
 }
