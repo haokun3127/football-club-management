@@ -1,6 +1,9 @@
 import type {
+  AbilityMetric,
   AssessmentMetricBinding,
+  AssessmentTemplate,
   AssessmentTemplateVersion,
+  AssessmentTestItem,
   CatalogScope,
   EntityId,
   MetricDependency,
@@ -117,6 +120,12 @@ function catalogScope(row: SqlRow): CatalogScope {
   return { scope: "system" };
 }
 
+function catalogScopeValues(scope: CatalogScope): [CatalogScope["scope"], string | null, string | null] {
+  return scope.scope === "club"
+    ? [scope.scope, scope.clubId, scope.baseItemId ?? null]
+    : [scope.scope, null, null];
+}
+
 export class DataCapabilityRepository {
   constructor(private readonly database: DatabaseSync) {}
 
@@ -198,11 +207,10 @@ export class DataCapabilityRepository {
       return null;
     }
 
-    this.database.prepare(`
-      UPDATE external_raw_records
-      SET review_status = 'confirmed', updated_at = ?
-      WHERE club_id = ? AND id = ?
-    `).run(options.now, clubId, rawRecordId);
+    const rawRecord = mapExternalRawRecord(existing);
+    if (rawRecord.validationErrors?.length) {
+      throw new Error("Cannot confirm external record with validation errors.");
+    }
 
     const link: ExternalRecordLink = {
       id: options.linkId,
@@ -217,7 +225,21 @@ export class DataCapabilityRepository {
       updatedAt: options.now,
     };
 
-    this.saveExternalRecordLink(link);
+    this.database.exec("BEGIN");
+    try {
+      this.database.prepare(`
+        UPDATE external_raw_records
+        SET review_status = 'confirmed', updated_at = ?
+        WHERE club_id = ? AND id = ?
+      `).run(options.now, clubId, rawRecordId);
+
+      this.saveExternalRecordLink(link);
+      this.applyExternalRecordToCoreFacts(rawRecord, input, options.now);
+      this.database.exec("COMMIT");
+    } catch (error) {
+      this.database.exec("ROLLBACK");
+      throw error;
+    }
 
     return link;
   }
@@ -376,6 +398,277 @@ export class DataCapabilityRepository {
     );
   }
 
+  saveAbilityMetric(entity: AbilityMetric): void {
+    const [catalogScope, scopeClubId, baseItemId] = catalogScopeValues(entity.catalogScope);
+
+    this.database.prepare(`
+      INSERT INTO ability_metrics (
+        id, catalog_scope, scope_club_id, base_item_id, code, name, dimension_id, value_kind,
+        metric_kind, unit, max_score, source_kinds_json, version, status, description, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        code = excluded.code,
+        name = excluded.name,
+        dimension_id = excluded.dimension_id,
+        value_kind = excluded.value_kind,
+        metric_kind = excluded.metric_kind,
+        unit = excluded.unit,
+        max_score = excluded.max_score,
+        source_kinds_json = excluded.source_kinds_json,
+        version = excluded.version,
+        status = excluded.status,
+        description = excluded.description,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      catalogScope,
+      scopeClubId,
+      baseItemId,
+      entity.code,
+      entity.name,
+      entity.dimensionId,
+      entity.valueKind,
+      entity.metricKind,
+      entity.unit ?? null,
+      entity.maxScore ?? null,
+      entity.sourceKinds ? JSON.stringify(entity.sourceKinds) : null,
+      entity.version ?? null,
+      entity.status ?? null,
+      entity.description ?? null,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  saveMetricGraphVersion(entity: MetricGraphVersion): void {
+    const [catalogScope, scopeClubId, baseItemId] = catalogScopeValues(entity.catalogScope);
+
+    this.database.prepare(`
+      INSERT INTO metric_graph_versions (
+        id, catalog_scope, scope_club_id, base_item_id, name, version, status, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        name = excluded.name,
+        version = excluded.version,
+        status = excluded.status,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      catalogScope,
+      scopeClubId,
+      baseItemId,
+      entity.name,
+      entity.version,
+      entity.status,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  saveMetricDependency(entity: MetricDependency): void {
+    const [catalogScope, scopeClubId, baseItemId] = catalogScopeValues(entity.catalogScope);
+
+    this.database.prepare(`
+      INSERT INTO metric_dependencies (
+        id, catalog_scope, scope_club_id, base_item_id, graph_version_id, output_metric_id,
+        input_metric_id, formula_id, weight, role, sort_order, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        graph_version_id = excluded.graph_version_id,
+        output_metric_id = excluded.output_metric_id,
+        input_metric_id = excluded.input_metric_id,
+        formula_id = excluded.formula_id,
+        weight = excluded.weight,
+        role = excluded.role,
+        sort_order = excluded.sort_order,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      catalogScope,
+      scopeClubId,
+      baseItemId,
+      entity.graphVersionId,
+      entity.outputMetricId,
+      entity.inputMetricId,
+      entity.formulaId ?? null,
+      entity.weight ?? null,
+      entity.role ?? null,
+      entity.sortOrder,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  saveMetricView(entity: MetricView): void {
+    const [catalogScope, scopeClubId, baseItemId] = catalogScopeValues(entity.catalogScope);
+
+    this.database.prepare(`
+      INSERT INTO metric_views (
+        id, catalog_scope, scope_club_id, base_item_id, graph_version_id, name, status, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        graph_version_id = excluded.graph_version_id,
+        name = excluded.name,
+        status = excluded.status,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      catalogScope,
+      scopeClubId,
+      baseItemId,
+      entity.graphVersionId,
+      entity.name,
+      entity.status,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  saveMetricViewNode(entity: MetricViewNode): void {
+    const [catalogScope, scopeClubId, baseItemId] = catalogScopeValues(entity.catalogScope);
+
+    this.database.prepare(`
+      INSERT INTO metric_view_nodes (
+        id, catalog_scope, scope_club_id, base_item_id, view_id, metric_id, parent_view_node_id,
+        label, sort_order, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        view_id = excluded.view_id,
+        metric_id = excluded.metric_id,
+        parent_view_node_id = excluded.parent_view_node_id,
+        label = excluded.label,
+        sort_order = excluded.sort_order,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      catalogScope,
+      scopeClubId,
+      baseItemId,
+      entity.viewId,
+      entity.metricId ?? null,
+      entity.parentViewNodeId ?? null,
+      entity.label,
+      entity.sortOrder,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  saveAssessmentTemplate(entity: AssessmentTemplate): void {
+    const [catalogScope, scopeClubId, baseItemId] = catalogScopeValues(entity.catalogScope);
+
+    this.database.prepare(`
+      INSERT INTO assessment_templates (
+        id, catalog_scope, scope_club_id, base_item_id, name, age_group, team_level, status, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        name = excluded.name,
+        age_group = excluded.age_group,
+        team_level = excluded.team_level,
+        status = excluded.status,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      catalogScope,
+      scopeClubId,
+      baseItemId,
+      entity.name,
+      entity.ageGroup ?? null,
+      entity.teamLevel ?? null,
+      entity.status,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  saveAssessmentTemplateVersion(entity: AssessmentTemplateVersion): void {
+    this.database.prepare(`
+      INSERT INTO assessment_template_versions (
+        id, club_id, template_id, graph_version_id, version, status, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        graph_version_id = excluded.graph_version_id,
+        version = excluded.version,
+        status = excluded.status,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.templateId,
+      entity.graphVersionId ?? null,
+      entity.version,
+      entity.status,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  saveAssessmentMetricBinding(entity: AssessmentMetricBinding): void {
+    this.database.prepare(`
+      INSERT INTO assessment_metric_bindings (
+        id, club_id, template_version_id, metric_id, role, formula_id, test_item_id,
+        max_score, weight, sort_order, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        template_version_id = excluded.template_version_id,
+        metric_id = excluded.metric_id,
+        role = excluded.role,
+        formula_id = excluded.formula_id,
+        test_item_id = excluded.test_item_id,
+        max_score = excluded.max_score,
+        weight = excluded.weight,
+        sort_order = excluded.sort_order,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.templateVersionId,
+      entity.metricId,
+      entity.role,
+      entity.formulaId ?? null,
+      entity.testItemId ?? null,
+      entity.maxScore ?? null,
+      entity.weight ?? null,
+      entity.sortOrder,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  saveAssessmentTestItem(entity: AssessmentTestItem): void {
+    this.database.prepare(`
+      INSERT INTO assessment_test_items (
+        id, club_id, metric_id, name, value_kind, unit, protocol, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        metric_id = excluded.metric_id,
+        name = excluded.name,
+        value_kind = excluded.value_kind,
+        unit = excluded.unit,
+        protocol = excluded.protocol,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.metricId,
+      entity.name,
+      entity.valueKind,
+      entity.unit ?? null,
+      entity.protocol ?? null,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
   saveExternalSyncRun(entity: ExternalSyncRun): void {
     this.database.prepare(`
       INSERT INTO external_sync_runs (
@@ -463,6 +756,439 @@ export class DataCapabilityRepository {
       entity.updatedAt,
     );
   }
+
+  private applyExternalRecordToCoreFacts(
+    rawRecord: ExternalRawRecord,
+    input: ConfirmExternalRecordInput,
+    now: string,
+  ): void {
+    if (input.targetType !== "student" || !rawRecord.tableMappingId) {
+      return;
+    }
+
+    const tableMapping = this.database.prepare(`
+      SELECT * FROM external_table_mappings
+      WHERE club_id = ? AND id = ?
+    `).get(rawRecord.clubId, rawRecord.tableMappingId) as SqlRow | undefined;
+
+    if (!tableMapping) {
+      return;
+    }
+
+    const externalTableKey = requireString(tableMapping, "external_table_key");
+
+    switch (externalTableKey) {
+      case "full_users":
+        this.applyFullUserRecord(rawRecord, input.targetId, now);
+        return;
+      case "payment_events":
+        this.applyPaymentEventRecord(rawRecord, input.targetId, now);
+        return;
+      case "attendance_2025_2026_spring_summer":
+        this.applyAttendanceSnapshotRecord(rawRecord, input.targetId, now);
+        return;
+      case "insurance_policies":
+        this.applyInsurancePolicyRecord(rawRecord, input.targetId, now);
+        return;
+      case "talent_elite_assessment":
+        return;
+    }
+  }
+
+  private applyFullUserRecord(rawRecord: ExternalRawRecord, studentId: EntityId, now: string): void {
+    const preview = rawRecord.normalizedPreview ?? {};
+    const studentName = textValue(preview, "student.name");
+    const birthDate = normalizeBirthDate(textValue(preview, "student.birthDate"));
+
+    if (studentName || birthDate) {
+      this.database.prepare(`
+        UPDATE student_profiles
+        SET
+          name = COALESCE(?, name),
+          birth_date = COALESCE(?, birth_date),
+          updated_at = ?
+        WHERE club_id = ? AND id = ?
+      `).run(studentName ?? null, birthDate ?? null, now, rawRecord.clubId, studentId);
+    }
+
+    const coachId = this.findCoachIdByName(rawRecord.clubId, textValue(preview, "coach.name"));
+    this.upsertStudentOperationalProfile(rawRecord, studentId, now, {
+      externalRef: textValue(preview, "student.identityNumber"),
+      region: textValue(preview, "studentOperationalProfile.area"),
+      school: textValue(preview, "studentOperationalProfile.schoolName"),
+      acquisitionChannel: textValue(preview, "studentOperationalProfile.channel"),
+      studentStatus: textValue(preview, "student.status"),
+      responsibleCoachId: coachId,
+      insuranceExpiresAt: textValue(preview, "insurance.expiresAt"),
+      totalCheckins: numberValue(preview, "attendance.checkInCount"),
+      latestCheckinAt: textValue(preview, "attendance.lastCheckInAt"),
+      totalRecharges: numberValue(preview, "billing.paymentCount"),
+      notes: textValue(preview, "studentOperationalProfile.communicationFeedback"),
+    });
+    this.upsertPrimaryStudentContact(rawRecord, studentId, now);
+    this.upsertStudentTeamMembership(rawRecord.clubId, studentId, textValue(preview, "team.name"), now);
+  }
+
+  private applyPaymentEventRecord(rawRecord: ExternalRawRecord, studentId: EntityId, now: string): void {
+    const preview = rawRecord.normalizedPreview ?? {};
+    const courseHours = numberValue(preview, "payment.courseHours");
+    const occurredAt = textValue(preview, "payment.paidAt") ?? now;
+    const paymentEventId = `payment-event-${rawRecord.id}`;
+
+    this.database.prepare(`
+      INSERT INTO payment_events (
+        id, club_id, student_id, occurred_at, payment_type, amount, lesson_hours,
+        status, external_ref, note, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        occurred_at = excluded.occurred_at,
+        payment_type = excluded.payment_type,
+        amount = excluded.amount,
+        lesson_hours = excluded.lesson_hours,
+        status = excluded.status,
+        note = excluded.note,
+        updated_at = excluded.updated_at
+    `).run(
+      paymentEventId,
+      rawRecord.clubId,
+      studentId,
+      occurredAt,
+      textValue(preview, "payment.type") ?? null,
+      numberValue(preview, "payment.amount") ?? null,
+      courseHours ?? null,
+      booleanValue(preview, "payment.auditPassed") === 0 ? "pending_offline_review" : "confirmed_offline",
+      rawRecord.id,
+      textValue(preview, "payment.note") ?? null,
+      now,
+      now,
+    );
+
+    if (courseHours !== undefined) {
+      this.database.prepare(`
+        INSERT INTO lesson_credit_ledger (
+          id, club_id, student_id, payment_event_id, occurred_at, entry_type,
+          lesson_delta, source, note, created_at, updated_at
+        )
+        VALUES (?, ?, ?, ?, ?, 'credit', ?, 'external_import', ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          lesson_delta = excluded.lesson_delta,
+          note = excluded.note,
+          updated_at = excluded.updated_at
+      `).run(
+        `lesson-credit-${rawRecord.id}`,
+        rawRecord.clubId,
+        studentId,
+        paymentEventId,
+        occurredAt,
+        courseHours,
+        textValue(preview, "payment.stage") ?? null,
+        now,
+        now,
+      );
+    }
+
+    this.upsertStudentOperationalProfile(rawRecord, studentId, now, {
+      region: textValue(preview, "studentOperationalProfile.area"),
+      school: textValue(preview, "studentOperationalProfile.schoolName"),
+      insuranceExpiresAt: textValue(preview, "insurance.expiresAt"),
+    });
+    this.upsertPrimaryStudentContact(rawRecord, studentId, now);
+  }
+
+  private applyAttendanceSnapshotRecord(rawRecord: ExternalRawRecord, studentId: EntityId, now: string): void {
+    const preview = rawRecord.normalizedPreview ?? {};
+    const checkins = numberValue(preview, "attendance.termTeamCheckInCount");
+    const balance = numberValue(preview, "attendance.teamCourseBalance");
+
+    this.upsertStudentOperationalProfile(rawRecord, studentId, now, {
+      region: textValue(preview, "studentOperationalProfile.area"),
+      school: textValue(preview, "studentOperationalProfile.schoolName"),
+      totalCheckins: checkins,
+      lessonBalance: balance,
+      communicationStage: textValue(preview, "attendance.stage"),
+    });
+    this.upsertStudentTeamMembership(rawRecord.clubId, studentId, textValue(preview, "team.name"), now);
+
+    if (balance !== undefined) {
+      this.database.prepare(`
+        INSERT INTO lesson_credit_ledger (
+          id, club_id, student_id, team_id, occurred_at, entry_type,
+          lesson_delta, balance_after, source, note, created_at, updated_at
+        )
+        VALUES (?, ?, ?, ?, ?, 'external_snapshot', 0, ?, 'external_import', ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          balance_after = excluded.balance_after,
+          note = excluded.note,
+          updated_at = excluded.updated_at
+      `).run(
+        `lesson-credit-snapshot-${rawRecord.id}`,
+        rawRecord.clubId,
+        studentId,
+        this.findTeamIdByName(rawRecord.clubId, textValue(preview, "team.name")) ?? null,
+        textValue(preview, "attendance.createdAt") ?? now,
+        balance,
+        textValue(preview, "attendance.stage") ?? null,
+        now,
+        now,
+      );
+    }
+  }
+
+  private applyInsurancePolicyRecord(rawRecord: ExternalRawRecord, studentId: EntityId, now: string): void {
+    const preview = rawRecord.normalizedPreview ?? {};
+    const expiresAt = textValue(preview, "insurance.expiresAt");
+
+    if (!expiresAt) {
+      return;
+    }
+
+    this.database.prepare(`
+      INSERT INTO insurance_policies (
+        id, club_id, student_id, purchased_at, expires_at, policy_number, provider,
+        sport, approved, external_ref, note, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        purchased_at = excluded.purchased_at,
+        expires_at = excluded.expires_at,
+        policy_number = excluded.policy_number,
+        provider = excluded.provider,
+        sport = excluded.sport,
+        approved = excluded.approved,
+        note = excluded.note,
+        updated_at = excluded.updated_at
+    `).run(
+      `insurance-policy-${rawRecord.id}`,
+      rawRecord.clubId,
+      studentId,
+      textValue(preview, "insurance.purchasedAt") ?? null,
+      expiresAt,
+      textValue(preview, "insurance.policyNo") ?? null,
+      textValue(preview, "insurance.vendor") ?? null,
+      textValue(preview, "insurance.sport") ?? null,
+      booleanValue(preview, "insurance.auditPassed"),
+      rawRecord.id,
+      textValue(preview, "insurance.note") ?? null,
+      now,
+      now,
+    );
+
+    this.upsertStudentOperationalProfile(rawRecord, studentId, now, {
+      insuranceExpiresAt: expiresAt,
+      school: textValue(preview, "studentOperationalProfile.schoolName"),
+    });
+  }
+
+  private upsertStudentOperationalProfile(
+    rawRecord: ExternalRawRecord,
+    studentId: EntityId,
+    now: string,
+    values: {
+      externalRef?: string;
+      region?: string;
+      school?: string;
+      acquisitionChannel?: string;
+      studentStatus?: string;
+      communicationStage?: string;
+      responsibleCoachId?: string;
+      insuranceExpiresAt?: string;
+      totalCheckins?: number;
+      latestCheckinAt?: string;
+      totalRecharges?: number;
+      lessonBalance?: number;
+      notes?: string;
+    },
+  ): void {
+    this.database.prepare(`
+      INSERT INTO student_operational_profiles (
+        id, club_id, student_id, external_ref, region, school, acquisition_channel,
+        student_status, communication_stage, responsible_coach_id, insurance_expires_at,
+        total_checkins, latest_checkin_at, total_recharges, lesson_balance, notes,
+        created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(club_id, student_id) DO UPDATE SET
+        external_ref = COALESCE(excluded.external_ref, external_ref),
+        region = COALESCE(excluded.region, region),
+        school = COALESCE(excluded.school, school),
+        acquisition_channel = COALESCE(excluded.acquisition_channel, acquisition_channel),
+        student_status = COALESCE(excluded.student_status, student_status),
+        communication_stage = COALESCE(excluded.communication_stage, communication_stage),
+        responsible_coach_id = COALESCE(excluded.responsible_coach_id, responsible_coach_id),
+        insurance_expires_at = COALESCE(excluded.insurance_expires_at, insurance_expires_at),
+        total_checkins = COALESCE(excluded.total_checkins, total_checkins),
+        latest_checkin_at = COALESCE(excluded.latest_checkin_at, latest_checkin_at),
+        total_recharges = COALESCE(excluded.total_recharges, total_recharges),
+        lesson_balance = COALESCE(excluded.lesson_balance, lesson_balance),
+        notes = COALESCE(excluded.notes, notes),
+        updated_at = excluded.updated_at
+    `).run(
+      `student-operational-profile-${studentId}`,
+      rawRecord.clubId,
+      studentId,
+      values.externalRef ?? null,
+      values.region ?? null,
+      values.school ?? null,
+      values.acquisitionChannel ?? null,
+      values.studentStatus ?? null,
+      values.communicationStage ?? null,
+      values.responsibleCoachId ?? null,
+      values.insuranceExpiresAt ?? null,
+      values.totalCheckins ?? null,
+      values.latestCheckinAt ?? null,
+      values.totalRecharges ?? null,
+      values.lessonBalance ?? null,
+      values.notes ?? null,
+      now,
+      now,
+    );
+  }
+
+  private upsertPrimaryStudentContact(rawRecord: ExternalRawRecord, studentId: EntityId, now: string): void {
+    const preview = rawRecord.normalizedPreview ?? {};
+    const phone = textValue(preview, "contact.phone");
+    const wechat = textValue(preview, "contact.wechat");
+
+    if (!phone && !wechat) {
+      return;
+    }
+
+    this.database.prepare(`
+      INSERT INTO student_contacts (
+        id, club_id, student_id, name, relationship, phone, wechat,
+        is_primary_contact, receives_notifications, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, 'guardian', ?, ?, 1, 1, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        phone = COALESCE(excluded.phone, phone),
+        wechat = COALESCE(excluded.wechat, wechat),
+        updated_at = excluded.updated_at
+    `).run(
+      `student-contact-${studentId}-primary`,
+      rawRecord.clubId,
+      studentId,
+      `${textValue(preview, "student.name") ?? "学员"}家长`,
+      phone ?? null,
+      wechat ?? null,
+      now,
+      now,
+    );
+  }
+
+  private upsertStudentTeamMembership(clubId: EntityId, studentId: EntityId, teamName: string | undefined, now: string): void {
+    const teamId = this.findTeamIdByName(clubId, teamName);
+    if (!teamId) {
+      return;
+    }
+
+    const existing = this.database.prepare(`
+      SELECT id FROM team_members
+      WHERE club_id = ? AND team_id = ? AND student_id = ? AND status = 'active'
+      LIMIT 1
+    `).get(clubId, teamId, studentId) as SqlRow | undefined;
+
+    if (existing) {
+      return;
+    }
+
+    this.database.prepare(`
+      INSERT INTO team_members (
+        id, club_id, team_id, student_id, starts_at, is_primary_team, status, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, 0, 'active', ?, ?)
+    `).run(
+      `team-member-${studentId}-${teamId}`,
+      clubId,
+      teamId,
+      studentId,
+      now.slice(0, 10),
+      now,
+      now,
+    );
+  }
+
+  private findCoachIdByName(clubId: EntityId, coachName: string | undefined): string | undefined {
+    if (!coachName) {
+      return undefined;
+    }
+
+    const row = this.database.prepare(`
+      SELECT id FROM coach_profiles WHERE club_id = ? AND name = ? LIMIT 1
+    `).get(clubId, coachName) as SqlRow | undefined;
+
+    return optionalString(row ?? {}, "id");
+  }
+
+  private findTeamIdByName(clubId: EntityId, teamName: string | undefined): string | undefined {
+    if (!teamName) {
+      return undefined;
+    }
+
+    const row = this.database.prepare(`
+      SELECT id FROM teams WHERE club_id = ? AND name = ? LIMIT 1
+    `).get(clubId, teamName) as SqlRow | undefined;
+
+    return optionalString(row ?? {}, "id");
+  }
+}
+
+function textValue(preview: Record<string, unknown>, key: string): string | undefined {
+  const value = preview[key];
+
+  if (value === undefined || value === null || value === "") {
+    return undefined;
+  }
+
+  return String(value);
+}
+
+function numberValue(preview: Record<string, unknown>, key: string): number | undefined {
+  const value = preview[key];
+
+  if (typeof value === "number") {
+    return value;
+  }
+
+  if (typeof value === "string" && value.trim()) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+
+  return undefined;
+}
+
+function booleanValue(preview: Record<string, unknown>, key: string): 0 | 1 | null {
+  const value = preview[key];
+
+  if (typeof value === "boolean") {
+    return value ? 1 : 0;
+  }
+
+  if (typeof value === "number") {
+    return value === 0 ? 0 : 1;
+  }
+
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (["true", "yes", "y", "1", "是", "通过", "已通过"].includes(normalized)) {
+      return 1;
+    }
+
+    if (["false", "no", "n", "0", "否", "未通过"].includes(normalized)) {
+      return 0;
+    }
+  }
+
+  return null;
+}
+
+function normalizeBirthDate(value: string | undefined): string | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  return /^\d{4}-\d{2}$/.test(value) ? `${value}-01` : value;
 }
 
 function mapExternalConnection(row: SqlRow): ExternalSystemConnection {

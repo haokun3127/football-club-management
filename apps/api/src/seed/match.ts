@@ -1,5 +1,5 @@
 import type { SeedData } from "./types.js";
-import { demoClubId as clubId, seedNow as now } from "./types.js";
+import { chongqingTalentClubId as clubId, seedNow as now } from "./types.js";
 
 export function createMatchSeed(): Pick<SeedData, "matches" | "matchRosters" | "matchEvents" | "matchPlayerNotes"> {
   return {
@@ -9,7 +9,7 @@ export function createMatchSeed(): Pick<SeedData, "matches" | "matchRosters" | "
         clubId,
         eventId: "event-match-1",
         matchType: "friendly",
-        opponentName: "City School U10",
+        opponentName: "重庆中心小学U10",
         homeScore: 3,
         awayScore: 2,
         status: "completed",
@@ -62,7 +62,7 @@ export function createMatchSeed(): Pick<SeedData, "matches" | "matchRosters" | "
         matchId: "match-1",
         studentId: "student-1",
         coachId: "coach-1",
-        note: "Stayed high and attacked the space behind the back line.",
+        note: "保持前场宽度，能主动冲击防线身后空间。",
         createdAt: now,
         updatedAt: now,
       },

@@ -25,7 +25,7 @@ export async function readExcelWorksheetRecords(input: {
   }
 
   const headerRowNumber = input.headerRow ?? 1;
-  const headers = rowValues(worksheet.getRow(headerRowNumber)).map((value) => String(value ?? "").trim());
+  const headers = uniqueHeaders(rowValues(worksheet.getRow(headerRowNumber)));
   const records: ExcelRawRecord[] = [];
 
   worksheet.eachRow((row, rowNumber) => {
@@ -56,6 +56,23 @@ export async function readExcelWorksheetRecords(input: {
 function rowValues(row: ExcelJS.Row): unknown[] {
   const values = Array.isArray(row.values) ? row.values.slice(1) : [];
   return values.map(normalizeCellValue);
+}
+
+function uniqueHeaders(values: unknown[]): string[] {
+  const counts = new Map<string, number>();
+
+  return values.map((value) => {
+    const header = String(value ?? "").trim();
+
+    if (!header) {
+      return "";
+    }
+
+    const next = (counts.get(header) ?? 0) + 1;
+    counts.set(header, next);
+
+    return next === 1 ? header : `${header}_${next}`;
+  });
 }
 
 function normalizeCellValue(value: unknown): unknown {

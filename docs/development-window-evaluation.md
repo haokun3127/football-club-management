@@ -71,7 +71,7 @@ A 引入 persistence，B/C 仍偏内存 adapter 思路。必须统一应用服�
 处理方式：
 
 - 按领域拆 seed：platform、training、match、assessment。
-- demo seed 由一个组合入口导出。
+- 重庆天才种子配置由一个组合入口导出。
 
 ### P1：API 契约未统一
 

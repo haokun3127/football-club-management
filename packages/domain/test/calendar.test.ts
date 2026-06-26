@@ -6,7 +6,7 @@ describe("findScheduleConflicts", () => {
     const conflicts = findScheduleConflicts(
       [
         {
-          clubId: "club-demo",
+          clubId: "club-chongqing-talent",
           subjectId: "student-1",
           eventId: "event-training",
           timeRange: {
@@ -16,7 +16,7 @@ describe("findScheduleConflicts", () => {
         },
       ],
       {
-        clubId: "club-demo",
+        clubId: "club-chongqing-talent",
         subjectId: "student-1",
         eventId: "event-private",
         timeRange: {
@@ -28,7 +28,7 @@ describe("findScheduleConflicts", () => {
 
     expect(conflicts).toEqual([
       {
-        clubId: "club-demo",
+        clubId: "club-chongqing-talent",
         subjectId: "student-1",
         existingEventId: "event-training",
         candidateEventId: "event-private",
@@ -67,7 +67,7 @@ describe("findScheduleConflicts", () => {
     const occurrences = expandRecurringCalendarEvent({
       event: {
         id: "event-training-series",
-        clubId: "club-demo",
+        clubId: "club-chongqing-talent",
         type: "training",
         title: "Weekly Training",
         timeRange: {

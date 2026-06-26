@@ -77,6 +77,42 @@ export async function seedPlatformData(repositories: PlatformRepositories, data:
     await repositories.teamMembers.save(teamMember);
   }
 
+  for (const metric of data.metrics) {
+    repositories.dataCapability.saveAbilityMetric(metric);
+  }
+
+  for (const metricGraphVersion of data.metricGraphVersions) {
+    repositories.dataCapability.saveMetricGraphVersion(metricGraphVersion);
+  }
+
+  for (const assessmentTemplate of data.assessmentTemplates) {
+    repositories.dataCapability.saveAssessmentTemplate(assessmentTemplate);
+  }
+
+  for (const metricDependency of data.metricDependencies) {
+    repositories.dataCapability.saveMetricDependency(metricDependency);
+  }
+
+  for (const metricView of data.metricViews) {
+    repositories.dataCapability.saveMetricView(metricView);
+  }
+
+  for (const metricViewNode of data.metricViewNodes) {
+    repositories.dataCapability.saveMetricViewNode(metricViewNode);
+  }
+
+  for (const assessmentTemplateVersion of data.assessmentTemplateVersions) {
+    repositories.dataCapability.saveAssessmentTemplateVersion(assessmentTemplateVersion);
+  }
+
+  for (const assessmentTestItem of data.assessmentTestItems) {
+    repositories.dataCapability.saveAssessmentTestItem(assessmentTestItem);
+  }
+
+  for (const assessmentMetricBinding of data.assessmentMetricBindings) {
+    repositories.dataCapability.saveAssessmentMetricBinding(assessmentMetricBinding);
+  }
+
   for (const connection of data.externalConnections) {
     repositories.dataCapability.saveExternalConnection(connection);
   }

@@ -40,13 +40,17 @@ import {
   type TrainingSession,
 } from "@football-club/domain";
 import type {
+  ClubCapabilities,
   ConfirmExternalRecordInput,
   DataCapabilityConfig,
+  ExternalFieldMapping,
   ExternalRawRecord,
   ExternalRecordLink,
   ExternalSyncRun,
   ImportPreview,
   ImportPreviewFilters,
+  StageExternalImportInput,
+  StageExternalImportResult,
 } from "./data-capability/types.js";
 import { createApiServices } from "./application/services.js";
 import type { PlatformRepositories } from "./persistence/platform-persistence.js";
@@ -57,8 +61,10 @@ export interface ApiStore {
   listClubs(): Club[] | Promise<Club[]>;
   getClubById(clubId: EntityId): Club | null;
   getClubConfig(clubId: EntityId): unknown | null | Promise<unknown | null>;
+  getClubCapabilities(clubId: EntityId): ClubCapabilities | null | Promise<ClubCapabilities | null>;
   getDataCapabilityConfig(clubId: EntityId): DataCapabilityConfig | Promise<DataCapabilityConfig>;
   getImportPreview(clubId: EntityId, filters?: ImportPreviewFilters): ImportPreview | Promise<ImportPreview>;
+  stageExternalImport(clubId: EntityId, input: StageExternalImportInput): StageExternalImportResult | Promise<StageExternalImportResult>;
   listExternalSyncRuns(clubId: EntityId): ExternalSyncRun[] | Promise<ExternalSyncRun[]>;
   confirmExternalRecord(
     clubId: EntityId,
@@ -115,6 +121,134 @@ function upsertById<TEntity extends { id: EntityId }>(items: TEntity[], entity: 
 
   items.push(entity);
   return entity;
+}
+
+function safeIdPart(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "external";
+}
+
+function buildStagedRawRecordId(tableKey: string, rowHash: string): EntityId {
+  return `external-raw-${safeIdPart(tableKey)}-${rowHash.slice(0, 16)}`;
+}
+
+function normalizeExternalRawRecord(
+  raw: Record<string, unknown>,
+  fieldMappings: ExternalFieldMapping[],
+): Pick<ExternalRawRecord, "normalizedPreview" | "validationErrors"> {
+  const normalizedPreview: Record<string, unknown> = {};
+  const validationErrors: Array<Record<string, string>> = [];
+
+  for (const field of fieldMappings) {
+    const value = raw[field.externalFieldKey];
+    const hasValue = value !== undefined && value !== null && value !== "";
+
+    if (hasValue) {
+      normalizedPreview[field.targetFieldKey] = value;
+    } else if (field.required) {
+      validationErrors.push({
+        code: "required",
+        field: field.externalFieldKey,
+        targetField: field.targetFieldKey,
+        message: `Missing required field: ${field.externalFieldKey}`,
+      });
+    }
+  }
+
+  return {
+    normalizedPreview,
+    validationErrors: validationErrors.length ? validationErrors : undefined,
+  };
+}
+
+function buildClubCapabilities(
+  club: Club,
+  config: DataCapabilityConfig,
+  latestSyncRuns: ExternalSyncRun[],
+): ClubCapabilities {
+  return {
+    club: {
+      id: club.id,
+      code: club.code,
+      name: club.name,
+      timezone: club.timezone,
+      locale: club.locale,
+    },
+    features: Object.fromEntries(config.featureFlags.map((flag) => [flag.feature, flag.enabled])),
+    roles: {
+      parent: [
+        "calendar.read_child",
+        "training.read_summary",
+        "match.read_summary",
+        "assessment.read_trend",
+        "operations.read_offline_status",
+      ],
+      coach: [
+        "calendar.read",
+        "attendance.write",
+        "training_observation.write",
+        "match_event.write",
+        "assessment.write",
+      ],
+      admin: [
+        "roster.manage",
+        "schedule.manage",
+        "integration.import_preview",
+        "integration.confirm",
+        "assessment_graph.manage",
+      ],
+    },
+    calendar: {
+      eventTypes: ["training", "match", "other"],
+      participantStatuses: ["invited", "confirmed", "present", "absent", "late", "leave_requested", "excused"],
+    },
+    operations: {
+      standardFields: [
+        { key: "student.identityNumber", label: "身份证号", source: "operational" },
+        { key: "student.name", label: "学员姓名", source: "core" },
+        { key: "student.birthDate", label: "出生年月", source: "core" },
+        { key: "student.status", label: "学员状态", source: "operational" },
+        { key: "student.channel", label: "渠道", source: "operational" },
+        { key: "student.area", label: "区域", source: "operational" },
+        { key: "student.school", label: "学校", source: "operational" },
+        { key: "team.name", label: "队伍名称", source: "core" },
+        { key: "coach.name", label: "教练", source: "core" },
+        { key: "contact.phone", label: "手机", source: "operational" },
+        { key: "contact.wechat", label: "微信", source: "operational" },
+        { key: "billing.lastPaymentDate", label: "历次充值日期", source: "operational" },
+        { key: "billing.paymentCount", label: "充值笔数", source: "operational" },
+        { key: "billing.courseHours", label: "课时", source: "operational" },
+        { key: "billing.courseBalance", label: "剩余课时", source: "operational" },
+        { key: "insurance.expiresAt", label: "保险到期日期", source: "operational" },
+        { key: "attendance.checkInCount", label: "签到次数", source: "operational" },
+        { key: "attendance.lastCheckInAt", label: "最近签到时间", source: "operational" },
+        ...config.customFields.map((field) => ({
+          key: `${field.target}.${field.key}`,
+          label: field.label,
+          source: "custom" as const,
+        })),
+      ],
+      customFields: config.customFields,
+      offlineStatuses: [
+        { key: "payment_review_status", label: "线下收费确认状态" },
+        { key: "course_balance_snapshot", label: "线下课时余额快照" },
+        { key: "insurance_review_status", label: "线下保险确认状态" },
+        { key: "attendance_sync_status", label: "到课同步状态" },
+      ],
+    },
+    assessment: {
+      graphVersions: config.metricGraphVersions,
+      views: config.metricViews,
+      viewNodes: config.metricViewNodes,
+      templateVersions: config.assessmentTemplateVersions,
+      metricBindings: config.assessmentMetricBindings,
+    },
+    integration: {
+      connections: config.externalConnections,
+      tableMappings: config.tableMappings,
+      fieldMappings: config.fieldMappings,
+      latestSyncRuns: latestSyncRuns.slice(0, 10),
+    },
+  };
 }
 
 export abstract class SeedBackedStore implements ApiStore {
@@ -193,6 +327,19 @@ export abstract class SeedBackedStore implements ApiStore {
 
   getClubConfig(clubId: EntityId): ReturnType<ApiStore["getClubConfig"]> {
     return this.getSeedClubConfig(clubId, this.getClubById(clubId));
+  }
+
+  getClubCapabilities(clubId: EntityId): ReturnType<ApiStore["getClubCapabilities"]> {
+    const club = this.getClubById(clubId);
+    if (!club) {
+      return null;
+    }
+
+    return buildClubCapabilities(
+      club,
+      this.getDataCapabilityConfig(clubId),
+      this.listExternalSyncRuns(clubId),
+    );
   }
 
   isGuardianOfStudent(clubId: EntityId, userId: EntityId, studentId: EntityId): boolean {
@@ -416,6 +563,66 @@ export abstract class SeedBackedStore implements ApiStore {
     return {
       records: this.filterExternalRawRecords(clubId, filters),
     };
+  }
+
+  stageExternalImport(clubId: EntityId, input: StageExternalImportInput): StageExternalImportResult {
+    const connection = this.data.externalConnections.find((item) => item.clubId === clubId && item.id === input.connectionId);
+    const tableMapping = this.data.externalTableMappings.find((item) =>
+      item.clubId === clubId && item.id === input.tableMappingId && item.connectionId === input.connectionId,
+    );
+
+    if (!connection) {
+      throw new Error(`External connection ${input.connectionId} is not configured for club ${clubId}.`);
+    }
+
+    if (!tableMapping) {
+      throw new Error(`External table mapping ${input.tableMappingId} is not configured for club ${clubId}.`);
+    }
+
+    const now = this.now();
+    const syncRunId = this.nextId("external-sync-run");
+    const fieldMappings = this.data.externalFieldMappings.filter((item) =>
+      item.clubId === clubId && item.tableMappingId === input.tableMappingId,
+    );
+    const records = input.records.map((record) => {
+      const { normalizedPreview, validationErrors } = normalizeExternalRawRecord(record.raw, fieldMappings);
+      const id = buildStagedRawRecordId(tableMapping.externalTableKey, record.rowHash);
+      const existing = this.data.externalRawRecords.find((item) => item.id === id);
+
+      return upsertById<ExternalRawRecord>(this.data.externalRawRecords, {
+        id,
+        clubId,
+        connectionId: input.connectionId,
+        tableMappingId: input.tableMappingId,
+        syncRunId,
+        externalRecordId: `${input.sourceName ?? tableMapping.externalTableKey}:row-${record.rowNumber}`,
+        payload: record.raw,
+        payloadHash: record.rowHash,
+        reviewStatus: existing?.reviewStatus ?? "pending",
+        validationErrors,
+        normalizedPreview,
+        importedAt: now,
+        createdAt: existing?.createdAt ?? now,
+        updatedAt: now,
+      });
+    });
+    const failedRecords = records.filter((record) => record.validationErrors?.length).length;
+    const syncRun = upsertById<ExternalSyncRun>(this.data.externalSyncRuns, {
+      id: syncRunId,
+      clubId,
+      connectionId: connection.id,
+      tableMappingId: tableMapping.id,
+      status: "completed",
+      startedAt: now,
+      finishedAt: now,
+      totalRecords: records.length,
+      importedRecords: 0,
+      failedRecords,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    return { syncRun, records };
   }
 
   listExternalSyncRuns(clubId: EntityId): ExternalSyncRun[] {
@@ -725,6 +932,20 @@ export class PersistentApiStore extends SeedBackedStore {
     return this.getSeedClubConfig(clubId, club);
   }
 
+  override async getClubCapabilities(clubId: EntityId) {
+    const club = await this.repositories.clubs.getById(clubId);
+
+    if (!club) {
+      return null;
+    }
+
+    return buildClubCapabilities(
+      club,
+      this.getDataCapabilityConfig(clubId),
+      this.listExternalSyncRuns(clubId),
+    );
+  }
+
   override getDataCapabilityConfig(clubId: EntityId) {
     return this.repositories.dataCapability.getConfig(clubId, {
       featureFlags: this.listFeatureFlags(clubId),
@@ -739,6 +960,74 @@ export class PersistentApiStore extends SeedBackedStore {
 
   override listExternalSyncRuns(clubId: EntityId) {
     return this.repositories.dataCapability.listSyncRuns(clubId);
+  }
+
+  override stageExternalImport(clubId: EntityId, input: StageExternalImportInput): StageExternalImportResult {
+    const config = this.getDataCapabilityConfig(clubId);
+    const connection = config.externalConnections.find((item) => item.id === input.connectionId);
+    const tableMapping = config.tableMappings.find((item) =>
+      item.id === input.tableMappingId && item.connectionId === input.connectionId,
+    );
+
+    if (!connection) {
+      throw new Error(`External connection ${input.connectionId} is not configured for club ${clubId}.`);
+    }
+
+    if (!tableMapping) {
+      throw new Error(`External table mapping ${input.tableMappingId} is not configured for club ${clubId}.`);
+    }
+
+    const now = new Date().toISOString();
+    const syncRun: ExternalSyncRun = {
+      id: `external-sync-run-${Date.now()}`,
+      clubId,
+      connectionId: connection.id,
+      tableMappingId: tableMapping.id,
+      status: "completed",
+      startedAt: now,
+      finishedAt: now,
+      totalRecords: input.records.length,
+      importedRecords: 0,
+      failedRecords: 0,
+      createdAt: now,
+      updatedAt: now,
+    };
+    const existingRecords = this.repositories.dataCapability.getImportPreview(clubId, {
+      connectionId: input.connectionId,
+      tableMappingId: input.tableMappingId,
+    }).records;
+    const fieldMappings = config.fieldMappings.filter((item) => item.tableMappingId === input.tableMappingId);
+    const records = input.records.map((record) => {
+      const id = buildStagedRawRecordId(tableMapping.externalTableKey, record.rowHash);
+      const existing = existingRecords.find((item) => item.id === id);
+      const { normalizedPreview, validationErrors } = normalizeExternalRawRecord(record.raw, fieldMappings);
+
+      return {
+        id,
+        clubId,
+        connectionId: input.connectionId,
+        tableMappingId: input.tableMappingId,
+        syncRunId: syncRun.id,
+        externalRecordId: `${input.sourceName ?? tableMapping.externalTableKey}:row-${record.rowNumber}`,
+        payload: record.raw,
+        payloadHash: record.rowHash,
+        reviewStatus: existing?.reviewStatus ?? "pending",
+        validationErrors,
+        normalizedPreview,
+        importedAt: now,
+        createdAt: existing?.createdAt ?? now,
+        updatedAt: now,
+      } satisfies ExternalRawRecord;
+    });
+
+    syncRun.failedRecords = records.filter((record) => record.validationErrors?.length).length;
+
+    this.repositories.dataCapability.saveExternalSyncRun(syncRun);
+    for (const record of records) {
+      this.repositories.dataCapability.saveExternalRawRecord(record);
+    }
+
+    return { syncRun, records };
   }
 
   override confirmExternalRecord(

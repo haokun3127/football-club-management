@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
-import type { ImportPreviewFilters } from "../data-capability/types.js";
+import type { ExcelImportPreviewInput, ImportPreviewFilters } from "../data-capability/types.js";
 import { schemas } from "../http/schemas.js";
+import { readExcelWorksheetRecords } from "../integration/excel-import.js";
 import type { RouteContext } from "./context.js";
 
 export async function registerDataCapabilityRoutes(app: FastifyInstance, context: RouteContext) {
@@ -22,6 +23,40 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       }
 
       return context.store.getDataCapabilityConfig(request.params.clubId);
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+    };
+    Body: ExcelImportPreviewInput;
+  }>(
+    "/clubs/:clubId/admin/imports/excel/preview",
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.excelImportPreview,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      const records = await readExcelWorksheetRecords({
+        buffer: Buffer.from(request.body.contentBase64, "base64"),
+        worksheetName: request.body.worksheetName,
+        headerRow: request.body.headerRow,
+      });
+      const result = await context.store.stageExternalImport(request.params.clubId, {
+        connectionId: request.body.connectionId,
+        tableMappingId: request.body.tableMappingId,
+        sourceName: request.body.fileName ?? request.body.worksheetName,
+        records,
+      });
+
+      return reply.code(201).send(result);
     },
   );
 

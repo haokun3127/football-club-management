@@ -59,11 +59,11 @@ describe("createMatchService", () => {
     });
 
     const result = await service.recordMatchSummary({
-      clubId: "club-demo",
+      clubId: "club-chongqing-talent",
       eventId: "event-match-1",
       matchType: "friendly",
       status: "completed",
-      opponentName: "City School U10",
+      opponentName: "重庆中心小学U10",
       homeScore: 2,
       awayScore: 1,
       rosters: [

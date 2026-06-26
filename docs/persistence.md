@@ -109,5 +109,5 @@ MVP 中 `payment_events`、`payment_reviews`、`lesson_credit_ledger` 和 `insur
 API 层使用最小 auth context：
 
 - `x-user-id` 模拟当前登录用户。
-- 未传时默认使用 `API_DEMO_USER_ID` 或 `user-coach-1`。
+- 未传时默认使用 `API_DEFAULT_USER_ID` 或 `user-coach-1`。
 - `/clubs/:clubId/*` 请求必须解析到 active membership。

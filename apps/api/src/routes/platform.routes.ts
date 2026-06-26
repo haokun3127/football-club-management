@@ -12,6 +12,33 @@ export async function registerPlatformRoutes(app: FastifyInstance, context: Rout
       clubId: string;
     };
   }>(
+    "/clubs/:clubId/capabilities",
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.clubCapabilities,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubMembership(request, reply, request.params.clubId)) {
+        return reply;
+      }
+
+      const capabilities = await context.store.getClubCapabilities(request.params.clubId);
+
+      if (!capabilities) {
+        return context.sendError(reply, 404, "not_found", "Club not found");
+      }
+
+      return capabilities;
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+    };
+  }>(
     "/clubs/:clubId/config",
     {
       schema: {

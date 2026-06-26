@@ -50,9 +50,9 @@ import type {
 } from "../data-capability/types.js";
 
 export const seedNow = "2026-06-25T00:00:00.000Z";
-export const demoClubId = "club-demo";
+export const chongqingTalentClubId = "club-chongqing-talent";
 export const systemCatalog = { scope: "system" } as const;
-export const clubCatalog = { scope: "club", clubId: demoClubId } as const;
+export const clubCatalog = { scope: "club", clubId: chongqingTalentClubId } as const;
 
 export interface SeedData {
   clubs: Club[];

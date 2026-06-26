@@ -21,7 +21,7 @@ describe("createAssessmentService", () => {
         return {
           id: "assessment-template-technical",
           catalogScope: { scope: "system" as const },
-          name: "Technical Basics Assessment",
+          name: "天才精英队周期评测",
           ageGroup: "U10",
           teamLevel: "development",
           status: "active",
@@ -31,18 +31,18 @@ describe("createAssessmentService", () => {
       },
       findTemplateVersion: async () => ({
         id: "assessment-template-version-technical-1",
-        clubId: "club-demo",
+        clubId: "club-chongqing-talent",
         templateId: "assessment-template-technical",
-        graphVersionId: "metric-graph-version-demo",
+        graphVersionId: "metric-graph-version-chongqing-talent",
         version: "1.0.0",
         status: "active",
         createdAt: now,
         updatedAt: now,
       }),
       findMetricGraphVersion: async () => ({
-        id: "metric-graph-version-demo",
+        id: "metric-graph-version-chongqing-talent",
         catalogScope: { scope: "system" as const },
-        name: "Demo Metric Graph",
+        name: "重庆天才球员能力指标图谱",
         version: "1.0.0",
         status: "active",
         createdAt: now,
@@ -51,7 +51,7 @@ describe("createAssessmentService", () => {
       listTemplateMetricBindings: async () => [
         {
           id: "assessment-binding-finishing",
-          clubId: "club-demo",
+          clubId: "club-chongqing-talent",
           templateVersionId: "assessment-template-version-technical-1",
           metricId: "metric-finishing",
           role: "input",
@@ -84,7 +84,7 @@ describe("createAssessmentService", () => {
     });
 
     const result = await service.recordPlayerAssessment({
-      clubId: "club-demo",
+      clubId: "club-chongqing-talent",
       studentId: "student-1",
       templateId: "assessment-template-technical",
       templateVersionId: "assessment-template-version-technical-1",

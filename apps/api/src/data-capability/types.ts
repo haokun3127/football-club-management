@@ -109,6 +109,44 @@ export interface DataCapabilityConfig {
   fieldMappings: ExternalFieldMapping[];
 }
 
+export interface ClubCapabilities {
+  club: {
+    id: EntityId;
+    code: string;
+    name: string;
+    timezone: string;
+    locale: string;
+  };
+  features: Record<string, boolean>;
+  roles: {
+    parent: string[];
+    coach: string[];
+    admin: string[];
+  };
+  calendar: {
+    eventTypes: string[];
+    participantStatuses: string[];
+  };
+  operations: {
+    standardFields: Array<{ key: string; label: string; source: "core" | "operational" | "custom" }>;
+    customFields: CustomFieldDefinition[];
+    offlineStatuses: Array<{ key: string; label: string }>;
+  };
+  assessment: {
+    graphVersions: MetricGraphVersion[];
+    views: MetricView[];
+    viewNodes: MetricViewNode[];
+    templateVersions: AssessmentTemplateVersion[];
+    metricBindings: AssessmentMetricBinding[];
+  };
+  integration: {
+    connections: ExternalSystemConnection[];
+    tableMappings: ExternalTableMapping[];
+    fieldMappings: ExternalFieldMapping[];
+    latestSyncRuns: ExternalSyncRun[];
+  };
+}
+
 export interface ImportPreviewFilters {
   connectionId?: EntityId;
   tableMappingId?: EntityId;
@@ -123,4 +161,31 @@ export interface ConfirmExternalRecordInput {
 
 export interface ImportPreview {
   records: ExternalRawRecord[];
+}
+
+export interface StageExternalImportRecord {
+  rowNumber: number;
+  rowHash: string;
+  raw: Record<string, unknown>;
+}
+
+export interface StageExternalImportInput {
+  connectionId: EntityId;
+  tableMappingId: EntityId;
+  sourceName?: string;
+  records: StageExternalImportRecord[];
+}
+
+export interface StageExternalImportResult {
+  syncRun: ExternalSyncRun;
+  records: ExternalRawRecord[];
+}
+
+export interface ExcelImportPreviewInput {
+  connectionId: EntityId;
+  tableMappingId: EntityId;
+  contentBase64: string;
+  worksheetName?: string;
+  headerRow?: number;
+  fileName?: string;
 }

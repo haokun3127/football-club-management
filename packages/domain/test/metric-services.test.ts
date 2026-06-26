@@ -14,7 +14,7 @@ describe("createMetricService", () => {
       listMetricRecordsByStudent: async () => [
         {
           id: "record-goals",
-          clubId: "club-demo",
+          clubId: "club-chongqing-talent",
           studentId: "student-1",
           metricId: "metric-goals",
           value: { kind: "count", count: 2 },
@@ -25,7 +25,7 @@ describe("createMetricService", () => {
         },
         {
           id: "record-training",
-          clubId: "club-demo",
+          clubId: "club-chongqing-talent",
           studentId: "student-1",
           metricId: "metric-assists",
           value: { kind: "count", count: 1 },
@@ -60,7 +60,7 @@ describe("createMetricService", () => {
           id: "derived-attacking-contribution",
           catalogScope: { scope: "system" as const },
           code: "attacking_contribution",
-          name: "Attacking Contribution",
+          name: "进攻贡献",
           outputMetricId: "metric-attacking-contribution",
           method: "weighted_average",
           inputMetricIds: ["metric-goals"],
@@ -81,11 +81,11 @@ describe("createMetricService", () => {
       catalog,
     });
 
-    const records = await service.listStudentMetricRecords("club-demo", "student-1", { source: "match_event" });
+    const records = await service.listStudentMetricRecords("club-chongqing-talent", "student-1", { source: "match_event" });
     expect(records).toHaveLength(1);
     expect(records[0]?.id).toBe("record-goals");
 
-    const result = await service.computeDerivedMetric("club-demo", "student-1", "attacking_contribution");
+    const result = await service.computeDerivedMetric("club-chongqing-talent", "student-1", "attacking_contribution");
     expect(result.lineage.definitionVersion).toBe("1.2.3");
     expect(result.lineage.inputRecordIds).toEqual(["record-goals"]);
     expect(saved.records).toHaveLength(1);

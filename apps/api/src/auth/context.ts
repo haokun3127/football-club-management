@@ -16,7 +16,7 @@ export class HeaderMembershipResolver implements MembershipResolver {
   constructor(
     private readonly users: UserAccountRepository,
     private readonly memberships: ClubUserMembershipRepository,
-    private readonly defaultUserId = process.env.API_DEMO_USER_ID ?? "user-coach-1",
+    private readonly defaultUserId = process.env.API_DEFAULT_USER_ID ?? "user-coach-1",
   ) {}
 
   async resolve(request: FastifyRequest, clubId: EntityId): Promise<AuthContext | null> {

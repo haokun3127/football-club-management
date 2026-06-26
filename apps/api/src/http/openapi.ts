@@ -61,6 +61,9 @@ export function buildOpenApiDocument() {
     paths: {
       "/health": { get: operation("GET", "/health", schemas.health) },
       "/clubs": { get: operation("GET", "/clubs", schemas.clubsResponse) },
+      "/clubs/{clubId}/capabilities": {
+        get: operation("GET", "/clubs/{clubId}/capabilities", schemas.clubCapabilities),
+      },
       "/clubs/{clubId}/config": { get: operation("GET", "/clubs/{clubId}/config", schemas.clubConfig) },
       "/clubs/{clubId}/teams": { post: operation("POST", "/clubs/{clubId}/teams", schemas.createTeam) },
       "/clubs/{clubId}/teams/{teamId}/members": {
@@ -77,6 +80,9 @@ export function buildOpenApiDocument() {
       },
       "/clubs/{clubId}/admin/import-preview": {
         get: operation("GET", "/clubs/{clubId}/admin/import-preview", schemas.importPreview),
+      },
+      "/clubs/{clubId}/admin/imports/excel/preview": {
+        post: operation("POST", "/clubs/{clubId}/admin/imports/excel/preview", schemas.excelImportPreview),
       },
       "/clubs/{clubId}/admin/sync-runs": {
         get: operation("GET", "/clubs/{clubId}/admin/sync-runs", schemas.syncRuns),

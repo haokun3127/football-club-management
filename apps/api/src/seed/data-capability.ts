@@ -7,7 +7,37 @@ import type {
   ExternalTableMapping,
 } from "../data-capability/types.js";
 import type { SeedData } from "./types.js";
-import { demoClubId as clubId, seedNow as now } from "./types.js";
+import { chongqingTalentClubId as clubId, seedNow as now } from "./types.js";
+
+const connectionId = "external-connection-wps-cq-talent";
+
+const tableMappings: Array<Pick<ExternalTableMapping, "id" | "externalTableKey" | "targetType">> = [
+  {
+    id: "external-table-full-users-cq-talent",
+    externalTableKey: "full_users",
+    targetType: "student_operational_profile",
+  },
+  {
+    id: "external-table-payment-events-cq-talent",
+    externalTableKey: "payment_events",
+    targetType: "offline_payment_status",
+  },
+  {
+    id: "external-table-attendance-spring-summer-2025-2026-cq-talent",
+    externalTableKey: "attendance_2025_2026_spring_summer",
+    targetType: "attendance_snapshot",
+  },
+  {
+    id: "external-table-insurance-policies-cq-talent",
+    externalTableKey: "insurance_policies",
+    targetType: "insurance_status",
+  },
+  {
+    id: "external-table-talent-elite-assessment-cq-talent",
+    externalTableKey: "talent_elite_assessment",
+    targetType: "assessment_graph_draft",
+  },
+];
 
 export function createDataCapabilitySeed(): Pick<
   SeedData,
@@ -20,13 +50,20 @@ export function createDataCapabilitySeed(): Pick<
 > {
   const externalConnections: ExternalSystemConnection[] = [
     {
-      id: "external-connection-wps-demo",
+      id: connectionId,
       clubId,
       provider: "wps",
-      name: "Demo WPS Workbook",
+      name: "重庆天才 WPS 工作簿",
       status: "active",
       config: {
         mode: "manual_import",
+        sourceFiles: [
+          "全量用户",
+          "交费事件",
+          "2025-2026春夏",
+          "保险购买",
+          "天才精英队评分表",
+        ],
       },
       lastSyncedAt: "2026-06-25T08:00:00.000Z",
       createdAt: now,
@@ -34,51 +71,112 @@ export function createDataCapabilitySeed(): Pick<
     },
   ];
 
-  const externalTableMappings: ExternalTableMapping[] = [
-    {
-      id: "external-table-students-demo",
-      clubId,
-      connectionId: "external-connection-wps-demo",
-      externalTableKey: "students",
-      targetType: "student_operational_profile",
-      mappingVersion: "1.0.0",
-      status: "active",
-      createdAt: now,
-      updatedAt: now,
-    },
-  ];
+  const externalTableMappings: ExternalTableMapping[] = tableMappings.map((mapping) => ({
+    ...mapping,
+    clubId,
+    connectionId,
+    mappingVersion: "1.0.0",
+    status: "active",
+    createdAt: now,
+    updatedAt: now,
+  }));
 
   const externalFieldMappings: ExternalFieldMapping[] = [
-    {
-      id: "external-field-student-name-demo",
-      clubId,
-      tableMappingId: "external-table-students-demo",
-      externalFieldKey: "学员姓名",
-      targetFieldKey: "student.name",
-      targetFieldKind: "text",
-      required: true,
-      createdAt: now,
-      updatedAt: now,
-    },
-    {
-      id: "external-field-school-demo",
-      clubId,
-      tableMappingId: "external-table-students-demo",
-      externalFieldKey: "学校",
-      targetFieldKey: "studentOperationalProfile.schoolName",
-      targetFieldKind: "text",
-      required: false,
-      createdAt: now,
-      updatedAt: now,
-    },
+    ...fields("external-table-full-users-cq-talent", [
+      ["身份证号", "student.identityNumber", "text", true],
+      ["学员姓名", "student.name", "text", true],
+      ["渠道", "studentOperationalProfile.channel", "text"],
+      ["区域", "studentOperationalProfile.area", "text"],
+      ["学校", "studentOperationalProfile.schoolName", "text"],
+      ["队伍名称", "team.name", "text"],
+      ["教练", "coach.name", "text"],
+      ["学员状态", "student.status", "text"],
+      ["出生年月", "student.birthDate", "date"],
+      ["手机", "contact.phone", "text"],
+      ["微信", "contact.wechat", "text"],
+      ["历次充值日期", "billing.lastPaymentDates", "date_list"],
+      ["充值笔数", "billing.paymentCount", "number"],
+      ["保险到期日期", "insurance.expiresAt", "date"],
+      ["沟通反馈", "studentOperationalProfile.communicationFeedback", "text"],
+      ["签到次数", "attendance.checkInCount", "number"],
+      ["最近签到时间", "attendance.lastCheckInAt", "datetime"],
+    ]),
+    ...fields("external-table-payment-events-cq-talent", [
+      ["身份证号", "student.identityNumber", "text", true],
+      ["收费日期", "payment.paidAt", "date", true],
+      ["收费阶段", "payment.stage", "text"],
+      ["沟通进度", "payment.communicationProgress", "text"],
+      ["学员姓名", "student.name", "text"],
+      ["充值类型", "payment.type", "text"],
+      ["手机", "contact.phone", "text"],
+      ["微信", "contact.wechat", "text"],
+      ["区域", "studentOperationalProfile.area", "text"],
+      ["学校", "studentOperationalProfile.schoolName", "text"],
+      ["队伍名称", "team.name", "text"],
+      ["教练", "coach.name", "text"],
+      ["金额", "payment.amount", "money"],
+      ["课时", "payment.courseHours", "number"],
+      ["缴费证明", "payment.proof", "file_ref"],
+      ["备注", "payment.note", "text"],
+      ["支付事件填写人", "payment.createdByName", "text"],
+      ["核对人", "payment.checkedByName", "text"],
+      ["公司实收", "payment.companyReceivedAmount", "money"],
+      ["实收审核人", "payment.receiptReviewedByName", "text"],
+      ["保险到期日期", "insurance.expiresAt", "date"],
+      ["审核通过", "payment.auditPassed", "boolean"],
+      ["最终审核人", "payment.finalReviewedByName", "text"],
+      ["最后修改时间", "payment.updatedAt", "datetime"],
+      ["审核通过时间", "payment.auditPassedAt", "datetime"],
+      ["已同步", "payment.synced", "boolean"],
+    ]),
+    ...fields("external-table-attendance-spring-summer-2025-2026-cq-talent", [
+      ["身份证号", "student.identityNumber", "text", true],
+      ["阶段", "attendance.stage", "text"],
+      ["姓名", "student.name", "text"],
+      ["区域", "studentOperationalProfile.area", "text"],
+      ["学校", "studentOperationalProfile.schoolName", "text"],
+      ["队伍名称", "team.name", "text"],
+      ["教练", "coach.name", "text"],
+      ...Array.from({ length: 27 }, (_, index) => {
+        const week = index + 1;
+        return [`第${week}周`, `attendance.weeks.${String(week).padStart(2, "0")}`, "number"] as const;
+      }),
+      ["在该队充值课时", "attendance.teamPaidCourseHours", "number"],
+      ["在该队其他情况划课", "attendance.teamOtherDeductedCourseHours", "number"],
+      ["本学期在该队签到", "attendance.termTeamCheckInCount", "number"],
+      ["在该队的剩余课时", "attendance.teamCourseBalance", "number"],
+      ["创建时间", "attendance.createdAt", "datetime"],
+    ]),
+    ...fields("external-table-insurance-policies-cq-talent", [
+      ["投保日期", "insurance.purchasedAt", "date", true],
+      ["身份证号", "student.identityNumber", "text", true],
+      ["保险到期日期", "insurance.expiresAt", "date", true],
+      ["保单号", "insurance.policyNo", "text"],
+      ["运动项目", "insurance.sport", "text"],
+      ["学员姓名", "student.name", "text"],
+      ["学校", "studentOperationalProfile.schoolName", "text"],
+      ["购买公司", "insurance.vendor", "text"],
+      ["审核通过", "insurance.auditPassed", "boolean"],
+      ["备注", "insurance.note", "text"],
+    ]),
+    ...fields("external-table-talent-elite-assessment-cq-talent", [
+      ["核心能力", "assessment.coreAbility", "text", true],
+      ["得分", "assessment.coreScore", "number"],
+      ["二级子项", "assessment.secondaryMetric", "text", true],
+      ["得分_2", "assessment.secondaryScore", "number"],
+      ["三级子项", "assessment.atomicMetric", "text", true],
+      ["得分_3", "assessment.atomicScore", "number"],
+      ["测试项目", "assessment.testItem", "text"],
+      ["推荐训练项目", "assessment.recommendedTraining", "text"],
+    ]),
   ];
 
   const externalSyncRuns: ExternalSyncRun[] = [
     {
-      id: "external-sync-run-demo",
+      id: "external-sync-run-cq-talent",
       clubId,
-      connectionId: "external-connection-wps-demo",
-      tableMappingId: "external-table-students-demo",
+      connectionId,
+      tableMappingId: "external-table-full-users-cq-talent",
       status: "completed",
       startedAt: "2026-06-25T08:00:00.000Z",
       finishedAt: "2026-06-25T08:01:00.000Z",
@@ -92,21 +190,51 @@ export function createDataCapabilitySeed(): Pick<
 
   const externalRawRecords: ExternalRawRecord[] = [
     {
-      id: "external-raw-student-demo",
+      id: "external-raw-student-cq-talent",
       clubId,
-      connectionId: "external-connection-wps-demo",
-      tableMappingId: "external-table-students-demo",
-      syncRunId: "external-sync-run-demo",
-      externalRecordId: "row-2",
+      connectionId,
+      tableMappingId: "external-table-full-users-cq-talent",
+      syncRunId: "external-sync-run-cq-talent",
+      externalRecordId: "full_users:row-2",
       payload: {
-        "学员姓名": "Li Ming",
-        "学校": "Demo Primary School",
+        "身份证号": "500000201505010000",
+        "学员姓名": "李明",
+        "渠道": "老学员转介绍",
+        "区域": "重庆",
+        "学校": "重庆天才合作学校",
+        "队伍名称": "U10发展队",
+        "教练": "陈教练",
+        "学员状态": "在训",
+        "出生年月": "2015-05",
+        "手机": "13800000000",
+        "微信": "wx_li_parent",
+        "历次充值日期": "2026-06-01",
+        "充值笔数": 1,
+        "保险到期日期": "2027-06-01",
+        "沟通反馈": "家长关注精英队升组路径",
+        "签到次数": 8,
+        "最近签到时间": "2026-06-24T10:00:00.000Z",
       },
-      payloadHash: "demo-row-2-hash",
+      payloadHash: "cq-talent-row-2-hash",
       reviewStatus: "pending",
       normalizedPreview: {
-        studentName: "Li Ming",
-        schoolName: "Demo Primary School",
+        "student.identityNumber": "500000201505010000",
+        "student.name": "李明",
+        "student.birthDate": "2015-05",
+        "student.status": "在训",
+        "studentOperationalProfile.channel": "老学员转介绍",
+        "studentOperationalProfile.area": "重庆",
+        "studentOperationalProfile.schoolName": "重庆天才合作学校",
+        "studentOperationalProfile.communicationFeedback": "家长关注精英队升组路径",
+        "team.name": "U10发展队",
+        "coach.name": "陈教练",
+        "contact.phone": "13800000000",
+        "contact.wechat": "wx_li_parent",
+        "billing.lastPaymentDates": "2026-06-01",
+        "billing.paymentCount": 1,
+        "insurance.expiresAt": "2027-06-01",
+        "attendance.checkInCount": 8,
+        "attendance.lastCheckInAt": "2026-06-24T10:00:00.000Z",
       },
       importedAt: "2026-06-25T08:01:00.000Z",
       createdAt: now,
@@ -124,4 +252,21 @@ export function createDataCapabilitySeed(): Pick<
     externalRawRecords,
     externalRecordLinks,
   };
+}
+
+function fields(
+  tableMappingId: string,
+  definitions: Array<readonly [externalFieldKey: string, targetFieldKey: string, targetFieldKind: string, required?: boolean]>,
+): ExternalFieldMapping[] {
+  return definitions.map(([externalFieldKey, targetFieldKey, targetFieldKind, required], index) => ({
+    id: `${tableMappingId}-field-${String(index + 1).padStart(2, "0")}`,
+    clubId,
+    tableMappingId,
+    externalFieldKey,
+    targetFieldKey,
+    targetFieldKind,
+    required: required ?? false,
+    createdAt: now,
+    updatedAt: now,
+  }));
 }

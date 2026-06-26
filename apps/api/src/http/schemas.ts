@@ -281,9 +281,36 @@ export const schemas = {
       403: errorResponse,
     },
   },
+  clubCapabilities: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
   importPreview: {
     response: {
       200: flexibleObject,
+      403: errorResponse,
+    },
+  },
+  excelImportPreview: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["connectionId", "tableMappingId", "contentBase64"],
+      properties: {
+        connectionId: { type: "string", minLength: 1 },
+        tableMappingId: { type: "string", minLength: 1 },
+        contentBase64: { type: "string", minLength: 1 },
+        worksheetName: { type: "string", minLength: 1 },
+        headerRow: { type: "integer", minimum: 1 },
+        fileName: { type: "string", minLength: 1 },
+      },
+    },
+    response: {
+      201: flexibleObject,
+      400: errorResponse,
       403: errorResponse,
     },
   },

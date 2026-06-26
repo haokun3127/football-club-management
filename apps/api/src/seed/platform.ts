@@ -1,5 +1,5 @@
 import type { SeedData } from "./types.js";
-import { demoClubId as clubId, seedNow as now } from "./types.js";
+import { chongqingTalentClubId as clubId, seedNow as now } from "./types.js";
 
 export function createPlatformSeed(): Pick<
   SeedData,
@@ -20,8 +20,8 @@ export function createPlatformSeed(): Pick<
     clubs: [
       {
         id: clubId,
-        name: "Demo Football Academy",
-        code: "demo",
+        name: "重庆天才足球俱乐部",
+        code: "cq-talent",
         timezone: "Asia/Hong_Kong",
         locale: "zh-CN",
         status: "active",
@@ -32,7 +32,7 @@ export function createPlatformSeed(): Pick<
     users: [
       {
         id: "user-admin-1",
-        displayName: "Admin Wang",
+        displayName: "王管理员",
         roles: ["admin"],
         status: "active",
         createdAt: now,
@@ -40,7 +40,7 @@ export function createPlatformSeed(): Pick<
       },
       {
         id: "user-coach-1",
-        displayName: "Coach Chen",
+        displayName: "陈教练",
         roles: ["coach"],
         status: "active",
         createdAt: now,
@@ -48,7 +48,7 @@ export function createPlatformSeed(): Pick<
       },
       {
         id: "user-parent-1",
-        displayName: "Parent Li",
+        displayName: "李明家长",
         roles: ["parent"],
         status: "active",
         createdAt: now,
@@ -133,7 +133,7 @@ export function createPlatformSeed(): Pick<
         id: "parent-1",
         clubId,
         userId: "user-parent-1",
-        name: "Li Parent",
+        name: "李明家长",
         phone: "13800000000",
         createdAt: now,
         updatedAt: now,
@@ -143,7 +143,7 @@ export function createPlatformSeed(): Pick<
       {
         id: "student-1",
         clubId,
-        name: "Li Ming",
+        name: "李明",
         birthDate: "2015-05-01",
         gender: "male",
         dominantFoot: "right",
@@ -169,7 +169,7 @@ export function createPlatformSeed(): Pick<
         id: "coach-1",
         clubId,
         userId: "user-coach-1",
-        name: "Chen Coach",
+        name: "陈教练",
         specialties: ["technical", "U10"],
         status: "active",
         createdAt: now,
@@ -180,7 +180,7 @@ export function createPlatformSeed(): Pick<
       {
         id: "team-u10-dev",
         clubId,
-        name: "U10 Development",
+        name: "U10发展队",
         ageGroup: "U10",
         level: "development",
         defaultCoachId: "coach-1",
@@ -191,7 +191,7 @@ export function createPlatformSeed(): Pick<
       {
         id: "team-weekend-select",
         clubId,
-        name: "Weekend Select",
+        name: "周末精英队",
         ageGroup: "U10-U12",
         level: "advanced",
         defaultCoachId: "coach-1",

@@ -107,7 +107,7 @@
 - 设计 auth context 和 membership resolver。
 - 为 API 加请求/响应 schema。
 - 输出基础 OpenAPI。
-- 保留当前 seed demo 能力。
+- 保留当前重庆天才种子配置能力。
 
 验收：
 

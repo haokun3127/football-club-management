@@ -102,7 +102,7 @@ const formula: DerivedMetricDefinition = {
 const inputRecords: PlayerMetricRecord[] = [
   {
     id: "record-speed",
-    clubId: "club-demo",
+    clubId: "club-chongqing-talent",
     studentId: "student-1",
     metricId: "metric-speed",
     value: { kind: "score_0_100", score: 80 },
@@ -113,7 +113,7 @@ const inputRecords: PlayerMetricRecord[] = [
   },
   {
     id: "record-agility",
-    clubId: "club-demo",
+    clubId: "club-chongqing-talent",
     studentId: "student-1",
     metricId: "metric-agility",
     value: { kind: "score_0_100", score: 50 },
@@ -128,7 +128,7 @@ describe("metric graph services", () => {
   it("computes controlled formulas in dependency order and records lineage", () => {
     let idCounter = 0;
     const result = computeMetricGraph({
-      clubId: "club-demo",
+      clubId: "club-chongqing-talent",
       studentId: "student-1",
       graphVersion,
       metrics,
