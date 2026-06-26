@@ -105,6 +105,12 @@ export function buildOpenApiDocument() {
           ...schemas.clubAppClients,
         }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/parent/children": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/children", {
+          ...schemas.appClientParams,
+          ...schemas.appClientParentChildren,
+        }),
+      },
       "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/home": {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/home", {
           ...schemas.appClientStudentParams,
@@ -118,6 +124,19 @@ export function buildOpenApiDocument() {
           ...schemas.appClientParentSchedule,
         }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/activity-summaries": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/activity-summaries", {
+          ...schemas.appClientStudentParams,
+          ...schemas.appClientActivitySummaryQuery,
+          ...schemas.appClientActivitySummaries,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/growth-summary": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/growth-summary", {
+          ...schemas.appClientStudentParams,
+          ...schemas.appClientGrowthSummary,
+        }),
+      },
       "/clubs/{clubId}/app-clients/{clientId}/events/{eventId}": {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/events/{eventId}", {
           ...schemas.appClientEventParams,
@@ -129,6 +148,19 @@ export function buildOpenApiDocument() {
           ...schemas.appClientParams,
           ...schemas.appClientCoachHomeQuery,
           ...schemas.appClientCoachHome,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/workbench": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/workbench", {
+          ...schemas.appClientEventParams,
+          ...schemas.appClientCoachEventWorkbench,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/assessments/templates/{templateId}/form": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/assessments/templates/{templateId}/form", {
+          ...schemas.appClientAssessmentTemplateParams,
+          ...schemas.appClientAssessmentFormQuery,
+          ...schemas.appClientAssessmentForm,
         }),
       },
       "/clubs/{clubId}/config": { get: operation("GET", "/clubs/{clubId}/config", schemas.clubConfig) },

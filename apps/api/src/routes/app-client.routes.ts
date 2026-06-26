@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import type { ClubUserRole } from "@football-club/domain";
-import type { ClubAppClient, StudentDetail } from "../data-capability/types.js";
+import type { ClubAppClient, StudentDetail, StudentListItem } from "../data-capability/types.js";
 import { schemas } from "../http/schemas.js";
 import type { RouteContext } from "./context.js";
 
@@ -26,6 +26,49 @@ interface AppEventDetail {
 const adminRoles = new Set<ClubUserRole>(["owner", "admin", "operator"]);
 
 export async function registerAppClientRoutes(app: FastifyInstance, context: RouteContext) {
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/parent/children",
+    {
+      schema: {
+        ...schemas.appClientParams,
+        ...schemas.appClientParentChildren,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "parent");
+      if (!client) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+      if (auth && !auth.membership.roles.includes("parent")) {
+        return context.sendError(reply, 403, "forbidden", "Parent role is required for this operation");
+      }
+
+      const students = await context.store.listOperationalStudents(request.params.clubId);
+      const children = auth
+        ? students.filter((student) => context.store.isGuardianOfStudent(request.params.clubId, auth.user.id, student.id))
+        : students;
+
+      return {
+        clubId: request.params.clubId,
+        client: summarizeClient(client),
+        role: "parent",
+        children: children.map(summarizeStudent),
+      };
+    },
+  );
+
   app.get<{
     Params: {
       clubId: string;
@@ -90,6 +133,112 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
     Querystring: {
       from?: string;
       to?: string;
+      type?: "training" | "match" | "other";
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/parent/students/:studentId/activity-summaries",
+    {
+      schema: {
+        ...schemas.appClientStudentParams,
+        ...schemas.appClientActivitySummaryQuery,
+        ...schemas.appClientActivitySummaries,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "parent");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireStudentAccess(request, reply, request.params.clubId, request.params.studentId)) {
+        return reply;
+      }
+
+      const events = filterEventsByRange(
+        sortEvents(await context.store.getStudentTimeline(request.params.clubId, request.params.studentId)),
+        request.query,
+      ).filter((event) => request.query.type ? event.type === request.query.type : true);
+      const metrics = await context.store.getStudentMetrics(request.params.clubId, request.params.studentId, [
+        "training_observation",
+        "match_event",
+      ]);
+      const metricCatalog = await context.store.listAbilityMetrics(request.params.clubId);
+
+      return {
+        clubId: request.params.clubId,
+        client: summarizeClient(client),
+        studentId: request.params.studentId,
+        summaries: events.map((event) => ({
+          event,
+          metricRecords: metrics.filter((record) => record.eventId === event.id),
+          metrics: metrics
+            .filter((record) => record.eventId === event.id)
+            .map((record) => ({
+              record,
+              metric: metricCatalog.find((metric) => metric.id === record.metricId) ?? null,
+            })),
+        })),
+      };
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      studentId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/parent/students/:studentId/growth-summary",
+    {
+      schema: {
+        ...schemas.appClientStudentParams,
+        ...schemas.appClientGrowthSummary,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "parent");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireStudentAccess(request, reply, request.params.clubId, request.params.studentId)) {
+        return reply;
+      }
+
+      const [capabilities, metricCatalog, metricRecords] = await Promise.all([
+        context.store.getClubCapabilities(request.params.clubId, { clientId: request.params.clientId }),
+        context.store.listAbilityMetrics(request.params.clubId),
+        context.store.getStudentMetrics(request.params.clubId, request.params.studentId),
+      ]);
+
+      return {
+        clubId: request.params.clubId,
+        client: summarizeClient(client),
+        studentId: request.params.studentId,
+        assessment: capabilities?.assessment ?? {
+          graphVersions: [],
+          views: [],
+          viewNodes: [],
+          templateVersions: [],
+          metricBindings: [],
+        },
+        metrics: metricCatalog,
+        latest: buildLatestMetricRecords(metricRecords, metricCatalog),
+        trends: buildMetricTrends(metricRecords),
+      };
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      studentId: string;
+    };
+    Querystring: {
+      from?: string;
+      to?: string;
     };
   }>(
     "/clubs/:clubId/app-clients/:clientId/parent/students/:studentId/schedule",
@@ -120,6 +269,148 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         client: summarizeClient(client),
         studentId: request.params.studentId,
         events,
+      };
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      eventId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/workbench",
+    {
+      schema: {
+        ...schemas.appClientEventParams,
+        ...schemas.appClientCoachEventWorkbench,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+
+      const event = (await context.store.listCalendarEvents(request.params.clubId) as AppEventDetail[])
+        .find((item) => item.id === request.params.eventId);
+      if (!event) {
+        return context.sendError(reply, 404, "not_found", "Event not found");
+      }
+
+      const workbench = await context.store.getCoachToday(request.params.clubId, {
+        date: event.timeRange.startsAt.slice(0, 10),
+        userId: auth?.user.id ?? "user-coach-1",
+        roles: auth?.membership.roles ?? ["coach"],
+      }) as { events?: Array<AppEventDetail & { workflow?: Record<string, unknown>; students?: unknown[]; teams?: unknown[] }> };
+      const workbenchEvent = workbench.events?.find((item) => item.id === event.id);
+      if (context.membershipResolver && !workbenchEvent) {
+        return context.sendError(reply, 403, "forbidden", "Event is not accessible for this coach membership");
+      }
+
+      const metricCatalog = await context.store.listAbilityMetrics(request.params.clubId);
+      const config = await context.store.getDataCapabilityConfig(request.params.clubId);
+
+      return {
+        clubId: request.params.clubId,
+        client: summarizeClient(client),
+        role: "coach",
+        event,
+        rosterContext: {
+          participants: event.participants ?? [],
+          students: workbenchEvent?.students ?? [],
+          teams: workbenchEvent?.teams ?? [],
+        },
+        workflow: workbenchEvent?.workflow ?? {},
+        training: event.trainingSession,
+        match: event.match,
+        assessment: {
+          templateVersions: config.assessmentTemplateVersions,
+          metricBindings: config.assessmentMetricBindings,
+        },
+        metrics: metricCatalog,
+      };
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      templateId: string;
+    };
+    Querystring: {
+      templateVersionId?: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/assessments/templates/:templateId/form",
+    {
+      schema: {
+        ...schemas.appClientAssessmentTemplateParams,
+        ...schemas.appClientAssessmentFormQuery,
+        ...schemas.appClientAssessmentForm,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+
+      const [templates, testItems, metricCatalog, config] = await Promise.all([
+        context.store.listAssessmentTemplates(request.params.clubId),
+        context.store.listAssessmentTestItems(request.params.clubId),
+        context.store.listAbilityMetrics(request.params.clubId),
+        context.store.getDataCapabilityConfig(request.params.clubId),
+      ]);
+      const template = templates.find((item) => item.id === request.params.templateId && item.status === "active");
+      if (!template) {
+        return context.sendError(reply, 404, "not_found", "Assessment template not found");
+      }
+
+      const versions = config.assessmentTemplateVersions
+        .filter((item) => item.templateId === template.id && item.status === "active")
+        .sort((left, right) => right.version.localeCompare(left.version));
+      const templateVersion = request.query.templateVersionId
+        ? versions.find((item) => item.id === request.query.templateVersionId)
+        : versions[0];
+      if (!templateVersion) {
+        return context.sendError(reply, 404, "not_found", "Assessment template version not found");
+      }
+
+      const bindings = config.assessmentMetricBindings
+        .filter((binding) => binding.templateVersionId === templateVersion.id)
+        .sort((left, right) => left.sortOrder - right.sortOrder);
+
+      return {
+        clubId: request.params.clubId,
+        client: summarizeClient(client),
+        role: "coach",
+        template,
+        templateVersion,
+        fields: bindings.map((binding) => ({
+          binding,
+          metric: metricCatalog.find((metric) => metric.id === binding.metricId) ?? null,
+          testItem: binding.testItemId
+            ? testItems.find((item) => item.id === binding.testItemId) ?? null
+            : null,
+        })),
       };
     },
   );
@@ -267,7 +558,7 @@ function summarizeClient(client: ClubAppClient) {
   };
 }
 
-function summarizeStudent(student: StudentDetail) {
+function summarizeStudent(student: StudentDetail | StudentListItem) {
   return {
     id: student.id,
     name: student.name,
@@ -307,6 +598,25 @@ function splitHomeSchedule(events: AppEventDetail[]) {
       .reverse()
       .filter((event) => event.status === "completed" || event.status === "cancelled" || Date.parse(event.timeRange.endsAt) < now),
   };
+}
+
+function buildLatestMetricRecords(
+  metrics: Awaited<ReturnType<RouteContext["store"]["getStudentMetrics"]>>,
+  metricCatalog: Awaited<ReturnType<RouteContext["store"]["listAbilityMetrics"]>>,
+) {
+  const byMetric = new Map<string, typeof metrics[number]>();
+
+  for (const metric of metrics) {
+    if (!byMetric.has(metric.metricId)) {
+      byMetric.set(metric.metricId, metric);
+    }
+  }
+
+  return [...byMetric.entries()].map(([metricId, record]) => ({
+    metricId,
+    metric: metricCatalog.find((metric) => metric.id === metricId) ?? null,
+    record,
+  }));
 }
 
 function buildMetricTrends(metrics: Awaited<ReturnType<RouteContext["store"]["getStudentMetrics"]>>) {

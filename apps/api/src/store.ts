@@ -8,6 +8,8 @@ import {
   type AssessmentScore,
   type AssessmentTemplate,
   type AssessmentTemplateVersion,
+  type AssessmentTestItem,
+  type AbilityMetric,
   type CalendarEvent,
   type Club,
   type ClubFeatureFlag,
@@ -116,11 +118,13 @@ export interface ApiStore {
   isGuardianOfStudent(clubId: EntityId, userId: EntityId, studentId: EntityId): boolean;
   listCalendarEvents(clubId: EntityId): unknown[];
   getStudentTimeline(clubId: EntityId, studentId: EntityId): unknown[];
-  listAbilityMetrics(clubId: EntityId): unknown[];
+  listAbilityMetrics(clubId: EntityId): AbilityMetric[];
   listMetricGraphVersions(clubId: EntityId): MetricGraphVersion[];
   listMetricDependencies(clubId: EntityId): MetricDependency[];
   listMetricViews(clubId: EntityId): MetricView[];
   listMetricViewNodes(clubId: EntityId): MetricViewNode[];
+  listAssessmentTemplates(clubId: EntityId): AssessmentTemplate[] | Promise<AssessmentTemplate[]>;
+  listAssessmentTestItems(clubId: EntityId): AssessmentTestItem[] | Promise<AssessmentTestItem[]>;
   getStudentMetrics(clubId: EntityId, studentId: EntityId, source?: MetricSourceKind | MetricSourceKind[]): PlayerMetricRecord[];
   computeAttackingContribution(clubId: EntityId, studentId: EntityId): Promise<DerivedMetricResult>;
   getCoachToday(clubId: EntityId, input: { date: string; userId: EntityId; roles: string[] }): unknown;
@@ -670,7 +674,7 @@ export abstract class SeedBackedStore implements ApiStore {
     return this.data.drills.filter((item) => isCatalogVisibleToClub(item, clubId));
   }
 
-  listAbilityMetrics(clubId: EntityId) {
+  listAbilityMetrics(clubId: EntityId): AbilityMetric[] {
     return this.data.metrics.filter((item) => isCatalogVisibleToClub(item, clubId));
   }
 
@@ -688,6 +692,14 @@ export abstract class SeedBackedStore implements ApiStore {
 
   listMetricViewNodes(clubId: EntityId): MetricViewNode[] {
     return this.data.metricViewNodes.filter((item) => isCatalogVisibleToClub(item, clubId));
+  }
+
+  listAssessmentTemplates(clubId: EntityId): AssessmentTemplate[] {
+    return this.data.assessmentTemplates.filter((item) => isCatalogVisibleToClub(item, clubId));
+  }
+
+  listAssessmentTestItems(clubId: EntityId): AssessmentTestItem[] {
+    return this.data.assessmentTestItems.filter((item) => item.clubId === clubId);
   }
 
   listDerivedMetricDefinitions(clubId: EntityId): DerivedMetricDefinition[] {
@@ -1534,7 +1546,7 @@ export abstract class SeedBackedStore implements ApiStore {
       dependency.graphVersionId === graphVersionId && isCatalogVisibleToClub(dependency, clubId),
     );
 
-  private listAssessmentTestItems = (clubId: EntityId) =>
+  private listAssessmentTestItemsForService = (clubId: EntityId) =>
     this.data.assessmentTestItems.filter((item) => item.clubId === clubId);
 
   recordMatchSummary(input: RecordMatchInput) {
@@ -1605,7 +1617,7 @@ export abstract class SeedBackedStore implements ApiStore {
         findMetricGraphVersion: this.findMetricGraphVersion,
         listTemplateMetricBindings: this.listTemplateMetricBindings,
         listMetricGraphDependencies: this.listMetricGraphDependencies,
-        listAssessmentTestItems: this.listAssessmentTestItems,
+        listAssessmentTestItems: this.listAssessmentTestItemsForService,
         listAbilityMetrics: (clubId) => this.listAbilityMetrics(clubId),
         listDerivedMetricDefinitions: (clubId) => this.listDerivedMetricDefinitions(clubId),
       },
@@ -1710,6 +1722,14 @@ export class PersistentApiStore extends SeedBackedStore {
 
   override listClubAppClients(clubId: EntityId) {
     return this.repositories.dataCapability.listClubAppClients(clubId);
+  }
+
+  override listAssessmentTemplates(clubId: EntityId) {
+    return this.repositories.dataCapability.listAssessmentTemplates(clubId);
+  }
+
+  override listAssessmentTestItems(clubId: EntityId) {
+    return this.repositories.dataCapability.listAssessmentTestItems(clubId);
   }
 
   override async resolveAppClientCapabilities(input: { appId?: string; clientKey?: string }) {

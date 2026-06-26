@@ -877,6 +877,16 @@ export class DataCapabilityRepository {
     return rows.map(mapAssessmentTemplateVersion);
   }
 
+  listAssessmentTemplates(clubId: EntityId): AssessmentTemplate[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM assessment_templates
+      WHERE catalog_scope = 'system' OR scope_club_id = ?
+      ORDER BY name
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapAssessmentTemplate);
+  }
+
   listAssessmentMetricBindings(clubId: EntityId): AssessmentMetricBinding[] {
     const rows = this.database.prepare(`
       SELECT * FROM assessment_metric_bindings
@@ -885,6 +895,16 @@ export class DataCapabilityRepository {
     `).all(clubId) as SqlRow[];
 
     return rows.map(mapAssessmentMetricBinding);
+  }
+
+  listAssessmentTestItems(clubId: EntityId): AssessmentTestItem[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM assessment_test_items
+      WHERE club_id = ?
+      ORDER BY name
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapAssessmentTestItem);
   }
 
   saveExternalConnection(entity: ExternalSystemConnection): void {
@@ -2225,6 +2245,19 @@ function mapAssessmentTemplateVersion(row: SqlRow): AssessmentTemplateVersion {
   };
 }
 
+function mapAssessmentTemplate(row: SqlRow): AssessmentTemplate {
+  return {
+    id: requireString(row, "id"),
+    catalogScope: catalogScope(row),
+    name: requireString(row, "name"),
+    ageGroup: optionalString(row, "age_group"),
+    teamLevel: optionalString(row, "team_level"),
+    status: requireString(row, "status") as AssessmentTemplate["status"],
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
 function mapAssessmentMetricBinding(row: SqlRow): AssessmentMetricBinding {
   return {
     id: requireString(row, "id"),
@@ -2237,6 +2270,20 @@ function mapAssessmentMetricBinding(row: SqlRow): AssessmentMetricBinding {
     maxScore: optionalNumber(row, "max_score"),
     weight: optionalNumber(row, "weight"),
     sortOrder: numberFromSql(row, "sort_order"),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapAssessmentTestItem(row: SqlRow): AssessmentTestItem {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    metricId: requireString(row, "metric_id"),
+    name: requireString(row, "name"),
+    valueKind: requireString(row, "value_kind") as AssessmentTestItem["valueKind"],
+    unit: optionalString(row, "unit"),
+    protocol: optionalString(row, "protocol"),
     createdAt: requireString(row, "created_at"),
     updatedAt: requireString(row, "updated_at"),
   };

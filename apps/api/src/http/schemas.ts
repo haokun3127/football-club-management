@@ -394,6 +394,18 @@ export const schemas = {
       },
     },
   },
+  appClientAssessmentTemplateParams: {
+    params: {
+      type: "object",
+      additionalProperties: false,
+      required: ["clubId", "clientId", "templateId"],
+      properties: {
+        clubId: { type: "string", minLength: 1 },
+        clientId: { type: "string", minLength: 1 },
+        templateId: { type: "string", minLength: 1 },
+      },
+    },
+  },
   appClientScheduleQuery: {
     querystring: {
       type: "object",
@@ -404,6 +416,17 @@ export const schemas = {
       },
     },
   },
+  appClientActivitySummaryQuery: {
+    querystring: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        from: { type: "string", minLength: 1 },
+        to: { type: "string", minLength: 1 },
+        type: { type: "string", enum: ["training", "match", "other"] },
+      },
+    },
+  },
   appClientCoachHomeQuery: {
     querystring: {
       type: "object",
@@ -411,6 +434,22 @@ export const schemas = {
       properties: {
         date: { type: "string", minLength: 10 },
       },
+    },
+  },
+  appClientAssessmentFormQuery: {
+    querystring: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        templateVersionId: { type: "string", minLength: 1 },
+      },
+    },
+  },
+  appClientParentChildren: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
     },
   },
   appClientParentHome: {
@@ -427,7 +466,35 @@ export const schemas = {
       404: errorResponse,
     },
   },
+  appClientActivitySummaries: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientGrowthSummary: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
   appClientEventDetail: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientCoachEventWorkbench: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientAssessmentForm: {
     response: {
       200: flexibleObject,
       403: errorResponse,

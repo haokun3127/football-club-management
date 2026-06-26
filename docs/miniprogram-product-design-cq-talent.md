@@ -569,17 +569,18 @@ sequenceDiagram
 | 页面 | 必需接口 | 可选/补充接口 |
 | --- | --- | --- |
 | 启动 | `GET /app-clients/resolve`、`GET /clubs/:clubId/capabilities?clientId=...` | `GET /clubs/:clubId/config` 仅限有 membership 且需要基本俱乐部配置时 |
+| 孩子选择 | `GET /clubs/:clubId/app-clients/:clientId/parent/children` | 多孩子家庭切换 |
 | 家长首页 | `GET /clubs/:clubId/app-clients/:clientId/parent/students/:studentId/home` | `GET /clubs/:clubId/students/:studentId/status-summary` 用于局部刷新 |
 | 孩子日程 | `GET /clubs/:clubId/app-clients/:clientId/parent/students/:studentId/schedule` | `from`、`to` 范围过滤 |
 | 活动详情 | `GET /clubs/:clubId/app-clients/:clientId/events/:eventId` | 家长端由后端校验孩子参与关系 |
-| 训练/比赛摘要 | `GET /clubs/:clubId/students/:studentId/metrics?source=...`、`GET /clubs/:clubId/catalog/ability-metrics` | 家长可见活动摘要 BFF |
-| 能力成长 | `GET /clubs/:clubId/catalog/ability-metrics`、`GET /clubs/:clubId/students/:studentId/metrics` | 指标视图聚合 BFF |
+| 训练/比赛摘要 | `GET /clubs/:clubId/app-clients/:clientId/parent/students/:studentId/activity-summaries` | `type`、`from`、`to` 过滤 |
+| 能力成长 | `GET /clubs/:clubId/app-clients/:clientId/parent/students/:studentId/growth-summary` | 只展示后端返回的指标和趋势 |
 | 保险/课时状态 | `GET /clubs/:clubId/app-clients/:clientId/parent/students/:studentId/home` | `GET /clubs/:clubId/students/:studentId/status-summary` 用于局部刷新 |
 | 教练今日课表 | `GET /clubs/:clubId/app-clients/:clientId/coach/home?date=...` | 教练周课表 BFF |
-| 活动点名 | `GET /clubs/:clubId/app-clients/:clientId/coach/home?date=...`、`GET /clubs/:clubId/app-clients/:clientId/events/:eventId`、`PUT /clubs/:clubId/admin/calendar/events/:eventId/participants` | 单活动工作台 BFF |
+| 活动点名 | `GET /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/workbench`、`PUT /clubs/:clubId/admin/calendar/events/:eventId/participants` | 写入建议携带 `Idempotency-Key` |
 | 训练观察 | `GET /clubs/:clubId/catalog/ability-metrics`、`POST /clubs/:clubId/training/sessions/:trainingSessionId/observations` | 训练 session 自动创建/读取接口 |
 | 比赛事件记录 | `POST /clubs/:clubId/matches` | 比赛详情读取/编辑接口 |
-| 评测录入 | `GET /clubs/:clubId/capabilities?clientId=...`、`GET /clubs/:clubId/catalog/ability-metrics`、`POST /clubs/:clubId/assessments` | 按模板读取评测项 BFF |
+| 评测录入 | `GET /clubs/:clubId/app-clients/:clientId/coach/assessments/templates/:templateId/form`、`POST /clubs/:clubId/assessments` | 写入建议携带 `Idempotency-Key` |
 
 ## 通用权限与状态处理
 
@@ -620,6 +621,14 @@ sequenceDiagram
 
 小程序展示优先使用 `error.message`，分支处理使用 `error.code`。`details` 只用于调试或表单字段定位，不直接整段展示给家长。
 
+### 缓存与幂等
+
+- 小程序可以使用后端返回的 `ETag` 做只读页面刷新；同一响应未变化时后端可返回 `304`。
+- 家长、教练相关接口只允许私有缓存，不允许把数据放入跨用户共享缓存。
+- 点名、训练观察、比赛记录、评测提交等写入请求建议携带 `Idempotency-Key`。
+- 同一用户、同一路径、同一 key、同一请求体重复提交时，后端会重放第一次响应。
+- 同一 key 携带不同请求体会返回 `409 idempotency_conflict`，小程序应提示重新提交并生成新的 key。
+
 ## 后端 BFF/API 剩余缺口清单
 
 以下为小程序体验所需的接口需求，反馈给总控评估，不要求本规格新增后端模型。
@@ -627,51 +636,31 @@ sequenceDiagram
 已由当前后端首版覆盖：
 
 - 家长首页聚合：`GET /clubs/:clubId/app-clients/:clientId/parent/students/:studentId/home`
+- 家长端孩子列表：`GET /clubs/:clubId/app-clients/:clientId/parent/children`
 - 家长孩子日程：`GET /clubs/:clubId/app-clients/:clientId/parent/students/:studentId/schedule`
+- 家长可见训练/比赛摘要：`GET /clubs/:clubId/app-clients/:clientId/parent/students/:studentId/activity-summaries`
+- 能力成长聚合：`GET /clubs/:clubId/app-clients/:clientId/parent/students/:studentId/growth-summary`
 - 角色裁剪活动详情：`GET /clubs/:clubId/app-clients/:clientId/events/:eventId`
 - 教练今日工作台：`GET /clubs/:clubId/app-clients/:clientId/coach/home`
+- 教练单活动工作台：`GET /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/workbench`
+- 按模板读取评测表单：`GET /clubs/:clubId/app-clients/:clientId/coach/assessments/templates/:templateId/form`
 
-1. 家长端孩子列表/当前绑定关系接口
-   - 需求：登录后获取当前家长可见的 child list，用于首页孩子选择。
-   - 建议形态：`GET /clubs/:clubId/me/children`。
-   - 原因：现有页面规格需要 `studentId`，但小程序启动后需要从后端获得可访问孩子集合，不能由前端猜测。
-
-2. 家长可见训练/比赛摘要 BFF
-   - 需求：聚合活动、训练观察、比赛事件、指标名称和家长可见备注。
-   - 建议形态：`GET /clubs/:clubId/students/:studentId/activity-summaries?from=&to=&type=`。
-   - 原因：直接拉 timeline + metrics 需要小程序端做过多关联，且难以统一家长可见范围。
-
-3. 能力成长聚合 BFF
-   - 需求：按 assessment view/viewNodes 输出家长可见指标、最近值、趋势和来源。
-   - 建议形态：`GET /clubs/:clubId/students/:studentId/growth-summary`。
-   - 原因：小程序不应自行解释指标图谱或计算派生趋势。
-
-4. 教练单活动工作台 BFF
-   - 需求：一次性返回活动详情、学员名单、参与状态、训练 session、比赛记录状态、评测待办。
-   - 建议形态：`GET /clubs/:clubId/coach/events/:eventId/workbench`。
-   - 原因：`coach/today` 适合列表，但点名、训练观察、比赛记录、评测页需要稳定的单活动上下文。
-
-5. 训练 session 读取/初始化接口
+1. 训练 session 读取/初始化接口
    - 需求：教练从训练活动进入观察页时能获得 `trainingSessionId`，必要时按 event 初始化。
    - 建议形态：`GET /clubs/:clubId/training/sessions?eventId=...` 或后端在训练活动创建时保证 session 存在。
    - 原因：现有 observation 写入依赖 `trainingSessionId`，但小程序不应自行创建或猜测。
 
-6. 比赛详情读取/编辑策略接口
+2. 比赛详情读取/编辑策略接口
    - 需求：读取已提交比赛记录；若允许编辑，需要明确编辑接口和版本/并发策略。
    - 建议形态：`GET /clubs/:clubId/matches?eventId=...`、`PATCH /clubs/:clubId/matches/:matchId`。
    - 原因：现有 `POST /clubs/:clubId/matches` 适合首次写入，但页面需要展示已提交结果和避免重复覆盖。
 
-7. 按模板读取评测表单接口
-   - 需求：返回某模板版本下的评测项、metric 信息、输入类型、必填规则、排序。
-   - 建议形态：`GET /clubs/:clubId/assessments/templates/:templateId/form?templateVersionId=...`。
-   - 原因：capabilities 中有 templateVersions 和 metricBindings，但小程序直接拼装表单容易遗漏模板规则。
-
-8. 状态摘要增加更新时间和来源级别
+3. 状态摘要增加更新时间和来源级别
    - 需求：`status-summary` 返回 lesson/insurance 的 `updatedAt`、`sourceKind` 或“同步中/待确认”状态。
    - 建议形态：扩展现有响应字段。
    - 原因：家长端需要区分未知、未同步、已确认和可能过期数据。
 
-9. capability 中明确 match event types 和 parent visibility
+4. capability 中明确 match event types 和 parent visibility
     - 需求：提供比赛事件类型目录、家长可见字段策略、保险/课时展示策略。
     - 建议形态：补充 `capabilities.match.eventTypes` 和 `capabilities.client.visibility.parent`。
     - 原因：小程序不能写死重庆天才的比赛事件和家长可见范围。

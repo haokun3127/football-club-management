@@ -3,6 +3,7 @@ import type { FastifyError } from "fastify";
 import type { MembershipResolver } from "./auth/context.js";
 import { apiError } from "./http/errors.js";
 import { buildOpenApiDocument } from "./http/openapi.js";
+import { registerHttpRequestContracts } from "./http/request-contracts.js";
 import { InMemoryStore, type ApiStore } from "./store.js";
 import { registerAppClientRoutes } from "./routes/app-client.routes.js";
 import { registerAssessmentRoutes } from "./routes/assessment.routes.js";
@@ -29,6 +30,7 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
     },
   });
   const context = createRouteContext(store, options.membershipResolver);
+  registerHttpRequestContracts(app);
 
   app.setErrorHandler((error: FastifyError, _request, reply) => {
     if (error.validation) {

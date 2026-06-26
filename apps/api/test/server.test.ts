@@ -34,10 +34,15 @@ describe("api server", () => {
     expect(body.paths["/app-clients/resolve"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/capabilities"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/app-clients"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/children"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/home"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/schedule"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/activity-summaries"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/growth-summary"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/events/{eventId}"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/home"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/workbench"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/assessments/templates/{templateId}/form"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/imports/excel/preview"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/students"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/students/{studentId}"]).toBeDefined();
@@ -214,6 +219,171 @@ describe("api server", () => {
     expect(coachBody.workbench.events.map((event) => event.id)).toEqual(["event-training-1"]);
     expect(parentCoachHome.statusCode).toBe(403);
     expect(parentCoachHome.json().error.code).toBe("forbidden");
+
+    await app.close();
+    persistence.database.close();
+  });
+
+  it("serves next-stage mini-program BFF aggregates without leaking cross-role access", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    const children = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/children",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    const summaries = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/activity-summaries?type=match",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    const growth = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/growth-summary",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    const coachWorkbench = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/workbench",
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    const assessmentForm = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/assessments/templates/assessment-template-technical/form",
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    const parentAssessmentForm = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/assessments/templates/assessment-template-technical/form",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+
+    const childrenBody = children.json() as { children: Array<{ id: string }> };
+    const summariesBody = summaries.json() as { summaries: Array<{ event: { id: string; type: string }; metrics: unknown[] }> };
+    const growthBody = growth.json() as {
+      assessment: { views: unknown[]; viewNodes: unknown[] };
+      latest: Array<{ metricId: string; metric: { id: string } | null }>;
+      trends: Array<{ metricId: string; records: unknown[] }>;
+    };
+    const workbenchBody = coachWorkbench.json() as {
+      event: { id: string };
+      rosterContext: { participants: unknown[]; students: unknown[] };
+      workflow: Record<string, unknown>;
+      training: { id: string } | null;
+    };
+    const formBody = assessmentForm.json() as {
+      template: { id: string };
+      templateVersion: { id: string };
+      fields: Array<{ binding: { metricId: string; testItemId?: string }; metric: { id: string } | null; testItem: { id: string } | null }>;
+    };
+
+    expect(children.statusCode).toBe(200);
+    expect(childrenBody.children).toEqual([expect.objectContaining({ id: "student-1" })]);
+    expect(summaries.statusCode).toBe(200);
+    expect(summariesBody.summaries).toEqual([
+      expect.objectContaining({
+        event: expect.objectContaining({ id: "event-match-1", type: "match" }),
+      }),
+    ]);
+    expect(summariesBody.summaries[0]?.metrics.length).toBeGreaterThan(0);
+    expect(growth.statusCode).toBe(200);
+    expect(growthBody.assessment.views.length).toBeGreaterThan(0);
+    expect(growthBody.latest).toEqual(expect.arrayContaining([
+      expect.objectContaining({ metricId: "metric-finishing", metric: expect.objectContaining({ id: "metric-finishing" }) }),
+    ]));
+    expect(growthBody.trends.length).toBeGreaterThan(0);
+    expect(coachWorkbench.statusCode).toBe(200);
+    expect(workbenchBody.event.id).toBe("event-training-1");
+    expect(workbenchBody.rosterContext.participants.length).toBeGreaterThan(0);
+    expect(workbenchBody.rosterContext.students.length).toBeGreaterThan(0);
+    expect(workbenchBody.workflow).toEqual(expect.objectContaining({ pendingAttendance: true }));
+    expect(workbenchBody.training).toEqual(expect.objectContaining({ id: "training-session-1" }));
+    expect(assessmentForm.statusCode).toBe(200);
+    expect(formBody.template.id).toBe("assessment-template-technical");
+    expect(formBody.templateVersion.id).toBe("assessment-template-version-technical-1");
+    expect(formBody.fields).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        binding: expect.objectContaining({ metricId: "metric-finishing" }),
+        metric: expect.objectContaining({ id: "metric-finishing" }),
+        testItem: expect.objectContaining({ id: "assessment-test-finishing-cq-talent" }),
+      }),
+    ]));
+    expect(parentAssessmentForm.statusCode).toBe(403);
+    expect(parentAssessmentForm.json().error.code).toBe("forbidden");
+
+    await app.close();
+    persistence.database.close();
+  });
+
+  it("sets private ETags for user-scoped reads and replays mutating requests by idempotency key", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    const readResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/home",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    const etag = readResponse.headers.etag;
+    const notModifiedResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/home",
+      headers: { "x-user-id": "user-parent-1", "if-none-match": etag },
+    });
+    const payload = {
+      participants: [
+        { studentId: "student-1", status: "present" },
+      ],
+    };
+    const firstWrite = await app.inject({
+      method: "PUT",
+      url: "/clubs/club-chongqing-talent/admin/calendar/events/event-training-1/participants",
+      headers: { "x-user-id": "user-coach-1", "idempotency-key": "attendance-submit-1" },
+      payload,
+    });
+    const replayedWrite = await app.inject({
+      method: "PUT",
+      url: "/clubs/club-chongqing-talent/admin/calendar/events/event-training-1/participants",
+      headers: { "x-user-id": "user-coach-1", "idempotency-key": "attendance-submit-1" },
+      payload,
+    });
+    const conflictingWrite = await app.inject({
+      method: "PUT",
+      url: "/clubs/club-chongqing-talent/admin/calendar/events/event-training-1/participants",
+      headers: { "x-user-id": "user-coach-1", "idempotency-key": "attendance-submit-1" },
+      payload: {
+        participants: [
+          { studentId: "student-1", status: "absent" },
+        ],
+      },
+    });
+
+    expect(readResponse.statusCode).toBe(200);
+    expect(readResponse.headers["cache-control"]).toBe("private, max-age=30, stale-while-revalidate=60");
+    expect(readResponse.headers.vary).toContain("X-User-Id");
+    expect(etag).toBeTruthy();
+    expect(notModifiedResponse.statusCode).toBe(304);
+    expect(firstWrite.statusCode).toBe(200);
+    expect(firstWrite.headers["cache-control"]).toBe("no-store");
+    expect(firstWrite.headers["idempotency-status"]).toBe("stored");
+    expect(replayedWrite.statusCode).toBe(200);
+    expect(replayedWrite.headers["idempotency-status"]).toBe("replayed");
+    expect(replayedWrite.body).toBe(firstWrite.body);
+    expect(conflictingWrite.statusCode).toBe(409);
+    expect(conflictingWrite.json().error.code).toBe("idempotency_conflict");
 
     await app.close();
     persistence.database.close();
