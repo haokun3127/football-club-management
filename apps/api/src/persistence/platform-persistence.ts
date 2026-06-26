@@ -125,6 +125,10 @@ export async function seedPlatformData(repositories: PlatformRepositories, data:
     repositories.dataCapability.saveExternalFieldMapping(fieldMapping);
   }
 
+  for (const syncPolicy of data.externalSyncPolicies) {
+    repositories.dataCapability.saveExternalSyncPolicy(syncPolicy);
+  }
+
   for (const syncRun of data.externalSyncRuns) {
     repositories.dataCapability.saveExternalSyncRun(syncRun);
   }

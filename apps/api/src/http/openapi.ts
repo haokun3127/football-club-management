@@ -109,6 +109,34 @@ export function buildOpenApiDocument() {
       "/clubs/{clubId}/admin/data/config": {
         get: operation("GET", "/clubs/{clubId}/admin/data/config", schemas.dataCapabilityConfig),
       },
+      "/clubs/{clubId}/admin/integrations/connections": {
+        get: operation("GET", "/clubs/{clubId}/admin/integrations/connections", {
+          ...schemas.clubParams,
+          ...schemas.integrationConnections,
+        }),
+      },
+      "/clubs/{clubId}/admin/integrations/sync-policies": {
+        get: operation("GET", "/clubs/{clubId}/admin/integrations/sync-policies", {
+          ...schemas.clubParams,
+          ...schemas.syncPolicies,
+        }),
+        post: operation("POST", "/clubs/{clubId}/admin/integrations/sync-policies", {
+          ...schemas.clubParams,
+          ...schemas.createSyncPolicy,
+        }),
+      },
+      "/clubs/{clubId}/admin/integrations/sync-policies/{policyId}": {
+        patch: operation("PATCH", "/clubs/{clubId}/admin/integrations/sync-policies/{policyId}", {
+          ...schemas.clubSyncPolicyParams,
+          ...schemas.updateSyncPolicy,
+        }),
+      },
+      "/clubs/{clubId}/admin/integrations/sync-policies/{policyId}/run": {
+        post: operation("POST", "/clubs/{clubId}/admin/integrations/sync-policies/{policyId}/run", {
+          ...schemas.clubSyncPolicyParams,
+          ...schemas.runSyncPolicy,
+        }),
+      },
       "/clubs/{clubId}/admin/students": {
         get: operation("GET", "/clubs/{clubId}/admin/students", {
           ...schemas.clubParams,

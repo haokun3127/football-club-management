@@ -483,6 +483,26 @@ CREATE TABLE IF NOT EXISTS external_table_mappings (
 CREATE INDEX IF NOT EXISTS idx_external_table_mappings_club_connection
   ON external_table_mappings (club_id, connection_id, status);
 
+CREATE TABLE IF NOT EXISTS external_sync_policies (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  connection_id TEXT NOT NULL REFERENCES external_system_connections(id) ON DELETE CASCADE,
+  table_mapping_id TEXT REFERENCES external_table_mappings(id) ON DELETE SET NULL,
+  name TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('draft', 'active', 'paused', 'disabled')),
+  trigger_mode TEXT NOT NULL CHECK (trigger_mode IN ('manual', 'scheduled')),
+  schedule_json TEXT,
+  direction TEXT NOT NULL CHECK (direction IN ('inbound', 'outbound', 'bidirectional')),
+  apply_policy TEXT NOT NULL CHECK (apply_policy IN ('manual_confirm', 'auto_apply_valid')),
+  conflict_policy TEXT NOT NULL CHECK (conflict_policy IN ('manual_review', 'external_wins', 'system_wins')),
+  writeback_policy TEXT NOT NULL CHECK (writeback_policy IN ('disabled', 'status_only')),
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_external_sync_policies_club_connection_status
+  ON external_sync_policies (club_id, connection_id, status);
+
 CREATE TABLE IF NOT EXISTS external_field_mappings (
   id TEXT PRIMARY KEY,
   club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,

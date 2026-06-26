@@ -46,6 +46,7 @@ import type {
   ExternalRawRecord,
   ExternalRecordLink,
   ExternalSyncRun,
+  ExternalSyncPolicy,
   ExternalSystemConnection,
   ExternalTableMapping,
 } from "../data-capability/types.js";
@@ -100,6 +101,7 @@ export interface SeedData {
   externalConnections: ExternalSystemConnection[];
   externalTableMappings: ExternalTableMapping[];
   externalFieldMappings: ExternalFieldMapping[];
+  externalSyncPolicies: ExternalSyncPolicy[];
   externalSyncRuns: ExternalSyncRun[];
   externalRawRecords: ExternalRawRecord[];
   externalRecordLinks: ExternalRecordLink[];

@@ -1,10 +1,151 @@
 import type { FastifyInstance } from "fastify";
-import type { ExcelImportPreviewInput, ImportPreviewFilters, StudentListFilters } from "../data-capability/types.js";
+import type {
+  CreateExternalSyncPolicyInput,
+  ExcelImportPreviewInput,
+  ImportPreviewFilters,
+  StudentListFilters,
+  UpdateExternalSyncPolicyInput,
+} from "../data-capability/types.js";
 import { schemas } from "../http/schemas.js";
 import { readExcelWorksheetRecords } from "../integration/excel-import.js";
 import type { RouteContext } from "./context.js";
 
 export async function registerDataCapabilityRoutes(app: FastifyInstance, context: RouteContext) {
+  app.get<{
+    Params: {
+      clubId: string;
+    };
+  }>(
+    "/clubs/:clubId/admin/integrations/connections",
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.integrationConnections,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      return context.store.listExternalConnections(request.params.clubId);
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+    };
+  }>(
+    "/clubs/:clubId/admin/integrations/sync-policies",
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.syncPolicies,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      return context.store.listExternalSyncPolicies(request.params.clubId);
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+    };
+    Body: CreateExternalSyncPolicyInput;
+  }>(
+    "/clubs/:clubId/admin/integrations/sync-policies",
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.createSyncPolicy,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      try {
+        const policy = await context.store.createExternalSyncPolicy(request.params.clubId, request.body);
+        return reply.code(201).send(policy);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Sync policy creation failed";
+        return context.sendError(reply, 400, "invalid_sync_policy", message);
+      }
+    },
+  );
+
+  app.patch<{
+    Params: {
+      clubId: string;
+      policyId: string;
+    };
+    Body: UpdateExternalSyncPolicyInput;
+  }>(
+    "/clubs/:clubId/admin/integrations/sync-policies/:policyId",
+    {
+      schema: {
+        ...schemas.clubSyncPolicyParams,
+        ...schemas.updateSyncPolicy,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      try {
+        const policy = await context.store.updateExternalSyncPolicy(request.params.clubId, request.params.policyId, request.body);
+        if (!policy) {
+          return context.sendError(reply, 404, "not_found", "Sync policy not found");
+        }
+
+        return policy;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Sync policy update failed";
+        return context.sendError(reply, 400, "invalid_sync_policy", message);
+      }
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+      policyId: string;
+    };
+  }>(
+    "/clubs/:clubId/admin/integrations/sync-policies/:policyId/run",
+    {
+      schema: {
+        ...schemas.clubSyncPolicyParams,
+        ...schemas.runSyncPolicy,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      try {
+        const result = await context.store.runExternalSyncPolicy(request.params.clubId, request.params.policyId);
+        if (!result) {
+          return context.sendError(reply, 404, "not_found", "Sync policy not found");
+        }
+
+        return reply.code(201).send(result);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Sync policy run failed";
+        return context.sendError(reply, 400, "sync_policy_not_runnable", message);
+      }
+    },
+  );
+
   app.get<{
     Params: {
       clubId: string;

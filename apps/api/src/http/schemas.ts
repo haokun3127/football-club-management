@@ -286,6 +286,17 @@ export const schemas = {
       },
     },
   },
+  clubSyncPolicyParams: {
+    params: {
+      type: "object",
+      additionalProperties: false,
+      required: ["clubId", "policyId"],
+      properties: {
+        clubId: { type: "string", minLength: 1 },
+        policyId: { type: "string", minLength: 1 },
+      },
+    },
+  },
   adminStudentListQuery: {
     querystring: {
       type: "object",
@@ -357,6 +368,80 @@ export const schemas = {
         items: flexibleObject,
       },
       403: errorResponse,
+    },
+  },
+  integrationConnections: {
+    response: {
+      200: {
+        type: "array",
+        items: flexibleObject,
+      },
+      403: errorResponse,
+    },
+  },
+  syncPolicies: {
+    response: {
+      200: {
+        type: "array",
+        items: flexibleObject,
+      },
+      403: errorResponse,
+    },
+  },
+  createSyncPolicy: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["connectionId", "name", "status", "triggerMode", "direction", "applyPolicy", "conflictPolicy", "writebackPolicy"],
+      properties: {
+        connectionId: { type: "string", minLength: 1 },
+        tableMappingId: { type: "string", minLength: 1 },
+        name: { type: "string", minLength: 1 },
+        status: { type: "string", enum: ["draft", "active", "paused", "disabled"] },
+        triggerMode: { type: "string", enum: ["manual", "scheduled"] },
+        schedule: flexibleObject,
+        direction: { type: "string", enum: ["inbound", "outbound", "bidirectional"] },
+        applyPolicy: { type: "string", enum: ["manual_confirm", "auto_apply_valid"] },
+        conflictPolicy: { type: "string", enum: ["manual_review", "external_wins", "system_wins"] },
+        writebackPolicy: { type: "string", enum: ["disabled", "status_only"] },
+      },
+    },
+    response: {
+      201: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
+    },
+  },
+  updateSyncPolicy: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        connectionId: { type: "string", minLength: 1 },
+        tableMappingId: { type: "string", minLength: 1 },
+        name: { type: "string", minLength: 1 },
+        status: { type: "string", enum: ["draft", "active", "paused", "disabled"] },
+        triggerMode: { type: "string", enum: ["manual", "scheduled"] },
+        schedule: flexibleObject,
+        direction: { type: "string", enum: ["inbound", "outbound", "bidirectional"] },
+        applyPolicy: { type: "string", enum: ["manual_confirm", "auto_apply_valid"] },
+        conflictPolicy: { type: "string", enum: ["manual_review", "external_wins", "system_wins"] },
+        writebackPolicy: { type: "string", enum: ["disabled", "status_only"] },
+      },
+    },
+    response: {
+      200: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  runSyncPolicy: {
+    response: {
+      201: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
+      404: errorResponse,
     },
   },
   syncRunDetail: {

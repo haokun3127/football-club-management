@@ -19,6 +19,7 @@ import type {
   ExternalRawRecord,
   ExternalRecordLink,
   ExternalSyncRun,
+  ExternalSyncPolicy,
   ExternalSystemConnection,
   ExternalTableMapping,
   ImportPreview,
@@ -161,6 +162,25 @@ export class DataCapabilityRepository {
     `).all(clubId) as SqlRow[];
 
     return rows.map(mapExternalFieldMapping);
+  }
+
+  listExternalSyncPolicies(clubId: EntityId): ExternalSyncPolicy[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM external_sync_policies
+      WHERE club_id = ?
+      ORDER BY name
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapExternalSyncPolicy);
+  }
+
+  getExternalSyncPolicy(clubId: EntityId, policyId: EntityId): ExternalSyncPolicy | null {
+    const row = this.database.prepare(`
+      SELECT * FROM external_sync_policies
+      WHERE club_id = ? AND id = ?
+    `).get(clubId, policyId) as SqlRow | undefined;
+
+    return row ? mapExternalSyncPolicy(row) : null;
   }
 
   listSyncRuns(clubId: EntityId): ExternalSyncRun[] {
@@ -443,6 +463,7 @@ export class DataCapabilityRepository {
       assessmentTemplateVersions: this.listAssessmentTemplateVersions(clubId),
       assessmentMetricBindings: this.listAssessmentMetricBindings(clubId),
       externalConnections: this.listExternalConnections(clubId),
+      syncPolicies: this.listExternalSyncPolicies(clubId),
       tableMappings: this.listExternalTableMappings(clubId),
       fieldMappings: this.listExternalFieldMappings(clubId),
     };
@@ -582,6 +603,44 @@ export class DataCapabilityRepository {
       entity.targetFieldKind,
       entity.required ? 1 : 0,
       entity.transform ? JSON.stringify(entity.transform) : null,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  saveExternalSyncPolicy(entity: ExternalSyncPolicy): void {
+    this.database.prepare(`
+      INSERT INTO external_sync_policies (
+        id, club_id, connection_id, table_mapping_id, name, status, trigger_mode,
+        schedule_json, direction, apply_policy, conflict_policy, writeback_policy,
+        created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        connection_id = excluded.connection_id,
+        table_mapping_id = excluded.table_mapping_id,
+        name = excluded.name,
+        status = excluded.status,
+        trigger_mode = excluded.trigger_mode,
+        schedule_json = excluded.schedule_json,
+        direction = excluded.direction,
+        apply_policy = excluded.apply_policy,
+        conflict_policy = excluded.conflict_policy,
+        writeback_policy = excluded.writeback_policy,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.connectionId,
+      entity.tableMappingId ?? null,
+      entity.name,
+      entity.status,
+      entity.triggerMode,
+      entity.schedule ? JSON.stringify(entity.schedule) : null,
+      entity.direction,
+      entity.applyPolicy,
+      entity.conflictPolicy,
+      entity.writebackPolicy,
       entity.createdAt,
       entity.updatedAt,
     );
@@ -900,6 +959,10 @@ export class DataCapabilityRepository {
       )
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
+        connection_id = excluded.connection_id,
+        table_mapping_id = excluded.table_mapping_id,
+        sync_run_id = excluded.sync_run_id,
+        external_record_id = excluded.external_record_id,
         payload_json = excluded.payload_json,
         payload_hash = excluded.payload_hash,
         review_status = excluded.review_status,
@@ -1593,6 +1656,25 @@ function mapExternalFieldMapping(row: SqlRow): ExternalFieldMapping {
     targetFieldKind: requireString(row, "target_field_kind"),
     required: booleanFromSql(row.required),
     transform: jsonObject(optionalString(row, "transform_json")),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapExternalSyncPolicy(row: SqlRow): ExternalSyncPolicy {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    connectionId: requireString(row, "connection_id"),
+    tableMappingId: optionalString(row, "table_mapping_id"),
+    name: requireString(row, "name"),
+    status: requireString(row, "status") as ExternalSyncPolicy["status"],
+    triggerMode: requireString(row, "trigger_mode") as ExternalSyncPolicy["triggerMode"],
+    schedule: jsonObject(optionalString(row, "schedule_json")),
+    direction: requireString(row, "direction") as ExternalSyncPolicy["direction"],
+    applyPolicy: requireString(row, "apply_policy") as ExternalSyncPolicy["applyPolicy"],
+    conflictPolicy: requireString(row, "conflict_policy") as ExternalSyncPolicy["conflictPolicy"],
+    writebackPolicy: requireString(row, "writeback_policy") as ExternalSyncPolicy["writebackPolicy"],
     createdAt: requireString(row, "created_at"),
     updatedAt: requireString(row, "updated_at"),
   };
