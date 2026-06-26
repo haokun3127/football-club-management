@@ -43,6 +43,7 @@ import {
 } from "@football-club/domain";
 import type {
   ClubCapabilities,
+  ClubAppClient,
   ConfirmExternalRecordInput,
   DataCapabilityConfig,
   CreateExternalSyncPolicyInput,
@@ -85,8 +86,10 @@ export interface ApiStore {
   listClubs(): Club[] | Promise<Club[]>;
   getClubById(clubId: EntityId): Club | null;
   getClubConfig(clubId: EntityId): unknown | null | Promise<unknown | null>;
-  getClubCapabilities(clubId: EntityId): ClubCapabilities | null | Promise<ClubCapabilities | null>;
+  getClubCapabilities(clubId: EntityId, client?: { clientId?: EntityId; appId?: string; clientKey?: string }): ClubCapabilities | null | Promise<ClubCapabilities | null>;
+  resolveAppClientCapabilities(input: { appId?: string; clientKey?: string }): { clubId: EntityId; clientId: EntityId; capabilities: ClubCapabilities } | null | Promise<{ clubId: EntityId; clientId: EntityId; capabilities: ClubCapabilities } | null>;
   getDataCapabilityConfig(clubId: EntityId): DataCapabilityConfig | Promise<DataCapabilityConfig>;
+  listClubAppClients(clubId: EntityId): ClubAppClient[] | Promise<ClubAppClient[]>;
   listExternalConnections(clubId: EntityId): ExternalSystemConnection[] | Promise<ExternalSystemConnection[]>;
   listExternalSyncPolicies(clubId: EntityId): ExternalSyncPolicy[] | Promise<ExternalSyncPolicy[]>;
   createExternalSyncPolicy(clubId: EntityId, input: CreateExternalSyncPolicyInput): ExternalSyncPolicy | Promise<ExternalSyncPolicy>;
@@ -218,7 +221,13 @@ function buildClubCapabilities(
   club: Club,
   config: DataCapabilityConfig,
   latestSyncRuns: ExternalSyncRun[],
+  client?: ClubAppClient,
 ): ClubCapabilities {
+  const features = {
+    ...Object.fromEntries(config.featureFlags.map((flag) => [flag.feature, flag.enabled])),
+    ...(client?.featureOverrides ?? {}),
+  };
+
   return {
     club: {
       id: club.id,
@@ -227,7 +236,20 @@ function buildClubCapabilities(
       timezone: club.timezone,
       locale: club.locale,
     },
-    features: Object.fromEntries(config.featureFlags.map((flag) => [flag.feature, flag.enabled])),
+    client: client
+      ? {
+          id: client.id,
+          channel: client.channel,
+          name: client.name,
+          appId: client.appId,
+          clientKey: client.clientKey,
+          theme: client.theme,
+          navigation: (client.navigation ?? []).filter((item) => item.enabled !== false),
+          roleEntrypoints: client.roleEntrypoints ?? {},
+          visibility: client.visibility,
+        }
+      : undefined,
+    features,
     roles: {
       parent: [
         "calendar.read_child",
@@ -438,9 +460,13 @@ export abstract class SeedBackedStore implements ApiStore {
     return this.getSeedClubConfig(clubId, this.getClubById(clubId));
   }
 
-  getClubCapabilities(clubId: EntityId): ReturnType<ApiStore["getClubCapabilities"]> {
+  getClubCapabilities(clubId: EntityId, clientSelector: { clientId?: EntityId; appId?: string; clientKey?: string } = {}): ReturnType<ApiStore["getClubCapabilities"]> {
     const club = this.getClubById(clubId);
     if (!club) {
+      return null;
+    }
+    const client = this.resolveClubAppClient(clubId, clientSelector);
+    if ((clientSelector.clientId || clientSelector.appId || clientSelector.clientKey) && !client) {
       return null;
     }
 
@@ -448,6 +474,43 @@ export abstract class SeedBackedStore implements ApiStore {
       club,
       this.getDataCapabilityConfig(clubId),
       this.listExternalSyncRuns(clubId),
+      client,
+    );
+  }
+
+  listClubAppClients(clubId: EntityId): ClubAppClient[] {
+    return this.data.appClients.filter((item) => item.clubId === clubId);
+  }
+
+  async resolveAppClientCapabilities(input: { appId?: string; clientKey?: string }) {
+    const client = this.data.appClients.find((item) =>
+      item.status === "active"
+      && (input.appId ? item.appId === input.appId : true)
+      && (input.clientKey ? item.clientKey === input.clientKey : true)
+      && (input.appId || input.clientKey),
+    );
+    if (!client) {
+      return null;
+    }
+    const capabilities = await this.getClubCapabilities(client.clubId, { clientId: client.id });
+    if (!capabilities) {
+      return null;
+    }
+
+    return { clubId: client.clubId, clientId: client.id, capabilities };
+  }
+
+  private resolveClubAppClient(clubId: EntityId, selector: { clientId?: EntityId; appId?: string; clientKey?: string }): ClubAppClient | undefined {
+    if (!selector.clientId && !selector.appId && !selector.clientKey) {
+      return undefined;
+    }
+
+    return this.data.appClients.find((item) =>
+      item.clubId === clubId
+      && item.status === "active"
+      && (selector.clientId ? item.id === selector.clientId : true)
+      && (selector.appId ? item.appId === selector.appId : true)
+      && (selector.clientKey ? item.clientKey === selector.clientKey : true),
     );
   }
 
@@ -656,6 +719,7 @@ export abstract class SeedBackedStore implements ApiStore {
       featureFlags: this.listFeatureFlags(clubId),
       policies: this.listPolicies(clubId),
       customFields: this.listCustomFields(clubId),
+      appClients: this.listClubAppClients(clubId),
       metricGraphVersions: this.listMetricGraphVersions(clubId),
       metricDependencies: this.listMetricDependencies(clubId),
       metricViews: this.listMetricViews(clubId),
@@ -1612,10 +1676,14 @@ export class PersistentApiStore extends SeedBackedStore {
     return this.getSeedClubConfig(clubId, club);
   }
 
-  override async getClubCapabilities(clubId: EntityId) {
+  override async getClubCapabilities(clubId: EntityId, clientSelector: { clientId?: EntityId; appId?: string; clientKey?: string } = {}) {
     const club = await this.repositories.clubs.getById(clubId);
 
     if (!club) {
+      return null;
+    }
+    const client = this.resolvePersistentClubAppClient(clubId, clientSelector);
+    if ((clientSelector.clientId || clientSelector.appId || clientSelector.clientKey) && !client) {
       return null;
     }
 
@@ -1623,6 +1691,7 @@ export class PersistentApiStore extends SeedBackedStore {
       club,
       this.getDataCapabilityConfig(clubId),
       this.listExternalSyncRuns(clubId),
+      client,
     );
   }
 
@@ -1637,6 +1706,23 @@ export class PersistentApiStore extends SeedBackedStore {
       ...config,
       externalConnections: config.externalConnections.map(sanitizeExternalConnection),
     };
+  }
+
+  override listClubAppClients(clubId: EntityId) {
+    return this.repositories.dataCapability.listClubAppClients(clubId);
+  }
+
+  override async resolveAppClientCapabilities(input: { appId?: string; clientKey?: string }) {
+    const client = this.repositories.dataCapability.findActiveClubAppClient(input);
+    if (!client) {
+      return null;
+    }
+    const capabilities = await this.getClubCapabilities(client.clubId, { clientId: client.id });
+    if (!capabilities) {
+      return null;
+    }
+
+    return { clubId: client.clubId, clientId: client.id, capabilities };
   }
 
   override listExternalConnections(clubId: EntityId) {
@@ -1944,6 +2030,19 @@ export class PersistentApiStore extends SeedBackedStore {
     if (!tableMapping) {
       throw new Error(`External table mapping ${tableMappingId} is not configured for club ${clubId}.`);
     }
+  }
+
+  private resolvePersistentClubAppClient(clubId: EntityId, selector: { clientId?: EntityId; appId?: string; clientKey?: string }): ClubAppClient | undefined {
+    if (!selector.clientId && !selector.appId && !selector.clientKey) {
+      return undefined;
+    }
+
+    return this.repositories.dataCapability.listClubAppClients(clubId).find((item) =>
+      item.status === "active"
+      && (selector.clientId ? item.id === selector.clientId : true)
+      && (selector.appId ? item.appId === selector.appId : true)
+      && (selector.clientKey ? item.clientKey === selector.clientKey : true),
+    );
   }
 }
 

@@ -23,6 +23,31 @@ export interface ExternalSystemConnection {
   updatedAt: string;
 }
 
+export type ClubAppClientChannel =
+  | "wechat_miniprogram"
+  | "wechat_official_account"
+  | "douyin"
+  | "video_account"
+  | "xiaohongshu"
+  | "admin_portal";
+
+export interface ClubAppClient {
+  id: EntityId;
+  clubId: EntityId;
+  channel: ClubAppClientChannel;
+  name: string;
+  status: "draft" | "active" | "paused" | "disabled";
+  appId?: string;
+  clientKey: string;
+  theme?: Record<string, unknown>;
+  navigation?: Array<Record<string, unknown>>;
+  roleEntrypoints?: Record<string, string[]>;
+  featureOverrides?: Record<string, boolean>;
+  visibility?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ExternalTableMapping {
   id: EntityId;
   clubId: EntityId;
@@ -120,6 +145,7 @@ export interface DataCapabilityConfig {
   featureFlags: ClubFeatureFlag[];
   policies: ClubPolicy[];
   customFields: CustomFieldDefinition[];
+  appClients: ClubAppClient[];
   metricGraphVersions: MetricGraphVersion[];
   metricDependencies: MetricDependency[];
   metricViews: MetricView[];
@@ -139,6 +165,17 @@ export interface ClubCapabilities {
     name: string;
     timezone: string;
     locale: string;
+  };
+  client?: {
+    id: EntityId;
+    channel: ClubAppClientChannel;
+    name: string;
+    appId?: string;
+    clientKey: string;
+    theme?: Record<string, unknown>;
+    navigation: Array<Record<string, unknown>>;
+    roleEntrypoints: Record<string, string[]>;
+    visibility?: Record<string, unknown>;
   };
   features: Record<string, boolean>;
   roles: {

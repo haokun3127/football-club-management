@@ -8,14 +8,41 @@ export async function registerPlatformRoutes(app: FastifyInstance, context: Rout
   app.get("/clubs", { schema: schemas.clubsResponse }, async () => context.store.listClubs());
 
   app.get<{
+    Querystring: {
+      appId?: string;
+      clientKey?: string;
+    };
+  }>(
+    "/app-clients/resolve",
+    {
+      schema: schemas.resolveAppClient,
+    },
+    async (request, reply) => {
+      const result = await context.store.resolveAppClientCapabilities(request.query);
+
+      if (!result) {
+        return context.sendError(reply, 404, "not_found", "App client not found");
+      }
+
+      return result;
+    },
+  );
+
+  app.get<{
     Params: {
       clubId: string;
+    };
+    Querystring: {
+      clientId?: string;
+      appId?: string;
+      clientKey?: string;
     };
   }>(
     "/clubs/:clubId/capabilities",
     {
       schema: {
         ...schemas.clubParams,
+        ...schemas.clubCapabilitiesQuery,
         ...schemas.clubCapabilities,
       },
     },
@@ -24,13 +51,34 @@ export async function registerPlatformRoutes(app: FastifyInstance, context: Rout
         return reply;
       }
 
-      const capabilities = await context.store.getClubCapabilities(request.params.clubId);
+      const capabilities = await context.store.getClubCapabilities(request.params.clubId, request.query);
 
       if (!capabilities) {
         return context.sendError(reply, 404, "not_found", "Club not found");
       }
 
       return capabilities;
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+    };
+  }>(
+    "/clubs/:clubId/admin/app-clients",
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.clubAppClients,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      return context.store.listClubAppClients(request.params.clubId);
     },
   );
 

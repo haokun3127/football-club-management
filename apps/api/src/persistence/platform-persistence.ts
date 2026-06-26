@@ -117,6 +117,10 @@ export async function seedPlatformData(repositories: PlatformRepositories, data:
     repositories.dataCapability.saveExternalConnection(connection);
   }
 
+  for (const appClient of data.appClients) {
+    repositories.dataCapability.saveClubAppClient(appClient);
+  }
+
   for (const tableMapping of data.externalTableMappings) {
     repositories.dataCapability.saveExternalTableMapping(tableMapping);
   }

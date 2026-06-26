@@ -467,6 +467,28 @@ CREATE TABLE IF NOT EXISTS external_system_connections (
 CREATE INDEX IF NOT EXISTS idx_external_system_connections_club_status
   ON external_system_connections (club_id, status);
 
+CREATE TABLE IF NOT EXISTS club_app_clients (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  channel TEXT NOT NULL CHECK (channel IN ('wechat_miniprogram', 'wechat_official_account', 'douyin', 'video_account', 'xiaohongshu', 'admin_portal')),
+  name TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('draft', 'active', 'paused', 'disabled')),
+  app_id TEXT,
+  client_key TEXT NOT NULL,
+  theme_json TEXT,
+  navigation_json TEXT,
+  role_entrypoints_json TEXT,
+  feature_overrides_json TEXT,
+  visibility_json TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE (club_id, client_key),
+  UNIQUE (club_id, app_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_club_app_clients_club_status
+  ON club_app_clients (club_id, status);
+
 CREATE TABLE IF NOT EXISTS external_table_mappings (
   id TEXT PRIMARY KEY,
   club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,

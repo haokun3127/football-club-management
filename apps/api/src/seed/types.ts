@@ -42,6 +42,7 @@ import type {
   UserAccount,
 } from "@football-club/domain";
 import type {
+  ClubAppClient,
   ExternalFieldMapping,
   ExternalRawRecord,
   ExternalRecordLink,
@@ -101,6 +102,7 @@ export interface SeedData {
   metricLineages: MetricLineage[];
   derivedMetricDefinitions: DerivedMetricDefinition[];
   externalConnections: ExternalSystemConnection[];
+  appClients: ClubAppClient[];
   externalTableMappings: ExternalTableMapping[];
   externalFieldMappings: ExternalFieldMapping[];
   externalSyncPolicies: ExternalSyncPolicy[];

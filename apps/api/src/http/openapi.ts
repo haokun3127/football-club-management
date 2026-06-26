@@ -89,8 +89,21 @@ export function buildOpenApiDocument() {
     paths: {
       "/health": { get: operation("GET", "/health", schemas.health) },
       "/clubs": { get: operation("GET", "/clubs", schemas.clubsResponse) },
+      "/app-clients/resolve": {
+        get: operation("GET", "/app-clients/resolve", schemas.resolveAppClient),
+      },
       "/clubs/{clubId}/capabilities": {
-        get: operation("GET", "/clubs/{clubId}/capabilities", schemas.clubCapabilities),
+        get: operation("GET", "/clubs/{clubId}/capabilities", {
+          ...schemas.clubParams,
+          ...schemas.clubCapabilitiesQuery,
+          ...schemas.clubCapabilities,
+        }),
+      },
+      "/clubs/{clubId}/admin/app-clients": {
+        get: operation("GET", "/clubs/{clubId}/admin/app-clients", {
+          ...schemas.clubParams,
+          ...schemas.clubAppClients,
+        }),
       },
       "/clubs/{clubId}/config": { get: operation("GET", "/clubs/{clubId}/config", schemas.clubConfig) },
       "/clubs/{clubId}/teams": { post: operation("POST", "/clubs/{clubId}/teams", schemas.createTeam) },

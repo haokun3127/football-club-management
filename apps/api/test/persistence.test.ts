@@ -28,6 +28,7 @@ describe("platform persistence", () => {
           'student_operational_profiles',
           'student_contacts',
           'custom_field_values',
+          'club_app_clients',
           'external_system_connections',
           'external_table_mappings',
           'external_field_mappings',
@@ -53,6 +54,7 @@ describe("platform persistence", () => {
       "assessment_template_versions",
       "assessment_test_items",
       "calendar_events",
+      "club_app_clients",
       "custom_field_values",
       "event_participants",
       "external_field_mappings",
@@ -82,6 +84,7 @@ describe("platform persistence", () => {
     const store = new PersistentApiStore(repositories);
 
     const seededPolicies = repositories.dataCapability.listExternalSyncPolicies("club-chongqing-talent");
+    const appClients = repositories.dataCapability.listClubAppClients("club-chongqing-talent");
     const created = store.createExternalSyncPolicy("club-chongqing-talent", {
       connectionId: "external-connection-wps-cq-talent",
       tableMappingId: "external-table-payment-events-cq-talent",
@@ -144,6 +147,10 @@ describe("platform persistence", () => {
       direction: "inbound",
       applyPolicy: "manual_confirm",
     })]);
+    expect(appClients).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "app-client-cq-talent-wechat-main", appId: "wx-cq-talent-main" }),
+      expect.objectContaining({ id: "app-client-cq-talent-admin", clientKey: "cq-talent-admin" }),
+    ]));
     expect(created).toEqual(expect.objectContaining({
       clubId: "club-chongqing-talent",
       tableMappingId: "external-table-payment-events-cq-talent",

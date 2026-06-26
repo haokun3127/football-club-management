@@ -31,7 +31,9 @@ describe("api server", () => {
 
     expect(response.statusCode).toBe(200);
     expect(body.openapi).toBe("3.1.0");
+    expect(body.paths["/app-clients/resolve"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/capabilities"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/admin/app-clients"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/imports/excel/preview"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/students"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/students/{studentId}"]).toBeDefined();
@@ -49,6 +51,74 @@ describe("api server", () => {
     expect(body.paths["/clubs/{clubId}/coach/today"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/training/sessions/{trainingSessionId}/observations"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/assessments"]).toBeDefined();
+  });
+
+  it("returns client-scoped capabilities for multiple app clients", async () => {
+    const app = buildServer(undefined, { logger: false });
+    const defaultResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/capabilities",
+    });
+    const miniProgramResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/capabilities?appId=wx-cq-talent-main",
+    });
+    const adminClientsResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/admin/app-clients",
+    });
+    const resolvedResponse = await app.inject({
+      method: "GET",
+      url: "/app-clients/resolve?appId=wx-cq-talent-main",
+    });
+    const missingClientResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/capabilities?appId=missing-app",
+    });
+
+    const defaultBody = defaultResponse.json() as { client?: unknown; features: Record<string, boolean> };
+    const miniProgramBody = miniProgramResponse.json() as {
+      client: {
+        id: string;
+        channel: string;
+        appId: string;
+        navigation: Array<{ key: string; enabled?: boolean }>;
+        roleEntrypoints: Record<string, string[]>;
+      };
+      features: Record<string, boolean>;
+    };
+    const appClients = adminClientsResponse.json() as Array<{ id: string; channel: string; clientKey: string }>;
+    const resolved = resolvedResponse.json() as {
+      clubId: string;
+      clientId: string;
+      capabilities: { client: { appId: string }; features: Record<string, boolean> };
+    };
+
+    expect(defaultResponse.statusCode).toBe(200);
+    expect(defaultBody.client).toBeUndefined();
+    expect(miniProgramResponse.statusCode).toBe(200);
+    expect(miniProgramBody.client).toEqual(expect.objectContaining({
+      id: "app-client-cq-talent-wechat-main",
+      channel: "wechat_miniprogram",
+      appId: "wx-cq-talent-main",
+    }));
+    expect(miniProgramBody.client.navigation.map((item) => item.key)).toEqual(expect.arrayContaining(["calendar", "attendance", "assessment"]));
+    expect(miniProgramBody.client.roleEntrypoints.parent).toEqual(expect.arrayContaining(["calendar", "status"]));
+    expect(miniProgramBody.features.payments).toBe(false);
+    expect(adminClientsResponse.statusCode).toBe(200);
+    expect(appClients).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "app-client-cq-talent-wechat-main", channel: "wechat_miniprogram" }),
+      expect.objectContaining({ id: "app-client-cq-talent-admin", channel: "admin_portal" }),
+    ]));
+    expect(resolvedResponse.statusCode).toBe(200);
+    expect(resolved).toEqual(expect.objectContaining({
+      clubId: "club-chongqing-talent",
+      clientId: "app-client-cq-talent-wechat-main",
+      capabilities: expect.objectContaining({
+        client: expect.objectContaining({ appId: "wx-cq-talent-main" }),
+      }),
+    }));
+    expect(missingClientResponse.statusCode).toBe(404);
   });
 
   it("computes a derived 进攻贡献 metric", async () => {

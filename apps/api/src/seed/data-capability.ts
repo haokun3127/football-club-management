@@ -1,4 +1,5 @@
 import type {
+  ClubAppClient,
   ExternalFieldMapping,
   ExternalRawRecord,
   ExternalRecordLink,
@@ -42,6 +43,7 @@ const tableMappings: Array<Pick<ExternalTableMapping, "id" | "externalTableKey" 
 
 export function createDataCapabilitySeed(): Pick<
   SeedData,
+  | "appClients"
   | "externalConnections"
   | "externalTableMappings"
   | "externalFieldMappings"
@@ -52,6 +54,81 @@ export function createDataCapabilitySeed(): Pick<
   | "lessonLedger"
   | "insurancePolicies"
 > {
+  const appClients: ClubAppClient[] = [
+    {
+      id: "app-client-cq-talent-wechat-main",
+      clubId,
+      channel: "wechat_miniprogram" as const,
+      name: "重庆天才家校训练小程序",
+      status: "active" as const,
+      appId: "wx-cq-talent-main",
+      clientKey: "cq-talent-wechat-main",
+      theme: {
+        brandName: "重庆天才足球俱乐部",
+        primaryColor: "#0f766e",
+        accentColor: "#f59e0b",
+      },
+      navigation: [
+        { key: "home", label: "首页", roles: ["parent", "coach"], enabled: true },
+        { key: "calendar", label: "日程", roles: ["parent", "coach"], enabled: true },
+        { key: "attendance", label: "点名", roles: ["coach"], enabled: true },
+        { key: "training", label: "训练", roles: ["parent", "coach"], enabled: true },
+        { key: "matches", label: "比赛", roles: ["parent", "coach"], enabled: true },
+        { key: "assessment", label: "能力", roles: ["parent", "coach"], enabled: true },
+        { key: "status", label: "保险课时", roles: ["parent"], enabled: true },
+      ],
+      roleEntrypoints: {
+        parent: ["home", "calendar", "training", "matches", "assessment", "status"],
+        coach: ["home", "calendar", "attendance", "training", "matches", "assessment"],
+        admin: [],
+      },
+      featureOverrides: {
+        payments: false,
+        crm: false,
+        media_distribution: false,
+      },
+      visibility: {
+        parentMetricScope: "published_summary",
+        showInsurancePolicyNumber: true,
+        showLessonBalance: true,
+      },
+      createdAt: now,
+      updatedAt: now,
+    },
+    {
+      id: "app-client-cq-talent-admin",
+      clubId,
+      channel: "admin_portal" as const,
+      name: "重庆天才运营后台",
+      status: "active" as const,
+      clientKey: "cq-talent-admin",
+      theme: {
+        brandName: "重庆天才运营后台",
+        primaryColor: "#1f2937",
+      },
+      navigation: [
+        { key: "students", label: "学员", roles: ["admin"], enabled: true },
+        { key: "teams", label: "球队", roles: ["admin"], enabled: true },
+        { key: "calendar", label: "日程", roles: ["admin"], enabled: true },
+        { key: "integrations", label: "数据同步", roles: ["admin"], enabled: true },
+        { key: "assessment_graph", label: "评测图谱", roles: ["admin"], enabled: true },
+      ],
+      roleEntrypoints: {
+        parent: [],
+        coach: [],
+        admin: ["students", "teams", "calendar", "integrations", "assessment_graph"],
+      },
+      featureOverrides: {
+        crm: true,
+      },
+      visibility: {
+        integrationConfigVisible: true,
+      },
+      createdAt: now,
+      updatedAt: now,
+    },
+  ];
+
   const externalConnections: ExternalSystemConnection[] = [
     {
       id: connectionId,
@@ -267,6 +344,7 @@ export function createDataCapabilitySeed(): Pick<
   const externalRecordLinks: ExternalRecordLink[] = [];
 
   return {
+    appClients,
     externalConnections,
     externalTableMappings,
     externalFieldMappings,

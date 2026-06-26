@@ -441,6 +441,45 @@ export const schemas = {
       404: errorResponse,
     },
   },
+  clubCapabilitiesQuery: {
+    querystring: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        clientId: { type: "string", minLength: 1 },
+        appId: { type: "string", minLength: 1 },
+        clientKey: { type: "string", minLength: 1 },
+      },
+    },
+  },
+  clubAppClients: {
+    response: {
+      200: {
+        type: "array",
+        items: flexibleObject,
+      },
+      403: errorResponse,
+    },
+  },
+  resolveAppClient: {
+    querystring: {
+      type: "object",
+      additionalProperties: false,
+      anyOf: [
+        { required: ["appId"] },
+        { required: ["clientKey"] },
+      ],
+      properties: {
+        appId: { type: "string", minLength: 1 },
+        clientKey: { type: "string", minLength: 1 },
+      },
+    },
+    response: {
+      200: flexibleObject,
+      400: errorResponse,
+      404: errorResponse,
+    },
+  },
   importPreview: {
     response: {
       200: flexibleObject,

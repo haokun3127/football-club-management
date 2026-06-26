@@ -14,6 +14,7 @@ import type {
 import type { DatabaseSync, SQLInputValue } from "node:sqlite";
 import type {
   ConfirmExternalRecordInput,
+  ClubAppClient,
   DataCapabilityConfig,
   ExternalFieldMapping,
   ExternalRawRecord,
@@ -191,6 +192,46 @@ function jsonArray(value: string | undefined): unknown[] | undefined {
   return parsed;
 }
 
+function jsonRecordArray(value: string | undefined): Array<Record<string, unknown>> | undefined {
+  const parsed = jsonArray(value);
+  if (!parsed) {
+    return undefined;
+  }
+  if (!parsed.every((item) => item && typeof item === "object" && !Array.isArray(item))) {
+    throw new Error("Expected JSON object array.");
+  }
+
+  return parsed as Array<Record<string, unknown>>;
+}
+
+function booleanRecord(value: string | undefined): Record<string, boolean> | undefined {
+  const parsed = jsonObject(value);
+  if (!parsed) {
+    return undefined;
+  }
+  for (const [key, flag] of Object.entries(parsed)) {
+    if (typeof flag !== "boolean") {
+      throw new Error(`Expected ${key} to be a boolean.`);
+    }
+  }
+
+  return parsed as Record<string, boolean>;
+}
+
+function stringArrayRecord(value: string | undefined): Record<string, string[]> | undefined {
+  const parsed = jsonObject(value);
+  if (!parsed) {
+    return undefined;
+  }
+  for (const [key, items] of Object.entries(parsed)) {
+    if (!Array.isArray(items) || !items.every((item) => typeof item === "string")) {
+      throw new Error(`Expected ${key} to be a string array.`);
+    }
+  }
+
+  return parsed as Record<string, string[]>;
+}
+
 function catalogScope(row: SqlRow): CatalogScope {
   const scope = requireString(row, "catalog_scope") as CatalogScope["scope"];
 
@@ -221,6 +262,42 @@ export class DataCapabilityRepository {
     `).all(clubId) as SqlRow[];
 
     return rows.map(mapExternalConnection);
+  }
+
+  listClubAppClients(clubId: EntityId): ClubAppClient[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM club_app_clients
+      WHERE club_id = ?
+      ORDER BY channel, name
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapClubAppClient);
+  }
+
+  findActiveClubAppClient(input: { appId?: string; clientKey?: string }): ClubAppClient | null {
+    if (!input.appId && !input.clientKey) {
+      return null;
+    }
+
+    const clauses = ["status = 'active'"];
+    const params: SQLInputValue[] = [];
+    if (input.appId) {
+      clauses.push("app_id = ?");
+      params.push(input.appId);
+    }
+    if (input.clientKey) {
+      clauses.push("client_key = ?");
+      params.push(input.clientKey);
+    }
+
+    const row = this.database.prepare(`
+      SELECT * FROM club_app_clients
+      WHERE ${clauses.join(" AND ")}
+      ORDER BY updated_at DESC
+      LIMIT 1
+    `).get(...params) as SqlRow | undefined;
+
+    return row ? mapClubAppClient(row) : null;
   }
 
   listExternalTableMappings(clubId: EntityId): ExternalTableMapping[] {
@@ -742,6 +819,7 @@ export class DataCapabilityRepository {
       metricViewNodes: this.listMetricViewNodes(clubId),
       assessmentTemplateVersions: this.listAssessmentTemplateVersions(clubId),
       assessmentMetricBindings: this.listAssessmentMetricBindings(clubId),
+      appClients: this.listClubAppClients(clubId),
       externalConnections: this.listExternalConnections(clubId),
       syncPolicies: this.listExternalSyncPolicies(clubId),
       tableMappings: this.listExternalTableMappings(clubId),
@@ -830,6 +908,44 @@ export class DataCapabilityRepository {
       entity.status,
       JSON.stringify(entity.config),
       entity.lastSyncedAt ?? null,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  saveClubAppClient(entity: ClubAppClient): void {
+    this.database.prepare(`
+      INSERT INTO club_app_clients (
+        id, club_id, channel, name, status, app_id, client_key, theme_json,
+        navigation_json, role_entrypoints_json, feature_overrides_json, visibility_json,
+        created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        channel = excluded.channel,
+        name = excluded.name,
+        status = excluded.status,
+        app_id = excluded.app_id,
+        client_key = excluded.client_key,
+        theme_json = excluded.theme_json,
+        navigation_json = excluded.navigation_json,
+        role_entrypoints_json = excluded.role_entrypoints_json,
+        feature_overrides_json = excluded.feature_overrides_json,
+        visibility_json = excluded.visibility_json,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.channel,
+      entity.name,
+      entity.status,
+      entity.appId ?? null,
+      entity.clientKey,
+      entity.theme ? JSON.stringify(entity.theme) : null,
+      entity.navigation ? JSON.stringify(entity.navigation) : null,
+      entity.roleEntrypoints ? JSON.stringify(entity.roleEntrypoints) : null,
+      entity.featureOverrides ? JSON.stringify(entity.featureOverrides) : null,
+      entity.visibility ? JSON.stringify(entity.visibility) : null,
       entity.createdAt,
       entity.updatedAt,
     );
@@ -1917,6 +2033,25 @@ function mapExternalConnection(row: SqlRow): ExternalSystemConnection {
     status: requireString(row, "status") as ExternalSystemConnection["status"],
     config: jsonObject(requireString(row, "config_json")) ?? {},
     lastSyncedAt: optionalString(row, "last_synced_at"),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapClubAppClient(row: SqlRow): ClubAppClient {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    channel: requireString(row, "channel") as ClubAppClient["channel"],
+    name: requireString(row, "name"),
+    status: requireString(row, "status") as ClubAppClient["status"],
+    appId: optionalString(row, "app_id"),
+    clientKey: requireString(row, "client_key"),
+    theme: jsonObject(optionalString(row, "theme_json")),
+    navigation: jsonRecordArray(optionalString(row, "navigation_json")),
+    roleEntrypoints: stringArrayRecord(optionalString(row, "role_entrypoints_json")),
+    featureOverrides: booleanRecord(optionalString(row, "feature_overrides_json")),
+    visibility: jsonObject(optionalString(row, "visibility_json")),
     createdAt: requireString(row, "created_at"),
     updatedAt: requireString(row, "updated_at"),
   };
