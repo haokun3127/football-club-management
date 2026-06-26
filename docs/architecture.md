@@ -12,6 +12,7 @@
 - `CatalogScope` 区分系统级目录和俱乐部级目录，训练体系、指标和评测模板可以共享也可以覆盖。
 - `PlayerMetricRecord` 是球员数据资产的最小单元，训练观察、比赛事件、周期评测、体测和算法派生都写入同一种记录。
 - `DomainEvent` 带 `clubId`，后续 CRM、通知、内容分发、AI 报告可以订阅这些事件，而不侵入核心训练业务。
+- 青训运营字段要区分标准字段和俱乐部扩展字段。渠道、区域、学校、学员状态、联系人、保险、收费和课时流水属于高复用运营能力，不能只作为某个客户的表格字段处理。
 
 ## 工作区结构
 
@@ -29,7 +30,9 @@
 - `ClubUserMembership`
 - `UserAccount`
 - `ParentProfile`
+- `StudentContact`
 - `StudentProfile`
+- `StudentOperationalProfile`
 - `CoachProfile`
 - `Team`
 - `TeamMember`
@@ -37,6 +40,8 @@
 学员可以属于多个球队，球队成员关系记录周期、状态和主队标记。私教和小班课不强行建队，通过活动参与关系组织。
 
 `UserAccount` 是全局登录账号；家长、教练、学员资料是俱乐部内资料。这样同一个手机号或用户未来可以加入多个俱乐部，但各俱乐部的训练、评测和运营数据保持隔离。
+
+学员主档要能覆盖青训俱乐部的基础运营需要，包括证件匹配、入训日期、学员状态、区域、学校、渠道、主联系人、微信、健康备注和负责教练等信息。低频个性字段进入 `CustomFieldDefinition` 和类型化字段值表；高频字段一旦影响筛选、统计、权限或对账，应升级为标准字段。
 
 ### 活动日历
 
@@ -99,17 +104,33 @@ MVP 只做单场比赛记录，包括出场、比分、进球、助攻和教练�
 - `ClubFeatureFlag`
 - `ClubPolicy`
 - `CustomFieldDefinition`
+- `CustomFieldValue`
 
 不同俱乐部的业务差异优先通过功能开关、策略配置、自定义字段和俱乐部级目录承载。详见 [多俱乐部解耦分析](multi-club-decoupling.md)。
 
+数据字段扩展的完整原则见 [数据能力与字段扩展规划](data-capability-plan.md)。
+
+### 基础运营事实
+
+收费、课时、保险和沟通记录可以分阶段开放功能，但数据模型需要前置承接：
+
+- `PaymentEvent`
+- `LessonCreditLedger`
+- `InsurancePolicy`
+- `CommunicationLog`
+- `Attachment`
+
+这些对象关联 `clubId`、`studentId`、`eventId` 或 `teamId`，不反向改变训练、比赛和评测事实。
+
 ## 运营扩展方式
 
-未来运营能力不要直接改核心表，而是优先通过这些方式扩展：
+未来运营能力不要污染训练和比赛核心事实，而是优先通过这些方式扩展：
 
 1. 订阅领域事件，例如活动创建、比赛事件记录、球员指标更新。
 2. 增加独立运营模块，例如 CRM、支付、通知、内容分发。
 3. 用外键关联核心实体，例如 `studentId`、`eventId`、`teamId`、`metricRecordId`。
-4. 保持核心训练数据不被营销数据污染。
+4. 将跨俱乐部高复用的运营字段沉淀为标准字段，将个性字段放入类型化自定义字段值表。
+5. 保持核心训练数据不被营销数据污染。
 
 后续模块示例：
 

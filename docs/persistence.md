@@ -40,6 +40,54 @@ DATABASE_URL=apps/api/data/dev.sqlite pnpm --filter @football-club/api db:migrat
 
 除 `clubs` 和 `user_accounts` 外，俱乐部内实体都带 `club_id`，并为高频查询建立包含 `club_id` 的索引。
 
+## 下一阶段覆盖目标
+
+当前数据库还只是平台基础持久化，不应被理解为最终字段能力。第一个俱乐部的 WPS 表格暴露了青训运营必须前置承接的字段和事实。
+
+下一阶段 migration 应优先补齐三类表：
+
+### 1. 标准运营字段
+
+- `student_contacts`
+- `student_operational_profiles`
+- `regions`
+- `schools`
+- `acquisition_channels`
+
+这些字段支撑渠道、区域、学校、学员状态、微信、联系人、负责教练和沟通阶段等高频查询。
+
+### 2. 业务事实表
+
+- `calendar_events`
+- `event_participants`
+- `payment_events`
+- `payment_reviews`
+- `lesson_credit_ledger`
+- `insurance_policies`
+- `communication_logs`
+- `attachments`
+- `player_assessments`
+- `assessment_scores`
+- `ability_metrics`
+- `player_metric_records`
+- `derived_metric_definitions`
+- `metric_lineages`
+
+收费、保险、出勤和评测不要只存汇总字段。列表需要的余额、保险到期和签到次数可以作为快照，但权威来源应是事实表和流水表。
+
+### 3. 扩展与同步表
+
+- `custom_field_definitions`
+- `custom_field_values`
+- `external_system_connections`
+- `external_table_mappings`
+- `external_field_mappings`
+- `external_sync_runs`
+- `external_raw_records`
+- `external_record_links`
+
+自定义字段值应使用类型化存储，支持筛选、导入校验、权限和报表。外部同步表负责承载 WPS、Excel 或未来其他表格系统的来源记录，不把外部表格形状写死进核心业务表。
+
 ## Club Scope 约束
 
 俱乐部内 repository 暴露：
