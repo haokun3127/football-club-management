@@ -4,6 +4,7 @@ import type { MembershipResolver } from "./auth/context.js";
 import { apiError } from "./http/errors.js";
 import { buildOpenApiDocument } from "./http/openapi.js";
 import { InMemoryStore, type ApiStore } from "./store.js";
+import { registerAppClientRoutes } from "./routes/app-client.routes.js";
 import { registerAssessmentRoutes } from "./routes/assessment.routes.js";
 import { registerCalendarRoutes } from "./routes/calendar.routes.js";
 import { createRouteContext } from "./routes/context.js";
@@ -51,6 +52,7 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
   app.get("/openapi.json", async () => buildOpenApiDocument());
 
   void app.register(registerPlatformRoutes, context);
+  void app.register(registerAppClientRoutes, context);
   void app.register(registerDataCapabilityRoutes, context);
   void app.register(registerCalendarRoutes, context);
   void app.register(registerTrainingRoutes, context);

@@ -34,6 +34,10 @@ describe("api server", () => {
     expect(body.paths["/app-clients/resolve"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/capabilities"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/app-clients"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/home"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/schedule"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/events/{eventId}"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/home"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/imports/excel/preview"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/students"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/students/{studentId}"]).toBeDefined();
@@ -119,6 +123,100 @@ describe("api server", () => {
       }),
     }));
     expect(missingClientResponse.statusCode).toBe(404);
+  });
+
+  it("serves client-scoped mini-program BFF contracts for parent and coach entrypoints", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    const parentHome = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/home",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    const parentSchedule = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/schedule?from=2026-07-01&to=2026-07-31",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    const parentEvent = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/events/event-training-1",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    const parentUsingAdminClient = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-admin/parent/students/student-1/home",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    const parentOtherStudent = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-other/home",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    const coachHome = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/home?date=2026-07-01",
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    const parentCoachHome = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/home?date=2026-07-01",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+
+    const homeBody = parentHome.json() as {
+      client: { id: string; channel: string };
+      role: string;
+      student: { id: string; lessonBalance?: number; insuranceStatus: Record<string, unknown> };
+      status: { studentId: string; lessonBalance?: number; insurance: Record<string, unknown> };
+      schedule: { upcoming: Array<{ id: string }>; recent: Array<{ id: string }> };
+      metrics: { latest: Array<{ metricId: string }>; trends: Array<{ metricId: string }> };
+    };
+    const scheduleBody = parentSchedule.json() as { events: Array<{ id: string; type: string }> };
+    const eventBody = parentEvent.json() as { role: string; event: { id: string; participants: Array<{ studentId: string }> } };
+    const coachBody = coachHome.json() as { role: string; workbench: { coachId: string; events: Array<{ id: string }> } };
+
+    expect(parentHome.statusCode).toBe(200);
+    expect(homeBody.client).toEqual(expect.objectContaining({
+      id: "app-client-cq-talent-wechat-main",
+      channel: "wechat_miniprogram",
+    }));
+    expect(homeBody.role).toBe("parent");
+    expect(homeBody.student).toEqual(expect.objectContaining({ id: "student-1" }));
+    expect(homeBody.status).toEqual(expect.objectContaining({ studentId: "student-1" }));
+    expect(homeBody.schedule.upcoming.map((event) => event.id)).toEqual(expect.arrayContaining(["event-training-1"]));
+    expect(homeBody.metrics.latest.length).toBeGreaterThan(0);
+    expect(homeBody.metrics.trends.length).toBeGreaterThan(0);
+    expect(parentSchedule.statusCode).toBe(200);
+    expect(scheduleBody.events.map((event) => event.id)).toEqual(expect.arrayContaining(["event-training-1", "event-match-1"]));
+    expect(parentEvent.statusCode).toBe(200);
+    expect(eventBody).toEqual(expect.objectContaining({
+      role: "parent",
+      event: expect.objectContaining({
+        id: "event-training-1",
+        participants: expect.arrayContaining([expect.objectContaining({ studentId: "student-1" })]),
+      }),
+    }));
+    expect(parentUsingAdminClient.statusCode).toBe(403);
+    expect(parentUsingAdminClient.json().error.code).toBe("forbidden");
+    expect(parentOtherStudent.statusCode).toBe(403);
+    expect(parentOtherStudent.json().error.code).toBe("forbidden");
+    expect(coachHome.statusCode).toBe(200);
+    expect(coachBody.role).toBe("coach");
+    expect(coachBody.workbench.coachId).toBe("coach-1");
+    expect(coachBody.workbench.events.map((event) => event.id)).toEqual(["event-training-1"]);
+    expect(parentCoachHome.statusCode).toBe(403);
+    expect(parentCoachHome.json().error.code).toBe("forbidden");
+
+    await app.close();
+    persistence.database.close();
   });
 
   it("computes a derived 进攻贡献 metric", async () => {

@@ -359,6 +359,88 @@ export const schemas = {
       },
     },
   },
+  appClientParams: {
+    params: {
+      type: "object",
+      additionalProperties: false,
+      required: ["clubId", "clientId"],
+      properties: {
+        clubId: { type: "string", minLength: 1 },
+        clientId: { type: "string", minLength: 1 },
+      },
+    },
+  },
+  appClientStudentParams: {
+    params: {
+      type: "object",
+      additionalProperties: false,
+      required: ["clubId", "clientId", "studentId"],
+      properties: {
+        clubId: { type: "string", minLength: 1 },
+        clientId: { type: "string", minLength: 1 },
+        studentId: { type: "string", minLength: 1 },
+      },
+    },
+  },
+  appClientEventParams: {
+    params: {
+      type: "object",
+      additionalProperties: false,
+      required: ["clubId", "clientId", "eventId"],
+      properties: {
+        clubId: { type: "string", minLength: 1 },
+        clientId: { type: "string", minLength: 1 },
+        eventId: { type: "string", minLength: 1 },
+      },
+    },
+  },
+  appClientScheduleQuery: {
+    querystring: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        from: { type: "string", minLength: 1 },
+        to: { type: "string", minLength: 1 },
+      },
+    },
+  },
+  appClientCoachHomeQuery: {
+    querystring: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        date: { type: "string", minLength: 10 },
+      },
+    },
+  },
+  appClientParentHome: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientParentSchedule: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientEventDetail: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientCoachHome: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
   clubTrainingSessionParams: {
     params: {
       type: "object",

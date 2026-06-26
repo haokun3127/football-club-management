@@ -105,6 +105,32 @@ export function buildOpenApiDocument() {
           ...schemas.clubAppClients,
         }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/home": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/home", {
+          ...schemas.appClientStudentParams,
+          ...schemas.appClientParentHome,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/schedule": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/schedule", {
+          ...schemas.appClientStudentParams,
+          ...schemas.appClientScheduleQuery,
+          ...schemas.appClientParentSchedule,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/events/{eventId}": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/events/{eventId}", {
+          ...schemas.appClientEventParams,
+          ...schemas.appClientEventDetail,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/home": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/home", {
+          ...schemas.appClientParams,
+          ...schemas.appClientCoachHomeQuery,
+          ...schemas.appClientCoachHome,
+        }),
+      },
       "/clubs/{clubId}/config": { get: operation("GET", "/clubs/{clubId}/config", schemas.clubConfig) },
       "/clubs/{clubId}/teams": { post: operation("POST", "/clubs/{clubId}/teams", schemas.createTeam) },
       "/clubs/{clubId}/teams/{teamId}/members": {
