@@ -29,6 +29,10 @@ import type {
   ParentProfile,
   PlayerAssessment,
   PlayerMetricRecord,
+  PrivacyFieldPolicy,
+  PrivacyNoticeVersion,
+  PrivacyRetentionPolicy,
+  StudentConsentRecord,
   SessionDelivery,
   SessionObservation,
   SessionPlan,
@@ -111,4 +115,8 @@ export interface SeedData {
   externalRecordLinks: ExternalRecordLink[];
   lessonLedger: LessonLedgerEntry[];
   insurancePolicies: InsurancePolicy[];
+  privacyFieldPolicies: PrivacyFieldPolicy[];
+  privacyNoticeVersions: PrivacyNoticeVersion[];
+  privacyRetentionPolicies: PrivacyRetentionPolicy[];
+  studentConsentRecords: StudentConsentRecord[];
 }

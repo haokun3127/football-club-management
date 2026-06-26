@@ -140,6 +140,22 @@ export async function seedPlatformData(repositories: PlatformRepositories, data:
   for (const rawRecord of data.externalRawRecords) {
     repositories.dataCapability.saveExternalRawRecord(rawRecord);
   }
+
+  for (const privacyFieldPolicy of data.privacyFieldPolicies) {
+    repositories.dataCapability.savePrivacyFieldPolicy(privacyFieldPolicy);
+  }
+
+  for (const privacyNoticeVersion of data.privacyNoticeVersions) {
+    repositories.dataCapability.savePrivacyNoticeVersion(privacyNoticeVersion);
+  }
+
+  for (const privacyRetentionPolicy of data.privacyRetentionPolicies) {
+    repositories.dataCapability.savePrivacyRetentionPolicy(privacyRetentionPolicy);
+  }
+
+  for (const studentConsentRecord of data.studentConsentRecords) {
+    repositories.dataCapability.saveStudentConsentRecord(studentConsentRecord);
+  }
 }
 
 export async function createPlatformPersistence(options: {

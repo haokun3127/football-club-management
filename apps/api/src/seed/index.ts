@@ -2,6 +2,7 @@ import { createAssessmentSeed } from "./assessment.js";
 import { createDataCapabilitySeed } from "./data-capability.js";
 import { createMatchSeed } from "./match.js";
 import { createPlatformSeed } from "./platform.js";
+import { createPrivacySeed } from "./privacy.js";
 import { createTrainingSeed } from "./training.js";
 import type { SeedData } from "./types.js";
 
@@ -14,5 +15,6 @@ export function createSeedData(): SeedData {
     ...createMatchSeed(),
     ...createAssessmentSeed(),
     ...createDataCapabilitySeed(),
+    ...createPrivacySeed(),
   };
 }

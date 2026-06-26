@@ -16,6 +16,7 @@ describe("platform persistence", () => {
       "0002_data_capability_foundation.sql",
       "0003_status_flow_audit_fields.sql",
       "0004_http_idempotency_records.sql",
+      "0005_privacy_foundation.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);
@@ -38,6 +39,12 @@ describe("platform persistence", () => {
           'external_raw_records',
           'external_record_links',
           'http_idempotency_records',
+          'privacy_field_policies',
+          'privacy_notice_versions',
+          'student_consent_records',
+          'privacy_audit_logs',
+          'privacy_requests',
+          'privacy_retention_policies',
           'metric_graph_versions',
           'metric_dependencies',
           'metric_views',
@@ -71,6 +78,12 @@ describe("platform persistence", () => {
       "metric_graph_versions",
       "metric_view_nodes",
       "metric_views",
+      "privacy_audit_logs",
+      "privacy_field_policies",
+      "privacy_notice_versions",
+      "privacy_requests",
+      "privacy_retention_policies",
+      "student_consent_records",
       "student_contacts",
       "student_operational_profiles",
     ]);

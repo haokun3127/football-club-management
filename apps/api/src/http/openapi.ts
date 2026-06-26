@@ -137,6 +137,18 @@ export function buildOpenApiDocument() {
           ...schemas.appClientGrowthSummary,
         }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/privacy": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/privacy", {
+          ...schemas.appClientStudentParams,
+          ...schemas.appClientPrivacyState,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/privacy/requests": {
+        post: operation("POST", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/privacy/requests", {
+          ...schemas.appClientStudentParams,
+          ...schemas.appClientPrivacyRequestCreate,
+        }),
+      },
       "/clubs/{clubId}/app-clients/{clientId}/events/{eventId}": {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/events/{eventId}", {
           ...schemas.appClientEventParams,
@@ -229,6 +241,48 @@ export function buildOpenApiDocument() {
       },
       "/clubs/{clubId}/admin/students/{studentId}": {
         get: operation("GET", "/clubs/{clubId}/admin/students/{studentId}", schemas.operationalStudentDetail),
+      },
+      "/clubs/{clubId}/admin/privacy": {
+        get: operation("GET", "/clubs/{clubId}/admin/privacy", {
+          ...schemas.clubParams,
+          ...schemas.privacyOverview,
+        }),
+      },
+      "/clubs/{clubId}/admin/privacy/audit-logs": {
+        get: operation("GET", "/clubs/{clubId}/admin/privacy/audit-logs", {
+          ...schemas.clubParams,
+          ...schemas.privacyAuditLogs,
+        }),
+      },
+      "/clubs/{clubId}/admin/privacy/retention/dry-run": {
+        get: operation("GET", "/clubs/{clubId}/admin/privacy/retention/dry-run", {
+          ...schemas.clubParams,
+          ...schemas.privacyRetentionDryRun,
+        }),
+      },
+      "/clubs/{clubId}/admin/privacy/export-preview": {
+        post: operation("POST", "/clubs/{clubId}/admin/privacy/export-preview", {
+          ...schemas.clubParams,
+          ...schemas.privacyExportPreview,
+        }),
+      },
+      "/clubs/{clubId}/admin/privacy/consents": {
+        put: operation("PUT", "/clubs/{clubId}/admin/privacy/consents", {
+          ...schemas.clubParams,
+          ...schemas.privacyConsentUpsert,
+        }),
+      },
+      "/clubs/{clubId}/admin/privacy/requests": {
+        get: operation("GET", "/clubs/{clubId}/admin/privacy/requests", {
+          ...schemas.clubParams,
+          ...schemas.privacyRequests,
+        }),
+      },
+      "/clubs/{clubId}/admin/privacy/requests/{requestId}": {
+        patch: operation("PATCH", "/clubs/{clubId}/admin/privacy/requests/{requestId}", {
+          ...schemas.clubPrivacyRequestParams,
+          ...schemas.privacyRequestResolve,
+        }),
       },
       "/clubs/{clubId}/students/{studentId}/status-summary": {
         get: operation("GET", "/clubs/{clubId}/students/{studentId}/status-summary", {

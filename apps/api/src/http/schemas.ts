@@ -362,6 +362,17 @@ export const schemas = {
       },
     },
   },
+  clubPrivacyRequestParams: {
+    params: {
+      type: "object",
+      additionalProperties: false,
+      required: ["clubId", "requestId"],
+      properties: {
+        clubId: { type: "string", minLength: 1 },
+        requestId: { type: "string", minLength: 1 },
+      },
+    },
+  },
   appClientParams: {
     params: {
       type: "object",
@@ -811,6 +822,148 @@ export const schemas = {
     },
   },
   operationalStudentDetail: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  privacyOverview: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+    },
+  },
+  privacyAuditLogs: {
+    response: {
+      200: {
+        type: "array",
+        items: flexibleObject,
+      },
+      403: errorResponse,
+    },
+  },
+  privacyRequests: {
+    response: {
+      200: {
+        type: "array",
+        items: flexibleObject,
+      },
+      403: errorResponse,
+    },
+  },
+  privacyRetentionDryRun: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+    },
+  },
+  privacyExportPreview: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["targetType", "targetId", "purpose", "fieldKeys"],
+      properties: {
+        targetType: { type: "string", enum: ["student"] },
+        targetId: { type: "string", minLength: 1 },
+        purpose: { type: "string", minLength: 1 },
+        fieldKeys: { type: "array", items: { type: "string", minLength: 1 } },
+      },
+    },
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  privacyConsentUpsert: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["studentId", "scope", "status"],
+      properties: {
+        studentId: { type: "string", minLength: 1 },
+        scope: {
+          type: "string",
+          enum: [
+            "core_training_service",
+            "schedule_attendance",
+            "assessment_metrics",
+            "match_stats",
+            "insurance_lesson_status",
+            "media_capture",
+            "media_public_share",
+            "ai_performance_analysis",
+            "ai_video_editing",
+            "marketing_contact",
+          ],
+        },
+        status: { type: "string", enum: ["granted", "withdrawn", "expired"] },
+        noticeVersionId: { type: "string", minLength: 1 },
+        guardianUserId: { type: "string", minLength: 1 },
+        relationship: { type: "string", minLength: 1 },
+        source: { type: "string", enum: ["admin_recorded", "parent_self_service", "external_import"] },
+        evidenceRef: { type: "string", minLength: 1 },
+        reason: { type: "string", minLength: 1 },
+      },
+    },
+    response: {
+      200: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
+    },
+  },
+  privacyRequestCreate: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["studentId", "requestType"],
+      properties: {
+        studentId: { type: "string", minLength: 1 },
+        requestType: { type: "string", enum: ["correction", "deletion", "withdraw_consent", "restrict_processing", "export_copy"] },
+        description: { type: "string" },
+      },
+    },
+    response: {
+      201: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
+    },
+  },
+  appClientPrivacyRequestCreate: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["requestType"],
+      properties: {
+        requestType: { type: "string", enum: ["correction", "deletion", "withdraw_consent", "restrict_processing", "export_copy"] },
+        description: { type: "string" },
+      },
+    },
+    response: {
+      201: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
+    },
+  },
+  privacyRequestResolve: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["status"],
+      properties: {
+        status: { type: "string", enum: ["in_review", "resolved", "rejected"] },
+        resolutionNote: { type: "string" },
+        resolvedByUserId: { type: "string", minLength: 1 },
+      },
+    },
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientPrivacyState: {
     response: {
       200: flexibleObject,
       403: errorResponse,

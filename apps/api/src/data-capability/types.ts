@@ -9,6 +9,15 @@ import type {
   MetricGraphVersion,
   MetricView,
   MetricViewNode,
+  PrivacyAuditLog,
+  PrivacyCapability,
+  PrivacyFieldPolicy,
+  PrivacyNoticeVersion,
+  PrivacyRequest,
+  PrivacyRequestStatus,
+  PrivacyRequestType,
+  PrivacyRetentionPolicy,
+  StudentConsentRecord,
 } from "@football-club/domain";
 
 export interface ExternalSystemConnection {
@@ -156,6 +165,9 @@ export interface DataCapabilityConfig {
   syncPolicies: ExternalSyncPolicy[];
   tableMappings: ExternalTableMapping[];
   fieldMappings: ExternalFieldMapping[];
+  privacyFieldPolicies: PrivacyFieldPolicy[];
+  privacyNoticeVersions: PrivacyNoticeVersion[];
+  privacyRetentionPolicies: PrivacyRetentionPolicy[];
 }
 
 export interface ClubCapabilities {
@@ -226,6 +238,73 @@ export interface ClubCapabilities {
     fieldMappings: ExternalFieldMapping[];
     latestSyncRuns: ExternalSyncRun[];
   };
+  privacy: PrivacyCapability;
+}
+
+export interface PrivacyConsentUpsertInput {
+  studentId: EntityId;
+  scope: StudentConsentRecord["scope"];
+  status: StudentConsentRecord["status"];
+  noticeVersionId?: EntityId;
+  guardianUserId?: EntityId;
+  relationship?: string;
+  source?: StudentConsentRecord["source"];
+  evidenceRef?: string;
+  reason?: string;
+}
+
+export interface PrivacyRequestCreateInput {
+  studentId: EntityId;
+  requestType: PrivacyRequestType;
+  description?: string;
+}
+
+export interface PrivacyRequestResolveInput {
+  status: Exclude<PrivacyRequestStatus, "open">;
+  resolutionNote?: string;
+  resolvedByUserId?: EntityId;
+}
+
+export interface PrivacyRetentionDryRunResult {
+  policies: PrivacyRetentionPolicy[];
+  candidates: Array<{
+    policyId: EntityId;
+    category: string;
+    action: PrivacyRetentionPolicy["action"];
+    targetType: string;
+    estimatedCount: number;
+  }>;
+}
+
+export interface PrivacyExportPreviewInput {
+  targetType: "student";
+  targetId: EntityId;
+  purpose: string;
+  fieldKeys: string[];
+}
+
+export interface PrivacyExportPreviewResult {
+  targetType: "student";
+  targetId: EntityId;
+  purpose: string;
+  allowedFieldKeys: string[];
+  deniedFieldKeys: string[];
+  redactedFieldKeys: string[];
+  data: Record<string, unknown>;
+}
+
+export interface PrivacyOverview {
+  fieldPolicies: PrivacyFieldPolicy[];
+  noticeVersions: PrivacyNoticeVersion[];
+  retentionPolicies: PrivacyRetentionPolicy[];
+}
+
+export interface StudentPrivacyState {
+  studentId: EntityId;
+  clubId: EntityId;
+  noticeVersion?: PrivacyNoticeVersion;
+  consents: StudentConsentRecord[];
+  requests: PrivacyRequest[];
 }
 
 export interface ImportPreviewFilters {

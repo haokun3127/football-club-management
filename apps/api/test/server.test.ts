@@ -1811,6 +1811,130 @@ describe("api server", () => {
     persistence.database.close();
   });
 
+  it("enforces platform-side minor privacy controls and audit trails", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    const capabilities = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/capabilities?appId=wx-cq-talent-main",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    const parentHome = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/home",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    const adminDetail = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/admin/students/student-1",
+      headers: { "x-user-id": "user-admin-1" },
+    });
+    const exportPreview = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/privacy/export-preview",
+      headers: { "x-user-id": "user-admin-1" },
+      payload: {
+        targetType: "student",
+        targetId: "student-1",
+        purpose: "guardian copy review",
+        fieldKeys: ["student.name", "contact.phone", "student.identityNumber"],
+      },
+    });
+    const parentPrivacy = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/privacy",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    const parentRequest = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/privacy/requests",
+      headers: { "x-user-id": "user-parent-1" },
+      payload: {
+        requestType: "correction",
+        description: "修正联系电话",
+      },
+    });
+    const auditLogs = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/admin/privacy/audit-logs",
+      headers: { "x-user-id": "user-admin-1" },
+    });
+    const adminRequests = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/admin/privacy/requests",
+      headers: { "x-user-id": "user-admin-1" },
+    });
+
+    const capabilityBody = capabilities.json() as {
+      privacy: {
+        features: Record<string, boolean>;
+        fieldVisibility: Array<{ fieldKey: string; dataClass: string }>;
+        consentScopes: Array<{ scope: string; enabledByDefault: boolean }>;
+      };
+    };
+    const homeBody = parentHome.json() as {
+      student: { primaryContact?: Record<string, unknown> };
+    };
+    const exportBody = exportPreview.json() as {
+      allowedFieldKeys: string[];
+      deniedFieldKeys: string[];
+      redactedFieldKeys: string[];
+      data: Record<string, unknown>;
+    };
+    const privacyBody = parentPrivacy.json() as { consents: Array<{ scope: string; status: string }> };
+    const auditBody = auditLogs.json() as Array<{ action: string; targetType: string; fieldKeys: string[] }>;
+    const requestBody = adminRequests.json() as Array<{ requestType: string; status: string; studentId: string }>;
+
+    expect(capabilities.statusCode).toBe(200);
+    expect(capabilityBody.privacy.features.aiPerformanceAnalysis).toBe(false);
+    expect(capabilityBody.privacy.consentScopes).toContainEqual(expect.objectContaining({
+      scope: "ai_video_editing",
+      enabledByDefault: false,
+    }));
+    expect(capabilityBody.privacy.fieldVisibility).toContainEqual(expect.objectContaining({
+      fieldKey: "student.identityNumber",
+      dataClass: "minor_sensitive",
+    }));
+    expect(parentHome.statusCode).toBe(200);
+    expect(homeBody.student.primaryContact).toEqual(expect.not.objectContaining({
+      phone: expect.anything(),
+      wechat: expect.anything(),
+    }));
+    expect(adminDetail.statusCode).toBe(200);
+    expect(exportPreview.statusCode).toBe(200);
+    expect(exportBody.allowedFieldKeys).toEqual(["student.name"]);
+    expect(exportBody.deniedFieldKeys).toEqual(expect.arrayContaining(["contact.phone", "student.identityNumber"]));
+    expect(exportBody.redactedFieldKeys).toEqual(["student.name"]);
+    expect(parentPrivacy.statusCode).toBe(200);
+    expect(privacyBody.consents).toContainEqual(expect.objectContaining({
+      scope: "core_training_service",
+      status: "granted",
+    }));
+    expect(parentRequest.statusCode).toBe(201);
+    expect(adminRequests.statusCode).toBe(200);
+    expect(requestBody).toContainEqual(expect.objectContaining({
+      requestType: "correction",
+      status: "open",
+      studentId: "student-1",
+    }));
+    expect(auditLogs.statusCode).toBe(200);
+    expect(auditBody).toEqual(expect.arrayContaining([
+      expect.objectContaining({ action: "read", targetType: "student" }),
+      expect.objectContaining({ action: "export", targetType: "student" }),
+      expect.objectContaining({ action: "request_create", targetType: "student" }),
+    ]));
+
+    await app.close();
+    persistence.database.close();
+  });
+
   it("returns a minimal OpenAPI document from the schema registry", async () => {
     const app = buildServer(undefined, { logger: false });
     const response = await app.inject({

@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import type { ClubUserRole } from "@football-club/domain";
+import type { PrivacyRequestCreateInput } from "../data-capability/types.js";
 import type { ClubAppClient, StudentDetail, StudentListItem } from "../data-capability/types.js";
 import { schemas } from "../http/schemas.js";
 import type { RouteContext } from "./context.js";
@@ -121,6 +122,75 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
           latestRuns: (await context.store.listExternalSyncRuns(request.params.clubId)).slice(0, 3),
         },
       };
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      studentId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/parent/students/:studentId/privacy",
+    {
+      schema: {
+        ...schemas.appClientStudentParams,
+        ...schemas.appClientPrivacyState,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "parent");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireStudentAccess(request, reply, request.params.clubId, request.params.studentId)) {
+        return reply;
+      }
+
+      return context.store.getStudentPrivacyState(request.params.clubId, request.params.studentId);
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      studentId: string;
+    };
+    Body: Omit<PrivacyRequestCreateInput, "studentId">;
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/parent/students/:studentId/privacy/requests",
+    {
+      schema: {
+        ...schemas.appClientStudentParams,
+        ...schemas.appClientPrivacyRequestCreate,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "parent");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireStudentAccess(request, reply, request.params.clubId, request.params.studentId)) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      try {
+        const privacyRequest = await context.store.createPrivacyRequest(request.params.clubId, {
+          ...request.body,
+          studentId: request.params.studentId,
+        }, auth?.user.id);
+        return reply.code(201).send(privacyRequest);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Privacy request creation failed";
+        return context.sendError(reply, 400, "invalid_privacy_request", message);
+      }
     },
   );
 
@@ -566,10 +636,22 @@ function summarizeStudent(student: StudentDetail | StudentListItem) {
     gender: student.gender,
     currentLevel: student.currentLevel,
     teams: student.teams,
-    primaryContact: student.primaryContact,
+    primaryContact: summarizeContact(student.primaryContact),
     lessonBalance: student.lessonBalance,
     insuranceStatus: student.insuranceStatus,
     attendanceSnapshot: student.attendanceSnapshot,
+  };
+}
+
+function summarizeContact(contact: Record<string, unknown> | undefined) {
+  if (!contact) {
+    return undefined;
+  }
+
+  return {
+    id: contact.id,
+    name: contact.name,
+    relationship: contact.relationship,
   };
 }
 

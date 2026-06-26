@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import {
   createAssessmentService,
   createMatchService,
@@ -34,6 +35,13 @@ import {
   type OtherActivity,
   type PlayerAssessment,
   type PlayerMetricRecord,
+  type PrivacyAuditLog,
+  type PrivacyFieldPolicy,
+  type PrivacyNoticeVersion,
+  type PrivacyRequest,
+  type PrivacyRetentionPolicy,
+  type PrivacyRole,
+  type StudentConsentRecord,
   type RecordAssessmentInput,
   type RecordMatchInput,
   type SessionDelivery,
@@ -67,6 +75,13 @@ import type {
   LessonAdjustmentInput,
   LessonLedgerEntry,
   LessonLedgerSummary,
+  PrivacyConsentUpsertInput,
+  PrivacyExportPreviewInput,
+  PrivacyExportPreviewResult,
+  PrivacyOverview,
+  PrivacyRequestCreateInput,
+  PrivacyRequestResolveInput,
+  PrivacyRetentionDryRunResult,
   RunExternalSyncPolicyResult,
   StageExternalImportInput,
   StageExternalImportResult,
@@ -95,6 +110,16 @@ export interface ApiStore {
   getClubCapabilities(clubId: EntityId, client?: { clientId?: EntityId; appId?: string; clientKey?: string }): ClubCapabilities | null | Promise<ClubCapabilities | null>;
   resolveAppClientCapabilities(input: { appId?: string; clientKey?: string }): { clubId: EntityId; clientId: EntityId; capabilities: ClubCapabilities } | null | Promise<{ clubId: EntityId; clientId: EntityId; capabilities: ClubCapabilities } | null>;
   getDataCapabilityConfig(clubId: EntityId): DataCapabilityConfig | Promise<DataCapabilityConfig>;
+  getPrivacyOverview(clubId: EntityId): PrivacyOverview | Promise<PrivacyOverview>;
+  getStudentPrivacyState(clubId: EntityId, studentId: EntityId): { studentId: EntityId; clubId: EntityId; noticeVersion?: PrivacyNoticeVersion; consents: StudentConsentRecord[]; requests: PrivacyRequest[] } | Promise<{ studentId: EntityId; clubId: EntityId; noticeVersion?: PrivacyNoticeVersion; consents: StudentConsentRecord[]; requests: PrivacyRequest[] }>;
+  upsertStudentConsent(clubId: EntityId, input: PrivacyConsentUpsertInput, actorUserId?: EntityId): StudentConsentRecord | Promise<StudentConsentRecord>;
+  createPrivacyRequest(clubId: EntityId, input: PrivacyRequestCreateInput, requestedByUserId?: EntityId): PrivacyRequest | Promise<PrivacyRequest>;
+  resolvePrivacyRequest(clubId: EntityId, requestId: EntityId, input: PrivacyRequestResolveInput): PrivacyRequest | null | Promise<PrivacyRequest | null>;
+  listPrivacyRequests(clubId: EntityId, studentId?: EntityId): PrivacyRequest[] | Promise<PrivacyRequest[]>;
+  listPrivacyAuditLogs(clubId: EntityId): PrivacyAuditLog[] | Promise<PrivacyAuditLog[]>;
+  recordPrivacyAudit(log: Omit<PrivacyAuditLog, "id" | "createdAt" | "updatedAt">): PrivacyAuditLog | Promise<PrivacyAuditLog>;
+  previewPrivacyExport(clubId: EntityId, input: PrivacyExportPreviewInput, role: PrivacyRole): PrivacyExportPreviewResult | null | Promise<PrivacyExportPreviewResult | null>;
+  dryRunPrivacyRetention(clubId: EntityId): PrivacyRetentionDryRunResult | Promise<PrivacyRetentionDryRunResult>;
   listClubAppClients(clubId: EntityId): ClubAppClient[] | Promise<ClubAppClient[]>;
   listExternalConnections(clubId: EntityId): ExternalSystemConnection[] | Promise<ExternalSystemConnection[]>;
   listExternalSyncPolicies(clubId: EntityId): ExternalSyncPolicy[] | Promise<ExternalSyncPolicy[]>;
@@ -409,7 +434,62 @@ function buildClubCapabilities(
       fieldMappings: config.fieldMappings,
       latestSyncRuns: latestSyncRuns.slice(0, 10),
     },
+    privacy: buildPrivacyCapability(config),
   };
+}
+
+const defaultConsentScopes = [
+  "core_training_service",
+  "schedule_attendance",
+  "assessment_metrics",
+  "match_stats",
+  "insurance_lesson_status",
+  "media_capture",
+  "media_public_share",
+  "ai_performance_analysis",
+  "ai_video_editing",
+  "marketing_contact",
+] as const;
+
+function buildPrivacyCapability(config: DataCapabilityConfig) {
+  const activeNotice = config.privacyNoticeVersions.find((notice) => notice.active);
+  const disabledOptionalScopes = new Set(["media_public_share", "ai_performance_analysis", "ai_video_editing"]);
+
+  return {
+    noticeVersion: activeNotice
+      ? {
+          id: activeNotice.id,
+          version: activeNotice.version,
+          title: activeNotice.title,
+          effectiveAt: activeNotice.effectiveAt,
+        }
+      : undefined,
+    consentScopes: defaultConsentScopes.map((scope) => ({
+      scope,
+      required: [
+        "core_training_service",
+        "schedule_attendance",
+        "assessment_metrics",
+        "match_stats",
+        "insurance_lesson_status",
+      ].includes(scope),
+      enabledByDefault: !disabledOptionalScopes.has(scope),
+    })),
+    fieldVisibility: config.privacyFieldPolicies.map((policy) => ({
+      fieldKey: policy.fieldKey,
+      dataClass: policy.dataClass,
+      visibleToRoles: policy.visibleToRoles,
+      exportable: policy.exportable,
+      redactionMode: policy.redactionMode,
+    })),
+    features: {
+      mediaCapture: true,
+      mediaPublicShare: false,
+      aiPerformanceAnalysis: false,
+      aiVideoEditing: false,
+    },
+    parentRequestTypes: ["correction", "deletion", "withdraw_consent", "restrict_processing", "export_copy"],
+  } satisfies ClubCapabilities["privacy"];
 }
 
 function stringArrayPolicy(policies: ClubPolicy[], key: ClubPolicy["key"], fallback: string[]): string[] {
@@ -438,6 +518,14 @@ function deriveLessonBalance(entries: LessonLedgerEntry[]): number {
         ? entry.balanceAfter
         : balance + entry.lessonDelta,
     0);
+}
+
+function latestLessonLedgerEntry(entries: LessonLedgerEntry[]): LessonLedgerEntry | undefined {
+  return [...entries].sort((left, right) =>
+    Date.parse(right.updatedAt) - Date.parse(left.updatedAt)
+    || Date.parse(right.occurredAt) - Date.parse(left.occurredAt)
+    || left.id.localeCompare(right.id),
+  )[0];
 }
 
 function deriveInsuranceCurrentStatus(policy: Pick<InsurancePolicy, "expiresAt" | "reviewStatus"> | undefined, now = new Date()): InsurancePolicy["currentStatus"] {
@@ -488,6 +576,8 @@ export abstract class SeedBackedStore implements ApiStore {
   protected readonly data: SeedData;
   private readonly counters = new Map<string, number>();
   private readonly httpIdempotencyRecords = new Map<string, HttpIdempotencyRecord>();
+  private readonly privacyAuditLogs: PrivacyAuditLog[] = [];
+  private readonly privacyRequests: PrivacyRequest[] = [];
 
   constructor(data: SeedData = createSeedData()) {
     this.data = data;
@@ -866,6 +956,181 @@ export abstract class SeedBackedStore implements ApiStore {
       syncPolicies: this.data.externalSyncPolicies.filter((item) => item.clubId === clubId),
       tableMappings: this.data.externalTableMappings.filter((item) => item.clubId === clubId),
       fieldMappings: this.data.externalFieldMappings.filter((item) => item.clubId === clubId),
+      privacyFieldPolicies: this.data.privacyFieldPolicies.filter((item) => item.clubId === clubId && item.active),
+      privacyNoticeVersions: this.data.privacyNoticeVersions.filter((item) => item.clubId === clubId),
+      privacyRetentionPolicies: this.data.privacyRetentionPolicies.filter((item) => item.clubId === clubId && item.active),
+    };
+  }
+
+  getPrivacyOverview(clubId: EntityId): PrivacyOverview {
+    const config = this.getDataCapabilityConfig(clubId);
+    return {
+      fieldPolicies: config.privacyFieldPolicies,
+      noticeVersions: config.privacyNoticeVersions,
+      retentionPolicies: config.privacyRetentionPolicies,
+    };
+  }
+
+  getStudentPrivacyState(clubId: EntityId, studentId: EntityId) {
+    return {
+      clubId,
+      studentId,
+      noticeVersion: this.data.privacyNoticeVersions.find((notice) => notice.clubId === clubId && notice.active),
+      consents: this.data.studentConsentRecords.filter((record) => record.clubId === clubId && record.studentId === studentId),
+      requests: this.privacyRequests.filter((request) => request.clubId === clubId && request.studentId === studentId),
+    };
+  }
+
+  upsertStudentConsent(clubId: EntityId, input: PrivacyConsentUpsertInput, actorUserId?: EntityId): StudentConsentRecord {
+    this.ensureStudentInClub(clubId, input.studentId);
+    const now = this.now();
+    const existing = this.data.studentConsentRecords.find((record) =>
+      record.clubId === clubId && record.studentId === input.studentId && record.scope === input.scope,
+    );
+    const statusChanged = existing?.status !== input.status;
+    const record: StudentConsentRecord = {
+      id: existing?.id ?? this.nextId("student-consent"),
+      clubId,
+      studentId: input.studentId,
+      scope: input.scope,
+      status: input.status,
+      noticeVersionId: input.noticeVersionId ?? existing?.noticeVersionId,
+      guardianUserId: input.guardianUserId ?? existing?.guardianUserId,
+      relationship: input.relationship ?? existing?.relationship,
+      source: input.source ?? existing?.source ?? "admin_recorded",
+      evidenceRef: input.evidenceRef ?? existing?.evidenceRef,
+      grantedAt: input.status === "granted" ? now : existing?.grantedAt,
+      withdrawnAt: input.status === "withdrawn" ? now : undefined,
+      createdAt: existing?.createdAt ?? now,
+      updatedAt: now,
+    };
+
+    upsertById(this.data.studentConsentRecords, record);
+    if (statusChanged) {
+      this.recordPrivacyAudit({
+        clubId,
+        actorUserId,
+        actorRole: actorUserId ? "admin" : "system",
+        action: "consent_change",
+        targetType: "student",
+        targetId: input.studentId,
+        fieldKeys: [`consent.${input.scope}`],
+        dataClasses: ["personal"],
+        purpose: input.reason ?? "privacy consent update",
+      });
+    }
+
+    return record;
+  }
+
+  createPrivacyRequest(clubId: EntityId, input: PrivacyRequestCreateInput, requestedByUserId?: EntityId): PrivacyRequest {
+    this.ensureStudentInClub(clubId, input.studentId);
+    const now = this.now();
+    const request: PrivacyRequest = {
+      id: this.nextId("privacy-request"),
+      clubId,
+      studentId: input.studentId,
+      requestType: input.requestType,
+      status: "open",
+      requestedByUserId,
+      description: input.description,
+      requestedAt: now,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    this.privacyRequests.push(request);
+    this.recordPrivacyAudit({
+      clubId,
+      actorUserId: requestedByUserId,
+      actorRole: requestedByUserId ? "parent" : "system",
+      action: "request_create",
+      targetType: "student",
+      targetId: input.studentId,
+      fieldKeys: [`privacy_request.${input.requestType}`],
+      dataClasses: ["personal"],
+      purpose: "privacy request created",
+    });
+    return request;
+  }
+
+  resolvePrivacyRequest(clubId: EntityId, requestId: EntityId, input: PrivacyRequestResolveInput): PrivacyRequest | null {
+    const existing = this.privacyRequests.find((request) => request.clubId === clubId && request.id === requestId);
+    if (!existing) {
+      return null;
+    }
+
+    const now = this.now();
+    const resolved: PrivacyRequest = {
+      ...existing,
+      status: input.status,
+      resolvedByUserId: input.resolvedByUserId,
+      resolutionNote: input.resolutionNote,
+      resolvedAt: input.status === "resolved" || input.status === "rejected" ? now : existing.resolvedAt,
+      updatedAt: now,
+    };
+    upsertById(this.privacyRequests, resolved);
+    this.recordPrivacyAudit({
+      clubId,
+      actorUserId: input.resolvedByUserId,
+      actorRole: input.resolvedByUserId ? "admin" : "system",
+      action: "request_resolve",
+      targetType: "student",
+      targetId: resolved.studentId,
+      fieldKeys: [`privacy_request.${resolved.requestType}`],
+      dataClasses: ["personal"],
+      purpose: input.resolutionNote ?? "privacy request resolved",
+    });
+    return resolved;
+  }
+
+  listPrivacyRequests(clubId: EntityId, studentId?: EntityId): PrivacyRequest[] {
+    return this.privacyRequests.filter((request) =>
+      request.clubId === clubId && (studentId ? request.studentId === studentId : true),
+    );
+  }
+
+  listPrivacyAuditLogs(clubId: EntityId): PrivacyAuditLog[] {
+    return this.privacyAuditLogs.filter((log) => log.clubId === clubId).sort((left, right) =>
+      Date.parse(right.createdAt) - Date.parse(left.createdAt),
+    );
+  }
+
+  recordPrivacyAudit(log: Omit<PrivacyAuditLog, "id" | "createdAt" | "updatedAt">): PrivacyAuditLog {
+    const now = this.now();
+    const entity: PrivacyAuditLog = {
+      id: this.nextId("privacy-audit"),
+      ...log,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.privacyAuditLogs.push(entity);
+    return entity;
+  }
+
+  previewPrivacyExport(clubId: EntityId, input: PrivacyExportPreviewInput, role: PrivacyRole): PrivacyExportPreviewResult | null {
+    if (input.targetType !== "student") {
+      return null;
+    }
+    const detail = this.getOperationalStudentDetail(clubId, input.targetId);
+    if (!detail) {
+      return null;
+    }
+
+    return buildPrivacyExportPreview(detail, input, role, this.getDataCapabilityConfig(clubId).privacyFieldPolicies);
+  }
+
+  dryRunPrivacyRetention(clubId: EntityId): PrivacyRetentionDryRunResult {
+    const policies = this.getDataCapabilityConfig(clubId).privacyRetentionPolicies;
+    return {
+      policies,
+      candidates: policies.map((policy) => ({
+        policyId: policy.id,
+        category: policy.category,
+        action: policy.action,
+        targetType: retentionTargetType(policy.category),
+        estimatedCount: estimateRetentionCandidates(this.data, clubId, policy.category),
+      })),
     };
   }
 
@@ -1185,9 +1450,7 @@ export abstract class SeedBackedStore implements ApiStore {
 
     const lessonLedger = this.data.lessonLedger.filter((entry) => entry.clubId === clubId && entry.studentId === studentId);
     const insurance = this.listInsurancePolicies(clubId, studentId);
-    const latestLessonEntry = [...lessonLedger].sort((left, right) =>
-      Date.parse(right.updatedAt) - Date.parse(left.updatedAt) || Date.parse(right.occurredAt) - Date.parse(left.occurredAt),
-    )[0];
+    const latestLessonEntry = latestLessonLedgerEntry(lessonLedger);
     const latestSyncRun = this.listExternalSyncRuns(clubId)[0];
 
     return {
@@ -1908,6 +2171,167 @@ export class PersistentApiStore extends SeedBackedStore {
     };
   }
 
+  override getPrivacyOverview(clubId: EntityId): PrivacyOverview {
+    const config = this.getDataCapabilityConfig(clubId);
+    return {
+      fieldPolicies: config.privacyFieldPolicies,
+      noticeVersions: config.privacyNoticeVersions,
+      retentionPolicies: config.privacyRetentionPolicies,
+    };
+  }
+
+  override getStudentPrivacyState(clubId: EntityId, studentId: EntityId) {
+    return {
+      clubId,
+      studentId,
+      noticeVersion: this.repositories.dataCapability.listPrivacyNoticeVersions(clubId).find((notice) => notice.active),
+      consents: this.repositories.dataCapability.listStudentConsentRecords(clubId, studentId),
+      requests: this.repositories.dataCapability.listPrivacyRequests(clubId, studentId),
+    };
+  }
+
+  override upsertStudentConsent(clubId: EntityId, input: PrivacyConsentUpsertInput, actorUserId?: EntityId): StudentConsentRecord {
+    if (!this.repositories.dataCapability.getStudentDetail(clubId, input.studentId)) {
+      throw new Error("Student not found for club.");
+    }
+    const now = new Date().toISOString();
+    const existing = this.repositories.dataCapability
+      .listStudentConsentRecords(clubId, input.studentId)
+      .find((record) => record.scope === input.scope);
+    const record: StudentConsentRecord = {
+      id: existing?.id ?? `student-consent-${randomUUID()}`,
+      clubId,
+      studentId: input.studentId,
+      scope: input.scope,
+      status: input.status,
+      noticeVersionId: input.noticeVersionId ?? existing?.noticeVersionId,
+      guardianUserId: input.guardianUserId ?? existing?.guardianUserId,
+      relationship: input.relationship ?? existing?.relationship,
+      source: input.source ?? existing?.source ?? "admin_recorded",
+      evidenceRef: input.evidenceRef ?? existing?.evidenceRef,
+      grantedAt: input.status === "granted" ? now : existing?.grantedAt,
+      withdrawnAt: input.status === "withdrawn" ? now : undefined,
+      createdAt: existing?.createdAt ?? now,
+      updatedAt: now,
+    };
+    this.repositories.dataCapability.saveStudentConsentRecord(record);
+    this.recordPrivacyAudit({
+      clubId,
+      actorUserId,
+      actorRole: actorUserId ? "admin" : "system",
+      action: "consent_change",
+      targetType: "student",
+      targetId: input.studentId,
+      fieldKeys: [`consent.${input.scope}`],
+      dataClasses: ["personal"],
+      purpose: input.reason ?? "privacy consent update",
+    });
+    return record;
+  }
+
+  override createPrivacyRequest(clubId: EntityId, input: PrivacyRequestCreateInput, requestedByUserId?: EntityId): PrivacyRequest {
+    if (!this.repositories.dataCapability.getStudentDetail(clubId, input.studentId)) {
+      throw new Error("Student not found for club.");
+    }
+    const now = new Date().toISOString();
+    const request: PrivacyRequest = {
+      id: `privacy-request-${randomUUID()}`,
+      clubId,
+      studentId: input.studentId,
+      requestType: input.requestType,
+      status: "open",
+      requestedByUserId,
+      description: input.description,
+      requestedAt: now,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.repositories.dataCapability.savePrivacyRequest(request);
+    this.recordPrivacyAudit({
+      clubId,
+      actorUserId: requestedByUserId,
+      actorRole: requestedByUserId ? "parent" : "system",
+      action: "request_create",
+      targetType: "student",
+      targetId: input.studentId,
+      fieldKeys: [`privacy_request.${input.requestType}`],
+      dataClasses: ["personal"],
+      purpose: "privacy request created",
+    });
+    return request;
+  }
+
+  override resolvePrivacyRequest(clubId: EntityId, requestId: EntityId, input: PrivacyRequestResolveInput): PrivacyRequest | null {
+    const existing = this.repositories.dataCapability.listPrivacyRequests(clubId).find((request) => request.id === requestId);
+    if (!existing) {
+      return null;
+    }
+    const now = new Date().toISOString();
+    const request: PrivacyRequest = {
+      ...existing,
+      status: input.status,
+      resolvedByUserId: input.resolvedByUserId,
+      resolutionNote: input.resolutionNote,
+      resolvedAt: input.status === "resolved" || input.status === "rejected" ? now : existing.resolvedAt,
+      updatedAt: now,
+    };
+    this.repositories.dataCapability.savePrivacyRequest(request);
+    this.recordPrivacyAudit({
+      clubId,
+      actorUserId: input.resolvedByUserId,
+      actorRole: input.resolvedByUserId ? "admin" : "system",
+      action: "request_resolve",
+      targetType: "student",
+      targetId: request.studentId,
+      fieldKeys: [`privacy_request.${request.requestType}`],
+      dataClasses: ["personal"],
+      purpose: input.resolutionNote ?? "privacy request resolved",
+    });
+    return request;
+  }
+
+  override listPrivacyRequests(clubId: EntityId, studentId?: EntityId) {
+    return this.repositories.dataCapability.listPrivacyRequests(clubId, studentId);
+  }
+
+  override listPrivacyAuditLogs(clubId: EntityId) {
+    return this.repositories.dataCapability.listPrivacyAuditLogs(clubId);
+  }
+
+  override recordPrivacyAudit(log: Omit<PrivacyAuditLog, "id" | "createdAt" | "updatedAt">): PrivacyAuditLog {
+    const now = new Date().toISOString();
+    const entity: PrivacyAuditLog = {
+      id: `privacy-audit-${randomUUID()}`,
+      ...log,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.repositories.dataCapability.savePrivacyAuditLog(entity);
+    return entity;
+  }
+
+  override previewPrivacyExport(clubId: EntityId, input: PrivacyExportPreviewInput, role: PrivacyRole): PrivacyExportPreviewResult | null {
+    const detail = this.repositories.dataCapability.getStudentDetail(clubId, input.targetId);
+    if (!detail) {
+      return null;
+    }
+    return buildPrivacyExportPreview(detail, input, role, this.getDataCapabilityConfig(clubId).privacyFieldPolicies);
+  }
+
+  override dryRunPrivacyRetention(clubId: EntityId): PrivacyRetentionDryRunResult {
+    const policies = this.getDataCapabilityConfig(clubId).privacyRetentionPolicies;
+    return {
+      policies,
+      candidates: policies.map((policy) => ({
+        policyId: policy.id,
+        category: policy.category,
+        action: policy.action,
+        targetType: retentionTargetType(policy.category),
+        estimatedCount: estimateRetentionCandidates(this.data, clubId, policy.category),
+      })),
+    };
+  }
+
   override listClubAppClients(clubId: EntityId) {
     return this.repositories.dataCapability.listClubAppClients(clubId);
   }
@@ -2266,6 +2690,117 @@ function validateExternalSyncPolicyInput(input: {
   }
 
   parseExternalSyncSchedule(input.schedule);
+}
+
+function buildPrivacyExportPreview(
+  detail: StudentDetail,
+  input: PrivacyExportPreviewInput,
+  role: PrivacyRole,
+  policies: PrivacyFieldPolicy[],
+): PrivacyExportPreviewResult {
+  const data = flattenStudentPrivacyData(detail);
+  const policyByKey = new Map(policies.map((policy) => [policy.fieldKey, policy]));
+  const allowedFieldKeys: string[] = [];
+  const deniedFieldKeys: string[] = [];
+  const redactedFieldKeys: string[] = [];
+  const output: Record<string, unknown> = {};
+
+  for (const fieldKey of input.fieldKeys) {
+    const policy = policyByKey.get(fieldKey);
+    if (!policy || !policy.exportable || !policy.visibleToRoles.includes(role)) {
+      deniedFieldKeys.push(fieldKey);
+      continue;
+    }
+
+    allowedFieldKeys.push(fieldKey);
+    const value = data[fieldKey];
+    output[fieldKey] = policy.redactionMode === "none" ? value : redactValue(value, policy.redactionMode);
+    if (policy.redactionMode !== "none") {
+      redactedFieldKeys.push(fieldKey);
+    }
+  }
+
+  return {
+    targetType: "student",
+    targetId: input.targetId,
+    purpose: input.purpose,
+    allowedFieldKeys,
+    deniedFieldKeys,
+    redactedFieldKeys,
+    data: output,
+  };
+}
+
+function flattenStudentPrivacyData(detail: StudentDetail): Record<string, unknown> {
+  return {
+    "student.name": detail.name,
+    "student.birthDate": detail.birthDate,
+    "student.currentLevel": detail.currentLevel,
+    "student.school": fieldValue(detail.operationalProfile, "schoolName") ?? fieldValue(detail.operationalProfile, "school"),
+    "student.identityNumber": fieldValue(detail.operationalProfile, "idDocumentHash") ?? fieldValue(detail.operationalProfile, "externalRef"),
+    "contact.phone": fieldValue(detail.primaryContact, "phone"),
+    "contact.wechat": fieldValue(detail.primaryContact, "wechat"),
+    "guardian.relationship": fieldValue(detail.primaryContact, "relationship"),
+    "insurance.status": detail.insuranceStatus,
+    "insurance.policyNumber": fieldValue(detail.insuranceStatus, "policyNumber"),
+    "lesson.balance": detail.lessonBalance,
+    "attendance.snapshot": detail.attendanceSnapshot,
+    "assessment.metrics": "available_via_metric_records",
+    "training.observation": "available_via_training_records",
+    "match.stats": "available_via_match_records",
+  };
+}
+
+function fieldValue(record: Record<string, unknown> | undefined, key: string): unknown {
+  return record ? record[key] : undefined;
+}
+
+function redactValue(value: unknown, mode: PrivacyFieldPolicy["redactionMode"]): unknown {
+  if (mode === "hide") {
+    return undefined;
+  }
+  if (mode === "summary_only") {
+    return value === undefined || value === null ? value : "[summary_only]";
+  }
+  if (mode === "mask") {
+    if (typeof value === "string") {
+      return value.length <= 2 ? "*".repeat(value.length) : `${value.slice(0, 1)}***${value.slice(-1)}`;
+    }
+    return value === undefined || value === null ? value : "[redacted]";
+  }
+  return value;
+}
+
+function retentionTargetType(category: string): string {
+  if (category.includes("external")) {
+    return "external_raw_record";
+  }
+  if (category.includes("contact")) {
+    return "student_contact";
+  }
+  if (category.includes("assessment")) {
+    return "assessment";
+  }
+  if (category.includes("attendance")) {
+    return "attendance";
+  }
+  return "student";
+}
+
+function estimateRetentionCandidates(data: SeedData, clubId: EntityId, category: string): number {
+  if (category === "external_raw_record") {
+    return data.externalRawRecords.filter((record) => record.clubId === clubId).length;
+  }
+  if (category === "guardian_contact") {
+    return data.students.filter((student) => student.clubId === clubId).length;
+  }
+  if (category === "assessment") {
+    return data.playerAssessments.filter((assessment) => assessment.clubId === clubId).length;
+  }
+  if (category === "attendance") {
+    return data.participants.filter((participant) => participant.clubId === clubId).length;
+  }
+  return data.students.filter((student) => student.clubId === clubId).length;
 }
 
 function parseExternalSyncSchedule(schedule: Record<string, unknown> | undefined): ExternalSyncSchedule {

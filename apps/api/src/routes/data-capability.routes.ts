@@ -3,6 +3,9 @@ import type {
   CreateExternalSyncPolicyInput,
   ExcelImportPreviewInput,
   ImportPreviewFilters,
+  PrivacyConsentUpsertInput,
+  PrivacyExportPreviewInput,
+  PrivacyRequestResolveInput,
   StudentListFilters,
   UpdateExternalSyncPolicyInput,
   WpsWebhookIngestionInput,
@@ -254,7 +257,196 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
         return context.sendError(reply, 404, "not_found", "Student not found");
       }
 
+      await auditRequest(context, request, reply, request.params.clubId, {
+        action: "read",
+        targetType: "student",
+        targetId: request.params.studentId,
+        fieldKeys: ["student.detail"],
+        dataClasses: ["personal", "sensitive", "minor_sensitive"],
+        purpose: "admin student detail read",
+      });
       return detail;
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+    };
+  }>(
+    "/clubs/:clubId/admin/privacy",
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.privacyOverview,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      return context.store.getPrivacyOverview(request.params.clubId);
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+    };
+  }>(
+    "/clubs/:clubId/admin/privacy/audit-logs",
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.privacyAuditLogs,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      return context.store.listPrivacyAuditLogs(request.params.clubId);
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+    };
+  }>(
+    "/clubs/:clubId/admin/privacy/retention/dry-run",
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.privacyRetentionDryRun,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      return context.store.dryRunPrivacyRetention(request.params.clubId);
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+    };
+    Body: PrivacyExportPreviewInput;
+  }>(
+    "/clubs/:clubId/admin/privacy/export-preview",
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.privacyExportPreview,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      const preview = await context.store.previewPrivacyExport(request.params.clubId, request.body, "admin");
+      if (!preview) {
+        return context.sendError(reply, 404, "not_found", "Export target not found");
+      }
+      await auditRequest(context, request, reply, request.params.clubId, {
+        action: "export",
+        targetType: request.body.targetType,
+        targetId: request.body.targetId,
+        fieldKeys: request.body.fieldKeys,
+        dataClasses: ["personal", "sensitive", "minor_sensitive"],
+        purpose: request.body.purpose,
+      });
+      return preview;
+    },
+  );
+
+  app.put<{
+    Params: {
+      clubId: string;
+    };
+    Body: PrivacyConsentUpsertInput;
+  }>(
+    "/clubs/:clubId/admin/privacy/consents",
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.privacyConsentUpsert,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      try {
+        return await context.store.upsertStudentConsent(request.params.clubId, request.body, auth?.user.id);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Consent update failed";
+        return context.sendError(reply, 400, "invalid_privacy_consent", message);
+      }
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+    };
+  }>(
+    "/clubs/:clubId/admin/privacy/requests",
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.privacyRequests,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      return context.store.listPrivacyRequests(request.params.clubId);
+    },
+  );
+
+  app.patch<{
+    Params: {
+      clubId: string;
+      requestId: string;
+    };
+    Body: PrivacyRequestResolveInput;
+  }>(
+    "/clubs/:clubId/admin/privacy/requests/:requestId",
+    {
+      schema: {
+        ...schemas.clubPrivacyRequestParams,
+        ...schemas.privacyRequestResolve,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      const resolved = await context.store.resolvePrivacyRequest(request.params.clubId, request.params.requestId, {
+        ...request.body,
+        resolvedByUserId: request.body.resolvedByUserId ?? auth?.user.id,
+      });
+      if (!resolved) {
+        return context.sendError(reply, 404, "not_found", "Privacy request not found");
+      }
+      return resolved;
     },
   );
 
@@ -474,11 +666,19 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       },
     },
     async (request, reply) => {
-      if (!await context.requireClubMembership(request, reply, request.params.clubId)) {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
 
-      return context.store.getImportPreview(request.params.clubId, request.query);
+      const preview = await context.store.getImportPreview(request.params.clubId, request.query);
+      await auditRequest(context, request, reply, request.params.clubId, {
+        action: "raw_preview",
+        targetType: "external_raw_record",
+        fieldKeys: ["external.rawRecord"],
+        dataClasses: ["sensitive"],
+        purpose: "admin import preview read",
+      });
+      return preview;
     },
   );
 
@@ -517,7 +717,7 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       },
     },
     async (request, reply) => {
-      if (!await context.requireClubMembership(request, reply, request.params.clubId)) {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
 
@@ -527,6 +727,14 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
         return context.sendError(reply, 404, "not_found", "Sync run not found");
       }
 
+      await auditRequest(context, request, reply, request.params.clubId, {
+        action: "raw_preview",
+        targetType: "external_sync_run",
+        targetId: request.params.syncRunId,
+        fieldKeys: ["external.rawRecord"],
+        dataClasses: ["sensitive"],
+        purpose: "admin sync run detail read",
+      });
       return detail;
     },
   );
@@ -546,7 +754,7 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       },
     },
     async (request, reply) => {
-      if (!await context.requireClubMembership(request, reply, request.params.clubId)) {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
 
@@ -567,7 +775,39 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
         return context.sendError(reply, 404, "not_found", "External raw record not found");
       }
 
+      await auditRequest(context, request, reply, request.params.clubId, {
+        action: "confirm_import",
+        targetType: request.body.targetType,
+        targetId: request.body.targetId,
+        fieldKeys: ["external.rawRecord"],
+        dataClasses: ["sensitive"],
+        purpose: "admin external record confirmation",
+      });
       return link;
     },
   );
+}
+
+async function auditRequest(
+  context: RouteContext,
+  request: Parameters<RouteContext["resolveClubAuth"]>[0],
+  reply: Parameters<RouteContext["resolveClubAuth"]>[1],
+  clubId: string,
+  input: {
+    action: Parameters<RouteContext["store"]["recordPrivacyAudit"]>[0]["action"];
+    targetType: string;
+    targetId?: string;
+    fieldKeys: string[];
+    dataClasses: Parameters<RouteContext["store"]["recordPrivacyAudit"]>[0]["dataClasses"];
+    purpose: string;
+  },
+) {
+  const auth = context.membershipResolver ? await context.resolveClubAuth(request, reply, clubId) : null;
+  await context.store.recordPrivacyAudit({
+    clubId,
+    actorUserId: auth?.user.id,
+    actorRole: auth?.membership.roles[0] ?? "system",
+    ...input,
+    requestId: request.id,
+  });
 }

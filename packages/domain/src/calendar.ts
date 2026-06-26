@@ -2,7 +2,10 @@ import type { AuditFields, EntityId, TimeRange } from "./primitives.js";
 import type { ClubScoped } from "./clubs.js";
 import { timeRangesOverlap } from "./primitives.js";
 import { Temporal } from "@js-temporal/polyfill";
-import { RRule, rrulestr, type Frequency } from "rrule";
+import rrulePackage from "rrule";
+import type { Frequency } from "rrule";
+
+const { RRule, rrulestr } = rrulePackage as typeof import("rrule");
 
 export type CalendarEventType = "training" | "match" | "other";
 export type CalendarEventStatus = "scheduled" | "cancelled" | "completed";

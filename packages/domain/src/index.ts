@@ -11,6 +11,7 @@ export * from "./metrics.js";
 export * from "./metric-graph-services.js";
 export * from "./metric-services.js";
 export * from "./ports.js";
+export * from "./privacy.js";
 export * from "./primitives.js";
 export * from "./teams.js";
 export * from "./training.js";

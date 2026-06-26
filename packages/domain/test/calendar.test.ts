@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { expandRecurringCalendarEvent, findScheduleConflicts } from "../src/index.js";
+import { expandRecurringCalendarEvent, expandRecurringTimeRanges, findScheduleConflicts } from "../src/index.js";
 
 describe("findScheduleConflicts", () => {
   it("detects time overlap for the same student or coach", () => {
@@ -101,5 +101,33 @@ describe("findScheduleConflicts", () => {
       seriesEventId: "event-training-series",
       occurrenceIndex: 1,
     }));
+  });
+
+  it("expands recurring time ranges using weekday rules", () => {
+    const ranges = expandRecurringTimeRanges({
+      startsAt: "2026-07-01T09:00:00Z",
+      endsAt: "2026-07-01T10:30:00Z",
+      recurrence: {
+        frequency: "weekly",
+        interval: 1,
+        count: 3,
+        byWeekday: ["WE"],
+      },
+    });
+
+    expect(ranges).toEqual([
+      {
+        startsAt: "2026-07-01T09:00:00Z",
+        endsAt: "2026-07-01T10:30:00Z",
+      },
+      {
+        startsAt: "2026-07-08T09:00:00Z",
+        endsAt: "2026-07-08T10:30:00Z",
+      },
+      {
+        startsAt: "2026-07-15T09:00:00Z",
+        endsAt: "2026-07-15T10:30:00Z",
+      },
+    ]);
   });
 });

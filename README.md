@@ -28,5 +28,6 @@ This repository uses Git for source control. Keep generated files, dependency fo
 - [功能设计与技术开发计划](docs/development-plan.md)
 - [开发窗口评估](docs/development-window-evaluation.md)
 - [后端集成评估](docs/backend-integration-evaluation.md)
+- [部署需求与运维关注点](docs/deployment-requirements.md)
 - [持久化基础](docs/persistence.md)
 - [WPS 数据同步接入分析](docs/wps-integration-analysis.md)

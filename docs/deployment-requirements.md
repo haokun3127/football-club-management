@@ -1,0 +1,91 @@
+# 部署需求与运维关注点
+
+本文档用于第一个小程序前端进场前的后端部署准入。目标是确保 API 可启动、可迁移、可健康检查，并能支撑约 500 日常用户的早期内测。
+
+## 运行时版本
+
+- Node.js：推荐 `24.x`；可接受已验证的 `22.12+`。不要使用未验证的奇数主版本作为部署基线。
+- pnpm：使用根目录 `package.json` 的 `packageManager`，当前为 `pnpm@10.33.0`。
+- 安装依赖必须使用锁文件：
+
+```bash
+pnpm install --frozen-lockfile
+```
+
+重点关注：
+
+- 项目使用 ESM 和 `moduleResolution: NodeNext`，部署前必须验证 CommonJS/ESM 依赖加载，尤其是日历重复规则依赖 `rrule`。
+- 项目使用 `node:sqlite`，部署 Node 版本必须支持该模块。
+
+## 环境变量
+
+| 变量 | 必填 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `DATABASE_URL` | 是 | `apps/api/data/dev.sqlite` | SQLite 数据库文件路径。生产/内测应使用明确的持久化路径。 |
+| `PORT` | 否 | `3000` | API 监听端口。 |
+| `HOST` | 否 | `127.0.0.1` | API 监听地址；容器或反向代理环境按部署拓扑设置。 |
+
+SQLite 文件所在目录必须满足：
+
+- API 进程用户有读写权限。
+- 磁盘空间有监控和告警。
+- 数据库文件和 WAL/临时文件目录在持久化卷上。
+- 有定期备份和恢复演练流程。
+
+## 部署前检查
+
+每次部署前必须执行：
+
+```bash
+pnpm install --frozen-lockfile
+pnpm check
+pnpm build
+DATABASE_URL=/path/to/app.sqlite pnpm --filter @football-club/api db:migrate
+DATABASE_URL=/path/to/app.sqlite PORT=3000 HOST=127.0.0.1 pnpm --filter @football-club/api start
+curl -fsS http://127.0.0.1:3000/health
+```
+
+健康检查期望：
+
+```json
+{
+  "status": "ok",
+  "service": "@football-club/api"
+}
+```
+
+如果 `pnpm check`、`pnpm build`、迁移或 `/health` 任一失败，不允许交给小程序前端联调。
+
+## 小程序准入 smoke
+
+使用临时 SQLite 数据库启动 API 后，至少抽查：
+
+- `GET /health`
+- `GET /openapi.json`
+- `GET /clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/home`，header `x-user-id: user-parent-1`
+- `GET /clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/schedule?from=2026-07-01&to=2026-07-31`，header `x-user-id: user-parent-1`
+- `GET /clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/events/event-training-1`，header `x-user-id: user-parent-1`
+- `GET /clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/home?date=2026-07-01`，header `x-user-id: user-coach-1`
+
+权限抽查：
+
+- 家长读取未绑定学生应返回 `403`。
+- 家长写训练、比赛、课时应返回 `403`。
+- 教练写 admin-only 球队管理应返回 `403`。
+- 跨 club 请求应返回 `403`。
+
+## 500 日常用户容量准入
+
+当前 SQLite 架构适合 500 日常用户的早期内测，但不等同于长期生产高并发架构。准入压测建议：
+
+- 对 parent home、parent schedule、event detail、coach home 做 50 并发、持续 5 分钟的 GET 压测。
+- 目标：业务错误数为 0，HTTP 5xx 为 0，p95 小于 300ms，本机内存无持续上涨。
+- 压测期间不要同时运行 WPS/Excel 大批量导入；批量导入应安排在低峰期。
+
+## 运维风险
+
+- SQLite 是单实例写入模型；多实例部署前必须迁移幂等记录和数据库写入策略，不能多个 API 实例直接写同一 SQLite 文件。
+- WPS/Excel 导入会占用 CPU、内存和数据库写入，应限制文件大小、导入频率和操作权限。
+- 反向代理必须保留 `x-user-id` 或未来真实认证头；不要缓存带用户权限的响应。
+- `/openapi.json` 可以短期公共缓存；其他业务 GET 响应按私有缓存处理。
+- 数据库备份必须覆盖数据库文件及相关 WAL 文件，并定期验证可恢复。

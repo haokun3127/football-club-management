@@ -10,6 +10,12 @@ import type {
   MetricGraphVersion,
   MetricView,
   MetricViewNode,
+  PrivacyAuditLog,
+  PrivacyFieldPolicy,
+  PrivacyNoticeVersion,
+  PrivacyRequest,
+  PrivacyRetentionPolicy,
+  StudentConsentRecord,
 } from "@football-club/domain";
 import type { DatabaseSync, SQLInputValue } from "node:sqlite";
 import type {
@@ -109,6 +115,14 @@ function deriveLessonBalance(entries: LessonLedgerEntry[]): number {
         ? entry.balanceAfter
         : balance + entry.lessonDelta,
     0);
+}
+
+function latestLessonLedgerEntry(entries: LessonLedgerEntry[]): LessonLedgerEntry | undefined {
+  return [...entries].sort((left, right) =>
+    Date.parse(right.updatedAt) - Date.parse(left.updatedAt)
+    || Date.parse(right.occurredAt) - Date.parse(left.occurredAt)
+    || left.id.localeCompare(right.id),
+  )[0];
 }
 
 function insuranceReviewStatus(row: SqlRow): InsurancePolicy["reviewStatus"] {
@@ -361,6 +375,66 @@ export class DataCapabilityRepository {
     return rows.map(mapExternalFieldMapping);
   }
 
+  listPrivacyFieldPolicies(clubId: EntityId): PrivacyFieldPolicy[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM privacy_field_policies
+      WHERE club_id = ? AND active = 1
+      ORDER BY field_key
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapPrivacyFieldPolicy);
+  }
+
+  listPrivacyNoticeVersions(clubId: EntityId): PrivacyNoticeVersion[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM privacy_notice_versions
+      WHERE club_id = ?
+      ORDER BY active DESC, effective_at DESC, version DESC
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapPrivacyNoticeVersion);
+  }
+
+  listPrivacyRetentionPolicies(clubId: EntityId): PrivacyRetentionPolicy[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM privacy_retention_policies
+      WHERE club_id = ? AND active = 1
+      ORDER BY category
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapPrivacyRetentionPolicy);
+  }
+
+  listStudentConsentRecords(clubId: EntityId, studentId: EntityId): StudentConsentRecord[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM student_consent_records
+      WHERE club_id = ? AND student_id = ?
+      ORDER BY scope
+    `).all(clubId, studentId) as SqlRow[];
+
+    return rows.map(mapStudentConsentRecord);
+  }
+
+  listPrivacyAuditLogs(clubId: EntityId): PrivacyAuditLog[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM privacy_audit_logs
+      WHERE club_id = ?
+      ORDER BY created_at DESC
+    `).all(clubId) as SqlRow[];
+
+    return rows.map(mapPrivacyAuditLog);
+  }
+
+  listPrivacyRequests(clubId: EntityId, studentId?: EntityId): PrivacyRequest[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM privacy_requests
+      WHERE club_id = ? AND (? IS NULL OR student_id = ?)
+      ORDER BY requested_at DESC, id DESC
+    `).all(clubId, studentId ?? null, studentId ?? null) as SqlRow[];
+
+    return rows.map(mapPrivacyRequest);
+  }
+
   listExternalSyncPolicies(clubId: EntityId): ExternalSyncPolicy[] {
     const rows = this.database.prepare(`
       SELECT * FROM external_sync_policies
@@ -576,7 +650,7 @@ export class DataCapabilityRepository {
 
     const lessonLedger = this.getLessonLedger(clubId, studentId);
     const insurance = this.listInsurancePolicies(clubId, studentId);
-    const latestLessonEntry = lessonLedger?.entries[0];
+    const latestLessonEntry = latestLessonLedgerEntry(lessonLedger?.entries ?? []);
     const latestSyncRun = this.listSyncRuns(clubId)[0];
 
     return {
@@ -883,6 +957,9 @@ export class DataCapabilityRepository {
       syncPolicies: this.listExternalSyncPolicies(clubId),
       tableMappings: this.listExternalTableMappings(clubId),
       fieldMappings: this.listExternalFieldMappings(clubId),
+      privacyFieldPolicies: this.listPrivacyFieldPolicies(clubId),
+      privacyNoticeVersions: this.listPrivacyNoticeVersions(clubId),
+      privacyRetentionPolicies: this.listPrivacyRetentionPolicies(clubId),
     };
   }
 
@@ -1080,6 +1157,183 @@ export class DataCapabilityRepository {
       entity.targetFieldKind,
       entity.required ? 1 : 0,
       entity.transform ? JSON.stringify(entity.transform) : null,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  savePrivacyFieldPolicy(entity: PrivacyFieldPolicy): void {
+    this.database.prepare(`
+      INSERT INTO privacy_field_policies (
+        id, club_id, field_key, label, subject_type, data_class, visible_to_roles_json,
+        exportable, retention_category, redaction_mode, active, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        field_key = excluded.field_key,
+        label = excluded.label,
+        subject_type = excluded.subject_type,
+        data_class = excluded.data_class,
+        visible_to_roles_json = excluded.visible_to_roles_json,
+        exportable = excluded.exportable,
+        retention_category = excluded.retention_category,
+        redaction_mode = excluded.redaction_mode,
+        active = excluded.active,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.fieldKey,
+      entity.label,
+      entity.subjectType,
+      entity.dataClass,
+      JSON.stringify(entity.visibleToRoles),
+      entity.exportable ? 1 : 0,
+      entity.retentionCategory,
+      entity.redactionMode,
+      entity.active ? 1 : 0,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  savePrivacyNoticeVersion(entity: PrivacyNoticeVersion): void {
+    this.database.prepare(`
+      INSERT INTO privacy_notice_versions (
+        id, club_id, version, title, content_ref, effective_at, active, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        version = excluded.version,
+        title = excluded.title,
+        content_ref = excluded.content_ref,
+        effective_at = excluded.effective_at,
+        active = excluded.active,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.version,
+      entity.title,
+      entity.contentRef ?? null,
+      entity.effectiveAt,
+      entity.active ? 1 : 0,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  savePrivacyRetentionPolicy(entity: PrivacyRetentionPolicy): void {
+    this.database.prepare(`
+      INSERT INTO privacy_retention_policies (
+        id, club_id, category, data_class, retention_days, action, active, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        category = excluded.category,
+        data_class = excluded.data_class,
+        retention_days = excluded.retention_days,
+        action = excluded.action,
+        active = excluded.active,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.category,
+      entity.dataClass,
+      entity.retentionDays ?? null,
+      entity.action,
+      entity.active ? 1 : 0,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  saveStudentConsentRecord(entity: StudentConsentRecord): void {
+    this.database.prepare(`
+      INSERT INTO student_consent_records (
+        id, club_id, student_id, scope, status, notice_version_id, guardian_user_id,
+        relationship, source, evidence_ref, granted_at, withdrawn_at, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(club_id, student_id, scope) DO UPDATE SET
+        status = excluded.status,
+        notice_version_id = excluded.notice_version_id,
+        guardian_user_id = excluded.guardian_user_id,
+        relationship = excluded.relationship,
+        source = excluded.source,
+        evidence_ref = excluded.evidence_ref,
+        granted_at = excluded.granted_at,
+        withdrawn_at = excluded.withdrawn_at,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.studentId,
+      entity.scope,
+      entity.status,
+      entity.noticeVersionId ?? null,
+      entity.guardianUserId ?? null,
+      entity.relationship ?? null,
+      entity.source,
+      entity.evidenceRef ?? null,
+      entity.grantedAt ?? null,
+      entity.withdrawnAt ?? null,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  savePrivacyAuditLog(entity: PrivacyAuditLog): void {
+    this.database.prepare(`
+      INSERT INTO privacy_audit_logs (
+        id, club_id, actor_user_id, actor_role, action, target_type, target_id,
+        field_keys_json, data_classes_json, purpose, request_id, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.actorUserId ?? null,
+      entity.actorRole ?? null,
+      entity.action,
+      entity.targetType,
+      entity.targetId ?? null,
+      JSON.stringify(entity.fieldKeys),
+      JSON.stringify(entity.dataClasses),
+      entity.purpose,
+      entity.requestId ?? null,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  savePrivacyRequest(entity: PrivacyRequest): void {
+    this.database.prepare(`
+      INSERT INTO privacy_requests (
+        id, club_id, student_id, request_type, status, requested_by_user_id,
+        resolved_by_user_id, description, resolution_note, requested_at,
+        resolved_at, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        status = excluded.status,
+        resolved_by_user_id = excluded.resolved_by_user_id,
+        resolution_note = excluded.resolution_note,
+        resolved_at = excluded.resolved_at,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.studentId,
+      entity.requestType,
+      entity.status,
+      entity.requestedByUserId ?? null,
+      entity.resolvedByUserId ?? null,
+      entity.description ?? null,
+      entity.resolutionNote ?? null,
+      entity.requestedAt,
+      entity.resolvedAt ?? null,
       entity.createdAt,
       entity.updatedAt,
     );
@@ -2232,6 +2486,107 @@ function mapExternalRawRecord(row: SqlRow): ExternalRawRecord {
     validationErrors: jsonArray(optionalString(row, "validation_errors_json")),
     normalizedPreview: jsonObject(optionalString(row, "normalized_preview_json")),
     importedAt: optionalString(row, "imported_at"),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapPrivacyFieldPolicy(row: SqlRow): PrivacyFieldPolicy {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    fieldKey: requireString(row, "field_key"),
+    label: requireString(row, "label"),
+    subjectType: requireString(row, "subject_type") as PrivacyFieldPolicy["subjectType"],
+    dataClass: requireString(row, "data_class") as PrivacyFieldPolicy["dataClass"],
+    visibleToRoles: (jsonArray(requireString(row, "visible_to_roles_json")) ?? []) as PrivacyFieldPolicy["visibleToRoles"],
+    exportable: booleanFromSql(row.exportable),
+    retentionCategory: requireString(row, "retention_category"),
+    redactionMode: requireString(row, "redaction_mode") as PrivacyFieldPolicy["redactionMode"],
+    active: booleanFromSql(row.active),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapPrivacyNoticeVersion(row: SqlRow): PrivacyNoticeVersion {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    version: requireString(row, "version"),
+    title: requireString(row, "title"),
+    contentRef: optionalString(row, "content_ref"),
+    effectiveAt: requireString(row, "effective_at"),
+    active: booleanFromSql(row.active),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapPrivacyRetentionPolicy(row: SqlRow): PrivacyRetentionPolicy {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    category: requireString(row, "category"),
+    dataClass: requireString(row, "data_class") as PrivacyRetentionPolicy["dataClass"],
+    retentionDays: optionalNumber(row, "retention_days"),
+    action: requireString(row, "action") as PrivacyRetentionPolicy["action"],
+    active: booleanFromSql(row.active),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapStudentConsentRecord(row: SqlRow): StudentConsentRecord {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    studentId: requireString(row, "student_id"),
+    scope: requireString(row, "scope") as StudentConsentRecord["scope"],
+    status: requireString(row, "status") as StudentConsentRecord["status"],
+    noticeVersionId: optionalString(row, "notice_version_id"),
+    guardianUserId: optionalString(row, "guardian_user_id"),
+    relationship: optionalString(row, "relationship"),
+    source: requireString(row, "source") as StudentConsentRecord["source"],
+    evidenceRef: optionalString(row, "evidence_ref"),
+    grantedAt: optionalString(row, "granted_at"),
+    withdrawnAt: optionalString(row, "withdrawn_at"),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapPrivacyAuditLog(row: SqlRow): PrivacyAuditLog {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    actorUserId: optionalString(row, "actor_user_id"),
+    actorRole: optionalString(row, "actor_role") as PrivacyAuditLog["actorRole"],
+    action: requireString(row, "action") as PrivacyAuditLog["action"],
+    targetType: requireString(row, "target_type"),
+    targetId: optionalString(row, "target_id"),
+    fieldKeys: (jsonArray(requireString(row, "field_keys_json")) ?? []) as string[],
+    dataClasses: (jsonArray(requireString(row, "data_classes_json")) ?? []) as PrivacyAuditLog["dataClasses"],
+    purpose: requireString(row, "purpose"),
+    requestId: optionalString(row, "request_id"),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapPrivacyRequest(row: SqlRow): PrivacyRequest {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    studentId: requireString(row, "student_id"),
+    requestType: requireString(row, "request_type") as PrivacyRequest["requestType"],
+    status: requireString(row, "status") as PrivacyRequest["status"],
+    requestedByUserId: optionalString(row, "requested_by_user_id"),
+    resolvedByUserId: optionalString(row, "resolved_by_user_id"),
+    description: optionalString(row, "description"),
+    resolutionNote: optionalString(row, "resolution_note"),
+    requestedAt: requireString(row, "requested_at"),
+    resolvedAt: optionalString(row, "resolved_at"),
     createdAt: requireString(row, "created_at"),
     updatedAt: requireString(row, "updated_at"),
   };
