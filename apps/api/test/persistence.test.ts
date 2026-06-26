@@ -10,9 +10,12 @@ describe("platform persistence", () => {
     const first = migrate(database);
     const second = migrate(database);
 
-    expect(first.applied).toEqual(["0001_platform_foundation.sql"]);
+    expect(first.applied).toEqual([
+      "0001_platform_foundation.sql",
+      "0002_data_capability_foundation.sql",
+    ]);
     expect(second.applied).toEqual([]);
-    expect(second.skipped).toEqual(["0001_platform_foundation.sql"]);
+    expect(second.skipped).toEqual(first.applied);
 
     database.close();
   });

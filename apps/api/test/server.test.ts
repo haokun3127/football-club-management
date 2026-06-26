@@ -19,6 +19,20 @@ describe("api server", () => {
     });
   });
 
+  it("returns an OpenAPI document", async () => {
+    const app = buildServer(undefined, { logger: false });
+    const response = await app.inject({
+      method: "GET",
+      url: "/openapi.json",
+    });
+
+    const body = response.json() as { openapi: string; paths: Record<string, unknown> };
+
+    expect(response.statusCode).toBe(200);
+    expect(body.openapi).toBe("3.1.0");
+    expect(body.paths["/clubs/{clubId}/assessments"]).toBeDefined();
+  });
+
   it("computes a derived attacking contribution metric", async () => {
     const app = buildServer(undefined, { logger: false });
     const response = await app.inject({
@@ -219,7 +233,12 @@ describe("api server", () => {
     });
 
     expect(response.statusCode).toBe(403);
-    expect(response.json()).toEqual({ error: "Active club membership required" });
+    expect(response.json()).toEqual({
+      error: {
+        code: "forbidden",
+        message: "Active club membership required",
+      },
+    });
 
     await app.close();
     persistence.database.close();

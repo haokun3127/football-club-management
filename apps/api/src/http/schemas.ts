@@ -18,12 +18,21 @@ const club = {
   },
 } as const;
 
-const errorResponse = {
+export const errorResponse = {
   type: "object",
   additionalProperties: false,
   required: ["error"],
   properties: {
-    error: { type: "string" },
+    error: {
+      type: "object",
+      additionalProperties: false,
+      required: ["code", "message"],
+      properties: {
+        code: { type: "string" },
+        message: { type: "string" },
+        details: { type: "array", items: { type: "object", additionalProperties: true } },
+      },
+    },
   },
 } as const;
 

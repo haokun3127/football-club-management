@@ -1,5 +1,6 @@
 import type { AuditFields, EntityId, ISODateTimeString } from "./primitives.js";
 import type { CatalogScoped, ClubScoped } from "./clubs.js";
+import { Graph, alg } from "@dagrejs/graphlib";
 
 export type MetricValueKind =
   | "rating_1_5"
@@ -125,6 +126,141 @@ export interface MetricLineage extends AuditFields, ClubScoped {
 export interface DerivedMetricResult {
   record: PlayerMetricRecord;
   lineage: MetricLineage;
+}
+
+export interface MetricGraphValidationResult {
+  graph: Graph;
+  calculationOrder: EntityId[];
+}
+
+export interface DeriveMetricGraphInput {
+  metrics: AbilityMetric[];
+  dependencies: MetricDependency[];
+  definitions: DerivedMetricDefinition[];
+  inputRecords: PlayerMetricRecord[];
+  clubId: EntityId;
+  studentId: EntityId;
+  now: ISODateTimeString;
+  nextRecordId(prefix?: string): EntityId;
+  nextLineageId(prefix?: string): EntityId;
+}
+
+export interface DeriveMetricGraphResult {
+  records: PlayerMetricRecord[];
+  lineages: MetricLineage[];
+}
+
+export function validateMetricGraph(metrics: AbilityMetric[], dependencies: MetricDependency[]): MetricGraphValidationResult {
+  const metricIds = new Set(metrics.map((metric) => metric.id));
+  const graph = new Graph({ directed: true });
+
+  for (const metric of metrics) {
+    graph.setNode(metric.id);
+  }
+
+  for (const dependency of dependencies) {
+    if (!metricIds.has(dependency.inputMetricId)) {
+      throw new Error(`Metric dependency ${dependency.id} references missing input metric ${dependency.inputMetricId}.`);
+    }
+
+    if (!metricIds.has(dependency.outputMetricId)) {
+      throw new Error(`Metric dependency ${dependency.id} references missing output metric ${dependency.outputMetricId}.`);
+    }
+
+    graph.setEdge(dependency.inputMetricId, dependency.outputMetricId, dependency);
+  }
+
+  if (!alg.isAcyclic(graph)) {
+    const cycles = alg.findCycles(graph).map((cycle) => cycle.join(" -> ")).join("; ");
+    throw new Error(`Metric graph contains cycle: ${cycles}`);
+  }
+
+  return {
+    graph,
+    calculationOrder: alg.topsort(graph),
+  };
+}
+
+export function validateDerivedMetricDefinitions(
+  metrics: AbilityMetric[],
+  dependencies: MetricDependency[],
+  definitions: DerivedMetricDefinition[],
+): void {
+  const metricIds = new Set(metrics.map((metric) => metric.id));
+  const dependencyEdges = new Set(dependencies.map((dependency) =>
+    `${dependency.inputMetricId}->${dependency.outputMetricId}`,
+  ));
+  const outputMetricIds = new Set<EntityId>();
+
+  for (const definition of definitions) {
+    if (!metricIds.has(definition.outputMetricId)) {
+      throw new Error(`Derived metric definition ${definition.id} references missing output metric ${definition.outputMetricId}.`);
+    }
+
+    if (outputMetricIds.has(definition.outputMetricId)) {
+      throw new Error(`Derived metric output ${definition.outputMetricId} has multiple definitions in one graph calculation.`);
+    }
+    outputMetricIds.add(definition.outputMetricId);
+
+    for (const inputMetricId of definition.inputMetricIds) {
+      if (!metricIds.has(inputMetricId)) {
+        throw new Error(`Derived metric definition ${definition.id} references missing input metric ${inputMetricId}.`);
+      }
+
+      if (!dependencyEdges.has(`${inputMetricId}->${definition.outputMetricId}`)) {
+        throw new Error(`Derived metric definition ${definition.id} input ${inputMetricId} is not declared in metric dependencies.`);
+      }
+    }
+  }
+}
+
+export function deriveMetricGraph(input: DeriveMetricGraphInput): DeriveMetricGraphResult {
+  const validation = validateMetricGraph(input.metrics, input.dependencies);
+  validateDerivedMetricDefinitions(input.metrics, input.dependencies, input.definitions);
+  const definitionsByOutputMetric = new Map(input.definitions.map((definition) => [definition.outputMetricId, definition]));
+  const recordsByMetric = latestMetricRecords(input.inputRecords, input.clubId, input.studentId);
+  const records: PlayerMetricRecord[] = [];
+  const lineages: MetricLineage[] = [];
+
+  for (const metricId of validation.calculationOrder) {
+    const definition = definitionsByOutputMetric.get(metricId);
+    if (!definition || recordsByMetric.has(metricId)) {
+      continue;
+    }
+
+    const definitionInputs = definition.inputMetricIds.map((inputMetricId) => recordsByMetric.get(inputMetricId));
+    if (definitionInputs.some((record) => !record)) {
+      continue;
+    }
+
+    const result = derivePlayerMetricRecord({
+      definition,
+      inputRecords: definitionInputs.filter((record): record is PlayerMetricRecord => Boolean(record)),
+      outputRecordId: input.nextRecordId("metric-record"),
+      lineageId: input.nextLineageId("metric-lineage"),
+      clubId: input.clubId,
+      studentId: input.studentId,
+      now: input.now,
+    });
+
+    recordsByMetric.set(result.record.metricId, result.record);
+    records.push(result.record);
+    lineages.push(result.lineage);
+  }
+
+  return { records, lineages };
+}
+
+function latestMetricRecords(records: PlayerMetricRecord[], clubId: EntityId, studentId: EntityId): Map<EntityId, PlayerMetricRecord> {
+  const result = new Map<EntityId, PlayerMetricRecord>();
+
+  for (const record of [...records].sort((left, right) => Date.parse(left.occurredAt) - Date.parse(right.occurredAt))) {
+    if (record.clubId === clubId && record.studentId === studentId) {
+      result.set(record.metricId, record);
+    }
+  }
+
+  return result;
 }
 
 export function getNumericMetricValue(value: MetricValue): number | null {

@@ -1,0 +1,541 @@
+CREATE TABLE IF NOT EXISTS student_contacts (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  student_id TEXT NOT NULL REFERENCES student_profiles(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  relationship TEXT NOT NULL,
+  phone TEXT,
+  wechat TEXT,
+  is_primary_contact INTEGER NOT NULL CHECK (is_primary_contact IN (0, 1)),
+  receives_notifications INTEGER NOT NULL CHECK (receives_notifications IN (0, 1)),
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_student_contacts_club_student
+  ON student_contacts (club_id, student_id, is_primary_contact);
+
+CREATE TABLE IF NOT EXISTS student_operational_profiles (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  student_id TEXT NOT NULL REFERENCES student_profiles(id) ON DELETE CASCADE,
+  external_ref TEXT,
+  id_document_hash TEXT,
+  region TEXT,
+  school TEXT,
+  acquisition_channel TEXT,
+  student_status TEXT,
+  communication_stage TEXT,
+  responsible_coach_id TEXT REFERENCES coach_profiles(id) ON DELETE SET NULL,
+  insurance_expires_at TEXT,
+  total_checkins INTEGER,
+  latest_checkin_at TEXT,
+  total_recharges INTEGER,
+  lesson_balance REAL,
+  notes TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE (club_id, student_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_student_operational_profiles_club_status
+  ON student_operational_profiles (club_id, student_status, region, school);
+
+CREATE TABLE IF NOT EXISTS custom_field_definitions (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  target TEXT NOT NULL,
+  key TEXT NOT NULL,
+  label TEXT NOT NULL,
+  value_kind TEXT NOT NULL,
+  required INTEGER NOT NULL CHECK (required IN (0, 1)),
+  options_json TEXT,
+  active INTEGER NOT NULL CHECK (active IN (0, 1)),
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE (club_id, target, key)
+);
+
+CREATE TABLE IF NOT EXISTS custom_field_values (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  definition_id TEXT NOT NULL REFERENCES custom_field_definitions(id) ON DELETE CASCADE,
+  target_type TEXT NOT NULL,
+  target_id TEXT NOT NULL,
+  value_text TEXT,
+  value_number REAL,
+  value_boolean INTEGER CHECK (value_boolean IN (0, 1)),
+  value_date TEXT,
+  value_json TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE (club_id, definition_id, target_type, target_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_custom_field_values_target
+  ON custom_field_values (club_id, target_type, target_id);
+
+CREATE TABLE IF NOT EXISTS calendar_events (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  type TEXT NOT NULL CHECK (type IN ('training', 'match', 'other')),
+  title TEXT NOT NULL,
+  starts_at TEXT NOT NULL,
+  ends_at TEXT NOT NULL,
+  timezone TEXT,
+  recurrence_rule_json TEXT,
+  location_id TEXT,
+  primary_team_id TEXT REFERENCES teams(id) ON DELETE SET NULL,
+  owner_coach_id TEXT REFERENCES coach_profiles(id) ON DELETE SET NULL,
+  status TEXT NOT NULL CHECK (status IN ('scheduled', 'cancelled', 'completed')),
+  notes TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_calendar_events_club_time
+  ON calendar_events (club_id, starts_at, ends_at, status);
+
+CREATE TABLE IF NOT EXISTS event_participants (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  event_id TEXT NOT NULL REFERENCES calendar_events(id) ON DELETE CASCADE,
+  student_id TEXT NOT NULL REFERENCES student_profiles(id) ON DELETE CASCADE,
+  status TEXT NOT NULL,
+  note TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE (club_id, event_id, student_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_event_participants_club_student
+  ON event_participants (club_id, student_id, status);
+
+CREATE TABLE IF NOT EXISTS attachments (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  owner_type TEXT NOT NULL,
+  owner_id TEXT NOT NULL,
+  file_name TEXT NOT NULL,
+  mime_type TEXT,
+  uri TEXT NOT NULL,
+  checksum TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS payment_events (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  student_id TEXT NOT NULL REFERENCES student_profiles(id) ON DELETE CASCADE,
+  occurred_at TEXT NOT NULL,
+  payment_type TEXT,
+  amount REAL,
+  lesson_hours REAL,
+  proof_attachment_id TEXT REFERENCES attachments(id) ON DELETE SET NULL,
+  status TEXT NOT NULL,
+  external_ref TEXT,
+  note TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_payment_events_club_student
+  ON payment_events (club_id, student_id, occurred_at, status);
+
+CREATE TABLE IF NOT EXISTS payment_reviews (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  payment_event_id TEXT NOT NULL REFERENCES payment_events(id) ON DELETE CASCADE,
+  review_stage TEXT NOT NULL,
+  reviewer_name TEXT,
+  reviewed_at TEXT,
+  approved INTEGER CHECK (approved IN (0, 1)),
+  actual_received REAL,
+  note TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS lesson_credit_ledger (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  student_id TEXT NOT NULL REFERENCES student_profiles(id) ON DELETE CASCADE,
+  team_id TEXT REFERENCES teams(id) ON DELETE SET NULL,
+  event_id TEXT REFERENCES calendar_events(id) ON DELETE SET NULL,
+  payment_event_id TEXT REFERENCES payment_events(id) ON DELETE SET NULL,
+  occurred_at TEXT NOT NULL,
+  entry_type TEXT NOT NULL CHECK (entry_type IN ('credit', 'debit', 'adjustment', 'external_snapshot')),
+  lesson_delta REAL NOT NULL,
+  balance_after REAL,
+  source TEXT NOT NULL,
+  note TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_lesson_credit_ledger_club_student
+  ON lesson_credit_ledger (club_id, student_id, occurred_at);
+
+CREATE TABLE IF NOT EXISTS insurance_policies (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  student_id TEXT NOT NULL REFERENCES student_profiles(id) ON DELETE CASCADE,
+  purchased_at TEXT,
+  expires_at TEXT NOT NULL,
+  policy_number TEXT,
+  provider TEXT,
+  sport TEXT,
+  approved INTEGER CHECK (approved IN (0, 1)),
+  external_ref TEXT,
+  note TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_insurance_policies_club_expiry
+  ON insurance_policies (club_id, student_id, expires_at);
+
+CREATE TABLE IF NOT EXISTS communication_logs (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  student_id TEXT NOT NULL REFERENCES student_profiles(id) ON DELETE CASCADE,
+  occurred_at TEXT NOT NULL,
+  channel TEXT,
+  stage TEXT,
+  contact_name TEXT,
+  operator_user_id TEXT REFERENCES user_accounts(id) ON DELETE SET NULL,
+  summary TEXT NOT NULL,
+  next_follow_up_at TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_communication_logs_club_student
+  ON communication_logs (club_id, student_id, occurred_at);
+
+CREATE TABLE IF NOT EXISTS ability_metrics (
+  id TEXT PRIMARY KEY,
+  scope TEXT NOT NULL CHECK (scope IN ('system', 'club')),
+  club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
+  base_item_id TEXT,
+  code TEXT NOT NULL,
+  name TEXT NOT NULL,
+  dimension_id TEXT NOT NULL,
+  value_kind TEXT NOT NULL,
+  metric_kind TEXT NOT NULL,
+  unit TEXT,
+  max_score REAL,
+  source_kinds_json TEXT,
+  version TEXT,
+  status TEXT,
+  description TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  CHECK ((scope = 'system' AND club_id IS NULL) OR (scope = 'club' AND club_id IS NOT NULL)),
+  UNIQUE (scope, club_id, code, version)
+);
+
+CREATE TABLE IF NOT EXISTS metric_graph_versions (
+  id TEXT PRIMARY KEY,
+  scope TEXT NOT NULL CHECK (scope IN ('system', 'club')),
+  club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
+  base_item_id TEXT,
+  name TEXT NOT NULL,
+  version TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('draft', 'active', 'archived')),
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  CHECK ((scope = 'system' AND club_id IS NULL) OR (scope = 'club' AND club_id IS NOT NULL))
+);
+
+CREATE TABLE IF NOT EXISTS metric_dependencies (
+  id TEXT PRIMARY KEY,
+  scope TEXT NOT NULL CHECK (scope IN ('system', 'club')),
+  club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
+  base_item_id TEXT,
+  graph_version_id TEXT NOT NULL REFERENCES metric_graph_versions(id) ON DELETE CASCADE,
+  output_metric_id TEXT NOT NULL REFERENCES ability_metrics(id) ON DELETE CASCADE,
+  input_metric_id TEXT NOT NULL REFERENCES ability_metrics(id) ON DELETE CASCADE,
+  formula_id TEXT,
+  weight REAL,
+  role TEXT,
+  sort_order INTEGER NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  CHECK ((scope = 'system' AND club_id IS NULL) OR (scope = 'club' AND club_id IS NOT NULL))
+);
+
+CREATE INDEX IF NOT EXISTS idx_metric_dependencies_graph_output
+  ON metric_dependencies (graph_version_id, output_metric_id, sort_order);
+
+CREATE TABLE IF NOT EXISTS metric_views (
+  id TEXT PRIMARY KEY,
+  scope TEXT NOT NULL CHECK (scope IN ('system', 'club')),
+  club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
+  base_item_id TEXT,
+  graph_version_id TEXT NOT NULL REFERENCES metric_graph_versions(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('draft', 'active', 'archived')),
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  CHECK ((scope = 'system' AND club_id IS NULL) OR (scope = 'club' AND club_id IS NOT NULL))
+);
+
+CREATE TABLE IF NOT EXISTS metric_view_nodes (
+  id TEXT PRIMARY KEY,
+  scope TEXT NOT NULL CHECK (scope IN ('system', 'club')),
+  club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
+  base_item_id TEXT,
+  view_id TEXT NOT NULL REFERENCES metric_views(id) ON DELETE CASCADE,
+  metric_id TEXT REFERENCES ability_metrics(id) ON DELETE SET NULL,
+  parent_view_node_id TEXT REFERENCES metric_view_nodes(id) ON DELETE CASCADE,
+  label TEXT NOT NULL,
+  sort_order INTEGER NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  CHECK ((scope = 'system' AND club_id IS NULL) OR (scope = 'club' AND club_id IS NOT NULL))
+);
+
+CREATE TABLE IF NOT EXISTS assessment_templates (
+  id TEXT PRIMARY KEY,
+  scope TEXT NOT NULL CHECK (scope IN ('system', 'club')),
+  club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
+  base_item_id TEXT,
+  name TEXT NOT NULL,
+  age_group TEXT,
+  team_level TEXT,
+  status TEXT NOT NULL CHECK (status IN ('active', 'inactive')),
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  CHECK ((scope = 'system' AND club_id IS NULL) OR (scope = 'club' AND club_id IS NOT NULL))
+);
+
+CREATE TABLE IF NOT EXISTS assessment_template_versions (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  template_id TEXT NOT NULL REFERENCES assessment_templates(id) ON DELETE CASCADE,
+  graph_version_id TEXT REFERENCES metric_graph_versions(id) ON DELETE SET NULL,
+  version TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('draft', 'active', 'archived')),
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE (club_id, template_id, version)
+);
+
+CREATE TABLE IF NOT EXISTS assessment_metric_bindings (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  template_version_id TEXT NOT NULL REFERENCES assessment_template_versions(id) ON DELETE CASCADE,
+  metric_id TEXT NOT NULL REFERENCES ability_metrics(id) ON DELETE CASCADE,
+  role TEXT NOT NULL CHECK (role IN ('input', 'output', 'reference', 'display_only')),
+  formula_id TEXT,
+  test_item_id TEXT,
+  max_score REAL,
+  weight REAL,
+  sort_order INTEGER NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_assessment_metric_bindings_version
+  ON assessment_metric_bindings (club_id, template_version_id, sort_order);
+
+CREATE TABLE IF NOT EXISTS assessment_test_items (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  metric_id TEXT NOT NULL REFERENCES ability_metrics(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  value_kind TEXT NOT NULL,
+  unit TEXT,
+  protocol TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS player_assessments (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  student_id TEXT NOT NULL REFERENCES student_profiles(id) ON DELETE CASCADE,
+  template_id TEXT NOT NULL REFERENCES assessment_templates(id) ON DELETE CASCADE,
+  template_version_id TEXT REFERENCES assessment_template_versions(id) ON DELETE SET NULL,
+  assessed_by_coach_id TEXT NOT NULL REFERENCES coach_profiles(id) ON DELETE CASCADE,
+  assessed_at TEXT NOT NULL,
+  event_id TEXT REFERENCES calendar_events(id) ON DELETE SET NULL,
+  summary TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS assessment_raw_results (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  assessment_id TEXT NOT NULL REFERENCES player_assessments(id) ON DELETE CASCADE,
+  test_item_id TEXT NOT NULL REFERENCES assessment_test_items(id) ON DELETE CASCADE,
+  metric_id TEXT NOT NULL REFERENCES ability_metrics(id) ON DELETE CASCADE,
+  value_json TEXT NOT NULL,
+  recorded_by_coach_id TEXT REFERENCES coach_profiles(id) ON DELETE SET NULL,
+  note TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS assessment_scores (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  assessment_id TEXT NOT NULL REFERENCES player_assessments(id) ON DELETE CASCADE,
+  metric_id TEXT NOT NULL REFERENCES ability_metrics(id) ON DELETE CASCADE,
+  value_json TEXT NOT NULL,
+  normalized_score REAL,
+  raw_result_id TEXT REFERENCES assessment_raw_results(id) ON DELETE SET NULL,
+  comment TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS player_metric_records (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  student_id TEXT NOT NULL REFERENCES student_profiles(id) ON DELETE CASCADE,
+  metric_id TEXT NOT NULL REFERENCES ability_metrics(id) ON DELETE CASCADE,
+  value_json TEXT NOT NULL,
+  source TEXT NOT NULL,
+  occurred_at TEXT NOT NULL,
+  event_id TEXT REFERENCES calendar_events(id) ON DELETE SET NULL,
+  assessment_id TEXT REFERENCES player_assessments(id) ON DELETE SET NULL,
+  template_version_id TEXT REFERENCES assessment_template_versions(id) ON DELETE SET NULL,
+  raw_result_id TEXT REFERENCES assessment_raw_results(id) ON DELETE SET NULL,
+  source_record_id TEXT,
+  recorded_by_coach_id TEXT REFERENCES coach_profiles(id) ON DELETE SET NULL,
+  visibility TEXT,
+  confidence REAL,
+  note TEXT,
+  lineage_id TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_player_metric_records_club_student
+  ON player_metric_records (club_id, student_id, metric_id, occurred_at);
+
+CREATE TABLE IF NOT EXISTS derived_metric_definitions (
+  id TEXT PRIMARY KEY,
+  scope TEXT NOT NULL CHECK (scope IN ('system', 'club')),
+  club_id TEXT REFERENCES clubs(id) ON DELETE CASCADE,
+  base_item_id TEXT,
+  code TEXT NOT NULL,
+  name TEXT NOT NULL,
+  output_metric_id TEXT NOT NULL REFERENCES ability_metrics(id) ON DELETE CASCADE,
+  method TEXT NOT NULL,
+  input_metric_ids_json TEXT NOT NULL,
+  version TEXT NOT NULL,
+  weights_json TEXT,
+  input_scale REAL,
+  max_score REAL,
+  rounding TEXT,
+  input_window_days INTEGER,
+  output_unit TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  CHECK ((scope = 'system' AND club_id IS NULL) OR (scope = 'club' AND club_id IS NOT NULL))
+);
+
+CREATE TABLE IF NOT EXISTS metric_lineages (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  output_record_id TEXT NOT NULL REFERENCES player_metric_records(id) ON DELETE CASCADE,
+  definition_id TEXT NOT NULL REFERENCES derived_metric_definitions(id) ON DELETE CASCADE,
+  definition_version TEXT NOT NULL,
+  input_record_ids_json TEXT NOT NULL,
+  computed_at TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS external_system_connections (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  provider TEXT NOT NULL,
+  name TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('active', 'inactive')),
+  credentials_ref TEXT,
+  settings_json TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS external_table_mappings (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  connection_id TEXT NOT NULL REFERENCES external_system_connections(id) ON DELETE CASCADE,
+  source_table_key TEXT NOT NULL,
+  target_kind TEXT NOT NULL,
+  version TEXT NOT NULL,
+  active INTEGER NOT NULL CHECK (active IN (0, 1)),
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE (club_id, connection_id, source_table_key, version)
+);
+
+CREATE TABLE IF NOT EXISTS external_field_mappings (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  table_mapping_id TEXT NOT NULL REFERENCES external_table_mappings(id) ON DELETE CASCADE,
+  source_field TEXT NOT NULL,
+  target_field TEXT NOT NULL,
+  value_kind TEXT,
+  required INTEGER NOT NULL CHECK (required IN (0, 1)),
+  transform_json TEXT,
+  sort_order INTEGER NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS external_sync_runs (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  connection_id TEXT REFERENCES external_system_connections(id) ON DELETE SET NULL,
+  table_mapping_id TEXT REFERENCES external_table_mappings(id) ON DELETE SET NULL,
+  source_version TEXT,
+  status TEXT NOT NULL CHECK (status IN ('pending', 'running', 'completed', 'failed')),
+  started_at TEXT NOT NULL,
+  finished_at TEXT,
+  created_count INTEGER NOT NULL DEFAULT 0,
+  updated_count INTEGER NOT NULL DEFAULT 0,
+  skipped_count INTEGER NOT NULL DEFAULT 0,
+  failed_count INTEGER NOT NULL DEFAULT 0,
+  error_json TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_external_sync_runs_club_status
+  ON external_sync_runs (club_id, status, started_at);
+
+CREATE TABLE IF NOT EXISTS external_raw_records (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  sync_run_id TEXT NOT NULL REFERENCES external_sync_runs(id) ON DELETE CASCADE,
+  table_mapping_id TEXT REFERENCES external_table_mappings(id) ON DELETE SET NULL,
+  external_record_id TEXT,
+  row_number INTEGER,
+  row_hash TEXT NOT NULL,
+  raw_json TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('pending', 'mapped', 'skipped', 'failed')),
+  error_json TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE (club_id, sync_run_id, row_hash)
+);
+
+CREATE TABLE IF NOT EXISTS external_record_links (
+  id TEXT PRIMARY KEY,
+  club_id TEXT NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  raw_record_id TEXT NOT NULL REFERENCES external_raw_records(id) ON DELETE CASCADE,
+  target_type TEXT NOT NULL,
+  target_id TEXT NOT NULL,
+  link_kind TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE (club_id, raw_record_id, target_type, target_id, link_kind)
+);

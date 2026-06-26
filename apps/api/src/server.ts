@@ -1,5 +1,8 @@
 import Fastify from "fastify";
+import type { FastifyError } from "fastify";
 import type { MembershipResolver } from "./auth/context.js";
+import { apiError } from "./http/errors.js";
+import { buildOpenApiDocument } from "./http/openapi.js";
 import { InMemoryStore, type ApiStore } from "./store.js";
 import { registerAssessmentRoutes } from "./routes/assessment.routes.js";
 import { registerCalendarRoutes } from "./routes/calendar.routes.js";
@@ -24,6 +27,25 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
     },
   });
   const context = createRouteContext(store, options.membershipResolver);
+
+  app.setErrorHandler((error: FastifyError, _request, reply) => {
+    if (error.validation) {
+      return reply.code(400).send(apiError(
+        "bad_request",
+        "Request validation failed",
+        error.validation as unknown[],
+      ));
+    }
+
+    const statusCode = error.statusCode ?? 500;
+
+    return reply.code(statusCode).send(apiError(
+      statusCode < 500 ? "bad_request" : "internal_error",
+      error.message,
+    ));
+  });
+
+  app.get("/openapi.json", async () => buildOpenApiDocument());
 
   void app.register(registerPlatformRoutes, context);
   void app.register(registerCalendarRoutes, context);

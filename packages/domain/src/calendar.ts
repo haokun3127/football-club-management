@@ -1,6 +1,8 @@
 import type { AuditFields, EntityId, TimeRange } from "./primitives.js";
 import type { ClubScoped } from "./clubs.js";
 import { timeRangesOverlap } from "./primitives.js";
+import { Temporal } from "@js-temporal/polyfill";
+import { rrulestr } from "rrule";
 
 export type CalendarEventType = "training" | "match" | "other";
 export type CalendarEventStatus = "scheduled" | "cancelled" | "completed";
@@ -23,6 +25,17 @@ export interface CalendarEvent extends AuditFields, ClubScoped {
   ownerCoachId?: EntityId;
   status: CalendarEventStatus;
   notes?: string;
+}
+
+export interface RecurrenceRule {
+  rrule: string;
+  timezone: string;
+  startsAt: string;
+}
+
+export interface CalendarEventOccurrence extends CalendarEvent {
+  seriesEventId: EntityId;
+  occurrenceIndex: number;
 }
 
 export interface EventParticipant extends AuditFields, ClubScoped {
@@ -61,4 +74,43 @@ export function findScheduleConflicts(
       existingEventId: item.eventId,
       candidateEventId: candidate.eventId,
     }));
+}
+
+export function expandRecurringCalendarEvent(input: {
+  event: CalendarEvent;
+  recurrence: RecurrenceRule;
+  range: TimeRange;
+  maxOccurrences?: number;
+}): CalendarEventOccurrence[] {
+  const startsAt = Temporal.Instant.from(input.event.timeRange.startsAt);
+  const endsAt = Temporal.Instant.from(input.event.timeRange.endsAt);
+  const durationMilliseconds = endsAt.epochMilliseconds - startsAt.epochMilliseconds;
+
+  if (durationMilliseconds <= 0) {
+    throw new Error(`Calendar event ${input.event.id} must end after it starts.`);
+  }
+
+  const rule = rrulestr(input.recurrence.rrule, {
+    dtstart: new Date(input.recurrence.startsAt),
+    tzid: input.recurrence.timezone,
+  });
+  const occurrenceStarts = rule
+    .between(new Date(input.range.startsAt), new Date(input.range.endsAt), true)
+    .slice(0, input.maxOccurrences ?? 100);
+
+  return occurrenceStarts.map((occurrenceStart, index) => {
+    const occurrenceStartInstant = Temporal.Instant.from(occurrenceStart.toISOString());
+    const occurrenceEndInstant = occurrenceStartInstant.add({ milliseconds: durationMilliseconds });
+
+    return {
+      ...input.event,
+      id: `${input.event.id}#${index + 1}`,
+      seriesEventId: input.event.id,
+      occurrenceIndex: index + 1,
+      timeRange: {
+        startsAt: occurrenceStartInstant.toString(),
+        endsAt: occurrenceEndInstant.toString(),
+      },
+    };
+  });
 }

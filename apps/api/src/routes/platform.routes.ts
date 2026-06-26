@@ -27,7 +27,7 @@ export async function registerPlatformRoutes(app: FastifyInstance, context: Rout
       const config = await context.store.getClubConfig(request.params.clubId);
 
       if (!config) {
-        return reply.code(404).send({ error: "Club not found" });
+        return context.sendError(reply, 404, "not_found", "Club not found");
       }
 
       return config;
