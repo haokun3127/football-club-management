@@ -33,6 +33,9 @@ describe("api server", () => {
     expect(body.openapi).toBe("3.1.0");
     expect(body.paths["/clubs/{clubId}/capabilities"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/imports/excel/preview"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/admin/students"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/admin/students/{studentId}"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/admin/sync-runs/{syncRunId}"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/assessments"]).toBeDefined();
   });
 
@@ -136,6 +139,18 @@ describe("api server", () => {
       method: "GET",
       url: "/clubs/club-chongqing-talent/admin/sync-runs",
     });
+    const syncRunDetailResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/admin/sync-runs/external-sync-run-cq-talent",
+    });
+    const studentListResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/admin/students?teamId=team-u10-dev&coachId=coach-1",
+    });
+    const studentDetailResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/admin/students/student-1",
+    });
 
     const config = configResponse.json() as {
       metricGraphVersions: Array<{ id: string }>;
@@ -146,6 +161,17 @@ describe("api server", () => {
     };
     const preview = previewResponse.json() as { records: Array<{ id: string; reviewStatus: string }> };
     const syncRuns = syncRunsResponse.json() as Array<{ id: string; status: string }>;
+    const syncRunDetail = syncRunDetailResponse.json() as {
+      syncRun: { id: string };
+      rawRecords: Array<{ id: string }>;
+      validationSummary: { totalRecords: number; pendingRecords: number };
+    };
+    const students = studentListResponse.json() as Array<{ id: string; teams: Array<{ teamId: string }> }>;
+    const studentDetail = studentDetailResponse.json() as {
+      id: string;
+      primaryContact?: { phone?: string };
+      teams: Array<{ teamId: string }>;
+    };
 
     expect(configResponse.statusCode).toBe(200);
     expect(config.metricGraphVersions).toEqual([expect.objectContaining({ id: "metric-graph-version-chongqing-talent" })]);
@@ -176,6 +202,18 @@ describe("api server", () => {
       }),
     ]);
     expect(syncRuns).toEqual([expect.objectContaining({ id: "external-sync-run-cq-talent", status: "completed" })]);
+    expect(syncRunDetailResponse.statusCode).toBe(200);
+    expect(syncRunDetail.syncRun.id).toBe("external-sync-run-cq-talent");
+    expect(syncRunDetail.rawRecords).toEqual([expect.objectContaining({ id: "external-raw-student-cq-talent" })]);
+    expect(syncRunDetail.validationSummary).toEqual(expect.objectContaining({ totalRecords: 1, pendingRecords: 1 }));
+    expect(studentListResponse.statusCode).toBe(200);
+    expect(students).toEqual([expect.objectContaining({ id: "student-1" })]);
+    expect(studentDetailResponse.statusCode).toBe(200);
+    expect(studentDetail).toEqual(expect.objectContaining({
+      id: "student-1",
+      primaryContact: expect.objectContaining({ phone: "13800000000" }),
+      teams: expect.arrayContaining([expect.objectContaining({ teamId: "team-u10-dev" })]),
+    }));
   });
 
   it("stages Excel imports through field mappings with row-hash idempotency", async () => {

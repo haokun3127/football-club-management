@@ -1,10 +1,61 @@
 import type { FastifyInstance } from "fastify";
-import type { ExcelImportPreviewInput, ImportPreviewFilters } from "../data-capability/types.js";
+import type { ExcelImportPreviewInput, ImportPreviewFilters, StudentListFilters } from "../data-capability/types.js";
 import { schemas } from "../http/schemas.js";
 import { readExcelWorksheetRecords } from "../integration/excel-import.js";
 import type { RouteContext } from "./context.js";
 
 export async function registerDataCapabilityRoutes(app: FastifyInstance, context: RouteContext) {
+  app.get<{
+    Params: {
+      clubId: string;
+    };
+    Querystring: StudentListFilters;
+  }>(
+    "/clubs/:clubId/admin/students",
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.adminStudentListQuery,
+        ...schemas.operationalStudentList,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+
+      return context.store.listOperationalStudents(request.params.clubId, request.query);
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      studentId: string;
+    };
+  }>(
+    "/clubs/:clubId/admin/students/:studentId",
+    {
+      schema: {
+        ...schemas.clubStudentParams,
+        ...schemas.operationalStudentDetail,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+
+      const detail = await context.store.getOperationalStudentDetail(request.params.clubId, request.params.studentId);
+
+      if (!detail) {
+        return context.sendError(reply, 404, "not_found", "Student not found");
+      }
+
+      return detail;
+    },
+  );
+
   app.get<{
     Params: {
       clubId: string;
@@ -104,6 +155,34 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
     },
   );
 
+  app.get<{
+    Params: {
+      clubId: string;
+      syncRunId: string;
+    };
+  }>(
+    "/clubs/:clubId/admin/sync-runs/:syncRunId",
+    {
+      schema: {
+        ...schemas.clubSyncRunParams,
+        ...schemas.syncRunDetail,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubMembership(request, reply, request.params.clubId)) {
+        return reply;
+      }
+
+      const detail = await context.store.getExternalSyncRunDetail(request.params.clubId, request.params.syncRunId);
+
+      if (!detail) {
+        return context.sendError(reply, 404, "not_found", "Sync run not found");
+      }
+
+      return detail;
+    },
+  );
+
   app.post<{
     Params: {
       clubId: string;
@@ -123,14 +202,21 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
         return reply;
       }
 
-      const link = await context.store.confirmExternalRecord(
-        request.params.clubId,
-        request.params.rawRecordId,
-        request.body,
-      );
+      let link;
+
+      try {
+        link = await context.store.confirmExternalRecord(
+          request.params.clubId,
+          request.params.rawRecordId,
+          request.body,
+        );
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "External raw record confirmation failed";
+        return context.sendError(reply, 400, "invalid_external_record", message);
+      }
 
       if (!link) {
-        return reply.code(404).send({ error: "External raw record not found" });
+        return context.sendError(reply, 404, "not_found", "External raw record not found");
       }
 
       return link;

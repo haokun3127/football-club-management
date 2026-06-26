@@ -51,6 +51,10 @@ import type {
   ImportPreviewFilters,
   StageExternalImportInput,
   StageExternalImportResult,
+  StudentDetail,
+  StudentListFilters,
+  StudentListItem,
+  SyncRunDetail,
 } from "./data-capability/types.js";
 import { createApiServices } from "./application/services.js";
 import type { PlatformRepositories } from "./persistence/platform-persistence.js";
@@ -66,6 +70,9 @@ export interface ApiStore {
   getImportPreview(clubId: EntityId, filters?: ImportPreviewFilters): ImportPreview | Promise<ImportPreview>;
   stageExternalImport(clubId: EntityId, input: StageExternalImportInput): StageExternalImportResult | Promise<StageExternalImportResult>;
   listExternalSyncRuns(clubId: EntityId): ExternalSyncRun[] | Promise<ExternalSyncRun[]>;
+  getExternalSyncRunDetail(clubId: EntityId, syncRunId: EntityId): SyncRunDetail | null | Promise<SyncRunDetail | null>;
+  listOperationalStudents(clubId: EntityId, filters?: StudentListFilters): StudentListItem[] | Promise<StudentListItem[]>;
+  getOperationalStudentDetail(clubId: EntityId, studentId: EntityId): StudentDetail | null | Promise<StudentDetail | null>;
   confirmExternalRecord(
     clubId: EntityId,
     rawRecordId: EntityId,
@@ -631,6 +638,100 @@ export abstract class SeedBackedStore implements ApiStore {
       .sort((left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt));
   }
 
+  getExternalSyncRunDetail(clubId: EntityId, syncRunId: EntityId): SyncRunDetail | null {
+    const syncRun = this.data.externalSyncRuns.find((item) => item.clubId === clubId && item.id === syncRunId);
+
+    if (!syncRun) {
+      return null;
+    }
+
+    const rawRecords = this.data.externalRawRecords.filter((item) => item.clubId === clubId && item.syncRunId === syncRunId);
+    const invalidRecords = rawRecords.filter((record) => record.validationErrors?.length).length;
+
+    return {
+      syncRun,
+      rawRecords,
+      validationSummary: {
+        totalRecords: rawRecords.length,
+        validRecords: rawRecords.length - invalidRecords,
+        invalidRecords,
+        pendingRecords: rawRecords.filter((record) => record.reviewStatus === "pending").length,
+        confirmedRecords: rawRecords.filter((record) => record.reviewStatus === "confirmed" || record.reviewStatus === "linked").length,
+        rejectedRecords: rawRecords.filter((record) => record.reviewStatus === "rejected").length,
+      },
+    };
+  }
+
+  listOperationalStudents(clubId: EntityId, filters: StudentListFilters = {}): StudentListItem[] {
+    return this.data.students
+      .filter((student) => student.clubId === clubId)
+      .map((student) => this.getOperationalStudentDetail(clubId, student.id))
+      .filter((student): student is StudentDetail => Boolean(student))
+      .filter((student) => (filters.teamId ? student.teams.some((team) => team.teamId === filters.teamId) : true))
+      .filter((student) => (filters.coachId ? student.teams.some((team) => team.defaultCoachId === filters.coachId) : true))
+      .filter((student) => (filters.studentStatus ? student.operationalProfile?.studentStatus === filters.studentStatus : true))
+      .filter((student) => (filters.school ? student.operationalProfile?.school === filters.school : true))
+      .filter((student) => (filters.lessonBalanceLow ? typeof student.lessonBalance === "number" && student.lessonBalance <= 4 : true));
+  }
+
+  getOperationalStudentDetail(clubId: EntityId, studentId: EntityId): StudentDetail | null {
+    const student = this.data.students.find((item) => item.clubId === clubId && item.id === studentId);
+
+    if (!student) {
+      return null;
+    }
+
+    const teams = this.data.teamMembers
+      .filter((member) => member.clubId === clubId && member.studentId === studentId)
+      .map((member) => {
+        const team = this.data.teams.find((item) => item.clubId === clubId && item.id === member.teamId);
+        const coach = team?.defaultCoachId
+          ? this.data.coaches.find((item) => item.clubId === clubId && item.id === team.defaultCoachId)
+          : undefined;
+
+        return {
+          membershipId: member.id,
+          teamId: member.teamId,
+          name: team?.name,
+          ageGroup: team?.ageGroup,
+          level: team?.level,
+          defaultCoachId: team?.defaultCoachId,
+          defaultCoachName: coach?.name,
+          startsAt: member.startsAt,
+          endsAt: member.endsAt,
+          isPrimaryTeam: member.isPrimaryTeam,
+          status: member.status,
+        };
+      });
+    const primaryContact = this.data.parents.find((parent) =>
+      this.data.guardianBindings.some((binding) =>
+        binding.clubId === clubId && binding.studentId === studentId && binding.parentId === parent.id && binding.isPrimaryContact,
+      ),
+    );
+
+    return {
+      id: student.id,
+      clubId: student.clubId,
+      name: student.name,
+      birthDate: student.birthDate,
+      gender: student.gender,
+      currentLevel: student.currentLevel,
+      operationalProfile: undefined,
+      teams,
+      primaryContact: primaryContact
+        ? { id: primaryContact.id, name: primaryContact.name, phone: primaryContact.phone, relationship: "guardian" }
+        : undefined,
+      contacts: primaryContact
+        ? [{ id: primaryContact.id, name: primaryContact.name, phone: primaryContact.phone, relationship: "guardian" }]
+        : [],
+      lessonBalance: undefined,
+      lessonLedger: [],
+      insuranceStatus: {},
+      insurancePolicies: [],
+      attendanceSnapshot: {},
+    };
+  }
+
   confirmExternalRecord(
     clubId: EntityId,
     rawRecordId: EntityId,
@@ -640,6 +741,17 @@ export abstract class SeedBackedStore implements ApiStore {
 
     if (!rawRecord) {
       return null;
+    }
+
+    if (rawRecord.validationErrors?.length) {
+      throw new Error("Cannot confirm external record with validation errors.");
+    }
+
+    const existingLink = this.data.externalRecordLinks.find((item) =>
+      item.clubId === clubId && item.rawRecordId === rawRecordId && item.linkStatus === "confirmed",
+    );
+    if (existingLink) {
+      return existingLink;
     }
 
     const now = this.now();
@@ -960,6 +1072,18 @@ export class PersistentApiStore extends SeedBackedStore {
 
   override listExternalSyncRuns(clubId: EntityId) {
     return this.repositories.dataCapability.listSyncRuns(clubId);
+  }
+
+  override getExternalSyncRunDetail(clubId: EntityId, syncRunId: EntityId) {
+    return this.repositories.dataCapability.getSyncRunDetail(clubId, syncRunId);
+  }
+
+  override listOperationalStudents(clubId: EntityId, filters: StudentListFilters = {}) {
+    return this.repositories.dataCapability.listStudents(clubId, filters);
+  }
+
+  override getOperationalStudentDetail(clubId: EntityId, studentId: EntityId) {
+    return this.repositories.dataCapability.getStudentDetail(clubId, studentId);
   }
 
   override stageExternalImport(clubId: EntityId, input: StageExternalImportInput): StageExternalImportResult {

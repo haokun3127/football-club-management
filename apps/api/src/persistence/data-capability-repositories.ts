@@ -23,6 +23,10 @@ import type {
   ExternalTableMapping,
   ImportPreview,
   ImportPreviewFilters,
+  StudentDetail,
+  StudentListFilters,
+  StudentListItem,
+  SyncRunDetail,
 } from "../data-capability/types.js";
 
 type SqlRow = Record<string, unknown>;
@@ -169,6 +173,180 @@ export class DataCapabilityRepository {
     return rows.map(mapExternalSyncRun);
   }
 
+  getSyncRunDetail(clubId: EntityId, syncRunId: EntityId): SyncRunDetail | null {
+    const syncRunRow = this.database.prepare(`
+      SELECT * FROM external_sync_runs
+      WHERE club_id = ? AND id = ?
+    `).get(clubId, syncRunId) as SqlRow | undefined;
+
+    if (!syncRunRow) {
+      return null;
+    }
+
+    const rawRows = this.database.prepare(`
+      SELECT * FROM external_raw_records
+      WHERE club_id = ? AND sync_run_id = ?
+      ORDER BY external_record_id
+    `).all(clubId, syncRunId) as SqlRow[];
+    const rawRecords = rawRows.map(mapExternalRawRecord);
+    const invalidRecords = rawRecords.filter((record) => record.validationErrors?.length).length;
+
+    return {
+      syncRun: mapExternalSyncRun(syncRunRow),
+      rawRecords,
+      validationSummary: {
+        totalRecords: rawRecords.length,
+        validRecords: rawRecords.length - invalidRecords,
+        invalidRecords,
+        pendingRecords: rawRecords.filter((record) => record.reviewStatus === "pending").length,
+        confirmedRecords: rawRecords.filter((record) => record.reviewStatus === "confirmed" || record.reviewStatus === "linked").length,
+        rejectedRecords: rawRecords.filter((record) => record.reviewStatus === "rejected").length,
+      },
+    };
+  }
+
+  listStudents(clubId: EntityId, filters: StudentListFilters = {}): StudentListItem[] {
+    const where = ["s.club_id = ?"];
+    const params: unknown[] = [clubId];
+
+    if (filters.studentStatus) {
+      where.push("op.student_status = ?");
+      params.push(filters.studentStatus);
+    }
+
+    if (filters.school) {
+      where.push("op.school = ?");
+      params.push(filters.school);
+    }
+
+    if (filters.coachId) {
+      where.push(`(
+        op.responsible_coach_id = ?
+        OR EXISTS (
+          SELECT 1 FROM team_members tm
+          JOIN teams t ON t.id = tm.team_id AND t.club_id = tm.club_id
+          WHERE tm.club_id = s.club_id
+            AND tm.student_id = s.id
+            AND tm.status = 'active'
+            AND t.default_coach_id = ?
+        )
+      )`);
+      params.push(filters.coachId, filters.coachId);
+    }
+
+    if (filters.teamId) {
+      where.push(`EXISTS (
+        SELECT 1 FROM team_members tm
+        WHERE tm.club_id = s.club_id
+          AND tm.student_id = s.id
+          AND tm.team_id = ?
+          AND tm.status = 'active'
+      )`);
+      params.push(filters.teamId);
+    }
+
+    if (filters.insuranceExpiringSoon) {
+      where.push("op.insurance_expires_at IS NOT NULL AND op.insurance_expires_at <= date('now', '+30 days')");
+    }
+
+    if (filters.lessonBalanceLow) {
+      where.push("op.lesson_balance IS NOT NULL AND op.lesson_balance <= 4");
+    }
+
+    const rows = this.database.prepare(`
+      SELECT s.id
+      FROM student_profiles s
+      LEFT JOIN student_operational_profiles op
+        ON op.club_id = s.club_id AND op.student_id = s.id
+      WHERE ${where.join(" AND ")}
+      ORDER BY s.name, s.id
+    `).all(...params) as SqlRow[];
+
+    return rows
+      .map((row) => this.getStudentDetail(clubId, requireString(row, "id")))
+      .filter((detail): detail is StudentDetail => Boolean(detail));
+  }
+
+  getStudentDetail(clubId: EntityId, studentId: EntityId): StudentDetail | null {
+    const student = this.database.prepare(`
+      SELECT * FROM student_profiles
+      WHERE club_id = ? AND id = ?
+    `).get(clubId, studentId) as SqlRow | undefined;
+
+    if (!student) {
+      return null;
+    }
+
+    const operationalProfile = this.database.prepare(`
+      SELECT * FROM student_operational_profiles
+      WHERE club_id = ? AND student_id = ?
+    `).get(clubId, studentId) as SqlRow | undefined;
+    const contacts = this.database.prepare(`
+      SELECT * FROM student_contacts
+      WHERE club_id = ? AND student_id = ?
+      ORDER BY is_primary_contact DESC, id
+    `).all(clubId, studentId) as SqlRow[];
+    const teams = this.database.prepare(`
+      SELECT
+        tm.id,
+        tm.team_id,
+        t.name,
+        t.age_group,
+        t.level,
+        t.default_coach_id,
+        c.name AS default_coach_name,
+        tm.starts_at,
+        tm.ends_at,
+        tm.is_primary_team,
+        tm.status
+      FROM team_members tm
+      JOIN teams t ON t.club_id = tm.club_id AND t.id = tm.team_id
+      LEFT JOIN coach_profiles c ON c.club_id = t.club_id AND c.id = t.default_coach_id
+      WHERE tm.club_id = ? AND tm.student_id = ?
+      ORDER BY tm.is_primary_team DESC, tm.starts_at DESC
+    `).all(clubId, studentId) as SqlRow[];
+    const lessonLedger = this.database.prepare(`
+      SELECT * FROM lesson_credit_ledger
+      WHERE club_id = ? AND student_id = ?
+      ORDER BY occurred_at DESC, id DESC
+    `).all(clubId, studentId) as SqlRow[];
+    const insurancePolicies = this.database.prepare(`
+      SELECT * FROM insurance_policies
+      WHERE club_id = ? AND student_id = ?
+      ORDER BY expires_at DESC, id DESC
+    `).all(clubId, studentId) as SqlRow[];
+    const op = operationalProfile ? mapOperationalProfile(operationalProfile) : undefined;
+    const latestInsurance = insurancePolicies[0] ? mapInsurancePolicy(insurancePolicies[0]) : undefined;
+    const primaryContact = contacts.find((contact) => booleanFromSql(contact.is_primary_contact));
+
+    return {
+      id: requireString(student, "id"),
+      clubId: requireString(student, "club_id"),
+      name: requireString(student, "name"),
+      birthDate: requireString(student, "birth_date"),
+      gender: optionalString(student, "gender"),
+      currentLevel: optionalString(student, "current_level"),
+      operationalProfile: op,
+      teams: teams.map(mapStudentTeam),
+      primaryContact: primaryContact ? mapStudentContact(primaryContact) : undefined,
+      contacts: contacts.map(mapStudentContact),
+      lessonBalance: optionalNumber(operationalProfile ?? {}, "lesson_balance"),
+      lessonLedger: lessonLedger.map(mapLessonLedger),
+      insuranceStatus: {
+        expiresAt: op?.insuranceExpiresAt ?? latestInsurance?.expiresAt,
+        approved: latestInsurance?.approved,
+        policyNumber: latestInsurance?.policyNumber,
+      },
+      insurancePolicies: insurancePolicies.map(mapInsurancePolicy),
+      attendanceSnapshot: {
+        totalCheckins: op?.totalCheckins,
+        latestCheckinAt: op?.latestCheckinAt,
+        lessonBalance: op?.lessonBalance,
+        stage: op?.communicationStage,
+      },
+    };
+  }
+
   getImportPreview(clubId: EntityId, filters: ImportPreviewFilters = {}): ImportPreview {
     const rows = this.database.prepare(`
       SELECT * FROM external_raw_records
@@ -210,6 +388,17 @@ export class DataCapabilityRepository {
     const rawRecord = mapExternalRawRecord(existing);
     if (rawRecord.validationErrors?.length) {
       throw new Error("Cannot confirm external record with validation errors.");
+    }
+
+    const existingLink = this.database.prepare(`
+      SELECT * FROM external_record_links
+      WHERE club_id = ? AND raw_record_id = ? AND link_status = 'confirmed'
+      ORDER BY confirmed_at DESC
+      LIMIT 1
+    `).get(clubId, rawRecordId) as SqlRow | undefined;
+
+    if (existingLink) {
+      return mapExternalRecordLink(existingLink);
     }
 
     const link: ExternalRecordLink = {
@@ -791,8 +980,76 @@ export class DataCapabilityRepository {
         this.applyInsurancePolicyRecord(rawRecord, input.targetId, now);
         return;
       case "talent_elite_assessment":
+        this.applyTalentEliteAssessmentDraft(rawRecord, now);
         return;
     }
+  }
+
+  private applyTalentEliteAssessmentDraft(rawRecord: ExternalRawRecord, now: string): void {
+    const preview = rawRecord.normalizedPreview ?? {};
+    const graphVersionId = `metric-graph-draft-${rawRecord.id}`;
+    const viewId = `metric-view-draft-${rawRecord.id}`;
+    const nodeId = `metric-view-node-draft-${rawRecord.id}`;
+    const abilityName = textValue(preview, "assessment.coreAbility") ?? "导入评测图谱草稿";
+
+    this.database.prepare(`
+      INSERT INTO metric_graph_versions (
+        id, catalog_scope, scope_club_id, base_item_id, name, version, status, created_at, updated_at
+      )
+      VALUES (?, 'club', ?, NULL, ?, ?, 'draft', ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        name = excluded.name,
+        status = 'draft',
+        updated_at = excluded.updated_at
+    `).run(
+      graphVersionId,
+      rawRecord.clubId,
+      `导入草稿：${abilityName}`,
+      rawRecord.id,
+      now,
+      now,
+    );
+
+    this.database.prepare(`
+      INSERT INTO metric_views (
+        id, catalog_scope, scope_club_id, base_item_id, graph_version_id, name, status, created_at, updated_at
+      )
+      VALUES (?, 'club', ?, NULL, ?, ?, 'draft', ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        name = excluded.name,
+        status = 'draft',
+        updated_at = excluded.updated_at
+    `).run(
+      viewId,
+      rawRecord.clubId,
+      graphVersionId,
+      "导入评测草稿视图",
+      now,
+      now,
+    );
+
+    this.database.prepare(`
+      INSERT INTO metric_view_nodes (
+        id, catalog_scope, scope_club_id, base_item_id, view_id, metric_id,
+        parent_view_node_id, label, sort_order, created_at, updated_at
+      )
+      VALUES (?, 'club', ?, NULL, ?, NULL, NULL, ?, 1, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        label = excluded.label,
+        updated_at = excluded.updated_at
+    `).run(
+      nodeId,
+      rawRecord.clubId,
+      viewId,
+      [
+        abilityName,
+        textValue(preview, "assessment.secondaryMetric"),
+        textValue(preview, "assessment.atomicMetric"),
+        textValue(preview, "assessment.testItem"),
+      ].filter(Boolean).join(" / "),
+      now,
+      now,
+    );
   }
 
   private applyFullUserRecord(rawRecord: ExternalRawRecord, studentId: EntityId, now: string): void {
@@ -1191,6 +1448,98 @@ function normalizeBirthDate(value: string | undefined): string | undefined {
   return /^\d{4}-\d{2}$/.test(value) ? `${value}-01` : value;
 }
 
+function mapOperationalProfile(row: SqlRow) {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    studentId: requireString(row, "student_id"),
+    externalRef: optionalString(row, "external_ref"),
+    region: optionalString(row, "region"),
+    school: optionalString(row, "school"),
+    acquisitionChannel: optionalString(row, "acquisition_channel"),
+    studentStatus: optionalString(row, "student_status"),
+    communicationStage: optionalString(row, "communication_stage"),
+    responsibleCoachId: optionalString(row, "responsible_coach_id"),
+    insuranceExpiresAt: optionalString(row, "insurance_expires_at"),
+    totalCheckins: optionalNumber(row, "total_checkins"),
+    latestCheckinAt: optionalString(row, "latest_checkin_at"),
+    totalRecharges: optionalNumber(row, "total_recharges"),
+    lessonBalance: optionalNumber(row, "lesson_balance"),
+    notes: optionalString(row, "notes"),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapStudentContact(row: SqlRow) {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    studentId: requireString(row, "student_id"),
+    name: requireString(row, "name"),
+    relationship: requireString(row, "relationship"),
+    phone: optionalString(row, "phone"),
+    wechat: optionalString(row, "wechat"),
+    isPrimaryContact: booleanFromSql(row.is_primary_contact),
+    receivesNotifications: booleanFromSql(row.receives_notifications),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapStudentTeam(row: SqlRow) {
+  return {
+    membershipId: requireString(row, "id"),
+    teamId: requireString(row, "team_id"),
+    name: requireString(row, "name"),
+    ageGroup: requireString(row, "age_group"),
+    level: requireString(row, "level"),
+    defaultCoachId: optionalString(row, "default_coach_id"),
+    defaultCoachName: optionalString(row, "default_coach_name"),
+    startsAt: requireString(row, "starts_at"),
+    endsAt: optionalString(row, "ends_at"),
+    isPrimaryTeam: booleanFromSql(row.is_primary_team),
+    status: requireString(row, "status"),
+  };
+}
+
+function mapLessonLedger(row: SqlRow) {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    studentId: requireString(row, "student_id"),
+    teamId: optionalString(row, "team_id"),
+    eventId: optionalString(row, "event_id"),
+    paymentEventId: optionalString(row, "payment_event_id"),
+    occurredAt: requireString(row, "occurred_at"),
+    entryType: requireString(row, "entry_type"),
+    lessonDelta: numberFromSql(row, "lesson_delta"),
+    balanceAfter: optionalNumber(row, "balance_after"),
+    source: requireString(row, "source"),
+    note: optionalString(row, "note"),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapInsurancePolicy(row: SqlRow) {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    studentId: requireString(row, "student_id"),
+    purchasedAt: optionalString(row, "purchased_at"),
+    expiresAt: requireString(row, "expires_at"),
+    policyNumber: optionalString(row, "policy_number"),
+    provider: optionalString(row, "provider"),
+    sport: optionalString(row, "sport"),
+    approved: row.approved === null || row.approved === undefined ? undefined : booleanFromSql(row.approved),
+    externalRef: optionalString(row, "external_ref"),
+    note: optionalString(row, "note"),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
 function mapExternalConnection(row: SqlRow): ExternalSystemConnection {
   return {
     id: requireString(row, "id"),
@@ -1200,6 +1549,21 @@ function mapExternalConnection(row: SqlRow): ExternalSystemConnection {
     status: requireString(row, "status") as ExternalSystemConnection["status"],
     config: jsonObject(requireString(row, "config_json")) ?? {},
     lastSyncedAt: optionalString(row, "last_synced_at"),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapExternalRecordLink(row: SqlRow): ExternalRecordLink {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    rawRecordId: requireString(row, "raw_record_id"),
+    targetType: requireString(row, "target_type"),
+    targetId: requireString(row, "target_id"),
+    linkStatus: requireString(row, "link_status") as ExternalRecordLink["linkStatus"],
+    confirmedBy: optionalString(row, "confirmed_by"),
+    confirmedAt: requireString(row, "confirmed_at"),
     createdAt: requireString(row, "created_at"),
     updatedAt: requireString(row, "updated_at"),
   };

@@ -38,9 +38,37 @@ function requestBody(schema: RouteSchema) {
     : undefined;
 }
 
+function parameters(schema: RouteSchema) {
+  const params = objectSchemaProperties(schema.params).map(([name, property]) => ({
+    name,
+    in: "path",
+    required: true,
+    schema: property,
+  }));
+  const query = objectSchemaProperties(schema.querystring).map(([name, property]) => ({
+    name,
+    in: "query",
+    required: false,
+    schema: property,
+  }));
+  const allParameters = [...params, ...query];
+
+  return allParameters.length ? allParameters : undefined;
+}
+
+function objectSchemaProperties(schema: unknown): Array<[string, unknown]> {
+  if (!schema || typeof schema !== "object" || !("properties" in schema)) {
+    return [];
+  }
+
+  const properties = (schema as { properties?: Record<string, unknown> }).properties;
+  return properties ? Object.entries(properties) : [];
+}
+
 function operation(method: string, path: string, schema: RouteSchema) {
   return {
     operationId: `${method.toLowerCase()} ${path}`,
+    parameters: parameters(schema),
     requestBody: requestBody(schema),
     responses: responses(schema),
   };
@@ -78,6 +106,16 @@ export function buildOpenApiDocument() {
       "/clubs/{clubId}/admin/data/config": {
         get: operation("GET", "/clubs/{clubId}/admin/data/config", schemas.dataCapabilityConfig),
       },
+      "/clubs/{clubId}/admin/students": {
+        get: operation("GET", "/clubs/{clubId}/admin/students", {
+          ...schemas.clubParams,
+          ...schemas.adminStudentListQuery,
+          ...schemas.operationalStudentList,
+        }),
+      },
+      "/clubs/{clubId}/admin/students/{studentId}": {
+        get: operation("GET", "/clubs/{clubId}/admin/students/{studentId}", schemas.operationalStudentDetail),
+      },
       "/clubs/{clubId}/admin/import-preview": {
         get: operation("GET", "/clubs/{clubId}/admin/import-preview", schemas.importPreview),
       },
@@ -86,6 +124,9 @@ export function buildOpenApiDocument() {
       },
       "/clubs/{clubId}/admin/sync-runs": {
         get: operation("GET", "/clubs/{clubId}/admin/sync-runs", schemas.syncRuns),
+      },
+      "/clubs/{clubId}/admin/sync-runs/{syncRunId}": {
+        get: operation("GET", "/clubs/{clubId}/admin/sync-runs/{syncRunId}", schemas.syncRunDetail),
       },
       "/clubs/{clubId}/admin/external-records/{rawRecordId}/confirm": {
         post: operation(

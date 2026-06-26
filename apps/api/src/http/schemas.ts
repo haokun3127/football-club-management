@@ -264,6 +264,31 @@ export const schemas = {
       },
     },
   },
+  clubSyncRunParams: {
+    params: {
+      type: "object",
+      additionalProperties: false,
+      required: ["clubId", "syncRunId"],
+      properties: {
+        clubId: { type: "string", minLength: 1 },
+        syncRunId: { type: "string", minLength: 1 },
+      },
+    },
+  },
+  adminStudentListQuery: {
+    querystring: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        teamId: { type: "string", minLength: 1 },
+        coachId: { type: "string", minLength: 1 },
+        studentStatus: { type: "string", minLength: 1 },
+        school: { type: "string", minLength: 1 },
+        insuranceExpiringSoon: { type: "boolean" },
+        lessonBalanceLow: { type: "boolean" },
+      },
+    },
+  },
   importPreviewQuery: {
     querystring: {
       type: "object",
@@ -323,6 +348,29 @@ export const schemas = {
       403: errorResponse,
     },
   },
+  syncRunDetail: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  operationalStudentList: {
+    response: {
+      200: {
+        type: "array",
+        items: flexibleObject,
+      },
+      403: errorResponse,
+    },
+  },
+  operationalStudentDetail: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
   confirmExternalRecord: {
     body: {
       type: "object",
@@ -336,6 +384,7 @@ export const schemas = {
     },
     response: {
       200: flexibleObject,
+      400: errorResponse,
       403: errorResponse,
       404: errorResponse,
     },

@@ -192,6 +192,41 @@ describe("platform persistence", () => {
       createdAt: "2026-06-26T00:00:00.000Z",
       updatedAt: "2026-06-26T00:00:00.000Z",
     });
+    repositories.dataCapability.saveExternalRawRecord({
+      id: "external-raw-assessment-test",
+      clubId: "club-chongqing-talent",
+      connectionId: "external-connection-wps-cq-talent",
+      tableMappingId: "external-table-talent-elite-assessment-cq-talent",
+      externalRecordId: "talent_elite_assessment:row-2",
+      payload: {},
+      payloadHash: "assessment-test-hash",
+      reviewStatus: "pending",
+      normalizedPreview: {
+        "assessment.coreAbility": "进攻能力",
+        "assessment.secondaryMetric": "射门终结",
+        "assessment.atomicMetric": "正脚背射门",
+        "assessment.testItem": "禁区外射门",
+        "assessment.recommendedTraining": "射门专项",
+      },
+      createdAt: "2026-06-26T00:00:00.000Z",
+      updatedAt: "2026-06-26T00:00:00.000Z",
+    });
+    repositories.dataCapability.saveExternalRawRecord({
+      id: "external-raw-invalid-test",
+      clubId: "club-chongqing-talent",
+      connectionId: "external-connection-wps-cq-talent",
+      tableMappingId: "external-table-payment-events-cq-talent",
+      externalRecordId: "payment_events:row-invalid",
+      payload: {},
+      payloadHash: "payment-invalid-hash",
+      reviewStatus: "pending",
+      validationErrors: [{ field: "payment.paidAt", message: "收费日期缺失" }],
+      normalizedPreview: {
+        "payment.type": "线下课时充值",
+      },
+      createdAt: "2026-06-26T00:00:00.000Z",
+      updatedAt: "2026-06-26T00:00:00.000Z",
+    });
     repositories.dataCapability.confirmExternalRecord(
       "club-chongqing-talent",
       "external-raw-payment-test",
@@ -209,6 +244,18 @@ describe("platform persistence", () => {
       "external-raw-attendance-test",
       { targetType: "student", targetId: "student-1", confirmedBy: "user-coach-1" },
       { linkId: "external-record-link-attendance-test", now: "2026-06-26T00:07:00.000Z" },
+    );
+    const assessmentLink = repositories.dataCapability.confirmExternalRecord(
+      "club-chongqing-talent",
+      "external-raw-assessment-test",
+      { targetType: "student", targetId: "student-1", confirmedBy: "user-coach-1" },
+      { linkId: "external-record-link-assessment-test", now: "2026-06-26T00:08:00.000Z" },
+    );
+    const duplicatePaymentLink = repositories.dataCapability.confirmExternalRecord(
+      "club-chongqing-talent",
+      "external-raw-payment-test",
+      { targetType: "student", targetId: "student-1", confirmedBy: "user-coach-1" },
+      { linkId: "external-record-link-payment-test-duplicate", now: "2026-06-26T00:09:00.000Z" },
     );
     const confirmedPreview = repositories.dataCapability.getImportPreview("club-chongqing-talent", { reviewStatus: "confirmed" });
     const crossClubLink = repositories.dataCapability.confirmExternalRecord(
@@ -248,6 +295,31 @@ describe("platform persistence", () => {
       WHERE club_id = ? AND student_id = ?
       ORDER BY id
     `).all("club-chongqing-talent", "student-1") as Array<Record<string, unknown>>;
+    const paymentCount = database.prepare(`
+      SELECT COUNT(*) AS count FROM payment_events
+      WHERE club_id = ? AND id = ?
+    `).get("club-chongqing-talent", "payment-event-external-raw-payment-test") as Record<string, unknown>;
+    const paymentLedgerCount = database.prepare(`
+      SELECT COUNT(*) AS count FROM lesson_credit_ledger
+      WHERE club_id = ? AND payment_event_id = ?
+    `).get("club-chongqing-talent", "payment-event-external-raw-payment-test") as Record<string, unknown>;
+    const assessmentDraft = database.prepare(`
+      SELECT name, status FROM metric_graph_versions
+      WHERE id = ?
+    `).get("metric-graph-draft-external-raw-assessment-test") as Record<string, unknown>;
+    const assessmentDraftNode = database.prepare(`
+      SELECT label FROM metric_view_nodes
+      WHERE id = ?
+    `).get("metric-view-node-draft-external-raw-assessment-test") as Record<string, unknown>;
+    const studentDetail = repositories.dataCapability.getStudentDetail("club-chongqing-talent", "student-1");
+    const filteredStudents = repositories.dataCapability.listStudents("club-chongqing-talent", {
+      teamId: "team-u10-dev",
+      coachId: "coach-1",
+      studentStatus: "在训",
+      school: "重庆天才合作学校",
+      lessonBalanceLow: false,
+    });
+    const syncRunDetail = repositories.dataCapability.getSyncRunDetail("club-chongqing-talent", "external-sync-run-cq-talent");
 
     expect(preview.records).toEqual([expect.objectContaining({ id: "external-raw-student-cq-talent" })]);
     expect(link).toEqual(expect.objectContaining({
@@ -255,6 +327,14 @@ describe("platform persistence", () => {
       rawRecordId: "external-raw-student-cq-talent",
       targetType: "student",
       targetId: "student-1",
+    }));
+    expect(assessmentLink).toEqual(expect.objectContaining({
+      rawRecordId: "external-raw-assessment-test",
+      linkStatus: "confirmed",
+    }));
+    expect(duplicatePaymentLink).toEqual(expect.objectContaining({
+      id: "external-record-link-payment-test",
+      rawRecordId: "external-raw-payment-test",
     }));
     expect(confirmedPreview.records).toEqual(expect.arrayContaining([expect.objectContaining({ reviewStatus: "confirmed" })]));
     expect(student).toEqual(expect.objectContaining({ name: "李明", birth_date: "2015-05-01" }));
@@ -271,6 +351,39 @@ describe("platform persistence", () => {
       expect.objectContaining({ entry_type: "credit", lesson_delta: 24 }),
       expect.objectContaining({ entry_type: "external_snapshot", balance_after: 15 }),
     ]));
+    expect(paymentCount.count).toBe(1);
+    expect(paymentLedgerCount.count).toBe(1);
+    expect(assessmentDraft).toEqual(expect.objectContaining({
+      name: "导入草稿：进攻能力",
+      status: "draft",
+    }));
+    expect(assessmentDraftNode).toEqual(expect.objectContaining({
+      label: "进攻能力 / 射门终结 / 正脚背射门 / 禁区外射门",
+    }));
+    expect(() => repositories.dataCapability.confirmExternalRecord(
+      "club-chongqing-talent",
+      "external-raw-invalid-test",
+      { targetType: "student", targetId: "student-1", confirmedBy: "user-coach-1" },
+      { linkId: "external-record-link-invalid-test", now: "2026-06-26T00:10:00.000Z" },
+    )).toThrow("Cannot confirm external record with validation errors.");
+    expect(studentDetail).toEqual(expect.objectContaining({
+      id: "student-1",
+      primaryContact: expect.objectContaining({ phone: "13800000000" }),
+      lessonBalance: 15,
+      insuranceStatus: expect.objectContaining({ policyNumber: "POLICY-001", approved: true }),
+      attendanceSnapshot: expect.objectContaining({ totalCheckins: 9, lessonBalance: 15 }),
+      teams: expect.arrayContaining([expect.objectContaining({ teamId: "team-u10-dev" })]),
+    }));
+    expect(studentDetail?.contacts).toEqual([expect.objectContaining({ relationship: "guardian" })]);
+    expect(studentDetail?.lessonLedger).toEqual(expect.arrayContaining([expect.objectContaining({ entryType: "credit" })]));
+    expect(studentDetail?.insurancePolicies).toEqual([expect.objectContaining({ policyNumber: "POLICY-001" })]);
+    expect(filteredStudents).toEqual([expect.objectContaining({ id: "student-1", lessonBalance: 15 })]);
+    expect(syncRunDetail).toEqual(expect.objectContaining({
+      validationSummary: expect.objectContaining({
+        totalRecords: 1,
+        confirmedRecords: 1,
+      }),
+    }));
     expect(crossClubLink).toBeNull();
 
     database.close();

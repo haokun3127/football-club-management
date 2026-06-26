@@ -163,6 +163,49 @@ export interface ImportPreview {
   records: ExternalRawRecord[];
 }
 
+export interface StudentListFilters {
+  teamId?: EntityId;
+  coachId?: EntityId;
+  studentStatus?: string;
+  school?: string;
+  insuranceExpiringSoon?: boolean;
+  lessonBalanceLow?: boolean;
+}
+
+export interface StudentListItem {
+  id: EntityId;
+  clubId: EntityId;
+  name: string;
+  birthDate: string;
+  gender?: string;
+  currentLevel?: string;
+  operationalProfile?: Record<string, unknown>;
+  teams: Array<Record<string, unknown>>;
+  primaryContact?: Record<string, unknown>;
+  lessonBalance?: number;
+  insuranceStatus: Record<string, unknown>;
+  attendanceSnapshot: Record<string, unknown>;
+}
+
+export interface StudentDetail extends StudentListItem {
+  contacts: Array<Record<string, unknown>>;
+  lessonLedger: Array<Record<string, unknown>>;
+  insurancePolicies: Array<Record<string, unknown>>;
+}
+
+export interface SyncRunDetail {
+  syncRun: ExternalSyncRun;
+  rawRecords: ExternalRawRecord[];
+  validationSummary: {
+    totalRecords: number;
+    validRecords: number;
+    invalidRecords: number;
+    pendingRecords: number;
+    confirmedRecords: number;
+    rejectedRecords: number;
+  };
+}
+
 export interface StageExternalImportRecord {
   rowNumber: number;
   rowHash: string;
