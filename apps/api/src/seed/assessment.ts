@@ -8,6 +8,7 @@ export function createAssessmentSeed(): Pick<
   | "assessmentMetricBindings"
   | "assessmentTestItems"
   | "playerAssessments"
+  | "assessmentRawResults"
   | "assessmentScores"
   | "metricGraphVersions"
   | "metricDependencies"
@@ -29,7 +30,21 @@ export function createAssessmentSeed(): Pick<
         updatedAt: now,
       },
     ],
-    metricDependencies: [],
+    metricDependencies: [
+      {
+        id: "metric-dependency-finishing-technical-index",
+        catalogScope: systemCatalog,
+        graphVersionId: "metric-graph-version-chongqing-talent",
+        inputMetricId: "metric-finishing",
+        outputMetricId: "metric-technical-index",
+        formulaId: "derived-technical-index",
+        weight: 1,
+        role: "primary",
+        sortOrder: 1,
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
     metricViews: [
       {
         id: "metric-view-technical-basics",
@@ -49,6 +64,16 @@ export function createAssessmentSeed(): Pick<
         metricId: "metric-finishing",
         label: "射门终结",
         sortOrder: 1,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: "metric-view-node-technical-index",
+        catalogScope: systemCatalog,
+        viewId: "metric-view-technical-basics",
+        metricId: "metric-technical-index",
+        label: "技术综合指数",
+        sortOrder: 2,
         createdAt: now,
         updatedAt: now,
       },
@@ -87,6 +112,18 @@ export function createAssessmentSeed(): Pick<
         testItemId: "assessment-test-finishing-cq-talent",
         maxScore: 5,
         sortOrder: 1,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: "assessment-binding-technical-index",
+        clubId,
+        templateVersionId: "assessment-template-version-technical-1",
+        metricId: "metric-technical-index",
+        role: "output",
+        formulaId: "derived-technical-index",
+        maxScore: 100,
+        sortOrder: 2,
         createdAt: now,
         updatedAt: now,
       },
@@ -140,6 +177,7 @@ export function createAssessmentSeed(): Pick<
         updatedAt: now,
       },
     ],
+    assessmentRawResults: [],
     assessmentScores: [
       {
         id: "assessment-score-1",
@@ -226,6 +264,24 @@ export function createAssessmentSeed(): Pick<
           "metric-goals": 2,
           "metric-assists": 1,
         },
+        outputUnit: "score",
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: "derived-technical-index",
+        catalogScope: systemCatalog,
+        code: "technical_index",
+        name: "技术综合指数",
+        outputMetricId: "metric-technical-index",
+        method: "normalized_weighted_sum",
+        inputMetricIds: ["metric-finishing"],
+        version: "1.0.0",
+        weights: {
+          "metric-finishing": 1,
+        },
+        inputScale: 5,
+        maxScore: 100,
         outputUnit: "score",
         createdAt: now,
         updatedAt: now,

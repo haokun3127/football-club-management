@@ -7,6 +7,7 @@ describe("createAssessmentService", () => {
   it("records assessment scores and emits assessment metric records", async () => {
     const saved = {
       assessments: [] as unknown[],
+      rawResults: [] as unknown[],
       scores: [] as unknown[],
       metricRecords: [] as unknown[],
       lineages: [] as unknown[],
@@ -61,6 +62,7 @@ describe("createAssessmentService", () => {
           updatedAt: now,
         },
       ],
+      listAssessmentTestItems: async () => [],
       listMetricGraphDependencies: async () => [],
       listAbilityMetrics: async () => [],
       listDerivedMetricDefinitions: async () => [],
@@ -68,6 +70,7 @@ describe("createAssessmentService", () => {
 
     const store: AssessmentStore = {
       saveAssessment: async (assessment) => saved.assessments.push(assessment),
+      saveRawResult: async (rawResult) => saved.rawResults.push(rawResult),
       saveScore: async (score) => saved.scores.push(score),
       saveMetricRecord: async (record) => saved.metricRecords.push(record),
       saveMetricLineage: async (lineage) => saved.lineages.push(lineage),

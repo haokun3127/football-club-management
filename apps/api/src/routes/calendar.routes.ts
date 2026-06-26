@@ -7,6 +7,41 @@ export async function registerCalendarRoutes(app: FastifyInstance, context: Rout
     Params: {
       clubId: string;
     };
+    Querystring: {
+      date?: string;
+    };
+  }>(
+    "/clubs/:clubId/coach/today",
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.coachToday,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+
+      return context.store.getCoachToday(request.params.clubId, {
+        date: request.query.date ?? new Date().toISOString().slice(0, 10),
+        userId: auth?.user.id ?? "user-coach-1",
+        roles: auth?.membership.roles ?? ["coach"],
+      });
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+    };
   }>(
     "/clubs/:clubId/calendar/events",
     {

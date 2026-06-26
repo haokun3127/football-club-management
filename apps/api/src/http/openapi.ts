@@ -72,6 +72,9 @@ export function buildOpenApiDocument() {
       "/clubs/{clubId}/calendar/events": {
         get: operation("GET", "/clubs/{clubId}/calendar/events", schemas.calendarEvents),
       },
+      "/clubs/{clubId}/coach/today": {
+        get: operation("GET", "/clubs/{clubId}/coach/today", schemas.coachToday),
+      },
       "/clubs/{clubId}/students/{studentId}/timeline": {
         get: operation("GET", "/clubs/{clubId}/students/{studentId}/timeline", schemas.studentTimeline),
       },
@@ -105,6 +108,13 @@ export function buildOpenApiDocument() {
       },
       "/clubs/{clubId}/training/sessions": {
         post: operation("POST", "/clubs/{clubId}/training/sessions", schemas.createTrainingSession),
+      },
+      "/clubs/{clubId}/training/sessions/{trainingSessionId}/observations": {
+        post: operation(
+          "POST",
+          "/clubs/{clubId}/training/sessions/{trainingSessionId}/observations",
+          schemas.recordTrainingObservation,
+        ),
       },
       "/clubs/{clubId}/matches": { post: operation("POST", "/clubs/{clubId}/matches", schemas.recordMatch) },
       "/clubs/{clubId}/assessments": { post: operation("POST", "/clubs/{clubId}/assessments", schemas.recordAssessment) },

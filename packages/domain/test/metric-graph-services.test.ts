@@ -181,4 +181,12 @@ describe("metric graph services", () => {
       ],
     })).toThrow("contains a cycle");
   });
+
+  it("rejects missing graph dependency inputs", () => {
+    expect(() => validateMetricGraphVersion({
+      graphVersion,
+      metrics: metrics.filter((metric) => metric.id !== "metric-agility"),
+      dependencies,
+    })).toThrow("missing input metric metric-agility");
+  });
 });

@@ -11,6 +11,7 @@ const adminRoles = new Set<ClubUserRole>(["owner", "admin", "operator"]);
 export interface RouteContext {
   store: ApiStore;
   membershipResolver?: MembershipResolver;
+  resolveClubAuth(request: FastifyRequest, reply: FastifyReply, clubId: string): Promise<AuthContext | null>;
   requireClubMembership(request: FastifyRequest, reply: FastifyReply, clubId: string): Promise<boolean>;
   sendError: typeof sendError;
   requireClubRole(
@@ -47,6 +48,7 @@ export function createRouteContext(store: ApiStore, membershipResolver?: Members
     store,
     membershipResolver,
     sendError,
+    resolveClubAuth: resolveAuth,
     async requireClubMembership(request, reply, clubId) {
       if (!membershipResolver) {
         return true;
