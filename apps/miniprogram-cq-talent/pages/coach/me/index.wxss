@@ -1,0 +1,9 @@
+.empty {
+  padding-left: 0;
+  text-align: left;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-around;
+}

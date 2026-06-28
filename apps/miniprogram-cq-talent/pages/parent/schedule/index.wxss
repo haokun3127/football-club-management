@@ -1,0 +1,13 @@
+.hero {
+  background: #fff1f0;
+  border-color: #ffd6d2;
+}
+
+.event-card:active {
+  background: #fff8f7;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-around;
+}

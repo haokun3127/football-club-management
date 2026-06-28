@@ -1,0 +1,19 @@
+<view class="page">
+  <view class="card nav">
+    <text bindtap="goSchedule">日程</text>
+    <text class="tag">训练管理</text>
+    <text bindtap="goMe">我的</text>
+  </view>
+  <view class="card">
+    <view class="title">U8精英队</view>
+    <view class="subtitle">训练内容选择、能力覆盖预览、测试录入</view>
+  </view>
+  <view class="card">
+    <view class="section-title">能力覆盖预览</view>
+    <radar-canvas metrics="{{radar}}"></radar-canvas>
+  </view>
+  <view class="card">
+    <view class="section-title">待完善项</view>
+    <view class="subtitle">训练项目库、测试任务和自动保存接口待后端补齐。</view>
+  </view>
+</view>

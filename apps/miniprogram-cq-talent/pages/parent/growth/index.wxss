@@ -1,0 +1,8 @@
+.card radar-canvas {
+  display: block;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-around;
+}

@@ -1,0 +1,22 @@
+<view class="page">
+  <view class="card nav">
+    <text class="tag">日程</text>
+    <text bindtap="goTraining">训练管理</text>
+    <text bindtap="goMe">我的</text>
+  </view>
+  <view class="card hero">
+    <view class="title">今日课表</view>
+    <view class="subtitle">点名、销课、比赛录入从活动进入</view>
+  </view>
+  <view wx:for="{{events}}" wx:key="id" class="card">
+    <view class="row">
+      <view class="section-title">{{item.title}}</view>
+      <view class="tag">{{item.status}}</view>
+    </view>
+    <view class="subtitle">{{item.startsAt}}｜{{item.venue}}</view>
+    <view class="actions">
+      <button class="primary-button mini" bindtap="openAttendance">点名</button>
+      <button class="ghost-button mini" bindtap="openWrite">记录</button>
+    </view>
+  </view>
+</view>

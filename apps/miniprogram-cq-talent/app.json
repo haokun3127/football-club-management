@@ -1,0 +1,19 @@
+{
+  "pages": [
+    "pages/launch/index",
+    "pages/parent/schedule/index",
+    "pages/parent/growth/index",
+    "pages/parent/child/index",
+    "pages/coach/schedule/index",
+    "pages/coach/training/index",
+    "pages/coach/me/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "重庆天才足球",
+    "navigationBarBackgroundColor": "#E60012",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F7F8FA"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

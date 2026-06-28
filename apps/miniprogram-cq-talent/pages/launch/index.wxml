@@ -1,0 +1,10 @@
+<view class="page launch">
+  <view class="brand">重庆天才足球俱乐部</view>
+  <view class="card">
+    <view class="title">小程序服务</view>
+    <view class="subtitle">{{statusText}}</view>
+    <button class="primary-button action" bindtap="loginAsParent">家长 mock 登录</button>
+    <button class="ghost-button action" bindtap="loginAsCoach">教练 mock 登录</button>
+  </view>
+  <view class="subtitle note">正式联调时将通过微信登录和手机号授权匹配身份，用户不能自行选择角色。</view>
+</view>

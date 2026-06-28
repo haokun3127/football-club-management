@@ -1,0 +1,18 @@
+.launch {
+  padding-top: 120rpx;
+}
+
+.brand {
+  color: #e60012;
+  font-size: 44rpx;
+  font-weight: 800;
+  margin-bottom: 36rpx;
+}
+
+.action {
+  margin-top: 24rpx;
+}
+
+.note {
+  margin-top: 24rpx;
+}

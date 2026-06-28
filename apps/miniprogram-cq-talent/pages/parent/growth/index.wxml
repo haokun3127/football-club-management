@@ -1,0 +1,20 @@
+<view class="page">
+  <view class="card nav">
+    <text bindtap="goSchedule">日程</text>
+    <text class="tag">成长</text>
+    <text bindtap="goChild">我的孩子</text>
+  </view>
+  <view class="card">
+    <view class="title">张小明</view>
+    <view class="subtitle">U8精英队｜在训 2年3个月｜主教练：王教练、李教练</view>
+  </view>
+  <view class="card">
+    <view class="section-title">能力雷达图</view>
+    <radar-canvas metrics="{{radar}}" bindmetrictap="openMetric"></radar-canvas>
+    <view class="subtitle">同龄平均基于俱乐部内同年龄组最近一次有效记录计算。</view>
+  </view>
+  <view class="card">
+    <view class="section-title">训练历程</view>
+    <view class="subtitle">累计训练 86 次｜近 30 天 8 次｜出勤率 93%</view>
+  </view>
+</view>

@@ -33,6 +33,12 @@ importers:
         specifier: ^5.8.5
         version: 5.8.5
 
+  apps/miniprogram-cq-talent:
+    devDependencies:
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   packages/domain:
     dependencies:
       '@dagrejs/graphlib':

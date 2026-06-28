@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "训练管理",
+  "usingComponents": {
+    "radar-canvas": "/components/radar-canvas/index"
+  }
+}

@@ -1,0 +1,27 @@
+<view class="page">
+  <view class="card nav">
+    <text class="tag">日程</text>
+    <text bindtap="goGrowth">成长</text>
+    <text bindtap="goChild">我的孩子</text>
+  </view>
+  <view class="card hero">
+    <view class="title">重庆天才足球</view>
+    <view class="subtitle">家庭日程 · 训练 / 比赛 / 活动</view>
+  </view>
+  <view class="card">
+    <view class="row">
+      <view class="section-title">7月1日</view>
+      <view class="tag">提醒 2</view>
+    </view>
+    <view class="subtitle">默认展示当前家长绑定孩子的全部活动</view>
+  </view>
+  <view wx:for="{{events}}" wx:key="id" class="card event-card" bindtap="openEvent" data-id="{{item.id}}">
+    <view class="row">
+      <view class="section-title">{{item.title}}</view>
+      <view class="tag">{{item.status}}</view>
+    </view>
+    <view class="subtitle">{{item.studentName}}｜{{item.teamName}}</view>
+    <view class="subtitle">{{item.startsAt}} - {{item.endsAt}}</view>
+    <view class="subtitle">{{item.venue}}</view>
+  </view>
+</view>
