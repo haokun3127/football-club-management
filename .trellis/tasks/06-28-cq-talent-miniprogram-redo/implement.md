@@ -17,3 +17,16 @@
 - `/Applications/wechatwebdevtools.app/Contents/MacOS/cli islogin`
 - `/Applications/wechatwebdevtools.app/Contents/MacOS/cli open --project /Users/dongjun/Documents/football-club-management/apps/miniprogram-cq-talent`
 - `/Applications/wechatwebdevtools.app/Contents/MacOS/cli preview --project /Users/dongjun/Documents/football-club-management/apps/miniprogram-cq-talent`
+
+## Next Implementation Queue From Audit
+
+Use `docs/miniprogram-implementation-audit-cq-talent.md` as the source of truth before changing mini-program pages. Development must follow the P0 queue first:
+
+1. Parent schedule must switch from single-child schedule to family calendar and add date/type filtering.
+2. Coach attendance must support editable participant statuses, batch present, notes, submitting, and failure-retained drafts.
+3. Coach lesson confirmation must support exception selection before confirming, plus reason capture and pending balance preview.
+4. Coach training management must consume the completed training project tree and save selected training projects to an event.
+5. Coach match entry must support player events for goals, assists, key events, player selection, and minute; if BFF is missing, keep the page structure and mark it blocked.
+6. Remove misleading fake 0-value radar placeholders from coach training; use empty or pending states until real ability overview data exists.
+
+After P0 is green, continue with P1: typed parent event details, metric drilldown, content/account detail pages, coach work queue, training coverage preview, assessment-task autosave, and real coach profile/permission BFF.
