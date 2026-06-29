@@ -1,0 +1,32 @@
+{
+  "id": "cq-talent-miniprogram-p0-bff",
+  "name": "cq-talent-miniprogram-p0-bff",
+  "title": "补齐重庆天才小程序 P0 BFF",
+  "description": "为重庆天才微信小程序补齐发布前 P0 BFF，支撑生产登录、家庭聚合日程和训练内容选择闭环。",
+  "status": "todo",
+  "dev_type": "backend",
+  "scope": "app-client-bff",
+  "package": "api",
+  "priority": "P0",
+  "creator": "dongjun",
+  "assignee": "backend",
+  "createdAt": "2026-06-28",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "codex/chongqing-talent-business",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "cq-talent-miniprogram-redo",
+  "relatedFiles": [
+    "docs/miniprogram-bff-gap-cq-talent.md",
+    "docs/miniprogram-release-readiness-cq-talent.md",
+    "apps/api/src/routes/app-client.routes.ts",
+    "apps/api/src/http/schemas.ts",
+    "apps/miniprogram-cq-talent/utils/api.ts"
+  ],
+  "notes": "点名、销课、比赛、评测 app-client 写入口已存在；本任务只覆盖仍缺的 P0 后端能力。",
+  "meta": {}
+}

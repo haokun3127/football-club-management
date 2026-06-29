@@ -12,6 +12,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+logs/
 
 # Dependencies
 node_modules/
@@ -25,6 +26,11 @@ out/
 .next/
 .nuxt/
 coverage/
+.cache/
+.turbo/
+.vite/
+playwright-report/
+test-results/
 *.tsbuildinfo
 
 # Editor files
@@ -44,5 +50,10 @@ venv/
 *.sqlite
 *.sqlite3
 *.db
+*.inspect.ndjson
 tmp/
 temp/
+outputs/
+
+# Local agent/runtime helpers
+.agents/

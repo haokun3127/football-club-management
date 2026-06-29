@@ -1,0 +1,5 @@
+{"status":"todo","item":"wechat-login ignores roleHint as authority and returns production session/role/profile/capabilities"}
+{"status":"todo","item":"parent calendar aggregation route exists with guardian-bound permission filtering"}
+{"status":"todo","item":"coach training project tree route exists and derives data from backend catalog/capabilities"}
+{"status":"todo","item":"event training project save route exists, enforces coach event access, and supports Idempotency-Key"}
+{"status":"todo","item":"OpenAPI and tests cover all new P0 BFF routes"}
