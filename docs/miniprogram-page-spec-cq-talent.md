@@ -10,9 +10,23 @@
 - `docs/miniprogram-technical-deployment-evaluation.md`
 - `docs/multi-app-client-capability.md`
 
+逐页结构图、卡片级交互、详情页推导和开发缺口判定见：
+
+- `docs/miniprogram-page-blueprints-cq-talent.md`
+
 小程序运行时必须先通过 `appId/clientKey -> /app-clients/resolve -> clubId/clientId/capabilities`。页面不得写死 WPS 字段、评测字段、课时规则、训练项目或比赛事件类型。家长端只读；教练端只写训练交付相关数据，不进入后台运营管理。
 
 UI 口径：微信原生标准风格，主色 `#E60012`，按压态 `#C4000F`，浅红背景 `#FFF1F0`。不做营销页，不做复杂视觉稿。
+
+## 1.1 MVP 实现状态
+
+`apps/miniprogram-cq-talent` 已按本规格重做为微信原生小程序 + TypeScript MVP：
+
+- 启动页先 resolve app-client，再按后端/开发身份进入角色首页；生产 UI 不提供家长/教练自选入口。
+- 家长端已落 `日程 / 成长 / 我的孩子` 自定义角色 TabBar，活动详情和指标下钻为独立页面。
+- 教练端已落 `日程 / 训练管理 / 我的` 自定义角色 TabBar，活动工作台、点名、销课、比赛录入和评测录入为独立页面。
+- 已有 BFF 优先读取真实数据；缺失 BFF 以“接口待接入/数据待同步”状态呈现，不拼 admin API。
+- 开发完成后的主验收数据源使用会话 `019efcb5-8fe3-7951-a534-502d0abff8ce` 已导入的真实测试数据。
 
 ## 2. 全局启动与身份页
 
@@ -303,7 +317,7 @@ UI 口径：微信原生标准风格，主色 `#E60012`，按压态 `#C4000F`，
 | 用户操作 | 添加事件；编辑比分；提交。 |
 | 空状态 | 无名单提示先补充名单。 |
 | 错误状态 | 比赛已提交且无编辑接口、事件类型缺失、保存失败。 |
-| BFF/API | 读 workbench/event detail；写建议 app-client match APIs。当前 `POST /clubs/:clubId/matches` 不是 app-client 路径，前端仅预留联调。 |
+| BFF/API | 读 workbench/event detail；最小比赛摘要写入走 `POST /clubs/:clubId/app-clients/:clientId/coach/matches`。球员事件、点评和战术板仍为后续表单完善范围。 |
 | 权限边界 | 不可给无权限比赛写入；事件类型来自 capabilities。 |
 
 ### 4.7 战术板入口
@@ -329,7 +343,7 @@ UI 口径：微信原生标准风格，主色 `#E60012`，按压态 `#C4000F`，
 | 用户操作 | 进入球队详情；进入训练内容选择；进入测试任务。 |
 | 空状态 | 无负责球队显示权限说明。 |
 | 错误状态 | 403、网络失败。 |
-| BFF/API | 建议 coach training management aggregate。MVP 可从 coach/home/workbench mock 展示。 |
+| BFF/API | 建议 coach training management aggregate。MVP 从 coach/home/workbench 展示已有上下文；缺失训练项目树不在前端伪造。 |
 | 权限边界 | 只展示负责球队。 |
 
 ### 4.9 球队详情
@@ -368,7 +382,7 @@ UI 口径：微信原生标准风格，主色 `#E60012`，按压态 `#C4000F`，
 | 用户操作 | 切换单元格；标记缺测；重试保存。 |
 | 空状态 | 无测试任务。 |
 | 错误状态 | 弱网保存失败保留本地输入；异常值提示；幂等冲突。 |
-| BFF/API | 建议 assessment task APIs；已存在 `coach/assessments/templates/:templateId/form` 只解决表单配置。 |
+| BFF/API | 建议 assessment task APIs；已存在 `coach/assessments/templates/:templateId/form` 和 `coach/assessments`。当前页面支持按模板手动完整提交，单格自动保存/缺测任务模型待完善。 |
 | 权限边界 | 只录负责队伍/授权学员。 |
 
 ### 4.12 学员雷达图与全队能力概览
@@ -394,7 +408,7 @@ UI 口径：微信原生标准风格，主色 `#E60012`，按压态 `#C4000F`，
 | 用户操作 | 选择模板；录入原子项；保存草稿；提交。 |
 | 空状态 | 无模板或无学员。 |
 | 错误状态 | 校验失败、模板版本缺失、提交失败。 |
-| BFF/API | `GET /clubs/:clubId/app-clients/:clientId/coach/assessments/templates/:templateId/form`；写入建议 app-client assessment submit，目前 `POST /clubs/:clubId/assessments` 需后端确认是否允许小程序调用。 |
+| BFF/API | `GET /clubs/:clubId/app-clients/:clientId/coach/assessments/templates/:templateId/form`；提交走 `POST /clubs/:clubId/app-clients/:clientId/coach/assessments`。页面已支持学员选择、原子项输入和手动提交；缺测和自动保存模型待 assessment-task BFF。 |
 | 权限边界 | computed/composite 指标只读；公式由后端计算。 |
 
 ### 4.14 教练我的
