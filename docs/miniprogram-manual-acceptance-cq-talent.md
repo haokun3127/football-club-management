@@ -1,0 +1,150 @@
+# 重庆天才小程序本地手工验收
+
+## 1. 验收目标
+
+用本地 API 和重庆天才 200 人导入测试数据，在微信开发者工具里完成家长端、教练端主流程点击验收。
+
+固定俱乐部：
+
+- `clubId`: `club-chongqing-talent`
+- `clientKey`: `cq-talent-wechat-main`
+- `clientId`: `app-client-cq-talent-wechat-main`
+
+## 2. 启动本地 API
+
+使用临时 sqlite，避免污染长期 dev 数据，也避免反复 seed 触发唯一约束冲突。
+
+```bash
+find /tmp -maxdepth 1 -name 'fcm-cq-talent-smoke.sqlite*' -delete
+DATABASE_URL=/tmp/fcm-cq-talent-smoke.sqlite PORT=3000 HOST=127.0.0.1 pnpm --filter @football-club/api dev
+```
+
+另开终端确认：
+
+```bash
+curl -fsS http://127.0.0.1:3000/health
+curl -fsS 'http://127.0.0.1:3000/app-clients/resolve?clientKey=cq-talent-wechat-main'
+curl -fsS -H 'X-User-Id: user-parent-cq-talent-acceptance' \
+  'http://127.0.0.1:3000/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/children'
+curl -fsS -H 'X-User-Id: user-coach-1' \
+  'http://127.0.0.1:3000/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/home?date=2026-06-28'
+pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client
+```
+
+通过标准：
+
+- resolve 返回 `club-chongqing-talent`。
+- 家长 children 返回 200 名导入学员。
+- 教练 home 返回 `2026-06-28` 的训练活动。
+- `smoke:app-client` 完成 parent/coach app-client 读写链路，输出 `CQ Talent app-client smoke passed`。
+
+## 3. 打开 DevTools
+
+```bash
+/Applications/wechatwebdevtools.app/Contents/MacOS/cli open \
+  --project /Users/dongjun/Documents/football-club-management/apps/miniprogram-cq-talent \
+  --port 9420
+pnpm --filter @football-club/miniprogram-cq-talent devtools:preview
+```
+
+如 CLI 提示端口不可用，在微信开发者工具打开：
+
+```text
+设置 -> 安全设置 -> 服务端口
+```
+
+## 4. 家长端验收
+
+默认 `utils/config.ts` 中 `DEV_IDENTITY_ROLE = "parent"` 时进入家长端。请求头应带：
+
+```text
+X-User-Id: user-parent-cq-talent-acceptance
+```
+
+验收清单：
+
+- 启动页不出现“选择家长/教练”按钮。
+- 日程页显示孩子切换，至少能看到导入学员。
+- 日程页展示当前孩子活动；家庭聚合日程明确显示待后端补齐。
+- 活动详情页能打开训练/比赛详情，缺字段显示待同步。
+- 成长页显示雷达或“有效能力指标不足”的空状态，不展示其他孩子数据。
+- 指标下钻页显示 BFF 待接入和权限边界，不展示内部公式。
+- 我的孩子页显示档案、队伍/教练、课时、保险，只读且没有充值/投保/修改入口。
+- 私教意向显示 BFF 待接入，不伪造成提交成功。
+
+## 5. 教练端验收
+
+在启动页长按品牌区切换 dev 身份，或临时把 `utils/config.ts` 的 `DEV_IDENTITY_ROLE` 改为 `coach` 后重新编译。请求头应带：
+
+```text
+X-User-Id: user-coach-1
+```
+
+验收清单：
+
+- 启动页不出现“选择家长/教练”按钮。
+- 教练日程显示 `2026-06-28` 的活动。
+- 活动工作台显示名单、点名、销课、比赛录入、评测录入入口。
+- 点名页保存走 app-client attendance BFF，成功后刷新。
+- 销课页确认销课走 POST lesson-confirmation。
+- 销课页“返还/补扣”走 PATCH lesson-confirmation。
+- 比赛页能保存比赛摘要，字段包含类型、状态、对手、比分。
+- 评测页能选择学员、按后端模板字段录入，完整填写后提交成功。
+- 训练管理页清晰展示训练内容树/训练内容保存仍为 P0 后端缺口。
+- 我的页不展示后台运营菜单，只展示教练身份、负责球队和权限说明。
+
+## 6. 已知阻塞
+
+- 生产 `wechat-login` / `me` 尚未补齐；dev 身份仅用于本地验收。
+- 家庭聚合日程仍需 `parent/calendar` BFF。
+- 训练内容树和训练内容保存仍需 coach training BFF。
+- 评测单格自动保存、缺测和任务分配仍需 assessment-task BFF。
+- DevTools GUI 截图在当前 Codex 环境曾返回黑屏，最终视觉验收需要人工点击确认。
+
+## 7. 2026-06-28 Codex GUI 验收尝试
+
+已完成：
+
+- 本地 API 使用 `/tmp/fcm-cq-talent-smoke.sqlite` 启动成功。
+- DevTools CLI `islogin/open/preview` 成功，测试 AppID 为 `wx3df49f3b936ab2ed`。
+- CLI preview 包体为 `94.8 KB / 97054 Byte`。
+- 通过 Computer Use 列表确认 `Wechat Devtools` 进程正在运行。
+- 已新增固定脚本 `pnpm --filter @football-club/miniprogram-cq-talent devtools:preview`，可复跑 DevTools `islogin/open/preview`。
+- 本地 API 日志显示 DevTools 模拟器从 `localhost:3000` 发起过 `resolve`、`parent/children`、`parent/students/:studentId/schedule` 请求，说明模拟器已连到本地后端。
+
+未完成：
+
+- Computer Use 读取 `Wechat Devtools` 窗口失败，返回 `cgWindowNotFound`。
+- macOS `osascript` 读取窗口需要辅助功能权限，当前返回 `not allowed assistive access`。
+- `screencapture` 可生成 PNG 文件，但内容为黑屏，不能作为视觉验收证据。
+- 因此本轮无法由 Codex 直接点击模拟器并提供视觉证据。
+
+替代证据：
+
+- API smoke 已覆盖 parent/coach 真实 BFF 读写链路。
+- DevTools CLI 已覆盖项目可打开、可预览、可编译打包。
+- DevTools 模拟器已实际访问本地 API 的家长端读取链路。
+- 最终家长端/教练端视觉与点击验收仍需人工按第 4、5 节清单在 DevTools 或真机完成。
+
+## 8. 可复跑 Smoke 脚本
+
+小程序目录已提供固定 smoke 脚本：
+
+```bash
+pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client
+```
+
+默认配置：
+
+- `API_BASE_URL=http://127.0.0.1:3000`
+- `CLIENT_KEY=cq-talent-wechat-main`
+- `PARENT_USER_ID=user-parent-cq-talent-acceptance`
+- `COACH_USER_ID=user-coach-1`
+- `TEST_DATE=2026-06-28`
+
+覆盖范围：
+
+- resolve、capabilities。
+- 家长 200 名导入学员、单孩子 home/schedule/growth。
+- 教练 home/workbench、点名、销课确认、销课纠正、比赛摘要。
+- 精英评测模板完整提交。

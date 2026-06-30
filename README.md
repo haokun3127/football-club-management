@@ -31,3 +31,6 @@ This repository uses Git for source control. Keep generated files, dependency fo
 - [部署需求与运维关注点](docs/deployment-requirements.md)
 - [持久化基础](docs/persistence.md)
 - [WPS 数据同步接入分析](docs/wps-integration-analysis.md)
+- [WPS 生产接入边界](docs/wps-production-readiness.md)
+- [重庆天才小程序技术实现与部署选型评估](docs/miniprogram-technical-deployment-evaluation.md)
+- [通用后台产品设计](docs/backoffice-product-design.md)

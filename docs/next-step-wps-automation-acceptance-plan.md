@@ -77,8 +77,9 @@ Main controller will integrate E then F and run:
 - `pnpm build`
 - `DATABASE_URL=:memory: pnpm --filter @football-club/api db:migrate`
 - forbidden placeholder scan:
-  - old demo club ids and demo club variable names,
-  - old demo club display names,
+  - `club-demo`,
+  - `demoClubId`,
+  - `Demo Football`,
   - old placeholder identifiers for external integrations.
 - forbidden legacy assessment scan:
   - direct old assessment-template metric-id coupling,
