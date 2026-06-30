@@ -39,7 +39,48 @@
         <input class="field-input" type="number" placeholder="-" value="{{awayScore}}" data-field="awayScore" bindinput="onTextInput" />
       </view>
     </view>
-    <view class="subtitle">保存走 app-client matches BFF，携带 requestId 和 Idempotency-Key。球员事件、战术板和赛后报告作为后续 P1/P2。</view>
+  </view>
+
+  <view wx:if="{{workbench}}" class="card">
+    <view class="section-title">球员关键事件</view>
+    <view class="form-row">
+      <view class="label">事件</view>
+      <picker mode="selector" range="{{playerEventTypes}}" range-key="label" value="{{playerEventTypeIndex}}" bindchange="onPlayerEventTypeChange">
+        <view class="field-input">{{playerEventTypes[playerEventTypeIndex].label}}</view>
+      </picker>
+    </view>
+    <view class="form-row">
+      <view class="label">球员</view>
+      <picker mode="selector" range="{{workbench.roster}}" range-key="name" value="{{studentIndex}}" bindchange="onStudentChange">
+        <view class="field-input">{{workbench.roster[studentIndex].name || '选择球员'}}</view>
+      </picker>
+    </view>
+    <view wx:if="{{playerEventTypes[playerEventTypeIndex].value === 'goal'}}" class="form-row">
+      <view class="label">助攻</view>
+      <picker mode="selector" range="{{workbench.roster}}" range-key="name" value="{{assistStudentIndex}}" bindchange="onAssistStudentChange">
+        <view class="field-input">{{workbench.roster[assistStudentIndex].name || '无助攻'}}</view>
+      </picker>
+    </view>
+    <view class="form-row">
+      <view class="label">分钟</view>
+      <input class="field-input" type="number" placeholder="可选" value="{{eventMinute}}" data-field="eventMinute" bindinput="onTextInput" />
+    </view>
+    <view class="form-row">
+      <view class="label">备注</view>
+      <input class="field-input" placeholder="可选" value="{{eventNote}}" data-field="eventNote" bindinput="onTextInput" />
+    </view>
+    <button class="ghost-button" bindtap="addPlayerEvent">添加事件</button>
+    <view wx:if="{{playerEvents.length}}" class="event-list">
+      <view wx:for="{{playerEvents}}" wx:key="label" class="match-event-row">
+        <view>
+          <view class="label strong">{{item.label}}</view>
+          <view class="subtitle" wx:if="{{item.assistStudentName}}">助攻：{{item.assistStudentName}}</view>
+          <view class="subtitle" wx:if="{{item.note}}">{{item.note}}</view>
+        </view>
+        <view class="remove-action" data-index="{{index}}" bindtap="removePlayerEvent">删除</view>
+      </view>
+    </view>
+    <view class="subtitle">保存走 app-client matches BFF，进球和助攻会生成对应球员指标记录；战术板和赛后报告作为后续 P1/P2。</view>
     <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveMatch">保存比赛摘要</button>
   </view>
 </view>

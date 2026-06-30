@@ -25,10 +25,21 @@
     </view>
   </view>
 
-  <view class="card">
-    <view class="section-title">能力覆盖预览</view>
-    <radar-canvas metrics="{{radar}}"></radar-canvas>
-    <view class="subtitle">训练项目树、能力覆盖预览和应用到未来课程由 app-client BFF 返回，前端不计算模型。</view>
+  <view wx:if="{{projectTree}}" class="card">
+    <view class="section-title">训练项目树</view>
+    <view class="subtitle">来自后端训练项目库，可直接保存到当前训练活动</view>
+    <view wx:for="{{projectTree.groups}}" wx:key="id" class="project-group">
+      <view class="group-title">{{item.name}}</view>
+      <view wx:for="{{item.projects}}" wx:key="id" wx:for-item="project" class="project-row {{selectedProjectMap[project.id] ? 'selected' : ''}}" data-id="{{project.id}}" bindtap="toggleProject">
+        <view>
+          <view class="label strong">{{project.name}}</view>
+          <view class="subtitle">{{project.description || '训练说明待同步'}}</view>
+        </view>
+        <view class="tag {{selectedProjectMap[project.id] ? 'success' : 'muted'}}">{{selectedProjectMap[project.id] ? '已选' : '选择'}}</view>
+      </view>
+    </view>
+    <textarea class="project-note" placeholder="训练内容备注，可选" value="{{projectNote}}" bindinput="onProjectNoteInput" />
+    <button class="primary-button" loading="{{savingProjects}}" disabled="{{savingProjects}}" bindtap="saveProjects">保存训练内容</button>
   </view>
 
   <view class="card">
@@ -39,7 +50,6 @@
 
   <view class="card">
     <view class="section-title">待完善项</view>
-    <view class="field-row"><view class="label">训练内容树</view><view class="field-value">P0 BFF 待接入</view></view>
     <view class="field-row"><view class="label">能力覆盖预览</view><view class="field-value">P1 BFF 待接入</view></view>
     <view class="field-row"><view class="label">全队能力概览</view><view class="field-value">P1 BFF 待接入</view></view>
   </view>

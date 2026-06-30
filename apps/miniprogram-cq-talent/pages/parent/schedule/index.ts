@@ -1,4 +1,4 @@
-import { getParentChildren, getParentSchedule } from "../../../utils/api";
+import { getParentCalendar, getParentChildren } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { setCurrentStudentId } from "../../../utils/store";
@@ -11,8 +11,18 @@ interface PageData {
   activeStudentId: string;
   activeStudentName: string;
   events: ScheduleEvent[];
+  visibleEvents: ScheduleEvent[];
   selectedDate: string;
+  selectedType: "all" | ScheduleEvent["type"];
+  typeTabs: Array<{ label: string; value: "all" | ScheduleEvent["type"] }>;
 }
+
+const typeTabs: PageData["typeTabs"] = [
+  { label: "全部", value: "all" },
+  { label: "训练", value: "training" },
+  { label: "比赛", value: "match" },
+  { label: "其他", value: "other" },
+];
 
 Page<PageData>({
   data: {
@@ -22,7 +32,10 @@ Page<PageData>({
     activeStudentId: "",
     activeStudentName: "",
     events: [],
-    selectedDate: "2026-07-01",
+    visibleEvents: [],
+    selectedDate: "2026-06-28",
+    selectedType: "all",
+    typeTabs,
   },
   onLoad() {
     this.load();
@@ -43,14 +56,16 @@ Page<PageData>({
         return;
       }
       setCurrentStudentId(active.id);
-      const events = await getParentSchedule(active.id);
+      const events = await getParentCalendar(dateWindowStart(this.data.selectedDate), dateWindowEnd(this.data.selectedDate));
+      const visibleEvents = filterEvents(events, active.id, this.data.selectedDate, this.data.selectedType);
       this.setData({
-        state: events.length ? "ready" : "empty",
-        message: events.length ? "" : "该孩子当前日期范围暂无活动安排。",
+        state: visibleEvents.length ? "ready" : "empty",
+        message: visibleEvents.length ? "" : "当前筛选条件暂无活动安排。",
         children,
         activeStudentId: active.id,
         activeStudentName: active.name,
         events,
+        visibleEvents,
       });
     } catch (error) {
       this.setData({ state: "error", message: readableError(error) });
@@ -63,7 +78,25 @@ Page<PageData>({
     if (!child) return;
     setCurrentStudentId(id);
     this.setData({ activeStudentId: id, activeStudentName: child.name });
+    this.applyFilters();
+  },
+  onDateChange(event: { detail: { value: string } }) {
+    this.setData({ selectedDate: event.detail.value });
     this.load();
+  },
+  switchType(event: { currentTarget: { dataset: { type?: PageData["selectedType"] } } }) {
+    const selectedType = event.currentTarget.dataset.type;
+    if (!selectedType || selectedType === this.data.selectedType) return;
+    this.setData({ selectedType });
+    this.applyFilters();
+  },
+  applyFilters() {
+    const visibleEvents = filterEvents(this.data.events, this.data.activeStudentId, this.data.selectedDate, this.data.selectedType);
+    this.setData({
+      visibleEvents,
+      state: visibleEvents.length ? "ready" : "empty",
+      message: visibleEvents.length ? "" : "当前筛选条件暂无活动安排。",
+    });
   },
   openEvent(event: { currentTarget: { dataset: { id?: string } } }) {
     const id = event.currentTarget.dataset.id;
@@ -73,6 +106,26 @@ Page<PageData>({
     this.load();
   },
 });
+
+function filterEvents(events: ScheduleEvent[], studentId: string, selectedDate: string, selectedType: PageData["selectedType"]) {
+  return events.filter((event) => {
+    const childMatched = !studentId || !event.childIds?.length || event.childIds.includes(studentId);
+    const typeMatched = selectedType === "all" || event.type === selectedType;
+    const dateMatched = !selectedDate || event.startsAt.slice(0, 10) === selectedDate;
+    return childMatched && typeMatched && dateMatched;
+  });
+}
+
+function dateWindowStart(date: string) {
+  return date || "2026-06-28";
+}
+
+function dateWindowEnd(date: string) {
+  if (!date) return "2026-07-05";
+  const base = new Date(`${date}T00:00:00.000Z`);
+  base.setUTCDate(base.getUTCDate() + 7);
+  return base.toISOString().slice(0, 10);
+}
 
 function readableError(error: unknown) {
   const record = error as { message?: string; code?: string };

@@ -65,6 +65,8 @@ export interface ScheduleEvent {
   endsAt?: string;
   venue: string;
   studentName?: string;
+  childIds?: string[];
+  children?: Array<{ id: string; name: string }>;
   teamName?: string;
   status: string;
   summary?: string;
@@ -107,12 +109,47 @@ export interface CoachHome {
 
 export interface CoachWorkbench {
   event: ScheduleEvent;
-  roster: Array<{ studentId: string; name: string; status: string; lessonAction?: string }>;
+  roster: Array<{ studentId: string; name: string; status: string; note?: string; lessonAction?: string; shouldConsume?: boolean; exceptionReason?: string; remainingLessons?: number }>;
   workflow: Array<{ label: string; value: string; status?: string }>;
   training: Array<{ label: string; value: string }>;
   match: Array<{ label: string; value: string }>;
   assessmentTemplateId?: string;
   pending: Array<{ title: string; message: string }>;
+}
+
+export interface TrainingProject {
+  id: string;
+  name: string;
+  description?: string;
+  metricIds: string[];
+  tags: string[];
+  selected?: boolean;
+}
+
+export interface TrainingProjectGroup {
+  id: string;
+  name: string;
+  projects: TrainingProject[];
+}
+
+export interface TrainingProjectTree {
+  groups: TrainingProjectGroup[];
+  projects: TrainingProject[];
+  pending: Array<{ title: string; message: string }>;
+}
+
+export interface CoachLessonConfirmation {
+  participants: CoachWorkbench["roster"];
+  ledgers: Array<{ studentId: string; remainingLessons?: number; balance?: number; status?: string }>;
+  pending: Array<{ title: string; message: string }>;
+}
+
+export interface CoachMatchPlayerEvent {
+  type: "goal" | "assist" | "save" | "tackle" | "yellow_card" | "red_card" | "penalty" | "own_goal";
+  studentId: string;
+  minute?: number;
+  assistStudentId?: string;
+  note?: string;
 }
 
 export interface AssessmentForm {

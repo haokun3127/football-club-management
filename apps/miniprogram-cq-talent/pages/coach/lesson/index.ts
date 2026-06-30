@@ -1,4 +1,4 @@
-import { confirmCoachLesson, correctCoachLesson, getCoachWorkbench } from "../../../utils/api";
+import { confirmCoachLesson, correctCoachLesson, getCoachLessonConfirmation, getCoachWorkbench } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
 
@@ -12,6 +12,7 @@ Page({
     eventId: "",
     saving: false,
     correctingStudentId: "",
+    lessonNote: "",
   },
   onLoad(query?: Record<string, string | undefined>) {
     requireRole("coach");
@@ -20,17 +21,59 @@ Page({
   async load(id: string) {
     try {
       const workbench = await getCoachWorkbench(id);
-      this.setData({ state: "ready", workbench, message: "", eventId: id });
+      const confirmation = await getCoachLessonConfirmation(id);
+      const sourceRoster = confirmation.participants.length ? confirmation.participants : workbench.roster;
+      this.setData({
+        state: "ready",
+        workbench: {
+          ...workbench,
+          roster: sourceRoster.map((student) => ({
+            ...student,
+            shouldConsume: student.shouldConsume !== false,
+            exceptionReason: student.exceptionReason || "",
+          })),
+        },
+        message: "",
+        eventId: id,
+      });
     } catch (error) {
       this.setData({ state: "error", message: readableError(error) });
     }
   },
+  toggleConsume(event: { currentTarget: { dataset: Record<string, unknown> } }) {
+    const studentId = String(event.currentTarget.dataset.studentId ?? "");
+    if (!this.data.workbench || !studentId) return;
+    const roster = this.data.workbench.roster.map((student: RosterItem) => (
+      student.studentId === studentId ? { ...student, shouldConsume: student.shouldConsume === false } : student
+    ));
+    this.setData({ workbench: { ...this.data.workbench, roster } });
+  },
+  onReasonInput(event: { currentTarget: { dataset: Record<string, unknown> }; detail: { value: string } }) {
+    const studentId = String(event.currentTarget.dataset.studentId ?? "");
+    if (!this.data.workbench || !studentId) return;
+    const roster = this.data.workbench.roster.map((student: RosterItem) => (
+      student.studentId === studentId ? { ...student, exceptionReason: event.detail.value } : student
+    ));
+    this.setData({ workbench: { ...this.data.workbench, roster } });
+  },
+  onLessonNoteInput(event: { detail: { value: string } }) {
+    this.setData({ lessonNote: event.detail.value });
+  },
   async confirmLesson() {
     if (!this.data.workbench || !this.data.eventId || this.data.saving) return;
-    const studentIds = this.data.workbench.roster.map((student: RosterItem) => student.studentId).filter(Boolean);
+    const selected = this.data.workbench.roster.filter((student: RosterItem) => student.studentId && student.shouldConsume !== false);
+    const skipped = this.data.workbench.roster.filter((student: RosterItem) => student.studentId && student.shouldConsume === false);
+    const studentIds = selected.map((student: RosterItem) => student.studentId);
+    const exceptionText = skipped
+      .map((student: RosterItem) => `${student.name}:${student.exceptionReason || "不销课"}`)
+      .join("；");
+    if (!studentIds.length) {
+      wx.showToast({ title: "至少选择 1 名销课学员", icon: "none" });
+      return;
+    }
     this.setData({ saving: true });
     try {
-      await confirmCoachLesson(this.data.eventId, studentIds);
+      await confirmCoachLesson(this.data.eventId, studentIds, [this.data.lessonNote, exceptionText].filter(Boolean).join("；"));
       wx.showToast({ title: "销课已确认", icon: "success" });
       await this.load(this.data.eventId);
     } catch (error) {

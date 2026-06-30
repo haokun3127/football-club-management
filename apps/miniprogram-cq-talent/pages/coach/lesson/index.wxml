@@ -8,9 +8,22 @@
     <view class="section-title">学员销课状态</view>
     <view wx:for="{{workbench.roster}}" wx:key="studentId" class="lesson-row">
       <view class="lesson-main">
-        <view class="label">{{item.name}}</view>
-        <view class="field-value">{{item.lessonAction || '默认销课'}}</view>
+        <view>
+          <view class="label strong">{{item.name}}</view>
+          <view class="subtitle">余额：{{item.remainingLessons === undefined ? '待同步' : item.remainingLessons}}</view>
+        </view>
+        <view class="consume-toggle {{item.shouldConsume === false ? 'off' : 'on'}}" data-student-id="{{item.studentId}}" bindtap="toggleConsume">
+          {{item.shouldConsume === false ? '不销课' : '销课'}}
+        </view>
       </view>
+      <input
+        wx:if="{{item.shouldConsume === false}}"
+        class="reason-input"
+        placeholder="填写不销课原因，如请假、免扣、未到场"
+        value="{{item.exceptionReason}}"
+        data-student-id="{{item.studentId}}"
+        bindinput="onReasonInput"
+      />
       <view class="correction-actions">
         <button
           class="ghost-button mini-button"
@@ -33,7 +46,8 @@
   </view>
   <view wx:if="{{workbench}}" class="card">
     <view class="section-title">确认与纠正</view>
-    <view class="subtitle">确认销课调用 app-client lesson-confirmation BFF；返还/补扣走同一路径 PATCH，15 天内纠正规则由后端控制。</view>
+    <view class="subtitle">默认全员销课；余额未知不阻断确认，后端按课时规则生成流水。返还/补扣走同一路径 PATCH，纠正规则由后端控制。</view>
+    <textarea class="lesson-note" placeholder="本次销课备注，可选" value="{{lessonNote}}" bindinput="onLessonNoteInput" />
     <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="confirmLesson">确认销课</button>
   </view>
 </view>

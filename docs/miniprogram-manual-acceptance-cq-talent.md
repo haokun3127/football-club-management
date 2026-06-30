@@ -65,7 +65,7 @@ X-User-Id: user-parent-cq-talent-acceptance
 
 - 启动页不出现“选择家长/教练”按钮。
 - 日程页显示孩子切换，至少能看到导入学员。
-- 日程页展示当前孩子活动；家庭聚合日程明确显示待后端补齐。
+- 日程页走 `parent/calendar` 家庭聚合 BFF，支持孩子、日期、训练/比赛/其他筛选。
 - 活动详情页能打开训练/比赛详情，缺字段显示待同步。
 - 成长页显示雷达或“有效能力指标不足”的空状态，不展示其他孩子数据。
 - 指标下钻页显示 BFF 待接入和权限边界，不展示内部公式。
@@ -85,19 +85,17 @@ X-User-Id: user-coach-1
 - 启动页不出现“选择家长/教练”按钮。
 - 教练日程显示 `2026-06-28` 的活动。
 - 活动工作台显示名单、点名、销课、比赛录入、评测录入入口。
-- 点名页保存走 app-client attendance BFF，成功后刷新。
-- 销课页确认销课走 POST lesson-confirmation。
+- 点名页支持批量到课、单人到课/迟到/缺席/请假/免扣、备注，保存走 app-client attendance BFF，失败保留当前草稿。
+- 销课页默认全员销课，可取消个别学员并填写原因，确认走 POST lesson-confirmation。
 - 销课页“返还/补扣”走 PATCH lesson-confirmation。
-- 比赛页能保存比赛摘要，字段包含类型、状态、对手、比分。
+- 比赛页能保存比赛摘要和球员事件，字段包含类型、状态、对手、比分、进球、助攻和关键事件。
 - 评测页能选择学员、按后端模板字段录入，完整填写后提交成功。
-- 训练管理页清晰展示训练内容树/训练内容保存仍为 P0 后端缺口。
+- 训练管理页读取 `training-project-tree`，可选择训练项目并保存到当前训练活动。
 - 我的页不展示后台运营菜单，只展示教练身份、负责球队和权限说明。
 
 ## 6. 已知阻塞
 
 - 生产 `wechat-login` / `me` 尚未补齐；dev 身份仅用于本地验收。
-- 家庭聚合日程仍需 `parent/calendar` BFF。
-- 训练内容树和训练内容保存仍需 coach training BFF。
 - 评测单格自动保存、缺测和任务分配仍需 assessment-task BFF。
 - DevTools GUI 截图在当前 Codex 环境曾返回黑屏，最终视觉验收需要人工点击确认。
 
@@ -145,6 +143,19 @@ pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client
 覆盖范围：
 
 - resolve、capabilities。
-- 家长 200 名导入学员、单孩子 home/schedule/growth。
-- 教练 home/workbench、点名、销课确认、销课纠正、比赛摘要。
+- 家长 200 名导入学员、单孩子 home/schedule/growth、家庭聚合 calendar。
+- 教练 home/workbench、点名、销课确认、销课纠正、训练项目保存、比赛摘要和进球/助攻指标记录。
 - 精英评测模板完整提交。
+
+## 9. 2026-06-30 P0 业务闭环 Smoke 结果
+
+使用临时数据库 `/tmp/fcm-cq-talent-p0-smoke.sqlite` 和本地 API `http://127.0.0.1:3100` 验证通过：
+
+- parent children 返回 200 名重庆天才测试学员。
+- parent calendar 返回 9 个家庭聚合活动。
+- coach workbench 返回 `event-cq-talent-u10-dev-training` 的 25 人名单。
+- attendance PUT 更新 3 名学员。
+- lesson-confirmation POST/PATCH 均成功。
+- training-projects PUT 保存 2 个训练项目。
+- matches POST 写入 2 个球员事件，并生成 2 条进球/助攻指标记录。
+- 精英评测模板提交 62 个 rawResults，生成 62 条 scores 和 99 条 metricRecords。

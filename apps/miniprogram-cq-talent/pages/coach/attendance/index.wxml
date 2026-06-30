@@ -5,10 +5,30 @@
     <view class="subtitle">{{workbench.event.title}}</view>
   </view>
   <view wx:if="{{workbench}}" class="card">
-    <view class="section-title">学员名单</view>
-    <view wx:for="{{workbench.roster}}" wx:key="studentId" class="field-row">
-      <view class="label">{{item.name}}</view>
-      <view class="field-value">{{item.status}}</view>
+    <view class="row">
+      <view>
+        <view class="section-title">学员名单</view>
+        <view class="subtitle">支持单人状态、备注和批量到课</view>
+      </view>
+      <button class="ghost-button mini-button inline-button" bindtap="markAllPresent">批量到课</button>
+    </view>
+    <view wx:for="{{workbench.roster}}" wx:key="studentId" class="attendance-row">
+      <view class="attendance-main">
+        <view>
+          <view class="label strong">{{item.name}}</view>
+          <view class="subtitle">{{item.lessonAction || '课时状态待同步'}}</view>
+        </view>
+        <picker mode="selector" range="{{statusOptions}}" range-key="label" data-index="{{index}}" bindchange="onStatusChange">
+          <view class="status-pill">{{item.status}}</view>
+        </picker>
+      </view>
+      <input
+        class="note-input"
+        placeholder="备注，如迟到原因、请假说明"
+        value="{{item.note}}"
+        data-index="{{index}}"
+        bindinput="onNoteInput"
+      />
     </view>
   </view>
   <view wx:if="{{workbench}}" class="card">

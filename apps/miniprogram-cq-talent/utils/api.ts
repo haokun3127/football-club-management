@@ -5,6 +5,8 @@ import type {
   ActivityDetail,
   AppContext,
   AssessmentForm,
+  CoachLessonConfirmation,
+  CoachMatchPlayerEvent,
   CoachHome,
   CoachWorkbench,
   GrowthSummary,
@@ -12,6 +14,7 @@ import type {
   ScheduleEvent,
   StudentHome,
   StudentSummary,
+  TrainingProjectTree,
 } from "./types";
 
 export async function resolveClient() {
@@ -32,6 +35,18 @@ export async function getParentSchedule(studentId: string) {
   const context = requireContext();
   const response = await request<{ events?: Array<Record<string, unknown>> }>({
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/parent/students/${studentId}/schedule`,
+  });
+  return normalizeEvents(response.events ?? []);
+}
+
+export async function getParentCalendar(from?: string, to?: string) {
+  const context = requireContext();
+  const query = [
+    from ? `from=${encodeURIComponent(from)}` : "",
+    to ? `to=${encodeURIComponent(to)}` : "",
+  ].filter(Boolean).join("&");
+  const response = await request<{ events?: Array<Record<string, unknown>> }>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/parent/calendar${query ? `?${query}` : ""}`,
   });
   return normalizeEvents(response.events ?? []);
 }
@@ -94,6 +109,14 @@ export async function getCoachWorkbench(eventId: string): Promise<CoachWorkbench
   return normalizeCoachWorkbench(response, eventId);
 }
 
+export async function getCoachLessonConfirmation(eventId: string): Promise<CoachLessonConfirmation> {
+  const context = requireContext();
+  const response = await request<Record<string, unknown>>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/lesson-confirmation`,
+  });
+  return normalizeLessonConfirmation(response);
+}
+
 export async function saveCoachAttendance(eventId: string, roster: CoachWorkbench["roster"]) {
   const context = requireContext();
   const participants = roster
@@ -101,9 +124,10 @@ export async function saveCoachAttendance(eventId: string, roster: CoachWorkbenc
     .map((student) => ({
       studentId: student.studentId,
       status: normalizeParticipantStatus(student.status),
+      note: student.note || undefined,
     }));
 
-  return request<Record<string, unknown>, { participants: Array<{ studentId: string; status: string }> }>({
+  return request<Record<string, unknown>, { participants: Array<{ studentId: string; status: string; note?: string }> }>({
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/attendance`,
     method: "PUT",
     data: { participants },
@@ -111,7 +135,7 @@ export async function saveCoachAttendance(eventId: string, roster: CoachWorkbenc
   });
 }
 
-export async function confirmCoachLesson(eventId: string, studentIds: string[]) {
+export async function confirmCoachLesson(eventId: string, studentIds: string[], note?: string) {
   const context = requireContext();
   const session = getSession();
 
@@ -121,7 +145,7 @@ export async function confirmCoachLesson(eventId: string, studentIds: string[]) 
     data: {
       studentIds,
       actorUserId: session?.userId,
-      note: "重庆天才小程序教练端确认销课",
+      note: note || "重庆天才小程序教练端确认销课",
     },
     idempotent: true,
   });
@@ -156,6 +180,7 @@ export async function recordCoachMatch(input: {
   opponentName?: string;
   homeScore?: number;
   awayScore?: number;
+  events?: CoachMatchPlayerEvent[];
 }) {
   const context = requireContext();
 
@@ -163,6 +188,24 @@ export async function recordCoachMatch(input: {
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/matches`,
     method: "POST",
     data: input,
+    idempotent: true,
+  });
+}
+
+export async function getCoachTrainingProjectTree(): Promise<TrainingProjectTree> {
+  const context = requireContext();
+  const response = await request<Record<string, unknown>>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/training-project-tree`,
+  });
+  return normalizeTrainingProjectTree(response);
+}
+
+export async function saveCoachTrainingProjects(eventId: string, projectIds: string[], note?: string) {
+  const context = requireContext();
+  return request<Record<string, unknown>, { projectIds: string[]; note?: string }>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/training-projects`,
+    method: "PUT",
+    data: { projectIds, note },
     idempotent: true,
   });
 }
@@ -272,6 +315,10 @@ function normalizeEvents(events: Array<Record<string, unknown>>): ScheduleEvent[
 function normalizeEvent(raw: Record<string, unknown>): ScheduleEvent {
   const timeRange = raw.timeRange as { startsAt?: string; endsAt?: string } | undefined;
   const event = (raw.event && typeof raw.event === "object" ? raw.event : raw) as Record<string, unknown>;
+  const children = Array.isArray(raw.children) ? raw.children as Array<Record<string, unknown>> : [];
+  const childIds = Array.isArray(raw.childIds)
+    ? (raw.childIds as unknown[]).map(String).filter(Boolean)
+    : children.map((child) => String(child.id ?? child.studentId ?? "")).filter(Boolean);
   return {
     id: String(event.id ?? raw.id ?? ""),
     type: normalizeEventType(event.type ?? raw.type),
@@ -280,6 +327,11 @@ function normalizeEvent(raw: Record<string, unknown>): ScheduleEvent {
     endsAt: stringOrUndefined(event.endsAt ?? raw.endsAt ?? timeRange?.endsAt),
     venue: String(event.venue ?? event.locationName ?? raw.venue ?? raw.locationName ?? "地点待确认"),
     studentName: stringOrUndefined(event.studentName ?? raw.studentName),
+    childIds,
+    children: children.map((child) => ({
+      id: String(child.id ?? child.studentId ?? ""),
+      name: String(child.name ?? child.studentName ?? "学员"),
+    })).filter((child) => child.id),
     teamName: stringOrUndefined(event.teamName ?? raw.teamName),
     status: String(event.status ?? raw.status ?? "待确认"),
     summary: stringOrUndefined(event.summary ?? raw.summary),
@@ -427,7 +479,11 @@ function normalizeCoachWorkbench(raw: Record<string, unknown>, eventId: string):
     studentId: String(item.studentId ?? item.id ?? ""),
     name: String(item.studentName ?? item.name ?? "学员"),
     status: String(item.status ?? item.attendanceStatus ?? "待点名"),
+    note: stringOrUndefined(item.note ?? item.attendanceNote),
     lessonAction: stringOrUndefined(item.lessonAction ?? item.lessonStatus),
+    shouldConsume: item.shouldConsume === undefined ? true : Boolean(item.shouldConsume),
+    exceptionReason: stringOrUndefined(item.exceptionReason),
+    remainingLessons: numberOrUndefined(item.remainingLessons ?? item.remainingClassHours ?? item.balance),
   }));
   const workflow = asRecord(raw.workflow);
   const training = asRecord(raw.training);
@@ -447,12 +503,89 @@ function normalizeCoachWorkbench(raw: Record<string, unknown>, eventId: string):
       { label: "能力覆盖", value: String(training?.abilityCoverage ?? "能力覆盖预览接口待接入") },
     ],
     match: [
-      { label: "比赛记录", value: String(match?.summary ?? "可录入比赛摘要；球员事件/点评待完善") },
+      { label: "比赛记录", value: String(match?.summary ?? "可录入比赛摘要和进球/助攻等球员事件") },
     ],
     assessmentTemplateId: stringOrUndefined(templateVersions[0]?.templateId ?? templateVersions[0]?.id),
     pending: [
-      { title: "部分能力待完善", message: "点名、销课、比赛摘要和评测完整提交已接入 app-client BFF；训练内容保存、比赛球员事件和评测自动保存仍需补齐。" },
+      { title: "部分能力待完善", message: "点名、销课、训练内容、比赛球员事件和评测完整提交已接入 app-client BFF；评测自动保存仍需 assessment-task BFF。" },
     ],
+  };
+}
+
+function normalizeLessonConfirmation(raw: Record<string, unknown>): CoachLessonConfirmation {
+  const participants = Array.isArray(raw.participants) ? raw.participants as Array<Record<string, unknown>> : [];
+  const ledgers = Array.isArray(raw.ledgers) ? raw.ledgers as Array<Record<string, unknown>> : [];
+  const ledgerByStudentId = new Map<string, Record<string, unknown>>();
+  ledgers.forEach((ledger) => {
+    const studentId = String(ledger.studentId ?? "");
+    if (studentId) ledgerByStudentId.set(studentId, ledger);
+  });
+  return {
+    participants: participants.map((item) => {
+      const studentId = String(item.studentId ?? item.id ?? "");
+      const ledger = ledgerByStudentId.get(studentId);
+      return {
+        studentId,
+        name: String(item.studentName ?? item.name ?? "学员"),
+        status: String(item.status ?? item.attendanceStatus ?? "待确认"),
+        lessonAction: stringOrUndefined(item.lessonAction ?? item.lessonStatus),
+        shouldConsume: item.shouldConsume === undefined ? true : Boolean(item.shouldConsume),
+        exceptionReason: stringOrUndefined(item.exceptionReason),
+        remainingLessons: numberOrUndefined(item.remainingLessons ?? item.remainingClassHours ?? item.balance ?? ledger?.balanceAfter ?? ledger?.remainingLessons),
+      };
+    }).filter((item) => item.studentId),
+    ledgers: ledgers.map((ledger) => ({
+      studentId: String(ledger.studentId ?? ""),
+      remainingLessons: numberOrUndefined(ledger.remainingLessons ?? ledger.balanceAfter),
+      balance: numberOrUndefined(ledger.balance ?? ledger.balanceAfter),
+      status: stringOrUndefined(ledger.status),
+    })).filter((ledger) => ledger.studentId),
+    pending: [{ title: "余额预览", message: ledgers.length ? "余额来自后端销课流水。" : "余额未知时仍可确认销课，后端会按课时规则写入流水。" }],
+  };
+}
+
+function normalizeTrainingProjectTree(raw: Record<string, unknown>): TrainingProjectTree {
+  const dimensions = Array.isArray(raw.dimensions) ? raw.dimensions as Array<Record<string, unknown>> : [];
+  const projects = Array.isArray(raw.projects) ? raw.projects as Array<Record<string, unknown>> : [];
+  const normalizedProjects = projects.map((project) => {
+    const metricIds = Array.isArray(project.metricIds) ? (project.metricIds as unknown[]).map(String).filter(Boolean) : [];
+    const tags = Array.isArray(project.tags) ? (project.tags as unknown[]).map(String).filter(Boolean) : [];
+    return {
+      id: String(project.id ?? ""),
+      name: String(project.name ?? project.title ?? "训练项目"),
+      description: stringOrUndefined(project.description ?? project.summary),
+      metricIds,
+      tags,
+    };
+  }).filter((project) => project.id);
+  const groups = dimensions.map((dimension) => {
+    const dimensionId = String(dimension.id ?? "");
+    const objectives = Array.isArray(dimension.objectives) ? dimension.objectives as Array<Record<string, unknown>> : [];
+    const objectiveProjects = objectives.flatMap((objective) => {
+      const source = Array.isArray(objective.projects) ? objective.projects as Array<Record<string, unknown>> : [];
+      return source.map((project) => {
+        const metricIds = Array.isArray(project.metricIds) ? (project.metricIds as unknown[]).map(String).filter(Boolean) : [];
+        const tags = Array.isArray(project.tags) ? (project.tags as unknown[]).map(String).filter(Boolean) : [];
+        return {
+          id: String(project.id ?? ""),
+          name: String(project.name ?? project.title ?? "训练项目"),
+          description: stringOrUndefined(project.description ?? project.summary),
+          metricIds,
+          tags,
+        };
+      }).filter((project) => project.id);
+    });
+    const groupProjects = objectiveProjects.length ? objectiveProjects : normalizedProjects.slice(0, 8);
+    return {
+      id: dimensionId || String(dimension.name ?? "group"),
+      name: String(dimension.name ?? "训练分组"),
+      projects: groupProjects.length ? groupProjects : normalizedProjects.slice(0, 8),
+    };
+  }).filter((group) => group.id);
+  return {
+    groups: groups.length ? groups : [{ id: "all", name: "训练项目", projects: normalizedProjects }],
+    projects: normalizedProjects,
+    pending: normalizedProjects.length ? [] : [{ title: "训练项目待同步", message: "后端未返回可选训练项目。" }],
   };
 }
 

@@ -1,4 +1,3 @@
-import { alg, Graph } from "@dagrejs/graphlib";
 import type {
   AbilityMetric,
   DerivedMetricDefinition,
@@ -7,7 +6,7 @@ import type {
   MetricLineage,
   PlayerMetricRecord,
 } from "./metrics.js";
-import { getNumericMetricValue } from "./metrics.js";
+import { getNumericMetricValue, sortMetricDependencyGraph } from "./metrics.js";
 import type { EntityId, ISODateTimeString } from "./primitives.js";
 import type { IdGenerator } from "./ports.js";
 
@@ -43,7 +42,6 @@ export function validateMetricGraphVersion(input: {
   dependencies: MetricDependency[];
 }) {
   const metricIds = new Set(input.metrics.map((metric) => metric.id));
-  const graph = buildDependencyGraph(input.dependencies);
 
   for (const dependency of input.dependencies) {
     if (dependency.graphVersionId !== input.graphVersion.id) {
@@ -59,11 +57,12 @@ export function validateMetricGraphVersion(input: {
     }
   }
 
-  if (!alg.isAcyclic(graph)) {
+  const result = sortMetricDependencyGraph([...metricIds], input.dependencies);
+  if (result.cycles.length) {
     throw new Error(`Metric graph ${input.graphVersion.id} contains a cycle.`);
   }
 
-  return alg.topsort(graph) as EntityId[];
+  return result.calculationOrder;
 }
 
 export function computeMetricGraph(input: MetricGraphComputationInput): MetricGraphComputationResult {
@@ -157,18 +156,6 @@ export function computeMetricGraph(input: MetricGraphComputationInput): MetricGr
     lineages,
     calculationOrder,
   };
-}
-
-function buildDependencyGraph(dependencies: MetricDependency[]) {
-  const graph = new Graph({ directed: true });
-
-  for (const dependency of dependencies) {
-    graph.setNode(dependency.inputMetricId);
-    graph.setNode(dependency.outputMetricId);
-    graph.setEdge(dependency.inputMetricId, dependency.outputMetricId);
-  }
-
-  return graph;
 }
 
 function resolveFormula(

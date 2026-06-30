@@ -70,6 +70,14 @@ async function expectParentRead(clientId) {
   assert(events.length > 0, "parent schedule should include imported test events");
   pass("parent.schedule", `${events.length} events`);
 
+  const calendar = await request(`/clubs/${clubId}/app-clients/${clientId}/parent/calendar?from=${encodeURIComponent(testDate)}&to=${encodeURIComponent("2026-07-05")}`, {
+    userId: parentUserId,
+  });
+  const familyEvents = arrayOf(calendar.events);
+  assert(familyEvents.length > 0, "parent family calendar should include aggregated events");
+  assert(arrayOf(familyEvents[0]?.children).length > 0 || arrayOf(familyEvents[0]?.childIds).length > 0, "family calendar event should include child binding");
+  pass("parent.calendar", `${familyEvents.length} aggregated events`);
+
   const growth = await request(`/clubs/${clubId}/app-clients/${clientId}/parent/students/${studentId}/growth-summary`, {
     userId: parentUserId,
   });
@@ -150,6 +158,23 @@ async function expectCoachWrites(clientId, eventId, studentId) {
   assert(correction.ledger, "lesson correction response missing ledger");
   pass("coach.lesson.correct", correction.ledger.id ?? "ok");
 
+  const trainingTree = await request(`/clubs/${clubId}/app-clients/${clientId}/coach/training-project-tree`, {
+    userId: coachUserId,
+  });
+  const projects = arrayOf(trainingTree.projects);
+  assert(projects.length > 0, "training project tree should include projects");
+  const trainingProjectIds = projects.slice(0, 2).map((project) => project.id).filter(Boolean);
+  const trainingProjects = await request(`/clubs/${clubId}/app-clients/${clientId}/coach/events/${eventId}/training-projects`, {
+    method: "PUT",
+    userId: coachUserId,
+    body: {
+      projectIds: trainingProjectIds,
+      note: "CQ Talent mini-program app-client smoke training projects",
+    },
+    idempotent: true,
+  });
+  pass("coach.training-projects", `${arrayOf(trainingProjects.projects).length} projects saved`);
+
   const match = await request(`/clubs/${clubId}/app-clients/${clientId}/coach/matches`, {
     method: "POST",
     userId: coachUserId,
@@ -160,10 +185,16 @@ async function expectCoachWrites(clientId, eventId, studentId) {
       opponentName: "smoke opponent",
       homeScore: 3,
       awayScore: 1,
+      events: [
+        { studentId, type: "goal", minute: 12, note: "smoke goal" },
+        { studentId, type: "assist", minute: 20, note: "smoke assist" },
+      ],
     },
     idempotent: true,
   });
-  pass("coach.match", match.match?.id ?? match.id ?? "ok");
+  assert(arrayOf(match.events).length >= 2, "match response should include player events");
+  assert(arrayOf(match.metricRecords).length >= 2, "goal/assist should create metric records");
+  pass("coach.match", `${match.match?.id ?? match.id ?? "ok"}, metrics=${arrayOf(match.metricRecords).length}`);
 }
 
 async function expectAssessmentSubmit(clientId, eventId, studentId) {

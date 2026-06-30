@@ -1,6 +1,5 @@
 import type { AuditFields, EntityId, ISODateTimeString } from "./primitives.js";
 import type { CatalogScoped, ClubScoped } from "./clubs.js";
-import { Graph, alg } from "@dagrejs/graphlib";
 
 export type MetricValueKind =
   | "rating_1_5"
@@ -129,8 +128,13 @@ export interface DerivedMetricResult {
 }
 
 export interface MetricGraphValidationResult {
-  graph: Graph;
+  graph: MetricDependencyGraph;
   calculationOrder: EntityId[];
+}
+
+export interface MetricDependencyGraph {
+  nodes: EntityId[];
+  edges: Array<{ inputMetricId: EntityId; outputMetricId: EntityId; dependencyId?: EntityId }>;
 }
 
 export interface DeriveMetricGraphInput {
@@ -152,11 +156,6 @@ export interface DeriveMetricGraphResult {
 
 export function validateMetricGraph(metrics: AbilityMetric[], dependencies: MetricDependency[]): MetricGraphValidationResult {
   const metricIds = new Set(metrics.map((metric) => metric.id));
-  const graph = new Graph({ directed: true });
-
-  for (const metric of metrics) {
-    graph.setNode(metric.id);
-  }
 
   for (const dependency of dependencies) {
     if (!metricIds.has(dependency.inputMetricId)) {
@@ -166,19 +165,100 @@ export function validateMetricGraph(metrics: AbilityMetric[], dependencies: Metr
     if (!metricIds.has(dependency.outputMetricId)) {
       throw new Error(`Metric dependency ${dependency.id} references missing output metric ${dependency.outputMetricId}.`);
     }
-
-    graph.setEdge(dependency.inputMetricId, dependency.outputMetricId, dependency);
   }
 
-  if (!alg.isAcyclic(graph)) {
-    const cycles = alg.findCycles(graph).map((cycle) => cycle.join(" -> ")).join("; ");
+  const result = sortMetricDependencyGraph([...metricIds], dependencies);
+  if (result.cycles.length) {
+    const cycles = result.cycles.map((cycle) => cycle.join(" -> ")).join("; ");
     throw new Error(`Metric graph contains cycle: ${cycles}`);
   }
 
   return {
-    graph,
-    calculationOrder: alg.topsort(graph),
+    graph: result.graph,
+    calculationOrder: result.calculationOrder,
   };
+}
+
+export function sortMetricDependencyGraph(metricIds: EntityId[], dependencies: MetricDependency[]): {
+  graph: MetricDependencyGraph;
+  calculationOrder: EntityId[];
+  cycles: EntityId[][];
+} {
+  const nodes = Array.from(new Set(metricIds));
+  const graph: MetricDependencyGraph = {
+    nodes,
+    edges: dependencies.map((dependency) => ({
+      inputMetricId: dependency.inputMetricId,
+      outputMetricId: dependency.outputMetricId,
+      dependencyId: dependency.id,
+    })),
+  };
+  const adjacency = new Map<EntityId, EntityId[]>();
+  const indegree = new Map<EntityId, number>();
+  for (const node of nodes) {
+    adjacency.set(node, []);
+    indegree.set(node, 0);
+  }
+  for (const edge of graph.edges) {
+    if (!adjacency.has(edge.inputMetricId)) adjacency.set(edge.inputMetricId, []);
+    if (!indegree.has(edge.inputMetricId)) indegree.set(edge.inputMetricId, 0);
+    if (!adjacency.has(edge.outputMetricId)) adjacency.set(edge.outputMetricId, []);
+    if (!indegree.has(edge.outputMetricId)) indegree.set(edge.outputMetricId, 0);
+    adjacency.get(edge.inputMetricId)?.push(edge.outputMetricId);
+    indegree.set(edge.outputMetricId, (indegree.get(edge.outputMetricId) ?? 0) + 1);
+  }
+
+  const queue = [...indegree.entries()]
+    .filter(([, degree]) => degree === 0)
+    .map(([node]) => node)
+    .sort();
+  const calculationOrder: EntityId[] = [];
+  while (queue.length) {
+    const node = queue.shift();
+    if (!node) break;
+    calculationOrder.push(node);
+    for (const next of adjacency.get(node) ?? []) {
+      const nextDegree = (indegree.get(next) ?? 0) - 1;
+      indegree.set(next, nextDegree);
+      if (nextDegree === 0) {
+        queue.push(next);
+        queue.sort();
+      }
+    }
+  }
+
+  const cycles = calculationOrder.length === indegree.size ? [] : findMetricCycles(adjacency);
+  return { graph, calculationOrder, cycles };
+}
+
+function findMetricCycles(adjacency: Map<EntityId, EntityId[]>): EntityId[][] {
+  const cycles: EntityId[][] = [];
+  const visiting = new Set<EntityId>();
+  const visited = new Set<EntityId>();
+  const stack: EntityId[] = [];
+
+  function visit(node: EntityId) {
+    if (visiting.has(node)) {
+      const cycleStart = stack.indexOf(node);
+      cycles.push([...stack.slice(cycleStart), node]);
+      return;
+    }
+    if (visited.has(node)) return;
+    visiting.add(node);
+    stack.push(node);
+    for (const next of adjacency.get(node) ?? []) {
+      visit(next);
+    }
+    stack.pop();
+    visiting.delete(node);
+    visited.add(node);
+  }
+
+  for (const node of adjacency.keys()) {
+    visit(node);
+  }
+
+  return cycles;
 }
 
 export function validateDerivedMetricDefinitions(

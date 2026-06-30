@@ -676,7 +676,62 @@ export const schemas = {
     },
   },
   appClientRecordMatch: {
-    body: flexibleObject,
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["eventId", "matchType", "status"],
+      properties: {
+        eventId: { type: "string", minLength: 1 },
+        matchType: { type: "string", enum: ["friendly", "league", "cup", "internal"] },
+        status: { type: "string", enum: ["scheduled", "completed", "cancelled"] },
+        opponentName: { type: "string" },
+        homeScore: { type: "number" },
+        awayScore: { type: "number" },
+        rosters: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["studentId", "started"],
+            properties: {
+              studentId: { type: "string", minLength: 1 },
+              teamId: { type: "string", minLength: 1 },
+              started: { type: "boolean" },
+              minutesPlayed: { type: "number" },
+              position: { type: "string" },
+            },
+          },
+        },
+        events: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["studentId", "type"],
+            properties: {
+              studentId: { type: "string", minLength: 1 },
+              type: { type: "string", enum: ["goal", "assist", "save", "tackle", "yellow_card", "red_card", "penalty", "own_goal"] },
+              minute: { type: "number" },
+              note: { type: "string" },
+              linkedMetricId: { type: "string", minLength: 1 },
+            },
+          },
+        },
+        notes: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["studentId", "coachId", "note"],
+            properties: {
+              studentId: { type: "string", minLength: 1 },
+              coachId: { type: "string", minLength: 1 },
+              note: { type: "string", minLength: 1 },
+            },
+          },
+        },
+      },
+    },
     response: {
       201: flexibleObject,
       400: errorResponse,

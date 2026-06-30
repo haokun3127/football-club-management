@@ -26,9 +26,21 @@
     <view class="row">
       <view>
         <view class="section-title">{{selectedDate}}</view>
-        <view class="subtitle">当前展示 {{activeStudentName}} 的活动；家庭聚合日程 BFF 待补齐</view>
+        <view class="subtitle">当前展示 {{activeStudentName}} 的家庭聚合日程</view>
       </view>
       <view class="tag muted">只读</view>
+    </view>
+    <picker mode="date" value="{{selectedDate}}" bindchange="onDateChange">
+      <view class="date-picker">切换日期：{{selectedDate}}</view>
+    </picker>
+    <view class="type-tabs">
+      <view
+        wx:for="{{typeTabs}}"
+        wx:key="value"
+        class="type-tab {{selectedType === item.value ? 'active' : ''}}"
+        data-type="{{item.value}}"
+        bindtap="switchType"
+      >{{item.label}}</view>
     </view>
   </view>
 
@@ -41,12 +53,18 @@
   />
 
   <view wx:if="{{state === 'ready'}}">
-    <view wx:for="{{events}}" wx:key="id" class="card event-card" bindtap="openEvent" data-id="{{item.id}}">
+    <view wx:for="{{visibleEvents}}" wx:key="id" class="card event-card" bindtap="openEvent" data-id="{{item.id}}">
       <view class="row">
         <view class="section-title">{{item.title}}</view>
         <view class="tag">{{item.status}}</view>
       </view>
-      <view class="subtitle">{{item.studentName || activeStudentName}}｜{{item.teamName || '队伍待同步'}}</view>
+      <view class="subtitle">
+        <block wx:if="{{item.children && item.children.length}}">
+          <block wx:for="{{item.children}}" wx:key="id" wx:for-item="child">{{child.name}} </block>
+        </block>
+        <block wx:else>{{item.studentName || activeStudentName}}</block>
+        ｜{{item.teamName || '队伍待同步'}}
+      </view>
       <view class="subtitle">{{item.startsAt}} <text wx:if="{{item.endsAt}}">- {{item.endsAt}}</text></view>
       <view class="subtitle">{{item.venue}}</view>
     </view>

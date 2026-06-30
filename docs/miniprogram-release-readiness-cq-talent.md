@@ -118,8 +118,8 @@ sqlite3 /tmp/fcm-cq-talent-smoke.sqlite \
 | 活动工作台 | roster/workflow | 显示点名、销课、记录完善度和学员名单 | 已通过，`2026-06-28` 教练活动 roster 25 人 |
 | 点名 | 学员名单 | 读取 workbench roster；保存走 app-client BFF | 已通过读取与写入 smoke |
 | 销课 | 默认全员销课、返还/补扣纠正 | 确认和纠正都走 app-client lesson-confirmation BFF | 已通过写入 smoke |
-| 比赛录入 | 比赛摘要入口 | 使用 app-client matches BFF，不拼 admin API | 最小摘要表单已接入；球员事件/点评后续完善 |
-| 训练管理 | 训练内容/覆盖 | 训练项目树、覆盖预览缺口清晰呈现 | 待 200 人数据复验 |
+| 比赛录入 | 比赛摘要和球员事件 | 使用 app-client matches BFF，不拼 admin API | 摘要、进球、助攻和关键事件已通过 smoke；点评后续完善 |
+| 训练管理 | 训练内容/覆盖 | 训练项目树可选择并保存；覆盖预览后续完善 | 训练项目保存已通过 smoke |
 | 评测录入 | assessment form | 可读取表单配置；手动完整提交走 app-client assessment BFF；自动保存/任务模型待补 | 已通过完整 62 项提交 smoke |
 | 我的 | 权限范围 | 明确可读、可写、不可见范围 | 待 200 人数据复验 |
 

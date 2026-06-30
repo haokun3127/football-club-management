@@ -18,6 +18,47 @@ button {
   gap: 20rpx;
 }
 
+.strong {
+  color: #1f2329;
+  font-weight: 700;
+}
+
+.consume-toggle {
+  min-width: 118rpx;
+  min-height: 56rpx;
+  padding: 0 16rpx;
+  border-radius: 10rpx;
+  font-size: 24rpx;
+  line-height: 56rpx;
+  text-align: center;
+}
+
+.consume-toggle.on {
+  background: #fff1f0;
+  color: #e60012;
+}
+
+.consume-toggle.off {
+  background: #fff7e6;
+  color: #ad6800;
+}
+
+.reason-input,
+.lesson-note {
+  width: 100%;
+  min-height: 68rpx;
+  margin-top: 14rpx;
+  box-sizing: border-box;
+  padding: 14rpx 16rpx;
+  border-radius: 8rpx;
+  background: #f7f8fa;
+  font-size: 24rpx;
+}
+
+.lesson-note {
+  min-height: 120rpx;
+}
+
 .correction-actions {
   display: flex;
   gap: 16rpx;

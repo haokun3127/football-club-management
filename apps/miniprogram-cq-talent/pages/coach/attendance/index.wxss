@@ -1,3 +1,53 @@
 button {
   margin-top: 20rpx;
 }
+
+.inline-button {
+  width: 180rpx;
+  margin-top: 0;
+}
+
+.attendance-row {
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.attendance-row:last-child {
+  border-bottom: 0;
+}
+
+.attendance-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.strong {
+  color: #1f2329;
+  font-weight: 700;
+}
+
+.status-pill {
+  min-width: 128rpx;
+  min-height: 56rpx;
+  box-sizing: border-box;
+  padding: 0 16rpx;
+  border-radius: 10rpx;
+  background: #fff1f0;
+  color: #e60012;
+  font-size: 24rpx;
+  line-height: 56rpx;
+  text-align: center;
+}
+
+.note-input {
+  width: 100%;
+  min-height: 64rpx;
+  margin-top: 14rpx;
+  box-sizing: border-box;
+  padding: 12rpx 16rpx;
+  border-radius: 8rpx;
+  background: #f7f8fa;
+  font-size: 24rpx;
+}

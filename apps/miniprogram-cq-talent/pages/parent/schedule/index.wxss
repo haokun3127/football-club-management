@@ -18,6 +18,38 @@
   font-weight: 700;
 }
 
+.date-picker {
+  margin-top: 20rpx;
+  padding: 18rpx 20rpx;
+  border-radius: 10rpx;
+  background: #f7f8fa;
+  color: #1f2329;
+  font-size: 26rpx;
+}
+
+.type-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.type-tab {
+  min-height: 56rpx;
+  border-radius: 10rpx;
+  background: #f2f3f5;
+  color: #60646f;
+  font-size: 24rpx;
+  text-align: center;
+  line-height: 56rpx;
+}
+
+.type-tab.active {
+  background: #fff1f0;
+  color: #e60012;
+  font-weight: 700;
+}
+
 .event-card:active {
   background: #fff8f7;
 }

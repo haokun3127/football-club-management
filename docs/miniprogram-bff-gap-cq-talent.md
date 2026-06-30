@@ -29,7 +29,7 @@
 | 训练内容保存 | `PUT /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/training-projects` | 已补齐 | 校验教练活动权限，写入活动专属 session plan，支持 `Idempotency-Key`。 |
 | 点名写入 | `PUT /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/attendance` | 已有，前端已接入 | 教练点名保存，携带 `Idempotency-Key`。 |
 | 销课读取/确认/纠正 | `GET/POST/PATCH /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/lesson-confirmation` | 已有，前端已接入 | 教练销课确认、返还 1 课时、补扣 1 课时，携带 `Idempotency-Key`。 |
-| 比赛录入 app-client 口径 | `POST /clubs/:clubId/app-clients/:clientId/coach/matches` | 已有，最小比赛摘要前端已接入 | 小程序不得调用非 app-client match API；球员事件、点评和战术板后续完善。 |
+| 比赛录入 app-client 口径 | `POST /clubs/:clubId/app-clients/:clientId/coach/matches` | 已有，前端已接入摘要和球员事件 | 小程序不得调用非 app-client match API；进球/助攻会生成对应球员指标记录，点评和战术板后续完善。 |
 | 评测提交 app-client 口径 | `POST /clubs/:clubId/app-clients/:clientId/coach/assessments` | 已有，手动完整提交前端已接入 | 小程序不得调用非 app-client assessment API；单格自动保存仍需 assessment-task BFF。 |
 | 评测表单配置 | `GET /clubs/:clubId/app-clients/:clientId/coach/assessments/templates/:templateId/form` | 已有 | 教练评测录入读取模板字段。 |
 
@@ -92,7 +92,7 @@
 上线前剩余阻塞项：
 
 1. 微信真实 connector：`code2Session`、手机号换取、openId/unionId 绑定和 session 刷新。
-2. 评测任务/自动保存模型；比赛录入继续补齐球员事件、点评和战术板扩展表单。
+2. 评测任务/自动保存模型；比赛点评和战术板扩展表单。
 3. 生产 capabilities 中的 `client.theme`、`roleEntrypoints`、`calendar.participantStatuses`、`match.eventTypes`、`assessment.views`。
 
 ## 8. 已完成的 P0 后端任务
@@ -106,7 +106,7 @@
 | 训练内容树 | `GET /clubs/:clubId/app-clients/:clientId/coach/training-project-tree` | 训练管理 | 核心能力 -> 二级 -> 推荐训练项目。 |
 | 训练内容保存 | `PUT /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/training-projects` | 训练管理 | 保存本活动训练内容，后续接能力覆盖预览。 |
 
-当前本地 dev sqlite 已通过重庆天才验收 seed 写入 200 名导入测试学员，并通过 parent/coach app-client BFF 完成 smoke。后续 P0 后端任务已落到 `.trellis/tasks/06-28-cq-talent-miniprogram-p0-bff`：生产登录、家庭聚合日程、训练内容树、训练内容保存。点名与销课已接入前端并通过本地 API 写入 smoke。
+当前本地 dev sqlite 已通过重庆天才验收 seed 写入 200 名导入测试学员，并通过 parent/coach app-client BFF 完成 smoke。后续生产 P0 主要剩余微信真实 connector；家庭聚合日程、训练内容树、训练内容保存、点名、销课、比赛事件、评测完整提交均已接入前端并通过本地 API 写入 smoke。
 
 ## 9. 实现审计后的状态修正
 
@@ -114,9 +114,9 @@
 
 | 项 | 状态修正 | 后续动作 |
 | --- | --- | --- |
-| 家庭聚合日程 | BFF 已补齐，但前端仍主要使用单孩子 schedule。 | 小程序 P0 改用 `parent/calendar`，保留单孩子 schedule 作为局部详情补充。 |
-| 训练内容树/保存 | BFF 已补齐，但训练管理页仍显示 P0 待接入。 | 小程序 P0 接入 `training-project-tree` 和 `PUT training-projects`，移除过期 pending 文案。 |
-| 比赛进球/助攻事件 | 当前只有比赛摘要写入。 | 需要补 app-client 事件字段或专用 BFF，支持进球、助攻、关键事件、学员和分钟。 |
-| 点名状态编辑 | 点名写入 BFF 已有，但前端不能编辑单人状态。 | 前端 P0 补状态切换、批量到课、备注和失败草稿。 |
-| 销课例外选择 | 销课确认/纠正 BFF 已有，但前端不能在确认前点掉不销课学员。 | 前端 P0 补例外选择和原因；余额预览缺失时 pending。 |
+| 家庭聚合日程 | BFF 已补齐，前端已改用 `parent/calendar`。 | 后续只做提醒、分页和日历高级筛选。 |
+| 训练内容树/保存 | BFF 已补齐，训练管理页已接入。 | 后续补能力覆盖预览和应用到未来课程。 |
+| 比赛进球/助攻事件 | app-client schema 已包含球员事件，前端已接入。 | 后续补点评、战术板和赛后报告。 |
+| 点名状态编辑 | 点名写入 BFF 已有，前端已支持单人状态、批量到课和备注。 | 后续补弱网本地持久化草稿。 |
+| 销课例外选择 | 销课确认/纠正 BFF 已有，前端已支持不销课例外和原因。 | 后续补更完整余额预览和规则说明。 |
 | 指标详情/内容中心/账号详情 | 仍是 P1 BFF 缺口。 | 按页面蓝图补 BFF 后再实现完整详情页。 |

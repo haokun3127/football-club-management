@@ -317,7 +317,7 @@ UI 口径：微信原生标准风格，主色 `#E60012`，按压态 `#C4000F`，
 | 用户操作 | 添加事件；编辑比分；提交。 |
 | 空状态 | 无名单提示先补充名单。 |
 | 错误状态 | 比赛已提交且无编辑接口、事件类型缺失、保存失败。 |
-| BFF/API | 读 workbench/event detail；最小比赛摘要写入走 `POST /clubs/:clubId/app-clients/:clientId/coach/matches`。球员事件、点评和战术板仍为后续表单完善范围。 |
+| BFF/API | 读 workbench/event detail；比赛摘要和球员事件写入走 `POST /clubs/:clubId/app-clients/:clientId/coach/matches`。点评和战术板仍为后续表单完善范围。 |
 | 权限边界 | 不可给无权限比赛写入；事件类型来自 capabilities。 |
 
 ### 4.7 战术板入口
