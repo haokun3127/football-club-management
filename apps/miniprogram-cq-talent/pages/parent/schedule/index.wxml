@@ -1,27 +1,56 @@
 <view class="page">
-  <view class="card nav">
-    <text class="tag">日程</text>
-    <text bindtap="goGrowth">成长</text>
-    <text bindtap="goChild">我的孩子</text>
+  <view class="card hero-card">
+    <view class="row">
+      <view>
+        <view class="title">家庭日程</view>
+        <view class="subtitle">训练、比赛和俱乐部活动</view>
+      </view>
+      <view class="tag">提醒待接入</view>
+    </view>
   </view>
-  <view class="card hero">
-    <view class="title">重庆天才足球</view>
-    <view class="subtitle">家庭日程 · 训练 / 比赛 / 活动</view>
+
+  <view class="card">
+    <view class="section-title">孩子</view>
+    <view class="child-tabs">
+      <view
+        wx:for="{{children}}"
+        wx:key="id"
+        class="child-tab {{activeStudentId === item.id ? 'active' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="switchChild"
+      >{{item.name}}</view>
+    </view>
   </view>
+
   <view class="card">
     <view class="row">
-      <view class="section-title">7月1日</view>
-      <view class="tag">提醒 2</view>
+      <view>
+        <view class="section-title">{{selectedDate}}</view>
+        <view class="subtitle">当前展示 {{activeStudentName}} 的活动；家庭聚合日程 BFF 待补齐</view>
+      </view>
+      <view class="tag muted">只读</view>
     </view>
-    <view class="subtitle">默认展示当前家长绑定孩子的全部活动</view>
   </view>
-  <view wx:for="{{events}}" wx:key="id" class="card event-card" bindtap="openEvent" data-id="{{item.id}}">
-    <view class="row">
-      <view class="section-title">{{item.title}}</view>
-      <view class="tag">{{item.status}}</view>
+
+  <status-view
+    state="{{state}}"
+    title="{{state === 'loading' ? '加载日程' : state === 'empty' ? '暂无活动' : '日程读取失败'}}"
+    message="{{message}}"
+    action-text="{{state === 'error' ? '重试' : ''}}"
+    bindaction="retry"
+  />
+
+  <view wx:if="{{state === 'ready'}}">
+    <view wx:for="{{events}}" wx:key="id" class="card event-card" bindtap="openEvent" data-id="{{item.id}}">
+      <view class="row">
+        <view class="section-title">{{item.title}}</view>
+        <view class="tag">{{item.status}}</view>
+      </view>
+      <view class="subtitle">{{item.studentName || activeStudentName}}｜{{item.teamName || '队伍待同步'}}</view>
+      <view class="subtitle">{{item.startsAt}} <text wx:if="{{item.endsAt}}">- {{item.endsAt}}</text></view>
+      <view class="subtitle">{{item.venue}}</view>
     </view>
-    <view class="subtitle">{{item.studentName}}｜{{item.teamName}}</view>
-    <view class="subtitle">{{item.startsAt}} - {{item.endsAt}}</view>
-    <view class="subtitle">{{item.venue}}</view>
   </view>
+
+  <role-tabbar role="parent" active="schedule" />
 </view>

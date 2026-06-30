@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "比赛录入",
+  "usingComponents": {
+    "status-view": "/components/status-view/index"
+  }
+}

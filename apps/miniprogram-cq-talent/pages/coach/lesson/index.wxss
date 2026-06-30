@@ -1,0 +1,29 @@
+button {
+  margin-top: 20rpx;
+}
+
+.lesson-row {
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.lesson-row:last-child {
+  border-bottom: 0;
+}
+
+.lesson-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.correction-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+
+.correction-actions button {
+  margin-top: 0;
+}

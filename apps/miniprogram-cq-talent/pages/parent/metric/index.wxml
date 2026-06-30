@@ -1,0 +1,17 @@
+<view class="page">
+  <view class="card hero-card">
+    <view class="title">指标详情</view>
+    <view class="subtitle">当前指标：{{metricId || '未选择'}}</view>
+  </view>
+
+  <status-view
+    state="pending"
+    title="指标下钻 BFF 待接入"
+    message="需要 GET /clubs/:clubId/app-clients/:clientId/parent/students/:studentId/ability-metrics/:metricId 返回趋势、来源记录和相关训练项目。当前页面不展示内部公式、权重或其他孩子数据。"
+  />
+
+  <view class="card">
+    <view class="section-title">权限边界</view>
+    <view class="subtitle">仅展示当前家长绑定孩子的 parent-visible 指标；前端不计算评测公式。</view>
+  </view>
+</view>

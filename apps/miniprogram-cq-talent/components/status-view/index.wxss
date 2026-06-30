@@ -1,0 +1,36 @@
+.status {
+  padding: 44rpx 28rpx;
+  margin: 20rpx 0;
+  border-radius: 12rpx;
+  background: #ffffff;
+  border: 1rpx solid #eceef2;
+  text-align: center;
+}
+
+.status-loading,
+.status-pending {
+  background: #fff1f0;
+  border-color: #ffd6d2;
+}
+
+.status-title {
+  color: #1f2329;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.status-message {
+  margin-top: 12rpx;
+  color: #60646f;
+  font-size: 24rpx;
+  line-height: 1.55;
+}
+
+.status-action {
+  margin-top: 24rpx;
+  width: 220rpx;
+  background: #e60012;
+  color: #ffffff;
+  border-radius: 10rpx;
+  font-size: 26rpx;
+}

@@ -1,22 +1,65 @@
 <view class="page">
-  <view class="card nav">
-    <text bindtap="goSchedule">日程</text>
-    <text bindtap="goGrowth">成长</text>
-    <text class="tag">我的孩子</text>
+  <view class="card hero-card">
+    <view class="title">我的孩子</view>
+    <view class="subtitle">档案、课时保险、俱乐部服务和账号绑定</view>
   </view>
+
   <view class="card">
-    <view class="title">{{student.name}}</view>
-    <view class="subtitle">{{student.ageGroup}}｜{{student.teamsText}}</view>
-    <view class="subtitle">主教练：{{student.coachesText}}</view>
+    <view class="section-title">孩子</view>
+    <view class="child-tabs">
+      <view wx:for="{{children}}" wx:key="id" class="child-tab {{activeStudentId === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="switchChild">{{item.name}}</view>
+    </view>
   </view>
-  <view class="card">
-    <view class="section-title">课时与保险</view>
-    <view class="row"><text>剩余课时</text><text class="tag">24</text></view>
-    <view class="row"><text>保险状态</text><text class="tag">有效</text></view>
-    <view class="subtitle">数据来自俱乐部线下确认记录。</view>
+
+  <status-view
+    state="{{state}}"
+    title="{{state === 'loading' ? '加载孩子档案' : state === 'empty' ? '未绑定孩子' : '档案读取失败'}}"
+    message="{{message}}"
+    action-text="{{state === 'error' ? '重试' : ''}}"
+    bindaction="retry"
+  />
+
+  <view wx:if="{{studentHome}}">
+    <view class="card">
+      <view class="section-title">孩子档案</view>
+      <view wx:for="{{studentHome.profile}}" wx:key="label" class="field-row">
+        <view class="label">{{item.label}}</view>
+        <view class="field-value">{{item.value}}</view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="section-title">课时与保险</view>
+      <view wx:for="{{studentHome.lessonStatus}}" wx:key="label" class="field-row">
+        <view class="label">{{item.label}}</view>
+        <view class="field-value">{{item.value}}</view>
+      </view>
+      <view wx:for="{{studentHome.insuranceStatus}}" wx:key="label" class="field-row">
+        <view class="label">{{item.label}}</view>
+        <view class="field-value">{{item.value}}</view>
+      </view>
+      <view class="subtitle">家长端只读，不提供充值、投保、申诉或修改入口。</view>
+    </view>
+
+    <view class="card">
+      <view class="section-title">俱乐部服务</view>
+      <view wx:for="{{studentHome.clubInfo}}" wx:key="label" class="field-row">
+        <view class="label">{{item.label}}</view>
+        <view class="field-value">{{item.value}}</view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="section-title">私教意向</view>
+      <view class="subtitle">只发送意向通知，不做预约、订单、支付或自动派单。</view>
+      <button class="primary-button" bindtap="submitPrivateLessonInterest">发送意向</button>
+    </view>
+
+    <view class="card">
+      <view class="section-title">账号绑定</view>
+      <view class="subtitle">微信绑定、手机号匹配和最近登录状态依赖登录 BFF，当前为可联调结构。</view>
+    </view>
   </view>
-  <view class="card">
-    <view class="section-title">俱乐部服务</view>
-    <view class="subtitle">俱乐部信息｜球场分布｜青训帮助｜教练团队｜私教意向</view>
-  </view>
+
+  <role-tabbar role="parent" active="child" />
 </view>

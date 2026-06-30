@@ -1,18 +1,51 @@
 .launch {
-  padding-top: 120rpx;
+  min-height: 100vh;
+  padding: 96rpx 32rpx 48rpx;
+  box-sizing: border-box;
+  background: #f7f8fa;
 }
 
 .brand {
-  color: #e60012;
-  font-size: 44rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 48rpx;
+}
+
+.brand-mark {
+  width: 112rpx;
+  height: 112rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24rpx;
+  background: #e60012;
+  color: #ffffff;
+  font-size: 34rpx;
   font-weight: 800;
-  margin-bottom: 36rpx;
 }
 
-.action {
+.brand-name {
   margin-top: 24rpx;
+  color: #1f2329;
+  font-size: 38rpx;
+  font-weight: 800;
 }
 
-.note {
-  margin-top: 24rpx;
+.brand-subtitle,
+.notice,
+.dev-hint {
+  margin-top: 12rpx;
+  color: #60646f;
+  font-size: 24rpx;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.notice {
+  margin-top: 32rpx;
+}
+
+.dev-hint {
+  color: #ad6800;
 }

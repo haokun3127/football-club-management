@@ -1,0 +1,39 @@
+<view class="page">
+  <status-view state="{{state}}" title="销课确认" message="{{message}}" />
+  <view wx:if="{{workbench}}" class="card hero-card">
+    <view class="title">销课确认</view>
+    <view class="subtitle">默认全员销课，教练只处理不销课或需纠正学员</view>
+  </view>
+  <view wx:if="{{workbench}}" class="card">
+    <view class="section-title">学员销课状态</view>
+    <view wx:for="{{workbench.roster}}" wx:key="studentId" class="lesson-row">
+      <view class="lesson-main">
+        <view class="label">{{item.name}}</view>
+        <view class="field-value">{{item.lessonAction || '默认销课'}}</view>
+      </view>
+      <view class="correction-actions">
+        <button
+          class="ghost-button mini-button"
+          loading="{{correctingStudentId === item.studentId}}"
+          disabled="{{!!correctingStudentId}}"
+          data-student-id="{{item.studentId}}"
+          data-delta="{{1}}"
+          bindtap="correctLesson"
+        >返还</button>
+        <button
+          class="ghost-button mini-button"
+          loading="{{correctingStudentId === item.studentId}}"
+          disabled="{{!!correctingStudentId}}"
+          data-student-id="{{item.studentId}}"
+          data-delta="{{-1}}"
+          bindtap="correctLesson"
+        >补扣</button>
+      </view>
+    </view>
+  </view>
+  <view wx:if="{{workbench}}" class="card">
+    <view class="section-title">确认与纠正</view>
+    <view class="subtitle">确认销课调用 app-client lesson-confirmation BFF；返还/补扣走同一路径 PATCH，15 天内纠正规则由后端控制。</view>
+    <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="confirmLesson">确认销课</button>
+  </view>
+</view>

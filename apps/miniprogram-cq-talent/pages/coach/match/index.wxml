@@ -1,0 +1,45 @@
+<view class="page">
+  <status-view state="{{state}}" title="比赛录入" message="{{message}}" />
+  <view wx:if="{{workbench}}" class="card hero-card">
+    <view class="title">比赛事件记录</view>
+    <view class="subtitle">{{workbench.event.title}}</view>
+  </view>
+  <view wx:if="{{workbench}}" class="card">
+    <view class="section-title">当前比赛摘要</view>
+    <view wx:for="{{workbench.match}}" wx:key="label" class="field-row">
+      <view class="label">{{item.label}}</view>
+      <view class="field-value">{{item.value}}</view>
+    </view>
+  </view>
+  <view wx:if="{{workbench}}" class="card">
+    <view class="section-title">比赛摘要</view>
+    <view class="form-row">
+      <view class="label">比赛类型</view>
+      <picker mode="selector" range="{{matchTypes}}" range-key="label" value="{{matchTypeIndex}}" bindchange="onMatchTypeChange">
+        <view class="field-input">{{matchTypes[matchTypeIndex].label}}</view>
+      </picker>
+    </view>
+    <view class="form-row">
+      <view class="label">状态</view>
+      <picker mode="selector" range="{{statuses}}" range-key="label" value="{{statusIndex}}" bindchange="onStatusChange">
+        <view class="field-input">{{statuses[statusIndex].label}}</view>
+      </picker>
+    </view>
+    <view class="form-row">
+      <view class="label">对手</view>
+      <input class="field-input" placeholder="可选" value="{{opponentName}}" data-field="opponentName" bindinput="onTextInput" />
+    </view>
+    <view class="score-grid">
+      <view class="form-row">
+        <view class="label">本队</view>
+        <input class="field-input" type="number" placeholder="-" value="{{homeScore}}" data-field="homeScore" bindinput="onTextInput" />
+      </view>
+      <view class="form-row">
+        <view class="label">对手</view>
+        <input class="field-input" type="number" placeholder="-" value="{{awayScore}}" data-field="awayScore" bindinput="onTextInput" />
+      </view>
+    </view>
+    <view class="subtitle">保存走 app-client matches BFF，携带 requestId 和 Idempotency-Key。球员事件、战术板和赛后报告作为后续 P1/P2。</view>
+    <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveMatch">保存比赛摘要</button>
+  </view>
+</view>

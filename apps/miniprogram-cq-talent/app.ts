@@ -1,9 +1,8 @@
-import { setAppContext } from "./utils/store";
-import { mockContext } from "./utils/mock";
+import { restoreAppState } from "./utils/store";
 
 App({
   onLaunch() {
-    setAppContext(mockContext);
+    restoreAppState();
   },
   globalData: {},
 });

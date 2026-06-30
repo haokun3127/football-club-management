@@ -1,38 +1,81 @@
-import { APP_CLIENT_KEY } from "../../utils/config";
-import { createMockSession, mockContext } from "../../utils/mock";
-import { request } from "../../utils/request";
-import { setAppContext, setSession } from "../../utils/store";
+import { resolveClient } from "../../utils/api";
+import { routeHome } from "../../utils/auth";
+import { DEV_MODE } from "../../utils/config";
+import { createDevSession } from "../../utils/mock";
+import { getDevRole, getSession, setAppContext, setSession, toggleDevRole } from "../../utils/store";
+import type { AppRole, LoadState } from "../../utils/types";
 
-interface LaunchPageThis {
-  setData: (data: Record<string, unknown>) => void;
-  resolveClient: () => Promise<void>;
+interface LaunchData {
+  state: LoadState;
+  title: string;
+  message: string;
+  actionText: string;
+  clientName: string;
+  devHint: string;
 }
 
-Page({
+Page<LaunchData>({
   data: {
-    statusText: "正在准备客户端配置...",
+    state: "loading",
+    title: "正在进入重庆天才足球",
+    message: "正在解析小程序客户端和账号绑定状态",
+    actionText: "",
+    clientName: "足球俱乐部小程序",
+    devHint: "",
   },
-  onLoad(this: LaunchPageThis) {
-    this.resolveClient();
+  onLoad() {
+    this.bootstrap();
   },
-  async resolveClient(this: LaunchPageThis) {
+  async bootstrap() {
+    this.setData({
+      state: "loading",
+      title: "正在进入重庆天才足球",
+      message: "正在解析小程序客户端和账号绑定状态",
+      actionText: "",
+    });
     try {
-      const result = await request<typeof mockContext>({
-        path: `/app-clients/resolve?clientKey=${APP_CLIENT_KEY}`,
+      const context = await resolveClient();
+      setAppContext(context);
+      const existing = getSession();
+      if (existing?.role) {
+        routeHome(existing.role);
+        return;
+      }
+      if (DEV_MODE) {
+        const role = getDevRole();
+        setSession(createDevSession(context, role));
+        this.setData({ devHint: `开发身份：${role === "parent" ? "家长" : "教练"}` });
+        routeHome(role);
+        return;
+      }
+      this.setData({
+        state: "pending",
+        title: "需要完成手机号绑定",
+        message: "请使用微信手机号授权匹配俱乐部档案。登录 BFF 接入后会在这里完成绑定。",
+        actionText: "重新检测",
+        clientName: context.capabilities.client?.name || "足球俱乐部小程序",
       });
-      setAppContext(result);
-      this.setData({ statusText: "客户端配置已获取，请使用 mock 登录进入 MVP 页面。" });
-    } catch {
-      setAppContext(mockContext);
-      this.setData({ statusText: "当前使用本地 mock 配置。真实 resolve 接口联调后会自动切换。" });
+    } catch (error) {
+      this.setData({
+        state: "error",
+        title: "暂时无法进入小程序",
+        message: readableError(error),
+        actionText: "重试",
+      });
     }
   },
-  loginAsParent() {
-    setSession(createMockSession("parent"));
-    wx.navigateTo({ url: "/pages/parent/schedule/index" });
+  retry() {
+    this.bootstrap();
   },
-  loginAsCoach() {
-    setSession(createMockSession("coach"));
-    wx.navigateTo({ url: "/pages/coach/schedule/index" });
+  switchDevRole() {
+    if (!DEV_MODE) return;
+    const role: AppRole = toggleDevRole();
+    wx.showToast({ title: `已切换为${role === "parent" ? "家长" : "教练"}测试身份`, icon: "none" });
+    this.bootstrap();
   },
 });
+
+function readableError(error: unknown) {
+  const record = error as { message?: string; code?: string };
+  return record?.message || record?.code || "请检查网络、本地 API 或 app-client 配置后重试。";
+}

@@ -4,7 +4,9 @@
   "private": true,
   "description": "WeChat native mini-program for Chongqing Talent Football Club.",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "smoke:app-client": "node scripts/smoke-app-client.mjs",
+    "devtools:preview": "node scripts/devtools-preview.mjs"
   },
   "devDependencies": {
     "typescript": "^6.0.3"

@@ -1,22 +1,40 @@
 <view class="page">
-  <view class="card nav">
-    <text class="tag">日程</text>
-    <text bindtap="goTraining">训练管理</text>
-    <text bindtap="goMe">我的</text>
-  </view>
-  <view class="card hero">
-    <view class="title">今日课表</view>
-    <view class="subtitle">点名、销课、比赛录入从活动进入</view>
-  </view>
-  <view wx:for="{{events}}" wx:key="id" class="card">
+  <view class="card hero-card">
     <view class="row">
-      <view class="section-title">{{item.title}}</view>
-      <view class="tag">{{item.status}}</view>
-    </view>
-    <view class="subtitle">{{item.startsAt}}｜{{item.venue}}</view>
-    <view class="actions">
-      <button class="primary-button mini" bindtap="openAttendance">点名</button>
-      <button class="ghost-button mini" bindtap="openWrite">记录</button>
+      <view>
+        <view class="title">教练日程</view>
+        <view class="subtitle">今日/本周活动、点名、销课和比赛录入从活动进入</view>
+      </view>
+      <view class="tag">{{date}}</view>
     </view>
   </view>
+
+  <status-view
+    state="{{state}}"
+    title="{{state === 'loading' ? '加载课表' : state === 'empty' ? '暂无活动' : '课表读取失败'}}"
+    message="{{message}}"
+    action-text="{{state === 'error' ? '重试' : ''}}"
+    bindaction="retry"
+  />
+
+  <view wx:if="{{home}}" class="card">
+    <view class="section-title">负责范围</view>
+    <view class="subtitle">{{teamsText}}</view>
+  </view>
+
+  <view wx:if="{{state === 'ready'}}">
+    <view wx:for="{{events}}" wx:key="id" class="card event-card" data-id="{{item.id}}" bindtap="openEvent">
+      <view class="row">
+        <view class="section-title">{{item.title}}</view>
+        <view class="tag">{{item.status}}</view>
+      </view>
+      <view class="subtitle">{{item.teamName || '队伍待同步'}}｜{{item.startsAt}}</view>
+      <view class="subtitle">{{item.venue}}</view>
+      <view class="actions">
+        <button class="primary-button mini-button" data-id="{{item.id}}" bindtap="openEvent">进入工作台</button>
+      </view>
+    </view>
+  </view>
+
+  <role-tabbar role="coach" active="schedule" />
 </view>

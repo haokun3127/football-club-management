@@ -1,0 +1,36 @@
+.test-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #f2f3f5;
+}
+
+.test-row:last-child {
+  border-bottom: 0;
+}
+
+.test-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.field-input,
+.score-input {
+  min-height: 64rpx;
+  box-sizing: border-box;
+  padding: 14rpx 18rpx;
+  border-radius: 8rpx;
+  background: #f7f8fa;
+  color: #111827;
+}
+
+.field-input {
+  margin-top: 16rpx;
+}
+
+.score-input {
+  width: 180rpx;
+  text-align: right;
+}

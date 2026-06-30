@@ -1,0 +1,44 @@
+<view class="page">
+  <status-view state="{{state}}" title="评测录入" message="{{message}}" />
+
+  <view wx:if="{{form}}" class="card hero-card">
+    <view class="title">{{form.templateName}}</view>
+    <view class="subtitle">{{form.versionName}}</view>
+  </view>
+
+  <view wx:if="{{form}}" class="card">
+    <view class="section-title">录入对象</view>
+    <picker wx:if="{{roster.length}}" mode="selector" range="{{roster}}" range-key="name" value="{{studentIndex}}" bindchange="onStudentChange">
+      <view class="field-input">{{roster[studentIndex].name}}</view>
+    </picker>
+    <view wx:else class="subtitle">当前活动名单为空，无法提交评测。</view>
+  </view>
+
+  <view wx:if="{{form}}" class="card">
+    <view class="section-title">测试项目</view>
+    <view wx:for="{{form.fields}}" wx:key="id" wx:for-index="index" class="test-row">
+      <view class="test-meta">
+        <view>{{item.label}}</view>
+        <view class="subtitle">{{item.valueKind}}{{item.unit ? '｜' + item.unit : ''}}｜{{item.required ? '必填' : '可缺测'}}</view>
+      </view>
+      <input
+        class="score-input"
+        placeholder="录入"
+        value="{{values[index]}}"
+        data-index="{{index}}"
+        bindinput="onValueInput"
+      />
+    </view>
+  </view>
+
+  <view wx:if="{{form}}" class="card">
+    <view class="section-title">提交</view>
+    <view class="subtitle">仅提交已填写项目；公式和综合分由后端评测图谱计算。单格自动保存仍待 assessment-task BFF。</view>
+    <button class="primary-button" loading="{{saving}}" disabled="{{saving || !roster.length}}" bindtap="submitAssessment">提交评测</button>
+  </view>
+
+  <view wx:if="{{form}}" wx:for="{{form.pending}}" wx:key="title" class="card">
+    <view class="section-title">{{item.title}}</view>
+    <view class="subtitle">{{item.message}}</view>
+  </view>
+</view>

@@ -1,8 +1,32 @@
-.card radar-canvas {
-  display: block;
+.child-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
 }
 
-.nav {
+.child-tab {
+  padding: 12rpx 20rpx;
+  border-radius: 999rpx;
+  background: #f2f3f5;
+  color: #60646f;
+  font-size: 24rpx;
+}
+
+.child-tab.active {
+  background: #fff1f0;
+  color: #e60012;
+  font-weight: 700;
+}
+
+.metric-row {
   display: flex;
-  justify-content: space-around;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #f2f3f5;
+}
+
+.metric-row:last-child {
+  border-bottom: 0;
 }

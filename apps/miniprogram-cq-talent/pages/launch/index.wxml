@@ -1,10 +1,20 @@
-<view class="page launch">
-  <view class="brand">重庆天才足球俱乐部</view>
-  <view class="card">
-    <view class="title">小程序服务</view>
-    <view class="subtitle">{{statusText}}</view>
-    <button class="primary-button action" bindtap="loginAsParent">家长 mock 登录</button>
-    <button class="ghost-button action" bindtap="loginAsCoach">教练 mock 登录</button>
+<view class="launch">
+  <view class="brand" bindlongpress="switchDevRole">
+    <view class="brand-mark">CQ</view>
+    <view class="brand-name">{{clientName}}</view>
+    <view class="brand-subtitle">训练交付小程序</view>
   </view>
-  <view class="subtitle note">正式联调时将通过微信登录和手机号授权匹配身份，用户不能自行选择角色。</view>
+
+  <status-view
+    state="{{state}}"
+    title="{{title}}"
+    message="{{message}}"
+    action-text="{{actionText}}"
+    bindaction="retry"
+  />
+
+  <view class="notice">
+    身份由俱乐部档案和微信绑定结果决定。家长和教练入口不会在小程序内手动选择。
+  </view>
+  <view wx:if="{{devHint}}" class="dev-hint">{{devHint}}</view>
 </view>

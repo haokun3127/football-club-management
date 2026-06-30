@@ -15,22 +15,23 @@ interface WechatAppOptions {
   globalData?: Record<string, unknown>;
 }
 
-interface WechatPageOptions<TData extends Record<string, unknown> = Record<string, unknown>> {
+interface WechatPageOptions<TData extends Record<string, any> = Record<string, any>> {
   data?: TData;
   onLoad?: (query?: Record<string, string | undefined>) => void;
   onShow?: () => void;
   onReady?: () => void;
   onUnload?: () => void;
-  [key: string]: unknown;
+  setData?: (data: Partial<TData> | Record<string, unknown>) => void;
+  [key: string]: any;
 }
 
 interface WechatComponentOptions {
   properties?: Record<string, unknown>;
-  data?: Record<string, unknown>;
-  lifetimes?: Record<string, () => void>;
-  observers?: Record<string, (value: unknown) => void>;
-  methods?: Record<string, (...args: unknown[]) => unknown>;
-  [key: string]: unknown;
+  data?: Record<string, any>;
+  lifetimes?: Record<string, any>;
+  observers?: Record<string, any>;
+  methods?: Record<string, any>;
+  [key: string]: any;
 }
 
 declare const wx: {
@@ -48,6 +49,6 @@ declare const wx: {
 };
 
 declare function App(options: WechatAppOptions): void;
-declare function Page<TData extends Record<string, unknown>>(options: WechatPageOptions<TData>): void;
-declare function Component(options: WechatComponentOptions): void;
+declare function Page<TData extends Record<string, any> = Record<string, any>>(options: any): void;
+declare function Component(options: any): void;
 declare function getApp<T extends { globalData?: Record<string, unknown> } = { globalData?: Record<string, unknown> }>(): T;

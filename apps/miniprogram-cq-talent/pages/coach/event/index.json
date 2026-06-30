@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "活动工作台",
+  "usingComponents": {
+    "status-view": "/components/status-view/index"
+  }
+}

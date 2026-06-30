@@ -1,20 +1,58 @@
 <view class="page">
-  <view class="card nav">
-    <text bindtap="goSchedule">日程</text>
-    <text class="tag">成长</text>
-    <text bindtap="goChild">我的孩子</text>
+  <view class="card hero-card">
+    <view class="title">能力成长</view>
+    <view class="subtitle">成长足迹、训练历程、能力雷达图和指标下钻</view>
   </view>
+
   <view class="card">
-    <view class="title">张小明</view>
-    <view class="subtitle">U8精英队｜在训 2年3个月｜主教练：王教练、李教练</view>
+    <view class="section-title">孩子</view>
+    <view class="child-tabs">
+      <view wx:for="{{children}}" wx:key="id" class="child-tab {{activeStudentId === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="switchChild">{{item.name}}</view>
+    </view>
   </view>
-  <view class="card">
-    <view class="section-title">能力雷达图</view>
-    <radar-canvas metrics="{{radar}}" bindmetrictap="openMetric"></radar-canvas>
-    <view class="subtitle">同龄平均基于俱乐部内同年龄组最近一次有效记录计算。</view>
+
+  <status-view
+    state="{{state}}"
+    title="{{state === 'loading' ? '加载成长数据' : state === 'empty' ? '成长数据不足' : '成长数据读取失败'}}"
+    message="{{message}}"
+    action-text="{{state === 'error' ? '重试' : ''}}"
+    bindaction="retry"
+  />
+
+  <view wx:if="{{growth}}">
+    <view class="card">
+      <view class="section-title">能力雷达图</view>
+      <radar-canvas metrics="{{radar}}" bindmetrictap="openMetric"></radar-canvas>
+      <view class="subtitle">同龄平均由后端聚合返回；前端不计算排名和公式。</view>
+    </view>
+
+    <view class="card">
+      <view class="section-title">指标列表</view>
+      <view wx:for="{{growth.metricItems}}" wx:key="metricId" class="metric-row" data-id="{{item.metricId}}" bindtap="openMetric">
+        <view>
+          <view>{{item.label}}</view>
+          <view class="subtitle">同龄平均：{{item.peerAverage || '待同步'}}</view>
+        </view>
+        <view class="tag">{{item.value}}</view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="section-title">成长足迹</view>
+      <view wx:for="{{growth.milestones}}" wx:key="title" class="field-row">
+        <view class="label">{{item.title}}</view>
+        <view class="field-value">{{item.description}}</view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="section-title">训练历程</view>
+      <view wx:for="{{growth.trainingHistory}}" wx:key="label" class="field-row">
+        <view class="label">{{item.label}}</view>
+        <view class="field-value">{{item.value}}</view>
+      </view>
+    </view>
   </view>
-  <view class="card">
-    <view class="section-title">训练历程</view>
-    <view class="subtitle">累计训练 86 次｜近 30 天 8 次｜出勤率 93%</view>
-  </view>
+
+  <role-tabbar role="parent" active="growth" />
 </view>

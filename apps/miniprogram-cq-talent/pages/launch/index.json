@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "重庆天才足球"
+  "navigationBarTitleText": "重庆天才足球",
+  "usingComponents": {
+    "status-view": "/components/status-view/index"
+  }
 }

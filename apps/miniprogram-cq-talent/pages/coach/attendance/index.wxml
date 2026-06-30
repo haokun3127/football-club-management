@@ -1,0 +1,19 @@
+<view class="page">
+  <status-view state="{{state}}" title="点名" message="{{message}}" />
+  <view wx:if="{{workbench}}" class="card hero-card">
+    <view class="title">活动点名</view>
+    <view class="subtitle">{{workbench.event.title}}</view>
+  </view>
+  <view wx:if="{{workbench}}" class="card">
+    <view class="section-title">学员名单</view>
+    <view wx:for="{{workbench.roster}}" wx:key="studentId" class="field-row">
+      <view class="label">{{item.name}}</view>
+      <view class="field-value">{{item.status}}</view>
+    </view>
+  </view>
+  <view wx:if="{{workbench}}" class="card">
+    <view class="section-title">写入状态</view>
+    <view class="subtitle">保存将调用 app-client 点名 BFF，并携带 requestId 与 Idempotency-Key。</view>
+    <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveAttendance">保存点名</button>
+  </view>
+</view>

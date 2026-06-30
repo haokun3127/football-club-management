@@ -2,10 +2,17 @@
   "pages": [
     "pages/launch/index",
     "pages/parent/schedule/index",
+    "pages/parent/event/index",
     "pages/parent/growth/index",
+    "pages/parent/metric/index",
     "pages/parent/child/index",
     "pages/coach/schedule/index",
+    "pages/coach/event/index",
+    "pages/coach/attendance/index",
+    "pages/coach/lesson/index",
+    "pages/coach/match/index",
     "pages/coach/training/index",
+    "pages/coach/test-entry/index",
     "pages/coach/me/index"
   ],
   "window": {
@@ -14,6 +21,7 @@
     "navigationBarTextStyle": "white",
     "backgroundColor": "#F7F8FA"
   },
+  "lazyCodeLoading": "requiredComponents",
   "style": "v2",
   "sitemapLocation": "sitemap.json"
 }

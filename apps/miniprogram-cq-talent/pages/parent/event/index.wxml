@@ -1,0 +1,34 @@
+<view class="page">
+  <status-view state="{{state}}" title="活动详情" message="{{message}}" />
+
+  <view wx:if="{{detail}}" class="card hero-card">
+    <view class="row">
+      <view>
+        <view class="title">{{detail.title}}</view>
+        <view class="subtitle">{{detail.id}}</view>
+      </view>
+      <view class="tag">{{detail.status}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{detail}}" class="card">
+    <view class="section-title">基本信息</view>
+    <view wx:for="{{detail.fields}}" wx:key="label" class="field-row">
+      <view class="label">{{item.label}}</view>
+      <view class="field-value">{{item.value}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{detail}}" wx:for="{{detail.sections}}" wx:key="title" class="card">
+    <view class="section-title">{{item.title}}</view>
+    <view wx:for="{{item.items}}" wx:key="label" wx:for-item="sub" class="field-row">
+      <view class="label">{{sub.label}}</view>
+      <view class="field-value">{{sub.value}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{detail}}" wx:for="{{detail.pending}}" wx:key="title" class="card">
+    <view class="section-title">{{item.title}}</view>
+    <view class="subtitle">{{item.message}}</view>
+  </view>
+</view>

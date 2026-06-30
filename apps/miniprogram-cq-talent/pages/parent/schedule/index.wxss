@@ -1,13 +1,23 @@
-.hero {
+.child-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.child-tab {
+  padding: 12rpx 20rpx;
+  border-radius: 999rpx;
+  background: #f2f3f5;
+  color: #60646f;
+  font-size: 24rpx;
+}
+
+.child-tab.active {
   background: #fff1f0;
-  border-color: #ffd6d2;
+  color: #e60012;
+  font-weight: 700;
 }
 
 .event-card:active {
   background: #fff8f7;
-}
-
-.nav {
-  display: flex;
-  justify-content: space-around;
 }

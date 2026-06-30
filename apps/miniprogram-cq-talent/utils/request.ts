@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "./config";
+import { API_BASE_URL, DEV_MODE, DEV_USER_IDS } from "./config";
 import { createIdempotencyKey, createRequestId } from "./idempotency";
 import { getAppContext, getSession } from "./store";
 
@@ -30,6 +30,10 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
 
   if (session?.token) {
     headers.Authorization = `Bearer ${session.token}`;
+  }
+
+  if (DEV_MODE && session?.role) {
+    headers["X-User-Id"] = session.userId || DEV_USER_IDS[session.role];
   }
 
   if (options.idempotent && options.method && options.method !== "GET") {

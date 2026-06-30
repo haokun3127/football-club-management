@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "销课确认",
+  "usingComponents": {
+    "status-view": "/components/status-view/index"
+  }
+}

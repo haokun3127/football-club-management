@@ -1,0 +1,43 @@
+button {
+  margin-top: 20rpx;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.form-row:last-child {
+  border-bottom: 0;
+}
+
+.field-input {
+  min-width: 220rpx;
+  min-height: 64rpx;
+  box-sizing: border-box;
+  padding: 14rpx 18rpx;
+  border-radius: 8rpx;
+  background: #f7f8fa;
+  color: #111827;
+  text-align: right;
+}
+
+.score-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+}
+
+.score-grid .form-row {
+  display: block;
+}
+
+.score-grid .field-input {
+  width: 100%;
+  margin-top: 12rpx;
+  text-align: center;
+}

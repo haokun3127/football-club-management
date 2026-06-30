@@ -1,0 +1,44 @@
+<view class="page">
+  <status-view state="{{state}}" title="活动工作台" message="{{message}}" />
+
+  <view wx:if="{{workbench}}" class="card hero-card">
+    <view class="row">
+      <view>
+        <view class="title">{{workbench.event.title}}</view>
+        <view class="subtitle">{{workbench.event.startsAt}}｜{{workbench.event.venue}}</view>
+      </view>
+      <view class="tag">{{workbench.event.status}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{workbench}}" class="card">
+    <view class="section-title">记录完善度</view>
+    <view wx:for="{{workbench.workflow}}" wx:key="label" class="field-row">
+      <view class="label">{{item.label}}</view>
+      <view class="field-value">{{item.value}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{workbench}}" class="card">
+    <view class="section-title">活动操作</view>
+    <view class="grid-2">
+      <button class="primary-button mini-button" bindtap="openAttendance">点名</button>
+      <button class="primary-button mini-button" bindtap="openLesson">销课</button>
+      <button class="ghost-button mini-button" bindtap="openMatch">比赛录入</button>
+      <button class="ghost-button mini-button" bindtap="openTestEntry">评测录入</button>
+    </view>
+  </view>
+
+  <view wx:if="{{workbench}}" class="card">
+    <view class="section-title">学员名单</view>
+    <view wx:for="{{workbench.roster}}" wx:key="studentId" class="field-row">
+      <view class="label">{{item.name}}</view>
+      <view class="field-value">{{item.status}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{workbench}}" wx:for="{{workbench.pending}}" wx:key="title" class="card">
+    <view class="section-title">{{item.title}}</view>
+    <view class="subtitle">{{item.message}}</view>
+  </view>
+</view>

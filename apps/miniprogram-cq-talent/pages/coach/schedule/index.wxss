@@ -1,20 +1,3 @@
-.hero {
-  background: #fff1f0;
-  border-color: #ffd6d2;
-}
-
-.actions {
-  display: flex;
-  gap: 16rpx;
-  margin-top: 20rpx;
-}
-
-.mini {
-  flex: 1;
-  font-size: 26rpx;
-}
-
-.nav {
-  display: flex;
-  justify-content: space-around;
+.event-card:active {
+  background: #fff8f7;
 }

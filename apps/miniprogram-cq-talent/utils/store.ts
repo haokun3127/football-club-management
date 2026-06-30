@@ -1,8 +1,13 @@
-import { STORAGE_KEYS } from "./config";
-import type { AppContext, SessionState } from "./types";
+import { DEV_IDENTITY_ROLE, STORAGE_KEYS } from "./config";
+import type { AppContext, AppRole, SessionState } from "./types";
 
 let appContext: AppContext | null = null;
 let sessionState: SessionState | null = null;
+
+export function restoreAppState() {
+  getAppContext();
+  getSession();
+}
 
 export function setAppContext(context: AppContext) {
   appContext = context;
@@ -32,4 +37,22 @@ export function getSession() {
 export function clearSession() {
   sessionState = null;
   wx.removeStorageSync(STORAGE_KEYS.session);
+}
+
+export function setCurrentStudentId(studentId: string) {
+  const session = getSession();
+  if (!session) return;
+  setSession({ ...session, currentStudentId: studentId });
+}
+
+export function getDevRole(): AppRole {
+  const stored = wx.getStorageSync<AppRole | "">(STORAGE_KEYS.devRole);
+  return stored || DEV_IDENTITY_ROLE;
+}
+
+export function toggleDevRole(): AppRole {
+  const next = getDevRole() === "parent" ? "coach" : "parent";
+  wx.setStorageSync(STORAGE_KEYS.devRole, next);
+  clearSession();
+  return next;
 }
