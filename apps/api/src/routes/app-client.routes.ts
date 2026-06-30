@@ -1,5 +1,6 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import type { ClubUserRole } from "@football-club/domain";
+import type { RecordAssessmentInput, RecordMatchInput } from "@football-club/domain";
 import type { PrivacyRequestCreateInput } from "../data-capability/types.js";
 import type { ClubAppClient, StudentDetail, StudentListItem } from "../data-capability/types.js";
 import { schemas } from "../http/schemas.js";
@@ -66,6 +67,82 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         client: summarizeClient(client),
         role: "parent",
         children: children.map(summarizeStudent),
+      };
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+      clientId: string;
+    };
+    Body: {
+      wxLoginCode: string;
+      phoneCode?: string;
+      encryptedPhoneData?: string;
+      roleHint?: AppRole;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/wechat-login",
+    {
+      schema: {
+        ...schemas.appClientParams,
+        ...schemas.appClientWechatLogin,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClientAny(context, reply, request.params.clubId, request.params.clientId);
+      if (!client) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.membershipResolver.resolve(request, request.params.clubId)
+        : null;
+      if (!auth) {
+        return {
+          clubId: request.params.clubId,
+          client: summarizeClient(client),
+          status: "binding_required",
+          phoneBinding: request.body.phoneCode || request.body.encryptedPhoneData ? "received" : "required",
+          session: null,
+          role: null,
+          profile: null,
+          children: [],
+          capabilities: await context.store.getClubCapabilities(request.params.clubId, { clientId: request.params.clientId }),
+        };
+      }
+
+      const role = resolveAppRole(auth?.membership.roles);
+      const entrypoints = client.roleEntrypoints?.[role];
+      if (!Array.isArray(entrypoints) || entrypoints.length === 0) {
+        return context.sendError(reply, 403, "forbidden", `App client does not expose ${role} entrypoints`);
+      }
+      const students = role === "parent"
+        ? (await context.store.listOperationalStudents(request.params.clubId))
+          .filter((student) => auth ? context.store.isGuardianOfStudent(request.params.clubId, auth.user.id, student.id) : true)
+        : [];
+
+      return {
+        clubId: request.params.clubId,
+        client: summarizeClient(client),
+        status: "authenticated",
+        phoneBinding: request.body.phoneCode || request.body.encryptedPhoneData ? "accepted" : "not_provided",
+        session: {
+          token: auth ? `dev-session-${auth.user.id}` : "dev-session-anonymous",
+          expiresInSeconds: 7200,
+        },
+        profile: auth
+          ? {
+            userId: auth.user.id,
+            displayName: auth.user.displayName,
+            phone: auth.user.phone,
+            roles: auth.membership.roles,
+          }
+          : null,
+        role,
+        children: students.map(summarizeStudent),
+        capabilities: await context.store.getClubCapabilities(request.params.clubId, { clientId: request.params.clientId }),
       };
     },
   );
@@ -248,6 +325,100 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
               metric: metricCatalog.find((metric) => metric.id === record.metricId) ?? null,
             })),
         })),
+      };
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      studentId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/parent/students/:studentId/status-summary",
+    {
+      schema: {
+        ...schemas.appClientStudentParams,
+        ...schemas.appClientStatusSummary,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "parent");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireStudentAccess(request, reply, request.params.clubId, request.params.studentId)) {
+        return reply;
+      }
+
+      const status = await context.store.getStudentOperationalStatusSummary(request.params.clubId, request.params.studentId);
+      if (!status) {
+        return context.sendError(reply, 404, "not_found", "Student not found");
+      }
+
+      return {
+        clubId: request.params.clubId,
+        client: summarizeClient(client),
+        studentId: request.params.studentId,
+        status,
+      };
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      studentId: string;
+      metricId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/parent/students/:studentId/ability-metrics/:metricId",
+    {
+      schema: {
+        ...schemas.appClientMetricParams,
+        ...schemas.appClientMetricDetail,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "parent");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireStudentAccess(request, reply, request.params.clubId, request.params.studentId)) {
+        return reply;
+      }
+
+      const metricCatalog = await context.store.listAbilityMetrics(request.params.clubId);
+      const metric = metricCatalog.find((item) => item.id === request.params.metricId);
+      if (!metric) {
+        return context.sendError(reply, 404, "not_found", "Metric not found");
+      }
+
+      const records = (await context.store.getStudentMetrics(request.params.clubId, request.params.studentId))
+        .filter((record) => record.metricId === request.params.metricId);
+      const events = await context.store.getStudentTimeline(request.params.clubId, request.params.studentId) as AppEventDetail[];
+
+      return {
+        clubId: request.params.clubId,
+        client: summarizeClient(client),
+        studentId: request.params.studentId,
+        metric,
+        latest: records[0] ?? null,
+        records: records.slice(0, 20),
+        trend: buildMetricTrends(records),
+        sourceEvents: records
+          .filter((record) => record.eventId)
+          .map((record) => ({
+            recordId: record.id,
+            event: events.find((event) => event.id === record.eventId) ?? null,
+          })),
+        privacy: {
+          minorProfile: "redacted_contact_fields",
+        },
       };
     },
   );
@@ -547,6 +718,218 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       clientId: string;
     };
     Querystring: {
+      from?: string;
+      to?: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/parent/calendar",
+    {
+      schema: {
+        ...schemas.appClientParams,
+        ...schemas.appClientScheduleQuery,
+        ...schemas.appClientParentCalendar,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "parent");
+      if (!client) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+      if (auth && !auth.membership.roles.includes("parent")) {
+        return context.sendError(reply, 403, "forbidden", "Parent role is required for this operation");
+      }
+
+      const students = await context.store.listOperationalStudents(request.params.clubId);
+      const children = auth
+        ? students.filter((student) => context.store.isGuardianOfStudent(request.params.clubId, auth.user.id, student.id))
+        : students;
+      const childIds = new Set(children.map((student) => student.id));
+      const eventsById = new Map<string, AppEventDetail & { childIds: string[]; children: unknown[] }>();
+
+      for (const child of children) {
+        const events = filterEventsByRange(
+          sortEvents(await context.store.getStudentTimeline(request.params.clubId, child.id)),
+          request.query,
+        );
+        for (const event of events) {
+          const existing = eventsById.get(event.id);
+          const visibleParticipants = (event.participants ?? []).filter((participant) => childIds.has(participant.studentId));
+          if (existing) {
+            if (!existing.childIds.includes(child.id)) {
+              existing.childIds.push(child.id);
+              existing.children.push(summarizeStudent(child));
+            }
+            existing.participants = uniqueParticipants([...(existing.participants ?? []), ...visibleParticipants]);
+            continue;
+          }
+
+          eventsById.set(event.id, {
+            ...event,
+            participants: visibleParticipants,
+            childIds: [child.id],
+            children: [summarizeStudent(child)],
+          });
+        }
+      }
+
+      return {
+        clubId: request.params.clubId,
+        client: summarizeClient(client),
+        role: "parent",
+        children: children.map(summarizeStudent),
+        events: sortEvents([...eventsById.values()]),
+      };
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/training-project-tree",
+    {
+      schema: {
+        ...schemas.appClientParams,
+        ...schemas.appClientTrainingProjectTree,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+
+      const [dimensions, objectives, drills, metrics] = await Promise.all([
+        context.store.listDevelopmentDimensions(request.params.clubId),
+        context.store.listTrainingObjectives(request.params.clubId),
+        context.store.listTrainingDrills(request.params.clubId),
+        context.store.listAbilityMetrics(request.params.clubId),
+      ]);
+
+      return {
+        clubId: request.params.clubId,
+        client: summarizeClient(client),
+        role: "coach",
+        dimensions: dimensions.map((dimension) => ({
+          ...dimension,
+          objectives: objectives
+            .filter((objective) => objective.dimensionId === dimension.id)
+            .map((objective) => ({
+              ...objective,
+              metrics: metrics.filter((metric) => metric.dimensionId === dimension.id),
+              projects: drills
+                .filter((drill) => drill.objectiveIds.includes(objective.id))
+                .map((drill) => summarizeTrainingDrill(drill, metrics)),
+            })),
+        })),
+        projects: drills.map((drill) => summarizeTrainingDrill(drill, metrics)),
+      };
+    },
+  );
+
+  app.put<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      eventId: string;
+    };
+    Body: {
+      projectIds: string[];
+      intensity?: "low" | "medium" | "high";
+      note?: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/training-projects",
+    {
+      schema: {
+        ...schemas.appClientEventParams,
+        ...schemas.appClientTrainingProjectsUpdate,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await requireCoachEventAccess(context, request, reply, request.params.clubId, request.params.eventId)) {
+        return reply;
+      }
+
+      const event = (await context.store.listCalendarEvents(request.params.clubId) as AppEventDetail[])
+        .find((item) => item.id === request.params.eventId);
+      if (!event) {
+        return context.sendError(reply, 404, "not_found", "Event not found");
+      }
+      if (event.type !== "training") {
+        return context.sendError(reply, 400, "invalid_training_event", "Training projects can only be saved on training events");
+      }
+
+      const drills = context.store.listTrainingDrills(request.params.clubId);
+      const selectedDrills = request.body.projectIds.map((projectId) => drills.find((drill) => drill.id === projectId));
+      const missingProjectId = request.body.projectIds.find((projectId, index) => !selectedDrills[index]);
+      if (missingProjectId) {
+        return context.sendError(reply, 400, "invalid_training_project", `Training project not found: ${missingProjectId}`);
+      }
+
+      const now = new Date().toISOString();
+      const sessionPlanId = `session-plan-app-client-${request.params.eventId}`;
+      const existingPlan = context.store.getSessionPlan(sessionPlanId);
+      const selected = selectedDrills.filter((drill): drill is NonNullable<typeof drill> => Boolean(drill));
+      const sessionPlan = context.store.saveSessionPlan({
+        id: sessionPlanId,
+        catalogScope: { scope: "club", clubId: request.params.clubId },
+        name: `${event.title}训练内容`,
+        objectiveIds: Array.from(new Set(selected.flatMap((drill) => drill.objectiveIds))),
+        metricIds: Array.from(new Set(selected.flatMap((drill) => drill.metricIds))),
+        blocks: selected.map((drill, index) => ({
+          id: `session-plan-block-app-client-${request.params.eventId}-${String(index + 1).padStart(2, "0")}`,
+          drillId: drill.id,
+          order: index + 1,
+          plannedMinutes: drill.durationMinutes,
+          notes: request.body.note,
+        })),
+        estimatedMinutes: selected.reduce((sum, drill) => sum + drill.durationMinutes, 0),
+        createdAt: existingPlan?.createdAt ?? now,
+        updatedAt: now,
+      });
+      const trainingSession = await context.store.ensureTrainingSessionForEvent(request.params.clubId, request.params.eventId, {
+        kind: "team",
+        sessionPlanId: sessionPlan.id,
+        intensity: request.body.intensity,
+      });
+      const metrics = context.store.listAbilityMetrics(request.params.clubId);
+
+      return {
+        clubId: request.params.clubId,
+        client: summarizeClient(client),
+        eventId: request.params.eventId,
+        trainingSession,
+        sessionPlan,
+        projects: selected.map((drill) => summarizeTrainingDrill(drill, metrics)),
+      };
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+    };
+    Querystring: {
       date?: string;
     };
   }>(
@@ -592,6 +975,288 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       };
     },
   );
+
+  app.put<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      eventId: string;
+    };
+    Body: {
+      participants: Parameters<RouteContext["store"]["recordEventParticipants"]>[2];
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/attendance",
+    {
+      schema: {
+        ...schemas.appClientEventParams,
+        ...schemas.appClientAttendance,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await requireCoachEventAccess(context, request, reply, request.params.clubId, request.params.eventId)) {
+        return reply;
+      }
+
+      try {
+        const participants = await context.store.recordEventParticipants(
+          request.params.clubId,
+          request.params.eventId,
+          request.body.participants,
+        );
+        return {
+          clubId: request.params.clubId,
+          client: summarizeClient(client),
+          eventId: request.params.eventId,
+          participants,
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Attendance update failed";
+        return context.sendError(reply, 400, "invalid_attendance", message);
+      }
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      eventId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/lesson-confirmation",
+    {
+      schema: {
+        ...schemas.appClientEventParams,
+        ...schemas.appClientLessonConfirmation,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await requireCoachEventAccess(context, request, reply, request.params.clubId, request.params.eventId)) {
+        return reply;
+      }
+
+      const event = (await context.store.listCalendarEvents(request.params.clubId) as AppEventDetail[])
+        .find((item) => item.id === request.params.eventId);
+      const participants = event?.participants ?? [];
+      const ledgers = await Promise.all(participants.map(async (participant) => ({
+        studentId: participant.studentId,
+        ledger: await context.store.getLessonLedger(request.params.clubId, participant.studentId),
+      })));
+
+      return {
+        clubId: request.params.clubId,
+        client: summarizeClient(client),
+        eventId: request.params.eventId,
+        mode: "attendance_debit_confirmation",
+        participants,
+        ledgers,
+      };
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      eventId: string;
+    };
+    Body: {
+      studentIds?: string[];
+      actorUserId?: string;
+      note?: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/lesson-confirmation",
+    {
+      schema: {
+        ...schemas.appClientEventParams,
+        ...schemas.appClientLessonConfirmationCreate,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await requireCoachEventAccess(context, request, reply, request.params.clubId, request.params.eventId)) {
+        return reply;
+      }
+
+      const event = (await context.store.listCalendarEvents(request.params.clubId) as AppEventDetail[])
+        .find((item) => item.id === request.params.eventId);
+      const targetIds = new Set(request.body.studentIds ?? (event?.participants ?? []).map((participant) => participant.studentId));
+
+      try {
+        const ledgers = await Promise.all([...targetIds].map((studentId) =>
+          context.store.recordLessonAdjustment(request.params.clubId, studentId, {
+            entryType: "debit",
+            lessonDelta: -1,
+            source: "attendance",
+            sourceId: `app-client-lesson-${request.params.eventId}-${studentId}`,
+            eventId: request.params.eventId,
+            actorUserId: request.body.actorUserId,
+            note: request.body.note ?? "App client lesson confirmation",
+          }),
+        ));
+        return reply.code(201).send({
+          clubId: request.params.clubId,
+          client: summarizeClient(client),
+          eventId: request.params.eventId,
+          ledgers,
+        });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Lesson confirmation failed";
+        return context.sendError(reply, 400, "invalid_lesson_confirmation", message);
+      }
+    },
+  );
+
+  app.patch<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      eventId: string;
+    };
+    Body: {
+      studentId: string;
+      lessonDelta: number;
+      actorUserId?: string;
+      reason?: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/lesson-confirmation",
+    {
+      schema: {
+        ...schemas.appClientEventParams,
+        ...schemas.appClientLessonConfirmationPatch,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await requireCoachEventAccess(context, request, reply, request.params.clubId, request.params.eventId)) {
+        return reply;
+      }
+
+      try {
+        const ledger = await context.store.recordLessonAdjustment(request.params.clubId, request.body.studentId, {
+          entryType: "adjustment",
+          lessonDelta: request.body.lessonDelta,
+          source: "manual_adjustment",
+          sourceId: `app-client-lesson-correction-${request.params.eventId}-${request.body.studentId}-${Date.now()}`,
+          eventId: request.params.eventId,
+          actorUserId: request.body.actorUserId,
+          note: request.body.reason ?? "App client lesson correction",
+        });
+        return {
+          clubId: request.params.clubId,
+          client: summarizeClient(client),
+          eventId: request.params.eventId,
+          ledger,
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Lesson correction failed";
+        return context.sendError(reply, 400, "invalid_lesson_correction", message);
+      }
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+      clientId: string;
+    };
+    Body: Omit<RecordMatchInput, "clubId">;
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/matches",
+    {
+      schema: {
+        ...schemas.appClientParams,
+        ...schemas.appClientRecordMatch,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (request.body.eventId && !await requireCoachEventAccess(context, request, reply, request.params.clubId, request.body.eventId)) {
+        return reply;
+      }
+
+      try {
+        const result = await context.store.recordMatchSummary({
+          ...request.body,
+          clubId: request.params.clubId,
+        });
+        return reply.code(201).send({
+          clubId: request.params.clubId,
+          client: summarizeClient(client),
+          ...result,
+        });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Match recording failed";
+        return context.sendError(reply, 400, "invalid_match", message);
+      }
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+      clientId: string;
+    };
+    Body: Omit<RecordAssessmentInput, "clubId">;
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/assessments",
+    {
+      schema: {
+        ...schemas.appClientParams,
+        ...schemas.appClientRecordAssessment,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+
+      try {
+        const result = await context.store.recordAssessment({
+          ...request.body,
+          clubId: request.params.clubId,
+        });
+        return reply.code(201).send({
+          clubId: request.params.clubId,
+          client: summarizeClient(client),
+          ...result,
+        });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Assessment recording failed";
+        return context.sendError(reply, 400, "invalid_assessment", message);
+      }
+    },
+  );
 }
 
 async function requireActiveAppClient(
@@ -615,6 +1280,66 @@ async function requireActiveAppClient(
   }
 
   return client;
+}
+
+async function requireActiveAppClientAny(
+  context: RouteContext,
+  reply: Parameters<RouteContext["sendError"]>[0],
+  clubId: string,
+  clientId: string,
+): Promise<ClubAppClient | null> {
+  const client = (await context.store.listClubAppClients(clubId)).find((item) => item.id === clientId);
+
+  if (!client || client.status !== "active") {
+    context.sendError(reply, 404, "not_found", "App client not found");
+    return null;
+  }
+
+  return client;
+}
+
+async function requireCoachEventAccess(
+  context: RouteContext,
+  request: FastifyRequest,
+  reply: FastifyReply,
+  clubId: string,
+  eventId: string,
+): Promise<boolean> {
+  if (!await context.requireClubRole(request, reply, clubId, ["admin", "coach"])) {
+    return false;
+  }
+
+  const auth = context.membershipResolver
+    ? await context.resolveClubAuth(request, reply, clubId)
+    : null;
+  if (context.membershipResolver && !auth) {
+    return false;
+  }
+
+  const roles = auth?.membership.roles ?? ["coach"];
+  if (roles.some((role) => adminRoles.has(role))) {
+    return true;
+  }
+
+  const event = (await context.store.listCalendarEvents(clubId) as AppEventDetail[])
+    .find((item) => item.id === eventId);
+  if (!event) {
+    context.sendError(reply, 404, "not_found", "Event not found");
+    return false;
+  }
+
+  const workbench = await context.store.getCoachToday(clubId, {
+    date: event.timeRange.startsAt.slice(0, 10),
+    userId: auth?.user.id ?? "user-coach-1",
+    roles,
+  }) as { events?: Array<{ id: string }> };
+
+  if (!workbench.events?.some((item) => item.id === eventId)) {
+    context.sendError(reply, 403, "forbidden", "Event is not accessible for this coach membership");
+    return false;
+  }
+
+  return true;
 }
 
 function summarizeClient(client: ClubAppClient) {
@@ -653,6 +1378,38 @@ function summarizeContact(contact: Record<string, unknown> | undefined) {
     name: contact.name,
     relationship: contact.relationship,
   };
+}
+
+function summarizeTrainingDrill(
+  drill: ReturnType<RouteContext["store"]["listTrainingDrills"]>[number],
+  metrics: ReturnType<RouteContext["store"]["listAbilityMetrics"]>,
+) {
+  return {
+    id: drill.id,
+    name: drill.name,
+    objectiveIds: drill.objectiveIds,
+    metricIds: drill.metricIds,
+    metrics: drill.metricIds
+      .map((metricId: string) => metrics.find((metric) => metric.id === metricId))
+      .filter(Boolean),
+    durationMinutes: drill.durationMinutes,
+    difficulty: drill.difficulty,
+    recommendedAgeGroups: drill.recommendedAgeGroups,
+    recommendedLevels: drill.recommendedLevels,
+    equipment: drill.equipment,
+    setup: drill.setup,
+    coachingPoints: drill.coachingPoints,
+  };
+}
+
+function uniqueParticipants(participants: NonNullable<AppEventDetail["participants"]>) {
+  const byStudentId = new Map<string, typeof participants[number]>();
+
+  for (const participant of participants) {
+    byStudentId.set(participant.studentId, participant);
+  }
+
+  return [...byStudentId.values()];
 }
 
 function sortEvents(events: unknown[]): AppEventDetail[] {

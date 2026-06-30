@@ -17,6 +17,7 @@ import {
   type ClubPolicy,
   type CoachProfile,
   type CustomFieldDefinition,
+  type DevelopmentDimension,
   type DerivedMetricDefinition,
   type DerivedMetricResult,
   type EntityId,
@@ -46,9 +47,12 @@ import {
   type RecordMatchInput,
   type SessionDelivery,
   type SessionObservation,
+  type SessionPlan,
   type StudentProfile,
   type Team,
   type TeamMember,
+  type TrainingDrill,
+  type TrainingObjective,
   type TrainingSession,
 } from "@football-club/domain";
 import type {
@@ -83,6 +87,7 @@ import type {
   PrivacyRequestResolveInput,
   PrivacyRetentionDryRunResult,
   RunExternalSyncPolicyResult,
+  RunDueExternalSyncPoliciesResult,
   StageExternalImportInput,
   StageExternalImportResult,
   StudentDetail,
@@ -95,7 +100,13 @@ import type {
   WpsWebhookIngestionResult,
 } from "./data-capability/types.js";
 import { createApiServices } from "./application/services.js";
-import { createWpsConnector, sanitizeExternalConnection } from "./integration/wps-connector.js";
+import { createEnvWpsCredentialResolver, createWpsConnector, parseWpsConnectionConfig, sanitizeExternalConnection } from "./integration/wps-connector.js";
+import {
+  InMemoryWpsWebhookReplayGuard,
+  createEnvWpsSecretResolver,
+  parseWpsWebhookSecurityConfig,
+  verifyWpsWebhookSecurity,
+} from "./integration/wps-webhook-security.js";
 import type { PlatformRepositories } from "./persistence/platform-persistence.js";
 import { createSeedData, type SeedData } from "./seed.js";
 
@@ -127,6 +138,7 @@ export interface ApiStore {
   updateExternalSyncPolicy(clubId: EntityId, policyId: EntityId, input: UpdateExternalSyncPolicyInput): ExternalSyncPolicy | null | Promise<ExternalSyncPolicy | null>;
   runExternalSyncPolicy(clubId: EntityId, policyId: EntityId): RunExternalSyncPolicyResult | null | Promise<RunExternalSyncPolicyResult | null>;
   planDueExternalSyncPolicies(clubId: EntityId, now: string): DueExternalSyncPoliciesResult | Promise<DueExternalSyncPoliciesResult>;
+  runDueExternalSyncPolicies(clubId: EntityId, now: string): RunDueExternalSyncPoliciesResult | Promise<RunDueExternalSyncPoliciesResult>;
   ingestWpsWebhook(clubId: EntityId, input: WpsWebhookIngestionInput): WpsWebhookIngestionResult | Promise<WpsWebhookIngestionResult>;
   getImportPreview(clubId: EntityId, filters?: ImportPreviewFilters): ImportPreview | Promise<ImportPreview>;
   stageExternalImport(clubId: EntityId, input: StageExternalImportInput): StageExternalImportResult | Promise<StageExternalImportResult>;
@@ -154,6 +166,12 @@ export interface ApiStore {
   listMetricViewNodes(clubId: EntityId): MetricViewNode[];
   listAssessmentTemplates(clubId: EntityId): AssessmentTemplate[] | Promise<AssessmentTemplate[]>;
   listAssessmentTestItems(clubId: EntityId): AssessmentTestItem[] | Promise<AssessmentTestItem[]>;
+  listDevelopmentDimensions(clubId: EntityId): DevelopmentDimension[];
+  listTrainingObjectives(clubId: EntityId): TrainingObjective[];
+  listTrainingDrills(clubId: EntityId): TrainingDrill[];
+  listSessionPlans(clubId: EntityId): SessionPlan[];
+  getSessionPlan(sessionPlanId: EntityId): SessionPlan | null;
+  saveSessionPlan(sessionPlan: SessionPlan): SessionPlan;
   getStudentMetrics(clubId: EntityId, studentId: EntityId, source?: MetricSourceKind | MetricSourceKind[]): PlayerMetricRecord[];
   computeAttackingContribution(clubId: EntityId, studentId: EntityId): Promise<DerivedMetricResult>;
   getCoachToday(clubId: EntityId, input: { date: string; userId: EntityId; roles: string[] }): unknown;
@@ -578,6 +596,7 @@ export abstract class SeedBackedStore implements ApiStore {
   private readonly httpIdempotencyRecords = new Map<string, HttpIdempotencyRecord>();
   private readonly privacyAuditLogs: PrivacyAuditLog[] = [];
   private readonly privacyRequests: PrivacyRequest[] = [];
+  protected readonly wpsWebhookReplayGuard = new InMemoryWpsWebhookReplayGuard();
 
   constructor(data: SeedData = createSeedData()) {
     this.data = data;
@@ -874,6 +893,10 @@ export abstract class SeedBackedStore implements ApiStore {
 
   getSessionPlan(sessionPlanId: EntityId) {
     return this.data.sessionPlans.find((item) => item.id === sessionPlanId) ?? null;
+  }
+
+  saveSessionPlan(sessionPlan: SessionPlan) {
+    return upsertById(this.data.sessionPlans, sessionPlan);
   }
 
   listDevelopmentDimensions(clubId: EntityId) {
@@ -1188,17 +1211,25 @@ export abstract class SeedBackedStore implements ApiStore {
       return null;
     }
 
-    const { connection, tableMapping } = this.resolveRunnableSyncPolicy(policy);
-    const connector = createWpsConnector(connection);
-    const records = await connector.fetchRows({ clubId, connection, tableMapping });
-    const result = this.stageExternalImport(clubId, {
-      connectionId: connection.id,
-      tableMappingId: tableMapping.id,
-      sourceName: `wps:${tableMapping.externalTableKey}`,
-      records,
-    });
+    try {
+      const { connection, tableMapping } = this.resolveRunnableSyncPolicy(policy);
+      this.ensureWpsSyncReadiness(policy.clubId, connection, tableMapping);
+      const connector = createWpsConnector(connection, {
+        credentialResolver: createEnvWpsCredentialResolver(),
+      });
+      const records = await connector.fetchRows({ clubId, connection, tableMapping });
+      const result = this.stageExternalImport(clubId, {
+        connectionId: connection.id,
+        tableMappingId: tableMapping.id,
+        sourceName: `wps:${tableMapping.externalTableKey}`,
+        records,
+      });
 
-    return { policy, ...result };
+      return { policy, ...result };
+    } catch (error) {
+      this.recordFailedSyncRun(policy, error, this.now());
+      throw error;
+    }
   }
 
   planDueExternalSyncPolicies(clubId: EntityId, now: string): DueExternalSyncPoliciesResult {
@@ -1211,7 +1242,48 @@ export abstract class SeedBackedStore implements ApiStore {
     };
   }
 
-  ingestWpsWebhook(clubId: EntityId, input: WpsWebhookIngestionInput): WpsWebhookIngestionResult {
+  async runDueExternalSyncPolicies(clubId: EntityId, now: string): Promise<RunDueExternalSyncPoliciesResult> {
+    const due = this.planDueExternalSyncPolicies(clubId, now);
+    const results: RunDueExternalSyncPoliciesResult["results"] = [];
+
+    for (const item of due.policies) {
+      if (!item.due || !item.runnable) {
+        results.push({
+          policyId: item.policy.id,
+          due: item.due,
+          runnable: item.runnable,
+          status: "skipped",
+          error: item.notRunnableReason,
+        });
+        continue;
+      }
+
+      try {
+        const result = await this.runExternalSyncPolicy(clubId, item.policy.id);
+        results.push({
+          policyId: item.policy.id,
+          due: true,
+          runnable: true,
+          status: "completed",
+          syncRunId: result?.syncRun.id,
+          importedRecords: result?.syncRun.importedRecords,
+          failedRecords: result?.syncRun.failedRecords,
+        });
+      } catch (error) {
+        results.push({
+          policyId: item.policy.id,
+          due: true,
+          runnable: true,
+          status: "failed",
+          error: error instanceof Error ? error.message : "Due sync failed",
+        });
+      }
+    }
+
+    return { clubId, now, results };
+  }
+
+  async ingestWpsWebhook(clubId: EntityId, input: WpsWebhookIngestionInput): Promise<WpsWebhookIngestionResult> {
     const connection = this.data.externalConnections.find((item) =>
       item.clubId === clubId && item.id === input.connectionId && item.provider === "wps" && item.status === "active",
     );
@@ -1239,6 +1311,13 @@ export abstract class SeedBackedStore implements ApiStore {
     if (!policy) {
       throw new Error("No active inbound sync policy matches this WPS webhook.");
     }
+    await verifyWpsWebhookSecurity({
+      config: parseWpsWebhookSecurityConfig(connection.config),
+      envelope: input.security,
+      payload: webhookSignedPayload(input),
+      secretResolver: createEnvWpsSecretResolver(),
+      replayGuard: this.wpsWebhookReplayGuard,
+    });
 
     const now = input.occurredAt ?? this.now();
     const syncRun = upsertById<ExternalSyncRun>(this.data.externalSyncRuns, {
@@ -1709,6 +1788,41 @@ export abstract class SeedBackedStore implements ApiStore {
     }
 
     return { connection, tableMapping };
+  }
+
+  private ensureWpsSyncReadiness(clubId: EntityId, connection: ExternalSystemConnection, tableMapping: ExternalTableMapping) {
+    if (connection.status !== "active") {
+      throw new Error("WPS connection must be active before running sync.");
+    }
+    if (parseWpsConnectionConfig(connection.config).mode === "http") {
+      const fieldMappings = this.data.externalFieldMappings.filter((item) =>
+        item.clubId === clubId && item.tableMappingId === tableMapping.id,
+      );
+      if (!fieldMappings.length) {
+        throw new Error("WPS HTTP sync requires field mappings for schema validation.");
+      }
+    }
+  }
+
+  private recordFailedSyncRun(policy: ExternalSyncPolicy, error: unknown, now: string) {
+    upsertById(this.data.externalSyncRuns, {
+      id: this.nextId("external-sync-run-failed"),
+      clubId: policy.clubId,
+      connectionId: policy.connectionId,
+      tableMappingId: policy.tableMappingId,
+      status: "failed",
+      startedAt: now,
+      finishedAt: now,
+      totalRecords: 0,
+      importedRecords: 0,
+      failedRecords: 0,
+      error: {
+        code: "wps_sync_failed",
+        message: error instanceof Error ? error.message : "WPS sync failed",
+      },
+      createdAt: now,
+      updatedAt: now,
+    });
   }
 
   private eventDetail(event: CalendarEvent) {
@@ -2439,16 +2553,24 @@ export class PersistentApiStore extends SeedBackedStore {
       throw new Error("No active table mapping is configured for this sync policy.");
     }
 
-    const connector = createWpsConnector(connection);
-    const records = await connector.fetchRows({ clubId, connection, tableMapping });
-    const result = this.stageExternalImport(clubId, {
-      connectionId: connection.id,
-      tableMappingId: tableMapping.id,
-      sourceName: `wps:${tableMapping.externalTableKey}`,
-      records,
-    });
+    try {
+      ensurePersistentWpsSyncReadiness(config, connection, tableMapping);
+      const connector = createWpsConnector(connection, {
+        credentialResolver: createEnvWpsCredentialResolver(),
+      });
+      const records = await connector.fetchRows({ clubId, connection, tableMapping });
+      const result = this.stageExternalImport(clubId, {
+        connectionId: connection.id,
+        tableMappingId: tableMapping.id,
+        sourceName: `wps:${tableMapping.externalTableKey}`,
+        records,
+      });
 
-    return { policy, ...result };
+      return { policy, ...result };
+    } catch (error) {
+      this.saveFailedPersistentSyncRun(policy, error);
+      throw error;
+    }
   }
 
   override planDueExternalSyncPolicies(clubId: EntityId, now: string): DueExternalSyncPoliciesResult {
@@ -2462,7 +2584,48 @@ export class PersistentApiStore extends SeedBackedStore {
     };
   }
 
-  override ingestWpsWebhook(clubId: EntityId, input: WpsWebhookIngestionInput): WpsWebhookIngestionResult {
+  override async runDueExternalSyncPolicies(clubId: EntityId, now: string): Promise<RunDueExternalSyncPoliciesResult> {
+    const due = this.planDueExternalSyncPolicies(clubId, now);
+    const results: RunDueExternalSyncPoliciesResult["results"] = [];
+
+    for (const item of due.policies) {
+      if (!item.due || !item.runnable) {
+        results.push({
+          policyId: item.policy.id,
+          due: item.due,
+          runnable: item.runnable,
+          status: "skipped",
+          error: item.notRunnableReason,
+        });
+        continue;
+      }
+
+      try {
+        const result = await this.runExternalSyncPolicy(clubId, item.policy.id);
+        results.push({
+          policyId: item.policy.id,
+          due: true,
+          runnable: true,
+          status: "completed",
+          syncRunId: result?.syncRun.id,
+          importedRecords: result?.syncRun.importedRecords,
+          failedRecords: result?.syncRun.failedRecords,
+        });
+      } catch (error) {
+        results.push({
+          policyId: item.policy.id,
+          due: true,
+          runnable: true,
+          status: "failed",
+          error: error instanceof Error ? error.message : "Due sync failed",
+        });
+      }
+    }
+
+    return { clubId, now, results };
+  }
+
+  override async ingestWpsWebhook(clubId: EntityId, input: WpsWebhookIngestionInput): Promise<WpsWebhookIngestionResult> {
     const config = this.getDataCapabilityConfig(clubId);
     const connection = config.externalConnections.find((item) =>
       item.id === input.connectionId && item.provider === "wps" && item.status === "active",
@@ -2487,6 +2650,13 @@ export class PersistentApiStore extends SeedBackedStore {
     if (!policy) {
       throw new Error("No active inbound sync policy matches this WPS webhook.");
     }
+    await verifyWpsWebhookSecurity({
+      config: parseWpsWebhookSecurityConfig(connection.config),
+      envelope: input.security,
+      payload: webhookSignedPayload(input),
+      secretResolver: createEnvWpsSecretResolver(),
+      replayGuard: this.wpsWebhookReplayGuard,
+    });
 
     const now = input.occurredAt ?? new Date().toISOString();
     const syncRun: ExternalSyncRun = {
@@ -2676,6 +2846,44 @@ export class PersistentApiStore extends SeedBackedStore {
       && (selector.clientKey ? item.clientKey === selector.clientKey : true),
     );
   }
+
+  private saveFailedPersistentSyncRun(policy: ExternalSyncPolicy, error: unknown): void {
+    const now = new Date().toISOString();
+    this.repositories.dataCapability.saveExternalSyncRun({
+      id: `external-sync-run-failed-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      clubId: policy.clubId,
+      connectionId: policy.connectionId,
+      tableMappingId: policy.tableMappingId,
+      status: "failed",
+      startedAt: now,
+      finishedAt: now,
+      totalRecords: 0,
+      importedRecords: 0,
+      failedRecords: 0,
+      error: {
+        code: "wps_sync_failed",
+        message: error instanceof Error ? error.message : "WPS sync failed",
+      },
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+}
+
+function ensurePersistentWpsSyncReadiness(
+  config: DataCapabilityConfig,
+  connection: ExternalSystemConnection,
+  tableMapping: ExternalTableMapping,
+) {
+  if (connection.status !== "active") {
+    throw new Error("WPS connection must be active before running sync.");
+  }
+  if (parseWpsConnectionConfig(connection.config).mode === "http") {
+    const fieldMappings = config.fieldMappings.filter((item) => item.tableMappingId === tableMapping.id);
+    if (!fieldMappings.length) {
+      throw new Error("WPS HTTP sync requires field mappings for schema validation.");
+    }
+  }
 }
 
 function validateExternalSyncPolicyInput(input: {
@@ -2728,6 +2936,18 @@ function buildPrivacyExportPreview(
     deniedFieldKeys,
     redactedFieldKeys,
     data: output,
+  };
+}
+
+function webhookSignedPayload(input: WpsWebhookIngestionInput): Record<string, unknown> {
+  return {
+    eventId: input.eventId,
+    eventType: input.eventType,
+    connectionId: input.connectionId,
+    tableMappingId: input.tableMappingId,
+    policyId: input.policyId,
+    occurredAt: input.occurredAt,
+    payload: input.payload,
   };
 }
 

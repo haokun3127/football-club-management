@@ -65,8 +65,9 @@ export function createDataCapabilitySeed(): Pick<
       clientKey: "cq-talent-wechat-main",
       theme: {
         brandName: "重庆天才足球俱乐部",
-        primaryColor: "#0f766e",
-        accentColor: "#f59e0b",
+        primaryColor: "#E60012",
+        accentColor: "#C4000F",
+        lightColor: "#FFF1F0",
       },
       navigation: [
         { key: "home", label: "首页", roles: ["parent", "coach"], enabled: true },

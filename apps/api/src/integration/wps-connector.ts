@@ -17,6 +17,10 @@ export interface WpsConnectionConfig {
   documentToken?: string;
   fileToken?: string;
   pageSize?: number;
+  timeoutMs?: number;
+  maxRetries?: number;
+  retryBaseDelayMs?: number;
+  rateLimitPerMinute?: number;
 }
 
 export interface WpsTableMappingConfig {
@@ -35,7 +39,7 @@ export type WpsCredentialResolver = (credentialRef: string) => WpsCredential | P
 
 export type WpsFetch = (
   url: string,
-  init: { headers?: Record<string, string> },
+  init: { headers?: Record<string, string>; signal?: AbortSignal },
 ) => Promise<{
   ok: boolean;
   status: number;
@@ -54,6 +58,8 @@ export interface WpsConnector {
 export interface WpsConnectorFactoryOptions {
   fetch?: WpsFetch;
   credentialResolver?: WpsCredentialResolver;
+  sleep?: (milliseconds: number) => Promise<void>;
+  now?: () => number;
 }
 
 export function createWpsConnector(
@@ -74,7 +80,7 @@ export function createWpsConnector(
     throw new Error("WPS HTTP connector requires an injected credential resolver.");
   }
 
-  return new HttpWpsConnector(fetchImpl, options.credentialResolver);
+  return new HttpWpsConnector(fetchImpl, options.credentialResolver, options);
 }
 
 export function parseWpsConnectionConfig(config: Record<string, unknown>): WpsConnectionConfig {
@@ -91,6 +97,10 @@ export function parseWpsConnectionConfig(config: Record<string, unknown>): WpsCo
     documentToken: optionalString(config, "documentToken"),
     fileToken: optionalString(config, "fileToken"),
     pageSize: optionalPositiveInteger(config, "pageSize"),
+    timeoutMs: optionalPositiveInteger(config, "timeoutMs"),
+    maxRetries: optionalNonNegativeInteger(config, "maxRetries"),
+    retryBaseDelayMs: optionalPositiveInteger(config, "retryBaseDelayMs"),
+    rateLimitPerMinute: optionalPositiveInteger(config, "rateLimitPerMinute"),
   };
 
   if (mode === "http") {
@@ -146,7 +156,22 @@ export function sanitizeExternalConnection(connection: ExternalSystemConnection)
 
 export function sanitizeWpsConnectionConfig(config: Record<string, unknown>): Record<string, unknown> {
   const sanitized: Record<string, unknown> = {};
-  for (const key of ["mode", "apiBaseUrl", "credentialRef", "credentialStatus", "documentToken", "fileToken", "pageSize"]) {
+  for (const key of [
+    "mode",
+    "apiBaseUrl",
+    "credentialRef",
+    "credentialStatus",
+    "documentToken",
+    "fileToken",
+    "pageSize",
+    "timeoutMs",
+    "maxRetries",
+    "retryBaseDelayMs",
+    "rateLimitPerMinute",
+    "webhookSigningMode",
+    "webhookSecretRef",
+    "webhookMaxSkewSeconds",
+  ]) {
     if (config[key] !== undefined) {
       sanitized[key] = config[key];
     }
@@ -174,10 +199,17 @@ export class DeterministicWpsStubConnector implements WpsConnector {
 }
 
 export class HttpWpsConnector implements WpsConnector {
+  private readonly limiter: SimpleRateLimiter;
+  private readonly sleep: (milliseconds: number) => Promise<void>;
+
   constructor(
     private readonly fetchImpl: WpsFetch,
     private readonly credentialResolver: WpsCredentialResolver,
-  ) {}
+    options: Pick<WpsConnectorFactoryOptions, "sleep" | "now"> = {},
+  ) {
+    this.sleep = options.sleep ?? ((milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)));
+    this.limiter = new SimpleRateLimiter(options.now ?? (() => Date.now()), this.sleep);
+  }
 
   async fetchRows(input: {
     clubId: EntityId;
@@ -191,13 +223,22 @@ export class HttpWpsConnector implements WpsConnector {
     let pageToken: string | undefined;
 
     do {
-      const response = await this.fetchImpl(buildRecordsUrl(connectionConfig, tableConfig, pageToken), {
+      await this.limiter.wait(connectionConfig.rateLimitPerMinute);
+      const response = await fetchWpsWithRetry(
+        this.fetchImpl,
+        buildRecordsUrl(connectionConfig, tableConfig, pageToken),
+        {
         headers: { authorization: credential.authorizationHeader },
-      });
+        timeoutMs: connectionConfig.timeoutMs ?? 10_000,
+        maxRetries: connectionConfig.maxRetries ?? 2,
+        retryBaseDelayMs: connectionConfig.retryBaseDelayMs ?? 250,
+        sleep: this.sleep,
+      },
+      );
 
       if (!response.ok) {
         const body = response.text ? await response.text() : "";
-        throw new Error(`WPS records request failed with status ${response.status}${body ? `: ${body}` : ""}`);
+        throw new Error(`WPS records request failed with status ${response.status}${body ? `: ${redactWpsErrorBody(body)}` : ""}`);
       }
 
       const page = parseWpsRecordsPage(await response.json());
@@ -215,6 +256,84 @@ export class HttpWpsConnector implements WpsConnector {
     } while (pageToken);
 
     return rows;
+  }
+}
+
+export function createEnvWpsCredentialResolver(env: Record<string, string | undefined> = process.env): WpsCredentialResolver {
+  return (credentialRef) => {
+    const envKey = `WPS_CREDENTIAL_${credentialRef.toUpperCase().replace(/[^A-Z0-9]+/g, "_")}`;
+    const authorizationHeader = env[envKey];
+    if (!authorizationHeader) {
+      throw new Error(`WPS credential ${credentialRef} is not configured.`);
+    }
+
+    return { authorizationHeader, status: "configured" };
+  };
+}
+
+async function fetchWpsWithRetry(
+  fetchImpl: WpsFetch,
+  url: string,
+  options: {
+    headers: Record<string, string>;
+    timeoutMs: number;
+    maxRetries: number;
+    retryBaseDelayMs: number;
+    sleep: (milliseconds: number) => Promise<void>;
+  },
+): ReturnType<WpsFetch> {
+  let lastResponse: Awaited<ReturnType<WpsFetch>> | undefined;
+  for (let attempt = 0; attempt <= options.maxRetries; attempt += 1) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), options.timeoutMs);
+    try {
+      const response = await fetchImpl(url, { headers: options.headers, signal: controller.signal });
+      if (!isRetryableStatus(response.status) || attempt === options.maxRetries) {
+        return response;
+      }
+      lastResponse = response;
+    } catch (error) {
+      if (attempt === options.maxRetries) {
+        throw error;
+      }
+    } finally {
+      clearTimeout(timeout);
+    }
+
+    await options.sleep(options.retryBaseDelayMs * 2 ** attempt);
+  }
+
+  return lastResponse as Awaited<ReturnType<WpsFetch>>;
+}
+
+function isRetryableStatus(status: number): boolean {
+  return status === 408 || status === 429 || status >= 500;
+}
+
+function redactWpsErrorBody(body: string): string {
+  return body.replace(/(authorization|access_token|refresh_token|secret|password|credential)["'\s:=]+[^"',}\s]+/gi, "$1=[redacted]");
+}
+
+class SimpleRateLimiter {
+  private nextAvailableAt = 0;
+
+  constructor(
+    private readonly now: () => number,
+    private readonly sleep: (milliseconds: number) => Promise<void>,
+  ) {}
+
+  async wait(rateLimitPerMinute: number | undefined) {
+    if (!rateLimitPerMinute) {
+      return;
+    }
+
+    const intervalMs = Math.ceil(60_000 / rateLimitPerMinute);
+    const current = this.now();
+    const waitMs = Math.max(0, this.nextAvailableAt - current);
+    if (waitMs > 0) {
+      await this.sleep(waitMs);
+    }
+    this.nextAvailableAt = Math.max(current, this.nextAvailableAt) + intervalMs;
   }
 }
 
@@ -349,6 +468,15 @@ function optionalPositiveInteger(row: Record<string, unknown>, key: string): num
   const value = optionalNumber(row, key);
   if (value !== undefined && value <= 0) {
     throw new Error(`Expected ${key} to be a positive integer.`);
+  }
+
+  return value;
+}
+
+function optionalNonNegativeInteger(row: Record<string, unknown>, key: string): number | undefined {
+  const value = optionalNumber(row, key);
+  if (value !== undefined && value < 0) {
+    throw new Error(`Expected ${key} to be a non-negative integer.`);
   }
 
   return value;

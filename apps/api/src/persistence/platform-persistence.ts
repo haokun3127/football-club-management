@@ -141,6 +141,17 @@ export async function seedPlatformData(repositories: PlatformRepositories, data:
     repositories.dataCapability.saveExternalRawRecord(rawRecord);
   }
 
+  for (const link of data.externalRecordLinks) {
+    repositories.dataCapability.confirmExternalRecord(link.clubId, link.rawRecordId, {
+      targetType: link.targetType,
+      targetId: link.targetId,
+      confirmedBy: link.confirmedBy,
+    }, {
+      linkId: link.id,
+      now: link.confirmedAt,
+    });
+  }
+
   for (const privacyFieldPolicy of data.privacyFieldPolicies) {
     repositories.dataCapability.savePrivacyFieldPolicy(privacyFieldPolicy);
   }

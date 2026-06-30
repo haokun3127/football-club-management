@@ -148,8 +148,8 @@ describe("platform persistence", () => {
       conflictPolicy: "manual_review",
       writebackPolicy: "disabled",
     });
-    const due = store.planDueExternalSyncPolicies("club-chongqing-talent", "2026-06-27T09:00:00.000Z");
-    const webhook = store.ingestWpsWebhook("club-chongqing-talent", {
+    const due = store.planDueExternalSyncPolicies("club-chongqing-talent", "2999-01-01T00:00:00.000Z");
+    const webhook = await store.ingestWpsWebhook("club-chongqing-talent", {
       eventId: "persistent-event-001",
       eventType: "table.updated",
       connectionId: "external-connection-wps-cq-talent",

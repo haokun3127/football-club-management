@@ -1,4 +1,5 @@
 import type { SeedData } from "./types.js";
+import { createTalentEliteTrainingCatalog } from "./cq-talent-assessment-model.js";
 import { clubCatalog, chongqingTalentClubId as clubId, seedNow as now, systemCatalog } from "./types.js";
 
 export function createTrainingSeed(): Pick<
@@ -15,8 +16,11 @@ export function createTrainingSeed(): Pick<
   | "sessionObservations"
   | "otherActivities"
 > {
+  const talentElite = createTalentEliteTrainingCatalog();
+
   return {
     dimensions: [
+      ...talentElite.dimensions,
       {
         id: "dimension-technical",
         catalogScope: systemCatalog,
@@ -35,6 +39,7 @@ export function createTrainingSeed(): Pick<
       },
     ],
     objectives: [
+      ...talentElite.objectives,
       {
         id: "objective-finishing",
         catalogScope: systemCatalog,
@@ -46,6 +51,7 @@ export function createTrainingSeed(): Pick<
       },
     ],
     metrics: [
+      ...talentElite.metrics,
       {
         id: "metric-finishing",
         catalogScope: systemCatalog,
@@ -107,6 +113,7 @@ export function createTrainingSeed(): Pick<
       },
     ],
     drills: [
+      ...talentElite.drills,
       {
         id: "drill-finishing-1",
         catalogScope: systemCatalog,
@@ -125,6 +132,7 @@ export function createTrainingSeed(): Pick<
       },
     ],
     sessionPlans: [
+      ...talentElite.sessionPlans,
       {
         id: "session-plan-finishing",
         catalogScope: clubCatalog,

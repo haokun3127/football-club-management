@@ -1,6 +1,7 @@
 import ExcelJS from "exceljs";
 import { describe, expect, it } from "vitest";
 import { HeaderMembershipResolver } from "../src/auth/context.js";
+import { signWpsWebhookPayload } from "../src/integration/wps-webhook-security.js";
 import { createPlatformPersistence } from "../src/persistence/platform-persistence.js";
 import { buildServer } from "../src/server.js";
 import { PersistentApiStore } from "../src/store.js";
@@ -35,13 +36,23 @@ describe("api server", () => {
     expect(body.paths["/clubs/{clubId}/capabilities"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/app-clients"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/children"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/wechat-login"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/home"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/schedule"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/calendar"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/activity-summaries"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/growth-summary"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/status-summary"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/ability-metrics/{metricId}"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/events/{eventId}"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/home"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/workbench"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/training-project-tree"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/training-projects"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/attendance"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/lesson-confirmation"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/matches"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/assessments"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/assessments/templates/{templateId}/form"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/imports/excel/preview"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/students"]).toBeDefined();
@@ -49,6 +60,7 @@ describe("api server", () => {
     expect(body.paths["/clubs/{clubId}/admin/integrations/connections"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/integrations/sync-policies"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/integrations/sync-policies/due"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/admin/integrations/sync-policies/run-due"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/integrations/sync-policies/{policyId}"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/integrations/sync-policies/{policyId}/run"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/integrations/wps/webhook"]).toBeDefined();
@@ -165,6 +177,11 @@ describe("api server", () => {
       url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/schedule?from=2026-07-01&to=2026-07-31",
       headers: { "x-user-id": "user-parent-1" },
     });
+    const parentCalendar = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/calendar?from=2026-07-01&to=2026-07-31",
+      headers: { "x-user-id": "user-parent-1" },
+    });
     const parentEvent = await app.inject({
       method: "GET",
       url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/events/event-training-1",
@@ -200,6 +217,10 @@ describe("api server", () => {
       metrics: { latest: Array<{ metricId: string }>; trends: Array<{ metricId: string }> };
     };
     const scheduleBody = parentSchedule.json() as { events: Array<{ id: string; type: string }> };
+    const calendarBody = parentCalendar.json() as {
+      children: Array<{ id: string }>;
+      events: Array<{ id: string; participants: Array<{ studentId: string }>; childIds: string[] }>;
+    };
     const eventBody = parentEvent.json() as { role: string; event: { id: string; participants: Array<{ studentId: string }> } };
     const coachBody = coachHome.json() as { role: string; workbench: { coachId: string; events: Array<{ id: string }> } };
 
@@ -216,6 +237,11 @@ describe("api server", () => {
     expect(homeBody.metrics.trends.length).toBeGreaterThan(0);
     expect(parentSchedule.statusCode).toBe(200);
     expect(scheduleBody.events.map((event) => event.id)).toEqual(expect.arrayContaining(["event-training-1", "event-match-1"]));
+    expect(parentCalendar.statusCode).toBe(200);
+    expect(calendarBody.children).toEqual([expect.objectContaining({ id: "student-1" })]);
+    expect(calendarBody.events.map((event) => event.id)).toEqual(expect.arrayContaining(["event-training-1", "event-match-1"]));
+    expect(calendarBody.events.every((event) => event.childIds.includes("student-1"))).toBe(true);
+    expect(calendarBody.events.flatMap((event) => event.participants).every((participant) => participant.studentId === "student-1")).toBe(true);
     expect(parentEvent.statusCode).toBe(200);
     expect(eventBody).toEqual(expect.objectContaining({
       role: "parent",
@@ -269,6 +295,21 @@ describe("api server", () => {
       url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/workbench",
       headers: { "x-user-id": "user-coach-1" },
     });
+    const trainingProjectTree = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/training-project-tree",
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    const trainingProjects = await app.inject({
+      method: "PUT",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/training-projects",
+      headers: { "x-user-id": "user-coach-1", "idempotency-key": "training-projects-submit-1" },
+      payload: {
+        projectIds: ["drill-cq-talent-assessment-001", "drill-cq-talent-assessment-002"],
+        intensity: "medium",
+        note: "小程序训练管理保存",
+      },
+    });
     const assessmentForm = await app.inject({
       method: "GET",
       url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/assessments/templates/assessment-template-technical/form",
@@ -292,6 +333,15 @@ describe("api server", () => {
       rosterContext: { participants: unknown[]; students: unknown[] };
       workflow: Record<string, unknown>;
       training: { id: string } | null;
+    };
+    const trainingTreeBody = trainingProjectTree.json() as {
+      dimensions: Array<{ objectives: Array<{ projects: Array<{ id: string; name: string; metrics: unknown[] }> }> }>;
+      projects: Array<{ id: string; name: string; metricIds: string[] }>;
+    };
+    const trainingProjectsBody = trainingProjects.json() as {
+      trainingSession: { eventId: string; sessionPlanId: string; intensity?: string };
+      sessionPlan: { id: string; blocks: Array<{ drillId: string }> };
+      projects: Array<{ id: string }>;
     };
     const formBody = assessmentForm.json() as {
       template: { id: string };
@@ -320,6 +370,26 @@ describe("api server", () => {
     expect(workbenchBody.rosterContext.students.length).toBeGreaterThan(0);
     expect(workbenchBody.workflow).toEqual(expect.objectContaining({ pendingAttendance: true }));
     expect(workbenchBody.training).toEqual(expect.objectContaining({ id: "training-session-1" }));
+    expect(trainingProjectTree.statusCode).toBe(200);
+    expect(trainingTreeBody.projects).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "drill-cq-talent-assessment-001" }),
+    ]));
+    expect(trainingTreeBody.dimensions.flatMap((dimension) =>
+      dimension.objectives.flatMap((objective) => objective.projects),
+    )).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "drill-cq-talent-assessment-001" }),
+    ]));
+    expect(trainingProjects.statusCode).toBe(200);
+    expect(trainingProjects.headers["idempotency-status"]).toBe("stored");
+    expect(trainingProjectsBody.trainingSession).toEqual(expect.objectContaining({
+      eventId: "event-training-1",
+      sessionPlanId: "session-plan-app-client-event-training-1",
+      intensity: "medium",
+    }));
+    expect(trainingProjectsBody.sessionPlan.blocks.map((block) => block.drillId)).toEqual([
+      "drill-cq-talent-assessment-001",
+      "drill-cq-talent-assessment-002",
+    ]);
     expect(assessmentForm.statusCode).toBe(200);
     expect(formBody.template.id).toBe("assessment-template-technical");
     expect(formBody.templateVersion.id).toBe("assessment-template-version-technical-1");
@@ -332,6 +402,133 @@ describe("api server", () => {
     ]));
     expect(parentAssessmentForm.statusCode).toBe(403);
     expect(parentAssessmentForm.json().error.code).toBe("forbidden");
+
+    await app.close();
+    persistence.database.close();
+  });
+
+  it("serves app-client login, status, metric drilldown, and coach write contracts", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    const login = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/wechat-login",
+      payload: {
+        wxLoginCode: "wx-code-placeholder",
+        phoneCode: "phone-code-placeholder",
+        roleHint: "parent",
+      },
+    });
+    const status = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/status-summary",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    const metric = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/ability-metrics/metric-finishing",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    const attendance = await app.inject({
+      method: "PUT",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/attendance",
+      headers: { "x-user-id": "user-coach-1" },
+      payload: {
+        participants: [{ studentId: "student-1", status: "present", note: "Arrived on time" }],
+      },
+    });
+    const lessonRead = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/lesson-confirmation",
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    const lessonConfirm = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/lesson-confirmation",
+      headers: { "x-user-id": "user-coach-1" },
+      payload: {
+        studentIds: ["student-1"],
+        actorUserId: "user-coach-1",
+      },
+    });
+    const lessonCorrection = await app.inject({
+      method: "PATCH",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/lesson-confirmation",
+      headers: { "x-user-id": "user-coach-1" },
+      payload: {
+        studentId: "student-1",
+        lessonDelta: 1,
+        actorUserId: "user-coach-1",
+        reason: "Correct duplicated deduction",
+      },
+    });
+    const match = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/matches",
+      headers: { "x-user-id": "user-coach-1" },
+      payload: {
+        eventId: "event-match-1",
+        matchType: "friendly",
+        status: "completed",
+        events: [{ studentId: "student-1", type: "goal", minute: 18 }],
+      },
+    });
+    const assessment = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/assessments",
+      headers: { "x-user-id": "user-coach-1" },
+      payload: {
+        studentId: "student-1",
+        templateId: "assessment-template-technical",
+        templateVersionId: "assessment-template-version-technical-1",
+        assessedByCoachId: "coach-1",
+        rawResults: [{
+          testItemId: "assessment-test-finishing-cq-talent",
+          value: { kind: "rating_1_5", score: 4 },
+        }],
+      },
+    });
+    const parentWrite = await app.inject({
+      method: "PUT",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/attendance",
+      headers: { "x-user-id": "user-parent-1" },
+      payload: {
+        participants: [{ studentId: "student-1", status: "present" }],
+      },
+    });
+
+    const loginBody = login.json() as { status: string; phoneBinding: string; session: { token: string } | null; role: string };
+    const statusBody = status.json() as { status: { studentId: string; insurance: Record<string, unknown> } };
+    const metricBody = metric.json() as { metric: { id: string }; records: unknown[]; privacy: { minorProfile: string } };
+
+    expect(login.statusCode).toBe(200);
+    expect(loginBody).toEqual(expect.objectContaining({
+      status: "authenticated",
+      phoneBinding: "accepted",
+      role: "coach",
+      session: expect.objectContaining({ token: "dev-session-user-coach-1" }),
+    }));
+    expect(status.statusCode).toBe(200);
+    expect(statusBody.status).toEqual(expect.objectContaining({ studentId: "student-1" }));
+    expect(metric.statusCode).toBe(200);
+    expect(metricBody.metric.id).toBe("metric-finishing");
+    expect(metricBody.records.length).toBeGreaterThan(0);
+    expect(metricBody.privacy.minorProfile).toBe("redacted_contact_fields");
+    expect(attendance.statusCode).toBe(200);
+    expect(lessonRead.statusCode).toBe(200);
+    expect(lessonConfirm.statusCode).toBe(201);
+    expect(lessonCorrection.statusCode).toBe(200);
+    expect(match.statusCode).toBe(201);
+    expect(assessment.statusCode).toBe(201);
+    expect(parentWrite.statusCode).toBe(403);
+    expect(parentWrite.json().error.code).toBe("forbidden");
 
     await app.close();
     persistence.database.close();
@@ -484,7 +681,11 @@ describe("api server", () => {
       expect.objectContaining({ key: "insurance.expiresAt", label: "保险到期日期" }),
       expect.objectContaining({ key: "billing.courseBalance", label: "剩余课时" }),
     ]));
-    expect(body.assessment.views).toEqual([expect.objectContaining({ name: "天才精英队评分视图" })]);
+    expect(body.assessment.views).toEqual(expect.arrayContaining([
+      expect.objectContaining({ name: "天才精英队核心能力雷达" }),
+      expect.objectContaining({ name: "天才精英队完整评分图谱" }),
+      expect.objectContaining({ name: "天才精英队评分视图" }),
+    ]));
     expect(body.assessment.viewNodes).toEqual(expect.arrayContaining([
       expect.objectContaining({ label: "射门终结" }),
       expect.objectContaining({ label: "技术综合指数" }),
@@ -607,13 +808,20 @@ describe("api server", () => {
     };
 
     expect(configResponse.statusCode).toBe(200);
-    expect(config.metricGraphVersions).toEqual([expect.objectContaining({ id: "metric-graph-version-chongqing-talent" })]);
-    expect(config.assessmentTemplateVersions).toEqual([
+    expect(config.metricGraphVersions).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "metric-graph-version-cq-talent-elite-20260326" }),
+      expect.objectContaining({ id: "metric-graph-version-chongqing-talent" }),
+    ]));
+    expect(config.assessmentTemplateVersions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: "assessment-template-version-cq-talent-elite-20260326",
+        graphVersionId: "metric-graph-version-cq-talent-elite-20260326",
+      }),
       expect.objectContaining({
         id: "assessment-template-version-technical-1",
         graphVersionId: "metric-graph-version-chongqing-talent",
       }),
-    ]);
+    ]));
     expect(config.externalConnections).toEqual([expect.objectContaining({ provider: "wps" })]);
     expect(config.tableMappings).toHaveLength(5);
     expect(config.tableMappings.map((mapping) => mapping.externalTableKey)).toEqual(expect.arrayContaining([
@@ -791,7 +999,14 @@ describe("api server", () => {
     const scheduled = scheduledResponse.json() as { id: string };
     const dueResponse = await app.inject({
       method: "GET",
-      url: "/clubs/club-chongqing-talent/admin/integrations/sync-policies/due?now=2026-06-27T09:00:00.000Z",
+      url: "/clubs/club-chongqing-talent/admin/integrations/sync-policies/due?now=2999-01-01T00:00:00.000Z",
+    });
+    const runDueResponse = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/integrations/sync-policies/run-due",
+      payload: {
+        now: "2999-01-01T00:00:00.000Z",
+      },
     });
     const webhookResponse = await app.inject({
       method: "POST",
@@ -851,12 +1066,111 @@ describe("api server", () => {
         }),
       ]),
     }));
+    expect(runDueResponse.statusCode).toBe(201);
+    expect(runDueResponse.json()).toEqual(expect.objectContaining({
+      clubId: "club-chongqing-talent",
+      results: expect.arrayContaining([
+        expect.objectContaining({
+          policyId: scheduled.id,
+          due: true,
+          runnable: true,
+          status: "completed",
+        }),
+      ]),
+    }));
     expect(webhookResponse.statusCode).toBe(202);
     expect(webhookResponse.json()).toEqual(expect.objectContaining({
       status: "queued",
       matchedPolicy: expect.objectContaining({ id: scheduled.id }),
       syncRun: expect.objectContaining({ status: "queued", totalRecords: 0 }),
     }));
+  });
+
+  it("verifies WPS webhook signatures and rejects replayed events", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const connection = persistence.repositories.dataCapability
+      .listExternalConnections("club-chongqing-talent")
+      .find((item) => item.id === "external-connection-wps-cq-talent");
+    if (!connection) {
+      throw new Error("Expected seeded WPS connection.");
+    }
+    persistence.repositories.dataCapability.saveExternalConnection({
+      ...connection,
+      config: {
+        ...connection.config,
+        webhookSigningMode: "hmac_sha256",
+        webhookSecretRef: "cq-talent-webhook",
+        webhookMaxSkewSeconds: 300,
+      },
+    });
+
+    const previousSecret = process.env.WPS_WEBHOOK_SECRET_CQ_TALENT_WEBHOOK;
+    process.env.WPS_WEBHOOK_SECRET_CQ_TALENT_WEBHOOK = "local-webhook-secret";
+
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    const body = {
+      eventId: "signed-event-001",
+      eventType: "table.updated",
+      connectionId: "external-connection-wps-cq-talent",
+      tableMappingId: "external-table-full-users-cq-talent",
+      policyId: "external-sync-policy-wps-cq-talent-manual",
+      occurredAt: "2026-06-26T09:05:00.000Z",
+      payload: { changedRows: 1 },
+    };
+    const timestamp = String(Date.now());
+    const nonce = "nonce-001";
+    const signature = signWpsWebhookPayload({
+      timestamp,
+      nonce,
+      secret: "local-webhook-secret",
+      payload: body,
+    });
+
+    const accepted = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/integrations/wps/webhook",
+      headers: {
+        "x-user-id": "user-admin-1",
+        "x-wps-timestamp": timestamp,
+        "x-wps-nonce": nonce,
+        "x-wps-signature": signature,
+      },
+      payload: body,
+    });
+    const replayed = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/admin/integrations/wps/webhook",
+      headers: {
+        "x-user-id": "user-admin-1",
+        "x-wps-timestamp": timestamp,
+        "x-wps-nonce": nonce,
+        "x-wps-signature": signature,
+      },
+      payload: body,
+    });
+
+    expect(accepted.statusCode).toBe(202);
+    expect(accepted.json()).toEqual(expect.objectContaining({
+      status: "queued",
+      syncRun: expect.objectContaining({ id: "external-sync-run-wps-webhook-signed-event-001" }),
+    }));
+    expect(replayed.statusCode).toBe(400);
+    expect(replayed.json().error.message).toBe("WPS webhook replay detected.");
+
+    if (previousSecret === undefined) {
+      delete process.env.WPS_WEBHOOK_SECRET_CQ_TALENT_WEBHOOK;
+    } else {
+      process.env.WPS_WEBHOOK_SECRET_CQ_TALENT_WEBHOOK = previousSecret;
+    }
+    await app.close();
+    persistence.database.close();
   });
 
   it("rejects non-admin access to WPS automation controls", async () => {

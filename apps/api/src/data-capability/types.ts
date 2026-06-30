@@ -517,6 +517,21 @@ export interface DueExternalSyncPoliciesResult {
   policies: DueExternalSyncPolicy[];
 }
 
+export interface RunDueExternalSyncPoliciesResult {
+  clubId: EntityId;
+  now: string;
+  results: Array<{
+    policyId: EntityId;
+    due: boolean;
+    runnable: boolean;
+    status: "skipped" | "completed" | "failed";
+    syncRunId?: EntityId;
+    importedRecords?: number;
+    failedRecords?: number;
+    error?: string;
+  }>;
+}
+
 export interface WpsWebhookIngestionInput {
   eventId?: string;
   eventType: string;
@@ -525,6 +540,11 @@ export interface WpsWebhookIngestionInput {
   policyId?: EntityId;
   occurredAt?: string;
   payload?: Record<string, unknown>;
+  security?: {
+    timestamp?: string;
+    nonce?: string;
+    signature?: string;
+  };
 }
 
 export interface WpsWebhookIngestionResult {

@@ -1,4 +1,5 @@
 import type { SeedData } from "./types.js";
+import { createTalentEliteAssessmentCatalog } from "./cq-talent-assessment-model.js";
 import { chongqingTalentClubId as clubId, seedNow as now, systemCatalog } from "./types.js";
 
 export function createAssessmentSeed(): Pick<
@@ -18,8 +19,11 @@ export function createAssessmentSeed(): Pick<
   | "metricLineages"
   | "derivedMetricDefinitions"
 > {
+  const talentElite = createTalentEliteAssessmentCatalog();
+
   return {
     metricGraphVersions: [
+      ...talentElite.metricGraphVersions,
       {
         id: "metric-graph-version-chongqing-talent",
         catalogScope: systemCatalog,
@@ -31,6 +35,7 @@ export function createAssessmentSeed(): Pick<
       },
     ],
     metricDependencies: [
+      ...talentElite.metricDependencies,
       {
         id: "metric-dependency-finishing-technical-index",
         catalogScope: systemCatalog,
@@ -46,6 +51,7 @@ export function createAssessmentSeed(): Pick<
       },
     ],
     metricViews: [
+      ...talentElite.metricViews,
       {
         id: "metric-view-technical-basics",
         catalogScope: systemCatalog,
@@ -57,6 +63,7 @@ export function createAssessmentSeed(): Pick<
       },
     ],
     metricViewNodes: [
+      ...talentElite.metricViewNodes,
       {
         id: "metric-view-node-finishing",
         catalogScope: systemCatalog,
@@ -79,6 +86,7 @@ export function createAssessmentSeed(): Pick<
       },
     ],
     assessmentTemplates: [
+      ...talentElite.assessmentTemplates,
       {
         id: "assessment-template-technical",
         catalogScope: systemCatalog,
@@ -91,6 +99,7 @@ export function createAssessmentSeed(): Pick<
       },
     ],
     assessmentTemplateVersions: [
+      ...talentElite.assessmentTemplateVersions,
       {
         id: "assessment-template-version-technical-1",
         clubId,
@@ -103,6 +112,7 @@ export function createAssessmentSeed(): Pick<
       },
     ],
     assessmentMetricBindings: [
+      ...talentElite.assessmentMetricBindings,
       {
         id: "assessment-binding-finishing",
         clubId,
@@ -129,6 +139,7 @@ export function createAssessmentSeed(): Pick<
       },
     ],
     assessmentTestItems: [
+      ...talentElite.assessmentTestItems,
       {
         id: "assessment-test-finishing-cq-talent",
         clubId,
@@ -251,6 +262,7 @@ export function createAssessmentSeed(): Pick<
     ],
     metricLineages: [],
     derivedMetricDefinitions: [
+      ...talentElite.derivedMetricDefinitions,
       {
         id: "derived-attacking-contribution",
         catalogScope: systemCatalog,

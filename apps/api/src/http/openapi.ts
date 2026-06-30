@@ -111,6 +111,12 @@ export function buildOpenApiDocument() {
           ...schemas.appClientParentChildren,
         }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/wechat-login": {
+        post: operation("POST", "/clubs/{clubId}/app-clients/{clientId}/wechat-login", {
+          ...schemas.appClientParams,
+          ...schemas.appClientWechatLogin,
+        }),
+      },
       "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/home": {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/home", {
           ...schemas.appClientStudentParams,
@@ -124,6 +130,13 @@ export function buildOpenApiDocument() {
           ...schemas.appClientParentSchedule,
         }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/parent/calendar": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/calendar", {
+          ...schemas.appClientParams,
+          ...schemas.appClientScheduleQuery,
+          ...schemas.appClientParentCalendar,
+        }),
+      },
       "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/activity-summaries": {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/activity-summaries", {
           ...schemas.appClientStudentParams,
@@ -135,6 +148,18 @@ export function buildOpenApiDocument() {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/growth-summary", {
           ...schemas.appClientStudentParams,
           ...schemas.appClientGrowthSummary,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/status-summary": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/status-summary", {
+          ...schemas.appClientStudentParams,
+          ...schemas.appClientStatusSummary,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/ability-metrics/{metricId}": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/ability-metrics/{metricId}", {
+          ...schemas.appClientMetricParams,
+          ...schemas.appClientMetricDetail,
         }),
       },
       "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/privacy": {
@@ -166,6 +191,50 @@ export function buildOpenApiDocument() {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/workbench", {
           ...schemas.appClientEventParams,
           ...schemas.appClientCoachEventWorkbench,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/training-project-tree": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/training-project-tree", {
+          ...schemas.appClientParams,
+          ...schemas.appClientTrainingProjectTree,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/training-projects": {
+        put: operation("PUT", "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/training-projects", {
+          ...schemas.appClientEventParams,
+          ...schemas.appClientTrainingProjectsUpdate,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/attendance": {
+        put: operation("PUT", "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/attendance", {
+          ...schemas.appClientEventParams,
+          ...schemas.appClientAttendance,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/lesson-confirmation": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/lesson-confirmation", {
+          ...schemas.appClientEventParams,
+          ...schemas.appClientLessonConfirmation,
+        }),
+        post: operation("POST", "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/lesson-confirmation", {
+          ...schemas.appClientEventParams,
+          ...schemas.appClientLessonConfirmationCreate,
+        }),
+        patch: operation("PATCH", "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/lesson-confirmation", {
+          ...schemas.appClientEventParams,
+          ...schemas.appClientLessonConfirmationPatch,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/matches": {
+        post: operation("POST", "/clubs/{clubId}/app-clients/{clientId}/coach/matches", {
+          ...schemas.appClientParams,
+          ...schemas.appClientRecordMatch,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/assessments": {
+        post: operation("POST", "/clubs/{clubId}/app-clients/{clientId}/coach/assessments", {
+          ...schemas.appClientParams,
+          ...schemas.appClientRecordAssessment,
         }),
       },
       "/clubs/{clubId}/app-clients/{clientId}/coach/assessments/templates/{templateId}/form": {
@@ -212,6 +281,12 @@ export function buildOpenApiDocument() {
         get: operation("GET", "/clubs/{clubId}/admin/integrations/sync-policies/due", {
           ...schemas.clubParams,
           ...schemas.dueSyncPolicies,
+        }),
+      },
+      "/clubs/{clubId}/admin/integrations/sync-policies/run-due": {
+        post: operation("POST", "/clubs/{clubId}/admin/integrations/sync-policies/run-due", {
+          ...schemas.clubParams,
+          ...schemas.runDueSyncPolicies,
         }),
       },
       "/clubs/{clubId}/admin/integrations/sync-policies/{policyId}": {

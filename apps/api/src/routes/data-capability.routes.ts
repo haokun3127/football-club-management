@@ -61,6 +61,39 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
     Params: {
       clubId: string;
     };
+    Body: {
+      now?: string;
+    };
+  }>(
+    "/clubs/:clubId/admin/integrations/sync-policies/run-due",
+    {
+      schema: {
+        ...schemas.clubParams,
+        ...schemas.runDueSyncPolicies,
+      },
+    },
+    async (request, reply) => {
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
+        return reply;
+      }
+
+      try {
+        const result = await context.store.runDueExternalSyncPolicies(
+          request.params.clubId,
+          request.body.now ?? new Date().toISOString(),
+        );
+        return reply.code(201).send(result);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Due sync execution failed";
+        return context.sendError(reply, 400, "due_sync_failed", message);
+      }
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+    };
     Body: CreateExternalSyncPolicyInput;
   }>(
     "/clubs/:clubId/admin/integrations/sync-policies",
@@ -136,7 +169,10 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       }
 
       try {
-        const result = await context.store.ingestWpsWebhook(request.params.clubId, request.body);
+        const result = await context.store.ingestWpsWebhook(request.params.clubId, {
+          ...request.body,
+          security: webhookSecurityFromHeaders(request.headers) ?? request.body.security,
+        });
         return reply.code(202).send(result);
       } catch (error) {
         const message = error instanceof Error ? error.message : "WPS webhook ingestion failed";
@@ -786,6 +822,21 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       return link;
     },
   );
+}
+
+function webhookSecurityFromHeaders(headers: Record<string, string | string[] | undefined>) {
+  const signature = headerValue(headers["x-wps-signature"]);
+  const timestamp = headerValue(headers["x-wps-timestamp"]);
+  const nonce = headerValue(headers["x-wps-nonce"]);
+  if (!signature && !timestamp && !nonce) {
+    return undefined;
+  }
+
+  return { signature, timestamp, nonce };
+}
+
+function headerValue(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
 }
 
 async function auditRequest(

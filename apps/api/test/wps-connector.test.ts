@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  createEnvWpsCredentialResolver,
   createWpsConnector,
   sanitizeExternalConnection,
 } from "../src/integration/wps-connector.js";
@@ -105,5 +106,67 @@ describe("WPS connector runtime", () => {
       documentToken: "doc-token",
       pageSize: 1,
     });
+  });
+
+  it("resolves credentials from env and retries transient WPS failures without leaking secrets", async () => {
+    const attempts: number[] = [];
+    const sleeps: number[] = [];
+    const httpConnection = {
+      ...connection,
+      config: {
+        ...connection.config,
+        credentialRef: "cq-talent-prod",
+        maxRetries: 1,
+        retryBaseDelayMs: 5,
+        timeoutMs: 500,
+      },
+    };
+    const connector = createWpsConnector(httpConnection, {
+      credentialResolver: createEnvWpsCredentialResolver({
+        WPS_CREDENTIAL_CQ_TALENT_PROD: "Bearer real-token",
+      }),
+      sleep: async (milliseconds) => {
+        sleeps.push(milliseconds);
+      },
+      fetch: async (_url, init) => {
+        attempts.push(1);
+        expect(init.headers?.authorization).toBe("Bearer real-token");
+        if (attempts.length === 1) {
+          return {
+            ok: false,
+            status: 500,
+            text: async () => "access_token=real-token internal error",
+            json: async () => ({ records: [] }),
+          };
+        }
+
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ records: [] }),
+        };
+      },
+    });
+
+    await expect(connector.fetchRows({ clubId: "club-chongqing-talent", connection: httpConnection, tableMapping })).resolves.toEqual([]);
+    expect(attempts).toHaveLength(2);
+    expect(sleeps).toEqual([5]);
+
+    const failingConnection = {
+      ...connection,
+      config: { ...connection.config, maxRetries: 0 },
+    };
+    const failing = createWpsConnector(failingConnection, {
+      credentialResolver: () => ({ authorizationHeader: "Bearer secret" }),
+      fetch: async () => ({
+        ok: false,
+        status: 500,
+        text: async () => "authorization Bearer-secret",
+        json: async () => ({ records: [] }),
+      }),
+    });
+
+    await expect(failing.fetchRows({ clubId: "club-chongqing-talent", connection: failingConnection, tableMapping }))
+      .rejects.toThrow("authorization=[redacted]");
   });
 });

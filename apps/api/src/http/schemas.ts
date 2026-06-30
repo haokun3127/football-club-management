@@ -396,6 +396,19 @@ export const schemas = {
       },
     },
   },
+  appClientMetricParams: {
+    params: {
+      type: "object",
+      additionalProperties: false,
+      required: ["clubId", "clientId", "studentId", "metricId"],
+      properties: {
+        clubId: { type: "string", minLength: 1 },
+        clientId: { type: "string", minLength: 1 },
+        studentId: { type: "string", minLength: 1 },
+        metricId: { type: "string", minLength: 1 },
+      },
+    },
+  },
   appClientEventParams: {
     params: {
       type: "object",
@@ -459,6 +472,24 @@ export const schemas = {
       },
     },
   },
+  appClientWechatLogin: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["wxLoginCode"],
+      properties: {
+        wxLoginCode: { type: "string", minLength: 1 },
+        phoneCode: { type: "string", minLength: 1 },
+        encryptedPhoneData: { type: "string", minLength: 1 },
+        roleHint: { type: "string", enum: ["parent", "coach"] },
+      },
+    },
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
   appClientParentChildren: {
     response: {
       200: flexibleObject,
@@ -480,6 +511,13 @@ export const schemas = {
       404: errorResponse,
     },
   },
+  appClientParentCalendar: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
   appClientActivitySummaries: {
     response: {
       200: flexibleObject,
@@ -488,6 +526,20 @@ export const schemas = {
     },
   },
   appClientGrowthSummary: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientStatusSummary: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientMetricDetail: {
     response: {
       200: flexibleObject,
       403: errorResponse,
@@ -515,9 +567,128 @@ export const schemas = {
       404: errorResponse,
     },
   },
+  appClientTrainingProjectTree: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientTrainingProjectsUpdate: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["projectIds"],
+      properties: {
+        projectIds: {
+          type: "array",
+          minItems: 1,
+          items: { type: "string", minLength: 1 },
+        },
+        intensity: { type: "string", enum: ["low", "medium", "high"] },
+        note: { type: "string" },
+      },
+    },
+    response: {
+      200: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
   appClientCoachHome: {
     response: {
       200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientAttendance: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["participants"],
+      properties: {
+        participants: {
+          type: "array",
+          minItems: 1,
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["studentId", "status"],
+            properties: {
+              studentId: { type: "string", minLength: 1 },
+              status: { type: "string", enum: ["invited", "confirmed", "present", "absent", "late", "leave_requested", "excused"] },
+              note: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    response: {
+      200: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientLessonConfirmation: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientLessonConfirmationCreate: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        studentIds: { type: "array", items: { type: "string", minLength: 1 } },
+        actorUserId: { type: "string", minLength: 1 },
+        note: { type: "string" },
+      },
+    },
+    response: {
+      201: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientLessonConfirmationPatch: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["studentId", "lessonDelta"],
+      properties: {
+        studentId: { type: "string", minLength: 1 },
+        lessonDelta: { type: "number" },
+        actorUserId: { type: "string", minLength: 1 },
+        reason: { type: "string" },
+      },
+    },
+    response: {
+      200: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientRecordMatch: {
+    body: flexibleObject,
+    response: {
+      201: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientRecordAssessment: {
+    body: flexibleObject,
+    response: {
+      201: flexibleObject,
+      400: errorResponse,
       403: errorResponse,
       404: errorResponse,
     },
@@ -784,6 +955,20 @@ export const schemas = {
       403: errorResponse,
     },
   },
+  runDueSyncPolicies: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        now: { type: "string", minLength: 1 },
+      },
+    },
+    response: {
+      201: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
+    },
+  },
   wpsWebhook: {
     body: {
       type: "object",
@@ -797,6 +982,15 @@ export const schemas = {
         policyId: { type: "string", minLength: 1 },
         occurredAt: { type: "string", minLength: 1 },
         payload: flexibleObject,
+        security: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            timestamp: { type: "string", minLength: 1 },
+            nonce: { type: "string", minLength: 1 },
+            signature: { type: "string", minLength: 1 },
+          },
+        },
       },
     },
     response: {
