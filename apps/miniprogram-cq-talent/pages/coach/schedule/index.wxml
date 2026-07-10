@@ -2,38 +2,50 @@
   <view class="card hero-card">
     <view class="row">
       <view>
-        <view class="title">教练日程</view>
-        <view class="subtitle">今日/本周活动、点名、销课和比赛录入从活动进入</view>
+        <view class="title">教练任务</view>
+        <view class="subtitle">先完成今天必须处理的工作</view>
       </view>
-      <view class="tag">{{date}}</view>
+      <view class="tag">{{viewMode === 'week' ? '本周' : '今日'}}</view>
+    </view>
+    <picker mode="date" value="{{date}}" bindchange="onDateChange">
+      <view class="date-picker">{{date}}｜点击切换日期</view>
+    </picker>
+    <view class="view-switch">
+      <view class="switch-item {{viewMode === 'day' ? 'active' : ''}}" data-mode="day" bindtap="switchView">今日</view>
+      <view class="switch-item {{viewMode === 'week' ? 'active' : ''}}" data-mode="week" bindtap="switchView">本周</view>
     </view>
   </view>
 
-  <status-view
-    state="{{state}}"
-    title="{{state === 'loading' ? '加载课表' : state === 'empty' ? '暂无活动' : '课表读取失败'}}"
-    message="{{message}}"
-    action-text="{{state === 'error' ? '重试' : ''}}"
-    bindaction="retry"
-  />
+  <status-view state="{{state}}" title="{{state === 'loading' ? '加载任务' : state === 'empty' ? '暂无活动' : '任务读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
-  <view wx:if="{{home}}" class="card">
+  <view wx:if="{{home}}" class="summary-grid">
+    <view class="summary-card"><view class="summary-value">{{home.summary.total}}</view><view class="summary-label">活动</view></view>
+    <view class="summary-card"><view class="summary-value">{{home.summary.training}}</view><view class="summary-label">训练</view></view>
+    <view class="summary-card"><view class="summary-value">{{home.summary.matches}}</view><view class="summary-label">比赛</view></view>
+    <view class="summary-card important"><view class="summary-value">{{home.summary.pending}}</view><view class="summary-label">待处理</view></view>
+  </view>
+
+  <view wx:if="{{home}}" class="card compact-card">
     <view class="section-title">负责范围</view>
     <view class="subtitle">{{teamsText}}</view>
   </view>
 
+  <view wx:if="{{home}}" class="filter-row">
+    <view wx:for="{{filters}}" wx:key="value" class="filter-item {{activeFilter === item.value ? 'active' : ''}}" data-filter="{{item.value}}" bindtap="switchFilter">{{item.label}}</view>
+  </view>
+
   <view wx:if="{{state === 'ready'}}">
-    <view wx:for="{{events}}" wx:key="id" class="card event-card" data-id="{{item.id}}" bindtap="openEvent">
+    <view wx:for="{{visibleEvents}}" wx:key="id" class="card task-card" data-id="{{item.id}}" bindtap="openEvent">
       <view class="row">
-        <view class="section-title">{{item.title}}</view>
-        <view class="tag">{{item.status}}</view>
+        <view class="task-time">{{item.startsAt}}</view>
+        <view class="tag {{item.status === 'cancelled' ? 'muted' : ''}}">{{item.status}}</view>
       </view>
-      <view class="subtitle">{{item.teamName || '队伍待同步'}}｜{{item.startsAt}}</view>
-      <view class="subtitle">{{item.venue}}</view>
-      <view class="actions">
-        <button class="primary-button mini-button" data-id="{{item.id}}" bindtap="openEvent">进入工作台</button>
-      </view>
+      <view class="section-title task-title">{{item.title}}</view>
+      <view class="subtitle">{{item.teamName || '队伍待确认'}}｜{{item.venue}}</view>
+      <view class="subtitle" wx:if="{{item.participantCount}}">名单 {{item.participantCount}} 人</view>
+      <button class="primary-button task-button" data-id="{{item.id}}" data-action="{{item.nextAction || 'view'}}" catchtap="openTask">{{item.nextActionLabel || '查看活动'}}</button>
     </view>
+    <view wx:if="{{!visibleEvents.length}}" class="card empty">当前筛选下没有任务</view>
   </view>
 
   <role-tabbar role="coach" active="schedule" />

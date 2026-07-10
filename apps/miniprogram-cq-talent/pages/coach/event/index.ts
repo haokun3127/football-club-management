@@ -8,6 +8,7 @@ Page({
     state: "loading" as LoadState,
     message: "正在读取活动工作台",
     workbench: null as CoachWorkbench | null,
+    rosterPreview: [] as CoachWorkbench["roster"],
     eventId: "",
   },
   onLoad(query?: Record<string, string | undefined>) {
@@ -21,7 +22,7 @@ Page({
     }
     try {
       const workbench = await getCoachWorkbench(id);
-      this.setData({ state: "ready", message: "", workbench, eventId: id });
+      this.setData({ state: "ready", message: "", workbench, eventId: id, rosterPreview: workbench.roster.slice(0, 5) });
     } catch (error) {
       this.setData({ state: "error", message: readableError(error), eventId: id });
     }
@@ -34,6 +35,9 @@ Page({
   },
   openMatch() {
     openPage(`/pages/coach/match/index?id=${this.data.eventId}`);
+  },
+  openTraining() {
+    openPage(`/pages/coach/training/index?eventId=${this.data.eventId}`);
   },
   openTestEntry() {
     const templateId = this.data.workbench?.assessmentTemplateId || "";

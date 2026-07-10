@@ -1,57 +1,52 @@
 <view class="page">
   <view class="card hero-card">
-    <view class="title">训练管理</view>
-    <view class="subtitle">训练内容选择、能力覆盖预览、测试任务和学员雷达图</view>
+    <view class="title">训练内容</view>
+    <view class="subtitle">选择活动、设置项目并确认保存</view>
   </view>
 
-  <status-view
-    state="{{state}}"
-    title="{{state === 'loading' ? '加载训练管理' : '训练管理读取失败'}}"
-    message="{{message}}"
-    action-text="{{state === 'error' ? '重试' : ''}}"
-    bindaction="retry"
-  />
+  <status-view state="{{state}}" title="{{state === 'loading' ? '加载训练内容' : state === 'empty' ? '暂无训练活动' : '训练内容读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
-  <view wx:if="{{home}}" class="card">
-    <view class="section-title">我的球队</view>
-    <view class="subtitle">{{teamsText}}</view>
+  <view wx:if="{{eventOptions.length}}" class="card">
+    <view class="section-title">当前活动</view>
+    <picker mode="selector" range="{{eventOptions}}" range-key="title" value="{{eventIndex}}" bindchange="onEventChange">
+      <view class="event-picker">{{eventOptions[eventIndex].title}}<view class="subtitle">{{eventOptions[eventIndex].startsAt}}</view></view>
+    </picker>
   </view>
 
-  <view wx:if="{{workbench}}" class="card">
-    <view class="section-title">当前活动训练内容</view>
-    <view wx:for="{{workbench.training}}" wx:key="label" class="field-row">
-      <view class="label">{{item.label}}</view>
-      <view class="field-value">{{item.value}}</view>
+  <view wx:if="{{workbench}}" class="card selected-card">
+    <view class="row"><view class="section-title">已选项目</view><view class="tag">{{selectedProjects.length}} 项</view></view>
+    <view wx:if="{{selectedProjects.length}}" class="selected-list">
+      <view wx:for="{{selectedProjects}}" wx:key="id" class="selected-chip" data-id="{{item.id}}" bindtap="toggleProject">{{item.name}} ×</view>
     </view>
+    <view wx:else class="subtitle">尚未选择训练项目</view>
   </view>
 
-  <view wx:if="{{projectTree}}" class="card">
-    <view class="section-title">训练项目树</view>
-    <view class="subtitle">来自后端训练项目库，可直接保存到当前训练活动</view>
-    <view wx:for="{{projectTree.groups}}" wx:key="id" class="project-group">
-      <view class="group-title">{{item.name}}</view>
-      <view wx:for="{{item.projects}}" wx:key="id" wx:for-item="project" class="project-row {{selectedProjectMap[project.id] ? 'selected' : ''}}" data-id="{{project.id}}" bindtap="toggleProject">
-        <view>
-          <view class="label strong">{{project.name}}</view>
-          <view class="subtitle">{{project.description || '训练说明待同步'}}</view>
+  <view wx:if="{{projectTree}}" class="card project-library">
+    <view class="section-title">训练项目库</view>
+    <input class="search-input" placeholder="搜索训练项目" value="{{searchText}}" bindinput="onSearchInput" />
+    <view wx:for="{{filteredGroups}}" wx:key="id" class="project-group">
+      <view class="group-header" data-id="{{item.id}}" bindtap="toggleGroup">
+        <view class="group-title">{{item.name}}</view><view>{{expandedGroupMap[item.id] ? '收起' : '展开'}}</view>
+      </view>
+      <view wx:if="{{expandedGroupMap[item.id]}}">
+        <view wx:for="{{item.projects}}" wx:key="id" wx:for-item="project" class="project-row {{selectedProjectMap[project.id] ? 'selected' : ''}}" data-id="{{project.id}}" bindtap="toggleProject">
+          <view><view class="label strong">{{project.name}}</view><view class="subtitle">{{project.description || '暂无说明'}}</view></view>
+          <view class="tag {{selectedProjectMap[project.id] ? 'success' : 'muted'}}">{{selectedProjectMap[project.id] ? '已选' : '选择'}}</view>
         </view>
-        <view class="tag {{selectedProjectMap[project.id] ? 'success' : 'muted'}}">{{selectedProjectMap[project.id] ? '已选' : '选择'}}</view>
       </view>
     </view>
-    <textarea class="project-note" placeholder="训练内容备注，可选" value="{{projectNote}}" bindinput="onProjectNoteInput" />
-    <button class="primary-button" loading="{{savingProjects}}" disabled="{{savingProjects}}" bindtap="saveProjects">保存训练内容</button>
+    <textarea class="project-note" placeholder="训练备注（选填）" value="{{projectNote}}" bindinput="onProjectNoteInput" />
+  </view>
+
+  <view wx:if="{{workbench}}" class="sticky-save">
+    <view><view class="label strong">已选 {{selectedProjects.length}} 项</view><view class="subtitle">保存到 {{workbench.event.title}}</view></view>
+    <button class="primary-button save-button" loading="{{savingProjects}}" disabled="{{savingProjects}}" bindtap="saveProjects">保存</button>
   </view>
 
   <view class="card">
-    <view class="section-title">测试任务</view>
-    <view class="subtitle">按后端模板录入并手动完整提交；缺测、任务分配和单格自动保存待 assessment-task BFF。</view>
-    <button class="primary-button" bindtap="openTestEntry">进入评测录入</button>
-  </view>
-
-  <view class="card">
-    <view class="section-title">待完善项</view>
-    <view class="field-row"><view class="label">能力覆盖预览</view><view class="field-value">P1 BFF 待接入</view></view>
-    <view class="field-row"><view class="label">全队能力概览</view><view class="field-value">P1 BFF 待接入</view></view>
+    <view class="section-title">评测录入</view>
+    <view class="subtitle">按俱乐部评测模板记录学员表现。</view>
+    <button class="ghost-button" bindtap="openTestEntry">进入评测</button>
   </view>
 
   <role-tabbar role="coach" active="training" />

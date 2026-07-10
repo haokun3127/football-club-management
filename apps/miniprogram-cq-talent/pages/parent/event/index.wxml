@@ -5,7 +5,7 @@
     <view class="row">
       <view>
         <view class="title">{{detail.title}}</view>
-        <view class="subtitle">{{detail.id}}</view>
+        <view class="subtitle">{{detail.type === 'training' ? '训练安排与课后结果' : detail.type === 'match' ? '比赛信息与孩子表现' : '俱乐部活动信息'}}</view>
       </view>
       <view class="tag">{{detail.status}}</view>
     </view>

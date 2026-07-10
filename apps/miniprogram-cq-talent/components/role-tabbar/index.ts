@@ -42,7 +42,7 @@ Component({
     handleTap(this: any, event: { currentTarget: { dataset: { key?: string; path?: string } } }) {
       const { key, path } = event.currentTarget.dataset;
       if (!path || key === this.data.active) return;
-      wx.navigateTo({ url: path });
+      wx.reLaunch({ url: path });
     },
   },
 });

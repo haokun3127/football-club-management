@@ -202,6 +202,11 @@ describe("api server", () => {
       url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/home?date=2026-07-01",
       headers: { "x-user-id": "user-coach-1" },
     });
+    const coachWeek = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/home?from=2026-07-01&to=2026-07-07",
+      headers: { "x-user-id": "user-coach-1" },
+    });
     const parentCoachHome = await app.inject({
       method: "GET",
       url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/home?date=2026-07-01",
@@ -223,6 +228,9 @@ describe("api server", () => {
     };
     const eventBody = parentEvent.json() as { role: string; event: { id: string; participants: Array<{ studentId: string }> } };
     const coachBody = coachHome.json() as { role: string; workbench: { coachId: string; events: Array<{ id: string }> } };
+    const coachWeekBody = coachWeek.json() as {
+      workbench: { dateRange: { from: string; to: string }; summary: { total: number; pending: number }; tasks: Array<{ eventId: string; action: string }> };
+    };
 
     expect(parentHome.statusCode).toBe(200);
     expect(homeBody.client).toEqual(expect.objectContaining({
@@ -258,6 +266,12 @@ describe("api server", () => {
     expect(coachBody.role).toBe("coach");
     expect(coachBody.workbench.coachId).toBe("coach-1");
     expect(coachBody.workbench.events.map((event) => event.id)).toEqual(["event-training-1"]);
+    expect(coachWeek.statusCode).toBe(200);
+    expect(coachWeekBody.workbench.dateRange).toEqual({ from: "2026-07-01", to: "2026-07-07" });
+    expect(coachWeekBody.workbench.summary.total).toBeGreaterThan(0);
+    expect(coachWeekBody.workbench.tasks).toEqual(expect.arrayContaining([
+      expect.objectContaining({ eventId: "event-training-1", action: "attendance" }),
+    ]));
     expect(parentCoachHome.statusCode).toBe(403);
     expect(parentCoachHome.json().error.code).toBe("forbidden");
 
@@ -310,6 +324,11 @@ describe("api server", () => {
         note: "小程序训练管理保存",
       },
     });
+    const workbenchAfterTrainingSave = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/workbench",
+      headers: { "x-user-id": "user-coach-1" },
+    });
     const assessmentForm = await app.inject({
       method: "GET",
       url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/assessments/templates/assessment-template-technical/form",
@@ -332,7 +351,7 @@ describe("api server", () => {
       event: { id: string };
       rosterContext: { participants: unknown[]; students: unknown[] };
       workflow: Record<string, unknown>;
-      training: { id: string } | null;
+      training: { session: { id: string } | null; selectedProjectIds: string[]; projects: Array<{ id: string }> };
     };
     const trainingTreeBody = trainingProjectTree.json() as {
       dimensions: Array<{ objectives: Array<{ projects: Array<{ id: string; name: string; metrics: unknown[] }> }> }>;
@@ -369,7 +388,7 @@ describe("api server", () => {
     expect(workbenchBody.rosterContext.participants.length).toBeGreaterThan(0);
     expect(workbenchBody.rosterContext.students.length).toBeGreaterThan(0);
     expect(workbenchBody.workflow).toEqual(expect.objectContaining({ pendingAttendance: true }));
-    expect(workbenchBody.training).toEqual(expect.objectContaining({ id: "training-session-1" }));
+    expect(workbenchBody.training.session).toEqual(expect.objectContaining({ id: "training-session-1" }));
     expect(trainingProjectTree.statusCode).toBe(200);
     expect(trainingTreeBody.projects).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "drill-cq-talent-assessment-001" }),
@@ -390,6 +409,14 @@ describe("api server", () => {
       "drill-cq-talent-assessment-001",
       "drill-cq-talent-assessment-002",
     ]);
+    expect(workbenchAfterTrainingSave.statusCode).toBe(200);
+    expect(workbenchAfterTrainingSave.json().training).toEqual(expect.objectContaining({
+      selectedProjectIds: ["drill-cq-talent-assessment-001", "drill-cq-talent-assessment-002"],
+      projects: expect.arrayContaining([
+        expect.objectContaining({ id: "drill-cq-talent-assessment-001" }),
+        expect.objectContaining({ id: "drill-cq-talent-assessment-002" }),
+      ]),
+    }));
     expect(assessmentForm.statusCode).toBe(200);
     expect(formBody.template.id).toBe("assessment-template-technical");
     expect(formBody.templateVersion.id).toBe("assessment-template-version-technical-1");

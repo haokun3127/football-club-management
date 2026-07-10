@@ -1891,6 +1891,10 @@ export abstract class SeedBackedStore implements ApiStore {
         const pendingAssessment = event.type === "training" && !this.data.playerAssessments.some((assessment) =>
           assessment.clubId === clubId && assessment.eventId === event.id,
         );
+        const pendingLessonConfirmation = event.participants.some((participant) => {
+          const sourceId = `app-client-lesson-${event.id}-${participant.studentId}`;
+          return !this.getLessonLedger(clubId, participant.studentId)?.entries.some((entry) => entry.sourceId === sourceId);
+        });
 
         return {
           ...event,
@@ -1898,6 +1902,7 @@ export abstract class SeedBackedStore implements ApiStore {
           students: this.listStudents(clubId).filter((student) => participantStudentIds.has(student.id)),
           workflow: {
             pendingAttendance,
+            pendingLessonConfirmation,
             pendingRecord,
             pendingAssessment,
           },

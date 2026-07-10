@@ -57,7 +57,7 @@
 
     <view class="card">
       <view class="section-title">账号绑定</view>
-      <view class="subtitle">微信绑定、手机号匹配和最近登录状态依赖登录 BFF，当前为可联调结构。</view>
+      <view class="subtitle">正式登录后可查看微信绑定、脱敏手机号和最近登录时间。</view>
     </view>
   </view>
 

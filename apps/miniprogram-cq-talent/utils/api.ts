@@ -86,19 +86,24 @@ export async function getParentStudentHome(student: StudentSummary): Promise<Stu
         { label: "队伍", value: textOrPending(student.teams.join("、")) },
         { label: "教练", value: textOrPending(student.coachNames.join("、")) },
       ],
-      lessonStatus: [{ label: "课时状态", value: "接口待接入", status: "pending" }],
-      insuranceStatus: [{ label: "保险状态", value: "接口待接入", status: "pending" }],
+      lessonStatus: [{ label: "课时状态", value: "数据同步中", status: "pending" }],
+      insuranceStatus: [{ label: "保险状态", value: "数据同步中", status: "pending" }],
       clubInfo: pendingClubInfo(context),
     };
   }
 }
 
-export async function getCoachHome(date = DEV_TEST_DATE): Promise<CoachHome> {
+export async function getCoachHome(range: string | { from: string; to: string } = DEV_TEST_DATE): Promise<CoachHome> {
   const context = requireContext();
+  const query = typeof range === "string"
+    ? `date=${encodeURIComponent(range)}`
+    : `from=${encodeURIComponent(range.from)}&to=${encodeURIComponent(range.to)}`;
   const response = await request<Record<string, unknown>>({
-    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/home?date=${date}`,
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/home?${query}`,
   });
-  return normalizeCoachHome(response, date);
+  const from = typeof range === "string" ? range : range.from;
+  const to = typeof range === "string" ? range : range.to;
+  return normalizeCoachHome(response, from, to);
 }
 
 export async function getCoachWorkbench(eventId: string): Promise<CoachWorkbench> {
@@ -234,7 +239,7 @@ export async function submitCoachAssessment(input: {
   const session = getSession();
   const assessedByCoachId = resolveCoachProfileId(session?.userId);
   if (!assessedByCoachId) {
-    throw new Error("教练身份 BFF 待接入，无法提交评测。");
+    throw new Error("教练身份尚未完成验证，暂时无法提交评测。");
   }
 
   return request<Record<string, unknown>, {
@@ -271,8 +276,8 @@ export async function submitCoachAssessment(input: {
 export async function pendingWrite(label: string) {
   return {
     ok: false,
-    title: `${label}接口待接入`,
-    message: "小程序已预留 BFF 调用、requestId 和 Idempotency-Key；当前不会拼接 admin API。",
+    title: `${label}暂未开放`,
+    message: "该功能正在准备中，请联系俱乐部了解后续安排。",
   };
 }
 
@@ -319,6 +324,7 @@ function normalizeEvent(raw: Record<string, unknown>): ScheduleEvent {
   const childIds = Array.isArray(raw.childIds)
     ? (raw.childIds as unknown[]).map(String).filter(Boolean)
     : children.map((child) => String(child.id ?? child.studentId ?? "")).filter(Boolean);
+  const participants = Array.isArray(raw.participants) ? raw.participants : Array.isArray(raw.students) ? raw.students : [];
   return {
     id: String(event.id ?? raw.id ?? ""),
     type: normalizeEventType(event.type ?? raw.type),
@@ -335,13 +341,18 @@ function normalizeEvent(raw: Record<string, unknown>): ScheduleEvent {
     teamName: stringOrUndefined(event.teamName ?? raw.teamName),
     status: String(event.status ?? raw.status ?? "待确认"),
     summary: stringOrUndefined(event.summary ?? raw.summary),
+    participantCount: participants.length || undefined,
   };
 }
 
 function normalizeActivityDetail(raw: Record<string, unknown>): ActivityDetail {
-  const event = normalizeEvent((raw.event && typeof raw.event === "object" ? raw.event : raw) as Record<string, unknown>);
-  const training = asRecord(raw.training);
-  const match = asRecord(raw.match);
+  const eventSource = (raw.event && typeof raw.event === "object" ? raw.event : raw) as Record<string, unknown>;
+  const event = normalizeEvent(eventSource);
+  const training = asRecord(raw.training ?? eventSource.trainingSession);
+  const match = asRecord(raw.match ?? eventSource.match);
+  const other = asRecord(raw.other ?? eventSource.otherActivity);
+  const participants = Array.isArray(eventSource.participants) ? eventSource.participants as Array<Record<string, unknown>> : [];
+  const participantStatus = participants.map((item) => statusLabel(item.status)).filter(Boolean).join("、") || "待更新";
   const fields = [
     { label: "活动类型", value: typeLabel(event.type) },
     { label: "时间", value: compactRange(event.startsAt, event.endsAt) },
@@ -349,22 +360,52 @@ function normalizeActivityDetail(raw: Record<string, unknown>): ActivityDetail {
     { label: "队伍", value: event.teamName || "待同步" },
     { label: "状态", value: event.status },
   ];
-  const sections = [
-    {
-      title: event.type === "match" ? "比赛摘要" : event.type === "training" ? "训练摘要" : "活动说明",
-      items: [
-        { label: "内容", value: String(training?.summary ?? match?.summary ?? event.summary ?? "课后结果待更新") },
-        { label: "关联能力", value: String(training?.abilityTags ?? training?.abilitySummary ?? "能力标签待同步"), status: "pending" },
-      ],
-    },
-    {
-      title: "课时与出勤",
-      items: [
-        { label: "出勤", value: String(raw.attendanceStatus ?? "待更新") },
-        { label: "销课", value: String(raw.lessonStatus ?? "待更新") },
-      ],
-    },
-  ];
+  const sections = event.type === "training"
+    ? [
+      {
+        title: "本次训练",
+        items: [
+          { label: "训练内容", value: String(training?.summary ?? event.summary ?? "教练尚未补充训练内容") },
+          { label: "关联能力", value: listText(training?.abilityTags ?? training?.metricIds, "保存训练内容后显示") },
+        ],
+      },
+      {
+        title: "出勤与课时",
+        items: [
+          { label: "出勤", value: participantStatus },
+          { label: "课时结果", value: String(raw.lessonStatus ?? "活动结束后更新") },
+          { label: "课后摘要", value: String(training?.note ?? training?.observation ?? "活动结束后由教练补充") },
+        ],
+      },
+    ]
+    : event.type === "match"
+      ? [
+        {
+          title: "比赛信息",
+          items: [
+            { label: "对手", value: String(match?.opponentName ?? "待确认") },
+            { label: "比分", value: scoreText(match) },
+            { label: "比赛类型", value: String(match?.matchType ?? "待确认") },
+          ],
+        },
+        {
+          title: "比赛过程",
+          items: [
+            { label: "关键事件", value: String(match?.summary ?? event.summary ?? "比赛结束后更新") },
+            { label: "孩子表现", value: participantStatus === "待更新" ? "比赛结束后更新" : participantStatus },
+          ],
+        },
+      ]
+      : [
+        {
+          title: "活动说明",
+          items: [
+            { label: "内容", value: String(other?.description ?? event.summary ?? "暂无补充说明") },
+            { label: "参与状态", value: participantStatus },
+            { label: "通知", value: event.status === "cancelled" ? "活动已取消，请留意俱乐部通知" : "如有变更，俱乐部将另行通知" },
+          ],
+        },
+      ];
   return {
     id: event.id,
     type: event.type,
@@ -372,7 +413,7 @@ function normalizeActivityDetail(raw: Record<string, unknown>): ActivityDetail {
     status: event.status,
     fields,
     sections,
-    pending: [{ title: "详情字段待补齐", message: "活动详情 BFF 可读；训练内容、课后摘要、课时状态按后端可见字段逐步补齐。" }],
+    pending: [],
   };
 }
 
@@ -380,11 +421,11 @@ function pendingActivityDetail(eventId: string): ActivityDetail {
   return {
     id: eventId,
     type: "other",
-    title: "活动详情待接入",
+    title: "暂时无法读取活动",
     status: "pending",
-    fields: [{ label: "接口", value: "GET /clubs/:clubId/app-clients/:clientId/events/:eventId" }],
+    fields: [],
     sections: [],
-    pending: [{ title: "活动详情 BFF 待接入", message: "当前仅保留页面结构，不拼接 admin API。" }],
+    pending: [{ title: "活动信息暂不可用", message: "请稍后重试；如持续无法查看，请联系俱乐部。" }],
   };
 }
 
@@ -401,10 +442,10 @@ function normalizeGrowth(raw: Record<string, unknown>, student?: StudentSummary)
     student,
     radar,
     milestones: [
-      { title: "成长足迹", description: "成长里程碑聚合接口待接入，当前展示最新评测能力数据。" },
+      { title: "成长足迹", description: "成长记录正在积累，当前先展示最新评测能力数据。" },
     ],
     trainingHistory: [
-      { label: "训练历程", value: "训练次数、出勤率和能力覆盖聚合接口待接入" },
+      { label: "训练历程", value: "训练统计正在同步" },
       { label: "更新时间", value: String(raw.updatedAt ?? raw.generatedAt ?? "以后端同步时间为准") },
     ],
     metricItems: metrics,
@@ -450,23 +491,35 @@ function normalizeStudentHome(raw: Record<string, unknown>, student: StudentSumm
   };
 }
 
-function normalizeCoachHome(raw: Record<string, unknown>, date: string): CoachHome {
+function normalizeCoachHome(raw: Record<string, unknown>, from: string, to: string): CoachHome {
   const workbench = asRecord(raw.workbench) ?? raw;
-  const events = Array.isArray(workbench.events) ? normalizeEvents(workbench.events as Array<Record<string, unknown>>) : [];
+  const tasksSource = Array.isArray(workbench.tasks) ? workbench.tasks as Array<Record<string, unknown>> : [];
+  const tasks = tasksSource.map((task) => ({
+    eventId: String(task.eventId ?? ""),
+    eventType: normalizeEventType(task.eventType),
+    action: normalizeCoachTaskAction(task.action),
+    label: String(task.label ?? "查看活动"),
+    dueAt: stringOrUndefined(task.dueAt),
+  })).filter((task) => task.eventId);
+  const taskByEventId = new Map(tasks.map((task) => [task.eventId, task]));
+  const events = Array.isArray(workbench.events)
+    ? normalizeEvents(workbench.events as Array<Record<string, unknown>>).map((event) => {
+      const task = taskByEventId.get(event.id);
+      return { ...event, nextAction: task?.action, nextActionLabel: task?.label };
+    })
+    : [];
   const teams = Array.isArray(workbench.teams)
     ? (workbench.teams as unknown[]).map((team) => typeof team === "string" ? team : String((team as Record<string, unknown>).name ?? "")).filter(Boolean)
     : [];
   return {
-    date,
+    date: from,
+    dateRange: { from, to },
     coachName: stringOrUndefined(workbench.coachName ?? raw.coachName),
     teams,
     events,
-    pendingItems: [
-      { label: "点名写入", value: "app-client BFF 已接入" },
-      { label: "销课确认", value: "app-client BFF 已接入" },
-      { label: "比赛摘要", value: "app-client BFF 已接入" },
-      { label: "评测提交", value: "手动完整提交已接入" },
-    ],
+    tasks,
+    summary: normalizeCoachSummary(asRecord(workbench.summary), events, tasks.length),
+    pendingItems: [],
   };
 }
 
@@ -490,6 +543,11 @@ function normalizeCoachWorkbench(raw: Record<string, unknown>, eventId: string):
   const match = asRecord(raw.match);
   const assessment = asRecord(raw.assessment);
   const templateVersions = Array.isArray(assessment?.templateVersions) ? assessment?.templateVersions as Array<Record<string, unknown>> : [];
+  const selectedProjectsSource = Array.isArray(training?.projects) ? training.projects as Array<Record<string, unknown>> : [];
+  const selectedTrainingProjects = selectedProjectsSource.map(normalizeTrainingProject).filter((project) => project.id);
+  const selectedTrainingProjectIds = Array.isArray(training?.selectedProjectIds)
+    ? (training.selectedProjectIds as unknown[]).map(String).filter(Boolean)
+    : selectedTrainingProjects.map((project) => project.id);
   return {
     event,
     roster,
@@ -499,16 +557,16 @@ function normalizeCoachWorkbench(raw: Record<string, unknown>, eventId: string):
       { label: "记录完善度", value: String(workflow?.completionStatus ?? workflow?.recordCompleteness ?? "待同步") },
     ],
     training: [
-      { label: "训练记录", value: String(training?.title ?? training?.summary ?? "训练内容选择接口待接入") },
-      { label: "能力覆盖", value: String(training?.abilityCoverage ?? "能力覆盖预览接口待接入") },
+      { label: "训练项目", value: selectedTrainingProjects.length ? `${selectedTrainingProjects.length} 项` : "尚未设置" },
+      { label: "能力覆盖", value: String(training?.abilityCoverage ?? "保存后生成覆盖摘要") },
     ],
+    selectedTrainingProjects,
+    selectedTrainingProjectIds,
     match: [
       { label: "比赛记录", value: String(match?.summary ?? "可录入比赛摘要和进球/助攻等球员事件") },
     ],
     assessmentTemplateId: stringOrUndefined(templateVersions[0]?.templateId ?? templateVersions[0]?.id),
-    pending: [
-      { title: "部分能力待完善", message: "点名、销课、训练内容、比赛球员事件和评测完整提交已接入 app-client BFF；评测自动保存仍需 assessment-task BFF。" },
-    ],
+    pending: [],
   };
 }
 
@@ -547,33 +605,13 @@ function normalizeLessonConfirmation(raw: Record<string, unknown>): CoachLessonC
 function normalizeTrainingProjectTree(raw: Record<string, unknown>): TrainingProjectTree {
   const dimensions = Array.isArray(raw.dimensions) ? raw.dimensions as Array<Record<string, unknown>> : [];
   const projects = Array.isArray(raw.projects) ? raw.projects as Array<Record<string, unknown>> : [];
-  const normalizedProjects = projects.map((project) => {
-    const metricIds = Array.isArray(project.metricIds) ? (project.metricIds as unknown[]).map(String).filter(Boolean) : [];
-    const tags = Array.isArray(project.tags) ? (project.tags as unknown[]).map(String).filter(Boolean) : [];
-    return {
-      id: String(project.id ?? ""),
-      name: String(project.name ?? project.title ?? "训练项目"),
-      description: stringOrUndefined(project.description ?? project.summary),
-      metricIds,
-      tags,
-    };
-  }).filter((project) => project.id);
+  const normalizedProjects = projects.map(normalizeTrainingProject).filter((project) => project.id);
   const groups = dimensions.map((dimension) => {
     const dimensionId = String(dimension.id ?? "");
     const objectives = Array.isArray(dimension.objectives) ? dimension.objectives as Array<Record<string, unknown>> : [];
     const objectiveProjects = objectives.flatMap((objective) => {
       const source = Array.isArray(objective.projects) ? objective.projects as Array<Record<string, unknown>> : [];
-      return source.map((project) => {
-        const metricIds = Array.isArray(project.metricIds) ? (project.metricIds as unknown[]).map(String).filter(Boolean) : [];
-        const tags = Array.isArray(project.tags) ? (project.tags as unknown[]).map(String).filter(Boolean) : [];
-        return {
-          id: String(project.id ?? ""),
-          name: String(project.name ?? project.title ?? "训练项目"),
-          description: stringOrUndefined(project.description ?? project.summary),
-          metricIds,
-          tags,
-        };
-      }).filter((project) => project.id);
+      return source.map(normalizeTrainingProject).filter((project) => project.id);
     });
     const groupProjects = objectiveProjects.length ? objectiveProjects : normalizedProjects.slice(0, 8);
     return {
@@ -586,6 +624,34 @@ function normalizeTrainingProjectTree(raw: Record<string, unknown>): TrainingPro
     groups: groups.length ? groups : [{ id: "all", name: "训练项目", projects: normalizedProjects }],
     projects: normalizedProjects,
     pending: normalizedProjects.length ? [] : [{ title: "训练项目待同步", message: "后端未返回可选训练项目。" }],
+  };
+}
+
+function normalizeTrainingProject(project: Record<string, unknown>) {
+  const metricIds = Array.isArray(project.metricIds) ? (project.metricIds as unknown[]).map(String).filter(Boolean) : [];
+  const tags = Array.isArray(project.tags) ? (project.tags as unknown[]).map(String).filter(Boolean) : [];
+  return {
+    id: String(project.id ?? ""),
+    name: String(project.name ?? project.title ?? "训练项目"),
+    description: stringOrUndefined(project.description ?? project.summary),
+    metricIds,
+    tags,
+  };
+}
+
+function normalizeCoachTaskAction(value: unknown): "attendance" | "lesson" | "match" | "assessment" | "training" | "view" {
+  if (value === "attendance" || value === "lesson" || value === "match" || value === "assessment" || value === "training") {
+    return value;
+  }
+  return "view";
+}
+
+function normalizeCoachSummary(raw: Record<string, unknown> | undefined, events: ScheduleEvent[], taskCount: number) {
+  return {
+    total: numberOrUndefined(raw?.total) ?? events.length,
+    training: numberOrUndefined(raw?.training) ?? events.filter((event) => event.type === "training").length,
+    matches: numberOrUndefined(raw?.matches) ?? events.filter((event) => event.type === "match").length,
+    pending: numberOrUndefined(raw?.pending) ?? taskCount,
   };
 }
 
@@ -629,7 +695,7 @@ function normalizeAssessmentForm(raw: Record<string, unknown>): AssessmentForm {
     templateVersionId: stringOrUndefined(version?.id),
     versionName: String(version?.name ?? version?.id ?? "当前版本"),
     fields,
-    pending: [{ title: "自动保存待完善", message: "当前支持手动提交已输入项目；单格自动保存和缺测任务模型仍需 assessment-task BFF。" }],
+    pending: [{ title: "保存提示", message: "当前填写完成后统一提交，请在离开页面前确认保存。" }],
   };
 }
 
@@ -648,7 +714,7 @@ function normalizeEventType(type: unknown): ScheduleEvent["type"] {
 function pendingClubInfo(context: AppContext) {
   return [
     { label: "俱乐部", value: context.capabilities.client?.name || "俱乐部信息待同步" },
-    { label: "内容中心", value: "俱乐部信息、球场分布、青训帮助、教练团队内容接口待接入" },
+    { label: "俱乐部服务", value: "俱乐部信息、球场和教练团队内容正在整理" },
   ];
 }
 
@@ -668,6 +734,31 @@ function textOrPending(value: string) {
 
 function boolStatus(value: unknown, pending: string, ready: string) {
   return value ? pending : ready;
+}
+
+function listText(value: unknown, fallback: string) {
+  if (Array.isArray(value)) return value.map(String).filter(Boolean).join("、") || fallback;
+  return value ? String(value) : fallback;
+}
+
+function scoreText(match: Record<string, unknown> | undefined) {
+  const home = numberOrUndefined(match?.homeScore);
+  const away = numberOrUndefined(match?.awayScore);
+  return home === undefined || away === undefined ? "比赛结束后更新" : `${home} : ${away}`;
+}
+
+function statusLabel(value: unknown) {
+  const labels: Record<string, string> = {
+    invited: "待确认",
+    confirmed: "已确认",
+    present: "已到课",
+    absent: "缺席",
+    late: "迟到",
+    leave_requested: "请假",
+    excused: "免扣",
+  };
+  const key = String(value ?? "");
+  return labels[key] ?? key;
 }
 
 function inferMaxValue(value: Record<string, unknown> | undefined) {

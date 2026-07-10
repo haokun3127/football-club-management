@@ -51,7 +51,7 @@ Page<LaunchData>({
       this.setData({
         state: "pending",
         title: "需要完成手机号绑定",
-        message: "请使用微信手机号授权匹配俱乐部档案。登录 BFF 接入后会在这里完成绑定。",
+        message: "请使用微信手机号授权匹配俱乐部档案。",
         actionText: "重新检测",
         clientName: context.capabilities.client?.name || "足球俱乐部小程序",
       });
@@ -77,5 +77,5 @@ Page<LaunchData>({
 
 function readableError(error: unknown) {
   const record = error as { message?: string; code?: string };
-  return record?.message || record?.code || "请检查网络、本地 API 或 app-client 配置后重试。";
+  return record?.message || record?.code || "暂时无法连接俱乐部服务，请检查网络后重试。";
 }

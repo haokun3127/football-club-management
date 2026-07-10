@@ -77,3 +77,55 @@ const selectedDate = "2026-06-28";
 - In non-dev mode, date-driven pages start from the user's current local date.
 - Smoke scripts may pin fixture dates explicitly, but production page defaults must not duplicate those literals.
 - Static acceptance checks should search page code for duplicated fixture dates and demo identities.
+
+## Scenario: Coach Task Workbench
+
+### 1. Scope / Trigger
+
+- Trigger: coach mini-program daily/weekly workbench and training-content editing.
+
+### 2. Signatures
+
+- `GET /clubs/:clubId/app-clients/:clientId/coach/home?date=YYYY-MM-DD`
+- `GET /clubs/:clubId/app-clients/:clientId/coach/home?from=YYYY-MM-DD&to=YYYY-MM-DD`
+- `GET /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/workbench`
+
+### 3. Contracts
+
+- `date` remains backward compatible; `from/to` selects an inclusive range of at most 31 days.
+- `workbench.summary` returns `total/training/matches/pending`; `tasks[]` returns `eventId/eventType/action/label/dueAt`.
+- Task priority is attendance, lesson confirmation after event end, match result, assessment, training content, then view.
+- Event workbench training data returns `selectedProjectIds` and resolved `projects` from the current session plan.
+- All events remain membership-scoped on the backend.
+
+### 4. Validation & Error Matrix
+
+- Invalid, reversed, or longer-than-31-day range -> `400 invalid_date_range`.
+- Coach without event access -> `403 forbidden`.
+- Missing event -> `404 not_found`.
+
+### 5. Good/Base/Bad Cases
+
+- Good: a seven-day query returns only assigned events, a summary, and one next task per event.
+- Base: a date-only query returns the original single-day shape plus additive summary/tasks fields.
+- Bad: the client infers access or reconstructs selected training projects from local state.
+
+### 6. Tests Required
+
+- Contract test asserts inclusive range, summary, tasks, and membership redaction.
+- Training save followed by workbench read asserts identical selected project ids.
+- Legacy date query smoke remains green.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```typescript
+const selectedProjectIds = localDraft.projectIds;
+```
+
+#### Correct
+
+```typescript
+const selectedProjectIds = workbench.training.selectedProjectIds;
+```

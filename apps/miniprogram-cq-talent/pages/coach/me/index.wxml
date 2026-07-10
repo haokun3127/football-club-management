@@ -20,18 +20,18 @@
   <view class="card">
     <view class="section-title">权限范围</view>
     <view class="field-row"><view class="label">可读</view><view class="field-value">负责活动、球队、学员训练交付数据</view></view>
-    <view class="field-row"><view class="label">可写</view><view class="field-value">点名、销课、比赛、训练内容、评测，需 BFF 授权</view></view>
+    <view class="field-row"><view class="label">可操作</view><view class="field-value">负责活动的点名、销课、比赛、训练内容和评测</view></view>
     <view class="field-row"><view class="label">不可见</view><view class="field-value">收费、保险审核、后台运营和 WPS 配置</view></view>
   </view>
 
   <view class="card">
     <view class="section-title">私教意向提醒</view>
-    <view class="subtitle">提醒接口待接入；只展示家长意向，不做订单、支付或派单。</view>
+    <view class="subtitle">家长意向同步后将在这里展示；不生成订单或自动派单。</view>
   </view>
 
   <view class="card">
     <view class="section-title">账号绑定</view>
-    <view class="subtitle">微信绑定、手机号匹配、最近登录依赖登录 BFF；当前为可联调结构。</view>
+    <view class="subtitle">正式登录后可查看微信绑定和最近登录状态。</view>
   </view>
 
   <role-tabbar role="coach" active="me" />

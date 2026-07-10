@@ -1,5 +1,6 @@
 import { getCoachWorkbench, recordCoachMatch } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { getAppContext } from "../../../utils/store";
 import type { CoachMatchPlayerEvent, CoachWorkbench, LoadState } from "../../../utils/types";
 
 const matchTypes = [
@@ -15,7 +16,7 @@ const statuses = [
   { label: "已取消", value: "cancelled" },
 ];
 
-const playerEventTypes: Array<{ label: string; value: CoachMatchPlayerEvent["type"] }> = [
+const allPlayerEventTypes: Array<{ label: string; value: CoachMatchPlayerEvent["type"] }> = [
   { label: "进球", value: "goal" },
   { label: "助攻", value: "assist" },
   { label: "扑救", value: "save" },
@@ -35,12 +36,13 @@ Page({
     saving: false,
     matchTypes,
     statuses,
-    playerEventTypes,
+    playerEventTypes: allPlayerEventTypes,
     matchTypeIndex: 0,
     statusIndex: 0,
     playerEventTypeIndex: 0,
     studentIndex: 0,
     assistStudentIndex: 0,
+    assistOptions: [{ studentId: "", name: "无助攻" }] as Array<{ studentId: string; name: string }>,
     eventMinute: "",
     eventNote: "",
     playerEvents: [] as Array<CoachMatchPlayerEvent & { studentName: string; assistStudentName?: string; label: string }>,
@@ -55,7 +57,19 @@ Page({
   async load(id: string) {
     try {
       const workbench = await getCoachWorkbench(id);
-      this.setData({ state: "ready", workbench, message: "", eventId: id });
+      const configuredTypes = getAppContext()?.capabilities.match?.eventTypes ?? [];
+      const playerEventTypes = configuredTypes.length
+        ? allPlayerEventTypes.filter((item) => configuredTypes.includes(item.value))
+        : allPlayerEventTypes;
+      this.setData({
+        state: "ready",
+        workbench,
+        message: "",
+        eventId: id,
+        playerEventTypes: playerEventTypes.length ? playerEventTypes : allPlayerEventTypes,
+        assistOptions: [{ studentId: "", name: "无助攻" }, ...workbench.roster.map((student) => ({ studentId: student.studentId, name: student.name }))],
+        assistStudentIndex: 0,
+      });
     } catch (error) {
       this.setData({ state: "error", message: readableError(error) });
     }
@@ -83,8 +97,8 @@ Page({
   addPlayerEvent() {
     const roster = this.data.workbench?.roster ?? [];
     const student = roster[this.data.studentIndex];
-    const assistStudent = roster[this.data.assistStudentIndex];
-    const eventType = playerEventTypes[this.data.playerEventTypeIndex] ?? playerEventTypes[0];
+    const assistStudent = this.data.assistOptions[this.data.assistStudentIndex];
+    const eventType = this.data.playerEventTypes[this.data.playerEventTypeIndex] ?? this.data.playerEventTypes[0];
     if (!student?.studentId || !eventType) {
       wx.showToast({ title: "请选择球员", icon: "none" });
       return;
@@ -94,8 +108,8 @@ Page({
       type: eventType.value,
       studentId: student.studentId,
       studentName: student.name,
-      assistStudentId: eventType.value === "goal" ? assistStudent?.studentId : undefined,
-      assistStudentName: eventType.value === "goal" ? assistStudent?.name : undefined,
+      assistStudentId: eventType.value === "goal" && assistStudent?.studentId !== student.studentId ? assistStudent?.studentId || undefined : undefined,
+      assistStudentName: eventType.value === "goal" && assistStudent?.studentId !== student.studentId ? assistStudent?.name || undefined : undefined,
       minute,
       note: emptyToUndefined(this.data.eventNote),
       label: `${eventType.label}｜${student.name}${minute === undefined ? "" : `｜${minute}'`}`,
@@ -113,12 +127,21 @@ Page({
   },
   async saveMatch() {
     if (!this.data.eventId || this.data.saving) return;
+    if (!this.data.opponentName.trim()) {
+      wx.showToast({ title: "请填写对手", icon: "none" });
+      return;
+    }
+    const status = statuses[this.data.statusIndex]?.value ?? "completed";
+    if (status === "completed" && (numberOrUndefined(this.data.homeScore) === undefined || numberOrUndefined(this.data.awayScore) === undefined)) {
+      wx.showToast({ title: "完赛记录需要填写比分", icon: "none" });
+      return;
+    }
     this.setData({ saving: true });
     try {
       await recordCoachMatch({
         eventId: this.data.eventId,
         matchType: matchTypes[this.data.matchTypeIndex]?.value ?? "friendly",
-        status: statuses[this.data.statusIndex]?.value ?? "completed",
+        status,
         opponentName: emptyToUndefined(this.data.opponentName),
         homeScore: numberOrUndefined(this.data.homeScore),
         awayScore: numberOrUndefined(this.data.awayScore),

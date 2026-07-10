@@ -27,7 +27,7 @@
     </view>
     <view class="form-row">
       <view class="label">对手</view>
-      <input class="field-input" placeholder="可选" value="{{opponentName}}" data-field="opponentName" bindinput="onTextInput" />
+      <input class="field-input" placeholder="请输入对手" value="{{opponentName}}" data-field="opponentName" bindinput="onTextInput" />
     </view>
     <view class="score-grid">
       <view class="form-row">
@@ -57,8 +57,8 @@
     </view>
     <view wx:if="{{playerEventTypes[playerEventTypeIndex].value === 'goal'}}" class="form-row">
       <view class="label">助攻</view>
-      <picker mode="selector" range="{{workbench.roster}}" range-key="name" value="{{assistStudentIndex}}" bindchange="onAssistStudentChange">
-        <view class="field-input">{{workbench.roster[assistStudentIndex].name || '无助攻'}}</view>
+      <picker mode="selector" range="{{assistOptions}}" range-key="name" value="{{assistStudentIndex}}" bindchange="onAssistStudentChange">
+        <view class="field-input">{{assistOptions[assistStudentIndex].name}}</view>
       </picker>
     </view>
     <view class="form-row">
@@ -80,7 +80,7 @@
         <view class="remove-action" data-index="{{index}}" bindtap="removePlayerEvent">删除</view>
       </view>
     </view>
-    <view class="subtitle">保存走 app-client matches BFF，进球和助攻会生成对应球员指标记录；战术板和赛后报告作为后续 P1/P2。</view>
+    <view class="subtitle">请确认比分和球员事件后保存；未选择助攻时不会生成助攻记录。</view>
     <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveMatch">保存比赛摘要</button>
   </view>
 </view>

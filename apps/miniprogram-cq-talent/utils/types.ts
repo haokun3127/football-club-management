@@ -70,6 +70,26 @@ export interface ScheduleEvent {
   teamName?: string;
   status: string;
   summary?: string;
+  participantCount?: number;
+  nextAction?: CoachTaskAction;
+  nextActionLabel?: string;
+}
+
+export type CoachTaskAction = "attendance" | "lesson" | "match" | "assessment" | "training" | "view";
+
+export interface CoachTask {
+  eventId: string;
+  eventType: ScheduleEvent["type"];
+  action: CoachTaskAction;
+  label: string;
+  dueAt?: string;
+}
+
+export interface CoachTaskSummary {
+  total: number;
+  training: number;
+  matches: number;
+  pending: number;
 }
 
 export interface ActivityDetail {
@@ -101,9 +121,12 @@ export interface GrowthSummary {
 
 export interface CoachHome {
   date: string;
+  dateRange: { from: string; to: string };
   coachName?: string;
   teams: string[];
   events: ScheduleEvent[];
+  tasks: CoachTask[];
+  summary: CoachTaskSummary;
   pendingItems: Array<{ label: string; value: string }>;
 }
 
@@ -112,6 +135,8 @@ export interface CoachWorkbench {
   roster: Array<{ studentId: string; name: string; status: string; note?: string; lessonAction?: string; shouldConsume?: boolean; exceptionReason?: string; remainingLessons?: number }>;
   workflow: Array<{ label: string; value: string; status?: string }>;
   training: Array<{ label: string; value: string }>;
+  selectedTrainingProjects: TrainingProject[];
+  selectedTrainingProjectIds: string[];
   match: Array<{ label: string; value: string }>;
   assessmentTemplateId?: string;
   pending: Array<{ title: string; message: string }>;

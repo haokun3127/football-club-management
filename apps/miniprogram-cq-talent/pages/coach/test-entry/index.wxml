@@ -33,7 +33,7 @@
 
   <view wx:if="{{form}}" class="card">
     <view class="section-title">提交</view>
-    <view class="subtitle">仅提交已填写项目；公式和综合分由后端评测图谱计算。单格自动保存仍待 assessment-task BFF。</view>
+    <view class="subtitle">仅记录原始测试结果，综合评分由系统统一计算。</view>
     <button class="primary-button" loading="{{saving}}" disabled="{{saving || !roster.length}}" bindtap="submitAssessment">提交评测</button>
   </view>
 

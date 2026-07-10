@@ -1,3 +1,90 @@
-.event-card:active {
+.date-picker {
+  margin-top: 20rpx;
+  padding: 16rpx 18rpx;
+  border-radius: 10rpx;
+  background: #ffffff;
+  font-size: 24rpx;
+}
+
+.view-switch,
+.filter-row {
+  display: flex;
+  gap: 12rpx;
+}
+
+.view-switch {
+  margin-top: 14rpx;
+}
+
+.switch-item,
+.filter-item {
+  flex: 1;
+  padding: 12rpx;
+  border-radius: 10rpx;
+  background: #f2f3f5;
+  color: #60646f;
+  text-align: center;
+}
+
+.switch-item.active,
+.filter-item.active {
+  background: #e60012;
+  color: #ffffff;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.summary-card {
+  padding: 20rpx 8rpx;
+  border-radius: 12rpx;
+  background: #ffffff;
+  text-align: center;
+}
+
+.summary-card.important {
+  background: #fff1f0;
+  color: #e60012;
+}
+
+.summary-value {
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+.summary-label {
+  margin-top: 4rpx;
+  color: #60646f;
+  font-size: 20rpx;
+}
+
+.compact-card {
+  padding-top: 18rpx;
+  padding-bottom: 18rpx;
+}
+
+.filter-row {
+  margin-bottom: 20rpx;
+}
+
+.task-card:active {
   background: #fff8f7;
+}
+
+.task-time {
+  color: #60646f;
+  font-size: 22rpx;
+}
+
+.task-title {
+  margin-top: 14rpx;
+  margin-bottom: 8rpx;
+}
+
+.task-button {
+  margin-top: 18rpx;
 }

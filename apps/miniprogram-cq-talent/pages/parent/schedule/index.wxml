@@ -10,29 +10,31 @@
   </view>
 
   <view class="card">
-    <view class="section-title">孩子</view>
-    <view class="child-tabs">
-      <view
-        wx:for="{{children}}"
-        wx:key="id"
-        class="child-tab {{activeStudentId === item.id ? 'active' : ''}}"
-        data-id="{{item.id}}"
-        bindtap="switchChild"
-      >{{item.name}}</view>
-    </view>
+    <view class="section-title">查看范围</view>
+    <picker mode="selector" range="{{childOptions}}" range-key="name" value="{{childIndex}}" bindchange="onChildChange">
+      <view class="child-picker">{{activeStudentName}} <text class="picker-hint">点击切换</text></view>
+    </picker>
   </view>
 
   <view class="card">
     <view class="row">
       <view>
         <view class="section-title">{{selectedDate}}</view>
-        <view class="subtitle">当前展示 {{activeStudentName}} 的家庭聚合日程</view>
+        <view class="subtitle">{{activeStudentName}}｜当天 {{visibleEvents.length}} 项安排</view>
       </view>
       <view class="tag muted">只读</view>
     </view>
     <picker mode="date" value="{{selectedDate}}" bindchange="onDateChange">
       <view class="date-picker">切换日期：{{selectedDate}}</view>
     </picker>
+    <scroll-view scroll-x class="date-strip" enhanced show-scrollbar="{{false}}">
+      <view class="date-strip-inner">
+        <view wx:for="{{dateOptions}}" wx:key="date" class="date-chip {{selectedDate === item.date ? 'active' : ''}}" data-date="{{item.date}}" bindtap="selectDate">
+          <view>{{item.day}}</view>
+          <view class="date-count">{{item.count ? item.count + '项' : '无安排'}}</view>
+        </view>
+      </view>
+    </scroll-view>
     <view class="type-tabs">
       <view
         wx:for="{{typeTabs}}"
@@ -62,7 +64,7 @@
         <block wx:if="{{item.children && item.children.length}}">
           <block wx:for="{{item.children}}" wx:key="id" wx:for-item="child">{{child.name}} </block>
         </block>
-        <block wx:else>{{item.studentName || activeStudentName}}</block>
+        <block wx:else>{{item.studentName || '家庭活动'}}</block>
         ｜{{item.teamName || '队伍待同步'}}
       </view>
       <view class="subtitle">{{item.startsAt}} <text wx:if="{{item.endsAt}}">- {{item.endsAt}}</text></view>

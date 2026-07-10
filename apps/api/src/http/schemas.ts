@@ -460,6 +460,8 @@ export const schemas = {
       additionalProperties: false,
       properties: {
         date: { type: "string", minLength: 10 },
+        from: { type: "string", minLength: 10 },
+        to: { type: "string", minLength: 10 },
       },
     },
   },

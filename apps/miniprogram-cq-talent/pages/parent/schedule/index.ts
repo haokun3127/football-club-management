@@ -9,6 +9,8 @@ interface PageData {
   state: LoadState;
   message: string;
   children: StudentSummary[];
+  childOptions: Array<{ id: string; name: string }>;
+  childIndex: number;
   activeStudentId: string;
   activeStudentName: string;
   events: ScheduleEvent[];
@@ -16,6 +18,7 @@ interface PageData {
   selectedDate: string;
   selectedType: "all" | ScheduleEvent["type"];
   typeTabs: Array<{ label: string; value: "all" | ScheduleEvent["type"] }>;
+  dateOptions: Array<{ date: string; day: string; count: number }>;
 }
 
 const typeTabs: PageData["typeTabs"] = [
@@ -32,6 +35,8 @@ Page<PageData>({
     state: "loading",
     message: "正在读取家庭日程",
     children: [],
+    childOptions: [{ id: "", name: "全部孩子" }],
+    childIndex: 0,
     activeStudentId: "",
     activeStudentName: "",
     events: [],
@@ -39,6 +44,7 @@ Page<PageData>({
     selectedDate: initialDate,
     selectedType: "all",
     typeTabs,
+    dateOptions: [],
   },
   onLoad() {
     this.load();
@@ -53,39 +59,42 @@ Page<PageData>({
         this.setData({ state: "empty", message: "当前微信手机号尚未绑定孩子档案，请联系俱乐部确认登记信息。" });
         return;
       }
-      const active = children.find((child) => child.id === session.currentStudentId) ?? children[0];
-      if (!active) {
-        this.setData({ state: "empty", message: "当前微信手机号尚未绑定孩子档案，请联系俱乐部确认登记信息。" });
-        return;
-      }
-      setCurrentStudentId(active.id);
       const events = await getParentCalendar(dateWindowStart(this.data.selectedDate), dateWindowEnd(this.data.selectedDate));
-      const visibleEvents = filterEvents(events, active.id, this.data.selectedDate, this.data.selectedType);
+      const active = children.find((child) => child.id === this.data.activeStudentId);
+      const visibleEvents = filterEvents(events, this.data.activeStudentId, this.data.selectedDate, this.data.selectedType);
       this.setData({
         state: visibleEvents.length ? "ready" : "empty",
         message: visibleEvents.length ? "" : "当前筛选条件暂无活动安排。",
         children,
-        activeStudentId: active.id,
-        activeStudentName: active.name,
+        childOptions: [{ id: "", name: "全部孩子" }, ...children.map((child) => ({ id: child.id, name: child.name }))],
+        childIndex: active ? children.findIndex((child) => child.id === active.id) + 1 : 0,
+        activeStudentId: active?.id ?? "",
+        activeStudentName: active?.name ?? "全部孩子",
         events,
         visibleEvents,
+        dateOptions: buildDateOptions(this.data.selectedDate, events),
       });
     } catch (error) {
       this.setData({ state: "error", message: readableError(error) });
     }
   },
-  switchChild(event: { currentTarget: { dataset: { id?: string } } }) {
-    const id = event.currentTarget.dataset.id;
-    if (!id || id === this.data.activeStudentId) return;
-    const child = this.data.children.find((item: StudentSummary) => item.id === id);
-    if (!child) return;
-    setCurrentStudentId(id);
-    this.setData({ activeStudentId: id, activeStudentName: child.name });
+  onChildChange(event: { detail: { value: string | number } }) {
+    const childIndex = Number(event.detail.value);
+    const option = this.data.childOptions[childIndex];
+    if (!option) return;
+    if (option.id) setCurrentStudentId(option.id);
+    this.setData({ childIndex, activeStudentId: option.id, activeStudentName: option.name });
     this.applyFilters();
   },
   onDateChange(event: { detail: { value: string } }) {
     this.setData({ selectedDate: event.detail.value });
     this.load();
+  },
+  selectDate(event: { currentTarget: { dataset: { date?: string } } }) {
+    const date = event.currentTarget.dataset.date;
+    if (!date || date === this.data.selectedDate) return;
+    this.setData({ selectedDate: date });
+    this.applyFilters();
   },
   switchType(event: { currentTarget: { dataset: { type?: PageData["selectedType"] } } }) {
     const selectedType = event.currentTarget.dataset.type;
@@ -116,6 +125,20 @@ function filterEvents(events: ScheduleEvent[], studentId: string, selectedDate: 
     const typeMatched = selectedType === "all" || event.type === selectedType;
     const dateMatched = !selectedDate || event.startsAt.slice(0, 10) === selectedDate;
     return childMatched && typeMatched && dateMatched;
+  });
+}
+
+function buildDateOptions(start: string, events: ScheduleEvent[]) {
+  const base = new Date(`${start}T00:00:00.000Z`);
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(base);
+    date.setUTCDate(date.getUTCDate() + index);
+    const key = date.toISOString().slice(0, 10);
+    return {
+      date: key,
+      day: `${date.getUTCMonth() + 1}/${date.getUTCDate()}`,
+      count: events.filter((event) => event.startsAt.slice(0, 10) === key).length,
+    };
   });
 }
 

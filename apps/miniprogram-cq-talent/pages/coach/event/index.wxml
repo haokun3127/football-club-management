@@ -19,19 +19,21 @@
     </view>
   </view>
 
-  <view wx:if="{{workbench}}" class="card">
+  <view wx:if="{{workbench && workbench.event.status !== 'cancelled'}}" class="card">
     <view class="section-title">活动操作</view>
     <view class="grid-2">
       <button class="primary-button mini-button" bindtap="openAttendance">点名</button>
       <button class="primary-button mini-button" bindtap="openLesson">销课</button>
-      <button class="ghost-button mini-button" bindtap="openMatch">比赛录入</button>
-      <button class="ghost-button mini-button" bindtap="openTestEntry">评测录入</button>
+      <button wx:if="{{workbench.event.type === 'match'}}" class="ghost-button mini-button" bindtap="openMatch">比赛录入</button>
+      <button wx:if="{{workbench.event.type === 'training'}}" class="ghost-button mini-button" bindtap="openTraining">训练内容</button>
+      <button wx:if="{{workbench.event.type === 'training' && workbench.assessmentTemplateId}}" class="ghost-button mini-button" bindtap="openTestEntry">评测录入</button>
     </view>
   </view>
 
   <view wx:if="{{workbench}}" class="card">
     <view class="section-title">学员名单</view>
-    <view wx:for="{{workbench.roster}}" wx:key="studentId" class="field-row">
+    <view class="subtitle">共 {{workbench.roster.length}} 人，以下为名单摘要</view>
+    <view wx:for="{{rosterPreview}}" wx:key="studentId" class="field-row">
       <view class="label">{{item.name}}</view>
       <view class="field-value">{{item.status}}</view>
     </view>

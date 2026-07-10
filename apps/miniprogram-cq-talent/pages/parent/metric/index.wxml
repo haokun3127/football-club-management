@@ -6,8 +6,8 @@
 
   <status-view
     state="pending"
-    title="指标下钻 BFF 待接入"
-    message="需要 GET /clubs/:clubId/app-clients/:clientId/parent/students/:studentId/ability-metrics/:metricId 返回趋势、来源记录和相关训练项目。当前页面不展示内部公式、权重或其他孩子数据。"
+    title="指标详情准备中"
+    message="趋势、来源记录和相关训练内容将在数据同步完成后显示。"
   />
 
   <view class="card">

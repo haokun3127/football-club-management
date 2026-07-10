@@ -563,6 +563,12 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
 
       const metricCatalog = await context.store.listAbilityMetrics(request.params.clubId);
       const config = await context.store.getDataCapabilityConfig(request.params.clubId);
+      const trainingSession = event.trainingSession as { sessionPlanId?: string } | undefined;
+      const sessionPlan = trainingSession?.sessionPlanId
+        ? context.store.getSessionPlan(trainingSession.sessionPlanId)
+        : null;
+      const drills = context.store.listTrainingDrills(request.params.clubId);
+      const selectedProjectIds = sessionPlan?.blocks.map((block) => block.drillId) ?? [];
 
       return {
         clubId: request.params.clubId,
@@ -575,7 +581,15 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
           teams: workbenchEvent?.teams ?? [],
         },
         workflow: workbenchEvent?.workflow ?? {},
-        training: event.trainingSession,
+        training: {
+          session: event.trainingSession,
+          sessionPlan,
+          selectedProjectIds,
+          projects: selectedProjectIds
+            .map((projectId) => drills.find((drill) => drill.id === projectId))
+            .filter((drill): drill is NonNullable<typeof drill> => Boolean(drill))
+            .map((drill) => summarizeTrainingDrill(drill, metricCatalog)),
+        },
         match: event.match,
         assessment: {
           templateVersions: config.assessmentTemplateVersions,
@@ -931,6 +945,8 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
     };
     Querystring: {
       date?: string;
+      from?: string;
+      to?: string;
     };
   }>(
     "/clubs/:clubId/app-clients/:clientId/coach/home",
@@ -958,17 +974,44 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return reply;
       }
 
-      const date = request.query.date ?? new Date().toISOString().slice(0, 10);
+      const fallbackDate = request.query.date ?? new Date().toISOString().slice(0, 10);
+      const from = request.query.from ?? fallbackDate;
+      const to = request.query.to ?? from;
+      const dates = enumerateDateRange(from, to);
+      if (!dates) {
+        return context.sendError(reply, 400, "invalid_date_range", "Date range must be valid and no longer than 31 days");
+      }
+
+      const dailyWorkbenches = await Promise.all(dates.map((date) => context.store.getCoachToday(request.params.clubId, {
+        date,
+        userId: auth?.user.id ?? "user-coach-1",
+        roles: auth?.membership.roles ?? ["coach"],
+      }))) as Array<{ coachId?: string; events?: Array<AppEventDetail & { workflow?: Record<string, unknown>; teams?: unknown[] }> }>;
+      const events = dailyWorkbenches.flatMap((item) => item.events ?? []);
+      const tasks = events.map(buildCoachTask);
+      const teamNames = Array.from(new Set(events.flatMap((event) => {
+        const teams = Array.isArray(event.teams) ? event.teams : [];
+        return teams.map((team) => typeof team === "string" ? team : String((team as Record<string, unknown>).name ?? "")).filter(Boolean);
+      })));
 
       return {
         clubId: request.params.clubId,
         client: summarizeClient(client),
         role: "coach",
-        workbench: await context.store.getCoachToday(request.params.clubId, {
-          date,
-          userId: auth?.user.id ?? "user-coach-1",
-          roles: auth?.membership.roles ?? ["coach"],
-        }),
+        workbench: {
+          date: from,
+          dateRange: { from, to },
+          coachId: dailyWorkbenches.find((item) => item.coachId)?.coachId,
+          teams: teamNames,
+          events,
+          tasks,
+          summary: {
+            total: events.length,
+            training: events.filter((event) => event.type === "training").length,
+            matches: events.filter((event) => event.type === "match").length,
+            pending: tasks.filter((task) => task.action !== "view").length,
+          },
+        },
         sync: {
           latestRuns: (await context.store.listExternalSyncRuns(request.params.clubId)).slice(0, 3),
         },
@@ -1350,6 +1393,52 @@ function summarizeClient(client: ClubAppClient) {
     clientKey: client.clientKey,
     appId: client.appId,
     visibility: client.visibility,
+  };
+}
+
+function enumerateDateRange(from: string, to: string): string[] | null {
+  const start = new Date(`${from}T00:00:00.000Z`);
+  const end = new Date(`${to}T00:00:00.000Z`);
+  if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || start > end) {
+    return null;
+  }
+  const days = Math.floor((end.getTime() - start.getTime()) / 86_400_000) + 1;
+  if (days > 31) {
+    return null;
+  }
+  return Array.from({ length: days }, (_, index) => {
+    const date = new Date(start);
+    date.setUTCDate(date.getUTCDate() + index);
+    return date.toISOString().slice(0, 10);
+  });
+}
+
+function buildCoachTask(event: AppEventDetail & { workflow?: Record<string, unknown> }) {
+  const workflow = event.workflow ?? {};
+  let action = "view";
+  let label = "查看活动";
+  if (workflow.pendingAttendance) {
+    action = "attendance";
+    label = "完成点名";
+  } else if (workflow.pendingLessonConfirmation && Date.parse(event.timeRange.endsAt) <= Date.now()) {
+    action = "lesson";
+    label = "确认销课";
+  } else if (event.type === "match" && workflow.pendingRecord) {
+    action = "match";
+    label = "录入比赛";
+  } else if (workflow.pendingAssessment) {
+    action = "assessment";
+    label = "录入评测";
+  } else if (event.type === "training" && workflow.pendingRecord) {
+    action = "training";
+    label = "补充训练内容";
+  }
+  return {
+    eventId: event.id,
+    eventType: event.type,
+    action,
+    label,
+    dueAt: event.timeRange.endsAt,
   };
 }
 

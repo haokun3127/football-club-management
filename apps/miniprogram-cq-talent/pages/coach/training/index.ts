@@ -1,7 +1,7 @@
 import { getCoachHome, getCoachTrainingProjectTree, getCoachWorkbench, saveCoachTrainingProjects } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import type { CoachHome, CoachWorkbench, LoadState, TrainingProjectTree } from "../../../utils/types";
+import type { CoachHome, CoachWorkbench, LoadState, ScheduleEvent, TrainingProject, TrainingProjectGroup, TrainingProjectTree } from "../../../utils/types";
 
 Page({
   data: {
@@ -9,14 +9,22 @@ Page({
     message: "正在读取训练管理",
     home: null as CoachHome | null,
     teamsText: "",
+    eventOptions: [] as ScheduleEvent[],
+    eventIndex: 0,
     workbench: null as CoachWorkbench | null,
     projectTree: null as TrainingProjectTree | null,
+    filteredGroups: [] as TrainingProjectGroup[],
+    expandedGroupMap: {} as Record<string, boolean>,
     selectedProjectIds: [] as string[],
     selectedProjectMap: {} as Record<string, boolean>,
+    selectedProjects: [] as TrainingProject[],
     savingProjects: false,
     projectNote: "",
+    searchText: "",
+    requestedEventId: "",
   },
-  onLoad() {
+  onLoad(query?: Record<string, string | undefined>) {
+    this.setData({ requestedEventId: query?.eventId || "" });
     this.load();
   },
   async load() {
@@ -25,44 +33,81 @@ Page({
     this.setData({ state: "loading", message: "正在读取训练管理" });
     try {
       const home = await getCoachHome();
-      const firstEvent = home.events.find((event) => event.type === "training") ?? home.events[0];
-      const workbench = firstEvent ? await getCoachWorkbench(firstEvent.id) : null;
-      const projectTree = await getCoachTrainingProjectTree();
+      const eventOptions = home.events.filter((event) => event.type === "training");
+      const requestedIndex = eventOptions.findIndex((event) => event.id === this.data.requestedEventId);
+      const eventIndex = requestedIndex >= 0 ? requestedIndex : 0;
+      const selectedEvent = eventOptions[eventIndex];
+      const [workbench, projectTree] = await Promise.all([
+        selectedEvent ? getCoachWorkbench(selectedEvent.id) : Promise.resolve(null),
+        getCoachTrainingProjectTree(),
+      ]);
+      const selectedProjectIds = workbench?.selectedTrainingProjectIds ?? [];
+      const selectedProjectMap = toSelectionMap(selectedProjectIds);
       this.setData({
-        state: "ready",
-        message: "",
+        state: selectedEvent ? "ready" : "empty",
+        message: selectedEvent ? "" : "当前日期没有可编辑的训练活动。",
         home,
-        teamsText: home.teams.length ? home.teams.join("、") : "负责球队接口待同步",
+        teamsText: home.teams.length ? home.teams.join("、") : "暂无负责球队",
+        eventOptions,
+        eventIndex,
         workbench,
         projectTree,
-        selectedProjectIds: [],
-        selectedProjectMap: {},
+        filteredGroups: projectTree.groups,
+        expandedGroupMap: projectTree.groups[0] ? { [projectTree.groups[0].id]: true } : {},
+        selectedProjectIds,
+        selectedProjectMap,
+        selectedProjects: projectTree.projects.filter((project) => selectedProjectMap[project.id]),
       });
     } catch (error) {
       this.setData({ state: "error", message: readableError(error) });
     }
+  },
+  async onEventChange(event: { detail: { value: string | number } }) {
+    const eventIndex = Number(event.detail.value);
+    const selectedEvent = this.data.eventOptions[eventIndex];
+    if (!selectedEvent) return;
+    this.setData({ eventIndex, requestedEventId: selectedEvent.id });
+    await this.load();
   },
   openTestEntry() {
     const eventId = this.data.workbench?.event.id || "";
     const templateId = this.data.workbench?.assessmentTemplateId || "";
     openPage(`/pages/coach/test-entry/index?eventId=${eventId}&templateId=${templateId}`);
   },
+  toggleGroup(event: { currentTarget: { dataset: { id?: string } } }) {
+    const id = event.currentTarget.dataset.id;
+    if (!id) return;
+    this.setData({ expandedGroupMap: { ...this.data.expandedGroupMap, [id]: !this.data.expandedGroupMap[id] } });
+  },
+  onSearchInput(event: { detail: { value: string } }) {
+    const searchText = event.detail.value;
+    const keyword = searchText.trim().toLowerCase();
+    const groups = this.data.projectTree?.groups ?? [];
+    const filteredGroups = keyword
+      ? groups.map((group: TrainingProjectGroup) => ({
+        ...group,
+        projects: group.projects.filter((project: TrainingProject) => `${project.name} ${project.description ?? ""} ${project.tags.join(" ")}`.toLowerCase().includes(keyword)),
+      })).filter((group: TrainingProjectGroup) => group.projects.length)
+      : groups;
+    const expandedGroupMap: Record<string, boolean> = keyword ? {} : this.data.expandedGroupMap;
+    if (keyword) {
+      (filteredGroups as TrainingProjectGroup[]).forEach((group) => {
+        expandedGroupMap[group.id] = true;
+      });
+    }
+    this.setData({ searchText, filteredGroups, expandedGroupMap });
+  },
   toggleProject(event: { currentTarget: { dataset: Record<string, unknown> } }) {
     const projectId = String(event.currentTarget.dataset.id ?? "");
     if (!projectId) return;
     const selected = new Set(this.data.selectedProjectIds as string[]);
-    if (selected.has(projectId)) {
-      selected.delete(projectId);
-    } else {
-      selected.add(projectId);
-    }
+    selected.has(projectId) ? selected.delete(projectId) : selected.add(projectId);
     const selectedProjectIds = Array.from(selected);
+    const selectedProjectMap = toSelectionMap(selectedProjectIds);
     this.setData({
       selectedProjectIds,
-      selectedProjectMap: selectedProjectIds.reduce<Record<string, boolean>>((map, id) => {
-        map[id] = true;
-        return map;
-      }, {} as Record<string, boolean>),
+      selectedProjectMap,
+      selectedProjects: (this.data.projectTree?.projects ?? []).filter((project: TrainingProject) => selectedProjectMap[project.id]),
     });
   },
   onProjectNoteInput(event: { detail: { value: string } }) {
@@ -72,15 +117,21 @@ Page({
     const eventId = this.data.workbench?.event.id;
     if (!eventId || this.data.savingProjects) return;
     if (!this.data.selectedProjectIds.length) {
-      wx.showToast({ title: "请选择训练项目", icon: "none" });
+      wx.showToast({ title: "请至少选择一个训练项目", icon: "none" });
       return;
     }
     this.setData({ savingProjects: true });
     try {
-      await saveCoachTrainingProjects(eventId, this.data.selectedProjectIds, this.data.projectNote || "重庆天才小程序教练端训练内容选择");
-      wx.showToast({ title: "训练内容已保存", icon: "success" });
+      await saveCoachTrainingProjects(eventId, this.data.selectedProjectIds, this.data.projectNote || undefined);
       const workbench = await getCoachWorkbench(eventId);
-      this.setData({ workbench });
+      const selectedProjectMap = toSelectionMap(workbench.selectedTrainingProjectIds);
+      this.setData({
+        workbench,
+        selectedProjectIds: workbench.selectedTrainingProjectIds,
+        selectedProjectMap,
+        selectedProjects: (this.data.projectTree?.projects ?? []).filter((project: TrainingProject) => selectedProjectMap[project.id]),
+      });
+      wx.showToast({ title: "训练内容已保存", icon: "success" });
     } catch (error) {
       wx.showToast({ title: readableError(error), icon: "none" });
     } finally {
@@ -91,6 +142,13 @@ Page({
     this.load();
   },
 });
+
+function toSelectionMap(ids: string[]) {
+  return ids.reduce<Record<string, boolean>>((map, id) => {
+    map[id] = true;
+    return map;
+  }, {});
+}
 
 function readableError(error: unknown) {
   const record = error as { message?: string; code?: string };

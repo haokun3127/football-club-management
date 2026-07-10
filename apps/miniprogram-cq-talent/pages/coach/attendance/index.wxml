@@ -33,7 +33,7 @@
   </view>
   <view wx:if="{{workbench}}" class="card">
     <view class="section-title">写入状态</view>
-    <view class="subtitle">保存将调用 app-client 点名 BFF，并携带 requestId 与 Idempotency-Key。</view>
+    <view class="subtitle">请确认名单状态；保存失败时当前填写不会被清空。</view>
     <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveAttendance">保存点名</button>
   </view>
 </view>
