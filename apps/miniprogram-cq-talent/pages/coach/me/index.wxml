@@ -1,7 +1,8 @@
-<view class="page">
-  <view class="card hero-card">
-    <view class="title">{{displayName}}</view>
-    <view class="subtitle">身份、负责球队、权限范围和账号绑定</view>
+<app-header title="我的" subtitle="教练身份与工作范围" />
+<view class="page page-with-header coach-me">
+  <view class="coach-profile">
+    <view class="coach-profile__avatar">{{avatarLetter}}</view>
+    <view><view class="coach-profile__eyebrow">COACH PROFILE</view><view class="title">{{displayName}}</view><view class="coach-profile__meta">重庆天才足球俱乐部</view></view>
   </view>
 
   <status-view
@@ -12,26 +13,21 @@
     bindaction="retry"
   />
 
-  <view wx:if="{{home}}" class="card">
-    <view class="section-title">负责球队</view>
-    <view class="subtitle">{{teamsText}}</view>
+  <view wx:if="{{home}}" class="card scope-card">
+    <view class="section-title">负责球队</view><view class="tag">{{home.teams.length}} 支</view>
+    <view class="subtitle scope-card__teams">{{teamsText}}</view>
   </view>
 
-  <view class="card">
+  <view class="card permission-card">
     <view class="section-title">权限范围</view>
     <view class="field-row"><view class="label">可读</view><view class="field-value">负责活动、球队、学员训练交付数据</view></view>
     <view class="field-row"><view class="label">可操作</view><view class="field-value">负责活动的点名、销课、比赛、训练内容和评测</view></view>
-    <view class="field-row"><view class="label">不可见</view><view class="field-value">收费、保险审核、后台运营和 WPS 配置</view></view>
+    <view class="field-row"><view class="label">不可见</view><view class="field-value">收费、保险审核和俱乐部运营配置</view></view>
   </view>
 
-  <view class="card">
-    <view class="section-title">私教意向提醒</view>
-    <view class="subtitle">家长意向同步后将在这里展示；不生成订单或自动派单。</view>
-  </view>
-
-  <view class="card">
-    <view class="section-title">账号绑定</view>
-    <view class="subtitle">正式登录后可查看微信绑定和最近登录状态。</view>
+  <view class="card service-card">
+    <view class="section-title">工作说明</view>
+    <view class="subtitle">这里只展示当前账号已获得的教练工作权限。如需调整负责队伍，请联系俱乐部管理员。</view>
   </view>
 
   <role-tabbar role="coach" active="me" />

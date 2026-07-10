@@ -3,7 +3,7 @@
   "name": "cq-talent-coach-ui-alignment",
   "title": "重庆天才教练端Figma全页面对齐",
   "description": "完成教练端全部现有路由的Figma风格对齐并保留任务工作台和安全写入流程",
-  "status": "planning",
+  "status": "in_progress",
   "dev_type": null,
   "scope": "miniprogram-coach-pages-figma-alignment",
   "package": "api",

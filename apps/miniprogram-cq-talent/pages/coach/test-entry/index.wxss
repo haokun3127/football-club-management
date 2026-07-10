@@ -129,22 +129,8 @@
   margin-top: 12rpx;
 }
 
-.submit-bar {
-  position: sticky;
-  bottom: 20rpx;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20rpx;
-  padding: 20rpx 22rpx;
-  border: 1rpx solid #ffd6d2;
-  border-radius: 12rpx;
-  background: #ffffff;
-  box-shadow: 0 8rpx 30rpx rgba(31, 35, 41, 0.12);
-}
-
-.submit-button {
-  width: 180rpx;
-  margin: 0;
-}
+.assessment-page { padding-bottom: calc(190rpx + env(safe-area-inset-bottom)); }
+.assessment-hero { margin-bottom: 20rpx; padding: 28rpx 24rpx; border-radius: 28rpx; background: linear-gradient(145deg,#17191f,#30333b); color: #fff; }
+.assessment-hero .title { color: #fff; }
+.assessment-hero__eyebrow { margin-bottom: 8rpx; color: rgba(255,255,255,.62); font-size: 18rpx; font-weight: 700; letter-spacing: 2rpx; }
+.assessment-hero__meta { margin-top: 8rpx; color: rgba(255,255,255,.72); font-size: 23rpx; }

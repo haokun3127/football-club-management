@@ -2,6 +2,7 @@ import { getCoachHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { DEV_TEST_DATE } from "../../../utils/config";
 import { openPage } from "../../../utils/navigation";
+import { activityStatus, formatCalendarDate, formatTimeRange } from "../../../utils/presentation";
 import type { CoachHome, CoachTaskAction, LoadState, ScheduleEvent } from "../../../utils/types";
 
 type Filter = "all" | "pending" | "training" | "match";
@@ -13,6 +14,14 @@ const filters: Array<{ label: string; value: Filter }> = [
   { label: "比赛", value: "match" },
 ];
 
+type CoachEventView = ScheduleEvent & {
+  timeLabel: string;
+  dateLabel: string;
+  statusLabel: string;
+  statusTone: string;
+  meta: Array<{ label: string; value: string }>;
+};
+
 Page({
   data: {
     state: "loading" as LoadState,
@@ -20,11 +29,12 @@ Page({
     home: null as CoachHome | null,
     teamsText: "",
     events: [] as ScheduleEvent[],
-    visibleEvents: [] as ScheduleEvent[],
+    visibleEvents: [] as CoachEventView[],
     date: DEV_TEST_DATE,
     viewMode: "day" as "day" | "week",
     activeFilter: "all" as Filter,
     filters,
+    rangeLabel: "今日任务",
   },
   onLoad() {
     this.load();
@@ -42,6 +52,7 @@ Page({
         home,
         teamsText: home.teams.length ? home.teams.join("、") : "暂无负责球队",
         events: home.events,
+        rangeLabel: this.data.viewMode === "week" ? `${formatCalendarDate(this.data.date)}起 7 天` : formatCalendarDate(this.data.date),
       });
       this.applyFilter();
     } catch (error) {
@@ -70,15 +81,16 @@ Page({
       if (activeFilter === "pending") return event.nextAction && event.nextAction !== "view";
       if (activeFilter === "training" || activeFilter === "match") return event.type === activeFilter;
       return true;
-    });
+    }).map(toCoachEventView);
     this.setData({ visibleEvents });
   },
-  openEvent(event: { currentTarget: { dataset: { id?: string } } }) {
-    const id = event.currentTarget.dataset.id;
+  openEvent(event: { detail?: { eventId?: string }; currentTarget?: { dataset?: { id?: string } } }) {
+    const id = event.detail?.eventId ?? event.currentTarget?.dataset?.id;
     if (id) openPage(`/pages/coach/event/index?id=${id}`);
   },
-  openTask(event: { currentTarget: { dataset: { id?: string; action?: CoachTaskAction } } }) {
-    const { id, action } = event.currentTarget.dataset;
+  openTask(event: { detail?: { eventId?: string; action?: CoachTaskAction }; currentTarget?: { dataset?: { id?: string; action?: CoachTaskAction } } }) {
+    const id = event.detail?.eventId ?? event.currentTarget?.dataset?.id;
+    const action = event.detail?.action ?? event.currentTarget?.dataset?.action;
     if (!id) return;
     const routes: Partial<Record<CoachTaskAction, string>> = {
       attendance: `/pages/coach/attendance/index?id=${id}`,
@@ -94,6 +106,21 @@ Page({
     this.load();
   },
 });
+
+function toCoachEventView(event: ScheduleEvent): CoachEventView {
+  const status = activityStatus(event.status);
+  return {
+    ...event,
+    timeLabel: formatTimeRange(event.startsAt, event.endsAt),
+    dateLabel: formatCalendarDate(event.startsAt),
+    statusLabel: status.label,
+    statusTone: status.tone,
+    meta: [
+      event.teamName ? { label: "队伍", value: event.teamName } : null,
+      event.participantCount ? { label: "名单", value: `${event.participantCount} 人` } : null,
+    ].filter((item): item is { label: string; value: string } => Boolean(item)),
+  };
+}
 
 function addDays(date: string, amount: number) {
   const value = new Date(`${date}T00:00:00.000Z`);

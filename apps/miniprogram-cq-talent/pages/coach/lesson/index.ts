@@ -22,7 +22,8 @@ Page({
     try {
       const workbench = await getCoachWorkbench(id);
       const confirmation = await getCoachLessonConfirmation(id);
-      const sourceRoster = confirmation.participants.length ? confirmation.participants : workbench.roster;
+      const confirmationByStudentId = new Map(confirmation.participants.map((student) => [student.studentId, student]));
+      const sourceRoster = workbench.roster.map((student) => ({ ...student, ...confirmationByStudentId.get(student.studentId), name: student.name }));
       this.setData({
         state: "ready",
         workbench: {

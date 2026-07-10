@@ -466,7 +466,7 @@ function normalizeGrowth(raw: Record<string, unknown>, student?: StudentSummary)
     ],
     trainingHistory: [
       { label: "训练历程", value: "训练统计正在同步" },
-      { label: "更新时间", value: String(raw.updatedAt ?? raw.generatedAt ?? "以后端同步时间为准") },
+      { label: "更新时间", value: String(raw.updatedAt ?? raw.generatedAt ?? "尚未同步") },
     ],
     metricItems: metrics,
     views: views.length ? views : [{ id: "default", name: "能力概览", metricIds: radar.map((point) => point.metricId) }],
@@ -657,6 +657,9 @@ function normalizeCoachWorkbench(raw: Record<string, unknown>, eventId: string):
   const match = asRecord(raw.match);
   const assessment = asRecord(raw.assessment);
   const templateVersions = Array.isArray(assessment?.templateVersions) ? assessment?.templateVersions as Array<Record<string, unknown>> : [];
+  const preferredTemplateVersion = templateVersions.find((version) =>
+    String(version.templateId ?? version.id ?? "").includes("cq-talent-elite"),
+  ) ?? templateVersions[0];
   const selectedProjectsSource = Array.isArray(training?.projects) ? training.projects as Array<Record<string, unknown>> : [];
   const selectedTrainingProjects = selectedProjectsSource.map(normalizeTrainingProject).filter((project) => project.id);
   const selectedTrainingProjectIds = Array.isArray(training?.selectedProjectIds)
@@ -679,7 +682,7 @@ function normalizeCoachWorkbench(raw: Record<string, unknown>, eventId: string):
     match: [
       { label: "比赛记录", value: String(match?.summary ?? "可录入比赛摘要和进球/助攻等球员事件") },
     ],
-    assessmentTemplateId: stringOrUndefined(templateVersions[0]?.templateId ?? templateVersions[0]?.id),
+    assessmentTemplateId: stringOrUndefined(preferredTemplateVersion?.templateId ?? preferredTemplateVersion?.id),
     pending: [],
   };
 }
@@ -712,7 +715,7 @@ function normalizeLessonConfirmation(raw: Record<string, unknown>): CoachLessonC
       balance: numberOrUndefined(ledger.balance ?? ledger.balanceAfter),
       status: stringOrUndefined(ledger.status),
     })).filter((ledger) => ledger.studentId),
-    pending: [{ title: "余额预览", message: ledgers.length ? "余额来自后端销课流水。" : "余额未知时仍可确认销课，后端会按课时规则写入流水。" }],
+    pending: [{ title: "课时余额", message: ledgers.length ? "余额已按最近一次课时记录更新。" : "余额暂未核对时仍可确认，俱乐部会按课时规则更新。" }],
   };
 }
 
@@ -737,7 +740,7 @@ function normalizeTrainingProjectTree(raw: Record<string, unknown>): TrainingPro
   return {
     groups: groups.length ? groups : [{ id: "all", name: "训练项目", projects: normalizedProjects }],
     projects: normalizedProjects,
-    pending: normalizedProjects.length ? [] : [{ title: "训练项目待同步", message: "后端未返回可选训练项目。" }],
+    pending: normalizedProjects.length ? [] : [{ title: "暂无训练项目", message: "当前还没有可选项目，请联系俱乐部完善训练内容。" }],
   };
 }
 
@@ -799,9 +802,9 @@ function normalizeAssessmentForm(raw: Record<string, unknown>): AssessmentForm {
       label: String(testItem.name ?? testItem.label ?? field.label ?? "测试项目"),
       inputType: String(testItem.inputType ?? field.inputType ?? "number"),
       valueKind: String(testItem.valueKind ?? metric?.valueKind ?? field.valueKind ?? "score_0_100"),
-      unit: stringOrUndefined(testItem.unit ?? metric?.unit),
+      unit: userFacingMetricUnit(testItem.unit ?? metric?.unit),
       required: Boolean(testItem.required ?? field.required ?? binding?.role === "input"),
-      protocol: stringOrUndefined(testItem.protocol),
+      protocol: userFacingAssessmentProtocol(testItem.protocol),
       groupId: String(dimension?.id ?? metric?.dimensionId ?? "other"),
       groupLabel: String(dimension?.name ?? "其他项目"),
       minValue: numberOrUndefined(testItem.minValue ?? field.minValue),
@@ -814,10 +817,22 @@ function normalizeAssessmentForm(raw: Record<string, unknown>): AssessmentForm {
     templateId: String(template?.id ?? ""),
     templateName: String(template?.name ?? "评测表单"),
     templateVersionId: stringOrUndefined(version?.id),
-    versionName: String(version?.name ?? version?.id ?? "当前版本"),
+    versionName: userFacingVersionName(version?.name ?? version?.id),
     fields,
     pending: [{ title: "保存提示", message: "当前填写完成后统一提交，请在离开页面前确认保存。" }],
   };
+}
+
+function userFacingAssessmentProtocol(value: unknown) {
+  const protocol = stringOrUndefined(value);
+  if (!protocol || /公式|来源：.*第\d+行|[A-Z]\d+/.test(protocol)) return undefined;
+  return protocol;
+}
+
+function userFacingVersionName(value: unknown) {
+  const name = stringOrUndefined(value);
+  if (!name || /assessment-template|version-/i.test(name)) return "当前版本";
+  return name;
 }
 
 function normalizeEventType(type: unknown): ScheduleEvent["type"] {

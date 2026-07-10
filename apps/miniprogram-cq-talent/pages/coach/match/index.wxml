@@ -1,17 +1,20 @@
-<view class="page">
+<app-header title="比赛录入" subtitle="比分与球员关键事件" show-back="{{true}}" />
+<view class="page page-with-header match-page">
   <status-view state="{{state}}" title="比赛录入" message="{{message}}" />
-  <view wx:if="{{workbench}}" class="card hero-card">
-    <view class="title">比赛事件记录</view>
-    <view class="subtitle">{{workbench.event.title}}</view>
+  <view wx:if="{{workbench}}" class="match-hero">
+    <view class="match-hero__eyebrow">MATCH RECORD</view>
+    <view class="title">{{workbench.event.title}}</view>
+    <view class="match-hero__score"><text>{{homeScore === '' ? '–' : homeScore}}</text><text class="match-hero__divider">:</text><text>{{awayScore === '' ? '–' : awayScore}}</text></view>
+    <view class="match-hero__opponent">{{opponentName || '对手待填写'}}</view>
   </view>
-  <view wx:if="{{workbench}}" class="card">
+  <view wx:if="{{workbench}}" class="card match-form-card">
     <view class="section-title">当前比赛摘要</view>
     <view wx:for="{{workbench.match}}" wx:key="label" class="field-row">
       <view class="label">{{item.label}}</view>
       <view class="field-value">{{item.value}}</view>
     </view>
   </view>
-  <view wx:if="{{workbench}}" class="card">
+  <view wx:if="{{workbench}}" class="card match-form-card match-form-card--events">
     <view class="section-title">比赛摘要</view>
     <view class="form-row">
       <view class="label">比赛类型</view>
@@ -81,6 +84,6 @@
       </view>
     </view>
     <view class="subtitle">请确认比分和球员事件后保存；未选择助攻时不会生成助攻记录。</view>
-    <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveMatch">保存比赛摘要</button>
   </view>
+  <submit-bar wx:if="{{workbench}}" primary-text="保存比赛记录" hint="未选择助攻时只记录进球" loading="{{saving}}" disabled="{{saving}}" bindsubmit="saveMatch" />
 </view>

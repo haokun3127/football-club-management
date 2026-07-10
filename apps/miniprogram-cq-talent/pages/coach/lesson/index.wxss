@@ -1,6 +1,10 @@
-button {
-  margin-top: 20rpx;
-}
+.lesson-page { padding-bottom: calc(190rpx + env(safe-area-inset-bottom)); }
+.lesson-hero { margin-bottom: 20rpx; padding: 28rpx 24rpx; border-radius: 28rpx; background: linear-gradient(145deg,#8f0d18,#c41725); color: #fff; }
+.lesson-hero .title { color: #fff; }
+.lesson-hero__eyebrow { margin-bottom: 8rpx; color: rgba(255,255,255,.66); font-size: 18rpx; font-weight: 700; letter-spacing: 2rpx; }
+.lesson-hero__hint { margin-top: 10rpx; color: rgba(255,255,255,.76); font-size: 23rpx; }
+.lesson-list-card { padding-top: 18rpx; }
+.lesson-note-card { margin-bottom: 30rpx; }
 
 .lesson-row {
   padding: 20rpx 0;
@@ -27,7 +31,7 @@ button {
   min-width: 118rpx;
   min-height: 56rpx;
   padding: 0 16rpx;
-  border-radius: 10rpx;
+  border-radius: 999rpx;
   font-size: 24rpx;
   line-height: 56rpx;
   text-align: center;
@@ -50,7 +54,7 @@ button {
   margin-top: 14rpx;
   box-sizing: border-box;
   padding: 14rpx 16rpx;
-  border-radius: 8rpx;
+  border-radius: 14rpx;
   background: #f7f8fa;
   font-size: 24rpx;
 }

@@ -1,6 +1,8 @@
 {
-  "navigationBarTitleText": "比赛录入",
+  "navigationStyle": "custom",
   "usingComponents": {
+    "app-header": "/components/app-header/index",
+    "submit-bar": "/components/submit-bar/index",
     "status-view": "/components/status-view/index"
   }
 }

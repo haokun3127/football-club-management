@@ -1,46 +1,49 @@
-<view class="page">
-  <status-view state="{{state}}" title="活动工作台" message="{{message}}" />
+<app-header title="活动工作台" subtitle="{{eventTypeLabel}}任务与记录" show-back="{{true}}" />
+<view class="event-workbench event-workbench--{{workbench ? workbench.event.type : 'training'}}">
+  <view class="event-workbench__body">
+  <status-view state="{{state}}" title="{{state === 'loading' ? '加载活动' : '活动读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
-  <view wx:if="{{workbench}}" class="card hero-card">
-    <view class="row">
-      <view>
-        <view class="title">{{workbench.event.title}}</view>
-        <view class="subtitle">{{workbench.event.startsAt}}｜{{workbench.event.venue}}</view>
-      </view>
-      <view class="tag">{{workbench.event.status}}</view>
+  <view wx:if="{{workbench}}" class="workbench-hero">
+    <view class="workbench-hero__eyebrow">{{eventTypeLabel}} · SESSION WORKBENCH</view>
+    <view class="row workbench-hero__row">
+      <view class="workbench-hero__title">{{workbench.event.title}}</view>
+      <status-chip label="{{statusLabel}}" tone="{{statusTone}}" compact="{{true}}" />
     </view>
+    <view class="workbench-hero__meta">{{timeLabel}}</view>
+    <view class="workbench-hero__meta">{{workbench.event.venue}}</view>
   </view>
 
-  <view wx:if="{{workbench}}" class="card">
-    <view class="section-title">记录完善度</view>
+  <view wx:if="{{workbench}}" class="workbench-card completion-card">
+    <view class="row"><view><view class="section-title">记录完善度</view><view class="subtitle">完成活动后续所需的关键记录</view></view><view class="completion-card__score">{{completionCount}}/{{workbench.workflow.length}}</view></view>
     <view wx:for="{{workbench.workflow}}" wx:key="label" class="field-row">
       <view class="label">{{item.label}}</view>
-      <view class="field-value">{{item.value}}</view>
+      <status-chip label="{{item.value}}" tone="{{item.status === 'ready' ? 'success' : 'pending'}}" compact="{{true}}" />
     </view>
   </view>
 
-  <view wx:if="{{workbench && workbench.event.status !== 'cancelled'}}" class="card">
-    <view class="section-title">活动操作</view>
-    <view class="grid-2">
-      <button class="primary-button mini-button" bindtap="openAttendance">点名</button>
-      <button class="primary-button mini-button" bindtap="openLesson">销课</button>
-      <button wx:if="{{workbench.event.type === 'match'}}" class="ghost-button mini-button" bindtap="openMatch">比赛录入</button>
-      <button wx:if="{{workbench.event.type === 'training'}}" class="ghost-button mini-button" bindtap="openTraining">训练内容</button>
-      <button wx:if="{{workbench.event.type === 'training' && workbench.assessmentTemplateId}}" class="ghost-button mini-button" bindtap="openTestEntry">评测录入</button>
+  <view wx:if="{{workbench && workbench.event.status !== 'cancelled'}}" class="workbench-card">
+    <view class="section-title">下一步操作</view>
+    <view class="action-grid">
+      <button class="action-tile action-tile--primary" bindtap="openAttendance"><text class="action-tile__icon">点</text><text>点名</text></button>
+      <button wx:if="{{workbench.event.type !== 'other'}}" class="action-tile" bindtap="openLesson"><text class="action-tile__icon">课</text><text>销课</text></button>
+      <button wx:if="{{workbench.event.type === 'match'}}" class="action-tile action-tile--match" bindtap="openMatch"><text class="action-tile__icon">赛</text><text>比赛录入</text></button>
+      <button wx:if="{{workbench.event.type === 'training'}}" class="action-tile" bindtap="openTraining"><text class="action-tile__icon">训</text><text>训练内容</text></button>
+      <button wx:if="{{workbench.event.type === 'training' && workbench.assessmentTemplateId}}" class="action-tile" bindtap="openTestEntry"><text class="action-tile__icon">测</text><text>评测录入</text></button>
     </view>
   </view>
 
-  <view wx:if="{{workbench}}" class="card">
-    <view class="section-title">学员名单</view>
-    <view class="subtitle">共 {{workbench.roster.length}} 人，以下为名单摘要</view>
+  <view wx:if="{{workbench}}" class="workbench-card">
+    <view class="row"><view class="section-title">名单摘要</view><view class="roster-count">{{workbench.roster.length}} 人</view></view>
+    <view class="subtitle">{{rosterSummary}}，完整名单请进入点名页</view>
     <view wx:for="{{rosterPreview}}" wx:key="studentId" class="field-row">
       <view class="label">{{item.name}}</view>
-      <view class="field-value">{{item.status}}</view>
+      <view class="field-value">{{item.statusLabel}}</view>
     </view>
   </view>
 
-  <view wx:if="{{workbench}}" wx:for="{{workbench.pending}}" wx:key="title" class="card">
+  <view wx:if="{{workbench}}" wx:for="{{workbench.pending}}" wx:key="title" class="workbench-card workbench-card--pending">
     <view class="section-title">{{item.title}}</view>
     <view class="subtitle">{{item.message}}</view>
+  </view>
   </view>
 </view>

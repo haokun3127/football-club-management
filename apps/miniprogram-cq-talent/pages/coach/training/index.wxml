@@ -1,15 +1,13 @@
-<view class="page">
-  <view class="card hero-card">
-    <view class="title">训练内容</view>
-    <view class="subtitle">选择活动、设置项目并确认保存</view>
-  </view>
+<app-header title="训练内容" subtitle="选择项目并保存到当前活动" />
+<view class="page page-with-header training-page">
 
   <status-view state="{{state}}" title="{{state === 'loading' ? '加载训练内容' : state === 'empty' ? '暂无训练活动' : '训练内容读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
-  <view wx:if="{{eventOptions.length}}" class="card">
-    <view class="section-title">当前活动</view>
+  <view wx:if="{{eventOptions.length}}" class="training-event-card">
+    <view class="training-event-card__eyebrow">CURRENT SESSION</view>
+    <view class="section-title">当前训练活动</view>
     <picker mode="selector" range="{{eventOptions}}" range-key="title" value="{{eventIndex}}" bindchange="onEventChange">
-      <view class="event-picker">{{eventOptions[eventIndex].title}}<view class="subtitle">{{eventOptions[eventIndex].startsAt}}</view></view>
+      <view class="event-picker">{{eventOptions[eventIndex].title}}<view class="subtitle">{{eventOptions[eventIndex].displayTime}}</view></view>
     </picker>
   </view>
 
@@ -38,11 +36,6 @@
     <textarea class="project-note" placeholder="训练备注（选填）" value="{{projectNote}}" bindinput="onProjectNoteInput" />
   </view>
 
-  <view wx:if="{{workbench}}" class="sticky-save">
-    <view><view class="label strong">已选 {{selectedProjects.length}} 项</view><view class="subtitle">保存到 {{workbench.event.title}}</view></view>
-    <button class="primary-button save-button" loading="{{savingProjects}}" disabled="{{savingProjects}}" bindtap="saveProjects">保存</button>
-  </view>
-
   <view class="card">
     <view class="section-title">评测录入</view>
     <view class="subtitle">按俱乐部评测模板记录学员表现。</view>
@@ -50,4 +43,5 @@
   </view>
 
   <role-tabbar role="coach" active="training" />
+  <submit-bar wx:if="{{workbench}}" primary-text="保存训练内容" hint="已选 {{selectedProjects.length}} 项 · 保存到当前活动" loading="{{savingProjects}}" disabled="{{savingProjects}}" bindsubmit="saveProjects" />
 </view>

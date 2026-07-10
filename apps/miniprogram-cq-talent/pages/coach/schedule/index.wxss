@@ -1,8 +1,15 @@
+.coach-schedule { padding-top: 20rpx; }
+.range-card { margin-bottom: 20rpx; padding: 28rpx 24rpx; border-radius: 28rpx; background: linear-gradient(135deg,#8f0d18,#c41725); color: #fff; box-shadow: 0 16rpx 36rpx rgba(168,15,27,.18); }
+.range-card__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 20rpx; }
+.range-card__eyebrow { color: rgba(255,255,255,.68); font-size: 18rpx; font-weight: 700; letter-spacing: 2rpx; }
+.range-card__title { margin-top: 8rpx; font-size: 34rpx; font-weight: 700; }
+.range-card__coach { padding: 8rpx 14rpx; border-radius: 999rpx; background: rgba(255,255,255,.14); font-size: 21rpx; }
 .date-picker {
   margin-top: 20rpx;
   padding: 16rpx 18rpx;
   border-radius: 10rpx;
-  background: #ffffff;
+  background: rgba(255,255,255,.14);
+  color: #fff;
   font-size: 24rpx;
 }
 
@@ -27,6 +34,10 @@
 }
 
 .switch-item.active,
+.filter-item.active {
+  background: #ffffff;
+  color: #a80f1b;
+}
 .filter-item.active {
   background: #a80f1b;
   color: #ffffff;
@@ -62,29 +73,10 @@
   font-size: 20rpx;
 }
 
-.compact-card {
-  padding-top: 18rpx;
-  padding-bottom: 18rpx;
-}
+.scope-line { display: flex; gap: 18rpx; margin-bottom: 20rpx; padding: 18rpx 20rpx; border: 1rpx solid #e7eaf0; border-radius: 18rpx; background: #fff; }
+.scope-line__label { flex: 0 0 auto; color: #a80f1b; font-size: 23rpx; font-weight: 700; }
+.scope-line__value { overflow: hidden; color: #667085; font-size: 23rpx; text-overflow: ellipsis; white-space: nowrap; }
 
 .filter-row {
   margin-bottom: 20rpx;
-}
-
-.task-card:active {
-  background: #fff8f7;
-}
-
-.task-time {
-  color: #60646f;
-  font-size: 22rpx;
-}
-
-.task-title {
-  margin-top: 14rpx;
-  margin-bottom: 8rpx;
-}
-
-.task-button {
-  margin-top: 18rpx;
 }

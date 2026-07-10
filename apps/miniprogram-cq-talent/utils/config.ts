@@ -14,6 +14,10 @@ export const DEV_USER_IDS = {
   parent: "user-parent-cq-talent-acceptance",
   coach: "user-coach-1",
 };
+export const DEV_DISPLAY_NAMES = {
+  parent: "王子轩家长",
+  coach: "陈教练",
+} as const;
 export const DEV_COACH_PROFILE_IDS = {
   "user-coach-1": "coach-1",
 };

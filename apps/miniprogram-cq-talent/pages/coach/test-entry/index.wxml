@@ -1,9 +1,11 @@
-<view class="page">
+<app-header title="整队评测" subtitle="按项目连续录入学员" show-back="{{true}}" />
+<view class="page page-with-header assessment-page">
   <status-view state="{{state}}" title="{{state === 'loading' ? '加载评测' : state === 'empty' ? '暂无学员' : '评测读取失败'}}" message="{{message}}" />
 
-  <view wx:if="{{form}}" class="card hero-card">
+  <view wx:if="{{form}}" class="assessment-hero">
+    <view class="assessment-hero__eyebrow">TEAM ASSESSMENT</view>
     <view class="title">{{form.templateName}}</view>
-    <view class="subtitle">{{form.versionName}}｜已完成 {{completedCount}} / {{totalCount}}</view>
+    <view class="assessment-hero__meta">{{form.versionName}} · 已完成 {{completedCount}} / {{totalCount}}</view>
     <view class="progress-track"><view class="progress-value" style="width: {{totalCount ? completedCount * 100 / totalCount : 0}}%"></view></view>
   </view>
 
@@ -35,8 +37,5 @@
     </view>
   </view>
 
-  <view wx:if="{{form}}" class="submit-bar">
-    <view><view class="label strong">{{submitMessage || '输入会自动保存到本机'}}</view><view class="subtitle">提交成功后清理对应学员草稿</view></view>
-    <button class="primary-button submit-button" loading="{{saving}}" disabled="{{saving || !roster.length}}" bindtap="submitAssessment">提交</button>
-  </view>
+  <submit-bar wx:if="{{form}}" primary-text="提交评测" hint="{{submitMessage || '输入已自动保存'}}" loading="{{saving}}" disabled="{{saving || !roster.length}}" bindsubmit="submitAssessment" />
 </view>

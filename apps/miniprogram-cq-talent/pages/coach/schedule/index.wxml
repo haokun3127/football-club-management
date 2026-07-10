@@ -1,14 +1,15 @@
-<view class="page">
-  <view class="card hero-card">
-    <view class="row">
+<app-header title="教练任务" subtitle="按优先级完成训练与比赛工作" />
+<view class="page page-with-header coach-schedule">
+  <view class="range-card">
+    <view class="range-card__top">
       <view>
-        <view class="title">教练任务</view>
-        <view class="subtitle">先完成今天必须处理的工作</view>
+        <view class="range-card__eyebrow">{{viewMode === 'week' ? 'WEEKLY WORKBENCH' : 'TODAY WORKBENCH'}}</view>
+        <view class="range-card__title">{{rangeLabel}}</view>
       </view>
-      <view class="tag">{{viewMode === 'week' ? '本周' : '今日'}}</view>
+      <view class="range-card__coach">{{home && home.coachName ? home.coachName : '教练工作台'}}</view>
     </view>
     <picker mode="date" value="{{date}}" bindchange="onDateChange">
-      <view class="date-picker">{{date}}｜点击切换日期</view>
+      <view class="date-picker">选择起始日期 · {{date}}</view>
     </picker>
     <view class="view-switch">
       <view class="switch-item {{viewMode === 'day' ? 'active' : ''}}" data-mode="day" bindtap="switchView">今日</view>
@@ -25,9 +26,9 @@
     <view class="summary-card important"><view class="summary-value">{{home.summary.pending}}</view><view class="summary-label">待处理</view></view>
   </view>
 
-  <view wx:if="{{home}}" class="card compact-card">
-    <view class="section-title">负责范围</view>
-    <view class="subtitle">{{teamsText}}</view>
+  <view wx:if="{{home}}" class="scope-line">
+    <view class="scope-line__label">负责队伍</view>
+    <view class="scope-line__value">{{teamsText}}</view>
   </view>
 
   <view wx:if="{{home}}" class="filter-row">
@@ -35,16 +36,7 @@
   </view>
 
   <view wx:if="{{state === 'ready'}}">
-    <view wx:for="{{visibleEvents}}" wx:key="id" class="card task-card" data-id="{{item.id}}" bindtap="openEvent">
-      <view class="row">
-        <view class="task-time">{{item.startsAt}}</view>
-        <view class="tag {{item.status === 'cancelled' ? 'muted' : ''}}">{{item.status}}</view>
-      </view>
-      <view class="section-title task-title">{{item.title}}</view>
-      <view class="subtitle">{{item.teamName || '队伍待确认'}}｜{{item.venue}}</view>
-      <view class="subtitle" wx:if="{{item.participantCount}}">名单 {{item.participantCount}} 人</view>
-      <button class="primary-button task-button" data-id="{{item.id}}" data-action="{{item.nextAction || 'view'}}" catchtap="openTask">{{item.nextActionLabel || '查看活动'}}</button>
-    </view>
+    <activity-card wx:for="{{visibleEvents}}" wx:key="id" event-id="{{item.id}}" type="{{item.type}}" title="{{item.title}}" time="{{item.dateLabel}} · {{item.timeLabel}}" venue="{{item.venue}}" status-label="{{item.statusLabel}}" status-tone="{{item.statusTone}}" action="{{item.nextAction || 'view'}}" action-label="{{item.nextActionLabel || '查看活动'}}" meta="{{item.meta}}" bindopen="openEvent" bindaction="openTask" />
     <view wx:if="{{!visibleEvents.length}}" class="card empty">当前筛选下没有任务</view>
   </view>
 

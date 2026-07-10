@@ -69,27 +69,12 @@
   background: #f7f8fa;
 }
 
-.sticky-save {
-  position: sticky;
-  bottom: 124rpx;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20rpx;
-  margin-bottom: 20rpx;
-  padding: 18rpx 22rpx;
-  border: 1rpx solid #ffd6d2;
-  border-radius: 12rpx;
-  background: #ffffff;
-  box-shadow: 0 8rpx 30rpx rgba(31, 35, 41, 0.1);
-}
-
-.save-button {
-  width: 180rpx;
-  margin: 0;
-}
-
 button {
   margin-top: 20rpx;
 }
+.training-page { padding-bottom: calc(250rpx + env(safe-area-inset-bottom)); }
+.training-event-card { margin-bottom: 20rpx; padding: 26rpx 24rpx; border-radius: 28rpx; background: linear-gradient(145deg,#17191f,#30333b); color: #fff; }
+.training-event-card .section-title { color: #fff; }
+.training-event-card__eyebrow { margin-bottom: 8rpx; color: rgba(255,255,255,.62); font-size: 18rpx; font-weight: 700; letter-spacing: 2rpx; }
+.training-event-card .event-picker { background: rgba(255,255,255,.1); color: #fff; }
+.training-event-card .subtitle { color: rgba(255,255,255,.7); }

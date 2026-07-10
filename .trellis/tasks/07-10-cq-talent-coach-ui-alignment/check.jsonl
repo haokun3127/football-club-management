@@ -1,1 +1,3 @@
-{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python3 .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"核对任务优先级、权限和安全写入契约"}
+{"file":".trellis/tasks/07-10-cq-talent-devtools-device-acceptance/research/figma-page-diff-matrix.md","reason":"核对七个路由与 Coach Generated frames 的逐页一致性"}
+{"file":".trellis/tasks/07-10-cq-talent-coach-ui-alignment/research/implementation-verification.md","reason":"核对 25 人、62 项、DevTools 截图和全量质量门槛"}

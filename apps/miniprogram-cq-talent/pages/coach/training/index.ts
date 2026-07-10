@@ -1,7 +1,10 @@
 import { getCoachHome, getCoachTrainingProjectTree, getCoachWorkbench, saveCoachTrainingProjects } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
+import { formatCalendarDate, formatTimeRange } from "../../../utils/presentation";
 import type { CoachHome, CoachWorkbench, LoadState, ScheduleEvent, TrainingProject, TrainingProjectGroup, TrainingProjectTree } from "../../../utils/types";
+
+type TrainingEventOption = ScheduleEvent & { displayTime: string };
 
 Page({
   data: {
@@ -9,7 +12,7 @@ Page({
     message: "正在读取训练管理",
     home: null as CoachHome | null,
     teamsText: "",
-    eventOptions: [] as ScheduleEvent[],
+    eventOptions: [] as TrainingEventOption[],
     eventIndex: 0,
     workbench: null as CoachWorkbench | null,
     projectTree: null as TrainingProjectTree | null,
@@ -33,7 +36,10 @@ Page({
     this.setData({ state: "loading", message: "正在读取训练管理" });
     try {
       const home = await getCoachHome();
-      const eventOptions = home.events.filter((event) => event.type === "training");
+      const eventOptions = home.events.filter((event) => event.type === "training").map((event) => ({
+        ...event,
+        displayTime: `${formatCalendarDate(event.startsAt)} · ${formatTimeRange(event.startsAt, event.endsAt)}`,
+      }));
       const requestedIndex = eventOptions.findIndex((event) => event.id === this.data.requestedEventId);
       const eventIndex = requestedIndex >= 0 ? requestedIndex : 0;
       const selectedEvent = eventOptions[eventIndex];

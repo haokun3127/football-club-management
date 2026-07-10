@@ -1,1 +1,5 @@
-{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python3 .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"教练任务、权限、训练项目、评测与登录 BFF 契约"}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"复用 UI-1 组件与展示层 normalizer，避免七页重复"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"验证 capabilities/workflow 到页面动作及写入的端到端边界"}
+{"file":".trellis/tasks/07-10-cq-talent-devtools-device-acceptance/research/figma-page-diff-matrix.md","reason":"完整 Figma 文件与当前教练页逐页差异基线"}
+{"file":".trellis/tasks/archive/2026-07/07-10-cq-talent-ui-foundation/validation.md","reason":"UI-1 共享组件与 DevTools 验证基线"}

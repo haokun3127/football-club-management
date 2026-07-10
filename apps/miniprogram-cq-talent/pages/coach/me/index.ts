@@ -8,6 +8,7 @@ Page({
     message: "正在读取教练身份",
     home: null as CoachHome | null,
     displayName: "教练身份已绑定",
+    avatarLetter: "教",
     teamsText: "",
   },
   onLoad() {
@@ -16,14 +17,18 @@ Page({
   async load() {
     const session = requireRole("coach");
     if (!session) return;
-    this.setData({ state: "loading", message: "正在读取教练身份", displayName: session.displayName || "教练身份已绑定" });
+    const displayName = session.displayName || "教练身份已绑定";
+    this.setData({ state: "loading", message: "正在读取教练身份", displayName, avatarLetter: displayName.slice(0, 1) });
     try {
       const home = await getCoachHome();
+      const resolvedDisplayName = home.coachName || displayName;
       this.setData({
         state: "ready",
         message: "",
         home,
-        teamsText: home.teams.length ? home.teams.join("、") : "负责球队接口待同步",
+        displayName: resolvedDisplayName,
+        avatarLetter: resolvedDisplayName.slice(0, 1),
+        teamsText: home.teams.length ? home.teams.join("、") : "暂无负责球队",
       });
     } catch (error) {
       this.setData({ state: "error", message: readableError(error) });

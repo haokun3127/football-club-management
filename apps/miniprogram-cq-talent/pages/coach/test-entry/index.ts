@@ -29,7 +29,7 @@ Page({
     requireRole("coach");
     const eventId = query?.eventId || "";
     this.setData({ eventId });
-    this.load(query?.templateId || "assessment-template-technical", eventId);
+    this.load(query?.templateId || "assessment-template-cq-talent-elite", eventId);
   },
   async load(templateId: string, eventId: string) {
     try {

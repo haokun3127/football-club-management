@@ -1,6 +1,13 @@
-button {
-  margin-top: 20rpx;
-}
+.match-page { padding-bottom: calc(190rpx + env(safe-area-inset-bottom)); }
+.match-hero { margin-bottom: 20rpx; padding: 28rpx 24rpx; border-radius: 28rpx; background: linear-gradient(145deg,#0f4aa8,#2873e8); color: #fff; text-align: center; }
+.match-hero .title { color: #fff; }
+.match-hero__eyebrow { color: rgba(255,255,255,.65); font-size: 18rpx; font-weight: 700; letter-spacing: 2rpx; }
+.match-hero__score { display: flex; justify-content: center; gap: 22rpx; margin-top: 20rpx; font-size: 62rpx; font-weight: 750; }
+.match-hero__divider { color: rgba(255,255,255,.5); }
+.match-hero__opponent { color: rgba(255,255,255,.76); font-size: 23rpx; }
+.match-form-card { border-top: 6rpx solid #175cd3; }
+.match-form-card--events { margin-bottom: 30rpx; }
+button { margin-top: 20rpx; }
 
 .form-row {
   display: flex;
@@ -20,7 +27,7 @@ button {
   min-height: 64rpx;
   box-sizing: border-box;
   padding: 14rpx 18rpx;
-  border-radius: 8rpx;
+  border-radius: 14rpx;
   background: #f7f8fa;
   color: #111827;
   text-align: right;
