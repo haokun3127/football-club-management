@@ -105,6 +105,11 @@ export class UserAccountRepository {
     return row ? mapUserAccount(row) : null;
   }
 
+  async getByPhone(phone: string): Promise<UserAccount | null> {
+    const row = this.database.prepare("SELECT * FROM user_accounts WHERE phone = ?").get(phone) as SqlRow | undefined;
+    return row ? mapUserAccount(row) : null;
+  }
+
   async save(entity: UserAccount): Promise<void> {
     this.database.prepare(`
       INSERT INTO user_accounts (id, display_name, phone, roles_json, status, created_at, updated_at)

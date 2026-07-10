@@ -1,6 +1,8 @@
 import Fastify from "fastify";
 import type { FastifyError } from "fastify";
 import type { MembershipResolver } from "./auth/context.js";
+import { SessionRegistry } from "./auth/session-registry.js";
+import type { WechatIdentityConnector } from "./integrations/wechat-identity-connector.js";
 import { apiError } from "./http/errors.js";
 import { buildOpenApiDocument } from "./http/openapi.js";
 import { registerHttpRequestContracts } from "./http/request-contracts.js";
@@ -18,6 +20,8 @@ import { registerTrainingRoutes } from "./routes/training.routes.js";
 export interface ServerOptions {
   logger?: boolean;
   membershipResolver?: MembershipResolver;
+  wechatIdentityConnector?: WechatIdentityConnector;
+  sessionRegistry?: SessionRegistry;
 }
 
 export function buildServer(store: ApiStore = new InMemoryStore(), options: ServerOptions = {}) {
@@ -29,7 +33,7 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
       },
     },
   });
-  const context = createRouteContext(store, options.membershipResolver);
+  const context = createRouteContext(store, options.membershipResolver, options.sessionRegistry ?? new SessionRegistry(), options.wechatIdentityConnector);
   registerHttpRequestContracts(app, store);
 
   app.setErrorHandler((error: FastifyError, _request, reply) => {

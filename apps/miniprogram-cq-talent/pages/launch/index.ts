@@ -1,6 +1,6 @@
 import { resolveClient } from "../../utils/api";
 import { routeHome } from "../../utils/auth";
-import { DEV_MODE } from "../../utils/config";
+import { DEV_AUTO_SESSION, DEV_MODE } from "../../utils/config";
 import { createDevSession } from "../../utils/mock";
 import { getDevRole, getSession, setAppContext, setSession, toggleDevRole } from "../../utils/store";
 import type { AppRole, LoadState } from "../../utils/types";
@@ -41,20 +41,15 @@ Page<LaunchData>({
         routeHome(existing.role);
         return;
       }
-      if (DEV_MODE) {
+      if (DEV_MODE && DEV_AUTO_SESSION) {
         const role = getDevRole();
         setSession(createDevSession(context, role));
         this.setData({ devHint: `开发身份：${role === "parent" ? "家长" : "教练"}` });
         routeHome(role);
         return;
       }
-      this.setData({
-        state: "pending",
-        title: "需要完成手机号绑定",
-        message: "请使用微信手机号授权匹配俱乐部档案。",
-        actionText: "重新检测",
-        clientName: context.capabilities.client?.name || "足球俱乐部小程序",
-      });
+      const code = await requestWechatCode();
+      wx.reLaunch({ url: `/pages/login/index?code=${encodeURIComponent(code)}` });
     } catch (error) {
       this.setData({
         state: "error",
@@ -78,4 +73,13 @@ Page<LaunchData>({
 function readableError(error: unknown) {
   const record = error as { message?: string; code?: string };
   return record?.message || record?.code || "暂时无法连接俱乐部服务，请检查网络后重试。";
+}
+
+function requestWechatCode() {
+  return new Promise<string>((resolve, reject) => {
+    wx.login({
+      success: (result) => result.code ? resolve(result.code) : reject(new Error("微信登录未返回有效凭证")),
+      fail: (error) => reject(new Error(error.errMsg || "微信登录失败")),
+    });
+  });
 }

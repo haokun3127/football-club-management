@@ -180,3 +180,58 @@ openMetric(metrics[tappedIndex + 1].metricId);
 ```typescript
 openMetric(tappedPoint.metricId);
 ```
+
+## Scenario: WeChat Login Connector and Session
+
+### 1. Scope / Trigger
+
+- Trigger: non-develop mini-program login and every authenticated app-client request.
+
+### 2. Signatures
+
+- `POST /clubs/:clubId/app-clients/:clientId/wechat-login`
+- Environment: `WECHAT_MINIPROGRAM_APP_ID`, `WECHAT_MINIPROGRAM_APP_SECRET`.
+- Client runtime: `envVersion = develop|trial|release`.
+
+### 3. Contracts
+
+- Connector exchanges `wxLoginCode` and optional `phoneCode`; membership is resolved from the returned phone, never from `roleHint`.
+- Authenticated login returns a random expiring bearer token; app-client routes resolve membership from that session.
+- Missing connector or unmatched phone returns `binding_required` without a session or role.
+- develop may send the explicit test user header; trial/release must use HTTPS and must never send dev identity headers.
+- The current registry is process-local; production deployment must replace it with shared durable session storage before horizontal scaling.
+
+### 4. Validation & Error Matrix
+
+- Missing credentials -> connector disabled, `binding_required`.
+- WeChat exchange failure -> `400 wechat_login_failed`.
+- Unmatched/stopped/multi-role-invalid account -> no authenticated session.
+- Expired/unknown bearer token -> membership required; client clears its session.
+
+### 5. Good/Base/Bad Cases
+
+- Good: phone maps to a parent membership even when the payload suggests coach.
+- Base: develop header login creates a test bearer session for local smoke.
+- Bad: accepting roleHint, shipping localhost in trial/release, or retaining a 401 session.
+
+### 6. Tests Required
+
+- Fake connector test asserts phone-derived role and bearer session reuse.
+- Contract test asserts roleHint cannot override membership.
+- Client type-check covers expiresAt and environment configuration.
+- DevTools preview is recorded separately from API smoke.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```typescript
+const role = body.roleHint;
+```
+
+#### Correct
+
+```typescript
+const identity = await connector.resolve(body.wxLoginCode, body.phoneCode);
+const auth = await membershipResolver.resolveByPhone(clubId, identity.phone);
+```

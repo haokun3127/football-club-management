@@ -38,6 +38,17 @@ export interface SessionState extends AppContext {
   userId?: string;
   displayName?: string;
   currentStudentId?: string;
+  expiresAt: string;
+}
+
+export interface LoginResult {
+  status: "authenticated" | "binding_required";
+  phoneBinding: "required" | "received" | "accepted" | "not_provided";
+  session: { token: string; expiresInSeconds: number } | null;
+  role: AppRole | null;
+  profile: { userId: string; displayName: string; phone?: string } | null;
+  children: StudentSummary[];
+  capabilities: Capabilities;
 }
 
 export interface StudentSummary {

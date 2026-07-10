@@ -533,6 +533,11 @@ describe("api server", () => {
     });
 
     const loginBody = login.json() as { status: string; phoneBinding: string; session: { token: string } | null; role: string };
+    const sessionHome = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/home?date=2026-07-01",
+      headers: { authorization: `Bearer ${loginBody.session?.token ?? ""}` },
+    });
     const statusBody = status.json() as { status: { studentId: string; insurance: Record<string, unknown> } };
     const metricBody = metric.json() as { metric: { id: string }; records: unknown[]; privacy: { minorProfile: string } };
 
@@ -541,8 +546,9 @@ describe("api server", () => {
       status: "authenticated",
       phoneBinding: "accepted",
       role: "coach",
-      session: expect.objectContaining({ token: "dev-session-user-coach-1" }),
+      session: expect.objectContaining({ token: expect.stringMatching(/^wx-session-/) }),
     }));
+    expect(sessionHome.statusCode).toBe(200);
     expect(status.statusCode).toBe(200);
     expect(statusBody.status).toEqual(expect.objectContaining({ studentId: "student-1" }));
     expect(metric.statusCode).toBe(200);
@@ -557,6 +563,63 @@ describe("api server", () => {
     expect(assessment.statusCode).toBe(201);
     expect(parentWrite.statusCode).toBe(403);
     expect(parentWrite.json().error.code).toBe("forbidden");
+
+    await app.close();
+    persistence.database.close();
+  });
+
+  it("authenticates a WeChat phone through the connector and reuses the issued session", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const membershipResolver = new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships, null);
+    const unconfiguredApp = buildServer(new PersistentApiStore(persistence.repositories), { logger: false, membershipResolver });
+    const bindingRequired = await unconfiguredApp.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/wechat-login",
+      payload: { wxLoginCode: "wx-code", phoneCode: "phone-code", roleHint: "coach" },
+    });
+    expect(bindingRequired.statusCode).toBe(200);
+    expect(bindingRequired.json()).toEqual(expect.objectContaining({ status: "binding_required", role: null, session: null }));
+    await unconfiguredApp.close();
+
+    const app = buildServer(new PersistentApiStore(persistence.repositories), {
+      logger: false,
+      membershipResolver,
+      wechatIdentityConnector: {
+        async resolve() {
+          return { openId: "openid-parent-1", phone: "13800000000" };
+        },
+      },
+    });
+
+    const login = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/wechat-login",
+      payload: { wxLoginCode: "wx-code", phoneCode: "phone-code", roleHint: "coach" },
+    });
+    const body = login.json() as { role: string; status: string; session: { token: string }; profile: { userId: string } };
+    expect(login.statusCode).toBe(200);
+    expect(body).toEqual(expect.objectContaining({
+      role: "parent",
+      status: "authenticated",
+      profile: expect.objectContaining({ userId: "user-parent-1" }),
+      session: expect.objectContaining({ token: expect.stringMatching(/^wx-session-/) }),
+    }));
+
+    const children = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/children",
+      headers: { authorization: `Bearer ${body.session.token}` },
+    });
+    expect(children.statusCode).toBe(200);
+    expect(children.json().children).toEqual([expect.objectContaining({ id: "student-1" })]);
+
+    const expired = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/children",
+      headers: { authorization: "Bearer expired-token" },
+    });
+    expect(expired.statusCode).toBe(401);
+    expect(expired.json().error.code).toBe("authentication_required");
 
     await app.close();
     persistence.database.close();

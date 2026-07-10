@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/launch/index",
+    "pages/login/index",
     "pages/parent/schedule/index",
     "pages/parent/event/index",
     "pages/parent/growth/index",

@@ -3,6 +3,8 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import type { AuthContext, MembershipResolver } from "../auth/context.js";
 import { sendError } from "../http/errors.js";
 import type { ApiStore } from "../store.js";
+import type { SessionRegistry } from "../auth/session-registry.js";
+import type { WechatIdentityConnector } from "../integrations/wechat-identity-connector.js";
 
 type AccessRole = "admin" | "coach" | "parent";
 
@@ -11,6 +13,8 @@ const adminRoles = new Set<ClubUserRole>(["owner", "admin", "operator"]);
 export interface RouteContext {
   store: ApiStore;
   membershipResolver?: MembershipResolver;
+  sessionRegistry: SessionRegistry;
+  wechatIdentityConnector?: WechatIdentityConnector;
   resolveClubAuth(request: FastifyRequest, reply: FastifyReply, clubId: string): Promise<AuthContext | null>;
   requireClubMembership(request: FastifyRequest, reply: FastifyReply, clubId: string): Promise<boolean>;
   sendError: typeof sendError;
@@ -29,13 +33,20 @@ export interface RouteContext {
   ): Promise<boolean>;
 }
 
-export function createRouteContext(store: ApiStore, membershipResolver?: MembershipResolver): RouteContext {
+export function createRouteContext(store: ApiStore, membershipResolver: MembershipResolver | undefined, sessionRegistry: SessionRegistry, wechatIdentityConnector?: WechatIdentityConnector): RouteContext {
   const resolveAuth = async (request: FastifyRequest, reply: FastifyReply, clubId: string): Promise<AuthContext | null> => {
     if (!membershipResolver) {
       return null;
     }
 
-    const context = await membershipResolver.resolve(request, clubId);
+    const authorization = request.headers.authorization;
+    const bearer = authorization?.startsWith("Bearer ") ? authorization.slice(7) : undefined;
+    const sessionContext = sessionRegistry.resolve(bearer, clubId);
+    if (bearer && !sessionContext) {
+      sendError(reply, 401, "authentication_required", "Session is missing or expired");
+      return null;
+    }
+    const context = sessionContext ?? await membershipResolver.resolve(request, clubId);
     if (!context) {
       sendError(reply, 403, "club_membership_required", "Active club membership required");
       return null;
@@ -47,6 +58,8 @@ export function createRouteContext(store: ApiStore, membershipResolver?: Members
   return {
     store,
     membershipResolver,
+    sessionRegistry,
+    wechatIdentityConnector,
     sendError,
     resolveClubAuth: resolveAuth,
     async requireClubMembership(request, reply, clubId) {

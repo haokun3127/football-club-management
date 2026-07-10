@@ -1,4 +1,4 @@
-import { APP_CLIENT_KEY, DEV_COACH_PROFILE_IDS, DEV_MODE, DEV_TEST_DATE } from "./config";
+import { APP_CLIENT_KEY, DEV_TEST_DATE } from "./config";
 import { request } from "./request";
 import { getAppContext, getSession } from "./store";
 import type {
@@ -11,6 +11,7 @@ import type {
   CoachWorkbench,
   GrowthSummary,
   MetricDetail,
+  LoginResult,
   RadarMetricPoint,
   ScheduleEvent,
   StudentHome,
@@ -21,6 +22,15 @@ import type {
 export async function resolveClient() {
   return request<AppContext>({
     path: `/app-clients/resolve?clientKey=${APP_CLIENT_KEY}`,
+  });
+}
+
+export async function wechatLogin(wxLoginCode: string, phoneCode?: string): Promise<LoginResult> {
+  const context = requireContext();
+  return request<LoginResult, { wxLoginCode: string; phoneCode?: string }>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/wechat-login`,
+    method: "POST",
+    data: { wxLoginCode, phoneCode },
   });
 }
 
@@ -245,17 +255,11 @@ export async function submitCoachAssessment(input: {
   }>;
 }) {
   const context = requireContext();
-  const session = getSession();
-  const assessedByCoachId = resolveCoachProfileId(session?.userId);
-  if (!assessedByCoachId) {
-    throw new Error("教练身份尚未完成验证，暂时无法提交评测。");
-  }
 
   return request<Record<string, unknown>, {
     studentId: string;
     templateId: string;
     templateVersionId?: string;
-    assessedByCoachId: string;
     assessedAt: string;
     eventId?: string;
     summary: string;
@@ -272,7 +276,6 @@ export async function submitCoachAssessment(input: {
       studentId: input.studentId,
       templateId: input.templateId,
       templateVersionId: input.templateVersionId,
-      assessedByCoachId,
       assessedAt: new Date().toISOString(),
       eventId: input.eventId || undefined,
       summary: "重庆天才小程序教练端评测录入",
@@ -780,13 +783,6 @@ function normalizeAssessmentForm(raw: Record<string, unknown>): AssessmentForm {
     fields,
     pending: [{ title: "保存提示", message: "当前填写完成后统一提交，请在离开页面前确认保存。" }],
   };
-}
-
-function resolveCoachProfileId(userId?: string) {
-  if (!userId) return undefined;
-  const devCoachIds = DEV_COACH_PROFILE_IDS as Record<string, string>;
-  if (DEV_MODE && devCoachIds[userId]) return devCoachIds[userId];
-  return undefined;
 }
 
 function normalizeEventType(type: unknown): ScheduleEvent["type"] {

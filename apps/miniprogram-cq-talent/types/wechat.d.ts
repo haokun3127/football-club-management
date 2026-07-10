@@ -38,13 +38,13 @@ declare const wx: {
   request: <TData = unknown>(options: WechatRequestOptions<TData>) => void;
   login: (options: { success?: WechatCallback<{ code: string }>; fail?: WechatCallback<{ errMsg: string }> }) => void;
   getSystemInfoSync: () => { platform?: string; windowWidth: number; pixelRatio?: number };
-  getAccountInfoSync?: () => { miniProgram?: { appId?: string } };
+  getAccountInfoSync?: () => { miniProgram?: { appId?: string; envVersion?: "develop" | "trial" | "release" } };
   getStorageSync: <T = unknown>(key: string) => T;
   setStorageSync: (key: string, value: unknown) => void;
   removeStorageSync: (key: string) => void;
   switchTab: (options: { url: string }) => void;
   navigateTo: (options: { url: string }) => void;
-  reLaunch: (options: { url: string }) => void;
+  reLaunch: (options: { url: string; success?: WechatCallback<unknown>; fail?: WechatCallback<{ errMsg: string }> }) => void;
   showToast: (options: { title: string; icon?: "success" | "error" | "loading" | "none"; duration?: number }) => void;
   showModal: (options: { title: string; content: string; showCancel?: boolean; success?: WechatCallback<{ confirm: boolean }> }) => void;
 };

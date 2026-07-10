@@ -28,9 +28,13 @@ export function setSession(session: SessionState) {
 }
 
 export function getSession() {
-  if (sessionState) return sessionState;
-  const stored = wx.getStorageSync<SessionState | "">(STORAGE_KEYS.session);
-  sessionState = stored || null;
+  if (!sessionState) {
+    const stored = wx.getStorageSync<SessionState | "">(STORAGE_KEYS.session);
+    sessionState = stored || null;
+  }
+  if (sessionState?.expiresAt && Date.parse(sessionState.expiresAt) <= Date.now()) {
+    clearSession();
+  }
   return sessionState;
 }
 

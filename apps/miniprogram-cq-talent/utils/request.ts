@@ -1,6 +1,6 @@
-import { API_BASE_URL, DEV_MODE, DEV_USER_IDS } from "./config";
+import { assertRuntimeApiConfigured, DEV_MODE, DEV_USER_IDS } from "./config";
 import { createIdempotencyKey, createRequestId } from "./idempotency";
-import { getAppContext, getSession } from "./store";
+import { clearSession, getAppContext, getSession } from "./store";
 
 export interface ApiError {
   code: string;
@@ -41,8 +41,15 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
   }
 
   return new Promise((resolve, reject) => {
+    let baseUrl: string;
+    try {
+      baseUrl = assertRuntimeApiConfigured();
+    } catch (error) {
+      reject({ code: "runtime_not_configured", message: error instanceof Error ? error.message : "当前环境尚未配置服务地址" });
+      return;
+    }
     wx.request({
-      url: `${API_BASE_URL}${options.path}`,
+      url: `${baseUrl}${options.path}`,
       method: options.method ?? "GET",
       data: options.data,
       header: headers,
@@ -50,6 +57,10 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
         if (response.statusCode >= 200 && response.statusCode < 300) {
           resolve(response.data as TResponse);
           return;
+        }
+        if (response.statusCode === 401) {
+          clearSession();
+          wx.reLaunch({ url: "/pages/login/index" });
         }
         const payload = response.data as { error?: ApiError };
         reject(payload.error ?? { code: "http_error", message: `HTTP ${response.statusCode}` });

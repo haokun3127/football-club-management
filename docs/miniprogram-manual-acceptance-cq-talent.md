@@ -95,8 +95,8 @@ X-User-Id: user-coach-1
 
 ## 6. 已知阻塞
 
-- 生产 `wechat-login` / `me` 尚未补齐；dev 身份仅用于本地验收。
-- 评测单格自动保存、缺测和任务分配仍需 assessment-task BFF。
+- 微信登录页、手机号授权、connector 和 session 已实现；当前缺正式 AppID/AppSecret 和可访问的 HTTPS API，因此不能宣称生产登录闭环。
+- 评测已支持按项目录整队、本机草稿和缺测；正式 assessment-task 服务端任务模型仍未实现。
 - DevTools GUI 截图在当前 Codex 环境曾返回黑屏，最终视觉验收需要人工点击确认。
 
 ## 7. 2026-06-28 Codex GUI 验收尝试
@@ -159,3 +159,11 @@ pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client
 - training-projects PUT 保存 2 个训练项目。
 - matches POST 写入 2 个球员事件，并生成 2 条进球/助攻指标记录。
 - 精英评测模板提交 62 个 rawResults，生成 62 条 scores 和 99 条 metricRecords。
+
+## 10. 2026-07-10 可试用版验收状态
+
+- `smoke:app-client` 通过 19 项：200 名家长绑定、指标详情、周工作台、训练项目回填、点名/销课/比赛和 62 项评测均通过。
+- 登录契约测试确认：手机号决定角色，`roleHint` 不能越权；签发 token 后可使用 Bearer session 访问数据。
+- develop 环境保留开发身份；trial/release 禁用开发身份并要求 HTTPS 地址。
+- DevTools 当前 `login=false`，脚本已改为复用当前 IDE 端口并明确提示登录阻塞。
+- 登录 DevTools 后复跑 `pnpm --filter @football-club/miniprogram-cq-talent devtools:preview`，再按家长/教练清单完成真机点击。

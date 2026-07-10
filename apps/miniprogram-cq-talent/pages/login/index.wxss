@@ -1,0 +1,6 @@
+.login-page { padding-top: 120rpx; padding-bottom: 40rpx; }
+.brand-mark { margin-bottom: 36rpx; color: #e60012; font-size: 42rpx; font-weight: 800; text-align: center; }
+.login-card { padding-top: 36rpx; padding-bottom: 36rpx; text-align: center; }
+.login-card .subtitle { margin-top: 14rpx; }
+button { margin-top: 28rpx; }
+.help-card { margin-top: 36rpx; }

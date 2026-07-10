@@ -96,9 +96,20 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return reply;
       }
 
-      const auth = context.membershipResolver
+      let auth = context.membershipResolver
         ? await context.membershipResolver.resolve(request, request.params.clubId)
         : null;
+      if (!auth && context.wechatIdentityConnector && context.membershipResolver?.resolveByPhone) {
+        try {
+          const identity = await context.wechatIdentityConnector.resolve(request.body.wxLoginCode, request.body.phoneCode);
+          auth = identity.phone
+            ? await context.membershipResolver.resolveByPhone(request.params.clubId, identity.phone)
+            : null;
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "WeChat login failed";
+          return context.sendError(reply, 400, "wechat_login_failed", message);
+        }
+      }
       if (!auth) {
         return {
           clubId: request.params.clubId,
@@ -122,16 +133,14 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         ? (await context.store.listOperationalStudents(request.params.clubId))
           .filter((student) => auth ? context.store.isGuardianOfStudent(request.params.clubId, auth.user.id, student.id) : true)
         : [];
+      const session = context.sessionRegistry.create(auth);
 
       return {
         clubId: request.params.clubId,
         client: summarizeClient(client),
         status: "authenticated",
         phoneBinding: request.body.phoneCode || request.body.encryptedPhoneData ? "accepted" : "not_provided",
-        session: {
-          token: auth ? `dev-session-${auth.user.id}` : "dev-session-anonymous",
-          expiresInSeconds: 7200,
-        },
+        session,
         profile: auth
           ? {
             userId: auth.user.id,
@@ -1286,10 +1295,19 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return reply;
       }
 
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) return reply;
+      const authenticatedCoach = auth
+        ? context.store.listCoaches(request.params.clubId).find((coach) => coach.userId === auth.user.id)
+        : null;
+
       try {
         const result = await context.store.recordAssessment({
           ...request.body,
           clubId: request.params.clubId,
+          assessedByCoachId: authenticatedCoach?.id ?? request.body.assessedByCoachId,
         });
         return reply.code(201).send({
           clubId: request.params.clubId,

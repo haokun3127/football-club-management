@@ -41,6 +41,7 @@ export function createPlatformSeed(): Pick<
       {
         id: "user-coach-1",
         displayName: "陈教练",
+        phone: "13900000000",
         roles: ["coach"],
         status: "active",
         createdAt: now,
@@ -49,6 +50,7 @@ export function createPlatformSeed(): Pick<
       {
         id: "user-parent-1",
         displayName: "李明家长",
+        phone: "13800000000",
         roles: ["parent"],
         status: "active",
         createdAt: now,

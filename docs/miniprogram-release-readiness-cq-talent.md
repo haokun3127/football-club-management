@@ -242,3 +242,13 @@ pnpm --filter @football-club/miniprogram-cq-talent devtools:preview
 - P0 后端只剩生产 `wechat-login` connector；家庭聚合日程、训练内容树和训练内容保存已经完成。
 - 比赛录入已有摘要和球员事件；球员点评、战术板属于后续 P1/P2 范围。
 - 评测录入已有手动完整提交；单格自动保存、缺测、任务分配仍需 assessment-task BFF。
+
+## 11. 2026-07-10 可试用版改造结果
+
+- 教练日程已升级为今日/本周任务工作台；家庭日程默认全部孩子；活动详情按训练/比赛/其他分卡。
+- 比赛默认无助攻、Tab 页面栈和训练项目回填风险已修复。
+- 评测已改为按项目录整队，支持本机草稿、缺测和部分失败保留。
+- 家长雷达支持 MetricView 切换、点击指标、页内摘要和趋势/来源下钻。
+- 微信登录页、手机号授权、connector 接口、Bearer session 和过期清理已实现。
+- 全仓测试为 domain 14 项、API 54 项；隔离数据 smoke 为 19 项。
+- 当前 DevTools `login=false`，因此本轮 open/preview 与真机截图仍为外部阻塞；正式微信凭证和 HTTPS 服务地址也尚未提供。

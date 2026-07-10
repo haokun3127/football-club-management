@@ -7,13 +7,13 @@ const HOME_BY_ROLE: Record<AppRole, string> = {
 };
 
 export function routeHome(role: AppRole) {
-  wx.navigateTo({ url: HOME_BY_ROLE[role] });
+  wx.reLaunch({ url: HOME_BY_ROLE[role] });
 }
 
 export function requireRole(role: AppRole) {
   const session = getSession();
   if (!session) {
-    wx.navigateTo({ url: "/pages/launch/index" });
+    wx.reLaunch({ url: "/pages/launch/index" });
     return null;
   }
   if (session.role !== role) {

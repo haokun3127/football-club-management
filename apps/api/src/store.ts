@@ -145,6 +145,7 @@ export interface ApiStore {
   listExternalSyncRuns(clubId: EntityId): ExternalSyncRun[] | Promise<ExternalSyncRun[]>;
   getExternalSyncRunDetail(clubId: EntityId, syncRunId: EntityId): SyncRunDetail | null | Promise<SyncRunDetail | null>;
   listOperationalStudents(clubId: EntityId, filters?: StudentListFilters): StudentListItem[] | Promise<StudentListItem[]>;
+  listCoaches(clubId: EntityId): CoachProfile[];
   getOperationalStudentDetail(clubId: EntityId, studentId: EntityId): StudentDetail | null | Promise<StudentDetail | null>;
   getStudentOperationalStatusSummary(clubId: EntityId, studentId: EntityId): StudentOperationalStatusSummary | null | Promise<StudentOperationalStatusSummary | null>;
   getLessonLedger(clubId: EntityId, studentId: EntityId): LessonLedgerSummary | null | Promise<LessonLedgerSummary | null>;
