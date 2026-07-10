@@ -61,6 +61,58 @@ const role = resolveAppRole(auth.membership.roles);
 const entrypoints = client.roleEntrypoints?.[role];
 ```
 
+## Scenario: Parent Event Participant Projection
+
+### 1. Scope / Trigger
+
+- Trigger: returning an event aggregate to a parent from `GET .../events/:eventId` or another parent BFF.
+- Event-level authorization and response-level participant projection are separate checks; both are mandatory.
+
+### 2. Signatures
+
+- `GET /clubs/:clubId/app-clients/:clientId/events/:eventId`
+- Parent response: `{ role: "parent", event: { participants: EventParticipant[] } }`.
+
+### 3. Contracts
+
+- A parent may read the event only when at least one participant is guarded by the authenticated user.
+- For a parent response, `event.participants` contains only guarded students, even when the underlying team event has a full roster.
+- Coach/admin responses may retain the role-authorized roster; the frontend must never perform the parent redaction.
+
+### 4. Validation & Error Matrix
+
+- Event has no participant guarded by the parent -> `403 forbidden`.
+- Event exists and has one or more guarded participants -> `200`, with all unrelated participants removed.
+- Missing event -> `404 not_found`.
+
+### 5. Good/Base/Bad Cases
+
+- Good: a two-child family sees both siblings on their shared activity and none of the other team members.
+- Base: a one-child family receives one participant from a 25-player training event.
+- Bad: authorize with `participants.some(isGuardian)` and then return the original unfiltered event.
+
+### 6. Tests Required
+
+- API contract test asserts every returned parent participant belongs to the authenticated guardian.
+- Family-calendar and event-detail smoke must use a multi-player event so redaction is observable.
+- Coach workbench regression test confirms its authorized roster is not parent-projected.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```typescript
+if (event.participants.some(isGuardian)) return { event };
+```
+
+#### Correct
+
+```typescript
+const participants = event.participants.filter(isGuardian);
+if (!participants.length) return forbidden();
+return { event: { ...event, participants } };
+```
+
 ## Mini-Program Acceptance Fixture Convention
 
 Acceptance dates and identities belong to the shared development configuration, not to page implementations. This keeps the imported-data fixture reproducible without shipping a historical date as production behavior.
