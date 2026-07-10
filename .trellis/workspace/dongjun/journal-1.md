@@ -39,3 +39,37 @@ Validated the CQ Talent mini-program P0, centralized acceptance-date configurati
 ### Next Steps
 
 - None - task complete
+
+
+## Session 2: Rebuild CQ Talent task flows
+
+**Date**: 2026-07-10
+**Task**: Rebuild CQ Talent task flows
+**Package**: api
+**Branch**: `codex/chongqing-talent-business`
+
+### Summary
+
+Added the coach daily/weekly task workbench, all-children family calendar, differentiated activity details, safe match assist handling, stack-safe tabs, training project restore/search, and plain-language UI states.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `6357dae` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
