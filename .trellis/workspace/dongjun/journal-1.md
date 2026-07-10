@@ -107,3 +107,37 @@ Rebuilt assessment entry around test items and whole-team local drafts, added pa
 ### Next Steps
 
 - None - task complete
+
+
+## Session 4: Add CQ Talent WeChat login boundary
+
+**Date**: 2026-07-10
+**Task**: Add CQ Talent WeChat login boundary
+**Package**: api
+**Branch**: `codex/chongqing-talent-business`
+
+### Summary
+
+Added the test-AppID login UI, WeChat identity connector, phone-derived membership, expiring bearer sessions, runtime environment isolation, 401 recovery, and truthful DevTools login validation.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `0e7ca23` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
