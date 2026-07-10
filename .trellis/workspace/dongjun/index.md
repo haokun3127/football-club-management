@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 2
+- **Total Sessions**: 3
 - **Last Active**: 2026-07-10
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~75 | Active |
+| `journal-1.md` | ~109 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 3 | 2026-07-10 | Add CQ Talent assessment and radar drilldown | `742598c` | `codex/chongqing-talent-business` |
 | 2 | 2026-07-10 | Rebuild CQ Talent task flows | `6357dae` | `codex/chongqing-talent-business` |
 | 1 | 2026-07-10 | Complete CQ Talent mini-program P0 | `3da51bd`, `88f0ab5` | `codex/chongqing-talent-business` |
 <!-- @@@/auto:session-history -->
