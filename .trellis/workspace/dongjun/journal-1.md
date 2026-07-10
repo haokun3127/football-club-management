@@ -19,7 +19,11 @@ Validated the CQ Talent mini-program P0, centralized acceptance-date configurati
 
 ### Main Changes
 
-(Add details)
+- Generated 188 realistic families for 200 imported students: 178 single-child, 8 two-child and 2 three-child families.
+- Reused the stable acceptance parent identity for one real two-child family and removed the 200-student omnibus guardian bindings.
+- Added referential-integrity tests for parent accounts, memberships, teams, coaches, events and participants.
+- Updated app-client smoke to assert both siblings are visible and unrelated child identifiers are redacted.
+- Corrected acceptance documentation and added the durable fixture privacy contract.
 
 ### Git Commits
 
@@ -133,6 +137,43 @@ Added the test-AppID login UI, WeChat identity connector, phone-derived membersh
 ### Testing
 
 - [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 5: 修正重庆天才200人家庭测试数据
+
+**Date**: 2026-07-10
+**Task**: 修正重庆天才200人家庭测试数据
+**Package**: api
+**Branch**: `codex/chongqing-talent-business`
+
+### Summary
+
+将200名导入学员重构为178个单孩、8个双孩、2个三孩家庭；稳定验收家长改为真实双孩家庭，删除万能监护绑定；补齐球队教练引用测试、家庭隐私 smoke、验收文档和长期规范。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `cd9aabe` | fix: model cq talent test families realistically |
+
+### Testing
+
+- [OK] `pnpm check` (domain 14 tests, API 54 tests, all typechecks)
+- [OK] Isolated app-client smoke: 19/19 checks
+- [OK] Parent privacy: 2 siblings, 4 family events, no unrelated child IDs
+- [OK] Coach workbench: 25-person roster and all write flows
 
 ### Status
 
