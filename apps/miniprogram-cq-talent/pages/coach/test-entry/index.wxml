@@ -1,44 +1,42 @@
 <view class="page">
-  <status-view state="{{state}}" title="评测录入" message="{{message}}" />
+  <status-view state="{{state}}" title="{{state === 'loading' ? '加载评测' : state === 'empty' ? '暂无学员' : '评测读取失败'}}" message="{{message}}" />
 
   <view wx:if="{{form}}" class="card hero-card">
     <view class="title">{{form.templateName}}</view>
-    <view class="subtitle">{{form.versionName}}</view>
+    <view class="subtitle">{{form.versionName}}｜已完成 {{completedCount}} / {{totalCount}}</view>
+    <view class="progress-track"><view class="progress-value" style="width: {{totalCount ? completedCount * 100 / totalCount : 0}}%"></view></view>
   </view>
 
-  <view wx:if="{{form}}" class="card">
-    <view class="section-title">录入对象</view>
-    <picker wx:if="{{roster.length}}" mode="selector" range="{{roster}}" range-key="name" value="{{studentIndex}}" bindchange="onStudentChange">
-      <view class="field-input">{{roster[studentIndex].name}}</view>
+  <scroll-view wx:if="{{form}}" scroll-x class="group-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="group-row">
+      <view wx:for="{{groupOptions}}" wx:key="id" class="group-tab {{activeGroupId === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="switchGroup">{{item.label}}</view>
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{currentField}}" class="card field-card">
+    <view class="row"><view class="section-title">当前项目</view><view class="tag">{{fieldIndex + 1}} / {{fieldsInGroup.length}}</view></view>
+    <picker mode="selector" range="{{fieldsInGroup}}" range-key="label" value="{{fieldIndex}}" bindchange="onFieldChange">
+      <view class="field-picker">{{currentField.label}}<view class="subtitle">{{currentField.unit || '按项目要求录入'}}</view></view>
     </picker>
-    <view wx:else class="subtitle">当前活动名单为空，无法提交评测。</view>
+    <view wx:if="{{currentField.protocol}}" class="protocol">{{currentField.protocol}}</view>
+    <view class="field-nav"><button class="ghost-button mini-button" disabled="{{fieldIndex === 0}}" bindtap="previousField">上一项</button><button class="ghost-button mini-button" disabled="{{fieldIndex >= fieldsInGroup.length - 1}}" bindtap="nextField">下一项</button></view>
   </view>
 
-  <view wx:if="{{form}}" class="card">
-    <view class="section-title">测试项目</view>
-    <view wx:for="{{form.fields}}" wx:key="id" wx:for-index="index" class="test-row">
-      <view class="test-meta">
-        <view>{{item.label}}</view>
-        <view class="subtitle">{{item.valueKind}}{{item.unit ? '｜' + item.unit : ''}}｜{{item.required ? '必填' : '可缺测'}}</view>
+  <view wx:if="{{currentField}}" class="card roster-card">
+    <view class="section-title">整队录入</view>
+    <view wx:for="{{draftRows}}" wx:key="studentId" class="draft-row">
+      <view class="draft-head"><view class="label strong">{{item.name}}</view><view class="draft-status {{item.invalid ? 'status-invalid' : 'status-' + item.status}}">{{item.invalid ? '超出范围' : item.status === 'recorded' ? '已录' : item.status === 'missing' ? '缺测' : '未录'}}</view></view>
+      <view class="draft-controls">
+        <input wx:if="{{item.status !== 'missing'}}" class="score-input" type="{{currentField.inputType === 'number' ? 'digit' : 'text'}}" placeholder="{{currentField.unit || '录入结果'}}" value="{{item.rawValue}}" data-student-id="{{item.studentId}}" bindinput="onValueInput" />
+        <button class="missing-button {{item.status === 'missing' ? 'active' : ''}}" data-student-id="{{item.studentId}}" bindtap="toggleMissing">{{item.status === 'missing' ? '取消缺测' : '标记缺测'}}</button>
       </view>
-      <input
-        class="score-input"
-        placeholder="录入"
-        value="{{values[index]}}"
-        data-index="{{index}}"
-        bindinput="onValueInput"
-      />
+      <input wx:if="{{item.status === 'missing'}}" class="reason-input" placeholder="缺测原因，如请假、受伤" value="{{item.missingReason}}" data-student-id="{{item.studentId}}" bindinput="onMissingReasonInput" />
+      <view wx:if="{{item.invalid}}" class="invalid-hint">合理范围：{{currentField.minValue === undefined ? '不限' : currentField.minValue}} - {{currentField.maxValue === undefined ? '不限' : currentField.maxValue}}</view>
     </view>
   </view>
 
-  <view wx:if="{{form}}" class="card">
-    <view class="section-title">提交</view>
-    <view class="subtitle">仅记录原始测试结果，综合评分由系统统一计算。</view>
-    <button class="primary-button" loading="{{saving}}" disabled="{{saving || !roster.length}}" bindtap="submitAssessment">提交评测</button>
-  </view>
-
-  <view wx:if="{{form}}" wx:for="{{form.pending}}" wx:key="title" class="card">
-    <view class="section-title">{{item.title}}</view>
-    <view class="subtitle">{{item.message}}</view>
+  <view wx:if="{{form}}" class="submit-bar">
+    <view><view class="label strong">{{submitMessage || '输入会自动保存到本机'}}</view><view class="subtitle">提交成功后清理对应学员草稿</view></view>
+    <button class="primary-button submit-button" loading="{{saving}}" disabled="{{saving || !roster.length}}" bindtap="submitAssessment">提交</button>
   </view>
 </view>

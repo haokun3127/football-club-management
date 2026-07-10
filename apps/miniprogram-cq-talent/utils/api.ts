@@ -10,6 +10,7 @@ import type {
   CoachHome,
   CoachWorkbench,
   GrowthSummary,
+  MetricDetail,
   RadarMetricPoint,
   ScheduleEvent,
   StudentHome,
@@ -69,6 +70,14 @@ export async function getParentGrowth(studentId: string, student?: StudentSummar
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/parent/students/${studentId}/growth-summary`,
   });
   return normalizeGrowth(response, student);
+}
+
+export async function getParentMetricDetail(studentId: string, metricId: string): Promise<MetricDetail> {
+  const context = requireContext();
+  const response = await request<Record<string, unknown>>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/parent/students/${studentId}/ability-metrics/${metricId}`,
+  });
+  return normalizeMetricDetail(response, metricId);
 }
 
 export async function getParentStudentHome(student: StudentSummary): Promise<StudentHome> {
@@ -438,6 +447,21 @@ function normalizeGrowth(raw: Record<string, unknown>, student?: StudentSummary)
     value: `${point.value ?? "-"} / ${point.maxValue}`,
     peerAverage: point.peerAverage === undefined ? undefined : `${point.peerAverage}`,
   }));
+  const assessment = asRecord(raw.assessment);
+  const viewsSource = Array.isArray(assessment?.views) ? assessment.views as Array<Record<string, unknown>> : [];
+  const nodesSource = Array.isArray(assessment?.viewNodes) ? assessment.viewNodes as Array<Record<string, unknown>> : [];
+  const views = viewsSource
+    .filter((view) => !view.status || view.status === "active")
+    .map((view) => {
+      const metricIds = nodesSource
+        .filter((node) => node.viewId === view.id && node.metricId)
+        .sort((left, right) => Number(left.sortOrder ?? 0) - Number(right.sortOrder ?? 0))
+        .map((node) => String(node.metricId))
+        .filter((metricId) => radar.some((point) => point.metricId === metricId));
+      return { id: String(view.id ?? ""), name: String(view.name ?? "能力视图"), metricIds };
+    })
+    .filter((view) => view.id && view.metricIds.length >= 3 && view.metricIds.length <= 12)
+    .sort((left, right) => Number(/雷达|radar/i.test(right.name)) - Number(/雷达|radar/i.test(left.name)));
   return {
     student,
     radar,
@@ -449,8 +473,60 @@ function normalizeGrowth(raw: Record<string, unknown>, student?: StudentSummary)
       { label: "更新时间", value: String(raw.updatedAt ?? raw.generatedAt ?? "以后端同步时间为准") },
     ],
     metricItems: metrics,
+    views: views.length ? views : [{ id: "default", name: "能力概览", metricIds: radar.map((point) => point.metricId) }],
     updatedAt: stringOrUndefined(raw.updatedAt ?? raw.generatedAt),
   };
+}
+
+function normalizeMetricDetail(raw: Record<string, unknown>, fallbackMetricId: string): MetricDetail {
+  const metric = asRecord(raw.metric);
+  const recordsSource = Array.isArray(raw.records) ? raw.records as Array<Record<string, unknown>> : [];
+  const records = recordsSource.map((record) => ({
+    id: String(record.id ?? ""),
+    value: metricRecordNumber(record),
+    occurredAt: String(record.occurredAt ?? record.updatedAt ?? ""),
+    source: sourceLabel(record.source),
+    note: stringOrUndefined(record.note),
+    eventId: stringOrUndefined(record.eventId),
+  })).filter((record) => record.id);
+  const sourceEventsSource = Array.isArray(raw.sourceEvents) ? raw.sourceEvents as Array<Record<string, unknown>> : [];
+  return {
+    metricId: String(metric?.id ?? fallbackMetricId),
+    label: String(metric?.name ?? "能力指标"),
+    unit: stringOrUndefined(metric?.unit),
+    description: stringOrUndefined(metric?.description),
+    latest: records[0],
+    records,
+    sourceEvents: sourceEventsSource.map((item) => {
+      const event = asRecord(item.event);
+      const timeRange = asRecord(event?.timeRange);
+      return {
+        recordId: String(item.recordId ?? ""),
+        eventId: String(event?.id ?? ""),
+        title: String(event?.title ?? "相关活动"),
+        type: normalizeEventType(event?.type),
+        startsAt: stringOrUndefined(timeRange?.startsAt ?? event?.startsAt),
+      };
+    }).filter((item) => item.recordId && item.eventId),
+  };
+}
+
+function metricRecordNumber(record: Record<string, unknown>) {
+  const value = asRecord(record.value);
+  return numberOrUndefined(record.numericValue ?? value?.score ?? value?.number ?? value?.count ?? value?.percentage ?? value?.minutes ?? value?.seconds ?? value?.meters ?? value?.value);
+}
+
+function sourceLabel(value: unknown) {
+  const labels: Record<string, string> = {
+    training_observation: "训练观察",
+    match_event: "比赛记录",
+    assessment: "阶段评测",
+    fitness_test: "体能测试",
+    manual_adjustment: "人工复核",
+    algorithm: "系统计算",
+  };
+  const key = String(value ?? "");
+  return labels[key] ?? "训练记录";
 }
 
 function normalizeRadarMetric(item: Record<string, unknown>): RadarMetricPoint {
@@ -677,6 +753,7 @@ function normalizeAssessmentForm(raw: Record<string, unknown>): AssessmentForm {
     const testItem = asRecord(field.testItem) ?? field;
     const metric = asRecord(field.metric);
     const binding = asRecord(field.binding);
+    const dimension = asRecord(field.dimension);
     return {
       id: String(testItem.id ?? field.id ?? `field-${index}`),
       metricId: stringOrUndefined(testItem.metricId ?? metric?.id ?? binding?.metricId),
@@ -686,6 +763,12 @@ function normalizeAssessmentForm(raw: Record<string, unknown>): AssessmentForm {
       valueKind: String(testItem.valueKind ?? metric?.valueKind ?? field.valueKind ?? "score_0_100"),
       unit: stringOrUndefined(testItem.unit ?? metric?.unit),
       required: Boolean(testItem.required ?? field.required ?? binding?.role === "input"),
+      protocol: stringOrUndefined(testItem.protocol),
+      groupId: String(dimension?.id ?? metric?.dimensionId ?? "other"),
+      groupLabel: String(dimension?.name ?? "其他项目"),
+      minValue: numberOrUndefined(testItem.minValue ?? field.minValue),
+      maxValue: numberOrUndefined(testItem.maxValue ?? binding?.maxScore ?? metric?.maxScore),
+      precision: numberOrUndefined(testItem.precision ?? field.precision),
       bindingRole: stringOrUndefined(binding?.role),
     };
   }).filter((field) => field.testItemId && field.bindingRole !== "output" && field.bindingRole !== "display_only");

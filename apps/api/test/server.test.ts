@@ -365,7 +365,7 @@ describe("api server", () => {
     const formBody = assessmentForm.json() as {
       template: { id: string };
       templateVersion: { id: string };
-      fields: Array<{ binding: { metricId: string; testItemId?: string }; metric: { id: string } | null; testItem: { id: string } | null }>;
+      fields: Array<{ binding: { metricId: string; testItemId?: string }; metric: { id: string } | null; dimension: { id: string; name: string } | null; testItem: { id: string } | null }>;
     };
 
     expect(children.statusCode).toBe(200);
@@ -424,6 +424,7 @@ describe("api server", () => {
       expect.objectContaining({
         binding: expect.objectContaining({ metricId: "metric-finishing" }),
         metric: expect.objectContaining({ id: "metric-finishing" }),
+        dimension: expect.objectContaining({ id: "dimension-technical", name: "技术能力" }),
         testItem: expect.objectContaining({ id: "assessment-test-finishing-cq-talent" }),
       }),
     ]));

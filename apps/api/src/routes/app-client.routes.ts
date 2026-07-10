@@ -628,10 +628,11 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return reply;
       }
 
-      const [templates, testItems, metricCatalog, config] = await Promise.all([
+      const [templates, testItems, metricCatalog, dimensions, config] = await Promise.all([
         context.store.listAssessmentTemplates(request.params.clubId),
         context.store.listAssessmentTestItems(request.params.clubId),
         context.store.listAbilityMetrics(request.params.clubId),
+        context.store.listDevelopmentDimensions(request.params.clubId),
         context.store.getDataCapabilityConfig(request.params.clubId),
       ]);
       const template = templates.find((item) => item.id === request.params.templateId && item.status === "active");
@@ -662,6 +663,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         fields: bindings.map((binding) => ({
           binding,
           metric: metricCatalog.find((metric) => metric.id === binding.metricId) ?? null,
+          dimension: dimensions.find((dimension) => dimension.id === metricCatalog.find((metric) => metric.id === binding.metricId)?.dimensionId) ?? null,
           testItem: binding.testItemId
             ? testItems.find((item) => item.id === binding.testItemId) ?? null
             : null,

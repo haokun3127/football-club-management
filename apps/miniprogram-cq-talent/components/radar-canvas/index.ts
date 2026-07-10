@@ -29,6 +29,9 @@ interface CanvasRenderingContext2D {
 interface RadarComponentThis {
   data: {
     metrics?: RadarMetricPoint[];
+    selectedMetricId?: string;
+    canvasWidth?: number;
+    canvasHeight?: number;
   };
   setData: (data: Record<string, unknown>) => void;
   triggerEvent: (name: string, detail: Record<string, unknown>) => void;
@@ -49,6 +52,10 @@ Component({
       type: Array,
       value: [],
     },
+    selectedMetricId: {
+      type: String,
+      value: "",
+    },
   },
   data: {
     empty: true,
@@ -60,6 +67,9 @@ Component({
   },
   observers: {
     metrics(this: RadarComponentThis, _value: unknown) {
+      this.draw();
+    },
+    selectedMetricId(this: RadarComponentThis, _value: unknown) {
       this.draw();
     },
   },
@@ -78,28 +88,41 @@ Component({
         canvas.width = res.width * pixelRatio;
         canvas.height = res.height * pixelRatio;
         ctx.scale(pixelRatio, pixelRatio);
-        renderRadar(ctx, metrics, res.width, res.height);
+        component.setData({ canvasWidth: res.width, canvasHeight: res.height });
+        renderRadar(ctx, metrics, res.width, res.height, component.data.selectedMetricId);
       }).exec();
     },
-    handleTap(this: RadarComponentThis) {
+    handleTap(this: RadarComponentThis, event: { detail?: { x?: number; y?: number } }) {
       const component = this as unknown as RadarComponentThis;
-      const metrics = component.data.metrics ?? [];
-      if (metrics[0]) {
-        component.triggerEvent("metrictap", { metricId: metrics[0].metricId });
-      }
+      const metrics = (component.data.metrics ?? []).filter((item) => typeof item.value === "number");
+      const width = component.data.canvasWidth ?? 0;
+      const height = component.data.canvasHeight ?? 0;
+      if (!metrics.length || !width || !height) return;
+      const x = event.detail?.x ?? width / 2;
+      const y = event.detail?.y ?? height / 2;
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const labelRadius = Math.min(width, height) * 0.34 + 28;
+      const selected = metrics
+        .map((metric, index) => ({ metric, point: pointAt(index, metrics.length, centerX, centerY, labelRadius) }))
+        .sort((left, right) => distance(left.point, { x, y }) - distance(right.point, { x, y }))[0];
+      if (selected) component.triggerEvent("metrictap", { metricId: selected.metric.metricId });
     },
   },
 });
 
-function renderRadar(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], width: number, height: number) {
+function renderRadar(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], width: number, height: number, selectedMetricId?: string) {
   const centerX = width / 2;
   const centerY = height / 2;
   const radius = Math.min(width, height) * 0.34;
   ctx.clearRect(0, 0, width, height);
   drawGrid(ctx, metrics.length, centerX, centerY, radius);
-  drawPolygon(ctx, metrics, "peerAverage", centerX, centerY, radius, "rgba(96, 100, 111, 0.18)", "#8A8F99");
+  if (metrics.every((metric) => typeof metric.peerAverage === "number")) {
+    drawPolygon(ctx, metrics, "peerAverage", centerX, centerY, radius, "rgba(96, 100, 111, 0.18)", "#8A8F99");
+  }
   drawPolygon(ctx, metrics, "value", centerX, centerY, radius, "rgba(230, 0, 18, 0.18)", "#E60012");
   drawLabels(ctx, metrics, centerX, centerY, radius + 28);
+  drawSelection(ctx, metrics, selectedMetricId, centerX, centerY, radius);
 }
 
 function pointAt(index: number, total: number, centerX: number, centerY: number, radius: number) {
@@ -158,4 +181,20 @@ function drawLabels(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], 
     const point = pointAt(index, metrics.length, centerX, centerY, radius);
     ctx.fillText(metric.label, point.x, point.y);
   });
+}
+
+function drawSelection(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], selectedMetricId: string | undefined, centerX: number, centerY: number, radius: number) {
+  const index = metrics.findIndex((metric) => metric.metricId === selectedMetricId);
+  if (index < 0) return;
+  const metric = metrics[index]!;
+  const value = typeof metric.value === "number" ? metric.value : 0;
+  const point = pointAt(index, metrics.length, centerX, centerY, radius * Math.max(0, Math.min(value / metric.maxValue, 1)));
+  ctx.beginPath();
+  ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
+  ctx.fillStyle = "#E60012";
+  ctx.fill();
+}
+
+function distance(left: { x: number; y: number }, right: { x: number; y: number }) {
+  return Math.hypot(left.x - right.x, left.y - right.y);
 }

@@ -129,3 +129,54 @@ const selectedProjectIds = localDraft.projectIds;
 ```typescript
 const selectedProjectIds = workbench.training.selectedProjectIds;
 ```
+
+## Scenario: Parent Metric Drilldown and Assessment Form Grouping
+
+### 1. Scope / Trigger
+
+- Trigger: parent radar selection/detail and coach test-item-first assessment entry.
+
+### 2. Signatures
+
+- `GET /clubs/:clubId/app-clients/:clientId/parent/students/:studentId/growth-summary`
+- `GET /clubs/:clubId/app-clients/:clientId/parent/students/:studentId/ability-metrics/:metricId`
+- `GET /clubs/:clubId/app-clients/:clientId/coach/assessments/templates/:templateId/form`
+
+### 3. Contracts
+
+- `metricId` is the identity shared by MetricView nodes, radar points, page selection, detail records and source links.
+- Metric detail returns metric metadata, latest/records, trend and redacted source events.
+- Assessment form fields return metric, development dimension and test-item protocol so clients can group by project without hardcoding the CQ Talent model.
+- Device drafts are keyed by event, template version, student and test item; successful student submissions clear only that student's draft.
+
+### 4. Validation & Error Matrix
+
+- Guardian without student access -> `403 forbidden`.
+- Unknown metric/template/version -> `404 not_found`.
+- Missing metric record -> successful empty detail; clients must not render a synthetic zero.
+
+### 5. Good/Base/Bad Cases
+
+- Good: clicking a radar axis selects the same metric detail and links its source activity.
+- Base: growth without a usable MetricView falls back to available numeric radar metrics.
+- Bad: mapping radar axes to details by array index or drawing missing peer averages as zero.
+
+### 6. Tests Required
+
+- Contract tests assert metric identity, privacy redaction and assessment dimension metadata.
+- Smoke asserts growth metric -> detail round-trip.
+- UI type-check covers local draft and partial-submit result shapes.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```typescript
+openMetric(metrics[tappedIndex + 1].metricId);
+```
+
+#### Correct
+
+```typescript
+openMetric(tappedPoint.metricId);
+```

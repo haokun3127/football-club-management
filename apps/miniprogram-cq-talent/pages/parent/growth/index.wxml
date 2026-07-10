@@ -1,57 +1,32 @@
 <view class="page">
-  <view class="card hero-card">
-    <view class="title">能力成长</view>
-    <view class="subtitle">成长足迹、训练历程、能力雷达图和指标下钻</view>
-  </view>
+  <view class="card hero-card"><view class="title">能力成长</view><view class="subtitle">选择指标查看趋势和来源</view></view>
 
-  <view class="card">
-    <view class="section-title">孩子</view>
-    <view class="child-tabs">
-      <view wx:for="{{children}}" wx:key="id" class="child-tab {{activeStudentId === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="switchChild">{{item.name}}</view>
-    </view>
-  </view>
+  <view class="card"><view class="section-title">孩子</view><view class="child-tabs"><view wx:for="{{children}}" wx:key="id" class="child-tab {{activeStudentId === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="switchChild">{{item.name}}</view></view></view>
 
-  <status-view
-    state="{{state}}"
-    title="{{state === 'loading' ? '加载成长数据' : state === 'empty' ? '成长数据不足' : '成长数据读取失败'}}"
-    message="{{message}}"
-    action-text="{{state === 'error' ? '重试' : ''}}"
-    bindaction="retry"
-  />
+  <status-view state="{{state}}" title="{{state === 'loading' ? '加载成长数据' : state === 'empty' ? '成长数据不足' : '成长数据读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
   <view wx:if="{{growth}}">
-    <view class="card">
-      <view class="section-title">能力雷达图</view>
-      <radar-canvas metrics="{{radar}}" bindmetrictap="openMetric"></radar-canvas>
-      <view class="subtitle">同龄平均由后端聚合返回；前端不计算排名和公式。</view>
+    <view class="card radar-card">
+      <view class="row"><view class="section-title">能力雷达</view><picker mode="selector" range="{{growth.views}}" range-key="name" value="{{viewIndex}}" bindchange="onViewChange"><view class="view-picker">{{growth.views[viewIndex].name}}⌄</view></picker></view>
+      <radar-canvas metrics="{{radar}}" selectedMetricId="{{selectedMetricId}}" bindmetrictap="selectMetric"></radar-canvas>
+      <view class="subtitle">点击雷达轴点或下方指标切换查看</view>
     </view>
 
-    <view class="card">
-      <view class="section-title">指标列表</view>
-      <view wx:for="{{growth.metricItems}}" wx:key="metricId" class="metric-row" data-id="{{item.metricId}}" bindtap="openMetric">
-        <view>
-          <view>{{item.label}}</view>
-          <view class="subtitle">同龄平均：{{item.peerAverage || '待同步'}}</view>
-        </view>
-        <view class="tag">{{item.value}}</view>
+    <scroll-view scroll-x class="metric-scroll" enhanced show-scrollbar="{{false}}"><view class="metric-chips"><view wx:for="{{radar}}" wx:key="metricId" class="metric-chip {{selectedMetricId === item.metricId ? 'active' : ''}}" data-id="{{item.metricId}}" bindtap="selectMetric">{{item.label}}</view></view></scroll-view>
+
+    <view wx:if="{{selectedMetric}}" class="card metric-summary">
+      <view class="row"><view><view class="section-title">{{selectedMetric.label}}</view><view class="subtitle">当前能力参考</view></view><view class="metric-value">{{selectedMetric.value}}</view></view>
+      <view class="field-row"><view class="label">同龄平均</view><view class="field-value">{{selectedMetric.peerAverage === undefined ? '样本积累中' : selectedMetric.peerAverage}}</view></view>
+      <view wx:if="{{detailState === 'loading'}}" class="subtitle">正在读取趋势和来源…</view>
+      <view wx:if="{{selectedDetail}}">
+        <view class="field-row"><view class="label">最近记录</view><view class="field-value">{{selectedDetail.latest ? selectedDetail.latest.occurredAt : '暂无记录'}}</view></view>
+        <view class="field-row"><view class="label">可追溯来源</view><view class="field-value">{{selectedDetail.sourceEvents.length}} 项</view></view>
       </view>
+      <button class="ghost-button" bindtap="openMetricDetail">查看完整详情</button>
     </view>
 
-    <view class="card">
-      <view class="section-title">成长足迹</view>
-      <view wx:for="{{growth.milestones}}" wx:key="title" class="field-row">
-        <view class="label">{{item.title}}</view>
-        <view class="field-value">{{item.description}}</view>
-      </view>
-    </view>
-
-    <view class="card">
-      <view class="section-title">训练历程</view>
-      <view wx:for="{{growth.trainingHistory}}" wx:key="label" class="field-row">
-        <view class="label">{{item.label}}</view>
-        <view class="field-value">{{item.value}}</view>
-      </view>
-    </view>
+    <view class="card"><view class="section-title">成长足迹</view><view wx:for="{{growth.milestones}}" wx:key="title" class="field-row"><view class="label">{{item.title}}</view><view class="field-value">{{item.description}}</view></view></view>
+    <view class="card"><view class="section-title">训练历程</view><view wx:for="{{growth.trainingHistory}}" wx:key="label" class="field-row"><view class="label">{{item.label}}</view><view class="field-value">{{item.value}}</view></view></view>
   </view>
 
   <role-tabbar role="parent" active="growth" />

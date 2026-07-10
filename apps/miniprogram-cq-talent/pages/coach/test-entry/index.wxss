@@ -1,36 +1,150 @@
-.test-row {
+.progress-track {
+  height: 12rpx;
+  margin-top: 20rpx;
+  overflow: hidden;
+  border-radius: 999rpx;
+  background: #ffffff;
+}
+
+.progress-value {
+  height: 100%;
+  border-radius: inherit;
+  background: #e60012;
+}
+
+.group-scroll {
+  width: 100%;
+  margin-bottom: 20rpx;
+  white-space: nowrap;
+}
+
+.group-row {
+  display: inline-flex;
+  gap: 12rpx;
+}
+
+.group-tab {
+  padding: 14rpx 22rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  color: #60646f;
+}
+
+.group-tab.active {
+  background: #e60012;
+  color: #ffffff;
+}
+
+.field-picker,
+.protocol {
+  padding: 18rpx;
+  border-radius: 10rpx;
+  background: #f7f8fa;
+}
+
+.protocol {
+  margin-top: 14rpx;
+  color: #60646f;
+  font-size: 22rpx;
+  line-height: 1.5;
+}
+
+.field-nav,
+.draft-controls {
+  display: flex;
+  gap: 16rpx;
+}
+
+.field-nav {
+  margin-top: 16rpx;
+}
+
+.field-nav button {
+  margin: 0;
+}
+
+.draft-row {
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.draft-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.strong {
+  color: #1f2329;
+  font-weight: 700;
+}
+
+.draft-status {
+  font-size: 22rpx;
+}
+
+.status-recorded { color: #237804; }
+.status-missing { color: #ad6800; }
+.status-empty { color: #8a8f99; }
+
+.draft-controls {
+  margin-top: 12rpx;
+}
+
+.score-input,
+.reason-input {
+  flex: 1;
+  min-height: 68rpx;
+  box-sizing: border-box;
+  padding: 12rpx 16rpx;
+  border-radius: 8rpx;
+  background: #f7f8fa;
+}
+
+.missing-button {
+  width: 180rpx;
+  margin: 0;
+  color: #60646f;
+  background: #ffffff;
+  font-size: 24rpx;
+}
+
+.missing-button.active {
+  color: #ad6800;
+  border-color: #ad6800;
+}
+
+.status-invalid,
+.invalid-hint {
+  color: #e60012;
+}
+
+.invalid-hint {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+}
+
+.reason-input {
+  width: 100%;
+  margin-top: 12rpx;
+}
+
+.submit-bar {
+  position: sticky;
+  bottom: 20rpx;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20rpx;
-  padding: 18rpx 0;
-  border-bottom: 1rpx solid #f2f3f5;
+  padding: 20rpx 22rpx;
+  border: 1rpx solid #ffd6d2;
+  border-radius: 12rpx;
+  background: #ffffff;
+  box-shadow: 0 8rpx 30rpx rgba(31, 35, 41, 0.12);
 }
 
-.test-row:last-child {
-  border-bottom: 0;
-}
-
-.test-meta {
-  flex: 1;
-  min-width: 0;
-}
-
-.field-input,
-.score-input {
-  min-height: 64rpx;
-  box-sizing: border-box;
-  padding: 14rpx 18rpx;
-  border-radius: 8rpx;
-  background: #f7f8fa;
-  color: #111827;
-}
-
-.field-input {
-  margin-top: 16rpx;
-}
-
-.score-input {
+.submit-button {
   width: 180rpx;
-  text-align: right;
+  margin: 0;
 }

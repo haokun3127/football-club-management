@@ -20,4 +20,5 @@ export const STORAGE_KEYS = {
   context: "cqTalentAppContext",
   session: "cqTalentSession",
   devRole: "cqTalentDevRole",
+  assessmentDraftPrefix: "cqTalentAssessmentDraft",
 };

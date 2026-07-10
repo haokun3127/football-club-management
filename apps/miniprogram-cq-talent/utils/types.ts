@@ -110,12 +110,38 @@ export interface RadarMetricPoint {
   maxValue: number;
 }
 
+export interface MetricViewOption {
+  id: string;
+  name: string;
+  metricIds: string[];
+}
+
+export interface MetricDetailRecord {
+  id: string;
+  value?: number;
+  occurredAt: string;
+  source: string;
+  note?: string;
+  eventId?: string;
+}
+
+export interface MetricDetail {
+  metricId: string;
+  label: string;
+  unit?: string;
+  description?: string;
+  latest?: MetricDetailRecord;
+  records: MetricDetailRecord[];
+  sourceEvents: Array<{ recordId: string; eventId: string; title: string; type: ScheduleEvent["type"]; startsAt?: string }>;
+}
+
 export interface GrowthSummary {
   student?: StudentSummary;
   radar: RadarMetricPoint[];
   milestones: Array<{ title: string; description: string; date?: string }>;
   trainingHistory: Array<{ label: string; value: string }>;
   metricItems: Array<{ metricId: string; label: string; value: string; peerAverage?: string }>;
+  views: MetricViewOption[];
   updatedAt?: string;
 }
 
@@ -191,6 +217,23 @@ export interface AssessmentForm {
     valueKind: string;
     unit?: string;
     required: boolean;
+    protocol?: string;
+    groupId: string;
+    groupLabel: string;
+    minValue?: number;
+    maxValue?: number;
+    precision?: number;
   }>;
   pending: Array<{ title: string; message: string }>;
+}
+
+export type AssessmentDraftStatus = "empty" | "recorded" | "missing";
+
+export interface AssessmentDraftEntry {
+  studentId: string;
+  testItemId: string;
+  status: AssessmentDraftStatus;
+  rawValue: string;
+  missingReason?: string;
+  updatedAt: string;
 }

@@ -82,6 +82,13 @@ async function expectParentRead(clientId) {
     userId: parentUserId,
   });
   pass("parent.growth", `keys=${Object.keys(growth).slice(0, 5).join(",")}`);
+  const metricId = arrayOf(growth.latest)[0]?.metricId;
+  assert(metricId, "parent growth should include a metric for drilldown");
+  const metricDetail = await request(`/clubs/${clubId}/app-clients/${clientId}/parent/students/${studentId}/ability-metrics/${metricId}`, {
+    userId: parentUserId,
+  });
+  assert(metricDetail.metric?.id === metricId, "metric detail should preserve selected metric identity");
+  pass("parent.metric-detail", `${arrayOf(metricDetail.records).length} records`);
 
   return studentId;
 }
@@ -94,6 +101,12 @@ async function expectCoachRead(clientId) {
   assert(events.length > 0, `coach home should include events for ${testDate}`);
   const eventId = events[0].id;
   pass("coach.home", `${events.length} events, first=${eventId}`);
+  const weekHome = await request(`/clubs/${clubId}/app-clients/${clientId}/coach/home?from=${encodeURIComponent(testDate)}&to=${encodeURIComponent("2026-07-05")}`, {
+    userId: coachUserId,
+  });
+  assert(weekHome.workbench?.summary?.total >= events.length, "coach week workbench should include summary totals");
+  assert(arrayOf(weekHome.workbench?.tasks).length >= events.length, "coach week workbench should include tasks");
+  pass("coach.week-workbench", `${weekHome.workbench.summary.pending} pending tasks`);
 
   const workbench = await request(`/clubs/${clubId}/app-clients/${clientId}/coach/events/${eventId}/workbench`, {
     userId: coachUserId,
@@ -174,6 +187,11 @@ async function expectCoachWrites(clientId, eventId, studentId) {
     idempotent: true,
   });
   pass("coach.training-projects", `${arrayOf(trainingProjects.projects).length} projects saved`);
+  const restoredWorkbench = await request(`/clubs/${clubId}/app-clients/${clientId}/coach/events/${eventId}/workbench`, {
+    userId: coachUserId,
+  });
+  assert(arrayOf(restoredWorkbench.training?.selectedProjectIds).length === trainingProjectIds.length, "saved training projects should restore in workbench");
+  pass("coach.training-projects-restore", `${arrayOf(restoredWorkbench.training?.selectedProjectIds).length} projects restored`);
 
   const match = await request(`/clubs/${clubId}/app-clients/${clientId}/coach/matches`, {
     method: "POST",
