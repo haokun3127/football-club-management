@@ -60,7 +60,7 @@ pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client
 - 启动页先调用 `/app-clients/resolve?clientKey=cq-talent-wechat-main`。
 - 运行环境读取 `envVersion`：develop 使用本地 API 和开发身份；trial/release 必须在 `utils/config.ts` 配置 HTTPS 服务地址，且不会发送开发身份头。
 - 家长/教练身份不在 UI 中手动选择。dev 模式默认读取 `utils/config.ts` 的 `DEV_IDENTITY_ROLE`，也可在启动页长按品牌区隐藏切换。
-- dev 家长请求带 `X-User-Id: user-parent-cq-talent-acceptance`，绑定 200 名重庆天才导入测试学员；dev 教练请求带 `X-User-Id: user-coach-1`。
+- dev 家长请求带 `X-User-Id: user-parent-cq-talent-acceptance`，代表一个真实的双孩测试家庭；俱乐部 seed 整体包含 200 名重庆天才导入学员。dev 教练请求带 `X-User-Id: user-coach-1`。
 - 页面业务请求统一经过 `utils/request.ts`，自动携带 session、`clubId`、`clientId`、`X-Request-Id`。
 - 写操作请求封装使用幂等键；401 或 session 过期会清理本地会话并返回登录。
 

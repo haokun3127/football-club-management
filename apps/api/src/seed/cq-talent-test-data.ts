@@ -114,6 +114,7 @@ export interface CqTalentSyntheticStudent {
   wechat: string;
   school: string;
   area: string;
+  channel: string;
   teamName: string;
   coachName: string;
   teamMemberships: CqTalentSyntheticTeamMembership[];
@@ -161,6 +162,16 @@ const parentGivenNames = [
   "辉", "洁", "超", "丹", "波", "莉", "强", "娜", "杰", "萍", "鑫", "倩",
 ];
 
+export const cqTalentFamilyDistribution = {
+  singleChildFamilies: 178,
+  twoChildFamilies: 8,
+  threeChildFamilies: 2,
+  totalFamilies: 188,
+  totalStudents: 200,
+} as const;
+
+const familyDistributionShuffleSeed = 0x43515446;
+
 export function createCqTalentSyntheticFixture(playerCount = 200): CqTalentSyntheticFixture {
   const coaches = teams.map((team, index) => ({
     id: `coach-cq-talent-${String(index + 1).padStart(2, "0")}`,
@@ -168,9 +179,10 @@ export function createCqTalentSyntheticFixture(playerCount = 200): CqTalentSynth
     phone: `1390000${String(index + 1).padStart(4, "0")}`,
     teams: [team.name],
   }));
-  const familyCount = familyIndexForStudent(playerCount - 1) + 1;
-  const families = Array.from({ length: familyCount }, (_, index) => createFamily(index));
-  const students = Array.from({ length: playerCount }, (_, index) => createStudent(index, families[familyIndexForStudent(index)]!));
+  const familySizes = createFamilySizes(playerCount);
+  const families = familySizes.map((_, index) => createFamily(index));
+  const familyIndexes = familySizes.flatMap((size, familyIndex) => Array.from({ length: size }, () => familyIndex));
+  const students = familyIndexes.map((familyIndex, index) => createStudent(index, families[familyIndex]!));
 
   return {
     students,
@@ -203,14 +215,40 @@ function createFamily(index: number): CqTalentSyntheticFamily {
   };
 }
 
-function familyIndexForStudent(index: number): number {
-  if (index < 120) {
-    return index;
+function createFamilySizes(playerCount: number): number[] {
+  const threeChildFamilies = Math.min(
+    cqTalentFamilyDistribution.threeChildFamilies,
+    Math.floor(playerCount / 100),
+  );
+  const twoChildFamilies = Math.min(
+    cqTalentFamilyDistribution.twoChildFamilies,
+    Math.floor(playerCount / 25),
+  );
+  const singleChildFamilies = playerCount - threeChildFamilies * 3 - twoChildFamilies * 2;
+  const remainingSizes = [
+    ...Array.from({ length: singleChildFamilies }, () => 1),
+    ...Array.from({ length: Math.max(twoChildFamilies - 1, 0) }, () => 2),
+    ...Array.from({ length: threeChildFamilies }, () => 3),
+  ];
+
+  if (twoChildFamilies === 0) {
+    return shuffleDeterministically(remainingSizes, familyDistributionShuffleSeed);
   }
-  if (index < 180) {
-    return 120 + Math.floor((index - 120) / 2);
+
+  return [2, ...shuffleDeterministically(remainingSizes, familyDistributionShuffleSeed)];
+}
+
+function shuffleDeterministically<T>(values: T[], seed: number): T[] {
+  const shuffled = [...values];
+  let state = seed >>> 0;
+
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    state = (Math.imul(1_664_525, state) + 1_013_904_223) >>> 0;
+    const swapIndex = state % (index + 1);
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex]!, shuffled[index]!];
   }
-  return 150 + Math.floor((index - 180) / 3);
+
+  return shuffled;
 }
 
 function createStudent(index: number, family: CqTalentSyntheticFamily): CqTalentSyntheticStudent {
@@ -234,6 +272,7 @@ function createStudent(index: number, family: CqTalentSyntheticFamily): CqTalent
     wechat: family.wechat,
     school: family.school,
     area: family.area,
+    channel: family.channel,
     teamName: team.name,
     coachName: team.coach,
     teamMemberships: memberships,
@@ -270,7 +309,7 @@ function createFullUserRow(student: CqTalentSyntheticStudent, index: number): Cq
   return {
     "身份证号": student.identityNumber,
     "学员姓名": student.name,
-    "渠道": channels[familyIndexForStudent(index) % channels.length]!,
+    "渠道": student.channel,
     "区域": student.area,
     "学校": student.school,
     "队伍名称": student.teamName,

@@ -68,7 +68,7 @@ sqlite3 /tmp/fcm-cq-talent-smoke.sqlite \
 | 数据项 | 当前数量 |
 | --- | ---: |
 | student_profiles | 201 |
-| parent_profiles | 159 |
+| parent_profiles | 189 |
 | coach_profiles | 8 |
 | teams | 9 |
 | team_members | 257 |
@@ -79,7 +79,7 @@ sqlite3 /tmp/fcm-cq-talent-smoke.sqlite \
 | lesson_credit_ledger | 400 |
 | insurance_policies | 200 |
 
-结论：当前 smoke sqlite 已具备 200 名重庆天才导入测试学员的运营档案、联系人、课时和保险数据。`student_profiles=201` 是因为保留了后端原始回归样例 `student-1`；小程序 dev 家长身份使用 `user-parent-cq-talent-acceptance`，绑定 200 名导入测试学员。活动、评测和部分能力图谱仍由 seed-backed store 提供给 BFF，不能仅用 sqlite 表计数判断页面数据完整性。
+结论：当前 smoke sqlite 已具备 200 名重庆天才导入测试学员的运营档案、联系人、课时和保险数据。`student_profiles=201` 是因为保留了后端原始回归样例 `student-1`；小程序 dev 家长身份使用 `user-parent-cq-talent-acceptance`，该账号是一个真实双孩家庭，只能访问自己的 2 名孩子。活动、评测和部分能力图谱仍由 seed-backed store 提供给 BFF，不能仅用 sqlite 表计数判断页面数据完整性。
 
 ## 5. 家长端手工验收清单
 
@@ -94,7 +94,7 @@ sqlite3 /tmp/fcm-cq-talent-smoke.sqlite \
 | 页面/流程 | 验收点 | 通过标准 | 结果 |
 | --- | --- | --- | --- |
 | 启动页 | resolve app-client | 成功解析 `club-chongqing-talent` 和 `app-client-cq-talent-wechat-main` | 已通过 |
-| 家长日程 | 孩子绑定 | 展示当前家长绑定孩子；无其他孩子隐私 | 已通过，200 名导入学员 |
+| 家长日程 | 孩子绑定 | 展示当前家长绑定孩子；无其他孩子隐私 | 已通过，真实双孩家庭 2 名学员 |
 | 家长日程 | 活动列表 | 展示训练/比赛/其他活动，字段来自 BFF | 已通过，单学员 2 个活动 |
 | 活动详情 | 训练/比赛详情 | 展示时间、场地、队伍、状态、摘要；缺字段显示待同步 | 已通过基础读取 |
 | 成长 | 雷达图 | 指标来自 `growth-summary`；指标不足不画误导性 0 分 | 已通过基础读取 |
@@ -130,7 +130,7 @@ P0 BFF 当前交付状态如下；已完成项继续由 smoke 回归，生产登
 | P0 BFF | 建议路径 | 前端入口 | 验收标准 |
 | --- | --- | --- | --- |
 | 微信登录 + 手机号匹配 | `POST /clubs/:clubId/app-clients/:clientId/wechat-login` | 启动/登录绑定 | 未完成：缺生产微信 connector；dev 身份仅用于本地验收 |
-| 家庭聚合日程 | `GET /clubs/:clubId/app-clients/:clientId/parent/calendar?from=&to=` | 家长日程 | 已完成：200 人数据 smoke 返回 9 个聚合活动 |
+| 家庭聚合日程 | `GET /clubs/:clubId/app-clients/:clientId/parent/calendar?from=&to=` | 家长日程 | 已完成：双孩家庭 smoke 仅聚合本家庭活动；200 人整体由 seed 契约验证 |
 | 训练内容树 | `GET /clubs/:clubId/app-clients/:clientId/coach/training-project-tree` | 训练管理 | 已完成：前端可读取并选择训练项目 |
 | 训练内容保存 | `PUT /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/training-projects` | 训练管理 | 已完成：隔离 smoke 保存 2 个训练项目 |
 
@@ -180,7 +180,7 @@ pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client
 | `GET /health` | 200，`service=@football-club/api` |
 | `GET /app-clients/resolve?clientKey=cq-talent-wechat-main` | `clubId=club-chongqing-talent`，`clientId=app-client-cq-talent-wechat-main` |
 | `GET /app-clients/resolve?clientKey=cq-talent-wechat-main` | `clubId=club-chongqing-talent`，`clientId=app-client-cq-talent-wechat-main`，主题色 `#E60012/#C4000F/#FFF1F0` |
-| parent children，`X-User-Id: user-parent-cq-talent-acceptance` | 200 个孩子，首个孩子 `丁云帆` |
+| parent children，`X-User-Id: user-parent-cq-talent-acceptance` | 2 个同家庭孩子，不返回其他 198 名学员 |
 | parent schedule，首个导入学员 | 3 个活动，字段来自 app-client BFF |
 | parent growth-summary，首个导入学员 | `latest=1` |
 | coach home，`X-User-Id: user-coach-1`，`date=2026-06-28` | 1 个活动：`event-cq-talent-u10-dev-training` |
@@ -217,7 +217,7 @@ pnpm --filter @football-club/miniprogram-cq-talent devtools:preview
 - `pnpm --filter @football-club/api test` 通过：5 个测试文件，53 个测试。
 - `pnpm --filter @football-club/api typecheck` 通过。
 - `pnpm --filter @football-club/miniprogram-cq-talent typecheck` 通过。
-- `pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client` 已新增为固定验收脚本，并已通过：14 个检查项，parent children 200 人，coach roster 25 人，评测 62 rawResults / 62 scores / 99 metricRecords。
+- `pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client` 是固定验收脚本：parent children 必须为真实双孩家庭 2 人；coach roster、评测和写入流程继续回归。俱乐部 200 人总量及 178/8/2 家庭分布由 API fixture 契约测试负责。
 - `pnpm --filter @football-club/miniprogram-cq-talent devtools:preview` 已新增为固定 DevTools CLI 验收脚本，并已通过：`islogin/open/preview` 成功，包体 `94.8 KB / 97054 Byte`。
 - DevTools CLI `islogin/open/preview` 通过，测试 AppID `wx3df49f3b936ab2ed`，包体 `94.8 KB / 97054 Byte`。
 - 本地 API 日志显示 DevTools 模拟器从 `localhost:3000` 发起过 `resolve`、`parent/children`、`parent/students/:studentId/schedule` 请求，已验证模拟器能连到本地后端。
@@ -231,7 +231,7 @@ pnpm --filter @football-club/miniprogram-cq-talent devtools:preview
 
 - `pnpm check` 通过：domain 6 个测试文件 / 14 项，API 5 个测试文件 / 53 项。
 - 隔离数据库 `/tmp/fcm-cq-talent-audit-20260710.sqlite` 上的 `smoke:app-client` 通过 16 项。
-- 家长链路：200 名绑定学员、9 个家庭聚合活动、成长数据读取成功。
+- 家长链路：该轮曾以单个家长绑定 200 人作为验收口径；此数据关系错误，已由后续真实双孩家庭 smoke 和 200 人整体 fixture 契约取代。
 - 教练链路：25 人 roster、点名、销课确认/纠正、训练项目保存、比赛进球/助攻事件、62 项评测提交均通过。
 - 静态搜索未发现旧 mock 登录文案、`club-demo` 或演示姓名。
 - 微信 DevTools CLI 当前 `login=false`，因此本轮未重复生成 preview 码；保留 2026-06-28 的成功记录，不将历史结果冒充本轮结果。
@@ -252,3 +252,5 @@ pnpm --filter @football-club/miniprogram-cq-talent devtools:preview
 - 微信登录页、手机号授权、connector 接口、Bearer session 和过期清理已实现。
 - 全仓测试为 domain 14 项、API 54 项；隔离数据 smoke 为 19 项。
 - 当前 DevTools `login=false`，因此本轮 open/preview 与真机截图仍为外部阻塞；正式微信凭证和 HTTPS 服务地址也尚未提供。
+- 200 人测试数据已纠正为 188 个真实家庭：178 个单孩、8 个双孩、2 个三孩家庭；稳定 dev 家长是其中一个双孩家庭，不再拥有跨家庭绑定。
+- 最新隔离 smoke 通过 19 项：parent children 为 2 人，calendar 为覆盖两名孩子的 4 个活动；教练 roster 仍为 25 人，训练、比赛和 62 项评测写入均通过。

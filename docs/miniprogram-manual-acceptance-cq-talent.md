@@ -34,7 +34,7 @@ pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client
 通过标准：
 
 - resolve 返回 `club-chongqing-talent`。
-- 家长 children 返回 200 名导入学员。
+- 家长 children 只返回验收家庭的 2 名孩子；俱乐部 seed 整体仍为 200 名导入学员。
 - 教练 home 返回 `2026-06-28` 的训练活动。
 - `smoke:app-client` 完成 parent/coach app-client 读写链路，输出 `CQ Talent app-client smoke passed`。
 
@@ -143,7 +143,7 @@ pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client
 覆盖范围：
 
 - resolve、capabilities。
-- 家长 200 名导入学员、单孩子 home/schedule/growth、家庭聚合 calendar。
+- 真实双孩家庭的 children、单孩子 home/schedule/growth、家庭聚合 calendar；200 人整体覆盖由 seed 契约验证。
 - 教练 home/workbench、点名、销课确认、销课纠正、训练项目保存、比赛摘要和进球/助攻指标记录。
 - 精英评测模板完整提交。
 
@@ -151,8 +151,8 @@ pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client
 
 使用临时数据库 `/tmp/fcm-cq-talent-p0-smoke.sqlite` 和本地 API `http://127.0.0.1:3100` 验证通过：
 
-- parent children 返回 200 名重庆天才测试学员。
-- parent calendar 返回 9 个家庭聚合活动。
+- parent children 仅返回同一真实家庭的 2 名重庆天才测试学员，不泄露其他家庭数据。
+- parent calendar 仅聚合验收双孩家庭的 4 个活动，并覆盖 2 名孩子。
 - coach workbench 返回 `event-cq-talent-u10-dev-training` 的 25 人名单。
 - attendance PUT 更新 3 名学员。
 - lesson-confirmation POST/PATCH 均成功。
@@ -162,7 +162,7 @@ pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client
 
 ## 10. 2026-07-10 可试用版验收状态
 
-- `smoke:app-client` 通过 19 项：200 名家长绑定、指标详情、周工作台、训练项目回填、点名/销课/比赛和 62 项评测均通过。
+- `smoke:app-client` 覆盖真实双孩家庭、指标详情、周工作台、训练项目回填、点名/销课/比赛和 62 项评测；fixture 契约另行验证俱乐部 200 人全量数据。
 - 登录契约测试确认：手机号决定角色，`roleHint` 不能越权；签发 token 后可使用 Bearer session 访问数据。
 - develop 环境保留开发身份；trial/release 禁用开发身份并要求 HTTPS 地址。
 - DevTools 当前 `login=false`，脚本已改为复用当前 IDE 端口并明确提示登录阻塞。

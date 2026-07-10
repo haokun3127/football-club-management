@@ -1,6 +1,7 @@
 import { computeMetricGraph } from "@football-club/domain";
 import { describe, expect, it } from "vitest";
 import {
+  cqTalentFamilyDistribution,
   createCqTalentSyntheticFixture,
   cqTalentAttendanceHeaders,
   cqTalentFullUsersHeaders,
@@ -15,6 +16,7 @@ import {
   talentEliteAssessmentBlueprintRows,
 } from "../src/seed/cq-talent-assessment-model.js";
 import { createSeedData } from "../src/seed.js";
+import { createPlatformSeed } from "../src/seed/platform.js";
 
 describe("Chongqing Talent synthetic fixtures", () => {
   it("generates 200 students across the real customer table fields with matching coach names", () => {
@@ -26,10 +28,18 @@ describe("Chongqing Talent synthetic fixtures", () => {
       phoneCounts.set(phone, (phoneCounts.get(phone) ?? 0) + 1);
     }
     const teamNames = new Set(fixture.students.flatMap((student) => student.teamMemberships.map((membership) => membership.teamName)));
+    const familySizes = new Map<string, number>();
+    for (const student of fixture.students) {
+      familySizes.set(student.familyId, (familySizes.get(student.familyId) ?? 0) + 1);
+    }
+    const familySizeCounts = countValues(familySizes.values());
 
     expect(fixture.students).toHaveLength(200);
-    expect(fixture.families.length).toBeGreaterThan(120);
-    expect(fixture.families.length).toBeLessThan(200);
+    expect(fixture.families).toHaveLength(cqTalentFamilyDistribution.totalFamilies);
+    expect(familySizeCounts.get(1)).toBe(cqTalentFamilyDistribution.singleChildFamilies);
+    expect(familySizeCounts.get(2)).toBe(cqTalentFamilyDistribution.twoChildFamilies);
+    expect(familySizeCounts.get(3)).toBe(cqTalentFamilyDistribution.threeChildFamilies);
+    expect(familySizes.get(fixture.families[0]!.id)).toBe(2);
     expect(fixture.tables.fullUsers).toHaveLength(200);
     expect(fixture.tables.paymentEvents).toHaveLength(200);
     expect(fixture.tables.attendance).toHaveLength(200);
@@ -51,34 +61,90 @@ describe("Chongqing Talent synthetic fixtures", () => {
 
   it("builds an acceptance seed with realistic family, team, coach, and activity distribution", () => {
     const seed = createCqTalentAcceptanceSeed();
-    const parentIds = new Set((seed.parents ?? []).map((parent) => parent.id));
+    const platform = createPlatformSeed();
+    const parents = seed.parents ?? [];
+    const users = seed.users ?? [];
+    const memberships = seed.clubMemberships ?? [];
+    const bindings = seed.guardianBindings ?? [];
+    const parentIds = new Set(parents.map((parent) => parent.id));
     const acceptanceParentId = "parent-cq-talent-acceptance";
-    const familyBindings = (seed.guardianBindings ?? []).filter((binding) => binding.parentId !== acceptanceParentId);
-    const acceptanceBindings = (seed.guardianBindings ?? []).filter((binding) => binding.parentId === acceptanceParentId);
+    const acceptanceParentUserId = "user-parent-cq-talent-acceptance";
+    const acceptanceBindings = bindings.filter((binding) => binding.parentId === acceptanceParentId);
     const bindingsByParent = new Map<string, number>();
+    const bindingsByStudent = new Map<string, number>();
     const participantsByEvent = new Map<string, number>();
 
-    for (const binding of familyBindings) {
+    for (const binding of bindings) {
       bindingsByParent.set(binding.parentId, (bindingsByParent.get(binding.parentId) ?? 0) + 1);
+      bindingsByStudent.set(binding.studentId, (bindingsByStudent.get(binding.studentId) ?? 0) + 1);
     }
     for (const participant of seed.participants ?? []) {
       participantsByEvent.set(participant.eventId, (participantsByEvent.get(participant.eventId) ?? 0) + 1);
     }
 
     expect(seed.students).toHaveLength(200);
-    expect(seed.parents?.length).toBeGreaterThan(120);
-    expect(seed.parents?.length).toBeLessThan(200);
-    expect(familyBindings).toHaveLength(200);
-    expect(acceptanceBindings).toHaveLength(200);
-    expect((seed.guardianBindings ?? []).every((binding) => parentIds.has(binding.parentId))).toBe(true);
+    expect(parents).toHaveLength(cqTalentFamilyDistribution.totalFamilies);
+    expect(bindings).toHaveLength(200);
+    expect(acceptanceBindings).toHaveLength(2);
+    expect(bindings.every((binding) => binding.isPrimaryContact && parentIds.has(binding.parentId))).toBe(true);
+    expect(bindingsByParent.size).toBe(parents.length);
+    expect(bindingsByStudent.size).toBe(seed.students?.length);
+    expect(bindings.every((binding) => seed.students?.some((student) => student.id === binding.studentId))).toBe(true);
+    expect(Array.from(bindingsByStudent.values()).every((count) => count === 1)).toBe(true);
+    expect(countValues(bindingsByParent.values()).get(1)).toBe(cqTalentFamilyDistribution.singleChildFamilies);
+    expect(countValues(bindingsByParent.values()).get(2)).toBe(cqTalentFamilyDistribution.twoChildFamilies);
+    expect(countValues(bindingsByParent.values()).get(3)).toBe(cqTalentFamilyDistribution.threeChildFamilies);
     expect(Math.max(...bindingsByParent.values())).toBeLessThanOrEqual(3);
-    expect(Array.from(bindingsByParent.values()).some((count) => count > 1)).toBe(true);
+    expect(parents.every((parent) => {
+      const user = users.find((candidate) => candidate.id === parent.userId);
+      return user?.phone === parent.phone
+        && user.roles.includes("parent")
+        && memberships.some((membership) => membership.userId === parent.userId && membership.roles.includes("parent"));
+    })).toBe(true);
+    expect(new Set(parents.map((parent) => parent.userId)).size).toBe(parents.length);
+    expect(new Set(parents.map((parent) => parent.phone)).size).toBe(parents.length);
+    expect(parents.find((parent) => parent.id === acceptanceParentId)?.userId).toBe(acceptanceParentUserId);
+    expect(users.find((user) => user.id === acceptanceParentUserId)?.phone).not.toBe("13900000000");
     expect(seed.teamMembers?.length).toBeGreaterThan(200);
     expect(seed.events?.filter((event) => event.type === "training").length).toBeGreaterThanOrEqual(8);
     expect(seed.events?.filter((event) => event.type === "match").length).toBeGreaterThanOrEqual(6);
     expect(Math.max(...participantsByEvent.values())).toBeLessThan(100);
+
+    const allTeams = [...platform.teams, ...(seed.teams ?? [])];
+    const allCoaches = [...platform.coaches, ...(seed.coaches ?? [])];
+    const allUsers = [...platform.users, ...users];
+    const allMemberships = [...platform.clubMemberships, ...memberships];
+    const teamIds = new Set(allTeams.map((team) => team.id));
+    const coachIds = new Set(allCoaches.map((coach) => coach.id));
+    const eventIds = new Set((seed.events ?? []).map((event) => event.id));
+    const studentIds = new Set((seed.students ?? []).map((student) => student.id));
+    const teamMembersByStudent = new Map<string, Array<{ isPrimaryTeam: boolean }>>();
+
+    for (const teamMember of seed.teamMembers ?? []) {
+      const current = teamMembersByStudent.get(teamMember.studentId) ?? [];
+      current.push(teamMember);
+      teamMembersByStudent.set(teamMember.studentId, current);
+    }
+
+    expect((seed.teamMembers ?? []).every((teamMember) => teamIds.has(teamMember.teamId) && studentIds.has(teamMember.studentId))).toBe(true);
+    expect(Array.from(teamMembersByStudent.values()).every((items) => items.filter((item) => item.isPrimaryTeam).length === 1)).toBe(true);
+    expect(allTeams.every((team) => !team.defaultCoachId || coachIds.has(team.defaultCoachId))).toBe(true);
+    expect((seed.events ?? []).every((event) => teamIds.has(event.primaryTeamId ?? "") && coachIds.has(event.ownerCoachId ?? ""))).toBe(true);
+    expect((seed.participants ?? []).every((participant) => eventIds.has(participant.eventId) && studentIds.has(participant.studentId))).toBe(true);
+    expect(allCoaches.every((coach) =>
+      allUsers.some((user) => user.id === coach.userId && user.roles.includes("coach"))
+      && allMemberships.some((membership) => membership.userId === coach.userId && membership.roles.includes("coach")),
+    )).toBe(true);
   });
 });
+
+function countValues(values: Iterable<number>) {
+  const counts = new Map<number, number>();
+  for (const value of values) {
+    counts.set(value, (counts.get(value) ?? 0) + 1);
+  }
+  return counts;
+}
 
 describe("Chongqing Talent elite assessment model", () => {
   it("extracts test items and recommended training projects from the real outline", () => {

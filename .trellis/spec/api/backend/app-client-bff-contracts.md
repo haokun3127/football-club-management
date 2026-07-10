@@ -78,6 +78,70 @@ const selectedDate = "2026-06-28";
 - Smoke scripts may pin fixture dates explicitly, but production page defaults must not duplicate those literals.
 - Static acceptance checks should search page code for duplicated fixture dates and demo identities.
 
+## Scenario: Acceptance Data Identity and Family Privacy
+
+### 1. Scope / Trigger
+
+- Trigger: generating or changing the Chongqing Talent imported-data fixture used by parent/coach app-client smoke.
+- The club-wide fixture size and a signed-in family's visibility are separate contracts. Never simulate a 200-player club by granting one parent access to all 200 players.
+
+### 2. Signatures
+
+- `createCqTalentSyntheticFixture(200)` -> 200 students and four 200-row business tables.
+- `createCqTalentAcceptanceSeed()` -> users, memberships, parent/coach profiles, guardian bindings, teams, events and participants.
+- Stable dev identity: `X-User-Id: user-parent-cq-talent-acceptance`.
+- Privacy boundary: `GET .../parent/children` and `GET .../parent/calendar`.
+
+### 3. Contracts
+
+- The 200-player fixture contains 188 families: 178 single-child, 8 two-child and 2 three-child families, deterministically shuffled for reproducible tests.
+- Every imported student has exactly one primary guardian binding; every generated family has one parent user, active club membership and parent profile.
+- The stable dev parent is one real two-child family. It receives no extra guardian binding and must see only those two children.
+- Every imported student has exactly one primary team; every referenced team, default coach, event owner, participant and account membership must exist.
+- Club-wide 200-player coverage is asserted at the seed/fixture layer. Parent BFF smoke asserts family privacy and must not use child count as a proxy for club size.
+
+### 4. Validation & Error Matrix
+
+- Student without exactly one primary guardian -> fixture contract failure.
+- Parent with more than three bound children -> fixture contract failure.
+- Missing parent user/membership/profile or mismatched phone -> fixture contract failure.
+- Missing team/coach/event/student reference -> fixture contract failure.
+- Dev parent response includes an unrelated student -> parent smoke failure and privacy regression.
+
+### 5. Good/Base/Bad Cases
+
+- Good: the stable dev parent sees two siblings while coach rosters span their assigned teams and the seed still contains 200 students.
+- Base: a single-child generated parent sees one child and only that child's calendar entries.
+- Bad: add a non-primary guardian binding from the stable dev parent to every imported student so a smoke can count to 200.
+
+### 6. Tests Required
+
+- Fixture test asserts 200 students, four 200-row tables and exact `178/8/2` family-size counts.
+- Seed test asserts one guardian per student, at most three students per parent, unique parent accounts/phones and valid user-membership-profile chains.
+- Seed test asserts primary-team uniqueness and referential integrity for teams, coaches, events and participants.
+- App-client smoke asserts stable parent `children.length === 2`, calendar returns both siblings and no unrelated child identifiers, while coach write flows remain green.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```typescript
+guardianBindings.push(...students.map((student) => ({
+  studentId: student.id,
+  parentId: "parent-cq-talent-acceptance",
+})));
+```
+
+#### Correct
+
+```typescript
+guardianBindings.push(...students.map((student) => ({
+  studentId: student.id,
+  parentId: familyParentIds.get(student.familyId)!,
+  isPrimaryContact: true,
+})));
+```
+
 ## Scenario: Coach Task Workbench
 
 ### 1. Scope / Trigger

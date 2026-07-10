@@ -54,20 +54,18 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
   const families = fixture.families;
   const tableRows = fixture.tables;
   const importedCoaches = fixture.coaches.filter((coach) => coach.name !== "陈教练");
-  const familyUserIds = new Map(families.map((family) => [family.id, `user-parent-${family.id}`]));
-  const familyParentIds = new Map(families.map((family) => [family.id, `parent-${family.id}`]));
+  const acceptanceFamilyId = families[0]!.id;
+  const familyUserIds = new Map(families.map((family) => [
+    family.id,
+    family.id === acceptanceFamilyId ? acceptanceParentUserId : `user-parent-${family.id}`,
+  ]));
+  const familyParentIds = new Map(families.map((family) => [
+    family.id,
+    family.id === acceptanceFamilyId ? acceptanceParentId : `parent-${family.id}`,
+  ]));
 
   return {
     users: [
-      {
-        id: acceptanceParentUserId,
-        displayName: "重庆天才验收家长",
-        phone: "13900000000",
-        roles: ["parent" as const],
-        status: "active" as const,
-        createdAt: now,
-        updatedAt: now,
-      },
       ...importedCoaches.map((coach) => ({
         id: `user-${coachIdByName.get(coach.name) ?? coach.id}`,
         displayName: coach.name,
@@ -88,15 +86,6 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
       })),
     ],
     clubMemberships: [
-      {
-        id: `club-member-${acceptanceParentUserId}`,
-        clubId,
-        userId: acceptanceParentUserId,
-        roles: ["parent" as const],
-        status: "active" as const,
-        createdAt: now,
-        updatedAt: now,
-      },
       ...importedCoaches.map((coach) => ({
         id: `club-member-${coachIdByName.get(coach.name) ?? coach.id}`,
         clubId,
@@ -116,36 +105,25 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
         updatedAt: now,
       })),
     ],
-    parents: [
-      {
-        id: acceptanceParentId,
-        clubId,
-        userId: acceptanceParentUserId,
-        name: "重庆天才验收家长",
-        phone: "13900000000",
-        createdAt: now,
-        updatedAt: now,
-      },
-      ...families.map((family) => ({
-        id: familyParentIds.get(family.id)!,
-        clubId,
-        userId: familyUserIds.get(family.id)!,
-        name: family.parentName,
-        phone: family.phone,
-        createdAt: now,
-        updatedAt: now,
-      })),
-    ],
+    parents: families.map((family) => ({
+      id: familyParentIds.get(family.id)!,
+      clubId,
+      userId: familyUserIds.get(family.id)!,
+      name: family.parentName,
+      phone: family.phone,
+      createdAt: now,
+      updatedAt: now,
+    })),
     coaches: importedCoaches.map((coach) => ({
-        id: coachIdByName.get(coach.name) ?? coach.id,
-        clubId,
-        userId: `user-${coachIdByName.get(coach.name) ?? coach.id}`,
-        name: coach.name,
-        specialties: ["重庆天才导入数据", ...coach.teams],
-        status: "active" as const,
-        createdAt: now,
-        updatedAt: now,
-      })),
+      id: coachIdByName.get(coach.name) ?? coach.id,
+      clubId,
+      userId: `user-${coachIdByName.get(coach.name) ?? coach.id}`,
+      name: coach.name,
+      specialties: ["重庆天才导入数据", ...coach.teams],
+      status: "active" as const,
+      createdAt: now,
+      updatedAt: now,
+    })),
     teams: Array.from(teamIdByName.entries())
       .filter(([name]) => name !== "U10发展队")
       .map(([name, id]) => ({
@@ -170,28 +148,16 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
       createdAt: now,
       updatedAt: now,
     })),
-    guardianBindings: [
-      ...students.map((student, index) => ({
-        id: `guardian-cq-talent-import-${String(index + 1).padStart(3, "0")}`,
-        clubId,
-        studentId: student.id,
-        parentId: familyParentIds.get(student.familyId)!,
-        relationship: (families.find((family) => family.id === student.familyId)?.relationship ?? "guardian") as "father" | "mother" | "guardian",
-        isPrimaryContact: true,
-        createdAt: now,
-        updatedAt: now,
-      })),
-      ...students.map((student, index) => ({
-        id: `guardian-cq-talent-acceptance-${String(index + 1).padStart(3, "0")}`,
-        clubId,
-        studentId: student.id,
-        parentId: acceptanceParentId,
-        relationship: "other" as const,
-        isPrimaryContact: false,
-        createdAt: now,
-        updatedAt: now,
-      })),
-    ],
+    guardianBindings: students.map((student, index) => ({
+      id: `guardian-cq-talent-import-${String(index + 1).padStart(3, "0")}`,
+      clubId,
+      studentId: student.id,
+      parentId: familyParentIds.get(student.familyId)!,
+      relationship: (families.find((family) => family.id === student.familyId)?.relationship ?? "guardian") as "father" | "mother" | "guardian",
+      isPrimaryContact: true,
+      createdAt: now,
+      updatedAt: now,
+    })),
     teamMembers: students.flatMap((student, studentIndex) => student.teamMemberships.map((membership, membershipIndex) => ({
       id: `team-member-cq-talent-import-${String(studentIndex + 1).padStart(3, "0")}-${membershipIndex + 1}`,
       clubId,

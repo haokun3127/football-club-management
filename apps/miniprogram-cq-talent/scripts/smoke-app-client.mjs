@@ -53,10 +53,10 @@ async function expectParentRead(clientId) {
     userId: parentUserId,
   });
   const children = arrayOf(childrenResponse.children, childrenResponse.students);
-  assertEqual(children.length, 200, "parent children count");
+  assertEqual(children.length, 2, "acceptance family children count");
   const studentId = children[0]?.id ?? children[0]?.studentId;
   assert(studentId, "parent first student id missing");
-  pass("parent.children", `${children.length} students, first=${studentId}`);
+  pass("parent.children", `${children.length} siblings, first=${studentId}`);
 
   const home = await request(`/clubs/${clubId}/app-clients/${clientId}/parent/students/${studentId}/home`, {
     userId: parentUserId,
@@ -74,9 +74,18 @@ async function expectParentRead(clientId) {
     userId: parentUserId,
   });
   const familyEvents = arrayOf(calendar.events);
+  const calendarChildren = arrayOf(calendar.children);
+  const expectedChildIds = new Set(children.map((child) => child.id ?? child.studentId));
+  const visibleChildIds = new Set(familyEvents.flatMap((event) => [
+    ...arrayOf(event.childIds),
+    ...arrayOf(event.children).map((child) => child.id ?? child.studentId),
+  ]));
   assert(familyEvents.length > 0, "parent family calendar should include aggregated events");
+  assertEqual(calendarChildren.length, children.length, "family calendar children count");
   assert(arrayOf(familyEvents[0]?.children).length > 0 || arrayOf(familyEvents[0]?.childIds).length > 0, "family calendar event should include child binding");
-  pass("parent.calendar", `${familyEvents.length} aggregated events`);
+  assert(Array.from(expectedChildIds).every((childId) => visibleChildIds.has(childId)), "family calendar should include both siblings without unrelated children");
+  assert(Array.from(visibleChildIds).every((childId) => expectedChildIds.has(childId)), "family calendar must not expose unrelated children");
+  pass("parent.calendar", `${familyEvents.length} events across ${visibleChildIds.size} siblings`);
 
   const growth = await request(`/clubs/${clubId}/app-clients/${clientId}/parent/students/${studentId}/growth-summary`, {
     userId: parentUserId,
