@@ -217,3 +217,38 @@ Migrated Figma Contract Tokens and shared native mini-program components; aligne
 ### Next Steps
 
 - None - task complete
+
+
+## Session 7: CQ Talent parent UI alignment
+
+**Date**: 2026-07-11
+**Task**: CQ Talent parent UI alignment
+**Package**: api
+**Branch**: `codex/chongqing-talent-business`
+
+### Summary
+
+Aligned all parent mini-program routes to the current Figma style, enforced family privacy, added real lesson and insurance fixture data, and completed DevTools automated acceptance.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `ced0b2c` | (see git log) |
+| `841f5ef` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
