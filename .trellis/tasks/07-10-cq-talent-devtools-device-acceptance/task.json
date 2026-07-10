@@ -1,0 +1,31 @@
+{
+  "id": "cq-talent-devtools-device-acceptance",
+  "name": "cq-talent-devtools-device-acceptance",
+  "title": "重庆天才小程序Figma全页面对齐与真机验收",
+  "description": "以完整Figma文件为基线完善当前小程序全部页面、补齐战术板MVP并完成DevTools与真机验收",
+  "status": "planning",
+  "dev_type": null,
+  "scope": "miniprogram-ui-parent-coach-tactical-board-acceptance",
+  "package": "api",
+  "priority": "P0",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-07-10",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "codex/chongqing-talent-business",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [
+    "07-10-cq-talent-tactical-board-mvp",
+    "07-10-cq-talent-coach-ui-alignment",
+    "07-10-cq-talent-parent-ui-alignment",
+    "07-10-cq-talent-ui-foundation"
+  ],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {}
+}
