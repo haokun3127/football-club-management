@@ -29,4 +29,4 @@
 - No backend model changes.
 - No WPS import changes.
 - No admin API calls from the mini-program.
-- No git commit from this task.
+- Commit and archive through the required Trellis Phase 3 workflow after validation.

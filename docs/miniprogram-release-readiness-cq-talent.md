@@ -9,7 +9,7 @@
 - 本地开发后端 API：`apps/api`
 - 总控导入的真实测试数据，目标为 200 人测试数据
 
-不使用 `club-demo`、`demoClubId`、`Demo Football`。不提交 git，由总控统一验收和提交。
+不使用 `club-demo`、`demoClubId`、`Demo Football`。代码按 Trellis 任务流程由总控统一验收、提交和归档。
 
 ## 2. 运行链路
 
@@ -125,14 +125,14 @@ sqlite3 /tmp/fcm-cq-talent-smoke.sqlite \
 
 ## 7. P0 后端交付清单
 
-以下缺口需要 F/总控安排后端补齐，小程序前端已预留入口和状态：
+P0 BFF 当前交付状态如下；已完成项继续由 smoke 回归，生产登录仍需 connector：
 
 | P0 BFF | 建议路径 | 前端入口 | 验收标准 |
 | --- | --- | --- | --- |
-| 微信登录 + 手机号匹配 | `POST /clubs/:clubId/app-clients/:clientId/wechat-login` | 启动/登录绑定 | 返回 session、role、profile、children/capabilities；失败不进入业务页 |
-| 家庭聚合日程 | `GET /clubs/:clubId/app-clients/:clientId/parent/calendar?from=&to=` | 家长日程 | 多孩子家庭日程一次返回，按绑定权限裁剪 |
-| 训练内容树 | `GET /clubs/:clubId/app-clients/:clientId/coach/training-project-tree` | 训练管理 | 返回核心能力 -> 二级 -> 三级 -> 推荐训练项目 |
-| 训练内容保存 | `PUT /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/training-projects` | 训练管理 | 保存本活动训练内容，支持后续覆盖预览 |
+| 微信登录 + 手机号匹配 | `POST /clubs/:clubId/app-clients/:clientId/wechat-login` | 启动/登录绑定 | 未完成：缺生产微信 connector；dev 身份仅用于本地验收 |
+| 家庭聚合日程 | `GET /clubs/:clubId/app-clients/:clientId/parent/calendar?from=&to=` | 家长日程 | 已完成：200 人数据 smoke 返回 9 个聚合活动 |
+| 训练内容树 | `GET /clubs/:clubId/app-clients/:clientId/coach/training-project-tree` | 训练管理 | 已完成：前端可读取并选择训练项目 |
+| 训练内容保存 | `PUT /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/training-projects` | 训练管理 | 已完成：隔离 smoke 保存 2 个训练项目 |
 
 ## 8. 发布前准备状态
 
@@ -140,8 +140,8 @@ sqlite3 /tmp/fcm-cq-talent-smoke.sqlite \
 | --- | --- | --- |
 | 小程序 typecheck | 已通过 | 保持每次改动后运行 |
 | 小程序 app-client smoke | 已固化为 `pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client` | 后端补 P0 或页面改动后复跑 |
-| DevTools CLI 登录 | 已通过 | 用真机预览复验 |
-| DevTools open/preview | 已固化为 `pnpm --filter @football-club/miniprogram-cq-talent devtools:preview`，已通过 | 真机预览复验 |
+| DevTools CLI 登录 | 2026-06-28 已通过；2026-07-10 复验为未登录 | 登录开发者工具后重跑 |
+| DevTools open/preview | 2026-06-28 已通过；当前受 CLI 未登录阻塞 | 登录后运行 `devtools:preview` 并做真机复验 |
 | 测试 AppID | 已配置 `wx3df49f3b936ab2ed` | 发布前替换正式 AppID |
 | 合法域名/HTTPS | 未配置 | 后端部署到 HTTPS 后配置微信后台 |
 | 生产登录 | 缺 P0 BFF | 后端补齐 `wechat-login` |
@@ -227,9 +227,18 @@ pnpm --filter @football-club/miniprogram-cq-talent devtools:preview
 
 注意：写入 smoke 会改变当前 sqlite 中的比赛/点名/课时流水。为避免污染长期 dev.sqlite，本轮验证使用 `/tmp/fcm-cq-talent-smoke.sqlite` 全新临时库。若对同一个持久 sqlite 反复 seed，可能触发唯一约束冲突，应重建临时库或补齐持久化 seed 幂等策略。
 
+## 10. 2026-07-10 总控复验
+
+- `pnpm check` 通过：domain 6 个测试文件 / 14 项，API 5 个测试文件 / 53 项。
+- 隔离数据库 `/tmp/fcm-cq-talent-audit-20260710.sqlite` 上的 `smoke:app-client` 通过 16 项。
+- 家长链路：200 名绑定学员、9 个家庭聚合活动、成长数据读取成功。
+- 教练链路：25 人 roster、点名、销课确认/纠正、训练项目保存、比赛进球/助攻事件、62 项评测提交均通过。
+- 静态搜索未发现旧 mock 登录文案、`club-demo` 或演示姓名。
+- 微信 DevTools CLI 当前 `login=false`，因此本轮未重复生成 preview 码；保留 2026-06-28 的成功记录，不将历史结果冒充本轮结果。
+
 ### 当前未完成项
 
 - 真机手工点击验收还需用户在 DevTools/预览码中完成；当前 Computer Use 无法获取 Wechat Devtools 窗口，`screencapture` 输出黑屏，无法由 Codex 直接提供视觉截图证据。
-- P0 后端剩余：生产 `wechat-login`、家庭聚合日程、训练内容树、训练内容保存。
-- 比赛录入已有最小摘要表单；球员事件/点评/战术板仍需继续完善。
+- P0 后端只剩生产 `wechat-login` connector；家庭聚合日程、训练内容树和训练内容保存已经完成。
+- 比赛录入已有摘要和球员事件；球员点评、战术板属于后续 P1/P2 范围。
 - 评测录入已有手动完整提交；单格自动保存、缺测、任务分配仍需 assessment-task BFF。

@@ -19,13 +19,13 @@
 
 ## Acceptance Criteria
 
-- [ ] 启动页无可见“家长 mock 登录/教练 mock 登录”按钮。
-- [ ] 页面模板和主 UI 不再硬编码演示学员/教练姓名。
-- [ ] dev 家长身份进入家长三 Tab；dev 教练身份进入教练三 Tab。
-- [ ] 真实 BFF 可用时，家长孩子、日程、成长雷达和教练课表/活动 workbench 从接口读取。
-- [ ] BFF 不可用或缺失时显示合规 loading/empty/error/pending 状态，不伪造业务结果。
-- [ ] 类型检查通过；微信开发者工具 CLI 可 open/preview。
-- [ ] 开发完成后使用会话 `019efcb5-8fe3-7951-a534-502d0abff8ce` 导入数据作为主验收数据源进行模拟测试。
+- [x] 启动页无可见“家长 mock 登录/教练 mock 登录”按钮。
+- [x] 页面模板和主 UI 不再硬编码演示学员/教练姓名。
+- [x] dev 家长身份进入家长三 Tab；dev 教练身份进入教练三 Tab。
+- [x] 真实 BFF 可用时，家长孩子、日程、成长雷达和教练课表/活动 workbench 从接口读取。
+- [x] BFF 不可用或缺失时显示合规 loading/empty/error/pending 状态，不伪造业务结果。
+- [x] 类型检查通过；微信开发者工具 CLI 已在 2026-06-28 完成 open/preview，2026-07-10 复验时本机 CLI 未登录。
+- [x] 已使用会话 `019efcb5-8fe3-7951-a534-502d0abff8ce` 导入的 200 人数据作为主验收数据源完成模拟测试。
 
 ## Notes
 
