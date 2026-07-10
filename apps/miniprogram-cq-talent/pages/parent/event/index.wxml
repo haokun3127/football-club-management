@@ -1,34 +1,41 @@
-<view class="page">
-  <status-view state="{{state}}" title="活动详情" message="{{message}}" />
+<view class="event-page event-page--{{detail ? detail.type : 'other'}}">
+  <app-header title="活动详情" show-back="{{true}}" />
+  <view class="event-page__body">
+  <status-view state="{{state}}" title="{{state === 'loading' ? '正在读取活动' : '暂时无法查看'}}" message="{{message}}" action-text="{{state === 'error' ? '重新加载' : ''}}" bindaction="retry" />
 
-  <view wx:if="{{detail}}" class="card hero-card">
-    <view class="row">
+  <view wx:if="{{detail}}" class="event-hero">
+    <view class="event-hero__symbol">{{detail.symbol}}</view>
+    <view class="event-hero__content">
+      <view class="event-hero__eyebrow">{{detail.eyebrow}}</view>
+      <view class="row event-hero__row">
       <view>
-        <view class="title">{{detail.title}}</view>
-        <view class="subtitle">{{detail.type === 'training' ? '训练安排与课后结果' : detail.type === 'match' ? '比赛信息与孩子表现' : '俱乐部活动信息'}}</view>
+        <view class="event-hero__title">{{detail.title}}</view>
+        <view class="event-hero__subtitle">{{detail.subtitle}}</view>
       </view>
-      <view class="tag">{{detail.status}}</view>
+      <status-chip label="{{detail.statusLabel}}" tone="{{detail.statusTone}}" />
+      </view>
     </view>
   </view>
 
-  <view wx:if="{{detail}}" class="card">
-    <view class="section-title">基本信息</view>
+  <view wx:if="{{detail}}" class="detail-card detail-card--overview">
+    <view class="detail-card__head"><view class="detail-card__icon">i</view><view><view class="section-title">基本信息</view><view class="detail-card__hint">{{detail.typeLabel}}安排</view></view></view>
     <view wx:for="{{detail.fields}}" wx:key="label" class="field-row">
       <view class="label">{{item.label}}</view>
       <view class="field-value">{{item.value}}</view>
     </view>
   </view>
 
-  <view wx:if="{{detail}}" wx:for="{{detail.sections}}" wx:key="title" class="card">
-    <view class="section-title">{{item.title}}</view>
+  <view wx:if="{{detail}}" wx:for="{{detail.sections}}" wx:key="title" class="detail-card detail-card--section">
+    <view class="detail-card__head"><view class="detail-card__icon">{{index + 1}}</view><view class="section-title">{{item.title}}</view></view>
     <view wx:for="{{item.items}}" wx:key="label" wx:for-item="sub" class="field-row">
       <view class="label">{{sub.label}}</view>
       <view class="field-value">{{sub.value}}</view>
     </view>
   </view>
 
-  <view wx:if="{{detail}}" wx:for="{{detail.pending}}" wx:key="title" class="card">
+  <view wx:if="{{detail}}" wx:for="{{detail.pending}}" wx:key="title" class="detail-card detail-card--pending">
     <view class="section-title">{{item.title}}</view>
     <view class="subtitle">{{item.message}}</view>
+  </view>
   </view>
 </view>

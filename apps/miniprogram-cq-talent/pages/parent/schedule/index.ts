@@ -2,23 +2,31 @@ import { getParentCalendar, getParentChildren } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { DEV_MODE, DEV_TEST_DATE } from "../../../utils/config";
 import { openPage } from "../../../utils/navigation";
+import { activityStatus, childNames, formatCalendarDate, formatTimeRange } from "../../../utils/presentation";
 import { setCurrentStudentId } from "../../../utils/store";
 import type { LoadState, ScheduleEvent, StudentSummary } from "../../../utils/types";
+
+type ScheduleEventView = ScheduleEvent & {
+  timeLabel: string;
+  statusLabel: string;
+  statusTone: string;
+  description: string;
+  meta: Array<{ label: string; value: string }>;
+};
 
 interface PageData {
   state: LoadState;
   message: string;
   children: StudentSummary[];
-  childOptions: Array<{ id: string; name: string }>;
-  childIndex: number;
   activeStudentId: string;
   activeStudentName: string;
   events: ScheduleEvent[];
-  visibleEvents: ScheduleEvent[];
+  visibleEvents: ScheduleEventView[];
   selectedDate: string;
+  selectedDateLabel: string;
   selectedType: "all" | ScheduleEvent["type"];
   typeTabs: Array<{ label: string; value: "all" | ScheduleEvent["type"] }>;
-  dateOptions: Array<{ date: string; day: string; count: number }>;
+  dateOptions: Array<{ date: string; day: string; weekday: string; count: number }>;
 }
 
 const typeTabs: PageData["typeTabs"] = [
@@ -35,13 +43,12 @@ Page<PageData>({
     state: "loading",
     message: "正在读取家庭日程",
     children: [],
-    childOptions: [{ id: "", name: "全部孩子" }],
-    childIndex: 0,
     activeStudentId: "",
     activeStudentName: "",
     events: [],
     visibleEvents: [],
     selectedDate: initialDate,
+    selectedDateLabel: formatCalendarDate(initialDate),
     selectedType: "all",
     typeTabs,
     dateOptions: [],
@@ -61,39 +68,37 @@ Page<PageData>({
       }
       const events = await getParentCalendar(dateWindowStart(this.data.selectedDate), dateWindowEnd(this.data.selectedDate));
       const active = children.find((child) => child.id === this.data.activeStudentId);
-      const visibleEvents = filterEvents(events, this.data.activeStudentId, this.data.selectedDate, this.data.selectedType);
+      const visibleEvents = presentEvents(filterEvents(events, this.data.activeStudentId, this.data.selectedDate, this.data.selectedType));
       this.setData({
         state: visibleEvents.length ? "ready" : "empty",
         message: visibleEvents.length ? "" : "当前筛选条件暂无活动安排。",
         children,
-        childOptions: [{ id: "", name: "全部孩子" }, ...children.map((child) => ({ id: child.id, name: child.name }))],
-        childIndex: active ? children.findIndex((child) => child.id === active.id) + 1 : 0,
         activeStudentId: active?.id ?? "",
         activeStudentName: active?.name ?? "全部孩子",
         events,
         visibleEvents,
+        selectedDateLabel: formatCalendarDate(this.data.selectedDate),
         dateOptions: buildDateOptions(this.data.selectedDate, events),
       });
     } catch (error) {
       this.setData({ state: "error", message: readableError(error) });
     }
   },
-  onChildChange(event: { detail: { value: string | number } }) {
-    const childIndex = Number(event.detail.value);
-    const option = this.data.childOptions[childIndex];
-    if (!option) return;
-    if (option.id) setCurrentStudentId(option.id);
-    this.setData({ childIndex, activeStudentId: option.id, activeStudentName: option.name });
+  onChildChange(event: { detail: { studentId: string } }) {
+    const id = event.detail.studentId === "all" ? "" : event.detail.studentId;
+    const child = this.data.children.find((item: StudentSummary) => item.id === id);
+    if (id) setCurrentStudentId(id);
+    this.setData({ activeStudentId: id, activeStudentName: child?.name ?? "全部孩子" });
     this.applyFilters();
   },
   onDateChange(event: { detail: { value: string } }) {
-    this.setData({ selectedDate: event.detail.value });
+    this.setData({ selectedDate: event.detail.value, selectedDateLabel: formatCalendarDate(event.detail.value) });
     this.load();
   },
   selectDate(event: { currentTarget: { dataset: { date?: string } } }) {
     const date = event.currentTarget.dataset.date;
     if (!date || date === this.data.selectedDate) return;
-    this.setData({ selectedDate: date });
+    this.setData({ selectedDate: date, selectedDateLabel: formatCalendarDate(date) });
     this.applyFilters();
   },
   switchType(event: { currentTarget: { dataset: { type?: PageData["selectedType"] } } }) {
@@ -103,15 +108,15 @@ Page<PageData>({
     this.applyFilters();
   },
   applyFilters() {
-    const visibleEvents = filterEvents(this.data.events, this.data.activeStudentId, this.data.selectedDate, this.data.selectedType);
+    const visibleEvents = presentEvents(filterEvents(this.data.events, this.data.activeStudentId, this.data.selectedDate, this.data.selectedType));
     this.setData({
       visibleEvents,
       state: visibleEvents.length ? "ready" : "empty",
       message: visibleEvents.length ? "" : "当前筛选条件暂无活动安排。",
     });
   },
-  openEvent(event: { currentTarget: { dataset: { id?: string } } }) {
-    const id = event.currentTarget.dataset.id;
+  openEvent(event: { detail?: { eventId?: string }; currentTarget?: { dataset?: { id?: string } } }) {
+    const id = event.detail?.eventId || event.currentTarget?.dataset?.id;
     if (id) openPage(`/pages/parent/event/index?id=${id}`);
   },
   retry() {
@@ -137,6 +142,7 @@ function buildDateOptions(start: string, events: ScheduleEvent[]) {
     return {
       date: key,
       day: `${date.getUTCMonth() + 1}/${date.getUTCDate()}`,
+      weekday: ["日", "一", "二", "三", "四", "五", "六"][date.getUTCDay()],
       count: events.filter((event) => event.startsAt.slice(0, 10) === key).length,
     };
   });
@@ -148,8 +154,25 @@ function dateWindowStart(date: string) {
 
 function dateWindowEnd(date: string) {
   const base = new Date(`${date || initialDate}T00:00:00.000Z`);
-  base.setUTCDate(base.getUTCDate() + 7);
+  base.setUTCDate(base.getUTCDate() + 6);
   return base.toISOString().slice(0, 10);
+}
+
+function presentEvents(events: ScheduleEvent[]): ScheduleEventView[] {
+  return events.map((event) => {
+    const status = activityStatus(event.status);
+    return {
+      ...event,
+      timeLabel: formatTimeRange(event.startsAt, event.endsAt),
+      statusLabel: status.label,
+      statusTone: status.tone,
+      description: event.summary || "",
+      meta: [
+        { label: "孩子", value: childNames(event) },
+        { label: "队伍", value: event.teamName || "待确认" },
+      ],
+    };
+  });
 }
 
 function currentLocalDate() {

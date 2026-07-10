@@ -110,3 +110,19 @@
 - 当前 15 个路由中，Attendance 可接近逐屏还原；其余核心路由均需在保留新业务结构的前提下适配。
 - Figma 中额外的状态/页面不应一次性补齐；其中大多数依赖当前明确不做的业务模型。
 - 推荐先完成 UI-1，再并行按家长/教练域推进 UI-2/UI-3，最后恢复当前 DevTools 验收任务作为集成门槛。
+
+## 8. UI-2 实施回写（2026-07-11）
+
+家长端没有覆盖原始 P 系列画板，而是在完整文件 `05 Parent Generated` 中新增代码对齐基线，便于持续比较“原设计意图”和“当前可运行产品”。新增画板均为 375×812，并复用现有 AppHeader、RoleTabBar、StudentSwitcher、ActivityCard、InfoCard、ListRow、MetricCard 和 RadarPanel：
+
+| 代码路由/状态 | Figma 代码对齐画板 | 节点 | 最终处理 |
+| --- | --- | --- | --- |
+| 家庭日程（全部孩子） | `CODE / P1 Family Schedule` | `222:86` | 适配重构；默认全部孩子、7 天范围、家庭活动数量和三类卡片 |
+| 训练活动详情 | `CODE / P2 Training Detail` | `222:87` | 适配重构；训练内容、关联能力、出勤、课时、课后摘要 |
+| 比赛活动详情 | `CODE / P2.1 Match Detail` | `222:88` | 适配重构；赛前信息、比分、比赛过程、孩子表现和事件来源 |
+| 其他活动详情 | `CODE / P2.2 Other Detail` | `222:89` | 适配重构；活动说明、参与状态、变更通知和负责教练 |
+| 成长/雷达 | `CODE / P4 Growth & Radar` | `222:90` | 适配重构；同一 metricId 驱动雷达、指标选择、摘要和详情入口 |
+| 指标详情 | `CODE / P6 Metric Detail` | `222:91` | 适配重构；真实时间轴、同龄平均、趋势和来源活动，无 TOP 假排名 |
+| 我的孩子 | `CODE / P7 Child Hub` | `222:92` | 适配重构；档案、课时、保险和俱乐部服务，隐藏私教与账号假入口 |
+
+实施中发现现有 Figma 组件集虽然声明了 TEXT component properties，但内部 TextNode 未绑定对应 property reference。代码对齐画板因此保留组件实例关系，并对实例文本做受控 override；后续应在设计系统任务中修复组件主定义，而不是在业务画板重复维护占位文字。

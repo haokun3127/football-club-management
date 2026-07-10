@@ -719,20 +719,22 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return context.sendError(reply, 404, "not_found", "Event not found");
       }
 
+      let visibleEvent = event;
       if (role === "parent" && auth) {
-        const canReadEvent = (event.participants ?? []).some((participant) =>
+        const visibleParticipants = (event.participants ?? []).filter((participant) =>
           context.store.isGuardianOfStudent(request.params.clubId, auth.user.id, participant.studentId),
         );
-        if (!canReadEvent) {
+        if (!visibleParticipants.length) {
           return context.sendError(reply, 403, "forbidden", "Event is not accessible for this parent membership");
         }
+        visibleEvent = { ...event, participants: visibleParticipants };
       }
 
       return {
         clubId: request.params.clubId,
         client: summarizeClient(client),
         role,
-        event,
+        event: visibleEvent,
       };
     },
   );

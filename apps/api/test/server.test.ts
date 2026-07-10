@@ -258,6 +258,7 @@ describe("api server", () => {
         participants: expect.arrayContaining([expect.objectContaining({ studentId: "student-1" })]),
       }),
     }));
+    expect(eventBody.event.participants.every((participant) => participant.studentId === "student-1")).toBe(true);
     expect(parentUsingAdminClient.statusCode).toBe(403);
     expect(parentUsingAdminClient.json().error.code).toBe("forbidden");
     expect(parentOtherStudent.statusCode).toBe(403);

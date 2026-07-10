@@ -3,7 +3,7 @@
   "name": "cq-talent-parent-ui-alignment",
   "title": "重庆天才家长端Figma全页面对齐",
   "description": "完成家长端全部现有路由的Figma风格对齐并保持家庭隐私与指标下钻",
-  "status": "planning",
+  "status": "in_progress",
   "dev_type": null,
   "scope": "miniprogram-parent-pages-figma-alignment",
   "package": "api",

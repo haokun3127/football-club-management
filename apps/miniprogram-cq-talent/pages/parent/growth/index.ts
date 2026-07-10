@@ -1,6 +1,7 @@
 import { getParentChildren, getParentGrowth, getParentMetricDetail } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
+import { formatDateTime } from "../../../utils/presentation";
 import { setCurrentStudentId } from "../../../utils/store";
 import type { GrowthSummary, LoadState, MetricDetail, RadarMetricPoint, StudentSummary } from "../../../utils/types";
 
@@ -18,6 +19,10 @@ Page({
     selectedDetail: null as MetricDetail | null,
     detailState: "idle" as LoadState,
     detailCache: {} as Record<string, MetricDetail>,
+    canDrawRadar: false,
+    updatedAtLabel: "",
+    latestLabel: "",
+    trendLabel: "等待更多记录",
   },
   onLoad() {
     this.load();
@@ -50,14 +55,18 @@ Page({
         selectedMetric,
         selectedDetail: null,
         detailCache: {},
+        canDrawRadar: radar.length >= 3,
+        updatedAtLabel: growth.updatedAt ? formatDateTime(growth.updatedAt) : "随训练和评测持续更新",
+        latestLabel: "",
+        trendLabel: "等待更多记录",
       });
       if (selectedMetric) await this.loadMetricDetail(selectedMetric.metricId);
     } catch (error) {
       this.setData({ state: "error", message: readableError(error) });
     }
   },
-  switchChild(event: { currentTarget: { dataset: { id?: string } } }) {
-    const id = event.currentTarget.dataset.id;
+  switchChild(event: { detail: { studentId: string } }) {
+    const id = event.detail.studentId;
     if (!id || id === this.data.activeStudentId) return;
     setCurrentStudentId(id);
     this.load();
@@ -67,7 +76,7 @@ Page({
     if (!this.data.growth) return;
     const radar = radarForView(this.data.growth, viewIndex);
     const selectedMetric = radar[0] ?? null;
-    this.setData({ viewIndex, radar, selectedMetricId: selectedMetric?.metricId ?? "", selectedMetric, selectedDetail: null });
+    this.setData({ viewIndex, radar, selectedMetricId: selectedMetric?.metricId ?? "", selectedMetric, selectedDetail: null, canDrawRadar: radar.length >= 3, latestLabel: "", trendLabel: "等待更多记录" });
     if (selectedMetric) this.loadMetricDetail(selectedMetric.metricId);
   },
   selectMetric(event: { detail?: { metricId?: string }; currentTarget?: { dataset?: { id?: string } } }) {
@@ -80,16 +89,29 @@ Page({
   async loadMetricDetail(metricId: string) {
     const cached = this.data.detailCache[metricId];
     if (cached) {
-      this.setData({ selectedDetail: cached, detailState: "ready" });
+      this.applyMetricDetail(cached);
       return;
     }
     this.setData({ detailState: "loading", selectedDetail: null });
     try {
       const detail = await getParentMetricDetail(this.data.activeStudentId, metricId);
-      this.setData({ selectedDetail: detail, detailState: "ready", detailCache: { ...this.data.detailCache, [metricId]: detail } });
+      if (this.data.selectedMetricId === metricId) {
+        this.applyMetricDetail(detail, metricId);
+      } else {
+        this.setData({ detailCache: { ...this.data.detailCache, [metricId]: detail } });
+      }
     } catch (_error) {
       this.setData({ detailState: "error", selectedDetail: null });
     }
+  },
+  applyMetricDetail(detail: MetricDetail, metricId?: string) {
+    this.setData({
+      selectedDetail: detail,
+      detailState: "ready",
+      latestLabel: detail.latest?.occurredAt ? formatDateTime(detail.latest.occurredAt) : "暂无记录",
+      trendLabel: metricTrend(detail),
+      detailCache: metricId ? { ...this.data.detailCache, [metricId]: detail } : this.data.detailCache,
+    });
   },
   openMetricDetail() {
     if (this.data.selectedMetricId) {
@@ -110,4 +132,14 @@ function radarForView(growth: GrowthSummary, viewIndex: number) {
 function readableError(error: unknown) {
   const record = error as { message?: string; code?: string };
   return record?.message || record?.code || "成长数据读取失败。";
+}
+
+function metricTrend(detail: MetricDetail) {
+  const current = detail.records[0]?.value;
+  const previous = detail.records[1]?.value;
+  if (current === undefined || previous === undefined) return "等待更多记录";
+  const delta = Number((current - previous).toFixed(1));
+  if (delta > 0) return `较上次提升 ${delta}${detail.unit || ""}`;
+  if (delta < 0) return `较上次变化 ${delta}${detail.unit || ""}`;
+  return "与上次持平";
 }

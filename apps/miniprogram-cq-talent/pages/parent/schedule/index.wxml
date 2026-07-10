@@ -1,35 +1,23 @@
-<view class="page">
-  <view class="card hero-card">
+<view class="schedule-page">
+  <app-header title="家庭日程" subtitle="训练、比赛与俱乐部活动" />
+  <view class="schedule-page__body">
+    <view class="scope-block">
+      <view class="scope-block__label">查看范围</view>
+      <student-switcher students="{{children}}" selected-id="{{activeStudentId || 'all'}}" show-all="{{true}}" bindchange="onChildChange" />
+    </view>
+
+  <view class="calendar-panel">
     <view class="row">
       <view>
-        <view class="title">家庭日程</view>
-        <view class="subtitle">训练、比赛和俱乐部活动</view>
+        <view class="calendar-panel__date">{{selectedDateLabel}}</view>
+        <view class="subtitle">{{activeStudentName}} · 当天 {{visibleEvents.length}} 项安排</view>
       </view>
-      <view class="tag">提醒待接入</view>
+      <picker mode="date" value="{{selectedDate}}" bindchange="onDateChange"><view class="calendar-button">选择日期</view></picker>
     </view>
-  </view>
-
-  <view class="card">
-    <view class="section-title">查看范围</view>
-    <picker mode="selector" range="{{childOptions}}" range-key="name" value="{{childIndex}}" bindchange="onChildChange">
-      <view class="child-picker">{{activeStudentName}} <text class="picker-hint">点击切换</text></view>
-    </picker>
-  </view>
-
-  <view class="card">
-    <view class="row">
-      <view>
-        <view class="section-title">{{selectedDate}}</view>
-        <view class="subtitle">{{activeStudentName}}｜当天 {{visibleEvents.length}} 项安排</view>
-      </view>
-      <view class="tag muted">只读</view>
-    </view>
-    <picker mode="date" value="{{selectedDate}}" bindchange="onDateChange">
-      <view class="date-picker">切换日期：{{selectedDate}}</view>
-    </picker>
     <scroll-view scroll-x class="date-strip" enhanced show-scrollbar="{{false}}">
       <view class="date-strip-inner">
         <view wx:for="{{dateOptions}}" wx:key="date" class="date-chip {{selectedDate === item.date ? 'active' : ''}}" data-date="{{item.date}}" bindtap="selectDate">
+          <view class="date-weekday">周{{item.weekday}}</view>
           <view>{{item.day}}</view>
           <view class="date-count">{{item.count ? item.count + '项' : '无安排'}}</view>
         </view>
@@ -54,23 +42,9 @@
     bindaction="retry"
   />
 
-  <view wx:if="{{state === 'ready'}}">
-    <view wx:for="{{visibleEvents}}" wx:key="id" class="card event-card" bindtap="openEvent" data-id="{{item.id}}">
-      <view class="row">
-        <view class="section-title">{{item.title}}</view>
-        <view class="tag">{{item.status}}</view>
-      </view>
-      <view class="subtitle">
-        <block wx:if="{{item.children && item.children.length}}">
-          <block wx:for="{{item.children}}" wx:key="id" wx:for-item="child">{{child.name}} </block>
-        </block>
-        <block wx:else>{{item.studentName || '家庭活动'}}</block>
-        ｜{{item.teamName || '队伍待同步'}}
-      </view>
-      <view class="subtitle">{{item.startsAt}} <text wx:if="{{item.endsAt}}">- {{item.endsAt}}</text></view>
-      <view class="subtitle">{{item.venue}}</view>
-    </view>
+  <view wx:if="{{state === 'ready'}}" class="event-list">
+    <activity-card wx:for="{{visibleEvents}}" wx:key="id" event-id="{{item.id}}" type="{{item.type}}" title="{{item.title}}" time="{{item.timeLabel}}" venue="{{item.venue}}" description="{{item.description}}" status-label="{{item.statusLabel}}" status-tone="{{item.statusTone}}" meta="{{item.meta}}" bindopen="openEvent" />
   </view>
-
+  </view>
   <role-tabbar role="parent" active="schedule" />
 </view>

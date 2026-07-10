@@ -1,32 +1,41 @@
-<view class="page">
+<view class="metric-page">
+  <app-header title="指标详情" show-back="{{true}}" />
+  <view class="metric-page__body">
   <status-view state="{{state}}" title="{{state === 'loading' ? '加载指标详情' : '暂时无法查看'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
-  <view wx:if="{{detail}}" class="card hero-card">
-    <view class="title">{{detail.label}}</view>
-    <view class="subtitle">{{detail.description || '根据训练、比赛和评测记录持续更新'}}</view>
-    <view class="latest-value">{{detail.latest && detail.latest.value !== undefined ? detail.latest.value : '暂无数据'}} <text class="unit">{{detail.unit}}</text></view>
+  <view wx:if="{{detail}}" class="metric-hero">
+    <view class="metric-hero__eyebrow">能力指标</view>
+    <view class="metric-hero__title">{{detail.label}}</view>
+    <view class="metric-hero__description">{{detail.description || '根据训练、比赛和评测记录持续更新'}}</view>
+    <view class="metric-hero__value">{{latestLabel}}</view>
+    <view class="metric-hero__foot"><view>{{latestDateLabel}}</view><status-chip label="{{trendSummary}}" tone="{{trendTone}}" compact="{{true}}" /></view>
   </view>
 
-  <view wx:if="{{detail}}" class="card">
-    <view class="section-title">变化记录</view>
-    <view wx:if="{{detail.records.length}}" class="trend-list">
-      <view wx:for="{{detail.records}}" wx:key="id" class="trend-row">
-        <view><view class="label strong">{{item.value === undefined ? '未量化' : item.value}} {{detail.unit}}</view><view class="subtitle">{{item.occurredAt}}｜{{item.source}}</view></view>
-        <view class="subtitle">{{item.note}}</view>
+  <view wx:if="{{detail}}" class="metric-card">
+    <view class="section-heading"><view><view class="section-title">变化记录</view><view class="subtitle">按时间查看每次记录与变化</view></view><view class="record-count">{{records.length}} 次</view></view>
+    <view wx:if="{{records.length}}" class="trend-list">
+      <view wx:for="{{records}}" wx:key="id" class="trend-row">
+        <view class="trend-row__axis"><view class="trend-row__dot"></view><view class="trend-row__line"></view></view>
+        <view class="trend-row__content">
+          <view class="row"><view class="trend-row__value">{{item.valueLabel}}</view><status-chip label="{{item.changeLabel}}" tone="{{item.changeTone}}" compact="{{true}}" /></view>
+          <view class="trend-row__meta">{{item.dateLabel}} · {{item.source}}</view>
+          <view wx:if="{{item.note}}" class="trend-row__note">{{item.note}}</view>
+        </view>
       </view>
     </view>
     <view wx:else class="subtitle">暂无可展示的趋势记录。</view>
   </view>
 
-  <view wx:if="{{detail}}" class="card">
+  <view wx:if="{{detail}}" class="metric-card">
     <view class="section-title">数据来源</view>
-    <view wx:if="{{detail.sourceEvents.length}}">
-      <view wx:for="{{detail.sourceEvents}}" wx:key="recordId" class="source-row" data-id="{{item.eventId}}" bindtap="openSourceEvent">
-        <view><view class="label strong">{{item.title}}</view><view class="subtitle">{{item.startsAt}}</view></view><view class="source-link">查看活动</view>
+    <view wx:if="{{sourceEvents.length}}">
+      <view wx:for="{{sourceEvents}}" wx:key="recordId" class="source-row" data-id="{{item.eventId}}" bindtap="openSourceEvent">
+        <view class="source-row__mark">{{item.typeSymbol}}</view><view class="source-row__content"><view class="source-row__title">{{item.title}}</view><view class="subtitle">{{item.typeLabel}} · {{item.startsAtLabel}}</view></view><view class="source-link">查看 ›</view>
       </view>
     </view>
     <view wx:else class="subtitle">当前记录暂无可跳转的活动来源。</view>
   </view>
 
-  <view wx:if="{{detail}}" class="card"><view class="section-title">说明</view><view class="subtitle">这里只展示当前孩子可见的能力结果和来源，不展示内部计算公式或其他学员数据。</view></view>
+  <view wx:if="{{detail}}" class="privacy-note"><view class="privacy-note__icon">✓</view><view><view class="privacy-note__title">孩子数据已保护</view><view class="subtitle">这里只展示当前孩子可见的能力结果与来源。</view></view></view>
+  </view>
 </view>

@@ -1,11 +1,26 @@
-.child-tabs { display: flex; flex-wrap: wrap; gap: 16rpx; }
-.child-tab { padding: 12rpx 20rpx; border-radius: 999rpx; background: #f2f3f5; color: #60646f; font-size: 24rpx; }
-.child-tab.active { background: #fceeef; color: #a80f1b; font-weight: 700; }
+.growth-page { min-height: 100vh; background: #f6f7f9; }
+.growth-page__body { padding: 24rpx 24rpx calc(148rpx + env(safe-area-inset-bottom)); }
+.switcher-block { margin-bottom: 20rpx; }
+.switcher-block__label { margin-bottom: 12rpx; color: #667085; font-size: 22rpx; font-weight: 600; }
+.radar-card,.metric-summary,.info-card { margin-bottom: 20rpx; padding: 24rpx; border: 1rpx solid #e7eaf0; border-radius: 24rpx; background: #fff; box-shadow: 0 8rpx 24rpx rgba(16,24,40,.04); }
+.radar-card { overflow: hidden; border-color: #f7cdd1; background: linear-gradient(180deg,#fff 0%,#fffafa 100%); }
+.radar-card__updated { color: #98a2b3; font-size: 20rpx; }
+.radar-card__hint { color: #667085; font-size: 22rpx; text-align: center; }
 .view-picker { padding: 10rpx 16rpx; border-radius: 999rpx; background: #f2f3f5; color: #60646f; font-size: 22rpx; }
+.radar-placeholder { margin: 28rpx 0; padding: 40rpx 28rpx; border: 1rpx dashed #f7cdd1; border-radius: 20rpx; background: #fff; text-align: center; }
+.radar-placeholder__title { margin-bottom: 8rpx; color: #202124; font-size: 28rpx; font-weight: 700; }
 .metric-scroll { width: 100%; margin-bottom: 20rpx; white-space: nowrap; }
 .metric-chips { display: inline-flex; gap: 12rpx; }
-.metric-chip { padding: 12rpx 18rpx; border-radius: 999rpx; background: #ffffff; color: #60646f; }
+.metric-chip { display: inline-flex; align-items: center; gap: 8rpx; padding: 12rpx 18rpx; border: 1rpx solid #e7eaf0; border-radius: 999rpx; background: #ffffff; color: #60646f; }
 .metric-chip.active { background: #a80f1b; color: #ffffff; }
-.metric-summary { border-color: #ffd6d2; }
+.metric-chip__dot { width: 10rpx; height: 10rpx; border-radius: 50%; background: #d0d5dd; }
+.metric-chip.active .metric-chip__dot { background: #fff; }
+.metric-summary { border-color: #f7cdd1; }
+.metric-summary__eyebrow { margin-bottom: 8rpx; color: #a80f1b; font-size: 21rpx; font-weight: 700; letter-spacing: 2rpx; }
 .metric-value { color: #a80f1b; font-size: 44rpx; font-weight: 700; }
 .metric-summary button { margin-top: 20rpx; }
+.trend-text { color: #237804; font-weight: 600; }
+.inline-error { margin-top: 16rpx; padding: 16rpx; border-radius: 14rpx; background: #fff1f0; color: #b42318; font-size: 22rpx; }
+.timeline-row { display: flex; gap: 16rpx; padding: 8rpx 0 18rpx; }
+.timeline-row__dot { flex: 0 0 16rpx; width: 16rpx; height: 16rpx; margin-top: 10rpx; border: 5rpx solid #fceeef; border-radius: 50%; background: #a80f1b; }
+.timeline-row__title { margin-bottom: 6rpx; color: #202124; font-size: 26rpx; font-weight: 650; }

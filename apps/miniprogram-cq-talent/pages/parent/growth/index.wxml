@@ -1,33 +1,37 @@
-<view class="page">
-  <view class="card hero-card"><view class="title">能力成长</view><view class="subtitle">选择指标查看趋势和来源</view></view>
-
-  <view class="card"><view class="section-title">孩子</view><view class="child-tabs"><view wx:for="{{children}}" wx:key="id" class="child-tab {{activeStudentId === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="switchChild">{{item.name}}</view></view></view>
+<view class="growth-page">
+  <app-header title="能力成长" subtitle="选择指标，查看变化与来源" />
+  <view class="growth-page__body">
+  <view class="switcher-block"><view class="switcher-block__label">当前孩子</view><student-switcher students="{{children}}" selected-id="{{activeStudentId}}" show-all="{{false}}" bindchange="switchChild" /></view>
 
   <status-view state="{{state}}" title="{{state === 'loading' ? '加载成长数据' : state === 'empty' ? '成长数据不足' : '成长数据读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
-  <view wx:if="{{growth}}">
-    <view class="card radar-card">
-      <view class="row"><view class="section-title">能力雷达</view><picker mode="selector" range="{{growth.views}}" range-key="name" value="{{viewIndex}}" bindchange="onViewChange"><view class="view-picker">{{growth.views[viewIndex].name}}⌄</view></picker></view>
-      <radar-canvas metrics="{{radar}}" selectedMetricId="{{selectedMetricId}}" bindmetrictap="selectMetric"></radar-canvas>
-      <view class="subtitle">点击雷达轴点或下方指标切换查看</view>
+  <view wx:if="{{growth}}" class="growth-content">
+    <view class="radar-card">
+      <view class="row"><view><view class="section-title">能力雷达</view><view class="radar-card__updated">{{updatedAtLabel}}</view></view><picker mode="selector" range="{{growth.views}}" range-key="name" value="{{viewIndex}}" bindchange="onViewChange"><view class="view-picker">{{growth.views[viewIndex].name}}⌄</view></picker></view>
+      <radar-canvas wx:if="{{canDrawRadar}}" metrics="{{radar}}" selectedMetricId="{{selectedMetricId}}" bindmetrictap="selectMetric"></radar-canvas>
+      <view wx:else class="radar-placeholder"><view class="radar-placeholder__title">指标正在积累</view><view class="subtitle">至少有 3 项有效指标后绘制雷达图，已有结果仍可在下方查看。</view></view>
+      <view class="radar-card__hint">点击雷达轴点或指标名称切换内容</view>
     </view>
 
-    <scroll-view scroll-x class="metric-scroll" enhanced show-scrollbar="{{false}}"><view class="metric-chips"><view wx:for="{{radar}}" wx:key="metricId" class="metric-chip {{selectedMetricId === item.metricId ? 'active' : ''}}" data-id="{{item.metricId}}" bindtap="selectMetric">{{item.label}}</view></view></scroll-view>
+    <scroll-view scroll-x class="metric-scroll" enhanced show-scrollbar="{{false}}"><view class="metric-chips"><view wx:for="{{radar}}" wx:key="metricId" class="metric-chip {{selectedMetricId === item.metricId ? 'active' : ''}}" data-id="{{item.metricId}}" bindtap="selectMetric"><view class="metric-chip__dot"></view>{{item.label}}</view></view></scroll-view>
 
-    <view wx:if="{{selectedMetric}}" class="card metric-summary">
-      <view class="row"><view><view class="section-title">{{selectedMetric.label}}</view><view class="subtitle">当前能力参考</view></view><view class="metric-value">{{selectedMetric.value}}</view></view>
+    <view wx:if="{{selectedMetric}}" class="metric-summary">
+      <view class="metric-summary__eyebrow">当前指标</view>
+      <view class="row"><view><view class="section-title">{{selectedMetric.label}}</view><view class="subtitle">满分 {{selectedMetric.maxValue}}</view></view><view class="metric-value">{{selectedMetric.value}}</view></view>
       <view class="field-row"><view class="label">同龄平均</view><view class="field-value">{{selectedMetric.peerAverage === undefined ? '样本积累中' : selectedMetric.peerAverage}}</view></view>
       <view wx:if="{{detailState === 'loading'}}" class="subtitle">正在读取趋势和来源…</view>
       <view wx:if="{{selectedDetail}}">
-        <view class="field-row"><view class="label">最近记录</view><view class="field-value">{{selectedDetail.latest ? selectedDetail.latest.occurredAt : '暂无记录'}}</view></view>
+        <view class="field-row"><view class="label">最近记录</view><view class="field-value">{{latestLabel}}</view></view>
+        <view class="field-row"><view class="label">近期变化</view><view class="field-value trend-text">{{trendLabel}}</view></view>
         <view class="field-row"><view class="label">可追溯来源</view><view class="field-value">{{selectedDetail.sourceEvents.length}} 项</view></view>
       </view>
+      <view wx:if="{{detailState === 'error'}}" class="inline-error">趋势暂时未能加载，进入详情后可重试。</view>
       <button class="ghost-button" bindtap="openMetricDetail">查看完整详情</button>
     </view>
 
-    <view class="card"><view class="section-title">成长足迹</view><view wx:for="{{growth.milestones}}" wx:key="title" class="field-row"><view class="label">{{item.title}}</view><view class="field-value">{{item.description}}</view></view></view>
-    <view class="card"><view class="section-title">训练历程</view><view wx:for="{{growth.trainingHistory}}" wx:key="label" class="field-row"><view class="label">{{item.label}}</view><view class="field-value">{{item.value}}</view></view></view>
+    <view class="info-card"><view class="section-title">成长足迹</view><view wx:for="{{growth.milestones}}" wx:key="title" class="timeline-row"><view class="timeline-row__dot"></view><view><view class="timeline-row__title">{{item.title}}</view><view class="subtitle">{{item.description}}</view></view></view></view>
+    <view class="info-card"><view class="section-title">训练历程</view><view wx:for="{{growth.trainingHistory}}" wx:key="label" class="field-row"><view class="label">{{item.label}}</view><view class="field-value">{{item.value}}</view></view></view>
   </view>
-
+  </view>
   <role-tabbar role="parent" active="growth" />
 </view>

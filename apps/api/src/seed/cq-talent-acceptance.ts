@@ -1,11 +1,19 @@
 import type { SeedData } from "./types.js";
 import { chongqingTalentClubId as clubId, seedNow as now } from "./types.js";
+import { createTalentEliteAssessmentCatalog } from "./cq-talent-assessment-model.js";
 import { createCqTalentSyntheticFixture, type CqTalentBusinessRow, type CqTalentSyntheticStudent } from "./cq-talent-test-data.js";
 
 const connectionId = "external-connection-wps-cq-talent";
 const importedAt = "2026-06-25T08:01:00.000Z";
 const acceptanceParentUserId = "user-parent-cq-talent-acceptance";
 const acceptanceParentId = "parent-cq-talent-acceptance";
+const talentAssessmentCatalog = createTalentEliteAssessmentCatalog();
+const talentRadarViewId = talentAssessmentCatalog.metricViews.find((view) => view.name.includes("核心能力雷达"))?.id;
+const talentRadarMetricIds = talentAssessmentCatalog.metricViewNodes
+  .filter((node) => node.viewId === talentRadarViewId)
+  .sort((left, right) => left.sortOrder - right.sortOrder)
+  .map((node) => node.metricId)
+  .filter((metricId): metricId is string => Boolean(metricId));
 type Rating = 1 | 2 | 3 | 4 | 5;
 
 const tableIds = {
@@ -201,8 +209,25 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
         createdAt: now,
         updatedAt: now,
       })),
+      {
+        id: "event-cq-talent-family-assessment-day",
+        clubId,
+        type: "other" as const,
+        title: "青训体测与家长说明会",
+        timeRange: {
+          startsAt: "2026-07-03T09:30:00.000Z",
+          endsAt: "2026-07-03T11:00:00.000Z",
+        },
+        primaryTeamId: "team-cq-talent-u8-elite",
+        ownerCoachId: "coach-1",
+        status: "scheduled" as const,
+        notes: "用于验收家庭日历中的其他活动、双孩参与和活动通知展示。",
+        createdAt: now,
+        updatedAt: now,
+      },
     ],
-    participants: students.flatMap((student, index) => {
+    participants: [
+      ...students.flatMap((student, index) => {
       const primaryTeamName = student.teamMemberships.find((membership) => membership.isPrimary)?.teamName ?? student.teamName;
       const trainingParticipants = student.teamMemberships.map((membership, membershipIndex) => ({
         id: `participant-cq-talent-training-${String(index + 1).padStart(3, "0")}-${membershipIndex + 1}`,
@@ -225,8 +250,20 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
       }]
         : [];
 
-      return [...trainingParticipants, ...matchParticipant];
-    }),
+        return [...trainingParticipants, ...matchParticipant];
+      }),
+      ...students
+        .filter((student) => student.familyId === acceptanceFamilyId)
+        .map((student, index) => ({
+          id: `participant-cq-talent-family-assessment-${index + 1}`,
+          clubId,
+          eventId: "event-cq-talent-family-assessment-day",
+          studentId: student.id,
+          status: "confirmed" as const,
+          createdAt: now,
+          updatedAt: now,
+        })),
+    ],
     metricRecords: students.flatMap((student, index) => createMetricRecords(student, index)),
     sessionObservations: students.slice(0, 40).map((student, index) => ({
       id: `session-observation-cq-talent-import-${String(index + 1).padStart(3, "0")}`,
@@ -260,6 +297,43 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
       ...createRecordLinks("attendance", students),
       ...createRecordLinks("insurance", students),
     ],
+    lessonLedger: students.map((student, index) => {
+      const otherDeductedHours = index % 5 === 0 ? 1 : 0;
+      const balance = Math.max(student.lessonHours - student.checkInCount - otherDeductedHours, 0);
+      return {
+        id: `lesson-ledger-cq-talent-import-${String(index + 1).padStart(3, "0")}`,
+        clubId,
+        studentId: student.id,
+        teamId: teamIdByName.get(student.teamName),
+        occurredAt: importedAt,
+        entryType: "external_snapshot" as const,
+        lessonDelta: balance,
+        balanceAfter: balance,
+        source: "external_import" as const,
+        sourceId: rawRecordId("attendance", student),
+        note: "重庆天才课时表同步余额。",
+        createdAt: now,
+        updatedAt: importedAt,
+      };
+    }),
+    insurancePolicies: students.map((student, index) => ({
+      id: `insurance-policy-cq-talent-import-${String(index + 1).padStart(3, "0")}`,
+      clubId,
+      studentId: student.id,
+      purchasedAt: `2026-${padDate(index % 12 + 1)}-${padDate(index % 26 + 1)}`,
+      expiresAt: student.insuranceExpiresAt,
+      policyNumber: `CQTFB${String(index + 1).padStart(6, "0")}`,
+      provider: index % 2 === 0 ? "太平洋保险" : "平安保险",
+      sport: "足球",
+      approved: true,
+      reviewStatus: "approved" as const,
+      currentStatus: "active" as const,
+      source: "external_import",
+      sourceId: rawRecordId("insurance", student),
+      note: "重庆天才保险表同步记录。",
+      createdAt: now,
+      updatedAt: importedAt,
+    })),
   };
 }
 
@@ -267,6 +341,43 @@ function createMetricRecords(student: CqTalentSyntheticStudent, index: number) {
   const score = ratingForIndex(index);
   const eventId = trainingEventId(student.teamName);
   const coachId = coachIdByTeamName(student.teamName);
+  const radarRecords = talentRadarMetricIds.flatMap((metricId, metricIndex) => {
+    const currentScore = 62 + ((index * 7 + metricIndex * 4) % 31);
+    const previousScore = Math.max(0, currentScore - 3 - (metricIndex % 2));
+    return [
+      {
+        id: `metric-record-cq-talent-radar-current-${student.id}-${metricIndex + 1}`,
+        clubId,
+        studentId: student.id,
+        metricId,
+        value: { kind: "measurement" as const, value: currentScore, unit: "score" },
+        source: "assessment" as const,
+        occurredAt: "2026-06-29T10:10:00.000Z",
+        eventId,
+        templateVersionId: "assessment-template-version-cq-talent-elite-20260326",
+        recordedByCoachId: coachId,
+        visibility: "parent" as const,
+        note: "重庆天才核心能力阶段评测。",
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: `metric-record-cq-talent-radar-previous-${student.id}-${metricIndex + 1}`,
+        clubId,
+        studentId: student.id,
+        metricId,
+        value: { kind: "measurement" as const, value: previousScore, unit: "score" },
+        source: "training_observation" as const,
+        occurredAt: "2026-06-15T10:10:00.000Z",
+        eventId,
+        recordedByCoachId: coachId,
+        visibility: "parent" as const,
+        note: "重庆天才核心能力训练观察。",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+  });
 
   return [
     {
@@ -300,6 +411,7 @@ function createMetricRecords(student: CqTalentSyntheticStudent, index: number) {
       createdAt: now,
       updatedAt: now,
     },
+    ...radarRecords,
   ];
 }
 

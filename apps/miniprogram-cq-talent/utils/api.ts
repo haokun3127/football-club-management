@@ -1,4 +1,5 @@
 import { APP_CLIENT_KEY, DEV_TEST_DATE } from "./config";
+import { activityStatus, formatDateTime, formatTimeRange } from "./presentation";
 import { request } from "./request";
 import { getAppContext, getSession } from "./store";
 import type {
@@ -285,14 +286,6 @@ export async function submitCoachAssessment(input: {
   });
 }
 
-export async function pendingWrite(label: string) {
-  return {
-    ok: false,
-    title: `${label}暂未开放`,
-    message: "该功能正在准备中，请联系俱乐部了解后续安排。",
-  };
-}
-
 function requireContext() {
   const context = getAppContext() ?? getSession();
   if (!context) {
@@ -367,10 +360,10 @@ function normalizeActivityDetail(raw: Record<string, unknown>): ActivityDetail {
   const participantStatus = participants.map((item) => statusLabel(item.status)).filter(Boolean).join("、") || "待更新";
   const fields = [
     { label: "活动类型", value: typeLabel(event.type) },
-    { label: "时间", value: compactRange(event.startsAt, event.endsAt) },
+    { label: "时间", value: `${formatDateTime(event.startsAt)} · ${formatTimeRange(event.startsAt, event.endsAt)}` },
     { label: "地点", value: event.venue },
-    { label: "队伍", value: event.teamName || "待同步" },
-    { label: "状态", value: event.status },
+    { label: "队伍", value: event.teamName || "待确认" },
+    { label: "状态", value: activityStatus(event.status).label },
   ];
   const sections = event.type === "training"
     ? [
@@ -493,25 +486,40 @@ function normalizeMetricDetail(raw: Record<string, unknown>, fallbackMetricId: s
     eventId: stringOrUndefined(record.eventId),
   })).filter((record) => record.id);
   const sourceEventsSource = Array.isArray(raw.sourceEvents) ? raw.sourceEvents as Array<Record<string, unknown>> : [];
+  const sourceEvents = sourceEventsSource.map((item) => {
+    const event = asRecord(item.event);
+    const timeRange = asRecord(event?.timeRange);
+    return {
+      recordId: String(item.recordId ?? ""),
+      eventId: String(event?.id ?? ""),
+      title: String(event?.title ?? "相关活动"),
+      type: normalizeEventType(event?.type),
+      startsAt: stringOrUndefined(timeRange?.startsAt ?? event?.startsAt),
+    };
+  }).filter((item) => item.recordId && item.eventId);
   return {
     metricId: String(metric?.id ?? fallbackMetricId),
     label: String(metric?.name ?? "能力指标"),
-    unit: stringOrUndefined(metric?.unit),
-    description: stringOrUndefined(metric?.description),
+    unit: userFacingMetricUnit(metric?.unit),
+    description: userFacingMetricDescription(metric?.description),
     latest: records[0],
     records,
-    sourceEvents: sourceEventsSource.map((item) => {
-      const event = asRecord(item.event);
-      const timeRange = asRecord(event?.timeRange);
-      return {
-        recordId: String(item.recordId ?? ""),
-        eventId: String(event?.id ?? ""),
-        title: String(event?.title ?? "相关活动"),
-        type: normalizeEventType(event?.type),
-        startsAt: stringOrUndefined(timeRange?.startsAt ?? event?.startsAt),
-      };
-    }).filter((item) => item.recordId && item.eventId),
+    sourceEvents: sourceEvents.filter((item, index) =>
+      sourceEvents.findIndex((candidate) => candidate.eventId === item.eventId) === index,
+    ),
   };
+}
+
+function userFacingMetricUnit(value: unknown) {
+  const unit = stringOrUndefined(value);
+  if (!unit) return undefined;
+  return ({ score: "分", goal: "个", assist: "次" } as Record<string, string>)[unit] ?? unit;
+}
+
+function userFacingMetricDescription(value: unknown) {
+  const description = stringOrUndefined(value);
+  if (!description || /公式|权重|[=＋+*/]/.test(description)) return undefined;
+  return description;
 }
 
 function metricRecordNumber(record: Record<string, unknown>) {
@@ -536,7 +544,17 @@ function normalizeRadarMetric(item: Record<string, unknown>): RadarMetricPoint {
   const metric = asRecord(item.metric);
   const record = asRecord(item.record);
   const value = asRecord(record?.value);
-  const numericValue = numberOrUndefined(record?.numericValue ?? value?.score ?? value?.number);
+  const numericValue = numberOrUndefined(
+    record?.numericValue
+    ?? value?.score
+    ?? value?.number
+    ?? value?.value
+    ?? value?.count
+    ?? value?.percentage
+    ?? value?.minutes
+    ?? value?.seconds
+    ?? value?.meters,
+  );
   const maxValue = numberOrUndefined(metric?.maxScore) ?? inferMaxValue(value);
   return {
     metricId: String(metric?.id ?? item.metricId ?? "metric"),
@@ -548,26 +566,42 @@ function normalizeRadarMetric(item: Record<string, unknown>): RadarMetricPoint {
 }
 
 function normalizeStudentHome(raw: Record<string, unknown>, student: StudentSummary): StudentHome {
-  const profile = asRecord(raw.profile);
+  const profile = asRecord(raw.profile ?? raw.student);
   const status = asRecord(raw.status ?? raw.statusSummary);
+  const lesson = asRecord(status?.lesson);
+  const insurance = asRecord(status?.insurance);
+  const sync = asRecord(status?.sync ?? raw.sync);
+  const latestRun = asRecord(sync?.latestRun);
+  const updatedAt = stringOrUndefined(lesson?.updatedAt ?? insurance?.updatedAt ?? latestRun?.updatedAt ?? raw.updatedAt);
   return {
     profile: [
       { label: "姓名", value: String(profile?.name ?? student.name) },
-      { label: "年龄组", value: String(profile?.ageGroup ?? student.ageGroup ?? "待同步") },
+      { label: "年龄组", value: String(profile?.ageGroup ?? student.ageGroup ?? "未填写") },
       { label: "队伍", value: textOrPending(student.teams.join("、")) },
       { label: "教练", value: textOrPending(student.coachNames.join("、")) },
     ],
     lessonStatus: [
-      { label: "剩余课时", value: String(status?.remainingLessons ?? status?.remainingClassHours ?? "待同步") },
-      { label: "最近更新", value: String(raw.updatedAt ?? "以后端同步时间为准") },
+      { label: "剩余课时", value: lessonCountLabel(status?.lessonBalance ?? lesson?.balance ?? status?.remainingLessons ?? status?.remainingClassHours) },
+      { label: "最近更新", value: updatedAt ? formatDateTime(updatedAt) : "尚未同步" },
     ],
     insuranceStatus: [
-      { label: "保险状态", value: String(status?.insuranceStatus ?? "待同步") },
-      { label: "到期日期", value: String(status?.insuranceExpiresAt ?? status?.insuranceEndDate ?? "待同步") },
+      { label: "保险状态", value: insuranceStatusLabel(insurance?.status ?? status?.insuranceStatus) },
+      { label: "到期日期", value: String(insurance?.expiresAt ?? status?.insuranceExpiresAt ?? status?.insuranceEndDate ?? "未登记") },
     ],
     clubInfo: pendingClubInfo(requireContext()),
-    updatedAt: stringOrUndefined(raw.updatedAt),
+    updatedAt,
   };
+}
+
+function lessonCountLabel(value: unknown) {
+  const count = numberOrUndefined(value);
+  return count === undefined ? "请联系俱乐部核对" : `${count} 课时`;
+}
+
+function insuranceStatusLabel(value: unknown) {
+  const labels: Record<string, string> = { active: "保障中", expired: "已到期", pending: "待审核", unknown: "未登记" };
+  const key = String(value ?? "unknown").toLowerCase();
+  return labels[key] ?? String(value ?? "未登记");
 }
 
 function normalizeCoachHome(raw: Record<string, unknown>, from: string, to: string): CoachHome {
@@ -802,10 +836,6 @@ function typeLabel(type: ScheduleEvent["type"]) {
   if (type === "training") return "训练";
   if (type === "match") return "比赛";
   return "活动";
-}
-
-function compactRange(start?: string, end?: string) {
-  return [start, end].filter(Boolean).join(" - ") || "时间待确认";
 }
 
 function textOrPending(value: string) {
