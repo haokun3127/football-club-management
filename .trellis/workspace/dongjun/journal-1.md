@@ -182,3 +182,38 @@ Added the test-AppID login UI, WeChat identity connector, phone-derived membersh
 ### Next Steps
 
 - None - task complete
+
+
+## Session 6: CQ Talent UI foundation and DevTools validation
+
+**Date**: 2026-07-11
+**Task**: CQ Talent UI foundation and DevTools validation
+**Package**: api
+**Branch**: `codex/chongqing-talent-business`
+
+### Summary
+
+Migrated Figma Contract Tokens and shared native mini-program components; aligned launch, login and coach attendance; fixed realistic seed re-entry, development bearer handling, roster name joining and safe pending attendance defaults; pnpm check, app-client smoke and test AppID preview passed on base library 3.15.1.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `a4aef32` | (see git log) |
+| `1269dce` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
