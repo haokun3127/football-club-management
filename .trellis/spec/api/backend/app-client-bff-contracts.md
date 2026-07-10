@@ -60,3 +60,20 @@ const role = request.body.roleHint ?? "parent";
 const role = resolveAppRole(auth.membership.roles);
 const entrypoints = client.roleEntrypoints?.[role];
 ```
+
+## Mini-Program Acceptance Fixture Convention
+
+Acceptance dates and identities belong to the shared development configuration, not to page implementations. This keeps the imported-data fixture reproducible without shipping a historical date as production behavior.
+
+```typescript
+// Correct: one fixture owner, current date outside dev mode.
+const initialDate = DEV_MODE ? DEV_TEST_DATE : currentLocalDate();
+
+// Wrong: a page-level fixture that silently becomes production behavior.
+const selectedDate = "2026-06-28";
+```
+
+- Read `DEV_TEST_DATE` and dev user ids from `utils/config.ts` for local smoke/manual acceptance.
+- In non-dev mode, date-driven pages start from the user's current local date.
+- Smoke scripts may pin fixture dates explicitly, but production page defaults must not duplicate those literals.
+- Static acceptance checks should search page code for duplicated fixture dates and demo identities.

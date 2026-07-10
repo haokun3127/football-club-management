@@ -1,5 +1,6 @@
 import { getParentCalendar, getParentChildren } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { DEV_MODE, DEV_TEST_DATE } from "../../../utils/config";
 import { openPage } from "../../../utils/navigation";
 import { setCurrentStudentId } from "../../../utils/store";
 import type { LoadState, ScheduleEvent, StudentSummary } from "../../../utils/types";
@@ -24,6 +25,8 @@ const typeTabs: PageData["typeTabs"] = [
   { label: "其他", value: "other" },
 ];
 
+const initialDate = DEV_MODE ? DEV_TEST_DATE : currentLocalDate();
+
 Page<PageData>({
   data: {
     state: "loading",
@@ -33,7 +36,7 @@ Page<PageData>({
     activeStudentName: "",
     events: [],
     visibleEvents: [],
-    selectedDate: "2026-06-28",
+    selectedDate: initialDate,
     selectedType: "all",
     typeTabs,
   },
@@ -117,14 +120,19 @@ function filterEvents(events: ScheduleEvent[], studentId: string, selectedDate: 
 }
 
 function dateWindowStart(date: string) {
-  return date || "2026-06-28";
+  return date || initialDate;
 }
 
 function dateWindowEnd(date: string) {
-  if (!date) return "2026-07-05";
-  const base = new Date(`${date}T00:00:00.000Z`);
+  const base = new Date(`${date || initialDate}T00:00:00.000Z`);
   base.setUTCDate(base.getUTCDate() + 7);
   return base.toISOString().slice(0, 10);
+}
+
+function currentLocalDate() {
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
+  return local.toISOString().slice(0, 10);
 }
 
 function readableError(error: unknown) {
