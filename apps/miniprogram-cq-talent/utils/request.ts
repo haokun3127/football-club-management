@@ -28,7 +28,7 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
     headers["X-Client-Id"] = context.clientId;
   }
 
-  if (session?.token) {
+  if (session?.token && !session.token.startsWith("dev-")) {
     headers.Authorization = `Bearer ${session.token}`;
   }
 

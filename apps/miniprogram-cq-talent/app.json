@@ -18,9 +18,9 @@
   ],
   "window": {
     "navigationBarTitleText": "重庆天才足球",
-    "navigationBarBackgroundColor": "#E60012",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#F7F8FA"
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F6F7F9"
   },
   "lazyCodeLoading": "requiredComponents",
   "style": "v2",

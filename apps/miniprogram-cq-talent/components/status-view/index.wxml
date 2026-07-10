@@ -1,5 +1,7 @@
-<view wx:if="{{state !== 'ready' && state !== 'idle'}}" class="status status-{{state}}">
-  <view class="status-title">{{title}}</view>
-  <view class="status-message">{{message}}</view>
-  <button wx:if="{{actionText}}" class="status-action" bindtap="handleAction">{{actionText}}</button>
+<view wx:if="{{state !== 'ready' && state !== 'idle'}}" class="status status--{{state}} {{compact ? 'status--compact' : ''}}">
+  <view wx:if="{{state === 'loading'}}" class="status__spinner"></view>
+  <view wx:elif="{{symbol}}" class="status__symbol">{{symbol}}</view>
+  <view wx:if="{{title}}" class="status__title">{{title}}</view>
+  <view wx:if="{{message}}" class="status__message">{{message}}</view>
+  <button wx:if="{{actionText}}" class="status__action" bindtap="handleAction">{{actionText}}</button>
 </view>

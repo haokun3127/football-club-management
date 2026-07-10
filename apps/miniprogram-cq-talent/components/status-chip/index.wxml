@@ -1,0 +1,1 @@
+<view class="chip chip--{{tone}} {{compact ? 'chip--compact' : ''}}">{{label}}</view>

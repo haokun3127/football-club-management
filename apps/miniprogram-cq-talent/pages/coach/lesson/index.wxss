@@ -34,8 +34,8 @@ button {
 }
 
 .consume-toggle.on {
-  background: #fff1f0;
-  color: #e60012;
+  background: #fceeef;
+  color: #a80f1b;
 }
 
 .consume-toggle.off {

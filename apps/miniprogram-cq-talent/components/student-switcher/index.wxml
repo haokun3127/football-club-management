@@ -1,0 +1,6 @@
+<scroll-view class="switcher" scroll-x enable-flex show-scrollbar="{{false}}">
+  <view class="switcher__inner">
+    <view wx:if="{{showAll}}" class="switcher__item {{selectedId === 'all' ? 'switcher__item--active' : ''}}" data-id="all" bindtap="select">{{allLabel}}</view>
+    <view wx:for="{{students}}" wx:key="id" class="switcher__item {{selectedId === item.id ? 'switcher__item--active' : ''}}" data-id="{{item.id}}" bindtap="select">{{item.name}}</view>
+  </view>
+</scroll-view>

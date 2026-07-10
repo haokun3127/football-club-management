@@ -14,6 +14,7 @@ The API currently uses SQLite persistence with ordered SQL migrations and reposi
 - Put SQL access in `src/persistence/*`, not directly inside route handlers.
 - Keep store-level behavior behind `ApiStore` / `PersistentApiStore` in `src/store.ts`.
 - Preserve club scoping in every query that touches tenant data.
+- Seeded repositories with a database natural-key `UNIQUE` constraint must upsert both by stable `id` and by that natural key. Generated fixture ids can change while the real record identity remains the same; re-seeding an existing development database must update the existing row instead of failing startup.
 - Tests should use `openSqliteDatabase(":memory:")` for persistence behavior.
 
 ## Examples
@@ -21,3 +22,4 @@ The API currently uses SQLite persistence with ordered SQL migrations and reposi
 - Migration runner test: `apps/api/test/persistence.test.ts`
 - SQLite helper: `apps/api/src/persistence/sqlite.ts`
 - Repository assembly: `apps/api/src/persistence/platform-persistence.ts`
+- Natural-key reseed regression: `apps/api/test/persistence.test.ts`

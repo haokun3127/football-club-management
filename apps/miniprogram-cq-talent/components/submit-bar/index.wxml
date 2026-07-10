@@ -1,0 +1,7 @@
+<view class="submit-bar">
+  <view wx:if="{{hint}}" class="submit-bar__hint">{{hint}}</view>
+  <view class="submit-bar__actions">
+    <button wx:if="{{secondaryText}}" class="submit-bar__secondary" bindtap="handleSecondary">{{secondaryText}}</button>
+    <button class="submit-bar__primary {{loading || disabled ? 'submit-bar__primary--disabled' : ''}}" loading="{{loading}}" disabled="{{loading || disabled}}" bindtap="handlePrimary">{{primaryText}}</button>
+  </view>
+</view>

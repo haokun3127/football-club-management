@@ -1,39 +1,35 @@
-<view class="page">
-  <status-view state="{{state}}" title="点名" message="{{message}}" />
-  <view wx:if="{{workbench}}" class="card hero-card">
-    <view class="title">活动点名</view>
-    <view class="subtitle">{{workbench.event.title}}</view>
-  </view>
-  <view wx:if="{{workbench}}" class="card">
-    <view class="row">
-      <view>
-        <view class="section-title">学员名单</view>
-        <view class="subtitle">支持单人状态、备注和批量到课</view>
-      </view>
-      <button class="ghost-button mini-button inline-button" bindtap="markAllPresent">批量到课</button>
+<view class="attendance-page">
+  <app-header title="活动点名" show-back="{{true}}" />
+  <view class="attendance-page__body">
+    <status-view state="{{state}}" title="{{state === 'loading' ? '正在读取名单' : state === 'empty' ? '暂无学员' : '名单读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重新加载' : ''}}" bindaction="retry" />
+
+    <view wx:if="{{workbench}}" class="event-head">
+      <view class="event-head__eyebrow">本次活动</view>
+      <view class="event-head__title">{{workbench.event.title}}</view>
+      <view class="event-head__meta">{{workbench.event.startsAt}} · {{workbench.event.venue}}</view>
     </view>
-    <view wx:for="{{workbench.roster}}" wx:key="studentId" class="attendance-row">
-      <view class="attendance-main">
-        <view>
-          <view class="label strong">{{item.name}}</view>
-          <view class="subtitle">{{item.lessonAction || '课时状态待同步'}}</view>
+
+    <view wx:if="{{workbench && workbench.roster.length}}" class="summary-grid">
+      <view class="summary-item"><view class="summary-item__value">{{summary.total}}</view><view class="summary-item__label">应到</view></view>
+      <view class="summary-item summary-item--success"><view class="summary-item__value">{{summary.present}}</view><view class="summary-item__label">到课</view></view>
+      <view class="summary-item summary-item--warning"><view class="summary-item__value">{{summary.attention}}</view><view class="summary-item__label">待确认</view></view>
+    </view>
+
+    <view wx:if="{{workbench && workbench.roster.length}}" class="roster-card">
+      <view class="roster-head">
+        <view><view class="section-title">学员名单</view><view class="subtitle">逐一确认状态，必要时补充说明</view></view>
+        <button class="batch-button" bindtap="markAllPresent">全部到课</button>
+      </view>
+      <view wx:for="{{workbench.roster}}" wx:key="studentId" class="attendance-row">
+        <view class="attendance-main">
+          <view class="student-info"><view class="student-avatar">{{item.avatarLetter}}</view><view><view class="student-name">{{item.name}}</view><view class="lesson-state">{{item.lessonAction || '课时状态待确认'}}</view></view></view>
+          <picker mode="selector" range="{{statusOptions}}" range-key="label" value="{{item.statusIndex}}" data-index="{{index}}" bindchange="onStatusChange">
+            <status-chip label="{{item.statusLabel}}" tone="{{item.statusTone}}" />
+          </picker>
         </view>
-        <picker mode="selector" range="{{statusOptions}}" range-key="label" data-index="{{index}}" bindchange="onStatusChange">
-          <view class="status-pill">{{item.status}}</view>
-        </picker>
+        <input class="note-input" placeholder="补充迟到、请假等说明（选填）" value="{{item.note}}" data-index="{{index}}" bindinput="onNoteInput" />
       </view>
-      <input
-        class="note-input"
-        placeholder="备注，如迟到原因、请假说明"
-        value="{{item.note}}"
-        data-index="{{index}}"
-        bindinput="onNoteInput"
-      />
     </view>
   </view>
-  <view wx:if="{{workbench}}" class="card">
-    <view class="section-title">写入状态</view>
-    <view class="subtitle">请确认名单状态；保存失败时当前填写不会被清空。</view>
-    <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveAttendance">保存点名</button>
-  </view>
+  <submit-bar wx:if="{{workbench && workbench.roster.length}}" primary-text="保存点名" hint="保存失败时，本页填写内容会保留" loading="{{saving}}" bindsubmit="saveAttendance" />
 </view>

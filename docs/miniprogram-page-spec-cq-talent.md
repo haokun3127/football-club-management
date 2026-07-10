@@ -16,7 +16,7 @@
 
 小程序运行时必须先通过 `appId/clientKey -> /app-clients/resolve -> clubId/clientId/capabilities`。页面不得写死 WPS 字段、评测字段、课时规则、训练项目或比赛事件类型。家长端只读；教练端只写训练交付相关数据，不进入后台运营管理。
 
-UI 口径：微信原生标准风格，主色 `#E60012`，按压态 `#C4000F`，浅红背景 `#FFF1F0`。不做营销页，不做复杂视觉稿。
+UI 口径：沿用重庆天才完整 Figma 文件的 Contract Tokens，主色 `#A80F1B`，按压态 `#7F0B14`，浅红背景 `#FCEEEF`，页面背景 `#F6F7F9`。保持微信原生交互与俱乐部品牌识别。
 
 ## 1.1 MVP 实现状态
 

@@ -1,6 +1,12 @@
-.login-page { padding-top: 120rpx; padding-bottom: 40rpx; }
-.brand-mark { margin-bottom: 36rpx; color: #e60012; font-size: 42rpx; font-weight: 800; text-align: center; }
-.login-card { padding-top: 36rpx; padding-bottom: 36rpx; text-align: center; }
-.login-card .subtitle { margin-top: 14rpx; }
-button { margin-top: 28rpx; }
-.help-card { margin-top: 36rpx; }
+.login-page { min-height: 100vh; background: #f6f7f9; }
+.login-page__body { padding: 44rpx 24rpx 48rpx; }
+.login-hero { padding: 28rpx 12rpx 34rpx; }
+.login-hero__eyebrow { margin-bottom: 14rpx; color: #a80f1b; font-size: 24rpx; font-weight: 700; }
+.login-hero .title { font-size: 44rpx; }
+.login-hero .subtitle { max-width: 600rpx; margin-top: 16rpx; }
+.verify-card { padding: 32rpx; }
+.verify-button { margin-top: 28rpx; }
+.privacy-note { margin-top: 18rpx; color: #98a2b3; font-size: 21rpx; line-height: 1.5; text-align: center; }
+.help-row { margin-top: 36rpx; padding: 0 12rpx; }
+.help-row__title { color: #202124; font-size: 25rpx; font-weight: 650; }
+.help-row__text { margin-top: 8rpx; color: #667085; font-size: 23rpx; line-height: 1.55; }

@@ -160,6 +160,7 @@ guardianBindings.push(...students.map((student) => ({
 - `workbench.summary` returns `total/training/matches/pending`; `tasks[]` returns `eventId/eventType/action/label/dueAt`.
 - Task priority is attendance, lesson confirmation after event end, match result, assessment, training content, then view.
 - Event workbench training data returns `selectedProjectIds` and resolved `projects` from the current session plan.
+- `rosterContext.participants[].status` is participation/RSVP state, not attendance. The client must join participant `studentId` to `rosterContext.students` for the real name and default missing attendance to `pending`, never `present`.
 - All events remain membership-scoped on the backend.
 
 ### 4. Validation & Error Matrix
@@ -263,6 +264,7 @@ openMetric(tappedPoint.metricId);
 - Authenticated login returns a random expiring bearer token; app-client routes resolve membership from that session.
 - Missing connector or unmatched phone returns `binding_required` without a session or role.
 - develop may send the explicit test user header; trial/release must use HTTPS and must never send dev identity headers.
+- A synthetic `dev-*` client token is local state only: do not send it as `Authorization: Bearer`, because the API correctly rejects unknown bearer sessions before header-based development membership is evaluated. Real connector-issued tokens are always sent.
 - The current registry is process-local; production deployment must replace it with shared durable session storage before horizontal scaling.
 
 ### 4. Validation & Error Matrix

@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "重庆天才足球",
+  "navigationStyle": "custom",
   "usingComponents": {
     "status-view": "/components/status-view/index"
   }

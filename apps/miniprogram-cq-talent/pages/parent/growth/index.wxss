@@ -1,11 +1,11 @@
 .child-tabs { display: flex; flex-wrap: wrap; gap: 16rpx; }
 .child-tab { padding: 12rpx 20rpx; border-radius: 999rpx; background: #f2f3f5; color: #60646f; font-size: 24rpx; }
-.child-tab.active { background: #fff1f0; color: #e60012; font-weight: 700; }
+.child-tab.active { background: #fceeef; color: #a80f1b; font-weight: 700; }
 .view-picker { padding: 10rpx 16rpx; border-radius: 999rpx; background: #f2f3f5; color: #60646f; font-size: 22rpx; }
 .metric-scroll { width: 100%; margin-bottom: 20rpx; white-space: nowrap; }
 .metric-chips { display: inline-flex; gap: 12rpx; }
 .metric-chip { padding: 12rpx 18rpx; border-radius: 999rpx; background: #ffffff; color: #60646f; }
-.metric-chip.active { background: #e60012; color: #ffffff; }
+.metric-chip.active { background: #a80f1b; color: #ffffff; }
 .metric-summary { border-color: #ffd6d2; }
-.metric-value { color: #e60012; font-size: 44rpx; font-weight: 700; }
+.metric-value { color: #a80f1b; font-size: 44rpx; font-weight: 700; }
 .metric-summary button { margin-top: 20rpx; }

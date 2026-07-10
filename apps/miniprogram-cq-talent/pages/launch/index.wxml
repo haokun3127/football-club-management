@@ -1,20 +1,14 @@
 <view class="launch">
-  <view class="brand" bindlongpress="switchDevRole">
-    <view class="brand-mark">CQ</view>
-    <view class="brand-name">{{clientName}}</view>
-    <view class="brand-subtitle">训练交付小程序</view>
-  </view>
+  <view class="launch__body">
+    <view class="brand" bindlongpress="switchDevRole">
+      <view class="brand-mark"><view class="brand-ball">CQ</view></view>
+      <view class="brand-name">{{clientName}}</view>
+      <view class="brand-subtitle">陪伴每一次训练与成长</view>
+    </view>
 
-  <status-view
-    state="{{state}}"
-    title="{{title}}"
-    message="{{message}}"
-    action-text="{{actionText}}"
-    bindaction="retry"
-  />
+    <status-view state="{{state}}" title="{{title}}" message="{{message}}" action-text="{{actionText}}" bindaction="retry" />
 
-  <view class="notice">
-    身份由俱乐部档案和微信绑定结果决定。家长和教练入口不会在小程序内手动选择。
+    <view class="notice">身份将根据俱乐部登记资料自动匹配。如资料有误，请联系俱乐部工作人员。</view>
+    <view wx:if="{{devHint}}" class="dev-hint">{{devHint}}</view>
   </view>
-  <view wx:if="{{devHint}}" class="dev-hint">{{devHint}}</view>
 </view>

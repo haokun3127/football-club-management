@@ -1,6 +1,9 @@
 {
-  "navigationBarTitleText": "点名",
+  "navigationStyle": "custom",
   "usingComponents": {
-    "status-view": "/components/status-view/index"
+    "app-header": "/components/app-header/index",
+    "status-chip": "/components/status-chip/index",
+    "status-view": "/components/status-view/index",
+    "submit-bar": "/components/submit-bar/index"
   }
 }

@@ -3,8 +3,10 @@ import { requireRole } from "../../../utils/auth";
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
 
 type RosterItem = CoachWorkbench["roster"][number];
+type RosterUiItem = RosterItem & { avatarLetter: string; statusLabel: string; statusTone: string; statusIndex: number };
 
 const statusOptions = [
+  { label: "未点名", value: "pending" },
   { label: "到课", value: "present" },
   { label: "迟到", value: "late" },
   { label: "缺席", value: "absent" },
@@ -20,6 +22,7 @@ Page({
     eventId: "",
     saving: false,
     statusOptions,
+    summary: { total: 0, present: 0, attention: 0 },
   },
   onLoad(query?: Record<string, string | undefined>) {
     requireRole("coach");
@@ -28,29 +31,29 @@ Page({
   async load(id: string) {
     try {
       const workbench = await getCoachWorkbench(id);
-      this.setData({ state: "ready", workbench, message: "", eventId: id });
+      const roster = withRosterUi(workbench.roster);
+      this.setData({ state: roster.length ? "ready" : "empty", workbench: { ...workbench, roster }, message: roster.length ? "" : "当前活动还没有可点名学员。", eventId: id, summary: summarizeRoster(roster) });
     } catch (error) {
       this.setData({ state: "error", message: readableError(error) });
     }
   },
+  retry() {
+    this.load(this.data.eventId);
+  },
   markAllPresent() {
     const workbench = this.data.workbench;
     if (!workbench) return;
-    this.setData({
-      workbench: {
-        ...workbench,
-        roster: workbench.roster.map((student: RosterItem) => ({ ...student, status: "present" })),
-      },
-    });
+    const roster = withRosterUi(workbench.roster.map((student: RosterItem) => ({ ...student, status: "present" })));
+    this.setData({ workbench: { ...workbench, roster }, summary: summarizeRoster(roster) });
   },
   onStatusChange(event: { currentTarget: { dataset: Record<string, unknown> }; detail: { value: string | number } }) {
     const index = Number(event.currentTarget.dataset.index);
     const status = statusOptions[Number(event.detail.value)]?.value;
     if (!this.data.workbench || !Number.isFinite(index) || !status) return;
-    const roster = this.data.workbench.roster.map((student: RosterItem, rosterIndex: number) => (
+    const roster = withRosterUi(this.data.workbench.roster.map((student: RosterItem, rosterIndex: number) => (
       rosterIndex === index ? { ...student, status } : student
-    ));
-    this.setData({ workbench: { ...this.data.workbench, roster } });
+    )));
+    this.setData({ workbench: { ...this.data.workbench, roster }, summary: summarizeRoster(roster) });
   },
   onNoteInput(event: { currentTarget: { dataset: Record<string, unknown> }; detail: { value: string } }) {
     const index = Number(event.currentTarget.dataset.index);
@@ -62,9 +65,15 @@ Page({
   },
   async saveAttendance() {
     if (!this.data.workbench || !this.data.eventId || this.data.saving) return;
+    const pendingStudent = this.data.workbench.roster.find((student: RosterItem) => student.status === "pending");
+    if (pendingStudent) {
+      wx.showToast({ title: `请先完成${pendingStudent.name}的点名`, icon: "none" });
+      return;
+    }
     this.setData({ saving: true });
     try {
-      await saveCoachAttendance(this.data.eventId, this.data.workbench.roster);
+      const roster = this.data.workbench.roster.map(({ statusLabel: _label, statusTone: _tone, statusIndex: _index, ...student }: RosterUiItem) => student);
+      await saveCoachAttendance(this.data.eventId, roster);
       wx.showToast({ title: "点名已保存", icon: "success" });
       await this.load(this.data.eventId);
     } catch (error) {
@@ -78,4 +87,18 @@ Page({
 function readableError(error: unknown) {
   const record = error as { message?: string; code?: string };
   return record?.message || record?.code || "点名名单读取失败。";
+}
+
+function withRosterUi(roster: RosterItem[]): RosterUiItem[] {
+  return roster.map((student) => {
+    const statusIndex = Math.max(0, statusOptions.findIndex((option) => option.value === student.status));
+    const status = statusOptions[statusIndex] ?? statusOptions[0]!;
+    const statusTone = status.value === "present" ? "success" : status.value === "late" ? "warning" : status.value === "absent" ? "error" : "pending";
+    return { ...student, avatarLetter: student.name.slice(0, 1), status: status.value, statusLabel: status.label, statusTone, statusIndex };
+  });
+}
+
+function summarizeRoster(roster: RosterItem[]) {
+  const present = roster.filter((student) => student.status === "present").length;
+  return { total: roster.length, present, attention: roster.length - present };
 }

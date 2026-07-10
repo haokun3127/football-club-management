@@ -248,6 +248,49 @@ describe("platform persistence", () => {
     database.close();
   });
 
+  it("re-seeds natural-key records when generated ids change", async () => {
+    const database = openSqliteDatabase(":memory:");
+    migrate(database);
+    const repositories = createPlatformRepositories(database);
+    const now = "2026-06-25T00:00:00.000Z";
+    await seedPlatformData(repositories, createSeedData());
+    await repositories.memberships.save({
+      id: "membership-after",
+      clubId: "club-chongqing-talent",
+      userId: "user-parent-1",
+      roles: ["parent"],
+      status: "active",
+      createdAt: now,
+      updatedAt: "2026-06-26T00:00:00.000Z",
+    });
+
+    expect(await repositories.memberships.findActiveByClubAndUser(
+      "club-chongqing-talent",
+      "user-parent-1",
+    )).toEqual(expect.objectContaining({ id: "club-member-parent-1", updatedAt: "2026-06-26T00:00:00.000Z" }));
+    expect(await repositories.memberships.listByClub("club-chongqing-talent")).toHaveLength(3);
+
+    await repositories.teamMembers.save({
+      id: "team-member-after",
+      clubId: "club-chongqing-talent",
+      teamId: "team-u10-dev",
+      studentId: "student-1",
+      startsAt: "2026-06-01",
+      endsAt: "2027-06-01",
+      isPrimaryTeam: true,
+      status: "active",
+      createdAt: now,
+      updatedAt: "2026-06-26T00:00:00.000Z",
+    });
+    const teamMembers = await repositories.teamMembers.listByClub("club-chongqing-talent");
+    expect(teamMembers).toHaveLength(2);
+    expect(teamMembers.find((membership) => membership.id === "team-member-1")).toEqual(expect.objectContaining({
+      endsAt: "2027-06-01",
+      updatedAt: "2026-06-26T00:00:00.000Z",
+    }));
+    database.close();
+  });
+
   it("persists integration staging records and manual confirmations by club", async () => {
     const database = openSqliteDatabase(":memory:");
     migrate(database);

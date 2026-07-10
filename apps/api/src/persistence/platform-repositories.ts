@@ -185,6 +185,10 @@ export class ClubUserMembershipRepository extends BaseClubScopedRepository<ClubU
         roles_json = excluded.roles_json,
         status = excluded.status,
         updated_at = excluded.updated_at
+      ON CONFLICT(club_id, user_id) DO UPDATE SET
+        roles_json = excluded.roles_json,
+        status = excluded.status,
+        updated_at = excluded.updated_at
     `).run(
       entity.id,
       entity.clubId,
@@ -388,6 +392,11 @@ export class TeamMemberRepository extends BaseClubScopedRepository<TeamMember> {
         team_id = excluded.team_id,
         student_id = excluded.student_id,
         starts_at = excluded.starts_at,
+        ends_at = excluded.ends_at,
+        is_primary_team = excluded.is_primary_team,
+        status = excluded.status,
+        updated_at = excluded.updated_at
+      ON CONFLICT(club_id, team_id, student_id, starts_at) DO UPDATE SET
         ends_at = excluded.ends_at,
         is_primary_team = excluded.is_primary_team,
         status = excluded.status,

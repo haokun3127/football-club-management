@@ -179,7 +179,7 @@ pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client
 | --- | --- |
 | `GET /health` | 200，`service=@football-club/api` |
 | `GET /app-clients/resolve?clientKey=cq-talent-wechat-main` | `clubId=club-chongqing-talent`，`clientId=app-client-cq-talent-wechat-main` |
-| `GET /app-clients/resolve?clientKey=cq-talent-wechat-main` | `clubId=club-chongqing-talent`，`clientId=app-client-cq-talent-wechat-main`，主题色 `#E60012/#C4000F/#FFF1F0` |
+| `GET /app-clients/resolve?clientKey=cq-talent-wechat-main` | `clubId=club-chongqing-talent`，`clientId=app-client-cq-talent-wechat-main`，主题色 `#A80F1B/#7F0B14/#FCEEEF` |
 | parent children，`X-User-Id: user-parent-cq-talent-acceptance` | 2 个同家庭孩子，不返回其他 198 名学员 |
 | parent schedule，首个导入学员 | 3 个活动，字段来自 app-client BFF |
 | parent growth-summary，首个导入学员 | `latest=1` |

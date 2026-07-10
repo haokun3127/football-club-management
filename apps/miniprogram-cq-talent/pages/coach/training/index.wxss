@@ -18,8 +18,8 @@
 .selected-chip {
   padding: 10rpx 16rpx;
   border-radius: 999rpx;
-  background: #fff1f0;
-  color: #e60012;
+  background: #fceeef;
+  color: #a80f1b;
   font-size: 22rpx;
 }
 

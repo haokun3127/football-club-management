@@ -120,7 +120,7 @@ function renderRadar(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[],
   if (metrics.every((metric) => typeof metric.peerAverage === "number")) {
     drawPolygon(ctx, metrics, "peerAverage", centerX, centerY, radius, "rgba(96, 100, 111, 0.18)", "#8A8F99");
   }
-  drawPolygon(ctx, metrics, "value", centerX, centerY, radius, "rgba(230, 0, 18, 0.18)", "#E60012");
+  drawPolygon(ctx, metrics, "value", centerX, centerY, radius, "rgba(168, 15, 27, 0.18)", "#A80F1B");
   drawLabels(ctx, metrics, centerX, centerY, radius + 28);
   drawSelection(ctx, metrics, selectedMetricId, centerX, centerY, radius);
 }
@@ -191,7 +191,7 @@ function drawSelection(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[
   const point = pointAt(index, metrics.length, centerX, centerY, radius * Math.max(0, Math.min(value / metric.maxValue, 1)));
   ctx.beginPath();
   ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
-  ctx.fillStyle = "#E60012";
+  ctx.fillStyle = "#A80F1B";
   ctx.fill();
 }
 

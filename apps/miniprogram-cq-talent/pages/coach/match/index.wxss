@@ -66,7 +66,7 @@ button {
 
 .remove-action {
   min-width: 80rpx;
-  color: #e60012;
+  color: #a80f1b;
   font-size: 24rpx;
   text-align: right;
 }

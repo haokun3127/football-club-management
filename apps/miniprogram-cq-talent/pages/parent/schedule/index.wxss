@@ -32,8 +32,8 @@
 }
 
 .date-chip.active {
-  background: #fff1f0;
-  color: #e60012;
+  background: #fceeef;
+  color: #a80f1b;
   font-weight: 700;
 }
 
@@ -70,8 +70,8 @@
 }
 
 .type-tab.active {
-  background: #fff1f0;
-  color: #e60012;
+  background: #fceeef;
+  color: #a80f1b;
   font-weight: 700;
 }
 

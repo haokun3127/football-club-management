@@ -46,7 +46,7 @@
   </view>
   <view wx:if="{{workbench}}" class="card">
     <view class="section-title">确认与纠正</view>
-    <view class="subtitle">默认全员销课；余额未知不阻断确认，后端按课时规则生成流水。返还/补扣走同一路径 PATCH，纠正规则由后端控制。</view>
+    <view class="subtitle">默认按本次出勤确认课时；余额暂未更新时仍可提交。如需返还或补扣，请在保存后发起课时调整。</view>
     <textarea class="lesson-note" placeholder="本次销课备注，可选" value="{{lessonNote}}" bindinput="onLessonNoteInput" />
     <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="confirmLesson">确认销课</button>
   </view>

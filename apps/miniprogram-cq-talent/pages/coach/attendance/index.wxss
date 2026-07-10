@@ -1,53 +1,25 @@
-button {
-  margin-top: 20rpx;
-}
-
-.inline-button {
-  width: 180rpx;
-  margin-top: 0;
-}
-
-.attendance-row {
-  padding: 22rpx 0;
-  border-bottom: 1rpx solid #f0f0f0;
-}
-
-.attendance-row:last-child {
-  border-bottom: 0;
-}
-
-.attendance-main {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20rpx;
-}
-
-.strong {
-  color: #1f2329;
-  font-weight: 700;
-}
-
-.status-pill {
-  min-width: 128rpx;
-  min-height: 56rpx;
-  box-sizing: border-box;
-  padding: 0 16rpx;
-  border-radius: 10rpx;
-  background: #fff1f0;
-  color: #e60012;
-  font-size: 24rpx;
-  line-height: 56rpx;
-  text-align: center;
-}
-
-.note-input {
-  width: 100%;
-  min-height: 64rpx;
-  margin-top: 14rpx;
-  box-sizing: border-box;
-  padding: 12rpx 16rpx;
-  border-radius: 8rpx;
-  background: #f7f8fa;
-  font-size: 24rpx;
-}
+.attendance-page { min-height: 100vh; background: #f6f7f9; }
+.attendance-page__body { padding: 20rpx 24rpx 230rpx; }
+.event-head { padding: 24rpx 8rpx 28rpx; }
+.event-head__eyebrow { color: #a80f1b; font-size: 22rpx; font-weight: 700; }
+.event-head__title { margin-top: 10rpx; color: #202124; font-size: 36rpx; font-weight: 750; line-height: 1.35; }
+.event-head__meta { margin-top: 10rpx; color: #667085; font-size: 23rpx; line-height: 1.5; }
+.summary-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14rpx; margin-bottom: 20rpx; }
+.summary-item { padding: 22rpx 12rpx; border: 1rpx solid #e7eaf0; border-radius: 20rpx; background: #ffffff; text-align: center; }
+.summary-item__value { color: #202124; font-size: 36rpx; font-weight: 750; }
+.summary-item__label { margin-top: 4rpx; color: #667085; font-size: 21rpx; }
+.summary-item--success .summary-item__value { color: #237804; }
+.summary-item--warning .summary-item__value { color: #ad6800; }
+.roster-card { overflow: hidden; border: 1rpx solid #e7eaf0; border-radius: 24rpx; background: #ffffff; }
+.roster-head { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; padding: 26rpx 24rpx; border-bottom: 1rpx solid #e7eaf0; }
+.roster-head .section-title { margin-bottom: 5rpx; }
+.batch-button { flex-shrink: 0; min-height: 64rpx; margin: 0; padding: 0 22rpx; border: 1rpx solid #a80f1b; border-radius: 14rpx; background: #ffffff; color: #a80f1b; font-size: 24rpx; font-weight: 600; line-height: 62rpx; }
+.attendance-row { padding: 24rpx; border-bottom: 1rpx solid #f2f4f7; }
+.attendance-row:last-child { border-bottom: 0; }
+.attendance-main,.student-info { display: flex; align-items: center; }
+.attendance-main { justify-content: space-between; gap: 20rpx; }
+.student-info { min-width: 0; gap: 18rpx; }
+.student-avatar { display: flex; flex-shrink: 0; align-items: center; justify-content: center; width: 68rpx; height: 68rpx; border-radius: 50%; background: #fceeef; color: #a80f1b; font-size: 26rpx; font-weight: 700; }
+.student-name { color: #202124; font-size: 27rpx; font-weight: 700; }
+.lesson-state { margin-top: 5rpx; color: #667085; font-size: 21rpx; }
+.note-input { width: 100%; min-height: 68rpx; margin-top: 16rpx; box-sizing: border-box; padding: 12rpx 18rpx; border-radius: 14rpx; background: #f6f7f9; color: #202124; font-size: 23rpx; }

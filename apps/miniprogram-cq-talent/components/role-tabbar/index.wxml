@@ -7,7 +7,10 @@
     data-path="{{item.path}}"
     bindtap="handleTap"
   >
-    <view class="tabbar-dot"></view>
+    <view class="tabbar-icon-wrap">
+      <image class="tabbar-icon" src="{{item.icon}}" mode="aspectFit" />
+      <view class="tabbar-dot"></view>
+    </view>
     <view class="tabbar-label">{{item.label}}</view>
   </view>
 </view>

@@ -145,11 +145,11 @@ export async function saveCoachAttendance(eventId: string, roster: CoachWorkbenc
   const context = requireContext();
   const participants = roster
     .filter((student) => student.studentId)
-    .map((student) => ({
-      studentId: student.studentId,
-      status: normalizeParticipantStatus(student.status),
-      note: student.note || undefined,
-    }));
+    .map((student) => {
+      const status = normalizeParticipantStatus(student.status);
+      if (!status) throw new Error(`请先完成${student.name}的点名`);
+      return { studentId: student.studentId, status, note: student.note || undefined };
+    });
 
   return request<Record<string, unknown>, { participants: Array<{ studentId: string; status: string; note?: string }> }>({
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/attendance`,
@@ -607,10 +607,11 @@ function normalizeCoachWorkbench(raw: Record<string, unknown>, eventId: string):
   const rosterContext = asRecord(raw.rosterContext);
   const participants = Array.isArray(rosterContext?.participants) ? rosterContext?.participants as Array<Record<string, unknown>> : [];
   const students = Array.isArray(rosterContext?.students) ? rosterContext?.students as Array<Record<string, unknown>> : [];
+  const studentsById = new Map(students.map((student) => [String(student.id ?? student.studentId ?? ""), student]));
   const roster = (participants.length ? participants : students).map((item) => ({
     studentId: String(item.studentId ?? item.id ?? ""),
-    name: String(item.studentName ?? item.name ?? "学员"),
-    status: String(item.status ?? item.attendanceStatus ?? "待点名"),
+    name: String(item.studentName ?? item.name ?? studentsById.get(String(item.studentId ?? item.id ?? ""))?.name ?? "学员"),
+    status: String(item.attendanceStatus ?? item.checkInStatus ?? "pending"),
     note: stringOrUndefined(item.note ?? item.attendanceNote),
     lessonAction: stringOrUndefined(item.lessonAction ?? item.lessonStatus),
     shouldConsume: item.shouldConsume === undefined ? true : Boolean(item.shouldConsume),
@@ -734,18 +735,18 @@ function normalizeCoachSummary(raw: Record<string, unknown> | undefined, events:
   };
 }
 
-function normalizeParticipantStatus(status: string) {
+function normalizeParticipantStatus(status: string): "present" | "absent" | "late" | "leave_requested" | "excused" | undefined {
   const value = status.trim();
   if (value === "present" || value === "absent" || value === "late" || value === "leave_requested" || value === "excused") {
     return value;
   }
-  if (value === "已到" || value === "出勤" || value === "confirmed" || value === "待点名") {
+  if (value === "已到" || value === "出勤") {
     return "present";
   }
   if (value === "请假") return "leave_requested";
   if (value === "缺勤") return "absent";
   if (value === "迟到") return "late";
-  return "present";
+  return undefined;
 }
 
 function normalizeAssessmentForm(raw: Record<string, unknown>): AssessmentForm {

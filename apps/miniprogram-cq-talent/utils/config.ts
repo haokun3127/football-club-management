@@ -19,9 +19,9 @@ export const DEV_COACH_PROFILE_IDS = {
 };
 export const DEV_TEST_DATE = "2026-06-28";
 export const THEME = {
-  primary: "#E60012",
-  pressed: "#C4000F",
-  light: "#FFF1F0",
+  primary: "#A80F1B",
+  pressed: "#7F0B14",
+  light: "#FCEEEF",
 };
 
 export const STORAGE_KEYS = {

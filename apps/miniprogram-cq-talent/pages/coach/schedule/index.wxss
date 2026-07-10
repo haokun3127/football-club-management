@@ -28,7 +28,7 @@
 
 .switch-item.active,
 .filter-item.active {
-  background: #e60012;
+  background: #a80f1b;
   color: #ffffff;
 }
 
@@ -47,8 +47,8 @@
 }
 
 .summary-card.important {
-  background: #fff1f0;
-  color: #e60012;
+  background: #fceeef;
+  color: #a80f1b;
 }
 
 .summary-value {

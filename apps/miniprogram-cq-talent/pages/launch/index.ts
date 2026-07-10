@@ -18,7 +18,7 @@ Page<LaunchData>({
   data: {
     state: "loading",
     title: "正在进入重庆天才足球",
-    message: "正在解析小程序客户端和账号绑定状态",
+    message: "正在确认俱乐部与账号状态",
     actionText: "",
     clientName: "足球俱乐部小程序",
     devHint: "",
@@ -30,7 +30,7 @@ Page<LaunchData>({
     this.setData({
       state: "loading",
       title: "正在进入重庆天才足球",
-      message: "正在解析小程序客户端和账号绑定状态",
+      message: "正在确认俱乐部与账号状态",
       actionText: "",
     });
     try {

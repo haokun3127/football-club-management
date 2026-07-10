@@ -1,17 +1,21 @@
-<view class="page login-page">
-  <view class="brand-mark">重庆天才足球</view>
-  <view class="card hero-card login-card">
-    <view class="title">绑定俱乐部账号</view>
-    <view class="subtitle">身份来自俱乐部登记资料，不需要注册，也不能自行选择家长或教练。</view>
+<view class="login-page">
+  <app-header title="账号验证" />
+  <view class="login-page__body">
+    <view class="login-hero">
+      <view class="login-hero__eyebrow">重庆天才足球</view>
+      <view class="title">欢迎回来</view>
+      <view class="subtitle">验证微信手机号后，将自动匹配您在俱乐部登记的身份。</view>
+    </view>
+
+    <status-view state="{{state}}" title="{{state === 'loading' ? '正在验证' : state === 'pending' ? '需要俱乐部确认' : state === 'error' ? '暂时无法登录' : ''}}" message="{{message}}" action-text="{{state === 'error' ? '重新连接' : ''}}" bindaction="retry" />
+
+    <view wx:if="{{state === 'ready'}}" class="card verify-card">
+      <view class="section-title">手机号验证</view>
+      <view class="subtitle">手机号只用于匹配当前俱乐部档案，不会创建新的身份。</view>
+      <button class="primary-button verify-button" open-type="getPhoneNumber" loading="{{submitting}}" disabled="{{submitting}}" bindgetphonenumber="onGetPhoneNumber">授权手机号并进入</button>
+      <view class="privacy-note">继续即表示同意使用微信授权手机号完成身份核验。</view>
+    </view>
+
+    <view class="help-row"><view class="help-row__title">遇到问题？</view><view class="help-row__text">未登记、手机号不一致、多身份或账号停用，请联系俱乐部工作人员处理。</view></view>
   </view>
-
-  <status-view state="{{state}}" title="{{state === 'loading' ? '正在验证' : state === 'pending' ? '需要俱乐部确认' : state === 'error' ? '暂时无法登录' : ''}}" message="{{message}}" action-text="{{state === 'error' ? '重新连接' : ''}}" bindaction="retry" />
-
-  <view wx:if="{{state === 'ready'}}" class="card">
-    <view class="section-title">手机号验证</view>
-    <view class="subtitle">手机号仅用于匹配当前俱乐部的家长或教练档案。</view>
-    <button class="primary-button" open-type="getPhoneNumber" loading="{{submitting}}" disabled="{{submitting}}" bindgetphonenumber="onGetPhoneNumber">授权手机号并进入</button>
-  </view>
-
-  <view class="card help-card"><view class="section-title">无法登录？</view><view class="subtitle">请确认俱乐部登记手机号与当前授权手机号一致；未登记、多身份或停用账号需要联系俱乐部管理员处理。</view></view>
 </view>

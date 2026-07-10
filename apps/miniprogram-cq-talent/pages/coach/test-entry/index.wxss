@@ -9,7 +9,7 @@
 .progress-value {
   height: 100%;
   border-radius: inherit;
-  background: #e60012;
+  background: #a80f1b;
 }
 
 .group-scroll {
@@ -31,7 +31,7 @@
 }
 
 .group-tab.active {
-  background: #e60012;
+  background: #a80f1b;
   color: #ffffff;
 }
 
@@ -116,7 +116,7 @@
 
 .status-invalid,
 .invalid-hint {
-  color: #e60012;
+  color: #a80f1b;
 }
 
 .invalid-hint {
