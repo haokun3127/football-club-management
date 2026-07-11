@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 7
+- **Total Sessions**: 8
 - **Last Active**: 2026-07-11
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~254 | Active |
+| `journal-1.md` | ~292 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 8 | 2026-07-11 | CQ Talent full mini-program UI and tactical board | `c099630`, `7b4200b`, `a331704`, `f091d7a`, `b3eb2bd` | `codex/chongqing-talent-business` |
 | 7 | 2026-07-11 | CQ Talent parent UI alignment | `ced0b2c`, `841f5ef` | `codex/chongqing-talent-business` |
 | 6 | 2026-07-11 | CQ Talent UI foundation and DevTools validation | `a4aef32`, `1269dce` | `codex/chongqing-talent-business` |
 | 5 | 2026-07-10 | 修正重庆天才200人家庭测试数据 | `cd9aabe` | `codex/chongqing-talent-business` |

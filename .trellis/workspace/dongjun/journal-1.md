@@ -252,3 +252,41 @@ Aligned all parent mini-program routes to the current Figma style, enforced fami
 ### Next Steps
 
 - None - task complete
+
+
+## Session 8: CQ Talent full mini-program UI and tactical board
+
+**Date**: 2026-07-11
+**Task**: CQ Talent full mini-program UI and tactical board
+**Package**: api
+**Branch**: `codex/chongqing-talent-business`
+
+### Summary
+
+Completed full registered-page Figma alignment, parent and coach workflows, persistent tactical board, automated integration and DevTools acceptance. User deferred the remaining physical-device manual sign-off; archived the parent task without marking that item passed.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `c099630` | (see git log) |
+| `7b4200b` | (see git log) |
+| `a331704` | (see git log) |
+| `f091d7a` | (see git log) |
+| `b3eb2bd` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
