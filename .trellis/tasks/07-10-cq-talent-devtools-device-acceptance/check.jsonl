@@ -1,1 +1,3 @@
-{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python3 .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file":".trellis/tasks/07-10-cq-talent-devtools-device-acceptance/research/final-acceptance.md","reason":"最终自动化证据与真机待签署项"}
+{"file":".trellis/tasks/07-10-cq-talent-devtools-device-acceptance/research/figma-page-diff-matrix.md","reason":"核对所有页面分类、实现回写和 Figma 节点"}
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"核对跨层权限与持久化契约"}

@@ -1,1 +1,5 @@
-{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python3 .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"最终核对登录、家庭隐私、教练工作台、评测和战术板边界"}
+{"file":".trellis/tasks/07-10-cq-talent-devtools-device-acceptance/research/figma-page-diff-matrix.md","reason":"16 个注册路由与完整 Figma 文件的页面级基线"}
+{"file":".trellis/tasks/archive/2026-07/07-10-cq-talent-parent-ui-alignment/research/implementation-verification.md","reason":"家长端 DevTools 自动化和截图证据"}
+{"file":".trellis/tasks/archive/2026-07/07-10-cq-talent-coach-ui-alignment/research/implementation-verification.md","reason":"教练端 25 人/62 项和战术板自动化证据"}
+{"file":".trellis/tasks/archive/2026-07/07-10-cq-talent-tactical-board-mvp/research/implementation-verification.md","reason":"战术板 persistence、权限和相对坐标证据"}
