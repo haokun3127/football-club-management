@@ -6,6 +6,7 @@
     <view class="title">{{workbench.event.title}}</view>
     <view class="match-hero__score"><text>{{homeScore === '' ? '–' : homeScore}}</text><text class="match-hero__divider">:</text><text>{{awayScore === '' ? '–' : awayScore}}</text></view>
     <view class="match-hero__opponent">{{opponentName || '对手待填写'}}</view>
+    <button class="match-hero__board" bindtap="openTacticalBoard">打开比赛战术板</button>
   </view>
   <view wx:if="{{workbench}}" class="card match-form-card">
     <view class="section-title">当前比赛摘要</view>

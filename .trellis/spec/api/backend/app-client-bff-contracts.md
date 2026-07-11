@@ -298,6 +298,61 @@ openMetric(metrics[tappedIndex + 1].metricId);
 openMetric(tappedPoint.metricId);
 ```
 
+## Scenario: Match Tactical Board Snapshot
+
+### 1. Scope / Trigger
+
+- Trigger: a coach reads or writes a tactical board for a match event.
+- Pixel positions are presentation state; the cross-layer contract stores only normalized coordinates.
+
+### 2. Signatures
+
+- `GET /clubs/:clubId/app-clients/:clientId/coach/tactical-board/formations`
+- `GET /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/tactical-board`
+- `PUT /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/tactical-board`
+- SQLite natural key: `UNIQUE (club_id, event_id)`.
+
+### 3. Contracts
+
+- Formation templates contain exactly 11 positions with finite `x/y` values in `0..1`.
+- PUT accepts one unique entry per visible event-roster student; at most 11 entries may have role `starter`.
+- Snapshot writes record `updatedByCoachId/updatedAt` and upsert by club/event, preserving `createdAt`.
+- `completed/cancelled` matches are readable but not writable; parent clients have no route access.
+
+### 4. Validation & Error Matrix
+
+- Non-match event -> `400 invalid_tactical_board_event`.
+- Unknown formation, duplicate/out-of-roster student, invalid role or coordinate -> `400 invalid_tactical_board_snapshot`.
+- Completed/cancelled write -> `409 tactical_board_read_only`.
+- Coach without event access or parent -> `403 forbidden`.
+
+### 5. Good/Base/Bad Cases
+
+- Good: 25-player roster yields 11 starters and 14 substitutes, then restores the saved relative positions after restart.
+- Base: no snapshot returns a generated 4-3-3 board with `saved=false`.
+- Bad: store `left/top` pixels or accept a student id that is not in the match roster.
+
+### 6. Tests Required
+
+- Domain tests assert templates and duplicate/range/roster validation.
+- Repository test closes and reopens SQLite before asserting the saved snapshot.
+- Contract test covers coach save/read, parent denial and completed-match read-only behavior.
+- Client coordinate tests round-trip at small, regular and large pitch widths.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```typescript
+players: [{ studentId, left: 132, top: 284 }]
+```
+
+#### Correct
+
+```typescript
+players: [{ studentId, x: 0.42, y: 0.68 }]
+```
+
 ## Scenario: WeChat Login Connector and Session
 
 ### 1. Scope / Trigger

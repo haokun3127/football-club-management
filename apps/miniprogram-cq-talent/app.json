@@ -12,6 +12,7 @@
     "pages/coach/attendance/index",
     "pages/coach/lesson/index",
     "pages/coach/match/index",
+    "pages/coach/tactical-board/index",
     "pages/coach/training/index",
     "pages/coach/test-entry/index",
     "pages/coach/me/index"

@@ -1,10 +1,41 @@
 import { describe, expect, it } from "vitest";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { createSeedData } from "../src/seed.js";
-import { createPlatformRepositories, seedPlatformData } from "../src/persistence/platform-persistence.js";
+import { createPlatformPersistence, createPlatformRepositories, seedPlatformData } from "../src/persistence/platform-persistence.js";
 import { migrate, openSqliteDatabase } from "../src/persistence/sqlite.js";
 import { PersistentApiStore } from "../src/store.js";
 
 describe("platform persistence", () => {
+  it("restores tactical board snapshots after reopening SQLite", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "football-tactical-board-"));
+    const databasePath = join(directory, "club.sqlite");
+    try {
+      const first = await createPlatformPersistence({ databasePath });
+      first.repositories.tacticalBoards.save({
+        id: "tactical-board-event-match-1",
+        clubId: "club-chongqing-talent",
+        eventId: "event-match-1",
+        formationName: "4-3-3",
+        pitchType: "full",
+        players: [{ studentId: "student-1", displayName: "王小虎", role: "starter", x: 0.42, y: 0.8 }],
+        updatedByCoachId: "coach-1",
+        createdAt: "2026-07-11T00:00:00.000Z",
+        updatedAt: "2026-07-11T00:00:00.000Z",
+      });
+      first.database.close();
+      const reopened = await createPlatformPersistence({ databasePath, seed: false });
+      expect(reopened.repositories.tacticalBoards.get("club-chongqing-talent", "event-match-1")).toEqual(expect.objectContaining({
+        formationName: "4-3-3",
+        players: [expect.objectContaining({ studentId: "student-1", x: 0.42 })],
+      }));
+      reopened.database.close();
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   it("runs migrations idempotently", () => {
     const database = openSqliteDatabase(":memory:");
 
@@ -17,6 +48,7 @@ describe("platform persistence", () => {
       "0003_status_flow_audit_fields.sql",
       "0004_http_idempotency_records.sql",
       "0005_privacy_foundation.sql",
+      "0006_tactical_boards.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);
@@ -53,6 +85,7 @@ describe("platform persistence", () => {
           'assessment_metric_bindings',
           'assessment_test_items',
           'assessment_raw_results'
+          ,'tactical_boards'
         )
       ORDER BY name
     `).all() as Array<{ name: string }>;
@@ -86,6 +119,7 @@ describe("platform persistence", () => {
       "student_consent_records",
       "student_contacts",
       "student_operational_profiles",
+      "tactical_boards",
     ]);
 
     database.close();

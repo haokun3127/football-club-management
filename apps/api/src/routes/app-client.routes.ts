@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import type { ClubUserRole } from "@football-club/domain";
+import { formationTemplates, validateTacticalBoardPlayers, type ClubUserRole, type TacticalBoardPlayer } from "@football-club/domain";
 import type { RecordAssessmentInput, RecordMatchInput } from "@football-club/domain";
 import type { PrivacyRequestCreateInput } from "../data-capability/types.js";
 import type { ClubAppClient, StudentDetail, StudentListItem } from "../data-capability/types.js";
@@ -28,6 +28,89 @@ interface AppEventDetail {
 const adminRoles = new Set<ClubUserRole>(["owner", "admin", "operator"]);
 
 export async function registerAppClientRoutes(app: FastifyInstance, context: RouteContext) {
+  app.get<{ Params: { clubId: string; clientId: string } }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/tactical-board/formations",
+    { schema: { ...schemas.appClientParams } },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) return reply;
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) return reply;
+      return { clubId: request.params.clubId, formations: formationTemplates };
+    },
+  );
+
+  app.get<{ Params: { clubId: string; clientId: string; eventId: string } }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/tactical-board",
+    { schema: { ...schemas.appClientEventParams } },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) return reply;
+      if (!await requireCoachEventAccess(context, request, reply, request.params.clubId, request.params.eventId)) return reply;
+      const event = (await context.store.listCalendarEvents(request.params.clubId) as AppEventDetail[]).find((item) => item.id === request.params.eventId);
+      if (!event) return context.sendError(reply, 404, "not_found", "Event not found");
+      if (event.type !== "match") return context.sendError(reply, 400, "invalid_tactical_board_event", "Tactical board is only available for match events");
+      const roster = await tacticalBoardRoster(context, request.params.clubId, event);
+      const saved = await context.store.getTacticalBoard(request.params.clubId, event.id);
+      return {
+        event: { id: event.id, title: event.title, status: event.status },
+        board: saved ?? createInitialTacticalBoard(request.params.clubId, event.id, roster),
+        roster,
+        saved: Boolean(saved),
+        readOnly: ["completed", "cancelled", "canceled"].includes(event.status),
+      };
+    },
+  );
+
+  app.put<{
+    Params: { clubId: string; clientId: string; eventId: string };
+    Body: { formationName: string; players: TacticalBoardPlayer[] };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/tactical-board",
+    { schema: {
+      ...schemas.appClientEventParams,
+      body: {
+        type: "object", additionalProperties: false, required: ["formationName", "players"],
+        properties: {
+          formationName: { type: "string", minLength: 1 },
+          players: { type: "array", maxItems: 200, items: { type: "object", additionalProperties: false, required: ["studentId", "displayName", "role", "x", "y"], properties: {
+            studentId: { type: "string", minLength: 1 }, displayName: { type: "string", minLength: 1 }, avatarUrl: { type: "string" },
+            role: { type: "string", enum: ["starter", "substitute", "reserve"] }, positionLabel: { type: "string" },
+            x: { type: "number", minimum: 0, maximum: 1 }, y: { type: "number", minimum: 0, maximum: 1 },
+          } } },
+        },
+      },
+    } },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) return reply;
+      if (!await requireCoachEventAccess(context, request, reply, request.params.clubId, request.params.eventId)) return reply;
+      const event = (await context.store.listCalendarEvents(request.params.clubId) as AppEventDetail[]).find((item) => item.id === request.params.eventId);
+      if (!event) return context.sendError(reply, 404, "not_found", "Event not found");
+      if (event.type !== "match") return context.sendError(reply, 400, "invalid_tactical_board_event", "Tactical board is only available for match events");
+      if (["completed", "cancelled", "canceled"].includes(event.status)) return context.sendError(reply, 409, "tactical_board_read_only", "Completed or cancelled matches are read only");
+      if (!formationTemplates.some((item) => item.name === request.body.formationName)) return context.sendError(reply, 400, "invalid_tactical_board_snapshot", "Unknown formation template");
+      const roster = await tacticalBoardRoster(context, request.params.clubId, event);
+      const errors = validateTacticalBoardPlayers(request.body.players, roster.map((item) => item.studentId));
+      if (errors.length) return context.sendError(reply, 400, "invalid_tactical_board_snapshot", "Invalid tactical board snapshot", errors);
+      const auth = context.membershipResolver ? await context.resolveClubAuth(request, reply, request.params.clubId) : null;
+      const coach = context.store.listCoaches(request.params.clubId).find((item) => item.userId === auth?.user.id);
+      const existing = await context.store.getTacticalBoard(request.params.clubId, event.id);
+      const now = new Date().toISOString();
+      const board = await context.store.saveTacticalBoard({
+        id: existing?.id ?? `tactical-board-${event.id}`,
+        clubId: request.params.clubId,
+        eventId: event.id,
+        formationName: request.body.formationName,
+        pitchType: "full",
+        players: request.body.players,
+        updatedByCoachId: coach?.id ?? "coach-1",
+        createdAt: existing?.createdAt ?? now,
+        updatedAt: now,
+      });
+      return { event: { id: event.id, title: event.title, status: event.status }, board, roster, saved: true, readOnly: false };
+    },
+  );
+
   app.get<{
     Params: {
       clubId: string;
@@ -1322,6 +1405,37 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       }
     },
   );
+}
+
+async function tacticalBoardRoster(context: RouteContext, clubId: string, event: AppEventDetail) {
+  const students = await context.store.listOperationalStudents(clubId);
+  const names = new Map(students.map((student) => [student.id, student.name]));
+  return (event.participants ?? []).map((participant) => ({
+    studentId: participant.studentId,
+    displayName: names.get(participant.studentId) ?? "学员",
+  }));
+}
+
+function createInitialTacticalBoard(clubId: string, eventId: string, roster: Array<{ studentId: string; displayName: string }>) {
+  const formation = formationTemplates[0]!;
+  const now = new Date().toISOString();
+  return {
+    id: `tactical-board-${eventId}`,
+    clubId,
+    eventId,
+    formationName: formation.name,
+    pitchType: "full" as const,
+    players: roster.map((student, index) => ({
+      ...student,
+      role: index < 11 ? "starter" as const : "substitute" as const,
+      positionLabel: index < 11 ? formation.positions[index]?.positionLabel : undefined,
+      x: index < 11 ? formation.positions[index]?.x ?? 0.5 : 0.05,
+      y: index < 11 ? formation.positions[index]?.y ?? 0.5 : 0.95,
+    })),
+    updatedByCoachId: "coach-1",
+    createdAt: now,
+    updatedAt: now,
+  };
 }
 
 async function requireActiveAppClient(

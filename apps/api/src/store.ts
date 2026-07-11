@@ -54,6 +54,7 @@ import {
   type TrainingDrill,
   type TrainingObjective,
   type TrainingSession,
+  type TacticalBoard,
 } from "@football-club/domain";
 import type {
   ClubCapabilities,
@@ -112,6 +113,8 @@ import { createSeedData, type SeedData } from "./seed.js";
 
 export interface ApiStore {
   getHealth(): { status: "ok"; service: "@football-club/api" };
+  getTacticalBoard(clubId: EntityId, eventId: EntityId): TacticalBoard | null | Promise<TacticalBoard | null>;
+  saveTacticalBoard(board: TacticalBoard): TacticalBoard | Promise<TacticalBoard>;
   getHttpIdempotencyRecord(key: string): HttpIdempotencyRecord | null | Promise<HttpIdempotencyRecord | null>;
   saveHttpIdempotencyRecord(record: HttpIdempotencyRecord): void | Promise<void>;
   pruneHttpIdempotencyRecords(now: string): void | Promise<void>;
@@ -597,6 +600,7 @@ export abstract class SeedBackedStore implements ApiStore {
   private readonly httpIdempotencyRecords = new Map<string, HttpIdempotencyRecord>();
   private readonly privacyAuditLogs: PrivacyAuditLog[] = [];
   private readonly privacyRequests: PrivacyRequest[] = [];
+  private readonly tacticalBoards = new Map<string, TacticalBoard>();
   protected readonly wpsWebhookReplayGuard = new InMemoryWpsWebhookReplayGuard();
 
   constructor(data: SeedData = createSeedData()) {
@@ -646,6 +650,15 @@ export abstract class SeedBackedStore implements ApiStore {
       status: "ok",
       service: "@football-club/api",
     };
+  }
+
+  getTacticalBoard(clubId: EntityId, eventId: EntityId): TacticalBoard | null {
+    return this.tacticalBoards.get(`${clubId}:${eventId}`) ?? null;
+  }
+
+  saveTacticalBoard(board: TacticalBoard): TacticalBoard {
+    this.tacticalBoards.set(`${board.clubId}:${board.eventId}`, board);
+    return board;
   }
 
   getHttpIdempotencyRecord(key: string): HttpIdempotencyRecord | null {
@@ -2247,6 +2260,14 @@ export class PersistentApiStore extends SeedBackedStore {
 
   override pruneHttpIdempotencyRecords(now: string) {
     this.repositories.dataCapability.pruneHttpIdempotencyRecords(now);
+  }
+
+  override getTacticalBoard(clubId: EntityId, eventId: EntityId) {
+    return this.repositories.tacticalBoards.get(clubId, eventId);
+  }
+
+  override saveTacticalBoard(board: TacticalBoard) {
+    return this.repositories.tacticalBoards.save(board);
   }
 
   override async listClubs() {

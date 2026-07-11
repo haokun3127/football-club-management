@@ -1,0 +1,26 @@
+<app-header title="比赛战术板" subtitle="阵型与首发位置" show-back="{{true}}" />
+<view class="board-page">
+  <status-view state="{{state}}" title="{{state === 'loading' ? '加载战术板' : '暂时无法查看'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+  <view wx:if="{{state === 'ready'}}" class="board-body">
+    <view class="board-head">
+      <view><view class="board-head__eyebrow">MATCH TACTICS</view><view class="board-head__title">{{eventTitle}}</view></view>
+      <status-chip label="{{readOnly ? '只读' : dirty ? '未保存' : '已保存'}}" tone="{{readOnly ? 'neutral' : dirty ? 'warning' : 'success'}}" compact="{{true}}" />
+    </view>
+    <picker mode="selector" range="{{formations}}" range-key="label" value="{{formationIndex}}" bindchange="onFormationChange" disabled="{{readOnly}}">
+      <view class="formation-picker">阵型 {{formations[formationIndex].label}}<text>⌄</text></view>
+    </picker>
+    <movable-area id="pitch" class="pitch">
+      <view class="pitch__half"></view><view class="pitch__circle"></view><view class="pitch__box pitch__box--top"></view><view class="pitch__box pitch__box--bottom"></view>
+      <movable-view wx:for="{{starters}}" wx:key="studentId" class="player {{item.selected ? 'player--selected' : ''}}" direction="all" x="{{item.px}}" y="{{item.py}}" inertia="{{false}}" out-of-bounds="{{false}}" disabled="{{readOnly}}" data-id="{{item.studentId}}" bindchange="onPlayerMove" bindtap="selectStarter">
+        <view class="player__badge">{{item.initials}}</view><view class="player__name">{{item.displayName}}</view>
+      </movable-view>
+    </movable-area>
+    <view class="bench-card">
+      <view class="row"><view class="section-title">替补席</view><view class="subtitle">先选场上球员，再点替补完成换位</view></view>
+      <scroll-view scroll-x class="bench-scroll" show-scrollbar="{{false}}">
+        <view class="bench-row"><view wx:for="{{substitutes}}" wx:key="studentId" class="bench-player" data-id="{{item.studentId}}" bindtap="swapSubstitute"><view class="bench-player__avatar">{{item.initials}}</view><view>{{item.displayName}}</view></view></view>
+      </scroll-view>
+    </view>
+  </view>
+  <submit-bar wx:if="{{state === 'ready' && !readOnly}}" primary-text="保存战术板" secondary-text="重置阵型" hint="位置按屏幕比例保存" loading="{{saving}}" disabled="{{!dirty}}" bindsubmit="saveBoard" bindsecondary="resetBoard" />
+</view>

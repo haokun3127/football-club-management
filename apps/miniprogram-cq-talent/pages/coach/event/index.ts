@@ -60,6 +60,9 @@ Page({
   openMatch() {
     openPage(`/pages/coach/match/index?id=${this.data.eventId}`);
   },
+  openTacticalBoard() {
+    openPage(`/pages/coach/tactical-board/index?eventId=${this.data.eventId}`);
+  },
   openTraining() {
     openPage(`/pages/coach/training/index?eventId=${this.data.eventId}`);
   },

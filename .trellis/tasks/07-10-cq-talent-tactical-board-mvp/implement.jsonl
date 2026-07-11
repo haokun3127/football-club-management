@@ -1,1 +1,5 @@
-{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python3 .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"战术板 app-client 权限、错误和幂等契约"}
+{"file":".trellis/spec/api/backend/database-guidelines.md","reason":"SQLite migration、repository 与重启持久化规则"}
+{"file":".trellis/spec/api/backend/directory-structure.md","reason":"domain、route、schema、store 与 persistence 放置约定"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"相对坐标从 domain 到 API 再到 movable-view 的跨层一致性"}
+{"file":".trellis/tasks/07-10-cq-talent-devtools-device-acceptance/research/figma-page-diff-matrix.md","reason":"C7 原稿与 MVP 决策基线"}

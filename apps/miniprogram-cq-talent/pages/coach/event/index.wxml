@@ -27,6 +27,7 @@
       <button class="action-tile action-tile--primary" bindtap="openAttendance"><text class="action-tile__icon">点</text><text>点名</text></button>
       <button wx:if="{{workbench.event.type !== 'other'}}" class="action-tile" bindtap="openLesson"><text class="action-tile__icon">课</text><text>销课</text></button>
       <button wx:if="{{workbench.event.type === 'match'}}" class="action-tile action-tile--match" bindtap="openMatch"><text class="action-tile__icon">赛</text><text>比赛录入</text></button>
+      <button wx:if="{{workbench.event.type === 'match'}}" class="action-tile action-tile--match" bindtap="openTacticalBoard"><text class="action-tile__icon">阵</text><text>比赛战术板</text></button>
       <button wx:if="{{workbench.event.type === 'training'}}" class="action-tile" bindtap="openTraining"><text class="action-tile__icon">训</text><text>训练内容</text></button>
       <button wx:if="{{workbench.event.type === 'training' && workbench.assessmentTemplateId}}" class="action-tile" bindtap="openTestEntry"><text class="action-tile__icon">测</text><text>评测录入</text></button>
     </view>

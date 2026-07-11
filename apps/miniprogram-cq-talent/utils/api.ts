@@ -18,6 +18,9 @@ import type {
   StudentHome,
   StudentSummary,
   TrainingProjectTree,
+  FormationTemplate,
+  TacticalBoardPlayer,
+  TacticalBoardState,
 } from "./types";
 
 export async function resolveClient() {
@@ -223,6 +226,31 @@ export async function getCoachTrainingProjectTree(): Promise<TrainingProjectTree
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/training-project-tree`,
   });
   return normalizeTrainingProjectTree(response);
+}
+
+export async function getTacticalBoardFormations(): Promise<FormationTemplate[]> {
+  const context = requireContext();
+  const response = await request<{ formations: FormationTemplate[] }>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/tactical-board/formations`,
+  });
+  return response.formations ?? [];
+}
+
+export async function getCoachTacticalBoard(eventId: string): Promise<TacticalBoardState> {
+  const context = requireContext();
+  return request<TacticalBoardState>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/tactical-board`,
+  });
+}
+
+export async function saveCoachTacticalBoard(eventId: string, formationName: string, players: TacticalBoardPlayer[]): Promise<TacticalBoardState> {
+  const context = requireContext();
+  return request<TacticalBoardState, { formationName: string; players: TacticalBoardPlayer[] }>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/tactical-board`,
+    method: "PUT",
+    data: { formationName, players },
+    idempotent: true,
+  });
 }
 
 export async function saveCoachTrainingProjects(eventId: string, projectIds: string[], note?: string) {

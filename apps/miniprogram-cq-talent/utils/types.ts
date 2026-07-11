@@ -179,6 +179,36 @@ export interface CoachWorkbench {
   pending: Array<{ title: string; message: string }>;
 }
 
+export interface FormationTemplate {
+  name: string;
+  label: string;
+  positions: Array<{ positionLabel: string; x: number; y: number }>;
+}
+
+export interface TacticalBoardPlayer {
+  studentId: string;
+  displayName: string;
+  avatarUrl?: string;
+  role: "starter" | "substitute" | "reserve";
+  positionLabel?: string;
+  x: number;
+  y: number;
+}
+
+export interface TacticalBoardState {
+  event: { id: string; title: string; status: string };
+  board: {
+    id: string;
+    eventId: string;
+    formationName: string;
+    players: TacticalBoardPlayer[];
+    updatedAt: string;
+  };
+  roster: Array<{ studentId: string; displayName: string }>;
+  saved: boolean;
+  readOnly: boolean;
+}
+
 export interface TrainingProject {
   id: string;
   name: string;

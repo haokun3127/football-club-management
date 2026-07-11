@@ -1,0 +1,18 @@
+.board-page { min-height: 100vh; background: #f6f7f9; }
+.board-body { padding: 18rpx 24rpx 190rpx; }
+.board-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20rpx; margin-bottom: 16rpx; }
+.board-head__eyebrow { color: #a80f1b; font-size: 18rpx; font-weight: 700; letter-spacing: 2rpx; }
+.board-head__title { margin-top: 4rpx; font-size: 28rpx; font-weight: 700; }
+.formation-picker { display: flex; justify-content: space-between; margin-bottom: 16rpx; padding: 18rpx 20rpx; border: 1rpx solid #e7eaf0; border-radius: 16rpx; background: #fff; font-weight: 650; }
+.pitch { position: relative; width: 100%; height: 780rpx; overflow: hidden; border: 6rpx solid #fff; border-radius: 24rpx; background: repeating-linear-gradient(0deg,#26834f 0,#26834f 78rpx,#2d8d58 78rpx,#2d8d58 156rpx); box-shadow: 0 10rpx 30rpx rgba(16,24,40,.16); }
+.pitch::before { content: ""; position: absolute; inset: 20rpx; border: 2rpx solid rgba(255,255,255,.72); }
+.pitch__half { position: absolute; top: 50%; right: 20rpx; left: 20rpx; border-top: 2rpx solid rgba(255,255,255,.72); }
+.pitch__circle { position: absolute; top: 50%; left: 50%; width: 120rpx; height: 120rpx; border: 2rpx solid rgba(255,255,255,.72); border-radius: 50%; transform: translate(-50%,-50%); }
+.pitch__box { position: absolute; left: 50%; width: 220rpx; height: 90rpx; border: 2rpx solid rgba(255,255,255,.72); transform: translateX(-50%); }
+.pitch__box--top { top: 20rpx; border-top: 0; }.pitch__box--bottom { bottom: 20rpx; border-bottom: 0; }
+.player { width: 96rpx; height: 94rpx; text-align: center; }
+.player__badge { display: flex; align-items: center; justify-content: center; width: 54rpx; height: 54rpx; margin: 0 auto; border: 4rpx solid #fff; border-radius: 50%; background: #a80f1b; color: #fff; font-size: 19rpx; font-weight: 700; box-shadow: 0 4rpx 12rpx rgba(0,0,0,.2); }
+.player--selected .player__badge { border-color: #ffd666; transform: scale(1.1); }
+.player__name { overflow: hidden; margin-top: 2rpx; color: #fff; font-size: 18rpx; font-weight: 650; text-shadow: 0 1rpx 4rpx rgba(0,0,0,.65); text-overflow: ellipsis; white-space: nowrap; }
+.bench-card { margin-top: 18rpx; padding: 20rpx; border: 1rpx solid #e7eaf0; border-radius: 20rpx; background: #fff; }
+.bench-card .section-title { margin-bottom: 0; }.bench-scroll { width: 100%; margin-top: 16rpx; white-space: nowrap; }.bench-row { display: inline-flex; gap: 18rpx; }.bench-player { width: 90rpx; color: #667085; font-size: 20rpx; text-align: center; }.bench-player__avatar { display: flex; align-items: center; justify-content: center; width: 58rpx; height: 58rpx; margin: 0 auto 6rpx; border-radius: 50%; background: #f2f4f7; color: #202124; font-weight: 700; }

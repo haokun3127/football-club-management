@@ -3,7 +3,7 @@
   "name": "cq-talent-tactical-board-mvp",
   "title": "重庆天才战术板MVP",
   "description": "实现比赛日战术板MVP的domain、持久化BFF、拖拽页面、权限和Figma同步",
-  "status": "planning",
+  "status": "in_progress",
   "dev_type": null,
   "scope": "domain-api-miniprogram-tactical-board-mvp",
   "package": "api",

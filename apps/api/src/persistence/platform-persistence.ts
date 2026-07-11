@@ -12,6 +12,7 @@ import {
   UserAccountRepository,
 } from "./platform-repositories.js";
 import { migrate, openSqliteDatabase } from "./sqlite.js";
+import { TacticalBoardRepository } from "./tactical-board-repository.js";
 
 export interface PlatformRepositories {
   clubs: ClubRepository;
@@ -23,6 +24,7 @@ export interface PlatformRepositories {
   teams: TeamRepository;
   teamMembers: TeamMemberRepository;
   dataCapability: DataCapabilityRepository;
+  tacticalBoards: TacticalBoardRepository;
 }
 
 export interface PlatformPersistence {
@@ -41,6 +43,7 @@ export function createPlatformRepositories(database: DatabaseSync): PlatformRepo
     teams: new TeamRepository(database),
     teamMembers: new TeamMemberRepository(database),
     dataCapability: new DataCapabilityRepository(database),
+    tacticalBoards: new TacticalBoardRepository(database),
   };
 }
 

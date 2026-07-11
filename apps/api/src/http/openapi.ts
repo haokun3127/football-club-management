@@ -231,6 +231,20 @@ export function buildOpenApiDocument() {
           ...schemas.appClientRecordMatch,
         }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/tactical-board/formations": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/tactical-board/formations", {
+          ...schemas.appClientParams,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/tactical-board": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/tactical-board", {
+          ...schemas.appClientEventParams,
+        }),
+        put: operation("PUT", "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/tactical-board", {
+          ...schemas.appClientEventParams,
+          body: { type: "object", required: ["formationName", "players"], properties: { formationName: { type: "string" }, players: { type: "array", items: { type: "object" } } } },
+        }),
+      },
       "/clubs/{clubId}/app-clients/{clientId}/coach/assessments": {
         post: operation("POST", "/clubs/{clubId}/app-clients/{clientId}/coach/assessments", {
           ...schemas.appClientParams,

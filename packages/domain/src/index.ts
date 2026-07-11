@@ -15,3 +15,4 @@ export * from "./privacy.js";
 export * from "./primitives.js";
 export * from "./teams.js";
 export * from "./training.js";
+export * from "./tactical-board.js";

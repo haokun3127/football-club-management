@@ -25,6 +25,8 @@
 - `06 Coach Generated` 新增 7 个 `CODE / C...` 画板，节点 `231:2`、`231:27`、`231:48`、`231:65`、`231:87`、`231:108`、`231:137`。
 - 原始 C 系列画板保留，用于比较旧视觉探索与当前可运行产品结构。
 
-## 待战术板子任务回填
+## 战术板回填
 
-- 比赛活动工作台和比赛录入页的战术板入口将在 `cq-talent-tactical-board-mvp` 完成后接入并复验。
+- 比赛活动工作台和比赛录入页均已接入 `pages/coach/tactical-board/index`。
+- DevTools 自动化覆盖 11 首发＋14 替补、拖拽、保存、重置与回填；截图 `coach-07-tactical-board.png`。
+- Figma 新增 `CODE / C7 Tactical Board MVP` 节点 `233:2`，旧 C7 标为 LEGACY。

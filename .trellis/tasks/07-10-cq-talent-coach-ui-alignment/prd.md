@@ -19,10 +19,10 @@
 
 ## Acceptance Criteria
 
-- [ ] 七个教练路由全部完成 ready/loading/empty/error/pending/success 所需状态并通过渲染检查。
-- [ ] 任务卡只显示一个最高优先级 CTA；训练活动无比赛操作，比赛活动显示战术板/比赛录入。
-- [ ] 无助攻、训练项目回填、Tab 栈、权限裁剪和评测草稿行为没有回退。
-- [ ] 25 人名单和 62 项模板在小屏可滚动操作，固定提交栏不遮挡内容。
-- [ ] 页面不展示 Figma 固定统计、未知 capabilities、假计时/学分或技术文案。
-- [ ] Coach Generated frames 同步最终结构，逐页 DevTools 截图通过。
-- [ ] 全量类型检查、API contract、纯函数测试和教练 smoke 通过。
+- [x] 七个教练路由全部完成 ready/loading/empty/error/pending/success 所需状态并通过渲染检查。
+- [x] 任务卡只显示一个最高优先级 CTA；训练活动无比赛操作，比赛活动显示战术板/比赛录入。
+- [x] 无助攻、训练项目回填、Tab 栈、权限裁剪和评测草稿行为没有回退。
+- [x] 25 人名单和 62 项模板在小屏可滚动操作，固定提交栏不遮挡内容。
+- [x] 页面不展示 Figma 固定统计、未知 capabilities、假计时/学分或技术文案。
+- [x] Coach Generated frames 同步最终结构，逐页 DevTools 截图通过。
+- [x] 全量类型检查、API contract、纯函数测试和教练 smoke 通过。

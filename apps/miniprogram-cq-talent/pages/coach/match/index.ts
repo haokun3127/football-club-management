@@ -1,5 +1,6 @@
 import { getCoachWorkbench, recordCoachMatch } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { openPage } from "../../../utils/navigation";
 import { getAppContext } from "../../../utils/store";
 import type { CoachMatchPlayerEvent, CoachWorkbench, LoadState } from "../../../utils/types";
 
@@ -53,6 +54,9 @@ Page({
   onLoad(query?: Record<string, string | undefined>) {
     requireRole("coach");
     this.load(query?.id || "");
+  },
+  openTacticalBoard() {
+    if (this.data.eventId) openPage(`/pages/coach/tactical-board/index?eventId=${this.data.eventId}`);
   },
   async load(id: string) {
     try {

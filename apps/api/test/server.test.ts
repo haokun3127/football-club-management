@@ -5,6 +5,7 @@ import { signWpsWebhookPayload } from "../src/integration/wps-webhook-security.j
 import { createPlatformPersistence } from "../src/persistence/platform-persistence.js";
 import { buildServer } from "../src/server.js";
 import { PersistentApiStore } from "../src/store.js";
+import { createSeedData } from "../src/seed.js";
 
 describe("api server", () => {
   it("returns health status", async () => {
@@ -52,6 +53,8 @@ describe("api server", () => {
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/attendance"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/lesson-confirmation"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/matches"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/tactical-board/formations"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/tactical-board"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/assessments"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/coach/assessments/templates/{templateId}/form"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/imports/excel/preview"]).toBeDefined();
@@ -275,6 +278,55 @@ describe("api server", () => {
     ]));
     expect(parentCoachHome.statusCode).toBe(403);
     expect(parentCoachHome.json().error.code).toBe("forbidden");
+
+    await app.close();
+    persistence.database.close();
+  });
+
+  it("persists and validates coach tactical board snapshots", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const seed = createSeedData();
+    const scheduledMatch = seed.events.find((event) => event.id === "event-match-1")!;
+    scheduledMatch.status = "scheduled";
+    seed.events.push({ ...scheduledMatch, id: "event-match-readonly", status: "completed" });
+    seed.participants.push(...seed.participants.filter((participant) => participant.eventId === "event-match-1").map((participant) => ({ ...participant, id: `${participant.id}-readonly`, eventId: "event-match-readonly" })));
+    const app = buildServer(new PersistentApiStore(persistence.repositories, seed), {
+      logger: false,
+      membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+    });
+    const base = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main";
+    const headers = { "x-user-id": "user-coach-1" };
+    const formations = await app.inject({ method: "GET", url: `${base}/coach/tactical-board/formations`, headers });
+    const initial = await app.inject({ method: "GET", url: `${base}/coach/events/event-match-1/tactical-board`, headers });
+    expect(initial.statusCode, initial.body).toBe(200);
+    const initialBody = initial.json() as { board: { formationName: string; players: Array<Record<string, unknown>> }; roster: unknown[]; saved: boolean };
+    const saved = await app.inject({
+      method: "PUT",
+      url: `${base}/coach/events/event-match-1/tactical-board`,
+      headers: { ...headers, "idempotency-key": "tactical-board-contract-1" },
+      payload: { formationName: "4-3-3", players: initialBody.board.players.map((player, index) => index === 0 ? { ...player, x: 0.42 } : player) },
+    });
+    const restored = await app.inject({ method: "GET", url: `${base}/coach/events/event-match-1/tactical-board`, headers });
+    const parent = await app.inject({ method: "GET", url: `${base}/coach/events/event-match-1/tactical-board`, headers: { "x-user-id": "user-parent-1" } });
+    const readonly = await app.inject({
+      method: "PUT",
+      url: `${base}/coach/events/event-match-readonly/tactical-board`,
+      headers: { ...headers, "idempotency-key": "tactical-board-readonly-1" },
+      payload: { formationName: "4-3-3", players: [] },
+    });
+
+    expect(formations.statusCode).toBe(200);
+    expect(formations.json().formations).toHaveLength(3);
+    expect(formations.json().formations.every((item: { positions: unknown[] }) => item.positions.length === 11)).toBe(true);
+    expect(initial.statusCode).toBe(200);
+    expect(initialBody.roster).toHaveLength(1);
+    expect(initialBody.board.players.filter((player) => player.role === "starter")).toHaveLength(1);
+    expect(saved.statusCode).toBe(200);
+    expect(restored.json().saved).toBe(true);
+    expect(restored.json().board.players[0].x).toBe(0.42);
+    expect(parent.statusCode).toBe(403);
+    expect(readonly.statusCode).toBe(409);
+    expect(readonly.json().error.code).toBe("tactical_board_read_only");
 
     await app.close();
     persistence.database.close();
