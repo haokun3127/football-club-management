@@ -19,7 +19,7 @@
 | 路径 | 责任 |
 | --- | --- |
 | `packages/domain` | 核心领域模型、基础规则、指标派生算法和扩展端口。 |
-| `apps/api` | 后端 API 应用壳，目前使用内存数据演示领域模型。 |
+| `apps/api` | 后端 API 应用（Fastify 5），已通过 SQLite 持久化承载业务数据，包含迁移、种子数据、鉴权、BFF 和 OpenAPI。 |
 | `docs` | 产品范围和架构文档。 |
 
 ## 领域分层
@@ -157,17 +157,18 @@ MVP 阶段这些对象主要承接外部同步和线下确认状态。平台不�
 | 媒体分发 | 从训练、比赛和球员亮点中挑选可发布素材。 |
 | 场地管理 | 关联活动地点和训练体验反馈。 |
 
-## 当前 API 壳
+## 当前 API 结构
 
-当前 `apps/api` 只提供内存数据接口，用来验证领域骨架：
+`apps/api` 已不再是内存演示壳。当前为 Fastify 5 + SQLite（`node:sqlite`）单实例服务，具备：
 
-- `GET /health`
-- `GET /clubs`
-- `GET /clubs/:clubId/config`
-- `GET /clubs/:clubId/calendar/events`
-- `GET /clubs/:clubId/students/:studentId/timeline`
-- `GET /clubs/:clubId/catalog/ability-metrics`
-- `GET /clubs/:clubId/students/:studentId/metrics`
-- `POST /clubs/:clubId/students/:studentId/derived-metrics/attacking-contribution`
+- **持久化**：`src/persistence/`（SQLite 仓储层），`src/migrate.ts` 提供 6 个版本化迁移，`src/seed.ts` 提供种子数据。
+- **路由模块**（`src/routes/`，按职责拆分）：
+  - `platform.routes.ts` — 俱乐部、配置、能力目录等平台接口
+  - `calendar.routes.ts` — 统一活动日历、教练今日视图
+  - `training.routes.ts` / `match.routes.ts` / `assessment.routes.ts` / `metrics.routes.ts` — 训练、比赛、评测、指标业务接口
+  - `data-capability.routes.ts` — WPS/Excel 导入、外部记录确认、集成连接与同步策略、隐私管理（同意、导出、留存）
+  - `app-client.routes.ts` — 小程序 BFF（家长端 / 教练端聚合视图、微信登录、战术板、考勤）
+- **鉴权**：`src/auth/` 提供俱乐部角色校验（admin / coach / parent），微信登录连接器接口已预留，正式凭证待接入。
+- **OpenAPI**：运行时暴露在 `GET /openapi.json`，健康检查为 `GET /health`。
 
-正式开发数据库前，先用这些接口验证领域模型和前端信息结构。
+> 时效说明：本节描述的是交接时（2026-07）的实际状态。早期版本的本节曾记录"仅内存接口"，该描述已随 SQLite 持久化落地而过时。SQLite 适用于约 500 日活规模的单实例内测；多实例或高并发的正式部署需迁移到独立数据库（见 `docs/deployment-requirements.md`）。
