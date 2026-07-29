@@ -6,7 +6,8 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "pnpm run clean && tsc -p tsconfig.json",
+    "clean": "node ../../scripts/clean.mjs dist tsconfig.tsbuildinfo",
     "dev": "pnpm --filter @football-club/domain build && tsx watch src/index.ts",
     "db:migrate": "tsx src/migrate.ts",
     "start": "node dist/index.js",
