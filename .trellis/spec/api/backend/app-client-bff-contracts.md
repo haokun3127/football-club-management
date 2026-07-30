@@ -460,3 +460,87 @@ const auth = await membershipResolver.resolveByPhone(clubId, identity.phone);
 ### 4. Tests Required
 
 - Contract test asserts create returns `201` with `pending`, guardian scoping holds (other guardian's child -> `403`), validation errors -> `400`, coach role -> `403`, and `GET` never leaks another guardian's requests.
+
+## Scenario: Coach Team and Ability BFF
+
+教练端球队详情 / 学员雷达 / 团队能力总览三个读端点（Figma C9/C13/C14）。
+
+### Request
+
+- `GET /clubs/:clubId/app-clients/:clientId/coach/team`
+- `GET /clubs/:clubId/app-clients/:clientId/coach/students/:studentId/radar`
+- `GET /clubs/:clubId/app-clients/:clientId/coach/team/ability-overview`
+
+### Response shape
+
+```ts
+// coach/team
+interface CoachTeamDetailResponse {
+  clubId: string;
+  role: "coach";
+  team: { id: string; name: string; season: string } | null;
+  stats: { memberCount: number; trainingCount: number; attendanceRate: number | null }; // attendanceRate 0-100, 无出勤数据时 null
+  members: Array<{ id: string; name: string }>;
+}
+
+// coach/students/:studentId/radar（与 parent growth-summary 同构，客户端复用同一雷达计算）
+interface CoachStudentRadarResponse {
+  clubId: string;
+  role: "coach";
+  studentId: string;
+  metrics: AbilityMetric[];      // 指标目录
+  latest: LatestMetricRecord[];  // 每指标最新记录
+}
+
+// coach/team/ability-overview
+interface CoachTeamAbilityOverviewResponse {
+  clubId: string;
+  role: "coach";
+  studentCount: number;
+  overall: number | null;               // 队均综合分(各维度均值再平均)
+  trendDelta: number | null;            // 本评估期 vs 上一期综合分差
+  dimensions: Array<{
+    metricId: string;
+    label: string;
+    average: number | null;
+    top: number | null;
+    bottom: number | null;
+  }>;
+}
+```
+
+### Error matrix
+
+- client 不存在/未激活/角色不符 → 404 app_client_not_found
+- 非 coach/admin 角色 → 403 forbidden
+- radar：studentId 不在该教练执教学生集合内 → 403 forbidden（不泄露其他学生能力数据）
+- 教练无执教事件 → team 返回空 members（200，不报错）
+
+## Scenario: Coach Event Change Request
+
+教练对活动发起变更申请（Figma C3 变更活动：原因 chips + 新时间 + 新场地 + 备注，顶部"保存"提交）。
+v1 为申请-受理语义：创建后 status=pending 等待管理员处理，不直接改活动。
+
+### Request
+
+`POST /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/change-requests`
+
+```json
+{ "reason": "venue|time|weather|other", "newStartsAt": "ISO8601(可选)", "newVenue": "string(可选)", "note": "string(可选,≤500)" }
+```
+
+### Response shape
+
+201：`{ clubId, request: EventChangeRequest }`，`status = "pending"`。
+
+### Error matrix
+
+- client 不存在/未激活/角色不符 → 404
+- 非 coach/admin 角色 → 403 forbidden
+- eventId 不存在 → 404 not_found
+- eventId 不在该教练可访问活动内 → 403 forbidden
+- 缺 reason / reason 非枚举 / note 超长 → 400 bad_request
+
+### Storage
+
+v1 存储为进程内集合（同私教申请语义），SQLite 持久化是已声明的后续项。

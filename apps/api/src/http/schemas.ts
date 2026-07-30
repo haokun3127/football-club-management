@@ -558,6 +558,46 @@ export const schemas = {
       404: errorResponse,
     },
   },
+  appClientCoachTeam: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientCoachStudentRadar: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientCoachTeamAbilityOverview: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientCoachEventChangeRequest: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["reason"],
+      properties: {
+        reason: { type: "string", enum: ["venue", "time", "weather", "other"] },
+        newStartsAt: { type: "string", minLength: 1 },
+        newVenue: { type: "string", minLength: 1 },
+        note: { type: "string", maxLength: 500 },
+      },
+    },
+    response: {
+      201: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
   appClientActivitySummaries: {
     response: {
       200: flexibleObject,

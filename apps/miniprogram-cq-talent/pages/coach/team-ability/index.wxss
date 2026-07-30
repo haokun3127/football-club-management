@@ -1,0 +1,120 @@
+.ability-page {
+  min-height: 100vh;
+  background: var(--color-page);
+}
+
+.ability-page__body {
+  padding: 24rpx var(--space-page) 180rpx;
+}
+
+/* 团队均值雷达（Figma C14: #07111f r16） */
+.ability-hero {
+  background: #07111f;
+  border-radius: 32rpx;
+  padding: 32rpx;
+}
+
+.ability-hero__title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 16rpx;
+}
+
+.ability-hero__overall {
+  margin-top: 16rpx;
+  text-align: center;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.trend-chip {
+  display: inline-block;
+  margin-top: 16rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.trend-chip--up {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.trend-chip--down {
+  background: #fee2e2;
+  color: #a80f1b;
+}
+
+/* 维度统计表 */
+.dim-table {
+  margin-top: 32rpx;
+  background: var(--color-card);
+  border-radius: 24rpx;
+  padding: 32rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.05);
+}
+
+.dim-table__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.dim-table__title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.dim-table__hint {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+}
+
+.dim-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid var(--color-line);
+}
+
+.dim-row:last-child {
+  border-bottom: none;
+}
+
+.dim-row__label {
+  font-size: 28rpx;
+  color: var(--color-text);
+}
+
+.dim-row__values {
+  display: flex;
+  gap: 32rpx;
+}
+
+.dim-row__avg {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-text);
+  min-width: 72rpx;
+  text-align: right;
+}
+
+.dim-row__top {
+  font-size: 28rpx;
+  color: #16a34a;
+  min-width: 72rpx;
+  text-align: right;
+}
+
+.dim-row__bottom {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  min-width: 72rpx;
+  text-align: right;
+}

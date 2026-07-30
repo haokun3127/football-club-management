@@ -78,6 +78,8 @@ import type {
   InsurancePolicyInput,
   PrivateLessonRequest,
   PrivateLessonRequestInput,
+  EventChangeRequest,
+  EventChangeRequestInput,
   InsurancePolicySummary,
   LessonAdjustmentInput,
   LessonLedgerEntry,
@@ -159,6 +161,8 @@ export interface ApiStore {
   createInsurancePolicy(clubId: EntityId, studentId: EntityId, input: InsurancePolicyInput): InsurancePolicySummary | Promise<InsurancePolicySummary>;
   listPrivateLessonRequests(clubId: EntityId, studentId?: EntityId): PrivateLessonRequest[] | Promise<PrivateLessonRequest[]>;
   createPrivateLessonRequest(clubId: EntityId, studentId: EntityId, input: PrivateLessonRequestInput): PrivateLessonRequest | Promise<PrivateLessonRequest>;
+  listEventChangeRequests(clubId: EntityId, eventId?: EntityId): EventChangeRequest[] | Promise<EventChangeRequest[]>;
+  createEventChangeRequest(clubId: EntityId, eventId: EntityId, input: EventChangeRequestInput): EventChangeRequest | Promise<EventChangeRequest>;
   confirmExternalRecord(
     clubId: EntityId,
     rawRecordId: EntityId,
@@ -1731,6 +1735,37 @@ export abstract class SeedBackedStore implements ApiStore {
     };
 
     this.data.privateLessonRequests.push(request);
+    return request;
+  }
+
+  listEventChangeRequests(clubId: EntityId, eventId?: EntityId): EventChangeRequest[] {
+    return this.data.eventChangeRequests
+      .filter((item) => item.clubId === clubId && (!eventId || item.eventId === eventId))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+
+  createEventChangeRequest(clubId: EntityId, eventId: EntityId, input: EventChangeRequestInput): EventChangeRequest {
+    const event = this.data.events.find((item) => item.clubId === clubId && item.id === eventId);
+    if (!event) {
+      throw new Error("Event not found for club.");
+    }
+
+    const now = this.now();
+    const request: EventChangeRequest = {
+      id: this.nextId("event-change-request"),
+      clubId,
+      eventId,
+      reason: input.reason,
+      newStartsAt: input.newStartsAt,
+      newVenue: input.newVenue,
+      note: input.note,
+      status: "pending",
+      requestedByUserId: input.requestedByUserId,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    this.data.eventChangeRequests.push(request);
     return request;
   }
 

@@ -606,3 +606,28 @@ export interface PrivateLessonRequestInput {
   note?: string;
   requestedByUserId?: EntityId;
 }
+
+export type EventChangeReason = "venue" | "time" | "weather" | "other";
+export type EventChangeRequestStatus = "pending" | "approved" | "rejected";
+
+export interface EventChangeRequest {
+  id: EntityId;
+  clubId: EntityId;
+  eventId: EntityId;
+  reason: EventChangeReason;
+  newStartsAt?: string;
+  newVenue?: string;
+  note?: string;
+  status: EventChangeRequestStatus;
+  requestedByUserId?: EntityId;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EventChangeRequestInput {
+  reason: EventChangeReason;
+  newStartsAt?: string;
+  newVenue?: string;
+  note?: string;
+  requestedByUserId?: EntityId;
+}

@@ -153,6 +153,30 @@ export function buildOpenApiDocument() {
           ...schemas.appClientParentPrivateLessons,
         }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/team": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/team", {
+          ...schemas.appClientParams,
+          ...schemas.appClientCoachTeam,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/team/ability-overview": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/team/ability-overview", {
+          ...schemas.appClientParams,
+          ...schemas.appClientCoachTeamAbilityOverview,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/students/{studentId}/radar": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/students/{studentId}/radar", {
+          ...schemas.appClientStudentParams,
+          ...schemas.appClientCoachStudentRadar,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/change-requests": {
+        post: operation("POST", "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/change-requests", {
+          ...schemas.appClientEventParams,
+          ...schemas.appClientCoachEventChangeRequest,
+        }),
+      },
       "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/activity-summaries": {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/activity-summaries", {
           ...schemas.appClientStudentParams,

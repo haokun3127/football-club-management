@@ -1,0 +1,50 @@
+<view class="team-page">
+  <app-header title="队伍详情" show-back />
+  <view class="team-page__body">
+    <status-view
+      state="{{state}}"
+      title="{{state === 'loading' ? '加载球队' : state === 'empty' ? '暂无学员' : '读取失败'}}"
+      message="{{message}}"
+      action-text="{{state === 'error' ? '重试' : ''}}"
+      bindaction="retry"
+    />
+
+    <block wx:if="{{state === 'ready'}}">
+      <!-- Hero（Figma C9: #07111f 深底 r16 + 赛季 chip + 三统计） -->
+      <view class="hero">
+        <view class="hero__name">{{teamName}}</view>
+        <view wx:if="{{season}}" class="hero__season">{{season}}</view>
+        <view class="hero__stats">
+          <view class="hero-stat">
+            <view class="hero-stat__label">在队人数</view>
+            <view class="hero-stat__value">{{memberCount}}</view>
+          </view>
+          <view class="hero-stat">
+            <view class="hero-stat__label">累计训练</view>
+            <view class="hero-stat__value">{{trainingCount}}</view>
+          </view>
+          <view class="hero-stat">
+            <view class="hero-stat__label">出勤率</view>
+            <view class="hero-stat__value hero-stat__value--accent">{{attendanceRate}}</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 学员名单（Figma: 44px 圆头像 + 名字，点击看雷达） -->
+      <view class="members-title">学员名单</view>
+      <view class="members-grid">
+        <view
+          wx:for="{{members}}"
+          wx:key="id"
+          class="member"
+          data-id="{{item.id}}"
+          bindtap="openRadar"
+        >
+          <view class="member__avatar" style="background: {{item.avatarBg}}; color: {{item.avatarColor}}">{{item.initial}}</view>
+          <view class="member__name">{{item.name}}</view>
+        </view>
+      </view>
+    </block>
+  </view>
+  <role-tabbar role="coach" active="me" />
+</view>

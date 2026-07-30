@@ -30,6 +30,7 @@
       <button wx:if="{{workbench.event.type === 'match'}}" class="action-tile action-tile--match" bindtap="openTacticalBoard"><text class="action-tile__icon">阵</text><text>比赛战术板</text></button>
       <button wx:if="{{workbench.event.type === 'training'}}" class="action-tile" bindtap="openTraining"><text class="action-tile__icon">训</text><text>训练内容</text></button>
       <button wx:if="{{workbench.event.type === 'training' && workbench.assessmentTemplateId}}" class="action-tile" bindtap="openTestEntry"><text class="action-tile__icon">测</text><text>评测录入</text></button>
+      <button class="action-tile" bindtap="openChange"><text class="action-tile__icon">变</text><text>变更活动</text></button>
     </view>
   </view>
 

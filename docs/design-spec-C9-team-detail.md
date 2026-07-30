@@ -1,0 +1,126 @@
+# Figma 画板规格: C9 Team Detail
+
+- [4] | C9 Team Detail | 375x812 @(510,2820) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(510,2820) | fill=#fceeef | layout=H pad=0/16
+    - [4] | left | 124x27 @(526,2850) | layout=H gap=12
+      - [4] | arrow-left | 24x24 @(526,2852)
+        - [6] | Vector | 14x14 @(531,2857) | stroke=#202124 w2
+      - [13] | 队伍详情 | 88x27 @(562,2850) | fill=#202124 | font=Inter/Bold 22px | text="队伍详情"
+  - [4] | Content | 375x654 @(510,2908) | layout=V gap=16 pad=16/16
+    - [4] | Hero | 343x130 @(526,2924) | fill=#07111f | r=16 | layout=V gap=12 pad=16/16
+      - [4] | hero-top | 311x52 @(542,2940) | layout=V gap=8
+        - [13] | 凤凰山足球俱乐部 U10精英队 | 311x21 @(542,2940) | fill=#ffffff | font=Inter/Bold 17px | text="凤凰山足球俱乐部 U10精英队"
+        - [4] | season-chip | 111x23 @(542,2969) | fill=#ffffff@0.08 | r=999 | layout=H pad=4/10
+          - [13] | 2024-2025赛季 | 91x15 @(552,2973) | fill=#ffffff | font=Inter/Semi Bold 12px | text="2024-2025赛季"
+      - [4] | stats | 311x34 @(542,3004) | layout=H gap=12
+        - [4] | stat | 96x34 @(542,3004) | layout=V gap=4
+          - [13] | 在队人数 | 44x13 @(542,3004) | fill=#94a3b8 | font=Inter/Regular 11px | text="在队人数"
+          - [13] | 18 | 17x17 @(542,3021) | fill=#ffffff | font=Inter/Bold 14px | text="18"
+        - [4] | stat | 96x34 @(650,3004) | layout=V gap=4
+          - [13] | 累计训练 | 44x13 @(650,3004) | fill=#94a3b8 | font=Inter/Regular 11px | text="累计训练"
+          - [13] | 46 | 19x17 @(650,3021) | fill=#ffffff | font=Inter/Bold 14px | text="46"
+        - [4] | stat | 96x34 @(757,3004) | layout=V gap=4
+          - [13] | 出勤率 | 33x13 @(757,3004) | fill=#94a3b8 | font=Inter/Regular 11px | text="出勤率"
+          - [13] | 89% | 31x17 @(757,3021) | fill=#10b981 | font=Inter/Bold 14px | text="89%"
+    - [4] | Members | 343x254 @(526,3070) | layout=V gap=12
+      - [13] | 学员名单 | 56x17 @(526,3070) | fill=#202124 | font=Inter/Bold 14px | text="学员名单"
+      - [4] | members-grid | 343x225 @(526,3099) | layout=V gap=12
+        - [4] | row-1 | 343x67 @(526,3099) | layout=H gap=12
+          - [4] | player | 78x67 @(526,3099) | layout=V gap=8
+            - [4] | Frame | 44x44 @(543,3099) | fill=#fee2e2 | r=22 | layout=V
+              - [13] | 陈 | 14x17 @(558,3112) | fill=#a80f1b | font=Inter/Bold 14px | text="陈"
+            - [13] | 陈小宇 | 36x15 @(547,3151) | fill=#202124 | font=Inter/Semi Bold 12px | text="陈小宇"
+          - [4] | player | 78x67 @(616,3099) | layout=V gap=8
+            - [4] | Frame | 44x44 @(633,3099) | fill=#fef3c7 | r=22 | layout=V
+              - [13] | 林 | 14x17 @(648,3112) | fill=#d97706 | font=Inter/Bold 14px | text="林"
+            - [13] | 林一诺 | 36x15 @(637,3151) | fill=#202124 | font=Inter/Semi Bold 12px | text="林一诺"
+          - [4] | player | 78x67 @(706,3099) | layout=V gap=8
+            - [4] | Frame | 44x44 @(723,3099) | fill=#e0e7ff | r=22 | layout=V
+              - [13] | 王 | 14x17 @(738,3112) | fill=#4f46e5 | font=Inter/Bold 14px | text="王"
+            - [13] | 王明 | 24x15 @(733,3151) | fill=#202124 | font=Inter/Semi Bold 12px | text="王明"
+          - [4] | player | 78x67 @(796,3099) | layout=V gap=8
+            - [4] | Frame | 44x44 @(813,3099) | fill=#fee2e2 | r=22 | layout=V
+              - [13] | 赵 | 14x17 @(828,3112) | fill=#a80f1b | font=Inter/Bold 14px | text="赵"
+            - [13] | 赵凯 | 24x15 @(823,3151) | fill=#202124 | font=Inter/Semi Bold 12px | text="赵凯"
+        - [4] | row-2 | 343x67 @(526,3178) | layout=H gap=12
+          - [4] | player | 78x67 @(526,3178) | layout=V gap=8
+            - [4] | Frame | 44x44 @(543,3178) | fill=#d1fae5 | r=22 | layout=V
+              - [13] | 李 | 14x17 @(558,3192) | fill=#10b981 | font=Inter/Bold 14px | text="李"
+            - [13] | 李晨 | 24x15 @(553,3230) | fill=#202124 | font=Inter/Semi Bold 12px | text="李晨"
+          - [4] | player | 78x67 @(616,3178) | layout=V gap=8
+            - [4] | Frame | 44x44 @(633,3178) | fill=#dbeafe | r=22 | layout=V
+              - [13] | 张 | 14x17 @(648,3192) | fill=#3b82f6 | font=Inter/Bold 14px | text="张"
+            - [13] | 张浩 | 24x15 @(643,3230) | fill=#202124 | font=Inter/Semi Bold 12px | text="张浩"
+          - [4] | player | 78x67 @(706,3178) | layout=V gap=8
+            - [4] | Frame | 44x44 @(723,3178) | fill=#fee2e2 | r=22 | layout=V
+              - [13] | 孙 | 14x17 @(738,3192) | fill=#a80f1b | font=Inter/Bold 14px | text="孙"
+            - [13] | 孙杰 | 24x15 @(733,3230) | fill=#202124 | font=Inter/Semi Bold 12px | text="孙杰"
+          - [4] | player | 78x67 @(796,3178) | layout=V gap=8
+            - [4] | Frame | 44x44 @(813,3178) | fill=#fef3c7 | r=22 | layout=V
+              - [13] | 周 | 14x17 @(828,3192) | fill=#d97706 | font=Inter/Bold 14px | text="周"
+            - [13] | 周洋 | 24x15 @(823,3230) | fill=#202124 | font=Inter/Semi Bold 12px | text="周洋"
+        - [4] | row-3 | 343x67 @(526,3257) | layout=H gap=12
+          - [4] | player | 78x67 @(526,3257) | layout=V gap=8
+            - [4] | Frame | 44x44 @(543,3257) | fill=#e0e7ff | r=22 | layout=V
+              - [13] | 胡 | 14x17 @(558,3270) | fill=#4f46e5 | font=Inter/Bold 14px | text="胡"
+            - [13] | 胡昊 | 24x15 @(553,3309) | fill=#202124 | font=Inter/Semi Bold 12px | text="胡昊"
+          - [4] | player | 78x67 @(616,3257) | layout=V gap=8
+            - [4] | Frame | 44x44 @(633,3257) | fill=#fee2e2 | r=22 | layout=V
+              - [13] | 高 | 14x17 @(648,3270) | fill=#a80f1b | font=Inter/Bold 14px | text="高"
+            - [13] | 高峰 | 24x15 @(643,3309) | fill=#202124 | font=Inter/Semi Bold 12px | text="高峰"
+          - [4] | player | 78x67 @(706,3257) | layout=V gap=8
+            - [4] | Frame | 44x44 @(723,3257) | fill=#dbeafe | r=22 | layout=V
+              - [13] | 刘 | 14x17 @(738,3270) | fill=#3b82f6 | font=Inter/Bold 14px | text="刘"
+            - [13] | 刘洋 | 24x15 @(733,3309) | fill=#202124 | font=Inter/Semi Bold 12px | text="刘洋"
+          - [4] | player | 78x67 @(796,3257) | layout=V gap=8
+            - [4] | Frame | 44x44 @(813,3257) | fill=#fef3c7 | r=22 | layout=V
+              - [13] | 马 | 14x17 @(828,3270) | fill=#d97706 | font=Inter/Bold 14px | text="马"
+            - [13] | 马骏 | 24x15 @(823,3309) | fill=#202124 | font=Inter/Semi Bold 12px | text="马骏"
+    - [4] | Coaches | 343x149 @(526,3340) | layout=V gap=12
+      - [13] | 教练组 | 42x17 @(526,3340) | fill=#202124 | font=Inter/Bold 14px | text="教练组"
+      - [4] | coaches-scroll | 343x120 @(526,3369) | layout=H gap=12
+        - [4] | coach-card | 140x120 @(526,3369) | fill=#ffffff | stroke=#e7eaf0 w1 | r=12 | layout=V gap=10 pad=12/12
+          - [4] | Frame | 44x44 @(538,3381) | fill=#fee2e2 | r=22 | layout=V
+            - [13] | 林 | 14x17 @(553,3394) | fill=#a80f1b | font=Inter/Bold 14px | text="林"
+          - [13] | 林教练 | 116x16 @(538,3435) | fill=#202124 | font=Inter/Bold 13px | text="林教练"
+          - [4] | Frame | 46x16 @(538,3461) | fill=#f3f4f6 | r=999 | layout=H pad=2/8
+            - [13] | 主教练 | 30x12 @(546,3463) | fill=#667085 | font=Inter/Bold 10px | text="主教练"
+        - [4] | coach-card | 140x120 @(678,3369) | fill=#ffffff | stroke=#e7eaf0 w1 | r=12 | layout=V gap=10 pad=12/12
+          - [4] | Frame | 44x44 @(690,3381) | fill=#dbeafe | r=22 | layout=V
+            - [13] | 王 | 14x17 @(705,3394) | fill=#3b82f6 | font=Inter/Bold 14px | text="王"
+          - [13] | 王助教 | 116x16 @(690,3435) | fill=#202124 | font=Inter/Bold 13px | text="王助教"
+          - [4] | Frame | 36x16 @(690,3461) | fill=#f3f4f6 | r=999 | layout=H pad=2/8
+            - [13] | 助理 | 20x12 @(698,3463) | fill=#667085 | font=Inter/Bold 10px | text="助理"
+        - [4] | coach-card | 140x120 @(830,3369) | fill=#ffffff | stroke=#e7eaf0 w1 | r=12 | layout=V gap=10 pad=12/12
+          - [4] | Frame | 44x44 @(842,3381) | fill=#d1fae5 | r=22 | layout=V
+            - [13] | 李 | 14x17 @(857,3394) | fill=#10b981 | font=Inter/Bold 14px | text="李"
+          - [13] | 李体能 | 116x16 @(842,3435) | fill=#202124 | font=Inter/Bold 13px | text="李体能"
+          - [4] | Frame | 36x16 @(842,3461) | fill=#f3f4f6 | r=999 | layout=H pad=2/8
+            - [13] | 体能 | 20x12 @(850,3463) | fill=#667085 | font=Inter/Bold 10px | text="体能"
+    - [4] | Frame | 343x96 @(526,3505)
+  - [4] | TabIconsOverlay | 375x70 @(510,3562) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(630,3622) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(510,3562)
+      - [4] | icon_0 | 22x22 @(562,3568)
+        - [6] | Vector | 17x16 @(564,3572) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(568,3570) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(564,3577) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(567,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(571,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(575,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(567,3584) | fill=#8e97a6
+      - [13] | 日程 | 121x14 @(512,3593) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(635,3562)
+      - [4] | icon_1 | 22x22 @(686,3568)
+        - [6] | Vector | 14x17 @(690,3571) | stroke=#a80f1b w1.6
+        - [6] | Vector | 6x2 @(694,3571) | stroke=#a80f1b w1.4
+        - [6] | Vector | 8x0 @(694,3578) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 8x0 @(694,3582) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 5x0 @(694,3585) | fill=#000000 | stroke=#a80f1b w1.3
+      - [13] | 训练管理 | 121x14 @(637,3593) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="训练管理"
+      - [9] | Ellipse | 4x4 @(696,3610) | fill=#a80f1b
+    - [4] | tab_2 | 125x56 @(760,3562)
+      - [4] | icon_2 | 22x22 @(812,3568)
+        - [6] | Vector | 8x8 @(818,3571) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(814,3580) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(762,3593) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

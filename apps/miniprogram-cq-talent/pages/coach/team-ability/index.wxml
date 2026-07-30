@@ -1,0 +1,39 @@
+<view class="ability-page">
+  <app-header title="团队能力总览" subtitle="{{studentCount}} 名学员" show-back />
+  <view class="ability-page__body">
+    <status-view
+      state="{{state}}"
+      title="{{state === 'loading' ? '汇总团队能力' : state === 'empty' ? '暂无评测数据' : '读取失败'}}"
+      message="{{message}}"
+      action-text="{{state === 'error' ? '重试' : ''}}"
+      bindaction="retry"
+    />
+
+    <block wx:if="{{state === 'ready'}}">
+      <!-- 团队均值雷达（Figma C14: #07111f 深底 + 综合分 + 趋势 chip） -->
+      <view class="ability-hero">
+        <view class="ability-hero__title">团队平均能力雷达</view>
+        <radar-canvas metrics="{{radar}}"></radar-canvas>
+        <view class="ability-hero__overall">综合 {{overall}}</view>
+        <view wx:if="{{trendLabel}}" class="trend-chip {{trendPositive ? 'trend-chip--up' : 'trend-chip--down'}}">{{trendLabel}}</view>
+      </view>
+
+      <!-- 维度统计表（Figma: 队均 / TOP / 底） -->
+      <view class="dim-table">
+        <view class="dim-table__head">
+          <view class="dim-table__title">维度统计</view>
+          <view class="dim-table__hint">队均 / TOP / 底</view>
+        </view>
+        <view wx:for="{{dimensions}}" wx:key="metricId" class="dim-row">
+          <view class="dim-row__label">{{item.label}}</view>
+          <view class="dim-row__values">
+            <text class="dim-row__avg">{{item.average}}</text>
+            <text class="dim-row__top">{{item.top}}</text>
+            <text class="dim-row__bottom">{{item.bottom}}</text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+  <role-tabbar role="coach" active="me" />
+</view>

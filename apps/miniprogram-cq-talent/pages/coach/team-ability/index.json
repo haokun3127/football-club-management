@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "团队能力总览",
+  "usingComponents": {
+    "app-header": "/components/app-header/index",
+    "role-tabbar": "/components/role-tabbar/index",
+    "status-view": "/components/status-view/index",
+    "radar-canvas": "/components/radar-canvas/index"
+  }
+}

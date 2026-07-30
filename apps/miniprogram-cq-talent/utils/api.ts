@@ -9,6 +9,8 @@ import type {
   CoachLessonConfirmation,
   CoachMatchPlayerEvent,
   CoachHome,
+  CoachTeamDetail,
+  CoachTeamAbilityOverview,
   CoachWorkbench,
   GrowthSummary,
   MetricDetail,
@@ -970,4 +972,41 @@ export async function getPrivateLessonRequests(studentId?: string): Promise<Priv
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/parent/private-lessons${query}`,
   });
   return response.requests ?? [];
+}
+
+export async function getCoachTeam(): Promise<CoachTeamDetail> {
+  const context = requireContext();
+  return request<CoachTeamDetail>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/team`,
+  });
+}
+
+export async function getCoachStudentRadar(studentId: string): Promise<RadarMetricPoint[]> {
+  const context = requireContext();
+  const response = await request<{ latest?: Array<Record<string, unknown>> }>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/students/${studentId}/radar`,
+  });
+  const latest = Array.isArray(response.latest) ? response.latest : [];
+  return latest
+    .map((item) => normalizeRadarMetric(item))
+    .filter((item) => typeof item.value === "number");
+}
+
+export async function getCoachTeamAbilityOverview(): Promise<CoachTeamAbilityOverview> {
+  const context = requireContext();
+  return request<CoachTeamAbilityOverview>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/team/ability-overview`,
+  });
+}
+
+export async function createCoachEventChangeRequest(
+  eventId: string,
+  input: { reason: "venue" | "time" | "weather" | "other"; newStartsAt?: string; newVenue?: string; note?: string },
+): Promise<void> {
+  const context = requireContext();
+  await request<unknown, typeof input>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/change-requests`,
+    method: "POST",
+    data: input,
+  });
 }

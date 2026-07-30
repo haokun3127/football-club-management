@@ -1,0 +1,76 @@
+# Figma 画板规格: C3 Activity Change
+
+- [4] | C3 Activity Change | 375x812 @(940,120) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(940,120) | fill=#fceeef | layout=H pad=14/22
+    - [4] | Left | 124x27 @(962,150) | layout=H gap=12
+      - [4] | chevron-left | 24x24 @(962,152)
+        - [6] | Vector | 6x12 @(971,158) | stroke=#202124 w2
+      - [13] | 变更活动 | 88x27 @(998,150) | fill=#202124 | font=Inter/Bold 22px | text="变更活动"
+    - [13] | 保存 | 32x19 @(1261,154) | fill=#a80f1b | font=Inter/Semi Bold 16px | text="保存"
+  - [4] | Content | 375x654 @(940,208) | layout=V gap=16 pad=22/22
+    - [4] | Activity Info | 331x79 @(962,230) | fill=#ffffff | r=12 | layout=V gap=8 pad=16/16 | shadow=0,2,8,#000000@0.05
+      - [4] | Frame | 299x23 @(978,246) | layout=H
+        - [13] | 技术专项训练 | 96x19 @(978,248) | fill=#202124 | font=Inter/Bold 16px | text="技术专项训练"
+        - [4] | Frame | 52x23 @(1225,246) | fill=#e8f5e9 | r=4 | layout=H pad=4/8
+          - [13] | 已排定 | 36x15 @(1233,250) | fill=#188754 | font=Inter/Semi Bold 12px | text="已排定"
+      - [13] | U10精英队 · 2025-07-09 17:30 | 186x16 @(978,277) | fill=#667085 | font=Inter/Regular 13px | text="U10精英队 · 2025-07-09 17:30"
+    - [4] | Reason Card | 331x125 @(962,325) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,2,8,#000000@0.05
+      - [13] | 变更原因 | 56x17 @(978,341) | fill=#202124 | font=Inter/Bold 14px | text="变更原因"
+      - [4] | Frame | 299x64 @(978,370) | layout=H gap=8
+        - [4] | Frame | 76x28 @(978,370) | fill=#a80f1b | r=16 | layout=H pad=6/12
+          - [13] | 场地变更 | 52x16 @(990,376) | fill=#ffffff | font=Inter/Semi Bold 13px | text="场地变更"
+        - [4] | Frame | 76x28 @(1062,370) | stroke=#e7eaf0 w1 | r=16 | layout=H pad=6/12
+          - [13] | 时间调整 | 52x16 @(1074,376) | fill=#667085 | font=Inter/Medium 13px | text="时间调整"
+        - [4] | Frame | 76x28 @(1146,370) | stroke=#e7eaf0 w1 | r=16 | layout=H pad=6/12
+          - [13] | 天气原因 | 52x16 @(1158,376) | fill=#667085 | font=Inter/Medium 13px | text="天气原因"
+        - [4] | Frame | 50x28 @(978,406) | stroke=#e7eaf0 w1 | r=16 | layout=H pad=6/12
+          - [13] | 其他 | 26x16 @(990,412) | fill=#667085 | font=Inter/Medium 13px | text="其他"
+    - [4] | Date Card | 331x105 @(962,466) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,2,8,#000000@0.05
+      - [13] | 新时间 | 42x17 @(978,482) | fill=#202124 | font=Inter/Bold 14px | text="新时间"
+      - [4] | Frame | 299x44 @(978,511) | fill=#f6f7f9 | r=8 | layout=H pad=0/12
+        - [13] | 2025-07-10 18:00 | 120x17 @(990,524) | fill=#202124 | font=Inter/Regular 14px | text="2025-07-10 18:00"
+        - [4] | calendar | 16x16 @(1249,525)
+          - [6] | Vector | 12x13 @(1251,526) | stroke=#667085 w2
+    - [4] | Venue Card | 331x105 @(962,587) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,2,8,#000000@0.05
+      - [13] | 新场地 | 42x17 @(978,603) | fill=#202124 | font=Inter/Bold 14px | text="新场地"
+      - [4] | Frame | 299x44 @(978,632) | fill=#f6f7f9 | r=8 | layout=H pad=0/12
+        - [13] | 凤凰山 B场 | 70x17 @(990,646) | fill=#202124 | font=Inter/Regular 14px | text="凤凰山 B场"
+        - [4] | chevron-right | 16x16 @(1249,646)
+          - [6] | Vector | 4x8 @(1255,650) | stroke=#667085 w2
+    - [4] | Notes Card | 331x141 @(962,708) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,2,8,#000000@0.05
+      - [13] | 说明 | 28x17 @(978,724) | fill=#202124 | font=Inter/Bold 14px | text="说明"
+      - [4] | Frame | 299x80 @(978,753) | fill=#f6f7f9 | r=8 | layout=V pad=12/12
+        - [13] | 请说明变更原因（选填） | 143x16 @(990,765) | fill=#667085 | font=Inter/Regular 13px | text="请说明变更原因（选填）"
+    - [4] | Notify Card | 331x68 @(962,865) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,2,8,#000000@0.05
+      - [4] | Frame | 299x36 @(978,881) | layout=H
+        - [4] | Frame | 142x36 @(978,881) | layout=V gap=4
+          - [13] | 通知学员家长 | 84x17 @(978,881) | fill=#202124 | font=Inter/Bold 14px | text="通知学员家长"
+          - [13] | 本次变更将通知 20 位家长 | 142x15 @(978,902) | fill=#667085 | font=Inter/Regular 12px | text="本次变更将通知 20 位家长"
+        - [4] | Frame | 44x24 @(1233,887) | fill=#a80f1b | r=12 | layout=H pad=2/2
+          - [9] | Ellipse | 20x20 @(1255,889) | fill=#ffffff
+  - [4] | TabIconsOverlay | 375x70 @(940,862) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1060,922) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(940,862)
+      - [4] | icon_0 | 22x22 @(992,868)
+        - [6] | Vector | 17x16 @(994,872) | stroke=#a80f1b w1.6
+        - [6] | Vector | 8x4 @(998,870) | fill=#000000 | stroke=#a80f1b w1.6
+        - [6] | Vector | 17x0 @(994,877) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 3x3 @(997,880) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1001,880) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1005,880) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(997,884) | fill=#a80f1b
+      - [13] | 日程 | 121x14 @(942,893) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="日程"
+      - [9] | Ellipse | 4x4 @(1000,910) | fill=#a80f1b
+    - [4] | tab_1 | 125x56 @(1065,862)
+      - [4] | icon_1 | 22x22 @(1116,868)
+        - [6] | Vector | 14x17 @(1120,871) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 6x2 @(1124,871) | stroke=#8e97a6 w1.4
+        - [6] | Vector | 8x0 @(1124,878) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 8x0 @(1124,882) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 5x0 @(1124,885) | fill=#000000 | stroke=#8e97a6 w1.3
+      - [13] | 训练管理 | 121x14 @(1067,893) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="训练管理"
+    - [4] | tab_2 | 125x56 @(1190,862)
+      - [4] | icon_2 | 22x22 @(1242,868)
+        - [6] | Vector | 8x8 @(1248,871) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(1244,880) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(1192,893) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

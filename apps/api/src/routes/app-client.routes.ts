@@ -1367,6 +1367,256 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
     },
   );
 
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/team",
+    {
+      schema: {
+        ...schemas.appClientParams,
+        ...schemas.appClientCoachTeam,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+
+      const scope = await collectCoachScope(context, request.params.clubId, auth);
+      const team = scope.teams[0] ?? null;
+      const decided = scope.events.flatMap((event) => event.participants ?? [])
+        .filter((participant) => participant.status === "present" || participant.status === "absent" || participant.status === "excused");
+      const present = decided.filter((participant) => participant.status === "present").length;
+
+      return {
+        clubId: request.params.clubId,
+        role: "coach",
+        team,
+        stats: {
+          memberCount: scope.students.length,
+          trainingCount: scope.events.filter((event) => event.type === "training").length,
+          attendanceRate: decided.length ? Math.round((present / decided.length) * 100) : null,
+        },
+        members: scope.students,
+      };
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      studentId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/students/:studentId/radar",
+    {
+      schema: {
+        ...schemas.appClientStudentParams,
+        ...schemas.appClientCoachStudentRadar,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+
+      const scope = await collectCoachScope(context, request.params.clubId, auth);
+      if (context.membershipResolver && !scope.students.some((student) => student.id === request.params.studentId)) {
+        return context.sendError(reply, 403, "forbidden", "Student is not accessible for this coach membership");
+      }
+
+      const [metricCatalog, metricRecords] = await Promise.all([
+        context.store.listAbilityMetrics(request.params.clubId),
+        context.store.getStudentMetrics(request.params.clubId, request.params.studentId),
+      ]);
+
+      return {
+        clubId: request.params.clubId,
+        role: "coach",
+        studentId: request.params.studentId,
+        metrics: metricCatalog,
+        latest: buildLatestMetricRecords(metricRecords, metricCatalog),
+      };
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/team/ability-overview",
+    {
+      schema: {
+        ...schemas.appClientParams,
+        ...schemas.appClientCoachTeamAbilityOverview,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+
+      const scope = await collectCoachScope(context, request.params.clubId, auth);
+      const metricCatalog = await context.store.listAbilityMetrics(request.params.clubId);
+      const perStudent = await Promise.all(scope.students.map(async (student) => ({
+        studentId: student.id,
+        records: await context.store.getStudentMetrics(request.params.clubId, student.id),
+      })));
+
+      const dimensions = metricCatalog.map((metric) => {
+        const latestValues: number[] = [];
+        for (const student of perStudent) {
+          const record = student.records.find((item) => item.metricId === metric.id);
+          const value = record ? metricNumericValue(record.value) : null;
+          if (value !== null) {
+            latestValues.push(value);
+          }
+        }
+        return {
+          metricId: metric.id,
+          label: metric.name,
+          average: latestValues.length ? round1(latestValues.reduce((sum, value) => sum + value, 0) / latestValues.length) : null,
+          top: latestValues.length ? round1(Math.max(...latestValues)) : null,
+          bottom: latestValues.length ? round1(Math.min(...latestValues)) : null,
+        };
+      }).filter((dimension) => dimension.average !== null);
+
+      const deltas: number[] = [];
+      for (const student of perStudent) {
+        const byMetric = new Map<string, typeof student.records>();
+        for (const record of student.records) {
+          const list = byMetric.get(record.metricId) ?? [];
+          list.push(record);
+          byMetric.set(record.metricId, list);
+        }
+        for (const records of byMetric.values()) {
+          const current = records[0] ? metricNumericValue(records[0].value) : null;
+          const previous = records[1] ? metricNumericValue(records[1].value) : null;
+          if (current !== null && previous !== null) {
+            deltas.push(current - previous);
+          }
+        }
+      }
+
+      const averages = dimensions.map((dimension) => dimension.average).filter((value): value is number => value !== null);
+      return {
+        clubId: request.params.clubId,
+        role: "coach",
+        studentCount: scope.students.length,
+        overall: averages.length ? round1(averages.reduce((sum, value) => sum + value, 0) / averages.length) : null,
+        trendDelta: deltas.length ? round1(deltas.reduce((sum, value) => sum + value, 0) / deltas.length) : null,
+        dimensions,
+      };
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      eventId: string;
+    };
+    Body: {
+      reason: "venue" | "time" | "weather" | "other";
+      newStartsAt?: string;
+      newVenue?: string;
+      note?: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/change-requests",
+    {
+      schema: {
+        ...schemas.appClientEventParams,
+        ...schemas.appClientCoachEventChangeRequest,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+
+      const event = (await context.store.listCalendarEvents(request.params.clubId) as AppEventDetail[])
+        .find((item) => item.id === request.params.eventId);
+      if (!event) {
+        return context.sendError(reply, 404, "not_found", "Event not found");
+      }
+
+      if (context.membershipResolver) {
+        const scope = await collectCoachScope(context, request.params.clubId, auth);
+        if (!scope.events.some((item) => item.id === request.params.eventId)) {
+          return context.sendError(reply, 403, "forbidden", "Event is not accessible for this coach membership");
+        }
+      }
+
+      const created = await context.store.createEventChangeRequest(request.params.clubId, request.params.eventId, {
+        reason: request.body.reason,
+        newStartsAt: request.body.newStartsAt,
+        newVenue: request.body.newVenue,
+        note: request.body.note,
+        requestedByUserId: auth?.user.id,
+      });
+      reply.code(201);
+      return {
+        clubId: request.params.clubId,
+        request: created,
+      };
+    },
+  );
+
   app.put<{
     Params: {
       clubId: string;
@@ -1945,6 +2195,65 @@ function buildMetricTrends(metrics: Awaited<ReturnType<RouteContext["store"]["ge
   }
 
   return [...byMetric.entries()].map(([metricId, records]) => ({ metricId, records }));
+}
+
+type CoachScopeAuth = Awaited<ReturnType<RouteContext["resolveClubAuth"]>> | null;
+
+interface CoachScopeEvent extends AppEventDetail {
+  students?: Array<{ id: string; name: string }>;
+  teams?: Array<{ id: string; name: string }>;
+  participants?: Array<{ studentId: string; status: string }>;
+}
+
+async function collectCoachScope(context: RouteContext, clubId: string, auth: CoachScopeAuth) {
+  const dayMs = 24 * 60 * 60 * 1000;
+  const to = new Date().toISOString().slice(0, 10);
+  const from = new Date(Date.now() - 29 * dayMs).toISOString().slice(0, 10);
+  const dates = enumerateDateRange(from, to) ?? [to];
+  const daily = await Promise.all(dates.map((date) => context.store.getCoachToday(clubId, {
+    date,
+    userId: auth?.user.id ?? "user-coach-1",
+    roles: auth?.membership.roles ?? ["coach"],
+  }))) as Array<{ events?: CoachScopeEvent[] }>;
+  const events = daily.flatMap((item) => item.events ?? []);
+  const studentsById = new Map<string, { id: string; name: string }>();
+  const teamsById = new Map<string, { id: string; name: string; season: string }>();
+  for (const event of events) {
+    for (const student of event.students ?? []) {
+      studentsById.set(student.id, { id: student.id, name: student.name });
+    }
+    for (const team of event.teams ?? []) {
+      teamsById.set(team.id, { id: team.id, name: team.name, season: currentSeason() });
+    }
+  }
+  return { events, students: [...studentsById.values()], teams: [...teamsById.values()] };
+}
+
+function currentSeason(): string {
+  const now = new Date();
+  const startYear = now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1;
+  return `${startYear}-${startYear + 1}赛季`;
+}
+
+function metricNumericValue(value: unknown): number | null {
+  const record = value as { kind?: string; score?: number; percentage?: number } | null;
+  if (!record || typeof record !== "object") {
+    return null;
+  }
+  if (record.kind === "score_0_100" && typeof record.score === "number") {
+    return record.score;
+  }
+  if (record.kind === "rating_1_5" && typeof record.score === "number") {
+    return record.score * 20;
+  }
+  if (record.kind === "percentage" && typeof record.percentage === "number") {
+    return record.percentage;
+  }
+  return null;
+}
+
+function round1(value: number): number {
+  return Math.round(value * 10) / 10;
 }
 
 function resolveAppRole(roles: ClubUserRole[] | undefined): AppRole {

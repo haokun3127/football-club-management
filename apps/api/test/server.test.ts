@@ -483,6 +483,144 @@ describe("api server", () => {
     persistence.database.close();
   });
 
+  it("serves coach team, student radar and ability overview with coach scoping", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const store = new PersistentApiStore(persistence.repositories);
+    const app = buildServer(
+      store,
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    const base = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach";
+
+    const team = await app.inject({
+      method: "GET",
+      url: `${base}/team`,
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    expect(team.statusCode, team.body).toBe(200);
+    const teamBody = team.json() as {
+      team: { id: string; name: string; season: string } | null;
+      stats: { memberCount: number; trainingCount: number; attendanceRate: number | null };
+      members: Array<{ id: string; name: string }>;
+    };
+    expect(teamBody.stats.memberCount).toBeGreaterThanOrEqual(1);
+    expect(teamBody.members.some((member) => member.id === "student-1")).toBe(true);
+
+    const radar = await app.inject({
+      method: "GET",
+      url: `${base}/students/student-1/radar`,
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    expect(radar.statusCode, radar.body).toBe(200);
+    const radarBody = radar.json() as { studentId: string; metrics: unknown[]; latest: unknown[] };
+    expect(radarBody.studentId).toBe("student-1");
+
+    // Parent role denied on coach endpoints.
+    const parentTeam = await app.inject({
+      method: "GET",
+      url: `${base}/team`,
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    expect(parentTeam.statusCode).toBe(403);
+
+    // Student outside the coach scope is denied.
+    const foreignRadar = await app.inject({
+      method: "GET",
+      url: `${base}/students/student-2/radar`,
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    expect(foreignRadar.statusCode).toBe(403);
+
+    const overview = await app.inject({
+      method: "GET",
+      url: `${base}/team/ability-overview`,
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    expect(overview.statusCode, overview.body).toBe(200);
+    const overviewBody = overview.json() as {
+      studentCount: number;
+      overall: number | null;
+      dimensions: Array<{ metricId: string; label: string; average: number | null }>;
+    };
+    expect(overviewBody.studentCount).toBeGreaterThanOrEqual(1);
+    expect(Array.isArray(overviewBody.dimensions)).toBe(true);
+
+    await app.close();
+    persistence.database.close();
+  });
+
+  it("accepts coach event change requests with scoping and validation", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const store = new PersistentApiStore(persistence.repositories);
+    const app = buildServer(
+      store,
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    // Seed an event owned by the coach inside the trailing 30-day scope window.
+    const dayMs = 24 * 60 * 60 * 1000;
+    const startsAt = new Date(Date.now() - dayMs).toISOString();
+    const event = await store.createCalendarEvent("club-chongqing-talent", {
+      type: "training",
+      title: "变更测试训练课",
+      startsAt,
+      endsAt: new Date(Date.now() - dayMs + 90 * 60 * 1000).toISOString(),
+      ownerCoachId: "coach-1",
+      participants: [{ studentId: "student-1", status: "invited" }],
+    });
+    const eventId = (event as { id: string }).id;
+
+    const url = `/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/${eventId}/change-requests`;
+
+    const created = await app.inject({
+      method: "POST",
+      url,
+      headers: { "x-user-id": "user-coach-1" },
+      payload: { reason: "venue", newVenue: "凤凰山 B场", note: "原场地维护" },
+    });
+    expect(created.statusCode, created.body).toBe(201);
+    const createdBody = created.json() as { request: { id: string; status: string; eventId: string; reason: string } };
+    expect(createdBody.request.status).toBe("pending");
+    expect(createdBody.request.eventId).toBe(eventId);
+
+    // Missing/invalid reason -> 400.
+    const invalid = await app.inject({
+      method: "POST",
+      url,
+      headers: { "x-user-id": "user-coach-1" },
+      payload: { reason: "bad-reason" },
+    });
+    expect(invalid.statusCode).toBe(400);
+
+    // Parent role denied.
+    const parentCreate = await app.inject({
+      method: "POST",
+      url,
+      headers: { "x-user-id": "user-parent-1" },
+      payload: { reason: "time" },
+    });
+    expect(parentCreate.statusCode).toBe(403);
+
+    // Unknown event -> 404.
+    const missing = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-missing/change-requests",
+      headers: { "x-user-id": "user-coach-1" },
+      payload: { reason: "time" },
+    });
+    expect(missing.statusCode).toBe(404);
+
+    await app.close();
+    persistence.database.close();
+  });
+
   it("serves next-stage mini-program BFF aggregates without leaking cross-role access", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
     const app = buildServer(

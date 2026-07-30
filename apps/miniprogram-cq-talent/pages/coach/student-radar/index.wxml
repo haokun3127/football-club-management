@@ -1,0 +1,38 @@
+<view class="radar-page">
+  <app-header title="学员雷达" show-back />
+  <view class="radar-page__body">
+    <!-- 学员选择 chips（Figma C13: 选中=品牌红 r20） -->
+    <scroll-view wx:if="{{students.length}}" scroll-x class="student-strip" enhanced show-scrollbar="{{false}}">
+      <view class="student-strip__inner">
+        <view
+          wx:for="{{students}}"
+          wx:key="id"
+          class="student-chip {{activeStudentId === item.id ? 'student-chip--active' : ''}}"
+          data-id="{{item.id}}"
+          data-name="{{item.name}}"
+          bindtap="selectStudent"
+        >{{item.name}}</view>
+      </view>
+    </scroll-view>
+
+    <status-view
+      state="{{state}}"
+      title="{{state === 'loading' ? '加载能力雷达' : state === 'empty' ? '暂无雷达数据' : '读取失败'}}"
+      message="{{message}}"
+      action-text="{{state === 'error' ? '重试' : ''}}"
+      bindaction="retry"
+    />
+
+    <block wx:if="{{state === 'ready'}}">
+      <!-- 雷达 Hero（Figma: #07111f 深底 + 白网格 + 品牌红多边形） -->
+      <view class="radar-hero">
+        <view class="radar-hero__head">
+          <view class="radar-hero__title">{{activeStudentName}}能力雷达</view>
+        </view>
+        <radar-canvas metrics="{{radar}}"></radar-canvas>
+        <view class="radar-hero__overall">{{overall}}</view>
+      </view>
+    </block>
+  </view>
+  <role-tabbar role="coach" active="me" />
+</view>

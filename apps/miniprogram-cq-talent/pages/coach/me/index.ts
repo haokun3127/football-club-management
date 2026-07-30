@@ -1,5 +1,6 @@
 import { getCoachHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { openPage } from "../../../utils/navigation";
 import type { CoachHome, LoadState } from "../../../utils/types";
 
 Page({
@@ -36,6 +37,15 @@ Page({
   },
   retry() {
     this.load();
+  },
+  openTeam() {
+    openPage("/pages/coach/team/index");
+  },
+  openStudentRadar() {
+    openPage("/pages/coach/student-radar/index");
+  },
+  openTeamAbility() {
+    openPage("/pages/coach/team-ability/index");
   },
 });
 

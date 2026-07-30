@@ -66,6 +66,9 @@ Page({
   openTraining() {
     openPage(`/pages/coach/training/index?eventId=${this.data.eventId}`);
   },
+  openChange() {
+    openPage(`/pages/coach/event-change/index?id=${this.data.eventId}`);
+  },
   openTestEntry() {
     const templateId = this.data.workbench?.assessmentTemplateId || "";
     openPage(`/pages/coach/test-entry/index?eventId=${this.data.eventId}&templateId=${templateId}`);

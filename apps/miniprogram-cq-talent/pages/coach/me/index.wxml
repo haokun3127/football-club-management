@@ -16,6 +16,18 @@
   <view wx:if="{{home}}" class="card scope-card">
     <view class="section-title">负责球队</view><view class="tag">{{home.teams.length}} 支</view>
     <view class="subtitle scope-card__teams">{{teamsText}}</view>
+    <view class="field-row field-row--link" bindtap="openTeam">
+      <view class="label">队伍详情</view>
+      <view class="field-value field-value--link">在队人数、累计训练与出勤 ›</view>
+    </view>
+    <view class="field-row field-row--link" bindtap="openStudentRadar">
+      <view class="label">学员雷达</view>
+      <view class="field-value field-value--link">单个学员能力雷达 ›</view>
+    </view>
+    <view class="field-row field-row--link" bindtap="openTeamAbility">
+      <view class="label">团队能力总览</view>
+      <view class="field-value field-value--link">队均雷达与维度统计 ›</view>
+    </view>
   </view>
 
   <view class="card permission-card">

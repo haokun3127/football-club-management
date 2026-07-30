@@ -1,0 +1,123 @@
+# Figma 画板规格: C14 Team Ability Overview
+
+- [4] | C14 Team Ability Overview | 375x812 @(80,4620) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Header | 375x88 @(80,4620) | fill=#fceeef | layout=H gap=12 pad=0/16
+    - [4] | Back | 32x32 @(96,4648) | fill=#ffffff | r=16 | layout=H
+      - [4] | chevron-left | 18x18 @(103,4655)
+        - [6] | Vector | 4x9 @(110,4660) | stroke=#202124 w2
+    - [13] | Title | 235x27 @(140,4650) | fill=#202124 | font=Inter/Bold 22px | text="团队能力总览"
+    - [4] | Frame | 52x29 @(387,4650) | fill=#ffffff | r=12 | layout=H pad=6/12
+      - [13] | 导出 | 28x17 @(399,4656) | fill=#a80f1b | font=Inter/Semi Bold 14px | text="导出"
+  - [4] | Content | 375x654 @(80,4708) | layout=V gap=16 pad=16/16
+    - [13] | 2025 春季评估 · U10精英队 | 162x16 @(96,4724) | fill=#667085 | font=Inter/Regular 13px | text="2025 春季评估 · U10精英队"
+    - [4] | Team Stats | 343x260 @(96,4756) | fill=#07111f | r=16 | layout=V gap=12 pad=16/16
+      - [4] | Header | 311x19 @(112,4772) | layout=H
+        - [13] | 团队平均能力雷达 | 128x19 @(112,4772) | fill=#ffffff | font=Inter/Bold 16px | text="团队平均能力雷达"
+        - [13] | 2025-07 评估 | 77x15 @(346,4774) | fill=#ffffff@0.60 | font=Inter/Regular 12px | text="2025-07 评估"
+      - [4] | Plot | 311x160 @(112,4803) | layout=V
+        - [4] | Radar Chart | 220x180 @(158,4793)
+          - [9] | Ellipse | 220x180 @(158,4793) | stroke=#ffffff@0.20 w1
+          - [9] | Ellipse | 220x180 @(158,4793) | stroke=#ffffff@0.20 w1
+          - [9] | Ellipse | 220x180 @(158,4793) | stroke=#ffffff@0.20 w1
+          - [9] | Ellipse | 220x180 @(158,4793) | stroke=#ffffff@0.20 w1
+          - [9] | Ellipse | 220x180 @(158,4793) | stroke=#ffffff@0.20 w1
+          - [6] | Vector | 220x180 @(178,4813) | stroke=#a80f1b w2
+          - [13] | 综合 74 | 220x24 @(158,4873) | fill=#ffffff | font=Inter/Bold 20px | text="综合 74"
+          - [13] | 速度 | 20x12 @(348,4828) | fill=#ffffff | font=Inter/Regular 10px | text="速度"
+          - [13] | 射门 | 20x12 @(348,4933) | fill=#ffffff | font=Inter/Regular 10px | text="射门"
+          - [13] | 体能 | 20x12 @(248,4958) | fill=#ffffff | font=Inter/Regular 10px | text="体能"
+          - [13] | 防守 | 10x24 @(158,4933) | fill=#ffffff | font=Inter/Regular 10px | text="防守"
+          - [13] | 传球 | 10x24 @(158,4828) | fill=#ffffff | font=Inter/Regular 10px | text="传球"
+          - [13] | 协作 | 20x12 @(198,4783) | fill=#ffffff | font=Inter/Regular 10px | text="协作"
+      - [4] | Frame | 86x25 @(112,4975) | fill=#dcfce7 | r=12 | layout=H gap=4 pad=6/10
+        - [4] | trending-up | 12x12 @(122,4982)
+          - [6] | Vector | 10x5 @(123,4985) | stroke=#16a34a w2
+        - [13] | 较上季 +2 | 50x13 @(138,4981) | fill=#16a34a | font=Inter/Semi Bold 11px | text="较上季 +2"
+    - [4] | Dimension Table | 343x275 @(96,5032) | fill=#ffffff | r=12 | layout=V pad=16/16 | shadow=0,4,12,#000000@0.05
+      - [4] | Table Header | 311x27 @(112,5048) | layout=H
+        - [13] | 维度统计 | 56x17 @(112,5048) | fill=#202124 | font=Inter/Bold 14px | text="维度统计"
+        - [13] | 队均 / TOP / 底 | 83x15 @(340,5049) | fill=#667085 | font=Inter/Regular 12px | text="队均 / TOP / 底"
+      - [4] | Rows | 311x216 @(112,5075) | layout=V
+        - [4] | Row-传球 | 311x36 @(112,5075) | stroke=#e7eaf0 w1 | layout=H pad=10/0
+          - [13] | 传球 | 26x16 @(112,5085) | fill=#667085 | font=Inter/Regular 13px | text="传球"
+          - [4] | Frame | 146x16 @(277,5085) | layout=H gap=16
+            - [13] | 74 | 16x16 @(277,5085) | fill=#a80f1b | font=Inter/Bold 13px | text="74"
+            - [13] | 李明辉 80 | 55x15 @(309,5086) | fill=#667085 | font=Inter/Regular 12px | text="李明辉 80"
+            - [13] | 王浩 45 | 43x15 @(380,5086) | fill=#667085 | font=Inter/Regular 12px | text="王浩 45"
+        - [4] | Row-射门 | 311x36 @(112,5111) | stroke=#e7eaf0 w1 | layout=H pad=10/0
+          - [13] | 射门 | 26x16 @(112,5121) | fill=#667085 | font=Inter/Regular 13px | text="射门"
+          - [4] | Frame | 147x16 @(276,5121) | layout=H gap=16
+            - [13] | 68 | 18x16 @(276,5121) | fill=#a80f1b | font=Inter/Bold 13px | text="68"
+            - [13] | 陈小宇 72 | 54x15 @(310,5122) | fill=#667085 | font=Inter/Regular 12px | text="陈小宇 72"
+            - [13] | 赵晨 42 | 43x15 @(380,5122) | fill=#667085 | font=Inter/Regular 12px | text="赵晨 42"
+        - [4] | Row-防守 | 311x36 @(112,5147) | stroke=#e7eaf0 w1 | layout=H pad=10/0
+          - [13] | 防守 | 26x16 @(112,5157) | fill=#667085 | font=Inter/Regular 13px | text="防守"
+          - [4] | Frame | 146x16 @(277,5157) | layout=H gap=16
+            - [13] | 70 | 17x16 @(277,5157) | fill=#a80f1b | font=Inter/Bold 13px | text="70"
+            - [13] | 张伟 76 | 42x15 @(310,5158) | fill=#667085 | font=Inter/Regular 12px | text="张伟 76"
+            - [13] | 李小花 58 | 55x15 @(368,5158) | fill=#667085 | font=Inter/Regular 12px | text="李小花 58"
+        - [4] | Row-体能 | 311x36 @(112,5183) | stroke=#e7eaf0 w1 | layout=H pad=10/0
+          - [13] | 体能 | 26x16 @(112,5193) | fill=#667085 | font=Inter/Regular 13px | text="体能"
+          - [4] | Frame | 134x16 @(289,5193) | layout=H gap=16
+            - [13] | 72 | 16x16 @(289,5193) | fill=#a80f1b | font=Inter/Bold 13px | text="72"
+            - [13] | 张伟 82 | 43x15 @(321,5194) | fill=#667085 | font=Inter/Regular 12px | text="张伟 82"
+            - [13] | 王浩 60 | 43x15 @(380,5194) | fill=#667085 | font=Inter/Regular 12px | text="王浩 60"
+        - [4] | Row-速度 | 311x36 @(112,5219) | stroke=#e7eaf0 w1 | layout=H pad=10/0
+          - [13] | 速度 | 26x16 @(112,5229) | fill=#667085 | font=Inter/Regular 13px | text="速度"
+          - [4] | Frame | 146x16 @(277,5229) | layout=H gap=16
+            - [13] | 76 | 17x16 @(277,5229) | fill=#a80f1b | font=Inter/Bold 13px | text="76"
+            - [13] | 陈小宇 78 | 54x15 @(310,5230) | fill=#667085 | font=Inter/Regular 12px | text="陈小宇 78"
+            - [13] | 赵晨 64 | 43x15 @(380,5230) | fill=#667085 | font=Inter/Regular 12px | text="赵晨 64"
+        - [4] | Row-协作 | 311x36 @(112,5255) | layout=H pad=10/0
+          - [13] | 协作 | 26x16 @(112,5265) | fill=#667085 | font=Inter/Regular 13px | text="协作"
+          - [4] | Frame | 146x16 @(277,5265) | layout=H gap=16
+            - [13] | 75 | 16x16 @(277,5265) | fill=#a80f1b | font=Inter/Bold 13px | text="75"
+            - [13] | 李明辉 80 | 55x15 @(309,5266) | fill=#667085 | font=Inter/Regular 12px | text="李明辉 80"
+            - [13] | 王浩 62 | 43x15 @(380,5266) | fill=#667085 | font=Inter/Regular 12px | text="王浩 62"
+    - [4] | Ranking | 343x207 @(96,5323) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+      - [13] | TOP 3 排名（每维度） | 143x17 @(112,5339) | fill=#202124 | font=Inter/Bold 14px | text="TOP 3 排名（每维度）"
+      - [4] | Rank Rows | 311x146 @(112,5368) | layout=V gap=10
+        - [4] | Rank-传球 | 311x16 @(112,5368) | layout=H
+          - [13] | 传球 | 26x16 @(112,5368) | fill=#667085 | font=Inter/Regular 13px | text="传球"
+          - [13] | 李明辉 80 | 60x16 @(363,5368) | fill=#a80f1b | font=Inter/Bold 13px | text="李明辉 80"
+        - [4] | Rank-射门 | 311x16 @(112,5394) | layout=H
+          - [13] | 射门 | 26x16 @(112,5394) | fill=#667085 | font=Inter/Regular 13px | text="射门"
+          - [13] | 陈小宇 72 | 58x16 @(365,5394) | fill=#a80f1b | font=Inter/Bold 13px | text="陈小宇 72"
+        - [4] | Rank-防守 | 311x16 @(112,5420) | layout=H
+          - [13] | 防守 | 26x16 @(112,5420) | fill=#667085 | font=Inter/Regular 13px | text="防守"
+          - [13] | 张伟 76 | 46x16 @(377,5420) | fill=#a80f1b | font=Inter/Bold 13px | text="张伟 76"
+        - [4] | Rank-体能 | 311x16 @(112,5446) | layout=H
+          - [13] | 体能 | 26x16 @(112,5446) | fill=#667085 | font=Inter/Regular 13px | text="体能"
+          - [13] | 张伟 82 | 46x16 @(377,5446) | fill=#a80f1b | font=Inter/Bold 13px | text="张伟 82"
+        - [4] | Rank-速度 | 311x16 @(112,5472) | layout=H
+          - [13] | 速度 | 26x16 @(112,5472) | fill=#667085 | font=Inter/Regular 13px | text="速度"
+          - [13] | 陈小宇 78 | 59x16 @(364,5472) | fill=#a80f1b | font=Inter/Bold 13px | text="陈小宇 78"
+        - [4] | Rank-协作 | 311x16 @(112,5498) | layout=H
+          - [13] | 协作 | 26x16 @(112,5498) | fill=#667085 | font=Inter/Regular 13px | text="协作"
+          - [13] | 李明辉 80 | 60x16 @(363,5498) | fill=#a80f1b | font=Inter/Bold 13px | text="李明辉 80"
+  - [4] | TabIconsOverlay | 375x70 @(80,5362) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(200,5422) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(80,5362)
+      - [4] | icon_0 | 22x22 @(132,5368)
+        - [6] | Vector | 17x16 @(134,5372) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(138,5370) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(134,5377) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(137,5380) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(141,5380) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(145,5380) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(137,5384) | fill=#8e97a6
+      - [13] | 日程 | 121x14 @(82,5393) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(205,5362)
+      - [4] | icon_1 | 22x22 @(256,5368)
+        - [6] | Vector | 14x17 @(260,5371) | stroke=#a80f1b w1.6
+        - [6] | Vector | 6x2 @(264,5371) | stroke=#a80f1b w1.4
+        - [6] | Vector | 8x0 @(264,5378) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 8x0 @(264,5382) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 5x0 @(264,5385) | fill=#000000 | stroke=#a80f1b w1.3
+      - [13] | 训练管理 | 121x14 @(207,5393) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="训练管理"
+      - [9] | Ellipse | 4x4 @(266,5410) | fill=#a80f1b
+    - [4] | tab_2 | 125x56 @(330,5362)
+      - [4] | icon_2 | 22x22 @(382,5368)
+        - [6] | Vector | 8x8 @(388,5371) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(384,5380) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(332,5393) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

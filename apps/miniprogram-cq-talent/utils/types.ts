@@ -313,3 +313,22 @@ export interface PrivateLessonRequest {
   status: "pending" | "confirmed" | "declined" | "cancelled";
   createdAt: string;
 }
+
+export interface CoachTeamDetail {
+  team: { id: string; name: string; season: string } | null;
+  stats: { memberCount: number; trainingCount: number; attendanceRate: number | null };
+  members: Array<{ id: string; name: string }>;
+}
+
+export interface CoachTeamAbilityOverview {
+  studentCount: number;
+  overall: number | null;
+  trendDelta: number | null;
+  dimensions: Array<{
+    metricId: string;
+    label: string;
+    average: number | null;
+    top: number | null;
+    bottom: number | null;
+  }>;
+}
