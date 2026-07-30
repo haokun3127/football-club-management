@@ -27,6 +27,29 @@ interface AppEventDetail {
 
 const adminRoles = new Set<ClubUserRole>(["owner", "admin", "operator"]);
 
+interface ParentReminder {
+  id: string;
+  type: "event_upcoming" | "insurance_expiring" | "lesson_credit_low";
+  severity: "info" | "warning" | "urgent";
+  studentId: string;
+  studentName: string;
+  dueAt: string;
+  event?: {
+    id: string;
+    type: string;
+    title: string;
+    startsAt: string;
+    endsAt: string;
+  };
+  insurance?: {
+    status: "expiring" | "expired";
+    expiresAt?: string;
+  };
+  lessonCredit?: {
+    balance: number;
+  };
+}
+
 export async function registerAppClientRoutes(app: FastifyInstance, context: RouteContext) {
   app.get<{ Params: { clubId: string; clientId: string } }>(
     "/clubs/:clubId/app-clients/:clientId/coach/tactical-board/formations",
@@ -150,6 +173,128 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         client: summarizeClient(client),
         role: "parent",
         children: children.map(summarizeStudent),
+      };
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/parent/reminders",
+    {
+      schema: {
+        ...schemas.appClientParams,
+        ...schemas.appClientParentReminders,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "parent");
+      if (!client) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+      if (auth && !auth.membership.roles.includes("parent")) {
+        return context.sendError(reply, 403, "forbidden", "Parent role is required for this operation");
+      }
+
+      const students = await context.store.listOperationalStudents(request.params.clubId);
+      const children = auth
+        ? students.filter((student) => context.store.isGuardianOfStudent(request.params.clubId, auth.user.id, student.id))
+        : students;
+
+      const now = Date.now();
+      const dayMs = 24 * 60 * 60 * 1000;
+      const upcomingWindowMs = 2 * dayMs;
+      const insuranceWindowMs = 30 * dayMs;
+      const insuranceUrgentWindowMs = 7 * dayMs;
+      const lowCreditThreshold = 4;
+
+      const reminders: ParentReminder[] = [];
+
+      for (const child of children) {
+        const events = sortEvents(await context.store.getStudentTimeline(request.params.clubId, child.id));
+        for (const event of events) {
+          const startsAt = Date.parse(event.timeRange?.startsAt ?? "");
+          if (!Number.isFinite(startsAt) || startsAt < now || startsAt > now + upcomingWindowMs) {
+            continue;
+          }
+          if (event.status === "cancelled" || event.status === "completed") {
+            continue;
+          }
+          reminders.push({
+            id: `event_upcoming:${event.id}:${child.id}`,
+            type: "event_upcoming",
+            severity: startsAt - now <= dayMs ? "warning" : "info",
+            studentId: child.id,
+            studentName: child.name,
+            dueAt: event.timeRange.startsAt,
+            event: {
+              id: event.id,
+              type: event.type,
+              title: event.title,
+              startsAt: event.timeRange.startsAt,
+              endsAt: event.timeRange.endsAt,
+            },
+          });
+        }
+
+        const status = await context.store.getStudentOperationalStatusSummary(request.params.clubId, child.id);
+        if (!status) {
+          continue;
+        }
+
+        const insuranceExpiresAtIso = status.insurance?.expiresAt;
+        const insuranceExpiresAt = insuranceExpiresAtIso ? Date.parse(insuranceExpiresAtIso) : Number.NaN;
+        if (insuranceExpiresAtIso && Number.isFinite(insuranceExpiresAt) && insuranceExpiresAt <= now + insuranceWindowMs) {
+          const expired = insuranceExpiresAt < now;
+          reminders.push({
+            id: `insurance_expiring:${child.id}`,
+            type: "insurance_expiring",
+            severity: expired || insuranceExpiresAt - now <= insuranceUrgentWindowMs ? "urgent" : "warning",
+            studentId: child.id,
+            studentName: child.name,
+            dueAt: insuranceExpiresAtIso,
+            insurance: {
+              status: expired ? "expired" : "expiring",
+              expiresAt: insuranceExpiresAtIso,
+            },
+          });
+        }
+
+        const lessonBalance = status.lessonBalance ?? status.lesson?.balance;
+        if (typeof lessonBalance === "number" && lessonBalance <= lowCreditThreshold) {
+          reminders.push({
+            id: `lesson_credit_low:${child.id}`,
+            type: "lesson_credit_low",
+            severity: lessonBalance <= 0 ? "urgent" : "warning",
+            studentId: child.id,
+            studentName: child.name,
+            dueAt: status.lesson?.updatedAt ?? new Date(now).toISOString(),
+            lessonCredit: { balance: lessonBalance },
+          });
+        }
+      }
+
+      const severityRank: Record<ParentReminder["severity"], number> = { urgent: 0, warning: 1, info: 2 };
+      reminders.sort((left, right) =>
+        severityRank[left.severity] - severityRank[right.severity] || Date.parse(left.dueAt) - Date.parse(right.dueAt)
+      );
+
+      return {
+        clubId: request.params.clubId,
+        client: summarizeClient(client),
+        role: "parent",
+        generatedAt: new Date(now).toISOString(),
+        reminders,
       };
     },
   );

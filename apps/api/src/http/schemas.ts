@@ -520,6 +520,13 @@ export const schemas = {
       404: errorResponse,
     },
   },
+  appClientParentReminders: {
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
   appClientActivitySummaries: {
     response: {
       200: flexibleObject,

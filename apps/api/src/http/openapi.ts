@@ -137,6 +137,12 @@ export function buildOpenApiDocument() {
           ...schemas.appClientParentCalendar,
         }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/parent/reminders": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/reminders", {
+          ...schemas.appClientParams,
+          ...schemas.appClientParentReminders,
+        }),
+      },
       "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/activity-summaries": {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/activity-summaries", {
           ...schemas.appClientStudentParams,

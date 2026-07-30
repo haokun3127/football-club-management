@@ -41,6 +41,7 @@ describe("api server", () => {
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/home"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/schedule"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/calendar"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/reminders"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/activity-summaries"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/growth-summary"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/status-summary"]).toBeDefined();
@@ -327,6 +328,72 @@ describe("api server", () => {
     expect(parent.statusCode).toBe(403);
     expect(readonly.statusCode).toBe(409);
     expect(readonly.json().error.code).toBe("tactical_board_read_only");
+
+    await app.close();
+    persistence.database.close();
+  });
+
+  it("serves parent reminders derived from real store data with guardian scoping", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const store = new PersistentApiStore(persistence.repositories);
+    const app = buildServer(
+      store,
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    const now = Date.now();
+    const dayMs = 24 * 60 * 60 * 1000;
+
+    await store.createCalendarEvent("club-chongqing-talent", {
+      type: "training",
+      title: "U10 提醒测试训练课",
+      startsAt: new Date(now + dayMs).toISOString(),
+      endsAt: new Date(now + dayMs + 90 * 60 * 1000).toISOString(),
+      participants: [{ studentId: "student-1", status: "invited" }],
+    });
+    await store.createInsurancePolicy("club-chongqing-talent", "student-1", {
+      expiresAt: new Date(now + 10 * dayMs).toISOString().slice(0, 10),
+      reviewStatus: "approved",
+      source: "offline_insurance",
+    });
+    await store.recordLessonAdjustment("club-chongqing-talent", "student-1", {
+      entryType: "credit",
+      lessonDelta: 2,
+      source: "offline_recharge",
+    });
+
+    const parentResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/reminders",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    const coachResponse = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/reminders",
+      headers: { "x-user-id": "user-coach-1" },
+    });
+
+    expect(parentResponse.statusCode, parentResponse.body).toBe(200);
+    const body = parentResponse.json() as {
+      role: string;
+      reminders: Array<{ type: string; severity: string; studentId: string; dueAt: string }>;
+    };
+    expect(body.role).toBe("parent");
+    expect(body.reminders.length).toBeGreaterThanOrEqual(3);
+    expect(new Set(body.reminders.map((item) => item.type))).toEqual(
+      new Set(["event_upcoming", "insurance_expiring", "lesson_credit_low"]),
+    );
+    // Guardian scoping: every reminder must belong to the bound child only.
+    expect(body.reminders.every((item) => item.studentId === "student-1")).toBe(true);
+    // Severity ordering: urgent first, then warning, then info.
+    const severityRank = { urgent: 0, warning: 1, info: 2 } as const;
+    const ranks = body.reminders.map((item) => severityRank[item.severity as keyof typeof severityRank]);
+    expect([...ranks].sort((left, right) => left - right)).toEqual(ranks);
+
+    expect(coachResponse.statusCode).toBe(403);
 
     await app.close();
     persistence.database.close();
