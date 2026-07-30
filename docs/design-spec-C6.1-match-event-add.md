@@ -1,0 +1,75 @@
+# Figma 画板规格: C6.1 Add Match Event
+
+- [4] | C6.1 Add Match Event | 375x812 @(510,1920) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | TopNav | 375x88 @(510,1920) | fill=#fceeef | layout=H pad=0/16
+    - [4] | Left | 168x27 @(526,1950) | layout=H gap=12
+      - [4] | arrow-left | 24x24 @(526,1952)
+        - [6] | Vector | 14x14 @(531,1957) | stroke=#202124 w2
+      - [13] | 添加比赛事件 | 132x27 @(562,1950) | fill=#202124 | font=Inter/Bold 22px | text="添加比赛事件"
+  - [4] | Content | 375x654 @(510,2008) | layout=V gap=24 pad=16/16
+    - [4] | EventType | 343x105 @(526,2024) | layout=V gap=12
+      - [13] | 事件类型 | 56x17 @(526,2024) | fill=#202124 | font=Inter/Bold 14px | text="事件类型"
+      - [4] | Grid | 343x76 @(526,2053) | layout=H gap=12
+        - [4] | Frame | 50x32 @(526,2053) | fill=#a80f1b | r=8 | layout=H pad=8/12
+          - [13] | 进球 | 26x16 @(538,2061) | fill=#ffffff | font=Inter/Semi Bold 13px | text="进球"
+        - [4] | Frame | 50x32 @(588,2053) | stroke=#e7eaf0 w1 | r=8 | layout=H pad=8/12
+          - [13] | 助攻 | 26x16 @(600,2061) | fill=#202124 | font=Inter/Semi Bold 13px | text="助攻"
+        - [4] | Frame | 50x32 @(650,2053) | stroke=#e7eaf0 w1 | r=8 | layout=H pad=8/12
+          - [13] | 黄牌 | 26x16 @(662,2061) | fill=#202124 | font=Inter/Semi Bold 13px | text="黄牌"
+        - [4] | Frame | 50x32 @(712,2053) | stroke=#e7eaf0 w1 | r=8 | layout=H pad=8/12
+          - [13] | 红牌 | 26x16 @(724,2061) | fill=#202124 | font=Inter/Semi Bold 13px | text="红牌"
+        - [4] | Frame | 50x32 @(774,2053) | stroke=#e7eaf0 w1 | r=8 | layout=H pad=8/12
+          - [13] | 换人 | 26x16 @(786,2061) | fill=#202124 | font=Inter/Semi Bold 13px | text="换人"
+        - [4] | Frame | 50x32 @(526,2097) | stroke=#e7eaf0 w1 | r=8 | layout=H pad=8/12
+          - [13] | 其他 | 26x16 @(538,2105) | fill=#202124 | font=Inter/Semi Bold 13px | text="其他"
+    - [4] | Form | 343x315 @(526,2153) | fill=#ffffff | r=12 | layout=V gap=16 pad=16/16 | shadow=0,2,8,#000000@0.05
+      - [4] | TimeRow | 311x73 @(542,2169) | layout=V gap=8
+        - [13] | 时间 | 28x17 @(542,2169) | fill=#202124 | font=Inter/Semi Bold 14px | text="时间"
+        - [4] | Frame | 311x48 @(542,2194) | stroke=#e7eaf0 w1 | r=8 | layout=H pad=0/12
+          - [13] | 第45分钟 | 69x19 @(554,2208) | fill=#202124 | font=Inter/Semi Bold 16px | text="第45分钟"
+          - [4] | Frame | 12x26 @(829,2205) | layout=V gap=2
+            - [4] | chevron-up | 12x12 @(829,2205)
+              - [6] | Vector | 6x3 @(832,2210) | stroke=#202124 w2
+            - [4] | chevron-down | 12x12 @(829,2219)
+              - [6] | Vector | 6x3 @(832,2224) | stroke=#202124 w2
+      - [4] | PlayerRow | 311x73 @(542,2258) | layout=V gap=8
+        - [13] | 球员 | 28x17 @(542,2258) | fill=#202124 | font=Inter/Semi Bold 14px | text="球员"
+        - [4] | Frame | 311x48 @(542,2283) | stroke=#e7eaf0 w1 | r=8 | layout=H pad=0/12
+          - [4] | Frame | 112x24 @(554,2295) | layout=H gap=8
+            - [4] | Frame | 24x24 @(554,2295) | fill=paint-type-5 | r=12 | layout=H
+            - [13] | 陈小宇 | 48x19 @(586,2298) | fill=#202124 | font=Inter/Semi Bold 16px | text="陈小宇"
+            - [13] | 前锋 | 24x15 @(642,2300) | fill=#667085 | font=Inter/Regular 12px | text="前锋"
+          - [4] | chevron-down | 16x16 @(825,2299)
+            - [6] | Vector | 8x4 @(829,2305) | stroke=#667085 w2
+      - [4] | NoteRow | 311x105 @(542,2347) | layout=V gap=8
+        - [13] | 备注 | 28x17 @(542,2347) | fill=#202124 | font=Inter/Semi Bold 14px | text="备注"
+        - [4] | Frame | 311x80 @(542,2372) | stroke=#e7eaf0 w1 | r=8 | layout=V pad=12/12
+          - [13] | 右路传中后禁区内推射 | 140x17 @(554,2384) | fill=#667085 | font=Inter/Regular 14px | text="右路传中后禁区内推射"
+    - [4] | SaveBtn | 343x52 @(526,2492) | fill=#a80f1b | r=26 | layout=H
+      - [13] | 提交事件 | 64x19 @(666,2508) | fill=#ffffff | font=Inter/Semi Bold 16px | text="提交事件"
+  - [4] | TabIconsOverlay | 375x70 @(510,2662) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(630,2722) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(510,2662)
+      - [4] | icon_0 | 22x22 @(562,2668)
+        - [6] | Vector | 17x16 @(564,2672) | stroke=#a80f1b w1.6
+        - [6] | Vector | 8x4 @(568,2670) | fill=#000000 | stroke=#a80f1b w1.6
+        - [6] | Vector | 17x0 @(564,2677) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 3x3 @(567,2680) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(571,2680) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(575,2680) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(567,2684) | fill=#a80f1b
+      - [13] | 日程 | 121x14 @(512,2693) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="日程"
+      - [9] | Ellipse | 4x4 @(570,2710) | fill=#a80f1b
+    - [4] | tab_1 | 125x56 @(635,2662)
+      - [4] | icon_1 | 22x22 @(686,2668)
+        - [6] | Vector | 14x17 @(690,2671) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 6x2 @(694,2671) | stroke=#8e97a6 w1.4
+        - [6] | Vector | 8x0 @(694,2678) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 8x0 @(694,2682) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 5x0 @(694,2685) | fill=#000000 | stroke=#8e97a6 w1.3
+      - [13] | 训练管理 | 121x14 @(637,2693) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="训练管理"
+    - [4] | tab_2 | 125x56 @(760,2662)
+      - [4] | icon_2 | 22x22 @(812,2668)
+        - [6] | Vector | 8x8 @(818,2671) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(814,2680) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(762,2693) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

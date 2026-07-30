@@ -1,0 +1,49 @@
+<view class="correction-page">
+  <app-header title="课时更正" show-back />
+  <view class="correction-page__body">
+    <status-view
+      state="{{state}}"
+      title="{{state === 'loading' ? '加载课时记录' : state === 'empty' ? '暂无学员' : '读取失败'}}"
+      message="{{message}}"
+      action-text="{{state === 'error' ? '重试' : ''}}"
+      bindaction="retry"
+    />
+
+    <block wx:if="{{state === 'ready'}}">
+      <!-- 警示头（Figma C5.1: 橙色竖条 + 标题） -->
+      <view class="alert-header">
+        <view class="alert-header__bar"></view>
+        <view class="alert-header__texts">
+          <view class="alert-header__title">⚠️ 课时记录异常</view>
+          <view class="alert-header__text">请检查并更正以下学员的课时记录</view>
+        </view>
+      </view>
+
+      <!-- 需更正学员 -->
+      <view class="student-card">
+        <view class="student-card__title">需更正学员</view>
+        <view wx:for="{{rows}}" wx:key="studentId" class="student-row">
+          <view class="student-row__avatar">{{item.name.slice(0, 1)}}</view>
+          <view class="student-row__info">
+            <view class="student-row__name">{{item.name}}</view>
+            <view class="student-row__base">{{item.baseLabel}}</view>
+          </view>
+          <view class="student-row__stepper">
+            <view class="student-row__btn" data-student-id="{{item.studentId}}" data-direction="{{-1}}" bindtap="adjustDelta">−</view>
+            <view class="student-row__delta {{item.delta !== 0 ? 'student-row__delta--changed' : ''}}">{{item.deltaLabel}}</view>
+            <view class="student-row__btn" data-student-id="{{item.studentId}}" data-direction="{{1}}" bindtap="adjustDelta">＋</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 更正原因 -->
+      <view class="reason-card">
+        <view class="reason-card__title">更正原因</view>
+        <textarea class="reason-card__input" placeholder="例如：家长反馈实际到场未销课" value="{{reason}}" bindinput="onReasonInput" />
+      </view>
+
+      <view class="submit-button {{submitting ? 'submit-button--disabled' : ''}}" bindtap="submit">{{submitting ? '提交中…' : '提交更正'}}</view>
+    </block>
+  </view>
+  <role-tabbar role="coach" active="schedule" />
+</view>

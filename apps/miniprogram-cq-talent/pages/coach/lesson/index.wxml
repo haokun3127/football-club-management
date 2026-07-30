@@ -50,6 +50,7 @@
     <view class="section-title">本次备注</view>
     <view class="subtitle">确认前请检查不销课原因；返还或补扣会单独留痕。</view>
     <textarea class="lesson-note" placeholder="本次销课备注，可选" value="{{lessonNote}}" bindinput="onLessonNoteInput" />
+    <view class="lesson-correction-link" bindtap="openLessonCorrection">课时更正（C5.1 设计稿流程）›</view>
   </view>
   <submit-bar wx:if="{{workbench}}" primary-text="确认销课" hint="{{workbench.roster.length}} 名学员 · 例外学员不会扣课" loading="{{saving}}" disabled="{{saving}}" bindsubmit="confirmLesson" />
 </view>

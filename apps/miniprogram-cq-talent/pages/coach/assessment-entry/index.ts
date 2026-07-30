@@ -29,6 +29,8 @@ interface PageData {
   fields: SliderField[];
   students: StudentEntry[];
   submitting: boolean;
+  autosaveVisible: boolean;
+  lastSavedLabel: string;
 }
 
 Page<PageData>({
@@ -43,7 +45,9 @@ Page<PageData>({
     fields: [],
     students: [],
     submitting: false,
-  },
+    autosaveVisible: false,
+    lastSavedLabel: "",
+    },
   onLoad(query: { templateId?: string; title?: string }) {
     this.load(query?.templateId || "", query?.title ? decodeURIComponent(query.title) : "能力评估");
   },
@@ -106,13 +110,25 @@ Page<PageData>({
       };
     });
     this.setData({ students });
+    this.autosave();
   },
-  saveDraft() {
+  autosave() {
     wx.setStorageSync(`assessment-draft-${this.data.templateId}`, {
       savedAt: new Date().toISOString(),
       students: this.data.students.map((student: StudentEntry) => ({ id: student.id, values: student.values })),
     });
-    wx.showToast({ title: "草稿已保存", icon: "success" });
+    const now = new Date();
+    this.setData({ lastSavedLabel: `已自动保存 ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}` });
+  },
+  saveDraft() {
+    this.autosave();
+    this.setData({ autosaveVisible: true });
+  },
+  continueEditing() {
+    this.setData({ autosaveVisible: false });
+  },
+  exitEditing() {
+    wx.navigateBack({ delta: 1 });
   },
   async submit() {
     if (this.data.submitting) return;

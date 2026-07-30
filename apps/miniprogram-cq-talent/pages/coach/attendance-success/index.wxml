@@ -1,0 +1,33 @@
+<view class="success-page">
+  <app-header title="出勤管理" show-back />
+  <view class="success-page__body">
+    <!-- 成功态（Figma C4.1: 绿圆 + 白对勾 + 阴影） -->
+    <view class="hero">
+      <view class="hero__circle">✓</view>
+      <view class="hero__title">{{correction ? '出勤修改已提交' : '出勤记录已提交'}}</view>
+      <view class="hero__subtitle">{{present}}名学员已到场，{{absent}}名未到场</view>
+    </view>
+
+    <!-- 摘要卡 -->
+    <view class="summary-card">
+      <view class="summary-card__row">
+        <text class="summary-card__label">课程</text>
+        <text class="summary-card__value">{{title}}</text>
+      </view>
+      <view class="summary-card__row">
+        <text class="summary-card__label">日期</text>
+        <text class="summary-card__value">{{date}}</text>
+      </view>
+      <view class="summary-card__row" wx:if="{{venue}}">
+        <text class="summary-card__label">场地</text>
+        <text class="summary-card__value">{{venue}}</text>
+      </view>
+    </view>
+
+    <view class="actions">
+      <view class="actions__primary" bindtap="backToEvent">返回活动</view>
+      <view class="actions__secondary" bindtap="done">完成</view>
+    </view>
+  </view>
+  <role-tabbar role="coach" active="schedule" />
+</view>

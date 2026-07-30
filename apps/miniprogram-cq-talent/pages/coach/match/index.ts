@@ -35,6 +35,7 @@ Page({
     workbench: null as CoachWorkbench | null,
     eventId: "",
     saving: false,
+    savedFlash: false,
     matchTypes,
     statuses,
     playerEventTypes: allPlayerEventTypes,
@@ -57,6 +58,19 @@ Page({
   },
   openTacticalBoard() {
     if (this.data.eventId) openPage(`/pages/coach/tactical-board/index?eventId=${this.data.eventId}`);
+  },
+  openMatchEventAdd() {
+    if (!this.data.eventId) return;
+    const navigate = wx.navigateTo as unknown as (options: { url: string; events?: Record<string, (payload: CoachMatchPlayerEvent & { studentName: string; label: string }) => void> }) => void;
+    navigate({
+      url: `/pages/coach/match-event-add/index?eventId=${this.data.eventId}`,
+      events: {
+        acceptMatchEvent: (payload) => {
+          this.setData({ playerEvents: [...this.data.playerEvents, payload] });
+          wx.showToast({ title: "事件已加入列表", icon: "success" });
+        },
+      },
+    });
   },
   async load(id: string) {
     try {
@@ -152,7 +166,9 @@ Page({
         events: expandMatchEvents(this.data.playerEvents),
       });
       wx.showToast({ title: "比赛摘要已保存", icon: "success" });
+      this.setData({ savedFlash: true });
       await this.load(this.data.eventId);
+      this.setData({ savedFlash: false });
     } catch (error) {
       wx.showToast({ title: readableError(error), icon: "none" });
     } finally {

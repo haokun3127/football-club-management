@@ -23,16 +23,22 @@ Page({
     saving: false,
     statusOptions,
     summary: { total: 0, present: 0, attention: 0 },
+    correctionMode: false,
+    disputedCount: 0,
   },
   onLoad(query?: Record<string, string | undefined>) {
     requireRole("coach");
+    this.setData({ correctionMode: query?.mode === "correction" });
     this.load(query?.id || "");
   },
   async load(id: string) {
     try {
       const workbench = await getCoachWorkbench(id);
       const roster = withRosterUi(workbench.roster);
-      this.setData({ state: roster.length ? "ready" : "empty", workbench: { ...workbench, roster }, message: roster.length ? "" : "当前活动还没有可点名学员。", eventId: id, summary: summarizeRoster(roster) });
+      const disputedCount = this.data.correctionMode
+        ? roster.filter((student) => student.status === "absent" || student.status === "leave_requested").length
+        : 0;
+      this.setData({ state: roster.length ? "ready" : "empty", workbench: { ...workbench, roster }, message: roster.length ? "" : "当前活动还没有可点名学员。", eventId: id, summary: summarizeRoster(roster), disputedCount });
     } catch (error) {
       this.setData({ state: "error", message: readableError(error) });
     }
@@ -74,11 +80,14 @@ Page({
     try {
       const roster = this.data.workbench.roster.map(({ statusLabel: _label, statusTone: _tone, statusIndex: _index, ...student }: RosterUiItem) => student);
       await saveCoachAttendance(this.data.eventId, roster);
-      wx.showToast({ title: "点名已保存", icon: "success" });
-      await this.load(this.data.eventId);
+      const event = this.data.workbench.event;
+      const present = this.data.workbench.roster.filter((student: RosterItem) => student.status === "present").length;
+      const absent = this.data.workbench.roster.length - present;
+      wx.redirectTo({
+        url: `/pages/coach/attendance-success/index?title=${encodeURIComponent(event.title)}&date=${encodeURIComponent(event.startsAt)}&venue=${encodeURIComponent(event.venue || "")}&present=${present}&absent=${absent}&correction=${this.data.correctionMode ? 1 : 0}`,
+      });
     } catch (error) {
       wx.showToast({ title: readableError(error), icon: "none" });
-    } finally {
       this.setData({ saving: false });
     }
   },

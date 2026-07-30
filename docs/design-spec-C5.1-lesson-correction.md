@@ -1,0 +1,76 @@
+# Figma 画板规格: C5.1 Lesson Correction
+
+- [4] | C5.1 Lesson Correction | 375x812 @(1370,1020) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(1370,1020) | fill=#fceeef | layout=H pad=14/22
+    - [4] | Frame | 124x27 @(1392,1050) | layout=H gap=12
+      - [4] | arrow-left | 24x24 @(1392,1052)
+        - [6] | Vector | 14x14 @(1397,1057) | stroke=#202124 w2
+      - [13] | 课时更正 | 88x27 @(1428,1050) | fill=#202124 | font=Inter/Bold 22px | text="课时更正"
+  - [4] | Content | 375x654 @(1370,1108) | layout=V gap=20 pad=22/22
+    - [4] | Alert Header | 331x71 @(1392,1130) | fill=#ffffff | r=12 | layout=H gap=12 pad=16/16
+      - [12] | Rectangle | 4x39 @(1408,1146) | fill=#f59e0b | r=2
+      - [4] | Frame | 283x39 @(1424,1146) | layout=V gap=4
+        - [13] | ⚠️ 课时记录异常 | 116x19 @(1424,1146) | fill=#202124 | font=Inter/Bold 16px | text="⚠️ 课时记录异常"
+        - [13] | 请检查并更正以下学员的课时记录 | 195x16 @(1424,1169) | fill=#667085 | font=Inter/Regular 13px | text="请检查并更正以下学员的课时记录"
+    - [4] | Student List | 331x161 @(1392,1221) | fill=#ffffff | r=12 | layout=V gap=16 pad=16/16
+      - [13] | 需更正学员 | 70x17 @(1408,1237) | fill=#202124 | font=Inter/Bold 14px | text="需更正学员"
+      - [4] | Student Row | 299x40 @(1408,1270) | layout=H
+        - [4] | Frame | 123x40 @(1408,1270) | layout=H gap=12
+          - [4] | Frame | 40x40 @(1408,1270) | fill=paint-type-5 | r=20 | layout=H
+          - [4] | Frame | 71x34 @(1460,1273) | layout=V gap=2
+            - [13] | 陈小宇 | 42x17 @(1460,1273) | fill=#202124 | font=Inter/Semi Bold 14px | text="陈小宇"
+            - [13] | 原值: 1.5课时 | 71x15 @(1460,1292) | fill=#667085 | font=Inter/Regular 12px | text="原值: 1.5课时"
+        - [4] | Frame | 152x40 @(1555,1270) | layout=H gap=8
+          - [4] | Frame | 64x23 @(1555,1278) | fill=#fff7ed | r=4 | layout=H pad=4/8
+            - [13] | 系统差异 | 48x15 @(1563,1282) | fill=#f59e0b | font=Inter/Semi Bold 12px | text="系统差异"
+          - [4] | Frame | 80x40 @(1627,1270) | stroke=#e7eaf0 w1 | r=8 | layout=H gap=8 pad=0/12
+            - [13] | 0.5 | 22x17 @(1639,1282) | fill=#202124 | font=Inter/Semi Bold 14px | text="0.5"
+            - [4] | Frame | 12x26 @(1669,1277) | layout=V gap=2
+              - [4] | chevron-up | 12x12 @(1669,1277)
+                - [6] | Vector | 6x3 @(1672,1282) | stroke=#202124 w2
+              - [4] | chevron-down | 12x12 @(1669,1291)
+                - [6] | Vector | 6x3 @(1672,1296) | stroke=#202124 w2
+      - [4] | Student Row | 299x40 @(1408,1326) | layout=H
+        - [4] | Frame | 123x40 @(1408,1326) | layout=H gap=12
+          - [4] | Frame | 40x40 @(1408,1326) | fill=paint-type-5 | r=20 | layout=H
+          - [4] | Frame | 71x34 @(1460,1329) | layout=V gap=2
+            - [13] | 王一涵 | 42x17 @(1460,1329) | fill=#202124 | font=Inter/Semi Bold 14px | text="王一涵"
+            - [13] | 原值: 1.5课时 | 71x15 @(1460,1348) | fill=#667085 | font=Inter/Regular 12px | text="原值: 1.5课时"
+        - [4] | Frame | 152x40 @(1555,1326) | layout=H gap=8
+          - [4] | Frame | 64x23 @(1555,1334) | fill=#fff7ed | r=4 | layout=H pad=4/8
+            - [13] | 系统差异 | 48x15 @(1563,1338) | fill=#f59e0b | font=Inter/Semi Bold 12px | text="系统差异"
+          - [4] | Frame | 80x40 @(1627,1326) | stroke=#e7eaf0 w1 | r=8 | layout=H gap=8 pad=0/12
+            - [13] | 0.5 | 22x17 @(1639,1338) | fill=#202124 | font=Inter/Semi Bold 14px | text="0.5"
+            - [4] | Frame | 12x26 @(1669,1333) | layout=V gap=2
+              - [4] | chevron-up | 12x12 @(1669,1333)
+                - [6] | Vector | 6x3 @(1672,1338) | stroke=#202124 w2
+              - [4] | chevron-down | 12x12 @(1669,1347)
+                - [6] | Vector | 6x3 @(1672,1352) | stroke=#202124 w2
+    - [4] | Save Button | 331x52 @(1392,1402) | fill=#a80f1b | r=26 | layout=H
+      - [13] | 保存更正 | 64x19 @(1526,1418) | fill=#ffffff | font=Inter/Semi Bold 16px | text="保存更正"
+  - [4] | TabIconsOverlay | 375x70 @(1370,1762) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1490,1822) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(1370,1762)
+      - [4] | icon_0 | 22x22 @(1422,1768)
+        - [6] | Vector | 17x16 @(1424,1772) | stroke=#a80f1b w1.6
+        - [6] | Vector | 8x4 @(1428,1770) | fill=#000000 | stroke=#a80f1b w1.6
+        - [6] | Vector | 17x0 @(1424,1777) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 3x3 @(1427,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1431,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1435,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1427,1784) | fill=#a80f1b
+      - [13] | 日程 | 121x14 @(1372,1793) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="日程"
+      - [9] | Ellipse | 4x4 @(1430,1810) | fill=#a80f1b
+    - [4] | tab_1 | 125x56 @(1495,1762)
+      - [4] | icon_1 | 22x22 @(1546,1768)
+        - [6] | Vector | 14x17 @(1550,1771) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 6x2 @(1554,1771) | stroke=#8e97a6 w1.4
+        - [6] | Vector | 8x0 @(1554,1778) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 8x0 @(1554,1782) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 5x0 @(1554,1785) | fill=#000000 | stroke=#8e97a6 w1.3
+      - [13] | 训练管理 | 121x14 @(1497,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="训练管理"
+    - [4] | tab_2 | 125x56 @(1620,1762)
+      - [4] | icon_2 | 22x22 @(1672,1768)
+        - [6] | Vector | 8x8 @(1678,1771) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(1674,1780) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(1622,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

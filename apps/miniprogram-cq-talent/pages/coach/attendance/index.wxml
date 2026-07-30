@@ -1,7 +1,16 @@
 <view class="attendance-page">
-  <app-header title="活动点名" show-back="{{true}}" />
+  <app-header title="{{correctionMode ? '出勤修改' : '活动点名'}}" show-back="{{true}}" />
   <view class="attendance-page__body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '正在读取名单' : state === 'empty' ? '暂无学员' : '名单读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重新加载' : ''}}" bindaction="retry" />
+
+    <!-- C4.2 家长异议警示卡 -->
+    <view wx:if="{{correctionMode && workbench}}" class="correction-alert">
+      <view class="correction-alert__icon">⚠</view>
+      <view class="correction-alert__texts">
+        <view class="correction-alert__title">出勤记录需要修改</view>
+        <view class="correction-alert__text">家长对出勤记录提出异议，请核实后重新提交（共 {{disputedCount}} 条异常）</view>
+      </view>
+    </view>
 
     <view wx:if="{{workbench}}" class="event-head">
       <view class="event-head__eyebrow">本次活动</view>

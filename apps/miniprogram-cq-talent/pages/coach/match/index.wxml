@@ -74,6 +74,7 @@
       <input class="field-input" placeholder="可选" value="{{eventNote}}" data-field="eventNote" bindinput="onTextInput" />
     </view>
     <button class="ghost-button" bindtap="addPlayerEvent">添加事件</button>
+    <button class="ghost-button ghost-button--brand" bindtap="openMatchEventAdd">按设计稿添加 ›</button>
     <view wx:if="{{playerEvents.length}}" class="event-list">
       <view wx:for="{{playerEvents}}" wx:key="label" class="match-event-row">
         <view>
@@ -86,5 +87,5 @@
     </view>
     <view class="subtitle">请确认比分和球员事件后保存；未选择助攻时不会生成助攻记录。</view>
   </view>
-  <submit-bar wx:if="{{workbench}}" primary-text="保存比赛记录" hint="未选择助攻时只记录进球" loading="{{saving}}" disabled="{{saving}}" bindsubmit="saveMatch" />
+  <submit-bar wx:if="{{workbench}}" primary-text="{{savedFlash ? '已保存 ✓' : '保存比赛记录'}}" hint="未选择助攻时只记录进球" loading="{{saving}}" disabled="{{saving}}" bindsubmit="saveMatch" />
 </view>

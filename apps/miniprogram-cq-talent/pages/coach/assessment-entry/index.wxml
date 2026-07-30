@@ -54,7 +54,20 @@
       </view>
 
       <view class="submit-button {{submitting ? 'submit-button--disabled' : ''}}" bindtap="submit">{{submitting ? '提交中…' : '提交评估'}}</view>
+      <view wx:if="{{lastSavedLabel}}" class="autosave-hint">{{lastSavedLabel}}</view>
     </block>
+  </view>
+
+  <!-- C12.1 自动保存弹层 -->
+  <view wx:if="{{autosaveVisible}}" class="autosave-overlay">
+    <view class="autosave-modal">
+      <view class="autosave-modal__circle">✓</view>
+      <view class="autosave-modal__title">评分已自动保存</view>
+      <view class="autosave-modal__text">下次打开可继续录入</view>
+      <view class="autosave-modal__meta">{{lastSavedLabel}}</view>
+      <view class="autosave-modal__primary" bindtap="continueEditing">继续录入</view>
+      <view class="autosave-modal__secondary" bindtap="exitEditing">退出</view>
+    </view>
   </view>
   <role-tabbar role="coach" active="me" />
 </view>

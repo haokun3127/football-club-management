@@ -1,0 +1,82 @@
+# Figma 画板规格: C6.2 Save State
+
+- [4] | C6.2 Save State | 375x812 @(940,1920) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Background | 375x742 @(940,1920) | layout=V
+    - [4] | TopNav | 375x88 @(940,1920) | fill=#fceeef | layout=H pad=0/16
+      - [4] | Left | 146x27 @(956,1950) | layout=H gap=12
+        - [4] | arrow-left | 24x24 @(956,1952)
+          - [6] | Vector | 14x14 @(961,1957) | stroke=#202124 w2
+        - [13] | 比赛进行中 | 110x27 @(992,1950) | fill=#202124 | font=Inter/Bold 22px | text="比赛进行中"
+    - [4] | Content | 375x654 @(940,2008) | layout=V gap=24 pad=16/16
+      - [4] | StatusCard | 343x141 @(956,2024) | fill=#07111f | r=16 | layout=V gap=16 pad=20/20 | shadow=0,4,12,#000000@0.10
+        - [4] | Header | 303x41 @(976,2044) | layout=H gap=12
+          - [4] | Frame | 40x40 @(976,2044) | fill=#ffffff@0.10 | r=20 | layout=V
+            - [4] | clock | 20x20 @(986,2054)
+              - [6] | Vector | 17x17 @(988,2056) | stroke=#ffffff w2
+          - [4] | Frame | 90x41 @(1028,2044) | layout=V gap=2
+            - [13] | 比赛进行中 | 90x22 @(1028,2044) | fill=#ffffff | font=Inter/Bold 18px | text="比赛进行中"
+            - [13] | 第 54 分钟 | 68x17 @(1028,2068) | fill=#ffffff | font=Inter/Regular 14px | text="第 54 分钟"
+        - [4] | Actions | 303x44 @(976,2101) | layout=H gap=12
+          - [4] | Frame | 146x44 @(976,2101) | stroke=#ffffff w1 | r=12 | layout=H gap=8
+            - [4] | pause | 16x16 @(1014,2115)
+              - [6] | Vector | 9x12 @(1017,2117) | stroke=#ffffff w2
+            - [13] | ⏸ 暂停 | 46x17 @(1038,2114) | fill=#ffffff | font=Inter/Semi Bold 14px | text="⏸ 暂停"
+          - [4] | Frame | 146x44 @(1134,2101) | fill=#a80f1b | r=12 | layout=H gap=8
+            - [4] | square | 16x16 @(1157,2115)
+              - [6] | Vector | 12x12 @(1159,2117) | stroke=#ffffff w2
+            - [13] | ⏹ 结束比赛 | 74x17 @(1181,2114) | fill=#ffffff | font=Inter/Semi Bold 14px | text="⏹ 结束比赛"
+      - [4] | ScoreCard | 343x104 @(956,2189) | fill=#ffffff | r=12 | layout=V gap=8 pad=20/20 | shadow=0,2,8,#000000@0.05
+        - [13] | 2 : 1 | 61x39 @(1097,2209) | fill=#202124 | font=Inter/Bold 32px | text="2 : 1"
+        - [13] | 凤凰山U10 vs 星辰队 | 133x17 @(1061,2256) | fill=#667085 | font=Inter/Regular 14px | text="凤凰山U10 vs 星辰队"
+      - [4] | RecentEvents | 343x137 @(956,2317) | fill=#ffffff | r=12 | layout=V gap=16 pad=16/16 | shadow=0,2,8,#000000@0.05
+        - [13] | 最近事件 | 56x17 @(972,2333) | fill=#202124 | font=Inter/Bold 14px | text="最近事件"
+        - [4] | Frame | 124x72 @(972,2366) | layout=V gap=12
+          - [4] | Frame | 124x16 @(972,2366) | layout=H gap=12
+            - [9] | Ellipse | 6x6 @(972,2371) | fill=#10b981
+            - [13] | 54分 · 陈小宇进球 | 106x16 @(990,2366) | fill=#202124 | font=Inter/Regular 13px | text="54分 · 陈小宇进球"
+          - [4] | Frame | 111x16 @(972,2394) | layout=H gap=12
+            - [9] | Ellipse | 6x6 @(972,2399) | fill=#f59e0b
+            - [13] | 32分 · 张伟黄牌 | 93x16 @(990,2394) | fill=#202124 | font=Inter/Regular 13px | text="32分 · 张伟黄牌"
+          - [4] | Frame | 121x16 @(972,2422) | layout=H gap=12
+            - [9] | Ellipse | 6x6 @(972,2427) | fill=#10b981
+            - [13] | 18分 · 陈小宇进球 | 103x16 @(990,2422) | fill=#202124 | font=Inter/Regular 13px | text="18分 · 陈小宇进球"
+  - [4] | Overlay | 375x812 @(940,1920) | fill=#000000@0.50 | layout=V
+    - [4] | ModalCard | 315x270 @(970,2191) | fill=#ffffff | r=20 | layout=V gap=20 pad=24/24 | shadow=0,12,24,#000000@0.10
+      - [4] | IconContainer | 64x64 @(994,2215) | fill=#ecfdf5 | r=32 | layout=V
+        - [4] | cloud-check | 32x32 @(1010,2231)
+          - [6] | Vector | 27x23 @(1013,2235) | stroke=#10b981 w2
+      - [4] | TextContent | 267x70 @(994,2299) | layout=V gap=8
+        - [13] | 已自动保存 | 267x22 @(994,2299) | fill=#202124 | font=Inter/Bold 18px | text="已自动保存"
+        - [13] | 比赛记录已暂存，可稍后继续编辑 | 267x17 @(994,2329) | fill=#667085 | font=Inter/Regular 14px | text="比赛记录已暂存，可稍后继续编辑"
+        - [13] | 上次保存 2分钟前 | 95x15 @(994,2354) | fill=#667085 | font=Inter/Regular 12px | text="上次保存 2分钟前"
+      - [4] | Actions | 267x48 @(994,2389) | layout=H gap=12
+        - [4] | ContinueBtn | 128x48 @(994,2389) | stroke=#e7eaf0 w1 | r=12 | layout=H
+          - [13] | 继续编辑 | 56x17 @(1030,2404) | fill=#202124 | font=Inter/Semi Bold 14px | text="继续编辑"
+        - [4] | ExitBtn | 128x48 @(1134,2389) | fill=#a80f1b | r=12 | layout=H
+          - [13] | 退出 | 28x17 @(1183,2404) | fill=#ffffff | font=Inter/Semi Bold 14px | text="退出"
+  - [4] | TabIconsOverlay | 375x70 @(940,2662) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1060,2722) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(940,2662)
+      - [4] | icon_0 | 22x22 @(992,2668)
+        - [6] | Vector | 17x16 @(994,2672) | stroke=#a80f1b w1.6
+        - [6] | Vector | 8x4 @(998,2670) | fill=#000000 | stroke=#a80f1b w1.6
+        - [6] | Vector | 17x0 @(994,2677) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 3x3 @(997,2680) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1001,2680) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1005,2680) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(997,2684) | fill=#a80f1b
+      - [13] | 日程 | 121x14 @(942,2693) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="日程"
+      - [9] | Ellipse | 4x4 @(1000,2710) | fill=#a80f1b
+    - [4] | tab_1 | 125x56 @(1065,2662)
+      - [4] | icon_1 | 22x22 @(1116,2668)
+        - [6] | Vector | 14x17 @(1120,2671) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 6x2 @(1124,2671) | stroke=#8e97a6 w1.4
+        - [6] | Vector | 8x0 @(1124,2678) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 8x0 @(1124,2682) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 5x0 @(1124,2685) | fill=#000000 | stroke=#8e97a6 w1.3
+      - [13] | 训练管理 | 121x14 @(1067,2693) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="训练管理"
+    - [4] | tab_2 | 125x56 @(1190,2662)
+      - [4] | icon_2 | 22x22 @(1242,2668)
+        - [6] | Vector | 8x8 @(1248,2671) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(1244,2680) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(1192,2693) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

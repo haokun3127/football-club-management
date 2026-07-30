@@ -72,3 +72,10 @@
 .correction-actions button {
   margin-top: 0;
 }
+
+.lesson-correction-link {
+  margin-top: 20rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--color-brand);
+}

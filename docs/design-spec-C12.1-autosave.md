@@ -1,0 +1,49 @@
+# Figma 画板规格: C12.1 Autosave State
+
+- [4] | C12.1 Autosave State | 375x812 @(940,3720) | fill=#f6f7f9 | r=28
+  - [4] | Top Nav | 375x88 @(940,3720) | fill=#fceeef | layout=H pad=14/22
+    - [4] | Frame | 124x27 @(962,3750) | layout=H gap=12
+      - [13] | 成绩录入 | 88x27 @(998,3750) | fill=#202124 | font=Inter/Bold 22px | text="成绩录入"
+      - [4] | arrow-left | 24x24 @(962,3752)
+        - [6] | Vector | 14x14 @(967,3757) | stroke=#202124 w2
+    - [13] | 提交 | 30x18 @(1263,3755) | fill=#a80f1b | font=Inter/Semi Bold 15px | text="提交"
+  - [12] | Dim Overlay | 375x812 @(940,3720) | fill=#000000
+  - [4] | Autosave Modal | 331x330 @(962,4040) | fill=#ffffff | r=16 | layout=V gap=20 pad=24/24 | shadow=0,12,24,#000000@0.10
+    - [4] | Frame | 283x108 @(986,4238) | layout=V gap=12
+      - [4] | Continue Button | 283x48 @(986,4238) | fill=#a80f1b | r=12 | layout=H
+        - [13] | 继续录入 | 60x18 @(1098,4253) | fill=#ffffff | font=Inter/Semi Bold 15px | text="继续录入"
+      - [4] | Exit Button | 283x48 @(986,4298) | stroke=#e7eaf0 w1 | r=12 | layout=H
+        - [13] | 退出 | 30x18 @(1112,4313) | fill=#667085 | font=Inter/Semi Bold 15px | text="退出"
+    - [4] | Frame | 126x154 @(1064,4064) | layout=V gap=12
+      - [13] | 下次打开可继续录入 | 126x17 @(1064,4174) | fill=#667085 | font=Inter/Regular 14px | text="下次打开可继续录入"
+      - [13] | 上次保存 1分钟前 | 93x15 @(1081,4203) | fill=#667085 | font=Inter/Regular 12px | text="上次保存 1分钟前"
+      - [4] | Frame | 64x64 @(1096,4064) | fill=#e8f5e9 | r=32 | layout=H
+        - [4] | check | 32x32 @(1112,4080)
+          - [6] | Vector | 21x15 @(1117,4088) | stroke=#2e7d32 w2
+      - [13] | 评分已自动保存 | 126x22 @(1064,4140) | fill=#202124 | font=Inter/Bold 18px | text="评分已自动保存"
+  - [4] | TabIconsOverlay | 375x70 @(940,4462) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1060,4522) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(940,4462)
+      - [4] | icon_0 | 22x22 @(992,4468)
+        - [6] | Vector | 17x16 @(994,4472) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(998,4470) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(994,4477) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(997,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1001,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1005,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(997,4484) | fill=#8e97a6
+      - [13] | 日程 | 121x14 @(942,4493) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(1065,4462)
+      - [4] | icon_1 | 22x22 @(1116,4468)
+        - [6] | Vector | 14x17 @(1120,4471) | stroke=#a80f1b w1.6
+        - [6] | Vector | 6x2 @(1124,4471) | stroke=#a80f1b w1.4
+        - [6] | Vector | 8x0 @(1124,4478) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 8x0 @(1124,4482) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 5x0 @(1124,4485) | fill=#000000 | stroke=#a80f1b w1.3
+      - [13] | 训练管理 | 121x14 @(1067,4493) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="训练管理"
+      - [9] | Ellipse | 4x4 @(1126,4510) | fill=#a80f1b
+    - [4] | tab_2 | 125x56 @(1190,4462)
+      - [4] | icon_2 | 22x22 @(1242,4468)
+        - [6] | Vector | 8x8 @(1248,4471) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(1244,4480) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(1192,4493) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

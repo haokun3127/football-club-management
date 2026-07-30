@@ -1,0 +1,58 @@
+# Figma 画板规格: C4.1 Attendance Success
+
+- [4] | C4.1 Attendance Success | 375x812 @(80,1020) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(80,1020) | fill=#fceeef | layout=H pad=14/22
+    - [4] | Left | 124x27 @(102,1050) | layout=H gap=12
+      - [4] | chevron-left | 24x24 @(102,1052)
+        - [6] | Vector | 6x12 @(111,1058) | stroke=#202124 w2
+      - [13] | 出勤管理 | 88x27 @(138,1050) | fill=#202124 | font=Inter/Bold 22px | text="出勤管理"
+  - [4] | Content | 375x654 @(80,1108) | layout=V gap=40 pad=80/22
+    - [4] | Frame | 164x149 @(186,1188) | layout=V gap=20
+      - [4] | Frame | 80x80 @(228,1188) | fill=#22c55e | r=40 | layout=V | shadow=0,8,24,#22c55e@0.25
+        - [4] | check | 40x40 @(248,1208)
+          - [6] | Vector | 27x18 @(254,1218) | stroke=#ffffff w2
+      - [4] | Frame | 164x49 @(186,1288) | layout=V gap=8
+        - [13] | 出勤记录已提交 | 140x24 @(198,1288) | fill=#202124 | font=Inter/Bold 20px | text="出勤记录已提交"
+        - [13] | 18名学员已到场，2名缺勤 | 164x17 @(186,1320) | fill=#667085 | font=Inter/Regular 14px | text="18名学员已到场，2名缺勤"
+    - [4] | Summary Card | 331x144 @(102,1377) | fill=#ffffff | r=12 | layout=V gap=12 pad=20/20
+      - [4] | Frame | 291x17 @(122,1397) | layout=H
+        - [13] | 课程 | 28x17 @(122,1397) | fill=#667085 | font=Inter/Regular 14px | text="课程"
+        - [13] | 技术专项训练 | 84x17 @(329,1397) | fill=#202124 | font=Inter/Semi Bold 14px | text="技术专项训练"
+      - [4] | Frame | 291x17 @(122,1426) | layout=H
+        - [13] | 日期 | 28x17 @(122,1426) | fill=#667085 | font=Inter/Regular 14px | text="日期"
+        - [13] | 2025-07-09 | 85x17 @(328,1426) | fill=#202124 | font=Inter/Semi Bold 14px | text="2025-07-09"
+      - [4] | Frame | 291x17 @(122,1455) | layout=H
+        - [13] | 出席 | 28x17 @(122,1455) | fill=#667085 | font=Inter/Regular 14px | text="出席"
+        - [13] | 18/20人 | 54x17 @(359,1455) | fill=#202124 | font=Inter/Semi Bold 14px | text="18/20人"
+      - [4] | Frame | 291x17 @(122,1484) | layout=H
+        - [13] | 时间 | 28x17 @(122,1484) | fill=#667085 | font=Inter/Regular 14px | text="时间"
+        - [13] | 17:30-19:00 | 83x17 @(330,1484) | fill=#202124 | font=Inter/Semi Bold 14px | text="17:30-19:00"
+    - [4] | Actions | 331x48 @(102,1561) | layout=V gap=12
+      - [4] | Frame | 331x48 @(102,1561) | fill=#a80f1b | r=12 | layout=H
+        - [13] | 查看训练详情 | 84x17 @(226,1576) | fill=#ffffff | font=Inter/Semi Bold 14px | text="查看训练详情"
+  - [4] | TabIconsOverlay | 375x70 @(80,1762) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(200,1822) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(80,1762)
+      - [4] | icon_0 | 22x22 @(132,1768)
+        - [6] | Vector | 17x16 @(134,1772) | stroke=#a80f1b w1.6
+        - [6] | Vector | 8x4 @(138,1770) | fill=#000000 | stroke=#a80f1b w1.6
+        - [6] | Vector | 17x0 @(134,1777) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 3x3 @(137,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(141,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(145,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(137,1784) | fill=#a80f1b
+      - [13] | 日程 | 121x14 @(82,1793) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="日程"
+      - [9] | Ellipse | 4x4 @(140,1810) | fill=#a80f1b
+    - [4] | tab_1 | 125x56 @(205,1762)
+      - [4] | icon_1 | 22x22 @(256,1768)
+        - [6] | Vector | 14x17 @(260,1771) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 6x2 @(264,1771) | stroke=#8e97a6 w1.4
+        - [6] | Vector | 8x0 @(264,1778) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 8x0 @(264,1782) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 5x0 @(264,1785) | fill=#000000 | stroke=#8e97a6 w1.3
+      - [13] | 训练管理 | 121x14 @(207,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="训练管理"
+    - [4] | tab_2 | 125x56 @(330,1762)
+      - [4] | icon_2 | 22x22 @(382,1768)
+        - [6] | Vector | 8x8 @(388,1771) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(384,1780) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(332,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

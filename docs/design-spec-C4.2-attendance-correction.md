@@ -1,0 +1,65 @@
+# Figma 画板规格: C4.2 Attendance Failed/Correction
+
+- [4] | C4.2 Attendance Failed/Correction | 375x812 @(510,1020) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(510,1020) | fill=#fceeef | layout=H pad=14/22
+    - [4] | Left | 124x27 @(532,1050) | layout=H gap=12
+      - [4] | arrow-left | 24x24 @(532,1052)
+        - [6] | Vector | 14x14 @(537,1057) | stroke=#202124 w2
+      - [13] | 出勤修改 | 88x27 @(568,1050) | fill=#202124 | font=Inter/Bold 22px | text="出勤修改"
+  - [4] | Content | 375x558 @(510,1108) | layout=V gap=20 pad=22/22
+    - [4] | Alert Card | 331x139 @(532,1130) | fill=#fff3e0 | stroke=#ff9800 w1 | r=12 | layout=V gap=12 pad=20/20
+      - [4] | Frame | 48x48 @(674,1150) | fill=#ff9800 | r=24 | layout=V
+        - [4] | alert-triangle | 24x24 @(686,1162)
+          - [6] | Vector | 20x18 @(687,1165) | stroke=#ffffff w2
+      - [4] | Frame | 260x39 @(568,1210) | layout=V gap=4
+        - [13] | ⚠️ 出勤记录需要修改 | 148x19 @(624,1210) | fill=#ff9800 | font=Inter/Bold 16px | text="⚠️ 出勤记录需要修改"
+        - [13] | 家长对出勤记录提出异议，请核实后重新提交 | 260x16 @(568,1233) | fill=#667085 | font=Inter/Regular 13px | text="家长对出勤记录提出异议，请核实后重新提交"
+    - [4] | Student List | 331x169 @(532,1289) | fill=#ffffff | r=12 | layout=V
+      - [4] | Frame | 331x49 @(532,1289) | stroke=#e7eaf0 w1 | layout=H pad=16/16
+        - [13] | 学员列表 | 56x17 @(548,1305) | fill=#202124 | font=Inter/Semi Bold 14px | text="学员列表"
+        - [13] | 共 2 条异常 | 63x15 @(784,1306) | fill=#667085 | font=Inter/Regular 12px | text="共 2 条异常"
+      - [4] | Frame | 331x60 @(532,1338) | stroke=#e7eaf0 w1 | layout=H gap=12 pad=16/16
+        - [4] | Frame | 28x28 @(548,1354) | fill=#f3f4f6 | r=14 | layout=V
+          - [13] | 陈 | 10x12 @(557,1362) | fill=#202124 | font=Inter/Semi Bold 10px | text="陈"
+        - [13] | 陈小宇 | 183x17 @(588,1360) | fill=#202124 | font=Inter/Regular 14px | text="陈小宇"
+        - [4] | Frame | 64x23 @(783,1356) | fill=#fff3e0 | r=4 | layout=H pad=4/8
+          - [13] | 家长异议 | 48x15 @(791,1360) | fill=#ff9800 | font=Inter/Semi Bold 12px | text="家长异议"
+      - [4] | Frame | 331x60 @(532,1398) | layout=H gap=12 pad=16/16
+        - [4] | Frame | 28x28 @(548,1414) | fill=#f3f4f6 | r=14 | layout=V
+          - [13] | 王 | 10x12 @(557,1422) | fill=#202124 | font=Inter/Semi Bold 10px | text="王"
+        - [13] | 王一涵 | 183x17 @(588,1420) | fill=#202124 | font=Inter/Regular 14px | text="王一涵"
+        - [4] | Frame | 64x23 @(783,1416) | fill=#fff3e0 | r=4 | layout=H pad=4/8
+          - [13] | 家长异议 | 48x15 @(791,1420) | fill=#ff9800 | font=Inter/Semi Bold 12px | text="家长异议"
+    - [4] | Correction Note | 331x137 @(532,1478) | fill=#ffffff | r=12 | layout=V gap=8 pad=16/16
+      - [13] | 修改说明 | 56x17 @(548,1494) | fill=#202124 | font=Inter/Semi Bold 14px | text="修改说明"
+      - [4] | Frame | 299x80 @(548,1519) | stroke=#e7eaf0 w1 | r=8 | layout=V pad=12/12
+        - [13] | 请填写核实结果... | 102x16 @(560,1531) | fill=#667085 | font=Inter/Regular 13px | text="请填写核实结果..."
+  - [4] | Bottom Action | 375x96 @(510,1666) | fill=#f6f7f9 | layout=V pad=22/22
+    - [4] | Frame | 331x52 @(532,1688) | fill=#a80f1b | r=12 | layout=V
+      - [13] | 重新提交 | 64x19 @(666,1704) | fill=#ffffff | font=Inter/Semi Bold 16px | text="重新提交"
+  - [4] | TabIconsOverlay | 375x70 @(510,1762) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(630,1822) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(510,1762)
+      - [4] | icon_0 | 22x22 @(562,1768)
+        - [6] | Vector | 17x16 @(564,1772) | stroke=#a80f1b w1.6
+        - [6] | Vector | 8x4 @(568,1770) | fill=#000000 | stroke=#a80f1b w1.6
+        - [6] | Vector | 17x0 @(564,1777) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 3x3 @(567,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(571,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(575,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(567,1784) | fill=#a80f1b
+      - [13] | 日程 | 121x14 @(512,1793) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="日程"
+      - [9] | Ellipse | 4x4 @(570,1810) | fill=#a80f1b
+    - [4] | tab_1 | 125x56 @(635,1762)
+      - [4] | icon_1 | 22x22 @(686,1768)
+        - [6] | Vector | 14x17 @(690,1771) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 6x2 @(694,1771) | stroke=#8e97a6 w1.4
+        - [6] | Vector | 8x0 @(694,1778) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 8x0 @(694,1782) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 5x0 @(694,1785) | fill=#000000 | stroke=#8e97a6 w1.3
+      - [13] | 训练管理 | 121x14 @(637,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="训练管理"
+    - [4] | tab_2 | 125x56 @(760,1762)
+      - [4] | icon_2 | 22x22 @(812,1768)
+        - [6] | Vector | 8x8 @(818,1771) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(814,1780) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(762,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

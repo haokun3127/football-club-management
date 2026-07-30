@@ -1,5 +1,6 @@
 import { confirmCoachLesson, correctCoachLesson, getCoachLessonConfirmation, getCoachWorkbench } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { openPage } from "../../../utils/navigation";
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
 
 type RosterItem = CoachWorkbench["roster"][number];
@@ -59,6 +60,9 @@ Page({
   },
   onLessonNoteInput(event: { detail: { value: string } }) {
     this.setData({ lessonNote: event.detail.value });
+  },
+  openLessonCorrection() {
+    if (this.data.eventId) openPage(`/pages/coach/lesson-correction/index?id=${this.data.eventId}`);
   },
   async confirmLesson() {
     if (!this.data.workbench || !this.data.eventId || this.data.saving) return;
