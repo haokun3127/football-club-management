@@ -1,8 +1,8 @@
 /**
  * 重庆天才设计 Token 层
- * 来源：Figma《重庆天才小程序 UIUX Design System》02 Tokens 分区
- * 说明：色值经交接 PNG 像素级比对校准（2026-07-30）；
- *       标注 ≈ 的值为近似值，待 Figma API 拉取 68 个变量后回填精确值。
+ * 来源：Figma《重庆天才小程序 UIUX Design System》"CQ Talent Contract Tokens" 变量集
+ * 校准：2026-07-30 通过 .fig 全量解析（kiwi 解码）提取精确色值，
+ *       并与 P/C 页面实际用色直方图交叉验证（Contract 集与页面一致）。
  * 消费方式：app.wxss 顶部 @import，页面/组件一律使用 var(--token)，禁止新增硬编码色值。
  */
 
@@ -22,15 +22,15 @@ page {
   --color-text: #202124;
   --color-text-secondary: #667085;
 
-  /* 语义状态（≈ 为 Figma 取色近似值，待 API 校准） */
-  --color-success: #188050; /* ≈ Figma 青绿，替代旧 #237804 */
-  --color-success-soft: #f0fff4;
-  --color-warning: #ad6800;
-  --color-warning-soft: #fff7e6;
+  /* 语义状态（色值已从 .fig 精确校准） */
+  --color-success: #188754; /* Figma color/state/success/fg，替代旧 #237804 */
+  --color-success-soft: #ecfdf3;
+  --color-warning: #b56a00;
+  --color-warning-soft: #fff7e8;
   --color-error: #b42318;
-  --color-error-soft: #fff1f0;
-  --color-info: #175cd3;
-  --color-info-soft: #eff8ff;
+  --color-error-soft: #fff1f1;
+  --color-info: #2268d8;
+  --color-info-soft: #eef4ff;
   --color-pending: #7a5af8;
   --color-pending-soft: #f4f3ff;
 
