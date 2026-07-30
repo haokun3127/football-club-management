@@ -9,7 +9,11 @@
       <view wx:if="{{subtitle}}" class="app-header__subtitle">{{subtitle}}</view>
     </view>
     <view class="app-header__side app-header__side--right">
-      <view wx:if="{{actionText}}" class="app-header__action" role="button" bindtap="handleAction">{{actionText}}</view>
+      <view wx:if="{{actionIcon}}" class="app-header__icon-action" role="button" bindtap="handleAction">
+        <text class="app-header__icon-glyph">{{actionIcon}}</text>
+        <view wx:if="{{actionDot}}" class="app-header__icon-dot"></view>
+      </view>
+      <view wx:elif="{{actionText}}" class="app-header__action {{actionPill ? 'app-header__action--pill' : ''}}" role="button" bindtap="handleAction">{{actionText}}</view>
     </view>
   </view>
 </view>

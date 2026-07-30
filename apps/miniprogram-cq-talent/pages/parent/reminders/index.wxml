@@ -4,6 +4,7 @@
     subtitle="{{unreadCount ? unreadCount + ' 条未读提醒' : '活动、保险与课时动态'}}"
     show-back
     action-text="{{unreadCount ? '全部已读' : ''}}"
+    action-pill
     bindaction="markAllRead"
   />
   <view class="reminders-page__body">

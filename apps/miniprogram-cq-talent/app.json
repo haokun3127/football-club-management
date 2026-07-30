@@ -8,6 +8,8 @@
     "pages/parent/metric/index",
     "pages/parent/child/index",
     "pages/parent/reminders/index",
+    "pages/parent/status/index",
+    "pages/parent/content/index",
     "pages/coach/schedule/index",
     "pages/coach/event/index",
     "pages/coach/attendance/index",

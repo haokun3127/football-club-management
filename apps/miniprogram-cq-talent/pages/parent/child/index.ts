@@ -1,5 +1,6 @@
 import { getParentChildren, getParentStudentHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { openPage } from "../../../utils/navigation";
 import { formatDateTime } from "../../../utils/presentation";
 import { setCurrentStudentId } from "../../../utils/store";
 import type { LoadState, StudentHome, StudentSummary } from "../../../utils/types";
@@ -61,6 +62,12 @@ Page({
   },
   retry() {
     this.load();
+  },
+  openStatus() {
+    openPage(`/pages/parent/status/index?student=${this.data.activeStudentId}`);
+  },
+  openContent() {
+    openPage("/pages/parent/content/index");
   },
 });
 

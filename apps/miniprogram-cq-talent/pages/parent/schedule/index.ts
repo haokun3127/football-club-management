@@ -1,8 +1,9 @@
-import { getParentCalendar, getParentChildren } from "../../../utils/api";
+import { getParentCalendar, getParentChildren, getParentReminders } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { DEV_MODE, DEV_TEST_DATE } from "../../../utils/config";
 import { openPage } from "../../../utils/navigation";
 import { activityStatus, childNames, formatCalendarDate, formatTimeRange } from "../../../utils/presentation";
+import { countUnreadReminders } from "../../../utils/reminders";
 import { setCurrentStudentId } from "../../../utils/store";
 import type { LoadState, ScheduleEvent, StudentSummary } from "../../../utils/types";
 
@@ -27,6 +28,7 @@ interface PageData {
   selectedType: "all" | ScheduleEvent["type"];
   typeTabs: Array<{ label: string; value: "all" | ScheduleEvent["type"] }>;
   dateOptions: Array<{ date: string; day: string; weekday: string; count: number }>;
+  hasUnreadReminders: boolean;
 }
 
 const typeTabs: PageData["typeTabs"] = [
@@ -52,9 +54,21 @@ Page<PageData>({
     selectedType: "all",
     typeTabs,
     dateOptions: [],
+    hasUnreadReminders: false,
   },
   onLoad() {
     this.load();
+  },
+  onShow() {
+    this.refreshRemindersBadge();
+  },
+  async refreshRemindersBadge() {
+    try {
+      const reminders = await getParentReminders();
+      this.setData({ hasUnreadReminders: countUnreadReminders(reminders) > 0 });
+    } catch (error) {
+      // 角标失败不影响主流程
+    }
   },
   async load() {
     const session = requireRole("parent");

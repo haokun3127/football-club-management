@@ -27,8 +27,8 @@
     </view>
 
     <view class="summary-grid">
-      <view class="summary-card summary-card--lesson"><view class="summary-card__label">课时状态</view><view wx:for="{{studentHome.lessonStatus}}" wx:key="label" class="summary-card__row"><view>{{item.label}}</view><view class="summary-card__value">{{item.value}}</view></view></view>
-      <view class="summary-card summary-card--insurance"><view class="summary-card__label">保险状态</view><view wx:for="{{studentHome.insuranceStatus}}" wx:key="label" class="summary-card__row"><view>{{item.label}}</view><view class="summary-card__value">{{item.value}}</view></view></view>
+      <view class="summary-card summary-card--lesson" bindtap="openStatus"><view class="summary-card__label">课时状态</view><view wx:for="{{studentHome.lessonStatus}}" wx:key="label" class="summary-card__row"><view>{{item.label}}</view><view class="summary-card__value">{{item.value}}</view></view><view class="summary-card__more">查看课时与保障 ›</view></view>
+      <view class="summary-card summary-card--insurance" bindtap="openStatus"><view class="summary-card__label">保险状态</view><view wx:for="{{studentHome.insuranceStatus}}" wx:key="label" class="summary-card__row"><view>{{item.label}}</view><view class="summary-card__value">{{item.value}}</view></view><view class="summary-card__more">查看课时与保障 ›</view></view>
     </view>
 
     <view class="info-card">
@@ -49,6 +49,10 @@
       <view wx:for="{{studentHome.clubInfo}}" wx:key="label" class="field-row">
         <view class="label">{{item.label}}</view>
         <view class="field-value">{{item.value}}</view>
+      </view>
+      <view class="field-row field-row--link" bindtap="openContent">
+        <view class="label">内容中心</view>
+        <view class="field-value field-value--link">场地、帮助与训练攻略 ›</view>
       </view>
     </view>
 

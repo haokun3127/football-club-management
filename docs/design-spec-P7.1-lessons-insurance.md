@@ -1,0 +1,86 @@
+# Figma 画板规格: P7.1 Lessons Insurance
+
+- [4] | P7.1 Lessons Insurance | 375x812 @(510,2820) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Header | 375x88 @(510,2820) | fill=#ffffff | layout=H pad=0/16
+    - [4] | Back | 40x40 @(526,2844) | layout=H
+      - [4] | chevron-left | 24x24 @(534,2852)
+        - [6] | Vector | 6x12 @(543,2858) | stroke=#202124 w2
+    - [13] | 课时与保障 | 90x22 @(652,2853) | fill=#202124 | font=Inter/Bold 18px | text="课时与保障"
+    - [4] | Frame | 40x40 @(829,2844) | layout=H
+  - [4] | Content | 375x654 @(510,2908) | layout=V gap=16 pad=16/16
+    - [4] | Lesson Hours Card | 343x211 @(526,2924) | fill=#ffffff | r=16 | layout=V gap=20 pad=24/24 | shadow=0,4,12,#000000@0.05
+      - [13] | 训练课时 | 60x18 @(550,2948) | fill=#202124 | font=Inter/Semi Bold 15px | text="训练课时"
+      - [4] | Frame | 295x78 @(550,2986) | layout=V gap=4
+        - [13] | 46 | 65x58 @(550,2986) | fill=#07111f | font=Inter/Bold 48px | text="46"
+        - [13] | 累计课时 | 52x16 @(550,3048) | fill=#667085 | font=Inter/Regular 13px | text="累计课时"
+      - [4] | Progress Stats | 295x27 @(550,3084) | layout=H gap=8
+        - [4] | Stat Chip | 144x27 @(550,3084) | fill=#e7eaf0 | r=6 | layout=H pad=6/10
+          - [13] | 本月 12课 | 53x15 @(595,3090) | fill=#202124 | font=Inter/Semi Bold 12px | text="本月 12课"
+        - [4] | Stat Chip | 144x27 @(702,3084) | fill=#e7eaf0 | r=6 | layout=H pad=6/10
+          - [13] | 本季 38课 | 55x15 @(746,3090) | fill=#202124 | font=Inter/Semi Bold 12px | text="本季 38课"
+    - [4] | History Card | 343x225 @(526,3151) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+      - [13] | 近期课时记录 | 90x18 @(542,3167) | fill=#202124 | font=Inter/Semi Bold 15px | text="近期课时记录"
+      - [4] | Frame | 311x163 @(542,3197) | layout=V
+        - [4] | Row 1 | 311x40 @(542,3197) | layout=H gap=12 pad=12/0
+          - [13] | 6月27日 | 80x16 @(542,3209) | fill=#667085 | font=Inter/Regular 13px | text="6月27日"
+          - [13] | U10 训练 | 147x16 @(634,3209) | fill=#202124 | font=Inter/Regular 13px | text="U10 训练"
+          - [13] | 1.5h | 60x16 @(793,3209) | fill=#202124 | font=Inter/Semi Bold 13px | text="1.5h"
+        - [12] | Rectangle | 311x1 @(542,3237) | fill=#e7eaf0
+        - [4] | Row 2 | 311x40 @(542,3238) | layout=H gap=12 pad=12/0
+          - [13] | 6月20日 | 80x16 @(542,3250) | fill=#667085 | font=Inter/Regular 13px | text="6月20日"
+          - [13] | U10 训练 | 147x16 @(634,3250) | fill=#202124 | font=Inter/Regular 13px | text="U10 训练"
+          - [13] | 1.5h | 60x16 @(793,3250) | fill=#202124 | font=Inter/Semi Bold 13px | text="1.5h"
+        - [12] | Rectangle | 311x1 @(542,3278) | fill=#e7eaf0
+        - [4] | Row 3 | 311x40 @(542,3279) | layout=H gap=12 pad=12/0
+          - [13] | 6月13日 | 80x16 @(542,3291) | fill=#667085 | font=Inter/Regular 13px | text="6月13日"
+          - [13] | U10 训练 | 147x16 @(634,3291) | fill=#202124 | font=Inter/Regular 13px | text="U10 训练"
+          - [13] | 1.5h | 60x16 @(793,3291) | fill=#202124 | font=Inter/Semi Bold 13px | text="1.5h"
+        - [12] | Rectangle | 311x1 @(542,3319) | fill=#e7eaf0
+        - [4] | Row 4 | 311x40 @(542,3320) | layout=H gap=12 pad=12/0
+          - [13] | 6月06日 | 80x16 @(542,3332) | fill=#667085 | font=Inter/Regular 13px | text="6月06日"
+          - [13] | U10 训练 | 147x16 @(634,3332) | fill=#202124 | font=Inter/Regular 13px | text="U10 训练"
+          - [13] | 1.5h | 60x16 @(793,3332) | fill=#202124 | font=Inter/Semi Bold 13px | text="1.5h"
+    - [4] | Safety Card | 343x224 @(526,3392) | fill=#ffffff | r=12 | layout=V gap=16 pad=16/16 | shadow=0,4,12,#000000@0.05
+      - [4] | Frame | 311x18 @(542,3408) | layout=H
+        - [13] | 运动保障 | 60x18 @(542,3408) | fill=#202124 | font=Inter/Semi Bold 15px | text="运动保障"
+        - [4] | info | 16x16 @(837,3409)
+          - [6] | Vector | 13x13 @(838,3410) | stroke=#667085 w2
+      - [4] | Frame | 49x21 @(542,3474) | fill=#d1fae5 | r=4 | layout=H pad=4/8
+        - [13] | 已生效 | 33x13 @(550,3478) | fill=#059669 | font=Inter/Semi Bold 11px | text="已生效"
+      - [13] | 随队保险覆盖中 | 91x16 @(542,3442) | fill=#667085 | font=Inter/Regular 13px | text="随队保险覆盖中"
+      - [12] | Rectangle | 311x1 @(542,3511) | fill=#e7eaf0
+      - [4] | Frame | 311x72 @(542,3528) | layout=V gap=12
+        - [4] | Frame | 311x16 @(542,3528) | layout=H
+          - [13] | 保险类型 | 52x16 @(542,3528) | fill=#667085 | font=Inter/Regular 13px | text="保险类型"
+          - [13] | 运动意外险 | 65x16 @(788,3528) | fill=#202124 | font=Inter/Medium 13px | text="运动意外险"
+        - [4] | Frame | 311x16 @(542,3556) | layout=H
+          - [13] | 覆盖范围 | 52x16 @(542,3556) | fill=#667085 | font=Inter/Regular 13px | text="覆盖范围"
+          - [13] | 训练+比赛 | 61x16 @(792,3556) | fill=#202124 | font=Inter/Medium 13px | text="训练+比赛"
+        - [4] | Frame | 311x16 @(542,3584) | layout=H
+          - [13] | 有效期 | 39x16 @(542,3584) | fill=#667085 | font=Inter/Regular 13px | text="有效期"
+          - [13] | 2024.9-2025.8 | 94x16 @(759,3584) | fill=#202124 | font=Inter/Medium 13px | text="2024.9-2025.8"
+    - [4] | Contact | 343x23 @(526,3632) | layout=V gap=12 pad=8/0
+      - [13] | 如有疑问请联系俱乐部管理员 | 156x15 @(620,3640) | fill=#667085 | font=Inter/Regular 12px | text="如有疑问请联系俱乐部管理员"
+  - [4] | TabIconsOverlay | 375x70 @(510,3562) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(630,3622) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(510,3562)
+      - [4] | icon_0 | 22x22 @(562,3568)
+        - [6] | Vector | 17x16 @(564,3572) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(568,3570) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(564,3577) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(567,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(571,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(575,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(567,3584) | fill=#8e97a6
+      - [13] | 日程 | 117x14 @(514,3593) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(635,3562)
+      - [4] | icon_1 | 22x22 @(686,3568)
+        - [6] | Vector | 18x10 @(688,3575) | stroke=#8e97a6 w1.8
+        - [6] | Vector | 4x4 @(702,3573) | stroke=#8e97a6 w1.8
+      - [13] | 成长 | 117x14 @(639,3593) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="成长"
+    - [4] | tab_2 | 125x56 @(760,3562)
+      - [4] | icon_2 | 22x22 @(812,3568)
+        - [6] | Vector | 8x8 @(818,3571) | stroke=#a80f1b w1.6
+        - [6] | Vector | 16x8 @(814,3580) | stroke=#a80f1b w1.6
+      - [13] | 我的孩子 | 117x14 @(764,3593) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="我的孩子"
+      - [9] | Ellipse | 4x4 @(820,3610) | fill=#a80f1b

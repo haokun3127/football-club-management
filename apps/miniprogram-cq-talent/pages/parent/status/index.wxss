@@ -1,0 +1,155 @@
+.status-page {
+  min-height: 100vh;
+  background: var(--color-page);
+}
+
+.status-page__body {
+  padding: 24rpx var(--space-page) 180rpx;
+}
+
+/* 课时统计卡（Figma P7.1: 白底 r16, pad 24px, shadow 0,4,12,.05） */
+.lesson-card {
+  background: var(--color-card);
+  border-radius: 32rpx;
+  padding: 48rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.05);
+}
+
+.lesson-card__title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 40rpx;
+}
+
+.lesson-card__count {
+  font-size: 96rpx;
+  font-weight: 700;
+  line-height: 1;
+  color: #07111f;
+}
+
+.lesson-card__caption {
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+}
+
+.lesson-card__chips {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 32rpx;
+}
+
+.stat-chip {
+  flex: 1;
+  background: var(--color-line);
+  border-radius: 12rpx;
+  padding: 12rpx 20rpx;
+  text-align: center;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.lesson-card__rows {
+  margin-top: 32rpx;
+}
+
+/* 通用卡片 */
+.card {
+  background: var(--color-card);
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.05);
+}
+
+.card__title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 24rpx;
+}
+
+/* 课时记录行（Figma: 13px, date #667085, title #202124, hours Semi Bold） */
+.history-row {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 24rpx 0;
+}
+
+.history-row--border {
+  border-bottom: 1rpx solid var(--color-line);
+}
+
+.history-row__date {
+  width: 160rpx;
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+}
+
+.history-row__title {
+  flex: 1;
+  font-size: 26rpx;
+  color: var(--color-text);
+}
+
+.history-row__hours {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* 保险徽标（Figma: bg #d1fae5, text #059669, r4, pad 4/8） */
+.insurance-badge {
+  display: inline-block;
+  border-radius: 8rpx;
+  padding: 8rpx 16rpx;
+  margin-bottom: 24rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.insurance-badge--success {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.insurance-badge--warning {
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.insurance-badge--error {
+  background: var(--color-error-soft);
+  color: var(--color-error);
+}
+
+/* 键值行 */
+.kv-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+}
+
+.kv-row__label {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+}
+
+.kv-row__value {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.contact-note {
+  padding: 16rpx 0;
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+}

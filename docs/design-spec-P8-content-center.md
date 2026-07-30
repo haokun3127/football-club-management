@@ -1,0 +1,101 @@
+# Figma 画板规格: P8 Content Center
+
+- [4] | P8 Content Center | 375x812 @(940,2820) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Navigation | 375x88 @(940,2820) | fill=#ffffff | stroke=#e7eaf0 w1 | layout=H pad=12/16
+    - [13] | Title | 80x24 @(956,2852) | fill=#202124 | font=Inter/Bold 20px | text="内容中心"
+    - [4] | Spacer | 227x1 @(1036,2864) | layout=H
+    - [4] | Search Button | 36x36 @(1263,2846) | fill=#f6f7f9 | r=18 | layout=H
+      - [4] | search | 18x18 @(1272,2855)
+        - [6] | Vector | 14x14 @(1274,2857) | stroke=#667085 w2
+  - [4] | Body | 375x654 @(940,2908) | layout=V gap=24 pad=16/16
+    - [4] | Category Section | 343x63 @(956,2924) | layout=V gap=12
+      - [13] | 分类导航 | 64x19 @(956,2924) | fill=#202124 | font=Inter/Bold 16px | text="分类导航"
+      - [4] | Pills Container | 343x32 @(956,2955) | layout=H gap=8
+        - [4] | Pill Active | 58x32 @(956,2955) | fill=#a80f1b | r=20 | layout=H pad=8/16
+          - [13] | 全部 | 26x16 @(972,2963) | fill=#ffffff | font=Inter/Bold 13px | text="全部"
+        - [4] | Pill | 58x32 @(1022,2955) | fill=#ffffff | stroke=#e7eaf0 w1 | r=20 | layout=H pad=8/16
+          - [13] | 场地 | 26x16 @(1038,2963) | fill=#667085 | font=Inter/Semi Bold 13px | text="场地"
+        - [4] | Pill | 58x32 @(1088,2955) | fill=#ffffff | stroke=#e7eaf0 w1 | r=20 | layout=H pad=8/16
+          - [13] | 帮助 | 26x16 @(1104,2963) | fill=#667085 | font=Inter/Semi Bold 13px | text="帮助"
+        - [4] | Pill | 84x32 @(1154,2955) | fill=#ffffff | stroke=#e7eaf0 w1 | r=20 | layout=H pad=8/16
+          - [13] | 教练团队 | 52x16 @(1170,2963) | fill=#667085 | font=Inter/Semi Bold 13px | text="教练团队"
+        - [4] | Pill | 58x32 @(1246,2955) | fill=#ffffff | stroke=#e7eaf0 w1 | r=20 | layout=H pad=8/16
+          - [13] | 攻略 | 26x16 @(1262,2963) | fill=#667085 | font=Inter/Semi Bold 13px | text="攻略"
+    - [4] | Featured Card | 343x180 @(956,3011) | fill=paint-type-5,paint-type-1 | r=16 | layout=V
+      - [4] | Content | 343x180 @(956,3011) | layout=V gap=8 pad=16/16
+        - [4] | Category Chip | 38x21 @(972,3100) | fill=#ffffff@0.20 | stroke=#ffffff@0.40 w1 | r=6 | layout=H pad=4/8
+          - [13] | 场地 | 22x13 @(980,3104) | fill=#ffffff | font=Inter/Bold 11px | text="场地"
+        - [13] | Title | 311x22 @(972,3129) | fill=#ffffff | font=Inter/Bold 18px | text="球场预订指南"
+        - [13] | Subtitle | 311x16 @(972,3159) | fill=#ffffff@0.80 | font=Inter/Regular 13px | text="了解各场地设施与预订流程"
+    - [4] | Quick Links Section | 343x243 @(956,3215) | layout=V gap=12
+      - [13] | 快速入口 | 64x19 @(956,3215) | fill=#202124 | font=Inter/Bold 16px | text="快速入口"
+      - [4] | Grid | 343x212 @(956,3246) | layout=V gap=12
+        - [4] | Row 1 | 343x100 @(956,3246) | layout=H gap=12
+          - [4] | Card | 166x100 @(956,3246) | fill=#ffffff | stroke=#e7eaf0 w1 | r=12 | layout=V gap=8 pad=16/16
+            - [4] | Icon Container | 40x40 @(1019,3264) | fill=#1976d2@0.10 | r=20 | layout=H
+              - [4] | map-pin | 20x20 @(1029,3274)
+                - [6] | Vector | 13x17 @(1032,3276) | stroke=#1976d2 w2
+            - [13] | 场地信息 | 52x16 @(1013,3312) | fill=#202124 | font=Inter/Bold 13px | text="场地信息"
+          - [4] | Card | 166x100 @(1134,3246) | fill=#ffffff | stroke=#e7eaf0 w1 | r=12 | layout=V gap=8 pad=16/16
+            - [4] | Icon Container | 40x40 @(1196,3264) | fill=#ff9800@0.10 | r=20 | layout=H
+              - [4] | help-circle | 20x20 @(1206,3274)
+                - [6] | Vector | 17x17 @(1208,3276) | stroke=#ff9800 w2
+            - [13] | 帮助中心 | 52x16 @(1190,3312) | fill=#202124 | font=Inter/Bold 13px | text="帮助中心"
+        - [4] | Row 2 | 343x100 @(956,3358) | layout=H gap=12
+          - [4] | Card | 166x100 @(956,3358) | fill=#ffffff | stroke=#e7eaf0 w1 | r=12 | layout=V gap=8 pad=16/16
+            - [4] | Icon Container | 40x40 @(1019,3376) | fill=#22c55e@0.10 | r=20 | layout=H
+              - [4] | users | 20x20 @(1029,3386)
+                - [6] | Vector | 17x15 @(1030,3388) | stroke=#22c55e w2
+            - [13] | 教练团队 | 52x16 @(1013,3424) | fill=#202124 | font=Inter/Bold 13px | text="教练团队"
+          - [4] | Card | 166x100 @(1134,3358) | fill=#ffffff | stroke=#e7eaf0 w1 | r=12 | layout=V gap=8 pad=16/16
+            - [4] | Icon Container | 40x40 @(1196,3376) | fill=#a80f1b@0.10 | r=20 | layout=H
+              - [4] | book-open | 20x20 @(1206,3386)
+                - [6] | Vector | 17x15 @(1208,3388) | stroke=#a80f1b w2
+            - [13] | 训练攻略 | 52x16 @(1190,3424) | fill=#202124 | font=Inter/Bold 13px | text="训练攻略"
+    - [4] | Recent Articles Section | 343x235 @(956,3482) | layout=V gap=12
+      - [13] | 最近文章 | 64x19 @(956,3482) | fill=#202124 | font=Inter/Bold 16px | text="最近文章"
+      - [4] | List | 343x204 @(956,3513) | layout=V gap=12
+        - [4] | Article Card | 343x60 @(956,3513) | fill=#ffffff | stroke=#e7eaf0 w1 | r=12 | layout=H gap=12 pad=12/12
+          - [4] | Accent | 4x36 @(968,3525) | fill=#a80f1b | r=2 | layout=H
+          - [4] | Content | 275x36 @(984,3525) | layout=V gap=4
+            - [13] | 2023秋季训练计划 | 275x17 @(984,3525) | fill=#202124 | font=Inter/Bold 14px | text="2023秋季训练计划"
+            - [13] | 了解最新的训练课程安排与重点内容 | 275x15 @(984,3546) | fill=#667085 | font=Inter/Regular 12px | text="了解最新的训练课程安排与重点内容"
+          - [4] | chevron-right | 16x16 @(1271,3535)
+            - [6] | Vector | 4x8 @(1277,3539) | stroke=#667085 w2
+        - [4] | Article Card | 343x60 @(956,3585) | fill=#ffffff | stroke=#e7eaf0 w1 | r=12 | layout=H gap=12 pad=12/12
+          - [4] | Accent | 4x36 @(968,3597) | fill=#1976d2 | r=2 | layout=H
+          - [4] | Content | 275x36 @(984,3597) | layout=V gap=4
+            - [13] | 球员成长评估报告 | 275x17 @(984,3597) | fill=#202124 | font=Inter/Bold 14px | text="球员成长评估报告"
+            - [13] | 详细分析球员近期训练表现与成长点 | 275x15 @(984,3618) | fill=#667085 | font=Inter/Regular 12px | text="详细分析球员近期训练表现与成长点"
+          - [4] | chevron-right | 16x16 @(1271,3607)
+            - [6] | Vector | 4x8 @(1277,3611) | stroke=#667085 w2
+        - [4] | Article Card | 343x60 @(956,3657) | fill=#ffffff | stroke=#e7eaf0 w1 | r=12 | layout=H gap=12 pad=12/12
+          - [4] | Accent | 4x36 @(968,3669) | fill=#ff9800 | r=2 | layout=H
+          - [4] | Content | 275x36 @(984,3669) | layout=V gap=4
+            - [13] | 新手入门：如何选择合适场地 | 275x17 @(984,3669) | fill=#202124 | font=Inter/Bold 14px | text="新手入门：如何选择合适场地"
+            - [13] | 为您提供最优的场地选择与预订技巧 | 275x15 @(984,3690) | fill=#667085 | font=Inter/Regular 12px | text="为您提供最优的场地选择与预订技巧"
+          - [4] | chevron-right | 16x16 @(1271,3679)
+            - [6] | Vector | 4x8 @(1277,3683) | stroke=#667085 w2
+  - [4] | TabIconsOverlay | 375x70 @(940,3562) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1060,3622) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(940,3562)
+      - [4] | icon_0 | 22x22 @(992,3568)
+        - [6] | Vector | 17x16 @(994,3572) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(998,3570) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(994,3577) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(997,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1001,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1005,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(997,3584) | fill=#8e97a6
+      - [13] | 日程 | 117x14 @(944,3593) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(1065,3562)
+      - [4] | icon_1 | 22x22 @(1116,3568)
+        - [6] | Vector | 18x10 @(1118,3575) | stroke=#8e97a6 w1.8
+        - [6] | Vector | 4x4 @(1132,3573) | stroke=#8e97a6 w1.8
+      - [13] | 成长 | 117x14 @(1069,3593) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="成长"
+    - [4] | tab_2 | 125x56 @(1190,3562)
+      - [4] | icon_2 | 22x22 @(1242,3568)
+        - [6] | Vector | 8x8 @(1248,3571) | stroke=#a80f1b w1.6
+        - [6] | Vector | 16x8 @(1244,3580) | stroke=#a80f1b w1.6
+      - [13] | 我的孩子 | 117x14 @(1194,3593) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="我的孩子"
+      - [9] | Ellipse | 4x4 @(1250,3610) | fill=#a80f1b

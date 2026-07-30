@@ -4,6 +4,9 @@ Component({
     subtitle: { type: String, value: "" },
     showBack: { type: Boolean, value: false },
     actionText: { type: String, value: "" },
+    actionIcon: { type: String, value: "" },
+    actionDot: { type: Boolean, value: false },
+    actionPill: { type: Boolean, value: false },
     theme: { type: String, value: "light" },
   },
   data: {

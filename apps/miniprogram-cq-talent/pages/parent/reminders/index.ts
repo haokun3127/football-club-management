@@ -1,5 +1,6 @@
 import { getParentReminders } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { countUnreadReminders, getReminderReadIds, markAllRemindersRead } from "../../../utils/reminders";
 import type { LoadState, ReminderItem } from "../../../utils/types";
 
 interface ReminderView {
@@ -20,8 +21,6 @@ interface PageData {
   earlier: ReminderView[];
   unreadCount: number;
 }
-
-const READ_STORAGE_KEY = "cq-parent-reminder-read-ids";
 
 const TYPE_META: Record<ReminderItem["type"], { icon: string; iconBg: string; dotColor: string }> = {
   event_upcoming: { icon: "📅", iconBg: "#f3f4f6", dotColor: "#a80f1b" },
@@ -60,9 +59,7 @@ Page<PageData>({
   markAllRead() {
     const views = [...this.data.today, ...this.data.earlier];
     if (!views.length) return;
-    const readIds = new Set(loadReadIds());
-    views.forEach((view) => readIds.add(view.id));
-    saveReadIds(Array.from(readIds));
+    markAllRemindersRead(views);
     this.setData({
       today: this.data.today.map((view: ReminderView) => ({ ...view, read: true })),
       earlier: this.data.earlier.map((view: ReminderView) => ({ ...view, read: true })),
@@ -70,14 +67,14 @@ Page<PageData>({
     });
   },
   render(reminders: ReminderItem[]) {
-    const readIds = new Set(loadReadIds());
+    const readIds = new Set(getReminderReadIds());
     const today: ReminderView[] = [];
     const earlier: ReminderView[] = [];
     reminders.forEach((item) => {
       const view = presentReminder(item, readIds.has(item.id));
       (isToday(item.dueAt) ? today : earlier).push(view);
     });
-    const unreadCount = reminders.filter((item) => !readIds.has(item.id)).length;
+    const unreadCount = countUnreadReminders(reminders);
     this.setData({
       state: reminders.length ? "ready" : "empty",
       message: reminders.length ? "" : "暂无新提醒",
@@ -110,15 +107,6 @@ function reminderTitle(item: ReminderItem): string {
     return `${item.studentName} 保险${item.insurance?.status === "expired" ? "已到期" : "即将到期"}`;
   }
   return `${item.studentName} 课时不足，剩余 ${item.lessonCredit?.balance ?? 0} 节`;
-}
-
-function loadReadIds(): string[] {
-  const raw = wx.getStorageSync(READ_STORAGE_KEY);
-  return Array.isArray(raw) ? raw.map(String) : [];
-}
-
-function saveReadIds(ids: string[]) {
-  wx.setStorageSync(READ_STORAGE_KEY, ids.slice(-500));
 }
 
 function isToday(iso: string): boolean {
