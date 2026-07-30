@@ -1,0 +1,80 @@
+# Figma 画板规格: P3 Reminder Center
+
+- [4] | P3 Reminder Center | 375x812 @(80,1920) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x56 @(80,1920) | fill=#ffffff | layout=H pad=0/16
+    - [4] | Back Nav | 56x20 @(96,1938) | layout=H gap=8
+      - [13] | 返回 | 28x17 @(124,1940) | fill=#202124 | font=Inter/Medium 14px | text="返回"
+      - [4] | arrow-left | 20x20 @(96,1938)
+        - [6] | Vector | 12x12 @(100,1942) | stroke=#202124 w2
+    - [13] | 提醒中心 | 68x21 @(226,1938) | fill=#202124 | font=Inter/Bold 17px | text="提醒中心"
+    - [4] | Mark All Read | 72x27 @(367,1934) | fill=#fceeef | r=16 | layout=H pad=6/12
+      - [13] | 全部已读 | 48x15 @(379,1940) | fill=#a80f1b | font=Inter/Semi Bold 12px | text="全部已读"
+  - [4] | Content | 375x686 @(80,1976) | layout=V gap=24 pad=24/22
+    - [4] | Today Section | 331x249 @(102,2000) | layout=V gap=12
+      - [13] | 今天 | 24x15 @(102,2000) | fill=#667085 | font=Inter/Bold 12px | text="今天"
+      - [4] | Notification Item | 331x66 @(102,2027) | fill=#ffffff | r=12 | layout=H gap=12 pad=16/16 | shadow=0,2,8,#000000@0.05
+        - [9] | Ellipse | 8x8 @(118,2056) | fill=#a80f1b
+        - [4] | Frame | 234x34 @(138,2043) | layout=H gap=12
+          - [4] | Frame | 32x32 @(138,2044) | fill=#f3f4f6 | r=16 | layout=H
+            - [13] | 📅 | 16x16 @(146,2052) | fill=#000000 | font=Inter/Regular 16px | text="📅"
+          - [4] | Frame | 190x34 @(182,2043) | layout=V gap=2
+            - [13] | 本周训练安排已更新 | 126x17 @(182,2043) | fill=#202124 | font=Inter/Semi Bold 14px | text="本周训练安排已更新"
+            - [13] | 今日 | 24x15 @(182,2062) | fill=#667085 | font=Inter/Regular 12px | text="今日"
+        - [13] | 18:30 | 33x15 @(384,2052) | fill=#202124 | font=Inter/Medium 12px | text="18:30"
+      - [4] | Notification Item | 331x66 @(102,2105) | fill=#ffffff | r=12 | layout=H gap=12 pad=16/16 | shadow=0,2,8,#000000@0.05
+        - [9] | Ellipse | 8x8 @(118,2134) | fill=#1976d2
+        - [4] | Frame | 234x34 @(138,2121) | layout=H gap=12
+          - [4] | Frame | 32x32 @(138,2122) | fill=#eff6ff | r=16 | layout=H
+            - [13] | 🏆 | 16x16 @(146,2130) | fill=#000000 | font=Inter/Regular 16px | text="🏆"
+          - [4] | Frame | 190x34 @(182,2121) | layout=V gap=2
+            - [13] | 周末联赛比赛通知 | 112x17 @(182,2121) | fill=#202124 | font=Inter/Semi Bold 14px | text="周末联赛比赛通知"
+            - [13] | 昨天 | 24x15 @(182,2140) | fill=#667085 | font=Inter/Regular 12px | text="昨天"
+        - [13] | 10:00 | 33x15 @(384,2130) | fill=#202124 | font=Inter/Medium 12px | text="10:00"
+      - [4] | Notification Item | 331x66 @(102,2183) | fill=#ffffff | r=12 | layout=H gap=12 pad=16/16 | shadow=0,2,8,#000000@0.05
+        - [9] | Ellipse | 8x8 @(118,2212) | fill=#f59e0b
+        - [4] | Frame | 235x34 @(138,2199) | layout=H gap=12
+          - [4] | Frame | 32x32 @(138,2200) | fill=#fef3c7 | r=16 | layout=H
+            - [13] | 🎖 | 16x16 @(146,2208) | fill=#000000 | font=Inter/Regular 16px | text="🎖"
+          - [4] | Frame | 191x34 @(182,2199) | layout=V gap=2
+            - [13] | 陈小宇 获得成长徽章 | 130x17 @(182,2199) | fill=#202124 | font=Inter/Semi Bold 14px | text="陈小宇 获得成长徽章"
+            - [13] | 2天前 | 32x15 @(182,2218) | fill=#667085 | font=Inter/Regular 12px | text="2天前"
+        - [13] | 09:15 | 32x15 @(385,2208) | fill=#202124 | font=Inter/Medium 12px | text="09:15"
+    - [4] | Earlier Section | 331x93 @(102,2273) | layout=V gap=12
+      - [13] | 更早 | 24x15 @(102,2273) | fill=#667085 | font=Inter/Bold 12px | text="更早"
+      - [4] | Notification Item | 331x66 @(102,2300) | fill=#ffffff | r=12 | layout=H gap=12 pad=16/16 | shadow=0,2,8,#000000@0.05
+        - [9] | Ellipse | 8x8 @(118,2329) | fill=#e7eaf0
+        - [4] | Frame | 235x34 @(138,2316) | layout=H gap=12
+          - [4] | Frame | 32x32 @(138,2317) | fill=#f0fdf4 | r=16 | layout=H
+            - [13] | 📝 | 16x16 @(146,2325) | fill=#000000 | font=Inter/Regular 16px | text="📝"
+          - [4] | Frame | 191x34 @(182,2316) | layout=V gap=2
+            - [13] | 林教练课后评语已更新 | 140x17 @(182,2316) | fill=#667085 | font=Inter/Semi Bold 14px | text="林教练课后评语已更新"
+            - [13] | 3天前 | 32x15 @(182,2335) | fill=#667085 | font=Inter/Regular 12px | text="3天前"
+        - [13] | 16:45 | 32x15 @(385,2326) | fill=#667085 | font=Inter/Medium 12px | text="16:45"
+    - [4] | Empty State | 331x172 @(102,2390) | layout=V gap=12
+      - [4] | Frame | 64x64 @(236,2430) | fill=#f3f4f6 | r=32 | layout=H
+        - [4] | circle-x | 32x32 @(252,2446)
+          - [6] | Vector | 27x27 @(254,2448) | stroke=#667085 w2
+      - [13] | 暂无新提醒 | 70x17 @(232,2506) | fill=#667085 | font=Inter/Regular 14px | text="暂无新提醒"
+  - [4] | TabIconsOverlay | 375x70 @(80,2662) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(200,2722) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(80,2662)
+      - [4] | icon_0 | 22x22 @(132,2668)
+        - [6] | Vector | 17x16 @(134,2672) | stroke=#a80f1b w1.6
+        - [6] | Vector | 8x4 @(138,2670) | fill=#000000 | stroke=#a80f1b w1.6
+        - [6] | Vector | 17x0 @(134,2677) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 3x3 @(137,2680) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(141,2680) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(145,2680) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(137,2684) | fill=#a80f1b
+      - [13] | 日程 | 117x14 @(84,2693) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="日程"
+      - [9] | Ellipse | 4x4 @(140,2710) | fill=#a80f1b
+    - [4] | tab_1 | 125x56 @(205,2662)
+      - [4] | icon_1 | 22x22 @(256,2668)
+        - [6] | Vector | 18x10 @(258,2675) | stroke=#8e97a6 w1.8
+        - [6] | Vector | 4x4 @(272,2673) | stroke=#8e97a6 w1.8
+      - [13] | 成长 | 117x14 @(209,2693) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="成长"
+    - [4] | tab_2 | 125x56 @(330,2662)
+      - [4] | icon_2 | 22x22 @(382,2668)
+        - [6] | Vector | 8x8 @(388,2671) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(384,2680) | stroke=#8e97a6 w1.6
+      - [13] | 我的孩子 | 117x14 @(334,2693) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的孩子"

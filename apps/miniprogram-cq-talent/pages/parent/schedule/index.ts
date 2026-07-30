@@ -119,6 +119,9 @@ Page<PageData>({
     const id = event.detail?.eventId || event.currentTarget?.dataset?.id;
     if (id) openPage(`/pages/parent/event/index?id=${id}`);
   },
+  openReminders() {
+    openPage("/pages/parent/reminders/index");
+  },
   retry() {
     this.load();
   },

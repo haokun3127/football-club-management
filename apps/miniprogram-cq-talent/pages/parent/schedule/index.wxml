@@ -1,5 +1,5 @@
 <view class="schedule-page">
-  <app-header title="家庭日程" subtitle="训练、比赛与俱乐部活动" />
+  <app-header title="家庭日程" subtitle="训练、比赛与俱乐部活动" action-text="提醒" bindaction="openReminders" />
   <view class="schedule-page__body">
     <view class="scope-block">
       <view class="scope-block__label">查看范围</view>

@@ -1,0 +1,47 @@
+<view class="reminders-page">
+  <app-header
+    title="提醒中心"
+    subtitle="{{unreadCount ? unreadCount + ' 条未读提醒' : '活动、保险与课时动态'}}"
+    show-back
+    action-text="{{unreadCount ? '全部已读' : ''}}"
+    bindaction="markAllRead"
+  />
+  <view class="reminders-page__body">
+    <status-view
+      state="{{state}}"
+      title="{{state === 'loading' ? '加载提醒' : state === 'empty' ? '暂无新提醒' : '提醒读取失败'}}"
+      message="{{message}}"
+      action-text="{{state === 'error' ? '重试' : ''}}"
+      bindaction="retry"
+    />
+
+    <block wx:if="{{state === 'ready'}}">
+      <view wx:if="{{today.length}}" class="reminder-section">
+        <view class="reminder-section__title">今天</view>
+        <view wx:for="{{today}}" wx:key="id" class="reminder-item {{item.read ? 'reminder-item--read' : ''}}">
+          <view class="reminder-item__dot" style="background: {{item.read ? '#e7eaf0' : item.dotColor}}"></view>
+          <view class="reminder-item__icon" style="background: {{item.iconBg}}">{{item.icon}}</view>
+          <view class="reminder-item__main">
+            <view class="reminder-item__title">{{item.title}}</view>
+            <view class="reminder-item__ago">{{item.timeAgo}}</view>
+          </view>
+          <view class="reminder-item__time">{{item.timeLabel}}</view>
+        </view>
+      </view>
+
+      <view wx:if="{{earlier.length}}" class="reminder-section">
+        <view class="reminder-section__title">更早</view>
+        <view wx:for="{{earlier}}" wx:key="id" class="reminder-item {{item.read ? 'reminder-item--read' : ''}}">
+          <view class="reminder-item__dot" style="background: {{item.read ? '#e7eaf0' : item.dotColor}}"></view>
+          <view class="reminder-item__icon" style="background: {{item.iconBg}}">{{item.icon}}</view>
+          <view class="reminder-item__main">
+            <view class="reminder-item__title">{{item.title}}</view>
+            <view class="reminder-item__ago">{{item.timeAgo}}</view>
+          </view>
+          <view class="reminder-item__time">{{item.timeLabel}}</view>
+        </view>
+      </view>
+    </block>
+  </view>
+  <role-tabbar role="parent" active="schedule" />
+</view>

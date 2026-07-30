@@ -14,6 +14,7 @@ import type {
   MetricDetail,
   LoginResult,
   RadarMetricPoint,
+  ReminderItem,
   ScheduleEvent,
   StudentHome,
   StudentSummary,
@@ -52,6 +53,14 @@ export async function getParentSchedule(studentId: string) {
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/parent/students/${studentId}/schedule`,
   });
   return normalizeEvents(response.events ?? []);
+}
+
+export async function getParentReminders(): Promise<ReminderItem[]> {
+  const context = requireContext();
+  const response = await request<{ reminders?: ReminderItem[] }>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/parent/reminders`,
+  });
+  return response.reminders ?? [];
 }
 
 export async function getParentCalendar(from?: string, to?: string) {

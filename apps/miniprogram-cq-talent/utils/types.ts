@@ -278,3 +278,26 @@ export interface AssessmentDraftEntry {
   missingReason?: string;
   updatedAt: string;
 }
+
+export interface ReminderItem {
+  id: string;
+  type: "event_upcoming" | "insurance_expiring" | "lesson_credit_low";
+  severity: "info" | "warning" | "urgent";
+  studentId: string;
+  studentName: string;
+  dueAt: string;
+  event?: {
+    id: string;
+    type: string;
+    title: string;
+    startsAt: string;
+    endsAt: string;
+  };
+  insurance?: {
+    status: "expiring" | "expired";
+    expiresAt?: string;
+  };
+  lessonCredit?: {
+    balance: number;
+  };
+}
