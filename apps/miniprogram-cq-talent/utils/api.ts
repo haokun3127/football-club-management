@@ -15,6 +15,7 @@ import type {
   LoginResult,
   RadarMetricPoint,
   ReminderItem,
+  PrivateLessonRequest,
   ScheduleEvent,
   StudentHome,
   StudentSummary,
@@ -940,4 +941,33 @@ function stringOrUndefined(value: unknown) {
 function numberOrUndefined(value: unknown) {
   const numeric = typeof value === "number" ? value : Number(value);
   return Number.isFinite(numeric) ? numeric : undefined;
+}
+
+export async function createPrivateLessonRequest(input: {
+  studentId: string;
+  coachName: string;
+  date: string;
+  timeSlot: string;
+  goals: string[];
+  note?: string;
+}): Promise<PrivateLessonRequest> {
+  const context = requireContext();
+  const response = await request<{ request?: PrivateLessonRequest }, typeof input>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/parent/private-lessons`,
+    method: "POST",
+    data: input,
+  });
+  if (!response.request) {
+    throw new Error("私教预约提交失败，请稍后重试。");
+  }
+  return response.request;
+}
+
+export async function getPrivateLessonRequests(studentId?: string): Promise<PrivateLessonRequest[]> {
+  const context = requireContext();
+  const query = studentId ? `?student=${encodeURIComponent(studentId)}` : "";
+  const response = await request<{ requests?: PrivateLessonRequest[] }>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/parent/private-lessons${query}`,
+  });
+  return response.requests ?? [];
 }

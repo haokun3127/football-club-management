@@ -580,3 +580,29 @@ export interface ExcelImportPreviewInput {
   headerRow?: number;
   fileName?: string;
 }
+
+export type PrivateLessonRequestStatus = "pending" | "confirmed" | "declined" | "cancelled";
+
+export interface PrivateLessonRequest {
+  id: EntityId;
+  clubId: EntityId;
+  studentId: EntityId;
+  coachName: string;
+  date: string;
+  timeSlot: string;
+  goals: string[];
+  note?: string;
+  status: PrivateLessonRequestStatus;
+  requestedByUserId?: EntityId;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PrivateLessonRequestInput {
+  coachName: string;
+  date: string;
+  timeSlot: string;
+  goals: string[];
+  note?: string;
+  requestedByUserId?: EntityId;
+}

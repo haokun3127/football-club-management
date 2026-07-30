@@ -76,6 +76,8 @@ import type {
   ImportPreviewFilters,
   InsurancePolicy,
   InsurancePolicyInput,
+  PrivateLessonRequest,
+  PrivateLessonRequestInput,
   InsurancePolicySummary,
   LessonAdjustmentInput,
   LessonLedgerEntry,
@@ -155,6 +157,8 @@ export interface ApiStore {
   recordLessonAdjustment(clubId: EntityId, studentId: EntityId, input: LessonAdjustmentInput): LessonLedgerSummary | Promise<LessonLedgerSummary>;
   listInsurancePolicies(clubId: EntityId, studentId: EntityId): InsurancePolicySummary | null | Promise<InsurancePolicySummary | null>;
   createInsurancePolicy(clubId: EntityId, studentId: EntityId, input: InsurancePolicyInput): InsurancePolicySummary | Promise<InsurancePolicySummary>;
+  listPrivateLessonRequests(clubId: EntityId, studentId?: EntityId): PrivateLessonRequest[] | Promise<PrivateLessonRequest[]>;
+  createPrivateLessonRequest(clubId: EntityId, studentId: EntityId, input: PrivateLessonRequestInput): PrivateLessonRequest | Promise<PrivateLessonRequest>;
   confirmExternalRecord(
     clubId: EntityId,
     rawRecordId: EntityId,
@@ -1696,6 +1700,38 @@ export abstract class SeedBackedStore implements ApiStore {
       current: { status: policy.currentStatus, expiresAt: policy.expiresAt, policyNumber: policy.policyNumber, reviewStatus: policy.reviewStatus },
       policies: [policy],
     };
+  }
+
+  listPrivateLessonRequests(clubId: EntityId, studentId?: EntityId): PrivateLessonRequest[] {
+    return this.data.privateLessonRequests
+      .filter((item) => item.clubId === clubId && (!studentId || item.studentId === studentId))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+
+  createPrivateLessonRequest(clubId: EntityId, studentId: EntityId, input: PrivateLessonRequestInput): PrivateLessonRequest {
+    const student = this.data.students.find((item) => item.clubId === clubId && item.id === studentId);
+    if (!student) {
+      throw new Error("Student not found for club.");
+    }
+
+    const now = this.now();
+    const request: PrivateLessonRequest = {
+      id: this.nextId("private-lesson-request"),
+      clubId,
+      studentId,
+      coachName: input.coachName,
+      date: input.date,
+      timeSlot: input.timeSlot,
+      goals: [...input.goals],
+      note: input.note,
+      status: "pending",
+      requestedByUserId: input.requestedByUserId,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    this.data.privateLessonRequests.push(request);
+    return request;
   }
 
   confirmExternalRecord(

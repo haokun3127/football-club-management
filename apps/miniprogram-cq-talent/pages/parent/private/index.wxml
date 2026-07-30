@@ -1,0 +1,92 @@
+<view class="private-page">
+  <app-header title="私教预约" subtitle="{{studentName}}" show-back />
+  <view class="private-page__body">
+    <status-view
+      state="{{state}}"
+      title="{{state === 'loading' ? '加载预约信息' : state === 'empty' ? '未绑定孩子' : '读取失败'}}"
+      message="{{message}}"
+      action-text="{{state === 'error' ? '重试' : ''}}"
+      bindaction="retry"
+    />
+
+    <block wx:if="{{state === 'ready'}}">
+      <!-- 表单卡（Figma P9: 白底 r12, 分组 13px Semi Bold 标签） -->
+      <view class="form-card">
+        <view class="form-card__title">预约信息</view>
+
+        <view class="field">
+          <view class="field__label">选择教练</view>
+          <picker range="{{coachOptions}}" value="{{coachIndex}}" bindchange="selectCoach">
+            <view class="field__picker">
+              <text>{{coachOptions[coachIndex]}}</text>
+              <text class="field__chevron">›</text>
+            </view>
+          </picker>
+        </view>
+
+        <view class="field">
+          <view class="field__label">预约日期</view>
+          <picker mode="date" value="{{date}}" bindchange="selectDate">
+            <view class="field__picker">
+              <text class="{{date ? '' : 'field__picker--placeholder'}}">{{date || '请选择日期'}}</text>
+              <text class="field__chevron">📅</text>
+            </view>
+          </picker>
+        </view>
+
+        <view class="field">
+          <view class="field__label">时段选择</view>
+          <view class="chip-grid">
+            <view
+              wx:for="{{timeSlots}}"
+              wx:key="*this"
+              class="chip chip--wide {{slotIndex === index ? 'chip--active' : ''}}"
+              data-index="{{index}}"
+              bindtap="selectSlot"
+            >{{item}}</view>
+          </view>
+        </view>
+
+        <view class="field">
+          <view class="field__label">训练目标</view>
+          <view class="chip-grid">
+            <view
+              wx:for="{{goals}}"
+              wx:key="*this"
+              class="chip {{selectedGoals[index] ? 'chip--active' : ''}}"
+              data-index="{{index}}"
+              bindtap="toggleGoal"
+            >{{item}}</view>
+          </view>
+        </view>
+
+        <view class="field">
+          <view class="field__label">备注</view>
+          <textarea
+            class="field__textarea"
+            placeholder="请输入特殊要求或说明"
+            maxlength="500"
+            value="{{note}}"
+            bindinput="inputNote"
+          />
+        </view>
+      </view>
+
+      <!-- 费用说明（Figma: 预计费用 + 已包含在课时包 绿 chip） -->
+      <view class="price-card">
+        <view class="price-card__row">
+          <view class="price-card__label">预计费用</view>
+          <view class="price-card__value">按实际到场收取</view>
+        </view>
+        <view class="price-card__chip">已包含在课时包</view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 提交区（Figma: 底部白底上阴影 + r26 品牌红按钮） -->
+  <view wx:if="{{state === 'ready'}}" class="submit-area">
+    <view class="submit-button {{submitting ? 'submit-button--disabled' : ''}}" bindtap="submit">{{submitting ? '提交中…' : '提交预约'}}</view>
+    <view class="submit-hint">提交后等待教练确认，无需在线支付</view>
+  </view>
+  <role-tabbar wx:if="{{state !== 'ready'}}" role="parent" active="child" />
+</view>

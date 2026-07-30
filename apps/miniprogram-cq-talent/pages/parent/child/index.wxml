@@ -54,6 +54,10 @@
         <view class="label">内容中心</view>
         <view class="field-value field-value--link">场地、帮助与训练攻略 ›</view>
       </view>
+      <view class="field-row field-row--link" bindtap="openPrivate">
+        <view class="label">私教预约</view>
+        <view class="field-value field-value--link">预约一对一私教课 ›</view>
+      </view>
     </view>
 
   </view>

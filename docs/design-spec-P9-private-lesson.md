@@ -1,0 +1,88 @@
+# Figma 画板规格: P9 Private Lesson Form
+
+- [4] | P9 Private Lesson Form | 375x812 @(940,3720) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(940,3720) | fill=#ffffff | stroke=#e7eaf0 w1 | layout=H gap=12 pad=14/22
+    - [13] | 私教预约 | 259x27 @(998,3750) | fill=#202124 | font=Inter/Bold 22px | text="私教预约"
+    - [4] | arrow-left | 24x24 @(962,3752)
+      - [6] | Vector | 14x14 @(967,3757) | stroke=#202124 w2
+    - [4] | Frame | 24x24 @(1269,3752)
+  - [4] | Content | 375x543 @(940,3808) | layout=V gap=16 pad=16/22
+    - [4] | Form Card | 331x554 @(962,3824) | fill=#ffffff | r=12 | layout=V gap=20 pad=16/16 | shadow=0,4,12,#000000@0.05
+      - [13] | 预约信息 | 56x17 @(978,3840) | fill=#202124 | font=Inter/Bold 14px | text="预约信息"
+      - [4] | Frame | 299x72 @(978,3877) | layout=V gap=8
+        - [13] | 选择教练 | 52x16 @(978,3877) | fill=#202124 | font=Inter/Semi Bold 13px | text="选择教练"
+        - [4] | Frame | 299x48 @(978,3901) | fill=#f9fafb | r=8 | layout=H pad=0/12
+          - [13] | 林教练 (主教练) | 99x17 @(990,3916) | fill=#202124 | font=Inter/Regular 14px | text="林教练 (主教练)"
+          - [4] | chevron-right | 16x16 @(1249,3917)
+            - [6] | Vector | 4x8 @(1255,3921) | stroke=#667085 w2
+      - [4] | Frame | 299x59 @(978,4179) | layout=V gap=12
+        - [13] | 训练目标 | 52x16 @(978,4179) | fill=#202124 | font=Inter/Semi Bold 13px | text="训练目标"
+        - [4] | Frame | 299x31 @(978,4207) | layout=H gap=8
+          - [4] | Frame | 48x31 @(978,4207) | fill=#a80f1b | stroke=#a80f1b w1 | r=6 | layout=H pad=8/12
+            - [13] | 传球 | 24x15 @(990,4215) | fill=#ffffff | font=Inter/Semi Bold 12px | text="传球"
+          - [4] | Frame | 48x31 @(1034,4207) | fill=#ffffff | stroke=#e7eaf0 w1 | r=6 | layout=H pad=8/12
+            - [13] | 射门 | 24x15 @(1046,4215) | fill=#202124 | font=Inter/Regular 12px | text="射门"
+          - [4] | Frame | 48x31 @(1090,4207) | fill=#ffffff | stroke=#e7eaf0 w1 | r=6 | layout=H pad=8/12
+            - [13] | 体能 | 24x15 @(1102,4215) | fill=#202124 | font=Inter/Regular 12px | text="体能"
+          - [4] | Frame | 48x31 @(1146,4207) | fill=#ffffff | stroke=#e7eaf0 w1 | r=6 | layout=H pad=8/12
+            - [13] | 技巧 | 24x15 @(1158,4215) | fill=#202124 | font=Inter/Regular 12px | text="技巧"
+      - [4] | Frame | 299x72 @(978,3969) | layout=V gap=8
+        - [13] | 预约日期 | 52x16 @(978,3969) | fill=#202124 | font=Inter/Semi Bold 13px | text="预约日期"
+        - [4] | Frame | 299x48 @(978,3993) | fill=#f9fafb | r=8 | layout=H pad=0/12
+          - [13] | 请选择日期 | 70x17 @(990,4008) | fill=#667085 | font=Inter/Regular 14px | text="请选择日期"
+          - [4] | calendar | 16x16 @(1249,4009)
+            - [6] | Vector | 12x13 @(1251,4010) | stroke=#667085 w2
+      - [4] | Frame | 299x98 @(978,4061) | layout=V gap=12
+        - [13] | 时段选择 | 52x16 @(978,4061) | fill=#202124 | font=Inter/Semi Bold 13px | text="时段选择"
+        - [4] | Frame | 299x70 @(978,4089) | layout=V gap=8
+          - [4] | Frame | 299x31 @(978,4089) | layout=H gap=8
+            - [4] | Frame | 95x31 @(978,4089) | fill=#ffffff | stroke=#e7eaf0 w1 | r=6 | layout=H pad=8/12
+              - [13] | 09:00-10:00 | 71x15 @(990,4097) | fill=#667085 | font=Inter/Regular 12px | text="09:00-10:00"
+            - [4] | Frame | 91x31 @(1081,4089) | fill=#ffffff | stroke=#e7eaf0 w1 | r=6 | layout=H pad=8/12
+              - [13] | 10:00-11:00 | 67x15 @(1093,4097) | fill=#667085 | font=Inter/Regular 12px | text="10:00-11:00"
+            - [4] | Frame | 93x31 @(1180,4089) | fill=#ffffff | stroke=#e7eaf0 w1 | r=6 | layout=H pad=8/12
+              - [13] | 14:00-15:00 | 69x15 @(1192,4097) | fill=#667085 | font=Inter/Regular 12px | text="14:00-15:00"
+          - [4] | Frame | 299x31 @(978,4128) | layout=H gap=8
+            - [4] | Frame | 93x31 @(978,4128) | fill=#ffffff | stroke=#e7eaf0 w1 | r=6 | layout=H pad=8/12
+              - [13] | 15:00-16:00 | 69x15 @(990,4136) | fill=#667085 | font=Inter/Regular 12px | text="15:00-16:00"
+            - [4] | Frame | 95x31 @(1079,4128) | fill=#a80f1b | stroke=#a80f1b w1 | r=6 | layout=H pad=8/12
+              - [13] | 16:00-17:00 | 71x15 @(1091,4136) | fill=#ffffff | font=Inter/Semi Bold 12px | text="16:00-17:00"
+            - [4] | Frame | 92x31 @(1182,4128) | fill=#ffffff | stroke=#e7eaf0 w1 | r=6 | layout=H pad=8/12
+              - [13] | 17:00-18:00 | 68x15 @(1194,4136) | fill=#667085 | font=Inter/Regular 12px | text="17:00-18:00"
+      - [4] | Frame | 299x104 @(978,4258) | layout=V gap=8
+        - [13] | 备注 | 26x16 @(978,4258) | fill=#202124 | font=Inter/Semi Bold 13px | text="备注"
+        - [4] | Frame | 299x80 @(978,4282) | fill=#f9fafb | r=8 | layout=V pad=12/12
+          - [13] | 请输入特殊要求或说明 | 130x16 @(990,4294) | fill=#667085 | font=Inter/Regular 13px | text="请输入特殊要求或说明"
+    - [4] | Price Estimate | 331x82 @(962,4394) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+      - [4] | Frame | 299x17 @(978,4410) | layout=H
+        - [13] | 预计费用 | 56x17 @(978,4410) | fill=#202124 | font=Inter/Bold 14px | text="预计费用"
+        - [13] | 按实际到场收取 | 98x17 @(1179,4410) | fill=#a80f1b | font=Inter/Bold 14px | text="按实际到场收取"
+      - [4] | Frame | 93x21 @(978,4439) | fill=#ecfdf5 | r=4 | layout=H pad=4/8
+        - [13] | 已包含在课时包 | 77x13 @(986,4443) | fill=#10b981 | font=Inter/Bold 11px | text="已包含在课时包"
+  - [4] | Submit Area | 375x111 @(940,4351) | fill=#ffffff | layout=V gap=12 pad=16/22 | shadow=0,-4,12,#000000@0.05
+    - [4] | Frame | 331x52 @(962,4367) | fill=#a80f1b | r=26 | layout=H
+      - [13] | 提交预约 | 64x19 @(1096,4384) | fill=#ffffff | font=Inter/Semi Bold 16px | text="提交预约"
+    - [13] | 提交后等待教练确认，无需在线支付 | 331x15 @(962,4431) | fill=#667085 | font=Inter/Regular 12px | text="提交后等待教练确认，无需在线支付"
+  - [4] | TabIconsOverlay | 375x70 @(940,4462) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1060,4522) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(940,4462)
+      - [4] | icon_0 | 22x22 @(992,4468)
+        - [6] | Vector | 17x16 @(994,4472) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(998,4470) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(994,4477) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(997,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1001,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1005,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(997,4484) | fill=#8e97a6
+      - [13] | 日程 | 117x14 @(944,4493) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(1065,4462)
+      - [4] | icon_1 | 22x22 @(1116,4468)
+        - [6] | Vector | 18x10 @(1118,4475) | stroke=#8e97a6 w1.8
+        - [6] | Vector | 4x4 @(1132,4473) | stroke=#8e97a6 w1.8
+      - [13] | 成长 | 117x14 @(1069,4493) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="成长"
+    - [4] | tab_2 | 125x56 @(1190,4462)
+      - [4] | icon_2 | 22x22 @(1242,4468)
+        - [6] | Vector | 8x8 @(1248,4471) | stroke=#a80f1b w1.6
+        - [6] | Vector | 16x8 @(1244,4480) | stroke=#a80f1b w1.6
+      - [13] | 我的孩子 | 117x14 @(1194,4493) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="我的孩子"
+      - [9] | Ellipse | 4x4 @(1250,4510) | fill=#a80f1b

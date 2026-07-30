@@ -53,6 +53,7 @@ export function createDataCapabilitySeed(): Pick<
   | "externalRecordLinks"
   | "lessonLedger"
   | "insurancePolicies"
+  | "privateLessonRequests"
 > {
   const appClients: ClubAppClient[] = [
     {
@@ -355,6 +356,7 @@ export function createDataCapabilitySeed(): Pick<
     externalRecordLinks,
     lessonLedger: [],
     insurancePolicies: [],
+    privateLessonRequests: [],
   };
 }
 

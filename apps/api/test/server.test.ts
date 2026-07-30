@@ -399,6 +399,90 @@ describe("api server", () => {
     persistence.database.close();
   });
 
+  it("accepts parent private lesson requests with guardian scoping and validation", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const store = new PersistentApiStore(persistence.repositories);
+    const app = buildServer(
+      store,
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    const url = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/private-lessons";
+    const validBody = {
+      studentId: "student-1",
+      coachName: "林教练",
+      date: "2026-08-05",
+      timeSlot: "16:00-17:00",
+      goals: ["传球", "射门"],
+      note: "希望加强弱侧脚",
+    };
+
+    const created = await app.inject({
+      method: "POST",
+      url,
+      headers: { "x-user-id": "user-parent-1" },
+      payload: validBody,
+    });
+    expect(created.statusCode, created.body).toBe(201);
+    const createdBody = created.json() as {
+      request: { id: string; status: string; studentId: string; coachName: string; goals: string[] };
+    };
+    expect(createdBody.request.status).toBe("pending");
+    expect(createdBody.request.studentId).toBe("student-1");
+    expect(createdBody.request.goals).toEqual(["传球", "射门"]);
+
+    // Guardian scoping: another guardian's student is rejected, never re-targeted.
+    const foreign = await app.inject({
+      method: "POST",
+      url,
+      headers: { "x-user-id": "user-parent-1" },
+      payload: { ...validBody, studentId: "student-2" },
+    });
+    expect(foreign.statusCode).toBe(403);
+
+    // Validation: empty goals -> 400.
+    const invalid = await app.inject({
+      method: "POST",
+      url,
+      headers: { "x-user-id": "user-parent-1" },
+      payload: { ...validBody, goals: [] },
+    });
+    expect(invalid.statusCode).toBe(400);
+
+    // Coach role denied.
+    const coachCreate = await app.inject({
+      method: "POST",
+      url,
+      headers: { "x-user-id": "user-coach-1" },
+      payload: validBody,
+    });
+    expect(coachCreate.statusCode).toBe(403);
+
+    // GET lists own requests; foreign student filter denied.
+    const list = await app.inject({
+      method: "GET",
+      url,
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    expect(list.statusCode).toBe(200);
+    const listBody = list.json() as { requests: Array<{ id: string; studentId: string }> };
+    expect(listBody.requests.some((item) => item.id === createdBody.request.id)).toBe(true);
+    expect(listBody.requests.every((item) => item.studentId === "student-1")).toBe(true);
+
+    const foreignList = await app.inject({
+      method: "GET",
+      url: `${url}?student=student-2`,
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    expect(foreignList.statusCode).toBe(403);
+
+    await app.close();
+    persistence.database.close();
+  });
+
   it("serves next-stage mini-program BFF aggregates without leaking cross-role access", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
     const app = buildServer(

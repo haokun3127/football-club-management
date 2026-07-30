@@ -55,6 +55,7 @@ import type {
   ExternalSystemConnection,
   ExternalTableMapping,
   InsurancePolicy,
+  PrivateLessonRequest,
   LessonLedgerEntry,
 } from "../data-capability/types.js";
 
@@ -115,6 +116,7 @@ export interface SeedData {
   externalRecordLinks: ExternalRecordLink[];
   lessonLedger: LessonLedgerEntry[];
   insurancePolicies: InsurancePolicy[];
+  privateLessonRequests: PrivateLessonRequest[];
   privacyFieldPolicies: PrivacyFieldPolicy[];
   privacyNoticeVersions: PrivacyNoticeVersion[];
   privacyRetentionPolicies: PrivacyRetentionPolicy[];

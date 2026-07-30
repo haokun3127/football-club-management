@@ -136,6 +136,9 @@ Page<PageData>({
   openReminders() {
     openPage("/pages/parent/reminders/index");
   },
+  openDay() {
+    openPage(`/pages/parent/day/index?date=${this.data.selectedDate}`);
+  },
   retry() {
     this.load();
   },

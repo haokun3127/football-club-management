@@ -1,0 +1,73 @@
+.day-page {
+  min-height: 100vh;
+  background: var(--color-page);
+}
+
+.day-page__body {
+  padding: 24rpx var(--space-page) 180rpx;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+/* 活动卡（Figma P1.1: 白底 r16 + 4px 彩色左条 + 状态 pill） */
+.activity-card {
+  display: flex;
+  gap: 32rpx;
+  background: var(--color-card);
+  border-radius: 32rpx;
+  padding: 32rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.activity-card__bar {
+  width: 8rpx;
+  border-radius: 40rpx;
+  flex-shrink: 0;
+}
+
+.activity-card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.activity-card__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activity-card__status {
+  flex-shrink: 0;
+  padding: 8rpx 20rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.activity-card__time {
+  margin-top: 16rpx;
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+}
+
+.activity-card__place {
+  margin-top: 8rpx;
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+}

@@ -69,6 +69,9 @@ Page({
   openContent() {
     openPage("/pages/parent/content/index");
   },
+  openPrivate() {
+    openPage(`/pages/parent/private/index?student=${this.data.activeStudentId}`);
+  },
 });
 
 function readableError(error: unknown) {

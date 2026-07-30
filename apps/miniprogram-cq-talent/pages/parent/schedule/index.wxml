@@ -13,6 +13,7 @@
         <view class="subtitle">{{activeStudentName}} · 当天 {{visibleEvents.length}} 项安排</view>
       </view>
       <picker mode="date" value="{{selectedDate}}" bindchange="onDateChange"><view class="calendar-button">选择日期</view></picker>
+      <view class="calendar-button calendar-button--link" bindtap="openDay">列表 ›</view>
     </view>
     <scroll-view scroll-x class="date-strip" enhanced show-scrollbar="{{false}}">
       <view class="date-strip-inner">

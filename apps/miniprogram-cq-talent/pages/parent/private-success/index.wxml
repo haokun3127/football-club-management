@@ -1,0 +1,37 @@
+<view class="success-page">
+  <app-header title="预约成功" show-back />
+  <view class="success-page__body">
+    <!-- 绿色对勾（Figma: 100px #22c55e 圆 + 白色 check + 绿色投影） -->
+    <view class="check-circle">
+      <text class="check-circle__icon">✓</text>
+    </view>
+
+    <view class="success-title">预约申请已提交</view>
+    <view class="success-subtitle">{{coach}}将在 24 小时内确认</view>
+
+    <!-- 摘要卡（Figma: 白底 r16 描边 + 分隔行） -->
+    <view class="summary-card">
+      <view class="summary-row">
+        <view class="summary-row__label">教练</view>
+        <view class="summary-row__value">{{coach}}</view>
+      </view>
+      <view class="summary-row">
+        <view class="summary-row__label">日期</view>
+        <view class="summary-row__value">{{date}}</view>
+      </view>
+      <view class="summary-row">
+        <view class="summary-row__label">时段</view>
+        <view class="summary-row__value">{{slot}}</view>
+      </view>
+      <view class="summary-row summary-row--last">
+        <view class="summary-row__label">内容</view>
+        <view class="summary-row__value">{{goals}}</view>
+      </view>
+    </view>
+
+    <view class="actions">
+      <view class="actions__primary" bindtap="backToSchedule">返回日程</view>
+      <view class="actions__outline" bindtap="backToChild">返回我的孩子</view>
+    </view>
+  </view>
+</view>

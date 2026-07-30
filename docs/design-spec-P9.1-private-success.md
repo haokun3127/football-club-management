@@ -1,0 +1,58 @@
+# Figma 画板规格: P9.1 Private Success
+
+- [4] | P9.1 Private Success | 375x812 @(1370,3720) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(1370,3720) | fill=#ffffff | stroke=#e7eaf0 w1 | layout=H gap=12 pad=14/22
+    - [13] | 预约成功 | 88x27 @(1428,3750) | fill=#202124 | font=Inter/Bold 22px | text="预约成功"
+    - [4] | arrow-left | 24x24 @(1392,3752)
+      - [6] | Vector | 14x14 @(1397,3757) | stroke=#202124 w2
+  - [4] | Content | 375x654 @(1370,3808) | layout=V gap=32 pad=0/22
+    - [4] | Frame | 100x100 @(1508,3803) | fill=#22c55e | r=50 | layout=H | shadow=0,12,24,#22c55e@0.25
+      - [4] | check | 48x48 @(1534,3829)
+        - [6] | Vector | 32x22 @(1542,3841) | stroke=#ffffff w3
+    - [4] | Frame | 331x49 @(1392,3935) | layout=V gap=8
+      - [13] | 预约申请已提交 | 331x24 @(1392,3935) | fill=#202124 | font=Inter/Bold 20px | text="预约申请已提交"
+      - [13] | 林教练将在 24 小时内确认 | 331x17 @(1392,3967) | fill=#667085 | font=Inter/Regular 14px | text="林教练将在 24 小时内确认"
+    - [4] | Summary | 331x203 @(1392,4016) | fill=#ffffff | stroke=#e7eaf0 w1 | r=16 | layout=V gap=16 pad=20/20 | shadow=0,4,12,#000000@0.05
+      - [4] | Frame | 291x16 @(1412,4036) | layout=H
+        - [13] | 教练 | 26x16 @(1412,4036) | fill=#667085 | font=Inter/Regular 13px | text="教练"
+        - [13] | 林教练 | 39x16 @(1664,4036) | fill=#202124 | font=Inter/Semi Bold 13px | text="林教练"
+      - [12] | Rectangle | 291x1 @(1412,4068) | fill=#e7eaf0
+      - [4] | Frame | 291x16 @(1412,4085) | layout=H
+        - [13] | 日期 | 26x16 @(1412,4085) | fill=#667085 | font=Inter/Regular 13px | text="日期"
+        - [13] | 2025-07-15 | 76x16 @(1627,4085) | fill=#202124 | font=Inter/Semi Bold 13px | text="2025-07-15"
+      - [12] | Rectangle | 291x1 @(1412,4117) | fill=#e7eaf0
+      - [4] | Frame | 291x16 @(1412,4134) | layout=H
+        - [13] | 时段 | 26x16 @(1412,4134) | fill=#667085 | font=Inter/Regular 13px | text="时段"
+        - [13] | 17:00-18:00 | 77x16 @(1626,4134) | fill=#202124 | font=Inter/Semi Bold 13px | text="17:00-18:00"
+      - [12] | Rectangle | 291x1 @(1412,4166) | fill=#e7eaf0
+      - [4] | Frame | 291x16 @(1412,4183) | layout=H
+        - [13] | 内容 | 26x16 @(1412,4183) | fill=#667085 | font=Inter/Regular 13px | text="内容"
+        - [13] | 技术专项 | 52x16 @(1651,4183) | fill=#202124 | font=Inter/Semi Bold 13px | text="技术专项"
+    - [4] | Frame | 331x116 @(1392,4251) | layout=V gap=12
+      - [4] | Frame | 331x52 @(1392,4315) | stroke=#a80f1b w1 | r=26 | layout=H
+        - [13] | 返回首页 | 64x19 @(1526,4332) | fill=#a80f1b | font=Inter/Semi Bold 16px | text="返回首页"
+      - [4] | Frame | 331x52 @(1392,4251) | fill=#a80f1b | r=26 | layout=H | shadow=0,4,8,#a80f1b@0.20
+        - [13] | 查看训练日程 | 96x19 @(1510,4268) | fill=#ffffff | font=Inter/Semi Bold 16px | text="查看训练日程"
+  - [4] | TabIconsOverlay | 375x70 @(1370,4462) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1490,4522) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(1370,4462)
+      - [4] | icon_0 | 22x22 @(1422,4468)
+        - [6] | Vector | 17x16 @(1424,4472) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(1428,4470) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(1424,4477) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(1427,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1431,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1435,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1427,4484) | fill=#8e97a6
+      - [13] | 日程 | 117x14 @(1374,4493) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(1495,4462)
+      - [4] | icon_1 | 22x22 @(1546,4468)
+        - [6] | Vector | 18x10 @(1548,4475) | stroke=#8e97a6 w1.8
+        - [6] | Vector | 4x4 @(1562,4473) | stroke=#8e97a6 w1.8
+      - [13] | 成长 | 117x14 @(1499,4493) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="成长"
+    - [4] | tab_2 | 125x56 @(1620,4462)
+      - [4] | icon_2 | 22x22 @(1672,4468)
+        - [6] | Vector | 8x8 @(1678,4471) | stroke=#a80f1b w1.6
+        - [6] | Vector | 16x8 @(1674,4480) | stroke=#a80f1b w1.6
+      - [13] | 我的孩子 | 117x14 @(1624,4493) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="我的孩子"
+      - [9] | Ellipse | 4x4 @(1680,4510) | fill=#a80f1b

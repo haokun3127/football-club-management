@@ -1,0 +1,92 @@
+# Figma 画板规格: P1.1 Date Activity List
+
+- [4] | P1.1 Date Activity List | 375x812 @(80,1020) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(80,1020) | fill=#ffffff | layout=H pad=12/16 | shadow=0,2,8,#000000@0.03
+    - [4] | Back | 32x32 @(96,1048) | layout=V
+      - [4] | chevron-left | 20x20 @(102,1054)
+        - [6] | Vector | 5x10 @(110,1059) | stroke=#202124 w2
+    - [13] | 6月29日 星期六 | 123x21 @(206,1054) | fill=#202124 | font=Inter/Bold 17px | text="6月29日 星期六"
+    - [4] | Filter | 32x32 @(407,1048) | layout=V
+      - [4] | filter | 20x20 @(413,1054)
+        - [6] | Vector | 17x16 @(415,1056) | stroke=#202124 w2
+  - [4] | Content | 375x654 @(80,1108) | layout=V gap=24 pad=16/16
+    - [4] | Activity List | 343x508 @(96,1124) | layout=V gap=12
+      - [4] | Card | 343x118 @(96,1124) | fill=#ffffff | r=16 | layout=H gap=16 pad=16/16 | shadow=0,2,8,#000000@0.06
+        - [12] | Rectangle | 4x86 @(112,1140) | fill=#a80f1b | r=20
+        - [4] | Frame | 291x86 @(132,1140) | layout=V gap=8
+          - [4] | Frame | 291x21 @(132,1140) | layout=H
+            - [13] | 传球基础与 3v3 小场 | 238x19 @(132,1141) | fill=#202124 | font=Inter/Bold 16px | text="传球基础与 3v3 小场"
+            - [4] | Frame | 53x21 @(370,1140) | fill=#fee2e2 | r=999 | layout=H pad=4/10
+              - [13] | 进行中 | 33x13 @(380,1144) | fill=#a80f1b | font=Inter/Semi Bold 11px | text="进行中"
+          - [4] | Frame | 291x57 @(132,1169) | layout=V gap=4
+            - [13] | 18:30-20:00 | 82x17 @(132,1169) | fill=#667085 | font=Inter/Regular 14px | text="18:30-20:00"
+            - [4] | Frame | 291x17 @(132,1190) | layout=H gap=6
+              - [13] | U10精英队 · 嘉庆中心 3号场 | 271x17 @(152,1190) | fill=#667085 | font=Inter/Regular 14px | text="U10精英队 · 嘉庆中心 3号场"
+              - [4] | map-pin | 14x14 @(132,1192)
+                - [6] | Vector | 9x12 @(134,1193) | stroke=#667085 w2
+            - [13] | 教练：林教练 | 72x15 @(132,1211) | fill=#667085 | font=Inter/Regular 12px | text="教练：林教练"
+      - [4] | Card | 343x118 @(96,1254) | fill=#ffffff | r=16 | layout=H gap=16 pad=16/16 | shadow=0,2,8,#000000@0.06
+        - [12] | Rectangle | 4x86 @(112,1270) | fill=#1976d2 | r=20
+        - [4] | Frame | 291x86 @(132,1270) | layout=V gap=8
+          - [4] | Frame | 291x21 @(132,1270) | layout=H
+            - [13] | 周末联赛补赛 | 238x19 @(132,1271) | fill=#202124 | font=Inter/Bold 16px | text="周末联赛补赛"
+            - [4] | Frame | 53x21 @(370,1270) | fill=#fff3e0 | r=999 | layout=H pad=4/10
+              - [13] | 待确认 | 33x13 @(380,1274) | fill=#c2410c | font=Inter/Semi Bold 11px | text="待确认"
+          - [4] | Frame | 291x57 @(132,1299) | layout=V gap=4
+            - [13] | 16:00 | 37x17 @(132,1299) | fill=#667085 | font=Inter/Regular 14px | text="16:00"
+            - [4] | Frame | 291x17 @(132,1320) | layout=H gap=6
+              - [13] | 集合 · 九龙坡足球公园 | 271x17 @(152,1320) | fill=#667085 | font=Inter/Regular 14px | text="集合 · 九龙坡足球公园"
+              - [4] | map-pin | 14x14 @(132,1322)
+                - [6] | Vector | 9x12 @(134,1323) | stroke=#667085 w2
+            - [13] | 教练：林教练 | 72x15 @(132,1341) | fill=#667085 | font=Inter/Regular 12px | text="教练：林教练"
+      - [4] | Card | 343x118 @(96,1384) | fill=#ffffff | r=16 | layout=H gap=16 pad=16/16 | shadow=0,2,8,#000000@0.06
+        - [12] | Rectangle | 4x86 @(112,1400) | fill=#ff9800 | r=20
+        - [4] | Frame | 291x86 @(132,1400) | layout=V gap=8
+          - [4] | Frame | 291x21 @(132,1400) | layout=H
+            - [13] | 青训体测日 | 238x19 @(132,1401) | fill=#202124 | font=Inter/Bold 16px | text="青训体测日"
+            - [4] | Frame | 53x21 @(370,1400) | fill=#f3f4f6 | r=999 | layout=H pad=4/10
+              - [13] | 已结束 | 33x13 @(380,1404) | fill=#667085 | font=Inter/Semi Bold 11px | text="已结束"
+          - [4] | Frame | 291x57 @(132,1429) | layout=V gap=4
+            - [13] | 10:00-11:30 | 78x17 @(132,1429) | fill=#667085 | font=Inter/Regular 14px | text="10:00-11:30"
+            - [4] | Frame | 291x17 @(132,1450) | layout=H gap=6
+              - [13] | 室内训练馆 | 271x17 @(152,1450) | fill=#667085 | font=Inter/Regular 14px | text="室内训练馆"
+              - [4] | map-pin | 14x14 @(132,1452)
+                - [6] | Vector | 9x12 @(134,1453) | stroke=#667085 w2
+            - [13] | 教练：林教练 | 72x15 @(132,1471) | fill=#667085 | font=Inter/Regular 12px | text="教练：林教练"
+      - [4] | Card | 343x118 @(96,1514) | fill=#ffffff | r=16 | layout=H gap=16 pad=16/16 | shadow=0,2,8,#000000@0.06
+        - [12] | Rectangle | 4x86 @(112,1530) | fill=#ff9800 | r=20
+        - [4] | Frame | 291x86 @(132,1530) | layout=V gap=8
+          - [4] | Frame | 291x21 @(132,1530) | layout=H
+            - [13] | 家长会 | 238x19 @(132,1531) | fill=#202124 | font=Inter/Bold 16px | text="家长会"
+            - [4] | Frame | 53x21 @(370,1530) | fill=#f3f4f6 | r=999 | layout=H pad=4/10
+              - [13] | 已结束 | 33x13 @(380,1534) | fill=#667085 | font=Inter/Semi Bold 11px | text="已结束"
+          - [4] | Frame | 291x57 @(132,1559) | layout=V gap=4
+            - [13] | 昨天 19:00 | 69x17 @(132,1559) | fill=#667085 | font=Inter/Regular 14px | text="昨天 19:00"
+            - [4] | Frame | 291x17 @(132,1580) | layout=H gap=6
+              - [13] | 线上会议 | 271x17 @(152,1580) | fill=#667085 | font=Inter/Regular 14px | text="线上会议"
+              - [4] | map-pin | 14x14 @(132,1582)
+                - [6] | Vector | 9x12 @(134,1583) | stroke=#667085 w2
+            - [13] | 教练：林教练 | 72x15 @(132,1601) | fill=#667085 | font=Inter/Regular 12px | text="教练：林教练"
+  - [4] | TabIconsOverlay | 375x70 @(80,1762) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(200,1822) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(80,1762)
+      - [4] | icon_0 | 22x22 @(132,1768)
+        - [6] | Vector | 17x16 @(134,1772) | stroke=#a80f1b w1.6
+        - [6] | Vector | 8x4 @(138,1770) | fill=#000000 | stroke=#a80f1b w1.6
+        - [6] | Vector | 17x0 @(134,1777) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 3x3 @(137,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(141,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(145,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(137,1784) | fill=#a80f1b
+      - [13] | 日程 | 117x14 @(84,1793) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="日程"
+      - [9] | Ellipse | 4x4 @(140,1810) | fill=#a80f1b
+    - [4] | tab_1 | 125x56 @(205,1762)
+      - [4] | icon_1 | 22x22 @(256,1768)
+        - [6] | Vector | 18x10 @(258,1775) | stroke=#8e97a6 w1.8
+        - [6] | Vector | 4x4 @(272,1773) | stroke=#8e97a6 w1.8
+      - [13] | 成长 | 117x14 @(209,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="成长"
+    - [4] | tab_2 | 125x56 @(330,1762)
+      - [4] | icon_2 | 22x22 @(382,1768)
+        - [6] | Vector | 8x8 @(388,1771) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(384,1780) | stroke=#8e97a6 w1.6
+      - [13] | 我的孩子 | 117x14 @(334,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的孩子"

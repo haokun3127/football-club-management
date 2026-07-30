@@ -301,3 +301,15 @@ export interface ReminderItem {
     balance: number;
   };
 }
+
+export interface PrivateLessonRequest {
+  id: string;
+  studentId: string;
+  coachName: string;
+  date: string;
+  timeSlot: string;
+  goals: string[];
+  note?: string;
+  status: "pending" | "confirmed" | "declined" | "cancelled";
+  createdAt: string;
+}

@@ -299,6 +299,113 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
     },
   );
 
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+    };
+    Querystring: {
+      student?: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/parent/private-lessons",
+    {
+      schema: {
+        ...schemas.appClientParams,
+        ...schemas.appClientParentPrivateLessonsQuery,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "parent");
+      if (!client) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+      if (auth && !auth.membership.roles.includes("parent")) {
+        return context.sendError(reply, 403, "forbidden", "Parent role is required for this operation");
+      }
+
+      const students = await context.store.listOperationalStudents(request.params.clubId);
+      const childIds = new Set(
+        (auth
+          ? students.filter((student) => context.store.isGuardianOfStudent(request.params.clubId, auth.user.id, student.id))
+          : students
+        ).map((student) => student.id),
+      );
+      if (request.query.student && auth && !childIds.has(request.query.student)) {
+        return context.sendError(reply, 403, "forbidden", "Student is not a child of the authenticated guardian");
+      }
+
+      const requests = await context.store.listPrivateLessonRequests(request.params.clubId, request.query.student);
+      return {
+        clubId: request.params.clubId,
+        requests: requests.filter((item) => childIds.has(item.studentId)),
+      };
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+      clientId: string;
+    };
+    Body: {
+      studentId: string;
+      coachName: string;
+      date: string;
+      timeSlot: string;
+      goals: string[];
+      note?: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/parent/private-lessons",
+    {
+      schema: {
+        ...schemas.appClientParams,
+        ...schemas.appClientParentPrivateLessons,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "parent");
+      if (!client) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+      if (auth && !auth.membership.roles.includes("parent")) {
+        return context.sendError(reply, 403, "forbidden", "Parent role is required for this operation");
+      }
+      if (auth && !context.store.isGuardianOfStudent(request.params.clubId, auth.user.id, request.body.studentId)) {
+        return context.sendError(reply, 403, "forbidden", "Student is not a child of the authenticated guardian");
+      }
+
+      const created = await context.store.createPrivateLessonRequest(request.params.clubId, request.body.studentId, {
+        coachName: request.body.coachName,
+        date: request.body.date,
+        timeSlot: request.body.timeSlot,
+        goals: request.body.goals,
+        note: request.body.note,
+        requestedByUserId: auth?.user.id,
+      });
+      reply.code(201);
+      return {
+        clubId: request.params.clubId,
+        request: created,
+      };
+    },
+  );
+
   app.post<{
     Params: {
       clubId: string;

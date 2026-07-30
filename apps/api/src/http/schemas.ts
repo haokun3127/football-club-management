@@ -527,6 +527,37 @@ export const schemas = {
       404: errorResponse,
     },
   },
+  appClientParentPrivateLessonsQuery: {
+    querystring: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        student: { type: "string", minLength: 1 },
+      },
+    },
+  },
+  appClientParentPrivateLessons: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["studentId", "coachName", "date", "timeSlot", "goals"],
+      properties: {
+        studentId: { type: "string", minLength: 1 },
+        coachName: { type: "string", minLength: 1 },
+        date: { type: "string", pattern: "^\\d{4}-\\d{2}-\\d{2}$" },
+        timeSlot: { type: "string", minLength: 1 },
+        goals: { type: "array", minItems: 1, items: { type: "string", minLength: 1 } },
+        note: { type: "string", maxLength: 500 },
+      },
+    },
+    response: {
+      200: flexibleObject,
+      201: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
   appClientActivitySummaries: {
     response: {
       200: flexibleObject,

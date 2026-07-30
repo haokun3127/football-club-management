@@ -143,6 +143,16 @@ export function buildOpenApiDocument() {
           ...schemas.appClientParentReminders,
         }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/parent/private-lessons": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/private-lessons", {
+          ...schemas.appClientParams,
+          ...schemas.appClientParentPrivateLessonsQuery,
+        }),
+        post: operation("POST", "/clubs/{clubId}/app-clients/{clientId}/parent/private-lessons", {
+          ...schemas.appClientParams,
+          ...schemas.appClientParentPrivateLessons,
+        }),
+      },
       "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/activity-summaries": {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/activity-summaries", {
           ...schemas.appClientStudentParams,

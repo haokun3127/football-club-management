@@ -46,6 +46,7 @@ declare const wx: {
   removeStorageSync: (key: string) => void;
   switchTab: (options: { url: string }) => void;
   navigateTo: (options: { url: string }) => void;
+  redirectTo: (options: { url: string }) => void;
   navigateBack: (options?: { delta?: number }) => void;
   reLaunch: (options: { url: string; success?: WechatCallback<unknown>; fail?: WechatCallback<{ errMsg: string }> }) => void;
   showToast: (options: { title: string; icon?: "success" | "error" | "loading" | "none"; duration?: number }) => void;

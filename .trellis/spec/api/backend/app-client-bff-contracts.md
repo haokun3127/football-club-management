@@ -433,3 +433,30 @@ const role = body.roleHint;
 const identity = await connector.resolve(body.wxLoginCode, body.phoneCode);
 const auth = await membershipResolver.resolveByPhone(clubId, identity.phone);
 ```
+
+## Scenario: Parent Private Lesson Request
+
+### 1. Scope / Trigger
+
+- Trigger: parent mini-program private lesson booking form (Figma P9 / P9.1).
+- `POST /clubs/:clubId/app-clients/:clientId/parent/private-lessons`
+- `GET /clubs/:clubId/app-clients/:clientId/parent/private-lessons?student=<studentId>`
+
+### 2. Contracts
+
+- Guardian-scoped write: `studentId` in the body must resolve to a child of the authenticated guardian (same filter as `parent/children`). A request for an unrelated student is rejected, never silently re-targeted.
+- Body: `{ studentId, coachName, date, timeSlot, goals, note? }`. `date` is `YYYY-MM-DD`; `goals` is a non-empty string array from the client's fixed vocabulary; `coachName` is a display name (coach identity resolution is a follow-up).
+- Created requests are `pending` and returned in full; `201` on create. The BFF never confirms, prices, or schedules — coach confirmation is out of scope for this slice.
+- `GET` lists only the guardian's own children's requests, newest first; `student` query narrows to one child.
+- Storage: process-local seed-backed collection for this slice; durable persistence (SQLite repository) is a declared follow-up before production use.
+
+### 3. Validation & Error Matrix
+
+- Missing or inactive app client -> `404 not_found`.
+- Authenticated role not parent -> `403 forbidden`.
+- `studentId` not among the guardian's children -> `403 forbidden`.
+- Missing/invalid `studentId`, `coachName`, `date`, `timeSlot`, or empty `goals` -> `400 validation_failed`.
+
+### 4. Tests Required
+
+- Contract test asserts create returns `201` with `pending`, guardian scoping holds (other guardian's child -> `403`), validation errors -> `400`, coach role -> `403`, and `GET` never leaks another guardian's requests.
