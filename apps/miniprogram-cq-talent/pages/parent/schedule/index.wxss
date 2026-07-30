@@ -4,7 +4,7 @@
 .scope-block__label { margin-bottom: 12rpx; color: #667085; font-size: 22rpx; font-weight: 600; }
 .calendar-panel { margin-bottom: 24rpx; padding: 24rpx; border: 1rpx solid #e7eaf0; border-radius: 24rpx; background: #fff; }
 .calendar-panel__date { margin-bottom: 6rpx; color: #202124; font-size: 32rpx; font-weight: 700; }
-.calendar-button { padding: 12rpx 18rpx; border-radius: 999rpx; background: #fceeef; color: #a80f1b; font-size: 23rpx; font-weight: 600; }
+.calendar-button { padding: 12rpx 18rpx; border-radius: 999rpx; background: #fceeef; color: var(--color-brand); font-size: 23rpx; font-weight: 600; }
 
 .date-strip {
   width: 100%;
@@ -27,13 +27,13 @@
 }
 
 .date-chip.active {
-  border-color: #a80f1b;
+  border-color: var(--color-brand);
   background: #fceeef;
-  color: #a80f1b;
+  color: var(--color-brand);
   font-weight: 700;
 }
 .date-weekday { margin-bottom: 4rpx; color: #667085; font-size: 20rpx; }
-.date-chip.active .date-weekday { color: #a80f1b; }
+.date-chip.active .date-weekday { color: var(--color-brand); }
 
 .date-count {
   margin-top: 4rpx;
@@ -60,7 +60,7 @@
 
 .type-tab.active {
   background: #fceeef;
-  color: #a80f1b;
+  color: var(--color-brand);
   font-weight: 700;
 }
 

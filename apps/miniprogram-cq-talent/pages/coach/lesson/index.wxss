@@ -39,7 +39,7 @@
 
 .consume-toggle.on {
   background: #fceeef;
-  color: #a80f1b;
+  color: var(--color-brand);
 }
 
 .consume-toggle.off {

@@ -1,22 +1,6 @@
+@import "styles/tokens.wxss";
+
 page {
-  --color-brand: #a80f1b;
-  --color-brand-pressed: #7f0b14;
-  --color-brand-soft: #fceeef;
-  --color-page: #f6f7f9;
-  --color-card: #ffffff;
-  --color-line: #e7eaf0;
-  --color-text: #202124;
-  --color-text-secondary: #667085;
-  --color-success: #237804;
-  --color-success-soft: #f0fff4;
-  --color-warning: #ad6800;
-  --color-warning-soft: #fff7e6;
-  --color-error: #b42318;
-  --color-error-soft: #fff1f0;
-  --color-info: #175cd3;
-  --color-info-soft: #eff8ff;
-  --color-pending: #7a5af8;
-  --color-pending-soft: #f4f3ff;
   background: var(--color-page);
   color: var(--color-text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;

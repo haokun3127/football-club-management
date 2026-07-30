@@ -1,7 +1,7 @@
 .chip { display: inline-flex; align-items: center; justify-content: center; min-height: 44rpx; box-sizing: border-box; padding: 0 16rpx; border-radius: 999rpx; background: #f2f4f7; color: #667085; font-size: 22rpx; line-height: 1; }
 .chip--compact { min-height: 36rpx; padding: 0 12rpx; font-size: 20rpx; }
-.chip--brand { background: #fceeef; color: #a80f1b; }
-.chip--success { background: #f0fff4; color: #237804; }
+.chip--brand { background: #fceeef; color: var(--color-brand); }
+.chip--success { background: #f0fff4; color: var(--color-success); }
 .chip--warning { background: #fff7e6; color: #ad6800; }
 .chip--error { background: #fff1f0; color: #b42318; }
 .chip--info { background: #eff8ff; color: #175cd3; }

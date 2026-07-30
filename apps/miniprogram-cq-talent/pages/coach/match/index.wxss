@@ -74,7 +74,7 @@ button { margin-top: 20rpx; }
 
 .remove-action {
   min-width: 80rpx;
-  color: #a80f1b;
+  color: var(--color-brand);
   font-size: 24rpx;
   text-align: right;
 }

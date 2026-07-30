@@ -19,7 +19,7 @@
   padding: 10rpx 16rpx;
   border-radius: 999rpx;
   background: #fceeef;
-  color: #a80f1b;
+  color: var(--color-brand);
   font-size: 22rpx;
 }
 

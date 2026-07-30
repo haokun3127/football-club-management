@@ -36,10 +36,10 @@
 .switch-item.active,
 .filter-item.active {
   background: #ffffff;
-  color: #a80f1b;
+  color: var(--color-brand);
 }
 .filter-item.active {
-  background: #a80f1b;
+  background: var(--color-brand);
   color: #ffffff;
 }
 
@@ -59,7 +59,7 @@
 
 .summary-card.important {
   background: #fceeef;
-  color: #a80f1b;
+  color: var(--color-brand);
 }
 
 .summary-value {
@@ -74,7 +74,7 @@
 }
 
 .scope-line { display: flex; gap: 18rpx; margin-bottom: 20rpx; padding: 18rpx 20rpx; border: 1rpx solid #e7eaf0; border-radius: 18rpx; background: #fff; }
-.scope-line__label { flex: 0 0 auto; color: #a80f1b; font-size: 23rpx; font-weight: 700; }
+.scope-line__label { flex: 0 0 auto; color: var(--color-brand); font-size: 23rpx; font-weight: 700; }
 .scope-line__value { overflow: hidden; color: #667085; font-size: 23rpx; text-overflow: ellipsis; white-space: nowrap; }
 
 .filter-row {

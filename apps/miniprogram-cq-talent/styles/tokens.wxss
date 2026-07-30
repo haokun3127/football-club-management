@@ -1,0 +1,58 @@
+/**
+ * 重庆天才设计 Token 层
+ * 来源：Figma《重庆天才小程序 UIUX Design System》02 Tokens 分区
+ * 说明：色值经交接 PNG 像素级比对校准（2026-07-30）；
+ *       标注 ≈ 的值为近似值，待 Figma API 拉取 68 个变量后回填精确值。
+ * 消费方式：app.wxss 顶部 @import，页面/组件一律使用 var(--token)，禁止新增硬编码色值。
+ */
+
+page {
+  /* 品牌 */
+  --color-brand: #a80f1b;
+  --color-brand-pressed: #7f0b14;
+  --color-brand-soft: #fceeef;
+  --color-brand-rgb: 168, 15, 27; /* 供 rgba(var(--color-brand-rgb), .xx) 使用 */
+
+  /* 表面 */
+  --color-page: #f6f7f9;
+  --color-card: #ffffff;
+  --color-line: #e7eaf0;
+
+  /* 文本 */
+  --color-text: #202124;
+  --color-text-secondary: #667085;
+
+  /* 语义状态（≈ 为 Figma 取色近似值，待 API 校准） */
+  --color-success: #188050; /* ≈ Figma 青绿，替代旧 #237804 */
+  --color-success-soft: #f0fff4;
+  --color-warning: #ad6800;
+  --color-warning-soft: #fff7e6;
+  --color-error: #b42318;
+  --color-error-soft: #fff1f0;
+  --color-info: #175cd3;
+  --color-info-soft: #eff8ff;
+  --color-pending: #7a5af8;
+  --color-pending-soft: #f4f3ff;
+
+  /* 字号（rpx） */
+  --font-size-display: 36rpx;
+  --font-size-section: 30rpx;
+  --font-size-body: 28rpx;
+  --font-size-aux: 24rpx;
+  --font-size-caption: 22rpx;
+
+  /* 间距（rpx） */
+  --spacing-page: 24rpx;
+  --spacing-card: 24rpx;
+  --spacing-card-gap: 20rpx;
+  --spacing-stack: 16rpx;
+
+  /* 圆角（rpx） */
+  --radius-card: 24rpx;
+  --radius-button: 16rpx;
+  --radius-hero: 28rpx;
+
+  /* 阴影 */
+  --shadow-card: 0 8rpx 24rpx rgba(16, 24, 40, 0.04);
+  --shadow-hero: 0 18rpx 36rpx rgba(var(--color-brand-rgb), 0.16);
+}

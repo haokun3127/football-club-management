@@ -4,12 +4,12 @@
 .status--pending { border-color: #e9d7fe; background: #f4f3ff; }
 .status--error { border-color: #fecdca; background: #fff1f0; }
 .status--success { border-color: #abefc6; background: #f0fff4; }
-.status__spinner { width: 42rpx; height: 42rpx; margin-bottom: 20rpx; border: 5rpx solid rgba(168,15,27,.18); border-top-color: #a80f1b; border-radius: 50%; animation: spin .8s linear infinite; }
+.status__spinner { width: 42rpx; height: 42rpx; margin-bottom: 20rpx; border: 5rpx solid rgba(168,15,27,.18); border-top-color: var(--color-brand); border-radius: 50%; animation: spin .8s linear infinite; }
 .status__symbol { display: flex; align-items: center; justify-content: center; width: 56rpx; height: 56rpx; margin-bottom: 18rpx; border-radius: 50%; background: #f2f4f7; color: #667085; font-size: 32rpx; font-weight: 700; }
 .status--pending .status__symbol { background: #e9d7fe; color: #6941c6; }
 .status--error .status__symbol { background: #fecdca; color: #b42318; }
-.status--success .status__symbol { background: #abefc6; color: #237804; }
+.status--success .status__symbol { background: #abefc6; color: var(--color-success); }
 .status__title { color: #202124; font-size: 30rpx; font-weight: 700; }
 .status__message { margin-top: 12rpx; color: #667085; font-size: 24rpx; line-height: 1.55; }
-.status__action { min-width: 220rpx; min-height: 72rpx; margin-top: 24rpx; border-radius: 14rpx; background: #a80f1b; color: #ffffff; font-size: 26rpx; font-weight: 600; line-height: 72rpx; }
+.status__action { min-width: 220rpx; min-height: 72rpx; margin-top: 24rpx; border-radius: 14rpx; background: var(--color-brand); color: #ffffff; font-size: 26rpx; font-weight: 600; line-height: 72rpx; }
 @keyframes spin { to { transform: rotate(360deg); } }

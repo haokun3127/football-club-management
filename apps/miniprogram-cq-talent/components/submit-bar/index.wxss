@@ -2,6 +2,6 @@
 .submit-bar__hint { margin-bottom: 10rpx; color: #667085; font-size: 22rpx; text-align: center; }
 .submit-bar__actions { display: flex; gap: 16rpx; }
 .submit-bar__primary,.submit-bar__secondary { min-height: 84rpx; margin: 0; border-radius: 16rpx; font-size: 28rpx; font-weight: 600; line-height: 84rpx; }
-.submit-bar__primary { flex: 1; background: #a80f1b; color: #ffffff; }
+.submit-bar__primary { flex: 1; background: var(--color-brand); color: #ffffff; }
 .submit-bar__primary--disabled { background: #d0d5dd; color: #ffffff; }
 .submit-bar__secondary { width: 196rpx; border: 1rpx solid #e7eaf0; background: #ffffff; color: #202124; }

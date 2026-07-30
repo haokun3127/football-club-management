@@ -9,5 +9,5 @@
 .scope-card { position: relative; }
 .scope-card .tag { position: absolute; top: 22rpx; right: 22rpx; }
 .scope-card__teams { margin-top: 8rpx; line-height: 1.8; }
-.permission-card { border-top: 6rpx solid #a80f1b; }
+.permission-card { border-top: 6rpx solid var(--color-brand); }
 .service-card { background: #fff8f7; }
