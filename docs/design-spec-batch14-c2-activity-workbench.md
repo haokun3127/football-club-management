@@ -1,0 +1,115 @@
+# Figma 画板规格: C2 Activity Workbench
+
+- [4] | C2 Activity Workbench | 375x812 @(510,120) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(510,120) | fill=#ffffff | layout=H pad=14/22
+    - [4] | Nav Left | 146x27 @(532,150) | layout=H gap=12
+      - [4] | arrow-left | 24x24 @(532,152)
+        - [6] | Vector | 14x14 @(537,157) | stroke=#202124 w2
+      - [13] | 训练工作台 | 110x27 @(568,150) | fill=#202124 | font=Inter/Bold 22px | text="训练工作台"
+    - [13] | 结束训练 | 60x18 @(803,155) | fill=#a80f1b | font=Inter/Semi Bold 15px | text="结束训练"
+  - [4] | Content | 375x654 @(510,208) | layout=V gap=16 pad=16/22
+    - [4] | Session Header | 331x140 @(532,224) | fill=#07111f | r=16 | layout=V gap=12 pad=20/20 | shadow=0,8,16,#000000@0.25
+      - [4] | Frame | 291x39 @(552,244) | layout=V gap=4
+        - [13] | 技术专项训练 | 96x19 @(552,244) | fill=#ffffff | font=Inter/Semi Bold 16px | text="技术专项训练"
+        - [13] | 凤凰山U10精英队 · 2024-07-09 17:30 | 225x16 @(552,267) | fill=#ffffff@0.70 | font=Inter/Regular 13px | text="凤凰山U10精英队 · 2024-07-09 17:30"
+      - [4] | Frame | 291x63 @(552,295) | layout=H gap=8
+        - [4] | clock | 20x20 @(552,316)
+          - [6] | Vector | 17x17 @(554,318) | stroke=#ffffff w2
+        - [13] | 00:42:15 | 235x63 @(580,295) | fill=#ffffff | font=Inter/Extra Bold 52px | text="00:42:15"
+      - [4] | Frame | 291x23 @(552,370) | layout=H gap=12
+        - [4] | Frame | 104x23 @(552,370) | fill=#10b981@0.10 | r=6 | layout=H gap=6 pad=4/8
+          - [9] | Ellipse | 6x6 @(560,378) | fill=#10b981
+          - [13] | 出席 18/20 人 | 76x15 @(572,374) | fill=#10b981 | font=Inter/Semi Bold 12px | text="出席 18/20 人"
+        - [4] | Frame | 63x23 @(668,370) | fill=#e0e2e6 | r=6 | layout=H gap=6 pad=4/8
+          - [13] | 学分 0点 | 47x15 @(676,374) | fill=#667085 | font=Inter/Medium 12px | text="学分 0点"
+        - [4] | Frame | 64x23 @(743,370) | fill=#10b981@0.10 | r=6 | layout=H gap=6 pad=4/8
+          - [9] | Ellipse | 6x6 @(751,378) | fill=#10b981
+          - [13] | 进行中 | 36x15 @(763,374) | fill=#10b981 | font=Inter/Semi Bold 12px | text="进行中"
+    - [4] | Attendance Card | 331x120 @(532,380) | fill=#ffffff | r=12 | layout=V gap=16 pad=16/16 | shadow=0,2,4,#000000@0.05
+      - [4] | Frame | 299x17 @(548,396) | layout=H
+        - [13] | 出勤情况 18/20 | 99x17 @(548,396) | fill=#202124 | font=Inter/Semi Bold 14px | text="出勤情况 18/20"
+        - [13] | 查看详情 | 56x17 @(791,396) | fill=#a80f1b | font=Inter/Bold 14px | text="查看详情"
+      - [4] | Frame | 299x24 @(548,429) | layout=H gap=4
+        - [9] | Ellipse | 24x24 @(548,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(576,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(604,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(632,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(660,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(688,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(716,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(744,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(772,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(800,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(828,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(856,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(884,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(912,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(940,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(968,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(996,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(1024,429) | fill=#a80f1b | stroke=#ffffff w2
+        - [9] | Ellipse | 24x24 @(1052,429) | fill=#d1d5db
+        - [9] | Ellipse | 24x24 @(1080,429) | fill=#d1d5db
+        - [9] | Ellipse | 24x24 @(1108,429) | fill=#d1d5db
+      - [4] | Frame | 299x15 @(548,469) | layout=H
+        - [13] | 已加入: 陈X · 林X | 93x15 @(548,469) | fill=#667085 | font=Inter/Regular 12px | text="已加入: 陈X · 林X"
+    - [4] | Content Progress | 331x133 @(532,516) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,2,4,#000000@0.05
+      - [13] | 训练内容进度 | 84x17 @(548,532) | fill=#202124 | font=Inter/Semi Bold 14px | text="训练内容进度"
+      - [4] | Frame | 299x72 @(548,561) | layout=V gap=12
+        - [4] | Frame | 299x16 @(548,561) | layout=H
+          - [4] | Frame | 50x16 @(548,561) | layout=H gap=8
+            - [4] | check-circle | 16x16 @(548,561)
+              - [6] | Vector | 13x13 @(549,562) | stroke=#10b981 w2
+            - [13] | 热身 | 26x16 @(572,561) | fill=#202124 | font=Inter/Regular 13px | text="热身"
+          - [13] | 完成 | 24x15 @(823,562) | fill=#10b981 | font=Inter/Regular 12px | text="完成"
+        - [4] | Frame | 299x16 @(548,589) | layout=H
+          - [4] | Frame | 76x16 @(548,589) | layout=H gap=8
+            - [4] | activity | 16x16 @(548,589)
+              - [6] | Vector | 13x13 @(549,590) | stroke=#a80f1b w2
+            - [13] | 技术训练 | 52x16 @(572,589) | fill=#a80f1b | font=Inter/Semi Bold 13px | text="技术训练"
+          - [13] | 进行中 | 36x15 @(811,590) | fill=#a80f1b | font=Inter/Regular 12px | text="进行中"
+        - [4] | Frame | 299x16 @(548,617) | layout=H
+          - [4] | Frame | 76x16 @(548,617) | layout=H gap=8
+            - [4] | clock | 16x16 @(548,617)
+              - [6] | Vector | 13x13 @(549,618) | stroke=#667085 w2
+            - [13] | 对抗演练 | 52x16 @(572,617) | fill=#202124 | font=Inter/Regular 13px | text="对抗演练"
+          - [13] | 待开始 | 36x15 @(811,618) | fill=#667085 | font=Inter/Regular 12px | text="待开始"
+    - [4] | Quick Actions | 331x100 @(532,665) | layout=H gap=12
+      - [4] | Frame | 100x100 @(532,665) | fill=#ffffff | r=12 | layout=V gap=8 | shadow=0,2,4,#000000@0.05
+        - [4] | trophy | 28x28 @(568,690)
+          - [6] | Vector | 23x23 @(570,692) | stroke=#a80f1b w2
+        - [13] | 记录比分 | 48x15 @(558,726) | fill=#202124 | font=Inter/Medium 12px | text="记录比分"
+      - [4] | Frame | 100x100 @(644,665) | fill=#ffffff | r=12 | layout=V gap=8 | shadow=0,2,4,#000000@0.05
+        - [4] | star | 28x28 @(680,690)
+          - [6] | Vector | 23x22 @(682,692) | stroke=#a80f1b w2
+        - [13] | 课后评价 | 48x15 @(670,726) | fill=#202124 | font=Inter/Medium 12px | text="课后评价"
+      - [4] | Frame | 100x100 @(756,665) | fill=#ffffff | r=12 | layout=V gap=8 | shadow=0,2,4,#000000@0.05
+        - [4] | save | 28x28 @(792,690)
+          - [6] | Vector | 21x21 @(796,693) | stroke=#a80f1b w2
+        - [13] | 保存进度 | 48x15 @(782,726) | fill=#202124 | font=Inter/Medium 12px | text="保存进度"
+  - [4] | TabIconsOverlay | 375x70 @(510,862) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(630,922) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(510,862)
+      - [4] | icon_0 | 22x22 @(562,868)
+        - [6] | Vector | 17x16 @(564,872) | stroke=#a80f1b w1.6
+        - [6] | Vector | 8x4 @(568,870) | fill=#000000 | stroke=#a80f1b w1.6
+        - [6] | Vector | 17x0 @(564,877) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 3x3 @(567,880) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(571,880) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(575,880) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(567,884) | fill=#a80f1b
+      - [13] | 日程 | 121x14 @(512,893) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="日程"
+      - [9] | Ellipse | 4x4 @(570,910) | fill=#a80f1b
+    - [4] | tab_1 | 125x56 @(635,862)
+      - [4] | icon_1 | 22x22 @(686,868)
+        - [6] | Vector | 14x17 @(690,871) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 6x2 @(694,871) | stroke=#8e97a6 w1.4
+        - [6] | Vector | 8x0 @(694,878) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 8x0 @(694,882) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 5x0 @(694,885) | fill=#000000 | stroke=#8e97a6 w1.3
+      - [13] | 训练管理 | 121x14 @(637,893) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="训练管理"
+    - [4] | tab_2 | 125x56 @(760,862)
+      - [4] | icon_2 | 22x22 @(812,868)
+        - [6] | Vector | 8x8 @(818,871) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(814,880) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(762,893) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

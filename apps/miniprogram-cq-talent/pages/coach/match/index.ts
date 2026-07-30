@@ -56,6 +56,9 @@ Page({
     requireRole("coach");
     this.load(query?.id || "");
   },
+  goBack() {
+    wx.navigateBack();
+  },
   openTacticalBoard() {
     if (this.data.eventId) openPage(`/pages/coach/tactical-board/index?eventId=${this.data.eventId}`);
   },

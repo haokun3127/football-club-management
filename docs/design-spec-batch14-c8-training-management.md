@@ -1,0 +1,88 @@
+# Figma 画板规格: C8 Training Management
+
+- [4] | C8 Training Management | 375x812 @(80,2820) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | TopNav | 375x88 @(80,2820) | fill=#ffffff | layout=H pad=0/16
+    - [13] | 训练管理 | 80x24 @(96,2852) | fill=#202124 | font=Inter/Bold 20px | text="训练管理"
+  - [4] | HeroCard | 375x180 @(80,2908) | fill=#07111f | r=16 | layout=V gap=16 pad=20/20 | shadow=0,4,12,#000000@0.10
+    - [4] | StatsGrid | 335x140 @(100,2928) | layout=V gap=12
+      - [4] | Frame | 335x64 @(100,2928) | layout=H gap=12
+        - [4] | Frame | 162x64 @(100,2928) | fill=#ffffff@0.10 | r=12 | layout=V gap=2
+          - [13] | 累计课时 | 44x13 @(159,2936) | fill=#ffffff | font=Inter/Regular 11px | text="累计课时"
+          - [13] | 46 | 38x34 @(162,2950) | fill=#ffffff | font=Inter/Bold 28px | text="46"
+        - [4] | Frame | 162x64 @(274,2928) | fill=#ffffff@0.10 | r=12 | layout=V gap=2
+          - [13] | 平均出勤 | 44x13 @(332,2936) | fill=#ffffff | font=Inter/Regular 11px | text="平均出勤"
+          - [13] | 89% | 62x34 @(323,2950) | fill=#ffffff | font=Inter/Bold 28px | text="89%"
+      - [4] | Frame | 335x64 @(100,3004) | layout=H gap=12
+        - [4] | Frame | 162x64 @(100,3004) | fill=#ffffff@0.10 | r=12 | layout=V gap=2
+          - [13] | 在队人数 | 44x13 @(159,3012) | fill=#ffffff | font=Inter/Regular 11px | text="在队人数"
+          - [13] | 18 | 33x34 @(164,3026) | fill=#ffffff | font=Inter/Bold 28px | text="18"
+        - [4] | Frame | 162x64 @(274,3004) | fill=#ffffff@0.10 | r=12 | layout=V gap=2
+          - [13] | 本月比赛 | 44x13 @(332,3012) | fill=#ffffff | font=Inter/Regular 11px | text="本月比赛"
+          - [13] | 3 | 19x34 @(345,3026) | fill=#ffffff | font=Inter/Bold 28px | text="3"
+  - [4] | Tabs | 375x48 @(80,3088) | fill=#ffffff | stroke=#e7eaf0 w1 | layout=H gap=24 pad=0/24
+    - [4] | Frame | 93x23 @(104,3088) | layout=V gap=4
+      - [13] | 训练计划 | 56x17 @(123,3088) | fill=#a80f1b | font=Inter/Semi Bold 14px | text="训练计划"
+      - [12] | Rectangle | 24x2 @(138,3109) | fill=#a80f1b
+    - [4] | Frame | 93x23 @(221,3088) | layout=V gap=4
+      - [13] | 能力评估 | 56x17 @(240,3088) | fill=#667085 | font=Inter/Medium 14px | text="能力评估"
+      - [12] | Rectangle | 24x2 @(256,3109) | fill=#000000@0.00
+    - [4] | Frame | 93x23 @(338,3088) | layout=V gap=4
+      - [13] | 学员管理 | 56x17 @(357,3088) | fill=#667085 | font=Inter/Medium 14px | text="学员管理"
+      - [12] | Rectangle | 24x2 @(372,3109) | fill=#000000@0.00
+  - [4] | List | 375x426 @(80,3136) | layout=V gap=12 pad=16/22
+    - [4] | SessionCard | 331x114 @(102,3152) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+      - [4] | Frame | 299x21 @(118,3168) | layout=H
+        - [13] | U10精英队 训练 | 115x19 @(118,3169) | fill=#202124 | font=Inter/Semi Bold 16px | text="U10精英队 训练"
+        - [4] | Frame | 70x21 @(347,3168) | fill=#fceeef | r=4 | layout=H pad=4/8
+          - [13] | 明天 17:30 | 54x13 @(355,3172) | fill=#a80f1b | font=Inter/Semi Bold 11px | text="明天 17:30"
+      - [13] | 凤凰山B场 | 61x16 @(118,3201) | fill=#667085 | font=Inter/Regular 13px | text="凤凰山B场"
+      - [4] | Frame | 299x21 @(118,3229) | layout=H gap=8
+        - [4] | Frame | 49x21 @(118,3229) | fill=#ecfdf5 | r=4 | layout=H pad=4/8
+          - [13] | 已排定 | 33x13 @(126,3233) | fill=#10b981 | font=Inter/Semi Bold 11px | text="已排定"
+        - [13] | 20 人报到 | 50x13 @(175,3233) | fill=#667085 | font=Inter/Regular 11px | text="20 人报到"
+    - [4] | SessionCard | 331x114 @(102,3278) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+      - [4] | Frame | 299x21 @(118,3294) | layout=H
+        - [13] | U10精英队 训练 | 115x19 @(118,3295) | fill=#202124 | font=Inter/Semi Bold 16px | text="U10精英队 训练"
+        - [4] | Frame | 71x21 @(346,3294) | fill=#fceeef | r=4 | layout=H pad=4/8
+          - [13] | 周四 18:00 | 55x13 @(354,3298) | fill=#a80f1b | font=Inter/Semi Bold 11px | text="周四 18:00"
+      - [13] | 凤凰山A场 | 61x16 @(118,3327) | fill=#667085 | font=Inter/Regular 13px | text="凤凰山A场"
+      - [4] | Frame | 299x21 @(118,3355) | layout=H gap=8
+        - [4] | Frame | 49x21 @(118,3355) | fill=#fef3c7 | r=4 | layout=H pad=4/8
+          - [13] | 待确认 | 33x13 @(126,3359) | fill=#d97706 | font=Inter/Semi Bold 11px | text="待确认"
+        - [13] | 15 人报到 | 48x13 @(175,3359) | fill=#667085 | font=Inter/Regular 11px | text="15 人报到"
+    - [4] | SessionCard | 331x114 @(102,3404) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+      - [4] | Frame | 299x21 @(118,3420) | layout=H
+        - [13] | U10精英队 训练 | 115x19 @(118,3421) | fill=#202124 | font=Inter/Semi Bold 16px | text="U10精英队 训练"
+        - [4] | Frame | 74x21 @(343,3420) | fill=#fceeef | r=4 | layout=H pad=4/8
+          - [13] | 周六 09:00 | 58x13 @(351,3424) | fill=#a80f1b | font=Inter/Semi Bold 11px | text="周六 09:00"
+      - [13] | 星辰体育中心 | 78x16 @(118,3453) | fill=#667085 | font=Inter/Regular 13px | text="星辰体育中心"
+      - [4] | Frame | 299x21 @(118,3481) | layout=H gap=8
+        - [4] | Frame | 49x21 @(118,3481) | fill=#f3f4f6 | r=4 | layout=H pad=4/8
+          - [13] | 已结束 | 33x13 @(126,3485) | fill=#667085 | font=Inter/Semi Bold 11px | text="已结束"
+        - [13] | 18 人报到 | 48x13 @(175,3485) | fill=#667085 | font=Inter/Regular 11px | text="18 人报到"
+  - [4] | TabIconsOverlay | 375x70 @(80,3562) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(200,3622) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(80,3562)
+      - [4] | icon_0 | 22x22 @(132,3568)
+        - [6] | Vector | 17x16 @(134,3572) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(138,3570) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(134,3577) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(137,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(141,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(145,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(137,3584) | fill=#8e97a6
+      - [13] | 日程 | 121x14 @(82,3593) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(205,3562)
+      - [4] | icon_1 | 22x22 @(256,3568)
+        - [6] | Vector | 14x17 @(260,3571) | stroke=#a80f1b w1.6
+        - [6] | Vector | 6x2 @(264,3571) | stroke=#a80f1b w1.4
+        - [6] | Vector | 8x0 @(264,3578) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 8x0 @(264,3582) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 5x0 @(264,3585) | fill=#000000 | stroke=#a80f1b w1.3
+      - [13] | 训练管理 | 121x14 @(207,3593) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="训练管理"
+      - [9] | Ellipse | 4x4 @(266,3610) | fill=#a80f1b
+    - [4] | tab_2 | 125x56 @(330,3562)
+      - [4] | icon_2 | 22x22 @(382,3568)
+        - [6] | Vector | 8x8 @(388,3571) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(384,3580) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(332,3593) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

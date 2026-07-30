@@ -19,8 +19,14 @@ type CoachEventView = ScheduleEvent & {
   dateLabel: string;
   statusLabel: string;
   statusTone: string;
+  startTime: string;
+  durationText: string;
+  typeColor: string;
   meta: Array<{ label: string; value: string }>;
 };
+
+const TYPE_COLORS: Record<string, string> = { training: "#a80f1b", match: "#1a3a6b", other: "#6b7280" };
+const WEEK_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 Page({
   data: {
@@ -31,10 +37,16 @@ Page({
     events: [] as ScheduleEvent[],
     visibleEvents: [] as CoachEventView[],
     date: DEV_TEST_DATE,
+    selectedDate: DEV_TEST_DATE,
     viewMode: "day" as "day" | "week",
     activeFilter: "all" as Filter,
     filters,
     rangeLabel: "今日任务",
+    coachInitial: "教",
+    dayStrip: [] as Array<{ date: string; weekLabel: string; dayNum: string }>,
+    statTraining: "今日0节训练课",
+    statMatches: "0 场比赛",
+    statPending: 0,
   },
   onLoad() {
     this.load();
@@ -53,6 +65,12 @@ Page({
         teamsText: home.teams.length ? home.teams.join("、") : "暂无负责球队",
         events: home.events,
         rangeLabel: this.data.viewMode === "week" ? `${formatCalendarDate(this.data.date)}起 7 天` : formatCalendarDate(this.data.date),
+        coachInitial: (home.coachName ?? "教").slice(0, 1),
+        dayStrip: buildDayStrip(this.data.date),
+        selectedDate: this.data.date,
+        statTraining: `${this.data.viewMode === "week" ? "本周" : "今日"}${home.summary.training}节训练课`,
+        statMatches: `${home.summary.matches} 场比赛`,
+        statPending: home.summary.pending,
       });
       this.applyFilter();
     } catch (error) {
@@ -62,6 +80,15 @@ Page({
   onDateChange(event: { detail: { value: string } }) {
     this.setData({ date: event.detail.value });
     this.load();
+  },
+  selectDay(event: { currentTarget: { dataset: { date?: string } } }) {
+    const date = event.currentTarget.dataset.date;
+    if (!date) return;
+    this.setData({ date, viewMode: "day" });
+    this.load();
+  },
+  openMe() {
+    openPage("/pages/coach/me/index");
   },
   switchView(event: { currentTarget: { dataset: { mode?: "day" | "week" } } }) {
     const viewMode = event.currentTarget.dataset.mode;
@@ -115,11 +142,33 @@ function toCoachEventView(event: ScheduleEvent): CoachEventView {
     dateLabel: formatCalendarDate(event.startsAt),
     statusLabel: status.label,
     statusTone: status.tone,
+    startTime: event.startsAt?.slice(11, 16) || "待定",
+    durationText: durationLabel(event.startsAt, event.endsAt),
+    typeColor: TYPE_COLORS[event.type] ?? "#6b7280",
     meta: [
       event.teamName ? { label: "队伍", value: event.teamName } : null,
       event.participantCount ? { label: "名单", value: `${event.participantCount} 人` } : null,
     ].filter((item): item is { label: string; value: string } => Boolean(item)),
   };
+}
+
+function durationLabel(startsAt?: string, endsAt?: string) {
+  const start = Date.parse(startsAt ?? "");
+  const end = Date.parse(endsAt ?? "");
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return "时长待定";
+  return `${Math.round((end - start) / 60000)}分钟`;
+}
+
+function buildDayStrip(center: string) {
+  const base = new Date(`${center}T00:00:00.000Z`);
+  const mondayOffset = (base.getUTCDay() + 6) % 7;
+  base.setUTCDate(base.getUTCDate() - mondayOffset);
+  return Array.from({ length: 7 }, (_, index) => {
+    const day = new Date(base);
+    day.setUTCDate(base.getUTCDate() + index);
+    const date = day.toISOString().slice(0, 10);
+    return { date, weekLabel: WEEK_LABELS[day.getUTCDay()], dayNum: String(day.getUTCDate()) };
+  });
 }
 
 function addDays(date: string, amount: number) {

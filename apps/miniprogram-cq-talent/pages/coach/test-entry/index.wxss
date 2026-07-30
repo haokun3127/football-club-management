@@ -134,3 +134,12 @@
 .assessment-hero .title { color: #fff; }
 .assessment-hero__eyebrow { margin-bottom: 8rpx; color: rgba(255,255,255,.62); font-size: 18rpx; font-weight: 700; letter-spacing: 2rpx; }
 .assessment-hero__meta { margin-top: 8rpx; color: rgba(255,255,255,.72); font-size: 23rpx; }
+
+/* C12 Top Nav */
+.c12 { min-height: 100vh; background: #f6f7f9; }
+.c12-nav { display: flex; align-items: center; justify-content: space-between; height: 176rpx; padding: 28rpx 44rpx; background: #fceeef; }
+.c12-nav__left { display: flex; align-items: center; gap: 24rpx; }
+.c12-nav__back { color: #202124; font-size: 56rpx; font-weight: 300; line-height: 1; }
+.c12-nav__title { color: #202124; font-size: 44rpx; font-weight: 700; }
+.c12-nav__submit { color: #a80f1b; font-size: 30rpx; font-weight: 600; }
+.c12-body { padding-top: 32rpx; }

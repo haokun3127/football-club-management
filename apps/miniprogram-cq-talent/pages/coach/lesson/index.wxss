@@ -1,81 +1,36 @@
-.lesson-page { padding-bottom: calc(190rpx + env(safe-area-inset-bottom)); }
-.lesson-hero { margin-bottom: 20rpx; padding: 28rpx 24rpx; border-radius: 28rpx; background: linear-gradient(145deg,#8f0d18,#c41725); color: #fff; }
-.lesson-hero .title { color: #fff; }
-.lesson-hero__eyebrow { margin-bottom: 8rpx; color: rgba(255,255,255,.66); font-size: 18rpx; font-weight: 700; letter-spacing: 2rpx; }
-.lesson-hero__hint { margin-top: 10rpx; color: rgba(255,255,255,.76); font-size: 23rpx; }
-.lesson-list-card { padding-top: 18rpx; }
-.lesson-note-card { margin-bottom: 30rpx; }
+.c5 { min-height: 100vh; background: #f6f7f9; }
 
-.lesson-row {
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid #f0f0f0;
-}
+/* C5 Top Nav（粉底） */
+.c5-nav { display: flex; align-items: center; height: 176rpx; padding: 28rpx 44rpx; background: #fceeef; }
+.c5-nav__left { display: flex; align-items: center; gap: 24rpx; }
+.c5-nav__back { color: #202124; font-size: 56rpx; font-weight: 300; line-height: 1; }
+.c5-nav__title { color: #202124; font-size: 44rpx; font-weight: 700; }
 
-.lesson-row:last-child {
-  border-bottom: 0;
-}
+.c5-body { padding: 44rpx 44rpx calc(148rpx + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 40rpx; }
 
-.lesson-main {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20rpx;
-}
+/* C5 Activity Header */
+.c5-hero { display: flex; flex-direction: column; gap: 16rpx; padding: 40rpx; border-radius: 32rpx; background: #07111f; }
+.c5-hero__title { color: #ffffff; font-size: 36rpx; font-weight: 700; }
+.c5-hero__meta { color: rgba(255, 255, 255, 0.85); font-size: 26rpx; }
 
-.strong {
-  color: #1f2329;
-  font-weight: 700;
-}
+/* C5 Student List */
+.c5-list { border-radius: 24rpx; background: #ffffff; overflow: hidden; }
+.c5-list__head { display: flex; align-items: center; justify-content: space-between; padding: 32rpx; border-bottom: 1rpx solid #e7eaf0; }
+.c5-list__title { color: #202124; font-size: 28rpx; font-weight: 600; }
+.c5-list__count { color: #667085; font-size: 24rpx; }
+.c5-row { padding: 24rpx 32rpx; border-bottom: 1rpx solid #e7eaf0; }
+.c5-row:last-child { border-bottom: 0; }
+.c5-row__main { display: flex; align-items: center; gap: 24rpx; }
+.c5-row__avatar { width: 56rpx; height: 56rpx; border-radius: 28rpx; background: #f3f4f6; color: #202124; font-size: 22rpx; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.c5-row__info { flex: 1; min-width: 0; }
+.c5-row__name { color: #202124; font-size: 28rpx; }
+.c5-row__sub { color: #667085; font-size: 22rpx; margin-top: 4rpx; }
+.c5-chip { padding: 8rpx 20rpx; border-radius: 8rpx; background: #dcfce7; color: #22c55e; font-size: 24rpx; font-weight: 600; flex-shrink: 0; }
+.c5-chip--off { background: #f3f4f6; color: #9ca3af; }
 
-.consume-toggle {
-  min-width: 118rpx;
-  min-height: 56rpx;
-  padding: 0 16rpx;
-  border-radius: 999rpx;
-  font-size: 24rpx;
-  line-height: 56rpx;
-  text-align: center;
-}
-
-.consume-toggle.on {
-  background: #fceeef;
-  color: var(--color-brand);
-}
-
-.consume-toggle.off {
-  background: #fff7e6;
-  color: #ad6800;
-}
-
-.reason-input,
-.lesson-note {
-  width: 100%;
-  min-height: 68rpx;
-  margin-top: 14rpx;
-  box-sizing: border-box;
-  padding: 14rpx 16rpx;
-  border-radius: 14rpx;
-  background: #f7f8fa;
-  font-size: 24rpx;
-}
-
-.lesson-note {
-  min-height: 120rpx;
-}
-
-.correction-actions {
-  display: flex;
-  gap: 16rpx;
-  margin-top: 16rpx;
-}
-
-.correction-actions button {
-  margin-top: 0;
-}
-
-.lesson-correction-link {
-  margin-top: 20rpx;
-  font-size: 24rpx;
-  font-weight: 600;
-  color: var(--color-brand);
-}
+/* 保留共享类补充 */
+.reason-input { margin-top: 16rpx; padding: 14rpx 20rpx; border-radius: 12rpx; background: #f8f9fb; color: #202124; font-size: 24rpx; }
+.correction-actions { display: flex; gap: 16rpx; margin-top: 12rpx; }
+.card.lesson-note-card { padding: 32rpx; border-radius: 24rpx; background: #ffffff; display: flex; flex-direction: column; gap: 16rpx; }
+.lesson-note { min-height: 120rpx; padding: 20rpx; border-radius: 12rpx; background: #f8f9fb; font-size: 26rpx; }
+.lesson-correction-link { color: #a80f1b; font-size: 26rpx; font-weight: 600; }

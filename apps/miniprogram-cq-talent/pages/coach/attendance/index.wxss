@@ -1,64 +1,60 @@
-.attendance-page { min-height: 100vh; background: #f6f7f9; }
-.attendance-page__body { padding: 20rpx 24rpx 230rpx; }
-.event-head { padding: 24rpx 8rpx 28rpx; }
-.event-head__eyebrow { color: var(--color-brand); font-size: 22rpx; font-weight: 700; }
-.event-head__title { margin-top: 10rpx; color: #202124; font-size: 36rpx; font-weight: 750; line-height: 1.35; }
-.event-head__meta { margin-top: 10rpx; color: #667085; font-size: 23rpx; line-height: 1.5; }
-.summary-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14rpx; margin-bottom: 20rpx; }
-.summary-item { padding: 22rpx 12rpx; border: 1rpx solid #e7eaf0; border-radius: 20rpx; background: #ffffff; text-align: center; }
-.summary-item__value { color: #202124; font-size: 36rpx; font-weight: 750; }
-.summary-item__label { margin-top: 4rpx; color: #667085; font-size: 21rpx; }
-.summary-item--success .summary-item__value { color: var(--color-success); }
-.summary-item--warning .summary-item__value { color: #ad6800; }
-.roster-card { overflow: hidden; border: 1rpx solid #e7eaf0; border-radius: 24rpx; background: #ffffff; }
-.roster-head { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; padding: 26rpx 24rpx; border-bottom: 1rpx solid #e7eaf0; }
-.roster-head .section-title { margin-bottom: 5rpx; }
-.batch-button { flex-shrink: 0; min-height: 64rpx; margin: 0; padding: 0 22rpx; border: 1rpx solid var(--color-brand); border-radius: 14rpx; background: #ffffff; color: var(--color-brand); font-size: 24rpx; font-weight: 600; line-height: 62rpx; }
-.attendance-row { padding: 24rpx; border-bottom: 1rpx solid #f2f4f7; }
-.attendance-row:last-child { border-bottom: 0; }
-.attendance-main,.student-info { display: flex; align-items: center; }
-.attendance-main { justify-content: space-between; gap: 20rpx; }
-.student-info { min-width: 0; gap: 18rpx; }
-.student-avatar { display: flex; flex-shrink: 0; align-items: center; justify-content: center; width: 68rpx; height: 68rpx; border-radius: 50%; background: #fceeef; color: var(--color-brand); font-size: 26rpx; font-weight: 700; }
-.student-name { color: #202124; font-size: 27rpx; font-weight: 700; }
-.lesson-state { margin-top: 5rpx; color: #667085; font-size: 21rpx; }
-.note-input { width: 100%; min-height: 68rpx; margin-top: 16rpx; box-sizing: border-box; padding: 12rpx 18rpx; border-radius: 14rpx; background: #f6f7f9; color: #202124; font-size: 23rpx; }
+.c4 { min-height: 100vh; background: #f6f7f9; }
 
-/* C4.2 家长异议警示卡 */
-.correction-alert {
+/* C4 Top Nav（粉底） */
+.c4-nav { display: flex; align-items: center; justify-content: space-between; height: 176rpx; padding: 28rpx 44rpx; background: #fceeef; }
+.c4-nav__left { display: flex; align-items: center; gap: 24rpx; }
+.c4-nav__back { color: #202124; font-size: 56rpx; font-weight: 300; line-height: 1; }
+.c4-nav__title { color: #202124; font-size: 44rpx; font-weight: 700; }
+.c4-nav__submit { color: #a80f1b; font-size: 32rpx; font-weight: 600; }
+
+.c4-body { padding: 44rpx 44rpx calc(148rpx + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 32rpx; }
+
+/* C4 Session Header */
+.c4-hero {
   display: flex;
-  gap: 20rpx;
-  background: #fff3e0;
-  border: 1rpx solid #ff9800;
-  border-radius: 20rpx;
-  padding: 28rpx;
-  margin-bottom: 24rpx;
+  flex-direction: column;
+  gap: 24rpx;
+  padding: 40rpx;
+  border-radius: 32rpx;
+  background: #07111f;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.25);
 }
+.c4-hero__title { color: #ffffff; font-size: 36rpx; font-weight: 700; }
+.c4-hero__meta { color: rgba(255, 255, 255, 0.6); font-size: 26rpx; }
+.c4-hero__counts { display: flex; gap: 24rpx; }
+.c4-hero__count { display: flex; align-items: center; gap: 8rpx; color: #ffffff; font-size: 28rpx; font-weight: 600; }
+.c4-dot { width: 16rpx; height: 16rpx; border-radius: 50%; }
+.c4-dot--green { background: #188754; }
+.c4-dot--red { background: #a80f1b; }
+.c4-dot--gray { background: #667085; }
 
-.correction-alert__icon {
-  width: 72rpx;
-  height: 72rpx;
-  border-radius: 50%;
-  background: #ff9800;
-  color: #ffffff;
+/* C4 Quick Actions */
+.c4-actions { display: flex; gap: 24rpx; }
+.c4-action {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 40rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36rpx;
+  font-size: 28rpx;
+  font-weight: 600;
 }
+.c4-action--green { background: #e8f5e9; color: #188754; }
+.c4-action--outline { border: 2rpx solid #a80f1b; color: #a80f1b; }
 
-.correction-alert__texts {
-  flex: 1;
-}
+/* C4 异议警示卡 */
+.correction-alert { display: flex; gap: 20rpx; padding: 28rpx; border: 1rpx solid #fde68a; border-radius: 24rpx; background: #fffbeb; }
+.correction-alert__icon { color: #d97706; font-size: 36rpx; }
+.correction-alert__title { color: #92400e; font-size: 28rpx; font-weight: 700; }
+.correction-alert__text { color: #92400e; font-size: 24rpx; margin-top: 6rpx; }
 
-.correction-alert__title {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: #ff9800;
-}
-
-.correction-alert__text {
-  margin-top: 8rpx;
-  font-size: 24rpx;
-  color: var(--color-text-secondary);
-}
+/* C4 名单 */
+.roster-card { display: flex; flex-direction: column; gap: 20rpx; }
+.attendance-row { padding: 24rpx; border-radius: 16rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05); }
+.attendance-main { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; }
+.student-info { display: flex; align-items: center; gap: 20rpx; }
+.student-avatar { width: 72rpx; height: 72rpx; border-radius: 36rpx; background: #3b82f6; color: #ffffff; font-size: 26rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.student-name { color: #202124; font-size: 28rpx; font-weight: 700; }
+.lesson-state { color: #667085; font-size: 22rpx; margin-top: 4rpx; }
+.note-input { margin-top: 16rpx; padding: 14rpx 20rpx; border-radius: 12rpx; background: #f8f9fb; color: #202124; font-size: 24rpx; }

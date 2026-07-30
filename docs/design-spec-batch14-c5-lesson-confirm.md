@@ -1,0 +1,77 @@
+# Figma 画板规格: C5 Lesson Confirm
+
+- [4] | C5 Lesson Confirm | 375x812 @(940,1020) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(940,1020) | fill=#fceeef | layout=H pad=14/22
+    - [4] | Left | 124x27 @(962,1050) | layout=H gap=12
+      - [4] | arrow-left | 24x24 @(962,1052)
+        - [6] | Vector | 14x14 @(967,1057) | stroke=#202124 w2
+      - [13] | 课时确认 | 88x27 @(998,1050) | fill=#202124 | font=Inter/Bold 22px | text="课时确认"
+  - [4] | Content | 375x558 @(940,1108) | layout=V gap=20 pad=22/22
+    - [4] | Activity Header | 331x110 @(962,1130) | fill=#07111f | r=16 | layout=V gap=12 pad=20/20
+      - [13] | 技术专项训练 | 108x22 @(982,1150) | fill=#ffffff | font=Inter/Bold 18px | text="技术专项训练"
+      - [4] | Frame | 149x36 @(982,1184) | layout=V gap=4
+        - [13] | U10精英队 · 2025-07-09 | 149x16 @(982,1184) | fill=#ffffff | font=Inter/Regular 13px | text="U10精英队 · 2025-07-09"
+        - [13] | 17:30-19:00 (90分钟) | 129x16 @(982,1204) | fill=#ffffff | font=Inter/Regular 13px | text="17:30-19:00 (90分钟)"
+    - [4] | Student List | 331x349 @(962,1260) | fill=#ffffff | r=12 | layout=V
+      - [4] | Frame | 331x49 @(962,1260) | stroke=#e7eaf0 w1 | layout=H pad=16/16
+        - [13] | 学员课时记录 | 84x17 @(978,1276) | fill=#202124 | font=Inter/Semi Bold 14px | text="学员课时记录"
+        - [13] | 共 5 名学员 | 63x15 @(1214,1277) | fill=#667085 | font=Inter/Regular 12px | text="共 5 名学员"
+      - [4] | Frame | 331x60 @(962,1309) | stroke=#e7eaf0 w1 | layout=H gap=12 pad=16/16
+        - [4] | Frame | 28x28 @(978,1325) | fill=#f3f4f6 | r=14 | layout=V
+          - [13] | 陈 | 10x12 @(987,1333) | fill=#202124 | font=Inter/Semi Bold 10px | text="陈"
+        - [13] | 陈小宇 | 190x17 @(1018,1330) | fill=#202124 | font=Inter/Regular 14px | text="陈小宇"
+        - [4] | Frame | 57x23 @(1220,1328) | fill=#dcfce7 | r=4 | layout=H pad=4/8
+          - [13] | 1.5课时 | 41x15 @(1228,1332) | fill=#22c55e | font=Inter/Semi Bold 12px | text="1.5课时"
+      - [4] | Frame | 331x60 @(962,1369) | stroke=#e7eaf0 w1 | layout=H gap=12 pad=16/16
+        - [4] | Frame | 28x28 @(978,1385) | fill=#f3f4f6 | r=14 | layout=V
+          - [13] | 周 | 10x12 @(987,1393) | fill=#202124 | font=Inter/Semi Bold 10px | text="周"
+        - [13] | 周亦辰 | 190x17 @(1018,1390) | fill=#202124 | font=Inter/Regular 14px | text="周亦辰"
+        - [4] | Frame | 57x23 @(1220,1388) | fill=#dcfce7 | r=4 | layout=H pad=4/8
+          - [13] | 1.5课时 | 41x15 @(1228,1392) | fill=#22c55e | font=Inter/Semi Bold 12px | text="1.5课时"
+      - [4] | Frame | 331x60 @(962,1429) | stroke=#e7eaf0 w1 | layout=H gap=12 pad=16/16
+        - [4] | Frame | 28x28 @(978,1445) | fill=#f3f4f6 | r=14 | layout=V
+          - [13] | 何 | 10x12 @(987,1453) | fill=#202124 | font=Inter/Semi Bold 10px | text="何"
+        - [13] | 何沐阳 | 190x17 @(1018,1450) | fill=#202124 | font=Inter/Regular 14px | text="何沐阳"
+        - [4] | Frame | 57x23 @(1220,1448) | fill=#dcfce7 | r=4 | layout=H pad=4/8
+          - [13] | 1.5课时 | 41x15 @(1228,1452) | fill=#22c55e | font=Inter/Semi Bold 12px | text="1.5课时"
+      - [4] | Frame | 331x60 @(962,1489) | stroke=#e7eaf0 w1 | layout=H gap=12 pad=16/16
+        - [4] | Frame | 28x28 @(978,1505) | fill=#f3f4f6 | r=14 | layout=V
+          - [13] | 王 | 10x12 @(987,1513) | fill=#202124 | font=Inter/Semi Bold 10px | text="王"
+        - [13] | 王一涵 | 190x17 @(1018,1510) | fill=#202124 | font=Inter/Regular 14px | text="王一涵"
+        - [4] | Frame | 57x23 @(1220,1508) | fill=#dcfce7 | r=4 | layout=H pad=4/8
+          - [13] | 1.5课时 | 41x15 @(1228,1512) | fill=#22c55e | font=Inter/Semi Bold 12px | text="1.5课时"
+      - [4] | Frame | 331x60 @(962,1549) | layout=H gap=12 pad=16/16
+        - [4] | Frame | 28x28 @(978,1565) | fill=#f3f4f6 | r=14 | layout=V
+          - [13] | 林 | 10x12 @(987,1573) | fill=#202124 | font=Inter/Semi Bold 10px | text="林"
+        - [13] | 林子琪 | 190x17 @(1018,1570) | fill=#202124 | font=Inter/Regular 14px | text="林子琪"
+        - [4] | Frame | 57x23 @(1220,1568) | fill=#dcfce7 | r=4 | layout=H pad=4/8
+          - [13] | 1.5课时 | 41x15 @(1228,1572) | fill=#22c55e | font=Inter/Semi Bold 12px | text="1.5课时"
+  - [4] | Bottom Action | 375x96 @(940,1666) | fill=#f6f7f9 | layout=V pad=22/22
+    - [4] | Frame | 331x52 @(962,1688) | fill=#a80f1b | r=12 | layout=V
+      - [13] | 确认全部 | 64x19 @(1096,1704) | fill=#ffffff | font=Inter/Semi Bold 16px | text="确认全部"
+  - [4] | TabIconsOverlay | 375x70 @(940,1762) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1060,1822) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(940,1762)
+      - [4] | icon_0 | 22x22 @(992,1768)
+        - [6] | Vector | 17x16 @(994,1772) | stroke=#a80f1b w1.6
+        - [6] | Vector | 8x4 @(998,1770) | fill=#000000 | stroke=#a80f1b w1.6
+        - [6] | Vector | 17x0 @(994,1777) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 3x3 @(997,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1001,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1005,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(997,1784) | fill=#a80f1b
+      - [13] | 日程 | 121x14 @(942,1793) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="日程"
+      - [9] | Ellipse | 4x4 @(1000,1810) | fill=#a80f1b
+    - [4] | tab_1 | 125x56 @(1065,1762)
+      - [4] | icon_1 | 22x22 @(1116,1768)
+        - [6] | Vector | 14x17 @(1120,1771) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 6x2 @(1124,1771) | stroke=#8e97a6 w1.4
+        - [6] | Vector | 8x0 @(1124,1778) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 8x0 @(1124,1782) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 5x0 @(1124,1785) | fill=#000000 | stroke=#8e97a6 w1.3
+      - [13] | 训练管理 | 121x14 @(1067,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="训练管理"
+    - [4] | tab_2 | 125x56 @(1190,1762)
+      - [4] | icon_2 | 22x22 @(1242,1768)
+        - [6] | Vector | 8x8 @(1248,1771) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(1244,1780) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(1192,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

@@ -1,0 +1,83 @@
+# Figma 画板规格: C6 Match Entry
+
+- [4] | C6 Match Entry | 375x812 @(80,1920) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | TopNav | 375x88 @(80,1920) | fill=#fceeef | layout=H pad=0/16
+    - [4] | Left | 124x27 @(96,1950) | layout=H gap=12
+      - [4] | arrow-left | 24x24 @(96,1952)
+        - [6] | Vector | 14x14 @(101,1957) | stroke=#202124 w2
+      - [13] | 比赛记录 | 88x27 @(132,1950) | fill=#202124 | font=Inter/Bold 22px | text="比赛记录"
+  - [4] | Content | 375x654 @(80,2008) | layout=V gap=16 pad=16/16
+    - [4] | MatchHero | 343x155 @(96,2024) | fill=#07111f | r=16 | layout=V gap=20 pad=20/20 | shadow=0,4,12,#000000@0.10
+      - [13] | 周末联赛补赛 | 96x19 @(116,2044) | fill=#ffffff | font=Inter/Bold 16px | text="周末联赛补赛"
+      - [4] | Teams | 303x29 @(116,2083) | layout=H
+        - [13] | 凤凰山U10精英队 | 127x19 @(116,2088) | fill=#ffffff | font=Inter/Bold 16px | text="凤凰山U10精英队"
+        - [13] | 0:0 | 39x29 @(288,2083) | fill=#ffffff | font=Inter/Semi Bold 24px | text="0:0"
+        - [13] | 星辰队 | 48x19 @(371,2088) | fill=#ffffff | font=Inter/Bold 16px | text="星辰队"
+      - [4] | Periods | 303x27 @(116,2132) | layout=H gap=8
+        - [4] | Frame | 87x27 @(116,2132) | fill=#ffffff@0.10 | r=100 | layout=H gap=4 pad=6/12
+          - [13] | 上半场 | 36x15 @(128,2138) | fill=#ffffff | font=Inter/Regular 12px | text="上半场"
+          - [13] | 0-0 | 23x15 @(168,2138) | fill=#ffffff | font=Inter/Bold 12px | text="0-0"
+        - [4] | Frame | 87x27 @(211,2132) | fill=#ffffff@0.10 | r=100 | layout=H gap=4 pad=6/12
+          - [13] | 下半场 | 36x15 @(223,2138) | fill=#ffffff | font=Inter/Regular 12px | text="下半场"
+          - [13] | 0-0 | 23x15 @(263,2138) | fill=#ffffff | font=Inter/Bold 12px | text="0-0"
+    - [4] | EventsCard | 343x206 @(96,2195) | fill=#ffffff | r=12 | layout=V gap=16 pad=16/16 | shadow=0,2,8,#000000@0.05
+      - [4] | Header | 311x29 @(112,2211) | layout=H
+        - [13] | 比赛事件 | 56x17 @(112,2217) | fill=#202124 | font=Inter/Bold 14px | text="比赛事件"
+        - [4] | Frame | 90x29 @(333,2211) | stroke=#a80f1b w1 | r=4 | layout=H pad=6/12
+          - [13] | +添加事件 | 66x17 @(345,2217) | fill=#a80f1b | font=Inter/Semi Bold 14px | text="+添加事件"
+      - [4] | TimelineList | 311x129 @(112,2256) | layout=V gap=12
+        - [4] | EventRow | 311x36 @(112,2256) | layout=H gap=12
+          - [13] | 18分 | 28x16 @(112,2256) | fill=#202124 | font=Inter/Bold 13px | text="18分"
+          - [4] | Frame | 271x36 @(152,2256) | layout=V gap=2
+            - [4] | Frame | 79x19 @(152,2256) | layout=H gap=4
+              - [4] | Frame | 36x19 @(152,2256) | fill=#10b981@0.10 | r=4 | layout=H pad=2/6
+                - [13] | 进球 | 24x15 @(158,2258) | fill=#10b981 | font=Inter/Bold 12px | text="进球"
+              - [13] | 陈小宇 | 39x16 @(192,2258) | fill=#202124 | font=Inter/Regular 13px | text="陈小宇"
+            - [13] | 助攻: 李明辉 | 67x15 @(152,2277) | fill=#667085 | font=Inter/Regular 12px | text="助攻: 李明辉"
+        - [4] | EventRow | 311x19 @(112,2304) | layout=H gap=12
+          - [13] | 32分 | 30x16 @(112,2304) | fill=#202124 | font=Inter/Bold 13px | text="32分"
+          - [4] | Frame | 269x19 @(154,2304) | layout=V gap=2
+            - [4] | Frame | 66x19 @(154,2304) | layout=H gap=4
+              - [4] | Frame | 36x19 @(154,2304) | fill=#f59e0b@0.10 | r=4 | layout=H pad=2/6
+                - [13] | 黄牌 | 24x15 @(160,2306) | fill=#f59e0b | font=Inter/Bold 12px | text="黄牌"
+              - [13] | 张伟 | 26x16 @(194,2306) | fill=#202124 | font=Inter/Regular 13px | text="张伟"
+        - [4] | EventRow | 311x19 @(112,2335) | layout=H gap=12
+          - [13] | 54分 | 31x16 @(112,2335) | fill=#202124 | font=Inter/Bold 13px | text="54分"
+          - [4] | Frame | 268x19 @(155,2335) | layout=V gap=2
+            - [4] | Frame | 92x19 @(155,2335) | layout=H gap=4
+              - [4] | Frame | 36x19 @(155,2335) | fill=#a80f1b@0.10 | r=4 | layout=H pad=2/6
+                - [13] | 进球 | 24x15 @(161,2337) | fill=#a80f1b | font=Inter/Bold 12px | text="进球"
+              - [13] | 对方进球 | 52x16 @(195,2336) | fill=#202124 | font=Inter/Regular 13px | text="对方进球"
+        - [4] | EventRow | 311x19 @(112,2366) | layout=H gap=12
+          - [13] | 71分 | 28x16 @(112,2366) | fill=#202124 | font=Inter/Bold 13px | text="71分"
+          - [4] | Frame | 271x19 @(152,2366) | layout=V gap=2
+            - [4] | Frame | 79x19 @(152,2366) | layout=H gap=4
+              - [4] | Frame | 36x19 @(152,2366) | fill=#10b981@0.10 | r=4 | layout=H pad=2/6
+                - [13] | 进球 | 24x15 @(158,2368) | fill=#10b981 | font=Inter/Bold 12px | text="进球"
+              - [13] | 陈小宇 | 39x16 @(192,2368) | fill=#202124 | font=Inter/Regular 13px | text="陈小宇"
+  - [4] | TabIconsOverlay | 375x70 @(80,2662) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(200,2722) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(80,2662)
+      - [4] | icon_0 | 22x22 @(132,2668)
+        - [6] | Vector | 17x16 @(134,2672) | stroke=#a80f1b w1.6
+        - [6] | Vector | 8x4 @(138,2670) | fill=#000000 | stroke=#a80f1b w1.6
+        - [6] | Vector | 17x0 @(134,2677) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 3x3 @(137,2680) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(141,2680) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(145,2680) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(137,2684) | fill=#a80f1b
+      - [13] | 日程 | 121x14 @(82,2693) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="日程"
+      - [9] | Ellipse | 4x4 @(140,2710) | fill=#a80f1b
+    - [4] | tab_1 | 125x56 @(205,2662)
+      - [4] | icon_1 | 22x22 @(256,2668)
+        - [6] | Vector | 14x17 @(260,2671) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 6x2 @(264,2671) | stroke=#8e97a6 w1.4
+        - [6] | Vector | 8x0 @(264,2678) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 8x0 @(264,2682) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 5x0 @(264,2685) | fill=#000000 | stroke=#8e97a6 w1.3
+      - [13] | 训练管理 | 121x14 @(207,2693) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="训练管理"
+    - [4] | tab_2 | 125x56 @(330,2662)
+      - [4] | icon_2 | 22x22 @(382,2668)
+        - [6] | Vector | 8x8 @(388,2671) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(384,2680) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(332,2693) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

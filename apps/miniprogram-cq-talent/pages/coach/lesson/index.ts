@@ -14,10 +14,14 @@ Page({
     saving: false,
     correctingStudentId: "",
     lessonNote: "",
+    timeRangeLabel: "",
   },
   onLoad(query?: Record<string, string | undefined>) {
     requireRole("coach");
     this.load(query?.id || "");
+  },
+  goBack() {
+    wx.navigateBack();
   },
   async load(id: string) {
     try {
@@ -37,6 +41,7 @@ Page({
         },
         message: "",
         eventId: id,
+        timeRangeLabel: timeRangeLabel(workbench.event.startsAt, workbench.event.endsAt),
       });
     } catch (error) {
       this.setData({ state: "error", message: readableError(error) });
@@ -118,4 +123,12 @@ Page({
 function readableError(error: unknown) {
   const record = error as { message?: string; code?: string };
   return record?.message || record?.code || "销课名单读取失败。";
+}
+
+function timeRangeLabel(startsAt?: string, endsAt?: string) {
+  const start = Date.parse(startsAt ?? "");
+  const end = Date.parse(endsAt ?? "");
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return "时间待确认";
+  const minutes = Math.round((end - start) / 60000);
+  return `${(startsAt ?? "").slice(11, 16)}-${(endsAt ?? "").slice(11, 16)} (${minutes}分钟)`;
 }

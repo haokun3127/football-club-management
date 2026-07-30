@@ -1,8 +1,18 @@
-<app-header title="我的" subtitle="教练身份与工作范围" />
-<view class="page page-with-header coach-me">
-  <view class="coach-profile">
-    <view class="coach-profile__avatar">{{avatarLetter}}</view>
-    <view><view class="coach-profile__eyebrow">COACH PROFILE</view><view class="title">{{displayName}}</view><view class="coach-profile__meta">重庆天才足球俱乐部</view></view>
+<view class="c16">
+  <!-- C16 TopBar（粉底） -->
+  <view class="c16-bar">
+    <view class="c16-bar__title">我的</view>
+    <view class="c16-bar__settings" bindtap="openAccount">⚙</view>
+  </view>
+<view class="page coach-me c16-body">
+  <!-- C16 profile-hero -->
+  <view class="c16-hero">
+    <view class="c16-hero__avatar">{{avatarLetter}}</view>
+    <view class="c16-hero__info">
+      <view class="c16-hero__name">{{displayName}}</view>
+      <view class="c16-hero__meta">重庆天才足球俱乐部</view>
+      <view wx:if="{{home}}" class="c16-hero__teams">负责 {{home.teams.length}} 支球队</view>
+    </view>
   </view>
 
   <status-view
@@ -63,4 +73,5 @@
   </view>
 
   <role-tabbar role="coach" active="me" />
+</view>
 </view>

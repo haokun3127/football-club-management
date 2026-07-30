@@ -31,6 +31,9 @@ Page({
     this.setData({ eventId });
     this.load(query?.templateId || "assessment-template-cq-talent-elite", eventId);
   },
+  goBack() {
+    wx.navigateBack();
+  },
   async load(templateId: string, eventId: string) {
     try {
       const [form, workbench] = await Promise.all([

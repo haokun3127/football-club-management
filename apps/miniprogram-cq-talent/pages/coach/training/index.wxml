@@ -1,7 +1,33 @@
-<app-header title="训练内容" subtitle="选择项目并保存到当前活动" />
-<view class="page page-with-header training-page">
+<view class="c8">
+  <!-- C8 TopNav -->
+  <view class="c8-nav">
+    <view class="c8-nav__title">训练管理</view>
+  </view>
+<view class="page training-page c8-body">
 
   <status-view state="{{state}}" title="{{state === 'loading' ? '加载训练内容' : state === 'empty' ? '暂无训练活动' : '训练内容读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+
+  <!-- C8 HeroCard -->
+  <view wx:if="{{eventOptions.length}}" class="c8-hero">
+    <view class="c8-hero__grid">
+      <view class="c8-stat">
+        <view class="c8-stat__label">训练活动</view>
+        <view class="c8-stat__value">{{eventOptions.length}}</view>
+      </view>
+      <view class="c8-stat">
+        <view class="c8-stat__label">已选项目</view>
+        <view class="c8-stat__value">{{selectedProjects.length}}</view>
+      </view>
+      <view class="c8-stat">
+        <view class="c8-stat__label">项目库</view>
+        <view class="c8-stat__value">{{filteredGroups.length}} 组</view>
+      </view>
+      <view class="c8-stat">
+        <view class="c8-stat__label">负责队伍</view>
+        <view class="c8-stat__value">{{home ? home.teams.length : 0}} 支</view>
+      </view>
+    </view>
+  </view>
 
   <view wx:if="{{eventOptions.length}}" class="training-event-card">
     <view class="training-event-card__eyebrow">CURRENT SESSION</view>
@@ -44,4 +70,5 @@
 
   <role-tabbar role="coach" active="training" />
   <submit-bar wx:if="{{workbench}}" primary-text="保存训练内容" hint="已选 {{selectedProjects.length}} 项 · 保存到当前活动" loading="{{savingProjects}}" disabled="{{savingProjects}}" bindsubmit="saveProjects" />
+</view>
 </view>

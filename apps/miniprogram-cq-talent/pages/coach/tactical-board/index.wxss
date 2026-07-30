@@ -16,3 +16,11 @@
 .player__name { overflow: hidden; margin-top: 2rpx; color: #fff; font-size: 18rpx; font-weight: 650; text-shadow: 0 1rpx 4rpx rgba(0,0,0,.65); text-overflow: ellipsis; white-space: nowrap; }
 .bench-card { margin-top: 18rpx; padding: 20rpx; border: 1rpx solid #e7eaf0; border-radius: 20rpx; background: #fff; }
 .bench-card .section-title { margin-bottom: 0; }.bench-scroll { width: 100%; margin-top: 16rpx; white-space: nowrap; }.bench-row { display: inline-flex; gap: 18rpx; }.bench-player { width: 90rpx; color: #667085; font-size: 20rpx; text-align: center; }.bench-player__avatar { display: flex; align-items: center; justify-content: center; width: 58rpx; height: 58rpx; margin: 0 auto 6rpx; border-radius: 50%; background: #f2f4f7; color: #202124; font-weight: 700; }
+
+/* C7 TopNav */
+.c7 { min-height: 100vh; background: #f6f7f9; }
+.c7-nav { display: flex; align-items: center; justify-content: space-between; height: 176rpx; padding: 0 32rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
+.c7-nav__left { display: flex; align-items: center; gap: 24rpx; }
+.c7-nav__back { color: #202124; font-size: 56rpx; font-weight: 300; line-height: 1; }
+.c7-nav__title { color: #202124; font-size: 40rpx; font-weight: 700; }
+.c7-body { padding-top: 24rpx; }

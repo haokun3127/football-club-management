@@ -1,43 +1,69 @@
-<app-header title="教练任务" subtitle="按优先级完成训练与比赛工作" />
-<view class="page page-with-header coach-schedule">
-  <view class="range-card">
-    <view class="range-card__top">
-      <view>
-        <view class="range-card__eyebrow">{{viewMode === 'week' ? 'WEEKLY WORKBENCH' : 'TODAY WORKBENCH'}}</view>
-        <view class="range-card__title">{{rangeLabel}}</view>
+<view class="c1">
+  <!-- C1 Top Nav -->
+  <view class="c1-nav">
+    <view class="c1-nav__title">日程</view>
+    <view class="c1-nav__avatar" bindtap="openMe">{{coachInitial}}</view>
+  </view>
+
+  <!-- C1 Date Strip -->
+  <view class="c1-dates">
+    <view
+      wx:for="{{dayStrip}}"
+      wx:key="date"
+      class="c1-day {{selectedDate === item.date ? 'c1-day--selected' : ''}}"
+      data-date="{{item.date}}"
+      bindtap="selectDay"
+    >
+      <view class="c1-day__week">{{item.weekLabel}}</view>
+      <view class="c1-day__num">{{item.dayNum}}</view>
+    </view>
+  </view>
+
+  <!-- C1 Stats Row -->
+  <view class="c1-stats">
+    <view class="c1-pill c1-pill--brand">📅 {{statTraining}}</view>
+    <view class="c1-pill c1-pill--green">⚽ {{statMatches}}</view>
+    <view class="c1-pill c1-pill--amber">⚠️ 待处理{{statPending}}</view>
+  </view>
+
+  <view class="c1-body">
+    <view class="c1-tools">
+      <view class="view-switch">
+        <view class="switch-item {{viewMode === 'day' ? 'active' : ''}}" data-mode="day" bindtap="switchView">今日</view>
+        <view class="switch-item {{viewMode === 'week' ? 'active' : ''}}" data-mode="week" bindtap="switchView">本周</view>
       </view>
-      <view class="range-card__coach">{{home && home.coachName ? home.coachName : '教练工作台'}}</view>
+      <picker mode="date" value="{{date}}" bindchange="onDateChange">
+        <view class="c1-tools__picker">{{rangeLabel}} ⌄</view>
+      </picker>
     </view>
-    <picker mode="date" value="{{date}}" bindchange="onDateChange">
-      <view class="date-picker">选择起始日期 · {{date}}</view>
-    </picker>
-    <view class="view-switch">
-      <view class="switch-item {{viewMode === 'day' ? 'active' : ''}}" data-mode="day" bindtap="switchView">今日</view>
-      <view class="switch-item {{viewMode === 'week' ? 'active' : ''}}" data-mode="week" bindtap="switchView">本周</view>
+
+    <status-view state="{{state}}" title="{{state === 'loading' ? '加载任务' : state === 'empty' ? '暂无活动' : '任务读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+
+    <view wx:if="{{home}}" class="c1-scope">负责队伍 · {{teamsText}}</view>
+
+    <view wx:if="{{home}}" class="filter-row">
+      <view wx:for="{{filters}}" wx:key="value" class="filter-item {{activeFilter === item.value ? 'active' : ''}}" data-filter="{{item.value}}" bindtap="switchFilter">{{item.label}}</view>
     </view>
-  </view>
 
-  <status-view state="{{state}}" title="{{state === 'loading' ? '加载任务' : state === 'empty' ? '暂无活动' : '任务读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
-
-  <view wx:if="{{home}}" class="summary-grid">
-    <view class="summary-card"><view class="summary-value">{{home.summary.total}}</view><view class="summary-label">活动</view></view>
-    <view class="summary-card"><view class="summary-value">{{home.summary.training}}</view><view class="summary-label">训练</view></view>
-    <view class="summary-card"><view class="summary-value">{{home.summary.matches}}</view><view class="summary-label">比赛</view></view>
-    <view class="summary-card important"><view class="summary-value">{{home.summary.pending}}</view><view class="summary-label">待处理</view></view>
-  </view>
-
-  <view wx:if="{{home}}" class="scope-line">
-    <view class="scope-line__label">负责队伍</view>
-    <view class="scope-line__value">{{teamsText}}</view>
-  </view>
-
-  <view wx:if="{{home}}" class="filter-row">
-    <view wx:for="{{filters}}" wx:key="value" class="filter-item {{activeFilter === item.value ? 'active' : ''}}" data-filter="{{item.value}}" bindtap="switchFilter">{{item.label}}</view>
-  </view>
-
-  <view wx:if="{{state === 'ready'}}">
-    <activity-card wx:for="{{visibleEvents}}" wx:key="id" event-id="{{item.id}}" type="{{item.type}}" title="{{item.title}}" time="{{item.dateLabel}} · {{item.timeLabel}}" venue="{{item.venue}}" status-label="{{item.statusLabel}}" status-tone="{{item.statusTone}}" action="{{item.nextAction || 'view'}}" action-label="{{item.nextActionLabel || '查看活动'}}" meta="{{item.meta}}" bindopen="openEvent" bindaction="openTask" />
-    <view wx:if="{{!visibleEvents.length}}" class="card empty">当前筛选下没有任务</view>
+    <!-- C1 Activity Cards -->
+    <view wx:if="{{state === 'ready'}}" class="c1-list">
+      <view wx:for="{{visibleEvents}}" wx:key="id" class="acard" data-id="{{item.id}}" bindtap="openEvent">
+        <view class="acard__accent" style="background:{{item.typeColor}}"></view>
+        <view class="acard__time">
+          <view class="acard__start">{{item.startTime}}</view>
+          <view class="acard__dur">{{item.durationText}}</view>
+        </view>
+        <view class="acard__content">
+          <view class="acard__head">
+            <view class="acard__title">{{item.title}}</view>
+            <view class="acard__pill pill--{{item.statusTone}}">{{item.statusLabel}}</view>
+          </view>
+          <view class="acard__meta">{{item.teamName || '队伍待确认'}} · {{item.venue || '地点待确认'}}</view>
+          <view wx:if="{{item.nextAction && item.nextAction !== 'view'}}" class="acard__action" catchtap="openTask" data-id="{{item.id}}" data-action="{{item.nextAction}}">{{item.nextActionLabel}} ›</view>
+        </view>
+      </view>
+      <view wx:if="{{!visibleEvents.length}}" class="card empty">当前筛选下没有任务</view>
+    </view>
   </view>
 
   <role-tabbar role="coach" active="schedule" />

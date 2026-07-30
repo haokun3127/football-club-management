@@ -1,10 +1,17 @@
-<app-header title="比赛战术板" subtitle="阵型与首发位置" show-back="{{true}}" />
-<view class="board-page">
+<view class="c7">
+  <!-- C7 TopNav -->
+  <view class="c7-nav">
+    <view class="c7-nav__left" bindtap="goBack">
+      <view class="c7-nav__back">‹</view>
+      <view class="c7-nav__title">比赛战术板</view>
+    </view>
+    <status-chip label="{{readOnly ? '只读' : dirty ? '未保存' : '已保存'}}" tone="{{readOnly ? 'neutral' : dirty ? 'warning' : 'success'}}" compact="{{true}}" />
+  </view>
+<view class="board-page c7-body">
   <status-view state="{{state}}" title="{{state === 'loading' ? '加载战术板' : '暂时无法查看'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
   <view wx:if="{{state === 'ready'}}" class="board-body">
     <view class="board-head">
       <view><view class="board-head__eyebrow">MATCH TACTICS</view><view class="board-head__title">{{eventTitle}}</view></view>
-      <status-chip label="{{readOnly ? '只读' : dirty ? '未保存' : '已保存'}}" tone="{{readOnly ? 'neutral' : dirty ? 'warning' : 'success'}}" compact="{{true}}" />
     </view>
     <picker mode="selector" range="{{formations}}" range-key="label" value="{{formationIndex}}" bindchange="onFormationChange" disabled="{{readOnly}}">
       <view class="formation-picker">阵型 {{formations[formationIndex].label}}<text>⌄</text></view>
@@ -23,4 +30,5 @@
     </view>
   </view>
   <submit-bar wx:if="{{state === 'ready' && !readOnly}}" primary-text="保存战术板" secondary-text="重置阵型" hint="位置按屏幕比例保存" loading="{{saving}}" disabled="{{!dirty}}" bindsubmit="saveBoard" bindsecondary="resetBoard" />
+</view>
 </view>

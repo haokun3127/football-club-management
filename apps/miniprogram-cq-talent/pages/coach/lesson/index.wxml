@@ -1,56 +1,74 @@
-<app-header title="销课确认" subtitle="核对本次出勤与课时" show-back="{{true}}" />
-<view class="page page-with-header lesson-page">
-  <status-view state="{{state}}" title="销课确认" message="{{message}}" />
-  <view wx:if="{{workbench}}" class="lesson-hero">
-    <view class="lesson-hero__eyebrow">LESSON CONFIRMATION</view>
-    <view class="title">{{workbench.event.title}}</view>
-    <view class="lesson-hero__hint">默认按到课名单销课，只需处理例外学员</view>
-  </view>
-  <view wx:if="{{workbench}}" class="card lesson-list-card">
-    <view class="section-title">学员销课状态</view>
-    <view wx:for="{{workbench.roster}}" wx:key="studentId" class="lesson-row">
-      <view class="lesson-main">
-        <view>
-          <view class="label strong">{{item.name}}</view>
-          <view class="subtitle">剩余 {{item.remainingLessons === undefined ? '待核对' : item.remainingLessons + ' 课时'}}</view>
-        </view>
-        <view class="consume-toggle {{item.shouldConsume === false ? 'off' : 'on'}}" data-student-id="{{item.studentId}}" bindtap="toggleConsume">
-          {{item.shouldConsume === false ? '不销课' : '销课'}}
-        </view>
-      </view>
-      <input
-        wx:if="{{item.shouldConsume === false}}"
-        class="reason-input"
-        placeholder="填写不销课原因，如请假、免扣、未到场"
-        value="{{item.exceptionReason}}"
-        data-student-id="{{item.studentId}}"
-        bindinput="onReasonInput"
-      />
-      <view class="correction-actions">
-        <button
-          class="ghost-button mini-button"
-          loading="{{correctingStudentId === item.studentId}}"
-          disabled="{{!!correctingStudentId}}"
-          data-student-id="{{item.studentId}}"
-          data-delta="{{1}}"
-          bindtap="correctLesson"
-        >返还</button>
-        <button
-          class="ghost-button mini-button"
-          loading="{{correctingStudentId === item.studentId}}"
-          disabled="{{!!correctingStudentId}}"
-          data-student-id="{{item.studentId}}"
-          data-delta="{{-1}}"
-          bindtap="correctLesson"
-        >补扣</button>
-      </view>
+<view class="c5">
+  <!-- C5 Top Nav（粉底） -->
+  <view class="c5-nav">
+    <view class="c5-nav__left" bindtap="goBack">
+      <view class="c5-nav__back">‹</view>
+      <view class="c5-nav__title">课时确认</view>
     </view>
   </view>
-  <view wx:if="{{workbench}}" class="card lesson-note-card">
-    <view class="section-title">本次备注</view>
-    <view class="subtitle">确认前请检查不销课原因；返还或补扣会单独留痕。</view>
-    <textarea class="lesson-note" placeholder="本次销课备注，可选" value="{{lessonNote}}" bindinput="onLessonNoteInput" />
-    <view class="lesson-correction-link" bindtap="openLessonCorrection">课时更正（C5.1 设计稿流程）›</view>
+
+  <view class="c5-body">
+    <status-view state="{{state}}" title="销课确认" message="{{message}}" />
+
+    <!-- C5 Activity Header -->
+    <view wx:if="{{workbench}}" class="c5-hero">
+      <view class="c5-hero__title">{{workbench.event.title}}</view>
+      <view class="c5-hero__meta">{{workbench.event.teamName || '队伍待确认'}} · {{workbench.event.startsAt.slice(0, 10)}}</view>
+      <view class="c5-hero__meta">{{timeRangeLabel}}</view>
+    </view>
+
+    <!-- C5 Student List -->
+    <view wx:if="{{workbench}}" class="c5-list">
+      <view class="c5-list__head">
+        <view class="c5-list__title">学员课时记录</view>
+        <view class="c5-list__count">共 {{workbench.roster.length}} 名学员</view>
+      </view>
+      <view wx:for="{{workbench.roster}}" wx:key="studentId" class="c5-row">
+        <view class="c5-row__main">
+          <view class="c5-row__avatar">{{item.name.slice(0, 1)}}</view>
+          <view class="c5-row__info">
+            <view class="c5-row__name">{{item.name}}</view>
+            <view class="c5-row__sub">剩余 {{item.remainingLessons === undefined ? '待核对' : item.remainingLessons + ' 课时'}}</view>
+          </view>
+          <view class="c5-chip {{item.shouldConsume === false ? 'c5-chip--off' : ''}}" data-student-id="{{item.studentId}}" bindtap="toggleConsume">
+            {{item.shouldConsume === false ? '不销课' : '销课'}}
+          </view>
+        </view>
+        <input
+          wx:if="{{item.shouldConsume === false}}"
+          class="reason-input"
+          placeholder="填写不销课原因，如请假、免扣、未到场"
+          value="{{item.exceptionReason}}"
+          data-student-id="{{item.studentId}}"
+          bindinput="onReasonInput"
+        />
+        <view class="correction-actions">
+          <button
+            class="ghost-button mini-button"
+            loading="{{correctingStudentId === item.studentId}}"
+            disabled="{{!!correctingStudentId}}"
+            data-student-id="{{item.studentId}}"
+            data-delta="{{1}}"
+            bindtap="correctLesson"
+          >返还</button>
+          <button
+            class="ghost-button mini-button"
+            loading="{{correctingStudentId === item.studentId}}"
+            disabled="{{!!correctingStudentId}}"
+            data-student-id="{{item.studentId}}"
+            data-delta="{{-1}}"
+            bindtap="correctLesson"
+          >补扣</button>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{workbench}}" class="card lesson-note-card">
+      <view class="section-title">本次备注</view>
+      <view class="subtitle">确认前请检查不销课原因；返还或补扣会单独留痕。</view>
+      <textarea class="lesson-note" placeholder="本次销课备注，可选" value="{{lessonNote}}" bindinput="onLessonNoteInput" />
+      <view class="lesson-correction-link" bindtap="openLessonCorrection">课时更正（C5.1 设计稿流程）›</view>
+    </view>
   </view>
   <submit-bar wx:if="{{workbench}}" primary-text="确认销课" hint="{{workbench.roster.length}} 名学员 · 例外学员不会扣课" loading="{{saving}}" disabled="{{saving}}" bindsubmit="confirmLesson" />
 </view>

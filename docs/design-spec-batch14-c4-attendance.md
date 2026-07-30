@@ -1,0 +1,113 @@
+# Figma 画板规格: C4 Attendance
+
+- [4] | C4 Attendance | 375x812 @(1370,120) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(1370,120) | fill=#fceeef | layout=H pad=14/22
+    - [4] | Left | 124x27 @(1392,150) | layout=H gap=12
+      - [4] | chevron-left | 24x24 @(1392,152)
+        - [6] | Vector | 6x12 @(1401,158) | stroke=#202124 w2
+      - [13] | 出勤管理 | 88x27 @(1428,150) | fill=#202124 | font=Inter/Bold 22px | text="出勤管理"
+    - [13] | 提交 | 32x19 @(1691,154) | fill=#a80f1b | font=Inter/Semi Bold 16px | text="提交"
+  - [4] | Content | 375x654 @(1370,208) | layout=V gap=16 pad=22/22
+    - [4] | Session Header | 331x119 @(1392,230) | fill=#07111f | r=16 | layout=V gap=12 pad=20/20 | shadow=0,4,12,#000000@0.25
+      - [13] | 技术专项训练 | 108x22 @(1412,250) | fill=#ffffff | font=Inter/Bold 18px | text="技术专项训练"
+      - [13] | U10精英队 · 2025-07-09 17:30-19:00 | 226x16 @(1412,284) | fill=#ffffff@0.60 | font=Inter/Regular 13px | text="U10精英队 · 2025-07-09 17:30-19:00"
+      - [4] | Frame | 291x17 @(1412,312) | layout=H gap=12
+        - [4] | Frame | 62x17 @(1412,312) | layout=H gap=6
+          - [9] | Ellipse | 8x8 @(1412,316) | fill=#188754
+          - [13] | 出勤 18 | 48x17 @(1426,312) | fill=#ffffff | font=Inter/Semi Bold 14px | text="出勤 18"
+        - [4] | Frame | 55x17 @(1486,312) | layout=H gap=6
+          - [9] | Ellipse | 8x8 @(1486,316) | fill=#a80f1b
+          - [13] | 缺勤 2 | 41x17 @(1500,312) | fill=#ffffff | font=Inter/Semi Bold 14px | text="缺勤 2"
+        - [4] | Frame | 69x17 @(1553,312) | layout=H gap=6
+          - [9] | Ellipse | 8x8 @(1553,316) | fill=#667085
+          - [13] | 待确认 0 | 55x17 @(1567,312) | fill=#ffffff | font=Inter/Semi Bold 14px | text="待确认 0"
+    - [4] | Quick Actions | 331x40 @(1392,365) | layout=H gap=12
+      - [4] | Frame | 160x40 @(1392,365) | fill=#e8f5e9 | r=20 | layout=H
+        - [13] | 全员到场 | 56x17 @(1444,376) | fill=#188754 | font=Inter/Semi Bold 14px | text="全员到场"
+      - [4] | Frame | 160x40 @(1564,365) | stroke=#a80f1b w1 | r=20 | layout=H
+        - [13] | 清空 | 28x17 @(1629,376) | fill=#a80f1b | font=Inter/Semi Bold 14px | text="清空"
+    - [4] | List | 331x380 @(1392,421) | layout=V gap=12
+      - [4] | Frame | 331x60 @(1392,421) | fill=#ffffff | r=8 | layout=H gap=12 pad=12/12 | shadow=0,2,8,#000000@0.05
+        - [4] | Frame | 36x36 @(1404,433) | fill=#3b82f6 | r=18 | layout=V
+          - [13] | 陈 | 12x15 @(1416,444) | fill=#ffffff | font=Inter/Bold 12px | text="陈"
+        - [4] | Frame | 227x34 @(1452,434) | layout=V gap=2
+          - [13] | 陈小宇 | 42x17 @(1452,434) | fill=#202124 | font=Inter/Bold 14px | text="陈小宇"
+          - [13] | 前锋 | 24x15 @(1452,453) | fill=#667085 | font=Inter/Regular 12px | text="前锋"
+        - [4] | check-circle | 20x20 @(1691,441)
+          - [6] | Vector | 17x17 @(1693,443) | stroke=#188754 w2
+      - [4] | Frame | 331x60 @(1392,493) | fill=#ffffff | r=8 | layout=H gap=12 pad=12/12 | shadow=0,2,8,#000000@0.05
+        - [4] | Frame | 36x36 @(1404,505) | fill=#10b981 | r=18 | layout=V
+          - [13] | 林 | 12x15 @(1416,516) | fill=#ffffff | font=Inter/Bold 12px | text="林"
+        - [4] | Frame | 227x34 @(1452,506) | layout=V gap=2
+          - [13] | 林一诺 | 42x17 @(1452,506) | fill=#202124 | font=Inter/Bold 14px | text="林一诺"
+          - [13] | 中场 | 24x15 @(1452,525) | fill=#667085 | font=Inter/Regular 12px | text="中场"
+        - [4] | check-circle | 20x20 @(1691,513)
+          - [6] | Vector | 17x17 @(1693,515) | stroke=#188754 w2
+      - [4] | Frame | 331x60 @(1392,565) | fill=#ffffff | r=8 | layout=H gap=12 pad=12/12 | shadow=0,2,8,#000000@0.05
+        - [4] | Frame | 36x36 @(1404,577) | fill=#8b5cf6 | r=18 | layout=V
+          - [13] | 周 | 12x15 @(1416,588) | fill=#ffffff | font=Inter/Bold 12px | text="周"
+        - [4] | Frame | 227x34 @(1452,578) | layout=V gap=2
+          - [13] | 周亦辰 | 42x17 @(1452,578) | fill=#202124 | font=Inter/Bold 14px | text="周亦辰"
+          - [13] | 后卫 | 24x15 @(1452,597) | fill=#667085 | font=Inter/Regular 12px | text="后卫"
+        - [4] | check-circle | 20x20 @(1691,585)
+          - [6] | Vector | 17x17 @(1693,587) | stroke=#188754 w2
+      - [4] | Frame | 331x60 @(1392,637) | fill=#ffffff | r=8 | layout=H gap=12 pad=12/12 | shadow=0,2,8,#000000@0.05
+        - [4] | Frame | 36x36 @(1404,649) | fill=#f59e0b | r=18 | layout=V
+          - [13] | 王 | 12x15 @(1416,660) | fill=#ffffff | font=Inter/Bold 12px | text="王"
+        - [4] | Frame | 227x34 @(1452,650) | layout=V gap=2
+          - [13] | 王林教练 | 56x17 @(1452,650) | fill=#202124 | font=Inter/Bold 14px | text="王林教练"
+          - [13] | 教练 | 24x15 @(1452,669) | fill=#667085 | font=Inter/Regular 12px | text="教练"
+        - [4] | check-circle | 20x20 @(1691,657)
+          - [6] | Vector | 17x17 @(1693,659) | stroke=#188754 w2
+      - [4] | Frame | 331x60 @(1392,709) | fill=#ffffff | r=8 | layout=H gap=12 pad=12/12 | shadow=0,2,8,#000000@0.05
+        - [4] | Frame | 36x36 @(1404,721) | fill=#ef4444 | r=18 | layout=V
+          - [13] | 李 | 12x15 @(1416,732) | fill=#ffffff | font=Inter/Bold 12px | text="李"
+        - [4] | Frame | 227x34 @(1452,722) | layout=V gap=2
+          - [13] | 李明 | 28x17 @(1452,722) | fill=#202124 | font=Inter/Bold 14px | text="李明"
+          - [13] | 前锋 | 24x15 @(1452,741) | fill=#667085 | font=Inter/Regular 12px | text="前锋"
+        - [4] | check-circle | 20x20 @(1691,729)
+          - [6] | Vector | 17x17 @(1693,731) | stroke=#188754 w2
+      - [4] | Frame | 331x60 @(1392,781) | fill=#ffffff | r=8 | layout=H gap=12 pad=12/12 | shadow=0,2,8,#000000@0.05
+        - [4] | Frame | 36x36 @(1404,793) | fill=#3b82f6 | r=18 | layout=V
+          - [13] | 赵 | 12x15 @(1416,804) | fill=#ffffff | font=Inter/Bold 12px | text="赵"
+        - [4] | Frame | 227x34 @(1452,794) | layout=V gap=2
+          - [13] | 赵强 | 28x17 @(1452,794) | fill=#202124 | font=Inter/Bold 14px | text="赵强"
+          - [13] | 中场 | 24x15 @(1452,813) | fill=#667085 | font=Inter/Regular 12px | text="中场"
+        - [4] | check-circle | 20x20 @(1691,801)
+          - [6] | Vector | 17x17 @(1693,803) | stroke=#188754 w2
+      - [4] | Frame | 331x60 @(1392,853) | fill=#ffffff | r=8 | layout=H gap=12 pad=12/12 | shadow=0,2,8,#000000@0.05
+        - [4] | Frame | 36x36 @(1404,865) | fill=#10b981 | r=18 | layout=V
+          - [13] | 孙 | 12x15 @(1416,876) | fill=#ffffff | font=Inter/Bold 12px | text="孙"
+        - [4] | Frame | 227x34 @(1452,866) | layout=V gap=2
+          - [13] | 孙亮 | 28x17 @(1452,866) | fill=#202124 | font=Inter/Bold 14px | text="孙亮"
+          - [13] | 后卫 | 24x15 @(1452,885) | fill=#667085 | font=Inter/Regular 12px | text="后卫"
+        - [4] | check-circle | 20x20 @(1691,873)
+          - [6] | Vector | 17x17 @(1693,875) | stroke=#188754 w2
+    - [4] | Frame | 331x23 @(1392,817) | layout=H pad=8/0
+      - [13] | 共 20 名学员 | 70x15 @(1522,825) | fill=#667085 | font=Inter/Regular 12px | text="共 20 名学员"
+  - [4] | TabIconsOverlay | 375x70 @(1370,862) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1490,922) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(1370,862)
+      - [4] | icon_0 | 22x22 @(1422,868)
+        - [6] | Vector | 17x16 @(1424,872) | stroke=#a80f1b w1.6
+        - [6] | Vector | 8x4 @(1428,870) | fill=#000000 | stroke=#a80f1b w1.6
+        - [6] | Vector | 17x0 @(1424,877) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 3x3 @(1427,880) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1431,880) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1435,880) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1427,884) | fill=#a80f1b
+      - [13] | 日程 | 121x14 @(1372,893) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="日程"
+      - [9] | Ellipse | 4x4 @(1430,910) | fill=#a80f1b
+    - [4] | tab_1 | 125x56 @(1495,862)
+      - [4] | icon_1 | 22x22 @(1546,868)
+        - [6] | Vector | 14x17 @(1550,871) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 6x2 @(1554,871) | stroke=#8e97a6 w1.4
+        - [6] | Vector | 8x0 @(1554,878) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 8x0 @(1554,882) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 5x0 @(1554,885) | fill=#000000 | stroke=#8e97a6 w1.3
+      - [13] | 训练管理 | 121x14 @(1497,893) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="训练管理"
+    - [4] | tab_2 | 125x56 @(1620,862)
+      - [4] | icon_2 | 22x22 @(1672,868)
+        - [6] | Vector | 8x8 @(1678,871) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(1674,880) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(1622,893) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

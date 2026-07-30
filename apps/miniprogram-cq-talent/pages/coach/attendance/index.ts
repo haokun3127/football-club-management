@@ -22,7 +22,7 @@ Page({
     eventId: "",
     saving: false,
     statusOptions,
-    summary: { total: 0, present: 0, attention: 0 },
+    summary: { total: 0, present: 0, attention: 0, absent: 0, pendingCount: 0 },
     correctionMode: false,
     disputedCount: 0,
   },
@@ -45,6 +45,15 @@ Page({
   },
   retry() {
     this.load(this.data.eventId);
+  },
+  goBack() {
+    wx.navigateBack();
+  },
+  clearAll() {
+    const workbench = this.data.workbench;
+    if (!workbench) return;
+    const roster = withRosterUi(workbench.roster.map((student: RosterItem) => ({ ...student, status: "pending", note: "" })));
+    this.setData({ workbench: { ...workbench, roster }, summary: summarizeRoster(roster) });
   },
   markAllPresent() {
     const workbench = this.data.workbench;
@@ -109,5 +118,6 @@ function withRosterUi(roster: RosterItem[]): RosterUiItem[] {
 
 function summarizeRoster(roster: RosterItem[]) {
   const present = roster.filter((student) => student.status === "present").length;
-  return { total: roster.length, present, attention: roster.length - present };
+  const absent = roster.filter((student) => student.status === "absent" || student.status === "leave_requested").length;
+  return { total: roster.length, present, attention: roster.length - present, absent, pendingCount: roster.filter((student) => student.status === "pending").length };
 }

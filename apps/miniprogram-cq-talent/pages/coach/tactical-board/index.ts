@@ -35,6 +35,9 @@ Page<BoardPageData>({
     this.setData({ eventId });
     this.load();
   },
+  goBack() {
+    wx.navigateBack();
+  },
   async load() {
     if (!this.data.eventId) return this.setData({ state: "error", message: "请选择一场比赛后再打开战术板" });
     try {

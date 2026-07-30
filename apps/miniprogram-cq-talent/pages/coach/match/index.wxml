@@ -1,12 +1,27 @@
-<app-header title="比赛录入" subtitle="比分与球员关键事件" show-back="{{true}}" />
-<view class="page page-with-header match-page">
+<view class="c6">
+  <!-- C6 TopNav（粉底） -->
+  <view class="c6-nav">
+    <view class="c6-nav__left" bindtap="goBack">
+      <view class="c6-nav__back">‹</view>
+      <view class="c6-nav__title">比赛记录</view>
+    </view>
+  </view>
+
+  <view class="c6-body">
   <status-view state="{{state}}" title="比赛录入" message="{{message}}" />
-  <view wx:if="{{workbench}}" class="match-hero">
-    <view class="match-hero__eyebrow">MATCH RECORD</view>
-    <view class="title">{{workbench.event.title}}</view>
-    <view class="match-hero__score"><text>{{homeScore === '' ? '–' : homeScore}}</text><text class="match-hero__divider">:</text><text>{{awayScore === '' ? '–' : awayScore}}</text></view>
-    <view class="match-hero__opponent">{{opponentName || '对手待填写'}}</view>
-    <button class="match-hero__board" bindtap="openTacticalBoard">打开比赛战术板</button>
+  <!-- C6 MatchHero -->
+  <view wx:if="{{workbench}}" class="c6-hero">
+    <view class="c6-hero__title">{{workbench.event.title}}</view>
+    <view class="c6-hero__teams">
+      <view class="c6-hero__team">{{workbench.event.teamName || '本队'}}</view>
+      <view class="c6-hero__score">{{homeScore === '' ? '–' : homeScore}}:{{awayScore === '' ? '–' : awayScore}}</view>
+      <view class="c6-hero__team">{{opponentName || '对手待填写'}}</view>
+    </view>
+    <view class="c6-hero__periods">
+      <view class="c6-period">上半场 {{homeScore === '' ? '–' : homeScore}}-{{awayScore === '' ? '–' : awayScore}}</view>
+      <view class="c6-period">{{statuses[statusIndex].label}}</view>
+      <view class="c6-period c6-period--link" bindtap="openTacticalBoard">战术板 ›</view>
+    </view>
   </view>
   <view wx:if="{{workbench}}" class="card match-form-card">
     <view class="section-title">当前比赛摘要</view>
@@ -88,4 +103,5 @@
     <view class="subtitle">请确认比分和球员事件后保存；未选择助攻时不会生成助攻记录。</view>
   </view>
   <submit-bar wx:if="{{workbench}}" primary-text="{{savedFlash ? '已保存 ✓' : '保存比赛记录'}}" hint="未选择助攻时只记录进球" loading="{{saving}}" disabled="{{saving}}" bindsubmit="saveMatch" />
+  </view>
 </view>

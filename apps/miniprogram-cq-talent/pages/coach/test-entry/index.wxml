@@ -1,5 +1,13 @@
-<app-header title="整队评测" subtitle="按项目连续录入学员" show-back="{{true}}" />
-<view class="page page-with-header assessment-page">
+<view class="c12">
+  <!-- C12 Top Nav（粉底） -->
+  <view class="c12-nav">
+    <view class="c12-nav__left" bindtap="goBack">
+      <view class="c12-nav__back">‹</view>
+      <view class="c12-nav__title">项目评分录入</view>
+    </view>
+    <view class="c12-nav__submit" bindtap="submitAssessment">提交</view>
+  </view>
+<view class="page assessment-page c12-body">
   <status-view state="{{state}}" title="{{state === 'loading' ? '加载评测' : state === 'empty' ? '暂无学员' : '评测读取失败'}}" message="{{message}}" />
 
   <view wx:if="{{form}}" class="assessment-hero">
@@ -38,4 +46,5 @@
   </view>
 
   <submit-bar wx:if="{{form}}" primary-text="提交评测" hint="{{submitMessage || '输入已自动保存'}}" loading="{{saving}}" disabled="{{saving || !roster.length}}" bindsubmit="submitAssessment" />
+</view>
 </view>

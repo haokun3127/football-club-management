@@ -78,3 +78,14 @@ button {
 .training-event-card__eyebrow { margin-bottom: 8rpx; color: rgba(255,255,255,.62); font-size: 18rpx; font-weight: 700; letter-spacing: 2rpx; }
 .training-event-card .event-picker { background: rgba(255,255,255,.1); color: #fff; }
 .training-event-card .subtitle { color: rgba(255,255,255,.7); }
+
+/* C8 TopNav + HeroCard */
+.c8 { min-height: 100vh; background: #f6f7f9; }
+.c8-nav { display: flex; align-items: center; height: 176rpx; padding: 0 32rpx; background: #ffffff; }
+.c8-nav__title { color: #202124; font-size: 40rpx; font-weight: 700; }
+.c8-body { padding-top: 32rpx; }
+.c8-hero { padding: 40rpx; border-radius: 32rpx; background: #07111f; box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.1); }
+.c8-hero__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24rpx; }
+.c8-stat { display: flex; flex-direction: column; gap: 8rpx; align-items: center; padding: 20rpx; border-radius: 24rpx; background: rgba(255, 255, 255, 0.1); }
+.c8-stat__label { color: #ffffff; font-size: 22rpx; }
+.c8-stat__value { color: #ffffff; font-size: 52rpx; font-weight: 700; }

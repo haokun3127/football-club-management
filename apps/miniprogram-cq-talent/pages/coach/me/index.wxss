@@ -11,3 +11,16 @@
 .scope-card__teams { margin-top: 8rpx; line-height: 1.8; }
 .permission-card { border-top: 6rpx solid var(--color-brand); }
 .service-card { background: #fff8f7; }
+
+/* C16 TopBar + profile-hero */
+.c16 { min-height: 100vh; background: #f6f7f9; }
+.c16-bar { display: flex; align-items: center; justify-content: space-between; height: 176rpx; padding: 28rpx 44rpx; background: #fceeef; }
+.c16-bar__title { color: #202124; font-size: 44rpx; font-weight: 700; }
+.c16-bar__settings { color: #202124; font-size: 40rpx; }
+.c16-body { padding-top: 32rpx; }
+.c16-hero { display: flex; gap: 24rpx; padding: 40rpx; border-radius: 24rpx; background: #07111f; margin-bottom: 32rpx; }
+.c16-hero__avatar { width: 120rpx; height: 120rpx; border-radius: 60rpx; background: #a80f1b; color: #ffffff; font-size: 40rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.c16-hero__info { display: flex; flex-direction: column; gap: 8rpx; }
+.c16-hero__name { color: #ffffff; font-size: 40rpx; font-weight: 700; }
+.c16-hero__meta { color: rgba(255, 255, 255, 0.6); font-size: 26rpx; }
+.c16-hero__teams { margin-top: 8rpx; align-self: flex-start; padding: 6rpx 16rpx; border-radius: 8rpx; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 22rpx; }

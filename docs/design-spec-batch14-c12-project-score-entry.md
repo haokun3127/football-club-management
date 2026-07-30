@@ -1,0 +1,181 @@
+# Figma 画板规格: C12 Project Score Entry
+
+- [4] | C12 Project Score Entry | 375x812 @(510,3720) | fill=#f6f7f9 | r=28
+  - [4] | Top Nav | 375x88 @(510,3720) | fill=#fceeef | layout=H pad=14/22
+    - [4] | Frame | 168x27 @(532,3750) | layout=H gap=12
+      - [13] | 项目评分录入 | 132x27 @(568,3750) | fill=#202124 | font=Inter/Bold 22px | text="项目评分录入"
+      - [4] | arrow-left | 24x24 @(532,3752)
+        - [6] | Vector | 14x14 @(537,3757) | stroke=#202124 w2
+    - [13] | 提交 | 30x18 @(833,3755) | fill=#a80f1b | font=Inter/Semi Bold 15px | text="提交"
+  - [4] | Task Header | 331x96 @(532,3824) | fill=#07111f | r=16 | layout=V gap=8 pad=16/16
+    - [13] | 体能综合测评 | 108x22 @(548,3840) | fill=#ffffff | font=Inter/Bold 18px | text="体能综合测评"
+    - [13] | U10精英队 · 截止 2025-07-16 | 177x16 @(548,3870) | fill=#ffffff | font=Inter/Regular 13px | text="U10精英队 · 截止 2025-07-16"
+    - [4] | Frame | 150x21 @(548,3894) | layout=H gap=8
+      - [4] | Frame | 83x21 @(548,3894) | fill=#f8e231 | r=4 | layout=H pad=4/8
+        - [13] | 12/20 已完成 | 67x13 @(556,3898) | fill=#07111f | font=Inter/Semi Bold 11px | text="12/20 已完成"
+      - [4] | Frame | 59x21 @(639,3894) | fill=#fceeef | r=4 | layout=H pad=4/8
+        - [13] | 8 待录入 | 43x13 @(647,3898) | fill=#a80f1b | font=Inter/Semi Bold 11px | text="8 待录入"
+  - [4] | Student List | 331x522 @(532,3940) | layout=V gap=12
+    - [13] | 待录入学员 | 70x17 @(532,3940) | fill=#202124 | font=Inter/Semi Bold 14px | text="待录入学员"
+    - [4] | Frame | 331x75 @(532,3969) | fill=#ffffff | r=12 | layout=H gap=12 pad=12/12
+      - [4] | Frame | 32x32 @(544,3990) | fill=#f3f4f6 | r=16 | layout=H
+        - [13] | 陈 | 12x15 @(554,3999) | fill=#667085 | font=Inter/Semi Bold 12px | text="陈"
+      - [13] | 陈小宇 | 1x51 @(588,3981) | fill=#202124 | font=Inter/Semi Bold 14px | text="陈小宇"
+      - [4] | Frame | 356x32 @(601,3990) | layout=H gap=16
+        - [4] | Frame | 68x32 @(601,3990) | layout=H gap=4
+          - [13] | 速度 | 24x15 @(601,3999) | fill=#667085 | font=Inter/Regular 12px | text="速度"
+          - [4] | Frame | 40x32 @(629,3990) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 8.5 | 21x17 @(638,3998) | fill=#202124 | font=Inter/Regular 14px | text="8.5"
+        - [4] | Frame | 68x32 @(685,3990) | layout=H gap=4
+          - [13] | 耐力 | 24x15 @(685,3999) | fill=#667085 | font=Inter/Regular 12px | text="耐力"
+          - [4] | Frame | 40x32 @(713,3990) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 7.2 | 19x17 @(724,3998) | fill=#202124 | font=Inter/Regular 14px | text="7.2"
+        - [4] | Frame | 68x32 @(769,3990) | layout=H gap=4
+          - [13] | 力量 | 24x15 @(769,3999) | fill=#667085 | font=Inter/Regular 12px | text="力量"
+          - [4] | Frame | 40x32 @(797,3990) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 6.8 | 21x17 @(806,3998) | fill=#202124 | font=Inter/Regular 14px | text="6.8"
+        - [4] | Frame | 68x32 @(853,3990) | layout=H gap=4
+          - [13] | 协调 | 24x15 @(853,3999) | fill=#667085 | font=Inter/Regular 12px | text="协调"
+          - [4] | Frame | 40x32 @(881,3990) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 8.1 | 18x17 @(892,3998) | fill=#202124 | font=Inter/Regular 14px | text="8.1"
+        - [13] | 7.9 | 20x17 @(937,3998) | fill=#a80f1b | font=Inter/Bold 14px | text="7.9"
+    - [4] | Frame | 331x75 @(532,4056) | fill=#ffffff | r=12 | layout=H gap=12 pad=12/12
+      - [4] | Frame | 32x32 @(544,4078) | fill=#f3f4f6 | r=16 | layout=H
+        - [13] | 林 | 12x15 @(554,4086) | fill=#667085 | font=Inter/Semi Bold 12px | text="林"
+      - [13] | 林一诺 | 1x51 @(588,4068) | fill=#202124 | font=Inter/Semi Bold 14px | text="林一诺"
+      - [4] | Frame | 359x32 @(601,4078) | layout=H gap=16
+        - [4] | Frame | 68x32 @(601,4078) | layout=H gap=4
+          - [13] | 速度 | 24x15 @(601,4086) | fill=#667085 | font=Inter/Regular 12px | text="速度"
+          - [4] | Frame | 40x32 @(629,4078) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 8.8 | 21x17 @(638,4085) | fill=#202124 | font=Inter/Regular 14px | text="8.8"
+        - [4] | Frame | 68x32 @(685,4078) | layout=H gap=4
+          - [13] | 耐力 | 24x15 @(685,4086) | fill=#667085 | font=Inter/Regular 12px | text="耐力"
+          - [4] | Frame | 40x32 @(713,4078) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 8.5 | 21x17 @(722,4085) | fill=#202124 | font=Inter/Regular 14px | text="8.5"
+        - [4] | Frame | 68x32 @(769,4078) | layout=H gap=4
+          - [13] | 力量 | 24x15 @(769,4086) | fill=#667085 | font=Inter/Regular 12px | text="力量"
+          - [4] | Frame | 40x32 @(797,4078) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 7.4 | 20x17 @(807,4085) | fill=#202124 | font=Inter/Regular 14px | text="7.4"
+        - [4] | Frame | 68x32 @(853,4078) | layout=H gap=4
+          - [13] | 协调 | 24x15 @(853,4086) | fill=#667085 | font=Inter/Regular 12px | text="协调"
+          - [4] | Frame | 40x32 @(881,4078) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 8.9 | 21x17 @(890,4085) | fill=#202124 | font=Inter/Regular 14px | text="8.9"
+        - [13] | 8.4 | 23x17 @(937,4085) | fill=#a80f1b | font=Inter/Bold 14px | text="8.4"
+    - [4] | Frame | 331x75 @(532,4143) | fill=#ffffff | r=12 | layout=H gap=12 pad=12/12
+      - [4] | Frame | 32x32 @(544,4164) | fill=#f3f4f6 | r=16 | layout=H
+        - [13] | 周 | 12x15 @(554,4173) | fill=#667085 | font=Inter/Semi Bold 12px | text="周"
+      - [13] | 周亦辰 | 1x51 @(588,4155) | fill=#202124 | font=Inter/Semi Bold 14px | text="周亦辰"
+      - [4] | Frame | 356x32 @(601,4164) | layout=H gap=16
+        - [4] | Frame | 68x32 @(601,4164) | layout=H gap=4
+          - [13] | 速度 | 24x15 @(601,4173) | fill=#667085 | font=Inter/Regular 12px | text="速度"
+          - [4] | Frame | 40x32 @(629,4164) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 7.9 | 19x17 @(640,4172) | fill=#202124 | font=Inter/Regular 14px | text="7.9"
+        - [4] | Frame | 68x32 @(685,4164) | layout=H gap=4
+          - [13] | 耐力 | 24x15 @(685,4173) | fill=#667085 | font=Inter/Regular 12px | text="耐力"
+          - [4] | Frame | 40x32 @(713,4164) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 7.1 | 16x17 @(725,4172) | fill=#202124 | font=Inter/Regular 14px | text="7.1"
+        - [4] | Frame | 68x32 @(769,4164) | layout=H gap=4
+          - [13] | 力量 | 24x15 @(769,4173) | fill=#667085 | font=Inter/Regular 12px | text="力量"
+          - [4] | Frame | 40x32 @(797,4164) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 6.5 | 21x17 @(806,4172) | fill=#202124 | font=Inter/Regular 14px | text="6.5"
+        - [4] | Frame | 68x32 @(853,4164) | layout=H gap=4
+          - [13] | 协调 | 24x15 @(853,4173) | fill=#667085 | font=Inter/Regular 12px | text="协调"
+          - [4] | Frame | 40x32 @(881,4164) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 7.8 | 19x17 @(892,4172) | fill=#202124 | font=Inter/Regular 14px | text="7.8"
+        - [13] | 7.6 | 20x17 @(937,4172) | fill=#a80f1b | font=Inter/Bold 14px | text="7.6"
+    - [4] | Frame | 331x75 @(532,4230) | fill=#ffffff | r=12 | layout=H gap=12 pad=12/12
+      - [4] | Frame | 32x32 @(544,4252) | fill=#f3f4f6 | r=16 | layout=H
+        - [13] | 王 | 12x15 @(554,4260) | fill=#667085 | font=Inter/Semi Bold 12px | text="王"
+      - [13] | 王雨涵 | 1x51 @(588,4242) | fill=#202124 | font=Inter/Semi Bold 14px | text="王雨涵"
+      - [4] | Frame | 355x32 @(601,4252) | layout=H gap=16
+        - [4] | Frame | 68x32 @(601,4252) | layout=H gap=4
+          - [13] | 速度 | 24x15 @(601,4260) | fill=#667085 | font=Inter/Regular 12px | text="速度"
+          - [4] | Frame | 40x32 @(629,4252) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 8.2 | 21x17 @(638,4259) | fill=#202124 | font=Inter/Regular 14px | text="8.2"
+        - [4] | Frame | 68x32 @(685,4252) | layout=H gap=4
+          - [13] | 耐力 | 24x15 @(685,4260) | fill=#667085 | font=Inter/Regular 12px | text="耐力"
+          - [4] | Frame | 40x32 @(713,4252) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 8.0 | 21x17 @(722,4259) | fill=#202124 | font=Inter/Regular 14px | text="8.0"
+        - [4] | Frame | 68x32 @(769,4252) | layout=H gap=4
+          - [13] | 力量 | 24x15 @(769,4260) | fill=#667085 | font=Inter/Regular 12px | text="力量"
+          - [4] | Frame | 40x32 @(797,4252) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 7.6 | 19x17 @(808,4259) | fill=#202124 | font=Inter/Regular 14px | text="7.6"
+        - [4] | Frame | 68x32 @(853,4252) | layout=H gap=4
+          - [13] | 协调 | 24x15 @(853,4260) | fill=#667085 | font=Inter/Regular 12px | text="协调"
+          - [4] | Frame | 40x32 @(881,4252) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 8.4 | 22x17 @(890,4259) | fill=#202124 | font=Inter/Regular 14px | text="8.4"
+        - [13] | 8.1 | 19x17 @(937,4259) | fill=#a80f1b | font=Inter/Bold 14px | text="8.1"
+    - [4] | Frame | 331x58 @(532,4317) | fill=#ffffff | r=12 | layout=H gap=12 pad=12/12
+      - [4] | Frame | 32x32 @(544,4330) | fill=#f3f4f6 | r=16 | layout=H
+        - [13] | 陈 | 12x15 @(554,4338) | fill=#667085 | font=Inter/Semi Bold 12px | text="陈"
+      - [13] | 陈峰 | 1x34 @(588,4329) | fill=#202124 | font=Inter/Semi Bold 14px | text="陈峰"
+      - [4] | Frame | 356x32 @(601,4330) | layout=H gap=16
+        - [4] | Frame | 68x32 @(601,4330) | layout=H gap=4
+          - [13] | 速度 | 24x15 @(601,4338) | fill=#667085 | font=Inter/Regular 12px | text="速度"
+          - [4] | Frame | 40x32 @(629,4330) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 7.5 | 19x17 @(640,4338) | fill=#202124 | font=Inter/Regular 14px | text="7.5"
+        - [4] | Frame | 68x32 @(685,4330) | layout=H gap=4
+          - [13] | 耐力 | 24x15 @(685,4338) | fill=#667085 | font=Inter/Regular 12px | text="耐力"
+          - [4] | Frame | 40x32 @(713,4330) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 6.9 | 21x17 @(722,4338) | fill=#202124 | font=Inter/Regular 14px | text="6.9"
+        - [4] | Frame | 68x32 @(769,4330) | layout=H gap=4
+          - [13] | 力量 | 24x15 @(769,4338) | fill=#667085 | font=Inter/Regular 12px | text="力量"
+          - [4] | Frame | 40x32 @(797,4330) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 7.2 | 19x17 @(808,4338) | fill=#202124 | font=Inter/Regular 14px | text="7.2"
+        - [4] | Frame | 68x32 @(853,4330) | layout=H gap=4
+          - [13] | 协调 | 24x15 @(853,4338) | fill=#667085 | font=Inter/Regular 12px | text="协调"
+          - [4] | Frame | 40x32 @(881,4330) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 7.6 | 19x17 @(892,4338) | fill=#202124 | font=Inter/Regular 14px | text="7.6"
+        - [13] | 7.5 | 20x17 @(937,4338) | fill=#a80f1b | font=Inter/Bold 14px | text="7.5"
+    - [4] | Frame | 331x75 @(532,4387) | fill=#ffffff | r=12 | layout=H gap=12 pad=12/12
+      - [4] | Frame | 32x32 @(544,4408) | fill=#f3f4f6 | r=16 | layout=H
+        - [13] | 李 | 12x15 @(554,4417) | fill=#667085 | font=Inter/Semi Bold 12px | text="李"
+      - [13] | 李明辉 | 1x51 @(588,4399) | fill=#202124 | font=Inter/Semi Bold 14px | text="李明辉"
+      - [4] | Frame | 358x32 @(601,4408) | layout=H gap=16
+        - [4] | Frame | 68x32 @(601,4408) | layout=H gap=4
+          - [13] | 速度 | 24x15 @(601,4417) | fill=#667085 | font=Inter/Regular 12px | text="速度"
+          - [4] | Frame | 40x32 @(629,4408) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 9.0 | 21x17 @(638,4416) | fill=#202124 | font=Inter/Regular 14px | text="9.0"
+        - [4] | Frame | 68x32 @(685,4408) | layout=H gap=4
+          - [13] | 耐力 | 24x15 @(685,4417) | fill=#667085 | font=Inter/Regular 12px | text="耐力"
+          - [4] | Frame | 40x32 @(713,4408) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 8.8 | 21x17 @(722,4416) | fill=#202124 | font=Inter/Regular 14px | text="8.8"
+        - [4] | Frame | 68x32 @(769,4408) | layout=H gap=4
+          - [13] | 力量 | 24x15 @(769,4417) | fill=#667085 | font=Inter/Regular 12px | text="力量"
+          - [4] | Frame | 40x32 @(797,4408) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 8.2 | 21x17 @(806,4416) | fill=#202124 | font=Inter/Regular 14px | text="8.2"
+        - [4] | Frame | 68x32 @(853,4408) | layout=H gap=4
+          - [13] | 协调 | 24x15 @(853,4417) | fill=#667085 | font=Inter/Regular 12px | text="协调"
+          - [4] | Frame | 40x32 @(881,4408) | stroke=#e7eaf0 w1 | r=8 | layout=H
+            - [13] | 9.1 | 18x17 @(892,4416) | fill=#202124 | font=Inter/Regular 14px | text="9.1"
+        - [13] | 8.8 | 22x17 @(937,4416) | fill=#a80f1b | font=Inter/Bold 14px | text="8.8"
+  - [4] | Submit Footer | 375x70 @(510,4392) | fill=#ffffff | stroke=#e7eaf0 w1 | layout=V gap=4
+    - [4] | Frame | 291x42 @(552,4416) | fill=#a80f1b | r=12 | layout=H
+      - [13] | 保存评分 | 56x17 @(670,4428) | fill=#ffffff | font=Inter/Semi Bold 14px | text="保存评分"
+    - [13] | 已录入 0/5 人 · 剩余 5 人 | 134x15 @(630,4396) | fill=#667085 | font=Inter/Regular 12px | text="已录入 0/5 人 · 剩余 5 人"
+  - [4] | TabIconsOverlay | 375x70 @(510,4462) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(630,4522) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(510,4462)
+      - [4] | icon_0 | 22x22 @(562,4468)
+        - [6] | Vector | 17x16 @(564,4472) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(568,4470) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(564,4477) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(567,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(571,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(575,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(567,4484) | fill=#8e97a6
+      - [13] | 日程 | 121x14 @(512,4493) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(635,4462)
+      - [4] | icon_1 | 22x22 @(686,4468)
+        - [6] | Vector | 14x17 @(690,4471) | stroke=#a80f1b w1.6
+        - [6] | Vector | 6x2 @(694,4471) | stroke=#a80f1b w1.4
+        - [6] | Vector | 8x0 @(694,4478) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 8x0 @(694,4482) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 5x0 @(694,4485) | fill=#000000 | stroke=#a80f1b w1.3
+      - [13] | 训练管理 | 121x14 @(637,4493) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="训练管理"
+      - [9] | Ellipse | 4x4 @(696,4510) | fill=#a80f1b
+    - [4] | tab_2 | 125x56 @(760,4462)
+      - [4] | icon_2 | 22x22 @(812,4468)
+        - [6] | Vector | 8x8 @(818,4471) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(814,4480) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(762,4493) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"
