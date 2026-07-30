@@ -1,0 +1,128 @@
+.interest-page {
+  min-height: 100vh;
+  background: var(--color-page);
+}
+
+.interest-page__body {
+  padding: 24rpx var(--space-page) 180rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.info-card {
+  background: var(--color-card);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.info-card__title {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.info-card__text {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+}
+
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-card);
+  border-radius: 20rpx;
+  padding: 24rpx 28rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.toggle-row__label {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.toggle-row__switch {
+  width: 84rpx;
+  height: 46rpx;
+  border-radius: 23rpx;
+  background: #e5e7eb;
+  padding: 4rpx;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-row__switch--on {
+  background: #34c759;
+  justify-content: flex-end;
+}
+
+.toggle-row__knob {
+  width: 38rpx;
+  height: 38rpx;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.schedule-card {
+  background: var(--color-card);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.schedule-card__title {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 20rpx;
+}
+
+.slot-table__row {
+  display: flex;
+  gap: 8rpx;
+  margin-bottom: 8rpx;
+}
+
+.slot-table__row--head .slot-table__cell {
+  font-size: 20rpx;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.slot-table__cell {
+  flex: 1;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+}
+
+.slot-table__cell--day {
+  flex: 0 0 72rpx;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.slot-table__cell--slot {
+  border: 1rpx solid var(--color-line);
+  border-radius: 12rpx;
+  background: #f8f9fb;
+  color: #ffffff;
+}
+
+.slot-table__cell--active {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  font-weight: 700;
+}
+
+.schedule-card__hint {
+  margin-top: 16rpx;
+  font-size: 22rpx;
+  color: var(--color-text-secondary);
+}

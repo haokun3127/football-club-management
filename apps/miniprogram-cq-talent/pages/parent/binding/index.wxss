@@ -1,0 +1,135 @@
+.binding-page {
+  min-height: 100vh;
+  background: var(--color-page);
+}
+
+.binding-page__body {
+  padding: 24rpx var(--space-page) 180rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.card {
+  background: var(--color-card);
+  border: 1rpx solid var(--color-line);
+  border-radius: 24rpx;
+  padding: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card__title {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.card__icon--green {
+  font-size: 28rpx;
+}
+
+.card__action {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--color-brand);
+}
+
+.card__hint {
+  margin-top: 16rpx;
+  font-size: 22rpx;
+  color: var(--color-text-secondary);
+}
+
+.child-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--color-line);
+}
+
+.child-row:last-of-type {
+  border-bottom: none;
+}
+
+.child-row__avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.child-row__info {
+  flex: 1;
+}
+
+.child-row__name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.child-row__team {
+  margin-top: 4rpx;
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+}
+
+.child-row__chip {
+  padding: 6rpx 20rpx;
+  background: #ecfdf5;
+  border-radius: 8rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.child-row__chip--muted {
+  background: #f3f4f6;
+  color: var(--color-text-secondary);
+}
+
+.wechat-row {
+  margin-top: 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.wechat-row__check {
+  color: #10b981;
+  font-size: 28rpx;
+}
+
+.wechat-row__label {
+  flex: 1;
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+}
+
+.wechat-row__action {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--color-brand);
+}
+
+.family-empty {
+  margin-top: 20rpx;
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+}

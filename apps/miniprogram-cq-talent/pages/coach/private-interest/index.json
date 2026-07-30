@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "私教兴趣",
+  "usingComponents": {
+    "app-header": "/components/app-header/index",
+    "role-tabbar": "/components/role-tabbar/index"
+  }
+}

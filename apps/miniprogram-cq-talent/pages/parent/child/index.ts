@@ -72,6 +72,9 @@ Page({
   openPrivate() {
     openPage(`/pages/parent/private/index?student=${this.data.activeStudentId}`);
   },
+  openBinding() {
+    openPage("/pages/parent/binding/index");
+  },
 });
 
 function readableError(error: unknown) {

@@ -1,0 +1,107 @@
+# Figma 画板规格: C16.4 Coach Help
+
+- [4] | C16.4 Coach Help | 375x812 @(1370,5520) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | TopNav | 375x88 @(1370,5520) | fill=#fceeef | layout=H gap=12 pad=14/16
+    - [4] | BackButton | 24x24 @(1386,5552) | layout=V
+      - [4] | chevron-left | 20x20 @(1388,5554)
+        - [6] | Vector | 5x10 @(1396,5559) | stroke=#202124 w2
+    - [13] | Title | 271x27 @(1422,5550) | fill=#202124 | font=Inter/Bold 22px | text="帮助中心"
+    - [4] | Frame | 24x24 @(1705,5552)
+  - [4] | Content | 375x654 @(1370,5608) | layout=V gap=20 pad=16/22
+    - [4] | SearchBar | 331x44 @(1392,5624) | fill=#ffffff | r=22 | layout=H gap=8 pad=0/16 | shadow=0,2,8,#000000@0.05
+      - [4] | search | 18x18 @(1408,5637)
+        - [6] | Vector | 14x14 @(1410,5639) | stroke=#667085 w2
+      - [13] | 搜索使用指南 | 78x16 @(1434,5638) | fill=#667085 | font=Inter/Regular 13px | text="搜索使用指南"
+    - [4] | CategoryGrid | 331x291 @(1392,5688) | layout=V gap=12
+      - [13] | 快速上手 | 48x15 @(1392,5688) | fill=#667085 | font=Inter/Semi Bold 12px | text="快速上手"
+      - [4] | Grid | 331x264 @(1392,5715) | layout=V gap=12
+        - [4] | Row1 | 331x80 @(1392,5715) | layout=H gap=12
+          - [4] | Card1 | 140x80 @(1392,5715) | fill=#ffffff | r=8 | layout=V gap=8 | shadow=0,2,8,#000000@0.05
+            - [4] | icon | 28x28 @(1448,5729)
+              - [6] | Vector | 22x21 @(1452,5732) | stroke=#a80f1b w2
+            - [13] | 出勤操作 | 52x16 @(1436,5765) | fill=#202124 | font=Inter/Semi Bold 13px | text="出勤操作"
+          - [4] | Card2 | 140x80 @(1544,5715) | fill=#ffffff | r=8 | layout=V gap=8 | shadow=0,2,8,#000000@0.05
+            - [4] | icon | 28x28 @(1600,5729)
+              - [6] | Vector | 14x23 @(1607,5731) | stroke=#3b82f6 w2
+            - [13] | 活动管理 | 52x16 @(1588,5765) | fill=#202124 | font=Inter/Semi Bold 13px | text="活动管理"
+        - [4] | Row2 | 331x80 @(1392,5807) | layout=H gap=12
+          - [4] | Card3 | 140x80 @(1392,5807) | fill=#ffffff | r=8 | layout=V gap=8 | shadow=0,2,8,#000000@0.05
+            - [4] | icon | 28x28 @(1448,5821)
+              - [6] | Vector | 23x22 @(1450,5824) | stroke=#34c759 w2
+            - [13] | 评分评估 | 52x16 @(1436,5857) | fill=#202124 | font=Inter/Semi Bold 13px | text="评分评估"
+          - [4] | Card4 | 140x80 @(1544,5807) | fill=#ffffff | r=8 | layout=V gap=8 | shadow=0,2,8,#000000@0.05
+            - [4] | icon | 28x28 @(1600,5821)
+              - [6] | Vector | 22x21 @(1604,5824) | stroke=#f59e0b w2
+            - [13] | 私教流程 | 52x16 @(1588,5857) | fill=#202124 | font=Inter/Semi Bold 13px | text="私教流程"
+        - [4] | Row3 | 331x80 @(1392,5899) | layout=H gap=12
+          - [4] | Card5 | 140x80 @(1392,5899) | fill=#ffffff | r=8 | layout=V gap=8 | shadow=0,2,8,#000000@0.05
+            - [4] | icon | 28x28 @(1448,5913)
+              - [6] | Vector | 14x23 @(1455,5915) | stroke=#8b5cf6 w2
+            - [13] | 账号权限 | 52x16 @(1436,5949) | fill=#202124 | font=Inter/Semi Bold 13px | text="账号权限"
+          - [4] | Card6 | 140x80 @(1544,5899) | fill=#ffffff | r=8 | layout=V gap=8 | shadow=0,2,8,#000000@0.05
+            - [4] | icon | 28x28 @(1600,5913)
+              - [6] | Vector | 23x22 @(1602,5916) | stroke=#667085 w2
+            - [13] | 联系支持 | 52x16 @(1588,5949) | fill=#202124 | font=Inter/Semi Bold 13px | text="联系支持"
+    - [4] | FAQ | 331x187 @(1392,5999) | fill=#ffffff | r=12 | layout=V | shadow=0,2,8,#000000@0.05
+      - [4] | Header | 331x49 @(1392,5999) | layout=V pad=16/16
+        - [13] | 常见问题 | 56x17 @(1408,6015) | fill=#202124 | font=Inter/Bold 14px | text="常见问题"
+      - [12] | Rectangle | 331x1 @(1392,6048) | fill=#e7eaf0
+      - [4] | Item | 331x45 @(1392,6049) | layout=H pad=14/16
+        - [4] | Frame | 178x17 @(1408,6063) | layout=H gap=8
+          - [4] | q-icon | 16x16 @(1408,6064)
+            - [6] | Vector | 12x12 @(1410,6066) | stroke=#a80f1b w2
+          - [13] | 如何修改已提交的出勤？ | 154x17 @(1432,6063) | fill=#202124 | font=Inter/Regular 14px | text="如何修改已提交的出勤？"
+        - [4] | chevron-right | 16x16 @(1691,6064)
+          - [6] | Vector | 4x8 @(1697,6068) | stroke=#667085 w2
+      - [12] | Rectangle | 331x1 @(1392,6094) | fill=#e7eaf0
+      - [4] | Item | 331x45 @(1392,6095) | layout=H pad=14/16
+        - [4] | Frame | 178x17 @(1408,6109) | layout=H gap=8
+          - [4] | q-icon | 16x16 @(1408,6110)
+            - [6] | Vector | 12x12 @(1410,6112) | stroke=#a80f1b w2
+          - [13] | 课时记录出错如何处理？ | 154x17 @(1432,6109) | fill=#202124 | font=Inter/Regular 14px | text="课时记录出错如何处理？"
+        - [4] | chevron-right | 16x16 @(1691,6110)
+          - [6] | Vector | 4x8 @(1697,6114) | stroke=#667085 w2
+      - [12] | Rectangle | 331x1 @(1392,6140) | fill=#e7eaf0
+      - [4] | Item | 331x45 @(1392,6141) | layout=H pad=14/16
+        - [4] | Frame | 178x17 @(1408,6155) | layout=H gap=8
+          - [4] | q-icon | 16x16 @(1408,6156)
+            - [6] | Vector | 12x12 @(1410,6158) | stroke=#a80f1b w2
+          - [13] | 如何联系俱乐部管理员？ | 154x17 @(1432,6155) | fill=#202124 | font=Inter/Regular 14px | text="如何联系俱乐部管理员？"
+        - [4] | chevron-right | 16x16 @(1691,6156)
+          - [6] | Vector | 4x8 @(1697,6160) | stroke=#667085 w2
+    - [4] | ContactCard | 331x148 @(1392,6206) | fill=#ffffff | r=12 | layout=V gap=16 pad=16/16 | shadow=0,2,8,#000000@0.05
+      - [13] | 联系支持 | 56x17 @(1408,6222) | fill=#202124 | font=Inter/Bold 14px | text="联系支持"
+      - [4] | SupportHours | 299x23 @(1408,6255) | layout=H gap=12
+        - [13] | 工作日 9:00-18:00 | 111x16 @(1408,6258) | fill=#667085 | font=Inter/Regular 13px | text="工作日 9:00-18:00"
+        - [4] | Frame | 64x23 @(1531,6255) | fill=#fceeef | r=4 | layout=H pad=4/8
+          - [13] | 在线咨询 | 48x15 @(1539,6259) | fill=#a80f1b | font=Inter/Semi Bold 12px | text="在线咨询"
+      - [4] | WeChatButton | 299x44 @(1408,6294) | fill=#f1f3f5 | r=8 | layout=H gap=8 pad=12/12
+        - [13] | 关注微信公众号 | 91x16 @(1448,6308) | fill=#34c759 | font=Inter/Semi Bold 13px | text="关注微信公众号"
+        - [4] | circle-x | 20x20 @(1420,6306)
+          - [6] | Vector | 17x17 @(1422,6308) | stroke=#34c759 w2
+  - [4] | TabIconsOverlay | 375x70 @(1370,6262) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1490,6322) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(1370,6262)
+      - [4] | icon_0 | 22x22 @(1422,6268)
+        - [6] | Vector | 17x16 @(1424,6272) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(1428,6270) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(1424,6277) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(1427,6280) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1431,6280) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1435,6280) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1427,6284) | fill=#8e97a6
+      - [13] | 日程 | 121x14 @(1372,6293) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(1495,6262)
+      - [4] | icon_1 | 22x22 @(1546,6268)
+        - [6] | Vector | 14x17 @(1550,6271) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 6x2 @(1554,6271) | stroke=#8e97a6 w1.4
+        - [6] | Vector | 8x0 @(1554,6278) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 8x0 @(1554,6282) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 5x0 @(1554,6285) | fill=#000000 | stroke=#8e97a6 w1.3
+      - [13] | 训练管理 | 121x14 @(1497,6293) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="训练管理"
+    - [4] | tab_2 | 125x56 @(1620,6262)
+      - [4] | icon_2 | 22x22 @(1672,6268)
+        - [6] | Vector | 8x8 @(1678,6271) | stroke=#a80f1b w1.6
+        - [6] | Vector | 16x8 @(1674,6280) | stroke=#a80f1b w1.6
+      - [13] | 我的 | 121x14 @(1622,6293) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="我的"
+      - [9] | Ellipse | 4x4 @(1680,6310) | fill=#a80f1b

@@ -1,0 +1,37 @@
+<view class="help-page">
+  <app-header title="帮助中心" show-back />
+  <view class="help-page__body">
+    <!-- 搜索（Figma C16.4: 白底 r22） -->
+    <view class="search-bar">
+      <text class="search-bar__icon">🔍</text>
+      <input class="search-bar__input" placeholder="搜索使用指南" value="{{searchText}}" bindinput="onSearchInput" />
+    </view>
+
+    <!-- 快速上手网格 -->
+    <view class="section-title">快速上手</view>
+    <view class="topic-grid">
+      <block wx:for="{{topics}}" wx:key="key">
+        <view
+          wx:if="{{!searchText || item.label.indexOf(searchText) >= 0 || item.answer.indexOf(searchText) >= 0}}"
+          class="topic-card {{openKey === item.key ? 'topic-card--open' : ''}}"
+          data-key="{{item.key}}"
+          bindtap="toggleTopic"
+        >
+          <view class="topic-card__icon">{{item.icon}}</view>
+          <view class="topic-card__label">{{item.label}}</view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 展开的答案 -->
+    <view wx:if="{{openKey}}" class="answer-card">
+      <block wx:for="{{topics}}" wx:key="key">
+        <view wx:if="{{item.key === openKey}}">
+          <view class="answer-card__title">{{item.label}}</view>
+          <view class="answer-card__text">{{item.answer}}</view>
+        </view>
+      </block>
+    </view>
+  </view>
+  <role-tabbar role="coach" active="me" />
+</view>

@@ -1,0 +1,51 @@
+<view class="binding-page">
+  <app-header title="账号绑定" show-back />
+  <view class="binding-page__body">
+    <status-view
+      state="{{state}}"
+      title="{{state === 'loading' ? '加载绑定信息' : state === 'empty' ? '暂无绑定学员' : '读取失败'}}"
+      message="{{message}}"
+      action-text="{{state === 'error' ? '重试' : ''}}"
+      bindaction="retry"
+    />
+
+    <block wx:if="{{state === 'ready'}}">
+      <!-- 绑定学员（Figma P10: 头像 + 姓名 + 队伍 + 已绑定 chip） -->
+      <view class="card">
+        <view class="card__title">绑定学员</view>
+        <view wx:for="{{children}}" wx:key="id" class="child-row" data-id="{{item.id}}" bindtap="switchChild">
+          <view class="child-row__avatar">{{item.name.slice(0, 1)}}</view>
+          <view class="child-row__info">
+            <view class="child-row__name">{{item.name}}</view>
+            <view class="child-row__team">{{item.teams[0] || '重庆天才足球俱乐部'}}</view>
+          </view>
+          <view wx:if="{{item.id === activeChildId}}" class="child-row__chip">当前</view>
+          <view wx:else class="child-row__chip child-row__chip--muted">切换</view>
+        </view>
+        <view class="card__hint">点击学员可切换当前学员</view>
+      </view>
+
+      <!-- 微信登录绑定 -->
+      <view class="card">
+        <view class="card__title">
+          <text class="card__icon card__icon--green">📱</text>微信登录绑定
+        </view>
+        <view class="wechat-row">
+          <text class="wechat-row__check">✓</text>
+          <text class="wechat-row__label">{{wechatLabel}}</text>
+          <text class="wechat-row__action" bindtap="unbindWechat">解绑</text>
+        </view>
+      </view>
+
+      <!-- 家庭成员 -->
+      <view class="card">
+        <view class="card__head">
+          <view class="card__title">家庭成员</view>
+          <view class="card__action" bindtap="addFamilyMember">+ 添加</view>
+        </view>
+        <view class="family-empty">暂无其他家庭成员，可联系俱乐部添加共同监护人</view>
+      </view>
+    </block>
+  </view>
+  <role-tabbar role="parent" active="child" />
+</view>

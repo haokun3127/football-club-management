@@ -16,6 +16,7 @@
     "pages/parent/private/index",
     "pages/parent/private-success/index",
     "pages/parent/day/index",
+    "pages/parent/binding/index",
     "pages/coach/schedule/index",
     "pages/coach/event/index",
     "pages/coach/attendance/index",
@@ -31,6 +32,10 @@
     "pages/coach/test-tasks/index",
     "pages/coach/assessment-entry/index",
     "pages/coach/assessment-submit/index",
+    "pages/coach/permissions/index",
+    "pages/coach/private-interest/index",
+    "pages/coach/account/index",
+    "pages/coach/help/index",
     "pages/coach/training/index",
     "pages/coach/test-entry/index",
     "pages/coach/me/index"

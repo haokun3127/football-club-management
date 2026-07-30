@@ -1,0 +1,21 @@
+<view class="permissions-page">
+  <app-header title="权限范围" show-back />
+  <view class="permissions-page__body">
+    <!-- 说明卡（Figma C16.1: 蓝色 info 图标 + 灰字） -->
+    <view class="explain-card">
+      <view class="explain-card__icon">ℹ</view>
+      <view class="explain-card__text">以下权限由俱乐部管理员分配，如需调整请联系管理员</view>
+    </view>
+
+    <!-- 权限开关列表（只读展示） -->
+    <view class="permission-list">
+      <view wx:for="{{permissions}}" wx:key="key" class="permission-row" bindtap="explainToggle">
+        <view class="permission-row__label">{{item.label}}</view>
+        <view class="permission-row__toggle {{item.enabled ? 'permission-row__toggle--on' : ''}}">
+          <view class="permission-row__knob"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <role-tabbar role="coach" active="me" />
+</view>

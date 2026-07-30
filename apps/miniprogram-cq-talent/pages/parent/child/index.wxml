@@ -58,6 +58,10 @@
         <view class="label">私教预约</view>
         <view class="field-value field-value--link">预约一对一私教课 ›</view>
       </view>
+      <view class="field-row field-row--link" bindtap="openBinding">
+        <view class="label">账号绑定</view>
+        <view class="field-value field-value--link">学员绑定与家庭成员 ›</view>
+      </view>
     </view>
 
   </view>

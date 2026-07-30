@@ -1,0 +1,66 @@
+# Figma 画板规格: P10 Account Binding
+
+- [4] | P10 Account Binding | 375x812 @(80,4620) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(80,4620) | fill=#ffffff | stroke=#e7eaf0 w1 | layout=H gap=12 pad=14/22
+    - [13] | 账号绑定 | 88x27 @(138,4650) | fill=#202124 | font=Inter/Bold 22px | text="账号绑定"
+    - [4] | arrow-left | 24x24 @(102,4652)
+      - [6] | Vector | 14x14 @(107,4657) | stroke=#202124 w2
+  - [4] | Content | 375x654 @(80,4708) | layout=V gap=16 pad=16/22
+    - [4] | Child Binding | 331x141 @(102,4724) | fill=#ffffff | stroke=#e7eaf0 w1 | r=16 | layout=V gap=16 pad=16/16 | shadow=0,4,12,#000000@0.05
+      - [13] | 绑定学员 | 56x17 @(118,4740) | fill=#202124 | font=Inter/Bold 14px | text="绑定学员"
+      - [4] | Frame | 299x44 @(118,4773) | layout=H gap=12
+        - [4] | Frame | 44x44 @(118,4773) | fill=#f3f4f6 | r=22 | layout=H
+          - [13] | 陈 | 14x17 @(133,4786) | fill=#202124 | font=Inter/Bold 14px | text="陈"
+        - [4] | Frame | 182x36 @(174,4777) | layout=V gap=2
+          - [13] | 陈小宇 | 45x18 @(174,4777) | fill=#202124 | font=Inter/Bold 15px | text="陈小宇"
+          - [13] | U10精英队 | 63x16 @(174,4797) | fill=#667085 | font=Inter/Regular 13px | text="U10精英队"
+        - [4] | Frame | 49x21 @(368,4784) | fill=#ecfdf5 | r=4 | layout=H pad=4/8
+          - [13] | 已绑定 | 33x13 @(376,4788) | fill=#10b981 | font=Inter/Bold 11px | text="已绑定"
+      - [13] | 切换学员 | 52x16 @(118,4833) | fill=#667085 | font=Inter/Regular 13px | text="切换学员"
+    - [4] | Parent Info | 331x80 @(102,4881) | fill=#ffffff | stroke=#e7eaf0 w1 | r=16 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+      - [4] | Frame | 112x20 @(118,4897) | layout=H gap=8
+        - [13] | 微信登录绑定 | 84x17 @(146,4898) | fill=#202124 | font=Inter/Bold 14px | text="微信登录绑定"
+        - [4] | smartphone | 20x20 @(118,4897)
+          - [6] | Vector | 12x17 @(122,4899) | stroke=#22c55e w2
+      - [4] | Frame | 140x16 @(118,4929) | layout=H gap=8
+        - [13] | 微信: wx_parent_001 | 116x15 @(142,4930) | fill=#667085 | font=Inter/Regular 12px | text="微信: wx_parent_001"
+        - [4] | check-circle | 16x16 @(118,4929)
+          - [6] | Vector | 13x13 @(119,4930) | stroke=#10b981 w2
+    - [4] | Family Members | 331x182 @(102,4977) | fill=#ffffff | stroke=#e7eaf0 w1 | r=16 | layout=V gap=16 pad=16/16 | shadow=0,4,12,#000000@0.05
+      - [13] | 家庭成员 | 56x17 @(118,4993) | fill=#202124 | font=Inter/Bold 14px | text="家庭成员"
+      - [4] | Frame | 299x36 @(118,5026) | layout=H gap=12
+        - [4] | Frame | 202x36 @(154,5026) | layout=V gap=2
+          - [13] | 妈妈 | 30x18 @(154,5026) | fill=#202124 | font=Inter/Bold 15px | text="妈妈"
+          - [13] | 138****6789 | 80x16 @(154,5046) | fill=#667085 | font=Inter/Regular 13px | text="138****6789"
+        - [4] | Frame | 49x21 @(368,5034) | fill=#ecfdf5 | r=4 | layout=H pad=4/8
+          - [13] | 已加入 | 33x13 @(376,5038) | fill=#10b981 | font=Inter/Bold 11px | text="已加入"
+        - [4] | user | 24x24 @(118,5032)
+          - [6] | Vector | 14x18 @(123,5035) | stroke=#667085 w2
+      - [12] | Rectangle | 299x1 @(118,5078) | fill=#e7eaf0
+      - [4] | Frame | 299x48 @(118,5095) | stroke=#e7eaf0 w1 | r=8 | layout=H gap=12 pad=12/12
+        - [13] | +添加家庭成员 | 94x17 @(166,5110) | fill=#a80f1b | font=Inter/Semi Bold 14px | text="+添加家庭成员"
+        - [4] | plus | 24x24 @(130,5107)
+          - [6] | Vector | 14x14 @(135,5112) | stroke=#a80f1b w2
+  - [4] | TabIconsOverlay | 375x70 @(80,5362) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(200,5422) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(80,5362)
+      - [4] | icon_0 | 22x22 @(132,5368)
+        - [6] | Vector | 17x16 @(134,5372) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(138,5370) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(134,5377) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(137,5380) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(141,5380) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(145,5380) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(137,5384) | fill=#8e97a6
+      - [13] | 日程 | 117x14 @(84,5393) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(205,5362)
+      - [4] | icon_1 | 22x22 @(256,5368)
+        - [6] | Vector | 18x10 @(258,5375) | stroke=#8e97a6 w1.8
+        - [6] | Vector | 4x4 @(272,5373) | stroke=#8e97a6 w1.8
+      - [13] | 成长 | 117x14 @(209,5393) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="成长"
+    - [4] | tab_2 | 125x56 @(330,5362)
+      - [4] | icon_2 | 22x22 @(382,5368)
+        - [6] | Vector | 8x8 @(388,5371) | stroke=#a80f1b w1.6
+        - [6] | Vector | 16x8 @(384,5380) | stroke=#a80f1b w1.6
+      - [13] | 我的孩子 | 117x14 @(334,5393) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="我的孩子"
+      - [9] | Ellipse | 4x4 @(390,5410) | fill=#a80f1b

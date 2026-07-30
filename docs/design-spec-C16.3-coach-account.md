@@ -1,0 +1,75 @@
+# Figma 画板规格: C16.3 Coach Account
+
+- [4] | C16.3 Coach Account | 375x812 @(940,5520) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | TopNav | 375x88 @(940,5520) | fill=#fceeef | layout=H gap=12 pad=14/16
+    - [4] | BackButton | 24x24 @(956,5552) | layout=V
+      - [4] | chevron-left | 20x20 @(958,5554)
+        - [6] | Vector | 5x10 @(966,5559) | stroke=#202124 w2
+    - [13] | Title | 271x27 @(992,5550) | fill=#202124 | font=Inter/Bold 22px | text="账号设置"
+    - [4] | Frame | 24x24 @(1275,5552)
+  - [4] | Content | 375x654 @(940,5608) | layout=V gap=16 pad=16/22
+    - [4] | ProfileCard | 331x92 @(962,5624) | fill=#ffffff | r=12 | layout=H gap=12 pad=16/16 | shadow=0,2,8,#000000@0.05
+      - [4] | Avatar | 48x48 @(978,5646) | fill=#fceeef | stroke=#a80f1b w2 | r=24 | layout=V
+        - [13] | 林 | 16x19 @(994,5660) | fill=#a80f1b | font=Inter/Bold 16px | text="林"
+      - [4] | Info | 239x60 @(1038,5640) | layout=V gap=4
+        - [4] | NameInput | 239x19 @(1038,5640) | layout=H gap=8
+          - [13] | 林教练 | 48x19 @(1038,5640) | fill=#202124 | font=Inter/Bold 16px | text="林教练"
+          - [4] | Frame | 34x17 @(1094,5641) | fill=#fceeef | r=4 | layout=H pad=2/6
+            - [13] | 编辑 | 22x13 @(1100,5643) | fill=#a80f1b | font=Inter/Semi Bold 11px | text="编辑"
+        - [13] | U10精英队 · 主教练 | 113x16 @(1038,5663) | fill=#667085 | font=Inter/Regular 13px | text="U10精英队 · 主教练"
+        - [4] | Badge | 45x17 @(1038,5683) | fill=#e8f5e9 | r=4 | layout=H pad=2/6
+          - [13] | 已认证 | 33x13 @(1044,5685) | fill=#2e7d32 | font=Inter/Semi Bold 11px | text="已认证"
+    - [4] | SettingsList | 331x92 @(962,5732) | fill=#ffffff | r=12 | layout=V | shadow=0,2,8,#000000@0.05
+      - [4] | Row | 331x45 @(962,5732) | layout=H pad=14/16
+        - [13] | 手机号 | 42x17 @(978,5746) | fill=#202124 | font=Inter/Medium 14px | text="手机号"
+        - [4] | Frame | 130x17 @(1147,5746) | layout=H gap=16
+          - [13] | 138****6789 | 86x17 @(1147,5746) | fill=#667085 | font=Inter/Regular 14px | text="138****6789"
+          - [13] | 修改 | 28x17 @(1249,5746) | fill=#a80f1b | font=Inter/Semi Bold 14px | text="修改"
+      - [12] | Rectangle | 331x1 @(962,5777) | fill=#e7eaf0
+      - [4] | Row | 331x46 @(962,5778) | layout=H pad=14/16
+        - [4] | Frame | 82x18 @(978,5792) | layout=H gap=8
+          - [4] | circle-x | 18x18 @(978,5792)
+            - [6] | Vector | 15x15 @(979,5793) | stroke=#34c759 w2
+          - [13] | 微信绑定 | 56x17 @(1004,5792) | fill=#202124 | font=Inter/Medium 14px | text="微信绑定"
+        - [13] | 已绑定 | 42x17 @(1235,5792) | fill=#34c759 | font=Inter/Semi Bold 14px | text="已绑定"
+    - [4] | SecuritySection | 331x91 @(962,5840) | fill=#ffffff | r=12 | layout=V | shadow=0,2,8,#000000@0.05
+      - [4] | Row | 331x45 @(962,5840) | layout=H pad=14/16
+        - [13] | 修改密码 | 56x17 @(978,5854) | fill=#202124 | font=Inter/Medium 14px | text="修改密码"
+        - [4] | chevron-right | 16x16 @(1261,5854)
+          - [6] | Vector | 4x8 @(1267,5858) | stroke=#667085 w2
+      - [12] | Rectangle | 331x1 @(962,5885) | fill=#e7eaf0
+      - [4] | Row | 331x45 @(962,5886) | layout=H pad=14/16
+        - [13] | 设备管理 | 56x17 @(978,5900) | fill=#202124 | font=Inter/Medium 14px | text="设备管理"
+        - [4] | chevron-right | 16x16 @(1261,5900)
+          - [6] | Vector | 4x8 @(1267,5904) | stroke=#667085 w2
+    - [4] | DataSection | 331x45 @(962,5947) | fill=#ffffff | r=12 | layout=V | shadow=0,2,8,#000000@0.05
+      - [4] | Row | 331x45 @(962,5947) | layout=H pad=14/16
+        - [13] | 清除缓存 | 56x17 @(978,5961) | fill=#202124 | font=Inter/Medium 14px | text="清除缓存"
+        - [4] | chevron-right | 16x16 @(1261,5962)
+          - [6] | Vector | 4x8 @(1267,5966) | stroke=#667085 w2
+  - [4] | TabIconsOverlay | 375x70 @(940,6262) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1060,6322) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(940,6262)
+      - [4] | icon_0 | 22x22 @(992,6268)
+        - [6] | Vector | 17x16 @(994,6272) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(998,6270) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(994,6277) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(997,6280) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1001,6280) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1005,6280) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(997,6284) | fill=#8e97a6
+      - [13] | 日程 | 121x14 @(942,6293) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(1065,6262)
+      - [4] | icon_1 | 22x22 @(1116,6268)
+        - [6] | Vector | 14x17 @(1120,6271) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 6x2 @(1124,6271) | stroke=#8e97a6 w1.4
+        - [6] | Vector | 8x0 @(1124,6278) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 8x0 @(1124,6282) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 5x0 @(1124,6285) | fill=#000000 | stroke=#8e97a6 w1.3
+      - [13] | 训练管理 | 121x14 @(1067,6293) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="训练管理"
+    - [4] | tab_2 | 125x56 @(1190,6262)
+      - [4] | icon_2 | 22x22 @(1242,6268)
+        - [6] | Vector | 8x8 @(1248,6271) | stroke=#a80f1b w1.6
+        - [6] | Vector | 16x8 @(1244,6280) | stroke=#a80f1b w1.6
+      - [13] | 我的 | 121x14 @(1192,6293) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="我的"
+      - [9] | Ellipse | 4x4 @(1250,6310) | fill=#a80f1b

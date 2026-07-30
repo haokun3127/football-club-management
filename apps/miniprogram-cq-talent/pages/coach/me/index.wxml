@@ -32,6 +32,22 @@
       <view class="label">测评任务</view>
       <view class="field-value field-value--link">任务进度与评估录入 ›</view>
     </view>
+    <view class="field-row field-row--link" bindtap="openPermissions">
+      <view class="label">权限范围</view>
+      <view class="field-value field-value--link">管理员分配的功能权限 ›</view>
+    </view>
+    <view class="field-row field-row--link" bindtap="openPrivateInterest">
+      <view class="label">私教兴趣</view>
+      <view class="field-value field-value--link">预约开关与可用时段 ›</view>
+    </view>
+    <view class="field-row field-row--link" bindtap="openAccount">
+      <view class="label">账号设置</view>
+      <view class="field-value field-value--link">资料 / 手机号 / 退出 ›</view>
+    </view>
+    <view class="field-row field-row--link" bindtap="openHelp">
+      <view class="label">帮助中心</view>
+      <view class="field-value field-value--link">使用指南与常见问题 ›</view>
+    </view>
   </view>
 
   <view class="card permission-card">

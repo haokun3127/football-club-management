@@ -1,0 +1,43 @@
+<view class="interest-page">
+  <app-header title="私教兴趣" show-back />
+  <view class="interest-page__body">
+    <!-- 说明卡（Figma C16.2） -->
+    <view class="info-card">
+      <view class="info-card__title">私教兴趣</view>
+      <view class="info-card__text">开启私教兴趣后，家长可向您发起私教预约</view>
+    </view>
+
+    <!-- 总开关 -->
+    <view class="toggle-row" bindtap="toggleAccepting">
+      <view class="toggle-row__label">接受私教预约</view>
+      <view class="toggle-row__switch {{accepting ? 'toggle-row__switch--on' : ''}}">
+        <view class="toggle-row__knob"></view>
+      </view>
+    </view>
+
+    <!-- 可用时段 -->
+    <view class="schedule-card">
+      <view class="schedule-card__title">可用时段</view>
+      <view class="slot-table">
+        <view class="slot-table__row slot-table__row--head">
+          <view class="slot-table__cell slot-table__cell--day"></view>
+          <view class="slot-table__cell" wx:for="{{week[0].slots}}" wx:key="label">{{item.label}}</view>
+        </view>
+        <view class="slot-table__row" wx:for="{{week}}" wx:key="day">
+          <view class="slot-table__cell slot-table__cell--day">{{item.day}}</view>
+          <view
+            wx:for="{{item.slots}}"
+            wx:for-item="slot"
+            wx:key="label"
+            class="slot-table__cell slot-table__cell--slot {{slot.active ? 'slot-table__cell--active' : ''}}"
+            data-day="{{item.day}}"
+            data-label="{{slot.label}}"
+            bindtap="toggleSlot"
+          >{{slot.active ? '✓' : ''}}</view>
+        </view>
+      </view>
+      <view class="schedule-card__hint">点击格子标记可约时段，保存在本机</view>
+    </view>
+  </view>
+  <role-tabbar role="coach" active="me" />
+</view>

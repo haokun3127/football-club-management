@@ -1,0 +1,126 @@
+# Figma 画板规格: C16.2 Private Interest
+
+- [4] | C16.2 Private Interest | 375x812 @(510,5520) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | TopNav | 375x88 @(510,5520) | fill=#fceeef | layout=H gap=12 pad=14/16
+    - [4] | BackButton | 24x24 @(526,5552) | layout=V
+      - [4] | chevron-left | 20x20 @(528,5554)
+        - [6] | Vector | 5x10 @(536,5559) | stroke=#202124 w2
+    - [13] | Title | 271x27 @(562,5550) | fill=#202124 | font=Inter/Bold 22px | text="私教兴趣"
+    - [4] | Frame | 24x24 @(845,5552)
+  - [4] | Content | 375x654 @(510,5608) | layout=V gap=16 pad=16/22
+    - [4] | InfoCard | 331x72 @(532,5624) | fill=#ffffff | r=12 | layout=V gap=8 pad=16/16 | shadow=0,2,8,#000000@0.05
+      - [13] | 私教兴趣 | 56x17 @(548,5640) | fill=#202124 | font=Inter/Bold 14px | text="私教兴趣"
+      - [13] | 开启私教兴趣后，家长可向您发起私教预约 | 299x15 @(548,5665) | fill=#667085 | font=Inter/Regular 12px | text="开启私教兴趣后，家长可向您发起私教预约"
+    - [4] | ToggleRow | 331x56 @(532,5712) | fill=#ffffff | r=12 | layout=H pad=16/16 | shadow=0,2,8,#000000@0.05
+      - [13] | 接受私教预约 | 84x17 @(548,5732) | fill=#202124 | font=Inter/Semi Bold 14px | text="接受私教预约"
+      - [4] | Frame | 44x24 @(803,5728) | fill=#34c759 | r=12 | layout=H pad=2/2
+        - [9] | Ellipse | 20x20 @(825,5730) | fill=#ffffff
+    - [4] | ScheduleSection | 331x261 @(532,5784) | fill=#ffffff | r=12 | layout=V gap=16 pad=16/16 | shadow=0,2,8,#000000@0.05
+      - [13] | 可用时段 | 56x17 @(548,5800) | fill=#202124 | font=Inter/Bold 14px | text="可用时段"
+      - [4] | Grid | 299x165 @(548,5833) | layout=V gap=12
+        - [4] | Headers | 299x13 @(548,5833) | layout=H gap=4
+          - [4] | Frame | 39x13 @(548,5833) | layout=H
+            - [13] | 周一 | 22x13 @(557,5833) | fill=#667085 | font=Inter/Semi Bold 11px | text="周一"
+          - [4] | Frame | 39x13 @(591,5833) | layout=H
+            - [13] | 周二 | 22x13 @(600,5833) | fill=#667085 | font=Inter/Semi Bold 11px | text="周二"
+          - [4] | Frame | 39x13 @(635,5833) | layout=H
+            - [13] | 周三 | 22x13 @(643,5833) | fill=#667085 | font=Inter/Semi Bold 11px | text="周三"
+          - [4] | Frame | 39x13 @(678,5833) | layout=H
+            - [13] | 周四 | 22x13 @(687,5833) | fill=#667085 | font=Inter/Semi Bold 11px | text="周四"
+          - [4] | Frame | 39x13 @(721,5833) | layout=H
+            - [13] | 周五 | 22x13 @(730,5833) | fill=#667085 | font=Inter/Semi Bold 11px | text="周五"
+          - [4] | Frame | 39x13 @(764,5833) | layout=H
+            - [13] | 周六 | 22x13 @(773,5833) | fill=#667085 | font=Inter/Semi Bold 11px | text="周六"
+          - [4] | Frame | 39x13 @(808,5833) | layout=H
+            - [13] | 周日 | 22x13 @(816,5833) | fill=#667085 | font=Inter/Semi Bold 11px | text="周日"
+        - [4] | Slots | 299x140 @(548,5858) | layout=H gap=4
+          - [4] | Frame | 39x140 @(548,5858) | layout=V gap=4
+            - [4] | Frame | 39x32 @(548,5858) | fill=#34c759 | r=4 | layout=H
+              - [13] | 17:00 | 26x12 @(555,5868) | fill=#ffffff | font=Inter/Regular 10px | text="17:00"
+            - [4] | Frame | 39x32 @(548,5894) | fill=#34c759 | r=4 | layout=H
+              - [13] | 18:00 | 27x12 @(554,5904) | fill=#ffffff | font=Inter/Regular 10px | text="18:00"
+            - [4] | Frame | 39x32 @(548,5930) | fill=#34c759 | r=4 | layout=H
+              - [13] | 19:00 | 27x12 @(554,5940) | fill=#ffffff | font=Inter/Regular 10px | text="19:00"
+            - [4] | Frame | 39x32 @(548,5966) | fill=#34c759 | r=4 | layout=H
+              - [13] | 20:00 | 28x12 @(554,5976) | fill=#ffffff | font=Inter/Regular 10px | text="20:00"
+          - [4] | Frame | 39x140 @(591,5858) | layout=V gap=4
+            - [4] | Frame | 39x32 @(591,5858) | fill=#34c759 | r=4 | layout=H
+              - [13] | 17:00 | 26x12 @(598,5868) | fill=#ffffff | font=Inter/Regular 10px | text="17:00"
+            - [4] | Frame | 39x32 @(591,5894) | fill=#34c759 | r=4 | layout=H
+              - [13] | 18:00 | 27x12 @(597,5904) | fill=#ffffff | font=Inter/Regular 10px | text="18:00"
+            - [4] | Frame | 39x32 @(591,5930) | fill=#34c759 | r=4 | layout=H
+              - [13] | 19:00 | 27x12 @(597,5940) | fill=#ffffff | font=Inter/Regular 10px | text="19:00"
+            - [4] | Frame | 39x32 @(591,5966) | fill=#34c759 | r=4 | layout=H
+              - [13] | 20:00 | 28x12 @(597,5976) | fill=#ffffff | font=Inter/Regular 10px | text="20:00"
+          - [4] | Frame | 39x140 @(635,5858) | layout=V gap=4
+            - [4] | Frame | 39x32 @(635,5858) | fill=#34c759 | r=4 | layout=H
+              - [13] | 17:00 | 26x12 @(641,5868) | fill=#ffffff | font=Inter/Regular 10px | text="17:00"
+            - [4] | Frame | 39x32 @(635,5894) | fill=#34c759 | r=4 | layout=H
+              - [13] | 18:00 | 27x12 @(641,5904) | fill=#ffffff | font=Inter/Regular 10px | text="18:00"
+            - [4] | Frame | 39x32 @(635,5930) | fill=#34c759 | r=4 | layout=H
+              - [13] | 19:00 | 27x12 @(641,5940) | fill=#ffffff | font=Inter/Regular 10px | text="19:00"
+            - [4] | Frame | 39x32 @(635,5966) | fill=#34c759 | r=4 | layout=H
+              - [13] | 20:00 | 28x12 @(640,5976) | fill=#ffffff | font=Inter/Regular 10px | text="20:00"
+          - [4] | Frame | 39x140 @(678,5858) | layout=V gap=4
+            - [4] | Frame | 39x32 @(678,5858) | fill=#34c759 | r=4 | layout=H
+              - [13] | 17:00 | 26x12 @(685,5868) | fill=#ffffff | font=Inter/Regular 10px | text="17:00"
+            - [4] | Frame | 39x32 @(678,5894) | fill=#34c759 | r=4 | layout=H
+              - [13] | 18:00 | 27x12 @(684,5904) | fill=#ffffff | font=Inter/Regular 10px | text="18:00"
+            - [4] | Frame | 39x32 @(678,5930) | fill=#34c759 | r=4 | layout=H
+              - [13] | 19:00 | 27x12 @(684,5940) | fill=#ffffff | font=Inter/Regular 10px | text="19:00"
+            - [4] | Frame | 39x32 @(678,5966) | fill=#34c759 | r=4 | layout=H
+              - [13] | 20:00 | 28x12 @(684,5976) | fill=#ffffff | font=Inter/Regular 10px | text="20:00"
+          - [4] | Frame | 39x140 @(721,5858) | layout=V gap=4
+            - [4] | Frame | 39x32 @(721,5858) | fill=#34c759 | r=4 | layout=H
+              - [13] | 17:00 | 26x12 @(728,5868) | fill=#ffffff | font=Inter/Regular 10px | text="17:00"
+            - [4] | Frame | 39x32 @(721,5894) | fill=#34c759 | r=4 | layout=H
+              - [13] | 18:00 | 27x12 @(727,5904) | fill=#ffffff | font=Inter/Regular 10px | text="18:00"
+            - [4] | Frame | 39x32 @(721,5930) | fill=#34c759 | r=4 | layout=H
+              - [13] | 19:00 | 27x12 @(727,5940) | fill=#ffffff | font=Inter/Regular 10px | text="19:00"
+            - [4] | Frame | 39x32 @(721,5966) | fill=#34c759 | r=4 | layout=H
+              - [13] | 20:00 | 28x12 @(727,5976) | fill=#ffffff | font=Inter/Regular 10px | text="20:00"
+          - [4] | Frame | 39x140 @(764,5858) | layout=V gap=4
+            - [4] | Frame | 39x32 @(764,5858) | fill=#e7eaf0 | r=4 | layout=H
+              - [13] | 17:00 | 26x12 @(771,5868) | fill=#667085 | font=Inter/Regular 10px | text="17:00"
+            - [4] | Frame | 39x32 @(764,5894) | fill=#34c759 | r=4 | layout=H
+              - [13] | 18:00 | 27x12 @(771,5904) | fill=#ffffff | font=Inter/Regular 10px | text="18:00"
+            - [4] | Frame | 39x32 @(764,5930) | fill=#34c759 | r=4 | layout=H
+              - [13] | 19:00 | 27x12 @(771,5940) | fill=#ffffff | font=Inter/Regular 10px | text="19:00"
+            - [4] | Frame | 39x32 @(764,5966) | fill=#e7eaf0 | r=4 | layout=H
+              - [13] | 20:00 | 28x12 @(770,5976) | fill=#667085 | font=Inter/Regular 10px | text="20:00"
+          - [4] | Frame | 39x140 @(808,5858) | layout=V gap=4
+            - [4] | Frame | 39x32 @(808,5858) | fill=#e7eaf0 | r=4 | layout=H
+              - [13] | 17:00 | 26x12 @(814,5868) | fill=#667085 | font=Inter/Regular 10px | text="17:00"
+            - [4] | Frame | 39x32 @(808,5894) | fill=#34c759 | r=4 | layout=H
+              - [13] | 18:00 | 27x12 @(814,5904) | fill=#ffffff | font=Inter/Regular 10px | text="18:00"
+            - [4] | Frame | 39x32 @(808,5930) | fill=#34c759 | r=4 | layout=H
+              - [13] | 19:00 | 27x12 @(814,5940) | fill=#ffffff | font=Inter/Regular 10px | text="19:00"
+            - [4] | Frame | 39x32 @(808,5966) | fill=#e7eaf0 | r=4 | layout=H
+              - [13] | 20:00 | 28x12 @(813,5976) | fill=#667085 | font=Inter/Regular 10px | text="20:00"
+      - [13] | 费用由俱乐部统一结算 | 299x15 @(548,6014) | fill=#667085 | font=Inter/Regular 12px | text="费用由俱乐部统一结算"
+  - [4] | TabIconsOverlay | 375x70 @(510,6262) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(630,6322) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(510,6262)
+      - [4] | icon_0 | 22x22 @(562,6268)
+        - [6] | Vector | 17x16 @(564,6272) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(568,6270) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(564,6277) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(567,6280) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(571,6280) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(575,6280) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(567,6284) | fill=#8e97a6
+      - [13] | 日程 | 121x14 @(512,6293) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(635,6262)
+      - [4] | icon_1 | 22x22 @(686,6268)
+        - [6] | Vector | 14x17 @(690,6271) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 6x2 @(694,6271) | stroke=#8e97a6 w1.4
+        - [6] | Vector | 8x0 @(694,6278) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 8x0 @(694,6282) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 5x0 @(694,6285) | fill=#000000 | stroke=#8e97a6 w1.3
+      - [13] | 训练管理 | 121x14 @(637,6293) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="训练管理"
+    - [4] | tab_2 | 125x56 @(760,6262)
+      - [4] | icon_2 | 22x22 @(812,6268)
+        - [6] | Vector | 8x8 @(818,6271) | stroke=#a80f1b w1.6
+        - [6] | Vector | 16x8 @(814,6280) | stroke=#a80f1b w1.6
+      - [13] | 我的 | 121x14 @(762,6293) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="我的"
+      - [9] | Ellipse | 4x4 @(820,6310) | fill=#a80f1b

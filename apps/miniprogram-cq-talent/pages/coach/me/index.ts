@@ -50,6 +50,18 @@ Page({
   openTestTasks() {
     openPage("/pages/coach/test-tasks/index");
   },
+  openPermissions() {
+    openPage("/pages/coach/permissions/index");
+  },
+  openPrivateInterest() {
+    openPage("/pages/coach/private-interest/index");
+  },
+  openAccount() {
+    openPage("/pages/coach/account/index");
+  },
+  openHelp() {
+    openPage("/pages/coach/help/index");
+  },
 });
 
 function readableError(error: unknown) {
