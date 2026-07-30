@@ -177,6 +177,18 @@ export function buildOpenApiDocument() {
           ...schemas.appClientCoachEventChangeRequest,
         }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/training-coverage": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/training-coverage", {
+          ...schemas.appClientParams,
+          ...schemas.appClientCoachTrainingCoverage,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks", {
+          ...schemas.appClientParams,
+          ...schemas.appClientCoachAssessmentTasks,
+        }),
+      },
       "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/activity-summaries": {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/activity-summaries", {
           ...schemas.appClientStudentParams,

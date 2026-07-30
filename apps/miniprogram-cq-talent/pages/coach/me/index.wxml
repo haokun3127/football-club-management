@@ -28,6 +28,10 @@
       <view class="label">团队能力总览</view>
       <view class="field-value field-value--link">队均雷达与维度统计 ›</view>
     </view>
+    <view class="field-row field-row--link" bindtap="openTestTasks">
+      <view class="label">测评任务</view>
+      <view class="field-value field-value--link">任务进度与评估录入 ›</view>
+    </view>
   </view>
 
   <view class="card permission-card">

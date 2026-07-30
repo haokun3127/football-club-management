@@ -47,6 +47,9 @@ Page({
   openTeamAbility() {
     openPage("/pages/coach/team-ability/index");
   },
+  openTestTasks() {
+    openPage("/pages/coach/test-tasks/index");
+  },
 });
 
 function readableError(error: unknown) {

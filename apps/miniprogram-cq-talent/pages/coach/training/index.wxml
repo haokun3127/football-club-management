@@ -20,7 +20,7 @@
   </view>
 
   <view wx:if="{{projectTree}}" class="card project-library">
-    <view class="section-title">训练项目库</view>
+    <view class="row"><view class="section-title">训练项目库</view><view class="tag library-link" bindtap="openContentSelect">分类选择 ›</view></view>
     <input class="search-input" placeholder="搜索训练项目" value="{{searchText}}" bindinput="onSearchInput" />
     <view wx:for="{{filteredGroups}}" wx:key="id" class="project-group">
       <view class="group-header" data-id="{{item.id}}" bindtap="toggleGroup">

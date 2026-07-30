@@ -621,6 +621,78 @@ describe("api server", () => {
     persistence.database.close();
   });
 
+  it("serves coach training coverage and assessment tasks with coach scoping", async () => {
+    process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED = "1";
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const store = new PersistentApiStore(persistence.repositories);
+    const app = buildServer(
+      store,
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    const base = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach";
+
+    const coverage = await app.inject({
+      method: "GET",
+      url: `${base}/training-coverage`,
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    expect(coverage.statusCode, coverage.body).toBe(200);
+    const coverageBody = coverage.json() as {
+      students: Array<{
+        studentId: string;
+        name: string;
+        coveredCount: number;
+        totalCount: number;
+        dimensions: Array<{ dimensionId: string; label: string; covered: boolean; scorePercent: number | null }>;
+      }>;
+    };
+    expect(coverageBody.students.length).toBeGreaterThanOrEqual(1);
+    const firstStudent = coverageBody.students[0];
+    expect(firstStudent.totalCount).toBeGreaterThanOrEqual(1);
+    expect(firstStudent.dimensions.length).toBe(firstStudent.totalCount);
+
+    // Parent role denied.
+    const parentCoverage = await app.inject({
+      method: "GET",
+      url: `${base}/training-coverage`,
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    expect(parentCoverage.statusCode).toBe(403);
+
+    const tasks = await app.inject({
+      method: "GET",
+      url: `${base}/assessment-tasks`,
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    expect(tasks.statusCode, tasks.body).toBe(200);
+    const tasksBody = tasks.json() as {
+      tasks: Array<{
+        id: string;
+        title: string;
+        templateId: string;
+        startsOn: string;
+        dueOn: string;
+        status: "not_started" | "in_progress" | "completed";
+        completedStudents: number;
+        totalStudents: number;
+      }>;
+    };
+    expect(tasksBody.tasks.length).toBeGreaterThanOrEqual(2);
+    const july = tasksBody.tasks.find((task) => task.id === "assessment-task-cq-talent-fitness-july");
+    const august = tasksBody.tasks.find((task) => task.id === "assessment-task-cq-talent-speed-august");
+    expect(july?.status).toBe("in_progress");
+    expect(august?.status).toBe("not_started");
+    expect(july?.totalStudents).toBeGreaterThanOrEqual(1);
+
+    await app.close();
+    persistence.database.close();
+    delete process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED;
+  });
+
   it("serves next-stage mini-program BFF aggregates without leaking cross-role access", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
     const app = buildServer(

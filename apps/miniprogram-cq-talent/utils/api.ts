@@ -11,6 +11,8 @@ import type {
   CoachHome,
   CoachTeamDetail,
   CoachTeamAbilityOverview,
+  CoachTrainingCoverageStudent,
+  CoachAssessmentTask,
   CoachWorkbench,
   GrowthSummary,
   MetricDetail,
@@ -793,6 +795,8 @@ function normalizeTrainingProject(project: Record<string, unknown>) {
     description: stringOrUndefined(project.description ?? project.summary),
     metricIds,
     tags,
+    durationMinutes: typeof project.durationMinutes === "number" ? project.durationMinutes : undefined,
+    difficulty: stringOrUndefined(project.difficulty),
   };
 }
 
@@ -1009,4 +1013,20 @@ export async function createCoachEventChangeRequest(
     method: "POST",
     data: input,
   });
+}
+
+export async function getCoachTrainingCoverage(): Promise<CoachTrainingCoverageStudent[]> {
+  const context = requireContext();
+  const response = await request<{ students?: CoachTrainingCoverageStudent[] }>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/training-coverage`,
+  });
+  return Array.isArray(response.students) ? response.students : [];
+}
+
+export async function getCoachAssessmentTasks(): Promise<CoachAssessmentTask[]> {
+  const context = requireContext();
+  const response = await request<{ tasks?: CoachAssessmentTask[] }>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessment-tasks`,
+  });
+  return Array.isArray(response.tasks) ? response.tasks : [];
 }

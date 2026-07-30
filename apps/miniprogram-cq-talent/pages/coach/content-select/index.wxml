@@ -1,0 +1,61 @@
+<view class="select-page">
+  <app-header title="训练内容选择" action-text="覆盖预览" bindaction="openCoverage" show-back />
+  <view class="select-page__body">
+    <status-view
+      state="{{state}}"
+      title="{{state === 'loading' ? '加载训练项目' : state === 'empty' ? '暂无训练项目' : '读取失败'}}"
+      message="{{message}}"
+      action-text="{{state === 'error' ? '重试' : ''}}"
+      bindaction="retry"
+    />
+
+    <block wx:if="{{state === 'ready'}}">
+      <!-- 搜索栏（Figma C10: 白底 r22） -->
+      <view class="search-bar">
+        <text class="search-bar__icon">🔍</text>
+        <input class="search-bar__input" placeholder="搜索训练项目" value="{{searchText}}" bindinput="onSearchInput" />
+      </view>
+
+      <!-- 分类 tabs（选中=品牌红 r16） -->
+      <scroll-view scroll-x class="category-strip" enhanced show-scrollbar="{{false}}">
+        <view class="category-strip__inner">
+          <view
+            wx:for="{{categories}}"
+            wx:key="*this"
+            class="category-chip {{activeCategory === item ? 'category-chip--active' : ''}}"
+            data-name="{{item}}"
+            bindtap="selectCategory"
+          >{{item}}</view>
+        </view>
+      </scroll-view>
+
+      <!-- 项目卡片列表 -->
+      <view class="project-list">
+        <block wx:for="{{projects}}" wx:key="id">
+          <view
+            wx:if="{{(activeCategory === '全部' || item.tags.indexOf(activeCategory) >= 0) && (!searchText || item.name.indexOf(searchText) >= 0)}}"
+            class="project-card {{selectedMap[item.id] ? 'project-card--selected' : ''}}"
+            data-id="{{item.id}}"
+            bindtap="toggleProject"
+          >
+            <view class="project-card__icon {{selectedMap[item.id] ? 'project-card__icon--selected' : ''}}">{{selectedMap[item.id] ? '✓' : '⚽'}}</view>
+            <view class="project-card__info">
+              <view class="project-card__name">{{item.name}}</view>
+              <view class="project-card__meta">
+                <text wx:if="{{item.difficultyLabel}}" class="project-card__level">{{item.difficultyLabel}}</text>
+                <text wx:if="{{item.durationLabel}}" class="project-card__duration">{{item.durationLabel}}</text>
+              </view>
+            </view>
+          </view>
+        </block>
+      </view>
+    </block>
+  </view>
+
+  <!-- 底部已选栏 -->
+  <view wx:if="{{state === 'ready'}}" class="select-bar">
+    <view class="select-bar__count">已选 {{selectedCount}} 项</view>
+    <view class="select-bar__confirm {{selectedCount ? '' : 'select-bar__confirm--disabled'}}" bindtap="confirmSelection">{{eventId ? '保存到活动' : '确定'}}</view>
+  </view>
+  <role-tabbar role="coach" active="schedule" />
+</view>

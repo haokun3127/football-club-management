@@ -1,0 +1,52 @@
+<view class="tasks-page">
+  <app-header title="测评任务" action-text="新增" bindaction="createTask" show-back />
+  <view class="tasks-page__body">
+    <!-- 筛选 chips（Figma C11: 全部/未完成/已完成） -->
+    <view class="filter-row">
+      <view
+        wx:for="{{filters}}"
+        wx:key="*this"
+        class="filter-chip {{activeFilter === item ? 'filter-chip--active' : ''}}"
+        data-name="{{item}}"
+        bindtap="selectFilter"
+      >{{item}}</view>
+    </view>
+
+    <status-view
+      state="{{state}}"
+      title="{{state === 'loading' ? '加载测评任务' : state === 'empty' ? '暂无任务' : '读取失败'}}"
+      message="{{message}}"
+      action-text="{{state === 'error' ? '重试' : ''}}"
+      bindaction="retry"
+    />
+
+    <block wx:if="{{state === 'ready'}}">
+      <block wx:for="{{tasks}}" wx:key="id">
+        <view
+          wx:if="{{activeFilter === '全部' || (activeFilter === '未完成' && item.status !== 'completed') || (activeFilter === '已完成' && item.status === 'completed')}}"
+          class="task-card"
+          data-template-id="{{item.templateId}}"
+          data-title="{{item.title}}"
+          data-status="{{item.status}}"
+          bindtap="openTask"
+        >
+          <view class="task-card__head">
+            <view class="task-card__title">{{item.title}}</view>
+            <view class="task-card__status {{item.statusClass}}">{{item.statusLabel}}</view>
+          </view>
+          <view class="task-card__dates">{{item.dateRange}}</view>
+          <view class="task-card__foot">
+            <view class="task-card__progress">
+              <view class="task-card__progress-label">{{item.progressLabel}}</view>
+              <view class="task-card__track">
+                <view class="task-card__bar" style="width: {{item.progressPercent}}%"></view>
+              </view>
+            </view>
+            <view class="task-card__chevron">›</view>
+          </view>
+        </view>
+      </block>
+    </block>
+  </view>
+  <role-tabbar role="coach" active="me" />
+</view>

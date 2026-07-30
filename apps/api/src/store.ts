@@ -80,6 +80,7 @@ import type {
   PrivateLessonRequestInput,
   EventChangeRequest,
   EventChangeRequestInput,
+  AssessmentTask,
   InsurancePolicySummary,
   LessonAdjustmentInput,
   LessonLedgerEntry,
@@ -163,6 +164,7 @@ export interface ApiStore {
   createPrivateLessonRequest(clubId: EntityId, studentId: EntityId, input: PrivateLessonRequestInput): PrivateLessonRequest | Promise<PrivateLessonRequest>;
   listEventChangeRequests(clubId: EntityId, eventId?: EntityId): EventChangeRequest[] | Promise<EventChangeRequest[]>;
   createEventChangeRequest(clubId: EntityId, eventId: EntityId, input: EventChangeRequestInput): EventChangeRequest | Promise<EventChangeRequest>;
+  listAssessmentTasks(clubId: EntityId): AssessmentTask[] | Promise<AssessmentTask[]>;
   confirmExternalRecord(
     clubId: EntityId,
     rawRecordId: EntityId,
@@ -1767,6 +1769,10 @@ export abstract class SeedBackedStore implements ApiStore {
 
     this.data.eventChangeRequests.push(request);
     return request;
+  }
+
+  listAssessmentTasks(clubId: EntityId): AssessmentTask[] {
+    return this.data.assessmentTasks.filter((item) => item.clubId === clubId);
   }
 
   confirmExternalRecord(

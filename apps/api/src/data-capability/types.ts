@@ -624,6 +624,15 @@ export interface EventChangeRequest {
   updatedAt: string;
 }
 
+export interface AssessmentTask {
+  id: string;
+  clubId: string;
+  title: string;
+  templateId: string;
+  startsOn: string;
+  dueOn: string;
+}
+
 export interface EventChangeRequestInput {
   reason: EventChangeReason;
   newStartsAt?: string;

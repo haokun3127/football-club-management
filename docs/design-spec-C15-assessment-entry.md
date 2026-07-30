@@ -1,0 +1,162 @@
+# Figma 画板规格: C15 Assessment Entry
+
+- [4] | C15 Assessment Entry | 375x812 @(510,4620) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | TopNav | 375x88 @(510,4620) | fill=#fceeef | layout=H pad=14/22
+    - [4] | chevron-left | 24x24 @(532,4652)
+      - [6] | Vector | 6x12 @(541,4658) | stroke=#202124 w2
+    - [13] | 能力评估录入 | 132x27 @(616,4650) | fill=#202124 | font=Inter/Bold 22px | text="能力评估录入"
+    - [13] | 保存草稿 | 56x17 @(807,4656) | fill=#667085 | font=Inter/Medium 14px | text="保存草稿"
+  - [4] | Content | 375x654 @(510,4708) | layout=V gap=16 pad=16/22
+    - [4] | Assessment Tabs | 331x32 @(532,4724) | layout=H gap=8
+      - [4] | Frame | 54x32 @(532,4724) | fill=#ffffff | stroke=#e7eaf0 w1 | r=20 | layout=H pad=8/14
+        - [13] | 技术 | 26x16 @(546,4732) | fill=#667085 | font=Inter/Regular 13px | text="技术"
+      - [4] | Frame | 54x32 @(594,4724) | fill=#ffffff | stroke=#e7eaf0 w1 | r=20 | layout=H pad=8/14
+        - [13] | 体能 | 26x16 @(608,4732) | fill=#667085 | font=Inter/Regular 13px | text="体能"
+      - [4] | Frame | 54x32 @(656,4724) | fill=#a80f1b | r=20 | layout=H pad=8/14
+        - [13] | 战术 | 26x16 @(670,4732) | fill=#ffffff | font=Inter/Semi Bold 13px | text="战术"
+    - [4] | Student List | 331x696 @(532,4772) | layout=V gap=12
+      - [4] | Student Row | 331x224 @(532,4772) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+        - [4] | Frame | 299x40 @(548,4788) | layout=H gap=12
+          - [4] | Avatar | 40x40 @(548,4788) | fill=#fceeef | stroke=#a80f1b w2 | r=20 | layout=V
+            - [13] | 陈 | 14x17 @(561,4800) | fill=#a80f1b | font=Inter/Bold 14px | text="陈"
+          - [4] | Frame | 215x34 @(600,4791) | layout=V gap=2
+            - [13] | 陈小宇 | 42x17 @(600,4791) | fill=#202124 | font=Inter/Bold 14px | text="陈小宇"
+            - [13] | U10精英队 · 10岁 | 94x15 @(600,4810) | fill=#667085 | font=Inter/Regular 12px | text="U10精英队 · 10岁"
+          - [13] | 76 | 20x19 @(827,4798) | fill=#a80f1b | font=Inter/Bold 16px | text="76"
+        - [4] | Sliders | 299x140 @(548,4840) | layout=V gap=10
+          - [4] | Frame | 299x15 @(548,4840) | layout=H
+            - [13] | 传球 | 24x15 @(548,4840) | fill=#667085 | font=Inter/Regular 12px | text="传球"
+            - [4] | Frame | 160x6 @(621,4844) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 120x6 @(621,4844) | fill=#a80f1b
+            - [13] | 7.5 | 17x15 @(830,4840) | fill=#a80f1b | font=Inter/Bold 12px | text="7.5"
+          - [4] | Frame | 299x15 @(548,4865) | layout=H
+            - [13] | 射门 | 24x15 @(548,4865) | fill=#667085 | font=Inter/Regular 12px | text="射门"
+            - [4] | Frame | 160x6 @(620,4870) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 110x6 @(620,4870) | fill=#a80f1b
+            - [13] | 6.9 | 19x15 @(828,4865) | fill=#a80f1b | font=Inter/Bold 12px | text="6.9"
+          - [4] | Frame | 299x15 @(548,4890) | layout=H
+            - [13] | 防守 | 24x15 @(548,4890) | fill=#667085 | font=Inter/Regular 12px | text="防守"
+            - [4] | Frame | 160x6 @(621,4894) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 115x6 @(621,4894) | fill=#a80f1b
+            - [13] | 7.2 | 17x15 @(830,4890) | fill=#a80f1b | font=Inter/Bold 12px | text="7.2"
+          - [4] | Frame | 299x15 @(548,4915) | layout=H
+            - [13] | 体能 | 24x15 @(548,4915) | fill=#667085 | font=Inter/Regular 12px | text="体能"
+            - [4] | Frame | 160x6 @(621,4920) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 125x6 @(621,4920) | fill=#a80f1b
+            - [13] | 7.9 | 17x15 @(830,4915) | fill=#a80f1b | font=Inter/Bold 12px | text="7.9"
+          - [4] | Frame | 299x15 @(548,4940) | layout=H
+            - [13] | 速度 | 24x15 @(548,4940) | fill=#667085 | font=Inter/Regular 12px | text="速度"
+            - [4] | Frame | 160x6 @(620,4944) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 130x6 @(620,4944) | fill=#a80f1b
+            - [13] | 8.2 | 19x15 @(828,4940) | fill=#a80f1b | font=Inter/Bold 12px | text="8.2"
+          - [4] | Frame | 299x15 @(548,4965) | layout=H
+            - [13] | 协作 | 24x15 @(548,4965) | fill=#667085 | font=Inter/Regular 12px | text="协作"
+            - [4] | Frame | 160x6 @(620,4970) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 128x6 @(620,4970) | fill=#a80f1b
+            - [13] | 8.0 | 20x15 @(827,4965) | fill=#a80f1b | font=Inter/Bold 12px | text="8.0"
+      - [4] | Student Row | 331x224 @(532,5008) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+        - [4] | Frame | 299x40 @(548,5024) | layout=H gap=12
+          - [4] | Avatar | 40x40 @(548,5024) | fill=#fceeef | stroke=#a80f1b w2 | r=20 | layout=V
+            - [13] | 李 | 14x17 @(561,5036) | fill=#a80f1b | font=Inter/Bold 14px | text="李"
+          - [4] | Frame | 213x34 @(600,5027) | layout=V gap=2
+            - [13] | 李明辉 | 42x17 @(600,5027) | fill=#202124 | font=Inter/Bold 14px | text="李明辉"
+            - [13] | U10精英队 · 10岁 | 94x15 @(600,5046) | fill=#667085 | font=Inter/Regular 12px | text="U10精英队 · 10岁"
+          - [13] | 80 | 22x19 @(825,5034) | fill=#a80f1b | font=Inter/Bold 16px | text="80"
+        - [4] | Sliders | 299x140 @(548,5076) | layout=V gap=10
+          - [4] | Frame | 299x15 @(548,5076) | layout=H
+            - [13] | 传球 | 24x15 @(548,5076) | fill=#667085 | font=Inter/Regular 12px | text="传球"
+            - [4] | Frame | 160x6 @(620,5080) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 140x6 @(620,5080) | fill=#a80f1b
+            - [13] | 8.8 | 19x15 @(828,5076) | fill=#a80f1b | font=Inter/Bold 12px | text="8.8"
+          - [4] | Frame | 299x15 @(548,5101) | layout=H
+            - [13] | 射门 | 24x15 @(548,5101) | fill=#667085 | font=Inter/Regular 12px | text="射门"
+            - [4] | Frame | 160x6 @(620,5106) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 118x6 @(620,5106) | fill=#a80f1b
+            - [13] | 7.4 | 18x15 @(829,5101) | fill=#a80f1b | font=Inter/Bold 12px | text="7.4"
+          - [4] | Frame | 299x15 @(548,5126) | layout=H
+            - [13] | 防守 | 24x15 @(548,5126) | fill=#667085 | font=Inter/Regular 12px | text="防守"
+            - [4] | Frame | 160x6 @(621,5130) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 122x6 @(621,5130) | fill=#a80f1b
+            - [13] | 7.7 | 17x15 @(830,5126) | fill=#a80f1b | font=Inter/Bold 12px | text="7.7"
+          - [4] | Frame | 299x15 @(548,5151) | layout=H
+            - [13] | 体能 | 24x15 @(548,5151) | fill=#667085 | font=Inter/Regular 12px | text="体能"
+            - [4] | Frame | 160x6 @(620,5156) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 128x6 @(620,5156) | fill=#a80f1b
+            - [13] | 8.0 | 20x15 @(827,5151) | fill=#a80f1b | font=Inter/Bold 12px | text="8.0"
+          - [4] | Frame | 299x15 @(548,5176) | layout=H
+            - [13] | 速度 | 24x15 @(548,5176) | fill=#667085 | font=Inter/Regular 12px | text="速度"
+            - [4] | Frame | 160x6 @(621,5180) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 124x6 @(621,5180) | fill=#a80f1b
+            - [13] | 7.8 | 17x15 @(830,5176) | fill=#a80f1b | font=Inter/Bold 12px | text="7.8"
+          - [4] | Frame | 299x15 @(548,5201) | layout=H
+            - [13] | 协作 | 24x15 @(548,5201) | fill=#667085 | font=Inter/Regular 12px | text="协作"
+            - [4] | Frame | 160x6 @(620,5206) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 132x6 @(620,5206) | fill=#a80f1b
+            - [13] | 8.3 | 19x15 @(828,5201) | fill=#a80f1b | font=Inter/Bold 12px | text="8.3"
+      - [4] | Student Row | 331x224 @(532,5244) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+        - [4] | Frame | 299x40 @(548,5260) | layout=H gap=12
+          - [4] | Avatar | 40x40 @(548,5260) | fill=#fceeef | stroke=#a80f1b w2 | r=20 | layout=V
+            - [13] | 张 | 14x17 @(561,5272) | fill=#a80f1b | font=Inter/Bold 14px | text="张"
+          - [4] | Frame | 214x34 @(600,5263) | layout=V gap=2
+            - [13] | 张伟 | 28x17 @(600,5263) | fill=#202124 | font=Inter/Bold 14px | text="张伟"
+            - [13] | U10精英队 · 10岁 | 94x15 @(600,5282) | fill=#667085 | font=Inter/Regular 12px | text="U10精英队 · 10岁"
+          - [13] | 82 | 21x19 @(826,5270) | fill=#a80f1b | font=Inter/Bold 16px | text="82"
+        - [4] | Sliders | 299x140 @(548,5312) | layout=V gap=10
+          - [4] | Frame | 299x15 @(548,5312) | layout=H
+            - [13] | 传球 | 24x15 @(548,5312) | fill=#667085 | font=Inter/Regular 12px | text="传球"
+            - [4] | Frame | 160x6 @(620,5316) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 135x6 @(620,5316) | fill=#a80f1b
+            - [13] | 8.5 | 19x15 @(828,5312) | fill=#a80f1b | font=Inter/Bold 12px | text="8.5"
+          - [4] | Frame | 299x15 @(548,5337) | layout=H
+            - [13] | 射门 | 24x15 @(548,5337) | fill=#667085 | font=Inter/Regular 12px | text="射门"
+            - [4] | Frame | 160x6 @(621,5342) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 125x6 @(621,5342) | fill=#a80f1b
+            - [13] | 7.9 | 17x15 @(830,5337) | fill=#a80f1b | font=Inter/Bold 12px | text="7.9"
+          - [4] | Frame | 299x15 @(548,5362) | layout=H
+            - [13] | 防守 | 24x15 @(548,5362) | fill=#667085 | font=Inter/Regular 12px | text="防守"
+            - [4] | Frame | 160x6 @(620,5366) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 130x6 @(620,5366) | fill=#a80f1b
+            - [13] | 8.2 | 19x15 @(828,5362) | fill=#a80f1b | font=Inter/Bold 12px | text="8.2"
+          - [4] | Frame | 299x15 @(548,5387) | layout=H
+            - [13] | 体能 | 24x15 @(548,5387) | fill=#667085 | font=Inter/Regular 12px | text="体能"
+            - [4] | Frame | 160x6 @(620,5392) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 140x6 @(620,5392) | fill=#a80f1b
+            - [13] | 8.8 | 19x15 @(828,5387) | fill=#a80f1b | font=Inter/Bold 12px | text="8.8"
+          - [4] | Frame | 299x15 @(548,5412) | layout=H
+            - [13] | 速度 | 24x15 @(548,5412) | fill=#667085 | font=Inter/Regular 12px | text="速度"
+            - [4] | Frame | 160x6 @(620,5416) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 128x6 @(620,5416) | fill=#a80f1b
+            - [13] | 8.0 | 20x15 @(827,5412) | fill=#a80f1b | font=Inter/Bold 12px | text="8.0"
+          - [4] | Frame | 299x15 @(548,5437) | layout=H
+            - [13] | 协作 | 24x15 @(548,5437) | fill=#667085 | font=Inter/Regular 12px | text="协作"
+            - [4] | Frame | 160x6 @(620,5442) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 136x6 @(620,5442) | fill=#a80f1b
+            - [13] | 8.6 | 19x15 @(828,5437) | fill=#a80f1b | font=Inter/Bold 12px | text="8.6"
+    - [4] | Save All | 331x48 @(532,5484) | fill=#a80f1b | r=12 | layout=H
+      - [13] | 保存所有 | 60x18 @(668,5499) | fill=#ffffff | font=Inter/Bold 15px | text="保存所有"
+  - [4] | TabIconsOverlay | 375x70 @(510,5362) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(630,5422) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(510,5362)
+      - [4] | icon_0 | 22x22 @(562,5368)
+        - [6] | Vector | 17x16 @(564,5372) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(568,5370) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(564,5377) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(567,5380) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(571,5380) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(575,5380) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(567,5384) | fill=#8e97a6
+      - [13] | 日程 | 121x14 @(512,5393) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(635,5362)
+      - [4] | icon_1 | 22x22 @(686,5368)
+        - [6] | Vector | 14x17 @(690,5371) | stroke=#a80f1b w1.6
+        - [6] | Vector | 6x2 @(694,5371) | stroke=#a80f1b w1.4
+        - [6] | Vector | 8x0 @(694,5378) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 8x0 @(694,5382) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 5x0 @(694,5385) | fill=#000000 | stroke=#a80f1b w1.3
+      - [13] | 训练管理 | 121x14 @(637,5393) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="训练管理"
+      - [9] | Ellipse | 4x4 @(696,5410) | fill=#a80f1b
+    - [4] | tab_2 | 125x56 @(760,5362)
+      - [4] | icon_2 | 22x22 @(812,5368)
+        - [6] | Vector | 8x8 @(818,5371) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(814,5380) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(762,5393) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

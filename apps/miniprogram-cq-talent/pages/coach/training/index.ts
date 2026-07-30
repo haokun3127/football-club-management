@@ -80,6 +80,10 @@ Page({
     const templateId = this.data.workbench?.assessmentTemplateId || "";
     openPage(`/pages/coach/test-entry/index?eventId=${eventId}&templateId=${templateId}`);
   },
+  openContentSelect() {
+    const eventId = this.data.workbench?.event.id || "";
+    openPage(`/pages/coach/content-select/index?eventId=${eventId}`);
+  },
   toggleGroup(event: { currentTarget: { dataset: { id?: string } } }) {
     const id = event.currentTarget.dataset.id;
     if (!id) return;

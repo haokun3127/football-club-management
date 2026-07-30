@@ -1,0 +1,85 @@
+# Figma 画板规格: C11 Test Task List
+
+- [4] | C11 Test Task List | 375x812 @(80,3720) | fill=#f6f7f9 | r=28
+  - [4] | Top Nav | 375x88 @(80,3720) | fill=#fceeef | layout=H pad=14/22
+    - [4] | Frame | 124x27 @(102,3750) | layout=H gap=12
+      - [13] | 测评任务 | 88x27 @(138,3750) | fill=#202124 | font=Inter/Bold 22px | text="测评任务"
+      - [4] | arrow-left | 24x24 @(102,3752)
+        - [6] | Vector | 14x14 @(107,3757) | stroke=#202124 w2
+    - [13] | 新增 | 30x18 @(403,3755) | fill=#a80f1b | font=Inter/Semi Bold 15px | text="新增"
+  - [4] | Filters | 224x32 @(102,3824) | layout=H gap=12
+    - [4] | Frame | 58x32 @(102,3824) | fill=#a80f1b | r=16 | layout=H pad=8/16
+      - [13] | 全部 | 26x16 @(118,3832) | fill=#ffffff | font=Inter/Semi Bold 13px | text="全部"
+    - [4] | Frame | 71x32 @(172,3824) | fill=#ffffff | stroke=#e7eaf0 w1 | r=16 | layout=H pad=8/16
+      - [13] | 未完成 | 39x16 @(188,3832) | fill=#667085 | font=Inter/Medium 13px | text="未完成"
+    - [4] | Frame | 71x32 @(255,3824) | fill=#ffffff | stroke=#e7eaf0 w1 | r=16 | layout=H pad=8/16
+      - [13] | 已完成 | 39x16 @(271,3832) | fill=#667085 | font=Inter/Medium 13px | text="已完成"
+  - [4] | Task List | 331x380 @(102,3880) | layout=V gap=16
+    - [4] | Task Card | 331x116 @(102,3880) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+      - [4] | Frame | 299x21 @(118,3896) | layout=H
+        - [13] | 体能综合测评 | 96x19 @(118,3897) | fill=#202124 | font=Inter/Bold 16px | text="体能综合测评"
+        - [4] | Frame | 49x21 @(368,3896) | fill=#e8f5e9 | r=4 | layout=H pad=4/8
+          - [13] | 进行中 | 33x13 @(376,3900) | fill=#2e7d32 | font=Inter/Semi Bold 11px | text="进行中"
+      - [13] | 2025-07-01 ~ 2025-07-31 | 163x16 @(118,3929) | fill=#667085 | font=Inter/Regular 13px | text="2025-07-01 ~ 2025-07-31"
+      - [4] | Frame | 299x23 @(118,3957) | layout=H
+        - [4] | Frame | 120x23 @(118,3957) | layout=V gap=4
+          - [13] | 12/18名学员 | 67x15 @(118,3957) | fill=#667085 | font=Inter/Regular 12px | text="12/18名学员"
+          - [4] | Frame | 120x4 @(118,3976) | fill=#f0f0f0 | r=2 | layout=H
+            - [12] | Rectangle | 80x4 @(118,3976) | fill=#a80f1b | r=2
+        - [4] | chevron-right | 16x16 @(401,3960)
+          - [6] | Vector | 4x8 @(407,3964) | stroke=#667085 w2
+    - [4] | Task Card | 331x116 @(102,4012) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+      - [4] | Frame | 299x21 @(118,4028) | layout=H
+        - [13] | 速度耐力体测 | 96x19 @(118,4029) | fill=#202124 | font=Inter/Bold 16px | text="速度耐力体测"
+        - [4] | Frame | 49x21 @(368,4028) | fill=#f3f4f6 | r=4 | layout=H pad=4/8
+          - [13] | 未开始 | 33x13 @(376,4032) | fill=#94a3b8 | font=Inter/Semi Bold 11px | text="未开始"
+      - [13] | 2025-08-01 ~ 2025-08-15 | 164x16 @(118,4061) | fill=#667085 | font=Inter/Regular 13px | text="2025-08-01 ~ 2025-08-15"
+      - [4] | Frame | 299x23 @(118,4089) | layout=H
+        - [4] | Frame | 120x23 @(118,4089) | layout=V gap=4
+          - [13] | 0/20名学员 | 63x15 @(118,4089) | fill=#667085 | font=Inter/Regular 12px | text="0/20名学员"
+          - [4] | Frame | 120x4 @(118,4108) | fill=#f0f0f0 | r=2 | layout=H
+            - [12] | Rectangle | 0x4 @(118,4108) | fill=#94a3b8 | r=2
+        - [4] | chevron-right | 16x16 @(401,4092)
+          - [6] | Vector | 4x8 @(407,4096) | stroke=#667085 w2
+    - [4] | Task Card | 331x116 @(102,4144) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+      - [4] | Frame | 299x21 @(118,4160) | layout=H
+        - [13] | 控球精度评估 | 96x19 @(118,4161) | fill=#202124 | font=Inter/Bold 16px | text="控球精度评估"
+        - [4] | Frame | 49x21 @(368,4160) | fill=#e8f5e9 | r=4 | layout=H pad=4/8
+          - [13] | 进行中 | 33x13 @(376,4164) | fill=#2e7d32 | font=Inter/Semi Bold 11px | text="进行中"
+      - [13] | 2025-06-20 ~ 2025-06-30 | 168x16 @(118,4193) | fill=#667085 | font=Inter/Regular 13px | text="2025-06-20 ~ 2025-06-30"
+      - [4] | Frame | 299x23 @(118,4221) | layout=H
+        - [4] | Frame | 120x23 @(118,4221) | layout=V gap=4
+          - [13] | 15/20名学员 | 68x15 @(118,4221) | fill=#667085 | font=Inter/Regular 12px | text="15/20名学员"
+          - [4] | Frame | 120x4 @(118,4240) | fill=#f0f0f0 | r=2 | layout=H
+            - [12] | Rectangle | 90x4 @(118,4240) | fill=#a80f1b | r=2
+        - [4] | chevron-right | 16x16 @(401,4224)
+          - [6] | Vector | 4x8 @(407,4228) | stroke=#667085 w2
+  - [4] | FAB | 56x56 @(371,4420) | fill=#a80f1b | r=28 | layout=H | shadow=0,4,12,#a80f1b@0.25
+    - [4] | plus | 24x24 @(387,4436)
+      - [6] | Vector | 14x14 @(392,4441) | stroke=#ffffff w2
+  - [4] | TabIconsOverlay | 375x70 @(80,4462) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(200,4522) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(80,4462)
+      - [4] | icon_0 | 22x22 @(132,4468)
+        - [6] | Vector | 17x16 @(134,4472) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(138,4470) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(134,4477) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(137,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(141,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(145,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(137,4484) | fill=#8e97a6
+      - [13] | 日程 | 121x14 @(82,4493) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(205,4462)
+      - [4] | icon_1 | 22x22 @(256,4468)
+        - [6] | Vector | 14x17 @(260,4471) | stroke=#a80f1b w1.6
+        - [6] | Vector | 6x2 @(264,4471) | stroke=#a80f1b w1.4
+        - [6] | Vector | 8x0 @(264,4478) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 8x0 @(264,4482) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 5x0 @(264,4485) | fill=#000000 | stroke=#a80f1b w1.3
+      - [13] | 训练管理 | 121x14 @(207,4493) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="训练管理"
+      - [9] | Ellipse | 4x4 @(266,4510) | fill=#a80f1b
+    - [4] | tab_2 | 125x56 @(330,4462)
+      - [4] | icon_2 | 22x22 @(382,4468)
+        - [6] | Vector | 8x8 @(388,4471) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(384,4480) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(332,4493) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

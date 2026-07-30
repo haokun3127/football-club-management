@@ -334,6 +334,24 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
       createdAt: now,
       updatedAt: importedAt,
     })),
+    assessmentTasks: [
+      {
+        id: "assessment-task-cq-talent-fitness-july",
+        clubId,
+        title: "体能综合测评",
+        templateId: "assessment-template-technical",
+        startsOn: "2026-07-01",
+        dueOn: "2026-07-31",
+      },
+      {
+        id: "assessment-task-cq-talent-speed-august",
+        clubId,
+        title: "速度耐力体测",
+        templateId: "assessment-template-technical",
+        startsOn: "2026-08-01",
+        dueOn: "2026-08-31",
+      },
+    ],
   };
 }
 

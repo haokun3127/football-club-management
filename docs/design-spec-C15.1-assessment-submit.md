@@ -1,0 +1,59 @@
+# Figma 画板规格: C15.1 Assessment Submit
+
+- [4] | C15.1 Assessment Submit | 375x812 @(940,4620) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | TopNav | 375x88 @(940,4620) | fill=#fceeef | layout=H pad=14/22
+    - [4] | chevron-left | 24x24 @(962,4652)
+      - [6] | Vector | 6x12 @(971,4658) | stroke=#202124 w2
+    - [13] | 评估提交 | 88x27 @(1084,4650) | fill=#202124 | font=Inter/Bold 22px | text="评估提交"
+    - [4] | Frame | 24x24 @(1269,4652)
+  - [4] | Content | 375x654 @(940,4708) | layout=V gap=32 pad=40/22
+    - [4] | SuccessState | 270x145 @(992,4748) | layout=V gap=16
+      - [4] | Frame | 80x80 @(1088,4748) | fill=#ffffff | r=40 | layout=V | shadow=0,4,12,#000000@0.05
+        - [4] | check | 40x40 @(1108,4768)
+          - [6] | Vector | 27x18 @(1114,4778) | stroke=#188754 w2
+      - [4] | Frame | 270x49 @(992,4844) | layout=V gap=8
+        - [13] | 能力评估已提交 | 140x24 @(1058,4844) | fill=#202124 | font=Inter/Bold 20px | text="能力评估已提交"
+        - [13] | 评估结果将在24小时内同步至学员成长档案 | 270x17 @(992,4876) | fill=#667085 | font=Inter/Regular 14px | text="评估结果将在24小时内同步至学员成长档案"
+    - [4] | SummaryCard | 331x125 @(962,4925) | fill=#ffffff | r=12 | layout=V gap=16 pad=20/20 | shadow=0,4,12,#000000@0.05
+      - [4] | Frame | 291x23 @(982,4945) | layout=H
+        - [13] | 技术评估 | 56x17 @(982,4948) | fill=#202124 | font=Inter/Bold 14px | text="技术评估"
+        - [4] | Frame | 52x23 @(1221,4945) | fill=#fce7e7 | r=4 | layout=H pad=4/8
+          - [13] | 处理中 | 36x15 @(1229,4949) | fill=#a80f1b | font=Inter/Semi Bold 12px | text="处理中"
+      - [4] | Frame | 291x46 @(982,4984) | layout=V gap=12
+        - [4] | Frame | 291x17 @(982,4984) | layout=H
+          - [13] | 学员数 | 42x17 @(982,4984) | fill=#667085 | font=Inter/Regular 14px | text="学员数"
+          - [13] | 18名 | 30x17 @(1243,4984) | fill=#202124 | font=Inter/Semi Bold 14px | text="18名"
+        - [4] | Frame | 291x17 @(982,5013) | layout=H
+          - [13] | 评估日期 | 56x17 @(982,5013) | fill=#667085 | font=Inter/Regular 14px | text="评估日期"
+          - [13] | 今天 | 28x17 @(1245,5013) | fill=#202124 | font=Inter/Semi Bold 14px | text="今天"
+    - [4] | Actions | 331x112 @(962,5082) | layout=V gap=12
+      - [4] | Frame | 331x52 @(962,5082) | fill=#a80f1b | r=26 | layout=H
+        - [13] | 查看结果 | 64x19 @(1096,5098) | fill=#ffffff | font=Inter/Semi Bold 16px | text="查看结果"
+      - [4] | Frame | 331x48 @(962,5146) | fill=#ffffff | stroke=#e7eaf0 w1 | r=24 | layout=H
+        - [13] | 返回列表 | 56x17 @(1100,5162) | fill=#667085 | font=Inter/Semi Bold 14px | text="返回列表"
+  - [4] | TabIconsOverlay | 375x70 @(940,5362) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1060,5422) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(940,5362)
+      - [4] | icon_0 | 22x22 @(992,5368)
+        - [6] | Vector | 17x16 @(994,5372) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(998,5370) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(994,5377) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(997,5380) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1001,5380) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1005,5380) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(997,5384) | fill=#8e97a6
+      - [13] | 日程 | 121x14 @(942,5393) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(1065,5362)
+      - [4] | icon_1 | 22x22 @(1116,5368)
+        - [6] | Vector | 14x17 @(1120,5371) | stroke=#a80f1b w1.6
+        - [6] | Vector | 6x2 @(1124,5371) | stroke=#a80f1b w1.4
+        - [6] | Vector | 8x0 @(1124,5378) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 8x0 @(1124,5382) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 5x0 @(1124,5385) | fill=#000000 | stroke=#a80f1b w1.3
+      - [13] | 训练管理 | 121x14 @(1067,5393) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="训练管理"
+      - [9] | Ellipse | 4x4 @(1126,5410) | fill=#a80f1b
+    - [4] | tab_2 | 125x56 @(1190,5362)
+      - [4] | icon_2 | 22x22 @(1242,5368)
+        - [6] | Vector | 8x8 @(1248,5371) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(1244,5380) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(1192,5393) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

@@ -598,6 +598,34 @@ export const schemas = {
       404: errorResponse,
     },
   },
+  appClientCoachTrainingCoverage: {
+    response: {
+      200: {
+        type: "object",
+        additionalProperties: true,
+        required: ["clubId", "role", "students"],
+        properties: {
+          clubId: { type: "string" },
+          role: { type: "string", enum: ["coach"] },
+          students: { type: "array", items: { type: "object", additionalProperties: true } },
+        },
+      },
+    },
+  },
+  appClientCoachAssessmentTasks: {
+    response: {
+      200: {
+        type: "object",
+        additionalProperties: true,
+        required: ["clubId", "role", "tasks"],
+        properties: {
+          clubId: { type: "string" },
+          role: { type: "string", enum: ["coach"] },
+          tasks: { type: "array", items: { type: "object", additionalProperties: true } },
+        },
+      },
+    },
+  },
   appClientActivitySummaries: {
     response: {
       200: flexibleObject,

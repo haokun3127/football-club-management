@@ -1,0 +1,113 @@
+.tasks-page {
+  min-height: 100vh;
+  background: var(--color-page);
+}
+
+.tasks-page__body {
+  padding: 24rpx var(--space-page) 180rpx;
+}
+
+.filter-row {
+  display: flex;
+  gap: 24rpx;
+  margin-bottom: 32rpx;
+}
+
+.filter-chip {
+  padding: 12rpx 32rpx;
+  background: var(--color-card);
+  border: 1rpx solid var(--color-line);
+  border-radius: 32rpx;
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+}
+
+.filter-chip--active {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.task-card {
+  background: var(--color-card);
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.05);
+}
+
+.task-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task-card__title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.task-card__status {
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.task-card__status--in_progress {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.task-card__status--not_started {
+  background: #f3f4f6;
+  color: #94a3b8;
+}
+
+.task-card__status--completed {
+  background: #e0e7ff;
+  color: #4f46e5;
+}
+
+.task-card__dates {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+}
+
+.task-card__foot {
+  margin-top: 24rpx;
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.task-card__progress {
+  flex: 1;
+}
+
+.task-card__progress-label {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+  margin-bottom: 8rpx;
+}
+
+.task-card__track {
+  height: 8rpx;
+  background: #f0f0f0;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.task-card__bar {
+  height: 100%;
+  background: var(--color-brand);
+  border-radius: 4rpx;
+}
+
+.task-card__chevron {
+  font-size: 40rpx;
+  color: var(--color-text-secondary);
+}

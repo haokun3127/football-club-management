@@ -57,6 +57,7 @@ import type {
   InsurancePolicy,
   PrivateLessonRequest,
   EventChangeRequest,
+  AssessmentTask,
   LessonLedgerEntry,
 } from "../data-capability/types.js";
 
@@ -119,6 +120,7 @@ export interface SeedData {
   insurancePolicies: InsurancePolicy[];
   privateLessonRequests: PrivateLessonRequest[];
   eventChangeRequests: EventChangeRequest[];
+  assessmentTasks: AssessmentTask[];
   privacyFieldPolicies: PrivacyFieldPolicy[];
   privacyNoticeVersions: PrivacyNoticeVersion[];
   privacyRetentionPolicies: PrivacyRetentionPolicy[];

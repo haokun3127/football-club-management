@@ -216,6 +216,8 @@ export interface TrainingProject {
   metricIds: string[];
   tags: string[];
   selected?: boolean;
+  durationMinutes?: number;
+  difficulty?: string;
 }
 
 export interface TrainingProjectGroup {
@@ -331,4 +333,28 @@ export interface CoachTeamAbilityOverview {
     top: number | null;
     bottom: number | null;
   }>;
+}
+
+export interface CoachTrainingCoverageStudent {
+  studentId: string;
+  name: string;
+  coveredCount: number;
+  totalCount: number;
+  dimensions: Array<{
+    dimensionId: string;
+    label: string;
+    covered: boolean;
+    scorePercent: number | null;
+  }>;
+}
+
+export interface CoachAssessmentTask {
+  id: string;
+  title: string;
+  templateId: string;
+  startsOn: string;
+  dueOn: string;
+  status: "not_started" | "in_progress" | "completed";
+  completedStudents: number;
+  totalStudents: number;
 }

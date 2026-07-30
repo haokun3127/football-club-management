@@ -1,0 +1,104 @@
+# Figma 画板规格: C10 Training Content Select
+
+- [4] | C10 Training Content Select | 375x812 @(940,2820) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(940,2820) | fill=#fceeef | layout=H pad=14/22
+    - [4] | left | 168x27 @(962,2850) | layout=H gap=12
+      - [4] | chevron-left | 24x24 @(962,2852)
+        - [6] | Vector | 6x12 @(971,2858) | stroke=#202124 w2
+      - [13] | 训练内容选择 | 132x27 @(998,2850) | fill=#202124 | font=Inter/Bold 22px | text="训练内容选择"
+  - [4] | Content | 375x584 @(940,2908) | layout=V gap=16 pad=16/22
+    - [4] | Search Bar | 331x44 @(962,2924) | fill=#ffffff | r=22 | layout=H gap=8 pad=0/16 | shadow=0,2,8,#000000@0.05
+      - [4] | search | 20x20 @(978,2936)
+        - [6] | Vector | 15x15 @(980,2938) | stroke=#667085 w2
+      - [13] | 搜索训练项目 | 271x16 @(1006,2938) | fill=#667085 | font=Inter/Regular 13px | text="搜索训练项目"
+    - [4] | Category Tabs | 331x32 @(962,2984) | layout=H gap=8
+      - [4] | Frame | 58x32 @(962,2984) | fill=#a80f1b | r=16 | layout=H pad=8/16
+        - [13] | 全部 | 26x16 @(978,2992) | fill=#ffffff | font=Inter/Semi Bold 13px | text="全部"
+      - [4] | Frame | 58x32 @(1028,2984) | stroke=#e7eaf0 w1 | r=16 | layout=H pad=8/16
+        - [13] | 传球 | 26x16 @(1044,2992) | fill=#667085 | font=Inter/Regular 13px | text="传球"
+      - [4] | Frame | 58x32 @(1094,2984) | stroke=#e7eaf0 w1 | r=16 | layout=H pad=8/16
+        - [13] | 射门 | 26x16 @(1110,2992) | fill=#667085 | font=Inter/Regular 13px | text="射门"
+      - [4] | Frame | 58x32 @(1160,2984) | stroke=#e7eaf0 w1 | r=16 | layout=H pad=8/16
+        - [13] | 体能 | 26x16 @(1176,2992) | fill=#667085 | font=Inter/Regular 13px | text="体能"
+      - [4] | Frame | 58x32 @(1226,2984) | stroke=#e7eaf0 w1 | r=16 | layout=H pad=8/16
+        - [13] | 战术 | 26x16 @(1242,2992) | fill=#667085 | font=Inter/Regular 13px | text="战术"
+    - [4] | Training List | 331x292 @(962,3032) | layout=V gap=12
+      - [4] | training-card | 331x64 @(962,3032) | fill=#ffffff | stroke=#e7eaf0 w1 | r=12 | layout=H gap=12 pad=12/12
+        - [4] | Frame | 40x40 @(974,3044) | fill=#fee2e2 | r=12 | layout=V
+          - [4] | target | 20x20 @(984,3054)
+            - [6] | Vector | 17x17 @(986,3056) | stroke=#a80f1b w2
+        - [4] | Frame | 223x39 @(1026,3044) | layout=V gap=6
+          - [13] | 传球训练（初级） | 223x17 @(1026,3044) | fill=#202124 | font=Inter/Bold 14px | text="传球训练（初级）"
+          - [4] | Frame | 223x16 @(1026,3068) | layout=H gap=8
+            - [4] | Frame | 36x16 @(1026,3068) | fill=#f3f4f6 | r=999 | layout=H pad=2/8
+              - [13] | 初级 | 20x12 @(1034,3070) | fill=#667085 | font=Inter/Bold 10px | text="初级"
+            - [13] | 45分钟 | 39x15 @(1070,3068) | fill=#667085 | font=Inter/Regular 12px | text="45分钟"
+        - [4] | check-circle | 20x20 @(1261,3054)
+          - [6] | Vector | 17x17 @(1263,3056) | stroke=#a80f1b w2
+      - [4] | training-card | 331x64 @(962,3108) | fill=#ffffff | stroke=#e7eaf0 w1 | r=12 | layout=H gap=12 pad=12/12
+        - [4] | Frame | 40x40 @(974,3120) | fill=#fef3c7 | r=12 | layout=V
+          - [4] | target | 20x20 @(984,3130)
+            - [6] | Vector | 17x17 @(986,3132) | stroke=#d97706 w2
+        - [4] | Frame | 223x39 @(1026,3120) | layout=V gap=6
+          - [13] | 射门训练（中级） | 223x17 @(1026,3120) | fill=#202124 | font=Inter/Bold 14px | text="射门训练（中级）"
+          - [4] | Frame | 223x16 @(1026,3144) | layout=H gap=8
+            - [4] | Frame | 36x16 @(1026,3144) | fill=#f3f4f6 | r=999 | layout=H pad=2/8
+              - [13] | 中级 | 20x12 @(1034,3146) | fill=#667085 | font=Inter/Bold 10px | text="中级"
+            - [13] | 45分钟 | 39x15 @(1070,3144) | fill=#667085 | font=Inter/Regular 12px | text="45分钟"
+        - [4] | check-circle | 20x20 @(1261,3130)
+          - [6] | Vector | 17x17 @(1263,3132) | stroke=#a80f1b w2
+      - [4] | training-card | 331x64 @(962,3184) | fill=#ffffff | stroke=#e7eaf0 w1 | r=12 | layout=H gap=12 pad=12/12
+        - [4] | Frame | 40x40 @(974,3196) | fill=#e0e7ff | r=12 | layout=V
+          - [4] | target | 20x20 @(984,3206)
+            - [6] | Vector | 17x17 @(986,3208) | stroke=#4f46e5 w2
+        - [4] | Frame | 223x39 @(1026,3196) | layout=V gap=6
+          - [13] | 战术转换练习（高级） | 223x17 @(1026,3196) | fill=#202124 | font=Inter/Bold 14px | text="战术转换练习（高级）"
+          - [4] | Frame | 223x16 @(1026,3220) | layout=H gap=8
+            - [4] | Frame | 36x16 @(1026,3220) | fill=#f3f4f6 | r=999 | layout=H pad=2/8
+              - [13] | 高级 | 20x12 @(1034,3222) | fill=#667085 | font=Inter/Bold 10px | text="高级"
+            - [13] | 45分钟 | 39x15 @(1070,3220) | fill=#667085 | font=Inter/Regular 12px | text="45分钟"
+        - [4] | check-circle | 20x20 @(1261,3206)
+          - [6] | Vector | 17x17 @(1263,3208) | stroke=#a80f1b w2
+      - [4] | training-card | 331x64 @(962,3260) | fill=#ffffff | stroke=#e7eaf0 w1 | r=12 | layout=H gap=12 pad=12/12
+        - [4] | Frame | 40x40 @(974,3272) | fill=#d1fae5 | r=12 | layout=V
+          - [4] | target | 20x20 @(984,3282)
+            - [6] | Vector | 17x17 @(986,3284) | stroke=#10b981 w2
+        - [4] | Frame | 223x39 @(1026,3272) | layout=V gap=6
+          - [13] | 体能循环训练（中级） | 223x17 @(1026,3272) | fill=#202124 | font=Inter/Bold 14px | text="体能循环训练（中级）"
+          - [4] | Frame | 223x16 @(1026,3296) | layout=H gap=8
+            - [4] | Frame | 36x16 @(1026,3296) | fill=#f3f4f6 | r=999 | layout=H pad=2/8
+              - [13] | 中级 | 20x12 @(1034,3298) | fill=#667085 | font=Inter/Bold 10px | text="中级"
+            - [13] | 45分钟 | 39x15 @(1070,3296) | fill=#667085 | font=Inter/Regular 12px | text="45分钟"
+        - [4] | check-circle | 20x20 @(1261,3282)
+          - [6] | Vector | 17x17 @(1263,3284) | stroke=#a80f1b w2
+    - [4] | Frame | 331x120 @(962,3340)
+  - [4] | Bottom Select | 375x70 @(940,3492) | fill=#ffffff | stroke=#e7eaf0 w1 | layout=H pad=0/22
+    - [13] | 已选 3 项 · 约 180 分钟 | 134x16 @(962,3519) | fill=#667085 | font=Inter/Regular 13px | text="已选 3 项 · 约 180 分钟"
+    - [4] | Frame | 100x37 @(1193,3508) | fill=#a80f1b | r=12 | layout=H pad=10/24
+      - [13] | 选择 (3) | 52x17 @(1217,3518) | fill=#ffffff | font=Inter/Semi Bold 14px | text="选择 (3)"
+  - [4] | TabIconsOverlay | 375x70 @(940,3562) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1060,3622) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(940,3562)
+      - [4] | icon_0 | 22x22 @(992,3568)
+        - [6] | Vector | 17x16 @(994,3572) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(998,3570) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(994,3577) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(997,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1001,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1005,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(997,3584) | fill=#8e97a6
+      - [13] | 日程 | 121x14 @(942,3593) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(1065,3562)
+      - [4] | icon_1 | 22x22 @(1116,3568)
+        - [6] | Vector | 14x17 @(1120,3571) | stroke=#a80f1b w1.6
+        - [6] | Vector | 6x2 @(1124,3571) | stroke=#a80f1b w1.4
+        - [6] | Vector | 8x0 @(1124,3578) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 8x0 @(1124,3582) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 5x0 @(1124,3585) | fill=#000000 | stroke=#a80f1b w1.3
+      - [13] | 训练管理 | 121x14 @(1067,3593) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="训练管理"
+      - [9] | Ellipse | 4x4 @(1126,3610) | fill=#a80f1b
+    - [4] | tab_2 | 125x56 @(1190,3562)
+      - [4] | icon_2 | 22x22 @(1242,3568)
+        - [6] | Vector | 8x8 @(1248,3571) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(1244,3580) | stroke=#8e97a6 w1.6
+      - [13] | 我的 | 121x14 @(1192,3593) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"

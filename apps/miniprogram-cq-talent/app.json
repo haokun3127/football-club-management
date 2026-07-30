@@ -26,6 +26,11 @@
     "pages/coach/student-radar/index",
     "pages/coach/team-ability/index",
     "pages/coach/event-change/index",
+    "pages/coach/content-select/index",
+    "pages/coach/coverage/index",
+    "pages/coach/test-tasks/index",
+    "pages/coach/assessment-entry/index",
+    "pages/coach/assessment-submit/index",
     "pages/coach/training/index",
     "pages/coach/test-entry/index",
     "pages/coach/me/index"

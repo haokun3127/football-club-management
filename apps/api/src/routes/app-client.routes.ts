@@ -1617,6 +1617,140 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
     },
   );
 
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/training-coverage",
+    {
+      schema: {
+        ...schemas.appClientParams,
+        ...schemas.appClientCoachTrainingCoverage,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+
+      const scope = await collectCoachScope(context, request.params.clubId, auth);
+      const [dimensions, metricCatalog] = await Promise.all([
+        context.store.listDevelopmentDimensions(request.params.clubId),
+        context.store.listAbilityMetrics(request.params.clubId),
+      ]);
+      const students = await Promise.all(scope.students.map(async (student) => {
+        const records = await context.store.getStudentMetrics(request.params.clubId, student.id);
+        const dimensionViews = dimensions.map((dimension) => {
+          const metricIds = metricCatalog.filter((metric) => metric.dimensionId === dimension.id).map((metric) => metric.id);
+          const dimensionRecords = records.filter((record) => metricIds.includes(record.metricId));
+          const latest = dimensionRecords[0] ? metricNumericValue(dimensionRecords[0].value) : null;
+          return {
+            dimensionId: dimension.id,
+            label: dimension.name,
+            covered: dimensionRecords.length > 0,
+            scorePercent: latest === null ? null : Math.max(0, Math.min(100, round1(latest))),
+          };
+        });
+        const coveredCount = dimensionViews.filter((dimension) => dimension.covered).length;
+        return {
+          studentId: student.id,
+          name: student.name,
+          coveredCount,
+          totalCount: dimensionViews.length,
+          dimensions: dimensionViews,
+        };
+      }));
+
+      return {
+        clubId: request.params.clubId,
+        role: "coach",
+        students,
+      };
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/assessment-tasks",
+    {
+      schema: {
+        ...schemas.appClientParams,
+        ...schemas.appClientCoachAssessmentTasks,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+
+      const scope = await collectCoachScope(context, request.params.clubId, auth);
+      const tasks = await context.store.listAssessmentTasks(request.params.clubId);
+      const today = new Date().toISOString().slice(0, 10);
+      const recordsByStudent = new Map<string, Awaited<ReturnType<RouteContext["store"]["getStudentMetrics"]>>>();
+      await Promise.all(scope.students.map(async (student) => {
+        recordsByStudent.set(student.id, await context.store.getStudentMetrics(request.params.clubId, student.id));
+      }));
+
+      const views = tasks.map((task) => {
+        const totalStudents = scope.students.length;
+        const completedStudents = scope.students.filter((student) =>
+          (recordsByStudent.get(student.id) ?? []).some((record) => record.occurredAt.slice(0, 10) >= task.startsOn && record.occurredAt.slice(0, 10) <= task.dueOn)
+        ).length;
+        const status = task.startsOn > today
+          ? "not_started"
+          : totalStudents > 0 && completedStudents >= totalStudents
+            ? "completed"
+            : "in_progress";
+        return {
+          id: task.id,
+          title: task.title,
+          templateId: task.templateId,
+          startsOn: task.startsOn,
+          dueOn: task.dueOn,
+          status,
+          completedStudents,
+          totalStudents,
+        };
+      });
+
+      return {
+        clubId: request.params.clubId,
+        role: "coach",
+        tasks: views,
+      };
+    },
+  );
+
   app.put<{
     Params: {
       clubId: string;

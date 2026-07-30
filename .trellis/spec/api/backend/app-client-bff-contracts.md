@@ -544,3 +544,26 @@ v1 为申请-受理语义：创建后 status=pending 等待管理员处理，不
 ### Storage
 
 v1 存储为进程内集合（同私教申请语义），SQLite 持久化是已声明的后续项。
+
+
+## Scenario: Coach Training Coverage and Assessment Tasks
+
+教练端训练覆盖面预览（C10.1）与测评任务列表（C11）。
+
+### `GET /clubs/{clubId}/app-clients/{clientId}/coach/training-coverage`
+
+- **200**：`{ clubId, role: "coach", students: [{ studentId, name, coveredCount, totalCount, dimensions: [{ dimensionId, label, covered, scorePercent }] }] }`
+- 语义：学员范围为教练近 30 天执教活动并集（与 `coach/team` 一致）；维度来自发展维度目录；`covered` = 该学员在该维度下任一能力指标存在记录；`scorePercent` = 该维度最新记录归一化百分值（`score_0_100` 原值，`rating_1_5` ×20，`percentage` 原值），无记录为 `null`。
+- **403**：非教练成员；无 active client → 404。
+
+### `GET /clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks`
+
+- **200**：`{ clubId, role: "coach", tasks: [{ id, title, templateId, startsOn, dueOn, status, completedStudents, totalStudents }] }`
+- 语义：`status` = `not_started`（startsOn 晚于今天）/ `completed`（完成学员数 ≥ 总学员数且总学员数 > 0）/ `in_progress`；`completedStudents` = 窗口内（occurredAt ≥ startsOn）存在任一能力指标记录的学员数；`totalStudents` = 教练作用域学员数。
+- 存储：进程内集合 + 种子数据（与私教申请/变更申请一致，持久化是已声明后续项）。
+- **403**：非教练成员。
+
+### 复用既有端点
+
+- C10 训练内容选择：`GET /coach/training-project-tree` + `PUT /coach/events/{eventId}/training-projects`（已存在）。
+- C15 测评录入提交：`POST /coach/assessments`（已存在，按学员逐条提交）。

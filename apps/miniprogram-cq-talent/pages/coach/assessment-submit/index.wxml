@@ -1,0 +1,34 @@
+<view class="submit-page">
+  <app-header title="评估提交" show-back />
+  <view class="submit-page__body">
+    <!-- 成功态（Figma C15.1: 白圆 + 绿对勾） -->
+    <view class="success">
+      <view class="success__circle">✓</view>
+      <view class="success__title">能力评估已提交</view>
+      <view class="success__subtitle">评估结果将在24小时内同步至学员成长档案</view>
+    </view>
+
+    <!-- 摘要卡 -->
+    <view class="summary-card">
+      <view class="summary-card__head">
+        <view class="summary-card__title">{{taskTitle}}</view>
+        <view class="summary-card__chip">处理中</view>
+      </view>
+      <view class="summary-card__row">
+        <text class="summary-card__label">学员数</text>
+        <text class="summary-card__value">{{studentCount}}名</text>
+      </view>
+      <view class="summary-card__row">
+        <text class="summary-card__label">评估日期</text>
+        <text class="summary-card__value">{{dateLabel}}</text>
+      </view>
+    </view>
+
+    <!-- 动作 -->
+    <view class="actions">
+      <view class="actions__primary" bindtap="viewResults">查看结果</view>
+      <view class="actions__secondary" bindtap="backToList">返回列表</view>
+    </view>
+  </view>
+  <role-tabbar role="coach" active="me" />
+</view>

@@ -1,0 +1,117 @@
+.entry-page {
+  min-height: 100vh;
+  background: var(--color-page);
+}
+
+.entry-page__body {
+  padding: 24rpx var(--space-page) 200rpx;
+}
+
+.group-strip {
+  margin-bottom: 24rpx;
+  white-space: nowrap;
+}
+
+.group-strip__inner {
+  display: flex;
+  gap: 16rpx;
+}
+
+.group-chip {
+  padding: 12rpx 28rpx;
+  background: var(--color-card);
+  border: 1rpx solid var(--color-line);
+  border-radius: 40rpx;
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+}
+
+.group-chip--active {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.student-card {
+  background: var(--color-card);
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.05);
+}
+
+.student-card__head {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.student-card__avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: #fceeef;
+  border: 4rpx solid var(--color-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-brand);
+}
+
+.student-card__name {
+  flex: 1;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.student-card__average {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--color-brand);
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 10rpx 0;
+}
+
+.slider-row__label {
+  width: 96rpx;
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+}
+
+.slider-row__slider {
+  flex: 1;
+  margin: 0;
+}
+
+.slider-row__value {
+  width: 72rpx;
+  text-align: right;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: var(--color-brand);
+}
+
+.submit-button {
+  margin-top: 32rpx;
+  background: var(--color-brand);
+  border-radius: 999rpx;
+  padding: 28rpx;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.submit-button--disabled {
+  opacity: 0.5;
+}
