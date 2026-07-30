@@ -1,0 +1,30 @@
+<view class="coaches-page">
+  <app-header title="教练团队" subtitle="球队教练阵容" show-back />
+  <view class="coaches-page__body">
+    <!-- 球队介绍卡（Figma: #07111f 深底 r16 + 半透明白 chips） -->
+    <view class="team-card">
+      <view class="team-card__name">{{teamName}}</view>
+      <view class="team-card__chips">
+        <view wx:for="{{teamChips}}" wx:key="*this" class="team-chip">{{item}}</view>
+      </view>
+      <view class="team-card__divider"></view>
+      <view class="team-card__goal">{{teamGoal}}</view>
+    </view>
+
+    <!-- 教练卡片（Figma: 56px 圆环头像 + 角色徽标 + 微信联系描边按钮） -->
+    <view class="coach-list">
+      <view wx:for="{{coaches}}" wx:key="id" class="coach-card">
+        <view class="coach-card__avatar" style="border-color: {{item.ringColor}}; color: {{item.ringColor}}">{{item.surname}}</view>
+        <view class="coach-card__info">
+          <view class="coach-card__name-row">
+            <view class="coach-card__name">{{item.name}}</view>
+            <view class="coach-card__role" style="background: {{item.roleBg}}; color: {{item.ringColor}}">{{item.role}}</view>
+          </view>
+          <view class="coach-card__bio">{{item.bio}}</view>
+        </view>
+        <view class="coach-card__contact" data-name="{{item.name}}" bindtap="contactCoach">微信联系</view>
+      </view>
+    </view>
+  </view>
+  <role-tabbar role="parent" active="child" />
+</view>

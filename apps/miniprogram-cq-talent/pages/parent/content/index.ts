@@ -1,4 +1,5 @@
 import { requireRole } from "../../../utils/auth";
+import { openPage } from "../../../utils/navigation";
 
 interface Category {
   label: string;
@@ -10,6 +11,7 @@ interface QuickLink {
   color: string;
   label: string;
   category: string;
+  page?: string;
 }
 
 interface Article {
@@ -39,9 +41,9 @@ const CATEGORIES: Category[] = [
 ];
 
 const QUICK_LINKS: QuickLink[] = [
-  { icon: "📍", color: "#1976d2", label: "场地信息", category: "venue" },
-  { icon: "❓", color: "#ff9800", label: "帮助中心", category: "help" },
-  { icon: "👥", color: "#22c55e", label: "教练团队", category: "coach" },
+  { icon: "📍", color: "#1976d2", label: "场地信息", category: "venue", page: "/pages/parent/venues/index" },
+  { icon: "❓", color: "#ff9800", label: "帮助中心", category: "help", page: "/pages/parent/help/index" },
+  { icon: "👥", color: "#22c55e", label: "教练团队", category: "coach", page: "/pages/parent/coaches/index" },
   { icon: "📖", color: "#a80f1b", label: "训练攻略", category: "guide" },
 ];
 
@@ -67,6 +69,11 @@ Page<PageData>({
     this.applyFilter(event.currentTarget.dataset.value);
   },
   openQuickLink(event: { currentTarget: { dataset: { category: string } } }) {
+    const link = QUICK_LINKS.find((item) => item.category === event.currentTarget.dataset.category);
+    if (link?.page) {
+      openPage(link.page);
+      return;
+    }
     this.applyFilter(event.currentTarget.dataset.category);
   },
   applyFilter(category: string) {

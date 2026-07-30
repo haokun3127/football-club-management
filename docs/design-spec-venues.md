@@ -1,0 +1,113 @@
+# Figma 画板规格: Venues - Premium
+
+- [4] | Venues - Premium | 375x812 @(1370,2820) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(1370,2820) | fill=#ffffff | layout=H pad=14/16 | shadow=0,2,8,#000000@0.04
+    - [4] | Left | 24x24 @(1386,2852) | layout=H gap=12
+      - [4] | arrow-left | 24x24 @(1386,2852)
+        - [6] | Vector | 14x14 @(1391,2857) | stroke=#202124 w2
+    - [13] | Title | 72x22 @(1522,2853) | fill=#202124 | font=Inter/Bold 18px | text="场地信息"
+    - [4] | Right | 24x24 @(1705,2852) | layout=H
+      - [4] | search | 24x24 @(1705,2852)
+        - [6] | Vector | 18x18 @(1708,2855) | stroke=#202124 w2
+  - [4] | Content | 375x654 @(1370,2908) | layout=V gap=20 pad=16/16
+    - [4] | Filters | 343x32 @(1386,2924) | layout=H gap=8
+      - [4] | Chip Active | 84x32 @(1386,2924) | fill=#a80f1b | r=20 | layout=H pad=8/16
+        - [13] | 全部场地 | 52x16 @(1402,2932) | fill=#ffffff | font=Inter/Semi Bold 13px | text="全部场地"
+      - [4] | Chip | 58x32 @(1478,2924) | fill=#ffffff | stroke=#e7eaf0 w1 | r=20 | layout=H pad=8/16
+        - [13] | 室外 | 26x16 @(1494,2932) | fill=#667085 | font=Inter/Medium 13px | text="室外"
+      - [4] | Chip | 58x32 @(1544,2924) | fill=#ffffff | stroke=#e7eaf0 w1 | r=20 | layout=H pad=8/16
+        - [13] | 室内 | 26x16 @(1560,2932) | fill=#667085 | font=Inter/Medium 13px | text="室内"
+      - [4] | Chip | 71x32 @(1610,2924) | fill=#ffffff | stroke=#e7eaf0 w1 | r=20 | layout=H pad=8/16
+        - [13] | 人工草 | 39x16 @(1626,2932) | fill=#667085 | font=Inter/Medium 13px | text="人工草"
+      - [4] | Chip | 71x32 @(1689,2924) | fill=#ffffff | stroke=#e7eaf0 w1 | r=20 | layout=H pad=8/16
+        - [13] | 天然草 | 39x16 @(1705,2932) | fill=#667085 | font=Inter/Medium 13px | text="天然草"
+    - [4] | Venue List | 343x983 @(1386,2976) | layout=V gap=16
+      - [4] | Venue Card | 343x317 @(1386,2976) | fill=#ffffff | r=16 | layout=V | shadow=0,4,16,#000000@0.05
+        - [4] | Hero | 343x160 @(1386,2976) | fill=paint-type-5 | layout=V pad=16/16
+          - [4] | Venue Type Chip | 71x21 @(1402,3099) | fill=#3b82f6 | r=6 | layout=H pad=4/8
+            - [13] | 11人制场地 | 55x13 @(1410,3103) | fill=#ffffff | font=Inter/Semi Bold 11px | text="11人制场地"
+        - [4] | Card Body | 343x157 @(1386,3136) | layout=V gap=12 pad=16/16
+          - [13] | 九龙坡足球公园 | 311x21 @(1402,3152) | fill=#202124 | font=Inter/Bold 17px | text="九龙坡足球公园"
+          - [4] | Address Row | 311x16 @(1402,3185) | layout=H gap=6
+            - [13] | 九龙坡区科园四路 | 291x16 @(1422,3185) | fill=#667085 | font=Inter/Regular 13px | text="九龙坡区科园四路"
+            - [4] | map-pin | 14x14 @(1402,3186)
+              - [6] | Vector | 9x12 @(1404,3187) | stroke=#667085 w2
+          - [4] | Stats | 311x21 @(1402,3213) | layout=H gap=8
+            - [4] | Frame | 60x21 @(1402,3213) | fill=#f6f7f9 | r=6 | layout=H pad=4/8
+              - [13] | 照明设施 | 44x13 @(1410,3217) | fill=#667085 | font=Inter/Regular 11px | text="照明设施"
+            - [4] | Frame | 49x21 @(1470,3213) | fill=#f6f7f9 | r=6 | layout=H pad=4/8
+              - [13] | 更衣室 | 33x13 @(1478,3217) | fill=#667085 | font=Inter/Regular 11px | text="更衣室"
+            - [4] | Frame | 49x21 @(1527,3213) | fill=#f6f7f9 | r=6 | layout=H pad=4/8
+              - [13] | 停车场 | 33x13 @(1535,3217) | fill=#667085 | font=Inter/Regular 11px | text="停车场"
+          - [4] | Schedule | 311x31 @(1402,3246) | layout=H pad=4/0
+            - [4] | Frame | 95x27 @(1402,3250) | stroke=#a80f1b w1 | r=20 | layout=H pad=6/12
+              - [13] | 本月训练 4次 | 71x15 @(1414,3256) | fill=#a80f1b | font=Inter/Semi Bold 12px | text="本月训练 4次"
+            - [4] | Frame | 48x27 @(1665,3250) | fill=#a80f1b | r=20 | layout=H pad=6/12
+              - [13] | 导航 | 24x15 @(1677,3256) | fill=#ffffff | font=Inter/Semi Bold 12px | text="导航"
+      - [4] | Venue Card | 343x317 @(1386,3309) | fill=#ffffff | r=16 | layout=V | shadow=0,4,16,#000000@0.05
+        - [4] | Hero | 343x160 @(1386,3309) | fill=paint-type-5 | layout=V pad=16/16
+          - [4] | Venue Type Chip | 67x21 @(1402,3432) | fill=#3b82f6 | r=6 | layout=H pad=4/8
+            - [13] | 5人制场地 | 51x13 @(1410,3436) | fill=#ffffff | font=Inter/Semi Bold 11px | text="5人制场地"
+        - [4] | Card Body | 343x157 @(1386,3469) | layout=V gap=12 pad=16/16
+          - [13] | 重庆体育学院训练馆 | 311x21 @(1402,3485) | fill=#202124 | font=Inter/Bold 17px | text="重庆体育学院训练馆"
+          - [4] | Address Row | 311x16 @(1402,3518) | layout=H gap=6
+            - [13] | 沙坪坝区大学城 | 291x16 @(1422,3518) | fill=#667085 | font=Inter/Regular 13px | text="沙坪坝区大学城"
+            - [4] | map-pin | 14x14 @(1402,3519)
+              - [6] | Vector | 9x12 @(1404,3520) | stroke=#667085 w2
+          - [4] | Stats | 311x21 @(1402,3546) | layout=H gap=8
+            - [4] | Frame | 38x21 @(1402,3546) | fill=#f6f7f9 | r=6 | layout=H pad=4/8
+              - [13] | 空调 | 22x13 @(1410,3550) | fill=#667085 | font=Inter/Regular 11px | text="空调"
+            - [4] | Frame | 49x21 @(1448,3546) | fill=#f6f7f9 | r=6 | layout=H pad=4/8
+              - [13] | 更衣室 | 33x13 @(1456,3550) | fill=#667085 | font=Inter/Regular 11px | text="更衣室"
+            - [4] | Frame | 49x21 @(1505,3546) | fill=#f6f7f9 | r=6 | layout=H pad=4/8
+              - [13] | 停车场 | 33x13 @(1513,3550) | fill=#667085 | font=Inter/Regular 11px | text="停车场"
+          - [4] | Schedule | 311x31 @(1402,3579) | layout=H pad=4/0
+            - [4] | Frame | 95x27 @(1402,3583) | stroke=#a80f1b w1 | r=20 | layout=H pad=6/12
+              - [13] | 本月训练 2次 | 71x15 @(1414,3589) | fill=#a80f1b | font=Inter/Semi Bold 12px | text="本月训练 2次"
+            - [4] | Frame | 48x27 @(1665,3583) | fill=#a80f1b | r=20 | layout=H pad=6/12
+              - [13] | 导航 | 24x15 @(1677,3589) | fill=#ffffff | font=Inter/Semi Bold 12px | text="导航"
+      - [4] | Venue Card | 343x317 @(1386,3642) | fill=#ffffff | r=16 | layout=V | shadow=0,4,16,#000000@0.05
+        - [4] | Hero | 343x160 @(1386,3642) | fill=paint-type-5 | layout=V pad=16/16
+          - [4] | Venue Type Chip | 67x21 @(1402,3765) | fill=#3b82f6 | r=6 | layout=H pad=4/8
+            - [13] | 7人制场地 | 51x13 @(1410,3769) | fill=#ffffff | font=Inter/Semi Bold 11px | text="7人制场地"
+        - [4] | Card Body | 343x157 @(1386,3802) | layout=V gap=12 pad=16/16
+          - [13] | 南岸足球公园 | 311x21 @(1402,3818) | fill=#202124 | font=Inter/Bold 17px | text="南岸足球公园"
+          - [4] | Address Row | 311x16 @(1402,3851) | layout=H gap=6
+            - [13] | 南岸区茶园路 | 291x16 @(1422,3851) | fill=#667085 | font=Inter/Regular 13px | text="南岸区茶园路"
+            - [4] | map-pin | 14x14 @(1402,3852)
+              - [6] | Vector | 9x12 @(1404,3853) | stroke=#667085 w2
+          - [4] | Stats | 311x21 @(1402,3879) | layout=H gap=8
+            - [4] | Frame | 60x21 @(1402,3879) | fill=#f6f7f9 | r=6 | layout=H pad=4/8
+              - [13] | 天然草坪 | 44x13 @(1410,3883) | fill=#667085 | font=Inter/Regular 11px | text="天然草坪"
+            - [4] | Frame | 49x21 @(1470,3879) | fill=#f6f7f9 | r=6 | layout=H pad=4/8
+              - [13] | 更衣室 | 33x13 @(1478,3883) | fill=#667085 | font=Inter/Regular 11px | text="更衣室"
+            - [4] | Frame | 49x21 @(1527,3879) | fill=#f6f7f9 | r=6 | layout=H pad=4/8
+              - [13] | 停车场 | 33x13 @(1535,3883) | fill=#667085 | font=Inter/Regular 11px | text="停车场"
+          - [4] | Schedule | 311x31 @(1402,3912) | layout=H pad=4/0
+            - [4] | Frame | 95x27 @(1402,3916) | stroke=#a80f1b w1 | r=20 | layout=H pad=6/12
+              - [13] | 本月训练 6次 | 71x15 @(1414,3922) | fill=#a80f1b | font=Inter/Semi Bold 12px | text="本月训练 6次"
+            - [4] | Frame | 48x27 @(1665,3916) | fill=#a80f1b | r=20 | layout=H pad=6/12
+              - [13] | 导航 | 24x15 @(1677,3922) | fill=#ffffff | font=Inter/Semi Bold 12px | text="导航"
+  - [4] | TabIconsOverlay | 375x70 @(1370,3562) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1490,3622) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(1370,3562)
+      - [4] | icon_0 | 22x22 @(1422,3568)
+        - [6] | Vector | 17x16 @(1424,3572) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(1428,3570) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(1424,3577) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(1427,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1431,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1435,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1427,3584) | fill=#8e97a6
+      - [13] | 日程 | 117x14 @(1374,3593) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(1495,3562)
+      - [4] | icon_1 | 22x22 @(1546,3568)
+        - [6] | Vector | 18x10 @(1548,3575) | stroke=#8e97a6 w1.8
+        - [6] | Vector | 4x4 @(1562,3573) | stroke=#8e97a6 w1.8
+      - [13] | 成长 | 117x14 @(1499,3593) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="成长"
+    - [4] | tab_2 | 125x56 @(1620,3562)
+      - [4] | icon_2 | 22x22 @(1672,3568)
+        - [6] | Vector | 8x8 @(1678,3571) | stroke=#a80f1b w1.6
+        - [6] | Vector | 16x8 @(1674,3580) | stroke=#a80f1b w1.6
+      - [13] | 我的孩子 | 117x14 @(1624,3593) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="我的孩子"
+      - [9] | Ellipse | 4x4 @(1680,3610) | fill=#a80f1b

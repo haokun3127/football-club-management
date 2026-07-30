@@ -1,0 +1,181 @@
+.help-page {
+  min-height: 100vh;
+  background: var(--color-page);
+}
+
+.help-page__body {
+  padding: 24rpx var(--space-page) 180rpx;
+}
+
+/* 搜索栏 */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  background: var(--color-card);
+  border-radius: 44rpx;
+  padding: 24rpx 32rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+}
+
+.search-bar__icon {
+  font-size: 32rpx;
+}
+
+.search-bar__placeholder {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 48rpx 0 24rpx;
+}
+
+/* 分类网格 */
+.category-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24rpx;
+}
+
+.category-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24rpx;
+  background: var(--color-card);
+  border-radius: 24rpx;
+  padding: 32rpx;
+}
+
+.category-card__icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+}
+
+.category-card__label {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* 卡片 */
+.card {
+  background: var(--color-card);
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-top: 48rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+}
+
+.card__title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 16rpx;
+}
+
+/* 热门问题行 */
+.question-row {
+  padding: 16rpx 0;
+}
+
+.question-row--border {
+  border-bottom: 1rpx solid var(--color-line);
+}
+
+.question-row__head {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 16rpx 0;
+}
+
+.question-row__icon {
+  font-size: 32rpx;
+  flex-shrink: 0;
+}
+
+.question-row__q {
+  flex: 1;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.question-row__chevron {
+  font-size: 36rpx;
+  color: var(--color-text-secondary);
+  transition: transform 0.18s ease;
+}
+
+.question-row__chevron--open {
+  transform: rotate(90deg);
+}
+
+.question-row__a {
+  padding: 8rpx 0 16rpx 56rpx;
+  font-size: 26rpx;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+/* 联系俱乐部 */
+.contact-head {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin-bottom: 16rpx;
+}
+
+.contact-head__icon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 32rpx;
+  background: var(--color-brand-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+}
+
+.contact-head__title {
+  margin-bottom: 0;
+}
+
+.kv-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+}
+
+.kv-row__label {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+}
+
+.kv-row__value {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.wechat-button {
+  margin-top: 24rpx;
+  border: 1rpx solid var(--color-brand);
+  border-radius: 16rpx;
+  padding: 20rpx 0;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-brand);
+}

@@ -1,0 +1,129 @@
+.venues-page {
+  min-height: 100vh;
+  background: var(--color-page);
+}
+
+.venues-page__body {
+  padding: 24rpx var(--space-page) 180rpx;
+}
+
+/* 筛选 chips */
+.filters {
+  white-space: nowrap;
+}
+
+.filters__inner {
+  display: inline-flex;
+  gap: 16rpx;
+}
+
+.filter-chip {
+  padding: 16rpx 32rpx;
+  background: var(--color-card);
+  border: 1rpx solid var(--color-line);
+  border-radius: 40rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.filter-chip--active {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* 场地卡片 */
+.venue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 32rpx;
+  margin-top: 32rpx;
+}
+
+.venue-card {
+  background: var(--color-card);
+  border-radius: 32rpx;
+  overflow: hidden;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.05);
+}
+
+.venue-card__hero {
+  height: 320rpx;
+  display: flex;
+  align-items: flex-end;
+  padding: 32rpx;
+  box-sizing: border-box;
+}
+
+.venue-card__type {
+  padding: 8rpx 16rpx;
+  border-radius: 12rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.venue-card__body {
+  padding: 32rpx;
+}
+
+.venue-card__name {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.venue-card__address {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+}
+
+.venue-card__facilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+
+.facility-chip {
+  padding: 8rpx 16rpx;
+  background: var(--color-page);
+  border-radius: 12rpx;
+  font-size: 22rpx;
+  color: var(--color-text-secondary);
+}
+
+.venue-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24rpx;
+}
+
+.venue-card__count {
+  border: 1rpx solid var(--color-brand);
+  border-radius: 40rpx;
+  padding: 12rpx 24rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--color-brand);
+}
+
+.venue-card__nav {
+  background: var(--color-brand);
+  border-radius: 40rpx;
+  padding: 12rpx 24rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.venue-empty {
+  padding: 48rpx 0;
+  text-align: center;
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+}

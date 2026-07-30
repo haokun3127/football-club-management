@@ -1,0 +1,39 @@
+<view class="venues-page">
+  <app-header title="场地信息" subtitle="训练与比赛场地" show-back action-icon="🔍" bindaction="openSearch" />
+  <view class="venues-page__body">
+    <!-- 筛选 chips（Figma: 32px 高, active 品牌红） -->
+    <scroll-view scroll-x class="filters" enhanced show-scrollbar="{{false}}">
+      <view class="filters__inner">
+        <view
+          wx:for="{{filters}}"
+          wx:key="value"
+          class="filter-chip {{activeFilter === item.value ? 'filter-chip--active' : ''}}"
+          data-value="{{item.value}}"
+          bindtap="selectFilter"
+        >{{item.label}}</view>
+      </view>
+    </scroll-view>
+
+    <!-- 场地卡片（Figma: r16 白卡 + 160px 渐变 Hero + 类型 chip + 设施 chips + 导航按钮） -->
+    <view class="venue-list">
+      <view wx:for="{{visibleVenues}}" wx:key="id" class="venue-card">
+        <view class="venue-card__hero" style="background: {{item.gradient}}">
+          <view class="venue-card__type" style="background: {{item.typeColor}}">{{item.type}}</view>
+        </view>
+        <view class="venue-card__body">
+          <view class="venue-card__name">{{item.name}}</view>
+          <view class="venue-card__address">📍 {{item.address}}</view>
+          <view class="venue-card__facilities">
+            <view wx:for="{{item.facilities}}" wx:key="*this" wx:for-item="facility" class="facility-chip">{{facility}}</view>
+          </view>
+          <view class="venue-card__footer">
+            <view class="venue-card__count">本月训练 {{item.monthlyCount}}次</view>
+            <view class="venue-card__nav" data-name="{{item.name}}" bindtap="navigate">导航</view>
+          </view>
+        </view>
+      </view>
+      <view wx:if="{{!visibleVenues.length}}" class="venue-empty">该分类暂无场地</view>
+    </view>
+  </view>
+  <role-tabbar role="parent" active="child" />
+</view>

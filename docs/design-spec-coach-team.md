@@ -1,0 +1,76 @@
+# Figma 画板规格: Coach Team
+
+- [4] | Coach Team | 375x812 @(510,3720) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(510,3720) | fill=#ffffff | layout=H gap=12 pad=14/22 | shadow=0,4,12,#000000@0.05
+    - [13] | 教练团队 | 259x27 @(568,3750) | fill=#202124 | font=Inter/Bold 22px | text="教练团队"
+    - [4] | arrow-left | 24x24 @(532,3752)
+      - [6] | Vector | 14x14 @(537,3757) | stroke=#202124 w2
+    - [4] | Frame | 24x24 @(839,3752)
+  - [4] | Content | 375x654 @(510,3808) | layout=V gap=16 pad=16/22
+    - [4] | Coach List | 331x297 @(532,4003) | layout=V gap=12
+      - [4] | Coach Card | 331x91 @(532,4003) | fill=#ffffff | r=12 | layout=H gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+        - [4] | Avatar | 56x56 @(548,4020) | fill=#f3f4f6 | stroke=#a80f1b w2 | r=28 | layout=H
+          - [13] | 林 | 18x22 @(567,4038) | fill=#a80f1b | font=Inter/Bold 18px | text="林"
+        - [4] | Info | 147x59 @(616,4019) | layout=V gap=6
+          - [4] | Frame | 147x21 @(616,4019) | layout=H
+            - [13] | 林建国 | 48x19 @(616,4020) | fill=#202124 | font=Inter/Bold 16px | text="林建国"
+            - [4] | Frame | 49x21 @(714,4019) | fill=#fceeef | r=4 | layout=H pad=4/8
+              - [13] | 主教练 | 33x13 @(722,4023) | fill=#a80f1b | font=Inter/Bold 11px | text="主教练"
+          - [13] | 技术型 · 执教年限 8年 · 专注于球员战术意识提升 | 147x32 @(616,4046) | fill=#667085 | font=Inter/Regular 13px | text="技术型 · 执教年限 8年 · 专注于球员战术意识提升"
+        - [4] | Contact | 72x27 @(775,4035) | stroke=#e7eaf0 w1 | r=20 | layout=H pad=6/12
+          - [13] | 微信联系 | 48x15 @(787,4041) | fill=#667085 | font=Inter/Regular 12px | text="微信联系"
+      - [4] | Coach Card | 331x91 @(532,4106) | fill=#ffffff | r=12 | layout=H gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+        - [4] | Avatar | 56x56 @(548,4124) | fill=#f3f4f6 | stroke=#3b82f6 w2 | r=28 | layout=H
+          - [13] | 张 | 18x22 @(567,4140) | fill=#3b82f6 | font=Inter/Bold 18px | text="张"
+        - [4] | Info | 147x59 @(616,4122) | layout=V gap=6
+          - [4] | Frame | 147x21 @(616,4122) | layout=H
+            - [13] | 张明 | 32x19 @(616,4123) | fill=#202124 | font=Inter/Bold 16px | text="张明"
+            - [4] | Frame | 38x21 @(725,4122) | fill=#eff6ff | r=4 | layout=H pad=4/8
+              - [13] | 助教 | 22x13 @(733,4126) | fill=#3b82f6 | font=Inter/Bold 11px | text="助教"
+          - [13] | 防守专项 · 执教年限 5年 · 专注于球员防守意识提升 | 147x32 @(616,4149) | fill=#667085 | font=Inter/Regular 13px | text="防守专项 · 执教年限 5年 · 专注于球员防守意识提升"
+        - [4] | Contact | 72x27 @(775,4138) | stroke=#e7eaf0 w1 | r=20 | layout=H pad=6/12
+          - [13] | 微信联系 | 48x15 @(787,4144) | fill=#667085 | font=Inter/Regular 12px | text="微信联系"
+      - [4] | Coach Card | 331x91 @(532,4209) | fill=#ffffff | r=12 | layout=H gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+        - [4] | Avatar | 56x56 @(548,4226) | fill=#f3f4f6 | stroke=#d97706 w2 | r=28 | layout=H
+          - [13] | 陈 | 18x22 @(567,4244) | fill=#d97706 | font=Inter/Bold 18px | text="陈"
+        - [4] | Info | 147x59 @(616,4225) | layout=V gap=6
+          - [4] | Frame | 147x21 @(616,4225) | layout=H
+            - [13] | 陈力 | 32x19 @(616,4226) | fill=#202124 | font=Inter/Bold 16px | text="陈力"
+            - [4] | Frame | 60x21 @(703,4225) | fill=#fffbeb | r=4 | layout=H pad=4/8
+              - [13] | 体能教练 | 44x13 @(711,4229) | fill=#d97706 | font=Inter/Bold 11px | text="体能教练"
+          - [13] | 体能专项 · 执教年限 6年 · 专注于球员爆发力与耐力提升 | 147x32 @(616,4252) | fill=#667085 | font=Inter/Regular 13px | text="体能专项 · 执教年限 6年 · 专注于球员爆发力与耐力提升"
+        - [4] | Contact | 72x27 @(775,4241) | stroke=#e7eaf0 w1 | r=20 | layout=H pad=6/12
+          - [13] | 微信联系 | 48x15 @(787,4247) | fill=#667085 | font=Inter/Regular 12px | text="微信联系"
+    - [4] | Team Intro | 331x163 @(532,3824) | fill=#07111f | r=16 | layout=V gap=16 pad=20/20 | shadow=0,8,20,#000000@0.10
+      - [4] | Frame | 291x50 @(552,3844) | layout=V gap=8
+        - [13] | 凤凰山足球俱乐部 U10精英队 | 291x19 @(552,3844) | fill=#ffffff | font=Inter/Bold 16px | text="凤凰山足球俱乐部 U10精英队"
+        - [4] | Frame | 165x23 @(552,3871) | layout=H gap=8
+          - [4] | Frame | 70x23 @(552,3871) | fill=#ffffff@0.10 | r=6 | layout=H pad=4/10
+            - [13] | 18名球员 | 50x15 @(562,3875) | fill=#ffffff | font=Inter/Semi Bold 12px | text="18名球员"
+          - [4] | Frame | 87x23 @(630,3871) | fill=#ffffff@0.10 | r=6 | layout=H pad=4/10
+            - [13] | 2020年成立 | 67x15 @(640,3875) | fill=#ffffff | font=Inter/Semi Bold 12px | text="2020年成立"
+      - [4] | Frame | 291x1 @(552,3910) | fill=#ffffff@0.10 | layout=H
+      - [13] | 本赛季目标：打造更强的团队凝聚力与战术执行力，争取联赛前三名。 | 291x40 @(552,3927) | fill=#ffffff@0.70 | font=Inter/Regular 13px | text="本赛季目标：打造更强的团队凝聚力与战术执行力，争取联赛前三名。"
+  - [4] | TabIconsOverlay | 375x70 @(510,4462) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(630,4522) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(510,4462)
+      - [4] | icon_0 | 22x22 @(562,4468)
+        - [6] | Vector | 17x16 @(564,4472) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(568,4470) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(564,4477) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(567,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(571,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(575,4480) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(567,4484) | fill=#8e97a6
+      - [13] | 日程 | 117x14 @(514,4493) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(635,4462)
+      - [4] | icon_1 | 22x22 @(686,4468)
+        - [6] | Vector | 18x10 @(688,4475) | stroke=#8e97a6 w1.8
+        - [6] | Vector | 4x4 @(702,4473) | stroke=#8e97a6 w1.8
+      - [13] | 成长 | 117x14 @(639,4493) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="成长"
+    - [4] | tab_2 | 125x56 @(760,4462)
+      - [4] | icon_2 | 22x22 @(812,4468)
+        - [6] | Vector | 8x8 @(818,4471) | stroke=#a80f1b w1.6
+        - [6] | Vector | 16x8 @(814,4480) | stroke=#a80f1b w1.6
+      - [13] | 我的孩子 | 117x14 @(764,4493) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="我的孩子"
+      - [9] | Ellipse | 4x4 @(820,4510) | fill=#a80f1b
