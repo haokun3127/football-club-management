@@ -2,7 +2,7 @@
 
 > 依据《Figma 全量补齐决策》（docs/figma-full-implementation-decision.md）执行。
 > 本文档随每批工作实时更新：完成一项勾一项，新增发现随时补充。
-> 最后更新：2026-07-30（批次 13 后）
+> 最后更新：2026-07-30（批次 14 后）
 
 ## 总体进度
 
@@ -113,6 +113,19 @@
 - [x] P5 新建 pages/parent/radar 独立雷达页（44 路由；学员切换 + 综合评分 + 维度条含同龄游标）`36a5072`
 - [x] P6 metric：深色 hero 大分值 + 真实记录 CSS 散点趋势图 `36a5072`
 - [x] P7 child：深色球员卡 + 统计行 + 2x2 快捷操作（日程/成长/私教/绑定）`36a5072`
+- [x] 全量 check 绿（89 测试）
+
+### 批次 14：教练端契约版视觉重做（9 画板）
+- [x] 规格归档 `docs/design-spec-batch14-*.md`（9 张；C7 原画板节点缺失按统一教练 nav 模式处理；C12 用 "C12 Project Score Entry"）`9ca6d33`
+- [x] C1 schedule：白顶导+红头像、7 日 strip（选中红）、统计 pills、色条活动卡 `9ca6d33`
+- [x] C2 event：nav 结束动作、深色 session hero（真实已进行计时器 + 出席 chips）、出勤卡（名单圆点）`9ca6d33`
+- [x] C4 attendance：粉底 nav+提交、深色 hero 出勤/缺勤/待确认圆点计数、全员到场/清空 `9ca6d33`
+- [x] C5 lesson：粉底 nav、深色活动头（时长）、学员课时记录卡（销课 chip，更正流保留）`9ca6d33`
+- [x] C6 match：粉底 nav、深色记分牌 hero（队伍+比分+半场 chips+战术板链）`9ca6d33`
+- [x] C7 tactical-board：白 nav + 保存状态 chip `9ca6d33`
+- [x] C8 training：白 nav + 深色 2x2 统计 hero（真实计数）`9ca6d33`
+- [x] C12 test-entry：粉底 nav+提交（深色任务头与进度条保留）`9ca6d33`
+- [x] C16 me：粉底 TopBar+设置、深色资料 hero（负责队伍数 chip）`9ca6d33`
 - [x] 全量 check 绿（89 测试）
 
 ## 未完成
