@@ -2,7 +2,7 @@
 
 > 依据《Figma 全量补齐决策》（docs/figma-full-implementation-decision.md）执行。
 > 本文档随每批工作实时更新：完成一项勾一项，新增发现随时补充。
-> 最后更新：2026-07-30（批次 11 后）
+> 最后更新：2026-07-30（批次 12 后）
 
 ## 总体进度
 
@@ -46,7 +46,7 @@
 - [x] P9 私教预约表单（教练/日期/时段/目标/备注 → 真实 POST）`dec757c`
 - [x] P9.1 预约成功页（摘要卡 + 返回动作）`dec757c`
 - [x] P1.1 日期活动列表（日程页"列表 ›"入口）`dec757c`
-- 注意：私教申请存储为进程内集合，**SQLite 持久化是已声明的后续项**
+- 注意：私教申请存储为进程内集合，~~SQLite 持久化是已声明的后续项~~ ✅ 批次 12 已落 SQLite
 
 ### 批次 8：教练端球队/雷达/能力/活动变更
 - [x] 契约 "Scenario: Coach Team & Ability BFF" 入 spec（4 端点）`bd0c9f6`
@@ -95,6 +95,16 @@
 - [x] 入口：lesson 页"课时更正"、match 页"按设计稿添加"；全量 check 绿
 - 注意：异议/纠错目前无独立后端实体——异议学员按缺席/请假状态推导，更正直接写课时台账
 
+### 批次 12：SQLite 持久化 + 家长端内容四切片真 BFF
+- [x] `db/migrations/0007_request_collections.sql`：private_lesson_requests + event_change_requests 两表 `bcb382a`
+- [x] PersistentApiStore 覆盖 list/create；persistence.test 新增"重开库恢复"用例（63→64）`bcb382a`
+- [x] 契约 "Parent Content Slices" 入 spec（4 端点）`bcb382a`
+- [x] 种子层 contentArticles(4)/contentFaqs(5)/venues(3, 含坐标) 三集合 `bcb382a`
+- [x] BFF：`content/articles`、`content/faqs`、`venues`（monthlyCount=近30天活动聚合）、`coach-team`（真实教练/队伍）`bcb382a`
+- [x] 小程序 4 静态切片换真 BFF：content/help/venues/coaches；场地"导航"接 wx.openLocation `bcb382a`
+- [x] dev API 重启实测 4 端点返回真实种子数据；全量 check 绿（89 测试）
+- 注意：测评任务仍为种子集合（俱乐部配置类，无需运行时持久化）
+
 ## 未完成
 
 ### 家长端 · 完全没做
@@ -126,7 +136,7 @@
 - [ ] C1 / C2 / C4 / C5 / C6 / C7 / C8 / C12 / C16 全部现为契约版
 
 ### 其他
-- [ ] **私教申请 SQLite 持久化**（现为进程内集合，重启丢失；契约已声明）
+- [x] **私教/变更申请 SQLite 持久化** —— ✅ 批次 12（0007 migration + PersistentApiStore 覆盖 + 重开库恢复测试）
 - [ ] 交接包 WPS 草稿（642 行，1 个 201 vs 400 失败测试）未合入
 - [ ] Trellis 任务 `07-30-figma-design-foundation` 未收官
 
@@ -136,7 +146,7 @@
 3. ~~教练端 C10/C11/C15（训练内容 + 测评任务/录入）~~ ✅ 批次 9 完成
 4. ~~P10 账号绑定 + C16.1~C16.4~~ ✅ 批次 10 完成
 5. ~~教练端 6 子状态页~~ ✅ 批次 11 完成
-6. 私教/变更申请 SQLite 持久化 + 4 个静态切片换真 BFF
+6. ~~私教/变更申请 SQLite 持久化 + 4 个静态切片换真 BFF~~ ✅ 批次 12 完成
 7. 家长端 5 页 + 教练端 9 页契约版按原始设计重做 —— 视觉升级，放最后
 
 ## 工作方法（每批固定流程）
