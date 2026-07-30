@@ -353,6 +353,31 @@ players: [{ studentId, left: 132, top: 284 }]
 players: [{ studentId, x: 0.42, y: 0.68 }]
 ```
 
+## Scenario: Parent Reminders Feed
+
+### 1. Scope / Trigger
+
+- Trigger: parent mini-program reminder center (Figma P3).
+- `GET /clubs/:clubId/app-clients/:clientId/parent/reminders`
+
+### 2. Contracts
+
+- Family-level feed: items are derived per bound child, using the same guardian filter as `parent/children`. No item may reference an unrelated student.
+- Items are **derived, never stored or fabricated**: `event_upcoming` (starts within 48h, excludes cancelled/completed), `insurance_expiring` (expires within 30d; `urgent` when expired or <=7d), `lesson_credit_low` (balance <= 4; `urgent` at <= 0).
+- A student without the underlying record produces no item; the client must not render synthetic empty states as business facts.
+- Response is sorted by severity (`urgent` > `warning` > `info`), then by `dueAt`.
+- Copy rendering is client-side; the BFF returns structured fields (`event`, `insurance`, `lessonCredit`), not composed UI strings.
+
+### 3. Validation & Error Matrix
+
+- Missing or inactive app client -> `404 not_found`.
+- Authenticated role not parent -> `403 forbidden`.
+- Student without operational records -> contributes no items (still `200`).
+
+### 4. Tests Required
+
+- Contract test asserts all three types derive from seeded sources, guardian scoping holds, severity ordering is stable, and coach access is denied.
+
 ## Scenario: WeChat Login Connector and Session
 
 ### 1. Scope / Trigger
