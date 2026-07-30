@@ -1,6 +1,6 @@
 <view class="p1">
   <!-- P1 Top Nav：22px 标题 + 铃铛红点 -->
-  <view class="p1-nav">
+  <view class="p1-nav" style="padding-top:{{navInset}}px">
     <view class="p1-nav__title">日程</view>
     <view class="p1-nav__bell" bindtap="openReminders">
       <text class="p1-nav__bell-icon">🔔</text>

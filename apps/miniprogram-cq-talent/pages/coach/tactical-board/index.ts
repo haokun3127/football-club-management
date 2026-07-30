@@ -1,5 +1,6 @@
 import { getCoachTacticalBoard, getTacticalBoardFormations, saveCoachTacticalBoard } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { resolveNavInset } from "../../../utils/presentation";
 import type { FormationTemplate, LoadState, TacticalBoardPlayer, TacticalBoardState } from "../../../utils/types";
 import { normalizedToPixel, pixelToNormalized } from "../../../utils/tactical-board";
 
@@ -13,6 +14,7 @@ interface BoardPageData {
 
 Page<BoardPageData>({
   data: {
+    navInset: resolveNavInset(),
     state: "loading" as LoadState,
     message: "正在读取战术板",
     eventId: "",

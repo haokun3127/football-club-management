@@ -26,7 +26,7 @@ Page<PageData>({
     if (!session) return;
     this.setData({ state: "loading", message: "正在读取绑定信息" });
     try {
-      const children = await getParentChildren();
+      const children = (await getParentChildren()).map((child: StudentSummary) => ({ ...child, avatarLetter: child.name.slice(0, 1) }));
       const stored = wx.getStorageSync("activeStudentId") as string | "";
       const activeChildId = stored && children.some((child: StudentSummary) => child.id === stored)
         ? stored

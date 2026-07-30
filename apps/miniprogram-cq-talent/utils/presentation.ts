@@ -75,3 +75,13 @@ function timePart(value?: string) {
 function weekday(year: number, month: number, day: number) {
   return WEEKDAYS[new Date(Date.UTC(year, month - 1, day)).getUTCDay()] ?? "";
 }
+
+/** navigationStyle:custom 页面的顶部安全区（状态栏高度，px） */
+export function resolveNavInset() {
+  try {
+    const info = (wx as unknown as { getWindowInfo?: () => { statusBarHeight?: number } }).getWindowInfo?.();
+    return info?.statusBarHeight ?? 20;
+  } catch (_error) {
+    return 20;
+  }
+}

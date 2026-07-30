@@ -1,10 +1,12 @@
 import { getCoachHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { resolveNavInset } from "../../../utils/presentation";
 import { openPage } from "../../../utils/navigation";
 import type { CoachHome, LoadState } from "../../../utils/types";
 
 Page({
   data: {
+    navInset: resolveNavInset(),
     state: "loading" as LoadState,
     message: "正在读取教练身份",
     home: null as CoachHome | null,

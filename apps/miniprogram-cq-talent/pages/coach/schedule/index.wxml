@@ -1,6 +1,6 @@
 <view class="c1">
   <!-- C1 Top Nav -->
-  <view class="c1-nav">
+  <view class="c1-nav" style="padding-top:{{navInset}}px">
     <view class="c1-nav__title">日程</view>
     <view class="c1-nav__avatar" bindtap="openMe">{{coachInitial}}</view>
   </view>

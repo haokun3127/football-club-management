@@ -1,6 +1,6 @@
 <view class="c4">
   <!-- C4 Top Nav（粉底） -->
-  <view class="c4-nav">
+  <view class="c4-nav" style="padding-top:{{navInset}}px">
     <view class="c4-nav__left" bindtap="goBack">
       <view class="c4-nav__back">‹</view>
       <view class="c4-nav__title">{{correctionMode ? '出勤修改' : '出勤管理'}}</view>
@@ -23,7 +23,7 @@
     <!-- C4 Session Header -->
     <view wx:if="{{workbench}}" class="c4-hero">
       <view class="c4-hero__title">{{workbench.event.title}}</view>
-      <view class="c4-hero__meta">{{workbench.event.teamName || '队伍待确认'}} · {{workbench.event.startsAt}}</view>
+      <view class="c4-hero__meta">{{eventMetaLabel}}</view>
       <view class="c4-hero__counts">
         <view class="c4-hero__count"><view class="c4-dot c4-dot--green"></view>出勤 {{summary.present}}</view>
         <view class="c4-hero__count"><view class="c4-dot c4-dot--red"></view>缺勤 {{summary.absent}}</view>

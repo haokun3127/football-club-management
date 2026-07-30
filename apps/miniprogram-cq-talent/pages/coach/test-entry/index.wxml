@@ -1,6 +1,6 @@
 <view class="c12">
   <!-- C12 Top Nav（粉底） -->
-  <view class="c12-nav">
+  <view class="c12-nav" style="padding-top:{{navInset}}px">
     <view class="c12-nav__left" bindtap="goBack">
       <view class="c12-nav__back">‹</view>
       <view class="c12-nav__title">项目评分录入</view>

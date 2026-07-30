@@ -14,7 +14,7 @@
       <view class="card">
         <view class="card__title">绑定学员</view>
         <view wx:for="{{children}}" wx:key="id" class="child-row" data-id="{{item.id}}" bindtap="switchChild">
-          <view class="child-row__avatar">{{item.name.slice(0, 1)}}</view>
+          <view class="child-row__avatar">{{item.avatarLetter}}</view>
           <view class="child-row__info">
             <view class="child-row__name">{{item.name}}</view>
             <view class="child-row__team">{{item.teams[0] || '重庆天才足球俱乐部'}}</view>

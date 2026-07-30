@@ -1,6 +1,6 @@
 <view class="p4">
   <!-- P4 Top Nav -->
-  <view class="p4-nav">
+  <view class="p4-nav" style="padding-top:{{navInset}}px">
     <view class="p4-nav__title">成长</view>
     <view class="p4-nav__settings" bindtap="openSettings">⚙</view>
   </view>

@@ -1,6 +1,6 @@
 <view class="c5">
   <!-- C5 Top Nav（粉底） -->
-  <view class="c5-nav">
+  <view class="c5-nav" style="padding-top:{{navInset}}px">
     <view class="c5-nav__left" bindtap="goBack">
       <view class="c5-nav__back">‹</view>
       <view class="c5-nav__title">课时确认</view>
@@ -13,7 +13,7 @@
     <!-- C5 Activity Header -->
     <view wx:if="{{workbench}}" class="c5-hero">
       <view class="c5-hero__title">{{workbench.event.title}}</view>
-      <view class="c5-hero__meta">{{workbench.event.teamName || '队伍待确认'}} · {{workbench.event.startsAt.slice(0, 10)}}</view>
+      <view class="c5-hero__meta">{{workbench.event.teamName || '队伍待确认'}} · {{eventDateLabel}}</view>
       <view class="c5-hero__meta">{{timeRangeLabel}}</view>
     </view>
 
@@ -25,7 +25,7 @@
       </view>
       <view wx:for="{{workbench.roster}}" wx:key="studentId" class="c5-row">
         <view class="c5-row__main">
-          <view class="c5-row__avatar">{{item.name.slice(0, 1)}}</view>
+          <view class="c5-row__avatar">{{item.avatarLetter}}</view>
           <view class="c5-row__info">
             <view class="c5-row__name">{{item.name}}</view>
             <view class="c5-row__sub">剩余 {{item.remainingLessons === undefined ? '待核对' : item.remainingLessons + ' 课时'}}</view>

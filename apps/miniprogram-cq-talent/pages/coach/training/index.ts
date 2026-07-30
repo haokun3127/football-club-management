@@ -1,13 +1,14 @@
 import { getCoachHome, getCoachTrainingProjectTree, getCoachWorkbench, saveCoachTrainingProjects } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import { formatCalendarDate, formatTimeRange } from "../../../utils/presentation";
+import { formatCalendarDate, formatTimeRange, resolveNavInset } from "../../../utils/presentation";
 import type { CoachHome, CoachWorkbench, LoadState, ScheduleEvent, TrainingProject, TrainingProjectGroup, TrainingProjectTree } from "../../../utils/types";
 
 type TrainingEventOption = ScheduleEvent & { displayTime: string };
 
 Page({
   data: {
+    navInset: resolveNavInset(),
     state: "loading" as LoadState,
     message: "正在读取训练管理",
     home: null as CoachHome | null,

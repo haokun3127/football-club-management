@@ -1,4 +1,5 @@
 {
+  "navigationStyle": "custom",
   "navigationBarTitleText": "能力雷达",
   "usingComponents": {
     "status-view": "/components/status-view/index",

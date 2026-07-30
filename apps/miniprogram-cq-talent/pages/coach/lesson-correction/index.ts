@@ -44,6 +44,7 @@ Page<PageData>({
       const rows = workbench.roster.map((student: RosterItem) => ({
         studentId: student.studentId,
         name: student.name,
+        avatarLetter: student.name.slice(0, 1),
         baseLabel: `原值: ${student.shouldConsume === false ? 0 : 1}课时`,
         delta: 0,
         deltaLabel: "±0",

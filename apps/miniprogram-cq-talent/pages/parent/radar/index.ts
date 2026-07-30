@@ -1,7 +1,7 @@
 import { getParentChildren, getParentGrowth } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import { formatDateTime } from "../../../utils/presentation";
+import { formatDateTime, resolveNavInset } from "../../../utils/presentation";
 import { setCurrentStudentId } from "../../../utils/store";
 import type { LoadState, RadarMetricPoint, StudentSummary } from "../../../utils/types";
 
@@ -12,6 +12,7 @@ type RadarPointView = RadarMetricPoint & {
 
 Page({
   data: {
+    navInset: resolveNavInset(),
     state: "loading" as LoadState,
     message: "正在读取能力雷达",
     children: [] as StudentSummary[],

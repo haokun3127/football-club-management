@@ -2,7 +2,7 @@ import { getCoachHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { DEV_TEST_DATE } from "../../../utils/config";
 import { openPage } from "../../../utils/navigation";
-import { activityStatus, formatCalendarDate, formatTimeRange } from "../../../utils/presentation";
+import { activityStatus, formatCalendarDate, formatTimeRange, resolveNavInset } from "../../../utils/presentation";
 import type { CoachHome, CoachTaskAction, LoadState, ScheduleEvent } from "../../../utils/types";
 
 type Filter = "all" | "pending" | "training" | "match";
@@ -30,6 +30,7 @@ const WEEK_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 Page({
   data: {
+    navInset: resolveNavInset(),
     state: "loading" as LoadState,
     message: "正在读取教练任务",
     home: null as CoachHome | null,

@@ -1,5 +1,6 @@
 import { getCoachWorkbench, recordCoachMatch } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { resolveNavInset } from "../../../utils/presentation";
 import { openPage } from "../../../utils/navigation";
 import { getAppContext } from "../../../utils/store";
 import type { CoachMatchPlayerEvent, CoachWorkbench, LoadState } from "../../../utils/types";
@@ -30,6 +31,7 @@ const allPlayerEventTypes: Array<{ label: string; value: CoachMatchPlayerEvent["
 
 Page({
   data: {
+    navInset: resolveNavInset(),
     state: "loading" as LoadState,
     message: "正在读取比赛上下文",
     workbench: null as CoachWorkbench | null,

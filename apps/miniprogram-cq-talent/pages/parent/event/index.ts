@@ -1,6 +1,6 @@
 import { getParentActivityDetail } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { activityStatus, activityTypeLabel } from "../../../utils/presentation";
+import { activityStatus, activityTypeLabel, resolveNavInset } from "../../../utils/presentation";
 import type { ActivityDetail, LoadState } from "../../../utils/types";
 
 type ActivityDetailView = ActivityDetail & {
@@ -21,6 +21,7 @@ const NAV_TITLES = { training: "训练详情", match: "比赛详情", other: "�
 
 Page({
   data: {
+    navInset: resolveNavInset(),
     state: "loading" as LoadState,
     message: "正在读取活动详情",
     eventId: "",

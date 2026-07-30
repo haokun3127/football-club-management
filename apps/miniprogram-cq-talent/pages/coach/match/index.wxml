@@ -1,6 +1,6 @@
 <view class="c6">
   <!-- C6 TopNav（粉底） -->
-  <view class="c6-nav">
+  <view class="c6-nav" style="padding-top:{{navInset}}px">
     <view class="c6-nav__left" bindtap="goBack">
       <view class="c6-nav__back">‹</view>
       <view class="c6-nav__title">比赛记录</view>

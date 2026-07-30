@@ -2,7 +2,7 @@ import { getParentCalendar, getParentChildren, getParentReminders } from "../../
 import { requireRole } from "../../../utils/auth";
 import { DEV_MODE, DEV_TEST_DATE } from "../../../utils/config";
 import { openPage } from "../../../utils/navigation";
-import { activityStatus, childNames, formatCalendarDate, formatTimeRange } from "../../../utils/presentation";
+import { activityStatus, childNames, formatCalendarDate, formatTimeRange, resolveNavInset } from "../../../utils/presentation";
 import { countUnreadReminders } from "../../../utils/reminders";
 import { setCurrentStudentId } from "../../../utils/store";
 import type { LoadState, ScheduleEvent, StudentSummary } from "../../../utils/types";
@@ -65,6 +65,7 @@ const initialDate = DEV_MODE ? DEV_TEST_DATE : currentLocalDate();
 
 Page<PageData>({
   data: {
+    navInset: resolveNavInset(),
     state: "loading",
     message: "正在读取家庭日程",
     children: [],

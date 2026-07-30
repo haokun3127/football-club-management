@@ -1,6 +1,6 @@
 <view class="c16">
   <!-- C16 TopBar（粉底） -->
-  <view class="c16-bar">
+  <view class="c16-bar" style="padding-top:{{navInset}}px">
     <view class="c16-bar__title">我的</view>
     <view class="c16-bar__settings" bindtap="openAccount">⚙</view>
   </view>

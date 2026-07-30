@@ -1,5 +1,6 @@
 import { confirmCoachLesson, correctCoachLesson, getCoachLessonConfirmation, getCoachWorkbench } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { resolveNavInset } from "../../../utils/presentation";
 import { openPage } from "../../../utils/navigation";
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
 
@@ -7,6 +8,7 @@ type RosterItem = CoachWorkbench["roster"][number];
 
 Page({
   data: {
+    navInset: resolveNavInset(),
     state: "loading" as LoadState,
     message: "正在读取销课名单",
     workbench: null as CoachWorkbench | null,
@@ -15,6 +17,7 @@ Page({
     correctingStudentId: "",
     lessonNote: "",
     timeRangeLabel: "",
+    eventDateLabel: "",
   },
   onLoad(query?: Record<string, string | undefined>) {
     requireRole("coach");
@@ -35,12 +38,14 @@ Page({
           ...workbench,
           roster: sourceRoster.map((student) => ({
             ...student,
+            avatarLetter: student.name.slice(0, 1),
             shouldConsume: student.shouldConsume !== false,
             exceptionReason: student.exceptionReason || "",
           })),
         },
         message: "",
         eventId: id,
+        eventDateLabel: (workbench.event.startsAt ?? "").slice(0, 10),
         timeRangeLabel: timeRangeLabel(workbench.event.startsAt, workbench.event.endsAt),
       });
     } catch (error) {

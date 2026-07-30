@@ -1,6 +1,6 @@
 <view class="p7">
   <!-- P7 Top Nav -->
-  <view class="p7-nav">
+  <view class="p7-nav" style="padding-top:{{navInset}}px">
     <view class="p7-nav__title">我的孩子</view>
   </view>
 

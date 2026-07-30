@@ -1,6 +1,6 @@
 <view class="c7">
   <!-- C7 TopNav -->
-  <view class="c7-nav">
+  <view class="c7-nav" style="padding-top:{{navInset}}px">
     <view class="c7-nav__left" bindtap="goBack">
       <view class="c7-nav__back">‹</view>
       <view class="c7-nav__title">比赛战术板</view>

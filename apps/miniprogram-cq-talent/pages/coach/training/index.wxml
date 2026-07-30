@@ -1,6 +1,6 @@
 <view class="c8">
   <!-- C8 TopNav -->
-  <view class="c8-nav">
+  <view class="c8-nav" style="padding-top:{{navInset}}px">
     <view class="c8-nav__title">训练管理</view>
   </view>
 <view class="page training-page c8-body">

@@ -1,5 +1,6 @@
 import { getCoachWorkbench, saveCoachAttendance } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { activityStatus, formatCalendarDate, formatTimeRange, resolveNavInset } from "../../../utils/presentation";
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
 
 type RosterItem = CoachWorkbench["roster"][number];
@@ -16,6 +17,7 @@ const statusOptions = [
 
 Page({
   data: {
+    navInset: resolveNavInset(),
     state: "loading" as LoadState,
     message: "正在读取点名名单",
     workbench: null as CoachWorkbench | null,
@@ -25,6 +27,7 @@ Page({
     summary: { total: 0, present: 0, attention: 0, absent: 0, pendingCount: 0 },
     correctionMode: false,
     disputedCount: 0,
+    eventMetaLabel: "",
   },
   onLoad(query?: Record<string, string | undefined>) {
     requireRole("coach");
@@ -38,7 +41,7 @@ Page({
       const disputedCount = this.data.correctionMode
         ? roster.filter((student) => student.status === "absent" || student.status === "leave_requested").length
         : 0;
-      this.setData({ state: roster.length ? "ready" : "empty", workbench: { ...workbench, roster }, message: roster.length ? "" : "当前活动还没有可点名学员。", eventId: id, summary: summarizeRoster(roster), disputedCount });
+      this.setData({ state: roster.length ? "ready" : "empty", workbench: { ...workbench, roster }, message: roster.length ? "" : "当前活动还没有可点名学员。", eventId: id, summary: summarizeRoster(roster), disputedCount, eventMetaLabel: `${workbench.event.teamName || "队伍待确认"} · ${formatCalendarDate(workbench.event.startsAt)} ${formatTimeRange(workbench.event.startsAt, workbench.event.endsAt)}` });
     } catch (error) {
       this.setData({ state: "error", message: readableError(error) });
     }

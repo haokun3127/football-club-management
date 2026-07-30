@@ -23,7 +23,7 @@
       <view class="student-card">
         <view class="student-card__title">需更正学员</view>
         <view wx:for="{{rows}}" wx:key="studentId" class="student-row">
-          <view class="student-row__avatar">{{item.name.slice(0, 1)}}</view>
+          <view class="student-row__avatar">{{item.avatarLetter}}</view>
           <view class="student-row__info">
             <view class="student-row__name">{{item.name}}</view>
             <view class="student-row__base">{{item.baseLabel}}</view>
