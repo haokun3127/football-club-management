@@ -358,3 +358,42 @@ export interface CoachAssessmentTask {
   completedStudents: number;
   totalStudents: number;
 }
+
+export interface ContentArticle {
+  id: string;
+  title: string;
+  subtitle: string;
+  accent: string;
+  category: "venue" | "help" | "coach" | "guide";
+}
+
+export interface ContentFaq {
+  id: string;
+  q: string;
+  a: string;
+  category: string;
+}
+
+export interface VenueInfo {
+  id: string;
+  name: string;
+  type: string;
+  address: string;
+  tags: string[];
+  facilities: string[];
+  latitude: number;
+  longitude: number;
+  monthlyCount: number;
+}
+
+export interface ClubCoachTeam {
+  teamName: string;
+  teamChips: string[];
+  teamGoal: string;
+  coaches: Array<{
+    id: string;
+    name: string;
+    role: string;
+    bio: string;
+  }>;
+}

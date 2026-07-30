@@ -189,6 +189,30 @@ export function buildOpenApiDocument() {
           ...schemas.appClientCoachAssessmentTasks,
         }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/content/articles": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/content/articles", {
+          ...schemas.appClientParams,
+          ...schemas.appClientContentArticles,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/content/faqs": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/content/faqs", {
+          ...schemas.appClientParams,
+          ...schemas.appClientContentFaqs,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/venues": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/venues", {
+          ...schemas.appClientParams,
+          ...schemas.appClientVenues,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach-team": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach-team", {
+          ...schemas.appClientParams,
+          ...schemas.appClientClubCoachTeam,
+        }),
+      },
       "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/activity-summaries": {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/activity-summaries", {
           ...schemas.appClientStudentParams,

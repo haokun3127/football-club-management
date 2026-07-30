@@ -58,6 +58,9 @@ import type {
   PrivateLessonRequest,
   EventChangeRequest,
   AssessmentTask,
+  ContentArticle,
+  ContentFaq,
+  VenueInfo,
   LessonLedgerEntry,
 } from "../data-capability/types.js";
 
@@ -121,6 +124,9 @@ export interface SeedData {
   privateLessonRequests: PrivateLessonRequest[];
   eventChangeRequests: EventChangeRequest[];
   assessmentTasks: AssessmentTask[];
+  contentArticles: ContentArticle[];
+  contentFaqs: ContentFaq[];
+  venues: VenueInfo[];
   privacyFieldPolicies: PrivacyFieldPolicy[];
   privacyNoticeVersions: PrivacyNoticeVersion[];
   privacyRetentionPolicies: PrivacyRetentionPolicy[];

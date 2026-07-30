@@ -1,5 +1,7 @@
+import { getContentArticles } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
+import type { ContentArticle } from "../../../utils/types";
 
 interface Category {
   label: string;
@@ -14,21 +16,13 @@ interface QuickLink {
   page?: string;
 }
 
-interface Article {
-  id: string;
-  title: string;
-  subtitle: string;
-  accent: string;
-  category: string;
-}
-
 interface PageData {
   categories: Category[];
   activeCategory: string;
   featured: { category: string; title: string; subtitle: string };
   quickLinks: QuickLink[];
-  articles: Article[];
-  visibleArticles: Article[];
+  articles: ContentArticle[];
+  visibleArticles: ContentArticle[];
 }
 
 // Figma P8 Content Center 设计内容（静态，待后端内容服务接入后替换为 API 数据）
@@ -47,23 +41,26 @@ const QUICK_LINKS: QuickLink[] = [
   { icon: "📖", color: "#a80f1b", label: "训练攻略", category: "guide" },
 ];
 
-const ARTICLES: Article[] = [
-  { id: "a1", title: "2023秋季训练计划", subtitle: "了解最新的训练课程安排与重点内容", accent: "#a80f1b", category: "guide" },
-  { id: "a2", title: "球员成长评估报告", subtitle: "详细分析球员近期训练表现与成长点", accent: "#1976d2", category: "help" },
-  { id: "a3", title: "新手入门：如何选择合适场地", subtitle: "为您提供最优的场地选择与预订技巧", accent: "#ff9800", category: "venue" },
-];
-
 Page<PageData>({
   data: {
     categories: CATEGORIES,
     activeCategory: "all",
     featured: { category: "场地", title: "球场预订指南", subtitle: "了解各场地设施与预订流程" },
     quickLinks: QUICK_LINKS,
-    articles: ARTICLES,
-    visibleArticles: ARTICLES,
+    articles: [],
+    visibleArticles: [],
   },
   onLoad() {
     requireRole("parent");
+    this.loadArticles();
+  },
+  async loadArticles() {
+    try {
+      const articles = await getContentArticles();
+      this.setData({ articles, visibleArticles: this.data.activeCategory === "all" ? articles : articles.filter((article: ContentArticle) => article.category === this.data.activeCategory) });
+    } catch {
+      wx.showToast({ title: "内容加载失败，请稍后重试", icon: "none" });
+    }
   },
   selectCategory(event: { currentTarget: { dataset: { value: string } } }) {
     this.applyFilter(event.currentTarget.dataset.value);
@@ -81,7 +78,7 @@ Page<PageData>({
       activeCategory: category,
       visibleArticles: category === "all"
         ? this.data.articles
-        : this.data.articles.filter((article: Article) => article.category === category),
+        : this.data.articles.filter((article: ContentArticle) => article.category === category),
     });
   },
   openArticle() {

@@ -633,6 +633,35 @@ export interface AssessmentTask {
   dueOn: string;
 }
 
+export interface ContentArticle {
+  id: string;
+  clubId: string;
+  title: string;
+  subtitle: string;
+  accent: string;
+  category: "venue" | "help" | "coach" | "guide";
+}
+
+export interface ContentFaq {
+  id: string;
+  clubId: string;
+  q: string;
+  a: string;
+  category: string;
+}
+
+export interface VenueInfo {
+  id: string;
+  clubId: string;
+  name: string;
+  type: string;
+  address: string;
+  tags: string[];
+  facilities: string[];
+  latitude: number;
+  longitude: number;
+}
+
 export interface EventChangeRequestInput {
   reason: EventChangeReason;
   newStartsAt?: string;

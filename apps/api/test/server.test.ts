@@ -2754,6 +2754,76 @@ describe("api server", () => {
     persistence.database.close();
   });
 
+  it("serves parent content slices (articles, faqs, venues, coach team)", async () => {
+    process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED = "1";
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const store = new PersistentApiStore(persistence.repositories);
+    const app = buildServer(
+      store,
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    const base = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main";
+
+    const articles = await app.inject({
+      method: "GET",
+      url: `${base}/content/articles`,
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    expect(articles.statusCode, articles.body).toBe(200);
+    const articlesBody = articles.json() as { articles: Array<{ id: string; category: string }> };
+    expect(articlesBody.articles.length).toBeGreaterThanOrEqual(4);
+    expect(articlesBody.articles.map((item) => item.category)).toEqual(expect.arrayContaining(["guide", "venue", "coach", "help"]));
+
+    const faqs = await app.inject({
+      method: "GET",
+      url: `${base}/content/faqs`,
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    expect(faqs.statusCode, faqs.body).toBe(200);
+    const faqsBody = faqs.json() as { questions: Array<{ id: string; q: string; a: string }> };
+    expect(faqsBody.questions.length).toBeGreaterThanOrEqual(5);
+    expect(faqsBody.questions[0]?.q).toBeTruthy();
+
+    const venues = await app.inject({
+      method: "GET",
+      url: `${base}/venues`,
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    expect(venues.statusCode, venues.body).toBe(200);
+    const venuesBody = venues.json() as { venues: Array<{ id: string; name: string; monthlyCount: number; latitude: number }> };
+    expect(venuesBody.venues).toHaveLength(3);
+    for (const venue of venuesBody.venues) {
+      expect(typeof venue.monthlyCount).toBe("number");
+      expect(typeof venue.latitude).toBe("number");
+    }
+
+    const coachTeam = await app.inject({
+      method: "GET",
+      url: `${base}/coach-team`,
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    expect(coachTeam.statusCode, coachTeam.body).toBe(200);
+    const coachTeamBody = coachTeam.json() as { teamName: string; coaches: Array<{ id: string; name: string; role: string }> };
+    expect(coachTeamBody.teamName).toBeTruthy();
+    expect(coachTeamBody.coaches.length).toBeGreaterThan(0);
+    expect(coachTeamBody.coaches[0]?.role).toBe("主教练");
+
+    // 教练角色也可读（合约：家长或教练均可）
+    const coachView = await app.inject({
+      method: "GET",
+      url: `${base}/venues`,
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    expect(coachView.statusCode).toBe(200);
+
+    await app.close();
+    persistence.database.close();
+  });
+
   it("returns a minimal OpenAPI document from the schema registry", async () => {
     const app = buildServer(undefined, { logger: false });
     const response = await app.inject({

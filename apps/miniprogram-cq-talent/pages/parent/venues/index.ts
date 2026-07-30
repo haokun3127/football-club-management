@@ -1,14 +1,9 @@
+import { getVenues } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import type { VenueInfo } from "../../../utils/types";
 
-interface Venue {
-  id: string;
-  name: string;
-  type: string;
+interface Venue extends VenueInfo {
   typeColor: string;
-  address: string;
-  tags: string[];
-  facilities: string[];
-  monthlyCount: number;
   gradient: string;
 }
 
@@ -19,43 +14,6 @@ interface PageData {
   visibleVenues: Venue[];
 }
 
-// Figma Venues - Premium 设计内容（静态，待后端场地服务接入）
-const VENUES: Venue[] = [
-  {
-    id: "v1",
-    name: "九龙坡足球公园",
-    type: "11人制场地",
-    typeColor: "#3b82f6",
-    address: "九龙坡区科园四路",
-    tags: ["outdoor", "natural"],
-    facilities: ["照明设施", "更衣室", "停车场"],
-    monthlyCount: 4,
-    gradient: "linear-gradient(135deg, #1d4ed8 0%, #0ea5e9 100%)",
-  },
-  {
-    id: "v2",
-    name: "重庆体育学院训练馆",
-    type: "5人制场地",
-    typeColor: "#8b5cf6",
-    address: "沙坪坝区大学城",
-    tags: ["indoor", "artificial"],
-    facilities: ["恒温室内", "淋浴间", "储物柜"],
-    monthlyCount: 2,
-    gradient: "linear-gradient(135deg, #6d28d9 0%, #a855f7 100%)",
-  },
-  {
-    id: "v3",
-    name: "南岸足球公园",
-    type: "7人制场地",
-    typeColor: "#059669",
-    address: "南岸区茶园路",
-    tags: ["outdoor", "artificial"],
-    facilities: ["照明设施", "停车场"],
-    monthlyCount: 6,
-    gradient: "linear-gradient(135deg, #047857 0%, #34d399 100%)",
-  },
-];
-
 const FILTERS = [
   { label: "全部场地", value: "all" },
   { label: "室外", value: "outdoor" },
@@ -64,15 +22,40 @@ const FILTERS = [
   { label: "天然草", value: "natural" },
 ];
 
+const TYPE_COLORS: Record<string, string> = {
+  "11人制场地": "#3b82f6",
+  "7人制场地": "#059669",
+  "5人制场地": "#8b5cf6",
+};
+
+const GRADIENTS = [
+  "linear-gradient(135deg, #1d4ed8 0%, #0ea5e9 100%)",
+  "linear-gradient(135deg, #047857 0%, #34d399 100%)",
+  "linear-gradient(135deg, #6d28d9 0%, #a855f7 100%)",
+];
+
 Page<PageData>({
   data: {
     filters: FILTERS,
     activeFilter: "all",
-    venues: VENUES,
-    visibleVenues: VENUES,
+    venues: [],
+    visibleVenues: [],
   },
   onLoad() {
     requireRole("parent");
+    this.loadVenues();
+  },
+  async loadVenues() {
+    try {
+      const venues = (await getVenues()).map((venue, index) => ({
+        ...venue,
+        typeColor: TYPE_COLORS[venue.type] ?? "#3b82f6",
+        gradient: GRADIENTS[index % GRADIENTS.length],
+      }));
+      this.setData({ venues, visibleVenues: this.data.activeFilter === "all" ? venues : venues.filter((venue) => venue.tags.includes(this.data.activeFilter)) });
+    } catch {
+      wx.showToast({ title: "场地加载失败，请稍后重试", icon: "none" });
+    }
   },
   selectFilter(event: { currentTarget: { dataset: { value: string } } }) {
     const value = event.currentTarget.dataset.value;
@@ -86,7 +69,14 @@ Page<PageData>({
   openSearch() {
     wx.showToast({ title: "场地搜索即将上线", icon: "none" });
   },
-  navigate(event: { currentTarget: { dataset: { name: string } } }) {
-    wx.showToast({ title: `导航到${event.currentTarget.dataset.name}`, icon: "none" });
+  navigate(event: { currentTarget: { dataset: { id: string } } }) {
+    const venue = this.data.venues.find((item: Venue) => item.id === event.currentTarget.dataset.id);
+    if (!venue) return;
+    const openLocation = (wx as unknown as { openLocation?: (options: { latitude: number; longitude: number; name: string; address: string }) => void }).openLocation;
+    if (openLocation) {
+      openLocation({ latitude: venue.latitude, longitude: venue.longitude, name: venue.name, address: venue.address });
+      return;
+    }
+    wx.showToast({ title: `导航到${venue.name}`, icon: "none" });
   },
 });

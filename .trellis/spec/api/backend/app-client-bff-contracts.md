@@ -567,3 +567,34 @@ v1 存储为进程内集合（同私教申请语义），SQLite 持久化是已�
 
 - C10 训练内容选择：`GET /coach/training-project-tree` + `PUT /coach/events/{eventId}/training-projects`（已存在）。
 - C15 测评录入提交：`POST /coach/assessments`（已存在，按学员逐条提交）。
+
+
+## Scenario: Parent Content Slices (articles / FAQs / venues / coach team)
+
+家长端内容中心四切片由静态数据切换为真实 BFF，全部只读、按俱乐部隔离。
+
+### GET /clubs/{clubId}/app-clients/{clientId}/content/articles
+
+- 响应 `{ "articles": [{ "id", "title", "subtitle", "accent", "category" }] }`
+- `category` ∈ `venue | help | coach | guide`；`accent` 为品牌色十六进制，供小程序卡片标题着色。
+- 数据来自种子集合 `contentArticles`（俱乐部内容运营维护），无需分页（单俱乐部 < 50 条）。
+
+### GET /clubs/{clubId}/app-clients/{clientId}/content/faqs
+
+- 响应 `{ "questions": [{ "id", "q", "a", "category" }] }`
+- `category` 对应帮助中心分类标签（训练规则/出勤说明/成长报告/账号设置/联系客服/更多问题）。
+
+### GET /clubs/{clubId}/app-clients/{clientId}/venues
+
+- 响应 `{ "venues": [{ "id", "name", "type", "address", "tags", "facilities", "monthlyCount", "latitude", "longitude" }] }`
+- `tags` ∈ `outdoor | indoor | natural | artificial`；`monthlyCount` 由近 30 天该场地活动数实时聚合（非种子字段）。
+- `latitude`/`longitude` 供 `wx.openLocation` 导航使用。
+
+### GET /clubs/{clubId}/app-clients/{clientId}/coach-team
+
+- 响应 `{ "teamName", "teamChips": [], "teamGoal", "coaches": [{ "id", "name", "role", "bio" }] }`
+- 教练列表来自平台种子 `coaches`（角色：球队主教练优先，其余按专长）；`bio` 由 specialties 拼接。
+
+### 错误与安全
+
+- 四个端点均要求已登录会话（家长或教练均可读）；未知俱乐部 → 404。

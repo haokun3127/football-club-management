@@ -626,6 +626,69 @@ export const schemas = {
       },
     },
   },
+  appClientContentArticles: {
+    response: {
+      200: {
+        type: "object",
+        additionalProperties: true,
+        required: ["clubId", "articles"],
+        properties: {
+          clubId: { type: "string" },
+          articles: { type: "array", items: { type: "object", additionalProperties: true } },
+        },
+      },
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientContentFaqs: {
+    response: {
+      200: {
+        type: "object",
+        additionalProperties: true,
+        required: ["clubId", "questions"],
+        properties: {
+          clubId: { type: "string" },
+          questions: { type: "array", items: { type: "object", additionalProperties: true } },
+        },
+      },
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientVenues: {
+    response: {
+      200: {
+        type: "object",
+        additionalProperties: true,
+        required: ["clubId", "venues"],
+        properties: {
+          clubId: { type: "string" },
+          venues: { type: "array", items: { type: "object", additionalProperties: true } },
+        },
+      },
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientClubCoachTeam: {
+    response: {
+      200: {
+        type: "object",
+        additionalProperties: true,
+        required: ["clubId", "teamName", "coaches"],
+        properties: {
+          clubId: { type: "string" },
+          teamName: { type: "string" },
+          teamChips: { type: "array", items: { type: "string" } },
+          teamGoal: { type: "string" },
+          coaches: { type: "array", items: { type: "object", additionalProperties: true } },
+        },
+      },
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
   appClientActivitySummaries: {
     response: {
       200: flexibleObject,

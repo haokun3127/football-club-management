@@ -13,6 +13,10 @@ import type {
   CoachTeamAbilityOverview,
   CoachTrainingCoverageStudent,
   CoachAssessmentTask,
+  ClubCoachTeam,
+  ContentArticle,
+  ContentFaq,
+  VenueInfo,
   CoachWorkbench,
   GrowthSummary,
   MetricDetail,
@@ -1029,4 +1033,36 @@ export async function getCoachAssessmentTasks(): Promise<CoachAssessmentTask[]> 
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessment-tasks`,
   });
   return Array.isArray(response.tasks) ? response.tasks : [];
+}
+
+export async function getContentArticles(): Promise<ContentArticle[]> {
+  const context = requireContext();
+  const response = await request<{ articles?: ContentArticle[] }>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/content/articles`,
+  });
+  return Array.isArray(response.articles) ? response.articles : [];
+}
+
+export async function getContentFaqs(): Promise<ContentFaq[]> {
+  const context = requireContext();
+  const response = await request<{ questions?: ContentFaq[] }>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/content/faqs`,
+  });
+  return Array.isArray(response.questions) ? response.questions : [];
+}
+
+export async function getVenues(): Promise<VenueInfo[]> {
+  const context = requireContext();
+  const response = await request<{ venues?: VenueInfo[] }>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/venues`,
+  });
+  return Array.isArray(response.venues) ? response.venues : [];
+}
+
+export async function getClubCoachTeam(): Promise<ClubCoachTeam | null> {
+  const context = requireContext();
+  const response = await request<ClubCoachTeam>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach-team`,
+  });
+  return response.teamName ? response : null;
 }

@@ -81,6 +81,9 @@ import type {
   EventChangeRequest,
   EventChangeRequestInput,
   AssessmentTask,
+  ContentArticle,
+  ContentFaq,
+  VenueInfo,
   InsurancePolicySummary,
   LessonAdjustmentInput,
   LessonLedgerEntry,
@@ -154,6 +157,8 @@ export interface ApiStore {
   getExternalSyncRunDetail(clubId: EntityId, syncRunId: EntityId): SyncRunDetail | null | Promise<SyncRunDetail | null>;
   listOperationalStudents(clubId: EntityId, filters?: StudentListFilters): StudentListItem[] | Promise<StudentListItem[]>;
   listCoaches(clubId: EntityId): CoachProfile[];
+  listTeams(clubId: EntityId): Team[];
+  listTeamMembers(clubId: EntityId): TeamMember[];
   getOperationalStudentDetail(clubId: EntityId, studentId: EntityId): StudentDetail | null | Promise<StudentDetail | null>;
   getStudentOperationalStatusSummary(clubId: EntityId, studentId: EntityId): StudentOperationalStatusSummary | null | Promise<StudentOperationalStatusSummary | null>;
   getLessonLedger(clubId: EntityId, studentId: EntityId): LessonLedgerSummary | null | Promise<LessonLedgerSummary | null>;
@@ -165,6 +170,9 @@ export interface ApiStore {
   listEventChangeRequests(clubId: EntityId, eventId?: EntityId): EventChangeRequest[] | Promise<EventChangeRequest[]>;
   createEventChangeRequest(clubId: EntityId, eventId: EntityId, input: EventChangeRequestInput): EventChangeRequest | Promise<EventChangeRequest>;
   listAssessmentTasks(clubId: EntityId): AssessmentTask[] | Promise<AssessmentTask[]>;
+  listContentArticles(clubId: EntityId): ContentArticle[] | Promise<ContentArticle[]>;
+  listContentFaqs(clubId: EntityId): ContentFaq[] | Promise<ContentFaq[]>;
+  listVenues(clubId: EntityId): VenueInfo[] | Promise<VenueInfo[]>;
   confirmExternalRecord(
     clubId: EntityId,
     rawRecordId: EntityId,
@@ -1773,6 +1781,18 @@ export abstract class SeedBackedStore implements ApiStore {
 
   listAssessmentTasks(clubId: EntityId): AssessmentTask[] {
     return this.data.assessmentTasks.filter((item) => item.clubId === clubId);
+  }
+
+  listContentArticles(clubId: EntityId): ContentArticle[] {
+    return this.data.contentArticles.filter((item) => item.clubId === clubId);
+  }
+
+  listContentFaqs(clubId: EntityId): ContentFaq[] {
+    return this.data.contentFaqs.filter((item) => item.clubId === clubId);
+  }
+
+  listVenues(clubId: EntityId): VenueInfo[] {
+    return this.data.venues.filter((item) => item.clubId === clubId);
   }
 
   confirmExternalRecord(

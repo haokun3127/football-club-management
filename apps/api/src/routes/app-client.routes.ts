@@ -1751,6 +1751,123 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
     },
   );
 
+  // ---- Parent content slices (contract: Parent Content Slices) ----
+
+  app.get<{
+    Params: { clubId: string; clientId: string };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/content/articles",
+    { schema: { ...schemas.appClientParams, ...schemas.appClientContentArticles } },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "parent");
+      if (!client) {
+        return reply;
+      }
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach", "parent"])) {
+        return reply;
+      }
+      return {
+        clubId: request.params.clubId,
+        articles: await context.store.listContentArticles(request.params.clubId),
+      };
+    },
+  );
+
+  app.get<{
+    Params: { clubId: string; clientId: string };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/content/faqs",
+    { schema: { ...schemas.appClientParams, ...schemas.appClientContentFaqs } },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "parent");
+      if (!client) {
+        return reply;
+      }
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach", "parent"])) {
+        return reply;
+      }
+      return {
+        clubId: request.params.clubId,
+        questions: await context.store.listContentFaqs(request.params.clubId),
+      };
+    },
+  );
+
+  app.get<{
+    Params: { clubId: string; clientId: string };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/venues",
+    { schema: { ...schemas.appClientParams, ...schemas.appClientVenues } },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "parent");
+      if (!client) {
+        return reply;
+      }
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach", "parent"])) {
+        return reply;
+      }
+      const venues = await context.store.listVenues(request.params.clubId);
+      const dayMs = 24 * 60 * 60 * 1000;
+      const from = new Date(Date.now() - 29 * dayMs).toISOString();
+      const students = await context.store.listOperationalStudents(request.params.clubId);
+      const eventIds = new Set<string>();
+      const venueUseCount = new Map<string, number>();
+      await Promise.all(students.map(async (student) => {
+        const timeline = sortEvents(await context.store.getStudentTimeline(request.params.clubId, student.id));
+        for (const event of timeline) {
+          const rawVenue = event.venue;
+          const venueName = typeof rawVenue === "string" ? rawVenue : String((rawVenue as { name?: string } | undefined)?.name ?? "");
+          if (!venueName || eventIds.has(event.id) || event.timeRange.startsAt < from) {
+            continue;
+          }
+          eventIds.add(event.id);
+          venueUseCount.set(venueName, (venueUseCount.get(venueName) ?? 0) + 1);
+        }
+      }));
+      return {
+        clubId: request.params.clubId,
+        venues: venues.map((venue) => ({
+          ...venue,
+          monthlyCount: venueUseCount.get(venue.name) ?? 0,
+        })),
+      };
+    },
+  );
+
+  app.get<{
+    Params: { clubId: string; clientId: string };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach-team",
+    { schema: { ...schemas.appClientParams, ...schemas.appClientClubCoachTeam } },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "parent");
+      if (!client) {
+        return reply;
+      }
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach", "parent"])) {
+        return reply;
+      }
+      const teams = context.store.listTeams(request.params.clubId);
+      const coaches = context.store.listCoaches(request.params.clubId).filter((coach) => coach.status === "active");
+      const primaryTeam = teams[0];
+      const memberCount = primaryTeam
+        ? context.store.listTeamMembers(request.params.clubId).filter((member) => member.teamId === primaryTeam.id).length
+        : 0;
+      return {
+        clubId: request.params.clubId,
+        teamName: primaryTeam?.name ?? "重庆天才足球俱乐部",
+        teamChips: [`${memberCount}名球员`, `${teams.length}支队伍`],
+        teamGoal: "本赛季目标：打造更强的团队凝聚力与战术执行力。",
+        coaches: coaches.map((coach, index) => ({
+          id: coach.id,
+          name: coach.name,
+          role: index === 0 ? "主教练" : "教练",
+          bio: coach.specialties.filter((item) => item !== "重庆天才导入数据").join(" · ") || "青训教练",
+        })),
+      };
+    },
+  );
+
   app.put<{
     Params: {
       clubId: string;

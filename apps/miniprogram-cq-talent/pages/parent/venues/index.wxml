@@ -28,7 +28,7 @@
           </view>
           <view class="venue-card__footer">
             <view class="venue-card__count">本月训练 {{item.monthlyCount}}次</view>
-            <view class="venue-card__nav" data-name="{{item.name}}" bindtap="navigate">导航</view>
+            <view class="venue-card__nav" data-id="{{item.id}}" bindtap="navigate">导航</view>
           </view>
         </view>
       </view>
