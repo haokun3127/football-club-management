@@ -2343,6 +2343,26 @@ export class PersistentApiStore extends SeedBackedStore {
     return this.repositories.tacticalBoards.get(clubId, eventId);
   }
 
+  override listPrivateLessonRequests(clubId: EntityId, studentId?: EntityId) {
+    return this.repositories.dataCapability.listPrivateLessonRequests(clubId, studentId);
+  }
+
+  override createPrivateLessonRequest(clubId: EntityId, studentId: EntityId, input: PrivateLessonRequestInput) {
+    const request = super.createPrivateLessonRequest(clubId, studentId, input);
+    this.repositories.dataCapability.savePrivateLessonRequest(request);
+    return request;
+  }
+
+  override listEventChangeRequests(clubId: EntityId, eventId?: EntityId) {
+    return this.repositories.dataCapability.listEventChangeRequests(clubId, eventId);
+  }
+
+  override createEventChangeRequest(clubId: EntityId, eventId: EntityId, input: EventChangeRequestInput) {
+    const request = super.createEventChangeRequest(clubId, eventId, input);
+    this.repositories.dataCapability.saveEventChangeRequest(request);
+    return request;
+  }
+
   override saveTacticalBoard(board: TacticalBoard) {
     return this.repositories.tacticalBoards.save(board);
   }

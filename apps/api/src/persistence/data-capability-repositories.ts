@@ -38,6 +38,8 @@ import type {
   LessonAdjustmentInput,
   LessonLedgerEntry,
   LessonLedgerSummary,
+  PrivateLessonRequest,
+  EventChangeRequest,
   StudentDetail,
   StudentListFilters,
   StudentListItem,
@@ -393,6 +395,79 @@ export class DataCapabilityRepository {
     `).all(clubId) as SqlRow[];
 
     return rows.map(mapPrivacyNoticeVersion);
+  }
+
+  listPrivateLessonRequests(clubId: EntityId, studentId?: EntityId): PrivateLessonRequest[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM private_lesson_requests
+      WHERE club_id = ? AND (? IS NULL OR student_id = ?)
+      ORDER BY created_at DESC, id DESC
+    `).all(clubId, studentId ?? null, studentId ?? null) as SqlRow[];
+
+    return rows.map(mapPrivateLessonRequest);
+  }
+
+  savePrivateLessonRequest(request: PrivateLessonRequest): void {
+    this.database.prepare(`
+      INSERT INTO private_lesson_requests (
+        id, club_id, student_id, coach_name, date, time_slot, goals_json,
+        note, status, requested_by_user_id, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        status = excluded.status,
+        note = excluded.note,
+        updated_at = excluded.updated_at
+    `).run(
+      request.id,
+      request.clubId,
+      request.studentId,
+      request.coachName,
+      request.date,
+      request.timeSlot,
+      JSON.stringify(request.goals),
+      request.note ?? null,
+      request.status,
+      request.requestedByUserId ?? null,
+      request.createdAt,
+      request.updatedAt,
+    );
+  }
+
+  listEventChangeRequests(clubId: EntityId, eventId?: EntityId): EventChangeRequest[] {
+    const rows = this.database.prepare(`
+      SELECT * FROM event_change_requests
+      WHERE club_id = ? AND (? IS NULL OR event_id = ?)
+      ORDER BY created_at DESC, id DESC
+    `).all(clubId, eventId ?? null, eventId ?? null) as SqlRow[];
+
+    return rows.map(mapEventChangeRequest);
+  }
+
+  saveEventChangeRequest(request: EventChangeRequest): void {
+    this.database.prepare(`
+      INSERT INTO event_change_requests (
+        id, club_id, event_id, reason, new_starts_at, new_venue,
+        note, status, requested_by_user_id, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        status = excluded.status,
+        note = excluded.note,
+        updated_at = excluded.updated_at
+    `).run(
+      request.id,
+      request.clubId,
+      request.eventId,
+      request.reason,
+      request.newStartsAt ?? null,
+      request.newVenue ?? null,
+      request.note ?? null,
+      request.status,
+      request.requestedByUserId ?? null,
+      request.createdAt,
+      request.updatedAt,
+    );
   }
 
   listPrivacyRetentionPolicies(clubId: EntityId): PrivacyRetentionPolicy[] {
@@ -2710,6 +2785,39 @@ function mapAssessmentTestItem(row: SqlRow): AssessmentTestItem {
     valueKind: requireString(row, "value_kind") as AssessmentTestItem["valueKind"],
     unit: optionalString(row, "unit"),
     protocol: optionalString(row, "protocol"),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapPrivateLessonRequest(row: SqlRow): PrivateLessonRequest {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    studentId: requireString(row, "student_id"),
+    coachName: requireString(row, "coach_name"),
+    date: requireString(row, "date"),
+    timeSlot: requireString(row, "time_slot"),
+    goals: JSON.parse(requireString(row, "goals_json")) as string[],
+    note: optionalString(row, "note"),
+    status: requireString(row, "status") as PrivateLessonRequest["status"],
+    requestedByUserId: optionalString(row, "requested_by_user_id"),
+    createdAt: requireString(row, "created_at"),
+    updatedAt: requireString(row, "updated_at"),
+  };
+}
+
+function mapEventChangeRequest(row: SqlRow): EventChangeRequest {
+  return {
+    id: requireString(row, "id"),
+    clubId: requireString(row, "club_id"),
+    eventId: requireString(row, "event_id"),
+    reason: requireString(row, "reason") as EventChangeRequest["reason"],
+    newStartsAt: optionalString(row, "new_starts_at"),
+    newVenue: optionalString(row, "new_venue"),
+    note: optionalString(row, "note"),
+    status: requireString(row, "status") as EventChangeRequest["status"],
+    requestedByUserId: optionalString(row, "requested_by_user_id"),
     createdAt: requireString(row, "created_at"),
     updatedAt: requireString(row, "updated_at"),
   };

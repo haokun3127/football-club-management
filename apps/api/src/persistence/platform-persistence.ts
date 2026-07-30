@@ -80,6 +80,14 @@ export async function seedPlatformData(repositories: PlatformRepositories, data:
     await repositories.teamMembers.save(teamMember);
   }
 
+  for (const request of data.privateLessonRequests) {
+    repositories.dataCapability.savePrivateLessonRequest(request);
+  }
+
+  for (const request of data.eventChangeRequests) {
+    repositories.dataCapability.saveEventChangeRequest(request);
+  }
+
   for (const metric of data.metrics) {
     repositories.dataCapability.saveAbilityMetric(metric);
   }

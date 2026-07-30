@@ -36,6 +36,36 @@ describe("platform persistence", () => {
     }
   });
 
+  it("restores private lesson and event change requests after reopening SQLite", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "football-requests-"));
+    const databasePath = join(directory, "club.sqlite");
+    try {
+      const first = await createPlatformPersistence({ databasePath });
+      const store = new PersistentApiStore(first.repositories);
+      await store.createPrivateLessonRequest("club-chongqing-talent", "student-1", {
+        coachName: "林教练",
+        date: "2026-08-02",
+        timeSlot: "19:00-20:00",
+        goals: ["射门"],
+        note: "测试持久化",
+      });
+      first.database.close();
+
+      const reopened = await createPlatformPersistence({ databasePath, seed: false });
+      const requests = reopened.repositories.dataCapability.listPrivateLessonRequests("club-chongqing-talent", "student-1");
+      expect(requests).toHaveLength(1);
+      expect(requests[0]).toEqual(expect.objectContaining({
+        coachName: "林教练",
+        timeSlot: "19:00-20:00",
+        goals: ["射门"],
+        status: "pending",
+      }));
+      reopened.database.close();
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   it("runs migrations idempotently", () => {
     const database = openSqliteDatabase(":memory:");
 
@@ -49,6 +79,7 @@ describe("platform persistence", () => {
       "0004_http_idempotency_records.sql",
       "0005_privacy_foundation.sql",
       "0006_tactical_boards.sql",
+      "0007_request_collections.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);
