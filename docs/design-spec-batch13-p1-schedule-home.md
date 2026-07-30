@@ -1,0 +1,129 @@
+# Figma 画板规格: P1 Schedule Home
+
+- [4] | P1 Schedule Home | 375x812 @(1370,120) | fill=#f5f6f8 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(1370,120) | fill=#ffffff | layout=H pad=12/16 | shadow=0,2,8,#000000@0.03
+    - [13] | 日程 | 44x27 @(1386,150) | fill=#0d0d0d | font=Inter/Bold 22px | text="日程"
+    - [4] | Bell Icon | 32x32 @(1697,148) | layout=V
+      - [9] | Ellipse | 8x8 @(1719,148) | fill=#ff3b30 | stroke=#ffffff w1
+      - [4] | bell | 24x24 @(1701,152)
+        - [6] | Vector | 18x20 @(1704,154) | stroke=#0d0d0d w2
+  - [4] | Content | 375x654 @(1370,208) | layout=V gap=16 pad=16/16
+    - [4] | Pending Chips | 343x27 @(1386,492) | layout=H gap=8
+      - [4] | chip | 64x27 @(1386,492) | fill=#fee2e2 | r=999 | layout=H gap=6 pad=6/10
+        - [13] | 今日2节 | 44x15 @(1396,498) | fill=#a80f1b | font=Inter/Bold 12px | text="今日2节"
+      - [4] | chip | 91x27 @(1458,492) | fill=#d1fae5 | r=999 | layout=H gap=6 pad=6/10
+        - [13] | 出席18/20人 | 71x15 @(1468,498) | fill=#065f46 | font=Inter/Bold 12px | text="出席18/20人"
+      - [4] | chip | 62x27 @(1557,492) | fill=#fef3c7 | r=999 | layout=H gap=6 pad=6/10
+        - [13] | 待处理1 | 42x15 @(1567,498) | fill=#92400e | font=Inter/Bold 12px | text="待处理1"
+    - [4] | Hero Card | 343x180 @(1386,224) | fill=#07111f | r=16 | layout=V gap=12 pad=16/16 | shadow=0,10,24,#000000@0.08 | shadow=0,2,8,#000000@0.04
+      - [9] | glow | 260x260 @(1266,144) | fill=#a80f1b
+      - [4] | hero-top | 311x15 @(1402,240) | layout=H
+        - [13] | 2025年7月10日 周四 | 114x15 @(1402,240) | fill=#ffffff@0.70 | font=Inter/Medium 12px | text="2025年7月10日 周四"
+        - [13] | 重庆天才 | 48x15 @(1665,240) | fill=#ffffff@0.70 | font=Inter/Medium 12px | text="重庆天才"
+      - [4] | hero-time-row | 311x65 @(1402,267) | layout=H gap=12
+        - [13] | 17:30 | 149x65 @(1402,267) | fill=#ffffff | font=Inter/Extra Bold 54px | text="17:30" | shadow=0,6,18,#a80f1b@0.40
+        - [13] | 技术专项训练 | 90x18 @(1563,305) | fill=#ffffff | font=Inter/Semi Bold 15px | text="技术专项训练"
+      - [13] | U10精英队 · 凤凰山球场 | 311x15 @(1402,344) | fill=#ffffff@0.80 | font=Inter/Regular 12px | text="U10精英队 · 凤凰山球场"
+      - [4] | hero-stats | 311x31 @(1402,371) | layout=H gap=10
+        - [4] | stat-pill | 86x31 @(1402,371) | fill=#a80f1b@0.10 | stroke=#a80f1b@0.20 w1 | r=999 | layout=H gap=6 pad=8/10
+          - [13] | 94% | 27x15 @(1412,379) | fill=#a80f1b | font=Inter/Extra Bold 12px | text="94%"
+          - [13] | 出席率 | 33x13 @(1445,380) | fill=#ffffff@0.80 | font=Inter/Semi Bold 11px | text="出席率"
+        - [4] | stat-pill | 95x31 @(1498,371) | fill=#ffffff@0.06 | stroke=#ffffff@0.10 w1 | r=999 | layout=H gap=6 pad=8/10
+          - [13] | 7.2h | 25x15 @(1508,379) | fill=#ffffff | font=Inter/Extra Bold 12px | text="7.2h"
+          - [13] | 本周训练 | 44x13 @(1539,380) | fill=#ffffff@0.70 | font=Inter/Semi Bold 11px | text="本周训练"
+        - [4] | stat-pill | 91x31 @(1603,371) | fill=#ffffff@0.06 | stroke=#ffffff@0.10 w1 | r=999 | layout=H gap=6 pad=8/10
+          - [13] | 3节 | 21x15 @(1613,379) | fill=#ffffff@0.70 | font=Inter/Extra Bold 12px | text="3节"
+          - [13] | 本周课次 | 44x13 @(1640,380) | fill=#ffffff@0.70 | font=Inter/Semi Bold 11px | text="本周课次"
+    - [4] | Activity List | 343x312 @(1386,535) | layout=V gap=12
+      - [4] | Card | 343x96 @(1386,535) | fill=#ffffff | r=16 | layout=H gap=12 pad=16/16 | shadow=0,4,16,#000000@0.05
+        - [12] | Rectangle | 4x64 @(1402,551) | fill=#a80f1b | r=20
+        - [4] | Frame | 265x64 @(1418,551) | layout=V gap=8
+          - [4] | Frame | 265x21 @(1418,551) | layout=H
+            - [13] | 技术专项训练 | 216x19 @(1418,552) | fill=#0d1117 | font=Inter/Semi Bold 16px | text="技术专项训练"
+            - [4] | Frame | 49x21 @(1634,551) | fill=#d1fae5 | r=999 | layout=H pad=4/8
+              - [13] | 进行中 | 33x13 @(1642,555) | fill=#065f46 | font=Inter/Bold 11px | text="进行中"
+          - [4] | Frame | 265x35 @(1418,580) | layout=V gap=4
+            - [13] | 17:30 · U10精英队 · 凤凰山球场 | 265x16 @(1418,580) | fill=#6b7280 | font=Inter/Regular 13px | text="17:30 · U10精英队 · 凤凰山球场"
+            - [4] | Frame | 59x15 @(1418,600) | layout=H gap=6
+              - [13] | 90分钟 | 39x15 @(1438,600) | fill=#6b7280 | font=Inter/Regular 12px | text="90分钟"
+              - [4] | clock | 14x14 @(1418,600)
+                - [6] | Vector | 12x12 @(1419,602) | stroke=#6b7280 w2
+        - [4] | Frame | 18x18 @(1695,551)
+          - [6] | Vector | 4x9 @(1702,556) | stroke=#c0c8d2 w2
+      - [4] | Card | 343x96 @(1386,643) | fill=#ffffff | r=16 | layout=H gap=12 pad=16/16 | shadow=0,4,16,#000000@0.05
+        - [12] | Rectangle | 4x64 @(1402,659) | fill=#1a3a6b | r=20
+        - [4] | Frame | 265x64 @(1418,659) | layout=V gap=8
+          - [4] | Frame | 265x21 @(1418,659) | layout=H
+            - [13] | 体能综合训练 | 216x19 @(1418,660) | fill=#0d1117 | font=Inter/Semi Bold 16px | text="体能综合训练"
+            - [4] | Frame | 49x21 @(1634,659) | fill=#dbeafe | r=999 | layout=H pad=4/8
+              - [13] | 待开始 | 33x13 @(1642,663) | fill=#1a3a6b | font=Inter/Bold 11px | text="待开始"
+          - [4] | Frame | 265x35 @(1418,688) | layout=V gap=4
+            - [13] | 16:00 · U10精英队 · 凤凰山球场 | 265x16 @(1418,688) | fill=#6b7280 | font=Inter/Regular 13px | text="16:00 · U10精英队 · 凤凰山球场"
+            - [4] | Frame | 59x15 @(1418,708) | layout=H gap=6
+              - [13] | 75分钟 | 39x15 @(1438,708) | fill=#6b7280 | font=Inter/Regular 12px | text="75分钟"
+              - [4] | clock | 14x14 @(1418,708)
+                - [6] | Vector | 12x12 @(1419,710) | stroke=#6b7280 w2
+        - [4] | Frame | 18x18 @(1695,659)
+          - [6] | Vector | 4x9 @(1702,664) | stroke=#c0c8d2 w2
+      - [4] | Card | 343x96 @(1386,751) | fill=#ffffff | r=16 | layout=H gap=12 pad=16/16 | shadow=0,4,16,#000000@0.05
+        - [12] | Rectangle | 4x64 @(1402,767) | fill=#f59e0b | r=20
+        - [4] | Frame | 265x64 @(1418,767) | layout=V gap=8
+          - [4] | Frame | 265x21 @(1418,767) | layout=H
+            - [13] | 友谊赛 | 216x19 @(1418,768) | fill=#0d1117 | font=Inter/Semi Bold 16px | text="友谊赛"
+            - [4] | Frame | 49x21 @(1634,767) | fill=#f3f4f6 | r=999 | layout=H pad=4/8
+              - [13] | 已结束 | 33x13 @(1642,771) | fill=#6b7280 | font=Inter/Bold 11px | text="已结束"
+          - [4] | Frame | 265x35 @(1418,796) | layout=V gap=4
+            - [13] | 昨天 19:00 · U10精英队 · 奥体中心3号场 | 265x16 @(1418,796) | fill=#6b7280 | font=Inter/Regular 13px | text="昨天 19:00 · U10精英队 · 奥体中心3号场"
+            - [4] | Frame | 59x15 @(1418,816) | layout=H gap=6
+              - [13] | 60分钟 | 39x15 @(1438,816) | fill=#6b7280 | font=Inter/Regular 12px | text="60分钟"
+              - [4] | clock | 14x14 @(1418,816)
+                - [6] | Vector | 12x12 @(1419,818) | stroke=#6b7280 w2
+        - [4] | Frame | 18x18 @(1695,767)
+          - [6] | Vector | 4x9 @(1702,772) | stroke=#c0c8d2 w2
+    - [4] | Date Week Nav | 343x56 @(1386,420) | fill=#ffffff | stroke=#e5e7eb w1 | r=14 | layout=H gap=8 pad=0/12
+      - [4] | day-mon | 39x36 @(1398,430) | layout=V gap=6
+        - [13] | MON | 27x13 @(1404,430) | fill=#6b7280 | font=Inter/Regular 11px | text="MON"
+        - [13] | 8 | 10x17 @(1412,449) | fill=#6b7280 | font=Inter/Bold 14px | text="8"
+      - [4] | day-tue | 39x36 @(1445,430) | layout=V gap=6
+        - [13] | TUE | 22x13 @(1453,430) | fill=#6b7280 | font=Inter/Regular 11px | text="TUE"
+        - [13] | 9 | 10x17 @(1459,449) | fill=#6b7280 | font=Inter/Bold 14px | text="9"
+      - [4] | day-wed | 39x36 @(1491,430) | layout=V gap=6
+        - [13] | WED | 25x13 @(1498,430) | fill=#6b7280 | font=Inter/Regular 11px | text="WED"
+        - [13] | 10 | 17x17 @(1502,449) | fill=#6b7280 | font=Inter/Bold 14px | text="10"
+      - [4] | day-thu | 39x47 @(1538,424) | layout=V gap=6
+        - [13] | THU | 24x13 @(1545,424) | fill=#ffffff | font=Inter/Regular 11px | text="THU"
+        - [4] | today-circle | 28x28 @(1543,444) | fill=#a80f1b | r=14 | layout=V
+          - [13] | 11 | 14x17 @(1550,449) | fill=#ffffff | font=Inter/Extra Bold 14px | text="11"
+      - [4] | day-fri | 39x36 @(1585,430) | layout=V gap=6
+        - [13] | FRI | 17x13 @(1596,430) | fill=#6b7280 | font=Inter/Regular 11px | text="FRI"
+        - [13] | 12 | 16x17 @(1596,449) | fill=#6b7280 | font=Inter/Bold 14px | text="12"
+      - [4] | day-sat | 39x36 @(1632,430) | layout=V gap=6
+        - [13] | SAT | 21x13 @(1640,430) | fill=#6b7280 | font=Inter/Regular 11px | text="SAT"
+        - [13] | 13 | 17x17 @(1642,449) | fill=#6b7280 | font=Inter/Bold 14px | text="13"
+      - [4] | day-sun | 39x36 @(1678,430) | layout=V gap=6
+        - [13] | SUN | 24x13 @(1686,430) | fill=#6b7280 | font=Inter/Regular 11px | text="SUN"
+        - [13] | 14 | 17x17 @(1689,449) | fill=#6b7280 | font=Inter/Bold 14px | text="14"
+    - [4] | Frame | 343x120 @(1386,863)
+  - [4] | TabIconsOverlay | 375x70 @(1370,862) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1490,922) | fill=#000000@0.20 | r=2
+    - [4] | Frame | 125x56 @(1370,862)
+      - [4] | Frame | 22x22 @(1422,868)
+        - [6] | Vector | 17x16 @(1424,872) | stroke=#a80f1b w1.6
+        - [6] | Vector | 8x4 @(1428,870) | fill=#000000 | stroke=#a80f1b w1.6
+        - [6] | Vector | 17x0 @(1424,877) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 3x3 @(1427,880) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1431,880) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1435,880) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1427,884) | fill=#a80f1b
+      - [13] | 日程 | 117x14 @(1374,893) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="日程"
+      - [9] | Ellipse | 4x4 @(1430,910) | fill=#a80f1b
+    - [4] | Frame | 125x56 @(1495,862)
+      - [4] | Frame | 22x22 @(1546,868)
+        - [6] | Vector | 18x10 @(1548,875) | stroke=#8e97a6 w1.8
+        - [6] | Vector | 4x4 @(1562,873) | stroke=#8e97a6 w1.8
+      - [13] | 成长 | 117x14 @(1499,893) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="成长"
+    - [4] | Frame | 125x56 @(1620,862)
+      - [4] | Frame | 22x22 @(1672,868)
+        - [6] | Vector | 8x8 @(1678,871) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(1674,880) | stroke=#8e97a6 w1.6
+      - [13] | 我的孩子 | 117x14 @(1624,893) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的孩子"

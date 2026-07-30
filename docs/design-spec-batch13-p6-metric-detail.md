@@ -1,0 +1,156 @@
+# Figma 画板规格: P6 Metric Detail
+
+- [4] | P6 Metric Detail | 375x812 @(1370,1920) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | NavHeader | 375x56 @(1370,1920) | fill=#ffffff | stroke=#e7eaf0 w1 | layout=H pad=0/16
+    - [4] | back-btn | 36x36 @(1386,1930) | fill=#f6f7f9 | r=18 | layout=H
+      - [4] | chevron-left | 18x18 @(1395,1939)
+        - [6] | Vector | 4x9 @(1402,1944) | stroke=#202124 w2
+    - [4] | title-center | 375x56 @(1370,1920) | layout=H
+      - [13] | 传球 指标详情 | 106x20 @(1504,1938) | fill=#202124 | font=Noto Sans SC/Bold 17px | text="传球 指标详情"
+    - [4] | date-range | 72x32 @(1651,1932) | fill=#f6f7f9 | r=8 | layout=H gap=4 pad=6/10
+      - [13] | 本赛季 | 36x14 @(1661,1941) | fill=#667085 | font=Noto Sans SC/Regular 12px | text="本赛季"
+      - [4] | chevron-down | 12x12 @(1701,1942)
+        - [6] | Vector | 6x3 @(1704,1946) | stroke=#667085 w2
+  - [4] | Content | 375x686 @(1370,1976) | layout=V gap=12 pad=16/16
+    - [4] | HeroCard | 343x194 @(1386,1992) | fill=#07111f | r=20 | layout=V gap=16 pad=20/20
+      - [4] | hero-top | 303x22 @(1406,2012) | layout=H
+        - [13] | 传球 | 36x22 @(1406,2012) | fill=#ffffff | font=Noto Sans SC/Bold 18px | text="传球"
+        - [4] | trend-chip | 51x22 @(1658,2012) | fill=#16a34a@0.10 | r=20 | layout=H gap=4 pad=4/10
+          - [13] | +5 | 15x14 @(1684,2016) | fill=#22c55e | font=Noto Sans SC/Bold 12px | text="+5"
+          - [4] | trending-up | 12x12 @(1668,2017)
+            - [6] | Vector | 10x5 @(1669,2021) | stroke=#22c55e w2
+      - [4] | score-row | 126x64 @(1406,2050) | layout=H gap=6
+        - [13] | 82 | 78x64 @(1406,2050) | fill=#ffffff | font=Noto Sans SC/Black 64px | text="82"
+        - [13] | /100 | 42x36 @(1490,2078) | fill=#ffffff@0.50 | font=Noto Sans SC/Regular 20px | text="/100"
+      - [12] | Rectangle | 303x1 @(1406,2130) | fill=#ffffff@0.10
+      - [4] | percentile-row | 303x19 @(1406,2147) | layout=H gap=8
+        - [4] | percentile-badge | 65x19 @(1406,2147) | fill=#a80f1b | r=4 | layout=H pad=3/8
+          - [13] | TOP 18% | 49x13 @(1414,2150) | fill=#ffffff | font=Noto Sans SC/Bold 11px | text="TOP 18%"
+        - [13] | 超越82%的同龄球员 | 118x16 @(1479,2148) | fill=#ffffff@0.60 | font=Noto Sans SC/Regular 13px | text="超越82%的同龄球员"
+    - [4] | TrendChart | 343x189 @(1386,2198) | fill=#ffffff | r=16 | layout=V gap=12 pad=16/16
+      - [4] | chart-header | 311x18 @(1402,2214) | layout=H
+        - [13] | 能力趋势 | 60x18 @(1402,2214) | fill=#202124 | font=Noto Sans SC/Bold 15px | text="能力趋势"
+        - [13] | 近6个月 | 43x14 @(1670,2216) | fill=#667085 | font=Noto Sans SC/Regular 12px | text="近6个月"
+      - [4] | chart-body | 311x127 @(1402,2244) | layout=H gap=8
+        - [4] | y-axis | 28x110 @(1402,2261) | layout=V
+          - [13] | 100 | 15x11 @(1402,2261) | fill=#667085 | font=Noto Sans SC/Regular 9px | text="100"
+          - [13] | 75 | 10x11 @(1402,2286) | fill=#667085 | font=Noto Sans SC/Regular 9px | text="75"
+          - [13] | 50 | 10x11 @(1402,2310) | fill=#667085 | font=Noto Sans SC/Regular 9px | text="50"
+          - [13] | 25 | 10x11 @(1402,2335) | fill=#667085 | font=Noto Sans SC/Regular 9px | text="25"
+          - [13] | 0 | 5x11 @(1402,2360) | fill=#667085 | font=Noto Sans SC/Regular 9px | text="0"
+        - [4] | chart-plot | 275x127 @(1438,2244) | layout=V gap=6
+          - [4] | line-area | 275x110 @(1438,2244)
+            - [12] | grid-1 | 275x1 @(1438,2244) | fill=#000000@0.06
+            - [12] | grid-2 | 275x1 @(1438,2271) | fill=#000000@0.06
+            - [12] | grid-3 | 275x1 @(1438,2298) | fill=#000000@0.06
+            - [12] | grid-4 | 275x1 @(1438,2326) | fill=#000000@0.06
+            - [12] | grid-5 | 275x1 @(1438,2353) | fill=#000000@0.06
+            - [12] | area-fill | 275x62 @(1438,2292) | fill=paint-type-1
+            - [9] | dot-jan | 6x6 @(1438,2314) | fill=#a80f1b
+            - [9] | dot-feb | 6x6 @(1493,2307) | fill=#a80f1b
+            - [9] | dot-mar | 6x6 @(1548,2301) | fill=#a80f1b
+            - [9] | dot-apr | 6x6 @(1603,2296) | fill=#a80f1b
+            - [9] | dot-may | 6x6 @(1658,2290) | fill=#a80f1b
+            - [9] | dot-jun-ring | 16x16 @(1707,2281) | fill=#a80f1b@0.20
+            - [9] | dot-jun | 8x8 @(1711,2285) | fill=#a80f1b
+            - [4] | current-label | 24x16 @(1693,2262) | fill=#a80f1b | r=4 | layout=H pad=2/6
+              - [13] | 82 | 12x12 @(1699,2264) | fill=#ffffff | font=Noto Sans SC/Bold 10px | text="82"
+          - [4] | x-axis | 275x11 @(1438,2360) | layout=H
+            - [13] | 1月 | 14x11 @(1438,2360) | fill=#667085 | font=Noto Sans SC/Regular 9px | text="1月"
+            - [13] | 2月 | 14x11 @(1490,2360) | fill=#667085 | font=Noto Sans SC/Regular 9px | text="2月"
+            - [13] | 3月 | 14x11 @(1542,2360) | fill=#667085 | font=Noto Sans SC/Regular 9px | text="3月"
+            - [13] | 4月 | 14x11 @(1594,2360) | fill=#667085 | font=Noto Sans SC/Regular 9px | text="4月"
+            - [13] | 5月 | 14x11 @(1646,2360) | fill=#667085 | font=Noto Sans SC/Regular 9px | text="5月"
+            - [13] | 6月 | 15x11 @(1698,2360) | fill=#a80f1b | font=Noto Sans SC/Bold 9px | text="6月"
+    - [4] | CoachFeedback | 343x134 @(1386,2399) | fill=#ffffff | r=16 | layout=V gap=12 pad=16/16
+      - [13] | 教练评语 | 60x18 @(1402,2415) | fill=#202124 | font=Noto Sans SC/Bold 15px | text="教练评语"
+      - [4] | coach-row | 311x40 @(1402,2445) | layout=H gap=12
+        - [4] | coach-avatar | 40x40 @(1402,2445) | fill=#a80f1b | r=20 | layout=H
+          - [13] | 林 | 16x19 @(1414,2456) | fill=#ffffff | font=Noto Sans SC/Bold 16px | text="林"
+        - [4] | Frame | 42x33 @(1454,2448) | layout=V gap=2
+          - [13] | 林教练 | 42x17 @(1454,2448) | fill=#202124 | font=Noto Sans SC/Bold 14px | text="林教练"
+          - [13] | 2天前 | 31x14 @(1454,2468) | fill=#667085 | font=Noto Sans SC/Regular 12px | text="2天前"
+        - [4] | rating-chip | 42x21 @(1662,2455) | fill=#fceeef | r=12 | layout=H pad=4/10
+          - [13] | 优秀 | 22x13 @(1672,2459) | fill=#a80f1b | font=Noto Sans SC/Bold 11px | text="优秀"
+      - [13] | 传球意识明显提升，继续保持节奏把握。 | 311x20 @(1402,2497) | fill=#667085 | font=Noto Sans SC/Regular 13px | text="传球意识明显提升，继续保持节奏把握。"
+    - [4] | TeamCompare | 343x272 @(1386,2545) | fill=#ffffff | r=16 | layout=V gap=14 pad=16/16
+      - [4] | compare-header | 311x18 @(1402,2561) | layout=H
+        - [13] | 同队对比 | 60x18 @(1402,2561) | fill=#202124 | font=Noto Sans SC/Bold 15px | text="同队对比"
+        - [13] | 共12名队员 | 62x14 @(1651,2563) | fill=#667085 | font=Noto Sans SC/Regular 12px | text="共12名队员"
+      - [4] | dist-section | 311x57 @(1402,2593) | layout=V gap=8
+        - [13] | 得分分布 | 44x13 @(1402,2593) | fill=#667085 | font=Noto Sans SC/Regular 11px | text="得分分布"
+        - [4] | dist-bar-bg | 311x16 @(1402,2614) | fill=#f6f7f9 | r=8 | layout=H
+          - [12] | seg-low | 60x16 @(1402,2614) | fill=#e5e7eb
+          - [12] | seg-mid | 100x16 @(1462,2614) | fill=#fca5a5
+          - [12] | seg-high | 80x16 @(1562,2614) | fill=#a80f1b
+          - [12] | seg-top | 103x16 @(1642,2614) | fill=#7f1d1d
+        - [4] | marker-row | 343x16 @(1418,2663) | layout=H
+          - [4] | player-marker | 34x25 @(1614,2639) | layout=V gap=2
+            - [4] | marker-label | 34x15 @(1614,2639) | fill=#a80f1b | r=4 | layout=H pad=2/6
+              - [13] | 我 82 | 22x11 @(1620,2641) | fill=#ffffff | font=Noto Sans SC/Bold 9px | text="我 82"
+            - [12] | marker-line | 2x8 @(1630,2656) | fill=#a80f1b
+        - [4] | dist-legend | 311x12 @(1402,2638) | layout=H gap=12
+          - [4] | Frame | 44x12 @(1402,2638) | layout=H gap=4
+            - [12] | Rectangle | 8x8 @(1402,2640) | fill=#e5e7eb | r=2
+            - [13] | 60以下 | 32x12 @(1414,2638) | fill=#667085 | font=Noto Sans SC/Regular 10px | text="60以下"
+          - [4] | Frame | 38x12 @(1458,2638) | layout=H gap=4
+            - [12] | Rectangle | 8x8 @(1458,2640) | fill=#fca5a5 | r=2
+            - [13] | 60-74 | 26x12 @(1470,2638) | fill=#667085 | font=Noto Sans SC/Regular 10px | text="60-74"
+          - [4] | Frame | 38x12 @(1508,2638) | layout=H gap=4
+            - [12] | Rectangle | 8x8 @(1508,2640) | fill=#a80f1b | r=2
+            - [13] | 75-84 | 26x12 @(1520,2638) | fill=#667085 | font=Noto Sans SC/Regular 10px | text="75-84"
+          - [4] | Frame | 29x12 @(1558,2638) | layout=H gap=4
+            - [12] | Rectangle | 8x8 @(1558,2640) | fill=#7f1d1d | r=2
+            - [13] | 85+ | 17x12 @(1570,2638) | fill=#667085 | font=Noto Sans SC/Regular 10px | text="85+"
+      - [4] | top-list | 311x137 @(1402,2664) | layout=V gap=8
+        - [13] | 队内排名 | 44x13 @(1402,2664) | fill=#667085 | font=Noto Sans SC/Regular 11px | text="队内排名"
+        - [4] | player-row-me | 311x36 @(1402,2685) | fill=#fceeef | r=8 | layout=H pad=8/10
+          - [4] | Frame | 41x20 @(1412,2693) | layout=H gap=8
+            - [4] | Frame | 20x20 @(1412,2693) | fill=#a80f1b | r=10 | layout=H
+              - [13] | 2 | 6x12 @(1419,2697) | fill=#ffffff | font=Noto Sans SC/Bold 10px | text="2"
+            - [13] | 我 | 13x16 @(1440,2695) | fill=#a80f1b | font=Noto Sans SC/Bold 13px | text="我"
+          - [4] | score-bar-me | 120x16 @(1583,2695) | layout=H gap=4
+            - [4] | bar-track | 100x6 @(1583,2700) | fill=#a80f1b@0.15 | r=3 | layout=H
+              - [12] | Rectangle | 82x6 @(1583,2700) | fill=#a80f1b | r=3
+            - [13] | 82 | 16x16 @(1687,2695) | fill=#a80f1b | font=Noto Sans SC/Bold 13px | text="82"
+        - [4] | player-row-1 | 311x32 @(1402,2729) | layout=H pad=6/10
+          - [4] | Frame | 67x20 @(1412,2735) | layout=H gap=8
+            - [4] | Frame | 20x20 @(1412,2735) | fill=#f3f4f6 | r=10 | layout=H
+              - [13] | 1 | 6x12 @(1419,2739) | fill=#667085 | font=Noto Sans SC/Bold 10px | text="1"
+            - [13] | 陈浩然 | 39x16 @(1440,2737) | fill=#202124 | font=Noto Sans SC/Regular 13px | text="陈浩然"
+          - [4] | Frame | 119x16 @(1584,2737) | layout=H gap=4
+            - [4] | bar-track-2 | 100x6 @(1584,2742) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 89x6 @(1584,2742) | fill=#9ca3af | r=3
+            - [13] | 89 | 15x16 @(1688,2737) | fill=#202124 | font=Noto Sans SC/Regular 13px | text="89"
+        - [4] | player-row-3 | 311x32 @(1402,2769) | layout=H pad=6/10
+          - [4] | Frame | 67x20 @(1412,2775) | layout=H gap=8
+            - [4] | Frame | 20x20 @(1412,2775) | fill=#f3f4f6 | r=10 | layout=H
+              - [13] | 3 | 6x12 @(1419,2779) | fill=#667085 | font=Noto Sans SC/Bold 10px | text="3"
+            - [13] | 王晓明 | 39x16 @(1440,2777) | fill=#667085 | font=Noto Sans SC/Regular 13px | text="王晓明"
+          - [4] | Frame | 119x16 @(1584,2777) | layout=H gap=4
+            - [4] | bar-track-3 | 100x6 @(1584,2782) | fill=#e7eaf0 | r=3 | layout=H
+              - [12] | Rectangle | 76x6 @(1584,2782) | fill=#9ca3af | r=3
+            - [13] | 76 | 15x16 @(1688,2777) | fill=#667085 | font=Noto Sans SC/Regular 13px | text="76"
+  - [4] | TabIconsOverlay | 375x70 @(1370,2662) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1490,2722) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(1370,2662)
+      - [4] | icon_0 | 22x22 @(1422,2668)
+        - [6] | Vector | 17x16 @(1424,2672) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(1428,2670) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(1424,2677) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(1427,2680) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1431,2680) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1435,2680) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(1427,2684) | fill=#8e97a6
+      - [13] | 日程 | 117x14 @(1374,2693) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(1495,2662)
+      - [4] | icon_1 | 22x22 @(1546,2668)
+        - [6] | Vector | 18x10 @(1548,2675) | stroke=#a80f1b w1.8
+        - [6] | Vector | 4x4 @(1562,2673) | stroke=#a80f1b w1.8
+      - [13] | 成长 | 117x14 @(1499,2693) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="成长"
+      - [9] | Ellipse | 4x4 @(1556,2710) | fill=#a80f1b
+    - [4] | tab_2 | 125x56 @(1620,2662)
+      - [4] | icon_2 | 22x22 @(1672,2668)
+        - [6] | Vector | 8x8 @(1678,2671) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(1674,2680) | stroke=#8e97a6 w1.6
+      - [13] | 我的孩子 | 117x14 @(1624,2693) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的孩子"

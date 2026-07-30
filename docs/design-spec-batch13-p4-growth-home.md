@@ -1,0 +1,126 @@
+# Figma 画板规格: P4 Growth Home
+
+- [4] | P4 Growth Home | 375x812 @(510,1920) | fill=#f5f6f8 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(510,1920) | fill=#ffffff | layout=H pad=14/20
+    - [13] | 成长 | 44x27 @(530,1950) | fill=#202124 | font=Inter/Bold 22px | text="成长"
+    - [4] | Settings Icon | 32x32 @(833,1948) | fill=#f3f4f6 | r=16 | layout=V
+      - [4] | settings | 18x18 @(840,1955)
+        - [6] | Vector | 13x15 @(842,1957) | stroke=#667085 w2
+  - [4] | Content | 375x654 @(510,2008) | layout=V gap=16 pad=16/20
+    - [4] | Player Hero | 335x212 @(530,2024) | fill=#07111f | r=16 | layout=V gap=16 pad=20/20
+      - [4] | Header | 295x48 @(550,2044) | layout=H gap=12
+        - [4] | Avatar | 48x48 @(550,2044) | fill=#a80f1b | r=24 | layout=V
+          - [13] | 陈 | 18x22 @(565,2057) | fill=#ffffff | font=Inter/Bold 18px | text="陈"
+        - [4] | Info | 235x42 @(610,2047) | layout=V gap=4
+          - [13] | 陈小宇 | 54x22 @(610,2047) | fill=#ffffff | font=Inter/Bold 18px | text="陈小宇"
+          - [13] | 凤凰山 U10精英队 | 106x16 @(610,2073) | fill=#ffffff | font=Inter/Regular 13px | text="凤凰山 U10精英队"
+      - [4] | Chips | 145x20 @(550,2108) | layout=H gap=8
+        - [4] | Frame | 77x20 @(550,2108) | fill=#334155 | r=4 | layout=H pad=4/8
+          - [13] | 在队1年7个月 | 61x12 @(558,2112) | fill=#ffffff | font=Inter/Semi Bold 10px | text="在队1年7个月"
+        - [4] | Frame | 60x20 @(635,2108) | fill=#a80f1b | r=4 | layout=H pad=4/8
+          - [13] | 训练46课 | 44x12 @(643,2112) | fill=#ffffff | font=Inter/Semi Bold 10px | text="训练46课"
+      - [4] | Stats Row | 295x72 @(550,2144) | stroke=#334155 w1 | layout=H pad=16/0
+        - [4] | Stat | 98x56 @(550,2160) | layout=V gap=4
+          - [13] | 46 | 44x39 @(577,2160) | fill=#ffffff | font=Inter/Extra Bold 32px | text="46"
+          - [13] | 训练课时 | 44x13 @(577,2203) | fill=#ffffff | font=Inter/Regular 11px | text="训练课时"
+        - [12] | Rectangle | 1x40 @(648,2160) | fill=#334155
+        - [4] | Stat | 98x56 @(649,2160) | layout=V gap=4
+          - [13] | 89% | 72x39 @(662,2160) | fill=#22c55e | font=Inter/Extra Bold 32px | text="89%"
+          - [13] | 出勤率 | 33x13 @(681,2203) | fill=#ffffff | font=Inter/Regular 11px | text="出勤率"
+        - [12] | Rectangle | 1x40 @(746,2160) | fill=#334155
+        - [4] | Stat | 98x56 @(747,2160) | layout=V gap=4
+          - [13] | 12 | 37x39 @(778,2160) | fill=#ffffff | font=Inter/Extra Bold 32px | text="12"
+          - [13] | 本月训练 | 44x13 @(774,2203) | fill=#ffffff | font=Inter/Regular 11px | text="本月训练"
+    - [4] | Milestones Card | 335x157 @(530,2252) | fill=#ffffff | r=16 | layout=V gap=12 pad=16/16 | shadow=0,2,8,#000000@0.05
+      - [4] | Header | 303x17 @(546,2268) | layout=H
+        - [13] | 成长足迹 🏆 | 74x17 @(546,2268) | fill=#202124 | font=Inter/Bold 14px | text="成长足迹 🏆"
+        - [13] | 更多› | 31x16 @(818,2268) | fill=#a80f1b | font=Inter/Semi Bold 13px | text="更多›"
+      - [4] | List | 303x96 @(546,2297) | layout=V gap=12
+        - [4] | Milestone | 303x24 @(546,2297) | layout=H gap=12
+          - [4] | Frame | 24x24 @(546,2297) | fill=#ecfdf5 | r=12 | layout=V
+            - [4] | check | 14x14 @(551,2302)
+              - [6] | Vector | 9x6 @(553,2306) | stroke=#10b981 w2
+          - [13] | 完成30次训练 | 213x16 @(582,2301) | fill=#202124 | font=Inter/Regular 13px | text="完成30次训练"
+          - [4] | Frame | 42x16 @(807,2301) | fill=#ecfdf5 | r=4 | layout=H pad=2/6
+            - [13] | 已达成 | 30x12 @(813,2303) | fill=#10b981 | font=Inter/Semi Bold 10px | text="已达成"
+        - [4] | Milestone | 303x24 @(546,2333) | layout=H gap=12
+          - [4] | Frame | 24x24 @(546,2333) | fill=#fee2e2 | r=12 | layout=V
+            - [4] | circle | 14x14 @(551,2338)
+              - [6] | Vector | 12x12 @(552,2339) | stroke=#a80f1b w2
+          - [13] | 首次参加比赛 | 213x16 @(582,2337) | fill=#202124 | font=Inter/Regular 13px | text="首次参加比赛"
+          - [4] | Frame | 42x16 @(807,2337) | fill=#fee2e2 | r=4 | layout=H pad=2/6
+            - [13] | 待达成 | 30x12 @(813,2339) | fill=#a80f1b | font=Inter/Semi Bold 10px | text="待达成"
+        - [4] | Milestone | 303x24 @(546,2369) | layout=H gap=12
+          - [4] | Frame | 24x24 @(546,2369) | fill=#dbeafe | r=12 | layout=V
+            - [4] | circle | 14x14 @(551,2374)
+              - [6] | Vector | 12x12 @(552,2375) | stroke=#3b82f6 w2
+          - [13] | 能力模型更新 | 213x16 @(582,2373) | fill=#202124 | font=Inter/Regular 13px | text="能力模型更新"
+          - [4] | Frame | 42x16 @(807,2373) | fill=#dbeafe | r=4 | layout=H pad=2/6
+            - [13] | 待达成 | 30x12 @(813,2375) | fill=#3b82f6 | font=Inter/Semi Bold 10px | text="待达成"
+    - [4] | Training Chart Card | 335x169 @(530,2425) | fill=#ffffff | r=16 | layout=V gap=16 pad=16/16 | shadow=0,2,8,#000000@0.05
+      - [4] | Header | 303x17 @(546,2441) | layout=H
+        - [13] | 训练历程 📊 | 74x17 @(546,2441) | fill=#202124 | font=Inter/Bold 14px | text="训练历程 📊"
+        - [13] | 查看› | 31x16 @(818,2442) | fill=#a80f1b | font=Inter/Semi Bold 13px | text="查看›"
+      - [4] | Chart | 303x104 @(546,2474) | layout=V gap=12
+        - [4] | Bars | 303x80 @(546,2474) | layout=H gap=4
+          - [12] | Rectangle | 34x10 @(546,2544) | fill=paint-type-1 | r=20
+          - [12] | Rectangle | 34x14 @(584,2540) | fill=paint-type-1 | r=20
+          - [12] | Rectangle | 34x10 @(623,2544) | fill=paint-type-1 | r=20
+          - [12] | Rectangle | 34x16 @(661,2538) | fill=paint-type-1 | r=20
+          - [12] | Rectangle | 34x12 @(700,2542) | fill=paint-type-1 | r=20
+          - [12] | Rectangle | 34x18 @(738,2536) | fill=paint-type-1 | r=20
+          - [12] | Rectangle | 34x14 @(776,2540) | fill=paint-type-1 | r=20
+          - [12] | Rectangle | 34x16 @(815,2538) | fill=paint-type-1 | r=20
+        - [4] | X-Axis | 303x12 @(546,2566) | layout=H gap=4
+          - [4] | Frame | 34x12 @(546,2566) | layout=V
+            - [13] | 1月 | 15x12 @(556,2566) | fill=#667085 | font=Inter/Regular 10px | text="1月"
+          - [4] | Frame | 34x12 @(584,2566) | layout=V
+            - [13] | 2月 | 17x12 @(593,2566) | fill=#667085 | font=Inter/Regular 10px | text="2月"
+          - [4] | Frame | 34x12 @(623,2566) | layout=V
+            - [13] | 3月 | 17x12 @(631,2566) | fill=#667085 | font=Inter/Regular 10px | text="3月"
+          - [4] | Frame | 34x12 @(661,2566) | layout=V
+            - [13] | 4月 | 17x12 @(670,2566) | fill=#667085 | font=Inter/Regular 10px | text="4月"
+          - [4] | Frame | 34x12 @(700,2566) | layout=V
+            - [13] | 5月 | 17x12 @(708,2566) | fill=#667085 | font=Inter/Regular 10px | text="5月"
+          - [4] | Frame | 34x12 @(738,2566) | layout=V
+            - [13] | 6月 | 17x12 @(747,2566) | fill=#667085 | font=Inter/Regular 10px | text="6月"
+          - [4] | Frame | 34x12 @(776,2566) | layout=V
+            - [13] | 7月 | 16x12 @(785,2566) | fill=#667085 | font=Inter/Regular 10px | text="7月"
+          - [4] | Frame | 34x12 @(815,2566) | layout=V
+            - [13] | 8月 | 17x12 @(823,2566) | fill=#667085 | font=Inter/Regular 10px | text="8月"
+    - [4] | Ability Radar Card | 335x200 @(530,2610) | fill=#07111f | r=16 | layout=V gap=16 pad=16/16 | shadow=0,2,8,#000000@0.05
+      - [4] | Header | 303x32 @(546,2626) | layout=H
+        - [4] | Frame | 73x32 @(546,2626) | layout=V gap=2
+          - [13] | 能力雷达 | 56x17 @(546,2626) | fill=#ffffff | font=Inter/Bold 14px | text="能力雷达"
+          - [13] | 6维度综合评估 | 73x13 @(546,2645) | fill=#ffffff | font=Inter/Regular 11px | text="6维度综合评估"
+        - [4] | Frame | 80x27 @(769,2628) | stroke=#a80f1b w1 | r=20 | layout=H pad=6/12
+          - [13] | 进入详情 › | 56x15 @(781,2634) | fill=#a80f1b | font=Inter/Semi Bold 12px | text="进入详情 ›"
+      - [4] | Radar Preview | 303x120 @(546,2674) | layout=V gap=12
+        - [4] | Chart | 120x120 @(638,2674) | layout=V
+          - [11] | Polygon | 60x60 @(687,2642) | fill=#a80f1b
+          - [11] | Polygon | 45x45 @(689,2724) | fill=#a80f1b
+          - [11] | Polygon | 30x30 @(692,2785) | fill=#a80f1b
+          - [9] | Ellipse | 4x4 @(696,2732) | fill=#ffffff
+  - [4] | TabIconsOverlay | 375x70 @(510,2662) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(630,2722) | fill=#000000@0.20 | r=2
+    - [4] | Frame | 125x56 @(510,2662)
+      - [4] | Frame | 22x22 @(562,2668)
+        - [6] | Vector | 17x16 @(564,2672) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(568,2670) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(564,2677) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(567,2680) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(571,2680) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(575,2680) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(567,2684) | fill=#8e97a6
+      - [13] | 日程 | 117x14 @(514,2693) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | Frame | 125x56 @(635,2662)
+      - [4] | Frame | 22x22 @(686,2668)
+        - [6] | Vector | 18x10 @(688,2675) | stroke=#a80f1b w1.8
+        - [6] | Vector | 4x4 @(702,2673) | stroke=#a80f1b w1.8
+      - [13] | 成长 | 117x14 @(639,2693) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="成长"
+      - [9] | Ellipse | 4x4 @(696,2710) | fill=#a80f1b
+    - [4] | Frame | 125x56 @(760,2662)
+      - [4] | Frame | 22x22 @(812,2668)
+        - [6] | Vector | 8x8 @(818,2671) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(814,2680) | stroke=#8e97a6 w1.6
+      - [13] | 我的孩子 | 117x14 @(764,2693) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的孩子"

@@ -23,6 +23,15 @@ interface SourceEventView {
   startsAtLabel: string;
 }
 
+interface ChartPoint {
+  id: string;
+  left: number;
+  bottom: number;
+  valueLabel: string;
+  monthLabel: string;
+  current: boolean;
+}
+
 Page({
   data: {
     state: "loading" as LoadState,
@@ -36,6 +45,9 @@ Page({
     latestDateLabel: "暂无记录",
     trendSummary: "等待更多记录",
     trendTone: "neutral",
+    heroValue: "–",
+    trendDelta: "",
+    chartPoints: [] as ChartPoint[],
   },
   onLoad(query?: Record<string, string | undefined>) {
     requireRole("parent");
@@ -68,6 +80,9 @@ Page({
         latestDateLabel: records[0]?.dateLabel || "暂无记录",
         trendSummary: records[0]?.changeLabel || "等待更多记录",
         trendTone: records[0]?.changeTone || "neutral",
+        heroValue: detail.latest?.value === undefined ? "–" : String(detail.latest.value),
+        trendDelta: records[0]?.changeTone === "success" ? `+${records[0].changeLabel.replace(/[^0-9.]/g, "")}` : "",
+        chartPoints: buildChartPoints(detail),
       });
     } catch (error) {
       const record = error as { code?: string; message?: string };
@@ -77,6 +92,12 @@ Page({
   openSourceEvent(event: { currentTarget: { dataset: { id?: string } } }) {
     const id = event.currentTarget.dataset.id;
     if (id) openPage(`/pages/parent/event/index?id=${id}`);
+  },
+  goBack() {
+    wx.navigateBack();
+  },
+  switchRange() {
+    wx.showToast({ title: "更多赛季数据即将上线", icon: "none" });
   },
   retry() {
     this.load();
@@ -98,4 +119,24 @@ function presentRecords(detail: MetricDetail): MetricRecordView[] {
       changeTone: delta === undefined ? "neutral" : delta > 0 ? "success" : delta < 0 ? "warning" : "info",
     };
   });
+}
+
+function buildChartPoints(detail: MetricDetail): ChartPoint[] {
+  const valued = [...detail.records]
+    .filter((record) => record.value !== undefined)
+    .sort((left, right) => left.occurredAt.localeCompare(right.occurredAt))
+    .slice(-6);
+  if (valued.length < 2) return [];
+  const values = valued.map((record) => record.value ?? 0);
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+  const span = max - min || 1;
+  return valued.map((record, index) => ({
+    id: record.id,
+    left: valued.length === 1 ? 50 : (index / (valued.length - 1)) * 100,
+    bottom: 10 + (((record.value ?? 0) - min) / span) * 80,
+    valueLabel: `${record.value}${detail.unit || ""}`,
+    monthLabel: `${Number(record.occurredAt.slice(5, 7))}月`,
+    current: index === valued.length - 1,
+  }));
 }

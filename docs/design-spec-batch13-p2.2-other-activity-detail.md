@@ -1,0 +1,73 @@
+# Figma 画板规格: P2.2 Other Activity Detail
+
+- [4] | P2.2 Other Activity Detail | 375x812 @(1370,1020) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(1370,1020) | fill=#ffffff | layout=H pad=14/22
+    - [4] | Back Action | 40x40 @(1392,1044) | layout=V
+      - [4] | arrow-left | 24x24 @(1400,1052)
+        - [6] | Vector | 14x14 @(1405,1057) | stroke=#202124 w2
+    - [13] | 活动详情 | 72x22 @(1514,1053) | fill=#202124 | font=Noto Sans SC/Bold 18px | text="活动详情"
+    - [4] | Status Chip | 56x22 @(1667,1053) | fill=#22c55e | r=12 | layout=V pad=4/10
+      - [13] | 已确认 | 36x14 @(1677,1057) | fill=#ffffff | font=Noto Sans SC/Bold 12px | text="已确认"
+  - [4] | Content | 375x654 @(1370,1108) | layout=V gap=16 pad=16/16
+    - [4] | Hero Card | 343x127 @(1386,1124) | fill=#ffffff | r=16 | layout=V gap=12 pad=20/20 | shadow=0,4,12,#000000@0.05
+      - [4] | Header Row | 303x22 @(1406,1144) | layout=H
+        - [4] | Type Chip | 44x22 @(1406,1144) | fill=#ff9a3b | r=100 | layout=V pad=4/10
+          - [13] | 体测 | 24x14 @(1416,1148) | fill=#ffffff | font=Noto Sans SC/Bold 12px | text="体测"
+        - [4] | Status Chip | 56x22 @(1653,1144) | fill=#22c55e | r=100 | layout=V pad=4/10
+          - [13] | 已确认 | 36x14 @(1663,1148) | fill=#ffffff | font=Noto Sans SC/Bold 12px | text="已确认"
+      - [13] | 青训体测日 | 303x24 @(1406,1178) | fill=#202124 | font=Noto Sans SC/Bold 20px | text="青训体测日"
+      - [4] | Meta Row | 303x17 @(1406,1214) | layout=H gap=12
+        - [13] | 10:00-11:30 | 75x17 @(1406,1214) | fill=#667085 | font=Noto Sans SC/Regular 14px | text="10:00-11:30"
+        - [13] | 室内训练场 | 70x17 @(1519,1214) | fill=#667085 | font=Noto Sans SC/Regular 14px | text="室内训练场"
+        - [4] | map-pin | 14x14 @(1493,1216)
+          - [6] | Vector | 9x12 @(1495,1217) | stroke=#667085 w2
+    - [4] | Info Rows | 343x90 @(1386,1267) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16
+      - [4] | Row 1 | 311x17 @(1402,1283) | layout=H
+        - [13] | 活动描述 | 56x17 @(1402,1283) | fill=#667085 | font=Noto Sans SC/Regular 14px | text="活动描述"
+        - [13] | 体能测试与评估 | 98x17 @(1615,1283) | fill=#202124 | font=Noto Sans SC/Medium 14px | text="体能测试与评估"
+      - [8] | Line | 311x0 @(1402,1312) | stroke=#e7eaf0 w1
+      - [4] | Row 2 | 311x17 @(1402,1324) | layout=H
+        - [13] | 注意事项 | 56x17 @(1402,1324) | fill=#667085 | font=Noto Sans SC/Regular 14px | text="注意事项"
+        - [13] | 请提前10分钟热场 | 114x17 @(1599,1324) | fill=#202124 | font=Noto Sans SC/Medium 14px | text="请提前10分钟热场"
+    - [4] | Participants | 343x103 @(1386,1373) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16
+      - [13] | 参与孩子 | 64x19 @(1402,1389) | fill=#202124 | font=Noto Sans SC/Bold 16px | text="参与孩子"
+      - [4] | Participant Row | 311x40 @(1402,1420) | layout=H gap=12
+        - [4] | Avatar | 40x40 @(1402,1420) | fill=#e8f5e9 | r=20 | layout=V
+          - [13] | 陈 | 14x17 @(1415,1432) | fill=#2e7d32 | font=Noto Sans SC/Bold 14px | text="陈"
+        - [4] | Info | 259x37 @(1454,1422) | layout=V gap=2
+          - [13] | 陈小宇 | 45x18 @(1454,1422) | fill=#202124 | font=Noto Sans SC/Bold 15px | text="陈小宇"
+          - [4] | Status Chip | 49x17 @(1454,1442) | fill=#22c55e | r=4 | layout=V pad=2/8
+            - [13] | 已确认 | 33x13 @(1462,1444) | fill=#ffffff | font=Noto Sans SC/Bold 11px | text="已确认"
+    - [4] | Coach | 343x72 @(1386,1492) | fill=#ffffff | r=12 | layout=H gap=12 pad=16/16
+      - [4] | Avatar | 40x40 @(1402,1508) | fill=#f3f4f6 | r=20 | layout=V
+        - [13] | 林 | 14x17 @(1415,1520) | fill=#202124 | font=Noto Sans SC/Bold 14px | text="林"
+      - [4] | Info | 259x34 @(1454,1511) | layout=V gap=2
+        - [13] | 林教练 | 45x18 @(1454,1511) | fill=#202124 | font=Noto Sans SC/Bold 15px | text="林教练"
+        - [13] | 主负责 | 36x14 @(1454,1531) | fill=#667085 | font=Noto Sans SC/Regular 12px | text="主负责"
+    - [4] | Footer Note | 343x48 @(1386,1580) | fill=#ffffff | r=12 | layout=H gap=8 pad=16/16
+      - [13] | 线下到场后检查身份完成确认 | 287x14 @(1426,1597) | fill=#667085 | font=Noto Sans SC/Regular 12px | text="线下到场后检查身份完成确认"
+      - [4] | info | 16x16 @(1402,1596)
+        - [6] | Vector | 13x13 @(1403,1597) | stroke=#667085 w2
+  - [4] | TabIconsOverlay | 375x70 @(1370,1762) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1490,1822) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(1370,1762)
+      - [4] | icon_0 | 22x22 @(1422,1768)
+        - [6] | Vector | 17x16 @(1424,1772) | stroke=#a80f1b w1.6
+        - [6] | Vector | 8x4 @(1428,1770) | fill=#000000 | stroke=#a80f1b w1.6
+        - [6] | Vector | 17x0 @(1424,1777) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 3x3 @(1427,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1431,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1435,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1427,1784) | fill=#a80f1b
+      - [13] | 日程 | 117x14 @(1374,1793) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="日程"
+      - [9] | Ellipse | 4x4 @(1430,1810) | fill=#a80f1b
+    - [4] | tab_1 | 125x56 @(1495,1762)
+      - [4] | icon_1 | 22x22 @(1546,1768)
+        - [6] | Vector | 18x10 @(1548,1775) | stroke=#8e97a6 w1.8
+        - [6] | Vector | 4x4 @(1562,1773) | stroke=#8e97a6 w1.8
+      - [13] | 成长 | 117x14 @(1499,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="成长"
+    - [4] | tab_2 | 125x56 @(1620,1762)
+      - [4] | icon_2 | 22x22 @(1672,1768)
+        - [6] | Vector | 8x8 @(1678,1771) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(1674,1780) | stroke=#8e97a6 w1.6
+      - [13] | 我的孩子 | 117x14 @(1624,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的孩子"

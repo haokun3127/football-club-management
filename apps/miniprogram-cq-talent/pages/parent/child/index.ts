@@ -17,6 +17,7 @@ Page({
     teamLabel: "",
     coachLabel: "",
     updatedAtLabel: "",
+    heroStats: [] as Array<{ label: string; value: string }>,
   },
   onLoad() {
     this.load();
@@ -49,6 +50,7 @@ Page({
         teamLabel: active.teams.join("、") || "队伍待确认",
         coachLabel: active.coachNames.join("、") || "教练待确认",
         updatedAtLabel: studentHome.updatedAt ? formatDateTime(studentHome.updatedAt) : "随俱乐部档案更新",
+        heroStats: buildHeroStats(studentHome),
       });
     } catch (error) {
       this.setData({ state: "error", message: readableError(error) });
@@ -75,7 +77,21 @@ Page({
   openBinding() {
     openPage("/pages/parent/binding/index");
   },
+  openSchedule() {
+    openPage("/pages/parent/schedule/index");
+  },
+  openGrowth() {
+    openPage("/pages/parent/growth/index");
+  },
 });
+
+function buildHeroStats(home: StudentHome) {
+  const stats = home.lessonStatus.slice(0, 3).map((item) => ({ label: item.label, value: item.value }));
+  while (stats.length < 3) {
+    stats.push({ label: ["训练课时", "出勤率", "在队时长"][stats.length] ?? "统计", value: "–" });
+  }
+  return stats;
+}
 
 function readableError(error: unknown) {
   const record = error as { message?: string; code?: string };

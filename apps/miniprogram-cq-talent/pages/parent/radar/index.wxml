@@ -1,0 +1,60 @@
+<view class="p5">
+  <!-- P5 Header -->
+  <view class="p5-nav">
+    <view class="p5-nav__back" bindtap="goBack">‹</view>
+    <view class="p5-nav__title-group">
+      <view class="p5-nav__title">能力雷达</view>
+      <view class="p5-nav__sub">{{activeChildName}}{{activeChildTeam ? ' · ' + activeChildTeam : ''}}</view>
+    </view>
+    <view class="p5-nav__compare" bindtap="openCompare">历史对比</view>
+  </view>
+
+  <!-- P5 Player Selector -->
+  <scroll-view scroll-x class="p5-players" enhanced show-scrollbar="{{false}}">
+    <view class="p5-players__inner">
+      <view
+        wx:for="{{children}}"
+        wx:key="id"
+        class="p5-chip {{activeStudentId === item.id ? 'p5-chip--active' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="switchChild"
+      >{{item.name}}</view>
+    </view>
+  </scroll-view>
+
+  <view class="p5-body">
+    <status-view state="{{state}}" title="{{state === 'loading' ? '加载能力雷达' : '能力数据不足'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+
+    <view wx:if="{{state === 'ready'}}" class="p5-content">
+      <!-- P5 Radar Hero -->
+      <view class="rhero">
+        <view class="rhero__head">
+          <view class="rhero__title">六维能力模型</view>
+          <view class="rhero__date">{{updatedAtLabel}}</view>
+        </view>
+        <view class="rhero__canvas">
+          <radar-canvas wx:if="{{canDrawRadar}}" metrics="{{radar}}" selectedMetricId="{{selectedMetricId}}" bindmetrictap="selectMetric"></radar-canvas>
+          <view wx:else class="rhero__empty">指标正在积累，完成评测后生成雷达图。</view>
+        </view>
+        <view class="rhero__score">
+          <view class="rhero__score-label">综合评分</view>
+          <view class="rhero__score-value">{{overallScore}}</view>
+        </view>
+      </view>
+
+      <!-- P5 Dimension Breakdown -->
+      <view class="dim-card">
+        <view class="dim-card__title">维度详情</view>
+        <view wx:for="{{radar}}" wx:key="metricId" class="dim-row" data-id="{{item.metricId}}" bindtap="openMetric">
+          <view class="dim-row__label">{{item.label}}</view>
+          <view class="dim-row__bar">
+            <view class="dim-row__fill" style="width:{{item.percent}}%"></view>
+            <view wx:if="{{item.peerPercent !== undefined}}" class="dim-row__peer" style="left:{{item.peerPercent}}%"></view>
+          </view>
+          <view class="dim-row__value">{{item.value === undefined ? '–' : item.value}}</view>
+        </view>
+        <view class="dim-card__hint">点击维度查看指标详情 ›</view>
+      </view>
+    </view>
+  </view>
+</view>

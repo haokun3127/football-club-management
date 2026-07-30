@@ -1,0 +1,75 @@
+# Figma 画板规格: P2 Training Detail
+
+- [4] | P2 Training Detail | 375x812 @(510,1020) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Nav Bar | 375x88 @(510,1020) | fill=#ffffff | layout=H pad=14/16
+    - [4] | Back Action | 40x40 @(526,1044) | layout=V
+      - [4] | arrow-left | 24x24 @(534,1052)
+        - [6] | Vector | 14x14 @(539,1057) | stroke=#202124 w2
+    - [13] | Title | 88x26 @(634,1051) | fill=#202124 | font=Noto Sans SC/Bold 22px | text="训练详情"
+    - [4] | Status Chip | 80x22 @(789,1053) | fill=#fff3e0 | r=12 | layout=H pad=4/10
+      - [13] | 进行待确认 | 60x14 @(799,1057) | fill=#ff9800 | font=Noto Sans SC/Bold 12px | text="进行待确认"
+  - [4] | Content | 375x654 @(510,1108) | layout=V gap=16 pad=16/16
+    - [4] | Hero Card | 343x160 @(526,1124) | fill=#07111f | r=20 | layout=V gap=16 pad=20/20 | shadow=0,8,24,#000000@0.10
+      - [4] | Header | 303x22 @(546,1144) | layout=H
+        - [4] | Type Chip | 44x22 @(546,1144) | fill=#a80f1b | r=100 | layout=H pad=4/10
+          - [13] | 训练 | 24x14 @(556,1148) | fill=#ffffff | font=Noto Sans SC/Bold 12px | text="训练"
+        - [4] | Coach Info | 56x14 @(793,1148) | layout=H gap=6
+          - [13] | 林教练 | 36x14 @(813,1148) | fill=#ffffff | font=Noto Sans SC/Regular 12px | text="林教练"
+          - [4] | user | 14x14 @(793,1148)
+            - [6] | Vector | 8x10 @(796,1150) | stroke=#ffffff w2
+      - [13] | Training Name | 303x24 @(546,1182) | fill=#ffffff | font=Noto Sans SC/Bold 20px | text="传球基础与 3v3 小场"
+      - [4] | Meta Info | 303x42 @(546,1222) | layout=V gap=8
+        - [4] | Date Row | 303x17 @(546,1222) | layout=H gap=8
+          - [13] | 18:30-20:00 · 6月29日 | 147x17 @(570,1222) | fill=#ffffff | font=Noto Sans SC/Regular 14px | text="18:30-20:00 · 6月29日"
+          - [4] | calendar | 16x16 @(546,1222)
+            - [6] | Vector | 12x13 @(548,1224) | stroke=#ffffff w2
+        - [4] | Location Row | 303x17 @(546,1247) | layout=H gap=8
+          - [13] | 重庆足球公园 | 84x17 @(570,1247) | fill=#ffffff | font=Noto Sans SC/Regular 14px | text="重庆足球公园"
+          - [4] | map-pin | 16x16 @(546,1248)
+            - [6] | Vector | 11x13 @(549,1249) | stroke=#ffffff w2
+    - [4] | Detail Card | 343x104 @(526,1300) | fill=#ffffff | r=16 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.04
+      - [4] | Section Header | 311x20 @(542,1316) | layout=H
+        - [13] | 训练内容 | 64x19 @(542,1316) | fill=#202124 | font=Noto Sans SC/Bold 16px | text="训练内容"
+        - [4] | chevron-right | 20x20 @(833,1316)
+          - [6] | Vector | 5x10 @(840,1321) | stroke=#667085 w2
+      - [13] | Description | 311x40 @(542,1348) | fill=#667085 | font=Noto Sans SC/Regular 14px | text="本次训练将重点强化球员的传球准确性与场上空间意识，通过 3v3 小场对抗提升快速决策能力。"
+    - [4] | Detail Card | 343x91 @(526,1420) | fill=#ffffff | r=16 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.04
+      - [13] | 关联能力 | 64x19 @(542,1436) | fill=#202124 | font=Noto Sans SC/Bold 16px | text="关联能力"
+      - [4] | Tags | 311x28 @(542,1467) | layout=H gap=8
+        - [4] | Tag | 50x28 @(542,1467) | fill=#fceeef | r=100 | layout=H pad=6/12
+          - [13] | 传球 | 26x16 @(554,1473) | fill=#a80f1b | font=Noto Sans SC/Bold 13px | text="传球"
+        - [4] | Tag | 50x28 @(600,1467) | fill=#fceeef | r=100 | layout=H pad=6/12
+          - [13] | 抢球 | 26x16 @(612,1473) | fill=#a80f1b | font=Noto Sans SC/Bold 13px | text="抢球"
+        - [4] | Tag | 76x28 @(658,1467) | fill=#fceeef | r=100 | layout=H pad=6/12
+          - [13] | 团队配合 | 52x16 @(670,1473) | fill=#a80f1b | font=Noto Sans SC/Bold 13px | text="团队配合"
+    - [4] | Detail Card | 343x104 @(526,1527) | fill=#ffffff | r=16 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.04
+      - [4] | Section Header | 311x20 @(542,1543) | layout=H gap=8
+        - [13] | 线下确认 | 64x19 @(570,1544) | fill=#202124 | font=Noto Sans SC/Bold 16px | text="线下确认"
+        - [4] | alert-triangle | 20x20 @(542,1543)
+          - [6] | Vector | 17x15 @(544,1545) | stroke=#ff9800 w2
+      - [13] | Explanation | 311x40 @(542,1575) | fill=#667085 | font=Noto Sans SC/Regular 14px | text="本次训练须经教练或家长在现场确认，无需在 APP 进行操作。请陈小宇准时到场。"
+    - [4] | Status Button | 343x48 @(526,1647) | fill=#2e7d32 | r=12 | layout=H
+      - [13] | 已确认出席 | 80x19 @(658,1662) | fill=#ffffff | font=Noto Sans SC/Bold 16px | text="已确认出席"
+  - [4] | TabIconsOverlay | 375x70 @(510,1762) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(630,1822) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(510,1762)
+      - [4] | icon_0 | 22x22 @(562,1768)
+        - [6] | Vector | 17x16 @(564,1772) | stroke=#a80f1b w1.6
+        - [6] | Vector | 8x4 @(568,1770) | fill=#000000 | stroke=#a80f1b w1.6
+        - [6] | Vector | 17x0 @(564,1777) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 3x3 @(567,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(571,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(575,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(567,1784) | fill=#a80f1b
+      - [13] | 日程 | 117x14 @(514,1793) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="日程"
+      - [9] | Ellipse | 4x4 @(570,1810) | fill=#a80f1b
+    - [4] | tab_1 | 125x56 @(635,1762)
+      - [4] | icon_1 | 22x22 @(686,1768)
+        - [6] | Vector | 18x10 @(688,1775) | stroke=#8e97a6 w1.8
+        - [6] | Vector | 4x4 @(702,1773) | stroke=#8e97a6 w1.8
+      - [13] | 成长 | 117x14 @(639,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="成长"
+    - [4] | tab_2 | 125x56 @(760,1762)
+      - [4] | icon_2 | 22x22 @(812,1768)
+        - [6] | Vector | 8x8 @(818,1771) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(814,1780) | stroke=#8e97a6 w1.6
+      - [13] | 我的孩子 | 117x14 @(764,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的孩子"

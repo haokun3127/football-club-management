@@ -1,22 +1,97 @@
-.schedule-page { min-height: 100vh; background: #f6f7f9; }
-.schedule-page__body { padding: 24rpx 24rpx calc(148rpx + env(safe-area-inset-bottom)); }
-.scope-block { margin-bottom: 24rpx; }
-.scope-block__label { margin-bottom: 12rpx; color: #667085; font-size: 22rpx; font-weight: 600; }
-.calendar-panel { margin-bottom: 24rpx; padding: 24rpx; border: 1rpx solid #e7eaf0; border-radius: 24rpx; background: #fff; }
-.calendar-panel__date { margin-bottom: 6rpx; color: #202124; font-size: 32rpx; font-weight: 700; }
-.calendar-button { padding: 12rpx 18rpx; border-radius: 999rpx; background: #fceeef; color: var(--color-brand); font-size: 23rpx; font-weight: 600; }
+.p1 { min-height: 100vh; background: #f5f6f8; }
 
-.date-strip {
-  width: 100%;
-  margin-top: 16rpx;
-  white-space: nowrap;
+/* P1 Top Nav */
+.p1-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 176rpx;
+  padding: 24rpx 32rpx;
+  background: #ffffff;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
+}
+.p1-nav__title { color: #0d0d0d; font-size: 44rpx; font-weight: 700; }
+.p1-nav__bell { position: relative; width: 64rpx; height: 64rpx; display: flex; align-items: center; justify-content: center; }
+.p1-nav__bell-icon { font-size: 40rpx; }
+.p1-nav__bell-dot {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: #ff3b30;
+  border: 2rpx solid #ffffff;
 }
 
-.date-strip-inner {
-  display: inline-flex;
+.p1-body { padding: 32rpx 32rpx calc(148rpx + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 32rpx; }
+
+/* P1 Hero Card */
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  padding: 32rpx;
+  border-radius: 32rpx;
+  background: #07111f;
+  box-shadow: 0 20rpx 48rpx rgba(0, 0, 0, 0.08), 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+.hero__glow {
+  position: absolute;
+  top: -160rpx;
+  left: -240rpx;
+  width: 520rpx;
+  height: 520rpx;
+  border-radius: 50%;
+  background: #a80f1b;
+  opacity: 0.35;
+  filter: blur(60rpx);
+}
+.hero__top { position: relative; display: flex; justify-content: space-between; color: rgba(255, 255, 255, 0.7); font-size: 24rpx; font-weight: 500; }
+.hero__time-row { position: relative; display: flex; align-items: flex-end; gap: 24rpx; }
+.hero__time {
+  color: #ffffff;
+  font-size: 108rpx;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: 0 12rpx 36rpx rgba(168, 15, 27, 0.4);
+}
+.hero__title { color: #ffffff; font-size: 30rpx; font-weight: 600; padding-bottom: 12rpx; }
+.hero__meta { position: relative; color: rgba(255, 255, 255, 0.8); font-size: 24rpx; }
+.hero__stats { position: relative; display: flex; gap: 20rpx; }
+.hero__pill {
+  display: flex;
+  align-items: center;
   gap: 12rpx;
+  padding: 16rpx 20rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1rpx solid rgba(255, 255, 255, 0.1);
 }
+.hero__pill--brand { background: rgba(168, 15, 27, 0.1); border-color: rgba(168, 15, 27, 0.2); }
+.hero__pill--brand .hero__pill-value { color: #a80f1b; }
+.hero__pill-value { color: #ffffff; font-size: 24rpx; font-weight: 800; }
+.hero__pill-label { color: rgba(255, 255, 255, 0.7); font-size: 22rpx; font-weight: 600; }
 
+/* P1 Pending Chips */
+.chips { display: flex; gap: 16rpx; }
+.chip { padding: 12rpx 20rpx; border-radius: 999rpx; font-size: 24rpx; font-weight: 700; }
+.chip--red { background: #fee2e2; color: #a80f1b; }
+.chip--green { background: #d1fae5; color: #065f46; }
+.chip--yellow { background: #fef3c7; color: #92400e; }
+
+/* 日期面板（保留功能，轻量样式） */
+.calendar-panel { padding: 24rpx; border-radius: 24rpx; background: #ffffff; box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.05); }
+.calendar-panel__row { display: flex; align-items: center; justify-content: space-between; }
+.calendar-panel__date { margin-bottom: 6rpx; color: #0d1117; font-size: 32rpx; font-weight: 700; }
+.calendar-panel__sub { color: #6b7280; font-size: 22rpx; }
+.calendar-button { padding: 12rpx 18rpx; border-radius: 999rpx; background: #fceeef; color: var(--color-brand); font-size: 23rpx; font-weight: 600; }
+.calendar-button--link { background: transparent; border: 1rpx solid #e7eaf0; color: #6b7280; }
+
+.date-strip { width: 100%; margin-top: 16rpx; white-space: nowrap; }
+.date-strip-inner { display: inline-flex; gap: 12rpx; }
 .date-chip {
   min-width: 108rpx;
   padding: 14rpx 12rpx;
@@ -25,44 +100,36 @@
   background: #fff;
   text-align: center;
 }
-
-.date-chip.active {
-  border-color: var(--color-brand);
-  background: #fceeef;
-  color: var(--color-brand);
-  font-weight: 700;
-}
+.date-chip.active { border-color: var(--color-brand); background: #fceeef; color: var(--color-brand); font-weight: 700; }
 .date-weekday { margin-bottom: 4rpx; color: #667085; font-size: 20rpx; }
 .date-chip.active .date-weekday { color: var(--color-brand); }
+.date-count { margin-top: 4rpx; color: #8a8f99; font-size: 20rpx; }
 
-.date-count {
-  margin-top: 4rpx;
-  color: #8a8f99;
-  font-size: 20rpx;
+.type-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12rpx; margin-top: 16rpx; }
+.type-tab { min-height: 56rpx; border-radius: 14rpx; background: #f2f3f5; color: #60646f; font-size: 24rpx; text-align: center; line-height: 56rpx; }
+.type-tab.active { background: #fceeef; color: var(--color-brand); font-weight: 700; }
+
+/* P1 Activity Cards */
+.event-list { display: flex; flex-direction: column; gap: 24rpx; }
+.acard {
+  display: flex;
+  align-items: flex-start;
+  gap: 24rpx;
+  padding: 32rpx;
+  border-radius: 32rpx;
+  background: #ffffff;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.05);
 }
-
-.type-tabs {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12rpx;
-  margin-top: 16rpx;
-}
-
-.type-tab {
-  min-height: 56rpx;
-  border-radius: 14rpx;
-  background: #f2f3f5;
-  color: #60646f;
-  font-size: 24rpx;
-  text-align: center;
-  line-height: 56rpx;
-}
-
-.type-tab.active {
-  background: #fceeef;
-  color: var(--color-brand);
-  font-weight: 700;
-}
-
-.event-list { margin-top: 4rpx; }
-.calendar-button--link { background: transparent; border: 1rpx solid var(--color-line); color: var(--color-text-secondary); }
+.acard__bar { width: 8rpx; height: 128rpx; border-radius: 40rpx; flex-shrink: 0; }
+.acard__main { flex: 1; display: flex; flex-direction: column; gap: 14rpx; min-width: 0; }
+.acard__row { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; }
+.acard__title { color: #0d1117; font-size: 32rpx; font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.acard__pill { padding: 8rpx 16rpx; border-radius: 999rpx; font-size: 22rpx; font-weight: 700; flex-shrink: 0; }
+.pill--info { background: #d1fae5; color: #065f46; }
+.pill--brand { background: #dbeafe; color: #1a3a6b; }
+.pill--success { background: #f3f4f6; color: #6b7280; }
+.pill--warning, .pill--pending { background: #fef3c7; color: #92400e; }
+.pill--error { background: #fee2e2; color: #a80f1b; }
+.acard__line { color: #6b7280; font-size: 26rpx; }
+.acard__dur { color: #6b7280; font-size: 24rpx; }
+.acard__chevron { color: #c0c8d2; font-size: 32rpx; font-weight: 700; }

@@ -1,41 +1,80 @@
-<view class="metric-page">
-  <app-header title="指标详情" show-back="{{true}}" />
-  <view class="metric-page__body">
-  <status-view state="{{state}}" title="{{state === 'loading' ? '加载指标详情' : '暂时无法查看'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
-
-  <view wx:if="{{detail}}" class="metric-hero">
-    <view class="metric-hero__eyebrow">能力指标</view>
-    <view class="metric-hero__title">{{detail.label}}</view>
-    <view class="metric-hero__description">{{detail.description || '根据训练、比赛和评测记录持续更新'}}</view>
-    <view class="metric-hero__value">{{latestLabel}}</view>
-    <view class="metric-hero__foot"><view>{{latestDateLabel}}</view><status-chip label="{{trendSummary}}" tone="{{trendTone}}" compact="{{true}}" /></view>
+<view class="p6">
+  <!-- P6 NavHeader -->
+  <view class="p6-nav">
+    <view class="p6-nav__back" bindtap="goBack">‹</view>
+    <view class="p6-nav__title">{{detail ? detail.label : ''}} 指标详情</view>
+    <view class="p6-nav__range" bindtap="switchRange">本赛季 ⌄</view>
   </view>
 
-  <view wx:if="{{detail}}" class="metric-card">
-    <view class="section-heading"><view><view class="section-title">变化记录</view><view class="subtitle">按时间查看每次记录与变化</view></view><view class="record-count">{{records.length}} 次</view></view>
-    <view wx:if="{{records.length}}" class="trend-list">
-      <view wx:for="{{records}}" wx:key="id" class="trend-row">
-        <view class="trend-row__axis"><view class="trend-row__dot"></view><view class="trend-row__line"></view></view>
-        <view class="trend-row__content">
-          <view class="row"><view class="trend-row__value">{{item.valueLabel}}</view><status-chip label="{{item.changeLabel}}" tone="{{item.changeTone}}" compact="{{true}}" /></view>
-          <view class="trend-row__meta">{{item.dateLabel}} · {{item.source}}</view>
-          <view wx:if="{{item.note}}" class="trend-row__note">{{item.note}}</view>
+  <view class="p6-body">
+    <status-view state="{{state}}" title="{{state === 'loading' ? '加载指标详情' : '暂时无法查看'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+
+    <!-- P6 HeroCard -->
+    <view wx:if="{{detail}}" class="mhero">
+      <view class="mhero__top">
+        <view class="mhero__label">{{detail.label}}</view>
+        <view wx:if="{{trendDelta}}" class="mhero__trend">↗ {{trendDelta}}</view>
+      </view>
+      <view class="mhero__score-row">
+        <text class="mhero__score">{{heroValue}}</text>
+        <text class="mhero__score-unit">{{detail.unit ? '/' + (100) : ''}}{{detail.unit || ''}}</text>
+      </view>
+      <view class="mhero__divider"></view>
+      <view class="mhero__foot">
+        <view class="mhero__badge">{{records.length}} 项记录</view>
+        <view class="mhero__foot-text">{{latestDateLabel}} · 持续追踪中</view>
+      </view>
+    </view>
+
+    <!-- P6 TrendChart -->
+    <view wx:if="{{detail && chartPoints.length > 1}}" class="chart-card">
+      <view class="chart-card__head">
+        <view class="chart-card__title">能力趋势</view>
+        <view class="chart-card__range">近{{chartPoints.length}}次记录</view>
+      </view>
+      <view class="chart-card__plot">
+        <view class="chart-grid" wx:for="{{[1,2,3,4]}}" wx:key="*this"></view>
+        <view
+          wx:for="{{chartPoints}}"
+          wx:key="id"
+          class="chart-dot {{item.current ? 'chart-dot--current' : ''}}"
+          style="left:{{item.left}}%;bottom:{{item.bottom}}%"
+        >
+          <view wx:if="{{item.current}}" class="chart-dot__label">{{item.valueLabel}}</view>
         </view>
       </view>
-    </view>
-    <view wx:else class="subtitle">暂无可展示的趋势记录。</view>
-  </view>
-
-  <view wx:if="{{detail}}" class="metric-card">
-    <view class="section-title">数据来源</view>
-    <view wx:if="{{sourceEvents.length}}">
-      <view wx:for="{{sourceEvents}}" wx:key="recordId" class="source-row" data-id="{{item.eventId}}" bindtap="openSourceEvent">
-        <view class="source-row__mark">{{item.typeSymbol}}</view><view class="source-row__content"><view class="source-row__title">{{item.title}}</view><view class="subtitle">{{item.typeLabel}} · {{item.startsAtLabel}}</view></view><view class="source-link">查看 ›</view>
+      <view class="chart-card__x">
+        <text wx:for="{{chartPoints}}" wx:key="id" class="chart-card__x-label">{{item.monthLabel}}</text>
       </view>
     </view>
-    <view wx:else class="subtitle">当前记录暂无可跳转的活动来源。</view>
-  </view>
 
-  <view wx:if="{{detail}}" class="privacy-note"><view class="privacy-note__icon">✓</view><view><view class="privacy-note__title">孩子数据已保护</view><view class="subtitle">这里只展示当前孩子可见的能力结果与来源。</view></view></view>
+    <!-- 变化记录 -->
+    <view wx:if="{{detail}}" class="metric-card">
+      <view class="section-heading"><view><view class="section-title">变化记录</view><view class="subtitle">按时间查看每次记录与变化</view></view><view class="record-count">{{records.length}} 次</view></view>
+      <view wx:if="{{records.length}}" class="trend-list">
+        <view wx:for="{{records}}" wx:key="id" class="trend-row">
+          <view class="trend-row__axis"><view class="trend-row__dot"></view><view class="trend-row__line"></view></view>
+          <view class="trend-row__content">
+            <view class="row"><view class="trend-row__value">{{item.valueLabel}}</view><status-chip label="{{item.changeLabel}}" tone="{{item.changeTone}}" compact="{{true}}" /></view>
+            <view class="trend-row__meta">{{item.dateLabel}} · {{item.source}}</view>
+            <view wx:if="{{item.note}}" class="trend-row__note">{{item.note}}</view>
+          </view>
+        </view>
+      </view>
+      <view wx:else class="subtitle">暂无可展示的趋势记录。</view>
+    </view>
+
+    <!-- 数据来源 -->
+    <view wx:if="{{detail}}" class="metric-card">
+      <view class="section-title">数据来源</view>
+      <view wx:if="{{sourceEvents.length}}">
+        <view wx:for="{{sourceEvents}}" wx:key="recordId" class="source-row" data-id="{{item.eventId}}" bindtap="openSourceEvent">
+          <view class="source-row__mark">{{item.typeSymbol}}</view><view class="source-row__content"><view class="source-row__title">{{item.title}}</view><view class="subtitle">{{item.typeLabel}} · {{item.startsAtLabel}}</view></view><view class="source-link">查看 ›</view>
+        </view>
+      </view>
+      <view wx:else class="subtitle">当前记录暂无可跳转的活动来源。</view>
+    </view>
+
+    <view wx:if="{{detail}}" class="privacy-note"><view class="privacy-note__icon">✓</view><view><view class="privacy-note__title">孩子数据已保护</view><view class="subtitle">这里只展示当前孩子可见的能力结果与来源。</view></view></view>
   </view>
 </view>

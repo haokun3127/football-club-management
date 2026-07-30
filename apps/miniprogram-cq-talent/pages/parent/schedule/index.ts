@@ -13,6 +13,23 @@ type ScheduleEventView = ScheduleEvent & {
   statusTone: string;
   description: string;
   meta: Array<{ label: string; value: string }>;
+  typeColor: string;
+  durationText: string;
+  childNames: string;
+};
+
+interface HeroView {
+  id: string;
+  title: string;
+  timeText: string;
+  teamName: string;
+  venue: string;
+}
+
+const TYPE_COLORS: Record<string, string> = {
+  training: "#a80f1b",
+  match: "#1a3a6b",
+  other: "#6b7280",
 };
 
 interface PageData {
@@ -29,6 +46,12 @@ interface PageData {
   typeTabs: Array<{ label: string; value: "all" | ScheduleEvent["type"] }>;
   dateOptions: Array<{ date: string; day: string; weekday: string; count: number }>;
   hasUnreadReminders: boolean;
+  unreadCount: number;
+  todayLabel: string;
+  todayCount: number;
+  weekCount: number;
+  weekHours: string;
+  hero: HeroView | null;
 }
 
 const typeTabs: PageData["typeTabs"] = [
@@ -55,6 +78,12 @@ Page<PageData>({
     typeTabs,
     dateOptions: [],
     hasUnreadReminders: false,
+    unreadCount: 0,
+    todayLabel: "",
+    todayCount: 0,
+    weekCount: 0,
+    weekHours: "0",
+    hero: null,
   },
   onLoad() {
     this.load();
@@ -65,7 +94,8 @@ Page<PageData>({
   async refreshRemindersBadge() {
     try {
       const reminders = await getParentReminders();
-      this.setData({ hasUnreadReminders: countUnreadReminders(reminders) > 0 });
+      const unreadCount = countUnreadReminders(reminders);
+      this.setData({ hasUnreadReminders: unreadCount > 0, unreadCount });
     } catch (error) {
       // 角标失败不影响主流程
     }
@@ -82,7 +112,9 @@ Page<PageData>({
       }
       const events = await getParentCalendar(dateWindowStart(this.data.selectedDate), dateWindowEnd(this.data.selectedDate));
       const active = children.find((child) => child.id === this.data.activeStudentId);
+      const childEvents = filterEvents(events, this.data.activeStudentId, "", "all");
       const visibleEvents = presentEvents(filterEvents(events, this.data.activeStudentId, this.data.selectedDate, this.data.selectedType));
+      const digest = buildScheduleDigest(childEvents);
       this.setData({
         state: visibleEvents.length ? "ready" : "empty",
         message: visibleEvents.length ? "" : "当前筛选条件暂无活动安排。",
@@ -93,6 +125,11 @@ Page<PageData>({
         visibleEvents,
         selectedDateLabel: formatCalendarDate(this.data.selectedDate),
         dateOptions: buildDateOptions(this.data.selectedDate, events),
+        todayLabel: digest.todayLabel,
+        todayCount: digest.todayCount,
+        weekCount: digest.weekCount,
+        weekHours: digest.weekHours,
+        hero: digest.hero,
       });
     } catch (error) {
       this.setData({ state: "error", message: readableError(error) });
@@ -102,7 +139,15 @@ Page<PageData>({
     const id = event.detail.studentId === "all" ? "" : event.detail.studentId;
     const child = this.data.children.find((item: StudentSummary) => item.id === id);
     if (id) setCurrentStudentId(id);
-    this.setData({ activeStudentId: id, activeStudentName: child?.name ?? "全部孩子" });
+    const digest = buildScheduleDigest(filterEvents(this.data.events, id, "", "all"));
+    this.setData({
+      activeStudentId: id,
+      activeStudentName: child?.name ?? "全部孩子",
+      todayCount: digest.todayCount,
+      weekCount: digest.weekCount,
+      weekHours: digest.weekHours,
+      hero: digest.hero,
+    });
     this.applyFilters();
   },
   onDateChange(event: { detail: { value: string } }) {
@@ -187,12 +232,59 @@ function presentEvents(events: ScheduleEvent[]): ScheduleEventView[] {
       statusLabel: status.label,
       statusTone: status.tone,
       description: event.summary || "",
+      typeColor: TYPE_COLORS[event.type] ?? "#6b7280",
+      durationText: durationLabel(event.startsAt, event.endsAt),
+      childNames: childNames(event),
       meta: [
         { label: "孩子", value: childNames(event) },
         { label: "队伍", value: event.teamName || "待确认" },
       ],
     };
   });
+}
+
+function durationLabel(startsAt?: string, endsAt?: string) {
+  const start = Date.parse(startsAt ?? "");
+  const end = Date.parse(endsAt ?? "");
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return "时长待确认";
+  return `${Math.round((end - start) / 60000)}分钟`;
+}
+
+function buildScheduleDigest(events: ScheduleEvent[]) {
+  const now = new Date();
+  const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
+  const todayKey = localNow.toISOString().slice(0, 10);
+  const weekStart = new Date(`${todayKey}T00:00:00.000Z`);
+  weekStart.setUTCDate(weekStart.getUTCDate() - ((weekStart.getUTCDay() + 6) % 7));
+  const weekEnd = new Date(weekStart);
+  weekEnd.setUTCDate(weekEnd.getUTCDate() + 7);
+  const weekEvents = events.filter((event) => {
+    const startsAt = Date.parse(event.startsAt);
+    return Number.isFinite(startsAt) && startsAt >= weekStart.getTime() && startsAt < weekEnd.getTime();
+  });
+  const weekMinutes = weekEvents.reduce((total, event) => {
+    const span = Date.parse(event.endsAt ?? "") - Date.parse(event.startsAt ?? "");
+    return total + (Number.isFinite(span) && span > 0 ? span : 0);
+  }, 0) / 60000;
+  const upcoming = events
+    .filter((event) => Date.parse(event.endsAt || event.startsAt) >= now.getTime() && event.status !== "cancelled")
+    .sort((left, right) => Date.parse(left.startsAt) - Date.parse(right.startsAt))[0];
+  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+  return {
+    todayLabel: `${localNow.getUTCFullYear()}年${localNow.getUTCMonth() + 1}月${localNow.getUTCDate()}日 周${weekdays[localNow.getUTCDay()]}`,
+    todayCount: events.filter((event) => event.startsAt.slice(0, 10) === todayKey).length,
+    weekCount: weekEvents.length,
+    weekHours: (Math.round(weekMinutes / 6) / 10).toString(),
+    hero: upcoming
+      ? {
+          id: upcoming.id,
+          title: upcoming.title,
+          timeText: upcoming.startsAt.slice(11, 16) || "待定",
+          teamName: upcoming.teamName ?? "",
+          venue: upcoming.venue ?? "",
+        }
+      : null,
+  };
 }
 
 function currentLocalDate() {

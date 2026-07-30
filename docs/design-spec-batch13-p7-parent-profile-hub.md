@@ -1,0 +1,98 @@
+# Figma 画板规格: P7 Parent Profile Hub
+
+- [4] | P7 Parent Profile Hub | 375x812 @(80,2820) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(80,2820) | fill=#ffffff | layout=H pad=14/22
+    - [13] | Time | 30x17 @(102,2856) | fill=#202124 | font=Inter/Semi Bold 14px | text="9:41"
+    - [13] | Title | 80x24 @(222,2852) | fill=#202124 | font=Inter/Bold 20px | text="我的孩子"
+    - [4] | Spacer | 40x1 @(393,2864)
+  - [4] | Content | 375x654 @(80,2908) | layout=V gap=16 pad=16/16
+    - [4] | Player Card | 343x104 @(96,2924) | fill=#07111f | r=16 | layout=H gap=16 pad=20/20
+      - [4] | Avatar | 64x64 @(116,2944) | fill=#a80f1b | r=32 | layout=V
+        - [13] | 陈 | 24x29 @(136,2962) | fill=#ffffff | font=Inter/Bold 24px | text="陈"
+      - [4] | Info | 223x44 @(196,2954) | layout=V gap=4
+        - [13] | 陈小宇 | 60x24 @(196,2954) | fill=#ffffff | font=Inter/Bold 20px | text="陈小宇"
+        - [13] | 凤凰山 U10精英队 | 106x16 @(196,2982) | fill=#ffffff@0.50 | font=Inter/Regular 13px | text="凤凰山 U10精英队"
+    - [4] | Stats Row | 343x80 @(96,3044) | fill=#ffffff | r=12 | layout=H pad=16/16 | shadow=0,4,12,#000000@0.05
+      - [4] | Stat 1 | 103x48 @(112,3060) | layout=V gap=4
+        - [13] | 46 | 33x29 @(147,3060) | fill=#202124 | font=Inter/Bold 24px | text="46"
+        - [13] | 训练课时 | 48x15 @(140,3093) | fill=#667085 | font=Inter/Regular 12px | text="训练课时"
+      - [12] | Rectangle | 1x48 @(215,3060) | fill=#e7eaf0
+      - [4] | Stat 2 | 103x48 @(216,3060) | layout=V gap=4
+        - [13] | 89% | 53x29 @(241,3060) | fill=#a80f1b | font=Inter/Bold 24px | text="89%"
+        - [13] | 出勤率 | 36x15 @(250,3093) | fill=#667085 | font=Inter/Regular 12px | text="出勤率"
+      - [12] | Rectangle | 1x48 @(319,3060) | fill=#e7eaf0
+      - [4] | Stat 3 | 103x48 @(320,3060) | layout=V gap=4
+        - [13] | 1年7个月 | 99x29 @(322,3060) | fill=#202124 | font=Inter/Bold 24px | text="1年7个月"
+        - [13] | 在队时长 | 48x15 @(348,3093) | fill=#667085 | font=Inter/Regular 12px | text="在队时长"
+    - [4] | Quick Actions | 343x214 @(96,3140) | layout=V gap=12
+      - [4] | Row 1 | 343x101 @(96,3140) | layout=H gap=12
+        - [4] | Action 1 | 166x101 @(96,3140) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16
+          - [4] | Frame | 40x40 @(159,3156) | fill=#fceeef | r=20 | layout=V
+            - [4] | calendar | 20x20 @(169,3166)
+              - [6] | Vector | 15x17 @(171,3168) | stroke=#a80f1b w2
+          - [13] | 训练日程 | 56x17 @(151,3208) | fill=#202124 | font=Inter/Semi Bold 14px | text="训练日程"
+        - [4] | Action 2 | 166x101 @(274,3140) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16
+          - [4] | Frame | 40x40 @(336,3156) | fill=#fceeef | r=20 | layout=V
+            - [4] | chart-bar | 20x20 @(346,3166)
+              - [6] | Vector | 15x15 @(349,3168) | stroke=#a80f1b w2
+          - [13] | 成长报告 | 56x17 @(328,3208) | fill=#202124 | font=Inter/Semi Bold 14px | text="成长报告"
+      - [4] | Row 2 | 343x101 @(96,3253) | layout=H gap=12
+        - [4] | Action 3 | 166x101 @(96,3253) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16
+          - [4] | Frame | 40x40 @(159,3269) | fill=#fceeef | r=20 | layout=V
+            - [4] | zap | 20x20 @(169,3279)
+              - [6] | Vector | 15x17 @(171,3281) | stroke=#a80f1b w2
+          - [13] | 体能数据 | 56x17 @(151,3321) | fill=#202124 | font=Inter/Semi Bold 14px | text="体能数据"
+        - [4] | Action 4 | 166x101 @(274,3253) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16
+          - [4] | Frame | 40x40 @(336,3269) | fill=#fceeef | r=20 | layout=V
+            - [4] | message-circle | 20x20 @(346,3279)
+              - [6] | Vector | 17x17 @(348,3281) | stroke=#a80f1b w2
+          - [13] | 联系教练 | 56x17 @(328,3321) | fill=#202124 | font=Inter/Semi Bold 14px | text="联系教练"
+    - [4] | Recent Activity | 343x193 @(96,3370) | fill=#ffffff | r=12 | layout=V gap=16 pad=16/16
+      - [13] | 最近动态 | 64x19 @(112,3386) | fill=#202124 | font=Inter/Bold 16px | text="最近动态"
+      - [4] | Activity List | 311x126 @(112,3421) | layout=V gap=12
+        - [4] | Frame | 311x34 @(112,3421) | layout=H gap=12
+          - [9] | Ellipse | 8x8 @(112,3434) | fill=#a80f1b
+          - [4] | Frame | 291x34 @(132,3421) | layout=V gap=2
+            - [13] | 完成周末精英训练 | 112x17 @(132,3421) | fill=#202124 | font=Inter/Semi Bold 14px | text="完成周末精英训练"
+            - [13] | 2024-10-12 | 67x15 @(132,3440) | fill=#667085 | font=Inter/Regular 12px | text="2024-10-12"
+        - [4] | Frame | 311x34 @(112,3467) | layout=H gap=12
+          - [9] | Ellipse | 8x8 @(112,3480) | fill=#059669
+          - [4] | Frame | 291x34 @(132,3467) | layout=V gap=2
+            - [13] | 更新体能测试成绩 | 112x17 @(132,3467) | fill=#202124 | font=Inter/Semi Bold 14px | text="更新体能测试成绩"
+            - [13] | 2024-10-10 | 67x15 @(132,3486) | fill=#667085 | font=Inter/Regular 12px | text="2024-10-10"
+        - [4] | Frame | 311x34 @(112,3513) | layout=H gap=12
+          - [9] | Ellipse | 8x8 @(112,3526) | fill=#2563eb
+          - [4] | Frame | 291x34 @(132,3513) | layout=V gap=2
+            - [13] | 发布比赛总结 | 84x17 @(132,3513) | fill=#202124 | font=Inter/Semi Bold 14px | text="发布比赛总结"
+            - [13] | 2024-10-08 | 69x15 @(132,3532) | fill=#667085 | font=Inter/Regular 12px | text="2024-10-08"
+    - [4] | Upcoming Reminder | 343x101 @(96,3579) | fill=#ffffff | r=12 | layout=V gap=16 pad=16/16
+      - [13] | 本周提醒 | 64x19 @(112,3595) | fill=#202124 | font=Inter/Bold 16px | text="本周提醒"
+      - [4] | Frame | 311x34 @(112,3630) | layout=H gap=12
+        - [4] | Frame | 279x34 @(144,3630) | layout=V gap=2
+          - [13] | 周六 09:00 准时到场 | 133x17 @(144,3630) | fill=#202124 | font=Inter/Semi Bold 14px | text="周六 09:00 准时到场"
+          - [13] | 奥体中心 · 凤凰山 | 95x15 @(144,3649) | fill=#667085 | font=Inter/Regular 12px | text="奥体中心 · 凤凰山"
+        - [4] | bell | 20x20 @(112,3637)
+          - [6] | Vector | 15x17 @(114,3639) | stroke=#a80f1b w2
+  - [4] | TabIconsOverlay | 375x70 @(80,3562) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(200,3622) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(80,3562)
+      - [4] | icon_0 | 22x22 @(132,3568)
+        - [6] | Vector | 17x16 @(134,3572) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 8x4 @(138,3570) | fill=#000000 | stroke=#8e97a6 w1.6
+        - [6] | Vector | 17x0 @(134,3577) | fill=#000000 | stroke=#8e97a6 w1.3
+        - [6] | Vector | 3x3 @(137,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(141,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(145,3580) | fill=#8e97a6
+        - [6] | Vector | 3x3 @(137,3584) | fill=#8e97a6
+      - [13] | 日程 | 117x14 @(84,3593) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="日程"
+    - [4] | tab_1 | 125x56 @(205,3562)
+      - [4] | icon_1 | 22x22 @(256,3568)
+        - [6] | Vector | 18x10 @(258,3575) | stroke=#8e97a6 w1.8
+        - [6] | Vector | 4x4 @(272,3573) | stroke=#8e97a6 w1.8
+      - [13] | 成长 | 117x14 @(209,3593) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="成长"
+    - [4] | tab_2 | 125x56 @(330,3562)
+      - [4] | icon_2 | 22x22 @(382,3568)
+        - [6] | Vector | 8x8 @(388,3571) | stroke=#a80f1b w1.6
+        - [6] | Vector | 16x8 @(384,3580) | stroke=#a80f1b w1.6
+      - [13] | 我的孩子 | 117x14 @(334,3593) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="我的孩子"
+      - [9] | Ellipse | 4x4 @(390,3610) | fill=#a80f1b

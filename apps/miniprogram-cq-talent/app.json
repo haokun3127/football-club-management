@@ -5,6 +5,7 @@
     "pages/parent/schedule/index",
     "pages/parent/event/index",
     "pages/parent/growth/index",
+    "pages/parent/radar/index",
     "pages/parent/metric/index",
     "pages/parent/child/index",
     "pages/parent/reminders/index",

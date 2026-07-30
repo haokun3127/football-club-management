@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "能力雷达",
+  "usingComponents": {
+    "status-view": "/components/status-view/index",
+    "radar-canvas": "/components/radar-canvas/index"
+  }
+}

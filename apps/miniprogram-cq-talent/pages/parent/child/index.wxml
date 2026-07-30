@@ -1,70 +1,96 @@
-<view class="child-page">
-  <app-header title="我的孩子" subtitle="档案、课时与俱乐部服务" />
-  <view class="child-page__body">
-  <view class="switcher-block"><view class="switcher-block__label">当前孩子</view><student-switcher students="{{children}}" selected-id="{{activeStudentId}}" show-all="{{false}}" bindchange="switchChild" /></view>
-
-  <status-view
-    state="{{state}}"
-    title="{{state === 'loading' ? '加载孩子档案' : state === 'empty' ? '未绑定孩子' : '档案读取失败'}}"
-    message="{{message}}"
-    action-text="{{state === 'error' ? '重试' : ''}}"
-    bindaction="retry"
-  />
-
-  <view wx:if="{{studentHome}}">
-    <view class="profile-hero">
-      <view class="profile-hero__avatar">{{avatarLetter}}</view>
-      <view class="profile-hero__content"><view class="profile-hero__name">{{activeChild.name}}</view><view class="profile-hero__meta">{{teamLabel}}</view><view class="profile-hero__meta">教练 · {{coachLabel}}</view></view>
-      <status-chip label="{{activeChild.trainingStatus || '在训'}}" tone="success" compact="{{true}}" />
-    </view>
-
-    <view class="info-card">
-      <view class="info-card__head"><view><view class="section-title">孩子档案</view><view class="subtitle">{{updatedAtLabel}}</view></view><view class="info-card__icon">档</view></view>
-      <view wx:for="{{studentHome.profile}}" wx:key="label" class="field-row">
-        <view class="label">{{item.label}}</view>
-        <view class="field-value">{{item.value}}</view>
-      </view>
-    </view>
-
-    <view class="summary-grid">
-      <view class="summary-card summary-card--lesson" bindtap="openStatus"><view class="summary-card__label">课时状态</view><view wx:for="{{studentHome.lessonStatus}}" wx:key="label" class="summary-card__row"><view>{{item.label}}</view><view class="summary-card__value">{{item.value}}</view></view><view class="summary-card__more">查看课时与保障 ›</view></view>
-      <view class="summary-card summary-card--insurance" bindtap="openStatus"><view class="summary-card__label">保险状态</view><view wx:for="{{studentHome.insuranceStatus}}" wx:key="label" class="summary-card__row"><view>{{item.label}}</view><view class="summary-card__value">{{item.value}}</view></view><view class="summary-card__more">查看课时与保障 ›</view></view>
-    </view>
-
-    <view class="info-card">
-      <view class="info-card__head"><view><view class="section-title">课时与保险说明</view><view class="subtitle">如信息有误，请联系俱乐部核对</view></view><view class="info-card__icon">保</view></view>
-      <view wx:for="{{studentHome.lessonStatus}}" wx:key="label" class="field-row">
-        <view class="label">{{item.label}}</view>
-        <view class="field-value">{{item.value}}</view>
-      </view>
-      <view wx:for="{{studentHome.insuranceStatus}}" wx:key="label" class="field-row">
-        <view class="label">{{item.label}}</view>
-        <view class="field-value">{{item.value}}</view>
-      </view>
-      <view class="read-only-note">档案信息由俱乐部维护，家长端仅供查看。</view>
-    </view>
-
-    <view class="info-card">
-      <view class="info-card__head"><view><view class="section-title">俱乐部服务</view><view class="subtitle">训练与服务信息</view></view><view class="info-card__icon">俱</view></view>
-      <view wx:for="{{studentHome.clubInfo}}" wx:key="label" class="field-row">
-        <view class="label">{{item.label}}</view>
-        <view class="field-value">{{item.value}}</view>
-      </view>
-      <view class="field-row field-row--link" bindtap="openContent">
-        <view class="label">内容中心</view>
-        <view class="field-value field-value--link">场地、帮助与训练攻略 ›</view>
-      </view>
-      <view class="field-row field-row--link" bindtap="openPrivate">
-        <view class="label">私教预约</view>
-        <view class="field-value field-value--link">预约一对一私教课 ›</view>
-      </view>
-      <view class="field-row field-row--link" bindtap="openBinding">
-        <view class="label">账号绑定</view>
-        <view class="field-value field-value--link">学员绑定与家庭成员 ›</view>
-      </view>
-    </view>
-
+<view class="p7">
+  <!-- P7 Top Nav -->
+  <view class="p7-nav">
+    <view class="p7-nav__title">我的孩子</view>
   </view>
+
+  <view class="p7-body">
+    <student-switcher students="{{children}}" selected-id="{{activeStudentId}}" show-all="{{false}}" bindchange="switchChild" />
+
+    <status-view
+      state="{{state}}"
+      title="{{state === 'loading' ? '加载孩子档案' : state === 'empty' ? '未绑定孩子' : '档案读取失败'}}"
+      message="{{message}}"
+      action-text="{{state === 'error' ? '重试' : ''}}"
+      bindaction="retry"
+    />
+
+    <view wx:if="{{studentHome}}" class="p7-content">
+      <!-- P7 Player Card -->
+      <view class="pcard">
+        <view class="pcard__avatar">{{avatarLetter}}</view>
+        <view class="pcard__info">
+          <view class="pcard__name">{{activeChild.name}}</view>
+          <view class="pcard__team">{{teamLabel}}</view>
+        </view>
+      </view>
+
+      <!-- P7 Stats Row -->
+      <view class="pstats">
+        <view wx:for="{{heroStats}}" wx:key="label" class="pstats__item">
+          <view class="pstats__value {{index === 1 ? 'pstats__value--brand' : ''}}">{{item.value}}</view>
+          <view class="pstats__label">{{item.label}}</view>
+        </view>
+      </view>
+
+      <!-- P7 Quick Actions -->
+      <view class="pactions">
+        <view class="pactions__item" bindtap="openSchedule">
+          <view class="pactions__icon">📅</view>
+          <view class="pactions__label">训练日程</view>
+        </view>
+        <view class="pactions__item" bindtap="openGrowth">
+          <view class="pactions__icon">📊</view>
+          <view class="pactions__label">成长报告</view>
+        </view>
+        <view class="pactions__item" bindtap="openPrivate">
+          <view class="pactions__icon">⚡</view>
+          <view class="pactions__label">私教预约</view>
+        </view>
+        <view class="pactions__item" bindtap="openBinding">
+          <view class="pactions__icon">👤</view>
+          <view class="pactions__label">账号绑定</view>
+        </view>
+      </view>
+
+      <view class="info-card">
+        <view class="info-card__head"><view><view class="section-title">孩子档案</view><view class="subtitle">{{updatedAtLabel}}</view></view><view class="info-card__icon">档</view></view>
+        <view wx:for="{{studentHome.profile}}" wx:key="label" class="field-row">
+          <view class="label">{{item.label}}</view>
+          <view class="field-value">{{item.value}}</view>
+        </view>
+      </view>
+
+      <view class="summary-grid">
+        <view class="summary-card summary-card--lesson" bindtap="openStatus"><view class="summary-card__label">课时状态</view><view wx:for="{{studentHome.lessonStatus}}" wx:key="label" class="summary-card__row"><view>{{item.label}}</view><view class="summary-card__value">{{item.value}}</view></view><view class="summary-card__more">查看课时与保障 ›</view></view>
+        <view class="summary-card summary-card--insurance" bindtap="openStatus"><view class="summary-card__label">保险状态</view><view wx:for="{{studentHome.insuranceStatus}}" wx:key="label" class="summary-card__row"><view>{{item.label}}</view><view class="summary-card__value">{{item.value}}</view></view><view class="summary-card__more">查看课时与保障 ›</view></view>
+      </view>
+
+      <view class="info-card">
+        <view class="info-card__head"><view><view class="section-title">课时与保险说明</view><view class="subtitle">如信息有误，请联系俱乐部核对</view></view><view class="info-card__icon">保</view></view>
+        <view wx:for="{{studentHome.lessonStatus}}" wx:key="label" class="field-row">
+          <view class="label">{{item.label}}</view>
+          <view class="field-value">{{item.value}}</view>
+        </view>
+        <view wx:for="{{studentHome.insuranceStatus}}" wx:key="label" class="field-row">
+          <view class="label">{{item.label}}</view>
+          <view class="field-value">{{item.value}}</view>
+        </view>
+        <view class="read-only-note">档案信息由俱乐部维护，家长端仅供查看。</view>
+      </view>
+
+      <view class="info-card">
+        <view class="info-card__head"><view><view class="section-title">俱乐部服务</view><view class="subtitle">训练与服务信息</view></view><view class="info-card__icon">俱</view></view>
+        <view wx:for="{{studentHome.clubInfo}}" wx:key="label" class="field-row">
+          <view class="label">{{item.label}}</view>
+          <view class="field-value">{{item.value}}</view>
+        </view>
+        <view class="field-row field-row--link" bindtap="openContent">
+          <view class="label">内容中心</view>
+          <view class="field-value field-value--link">场地、帮助与训练攻略 ›</view>
+        </view>
+      </view>
+    </view>
   </view>
 
   <role-tabbar role="parent" active="child" />

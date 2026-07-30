@@ -23,6 +23,11 @@ Page({
     updatedAtLabel: "",
     latestLabel: "",
     trendLabel: "等待更多记录",
+    heroSurname: "",
+    heroName: "",
+    heroTeam: "",
+    heroChips: [] as Array<{ label: string; value: string }>,
+    heroStats: [] as Array<{ label: string; value: string }>,
   },
   onLoad() {
     this.load();
@@ -59,6 +64,11 @@ Page({
         updatedAtLabel: growth.updatedAt ? formatDateTime(growth.updatedAt) : "随训练和评测持续更新",
         latestLabel: "",
         trendLabel: "等待更多记录",
+        heroSurname: active.name.slice(0, 1),
+        heroName: active.name,
+        heroTeam: active.teams?.[0] ?? "重庆天才",
+        heroChips: growth.trainingHistory.slice(0, 2),
+        heroStats: buildHeroStats(growth.trainingHistory),
       });
       if (selectedMetric) await this.loadMetricDetail(selectedMetric.metricId);
     } catch (error) {
@@ -70,6 +80,15 @@ Page({
     if (!id || id === this.data.activeStudentId) return;
     setCurrentStudentId(id);
     this.load();
+  },
+  openSettings() {
+    openPage("/pages/parent/binding/index");
+  },
+  openMilestones() {
+    wx.showToast({ title: "成长足迹详情即将上线", icon: "none" });
+  },
+  openRadar() {
+    openPage("/pages/parent/radar/index");
   },
   onViewChange(event: { detail: { value: string | number } }) {
     const viewIndex = Number(event.detail.value);
@@ -132,6 +151,14 @@ function radarForView(growth: GrowthSummary, viewIndex: number) {
 function readableError(error: unknown) {
   const record = error as { message?: string; code?: string };
   return record?.message || record?.code || "成长数据读取失败。";
+}
+
+function buildHeroStats(history: Array<{ label: string; value: string }>) {
+  const stats = history.slice(0, 3).map((item) => ({ label: item.label, value: item.value }));
+  while (stats.length < 3) {
+    stats.push({ label: ["训练课时", "出勤率", "本月训练"][stats.length] ?? "统计", value: "–" });
+  }
+  return stats;
 }
 
 function metricTrend(detail: MetricDetail) {

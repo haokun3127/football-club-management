@@ -1,0 +1,84 @@
+# Figma 画板规格: P2.1 Match Detail
+
+- [4] | P2.1 Match Detail | 375x812 @(940,1020) | fill=#f6f7f9 | r=28 | layout=V
+  - [4] | Top Nav | 375x88 @(940,1020) | fill=#ffffff | stroke=#e7eaf0 w1 | layout=H pad=0/16
+    - [4] | Left | 80x24 @(956,1052) | layout=H
+      - [4] | arrow-left | 24x24 @(956,1052)
+        - [6] | Vector | 14x14 @(961,1057) | stroke=#202124 w2
+    - [4] | Center | 183x22 @(1036,1053) | layout=H
+      - [13] | 比赛详情 | 72x22 @(1092,1053) | fill=#202124 | font=Noto Sans SC/Bold 18px | text="比赛详情"
+    - [4] | Right | 80x17 @(1219,1056) | layout=H
+      - [13] | 邀请好友 | 56x17 @(1243,1056) | fill=#a80f1b | font=Noto Sans SC/Bold 14px | text="邀请好友"
+  - [4] | Content | 375x654 @(940,1108) | layout=V gap=16 pad=16/16
+    - [4] | Hero Scoreboard | 343x220 @(956,1124) | fill=#07111f | r=16 | layout=V gap=16 pad=20/20
+      - [4] | Match Meta | 303x51 @(976,1144) | layout=H
+        - [4] | Type & Name | 108x51 @(976,1144) | layout=V gap=8
+          - [4] | Chip | 42x21 @(976,1144) | fill=#a80f1b | r=999 | layout=H pad=4/10
+            - [13] | 比赛 | 22x13 @(986,1148) | fill=#ffffff | font=Noto Sans SC/Bold 11px | text="比赛"
+          - [13] | 周末联赛补赛 | 108x22 @(976,1173) | fill=#ffffff | font=Noto Sans SC/Bold 18px | text="周末联赛补赛"
+        - [4] | Date Venue | 91x36 @(1188,1152) | layout=V gap=4
+          - [13] | 6月28日 16:00 | 84x16 @(1195,1152) | fill=#ffffff | font=Noto Sans SC/Regular 13px | text="6月28日 16:00"
+          - [13] | 九龙坡足球公园 | 91x16 @(1188,1172) | fill=#ffffff | font=Noto Sans SC/Regular 13px | text="九龙坡足球公园"
+      - [4] | Score Row | 303x103 @(976,1211) | layout=H pad=8/0
+        - [4] | Team A | 56x78 @(976,1224) | layout=V gap=8
+          - [4] | Frame | 56x56 @(976,1224) | fill=#ffffff | r=28 | layout=V
+            - [13] | A | 12x22 @(998,1240) | fill=#07111f | font=Noto Sans SC/Black 18px | text="A"
+          - [13] | 天才队 | 36x14 @(986,1288) | fill=#ffffff | font=Noto Sans SC/Regular 12px | text="天才队"
+        - [4] | Center | 98x87 @(1078,1219) | layout=V gap=8
+          - [13] | 0 : 0 | 98x58 @(1078,1219) | fill=#ffffff | font=Noto Sans SC/Black 48px | text="0 : 0"
+          - [4] | Frame | 53x21 @(1101,1285) | fill=#f1f5f9 | r=999 | layout=H pad=4/10
+            - [13] | 未开始 | 33x13 @(1111,1289) | fill=#475569 | font=Noto Sans SC/Bold 11px | text="未开始"
+        - [4] | Team B | 56x78 @(1223,1224) | layout=V gap=8
+          - [4] | Frame | 56x56 @(1223,1224) | fill=#ffffff | r=28 | layout=V
+            - [13] | B | 13x22 @(1244,1240) | fill=#07111f | font=Noto Sans SC/Black 18px | text="B"
+          - [13] | 南岸红队 | 48x14 @(1227,1288) | fill=#ffffff | font=Noto Sans SC/Regular 12px | text="南岸红队"
+    - [4] | Attendance Roster | 343x201 @(956,1360) | fill=#ffffff | r=16 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+      - [4] | Header | 311x17 @(972,1376) | layout=H
+        - [13] | 出席名单 | 56x17 @(972,1376) | fill=#202124 | font=Noto Sans SC/Bold 14px | text="出席名单"
+        - [13] | 3人 | 21x16 @(1262,1376) | fill=#667085 | font=Noto Sans SC/Regular 13px | text="3人"
+      - [4] | List | 311x140 @(972,1405) | layout=V gap=10
+        - [4] | Row | 311x40 @(972,1405) | layout=H gap=12
+          - [4] | Frame | 40x40 @(972,1405) | fill=#3b82f6 | r=20 | layout=V
+            - [13] | 陈 | 14x17 @(985,1416) | fill=#ffffff | font=Noto Sans SC/Black 14px | text="陈"
+          - [13] | 陈小宇 | 42x17 @(1024,1416) | fill=#202124 | font=Noto Sans SC/Bold 14px | text="陈小宇"
+          - [4] | Frame | 140x1 @(1078,1424) | layout=H
+          - [4] | Frame | 53x21 @(1230,1414) | fill=#22c55e | r=999 | layout=H pad=4/10
+            - [13] | 已到场 | 33x13 @(1240,1418) | fill=#ffffff | font=Noto Sans SC/Bold 11px | text="已到场"
+        - [4] | Row | 311x40 @(972,1455) | layout=H gap=12
+          - [4] | Frame | 40x40 @(972,1455) | fill=#f59e0b | r=20 | layout=V
+            - [13] | 陈 | 14x17 @(985,1466) | fill=#ffffff | font=Noto Sans SC/Black 14px | text="陈"
+          - [13] | 陈一诺 | 42x17 @(1024,1466) | fill=#202124 | font=Noto Sans SC/Bold 14px | text="陈一诺"
+          - [4] | Frame | 140x1 @(1078,1474) | layout=H
+          - [4] | Frame | 53x21 @(1230,1464) | fill=#f59e0b | r=999 | layout=H pad=4/10
+            - [13] | 未确认 | 33x13 @(1240,1468) | fill=#ffffff | font=Noto Sans SC/Bold 11px | text="未确认"
+        - [4] | Row | 311x40 @(972,1505) | layout=H gap=12
+          - [4] | Frame | 40x40 @(972,1505) | fill=#a80f1b | r=20 | layout=V
+            - [13] | 陈 | 14x17 @(985,1516) | fill=#ffffff | font=Noto Sans SC/Black 14px | text="陈"
+          - [13] | 陈小宇 | 42x17 @(1024,1516) | fill=#202124 | font=Noto Sans SC/Bold 14px | text="陈小宇"
+          - [4] | Frame | 140x1 @(1078,1524) | layout=H
+          - [4] | Frame | 53x21 @(1230,1514) | fill=#22c55e | r=999 | layout=H pad=4/10
+            - [13] | 已到场 | 33x13 @(1240,1518) | fill=#ffffff | font=Noto Sans SC/Bold 11px | text="已到场"
+    - [4] | Frame | 343x100 @(956,1577)
+  - [4] | TabIconsOverlay | 375x70 @(940,1762) | fill=#ffffff
+    - [12] | Rectangle | 134x4 @(1060,1822) | fill=#000000@0.20 | r=2
+    - [4] | tab_0 | 125x56 @(940,1762)
+      - [4] | icon_0 | 22x22 @(992,1768)
+        - [6] | Vector | 17x16 @(994,1772) | stroke=#a80f1b w1.6
+        - [6] | Vector | 8x4 @(998,1770) | fill=#000000 | stroke=#a80f1b w1.6
+        - [6] | Vector | 17x0 @(994,1777) | fill=#000000 | stroke=#a80f1b w1.3
+        - [6] | Vector | 3x3 @(997,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1001,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(1005,1780) | fill=#a80f1b
+        - [6] | Vector | 3x3 @(997,1784) | fill=#a80f1b
+      - [13] | 日程 | 117x14 @(944,1793) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="日程"
+      - [9] | Ellipse | 4x4 @(1000,1810) | fill=#a80f1b
+    - [4] | tab_1 | 125x56 @(1065,1762)
+      - [4] | icon_1 | 22x22 @(1116,1768)
+        - [6] | Vector | 18x10 @(1118,1775) | stroke=#8e97a6 w1.8
+        - [6] | Vector | 4x4 @(1132,1773) | stroke=#8e97a6 w1.8
+      - [13] | 成长 | 117x14 @(1069,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="成长"
+    - [4] | tab_2 | 125x56 @(1190,1762)
+      - [4] | icon_2 | 22x22 @(1242,1768)
+        - [6] | Vector | 8x8 @(1248,1771) | stroke=#8e97a6 w1.6
+        - [6] | Vector | 16x8 @(1244,1780) | stroke=#8e97a6 w1.6
+      - [13] | 我的孩子 | 117x14 @(1194,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的孩子"

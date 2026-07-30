@@ -5,12 +5,19 @@ import type { ActivityDetail, LoadState } from "../../../utils/types";
 
 type ActivityDetailView = ActivityDetail & {
   typeLabel: string;
-  eyebrow: string;
-  subtitle: string;
+  navTitle: string;
   statusLabel: string;
   statusTone: string;
-  symbol: string;
+  coachName: string;
+  dateTimeText: string;
+  venueText: string;
+  homeTeam: string;
+  awayTeam: string;
+  scoreText: string;
+  attendanceConfirmed: boolean;
 };
+
+const NAV_TITLES = { training: "训练详情", match: "比赛详情", other: "活动详情" } as const;
 
 Page({
   data: {
@@ -37,19 +44,40 @@ Page({
       this.setData({ state: "error", message: readableError(error) });
     }
   },
+  goBack() {
+    wx.navigateBack();
+  },
+  inviteFriend() {
+    wx.showToast({ title: "邀请海报即将上线", icon: "none" });
+  },
   retry() {
     this.load(this.data.eventId);
   },
 });
 
+function fieldValue(detail: ActivityDetail, keywords: string[]) {
+  const hit = detail.fields.find((field) => keywords.some((keyword) => field.label.includes(keyword)));
+  return hit?.value ?? "";
+}
+
 function presentDetail(detail: ActivityDetail): ActivityDetailView {
   const status = activityStatus(detail.status);
-  const variants = {
-    training: { eyebrow: "TRAINING", subtitle: "训练内容、出勤与课后反馈", symbol: "训" },
-    match: { eyebrow: "MATCH DAY", subtitle: "赛前信息、比分与孩子表现", symbol: "赛" },
-    other: { eyebrow: "CLUB EVENT", subtitle: "活动说明、参与状态与通知", symbol: "活" },
-  } as const;
-  return { ...detail, typeLabel: activityTypeLabel(detail.type), statusLabel: status.label, statusTone: status.tone, ...variants[detail.type] };
+  const dateTime = [fieldValue(detail, ["时间", "日期"]), fieldValue(detail, ["时段"])].filter(Boolean).join(" · ");
+  const score = fieldValue(detail, ["比分"]);
+  return {
+    ...detail,
+    typeLabel: activityTypeLabel(detail.type),
+    navTitle: NAV_TITLES[detail.type] ?? "活动详情",
+    statusLabel: status.label,
+    statusTone: status.tone,
+    coachName: fieldValue(detail, ["教练"]),
+    dateTimeText: dateTime || "时间待确认",
+    venueText: fieldValue(detail, ["地点", "场地", "场馆"]) || "地点待确认",
+    homeTeam: fieldValue(detail, ["队伍", "主队"]) || "天才队",
+    awayTeam: fieldValue(detail, ["对手", "客队"]) || "对手待确认",
+    scoreText: score || "– : –",
+    attendanceConfirmed: ["已确认", "已结束"].includes(status.label),
+  };
 }
 
 function readableError(error: unknown) {
