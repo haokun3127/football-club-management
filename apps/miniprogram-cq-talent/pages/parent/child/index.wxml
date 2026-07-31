@@ -1,7 +1,6 @@
 <view class="p7">
   <view class="p7-nav" style="padding-top:{{navInset}}px"><view class="p7-nav__title">我的孩子</view></view>
   <view class="p7-body">
-    <student-switcher students="{{children}}" selected-id="{{activeStudentId}}" show-all="{{false}}" bindchange="switchChild" />
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载孩子档案' : state === 'empty' ? '未绑定孩子' : '档案读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <view wx:if="{{studentHome}}" class="p7-content">
       <!-- Figma P7 Parent Profile Hub: Player Card -->
@@ -10,10 +9,10 @@
       <view class="p7-stats"><view wx:for="{{heroStats}}" wx:key="label" class="p7-stat"><view class="p7-stat__value {{index === 1 ? 'p7-stat__value--brand' : ''}}">{{item.value}}</view><view class="p7-stat__label">{{item.label}}</view></view></view>
       <!-- Figma P7 Parent Profile Hub: Quick Actions -->
       <view class="p7-actions">
-        <view class="p7-action" bindtap="openSchedule"><view class="p7-action__icon">日</view><view>训练日程</view></view>
-        <view class="p7-action" bindtap="openGrowth"><view class="p7-action__icon">长</view><view>成长报告</view></view>
-        <view class="p7-action" bindtap="openRadar"><view class="p7-action__icon">体</view><view>体能数据</view></view>
-        <view class="p7-action" bindtap="openCoach"><view class="p7-action__icon">联</view><view>联系教练</view></view>
+        <view class="p7-action" bindtap="openSchedule"><view class="p7-action__icon p7-action__icon--calendar"><view></view></view><view>训练日程</view></view>
+        <view class="p7-action" bindtap="openGrowth"><view class="p7-action__icon p7-action__icon--chart"><view></view></view><view>成长报告</view></view>
+        <view class="p7-action" bindtap="openRadar"><view class="p7-action__icon p7-action__icon--bolt"><view></view></view><view>体能数据</view></view>
+        <view class="p7-action" bindtap="openCoach"><view class="p7-action__icon p7-action__icon--message"><view></view></view><view>联系教练</view></view>
       </view>
       <!-- Figma P7 Parent Profile Hub: Recent Activity -->
       <view class="p7-card"><view class="p7-card__title">最近动态</view>

@@ -1,11 +1,10 @@
 <view class="p4">
   <view class="p4-nav" style="padding-top:{{navInset}}px">
     <view class="p4-nav__title">成长</view>
-    <view class="p4-nav__settings" bindtap="openSettings">⚙</view>
+    <view class="p4-nav__settings" bindtap="openSettings"><view class="p4-nav__settings-core"></view></view>
   </view>
 
   <view class="p4-body">
-    <student-switcher students="{{children}}" selected-id="{{activeStudentId}}" show-all="{{false}}" bindchange="switchChild" />
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载成长数据' : state === 'empty' ? '成长数据不足' : '成长数据读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
     <view wx:if="{{growth}}" class="p4-content">
@@ -46,12 +45,9 @@
       <!-- Figma P4 Ability Radar Card: dark surface -->
       <view class="p4-radar" bindtap="openRadar">
         <view class="p4-card__head"><view><view class="p4-radar__title">能力雷达</view><view class="p4-radar__sub">6维度综合评估</view></view><view class="p4-radar__action">进入详情 ›</view></view>
-        <radar-canvas wx:if="{{canDrawRadar}}" metrics="{{radar}}" selectedMetricId="{{selectedMetricId}}" bindmetrictap="selectMetric"></radar-canvas>
+        <radar-canvas wx:if="{{canDrawRadar}}" dark="{{true}}" metrics="{{radar}}" selectedMetricId="{{selectedMetricId}}" bindmetrictap="selectMetric"></radar-canvas>
         <view wx:else class="p4-radar__empty">指标正在积累</view>
       </view>
-
-      <scroll-view scroll-x class="metric-scroll" enhanced show-scrollbar="{{false}}"><view class="metric-chips"><view wx:for="{{radar}}" wx:key="metricId" class="metric-chip {{selectedMetricId === item.metricId ? 'active' : ''}}" data-id="{{item.metricId}}" bindtap="selectMetric"><view class="metric-chip__dot"></view>{{item.label}}</view></view></scroll-view>
-      <view wx:if="{{selectedMetric}}" class="metric-summary"><view class="row"><view><view class="section-title">{{selectedMetric.label}}</view><view class="subtitle">满分 {{selectedMetric.maxValue}}</view></view><view class="metric-value">{{selectedMetric.value}}</view></view><button class="ghost-button" bindtap="openMetricDetail">查看完整详情</button></view>
     </view>
   </view>
   <role-tabbar role="parent" active="growth" />

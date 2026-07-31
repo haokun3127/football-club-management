@@ -155,11 +155,20 @@ function readableError(error: unknown) {
 }
 
 function buildHeroStats(history: Array<{ label: string; value: string }>) {
-  const stats = history.slice(0, 3).map((item) => ({ label: item.label, value: clampStatValue(item.value) }));
-  while (stats.length < 3) {
-    stats.push({ label: ["训练课时", "出勤率", "本月训练"][stats.length] ?? "统计", value: "暂无" });
+  const values = history.map((item) => `${item.label} ${item.value}`);
+  return [
+    { label: "训练课时", value: extractShortMetric(values, /(\d+(?:\.\d+)?)\s*(?:课时|课|节)/) },
+    { label: "出勤率", value: extractShortMetric(values, /(\d+(?:\.\d+)?)\s*%/, "%") },
+    { label: "本月训练", value: extractShortMetric(values, /本月[^\d]*(\d+(?:\.\d+)?)\s*(?:课|节)?/) },
+  ];
+}
+
+function extractShortMetric(values: string[], pattern: RegExp, suffix = "") {
+  for (const value of values) {
+    const match = value.match(pattern);
+    if (match?.[1]) return `${match[1]}${suffix}`;
   }
-  return stats;
+  return "—";
 }
 
 function clampStatValue(value: string) {

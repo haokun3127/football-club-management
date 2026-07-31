@@ -99,17 +99,29 @@ Page({
 });
 
 function buildHeroStats(home: StudentHome) {
-  const stats = home.lessonStatus.slice(0, 3).map((item) => ({ label: item.label, value: clampStatValue(item.value) }));
-  while (stats.length < 3) {
-    stats.push({ label: ["训练课时", "出勤率", "在队时长"][stats.length] ?? "统计", value: "暂无" });
-  }
-  return stats;
+  const lessonText = home.lessonStatus.map((item) => `${item.label} ${item.value}`);
+  const profileText = home.profile.map((item) => `${item.label} ${item.value}`);
+  return [
+    { label: "训练课时", value: extractHomeMetric(lessonText, /(\d+(?:\.\d+)?)\s*(?:课时|课|节)/) },
+    { label: "出勤率", value: extractHomeMetric(lessonText, /(\d+(?:\.\d+)?)\s*%/, "%") },
+    { label: "在队时长", value: extractDuration(profileText) },
+  ];
 }
 
-function clampStatValue(value: string) {
-  const text = (value || "").trim();
-  if (!text) return "暂无";
-  return text.length > 8 ? `${text.slice(0, 7)}…` : text;
+function extractHomeMetric(values: string[], pattern: RegExp, suffix = "") {
+  for (const value of values) {
+    const match = value.match(pattern);
+    if (match?.[1]) return `${match[1]}${suffix}`;
+  }
+  return "—";
+}
+
+function extractDuration(values: string[]) {
+  for (const value of values) {
+    const match = value.match(/(\d+年(?:\d+个月)?|\d+个月)/);
+    if (match?.[1]) return match[1];
+  }
+  return "—";
 }
 
 function buildRecentActivities(home: StudentHome) {
