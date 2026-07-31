@@ -103,3 +103,10 @@
 .p2-nav { box-sizing: border-box; }
 /* Figma Top Nav is 375x88 (176rpx): safe area is inside this envelope. */
 .p2-nav { height: 176rpx; }
+
+/* Figma P2/P2.1/P2.2 type-specific content */
+.dcard--notice { border: 1rpx solid #e7eaf0; background: #f8fafc; }
+.detail-subtitle { margin-top: 4rpx; color: #667085; font-size: 24rpx; font-weight: 600; }
+.ability-chips { display: flex; flex-wrap: wrap; gap: 12rpx; }.ability-chip { padding: 8rpx 16rpx; border-radius: 8rpx; background: #fceeef; color: #a80f1b; font-size: 22rpx; font-weight: 600; }
+.roster-empty { padding: 24rpx; border-radius: 16rpx; background: #f6f7f9; color: #667085; font-size: 24rpx; line-height: 1.6; }
+.person-row { display: flex; align-items: center; gap: 16rpx; color: #202124; font-size: 26rpx; }.person-row__avatar { display: flex; align-items: center; justify-content: center; width: 56rpx; height: 56rpx; border-radius: 28rpx; background: #a80f1b; color: #ffffff; font-size: 24rpx; font-weight: 700; }.person-row__state { margin-left: auto; padding: 6rpx 14rpx; border-radius: 8rpx; background: #ecfdf5; color: #10b981; font-size: 20rpx; font-weight: 600; }

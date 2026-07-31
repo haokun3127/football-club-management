@@ -52,7 +52,23 @@
       </view>
     </view>
 
-    <!-- 基本信息卡 -->
+    <!-- P2 Training: content, ability chips, offline confirmation -->
+    <view wx:if="{{detail && detail.type === 'training'}}" class="dcard">
+      <view class="dcard__title">本次训练</view>
+      <view class="dcard__text">{{detail.trainingSummary}}</view>
+      <view class="detail-subtitle">关联能力</view>
+      <view class="ability-chips"><view wx:for="{{detail.abilityChips}}" wx:key="*this" class="ability-chip">{{item}}</view></view>
+    </view>
+    <view wx:if="{{detail && detail.type === 'training'}}" class="dcard dcard--notice"><view class="dcard__title">线下到场确认</view><view class="dcard__text">到场状态由教练在训练结束后确认。</view></view>
+
+    <!-- P2.1 Match: dedicated attendance roster -->
+    <view wx:if="{{detail && detail.type === 'match'}}" class="dcard"><view class="dcard__head"><view class="dcard__title">出席名单</view><view class="dcard__label">数据待同步</view></view><view class="roster-empty">暂未获取比赛出席名单，名单同步后将在这里展示。</view></view>
+
+    <!-- P2.2 Other: description, participants, coach and confirmation -->
+    <view wx:if="{{detail && detail.type === 'other'}}" class="dcard"><view class="dcard__title">活动说明</view><view class="dcard__text">{{detail.otherDescription}}</view><view class="detail-subtitle">参与孩子</view><view class="person-row"><view class="person-row__avatar">{{detail.childInitial}}</view><view>{{detail.childName}}</view><view class="person-row__state">已报名</view></view><view class="detail-subtitle">负责教练</view><view class="person-row"><view class="person-row__avatar">教</view><view>{{detail.coachName || '教练待同步'}}</view></view></view>
+    <view wx:if="{{detail && detail.type === 'other'}}" class="dcard dcard--notice"><view class="dcard__title">线下到场确认</view><view class="dcard__text">活动参与状态将由俱乐部在活动结束后同步。</view></view>
+
+    <!-- Supporting fields retained below the designed type-specific modules -->
     <view wx:if="{{detail}}" class="dcard">
       <view class="dcard__head">
         <view class="dcard__title">基本信息</view>

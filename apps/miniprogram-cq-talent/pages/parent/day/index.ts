@@ -14,6 +14,7 @@ interface DayEventView {
   statusLabel: string;
   statusBg: string;
   statusColor: string;
+  coachLabel: string;
 }
 
 interface PageData {
@@ -67,6 +68,9 @@ Page<PageData>({
   retry() {
     this.load(this.data.date || today());
   },
+  openFilter() {
+    wx.showToast({ title: "筛选条件待同步", icon: "none" });
+  },
   openEvent(event: { currentTarget: { dataset: { id: string } } }) {
     openPage(`/pages/parent/event/index?id=${event.currentTarget.dataset.id}`);
   },
@@ -84,6 +88,7 @@ function presentEvent(event: ScheduleEvent): DayEventView {
     statusLabel: status.label,
     statusBg: status.bg,
     statusColor: status.color,
+    coachLabel: "待同步",
   };
 }
 

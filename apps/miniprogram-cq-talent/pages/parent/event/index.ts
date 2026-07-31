@@ -15,6 +15,11 @@ type ActivityDetailView = ActivityDetail & {
   awayTeam: string;
   scoreText: string;
   attendanceConfirmed: boolean;
+  trainingSummary: string;
+  abilityChips: string[];
+  otherDescription: string;
+  childName: string;
+  childInitial: string;
 };
 
 const NAV_TITLES = { training: "训练详情", match: "比赛详情", other: "活动详情" } as const;
@@ -78,7 +83,20 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
     awayTeam: fieldValue(detail, ["对手", "客队"]) || "对手待确认",
     scoreText: score || "– : –",
     attendanceConfirmed: ["已确认", "已结束"].includes(status.label),
+    trainingSummary: fieldValue(detail, ["训练内容", "训练说明", "内容"]) || detail.sections[0]?.items.map((item) => item.value).join("；") || "训练内容待同步",
+    abilityChips: collectAbilityChips(detail),
+    otherDescription: fieldValue(detail, ["活动说明", "描述", "注意事项"]) || detail.sections[0]?.items.map((item) => item.value).join("；") || "活动说明待同步",
+    childName: fieldValue(detail, ["孩子", "学员"]) || "孩子待同步",
+    childInitial: (fieldValue(detail, ["孩子", "学员"]) || "学").slice(0, 1),
   };
+}
+
+function collectAbilityChips(detail: ActivityDetail) {
+  const values = detail.sections
+    .filter((section) => section.title.includes("能力") || section.title.includes("目标"))
+    .flatMap((section) => section.items.map((item) => item.label || item.value))
+    .filter(Boolean);
+  return values.length ? values.slice(0, 4) : ["能力数据待同步"];
 }
 
 function readableError(error: unknown) {
