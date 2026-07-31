@@ -19,31 +19,19 @@
     </view>
   </view>
 
-  <!-- C1 Stats Row -->
+  <!-- C1 Figma Stats Row -->
   <view class="c1-stats">
-    <view class="c1-pill c1-pill--brand">📅 {{statTraining}}</view>
-    <view class="c1-pill c1-pill--green">⚽ {{statMatches}}</view>
-    <view class="c1-pill c1-pill--amber">⚠️ 待处理{{statPending}}</view>
+    <view class="c1-pill c1-pill--brand">今日{{statTraining}}</view>
+    <view class="c1-pill c1-pill--green">出席数据待同步</view>
+    <view class="c1-pill c1-pill--amber">待处理{{statPending}}</view>
   </view>
 
   <view class="c1-body">
-    <view class="c1-tools">
-      <view class="view-switch">
-        <view class="switch-item {{viewMode === 'day' ? 'active' : ''}}" data-mode="day" bindtap="switchView">今日</view>
-        <view class="switch-item {{viewMode === 'week' ? 'active' : ''}}" data-mode="week" bindtap="switchView">本周</view>
-      </view>
-      <picker mode="date" value="{{date}}" bindchange="onDateChange">
-        <view class="c1-tools__picker">{{rangeLabel}} ⌄</view>
-      </picker>
-    </view>
+    <picker mode="date" value="{{date}}" bindchange="onDateChange">
+      <view class="c1-tools__picker">{{rangeLabel}}</view>
+    </picker>
 
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载任务' : state === 'empty' ? '暂无活动' : '任务读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
-
-    <view wx:if="{{home}}" class="c1-scope">负责队伍 · {{teamsText}}</view>
-
-    <view wx:if="{{home}}" class="filter-row">
-      <view wx:for="{{filters}}" wx:key="value" class="filter-item {{activeFilter === item.value ? 'active' : ''}}" data-filter="{{item.value}}" bindtap="switchFilter">{{item.label}}</view>
-    </view>
 
     <!-- C1 Activity Cards -->
     <view wx:if="{{state === 'ready'}}" class="c1-list">

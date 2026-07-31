@@ -1,77 +1,13 @@
 <view class="c16">
-  <!-- C16 TopBar（粉底） -->
-  <view class="c16-bar" style="padding-top:{{navInset}}px">
-    <view class="c16-bar__title">我的</view>
-    <view class="c16-bar__settings" bindtap="openAccount">⚙</view>
-  </view>
-<view class="page coach-me c16-body">
-  <!-- C16 profile-hero -->
-  <view class="c16-hero">
-    <view class="c16-hero__avatar">{{avatarLetter}}</view>
-    <view class="c16-hero__info">
-      <view class="c16-hero__name">{{displayName}}</view>
-      <view class="c16-hero__meta">重庆天才足球俱乐部</view>
-      <view wx:if="{{home}}" class="c16-hero__teams">负责 {{home.teams.length}} 支球队</view>
+  <view class="c16-bar" style="padding-top:{{navInset}}px"><view class="c16-bar__title">我的</view><view class="c16-bar__settings" bindtap="openAccount">设置</view></view>
+  <view class="c16-body">
+    <status-view state="{{state}}" title="{{state === 'loading' ? '加载教练身份' : '教练身份读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <view wx:if="{{home}}" class="c16-content">
+      <!-- Figma C16 profile hero -->
+      <view class="c16-profile"><view class="c16-profile__top"><view class="c16-profile__avatar">{{avatarLetter}}</view><view><view class="c16-profile__name">{{displayName}}</view><view class="c16-profile__badge">主教练</view><view class="c16-profile__team">{{teamsText}}</view></view></view><view class="c16-profile__stats"><view><view>本赛季执教</view><view class="c16-profile__number">{{home.events.length}}</view></view><view><view>在队学员</view><view class="c16-profile__number">{{home.teams.length}}</view></view><view><view>平均出勤</view><view class="c16-profile__number">数据待同步</view></view></view></view>
+      <!-- Figma C16 menu -->
+      <view class="c16-menu"><view class="c16-menu__item" bindtap="openPermissions"><view class="c16-menu__icon">权</view><view>权限范围</view><view class="c16-menu__arrow">›</view></view><view class="c16-menu__item" bindtap="openPrivateInterest"><view class="c16-menu__icon">私</view><view>私教兴趣</view><view class="c16-menu__arrow">›</view></view><view class="c16-menu__item" bindtap="openAccount"><view class="c16-menu__icon">账</view><view>账号设置</view><view class="c16-menu__arrow">›</view></view><view class="c16-menu__item" bindtap="openHelp"><view class="c16-menu__icon">帮</view><view>帮助中心</view><view class="c16-menu__arrow">›</view></view></view>
     </view>
   </view>
-
-  <status-view
-    state="{{state}}"
-    title="{{state === 'loading' ? '加载教练身份' : '教练身份读取失败'}}"
-    message="{{message}}"
-    action-text="{{state === 'error' ? '重试' : ''}}"
-    bindaction="retry"
-  />
-
-  <view wx:if="{{home}}" class="card scope-card">
-    <view class="section-title">负责球队</view><view class="tag">{{home.teams.length}} 支</view>
-    <view class="subtitle scope-card__teams">{{teamsText}}</view>
-    <view class="field-row field-row--link" bindtap="openTeam">
-      <view class="label">队伍详情</view>
-      <view class="field-value field-value--link">在队人数、累计训练与出勤 ›</view>
-    </view>
-    <view class="field-row field-row--link" bindtap="openStudentRadar">
-      <view class="label">学员雷达</view>
-      <view class="field-value field-value--link">单个学员能力雷达 ›</view>
-    </view>
-    <view class="field-row field-row--link" bindtap="openTeamAbility">
-      <view class="label">团队能力总览</view>
-      <view class="field-value field-value--link">队均雷达与维度统计 ›</view>
-    </view>
-    <view class="field-row field-row--link" bindtap="openTestTasks">
-      <view class="label">测评任务</view>
-      <view class="field-value field-value--link">任务进度与评估录入 ›</view>
-    </view>
-    <view class="field-row field-row--link" bindtap="openPermissions">
-      <view class="label">权限范围</view>
-      <view class="field-value field-value--link">管理员分配的功能权限 ›</view>
-    </view>
-    <view class="field-row field-row--link" bindtap="openPrivateInterest">
-      <view class="label">私教兴趣</view>
-      <view class="field-value field-value--link">预约开关与可用时段 ›</view>
-    </view>
-    <view class="field-row field-row--link" bindtap="openAccount">
-      <view class="label">账号设置</view>
-      <view class="field-value field-value--link">资料 / 手机号 / 退出 ›</view>
-    </view>
-    <view class="field-row field-row--link" bindtap="openHelp">
-      <view class="label">帮助中心</view>
-      <view class="field-value field-value--link">使用指南与常见问题 ›</view>
-    </view>
-  </view>
-
-  <view class="card permission-card">
-    <view class="section-title">权限范围</view>
-    <view class="field-row"><view class="label">可读</view><view class="field-value">负责活动、球队、学员训练交付数据</view></view>
-    <view class="field-row"><view class="label">可操作</view><view class="field-value">负责活动的点名、销课、比赛、训练内容和评测</view></view>
-    <view class="field-row"><view class="label">不可见</view><view class="field-value">收费、保险审核和俱乐部运营配置</view></view>
-  </view>
-
-  <view class="card service-card">
-    <view class="section-title">工作说明</view>
-    <view class="subtitle">这里只展示当前账号已获得的教练工作权限。如需调整负责队伍，请联系俱乐部管理员。</view>
-  </view>
-
   <role-tabbar role="coach" active="me" />
-</view>
 </view>

@@ -11,9 +11,9 @@
   <view class="c4-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '正在读取名单' : state === 'empty' ? '暂无学员' : '名单读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重新加载' : ''}}" bindaction="retry" />
 
-    <!-- C4.2 家长异议警示卡 -->
+    <!-- C4.2 Parent dispute correction state: do not mix normal C4 controls -->
     <view wx:if="{{correctionMode && workbench}}" class="correction-alert">
-      <view class="correction-alert__icon">⚠</view>
+      <view class="correction-alert__icon">!</view>
       <view class="correction-alert__texts">
         <view class="correction-alert__title">出勤记录需要修改</view>
         <view class="correction-alert__text">家长对出勤记录提出异议，请核实后重新提交（共 {{disputedCount}} 条异常）</view>
@@ -32,7 +32,7 @@
     </view>
 
     <!-- C4 Quick Actions -->
-    <view wx:if="{{workbench && workbench.roster.length}}" class="c4-actions">
+    <view wx:if="{{workbench && workbench.roster.length && !correctionMode}}" class="c4-actions">
       <view class="c4-action c4-action--green" bindtap="markAllPresent">全员到场</view>
       <view class="c4-action c4-action--outline" bindtap="clearAll">清空</view>
     </view>
@@ -50,5 +50,5 @@
       </view>
     </view>
   </view>
-  <submit-bar wx:if="{{workbench && workbench.roster.length}}" primary-text="保存点名" hint="保存失败时，本页填写内容会保留" loading="{{saving}}" bindsubmit="saveAttendance" />
+  <submit-bar wx:if="{{workbench && workbench.roster.length}}" primary-text="{{correctionMode ? '重新提交' : '保存点名'}}" hint="保存失败时，本页填写内容会保留" loading="{{saving}}" bindsubmit="saveAttendance" />
 </view>
