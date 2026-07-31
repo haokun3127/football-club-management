@@ -76,6 +76,17 @@ function weekday(year: number, month: number, day: number) {
   return WEEKDAYS[new Date(Date.UTC(year, month - 1, day)).getUTCDay()] ?? "";
 }
 
+export function resolveMenuInset() {
+  try {
+    const windowInfo = (wx as unknown as { getWindowInfo?: () => { windowWidth?: number } }).getWindowInfo?.();
+    const menu = wx.getMenuButtonBoundingClientRect?.();
+    if (menu && windowInfo?.windowWidth) return Math.max(16, windowInfo.windowWidth - menu.left + 8);
+  } catch (_error) {
+    // Use the Figma-safe fallback when the platform API is unavailable.
+  }
+  return 16;
+}
+
 /** navigationStyle:custom 页面的顶部安全区（状态栏高度，px） */
 export function resolveNavInset() {
   try {

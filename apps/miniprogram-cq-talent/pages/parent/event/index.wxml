@@ -1,6 +1,6 @@
 <view class="p2">
   <!-- P2/P2.1/P2.2 Nav：返回 + 标题 + 右侧动作 -->
-  <view class="p2-nav" style="padding-top:{{navInset}}px">
+  <view class="p2-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="p2-nav__back" bindtap="goBack">‹</view>
     <view class="p2-nav__title">{{detail ? detail.navTitle : '活动详情'}}</view>
     <view wx:if="{{detail && detail.type === 'match'}}" class="p2-nav__action" bindtap="inviteFriend">邀请好友</view>

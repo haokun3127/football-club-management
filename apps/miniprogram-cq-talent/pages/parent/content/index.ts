@@ -1,6 +1,7 @@
 import { getContentArticles } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
+import { resolveMenuInset } from "../../../utils/presentation";
 import type { ContentArticle } from "../../../utils/types";
 
 interface Category {
@@ -43,6 +44,7 @@ const QUICK_LINKS: QuickLink[] = [
 
 Page<PageData>({
   data: {
+    menuInset: resolveMenuInset(),
     categories: CATEGORIES,
     activeCategory: "all",
 

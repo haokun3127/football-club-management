@@ -1,7 +1,7 @@
 <view class="p1">
   <view class="p1-nav" style="padding-top:{{navInset}}px">
     <view class="p1-nav__title">日程</view>
-    <view class="p1-nav__bell" bindtap="openReminders">
+    <view class="p1-nav__bell" style="right:{{menuInset}}px;top:{{navActionTop}}px" bindtap="openReminders">
       <view class="p1-nav__bell-shape"><view class="p1-nav__bell-clapper"></view></view>
       <view wx:if="{{hasUnreadReminders}}" class="p1-nav__bell-dot"></view>
     </view>
@@ -30,7 +30,7 @@
     </view>
 
     <view class="chips">
-      <view class="chip chip--red">今日{{todayCount}}节</view>
+      <view class="chip chip--red">{{selectedCountLabel}}</view>
       <view class="chip chip--green">出席待同步</view>
       <view class="chip chip--yellow">待处理{{unreadCount}}</view>
     </view>

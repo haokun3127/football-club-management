@@ -1,6 +1,6 @@
 <view class="c2">
   <!-- C2 Top Nav -->
-  <view class="c2-nav" style="padding-top:{{navInset}}px">
+  <view class="c2-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="c2-nav__left" bindtap="goBack">
       <view class="c2-nav__back">‹</view>
       <view class="c2-nav__title">{{eventTypeLabel}}工作台</view>

@@ -1,7 +1,7 @@
 <view class="content-page">
   <view class="page-nav page-nav--plain">
     <view class="page-nav__title">内容中心</view>
-    <view class="page-nav__action" bindtap="openSearch" aria-label="搜索"><view class="icon-search"></view></view>
+    <view class="page-nav__action" style="margin-right:{{menuInset}}px" bindtap="openSearch" aria-label="搜索"><view class="icon-search"></view></view>
   </view>
   <view class="content-page__body">
 

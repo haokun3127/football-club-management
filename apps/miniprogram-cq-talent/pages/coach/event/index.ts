@@ -1,7 +1,7 @@
 import { getCoachWorkbench } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import { activityStatus, activityTypeLabel, formatCalendarDate, formatTimeRange, resolveNavInset } from "../../../utils/presentation";
+import { activityStatus, activityTypeLabel, formatCalendarDate, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
 
 type RosterPreview = CoachWorkbench["roster"][number] & { statusLabel: string };
@@ -11,6 +11,7 @@ type RosterDot = { studentId: string; initial: string; present: boolean };
 Page({
   data: {
     navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     state: "loading" as LoadState,
     message: "正在读取活动工作台",
     workbench: null as CoachWorkbench | null,

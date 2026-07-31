@@ -1,13 +1,14 @@
 import { getParentChildren, getParentGrowth, getParentMetricDetail } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import { formatDateTime, resolveNavInset } from "../../../utils/presentation";
+import { formatDateTime, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { setCurrentStudentId } from "../../../utils/store";
 import type { GrowthSummary, LoadState, MetricDetail, RadarMetricPoint, StudentSummary } from "../../../utils/types";
 
 Page({
   data: {
     navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     state: "loading" as LoadState,
     message: "正在读取成长数据",
     children: [] as StudentSummary[],

@@ -1,5 +1,5 @@
 <view class="p4">
-  <view class="p4-nav" style="padding-top:{{navInset}}px">
+  <view class="p4-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="p4-nav__title">成长</view>
     <view class="p4-nav__settings" bindtap="openSettings"><view class="p4-nav__settings-core"></view></view>
   </view>

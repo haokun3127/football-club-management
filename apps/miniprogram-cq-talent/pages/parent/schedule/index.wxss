@@ -1,7 +1,7 @@
 .p1 { min-height: 100vh; background: #f5f6f8; }
-.p1-nav { display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; height: 176rpx; padding: 24rpx 32rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0,0,0,.03); }
+.p1-nav { position: relative; display: flex; align-items: center; box-sizing: border-box; height: 176rpx; padding: 24rpx 32rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0,0,0,.03); }
 .p1-nav__title { color: #0d0d0d; font-size: 44rpx; font-weight: 700; }
-.p1-nav__bell { position: relative; display: flex; align-items: center; justify-content: center; width: 64rpx; height: 64rpx; }
+.p1-nav__bell { position: absolute; display: flex; align-items: center; justify-content: center; width: 64rpx; height: 64rpx; }
 .p1-nav__bell-shape { position: relative; width: 30rpx; height: 32rpx; border: 4rpx solid #0d0d0d; border-top-left-radius: 18rpx; border-top-right-radius: 18rpx; border-bottom: 0; }
 .p1-nav__bell-shape::after { position: absolute; right: -8rpx; bottom: -4rpx; left: -8rpx; height: 4rpx; border-radius: 4rpx; background: #0d0d0d; content: ""; }
 .p1-nav__bell-clapper { position: absolute; bottom: -12rpx; left: 9rpx; width: 10rpx; height: 6rpx; border-radius: 0 0 10rpx 10rpx; background: #0d0d0d; }

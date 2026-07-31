@@ -2,7 +2,7 @@ import { getParentCalendar, getParentChildren, getParentReminders } from "../../
 import { requireRole } from "../../../utils/auth";
 import { DEV_MODE, DEV_TEST_DATE } from "../../../utils/config";
 import { openPage } from "../../../utils/navigation";
-import { activityStatus, childNames, formatCalendarDate, formatTimeRange, resolveNavInset } from "../../../utils/presentation";
+import { activityStatus, childNames, formatCalendarDate, formatShortDate, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { countUnreadReminders } from "../../../utils/reminders";
 import { setCurrentStudentId } from "../../../utils/store";
 import type { LoadState, ScheduleEvent, StudentSummary } from "../../../utils/types";
@@ -48,6 +48,9 @@ interface PageData {
   hasUnreadReminders: boolean;
   unreadCount: number;
   todayLabel: string;
+  selectedCountLabel: string;
+  menuInset: number;
+  navActionTop: number;
   todayCount: number;
   weekCount: number;
   weekHours: string;
@@ -66,6 +69,8 @@ const initialDate = DEV_MODE ? DEV_TEST_DATE : currentLocalDate();
 Page<PageData>({
   data: {
     navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
+    navActionTop: resolveNavInset() + 12,
     state: "loading",
     message: "正在读取家庭日程",
     children: [],
@@ -81,6 +86,7 @@ Page<PageData>({
     hasUnreadReminders: false,
     unreadCount: 0,
     todayLabel: "",
+    selectedCountLabel: "",
     todayCount: 0,
     weekCount: 0,
     weekHours: "0",
@@ -127,6 +133,7 @@ Page<PageData>({
         selectedDateLabel: formatCalendarDate(this.data.selectedDate),
         dateOptions: buildDateOptions(this.data.selectedDate, events),
         todayLabel: digest.todayLabel,
+        selectedCountLabel: selectedCountLabel(this.data.selectedDate, digest.todayCount),
         todayCount: digest.todayCount,
         weekCount: digest.weekCount,
         weekHours: digest.weekHours,
@@ -158,7 +165,17 @@ Page<PageData>({
   selectDate(event: { currentTarget: { dataset: { date?: string } } }) {
     const date = event.currentTarget.dataset.date;
     if (!date || date === this.data.selectedDate) return;
-    this.setData({ selectedDate: date, selectedDateLabel: formatCalendarDate(date) });
+    const digest = buildScheduleDigest(filterEvents(this.data.events, this.data.activeStudentId, "", "all"), date);
+    this.setData({
+      selectedDate: date,
+      selectedDateLabel: formatCalendarDate(date),
+      todayLabel: digest.todayLabel,
+      selectedCountLabel: selectedCountLabel(date, digest.todayCount),
+      todayCount: digest.todayCount,
+      weekCount: digest.weekCount,
+      weekHours: digest.weekHours,
+      hero: digest.hero,
+    });
     this.applyFilters();
   },
   switchType(event: { currentTarget: { dataset: { type?: PageData["selectedType"] } } }) {
@@ -251,6 +268,11 @@ function durationLabel(startsAt?: string, endsAt?: string) {
   const end = Date.parse(endsAt ?? "");
   if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return "时长待确认";
   return `${Math.round((end - start) / 60000)}分钟`;
+}
+
+function selectedCountLabel(date: string, count: number) {
+  const selected = formatShortDate(date);
+  return date === currentLocalDate() ? `今日${count}节` : `${selected}${count}节`;
 }
 
 function buildScheduleDigest(events: ScheduleEvent[], selectedDate: string) {
