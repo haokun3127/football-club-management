@@ -29,10 +29,10 @@
         <view class="radar-hero__head">
           <view class="radar-hero__title">{{activeStudentName}}能力雷达</view>
         </view>
-        <radar-canvas metrics="{{radar}}"></radar-canvas>
+        <radar-canvas dark="{{true}}" metrics="{{radar}}"></radar-canvas>
         <view class="radar-hero__overall">{{overall}}</view>
       </view>
     </block>
   </view>
-  <role-tabbar role="coach" active="me" />
+  <role-tabbar role="coach" active="training" />
 </view>

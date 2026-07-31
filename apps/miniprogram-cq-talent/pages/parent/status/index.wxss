@@ -4,8 +4,12 @@
 }
 
 .status-page__body {
-  padding: 24rpx var(--space-page) 180rpx;
+  padding: 32rpx 32rpx 180rpx;
 }
+
+.page-nav { height: 176rpx; box-sizing: border-box; display: flex; align-items: center; padding: 64rpx 32rpx 0; background: var(--color-card); }
+.page-nav__back { width: 48rpx; font-size: 40rpx; color: var(--color-text-secondary); }
+.page-nav__title { margin-left: 24rpx; font-size: 36rpx; font-weight: 700; color: var(--color-text); }
 
 /* 课时统计卡（Figma P7.1: 白底 r16, pad 24px, shadow 0,4,12,.05） */
 .lesson-card {

@@ -44,6 +44,7 @@ Page<PageData>({
   retry() {
     this.load();
   },
+  goBack() { wx.navigateBack(); },
   switchChild(event: { currentTarget: { dataset: { id: string } } }) {
     const id = event.currentTarget.dataset.id;
     wx.setStorageSync("activeStudentId", id);

@@ -19,13 +19,13 @@ interface QuickLink {
 interface PageData {
   categories: Category[];
   activeCategory: string;
-  featured: { category: string; title: string; subtitle: string };
+
   quickLinks: QuickLink[];
   articles: ContentArticle[];
   visibleArticles: ContentArticle[];
 }
 
-// Figma P8 Content Center 设计内容（静态，待后端内容服务接入后替换为 API 数据）
+
 const CATEGORIES: Category[] = [
   { label: "全部", value: "all" },
   { label: "场地", value: "venue" },
@@ -35,17 +35,17 @@ const CATEGORIES: Category[] = [
 ];
 
 const QUICK_LINKS: QuickLink[] = [
-  { icon: "📍", color: "#1976d2", label: "场地信息", category: "venue", page: "/pages/parent/venues/index" },
-  { icon: "❓", color: "#ff9800", label: "帮助中心", category: "help", page: "/pages/parent/help/index" },
-  { icon: "👥", color: "#22c55e", label: "教练团队", category: "coach", page: "/pages/parent/coaches/index" },
-  { icon: "📖", color: "#a80f1b", label: "训练攻略", category: "guide" },
+  { icon: "场", color: "#2068d8", label: "场地信息", category: "venue", page: "/pages/parent/venues/index" },
+  { icon: "问", color: "#b06800", label: "帮助中心", category: "help", page: "/pages/parent/help/index" },
+  { icon: "教", color: "#188050", label: "教练团队", category: "coach", page: "/pages/parent/coaches/index" },
+  { icon: "训", color: "#a80818", label: "训练攻略", category: "guide" },
 ];
 
 Page<PageData>({
   data: {
     categories: CATEGORIES,
     activeCategory: "all",
-    featured: { category: "场地", title: "球场预订指南", subtitle: "了解各场地设施与预订流程" },
+
     quickLinks: QUICK_LINKS,
     articles: [],
     visibleArticles: [],

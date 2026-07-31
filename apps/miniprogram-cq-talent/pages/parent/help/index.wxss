@@ -4,8 +4,13 @@
 }
 
 .help-page__body {
-  padding: 24rpx var(--space-page) 180rpx;
+  padding: 32rpx 32rpx 180rpx;
 }
+
+.page-nav { height: 176rpx; box-sizing: border-box; display: flex; align-items: center; padding: 64rpx 32rpx 0; background: var(--color-card); }
+.page-nav__back, .page-nav__more { width: 48rpx; font-size: 40rpx; color: var(--color-text-secondary); text-align: center; }
+.page-nav__title { margin-left: 24rpx; flex: 1; font-size: 36rpx; font-weight: 700; color: var(--color-text); }
+.page-nav__more { font-size: 28rpx; letter-spacing: 4rpx; }
 
 /* 搜索栏 */
 .search-bar {

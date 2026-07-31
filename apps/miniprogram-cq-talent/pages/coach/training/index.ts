@@ -76,6 +76,11 @@ Page({
     this.setData({ eventIndex, requestedEventId: selectedEvent.id });
     await this.load();
   },
+  async selectSession(event: { currentTarget: { dataset: { index?: string | number } } }) {
+    const index = Number(event.currentTarget.dataset.index);
+    if (!Number.isFinite(index)) return;
+    await this.onEventChange({ detail: { value: index } });
+  },
   openTestEntry() {
     const eventId = this.data.workbench?.event.id || "";
     const templateId = this.data.workbench?.assessmentTemplateId || "";

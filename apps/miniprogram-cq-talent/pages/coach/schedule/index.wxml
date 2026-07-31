@@ -1,11 +1,9 @@
 <view class="c1">
-  <!-- C1 Top Nav -->
   <view class="c1-nav" style="padding-top:{{navInset}}px">
     <view class="c1-nav__title">日程</view>
     <view class="c1-nav__avatar" bindtap="openMe">{{coachInitial}}</view>
   </view>
 
-  <!-- C1 Date Strip -->
   <view class="c1-dates">
     <view
       wx:for="{{dayStrip}}"
@@ -19,21 +17,28 @@
     </view>
   </view>
 
-  <!-- C1 Figma Stats Row -->
   <view class="c1-stats">
-    <view class="c1-pill c1-pill--brand">今日{{statTraining}}</view>
-    <view class="c1-pill c1-pill--green">出席数据待同步</view>
+    <view class="c1-pill c1-pill--brand">{{statTraining}}</view>
+    <view class="c1-pill c1-pill--green">{{statMatches}}</view>
     <view class="c1-pill c1-pill--amber">待处理{{statPending}}</view>
   </view>
 
   <view class="c1-body">
-    <picker mode="date" value="{{date}}" bindchange="onDateChange">
-      <view class="c1-tools__picker">{{rangeLabel}}</view>
-    </picker>
+    <view class="c1-list-heading">
+      <view class="c1-list-heading__title">{{viewMode === 'week' ? '本周日程' : '今日安排'}}</view>
+      <view class="c1-list-heading__tools">
+        <view class="view-switch">
+          <view class="switch-item {{viewMode === 'day' ? 'active' : ''}}" data-mode="day" bindtap="switchView">日</view>
+          <view class="switch-item {{viewMode === 'week' ? 'active' : ''}}" data-mode="week" bindtap="switchView">周</view>
+        </view>
+        <picker mode="date" value="{{date}}" bindchange="onDateChange">
+          <view class="c1-tools__picker">{{rangeLabel}}</view>
+        </picker>
+      </view>
+    </view>
 
-    <status-view state="{{state}}" title="{{state === 'loading' ? '加载任务' : state === 'empty' ? '暂无活动' : '任务读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <status-view state="{{state}}" title="{{state === 'loading' ? '加载日程' : state === 'empty' ? '暂无活动' : '日程读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
-    <!-- C1 Activity Cards -->
     <view wx:if="{{state === 'ready'}}" class="c1-list">
       <view wx:for="{{visibleEvents}}" wx:key="id" class="acard" data-id="{{item.id}}" bindtap="openEvent">
         <view class="acard__accent" style="background:{{item.typeColor}}"></view>
@@ -44,13 +49,16 @@
         <view class="acard__content">
           <view class="acard__head">
             <view class="acard__title">{{item.title}}</view>
-            <view class="acard__pill pill--{{item.statusTone}}">{{item.statusLabel}}</view>
+            <view class="acard__coach">{{coachInitial}}教练</view>
           </view>
           <view class="acard__meta">{{item.teamName || '队伍待确认'}} · {{item.venue || '地点待确认'}}</view>
-          <view wx:if="{{item.nextAction && item.nextAction !== 'view'}}" class="acard__action" catchtap="openTask" data-id="{{item.id}}" data-action="{{item.nextAction}}">{{item.nextActionLabel}} ›</view>
+        </view>
+        <view class="acard__right">
+          <view class="acard__pill pill--{{item.statusTone}}">{{item.statusLabel}}</view>
+          <view class="acard__chevron">›</view>
         </view>
       </view>
-      <view wx:if="{{!visibleEvents.length}}" class="card empty">当前筛选下没有任务</view>
+      <view wx:if="{{!visibleEvents.length}}" class="c1-empty">当前筛选下没有任务</view>
     </view>
   </view>
 

@@ -1,5 +1,5 @@
 <view class="success-page">
-  <app-header title="预约成功" show-back />
+  <view class="page-nav"><view class="page-nav__back" bindtap="goBack">‹</view><view class="page-nav__title">预约成功</view></view>
   <view class="success-page__body">
     <!-- 绿色对勾（Figma: 100px #22c55e 圆 + 白色 check + 绿色投影） -->
     <view class="check-circle">

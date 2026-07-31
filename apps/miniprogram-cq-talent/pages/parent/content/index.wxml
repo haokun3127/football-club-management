@@ -1,7 +1,10 @@
 <view class="content-page">
-  <app-header title="内容中心" subtitle="场地、帮助与训练攻略" action-icon="🔍" bindaction="openSearch" />
+  <view class="page-nav page-nav--plain">
+    <view class="page-nav__title">内容中心</view>
+    <view class="page-nav__action" bindtap="openSearch" aria-label="搜索"><view class="icon-search"></view></view>
+  </view>
   <view class="content-page__body">
-    <!-- 分类导航（Figma: 16px Bold 标题 + 32px 胶囊 pills） -->
+
     <view class="section-title">分类导航</view>
     <scroll-view scroll-x class="pills" enhanced show-scrollbar="{{false}}">
       <view class="pills__inner">
@@ -15,14 +18,7 @@
       </view>
     </scroll-view>
 
-    <!-- 精选卡片（Figma: 品牌渐变 r16 + 分类 chip + 18px 标题） -->
-    <view class="featured" bindtap="openArticle">
-      <view class="featured__chip">{{featured.category}}</view>
-      <view class="featured__title">{{featured.title}}</view>
-      <view class="featured__subtitle">{{featured.subtitle}}</view>
-    </view>
 
-    <!-- 快速入口（Figma: 2x2 网格，40px 圆形图标 + 13px Bold 标签） -->
     <view class="section-title">快速入口</view>
     <view class="quick-grid">
       <view
@@ -37,7 +33,7 @@
       </view>
     </view>
 
-    <!-- 最近文章（Figma: 白卡 r12 + 4px 彩色 accent 条） -->
+
     <view class="section-title">最近文章</view>
     <view class="article-list">
       <view wx:for="{{visibleArticles}}" wx:key="id" class="article-card" bindtap="openArticle">
@@ -48,7 +44,7 @@
         </view>
         <view class="article-card__chevron">›</view>
       </view>
-      <view wx:if="{{!visibleArticles.length}}" class="article-empty">该分类暂无内容</view>
+      <view wx:if="{{!visibleArticles.length}}" class="article-empty">内容待同步</view>
     </view>
   </view>
   <role-tabbar role="parent" active="child" />

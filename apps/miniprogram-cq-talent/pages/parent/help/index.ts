@@ -56,6 +56,7 @@ Page<PageData>({
     });
   },
   contactWechat() {
-    wx.showToast({ title: "请添加俱乐部微信客服", icon: "none" });
+    wx.showToast({ title: "客服信息待同步", icon: "none" });
   },
+  goBack() { wx.navigateBack(); },
 });

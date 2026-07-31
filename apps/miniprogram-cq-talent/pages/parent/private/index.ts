@@ -67,6 +67,7 @@ Page<PageData>({
   retry() {
     this.load("");
   },
+  goBack() { wx.navigateBack(); },
   selectCoach(event: { detail: { value: string } }) {
     this.setData({ coachIndex: Number(event.detail.value) });
   },

@@ -3,7 +3,7 @@
   <view class="help-page__body">
     <!-- 搜索（Figma C16.4: 白底 r22） -->
     <view class="search-bar">
-      <text class="search-bar__icon">🔍</text>
+      <text class="search-bar__icon">搜</text>
       <input class="search-bar__input" placeholder="搜索使用指南" value="{{searchText}}" bindinput="onSearchInput" />
     </view>
 
@@ -12,7 +12,7 @@
     <view class="topic-grid">
       <block wx:for="{{topics}}" wx:key="key">
         <view
-          wx:if="{{!searchText || item.label.indexOf(searchText) >= 0 || item.answer.indexOf(searchText) >= 0}}"
+          wx:if="{{item.matchesSearch}}"
           class="topic-card {{openKey === item.key ? 'topic-card--open' : ''}}"
           data-key="{{item.key}}"
           bindtap="toggleTopic"

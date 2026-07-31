@@ -1,5 +1,5 @@
 <view class="binding-page">
-  <app-header title="账号绑定" show-back />
+  <view class="page-nav"><view class="page-nav__back" bindtap="goBack">‹</view><view class="page-nav__title">账号绑定</view></view>
   <view class="binding-page__body">
     <status-view
       state="{{state}}"

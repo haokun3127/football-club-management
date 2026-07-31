@@ -1,5 +1,5 @@
 <view class="status-page">
-  <app-header title="课时与保障" subtitle="{{activeStudentName}}" show-back />
+  <view class="page-nav"><view class="page-nav__back" bindtap="goBack">‹</view><view class="page-nav__title">课时与保障</view></view>
   <view class="status-page__body">
     <status-view
       state="{{state}}"

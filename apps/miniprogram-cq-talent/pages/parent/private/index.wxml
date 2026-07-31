@@ -1,5 +1,5 @@
 <view class="private-page">
-  <app-header title="私教预约" subtitle="{{studentName}}" show-back />
+  <view class="page-nav"><view class="page-nav__back" bindtap="goBack">‹</view><view class="page-nav__title">私教预约</view></view>
   <view class="private-page__body">
     <status-view
       state="{{state}}"
@@ -72,13 +72,12 @@
         </view>
       </view>
 
-      <!-- 费用说明（Figma: 预计费用 + 已包含在课时包 绿 chip） -->
       <view class="price-card">
         <view class="price-card__row">
           <view class="price-card__label">预计费用</view>
-          <view class="price-card__value">按实际到场收取</view>
+          <view class="price-card__value">待同步</view>
         </view>
-        <view class="price-card__chip">已包含在课时包</view>
+        <view class="price-card__chip">费用信息待同步</view>
       </view>
     </block>
   </view>

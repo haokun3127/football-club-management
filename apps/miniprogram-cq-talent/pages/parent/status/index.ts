@@ -74,6 +74,7 @@ Page<PageData>({
   retry() {
     this.load("");
   },
+  goBack() { wx.navigateBack(); },
   render(student: StudentSummary, home: StudentHome, events: ScheduleEvent[], today: Date) {
     const pastTrainings = events
       .filter((event) => event.type === "training" && new Date(event.startsAt).getTime() <= today.getTime())

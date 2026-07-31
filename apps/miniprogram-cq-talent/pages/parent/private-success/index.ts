@@ -17,7 +17,7 @@ Page<PageData>({
   onLoad(query: { coach?: string; date?: string; slot?: string; goals?: string }) {
     requireRole("parent");
     this.setData({
-      coach: query.coach || "教练",
+      coach: query.coach || "待同步",
       date: query.date || "",
       slot: query.slot || "",
       goals: query.goals || "",
@@ -29,4 +29,5 @@ Page<PageData>({
   backToChild() {
     wx.navigateBack({ delta: 2 });
   },
+  goBack() { wx.navigateBack(); },
 });

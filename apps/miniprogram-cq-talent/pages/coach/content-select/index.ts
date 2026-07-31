@@ -16,6 +16,7 @@ interface PageData {
   categories: string[];
   activeCategory: string;
   projects: ProjectCard[];
+  visibleProjects: ProjectCard[];
   selectedMap: Record<string, boolean>;
   selectedCount: number;
   submitting: boolean;
@@ -27,6 +28,15 @@ const DIFFICULTY_LABELS: Record<string, string> = {
   advanced: "高级",
 };
 
+function filterProjects(projects: ProjectCard[], category: string, searchText: string) {
+  const query = searchText.trim().toLowerCase();
+  return projects.filter((project) => {
+    const categoryMatches = category === "全部" || project.tags.includes(category);
+    const searchMatches = !query || project.name.toLowerCase().includes(query);
+    return categoryMatches && searchMatches;
+  });
+}
+
 Page<PageData>({
   data: {
     state: "idle",
@@ -36,6 +46,7 @@ Page<PageData>({
     categories: ["全部"],
     activeCategory: "全部",
     projects: [],
+    visibleProjects: [],
     selectedMap: {},
     selectedCount: 0,
     submitting: false,
@@ -70,6 +81,7 @@ Page<PageData>({
         message: uniqueProjects.length ? "" : "当前还没有可选训练项目。",
         categories,
         projects: uniqueProjects,
+        visibleProjects: uniqueProjects,
       });
     } catch (error) {
       this.setData({ state: "error", message: error instanceof Error ? error.message : "训练项目读取失败，请稍后重试。" });
@@ -79,10 +91,12 @@ Page<PageData>({
     this.load(this.data.eventId);
   },
   onSearchInput(event: { detail: { value: string } }) {
-    this.setData({ searchText: event.detail.value });
+    const searchText = event.detail.value;
+    this.setData({ searchText, visibleProjects: filterProjects(this.data.projects, this.data.activeCategory, searchText) });
   },
   selectCategory(event: { currentTarget: { dataset: { name: string } } }) {
-    this.setData({ activeCategory: event.currentTarget.dataset.name });
+    const activeCategory = event.currentTarget.dataset.name;
+    this.setData({ activeCategory, visibleProjects: filterProjects(this.data.projects, activeCategory, this.data.searchText) });
   },
   toggleProject(event: { currentTarget: { dataset: { id: string } } }) {
     const id = event.currentTarget.dataset.id;

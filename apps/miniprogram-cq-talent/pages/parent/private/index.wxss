@@ -4,8 +4,12 @@
 }
 
 .private-page__body {
-  padding: 24rpx var(--space-page) 260rpx;
+  padding: 32rpx 44rpx 260rpx;
 }
+
+.page-nav { height: 176rpx; box-sizing: border-box; display: flex; align-items: center; padding: 64rpx 44rpx 0; background: var(--color-card); }
+.page-nav__back { width: 48rpx; font-size: 40rpx; color: var(--color-text-secondary); }
+.page-nav__title { margin-left: 24rpx; font-size: 36rpx; font-weight: 700; color: var(--color-text); }
 
 /* 表单卡 */
 .form-card {
@@ -138,7 +142,7 @@
   right: 0;
   bottom: 0;
   background: var(--color-card);
-  padding: 32rpx var(--space-page) calc(32rpx + env(safe-area-inset-bottom));
+  padding: 32rpx 44rpx calc(32rpx + env(safe-area-inset-bottom));
   box-shadow: 0 -8rpx 24rpx rgba(0, 0, 0, 0.05);
 }
 
