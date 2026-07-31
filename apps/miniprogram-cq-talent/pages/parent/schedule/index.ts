@@ -44,7 +44,7 @@ interface PageData {
   selectedDateLabel: string;
   selectedType: "all" | ScheduleEvent["type"];
   typeTabs: Array<{ label: string; value: "all" | ScheduleEvent["type"] }>;
-  dateOptions: Array<{ date: string; day: string; weekday: string; count: number }>;
+  dateOptions: Array<{ date: string; day: string; weekday: string; weekShort: string; dayNumber: string; count: number }>;
   hasUnreadReminders: boolean;
   unreadCount: number;
   todayLabel: string;
@@ -115,7 +115,7 @@ Page<PageData>({
       const active = children.find((child) => child.id === this.data.activeStudentId);
       const childEvents = filterEvents(events, this.data.activeStudentId, "", "all");
       const visibleEvents = presentEvents(filterEvents(events, this.data.activeStudentId, this.data.selectedDate, this.data.selectedType));
-      const digest = buildScheduleDigest(childEvents);
+      const digest = buildScheduleDigest(childEvents, this.data.selectedDate);
       this.setData({
         state: visibleEvents.length ? "ready" : "empty",
         message: visibleEvents.length ? "" : "当前筛选条件暂无活动安排。",
@@ -140,7 +140,7 @@ Page<PageData>({
     const id = event.detail.studentId === "all" ? "" : event.detail.studentId;
     const child = this.data.children.find((item: StudentSummary) => item.id === id);
     if (id) setCurrentStudentId(id);
-    const digest = buildScheduleDigest(filterEvents(this.data.events, id, "", "all"));
+    const digest = buildScheduleDigest(filterEvents(this.data.events, id, "", "all"), this.data.selectedDate);
     this.setData({
       activeStudentId: id,
       activeStudentName: child?.name ?? "全部孩子",
@@ -209,6 +209,8 @@ function buildDateOptions(start: string, events: ScheduleEvent[]) {
       date: key,
       day: `${date.getUTCMonth() + 1}/${date.getUTCDate()}`,
       weekday: ["日", "一", "二", "三", "四", "五", "六"][date.getUTCDay()],
+      weekShort: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][date.getUTCDay()] ?? "",
+      dayNumber: String(date.getUTCDate()),
       count: events.filter((event) => event.startsAt.slice(0, 10) === key).length,
     };
   });
@@ -251,11 +253,10 @@ function durationLabel(startsAt?: string, endsAt?: string) {
   return `${Math.round((end - start) / 60000)}分钟`;
 }
 
-function buildScheduleDigest(events: ScheduleEvent[]) {
-  const now = new Date();
-  const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
-  const todayKey = localNow.toISOString().slice(0, 10);
-  const weekStart = new Date(`${todayKey}T00:00:00.000Z`);
+function buildScheduleDigest(events: ScheduleEvent[], selectedDate: string) {
+  const selected = new Date(`${selectedDate || initialDate}T00:00:00.000Z`);
+  const selectedKey = selected.toISOString().slice(0, 10);
+  const weekStart = new Date(selected);
   weekStart.setUTCDate(weekStart.getUTCDate() - ((weekStart.getUTCDay() + 6) % 7));
   const weekEnd = new Date(weekStart);
   weekEnd.setUTCDate(weekEnd.getUTCDate() + 7);
@@ -268,12 +269,12 @@ function buildScheduleDigest(events: ScheduleEvent[]) {
     return total + (Number.isFinite(span) && span > 0 ? span : 0);
   }, 0) / 60000;
   const upcoming = events
-    .filter((event) => Date.parse(event.endsAt || event.startsAt) >= now.getTime() && event.status !== "cancelled")
+    .filter((event) => event.startsAt.slice(0, 10) === selectedKey && event.status !== "cancelled")
     .sort((left, right) => Date.parse(left.startsAt) - Date.parse(right.startsAt))[0];
   const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
   return {
-    todayLabel: `${localNow.getUTCFullYear()}年${localNow.getUTCMonth() + 1}月${localNow.getUTCDate()}日 周${weekdays[localNow.getUTCDay()]}`,
-    todayCount: events.filter((event) => event.startsAt.slice(0, 10) === todayKey).length,
+    todayLabel: `${selected.getUTCFullYear()}年${selected.getUTCMonth() + 1}月${selected.getUTCDate()}日 周${weekdays[selected.getUTCDay()]}`,
+    todayCount: events.filter((event) => event.startsAt.slice(0, 10) === selectedKey).length,
     weekCount: weekEvents.length,
     weekHours: (Math.round(weekMinutes / 6) / 10).toString(),
     hero: upcoming

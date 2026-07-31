@@ -1,100 +1,47 @@
 <view class="p1">
-  <!-- P1 Top Nav：22px 标题 + 铃铛红点 -->
   <view class="p1-nav" style="padding-top:{{navInset}}px">
     <view class="p1-nav__title">日程</view>
     <view class="p1-nav__bell" bindtap="openReminders">
-      <text class="p1-nav__bell-icon">🔔</text>
+      <view class="p1-nav__bell-shape"><view class="p1-nav__bell-clapper"></view></view>
       <view wx:if="{{hasUnreadReminders}}" class="p1-nav__bell-dot"></view>
     </view>
   </view>
 
   <view class="p1-body">
-    <student-switcher students="{{children}}" selected-id="{{activeStudentId || 'all'}}" show-all="{{true}}" bindchange="onChildChange" />
+    <status-view state="{{state}}" title="{{state === 'loading' ? '加载日程' : state === 'empty' ? '暂无活动' : '日程读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
-    <!-- P1 Hero Card：下一场活动 -->
     <view wx:if="{{hero}}" class="hero" data-id="{{hero.id}}" bindtap="openEvent">
       <view class="hero__glow"></view>
-      <view class="hero__top">
-        <text>{{todayLabel}}</text>
-        <text>重庆天才</text>
-      </view>
-      <view class="hero__time-row">
-        <text class="hero__time">{{hero.timeText}}</text>
-        <text class="hero__title">{{hero.title}}</text>
-      </view>
-      <view class="hero__meta">{{hero.teamName || '队伍待确认'}} · {{hero.venue || '场地待确认'}}</view>
+      <view class="hero__top"><text>{{todayLabel}}</text><text>重庆天才</text></view>
+      <view class="hero__time-row"><text class="hero__time">{{hero.timeText}}</text><text class="hero__title">{{hero.title}}</text></view>
+      <view class="hero__meta">{{hero.teamName || '队伍待同步'}} · {{hero.venue || '场地待同步'}}</view>
       <view class="hero__stats">
-        <view class="hero__pill hero__pill--brand">
-          <text class="hero__pill-value">{{weekCount}}节</text>
-          <text class="hero__pill-label">本周课次</text>
-        </view>
-        <view class="hero__pill">
-          <text class="hero__pill-value">{{weekHours}}h</text>
-          <text class="hero__pill-label">本周训练</text>
-        </view>
-        <view class="hero__pill">
-          <text class="hero__pill-value">{{todayCount}}节</text>
-          <text class="hero__pill-label">今日</text>
-        </view>
+        <view class="hero__pill hero__pill--brand"><text class="hero__pill-value">—</text><text class="hero__pill-label">出席率</text></view>
+        <view class="hero__pill"><text class="hero__pill-value">{{weekHours}}h</text><text class="hero__pill-label">本周训练</text></view>
+        <view class="hero__pill"><text class="hero__pill-value">{{weekCount}}节</text><text class="hero__pill-label">本周课次</text></view>
       </view>
     </view>
 
-    <!-- P1 Pending Chips -->
+    <view class="week-nav">
+      <view wx:for="{{dateOptions}}" wx:key="date" class="week-day {{selectedDate === item.date ? 'week-day--active' : ''}}" data-date="{{item.date}}" bindtap="selectDate">
+        <view class="week-day__name">{{item.weekShort}}</view>
+        <view class="week-day__number">{{item.dayNumber}}</view>
+      </view>
+    </view>
+
     <view class="chips">
       <view class="chip chip--red">今日{{todayCount}}节</view>
-      <view wx:if="{{unreadCount > 0}}" class="chip chip--yellow">待处理{{unreadCount}}</view>
-      <view class="chip chip--green">本周{{weekCount}}节</view>
+      <view class="chip chip--green">出席待同步</view>
+      <view class="chip chip--yellow">待处理{{unreadCount}}</view>
     </view>
 
-    <!-- 日期 + 类型筛选（保留功能） -->
-    <view class="calendar-panel">
-      <view class="calendar-panel__row">
-        <view>
-          <view class="calendar-panel__date">{{selectedDateLabel}}</view>
-          <view class="calendar-panel__sub">{{activeStudentName}} · 当天 {{visibleEvents.length}} 项安排</view>
-        </view>
-        <picker mode="date" value="{{selectedDate}}" bindchange="onDateChange"><view class="calendar-button">选择日期</view></picker>
-        <view class="calendar-button calendar-button--link" bindtap="openDay">列表 ›</view>
-      </view>
-      <scroll-view scroll-x class="date-strip" enhanced show-scrollbar="{{false}}">
-        <view class="date-strip-inner">
-          <view wx:for="{{dateOptions}}" wx:key="date" class="date-chip {{selectedDate === item.date ? 'active' : ''}}" data-date="{{item.date}}" bindtap="selectDate">
-            <view class="date-weekday">周{{item.weekday}}</view>
-            <view>{{item.day}}</view>
-            <view class="date-count">{{item.count ? item.count + '项' : '无安排'}}</view>
-          </view>
-        </view>
-      </scroll-view>
-      <view class="type-tabs">
-        <view
-          wx:for="{{typeTabs}}"
-          wx:key="value"
-          class="type-tab {{selectedType === item.value ? 'active' : ''}}"
-          data-type="{{item.value}}"
-          bindtap="switchType"
-        >{{item.label}}</view>
-      </view>
-    </view>
-
-    <status-view
-      state="{{state}}"
-      title="{{state === 'loading' ? '加载日程' : state === 'empty' ? '暂无活动' : '日程读取失败'}}"
-      message="{{message}}"
-      action-text="{{state === 'error' ? '重试' : ''}}"
-      bindaction="retry"
-    />
-
-    <!-- P1 Activity List：4px 色条卡片 -->
     <view wx:if="{{state === 'ready'}}" class="event-list">
       <view wx:for="{{visibleEvents}}" wx:key="id" class="acard" data-id="{{item.id}}" bindtap="openEvent">
         <view class="acard__bar" style="background:{{item.typeColor}}"></view>
         <view class="acard__main">
-          <view class="acard__row">
-            <text class="acard__title">{{item.title}}</text>
-            <view class="acard__pill pill--{{item.statusTone}}">{{item.statusLabel}}</view>
-          </view>
-          <view class="acard__line">{{item.timeLabel}} · {{item.teamName || '队伍待确认'}} · {{item.venue || '场地待确认'}}</view>
-          <view class="acard__dur">🕐 {{item.durationText}} · {{item.childNames}}</view>
+          <view class="acard__row"><text class="acard__title">{{item.title}}</text><view class="acard__pill pill--{{item.statusTone}}">{{item.statusLabel}}</view></view>
+          <view class="acard__line">{{item.timeLabel}} · {{item.teamName || '队伍待同步'}} · {{item.venue || '场地待同步'}}</view>
+          <view class="acard__dur"><view class="acard__clock"></view>{{item.durationText}}</view>
         </view>
         <view class="acard__chevron">›</view>
       </view>
