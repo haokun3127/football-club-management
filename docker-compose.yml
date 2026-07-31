@@ -1,0 +1,53 @@
+services:
+  data-init:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cq-talent-api:latest
+    user: "0:0"
+    command: ["sh", "-c", "mkdir -p /var/lib/cq-talent && chown -R node:node /var/lib/cq-talent"]
+    volumes:
+      - cq-talent-api-data:/var/lib/cq-talent
+    networks:
+      - cq-talent-api-net
+    restart: "no"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cq-talent-api:latest
+    container_name: cq-talent-api
+    restart: unless-stopped
+    depends_on:
+      data-init:
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      DATABASE_URL: /var/lib/cq-talent/api.sqlite
+      FCM_CQ_TALENT_ACCEPTANCE_SEED: "1"
+    ports:
+      - "3000:3000"
+    volumes:
+      - cq-talent-api-data:/var/lib/cq-talent
+    networks:
+      - cq-talent-api-net
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+networks:
+  cq-talent-api-net:
+    name: cq-talent-api-net
+    internal: true
+
+volumes:
+  cq-talent-api-data:
+    name: cq-talent-api-data
