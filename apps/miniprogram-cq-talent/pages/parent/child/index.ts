@@ -2,7 +2,7 @@ import { getParentChildren, getParentStudentHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { formatDateTime, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
-import { clearSession, setCurrentStudentId } from "../../../utils/store";
+import { setCurrentStudentId } from "../../../utils/store";
 import type { LoadState, StudentHome, StudentSummary } from "../../../utils/types";
 
 Page({
@@ -97,16 +97,8 @@ Page({
   openCoach() {
     openPage("/pages/parent/coaches/index");
   },
-  signOut() {
-    wx.showModal({
-      title: "退出登录",
-      content: "退出后需要重新授权手机号才能进入小程序。",
-      success: (result) => {
-        if (!result.confirm) return;
-        clearSession();
-        wx.reLaunch({ url: "/pages/login/index" });
-      },
-    });
+  openAccount() {
+    openPage("/pages/parent/account/index");
   },
 });
 

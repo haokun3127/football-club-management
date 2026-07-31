@@ -1,5 +1,5 @@
 <view class="p7">
-  <view class="p7-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="p7-nav__title">我的孩子</view><view class="p7-nav__signout" bindtap="signOut">退出</view></view>
+  <view class="p7-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="p7-nav__title">我的孩子</view><view class="p7-nav__signout" bindtap="openAccount">设置</view></view>
   <view class="p7-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载孩子档案' : state === 'empty' ? '未绑定孩子' : '档案读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <view wx:if="{{studentHome}}" class="p7-content">
