@@ -1,97 +1,26 @@
 <view class="p7">
-  <!-- P7 Top Nav -->
-  <view class="p7-nav" style="padding-top:{{navInset}}px">
-    <view class="p7-nav__title">我的孩子</view>
-  </view>
-
+  <view class="p7-nav" style="padding-top:{{navInset}}px"><view class="p7-nav__title">我的孩子</view></view>
   <view class="p7-body">
     <student-switcher students="{{children}}" selected-id="{{activeStudentId}}" show-all="{{false}}" bindchange="switchChild" />
-
-    <status-view
-      state="{{state}}"
-      title="{{state === 'loading' ? '加载孩子档案' : state === 'empty' ? '未绑定孩子' : '档案读取失败'}}"
-      message="{{message}}"
-      action-text="{{state === 'error' ? '重试' : ''}}"
-      bindaction="retry"
-    />
-
+    <status-view state="{{state}}" title="{{state === 'loading' ? '加载孩子档案' : state === 'empty' ? '未绑定孩子' : '档案读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <view wx:if="{{studentHome}}" class="p7-content">
-      <!-- P7 Player Card -->
-      <view class="pcard">
-        <view class="pcard__avatar">{{avatarLetter}}</view>
-        <view class="pcard__info">
-          <view class="pcard__name">{{activeChild.name}}</view>
-          <view class="pcard__team">{{teamLabel}}</view>
-        </view>
+      <!-- Figma P7 Parent Profile Hub: Player Card -->
+      <view class="p7-player"><view class="p7-player__avatar">{{avatarLetter}}</view><view><view class="p7-player__name">{{activeChild.name}}</view><view class="p7-player__team">{{teamLabel}}</view></view></view>
+      <!-- Figma P7 Parent Profile Hub: Stats Row -->
+      <view class="p7-stats"><view wx:for="{{heroStats}}" wx:key="label" class="p7-stat"><view class="p7-stat__value {{index === 1 ? 'p7-stat__value--brand' : ''}}">{{item.value}}</view><view class="p7-stat__label">{{item.label}}</view></view></view>
+      <!-- Figma P7 Parent Profile Hub: Quick Actions -->
+      <view class="p7-actions">
+        <view class="p7-action" bindtap="openSchedule"><view class="p7-action__icon">日</view><view>训练日程</view></view>
+        <view class="p7-action" bindtap="openGrowth"><view class="p7-action__icon">长</view><view>成长报告</view></view>
+        <view class="p7-action" bindtap="openRadar"><view class="p7-action__icon">体</view><view>体能数据</view></view>
+        <view class="p7-action" bindtap="openCoach"><view class="p7-action__icon">联</view><view>联系教练</view></view>
       </view>
-
-      <!-- P7 Stats Row -->
-      <view class="pstats">
-        <view wx:for="{{heroStats}}" wx:key="label" class="pstats__item">
-          <view class="pstats__value {{index === 1 ? 'pstats__value--brand' : ''}}">{{item.value}}</view>
-          <view class="pstats__label">{{item.label}}</view>
-        </view>
+      <!-- Figma P7 Parent Profile Hub: Recent Activity -->
+      <view class="p7-card"><view class="p7-card__title">最近动态</view>
+        <view wx:for="{{recentActivities}}" wx:key="title" class="p7-activity"><view class="p7-activity__dot {{index === 1 ? 'p7-activity__dot--green' : index === 2 ? 'p7-activity__dot--blue' : ''}}"></view><view><view class="p7-activity__title">{{item.title}}</view><view class="p7-activity__date">{{item.date}}</view></view></view>
       </view>
-
-      <!-- P7 Quick Actions -->
-      <view class="pactions">
-        <view class="pactions__item" bindtap="openSchedule">
-          <view class="pactions__icon">📅</view>
-          <view class="pactions__label">训练日程</view>
-        </view>
-        <view class="pactions__item" bindtap="openGrowth">
-          <view class="pactions__icon">📊</view>
-          <view class="pactions__label">成长报告</view>
-        </view>
-        <view class="pactions__item" bindtap="openPrivate">
-          <view class="pactions__icon">⚡</view>
-          <view class="pactions__label">私教预约</view>
-        </view>
-        <view class="pactions__item" bindtap="openBinding">
-          <view class="pactions__icon">👤</view>
-          <view class="pactions__label">账号绑定</view>
-        </view>
-      </view>
-
-      <view class="info-card">
-        <view class="info-card__head"><view><view class="section-title">孩子档案</view><view class="subtitle">{{updatedAtLabel}}</view></view><view class="info-card__icon">档</view></view>
-        <view wx:for="{{studentHome.profile}}" wx:key="label" class="field-row">
-          <view class="label">{{item.label}}</view>
-          <view class="field-value">{{item.value}}</view>
-        </view>
-      </view>
-
-      <view class="summary-grid">
-        <view class="summary-card summary-card--lesson" bindtap="openStatus"><view class="summary-card__label">课时状态</view><view wx:for="{{studentHome.lessonStatus}}" wx:key="label" class="summary-card__row"><view>{{item.label}}</view><view class="summary-card__value">{{item.value}}</view></view><view class="summary-card__more">查看课时与保障 ›</view></view>
-        <view class="summary-card summary-card--insurance" bindtap="openStatus"><view class="summary-card__label">保险状态</view><view wx:for="{{studentHome.insuranceStatus}}" wx:key="label" class="summary-card__row"><view>{{item.label}}</view><view class="summary-card__value">{{item.value}}</view></view><view class="summary-card__more">查看课时与保障 ›</view></view>
-      </view>
-
-      <view class="info-card">
-        <view class="info-card__head"><view><view class="section-title">课时与保险说明</view><view class="subtitle">如信息有误，请联系俱乐部核对</view></view><view class="info-card__icon">保</view></view>
-        <view wx:for="{{studentHome.lessonStatus}}" wx:key="label" class="field-row">
-          <view class="label">{{item.label}}</view>
-          <view class="field-value">{{item.value}}</view>
-        </view>
-        <view wx:for="{{studentHome.insuranceStatus}}" wx:key="label" class="field-row">
-          <view class="label">{{item.label}}</view>
-          <view class="field-value">{{item.value}}</view>
-        </view>
-        <view class="read-only-note">档案信息由俱乐部维护，家长端仅供查看。</view>
-      </view>
-
-      <view class="info-card">
-        <view class="info-card__head"><view><view class="section-title">俱乐部服务</view><view class="subtitle">训练与服务信息</view></view><view class="info-card__icon">俱</view></view>
-        <view wx:for="{{studentHome.clubInfo}}" wx:key="label" class="field-row">
-          <view class="label">{{item.label}}</view>
-          <view class="field-value">{{item.value}}</view>
-        </view>
-        <view class="field-row field-row--link" bindtap="openContent">
-          <view class="label">内容中心</view>
-          <view class="field-value field-value--link">场地、帮助与训练攻略 ›</view>
-        </view>
-      </view>
+      <view class="p7-card"><view class="p7-card__title">本周提醒</view><view class="p7-reminder"><view><view class="p7-activity__title">{{reminderTitle}}</view><view class="p7-activity__date">{{reminderSub}}</view></view><view class="p7-reminder__icon">●</view></view></view>
     </view>
   </view>
-
   <role-tabbar role="parent" active="child" />
 </view>

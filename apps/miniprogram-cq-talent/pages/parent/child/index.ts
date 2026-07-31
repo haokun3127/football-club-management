@@ -19,6 +19,9 @@ Page({
     coachLabel: "",
     updatedAtLabel: "",
     heroStats: [] as Array<{ label: string; value: string }>,
+    recentActivities: [] as Array<{ title: string; date: string }>,
+    reminderTitle: "本周暂无待办提醒",
+    reminderSub: "日程有更新会在这里显示",
   },
   onLoad() {
     this.load();
@@ -52,6 +55,9 @@ Page({
         coachLabel: active.coachNames.join("、") || "教练待确认",
         updatedAtLabel: studentHome.updatedAt ? formatDateTime(studentHome.updatedAt) : "随俱乐部档案更新",
         heroStats: buildHeroStats(studentHome),
+        recentActivities: buildRecentActivities(studentHome),
+        reminderTitle: studentHome.clubInfo[0]?.value || "本周暂无待办提醒",
+        reminderSub: studentHome.clubInfo[0]?.label || "日程有更新会在这里显示",
       });
     } catch (error) {
       this.setData({ state: "error", message: readableError(error) });
@@ -84,6 +90,12 @@ Page({
   openGrowth() {
     openPage("/pages/parent/growth/index");
   },
+  openRadar() {
+    openPage("/pages/parent/radar/index");
+  },
+  openCoach() {
+    openPage("/pages/parent/coaches/index");
+  },
 });
 
 function buildHeroStats(home: StudentHome) {
@@ -98,6 +110,15 @@ function clampStatValue(value: string) {
   const text = (value || "").trim();
   if (!text) return "暂无";
   return text.length > 8 ? `${text.slice(0, 7)}…` : text;
+}
+
+function buildRecentActivities(home: StudentHome) {
+  const sources = [...home.lessonStatus, ...home.insuranceStatus, ...home.profile].slice(0, 3);
+  const fallback = ["完成本周训练", "更新训练数据", "档案信息已同步"];
+  return [0, 1, 2].map((index) => ({
+    title: sources[index]?.value || fallback[index],
+    date: sources[index]?.label || "近期更新",
+  }));
 }
 
 function readableError(error: unknown) {

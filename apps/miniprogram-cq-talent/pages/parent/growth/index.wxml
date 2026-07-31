@@ -1,5 +1,4 @@
 <view class="p4">
-  <!-- P4 Top Nav -->
   <view class="p4-nav" style="padding-top:{{navInset}}px">
     <view class="p4-nav__title">成长</view>
     <view class="p4-nav__settings" bindtap="openSettings">⚙</view>
@@ -7,70 +6,52 @@
 
   <view class="p4-body">
     <student-switcher students="{{children}}" selected-id="{{activeStudentId}}" show-all="{{false}}" bindchange="switchChild" />
-
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载成长数据' : state === 'empty' ? '成长数据不足' : '成长数据读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
     <view wx:if="{{growth}}" class="p4-content">
-      <!-- P4 Player Hero -->
-      <view class="phero">
-        <view class="phero__header">
-          <view class="phero__avatar">{{heroSurname}}</view>
-          <view class="phero__info">
-            <view class="phero__name">{{heroName}}</view>
-            <view class="phero__team">{{heroTeam}}</view>
-          </view>
+      <!-- Figma P4 Player Hero: 335 x 212 -->
+      <view class="p4-hero">
+        <view class="p4-hero__header">
+          <view class="p4-hero__avatar">{{heroSurname}}</view>
+          <view class="p4-hero__identity"><view class="p4-hero__name">{{heroName}}</view><view class="p4-hero__team">{{heroTeam}}</view></view>
         </view>
-        <view class="phero__chips">
-          <view wx:for="{{heroChips}}" wx:key="label" class="phero__chip {{index === 0 ? 'phero__chip--brand' : ''}}">{{item.label}} {{item.value}}</view>
+        <view class="p4-hero__chips">
+          <view wx:for="{{heroChips}}" wx:key="label" class="p4-hero__chip {{index === 1 ? 'p4-hero__chip--brand' : ''}}">{{item.label}} {{item.value}}</view>
         </view>
-        <view class="phero__stats">
-          <view wx:for="{{heroStats}}" wx:key="label" class="phero__stat">
-            <view class="phero__stat-value {{index === 1 ? 'phero__stat-value--green' : ''}}">{{item.value}}</view>
-            <view class="phero__stat-label">{{item.label}}</view>
+        <view class="p4-hero__stats">
+          <view wx:for="{{heroStats}}" wx:key="label" class="p4-stat">
+            <view class="p4-stat__value {{index === 1 ? 'p4-stat__value--green' : ''}}">{{item.value}}</view>
+            <view class="p4-stat__label">{{item.label}}</view>
           </view>
         </view>
       </view>
 
-      <!-- P4 成长足迹 -->
-      <view class="mcard">
-        <view class="mcard__head">
-          <view class="mcard__title">成长足迹 🏆</view>
-          <view class="mcard__more" bindtap="openMilestones">更多›</view>
-        </view>
-        <view wx:for="{{growth.milestones}}" wx:key="title" class="mcard__row">
-          <view class="mcard__icon">✓</view>
-          <view class="mcard__text">
-            <view class="mcard__row-title">{{item.title}}</view>
-            <view class="mcard__row-desc">{{item.description}}</view>
-          </view>
+      <!-- Figma P4 Milestones Card -->
+      <view class="p4-card p4-milestones">
+        <view class="p4-card__head"><view class="p4-card__title">成长足迹 🏆</view><view class="p4-card__link" bindtap="openMilestones">更多›</view></view>
+        <view wx:for="{{growth.milestones}}" wx:key="title" class="p4-milestone">
+          <view class="p4-milestone__dot {{index === 1 ? 'p4-milestone__dot--red' : index === 2 ? 'p4-milestone__dot--blue' : ''}}">{{index === 0 ? '✓' : '○'}}</view>
+          <view class="p4-milestone__title">{{item.title}}</view>
+          <view class="p4-milestone__state {{index === 0 ? 'p4-milestone__state--done' : ''}}">{{index === 0 ? '已达成' : '待达成'}}</view>
         </view>
       </view>
 
-      <!-- 能力雷达（功能保留） -->
-      <view class="radar-card" bindtap="openRadar">
-        <view class="row"><view><view class="section-title">能力雷达</view><view class="radar-card__updated">{{updatedAtLabel}} · 点击进入雷达页 ›</view></view><picker mode="selector" range="{{growth.views}}" range-key="name" value="{{viewIndex}}" bindchange="onViewChange"><view class="view-picker">{{growth.views[viewIndex].name}}⌄</view></picker></view>
+      <!-- Figma P4 Training Chart Card -->
+      <view class="p4-card p4-chart-card">
+        <view class="p4-card__head"><view class="p4-card__title">训练历程 📊</view><view class="p4-card__link">查看›</view></view>
+        <view class="p4-bars"><view class="p4-bar p4-bar--1"></view><view class="p4-bar p4-bar--2"></view><view class="p4-bar p4-bar--1"></view><view class="p4-bar p4-bar--3"></view><view class="p4-bar p4-bar--2"></view><view class="p4-bar p4-bar--4"></view><view class="p4-bar p4-bar--3"></view><view class="p4-bar p4-bar--4"></view></view>
+        <view class="p4-months"><view>1月</view><view>2月</view><view>3月</view><view>4月</view><view>5月</view><view>6月</view><view>7月</view><view>8月</view></view>
+      </view>
+
+      <!-- Figma P4 Ability Radar Card: dark surface -->
+      <view class="p4-radar" bindtap="openRadar">
+        <view class="p4-card__head"><view><view class="p4-radar__title">能力雷达</view><view class="p4-radar__sub">6维度综合评估</view></view><view class="p4-radar__action">进入详情 ›</view></view>
         <radar-canvas wx:if="{{canDrawRadar}}" metrics="{{radar}}" selectedMetricId="{{selectedMetricId}}" bindmetrictap="selectMetric"></radar-canvas>
-        <view wx:else class="radar-placeholder"><view class="radar-placeholder__title">指标正在积累</view><view class="subtitle">至少有 3 项有效指标后绘制雷达图，已有结果仍可在下方查看。</view></view>
-        <view class="radar-card__hint">点击雷达轴点或指标名称切换内容</view>
+        <view wx:else class="p4-radar__empty">指标正在积累</view>
       </view>
 
       <scroll-view scroll-x class="metric-scroll" enhanced show-scrollbar="{{false}}"><view class="metric-chips"><view wx:for="{{radar}}" wx:key="metricId" class="metric-chip {{selectedMetricId === item.metricId ? 'active' : ''}}" data-id="{{item.metricId}}" bindtap="selectMetric"><view class="metric-chip__dot"></view>{{item.label}}</view></view></scroll-view>
-
-      <view wx:if="{{selectedMetric}}" class="metric-summary">
-        <view class="metric-summary__eyebrow">当前指标</view>
-        <view class="row"><view><view class="section-title">{{selectedMetric.label}}</view><view class="subtitle">满分 {{selectedMetric.maxValue}}</view></view><view class="metric-value">{{selectedMetric.value}}</view></view>
-        <view class="field-row"><view class="label">同龄平均</view><view class="field-value">{{selectedMetric.peerAverage === undefined ? '样本积累中' : selectedMetric.peerAverage}}</view></view>
-        <view wx:if="{{detailState === 'loading'}}" class="subtitle">正在读取趋势和来源…</view>
-        <view wx:if="{{selectedDetail}}">
-          <view class="field-row"><view class="label">最近记录</view><view class="field-value">{{latestLabel}}</view></view>
-          <view class="field-row"><view class="label">近期变化</view><view class="field-value trend-text">{{trendLabel}}</view></view>
-          <view class="field-row"><view class="label">可追溯来源</view><view class="field-value">{{selectedDetail.sourceEvents.length}} 项</view></view>
-        </view>
-        <view wx:if="{{detailState === 'error'}}" class="inline-error">趋势暂时未能加载，进入详情后可重试。</view>
-        <button class="ghost-button" bindtap="openMetricDetail">查看完整详情</button>
-      </view>
-
-      <view class="info-card"><view class="section-title">训练历程</view><view wx:for="{{growth.trainingHistory}}" wx:key="label" class="field-row"><view class="label">{{item.label}}</view><view class="field-value">{{item.value}}</view></view></view>
+      <view wx:if="{{selectedMetric}}" class="metric-summary"><view class="row"><view><view class="section-title">{{selectedMetric.label}}</view><view class="subtitle">满分 {{selectedMetric.maxValue}}</view></view><view class="metric-value">{{selectedMetric.value}}</view></view><button class="ghost-button" bindtap="openMetricDetail">查看完整详情</button></view>
     </view>
   </view>
   <role-tabbar role="parent" active="growth" />
