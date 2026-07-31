@@ -8,7 +8,7 @@
   </view>
 
   <view class="p1-body">
-    <status-view state="{{state}}" title="{{state === 'loading' ? '加载日程' : state === 'empty' ? '暂无活动' : '日程读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '加载日程' : state === 'empty' ? '暂无活动' : '日程读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
     <view wx:if="{{hero}}" class="hero" data-id="{{hero.id}}" bindtap="openEvent">
       <view class="hero__glow"></view>
@@ -44,6 +44,11 @@
           <view class="acard__dur"><view class="acard__clock"></view>{{item.durationText}}</view>
         </view>
         <view class="acard__chevron">›</view>
+      </view>
+      <view wx:if="{{!visibleEvents.length}}" class="p1-empty-list">
+        <view class="p1-empty-list__icon"></view>
+        <view class="p1-empty-list__title">暂无活动</view>
+        <view class="p1-empty-list__copy">该日期暂未安排训练、比赛或其他活动</view>
       </view>
     </view>
   </view>
