@@ -1,5 +1,5 @@
-<view class="tabbar">
-  <view
+<cover-view class="tabbar">
+  <cover-view
     wx:for="{{items}}"
     wx:key="key"
     class="tabbar-item {{active === item.key ? 'active' : ''}}"
@@ -7,10 +7,10 @@
     data-path="{{item.path}}"
     bindtap="handleTap"
   >
-    <view class="tabbar-icon-wrap">
-      <image class="tabbar-icon" src="{{item.icon}}" mode="aspectFit" />
-      <view class="tabbar-dot"></view>
-    </view>
-    <view class="tabbar-label">{{item.label}}</view>
-  </view>
-</view>
+    <cover-view class="tabbar-icon-wrap">
+      <cover-image class="tabbar-icon" src="{{item.icon}}" />
+      <cover-view class="tabbar-dot"></cover-view>
+    </cover-view>
+    <cover-view class="tabbar-label">{{item.label}}</cover-view>
+  </cover-view>
+</cover-view>

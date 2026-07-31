@@ -1,4 +1,4 @@
-.tabbar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 20; display: flex; box-sizing: border-box; height: 140rpx; padding-bottom: env(safe-area-inset-bottom); border-top: 1rpx solid #e7eaf0; background: rgba(255,255,255,.98); box-shadow: 0 -6rpx 20rpx rgba(16,24,40,.04); }
+.tabbar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 9999; display: flex; box-sizing: border-box; height: 140rpx; padding-bottom: env(safe-area-inset-bottom); border-top: 1rpx solid #e7eaf0; background: #ffffff; box-shadow: 0 -6rpx 20rpx rgba(16,24,40,.04); }
 .tabbar-item { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; min-width: 0; color: #667085; font-size: 21rpx; }
 .tabbar-icon-wrap { position: relative; display: flex; align-items: center; justify-content: center; width: 64rpx; height: 52rpx; border-radius: 18rpx; transition: background-color 180ms ease; }
 .tabbar-icon { width: 42rpx; height: 42rpx; opacity: .48; transition: opacity 180ms ease; }
