@@ -117,8 +117,8 @@ Page<PageData>({
       const visibleEvents = presentEvents(filterEvents(events, this.data.activeStudentId, this.data.selectedDate, this.data.selectedType));
       const digest = buildScheduleDigest(childEvents, this.data.selectedDate);
       this.setData({
-        state: visibleEvents.length ? "ready" : "empty",
-        message: visibleEvents.length ? "" : "当前筛选条件暂无活动安排。",
+        state: "ready",
+        message: "",
         children,
         activeStudentId: active?.id ?? "",
         activeStudentName: active?.name ?? "全部孩子",
@@ -171,8 +171,8 @@ Page<PageData>({
     const visibleEvents = presentEvents(filterEvents(this.data.events, this.data.activeStudentId, this.data.selectedDate, this.data.selectedType));
     this.setData({
       visibleEvents,
-      state: visibleEvents.length ? "ready" : "empty",
-      message: visibleEvents.length ? "" : "当前筛选条件暂无活动安排。",
+      state: "ready",
+      message: "",
     });
   },
   openEvent(event: { detail?: { eventId?: string }; currentTarget?: { dataset?: { id?: string } } }) {
