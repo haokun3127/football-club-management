@@ -60,4 +60,4 @@
 .note-input { margin-top: 16rpx; padding: 14rpx 20rpx; border-radius: 12rpx; background: #f8f9fb; color: #202124; font-size: 24rpx; }
 
 /* 恢复自重写前样式（pre-b14） */
-.correction-alert__texts {
+.correction-alert__texts { flex: 1; }
