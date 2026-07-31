@@ -87,6 +87,16 @@ export function resolveMenuInset() {
   return 16;
 }
 
+export function resolveMenuActionTop() {
+  try {
+    const menu = wx.getMenuButtonBoundingClientRect?.();
+    if (menu) return menu.top + Math.max(0, (menu.height - 32) / 2);
+  } catch (_error) {
+    // Use the Figma-safe fallback when the platform API is unavailable.
+  }
+  return resolveNavInset() + 8;
+}
+
 /** navigationStyle:custom 页面的顶部安全区（状态栏高度，px） */
 export function resolveNavInset() {
   try {
