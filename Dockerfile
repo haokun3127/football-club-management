@@ -19,6 +19,7 @@ COPY packages/domain/package.json packages/domain/package.json
 RUN corepack enable && pnpm install --prod --frozen-lockfile
 
 COPY --from=build /app/apps/api/dist apps/api/dist
+COPY --from=build /app/apps/api/db/migrations apps/api/db/migrations
 COPY --from=build /app/packages/domain/dist packages/domain/dist
 
 RUN mkdir -p /var/lib/cq-talent

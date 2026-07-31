@@ -15,6 +15,8 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN
 
   api:
     build:
@@ -46,7 +48,6 @@ services:
 networks:
   cq-talent-api-net:
     name: cq-talent-api-net
-    internal: true
 
 volumes:
   cq-talent-api-data:
