@@ -48,7 +48,23 @@
       </view>
     </view>
 
-    <!-- 变化记录 -->
+    <!-- Figma P6 Coach Feedback -->
+    <view wx:if="{{detail}}" class="metric-card coach-feedback-card">
+      <view class="section-title">教练评语</view>
+      <view class="coach-feedback"><view class="coach-feedback__avatar">教</view><view class="coach-feedback__meta"><view class="coach-feedback__name">{{coachName}}</view><view class="subtitle">{{coachDateLabel || '评语待同步'}}</view></view><view class="coach-feedback__rating">优秀</view></view>
+      <view class="coach-feedback__text">{{coachFeedback}}</view>
+    </view>
+
+    <!-- Figma P6 Team Compare -->
+    <view wx:if="{{detail}}" class="metric-card team-compare-card">
+      <view class="section-heading"><view class="section-title">同队对比</view><view class="subtitle">数据同步中</view></view>
+      <view class="team-compare-card__message">{{teamCompareMessage}}</view>
+      <view class="team-distribution"><view class="team-distribution__low"></view><view class="team-distribution__mid"></view><view class="team-distribution__high"></view><view class="team-distribution__top"></view></view>
+      <view class="team-marker">我 {{heroValue}}</view>
+      <view class="team-rank"><view>队内排名</view><view class="team-rank__value">{{teamRankLabel}}</view></view>
+    </view>
+
+    <!-- 变化记录 / source trace remain below designed primary cards -->
     <view wx:if="{{detail}}" class="metric-card">
       <view class="section-heading"><view><view class="section-title">变化记录</view><view class="subtitle">按时间查看每次记录与变化</view></view><view class="record-count">{{records.length}} 次</view></view>
       <view wx:if="{{records.length}}" class="trend-list">

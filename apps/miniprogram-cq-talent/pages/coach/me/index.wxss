@@ -26,3 +26,5 @@
 .c16-hero__teams { margin-top: 8rpx; align-self: flex-start; padding: 6rpx 16rpx; border-radius: 8rpx; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 22rpx; }
 /* custom navigation: keep Figma 88px total height inclusive of safe area */
 .c16-bar { box-sizing: border-box; }
+/* Figma Top Nav is 375x88 (176rpx): safe area is inside this envelope. */
+.c16-bar { height: 176rpx; }

@@ -21,7 +21,9 @@ Component({
       const resolvedWindowInfo = windowInfo ?? fallback;
       const statusBarHeight = resolvedWindowInfo.statusBarHeight ?? fallback.statusBarHeight ?? 20;
       const menu = wx.getMenuButtonBoundingClientRect?.();
-      const contentHeight = menu ? Math.max(44, menu.height + Math.max(0, menu.top - statusBarHeight) * 2) : 44;
+      // Figma's Top Nav is a fixed 88px envelope, including the status bar.
+      // Do not let device menu geometry expand the page header beyond that frame.
+      const contentHeight = Math.max(40, 88 - statusBarHeight);
       const actionInset = menu ? Math.max(16, resolvedWindowInfo.windowWidth - menu.left + 8) : 16;
       this.setData({ statusBarHeight, contentHeight, actionInset });
     },

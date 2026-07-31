@@ -63,3 +63,5 @@
 .correction-alert__texts { flex: 1; }
 /* custom navigation: keep Figma 88px total height inclusive of safe area */
 .c4-nav { box-sizing: border-box; }
+/* Figma Top Nav is 375x88 (176rpx): safe area is inside this envelope. */
+.c4-nav { height: 176rpx; }

@@ -135,3 +135,5 @@
 .acard__chevron { color: #c0c8d2; font-size: 32rpx; font-weight: 700; }
 /* custom navigation: keep Figma 88px total height inclusive of safe area */
 .p1-nav { box-sizing: border-box; }
+/* Figma Top Nav is 375x88 (176rpx): safe area is inside this envelope. */
+.p1-nav { height: 176rpx; }

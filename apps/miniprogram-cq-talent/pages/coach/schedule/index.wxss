@@ -99,3 +99,5 @@
 .card.empty { padding: 64rpx 32rpx; border-radius: 24rpx; background: #ffffff; color: #8a8f99; font-size: 26rpx; text-align: center; }
 /* custom navigation: keep Figma 88px total height inclusive of safe area */
 .c1-nav { box-sizing: border-box; }
+/* Figma Top Nav is 375x88 (176rpx): safe area is inside this envelope. */
+.c1-nav { height: 176rpx; }

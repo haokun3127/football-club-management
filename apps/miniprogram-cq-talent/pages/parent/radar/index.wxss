@@ -40,3 +40,5 @@
 .dim-card__hint { color: #a80f1b; font-size: 24rpx; text-align: center; }
 /* custom navigation: keep Figma 88px total height inclusive of safe area */
 .p5-nav { box-sizing: border-box; }
+/* Figma Top Nav is 375x88 (176rpx): safe area is inside this envelope. */
+.p5-nav { height: 176rpx; }

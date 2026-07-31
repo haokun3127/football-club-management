@@ -4,7 +4,7 @@ const LABELS: Record<AppRole, Array<{ key: string; label: string; path: string; 
   parent: [
     { key: "schedule", label: "日程", path: "/pages/parent/schedule/index", icon: "/assets/icons/tab-calendar.svg" },
     { key: "growth", label: "成长", path: "/pages/parent/growth/index", icon: "/assets/icons/tab-growth.svg" },
-    { key: "child", label: "孩子", path: "/pages/parent/child/index", icon: "/assets/icons/tab-child.svg" },
+    { key: "child", label: "我的孩子", path: "/pages/parent/child/index", icon: "/assets/icons/tab-child.svg" },
   ],
   coach: [
     { key: "schedule", label: "工作台", path: "/pages/coach/schedule/index", icon: "/assets/icons/tab-calendar.svg" },

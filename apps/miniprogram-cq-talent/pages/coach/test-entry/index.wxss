@@ -145,3 +145,5 @@
 .c12-body { padding-top: 32rpx; }
 /* custom navigation: keep Figma 88px total height inclusive of safe area */
 .c12-nav { box-sizing: border-box; }
+/* Figma Top Nav is 375x88 (176rpx): safe area is inside this envelope. */
+.c12-nav { height: 176rpx; }

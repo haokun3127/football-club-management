@@ -15,3 +15,5 @@
 .p7-card { display: flex; flex-direction: column; gap: 24rpx; padding: 32rpx; border-radius: 24rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0,0,0,.05); }.p7-card__title { color: #202124; font-size: 32rpx; font-weight: 700; }.p7-activity { display: flex; align-items: center; gap: 24rpx; min-height: 68rpx; }.p7-activity__dot { width: 16rpx; height: 16rpx; border-radius: 50%; background: #a80f1b; }.p7-activity__dot--green { background: #059669; }.p7-activity__dot--blue { background: #2563eb; }.p7-activity__title { color: #202124; font-size: 28rpx; font-weight: 600; }.p7-activity__date { margin-top: 4rpx; color: #667085; font-size: 24rpx; }.p7-reminder { display: flex; align-items: center; justify-content: space-between; }.p7-reminder__icon { color: #a80f1b; font-size: 32rpx; }
 /* custom navigation: keep Figma 88px total height inclusive of safe area */
 .p7-nav { box-sizing: border-box; }
+/* Figma Top Nav is 375x88 (176rpx): safe area is inside this envelope. */
+.p7-nav { height: 176rpx; }

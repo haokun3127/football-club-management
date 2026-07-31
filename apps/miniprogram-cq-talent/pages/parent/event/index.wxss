@@ -101,3 +101,5 @@
 .status-btn--done { background: #2e7d32; color: #ffffff; }
 /* custom navigation: keep Figma 88px total height inclusive of safe area */
 .p2-nav { box-sizing: border-box; }
+/* Figma Top Nav is 375x88 (176rpx): safe area is inside this envelope. */
+.p2-nav { height: 176rpx; }

@@ -57,3 +57,17 @@
 .privacy-note__title { margin-bottom: 4rpx; color: #202124; font-size: 25rpx; font-weight: 650; }
 /* custom navigation: keep Figma 88px total height inclusive of safe area */
 .p6-nav { box-sizing: border-box; }
+/* Figma Top Nav is 375x88 (176rpx): safe area is inside this envelope. */
+.p6-nav { height: 176rpx; }
+
+/* Figma P6 Coach Feedback + Team Compare */
+.coach-feedback-card { gap: 20rpx; }
+.coach-feedback { display: flex; align-items: center; gap: 24rpx; }
+.coach-feedback__avatar { display: flex; align-items: center; justify-content: center; width: 80rpx; height: 80rpx; border-radius: 40rpx; background: #a80f1b; color: #ffffff; font-size: 32rpx; font-weight: 700; }
+.coach-feedback__meta { flex: 1; }.coach-feedback__name { color: #202124; font-size: 28rpx; font-weight: 700; }
+.coach-feedback__rating { padding: 8rpx 20rpx; border-radius: 24rpx; background: #fceeef; color: #a80f1b; font-size: 22rpx; font-weight: 700; }
+.coach-feedback__text { color: #667085; font-size: 26rpx; line-height: 1.6; }
+.team-compare-card { gap: 20rpx; }.team-compare-card__message { color: #667085; font-size: 24rpx; }
+.team-distribution { display: flex; height: 32rpx; overflow: hidden; border-radius: 16rpx; }.team-distribution__low { flex: 2; background: #e5e7eb; }.team-distribution__mid { flex: 3; background: #fca5a5; }.team-distribution__high { flex: 3; background: #a80f1b; }.team-distribution__top { flex: 2; background: #7f1d1d; }
+.team-marker { align-self: center; margin-top: -4rpx; padding: 4rpx 12rpx; border-radius: 8rpx; background: #a80f1b; color: #ffffff; font-size: 20rpx; font-weight: 700; }
+.team-rank { display: flex; align-items: center; justify-content: space-between; padding: 16rpx 20rpx; border-radius: 16rpx; background: #fceeef; color: #a80f1b; font-size: 26rpx; }.team-rank__value { font-size: 32rpx; font-weight: 800; }

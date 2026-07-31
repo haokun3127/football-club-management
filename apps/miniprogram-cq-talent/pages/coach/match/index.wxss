@@ -96,3 +96,5 @@ button { margin-top: 20rpx; }
 .c6-period--link { font-weight: 600; }
 /* custom navigation: keep Figma 88px total height inclusive of safe area */
 .c6-nav { box-sizing: border-box; }
+/* Figma Top Nav is 375x88 (176rpx): safe area is inside this envelope. */
+.c6-nav { height: 176rpx; }

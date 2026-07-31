@@ -91,3 +91,5 @@ button {
 .c8-stat__value { color: #ffffff; font-size: 52rpx; font-weight: 700; }
 /* custom navigation: keep Figma 88px total height inclusive of safe area */
 .c8-nav { box-sizing: border-box; }
+/* Figma Top Nav is 375x88 (176rpx): safe area is inside this envelope. */
+.c8-nav { height: 176rpx; }

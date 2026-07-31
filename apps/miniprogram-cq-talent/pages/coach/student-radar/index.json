@@ -5,5 +5,6 @@
     "role-tabbar": "/components/role-tabbar/index",
     "status-view": "/components/status-view/index",
     "radar-canvas": "/components/radar-canvas/index"
-  }
+  },
+  "navigationStyle": "custom"
 }

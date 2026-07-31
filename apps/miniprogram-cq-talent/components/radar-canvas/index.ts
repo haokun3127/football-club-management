@@ -30,6 +30,7 @@ interface RadarComponentThis {
   data: {
     metrics?: RadarMetricPoint[];
     selectedMetricId?: string;
+    dark?: boolean;
     canvasWidth?: number;
     canvasHeight?: number;
   };
@@ -55,6 +56,10 @@ Component({
     selectedMetricId: {
       type: String,
       value: "",
+    },
+    dark: {
+      type: Boolean,
+      value: false,
     },
   },
   data: {
@@ -89,7 +94,7 @@ Component({
         canvas.height = res.height * pixelRatio;
         ctx.scale(pixelRatio, pixelRatio);
         component.setData({ canvasWidth: res.width, canvasHeight: res.height });
-        renderRadar(ctx, metrics, res.width, res.height, component.data.selectedMetricId);
+        renderRadar(ctx, metrics, res.width, res.height, component.data.selectedMetricId, component.data.dark);
       }).exec();
     },
     handleTap(this: RadarComponentThis, event: { detail?: { x?: number; y?: number } }) {
@@ -111,17 +116,17 @@ Component({
   },
 });
 
-function renderRadar(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], width: number, height: number, selectedMetricId?: string) {
+function renderRadar(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], width: number, height: number, selectedMetricId?: string, dark = false) {
   const centerX = width / 2;
   const centerY = height / 2;
   const radius = Math.min(width, height) * 0.34;
   ctx.clearRect(0, 0, width, height);
-  drawGrid(ctx, metrics.length, centerX, centerY, radius);
+  drawGrid(ctx, metrics.length, centerX, centerY, radius, dark);
   if (metrics.every((metric) => typeof metric.peerAverage === "number")) {
-    drawPolygon(ctx, metrics, "peerAverage", centerX, centerY, radius, "rgba(96, 100, 111, 0.18)", "#8A8F99");
+    drawPolygon(ctx, metrics, "peerAverage", centerX, centerY, radius, "rgba(255, 255, 255, 0.08)", dark ? "rgba(255,255,255,0.5)" : "#8A8F99");
   }
-  drawPolygon(ctx, metrics, "value", centerX, centerY, radius, "rgba(168, 15, 27, 0.18)", "#A80F1B");
-  drawLabels(ctx, metrics, centerX, centerY, radius + 28);
+  drawPolygon(ctx, metrics, "value", centerX, centerY, radius, "rgba(168, 15, 27, 0.28)", "#A80F1B");
+  drawLabels(ctx, metrics, centerX, centerY, radius + 28, dark);
   drawSelection(ctx, metrics, selectedMetricId, centerX, centerY, radius);
 }
 
@@ -133,8 +138,8 @@ function pointAt(index: number, total: number, centerX: number, centerY: number,
   };
 }
 
-function drawGrid(ctx: CanvasRenderingContext2D, total: number, centerX: number, centerY: number, radius: number) {
-  ctx.strokeStyle = "#E5E6EB";
+function drawGrid(ctx: CanvasRenderingContext2D, total: number, centerX: number, centerY: number, radius: number, dark = false) {
+  ctx.strokeStyle = dark ? "rgba(255,255,255,0.20)" : "#E5E6EB";
   ctx.lineWidth = 1;
   for (let ring = 1; ring <= 4; ring += 1) {
     ctx.beginPath();
@@ -172,8 +177,8 @@ function drawPolygon(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[],
   ctx.stroke();
 }
 
-function drawLabels(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], centerX: number, centerY: number, radius: number) {
-  ctx.fillStyle = "#1F2329";
+function drawLabels(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], centerX: number, centerY: number, radius: number, dark = false) {
+  ctx.fillStyle = dark ? "#FFFFFF" : "#1F2329";
   ctx.font = "12px sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";

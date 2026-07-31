@@ -49,6 +49,11 @@ Page({
     heroValue: "–",
     trendDelta: "",
     chartPoints: [] as ChartPoint[],
+    coachFeedback: "教练评语数据待同步",
+    coachName: "教练待同步",
+    coachDateLabel: "",
+    teamCompareMessage: "同队对比数据待同步",
+    teamRankLabel: "—",
   },
   onLoad(query?: Record<string, string | undefined>) {
     requireRole("parent");
@@ -84,6 +89,11 @@ Page({
         heroValue: detail.latest?.value === undefined ? "–" : String(detail.latest.value),
         trendDelta: records[0]?.changeTone === "success" ? `+${records[0].changeLabel.replace(/[^0-9.]/g, "")}` : "",
         chartPoints: buildChartPoints(detail),
+        coachFeedback: records[0]?.note || "教练评语数据待同步",
+        coachName: detail.sourceEvents[0]?.title || "教练待同步",
+        coachDateLabel: records[0]?.dateLabel || "",
+        teamCompareMessage: detail.latest?.value === undefined ? "同队对比数据待同步" : "同队对比数据待同步，当前先展示个人趋势",
+        teamRankLabel: "—",
       });
     } catch (error) {
       const record = error as { code?: string; message?: string };
