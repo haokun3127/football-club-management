@@ -4,7 +4,10 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-const cliPath = process.env.WECHAT_DEVTOOLS_CLI ?? "/Applications/wechatwebdevtools.app/Contents/MacOS/cli";
+const defaultCliPath = process.platform === "win32"
+  ? "D:\\微信web开发者工具\\cli.bat"
+  : "/Applications/wechatwebdevtools.app/Contents/MacOS/cli";
+const cliPath = process.env.WECHAT_DEVTOOLS_CLI ?? defaultCliPath;
 const projectPath = process.env.PROJECT_PATH ?? resolve(import.meta.dirname, "..");
 const port = process.env.DEVTOOLS_PORT;
 
@@ -35,6 +38,7 @@ function run(args, label) {
   const result = spawnSync(cliPath, args, {
     encoding: "utf8",
     stdio: "pipe",
+    shell: process.platform === "win32" && /\.(bat|cmd)$/i.test(cliPath),
   });
   if (result.stdout) process.stdout.write(result.stdout);
   if (result.stderr) process.stderr.write(result.stderr);
