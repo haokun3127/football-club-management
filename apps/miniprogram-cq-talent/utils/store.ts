@@ -40,7 +40,10 @@ export function getSession() {
 
 export function clearSession() {
   sessionState = null;
+  appContext = null;
   wx.removeStorageSync(STORAGE_KEYS.session);
+  wx.removeStorageSync(STORAGE_KEYS.context);
+  wx.removeStorageSync(STORAGE_KEYS.devRole);
 }
 
 export function setCurrentStudentId(studentId: string) {

@@ -8,7 +8,7 @@ const API_BASE_URLS: Record<RuntimeEnvironment, string> = {
 };
 export const API_BASE_URL = API_BASE_URLS[RUNTIME_ENV];
 export const DEV_MODE = RUNTIME_ENV === "develop";
-export const DEV_AUTO_SESSION = true;
+export const DEV_AUTO_SESSION = false;
 export const DEV_IDENTITY_ROLE: "parent" | "coach" = "parent";
 export const DEV_USER_IDS = {
   parent: "user-parent-cq-talent-acceptance",
