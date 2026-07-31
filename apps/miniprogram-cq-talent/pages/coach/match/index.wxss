@@ -94,3 +94,5 @@ button { margin-top: 20rpx; }
 .c6-hero__periods { display: flex; gap: 16rpx; }
 .c6-period { display: flex; align-items: center; gap: 8rpx; padding: 12rpx 24rpx; border-radius: 999rpx; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 24rpx; }
 .c6-period--link { font-weight: 600; }
+/* custom navigation: keep Figma 88px total height inclusive of safe area */
+.c6-nav { box-sizing: border-box; }

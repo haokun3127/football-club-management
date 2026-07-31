@@ -143,3 +143,5 @@
 .c12-nav__title { color: #202124; font-size: 44rpx; font-weight: 700; }
 .c12-nav__submit { color: #a80f1b; font-size: 30rpx; font-weight: 600; }
 .c12-body { padding-top: 32rpx; }
+/* custom navigation: keep Figma 88px total height inclusive of safe area */
+.c12-nav { box-sizing: border-box; }

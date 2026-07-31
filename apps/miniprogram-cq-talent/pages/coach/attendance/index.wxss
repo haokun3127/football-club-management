@@ -61,3 +61,5 @@
 
 /* 恢复自重写前样式（pre-b14） */
 .correction-alert__texts { flex: 1; }
+/* custom navigation: keep Figma 88px total height inclusive of safe area */
+.c4-nav { box-sizing: border-box; }

@@ -97,3 +97,5 @@
 .filter-item { padding: 10rpx 24rpx; border-radius: 999rpx; background: #ffffff; border: 1rpx solid #e7eaf0; color: #60646f; font-size: 24rpx; }
 .filter-item.active { border-color: #a80f1b; background: #fceeef; color: #a80f1b; font-weight: 700; }
 .card.empty { padding: 64rpx 32rpx; border-radius: 24rpx; background: #ffffff; color: #8a8f99; font-size: 26rpx; text-align: center; }
+/* custom navigation: keep Figma 88px total height inclusive of safe area */
+.c1-nav { box-sizing: border-box; }

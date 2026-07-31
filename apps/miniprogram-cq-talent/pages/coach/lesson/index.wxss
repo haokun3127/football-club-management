@@ -34,3 +34,5 @@
 .card.lesson-note-card { padding: 32rpx; border-radius: 24rpx; background: #ffffff; display: flex; flex-direction: column; gap: 16rpx; }
 .lesson-note { min-height: 120rpx; padding: 20rpx; border-radius: 12rpx; background: #f8f9fb; font-size: 26rpx; }
 .lesson-correction-link { color: #a80f1b; font-size: 26rpx; font-weight: 600; }
+/* custom navigation: keep Figma 88px total height inclusive of safe area */
+.c5-nav { box-sizing: border-box; }

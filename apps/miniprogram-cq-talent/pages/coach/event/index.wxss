@@ -72,3 +72,5 @@
 .action-tile--primary { border-color: #f7cdd1; background: #fceeef; color: var(--color-brand); }
 .action-tile--match { border-color: #b2ddff; background: #eff8ff; color: #175cd3; }
 .action-tile__icon { display: inline-flex; align-items: center; justify-content: center; width: 44rpx; height: 44rpx; margin-right: 12rpx; border-radius: 12rpx; background: currentColor; color: #fff; font-size: 21rpx; }
+/* custom navigation: keep Figma 88px total height inclusive of safe area */
+.c2-nav { box-sizing: border-box; }

@@ -38,3 +38,5 @@
 .dim-row__peer { position: absolute; top: -6rpx; width: 4rpx; height: 28rpx; background: #07111f; }
 .dim-row__value { width: 72rpx; text-align: right; color: #202124; font-size: 28rpx; font-weight: 700; }
 .dim-card__hint { color: #a80f1b; font-size: 24rpx; text-align: center; }
+/* custom navigation: keep Figma 88px total height inclusive of safe area */
+.p5-nav { box-sizing: border-box; }

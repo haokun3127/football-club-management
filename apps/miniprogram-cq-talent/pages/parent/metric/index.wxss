@@ -55,3 +55,5 @@
 .privacy-note { display: flex; gap: 16rpx; padding: 22rpx; border-radius: 20rpx; background: #f0fff4; }
 .privacy-note__icon { display: flex; align-items: center; justify-content: center; width: 42rpx; height: 42rpx; border-radius: 50%; background: var(--color-success); color: #fff; font-size: 22rpx; }
 .privacy-note__title { margin-bottom: 4rpx; color: #202124; font-size: 25rpx; font-weight: 650; }
+/* custom navigation: keep Figma 88px total height inclusive of safe area */
+.p6-nav { box-sizing: border-box; }

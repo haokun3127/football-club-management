@@ -89,3 +89,5 @@ button {
 .c8-stat { display: flex; flex-direction: column; gap: 8rpx; align-items: center; padding: 20rpx; border-radius: 24rpx; background: rgba(255, 255, 255, 0.1); }
 .c8-stat__label { color: #ffffff; font-size: 22rpx; }
 .c8-stat__value { color: #ffffff; font-size: 52rpx; font-weight: 700; }
+/* custom navigation: keep Figma 88px total height inclusive of safe area */
+.c8-nav { box-sizing: border-box; }

@@ -24,3 +24,5 @@
 .c7-nav__back { color: #202124; font-size: 56rpx; font-weight: 300; line-height: 1; }
 .c7-nav__title { color: #202124; font-size: 40rpx; font-weight: 700; }
 .c7-body { padding-top: 24rpx; }
+/* custom navigation: keep Figma 88px total height inclusive of safe area */
+.c7-nav { box-sizing: border-box; }
