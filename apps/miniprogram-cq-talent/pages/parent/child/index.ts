@@ -87,11 +87,17 @@ Page({
 });
 
 function buildHeroStats(home: StudentHome) {
-  const stats = home.lessonStatus.slice(0, 3).map((item) => ({ label: item.label, value: item.value }));
+  const stats = home.lessonStatus.slice(0, 3).map((item) => ({ label: item.label, value: clampStatValue(item.value) }));
   while (stats.length < 3) {
-    stats.push({ label: ["训练课时", "出勤率", "在队时长"][stats.length] ?? "统计", value: "–" });
+    stats.push({ label: ["训练课时", "出勤率", "在队时长"][stats.length] ?? "统计", value: "暂无" });
   }
   return stats;
+}
+
+function clampStatValue(value: string) {
+  const text = (value || "").trim();
+  if (!text) return "暂无";
+  return text.length > 8 ? `${text.slice(0, 7)}…` : text;
 }
 
 function readableError(error: unknown) {

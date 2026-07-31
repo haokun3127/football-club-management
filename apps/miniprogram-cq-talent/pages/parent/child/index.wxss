@@ -69,3 +69,25 @@
   justify-content: center;
 }
 .pactions__label { color: #202124; font-size: 28rpx; font-weight: 600; }
+
+/* 恢复自重写前样式（pre-b13） */
+.switcher-block { margin-bottom: 20rpx; }
+.switcher-block__label { margin-bottom: 12rpx; color: #667085; font-size: 22rpx; font-weight: 600; }
+.info-card { margin-bottom: 20rpx; padding: 24rpx; border: 1rpx solid #e7eaf0; border-radius: 24rpx; background: #fff; }
+.info-card__head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10rpx; }
+.info-card__icon { display: flex; align-items: center; justify-content: center; width: 52rpx; height: 52rpx; border-radius: 16rpx; background: #fceeef; color: var(--color-brand); font-size: 22rpx; font-weight: 700; }
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16rpx; margin-bottom: 20rpx; }
+.summary-card { min-width: 0; padding: 22rpx; border: 1rpx solid #e7eaf0; border-radius: 22rpx; background: #fff; }
+.summary-card--lesson { border-color: #f7cdd1; background: #fffafa; }
+.summary-card--insurance { border-color: #b2ddff; background: #f5fbff; }
+.summary-card__label { margin-bottom: 14rpx; color: #667085; font-size: 21rpx; font-weight: 650; }
+.summary-card__row { margin-top: 10rpx; color: #667085; font-size: 20rpx; }
+.summary-card__value { overflow: hidden; margin-top: 4rpx; color: #202124; font-size: 26rpx; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.read-only-note { margin-top: 18rpx; padding: 16rpx; border-radius: 14rpx; background: #f8f9fb; color: #667085; font-size: 22rpx; line-height: 1.5; }
+.summary-card__more { margin-top: 16rpx; color: var(--color-brand); font-size: 24rpx; font-weight: 600; }
+.field-value--link { color: var(--color-brand); font-weight: 600; }
+
+/* 修复：统计格防溢出 + 垂直对齐一致 */
+.pstats__cell { min-width: 0; justify-content: center; }
+.pstats__value { max-width: 100%; min-height: 52rpx; overflow: hidden; font-size: 34rpx; line-height: 52rpx; text-overflow: ellipsis; white-space: nowrap; }
+.pstats__label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

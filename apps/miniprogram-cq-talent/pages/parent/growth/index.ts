@@ -68,7 +68,7 @@ Page({
         heroSurname: active.name.slice(0, 1),
         heroName: active.name,
         heroTeam: active.teams?.[0] ?? "重庆天才",
-        heroChips: growth.trainingHistory.slice(0, 2),
+        heroChips: growth.trainingHistory.slice(0, 2).map((chip) => clampChip(chip)),
         heroStats: buildHeroStats(growth.trainingHistory),
       });
       if (selectedMetric) await this.loadMetricDetail(selectedMetric.metricId);
@@ -155,11 +155,21 @@ function readableError(error: unknown) {
 }
 
 function buildHeroStats(history: Array<{ label: string; value: string }>) {
-  const stats = history.slice(0, 3).map((item) => ({ label: item.label, value: item.value }));
+  const stats = history.slice(0, 3).map((item) => ({ label: item.label, value: clampStatValue(item.value) }));
   while (stats.length < 3) {
-    stats.push({ label: ["训练课时", "出勤率", "本月训练"][stats.length] ?? "统计", value: "–" });
+    stats.push({ label: ["训练课时", "出勤率", "本月训练"][stats.length] ?? "统计", value: "暂无" });
   }
   return stats;
+}
+
+function clampStatValue(value: string) {
+  const text = (value || "").trim();
+  if (!text) return "暂无";
+  return text.length > 8 ? `${text.slice(0, 7)}…` : text;
+}
+
+function clampChip(chip: { label: string; value: string }) {
+  return { label: chip.label, value: clampStatValue(chip.value) };
 }
 
 function metricTrend(detail: MetricDetail) {
