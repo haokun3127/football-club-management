@@ -2,9 +2,9 @@ export const APP_CLIENT_KEY = "cq-talent-wechat-main";
 export type RuntimeEnvironment = "develop" | "trial" | "release";
 export const RUNTIME_ENV: RuntimeEnvironment = wx.getAccountInfoSync?.().miniProgram?.envVersion ?? "develop";
 const API_BASE_URLS: Record<RuntimeEnvironment, string> = {
-  develop: "http://localhost:3000",
-  trial: "",
-  release: "",
+  develop: "https://cqtc.pomi.tech",
+  trial: "https://cqtc.pomi.tech",
+  release: "https://cqtc.pomi.tech",
 };
 export const API_BASE_URL = API_BASE_URLS[RUNTIME_ENV];
 export const DEV_MODE = RUNTIME_ENV === "develop";
