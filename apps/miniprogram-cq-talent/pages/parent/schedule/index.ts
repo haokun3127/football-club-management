@@ -18,13 +18,25 @@ type ScheduleEventView = ScheduleEvent & {
   childNames: string;
 };
 
-interface HeroView {
-  id: string;
-  title: string;
-  timeText: string;
-  teamName: string;
-  venue: string;
-}
+type HeroView = {
+  todayLabel: string;
+  weekCount: number;
+  weekHours: string;
+} & (
+  | {
+      mode: "upcoming";
+      id: string;
+      title: string;
+      timeText: string;
+      teamName: string;
+      venue: string;
+    }
+  | {
+      mode: "empty";
+      title: "该日期暂无日程";
+      description: "暂未安排训练、比赛或其他活动";
+    }
+);
 
 const TYPE_COLORS: Record<string, string> = {
   training: "#a80f1b",
@@ -275,7 +287,7 @@ function selectedCountLabel(date: string, count: number) {
   return date === currentLocalDate() ? `今日${count}节` : `${selected}${count}节`;
 }
 
-function buildScheduleDigest(events: ScheduleEvent[], selectedDate: string) {
+export function buildScheduleDigest(events: ScheduleEvent[], selectedDate: string) {
   const selected = new Date(`${selectedDate || initialDate}T00:00:00.000Z`);
   const selectedKey = selected.toISOString().slice(0, 10);
   const weekStart = new Date(selected);
@@ -294,20 +306,34 @@ function buildScheduleDigest(events: ScheduleEvent[], selectedDate: string) {
     .filter((event) => event.startsAt.slice(0, 10) === selectedKey && event.status !== "cancelled")
     .sort((left, right) => Date.parse(left.startsAt) - Date.parse(right.startsAt))[0];
   const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+  const todayLabel = `${selected.getUTCFullYear()}年${selected.getUTCMonth() + 1}月${selected.getUTCDate()}日 周${weekdays[selected.getUTCDay()]}`;
+  const weekCount = weekEvents.length;
+  const weekHours = (Math.round(weekMinutes / 6) / 10).toString();
   return {
-    todayLabel: `${selected.getUTCFullYear()}年${selected.getUTCMonth() + 1}月${selected.getUTCDate()}日 周${weekdays[selected.getUTCDay()]}`,
+    todayLabel,
     todayCount: events.filter((event) => event.startsAt.slice(0, 10) === selectedKey).length,
-    weekCount: weekEvents.length,
-    weekHours: (Math.round(weekMinutes / 6) / 10).toString(),
+    weekCount,
+    weekHours,
     hero: upcoming
       ? {
+          mode: "upcoming",
+          todayLabel,
+          weekCount,
+          weekHours,
           id: upcoming.id,
           title: upcoming.title,
           timeText: upcoming.startsAt.slice(11, 16) || "待定",
           teamName: upcoming.teamName ?? "",
           venue: upcoming.venue ?? "",
         }
-      : null,
+      : {
+          mode: "empty",
+          todayLabel,
+          weekCount,
+          weekHours,
+          title: "该日期暂无日程",
+          description: "暂未安排训练、比赛或其他活动",
+        },
   };
 }
 
