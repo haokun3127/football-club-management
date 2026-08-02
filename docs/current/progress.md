@@ -1,6 +1,6 @@
 # 小程序全量补齐 · 进度跟踪
 
-> 依据《Figma 全量补齐决策》（docs/figma-full-implementation-decision.md）执行。
+> 依据《Figma 全量补齐决策》（../design/figma/figma-full-implementation-decision.md）执行。
 > 本文档随每批工作实时更新：完成一项勾一项，新增发现随时补充。
 > 最后更新：2026-07-30（批次 14 后）
 
@@ -106,7 +106,7 @@
 - 注意：测评任务仍为种子集合（俱乐部配置类，无需运行时持久化）
 
 ### 批次 13：家长端契约版视觉重做（8 画板）
-- [x] 规格归档 `docs/design-spec-batch13-*.md`（8 张）`36a5072`
+- [x] 规格归档 `docs/design/specifications/batches/design-spec-batch13-*.md`（8 张）`36a5072`
 - [x] P1 schedule：白顶导 + 深色下一场 hero + 周/今日统计 + pending chips + 色条活动卡 `36a5072`
 - [x] P2/P2.1/P2.2 event：按类型 nav、深色 hero、比赛记分牌、底部出席状态钮 `36a5072`
 - [x] P4 growth：深色球员 hero + 成长足迹卡（雷达/指标功能区保留）`36a5072`
@@ -116,7 +116,7 @@
 - [x] 全量 check 绿（89 测试）
 
 ### 批次 14：教练端契约版视觉重做（9 画板）
-- [x] 规格归档 `docs/design-spec-batch14-*.md`（9 张；C7 原画板节点缺失按统一教练 nav 模式处理；C12 用 "C12 Project Score Entry"）`9ca6d33`
+- [x] 规格归档 `docs/design/specifications/batches/design-spec-batch14-*.md`（9 张；C7 原画板节点缺失按统一教练 nav 模式处理；C12 用 "C12 Project Score Entry"）`9ca6d33`
 - [x] C1 schedule：白顶导+红头像、7 日 strip（选中红）、统计 pills、色条活动卡 `9ca6d33`
 - [x] C2 event：nav 结束动作、深色 session hero（真实已进行计时器 + 出席 chips）、出勤卡（名单圆点）`9ca6d33`
 - [x] C4 attendance：粉底 nav+提交、深色 hero 出勤/缺勤/待确认圆点计数、全员到场/清空 `9ca6d33`
@@ -170,7 +170,7 @@
 7. 家长端 5 页 + 教练端 9 页契约版按原始设计重做 —— 视觉升级，放最后
 
 ## 工作方法（每批固定流程）
-1. `fig_export_frame.py` 导出目标画板规格 → 归档 `docs/design-spec-*.md`
+1. `fig_export_frame.py` 导出目标画板规格 → 归档 `docs/design/specifications/`
 2. 需要新数据 → 契约先入 `.trellis/spec/api/backend/app-client-bff-contracts.md` 再实现 BFF
 3. 页面复用 app-header / role-tabbar / status-view + token 变量
 4. `pnpm check` + `pnpm build` 全绿后小步提交推送
@@ -178,5 +178,38 @@
 
 ## 环境备忘
 - 改完 `apps/api` 必须 `pnpm build` + 重启 localhost:3000 的 `node apps/api/dist/index.js`，否则小程序打到旧 dist 报 404
+
+## 2026-08-02 交接续作记录
+
+### 历史对话结论
+
+- G2 原稿是家长专属“绑定孩子”画板，不是教练通用登录页；资料中没有独立的 Coach Login 画板。
+- 授权前客户端不能可靠知道角色，因此登录页采用角色中性的“身份验证”；微信手机号授权和服务端档案匹配成功后，`parent` 进入家长日程/绑定流程，`coach` 进入教练日程。
+- 旧登录实现的主要问题是顶端安全区过大、验证码行与操作控件重叠、微信授权动作重复，以及在角色未知时显示家长语义。当前代码已删除验证码伪流程并保留单一真实手机号授权入口。
+
+### 当前未完成项
+
+- `apps/miniprogram-cq-talent/pages/login/` 已按 G2 v2 规格调整；本次续作进一步修正顶部 88px 包络，并在微信登录凭证加载期间禁用授权按钮。尚未取得可信的 `375x812` DevTools 截图。
+- 在线 Figma 更新未完成：前一轮 Hermes CLI 调用在进入 MCP 操作前因 provider HTTP 502 失败。不能将本地 `.fig` 或在线文件写入视为已完成。
+- Trellis 任务 `.trellis/tasks/07-30-figma-design-foundation` 仍为 `in_progress`，当前工作树有 64 项未提交改动，不能直接收官或清理其它批次。
+
+### 最新验证事实
+
+- 上一轮小程序 typecheck 通过；本次登录几何 patch 后需重跑。
+- 全仓 check/test 最近失败于两个 API fixture：`apps/api/test/server.test.ts:688` 期望 `not_started`、实际 `in_progress`；`apps/api/test/server.test.ts:1344` 期望固定数据能力预览记录、实际返回更大/不同记录集。它们与本次登录页改动无直接关系，但在修复或隔离前不得报告全仓通过。
+- P3 提醒、活动详情参与人映射、P1/P2/P3 及相关视觉批次的代码改动仍在当前工作树中，后续应按批次逐项复核，不要回滚用户已有改动。
 - curl 访问 localhost 需 `--noproxy '*'`（本机 Clash 代理）
-- fig 工具链：`Python313/python.exe tools/fig_export_frame.py tools/fig-out.json "<画板名>" <输出.md>`
+- fig 工具链：先运行 `Python313/python.exe scripts/fig2json.py <设计.fig> <decoded-fig.json>`，再运行 `python scripts/fig_export_frame.py <decoded-fig.json> "<画板名>" <输出.md>`。Token 报告使用 `python scripts/fig_extract_tokens.py <设计.fig> <decoded-fig.json> [report.md]`。
+
+### 2026-08-02 P1 无日程 Hero 保留
+
+- 家长日程页在 `state === "ready"` 且选中日期无活动时保留固定 Hero；空态不伪造活动字段，也不绑定点击事件；下方 `p1-empty-list` 保留。
+- 在线 Figma P1 节点 `93:83` 已核对成功态结构（Hero → 日期周条 → 标签 → 列表）；当前文件没有明确的 Empty Hero 画板，因此代码空态是保守补全，不能当作已由 Figma 定义。在线 Figma 后续应补同尺寸 Empty Hero 状态。
+- Luna 实现后经 Terra 复审：目标测试 `5/5`、小程序包测试 `4 files / 17 tests`、typecheck、`git diff --check` 通过。尚未取得微信开发者工具或真机 `375x812` 有活动/无活动截图，视觉验收仍待完成。
+
+### 2026-08-02 P1 响应式标签与 Figma 状态同步
+
+- 家长日程页 chips 已完成最小响应式修正：容器允许换行，chip 不再裁切、省略或强制单行；动态红色日期 chip 使用自适应宽度，绿色/黄色统计 chip 保留原定 `182rpx` / `124rpx` 几何。
+- 在线 Figma 文件 `ATlfBRO0ruOCDDY5ICagFD` 已核对并更新：原成功态 `93:83` 保持 `今日2节` 不变；新增/保留 `241:166`（Selected Date）与 `241:412`（Empty）状态。`241:412` 为 `375×812` 页面 frame，内部 Empty Hero 为 `343×180`（代码对应 `686rpx×360rpx`）；已移除不适用的“94% 出席率”，仅保留本周训练与本周课次统计及无日程文案。
+- 当前验证：目标测试 `6/6`、小程序包测试 `4 files / 18 tests`、typecheck 通过；WXML 禁用 JS 方法扫描干净；`git diff --check` 无空白错误，仅有工作树既有 LF→CRLF 提示。
+- 视觉证据分层：在线 Figma 节点 `93:83`、`241:166`、`241:412` 及 Empty 状态截图已核对；尚未取得微信开发者工具或真机 `375x812` 截图，因此小程序运行态视觉验收仍未完成，不能宣称与 Figma 完全一致。

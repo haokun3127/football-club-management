@@ -4,8 +4,8 @@
 
 后续小程序产品设计、技术架构和开发计划必须以以下文件为基线：
 
-- 产品规格：[miniprogram-product-design-cq-talent.md](./miniprogram-product-design-cq-talent.md)
-- 技术选型与开发工作流：[miniprogram-development-workflow.md](./miniprogram-development-workflow.md)
+- 产品规格：[miniprogram-product-design-cq-talent.md](../../archive/2026-06-discovery/miniprogram-product-design-cq-talent.md)
+- 技术选型与开发工作流：[miniprogram-development-workflow.md](../../archive/2026-06-discovery/miniprogram-development-workflow.md)
 
 除非明确更新上述基线，否则后续会话不应重新口头推翻已确认原则。
 
@@ -50,7 +50,7 @@
 
 - 雷达图采用小程序原生 Canvas 2D 自绘 `RadarCanvas`。
 - 暂不引入 ECharts/F2/uCharts。
-- 涉及雷达图、战术板、测试录入、自动保存、消息提醒或第三方依赖时，必须先走 [小程序技术选型与开发工作流](./miniprogram-development-workflow.md)。
+- 涉及雷达图、战术板、测试录入、自动保存、消息提醒或第三方依赖时，必须先走 [小程序技术选型与开发工作流](../../archive/2026-06-discovery/miniprogram-development-workflow.md)。
 
 ## 产品设计会话任务
 
@@ -220,7 +220,7 @@
 4. 微信小程序/公众号身份匹配与消息提醒。
 5. 训练内容选择页能力覆盖预览。
 
-每个 PoC 需按 [miniprogram-development-workflow.md](./miniprogram-development-workflow.md) 记录验收结果。
+每个 PoC 需按 [miniprogram-development-workflow.md](../../archive/2026-06-discovery/miniprogram-development-workflow.md) 记录验收结果。
 
 ## 开发计划建议
 

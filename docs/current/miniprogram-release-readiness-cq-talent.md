@@ -221,7 +221,7 @@ pnpm --filter @football-club/miniprogram-cq-talent devtools:preview
 - `pnpm --filter @football-club/miniprogram-cq-talent devtools:preview` 已新增为固定 DevTools CLI 验收脚本，并已通过：`islogin/open/preview` 成功，包体 `94.8 KB / 97054 Byte`。
 - DevTools CLI `islogin/open/preview` 通过，测试 AppID `wx3df49f3b936ab2ed`，包体 `94.8 KB / 97054 Byte`。
 - 本地 API 日志显示 DevTools 模拟器从 `localhost:3000` 发起过 `resolve`、`parent/children`、`parent/students/:studentId/schedule` 请求，已验证模拟器能连到本地后端。
-- 手工点击验收步骤已补充到 `docs/miniprogram-manual-acceptance-cq-talent.md`。
+- 手工点击验收步骤已补充到 `miniprogram-manual-acceptance-cq-talent.md`。
 - 已创建后端 P0 Trellis 任务：`.trellis/tasks/06-28-cq-talent-miniprogram-p0-bff`。
 - P0 BFF 缺口摘要已发送到总控线程 `019efcb5-8fe3-7951-a534-502d0abff8ce`，交由 F/后端补齐。
 
