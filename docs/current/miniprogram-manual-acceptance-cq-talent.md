@@ -1,5 +1,12 @@
 # 重庆天才小程序本地手工验收
 
+## 0. 当前运行基线（2026-08-03，优先于后文历史记录）
+
+- `utils/config.ts` 的 `develop`、`trial`、`release` 均请求 `https://cqtc.pomi.tech`。本地 `127.0.0.1` API 与 `X-User-Id` 仅用于独立的 API smoke，不代表当前 DevTools 小程序会访问本地 API。
+- `DEV_AUTO_SESSION = false`。正常小程序流程不创建开发 session，不允许长按或修改 `DEV_IDENTITY_ROLE` 进入家长/教练端；用户角色只能由微信手机号授权后，后端 `wechat-login` 的真实返回决定。
+- 真实人工验收顺序：启动后完成微信登录和手机号授权 → 后端返回 `authenticated` 及真实 `role` → 分流到家长或教练端。返回 `binding_required` 时不得用前端角色提示、伪手机号或伪 session 绕过。
+- 本文其余部分中有关 localhost、开发身份、长按切换和 WebSocket 自动截图的描述均为历史记录；与本节冲突时，以本节为准。
+
 ## 1. 验收目标
 
 用本地 API 和重庆天才 200 人导入测试数据，在微信开发者工具里完成家长端、教练端主流程点击验收。
@@ -55,7 +62,7 @@ pnpm --filter @football-club/miniprogram-cq-talent devtools:preview
 
 ## 4. 家长端验收
 
-默认 `utils/config.ts` 中 `DEV_IDENTITY_ROLE = "parent"` 时进入家长端。请求头应带：
+真实人工验收通过微信手机号授权后由后端返回 `parent` 角色进入家长端；下方 `X-User-Id` 仅用于独立 API smoke：
 
 ```text
 X-User-Id: user-parent-cq-talent-acceptance
@@ -74,7 +81,7 @@ X-User-Id: user-parent-cq-talent-acceptance
 
 ## 5. 教练端验收
 
-在启动页长按品牌区切换 dev 身份，或临时把 `utils/config.ts` 的 `DEV_IDENTITY_ROLE` 改为 `coach` 后重新编译。请求头应带：
+真实人工验收通过微信手机号授权后由后端返回 `coach` 角色进入教练端；下方 `X-User-Id` 仅用于独立 API smoke：
 
 ```text
 X-User-Id: user-coach-1
@@ -167,3 +174,11 @@ pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client
 - develop 环境保留开发身份；trial/release 禁用开发身份并要求 HTTPS 地址。
 - DevTools 当前 `login=false`，脚本已改为复用当前 IDE 端口并明确提示登录阻塞。
 - 登录 DevTools 后复跑 `pnpm --filter @football-club/miniprogram-cq-talent devtools:preview`，再按家长/教练清单完成真机点击。
+
+## 11. 2026-08-03 自动截图取证（历史尝试，已废弃）
+
+> **更正（2026-08-03）**：当前 Windows 微信开发者工具 Stable `v2.01.2510290` 的 `cli auto --auto-port 9420` 只提供 HTTP 端口，不能为 `ws://127.0.0.1:9420` 提供可用的截图 WebSocket；`App.captureScreenshot` 因而不是当前可信取证路径。以下历史脚本说明不应被当作可用的截图流程。
+
+可信替代方式是捕获前台 DevTools 真实窗口，再按模拟器内容区域裁成原始 `375×812` PNG，并同时记录设备、当前路由、测试结果和截图文件。仅连接成功或显示正确路由不算截图证据。已按该方式取得 P1 家长日程成功态 iPhone X `375×812` 截图：`C:\Users\ASUS\AppData\Local\Temp\cq-talent-p1-375x812-current-20260803.png`。Empty 状态、其他页面及 Parent/Coach TabBar 真机矩阵仍待逐项验收。
+
+该自动化 WebSocket 截图原型不随当前交付包提交，也不能作为验收命令运行。不要把连通性、路由信息或单元测试当作截图证据；真实角色、API/session 与运行态视觉仍需按本清单的人工验收步骤分别确认。

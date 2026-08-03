@@ -18,6 +18,17 @@
 | coach | 可读取俱乐部训练数据，可写入活动、训练、比赛、评测和指标计算；不能管理球队基础档案和队员关系。 |
 | parent | 可读取俱乐部公开目录和日历；学生个人时间线、指标只限 guardian binding 绑定的学生；不能写入训练、比赛、评测或派生指标。 |
 
+## 微信手机号登录契约（当前客户端）
+
+```text
+POST /clubs/:clubId/app-clients/:clientId/wechat-login
+```
+
+- `wxLoginCode` 必填，`phoneCode` 可选；`roleHint` 不是可信身份来源，不能决定访问权限或前端分流。
+- 返回 `binding_required` 时，`role`、`session`、`profile` 都为 `null`；只能提示核对登记手机号，不能伪造角色、手机号或 session。
+- 只有返回 `authenticated`、真实 `role`、`session` 和 `profile` 后，客户端才可按 parent/coach 分流。
+- 正式微信 connector 依赖服务器 `WECHAT_MINIPROGRAM_APP_ID` 与 `WECHAT_MINIPROGRAM_APP_SECRET`。本地 `x-user-id` smoke 只验证 API 边界，不能代替真实微信登录。
+
 ## Auth headers
 
 开发环境使用 `x-user-id` 模拟登录用户。生产接入真实身份后，API 仍应解析为同一个 membership context：

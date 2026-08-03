@@ -2,6 +2,8 @@
 
 ## Source of truth
 
+> Current source override (2026-08-03): the only design authority is online Figma `https://www.figma.com/design/ATlfBRO0ruOCDDY5ICagFD/` (file key `ATlfBRO0ruOCDDY5ICagFD`). Before every visual change, read the relevant page, frame/node ID, and online screenshot. The local `.fig`, decoded inspection data, and prior audits below are historical references only and must not be used to infer or overwrite the current online design.
+
 - `../02-Figma最新设计导出/重庆天才小程序 UIUX Design System.fig`
 - Decoded inspection data: `../../../../tools/fig-out-v2.json`
 - Audit baseline: `docs/figma-v2-visual-audit.md`
@@ -29,5 +31,5 @@ Bring all parent P1-P10 and coach C1-C16 business frames and their designed stat
 ## Verification
 
 - Static WXML class-to-WXSS audit and WXSS brace audit after each batch.
-- `pnpm check` after each batch.
+- Run the smallest relevant package checks after each batch. Before reporting a repository-wide `pnpm check` result, reproduce and state the two known API fixture differences precisely: `apps/api/test/server.test.ts:688` (`not_started` expected, `in_progress` actual) and `apps/api/test/server.test.ts:1344` (data-capability preview-record assertion mismatch).
 - Build/reload the mini-program and collect 375x812 developer-tool screenshots for each frame, comparing to the Figma export before declaring complete.

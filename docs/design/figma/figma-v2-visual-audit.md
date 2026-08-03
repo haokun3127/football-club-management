@@ -1,6 +1,6 @@
 # 新版 Figma 全量视觉审计（2026-07-31）
 
-> 权威离线源：`../02-Figma最新设计导出/重庆天才小程序 UIUX Design System.fig`
+> 历史离线核对源（非当前设计权威）：`../02-Figma最新设计导出/重庆天才小程序 UIUX Design System.fig`
 >
 > 解析产物：`../../tools/fig-out-v2.json`（5,653 个节点，完整解析）
 >

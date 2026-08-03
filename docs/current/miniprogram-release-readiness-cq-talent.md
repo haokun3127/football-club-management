@@ -1,5 +1,16 @@
 # 重庆天才小程序真实数据验收与发布前准备
 
+## 2026-08-03 当前发布判定（优先于后文历史快照）
+
+| 项目 | 当前事实 | 仍需完成的验证 |
+| --- | --- | --- |
+| 小程序 API 基址 | `develop`、`trial`、`release` 均已配置为 `https://cqtc.pomi.tech` | 微信公众平台 request 合法域名、DNS、TLS 与真机请求闭环 |
+| 微信登录接口 | `wechat-login`、前端手机号授权流和角色分流代码均已存在 | 服务器 `WECHAT_MINIPROGRAM_APP_ID` / `WECHAT_MINIPROGRAM_APP_SECRET`、真实手机号 parent/coach 分流 |
+| P1 成功态视觉 | DevTools iPhone X `375×812` 截图已取得 | P1 Empty、其余页面及 Parent/Coach TabBar 真机矩阵 |
+| 发布质量结论 | 小程序 P1 相关测试和 typecheck 已通过 | 不能将此写成全仓 `pnpm check` 通过；两项 API fixture 差异仍需按文件和断言复现 |
+
+后文有关“合法域名/HTTPS 未配置”“缺 P0 BFF”或“开发身份作为当前客户端入口”的表述均为历史快照，不应作为当前发布结论。
+
 ## 1. 目标
 
 本文件用于推进重庆天才小程序从 MVP 页面重做到发布前准备环境。范围只覆盖：
@@ -85,7 +96,7 @@ sqlite3 /tmp/fcm-cq-talent-smoke.sqlite \
 
 使用 dev 家长身份：
 
-- `DEV_IDENTITY_ROLE = "parent"` 或启动页隐藏切换到家长身份。
+- 真实人工验收通过微信手机号授权并由后端返回 `parent` 角色；本地 API smoke 才使用固定测试身份。
 - 请求头应带 `X-User-Id: user-parent-cq-talent-acceptance`。
 - 启动后不得出现家长/教练自选按钮。
 
@@ -106,7 +117,7 @@ sqlite3 /tmp/fcm-cq-talent-smoke.sqlite \
 
 使用 dev 教练身份：
 
-- `DEV_IDENTITY_ROLE = "coach"` 或启动页隐藏切换到教练身份。
+- 真实人工验收通过微信手机号授权并由后端返回 `coach` 角色；本地 API smoke 才使用固定测试身份。
 - 请求头应带 `X-User-Id: user-coach-1`。
 - 启动后不得出现家长/教练自选按钮。
 
@@ -143,8 +154,8 @@ P0 BFF 当前交付状态如下；已完成项继续由 smoke 回归，生产登
 | DevTools CLI 登录 | 2026-06-28 已通过；2026-07-10 复验为未登录 | 登录开发者工具后重跑 |
 | DevTools open/preview | 2026-06-28 已通过；当前受 CLI 未登录阻塞 | 登录后运行 `devtools:preview` 并做真机复验 |
 | 测试 AppID | 已配置 `wx3df49f3b936ab2ed` | 发布前替换正式 AppID |
-| 合法域名/HTTPS | 未配置 | 后端部署到 HTTPS 后配置微信后台 |
-| 生产登录 | 缺 P0 BFF | 后端补齐 `wechat-login` |
+| 合法域名/HTTPS | 小程序配置已指向 `https://cqtc.pomi.tech` | 确认 DNS、TLS、反向代理、微信公众平台 request 合法域名和真机请求 |
+| 生产登录 | `wechat-login` 和前端授权流已实现 | 配置正式 AppID/AppSecret，并用真实授权手机号完成 parent/coach 分流 |
 | 200 人数据 | 已接入本地 dev seed/BFF smoke | 继续做真机手工验收 |
 | 点名/销课写入 | 点名、销课确认、销课纠正已接入并通过本地 API smoke | 真机点击复验 |
 | 比赛摘要写入 | 已接入 app-client BFF，并通过本地 API smoke | 真机点击复验 |

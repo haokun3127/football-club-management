@@ -1,5 +1,9 @@
 # PRD：cq-talent Figma 视觉基础落地
 
+## 当前设计来源约定（2026-08-03）
+
+本任务后续的唯一设计权威是在线 Figma `https://www.figma.com/design/ATlfBRO0ruOCDDY5ICagFD/`（file key `ATlfBRO0ruOCDDY5ICagFD`）。下文关于本地 `.fig`、离线 PNG、fig-kiwi 与当时获取受阻的描述仅保留为 2026-07-30 的历史背景；任何新视觉决策都必须先读取在线目标画板、节点 ID 和截图。
+
 ## 目标
 
 按 2026-07-30《Figma 原始设计全量补齐》决策（docs/figma-full-implementation-decision.md），
