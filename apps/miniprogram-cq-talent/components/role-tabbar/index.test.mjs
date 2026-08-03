@@ -45,9 +45,21 @@ describe("role tabbar real-device icon contract", () => {
     expect(controller).not.toContain("tab-training.svg");
     expect(controller).not.toContain("tab-user.svg");
     expect(template).not.toMatch(/\.(map|filter|slice|indexOf)\s*\(/);
-    expect(template).toContain("<cover-view class=\"tabbar\">");
+    expect(template).toContain('<cover-view class="tabbar tabbar--{{role}}">');
     expect(template).toContain("<cover-image class=\"tabbar-icon\" src=\"{{item.icon}}\" />");
     expect(styles).not.toContain("opacity: .48");
+  });
+
+  it("keeps parent activity affordances separate from coach tab states", () => {
+    expect(template).toContain('class="tabbar tabbar--{{role}}"');
+    expect(styles).toContain(".tabbar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 9999; display: flex; box-sizing: border-box; height: 140rpx;");
+    expect(styles).toContain(".tabbar-icon-wrap { position: relative; display: flex; align-items: center; justify-content: center; width: 64rpx; height: 52rpx;");
+    expect(styles).toContain(".tabbar-icon { width: 44rpx; height: 44rpx; }");
+    expect(styles).toContain(".tabbar--parent .tabbar-item.active { color: #a80f1b;");
+    expect(styles).toContain(".tabbar--parent .tabbar-item.active .tabbar-dot { bottom: -3rpx; width: 4rpx; height: 4rpx; border-radius: 999rpx; background: #a80f1b; }");
+    expect(styles).toContain(".tabbar--coach .tabbar-dot { display: none; }");
+    expect(styles).not.toContain(".tabbar-item.active .tabbar-icon-wrap { background: #fceeef; }");
+    expect(styles).not.toContain(".tabbar-item.active .tabbar-dot { background: var(--color-brand); }");
   });
 
   it("ships all active and inactive icons as valid PNG files", () => {

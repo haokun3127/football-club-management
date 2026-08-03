@@ -1,4 +1,4 @@
-<cover-view class="tabbar">
+<cover-view class="tabbar tabbar--{{role}}">
   <cover-view
     wx:for="{{items}}"
     wx:key="key"
