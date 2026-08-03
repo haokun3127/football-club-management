@@ -3,12 +3,24 @@
 from decoded fig-kiwi JSON into markdown/JSON reports."""
 import json
 import sys
-sys.path.insert(0, 'tools')
+from pathlib import Path
 from fig2json import Buf, decode_schema
 import zipfile
 import zlib
 
-FIG = 'football-club-management-最终完整交接包-2026-07-29/01-当前项目完整副本/.hermes/desktop-attachments/重庆天才小程序 UIUX Design System.fig'
+if len(sys.argv) not in (3, 4):
+    raise SystemExit(
+        'usage: python scripts/fig_extract_tokens.py '
+        '<path-to-design.fig> <decoded-fig.json> [report.md]'
+    )
+
+FIG = Path(sys.argv[1])
+DECODED_JSON = Path(sys.argv[2])
+REPORT_PATH = Path(sys.argv[3]) if len(sys.argv) == 4 else DECODED_JSON.with_name('fig-report.md')
+if not FIG.is_file():
+    raise SystemExit(f'Figma source not found: {FIG}')
+if not DECODED_JSON.is_file():
+    raise SystemExit(f'Decoded Figma JSON not found: {DECODED_JSON}')
 
 z = zipfile.ZipFile(FIG)
 defs = decode_schema(Buf(zlib.decompressobj(-15).decompress(z.read('canvas.fig')[16:16+28766])))
@@ -17,7 +29,7 @@ for i, d in enumerate(defs):
     if d['kind'] == 0:
         enums[i] = {f['value']: f['name'] for f in d['fields']}
 
-doc = json.load(open('tools/fig-out.json', encoding='utf-8'))
+doc = json.load(DECODED_JSON.open(encoding='utf-8'))
 changes = doc['root']['nodeChanges']
 
 nc_def = next(d for d in defs if d['name'] == 'NodeChange')
@@ -88,5 +100,5 @@ for ck in canvas_keys:
         dim = f" {w:.0f}x{h:.0f}" if isinstance(w, (int, float)) and isinstance(h, (int, float)) else ''
         lines.append(f"- [{t}] {f.get('name')}{dim}")
 
-open('tools/fig-report.md', 'w', encoding='utf-8').write('\n'.join(lines))
-print(f'wrote tools/fig-report.md, {len(lines)} lines')
+REPORT_PATH.write_text('\n'.join(lines), encoding='utf-8')
+print(f'wrote {REPORT_PATH}, {len(lines)} lines')
