@@ -214,10 +214,11 @@
 - 当前验证：目标测试 `6/6`、小程序包测试 `4 files / 18 tests`、typecheck 通过；WXML 禁用 JS 方法扫描干净；`git diff --check` 无空白错误，仅有工作树既有 LF→CRLF 提示。
 - 视觉证据分层：在线 Figma 节点 `93:83`、`241:166`、`241:412` 及 Empty 状态截图已核对；尚未取得微信开发者工具或真机 `375x812` 截图，因此小程序运行态视觉验收仍未完成，不能宣称与 Figma 完全一致。
 
-### 2026-08-02 P1 Hero 位置与图标来源修正
+### 2026-08-03 P1 Hero 与提醒图标在线同步
 
-- 在线 Figma 成功态节点 `93:83` 的 hero-stats 位于 Hero 内 `147px`，代码以 `294rpx` 对齐；Empty Hero `.hero__stats--empty` 保持 `274rpx`，因暂无精确子层 bounds。三处未经直接证实的 SVG 引用已恢复为 CSS/文本回退图标节点。
-- 静态断言、目标 P1 单测 `8/8`、小程序包测试 `6 files / 26 tests` 与 typecheck 均通过；`git diff --check` 无空白错误（仅既有 LF→CRLF 提示）。
+- 在线 Figma 实测并复读：成功态 `93:83` 与 `241:166` 的 `Hero Card > hero-stats` 均为相对 Hero `X=16, Y=137, W=311, H=31`；Hero 为 `343×180`，底部留白 `12px`。此前历史规格中的 `Y=147` / `2px` 底距已过时；`241:412` Empty 未改动。
+- 小程序成功态与空态均使用 `.hero__stats { top: 274rpx; }` / `.hero__stats--empty { top: 274rpx; }`，与在线成功态 `Y=137px` 对齐。提醒入口保留真实 `menuInset`、`navActionTop` 与 `openReminders`，不引入未验证 SVG；CSS 铃铛使用 `64rpx` 点击区、约 `18×20px` 视觉轮廓和带白描边的红点。
+- Terra 复核后，P1 单测 `8/8`、小程序包测试 `6 files / 26 tests`、typecheck、WXML 禁用 JS 方法扫描与 `git diff --check` 通过。未改 API、session、角色或数据契约；真实 parent/API 的 DevTools 或真机 `375×812` 成功态与空态截图仍待验，不能宣称小程序运行态视觉完成。
 
 ### 2026-08-03 P1 在线 Figma 状态画板排布修正
 

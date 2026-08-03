@@ -24,16 +24,16 @@
         - [13] | 17:30 | 149x65 @(1402,267) | fill=#ffffff | font=Inter/Extra Bold 54px | text="17:30" | shadow=0,6,18,#a80f1b@0.40
         - [13] | 技术专项训练 | 90x18 @(1563,305) | fill=#ffffff | font=Inter/Semi Bold 15px | text="技术专项训练"
       - [13] | U10精英队 · 凤凰山球场 | 311x15 @(1402,344) | fill=#ffffff@0.80 | font=Inter/Regular 12px | text="U10精英队 · 凤凰山球场"
-      - [4] | hero-stats | 311x31 @(1402,371) | layout=H gap=10
-        - [4] | stat-pill | 86x31 @(1402,371) | fill=#a80f1b@0.10 | stroke=#a80f1b@0.20 w1 | r=999 | layout=H gap=6 pad=8/10
-          - [13] | 94% | 27x15 @(1412,379) | fill=#a80f1b | font=Inter/Extra Bold 12px | text="94%"
-          - [13] | 出席率 | 33x13 @(1445,380) | fill=#ffffff@0.80 | font=Inter/Semi Bold 11px | text="出席率"
-        - [4] | stat-pill | 95x31 @(1498,371) | fill=#ffffff@0.06 | stroke=#ffffff@0.10 w1 | r=999 | layout=H gap=6 pad=8/10
-          - [13] | 7.2h | 25x15 @(1508,379) | fill=#ffffff | font=Inter/Extra Bold 12px | text="7.2h"
-          - [13] | 本周训练 | 44x13 @(1539,380) | fill=#ffffff@0.70 | font=Inter/Semi Bold 11px | text="本周训练"
-        - [4] | stat-pill | 91x31 @(1603,371) | fill=#ffffff@0.06 | stroke=#ffffff@0.10 w1 | r=999 | layout=H gap=6 pad=8/10
-          - [13] | 3节 | 21x15 @(1613,379) | fill=#ffffff@0.70 | font=Inter/Extra Bold 12px | text="3节"
-          - [13] | 本周课次 | 44x13 @(1640,380) | fill=#ffffff@0.70 | font=Inter/Semi Bold 11px | text="本周课次"
+      - [4] | hero-stats | 311x31 @(1402,361) | layout=H gap=10 | online-rechecked: relative-to-Hero=(16,137), bottom-inset=12
+        - [4] | stat-pill | 86x31 @(1402,361) | fill=#a80f1b@0.10 | stroke=#a80f1b@0.20 w1 | r=999 | layout=H gap=6 pad=8/10
+          - [13] | 94% | 27x15 @(1412,369) | fill=#a80f1b | font=Inter/Extra Bold 12px | text="94%"
+          - [13] | 出席率 | 33x13 @(1445,370) | fill=#ffffff@0.80 | font=Inter/Semi Bold 11px | text="出席率"
+        - [4] | stat-pill | 95x31 @(1498,361) | fill=#ffffff@0.06 | stroke=#ffffff@0.10 w1 | r=999 | layout=H gap=6 pad=8/10
+          - [13] | 7.2h | 25x15 @(1508,369) | fill=#ffffff | font=Inter/Extra Bold 12px | text="7.2h"
+          - [13] | 本周训练 | 44x13 @(1539,370) | fill=#ffffff@0.70 | font=Inter/Semi Bold 11px | text="本周训练"
+        - [4] | stat-pill | 91x31 @(1603,361) | fill=#ffffff@0.06 | stroke=#ffffff@0.10 w1 | r=999 | layout=H gap=6 pad=8/10
+          - [13] | 3节 | 21x15 @(1613,369) | fill=#ffffff@0.70 | font=Inter/Extra Bold 12px | text="3节"
+          - [13] | 本周课次 | 44x13 @(1640,370) | fill=#ffffff@0.70 | font=Inter/Semi Bold 11px | text="本周课次"
     - [4] | Activity List | 343x312 @(1386,535) | layout=V gap=12
       - [4] | Card | 343x96 @(1386,535) | fill=#ffffff | r=16 | layout=H gap=12 pad=16/16 | shadow=0,4,16,#000000@0.05
         - [12] | Rectangle | 4x64 @(1402,551) | fill=#a80f1b | r=20

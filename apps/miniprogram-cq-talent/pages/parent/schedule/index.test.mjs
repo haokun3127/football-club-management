@@ -102,18 +102,20 @@ describe("parent schedule hero", () => {
     expect(template).toContain('class="p1-empty-list"');
   });
 
-  it("uses the approved offsets for regular and empty hero pills", () => {
+  it("keeps both hero statistic rows at the Figma-aligned offset", () => {
     const heroStats = styles.match(/\.hero__stats\s*\{([^}]*)\}/)?.[1] ?? "";
     const emptyHeroStats = styles.match(/\.hero__stats--empty\s*\{([^}]*)\}/)?.[1] ?? "";
     const heroPill = styles.match(/\.hero__pill\s*\{([^}]*)\}/)?.[1] ?? "";
 
-    expect(heroStats).toContain("top: 294rpx");
+    expect(heroStats).toContain("top: 274rpx");
     expect(emptyHeroStats).toContain("top: 274rpx");
     expect(heroPill).toContain("height: 62rpx");
   });
 
   it("uses the approved CSS and text fallback icon nodes instead of unverified SVG assets", () => {
+    const bell = styles.match(/\.p1-nav__bell\s*\{([^}]*)\}/)?.[1] ?? "";
     const bellShape = styles.match(/\.p1-nav__bell-shape\s*\{([^}]*)\}/)?.[1] ?? "";
+    const bellShapeBefore = styles.match(/\.p1-nav__bell-shape::before\s*\{([^}]*)\}/)?.[1] ?? "";
     const bellShapeAfter = styles.match(/\.p1-nav__bell-shape::after\s*\{([^}]*)\}/)?.[1] ?? "";
     const bellClapper = styles.match(/\.p1-nav__bell-clapper\s*\{([^}]*)\}/)?.[1] ?? "";
     const clock = styles.match(/\.acard__clock\s*\{([^}]*)\}/)?.[1] ?? "";
@@ -123,12 +125,38 @@ describe("parent schedule hero", () => {
     expect(template).not.toContain('/assets/icons/bell.svg');
     expect(template).not.toContain('/assets/icons/clock.svg');
     expect(template).not.toContain('/assets/icons/chevron-right.svg');
+    expect(template).toContain('style="right:{{menuInset}}px;top:{{navActionTop}}px"');
+    expect(template).toContain('bindtap="openReminders"');
     expect(template).toContain('<view class="p1-nav__bell-shape"><view class="p1-nav__bell-clapper"></view></view>');
     expect(template).toContain('<view class="acard__clock"></view>');
     expect(template).toContain('<view class="acard__chevron">›</view>');
-    expect(bellShape).not.toBe("");
-    expect(bellShapeAfter).not.toBe("");
-    expect(bellClapper).not.toBe("");
+    expect(bell).toContain("width: 64rpx");
+    expect(bell).toContain("height: 64rpx");
+    expect(bellShape).toContain("width: 36rpx");
+    expect(bellShape).toContain("height: 40rpx");
+    expect(bellShape).toContain("box-sizing: border-box");
+    expect(bellShape).not.toMatch(/(?:^|;)\s*border\s*:/);
+    expect(bellShapeBefore).toContain("top: 0");
+    expect(bellShapeBefore).toContain("left: 0");
+    expect(bellShapeBefore).toContain("width: 36rpx");
+    expect(bellShapeBefore).toContain("height: 32rpx");
+    expect(bellShapeBefore).toContain("box-sizing: border-box");
+    expect(bellShapeBefore).toContain("border: 4rpx solid #0d0d0d");
+    expect(bellShapeBefore).toContain("border-bottom: 0");
+    expect(bellShapeBefore).toContain('content: ""');
+    expect(bellShapeAfter).toContain("top: 32rpx");
+    expect(bellShapeAfter).toContain("left: 0");
+    expect(bellShapeAfter).toContain("width: 36rpx");
+    expect(bellShapeAfter).toContain("height: 4rpx");
+    expect(bellShapeAfter).toContain("box-sizing: border-box");
+    expect(bellShapeAfter).toContain("background: #0d0d0d");
+    expect(bellShapeAfter).toContain('content: ""');
+    expect(bellClapper).toContain("top: 36rpx");
+    expect(bellClapper).toContain("left: 13rpx");
+    expect(bellClapper).toContain("width: 10rpx");
+    expect(bellClapper).toContain("height: 4rpx");
+    expect(bellClapper).toContain("box-sizing: border-box");
+    expect(bellClapper).toContain("background: #0d0d0d");
     expect(clock).toContain("width: 20rpx");
     expect(clock).toContain("height: 20rpx");
     expect(clock).toContain("border: 3rpx solid #6b7280");
@@ -137,6 +165,8 @@ describe("parent schedule hero", () => {
     expect(bellDot).toContain("box-sizing: border-box");
     expect(bellDot).toContain("width: 16rpx");
     expect(bellDot).toContain("height: 16rpx");
+    expect(bellDot).toContain("border: 2rpx solid #ffffff");
+    expect(bellDot).toContain("right: 4rpx");
   });
 
   it("lets the dynamic date chip wrap without clipping while preserving the other chip widths", () => {
