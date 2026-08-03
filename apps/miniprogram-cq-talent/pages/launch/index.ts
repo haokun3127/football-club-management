@@ -2,6 +2,7 @@ import { resolveClient } from "../../utils/api";
 import { routeHome } from "../../utils/auth";
 import { DEV_AUTO_SESSION, DEV_MODE } from "../../utils/config";
 import { createDevSession } from "../../utils/mock";
+import { resolveNavInset } from "../../utils/presentation";
 import { getDevRole, getSession, setAppContext, setSession, toggleDevRole } from "../../utils/store";
 import type { AppRole, LoadState } from "../../utils/types";
 
@@ -12,6 +13,7 @@ interface LaunchData {
   actionText: string;
   clientName: string;
   devHint: string;
+  contentTop: number;
 }
 
 Page<LaunchData>({
@@ -22,8 +24,10 @@ Page<LaunchData>({
     actionText: "",
     clientName: "足球俱乐部小程序",
     devHint: "",
+    contentTop: 88,
   },
   onLoad() {
+    this.setData({ contentTop: Math.max(88, resolveNavInset() + 68) });
     this.bootstrap();
   },
   async bootstrap() {

@@ -1,7 +1,3 @@
 {
-  "navigationStyle": "custom",
-  "usingComponents": {
-    "app-header": "/components/app-header/index",
-    "status-view": "/components/status-view/index"
-  }
+  "navigationStyle": "custom"
 }

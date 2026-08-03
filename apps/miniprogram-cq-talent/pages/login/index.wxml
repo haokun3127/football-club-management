@@ -1,21 +1,30 @@
 <view class="login-page">
-  <app-header title="账号验证" />
-  <view class="login-page__body">
-    <view class="login-hero">
-      <view class="login-hero__eyebrow">重庆天才足球</view>
-      <view class="title">欢迎回来</view>
-      <view class="subtitle">验证微信手机号后，将自动匹配您在俱乐部登记的身份。</view>
-    </view>
+  <view class="login-nav" style="margin-top: {{navTop}}px"><view class="login-nav__title">{{isBlocked ? '访问受限' : '身份验证'}}</view></view>
 
-    <status-view state="{{state}}" title="{{state === 'loading' ? '正在验证' : state === 'pending' ? '需要俱乐部确认' : state === 'error' ? '暂时无法登录' : ''}}" message="{{message}}" action-text="{{state === 'error' ? '重新连接' : ''}}" bindaction="retry" />
-
-    <view wx:if="{{state === 'ready'}}" class="card verify-card">
-      <view class="section-title">手机号验证</view>
-      <view class="subtitle">手机号只用于匹配当前俱乐部档案，不会创建新的身份。</view>
-      <button class="primary-button verify-button" open-type="getPhoneNumber" loading="{{submitting}}" disabled="{{submitting}}" bindgetphonenumber="onGetPhoneNumber">授权手机号并进入</button>
-      <view class="privacy-note">继续即表示同意使用微信授权手机号完成身份核验。</view>
-    </view>
-
-    <view class="help-row"><view class="help-row__title">遇到问题？</view><view class="help-row__text">未登记、手机号不一致、多身份或账号停用，请联系俱乐部工作人员处理。</view></view>
+  <view wx:if="{{isBlocked}}" class="blocked-card">
+    <view class="blocked-card__icon"><image class="blocked-card__icon-image" src="/assets/icons/login-alert.svg" mode="aspectFit" /></view>
+    <view class="blocked-card__title">账号暂时受限</view>
+    <view class="blocked-card__desc">如有疑问，请联系俱乐部管理员</view>
+    <view class="blocked-card__status"><view class="blocked-card__chip">受限</view><view class="blocked-card__status-text">当前账号无法进入小程序</view></view>
+    <button class="blocked-card__button" bindtap="backToLaunch">返回首页</button>
   </view>
+
+  <block wx:else>
+    <view class="login-hero-card">
+      <view class="login-hero-card__badge"><image class="login-hero-card__icon" src="/assets/icons/login-link.svg" mode="aspectFit" /></view>
+      <view class="login-hero-card__title">连接重庆天才服务</view>
+      <view class="login-hero-card__desc">验证微信手机号，自动匹配俱乐部身份</view>
+    </view>
+
+    <view class="login-form-card">
+      <view class="login-field"><view class="login-field__label">微信手机号</view><view class="login-field__line"></view><view class="login-field__placeholder">授权后自动读取</view></view>
+      <view class="login-field login-field--status"><view class="login-field__label">身份匹配</view><view class="login-field__line"></view><view class="login-field__status">自动匹配俱乐部档案</view></view>
+    </view>
+
+    <view wx:if="{{state === 'loading'}}" class="login-feedback login-feedback--loading">{{message}}</view>
+    <view wx:elif="{{state === 'error'}}" class="login-feedback login-feedback--error" bindtap="retry">{{message}}<text class="login-feedback__action">重新连接</text></view>
+
+    <view class="login-cta-wrap"><button class="login-cta {{submitting || state === 'loading' ? 'login-cta--disabled' : ''}}" open-type="getPhoneNumber" loading="{{submitting}}" disabled="{{submitting || state === 'loading'}}" bindgetphonenumber="onGetPhoneNumber">微信手机号授权并继续</button></view>
+    <view class="login-privacy">同意《用户协议》和《隐私政策》</view>
+  </block>
 </view>

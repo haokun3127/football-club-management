@@ -1,14 +1,27 @@
 <view class="launch">
-  <view class="launch__body">
-    <view class="brand" bindlongpress="switchDevRole">
-      <view class="brand-mark"><view class="brand-ball">CQ</view></view>
-      <view class="brand-name">{{clientName}}</view>
-      <view class="brand-subtitle">陪伴每一次训练与成长</view>
+  <view class="launch__content" style="padding-top: {{contentTop}}px">
+    <view class="launch-brand">
+      <view class="launch-brand__badge"><image class="launch-brand__icon" src="/assets/icons/login-shield.svg" mode="aspectFit" /></view>
+      <view class="launch-brand__name">重庆天才足球俱乐部</view>
     </view>
 
-    <status-view state="{{state}}" title="{{title}}" message="{{message}}" action-text="{{actionText}}" bindaction="retry" />
+    <view class="launch-card">
+      <view class="launch-row">
+        <view class="launch-row__copy"><view class="launch-row__title">连接重庆天才服务</view><view class="launch-row__desc">解析小程序用户身份、登录、重置状态</view></view>
+        <view class="launch-chip launch-chip--{{state === 'error' ? 'error' : 'loading'}}">{{state === 'error' ? '异常' : '加载中'}}</view>
+      </view>
+      <view class="launch-divider"></view>
+      <view class="launch-row">
+        <view class="launch-row__copy"><view class="launch-row__title">客户端状态</view><view class="launch-row__desc">能力选择入口同步中</view></view>
+        <view class="launch-chip launch-chip--pending">待完成</view>
+      </view>
+      <view class="launch-divider"></view>
+      <view class="launch-row launch-row--action" bindtap="retry">
+        <view class="launch-row__copy"><view class="launch-row__title">异常处理</view><view class="launch-row__desc">失败时可重试或联系俱乐部</view></view>
+        <image class="launch-chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
+      </view>
+    </view>
 
-    <view class="notice">身份将根据俱乐部登记资料自动匹配。如资料有误，请联系俱乐部工作人员。</view>
-    <view wx:if="{{devHint}}" class="dev-hint">{{devHint}}</view>
+    <view class="launch-helper">{{state === 'error' ? message : '正在初始化，请稍候'}}</view>
   </view>
 </view>

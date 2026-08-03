@@ -9,14 +9,17 @@ Page({
     message: "首次使用需要验证微信手机号，以匹配俱乐部登记档案。",
     wxLoginCode: "",
     submitting: false,
+    isBlocked: false,
+    navTop: 88,
   },
   onLoad(query?: Record<string, string | undefined>) {
     const code = query?.code ? decodeURIComponent(query.code) : "";
-    this.setData({ wxLoginCode: code });
+    // Keep the G2 top navigation envelope at 88px.
+    this.setData({ wxLoginCode: code, navTop: 88 });
     if (!code) this.refreshWechatCode();
   },
   refreshWechatCode() {
-    this.setData({ state: "loading", message: "正在连接微信账号" });
+    this.setData({ state: "loading", message: "正在连接微信账号", isBlocked: false });
     wx.login({
       success: (result) => {
         if (!result.code) {
@@ -47,11 +50,11 @@ Page({
     try {
       const result = await wechatLogin(this.data.wxLoginCode, event.detail.code);
       if (result.status !== "authenticated" || !result.session || !result.role || !result.profile) {
-        this.setData({ state: "pending", message: "当前手机号尚未匹配到有效的家长或教练档案，请联系俱乐部管理员。" });
+        this.setData({ state: "pending", isBlocked: true, message: "当前手机号尚未匹配到有效的家长或教练档案，请联系俱乐部管理员。" });
         return;
       }
       if (result.role === "parent" && !result.children.length) {
-        this.setData({ state: "pending", message: "家长档案尚未绑定孩子，请联系俱乐部补充资料。" });
+        this.setData({ state: "pending", isBlocked: true, message: "家长档案尚未绑定孩子，请联系俱乐部补充资料。" });
         return;
       }
       setSession({
@@ -74,5 +77,8 @@ Page({
   },
   retry() {
     this.refreshWechatCode();
+  },
+  backToLaunch() {
+    wx.reLaunch({ url: "/pages/launch/index" });
   },
 });
