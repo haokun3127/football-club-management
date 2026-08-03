@@ -1,49 +1,33 @@
 <view class="binding-page">
-  <view class="page-nav"><view class="page-nav__back" bindtap="goBack">‹</view><view class="page-nav__title">账号绑定</view></view>
+  <view class="binding-nav" style="padding-top:{{navInset}}px">
+    <view class="binding-nav__back" style="top:{{navActionTop}}px" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+    <view class="binding-nav__title">账号绑定</view>
+  </view>
+
   <view class="binding-page__body">
-    <status-view
-      state="{{state}}"
-      title="{{state === 'loading' ? '加载绑定信息' : state === 'empty' ? '暂无绑定学员' : '读取失败'}}"
-      message="{{message}}"
-      action-text="{{state === 'error' ? '重试' : ''}}"
-      bindaction="retry"
-    />
+    <status-view state="{{state}}" title="{{state === 'loading' ? '加载绑定信息' : state === 'empty' ? '暂无绑定学员' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready'}}">
-      <!-- 绑定学员（Figma P10: 头像 + 姓名 + 队伍 + 已绑定 chip） -->
-      <view class="card">
-        <view class="card__title">绑定学员</view>
-        <view wx:for="{{children}}" wx:key="id" class="child-row" data-id="{{item.id}}" bindtap="switchChild">
-          <view class="child-row__avatar">{{item.avatarLetter}}</view>
-          <view class="child-row__info">
-            <view class="child-row__name">{{item.name}}</view>
-            <view class="child-row__team">{{item.teams[0] || '重庆天才足球俱乐部'}}</view>
-          </view>
-          <view wx:if="{{item.id === activeChildId}}" class="child-row__chip">当前</view>
-          <view wx:else class="child-row__chip child-row__chip--muted">切换</view>
+      <view class="binding-card binding-card--child">
+        <view class="binding-card__title">绑定学员</view>
+        <view wx:if="{{activeChild}}" class="binding-child" data-id="{{activeChild.id}}" bindtap="switchChild">
+          <view class="binding-child__avatar">{{activeChild.avatarLetter}}</view>
+          <view class="binding-child__info"><view class="binding-child__name">{{activeChild.name}}</view><view class="binding-child__team">{{activeChild.teams[0] || '重庆天才足球俱乐部'}}</view></view>
+          <view class="binding-child__chip">已绑定</view>
         </view>
-        <view class="card__hint">点击学员可切换当前学员</view>
+        <view class="binding-card__hint" bindtap="chooseChild">切换学员</view>
       </view>
 
-      <!-- 微信登录绑定 -->
-      <view class="card">
-        <view class="card__title">
-          <text class="card__icon card__icon--green">📱</text>微信登录绑定
-        </view>
-        <view class="wechat-row">
-          <text class="wechat-row__check">✓</text>
-          <text class="wechat-row__label">{{wechatLabel}}</text>
-          <text class="wechat-row__action" bindtap="unbindWechat">解绑</text>
-        </view>
+      <view class="binding-card binding-card--wechat" bindtap="openAccount">
+        <view class="wechat-head"><image src="/assets/icons/smartphone.svg" mode="aspectFit" /><view class="binding-card__title">微信登录绑定</view></view>
+        <view class="wechat-detail"><image src="/assets/icons/check-circle.svg" mode="aspectFit" /><view>微信: {{wechatLabel}}</view></view>
       </view>
 
-      <!-- 家庭成员 -->
-      <view class="card">
-        <view class="card__head">
-          <view class="card__title">家庭成员</view>
-          <view class="card__action" bindtap="addFamilyMember">+ 添加</view>
-        </view>
-        <view class="family-empty">暂无其他家庭成员，可联系俱乐部添加共同监护人</view>
+      <view class="binding-card binding-card--family">
+        <view class="binding-card__title">家庭成员</view>
+        <view class="family-row"><image src="/assets/icons/user.svg" mode="aspectFit" /><view class="family-row__main"><view class="family-row__name">主监护人</view><view class="family-row__phone">已通过微信授权</view></view><view class="family-row__chip">已加入</view></view>
+        <view class="family-divider"></view>
+        <view class="family-add" bindtap="addFamilyMember"><image src="/assets/icons/plus.svg" mode="aspectFit" /><view>添加家庭成员</view></view>
       </view>
     </block>
   </view>

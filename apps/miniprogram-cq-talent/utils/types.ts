@@ -108,6 +108,7 @@ export interface ActivityDetail {
   type: "training" | "match" | "other";
   title: string;
   status: string;
+  participants: Array<{ studentId: string; name: string; status: string }>;
   fields: Array<{ label: string; value: string }>;
   sections: Array<{ title: string; items: Array<{ label: string; value: string; status?: string }> }>;
   pending: Array<{ title: string; message: string }>;

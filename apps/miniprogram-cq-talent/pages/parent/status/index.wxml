@@ -1,5 +1,9 @@
 <view class="status-page">
-  <view class="page-nav"><view class="page-nav__back" bindtap="goBack">‹</view><view class="page-nav__title">课时与保障</view></view>
+  <view class="status-nav" style="padding-top:{{navInset}}px">
+    <view class="status-nav__back" style="top:{{navActionTop}}px" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+    <view class="status-nav__title">课时与保障</view>
+  </view>
+
   <view class="status-page__body">
     <status-view
       state="{{state}}"
@@ -10,43 +14,27 @@
     />
 
     <block wx:if="{{state === 'ready'}}">
-      <!-- 课时统计卡（Figma: 48px Bold #07111f + 本月/本季 chips） -->
       <view class="lesson-card">
         <view class="lesson-card__title">训练课时</view>
         <view class="lesson-card__count">{{totalCount}}</view>
         <view class="lesson-card__caption">累计课时</view>
-        <view class="lesson-card__chips">
-          <view class="stat-chip">本月 {{monthCount}}课</view>
-          <view class="stat-chip">本季 {{seasonCount}}课</view>
-        </view>
-        <view wx:if="{{lessonRows.length}}" class="lesson-card__rows">
-          <view wx:for="{{lessonRows}}" wx:key="label" class="kv-row">
-            <view class="kv-row__label">{{item.label}}</view>
-            <view class="kv-row__value">{{item.value}}</view>
-          </view>
-        </view>
+        <view class="lesson-card__chips"><view class="stat-chip">本月 {{monthCount}}课</view><view class="stat-chip">本季 {{seasonCount}}课</view></view>
       </view>
 
-      <!-- 近期课时记录 -->
-      <view wx:if="{{history.length}}" class="card">
+      <view class="card history-card">
         <view class="card__title">近期课时记录</view>
         <view wx:for="{{history}}" wx:key="id" class="history-row {{index < history.length - 1 ? 'history-row--border' : ''}}">
-          <view class="history-row__date">{{item.dateLabel}}</view>
-          <view class="history-row__title">{{item.title}}</view>
-          <view class="history-row__hours">{{item.hoursLabel}}</view>
+          <view class="history-row__date">{{item.dateLabel}}</view><view class="history-row__title">{{item.title}}</view><view class="history-row__hours">{{item.hoursLabel}}</view>
         </view>
       </view>
 
-      <!-- 运动保障卡 -->
-      <view class="card">
-        <view class="card__title">运动保障</view>
+      <view class="card safety-card">
+        <view class="safety-card__head"><view class="card__title">运动保障</view><image class="safety-card__info" src="/assets/icons/info.svg" mode="aspectFit" /></view>
+        <view class="safety-card__copy">随队保险覆盖中</view>
         <view class="insurance-badge insurance-badge--{{insuranceBadgeTone}}">{{insuranceBadge}}</view>
-        <view wx:for="{{insuranceRows}}" wx:key="label" class="kv-row">
-          <view class="kv-row__label">{{item.label}}</view>
-          <view class="kv-row__value">{{item.value}}</view>
-        </view>
+        <view class="safety-card__divider"></view>
+        <view wx:for="{{insuranceRows}}" wx:key="label" class="kv-row"><view class="kv-row__label">{{item.label}}</view><view class="kv-row__value">{{item.value}}</view></view>
       </view>
-
       <view class="contact-note">如有疑问请联系俱乐部管理员</view>
     </block>
   </view>

@@ -112,6 +112,26 @@ describe("parent schedule hero", () => {
     expect(heroPill).toContain("height: 62rpx");
   });
 
+  it("keeps the weekly lesson-count metric on one line when the count is two digits or less", () => {
+    const lastHeroPill = styles.match(/\.hero__pill:last-child\s*\{([^}]*)\}/)?.[1] ?? "";
+    const heroPillValueRules = [...styles.matchAll(/\.hero__pill-value\s*\{([^}]*)\}/g)].map((match) => match[1]);
+
+    expect(lastHeroPill).toContain("width: 196rpx");
+    expect(heroPillValueRules).toContainEqual(expect.stringContaining("white-space: nowrap"));
+  });
+
+  it("aligns the schedule title with the right-side menu action baseline", () => {
+    const nav = styles.match(/\.p1-nav\s*\{([^}]*)\}/)?.[1] ?? "";
+    const title = styles.match(/\.p1-nav__title\s*\{([^}]*)\}/)?.[1] ?? "";
+
+    expect(template).toContain('<view class="p1-nav__title" style="top:{{navActionTop}}px">日程</view>');
+    expect(nav).toContain("align-items: center");
+    expect(title).toContain("position: absolute");
+    expect(title).toContain("height: 64rpx");
+    expect(title).toContain("display: flex");
+    expect(title).toContain("align-items: center");
+  });
+
   it("uses the approved CSS and text fallback icon nodes instead of unverified SVG assets", () => {
     const bell = styles.match(/\.p1-nav__bell\s*\{([^}]*)\}/)?.[1] ?? "";
     const bellShape = styles.match(/\.p1-nav__bell-shape\s*\{([^}]*)\}/)?.[1] ?? "";
@@ -169,22 +189,23 @@ describe("parent schedule hero", () => {
     expect(bellDot).toContain("right: 4rpx");
   });
 
-  it("lets the dynamic date chip wrap without clipping while preserving the other chip widths", () => {
+  it("keeps all schedule chips on one Figma-sized line", () => {
     const chips = styles.match(/\.chips\s*\{([^}]*)\}/)?.[1] ?? "";
     const chip = styles.match(/\.chip\s*\{([^}]*)\}/)?.[1] ?? "";
     const redChip = styles.match(/\.chip--red\s*\{([^}]*)\}/)?.[1] ?? "";
     const greenChip = styles.match(/\.chip--green\s*\{([^}]*)\}/)?.[1] ?? "";
     const yellowChip = styles.match(/\.chip--yellow\s*\{([^}]*)\}/)?.[1] ?? "";
 
-    expect(chips).toContain("flex-wrap: wrap");
+    expect(chips).toContain("flex-wrap: nowrap");
     expect(chips).toContain("min-height: 54rpx");
-    expect(chips).toContain("height: auto");
+    expect(chips).toContain("height: 54rpx");
     expect(chip).toContain("min-height: 54rpx");
-    expect(chip).toContain("height: auto");
-    expect(chip).toContain("white-space: normal");
-    expect(chip).toContain("word-break: break-all");
-    expect(chip).toContain("overflow: visible");
-    expect(chip).toContain("text-overflow: clip");
+    expect(chip).toContain("height: 54rpx");
+    expect(chip).toContain("display: flex");
+    expect(chip).toContain("align-items: center");
+    expect(chip).toContain("justify-content: center");
+    expect(chip).toContain("white-space: nowrap");
+    expect(chip).toContain("flex-shrink: 0");
     expect(redChip).toContain("width: auto");
     expect(redChip).toContain("min-width: 0");
     expect(redChip).toContain("max-width: 100%");

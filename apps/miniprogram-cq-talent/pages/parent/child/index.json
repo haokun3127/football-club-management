@@ -1,10 +1,7 @@
 {
   "navigationStyle": "custom",
   "usingComponents": {
-    "app-header": "/components/app-header/index",
     "role-tabbar": "/components/role-tabbar/index",
-    "status-chip": "/components/status-chip/index",
-    "status-view": "/components/status-view/index",
-    "student-switcher": "/components/student-switcher/index"
+    "status-view": "/components/status-view/index"
   }
 }

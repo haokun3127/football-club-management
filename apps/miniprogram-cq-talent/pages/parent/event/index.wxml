@@ -1,107 +1,41 @@
 <view class="p2">
-  <!-- P2/P2.1/P2.2 Nav：返回 + 标题 + 右侧动作 -->
-  <view class="p2-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="p2-nav__back" bindtap="goBack">‹</view>
+  <view class="p2-nav" style="padding-top:{{navInset}}px">
+    <view class="p2-nav__back" style="top:{{navActionTop}}px" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
     <view class="p2-nav__title">{{detail ? detail.navTitle : '活动详情'}}</view>
-    <view wx:if="{{detail && detail.type === 'match'}}" class="p2-nav__action" bindtap="inviteFriend">邀请好友</view>
-    <view wx:elif="{{detail}}" class="p2-nav__status">{{detail.statusLabel}}</view>
-    <view wx:else class="p2-nav__placeholder"></view>
+    <view wx:if="{{detail && detail.type === 'match'}}" class="p2-nav__action" style="top:{{navActionTop}}px" bindtap="inviteFriend">邀请好友</view>
+    <view wx:elif="{{detail}}" class="p2-nav__status p2-nav__status--{{detail.statusTone}}" style="top:{{navActionTop}}px">{{detail.statusLabel}}</view>
   </view>
 
   <view class="p2-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '正在读取活动' : '暂时无法查看'}}" message="{{message}}" action-text="{{state === 'error' ? '重新加载' : ''}}" bindaction="retry" />
 
-    <!-- P2 Hero（训练/其他） -->
-    <view wx:if="{{detail && detail.type !== 'match'}}" class="hero">
-      <view class="hero__header">
-        <view class="hero__type-chip">{{detail.typeLabel}}</view>
-        <view wx:if="{{detail.coachName}}" class="hero__coach">👤 {{detail.coachName}}</view>
+    <block wx:if="{{detail && detail.type === 'training'}}">
+      <view class="training-hero">
+        <view class="training-hero__head"><view class="training-hero__type">训练</view><view class="training-hero__coach"><image src="/assets/icons/user-white.svg" mode="aspectFit" />{{detail.coachName}}</view></view>
+        <view class="training-hero__title">{{detail.title}}</view>
+        <view class="training-hero__meta"><view><image src="/assets/icons/calendar-white.svg" mode="aspectFit" />{{detail.dateText}}</view><view><image src="/assets/icons/map-pin-white.svg" mode="aspectFit" />{{detail.venueText}}</view></view>
       </view>
-      <view class="hero__title">{{detail.title}}</view>
-      <view class="hero__meta">
-        <view class="hero__meta-row">📅 {{detail.dateTimeText}}</view>
-        <view class="hero__meta-row">📍 {{detail.venueText}}</view>
-      </view>
-    </view>
+      <view class="detail-card detail-card--training"><view class="detail-card__head"><view class="detail-card__title">训练内容</view><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view><view class="detail-card__copy">{{detail.trainingSummary}}</view></view>
+      <view class="detail-card detail-card--ability"><view class="detail-card__title">关联能力</view><view class="ability-tags"><view wx:for="{{detail.abilityChips}}" wx:key="*this" class="ability-tag">{{item}}</view></view></view>
+      <view class="detail-card detail-card--confirm"><view class="detail-card__head"><image src="/assets/icons/alert.svg" mode="aspectFit" /><view class="detail-card__title">线下确认</view></view><view class="detail-card__copy">本次训练须经教练或家长在现场确认，无需在 APP 进行操作。</view></view>
+      <view class="attendance-button {{detail.attendanceConfirmed ? 'attendance-button--confirmed' : ''}}">{{detail.attendanceConfirmed ? '已确认出席' : '到场后由教练确认出席'}}</view>
+    </block>
 
-    <!-- P2.1 Hero Scoreboard（比赛） -->
-    <view wx:if="{{detail && detail.type === 'match'}}" class="scoreboard">
-      <view class="scoreboard__meta">
-        <view class="scoreboard__left">
-          <view class="hero__type-chip">比赛</view>
-          <view class="scoreboard__name">{{detail.title}}</view>
-        </view>
-        <view class="scoreboard__right">
-          <view class="scoreboard__date">{{detail.dateTimeText}}</view>
-          <view class="scoreboard__venue">{{detail.venueText}}</view>
-        </view>
+    <block wx:elif="{{detail && detail.type === 'match'}}">
+      <view class="match-hero">
+        <view class="match-hero__meta"><view><view class="match-hero__type">比赛</view><view class="match-hero__title">{{detail.title}}</view></view><view class="match-hero__date">{{detail.dateText}}<br />{{detail.venueText}}</view></view>
+        <view class="match-score"><view class="match-team"><view class="match-team__avatar">A</view><view>{{detail.homeTeam}}</view></view><view class="match-score__center"><view>{{detail.scoreText}}</view><view class="match-score__status">{{detail.statusLabel}}</view></view><view class="match-team"><view class="match-team__avatar">B</view><view>{{detail.awayTeam}}</view></view></view>
       </view>
-      <view class="scoreboard__row">
-        <view class="scoreboard__team">
-          <view class="scoreboard__avatar">A</view>
-          <view class="scoreboard__team-name">{{detail.homeTeam}}</view>
-        </view>
-        <view class="scoreboard__center">
-          <view class="scoreboard__score">{{detail.scoreText}}</view>
-          <view class="scoreboard__state">{{detail.statusLabel}}</view>
-        </view>
-        <view class="scoreboard__team">
-          <view class="scoreboard__avatar">B</view>
-          <view class="scoreboard__team-name">{{detail.awayTeam}}</view>
-        </view>
-      </view>
-    </view>
+      <view class="roster-card"><view class="roster-card__head"><view>出席名单</view><view>{{detail.roster.length}}人</view></view><view wx:for="{{detail.roster}}" wx:key="id" class="roster-row"><view class="roster-row__avatar roster-row__avatar--{{item.tone}}">{{item.initial}}</view><view class="roster-row__name">{{item.name}}</view><view class="roster-row__state roster-row__state--{{item.statusTone}}">{{item.statusLabel}}</view></view><view wx:if="{{!detail.roster.length}}" class="roster-empty">出席名单待同步</view></view>
+    </block>
 
-    <!-- P2 Training: content, ability chips, offline confirmation -->
-    <view wx:if="{{detail && detail.type === 'training'}}" class="dcard">
-      <view class="dcard__title">本次训练</view>
-      <view class="dcard__text">{{detail.trainingSummary}}</view>
-      <view class="detail-subtitle">关联能力</view>
-      <view class="ability-chips"><view wx:for="{{detail.abilityChips}}" wx:key="*this" class="ability-chip">{{item}}</view></view>
-    </view>
-    <view wx:if="{{detail && detail.type === 'training'}}" class="dcard dcard--notice"><view class="dcard__title">线下到场确认</view><view class="dcard__text">到场状态由教练在训练结束后确认。</view></view>
-
-    <!-- P2.1 Match: dedicated attendance roster -->
-    <view wx:if="{{detail && detail.type === 'match'}}" class="dcard"><view class="dcard__head"><view class="dcard__title">出席名单</view><view class="dcard__label">数据待同步</view></view><view class="roster-empty">暂未获取比赛出席名单，名单同步后将在这里展示。</view></view>
-
-    <!-- P2.2 Other: description, participants, coach and confirmation -->
-    <view wx:if="{{detail && detail.type === 'other'}}" class="dcard"><view class="dcard__title">活动说明</view><view class="dcard__text">{{detail.otherDescription}}</view><view class="detail-subtitle">参与孩子</view><view class="person-row"><view class="person-row__avatar">{{detail.childInitial}}</view><view>{{detail.childName}}</view><view class="person-row__state">已报名</view></view><view class="detail-subtitle">负责教练</view><view class="person-row"><view class="person-row__avatar">教</view><view>{{detail.coachName || '教练待同步'}}</view></view></view>
-    <view wx:if="{{detail && detail.type === 'other'}}" class="dcard dcard--notice"><view class="dcard__title">线下到场确认</view><view class="dcard__text">活动参与状态将由俱乐部在活动结束后同步。</view></view>
-
-    <!-- Supporting fields retained below the designed type-specific modules -->
-    <view wx:if="{{detail}}" class="dcard">
-      <view class="dcard__head">
-        <view class="dcard__title">基本信息</view>
-        <view class="dcard__chevron">›</view>
-      </view>
-      <view wx:for="{{detail.fields}}" wx:key="label" class="dcard__row">
-        <view class="dcard__label">{{item.label}}</view>
-        <view class="dcard__value">{{item.value}}</view>
-      </view>
-    </view>
-
-    <!-- 内容/能力卡 -->
-    <view wx:if="{{detail}}" wx:for="{{detail.sections}}" wx:key="title" class="dcard">
-      <view class="dcard__head">
-        <view class="dcard__title">{{item.title}}</view>
-      </view>
-      <view wx:for="{{item.items}}" wx:key="label" wx:for-item="sub" class="dcard__row">
-        <view class="dcard__label">{{sub.label}}</view>
-        <view class="dcard__value">{{sub.value}}</view>
-      </view>
-    </view>
-
-    <!-- 待确认提示卡 -->
-    <view wx:if="{{detail}}" wx:for="{{detail.pending}}" wx:key="title" class="dcard dcard--pending">
-      <view class="dcard__head">
-        <view class="dcard__title">⚠ {{item.title}}</view>
-      </view>
-      <view class="dcard__text">{{item.message}}</view>
-    </view>
-
-    <!-- P2 底部状态按钮 -->
-    <view wx:if="{{detail && detail.type === 'training'}}" class="status-btn {{detail.attendanceConfirmed ? 'status-btn--done' : ''}}">
-      {{detail.attendanceConfirmed ? '已确认出席' : '到场后由教练确认出席'}}
-    </view>
+    <block wx:elif="{{detail}}">
+      <view class="other-hero"><view class="other-hero__head"><view class="other-hero__type">{{detail.typeLabel}}</view><view class="other-hero__status">{{detail.statusLabel}}</view></view><view class="other-hero__title">{{detail.title}}</view><view class="other-hero__meta">{{detail.timeText}}<image src="/assets/icons/map-pin.svg" mode="aspectFit" />{{detail.venueText}}</view></view>
+      <view class="other-info"><view class="other-info__row"><view>活动描述</view><view>{{detail.otherDescription}}</view></view><view class="other-info__line"></view><view class="other-info__row"><view>注意事项</view><view>{{detail.otherNotice}}</view></view></view>
+      <view class="person-card"><view class="person-card__title">参与孩子</view><view class="person-row"><view class="person-row__avatar person-row__avatar--child">{{detail.childInitial}}</view><view class="person-row__main"><view>{{detail.childName}}</view><view class="person-row__badge">{{detail.childStatusLabel}}</view></view></view></view>
+      <view class="coach-card"><view class="person-row"><view class="person-row__avatar">{{detail.coachInitial}}</view><view class="person-row__main"><view>{{detail.coachName}}</view><view class="person-row__sub">主负责</view></view></view></view>
+      <view class="other-footer"><image src="/assets/icons/info.svg" mode="aspectFit" />线下到场后检查身份完成确认</view>
+    </block>
   </view>
+  <role-tabbar role="parent" active="schedule" />
 </view>

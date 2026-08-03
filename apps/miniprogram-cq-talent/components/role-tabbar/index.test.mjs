@@ -53,13 +53,26 @@ describe("role tabbar real-device icon contract", () => {
   it("keeps parent activity affordances separate from coach tab states", () => {
     expect(template).toContain('class="tabbar tabbar--{{role}}"');
     expect(styles).toContain(".tabbar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 9999; display: flex; box-sizing: border-box; height: 140rpx;");
-    expect(styles).toContain(".tabbar-icon-wrap { position: relative; display: flex; align-items: center; justify-content: center; width: 64rpx; height: 52rpx;");
+    expect(styles).toContain(".tabbar-icon-wrap { position: static; display: flex; align-items: center; justify-content: center; width: 44rpx; height: 44rpx;");
     expect(styles).toContain(".tabbar-icon { width: 44rpx; height: 44rpx; }");
     expect(styles).toContain(".tabbar--parent .tabbar-item.active { color: #a80f1b;");
-    expect(styles).toContain(".tabbar--parent .tabbar-item.active .tabbar-dot { bottom: -3rpx; width: 4rpx; height: 4rpx; border-radius: 999rpx; background: #a80f1b; }");
+    expect(styles).toContain(".tabbar--parent .tabbar-item.active .tabbar-dot { top: 96rpx; width: 4rpx; height: 4rpx; margin-left: -2rpx; border-radius: 999rpx; background: #a80f1b; }");
     expect(styles).toContain(".tabbar--coach .tabbar-dot { display: none; }");
     expect(styles).not.toContain(".tabbar-item.active .tabbar-icon-wrap { background: #fceeef; }");
     expect(styles).not.toContain(".tabbar-item.active .tabbar-dot { background: var(--color-brand); }");
+  });
+
+  it("places fixed tab content inside the Figma 70px overlay", () => {
+    expect(styles).toContain("height: 140rpx;");
+    expect(styles).toContain("padding-bottom: 0;");
+    expect(styles).not.toContain("padding-bottom: env(safe-area-inset-bottom);");
+    expect(styles).toContain("height: 112rpx;");
+    expect(styles).toContain("padding-top: 12rpx;");
+    expect(styles).toContain("justify-content: flex-start;");
+    expect(styles).toContain("width: 44rpx; height: 44rpx;");
+    expect(styles).toContain("margin-top: 6rpx;");
+    expect(styles).toContain("line-height: 28rpx;");
+    expect(styles).toContain("top: 96rpx;");
   });
 
   it("ships all active and inactive icons as valid PNG files", () => {

@@ -1,12 +1,21 @@
 <view class="p11">
-  <app-header title="{{dateLabel}}" subtitle="当日活动" show-back action-text="筛选" bindaction="openFilter" />
+  <view class="p11-nav" style="padding-top:{{navInset}}px">
+    <view class="p11-nav__back" style="top:{{navActionTop}}px" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+    <view class="p11-nav__title">{{dateLabel}}</view>
+    <view class="p11-nav__filter" style="right:{{menuInset}}px;top:{{navActionTop}}px" bindtap="openFilter"><image src="/assets/icons/filter.svg" mode="aspectFit" /></view>
+  </view>
+
   <view class="p11-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载当日活动' : state === 'empty' ? '暂无活动' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <view wx:if="{{state === 'ready'}}" class="p11-list">
       <view wx:for="{{events}}" wx:key="id" class="p11-card" data-id="{{item.id}}" bindtap="openEvent">
         <view class="p11-card__bar" style="background: {{item.barColor}}"></view>
-        <view class="p11-card__main"><view class="p11-card__head"><view class="p11-card__title">{{item.title}}</view><view class="p11-card__status" style="background: {{item.statusBg}}; color: {{item.statusColor}}">{{item.statusLabel}}</view></view><view class="p11-card__meta">{{item.timeLabel}}</view><view class="p11-card__meta">{{item.placeLabel}}</view><view class="p11-card__coach">教练：{{item.coachLabel}}</view></view>
-        <view class="p11-card__arrow">›</view>
+        <view class="p11-card__main">
+          <view class="p11-card__head"><view class="p11-card__title">{{item.title}}</view><view class="p11-card__status" style="background: {{item.statusBg}}; color: {{item.statusColor}}">{{item.statusLabel}}</view></view>
+          <view class="p11-card__meta">{{item.timeLabel}}</view>
+          <view class="p11-card__place"><image src="/assets/icons/map-pin.svg" mode="aspectFit" />{{item.placeLabel}}</view>
+          <view class="p11-card__coach">教练：{{item.coachLabel}}</view>
+        </view>
       </view>
     </view>
   </view>

@@ -1,6 +1,7 @@
 import { getParentCalendar, getParentChildren, getParentStudentHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { DEV_MODE, DEV_TEST_DATE } from "../../../utils/config";
+import { resolveMenuActionTop, resolveNavInset } from "../../../utils/presentation";
 import type { LoadState, ScheduleEvent, StudentHome, StudentSummary } from "../../../utils/types";
 
 interface HistoryRow {
@@ -27,6 +28,8 @@ interface PageData {
   insuranceBadge: string;
   insuranceBadgeTone: string;
   history: HistoryRow[];
+  navInset: number;
+  navActionTop: number;
 }
 
 Page<PageData>({
@@ -42,6 +45,8 @@ Page<PageData>({
     insuranceBadge: "",
     insuranceBadgeTone: "success",
     history: [],
+    navInset: resolveNavInset(),
+    navActionTop: resolveMenuActionTop(),
   },
   onLoad(query: { student?: string }) {
     this.load(query?.student || "");
@@ -98,7 +103,7 @@ Page<PageData>({
       monthCount,
       seasonCount,
       lessonRows: home.lessonStatus.map((row) => ({ label: row.label, value: row.value })),
-      insuranceRows: home.insuranceStatus.map((row) => ({ label: row.label, value: row.value })),
+      insuranceRows: home.insuranceStatus.slice(0, 3).map((row) => ({ label: row.label, value: row.value })),
       insuranceBadge: insuranceBadge(insuranceStatus).label,
       insuranceBadgeTone: insuranceBadge(insuranceStatus).tone,
       history: pastTrainings.slice(0, 4).map((event) => ({

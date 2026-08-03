@@ -51,6 +51,7 @@ declare const wx: {
   reLaunch: (options: { url: string; success?: WechatCallback<unknown>; fail?: WechatCallback<{ errMsg: string }> }) => void;
   showToast: (options: { title: string; icon?: "success" | "error" | "loading" | "none"; duration?: number }) => void;
   showModal: (options: { title: string; content: string; showCancel?: boolean; success?: WechatCallback<{ confirm: boolean }> }) => void;
+  showActionSheet: (options: { itemList: string[]; success?: WechatCallback<{ tapIndex: number }> }) => void;
 };
 
 declare function App(options: WechatAppOptions): void;

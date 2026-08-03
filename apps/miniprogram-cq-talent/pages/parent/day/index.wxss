@@ -1,1 +1,19 @@
-.p11 { min-height: 100vh; background: #f6f7f9; }.p11-body { padding: 32rpx 32rpx calc(148rpx + env(safe-area-inset-bottom)); }.p11-list { display: flex; flex-direction: column; gap: 24rpx; }.p11-card { display: flex; overflow: hidden; min-height: 176rpx; border-radius: 24rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0,0,0,.05); }.p11-card__bar { width: 8rpx; flex-shrink: 0; }.p11-card__main { flex: 1; padding: 28rpx; }.p11-card__head { display: flex; gap: 16rpx; align-items: center; justify-content: space-between; }.p11-card__title { color: #202124; font-size: 30rpx; font-weight: 700; }.p11-card__status { padding: 6rpx 14rpx; border-radius: 8rpx; font-size: 20rpx; font-weight: 600; }.p11-card__meta,.p11-card__coach { margin-top: 10rpx; color: #667085; font-size: 24rpx; }.p11-card__arrow { display: flex; align-items: center; padding: 0 24rpx 0 0; color: #667085; font-size: 40rpx; }
+.p11 { min-height: 100vh; background: #f6f7f9; }
+.p11-nav { position: relative; display: flex; box-sizing: border-box; align-items: center; justify-content: center; height: 176rpx; padding: 0 32rpx 48rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03); }
+.p11-nav__title { color: #202124; font-size: 34rpx; font-weight: 700; line-height: 42rpx; }
+.p11-nav__back, .p11-nav__filter { position: absolute; display: flex; align-items: center; justify-content: center; width: 64rpx; height: 64rpx; }
+.p11-nav__back { left: 32rpx; }
+.p11-nav__back image { width: 48rpx; height: 48rpx; }
+.p11-nav__filter image { width: 40rpx; height: 40rpx; }
+.p11-body { padding: 32rpx 32rpx calc(160rpx + env(safe-area-inset-bottom)); }
+.p11-list { display: flex; flex-direction: column; gap: 24rpx; }
+.p11-card { display: flex; box-sizing: border-box; width: 686rpx; height: 236rpx; padding: 32rpx; border-radius: 32rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06); }
+.p11-card__bar { flex: 0 0 8rpx; width: 8rpx; height: 172rpx; margin-right: 32rpx; border-radius: 40rpx; }
+.p11-card__main { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.p11-card__head { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; height: 42rpx; }
+.p11-card__title { overflow: hidden; flex: 1; color: #202124; font-size: 32rpx; font-weight: 700; line-height: 38rpx; text-overflow: ellipsis; white-space: nowrap; }
+.p11-card__status { flex: 0 0 auto; box-sizing: border-box; height: 42rpx; padding: 8rpx 20rpx; border-radius: 999rpx; font-size: 22rpx; font-weight: 600; line-height: 26rpx; }
+.p11-card__meta { margin-top: 16rpx; color: #667085; font-size: 28rpx; line-height: 34rpx; }
+.p11-card__place { display: flex; align-items: center; gap: 12rpx; overflow: hidden; margin-top: 8rpx; color: #667085; font-size: 28rpx; line-height: 34rpx; text-overflow: ellipsis; white-space: nowrap; }
+.p11-card__place image { flex: 0 0 auto; width: 28rpx; height: 28rpx; }
+.p11-card__coach { margin-top: 8rpx; color: #667085; font-size: 24rpx; line-height: 30rpx; }

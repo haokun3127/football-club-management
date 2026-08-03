@@ -2,6 +2,7 @@ import { getParentCalendar } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { DEV_MODE, DEV_TEST_DATE } from "../../../utils/config";
+import { resolveMenuActionTop, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { LoadState, ScheduleEvent } from "../../../utils/types";
 
 interface DayEventView {
@@ -23,6 +24,9 @@ interface PageData {
   date: string;
   dateLabel: string;
   events: DayEventView[];
+  navInset: number;
+  menuInset: number;
+  navActionTop: number;
 }
 
 const TYPE_COLORS: Record<ScheduleEvent["type"], string> = {
@@ -40,6 +44,9 @@ Page<PageData>({
     date: "",
     dateLabel: "",
     events: [],
+    navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
+    navActionTop: resolveMenuActionTop(),
   },
   onLoad(query: { date?: string }) {
     this.load(query?.date || today());
@@ -70,6 +77,9 @@ Page<PageData>({
   },
   openFilter() {
     wx.showToast({ title: "筛选条件待同步", icon: "none" });
+  },
+  goBack() {
+    wx.navigateBack();
   },
   openEvent(event: { currentTarget: { dataset: { id: string } } }) {
     openPage(`/pages/parent/event/index?id=${event.currentTarget.dataset.id}`);
