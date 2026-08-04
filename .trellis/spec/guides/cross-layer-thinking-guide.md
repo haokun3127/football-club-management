@@ -123,6 +123,81 @@ After implementation:
 
 ---
 
+## Scenario: WeChat DevTools Automator Screenshot Evidence
+
+### 1. Scope / Trigger
+
+- Trigger: a visual-evidence command crosses the Windows DevTools CLI, an
+  Automator WebSocket, mini-program runtime information, and a PNG artifact.
+- The authoritative implementation and acceptance notes live in
+  `apps/miniprogram-cq-talent/scripts/devtools-screenshot.mjs` and
+  `docs/current/miniprogram-manual-acceptance-cq-talent.md`.
+
+### 2. Signatures
+
+```text
+devtools:automator:open
+devtools:screenshot -- --output <absolute-outside-repo.png>
+  --expect-route-prefix <route-prefix> [--port <automation-port>]
+```
+
+### 3. Contracts
+
+- Use `miniprogram-automator`, not project-owned raw DevTools RPC.
+- Capture PNG and inspect `systemInfo` through two consecutive read-only SDK
+  connections; re-check the route before accepting the second connection.
+- `windowWidth` and `windowHeight` must be `375×812`. Preserve the raw PNG and
+  record both `devicePixelRatio` and the PNG's actual raster scale. Do not
+  infer PNG dimensions from `devicePixelRatio`.
+- The command must not navigate, authenticate, change role, create session, or
+  fabricate API data. Output and sidecar are published only after every check.
+
+### 4. Validation & Error Matrix
+
+| Condition | Required behavior |
+| --- | --- |
+| CLI path or automation endpoint unavailable | Fail with the endpoint/path; do not publish evidence. |
+| Route prefix mismatch or route changes between connections | Fail before publishing PNG or sidecar. |
+| Runtime logical viewport is not `375×812` | Reject the capture. |
+| PNG is not a full, uniformly scaled viewport | Reject the capture. |
+
+### 5. Good / Base / Bad Cases
+
+- Good: runtime reports `375×812`; original PNG is an equal-scale raster such
+  as `563×1218`; sidecar records the distinct logical, runtime, and raster
+  values.
+- Base: a `375×812` PNG with `devicePixelRatio: 1` is accepted and recorded.
+- Bad: treating iPhone X `pixelRatio: 3` as a requirement for a
+  `1125×2436` PNG, or accepting a screenshot after the verified route changed.
+
+### 6. Tests Required
+
+- Unit test the Windows `.bat` launch and endpoint retry without closing
+  DevTools.
+- Unit test route verification, route re-check, atomic no-output failure,
+  `375×812` logical-viewport validation, normal and high-density rasters, and
+  non-uniform raster rejection.
+- Real DevTools evidence is separate from unit tests: retain the resulting PNG
+  and sidecar, then perform the Figma comparison.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```js
+if (png.width !== 375 || png.height !== 812) throw new Error("wrong size");
+```
+
+#### Correct
+
+```js
+const viewport = await inspectionProgram.systemInfo();
+// Validate the logical 375×812 viewport, retain the original PNG,
+// and record its independently measured raster scale.
+```
+
+---
+
 ## Cross-Platform Template Consistency
 
 In Trellis, command templates (e.g., `record-session.md`) exist in **multiple platforms** with identical or near-identical content. This is a cross-layer boundary.

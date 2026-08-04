@@ -58,6 +58,22 @@ pnpm --filter @football-club/miniprogram-cq-talent devtools:preview
 
 然后重新执行 CLI 命令。
 
+## DevTools 自动截图（Windows）
+
+截图工具只使用官方 `miniprogram-automator`：不会导航、登录、授权、切换角色或伪造任何数据。先在真实自动化窗口中完成微信授权并进入待验页面，再执行截图。
+
+```bash
+pnpm --filter @football-club/miniprogram-cq-talent devtools:automator:open
+pnpm --filter @football-club/miniprogram-cq-talent devtools:screenshot -- \
+  --output C:\Users\ASUS\AppData\Local\Temp\cq-talent-parent.png \
+  --expect-route-prefix /pages/parent/ \
+  --port 9421
+```
+
+输出 PNG 必须在仓库外，旁边会生成同名 `.json` 证据文件。该文件记录当前路由、路由栈、原始 PNG 尺寸、SHA-256、`375×812` 逻辑视口、微信运行时 `devicePixelRatio` 和截图导出倍率；PNG 不会被裁剪或缩放。
+
+DevTools 的截图导出倍率不等于微信运行时 `pixelRatio`。例如 iPhone X 可报告逻辑 `375×812`、`pixelRatio: 3`，而原始 PNG 为 `563×1218`；这是可记录的等比导出，不应被误判为失败。若自动化端口或截图调用在超时后失效，完全退出并重新打开 DevTools 后再重试，不能把连接或单测当作视觉验收。
+
 ## 本地检查
 
 ```bash

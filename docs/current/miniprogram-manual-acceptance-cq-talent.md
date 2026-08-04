@@ -175,10 +175,28 @@ pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client
 - DevTools 当前 `login=false`，脚本已改为复用当前 IDE 端口并明确提示登录阻塞。
 - 登录 DevTools 后复跑 `pnpm --filter @football-club/miniprogram-cq-talent devtools:preview`，再按家长/教练清单完成真机点击。
 
-## 11. 2026-08-03 自动截图取证（历史尝试，已废弃）
+## 11. 2026-08-04 官方 Automator 截图取证
 
-> **更正（2026-08-03）**：当前 Windows 微信开发者工具 Stable `v2.01.2510290` 的 `cli auto --auto-port 9420` 只提供 HTTP 端口，不能为 `ws://127.0.0.1:9420` 提供可用的截图 WebSocket；`App.captureScreenshot` 因而不是当前可信取证路径。以下历史脚本说明不应被当作可用的截图流程。
+截图命令使用 `miniprogram-automator@0.12.1` 的官方 `connect`、`currentPage`、`pageStack`、`screenshot`、`systemInfo` 与 `disconnect` API；项目代码不直接发送 DevTools RPC。`devtools:automator:open` 通过 Windows `.bat` 兼容方式执行 `cli auto --auto-port 9421`，连接可用前会轮询，且不会自动关闭 DevTools 窗口。
 
-可信替代方式是捕获前台 DevTools 真实窗口，再按模拟器内容区域裁成原始 `375×812` PNG，并同时记录设备、当前路由、测试结果和截图文件。仅连接成功或显示正确路由不算截图证据。已按该方式取得 P1 家长日程成功态 iPhone X `375×812` 截图：`C:\Users\ASUS\AppData\Local\Temp\cq-talent-p1-375x812-current-20260803.png`。Empty 状态、其他页面及 Parent/Coach TabBar 真机矩阵仍待逐项验收。
+```bash
+pnpm --filter @football-club/miniprogram-cq-talent devtools:automator:open
+pnpm --filter @football-club/miniprogram-cq-talent devtools:screenshot -- \
+  --output C:\Users\ASUS\AppData\Local\Temp\cq-talent-parent.png \
+  --expect-route-prefix /pages/parent/ \
+  --port 9421
+```
 
-该自动化 WebSocket 截图原型不随当前交付包提交，也不能作为验收命令运行。不要把连通性、路由信息或单元测试当作截图证据；真实角色、API/session 与运行态视觉仍需按本清单的人工验收步骤分别确认。
+### 证据契约
+
+- 工具不导航、不登录、不授权、不切换角色，也不构造 session、手机号、角色或 API 响应；截图前必须已由真实微信手机号授权进入目标页面。
+- 工具先通过一个只读 Automator 连接读取路由和截取原始 PNG；断开后以第二个只读连接复核路由未变，再读取 `systemInfo`。此顺序避免当前 Windows DevTools 会话中先读 `systemInfo` 后截图可能一直等待的已知时序问题。
+- 逻辑视口必须为 `375×812`；原始 PNG 不裁剪、不缩放，且必须是该逻辑画布的等比完整导出。sidecar 记录路由、路由栈、原始像素、SHA-256、`devicePixelRatio` 和实际导出倍率。
+- `devicePixelRatio` 不能用来反推 PNG 像素。2026-08-04 在 iPhone X DevTools 会话中实测：`windowWidth=375`、`windowHeight=812`、`pixelRatio=3`，而旧严格校验得到的原始截图为 `563×1218`。它是约 `1.5×` 的导出位图，因此“PNG 必须等于 375×812”或“PNG 必须等于逻辑尺寸 × pixelRatio”都不可信。
+- 路由不匹配、逻辑尺寸不是 `375×812`、或 PNG 不是等比完整导出时，工具不发布 PNG 或 sidecar。
+
+### 当前实测边界
+
+- 2026-08-04 已实测官方 SDK 可连接自动化端口并读取当前 `pages/parent/schedule/index` 路由及 iPhone X `systemInfo`。这证明自动化连接和逻辑设备信息可读取，但不等于新的命令已取得运行态视觉验收。
+- 本轮调试中，旧的同连接 `systemInfo` → `screenshot` 顺序曾造成截图调用超时；随后该桌面 DevTools 自动化窗口未能重新开放端口。新工具已以双连接顺序修复并有回归测试，但在 DevTools 完全重启、重新真实授权并生成新的 PNG 前，P1 或任何页面都不能宣称完成 DevTools/真机视觉验收。
+- 已有的前台 DevTools P1 成功态截图 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-p1-375x812-current-20260803.png` 仍是历史人工证据；Empty 状态、其他页面及 Parent/Coach TabBar 真机矩阵仍待逐项验收。

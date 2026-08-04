@@ -7,9 +7,12 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "smoke:app-client": "node scripts/smoke-app-client.mjs",
-    "devtools:preview": "node scripts/devtools-preview.mjs"
+    "devtools:preview": "node scripts/devtools-preview.mjs",
+    "devtools:automator:open": "node scripts/devtools-automator-open.mjs",
+    "devtools:screenshot": "node scripts/devtools-screenshot.mjs"
   },
   "devDependencies": {
+    "miniprogram-automator": "0.12.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"
   }
