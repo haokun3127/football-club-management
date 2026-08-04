@@ -1,16 +1,24 @@
 # Figma 权威来源
 
-> 最后更新：2026-08-03
+> 最后更新：2026-08-04
 
 ## 唯一设计基准
 
 后续查看、审计、修改和验收重庆天才小程序设计时，唯一权威来源是以下在线 Figma 文件：
 
-https://www.figma.com/design/ATlfBRO0ruOCDDY5ICagFD/
+https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/
 
-文件 Key：`ATlfBRO0ruOCDDY5ICagFD`
+文件 Key：`zZ6wKyOHKcO4UYXDd9jGwv`
 
-任何页面实现、设计规格、视觉回归和 Figma MCP 操作，均应以此在线文件当前内容为准。不要再以旧的在线文件 Key `zZ6wKyOHKcO4UYXDd9jGwv` 或本地 `.fig` 二进制副本作为当前设计事实。
+任何页面实现、设计规格、视觉回归和 Figma MCP 操作，均应以此在线文件当前内容为准。旧文件 `ATlfBRO0ruOCDDY5ICagFD` 仅用于历史审计，禁止新的读取、编辑、实现或视觉验收；本地 `.fig` 二进制副本也不是当前设计事实。来自不同设计文件的节点 ID 不得互相继承。
+
+## 当前设计引用三元组
+
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:29 / G2 Login Verification`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 269:479 / P1 Schedule Home — Empty`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 4:6 / 05 Parent Generated`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 4:7 / 06 Coach Generated`
 
 ## 本地 .fig 的定位
 
@@ -20,12 +28,13 @@ https://www.figma.com/design/ATlfBRO0ruOCDDY5ICagFD/
 
 它不是可安全自动回写的工作副本。Figma MCP 修改的是在线文件；需要更新本地备份时，应从上述在线文件人工导出 `.fig` 后再替换本地文件，并记录新的导出时间和校验值。
 
-## 当前已在线更新的 G2
+## 当前 G2 设计引用
 
 - 页面：`05 Parent Generated`
 - 画板：`G2 Login Verification`
 - 节点 ID：`93:29`
 - 画板尺寸：`375x812`
+- 当前来源三元组：`zZ6wKyOHKcO4UYXDd9jGwv / 93:29 / G2 Login Verification`
 
 已完成的在线改动：
 
@@ -37,9 +46,9 @@ https://www.figma.com/design/ATlfBRO0ruOCDDY5ICagFD/
 
 ## P1 运行态证据边界
 
-- 成功态画板：`P1 Schedule Home`，节点 `93:83`，尺寸 `375×812`。
-- 2026-08-03 已取得与该成功态对照的 DevTools iPhone X `375×812` 截图。该截图只覆盖家长日程成功态，不代表 P1 Empty、其他家长页、教练页或真机矩阵已经验收。
-- 每次视觉改动仍必须先读取在线目标节点和截图；不能用本地 `.fig`、旧导出或历史规格反推当前设计。
+- 当前成功态画板来源三元组：`zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`，尺寸 `375×812`。
+- 旧文件 `ATlfBRO0ruOCDDY5ICagFD` 的 `93:83` 节点和相关历史截图仅保留为切源前审计事实，不构成新的视觉验收依据；不代表 P1 Empty、其他家长页、教练页或真机矩阵已经验收。
+- 每次视觉改动仍必须先读取当前在线目标三元组和截图；不能用本地 `.fig`、旧导出或切源前历史规格反推当前设计。
 
 ## 维护规则
 

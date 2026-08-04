@@ -1,5 +1,7 @@
 # G2 Login Verification v2
 
+> Current design source after 2026-08-04: `zZ6wKyOHKcO4UYXDd9jGwv / 93:29 / G2 Login Verification`, under page `zZ6wKyOHKcO4UYXDd9jGwv / 4:6 / 05 Parent Generated`. Geometry retained from before the source switch is historical and is not a new implementation basis.
+
 > Change request: replace the previous parent-only G2 binding interaction with a role-neutral pre-auth verification screen. The server resolves `parent` or `coach` only after WeChat phone authorization.
 
 ## Frame
@@ -17,7 +19,7 @@
   - badge: `48x48px`, radius `12px`, brand red `#a80f1b`
   - title: `连接重庆天才服务`, 18px bold
   - subtitle: `验证微信手机号，自动匹配俱乐部身份`, 13px regular
-- `verification-card`: `331x128px`, radius `12px`, 16px padding, 16px vertical gap
+- `form-card`: `331x144px`, radius `12px`, 16px padding, 16px vertical gap
   - `phone-status`: `299x48px`, radius `8px`, background `#f8f9fa`
     - label: `微信手机号`
     - separator: `1x16px`, `#e7eaf0`
@@ -55,7 +57,9 @@
 
 The previous implementation session confirmed that the supplied screenshot was the current `/pages/login/index` and that the old page mixed the parent-only `绑定孩子` flow with a duplicate WeChat authorization action. The implementation now keeps one real `open-type="getPhoneNumber"` CTA, removes the SMS-code pseudo-flow, uses role-neutral copy before authorization, and routes by the server-returned role after authorization.
 
-At the August 2 handoff, the Figma visual batches and login changes were uncommitted on branch `codex/chongqing-talent-business`. The login work is now recorded in commit `eab8206`; related parent-page work is in `81e4273`. The authoritative design source is the online Figma file `ATlfBRO0ruOCDDY5ICagFD`, G2 node `93:29`; the local `.fig` is only a historical offline backup. Any earlier statement that treats the local file as authoritative or says the online file was unavailable is superseded. Online Figma writes and screenshots must still be claimed only when their node-level evidence is actually recorded.
+At the August 2 handoff, the Figma visual batches and login changes were uncommitted on branch `codex/chongqing-talent-business`. The login work is now recorded in commit `eab8206`; related parent-page work is in `81e4273`. The current design source is `zZ6wKyOHKcO4UYXDd9jGwv / 93:29 / G2 Login Verification`; the old `ATlfBRO0ruOCDDY5ICagFD / 93:29` reference is pre-switch historical audit material only, and the local `.fig` is only a historical offline backup. Any earlier statement that treats the old file as current is superseded. Online Figma writes and screenshots must still be claimed only when their node-level evidence is actually recorded.
+
+The former `verification-card` value `331x128px` is a pre-switch historical value. The current form-card contract is `331x144px`; do not use the former value for new implementation or visual acceptance.
 
 ### Verification state
 

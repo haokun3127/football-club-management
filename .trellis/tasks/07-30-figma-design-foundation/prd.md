@@ -1,8 +1,10 @@
 # PRD：cq-talent Figma 视觉基础落地
 
-## 当前设计来源约定（2026-08-03）
+## 当前设计来源约定（2026-08-04）
 
-本任务后续的唯一设计权威是在线 Figma `https://www.figma.com/design/ATlfBRO0ruOCDDY5ICagFD/`（file key `ATlfBRO0ruOCDDY5ICagFD`）。下文关于本地 `.fig`、离线 PNG、fig-kiwi 与当时获取受阻的描述仅保留为 2026-07-30 的历史背景；任何新视觉决策都必须先读取在线目标画板、节点 ID 和截图。
+本任务后续的唯一当前设计权威是在线 Figma `https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/`（file key `zZ6wKyOHKcO4UYXDd9jGwv`）。当前引用必须使用三元组：`zZ6wKyOHKcO4UYXDd9jGwv / 93:29 / G2 Login Verification`、`zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`、`zZ6wKyOHKcO4UYXDd9jGwv / 269:479 / P1 Schedule Home — Empty`、`zZ6wKyOHKcO4UYXDd9jGwv / 4:6 / 05 Parent Generated`、`zZ6wKyOHKcO4UYXDd9jGwv / 4:7 / 06 Coach Generated`。旧文件 `ATlfBRO0ruOCDDY5ICagFD` 仅用于历史审计，禁止新的读取、编辑、实现或视觉验收；节点 ID 不得跨文件继承。
+
+下文保留的 P1/G2 几何若来自切源前记录，均须视为历史规格，不得作为新实现依据。G2 当前现行 `form-card` 为 `331×144`；旧 `verification-card` `331×128` 仅作历史值。
 
 ## 目标
 

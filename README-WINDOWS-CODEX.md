@@ -22,7 +22,17 @@ npx --yes pnpm@10.33.0 --filter @football-club/miniprogram-cq-talent test
 
 唯一权威在线 Figma：
 
-`https://www.figma.com/design/ATlfBRO0ruOCDDY5ICagFD/`
+`https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/`
+
+自 2026-08-04 起，唯一当前设计权威为 `zZ6wKyOHKcO4UYXDd9jGwv`。当前设计引用必须使用完整三元组：
+
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:29 / G2 Login Verification`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 269:479 / P1 Schedule Home — Empty`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 4:6 / 05 Parent Generated`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 4:7 / 06 Coach Generated`
+
+旧文件 `ATlfBRO0ruOCDDY5ICagFD` 仅用于历史审计；禁止将其用于新的读取、编辑、实现或视觉验收。节点 ID 不得跨 Figma 文件继承。
 
 本交付包不携带 `.fig` 二进制副本。离线设计快照与 PNG 导出保留在旧交接包的 `02-Figma最新设计导出/`。如需离线解析，显式传入文件路径：
 

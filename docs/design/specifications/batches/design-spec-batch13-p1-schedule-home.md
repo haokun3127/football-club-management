@@ -1,5 +1,7 @@
 # Figma 画板规格: P1 Schedule Home
 
+> 设计权威切换（2026-08-04）：当前来源三元组为 `zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`；空态来源为 `zZ6wKyOHKcO4UYXDd9jGwv / 269:479 / P1 Schedule Home — Empty`。本文件下方保留的几何与节点记录来自切源前历史规格，不能作为新的实现依据。
+
 - [4] | P1 Schedule Home | 375x812 @(1370,120) | fill=#f5f6f8 | r=28 | layout=V
   - [4] | Top Nav | 375x88 @(1370,120) | fill=#ffffff | layout=H pad=12/16 | shadow=0,2,8,#000000@0.03
     - [13] | 日程 | 44x27 @(1386,150) | fill=#0d0d0d | font=Inter/Bold 22px | text="日程"
@@ -130,7 +132,7 @@
 
 ## 实现与运行态验收（2026-08-03）
 
-- 本规格的当前设计权威是在线 Figma `ATlfBRO0ruOCDDY5ICagFD`，成功态节点为 `93:83`；本地导出数据仅保留为历史规格线索。
+- 当前设计权威是在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv` 的三元组 `zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`；本文件中的旧 `ATlfBRO0ruOCDDY5ICagFD / 93:83` 仅作切源前历史审计线索，不得用于新实现或视觉验收。本地导出数据同样仅保留为历史规格线索。
 - 页面标题和提醒按钮均使用运行时 `navActionTop` 对齐；标题在 `64rpx` 操作区内垂直居中，避免不同安全区下标题与按钮基线漂移。
 - Hero 统计值必须禁止收缩和换行，特别是 CJK 字体环境中的“`2节`”；三枚统计胶囊保持单行可读。
 - 成功态已取得可信 DevTools iPhone X `375×812` 截图并与该节点对照。P1 Empty 状态仍缺可信运行截图和完整对照，不能据此宣称整个 P1 已完成视觉验收。

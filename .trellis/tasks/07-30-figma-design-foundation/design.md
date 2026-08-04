@@ -2,7 +2,7 @@
 
 ## Source of truth
 
-> Current source override (2026-08-03): the only design authority is online Figma `https://www.figma.com/design/ATlfBRO0ruOCDDY5ICagFD/` (file key `ATlfBRO0ruOCDDY5ICagFD`). Before every visual change, read the relevant page, frame/node ID, and online screenshot. The local `.fig`, decoded inspection data, and prior audits below are historical references only and must not be used to infer or overwrite the current online design.
+> Current source override (2026-08-04): the only current design authority is online Figma `https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/` (file key `zZ6wKyOHKcO4UYXDd9jGwv`). Current references must use these triples: `zZ6wKyOHKcO4UYXDd9jGwv / 93:29 / G2 Login Verification`, `zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`, `zZ6wKyOHKcO4UYXDd9jGwv / 269:479 / P1 Schedule Home — Empty`, `zZ6wKyOHKcO4UYXDd9jGwv / 4:6 / 05 Parent Generated`, and `zZ6wKyOHKcO4UYXDd9jGwv / 4:7 / 06 Coach Generated`. The old file `ATlfBRO0ruOCDDY5ICagFD` is historical audit material only; do not read, edit, implement, or visually accept against it, and do not inherit node IDs across files. The local `.fig`, decoded inspection data, and prior audits below are historical references only and must not be used to infer or overwrite the current online design.
 
 - `../02-Figma最新设计导出/重庆天才小程序 UIUX Design System.fig`
 - Decoded inspection data: `../../../../tools/fig-out-v2.json`
