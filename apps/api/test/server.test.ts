@@ -1,11 +1,22 @@
 import ExcelJS from "exceljs";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { HeaderMembershipResolver } from "../src/auth/context.js";
 import { signWpsWebhookPayload } from "../src/integration/wps-webhook-security.js";
 import { createPlatformPersistence } from "../src/persistence/platform-persistence.js";
 import { buildServer } from "../src/server.js";
 import { PersistentApiStore } from "../src/store.js";
 import { createSeedData } from "../src/seed.js";
+
+const initialAcceptanceSeed = process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED;
+
+afterEach(() => {
+  if (initialAcceptanceSeed === undefined) {
+    delete process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED;
+  } else {
+    process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED = initialAcceptanceSeed;
+  }
+  vi.useRealTimers();
+});
 
 describe("api server", () => {
   it("returns health status", async () => {
@@ -484,6 +495,8 @@ describe("api server", () => {
   });
 
   it("serves coach team, student radar and ability overview with coach scoping", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-02T12:00:00.000Z"));
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
     const store = new PersistentApiStore(persistence.repositories);
     const app = buildServer(
@@ -622,6 +635,8 @@ describe("api server", () => {
   });
 
   it("serves coach training coverage and assessment tasks with coach scoping", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-05T12:00:00.000Z"));
     process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED = "1";
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
     const store = new PersistentApiStore(persistence.repositories);
@@ -690,7 +705,6 @@ describe("api server", () => {
 
     await app.close();
     persistence.database.close();
-    delete process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED;
   });
 
   it("serves next-stage mini-program BFF aggregates without leaking cross-role access", async () => {
@@ -977,6 +991,82 @@ describe("api server", () => {
     expect(assessment.statusCode).toBe(201);
     expect(parentWrite.statusCode).toBe(403);
     expect(parentWrite.json().error.code).toBe("forbidden");
+
+    await app.close();
+    persistence.database.close();
+  });
+
+  it("persists app-client attendance with role and idempotency boundaries", async () => {
+    const data = createSeedData();
+    const coach = data.users.find((user) => user.id === "user-coach-1")!;
+    const membership = data.clubMemberships.find((item) => item.userId === coach.id)!;
+    const coachProfile = data.coaches.find((item) => item.userId === coach.id)!;
+    data.users.push({ ...coach, id: "user-coach-out-of-scope", displayName: "Other coach" });
+    data.clubMemberships.push({ ...membership, id: "club-member-coach-out-of-scope", userId: "user-coach-out-of-scope" });
+    data.coaches.push({ ...coachProfile, id: "coach-out-of-scope", userId: "user-coach-out-of-scope", name: "Other coach" });
+
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:", seedData: data });
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories, data),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+    const base = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/attendance";
+    const payload = { participants: [{ studentId: "student-1", status: "present", note: "API persisted note" }] };
+    const first = await app.inject({
+      method: "PUT",
+      url: base,
+      headers: { "x-user-id": "user-coach-1", "idempotency-key": "app-attendance-1" },
+      payload,
+    });
+    const replay = await app.inject({
+      method: "PUT",
+      url: base,
+      headers: { "x-user-id": "user-coach-1", "idempotency-key": "app-attendance-1" },
+      payload,
+    });
+    const conflict = await app.inject({
+      method: "PUT",
+      url: base,
+      headers: { "x-user-id": "user-coach-1", "idempotency-key": "app-attendance-1" },
+      payload: { participants: [{ studentId: "student-1", status: "absent" }] },
+    });
+    const late = await app.inject({
+      method: "PUT",
+      url: base,
+      headers: { "x-user-id": "user-coach-1", "idempotency-key": "app-attendance-2" },
+      payload: { participants: [{ studentId: "student-1", status: "late", note: "API persisted note" }] },
+    });
+    const parent = await app.inject({
+      method: "PUT",
+      url: base,
+      headers: { "x-user-id": "user-parent-1" },
+      payload,
+    });
+    const outOfScopeCoach = await app.inject({
+      method: "PUT",
+      url: base,
+      headers: { "x-user-id": "user-coach-out-of-scope" },
+      payload,
+    });
+    const ledger = persistence.repositories.dataCapability.getLessonLedger("club-chongqing-talent", "student-1");
+
+    expect(first.statusCode).toBe(200);
+    expect(first.json().participants).toEqual([expect.objectContaining({ status: "present", note: "API persisted note" })]);
+    expect(replay.statusCode).toBe(200);
+    expect(replay.headers["idempotency-status"]).toBe("replayed");
+    expect(replay.body).toBe(first.body);
+    expect(conflict.statusCode).toBe(409);
+    expect(conflict.json().error.code).toBe("idempotency_conflict");
+    expect(late.statusCode).toBe(200);
+    expect(parent.statusCode).toBe(403);
+    expect(outOfScopeCoach.statusCode).toBe(403);
+    expect(ledger?.entries.filter((entry) => entry.sourceId === "event-training-1-student-1")).toHaveLength(1);
+    expect(ledger?.entries).toEqual(expect.arrayContaining([
+      expect.objectContaining({ source: "attendance", sourceId: "event-training-1-student-1", lessonDelta: -1 }),
+    ]));
 
     await app.close();
     persistence.database.close();

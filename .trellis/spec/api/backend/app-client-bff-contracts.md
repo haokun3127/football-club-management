@@ -247,6 +247,34 @@ const selectedProjectIds = localDraft.projectIds;
 const selectedProjectIds = workbench.training.selectedProjectIds;
 ```
 
+## Scenario: Coach Attendance Persistence
+
+### 1. Scope / Trigger
+
+- Trigger: a coach saves attendance from C4 through `PUT /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/attendance`.
+- Request: `{ participants: [{ studentId, status, note? }] }`.
+- Valid statuses remain `invited|confirmed|present|absent|late|leave_requested|excused`.
+
+### 2. Contracts
+
+- Only an active coach app client with access to the event may write; a parent or out-of-scope coach receives `403`.
+- Writes are partial upserts by `(club_id, event_id, student_id)`. A missing `note` preserves the existing note; an explicit empty string clears it.
+- The response remains `{ clubId, client, eventId, participants }`; the mini-program normalizes backend `participant.status` and `participant.note` before using legacy attendance field fallbacks.
+- `Idempotency-Key` keeps its existing semantics: the same key and payload replays the stored response, while a different payload with the same key returns `409 idempotency_conflict`.
+- `present` and `late` debit one lesson under source id `${eventId}-${studentId}`. Replays, duplicate submissions, and a process restart must not create a second debit.
+
+### 3. Persistence Boundary
+
+- Calendar events and event participants reuse the tables from migration `0002_data_capability_foundation.sql`.
+- On seed/restart, existing calendar participant rows are insert-if-absent; seed data must never replace a saved attendance status or note.
+- Persistence verification requires a file-backed `DATABASE_URL`: PUT a non-empty note, build, stop the confirmed API process, restart `dist/index.js` against the same database, then GET the event and lesson confirmation readback.
+
+### 4. Tests Required
+
+- File-database close/reopen regression asserts status/note preservation, another participant unchanged, and one natural-key row.
+- App-client contract regression covers coach `200`, parent/out-of-scope coach `403`, idempotent replay, conflicting payload `409`, and one attendance debit source id.
+- C4 visual acceptance is separate: a static or API test does not replace a trusted coach `375x812` DevTools/device screenshot.
+
 ## Scenario: Parent Metric Drilldown and Assessment Form Grouping
 
 ### 1. Scope / Trigger

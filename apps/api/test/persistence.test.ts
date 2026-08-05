@@ -8,6 +8,75 @@ import { migrate, openSqliteDatabase } from "../src/persistence/sqlite.js";
 import { PersistentApiStore } from "../src/store.js";
 
 describe("platform persistence", () => {
+  it("preserves attendance status and note after reopening a seeded file database", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "football-attendance-"));
+    const databasePath = join(directory, "club.sqlite");
+    const data = createSeedData();
+    const original = data.participants.find((participant) => participant.eventId === "event-training-1")!;
+    const unchangedStudent = {
+      ...data.students.find((student) => student.id === original.studentId)!,
+      id: "student-attendance-unchanged",
+      name: "Unchanged participant",
+    };
+    const unchangedParticipant = {
+      ...original,
+      id: "participant-attendance-unchanged",
+      studentId: unchangedStudent.id,
+      status: "confirmed" as const,
+      note: "Keep this note",
+    };
+    data.students.push(unchangedStudent);
+    data.participants.push(unchangedParticipant);
+
+    let first: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
+    let reopened: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
+
+    try {
+      first = await createPlatformPersistence({ databasePath, seedData: data });
+      const firstStore = new PersistentApiStore(first.repositories, data);
+      const saved = firstStore.recordEventParticipants("club-chongqing-talent", "event-training-1", [{
+        studentId: original.studentId,
+        status: "present",
+        note: "Arrived after warm-up",
+      }]);
+
+      expect(saved).toEqual([expect.objectContaining({
+        studentId: original.studentId,
+        status: "present",
+        note: "Arrived after warm-up",
+      })]);
+      first.database.close();
+      first = undefined;
+
+      reopened = await createPlatformPersistence({ databasePath, seed: true, seedData: data });
+      const reopenedStore = new PersistentApiStore(reopened.repositories, data);
+      const event = reopenedStore.listCalendarEvents("club-chongqing-talent")
+        .find((item) => item.id === "event-training-1")!;
+      const count = reopened.database.prepare(`
+        SELECT COUNT(*) AS count FROM event_participants
+        WHERE club_id = ? AND event_id = ? AND student_id = ?
+      `).get("club-chongqing-talent", "event-training-1", original.studentId) as { count: number };
+
+      expect(event.participants).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          studentId: original.studentId,
+          status: "present",
+          note: "Arrived after warm-up",
+        }),
+        expect.objectContaining({
+          studentId: unchangedStudent.id,
+          status: "confirmed",
+          note: "Keep this note",
+        }),
+      ]));
+      expect(count.count).toBe(1);
+    } finally {
+      reopened?.database.close();
+      first?.database.close();
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   it("restores tactical board snapshots after reopening SQLite", async () => {
     const directory = mkdtempSync(join(tmpdir(), "football-tactical-board-"));
     const databasePath = join(directory, "club.sqlite");

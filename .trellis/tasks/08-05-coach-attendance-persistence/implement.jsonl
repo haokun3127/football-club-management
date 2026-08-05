@@ -1,0 +1,6 @@
+{"file":".trellis/spec/api/backend/index.md","reason":"API backend layer entrypoint and quality checklist."}
+{"file":".trellis/spec/api/backend/database-guidelines.md","reason":"SQLite migration, repository, natural-key seed, and test conventions."}
+{"file":".trellis/spec/api/backend/error-handling.md","reason":"Route authorization and structured error conventions."}
+{"file":".trellis/spec/api/backend/quality-guidelines.md","reason":"Required API tests, typecheck, build, and forbidden patterns."}
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Coach attendance BFF role, privacy, idempotency, and mini-program contract boundaries."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Cross-layer persistence and API/client data-flow checklist."}

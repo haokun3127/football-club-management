@@ -697,7 +697,7 @@ function normalizeCoachWorkbench(raw: Record<string, unknown>, eventId: string):
   const roster = (participants.length ? participants : students).map((item) => ({
     studentId: String(item.studentId ?? item.id ?? ""),
     name: String(item.studentName ?? item.name ?? studentsById.get(String(item.studentId ?? item.id ?? ""))?.name ?? "学员"),
-    status: String(item.attendanceStatus ?? item.checkInStatus ?? "pending"),
+    status: String(item.status ?? item.attendanceStatus ?? item.checkInStatus ?? "pending"),
     note: stringOrUndefined(item.note ?? item.attendanceNote),
     lessonAction: stringOrUndefined(item.lessonAction ?? item.lessonStatus),
     shouldConsume: item.shouldConsume === undefined ? true : Boolean(item.shouldConsume),

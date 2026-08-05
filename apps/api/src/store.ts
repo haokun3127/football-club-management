@@ -2347,6 +2347,50 @@ export class PersistentApiStore extends SeedBackedStore {
     super(data);
   }
 
+  override listCalendarEvents(clubId: EntityId) {
+    return this.mergeCalendarEvents(clubId).map((event) => this.persistentEventDetail(event));
+  }
+
+  override getCalendarEvent(eventId: EntityId) {
+    return this.repositories.calendar.getEventById(eventId) ?? this.data.events.find((event) => event.id === eventId) ?? null;
+  }
+
+  override saveCalendarEvent(event: CalendarEvent) {
+    const saved = this.repositories.calendar.saveEvent(event);
+    upsertById(this.data.events, saved);
+    return saved;
+  }
+
+  override listEventParticipants(clubId: EntityId) {
+    const persisted = this.repositories.calendar.listParticipants(clubId);
+    const byKey = new Map(persisted.map((participant) => [participantKey(participant), participant]));
+    for (const participant of this.data.participants.filter((item) => item.clubId === clubId)) {
+      if (!byKey.has(participantKey(participant))) {
+        byKey.set(participantKey(participant), participant);
+      }
+    }
+    return [...byKey.values()];
+  }
+
+  override getEventParticipant(eventParticipantId: EntityId) {
+    return this.repositories.calendar.getParticipantById(eventParticipantId)
+      ?? this.data.participants.find((participant) => participant.id === eventParticipantId)
+      ?? null;
+  }
+
+  override saveEventParticipant(eventParticipant: EventParticipant) {
+    const saved = this.repositories.calendar.saveParticipant(eventParticipant);
+    upsertByNaturalParticipantKey(this.data.participants, saved);
+    return saved;
+  }
+
+  override getStudentTimeline(clubId: EntityId, studentId: EntityId) {
+    const eventIds = new Set(this.listEventParticipants(clubId)
+      .filter((participant) => participant.studentId === studentId)
+      .map((participant) => participant.eventId));
+    return this.listCalendarEvents(clubId).filter((event) => eventIds.has(event.id));
+  }
+
   override getHttpIdempotencyRecord(key: string) {
     return this.repositories.dataCapability.getHttpIdempotencyRecord(key);
   }
@@ -2978,6 +3022,30 @@ export class PersistentApiStore extends SeedBackedStore {
     }
   }
 
+  private mergeCalendarEvents(clubId: EntityId): CalendarEvent[] {
+    const byId = new Map(this.repositories.calendar.listEvents(clubId).map((event) => [event.id, event]));
+    for (const event of this.data.events.filter((item) => item.clubId === clubId)) {
+      byId.set(event.id, event);
+    }
+    return [...byId.values()].sort((left, right) =>
+      left.timeRange.startsAt.localeCompare(right.timeRange.startsAt) || left.id.localeCompare(right.id),
+    );
+  }
+
+  private persistentEventDetail(event: CalendarEvent) {
+    return {
+      ...event,
+      participants: this.listEventParticipants(event.clubId).filter((participant) => participant.eventId === event.id),
+      trainingSession:
+        this.data.trainingSessions.find((session) => session.clubId === event.clubId && session.eventId === event.id)
+        ?? null,
+      match: this.data.matches.find((match) => match.clubId === event.clubId && match.eventId === event.id) ?? null,
+      otherActivity:
+        this.data.otherActivities.find((activity) => activity.clubId === event.clubId && activity.eventId === event.id)
+        ?? null,
+    };
+  }
+
   private resolvePersistentClubAppClient(clubId: EntityId, selector: { clientId?: EntityId; appId?: string; clientKey?: string }): ClubAppClient | undefined {
     if (!selector.clientId && !selector.appId && !selector.clientKey) {
       return undefined;
@@ -3012,6 +3080,20 @@ export class PersistentApiStore extends SeedBackedStore {
       updatedAt: now,
     });
   }
+}
+
+function participantKey(participant: EventParticipant): string {
+  return `${participant.clubId}:${participant.eventId}:${participant.studentId}`;
+}
+
+function upsertByNaturalParticipantKey(items: EventParticipant[], participant: EventParticipant): EventParticipant {
+  const index = items.findIndex((item) => participantKey(item) === participantKey(participant));
+  if (index < 0) {
+    items.push(participant);
+    return participant;
+  }
+  items[index] = participant;
+  return participant;
 }
 
 function ensurePersistentWpsSyncReadiness(

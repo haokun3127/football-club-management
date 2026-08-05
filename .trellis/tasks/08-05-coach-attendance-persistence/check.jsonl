@@ -1,0 +1,6 @@
+{"file":".trellis/spec/api/backend/index.md","reason":"API backend quality-check entrypoint."}
+{"file":".trellis/spec/api/backend/database-guidelines.md","reason":"Verify migration reuse, repository isolation, and seed behavior."}
+{"file":".trellis/spec/api/backend/error-handling.md","reason":"Verify role and conflict error handling remains intact."}
+{"file":".trellis/spec/api/backend/quality-guidelines.md","reason":"Verify tests, typecheck, build, and generated-file boundaries."}
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Verify coach/parent BFF contract and idempotency boundaries."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Verify API, SQLite, and mini-program field flow together."}
