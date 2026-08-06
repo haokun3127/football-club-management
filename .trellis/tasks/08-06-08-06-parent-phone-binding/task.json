@@ -1,0 +1,31 @@
+{
+  "id": "08-06-parent-phone-binding",
+  "name": "08-06-parent-phone-binding",
+  "title": "Restart-safe parent phone binding",
+  "description": "Preserve existing production phone bindings across API seed restarts, then bind the authorized target phone (provided out of band) to the existing two-child acceptance parent with transactional production verification.",
+  "status": "in_progress",
+  "dev_type": "backend",
+  "scope": "restart-safe-parent-phone-binding",
+  "package": "api",
+  "priority": "P0",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-08-06",
+  "completedAt": null,
+  "branch": "codex/phone-binding-seed-safe",
+  "base_branch": "codex/phone-binding-seed-safe",
+  "worktree_path": "C:\\Users\\ASUS\\Desktop\\football-club-management-phone-binding-hotfix",
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "07-30-figma-design-foundation",
+  "relatedFiles": [
+    "apps/api/src/persistence/platform-persistence.ts",
+    "apps/api/test/persistence.test.ts",
+    "apps/api/src/seed/cq-talent-acceptance.ts",
+    "apps/api/src/seed/platform.ts"
+  ],
+  "notes": "",
+  "meta": {}
+}

@@ -68,7 +68,11 @@ export async function seedPlatformData(repositories: PlatformRepositories, data:
   }
 
   for (const user of data.users) {
-    await repositories.users.save(user);
+    const existing = await repositories.users.getById(user.id);
+    await repositories.users.save({
+      ...user,
+      phone: existing?.phone || user.phone,
+    });
   }
 
   for (const membership of data.clubMemberships) {
@@ -76,7 +80,11 @@ export async function seedPlatformData(repositories: PlatformRepositories, data:
   }
 
   for (const parent of data.parents) {
-    await repositories.parents.save(parent);
+    const existing = await repositories.parents.getByClubAndId(parent.clubId, parent.id);
+    await repositories.parents.save({
+      ...parent,
+      phone: existing?.phone || parent.phone,
+    });
   }
 
   for (const student of data.students) {

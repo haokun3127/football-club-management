@@ -1,0 +1,4 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Review that the hotfix preserves membership-derived parent access and the acceptance family's two-child boundary."}
+{"file":".trellis/spec/api/backend/quality-guidelines.md","reason":"Review focused API test coverage, typecheck/build verification, and scope discipline."}
+{"file":".trellis/spec/domain/backend/database-guidelines.md","reason":"Review that no database responsibility leaks into packages/domain."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Review restart behavior across seeding, SQLite persistence, and real WeChat authorization."}

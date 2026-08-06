@@ -1,0 +1,4 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Preserve the existing WeChat login role and two-child parent privacy contract; do not create a synthetic login/session or alter role derivation."}
+{"file":".trellis/spec/api/backend/quality-guidelines.md","reason":"Keep persistence behavior in the API layer, add the required persistence regression, and do not hand-edit generated runtime output."}
+{"file":".trellis/spec/domain/backend/database-guidelines.md","reason":"Keep SQLite persistence concerns out of the domain layer and retain explicit identity fields through the restart-safe update path."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Trace the seed-to-SQLite-to-login boundary so a restart cannot silently restore a synthetic phone."}

@@ -10,6 +10,55 @@ import { buildServer } from "../src/server.js";
 import { PersistentApiStore } from "../src/store.js";
 
 describe("platform persistence", () => {
+  it("preserves existing acceptance parent phones across a seeded file database reopen", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "football-parent-phone-"));
+    const databasePath = join(directory, "club.sqlite");
+    const originalAcceptanceSeed = process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED;
+    process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED = "1";
+
+    let first: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
+    let reopened: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
+
+    try {
+      const data = createSeedData();
+      const acceptanceUser = data.users.find((user) => user.id === "user-parent-cq-talent-acceptance")!;
+      const acceptanceParent = data.parents.find((parent) => parent.id === "parent-cq-talent-acceptance")!;
+      const acceptanceChildren = data.guardianBindings
+        .filter((binding) => binding.parentId === acceptanceParent.id)
+        .map((binding) => binding.studentId);
+
+      expect(acceptanceChildren).toHaveLength(2);
+
+      first = await createPlatformPersistence({ databasePath, seedData: data });
+      await first.repositories.users.save({ ...acceptanceUser, phone: "13700000001" });
+      await first.repositories.parents.save({ ...acceptanceParent, phone: "13700000001" });
+      first.database.close();
+      first = undefined;
+
+      reopened = await createPlatformPersistence({ databasePath, seed: true, seedData: data });
+      const reopenedStore = new PersistentApiStore(reopened.repositories, data);
+
+      await expect(reopened.repositories.users.getById(acceptanceUser.id)).resolves.toEqual(
+        expect.objectContaining({ phone: "13700000001" }),
+      );
+      await expect(reopened.repositories.parents.getByClubAndId(acceptanceParent.clubId, acceptanceParent.id)).resolves.toEqual(
+        expect.objectContaining({ phone: "13700000001" }),
+      );
+      expect(acceptanceChildren.every((studentId) =>
+        reopenedStore.isGuardianOfStudent(acceptanceParent.clubId, acceptanceUser.id, studentId),
+      )).toBe(true);
+    } finally {
+      reopened?.database.close();
+      first?.database.close();
+      if (originalAcceptanceSeed === undefined) {
+        delete process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED;
+      } else {
+        process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED = originalAcceptanceSeed;
+      }
+      rmSync(directory, { recursive: true, force: true });
+    }
+  }, 30_000);
+
   it("preserves attendance status and note after reopening a seeded file database", async () => {
     const directory = mkdtempSync(join(tmpdir(), "football-attendance-"));
     const databasePath = join(directory, "club.sqlite");

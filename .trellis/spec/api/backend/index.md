@@ -22,6 +22,7 @@ This directory contains guidelines for backend development. Fill in each file wi
 | [App Client BFF Contracts](./app-client-bff-contracts.md) | Mini-program app-client API boundary and role contracts | Active |
 | [Active Role Sessions](./active-role-sessions.md) | Durable dual-role session and switching contract | Active |
 | [Secure Test-Account Operations](./secure-test-account-operations.md) | Controlled file-SQLite import and rollback contract | Active |
+| [Restart-Safe Phone Binding Seed](./phone-binding-seed.md) | Seed behavior for preserving real WeChat phone bindings across API restarts | Active |
 
 ---
 
