@@ -24,7 +24,7 @@
     <view wx:if="{{state === 'loading'}}" class="login-feedback login-feedback--loading">{{message}}</view>
     <view wx:elif="{{state === 'error'}}" class="login-feedback login-feedback--error" bindtap="retry">{{message}}<text class="login-feedback__action">重新连接</text></view>
 
-    <view class="login-cta-wrap"><button class="login-cta {{submitting || state === 'loading' ? 'login-cta--disabled' : ''}}" open-type="getPhoneNumber" loading="{{submitting}}" disabled="{{submitting || state === 'loading'}}" bindgetphonenumber="onGetPhoneNumber">微信手机号授权并继续</button></view>
+    <view class="login-cta-wrap"><button class="login-cta {{submitting || state === 'loading' || authorizationLocked ? 'login-cta--disabled' : ''}}" open-type="getPhoneNumber" loading="{{submitting}}" disabled="{{submitting || state === 'loading' || authorizationLocked}}" bindtap="onPhoneAuthorizationTap" bindgetphonenumber="onGetPhoneNumber">微信手机号授权并继续</button></view>
     <view class="login-privacy">同意《用户协议》和《隐私政策》</view>
   </block>
 </view>

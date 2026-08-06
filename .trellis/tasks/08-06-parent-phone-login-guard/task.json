@@ -1,0 +1,29 @@
+{
+  "id": "08-06-parent-phone-login-guard",
+  "name": "08-06-parent-phone-login-guard",
+  "title": "Parent phone authorization single-flight guard",
+  "description": "Prevent repeated native getPhoneNumber calls without changing the real login contract.",
+  "status": "in_progress",
+  "dev_type": "frontend",
+  "scope": "parent-phone-login-guard",
+  "package": "miniprogram-cq-talent",
+  "priority": "P0",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-08-06",
+  "completedAt": null,
+  "branch": "codex/phone-login-guard",
+  "base_branch": "codex/phone-binding-seed-safe",
+  "worktree_path": "C:\\Users\\ASUS\\Desktop\\football-club-management-phone-login-hotfix",
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "07-30-figma-design-foundation",
+  "relatedFiles": [
+    "apps/miniprogram-cq-talent/pages/login/index.ts",
+    "apps/miniprogram-cq-talent/pages/login/index.wxml",
+    "apps/miniprogram-cq-talent/pages/login/index.test.mjs"
+  ],
+  "notes": "Do not store phone numbers, sessions, or raw authorization errors in repository files."
+}

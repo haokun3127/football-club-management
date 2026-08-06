@@ -1,0 +1,3 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Review role and binding response handling without bypassing authorization."}
+{"file":".trellis/spec/api/backend/phone-binding-seed.md","reason":"Verify no API or persistence change is smuggled into the frontend fix."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Review duplicate native callback and request/navigation single-flight behavior across boundaries."}
