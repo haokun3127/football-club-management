@@ -25,3 +25,10 @@
 - API full test: 67/67 passed.
 - Full workspace `pnpm check`: typecheck passed; API and domain tests passed; mini-program tests had 31 passing tests and one unrelated load-time failure in `apps/miniprogram-cq-talent/scripts/devtools-screenshot.test.mjs` (`SyntaxError: Invalid or unexpected token`, 0 tests collected).
 - Historical fixture failures named in the project handoff were not reproduced on this baseline: `apps/api/test/server.test.ts:688` and `apps/api/test/server.test.ts:1344` did not fail in the API full run. This is recorded as “not reproduced”, not as an unqualified existing failure.
+
+## Production record (2026-08-06)
+
+- Deployed isolated commit `9720b40`, verified `/health`, then created a private SQLite snapshot before the binding transaction.
+- Production preflight confirmed that the authorized target phone had no owner in either phone column; the fixed acceptance user/profile and active parent membership matched the approved contract.
+- One transaction updated exactly one user row and one parent-profile row. Post-restart readback retained the same masked phone mapping and active parent membership.
+- Remaining acceptance: the owner must complete a real WeChat phone authorization and confirm the parent flow returns the existing two children. No fabricated session or role may be used.

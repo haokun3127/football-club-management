@@ -26,6 +26,6 @@
     "apps/api/src/seed/cq-talent-acceptance.ts",
     "apps/api/src/seed/platform.ts"
   ],
-  "notes": "",
+  "notes": "Code and production transaction completed on 2026-08-06; awaiting real WeChat authorization acceptance without storing the target phone or session.",
   "meta": {}
 }
