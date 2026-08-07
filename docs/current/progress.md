@@ -4,6 +4,13 @@
 > 本文档随每批工作实时更新：完成一项勾一项，新增发现随时补充。
 > 最后更新：2026-08-07
 
+### 2026-08-07 P5/radar 批次 3 修复 + 复测（D3-1 白上白已修，D2 底部 tab 已实现，D3-2 根因已定位）
+
+- 代码修复（单独 commit）：radar 画布容器与 radar-canvas 空态白底改透明（对齐 Figma 深色 Hero）；radar 页接入 `role-tabbar`（active=growth）并补底部留白；`openPage` 补 `navigateTo` fail 日志（errMsg + 页面栈深度）；`types/wechat.d.ts` 补 `console`/`getCurrentPages` 声明。miniprogram typecheck 通过。
+- 复测：修复后 radar/growth 可信 375×812 截图已重取（新鲜性校验通过，非陈旧帧）；用户目视确认雷达线条/标签可见、底部 tab 出现。像素量化：header 高 88px 与 Figma 精确一致；运行胶囊位置 (281,≈28) vs Figma 占位 (281,28) 误差 ≤1px。
+- D3-2 定位：成长页雷达卡 tap 正常触发，`navigateTo:fail timeout` 后页面实际压栈并延迟数秒完整呈现——**radar 页首次加载过慢导致导航超时，非接线缺陷**；性能优化另立批次待用户裁决。
+- 条目状态明细见 `.trellis/tasks/08-05-08-05-test-metrics-p5-radar/visual-audit-2026-08-07.md` 复测记录节。P5 视觉验收判定权留用户（本批不构成通过/不通过判定）。
+
 ### 2026-08-07 P5/radar 首次设计↔运行对照取证完成（发现 D3 级差异，验收待修复后复测）
 
 - 设计侧证据齐：`93:278 / P5 Ability Radar` 官方渲染 PNG（375×812）+ `get_design_context` 全量几何/色值，含用户添加的微信胶囊占位节点 `272:860`（left:281 top:28 w:87 h:32）。

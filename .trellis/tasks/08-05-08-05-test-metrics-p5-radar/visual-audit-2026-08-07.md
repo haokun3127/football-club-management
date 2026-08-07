@@ -55,6 +55,29 @@
 - P5 视觉验收**未完成**：发现 2 个 D3 级差异（白底画布致雷达不可读；成长页跳转待复现），修复后须重新截图对照（含胶囊避让量化）。
 - 进度记录措辞上限遵守：本条仅为「已对照，差异见清单」，不构成通过/不通过判定。
 
+## 复测记录（2026-08-07 批次 3 修复后）
+
+代码修复 commit：`fix(miniprogram): repair P5 radar canvas contrast, add role tabbar, log navigateTo failures`（7 文件，显式路径提交）。
+
+**复测证据**（仓库外 `C:\Users\ASUS\cq-talent-visual-evidence\`，本次捕获 rasterScale=1.0，PNG 即逻辑 375×812）：
+
+| 证据 | sha256（前 16） | 新鲜性校验 |
+|---|---|---|
+| radar-runtime-375x812-20260807-fix1.png（+sidecar） | c5aa7daba2bc69db | 与修复前 f7755636 不同 ✓ 非陈旧帧 |
+| growth-runtime-375x812-20260807-fix1.png（+sidecar） | 148d44b7d0a78c45 | 与 bf706d9c 不同 ✓ 非陈旧帧 |
+
+**差异条目状态更新**：
+
+| # | 条目 | 复测结果 | 新状态 |
+|---|---|---|---|
+| 1 | D3-1 雷达白上白 | `.rhero__canvas` + `.radar-empty` 白底改透明；用户目视确认「雷达线条/标签可见」；像素复核画布中心 rgb(224,226,229) 非纯白、Hero 头部 rgb(12,16,31) 深色在位 | **已修复，用户目视确认** |
+| 2 | D3-2 成长页跳转 | 复现定位：tap 触发日志 `{pageStackDepth:1}` 正常 → `navigateTo:fail timeout`（fail 时栈深已 2，页面实际已压栈），数秒后 radar 页完整呈现（路由复核 currentPage=radar/index）。**结论：非接线缺陷，为 radar 页首次加载过慢导致导航超时**（嫌疑：libVersion 3.16.2 + LazyCodeLoading 下首访注入 + 生产 API 首屏数据等待；真机表现待验证）。`openPage` 已补 fail 日志（含 errMsg + 栈深），该日志保留 | **已定位根因；性能优化另立批次，待用户裁决** |
+| 3 | D2 底部 Tab | 复用 `role-tabbar`（active="growth"）+ `.p5-body` 补 `calc(180rpx + env(safe-area-inset-bottom))` 底部留白；用户目视确认「底部 tab 出现」 | **已实现，用户目视确认** |
+| 4 | 胶囊避让量化 | PIL 像素测量（fix1 截图）：header 白块总高 = **88px，与 Figma 精确一致**；运行胶囊左上缘实测 (x281, y≈28) vs Figma 占位 (281,28)，**误差 ≤1px**（容差 ±2px 内）✓；「历史对比」按钮-胶囊间距因红色自动扫描未命中未能量化，待后续 | **部分完成**（header/胶囊位置达标；按钮间距未量化） |
+| 5 | 胶囊本体 | — | D0 豁免（不变） |
+
+**遗留**：D3-2 的 radar 页首载性能优化（另立批次）；tabbar 切换走 reLaunch 清栈（与其他页一致，已注明）；role-tabbar cover-view 与 2d canvas 层级经用户目视确认无遮挡。
+
 ## 工具链备注（本次新确认）
 
 1. 弹出式模拟器窗口的 PrintWindow 后缓冲可能不随导航刷新（陈旧帧与前一帧哈希完全相同）——捕获后若与上一张哈希相同，必须视为不可信并重取。
