@@ -2,7 +2,13 @@
 
 > 依据《Figma 全量补齐决策》（../design/figma/figma-full-implementation-decision.md）执行。
 > 本文档随每批工作实时更新：完成一项勾一项，新增发现随时补充。
-> 最后更新：2026-08-05
+> 最后更新：2026-08-07
+
+### 2026-08-07 P5/radar 节点存在性阻塞解除（仅节点，不含截图与设计内容核验）
+
+- 经 Figma MCP `get_metadata` 实读 `zZ6wKyOHKcO4UYXDd9jGwv / 4:6 / 05 Parent Generated`，观测到 28 个 375×812 顶层画板存在（21 张原始设计 + 7 张 CODE 契约版），含 `93:250 / P4 Growth Home`、`93:278 / P5 Ability Radar`、`93:308 / P6 Metric Detail`。完整三元组清单见 [Figma 权威来源](figma-source-of-truth.md)。
+- 2026-08-05 条目中"当前在线 Figma 尚未取得可验证的 P5、雷达和指标录入节点及截图"含两个断言；本次仅推翻"节点"部分——**画板设计内容与截图仍未核验，不构成视觉验收依据**，需后续逐板 `get_screenshot` / `get_design_context` 取证，且仍须取得微信开发者工具真实 375×812 运行截图后方可做视觉对照。
+- 同期完成：教练签到生产持久化验证（生产 PUT → 容器重启 → 同库读回一致，台账零副作用，证据与边界见 `.trellis/tasks/08-05-coach-attendance-persistence/implement.md` 2026-08-07 节）；C4 可信 375×812 视觉验收仍待真实登录后完成。
 
 ### 2026-08-05 测试指标 SQLite 持久化（Batch A）
 

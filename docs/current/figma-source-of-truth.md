@@ -1,6 +1,6 @@
 # Figma 权威来源
 
-> 最后更新：2026-08-05
+> 最后更新：2026-08-07
 
 ## 唯一设计基准
 
@@ -14,11 +14,43 @@ https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/
 
 ## 当前设计引用三元组
 
-- `zZ6wKyOHKcO4UYXDd9jGwv / 93:29 / G2 Login Verification`
-- `zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`
-- `zZ6wKyOHKcO4UYXDd9jGwv / 269:479 / P1 Schedule Home — Empty`
+页面级引用：
+
 - `zZ6wKyOHKcO4UYXDd9jGwv / 4:6 / 05 Parent Generated`
 - `zZ6wKyOHKcO4UYXDd9jGwv / 4:7 / 06 Coach Generated`
+
+`4:6 / 05 Parent Generated` 页面画板（2026-08-07 经 Figma MCP `get_metadata` 实读观测，均为 375×812 顶层画板；设计内容与截图未核验，不构成视觉验收依据）：
+
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:2 / G1 Launch`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:29 / G2 Login Verification`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:56 / G3 Login Blocked`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 269:479 / P1 Schedule Home — Empty`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:139 / P2 Training Detail`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:170 / P2.1 Match Detail`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:198 / P2.2 Other Activity Detail`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:222 / P3 Reminder Center`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:250 / P4 Growth Home`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:278 / P5 Ability Radar`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:308 / P6 Metric Detail`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:336 / P7 Parent Profile Hub`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:364 / P7.1 Lessons Insurance`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:388 / P8 Content Center`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:416 / Venues - Premium`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:444 / P8.2 Help Center`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:472 / Coach Team`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:500 / P9 Private Lesson Form`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:531 / P9.1 Private Success`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 93:550 / P10 Account Binding`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 222:86 / CODE / P1 Family Schedule`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 222:87 / CODE / P2 Training Detail`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 222:88 / CODE / P2.1 Match Detail`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 222:89 / CODE / P2.2 Other Detail`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 222:90 / CODE / P4 Growth & Radar`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 222:91 / CODE / P6 Metric Detail`
+- `zZ6wKyOHKcO4UYXDd9jGwv / 222:92 / CODE / P7 Child Hub`
+
+实测构成：21 张原始设计 + 7 张 CODE 契约版（`222:86`–`222:92`）。此前本节的 5 条简表只是常用引用子集，不是全集；08-05 期间"P5/雷达节点不可得"的判断即源于把子集误读为全集。
 
 ## 本地 .fig 的定位
 

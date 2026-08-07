@@ -129,6 +129,7 @@ P1 按用户要求作为产品接受，但仍保留已知 Figma 差异：Hero �
 - Batch A 的测试指标 SQLite 持久化及本地同库重启读回已验证。
 - `growth-summary`、`ability-metrics` 可读回新 assessment 数据。
 - P5/radar 的 Batch B 视觉工作尚未开始/未验收：当前在线 Figma 尚未取得可验证的 P5、雷达和指标录入节点及截图。
+- 2026-08-07 superseding 注记（不改写上行原文）：经 Figma MCP `get_metadata` 实读 `zZ6wKyOHKcO4UYXDd9jGwv / 4:6 / 05 Parent Generated`，已观测到 28 个 375×812 顶层画板存在，含 `93:278 / P5 Ability Radar`、`93:250 / P4 Growth Home`、`93:308 / P6 Metric Detail`（完整清单见 `docs/current/figma-source-of-truth.md` 2026-08-07 实测节）。仅"节点存在性"阻塞解除；画板设计内容与截图仍未核验，不构成视觉验收依据。
 
 ### 训练计划、比赛记录、战术板
 
