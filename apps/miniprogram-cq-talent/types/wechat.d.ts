@@ -38,7 +38,7 @@ declare const wx: {
   request: <TData = unknown>(options: WechatRequestOptions<TData>) => void;
   login: (options: { success?: WechatCallback<{ code: string }>; fail?: WechatCallback<{ errMsg: string }> }) => void;
   getSystemInfoSync: () => { platform?: string; windowWidth: number; pixelRatio?: number; statusBarHeight?: number };
-  getWindowInfo?: () => { windowWidth: number; screenWidth?: number; statusBarHeight?: number };
+  getWindowInfo?: () => { windowWidth: number; screenWidth?: number; statusBarHeight?: number; pixelRatio?: number };
   getMenuButtonBoundingClientRect?: () => { top: number; bottom: number; left: number; right: number; width: number; height: number };
   getAccountInfoSync?: () => { miniProgram?: { appId?: string; envVersion?: "develop" | "trial" | "release" } };
   getStorageSync: <T = unknown>(key: string) => T;
