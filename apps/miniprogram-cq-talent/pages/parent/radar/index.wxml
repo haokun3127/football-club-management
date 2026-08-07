@@ -57,4 +57,5 @@
       </view>
     </view>
   </view>
+  <role-tabbar role="parent" active="growth" />
 </view>

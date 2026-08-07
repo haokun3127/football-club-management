@@ -16,5 +16,5 @@
   align-items: center;
   justify-content: center;
   color: #60646f;
-  background: #ffffff;
+  background: transparent;
 }

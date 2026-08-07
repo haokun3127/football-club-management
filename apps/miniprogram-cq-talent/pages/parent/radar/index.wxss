@@ -14,7 +14,7 @@
 .p5-chip { padding: 12rpx 24rpx; border-radius: 40rpx; background: #e7eaf0; color: #667085; font-size: 26rpx; font-weight: 500; }
 .p5-chip--active { background: #a80f1b; color: #ffffff; font-weight: 600; }
 
-.p5-body { padding: 32rpx; display: flex; flex-direction: column; gap: 32rpx; }
+.p5-body { padding: 32rpx 32rpx calc(180rpx + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 32rpx; }
 .p5-content { display: flex; flex-direction: column; gap: 32rpx; }
 
 /* P5 Radar Hero */
@@ -22,7 +22,7 @@
 .rhero__head { display: flex; align-items: center; justify-content: space-between; }
 .rhero__title { color: #ffffff; font-size: 32rpx; font-weight: 700; }
 .rhero__date { color: rgba(255, 255, 255, 0.6); font-size: 24rpx; }
-.rhero__canvas { border-radius: 24rpx; background: #ffffff; overflow: hidden; }
+.rhero__canvas { border-radius: 24rpx; background: transparent; overflow: hidden; }
 .rhero__empty { padding: 80rpx 32rpx; color: #667085; font-size: 26rpx; text-align: center; }
 .rhero__score { display: flex; flex-direction: column; align-items: center; gap: 8rpx; }
 .rhero__score-label { color: rgba(255, 255, 255, 0.6); font-size: 28rpx; font-weight: 600; }

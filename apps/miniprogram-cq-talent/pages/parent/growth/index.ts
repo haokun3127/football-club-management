@@ -90,6 +90,7 @@ Page({
     wx.showToast({ title: "成长足迹详情即将上线", icon: "none" });
   },
   openRadar() {
+    console.info("[growth] openRadar tapped", { pageStackDepth: getCurrentPages().length });
     openPage("/pages/parent/radar/index");
   },
   onViewChange(event: { detail: { value: string | number } }) {

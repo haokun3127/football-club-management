@@ -14,7 +14,16 @@ const ROLE_TABS: Record<AppRole, Record<string, string>> = {
 };
 
 export function openPage(url: string) {
-  wx.navigateTo({ url });
+  wx.navigateTo({
+    url,
+    fail: (err) => {
+      console.warn("[navigation] openPage navigateTo failed", {
+        url,
+        errMsg: err?.errMsg,
+        pageStackDepth: getCurrentPages().length,
+      });
+    },
+  });
 }
 
 export function openRoleTab(role: AppRole, key: string) {
