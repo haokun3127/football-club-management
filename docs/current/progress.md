@@ -4,6 +4,13 @@
 > 本文档随每批工作实时更新：完成一项勾一项，新增发现随时补充。
 > 最后更新：2026-08-07
 
+### 2026-08-07 P5/radar 首次设计↔运行对照取证完成（发现 D3 级差异，验收待修复后复测）
+
+- 设计侧证据齐：`93:278 / P5 Ability Radar` 官方渲染 PNG（375×812）+ `get_design_context` 全量几何/色值，含用户添加的微信胶囊占位节点 `272:860`（left:281 top:28 w:87 h:32）。
+- 运行侧：真实家长会话下 `pages/parent/radar/index` 为 ready 成功态（当前学员 ≥3 项有效指标），可信 375×812 截图已取（路由校验通过、用户确认与屏幕一致）。
+- 对照结论（措辞上限「已对照，差异见清单」，判定权留用户）：发现 **D3 级差异 2 项**——① 雷达画布容器白底（`radar/index.wxss:25`）叠加 dark 模式白色线条导致白上白、仅红色多边形可见（像素探针证实，用户提出的假设成立）；② 成长页雷达卡点击未跳转详情（用户报告，静态链路核查存在且路径正确，待复现）。另有 D2 1 项（画板底部 Tab 覆盖层 vs 运行页无 tab 组件）待用户裁决。差异清单与证据哈希见 `.trellis/tasks/08-05-08-05-test-metrics-p5-radar/visual-audit-2026-08-07.md`。
+- 工具链新陷阱：弹出式模拟器窗口 PrintWindow 后缓冲可能为陈旧帧（哈希与上一张相同即不可信）；本 DevTools 版本 DOM 查询（`page.data`/`page.$`）全部超时。
+
 ### 2026-08-07 P5/radar 节点存在性阻塞解除（仅节点，不含截图与设计内容核验）
 
 - 经 Figma MCP `get_metadata` 实读 `zZ6wKyOHKcO4UYXDd9jGwv / 4:6 / 05 Parent Generated`，观测到 28 个 375×812 顶层画板存在（21 张原始设计 + 7 张 CODE 契约版），含 `93:250 / P4 Growth Home`、`93:278 / P5 Ability Radar`、`93:308 / P6 Metric Detail`。完整三元组清单见 [Figma 权威来源](figma-source-of-truth.md)。

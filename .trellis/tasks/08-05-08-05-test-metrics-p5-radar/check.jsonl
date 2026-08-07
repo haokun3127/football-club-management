@@ -1,0 +1,5 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Check route signatures, role authorization, and parent privacy/readback requirements."}
+{"file":".trellis/spec/api/backend/quality-guidelines.md","reason":"Check test coverage, error handling, and package verification expectations."}
+{"file":".trellis/spec/domain/backend/database-guidelines.md","reason":"Check schema reuse, transaction, seed, and migration constraints."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Check end-to-end assessment field and lineage flow across API, store, database, and client."}
+{"file":".trellis/tasks/08-05-08-05-test-metrics-p5-radar/design.md","reason":"Check implementation against the approved persistence and Figma boundaries."}

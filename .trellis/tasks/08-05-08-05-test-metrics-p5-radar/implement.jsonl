@@ -1,0 +1,5 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Preserves coach app-client assessment and parent metric route contracts, authorization, and privacy boundaries."}
+{"file":".trellis/spec/api/backend/quality-guidelines.md","reason":"Defines backend test, error, and compatibility quality gates for the persistence change."}
+{"file":".trellis/spec/domain/backend/database-guidelines.md","reason":"Captures SQLite transaction, seed, and migration rules to apply before repository implementation."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Maps the coach POST -> SQLite -> parent readback boundary and prevents field loss across layers."}
+{"file":".trellis/tasks/08-05-08-05-test-metrics-p5-radar/design.md","reason":"Approved technical boundaries, persistence rules, rollback, and Figma block for this task."}
