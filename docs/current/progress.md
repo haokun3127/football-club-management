@@ -9,6 +9,7 @@
 - 代码修复（单独 commit）：radar 画布容器与 radar-canvas 空态白底改透明（对齐 Figma 深色 Hero）；radar 页接入 `role-tabbar`（active=growth）并补底部留白；`openPage` 补 `navigateTo` fail 日志（errMsg + 页面栈深度）；`types/wechat.d.ts` 补 `console`/`getCurrentPages` 声明。miniprogram typecheck 通过。
 - 复测：修复后 radar/growth 可信 375×812 截图已重取（新鲜性校验通过，非陈旧帧）；用户目视确认雷达线条/标签可见、底部 tab 出现。像素量化：header 高 88px 与 Figma 精确一致；运行胶囊位置 (281,≈28) vs Figma 占位 (281,28) 误差 ≤1px。
 - D3-2 定位：成长页雷达卡 tap 正常触发，`navigateTo:fail timeout` 后页面实际压栈并延迟数秒完整呈现——**radar 页首次加载过慢导致导航超时，非接线缺陷**；性能优化另立批次待用户裁决。
+- **模拟器渲染层冻结根因（傍晚定位）**：工作区未提交的 `libVersion` 降级 3.17.0→3.16.2 导致 Stable v2.01.2510290 模拟器 webview 渲染层冻结（跨路由捕获同哈希、原生 canvas 悬浮陈旧帧、可跨重启复现）。经用户同意改回 3.17.0 后渲染恢复，radar 页完整呈现（vision 逐项核实，无悬浮异常）。`project.config.json` 现与 HEAD 一致，未提交。该文件此前在 3.16.2 下产生的一切"只显示多边形/悬浮雷达"观感均为合成器幻影，非页面缺陷。
 - 条目状态明细见 `.trellis/tasks/08-05-08-05-test-metrics-p5-radar/visual-audit-2026-08-07.md` 复测记录节。P5 视觉验收判定权留用户（本批不构成通过/不通过判定）。
 
 ### 2026-08-07 P5/radar 首次设计↔运行对照取证完成（发现 D3 级差异，验收待修复后复测）
