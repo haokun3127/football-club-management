@@ -81,6 +81,8 @@
 ## 工具链备注（本次新确认）
 
 1. 弹出式模拟器窗口的 PrintWindow 后缓冲可能不随导航刷新（陈旧帧与前一帧哈希完全相同）——捕获后若与上一张哈希相同，必须视为不可信并重取。
-2. 本 DevTools 版本（Stable v2.01.2510290）上 `page.data()` / `page.$()` / `page.$$()` / `evaluate` 全部超时；仅 `launch/connect/currentPage/systemInfo/reLaunch` 可靠。`reLaunch` 的 promise 可能悬挂但导航实际成功，须以 `currentPage` 复核。
-3. 全退 DevTools 后 `cli auto --auto-port 9421` 可恢复自动化端口；本版本也支持在运行中的 IDE 上补开自动化端口。
-4. 弹出模拟器为独立窗口是用户手动动作，全退后不保持。
+2. **渲染层整体冻结（2026-08-07 午后确认，比后缓冲陈旧更严重）**：跨不同已校验路由的捕获 sha256 完全相同（a47649be 连续 4 张、横跨 radar/growth 两路由），且画面是错误合成——radar 页原生 canvas 悬浮在成长页陈旧 webview 帧上（用户感知为"点击详情只浮出一个雷达图"）。新弹出窗口也复现同一冻结帧（证明是渲染层卡住而非窗口问题）；逻辑层路由正常推进（currentPage 校验通过）。**判据：跨路由同哈希 = 渲染层冻结；唯一恢复手段是完全重启 DevTools。** 此状态下的视觉异常是合成器幻影，不得当作页面缺陷改码。
+3. 视觉分析后备通道：当会话内无 vision_analyze 工具时，`hermes chat -q "<定向问题>" --image <png>` 可完成图片分析（约 2-4 分钟/张，需 auxiliary.vision 配置在位）。本次用它确认了冻结帧内容（成长页+悬浮雷达）与成长页渲染完整性（标签/网格线齐全）。
+4. 本 DevTools 版本（Stable v2.01.2510290）上 `page.data()` / `page.$()` / `page.$$()` / `evaluate` 全部超时；仅 `launch/connect/currentPage/systemInfo/reLaunch` 可靠。`reLaunch` 的 promise 可能悬挂但导航实际成功，须以 `currentPage` 复核。
+5. 全退 DevTools 后 `cli auto --auto-port 9421` 可恢复自动化端口；本版本也支持在运行中的 IDE 上补开自动化端口。
+6. 弹出模拟器为独立窗口是用户手动动作，全退后不保持。
