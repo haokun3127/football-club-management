@@ -11,6 +11,7 @@
 - [小程序验收](current/miniprogram-manual-acceptance-cq-talent.md)：DevTools/真机验收流程。
 - [发布准备度](current/miniprogram-release-readiness-cq-talent.md)：上线前缺口与判断。
 - [部署要求](current/deployment-requirements.md)：部署环境与运维要求。
+- [Agent 交接文档（2026-08-07）](current/agent-handover-2026-08-07.md)：工作区、hotfix worktree、生产状态、未完成任务和交接规则。
 - [数据能力规划](current/data-capability-plan.md)：数据接入与字段扩展的当前规划。
 - [后台产品设计](current/backoffice-product-design.md)：运营后台的当前产品资料。
 
