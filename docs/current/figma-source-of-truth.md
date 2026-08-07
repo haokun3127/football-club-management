@@ -1,6 +1,6 @@
 # Figma 权威来源
 
-> 最后更新：2026-08-04
+> 最后更新：2026-08-05
 
 ## 唯一设计基准
 
@@ -49,6 +49,12 @@ https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/
 - 当前成功态画板来源三元组：`zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`，尺寸 `375×812`。
 - 旧文件 `ATlfBRO0ruOCDDY5ICagFD` 的 `93:83` 节点和相关历史截图仅保留为切源前审计事实，不构成新的视觉验收依据；不代表 P1 Empty、其他家长页、教练页或真机矩阵已经验收。
 - 每次视觉改动仍必须先读取当前在线目标三元组和截图；不能用本地 `.fig`、旧导出或切源前历史规格反推当前设计。
+
+## 2026-08-05 P1 运行态 superseding 记录
+
+- 当前成功态对照节点为 `zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`。已取得可信 Windows PrintWindow 模拟器截图，路由为 `pages/parent/schedule/index`，逻辑视口为 `375×812`，原始 PNG 为 `563×1218`。
+- 本次取证不通过视觉验收：运行态 Hero 左侧酒红面积/边界明显偏离当前 Figma，且周序显示为 `SUN→SAT`，当前节点为 `MON→SUN`。数据内容差异不单独判作 CSS 缺陷。
+- 取证成功只证明窗口、路由和视口可被可靠捕获，不等于角色/session/API 或当前 Figma 视觉验收通过；本轮没有代码改动。
 
 ## 维护规则
 

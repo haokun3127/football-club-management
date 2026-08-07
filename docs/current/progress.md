@@ -1,8 +1,15 @@
-# 小程序全量补齐 · 进度跟踪
+# 核心演示闭环 · 进度跟踪
 
 > 依据《Figma 全量补齐决策》（../design/figma/figma-full-implementation-decision.md）执行。
 > 本文档随每批工作实时更新：完成一项勾一项，新增发现随时补充。
-> 最后更新：2026-08-04
+> 最后更新：2026-08-05
+
+### 2026-08-05 测试指标 SQLite 持久化（Batch A）
+
+- 测试指标评测已写入 SQLite：`player_assessments`、`assessment_raw_results`、`assessment_scores`、`player_metric_records` 与 `metric_lineages`，保持现有 coach assessment POST 与 parent readback 契约。
+- 同一临时 SQLite 关闭后，以构建产物 `apps/api/dist/index.js` 重启并通过 HTTP 读回：`/health`、`growth-summary`、`ability-metrics` 均为 `200`，`assessment-2` 在重启后仍存在；确认 PID `29432` 已停止、端口 `3417` 已释放。
+- 本批 API focused tests `59/59`（提高默认超时后）通过，typecheck、build、`git diff --check` 通过；默认 5 秒运行仍准确保留 `server.test.ts:2903` 的历史超时记录。
+- P5 雷达视觉实现暂不开始：当前权威 Figma `zZ6wKyOHKcO4UYXDd9jGwv` 尚无可验证的 P5/指标录入节点与截图，因此尚未进行视觉验收。
 
 ## 2026-08-04 设计权威切换（覆盖现行规则）
 
@@ -10,6 +17,31 @@
 - 当前设计引用必须使用三元组：`zZ6wKyOHKcO4UYXDd9jGwv / 93:29 / G2 Login Verification`、`zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`、`zZ6wKyOHKcO4UYXDd9jGwv / 269:479 / P1 Schedule Home — Empty`、`zZ6wKyOHKcO4UYXDd9jGwv / 4:6 / 05 Parent Generated`、`zZ6wKyOHKcO4UYXDd9jGwv / 4:7 / 06 Coach Generated`。
 - 即使后续或历史排障记录包含 `ATlfBRO0ruOCDDY5ICagFD` 或裸节点 `93:83`（包括本文末尾的 DevTools 截图通道 hunk），也只表示切源前、尚未完成的历史排障线索，绝不能作为当前文件 `zZ6wKyOHKcO4UYXDd9jGwv` 的读取、实现或视觉验收依据。
 - 当前 P1 运行态对照只能使用 `zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`；P1 Empty 只能使用 `zZ6wKyOHKcO4UYXDd9jGwv / 269:479 / P1 Schedule Home — Empty`。P1/G2 下方保留的旧几何均属于切源前历史规格；G2 当前现行 `form-card` 为 `331×144`，旧 `verification-card` `331×128` 仅作历史值。
+
+## 2026-08-05 核心演示闭环（覆盖当前推进总纲）
+
+当前只冻结以下六项，按顺序推进，历史 P1–P10/C1–C16 全量视觉愿景保留但不作为本轮执行范围：
+
+1. P1 视觉验收
+2. 教练签到 SQLite 持久化
+3. 测试指标 + P5
+4. 训练计划
+5. 比赛记录
+6. 战术板重启读回 + MVP 视觉
+
+- P1 已取得可信 Windows PrintWindow 运行截图，但视觉验收不通过：Hero 左侧酒红面积/边界偏差，运行态周序为 `SUN→SAT` 而当前 Figma 为 `MON→SUN`；本轮无代码改动。
+- 教练签到已接入 SQLite；本地文件型数据库重启读回已验证，生产部署目前仅有 health/OpenAPI 可达证据。
+- 当前质量记录仅覆盖小程序 `44/44 tests`、小程序 `typecheck` 与截图工具测试；不得写成全仓通过。API fixture 差异仍保留：`apps/api/test/server.test.ts:688` 期望 `not_started`、实际 `in_progress`；`:1344` 数据能力预览记录断言不一致。
+
+### 2026-08-05 教练签到 SQLite 持久化
+
+- P1 当前为产品接受，但保留已知 Figma 差异（Hero 左侧酒红面积/边界及 `SUN→SAT` 周序）；不宣称像素一致或视觉验收完成。
+- 教练签到已接入 SQLite：日程与参与者 seed 采用 insert-if-absent，签到按 `(club_id, event_id, student_id)` 保存 `status`、`note` 与 `updated_at`；重启 seed 不覆盖既有签到。
+- 已完成文件型数据库实测：PUT 保存 `present` 与非空备注，构建后安全停止已确认 API PID，以同一数据库重启 `dist/index.js`，GET 读回状态与备注；`event-training-1-student-1` 仅保留一条 `-1` attendance debit。
+- 本批验证：API `5 files / 66 tests`、API typecheck/build、小程序 typecheck 与 `8 files / 45 tests`、`git diff --check` 通过。此结论不代表全仓测试；历史记录中的 `server.test.ts:688` 和 `:1344` fixture 说明仍仅作历史追踪，不以本批小程序/API 包验证替代全仓验收。
+- C4 真实 coach 运行态与可信 `375x812` 截图未取得，视觉验收仍待完成。
+- 2026-08-05 生产部署证据：`6526fe4` 已部署至容器 `cq-talent-api`，发布目录为 `/opt/cq-talent-releases/6526fe4`；旧 `/opt/cq-talent-api` 保留且非 Git 工作树，SQLite 使用 named volume `cq-talent-api-data`，生产 API 仅监听 `127.0.0.1:3000`，Nginx TLS 反代 `cqtc.pomi.tech` 至该端口，HTTPS `/health` 返回 `200`，OpenAPI 含 coach attendance 路由。
+- 生产本轮仅证明健康检查与 OpenAPI 路由可达；没有真实生产 coach PUT、生产同库重启读回或 C4 视觉验收证据。P1 仅为产品接受，仍保留已知 Figma 差异，不宣称视觉完成或像素一致。
 
 ## 总体进度
 
@@ -264,3 +296,16 @@
 - 证据定义改为：SDK `systemInfo` 必须证明逻辑视口为 `375×812`；PNG 保留原始像素且必须为等比完整导出；sidecar 同时记录 `devicePixelRatio` 与实际导出倍率。不能用微信运行时 `pixelRatio` 反推截图 PNG 像素。
 - 静态验证：目标回归 `10/10`、小程序完整测试 `7 files / 40 tests`、`pnpm --filter @football-club/miniprogram-cq-talent typecheck`、`git diff --check` 已通过。未改页面、Figma、API、session、授权或角色逻辑。
 - 运行态边界：2026-08-04 已实际连接到自动化端口并读取 `pages/parent/schedule/index` 及 iPhone X `375×812` 系统信息；调试中的超时使当前 DevTools 自动化窗口无法重新初始化，故新命令尚未生成可提交的最终 PNG。完全退出并重新打开 DevTools、真实授权并重新取图后，才能进行 P1 截图对照；在此之前不得宣称视觉验收通过。
+
+### 2026-08-04 DevTools 截图通道兼容性复现
+
+- 在 DevTools 完全重启、真实微信授权并回到 `pages/parent/schedule/index` 后，官方 Automator 协议日志证明当前桌面版本 `2.01.2510290` / 基础库 `3.17.0` 正常回复版本、当前路由和路由栈；唯一未响应的调用是 SDK 内部的 `MiniProgram.screenshot()`，脚本在 30 秒保护期后退出。
+- 取证脚本没有发布 PNG 或 sidecar，因而没有把失败、黑屏或桌面截图误标成 P1 视觉证据。此结论仅说明当前 DevTools 的截图通道与官方 SDK 的组合不可用；不影响已经通过的静态/类型/单测结论，也不代表 P1 已完成运行态 Figma 验收。
+- 后续动作：先完整退出所有 DevTools 进程，再由 `cli auto --auto-port` 建立一个实际监听的新自动化端口后，以相同的 `devtools:screenshot` 命令重新验证。2026-08-04 只关闭/重开项目窗口时，主进程仍自 10:24 存活、旧端口 `9421` 仍自 10:25 被占用；请求 `9422` 只创建新的渲染进程而未监听该端口。若全新自动化端口仍无响应，再判断 DevTools/Automator 兼容性。SDK 收到 PNG 后，才按在线 Figma `93:83` 做 P1 成功态逐像素/布局对照；当前不要继续通过更改页面样式、登录、API 或角色逻辑来猜测性“修复截图”。
+
+### 2026-08-05 Windows DevTools 模拟器截图工具
+
+- 已新增 `apps/miniprogram-cq-talent/scripts/devtools-simulator-capture.py`，并接入 `scripts/devtools-screenshot.mjs`。Windows 上，Automator 继续只读校验路由、路由栈和逻辑 `375×812` 视口；当且仅当这些校验通过后，Python 用 `PrintWindow(PW_RENDERFULLCONTENT)` 离屏获取唯一可见的“××的模拟器”窗口，并根据 DPI 与 iPhone X 刘海裁出完整逻辑画布。
+- 真实验证：当前路由为 `/pages/parent/schedule/index`，逻辑视口 `375×812`，输出原始 PNG 为 `563×1218`；模拟器窗口为“重庆天才俱乐部的模拟器”，裁剪参数为 `x=11, y=93, width=563, height=1218`。截图已人工检查为完整家长日程画面，不是黑屏或普通桌面截图。
+- 回归测试覆盖 Windows 选择窗口路径、SDK 截图超时不发布证据、错误标题拒绝和 ASCII-safe 元数据；Windows 之外仍使用官方 SDK 的截图路径。后续可直接运行 `pnpm --filter @football-club/miniprogram-cq-talent devtools:screenshot -- --output <仓库外绝对路径>.png --expect-route-prefix /pages/parent/ --port 9421` 获取同类证据。
+- 约束：仅允许一个可见模拟器窗口；多个窗口时设 `WECHAT_DEVTOOLS_SIMULATOR_TITLE`。无论窗口捕获、路由复核、视口验证或 PNG 尺寸验证中的哪一步失败，最终 PNG 与 sidecar 均不得发布。此工具只解决可信取证通道，不代替将截图与当前在线 Figma 节点逐页对照的视觉验收。
