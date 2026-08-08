@@ -54,7 +54,9 @@ Page({
     coachName: "教练待同步",
     coachDateLabel: "",
     teamCompareMessage: "同队对比数据待同步",
-    teamRankLabel: "—",
+    teamSizeLabel: "数据同步中",
+    markerLeft: "",
+    myScorePct: "0%",
   },
   onLoad(query?: Record<string, string | undefined>) {
     requireRole("parent");
@@ -93,8 +95,14 @@ Page({
         coachFeedback: records[0]?.note || "教练评语数据待同步",
         coachName: detail.sourceEvents[0]?.title || "教练待同步",
         coachDateLabel: records[0]?.dateLabel || "",
-        teamCompareMessage: detail.latest?.value === undefined ? "同队对比数据待同步" : "同队对比数据待同步，当前先展示个人趋势",
-        teamRankLabel: "—",
+        teamCompareMessage: detail.latest?.value === undefined ? "同队对比数据待同步" : "队内排名数据待同步，当前先展示我的位置",
+        teamSizeLabel: "数据同步中",
+        markerLeft: detail.latest?.value === undefined
+          ? ""
+          : `${Math.min(94.5, Math.max(5.5, detail.latest.value))}%`,
+        myScorePct: detail.latest?.value === undefined
+          ? "0%"
+          : `${Math.min(100, Math.max(0, detail.latest.value))}%`,
       });
     } catch (error) {
       const record = error as { code?: string; message?: string };
