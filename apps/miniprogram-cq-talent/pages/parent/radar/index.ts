@@ -3,7 +3,7 @@ import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { formatDateTime, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { setCurrentStudentId } from "../../../utils/store";
-import type { LoadState, RadarMetricPoint, StudentSummary } from "../../../utils/types";
+import type { GrowthSummary, LoadState, RadarMetricPoint, StudentSummary } from "../../../utils/types";
 
 type RadarPointView = RadarMetricPoint & {
   percent: number;
@@ -71,7 +71,7 @@ Page({
         growth = await getParentGrowth(active.id, active);
         if (gen !== loadGeneration) return;
       }
-      const radar = presentRadar(growth.radar);
+      const radar = presentRadar(radarForView(growth));
       const scores = radar.filter((point) => point.value !== undefined);
       this.setData({
         state: radar.length >= 3 ? "ready" : "empty",
@@ -132,6 +132,12 @@ Page({
     this.load();
   },
 });
+
+function radarForView(growth: GrowthSummary) {
+  const metricIds = new Set(growth.views[0]?.metricIds ?? growth.radar.map((point) => point.metricId));
+  const filtered = growth.radar.filter((point) => metricIds.has(point.metricId));
+  return filtered.length >= 3 ? filtered : growth.radar;
+}
 
 function presentRadar(points: RadarMetricPoint[]): RadarPointView[] {
   return points.map((point) => ({
