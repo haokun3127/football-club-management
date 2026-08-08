@@ -2,6 +2,11 @@
   min-height: 100vh;
   background: var(--color-page);
 }
+.coaches-nav { display: flex; align-items: center; box-sizing: content-box; height: 88rpx; padding: 0 200rpx 0 32rpx; background: #ffffff; box-shadow: 0 8rpx 12rpx rgba(0, 0, 0, 0.05); }
+.coaches-nav__back { width: 48rpx; height: 48rpx; display: flex; align-items: center; justify-content: center; }
+.coaches-nav__back image { width: 48rpx; height: 48rpx; }
+.coaches-nav__title { flex: 1; margin-left: 24rpx; color: #202124; font-size: 44rpx; font-weight: 700; text-align: center; }
+.coaches-nav__spacer { width: 48rpx; height: 48rpx; }
 
 .coaches-page__body {
   padding: 24rpx var(--space-page) 180rpx;

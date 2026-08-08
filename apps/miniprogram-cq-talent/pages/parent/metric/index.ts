@@ -1,7 +1,7 @@
 import { getParentMetricDetail } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import { activityTypeLabel, formatDateTime, resolveNavInset } from "../../../utils/presentation";
+import { activityTypeLabel, formatDateTime, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { LoadState, MetricDetail } from "../../../utils/types";
 
 interface MetricRecordView {
@@ -35,6 +35,7 @@ interface ChartPoint {
 Page({
   data: {
     navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     state: "loading" as LoadState,
     message: "正在读取指标详情",
     metricId: "",

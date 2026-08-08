@@ -1,7 +1,6 @@
 {
   "navigationStyle": "custom",
   "usingComponents": {
-    "app-header": "/components/app-header/index",
     "status-chip": "/components/status-chip/index",
     "status-view": "/components/status-view/index"
   }

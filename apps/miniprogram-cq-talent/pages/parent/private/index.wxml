@@ -1,5 +1,5 @@
 <view class="private-page">
-  <view class="page-nav"><view class="page-nav__back" bindtap="goBack">‹</view><view class="page-nav__title">私教预约</view></view>
+  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="page-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="page-nav__title">私教预约</view><view class="page-nav__spacer"></view></view>
   <view class="private-page__body">
     <status-view
       state="{{state}}"

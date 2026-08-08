@@ -1,5 +1,6 @@
 import { getContentFaqs } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { ContentFaq } from "../../../utils/types";
 
 interface HelpCategory {
@@ -26,6 +27,8 @@ const CATEGORIES: HelpCategory[] = [
 
 Page<PageData>({
   data: {
+    navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     categories: CATEGORIES,
     questions: [],
   },

@@ -1,7 +1,7 @@
 import { getParentCalendar, getParentChildren, getParentStudentHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { DEV_MODE, DEV_TEST_DATE } from "../../../utils/config";
-import { resolveMenuActionTop, resolveNavInset } from "../../../utils/presentation";
+import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { LoadState, ScheduleEvent, StudentHome, StudentSummary } from "../../../utils/types";
 
 interface HistoryRow {
@@ -46,7 +46,7 @@ Page<PageData>({
     insuranceBadgeTone: "success",
     history: [],
     navInset: resolveNavInset(),
-    navActionTop: resolveMenuActionTop(),
+    menuInset: resolveMenuInset(),
   },
   onLoad(query: { student?: string }) {
     this.load(query?.student || "");

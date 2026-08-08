@@ -1,5 +1,6 @@
 import { createPrivateLessonRequest, getParentChildren } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { LoadState, StudentSummary } from "../../../utils/types";
 
 const TIME_SLOTS = ["09:00-10:00", "10:00-11:00", "14:00-15:00", "15:00-16:00", "16:00-17:00", "17:00-18:00"];
@@ -23,6 +24,8 @@ interface PageData {
 
 Page<PageData>({
   data: {
+    navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     state: "idle",
     message: "",
     studentId: "",

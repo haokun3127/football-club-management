@@ -1,7 +1,7 @@
 <view class="p6">
   <!-- P6 NavHeader -->
-  <view class="p6-nav" style="padding-top:{{navInset}}px">
-    <view class="p6-nav__back" bindtap="goBack">‹</view>
+  <view class="p6-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
+    <view class="p6-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
     <view class="p6-nav__title">{{detail ? detail.label : ''}} 指标详情</view>
     <view class="p6-nav__range" bindtap="switchRange">本赛季 ⌄</view>
   </view>

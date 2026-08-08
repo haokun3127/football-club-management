@@ -1,5 +1,5 @@
 <view class="help-page">
-  <view class="page-nav"><view class="page-nav__back" bindtap="goBack">‹</view><view class="page-nav__title">帮助中心</view><view class="page-nav__more">•••</view></view>
+  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="page-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="page-nav__title">帮助中心</view><view class="page-nav__more"><image src="/assets/icons/more-horizontal.svg" mode="aspectFit" /></view></view>
   <view class="help-page__body">
     <!-- 搜索栏（Figma: 白底 r22, shadow 0,2,8,.08） -->
     <view class="search-bar" bindtap="openSearch">

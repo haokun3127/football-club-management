@@ -1,5 +1,5 @@
 .p7 { min-height: 100vh; background: #f6f7f9; }
-.p7-nav { position: relative; display: flex; box-sizing: border-box; align-items: center; justify-content: center; height: 176rpx; padding: 0 44rpx 48rpx; background: #ffffff; }
+.p7-nav { position: relative; display: flex; box-sizing: content-box; align-items: center; height: 88rpx; padding: 0 200rpx 0 32rpx; background: #ffffff; }
 .p7-nav__title { color: #202124; font-size: 40rpx; font-weight: 700; line-height: 48rpx; }.p7-nav__signout { position: absolute; min-width: 56rpx; height: 56rpx; padding: 0 16rpx; color: #a80f1b; font-size: 26rpx; font-weight: 600; line-height: 56rpx; text-align: center; }
 .p7-body { display: flex; flex-direction: column; gap: 32rpx; padding: 32rpx 32rpx calc(180rpx + env(safe-area-inset-bottom)); }
 .p7-content { display: flex; flex-direction: column; gap: 32rpx; }

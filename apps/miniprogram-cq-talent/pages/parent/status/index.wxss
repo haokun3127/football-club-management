@@ -1,7 +1,7 @@
 .status-page { min-height: 100vh; background: #f6f7f9; }
-.status-nav { position: relative; display: flex; box-sizing: border-box; align-items: center; justify-content: center; height: 176rpx; padding: 0 32rpx 48rpx; background: #ffffff; }
+.status-nav { position: relative; display: flex; box-sizing: content-box; align-items: center; height: 88rpx; padding: 0 200rpx 0 32rpx; background: #ffffff; }
 .status-nav__title { color: #202124; font-size: 36rpx; font-weight: 700; line-height: 44rpx; }
-.status-nav__back { position: absolute; left: 32rpx; display: flex; align-items: center; justify-content: center; width: 80rpx; height: 80rpx; }.status-nav__back image { width: 48rpx; height: 48rpx; }
+.status-nav__back { display: flex; align-items: center; justify-content: center; width: 80rpx; height: 80rpx; }.status-nav__back image { width: 48rpx; height: 48rpx; }
 .status-page__body { display: flex; flex-direction: column; gap: 32rpx; padding: 32rpx 32rpx calc(160rpx + env(safe-area-inset-bottom)); }
 .lesson-card { box-sizing: border-box; width: 686rpx; height: 422rpx; padding: 48rpx; border-radius: 32rpx; background: #ffffff; box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.05); }
 .lesson-card__title { color: #202124; font-size: 30rpx; font-weight: 600; line-height: 36rpx; }.lesson-card__count { margin-top: 40rpx; color: #07111f; font-size: 96rpx; font-weight: 700; line-height: 116rpx; }.lesson-card__caption { margin-top: 8rpx; color: #667085; font-size: 26rpx; line-height: 32rpx; }

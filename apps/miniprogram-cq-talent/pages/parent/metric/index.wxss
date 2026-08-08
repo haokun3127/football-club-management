@@ -1,8 +1,9 @@
 .p6 { min-height: 100vh; background: #f6f7f9; }
 
 /* P6 NavHeader */
-.p6-nav { display: flex; align-items: center; height: 112rpx; padding: 0 32rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
-.p6-nav__back { width: 72rpx; height: 72rpx; border-radius: 36rpx; background: #f6f7f9; color: #202124; font-size: 48rpx; font-weight: 300; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.p6-nav { display: flex; align-items: center; box-sizing: content-box; height: 88rpx; padding: 0 200rpx 0 32rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
+.p6-nav__back { width: 72rpx; height: 72rpx; border-radius: 36rpx; background: #f6f7f9; display: flex; align-items: center; justify-content: center; }
+.p6-nav__back image { width: 36rpx; height: 36rpx; }
 .p6-nav__title { flex: 1; text-align: center; color: #202124; font-size: 34rpx; font-weight: 700; }
 .p6-nav__range { padding: 12rpx 20rpx; border-radius: 16rpx; background: #f6f7f9; color: #667085; font-size: 24rpx; }
 

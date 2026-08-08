@@ -1,5 +1,5 @@
 <view class="coaches-page">
-  <app-header title="教练团队" subtitle="球队教练阵容" show-back />
+  <view class="coaches-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="coaches-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="coaches-nav__title">教练团队</view><view class="coaches-nav__spacer"></view></view>
   <view class="coaches-page__body">
     <!-- 球队介绍卡（Figma: #07111f 深底 r16 + 半透明白 chips） -->
     <view class="team-card">

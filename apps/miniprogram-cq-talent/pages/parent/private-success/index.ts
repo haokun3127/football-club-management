@@ -1,4 +1,5 @@
 import { requireRole } from "../../../utils/auth";
+import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 
 interface PageData {
   coach: string;
@@ -9,6 +10,8 @@ interface PageData {
 
 Page<PageData>({
   data: {
+    navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     coach: "",
     date: "",
     slot: "",
@@ -16,11 +19,19 @@ Page<PageData>({
   },
   onLoad(query: { coach?: string; date?: string; slot?: string; goals?: string }) {
     requireRole("parent");
+    const decode = (value?: string) => {
+      if (!value) return "";
+      try {
+        return decodeURIComponent(value);
+      } catch {
+        return value;
+      }
+    };
     this.setData({
-      coach: query.coach || "待同步",
-      date: query.date || "",
-      slot: query.slot || "",
-      goals: query.goals || "",
+      coach: decode(query.coach) || "待同步",
+      date: decode(query.date),
+      slot: decode(query.slot),
+      goals: decode(query.goals),
     });
   },
   backToSchedule() {

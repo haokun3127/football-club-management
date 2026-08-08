@@ -1,5 +1,6 @@
 import { getVenues } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { VenueInfo } from "../../../utils/types";
 
 interface Venue extends VenueInfo {
@@ -36,10 +37,15 @@ const GRADIENTS = [
 
 Page<PageData>({
   data: {
+    navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     filters: FILTERS,
     activeFilter: "all",
     venues: [],
     visibleVenues: [],
+  },
+  goBack() {
+    wx.navigateBack();
   },
   onLoad() {
     requireRole("parent");

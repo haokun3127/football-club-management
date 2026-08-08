@@ -1,5 +1,5 @@
 <view class="success-page">
-  <view class="page-nav"><view class="page-nav__back" bindtap="goBack">‹</view><view class="page-nav__title">预约成功</view></view>
+  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="page-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="page-nav__title">预约成功</view></view>
   <view class="success-page__body">
     <!-- 绿色对勾（Figma: 100px #22c55e 圆 + 白色 check + 绿色投影） -->
     <view class="check-circle">

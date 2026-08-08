@@ -1,6 +1,6 @@
 import { getParentReminders } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { resolveNavInset } from "../../../utils/presentation";
+import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { countUnreadReminders, getReminderReadIds, markAllRemindersRead } from "../../../utils/reminders";
 import type { LoadState, ReminderItem } from "../../../utils/types";
 
@@ -38,6 +38,7 @@ Page<PageData>({
     earlier: [],
     unreadCount: 0,
     navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
   },
   onLoad() {
     this.load();

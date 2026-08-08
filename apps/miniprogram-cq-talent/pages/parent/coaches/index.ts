@@ -1,5 +1,6 @@
 import { getClubCoachTeam } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 
 interface Coach {
   id: string;
@@ -27,10 +28,15 @@ const ROLE_STYLES = [
 
 Page<PageData>({
   data: {
+    navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     teamName: "重庆天才足球俱乐部",
     teamChips: [],
     teamGoal: "",
     coaches: [],
+  },
+  goBack() {
+    wx.navigateBack();
   },
   onLoad() {
     requireRole("parent");
