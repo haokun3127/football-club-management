@@ -2,7 +2,17 @@
 
 > 依据《Figma 全量补齐决策》（../design/figma/figma-full-implementation-decision.md）执行。
 > 本文档随每批工作实时更新：完成一项勾一项，新增发现随时补充。
-> 最后更新：2026-08-07
+> 最后更新：2026-08-08
+
+### 2026-08-08 批次 4/5/6 收口：家长端全部 17 页 topbar 按 Figma 修复并逐页实拍验收 + 4 个独立提交
+
+- **提交**：`663be2c` perf(api) 日程列表 N+1（5144ms→711ms）；`c48385b` P4 growth topbar；`2014a0a` radar 首载性能+P5 topbar；`a7646c4` 家长端 13 页 topbar。路径限定暂存，主工作区其余 ~31 项无关未提交改动（assessment 持久化等）未连带。
+- **Figma 唯一权威**：`zZ6wKyOHKcO4UYXDd9jGwv`（用户重申 URL），"05 Parent Generated"(4:6) 页下 16 块内容画板；画板枚举/Header 几何取自 mcp get_metadata(4:6)+逐 Header get_design_context。页面↔画板映射：child=P7 Parent Profile Hub(93:336)、status=P7.1(93:364)、event=P2/P2.1/P2.2、reminders=P3(93:222)、metric=P6(93:308)、content=P8(93:388)、help=P8.2(93:444)、private=P9(93:500)、private-success=P9.1(93:531)、binding=P10(93:550)、coaches=Coach Team(93:472)、venues=Venues Premium(93:416)；account 无画板（app-header 已胶囊安全，不动）。
+- **统一修法**：44px(88rpx) 内容带 content-box + `padding-top:{{navInset}}px` + `padding-right:{{menuInset}}px`（resolveMenuInset 动态避让胶囊）；‹字符/🔍emoji 全部换 Figma 原版 SVG（新增 search.svg、more-horizontal.svg）；coaches/venues/metric 摘除 app-header 死注册改手写 nav。
+- **验收中修复的 2 个真缺陷**：① event 比赛变体「邀请好友」绝对定位压居中标题 → 右操作改流式布局（title flex-1 center）；② private-success 未 decodeURIComponent query → 中文教练名显示 %E7%8E... 乱码，已修并复验。
+- **视觉验收**：模拟器逐页实拍 17 页（`C:\Users\ASUS\cq-talent-visual-evidence\b6-page-*.png`），vision 逐页核对胶囊间隙/垂直对齐/设计符合性，17/17 通过（reminders「全部已读」为 0 未读数据态隐藏，判 D 级可接受）。
+- **环境事件（重要教训）**：① 强杀 DevTools 进程后冷启动 GUI 白屏（逻辑层正常），shader 缓存清理无效，**Ctrl+Win+Shift+B 重置显卡驱动后恢复**；② 渲染层冻结可只发生在**弹出式模拟器**（原生状态栏/授权弹窗照常更新、webview 页帧陈旧跨路由同哈希），内嵌模拟器同刻健康——此后验证改用 WGC/dxcam 拍内嵌模拟器；③ 合成鼠标事件（mouse_event/PostMessage）**到不了模拟器 webview/原生弹窗**（但能点 DevTools 原生工具栏），登录授权弹窗无法自动点；④ 登录态在强杀后丢失，临时 `DEV_AUTO_SESSION=true`（config.ts）完成验证后已回滚 false 且未提交；⑤ 自动化端口 9421 会话失效后换 9422 恢复。
+- **门禁**：miniprogram typecheck ✅ vitest 51/51 ✅；api vitest 68/68 ✅；根 `pnpm run check` ✅。
 
 ### 2026-08-07 P5/radar 批次 3 修复 + 复测（D3-1 白上白已修，D2 底部 tab 已实现，D3-2 根因已定位）
 
