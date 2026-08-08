@@ -1810,20 +1810,22 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       const dayMs = 24 * 60 * 60 * 1000;
       const from = new Date(Date.now() - 29 * dayMs).toISOString();
       const students = await context.store.listOperationalStudents(request.params.clubId);
-      const eventIds = new Set<string>();
+      const studentIds = new Set(students.map((student) => student.id));
+      // 语义保持：统计 30 天窗口内、有运营学员参与、且带场地名称的去重事件数。
+      // 事件详情一次取全（内嵌参与者），避免按学员逐条拉时间线（201 学员 × 全量查询 的 N+1 开销）。
       const venueUseCount = new Map<string, number>();
-      await Promise.all(students.map(async (student) => {
-        const timeline = sortEvents(await context.store.getStudentTimeline(request.params.clubId, student.id));
-        for (const event of timeline) {
-          const rawVenue = event.venue;
-          const venueName = typeof rawVenue === "string" ? rawVenue : String((rawVenue as { name?: string } | undefined)?.name ?? "");
-          if (!venueName || eventIds.has(event.id) || event.timeRange.startsAt < from) {
-            continue;
-          }
-          eventIds.add(event.id);
-          venueUseCount.set(venueName, (venueUseCount.get(venueName) ?? 0) + 1);
+      const calendarEvents = await context.store.listCalendarEvents(request.params.clubId) as AppEventDetail[];
+      for (const event of calendarEvents) {
+        const rawVenue = event.venue;
+        const venueName = typeof rawVenue === "string" ? rawVenue : String((rawVenue as { name?: string } | undefined)?.name ?? "");
+        if (!venueName || event.timeRange.startsAt < from) {
+          continue;
         }
-      }));
+        if (!event.participants?.some((participant) => studentIds.has(participant.studentId))) {
+          continue;
+        }
+        venueUseCount.set(venueName, (venueUseCount.get(venueName) ?? 0) + 1);
+      }
       return {
         clubId: request.params.clubId,
         venues: venues.map((venue) => ({

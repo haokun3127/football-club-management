@@ -2348,7 +2348,18 @@ export class PersistentApiStore extends SeedBackedStore {
   }
 
   override listCalendarEvents(clubId: EntityId) {
-    return this.mergeCalendarEvents(clubId).map((event) => this.persistentEventDetail(event));
+    // 参与者按事件一次性分组，避免 persistentEventDetail 每事件全量重查（E×全量 的平方开销）
+    const participantsByEvent = new Map<EntityId, EventParticipant[]>();
+    for (const participant of this.listEventParticipants(clubId)) {
+      const list = participantsByEvent.get(participant.eventId);
+      if (list) {
+        list.push(participant);
+      } else {
+        participantsByEvent.set(participant.eventId, [participant]);
+      }
+    }
+    return this.mergeCalendarEvents(clubId).map((event) =>
+      this.persistentEventDetail(event, participantsByEvent.get(event.id) ?? []));
   }
 
   override getCalendarEvent(eventId: EntityId) {
@@ -3032,10 +3043,11 @@ export class PersistentApiStore extends SeedBackedStore {
     );
   }
 
-  private persistentEventDetail(event: CalendarEvent) {
+  private persistentEventDetail(event: CalendarEvent, participants?: EventParticipant[]) {
     return {
       ...event,
-      participants: this.listEventParticipants(event.clubId).filter((participant) => participant.eventId === event.id),
+      participants: participants
+        ?? this.listEventParticipants(event.clubId).filter((participant) => participant.eventId === event.id),
       trainingSession:
         this.data.trainingSessions.find((session) => session.clubId === event.clubId && session.eventId === event.id)
         ?? null,
