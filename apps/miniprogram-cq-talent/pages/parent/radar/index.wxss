@@ -3,9 +3,9 @@
 /* P5 Header */
 .p5-nav { display: flex; align-items: center; gap: 24rpx; box-sizing: content-box; height: 88rpx; padding: 0 200rpx 0 32rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
 .p5-nav__back { width: 80rpx; height: 80rpx; border-radius: 40rpx; background: #ffffff; color: #202124; font-size: 52rpx; font-weight: 300; display: flex; align-items: center; justify-content: center; line-height: 1; }
-.p5-nav__title-group { flex: 1; display: flex; flex-direction: column; gap: 4rpx; }
-.p5-nav__title { color: #202124; font-size: 44rpx; font-weight: 700; }
-.p5-nav__sub { color: #667085; font-size: 26rpx; }
+.p5-nav__title-group { flex: 1; display: flex; flex-direction: column; gap: 2rpx; }
+.p5-nav__title { color: #202124; font-size: 40rpx; font-weight: 700; line-height: 44rpx; }
+.p5-nav__sub { color: #667085; font-size: 24rpx; line-height: 30rpx; }
 .p5-nav__compare { padding: 16rpx 32rpx; border-radius: 40rpx; background: #a80f1b; color: #ffffff; font-size: 28rpx; font-weight: 600; }
 
 /* P5 Player Selector */
@@ -38,7 +38,3 @@
 .dim-row__peer { position: absolute; top: -6rpx; width: 4rpx; height: 28rpx; background: #07111f; }
 .dim-row__value { width: 72rpx; text-align: right; color: #202124; font-size: 28rpx; font-weight: 700; }
 .dim-card__hint { color: #a80f1b; font-size: 24rpx; text-align: center; }
-/* custom navigation: keep Figma 88px total height inclusive of safe area */
-.p5-nav { box-sizing: border-box; }
-/* Figma Top Nav is 375x88 (176rpx): safe area is inside this envelope. */
-.p5-nav { height: 176rpx; }

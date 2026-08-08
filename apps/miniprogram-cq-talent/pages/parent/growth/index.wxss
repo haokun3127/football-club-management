@@ -1,5 +1,5 @@
 .p4 { min-height: 100vh; background: #f5f6f8; }
-.p4-nav { display: flex; align-items: center; justify-content: space-between; box-sizing: content-box; height: 120rpx; padding: 28rpx 168rpx 28rpx 32rpx; background: #ffffff; }
+.p4-nav { display: flex; align-items: center; justify-content: space-between; box-sizing: content-box; height: 88rpx; padding: 0 168rpx 0 32rpx; background: #ffffff; }
 .p4-nav__title { color: #202124; font-size: 44rpx; font-weight: 700; }
 .p4-nav__settings { display: flex; align-items: center; justify-content: center; width: 64rpx; height: 64rpx; border-radius: 32rpx; background: #f3f4f6; color: #667085; }
 .p4-nav__settings-icon { width: 36rpx; height: 36rpx; }
@@ -46,7 +46,3 @@
 .p4-radar-preview__shape { position: absolute; top: 50%; left: 50%; width: 132rpx; height: 132rpx; border: 4rpx solid #a80f1b; background: rgba(168,15,27,.34); clip-path: polygon(50% 4%,88% 27%,79% 72%,50% 94%,16% 75%,10% 31%); transform: translate(-50%,-50%); }
 .p4-radar-preview__dot { position: absolute; top: 50%; left: 50%; width: 12rpx; height: 12rpx; border-radius: 50%; background: #ffffff; box-shadow: 0 0 0 4rpx #b70f20; transform: translate(-50%,-50%); }
 .metric-scroll { width: 100%; white-space: nowrap; }.metric-chips { display: inline-flex; gap: 12rpx; }.metric-chip { display: inline-flex; align-items: center; gap: 10rpx; padding: 12rpx 20rpx; border: 1rpx solid #e7eaf0; border-radius: 999rpx; background: #ffffff; color: #60646f; font-size: 24rpx; }.metric-chip.active { border-color: #a80f1b; background: #fceeef; color: #a80f1b; font-weight: 700; }.metric-chip__dot { width: 10rpx; height: 10rpx; border-radius: 50%; background: currentColor; }.metric-summary { display: flex; flex-direction: column; gap: 16rpx; padding: 32rpx; border-radius: 32rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0,0,0,.05); }.metric-value { color: #a80f1b; font-size: 56rpx; font-weight: 800; }
-/* custom navigation: keep Figma 88px total height inclusive of safe area */
-.p4-nav { box-sizing: border-box; }
-/* Figma Top Nav is 375x88 (176rpx): safe area is inside this envelope. */
-.p4-nav { height: 176rpx; }
