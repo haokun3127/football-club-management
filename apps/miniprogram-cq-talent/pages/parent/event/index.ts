@@ -21,6 +21,7 @@ type ActivityDetailView = ActivityDetail & {
   coachInitial: string;
   dateText: string;
   timeText: string;
+  trainingDateText: string;
   venueText: string;
   trainingSummary: string;
   abilityChips: string[];
@@ -95,6 +96,9 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
   const coachName = fieldValue(detail, ["教练"]) || "教练待同步";
   const otherDescription = sectionValue(detail, ["活动说明"], ["内容"]) || fieldValue(detail, ["活动描述", "描述"]) || "活动说明待同步";
   const otherNotice = sectionValue(detail, ["活动说明"], ["通知", "注意"]) || "线下到场后检查身份完成确认";
+  const rawDateTime = fieldValue(detail, ["时间", "日期"]);
+  const dateTime = parseDateTimeParts(rawDateTime);
+  const rawScore = sectionValue(detail, ["比赛信息"], ["比分"]).trim();
   return {
     ...detail,
     navTitle: NAV_TITLES[detail.type],
@@ -103,14 +107,15 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
     typeLabel: activityTypeLabel(detail.type),
     coachName,
     coachInitial: coachName.slice(0, 1),
-    dateText: fieldValue(detail, ["时间", "日期"]) || "日期待确认",
-    timeText: timePart(fieldValue(detail, ["时间", "日期"])) || "时间待确认",
+    dateText: dateTime.date ? `${dateTime.date} ${dateTime.start}`.trim() : rawDateTime || "日期待确认",
+    timeText: dateTime.range || dateTime.start || "时间待确认",
+    trainingDateText: dateTime.date ? `${dateTime.range || dateTime.start} · ${dateTime.date}` : rawDateTime || "日期待确认",
     venueText: fieldValue(detail, ["地点", "场地", "场馆"]) || "地点待确认",
     trainingSummary: sectionValue(detail, ["本次训练"], ["训练内容"]) || "训练内容待同步",
     abilityChips: collectAbilityChips(detail),
     homeTeam: fieldValue(detail, ["队伍", "主队"]) || "天才队",
     awayTeam: sectionValue(detail, ["比赛信息"], ["对手"]) || "对手待确认",
-    scoreText: sectionValue(detail, ["比赛信息"], ["比分"]) || "0 : 0",
+    scoreText: /^\d+\s*[:：]\s*\d+$/.test(rawScore) ? rawScore : "0 : 0",
     roster: detail.participants.slice(0, 3).map((participant, index) => rosterItem(participant, index)),
     otherDescription,
     otherNotice,
@@ -146,9 +151,14 @@ function collectAbilityChips(detail: ActivityDetail) {
   return chips.length ? chips.slice(0, 4) : ["能力数据待同步"];
 }
 
-function timePart(value: string) {
-  const matched = value.match(/(\d{1,2}:\d{2}(?:\s*[-–]\s*\d{1,2}:\d{2})?)/);
-  return matched?.[1] ?? value;
+function parseDateTimeParts(value: string) {
+  // 形如 "7月4日 08:30 · 08:30~10:00"，拆出日期/开始时间/时间段
+  const [left = "", right = ""] = value.split(" · ");
+  const date = left.match(/\d{1,2}月\d{1,2}日/)?.[0] ?? value.match(/\d{1,2}月\d{1,2}日/)?.[0] ?? "";
+  const start = left.match(/\d{1,2}:\d{2}/)?.[0] ?? right.match(/\d{1,2}:\d{2}/)?.[0] ?? "";
+  const rangeMatch = right.match(/(\d{1,2}:\d{2})\s*[-–~]\s*(\d{1,2}:\d{2})/) ?? left.match(/(\d{1,2}:\d{2})\s*[-–~]\s*(\d{1,2}:\d{2})/);
+  const range = rangeMatch ? `${rangeMatch[1]}-${rangeMatch[2]}` : "";
+  return { date, start, range };
 }
 
 function readableError(error: unknown) {

@@ -14,7 +14,7 @@
       <view class="training-hero">
         <view class="training-hero__head"><view class="training-hero__type">训练</view><view class="training-hero__coach"><image src="/assets/icons/user-white.svg" mode="aspectFit" />{{detail.coachName}}</view></view>
         <view class="training-hero__title">{{detail.title}}</view>
-        <view class="training-hero__meta"><view><image src="/assets/icons/calendar-white.svg" mode="aspectFit" />{{detail.dateText}}</view><view><image src="/assets/icons/map-pin-white.svg" mode="aspectFit" />{{detail.venueText}}</view></view>
+        <view class="training-hero__meta"><view><image src="/assets/icons/calendar-white.svg" mode="aspectFit" />{{detail.trainingDateText}}</view><view><image src="/assets/icons/map-pin-white.svg" mode="aspectFit" />{{detail.venueText}}</view></view>
       </view>
       <view class="detail-card detail-card--training"><view class="detail-card__head"><view class="detail-card__title">训练内容</view><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view><view class="detail-card__copy">{{detail.trainingSummary}}</view></view>
       <view class="detail-card detail-card--ability"><view class="detail-card__title">关联能力</view><view class="ability-tags"><view wx:for="{{detail.abilityChips}}" wx:key="*this" class="ability-tag">{{item}}</view></view></view>
@@ -24,7 +24,7 @@
 
     <block wx:elif="{{detail && detail.type === 'match'}}">
       <view class="match-hero">
-        <view class="match-hero__meta"><view><view class="match-hero__type">比赛</view><view class="match-hero__title">{{detail.title}}</view></view><view class="match-hero__date">{{detail.dateText}}<br />{{detail.venueText}}</view></view>
+        <view class="match-hero__meta"><view><view class="match-hero__type">比赛</view><view class="match-hero__title">{{detail.title}}</view></view><view class="match-hero__date"><view>{{detail.dateText}}</view><view>{{detail.venueText}}</view></view></view>
         <view class="match-score"><view class="match-team"><view class="match-team__avatar">A</view><view>{{detail.homeTeam}}</view></view><view class="match-score__center"><view>{{detail.scoreText}}</view><view class="match-score__status">{{detail.statusLabel}}</view></view><view class="match-team"><view class="match-team__avatar">B</view><view>{{detail.awayTeam}}</view></view></view>
       </view>
       <view class="roster-card"><view class="roster-card__head"><view>出席名单</view><view>{{detail.roster.length}}人</view></view><view wx:for="{{detail.roster}}" wx:key="id" class="roster-row"><view class="roster-row__avatar roster-row__avatar--{{item.tone}}">{{item.initial}}</view><view class="roster-row__name">{{item.name}}</view><view class="roster-row__state roster-row__state--{{item.statusTone}}">{{item.statusLabel}}</view></view><view wx:if="{{!detail.roster.length}}" class="roster-empty">出席名单待同步</view></view>
