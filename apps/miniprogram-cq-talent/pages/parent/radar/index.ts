@@ -1,7 +1,7 @@
 import { getParentChildren, getParentGrowth } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import { formatDateTime, resolveNavInset } from "../../../utils/presentation";
+import { formatDateTime, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { setCurrentStudentId } from "../../../utils/store";
 import type { LoadState, RadarMetricPoint, StudentSummary } from "../../../utils/types";
 
@@ -10,9 +10,17 @@ type RadarPointView = RadarMetricPoint & {
   peerPercent?: number;
 };
 
+// 模块级请求代际计数器：page 单例语义下单调递增即可
+let loadGeneration = 0;
+
+const runtimeTimers = globalThis as unknown as {
+  setTimeout: (callback: () => void, delay: number) => number;
+};
+
 Page({
   data: {
     navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     state: "loading" as LoadState,
     message: "正在读取能力雷达",
     children: [] as StudentSummary[],
@@ -31,17 +39,38 @@ Page({
   async load() {
     const session = requireRole("parent");
     if (!session) return;
+    // 请求代际守卫：switchChild/重试触发的后发 load 会让旧响应失效，避免旧数据覆盖新选择
+    loadGeneration += 1;
+    const gen = loadGeneration;
     this.setData({ state: "loading", message: "正在读取能力雷达" });
     try {
-      const children = await getParentChildren();
+      const preferredId = session.currentStudentId;
+      const childrenPromise = getParentChildren();
+      // 有偏好学生时并行预发 growth；汇合后仍按 children 列表校验，miss 则以 children[0] 重发
+      const preferredGrowthPromise = preferredId
+        ? getParentGrowth(preferredId).catch(() => undefined)
+        : undefined;
+      const children = await childrenPromise;
+      if (gen !== loadGeneration) return;
       if (!children.length) {
         this.setData({ state: "empty", message: "当前账号没有绑定孩子。" });
         return;
       }
-      const active = children.find((child) => child.id === session.currentStudentId) ?? children[0];
+      const active = children.find((child) => child.id === preferredId) ?? children[0];
       if (!active) return;
       setCurrentStudentId(active.id);
-      const growth = await getParentGrowth(active.id, active);
+      let growth;
+      if (preferredGrowthPromise && active.id === preferredId) {
+        growth = await preferredGrowthPromise;
+        if (gen !== loadGeneration) return;
+        if (!growth) {
+          growth = await getParentGrowth(active.id, active);
+          if (gen !== loadGeneration) return;
+        }
+      } else {
+        growth = await getParentGrowth(active.id, active);
+        if (gen !== loadGeneration) return;
+      }
       const radar = presentRadar(growth.radar);
       const scores = radar.filter((point) => point.value !== undefined);
       this.setData({
@@ -53,13 +82,21 @@ Page({
         activeChildTeam: active.teams?.[0] ?? "",
         radar,
         selectedMetricId: radar[0]?.metricId ?? "",
-        canDrawRadar: radar.length >= 3,
+        canDrawRadar: false,
         overallScore: scores.length
           ? (scores.reduce((total, point) => total + (point.value ?? 0), 0) / scores.length).toFixed(0)
           : "–",
         updatedAtLabel: growth.updatedAt ? formatDateTime(growth.updatedAt) : "随训练和评测持续更新",
       });
+      // 首帧门控：让 webview 内容（导航/hero/维度行）先上屏，下一帧再挂载原生 canvas，避免 canvas 合成层抢跑
+      if (radar.length >= 3) {
+        runtimeTimers.setTimeout(() => {
+          if (gen !== loadGeneration) return;
+          this.setData({ canDrawRadar: true });
+        }, 32);
+      }
     } catch (error) {
+      if (gen !== loadGeneration) return;
       const record = error as { message?: string; code?: string };
       this.setData({ state: "error", message: record?.message || record?.code || "能力雷达读取失败。" });
     }

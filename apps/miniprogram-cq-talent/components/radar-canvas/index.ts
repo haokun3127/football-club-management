@@ -37,6 +37,8 @@ interface RadarComponentThis {
   setData: (data: Record<string, unknown>) => void;
   triggerEvent: (name: string, detail: Record<string, unknown>) => void;
   draw: () => void;
+  _drawing?: boolean;
+  _dirty?: boolean;
   createSelectorQuery: () => {
     select: (selector: string) => {
       fields: (
@@ -84,6 +86,12 @@ Component({
       const metrics = (component.data.metrics ?? []).filter((item) => typeof item.value === "number");
       component.setData({ empty: metrics.length < 3 });
       if (metrics.length < 3) return;
+      // trailing coalesce：绘制进行中只记 dirty，回调结束后补画一次，避免 tap 选中等更新被丢弃
+      if (component._drawing) {
+        component._dirty = true;
+        return;
+      }
+      component._drawing = true;
 
       const query = component.createSelectorQuery();
       query.select("#radarCanvas").fields({ node: true, size: true }, (res) => {
@@ -95,6 +103,11 @@ Component({
         ctx.scale(pixelRatio, pixelRatio);
         component.setData({ canvasWidth: res.width, canvasHeight: res.height });
         renderRadar(ctx, metrics, res.width, res.height, component.data.selectedMetricId, component.data.dark);
+        component._drawing = false;
+        if (component._dirty) {
+          component._dirty = false;
+          component.draw();
+        }
       }).exec();
     },
     handleTap(this: RadarComponentThis, event: { detail?: { x?: number; y?: number } }) {

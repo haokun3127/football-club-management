@@ -1,6 +1,6 @@
 <view class="p5">
   <!-- P5 Header -->
-  <view class="p5-nav" style="padding-top:{{navInset}}px">
+  <view class="p5-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="p5-nav__back" bindtap="goBack">‹</view>
     <view class="p5-nav__title-group">
       <view class="p5-nav__title">能力雷达</view>
@@ -34,7 +34,7 @@
         </view>
         <view class="rhero__canvas">
           <radar-canvas wx:if="{{canDrawRadar}}" dark="{{true}}" metrics="{{radar}}" selectedMetricId="{{selectedMetricId}}" bindmetrictap="selectMetric"></radar-canvas>
-          <view wx:else class="rhero__empty">指标正在积累，完成评测后生成雷达图。</view>
+          <view wx:else class="rhero__placeholder"></view>
         </view>
         <view class="rhero__score">
           <view class="rhero__score-label">综合评分</view>
