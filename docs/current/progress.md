@@ -347,3 +347,12 @@
 - 真实验证：当前路由为 `/pages/parent/schedule/index`，逻辑视口 `375×812`，输出原始 PNG 为 `563×1218`；模拟器窗口为“重庆天才俱乐部的模拟器”，裁剪参数为 `x=11, y=93, width=563, height=1218`。截图已人工检查为完整家长日程画面，不是黑屏或普通桌面截图。
 - 回归测试覆盖 Windows 选择窗口路径、SDK 截图超时不发布证据、错误标题拒绝和 ASCII-safe 元数据；Windows 之外仍使用官方 SDK 的截图路径。后续可直接运行 `pnpm --filter @football-club/miniprogram-cq-talent devtools:screenshot -- --output <仓库外绝对路径>.png --expect-route-prefix /pages/parent/ --port 9421` 获取同类证据。
 - 约束：仅允许一个可见模拟器窗口；多个窗口时设 `WECHAT_DEVTOOLS_SIMULATOR_TITLE`。无论窗口捕获、路由复核、视口验证或 PNG 尺寸验证中的哪一步失败，最终 PNG 与 sidecar 均不得发布。此工具只解决可信取证通道，不代替将截图与当前在线 Figma 节点逐页对照的视觉验收。
+
+## 2026-08-09 全页级 Figma↔实页巡检（17页）+ 4 项修复
+- 巡检方法：miniProgram.screenshot 直出 375x812（免窗口遮挡），17 页首屏+滚动下半部全采，vision 逐页缺陷扫描后对照 design-spec 确认
+- 修复1（c05e82f）：比赛英雄卡——比分槽渲染「比赛结束后更新」长文案在 96rpx 字号下换行溢出卡片（440rpx 固定高）；时间地点 `<br>` 不生效粘连。修为 scoreText 非比分格式回落 "0 : 0"（对齐设计未开始态）+ dateText 只保留「日期+开始时间」+ 时间地点改双 view 纵排
+- 修复2（同 commit）：训练英雄卡时间行对齐设计「09:00-10:30 · 6月28日」（时间段在前），消除 API 字段「日期 时间 · 时间~时间」重复
+- 修复3（同 commit）：提醒中心空态双渲染（status-view + 自定义图标块）→ 只留设计规格的图标版
+- 修复4（bda7b3b）：雷达页维度列表泄漏第9行「射门综合评分 3」（遗留 metric-finishing 不在核心雷达视图）→ 按 growth.views[0]（核心能力雷达8维）过滤，综合评分 68→76 回归8维口径；与 growth 页 radarForView 同款逻辑
+- 非缺陷确认：content 文章卡左侧色条=设计原样；coaches 滚动中内容经过固定 tab 栏下方=正常；growth 芯片/日程banner标题省略号=设计防溢出；雷达图在 mp.screenshot 中不显示=canvas 采集限制（dxcam 验证正常）
+- 证据：cq-talent-visual-evidence/audit-*.png（17页+滚动）、fix-event-match2.png、fix-event-training.png、fix-reminders.png、fix-radar-scoped.png
