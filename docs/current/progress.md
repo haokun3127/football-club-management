@@ -14,6 +14,13 @@
 - **环境事件（重要教训）**：① 强杀 DevTools 进程后冷启动 GUI 白屏（逻辑层正常），shader 缓存清理无效，**Ctrl+Win+Shift+B 重置显卡驱动后恢复**；② 渲染层冻结可只发生在**弹出式模拟器**（原生状态栏/授权弹窗照常更新、webview 页帧陈旧跨路由同哈希），内嵌模拟器同刻健康——此后验证改用 WGC/dxcam 拍内嵌模拟器；③ 合成鼠标事件（mouse_event/PostMessage）**到不了模拟器 webview/原生弹窗**（但能点 DevTools 原生工具栏），登录授权弹窗无法自动点；④ 登录态在强杀后丢失，临时 `DEV_AUTO_SESSION=true`（config.ts）完成验证后已回滚 false 且未提交；⑤ 自动化端口 9421 会话失效后换 9422 恢复。
 - **门禁**：miniprogram typecheck ✅ vitest 51/51 ✅；api vitest 68/68 ✅；根 `pnpm run check` ✅。
 
+### 2026-08-08 P6「同队对比」条重做（用户反馈「那个条有问题」）
+
+- **问题**：marker 恒居中在色条下方且文字截断、缺得分分布标签+图例、分段比例不符、队内排名结构不符设计。
+- **修复**：按 Figma TeamCompare(196:893) 重做——marker 移到条上方按得分%定位（clamp 5.5–94.5%）；补 4 段图例；分段 19.3/32.2/25.7/22.8%；队内排名改设计结构（我的行+待同步占位）。提交 `见 git log`（metric 3 文件）。
+- **验收**：有数据态（运控球 62 分，marker 落浅粉段 62% 处）vision 6/6 ✅；无数据态（marker/我的行隐藏、条+图例+占位正常）vision 4/4 ✅。
+- **新 capability**：`miniProgram.callWxMethod("pageScrollTo", {scrollTop})` 在 evaluate 全挂起的本机 build 上可用——折下内容验收不再依赖用户手动滚动（已补入技能）。
+
 ### 2026-08-07 P5/radar 批次 3 修复 + 复测（D3-1 白上白已修，D2 底部 tab 已实现，D3-2 根因已定位）
 
 - 代码修复（单独 commit）：radar 画布容器与 radar-canvas 空态白底改透明（对齐 Figma 深色 Hero）；radar 页接入 `role-tabbar`（active=growth）并补底部留白；`openPage` 补 `navigateTo` fail 日志（errMsg + 页面栈深度）；`types/wechat.d.ts` 补 `console`/`getCurrentPages` 声明。miniprogram typecheck 通过。
