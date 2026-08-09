@@ -19,6 +19,7 @@
   background: #07111f;
   box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.25);
 }
+.c4-hero__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20rpx; }
 .c4-hero__title { color: #ffffff; font-size: 36rpx; font-weight: 700; }
 .c4-hero__meta { color: rgba(255, 255, 255, 0.6); font-size: 26rpx; }
 .c4-hero__counts { display: flex; gap: 24rpx; }
@@ -54,6 +55,7 @@
 .attendance-row { padding: 24rpx; border-radius: 16rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05); }
 .attendance-main { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; }
 .student-info { display: flex; align-items: center; gap: 20rpx; }
+.student-info__copy { min-width: 0; }
 .student-avatar { width: 72rpx; height: 72rpx; border-radius: 36rpx; background: #3b82f6; color: #ffffff; font-size: 26rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; }
 .student-name { color: #202124; font-size: 28rpx; font-weight: 700; }
 .lesson-state { color: #667085; font-size: 22rpx; margin-top: 4rpx; }
@@ -61,6 +63,7 @@
 
 /* 恢复自重写前样式（pre-b14） */
 .correction-alert__texts { flex: 1; }
+.save-error { padding: 20rpx 24rpx; border: 1rpx solid #fecaca; border-radius: 16rpx; background: #fff1f2; color: #b42318; font-size: 24rpx; line-height: 34rpx; }
 /* custom navigation: keep Figma 88px total height inclusive of safe area */
 .c4-nav { box-sizing: border-box; }
 /* Figma Top Nav is 375x88 (176rpx): safe area is inside this envelope. */
