@@ -8,6 +8,10 @@
 - Decoded inspection data: `../../../../tools/fig-out-v2.json`
 - Audit baseline: `docs/figma-v2-visual-audit.md`
 
+## 2026-08-05 当前范围覆盖
+
+当前执行范围由“核心演示闭环”取代：P1–P10/C1–C16 全部降级为长期愿景。本轮不以全量 Figma 视觉补齐为交付目标，只按冻结顺序推进 P1 视觉验收、签到持久化、测试指标+P5、训练计划、比赛记录、战术板重启读回+MVP 视觉。原有设计方案和历史节点记录保留为长期背景，不作为本轮实现依据。
+
 ## Scope
 
 Bring all parent P1-P10 and coach C1-C16 business frames and their designed state frames back to the latest Figma information architecture while preserving the existing BFF/API contracts and routes.

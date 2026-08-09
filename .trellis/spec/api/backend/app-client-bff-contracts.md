@@ -326,6 +326,60 @@ openMetric(metrics[tappedIndex + 1].metricId);
 openMetric(tappedPoint.metricId);
 ```
 
+## Scenario: Assessment Metric SQLite Persistence
+
+### 1. Scope / Trigger
+
+- Trigger: a coach submits a test-metric assessment and a parent later reads growth or metric detail after the API process has restarted.
+
+### 2. Signatures
+
+- `POST /clubs/:clubId/app-clients/:clientId/coach/assessments`
+- `POST /clubs/:clubId/assessments`
+- `GET /clubs/:clubId/app-clients/:clientId/parent/students/:studentId/growth-summary`
+- `GET /clubs/:clubId/app-clients/:clientId/parent/students/:studentId/ability-metrics/:metricId`
+- SQLite tables: `player_assessments`, `assessment_raw_results`, `assessment_scores`, `player_metric_records`, `metric_lineages`.
+
+### 3. Contracts
+
+- A successful assessment write persists the assessment graph in one transaction and preserves the existing response shape and coach `201` status.
+- Seed replay uses insert-if-absent semantics and never replaces an assessment, result, score, metric record, or lineage already in the file database.
+- Parent readbacks remain guardian-scoped and must return the submitted metric record and its `assessmentId`/`rawResultId` links after a same-database `dist/index.js` restart.
+- Assessment POST has no `Idempotency-Key` contract; repeated requests are distinct relationships and must not be described as idempotent.
+
+### 4. Validation & Error Matrix
+
+- Parent or out-of-scope coach attempting assessment write -> `403 forbidden`.
+- Parent without guardian access to the student -> `403 forbidden`.
+- Invalid assessment template, version, item, or club/student scope -> the existing assessment validation error; do not bypass route authorization in the repository.
+- SQLite transaction failure -> roll back the complete assessment graph; no partial readback is accepted.
+
+### 5. Good/Base/Bad Cases
+
+- Good: coach POST returns `201`; after closing and reopening the same SQLite file, parent `growth-summary` and `ability-metrics` return `200` with the submitted assessment relation.
+- Base: seed data is present alongside the new records and retains both sets after restart.
+- Bad: only the in-memory store contains the submitted score, or seed startup overwrites the saved record.
+
+### 6. Tests Required
+
+- File-backed close/reopen regression asserts all five persistence layers and parent readback.
+- Contract tests cover coach `201`, parent/no-scope/cross-child `403`, authorized parent `200`, and both POST route forms.
+- Build the API, restart `dist/index.js` against the same temporary database, then assert HTTP readback and confirmed PID/port cleanup.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```typescript
+const records = this.data.metricRecords;
+```
+
+#### Correct
+
+```typescript
+const records = this.repositories.assessments.listMetricRecords(clubId, studentId);
+```
+
 ## Scenario: Match Tactical Board Snapshot
 
 ### 1. Scope / Trigger

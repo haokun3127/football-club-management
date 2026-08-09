@@ -290,3 +290,54 @@ Completed full registered-page Figma alignment, parent and coach workflows, pers
 ### Next Steps
 
 - None - task complete
+
+## Session 9: Resume 20260730_002436_673351 and G2 login handoff
+
+**Date**: 2026-08-02
+**Task**: Summarize the prior handoff conversation, update project documentation, and continue the unfinished G2/login work.
+**Package**: api / miniprogram-cq-talent
+**Branch**: `codex/chongqing-talent-business`
+
+### Summary
+
+- Re-read the prior conversation and confirmed the key decision: G2 is parent-only binding copy, while pre-authorization cannot safely identify a role. The login page must remain role-neutral until the backend returns `parent` or `coach`.
+- Updated `docs/progress.md` and `docs/design-spec-G2-login-verification-v2.md` with the current implementation state, the online Figma provider failure, the screenshot acceptance gate, and the two reproducible API fixture failures.
+- Adjusted the login page top envelope from an extra 88px plus an 88rpx title row to a single 88px envelope (`44px` upper space plus `44px` title row). Authorization is disabled while the WeChat login code is loading.
+
+### Verification
+
+- Mini-program typecheck: passed, exit code 0.
+- Mini-program tests: passed, 3 files / 9 tests.
+- Full `pnpm run check`: failed only in `apps/api/test/server.test.ts`; 4 files passed, 2 tests failed. The failures are the coach training status expectation at line 688 (`not_started` vs `in_progress`) and data-capability preview equality at line 1344.
+- Full `pnpm run test`: reproduced the same API failures.
+- Trusted 375x812 WeChat DevTools screenshot: not available; previous capture channel was black/unreliable.
+
+### Status
+
+In progress. Do not archive the Trellis task or claim Figma visual completion until the API fixture drift is resolved/triaged and a trusted DevTools or real-device screenshot is captured.
+
+## Session 10: Repository documentation and local Git hygiene
+
+**Date**: 2026-08-02
+**Task**: Organize project documentation and reduce obsolete local Git branches without touching unfinished business changes.
+**Branch**: `codex/chongqing-talent-business`
+
+### Changes
+
+- Created `docs/README.md` as the documentation entry point and grouped documents into `current/`, `design/`, `plans/active/`, and `archive/`.
+- Moved 48 page specifications under `docs/design/specifications/`, separated by parent, coach, batches, and shared material.
+- Moved 20 early discovery/WPS records into date-labelled archive folders; they remain available but no longer appear as current project facts.
+- Updated the repository README and internal Markdown links after the move.
+- Pruned invalid Codex worktree metadata and deleted six local branches whose histories were already fully contained in the current branch. Remote branches were not deleted.
+
+### Verification
+
+- Markdown link audit: 61 local links checked, 0 missing targets.
+- `git diff --check`: passed; only existing Windows LF/CRLF warnings remain.
+- Local branches retained: current branch, `master`, and three branches each with one unique commit (`data-capability-persistence`, `e-wps-connector-runtime`, `harden-contracts-metric-graph`).
+- Pre-existing uncommitted mini-program changes, including login, reminders, and local SVG assets, were verified present after cleanup.
+
+### Remaining Git Hygiene
+
+- `master` is already contained in the current branch but remains intentionally until the user elects to promote the current branch as the official default branch.
+- `git fsck` still reports four dangling commits and two Codex checkpoint refs with Windows path-length warnings. They were not pruned because their content has not been reviewed.

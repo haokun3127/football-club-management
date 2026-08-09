@@ -196,6 +196,22 @@ const viewport = await inspectionProgram.systemInfo();
 // and record its independently measured raster scale.
 ```
 
+### 8. Compatibility Probe and Stop Condition
+
+- Before changing page code for a capture failure, record the DevTools `Tool.getInfo`, route, page stack, and the exact SDK operation that does not return.
+- If route and page-stack requests succeed but `MiniProgram.screenshot()` receives no response within the bounded timeout, classify the failure as a DevTools/Automator capability boundary—not a UI, login, API, role, or viewport defect.
+- Preserve the no-output rule: a timeout must leave no PNG and no sidecar. Do not replace it with a desktop crop, black image, route text, or manually edited image.
+- Before treating a timeout as a version incompatibility, verify process freshness: the requested automation port must be newly listening after the entire IDE process has exited. A project-window reopen that leaves the old port owned by the old process is not a clean retry.
+- Retry after that full-process restart or an external compatibility change (for example, a verified real device). Repeated page rebuilds and reconnect-order tweaks do not constitute visual acceptance.
+
+### 9. Windows Simulator Capture Fallback (2026-08-05)
+
+- When the Automator route, page-stack, and `systemInfo` calls work but the SDK screenshot call times out, Windows may use `scripts/devtools-simulator-capture.py` through `devtools-screenshot.mjs`.
+- This fallback is valid only when all of the following hold: the tool finds exactly one visible DevTools simulator title ending in “的模拟器”; `PrintWindow(PW_RENDERFULLCONTENT)` renders that window; the script crops the full DPI-scaled iPhone X canvas to the verified logical viewport; and the outer Node command completes the second route check plus uniform-PNG validation before atomically publishing evidence.
+- Do not replace this with a screen-coordinate crop. A normal desktop screenshot cannot prove which DevTools runtime, route, or device canvas was captured.
+- If multiple simulator windows are visible, reject by default and require `WECHAT_DEVTOOLS_SIMULATOR_TITLE`; if the Python helper, crop, or later route/PNG validation fails, publish neither final PNG nor sidecar.
+- Required regression checks: Windows code path bypasses SDK screenshot; timeout leaves no evidence; a missing explicit title fails; and metadata remains parseable across the Python/Node UTF-8 boundary.
+
 ---
 
 ## Cross-Platform Template Consistency
