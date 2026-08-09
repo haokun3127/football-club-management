@@ -1,6 +1,14 @@
 <view class="ability-page">
-  <app-header title="团队能力总览" subtitle="{{studentCount}} 名学员" show-back />
+  <view class="ability-nav">
+    <view class="ability-nav__back" bindtap="goBack">
+      <image class="ability-nav__back-icon" src="/assets/icons/c14-arrow-left.svg" mode="aspectFit" />
+    </view>
+    <view class="ability-nav__title">团队能力总览</view>
+    <button class="ability-nav__export" disabled="{{true}}">导出</button>
+  </view>
+
   <view class="ability-page__body">
+    <view class="ability-context">{{teamContext}}</view>
     <status-view
       state="{{state}}"
       title="{{state === 'loading' ? '汇总团队能力' : state === 'empty' ? '暂无评测数据' : '读取失败'}}"
@@ -9,16 +17,23 @@
       bindaction="retry"
     />
 
-    <block wx:if="{{state === 'ready'}}">
-      <!-- 团队均值雷达（Figma C14: #07111f 深底 + 综合分 + 趋势 chip） -->
+    <block wx:if="{{hasOverview}}">
       <view class="ability-hero">
-        <view class="ability-hero__title">团队平均能力雷达</view>
-        <radar-canvas dark="{{true}}" metrics="{{radar}}"></radar-canvas>
-        <view class="ability-hero__overall">综合 {{overall}}</view>
-        <view wx:if="{{trendLabel}}" class="trend-chip {{trendPositive ? 'trend-chip--up' : 'trend-chip--down'}}">{{trendLabel}}</view>
+        <view class="ability-hero__head">
+          <view class="ability-hero__title">团队平均能力雷达</view>
+          <view class="ability-hero__period">{{assessmentPeriod}}</view>
+        </view>
+        <view class="ability-hero__plot">
+          <radar-canvas wx:if="{{hasRadar}}" class="ability-hero__canvas" dark="{{true}}" metrics="{{radar}}" width="440rpx" height="360rpx"></radar-canvas>
+          <view wx:else class="ability-hero__empty">暂无足够维度生成雷达图</view>
+          <view class="ability-hero__overall">综合 {{overall}}</view>
+        </view>
+        <view wx:if="{{trendLabel}}" class="trend-chip {{trendPositive ? 'trend-chip--up' : 'trend-chip--down'}}">
+          <image wx:if="{{trendPositive}}" class="trend-chip__icon" src="/assets/icons/c14-trending-up.svg" mode="aspectFit" />
+          <text>{{trendLabel}}</text>
+        </view>
       </view>
 
-      <!-- 维度统计表（Figma: 队均 / TOP / 底） -->
       <view class="dim-table">
         <view class="dim-table__head">
           <view class="dim-table__title">维度统计</view>
@@ -32,6 +47,11 @@
             <text class="dim-row__bottom">{{item.bottom}}</text>
           </view>
         </view>
+      </view>
+
+      <view class="ranking-empty">
+        <view class="ranking-empty__title">TOP 3 排名（每维度）</view>
+        <view class="ranking-empty__message">{{rankingMessage}}</view>
       </view>
     </block>
   </view>

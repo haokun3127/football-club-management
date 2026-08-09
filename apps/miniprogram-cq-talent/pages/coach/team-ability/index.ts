@@ -1,6 +1,6 @@
-import { getCoachTeamAbilityOverview } from "../../../utils/api";
+import { getCoachTeam, getCoachTeamAbilityOverview } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import type { LoadState, RadarMetricPoint } from "../../../utils/types";
+import type { CoachTeamAbilityOverview, LoadState, RadarMetricPoint } from "../../../utils/types";
 
 interface DimensionRow {
   metricId: string;
@@ -13,65 +13,139 @@ interface DimensionRow {
 interface PageData {
   state: LoadState;
   message: string;
+  teamContext: string;
+  assessmentPeriod: string;
   studentCount: number;
   overall: string;
   trendLabel: string;
   trendPositive: boolean;
   radar: RadarMetricPoint[];
   dimensions: DimensionRow[];
+  hasOverview: boolean;
+  hasRadar: boolean;
+  rankingMessage: string;
 }
 
 Page<PageData>({
-  data: {
-    state: "idle",
-    message: "",
+  data: emptyPageData("idle", ""),
+  onLoad() {
+    return this.load();
+  },
+  async load() {
+    if (!requireRole("coach")) {
+      this.setData(emptyPageData("empty", "当前账号暂无可查看的团队能力数据。"));
+      return;
+    }
+
+    this.setData(emptyPageData("loading", "正在汇总团队能力数据"));
+    const [overviewResult, teamResult] = await Promise.allSettled([
+      getCoachTeamAbilityOverview(),
+      getCoachTeam(),
+    ]);
+
+    if (overviewResult.status !== "fulfilled") {
+      this.setData(emptyPageData("error", "团队能力读取失败，请稍后重试。"));
+      return;
+    }
+
+    const overview = overviewResult.value;
+    const dimensions = toDimensionRows(overview.dimensions);
+    const radar = toRadar(overview.dimensions);
+    const hasOverview = dimensions.length > 0;
+    this.setData({
+      state: hasOverview ? "ready" : "empty",
+      message: hasOverview ? "" : "暂无团队评测数据。",
+      teamContext: toTeamContext(teamResult),
+      assessmentPeriod: "评估时间待同步",
+      studentCount: toCount(overview.studentCount),
+      overall: formatOverall(overview.overall),
+      trendLabel: formatTrend(overview.trendDelta),
+      trendPositive: overview.trendDelta === null || overview.trendDelta >= 0,
+      radar: radar.length >= 3 ? radar : [],
+      dimensions,
+      hasOverview,
+      hasRadar: radar.length >= 3,
+      rankingMessage: "排名暂未同步",
+    });
+  },
+  retry() {
+    return this.load();
+  },
+  goBack() {
+    wx.navigateBack();
+  },
+});
+
+function emptyPageData(state: LoadState, message: string): PageData {
+  return {
+    state,
+    message,
+    teamContext: "团队信息待同步",
+    assessmentPeriod: "评估时间待同步",
     studentCount: 0,
     overall: "-",
     trendLabel: "",
     trendPositive: true,
     radar: [],
     dimensions: [],
-  },
-  onLoad() {
-    this.load();
-  },
-  async load() {
-    const session = requireRole("coach");
-    if (!session) return;
-    this.setData({ state: "loading", message: "正在汇总团队能力数据" });
-    try {
-      const overview = await getCoachTeamAbilityOverview();
-      const dimensions = overview.dimensions.map((dimension) => ({
-        metricId: dimension.metricId,
-        label: dimension.label,
-        average: dimension.average === null ? "-" : String(dimension.average),
-        top: dimension.top === null ? "-" : String(dimension.top),
-        bottom: dimension.bottom === null ? "-" : String(dimension.bottom),
-      }));
-      const radar: RadarMetricPoint[] = overview.dimensions
-        .filter((dimension) => dimension.average !== null)
-        .map((dimension) => ({
-          metricId: dimension.metricId,
-          label: dimension.label,
-          value: dimension.average as number,
-          maxValue: 100,
-        }));
-      const delta = overview.trendDelta;
-      this.setData({
-        state: dimensions.length ? "ready" : "empty",
-        message: dimensions.length ? "" : "暂无团队评测数据。",
-        studentCount: overview.studentCount,
-        overall: overview.overall === null ? "-" : String(Math.round(overview.overall)),
-        trendLabel: delta === null ? "" : `较上季 ${delta >= 0 ? "+" : ""}${delta}`,
-        trendPositive: delta === null || delta >= 0,
-        radar,
-        dimensions,
-      });
-    } catch (error) {
-      this.setData({ state: "error", message: error instanceof Error ? error.message : "团队能力读取失败，请稍后重试。" });
-    }
-  },
-  retry() {
-    this.load();
-  },
-});
+    hasOverview: false,
+    hasRadar: false,
+    rankingMessage: "排名暂未同步",
+  };
+}
+
+function toDimensionRows(dimensions: CoachTeamAbilityOverview["dimensions"]): DimensionRow[] {
+  return dimensions
+    .filter((dimension) => Boolean(dimension.metricId) && Boolean(dimension.label))
+    .map((dimension) => ({
+      metricId: dimension.metricId,
+      label: dimension.label,
+      average: formatScore(dimension.average),
+      top: formatScore(dimension.top),
+      bottom: formatScore(dimension.bottom),
+    }));
+}
+
+function toRadar(dimensions: CoachTeamAbilityOverview["dimensions"]): RadarMetricPoint[] {
+  return dimensions
+    .filter((dimension): dimension is CoachTeamAbilityOverview["dimensions"][number] & { average: number } => isFiniteNumber(dimension.average))
+    .map((dimension) => ({
+      metricId: dimension.metricId,
+      label: dimension.label,
+      value: clamp(dimension.average),
+      maxValue: 100,
+    }));
+}
+
+function toTeamContext(result: PromiseSettledResult<Awaited<ReturnType<typeof getCoachTeam>>>): string {
+  if (result.status !== "fulfilled") return "团队信息待同步";
+  const team = result.value.team;
+  if (!team?.name || !team.season) return "团队信息待同步";
+  return `${team.season} · ${team.name}`;
+}
+
+function toCount(value: number) {
+  return isFiniteNumber(value) ? Math.max(0, Math.round(value)) : 0;
+}
+
+function formatTrend(value: number | null) {
+  if (!isFiniteNumber(value)) return "";
+  return `较上期 ${value >= 0 ? "+" : ""}${formatScore(value)}`;
+}
+
+function formatOverall(value: number | null) {
+  return isFiniteNumber(value) ? String(Math.round(value)) : "-";
+}
+
+function formatScore(value: number | null) {
+  if (!isFiniteNumber(value)) return "-";
+  return Number.isInteger(value) ? String(value) : String(Number(value.toFixed(1)));
+}
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function clamp(value: number) {
+  return Math.max(0, Math.min(value, 100));
+}
