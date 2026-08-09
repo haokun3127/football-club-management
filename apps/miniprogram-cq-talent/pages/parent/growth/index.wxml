@@ -7,39 +7,26 @@
   <view class="p4-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载成长数据' : state === 'empty' ? '成长数据不足' : '成长数据读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
-    <view wx:if="{{growth}}" class="p4-content">
+    <view wx:if="{{growth && state === 'ready'}}" class="p4-content">
       <!-- Figma P4 Player Hero: 335 x 212 -->
       <view class="p4-hero">
         <view class="p4-hero__header">
           <view class="p4-hero__avatar">{{heroSurname}}</view>
           <view class="p4-hero__identity"><view class="p4-hero__name">{{heroName}}</view><view class="p4-hero__team">{{heroTeam}}</view></view>
         </view>
-        <view class="p4-hero__chips">
-          <view wx:for="{{heroChips}}" wx:key="label" class="p4-hero__chip {{index === 1 ? 'p4-hero__chip--brand' : ''}}">{{item.label}} {{item.value}}</view>
-        </view>
-        <view class="p4-hero__stats">
-          <view wx:for="{{heroStats}}" wx:key="label" class="p4-stat">
-            <view class="p4-stat__value {{index === 1 ? 'p4-stat__value--green' : ''}}">{{item.value}}</view>
-            <view class="p4-stat__label">{{item.label}}</view>
-          </view>
-        </view>
+        <view class="p4-hero__pending">{{heroSummaryMessage}}</view>
       </view>
 
       <!-- Figma P4 Milestones Card -->
       <view class="p4-card p4-milestones">
-        <view class="p4-card__head"><view class="p4-card__title">成长足迹 🏆</view><view class="p4-card__link" bindtap="openMilestones">更多›</view></view>
-        <view wx:for="{{growth.milestones}}" wx:key="title" class="p4-milestone">
-          <view class="p4-milestone__dot {{index === 1 ? 'p4-milestone__dot--red' : index === 2 ? 'p4-milestone__dot--blue' : ''}}">{{index === 0 ? '✓' : '○'}}</view>
-          <view class="p4-milestone__title">{{item.title}}</view>
-          <view class="p4-milestone__state {{index === 0 ? 'p4-milestone__state--done' : ''}}">{{index === 0 ? '已达成' : '待达成'}}</view>
-        </view>
+        <view class="p4-card__head"><view class="p4-card__title">成长足迹 🏆</view></view>
+        <view class="p4-card__empty">{{milestoneMessage}}</view>
       </view>
 
       <!-- Figma P4 Training Chart Card -->
       <view class="p4-card p4-chart-card">
         <view class="p4-card__head"><view class="p4-card__title">训练历程 📊</view><view class="p4-card__link" bindtap="openTrainingHistory">查看›</view></view>
-        <view class="p4-bars"><view class="p4-bar p4-bar--1"></view><view class="p4-bar p4-bar--2"></view><view class="p4-bar p4-bar--1"></view><view class="p4-bar p4-bar--3"></view><view class="p4-bar p4-bar--2"></view><view class="p4-bar p4-bar--4"></view><view class="p4-bar p4-bar--3"></view><view class="p4-bar p4-bar--4"></view></view>
-        <view class="p4-months"><view>1月</view><view>2月</view><view>3月</view><view>4月</view><view>5月</view><view>6月</view><view>7月</view><view>8月</view></view>
+        <view class="p4-card__empty">{{trainingHistoryMessage}}</view>
       </view>
 
       <!-- Figma P4 Ability Radar Card: dark surface -->

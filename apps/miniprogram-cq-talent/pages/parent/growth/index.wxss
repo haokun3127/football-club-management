@@ -14,6 +14,7 @@
 .p4-hero__identity { display: flex; flex-direction: column; gap: 8rpx; min-width: 0; }
 .p4-hero__name { color: #ffffff; font-size: 36rpx; font-weight: 700; }
 .p4-hero__team { overflow: hidden; max-width: 400rpx; color: #ffffff; font-size: 26rpx; text-overflow: ellipsis; white-space: nowrap; }
+.p4-hero__pending { padding-top: 12rpx; border-top: 1rpx solid #334155; color: #d0d5dd; font-size: 24rpx; line-height: 34rpx; }
 .p4-hero__chips { display: flex; gap: 16rpx; min-height: 40rpx; }
 .p4-hero__chip { overflow: hidden; max-width: 240rpx; padding: 8rpx 16rpx; border-radius: 8rpx; background: #334155; color: #ffffff; font-size: 20rpx; font-weight: 600; line-height: 24rpx; text-overflow: ellipsis; white-space: nowrap; }
 .p4-hero__chip--brand { background: #a80f1b; }
@@ -28,6 +29,7 @@
 .p4-card__head { display: flex; align-items: center; justify-content: space-between; }
 .p4-card__title { color: #202124; font-size: 28rpx; font-weight: 700; }
 .p4-card__link { color: #a80f1b; font-size: 26rpx; font-weight: 600; }
+.p4-card__empty { display: flex; align-items: center; justify-content: center; min-height: 96rpx; color: #667085; font-size: 24rpx; line-height: 34rpx; text-align: center; }
 .p4-milestones { gap: 24rpx; }
 .p4-milestone { display: flex; align-items: center; gap: 24rpx; min-height: 48rpx; }
 .p4-milestone__dot { display: flex; flex: 0 0 48rpx; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; border-radius: 24rpx; background: #ecfdf5; color: #10b981; font-size: 24rpx; font-weight: 700; }

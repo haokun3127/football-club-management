@@ -29,8 +29,9 @@ Page({
     heroSurname: "",
     heroName: "",
     heroTeam: "",
-    heroChips: [] as Array<{ label: string; value: string }>,
-    heroStats: [] as Array<{ label: string; value: string }>,
+    heroSummaryMessage: "",
+    milestoneMessage: "",
+    trainingHistoryMessage: "",
   },
   onLoad() {
     this.load();
@@ -65,14 +66,15 @@ Page({
         selectedDetail: null,
         detailCache: {},
         canDrawRadar: radar.length >= 3,
-        updatedAtLabel: growth.updatedAt ? formatDateTime(growth.updatedAt) : "随训练和评测持续更新",
+        updatedAtLabel: growth.updatedAt ? formatDateTime(growth.updatedAt) : "更新时间待同步",
         latestLabel: "",
         trendLabel: "等待更多记录",
         heroSurname: active.name.slice(0, 1),
         heroName: active.name,
-        heroTeam: active.teams?.[0] ?? "重庆天才",
-        heroChips: growth.trainingHistory.slice(0, 2).map((chip) => clampChip(chip)),
-        heroStats: buildHeroStats(growth.trainingHistory),
+        heroTeam: active.teams.find(Boolean) || "球队待同步",
+        heroSummaryMessage: "训练概览待同步",
+        milestoneMessage: "成长足迹数据待同步",
+        trainingHistoryMessage: "训练历程数据待同步",
       });
       if (selectedMetric) await this.loadMetricDetail(selectedMetric.metricId);
     } catch (error) {
@@ -87,9 +89,6 @@ Page({
   },
   openSettings() {
     openPage("/pages/parent/binding/index");
-  },
-  openMilestones() {
-    wx.showToast({ title: "成长足迹详情即将上线", icon: "none" });
   },
   openTrainingHistory() {
     if (!this.data.activeStudentId) return;
@@ -225,33 +224,6 @@ function radarForView(growth: GrowthSummary, viewIndex: number) {
 function readableError(error: unknown) {
   const record = error as { message?: string; code?: string };
   return record?.message || record?.code || "成长数据读取失败。";
-}
-
-function buildHeroStats(history: Array<{ label: string; value: string }>) {
-  const values = history.map((item) => `${item.label} ${item.value}`);
-  return [
-    { label: "训练课时", value: extractShortMetric(values, /(\d+(?:\.\d+)?)\s*(?:课时|课|节)/) },
-    { label: "出勤率", value: extractShortMetric(values, /(\d+(?:\.\d+)?)\s*%/, "%") },
-    { label: "本月训练", value: extractShortMetric(values, /本月[^\d]*(\d+(?:\.\d+)?)\s*(?:课|节)?/) },
-  ];
-}
-
-function extractShortMetric(values: string[], pattern: RegExp, suffix = "") {
-  for (const value of values) {
-    const match = value.match(pattern);
-    if (match?.[1]) return `${match[1]}${suffix}`;
-  }
-  return "—";
-}
-
-function clampStatValue(value: string) {
-  const text = (value || "").trim();
-  if (!text) return "暂无";
-  return text.length > 8 ? `${text.slice(0, 7)}…` : text;
-}
-
-function clampChip(chip: { label: string; value: string }) {
-  return { label: chip.label, value: clampStatValue(chip.value) };
 }
 
 function metricTrend(detail: MetricDetail) {

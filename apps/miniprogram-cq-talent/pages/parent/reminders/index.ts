@@ -22,6 +22,7 @@ interface PageData {
   earlier: ReminderView[];
   unreadCount: number;
   navInset: number;
+  menuInset: number;
 }
 
 const TYPE_META: Record<ReminderItem["type"], Omit<ReminderView, "id" | "title" | "timeAgo" | "timeLabel" | "read">> = {
@@ -46,11 +47,17 @@ Page<PageData>({
   async load() {
     const session = requireRole("parent");
     if (!session) return;
-    this.setData({ state: "loading", message: "正在读取提醒" });
+    this.setData({ state: "loading", message: "正在读取提醒", today: [], earlier: [], unreadCount: 0 });
     try {
       this.render(await getParentReminders());
     } catch (error) {
-      this.setData({ state: "error", message: error instanceof Error ? error.message : "提醒读取失败，请稍后重试。" });
+      this.setData({
+        state: "error",
+        message: error instanceof Error ? error.message : "提醒读取失败，请稍后重试。",
+        today: [],
+        earlier: [],
+        unreadCount: 0,
+      });
     }
   },
   retry() {
@@ -82,7 +89,7 @@ Page<PageData>({
       message: reminders.length ? "" : "暂无新提醒",
       today,
       earlier,
-      unreadCount: countUnreadReminders(reminders),
+      unreadCount: reminders.length ? countUnreadReminders(reminders) : 0,
     });
   },
 });
