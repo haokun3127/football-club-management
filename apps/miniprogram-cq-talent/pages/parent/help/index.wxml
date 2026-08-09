@@ -1,50 +1,40 @@
 <view class="help-page">
   <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="page-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="page-nav__title">帮助中心</view><view class="page-nav__more"><image src="/assets/icons/more-horizontal.svg" mode="aspectFit" /></view></view>
   <view class="help-page__body">
-    <!-- 搜索栏（Figma: 白底 r22, shadow 0,2,8,.08） -->
-    <view class="search-bar" bindtap="openSearch">
-      <text class="search-bar__icon">搜索</text>
-      <text class="search-bar__placeholder">搜索常见问题</text>
-    </view>
-
-    <!-- 帮助分类（Figma: 2x3 网格，40px 圆形图标） -->
-    <view class="section-title">帮助分类</view>
-    <view class="category-grid">
-      <view wx:for="{{categories}}" wx:key="label" class="category-card" bindtap="openCategory">
-        <view class="category-card__icon" style="background: {{item.iconBg}}; color: {{item.iconColor}}">{{item.icon}}</view>
-        <view class="category-card__label">{{item.label}}</view>
+    <status-view
+      state="{{state}}"
+      title="{{state === 'loading' ? '加载帮助问题' : state === 'empty' ? '暂无帮助问题' : '读取失败'}}"
+      message="{{message}}"
+      action-text="{{state === 'error' ? '重试' : ''}}"
+      bindaction="loadFaqs"
+    />
+    <block wx:if="{{state === 'ready'}}">
+      <view class="section-title">问题分类</view>
+      <view class="category-grid">
+        <view
+          wx:for="{{categories}}"
+          wx:key="value"
+          class="category-card {{activeCategory === item.value ? 'category-card--active' : ''}}"
+          data-value="{{item.value}}"
+          bindtap="selectCategory"
+        >{{item.label}}</view>
       </view>
-    </view>
 
-    <!-- 热门问题（Figma: 白卡 r12，行高 44，红色问号图标） -->
-    <view class="card">
-      <view class="card__title">热门问题</view>
-      <view wx:for="{{questions}}" wx:key="id" class="question-row {{index < questions.length - 1 ? 'question-row--border' : ''}}">
-        <view class="question-row__head" data-id="{{item.id}}" bindtap="toggleQuestion">
-          <text class="question-row__icon">问</text>
-          <view class="question-row__q">{{item.q}}</view>
-          <view class="question-row__chevron {{item.open ? 'question-row__chevron--open' : ''}}">›</view>
+      <view class="card">
+        <view class="card__title">帮助问题</view>
+        <view wx:if="{{hasVisibleQuestions}}">
+          <view wx:for="{{visibleQuestions}}" wx:key="id" class="question-row {{item.showDivider ? 'question-row--border' : ''}}">
+            <view class="question-row__head" data-id="{{item.id}}" bindtap="toggleQuestion">
+              <text class="question-row__icon">问</text>
+              <view class="question-row__q">{{item.q}}</view>
+              <view class="question-row__chevron {{item.open ? 'question-row__chevron--open' : ''}}">›</view>
+            </view>
+            <view wx:if="{{item.open}}" class="question-row__a">{{item.a}}</view>
+          </view>
         </view>
-        <view wx:if="{{item.open}}" class="question-row__a">{{item.a}}</view>
+        <view wx:else class="question-empty">{{emptyMessage}}</view>
       </view>
-    </view>
-
-    <!-- 联系俱乐部（Figma: 电话图标 + 信息行 + 微信客服描边按钮） -->
-    <view class="card">
-      <view class="contact-head">
-        <view class="contact-head__icon">联</view>
-        <view class="card__title contact-head__title">联系俱乐部</view>
-      </view>
-      <view class="kv-row">
-        <view class="kv-row__label">前台电话</view>
-        <view class="kv-row__value">待同步</view>
-      </view>
-      <view class="kv-row">
-        <view class="kv-row__label">工作时间</view>
-        <view class="kv-row__value">待同步</view>
-      </view>
-      <view class="wechat-button" bindtap="contactWechat">微信客服</view>
-    </view>
+    </block>
   </view>
   <role-tabbar role="parent" active="child" />
 </view>

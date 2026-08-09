@@ -1,65 +1,116 @@
 import { getContentFaqs } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
-import type { ContentFaq } from "../../../utils/types";
+import type { ContentFaq, LoadState } from "../../../utils/types";
 
 interface HelpCategory {
-  icon: string;
-  iconBg: string;
-  iconColor: string;
   label: string;
+  value: string;
+}
+
+interface FaqQuestion extends ContentFaq {
+  open: boolean;
+}
+
+interface VisibleFaqQuestion extends FaqQuestion {
+  showDivider: boolean;
 }
 
 interface PageData {
+  state: LoadState;
+  message: string;
   categories: HelpCategory[];
-  questions: Array<ContentFaq & { open: boolean }>;
+  activeCategory: string;
+  questions: FaqQuestion[];
+  visibleQuestions: VisibleFaqQuestion[];
+  hasVisibleQuestions: boolean;
+  emptyMessage: string;
 }
-
-// Figma P8.2 Help Center 设计内容（静态，待后端内容服务接入）
-const CATEGORIES: HelpCategory[] = [
-  { icon: "⛔", iconBg: "#fee2e2", iconColor: "#a80f1b", label: "训练规则" },
-  { icon: "📅", iconBg: "#dbeafe", iconColor: "#3b82f6", label: "出勤说明" },
-  { icon: "📊", iconBg: "#d1fae5", iconColor: "#10b981", label: "成长报告" },
-  { icon: "⚙️", iconBg: "#f3f4f6", iconColor: "#6b7280", label: "账号设置" },
-  { icon: "💬", iconBg: "#ffedd5", iconColor: "#f97316", label: "联系客服" },
-  { icon: "⋯", iconBg: "#f5f3ff", iconColor: "#8b5cf6", label: "更多问题" },
-];
 
 Page<PageData>({
   data: {
     navInset: resolveNavInset(),
     menuInset: resolveMenuInset(),
-    categories: CATEGORIES,
+    state: "loading",
+    message: "正在加载帮助问题",
+    categories: [],
+    activeCategory: "all",
     questions: [],
+    visibleQuestions: [],
+    hasVisibleQuestions: false,
+    emptyMessage: "暂无可展示的帮助问题",
   },
   onLoad() {
     requireRole("parent");
     this.loadFaqs();
   },
   async loadFaqs() {
+    this.setData({ state: "loading", message: "正在加载帮助问题" });
     try {
-      const faqs = await getContentFaqs();
-      this.setData({ questions: faqs.map((item) => ({ ...item, open: false })) });
+      const questions = presentQuestions(await getContentFaqs());
+      const categories = presentCategories(questions);
+      const visibleQuestions = filterQuestions(questions, this.data.activeCategory);
+      const hasQuestions = questions.length > 0;
+      this.setData({
+        state: hasQuestions ? "ready" : "empty",
+        message: hasQuestions ? "" : "暂无可展示的帮助问题",
+        categories,
+        questions,
+        visibleQuestions,
+        hasVisibleQuestions: visibleQuestions.length > 0,
+        emptyMessage: hasQuestions ? "当前分类暂无帮助问题" : "暂无可展示的帮助问题",
+      });
     } catch {
-      wx.showToast({ title: "问题加载失败，请稍后重试", icon: "none" });
+      this.setData({
+        state: "error",
+        message: "帮助问题加载失败，请点击重试",
+        categories: [],
+        questions: [],
+        visibleQuestions: [],
+        hasVisibleQuestions: false,
+        emptyMessage: "",
+      });
     }
   },
-  openSearch() {
-    wx.showToast({ title: "问题搜索即将上线", icon: "none" });
-  },
-  openCategory() {
-    wx.showToast({ title: "分类内容即将上线", icon: "none" });
+  selectCategory(event: { currentTarget: { dataset: { value: string } } }) {
+    const activeCategory = this.data.categories.some((category: HelpCategory) => category.value === event.currentTarget.dataset.value)
+      ? event.currentTarget.dataset.value
+      : "all";
+    const visibleQuestions = filterQuestions(this.data.questions, activeCategory);
+    this.setData({
+      activeCategory,
+      visibleQuestions,
+      hasVisibleQuestions: visibleQuestions.length > 0,
+      emptyMessage: this.data.questions.length > 0 ? "当前分类暂无帮助问题" : "暂无可展示的帮助问题",
+    });
   },
   toggleQuestion(event: { currentTarget: { dataset: { id: string } } }) {
     const id = event.currentTarget.dataset.id;
+    const questions = this.data.questions.map((item: FaqQuestion) =>
+      item.id === id ? { ...item, open: !item.open } : item,
+    );
+    const visibleQuestions = filterQuestions(questions, this.data.activeCategory);
     this.setData({
-      questions: this.data.questions.map((item: ContentFaq & { open: boolean }) =>
-        item.id === id ? { ...item, open: !item.open } : item,
-      ),
+      questions,
+      visibleQuestions,
     });
-  },
-  contactWechat() {
-    wx.showToast({ title: "客服信息待同步", icon: "none" });
   },
   goBack() { wx.navigateBack(); },
 });
+
+function presentQuestions(faqs: ContentFaq[]): FaqQuestion[] {
+  return faqs.map(({ id, category, q, a }) => ({ id, category, q, a, open: false }));
+}
+
+function presentCategories(questions: FaqQuestion[]): HelpCategory[] {
+  const categories = questions.reduce<string[]>((values, question) => {
+    if (question.category && !values.includes(question.category)) values.push(question.category);
+    return values;
+  }, []);
+  return [{ label: "全部", value: "all" }, ...categories.map((category) => ({ label: category, value: category }))];
+}
+
+function filterQuestions(questions: FaqQuestion[], category: string): VisibleFaqQuestion[] {
+  const filtered = category === "all" ? questions : questions.filter((question) => question.category === category);
+  return filtered.map((question, index) => ({ ...question, showDivider: index < filtered.length - 1 }));
+}
