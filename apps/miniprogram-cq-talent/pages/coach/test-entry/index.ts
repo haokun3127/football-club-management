@@ -5,162 +5,359 @@ import { resolveNavInset } from "../../../utils/presentation";
 import type { AssessmentForm, CoachWorkbench, LoadState } from "../../../utils/types";
 
 type AssessmentField = AssessmentForm["fields"][number];
-type DraftRow = { studentId: string; name: string; status: "empty" | "recorded" | "missing"; rawValue: string; missingReason: string; invalid: boolean };
+type RosterStudent = CoachWorkbench["roster"][number];
+type GroupView = { id: string; label: string; className: string };
+type DraftRow = {
+  studentId: string;
+  name: string;
+  status: "empty" | "recorded" | "missing";
+  rawValue: string;
+  missingReason: string;
+  invalid: boolean;
+  statusLabel: string;
+  statusClass: string;
+  showInput: boolean;
+  showMissingReason: boolean;
+  missingActionLabel: string;
+  invalidHint: string;
+};
 
-Page({
+interface PageData {
+  navInset: number;
+  state: LoadState;
+  statusTitle: string;
+  message: string;
+  eventId: string;
+  eventTitle: string;
+  form: AssessmentForm | null;
+  hasForm: boolean;
+  roster: CoachWorkbench["roster"];
+  groupOptions: GroupView[];
+  activeGroupId: string;
+  fieldsInGroup: AssessmentField[];
+  fieldIndex: number;
+  currentField: AssessmentField | null;
+  hasCurrentField: boolean;
+  currentFieldInputType: "digit" | "text";
+  currentFieldPlaceholder: string;
+  currentFieldUnitLabel: string;
+  currentFieldProtocol: string;
+  hasCurrentFieldProtocol: boolean;
+  fieldPositionLabel: string;
+  previousDisabled: boolean;
+  nextDisabled: boolean;
+  draft: AssessmentDraftMap;
+  draftRows: DraftRow[];
+  completedCount: number;
+  totalCount: number;
+  progressStyle: string;
+  progressLabel: string;
+  saving: boolean;
+  canSubmit: boolean;
+  submitClass: string;
+  submitLabel: string;
+  submitMessage: string;
+}
+
+Page<PageData>({
   data: {
     navInset: resolveNavInset(),
-    state: "loading" as LoadState,
-    message: "正在读取评测表单",
+    state: "idle",
+    statusTitle: "项目评分录入",
+    message: "",
     eventId: "",
-    form: null as AssessmentForm | null,
-    roster: [] as CoachWorkbench["roster"],
-    groupOptions: [] as Array<{ id: string; label: string }>,
+    eventTitle: "",
+    form: null,
+    hasForm: false,
+    roster: [],
+    groupOptions: [],
     activeGroupId: "",
-    fieldsInGroup: [] as AssessmentField[],
+    fieldsInGroup: [],
     fieldIndex: 0,
-    currentField: null as AssessmentField | null,
-    draft: {} as AssessmentDraftMap,
-    draftRows: [] as DraftRow[],
+    currentField: null,
+    hasCurrentField: false,
+    currentFieldInputType: "text",
+    currentFieldPlaceholder: "录入结果",
+    currentFieldUnitLabel: "",
+    currentFieldProtocol: "",
+    hasCurrentFieldProtocol: false,
+    fieldPositionLabel: "0 / 0",
+    previousDisabled: true,
+    nextDisabled: true,
+    draft: {},
+    draftRows: [],
     completedCount: 0,
     totalCount: 0,
+    progressStyle: "width: 0%",
+    progressLabel: "0 / 0 已录入",
     saving: false,
+    canSubmit: false,
+    submitClass: "c12-submit c12-submit--disabled",
+    submitLabel: "提交评分",
     submitMessage: "",
   },
+
   onLoad(query?: Record<string, string | undefined>) {
-    requireRole("coach");
-    const eventId = query?.eventId || "";
-    this.setData({ eventId });
-    this.load(query?.templateId || "assessment-template-cq-talent-elite", eventId);
+    return this.load(query?.eventId || "");
   },
-  goBack() {
-    wx.navigateBack();
-  },
-  async load(templateId: string, eventId: string) {
+
+  async load(eventId: string) {
+    if (!requireRole("coach")) {
+      this.showLoadError("", "当前账号无法录入评测。");
+      return;
+    }
+    if (!eventId) {
+      this.showLoadError("", "缺少活动信息，暂时无法录入评分。");
+      return;
+    }
+
+    this.setData({
+      state: "loading",
+      statusTitle: "正在读取评分项目",
+      message: "",
+      eventId,
+      eventTitle: "",
+      form: null,
+      hasForm: false,
+      roster: [],
+      groupOptions: [],
+      activeGroupId: "",
+      fieldsInGroup: [],
+      fieldIndex: 0,
+      currentField: null,
+      hasCurrentField: false,
+      draft: {},
+      draftRows: [],
+      completedCount: 0,
+      totalCount: 0,
+      progressStyle: "width: 0%",
+      progressLabel: "0 / 0 已录入",
+      saving: false,
+      canSubmit: false,
+      submitClass: "c12-submit c12-submit--disabled",
+      submitLabel: "提交评分",
+      submitMessage: "",
+    });
+
     try {
-      const [form, workbench] = await Promise.all([
-        getAssessmentForm(templateId),
-        eventId ? getCoachWorkbench(eventId) : Promise.resolve(null),
-      ]);
-      const groups = uniqueGroups(form.fields);
-      const activeGroupId = groups[0]?.id ?? "";
-      const fieldsInGroup = form.fields.filter((field) => field.groupId === activeGroupId);
-      const draft = loadAssessmentDraft(eventId, form.templateVersionId ?? form.templateId);
+      const workbench = await getCoachWorkbench(eventId);
+      if (!isWritableAssessmentWorkbench(workbench, eventId)) {
+        this.showLoadError(eventId, "当前活动暂时不能录入评分。");
+        return;
+      }
+
+      const templateId = workbench.assessmentTemplateId;
+      if (!templateId) {
+        this.showLoadError(eventId, "当前活动没有可用的评分模板。");
+        return;
+      }
+
+      const form = await getAssessmentForm(templateId);
+      if (!isMatchingAssessmentForm(form, templateId)) {
+        this.showLoadError(eventId, "评分表单暂时不可用。");
+        return;
+      }
+      const templateVersionId = form.templateVersionId;
+      if (!templateVersionId) {
+        this.showLoadError(eventId, "评分表单暂时不可用。");
+        return;
+      }
+
+      const activeGroupId = groupIds(form.fields)[0] || "";
+      const fieldsInGroup = fieldsForGroup(form.fields, activeGroupId);
+      const currentField = fieldsInGroup[0] || null;
+      const draft = loadAssessmentDraft(eventId, templateVersionId);
+      const hasEntries = Boolean(workbench.roster.length && currentField);
       this.setData({
-        state: workbench?.roster.length ? "ready" : "empty",
+        state: hasEntries ? "ready" : "empty",
+        statusTitle: hasEntries ? "" : "暂无可录入内容",
+        message: hasEntries ? "" : "当前活动没有可录入的学员或评分项目。",
+        eventId,
+        eventTitle: workbench.event.title,
         form,
-        roster: workbench?.roster ?? [],
-        groupOptions: groups,
+        hasForm: true,
+        roster: workbench.roster,
+        groupOptions: presentGroups(form.fields, activeGroupId),
         activeGroupId,
         fieldsInGroup,
         fieldIndex: 0,
-        currentField: fieldsInGroup[0] ?? null,
+        currentField,
+        hasCurrentField: Boolean(currentField),
         draft,
-        message: workbench?.roster.length ? "" : "当前活动没有可评测学员。",
+        canSubmit: hasEntries,
+        submitClass: hasEntries ? "c12-submit" : "c12-submit c12-submit--disabled",
+        submitLabel: "提交评分",
       });
       this.refreshDraftView();
-    } catch (error) {
-      this.setData({ state: "error", message: readableError(error) });
+    } catch {
+      this.showLoadError(eventId, "评分项目读取失败，请稍后重试。");
     }
   },
+
+  retry() {
+    return this.load(this.data.eventId);
+  },
+
+  showLoadError(eventId: string, message: string) {
+    this.setData({
+      state: "error",
+      statusTitle: "暂时无法录入",
+      message,
+      eventId,
+      eventTitle: "",
+      form: null,
+      hasForm: false,
+      roster: [],
+      groupOptions: [],
+      activeGroupId: "",
+      fieldsInGroup: [],
+      fieldIndex: 0,
+      currentField: null,
+      hasCurrentField: false,
+      draft: {},
+      draftRows: [],
+      completedCount: 0,
+      totalCount: 0,
+      progressStyle: "width: 0%",
+      progressLabel: "0 / 0 已录入",
+      saving: false,
+      canSubmit: false,
+      submitClass: "c12-submit c12-submit--disabled",
+      submitLabel: "提交评分",
+      submitMessage: "",
+    });
+  },
+
+  goBack() {
+    wx.navigateBack({ delta: 1 });
+  },
+
   switchGroup(event: { currentTarget: { dataset: { id?: string } } }) {
-    const activeGroupId = event.currentTarget.dataset.id;
-    if (!activeGroupId || !this.data.form) return;
-    const fieldsInGroup = this.data.form.fields.filter((field: AssessmentField) => field.groupId === activeGroupId);
-    this.setData({ activeGroupId, fieldsInGroup, fieldIndex: 0, currentField: fieldsInGroup[0] ?? null });
+    const activeGroupId = event.currentTarget.dataset.id || "";
+    const form = this.data.form;
+    if (!form || !activeGroupId) return;
+    const fieldsInGroup = fieldsForGroup(form.fields, activeGroupId);
+    const currentField = fieldsInGroup[0] || null;
+    this.setData({
+      groupOptions: presentGroups(form.fields, activeGroupId),
+      activeGroupId,
+      fieldsInGroup,
+      fieldIndex: 0,
+      currentField,
+      hasCurrentField: Boolean(currentField),
+    });
     this.refreshDraftView();
   },
+
   onFieldChange(event: { detail: { value: string | number } }) {
-    const fieldIndex = Number(event.detail.value);
+    this.selectField(Number(event.detail.value));
+  },
+
+  previousField() {
+    this.selectField(this.data.fieldIndex - 1);
+  },
+
+  nextField() {
+    this.selectField(this.data.fieldIndex + 1);
+  },
+
+  selectField(fieldIndex: number) {
     const currentField = this.data.fieldsInGroup[fieldIndex];
     if (!currentField) return;
-    this.setData({ fieldIndex, currentField });
+    this.setData({ fieldIndex, currentField, hasCurrentField: true });
     this.refreshDraftView();
   },
-  previousField() {
-    if (this.data.fieldIndex <= 0) return;
-    const fieldIndex = this.data.fieldIndex - 1;
-    this.setData({ fieldIndex, currentField: this.data.fieldsInGroup[fieldIndex] });
-    this.refreshDraftView();
-  },
-  nextField() {
-    if (this.data.fieldIndex >= this.data.fieldsInGroup.length - 1) return;
-    const fieldIndex = this.data.fieldIndex + 1;
-    this.setData({ fieldIndex, currentField: this.data.fieldsInGroup[fieldIndex] });
-    this.refreshDraftView();
-  },
+
   onValueInput(event: { currentTarget: { dataset: { studentId?: string } }; detail: { value: string | number } }) {
     const studentId = event.currentTarget.dataset.studentId;
     const field = this.data.currentField;
-    if (!studentId || !field?.testItemId || !this.data.form) return;
+    const form = this.data.form;
+    if (!this.data.canSubmit || !studentId || !field?.testItemId || !form?.templateVersionId) return;
     const rawValue = String(event.detail.value);
-    const draft = saveAssessmentDraftEntry(this.data.eventId, this.data.form.templateVersionId ?? this.data.form.templateId, {
+    const draft = saveAssessmentDraftEntry(this.data.eventId, form.templateVersionId, {
       studentId,
       testItemId: field.testItemId,
       status: rawValue.trim() ? "recorded" : "empty",
       rawValue,
     });
-    this.setData({ draft, submitMessage: "已保存到本机" });
+    this.setData({ draft, submitMessage: "已保存到本机草稿" });
     this.refreshDraftView();
   },
+
   toggleMissing(event: { currentTarget: { dataset: { studentId?: string } } }) {
     const studentId = event.currentTarget.dataset.studentId;
     const field = this.data.currentField;
-    if (!studentId || !field?.testItemId || !this.data.form) return;
+    const form = this.data.form;
+    if (!this.data.canSubmit || !studentId || !field?.testItemId || !form?.templateVersionId) return;
     const current = this.rowFor(studentId, field.testItemId);
     const status = current.status === "missing" ? "empty" : "missing";
-    const draft = saveAssessmentDraftEntry(this.data.eventId, this.data.form.templateVersionId ?? this.data.form.templateId, {
+    const draft = saveAssessmentDraftEntry(this.data.eventId, form.templateVersionId, {
       studentId,
       testItemId: field.testItemId,
       status,
       rawValue: status === "missing" ? "" : current.rawValue,
-      missingReason: status === "missing" ? current.missingReason || "未参加" : undefined,
+      missingReason: status === "missing" ? current.missingReason : undefined,
     });
-    this.setData({ draft, submitMessage: "已保存到本机" });
+    this.setData({ draft, submitMessage: "已保存到本机草稿" });
     this.refreshDraftView();
   },
+
   onMissingReasonInput(event: { currentTarget: { dataset: { studentId?: string } }; detail: { value: string } }) {
     const studentId = event.currentTarget.dataset.studentId;
     const field = this.data.currentField;
-    if (!studentId || !field?.testItemId || !this.data.form) return;
-    const draft = saveAssessmentDraftEntry(this.data.eventId, this.data.form.templateVersionId ?? this.data.form.templateId, {
+    const form = this.data.form;
+    if (!this.data.canSubmit || !studentId || !field?.testItemId || !form?.templateVersionId) return;
+    const draft = saveAssessmentDraftEntry(this.data.eventId, form.templateVersionId, {
       studentId,
       testItemId: field.testItemId,
       status: "missing",
       missingReason: event.detail.value,
     });
-    this.setData({ draft, submitMessage: "已保存到本机" });
+    this.setData({ draft, submitMessage: "已保存到本机草稿" });
     this.refreshDraftView();
   },
+
   rowFor(studentId: string, testItemId: string) {
-    return this.data.draft[`${studentId}:${testItemId}`] ?? { status: "empty", rawValue: "", missingReason: "" };
+    return this.data.draft[`${studentId}:${testItemId}`] ?? { status: "empty" as const, rawValue: "", missingReason: "" };
   },
+
   refreshDraftView() {
     const field = this.data.currentField;
     const form = this.data.form;
     if (!field?.testItemId || !form) return;
-    const draftRows = this.data.roster.map((student: CoachWorkbench["roster"][number]) => {
-      const entry = this.rowFor(student.studentId, field.testItemId!);
-      return {
-        studentId: student.studentId,
-        name: student.name,
-        status: entry.status,
-        rawValue: entry.rawValue,
-        missingReason: entry.missingReason ?? "",
-        invalid: entry.status === "recorded" && !validFieldValue(field, entry.rawValue),
-      };
+    const draftRows = this.data.roster.map((student: RosterStudent) => presentDraftRow(student, this.rowFor(student.studentId, field.testItemId!), field));
+    const itemIds = form.fields.map((item: AssessmentField) => item.testItemId || "").filter(Boolean);
+    const progress = draftProgress(this.data.draft, this.data.roster.map((student: RosterStudent) => student.studentId), itemIds);
+    const totalCount = progress.total;
+    const percent = totalCount ? Math.min(100, Math.round((progress.completed / totalCount) * 100)) : 0;
+    const currentFieldInputType = field.inputType === "number" ? "digit" : "text";
+    this.setData({
+      draftRows,
+      completedCount: progress.completed,
+      totalCount,
+      progressStyle: `width: ${percent}%`,
+      progressLabel: `${progress.completed} / ${totalCount} 已录入`,
+      currentFieldInputType,
+      currentFieldPlaceholder: field.unit ? `录入${field.unit}` : "录入结果",
+      currentFieldUnitLabel: field.unit || "按项目要求录入",
+      currentFieldProtocol: field.protocol || "",
+      hasCurrentFieldProtocol: Boolean(field.protocol),
+      fieldPositionLabel: `${this.data.fieldIndex + 1} / ${this.data.fieldsInGroup.length}`,
+      previousDisabled: this.data.fieldIndex <= 0,
+      nextDisabled: this.data.fieldIndex >= this.data.fieldsInGroup.length - 1,
     });
-    const progress = draftProgress(this.data.draft, this.data.roster.map((student: CoachWorkbench["roster"][number]) => student.studentId), form.fields.map((item: AssessmentField) => item.testItemId!).filter(Boolean));
-    this.setData({ draftRows, completedCount: progress.completed, totalCount: progress.total });
   },
+
   async submitAssessment() {
     const form = this.data.form;
-    if (!form || this.data.saving) return;
-    const recordedStudents = this.data.roster.filter((student: CoachWorkbench["roster"][number]) =>
-      form.fields.some((field: AssessmentField) => this.rowFor(student.studentId, field.testItemId!).status === "recorded"),
+    if (!this.data.canSubmit || !form?.templateVersionId || this.data.saving) return;
+
+    const recordedStudents = this.data.roster.filter((student: RosterStudent) =>
+      form.fields.some((field: AssessmentField) => field.testItemId && this.rowFor(student.studentId, field.testItemId).status === "recorded"),
     );
-    const hasInvalid = form.fields.some((field: AssessmentField) => this.data.roster.some((student: CoachWorkbench["roster"][number]) => {
-      const entry = this.rowFor(student.studentId, field.testItemId!);
+    const hasInvalid = form.fields.some((field: AssessmentField) => this.data.roster.some((student: RosterStudent) => {
+      if (!field.testItemId) return true;
+      const entry = this.rowFor(student.studentId, field.testItemId);
       return entry.status === "recorded" && !validFieldValue(field, entry.rawValue);
     }));
     if (hasInvalid) {
@@ -171,14 +368,16 @@ Page({
       wx.showToast({ title: "请先录入至少一项成绩", icon: "none" });
       return;
     }
-    this.setData({ saving: true, submitMessage: "正在提交" });
+
+    this.setData({ saving: true, submitClass: "c12-submit c12-submit--disabled", submitLabel: "正在提交", submitMessage: "正在确认提交结果" });
     const succeeded: string[] = [];
-    const failed: string[] = [];
+    const unconfirmed: string[] = [];
     for (const student of recordedStudents) {
       const rawResults = form.fields.flatMap((field: AssessmentField) => {
-        const entry = this.rowFor(student.studentId, field.testItemId!);
+        if (!field.testItemId) return [];
+        const entry = this.rowFor(student.studentId, field.testItemId);
         const value = entry.status === "recorded" ? buildMetricValue(field.valueKind, entry.rawValue, field.unit) : null;
-        return field.testItemId && value ? [{ testItemId: field.testItemId, metricId: field.metricId, value, note: "小程序现场录入" }] : [];
+        return value ? [{ testItemId: field.testItemId, metricId: field.metricId, value }] : [];
       });
       try {
         await submitCoachAssessment({
@@ -189,29 +388,86 @@ Page({
           rawResults,
         });
         succeeded.push(student.studentId);
-      } catch (_error) {
-        failed.push(student.studentId);
+      } catch {
+        unconfirmed.push(student.studentId);
       }
     }
-    const draft = clearAssessmentDraftStudents(this.data.eventId, form.templateVersionId ?? form.templateId, succeeded);
+
+    const draft = clearAssessmentDraftStudents(this.data.eventId, form.templateVersionId, succeeded);
+    const submitMessage = unconfirmed.length
+      ? `已确认 ${succeeded.length} 名，${unconfirmed.length} 名待确认，草稿已保留`
+      : `已确认提交 ${succeeded.length} 名`;
     this.setData({
       saving: false,
       draft,
-      submitMessage: `已提交 ${succeeded.length} 人${failed.length ? `，${failed.length} 人失败并保留草稿` : ""}`,
+      submitClass: this.data.canSubmit ? "c12-submit" : "c12-submit c12-submit--disabled",
+      submitLabel: "提交评分",
+      submitMessage,
     });
     this.refreshDraftView();
   },
 });
 
-function uniqueGroups(fields: AssessmentField[]) {
-  const groups = new Map<string, string>();
-  fields.forEach((field) => groups.set(field.groupId, field.groupLabel));
-  return [...groups.entries()].map(([id, label]) => ({ id, label }));
+function isWritableAssessmentWorkbench(workbench: CoachWorkbench, eventId: string) {
+  return workbench.event.id === eventId && workbench.event.status !== "cancelled" && Boolean(workbench.assessmentTemplateId);
 }
 
-function readableError(error: unknown) {
-  const record = error as { message?: string; code?: string };
-  return record?.message || record?.code || "评测表单读取失败。";
+function isMatchingAssessmentForm(form: AssessmentForm, templateId: string) {
+  return form.templateId === templateId
+    && Boolean(form.templateVersionId)
+    && form.fields.length > 0
+    && form.fields.every((field) => Boolean(field.testItemId));
+}
+
+function groupIds(fields: AssessmentField[]) {
+  const ids: string[] = [];
+  for (const field of fields) {
+    if (field.groupId && !ids.includes(field.groupId)) ids.push(field.groupId);
+  }
+  return ids;
+}
+
+function fieldsForGroup(fields: AssessmentField[], groupId: string) {
+  return fields.filter((field) => field.groupId === groupId);
+}
+
+function presentGroups(fields: AssessmentField[], activeGroupId: string): GroupView[] {
+  const groups = new Map<string, string>();
+  for (const field of fields) {
+    if (!groups.has(field.groupId)) groups.set(field.groupId, field.groupLabel);
+  }
+  return [...groups.entries()].map(([id, label]) => ({
+    id,
+    label,
+    className: id === activeGroupId ? "c12-group c12-group--active" : "c12-group",
+  }));
+}
+
+function presentDraftRow(student: CoachWorkbench["roster"][number], entry: { status: "empty" | "recorded" | "missing"; rawValue: string; missingReason?: string }, field: AssessmentField): DraftRow {
+  const invalid = entry.status === "recorded" && !validFieldValue(field, entry.rawValue);
+  const status = invalid ? "invalid" : entry.status;
+  const statusLabel = status === "recorded" ? "已录入" : status === "missing" ? "缺测" : status === "invalid" ? "超出范围" : "待录入";
+  const invalidHint = invalid ? rangeHint(field) : "";
+  return {
+    studentId: student.studentId,
+    name: student.name,
+    status: entry.status,
+    rawValue: entry.rawValue,
+    missingReason: entry.missingReason || "",
+    invalid,
+    statusLabel,
+    statusClass: `c12-row__status c12-row__status--${status}`,
+    showInput: entry.status !== "missing",
+    showMissingReason: entry.status === "missing",
+    missingActionLabel: entry.status === "missing" ? "取消缺测" : "标记缺测",
+    invalidHint,
+  };
+}
+
+function rangeHint(field: AssessmentField) {
+  const min = field.minValue === undefined ? "不限" : String(field.minValue);
+  const max = field.maxValue === undefined ? "不限" : String(field.maxValue);
+  return `合理范围：${min} - ${max}`;
 }
 
 function buildMetricValue(kind: string, rawValue: string, unit?: string): Record<string, unknown> | null {

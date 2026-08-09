@@ -1,50 +1,78 @@
 <view class="c12">
-  <!-- C12 Top Nav（粉底） -->
-  <view class="c12-nav" style="padding-top:{{navInset}}px">
+  <view class="c12-nav" style="padding-top: {{navInset}}px">
     <view class="c12-nav__left" bindtap="goBack">
-      <view class="c12-nav__back">‹</view>
-      <view class="c12-nav__title">项目评分录入</view>
+      <image class="c12-nav__back" src="/assets/icons/c12-arrow-left.svg" mode="aspectFit" />
+      <text class="c12-nav__title">项目评分录入</text>
     </view>
-    <view class="c12-nav__submit" bindtap="submitAssessment">提交</view>
-  </view>
-<view class="page assessment-page c12-body">
-  <status-view state="{{state}}" title="{{state === 'loading' ? '加载评测' : state === 'empty' ? '暂无学员' : '评测读取失败'}}" message="{{message}}" />
-
-  <view wx:if="{{form}}" class="assessment-hero">
-    <view class="assessment-hero__eyebrow">TEAM ASSESSMENT</view>
-    <view class="title">{{form.templateName}}</view>
-    <view class="assessment-hero__meta">{{form.versionName}} · 已完成 {{completedCount}} / {{totalCount}}</view>
-    <view class="progress-track"><view class="progress-value" style="width: {{totalCount ? completedCount * 100 / totalCount : 0}}%"></view></view>
+    <text class="c12-nav__action" bindtap="submitAssessment">提交</text>
   </view>
 
-  <scroll-view wx:if="{{form}}" scroll-x class="group-scroll" enhanced show-scrollbar="{{false}}">
-    <view class="group-row">
-      <view wx:for="{{groupOptions}}" wx:key="id" class="group-tab {{activeGroupId === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="switchGroup">{{item.label}}</view>
-    </view>
-  </scroll-view>
+  <view class="c12-body">
+    <status-view
+      state="{{state}}"
+      title="{{statusTitle}}"
+      message="{{message}}"
+      action-text="{{state === 'error' ? '重试' : ''}}"
+      bindaction="retry"
+    />
 
-  <view wx:if="{{currentField}}" class="card field-card">
-    <view class="row"><view class="section-title">当前项目</view><view class="tag">{{fieldIndex + 1}} / {{fieldsInGroup.length}}</view></view>
-    <picker mode="selector" range="{{fieldsInGroup}}" range-key="label" value="{{fieldIndex}}" bindchange="onFieldChange">
-      <view class="field-picker">{{currentField.label}}<view class="subtitle">{{currentField.unit || '按项目要求录入'}}</view></view>
-    </picker>
-    <view wx:if="{{currentField.protocol}}" class="protocol">{{currentField.protocol}}</view>
-    <view class="field-nav"><button class="ghost-button mini-button" disabled="{{fieldIndex === 0}}" bindtap="previousField">上一项</button><button class="ghost-button mini-button" disabled="{{fieldIndex >= fieldsInGroup.length - 1}}" bindtap="nextField">下一项</button></view>
-  </view>
-
-  <view wx:if="{{currentField}}" class="card roster-card">
-    <view class="section-title">整队录入</view>
-    <view wx:for="{{draftRows}}" wx:key="studentId" class="draft-row">
-      <view class="draft-head"><view class="label strong">{{item.name}}</view><view class="draft-status {{item.invalid ? 'status-invalid' : 'status-' + item.status}}">{{item.invalid ? '超出范围' : item.status === 'recorded' ? '已录' : item.status === 'missing' ? '缺测' : '未录'}}</view></view>
-      <view class="draft-controls">
-        <input wx:if="{{item.status !== 'missing'}}" class="score-input" type="{{currentField.inputType === 'number' ? 'digit' : 'text'}}" placeholder="{{currentField.unit || '录入结果'}}" value="{{item.rawValue}}" data-student-id="{{item.studentId}}" bindinput="onValueInput" />
-        <button class="missing-button {{item.status === 'missing' ? 'active' : ''}}" data-student-id="{{item.studentId}}" bindtap="toggleMissing">{{item.status === 'missing' ? '取消缺测' : '标记缺测'}}</button>
+    <block wx:if="{{hasForm}}">
+      <view class="c12-task-header">
+        <text class="c12-task-header__title">{{form.templateName}}</text>
+        <text class="c12-task-header__meta">{{eventTitle}}</text>
+        <view class="c12-task-header__chips">
+          <text class="c12-task-header__chip c12-task-header__chip--complete">{{progressLabel}}</text>
+          <text class="c12-task-header__chip c12-task-header__chip--version">{{form.versionName}}</text>
+        </view>
       </view>
-      <input wx:if="{{item.status === 'missing'}}" class="reason-input" placeholder="缺测原因，如请假、受伤" value="{{item.missingReason}}" data-student-id="{{item.studentId}}" bindinput="onMissingReasonInput" />
-      <view wx:if="{{item.invalid}}" class="invalid-hint">合理范围：{{currentField.minValue === undefined ? '不限' : currentField.minValue}} - {{currentField.maxValue === undefined ? '不限' : currentField.maxValue}}</view>
-    </view>
+
+      <view class="c12-progress"><view class="c12-progress__value" style="{{progressStyle}}"></view></view>
+
+      <scroll-view scroll-x class="c12-groups" enhanced show-scrollbar="{{false}}">
+        <view class="c12-groups__row">
+          <view wx:for="{{groupOptions}}" wx:key="id" class="{{item.className}}" data-id="{{item.id}}" bindtap="switchGroup">{{item.label}}</view>
+        </view>
+      </scroll-view>
+
+      <view wx:if="{{hasCurrentField}}" class="c12-field-card">
+        <view class="c12-field-card__heading">
+          <text class="c12-field-card__label">当前项目</text>
+          <text class="c12-field-card__position">{{fieldPositionLabel}}</text>
+        </view>
+        <picker mode="selector" range="{{fieldsInGroup}}" range-key="label" value="{{fieldIndex}}" bindchange="onFieldChange">
+          <view class="c12-field-card__picker">
+            <text class="c12-field-card__name">{{currentField.label}}</text>
+            <text class="c12-field-card__unit">{{currentFieldUnitLabel}}</text>
+          </view>
+        </picker>
+        <text wx:if="{{hasCurrentFieldProtocol}}" class="c12-field-card__protocol">{{currentFieldProtocol}}</text>
+        <view class="c12-field-card__navigation">
+          <button class="c12-field-card__nav-button" disabled="{{previousDisabled}}" bindtap="previousField">上一项</button>
+          <button class="c12-field-card__nav-button" disabled="{{nextDisabled}}" bindtap="nextField">下一项</button>
+        </view>
+      </view>
+
+      <view wx:if="{{hasCurrentField}}" class="c12-roster">
+        <text class="c12-roster__title">整队录入</text>
+        <view wx:for="{{draftRows}}" wx:key="studentId" class="c12-row">
+          <view class="c12-row__head">
+            <text class="c12-row__name">{{item.name}}</text>
+            <text class="{{item.statusClass}}">{{item.statusLabel}}</text>
+          </view>
+          <view class="c12-row__controls">
+            <input wx:if="{{item.showInput}}" class="c12-row__input" type="{{currentFieldInputType}}" placeholder="{{currentFieldPlaceholder}}" value="{{item.rawValue}}" data-student-id="{{item.studentId}}" bindinput="onValueInput" />
+            <button class="c12-row__missing" data-student-id="{{item.studentId}}" bindtap="toggleMissing">{{item.missingActionLabel}}</button>
+          </view>
+          <input wx:if="{{item.showMissingReason}}" class="c12-row__reason" placeholder="缺测原因（选填）" value="{{item.missingReason}}" data-student-id="{{item.studentId}}" bindinput="onMissingReasonInput" />
+          <text wx:if="{{item.invalid}}" class="c12-row__invalid">{{item.invalidHint}}</text>
+        </view>
+      </view>
+    </block>
   </view>
 
-  <submit-bar wx:if="{{form}}" primary-text="提交评测" hint="{{submitMessage || '输入已自动保存'}}" loading="{{saving}}" disabled="{{saving || !roster.length}}" bindsubmit="submitAssessment" />
-</view>
+  <view class="c12-submit-wrap">
+    <text class="c12-submit__hint">{{submitMessage}}</text>
+    <view class="{{submitClass}}" bindtap="submitAssessment">{{submitLabel}}</view>
+  </view>
+  <role-tabbar role="coach" active="training" />
 </view>
