@@ -1,13 +1,62 @@
 <view class="c16">
-  <view class="c16-bar" style="padding-top:{{navInset}}px"><view class="c16-bar__title">我的</view><view class="c16-bar__settings" bindtap="openAccount">设置</view></view>
-  <view class="c16-body">
-    <status-view state="{{state}}" title="{{state === 'loading' ? '加载教练身份' : '教练身份读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
-    <view wx:if="{{home}}" class="c16-content">
-      <!-- Figma C16 profile hero -->
-      <view class="c16-profile"><view class="c16-profile__top"><view class="c16-profile__avatar">{{avatarLetter}}</view><view><view class="c16-profile__name">{{displayName}}</view><view class="c16-profile__badge">主教练</view><view class="c16-profile__team">{{teamsText}}</view></view></view><view class="c16-profile__stats"><view><view>本赛季执教</view><view class="c16-profile__number">{{home.events.length}}</view></view><view><view>在队学员</view><view class="c16-profile__number">{{home.teams.length}}</view></view><view><view>平均出勤</view><view class="c16-profile__number">数据待同步</view></view></view></view>
-      <!-- Figma C16 menu -->
-      <view class="c16-menu"><view class="c16-menu__item" bindtap="openPermissions"><view class="c16-menu__icon">权</view><view>权限范围</view><view class="c16-menu__arrow">›</view></view><view class="c16-menu__item" bindtap="openPrivateInterest"><view class="c16-menu__icon">私</view><view>私教兴趣</view><view class="c16-menu__arrow">›</view></view><view class="c16-menu__item" bindtap="openAccount"><view class="c16-menu__icon">账</view><view>账号设置</view><view class="c16-menu__arrow">›</view></view><view class="c16-menu__item" bindtap="openHelp"><view class="c16-menu__icon">帮</view><view>帮助中心</view><view class="c16-menu__arrow">›</view></view></view>
+  <view class="c16-bar" style="padding-top:{{navInset}}px">
+    <view class="c16-bar__title">我的</view>
+    <view class="c16-bar__settings" bindtap="openAccount">
+      <image class="c16-bar__settings-icon" src="/assets/icons/c16-settings.svg" mode="aspectFit" />
     </view>
   </view>
+
+  <view class="c16-body">
+    <status-view
+      wx:if="{{state !== 'ready'}}"
+      state="{{state}}"
+      title="{{state === 'loading' ? '加载教练身份' : '教练身份读取失败'}}"
+      message="{{message}}"
+      action-text="{{state === 'error' ? '重试' : ''}}"
+      bindaction="retry"
+    />
+
+    <view wx:if="{{state === 'ready'}}" class="c16-content">
+      <view class="c16-profile">
+        <view class="c16-profile__top">
+          <view class="c16-profile__avatar">{{avatarLetter}}</view>
+          <view class="c16-profile__identity">
+            <view class="c16-profile__name">{{displayName}}</view>
+            <view class="c16-profile__role">教练</view>
+          </view>
+        </view>
+        <view class="c16-profile__teams">
+          <view class="c16-profile__teams-label">近30天负责球队</view>
+          <view class="c16-profile__teams-value">{{teamsText}}</view>
+        </view>
+      </view>
+
+      <view class="c16-menu">
+        <view class="c16-menu__item" bindtap="openPermissions">
+          <image class="c16-menu__icon" src="/assets/icons/c16-shield.svg" mode="aspectFit" />
+          <view class="c16-menu__label">权限范围</view>
+          <image class="c16-menu__arrow" src="/assets/icons/c16-chevron-right.svg" mode="aspectFit" />
+        </view>
+        <view class="c16-menu__item" bindtap="openPrivateInterest">
+          <image class="c16-menu__icon" src="/assets/icons/c16-heart.svg" mode="aspectFit" />
+          <view class="c16-menu__label">私教兴趣</view>
+          <image class="c16-menu__arrow" src="/assets/icons/c16-chevron-right.svg" mode="aspectFit" />
+        </view>
+        <view class="c16-menu__item" bindtap="openAccount">
+          <image class="c16-menu__icon" src="/assets/icons/c16-user.svg" mode="aspectFit" />
+          <view class="c16-menu__label">账号设置</view>
+          <image class="c16-menu__arrow" src="/assets/icons/c16-chevron-right.svg" mode="aspectFit" />
+        </view>
+        <view class="c16-menu__item" bindtap="openHelp">
+          <image class="c16-menu__icon" src="/assets/icons/c16-help-circle.svg" mode="aspectFit" />
+          <view class="c16-menu__label">帮助中心</view>
+          <image class="c16-menu__arrow" src="/assets/icons/c16-chevron-right.svg" mode="aspectFit" />
+        </view>
+      </view>
+
+      <button class="c16-logout" bindtap="logout">退出登录</button>
+    </view>
+  </view>
+
   <role-tabbar role="coach" active="me" />
 </view>
