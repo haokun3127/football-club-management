@@ -341,3 +341,37 @@ In progress. Do not archive the Trellis task or claim Figma visual completion un
 
 - `master` is already contained in the current branch but remains intentionally until the user elects to promote the current branch as the official default branch.
 - `git fsck` still reports four dangling commits and two Codex checkpoint refs with Windows path-length warnings. They were not pruned because their content has not been reviewed.
+
+
+## Session 9: Wire parent training history action
+
+**Date**: 2026-08-09
+**Task**: Wire parent training history action
+**Package**: api
+**Branch**: `codex/chongqing-talent-business`
+
+### Summary
+
+Restored the Parent Growth training-history View action by routing the active student to the existing lesson-and-safety detail page. Added a focused navigation test; package and workspace gates passed.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `3a4a669` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
