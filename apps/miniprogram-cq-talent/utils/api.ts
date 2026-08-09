@@ -86,14 +86,10 @@ export async function getParentCalendar(from?: string, to?: string) {
 
 export async function getParentActivityDetail(eventId: string) {
   const context = requireContext();
-  try {
-    const response = await request<Record<string, unknown>>({
-      path: `/clubs/${context.clubId}/app-clients/${context.clientId}/events/${eventId}`,
-    });
-    return normalizeActivityDetail(response);
-  } catch (error) {
-    return pendingActivityDetail(eventId);
-  }
+  const response = await request<Record<string, unknown>>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/events/${eventId}`,
+  });
+  return normalizeActivityDetail(response);
 }
 
 export async function getParentGrowth(studentId: string, student?: StudentSummary): Promise<GrowthSummary> {
@@ -453,7 +449,7 @@ function normalizeActivityDetail(raw: Record<string, unknown>): ActivityDetail {
           items: [
             { label: "内容", value: String(other?.description ?? event.summary ?? "暂无补充说明") },
             { label: "参与状态", value: participantStatus },
-            { label: "通知", value: event.status === "cancelled" ? "活动已取消，请留意俱乐部通知" : "如有变更，俱乐部将另行通知" },
+            { label: "通知", value: String(other?.notice ?? "通知待同步") },
           ],
         },
       ];
@@ -470,19 +466,6 @@ function normalizeActivityDetail(raw: Record<string, unknown>): ActivityDetail {
     fields,
     sections,
     pending: [],
-  };
-}
-
-function pendingActivityDetail(eventId: string): ActivityDetail {
-  return {
-    id: eventId,
-    type: "other",
-    title: "暂时无法读取活动",
-    status: "pending",
-    participants: [],
-    fields: [],
-    sections: [],
-    pending: [{ title: "活动信息暂不可用", message: "请稍后重试；如持续无法查看，请联系俱乐部。" }],
   };
 }
 

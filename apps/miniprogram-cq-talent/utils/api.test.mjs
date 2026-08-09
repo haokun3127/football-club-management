@@ -36,7 +36,7 @@ globalThis.wx = {
   }),
 };
 
-const { getCoachWorkbench } = await import("./api.ts");
+const { getCoachWorkbench, getParentActivityDetail } = await import("./api.ts");
 
 describe("coach workbench participant normalization", () => {
   it("uses backend participant.status and note fields", async () => {
@@ -44,5 +44,21 @@ describe("coach workbench participant normalization", () => {
     expect(workbench.roster).toEqual([
       expect.objectContaining({ studentId: "student-1", status: "present", note: "Saved by backend" }),
     ]);
+  });
+});
+
+describe("parent activity detail request boundary", () => {
+  it("rejects an unavailable activity instead of returning a fictional pending detail", async () => {
+    const originalRequest = globalThis.wx.request;
+    globalThis.wx.request = ({ fail }) => fail({ errMsg: "activity missing" });
+
+    try {
+      await expect(getParentActivityDetail("missing-event")).rejects.toMatchObject({
+        code: "network_error",
+        message: "activity missing",
+      });
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
   });
 });

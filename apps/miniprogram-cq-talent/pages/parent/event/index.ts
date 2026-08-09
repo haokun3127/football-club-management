@@ -19,6 +19,7 @@ type ActivityDetailView = ActivityDetail & {
   typeLabel: string;
   coachName: string;
   coachInitial: string;
+  coachRole: string;
   dateText: string;
   timeText: string;
   trainingDateText: string;
@@ -34,6 +35,7 @@ type ActivityDetailView = ActivityDetail & {
   childName: string;
   childInitial: string;
   childStatusLabel: string;
+  confirmationText: string;
   attendanceConfirmed: boolean;
 };
 
@@ -94,11 +96,13 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
   const child = detail.participants[0];
   const statusTone = status.label === "已确认" || status.label === "已结束" ? "success" : status.label === "待确认" ? "warning" : "muted";
   const coachName = fieldValue(detail, ["教练"]) || "教练待同步";
+  const coachRole = fieldValue(detail, ["教练角色", "职务"]) || "教练信息待同步";
   const otherDescription = sectionValue(detail, ["活动说明"], ["内容"]) || fieldValue(detail, ["活动描述", "描述"]) || "活动说明待同步";
-  const otherNotice = sectionValue(detail, ["活动说明"], ["通知", "注意"]) || "线下到场后检查身份完成确认";
+  const otherNotice = sectionValue(detail, ["活动说明"], ["通知", "注意"]) || "注意事项待同步";
   const rawDateTime = fieldValue(detail, ["时间", "日期"]);
   const dateTime = parseDateTimeParts(rawDateTime);
   const rawScore = sectionValue(detail, ["比赛信息"], ["比分"]).trim();
+  const childStatusLabel = child ? participantStatusLabel(child.status) : "出勤状态待同步";
   return {
     ...detail,
     navTitle: NAV_TITLES[detail.type],
@@ -107,23 +111,30 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
     typeLabel: activityTypeLabel(detail.type),
     coachName,
     coachInitial: coachName.slice(0, 1),
+    coachRole,
     dateText: dateTime.date ? `${dateTime.date} ${dateTime.start}`.trim() : rawDateTime || "日期待确认",
     timeText: dateTime.range || dateTime.start || "时间待确认",
     trainingDateText: dateTime.date ? `${dateTime.range || dateTime.start} · ${dateTime.date}` : rawDateTime || "日期待确认",
     venueText: fieldValue(detail, ["地点", "场地", "场馆"]) || "地点待确认",
     trainingSummary: sectionValue(detail, ["本次训练"], ["训练内容"]) || "训练内容待同步",
     abilityChips: collectAbilityChips(detail),
-    homeTeam: fieldValue(detail, ["队伍", "主队"]) || "天才队",
+    homeTeam: displayValue(fieldValue(detail, ["主队", "队伍"]), "主队待确认"),
     awayTeam: sectionValue(detail, ["比赛信息"], ["对手"]) || "对手待确认",
-    scoreText: /^\d+\s*[:：]\s*\d+$/.test(rawScore) ? rawScore : "0 : 0",
+    scoreText: /^\d+\s*[:：]\s*\d+$/.test(rawScore) ? rawScore : "比分待确认",
     roster: detail.participants.slice(0, 3).map((participant, index) => rosterItem(participant, index)),
     otherDescription,
     otherNotice,
     childName: child?.name || "孩子待同步",
     childInitial: (child?.name || "学").slice(0, 1),
-    childStatusLabel: participantStatusLabel(child?.status),
-    attendanceConfirmed: ["已确认", "已结束"].includes(status.label),
+    childStatusLabel,
+    confirmationText: childStatusLabel,
+    attendanceConfirmed: childStatusLabel === "已到场",
   };
+}
+
+function displayValue(value: string, fallback: string) {
+  const trimmed = value.trim();
+  return trimmed && trimmed !== "待确认" && trimmed !== "待同步" ? trimmed : fallback;
 }
 
 function rosterItem(participant: ActivityDetail["participants"][number], index: number): RosterItem {
@@ -142,7 +153,7 @@ function participantStatusLabel(status?: string) {
   const value = String(status ?? "").toLowerCase();
   if (["present", "confirmed", "completed", "accepted"].includes(value)) return "已到场";
   if (["absent", "cancelled"].includes(value)) return "未到场";
-  return "未确认";
+  return value ? "状态待确认" : "状态待同步";
 }
 
 function collectAbilityChips(detail: ActivityDetail) {
