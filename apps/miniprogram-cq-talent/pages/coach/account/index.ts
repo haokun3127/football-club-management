@@ -1,65 +1,91 @@
 import { getCoachHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { clearSession } from "../../../utils/store";
-import type { LoadState } from "../../../utils/types";
+import { resolveNavInset } from "../../../utils/presentation";
+
+type TeamState = "loading" | "ready" | "empty" | "pending";
 
 interface PageData {
-  state: LoadState;
-  message: string;
-  coachName: string;
-  coachInitial: string;
-  teamLabel: string;
-  phoneLabel: string;
+  navInset: number;
+  displayName: string;
+  avatarLetter: string;
+  teamState: TeamState;
+  teamText: string;
 }
 
 Page<PageData>({
-  data: {
-    state: "idle",
-    message: "",
-    coachName: "教练",
-    coachInitial: "教",
-    teamLabel: "",
-    phoneLabel: "未绑定",
-  },
+  data: accountPageData(),
   onLoad() {
-    this.load();
+    return this.load();
   },
   async load() {
     const session = requireRole("coach");
     if (!session) return;
-    this.setData({ state: "loading", message: "正在读取账号信息" });
+
+    const requestToken = nextRequestToken(this);
+    const displayName = sessionDisplayName(session.displayName);
+    this.setData(accountPageData(displayName, "loading", "正在同步团队信息"));
+
     try {
-      const home = await getCoachHome();
-      const coachName = home.coachName || "教练";
-      this.setData({
-        state: "ready",
-        coachName,
-        coachInitial: coachName.slice(0, 1),
-        teamLabel: home.teams.length ? `${home.teams.join(" / ")} · 主教练` : "重庆天才足球俱乐部",
-      });
-    } catch (error) {
-      this.setData({ state: "error", message: error instanceof Error ? error.message : "账号信息读取失败，请稍后重试。" });
+      const home = await getCoachHome(recentThirtyDayRange(new Date()));
+      if (!isCurrentRequest(this, requestToken)) return;
+
+      const teams = toTeams(home.teams);
+      this.setData(accountPageData(
+        displayName,
+        teams.length ? "ready" : "empty",
+        teams.length ? teams.join("、") : "暂无近30天负责球队",
+      ));
+    } catch {
+      if (!isCurrentRequest(this, requestToken)) return;
+      this.setData(accountPageData(displayName, "pending", "团队信息待同步"));
     }
   },
-  retry() {
-    this.load();
-  },
-  editName() {
-    wx.showToast({ title: "昵称修改需联系俱乐部管理员", icon: "none" });
-  },
-  editPhone() {
-    wx.showToast({ title: "手机号修改需验证后由管理员变更", icon: "none" });
-  },
-  logout() {
-    wx.showModal({
-      title: "退出登录",
-      content: "退出后需重新选择身份登录",
-      success: (result) => {
-        if (result.confirm) {
-          clearSession();
-          wx.reLaunch({ url: "/pages/launch/index" });
-        }
-      },
-    });
+  goBack() {
+    wx.navigateBack();
   },
 });
+
+function accountPageData(
+  displayName = "姓名待同步",
+  teamState: TeamState = "pending",
+  teamText = "团队信息待同步",
+): PageData {
+  return {
+    navInset: resolveNavInset(),
+    displayName,
+    avatarLetter: displayName.slice(0, 1),
+    teamState,
+    teamText,
+  };
+}
+
+function sessionDisplayName(value: string | undefined) {
+  return value?.trim() || "姓名待同步";
+}
+
+function recentThirtyDayRange(today: Date) {
+  const from = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  from.setDate(from.getDate() - 29);
+  return { from: toLocalDate(from), to: toLocalDate(today) };
+}
+
+function toLocalDate(value: Date) {
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function toTeams(teams: string[]) {
+  return teams.filter((team, index) => Boolean(team?.trim()) && teams.indexOf(team) === index);
+}
+
+function nextRequestToken(page: unknown) {
+  const state = page as { _c163RequestToken?: number };
+  state._c163RequestToken = (state._c163RequestToken ?? 0) + 1;
+  return state._c163RequestToken;
+}
+
+function isCurrentRequest(page: unknown, requestToken: number) {
+  return (page as { _c163RequestToken?: number })._c163RequestToken === requestToken;
+}

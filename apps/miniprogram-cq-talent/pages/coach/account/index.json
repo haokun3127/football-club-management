@@ -1,9 +1,7 @@
 {
   "navigationBarTitleText": "账号设置",
   "usingComponents": {
-    "app-header": "/components/app-header/index",
-    "role-tabbar": "/components/role-tabbar/index",
-    "status-view": "/components/status-view/index"
+    "role-tabbar": "/components/role-tabbar/index"
   },
   "navigationStyle": "custom"
 }
