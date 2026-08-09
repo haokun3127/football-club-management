@@ -1,59 +1,58 @@
 import { requireRole } from "../../../utils/auth";
+import { resolveNavInset } from "../../../utils/presentation";
 
-interface TimeSlot {
-  day: string;
-  slots: Array<{ label: string; active: boolean }>;
+type FeatureState = "enabled" | "unavailable" | "pending";
+
+interface PageData {
+  navInset: number;
+  featureState: FeatureState;
+  featureTitle: string;
+  featureMessage: string;
+  coachStatus: string;
+  availabilityMessage: string;
 }
 
-const STORAGE_KEY = "coach-private-interest";
-
-const WEEK_DAYS = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
-const SLOT_LABELS = ["上午", "下午", "晚上"];
-
-Page({
-  data: {
-    accepting: true,
-    week: [] as TimeSlot[],
-  },
+Page<PageData>({
+  data: featurePageData(undefined),
   onLoad() {
-    if (!requireRole("coach")) return;
-    const saved = wx.getStorageSync(STORAGE_KEY) as { accepting?: boolean; active?: Record<string, boolean> } | "";
-    const active = (saved && saved.active) || { "周六-上午": true, "周六-下午": true, "周日-上午": true };
-    this.setData({
-      accepting: saved && typeof saved.accepting === "boolean" ? saved.accepting : true,
-      week: WEEK_DAYS.map((day) => ({
-        day,
-        slots: SLOT_LABELS.map((label) => ({
-          label,
-          active: Boolean(active[`${day}-${label}`]),
-        })),
-      })),
-    });
+    const session = requireRole("coach");
+    if (!session) return;
+    this.setData(featurePageData(session.capabilities?.features?.private_lessons));
   },
-  toggleAccepting() {
-    const accepting = !this.data.accepting;
-    this.setData({ accepting });
-    this.persist();
-    wx.showToast({ title: accepting ? "已开启私教预约" : "已关闭私教预约", icon: "none" });
-  },
-  toggleSlot(event: { currentTarget: { dataset: { day: string; label: string } } }) {
-    const { day, label } = event.currentTarget.dataset;
-    const week = this.data.week.map((row: TimeSlot) =>
-      row.day !== day ? row : {
-        day: row.day,
-        slots: row.slots.map((slot) => slot.label !== label ? slot : { ...slot, active: !slot.active }),
-      },
-    );
-    this.setData({ week });
-    this.persist();
-  },
-  persist() {
-    const active: Record<string, boolean> = {};
-    this.data.week.forEach((row: TimeSlot) => {
-      row.slots.forEach((slot) => {
-        if (slot.active) active[`${row.day}-${slot.label}`] = true;
-      });
-    });
-    wx.setStorageSync(STORAGE_KEY, { accepting: this.data.accepting, active });
+  goBack() {
+    wx.navigateBack();
   },
 });
+
+function featurePageData(feature: unknown): PageData {
+  if (feature === true) {
+    return {
+      navInset: resolveNavInset(),
+      featureState: "enabled",
+      featureTitle: "私教服务已开通",
+      featureMessage: "家长可提交私教意向，当前教练接单状态与确认排期尚未接入",
+      coachStatus: "状态待同步",
+      availabilityMessage: "当前教练可用时段尚未接入",
+    };
+  }
+
+  if (feature === false) {
+    return {
+      navInset: resolveNavInset(),
+      featureState: "unavailable",
+      featureTitle: "俱乐部未开通私教服务",
+      featureMessage: "当前无法提供私教意向服务",
+      coachStatus: "状态待同步",
+      availabilityMessage: "俱乐部未开通，暂无可用时段",
+    };
+  }
+
+  return {
+    navInset: resolveNavInset(),
+    featureState: "pending",
+    featureTitle: "私教服务状态待同步",
+    featureMessage: "暂无法确认俱乐部是否已开通私教服务",
+    coachStatus: "状态待同步",
+    availabilityMessage: "当前教练可用时段尚未接入",
+  };
+}
