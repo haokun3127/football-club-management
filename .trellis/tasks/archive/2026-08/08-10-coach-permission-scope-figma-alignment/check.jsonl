@@ -1,0 +1,2 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Verify the UI does not turn entrypoint availability into write authority"}
+{"file":".trellis/tasks/08-10-coach-permission-scope-figma-alignment/design.md","reason":"Verify fixed capability projection and no-write boundary"}
