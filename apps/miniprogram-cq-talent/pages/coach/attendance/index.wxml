@@ -14,8 +14,8 @@
       <view wx:if="{{correctionMode}}" class="correction-alert">
         <view class="correction-alert__icon">!</view>
         <view class="correction-alert__texts">
-          <view class="correction-alert__title">出勤记录需要修改</view>
-          <view class="correction-alert__text">请核实后重新提交（{{disputedCount}} 条异常）</view>
+          <view class="correction-alert__title">出勤更正模式</view>
+          <view class="correction-alert__text">请核对当前名单中的出勤状态和备注，再重新提交。</view>
         </view>
       </view>
 

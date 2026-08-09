@@ -33,6 +33,7 @@ globalThis.wx = {
 await import("./index.ts");
 
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
+const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
 
 function createPageInstance(data = {}) {
   const instance = {
@@ -143,6 +144,31 @@ describe("coach attendance", () => {
     expect(failedPage.data.roster[0]).toMatchObject({ note: "Keep this edit" });
   });
 
+  it("uses correction mode to revise the real roster without inventing a parent dispute", async () => {
+    mocks.getCoachWorkbench.mockResolvedValue(workbench);
+    mocks.saveCoachAttendance.mockRejectedValueOnce(Object.assign(new Error("forbidden"), { status: 403 }));
+    const page = createPageInstance();
+
+    await page.onLoad({ id: "event-1", mode: "correction" });
+    expect(page.data).toMatchObject({
+      correctionMode: true,
+      roster: [
+        { studentId: "student-late", status: "late" },
+        { studentId: "student-leave", status: "leave_requested" },
+        { studentId: "student-excused", status: "excused" },
+      ],
+    });
+
+    await page.saveAttendance();
+    expect(mocks.saveCoachAttendance).toHaveBeenCalledWith("event-1", expect.arrayContaining([
+      expect.objectContaining({ studentId: "student-late", status: "late" }),
+      expect.objectContaining({ studentId: "student-leave", status: "leave_requested" }),
+      expect.objectContaining({ studentId: "student-excused", status: "excused" }),
+    ]));
+    expect(page.data).toMatchObject({ saving: false, hasSaveError: true });
+    expect(globalThis.wx.redirectTo).not.toHaveBeenCalled();
+  });
+
   it("keeps missing IDs, empty rosters, and workbench failures as safe page states", async () => {
     const missingPage = createPageInstance();
     await missingPage.load("");
@@ -170,6 +196,10 @@ describe("coach attendance", () => {
     expect(template).not.toContain("陈小宇");
     expect(template).not.toContain("林一诺");
     expect(template).not.toContain("共 20 名学员");
+    expect(template).toContain("请核对当前名单中的出勤状态和备注，再重新提交。");
+    expect(template).not.toContain("异常");
+    expect(template).not.toContain("家长异议");
+    expect(controller).not.toContain("disputedCount");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 });

@@ -34,7 +34,6 @@ interface AttendancePageData {
   statusOptions: typeof statusOptions;
   summary: { total: number; present: number; absent: number; pendingCount: number };
   correctionMode: boolean;
-  disputedCount: number;
   hasSaveError: boolean;
   saveError: string;
 }
@@ -57,7 +56,6 @@ Page<AttendancePageData>({
     statusOptions,
     summary: { total: 0, present: 0, absent: 0, pendingCount: 0 },
     correctionMode: false,
-    disputedCount: 0,
     hasSaveError: false,
     saveError: "",
   },
@@ -88,9 +86,6 @@ Page<AttendancePageData>({
       const eventStatus = activityStatus(workbench.event.status);
       const eventMeta = eventMetadata(workbench.event.teamName, workbench.event.startsAt, workbench.event.endsAt);
       const canSave = workbench.event.status !== "cancelled" && roster.length > 0;
-      const disputedCount = this.data.correctionMode
-        ? roster.filter((student) => student.status === "absent" || student.status === "leave_requested").length
-        : 0;
       this.setData({
         state: roster.length ? "ready" : "empty",
         message: roster.length ? "" : "当前活动还没有可点名学员。",
@@ -104,7 +99,6 @@ Page<AttendancePageData>({
         hasRoster: roster.length > 0,
         canSave,
         summary: summarizeRoster(roster),
-        disputedCount,
         saving: false,
         hasSaveError: false,
         saveError: "",
