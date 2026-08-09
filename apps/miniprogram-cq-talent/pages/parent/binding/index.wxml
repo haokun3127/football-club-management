@@ -12,7 +12,7 @@
         <view class="binding-card__title">绑定学员</view>
         <view wx:if="{{activeChild}}" class="binding-child" data-id="{{activeChild.id}}" bindtap="switchChild">
           <view class="binding-child__avatar">{{activeChild.avatarLetter}}</view>
-          <view class="binding-child__info"><view class="binding-child__name">{{activeChild.name}}</view><view class="binding-child__team">{{activeChild.teams[0] || '重庆天才足球俱乐部'}}</view></view>
+          <view class="binding-child__info"><view class="binding-child__name">{{activeChild.name}}</view><view class="binding-child__team">{{activeChild.teamLabel}}</view></view>
           <view class="binding-child__chip">已绑定</view>
         </view>
         <view class="binding-card__hint" bindtap="chooseChild">切换学员</view>
@@ -25,9 +25,7 @@
 
       <view class="binding-card binding-card--family">
         <view class="binding-card__title">家庭成员</view>
-        <view class="family-row"><image src="/assets/icons/user.svg" mode="aspectFit" /><view class="family-row__main"><view class="family-row__name">主监护人</view><view class="family-row__phone">已通过微信授权</view></view><view class="family-row__chip">已加入</view></view>
-        <view class="family-divider"></view>
-        <view class="family-add" bindtap="addFamilyMember"><image src="/assets/icons/plus.svg" mode="aspectFit" /><view>添加家庭成员</view></view>
+        <view class="family-unavailable">家庭成员信息暂不可显示</view>
       </view>
     </block>
   </view>

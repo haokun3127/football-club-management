@@ -205,9 +205,17 @@ describe("login page", () => {
   it("keeps the G2 device-frame geometry for the login card stack", () => {
     expect(styles).toContain("width: 662rpx");
     expect(styles).toContain("height: 348rpx");
-    expect(styles).toContain("height: 256rpx");
+    expect(styles).toContain("height: 288rpx");
     expect(styles).toContain("height: 100rpx");
     expect(styles.match(/box-shadow: 0 2rpx 4rpx rgba\(0,0,0,.06\);/g)).toHaveLength(2);
+  });
+
+  it("keeps the G3 restricted-account hierarchy and real return action", () => {
+    expect(template).toContain('wx:if="{{isBlocked}}"');
+    expect(template).toContain("账号暂时受限");
+    expect(template).toContain("当前账号无法进入小程序");
+    expect(template).toContain('bindtap="backToLaunch"');
+    expect(controller).toContain('wx.reLaunch({ url: "/pages/launch/index" });');
   });
 
   it("uses the 88px G2 top navigation envelope", () => {

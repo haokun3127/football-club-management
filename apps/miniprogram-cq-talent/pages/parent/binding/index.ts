@@ -7,13 +7,18 @@ import type { LoadState, StudentSummary } from "../../../utils/types";
 interface PageData {
   state: LoadState;
   message: string;
-  children: StudentSummary[];
-  activeChild: (StudentSummary & { avatarLetter: string }) | null;
+  children: BindingChild[];
+  activeChild: BindingChild | null;
   activeChildId: string;
   wechatLabel: string;
   navInset: number;
   navActionTop: number;
 }
+
+type BindingChild = StudentSummary & {
+  avatarLetter: string;
+  teamLabel: string;
+};
 
 Page<PageData>({
   data: {
@@ -34,9 +39,13 @@ Page<PageData>({
     if (!session) return;
     this.setData({ state: "loading", message: "正在读取绑定信息" });
     try {
-      const children = (await getParentChildren()).map((child: StudentSummary) => ({ ...child, avatarLetter: child.name.slice(0, 1) }));
+      const children: BindingChild[] = (await getParentChildren()).map((child: StudentSummary) => ({
+        ...child,
+        avatarLetter: child.name.slice(0, 1),
+        teamLabel: child.teams[0] || "所属球队信息待同步",
+      }));
       const stored = wx.getStorageSync("activeStudentId") as string | "";
-      const activeChildId = stored && children.some((child: StudentSummary) => child.id === stored)
+      const activeChildId = stored && children.some((child) => child.id === stored)
         ? stored
         : children[0]?.id || "";
       const activeChild = children.find((child: StudentSummary) => child.id === activeChildId) ?? null;
@@ -58,7 +67,7 @@ Page<PageData>({
   switchChild(event: { currentTarget: { dataset: { id: string } } }) {
     const id = event.currentTarget.dataset.id;
     wx.setStorageSync("activeStudentId", id);
-    const activeChild = this.data.children.find((child: StudentSummary & { avatarLetter?: string }) => child.id === id) ?? null;
+    const activeChild = this.data.children.find((child: BindingChild) => child.id === id) ?? null;
     this.setData({ activeChildId: id, activeChild });
     wx.showToast({ title: "已切换学员", icon: "success" });
   },
@@ -89,8 +98,5 @@ Page<PageData>({
   },
   openAccount() {
     openPage("/pages/parent/account/index");
-  },
-  addFamilyMember() {
-    wx.showToast({ title: "家庭成员由俱乐部管理员添加", icon: "none" });
   },
 });
