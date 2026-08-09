@@ -46,9 +46,15 @@
       <view class="p4-radar" bindtap="openRadar">
         <view class="p4-card__head"><view><view class="p4-radar__title">能力雷达</view><view class="p4-radar__sub">{{radar.length}}维度综合评估</view></view><view class="p4-radar__action">进入详情 ›</view></view>
         <view class="p4-radar-preview" wx:if="{{canDrawRadar && radarPreview}}">
+          <view wx:for="{{radarPreview.gridLayers}}" wx:key="index" class="p4-radar-preview__grid p4-radar-preview__grid--{{item.kind}}" style="width: {{item.size}}rpx; height: {{item.size}}rpx; clip-path: {{radarPreview.ringPath}}"></view>
           <view wx:for="{{radarPreview.spokes}}" wx:key="*this" class="p4-radar-preview__spoke" style="transform: translate(-50%,-50%) rotate({{item}}deg)"></view>
-          <view wx:for="{{radarPreview.rings}}" wx:key="size" class="p4-radar-preview__ring" style="width: {{item.size}}rpx; height: {{item.size}}rpx; clip-path: {{radarPreview.ringPath}}"></view>
-          <view class="p4-radar-preview__shape" style="clip-path: {{radarPreview.valuePath}}"></view>
+          <block wx:if="{{radarPreview.peerPath}}">
+            <view class="p4-radar-preview__peerline" style="clip-path: {{radarPreview.peerPath}}"></view>
+            <view class="p4-radar-preview__peerfill" style="clip-path: {{radarPreview.peerPathInner}}"></view>
+          </block>
+          <view class="p4-radar-preview__shapeline" style="clip-path: {{radarPreview.valuePath}}"></view>
+          <view class="p4-radar-preview__shapefill" style="clip-path: {{radarPreview.valuePathInner}}"></view>
+          <view wx:for="{{radarPreview.labels}}" wx:key="text" class="p4-radar-preview__label" style="left: {{item.x}}%; top: {{item.y}}%">{{item.text}}</view>
           <view class="p4-radar-preview__dot"></view>
         </view>
         <view wx:else class="p4-radar__empty">指标正在积累</view>

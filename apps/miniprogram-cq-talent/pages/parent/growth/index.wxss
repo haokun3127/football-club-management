@@ -39,9 +39,15 @@
 /* Figma P4: dark radar card */
 .p4-radar { display: flex; flex-direction: column; gap: 24rpx; padding: 32rpx; border-radius: 32rpx; background: #07111f; box-shadow: 0 4rpx 16rpx rgba(0,0,0,.05); }
 .p4-radar__title { color: #ffffff; font-size: 28rpx; font-weight: 700; }.p4-radar__sub { margin-top: 4rpx; color: #ffffff; font-size: 22rpx; }.p4-radar__action { padding: 10rpx 20rpx; border: 1rpx solid #a80f1b; border-radius: 40rpx; color: #a80f1b; font-size: 24rpx; font-weight: 600; }.p4-radar__empty { padding: 80rpx 0; color: #ffffff; font-size: 26rpx; text-align: center; }
-.p4-radar-preview { position: relative; align-self: center; width: 240rpx; height: 240rpx; }
-.p4-radar-preview__ring { position: absolute; top: 50%; left: 50%; box-sizing: border-box; border: 2rpx solid rgba(255,255,255,.42); transform: translate(-50%,-50%); }
-.p4-radar-preview__spoke { position: absolute; top: 50%; left: 50%; width: 240rpx; height: 2rpx; background: rgba(255,255,255,.36); transform-origin: center; }
-.p4-radar-preview__shape { position: absolute; top: 50%; left: 50%; width: 240rpx; height: 240rpx; border: 4rpx solid #a80f1b; background: rgba(168,15,27,.34); transform: translate(-50%,-50%); }
+.p4-radar-preview { position: relative; align-self: center; width: 560rpx; height: 560rpx; }
+.p4-radar-preview__grid { position: absolute; top: 50%; left: 50%; box-sizing: border-box; transform: translate(-50%,-50%); }
+.p4-radar-preview__grid--line { background: rgba(255,255,255,.42); }
+.p4-radar-preview__grid--cover { background: #07111f; }
+.p4-radar-preview__spoke { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 2rpx; background: rgba(255,255,255,.36); transform-origin: center; }
+.p4-radar-preview__shapeline { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 336rpx; background: #a80f1b; transform: translate(-50%,-50%); }
+.p4-radar-preview__shapefill { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 336rpx; background: rgba(168,15,27,.34); transform: translate(-50%,-50%); }
+.p4-radar-preview__peerline { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 336rpx; background: rgba(255,255,255,.5); transform: translate(-50%,-50%); }
+.p4-radar-preview__peerfill { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 336rpx; background: rgba(255,255,255,.08); transform: translate(-50%,-50%); }
+.p4-radar-preview__label { position: absolute; color: #ffffff; font-size: 18rpx; line-height: 24rpx; white-space: nowrap; transform: translate(-50%,-50%); }
 .p4-radar-preview__dot { position: absolute; top: 50%; left: 50%; width: 12rpx; height: 12rpx; border-radius: 50%; background: #ffffff; box-shadow: 0 0 0 4rpx #b70f20; transform: translate(-50%,-50%); }
 .metric-scroll { width: 100%; white-space: nowrap; }.metric-chips { display: inline-flex; gap: 12rpx; }.metric-chip { display: inline-flex; align-items: center; gap: 10rpx; padding: 12rpx 20rpx; border: 1rpx solid #e7eaf0; border-radius: 999rpx; background: #ffffff; color: #60646f; font-size: 24rpx; }.metric-chip.active { border-color: #a80f1b; background: #fceeef; color: #a80f1b; font-weight: 700; }.metric-chip__dot { width: 10rpx; height: 10rpx; border-radius: 50%; background: currentColor; }.metric-summary { display: flex; flex-direction: column; gap: 16rpx; padding: 32rpx; border-radius: 32rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0,0,0,.05); }.metric-value { color: #a80f1b; font-size: 56rpx; font-weight: 800; }
