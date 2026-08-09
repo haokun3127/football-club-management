@@ -4,9 +4,28 @@ import { openPage } from "../../../utils/navigation";
 import { activityStatus, activityTypeLabel, formatCalendarDate, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
 
-type RosterPreview = CoachWorkbench["roster"][number] & { statusLabel: string };
+type WorkbenchAction = "attendance" | "lesson" | "match" | "tactical" | "training" | "assessment" | "change";
 
-type RosterDot = { studentId: string; initial: string; present: boolean };
+type ActionCard = {
+  id: WorkbenchAction;
+  label: string;
+  toneClass: string;
+};
+
+type RosterRow = CoachWorkbench["roster"][number] & { statusLabel: string };
+
+type EventView = {
+  title: string;
+  typeLabel: string;
+  statusLabel: string;
+  statusTone: string;
+  teamName: string;
+  hasTeamName: boolean;
+  venue: string;
+  hasVenue: boolean;
+  timeLabel: string;
+  hasTime: boolean;
+};
 
 Page({
   data: {
@@ -14,18 +33,25 @@ Page({
     menuInset: resolveMenuInset(),
     state: "loading" as LoadState,
     message: "正在读取活动工作台",
-    workbench: null as CoachWorkbench | null,
-    rosterPreview: [] as RosterPreview[],
-    rosterDots: [] as RosterDot[],
     eventId: "",
     eventTypeLabel: "活动",
-    statusLabel: "安排中",
-    statusTone: "neutral",
-    timeLabel: "时间待确认",
-    completionCount: 0,
-    rosterSummary: "",
-    presentCount: 0,
-    elapsedText: "00:00:00",
+    eventView: null as EventView | null,
+    rosterRows: [] as RosterRow[],
+    rosterCount: 0,
+    workflowRows: [] as CoachWorkbench["workflow"],
+    trainingRows: [] as CoachWorkbench["training"],
+    matchRows: [] as CoachWorkbench["match"],
+    pendingRows: [] as CoachWorkbench["pending"],
+    actionCards: [] as ActionCard[],
+    assessmentTemplateId: "",
+    canWrite: false,
+    hasRoster: false,
+    hasWorkflow: false,
+    hasTraining: false,
+    hasMatch: false,
+    hasPendingRows: false,
+    hasActionCards: false,
+    hasAssessmentTemplate: false,
   },
   onLoad(query?: Record<string, string | undefined>) {
     requireRole("coach");
@@ -36,57 +62,79 @@ Page({
       this.setData({ state: "error", message: "缺少活动 ID" });
       return;
     }
+    this.setData({ state: "loading", message: "正在读取活动工作台", eventId: id });
     try {
       const workbench = await getCoachWorkbench(id);
-      const status = activityStatus(workbench.event.status);
-      const completionCount = workbench.workflow.filter((item) => item.status === "ready").length;
-      const presentCount = workbench.roster.filter((item) => ["confirmed", "present", "attended"].includes(item.status)).length;
-      const exceptionCount = workbench.roster.length - presentCount;
+      const eventView = presentEvent(workbench);
+      const canWrite = workbench.event.status !== "cancelled";
+      const rosterRows = workbench.roster.map((item) => ({ ...item, statusLabel: rosterStatusLabel(item.status) }));
+      const workflowRows = workbench.workflow.map((item) => ({ ...item }));
+      const trainingRows = workbench.event.type === "training" ? workbench.training.map((item) => ({ ...item })) : [];
+      const matchRows = workbench.event.type === "match" ? workbench.match.map((item) => ({ ...item })) : [];
+      const pendingRows = workbench.pending.map((item) => ({ ...item }));
+      const actionCards = buildActionCards(workbench, canWrite);
+      const hasDetails = rosterRows.length > 0
+        || workflowRows.length > 0
+        || trainingRows.length > 0
+        || matchRows.length > 0
+        || pendingRows.length > 0
+        || actionCards.length > 0;
+
       this.setData({
-        state: "ready",
-        message: "",
-        workbench,
+        state: hasDetails ? "ready" : "empty",
+        message: hasDetails ? "" : "当前活动暂无可用工作台数据",
         eventId: id,
-        rosterPreview: workbench.roster.slice(0, 5).map((item) => ({ ...item, statusLabel: rosterStatusLabel(item.status) })),
-        rosterDots: workbench.roster.slice(0, 10).map((item) => ({
-          studentId: item.studentId,
-          initial: item.name.slice(0, 1),
-          present: ["confirmed", "present", "attended"].includes(item.status),
-        })),
         eventTypeLabel: activityTypeLabel(workbench.event.type),
-        statusLabel: status.label,
-        statusTone: status.tone,
-        timeLabel: `${formatCalendarDate(workbench.event.startsAt)} · ${formatTimeRange(workbench.event.startsAt, workbench.event.endsAt)}`,
-        completionCount,
-        presentCount,
-        elapsedText: elapsedLabel(workbench.event.startsAt),
-        rosterSummary: exceptionCount ? `${workbench.roster.length} 人 · ${exceptionCount} 人待确认` : `${workbench.roster.length} 人 · 名单状态正常`,
+        eventView,
+        rosterRows,
+        rosterCount: rosterRows.length,
+        workflowRows,
+        trainingRows,
+        matchRows,
+        pendingRows,
+        actionCards,
+        assessmentTemplateId: workbench.assessmentTemplateId || "",
+        canWrite,
+        hasRoster: rosterRows.length > 0,
+        hasWorkflow: workflowRows.length > 0,
+        hasTraining: trainingRows.length > 0,
+        hasMatch: matchRows.length > 0,
+        hasPendingRows: pendingRows.length > 0,
+        hasActionCards: actionCards.length > 0,
+        hasAssessmentTemplate: Boolean(workbench.assessmentTemplateId),
       });
-    } catch (error) {
-      this.setData({ state: "error", message: readableError(error), eventId: id });
+    } catch {
+      this.setData({
+        state: "error",
+        message: "活动读取失败，请稍后重试",
+        eventId: id,
+        eventView: null,
+        rosterRows: [],
+        rosterCount: 0,
+        workflowRows: [],
+        trainingRows: [],
+        matchRows: [],
+        pendingRows: [],
+        actionCards: [],
+        assessmentTemplateId: "",
+        canWrite: false,
+        hasRoster: false,
+        hasWorkflow: false,
+        hasTraining: false,
+        hasMatch: false,
+        hasPendingRows: false,
+        hasActionCards: false,
+        hasAssessmentTemplate: false,
+      });
     }
   },
-  openAttendance() {
-    openPage(`/pages/coach/attendance/index?id=${this.data.eventId}`);
-  },
-  openLesson() {
-    openPage(`/pages/coach/lesson/index?id=${this.data.eventId}`);
-  },
-  openMatch() {
-    openPage(`/pages/coach/match/index?id=${this.data.eventId}`);
-  },
-  openTacticalBoard() {
-    openPage(`/pages/coach/tactical-board/index?eventId=${this.data.eventId}`);
-  },
-  openTraining() {
-    openPage(`/pages/coach/training/index?eventId=${this.data.eventId}`);
-  },
-  openChange() {
-    openPage(`/pages/coach/event-change/index?id=${this.data.eventId}`);
-  },
-  openTestEntry() {
-    const templateId = this.data.workbench?.assessmentTemplateId || "";
-    openPage(`/pages/coach/test-entry/index?eventId=${this.data.eventId}&templateId=${templateId}`);
+  openAction(event: { currentTarget?: { dataset?: { action?: WorkbenchAction } } }) {
+    const action = event.currentTarget?.dataset?.action;
+    const id = this.data.eventId;
+    if (!this.data.canWrite || !id || !action || !this.data.actionCards.some((item: ActionCard) => item.id === action)) return;
+
+    const route = routeForAction(action, id, this.data.assessmentTemplateId);
+    if (route) openPage(route);
   },
   retry() {
     this.load(this.data.eventId);
@@ -94,33 +142,56 @@ Page({
   goBack() {
     wx.navigateBack();
   },
-  finishSession() {
-    const id = this.data.eventId;
-    if (!id) return;
-    if (this.data.workbench?.event.type === "training") {
-      openPage(`/pages/coach/lesson/index?id=${id}`);
-    } else if (this.data.workbench?.event.type === "match") {
-      openPage(`/pages/coach/match/index?id=${id}`);
-    } else {
-      openPage(`/pages/coach/lesson/index?id=${id}`);
-    }
-  },
 });
 
-function elapsedLabel(startsAt?: string) {
-  const start = Date.parse(startsAt ?? "");
-  if (!Number.isFinite(start)) return "00:00:00";
-  const elapsed = Math.max(0, Date.now() - start);
-  const hours = Math.floor(elapsed / 3_600_000);
-  const minutes = Math.floor((elapsed % 3_600_000) / 60_000);
-  const seconds = Math.floor((elapsed % 60_000) / 1000);
-  const pad = (value: number) => String(value).padStart(2, "0");
-  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+function presentEvent(workbench: CoachWorkbench): EventView {
+  const status = activityStatus(workbench.event.status);
+  const hasTime = Boolean(workbench.event.startsAt && workbench.event.endsAt);
+  return {
+    title: workbench.event.title,
+    typeLabel: activityTypeLabel(workbench.event.type),
+    statusLabel: status.label,
+    statusTone: status.tone,
+    teamName: workbench.event.teamName || "",
+    hasTeamName: Boolean(workbench.event.teamName),
+    venue: workbench.event.venue || "",
+    hasVenue: Boolean(workbench.event.venue),
+    timeLabel: hasTime ? `${formatCalendarDate(workbench.event.startsAt)} · ${formatTimeRange(workbench.event.startsAt, workbench.event.endsAt)}` : "",
+    hasTime,
+  };
 }
 
-function readableError(error: unknown) {
-  const record = error as { message?: string; code?: string };
-  return record?.message || record?.code || "活动工作台读取失败。";
+function buildActionCards(workbench: CoachWorkbench, canWrite: boolean): ActionCard[] {
+  if (!canWrite) return [];
+
+  const cards: ActionCard[] = [];
+  if (workflowPending(workbench, "点名")) cards.push({ id: "attendance", label: "点名", toneClass: "action-tile--primary" });
+  if (workbench.event.type !== "other" && workflowPending(workbench, "销课")) cards.push({ id: "lesson", label: "销课", toneClass: "" });
+  if (workbench.event.type === "training") cards.push({ id: "training", label: "训练内容", toneClass: "" });
+  if (workbench.event.type === "match") {
+    cards.push({ id: "match", label: "比赛录入", toneClass: "action-tile--match" });
+    cards.push({ id: "tactical", label: "比赛战术板", toneClass: "action-tile--match" });
+  }
+  if (workbench.assessmentTemplateId) cards.push({ id: "assessment", label: "评测录入", toneClass: "" });
+  cards.push({ id: "change", label: "变更活动", toneClass: "" });
+  return cards;
+}
+
+function workflowPending(workbench: CoachWorkbench, label: string) {
+  return workbench.workflow.some((item) => item.label === label && item.status === "pending");
+}
+
+function routeForAction(action: WorkbenchAction, eventId: string, templateId: string) {
+  const routes: Record<Exclude<WorkbenchAction, "assessment">, string> = {
+    attendance: `/pages/coach/attendance/index?id=${eventId}`,
+    lesson: `/pages/coach/lesson/index?id=${eventId}`,
+    match: `/pages/coach/match/index?id=${eventId}`,
+    tactical: `/pages/coach/tactical-board/index?eventId=${eventId}`,
+    training: `/pages/coach/training/index?eventId=${eventId}`,
+    change: `/pages/coach/event-change/index?id=${eventId}`,
+  };
+  if (action === "assessment") return templateId ? `/pages/coach/test-entry/index?eventId=${eventId}&templateId=${templateId}` : "";
+  return routes[action];
 }
 
 function rosterStatusLabel(value: string) {
@@ -128,10 +199,13 @@ function rosterStatusLabel(value: string) {
     pending: "待确认",
     invited: "待确认",
     confirmed: "已确认",
-    present: "已到课",
-    attended: "已到课",
+    present: "已到场",
+    attended: "已到场",
     absent: "缺席",
+    late: "迟到",
+    leave_requested: "请假",
     leave: "请假",
+    excused: "免扣",
   };
   return labels[value.toLowerCase()] ?? "待确认";
 }

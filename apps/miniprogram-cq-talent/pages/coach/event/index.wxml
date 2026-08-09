@@ -1,75 +1,77 @@
 <view class="c2">
-  <!-- C2 Top Nav -->
   <view class="c2-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="c2-nav__left" bindtap="goBack">
       <view class="c2-nav__back">‹</view>
       <view class="c2-nav__title">{{eventTypeLabel}}工作台</view>
     </view>
-    <view wx:if="{{workbench && workbench.event.status !== 'cancelled'}}" class="c2-nav__action" bindtap="finishSession">结束{{eventTypeLabel}}</view>
   </view>
 
   <view class="c2-body">
-    <status-view state="{{state}}" title="{{state === 'loading' ? '加载活动' : '活动读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <status-view state="{{state}}" title="{{state === 'loading' ? '加载活动' : state === 'empty' ? '暂无工作台数据' : '活动读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
-    <!-- C2 Session Header -->
-    <view wx:if="{{workbench}}" class="shero">
-      <view class="shero__title">{{workbench.event.title}}</view>
-      <view class="shero__meta">{{workbench.event.teamName || '队伍待确认'}} · {{timeLabel}}</view>
-      <view class="shero__timer-row">
-        <view class="shero__clock">🕐</view>
-        <view class="shero__timer">{{elapsedText}}</view>
+    <block wx:if="{{state === 'ready'}}">
+    <view wx:if="{{eventView}}" class="shero">
+      <view class="shero__heading">
+        <view>
+          <view class="shero__eyebrow">{{eventView.typeLabel}}</view>
+          <view class="shero__title">{{eventView.title}}</view>
+        </view>
+        <status-chip label="{{eventView.statusLabel}}" tone="{{eventView.statusTone}}" compact="{{true}}" />
       </view>
+      <view wx:if="{{eventView.hasTime}}" class="shero__meta">{{eventView.timeLabel}}</view>
       <view class="shero__chips">
-        <view class="shero__chip shero__chip--green">● 出席 {{presentCount}}/{{workbench.roster.length}} 人</view>
-        <view class="shero__chip shero__chip--gray">{{workbench.event.venue || '地点待确认'}}</view>
-        <view class="shero__chip shero__chip--green">● {{statusLabel}}</view>
+        <view wx:if="{{eventView.hasTeamName}}" class="shero__chip">{{eventView.teamName}}</view>
+        <view wx:if="{{eventView.hasVenue}}" class="shero__chip shero__chip--muted">{{eventView.venue}}</view>
       </view>
     </view>
 
-    <!-- C2 Attendance Card -->
-    <view wx:if="{{workbench}}" class="acard2" bindtap="openAttendance">
-      <view class="acard2__head">
-        <view class="acard2__title">出勤情况 {{presentCount}}/{{workbench.roster.length}}</view>
-        <view class="acard2__link">查看详情</view>
-      </view>
-      <view class="acard2__dots">
-        <view wx:for="{{rosterDots}}" wx:key="studentId" class="acard2__dot {{item.present ? '' : 'acard2__dot--off'}}">{{item.initial}}</view>
-      </view>
-      <view class="acard2__summary">{{rosterSummary}}</view>
-    </view>
-
-    <view wx:if="{{workbench}}" class="workbench-card completion-card">
-      <view class="row"><view><view class="section-title">记录完善度</view><view class="subtitle">完成活动后续所需的关键记录</view></view><view class="completion-card__score">{{completionCount}}/{{workbench.workflow.length}}</view></view>
-      <view wx:for="{{workbench.workflow}}" wx:key="label" class="field-row">
+    <view wx:if="{{hasWorkflow}}" class="workbench-card">
+      <view class="section-title">流程状态</view>
+      <view wx:for="{{workflowRows}}" wx:key="label" class="field-row">
         <view class="label">{{item.label}}</view>
         <status-chip label="{{item.value}}" tone="{{item.status === 'ready' ? 'success' : 'pending'}}" compact="{{true}}" />
       </view>
     </view>
 
-    <view wx:if="{{workbench && workbench.event.status !== 'cancelled'}}" class="workbench-card">
-      <view class="section-title">下一步操作</view>
+    <view wx:if="{{hasActionCards}}" class="workbench-card">
+      <view class="section-title">可用操作</view>
       <view class="action-grid">
-        <button class="action-tile action-tile--primary" bindtap="openAttendance"><text class="action-tile__icon">点</text><text>点名</text></button>
-        <button wx:if="{{workbench.event.type !== 'other'}}" class="action-tile" bindtap="openLesson"><text class="action-tile__icon">课</text><text>销课</text></button>
-        <button wx:if="{{workbench.event.type === 'match'}}" class="action-tile action-tile--match" bindtap="openMatch"><text class="action-tile__icon">赛</text><text>比赛录入</text></button>
-        <button wx:if="{{workbench.event.type === 'match'}}" class="action-tile action-tile--match" bindtap="openTacticalBoard"><text class="action-tile__icon">阵</text><text>比赛战术板</text></button>
-        <button wx:if="{{workbench.event.type === 'training'}}" class="action-tile" bindtap="openTraining"><text class="action-tile__icon">训</text><text>训练内容</text></button>
-        <button wx:if="{{workbench.event.type === 'training' && workbench.assessmentTemplateId}}" class="action-tile" bindtap="openTestEntry"><text class="action-tile__icon">测</text><text>评测录入</text></button>
-        <button class="action-tile" bindtap="openChange"><text class="action-tile__icon">变</text><text>变更活动</text></button>
+        <button wx:for="{{actionCards}}" wx:key="id" class="action-tile {{item.toneClass}}" data-action="{{item.id}}" bindtap="openAction">{{item.label}}</button>
       </view>
     </view>
 
-    <view wx:if="{{workbench}}" class="workbench-card">
-      <view class="row"><view class="section-title">名单摘要</view><view class="roster-count">{{workbench.roster.length}} 人</view></view>
-      <view wx:for="{{rosterPreview}}" wx:key="studentId" class="field-row">
+    <view wx:if="{{hasRoster}}" class="workbench-card">
+      <view class="row">
+        <view class="section-title">参与成员</view>
+        <view class="roster-count">{{rosterCount}} 人</view>
+      </view>
+      <view class="subtitle">状态来自活动名单确认，不作为出勤统计。</view>
+      <view wx:for="{{rosterRows}}" wx:key="studentId" class="field-row">
         <view class="label">{{item.name}}</view>
         <view class="field-value">{{item.statusLabel}}</view>
       </view>
     </view>
 
-    <view wx:if="{{workbench}}" wx:for="{{workbench.pending}}" wx:key="title" class="workbench-card workbench-card--pending">
+    <view wx:if="{{hasTraining}}" class="workbench-card">
+      <view class="section-title">训练内容</view>
+      <view wx:for="{{trainingRows}}" wx:key="label" class="field-row">
+        <view class="label">{{item.label}}</view>
+        <view class="field-value">{{item.value}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{hasMatch}}" class="workbench-card">
+      <view class="section-title">比赛记录</view>
+      <view wx:for="{{matchRows}}" wx:key="label" class="field-row">
+        <view class="label">{{item.label}}</view>
+        <view class="field-value">{{item.value}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{hasPendingRows}}" wx:for="{{pendingRows}}" wx:key="title" class="workbench-card workbench-card--pending">
       <view class="section-title">{{item.title}}</view>
       <view class="subtitle">{{item.message}}</view>
     </view>
+    </block>
   </view>
 </view>
