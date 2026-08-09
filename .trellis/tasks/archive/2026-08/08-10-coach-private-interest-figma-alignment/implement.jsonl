@@ -1,0 +1,2 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Keep parent-only private-lesson routes separate from coach capability display"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Preserve the capability-to-UI projection boundary without invented writes"}

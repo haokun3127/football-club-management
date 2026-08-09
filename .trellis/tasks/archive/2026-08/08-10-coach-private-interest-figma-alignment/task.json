@@ -1,0 +1,33 @@
+{
+  "id": "coach-private-interest-figma-alignment",
+  "name": "coach-private-interest-figma-alignment",
+  "title": "Coach private interest Figma alignment",
+  "description": "Align C16.2 coach private-interest to the read-only private_lessons feature capability.",
+  "status": "completed",
+  "dev_type": "frontend",
+  "scope": "coach-private-interest",
+  "package": "miniprogram-cq-talent",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-08-10",
+  "completedAt": "2026-08-10",
+  "branch": null,
+  "base_branch": "codex/chongqing-talent-business",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "07-30-figma-design-foundation",
+  "relatedFiles": [
+    "apps/miniprogram-cq-talent/pages/coach/private-interest/index.json",
+    "apps/miniprogram-cq-talent/pages/coach/private-interest/index.ts",
+    "apps/miniprogram-cq-talent/pages/coach/private-interest/index.wxml",
+    "apps/miniprogram-cq-talent/pages/coach/private-interest/index.wxss",
+    "apps/miniprogram-cq-talent/pages/coach/private-interest/index.test.mjs",
+    "apps/miniprogram-cq-talent/assets/icons/c162-chevron-left.svg"
+  ],
+  "notes": "Figma: zZ6wKyOHKcO4UYXDd9jGwv / 93:1238 / C16.2 Private Interest. Read-only private_lessons feature availability; no coach acceptance or schedule contract.",
+  "meta": {}
+}

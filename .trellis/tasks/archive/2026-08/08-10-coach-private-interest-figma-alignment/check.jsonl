@@ -1,0 +1,2 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Verify no coach private-lesson BFF contract is invented"}
+{"file":".trellis/tasks/08-10-coach-private-interest-figma-alignment/design.md","reason":"Verify feature-flag tri-state and no-write UI boundary"}
