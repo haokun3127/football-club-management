@@ -11,6 +11,7 @@
 .page-nav--plain { justify-content: space-between; }
 .page-nav__title { font-size: 40rpx; font-weight: 700; color: var(--color-text); }
 .page-nav__action { width: 72rpx; height: 72rpx; display: flex; align-items: center; justify-content: center; border-radius: 36rpx; background: #f6f7f9; }
+.page-nav__action--disabled { opacity: 0.45; }
 .page-nav__action-icon { width: 36rpx; height: 36rpx; }
 .icon-search { width: 26rpx; height: 26rpx; border: 4rpx solid var(--color-text); border-radius: 50%; box-sizing: border-box; position: relative; }
 .icon-search::after { content: ""; position: absolute; width: 12rpx; height: 4rpx; background: var(--color-text); right: -9rpx; bottom: -4rpx; transform: rotate(45deg); border-radius: 4rpx; }
@@ -129,12 +130,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.article-card__chevron {
-  font-size: 40rpx;
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
 }
 
 .article-empty {
