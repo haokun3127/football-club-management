@@ -2,52 +2,56 @@ import { getCoachHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { DEV_TEST_DATE } from "../../../utils/config";
 import { openPage } from "../../../utils/navigation";
-import { activityStatus, formatCalendarDate, formatTimeRange, resolveNavInset } from "../../../utils/presentation";
-import type { CoachHome, CoachTaskAction, LoadState, ScheduleEvent } from "../../../utils/types";
+import { activityStatus, formatCalendarDate, resolveNavInset } from "../../../utils/presentation";
+import type { CoachHome, CoachTask, CoachTaskAction, LoadState, ScheduleEvent } from "../../../utils/types";
 
-type Filter = "all" | "pending" | "training" | "match";
+const WEEK_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-const filters: Array<{ label: string; value: Filter }> = [
-  { label: "全部", value: "all" },
-  { label: "待处理", value: "pending" },
-  { label: "训练", value: "training" },
-  { label: "比赛", value: "match" },
-];
+type Filter = "all" | "training" | "match" | "pending";
 
 type CoachEventView = ScheduleEvent & {
-  timeLabel: string;
-  dateLabel: string;
-  statusLabel: string;
-  statusTone: string;
   startTime: string;
   durationText: string;
+  statusLabel: string;
+  statusTone: string;
   typeColor: string;
-  meta: Array<{ label: string; value: string }>;
+  coachName: string;
+  hasCoachName: boolean;
+  locationLabel: string;
+  hasLocationDetail: boolean;
+  hasTeamName: boolean;
+  hasVenue: boolean;
+  hasNextAction: boolean;
 };
 
-const TYPE_COLORS: Record<string, string> = { training: "#a80f1b", match: "#1a3a6b", other: "#6b7280" };
-const WEEK_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+type CoachTaskView = CoachTask & {
+  hasDueAt: boolean;
+  dueLabel: string;
+};
 
 Page({
   data: {
     navInset: resolveNavInset(),
     state: "loading" as LoadState,
-    message: "正在读取教练任务",
+    message: "正在读取教练日程",
     home: null as CoachHome | null,
-    teamsText: "",
-    events: [] as ScheduleEvent[],
-    visibleEvents: [] as CoachEventView[],
     date: DEV_TEST_DATE,
     selectedDate: DEV_TEST_DATE,
     viewMode: "day" as "day" | "week",
     activeFilter: "all" as Filter,
-    filters,
-    rangeLabel: "今日任务",
-    coachInitial: "教",
     dayStrip: [] as Array<{ date: string; weekLabel: string; dayNum: string }>,
-    statTraining: "今日0节训练课",
-    statMatches: "0 场比赛",
-    statPending: 0,
+    rangeLabel: "",
+    coachName: "",
+    coachInitial: "",
+    hasCoachInitial: false,
+    teamChips: [] as Array<{ name: string }>,
+    hasTeams: false,
+    summaryItems: [] as Array<{ key: "training" | "match" | "pending"; label: string; value: string; tone: string }>,
+    eventViews: [] as CoachEventView[],
+    visibleEvents: [] as CoachEventView[],
+    hasVisibleEvents: false,
+    taskCards: [] as CoachTaskView[],
+    hasTaskCards: false,
   },
   onLoad() {
     this.load();
@@ -55,27 +59,45 @@ Page({
   async load() {
     const session = requireRole("coach");
     if (!session) return;
-    this.setData({ state: "loading", message: "正在读取教练任务" });
+    const range = resolveRange(this.data.date, this.data.viewMode);
+    this.setData({ state: "loading", message: "正在读取教练日程" });
     try {
-      const to = this.data.viewMode === "week" ? addDays(this.data.date, 6) : this.data.date;
-      const home = await getCoachHome({ from: this.data.date, to });
+      const home = await getCoachHome(range);
+      const coachName = home.coachName?.trim() || "";
+      const eventViews = home.events.map((event) => toCoachEventView(event, coachName));
+      const taskCards = home.tasks.map(toCoachTaskView);
+      const hasWork = eventViews.length > 0 || taskCards.length > 0;
       this.setData({
-        state: home.events.length ? "ready" : "empty",
-        message: home.events.length ? "" : "当前日期范围没有负责的活动。",
+        state: hasWork ? "ready" : "empty",
+        message: hasWork ? "" : "所选日期范围内没有日程或待处理任务",
         home,
-        teamsText: home.teams.length ? home.teams.join("、") : "暂无负责球队",
-        events: home.events,
-        rangeLabel: this.data.viewMode === "week" ? `${formatCalendarDate(this.data.date)}起 7 天` : formatCalendarDate(this.data.date),
-        coachInitial: (home.coachName ?? "教").slice(0, 1),
-        dayStrip: buildDayStrip(this.data.date),
         selectedDate: this.data.date,
-        statTraining: `${this.data.viewMode === "week" ? "本周" : "今日"}${home.summary.training}节训练课`,
-        statMatches: `${home.summary.matches} 场比赛`,
-        statPending: home.summary.pending,
+        dayStrip: buildDayStrip(range.from),
+        rangeLabel: rangeLabel(range, this.data.viewMode),
+        coachName,
+        coachInitial: coachName.slice(0, 1),
+        hasCoachInitial: Boolean(coachName),
+        teamChips: home.teams.map((name) => ({ name })),
+        hasTeams: home.teams.length > 0,
+        summaryItems: [
+          { key: "training", label: "训练", value: String(home.summary.training), tone: "brand" },
+          { key: "match", label: "比赛", value: String(home.summary.matches), tone: "blue" },
+          { key: "pending", label: "待处理", value: String(home.summary.pending), tone: "amber" },
+        ],
+        eventViews,
+        taskCards,
+        hasTaskCards: taskCards.length > 0,
       });
       this.applyFilter();
-    } catch (error) {
-      this.setData({ state: "error", message: readableError(error) });
+    } catch {
+      this.setData({
+        state: "error",
+        message: "日程读取失败，请稍后重试",
+        visibleEvents: [],
+        hasVisibleEvents: false,
+        taskCards: [],
+        hasTaskCards: false,
+      });
     }
   },
   onDateChange(event: { detail: { value: string } }) {
@@ -105,12 +127,12 @@ Page({
   },
   applyFilter() {
     const activeFilter = this.data.activeFilter as Filter;
-    const visibleEvents = (this.data.events as ScheduleEvent[]).filter((event) => {
-      if (activeFilter === "pending") return event.nextAction && event.nextAction !== "view";
+    const visibleEvents = (this.data.eventViews as CoachEventView[]).filter((event) => {
+      if (activeFilter === "pending") return event.hasNextAction;
       if (activeFilter === "training" || activeFilter === "match") return event.type === activeFilter;
       return true;
-    }).map(toCoachEventView);
-    this.setData({ visibleEvents });
+    });
+    this.setData({ visibleEvents, hasVisibleEvents: visibleEvents.length > 0 });
   },
   openEvent(event: { detail?: { eventId?: string }; currentTarget?: { dataset?: { id?: string } } }) {
     const id = event.detail?.eventId ?? event.currentTarget?.dataset?.id;
@@ -120,7 +142,7 @@ Page({
     const id = event.detail?.eventId ?? event.currentTarget?.dataset?.id;
     const action = event.detail?.action ?? event.currentTarget?.dataset?.action;
     if (!id) return;
-    const routes: Partial<Record<CoachTaskAction, string>> = {
+    const routes: Record<CoachTaskAction, string> = {
       attendance: `/pages/coach/attendance/index?id=${id}`,
       lesson: `/pages/coach/lesson/index?id=${id}`,
       match: `/pages/coach/match/index?id=${id}`,
@@ -128,57 +150,75 @@ Page({
       training: `/pages/coach/training/index?eventId=${id}`,
       view: `/pages/coach/event/index?id=${id}`,
     };
-    openPage(routes[action ?? "view"] ?? `/pages/coach/event/index?id=${id}`);
+    openPage(routes[action ?? "view"]);
   },
   retry() {
     this.load();
   },
 });
 
-function toCoachEventView(event: ScheduleEvent): CoachEventView {
+function toCoachEventView(event: ScheduleEvent, coachName: string): CoachEventView {
   const status = activityStatus(event.status);
+  const locationLabel = [event.teamName, event.venue].filter(Boolean).join(" · ");
   return {
     ...event,
-    timeLabel: formatTimeRange(event.startsAt, event.endsAt),
-    dateLabel: formatCalendarDate(event.startsAt),
+    startTime: event.startsAt?.slice(11, 16) || "",
+    durationText: durationLabel(event.startsAt, event.endsAt),
     statusLabel: status.label,
     statusTone: status.tone,
-    startTime: event.startsAt?.slice(11, 16) || "待定",
-    durationText: durationLabel(event.startsAt, event.endsAt),
-    typeColor: TYPE_COLORS[event.type] ?? "#6b7280",
-    meta: [
-      event.teamName ? { label: "队伍", value: event.teamName } : null,
-      event.participantCount ? { label: "名单", value: `${event.participantCount} 人` } : null,
-    ].filter((item): item is { label: string; value: string } => Boolean(item)),
+    typeColor: event.type === "training" ? "#a80f1b" : event.type === "match" ? "#1976d2" : "#6b7280",
+    coachName,
+    hasCoachName: Boolean(coachName),
+    locationLabel,
+    hasLocationDetail: Boolean(locationLabel),
+    hasTeamName: Boolean(event.teamName),
+    hasVenue: Boolean(event.venue),
+    hasNextAction: Boolean(event.nextAction && event.nextActionLabel),
   };
 }
 
-function durationLabel(startsAt?: string, endsAt?: string) {
+function toCoachTaskView(task: CoachTask): CoachTaskView {
+  return {
+    ...task,
+    hasDueAt: Boolean(task.dueAt),
+    dueLabel: task.dueAt ? formatCalendarDate(task.dueAt) : "",
+  };
+}
+
+function durationLabel(startsAt?: string, endsAt?: string): string {
   const start = Date.parse(startsAt ?? "");
   const end = Date.parse(endsAt ?? "");
-  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return "时长待定";
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return "";
   return `${Math.round((end - start) / 60000)}分钟`;
 }
 
-function buildDayStrip(center: string) {
-  const base = new Date(`${center}T00:00:00.000Z`);
-  const mondayOffset = (base.getUTCDay() + 6) % 7;
-  base.setUTCDate(base.getUTCDate() - mondayOffset);
+function resolveRange(date: string, viewMode: "day" | "week") {
+  if (viewMode === "day") return { from: date, to: date };
+  const monday = startOfWeek(date);
+  return { from: monday, to: addDays(monday, 6) };
+}
+
+function startOfWeek(date: string): string {
+  const value = new Date(`${date}T00:00:00.000Z`);
+  value.setUTCDate(value.getUTCDate() - ((value.getUTCDay() + 6) % 7));
+  return value.toISOString().slice(0, 10);
+}
+
+function buildDayStrip(monday: string) {
   return Array.from({ length: 7 }, (_, index) => {
-    const day = new Date(base);
-    day.setUTCDate(base.getUTCDate() + index);
-    const date = day.toISOString().slice(0, 10);
-    return { date, weekLabel: WEEK_LABELS[day.getUTCDay()], dayNum: String(day.getUTCDate()) };
+    const date = addDays(monday, index);
+    const value = new Date(`${date}T00:00:00.000Z`);
+    return { date, weekLabel: WEEK_LABELS[value.getUTCDay()], dayNum: String(value.getUTCDate()) };
   });
 }
 
-function addDays(date: string, amount: number) {
+function addDays(date: string, amount: number): string {
   const value = new Date(`${date}T00:00:00.000Z`);
   value.setUTCDate(value.getUTCDate() + amount);
   return value.toISOString().slice(0, 10);
 }
 
-function readableError(error: unknown) {
-  const record = error as { message?: string; code?: string };
-  return record?.message || record?.code || "任务工作台读取失败。";
+function rangeLabel(range: { from: string; to: string }, viewMode: "day" | "week"): string {
+  if (viewMode === "day") return formatCalendarDate(range.from);
+  return `${formatCalendarDate(range.from)} - ${formatCalendarDate(range.to)}`;
 }

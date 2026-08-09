@@ -6,42 +6,32 @@
   align-items: center;
   justify-content: space-between;
   height: 176rpx;
-  padding-right: 44rpx;
-  padding-left: 44rpx;
+  padding: 0 44rpx;
   background: #ffffff;
   border-bottom: 1rpx solid #e7eaf0;
 }
 .c1-nav__title { color: #202124; font-size: 44rpx; font-weight: 700; line-height: 54rpx; }
-.c1-nav__avatar { display: flex; align-items: center; justify-content: center; width: 72rpx; height: 72rpx; border-radius: 50%; background: #a80f1b; color: #ffffff; font-size: 28rpx; font-weight: 700; }
+.c1-nav__avatar { display: flex; align-items: center; justify-content: center; width: 72rpx; height: 72rpx; border-radius: 36rpx; background: #a80f1b; color: #ffffff; font-size: 28rpx; font-weight: 700; }
 
 .c1-dates { display: flex; height: 128rpx; box-sizing: border-box; padding: 24rpx 44rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
 .c1-day { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; min-width: 0; border-radius: 16rpx; }
 .c1-day--selected { border-radius: 32rpx; background: #a80f1b; }
-.c1-day__week { color: #667085; font-size: 20rpx; line-height: 24rpx; }
-.c1-day__num { color: #202124; font-size: 28rpx; font-weight: 600; line-height: 34rpx; }
+.c1-day__week { color: #667085; font-size: 20rpx; line-height: 24rpx; }.c1-day__num { color: #202124; font-size: 28rpx; font-weight: 600; line-height: 34rpx; }
 .c1-day--selected .c1-day__week, .c1-day--selected .c1-day__num { color: #ffffff; }
 
-.c1-stats { display: flex; gap: 16rpx; height: 136rpx; box-sizing: border-box; padding: 24rpx 44rpx; overflow: hidden; }
-.c1-pill { display: flex; align-items: center; justify-content: center; height: 88rpx; padding: 0 20rpx; box-sizing: border-box; border-radius: 24rpx; color: #ffffff; font-size: 24rpx; font-weight: 600; white-space: nowrap; }
-.c1-pill--brand { background: #a80f1b; }.c1-pill--green { background: #10b981; }.c1-pill--amber { background: #f59e0b; }
+.c1-summary, .c1-teams { display: flex; gap: 16rpx; padding: 24rpx 44rpx 0; overflow: hidden; }
+.c1-summary__item { display: flex; flex: 1; align-items: baseline; justify-content: center; gap: 8rpx; min-width: 0; height: 88rpx; padding: 0 18rpx; border-radius: 24rpx; box-sizing: border-box; color: #ffffff; white-space: nowrap; }
+.c1-summary__item--brand { background: #a80f1b; }.c1-summary__item--blue { background: #1976d2; }.c1-summary__item--amber { background: #f59e0b; }
+.c1-summary__label { font-size: 24rpx; font-weight: 600; }.c1-summary__value { font-size: 30rpx; font-weight: 700; }
+.c1-teams { padding-top: 16rpx; }.c1-team-chip { flex: 0 0 auto; padding: 10rpx 18rpx; border-radius: 20rpx; background: #ffffff; color: #667085; font-size: 22rpx; border: 1rpx solid #e7eaf0; }
 
 .c1-body { padding: 0 44rpx calc(148rpx + env(safe-area-inset-bottom)); }
-.c1-list-heading { display: flex; align-items: center; justify-content: space-between; height: 84rpx; }
-.c1-list-heading__title { color: #202124; font-size: 28rpx; font-weight: 600; }
-.c1-list-heading__tools { display: flex; align-items: center; gap: 12rpx; }
-.view-switch { display: flex; padding: 4rpx; border-radius: 20rpx; background: #ebeef2; }
-.switch-item { min-width: 40rpx; padding: 6rpx 10rpx; border-radius: 16rpx; box-sizing: border-box; color: #667085; font-size: 20rpx; line-height: 24rpx; text-align: center; }
-.switch-item.active { background: #ffffff; color: #a80f1b; font-weight: 700; }
-.c1-tools__picker { max-width: 126rpx; overflow: hidden; color: #667085; font-size: 20rpx; line-height: 32rpx; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
+.c1-list-heading { display: flex; align-items: center; justify-content: space-between; height: 84rpx; }.c1-list-heading__title, .c1-section-title { color: #202124; font-size: 28rpx; font-weight: 600; }
+.c1-list-heading__tools { display: flex; align-items: center; gap: 12rpx; }.view-switch { display: flex; padding: 4rpx; border-radius: 20rpx; background: #ebeef2; }
+.switch-item { min-width: 40rpx; padding: 6rpx 10rpx; border-radius: 16rpx; box-sizing: border-box; color: #667085; font-size: 20rpx; line-height: 24rpx; text-align: center; }.switch-item.active { background: #ffffff; color: #a80f1b; font-weight: 700; }
+.c1-tools__picker { max-width: 180rpx; overflow: hidden; color: #667085; font-size: 20rpx; line-height: 32rpx; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
 
-.c1-list { display: flex; flex-direction: column; gap: 24rpx; }
-.acard { display: flex; align-items: center; gap: 24rpx; height: 192rpx; padding: 24rpx; box-sizing: border-box; border-radius: 32rpx; background: #ffffff; box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.08); }
-.acard__accent { width: 8rpx; height: 144rpx; flex: 0 0 8rpx; border-radius: 4rpx; }
-.acard__time { width: 112rpx; flex: 0 0 112rpx; }.acard__start { color: #a80f1b; font-size: 30rpx; font-weight: 800; line-height: 36rpx; }.acard__dur { color: #667085; font-size: 22rpx; line-height: 26rpx; }
-.acard__content { display: flex; flex: 1; flex-direction: column; justify-content: center; min-width: 0; gap: 14rpx; }
-.acard__head { display: flex; align-items: center; gap: 8rpx; min-width: 0; }.acard__title { min-width: 0; overflow: hidden; color: #202124; font-size: 30rpx; font-weight: 600; line-height: 38rpx; text-overflow: ellipsis; white-space: nowrap; }
-.acard__coach { flex: 0 0 auto; padding: 4rpx 10rpx; border-radius: 8rpx; background: #f3f4f6; color: #667085; font-size: 20rpx; line-height: 26rpx; }
-.acard__meta { overflow: hidden; color: #667085; font-size: 22rpx; line-height: 30rpx; text-overflow: ellipsis; white-space: nowrap; }
-.acard__right { display: flex; flex: 0 0 auto; align-items: center; gap: 10rpx; }.acard__pill { height: 42rpx; padding: 0 12rpx; border-radius: 8rpx; font-size: 20rpx; line-height: 42rpx; }.acard__chevron { color: #667085; font-size: 40rpx; font-weight: 300; line-height: 40rpx; }
-.pill--info, .pill--success { background: #10b981; color: #ffffff; }.pill--brand { background: #1976d2; color: #ffffff; }.pill--warning, .pill--pending { background: #f59e0b; color: #ffffff; }.pill--error { background: #d14343; color: #ffffff; }
+.c1-task-section { margin-bottom: 24rpx; }.c1-section-title { margin-bottom: 16rpx; }.c1-task-card { display: flex; align-items: center; justify-content: space-between; gap: 20rpx; padding: 24rpx; border-radius: 24rpx; background: #ffffff; border: 1rpx solid #e7eaf0; }.c1-task-card__content { min-width: 0; }.c1-task-card__label { overflow: hidden; color: #202124; font-size: 26rpx; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }.c1-task-card__due { margin-top: 8rpx; color: #667085; font-size: 22rpx; }.c1-task-card__chevron, .acard__chevron { color: #667085; font-size: 40rpx; font-weight: 300; line-height: 40rpx; }
+
+.c1-list { display: flex; flex-direction: column; gap: 24rpx; }.acard { display: flex; align-items: center; gap: 24rpx; min-height: 192rpx; padding: 24rpx; box-sizing: border-box; border-radius: 32rpx; background: #ffffff; box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.08); }.acard__accent { width: 8rpx; align-self: stretch; flex: 0 0 8rpx; border-radius: 4rpx; }.acard__time { width: 112rpx; flex: 0 0 112rpx; }.acard__start { color: #a80f1b; font-size: 30rpx; font-weight: 800; line-height: 36rpx; }.acard__dur { color: #667085; font-size: 22rpx; line-height: 26rpx; }.acard__content { display: flex; flex: 1; flex-direction: column; justify-content: center; min-width: 0; gap: 12rpx; }.acard__head { display: flex; align-items: center; gap: 8rpx; min-width: 0; }.acard__title { min-width: 0; overflow: hidden; color: #202124; font-size: 30rpx; font-weight: 600; line-height: 38rpx; text-overflow: ellipsis; white-space: nowrap; }.acard__coach { flex: 0 0 auto; padding: 4rpx 10rpx; border-radius: 8rpx; background: #f3f4f6; color: #667085; font-size: 20rpx; line-height: 26rpx; }.acard__meta { overflow: hidden; color: #667085; font-size: 22rpx; line-height: 30rpx; text-overflow: ellipsis; white-space: nowrap; }.acard__action { align-self: flex-start; padding: 6rpx 12rpx; border-radius: 8rpx; background: #fdf0f1; color: #a80f1b; font-size: 22rpx; line-height: 28rpx; }.acard__right { display: flex; flex: 0 0 auto; align-items: center; gap: 10rpx; }.acard__pill { height: 42rpx; padding: 0 12rpx; border-radius: 8rpx; font-size: 20rpx; line-height: 42rpx; }.pill--info, .pill--success { background: #10b981; color: #ffffff; }.pill--brand { background: #1976d2; color: #ffffff; }.pill--warning, .pill--pending { background: #f59e0b; color: #ffffff; }.pill--error { background: #d14343; color: #ffffff; }
 .c1-empty { padding: 64rpx 32rpx; border-radius: 24rpx; background: #ffffff; color: #8a8f99; font-size: 26rpx; text-align: center; }
