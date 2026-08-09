@@ -1,52 +1,37 @@
 <view class="tasks-page">
-  <app-header title="测评任务" action-text="新增" bindaction="createTask" show-back />
-  <view class="tasks-page__body">
-    <!-- 筛选 chips（Figma C11: 全部/未完成/已完成） -->
-    <view class="filter-row">
-      <view
-        wx:for="{{filters}}"
-        wx:key="*this"
-        class="filter-chip {{activeFilter === item ? 'filter-chip--active' : ''}}"
-        data-name="{{item}}"
-        bindtap="selectFilter"
-      >{{item}}</view>
-    </view>
+  <view class="tasks-nav" style="padding-top:{{navInset}}px">
+    <view class="tasks-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/c11-arrow-left.svg" mode="aspectFit" /></view>
+    <view class="tasks-nav__title">测评任务</view>
+    <view class="tasks-nav__spacer"></view>
+  </view>
 
-    <status-view
-      state="{{state}}"
-      title="{{state === 'loading' ? '加载测评任务' : state === 'empty' ? '暂无任务' : '读取失败'}}"
-      message="{{message}}"
-      action-text="{{state === 'error' ? '重试' : ''}}"
-      bindaction="retry"
-    />
+  <view class="tasks-page__body">
+    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{statusTitle}}" message="{{message}}" action-text="{{statusActionText}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready'}}">
-      <block wx:for="{{tasks}}" wx:key="id">
-        <view
-          wx:if="{{activeFilter === '全部' || (activeFilter === '未完成' && item.status !== 'completed') || (activeFilter === '已完成' && item.status === 'completed')}}"
-          class="task-card"
-          data-template-id="{{item.templateId}}"
-          data-title="{{item.title}}"
-          data-status="{{item.status}}"
-          bindtap="openTask"
-        >
+      <view class="filter-row">
+        <view wx:for="{{filters}}" wx:key="id" class="{{item.className}}" data-id="{{item.id}}" bindtap="selectFilter">{{item.label}}</view>
+      </view>
+
+      <view wx:if="{{hasVisibleTasks}}" class="task-list">
+        <view wx:for="{{visibleTasks}}" wx:key="id" class="task-card" data-id="{{item.id}}" bindtap="openTask">
           <view class="task-card__head">
             <view class="task-card__title">{{item.title}}</view>
-            <view class="task-card__status {{item.statusClass}}">{{item.statusLabel}}</view>
+            <view class="{{item.statusClass}}">{{item.statusLabel}}</view>
           </view>
           <view class="task-card__dates">{{item.dateRange}}</view>
           <view class="task-card__foot">
             <view class="task-card__progress">
               <view class="task-card__progress-label">{{item.progressLabel}}</view>
-              <view class="task-card__track">
-                <view class="task-card__bar" style="width: {{item.progressPercent}}%"></view>
-              </view>
+              <view class="task-card__track"><view class="task-card__bar" style="{{item.progressStyle}}"></view></view>
             </view>
-            <view class="task-card__chevron">›</view>
+            <image wx:if="{{item.isEntryEnabled}}" class="task-card__chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
           </view>
         </view>
-      </block>
+      </view>
+      <view wx:else class="filter-empty">当前筛选暂无测评任务。</view>
     </block>
   </view>
-  <role-tabbar role="coach" active="me" />
+
+  <role-tabbar role="coach" active="training" />
 </view>
