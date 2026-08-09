@@ -228,8 +228,8 @@ function filterEvents(events: ScheduleEvent[], studentId: string, selectedDate: 
   });
 }
 
-function buildDateOptions(start: string, events: ScheduleEvent[]) {
-  const base = new Date(`${start}T00:00:00.000Z`);
+export function buildDateOptions(selectedDate: string, events: ScheduleEvent[]) {
+  const base = weekWindowStart(selectedDate);
   return Array.from({ length: 7 }, (_, index) => {
     const date = new Date(base);
     date.setUTCDate(date.getUTCDate() + index);
@@ -246,13 +246,19 @@ function buildDateOptions(start: string, events: ScheduleEvent[]) {
 }
 
 function dateWindowStart(date: string) {
-  return date || initialDate;
+  return weekWindowStart(date).toISOString().slice(0, 10);
 }
 
 function dateWindowEnd(date: string) {
-  const base = new Date(`${date || initialDate}T00:00:00.000Z`);
+  const base = weekWindowStart(date);
   base.setUTCDate(base.getUTCDate() + 6);
   return base.toISOString().slice(0, 10);
+}
+
+function weekWindowStart(date: string) {
+  const start = new Date(`${date || initialDate}T00:00:00.000Z`);
+  start.setUTCDate(start.getUTCDate() - ((start.getUTCDay() + 6) % 7));
+  return start;
 }
 
 function presentEvents(events: ScheduleEvent[]): ScheduleEventView[] {
@@ -290,8 +296,7 @@ function selectedCountLabel(date: string, count: number) {
 export function buildScheduleDigest(events: ScheduleEvent[], selectedDate: string) {
   const selected = new Date(`${selectedDate || initialDate}T00:00:00.000Z`);
   const selectedKey = selected.toISOString().slice(0, 10);
-  const weekStart = new Date(selected);
-  weekStart.setUTCDate(weekStart.getUTCDate() - ((weekStart.getUTCDay() + 6) % 7));
+  const weekStart = weekWindowStart(selectedDate);
   const weekEnd = new Date(weekStart);
   weekEnd.setUTCDate(weekEnd.getUTCDate() + 7);
   const weekEvents = events.filter((event) => {

@@ -1,5 +1,5 @@
 .p1 { min-height: 100vh; background: #f5f6f8; }
-.p1-nav { position: relative; display: flex; box-sizing: border-box; align-items: center; height: 176rpx; padding-right: 32rpx; padding-bottom: 48rpx; padding-left: 32rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03); }
+.p1-nav { position: relative; display: flex; box-sizing: content-box; align-items: center; height: 88rpx; padding-right: 32rpx; padding-bottom: 48rpx; padding-left: 32rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03); }
 .p1-nav__title { position: absolute; left: 32rpx; display: flex; align-items: center; height: 64rpx; color: #0d0d0d; font-size: 44rpx; font-weight: 700; line-height: 54rpx; }
 .p1-nav__bell { position: absolute; display: flex; align-items: center; justify-content: center; width: 64rpx; height: 64rpx; }
 .p1-nav__bell-shape { position: relative; box-sizing: border-box; width: 36rpx; height: 40rpx; }

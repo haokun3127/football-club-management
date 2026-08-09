@@ -13,7 +13,7 @@ globalThis.wx = {
 };
 globalThis.Page = () => {};
 
-const { buildScheduleDigest } = await import("./index.ts");
+const { buildDateOptions, buildScheduleDigest } = await import("./index.ts");
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
 const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 
@@ -130,6 +130,24 @@ describe("parent schedule hero", () => {
     expect(title).toContain("height: 64rpx");
     expect(title).toContain("display: flex");
     expect(title).toContain("align-items: center");
+  });
+
+  it("keeps one 88rpx content-box custom navigation rule", () => {
+    const navRules = [...styles.matchAll(/(?:^|})\s*\.p1-nav\s*\{([^}]*)\}/g)].map((match) => match[1]);
+
+    expect(navRules).toHaveLength(1);
+    expect(navRules[0]).toContain("height: 88rpx");
+    expect(navRules[0]).toContain("box-sizing: content-box");
+    expect(navRules[0]).not.toContain("height: 176rpx");
+    expect(navRules[0]).not.toContain("box-sizing: border-box");
+  });
+
+  it("presents a selected week from Monday through Sunday", () => {
+    const options = buildDateOptions("2026-08-05", []);
+
+    expect(options.map((option) => option.weekShort)).toEqual(["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]);
+    expect(options[0]?.date).toBe("2026-08-03");
+    expect(options[6]?.date).toBe("2026-08-09");
   });
 
   it("uses the approved CSS and text fallback icon nodes instead of unverified SVG assets", () => {
