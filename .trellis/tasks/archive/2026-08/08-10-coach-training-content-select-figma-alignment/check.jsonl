@@ -1,0 +1,2 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Review that C10 uses only the existing backend contract and preserves the workbench as source of truth after save."}
+{"file":".trellis/tasks/08-10-coach-training-content-select-figma-alignment/design.md","reason":"Review canonical selection, invalid-event protection, failure preservation, and allowed UI scope."}

@@ -1,0 +1,2 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Defines existing project-tree, training-project PUT, workbench selection, authorization, and idempotency boundaries."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Keeps the C10 view model and readback comparison aligned with the existing BFF without duplicating API behavior."}
