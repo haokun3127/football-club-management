@@ -187,7 +187,7 @@ function routeForAction(action: WorkbenchAction, eventId: string, templateId: st
     lesson: `/pages/coach/lesson/index?id=${eventId}`,
     match: `/pages/coach/match/index?id=${eventId}`,
     tactical: `/pages/coach/tactical-board/index?eventId=${eventId}`,
-    training: `/pages/coach/training/index?eventId=${eventId}`,
+    training: `/pages/coach/content-select/index?eventId=${eventId}`,
     change: `/pages/coach/event-change/index?id=${eventId}`,
   };
   if (action === "assessment") return templateId ? `/pages/coach/test-entry/index?eventId=${eventId}&templateId=${templateId}` : "";

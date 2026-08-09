@@ -160,7 +160,7 @@ describe("coach activity workbench", () => {
       lesson: "/pages/coach/lesson/index?id=event-1",
       match: "/pages/coach/match/index?id=event-1",
       tactical: "/pages/coach/tactical-board/index?eventId=event-1",
-      training: "/pages/coach/training/index?eventId=event-1",
+      training: "/pages/coach/content-select/index?eventId=event-1",
       assessment: "/pages/coach/test-entry/index?eventId=event-1&templateId=template-1",
       change: "/pages/coach/event-change/index?id=event-1",
     };
