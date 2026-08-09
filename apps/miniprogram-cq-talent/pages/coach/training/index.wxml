@@ -5,32 +5,32 @@
 
   <view class="c8-hero">
     <view class="c8-hero__grid">
-      <view class="c8-stat"><view class="c8-stat__label">训练活动</view><view class="c8-stat__value">{{eventOptions.length}}</view></view>
-      <view class="c8-stat"><view class="c8-stat__label">已选项目</view><view class="c8-stat__value">{{selectedProjects.length}}</view></view>
-      <view class="c8-stat"><view class="c8-stat__label">在队人数</view><view class="c8-stat__value">{{home ? home.teams.length : 0}}</view></view>
-      <view class="c8-stat"><view class="c8-stat__label">项目分组</view><view class="c8-stat__value">{{filteredGroups.length}}</view></view>
+      <view wx:for="{{heroMetrics}}" wx:key="label" class="c8-stat">
+        <view class="c8-stat__label">{{item.label}}</view>
+        <view class="c8-stat__value">{{item.value}}</view>
+      </view>
     </view>
   </view>
 
   <view class="c8-tabs">
-    <view class="c8-tab c8-tab--active">训练计划</view>
-    <view class="c8-tab" bindtap="openTestEntry">能力评估</view>
-    <view class="c8-tab" bindtap="openContentSelect">学员管理</view>
+    <view class="c8-tab c8-tab--active">训练管理</view>
+    <view class="c8-tab" bindtap="openTeamAbility">能力评估</view>
+    <view class="c8-tab" bindtap="openTeam">学员管理</view>
   </view>
 
   <view class="c8-body">
-    <status-view state="{{state}}" title="{{state === 'loading' ? '加载训练活动' : state === 'empty' ? '暂无训练活动' : '训练内容读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <status-view state="{{state}}" title="训练管理" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
 
-    <view wx:if="{{state === 'ready'}}" class="c8-list">
-      <view wx:for="{{eventOptions}}" wx:key="id" class="session-card {{eventIndex === index ? 'session-card--selected' : ''}}" data-index="{{index}}" bindtap="selectSession">
+    <view wx:if="{{hasTrainingCards}}" class="c8-list">
+      <view wx:for="{{trainingCards}}" wx:key="id" class="session-card" data-id="{{item.id}}" bindtap="openTrainingEvent">
         <view class="session-card__head">
-          <view class="session-card__title">{{item.teamName || '球队'}} 训练</view>
-          <view class="session-card__time">{{item.displayTime}}</view>
+          <view class="session-card__title">{{item.title}}</view>
+          <view class="session-card__time">{{item.timeLabel}}</view>
         </view>
-        <view class="session-card__venue">{{item.venue || '地点待确认'}}</view>
+        <view wx:if="{{item.hasVenue}}" class="session-card__venue">{{item.venue}}</view>
         <view class="session-card__foot">
-          <view class="session-card__status">{{item.status || '已排定'}}</view>
-          <view class="session-card__count">{{item.participantCount || 0}} 人报到</view>
+          <view wx:if="{{item.hasStatus}}" class="session-card__status">{{item.status}}</view>
+          <view wx:if="{{item.hasParticipantCount}}" class="session-card__count">{{item.participantLabel}}</view>
         </view>
       </view>
     </view>

@@ -1,9 +1,6 @@
 {
   "navigationStyle": "custom",
   "usingComponents": {
-    "app-header": "/components/app-header/index",
-    "submit-bar": "/components/submit-bar/index",
-    "radar-canvas": "/components/radar-canvas/index",
     "role-tabbar": "/components/role-tabbar/index",
     "status-view": "/components/status-view/index"
   }

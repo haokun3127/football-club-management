@@ -2,25 +2,24 @@
 .c8-nav { box-sizing: border-box; display: flex; align-items: center; height: 176rpx; padding: 0 32rpx; background: #ffffff; }
 .c8-nav__title { color: #202124; font-size: 40rpx; font-weight: 700; line-height: 48rpx; }
 
-.c8-hero { height: 360rpx; padding: 40rpx; box-sizing: border-box; border-radius: 0 0 32rpx 32rpx; background: #07111f; box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.1); }
-.c8-hero__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24rpx; }
-.c8-stat { display: flex; height: 128rpx; flex-direction: column; align-items: center; justify-content: center; border-radius: 24rpx; background: rgba(255, 255, 255, 0.1); }
-.c8-stat__label { color: #ffffff; font-size: 22rpx; line-height: 26rpx; }
-.c8-stat__value { margin-top: 4rpx; color: #ffffff; font-size: 56rpx; font-weight: 700; line-height: 64rpx; }
+.c8-hero { padding: 32rpx; background: #07111f; box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.1); }
+.c8-hero__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20rpx; }
+.c8-stat { display: flex; min-height: 120rpx; flex-direction: column; align-items: center; justify-content: center; border-radius: 16rpx; background: rgba(255, 255, 255, 0.1); }
+.c8-stat__label { color: #d8dee8; font-size: 22rpx; line-height: 28rpx; }
+.c8-stat__value { margin-top: 4rpx; color: #ffffff; font-size: 48rpx; font-weight: 700; line-height: 56rpx; }
 
-.c8-tabs { display: flex; height: 96rpx; padding: 0 48rpx; box-sizing: border-box; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
+.c8-tabs { display: flex; height: 96rpx; padding: 0 32rpx; box-sizing: border-box; border-bottom: 1rpx solid #e7eaf0; background: #ffffff; }
 .c8-tab { position: relative; display: flex; flex: 1; align-items: center; justify-content: center; min-width: 0; color: #667085; font-size: 28rpx; font-weight: 500; line-height: 34rpx; white-space: nowrap; }
 .c8-tab--active { color: #a80f1b; font-weight: 600; }
 .c8-tab--active::after { position: absolute; bottom: 0; width: 48rpx; height: 4rpx; border-radius: 2rpx; background: #a80f1b; content: ""; }
 
-.c8-body { padding: 32rpx 44rpx 0; }
-.c8-list { display: flex; flex-direction: column; gap: 24rpx; }
-.session-card { height: 228rpx; padding: 32rpx; box-sizing: border-box; border: 2rpx solid transparent; border-radius: 24rpx; background: #ffffff; box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.05); }
-.session-card--selected { border-color: #f3c4ca; }
-.session-card__head { display: flex; align-items: center; justify-content: space-between; gap: 12rpx; }
-.session-card__title { min-width: 0; overflow: hidden; color: #202124; font-size: 32rpx; font-weight: 600; line-height: 40rpx; text-overflow: ellipsis; white-space: nowrap; }
-.session-card__time { flex: 0 1 auto; max-width: 138rpx; overflow: hidden; padding: 8rpx 12rpx; border-radius: 8rpx; background: #fceeef; color: #a80f1b; font-size: 20rpx; font-weight: 600; line-height: 26rpx; text-overflow: ellipsis; white-space: nowrap; }
-.session-card__venue { margin-top: 20rpx; overflow: hidden; color: #667085; font-size: 26rpx; line-height: 32rpx; text-overflow: ellipsis; white-space: nowrap; }
-.session-card__foot { display: flex; align-items: center; gap: 16rpx; margin-top: 24rpx; }
-.session-card__status { padding: 8rpx 12rpx; border-radius: 8rpx; background: #ecfdf5; color: #10b981; font-size: 20rpx; font-weight: 600; line-height: 26rpx; }
+.c8-body { padding: 32rpx; }
+.c8-list { display: flex; flex-direction: column; gap: 20rpx; }
+.session-card { padding: 28rpx; border-radius: 16rpx; background: #ffffff; box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.05); }
+.session-card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16rpx; }
+.session-card__title { min-width: 0; overflow: hidden; color: #202124; font-size: 32rpx; font-weight: 600; line-height: 42rpx; text-overflow: ellipsis; white-space: nowrap; }
+.session-card__time { flex: 0 1 auto; max-width: 220rpx; overflow: hidden; padding: 8rpx 12rpx; border-radius: 8rpx; background: #fceeef; color: #a80f1b; font-size: 20rpx; font-weight: 600; line-height: 26rpx; text-overflow: ellipsis; white-space: nowrap; }
+.session-card__venue { margin-top: 18rpx; overflow: hidden; color: #667085; font-size: 26rpx; line-height: 34rpx; text-overflow: ellipsis; white-space: nowrap; }
+.session-card__foot { display: flex; align-items: center; gap: 16rpx; min-height: 28rpx; margin-top: 20rpx; }
+.session-card__status { padding: 6rpx 12rpx; border-radius: 8rpx; background: #ecfdf5; color: #047857; font-size: 20rpx; font-weight: 600; line-height: 26rpx; }
 .session-card__count { color: #667085; font-size: 22rpx; line-height: 28rpx; }
