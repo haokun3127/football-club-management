@@ -1,0 +1,31 @@
+{
+  "id": "coach-lesson-correction-idempotency",
+  "name": "coach-lesson-correction-idempotency",
+  "title": "Implement safe idempotent C5.1 lesson correction",
+  "description": "Align Figma C5.1 lesson correction with real roster and balances while adding minimal server-side membership, delta, actor, and idempotency guarantees.",
+  "status": "completed",
+  "dev_type": "full_stack",
+  "scope": "coach lesson correction API idempotency and C5.1 page",
+  "package": "api",
+  "priority": "P1",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-08-10",
+  "completedAt": "2026-08-10",
+  "branch": null,
+  "base_branch": "codex/chongqing-talent-business",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "apps/api/src/routes/app-client.routes.ts",
+    "apps/api/src/http/schemas.ts",
+    "apps/miniprogram-cq-talent/pages/coach/lesson-correction/index.ts",
+    ".trellis/spec/api/backend/app-client-bff-contracts.md"
+  ],
+  "notes": "",
+  "meta": {}
+}

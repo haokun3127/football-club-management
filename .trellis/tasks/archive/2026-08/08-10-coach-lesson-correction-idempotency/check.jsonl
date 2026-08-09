@@ -1,0 +1,2 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Review the request, identity, idempotency, and error contracts before accepting the API diff."}
+{"file":".trellis/spec/api/frontend/index.md","reason":"Review WXML view-model and Mini Program page-test conventions before accepting the page diff."}
