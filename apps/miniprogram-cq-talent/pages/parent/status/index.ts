@@ -19,6 +19,7 @@ interface StatusRow {
 interface PageData {
   state: LoadState;
   message: string;
+  studentId: string;
   activeStudentName: string;
   totalCount: number;
   monthCount: number;
@@ -36,6 +37,7 @@ Page<PageData>({
   data: {
     state: "idle",
     message: "",
+    studentId: "",
     activeStudentName: "",
     totalCount: 0,
     monthCount: 0,
@@ -49,7 +51,9 @@ Page<PageData>({
     menuInset: resolveMenuInset(),
   },
   onLoad(query: { student?: string }) {
-    this.load(query?.student || "");
+    const studentId = query?.student || "";
+    this.setData({ studentId });
+    this.load(studentId);
   },
   async load(studentId: string) {
     const session = requireRole("parent");
@@ -77,12 +81,12 @@ Page<PageData>({
     }
   },
   retry() {
-    this.load("");
+    this.load(this.data.studentId);
   },
   goBack() { wx.navigateBack(); },
   render(student: StudentSummary, home: StudentHome, events: ScheduleEvent[], today: Date) {
     const pastTrainings = events
-      .filter((event) => event.type === "training" && new Date(event.startsAt).getTime() <= today.getTime())
+      .filter((event) => event.type === "training" && eventBelongsToStudent(event, student.id) && new Date(event.startsAt).getTime() <= today.getTime())
       .sort((a, b) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime());
     const monthKey = `${today.getFullYear()}-${today.getMonth()}`;
     const seasonKey = `${today.getFullYear()}-${Math.floor(today.getMonth() / 3)}`;
@@ -98,6 +102,7 @@ Page<PageData>({
     this.setData({
       state: "ready",
       message: "",
+      studentId: student.id,
       activeStudentName: student.name,
       totalCount: pastTrainings.length,
       monthCount,
@@ -147,5 +152,12 @@ function hoursLabel(startsAt: string, endsAt?: string): string {
 function insuranceBadge(status: string): { label: string; tone: string } {
   if (/pending|待|审核/i.test(status)) return { label: "审核中", tone: "warning" };
   if (/expired|到期|失效/i.test(status)) return { label: "已到期", tone: "error" };
-  return { label: "已生效", tone: "success" };
+  if (/active|有效|生效/i.test(status)) return { label: "已生效", tone: "success" };
+  return { label: "待同步", tone: "neutral" };
+}
+
+function eventBelongsToStudent(event: ScheduleEvent, studentId: string) {
+  if (event.childIds?.length) return event.childIds.includes(studentId);
+  if (event.children?.length) return event.children.some((child) => child.id === studentId);
+  return false;
 }

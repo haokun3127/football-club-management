@@ -32,7 +32,6 @@ import type {
   TacticalBoardPlayer,
   TacticalBoardState,
 } from "./types";
-
 export async function resolveClient() {
   return request<AppContext>({
     path: `/app-clients/resolve?clientKey=${APP_CLIENT_KEY}`,
@@ -110,24 +109,10 @@ export async function getParentMetricDetail(studentId: string, metricId: string)
 
 export async function getParentStudentHome(student: StudentSummary): Promise<StudentHome> {
   const context = requireContext();
-  try {
-    const response = await request<Record<string, unknown>>({
-      path: `/clubs/${context.clubId}/app-clients/${context.clientId}/parent/students/${student.id}/home`,
-    });
-    return normalizeStudentHome(response, student);
-  } catch (error) {
-    return {
-      profile: [
-        { label: "姓名", value: student.name },
-        { label: "年龄组", value: student.ageGroup || "待同步" },
-        { label: "队伍", value: textOrPending(student.teams.join("、")) },
-        { label: "教练", value: textOrPending(student.coachNames.join("、")) },
-      ],
-      lessonStatus: [{ label: "课时状态", value: "数据同步中", status: "pending" }],
-      insuranceStatus: [{ label: "保险状态", value: "数据同步中", status: "pending" }],
-      clubInfo: pendingClubInfo(context),
-    };
-  }
+  const response = await request<Record<string, unknown>>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/parent/students/${student.id}/home`,
+  });
+  return normalizeStudentHome(response, student);
 }
 
 export async function getCoachHome(range: string | { from: string; to: string } = DEV_TEST_DATE): Promise<CoachHome> {

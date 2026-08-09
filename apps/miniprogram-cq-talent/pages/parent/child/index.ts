@@ -1,9 +1,9 @@
-import { getParentChildren, getParentStudentHome } from "../../../utils/api";
+import { getParentChildren, getParentSchedule, getParentStudentHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { formatDateTime, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { setCurrentStudentId } from "../../../utils/store";
-import type { LoadState, StudentHome, StudentSummary } from "../../../utils/types";
+import type { LoadState, ScheduleEvent, StudentHome, StudentSummary } from "../../../utils/types";
 
 Page({
   data: {
@@ -17,12 +17,8 @@ Page({
     studentHome: null as StudentHome | null,
     avatarLetter: "",
     teamLabel: "",
-    coachLabel: "",
-    updatedAtLabel: "",
     heroStats: [] as Array<{ label: string; value: string }>,
     recentActivities: [] as Array<{ title: string; date: string }>,
-    reminderTitle: "本周暂无待办提醒",
-    reminderSub: "日程有更新会在这里显示",
   },
   onLoad() {
     this.load();
@@ -43,7 +39,10 @@ Page({
         return;
       }
       setCurrentStudentId(active.id);
-      const studentHome = await getParentStudentHome(active);
+      const [studentHome, schedule] = await Promise.all([
+        getParentStudentHome(active),
+        getParentSchedule(active.id),
+      ]);
       this.setData({
         state: "ready",
         message: "",
@@ -52,13 +51,9 @@ Page({
         activeChild: { ...active, trainingStatus: trainingStatusLabel(active.trainingStatus) },
         studentHome,
         avatarLetter: active.name.slice(0, 1),
-        teamLabel: active.teams.join("、") || "队伍待确认",
-        coachLabel: active.coachNames.join("、") || "教练待确认",
-        updatedAtLabel: studentHome.updatedAt ? formatDateTime(studentHome.updatedAt) : "随俱乐部档案更新",
-        heroStats: buildHeroStats(studentHome),
-        recentActivities: buildRecentActivities(studentHome),
-        reminderTitle: studentHome.clubInfo[0]?.value || "本周暂无待办提醒",
-        reminderSub: studentHome.clubInfo[0]?.label || "日程有更新会在这里显示",
+        teamLabel: active.teams.filter(Boolean).join("、"),
+        heroStats: buildAvailableHeroStats(studentHome),
+        recentActivities: buildScheduledActivities(schedule),
       });
     } catch (error) {
       this.setData({ state: "error", message: readableError(error) });
@@ -133,6 +128,24 @@ function buildRecentActivities(home: StudentHome) {
     title: sources[index]?.value || fallback[index],
     date: sources[index]?.label || "近期更新",
   }));
+}
+
+function buildAvailableHeroStats(home: StudentHome) {
+  return home.lessonStatus
+    .filter((item) => item.label && item.value && !isUnavailable(item.value))
+    .map((item) => ({ label: item.label, value: item.value }));
+}
+
+function buildScheduledActivities(events: ScheduleEvent[]) {
+  return [...events]
+    .filter((event) => event.title && event.startsAt)
+    .sort((left, right) => right.startsAt.localeCompare(left.startsAt))
+    .slice(0, 3)
+    .map((event) => ({ title: event.title, date: formatDateTime(event.startsAt) }));
+}
+
+function isUnavailable(value: string) {
+  return /待同步|数据同步|未登记|尚未同步|请联系/.test(value);
 }
 
 function readableError(error: unknown) {

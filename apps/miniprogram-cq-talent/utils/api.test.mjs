@@ -36,7 +36,7 @@ globalThis.wx = {
   }),
 };
 
-const { getCoachWorkbench, getParentActivityDetail } = await import("./api.ts");
+const { getCoachWorkbench, getParentActivityDetail, getParentStudentHome } = await import("./api.ts");
 
 describe("coach workbench participant normalization", () => {
   it("uses backend participant.status and note fields", async () => {
@@ -56,6 +56,22 @@ describe("parent activity detail request boundary", () => {
       await expect(getParentActivityDetail("missing-event")).rejects.toMatchObject({
         code: "network_error",
         message: "activity missing",
+      });
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
+});
+
+describe("parent student-home request boundary", () => {
+  it("rejects an unavailable student home instead of returning fictional lesson or insurance data", async () => {
+    const originalRequest = globalThis.wx.request;
+    globalThis.wx.request = ({ fail }) => fail({ errMsg: "student home unavailable" });
+
+    try {
+      await expect(getParentStudentHome({ id: "student-1", name: "Player", teams: [], coachNames: [] })).rejects.toMatchObject({
+        code: "network_error",
+        message: "student home unavailable",
       });
     } finally {
       globalThis.wx.request = originalRequest;
