@@ -1,0 +1,2 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Defines coach-team response semantics, coach authorization, radar scope, and the trailing-30-day data boundary."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Keeps this page-only projection aligned to the existing BFF contract without creating a duplicate aggregate."}

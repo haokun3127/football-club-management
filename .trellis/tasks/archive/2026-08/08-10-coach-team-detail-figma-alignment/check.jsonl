@@ -1,0 +1,2 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Review coach-team truthfulness, no cross-scope leakage, and permitted radar navigation against the published BFF contract."}
+{"file":".trellis/tasks/08-10-coach-team-detail-figma-alignment/design.md","reason":"Review page-local empty, error, and navigation states against the approved C9 design boundary."}

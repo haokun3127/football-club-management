@@ -1,0 +1,32 @@
+{
+  "id": "coach-team-detail-figma-alignment",
+  "name": "coach-team-detail-figma-alignment",
+  "title": "Align C9 team detail to Figma",
+  "description": "Align C9 coach team detail with existing real coach-team data and Figma node 93:924 without changing APIs or protected work.",
+  "status": "completed",
+  "dev_type": "frontend",
+  "scope": "coach-team-detail",
+  "package": "miniprogram-cq-talent",
+  "priority": "P1",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-08-10",
+  "completedAt": "2026-08-10",
+  "branch": null,
+  "base_branch": "codex/chongqing-talent-business",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "apps/miniprogram-cq-talent/pages/coach/team/index.json",
+    "apps/miniprogram-cq-talent/pages/coach/team/index.ts",
+    "apps/miniprogram-cq-talent/pages/coach/team/index.wxml",
+    "apps/miniprogram-cq-talent/pages/coach/team/index.wxss",
+    "apps/miniprogram-cq-talent/pages/coach/team/index.test.mjs"
+  ],
+  "notes": "",
+  "meta": {}
+}
