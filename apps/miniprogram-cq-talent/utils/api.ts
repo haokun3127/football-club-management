@@ -594,6 +594,7 @@ function normalizeRadarMetric(item: Record<string, unknown>): RadarMetricPoint {
     value: numericValue,
     peerAverage: numberOrUndefined(item.peerAverage),
     maxValue,
+    occurredAt: stringOrUndefined(record?.occurredAt),
   };
 }
 

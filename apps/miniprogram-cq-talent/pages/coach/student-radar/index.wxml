@@ -1,5 +1,11 @@
 <view class="radar-page">
-  <app-header title="学员雷达" show-back />
+  <view class="radar-nav">
+    <view class="radar-nav__back" bindtap="goBack">
+      <image class="radar-nav__back-icon" src="/assets/icons/c13-arrow-left.svg" mode="aspectFit" />
+    </view>
+    <view class="radar-nav__title">学员雷达</view>
+    <view class="radar-nav__placeholder"></view>
+  </view>
   <view class="radar-page__body">
     <!-- 学员选择 chips（Figma C13: 选中=品牌红 r20） -->
     <scroll-view wx:if="{{students.length}}" scroll-x class="student-strip" enhanced show-scrollbar="{{false}}">
@@ -23,16 +29,38 @@
       bindaction="retry"
     />
 
-    <block wx:if="{{state === 'ready'}}">
-      <!-- 雷达 Hero（Figma: #07111f 深底 + 白网格 + 品牌红多边形） -->
+    <block wx:if="{{hasRadar}}">
       <view class="radar-hero">
         <view class="radar-hero__head">
-          <view class="radar-hero__title">{{activeStudentName}}能力雷达</view>
+          <view class="radar-hero__title">学员能力雷达</view>
+          <view class="radar-hero__period">{{assessmentPeriod}}</view>
         </view>
-        <radar-canvas dark="{{true}}" metrics="{{radar}}"></radar-canvas>
+        <view class="radar-hero__plot">
+          <radar-canvas class="radar-hero__canvas" dark="{{true}}" metrics="{{radar}}" width="440rpx" height="360rpx"></radar-canvas>
+        </view>
         <view class="radar-hero__overall">{{overall}}</view>
       </view>
     </block>
+
+    <view wx:if="{{dimensions.length}}" class="dimensions-card">
+        <view class="dimensions-card__title">维度评分</view>
+        <view class="dimension-list">
+          <view wx:for="{{dimensions}}" wx:key="metricId" class="dimension-row">
+            <view class="dimension-row__head">
+              <view class="dimension-row__label">{{item.label}}</view>
+              <view class="dimension-row__value">{{item.value}}</view>
+            </view>
+            <view class="dimension-row__track">
+              <view class="dimension-row__fill" style="width: {{item.width}}"></view>
+            </view>
+          </view>
+        </view>
+    </view>
+
+    <view wx:if="{{students.length}}" class="feedback-card">
+      <view class="feedback-card__title">能力评语</view>
+      <view class="feedback-card__message">{{feedbackMessage}}</view>
+    </view>
   </view>
   <role-tabbar role="coach" active="training" />
 </view>

@@ -120,6 +120,7 @@ export interface RadarMetricPoint {
   value?: number;
   peerAverage?: number;
   maxValue: number;
+  occurredAt?: string;
 }
 
 export interface MetricViewOption {

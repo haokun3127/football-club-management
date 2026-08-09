@@ -31,6 +31,8 @@ interface RadarComponentThis {
     metrics?: RadarMetricPoint[];
     selectedMetricId?: string;
     dark?: boolean;
+    width?: string;
+    height?: string;
     canvasWidth?: number;
     canvasHeight?: number;
   };
@@ -63,6 +65,14 @@ Component({
       type: Boolean,
       value: false,
     },
+    width: {
+      type: String,
+      value: "100%",
+    },
+    height: {
+      type: String,
+      value: "520rpx",
+    },
   },
   data: {
     empty: true,
@@ -77,6 +87,9 @@ Component({
       this.draw();
     },
     selectedMetricId(this: RadarComponentThis, _value: unknown) {
+      this.draw();
+    },
+    "width, height"(this: RadarComponentThis, _width: unknown, _height: unknown) {
       this.draw();
     },
   },
