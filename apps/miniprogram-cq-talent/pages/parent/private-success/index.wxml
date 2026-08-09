@@ -1,37 +1,42 @@
-<view class="success-page">
-  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="page-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="page-nav__title">预约成功</view></view>
-  <view class="success-page__body">
-    <!-- 绿色对勾（Figma: 100px #22c55e 圆 + 白色 check + 绿色投影） -->
-    <view class="check-circle">
-      <text class="check-circle__icon">✓</text>
-    </view>
-
-    <view class="success-title">预约申请已提交</view>
-    <view class="success-subtitle">{{coach}}将在 24 小时内确认</view>
-
-    <!-- 摘要卡（Figma: 白底 r16 描边 + 分隔行） -->
-    <view class="summary-card">
-      <view class="summary-row">
-        <view class="summary-row__label">教练</view>
-        <view class="summary-row__value">{{coach}}</view>
-      </view>
-      <view class="summary-row">
-        <view class="summary-row__label">日期</view>
-        <view class="summary-row__value">{{date}}</view>
-      </view>
-      <view class="summary-row">
-        <view class="summary-row__label">时段</view>
-        <view class="summary-row__value">{{slot}}</view>
-      </view>
-      <view class="summary-row summary-row--last">
-        <view class="summary-row__label">内容</view>
-        <view class="summary-row__value">{{goals}}</view>
-      </view>
-    </view>
-
-    <view class="actions">
-      <view class="actions__primary" bindtap="backToSchedule">返回日程</view>
-      <view class="actions__outline" bindtap="backToChild">返回我的孩子</view>
-    </view>
+<view class="private-success-page">
+  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
+    <view class="page-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+    <view class="page-nav__title">预约详情</view>
   </view>
+
+  <view class="private-success-page__body">
+    <status-view
+      wx:if="{{state !== 'ready'}}"
+      state="{{state}}"
+      title="{{state === 'loading' ? '正在读取预约申请' : '暂时无法显示预约详情'}}"
+      message="{{message}}"
+      action-text="{{state === 'error' ? '重试' : ''}}"
+      bindaction="retry"
+    />
+
+    <block wx:if="{{state === 'ready' && request}}">
+      <view class="request-marker {{request.hasConfirmation ? 'request-marker--confirmed' : 'request-marker--neutral'}}">
+        <text wx:if="{{request.hasConfirmation}}" class="request-marker__check">✓</text>
+        <text wx:else class="request-marker__status">{{request.statusLabel}}</text>
+      </view>
+      <view class="request-title">{{request.headline}}</view>
+      <view class="request-subtitle">当前状态：{{request.statusLabel}}</view>
+
+      <view class="summary-card">
+        <view class="summary-row"><view class="summary-row__label">教练</view><view class="summary-row__value">{{request.coachName}}</view></view>
+        <view class="summary-row"><view class="summary-row__label">日期</view><view class="summary-row__value">{{request.date}}</view></view>
+        <view class="summary-row"><view class="summary-row__label">时段</view><view class="summary-row__value">{{request.timeSlot}}</view></view>
+        <view class="summary-row"><view class="summary-row__label">状态</view><view class="summary-row__value">{{request.statusLabel}}</view></view>
+        <view wx:if="{{request.hasGoals}}" class="summary-row"><view class="summary-row__label">目标</view><view class="summary-row__value summary-row__value--wrap">{{request.goalsLabel}}</view></view>
+        <view wx:if="{{request.hasNote}}" class="summary-row summary-row--last"><view class="summary-row__label">备注</view><view class="summary-row__value summary-row__value--wrap">{{request.note}}</view></view>
+      </view>
+
+      <view class="actions">
+        <view class="actions__primary" bindtap="backToSchedule">查看训练日程</view>
+        <view class="actions__outline" bindtap="backToChild">返回孩子主页</view>
+      </view>
+    </block>
+  </view>
+
+  <role-tabbar role="parent" active="child" />
 </view>
