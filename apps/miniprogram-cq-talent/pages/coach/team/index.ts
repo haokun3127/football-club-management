@@ -1,25 +1,31 @@
 import { getCoachTeam } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import type { LoadState } from "../../../utils/types";
+import { resolveNavInset } from "../../../utils/presentation";
+import type { CoachTeamDetail, LoadState } from "../../../utils/types";
 
-interface MemberView {
+type HeroStat = { label: string; value: string };
+
+type MemberView = {
   id: string;
   name: string;
   initial: string;
   avatarBg: string;
   avatarColor: string;
-}
+};
 
 interface PageData {
+  navInset: number;
   state: LoadState;
   message: string;
+  retryLabel: string;
+  hasTeam: boolean;
+  hasMembers: boolean;
   teamName: string;
   season: string;
-  memberCount: number;
-  trainingCount: number;
-  attendanceRate: string;
+  heroStats: HeroStat[];
   members: MemberView[];
+  memberEmptyMessage: string;
 }
 
 const AVATAR_THEMES = [
@@ -30,52 +36,86 @@ const AVATAR_THEMES = [
 ];
 
 Page<PageData>({
-  data: {
-    state: "idle",
-    message: "",
-    teamName: "",
-    season: "",
-    memberCount: 0,
-    trainingCount: 0,
-    attendanceRate: "-",
-    members: [],
-  },
+  data: emptyPageData("loading", "正在读取队伍信息"),
   onLoad() {
-    this.load();
+    return this.load();
   },
   async load() {
-    const session = requireRole("coach");
-    if (!session) return;
-    this.setData({ state: "loading", message: "正在读取球队信息" });
+    if (!requireRole("coach")) return;
+    this.setData(emptyPageData("loading", "正在读取队伍信息"));
     try {
       const detail = await getCoachTeam();
+      const hasTeam = detail.team !== null;
+      const members = hasTeam ? toMembers(detail) : [];
       this.setData({
-        state: detail.members.length ? "ready" : "empty",
-        message: detail.members.length ? "" : "近 30 天暂无执教活动与学员。",
-        teamName: detail.team?.name || "我的球队",
-        season: detail.team?.season || "",
-        memberCount: detail.stats.memberCount,
-        trainingCount: detail.stats.trainingCount,
-        attendanceRate: detail.stats.attendanceRate === null ? "-" : `${detail.stats.attendanceRate}%`,
-        members: detail.members.map((member, index) => {
-          const theme = AVATAR_THEMES[index % AVATAR_THEMES.length] ?? AVATAR_THEMES[0] ?? { bg: "#fee2e2", color: "#a80f1b" };
-          return {
-            id: member.id,
-            name: member.name,
-            initial: member.name.slice(0, 1),
-            avatarBg: theme.bg,
-            avatarColor: theme.color,
-          };
-        }),
+        state: hasTeam ? "ready" : "empty",
+        message: hasTeam ? "" : "近30天暂无可展示的球队",
+        retryLabel: "",
+        hasTeam,
+        hasMembers: members.length > 0,
+        teamName: detail.team?.name ?? "",
+        season: detail.team?.season ?? "",
+        heroStats: hasTeam ? toHeroStats(detail) : emptyHeroStats(),
+        members,
+        memberEmptyMessage: hasTeam && !members.length ? "近30天暂无执教学员" : "",
       });
-    } catch (error) {
-      this.setData({ state: "error", message: error instanceof Error ? error.message : "球队信息读取失败，请稍后重试。" });
+    } catch {
+      this.setData(emptyPageData("error", "队伍信息读取失败，请稍后重试。", "重新读取"));
     }
   },
   retry() {
     this.load();
   },
-  openRadar(event: { currentTarget: { dataset: { id: string } } }) {
-    openPage(`/pages/coach/student-radar/index?student=${event.currentTarget.dataset.id}`);
+  goBack() {
+    wx.navigateBack();
+  },
+  openRadar(event: { currentTarget?: { dataset?: { id?: string } } }) {
+    const id = event.currentTarget?.dataset?.id;
+    if (id) openPage(`/pages/coach/student-radar/index?student=${encodeURIComponent(id)}`);
   },
 });
+
+function emptyPageData(state: LoadState, message: string, retryLabel = ""): PageData {
+  return {
+    navInset: resolveNavInset(),
+    state,
+    message,
+    retryLabel,
+    hasTeam: false,
+    hasMembers: false,
+    teamName: "",
+    season: "",
+    heroStats: emptyHeroStats(),
+    members: [],
+    memberEmptyMessage: "",
+  };
+}
+
+function emptyHeroStats(): HeroStat[] {
+  return [
+    { label: "在队人数", value: "--" },
+    { label: "近30天训练", value: "--" },
+    { label: "出勤率", value: "--" },
+  ];
+}
+
+function toHeroStats(detail: CoachTeamDetail): HeroStat[] {
+  return [
+    { label: "在队人数", value: String(detail.stats.memberCount) },
+    { label: "近30天训练", value: String(detail.stats.trainingCount) },
+    { label: "出勤率", value: detail.stats.attendanceRate === null ? "--" : `${detail.stats.attendanceRate}%` },
+  ];
+}
+
+function toMembers(detail: CoachTeamDetail): MemberView[] {
+  return detail.members.map((member, index) => {
+    const theme = AVATAR_THEMES[index % AVATAR_THEMES.length] ?? AVATAR_THEMES[0]!;
+    return {
+      id: member.id,
+      name: member.name,
+      initial: member.name.slice(0, 1),
+      avatarBg: theme.bg,
+      avatarColor: theme.color,
+    };
+  });
+}
