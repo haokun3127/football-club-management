@@ -949,6 +949,63 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
     Params: {
       clubId: string;
       clientId: string;
+      eventId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/match",
+    {
+      schema: {
+        ...schemas.appClientEventParams,
+        ...schemas.appClientCoachMatchDetail,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await requireCoachEventAccess(context, request, reply, request.params.clubId, request.params.eventId)) {
+        return reply;
+      }
+
+      const event = (await context.store.listCalendarEvents(request.params.clubId) as AppEventDetail[])
+        .find((item) => item.id === request.params.eventId);
+      if (!event) {
+        return context.sendError(reply, 404, "not_found", "Event not found");
+      }
+      if (event.type !== "match") {
+        return context.sendError(reply, 400, "invalid_match_event", "Event is not a match");
+      }
+
+      const students = await context.store.listOperationalStudents(request.params.clubId);
+      const nameByStudentId = new Map(students.map((student) => [student.id, student.name]));
+      const detail = await context.store.getMatchDetailByEvent(request.params.clubId, request.params.eventId);
+
+      return {
+        event: {
+          id: event.id,
+          type: event.type,
+          title: event.title,
+          timeRange: event.timeRange,
+          status: event.status,
+          teamName: typeof event.teamName === "string" ? event.teamName : undefined,
+        },
+        roster: (event.participants ?? []).map((participant) => ({
+          studentId: participant.studentId,
+          name: nameByStudentId.get(participant.studentId),
+          status: participant.status,
+        })),
+        match: detail?.match ?? null,
+        events: detail?.events ?? [],
+      };
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
       templateId: string;
     };
     Querystring: {

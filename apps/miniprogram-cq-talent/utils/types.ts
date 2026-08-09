@@ -180,6 +180,28 @@ export interface CoachWorkbench {
   pending: Array<{ title: string; message: string }>;
 }
 
+export interface CoachMatchDetail {
+  event: ScheduleEvent;
+  roster: Array<{ studentId: string; name?: string; status?: string }>;
+  match: {
+    id: string;
+    eventId?: string;
+    matchType?: string;
+    opponentName?: string;
+    homeScore?: number;
+    awayScore?: number;
+    status?: string;
+  } | null;
+  events: Array<{
+    id: string;
+    type: CoachMatchPlayerEvent["type"];
+    studentId: string;
+    minute?: number;
+    note?: string;
+    createdAt?: string;
+  }>;
+}
+
 export interface FormationTemplate {
   name: string;
   label: string;

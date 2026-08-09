@@ -1,107 +1,43 @@
-<view class="c6">
-  <!-- C6 TopNav（粉底） -->
-  <view class="c6-nav" style="padding-top:{{navInset}}px">
-    <view class="c6-nav__left" bindtap="goBack">
-      <view class="c6-nav__back">‹</view>
-      <view class="c6-nav__title">比赛记录</view>
-    </view>
-  </view>
+<view class="match-page">
+  <app-header title="比赛记录" show-back />
 
-  <view class="c6-body">
-  <status-view state="{{state}}" title="比赛录入" message="{{message}}" />
-  <!-- C6 MatchHero -->
-  <view wx:if="{{workbench}}" class="c6-hero">
-    <view class="c6-hero__title">{{workbench.event.title}}</view>
-    <view class="c6-hero__teams">
-      <view class="c6-hero__team">{{workbench.event.teamName || '本队'}}</view>
-      <view class="c6-hero__score">{{homeScore === '' ? '–' : homeScore}}:{{awayScore === '' ? '–' : awayScore}}</view>
-      <view class="c6-hero__team">{{opponentName || '对手待填写'}}</view>
-    </view>
-    <view class="c6-hero__periods">
-      <view class="c6-period">上半场 {{homeScore === '' ? '–' : homeScore}}-{{awayScore === '' ? '–' : awayScore}}</view>
-      <view class="c6-period">{{statuses[statusIndex].label}}</view>
-      <view class="c6-period c6-period--link" bindtap="openTacticalBoard">战术板 ›</view>
-    </view>
-  </view>
-  <view wx:if="{{workbench}}" class="card match-form-card">
-    <view class="section-title">当前比赛摘要</view>
-    <view wx:for="{{workbench.match}}" wx:key="label" class="field-row">
-      <view class="label">{{item.label}}</view>
-      <view class="field-value">{{item.value}}</view>
-    </view>
-  </view>
-  <view wx:if="{{workbench}}" class="card match-form-card match-form-card--events">
-    <view class="section-title">比赛摘要</view>
-    <view class="form-row">
-      <view class="label">比赛类型</view>
-      <picker mode="selector" range="{{matchTypes}}" range-key="label" value="{{matchTypeIndex}}" bindchange="onMatchTypeChange">
-        <view class="field-input">{{matchTypes[matchTypeIndex].label}}</view>
-      </picker>
-    </view>
-    <view class="form-row">
-      <view class="label">状态</view>
-      <picker mode="selector" range="{{statuses}}" range-key="label" value="{{statusIndex}}" bindchange="onStatusChange">
-        <view class="field-input">{{statuses[statusIndex].label}}</view>
-      </picker>
-    </view>
-    <view class="form-row">
-      <view class="label">对手</view>
-      <input class="field-input" placeholder="请输入对手" value="{{opponentName}}" data-field="opponentName" bindinput="onTextInput" />
-    </view>
-    <view class="score-grid">
-      <view class="form-row">
-        <view class="label">本队</view>
-        <input class="field-input" type="number" placeholder="-" value="{{homeScore}}" data-field="homeScore" bindinput="onTextInput" />
-      </view>
-      <view class="form-row">
-        <view class="label">对手</view>
-        <input class="field-input" type="number" placeholder="-" value="{{awayScore}}" data-field="awayScore" bindinput="onTextInput" />
-      </view>
-    </view>
-  </view>
+  <view class="match-page__content">
+    <status-view state="{{state}}" title="比赛记录" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
 
-  <view wx:if="{{workbench}}" class="card">
-    <view class="section-title">球员关键事件</view>
-    <view class="form-row">
-      <view class="label">事件</view>
-      <picker mode="selector" range="{{playerEventTypes}}" range-key="label" value="{{playerEventTypeIndex}}" bindchange="onPlayerEventTypeChange">
-        <view class="field-input">{{playerEventTypes[playerEventTypeIndex].label}}</view>
-      </picker>
-    </view>
-    <view class="form-row">
-      <view class="label">球员</view>
-      <picker mode="selector" range="{{workbench.roster}}" range-key="name" value="{{studentIndex}}" bindchange="onStudentChange">
-        <view class="field-input">{{workbench.roster[studentIndex].name || '选择球员'}}</view>
-      </picker>
-    </view>
-    <view wx:if="{{playerEventTypes[playerEventTypeIndex].value === 'goal'}}" class="form-row">
-      <view class="label">助攻</view>
-      <picker mode="selector" range="{{assistOptions}}" range-key="name" value="{{assistStudentIndex}}" bindchange="onAssistStudentChange">
-        <view class="field-input">{{assistOptions[assistStudentIndex].name}}</view>
-      </picker>
-    </view>
-    <view class="form-row">
-      <view class="label">分钟</view>
-      <input class="field-input" type="number" placeholder="可选" value="{{eventMinute}}" data-field="eventMinute" bindinput="onTextInput" />
-    </view>
-    <view class="form-row">
-      <view class="label">备注</view>
-      <input class="field-input" placeholder="可选" value="{{eventNote}}" data-field="eventNote" bindinput="onTextInput" />
-    </view>
-    <button class="ghost-button" bindtap="addPlayerEvent">添加事件</button>
-    <button class="ghost-button ghost-button--brand" bindtap="openMatchEventAdd">按设计稿添加 ›</button>
-    <view wx:if="{{playerEvents.length}}" class="event-list">
-      <view wx:for="{{playerEvents}}" wx:key="label" class="match-event-row">
-        <view>
-          <view class="label strong">{{item.label}}</view>
-          <view class="subtitle" wx:if="{{item.assistStudentName}}">助攻：{{item.assistStudentName}}</view>
-          <view class="subtitle" wx:if="{{item.note}}">{{item.note}}</view>
+    <block wx:if="{{state === 'ready' && hasMatch}}">
+      <view class="match-hero">
+        <view class="match-hero__eyebrow">比赛活动</view>
+        <view class="match-hero__title">{{eventTitle}}</view>
+        <view wx:if="{{hasTeamName || hasOpponentName}}" class="match-hero__teams">
+          <view wx:if="{{hasTeamName}}" class="match-hero__team">{{teamName}}</view>
+          <view wx:if="{{hasScore}}" class="match-hero__score">{{scoreLabel}}</view>
+          <view wx:if="{{hasOpponentName}}" class="match-hero__team">{{opponentName}}</view>
         </view>
-        <view class="remove-action" data-index="{{index}}" bindtap="removePlayerEvent">删除</view>
+        <view wx:else class="match-hero__score match-hero__score--pending">{{scoreLabel}}</view>
+        <view wx:if="{{hasMatchStatus}}" class="match-hero__status">{{matchStatus}}</view>
       </view>
-    </view>
-    <view class="subtitle">请确认比分和球员事件后保存；未选择助攻时不会生成助攻记录。</view>
+
+      <view class="match-card">
+        <view class="match-card__header">
+          <view class="match-card__title">比赛事件</view>
+          <view wx:if="{{canAddEvent}}" class="match-card__action" bindtap="openMatchEventAdd">添加事件</view>
+        </view>
+        <view wx:if="{{hasTimeline}}" class="timeline">
+          <view wx:for="{{timeline}}" wx:key="id" class="timeline__item">
+            <view class="timeline__time">{{item.minuteLabel}}</view>
+            <view class="timeline__body">
+              <view class="timeline__line">
+                <view class="timeline__label">{{item.typeLabel}}</view>
+                <view class="timeline__name">{{item.studentName}}</view>
+              </view>
+              <view wx:if="{{item.hasNote}}" class="timeline__note">{{item.note}}</view>
+            </view>
+          </view>
+        </view>
+        <view wx:else class="match-card__empty">暂无已记录的比赛事件</view>
+      </view>
+    </block>
   </view>
-  <submit-bar wx:if="{{workbench}}" primary-text="{{savedFlash ? '已保存 ✓' : '保存比赛记录'}}" hint="未选择助攻时只记录进球" loading="{{saving}}" disabled="{{saving}}" bindsubmit="saveMatch" />
-  </view>
+
+  <role-tabbar role="coach" active="schedule" />
 </view>

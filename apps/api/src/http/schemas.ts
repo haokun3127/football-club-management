@@ -731,6 +731,14 @@ export const schemas = {
       404: errorResponse,
     },
   },
+  appClientCoachMatchDetail: {
+    response: {
+      200: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
   appClientAssessmentForm: {
     response: {
       200: flexibleObject,

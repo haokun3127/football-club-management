@@ -275,6 +275,31 @@ const selectedProjectIds = workbench.training.selectedProjectIds;
 - App-client contract regression covers coach `200`, parent/out-of-scope coach `403`, idempotent replay, conflicting payload `409`, and one attendance debit source id.
 - C4 visual acceptance is separate: a static or API test does not replace a trusted coach `375x812` DevTools/device screenshot.
 
+## Scenario: Coach Match Detail (C6)
+
+### 1. Scope / Trigger
+
+- Trigger: coach match read view (`/pages/coach/match/index?id=<eventId>`).
+- `GET /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/match`
+
+### 2. Contract
+
+- Authorization order is fixed: require an active coach app client, then require coach access to the event, then read the event and verify `type === "match"` before reading the match projection.
+- `200` returns only `{ event, roster, match, events }`. `roster` is derived only from the event's participants. `event` does not include a second raw participant collection; there is no synthetic summary, inferred assist relation, or inferred half-time score.
+- A match event without an existing match record returns `200` with `match: null` and `events: []`.
+
+### 3. Validation & Error Matrix
+
+- Missing/inactive/non-coach app client -> `404 not_found`.
+- Parent or out-of-scope coach -> `403 forbidden` before the endpoint exposes event type or roster.
+- Accessible unknown event -> `404 not_found`.
+- Accessible non-match event -> `400 invalid_match_event`.
+
+### 4. Client Rules
+
+- The Mini Program sorts returned match events by recorded minute ascending. Ties use recorded `createdAt`, then event id; events without a minute sort last.
+- The view renders only API-backed event, roster, match, and event data. It does not offer C6's retired inline write form or tactical controls; adding a match event remains the separate C6.1 flow.
+
 ## Scenario: Coach Lesson Correction Idempotency
 
 ### 1. Scope / Trigger

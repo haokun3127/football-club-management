@@ -36,7 +36,7 @@ globalThis.wx = {
   }),
 };
 
-const { correctCoachLesson, getCoachWorkbench, getParentActivityDetail, getParentStudentHome } = await import("./api.ts");
+const { correctCoachLesson, getCoachMatchDetail, getCoachWorkbench, getParentActivityDetail, getParentStudentHome } = await import("./api.ts");
 
 describe("coach workbench participant normalization", () => {
   it("uses backend participant.status and note fields", async () => {
@@ -67,6 +67,38 @@ describe("coach lesson correction request boundary", () => {
         header: expect.objectContaining({ "Idempotency-Key": "lesson-correction-key" }),
       }));
       expect(received.data).not.toHaveProperty("actorUserId");
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
+});
+
+describe("coach match detail request boundary", () => {
+  it("reads the authorized event-match projection without producing a synthetic summary", async () => {
+    const originalRequest = globalThis.wx.request;
+    let received;
+    globalThis.wx.request = ({ url, method, success }) => {
+      received = { url, method };
+      success({
+        statusCode: 200,
+        data: {
+          event: { id: "event-match-1", type: "match", title: "Real match", startsAt: "2026-08-13T09:00:00.000Z", endsAt: "2026-08-13T10:00:00.000Z", status: "completed" },
+          roster: [{ studentId: "student-1", name: "Athlete One", status: "present" }],
+          match: { id: "match-1", homeScore: 2, awayScore: 1, status: "completed" },
+          events: [{ id: "match-event-1", type: "goal", studentId: "student-1", minute: 18, createdAt: "2026-08-13T09:18:00.000Z" }],
+        },
+      });
+    };
+
+    try {
+      const detail = await getCoachMatchDetail("event-match-1");
+      expect(received).toEqual(expect.objectContaining({
+        method: "GET",
+        url: expect.stringContaining("/coach/events/event-match-1/match"),
+      }));
+      expect(detail).toMatchObject({ event: { id: "event-match-1" }, match: { id: "match-1" } });
+      expect(detail).not.toHaveProperty("summary");
+      expect(detail.events[0]).not.toHaveProperty("assistStudentId");
     } finally {
       globalThis.wx.request = originalRequest;
     }

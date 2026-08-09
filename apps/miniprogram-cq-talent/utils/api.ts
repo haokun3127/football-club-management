@@ -7,6 +7,7 @@ import type {
   AppContext,
   AssessmentForm,
   CoachLessonConfirmation,
+  CoachMatchDetail,
   CoachMatchPlayerEvent,
   CoachHome,
   CoachTeamDetail,
@@ -134,6 +135,14 @@ export async function getCoachWorkbench(eventId: string): Promise<CoachWorkbench
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/workbench`,
   });
   return normalizeCoachWorkbench(response, eventId);
+}
+
+export async function getCoachMatchDetail(eventId: string): Promise<CoachMatchDetail> {
+  const context = requireContext();
+  const response = await request<Record<string, unknown>>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/match`,
+  });
+  return normalizeCoachMatchDetail(response);
 }
 
 export async function getCoachLessonConfirmation(eventId: string): Promise<CoachLessonConfirmation> {
@@ -708,6 +717,83 @@ function normalizeCoachWorkbench(raw: Record<string, unknown>, eventId: string):
     assessmentTemplateId: stringOrUndefined(preferredTemplateVersion?.templateId ?? preferredTemplateVersion?.id),
     pending: [],
   };
+}
+
+function normalizeCoachMatchDetail(raw: Record<string, unknown>): CoachMatchDetail {
+  const eventSource = asRecord(raw.event);
+  const timeRange = asRecord(eventSource?.timeRange);
+  const eventId = stringOrUndefined(eventSource?.id);
+  const eventTitle = stringOrUndefined(eventSource?.title);
+  if (!eventSource || !eventId || !eventTitle || eventSource.type !== "match") {
+    throw new Error("Coach match detail unavailable");
+  }
+
+  const rosterSource = Array.isArray(raw.roster) ? raw.roster as Array<Record<string, unknown>> : [];
+  const roster = rosterSource.flatMap((item) => {
+    const studentId = stringOrUndefined(item.studentId);
+    return studentId ? [{
+      studentId,
+      name: stringOrUndefined(item.name),
+      status: stringOrUndefined(item.status),
+    }] : [];
+  });
+
+  const matchSource = asRecord(raw.match);
+  const matchId = stringOrUndefined(matchSource?.id);
+  const match = matchId ? {
+    id: matchId,
+    eventId: stringOrUndefined(matchSource?.eventId),
+    matchType: stringOrUndefined(matchSource?.matchType),
+    opponentName: stringOrUndefined(matchSource?.opponentName),
+    homeScore: numberOrUndefined(matchSource?.homeScore),
+    awayScore: numberOrUndefined(matchSource?.awayScore),
+    status: stringOrUndefined(matchSource?.status),
+  } : null;
+
+  const eventsSource = Array.isArray(raw.events) ? raw.events as Array<Record<string, unknown>> : [];
+  const events = eventsSource.flatMap((item) => {
+    const id = stringOrUndefined(item.id);
+    const studentId = stringOrUndefined(item.studentId);
+    const type = stringOrUndefined(item.type);
+    if (!id || !studentId || !isCoachMatchEventType(type)) return [];
+    return [{
+      id,
+      type,
+      studentId,
+      minute: numberOrUndefined(item.minute),
+      note: stringOrUndefined(item.note),
+      createdAt: stringOrUndefined(item.createdAt),
+    }];
+  });
+
+  return {
+    event: {
+      id: eventId,
+      type: "match",
+      title: eventTitle,
+      startsAt: stringOrUndefined(eventSource.startsAt ?? timeRange?.startsAt) ?? "",
+      endsAt: stringOrUndefined(eventSource.endsAt ?? timeRange?.endsAt),
+      venue: stringOrUndefined(eventSource.venue ?? eventSource.locationName) ?? "",
+      teamName: stringOrUndefined(eventSource.teamName),
+      status: stringOrUndefined(eventSource.status) ?? "",
+      childIds: [],
+      children: [],
+    },
+    roster,
+    match,
+    events: match ? events : [],
+  };
+}
+
+function isCoachMatchEventType(value: string | undefined): value is CoachMatchPlayerEvent["type"] {
+  return value === "goal"
+    || value === "assist"
+    || value === "save"
+    || value === "tackle"
+    || value === "yellow_card"
+    || value === "red_card"
+    || value === "penalty"
+    || value === "own_goal";
 }
 
 function normalizeLessonConfirmation(raw: Record<string, unknown>): CoachLessonConfirmation {
