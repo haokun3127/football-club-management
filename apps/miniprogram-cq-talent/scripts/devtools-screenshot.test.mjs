@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -32,12 +33,18 @@ function createAutomator({
   png = createPng(),
   systemInfo = { windowWidth: 375, windowHeight: 812, pixelRatio: 1 },
   connectFailures = 0,
+  screenshotNeverResolves = false,
 } = {}) {
   const calls = { connect: [], launch: [], screenshotPaths: [], sequence: [], systemInfo: 0, disconnects: 0 };
   const miniProgram = {
     async currentPage() { return { path: route }; },
     async pageStack() { return pageStack.map((path) => ({ path })); },
-    async screenshot({ path }) { calls.screenshotPaths.push(path); calls.sequence.push("screenshot"); writeFileSync(path, png); },
+    async screenshot({ path }) {
+      calls.screenshotPaths.push(path);
+      calls.sequence.push("screenshot");
+      if (screenshotNeverResolves) return new Promise(() => {});
+      writeFileSync(path, png);
+    },
     async systemInfo() { calls.systemInfo += 1; calls.sequence.push("systemInfo"); return systemInfo; },
     disconnect() { calls.disconnects += 1; },
   };
@@ -67,6 +74,7 @@ describe("DevTools Automator screenshot CLI", () => {
     const result = await runCli({
       argv: ["--output", output, "--expect-route-prefix", "/pages/parent/"],
       automatorImpl: fake.automatorImpl,
+      platform: "darwin",
       now: () => new Date("2026-08-04T01:00:00.000Z"),
     });
 
@@ -95,7 +103,7 @@ describe("DevTools Automator screenshot CLI", () => {
     const png = createPng();
     const fake = createAutomator({ png });
 
-    await runCli({ argv: ["--output", output, "--expect-route-prefix", "/pages/parent/"], automatorImpl: fake.automatorImpl });
+    await runCli({ argv: ["--output", output, "--expect-route-prefix", "/pages/parent/"], automatorImpl: fake.automatorImpl, platform: "darwin" });
 
     expect(readFileSync(output)).toEqual(png);
     expect(JSON.parse(readFileSync(`${output}.json`, "utf8"))).toEqual({
@@ -128,13 +136,73 @@ describe("DevTools Automator screenshot CLI", () => {
       systemInfo: { windowWidth: 375, windowHeight: 812, pixelRatio: 3 },
     });
 
-    const result = await runCli({ argv: ["--output", output, "--expect-route-prefix", "/pages/parent/"], automatorImpl: fake.automatorImpl });
+    const result = await runCli({ argv: ["--output", output, "--expect-route-prefix", "/pages/parent/"], automatorImpl: fake.automatorImpl, platform: "darwin" });
 
     expect(result.png).toMatchObject({ width: 563, height: 1218 });
     expect(result.viewport).toMatchObject({ width: 375, height: 812, devicePixelRatio: 3 });
     expect(result.viewport.rasterScale.width).toBeCloseTo(563 / 375, 8);
     expect(result.viewport.rasterScale.height).toBeCloseTo(1218 / 812, 8);
     expect(existsSync(output)).toBe(true);
+  });
+
+  it("uses a direct DevTools simulator-window capture on Windows after Automator route verification", async () => {
+    const directory = createOutputDirectory();
+    const output = join(directory, "parent-window-capture.png");
+    const fake = createAutomator({
+      png: createPng(563, 1218),
+      systemInfo: { windowWidth: 375, windowHeight: 812, pixelRatio: 3 },
+    });
+    const captureWindowCalls = [];
+
+    const result = await runCli({
+      argv: ["--output", output, "--expect-route-prefix", "/pages/parent/"],
+      automatorImpl: fake.automatorImpl,
+      platform: "win32",
+      captureWindowsSimulatorImpl: async ({ output: captureOutput, viewport }) => {
+        captureWindowCalls.push({ output: captureOutput, viewport });
+        writeFileSync(captureOutput, createPng(563, 1218));
+        return {
+          title: "重庆天才俱乐部的模拟器",
+          window: { width: 585, height: 1361 },
+          crop: { x: 11, y: 93, width: 563, height: 1218 },
+          dpi: 144,
+        };
+      },
+    });
+
+    expect(captureWindowCalls).toHaveLength(1);
+    expect(captureWindowCalls[0].viewport).toEqual({ width: 375, height: 812 });
+    expect(fake.calls.screenshotPaths).toEqual([]);
+    expect(fake.calls.sequence).toEqual(["systemInfo"]);
+    expect(result.captureMethod).toBe("Windows PrintWindow DevTools simulator capture");
+    expect(result.simulatorWindow).toMatchObject({
+      title: "重庆天才俱乐部的模拟器",
+      crop: { x: 11, y: 93, width: 563, height: 1218 },
+    });
+  });
+
+  it.skipIf(process.platform !== "win32")("wires the Python window enumerator before reporting a missing simulator title", () => {
+    const directory = createOutputDirectory();
+    const result = spawnSync("python", [
+      new URL("./devtools-simulator-capture.py", import.meta.url).pathname.slice(1),
+      "--output",
+      join(directory, "missing.png"),
+      "--logical-width",
+      "375",
+      "--logical-height",
+      "812",
+      "--simulator-title",
+      "__cq_talent_missing_simulator__",
+    ], { encoding: "utf8" });
+
+    expect(result.status).toBe(1);
+    expect(`${result.stdout}\n${result.stderr}`).toMatch(/No visible WeChat DevTools simulator window found titled/);
+  });
+
+  it("emits Python simulator metadata in ASCII-safe JSON for Node pipe parsing", () => {
+    const source = readFileSync(new URL("./devtools-simulator-capture.py", import.meta.url), "utf8");
+
+    expect(source).toContain("ensure_ascii=True");
   });
 
   it("rejects a wrong route before calling screenshot", async () => {
@@ -144,8 +212,25 @@ describe("DevTools Automator screenshot CLI", () => {
     await expect(runCli({
       argv: ["--output", join(directory, "wrong-route.png"), "--expect-route-prefix", "/pages/parent/"],
       automatorImpl: fake.automatorImpl,
+      platform: "darwin",
     })).rejects.toThrow(/route prefix/i);
     expect(fake.calls.screenshotPaths).toEqual([]);
+    expect(fake.calls.disconnects).toBe(1);
+  });
+
+  it("times out a non-responsive SDK screenshot without publishing evidence", async () => {
+    const directory = createOutputDirectory();
+    const output = join(directory, "timed-out.png");
+    const fake = createAutomator({ screenshotNeverResolves: true });
+
+    await expect(runCli({
+      argv: ["--output", output, "--expect-route-prefix", "/pages/parent/"],
+      automatorImpl: fake.automatorImpl,
+      platform: "darwin",
+      operationTimeoutMs: 1,
+    })).rejects.toThrow(/screenshot timed out after 1ms/i);
+    expect(existsSync(output)).toBe(false);
+    expect(existsSync(`${output}.json`)).toBe(false);
     expect(fake.calls.disconnects).toBe(1);
   });
 
@@ -160,6 +245,7 @@ describe("DevTools Automator screenshot CLI", () => {
     await expect(runCli({
       argv: ["--output", output, "--expect-route-prefix", "/pages/parent/"],
       automatorImpl: fake.automatorImpl,
+      platform: "darwin",
     })).rejects.toThrow(error);
     expect(existsSync(output)).toBe(false);
     expect(existsSync(`${output}.json`)).toBe(false);
@@ -187,6 +273,7 @@ describe("DevTools Automator screenshot CLI", () => {
       port: 9431,
       timeoutMs: 12_000,
       isWindows: true,
+      commandShell: "cmd.exe",
       spawnImpl(command, args, options) {
         spawnCalls.push({ command, args, options });
         return { unref() { unrefCalls += 1; } };
@@ -196,9 +283,9 @@ describe("DevTools Automator screenshot CLI", () => {
     expect(fake.calls.launch).toEqual([]);
     expect(fake.calls.connect).toEqual([{ wsEndpoint: "ws://127.0.0.1:9431" }]);
     expect(spawnCalls).toEqual([{
-      command: "D:\\微信web开发者工具\\cli.bat",
-      args: ["auto", "--project", "C:\\workspace\\mini-program", "--auto-port", "9431", "--lang", "zh"],
-      options: { stdio: "ignore", windowsHide: true, shell: true },
+      command: "cmd.exe",
+      args: ["/d", "/s", "/c", "\"\"D:\\微信web开发者工具\\cli.bat\" auto --project \"C:\\workspace\\mini-program\" --auto-port 9431 --lang zh\""],
+      options: { stdio: "ignore", windowsHide: true, shell: false },
     }]);
     expect(unrefCalls).toBe(1);
     expect(result).toEqual({ port: 9431, route: "/pages/launch/index" });

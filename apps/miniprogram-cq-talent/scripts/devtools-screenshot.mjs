@@ -18,6 +18,7 @@ const DEFAULT_CLI_PATH = process.platform === "win32"
   ? "D:\\微信web开发者工具\\cli.bat"
   : "/Applications/wechatwebdevtools.app/Contents/MacOS/cli";
 const DEFAULT_PROJECT_PATH = resolve(import.meta.dirname, "..");
+const WINDOWS_SIMULATOR_CAPTURE_HELPER = resolve(import.meta.dirname, "devtools-simulator-capture.py");
 const USAGE = "Usage: devtools:screenshot -- --output C:\\temp\\shot.png --expect-route-prefix /pages/parent/ [--port 9421]";
 
 export function parseArgs(argv) {
@@ -146,8 +147,66 @@ function safeDisconnect(miniProgram) {
   try { miniProgram?.disconnect?.(); } catch {}
 }
 
+async function captureWindowsSimulator({
+  output,
+  viewport,
+  simulatorTitle = process.env.WECHAT_DEVTOOLS_SIMULATOR_TITLE ?? "",
+  pythonPath = process.env.WECHAT_DEVTOOLS_PYTHON ?? "python",
+  spawnImpl = spawn,
+} = {}) {
+  if (!existsSync(WINDOWS_SIMULATOR_CAPTURE_HELPER)) throw new Error(`Windows simulator capture helper not found: ${WINDOWS_SIMULATOR_CAPTURE_HELPER}`);
+  const args = [
+    WINDOWS_SIMULATOR_CAPTURE_HELPER,
+    "--output",
+    output,
+    "--logical-width",
+    String(viewport.width),
+    "--logical-height",
+    String(viewport.height),
+  ];
+  if (simulatorTitle) args.push("--simulator-title", simulatorTitle);
+
+  const child = spawnImpl(pythonPath, args, { stdio: ["ignore", "pipe", "pipe"], windowsHide: true, shell: false });
+  let stdout = "";
+  let stderr = "";
+  child.stdout?.setEncoding?.("utf8");
+  child.stderr?.setEncoding?.("utf8");
+  child.stdout?.on?.("data", (chunk) => { stdout += chunk; });
+  child.stderr?.on?.("data", (chunk) => { stderr += chunk; });
+
+  await new Promise((resolveCapture, rejectCapture) => {
+    child.once?.("error", rejectCapture);
+    child.once?.("close", (code) => {
+      if (code === 0) resolveCapture();
+      else rejectCapture(new Error(`Python simulator capture failed${stderr.trim() ? `: ${stderr.trim()}` : ` with exit code ${code}`}`));
+    });
+  });
+
+  try {
+    return JSON.parse(stdout.trim());
+  } catch {
+    throw new Error(`Python simulator capture returned invalid metadata${stdout.trim() ? `: ${stdout.trim()}` : ""}`);
+  }
+}
+
+function buildWindowsBatchCommand(cliPath, projectPath, port) {
+  for (const [label, value] of [["CLI path", cliPath], ["project path", projectPath]]) {
+    if (/[\"%&|<>()^!\r\n]/.test(value)) throw new Error(`Windows ${label} contains unsupported cmd metacharacters`);
+  }
+  return `\"\"${cliPath}\" auto --project \"${projectPath}\" --auto-port ${port} --lang zh\"`;
+}
+
 function sleep(milliseconds) {
   return new Promise((resolveSleep) => setTimeout(resolveSleep, milliseconds));
+}
+
+function withOperationTimeout(operation, label, timeoutMs) {
+  if (!Number.isFinite(timeoutMs) || timeoutMs < 1) throw new Error("operation timeout must be a positive finite number");
+  let timeout;
+  return new Promise((resolveOperation, rejectOperation) => {
+    timeout = setTimeout(() => rejectOperation(new Error(`${label} timed out after ${timeoutMs}ms`)), timeoutMs);
+    Promise.resolve(operation).then(resolveOperation, rejectOperation).finally(() => clearTimeout(timeout));
+  });
 }
 
 async function connectAfterLaunch({ automatorImpl, endpoint, timeoutMs, retryDelayMs, sleepImpl }) {
@@ -175,16 +234,25 @@ export async function openAutomation({
   retryDelayMs = DEFAULT_RETRY_DELAY_MS,
   sleepImpl = sleep,
   isWindows = process.platform === "win32",
+  commandShell = process.env.ComSpec ?? "cmd.exe",
   spawnImpl = spawn,
 } = {}) {
   if (!existsSync(cliPath)) throw new Error(`WeChat DevTools CLI not found: ${cliPath}`);
   const automationPort = parsePort(String(port));
   const endpoint = `ws://127.0.0.1:${automationPort}`;
-  const child = spawnImpl(cliPath, ["auto", "--project", projectPath, "--auto-port", String(automationPort), "--lang", "zh"], {
-    stdio: "ignore",
-    windowsHide: true,
-    shell: isWindows && /\.(bat|cmd)$/i.test(cliPath),
-  });
+  const cliArgs = ["auto", "--project", projectPath, "--auto-port", String(automationPort), "--lang", "zh"];
+  const isWindowsBatch = isWindows && /\.(bat|cmd)$/i.test(cliPath);
+  const child = isWindowsBatch
+    ? spawnImpl(commandShell, ["/d", "/s", "/c", buildWindowsBatchCommand(cliPath, projectPath, automationPort)], {
+      stdio: "ignore",
+      windowsHide: true,
+      shell: false,
+    })
+    : spawnImpl(cliPath, cliArgs, {
+      stdio: "ignore",
+      windowsHide: true,
+      shell: false,
+    });
   child?.unref?.();
   const miniProgram = await connectAfterLaunch({ automatorImpl, endpoint, timeoutMs, retryDelayMs, sleepImpl });
   try {
@@ -199,6 +267,9 @@ export async function runCli({
   automatorImpl = automator,
   repoRoot = REPO_ROOT,
   now = () => new Date(),
+  operationTimeoutMs = DEFAULT_TIMEOUT_MS,
+  platform = process.platform,
+  captureWindowsSimulatorImpl = captureWindowsSimulator,
 } = {}) {
   const options = parseArgs(argv ?? []);
   if (options.help) return { help: true, usage: USAGE };
@@ -211,14 +282,22 @@ export async function runCli({
     let route;
     let pageStackRoutes;
     let bytes;
+    let simulatorWindow;
     try {
       route = routeOf(await captureProgram.currentPage());
       pageStackRoutes = routesOf(await captureProgram.pageStack());
       if (!route.startsWith(options.expectRoutePrefix)) throw new Error(`current page does not match route prefix: ${route || "(none)"}`);
-      await captureProgram.screenshot({ path: captureTemp });
-      bytes = readFileSync(captureTemp);
+      if (platform !== "win32") {
+        await withOperationTimeout(captureProgram.screenshot({ path: captureTemp }), "screenshot", operationTimeoutMs);
+        bytes = readFileSync(captureTemp);
+      }
     } finally {
       safeDisconnect(captureProgram);
+    }
+
+    if (platform === "win32") {
+      simulatorWindow = await captureWindowsSimulatorImpl({ output: captureTemp, viewport: REQUIRED_VIEWPORT });
+      bytes = readFileSync(captureTemp);
     }
 
     const inspectionProgram = await automatorImpl.connect({ wsEndpoint: endpoint });
@@ -226,7 +305,7 @@ export async function runCli({
     try {
       const inspectionRoute = routeOf(await inspectionProgram.currentPage());
       if (inspectionRoute !== route) throw new Error(`current page changed during capture: ${route || "(none)"} -> ${inspectionRoute || "(none)"}`);
-      viewport = assertExpectedViewport(await inspectionProgram.systemInfo());
+      viewport = assertExpectedViewport(await withOperationTimeout(inspectionProgram.systemInfo(), "systemInfo", operationTimeoutMs));
     } finally {
       safeDisconnect(inspectionProgram);
     }
@@ -245,7 +324,8 @@ export async function runCli({
         sha256: createHash("sha256").update(bytes).digest("hex"),
       },
       viewport: { ...viewport, rasterScale },
-      captureMethod: "miniprogram-automator MiniProgram.screenshot",
+      captureMethod: simulatorWindow ? "Windows PrintWindow DevTools simulator capture" : "miniprogram-automator MiniProgram.screenshot",
+      ...(simulatorWindow ? { simulatorWindow } : {}),
     };
     writeCaptureAtomically({ targets, bytes, sidecar });
     return { ...sidecar, sidecarPath: targets.sidecar };
