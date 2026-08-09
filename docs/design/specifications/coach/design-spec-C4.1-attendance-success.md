@@ -1,5 +1,7 @@
 # Figma 画板规格: C4.1 Attendance Success
 
+> 当前在线来源（2026-08-05）：`zZ6wKyOHKcO4UYXDd9jGwv / 93:696 / C4.1 Attendance Success`。下方旧导出几何仅作历史记录，新的实现与视觉验收必须重新读取该在线节点。
+
 - [4] | C4.1 Attendance Success | 375x812 @(80,1020) | fill=#f6f7f9 | r=28 | layout=V
   - [4] | Top Nav | 375x88 @(80,1020) | fill=#fceeef | layout=H pad=14/22
     - [4] | Left | 124x27 @(102,1050) | layout=H gap=12

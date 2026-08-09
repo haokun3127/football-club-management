@@ -356,3 +356,8 @@
 - 修复4（bda7b3b）：雷达页维度列表泄漏第9行「射门综合评分 3」（遗留 metric-finishing 不在核心雷达视图）→ 按 growth.views[0]（核心能力雷达8维）过滤，综合评分 68→76 回归8维口径；与 growth 页 radarForView 同款逻辑
 - 非缺陷确认：content 文章卡左侧色条=设计原样；coaches 滚动中内容经过固定 tab 栏下方=正常；growth 芯片/日程banner标题省略号=设计防溢出；雷达图在 mp.screenshot 中不显示=canvas 采集限制（dxcam 验证正常）
 - 证据：cq-talent-visual-evidence/audit-*.png（17页+滚动）、fix-event-match2.png、fix-event-training.png、fix-reminders.png、fix-radar-scoped.png
+
+## 2026-08-09 成长页雷达预览真实数据化（2 commits）
+- 1fe9d8b feat：雷达预览卡从静态装饰图形（固定六边形+假多边形）改为真实数据渲染——TS 计算 N 边形顶点百分比注入内联 clip-path；副标题「6维度」改真实维数「8维度」
+- e4294d0 fix：补回网格环/基准多边形/维度标签，对齐点进去的详情页观感。关键教训：**clip-path 下 border 不绘制**（纯描边元素整体消失），轮廓线一律用「外多边形实心底+内缩盖面」双层叠加模拟
+- 验收：fix-growth-realradar3.png 4/4 通过（4圈网格环✓ 8轴线✓ 红色描边多边形+外部网格可见✓ 8标签无重叠✓）；门禁 typecheck+51 tests 全绿

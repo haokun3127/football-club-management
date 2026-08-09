@@ -1,5 +1,11 @@
 # Figma 画板规格: P1 Schedule Home
 
+## 2026-08-05 当前权威与运行态验收（覆盖说明）
+
+- 当前唯一设计来源：`zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`；Empty 状态使用 `zZ6wKyOHKcO4UYXDd9jGwv / 269:479 / P1 Schedule Home — Empty`。下方旧几何段落继续保留为历史规格。
+- 已取得可信 Windows PrintWindow `375×812` 运行截图并完成路由/视口取证，但 P1 视觉验收不通过：运行态 Hero 左侧酒红面积/边界偏大，周序为 `SUN→SAT` 而当前 Figma 为 `MON→SUN`。
+- 本记录不推导新的 CSS 修正值；在取得新实现截图和在线节点复核前，不得把上述差异改写为具体代码参数。
+
 > 设计权威切换（2026-08-04）：当前来源三元组为 `zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`；空态来源为 `zZ6wKyOHKcO4UYXDd9jGwv / 269:479 / P1 Schedule Home — Empty`。本文件下方保留的几何与节点记录来自切源前历史规格，不能作为新的实现依据。
 
 - [4] | P1 Schedule Home | 375x812 @(1370,120) | fill=#f5f6f8 | r=28 | layout=V

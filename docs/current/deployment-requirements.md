@@ -9,6 +9,23 @@
 - 若启用正式微信手机号解析，服务器必须配置 `WECHAT_MINIPROGRAM_APP_ID` 与 `WECHAT_MINIPROGRAM_APP_SECRET`；不得把任何密码、token、私钥或服务器登录信息写入本文件或提交到仓库。
 - API 路由、环境变量或部署构建变更后，必须重新 build 并重启 API 进程，再用 `/health` 和小程序实际请求确认没有继续访问旧 `dist`。
 
+## 重庆天才当前服务器与域名清单
+
+- 项目名称：重庆天才俱乐部（`football-club-management`）。
+- API 域名：`cqtc.pomi.tech`；公网基址：`https://cqtc.pomi.tech`。
+- 用户提供的服务器公网 IP：`43.136.114.225`；操作系统：Ubuntu Server 24.04 LTS。
+- DNS 目标：`cqtc.pomi.tech → 43.136.114.225`（用户提供，待 DNS/服务器核验）。
+- HTTPS 使用 `443`；`GET /health` 与小程序 `develop`、`trial`、`release` 均应使用同一 HTTPS 基址。
+- 当前 Git 分支：`codex/chongqing-talent-business`；签到持久化提交 `6526fe4` 已于 2026-08-05 部署。
+- 已核验部署形态：容器 `cq-talent-api` 使用发布目录 `/opt/cq-talent-releases/6526fe4`；`/opt/cq-talent-api` 保留且不是 Git 工作树；SQLite 使用 named volume `cq-talent-api-data`。
+- 已核验网络边界：生产端口仅监听 `127.0.0.1:3000`；Nginx TLS 将 `cqtc.pomi.tech` 反代到 `127.0.0.1:3000`；HTTPS `GET /health` 返回 `200`；OpenAPI 含 `/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/attendance`。
+- 未记录备份位置、实际 SQLite 文件路径或环境变量路径；生产真实 coach PUT、生产同库重启读回、微信 request 合法域名与真机请求仍待单独核验。
+
+### 敏感信息不入库
+
+- 禁止在仓库、文档、命令记录或日志中写入密码、私钥、`token`、`secret`、带凭据的 `DATABASE_URL`、认证头、`cookie`/session、手机号或完整 env 文件。
+- 环境变量只记录名称，不记录值。
+
 ## 运行时版本
 
 - Node.js：推荐 `24.x`；可接受已验证的 `22.12+`。不要使用未验证的奇数主版本作为部署基线。

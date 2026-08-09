@@ -1,5 +1,7 @@
 # Figma 设计变量提取（自动解析 .fig）
 
+> 警告（2026-08-05）：本文件来源于本地历史 `.fig` 导出，不能作为当前在线 Figma 节点、几何或视觉验收依据。这里的 Token 只作历史线索；实际使用前必须复核在线文件 `zZ6wKyOHKcO4UYXDd9jGwv` 的当前节点与截图。
+
 
 ## 变量集: CQ Talent / Mini Program
 - `brand/primary` = #a80f1b  (THEME.brand_primary)

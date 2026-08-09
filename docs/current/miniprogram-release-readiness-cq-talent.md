@@ -1,5 +1,14 @@
 # 重庆天才小程序真实数据验收与发布前准备
 
+## 2026-08-05 当前发布判定（覆盖后文历史快照）
+
+| 项目 | 当前事实 | 仍需完成 |
+| --- | --- | --- |
+| P1 成功态视觉 | 已取得可信 Windows PrintWindow 模拟器截图（路由 `pages/parent/schedule/index`，逻辑视口 `375×812`，原始 PNG `563×1218`），但与当前 Figma 对照不通过：Hero 左侧酒红面积/边界偏差，周序为 `SUN→SAT` 而 Figma 为 `MON→SUN` | 修复并重新做当前 Figma 对照；不得把截图取证写成视觉通过 |
+| C4 签到 | `6526fe4` 已部署；生产 HTTPS `/health` 返回 `200`，OpenAPI 含 coach attendance 路由；本地文件型 SQLite 重启读回已验证 | 生产真实 coach PUT、生产同库重启读回及 C4 可信 `375×812` 视觉验收仍待完成 |
+| Windows 截图基础设施 | PrintWindow 精确模拟器捕获可用；需保留 Automator 路由/视口复核和 sidecar | 每个页面仍须单独取得并对照可信样本 |
+| API 质量 | 只记录 API 局部验证；旧测试数量仅作历史快照 | 继续准确复现两个 fixture 差异：`apps/api/test/server.test.ts:688`（期望 `not_started`、实际 `in_progress`）与 `:1344`（数据能力预览记录断言不一致） |
+
 ## 2026-08-03 当前发布判定（优先于后文历史快照）
 
 | 项目 | 当前事实 | 仍需完成的验证 |

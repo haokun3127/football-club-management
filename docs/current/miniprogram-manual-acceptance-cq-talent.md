@@ -1,5 +1,13 @@
 # 重庆天才小程序本地手工验收
 
+## 2026-08-05 Windows 当前截图标准（覆盖运行态取证）
+
+- 当前 Windows 标准是 `apps/miniprogram-cq-talent/scripts/devtools-screenshot.mjs` 的 Automator 路由/路由栈复核，加上唯一可见“××的模拟器”窗口的 `PrintWindow(PW_RENDERFULLCONTENT)` 精确捕获。
+- 合格证据必须确认路由为 `pages/parent/schedule/index`（或本次目标页面的严格路由）、逻辑视口 `375×812`，并保存未裁剪小程序画布 PNG；既有家长日程样本的原始 PNG 为 `563×1218`，capture method 为 Windows PrintWindow DevTools simulator capture，并应有可解析 sidecar 与二次路由复核。
+- 截图只证明捕获到了指定 DevTools 模拟器窗口和路由/视口；不证明真实 parent/coach 角色、session、API 200、在线 Figma 几何或视觉验收通过。视觉结论必须另行对照当前在线 Figma 三元组。
+- Superseding 说明：下文 `2026-08-04` “窗口捕获不可用”条目继续保留为历史事实；2026-08-05 的 PrintWindow 标准和已取得的有效样本覆盖该条目的当前运行结论，但不删除或改写历史排障过程。
+- 2026-08-05 生产部署边界：`6526fe4` 已部署，HTTPS `GET /health` 返回 `200`，OpenAPI 可见 coach attendance 路由；这些证据只证明服务与路由可达，不证明真实 coach PUT、生产同库重启读回、角色/session 或 C4 视觉验收。
+
 ## 0. 当前运行基线（2026-08-03，优先于后文历史记录）
 
 - `utils/config.ts` 的 `develop`、`trial`、`release` 均请求 `https://cqtc.pomi.tech`。本地 `127.0.0.1` API 与 `X-User-Id` 仅用于独立的 API smoke，不代表当前 DevTools 小程序会访问本地 API。
@@ -102,7 +110,7 @@ X-User-Id: user-coach-1
 
 ## 6. 已知阻塞
 
-- 微信登录页、手机号授权、connector 和 session 已实现；当前缺正式 AppID/AppSecret 和可访问的 HTTPS API，因此不能宣称生产登录闭环。
+- 微信登录页、手机号授权、connector 和 session 已实现；当前缺正式 AppID/AppSecret，且没有真实手机号授权、session 与角色分流的生产证据，因此不能宣称生产登录闭环。HTTPS API 的 `/health` 已可访问，但不等于登录闭环。
 - 评测已支持按项目录整队、本机草稿和缺测；正式 assessment-task 服务端任务模型仍未实现。
 - DevTools GUI 截图在当前 Codex 环境曾返回黑屏，最终视觉验收需要人工点击确认。
 
@@ -197,6 +205,15 @@ pnpm --filter @football-club/miniprogram-cq-talent devtools:screenshot -- \
 
 ### 当前实测边界
 
+- 2026-08-04 10:35（DevTools 完全重启、真实授权并回到家长日程后）复现：安装的 DevTools `2.01.2510290` / 基础库 `3.17.0` 会回复 SDK 的 `Tool.getInfo`、`App.getCurrentPage` 与 `App.getPageStack`，但对 SDK 内部发起的 `MiniProgram.screenshot()` 永不回复，30 秒后由取证脚本超时退出。未写出 PNG 或 sidecar；这不是页面、路由、登录、角色或 iPhone X `375×812` 设置的问题。
+- Windows 窗口捕获也不能作为替代：本机只能枚举到 `wechatdevtools.exe` 进程，未取得可控的 DevTools 窗口句柄。不得用普通桌面截屏、黑屏或路由文本冒充视觉验收。不要将该现象归因于“版本过旧”：本机已确认 DevTools 是其更新通道显示的最新 `2.01.2510290`。先完整退出整个 IDE 进程并重新由 `cli auto --auto-port` 启动，确认新端口实际监听后再跑同一条官方 SDK 命令；只有全新自动化端口仍复现时，才进一步判断兼容性边界。
 - 2026-08-04 已实测官方 SDK 可连接自动化端口并读取当前 `pages/parent/schedule/index` 路由及 iPhone X `systemInfo`。这证明自动化连接和逻辑设备信息可读取，但不等于新的命令已取得运行态视觉验收。
 - 本轮调试中，旧的同连接 `systemInfo` → `screenshot` 顺序曾造成截图调用超时；随后该桌面 DevTools 自动化窗口未能重新开放端口。新工具已以双连接顺序修复并有回归测试，但在 DevTools 完全重启、重新真实授权并生成新的 PNG 前，P1 或任何页面都不能宣称完成 DevTools/真机视觉验收。
 - 已有的前台 DevTools P1 成功态截图 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-p1-375x812-current-20260803.png` 仍是历史人工证据；Empty 状态、其他页面及 Parent/Coach TabBar 真机矩阵仍待逐项验收。
+
+### 2026-08-05 Windows 模拟器窗口精确捕获（已验证）
+
+- 2026-08-05 已验证 `scripts/devtools-simulator-capture.py` 能枚举可见且标题以“的模拟器”结尾的微信开发者工具模拟器窗口，以 Windows `PrintWindow(PW_RENDERFULLCONTENT)` 离屏读取该窗口，而不是从桌面坐标截屏。它按窗口 DPI 与 iPhone X 黑色刘海定位完整画布，再裁成逻辑 `375×812` 的等比原始 PNG；本机 150% 缩放的家长日程样本为 `563×1218`，裁剪参数为 `x=11, y=93, width=563, height=1218`。
+- `devtools:screenshot` 仍先后用官方 Automator 读取当前路由、路由栈和 `systemInfo`，并强制逻辑视口为 `375×812`；Windows 上仅将不响应的 SDK `MiniProgram.screenshot()` 替换为上述受控模拟器窗口捕获。最终 PNG 和 sidecar 仍在路由二次复核、视口校验和 PNG 尺寸校验全部通过后原子发布，因此它是可用于 Figma 对照的 DevTools 模拟器证据，不是普通桌面截图。
+- 使用前必须只保留一个可见模拟器窗口。若同时打开多个，命令会拒绝执行；可用环境变量 `WECHAT_DEVTOOLS_SIMULATOR_TITLE` 指定精确窗口标题。`WECHAT_DEVTOOLS_PYTHON` 可指定 Python 解释器路径。捕获失败时不得发布最终 PNG 或 sidecar。
+- 2026-08-04 的 SDK 超时记录仍然有效：它描述的是 `MiniProgram.screenshot()` 的兼容性边界；从 2026-08-05 起，该边界不再阻塞 Windows DevTools 的可信视觉取证。每张截图仍须对照当前在线 Figma 节点后，才可声明对应页面视觉验收通过。

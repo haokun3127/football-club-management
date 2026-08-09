@@ -1,5 +1,7 @@
 # Figma 画板规格: C4 Attendance
 
+> 当前在线来源（2026-08-05）：`zZ6wKyOHKcO4UYXDd9jGwv / 93:665 / C4 Attendance`。下方旧导出几何仅作历史记录，新的实现与视觉验收必须重新读取该在线节点。
+
 - [4] | C4 Attendance | 375x812 @(1370,120) | fill=#f6f7f9 | r=28 | layout=V
   - [4] | Top Nav | 375x88 @(1370,120) | fill=#fceeef | layout=H pad=14/22
     - [4] | Left | 124x27 @(1392,150) | layout=H gap=12
