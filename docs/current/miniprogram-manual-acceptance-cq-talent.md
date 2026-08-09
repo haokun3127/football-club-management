@@ -1,5 +1,12 @@
 # 重庆天才小程序本地手工验收
 
+## 2026-08-09 Windows 当前截图标准（覆盖 08-05 PrintWindow 标准）
+
+- 当前首选取证通道是 `miniProgram.screenshot`（`tmp/prod-verify/mp-shot.cjs`，automator 端口 **9425**）：直出逻辑视口 `375×812` 页面 PNG，免疫窗口遮挡、最大化、GPU 白屏与前台竞争。
+- 两条已知限制：① 拍不到原生 canvas 2d 内容（radar 详情页雷达图须用 dxcam 窗口裁剪兜底）；② `screenshot` 超时但 `currentPage()` 仍应答 = 渲染进程死亡，先发 **Ctrl+Win+Shift+B** 显卡重启（已验证可恢复），不行再换端口冷启动。
+- 路由/滚动配套：`nav-to.cjs`（navigateTo promise 挂起属正常，以 currentPage 轮询为准）、`current-route.cjs`、`scroll-to.cjs`（`callWxMethod("pageScrollTo")`）。
+- 下文 2026-08-05 的 PrintWindow 标准保留为历史事实与兜底通道；取证优先级以本节为准。
+
 ## 2026-08-05 Windows 当前截图标准（覆盖运行态取证）
 
 - 当前 Windows 标准是 `apps/miniprogram-cq-talent/scripts/devtools-screenshot.mjs` 的 Automator 路由/路由栈复核，加上唯一可见“××的模拟器”窗口的 `PrintWindow(PW_RENDERFULLCONTENT)` 精确捕获。
