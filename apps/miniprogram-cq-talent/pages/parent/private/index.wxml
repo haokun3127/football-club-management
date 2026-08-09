@@ -10,57 +10,63 @@
     />
 
     <block wx:if="{{state === 'ready'}}">
-      <!-- 表单卡（Figma P9: 白底 r12, 分组 13px Semi Bold 标签） -->
       <view class="form-card">
         <view class="form-card__title">预约信息</view>
 
         <view class="field">
+          <view class="field__label">预约学员</view>
+          <view class="field__picker field__picker--readonly">{{studentName}}</view>
+        </view>
+
+        <view class="field">
           <view class="field__label">选择教练</view>
-          <picker range="{{coachOptions}}" value="{{coachIndex}}" bindchange="selectCoach">
+          <picker wx:if="{{hasCoaches}}" range="{{coachOptions}}" value="{{coachIndex}}" bindchange="selectCoach">
             <view class="field__picker">
-              <text>{{coachOptions[coachIndex]}}</text>
+              <text>{{coachDisplayName}}</text>
               <text class="field__chevron">›</text>
             </view>
           </picker>
+          <view wx:else class="field__picker field__picker--disabled">暂无可用教练</view>
         </view>
 
         <view class="field">
           <view class="field__label">预约日期</view>
           <picker mode="date" value="{{date}}" bindchange="selectDate">
             <view class="field__picker">
-              <text class="{{date ? '' : 'field__picker--placeholder'}}">{{date || '请选择日期'}}</text>
-              <text class="field__chevron">📅</text>
+              <text class="{{date ? '' : 'field__picker--placeholder'}}">{{dateLabel}}</text>
+              <text class="field__chevron">日期</text>
             </view>
           </picker>
         </view>
 
         <view class="field">
-          <view class="field__label">时段选择</view>
-          <view class="chip-grid">
-            <view
-              wx:for="{{timeSlots}}"
-              wx:key="*this"
-              class="chip chip--wide {{slotIndex === index ? 'chip--active' : ''}}"
-              data-index="{{index}}"
-              bindtap="selectSlot"
-            >{{item}}</view>
+          <view class="field__label">预约时间</view>
+          <view class="time-grid">
+            <picker mode="time" value="{{startTime}}" bindchange="selectStartTime">
+              <view class="field__picker">
+                <text class="{{startTime ? '' : 'field__picker--placeholder'}}">{{startTimeLabel}}</text>
+              </view>
+            </picker>
+            <picker mode="time" value="{{endTime}}" bindchange="selectEndTime">
+              <view class="field__picker">
+                <text class="{{endTime ? '' : 'field__picker--placeholder'}}">{{endTimeLabel}}</text>
+              </view>
+            </picker>
           </view>
         </view>
 
         <view class="field">
           <view class="field__label">训练目标</view>
-          <view class="chip-grid">
-            <view
-              wx:for="{{goals}}"
-              wx:key="*this"
-              class="chip {{selectedGoals[index] ? 'chip--active' : ''}}"
-              data-index="{{index}}"
-              bindtap="toggleGoal"
-            >{{item}}</view>
-          </view>
+          <textarea
+            class="field__textarea"
+            placeholder="请输入训练目标，多个目标用换行或逗号分隔"
+            maxlength="500"
+            value="{{goalsInput}}"
+            bindinput="inputGoals"
+          />
         </view>
 
-        <view class="field">
+        <view class="field field--last">
           <view class="field__label">备注</view>
           <textarea
             class="field__textarea"
@@ -71,21 +77,13 @@
           />
         </view>
       </view>
-
-      <view class="price-card">
-        <view class="price-card__row">
-          <view class="price-card__label">预计费用</view>
-          <view class="price-card__value">待同步</view>
-        </view>
-        <view class="price-card__chip">费用信息待同步</view>
-      </view>
+      <view wx:if="{{hasFormMessage}}" class="form-message">{{formMessage}}</view>
     </block>
   </view>
 
-  <!-- 提交区（Figma: 底部白底上阴影 + r26 品牌红按钮） -->
   <view wx:if="{{state === 'ready'}}" class="submit-area">
-    <view class="submit-button {{submitting ? 'submit-button--disabled' : ''}}" bindtap="submit">{{submitting ? '提交中…' : '提交预约'}}</view>
-    <view class="submit-hint">提交后等待教练确认，无需在线支付</view>
+    <view wx:if="{{canSubmit && !submitting}}" class="submit-button" bindtap="submit">{{submitLabel}}</view>
+    <view wx:else class="submit-button submit-button--disabled">{{submitLabel}}</view>
   </view>
   <role-tabbar wx:if="{{state !== 'ready'}}" role="parent" active="child" />
 </view>
