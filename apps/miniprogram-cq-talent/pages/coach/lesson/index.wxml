@@ -1,5 +1,4 @@
 <view class="c5">
-  <!-- C5 Top Nav（粉底） -->
   <view class="c5-nav" style="padding-top:{{navInset}}px">
     <view class="c5-nav__left" bindtap="goBack">
       <view class="c5-nav__back">‹</view>
@@ -8,67 +7,44 @@
   </view>
 
   <view class="c5-body">
-    <status-view state="{{state}}" title="销课确认" message="{{message}}" />
+    <status-view state="{{state}}" title="课时确认" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
 
-    <!-- C5 Activity Header -->
-    <view wx:if="{{workbench}}" class="c5-hero">
-      <view class="c5-hero__title">{{workbench.event.title}}</view>
-      <view class="c5-hero__meta">{{workbench.event.teamName || '队伍待确认'}} · {{eventDateLabel}}</view>
-      <view class="c5-hero__meta">{{timeRangeLabel}}</view>
-    </view>
-
-    <!-- C5 Student List -->
-    <view wx:if="{{workbench}}" class="c5-list">
-      <view class="c5-list__head">
-        <view class="c5-list__title">学员课时记录</view>
-        <view class="c5-list__count">共 {{workbench.roster.length}} 名学员</view>
+    <block wx:if="{{state === 'ready' && hasRoster}}">
+      <view class="c5-hero">
+        <view class="c5-hero__title">{{eventTitle}}</view>
+        <view class="c5-hero__meta" wx:if="{{hasEventTeam}}">{{eventTeam}} · {{eventDate}}</view>
+        <view class="c5-hero__meta" wx:else>{{eventDate}}</view>
+        <view class="c5-hero__meta">{{eventTime}}</view>
       </view>
-      <view wx:for="{{workbench.roster}}" wx:key="studentId" class="c5-row">
-        <view class="c5-row__main">
+
+      <view class="c5-list">
+        <view class="c5-list__head">
+          <view class="c5-list__title">学员课时记录</view>
+          <view class="c5-list__count">共 {{rosterCount}} 名学员</view>
+        </view>
+        <view wx:for="{{roster}}" wx:key="studentId" class="c5-row">
           <view class="c5-row__avatar">{{item.avatarLetter}}</view>
           <view class="c5-row__info">
             <view class="c5-row__name">{{item.name}}</view>
-            <view class="c5-row__sub">剩余 {{item.remainingLessons === undefined ? '待核对' : item.remainingLessons + ' 课时'}}</view>
+            <view class="c5-row__sub">{{item.balanceText}}</view>
           </view>
-          <view class="c5-chip {{item.shouldConsume === false ? 'c5-chip--off' : ''}}" data-student-id="{{item.studentId}}" bindtap="toggleConsume">
-            {{item.shouldConsume === false ? '不销课' : '销课'}}
-          </view>
-        </view>
-        <input
-          wx:if="{{item.shouldConsume === false}}"
-          class="reason-input"
-          placeholder="填写不销课原因，如请假、免扣、未到场"
-          value="{{item.exceptionReason}}"
-          data-student-id="{{item.studentId}}"
-          bindinput="onReasonInput"
-        />
-        <view class="correction-actions">
-          <button
-            class="ghost-button mini-button"
-            loading="{{correctingStudentId === item.studentId}}"
-            disabled="{{!!correctingStudentId}}"
-            data-student-id="{{item.studentId}}"
-            data-delta="{{1}}"
-            bindtap="correctLesson"
-          >返还</button>
-          <button
-            class="ghost-button mini-button"
-            loading="{{correctingStudentId === item.studentId}}"
-            disabled="{{!!correctingStudentId}}"
-            data-student-id="{{item.studentId}}"
-            data-delta="{{-1}}"
-            bindtap="correctLesson"
-          >补扣</button>
+          <view class="c5-chip">本次扣除 1 课时</view>
         </view>
       </view>
-    </view>
 
-    <view wx:if="{{workbench}}" class="card lesson-note-card">
-      <view class="section-title">本次备注</view>
-      <view class="subtitle">确认前请检查不销课原因；返还或补扣会单独留痕。</view>
-      <textarea class="lesson-note" placeholder="本次销课备注，可选" value="{{lessonNote}}" bindinput="onLessonNoteInput" />
-      <view class="lesson-correction-link" bindtap="openLessonCorrection">课时更正（C5.1 设计稿流程）›</view>
-    </view>
+      <view class="lesson-note-card">
+        <view class="section-title">本次备注</view>
+        <textarea class="lesson-note" placeholder="本次课时确认备注，可选" value="{{lessonNote}}" disabled="{{saving}}" bindinput="onLessonNoteInput" />
+      </view>
+
+      <view wx:if="{{hasSubmitError}}" class="submit-error">{{submitError}}</view>
+    </block>
   </view>
-  <submit-bar wx:if="{{workbench}}" primary-text="确认销课" hint="{{workbench.roster.length}} 名学员 · 例外学员不会扣课" loading="{{saving}}" disabled="{{saving}}" bindsubmit="confirmLesson" />
+
+  <view wx:if="{{state === 'ready' && hasRoster}}" class="c5-confirm-bar">
+    <view class="c5-confirm-bar__hint">确认 {{selectionCount}} 名学员，每人扣除 1 课时</view>
+    <button class="c5-confirm-bar__button" loading="{{saving}}" disabled="{{saving || !canConfirm}}" bindtap="confirmLesson">确认全部</button>
+  </view>
+
+  <role-tabbar role="coach" active="schedule" />
 </view>

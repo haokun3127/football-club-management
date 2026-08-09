@@ -1,40 +1,199 @@
-.c5 { min-height: 100vh; background: #f6f7f9; }
+.c5 {
+  min-height: 100vh;
+  background: #f6f7f9;
+}
 
-/* C5 Top Nav（粉底） */
-.c5-nav { display: flex; align-items: center; height: 176rpx; padding: 28rpx 44rpx; background: #fceeef; }
-.c5-nav__left { display: flex; align-items: center; gap: 24rpx; }
-.c5-nav__back { color: #202124; font-size: 56rpx; font-weight: 300; line-height: 1; }
-.c5-nav__title { color: #202124; font-size: 44rpx; font-weight: 700; }
+.c5-nav {
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  height: 176rpx;
+  padding: 28rpx 44rpx;
+  background: #fceeef;
+}
 
-.c5-body { padding: 44rpx 44rpx calc(148rpx + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 40rpx; }
+.c5-nav__left {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
 
-/* C5 Activity Header */
-.c5-hero { display: flex; flex-direction: column; gap: 16rpx; padding: 40rpx; border-radius: 32rpx; background: #07111f; }
-.c5-hero__title { color: #ffffff; font-size: 36rpx; font-weight: 700; }
-.c5-hero__meta { color: rgba(255, 255, 255, 0.85); font-size: 26rpx; }
+.c5-nav__back {
+  color: #202124;
+  font-size: 56rpx;
+  font-weight: 300;
+  line-height: 1;
+}
 
-/* C5 Student List */
-.c5-list { border-radius: 24rpx; background: #ffffff; overflow: hidden; }
-.c5-list__head { display: flex; align-items: center; justify-content: space-between; padding: 32rpx; border-bottom: 1rpx solid #e7eaf0; }
-.c5-list__title { color: #202124; font-size: 28rpx; font-weight: 600; }
-.c5-list__count { color: #667085; font-size: 24rpx; }
-.c5-row { padding: 24rpx 32rpx; border-bottom: 1rpx solid #e7eaf0; }
-.c5-row:last-child { border-bottom: 0; }
-.c5-row__main { display: flex; align-items: center; gap: 24rpx; }
-.c5-row__avatar { width: 56rpx; height: 56rpx; border-radius: 28rpx; background: #f3f4f6; color: #202124; font-size: 22rpx; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.c5-row__info { flex: 1; min-width: 0; }
-.c5-row__name { color: #202124; font-size: 28rpx; }
-.c5-row__sub { color: #667085; font-size: 22rpx; margin-top: 4rpx; }
-.c5-chip { padding: 8rpx 20rpx; border-radius: 8rpx; background: #dcfce7; color: #22c55e; font-size: 24rpx; font-weight: 600; flex-shrink: 0; }
-.c5-chip--off { background: #f3f4f6; color: #9ca3af; }
+.c5-nav__title {
+  color: #202124;
+  font-size: 44rpx;
+  font-weight: 700;
+}
 
-/* 保留共享类补充 */
-.reason-input { margin-top: 16rpx; padding: 14rpx 20rpx; border-radius: 12rpx; background: #f8f9fb; color: #202124; font-size: 24rpx; }
-.correction-actions { display: flex; gap: 16rpx; margin-top: 12rpx; }
-.card.lesson-note-card { padding: 32rpx; border-radius: 24rpx; background: #ffffff; display: flex; flex-direction: column; gap: 16rpx; }
-.lesson-note { min-height: 120rpx; padding: 20rpx; border-radius: 12rpx; background: #f8f9fb; font-size: 26rpx; }
-.lesson-correction-link { color: #a80f1b; font-size: 26rpx; font-weight: 600; }
-/* custom navigation: keep Figma 88px total height inclusive of safe area */
-.c5-nav { box-sizing: border-box; }
-/* Figma Top Nav is 375x88 (176rpx): safe area is inside this envelope. */
-.c5-nav { height: 176rpx; }
+.c5-body {
+  display: flex;
+  flex-direction: column;
+  gap: 40rpx;
+  padding: 44rpx 44rpx calc(340rpx + env(safe-area-inset-bottom));
+}
+
+.c5-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  padding: 40rpx;
+  border-radius: 32rpx;
+  background: #07111f;
+}
+
+.c5-hero__title {
+  color: #ffffff;
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+.c5-hero__meta {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 26rpx;
+}
+
+.c5-list,
+.lesson-note-card {
+  overflow: hidden;
+  border-radius: 24rpx;
+  background: #ffffff;
+}
+
+.c5-list__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #e7eaf0;
+}
+
+.c5-list__title,
+.section-title {
+  color: #202124;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.c5-list__count {
+  color: #667085;
+  font-size: 24rpx;
+}
+
+.c5-row {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 24rpx 32rpx;
+  border-bottom: 1rpx solid #e7eaf0;
+}
+
+.c5-row:last-child {
+  border-bottom: 0;
+}
+
+.c5-row__avatar {
+  display: flex;
+  flex: 0 0 56rpx;
+  align-items: center;
+  justify-content: center;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 28rpx;
+  background: #f3f4f6;
+  color: #202124;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.c5-row__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.c5-row__name {
+  overflow: hidden;
+  color: #202124;
+  font-size: 28rpx;
+  line-height: 36rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.c5-row__sub {
+  margin-top: 4rpx;
+  color: #667085;
+  font-size: 22rpx;
+}
+
+.c5-chip {
+  flex: 0 0 auto;
+  padding: 8rpx 20rpx;
+  border-radius: 8rpx;
+  background: #dcfce7;
+  color: #188754;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.lesson-note-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  padding: 32rpx;
+}
+
+.lesson-note {
+  min-height: 120rpx;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  background: #f8f9fb;
+  color: #202124;
+  font-size: 26rpx;
+}
+
+.submit-error {
+  padding: 20rpx 24rpx;
+  border: 1rpx solid #fecaca;
+  border-radius: 16rpx;
+  background: #fff1f2;
+  color: #b42318;
+  font-size: 24rpx;
+  line-height: 34rpx;
+}
+
+.c5-confirm-bar {
+  position: fixed;
+  right: 0;
+  bottom: 140rpx;
+  left: 0;
+  z-index: 50;
+  box-sizing: border-box;
+  padding: 16rpx 44rpx;
+  border-top: 1rpx solid #e7eaf0;
+  background: rgba(246, 247, 249, 0.98);
+  box-shadow: 0 -8rpx 24rpx rgba(16, 24, 40, 0.06);
+}
+
+.c5-confirm-bar__hint {
+  margin-bottom: 12rpx;
+  color: #667085;
+  font-size: 22rpx;
+  text-align: center;
+}
+
+.c5-confirm-bar__button {
+  width: 100%;
+  min-height: 96rpx;
+  border-radius: 24rpx;
+  background: #a80f1b;
+  color: #ffffff;
+  font-size: 30rpx;
+  font-weight: 600;
+  line-height: 96rpx;
+}
