@@ -1,48 +1,50 @@
-# PRD：cq-talent Figma 视觉基础落地
+# PRD: cq-talent Figma 全量页面对齐
 
-## 当前设计来源约定（2026-08-04）
+## 当前范围覆盖（B0，2026-08-09）
 
-本任务后续的唯一当前设计权威是在线 Figma `https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/`（file key `zZ6wKyOHKcO4UYXDd9jGwv`）。当前引用必须使用三元组：`zZ6wKyOHKcO4UYXDd9jGwv / 93:29 / G2 Login Verification`、`zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`、`zZ6wKyOHKcO4UYXDd9jGwv / 269:479 / P1 Schedule Home — Empty`、`zZ6wKyOHKcO4UYXDd9jGwv / 4:6 / 05 Parent Generated`、`zZ6wKyOHKcO4UYXDd9jGwv / 4:7 / 06 Coach Generated`。旧文件 `ATlfBRO0ruOCDDY5ICagFD` 仅用于历史审计，禁止新的读取、编辑、实现或视觉验收；节点 ID 不得跨文件继承。
+本任务的当前目标是完整实现在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv` 中的 **Parent 21** 与 **Coach 28** 个业务状态画板，共 49 个原始业务画板。此前“核心演示闭环”、其余页面冻结，以及以真机或模拟器截图作为完成阻塞条件的表述，均为历史阶段记录，不再限制当前 B1–B14 页面批次。
 
-下文保留的 P1/G2 几何若来自切源前记录，均须视为历史规格，不得作为新实现依据。G2 当前现行 `form-card` 为 `331×144`；旧 `verification-card` `331×128` 仅作历史值。
+唯一当前设计权威是 `https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/`。旧文件 `ATlfBRO0ruOCDDY5ICagFD`、本地 `.fig`、旧导出几何和其中的节点 ID 仅保留作历史审计，禁止用于新的读取、实现或验收。不得跨文件继承节点 ID。
 
-## 2026-08-05 当前范围覆盖
+`CODE / ...` frames 是对应业务页的同页实现契约，不是可新增路由、可单独计数或可替代业务画板的页面。每个页面批次必须同时读取该业务画板和适用的 CODE frame。`zZ6wKyOHKcO4UYXDd9jGwv / 93:877 / LEGACY C7` 明确排除；C7 只使用 `zZ6wKyOHKcO4UYXDd9jGwv / 233:2 / C7 MVP`，并在实施时重新读取其当前名称与 design context。
 
-“核心演示闭环”覆盖本任务的全量视觉愿景：P1–P10 与 C1–C16 降级为长期愿景，不作为本轮实现或验收范围。当前只按以下冻结顺序推进：P1 视觉验收、签到持久化、测试指标+P5、训练计划、比赛记录、战术板重启读回+MVP 视觉。历史调查、旧几何和既有时间线均保留，不得据此推导新实现参数。
+## 目标与验收
 
-## 目标
+1. 以 Parent 21 个原始画板与 Coach 28 个原始画板为完整范围，按 B1–B14 路线逐批实现；CODE frames 仅作为所配对页面的附加契约。
+2. 每个页面批次开始前，独立取得其在线 Figma 目标节点的 metadata、screenshot 与 `get_design_context`。不得用上一个页面、旧导出或历史规格推断当前页面。
+3. 每个页面批次遵循 TDD：先写能在旧实现失败的目标测试，再做最小实现，随后运行目标测试、相关包测试、类型检查与 `git diff --check`；检查通过后才可形成该批独立提交。
+4. 用户已取消真实设备或模拟器截图作为完成阻塞条件。截图可作为补充运行态证据，但没有截图不得阻止本任务的页面批次完成；反过来，静态测试、类型检查或代码结构检查也不得被描述为 Figma 像素一致或视觉验收通过。
+5. 设计不得迫使产品伪造数据。没有真实且已定义的 API/领域数据契约时，不得伪造手机号、session、角色、儿童、评测、训练、比赛、提醒或接口响应；应保留既有显式空态/错误态，或记录为独立契约阻塞并停止该数据依赖部分。
 
-按 2026-07-30《Figma 原始设计全量补齐》决策（docs/figma-full-implementation-decision.md），
-落地第一阶段：设计变量、基础组件、导航框架，使后续 P/C 页面重做有统一的 token 与组件基座。
+## B1–B14 页面路线
 
-## 现状核查（2026-07-30，实测）
+| 批次 | 业务画板 | 同页 CODE 契约或特别规则 |
+| --- | --- | --- |
+| B1 | G1 Launch、G2 Login Verification、G3 Login Blocked、P10 Account Binding | 不改变真实授权、绑定或角色契约。 |
+| B2 | P1 Schedule Home、P1 Schedule Home — Empty | 同读 `222:86 / CODE / P1 Family Schedule`；正常与空态都属于同一路由状态。 |
+| B3 | P2 Training Detail、P2.1 Match Detail、P2.2 Other Activity Detail | 同读 `222:87`、`222:88`、`222:89` 三个对应 CODE frame。 |
+| B4 | P3 Reminder Center、P4 Growth Home | P4 同读 `222:90 / CODE / P4 Growth & Radar`。 |
+| B5 | P5 Ability Radar、P6 Metric Detail | 同读适用的 `222:90` 与 `222:91 / CODE / P6 Metric Detail`；不凭视觉需求虚构指标数据。 |
+| B6 | P7 Parent Profile Hub、P7.1 Lessons Insurance | 同读 `222:92 / CODE / P7 Child Hub`。 |
+| B7 | P8 Content Center、Venues - Premium、P8.2 Help Center、Coach Team | 复用现有内容、场馆、帮助与教练数据契约；没有契约则不伪造。 |
+| B8 | P9 Private Lesson Form、P9.1 Private Success | 表单与成功态必须保留真实提交/错误边界。 |
+| B9 | C1 Coach Schedule Home、C2 Activity Workbench、C3 Activity Change | 保持活动 scope、权限与现有导航契约。 |
+| B10 | C4 Attendance、C4.1 Attendance Success、C4.2 Attendance Failed/Correction、C5 Lesson Confirm、C5.1 Lesson Correction | 不以视觉层绕过签到、课时或权限保护。 |
+| B11 | C6 Match Entry、C6.1 Add Match Event、C6.2 Save State、C7 MVP | C7 只读 `233:2`；`93:877 LEGACY C7` 永不作为实现依据。 |
+| B12 | C8 Training Management、C9 Team Detail、C10 Training Content Select、C10.1 Coverage Preview、C11 Test Task List | 保留训练/内容库/队伍的已有 API 与空态语义。 |
+| B13 | C12 Project Score Entry、C12.1 Autosave State、C13 Student Radar、C14 Team Ability Overview | 不把本地展示值伪装成已持久化的真实评测。 |
+| B14 | C15 Assessment Entry、C15.1 Assessment Submit、C16 Coach Me、C16.1 Permission Scope、C16.2 Private Interest、C16.3 Coach Account、C16.4 Coach Help | 账号、权限、私教意向和帮助均保持既有身份与数据边界。 |
 
-- 当前 `app.wxss` 已有一层 CSS 变量（brand/page/card/line/text/success/warning/error/info/pending）。
-- 与 Figma 导出 PNG 像素级取色对比（01-设计语言 / 02-设计变量）：
-  - 品牌红 Figma ≈ `#a80818`，代码 `#a80f1b` —— 一致
-  - 深红 `#780810` ≈ `brand-pressed #7f0b14` —— 一致
-  - 成功绿 Figma `#188050` vs 代码 `#237804` —— **有偏差**（Figma 偏青绿，代码偏黄绿）
-  - 错误红 `#b02018` ≈ `#b42318` —— 基本一致
-  - 信息蓝 `#2068d8` ≈ `#175cd3` —— 基本一致
-  - 警告橙 `#b06800` ≈ `#ad6800` —— 一致
-- 结论：色板层面代码与 Figma 同源，无需返工；差异集中在组件精细度、版式与动效。
+Parent 画板清单与当前节点三元组以 `docs/current/figma-source-of-truth.md` 的 2026-08-07 在线清单为准。Coach 画板在各自批次启动时从同一 Figma 文件重新读取三元组，不因本路线表而猜测节点 ID。
 
-## 阻塞与对策
+## 白名单与禁区
 
-- 交接 PNG 为 1280px 缩略总览，文字不可读，无法作为像素级重做依据。
-- 本机未配置 vision 模型，.fig 二进制（fig-kiwi）无可用解析器。
-- **权威数据获取待用户三选一**：Figma API token（走 /v1/files/:key/variables/local + nodes 接口）/
-  Figma MCP / 人工导出 P/C 画板高清图（每画板 2x PNG 或 PDF）。
-- 待办：拿到权威数据后回填 68 个变量的精确名称与值，替换本任务中的近似值。
+- **B0 白名单**：仅 `.trellis/tasks/07-30-figma-design-foundation/{prd.md,design.md,implement.md,implement.jsonl,check.jsonl,task.json}`。
+- **后续页面批次白名单**：先在独立子任务中声明目标页面的 TS、WXML、WXSS、最小测试、已复用组件/图标以及必要任务记录；未声明不得编辑。
+- **禁止**：Figma 写操作、旧 `ATlf...` 读取、`93:877` LEGACY C7、API/数据库/迁移/seed/鉴权/session/角色契约的顺手修改、`project.config*`、截图工具、WPS、归档目录及任何不属于当前页批次的脏文件。
 
-## 本阶段交付物
+## 回滚与证据
 
-1. `styles/tokens.wxss`：独立 token 层（颜色/字号/间距/圆角/阴影），app.wxss 改为 @import 消费。
-2. 成功绿等偏差色值按 Figma 取色修正。
-3. 基础组件对齐清单（23 组 Figma 组件 ↔ 现有 8 个组件的差距表）。
-4. 每步小提交，每组件附 375×812 截图对比（拿到高清画板后）。
+每个页面批次独立提交，以该提交作为回滚点；需要撤回时使用针对该提交的 `git revert`，不得使用 `reset`、`checkout`、`clean` 或覆盖其他未提交工作。B0 只建立文档与任务元数据，不修改业务代码，也不创建提交。
 
-## 不做
-
-- 不重排任何现有页面的业务逻辑与数据流。
-- 不新增 P/C 扩展页面路由（属第二、三阶段，且部分依赖后端闭环）。
+每个批次的记录必须区分：设计 context 已读取、静态/行为检查已通过、可选运行态截图（若有）以及尚未证明的视觉结论。历史的“核心演示闭环”与截图阻塞记录保留在版本历史中，不能覆盖本节的当前范围。

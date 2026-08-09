@@ -1,1 +1,4 @@
-{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python3 .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file":"docs/current/figma-source-of-truth.md","reason":"Audit every implemented page against the current file key and its own frame triple; never accept historic ATlf nodes."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Check that design-facing view models preserve established data, authorization, and state contracts."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Check that shared components and existing navigation are reused before new variants are introduced."}
+{"file":".trellis/tasks/07-30-figma-design-foundation/implement.md","reason":"Verify the per-page RED→GREEN, typecheck, diff-check, commit, and non-fabrication gates."}

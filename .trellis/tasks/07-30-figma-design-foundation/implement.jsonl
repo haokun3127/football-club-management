@@ -1,1 +1,4 @@
-{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python3 .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file":"docs/current/figma-source-of-truth.md","reason":"Defines the only current Figma file, Parent frame inventory, CODE-frame interpretation, and historic-source exclusion."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Requires preserving API-to-page data contracts instead of inventing data to fill Figma states."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Requires searching for and reusing existing page, navigation, tabbar, and icon patterns before adding code."}
+{"file":".trellis/tasks/07-30-figma-design-foundation/design.md","reason":"Defines B1–B14 scope, independent design-context reads, verification, and rollback boundaries."}

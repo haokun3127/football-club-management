@@ -1,12 +1,12 @@
 {
   "id": "figma-design-foundation",
   "name": "figma-design-foundation",
-  "title": "cq-talent Figma 视觉基础落地：设计变量 + 基础组件 + 导航框架",
-  "description": "",
+  "title": "cq-talent 全量 Figma 页面对齐：Parent 21 + Coach 28",
+  "description": "B0 scopes independent B1-B14 page batches against current online Figma zZ6wKyOHKcO4UYXDd9jGwv; CODE frames are same-page contracts, and legacy C7 93:877 is excluded.",
   "status": "in_progress",
-  "dev_type": null,
-  "scope": null,
-  "package": "api",
+  "dev_type": "frontend",
+  "scope": "full-figma-parent-coach-page-alignment",
+  "package": "miniprogram-cq-talent",
   "priority": "P2",
   "creator": "dongjun",
   "assignee": "dongjun",
@@ -23,7 +23,11 @@
     "08-05-08-05-test-metrics-p5-radar"
   ],
   "parent": null,
-  "relatedFiles": [],
-  "notes": "",
+  "relatedFiles": [
+    "docs/current/figma-source-of-truth.md",
+    ".trellis/spec/guides/cross-layer-thinking-guide.md",
+    ".trellis/spec/guides/code-reuse-thinking-guide.md"
+  ],
+  "notes": "B0 is documentation-only. Each B1-B14 page batch needs its own Figma design context, TDD, package checks, diff check, and commit. Device or simulator screenshots are optional evidence, not completion blockers.",
   "meta": {}
 }

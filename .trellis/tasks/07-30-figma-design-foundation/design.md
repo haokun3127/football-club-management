@@ -1,39 +1,60 @@
-# Design: Figma V2 Full Visual Regression
+# Design: cq-talent 全量 Figma 页面批次
 
-## Source of truth
+## 当前设计基准
 
-> Current source override (2026-08-04): the only current design authority is online Figma `https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/` (file key `zZ6wKyOHKcO4UYXDd9jGwv`). Current references must use these triples: `zZ6wKyOHKcO4UYXDd9jGwv / 93:29 / G2 Login Verification`, `zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`, `zZ6wKyOHKcO4UYXDd9jGwv / 269:479 / P1 Schedule Home — Empty`, `zZ6wKyOHKcO4UYXDd9jGwv / 4:6 / 05 Parent Generated`, and `zZ6wKyOHKcO4UYXDd9jGwv / 4:7 / 06 Coach Generated`. The old file `ATlfBRO0ruOCDDY5ICagFD` is historical audit material only; do not read, edit, implement, or visually accept against it, and do not inherit node IDs across files. The local `.fig`, decoded inspection data, and prior audits below are historical references only and must not be used to infer or overwrite the current online design.
+自 B0（2026-08-09）起，本任务实现在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv` 的 Parent 21 与 Coach 28 个原始业务状态画板。`ATlfBRO0ruOCDDY5ICagFD`、本地 `.fig` 和之前基于它们的几何均只属历史审计，不能作为新页面的输入。
 
-- `../02-Figma最新设计导出/重庆天才小程序 UIUX Design System.fig`
-- Decoded inspection data: `../../../../tools/fig-out-v2.json`
-- Audit baseline: `docs/figma-v2-visual-audit.md`
+页面必须引用同一文件内的三元组 `file key / node ID / frame name`。每次页面批次均单独读取目标业务 frame 的 metadata、screenshot 与 `get_design_context`；如果该页有 CODE frame，还必须读取配对的 CODE frame，作为同一路由的实现契约。CODE frame 不是第二张业务页面，不能据此新增路由或状态。C7 的唯一当前业务参考为 `zZ6wKyOHKcO4UYXDd9jGwv / 233:2 / C7 MVP`；`zZ6wKyOHKcO4UYXDd9jGwv / 93:877 / LEGACY C7` 永久排除。
 
-## 2026-08-05 当前范围覆盖
+此前 2026-08-05 的“核心演示闭环”、其余 P/C 页面冻结与真机截图阻塞规则是历史阶段决策；B0 已取代这些规则，不删除历史记录。
 
-当前执行范围由“核心演示闭环”取代：P1–P10/C1–C16 全部降级为长期愿景。本轮不以全量 Figma 视觉补齐为交付目标，只按冻结顺序推进 P1 视觉验收、签到持久化、测试指标+P5、训练计划、比赛记录、战术板重启读回+MVP 视觉。原有设计方案和历史节点记录保留为长期背景，不作为本轮实现依据。
+## 批次编排
 
-## Scope
+| 批次 | Parent / Coach 页面范围 | 主要风险边界 |
+| --- | --- | --- |
+| B1 | G1、G2、G3、P10 | 登录/绑定只消费真实回调和既有身份结果。 |
+| B2 | P1 正常态、P1 Empty | 同一路由的真实日程与空态，配对 CODE P1。 |
+| B3 | P2、P2.1、P2.2 | 训练、比赛、其他活动详情，配对三张 CODE P2。 |
+| B4 | P3、P4 | 提醒与成长数据按已有契约呈现，配对 CODE P4。 |
+| B5 | P5、P6 | 雷达/指标不伪造评测数据，读取 CODE P4 与 P6。 |
+| B6 | P7、P7.1 | 孩子/课时保障，读取 CODE P7。 |
+| B7 | P8、Venues、P8.2、Coach Team | 内容、场馆、帮助、教练均保持既有数据来源。 |
+| B8 | P9、P9.1 | 私教表单、成功态保留真实提交失败边界。 |
+| B9 | C1、C2、C3 | 教练活动列表、工作台和变更 scope。 |
+| B10 | C4、C4.1、C4.2、C5、C5.1 | 签到/课时/更正的权限和幂等边界。 |
+| B11 | C6、C6.1、C6.2、C7 MVP | 比赛状态和唯一 C7 MVP；排除 LEGACY C7。 |
+| B12 | C8、C9、C10、C10.1、C11 | 训练管理、队伍、内容选择、覆盖与测试任务。 |
+| B13 | C12、C12.1、C13、C14 | 测试分数、保存状态、球员与队伍能力。 |
+| B14 | C15、C15.1、C16、C16.1–C16.4 | 评测提交、教练账户、权限、私教与帮助。 |
 
-Bring all parent P1-P10 and coach C1-C16 business frames and their designed state frames back to the latest Figma information architecture while preserving the existing BFF/API contracts and routes.
+这 14 批覆盖 21 个 Parent 与 28 个 Coach 原始画板。一个批次内的页面可以共享已有组件，但页面外的视觉、行为或数据修复不可被捎带修改。
 
-## Global rendering rules
+## 每页实施协议
 
-1. Every page that renders `app-header` must declare `navigationStyle: custom`; no native navigation bar may coexist with it.
-2. Figma Top Nav has a 375x88 layout envelope. The app-header owns status-bar space and must use one fixed total-height model; page-local custom navs must use `box-sizing: border-box` when applying `navInset`.
-3. Bottom role tabbar uses Figma's 375x70 layer plus safe-area extension. Parent labels are `日程 / 成长 / 我的孩子`.
-4. No system emoji may stand in for a Figma icon. Reuse existing bundled SVGs or add local icon assets compatible with WXML `image`.
-5. Preserve API-derived content, but UI-specific summary values must be shaped in page TS rather than rendering arbitrary long raw fields in Figma-sized cells.
+1. 建立或进入该页面的独立子任务，声明精确文件白名单、画板三元组和适用 CODE frame。
+2. 读取当前在线 design context；再阅读对应页面、组件、路由、测试和 API/领域契约，确认可复用范围。
+3. 先写 RED 测试，覆盖目标页面可观察的结构、状态或交互约束。测试不应复制实现细节，也不得把静态断言包装成视觉一致性结论。
+4. 只在白名单内做最小 TS/WXML/WXSS/测试改动；优先复用现有 `app-header`、角色 tabbar、路由、normalizer 和图标资产。
+5. 跑目标测试、受影响包测试、类型检查与 `git diff --check`。每个批次通过后以单独提交作为回滚点。
+6. 记录已读取的设计 context、测试结果、已知数据限制和可选截图证据。真实设备/模拟器截图不是完成门槛；有无截图都不能自动证明设计像素一致。
 
-## Page remediation order
+## 数据与状态规则
 
-1. Global: navigation, tabbar, icon primitives.
-2. Parent primary data surfaces: P5 radar, P6 metric, P7.1 status.
-3. Parent main/detail/service surfaces: P1/P1.1/P2 variants/P3/P8/P9/P10.
-4. Coach primary work surfaces: C1/C8/C10/C12/C13/C14/C16.
-5. Coach state/detail pages: C2-C6, C11/C15, C16.1-C16.4.
+- Figma 只定义页面外观与状态意图，不创建后端事实。只使用已存在且有契约的 API 响应、领域状态、权限与路由参数。
+- 若一个设计状态需要尚未存在的真实数据、持久化、权限或错误语义，停止该依赖并提出独立契约任务；不得加假 API、写死身份、伪造手机号码、session、role、children、训练、评测或比赛数据。
+- 可使用仓库已定义的 fixture 来验证已存在契约，但 fixture 不可成为生产数据的替身，也不可改变响应形状以配合视觉。
+- 空态、加载态、错误态必须来自真实已有状态或明确显示为待契约状态，不能借导航或角色绕过。
 
-## Verification
+## 白名单、禁区与回滚
 
-- Static WXML class-to-WXSS audit and WXSS brace audit after each batch.
-- Run the smallest relevant package checks after each batch. Before reporting a repository-wide `pnpm check` result, reproduce and state the two known API fixture differences precisely: `apps/api/test/server.test.ts:688` (`not_started` expected, `in_progress` actual) and `apps/api/test/server.test.ts:1344` (data-capability preview-record assertion mismatch).
-- Build/reload the mini-program and collect 375x812 developer-tool screenshots for each frame, comparing to the Figma export before declaring complete.
+B0 仅编辑本任务目录的 `prd.md`、`design.md`、`implement.md`、两份 jsonl manifest 与 `task.json`。每个 B1–B14 子任务须先写出自己的页面文件白名单，方可编辑业务代码。
+
+任何页面批次不得修改迁移、API persistence/store/tests、请求工具、seed、登录/角色/session 契约、Figma 文件、`project.config*`、截图工具、WPS、归档或其他脏文件，除非用户在独立任务中明确批准。不要通过 `reset`、`checkout`、`clean` 或整文件覆盖来处理混合工作树。
+
+每批次的独立提交是唯一回滚单元。需要回退时只对该提交执行 `git revert`，保留其他用户改动；B0 无代码变更、无提交。
+
+## 验证语义
+
+每批的最低验证为：目标 RED→GREEN、相关测试、受影响包 typecheck、`git diff --check` 和范围审计。若用户另行要求，可追加可信运行截图或人工视觉评审；这些是补充证据，而非本任务的强制阻塞门槛。
+
+通过静态检查只能说明代码与行为断言满足，不能单独宣称 Figma 视觉一致、像素一致、真机通过或真实数据闭环。
