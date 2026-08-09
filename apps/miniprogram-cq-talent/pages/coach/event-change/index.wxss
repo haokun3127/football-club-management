@@ -126,3 +126,13 @@
   font-size: 24rpx;
   color: var(--color-text-secondary);
 }
+
+.form-error {
+  padding: 20rpx 24rpx;
+  border: 1rpx solid #fecaca;
+  border-radius: 16rpx;
+  background: #fff1f2;
+  color: #b42318;
+  font-size: 24rpx;
+  line-height: 34rpx;
+}

@@ -1,25 +1,23 @@
 <view class="change-page">
-  <app-header title="变更活动" action-text="保存" bindaction="submit" show-back />
+  <app-header title="变更活动" action-text="{{state === 'ready' && !submitting ? '保存' : ''}}" bindaction="submit" show-back />
   <view class="change-page__body">
     <status-view
       state="{{state}}"
-      title="{{state === 'loading' ? '加载活动' : state === 'empty' ? '无法进入' : '读取失败'}}"
+      title="{{state === 'loading' ? '加载活动' : state === 'empty' ? '无法提交变更' : '读取失败'}}"
       message="{{message}}"
       action-text="{{state === 'error' ? '重试' : ''}}"
       bindaction="retry"
     />
 
     <block wx:if="{{state === 'ready'}}">
-      <!-- 活动信息（Figma C3: 白底 r12 + 已排定 chip） -->
       <view class="info-card">
         <view class="info-card__head">
           <view class="info-card__title">{{eventTitle}}</view>
           <view class="info-card__chip">{{eventStatus}}</view>
         </view>
-        <view class="info-card__meta">{{eventMeta}}</view>
+        <view wx:if="{{hasEventMeta}}" class="info-card__meta">{{eventMeta}}</view>
       </view>
 
-      <!-- 变更原因 chips -->
       <view class="form-card">
         <view class="form-card__title">变更原因</view>
         <view class="reason-row">
@@ -33,38 +31,36 @@
         </view>
       </view>
 
-      <!-- 新时间 -->
-      <view class="form-card">
+      <view wx:if="{{requiresTime}}" class="form-card">
         <view class="form-card__title">新时间</view>
         <view class="picker-row">
-          <picker mode="date" value="{{newDate}}" bindchange="selectDate">
+          <picker mode="date" value="{{newDate}}" disabled="{{submitting}}" bindchange="selectDate">
             <view class="picker-box">
-              <text class="{{newDate ? '' : 'picker-box--placeholder'}}">{{newDate || '选择日期'}}</text>
-              <text>📅</text>
+              <text class="{{hasNewDate ? '' : 'picker-box--placeholder'}}">{{dateDisplay}}</text>
+              <text>日期</text>
             </view>
           </picker>
-          <picker mode="time" value="{{newTime}}" bindchange="selectTime">
+          <picker mode="time" value="{{newTime}}" disabled="{{submitting}}" bindchange="selectTime">
             <view class="picker-box">
-              <text class="{{newTime ? '' : 'picker-box--placeholder'}}">{{newTime || '选择时间'}}</text>
-              <text>🕐</text>
+              <text class="{{hasNewTime ? '' : 'picker-box--placeholder'}}">{{timeDisplay}}</text>
+              <text>时间</text>
             </view>
           </picker>
         </view>
       </view>
 
-      <!-- 新场地 -->
-      <view class="form-card">
+      <view wx:if="{{requiresVenue}}" class="form-card">
         <view class="form-card__title">新场地</view>
-        <input class="input-box" placeholder="填写新场地" value="{{newVenue}}" bindinput="inputVenue" />
+        <input class="input-box" placeholder="填写不同于原场地的新场地" value="{{newVenue}}" disabled="{{submitting}}" bindinput="inputVenue" />
       </view>
 
-      <!-- 备注 -->
       <view class="form-card">
-        <view class="form-card__title">备注</view>
-        <textarea class="textarea-box" placeholder="补充说明（可选）" maxlength="500" value="{{note}}" bindinput="inputNote" />
+        <view class="form-card__title">说明</view>
+        <textarea class="textarea-box" placeholder="补充说明（可选）" maxlength="500" value="{{note}}" disabled="{{submitting}}" bindinput="inputNote" />
       </view>
 
-      <view class="hint">提交后由俱乐部管理员确认，活动本身不会立即变更。</view>
+      <view wx:if="{{hasSubmitError}}" class="form-error">{{submitError}}</view>
+      <view class="hint">提交后等待管理员处理，活动本身不会立即变更。</view>
     </block>
   </view>
   <role-tabbar role="coach" active="schedule" />
