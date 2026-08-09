@@ -16,6 +16,7 @@ Page({
     growth: null as GrowthSummary | null,
     viewIndex: 0,
     radar: [] as RadarMetricPoint[],
+    radarPreview: null as RadarPreview | null,
     selectedMetricId: "",
     selectedMetric: null as RadarMetricPoint | null,
     selectedDetail: null as MetricDetail | null,
@@ -58,6 +59,7 @@ Page({
         growth,
         viewIndex: 0,
         radar,
+        radarPreview: buildRadarPreview(radar),
         selectedMetricId: selectedMetric?.metricId ?? "",
         selectedMetric,
         selectedDetail: null,
@@ -98,7 +100,7 @@ Page({
     if (!this.data.growth) return;
     const radar = radarForView(this.data.growth, viewIndex);
     const selectedMetric = radar[0] ?? null;
-    this.setData({ viewIndex, radar, selectedMetricId: selectedMetric?.metricId ?? "", selectedMetric, selectedDetail: null, canDrawRadar: radar.length >= 3, latestLabel: "", trendLabel: "等待更多记录" });
+    this.setData({ viewIndex, radar, radarPreview: buildRadarPreview(radar), selectedMetricId: selectedMetric?.metricId ?? "", selectedMetric, selectedDetail: null, canDrawRadar: radar.length >= 3, latestLabel: "", trendLabel: "等待更多记录" });
     if (selectedMetric) this.loadMetricDetail(selectedMetric.metricId);
   },
   selectMetric(event: { detail?: { metricId?: string }; currentTarget?: { dataset?: { id?: string } } }) {
@@ -144,6 +146,41 @@ Page({
     this.load();
   },
 });
+
+type RadarPreview = {
+  count: number;
+  spokes: number[];
+  rings: Array<{ size: number }>;
+  ringPath: string;
+  valuePath: string;
+};
+
+function previewVertex(index: number, total: number, radiusPct: number) {
+  const angle = -Math.PI / 2 + (Math.PI * 2 * index) / total;
+  return `${(50 + Math.cos(angle) * radiusPct).toFixed(1)}% ${(50 + Math.sin(angle) * radiusPct).toFixed(1)}%`;
+}
+
+function buildRadarPreview(points: RadarMetricPoint[]): RadarPreview | null {
+  if (points.length < 3) return null;
+  const total = points.length;
+  const ringPath = `polygon(${points.map((_, index) => previewVertex(index, total, 50)).join(",")})`;
+  const valuePath = `polygon(${points
+    .map((point, index) => {
+      const ratio = typeof point.value === "number" && point.maxValue ? point.value / point.maxValue : 0;
+      return previewVertex(index, total, Math.max(0.08, Math.min(ratio, 1)) * 50);
+    })
+    .join(",")})`;
+  // 偶数轴时每条直线贯穿两条对轴，奇数轴时每轴一条半径线
+  const spokeCount = total % 2 === 0 ? total / 2 : total;
+  const spokes = Array.from({ length: spokeCount }, (_, index) => (180 / spokeCount) * index);
+  return {
+    count: total,
+    spokes,
+    rings: [{ size: 240 }, { size: 160 }, { size: 80 }],
+    ringPath,
+    valuePath,
+  };
+}
 
 function radarForView(growth: GrowthSummary, viewIndex: number) {
   const metricIds = new Set(growth.views[viewIndex]?.metricIds ?? growth.radar.map((point) => point.metricId));
