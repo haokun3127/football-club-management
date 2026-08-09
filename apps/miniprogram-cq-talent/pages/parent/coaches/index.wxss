@@ -29,6 +29,7 @@
 
 .team-card__chips {
   display: flex;
+  flex-wrap: wrap;
   gap: 16rpx;
   margin-top: 16rpx;
 }
@@ -75,13 +76,14 @@
   width: 112rpx;
   height: 112rpx;
   border-radius: 50%;
-  border: 4rpx solid;
+  border: 4rpx solid var(--color-brand);
   background: #f3f4f6;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 36rpx;
   font-weight: 700;
+  color: var(--color-brand);
   flex-shrink: 0;
 }
 
@@ -122,5 +124,12 @@
   border-radius: 40rpx;
   padding: 12rpx 24rpx;
   font-size: 24rpx;
+  color: var(--color-text-secondary);
+}
+
+.coach-empty {
+  padding: 48rpx 0;
+  text-align: center;
+  font-size: 26rpx;
   color: var(--color-text-secondary);
 }

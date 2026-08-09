@@ -1,39 +1,39 @@
 import { getClubCoachTeam } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import type { ClubCoachTeam, LoadState } from "../../../utils/types";
 
 interface Coach {
   id: string;
   surname: string;
   name: string;
-  role: string;
-  roleBg: string;
-  ringColor: string;
   bio: string;
+  hasBio: boolean;
 }
 
 interface PageData {
+  state: LoadState;
+  message: string;
   teamName: string;
-  teamChips: string[];
-  teamGoal: string;
+  teamCounts: string[];
+  hasTeamCounts: boolean;
   coaches: Coach[];
+  hasCoaches: boolean;
+  emptyMessage: string;
 }
-
-const ROLE_STYLES = [
-  { roleBg: "#fceeef", ringColor: "#a80f1b" },
-  { roleBg: "#eff6ff", ringColor: "#3b82f6" },
-  { roleBg: "#fffbeb", ringColor: "#d97706" },
-  { roleBg: "#f0fdf4", ringColor: "#22c55e" },
-];
 
 Page<PageData>({
   data: {
     navInset: resolveNavInset(),
     menuInset: resolveMenuInset(),
-    teamName: "重庆天才足球俱乐部",
-    teamChips: [],
-    teamGoal: "",
+    state: "loading",
+    message: "正在加载教练团队",
+    teamName: "",
+    teamCounts: [],
+    hasTeamCounts: false,
     coaches: [],
+    hasCoaches: false,
+    emptyMessage: "暂无可展示的教练",
   },
   goBack() {
     wx.navigateBack();
@@ -43,28 +43,59 @@ Page<PageData>({
     this.loadCoachTeam();
   },
   async loadCoachTeam() {
+    this.setData({ state: "loading", message: "正在加载教练团队" });
     try {
       const team = await getClubCoachTeam();
-      if (!team) return;
+      if (!team?.teamName) {
+        this.setData({
+          state: "empty",
+          message: "暂无可展示的教练团队",
+          teamName: "",
+          teamCounts: [],
+          hasTeamCounts: false,
+          coaches: [],
+          hasCoaches: false,
+          emptyMessage: "暂无可展示的教练",
+        });
+        return;
+      }
+      const coaches = presentCoaches(team.coaches);
+      const teamCounts = presentTeamCounts(team.teamChips);
       this.setData({
+        state: "ready",
+        message: "",
         teamName: team.teamName,
-        teamChips: team.teamChips,
-        teamGoal: team.teamGoal,
-        coaches: team.coaches.map((coach, index) => ({
-          id: coach.id,
-          surname: coach.name.slice(0, 1),
-          name: coach.name,
-          role: coach.role,
-          roleBg: ROLE_STYLES[index % ROLE_STYLES.length]!.roleBg,
-          ringColor: ROLE_STYLES[index % ROLE_STYLES.length]!.ringColor,
-          bio: coach.bio,
-        })),
+        teamCounts,
+        hasTeamCounts: teamCounts.length > 0,
+        coaches,
+        hasCoaches: coaches.length > 0,
+        emptyMessage: coaches.length > 0 ? "" : "暂无可展示的教练",
       });
     } catch {
-      wx.showToast({ title: "教练团队加载失败", icon: "none" });
+      this.setData({
+        state: "error",
+        message: "教练团队加载失败，请点击重试",
+        teamName: "",
+        teamCounts: [],
+        hasTeamCounts: false,
+        coaches: [],
+        hasCoaches: false,
+        emptyMessage: "",
+      });
     }
   },
-  contactCoach(event: { currentTarget: { dataset: { name: string } } }) {
-    wx.showToast({ title: `联系${event.currentTarget.dataset.name}教练请通过俱乐部`, icon: "none" });
-  },
 });
+
+function presentTeamCounts(teamChips: ClubCoachTeam["teamChips"]): string[] {
+  return teamChips.filter((chip) => /^\d+(名球员|支队伍)$/.test(chip));
+}
+
+function presentCoaches(coaches: ClubCoachTeam["coaches"]): Coach[] {
+  return coaches.map(({ id, name, bio }) => ({
+    id,
+    name,
+    surname: name.slice(0, 1),
+    bio,
+    hasBio: Boolean(bio),
+  }));
+}

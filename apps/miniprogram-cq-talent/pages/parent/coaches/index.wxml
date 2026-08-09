@@ -1,30 +1,34 @@
 <view class="coaches-page">
   <view class="coaches-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="coaches-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="coaches-nav__title">教练团队</view><view class="coaches-nav__spacer"></view></view>
   <view class="coaches-page__body">
-    <!-- 球队介绍卡（Figma: #07111f 深底 r16 + 半透明白 chips） -->
-    <view class="team-card">
-      <view class="team-card__name">{{teamName}}</view>
-      <view class="team-card__chips">
-        <view wx:for="{{teamChips}}" wx:key="*this" class="team-chip">{{item}}</view>
-      </view>
-      <view class="team-card__divider"></view>
-      <view class="team-card__goal">{{teamGoal}}</view>
-    </view>
-
-    <!-- 教练卡片（Figma: 56px 圆环头像 + 角色徽标 + 微信联系描边按钮） -->
-    <view class="coach-list">
-      <view wx:for="{{coaches}}" wx:key="id" class="coach-card">
-        <view class="coach-card__avatar" style="border-color: {{item.ringColor}}; color: {{item.ringColor}}">{{item.surname}}</view>
-        <view class="coach-card__info">
-          <view class="coach-card__name-row">
-            <view class="coach-card__name">{{item.name}}</view>
-            <view class="coach-card__role" style="background: {{item.roleBg}}; color: {{item.ringColor}}">{{item.role}}</view>
-          </view>
-          <view class="coach-card__bio">{{item.bio}}</view>
+    <status-view
+      state="{{state}}"
+      title="{{state === 'loading' ? '加载教练团队' : state === 'empty' ? '暂无教练团队' : '读取失败'}}"
+      message="{{message}}"
+      action-text="{{state === 'error' ? '重试' : ''}}"
+      bindaction="loadCoachTeam"
+    />
+    <block wx:if="{{state === 'ready'}}">
+      <view class="team-card">
+        <view class="team-card__name">{{teamName}}</view>
+        <view wx:if="{{hasTeamCounts}}" class="team-card__chips">
+          <view wx:for="{{teamCounts}}" wx:key="*this" class="team-chip">{{item}}</view>
         </view>
-        <view class="coach-card__contact" data-name="{{item.name}}" bindtap="contactCoach">微信联系</view>
       </view>
-    </view>
+
+      <view class="coach-list">
+        <view wx:if="{{hasCoaches}}">
+          <view wx:for="{{coaches}}" wx:key="id" class="coach-card">
+            <view class="coach-card__avatar">{{item.surname}}</view>
+            <view class="coach-card__info">
+              <view class="coach-card__name">{{item.name}}</view>
+              <view wx:if="{{item.hasBio}}" class="coach-card__bio">{{item.bio}}</view>
+            </view>
+          </view>
+        </view>
+        <view wx:else class="coach-empty">{{emptyMessage}}</view>
+      </view>
+    </block>
   </view>
   <role-tabbar role="parent" active="child" />
 </view>
