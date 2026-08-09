@@ -1,0 +1,33 @@
+{
+  "id": "coach-project-score-entry-figma-alignment",
+  "name": "coach-project-score-entry-figma-alignment",
+  "title": "Coach project score entry Figma alignment",
+  "description": "Align C12 to the existing coach workbench, its template id, assessment form and write flow.",
+  "status": "completed",
+  "dev_type": "frontend",
+  "scope": "coach-project-score-entry",
+  "package": "miniprogram-cq-talent",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-08-10",
+  "completedAt": "2026-08-10",
+  "branch": null,
+  "base_branch": "codex/chongqing-talent-business",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "07-30-figma-design-foundation",
+  "relatedFiles": [
+    "apps/miniprogram-cq-talent/pages/coach/test-entry/index.json",
+    "apps/miniprogram-cq-talent/pages/coach/test-entry/index.ts",
+    "apps/miniprogram-cq-talent/pages/coach/test-entry/index.wxml",
+    "apps/miniprogram-cq-talent/pages/coach/test-entry/index.wxss",
+    "apps/miniprogram-cq-talent/pages/coach/test-entry/index.test.mjs",
+    "apps/miniprogram-cq-talent/assets/icons/c12-arrow-left.svg"
+  ],
+  "notes": "",
+  "meta": {}
+}
