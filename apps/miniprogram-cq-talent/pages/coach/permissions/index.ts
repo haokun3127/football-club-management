@@ -1,26 +1,58 @@
 import { requireRole } from "../../../utils/auth";
+import { resolveNavInset } from "../../../utils/presentation";
+import type { LoadState } from "../../../utils/types";
+
+const ENTRYPOINTS = [
+  { key: "calendar", label: "日程" },
+  { key: "attendance", label: "出勤" },
+  { key: "training", label: "训练" },
+  { key: "matches", label: "比赛" },
+  { key: "assessment", label: "能力评估" },
+] as const;
 
 interface PermissionRow {
-  key: string;
+  key: (typeof ENTRYPOINTS)[number]["key"];
   label: string;
-  enabled: boolean;
+  enabled: true;
 }
 
-Page({
+interface PageData {
+  navInset: number;
+  state: LoadState;
+  message: string;
+  permissions: PermissionRow[];
+}
+
+Page<PageData>({
   data: {
-    permissions: [
-      { key: "edit-event", label: "修改活动", enabled: true },
-      { key: "batch-attendance", label: "批量出勤", enabled: true },
-      { key: "assessment", label: "能力评估", enabled: true },
-      { key: "match-manage", label: "赛事管理", enabled: true },
-      { key: "student-profile", label: "学员档案", enabled: true },
-      { key: "private-lesson", label: "私教预约", enabled: false },
-    ] as PermissionRow[],
+    navInset: resolveNavInset(),
+    state: "idle",
+    message: "",
+    permissions: [],
   },
   onLoad() {
-    requireRole("coach");
+    this.load();
   },
-  explainToggle() {
-    wx.showToast({ title: "权限由俱乐部管理员分配", icon: "none" });
+  load() {
+    const session = requireRole("coach");
+    if (!session) return;
+
+    const permissions = projectEntrypoints(session.capabilities?.client?.roleEntrypoints?.coach);
+    this.setData({
+      state: permissions.length ? "ready" : "empty",
+      message: permissions.length ? "" : "当前未配置可用入口",
+      permissions,
+    });
+  },
+  goBack() {
+    wx.navigateBack();
   },
 });
+
+function projectEntrypoints(entrypoints: unknown): PermissionRow[] {
+  const available = new Set(Array.isArray(entrypoints) ? entrypoints : []);
+  return ENTRYPOINTS.filter((entrypoint) => available.has(entrypoint.key)).map((entrypoint) => ({
+    ...entrypoint,
+    enabled: true,
+  }));
+}

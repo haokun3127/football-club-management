@@ -1,8 +1,7 @@
 {
   "navigationBarTitleText": "权限范围",
+  "navigationStyle": "custom",
   "usingComponents": {
-    "app-header": "/components/app-header/index",
     "role-tabbar": "/components/role-tabbar/index"
-  },
-  "navigationStyle": "custom"
+  }
 }
