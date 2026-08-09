@@ -7,6 +7,7 @@
 .venues-nav__back image { width: 48rpx; height: 48rpx; }
 .venues-nav__title { flex: 1; margin-left: 24rpx; color: #202124; font-size: 36rpx; font-weight: 700; text-align: center; }
 .venues-nav__action { width: 48rpx; height: 48rpx; display: flex; align-items: center; justify-content: center; }
+.venues-nav__action--disabled { opacity: 0.45; }
 .venues-nav__action image { width: 48rpx; height: 48rpx; }
 
 .venues-page__body {
@@ -61,9 +62,11 @@
   align-items: flex-end;
   padding: 32rpx;
   box-sizing: border-box;
+  background: var(--color-page);
 }
 
 .venue-card__type {
+  background: var(--color-brand);
   padding: 8rpx 16rpx;
   border-radius: 12rpx;
   font-size: 22rpx;
@@ -94,6 +97,14 @@
   margin-top: 24rpx;
 }
 
+.venue-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+
+.tag-chip,
 .facility-chip {
   padding: 8rpx 16rpx;
   background: var(--color-page);
@@ -125,6 +136,11 @@
   font-size: 24rpx;
   font-weight: 600;
   color: #ffffff;
+}
+
+.venue-card__nav--disabled {
+  background: var(--color-line);
+  color: var(--color-text-secondary);
 }
 
 .venue-empty {

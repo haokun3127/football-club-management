@@ -1,18 +1,24 @@
 import { getVenues } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
-import type { VenueInfo } from "../../../utils/types";
+import type { LoadState, VenueInfo } from "../../../utils/types";
 
-interface Venue extends VenueInfo {
-  typeColor: string;
-  gradient: string;
+interface VenueView extends VenueInfo {
+  canNavigate: boolean;
+  hasFacilities: boolean;
+  hasTags: boolean;
+  usageLabel: string;
 }
 
 interface PageData {
+  state: LoadState;
+  message: string;
   filters: Array<{ label: string; value: string }>;
   activeFilter: string;
-  venues: Venue[];
-  visibleVenues: Venue[];
+  venues: VenueView[];
+  visibleVenues: VenueView[];
+  hasVisibleVenues: boolean;
+  emptyMessage: string;
 }
 
 const FILTERS = [
@@ -23,26 +29,18 @@ const FILTERS = [
   { label: "天然草", value: "natural" },
 ];
 
-const TYPE_COLORS: Record<string, string> = {
-  "11人制场地": "#3b82f6",
-  "7人制场地": "#059669",
-  "5人制场地": "#8b5cf6",
-};
-
-const GRADIENTS = [
-  "linear-gradient(135deg, #1d4ed8 0%, #0ea5e9 100%)",
-  "linear-gradient(135deg, #047857 0%, #34d399 100%)",
-  "linear-gradient(135deg, #6d28d9 0%, #a855f7 100%)",
-];
-
 Page<PageData>({
   data: {
     navInset: resolveNavInset(),
     menuInset: resolveMenuInset(),
+    state: "loading",
+    message: "正在加载场地",
     filters: FILTERS,
     activeFilter: "all",
     venues: [],
     visibleVenues: [],
+    hasVisibleVenues: false,
+    emptyMessage: "暂无可展示的场地",
   },
   goBack() {
     wx.navigateBack();
@@ -52,37 +50,83 @@ Page<PageData>({
     this.loadVenues();
   },
   async loadVenues() {
+    this.setData({ state: "loading", message: "正在加载场地" });
     try {
-      const venues = (await getVenues()).map((venue, index) => ({
-        ...venue,
-        typeColor: TYPE_COLORS[venue.type] ?? "#3b82f6",
-        gradient: GRADIENTS[index % GRADIENTS.length],
-      }));
-      this.setData({ venues, visibleVenues: this.data.activeFilter === "all" ? venues : venues.filter((venue) => venue.tags.includes(this.data.activeFilter)) });
+      const venues = presentVenues(await getVenues());
+      const visibleVenues = filterVenues(venues, this.data.activeFilter);
+      const hasVenues = venues.length > 0;
+      this.setData({
+        state: hasVenues ? "ready" : "empty",
+        message: hasVenues ? "" : "暂无可展示的场地",
+        venues,
+        visibleVenues,
+        hasVisibleVenues: visibleVenues.length > 0,
+        emptyMessage: hasVenues ? "当前分类暂无场地" : "暂无可展示的场地",
+      });
     } catch {
-      wx.showToast({ title: "场地加载失败，请稍后重试", icon: "none" });
+      this.setData({
+        state: "error",
+        message: "场地加载失败，请点击重试",
+        venues: [],
+        visibleVenues: [],
+        hasVisibleVenues: false,
+        emptyMessage: "",
+      });
     }
   },
   selectFilter(event: { currentTarget: { dataset: { value: string } } }) {
-    const value = event.currentTarget.dataset.value;
+    const activeFilter = FILTERS.some((filter) => filter.value === event.currentTarget.dataset.value)
+      ? event.currentTarget.dataset.value
+      : "all";
+    const visibleVenues = filterVenues(this.data.venues, activeFilter);
     this.setData({
-      activeFilter: value,
-      visibleVenues: value === "all"
-        ? this.data.venues
-        : this.data.venues.filter((venue: Venue) => venue.tags.includes(value)),
+      activeFilter,
+      visibleVenues,
+      hasVisibleVenues: visibleVenues.length > 0,
+      emptyMessage: this.data.venues.length > 0 ? "当前分类暂无场地" : "暂无可展示的场地",
     });
   },
-  openSearch() {
-    wx.showToast({ title: "场地搜索即将上线", icon: "none" });
-  },
   navigate(event: { currentTarget: { dataset: { id: string } } }) {
-    const venue = this.data.venues.find((item: Venue) => item.id === event.currentTarget.dataset.id);
-    if (!venue) return;
+    const venue = this.data.venues.find((item: VenueView) => item.id === event.currentTarget.dataset.id);
+    if (!venue?.canNavigate) return;
     const openLocation = (wx as unknown as { openLocation?: (options: { latitude: number; longitude: number; name: string; address: string }) => void }).openLocation;
     if (openLocation) {
       openLocation({ latitude: venue.latitude, longitude: venue.longitude, name: venue.name, address: venue.address });
       return;
     }
-    wx.showToast({ title: `导航到${venue.name}`, icon: "none" });
+    wx.showToast({ title: "当前环境不支持地图导航", icon: "none" });
   },
 });
+
+function presentVenues(venues: VenueInfo[]): VenueView[] {
+  return venues.map(({ id, name, type, address, tags, facilities, latitude, longitude, monthlyCount }) => ({
+    id,
+    name,
+    type,
+    address,
+    tags,
+    facilities,
+    latitude,
+    longitude,
+    monthlyCount,
+    canNavigate: hasRealCoordinates(latitude, longitude),
+    hasFacilities: facilities.length > 0,
+    hasTags: tags.length > 0,
+    usageLabel: `近30天使用 ${monthlyCount}次`,
+  }));
+}
+
+function filterVenues(venues: VenueView[], filter: string): VenueView[] {
+  return filter === "all" ? venues : venues.filter((venue) => venue.tags.includes(filter));
+}
+
+function hasRealCoordinates(latitude: number, longitude: number): boolean {
+  return Number.isFinite(latitude)
+    && Number.isFinite(longitude)
+    && latitude !== 0
+    && longitude !== 0
+    && latitude >= -90
+    && latitude <= 90
+    && longitude >= -180
+    && longitude <= 180;
+}
