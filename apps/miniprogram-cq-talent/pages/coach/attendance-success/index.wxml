@@ -1,33 +1,57 @@
 <view class="success-page">
   <app-header title="出勤管理" show-back />
-  <view class="success-page__body">
-    <!-- 成功态（Figma C4.1: 绿圆 + 白对勾 + 阴影） -->
+
+  <view class="success-page__body" wx:if="{{state === 'loading'}}">
+    <view class="page-state">正在读取出勤记录</view>
+  </view>
+
+  <view class="success-page__body" wx:elif="{{state === 'ready'}}">
     <view class="hero">
       <view class="hero__circle">✓</view>
-      <view class="hero__title">{{correction ? '出勤修改已提交' : '出勤记录已提交'}}</view>
-      <view class="hero__subtitle">{{present}}名学员已到场，{{absent}}名未到场</view>
+      <view class="hero__title">出勤记录已提交</view>
+      <view class="hero__subtitle">{{summary.present}}名已到场，{{summary.absent}}名未到场</view>
     </view>
 
-    <!-- 摘要卡 -->
     <view class="summary-card">
       <view class="summary-card__row">
-        <text class="summary-card__label">课程</text>
-        <text class="summary-card__value">{{title}}</text>
+        <text class="summary-card__label">活动</text>
+        <text class="summary-card__value">{{eventTitle}}</text>
       </view>
       <view class="summary-card__row">
         <text class="summary-card__label">日期</text>
-        <text class="summary-card__value">{{date}}</text>
+        <text class="summary-card__value">{{eventDate}}</text>
       </view>
-      <view class="summary-card__row" wx:if="{{venue}}">
+      <view class="summary-card__row">
+        <text class="summary-card__label">时间</text>
+        <text class="summary-card__value">{{eventTime}}</text>
+      </view>
+      <view class="summary-card__row" wx:if="{{hasVenue}}">
         <text class="summary-card__label">场地</text>
         <text class="summary-card__value">{{venue}}</text>
+      </view>
+      <view class="summary-card__row">
+        <text class="summary-card__label">已处理</text>
+        <text class="summary-card__value">{{summary.total}}名学员</text>
+      </view>
+      <view class="summary-card__row" wx:if="{{summary.pending > 0}}">
+        <text class="summary-card__label">待确认</text>
+        <text class="summary-card__value">{{summary.pending}}名学员</text>
       </view>
     </view>
 
     <view class="actions">
-      <view class="actions__primary" bindtap="backToEvent">返回活动</view>
-      <view class="actions__secondary" bindtap="done">完成</view>
+      <button class="actions__primary" bindtap="openWorkbench">查看活动工作台</button>
+      <button class="actions__secondary" bindtap="openSchedule">返回日程</button>
     </view>
   </view>
+
+  <view class="success-page__body" wx:else>
+    <view class="page-state">
+      <view class="page-state__message">{{message}}</view>
+      <button class="actions__primary" wx:if="{{state === 'error'}}" bindtap="retry">重新读取</button>
+      <button class="actions__secondary" bindtap="openSchedule">返回日程</button>
+    </view>
+  </view>
+
   <role-tabbar role="coach" active="schedule" />
 </view>
