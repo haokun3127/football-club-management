@@ -37,7 +37,7 @@
 
       <!-- Figma P4 Training Chart Card -->
       <view class="p4-card p4-chart-card">
-        <view class="p4-card__head"><view class="p4-card__title">训练历程 📊</view><view class="p4-card__link">查看›</view></view>
+        <view class="p4-card__head"><view class="p4-card__title">训练历程 📊</view><view class="p4-card__link" bindtap="openTrainingHistory">查看›</view></view>
         <view class="p4-bars"><view class="p4-bar p4-bar--1"></view><view class="p4-bar p4-bar--2"></view><view class="p4-bar p4-bar--1"></view><view class="p4-bar p4-bar--3"></view><view class="p4-bar p4-bar--2"></view><view class="p4-bar p4-bar--4"></view><view class="p4-bar p4-bar--3"></view><view class="p4-bar p4-bar--4"></view></view>
         <view class="p4-months"><view>1月</view><view>2月</view><view>3月</view><view>4月</view><view>5月</view><view>6月</view><view>7月</view><view>8月</view></view>
       </view>

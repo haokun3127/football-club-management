@@ -91,6 +91,10 @@ Page({
   openMilestones() {
     wx.showToast({ title: "成长足迹详情即将上线", icon: "none" });
   },
+  openTrainingHistory() {
+    if (!this.data.activeStudentId) return;
+    openPage(`/pages/parent/status/index?student=${this.data.activeStudentId}`);
+  },
   openRadar() {
     console.info("[growth] openRadar tapped", { pageStackDepth: getCurrentPages().length });
     openPage("/pages/parent/radar/index");
