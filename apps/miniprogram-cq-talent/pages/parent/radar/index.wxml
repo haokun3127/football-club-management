@@ -6,7 +6,7 @@
       <view class="p5-nav__title">能力雷达</view>
       <view class="p5-nav__sub">{{activeChildName}}{{activeChildTeam ? ' · ' + activeChildTeam : ''}}</view>
     </view>
-    <view class="p5-nav__compare" bindtap="openCompare">历史对比</view>
+    <view class="p5-nav__compare" bindtap="openMetricHistory">查看记录</view>
   </view>
 
   <!-- P5 Player Selector -->
@@ -29,16 +29,12 @@
       <!-- P5 Radar Hero -->
       <view class="rhero">
         <view class="rhero__head">
-          <view class="rhero__title">六维能力模型</view>
+          <view class="rhero__title">{{radarDimensionLabel}}</view>
           <view class="rhero__date">{{updatedAtLabel}}</view>
         </view>
         <view class="rhero__canvas">
           <radar-canvas wx:if="{{canDrawRadar}}" dark="{{true}}" metrics="{{radar}}" selectedMetricId="{{selectedMetricId}}" bindmetrictap="selectMetric"></radar-canvas>
           <view wx:else class="rhero__placeholder"></view>
-        </view>
-        <view class="rhero__score">
-          <view class="rhero__score-label">综合评分</view>
-          <view class="rhero__score-value">{{overallScore}}</view>
         </view>
       </view>
 
@@ -49,7 +45,6 @@
           <view class="dim-row__label">{{item.label}}</view>
           <view class="dim-row__bar">
             <view class="dim-row__fill" style="width:{{item.percent}}%"></view>
-            <view wx:if="{{item.peerPercent !== undefined}}" class="dim-row__peer" style="left:{{item.peerPercent}}%"></view>
           </view>
           <view class="dim-row__value">{{item.value === undefined ? '–' : item.value}}</view>
         </view>

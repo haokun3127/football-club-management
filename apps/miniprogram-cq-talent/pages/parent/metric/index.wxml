@@ -3,7 +3,6 @@
   <view class="p6-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="p6-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
     <view class="p6-nav__title">{{detail ? detail.label : ''}} 指标详情</view>
-    <view class="p6-nav__range" bindtap="switchRange">本赛季 ⌄</view>
   </view>
 
   <view class="p6-body">
@@ -17,7 +16,7 @@
       </view>
       <view class="mhero__score-row">
         <text class="mhero__score">{{heroValue}}</text>
-        <text class="mhero__score-unit">{{detail.unit ? '/' + (100) : ''}}{{detail.unit || ''}}</text>
+        <text class="mhero__score-unit">{{detail.unit || ''}}</text>
       </view>
       <view class="mhero__divider"></view>
       <view class="mhero__foot">
@@ -45,37 +44,6 @@
       </view>
       <view class="chart-card__x">
         <text wx:for="{{chartPoints}}" wx:key="id" class="chart-card__x-label">{{item.monthLabel}}</text>
-      </view>
-    </view>
-
-    <!-- Figma P6 Coach Feedback -->
-    <view wx:if="{{detail}}" class="metric-card coach-feedback-card">
-      <view class="section-title">教练评语</view>
-      <view class="coach-feedback"><view class="coach-feedback__avatar">教</view><view class="coach-feedback__meta"><view class="coach-feedback__name">{{coachName}}</view><view class="subtitle">{{coachDateLabel || '评语待同步'}}</view></view><view class="coach-feedback__rating">优秀</view></view>
-      <view class="coach-feedback__text">{{coachFeedback}}</view>
-    </view>
-
-    <!-- Figma P6 Team Compare (196:893) -->
-    <view wx:if="{{detail}}" class="metric-card team-compare-card">
-      <view class="section-heading"><view class="section-title">同队对比</view><view class="subtitle">{{teamSizeLabel}}</view></view>
-      <view class="team-dist">
-        <view class="team-dist__label">得分分布</view>
-        <view class="team-dist__plot">
-          <view wx:if="{{markerLeft}}" class="team-marker" style="left:{{markerLeft}}">
-            <view class="team-marker__label">我 {{heroValue}}</view>
-            <view class="team-marker__line"></view>
-          </view>
-          <view class="team-dist__bar"><view class="team-dist__seg team-dist__seg--low"></view><view class="team-dist__seg team-dist__seg--mid"></view><view class="team-dist__seg team-dist__seg--high"></view><view class="team-dist__seg team-dist__seg--top"></view></view>
-        </view>
-        <view class="team-dist__legend"><view class="team-dist__legend-item"><view class="team-dist__swatch team-dist__swatch--low"></view><view>60以下</view></view><view class="team-dist__legend-item"><view class="team-dist__swatch team-dist__swatch--mid"></view><view>60-74</view></view><view class="team-dist__legend-item"><view class="team-dist__swatch team-dist__swatch--high"></view><view>75-84</view></view><view class="team-dist__legend-item"><view class="team-dist__swatch team-dist__swatch--top"></view><view>85+</view></view></view>
-      </view>
-      <view class="team-toplist">
-        <view class="team-toplist__label">队内排名</view>
-        <view wx:if="{{markerLeft}}" class="team-row-me">
-          <view class="team-row-me__left"><view class="team-row-me__rank">–</view><view class="team-row-me__name">我</view></view>
-          <view class="team-row-me__right"><view class="team-row-me__track"><view class="team-row-me__fill" style="width:{{myScorePct}}"></view></view><view class="team-row-me__score">{{heroValue}}</view></view>
-        </view>
-        <view class="team-compare-card__message">{{teamCompareMessage}}</view>
       </view>
     </view>
 

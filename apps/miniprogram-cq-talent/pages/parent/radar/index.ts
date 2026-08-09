@@ -7,7 +7,6 @@ import type { GrowthSummary, LoadState, RadarMetricPoint, StudentSummary } from 
 
 type RadarPointView = RadarMetricPoint & {
   percent: number;
-  peerPercent?: number;
 };
 
 // 模块级请求代际计数器：page 单例语义下单调递增即可
@@ -30,7 +29,7 @@ Page({
     radar: [] as RadarPointView[],
     selectedMetricId: "",
     canDrawRadar: false,
-    overallScore: "–",
+    radarDimensionLabel: "",
     updatedAtLabel: "",
   },
   onLoad() {
@@ -72,7 +71,6 @@ Page({
         if (gen !== loadGeneration) return;
       }
       const radar = presentRadar(radarForView(growth));
-      const scores = radar.filter((point) => point.value !== undefined);
       this.setData({
         state: radar.length >= 3 ? "ready" : "empty",
         message: radar.length >= 3 ? "" : "有效能力指标不足，完成训练或评测后生成雷达图。",
@@ -83,10 +81,8 @@ Page({
         radar,
         selectedMetricId: radar[0]?.metricId ?? "",
         canDrawRadar: false,
-        overallScore: scores.length
-          ? (scores.reduce((total, point) => total + (point.value ?? 0), 0) / scores.length).toFixed(0)
-          : "–",
-        updatedAtLabel: growth.updatedAt ? formatDateTime(growth.updatedAt) : "随训练和评测持续更新",
+        radarDimensionLabel: radar.length >= 3 ? `${radar.length}维能力模型` : "",
+        updatedAtLabel: growth.updatedAt ? formatDateTime(growth.updatedAt) : "更新时间待同步",
       });
       // 首帧门控：让 webview 内容（导航/hero/维度行）先上屏，下一帧再挂载原生 canvas，避免 canvas 合成层抢跑
       if (radar.length >= 3) {
@@ -118,12 +114,12 @@ Page({
       openPage(`/pages/parent/metric/index?metricId=${metricId}&studentId=${this.data.activeStudentId}`);
     }
   },
-  openCompare() {
+  openMetricHistory() {
     if (this.data.selectedMetricId) {
       openPage(`/pages/parent/metric/index?metricId=${this.data.selectedMetricId}&studentId=${this.data.activeStudentId}`);
       return;
     }
-    wx.showToast({ title: "暂无可对比的指标", icon: "none" });
+    wx.showToast({ title: "暂无可查看的指标记录", icon: "none" });
   },
   goBack() {
     wx.navigateBack();
@@ -140,9 +136,8 @@ function radarForView(growth: GrowthSummary) {
 }
 
 function presentRadar(points: RadarMetricPoint[]): RadarPointView[] {
-  return points.map((point) => ({
+  return points.filter((point) => typeof point.value === "number" && Number.isFinite(point.value)).map((point) => ({
     ...point,
-    percent: point.value === undefined || !point.maxValue ? 0 : Math.min(100, Math.round((point.value / point.maxValue) * 100)),
-    peerPercent: point.peerAverage === undefined || !point.maxValue ? undefined : Math.min(100, Math.round((point.peerAverage / point.maxValue) * 100)),
+    percent: !point.maxValue ? 0 : Math.min(100, Math.round(((point.value ?? 0) / point.maxValue) * 100)),
   }));
 }

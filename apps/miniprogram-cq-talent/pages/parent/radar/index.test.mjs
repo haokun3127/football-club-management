@@ -1,0 +1,117 @@
+import { readFileSync } from "node:fs";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+const mocks = vi.hoisted(() => ({
+  getParentChildren: vi.fn(),
+  getParentGrowth: vi.fn(),
+  openPage: vi.fn(),
+  requireRole: vi.fn(),
+  setCurrentStudentId: vi.fn(),
+}));
+
+vi.mock("../../../utils/api", () => ({
+  getParentChildren: mocks.getParentChildren,
+  getParentGrowth: mocks.getParentGrowth,
+}));
+vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
+vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
+vi.mock("../../../utils/presentation", () => ({
+  formatDateTime: () => "2026-08-10 10:00",
+  resolveMenuInset: () => 0,
+  resolveNavInset: () => 0,
+}));
+vi.mock("../../../utils/store", () => ({ setCurrentStudentId: mocks.setCurrentStudentId }));
+
+let pageDefinition;
+globalThis.Page = (definition) => {
+  pageDefinition = definition;
+  return definition;
+};
+globalThis.wx = { navigateBack: vi.fn(), showToast: vi.fn() };
+
+await import("./index.ts");
+
+const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
+const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
+
+function createPageInstance(data = {}) {
+  const instance = {
+    ...pageDefinition,
+    data: { ...pageDefinition.data, ...data },
+  };
+  instance.setData = (patch) => {
+    instance.data = { ...instance.data, ...patch };
+  };
+  return instance;
+}
+
+describe("parent ability radar", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    mocks.getParentChildren.mockReset().mockResolvedValue([
+      { id: "student-1", name: "Student One", teams: [], coachNames: [] },
+    ]);
+    mocks.getParentGrowth.mockReset();
+    mocks.openPage.mockReset();
+    mocks.requireRole.mockReset().mockReturnValue({ role: "parent", currentStudentId: "student-1" });
+    mocks.setCurrentStudentId.mockReset();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("draws only three or more quantified dimensions and labels their real count", async () => {
+    mocks.getParentGrowth.mockResolvedValue({
+      radar: [
+        { metricId: "speed", label: "Speed", value: 8, maxValue: 10 },
+        { metricId: "passing", label: "Passing", value: undefined, maxValue: 10 },
+        { metricId: "control", label: "Control", value: 7, maxValue: 10 },
+        { metricId: "defence", label: "Defence", value: 6, maxValue: 10 },
+      ],
+      metricItems: [],
+      views: [{ id: "overview", name: "Overview", metricIds: ["speed", "passing", "control", "defence"] }],
+    });
+    const page = createPageInstance();
+
+    const loading = page.load();
+    await vi.runAllTimersAsync();
+    await loading;
+
+    expect(page.data).toMatchObject({
+      state: "ready",
+      canDrawRadar: true,
+      radarDimensionLabel: "3维能力模型",
+    });
+    expect(page.data.radar.map((point) => point.metricId)).toEqual(["speed", "control", "defence"]);
+  });
+
+  it("keeps the radar empty when fewer than three real values are available", async () => {
+    mocks.getParentGrowth.mockResolvedValue({
+      radar: [
+        { metricId: "speed", label: "Speed", value: 8, maxValue: 10 },
+        { metricId: "passing", label: "Passing", value: undefined, maxValue: 10 },
+        { metricId: "control", label: "Control", value: 7, maxValue: 10 },
+      ],
+      metricItems: [],
+      views: [{ id: "overview", name: "Overview", metricIds: ["speed", "passing", "control"] }],
+    });
+    const page = createPageInstance();
+
+    await page.load();
+
+    expect(page.data).toMatchObject({ state: "empty", canDrawRadar: false, radarDimensionLabel: "" });
+    expect(page.data.radar).toHaveLength(2);
+  });
+
+  it("does not present composite scores or peer baselines without a supplied contract", () => {
+    expect(template).toContain("{{radarDimensionLabel}}");
+    expect(template).toContain('bindtap="openMetricHistory"');
+    expect(template).not.toContain("overallScore");
+    expect(template).not.toContain("peerPercent");
+    expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
+    expect(controller).not.toContain("overallScore");
+    expect(controller).not.toContain("peerPercent");
+    expect(controller).not.toContain("openCompare");
+  });
+});
