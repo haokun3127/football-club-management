@@ -917,11 +917,13 @@ describe("api server", () => {
     const lessonCorrection = await app.inject({
       method: "PATCH",
       url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/lesson-confirmation",
-      headers: { "x-user-id": "user-coach-1" },
+      headers: {
+        "x-user-id": "user-coach-1",
+        "idempotency-key": "server-test-lesson-correction",
+      },
       payload: {
         studentId: "student-1",
-        lessonDelta: 1,
-        actorUserId: "user-coach-1",
+        lessonDelta: 0.5,
         reason: "Correct duplicated deduction",
       },
     });

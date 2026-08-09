@@ -13,6 +13,7 @@ export interface RequestOptions<TBody = unknown> {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   data?: TBody;
   idempotent?: boolean;
+  idempotencyKey?: string;
 }
 
 export function request<TResponse = unknown, TBody = unknown>(options: RequestOptions<TBody>): Promise<TResponse> {
@@ -36,7 +37,9 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
     headers["X-User-Id"] = session.userId || DEV_USER_IDS[session.role];
   }
 
-  if (options.idempotent && options.method && options.method !== "GET") {
+  if (options.idempotencyKey) {
+    headers["Idempotency-Key"] = options.idempotencyKey;
+  } else if (options.idempotent && options.method && options.method !== "GET") {
     headers["Idempotency-Key"] = createIdempotencyKey(options.method.toLowerCase());
   }
 

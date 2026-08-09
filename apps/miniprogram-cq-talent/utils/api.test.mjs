@@ -36,7 +36,7 @@ globalThis.wx = {
   }),
 };
 
-const { getCoachWorkbench, getParentActivityDetail, getParentStudentHome } = await import("./api.ts");
+const { correctCoachLesson, getCoachWorkbench, getParentActivityDetail, getParentStudentHome } = await import("./api.ts");
 
 describe("coach workbench participant normalization", () => {
   it("uses backend participant.status and note fields", async () => {
@@ -44,6 +44,32 @@ describe("coach workbench participant normalization", () => {
     expect(workbench.roster).toEqual([
       expect.objectContaining({ studentId: "student-1", status: "present", note: "Saved by backend" }),
     ]);
+  });
+});
+
+describe("coach lesson correction request boundary", () => {
+  it("sends only the correction payload with the page-owned stable idempotency key", async () => {
+    const originalRequest = globalThis.wx.request;
+    let received;
+    globalThis.wx.request = ({ data, header, success }) => {
+      received = { data, header };
+      success({ statusCode: 200, data: { ledger: {} } });
+    };
+
+    try {
+      await correctCoachLesson("event-training-1", "student-1", 0.5, "Attendance follow-up", "lesson-correction-key");
+      expect(received).toEqual(expect.objectContaining({
+        data: {
+          studentId: "student-1",
+          lessonDelta: 0.5,
+          reason: "Attendance follow-up",
+        },
+        header: expect.objectContaining({ "Idempotency-Key": "lesson-correction-key" }),
+      }));
+      expect(received.data).not.toHaveProperty("actorUserId");
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
   });
 });
 

@@ -178,25 +178,28 @@ export async function confirmCoachLesson(eventId: string, studentIds: string[], 
   });
 }
 
-export async function correctCoachLesson(eventId: string, studentId: string, lessonDelta: number, reason: string) {
+export async function correctCoachLesson(
+  eventId: string,
+  studentId: string,
+  lessonDelta: -0.5 | 0.5,
+  reason: string | undefined,
+  idempotencyKey: string,
+) {
   const context = requireContext();
-  const session = getSession();
 
   return request<Record<string, unknown>, {
     studentId: string;
-    lessonDelta: number;
-    actorUserId?: string;
-    reason: string;
+    lessonDelta: -0.5 | 0.5;
+    reason?: string;
   }>({
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/lesson-confirmation`,
     method: "PATCH",
     data: {
       studentId,
       lessonDelta,
-      actorUserId: session?.userId,
       reason,
     },
-    idempotent: true,
+    idempotencyKey,
   });
 }
 

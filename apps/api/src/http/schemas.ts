@@ -828,14 +828,20 @@ export const schemas = {
     },
   },
   appClientLessonConfirmationPatch: {
+    headers: {
+      type: "object",
+      required: ["idempotency-key"],
+      properties: {
+        "idempotency-key": { type: "string", minLength: 8, maxLength: 128 },
+      },
+    },
     body: {
       type: "object",
       additionalProperties: false,
       required: ["studentId", "lessonDelta"],
       properties: {
         studentId: { type: "string", minLength: 1 },
-        lessonDelta: { type: "number" },
-        actorUserId: { type: "string", minLength: 1 },
+        lessonDelta: { type: "number", enum: [-0.5, 0.5] },
         reason: { type: "string" },
       },
     },
@@ -844,6 +850,7 @@ export const schemas = {
       400: errorResponse,
       403: errorResponse,
       404: errorResponse,
+      409: errorResponse,
     },
   },
   appClientRecordMatch: {

@@ -275,6 +275,26 @@ const selectedProjectIds = workbench.training.selectedProjectIds;
 - App-client contract regression covers coach `200`, parent/out-of-scope coach `403`, idempotent replay, conflicting payload `409`, and one attendance debit source id.
 - C4 visual acceptance is separate: a static or API test does not replace a trusted coach `375x812` DevTools/device screenshot.
 
+## Scenario: Coach Lesson Correction Idempotency
+
+### 1. Scope / Trigger
+
+- Trigger: a coach saves one or more half-lesson corrections through `PATCH /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/lesson-confirmation`.
+- Request body: `{ studentId, lessonDelta, reason? }`, where `lessonDelta` is exactly `-0.5` or `0.5`.
+
+### 2. Contracts
+
+- `Idempotency-Key` is required and constrained to the route's accepted header length. The same key and payload replays the original response; the same key with a changed payload returns `409 idempotency_conflict`.
+- The client must not send `actorUserId`. The route requires an installed membership resolver and derives the actor from authenticated `auth.user.id`; an absent resolver receives `401`.
+- The caller must retain coach access to the event, and `studentId` must be a participant of that event. Parent, out-of-scope coach, and non-roster writes do not create ledger records.
+- The ledger source id is a deterministic SHA-256-derived value over club, event, student, authenticated actor, and idempotency key. Replays and process restarts therefore cannot create a second adjustment.
+
+### 3. Client Read/Write Boundary
+
+- C5.1 reads both coach workbench and lesson confirmation, shows only their participant-id intersection, and displays only returned balances.
+- Each selected student is saved serially in fixed `-0.5` or `0.5` steps. A row keeps its idempotency key while its payload is unchanged; changing the row's sign or shared reason creates a new key.
+- After a partial or unknown result, the client rereads both sources and stays on the correction page. It must not present sample names, synthetic balances, a system-difference diagnosis, or an unverified success state.
+
 ## Scenario: Parent Metric Drilldown and Assessment Form Grouping
 
 ### 1. Scope / Trigger

@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { formationTemplates, validateTacticalBoardPlayers, type ClubUserRole, type TacticalBoardPlayer } from "@football-club/domain";
 import type { RecordAssessmentInput, RecordMatchInput } from "@football-club/domain";
@@ -2026,7 +2027,6 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
     Body: {
       studentId: string;
       lessonDelta: number;
-      actorUserId?: string;
       reason?: string;
     };
   }>(
@@ -2043,18 +2043,53 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return reply;
       }
 
+      if (!context.membershipResolver) {
+        return context.sendError(reply, 401, "authentication_required", "Authenticated coach membership is required for lesson corrections");
+      }
+
+      const auth = await context.resolveClubAuth(request, reply, request.params.clubId);
+      if (!auth) {
+        return reply;
+      }
+
       if (!await requireCoachEventAccess(context, request, reply, request.params.clubId, request.params.eventId)) {
         return reply;
       }
+
+      const event = (await context.store.listCalendarEvents(request.params.clubId) as AppEventDetail[])
+        .find((item) => item.id === request.params.eventId);
+      if (!event) {
+        return context.sendError(reply, 404, "not_found", "Event not found");
+      }
+
+      if (!event.participants?.some((participant) => participant.studentId === request.body.studentId)) {
+        return context.sendError(reply, 400, "invalid_lesson_correction_student", "Student is not a participant in this event");
+      }
+
+      const idempotencyKey = firstHeaderValue(request.headers["idempotency-key"]);
+      if (!idempotencyKey) {
+        return context.sendError(reply, 400, "idempotency_key_required", "Idempotency-Key is required for lesson corrections");
+      }
+
+      const sourceId = `app-client-lesson-correction-${crypto
+        .createHash("sha256")
+        .update(JSON.stringify({
+          clubId: request.params.clubId,
+          eventId: request.params.eventId,
+          studentId: request.body.studentId,
+          actorUserId: auth.user.id,
+          idempotencyKey,
+        }))
+        .digest("base64url")}`;
 
       try {
         const ledger = await context.store.recordLessonAdjustment(request.params.clubId, request.body.studentId, {
           entryType: "adjustment",
           lessonDelta: request.body.lessonDelta,
           source: "manual_adjustment",
-          sourceId: `app-client-lesson-correction-${request.params.eventId}-${request.body.studentId}-${Date.now()}`,
+          sourceId,
           eventId: request.params.eventId,
-          actorUserId: request.body.actorUserId,
+          actorUserId: auth.user.id,
           note: request.body.reason ?? "App client lesson correction",
         });
         return {
@@ -2285,6 +2320,10 @@ function summarizeClient(client: ClubAppClient) {
     appId: client.appId,
     visibility: client.visibility,
   };
+}
+
+function firstHeaderValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
 }
 
 function enumerateDateRange(from: string, to: string): string[] | null {

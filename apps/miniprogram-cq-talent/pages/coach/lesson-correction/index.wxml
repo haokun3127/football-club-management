@@ -3,46 +3,40 @@
   <view class="correction-page__body">
     <status-view
       state="{{state}}"
-      title="{{state === 'loading' ? '加载课时记录' : state === 'empty' ? '暂无学员' : '读取失败'}}"
+      title="{{statusTitle}}"
       message="{{message}}"
-      action-text="{{state === 'error' ? '重试' : ''}}"
+      action-text="{{statusAction}}"
       bindaction="retry"
     />
 
-    <block wx:if="{{state === 'ready'}}">
-      <!-- 警示头（Figma C5.1: 橙色竖条 + 标题） -->
-      <view class="alert-header">
-        <view class="alert-header__bar"></view>
-        <view class="alert-header__texts">
-          <view class="alert-header__title">⚠️ 课时记录异常</view>
-          <view class="alert-header__text">请检查并更正以下学员的课时记录</view>
-        </view>
+    <block wx:if="{{state === 'ready' && hasRows}}">
+      <view class="correction-intro">
+        <view class="correction-intro__title">课时记录更正</view>
+        <view class="correction-intro__text">请核对活动参与者与当前课时余额后再保存。</view>
       </view>
 
-      <!-- 需更正学员 -->
       <view class="student-card">
-        <view class="student-card__title">需更正学员</view>
+        <view class="student-card__title">可更正学员</view>
         <view wx:for="{{rows}}" wx:key="studentId" class="student-row">
-          <view class="student-row__avatar">{{item.avatarLetter}}</view>
           <view class="student-row__info">
             <view class="student-row__name">{{item.name}}</view>
-            <view class="student-row__base">{{item.baseLabel}}</view>
+            <view class="student-row__balance">{{item.balanceText}}</view>
           </view>
           <view class="student-row__stepper">
-            <view class="student-row__btn" data-student-id="{{item.studentId}}" data-direction="{{-1}}" bindtap="adjustDelta">−</view>
+            <view class="student-row__button" data-student-id="{{item.studentId}}" data-direction="{{-1}}" bindtap="adjustDelta">-</view>
             <view class="student-row__delta {{item.delta !== 0 ? 'student-row__delta--changed' : ''}}">{{item.deltaLabel}}</view>
-            <view class="student-row__btn" data-student-id="{{item.studentId}}" data-direction="{{1}}" bindtap="adjustDelta">＋</view>
+            <view class="student-row__button" data-student-id="{{item.studentId}}" data-direction="{{1}}" bindtap="adjustDelta">+</view>
           </view>
         </view>
       </view>
 
-      <!-- 更正原因 -->
       <view class="reason-card">
-        <view class="reason-card__title">更正原因</view>
-        <textarea class="reason-card__input" placeholder="例如：家长反馈实际到场未销课" value="{{reason}}" bindinput="onReasonInput" />
+        <view class="reason-card__title">更正原因（可选）</view>
+        <textarea class="reason-card__input" value="{{reason}}" maxlength="200" placeholder="填写本次更正原因" bindinput="onReasonInput" />
       </view>
 
-      <view class="submit-button {{submitting ? 'submit-button--disabled' : ''}}" bindtap="submit">{{submitting ? '提交中…' : '提交更正'}}</view>
+      <view wx:if="{{hasSubmitError}}" class="submit-error">{{submitError}}</view>
+      <view class="submit-button {{!canSubmit || submitting ? 'submit-button--disabled' : ''}}" bindtap="submit">{{submitting ? '保存中' : '保存更正'}}</view>
     </block>
   </view>
   <role-tabbar role="coach" active="schedule" />
