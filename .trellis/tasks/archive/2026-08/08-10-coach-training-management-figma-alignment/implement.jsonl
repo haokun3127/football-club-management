@@ -1,0 +1,2 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Defines the existing coach-home and coach-team read contracts and their scope semantics."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Requires one trusted API-to-page projection with derived view fields kept out of WXML."}

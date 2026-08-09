@@ -1,0 +1,2 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Check that C8 continues to use, rather than reinterpret, the two established coach BFF reads."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Check truthful null, error, and derived-state handling at the page boundary."}

@@ -1,0 +1,32 @@
+{
+  "id": "coach-training-management-figma-alignment",
+  "name": "coach-training-management-figma-alignment",
+  "title": "Align C8 training management to Figma",
+  "description": "Rebuild C8 Training Management from real coach home and team statistics data without changing API contracts or protected persistence work.",
+  "status": "completed",
+  "dev_type": "frontend",
+  "scope": "coach-training-management",
+  "package": "miniprogram-cq-talent",
+  "priority": "P1",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-08-10",
+  "completedAt": "2026-08-10",
+  "branch": null,
+  "base_branch": "codex/chongqing-talent-business",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "apps/miniprogram-cq-talent/pages/coach/training/index.json",
+    "apps/miniprogram-cq-talent/pages/coach/training/index.ts",
+    "apps/miniprogram-cq-talent/pages/coach/training/index.wxml",
+    "apps/miniprogram-cq-talent/pages/coach/training/index.wxss",
+    "apps/miniprogram-cq-talent/pages/coach/training/index.test.mjs"
+  ],
+  "notes": "",
+  "meta": {}
+}
