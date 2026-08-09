@@ -1,0 +1,2 @@
+{"file": ".trellis/spec/api/backend/app-client-bff-contracts.md", "reason": "Verify that C11 consumes only the established assessment-task contract and does not add a create or detail capability."}
+{"file": ".trellis/tasks/08-10-coach-assessment-task-list-figma-alignment/design.md", "reason": "Verify status-gated navigation, precomputed filters and progress, and the no-double-refresh state machine."}

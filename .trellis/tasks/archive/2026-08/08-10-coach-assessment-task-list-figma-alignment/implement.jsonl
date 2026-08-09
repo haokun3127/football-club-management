@@ -1,0 +1,2 @@
+{"file": ".trellis/spec/api/backend/app-client-bff-contracts.md", "reason": "Defines the existing read-only coach assessment-task response and its coach authorization boundary."}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "Keeps API-derived task fields, safe error handling, and page view-model state aligned without changing the BFF."}

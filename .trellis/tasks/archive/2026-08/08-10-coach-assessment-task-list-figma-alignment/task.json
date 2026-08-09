@@ -1,0 +1,33 @@
+{
+  "id": "coach-assessment-task-list-figma-alignment",
+  "name": "coach-assessment-task-list-figma-alignment",
+  "title": "Coach assessment task list Figma alignment",
+  "description": "Align C11 with the existing real coach assessment-task list and only route in-progress tasks to the established assessment-entry page.",
+  "status": "completed",
+  "dev_type": "frontend",
+  "scope": "coach-assessment-task-list",
+  "package": "miniprogram-cq-talent",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-08-10",
+  "completedAt": "2026-08-10",
+  "branch": null,
+  "base_branch": "codex/chongqing-talent-business",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "07-30-figma-design-foundation",
+  "relatedFiles": [
+    "apps/miniprogram-cq-talent/pages/coach/test-tasks/index.json",
+    "apps/miniprogram-cq-talent/pages/coach/test-tasks/index.ts",
+    "apps/miniprogram-cq-talent/pages/coach/test-tasks/index.wxml",
+    "apps/miniprogram-cq-talent/pages/coach/test-tasks/index.wxss",
+    "apps/miniprogram-cq-talent/pages/coach/test-tasks/index.test.mjs",
+    "apps/miniprogram-cq-talent/assets/icons/c11-arrow-left.svg"
+  ],
+  "notes": "",
+  "meta": {}
+}
