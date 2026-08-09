@@ -1,0 +1,2 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Defines app-client role, event-scope, and response-boundary conventions."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Defines the API-to-normalizer-to-page projection boundary."}

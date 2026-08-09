@@ -1,0 +1,2 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Review the new coach match projection against existing BFF contracts."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Verify the response is normalized once and only trusted data reaches the template."}
