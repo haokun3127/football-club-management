@@ -1,0 +1,2 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Verifies BFF actor ownership and app-client request boundaries."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Verifies request status, local draft, and UI error boundary coverage."}

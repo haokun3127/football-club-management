@@ -1,0 +1,3 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Defines the authenticated app-client BFF boundary and forbids frontend role inference."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Covers the request/form/team/page data-flow and error boundaries."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Requires reuse of the established request and assessment helper contracts."}
