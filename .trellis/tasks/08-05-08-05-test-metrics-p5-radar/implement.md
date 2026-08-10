@@ -40,3 +40,11 @@
 ## Batch B visual-audit pointer (2026-08-07)
 
 - Figma 节点阻塞已于 2026-08-07 解除（`93:278 / P5 Ability Radar` 在线），首次设计↔运行对照取证完成，记录见 `visual-audit-2026-08-07.md`（D0–D3 分级差异清单；发现 2 个 D3 级差异待修复批复测；措辞上限「已对照，差异见清单」，判定权留用户）。
+
+## Batch A fresh controlled restart record (2026-08-10)
+
+- Code commit: `269611c feat(api): persist assessment metrics across restarts`.
+- A new SQLite file outside the repository was used. The first built `dist/index.js` process was confirmed as PID `43400`; `/health` returned `200` and the coach app-client assessment POST returned `201`. Only that PID was stopped.
+- A second confirmed `dist/index.js` process (PID `43908`) opened the same SQLite file. Parent `growth-summary` and `ability-metrics/metric-finishing` both returned `200` and contained the newly submitted non-seed relation `assessment-2` / `assessment-raw-result-1` / `metric-finishing`, plus derived `metric-technical-index` with `metric-lineage-1`.
+- The submitted finishing relation appeared exactly once after restart. A repeated assessment POST remained a separate `201` relationship; no assessment idempotency contract was introduced.
+- Fresh checks: API persistence/server Vitest `59/59` with `--testTimeout 15000`; API typecheck/build; mini-program Vitest `262/262`; mini-program typecheck; scoped `git diff --check`.

@@ -377,3 +377,10 @@
 - Figma 底部确认示例没有写入契约，因此未实现伪确认、伪保存或硬编码覆盖数量；请求陈旧保护、空态、错误态和重试均有覆盖。
 - 验证：focused Vitest 5/5、Mini Program typecheck、Trellis task validate、diff check 均通过；本批未进行真机/DevTools 截图验收。
 - 代码提交：`01ea5f4 feat: align coach coverage preview with C10.1`。任务归档与会话日志待后续独立提交。
+
+## 2026-08-10 Test-Metric SQLite Persistence and Parent Readback
+
+- Code commit: `269611c feat(api): persist assessment metrics across restarts`. Assessment, raw-result, score, metric-record, and metric-lineage rows now persist in one SQLite transaction; seed replay inserts missing records without replacing saved assessment data.
+- The restart merge now hydrates persisted assessment IDs before the in-memory ID counters initialize. A second assessment POST after reopen stays a distinct `201` instead of reusing an ID and returning `400`; no idempotency contract was added.
+- Fresh controlled HTTP proof used a SQLite database outside the repository. PID `43400` returned health `200` and coach assessment POST `201`; only that PID was stopped. PID `43908` reopened the same database and returned parent `growth-summary` `200` plus `ability-metrics/metric-finishing` `200` with the non-seed `assessment-2` / `assessment-raw-result-1` / `metric-finishing` relation and `metric-lineage-1`, with no duplicate relation.
+- Checks: API focused Vitest `59/59`, API typecheck/build, mini-program Vitest `262/262`, mini-program typecheck, and scoped `git diff --check` all passed. This batch makes no new P5/radar visual-acceptance claim.
