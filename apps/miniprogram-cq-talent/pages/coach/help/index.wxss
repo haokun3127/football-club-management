@@ -1,89 +1,206 @@
-.help-page {
+.c164-page {
   min-height: 100vh;
-  background: var(--color-page);
+  background: #f6f7f9;
 }
 
-.help-page__body {
-  padding: 24rpx var(--space-page) 180rpx;
+.c164-nav {
+  height: 176rpx;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 32rpx;
+  padding-left: 32rpx;
+  background: #fceeef;
 }
 
-.search-bar {
+.c164-nav__back,
+.c164-nav__placeholder {
+  width: 48rpx;
+  height: 48rpx;
+  flex: 0 0 48rpx;
+}
+
+.c164-nav__back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.c164-nav__back-icon {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.c164-nav__title {
+  color: #202124;
+  font-size: 44rpx;
+  font-weight: 700;
+}
+
+.c164-page__body {
+  padding: 32rpx 44rpx 180rpx;
+}
+
+.c164-content {
+  display: flex;
+  flex-direction: column;
+  gap: 40rpx;
+}
+
+.c164-search,
+.c164-card,
+.c164-state {
+  background: #ffffff;
+  box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.c164-search {
+  height: 88rpx;
+  padding: 0 32rpx;
+  border-radius: 44rpx;
   display: flex;
   align-items: center;
   gap: 16rpx;
-  background: var(--color-card);
-  border-radius: 44rpx;
-  padding: 20rpx 32rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
-  margin-bottom: 32rpx;
 }
 
-.search-bar__icon {
-  font-size: 26rpx;
+.c164-search__icon {
+  width: 36rpx;
+  height: 36rpx;
+  flex: 0 0 36rpx;
 }
 
-.search-bar__input {
+.c164-search__input {
+  min-width: 0;
   flex: 1;
+  color: #202124;
   font-size: 26rpx;
-  color: var(--color-text);
 }
 
-.section-title {
+.c164-state {
+  padding: 32rpx;
+  border-radius: 24rpx;
+  color: #667085;
+  font-size: 26rpx;
+}
+
+.c164-category-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.c164-section__title {
+  color: #667085;
   font-size: 24rpx;
   font-weight: 600;
-  color: var(--color-text-secondary);
-  margin-bottom: 20rpx;
 }
 
-.topic-grid {
+.c164-category-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 24rpx;
 }
 
-.topic-card {
-  width: 30%;
-  background: var(--color-card);
+.c164-category-card {
+  width: 280rpx;
+  height: 160rpx;
+  background: #ffffff;
   border-radius: 16rpx;
-  padding: 28rpx 0;
+  box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 16rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
 }
 
-.topic-card--open {
-  border: 2rpx solid var(--color-brand);
+.c164-category-card--active {
+  border: 2rpx solid #a80f1b;
 }
 
-.topic-card__icon {
-  font-size: 44rpx;
+.c164-category-card__icon {
+  width: 56rpx;
+  height: 56rpx;
 }
 
-.topic-card__label {
-  font-size: 24rpx;
+.c164-category-card__label {
+  color: #202124;
+  font-size: 26rpx;
   font-weight: 600;
-  color: var(--color-text);
 }
 
-.answer-card {
-  margin-top: 24rpx;
-  background: var(--color-card);
-  border-radius: 20rpx;
-  padding: 28rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+.c164-card {
+  border-radius: 24rpx;
 }
 
-.answer-card__title {
+.c164-faq-card__header {
+  padding: 32rpx;
+  border-bottom: 1rpx solid #e7eaf0;
+  color: #202124;
   font-size: 28rpx;
   font-weight: 700;
-  color: var(--color-text);
-  margin-bottom: 12rpx;
 }
 
-.answer-card__text {
+.c164-faq-item {
+  position: relative;
+  min-height: 88rpx;
+  padding: 28rpx 32rpx;
+}
+
+.c164-faq-item--line {
+  border-bottom: 1rpx solid #e7eaf0;
+}
+
+.c164-faq-item__question {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding-right: 40rpx;
+}
+
+.c164-faq-item__question-icon,
+.c164-faq-item__chevron {
+  width: 32rpx;
+  height: 32rpx;
+  flex: 0 0 32rpx;
+}
+
+.c164-faq-item__question-text {
+  min-width: 0;
+  flex: 1;
+  color: #202124;
+  font-size: 28rpx;
+}
+
+.c164-faq-item__chevron {
+  position: absolute;
+  top: 28rpx;
+  right: 32rpx;
+}
+
+.c164-faq-item__answer {
+  margin: 16rpx 40rpx 0 48rpx;
+  color: #667085;
   font-size: 26rpx;
-  color: var(--color-text-secondary);
-  line-height: 1.6;
+  line-height: 40rpx;
+}
+
+.c164-faq-card__empty,
+.c164-support-card__message {
+  padding: 0 32rpx 32rpx;
+  color: #667085;
+  font-size: 26rpx;
+}
+
+.c164-support-card {
+  padding-top: 32rpx;
+}
+
+.c164-support-card__title {
+  padding: 0 32rpx 16rpx;
+  color: #202124;
+  font-size: 28rpx;
+  font-weight: 700;
 }

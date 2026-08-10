@@ -1,37 +1,59 @@
-<view class="help-page">
-  <app-header title="帮助中心" show-back />
-  <view class="help-page__body">
-    <!-- 搜索（Figma C16.4: 白底 r22） -->
-    <view class="search-bar">
-      <text class="search-bar__icon">搜</text>
-      <input class="search-bar__input" placeholder="搜索使用指南" value="{{searchText}}" bindinput="onSearchInput" />
+<view class="c164-page">
+  <view class="c164-nav" style="padding-top:{{navInset}}px">
+    <view class="c164-nav__back" bindtap="goBack" aria-label="返回">
+      <image class="c164-nav__back-icon" src="/assets/icons/c164-chevron-left.svg" mode="aspectFit" />
     </view>
+    <view class="c164-nav__title">帮助中心</view>
+    <view class="c164-nav__placeholder"></view>
+  </view>
 
-    <!-- 快速上手网格 -->
-    <view class="section-title">快速上手</view>
-    <view class="topic-grid">
-      <block wx:for="{{topics}}" wx:key="key">
-        <view
-          wx:if="{{item.matchesSearch}}"
-          class="topic-card {{openKey === item.key ? 'topic-card--open' : ''}}"
-          data-key="{{item.key}}"
-          bindtap="toggleTopic"
-        >
-          <view class="topic-card__icon">{{item.icon}}</view>
-          <view class="topic-card__label">{{item.label}}</view>
+  <view class="c164-page__body">
+    <view class="c164-content">
+      <view class="c164-search">
+        <image class="c164-search__icon" src="/assets/icons/c164-search.svg" mode="aspectFit" />
+        <input class="c164-search__input" placeholder="搜索使用指南" value="{{searchText}}" bindinput="onSearchInput" />
+      </view>
+
+      <view wx:if="{{state === 'loading'}}" class="c164-state">{{message}}</view>
+      <view wx:elif="{{state === 'error'}}" class="c164-state">{{message}}</view>
+      <view wx:elif="{{state === 'empty'}}" class="c164-state">{{message}}</view>
+      <block wx:else>
+        <view wx:if="{{hasCategories}}" class="c164-category-section">
+          <view class="c164-section__title">快速上手</view>
+          <view class="c164-category-grid">
+            <block wx:for="{{categories}}" wx:key="value">
+              <view class="c164-category-card {{activeCategory === item.value ? 'c164-category-card--active' : ''}}" data-value="{{item.value}}" bindtap="selectCategory">
+                <image class="c164-category-card__icon" src="/assets/icons/c164-question.svg" mode="aspectFit" />
+                <text class="c164-category-card__label">{{item.label}}</text>
+              </view>
+            </block>
+          </view>
+        </view>
+
+        <view class="c164-card c164-faq-card">
+          <view class="c164-faq-card__header">常见问题</view>
+          <block wx:if="{{hasVisibleQuestions}}">
+            <block wx:for="{{visibleQuestions}}" wx:key="id">
+              <view class="c164-faq-item {{item.showDivider ? 'c164-faq-item--line' : ''}}" data-id="{{item.id}}" bindtap="toggleQuestion">
+                <view class="c164-faq-item__question">
+                  <image class="c164-faq-item__question-icon" src="/assets/icons/c164-question.svg" mode="aspectFit" />
+                  <text class="c164-faq-item__question-text">{{item.q}}</text>
+                </view>
+                <image class="c164-faq-item__chevron" src="/assets/icons/c164-chevron-right.svg" mode="aspectFit" />
+                <view wx:if="{{item.open}}" class="c164-faq-item__answer">{{item.a}}</view>
+              </view>
+            </block>
+          </block>
+          <view wx:else class="c164-faq-card__empty">{{emptyMessage}}</view>
         </view>
       </block>
-    </view>
 
-    <!-- 展开的答案 -->
-    <view wx:if="{{openKey}}" class="answer-card">
-      <block wx:for="{{topics}}" wx:key="key">
-        <view wx:if="{{item.key === openKey}}">
-          <view class="answer-card__title">{{item.label}}</view>
-          <view class="answer-card__text">{{item.answer}}</view>
-        </view>
-      </block>
+      <view class="c164-card c164-support-card">
+        <view class="c164-support-card__title">联系支持</view>
+        <view class="c164-support-card__message">支持方式待配置</view>
+      </view>
     </view>
   </view>
+
   <role-tabbar role="coach" active="me" />
 </view>
