@@ -47,3 +47,10 @@ B0 仅更新本任务的范围、设计与 context manifests：目标由历史�
 - `python .trellis/scripts/task.py validate .trellis/tasks/07-30-figma-design-foundation`
 - `git diff --check -- .trellis/tasks/07-30-figma-design-foundation`
 - 任务范围审计：仅该目录有本次 B0 修改。
+
+## Final completion audit (2026-08-10)
+
+- The online source of truth `zZ6wKyOHKcO4UYXDd9jGwv` contains 49 business states in scope: Parent 21 and Coach 28. CODE frames, ordinary internal frames, and `93:877 / LEGACY C7` are excluded; C7 is represented by `233:2 / C7 MVP`.
+- Independent Sol audit reconciled each of the 49 states with completed implementation/task evidence and commits. Parent-child task metadata was repaired for early archived batches; the in-progress parent phone authorization guard was unlinked because it is a separate login reliability task, not an unimplemented Figma state.
+- Fresh full quality gate passed without a CLI timeout override: domain `19/19`, mini-program `262/262`, and API `78/78`. The two file-backed SQLite restart tests carry local `15_000` ms budgets after their measured full-suite runtime exceeded the global 5-second default; the global default remains unchanged.
+- Scope conclusion: all 49 business states are implemented. No pixel-perfect, trusted device-screenshot, or universal runtime visual acceptance claim is made.

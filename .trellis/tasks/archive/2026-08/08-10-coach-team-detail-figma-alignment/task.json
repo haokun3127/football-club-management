@@ -19,7 +19,7 @@
   "pr_url": null,
   "subtasks": [],
   "children": [],
-  "parent": null,
+  "parent": "07-30-figma-design-foundation",
   "relatedFiles": [
     "apps/miniprogram-cq-talent/pages/coach/team/index.json",
     "apps/miniprogram-cq-talent/pages/coach/team/index.ts",

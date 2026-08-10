@@ -19,7 +19,7 @@
   "pr_url": null,
   "subtasks": [],
   "children": [],
-  "parent": null,
+  "parent": "07-30-figma-design-foundation",
   "relatedFiles": [
     "apps/api/src/routes/app-client.routes.ts",
     "apps/api/src/http/schemas.ts",

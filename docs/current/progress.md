@@ -390,3 +390,10 @@
 - Implementation commit `6526fe4` persists attendance status and note in SQLite without changing the attendance API contract, authorization, idempotency conflict handling, or the present/late lesson-debit rule.
 - Evidence separates local and production: local file-backed `dist` restart preserved a non-empty note and status with exactly one participant record; the recorded production marker-note PUT survived one `cq-talent-api` container restart on the same named SQLite volume and was then restored.
 - Fresh review confirms no uncommitted attendance-task files. C4 real-coach `375x812` screenshot evidence remains absent and is explicitly not reported as complete; under the current project goal it is nonblocking for this persistence-task archive.
+
+## 2026-08-10 Figma 49-State Completion Audit
+
+- The current online authority `zZ6wKyOHKcO4UYXDd9jGwv` was rechecked as 49 business states: Parent 21 and Coach 28. CODE frames, ordinary internal frames, and `93:877 / LEGACY C7` are excluded; C7 uses `233:2 / C7 MVP`.
+- Sol's final audit mapped all 49 states to completed implementation/task records and commits. Historical task-parent links that were missing from the audit tree were restored; the active phone-authorization single-flight guard was unlinked because it is a separate functional follow-up, not an unimplemented Figma state.
+- Test-stability remediation: the two file-backed SQLite restart integrations now use local `15_000` ms budgets after measured full-suite runtimes exceeded Vitest's 5-second default. Global timeout remains unchanged. Fresh root `check` exited `0`: domain `19/19`, mini-program `262/262`, API `78/78`.
+- Completion claim boundary: the 49-state implementation scope is complete. This does not claim pixel-level equality, universal DevTools/device screenshot coverage, or complete runtime visual acceptance.
