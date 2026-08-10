@@ -384,3 +384,9 @@
 - The restart merge now hydrates persisted assessment IDs before the in-memory ID counters initialize. A second assessment POST after reopen stays a distinct `201` instead of reusing an ID and returning `400`; no idempotency contract was added.
 - Fresh controlled HTTP proof used a SQLite database outside the repository. PID `43400` returned health `200` and coach assessment POST `201`; only that PID was stopped. PID `43908` reopened the same database and returned parent `growth-summary` `200` plus `ability-metrics/metric-finishing` `200` with the non-seed `assessment-2` / `assessment-raw-result-1` / `metric-finishing` relation and `metric-lineage-1`, with no duplicate relation.
 - Checks: API focused Vitest `59/59`, API typecheck/build, mini-program Vitest `262/262`, mini-program typecheck, and scoped `git diff --check` all passed. This batch makes no new P5/radar visual-acceptance claim.
+
+## 2026-08-10 Coach Attendance Persistence Archived
+
+- Implementation commit `6526fe4` persists attendance status and note in SQLite without changing the attendance API contract, authorization, idempotency conflict handling, or the present/late lesson-debit rule.
+- Evidence separates local and production: local file-backed `dist` restart preserved a non-empty note and status with exactly one participant record; the recorded production marker-note PUT survived one `cq-talent-api` container restart on the same named SQLite volume and was then restored.
+- Fresh review confirms no uncommitted attendance-task files. C4 real-coach `375x812` screenshot evidence remains absent and is explicitly not reported as complete; under the current project goal it is nonblocking for this persistence-task archive.
