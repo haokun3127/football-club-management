@@ -1,0 +1,27 @@
+<view class="coverage-page">
+  <view class="coverage-nav">
+    <view class="coverage-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+    <view class="coverage-nav__title">覆盖预览</view>
+  </view>
+
+  <view class="coverage-page__body">
+    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{statusTitle}}" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
+
+    <block wx:if="{{state === 'ready' && hasStudents}}">
+      <view class="coverage-title">学员覆盖</view>
+      <view wx:for="{{students}}" wx:key="studentId" class="student-card">
+        <view class="student-card__head">
+          <view class="student-card__name">{{item.name}}</view>
+          <view class="student-card__coverage">{{item.coverageLabel}}</view>
+        </view>
+        <view wx:for="{{item.dimensions}}" wx:for-item="dimension" wx:key="dimensionId" class="dimension-row">
+          <view class="dimension-row__label">{{dimension.label}}</view>
+          <view class="dimension-row__track"><view class="{{dimension.barClass}}" style="width: {{dimension.barWidth}}%;"></view></view>
+          <view wx:if="{{!dimension.hasScore}}" class="dimension-row__pending">{{dimension.pendingLabel}}</view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <role-tabbar role="coach" active="training" />
+</view>

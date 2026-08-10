@@ -1,0 +1,33 @@
+{
+  "id": "coach-coverage-preview-figma-alignment",
+  "name": "coach-coverage-preview-figma-alignment",
+  "title": "Coach Coverage Preview Figma Alignment",
+  "description": "Align the existing read-only coach coverage page with Figma C10.1 using the real training-coverage projection.",
+  "status": "in_progress",
+  "dev_type": "frontend",
+  "scope": "coach-coverage-preview-figma-alignment",
+  "package": "miniprogram-cq-talent",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-08-10",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "codex/chongqing-talent-business",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "07-30-figma-design-foundation",
+  "relatedFiles": [
+    "apps/miniprogram-cq-talent/pages/coach/coverage/index.json",
+    "apps/miniprogram-cq-talent/pages/coach/coverage/index.ts",
+    "apps/miniprogram-cq-talent/pages/coach/coverage/index.wxml",
+    "apps/miniprogram-cq-talent/pages/coach/coverage/index.wxss",
+    "apps/miniprogram-cq-talent/pages/coach/coverage/index.test.mjs",
+    ".trellis/spec/api/backend/app-client-bff-contracts.md"
+  ],
+  "notes": "Figma: zZ6wKyOHKcO4UYXDd9jGwv / 93:983 / C10.1 Coverage Preview. Read-only near-30-day training coverage; no current-selection confirmation or API write is implied.",
+  "meta": {}
+}
