@@ -36,7 +36,7 @@ globalThis.wx = {
   }),
 };
 
-const { correctCoachLesson, getCoachMatchDetail, getCoachWorkbench, getParentActivityDetail, getParentStudentHome } = await import("./api.ts");
+const { correctCoachLesson, getCoachMatchDetail, getCoachWorkbench, getParentActivityDetail, getParentStudentHome, submitCoachAssessment } = await import("./api.ts");
 
 describe("coach workbench participant normalization", () => {
   it("uses backend participant.status and note fields", async () => {
@@ -67,6 +67,36 @@ describe("coach lesson correction request boundary", () => {
         header: expect.objectContaining({ "Idempotency-Key": "lesson-correction-key" }),
       }));
       expect(received.data).not.toHaveProperty("actorUserId");
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
+});
+
+describe("coach assessment submission boundary", () => {
+  it("sends the BFF-owned actor-free assessment body and treats 200 as unconfirmed", async () => {
+    const originalRequest = globalThis.wx.request;
+    let received;
+    globalThis.wx.request = ({ data, success }) => {
+      received = data;
+      success({ statusCode: 200, data: { assessment: { id: "not-confirmed" } } });
+    };
+
+    try {
+      await expect(submitCoachAssessment({
+        studentId: "student-1",
+        templateId: "template-real",
+        templateVersionId: "version-real",
+        rawResults: [{ testItemId: "item-real", metricId: "metric-real", value: { kind: "score_0_100", score: 80 } }],
+      })).rejects.toMatchObject({ code: "unexpected_status", statusCode: 200 });
+      expect(received).toEqual(expect.objectContaining({
+        studentId: "student-1",
+        templateId: "template-real",
+        templateVersionId: "version-real",
+        rawResults: [{ testItemId: "item-real", metricId: "metric-real", value: { kind: "score_0_100", score: 80 } }],
+      }));
+      expect(received).not.toHaveProperty("assessedByCoachId");
+      expect(received).not.toHaveProperty("eventId");
     } finally {
       globalThis.wx.request = originalRequest;
     }

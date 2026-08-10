@@ -1,9 +1,7 @@
 {
-  "navigationBarTitleText": "能力评估录入",
+  "navigationStyle": "custom",
   "usingComponents": {
-    "app-header": "/components/app-header/index",
     "role-tabbar": "/components/role-tabbar/index",
     "status-view": "/components/status-view/index"
-  },
-  "navigationStyle": "custom"
+  }
 }

@@ -1,73 +1,61 @@
-<view class="entry-page">
-  <app-header title="能力评估录入" action-text="保存草稿" bindaction="saveDraft" show-back />
-  <view class="entry-page__body">
+<view class="c15-page">
+  <view class="c15-nav">
+    <view class="c15-nav__left" bindtap="goBack">
+      <image class="c15-nav__back" src="/assets/icons/c12-arrow-left.svg" mode="aspectFit" />
+      <text class="c15-nav__title">能力评估录入</text>
+    </view>
+    <text class="c15-nav__action" bindtap="saveDraft">保存草稿</text>
+  </view>
+
+  <view class="c15-body">
     <status-view
       state="{{state}}"
-      title="{{state === 'loading' ? '加载测评表单' : state === 'empty' ? '无法录入' : '读取失败'}}"
+      title="{{statusTitle}}"
       message="{{message}}"
-      action-text="{{state === 'error' ? '重试' : ''}}"
+      action-text="{{statusActionText}}"
       bindaction="retry"
     />
 
     <block wx:if="{{state === 'ready'}}">
-      <!-- 维度 tabs（Figma C15: 技术/体能/战术，选中=品牌红 r20） -->
-      <scroll-view scroll-x class="group-strip" enhanced show-scrollbar="{{false}}">
-        <view class="group-strip__inner">
-          <view
-            wx:for="{{groups}}"
-            wx:key="*this"
-            class="group-chip {{activeGroup === item ? 'group-chip--active' : ''}}"
-            data-name="{{item}}"
-            bindtap="selectGroup"
-          >{{item}}</view>
+      <scroll-view scroll-x class="c15-groups" enhanced show-scrollbar="{{false}}">
+        <view class="c15-groups__row">
+          <view wx:for="{{groups}}" wx:key="id" class="{{item.className}}" data-id="{{item.id}}" bindtap="selectGroup">{{item.label}}</view>
         </view>
       </scroll-view>
 
-      <!-- 学员卡片：头像 + 均分 + 滑杆组 -->
-      <view wx:for="{{students}}" wx:key="id" class="student-card">
-        <view class="student-card__head">
-          <view class="student-card__avatar">{{item.initial}}</view>
-          <view class="student-card__name">{{item.name}}</view>
-          <view class="student-card__average">{{item.average}}</view>
+      <view wx:for="{{students}}" wx:for-item="student" wx:key="id" class="c15-student-card">
+        <view class="c15-student-card__head">
+          <view class="c15-student-card__avatar">{{student.initial}}</view>
+          <text class="c15-student-card__name">{{student.name}}</text>
+          <text class="c15-student-card__average">{{student.averageLabel}}</text>
         </view>
-        <view class="slider-list">
-          <block wx:for="{{fields}}" wx:for-item="field" wx:key="id">
-            <view wx:if="{{(field.groupLabel || '评估项') === activeGroup}}" class="slider-row">
-              <view class="slider-row__label">{{field.label}}</view>
-              <slider
-                class="slider-row__slider"
-                min="{{field.sliderMin}}"
-                max="{{field.sliderMax}}"
-                step="{{field.sliderStep}}"
-                value="{{item.values[field.id] || field.sliderMin}}"
-                activeColor="#a80f1b"
-                backgroundColor="#e7eaf0"
-                block-size="20"
-                data-student-id="{{item.id}}"
-                data-field-id="{{field.id}}"
-                bindchange="onSliderChange"
-              />
-              <view class="slider-row__value">{{item.values[field.id] !== undefined ? item.values[field.id] : '-'}}</view>
-            </view>
-          </block>
+        <view class="c15-rows">
+          <view wx:for="{{student.rows}}" wx:for-item="row" wx:key="fieldId" class="c15-row">
+            <text class="c15-row__label">{{row.label}}</text>
+            <slider
+              class="c15-row__slider"
+              min="{{row.sliderMin}}"
+              max="{{row.sliderMax}}"
+              step="{{row.sliderStep}}"
+              value="{{row.sliderValue}}"
+              activeColor="#a80f1b"
+              backgroundColor="#e7eaf0"
+              block-size="20"
+              data-student-id="{{student.id}}"
+              data-field-id="{{row.fieldId}}"
+              bindchange="onSliderChange"
+            />
+            <text class="c15-row__value">{{row.valueLabel}}</text>
+          </view>
         </view>
       </view>
 
-      <view class="submit-button {{submitting ? 'submit-button--disabled' : ''}}" bindtap="submit">{{submitting ? '提交中…' : '提交评估'}}</view>
-      <view wx:if="{{lastSavedLabel}}" class="autosave-hint">{{lastSavedLabel}}</view>
+      <text wx:if="{{lastSavedLabel}}" class="c15-draft-label">{{lastSavedLabel}}</text>
+      <view class="c15-submit-wrap">
+        <view class="{{submitting ? 'c15-submit c15-submit--disabled' : 'c15-submit'}}" bindtap="submit">{{submitting ? '正在保存' : '保存所有'}}</view>
+      </view>
     </block>
   </view>
 
-  <!-- C12.1 自动保存弹层 -->
-  <view wx:if="{{autosaveVisible}}" class="autosave-overlay">
-    <view class="autosave-modal">
-      <view class="autosave-modal__circle">✓</view>
-      <view class="autosave-modal__title">评分已自动保存</view>
-      <view class="autosave-modal__text">下次打开可继续录入</view>
-      <view class="autosave-modal__meta">{{lastSavedLabel}}</view>
-      <view class="autosave-modal__primary" bindtap="continueEditing">继续录入</view>
-      <view class="autosave-modal__secondary" bindtap="exitEditing">退出</view>
-    </view>
-  </view>
-  <role-tabbar role="coach" active="me" />
+  <role-tabbar role="coach" active="training" />
 </view>

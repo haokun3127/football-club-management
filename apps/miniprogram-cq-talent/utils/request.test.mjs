@@ -34,3 +34,13 @@ describe("request idempotency keys", () => {
     expect(capturedHeaders["Idempotency-Key"]).toBe("lesson-correction-stable-key");
   });
 });
+
+describe("request expected status", () => {
+  it("keeps the default 2xx behavior but rejects an unexpected successful status when explicitly required", async () => {
+    await expect(request({ path: "/legacy" })).resolves.toEqual({ ok: true });
+    await expect(request({ path: "/created", expectedStatus: 201 })).rejects.toMatchObject({
+      code: "unexpected_status",
+      statusCode: 200,
+    });
+  });
+});

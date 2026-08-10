@@ -6,6 +6,7 @@ export interface ApiError {
   code: string;
   message: string;
   details?: unknown[];
+  statusCode?: number;
 }
 
 export interface RequestOptions<TBody = unknown> {
@@ -14,6 +15,7 @@ export interface RequestOptions<TBody = unknown> {
   data?: TBody;
   idempotent?: boolean;
   idempotencyKey?: string;
+  expectedStatus?: number;
 }
 
 export function request<TResponse = unknown, TBody = unknown>(options: RequestOptions<TBody>): Promise<TResponse> {
@@ -57,8 +59,19 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
       data: options.data,
       header: headers,
       success: (response) => {
-        if (response.statusCode >= 200 && response.statusCode < 300) {
+        const isExpectedStatus = options.expectedStatus === undefined
+          ? response.statusCode >= 200 && response.statusCode < 300
+          : response.statusCode === options.expectedStatus;
+        if (isExpectedStatus) {
           resolve(response.data as TResponse);
+          return;
+        }
+        if (options.expectedStatus !== undefined && response.statusCode >= 200 && response.statusCode < 300) {
+          reject({
+            code: "unexpected_status",
+            message: "Unexpected response status",
+            statusCode: response.statusCode,
+          });
           return;
         }
         if (response.statusCode === 401) {

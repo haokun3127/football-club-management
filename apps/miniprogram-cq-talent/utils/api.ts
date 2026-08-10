@@ -317,10 +317,11 @@ export async function submitCoachAssessment(input: {
       templateId: input.templateId,
       templateVersionId: input.templateVersionId,
       assessedAt: new Date().toISOString(),
-      eventId: input.eventId || undefined,
+      ...(input.eventId ? { eventId: input.eventId } : {}),
       summary: "重庆天才小程序教练端评测录入",
       rawResults: input.rawResults,
     },
+    expectedStatus: 201,
     idempotent: true,
   });
 }
