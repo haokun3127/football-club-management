@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 10
+- **Total Sessions**: 11
 - **Last Active**: 2026-08-10
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~412 | Active |
+| `journal-1.md` | ~447 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 11 | 2026-08-10 | Assessment persistence restart verification | `269611c`, `757b6cf` | `codex/chongqing-talent-business` |
 | 10 | 2026-08-10 | C10.1 coach coverage preview | `01ea5f4`, `db95ef5` | `codex/chongqing-talent-business` |
 | 9 | 2026-08-09 | Wire parent training history action | `3a4a669` | `codex/chongqing-talent-business` |
 | 8 | 2026-07-11 | CQ Talent full mini-program UI and tactical board | `c099630`, `7b4200b`, `a331704`, `f091d7a`, `b3eb2bd` | `codex/chongqing-talent-business` |

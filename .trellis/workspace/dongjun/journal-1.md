@@ -410,3 +410,38 @@ Aligned the read-only coach coverage preview to Figma 93:983 with truthful null/
 ### Next Steps
 
 - None - task complete
+
+
+## Session 11: Assessment persistence restart verification
+
+**Date**: 2026-08-10
+**Task**: Assessment persistence restart verification
+**Package**: api
+**Branch**: `codex/chongqing-talent-business`
+
+### Summary
+
+Persisted the full assessment graph in SQLite, proved coach write and guardian-scoped parent readback after a controlled same-file dist restart, and recorded API plus mini-program checks.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `269611c` | (see git log) |
+| `757b6cf` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
