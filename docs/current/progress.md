@@ -369,3 +369,11 @@
 - 服务页（`b783782`、`ebb5f52`、`ac97d4c`、`8da7ff0`）：文章、场馆、FAQ 与教练团队都只展示已有 API 契约的字段；搜索、文章详情、客服、电话、虚假地图导航、默认球队名、合成角色/目标与直接联系均不伪装为可用。
 - 验证：最后一次全仓门禁通过——领域 18、API 68、小程序 98 测试；类型检查通过。门禁首次运行曾出现 `apps/api/test/persistence.test.ts:13` 单条 5 秒超时，单独复现 9/9 通过，随后完整门禁重试通过；该现象须在后续稳定性工作中单独跟踪，不能归因于本轮页面改动。
 - 当前全页实现目标已继续进入下一批（P9/P9.1）；项目总体已豁免真实设备截图作为阻塞条件，但本轮没有新增运行态视觉验收结论。
+
+## 2026-08-10 C10.1 教练覆盖预览
+
+- 在线 Figma 唯一基准：`zZ6wKyOHKcO4UYXDd9jGwv / 93:983 / C10.1 Coverage Preview`；新增教练覆盖预览页，采用本地粉色顶栏和教练训练 Tab。
+- 页面仅在真实 coach 会话下读取 `GET /coach/training-coverage`；无 coach 角色不发请求。学员、维度、覆盖数和分数均来自真实响应；`scorePercent: null` 显示“待同步”，`0` 保持真实零值。
+- Figma 底部确认示例没有写入契约，因此未实现伪确认、伪保存或硬编码覆盖数量；请求陈旧保护、空态、错误态和重试均有覆盖。
+- 验证：focused Vitest 5/5、Mini Program typecheck、Trellis task validate、diff check 均通过；本批未进行真机/DevTools 截图验收。
+- 代码提交：`01ea5f4 feat: align coach coverage preview with C10.1`。任务归档与会话日志待后续独立提交。
