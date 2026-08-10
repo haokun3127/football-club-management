@@ -20,6 +20,7 @@
 - Login may accept `roleHint` as UI context only. It is never authoritative.
 - Authoritative role comes from active club membership, and must be checked against `ClubAppClient.roleEntrypoints`.
 - Parent calendar responses must be scoped by guardian binding and must not expose unrelated event participants.
+- Parent calendar and student-schedule date-only queries use UTC whole-day bounds: `from` is inclusive at midnight and `to` is exclusive at the following midnight.
 - Coach training project tree comes from the backend training catalog derived from assessment/training configuration.
 - Training project writes must verify coach event access and should be sent with `Idempotency-Key`.
 
@@ -118,17 +119,67 @@ return { event: { ...event, participants } };
 Acceptance dates and identities belong to the shared development configuration, not to page implementations. This keeps the imported-data fixture reproducible without shipping a historical date as production behavior.
 
 ```typescript
-// Correct: one fixture owner, current date outside dev mode.
-const initialDate = DEV_MODE ? DEV_TEST_DATE : currentLocalDate();
+// Correct: a real page date by default; only an explicit develop-only override may pin a fixture.
+const initialDate = resolveParentPageDate(new Date(), DEV_PARENT_PAGE_DATE_OVERRIDE);
 
 // Wrong: a page-level fixture that silently becomes production behavior.
 const selectedDate = "2026-06-28";
 ```
 
 - Read `DEV_TEST_DATE` and dev user ids from `utils/config.ts` for local smoke/manual acceptance.
-- In non-dev mode, date-driven pages start from the user's current local date.
+- Date-driven parent pages start from the user's current local date in every environment unless an explicit develop-only override is enabled in shared configuration.
 - Smoke scripts may pin fixture dates explicitly, but production page defaults must not duplicate those literals.
 - Static acceptance checks should search page code for duplicated fixture dates and demo identities.
+
+## Scenario: Parent Calendar Date-Only Range
+
+### 1. Scope / Trigger
+
+- Trigger: a parent schedule, day view, activity summary, or parent calendar BFF request supplies `from` and/or `to`.
+
+### 2. Signatures
+
+- `GET /clubs/:clubId/app-clients/:clientId/parent/calendar?from=YYYY-MM-DD&to=YYYY-MM-DD`
+- `GET /clubs/:clubId/app-clients/:clientId/parent/students/:studentId/schedule?from=YYYY-MM-DD&to=YYYY-MM-DD`
+
+### 3. Contracts
+
+- A date-only `from` includes activities from that UTC midnight.
+- A date-only `to` includes the entire named UTC date by converting it to the next midnight and using an exclusive upper bound.
+- ISO timestamp values preserve exact-time comparison semantics.
+- A requested interval can span at most 31 calendar days. Guardian participant projection is applied after range filtering and remains mandatory.
+
+### 4. Validation & Error Matrix
+
+- Malformed date/date-time, reversed bounds, or a range longer than 31 days -> `400 invalid_date_range`.
+- A Sunday date-only `to` includes Sunday afternoon and excludes the following Monday at `00:00:00.000Z`.
+
+### 5. Good/Base/Bad Cases
+
+- Good: `from=2026-08-10&to=2026-08-16` returns an authorized event at `2026-08-16T15:00:00.000Z`.
+- Base: a parent with no matching activities receives a normal empty events array, not another family's activities.
+- Bad: parsing `to=2026-08-16` as that day's `00:00:00.000Z` and using `<=`, which silently drops all later Sunday events.
+
+### 6. Tests Required
+
+- Contract test proves final-day inclusion, next-day exclusion, invalid-range `400`, and guardian participant redaction.
+- Mini-program test proves a parent schedule derives and requests the selected Monday–Sunday range without embedding a historical fixture date.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```typescript
+const to = Date.parse(range.to);
+return startsAt <= to;
+```
+
+#### Correct
+
+```typescript
+const endExclusive = Date.parse(`${range.to}T00:00:00.000Z`) + DAY_MS;
+return startsAt < endExclusive;
+```
 
 ## Scenario: Acceptance Data Identity and Family Privacy
 

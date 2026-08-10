@@ -295,6 +295,93 @@ describe("api server", () => {
     persistence.database.close();
   });
 
+  it("interprets parent calendar date-only ranges as whole UTC days and rejects invalid ranges", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const seed = createSeedData();
+    const sourceEvent = seed.events.find((event) => event.id === "event-training-1")!;
+    const sourceParticipants = seed.participants.filter((participant) => participant.eventId === sourceEvent.id);
+    const sundayEventId = "event-parent-calendar-sunday";
+    const mondayEventId = "event-parent-calendar-monday";
+
+    seed.events.push(
+      {
+        ...sourceEvent,
+        id: sundayEventId,
+        timeRange: {
+          startsAt: "2026-08-16T15:00:00.000Z",
+          endsAt: "2026-08-16T16:00:00.000Z",
+        },
+      },
+      {
+        ...sourceEvent,
+        id: mondayEventId,
+        timeRange: {
+          startsAt: "2026-08-17T00:00:00.000Z",
+          endsAt: "2026-08-17T01:00:00.000Z",
+        },
+      },
+    );
+    seed.participants.push(
+      ...sourceParticipants.flatMap((participant) => [
+        { ...participant, id: `${participant.id}-sunday`, eventId: sundayEventId },
+        { ...participant, id: `${participant.id}-monday`, eventId: mondayEventId },
+      ]),
+    );
+
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories, seed),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+    const base = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/calendar";
+    const headers = { "x-user-id": "user-parent-1" };
+
+    const fullWeek = await app.inject({
+      method: "GET",
+      url: `${base}?from=2026-08-10&to=2026-08-16`,
+      headers,
+    });
+    const malformed = await app.inject({
+      method: "GET",
+      url: `${base}?from=not-a-date&to=2026-08-16`,
+      headers,
+    });
+    const reversed = await app.inject({
+      method: "GET",
+      url: `${base}?from=2026-08-16&to=2026-08-10`,
+      headers,
+    });
+    const excessive = await app.inject({
+      method: "GET",
+      url: `${base}?from=2026-08-01&to=2026-09-01`,
+      headers,
+    });
+    const studentScheduleMalformed = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/schedule?from=not-a-date&to=2026-08-16",
+      headers,
+    });
+
+    const calendar = fullWeek.json() as {
+      events: Array<{ id: string; participants: Array<{ studentId: string }> }>;
+    };
+
+    expect(fullWeek.statusCode).toBe(200);
+    expect(calendar.events.map((event) => event.id)).toContain(sundayEventId);
+    expect(calendar.events.map((event) => event.id)).not.toContain(mondayEventId);
+    expect(calendar.events.find((event) => event.id === sundayEventId)?.participants)
+      .toEqual([expect.objectContaining({ studentId: "student-1" })]);
+    for (const response of [malformed, reversed, excessive, studentScheduleMalformed]) {
+      expect(response.statusCode).toBe(400);
+      expect(response.json().error.code).toBe("invalid_date_range");
+    }
+
+    await app.close();
+    persistence.database.close();
+  });
+
   it("persists and validates coach tactical board snapshots", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
     const seed = createSeedData();

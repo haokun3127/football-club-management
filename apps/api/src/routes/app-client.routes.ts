@@ -748,6 +748,10 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return reply;
       }
 
+      if (!parseEventRange(request.query)) {
+        return context.sendError(reply, 400, "invalid_date_range", "Date range must be valid and no longer than 31 days");
+      }
+
       const events = filterEventsByRange(
         sortEvents(await context.store.getStudentTimeline(request.params.clubId, request.params.studentId)),
         request.query,
@@ -945,6 +949,10 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
 
       if (!await context.requireStudentAccess(request, reply, request.params.clubId, request.params.studentId)) {
         return reply;
+      }
+
+      if (!parseEventRange(request.query)) {
+        return context.sendError(reply, 400, "invalid_date_range", "Date range must be valid and no longer than 31 days");
       }
 
       const events = filterEventsByRange(
@@ -1266,6 +1274,10 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       }
       if (auth && !auth.membership.roles.includes("parent")) {
         return context.sendError(reply, 403, "forbidden", "Parent role is required for this operation");
+      }
+
+      if (!parseEventRange(request.query)) {
+        return context.sendError(reply, 400, "invalid_date_range", "Date range must be valid and no longer than 31 days");
       }
 
       const students = await context.store.listOperationalStudents(request.params.clubId);
@@ -2600,14 +2612,68 @@ function sortEvents(events: unknown[]): AppEventDetail[] {
     .sort((left, right) => Date.parse(left.timeRange.startsAt) - Date.parse(right.timeRange.startsAt));
 }
 
+const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const MAX_EVENT_RANGE_DAYS = 31;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+type ParsedEventRange = {
+  from: number | null;
+  to: number | null;
+  toIsExclusive: boolean;
+};
+
 function filterEventsByRange(events: AppEventDetail[], range: { from?: string; to?: string }) {
+  const parsedRange = parseEventRange(range);
+  if (!parsedRange) {
+    return [];
+  }
+
   return events.filter((event) => {
     const startsAt = Date.parse(event.timeRange.startsAt);
-    const from = range.from ? Date.parse(range.from) : null;
-    const to = range.to ? Date.parse(range.to) : null;
 
-    return (from === null || startsAt >= from) && (to === null || startsAt <= to);
+    return (parsedRange.from === null || startsAt >= parsedRange.from)
+      && (parsedRange.to === null || (parsedRange.toIsExclusive ? startsAt < parsedRange.to : startsAt <= parsedRange.to));
   });
+}
+
+function parseEventRange(range: { from?: string; to?: string }): ParsedEventRange | null {
+  const from = parseEventRangeBoundary(range.from, false);
+  const to = parseEventRangeBoundary(range.to, true);
+  if ((range.from && !from) || (range.to && !to)) {
+    return null;
+  }
+
+  const parsedFrom = from?.timestamp ?? null;
+  const parsedTo = to?.timestamp ?? null;
+  const toIsExclusive = to?.dateOnly ?? false;
+  if (parsedFrom !== null && parsedTo !== null) {
+    const rangeEnd = toIsExclusive ? parsedTo : parsedTo + 1;
+    if (parsedFrom >= rangeEnd || rangeEnd - parsedFrom > MAX_EVENT_RANGE_DAYS * DAY_MS) {
+      return null;
+    }
+  }
+
+  return { from: parsedFrom, to: parsedTo, toIsExclusive };
+}
+
+function parseEventRangeBoundary(value: string | undefined, isEnd: boolean): { timestamp: number; dateOnly: boolean } | null {
+  if (!value) {
+    return null;
+  }
+
+  if (DATE_ONLY_PATTERN.test(value)) {
+    const timestamp = Date.parse(`${value}T00:00:00.000Z`);
+    if (!Number.isFinite(timestamp) || new Date(timestamp).toISOString().slice(0, 10) !== value) {
+      return null;
+    }
+    return { timestamp: isEnd ? timestamp + DAY_MS : timestamp, dateOnly: true };
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}T/.test(value)) {
+    return null;
+  }
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) ? { timestamp, dateOnly: false } : null;
 }
 
 function splitHomeSchedule(events: AppEventDetail[]) {
