@@ -1,0 +1,2 @@
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Verify route, API, and rendered-state boundaries without inventing data."}
+{"file":".trellis/tasks/08-10-08-10-coach-tactical-board-mvp-figma-alignment/design.md","reason":"Verify stale-load, read-only, and single-flight save behavior."}

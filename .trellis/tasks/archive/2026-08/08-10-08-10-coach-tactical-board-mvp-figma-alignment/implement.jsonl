@@ -1,0 +1,2 @@
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Preserve the existing GET/PUT contract and distinguish loaded from newly saved state."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Follow existing coach guard and tactical-board API usage without expanding helpers."}
