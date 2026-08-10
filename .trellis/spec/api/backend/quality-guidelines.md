@@ -16,6 +16,13 @@ API changes must preserve route contracts, OpenAPI coverage, persistence behavio
 - Update `apps/api/test/persistence.test.ts` when persistence schema, migrations, or repository behavior changes.
 - Keep WPS connector behavior deterministic in tests by injecting `fetch`, `sleep`, `now`, and credential resolvers.
 
+## File-Backed Restart Integration Tests
+
+- Keep Vitest's global 5-second default. Do not relax it for the whole API package.
+- A test that intentionally performs file SQLite migration, complete seed, close/reopen, and HTTP readback may declare its own explicit timeout after measuring the focused and full-suite runtime.
+- Use the smallest measured budget that covers normal full-suite contention (currently `15_000` ms for the attendance and assessment restart regressions in `test/persistence.test.ts`).
+- The quality gate must still run the full API suite without a command-line timeout override; an explicit local budget is not permission to hide a deadlock or widen unrelated tests.
+
 ## Forbidden Patterns
 
 - Do not bypass role checks in route handlers.

@@ -77,7 +77,7 @@ describe("platform persistence", () => {
       first?.database.close();
       rmSync(directory, { recursive: true, force: true });
     }
-  });
+  }, 15_000);
 
   it("preserves app-client assessment records and parent metric reads after reopening a seeded file database", async () => {
     const directory = mkdtempSync(join(tmpdir(), "football-assessment-"));
@@ -206,7 +206,7 @@ describe("platform persistence", () => {
       first?.database.close();
       rmSync(directory, { recursive: true, force: true });
     }
-  });
+  }, 15_000);
 
   it("restores tactical board snapshots after reopening SQLite", async () => {
     const directory = mkdtempSync(join(tmpdir(), "football-tactical-board-"));
