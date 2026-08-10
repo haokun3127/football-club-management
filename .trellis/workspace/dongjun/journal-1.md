@@ -480,3 +480,38 @@ Archived the coach attendance SQLite persistence task after separate review of l
 ### Next Steps
 
 - None - task complete
+
+
+## Session 13: Figma 49-state completion audit
+
+**Date**: 2026-08-10
+**Task**: Figma 49-state completion audit
+**Package**: api
+**Branch**: `codex/chongqing-talent-business`
+
+### Summary
+
+Audited the current online Figma scope as 49 business states, repaired historical task links, separated the independent phone-authorization guard, fixed local restart-test budgets, and passed the full workspace check before archiving the parent Figma task.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `c8244b4` | (see git log) |
+| `fbfe34e` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
