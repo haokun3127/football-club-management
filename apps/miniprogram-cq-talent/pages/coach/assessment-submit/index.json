@@ -1,8 +1,8 @@
 {
   "navigationBarTitleText": "评估提交",
   "usingComponents": {
-    "app-header": "/components/app-header/index",
-    "role-tabbar": "/components/role-tabbar/index"
+    "role-tabbar": "/components/role-tabbar/index",
+    "status-view": "/components/status-view/index"
   },
   "navigationStyle": "custom"
 }
