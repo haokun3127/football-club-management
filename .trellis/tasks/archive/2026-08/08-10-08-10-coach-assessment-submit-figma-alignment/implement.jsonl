@@ -1,0 +1,2 @@
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Keep route-derived presentation within the existing C15 boundary."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Reuse the established coach role, navigation, and tab-bar patterns."}
