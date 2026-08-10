@@ -1,0 +1,3 @@
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Keep FAQ presentation constrained to the BFF ContentFaq contract and exclude unsupported support actions."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Reuse local presenter and stale-request patterns without touching shared API or components."}
+{"file":".trellis/tasks/08-10-coach-help-figma-alignment/design.md","reason":"Approved C16.4 data, interaction, and icon boundaries."}
