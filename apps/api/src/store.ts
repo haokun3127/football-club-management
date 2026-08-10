@@ -263,6 +263,20 @@ export interface ApiStore {
   }>;
 }
 
+export interface MatchEventAppendInput extends RecordMatchEventInput {
+  idempotencyKey: string;
+  idempotencyFingerprint: string;
+  idempotencyExpiresAt: string;
+}
+
+export interface MatchEventAppendResult extends MatchEventBundle {
+  replayed: boolean;
+}
+
+export interface MatchEventAppendConflict {
+  conflict: true;
+}
+
 function upsertById<TEntity extends { id: EntityId }>(items: TEntity[], entity: TEntity): TEntity {
   const index = items.findIndex((item) => item.id === entity.id);
 

@@ -149,6 +149,7 @@ describe("platform persistence", () => {
       "0005_privacy_foundation.sql",
       "0006_tactical_boards.sql",
       "0007_request_collections.sql",
+      "0008_match_event_bundles.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);
