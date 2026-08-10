@@ -375,3 +375,38 @@ Restored the Parent Growth training-history View action by routing the active st
 ### Next Steps
 
 - None - task complete
+
+
+## Session 10: C10.1 coach coverage preview
+
+**Date**: 2026-08-10
+**Task**: C10.1 coach coverage preview
+**Package**: api
+**Branch**: `codex/chongqing-talent-business`
+
+### Summary
+
+Aligned the read-only coach coverage preview to Figma 93:983 with truthful null/zero score handling, scoped tests, documentation, and task archive.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `01ea5f4` | (see git log) |
+| `db95ef5` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
