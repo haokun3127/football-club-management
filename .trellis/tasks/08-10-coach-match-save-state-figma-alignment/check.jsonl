@@ -1,0 +1,1 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Check authorization order, exact status handling, and the ban on fabricated live-match state or unrelated persistence writes."}

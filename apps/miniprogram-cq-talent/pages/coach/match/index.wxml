@@ -39,5 +39,20 @@
     </block>
   </view>
 
+  <block wx:if="{{hasLocalDraftOverlay}}">
+    <view class="match-draft-mask">
+      <view class="match-draft-modal">
+        <view class="match-draft-modal__icon"><view class="match-draft-modal__check"></view></view>
+        <view class="match-draft-modal__title">本机草稿已保存</view>
+        <view class="match-draft-modal__message">这条未提交的比赛事件仅保存在当前设备</view>
+        <view class="match-draft-modal__updated">{{localDraftUpdatedAtLabel}}</view>
+        <view class="match-draft-modal__actions">
+          <view class="match-draft-modal__continue" bindtap="continueLocalDraft">继续填写</view>
+          <view class="match-draft-modal__exit" bindtap="exitLocalDraft">退出</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
   <role-tabbar role="coach" active="schedule" />
 </view>

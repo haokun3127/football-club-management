@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   getCoachMatchDetail: vi.fn(),
+  loadMatchEventDraft: vi.fn(),
   requireRole: vi.fn(),
   openPage: vi.fn(),
 }));
@@ -12,6 +13,7 @@ vi.mock("../../../utils/api", () => ({
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
+vi.mock("../../../utils/match-event-draft", () => ({ loadMatchEventDraft: mocks.loadMatchEventDraft }));
 
 let pageDefinition;
 globalThis.Page = (definition) => {
@@ -58,7 +60,11 @@ const detail = {
 describe("coach match detail", () => {
   beforeEach(() => {
     mocks.getCoachMatchDetail.mockReset().mockResolvedValue(detail);
-    mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
+    mocks.loadMatchEventDraft.mockReset().mockReturnValue(null);
+    mocks.requireRole.mockReset().mockReturnValue({
+      role: "coach",
+      capabilities: { match: { eventTypes: ["goal", "save"] } },
+    });
     mocks.openPage.mockReset();
     globalThis.wx.navigateBack.mockReset();
   });
@@ -113,6 +119,67 @@ describe("coach match detail", () => {
     expect(controller).not.toContain("getOpenerEventChannel");
   });
 
+  it("shows only a compatible local draft after real detail and capability checks, then bounds continue and exit", async () => {
+    mocks.loadMatchEventDraft.mockReturnValue({
+      eventId: "event-match-1",
+      studentId: "student-1",
+      type: "goal",
+      minute: 12,
+      updatedAt: "2026-08-10T12:00:00.000Z",
+    });
+    const page = createPageInstance();
+    await page.onLoad({ id: "event-match-1" });
+
+    expect(page.data).toMatchObject({
+      state: "ready",
+      hasLocalDraftOverlay: true,
+      localDraftUpdatedAtLabel: expect.stringContaining("2026"),
+    });
+
+    page.continueLocalDraft();
+    page.continueLocalDraft();
+    expect(mocks.openPage).toHaveBeenCalledTimes(1);
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/match-event-add/index?eventId=event-match-1");
+
+    const exitPage = createPageInstance({ eventId: "event-match-1", hasLocalDraftOverlay: true });
+    exitPage.exitLocalDraft();
+    exitPage.exitLocalDraft();
+    expect(globalThis.wx.navigateBack).toHaveBeenCalledTimes(1);
+    expect(globalThis.wx.navigateBack).toHaveBeenCalledWith({ delta: 1 });
+  });
+
+  it("hides missing or incompatible drafts and prevents a stale detail completion from replacing newer draft state", async () => {
+    mocks.loadMatchEventDraft.mockReturnValue({
+      eventId: "event-match-1",
+      studentId: "student-missing",
+      type: "goal",
+      updatedAt: "2026-08-10T12:00:00.000Z",
+    });
+    const incompatible = createPageInstance();
+    await incompatible.onLoad({ id: "event-match-1" });
+    expect(incompatible.data.hasLocalDraftOverlay).toBe(false);
+
+    let resolveOlder;
+    const olderRequest = new Promise((resolve) => { resolveOlder = resolve; });
+    mocks.getCoachMatchDetail.mockReset()
+      .mockImplementationOnce(() => olderRequest)
+      .mockResolvedValueOnce(detail);
+    mocks.loadMatchEventDraft.mockReturnValue({
+      eventId: "event-match-1",
+      studentId: "student-1",
+      type: "goal",
+      updatedAt: "2026-08-10T12:00:00.000Z",
+    });
+    const page = createPageInstance();
+    const olderLoad = page.load("event-stale", ["goal"]);
+    const newerLoad = page.load("event-match-1", ["goal"]);
+    await newerLoad;
+    resolveOlder({ ...detail, event: { ...detail.event, id: "event-stale", title: "Older match" } });
+    await olderLoad;
+
+    expect(page.data).toMatchObject({ eventId: "event-match-1", eventTitle: "Real match title", hasLocalDraftOverlay: true });
+  });
+
   it("uses the local role tab bar and excludes legacy writes, tactical UI, Figma samples, and template helpers", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"submit-bar"');
@@ -122,6 +189,10 @@ describe("coach match detail", () => {
     expect(template).not.toContain("half-time");
     expect(template).not.toContain("submit-bar");
     expect(template).not.toContain("tactical");
+    expect(template).toContain("match-draft-mask");
+    expect(template).toContain("localDraftUpdatedAtLabel");
+    expect(template).not.toContain("pause-match");
+    expect(template).not.toContain("end-match");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("recordCoachMatch");
     expect(controller).not.toContain("openTacticalBoard");

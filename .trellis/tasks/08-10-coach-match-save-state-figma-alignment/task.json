@@ -1,0 +1,36 @@
+{
+  "id": "coach-match-save-state-figma-alignment",
+  "name": "coach-match-save-state-figma-alignment",
+  "title": "C6.2 Coach Match Save State",
+  "description": "Implement a truthful local C6.2 match-event draft save-state overlay for Figma 93:858.",
+  "status": "in_progress",
+  "dev_type": "frontend",
+  "scope": "c6.2-local-match-event-draft-save-state",
+  "package": "miniprogram-cq-talent",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-08-10",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "codex/chongqing-talent-business",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "07-30-figma-design-foundation",
+  "relatedFiles": [
+    ".trellis/spec/api/backend/app-client-bff-contracts.md",
+    "apps/miniprogram-cq-talent/pages/coach/match-event-add/index.{json,ts,wxml,wxss,test.mjs}",
+    "apps/miniprogram-cq-talent/utils/{api.ts,types.ts,api.test.mjs}",
+    "apps/miniprogram-cq-talent/utils/match-event-draft.{ts,test.mjs}",
+    "apps/miniprogram-cq-talent/pages/coach/match/index.{json,ts,wxml,wxss,test.mjs}",
+    "apps/miniprogram-cq-talent/assets/icons/c62-*.svg"
+  ],
+  "notes": "The user approved implementation of the local-draft overlay on 2026-08-10. Preserve assessment WIP and do not commit.",
+  "meta": {
+    "figma": "zZ6wKyOHKcO4UYXDd9jGwv:93:858",
+    "legacyExcluded": "93:877"
+  }
+}

@@ -1,5 +1,6 @@
 import { getCoachMatchDetail } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { loadMatchEventDraft } from "../../../utils/match-event-draft";
 import { openPage } from "../../../utils/navigation";
 import type { CoachMatchDetail, LoadState } from "../../../utils/types";
 
@@ -33,7 +34,12 @@ interface MatchPageData {
   canAddEvent: boolean;
   timeline: TimelineItem[];
   hasTimeline: boolean;
+  hasLocalDraftOverlay: boolean;
+  localDraftUpdatedAtLabel: string;
+  localDraftNavigationLocked: boolean;
 }
+
+let loadToken = 0;
 
 Page<MatchPageData>({
   data: {
@@ -55,21 +61,28 @@ Page<MatchPageData>({
     canAddEvent: false,
     timeline: [],
     hasTimeline: false,
+    hasLocalDraftOverlay: false,
+    localDraftUpdatedAtLabel: "",
+    localDraftNavigationLocked: false,
   },
   onLoad(query?: Record<string, string | undefined>) {
-    if (!requireRole("coach")) return;
-    return this.load(query?.id || "");
+    const session = requireRole("coach");
+    if (!session) return;
+    return this.load(query?.id || "", session.capabilities?.match?.eventTypes);
   },
   onShow() {
     if (!this.data.eventId || !this.data.hasLoaded) return;
-    return this.load(this.data.eventId);
+    const session = requireRole("coach");
+    if (!session) return;
+    return this.load(this.data.eventId, session.capabilities?.match?.eventTypes);
   },
-  async load(eventId: string): Promise<boolean> {
+  async load(eventId: string, capabilityEventTypes?: string[]): Promise<boolean> {
     if (!eventId) {
       this.setData({ ...emptyState("缺少活动 ID"), state: "empty" });
       return false;
     }
 
+    const requestToken = ++loadToken;
     this.setData({
       ...emptyState("正在读取比赛记录"),
       state: "loading",
@@ -79,6 +92,7 @@ Page<MatchPageData>({
 
     try {
       const detail = await getCoachMatchDetail(eventId);
+      if (requestToken !== loadToken) return false;
       if (!detail.match) {
         this.setData({
           ...emptyState("当前活动尚未有已记录的比赛信息"),
@@ -95,6 +109,7 @@ Page<MatchPageData>({
       const teamName = detail.event.teamName || "";
       const opponentName = detail.match.opponentName || "";
       const matchStatus = matchStatusLabel(detail.match.status);
+      const draft = findCompatibleLocalDraft(eventId, detail, capabilityEventTypes);
       this.setData({
         state: "ready",
         message: "",
@@ -114,9 +129,13 @@ Page<MatchPageData>({
         canAddEvent: true,
         timeline,
         hasTimeline: timeline.length > 0,
+        hasLocalDraftOverlay: Boolean(draft),
+        localDraftUpdatedAtLabel: draft ? formatLocalDraftUpdatedAt(draft.updatedAt) : "",
+        localDraftNavigationLocked: false,
       });
       return true;
     } catch {
+      if (requestToken !== loadToken) return false;
       this.setData({
         ...emptyState("比赛记录读取失败，请稍后重试。"),
         state: "error",
@@ -128,7 +147,9 @@ Page<MatchPageData>({
     }
   },
   retry() {
-    this.load(this.data.eventId);
+    const session = requireRole("coach");
+    if (!session) return;
+    this.load(this.data.eventId, session.capabilities?.match?.eventTypes);
   },
   goBack() {
     wx.navigateBack();
@@ -136,6 +157,16 @@ Page<MatchPageData>({
   openMatchEventAdd() {
     if (!this.data.eventId || !this.data.canAddEvent) return;
     openPage(`/pages/coach/match-event-add/index?eventId=${this.data.eventId}`);
+  },
+  continueLocalDraft() {
+    if (!this.data.eventId || !this.data.hasLocalDraftOverlay || this.data.localDraftNavigationLocked) return;
+    this.setData({ localDraftNavigationLocked: true });
+    openPage(`/pages/coach/match-event-add/index?eventId=${this.data.eventId}`);
+  },
+  exitLocalDraft() {
+    if (!this.data.hasLocalDraftOverlay || this.data.localDraftNavigationLocked) return;
+    this.setData({ localDraftNavigationLocked: true });
+    wx.navigateBack({ delta: 1 });
   },
 });
 
@@ -158,7 +189,25 @@ function emptyState(message: string): Omit<MatchPageData, "state"> {
     canAddEvent: false,
     timeline: [],
     hasTimeline: false,
+    hasLocalDraftOverlay: false,
+    localDraftUpdatedAtLabel: "",
+    localDraftNavigationLocked: false,
   };
+}
+
+function findCompatibleLocalDraft(eventId: string, detail: CoachMatchDetail, capabilityEventTypes?: string[]) {
+  const draft = loadMatchEventDraft(eventId);
+  if (!draft || draft.eventId !== eventId) return null;
+  const hasStudent = detail.roster.some((student) => student.studentId === draft.studentId);
+  const hasType = (capabilityEventTypes ?? []).includes(draft.type);
+  return hasStudent && hasType ? draft : null;
+}
+
+function formatLocalDraftUpdatedAt(updatedAt: string) {
+  const date = new Date(updatedAt);
+  if (Number.isNaN(date.getTime())) return "本机草稿时间待同步";
+  const twoDigits = (value: number) => String(value).padStart(2, "0");
+  return `本机保存于 ${date.getFullYear()}-${twoDigits(date.getMonth() + 1)}-${twoDigits(date.getDate())} ${twoDigits(date.getHours())}:${twoDigits(date.getMinutes())}`;
 }
 
 function hasRecordedScore(detail: CoachMatchDetail) {

@@ -1,6 +1,7 @@
 import { createCoachMatchEvent, getCoachMatchDetail } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { createIdempotencyKey } from "../../../utils/idempotency";
+import { clearMatchEventDraft, isMatchEventDraftType, loadMatchEventDraft, saveMatchEventDraft } from "../../../utils/match-event-draft";
 import type { CoachMatchEventCreateInput, CoachMatchPlayerEvent, LoadState } from "../../../utils/types";
 
 type EventTypeOption = { value: CoachMatchPlayerEvent["type"]; label: string };
@@ -98,6 +99,7 @@ Page<MatchEventAddPageData>({
         submitError: "",
         operationKey: "",
       });
+      this.restoreLocalDraft(eventId);
     } catch {
       if (requestToken !== loadToken) return;
       this.setData({
@@ -121,18 +123,55 @@ Page<MatchEventAddPageData>({
     const next = this.data.eventTypes.find((item: EventTypeOption) => item.value === event.currentTarget.dataset.value);
     if (!next || next.value === this.data.activeType) return;
     this.setData({ activeType: next.value, operationKey: "", hasSubmitError: false, submitError: "" });
+    this.syncLocalDraft();
   },
   onPlayerChange(event: { detail: { value: string | number } }) {
     const playerIndex = Number(event.detail.value);
     const player = this.data.roster[playerIndex];
     if (!Number.isInteger(playerIndex) || !player) return;
     this.setData({ playerIndex, selectedPlayerName: player.name, operationKey: "", hasSubmitError: false, submitError: "" });
+    this.syncLocalDraft();
   },
   onMinuteInput(event: { detail: { value: string } }) {
     this.setData({ minute: event.detail.value, operationKey: "", hasSubmitError: false, submitError: "" });
+    this.syncLocalDraft();
   },
   onNoteInput(event: { detail: { value: string } }) {
     this.setData({ note: event.detail.value, operationKey: "", hasSubmitError: false, submitError: "" });
+    this.syncLocalDraft();
+  },
+  restoreLocalDraft(eventId: string) {
+    const draft = loadMatchEventDraft(eventId);
+    if (!draft) return;
+    const playerIndex = this.data.roster.findIndex((player: RosterOption) => player.studentId === draft.studentId);
+    const eventType = this.data.eventTypes.find((item: EventTypeOption) => item.value === draft.type);
+    if (playerIndex < 0 || !eventType) return;
+
+    this.setData({
+      activeType: eventType.value,
+      playerIndex,
+      selectedPlayerName: this.data.roster[playerIndex]!.name,
+      minute: draft.minute === undefined ? "" : String(draft.minute),
+      note: draft.note || "",
+      operationKey: "",
+      hasSubmitError: false,
+      submitError: "",
+    });
+  },
+  syncLocalDraft() {
+    if (this.data.state !== "ready") return;
+    const input = toCreateInput(this.data);
+    if (!input.ok) return;
+    if (!isMateriallyModified(this.data, input.value)) {
+      clearMatchEventDraft(this.data.eventId);
+      return;
+    }
+
+    saveMatchEventDraft({
+      eventId: this.data.eventId,
+      ...input.value,
+      updatedAt: new Date().toISOString(),
+    });
   },
   async saveEvent() {
     if (this.data.submitting) return;
@@ -149,6 +188,7 @@ Page<MatchEventAddPageData>({
       if (!result.event?.id || result.event.studentId !== input.value.studentId || result.event.type !== input.value.type) {
         throw new Error("Match event response was incomplete");
       }
+      clearMatchEventDraft(this.data.eventId);
       wx.navigateBack({ delta: 1 });
     } catch {
       this.setData({
@@ -233,14 +273,14 @@ function parseMinute(value: string): number | undefined | null {
 }
 
 function isMatchEventType(value: string): value is CoachMatchPlayerEvent["type"] {
-  return value === "goal"
-    || value === "assist"
-    || value === "save"
-    || value === "tackle"
-    || value === "yellow_card"
-    || value === "red_card"
-    || value === "penalty"
-    || value === "own_goal";
+  return isMatchEventDraftType(value);
+}
+
+function isMateriallyModified(data: MatchEventAddPageData, input: CoachMatchEventCreateInput) {
+  return input.studentId !== data.roster[0]?.studentId
+    || input.type !== data.eventTypes[0]?.value
+    || input.minute !== undefined
+    || input.note !== undefined;
 }
 
 function eventTypeLabel(value: CoachMatchPlayerEvent["type"]) {

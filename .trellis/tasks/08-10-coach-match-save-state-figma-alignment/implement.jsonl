@@ -1,0 +1,1 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Defines C6's existing read contract and C6.1 append boundary; C6.2 adds only a new server-backed progress resource."}
