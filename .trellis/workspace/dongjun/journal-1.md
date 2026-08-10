@@ -445,3 +445,38 @@ Persisted the full assessment graph in SQLite, proved coach write and guardian-s
 ### Next Steps
 
 - None - task complete
+
+
+## Session 12: Coach attendance persistence archive
+
+**Date**: 2026-08-10
+**Task**: Coach attendance persistence archive
+**Package**: api
+**Branch**: `codex/chongqing-talent-business`
+
+### Summary
+
+Archived the coach attendance SQLite persistence task after separate review of local and recorded production restart readback evidence; C4 screenshot acceptance remains explicitly nonblocking and unclaimed.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `6526fe4` | (see git log) |
+| `16dd073` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
