@@ -229,4 +229,97 @@ describe("coach project score entry", () => {
     expect(stylesheet).toMatch(/\.c12-submit-wrap\s*\{[^}]*bottom:\s*140rpx/s);
     expect(stylesheet).toMatch(/\.c12-body\s*\{[^}]*padding:\s*32rpx 32rpx 320rpx/s);
   });
+
+  it("offers only the latest valid local draft and blocks the underlying assessment until continuing", async () => {
+    drafts.set("event-assessment-1:template-current-v2", {
+      "student-1:item-speed": { studentId: "student-1", testItemId: "item-speed", status: "recorded", rawValue: "80", updatedAt: "2026-08-10T09:12:00.000Z" },
+      "student-2:item-balance": { studentId: "student-2", testItemId: "item-balance", status: "missing", rawValue: "", updatedAt: "2026-08-10T10:12:00.000Z" },
+      "student-other:item-speed": { studentId: "student-other", testItemId: "item-speed", status: "recorded", rawValue: "66", updatedAt: "2026-08-10T12:12:00.000Z" },
+      "student-1:item-other": { studentId: "student-1", testItemId: "item-other", status: "recorded", rawValue: "66", updatedAt: "2026-08-10T12:12:00.000Z" },
+      "student-1:item-balance": { studentId: "student-1", testItemId: "item-balance", status: "empty", rawValue: "", updatedAt: "2026-08-10T12:12:00.000Z" },
+    });
+    const page = createPageInstance();
+    await page.load("event-assessment-1");
+
+    expect(page.data).toMatchObject({ draftResumeVisible: true, canSubmit: false });
+    expect(page.data.draftResumeUpdatedAtLabel).toContain("本机草稿");
+    expect(page.data.draftResumeUpdatedAtLabel).toContain("2026-08-10 10:12");
+    page.onValueInput({ currentTarget: { dataset: { studentId: "student-2" } }, detail: { value: "72" } });
+    page.switchGroup({ currentTarget: { dataset: { id: "technique" } } });
+    await page.submitAssessment();
+    expect(page.data.draft["student-2:item-speed"]).toBeUndefined();
+    expect(page.data.activeGroupId).toBe("fitness");
+    expect(mocks.submitCoachAssessment).not.toHaveBeenCalled();
+
+    page.continueDraft();
+    expect(page.data).toMatchObject({ draftResumeVisible: false, canSubmit: true });
+    page.onValueInput({ currentTarget: { dataset: { studentId: "student-2" } }, detail: { value: "72" } });
+    expect(page.data.draft["student-2:item-speed"]).toMatchObject({ status: "recorded", rawValue: "72" });
+  });
+
+  it("skips invalid local draft rows and exits a valid resume modal once without clearing it", async () => {
+    drafts.set("event-other:template-current-v2", {
+      "student-1:item-speed": { studentId: "student-1", testItemId: "item-speed", status: "recorded", rawValue: "80", updatedAt: "2026-08-10T10:12:00.000Z" },
+    });
+    drafts.set("event-assessment-1:template-other-v1", {
+      "student-1:item-speed": { studentId: "student-1", testItemId: "item-speed", status: "recorded", rawValue: "80", updatedAt: "2026-08-10T10:12:00.000Z" },
+    });
+    drafts.set("event-assessment-1:template-current-v2", {
+      "student-other:item-speed": { studentId: "student-other", testItemId: "item-speed", status: "recorded", rawValue: "80", updatedAt: "2026-08-10T10:12:00.000Z" },
+      "student-1:item-other": { studentId: "student-1", testItemId: "item-other", status: "missing", rawValue: "", updatedAt: "2026-08-10T10:12:00.000Z" },
+      "student-1:item-speed": { studentId: "student-1", testItemId: "item-speed", status: "empty", rawValue: "", updatedAt: "2026-08-10T10:12:00.000Z" },
+    });
+    const page = createPageInstance();
+    await page.load("event-assessment-1");
+    expect(page.data).toMatchObject({ draftResumeVisible: false, draftResumeUpdatedAtLabel: "" });
+
+    drafts.set("event-assessment-1:template-current-v2", {
+      "student-1:item-speed": { studentId: "student-1", testItemId: "item-speed", status: "recorded", rawValue: "80", updatedAt: "not-a-date" },
+    });
+    await page.load("event-assessment-1");
+    const savedDraft = JSON.stringify(drafts.get("event-assessment-1:template-current-v2"));
+    expect(page.data).toMatchObject({ draftResumeVisible: true, draftResumeUpdatedAtLabel: "本机草稿" });
+    page.exitDraft();
+    page.exitDraft();
+    expect(mocks.navigateBack).toHaveBeenCalledTimes(1);
+    expect(JSON.stringify(drafts.get("event-assessment-1:template-current-v2"))).toBe(savedDraft);
+  });
+
+  it("ignores stale workbench success and failure before they can replace a later assessment modal", async () => {
+    let resolveOldSuccess;
+    let rejectOldFailure;
+    mocks.getCoachWorkbench
+      .mockImplementationOnce(() => new Promise((resolve) => { resolveOldSuccess = resolve; }))
+      .mockResolvedValueOnce(workbench({ id: "event-current", title: "Current assessment" }));
+    drafts.set("event-current:template-current-v2", {
+      "student-1:item-speed": { studentId: "student-1", testItemId: "item-speed", status: "recorded", rawValue: "80", updatedAt: "2026-08-10T10:12:00.000Z" },
+    });
+    const page = createPageInstance();
+    const oldSuccess = page.load("event-old-success");
+    await page.load("event-current");
+    resolveOldSuccess(workbench({ id: "event-old-success", title: "Old assessment" }));
+    await oldSuccess;
+    expect(page.data).toMatchObject({ eventId: "event-current", eventTitle: "Current assessment", draftResumeVisible: true });
+
+    mocks.getCoachWorkbench
+      .mockImplementationOnce(() => new Promise((_resolve, reject) => { rejectOldFailure = reject; }))
+      .mockResolvedValueOnce(workbench({ id: "event-current", title: "Current assessment" }));
+    const oldFailure = page.load("event-old-failure");
+    await page.load("event-current");
+    rejectOldFailure(new Error("stale failure"));
+    await oldFailure;
+    expect(page.data).toMatchObject({ state: "ready", eventId: "event-current", draftResumeVisible: true });
+  });
+
+  it("keeps the C12.1 mask and autosave modal truthful, page-local, and structurally Figma-aligned", () => {
+    expect(template).toContain('wx:if="{{draftResumeVisible}}"');
+    expect(template).toContain('class="c121-event-mask"');
+    expect(template).toContain('/assets/icons/c121-check.svg');
+    expect(template).toContain("continueDraft");
+    expect(template).toContain("exitDraft");
+    expect(template).not.toContain("1分钟前");
+    expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
+    expect(stylesheet).toMatch(/\.c121-event-mask\s*\{[^}]*position:\s*fixed[^}]*z-index:\s*10000/s);
+    expect(stylesheet).toMatch(/\.c121-modal\s*\{[^}]*width:\s*662rpx[^}]*border-radius:\s*32rpx/s);
+  });
 });

@@ -75,4 +75,19 @@
     <view class="{{submitClass}}" bindtap="submitAssessment">{{submitLabel}}</view>
   </view>
   <role-tabbar role="coach" active="training" />
+
+  <view wx:if="{{draftResumeVisible}}" class="c121-event-mask">
+    <view class="c121-modal">
+      <view class="c121-modal__content">
+        <view class="c121-modal__check-wrap"><image class="c121-modal__check" src="/assets/icons/c121-check.svg" mode="aspectFit" /></view>
+        <text class="c121-modal__title">评分已自动保存</text>
+        <text class="c121-modal__message">下次打开可继续录入</text>
+        <text class="c121-modal__updated-at">{{draftResumeUpdatedAtLabel}}</text>
+      </view>
+      <view class="c121-modal__actions">
+        <view class="c121-modal__continue" bindtap="continueDraft">继续录入</view>
+        <view class="c121-modal__exit" bindtap="exitDraft">退出</view>
+      </view>
+    </view>
+  </view>
 </view>

@@ -57,6 +57,10 @@ interface PageData {
   submitClass: string;
   submitLabel: string;
   submitMessage: string;
+  draftResumeVisible: boolean;
+  draftResumeUpdatedAtLabel: string;
+  draftExitInProgress: boolean;
+  loadToken: number;
 }
 
 Page<PageData>({
@@ -95,6 +99,10 @@ Page<PageData>({
     submitClass: "c12-submit c12-submit--disabled",
     submitLabel: "提交评分",
     submitMessage: "",
+    draftResumeVisible: false,
+    draftResumeUpdatedAtLabel: "",
+    draftExitInProgress: false,
+    loadToken: 0,
   },
 
   onLoad(query?: Record<string, string | undefined>) {
@@ -102,12 +110,14 @@ Page<PageData>({
   },
 
   async load(eventId: string) {
+    const loadToken = this.data.loadToken + 1;
+    this.setData({ loadToken });
     if (!requireRole("coach")) {
-      this.showLoadError("", "当前账号无法录入评测。");
+      this.showLoadError("", "当前账号无法录入评测。", loadToken);
       return;
     }
     if (!eventId) {
-      this.showLoadError("", "缺少活动信息，暂时无法录入评分。");
+      this.showLoadError("", "缺少活动信息，暂时无法录入评分。", loadToken);
       return;
     }
 
@@ -137,29 +147,34 @@ Page<PageData>({
       submitClass: "c12-submit c12-submit--disabled",
       submitLabel: "提交评分",
       submitMessage: "",
+      draftResumeVisible: false,
+      draftResumeUpdatedAtLabel: "",
+      draftExitInProgress: false,
     });
 
     try {
       const workbench = await getCoachWorkbench(eventId);
+      if (!this.isCurrentLoad(loadToken)) return;
       if (!isWritableAssessmentWorkbench(workbench, eventId)) {
-        this.showLoadError(eventId, "当前活动暂时不能录入评分。");
+        this.showLoadError(eventId, "当前活动暂时不能录入评分。", loadToken);
         return;
       }
 
       const templateId = workbench.assessmentTemplateId;
       if (!templateId) {
-        this.showLoadError(eventId, "当前活动没有可用的评分模板。");
+        this.showLoadError(eventId, "当前活动没有可用的评分模板。", loadToken);
         return;
       }
 
       const form = await getAssessmentForm(templateId);
+      if (!this.isCurrentLoad(loadToken)) return;
       if (!isMatchingAssessmentForm(form, templateId)) {
-        this.showLoadError(eventId, "评分表单暂时不可用。");
+        this.showLoadError(eventId, "评分表单暂时不可用。", loadToken);
         return;
       }
       const templateVersionId = form.templateVersionId;
       if (!templateVersionId) {
-        this.showLoadError(eventId, "评分表单暂时不可用。");
+        this.showLoadError(eventId, "评分表单暂时不可用。", loadToken);
         return;
       }
 
@@ -168,6 +183,8 @@ Page<PageData>({
       const currentField = fieldsInGroup[0] || null;
       const draft = loadAssessmentDraft(eventId, templateVersionId);
       const hasEntries = Boolean(workbench.roster.length && currentField);
+      const validDrafts = validDraftEntries(draft, workbench.roster, form.fields);
+      const draftResumeVisible = hasEntries && validDrafts.length > 0;
       this.setData({
         state: hasEntries ? "ready" : "empty",
         statusTitle: hasEntries ? "" : "暂无可录入内容",
@@ -184,21 +201,30 @@ Page<PageData>({
         currentField,
         hasCurrentField: Boolean(currentField),
         draft,
-        canSubmit: hasEntries,
-        submitClass: hasEntries ? "c12-submit" : "c12-submit c12-submit--disabled",
+        canSubmit: hasEntries && !draftResumeVisible,
+        submitClass: hasEntries && !draftResumeVisible ? "c12-submit" : "c12-submit c12-submit--disabled",
         submitLabel: "提交评分",
+        draftResumeVisible,
+        draftResumeUpdatedAtLabel: draftResumeVisible ? latestLocalDraftLabel(validDrafts) : "",
+        draftExitInProgress: false,
       });
       this.refreshDraftView();
     } catch {
-      this.showLoadError(eventId, "评分项目读取失败，请稍后重试。");
+      this.showLoadError(eventId, "评分项目读取失败，请稍后重试。", loadToken);
     }
   },
 
   retry() {
+    if (this.data.draftResumeVisible) return;
     return this.load(this.data.eventId);
   },
 
-  showLoadError(eventId: string, message: string) {
+  isCurrentLoad(loadToken: number) {
+    return this.data.loadToken === loadToken;
+  },
+
+  showLoadError(eventId: string, message: string, loadToken: number) {
+    if (!this.isCurrentLoad(loadToken)) return;
     this.setData({
       state: "error",
       statusTitle: "暂时无法录入",
@@ -225,14 +251,35 @@ Page<PageData>({
       submitClass: "c12-submit c12-submit--disabled",
       submitLabel: "提交评分",
       submitMessage: "",
+      draftResumeVisible: false,
+      draftResumeUpdatedAtLabel: "",
+      draftExitInProgress: false,
     });
   },
 
   goBack() {
+    if (this.data.draftResumeVisible) return;
+    wx.navigateBack({ delta: 1 });
+  },
+
+  continueDraft() {
+    if (!this.data.draftResumeVisible || this.data.draftExitInProgress) return;
+    const canSubmit = this.data.state === "ready" && Boolean(this.data.roster.length && this.data.currentField);
+    this.setData({
+      draftResumeVisible: false,
+      canSubmit,
+      submitClass: canSubmit ? "c12-submit" : "c12-submit c12-submit--disabled",
+    });
+  },
+
+  exitDraft() {
+    if (!this.data.draftResumeVisible || this.data.draftExitInProgress) return;
+    this.setData({ draftExitInProgress: true });
     wx.navigateBack({ delta: 1 });
   },
 
   switchGroup(event: { currentTarget: { dataset: { id?: string } } }) {
+    if (this.data.draftResumeVisible) return;
     const activeGroupId = event.currentTarget.dataset.id || "";
     const form = this.data.form;
     if (!form || !activeGroupId) return;
@@ -250,18 +297,22 @@ Page<PageData>({
   },
 
   onFieldChange(event: { detail: { value: string | number } }) {
+    if (this.data.draftResumeVisible) return;
     this.selectField(Number(event.detail.value));
   },
 
   previousField() {
+    if (this.data.draftResumeVisible) return;
     this.selectField(this.data.fieldIndex - 1);
   },
 
   nextField() {
+    if (this.data.draftResumeVisible) return;
     this.selectField(this.data.fieldIndex + 1);
   },
 
   selectField(fieldIndex: number) {
+    if (this.data.draftResumeVisible) return;
     const currentField = this.data.fieldsInGroup[fieldIndex];
     if (!currentField) return;
     this.setData({ fieldIndex, currentField, hasCurrentField: true });
@@ -272,7 +323,7 @@ Page<PageData>({
     const studentId = event.currentTarget.dataset.studentId;
     const field = this.data.currentField;
     const form = this.data.form;
-    if (!this.data.canSubmit || !studentId || !field?.testItemId || !form?.templateVersionId) return;
+    if (this.data.draftResumeVisible || !this.data.canSubmit || !studentId || !field?.testItemId || !form?.templateVersionId) return;
     const rawValue = String(event.detail.value);
     const draft = saveAssessmentDraftEntry(this.data.eventId, form.templateVersionId, {
       studentId,
@@ -288,7 +339,7 @@ Page<PageData>({
     const studentId = event.currentTarget.dataset.studentId;
     const field = this.data.currentField;
     const form = this.data.form;
-    if (!this.data.canSubmit || !studentId || !field?.testItemId || !form?.templateVersionId) return;
+    if (this.data.draftResumeVisible || !this.data.canSubmit || !studentId || !field?.testItemId || !form?.templateVersionId) return;
     const current = this.rowFor(studentId, field.testItemId);
     const status = current.status === "missing" ? "empty" : "missing";
     const draft = saveAssessmentDraftEntry(this.data.eventId, form.templateVersionId, {
@@ -306,7 +357,7 @@ Page<PageData>({
     const studentId = event.currentTarget.dataset.studentId;
     const field = this.data.currentField;
     const form = this.data.form;
-    if (!this.data.canSubmit || !studentId || !field?.testItemId || !form?.templateVersionId) return;
+    if (this.data.draftResumeVisible || !this.data.canSubmit || !studentId || !field?.testItemId || !form?.templateVersionId) return;
     const draft = saveAssessmentDraftEntry(this.data.eventId, form.templateVersionId, {
       studentId,
       testItemId: field.testItemId,
@@ -350,7 +401,7 @@ Page<PageData>({
 
   async submitAssessment() {
     const form = this.data.form;
-    if (!this.data.canSubmit || !form?.templateVersionId || this.data.saving) return;
+    if (this.data.draftResumeVisible || !this.data.canSubmit || !form?.templateVersionId || this.data.saving) return;
 
     const recordedStudents = this.data.roster.filter((student: RosterStudent) =>
       form.fields.some((field: AssessmentField) => field.testItemId && this.rowFor(student.studentId, field.testItemId).status === "recorded"),
@@ -407,6 +458,28 @@ Page<PageData>({
     this.refreshDraftView();
   },
 });
+
+function validDraftEntries(draft: AssessmentDraftMap, roster: CoachWorkbench["roster"], fields: AssessmentField[]) {
+  const studentIds = new Set(roster.map((student) => student.studentId));
+  const testItemIds = new Set(fields.map((field) => field.testItemId).filter(Boolean));
+  return Object.values(draft).filter((entry) =>
+    entry.status !== "empty" && studentIds.has(entry.studentId) && testItemIds.has(entry.testItemId),
+  );
+}
+
+function latestLocalDraftLabel(entries: ReturnType<typeof validDraftEntries>) {
+  let latest: string | null = null;
+  let latestTimestamp = -Infinity;
+  for (const entry of entries) {
+    const timestamp = Date.parse(entry.updatedAt);
+    if (Number.isNaN(timestamp) || timestamp <= latestTimestamp) continue;
+    latestTimestamp = timestamp;
+    latest = entry.updatedAt;
+  }
+  if (!latest) return "本机草稿";
+  const isoParts = latest.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/);
+  return isoParts ? `本机草稿 ${isoParts[1]} ${isoParts[2]}` : "本机草稿";
+}
 
 function isWritableAssessmentWorkbench(workbench: CoachWorkbench, eventId: string) {
   return workbench.event.id === eventId && workbench.event.status !== "cancelled" && Boolean(workbench.assessmentTemplateId);

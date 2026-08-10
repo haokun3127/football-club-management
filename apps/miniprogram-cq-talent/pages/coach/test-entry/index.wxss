@@ -301,3 +301,93 @@
 .c12-submit--disabled {
   background: #c9ccd3;
 }
+
+.c121-event-mask {
+  position: fixed;
+  z-index: 10000;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  box-sizing: border-box;
+  padding: 640rpx 44rpx 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.c121-modal {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+  gap: 40rpx;
+  width: 662rpx;
+  padding: 48rpx;
+  border-radius: 32rpx;
+  background: #ffffff;
+  box-shadow: 0 24rpx 24rpx rgba(0, 0, 0, 0.1);
+}
+
+.c121-modal__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.c121-modal__check-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 64rpx;
+  background: #e8f5e9;
+}
+
+.c121-modal__check {
+  width: 64rpx;
+  height: 64rpx;
+}
+
+.c121-modal__title {
+  color: #202124;
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+.c121-modal__message {
+  color: #667085;
+  font-size: 28rpx;
+}
+
+.c121-modal__updated-at {
+  color: #667085;
+  font-size: 24rpx;
+}
+
+.c121-modal__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.c121-modal__continue,
+.c121-modal__exit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 96rpx;
+  border-radius: 24rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.c121-modal__continue {
+  background: #a80f1b;
+  color: #ffffff;
+}
+
+.c121-modal__exit {
+  box-sizing: border-box;
+  border: 1rpx solid #e7eaf0;
+  color: #667085;
+}
