@@ -1,5 +1,6 @@
 import type { DatabaseSync } from "node:sqlite";
 import { createSeedData, type SeedData } from "../seed.js";
+import { AssessmentRepository } from "./assessment-repositories.js";
 import { CalendarRepository } from "./calendar-repositories.js";
 import { DataCapabilityRepository } from "./data-capability-repositories.js";
 import { MatchRepository } from "./match-repository.js";
@@ -17,6 +18,7 @@ import { migrate, openSqliteDatabase } from "./sqlite.js";
 import { TacticalBoardRepository } from "./tactical-board-repository.js";
 
 export interface PlatformRepositories {
+  assessments: AssessmentRepository;
   calendar: CalendarRepository;
   matches: MatchRepository;
   clubs: ClubRepository;
@@ -38,6 +40,7 @@ export interface PlatformPersistence {
 
 export function createPlatformRepositories(database: DatabaseSync): PlatformRepositories {
   return {
+    assessments: new AssessmentRepository(database),
     calendar: new CalendarRepository(database),
     matches: new MatchRepository(database),
     clubs: new ClubRepository(database),
@@ -114,6 +117,10 @@ export async function seedPlatformData(repositories: PlatformRepositories, data:
     repositories.dataCapability.saveAbilityMetric(metric);
   }
 
+  for (const definition of data.derivedMetricDefinitions) {
+    repositories.assessments.insertDerivedMetricDefinitionIfAbsent(definition);
+  }
+
   for (const metricGraphVersion of data.metricGraphVersions) {
     repositories.dataCapability.saveMetricGraphVersion(metricGraphVersion);
   }
@@ -144,6 +151,30 @@ export async function seedPlatformData(repositories: PlatformRepositories, data:
 
   for (const assessmentMetricBinding of data.assessmentMetricBindings) {
     repositories.dataCapability.saveAssessmentMetricBinding(assessmentMetricBinding);
+  }
+
+  for (const assessment of data.playerAssessments) {
+    repositories.assessments.insertAssessmentIfAbsent(assessment);
+  }
+
+  for (const rawResult of data.assessmentRawResults) {
+    repositories.assessments.insertRawResultIfAbsent(rawResult);
+  }
+
+  for (const score of data.assessmentScores) {
+    repositories.assessments.insertScoreIfAbsent(score);
+  }
+
+  for (const metricRecord of data.metricRecords) {
+    if (metricRecord.source === "match_event") {
+      repositories.matches.insertMetricRecordIfAbsent(metricRecord);
+    } else {
+      repositories.assessments.insertMetricRecordIfAbsent(metricRecord);
+    }
+  }
+
+  for (const lineage of data.metricLineages) {
+    repositories.assessments.insertMetricLineageIfAbsent(lineage);
   }
 
   for (const connection of data.externalConnections) {

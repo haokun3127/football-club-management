@@ -2537,6 +2537,62 @@ describe("api server", () => {
     expect(body.metricRecords.find((record) => record.metricId === "metric-technical-index")?.lineageId).toBeTruthy();
   });
 
+  it("preserves assessment app-client routes and role-scoped parent reads", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+    const payload = {
+      studentId: "student-1",
+      templateId: "assessment-template-technical",
+      templateVersionId: "assessment-template-version-technical-1",
+      assessedByCoachId: "coach-1",
+      rawResults: [{
+        testItemId: "assessment-test-finishing-cq-talent",
+        value: { kind: "rating_1_5", score: 4 },
+      }],
+    };
+    const appClientRoute = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/assessments";
+
+    const [coachWrite, genericWrite, parentWrite, noScopeCoachWrite] = await Promise.all([
+      app.inject({ method: "POST", url: appClientRoute, headers: { "x-user-id": "user-coach-1" }, payload }),
+      app.inject({
+        method: "POST",
+        url: "/clubs/club-chongqing-talent/assessments",
+        headers: { "x-user-id": "user-coach-1" },
+        payload,
+      }),
+      app.inject({ method: "POST", url: appClientRoute, headers: { "x-user-id": "user-parent-1" }, payload }),
+      app.inject({ method: "POST", url: appClientRoute, headers: { "x-user-id": "user-coach-no-club-scope" }, payload }),
+    ]);
+    const [ownRead, crossChildRead] = await Promise.all([
+      app.inject({
+        method: "GET",
+        url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/ability-metrics/metric-finishing",
+        headers: { "x-user-id": "user-parent-1" },
+      }),
+      app.inject({
+        method: "GET",
+        url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-other/ability-metrics/metric-finishing",
+        headers: { "x-user-id": "user-parent-1" },
+      }),
+    ]);
+
+    expect(coachWrite.statusCode).toBe(201);
+    expect(genericWrite.statusCode).toBe(201);
+    expect(parentWrite.statusCode).toBe(403);
+    expect(noScopeCoachWrite.statusCode).toBe(403);
+    expect(ownRead.statusCode).toBe(200);
+    expect(crossChildRead.statusCode).toBe(403);
+
+    await app.close();
+    persistence.database.close();
+  });
+
   it("rejects club-scoped requests without active membership", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
     const app = buildServer(

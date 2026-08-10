@@ -660,7 +660,7 @@ export abstract class SeedBackedStore implements ApiStore {
     }
   }
 
-  private nextId(prefix = "id"): EntityId {
+  protected nextId(prefix = "id"): EntityId {
     const next = (this.counters.get(prefix) ?? 0) + 1;
     this.counters.set(prefix, next);
     return `${prefix}-${next}`;
@@ -2409,7 +2409,7 @@ export class PersistentApiStore extends SeedBackedStore {
     private readonly repositories: PlatformRepositories,
     data: SeedData = createSeedData(),
   ) {
-    super(mergePersistedMatchData(repositories, data));
+    super(mergePersistedMatchData(repositories, mergePersistedAssessmentData(repositories, data)));
   }
 
   override listCalendarEvents(clubId: EntityId) {
@@ -2465,6 +2465,72 @@ export class PersistentApiStore extends SeedBackedStore {
       .filter((participant) => participant.studentId === studentId)
       .map((participant) => participant.eventId));
     return this.listCalendarEvents(clubId).filter((event) => eventIds.has(event.id));
+  }
+
+  override getStudentMetrics(clubId: EntityId, studentId: EntityId, source?: MetricSourceKind | MetricSourceKind[]) {
+    const sources = source ? new Set(Array.isArray(source) ? source : [source]) : null;
+    return this.repositories.assessments
+      .listMetricRecords(clubId, studentId)
+      .filter((record) => (sources ? sources.has(record.source) : true))
+      .sort((left, right) => Date.parse(right.occurredAt) - Date.parse(left.occurredAt));
+  }
+
+  override async recordAssessment(input: RecordAssessmentInput) {
+    this.ensureStudentInClub(input.clubId, input.studentId);
+    this.ensureCoachInClub(input.clubId, input.assessedByCoachId);
+    if (input.eventId) {
+      const event = this.getCalendarEvent(input.eventId);
+      if (!event || event.clubId !== input.clubId) {
+        throw new Error("Event not found for club.");
+      }
+    }
+
+    const service = createAssessmentService({
+      clock: { now: () => new Date().toISOString() },
+      ids: { next: (prefix?: string) => this.nextId(prefix) },
+      catalog: {
+        findTemplateById: (clubId, templateId) => this.data.assessmentTemplates.find((template) =>
+          template.id === templateId && isCatalogVisibleToClub(template, clubId),
+        ) ?? null,
+        findTemplateVersion: (clubId, templateId, templateVersionId) => this.data.assessmentTemplateVersions.find((version) =>
+          version.clubId === clubId
+          && version.templateId === templateId
+          && version.status === "active"
+          && (!templateVersionId || version.id === templateVersionId),
+        ) ?? null,
+        findMetricGraphVersion: (clubId, graphVersionId) => this.data.metricGraphVersions.find((version) =>
+          version.id === graphVersionId && isCatalogVisibleToClub(version, clubId),
+        ) ?? null,
+        listTemplateMetricBindings: (clubId, templateId, templateVersionId) => {
+          const versionIds = new Set(this.data.assessmentTemplateVersions
+            .filter((version) =>
+              version.clubId === clubId
+              && version.templateId === templateId
+              && version.status === "active"
+              && (!templateVersionId || version.id === templateVersionId),
+            )
+            .map((version) => version.id));
+          return this.data.assessmentMetricBindings.filter((binding) =>
+            binding.clubId === clubId && versionIds.has(binding.templateVersionId),
+          );
+        },
+        listAssessmentTestItems: (clubId) => this.data.assessmentTestItems.filter((item) => item.clubId === clubId),
+        listAbilityMetrics: (clubId) => this.listAbilityMetrics(clubId),
+        listMetricGraphDependencies: (clubId, graphVersionId) => this.data.metricDependencies.filter((dependency) =>
+          dependency.graphVersionId === graphVersionId && isCatalogVisibleToClub(dependency, clubId),
+        ),
+        listDerivedMetricDefinitions: (clubId) => this.listDerivedMetricDefinitions(clubId),
+      },
+      store: {
+        saveAssessment: async (assessment) => this.repositories.assessments.saveAssessment(assessment),
+        saveRawResult: async (rawResult) => this.repositories.assessments.saveRawResult(rawResult),
+        saveScore: async (score) => this.repositories.assessments.saveScore(score),
+        saveMetricRecord: async (record) => this.repositories.assessments.saveMetricRecord(record),
+        saveMetricLineage: async (lineage) => this.repositories.assessments.saveMetricLineage(lineage),
+      },
+    });
+
+    return this.repositories.assessments.transaction(() => service.recordPlayerAssessment(input));
   }
 
   override async recordCoachMatchEvent(input: MatchEventAppendInput): Promise<MatchEventAppendResult | MatchEventAppendConflict> {
@@ -3215,6 +3281,33 @@ export class PersistentApiStore extends SeedBackedStore {
       updatedAt: now,
     });
   }
+}
+
+function mergePersistedAssessmentData(repositories: PlatformRepositories, data: SeedData): SeedData {
+  const clubIds = data.clubs.map((club) => club.id);
+  return {
+    ...data,
+    playerAssessments: mergeById(
+      data.playerAssessments,
+      clubIds.flatMap((clubId) => repositories.assessments.listAssessments(clubId)),
+    ),
+    assessmentRawResults: mergeById(
+      data.assessmentRawResults,
+      clubIds.flatMap((clubId) => repositories.assessments.listRawResults(clubId)),
+    ),
+    assessmentScores: mergeById(
+      data.assessmentScores,
+      clubIds.flatMap((clubId) => repositories.assessments.listScores(clubId)),
+    ),
+    metricRecords: mergeById(
+      data.metricRecords,
+      clubIds.flatMap((clubId) => repositories.assessments.listMetricRecords(clubId)),
+    ),
+    metricLineages: mergeById(
+      data.metricLineages,
+      clubIds.flatMap((clubId) => repositories.assessments.listMetricLineages(clubId)),
+    ),
+  };
 }
 
 function mergePersistedMatchData(repositories: PlatformRepositories, data: SeedData): SeedData {

@@ -3,8 +3,10 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createSeedData } from "../src/seed.js";
+import { HeaderMembershipResolver } from "../src/auth/context.js";
 import { createPlatformPersistence, createPlatformRepositories, seedPlatformData } from "../src/persistence/platform-persistence.js";
 import { migrate, openSqliteDatabase } from "../src/persistence/sqlite.js";
+import { buildServer } from "../src/server.js";
 import { PersistentApiStore } from "../src/store.js";
 
 describe("platform persistence", () => {
@@ -71,6 +73,135 @@ describe("platform persistence", () => {
       ]));
       expect(count.count).toBe(1);
     } finally {
+      reopened?.database.close();
+      first?.database.close();
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  it("preserves app-client assessment records and parent metric reads after reopening a seeded file database", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "football-assessment-"));
+    const databasePath = join(directory, "club.sqlite");
+    let first: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
+    let reopened: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
+    let firstApp: ReturnType<typeof buildServer> | undefined;
+    let reopenedApp: ReturnType<typeof buildServer> | undefined;
+
+    try {
+      const firstData = createSeedData();
+      first = await createPlatformPersistence({ databasePath, seedData: firstData });
+      firstApp = buildServer(
+        new PersistentApiStore(first.repositories, firstData),
+        {
+          logger: false,
+          membershipResolver: new HeaderMembershipResolver(first.repositories.users, first.repositories.memberships),
+        },
+      );
+
+      const assessmentPayload = {
+        studentId: "student-1",
+        templateId: "assessment-template-technical",
+        templateVersionId: "assessment-template-version-technical-1",
+        assessedByCoachId: "coach-1",
+        assessedAt: "2026-08-05T12:00:00.000Z",
+        summary: "Restart-safe assessment proof",
+        rawResults: [{
+          testItemId: "assessment-test-finishing-cq-talent",
+          value: { kind: "rating_1_5", score: 5 },
+          note: "Persist this raw result",
+        }],
+      };
+      const write = await firstApp.inject({
+        method: "POST",
+        url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/assessments",
+        headers: { "x-user-id": "user-coach-1" },
+        payload: assessmentPayload,
+      });
+      const written = write.json() as {
+        assessment: { id: string };
+        rawResults: Array<{ id: string }>;
+        metricRecords: Array<{ id: string; assessmentId?: string; rawResultId?: string; metricId: string }>;
+      };
+
+      expect(write.statusCode).toBe(201);
+      expect(written.rawResults).toHaveLength(1);
+      await firstApp.close();
+      firstApp = undefined;
+      first.database.close();
+      first = undefined;
+
+      const reopenedData = createSeedData();
+      reopened = await createPlatformPersistence({ databasePath, seed: true, seedData: reopenedData });
+      reopenedApp = buildServer(
+        new PersistentApiStore(reopened.repositories, reopenedData),
+        {
+          logger: false,
+          membershipResolver: new HeaderMembershipResolver(reopened.repositories.users, reopened.repositories.memberships),
+        },
+      );
+
+      const [growth, ability] = await Promise.all([
+        reopenedApp.inject({
+          method: "GET",
+          url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/growth-summary",
+          headers: { "x-user-id": "user-parent-1" },
+        }),
+        reopenedApp.inject({
+          method: "GET",
+          url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/ability-metrics/metric-finishing",
+          headers: { "x-user-id": "user-parent-1" },
+        }),
+      ]);
+      const growthBody = growth.json() as {
+        latest: Array<{ metricId: string; record: { assessmentId?: string } }>;
+      };
+      const abilityBody = ability.json() as {
+        records: Array<{ assessmentId?: string; rawResultId?: string; metricId: string }>;
+      };
+
+      expect(growth.statusCode).toBe(200);
+      expect(ability.statusCode).toBe(200);
+      expect(growthBody.latest).toContainEqual(expect.objectContaining({
+        metricId: "metric-finishing",
+        record: expect.objectContaining({ assessmentId: written.assessment.id }),
+      }));
+      expect(abilityBody.records).toContainEqual(expect.objectContaining({
+        assessmentId: written.assessment.id,
+        rawResultId: written.rawResults[0]?.id,
+        metricId: "metric-finishing",
+      }));
+      const repeated = await reopenedApp.inject({
+        method: "POST",
+        url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/assessments",
+        headers: { "x-user-id": "user-coach-1" },
+        payload: assessmentPayload,
+      });
+      const repeatedBody = repeated.json() as { assessment: { id: string } };
+      expect(repeated.statusCode).toBe(201);
+      expect(repeatedBody.assessment.id).not.toBe(written.assessment.id);
+      const counts = reopened.database.prepare(`
+        SELECT
+          (SELECT COUNT(*) FROM player_assessments WHERE id = ?) AS assessments,
+          (SELECT COUNT(*) FROM assessment_raw_results WHERE assessment_id = ?) AS raw_results,
+          (SELECT COUNT(*) FROM assessment_scores WHERE assessment_id = ?) AS scores,
+          (SELECT COUNT(*) FROM player_metric_records WHERE assessment_id = ?) AS metric_records,
+          (SELECT COUNT(*) FROM metric_lineages WHERE output_record_id IN (
+            SELECT id FROM player_metric_records WHERE assessment_id = ?
+          )) AS metric_lineages
+      `).get(written.assessment.id, written.assessment.id, written.assessment.id, written.assessment.id, written.assessment.id) as {
+        assessments: number;
+        raw_results: number;
+        scores: number;
+        metric_records: number;
+        metric_lineages: number;
+      };
+      expect(counts).toEqual(expect.objectContaining({ assessments: 1, raw_results: 1 }));
+      expect(counts.scores).toBeGreaterThan(0);
+      expect(counts.metric_records).toBeGreaterThan(0);
+      expect(counts.metric_lineages).toBeGreaterThan(0);
+    } finally {
+      await reopenedApp?.close();
+      await firstApp?.close();
       reopened?.database.close();
       first?.database.close();
       rmSync(directory, { recursive: true, force: true });
