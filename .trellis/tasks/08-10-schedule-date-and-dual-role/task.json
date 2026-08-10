@@ -1,0 +1,29 @@
+{
+  "id": "schedule-date-and-dual-role",
+  "name": "schedule-date-and-dual-role",
+  "title": "Fix parent schedule date handling and add dual-role entry",
+  "description": "",
+  "status": "planning",
+  "dev_type": null,
+  "scope": null,
+  "package": "api",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-08-10",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "codex/chongqing-talent-business",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [
+    "08-10-parent-schedule-live-date",
+    "08-10-active-role-switch"
+  ],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {}
+}

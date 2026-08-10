@@ -397,3 +397,11 @@
 - Sol's final audit mapped all 49 states to completed implementation/task records and commits. Historical task-parent links that were missing from the audit tree were restored; the active phone-authorization single-flight guard was unlinked because it is a separate functional follow-up, not an unimplemented Figma state.
 - Test-stability remediation: the two file-backed SQLite restart integrations now use local `15_000` ms budgets after measured full-suite runtimes exceeded Vitest's 5-second default. Global timeout remains unchanged. Fresh root `check` exited `0`: domain `19/19`, mini-program `262/262`, API `78/78`.
 - Completion claim boundary: the 49-state implementation scope is complete. This does not claim pixel-level equality, universal DevTools/device screenshot coverage, or complete runtime visual acceptance.
+
+## 2026-08-10 Parent Schedule Live Date and Calendar Boundary
+
+- Fixed the parent schedule's develop-only historical default: parent schedule and parent day now use the real local device date unless `DEV_PARENT_PAGE_DATE_OVERRIDE` is explicitly set in shared configuration. The override is `null` by default and is unavailable outside develop.
+- Parent calendar and parent student schedule now validate date ranges and interpret date-only `to` as the exclusive start of the following UTC day. This includes Sunday daytime activities, excludes the following Monday, rejects malformed/reversed/over-31-day ranges with `400 invalid_date_range`, and retains guardian participant redaction.
+- Parent schedule now provides previous/next week controls; each moves the selected date by seven days and reloads the corresponding Monday–Sunday BFF interval. No activities are fabricated for empty weeks.
+- Verification: focused API regression passed after a recorded red failure; mini-program date/week tests passed after recorded red failures; API and mini-program type checks passed; root `check` passed with domain `19/19`, mini-program `264/264`, API `79/79`; `git diff --check` passed. No visual or production deployment claim is made by this entry.
+- Dual parent/coach role switching remains a separate planning task. Terra review blocked implementation until sessions can survive API restart/multi-instance use and every bearer request revalidates active membership and role availability.
