@@ -22,6 +22,8 @@ export const DEV_COACH_PROFILE_IDS = {
   "user-coach-1": "coach-1",
 };
 export const DEV_TEST_DATE = "2026-06-28";
+const DEVELOP_PARENT_PAGE_DATE_OVERRIDE: string | null = null;
+export const DEV_PARENT_PAGE_DATE_OVERRIDE = DEV_MODE ? DEVELOP_PARENT_PAGE_DATE_OVERRIDE : null;
 export const THEME = {
   primary: "#A80F1B",
   pressed: "#7F0B14",

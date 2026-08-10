@@ -35,11 +35,15 @@
       </view>
     </view>
 
-    <view class="week-nav">
-      <view wx:for="{{dateOptions}}" wx:key="date" class="week-day {{selectedDate === item.date ? 'week-day--active' : ''}}" data-date="{{item.date}}" bindtap="selectDate" bindlongpress="openDay">
-        <view class="week-day__name">{{item.weekShort}}</view>
-        <view class="week-day__number">{{item.dayNumber}}</view>
+    <view class="week-switcher">
+      <view class="week-switcher__button" data-offset="-7" bindtap="changeWeek">‹</view>
+      <view class="week-nav">
+        <view wx:for="{{dateOptions}}" wx:key="date" class="week-day {{selectedDate === item.date ? 'week-day--active' : ''}}" data-date="{{item.date}}" bindtap="selectDate" bindlongpress="openDay">
+          <view class="week-day__name">{{item.weekShort}}</view>
+          <view class="week-day__number">{{item.dayNumber}}</view>
+        </view>
       </view>
+      <view class="week-switcher__button" data-offset="7" bindtap="changeWeek">›</view>
     </view>
 
     <view class="chips">

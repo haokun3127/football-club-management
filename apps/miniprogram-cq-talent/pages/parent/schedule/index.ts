@@ -1,6 +1,7 @@
 import { getParentCalendar, getParentChildren, getParentReminders } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { DEV_MODE, DEV_TEST_DATE } from "../../../utils/config";
+import { DEV_PARENT_PAGE_DATE_OVERRIDE } from "../../../utils/config";
+import { currentLocalDate, resolveParentPageDate, shiftCalendarDate } from "../../../utils/date";
 import { openPage } from "../../../utils/navigation";
 import { activityStatus, childNames, formatCalendarDate, formatShortDate, formatTimeRange, resolveMenuActionTop, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { countUnreadReminders } from "../../../utils/reminders";
@@ -76,7 +77,7 @@ const typeTabs: PageData["typeTabs"] = [
   { label: "其他", value: "other" },
 ];
 
-const initialDate = DEV_MODE ? DEV_TEST_DATE : currentLocalDate();
+const initialDate = resolveParentPageDate(new Date(), DEV_PARENT_PAGE_DATE_OVERRIDE);
 
 Page<PageData>({
   data: {
@@ -189,6 +190,13 @@ Page<PageData>({
       hero: digest.hero,
     });
     this.applyFilters();
+  },
+  changeWeek(event: { currentTarget: { dataset: { offset?: string | number } } }) {
+    const offset = Number(event.currentTarget.dataset.offset);
+    if (offset !== -7 && offset !== 7) return;
+    const selectedDate = shiftCalendarDate(this.data.selectedDate, offset);
+    this.setData({ selectedDate, selectedDateLabel: formatCalendarDate(selectedDate) });
+    this.load();
   },
   switchType(event: { currentTarget: { dataset: { type?: PageData["selectedType"] } } }) {
     const selectedType = event.currentTarget.dataset.type;
@@ -340,12 +348,6 @@ export function buildScheduleDigest(events: ScheduleEvent[], selectedDate: strin
           description: "暂未安排训练、比赛或其他活动",
         },
   };
-}
-
-function currentLocalDate() {
-  const now = new Date();
-  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
-  return local.toISOString().slice(0, 10);
 }
 
 function readableError(error: unknown) {

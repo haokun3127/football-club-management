@@ -150,6 +150,12 @@ describe("parent schedule hero", () => {
     expect(options[6]?.date).toBe("2026-08-09");
   });
 
+  it("binds previous and next week controls to a fresh week request", () => {
+    expect(template).toContain('bindtap="changeWeek"');
+    expect(template).toContain('data-offset="-7"');
+    expect(template).toContain('data-offset="7"');
+  });
+
   it("uses the approved CSS and text fallback icon nodes instead of unverified SVG assets", () => {
     const bell = styles.match(/\.p1-nav__bell\s*\{([^}]*)\}/)?.[1] ?? "";
     const bellShape = styles.match(/\.p1-nav__bell-shape\s*\{([^}]*)\}/)?.[1] ?? "";

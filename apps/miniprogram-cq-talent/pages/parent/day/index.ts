@@ -1,7 +1,8 @@
 import { getParentCalendar } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import { DEV_MODE, DEV_TEST_DATE } from "../../../utils/config";
+import { DEV_PARENT_PAGE_DATE_OVERRIDE } from "../../../utils/config";
+import { resolveParentPageDate } from "../../../utils/date";
 import { resolveMenuActionTop, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { LoadState, ScheduleEvent } from "../../../utils/types";
 
@@ -49,7 +50,7 @@ Page<PageData>({
     navActionTop: resolveMenuActionTop(),
   },
   onLoad(query: { date?: string }) {
-    this.load(query?.date || today());
+    this.load(query?.date || parentPageToday());
   },
   async load(date: string) {
     const session = requireRole("parent");
@@ -73,7 +74,7 @@ Page<PageData>({
     }
   },
   retry() {
-    this.load(this.data.date || today());
+    this.load(this.data.date || parentPageToday());
   },
   openFilter() {
     wx.showToast({ title: "筛选条件待同步", icon: "none" });
@@ -124,9 +125,6 @@ function timeLabel(event: ScheduleEvent): string {
   return end ? `${start}-${end}` : start;
 }
 
-function today(): string {
-  if (DEV_MODE) return DEV_TEST_DATE;
-  const now = new Date();
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+function parentPageToday(): string {
+  return resolveParentPageDate(new Date(), DEV_PARENT_PAGE_DATE_OVERRIDE);
 }
