@@ -1,10 +1,4 @@
 {
-  "navigationStyle": "custom",
-  "disableScroll": true,
-  "usingComponents": {
-    "app-header": "/components/app-header/index",
-    "status-view": "/components/status-view/index",
-    "status-chip": "/components/status-chip/index",
-    "submit-bar": "/components/submit-bar/index"
-  }
+  "navigationBarTitleText": "比赛战术板",
+  "navigationStyle": "custom"
 }
