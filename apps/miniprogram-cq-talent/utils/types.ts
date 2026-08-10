@@ -270,6 +270,23 @@ export interface CoachMatchPlayerEvent {
   note?: string;
 }
 
+export interface CoachMatchEventCreateInput {
+  studentId: string;
+  type: CoachMatchPlayerEvent["type"];
+  minute?: number;
+  note?: string;
+}
+
+export interface CoachMatchEventCreateResult {
+  event: {
+    id: string;
+    studentId: string;
+    type: CoachMatchPlayerEvent["type"];
+    minute?: number;
+    note?: string;
+  };
+}
+
 export interface AssessmentForm {
   templateId: string;
   templateName: string;

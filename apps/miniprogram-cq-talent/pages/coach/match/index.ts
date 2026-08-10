@@ -19,6 +19,7 @@ interface MatchPageData {
   message: string;
   retryLabel: string;
   eventId: string;
+  hasLoaded: boolean;
   eventTitle: string;
   teamName: string;
   hasTeamName: boolean;
@@ -40,6 +41,7 @@ Page<MatchPageData>({
     message: "正在读取比赛记录",
     retryLabel: "",
     eventId: "",
+    hasLoaded: false,
     eventTitle: "",
     teamName: "",
     hasTeamName: false,
@@ -58,6 +60,10 @@ Page<MatchPageData>({
     if (!requireRole("coach")) return;
     return this.load(query?.id || "");
   },
+  onShow() {
+    if (!this.data.eventId || !this.data.hasLoaded) return;
+    return this.load(this.data.eventId);
+  },
   async load(eventId: string): Promise<boolean> {
     if (!eventId) {
       this.setData({ ...emptyState("缺少活动 ID"), state: "empty" });
@@ -68,6 +74,7 @@ Page<MatchPageData>({
       ...emptyState("正在读取比赛记录"),
       state: "loading",
       eventId,
+      hasLoaded: false,
     });
 
     try {
@@ -78,6 +85,7 @@ Page<MatchPageData>({
           state: "empty",
           eventId,
           eventTitle: detail.event.title,
+          hasLoaded: true,
         });
         return false;
       }
@@ -92,6 +100,7 @@ Page<MatchPageData>({
         message: "",
         retryLabel: "",
         eventId,
+        hasLoaded: true,
         eventTitle: detail.event.title,
         teamName,
         hasTeamName: Boolean(teamName),
@@ -113,6 +122,7 @@ Page<MatchPageData>({
         state: "error",
         retryLabel: "重新读取",
         eventId,
+        hasLoaded: true,
       });
       return false;
     }
@@ -134,6 +144,7 @@ function emptyState(message: string): Omit<MatchPageData, "state"> {
     message,
     retryLabel: "",
     eventId: "",
+    hasLoaded: false,
     eventTitle: "",
     teamName: "",
     hasTeamName: false,

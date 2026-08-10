@@ -18,6 +18,48 @@ function metric(id: string, code: string) {
 }
 
 describe("createMatchService", () => {
+  it("builds one match-event bundle before one atomic store save", async () => {
+    const saved = { bundles: [] as Array<{ event: { id: string; type: string }; metricRecords: Array<{ id: string }> }> };
+    const catalog: MatchCatalogLookup = {
+      findMetricById: async () => null,
+      findMetricByCode: async (_clubId, code) => code === "match_goals" ? metric("metric-goals", code) : null,
+    };
+    const store = {
+      saveMatch: async () => {},
+      saveRoster: async () => {},
+      saveEvent: async () => {},
+      saveNote: async () => {},
+      saveMetricRecord: async () => {},
+      saveEventBundle: async (bundle: { event: { id: string; type: string }; metricRecords: Array<{ id: string }> }) => {
+        saved.bundles.push(bundle);
+      },
+    } as MatchStore & { saveEventBundle: (bundle: { event: { id: string; type: string }; metricRecords: Array<{ id: string }> }) => Promise<void> };
+    let idCounter = 0;
+    const service = createMatchService({
+      clock: { now: () => now },
+      ids: { next: (prefix = "id") => `${prefix}-${++idCounter}` },
+      store,
+      catalog,
+    }) as ReturnType<typeof createMatchService> & {
+      recordMatchEvent: (input: { clubId: string; eventId: string; matchId: string; studentId: string; type: "goal"; minute: number; note: string }) => Promise<{ event: { id: string; linkedMetricId?: string }; metricRecords: Array<{ id: string }> }>;
+    };
+
+    const result = await service.recordMatchEvent({
+      clubId: "club-chongqing-talent",
+      eventId: "event-match-1",
+      matchId: "match-1",
+      studentId: "student-1",
+      type: "goal",
+      minute: 45,
+      note: "Recorded fact",
+    });
+
+    expect(result.event.linkedMetricId).toBe("metric-goals");
+    expect(result.metricRecords).toHaveLength(1);
+    expect(saved.bundles).toHaveLength(1);
+    expect(saved.bundles[0]?.metricRecords).toHaveLength(1);
+  });
+
   it("records match events and generates match metric records", async () => {
     const saved = {
       matches: [],

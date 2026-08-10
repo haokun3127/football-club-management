@@ -8,6 +8,8 @@ import type {
   AssessmentForm,
   CoachLessonConfirmation,
   CoachMatchDetail,
+  CoachMatchEventCreateInput,
+  CoachMatchEventCreateResult,
   CoachMatchPlayerEvent,
   CoachHome,
   CoachTeamDetail,
@@ -143,6 +145,21 @@ export async function getCoachMatchDetail(eventId: string): Promise<CoachMatchDe
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/match`,
   });
   return normalizeCoachMatchDetail(response);
+}
+
+export async function createCoachMatchEvent(
+  eventId: string,
+  input: CoachMatchEventCreateInput,
+  idempotencyKey: string,
+): Promise<CoachMatchEventCreateResult> {
+  const context = requireContext();
+  return request<CoachMatchEventCreateResult, CoachMatchEventCreateInput>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/match/events`,
+    method: "POST",
+    data: input,
+    idempotencyKey,
+    expectedStatus: 201,
+  });
 }
 
 export async function getCoachLessonConfirmation(eventId: string): Promise<CoachLessonConfirmation> {

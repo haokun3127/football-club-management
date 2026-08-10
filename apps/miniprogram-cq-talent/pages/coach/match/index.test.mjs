@@ -105,6 +105,14 @@ describe("coach match detail", () => {
     expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/match-event-add/index?eventId=event-match-1");
   });
 
+  it("re-reads its exact event on show instead of accepting a local add-event payload", async () => {
+    const page = createPageInstance({ eventId: "event-match-1", hasLoaded: true });
+    await page.onShow();
+    expect(mocks.getCoachMatchDetail).toHaveBeenCalledWith("event-match-1");
+    expect(controller).not.toContain("acceptMatchEvent");
+    expect(controller).not.toContain("getOpenerEventChannel");
+  });
+
   it("uses the local role tab bar and excludes legacy writes, tactical UI, Figma samples, and template helpers", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"submit-bar"');

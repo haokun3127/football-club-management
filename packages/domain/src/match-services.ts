@@ -19,6 +19,21 @@ export interface MatchEventInput {
   linkedMetricId?: EntityId;
 }
 
+export interface RecordMatchEventInput {
+  clubId: EntityId;
+  eventId: EntityId;
+  matchId: EntityId;
+  studentId: EntityId;
+  type: MatchEventType;
+  minute?: number;
+  note?: string;
+}
+
+export interface MatchEventBundle {
+  event: MatchEvent;
+  metricRecords: PlayerMetricRecord[];
+}
+
 export interface MatchPlayerNoteInput {
   studentId: EntityId;
   coachId: EntityId;
@@ -49,6 +64,7 @@ export interface MatchStore {
   saveEvent(event: MatchEvent): Promise<void> | void;
   saveNote(note: MatchPlayerNote): Promise<void> | void;
   saveMetricRecord(record: PlayerMetricRecord): Promise<void> | void;
+  saveEventBundle?(bundle: MatchEventBundle): Promise<void> | void;
 }
 
 export interface MatchServiceDependencies {
@@ -132,6 +148,44 @@ function buildMatchMetricRecord(input: {
 
 export function createMatchService(dependencies: MatchServiceDependencies) {
   return {
+    async recordMatchEvent(input: RecordMatchEventInput): Promise<MatchEventBundle> {
+      if (!dependencies.store.saveEventBundle) {
+        throw new Error("Match store does not support atomic event bundles.");
+      }
+
+      const now = dependencies.clock.now();
+      const event: MatchEvent = {
+        id: dependencies.ids.next("match-event"),
+        clubId: input.clubId,
+        matchId: input.matchId,
+        type: input.type,
+        studentId: input.studentId,
+        minute: input.minute,
+        note: input.note,
+        createdAt: now,
+        updatedAt: now,
+      };
+      const metric = await resolveMetricForMatchEvent(dependencies.catalog, input.clubId, event);
+      const metricRecords = metric
+        ? [buildMatchMetricRecord({
+          ids: dependencies.ids,
+          clock: dependencies.clock,
+          clubId: input.clubId,
+          studentId: event.studentId,
+          metricId: metric.id,
+          eventId: input.eventId,
+          sourceEvent: event,
+          note: event.note,
+        })]
+        : [];
+
+      if (metric) {
+        event.linkedMetricId = metric.id;
+      }
+      await dependencies.store.saveEventBundle({ event, metricRecords });
+      return { event, metricRecords };
+    },
+
     async recordMatchSummary(input: RecordMatchInput): Promise<MatchSummaryResult> {
       const now = dependencies.clock.now();
       const match: Match = {

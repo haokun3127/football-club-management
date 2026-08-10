@@ -2,6 +2,7 @@ import type { DatabaseSync } from "node:sqlite";
 import { createSeedData, type SeedData } from "../seed.js";
 import { CalendarRepository } from "./calendar-repositories.js";
 import { DataCapabilityRepository } from "./data-capability-repositories.js";
+import { MatchRepository } from "./match-repository.js";
 import {
   ClubRepository,
   ClubUserMembershipRepository,
@@ -17,6 +18,7 @@ import { TacticalBoardRepository } from "./tactical-board-repository.js";
 
 export interface PlatformRepositories {
   calendar: CalendarRepository;
+  matches: MatchRepository;
   clubs: ClubRepository;
   users: UserAccountRepository;
   memberships: ClubUserMembershipRepository;
@@ -37,6 +39,7 @@ export interface PlatformPersistence {
 export function createPlatformRepositories(database: DatabaseSync): PlatformRepositories {
   return {
     calendar: new CalendarRepository(database),
+    matches: new MatchRepository(database),
     clubs: new ClubRepository(database),
     users: new UserAccountRepository(database),
     memberships: new ClubUserMembershipRepository(database),
@@ -89,6 +92,14 @@ export async function seedPlatformData(repositories: PlatformRepositories, data:
 
   for (const participant of data.participants) {
     repositories.calendar.insertParticipantIfAbsent(participant);
+  }
+
+  for (const match of data.matches) {
+    repositories.matches.insertMatchIfAbsent(match);
+  }
+
+  for (const matchEvent of data.matchEvents) {
+    repositories.matches.insertEventIfAbsent(matchEvent);
   }
 
   for (const request of data.privateLessonRequests) {

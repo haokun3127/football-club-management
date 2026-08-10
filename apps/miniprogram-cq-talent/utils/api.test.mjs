@@ -36,7 +36,7 @@ globalThis.wx = {
   }),
 };
 
-const { correctCoachLesson, getCoachMatchDetail, getCoachWorkbench, getParentActivityDetail, getParentStudentHome, submitCoachAssessment } = await import("./api.ts");
+const { correctCoachLesson, createCoachMatchEvent, getCoachMatchDetail, getCoachWorkbench, getParentActivityDetail, getParentStudentHome, submitCoachAssessment } = await import("./api.ts");
 
 describe("coach workbench participant normalization", () => {
   it("uses backend participant.status and note fields", async () => {
@@ -129,6 +129,38 @@ describe("coach match detail request boundary", () => {
       expect(detail).toMatchObject({ event: { id: "event-match-1" }, match: { id: "match-1" } });
       expect(detail).not.toHaveProperty("summary");
       expect(detail.events[0]).not.toHaveProperty("assistStudentId");
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
+});
+
+describe("coach match-event create request boundary", () => {
+  it("uses the scoped POST with only the approved body and an exact 201 response", async () => {
+    const originalRequest = globalThis.wx.request;
+    let received;
+    globalThis.wx.request = ({ url, method, data, header, success }) => {
+      received = { url, method, data, header };
+      success({
+        statusCode: 201,
+        data: { event: { id: "server-event", studentId: "student-1", type: "goal", minute: 12, note: "Recorded fact" } },
+      });
+    };
+
+    try {
+      await expect(createCoachMatchEvent(
+        "event-match-1",
+        { studentId: "student-1", type: "goal", minute: 12, note: "Recorded fact" },
+        "match-event-stable-key",
+      )).resolves.toEqual({ event: expect.objectContaining({ id: "server-event", studentId: "student-1", type: "goal" }) });
+      expect(received).toEqual(expect.objectContaining({
+        method: "POST",
+        url: expect.stringContaining("/coach/events/event-match-1/match/events"),
+        data: { studentId: "student-1", type: "goal", minute: 12, note: "Recorded fact" },
+        header: expect.objectContaining({ "Idempotency-Key": "match-event-stable-key" }),
+      }));
+      expect(received.data).not.toHaveProperty("actorUserId");
+      expect(received.data).not.toHaveProperty("matchId");
     } finally {
       globalThis.wx.request = originalRequest;
     }

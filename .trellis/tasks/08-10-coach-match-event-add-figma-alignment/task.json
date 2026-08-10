@@ -1,0 +1,41 @@
+{
+  "id": "coach-match-event-add-figma-alignment",
+  "name": "coach-match-event-add-figma-alignment",
+  "title": "C6.1 Add Match Event",
+  "description": "Implement a durable, idempotent C6.1 coach match-event append flow for Figma 93:827, then re-read C6 from the BFF.",
+  "status": "in_progress",
+  "dev_type": "fullstack",
+  "scope": "c6.1-durable-idempotent-coach-match-event-append",
+  "package": "api",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-08-10",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "codex/chongqing-talent-business",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "07-30-figma-design-foundation",
+  "relatedFiles": [
+    ".trellis/spec/api/backend/index.md",
+    ".trellis/spec/api/frontend/index.md",
+    ".trellis/spec/api/backend/app-client-bff-contracts.md",
+    "packages/domain/src/match-services.ts",
+    "apps/api/src/routes/app-client.routes.ts",
+    "apps/api/src/http/schemas.ts",
+    "apps/api/src/http/openapi.ts",
+    "apps/api/src/store.ts",
+    "apps/api/src/persistence/",
+    "apps/miniprogram-cq-talent/pages/coach/match-event-add/",
+    "apps/miniprogram-cq-talent/pages/coach/match/"
+  ],
+  "notes": "Figma zZ6wKyOHKcO4UYXDd9jGwv node 93:827. User authorized the bounded C6.1 cross-layer patch on 2026-08-10. Preserve unrelated assessment WIP hunks; no commit or deployment.",
+  "meta": {
+    "figma": "zZ6wKyOHKcO4UYXDd9jGwv:93:827",
+    "legacyExcluded": "93:877"
+  }
+}

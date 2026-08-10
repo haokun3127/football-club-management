@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { formationTemplates, validateTacticalBoardPlayers, type ClubUserRole, type TacticalBoardPlayer } from "@football-club/domain";
+import { formationTemplates, validateTacticalBoardPlayers, type ClubUserRole, type MatchEventType, type TacticalBoardPlayer } from "@football-club/domain";
 import type { RecordAssessmentInput, RecordMatchInput } from "@football-club/domain";
 import type { PrivacyRequestCreateInput } from "../data-capability/types.js";
 import type { ClubAppClient, StudentDetail, StudentListItem } from "../data-capability/types.js";
@@ -27,6 +27,7 @@ interface AppEventDetail {
 }
 
 const adminRoles = new Set<ClubUserRole>(["owner", "admin", "operator"]);
+const nonNumericMatchEventMinutes = new WeakSet<FastifyRequest>();
 
 interface ParentReminder {
   id: string;
@@ -348,6 +349,107 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         clubId: request.params.clubId,
         requests: requests.filter((item) => childIds.has(item.studentId)),
       };
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      eventId: string;
+    };
+    Body: {
+      studentId: string;
+      type: MatchEventType;
+      minute?: number;
+      note?: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/match/events",
+    {
+      schema: {
+        ...schemas.appClientEventParams,
+        ...schemas.appClientCoachMatchEventCreate,
+      },
+      preValidation: async (request) => {
+        const rawBody = request.body as unknown;
+        if (
+          rawBody
+          && typeof rawBody === "object"
+          && !Array.isArray(rawBody)
+          && Object.prototype.hasOwnProperty.call(rawBody, "minute")
+          && typeof (rawBody as { minute?: unknown }).minute !== "number"
+        ) {
+          nonNumericMatchEventMinutes.add(request);
+        }
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) return reply;
+      if (!context.membershipResolver) {
+        return context.sendError(reply, 401, "authentication_required", "Authenticated coach membership is required for match events");
+      }
+      const auth = await context.resolveClubAuth(request, reply, request.params.clubId);
+      if (!auth) return reply;
+      if (!await requireCoachEventAccess(context, request, reply, request.params.clubId, request.params.eventId)) return reply;
+
+      const event = (await context.store.listCalendarEvents(request.params.clubId) as AppEventDetail[])
+        .find((item) => item.id === request.params.eventId);
+      if (!event) return context.sendError(reply, 404, "not_found", "Event not found");
+      if (event.type !== "match") return context.sendError(reply, 400, "invalid_match_event", "Event is not a match");
+      if (["cancelled", "canceled"].includes(event.status)) {
+        return context.sendError(reply, 409, "match_event_write_closed", "Cancelled matches cannot accept events");
+      }
+      const detail = await context.store.getMatchDetailByEvent(request.params.clubId, request.params.eventId);
+      if (!detail?.match) return context.sendError(reply, 404, "match_not_found", "Match not found");
+      const eventParticipantIds = new Set(event.participants?.map((participant) => participant.studentId) ?? []);
+      const matchRosterStudentIds = new Set(detail.rosters.map((roster) => roster.studentId));
+      if (!eventParticipantIds.has(request.body.studentId) || !matchRosterStudentIds.has(request.body.studentId)) {
+        return context.sendError(reply, 400, "invalid_match_event_student", "Student is not a participant in this match roster");
+      }
+      const capabilities = await context.store.getClubCapabilities(request.params.clubId, { clientId: client.id });
+      const allowedTypes = new Set((capabilities?.match?.eventTypes ?? []).filter(isMatchEventType));
+      if (!allowedTypes.has(request.body.type)) {
+        return context.sendError(reply, 400, "invalid_match_event_type", "Match event type is not available for this client");
+      }
+      if (nonNumericMatchEventMinutes.delete(request)) {
+        return context.sendError(reply, 400, "invalid_match_event_minute", "Match event minute must be a number");
+      }
+
+      const idempotencyKey = firstHeaderValue(request.headers["idempotency-key"]);
+      if (!idempotencyKey) {
+        return context.sendError(reply, 400, "idempotency_key_required", "Idempotency-Key is required for match events");
+      }
+      const fingerprint = crypto.createHash("sha256").update(JSON.stringify({
+        clubId: request.params.clubId,
+        eventId: request.params.eventId,
+        actorUserId: auth.user.id,
+        body: request.body,
+      })).digest("base64url");
+      let result;
+      try {
+        result = await context.store.recordCoachMatchEvent({
+          clubId: request.params.clubId,
+          eventId: request.params.eventId,
+          matchId: detail.match.id,
+          studentId: request.body.studentId,
+          type: request.body.type,
+          minute: request.body.minute,
+          note: request.body.note,
+          idempotencyKey,
+          idempotencyFingerprint: fingerprint,
+          idempotencyExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        });
+      } catch {
+        const persistenceError = new Error("Match event persistence failed") as Error & { statusCode?: number };
+        persistenceError.statusCode = 500;
+        throw persistenceError;
+      }
+      if ("conflict" in result) {
+        return context.sendError(reply, 409, "idempotency_conflict", "Idempotency key is already bound to a different match event");
+      }
+      return reply.code(201).send({ event: result.event });
     },
   );
 
@@ -2381,6 +2483,10 @@ function summarizeClient(client: ClubAppClient) {
 
 function firstHeaderValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
+}
+
+function isMatchEventType(value: string): value is MatchEventType {
+  return ["goal", "assist", "save", "tackle", "yellow_card", "red_card", "penalty", "own_goal"].includes(value);
 }
 
 function enumerateDateRange(from: string, to: string): string[] | null {

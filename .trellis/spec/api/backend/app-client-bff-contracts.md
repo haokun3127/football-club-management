@@ -696,6 +696,30 @@ v1 存储为进程内集合（同私教申请语义），SQLite 持久化是已�
 - C15 测评录入提交：`POST /coach/assessments`（已存在，按学员逐条提交）。
 
 
+## Scenario: Coach Match Event Append
+
+### Request
+
+`POST /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/match/events`
+
+The body is exactly `{ studentId, type, minute?, note? }`. The client must send an `Idempotency-Key` between 8 and 128 characters. It must not send an actor, match id, player name, score, metric id, or roster data.
+
+### Authorization and Validation
+
+- Resolve the active coach client and authenticated coach membership before exposing payload validation results.
+- Require coach access to the event, then verify the event exists and is a match.
+- A writable student belongs to both the event participant list and the persisted match roster.
+- `type` is the intersection of the domain match-event enum and `capabilities.match.eventTypes`.
+- `minute` must be a JSON number and an integer from 0 through 300; a numeric string is invalid.
+- Cancelled matches reject the append; completed matches remain available for retrospective facts.
+
+### Persistence and Response
+
+- Construct the event and any derived metric records before a single transaction writes them.
+- Persistent ids are server-generated. An unexpected persistence or foreign-key error returns a generic `500 internal_error` and leaves both event and metric tables unchanged.
+- The same key with the canonical payload replays the original `201`; a changed canonical payload returns `409 idempotency_conflict`.
+- Only an exact `201` is a client-side success. C6 re-reads its match detail after C6.1 returns; it does not accept an opener-channel or optimistic event payload.
+
 ## Scenario: Parent Content Slices (articles / FAQs / venues / coach team)
 
 家长端内容中心四切片由静态数据切换为真实 BFF，全部只读、按俱乐部隔离。

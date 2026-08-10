@@ -1,6 +1,31 @@
 .match-event-page {
   min-height: 100vh;
   background: var(--color-page);
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
+}
+
+.match-event-nav {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  height: 176rpx;
+  padding: 64rpx 32rpx 20rpx;
+  background: #fceeef;
+}
+
+.match-event-nav__back {
+  width: 112rpx;
+  color: #2f3440;
+  font-size: 28rpx;
+}
+
+.match-event-nav__title {
+  flex: 1;
+  margin-right: 112rpx;
+  color: #2f3440;
+  font-size: 36rpx;
+  font-weight: 700;
+  text-align: center;
 }
 
 .match-event-page__body {
@@ -70,4 +95,11 @@
   font-size: 32rpx;
   font-weight: 600;
   color: #ffffff;
+}
+
+.submit-error {
+  margin-top: 24rpx;
+  color: #b42318;
+  font-size: 24rpx;
+  line-height: 1.5;
 }

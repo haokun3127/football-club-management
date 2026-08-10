@@ -1,0 +1,4 @@
+{"file":".trellis/spec/api/backend/index.md","reason":"Review the BFF and persistence contract."}
+{"file":".trellis/spec/api/frontend/index.md","reason":"Review Mini Program state and request behavior."}
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Check idempotency and match projection compatibility."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Check the cross-layer readback and rollback boundary."}

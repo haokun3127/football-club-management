@@ -861,6 +861,39 @@ export const schemas = {
       409: errorResponse,
     },
   },
+  appClientCoachMatchEventCreate: {
+    headers: {
+      type: "object",
+      required: ["idempotency-key"],
+      properties: {
+        "idempotency-key": { type: "string", minLength: 8, maxLength: 128 },
+      },
+    },
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["studentId", "type"],
+      properties: {
+        studentId: { type: "string", minLength: 1 },
+        type: { type: "string", enum: ["goal", "assist", "save", "tackle", "yellow_card", "red_card", "penalty", "own_goal"] },
+        minute: { type: "integer", minimum: 0, maximum: 300 },
+        note: { type: "string", maxLength: 500 },
+      },
+    },
+    response: {
+      201: {
+        type: "object",
+        additionalProperties: false,
+        required: ["event"],
+        properties: { event: domainObject },
+      },
+      400: errorResponse,
+      401: errorResponse,
+      403: errorResponse,
+      404: errorResponse,
+      409: errorResponse,
+    },
+  },
   appClientRecordMatch: {
     body: {
       type: "object",

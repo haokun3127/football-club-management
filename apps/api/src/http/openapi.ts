@@ -275,6 +275,12 @@ export function buildOpenApiDocument() {
           ...schemas.appClientCoachMatchDetail,
         }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/match/events": {
+        post: operation("POST", "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/match/events", {
+          ...schemas.appClientEventParams,
+          ...schemas.appClientCoachMatchEventCreate,
+        }),
+      },
       "/clubs/{clubId}/app-clients/{clientId}/coach/training-project-tree": {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/training-project-tree", {
           ...schemas.appClientParams,

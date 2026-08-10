@@ -23,6 +23,7 @@ import {
   type EntityId,
   type EventParticipant,
   type Match,
+  type MatchEventBundle,
   type MatchEvent,
   type MatchPlayerNote,
   type MatchRoster,
@@ -44,6 +45,7 @@ import {
   type PrivacyRole,
   type StudentConsentRecord,
   type RecordAssessmentInput,
+  type RecordMatchEventInput,
   type RecordMatchInput,
   type SessionDelivery,
   type SessionObservation,
@@ -239,6 +241,7 @@ export interface ApiStore {
     notes: MatchPlayerNote[];
     metricRecords: PlayerMetricRecord[];
   }>;
+  recordCoachMatchEvent(input: MatchEventAppendInput): Promise<MatchEventAppendResult | MatchEventAppendConflict>;
   getMatchDetailByEvent(clubId: EntityId, eventId: EntityId): {
     match: Match;
     rosters: MatchRoster[];
@@ -817,7 +820,7 @@ export abstract class SeedBackedStore implements ApiStore {
     }
   }
 
-  private ensureCoachInClub(clubId: EntityId, coachId?: EntityId) {
+  protected ensureCoachInClub(clubId: EntityId, coachId?: EntityId) {
     if (!coachId || this.listCoaches(clubId).some((item) => item.id === coachId)) {
       return;
     }
@@ -825,7 +828,7 @@ export abstract class SeedBackedStore implements ApiStore {
     throw new Error("Coach not found for club.");
   }
 
-  private ensureStudentInClub(clubId: EntityId, studentId?: EntityId) {
+  protected ensureStudentInClub(clubId: EntityId, studentId?: EntityId) {
     if (!studentId || this.listStudents(clubId).some((item) => item.id === studentId)) {
       return;
     }
@@ -2144,10 +2147,10 @@ export abstract class SeedBackedStore implements ApiStore {
     return { observation, metricRecord };
   }
 
-  private findMetricById = (clubId: EntityId, metricId: EntityId) =>
+  protected findMetricById = (clubId: EntityId, metricId: EntityId) =>
     this.data.metrics.find((metric) => metric.id === metricId && isCatalogVisibleToClub(metric, clubId)) ?? null;
 
-  private findMetricByCode = (clubId: EntityId, code: string) =>
+  protected findMetricByCode = (clubId: EntityId, code: string) =>
     this.data.metrics.find((metric) => metric.code === code && isCatalogVisibleToClub(metric, clubId)) ?? null;
 
   private findTemplateById = (clubId: EntityId, templateId: EntityId): AssessmentTemplate | null =>
@@ -2252,6 +2255,54 @@ export abstract class SeedBackedStore implements ApiStore {
     return service.recordMatchSummary(input);
   }
 
+  async recordCoachMatchEvent(input: MatchEventAppendInput): Promise<MatchEventAppendResult | MatchEventAppendConflict> {
+    const existing = this.getHttpIdempotencyRecord(input.idempotencyKey);
+    if (existing) {
+      if (existing.fingerprint !== input.idempotencyFingerprint) {
+        return { conflict: true };
+      }
+      return { ...parseMatchEventBundle(existing.payload), replayed: true };
+    }
+
+    const match = this.data.matches.find((item) => item.clubId === input.clubId && item.id === input.matchId && item.eventId === input.eventId);
+    if (!match) {
+      throw new Error("Match not found for event.");
+    }
+    this.ensureStudentInClub(input.clubId, input.studentId);
+
+    const service = createMatchService({
+      clock: this.clock,
+      ids: this.ids,
+      catalog: {
+        findMetricById: this.findMetricById,
+        findMetricByCode: this.findMetricByCode,
+      },
+      store: {
+        saveMatch: async () => {},
+        saveRoster: async () => {},
+        saveEvent: async () => {},
+        saveNote: async () => {},
+        saveMetricRecord: async () => {},
+        saveEventBundle: async (bundle) => {
+          upsertById(this.data.matchEvents, bundle.event);
+          for (const record of bundle.metricRecords) {
+            upsertById(this.data.metricRecords, record);
+          }
+        },
+      },
+    });
+    const bundle = await service.recordMatchEvent(input);
+    this.saveHttpIdempotencyRecord({
+      key: input.idempotencyKey,
+      fingerprint: input.idempotencyFingerprint,
+      statusCode: 201,
+      payload: JSON.stringify(bundle),
+      createdAt: this.clock.now(),
+      expiresAt: input.idempotencyExpiresAt,
+    });
+    return { ...bundle, replayed: false };
+  }
+
   getMatchDetailByEvent(clubId: EntityId, eventId: EntityId) {
     const match = this.data.matches.find((item) => item.clubId === clubId && item.eventId === eventId);
     if (!match) {
@@ -2344,7 +2395,7 @@ export class PersistentApiStore extends SeedBackedStore {
     private readonly repositories: PlatformRepositories,
     data: SeedData = createSeedData(),
   ) {
-    super(data);
+    super(mergePersistedMatchData(repositories, data));
   }
 
   override listCalendarEvents(clubId: EntityId) {
@@ -2400,6 +2451,64 @@ export class PersistentApiStore extends SeedBackedStore {
       .filter((participant) => participant.studentId === studentId)
       .map((participant) => participant.eventId));
     return this.listCalendarEvents(clubId).filter((event) => eventIds.has(event.id));
+  }
+
+  override async recordCoachMatchEvent(input: MatchEventAppendInput): Promise<MatchEventAppendResult | MatchEventAppendConflict> {
+    const result = await this.repositories.matches.transaction(async () => {
+      const existing = this.repositories.dataCapability.getHttpIdempotencyRecord(input.idempotencyKey);
+      if (existing) {
+        if (existing.fingerprint !== input.idempotencyFingerprint) {
+          return { conflict: true } as MatchEventAppendConflict;
+        }
+        return { ...parseMatchEventBundle(existing.payload), replayed: true } as MatchEventAppendResult;
+      }
+
+      const match = this.data.matches.find((item) => item.clubId === input.clubId && item.id === input.matchId && item.eventId === input.eventId);
+      if (!match) {
+        throw new Error("Match not found for event.");
+      }
+      this.ensureStudentInClub(input.clubId, input.studentId);
+
+      const service = createMatchService({
+        clock: { now: () => new Date().toISOString() },
+        ids: { next: () => randomUUID() },
+        catalog: {
+          findMetricById: this.findMetricById,
+          findMetricByCode: this.findMetricByCode,
+        },
+        store: {
+          saveMatch: async () => {},
+          saveRoster: async () => {},
+          saveEvent: async () => {},
+          saveNote: async () => {},
+          saveMetricRecord: async () => {},
+          saveEventBundle: async (bundle) => {
+            this.repositories.matches.saveEvent(bundle.event);
+            for (const record of bundle.metricRecords) {
+              this.repositories.matches.saveMetricRecord(record);
+            }
+          },
+        },
+      });
+      const bundle = await service.recordMatchEvent(input);
+      this.repositories.dataCapability.saveHttpIdempotencyRecord({
+        key: input.idempotencyKey,
+        fingerprint: input.idempotencyFingerprint,
+        statusCode: 201,
+        payload: JSON.stringify(bundle),
+        createdAt: new Date().toISOString(),
+        expiresAt: input.idempotencyExpiresAt,
+      });
+      return { ...bundle, replayed: false } as MatchEventAppendResult;
+    });
+
+    if (!("conflict" in result) && !result.replayed) {
+      upsertById(this.data.matchEvents, result.event);
+      for (const record of result.metricRecords) {
+        upsertById(this.data.metricRecords, record);
+      }
+    }
+    return result;
   }
 
   override getHttpIdempotencyRecord(key: string) {
@@ -3092,6 +3201,36 @@ export class PersistentApiStore extends SeedBackedStore {
       updatedAt: now,
     });
   }
+}
+
+function mergePersistedMatchData(repositories: PlatformRepositories, data: SeedData): SeedData {
+  const clubIds = data.clubs.map((club) => club.id);
+  return {
+    ...data,
+    matches: mergeById(data.matches, clubIds.flatMap((clubId) => repositories.matches.listMatches(clubId))),
+    matchEvents: mergeById(data.matchEvents, clubIds.flatMap((clubId) => repositories.matches.listEvents(clubId))),
+    metricRecords: mergeById(data.metricRecords, clubIds.flatMap((clubId) => repositories.matches.listMetricRecords(clubId))),
+  };
+}
+
+function parseMatchEventBundle(payload: string): MatchEventBundle {
+  const parsed: unknown = JSON.parse(payload);
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error("Invalid persisted match event response.");
+  }
+  const record = parsed as Record<string, unknown>;
+  if (!record.event || !Array.isArray(record.metricRecords)) {
+    throw new Error("Invalid persisted match event response.");
+  }
+  return record as unknown as MatchEventBundle;
+}
+
+function mergeById<TEntity extends { id: EntityId }>(seeded: TEntity[], persisted: TEntity[]): TEntity[] {
+  const byId = new Map(seeded.map((item) => [item.id, item]));
+  for (const item of persisted) {
+    byId.set(item.id, item);
+  }
+  return [...byId.values()];
 }
 
 function participantKey(participant: EventParticipant): string {
