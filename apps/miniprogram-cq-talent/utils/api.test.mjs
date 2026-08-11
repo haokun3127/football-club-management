@@ -36,7 +36,7 @@ globalThis.wx = {
   }),
 };
 
-const { correctCoachLesson, createCoachMatchEvent, getCoachMatchDetail, getCoachWorkbench, getParentActivityDetail, getParentStudentHome, submitCoachAssessment, switchActiveRole, wechatLogin } = await import("./api.ts");
+const { correctCoachLesson, createCoachMatchEvent, getCoachMatchDetail, getCoachWorkbench, getParentActivityDetail, getParentStudentHome, saveCoachAttendance, submitCoachAssessment, switchActiveRole, wechatLogin } = await import("./api.ts");
 
 describe("active-role session transport", () => {
   it("advertises the role-switch capability when starting WeChat login", async () => {
@@ -85,6 +85,60 @@ describe("coach workbench participant normalization", () => {
     expect(workbench.roster).toEqual([
       expect.objectContaining({ studentId: "student-1", status: "present", note: "Saved by backend" }),
     ]);
+  });
+
+  it("treats RSVP confirmations as pending until a coach records attendance", async () => {
+    const originalRequest = globalThis.wx.request;
+    globalThis.wx.request = ({ success }) => success({
+      statusCode: 200,
+      data: {
+        event: {
+          id: "event-training-pending",
+          title: "Upcoming training",
+          type: "training",
+          startsAt: "2026-08-13T09:00:00.000Z",
+          endsAt: "2026-08-13T10:30:00.000Z",
+          status: "scheduled",
+        },
+        rosterContext: {
+          participants: [
+            { studentId: "student-confirmed", status: "confirmed" },
+            { studentId: "student-invited", status: "invited" },
+          ],
+          students: [
+            { id: "student-confirmed", name: "Confirmed RSVP" },
+            { id: "student-invited", name: "Invited RSVP" },
+          ],
+        },
+        workflow: {},
+        training: {},
+        match: {},
+        assessment: {},
+      },
+    });
+
+    try {
+      const workbench = await getCoachWorkbench("event-training-pending");
+      expect(workbench.roster.map((student) => student.status)).toEqual(["pending", "pending"]);
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
+
+  it("preserves an explicit empty note so a coach can clear a saved attendance note", async () => {
+    const originalRequest = globalThis.wx.request;
+    let received;
+    globalThis.wx.request = ({ data, success }) => {
+      received = data;
+      success({ statusCode: 200, data: { participants: [] } });
+    };
+
+    try {
+      await saveCoachAttendance("event-training-1", [{ studentId: "student-1", name: "Player", status: "present", note: "" }]);
+      expect(received).toEqual({ participants: [{ studentId: "student-1", status: "present", note: "" }] });
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
   });
 });
 

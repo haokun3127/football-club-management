@@ -16,8 +16,6 @@ vi.mock("../../../utils/presentation", () => ({
   activityStatus: (status) => ({ label: status, tone: "info" }),
   formatCalendarDate: (value) => String(value).slice(0, 10),
   formatTimeRange: () => "09:00-10:00",
-  resolveMenuInset: () => 0,
-  resolveNavInset: () => 0,
 }));
 
 let pageDefinition;
@@ -205,10 +203,14 @@ describe("coach attendance", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 
-  it("keeps C4 submit clear of the system menu without adding vertical header padding", () => {
-    expect(controller).toContain("resolveMenuInset");
-    expect(template).toContain('padding-right:{{menuInset}}px');
-    expect(stylesheet).toMatch(/\.c4-nav\s*\{[^}]*padding:\s*0\s+44rpx/s);
-    expect(stylesheet).toMatch(/\.c4-nav\s*\{[^}]*box-sizing:\s*border-box/s);
+  it("uses the shared 88px Figma header and coach tab bar without an overlapping submit bar", () => {
+    expect(template).toContain('<app-header theme="soft"');
+    expect(template).toContain('action-text="{{canSave && !saving && !correctionMode ? \'提交\' : \'\'}}"');
+    expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
+    expect(template).not.toContain("<submit-bar");
+    expect(template).toContain('style="background: {{item.avatarColor}}"');
+    expect(template).toContain('wx:if="{{correctionMode}}"');
+    expect(controller).toContain("function avatarColor");
+    expect(stylesheet).toMatch(/\.c4-correction-submit\s*\{[^}]*bottom:\s*140rpx/s);
   });
 });

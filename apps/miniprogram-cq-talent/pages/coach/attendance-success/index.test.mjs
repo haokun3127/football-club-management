@@ -81,8 +81,7 @@ describe("coach attendance success", () => {
       eventTitle: "Ball-control session",
       eventDate: "2026-08-13",
       eventTime: "09:00-10:00",
-      venue: "North field",
-      hasVenue: true,
+      attendanceText: "2/5人",
       summary: { total: 5, present: 2, absent: 2, pending: 1 },
     });
   });
@@ -122,10 +121,14 @@ describe("coach attendance success", () => {
   });
 
   it("keeps the template state-gated, data-driven, and free of unsafe WXML expressions", () => {
-    expect(template).toContain('<app-header title="出勤管理" title-align="left" show-back />');
+    expect(template).toContain('<app-header theme="soft" title="出勤管理" title-align="left" show-back />');
     expect(template).toContain('wx:elif="{{state === \'ready\'}}"');
     expect(template).toContain('bindtap="openWorkbench"');
     expect(template).toContain('bindtap="openSchedule"');
+    expect(template).toContain("attendanceText");
+    expect(template).toContain(">课程</text>");
+    expect(template).toContain(">出席</text>");
+    expect(template).not.toContain("hasVenue");
     expect(template).not.toContain("18/20");
     expect(template).not.toContain("20人");
     expect(template).not.toContain("技术专项训练");

@@ -1,11 +1,5 @@
 <view class="c4">
-  <view class="c4-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="c4-nav__left" bindtap="goBack">
-      <view class="c4-nav__back">‹</view>
-      <view class="c4-nav__title">{{correctionMode ? '出勤修改' : '出勤管理'}}</view>
-    </view>
-    <view wx:if="{{canSave && !saving}}" class="c4-nav__submit" bindtap="saveAttendance">提交</view>
-  </view>
+  <app-header theme="soft" title="{{correctionMode ? '出勤修改' : '出勤管理'}}" title-align="left" action-text="{{canSave && !saving && !correctionMode ? '提交' : ''}}" bindaction="saveAttendance" show-back />
 
   <view class="c4-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '正在读取名单' : state === 'empty' ? '暂无学员' : '名单读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重新加载' : ''}}" bindaction="retry" />
@@ -20,14 +14,11 @@
       </view>
 
       <view class="c4-hero">
-        <view class="c4-hero__head">
-          <view class="c4-hero__title">{{eventTitle}}</view>
-          <status-chip label="{{eventStatus}}" tone="{{eventStatusTone}}" compact="{{true}}" />
-        </view>
+        <view class="c4-hero__title">{{eventTitle}}</view>
         <view wx:if="{{hasEventMeta}}" class="c4-hero__meta">{{eventMeta}}</view>
         <view class="c4-hero__counts">
           <view class="c4-hero__count"><view class="c4-dot c4-dot--green"></view>出勤 {{summary.present}}</view>
-          <view class="c4-hero__count"><view class="c4-dot c4-dot--red"></view>未到 {{summary.absent}}</view>
+          <view class="c4-hero__count"><view class="c4-dot c4-dot--red"></view>缺勤 {{summary.absent}}</view>
           <view class="c4-hero__count"><view class="c4-dot c4-dot--gray"></view>待确认 {{summary.pendingCount}}</view>
         </view>
       </view>
@@ -41,7 +32,7 @@
         <view wx:for="{{roster}}" wx:key="studentId" class="attendance-row">
           <view class="attendance-main">
             <view class="student-info">
-              <view class="student-avatar">{{item.avatarLetter}}</view>
+              <view class="student-avatar" style="background: {{item.avatarColor}}">{{item.avatarLetter}}</view>
               <view class="student-info__copy">
                 <view class="student-name">{{item.name}}</view>
                 <view wx:if="{{item.hasLessonAction}}" class="lesson-state">{{item.lessonAction}}</view>
@@ -51,12 +42,15 @@
               <status-chip label="{{item.statusLabel}}" tone="{{item.statusTone}}" />
             </picker>
           </view>
-          <input class="note-input" placeholder="补充迟到、请假等说明（选填）" value="{{item.note}}" disabled="{{saving || !canSave}}" data-index="{{index}}" bindinput="onNoteInput" />
+          <input wx:if="{{correctionMode}}" class="note-input" placeholder="补充迟到、请假等说明（选填）" value="{{item.note}}" disabled="{{saving || !canSave}}" data-index="{{index}}" bindinput="onNoteInput" />
         </view>
       </view>
 
       <view wx:if="{{hasSaveError}}" class="save-error">{{saveError}}</view>
     </block>
   </view>
-  <submit-bar wx:if="{{state === 'ready' && hasRoster && canSave}}" primary-text="{{correctionMode ? '重新提交' : '保存点名'}}" hint="保存失败时，本页填写内容会保留" loading="{{saving}}" bindsubmit="saveAttendance" />
+  <view wx:if="{{state === 'ready' && hasRoster && correctionMode}}" class="c4-correction-submit">
+    <button class="c4-correction-submit__button" loading="{{saving}}" disabled="{{saving || !canSave}}" bindtap="saveAttendance">重新提交</button>
+  </view>
+  <role-tabbar role="coach" active="schedule" />
 </view>

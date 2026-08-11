@@ -1,15 +1,13 @@
 import { getCoachWorkbench, saveCoachAttendance } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { activityStatus, formatCalendarDate, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import { activityStatus, formatCalendarDate, formatTimeRange } from "../../../utils/presentation";
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
 
 type RosterItem = CoachWorkbench["roster"][number];
-type RosterUiItem = RosterItem & { avatarLetter: string; statusLabel: string; statusTone: string; statusIndex: number; hasLessonAction: boolean };
+type RosterUiItem = RosterItem & { avatarLetter: string; avatarColor: string; statusLabel: string; statusTone: string; statusIndex: number; hasLessonAction: boolean };
 
 const statusOptions = [
   { label: "未点名", value: "pending" },
-  { label: "已邀请", value: "invited" },
-  { label: "已确认", value: "confirmed" },
   { label: "到课", value: "present" },
   { label: "迟到", value: "late" },
   { label: "缺席", value: "absent" },
@@ -18,8 +16,6 @@ const statusOptions = [
 ];
 
 interface AttendancePageData {
-  navInset: number;
-  menuInset: number;
   state: LoadState;
   message: string;
   eventId: string;
@@ -41,8 +37,6 @@ interface AttendancePageData {
 
 Page<AttendancePageData>({
   data: {
-    navInset: resolveNavInset(),
-    menuInset: resolveMenuInset(),
     state: "loading",
     message: "正在读取点名名单",
     eventId: "",
@@ -122,9 +116,6 @@ Page<AttendancePageData>({
   retry() {
     this.load(this.data.eventId);
   },
-  goBack() {
-    wx.navigateBack();
-  },
   clearAll() {
     if (!this.data.canSave || this.data.saving) return;
     const roster = withRosterUi(this.data.roster.map((student: RosterUiItem) => ({ ...student, status: "pending", note: "" })));
@@ -187,12 +178,20 @@ function withRosterUi(roster: RosterItem[]): RosterUiItem[] {
       ...student,
       status: option.value,
       avatarLetter: student.name.slice(0, 1),
+      avatarColor: avatarColor(student.studentId),
       statusLabel: option.label,
       statusTone: statusTone(option.value),
       statusIndex: Math.max(0, statusIndex),
       hasLessonAction: Boolean(student.lessonAction),
     };
   });
+}
+
+function avatarColor(studentId: string) {
+  const palette = ["#3b82f6", "#10b981", "#8b5cf6", "#f59e0b", "#ef4444"];
+  let value = 0;
+  for (let index = 0; index < studentId.length; index += 1) value += studentId.charCodeAt(index);
+  return palette[value % palette.length]!;
 }
 
 function summarizeRoster(roster: RosterItem[]) {

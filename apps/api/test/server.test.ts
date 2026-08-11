@@ -1437,6 +1437,46 @@ describe("api server", () => {
       });
       expect(coachTeam.statusCode, coachTeam.body).toBe(200);
       expect((coachTeam.json() as { stats: { completedTrainingCount: number } }).stats.completedTrainingCount).toBe(3);
+      const completedAttendance = await firstApp.inject({
+        method: "GET",
+        url: `${base}/coach/events/event-cq-talent-demo-training-completed/workbench`,
+        headers: { authorization: `Bearer ${coachToken}` },
+      });
+      expect(completedAttendance.statusCode, completedAttendance.body).toBe(200);
+      const completedRoster = (completedAttendance.json() as {
+        rosterContext: { participants: Array<{ studentId: string; status: string }> };
+      }).rosterContext.participants;
+      expect(completedRoster.map((participant) => participant.studentId)).toEqual(coachDemoRosterStudentIds);
+      expect(completedRoster.filter((participant) => participant.status === "present")).toHaveLength(10);
+      expect(completedRoster.filter((participant) => participant.status === "late")).toHaveLength(2);
+      expect(completedRoster.filter((participant) => participant.status === "absent")).toHaveLength(2);
+      expect(completedRoster.filter((participant) => participant.status === "leave_requested")).toHaveLength(1);
+      expect(completedRoster.filter((participant) => participant.status === "excused")).toHaveLength(1);
+      const submittedAttendance = await firstApp.inject({
+        method: "PUT",
+        url: `${base}/coach/events/event-cq-talent-demo-training-upcoming/attendance`,
+        headers: { authorization: `Bearer ${coachToken}`, "idempotency-key": "acceptance-demo-attendance-readback" },
+        payload: {
+          participants: coachDemoRosterStudentIds.map((studentId, index) => ({
+            studentId,
+            status: index < 14 ? "present" : "absent",
+            note: index === 0 ? "Acceptance restart readback" : undefined,
+          })),
+        },
+      });
+      expect(submittedAttendance.statusCode, submittedAttendance.body).toBe(200);
+      const savedAttendance = await firstApp.inject({
+        method: "GET",
+        url: `${base}/coach/events/event-cq-talent-demo-training-upcoming/workbench`,
+        headers: { authorization: `Bearer ${coachToken}` },
+      });
+      expect(savedAttendance.statusCode, savedAttendance.body).toBe(200);
+      expect((savedAttendance.json() as {
+        rosterContext: { participants: Array<{ studentId: string; status: string; note?: string }> };
+      }).rosterContext.participants).toEqual(expect.arrayContaining([
+        expect.objectContaining({ studentId: coachDemoRosterStudentIds[0], status: "present", note: "Acceptance restart readback" }),
+        expect.objectContaining({ studentId: coachDemoRosterStudentIds[15], status: "absent" }),
+      ]));
       const tactical = await firstApp.inject({
         method: "GET",
         url: `${base}/coach/events/event-cq-talent-demo-match-tactical/tactical-board`,
@@ -1497,6 +1537,18 @@ describe("api server", () => {
       expect(restoredTactical.statusCode, restoredTactical.body).toBe(200);
       expect((restoredTactical.json() as { saved: boolean; board: { players: Array<{ x: number }> } }).saved).toBe(true);
       expect((restoredTactical.json() as { board: { players: Array<{ x: number }> } }).board.players[0]?.x).toBe(0.42);
+      const restoredAttendance = await restartedApp.inject({
+        method: "GET",
+        url: `${base}/coach/events/event-cq-talent-demo-training-upcoming/workbench`,
+        headers: { authorization: `Bearer ${coachToken}` },
+      });
+      expect(restoredAttendance.statusCode, restoredAttendance.body).toBe(200);
+      expect((restoredAttendance.json() as {
+        rosterContext: { participants: Array<{ studentId: string; status: string; note?: string }> };
+      }).rosterContext.participants).toEqual(expect.arrayContaining([
+        expect.objectContaining({ studentId: coachDemoRosterStudentIds[0], status: "present", note: "Acceptance restart readback" }),
+        expect.objectContaining({ studentId: coachDemoRosterStudentIds[15], status: "absent" }),
+      ]));
 
       const acceptanceMembership = await restartedPersistence.repositories.memberships.findActiveByClubAndUser("club-chongqing-talent", acceptanceUserId);
       const primaryClient = acceptanceSeed.appClients[0]!;

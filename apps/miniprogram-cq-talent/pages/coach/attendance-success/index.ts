@@ -13,8 +13,7 @@ interface AttendanceSuccessPageData {
   eventTitle: string;
   eventDate: string;
   eventTime: string;
-  venue: string;
-  hasVenue: boolean;
+  attendanceText: string;
   summary: AttendanceSummary;
 }
 
@@ -26,8 +25,7 @@ Page<AttendanceSuccessPageData>({
     eventTitle: "",
     eventDate: "",
     eventTime: "",
-    venue: "",
-    hasVenue: false,
+    attendanceText: "",
     summary: emptySummary(),
   },
   onLoad(query?: Record<string, string | undefined>) {
@@ -43,8 +41,7 @@ Page<AttendanceSuccessPageData>({
         eventTitle: "",
         eventDate: "",
         eventTime: "",
-        venue: "",
-        hasVenue: false,
+        attendanceText: "",
         summary: emptySummary(),
       });
       return;
@@ -71,8 +68,7 @@ Page<AttendanceSuccessPageData>({
         eventTitle: workbench.event.title,
         eventDate: formatCalendarDate(workbench.event.startsAt),
         eventTime: formatTimeRange(workbench.event.startsAt, workbench.event.endsAt),
-        venue: workbench.event.venue || "",
-        hasVenue: Boolean(workbench.event.venue),
+        attendanceText: attendanceText(summarizeAttendance(workbench)),
         summary: summarizeAttendance(workbench),
       });
     } catch {
@@ -83,8 +79,7 @@ Page<AttendanceSuccessPageData>({
         eventTitle: "",
         eventDate: "",
         eventTime: "",
-        venue: "",
-        hasVenue: false,
+        attendanceText: "",
         summary: emptySummary(),
       });
     }
@@ -110,4 +105,8 @@ function summarizeAttendance(workbench: CoachWorkbench): AttendanceSummary {
 
 function emptySummary(): AttendanceSummary {
   return { total: 0, present: 0, absent: 0, pending: 0 };
+}
+
+function attendanceText(summary: AttendanceSummary) {
+  return `${summary.present}/${summary.total}人`;
 }

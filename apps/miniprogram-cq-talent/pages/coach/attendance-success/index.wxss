@@ -6,9 +6,9 @@
 .success-page__body {
   display: flex;
   flex-direction: column;
-  gap: 72rpx;
+  gap: 80rpx;
   min-height: 720rpx;
-  padding: 160rpx var(--space-page) 180rpx;
+  padding: 160rpx var(--space-page) 200rpx;
 }
 
 .hero {
@@ -51,7 +51,7 @@
   padding: 32rpx;
   border-radius: 24rpx;
   background: var(--color-card);
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+  box-shadow: none;
 }
 
 .summary-card__row {

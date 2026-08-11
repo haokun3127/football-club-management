@@ -219,6 +219,14 @@ describe("Chongqing Talent synthetic fixtures", () => {
       expect(seed.participants?.filter((participant) => participant.eventId === eventId).map((participant) => participant.studentId))
         .toEqual(coachDemoRosterStudentIds);
     }
+    expect(new Set(seed.participants
+      ?.filter((participant) => participant.eventId === "event-cq-talent-demo-training-completed")
+      .map((participant) => participant.status)))
+      .toEqual(new Set(["present", "late", "absent", "leave_requested", "excused"]));
+    expect(new Set(seed.participants
+      ?.filter((participant) => participant.eventId === "event-cq-talent-demo-training-upcoming")
+      .map((participant) => participant.status)))
+      .toEqual(new Set(["confirmed"]));
     expect(seed.events).toContainEqual(expect.objectContaining({
       id: "event-cq-talent-demo-match-tactical",
       type: "match",
