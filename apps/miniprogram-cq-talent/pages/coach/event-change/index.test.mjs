@@ -26,6 +26,7 @@ globalThis.wx = {
 await import("./index.ts");
 
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
+const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 
 function createPageInstance(data = {}) {
   const instance = {
@@ -181,5 +182,12 @@ describe("coach activity change", () => {
     expect(template).not.toContain("通知学员家长");
     expect(template).not.toContain("20 位家长");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
+  });
+
+  it("uses the C3 soft header and full-width Figma form controls", () => {
+    expect(template).toContain('theme="soft"');
+    expect(stylesheet).toMatch(/\.change-page__body\s*\{[^}]*padding:\s*24rpx\s+32rpx\s+200rpx/s);
+    expect(stylesheet).toMatch(/\.input-box\s*\{[^}]*width:\s*100%/s);
+    expect(stylesheet).toMatch(/\.input-box\s*\{[^}]*box-sizing:\s*border-box/s);
   });
 });

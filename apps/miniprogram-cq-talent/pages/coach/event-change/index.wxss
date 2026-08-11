@@ -4,7 +4,7 @@
 }
 
 .change-page__body {
-  padding: 24rpx var(--space-page) 200rpx;
+  padding: 24rpx 32rpx 200rpx;
 }
 
 /* 活动信息卡（Figma C3） */
@@ -102,6 +102,9 @@
 }
 
 .input-box {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
   background: #f6f7f9;
   border-radius: 16rpx;
   padding: 24rpx;

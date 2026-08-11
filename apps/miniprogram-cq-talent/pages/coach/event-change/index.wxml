@@ -1,5 +1,5 @@
 <view class="change-page">
-  <app-header title="变更活动" action-text="{{state === 'ready' && !submitting ? '保存' : ''}}" bindaction="submit" show-back />
+  <app-header theme="soft" title="变更活动" action-text="{{state === 'ready' && !submitting ? '保存' : ''}}" bindaction="submit" show-back />
   <view class="change-page__body">
     <status-view
       state="{{state}}"

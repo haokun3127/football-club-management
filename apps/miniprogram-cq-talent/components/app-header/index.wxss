@@ -1,5 +1,6 @@
 .app-header { position: relative; z-index: 30; background: #ffffff; color: #202124; }
 .app-header--brand { background: var(--color-brand); color: #ffffff; }
+.app-header--soft { background: #fdf0f1; }
 .app-header__content { position: relative; display: flex; align-items: center; box-sizing: border-box; padding-left: 24rpx; }
 .app-header__heading { position: absolute; left: 128rpx; right: 128rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
 .app-header__title { overflow: hidden; max-width: 100%; font-size: 32rpx; font-weight: 650; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
