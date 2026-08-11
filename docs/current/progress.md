@@ -397,6 +397,13 @@
 - Evidence separates local and production: local file-backed `dist` restart preserved a non-empty note and status with exactly one participant record; the recorded production marker-note PUT survived one `cq-talent-api` container restart on the same named SQLite volume and was then restored.
 - Fresh review confirms no uncommitted attendance-task files. C4 real-coach `375x812` screenshot evidence remains absent and is explicitly not reported as complete; under the current project goal it is nonblocking for this persistence-task archive.
 
+## 2026-08-11 Acceptance Identity Runtime Binding Repair
+
+- Root cause: the fixed dual-role acceptance seed used a deterministic synthetic fixture phone on each restart, while real WeChat login resolves the currently authorized phone. The database therefore returned `binding_required` even though the intended user and membership were active.
+- Commit `d472307` adds private runtime override `FCM_CQ_TALENT_ACCEPTANCE_PHONE`; it is applied only to the fixed acceptance user and its matching parent profile. The value is not stored in the repository, test fixtures, deployment notes, or logs.
+- Verification: focused fixture regression first failed against the old seed and passed after the fix; full root check passed (domain `19/19`, mini-program `278/278`, API `85/85`).
+- Production: a new isolated tracked release was built after a restricted SQLite backup. The API was restarted with the private WeChat runtime credentials and acceptance-phone variable. HTTPS health returned `200`; the acceptance user and parent profile matched the configured phone, and both user and club membership were active with `parent` + `coach` roles. A fresh real WeChat authorization remains the required final device-side confirmation.
+
 ## 2026-08-10 Figma 49-State Completion Audit
 
 - The current online authority `zZ6wKyOHKcO4UYXDd9jGwv` was rechecked as 49 business states: Parent 21 and Coach 28. CODE frames, ordinary internal frames, and `93:877 / LEGACY C7` are excluded; C7 uses `233:2 / C7 MVP`.
