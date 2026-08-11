@@ -9,11 +9,14 @@ type TimelineItem = {
   minute?: number;
   minuteLabel: string;
   typeLabel: string;
+  tone: "score" | "assist" | "defense" | "discipline" | "neutral";
   studentName: string;
   note?: string;
   hasNote: boolean;
   createdAt?: string;
 };
+
+type PeriodChip = { id: "summary" | "timeline"; label: string };
 
 interface MatchPageData {
   state: LoadState;
@@ -32,6 +35,7 @@ interface MatchPageData {
   hasMatchStatus: boolean;
   hasMatch: boolean;
   canAddEvent: boolean;
+  periodChips: PeriodChip[];
   timeline: TimelineItem[];
   hasTimeline: boolean;
   hasLocalDraftOverlay: boolean;
@@ -59,6 +63,7 @@ Page<MatchPageData>({
     hasMatchStatus: false,
     hasMatch: false,
     canAddEvent: false,
+    periodChips: [],
     timeline: [],
     hasTimeline: false,
     hasLocalDraftOverlay: false,
@@ -127,6 +132,7 @@ Page<MatchPageData>({
         hasMatchStatus: Boolean(matchStatus),
         hasMatch: true,
         canAddEvent: true,
+        periodChips: toPeriodChips(),
         timeline,
         hasTimeline: timeline.length > 0,
         hasLocalDraftOverlay: Boolean(draft),
@@ -187,6 +193,7 @@ function emptyState(message: string): Omit<MatchPageData, "state"> {
     hasMatchStatus: false,
     hasMatch: false,
     canAddEvent: false,
+    periodChips: [],
     timeline: [],
     hasTimeline: false,
     hasLocalDraftOverlay: false,
@@ -221,11 +228,38 @@ function toTimeline(detail: CoachMatchDetail): TimelineItem[] {
     minute: event.minute,
     minuteLabel: typeof event.minute === "number" ? `${event.minute}分` : "时间待同步",
     typeLabel: matchEventLabel(event.type),
+    tone: matchEventTone(event.type),
     studentName: nameByStudentId.get(event.studentId) || "学员待同步",
     note: event.note,
     hasNote: Boolean(event.note),
     createdAt: event.createdAt,
   })).sort(compareTimelineItems);
+}
+
+function toPeriodChips(): PeriodChip[] {
+  return [
+    { id: "summary", label: "比赛总览" },
+    { id: "timeline", label: "事件记录" },
+  ];
+}
+
+function matchEventTone(type: CoachMatchDetail["events"][number]["type"]): TimelineItem["tone"] {
+  switch (type) {
+    case "goal":
+    case "penalty":
+    case "own_goal":
+      return "score";
+    case "assist":
+      return "assist";
+    case "save":
+    case "tackle":
+      return "defense";
+    case "yellow_card":
+    case "red_card":
+      return "discipline";
+    default:
+      return "neutral";
+  }
 }
 
 function compareTimelineItems(left: TimelineItem, right: TimelineItem) {

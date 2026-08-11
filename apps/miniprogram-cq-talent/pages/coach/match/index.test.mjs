@@ -201,6 +201,13 @@ describe("coach match detail", () => {
     expect(controller).not.toContain("openTacticalBoard");
   });
 
+  it("keeps the Figma match structure neutral with period chips and an outlined add-event action", () => {
+    expect(template).toContain('class="match-periods"');
+    expect(template).toContain('class="match-card__action match-card__action--outlined"');
+    expect(template).toContain('class="timeline__pill timeline__pill--{{item.tone}}"');
+    expect(template).not.toMatch(/\b(?:0|1|2|3|4|5):(?:0|1|2|3|4|5)\b/);
+  });
+
   it("uses the reusable left-aligned soft header required by the match Figma screens", () => {
     expect(appHeaderTemplate).toContain('app-header__heading--{{titleAlign}}');
     expect(appHeaderStylesheet).toMatch(/\.app-header__heading--left\s*\{[^}]*position:\s*static[^}]*align-items:\s*flex-start/s);

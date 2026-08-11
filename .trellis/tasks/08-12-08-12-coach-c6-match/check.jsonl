@@ -1,0 +1,3 @@
+{"file":".trellis/tasks/08-12-08-12-coach-c6-match/prd.md","reason":"C6/C6.1 acceptance criteria including real-data and truthful draft-state requirements."}
+{"file":".trellis/tasks/08-12-08-12-coach-c6-match/research/real-data-coverage.md","reason":"Data coverage, safe isolated-database boundary and unsupported-model caveats."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Cross-layer verification for seed -> SQLite -> BFF -> Mini Program data flow."}

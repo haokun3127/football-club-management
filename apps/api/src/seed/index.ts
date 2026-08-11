@@ -41,5 +41,5 @@ function mergeSeedData(base: SeedData, extra: Partial<SeedData>): SeedData {
 }
 
 function shouldIncludeCqTalentAcceptanceSeed() {
-  return process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED === "1";
+  return process.env.NODE_ENV !== "production" && process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED === "1";
 }

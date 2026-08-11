@@ -1,6 +1,6 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, relative, resolve } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { HeaderMembershipResolver } from "../src/auth/context.js";
 import { createPlatformPersistence } from "../src/persistence/platform-persistence.js";
@@ -134,11 +134,15 @@ describe("app-client coach match-event create", () => {
 
   it("retains the created event and metric record after reopening SQLite", async () => {
     const directory = mkdtempSync(join(tmpdir(), "football-match-event-"));
-    const databasePath = join(directory, "club.sqlite");
+    const resolvedDirectory = resolve(directory);
+    const databasePath = resolve(resolvedDirectory, "club.sqlite");
+    expect(relative(resolvedDirectory, databasePath)).toBe("club.sqlite");
     let first: Awaited<ReturnType<typeof createApp>> | undefined;
     let reopened: Awaited<ReturnType<typeof createApp>> | undefined;
     try {
       first = await createApp(databasePath);
+      const before = await first.app.inject({ method: "GET", url: `${basePath}/event-match-1/match`, headers: { "x-user-id": "user-coach-1" } });
+      expect(before.statusCode).toBe(200);
       const created = await first.app.inject({
         method: "POST",
         url: postPath,
@@ -147,6 +151,15 @@ describe("app-client coach match-event create", () => {
       });
       expect(created.statusCode).toBe(201);
       const id = (created.json() as { event: { id: string } }).event.id;
+      const headers = { "x-user-id": "user-coach-1", "idempotency-key": "match-event-key-restart" };
+      const replay = await first.app.inject({ method: "POST", url: postPath, headers, payload });
+      expect(replay.statusCode).toBe(201);
+      expect((replay.json() as { event: { id: string } }).event.id).toBe(id);
+      const conflict = await first.app.inject({ method: "POST", url: postPath, headers, payload: { ...payload, minute: 46 } });
+      expect(conflict.statusCode).toBe(409);
+      const afterCreate = await first.app.inject({ method: "GET", url: `${basePath}/event-match-1/match`, headers: { "x-user-id": "user-coach-1" } });
+      expect(afterCreate.statusCode).toBe(200);
+      expect((afterCreate.json() as { events: Array<{ id: string }> }).events.filter((event) => event.id === id)).toHaveLength(1);
       await first.app.close();
       first.persistence.database.close();
       first = undefined;
@@ -154,7 +167,7 @@ describe("app-client coach match-event create", () => {
       reopened = await createApp(databasePath);
       const detail = await reopened.app.inject({ method: "GET", url: `${basePath}/event-match-1/match`, headers: { "x-user-id": "user-coach-1" } });
       expect(detail.statusCode).toBe(200);
-      expect((detail.json() as { events: Array<{ id: string }> }).events).toContainEqual(expect.objectContaining({ id }));
+      expect((detail.json() as { events: Array<{ id: string }> }).events.filter((event) => event.id === id)).toHaveLength(1);
       const count = reopened.persistence.database.prepare("SELECT COUNT(*) AS count FROM player_metric_records WHERE event_id = ? AND source = 'match_event'").get("event-match-1") as { count: number };
       expect(count.count).toBeGreaterThan(0);
     } finally {

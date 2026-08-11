@@ -182,4 +182,12 @@ describe("C6.1 match event add", () => {
     expect(template).not.toContain("45");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
+
+  it("uses the Figma form hierarchy without adding non-capability event options", () => {
+    expect(template).toContain('class="match-event-form"');
+    expect(template).toContain('class="match-event-form__field"');
+    expect(template).toContain('class="save-button"');
+    expect(template).not.toContain("换人");
+    expect(template).not.toContain("其他");
+  });
 });

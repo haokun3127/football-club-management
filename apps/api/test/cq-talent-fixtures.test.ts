@@ -19,7 +19,7 @@ import { createSeedData } from "../src/seed.js";
 import { createPlatformSeed } from "../src/seed/platform.js";
 
 describe("Chongqing Talent synthetic fixtures", () => {
-  it("includes the production acceptance seed only when explicitly enabled", () => {
+  it("ignores the acceptance seed flag in production but permits an explicit isolated non-production seed", () => {
     const original = process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED;
     const originalNodeEnv = process.env.NODE_ENV;
     try {
@@ -27,6 +27,9 @@ describe("Chongqing Talent synthetic fixtures", () => {
       delete process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED;
       expect(createSeedData().users.some((user) => user.id === "user-parent-cq-talent-acceptance")).toBe(false);
       process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED = "1";
+      expect(createSeedData().users.some((user) => user.id === "user-parent-cq-talent-acceptance")).toBe(false);
+
+      process.env.NODE_ENV = "test";
       expect(createSeedData().users.some((user) => user.id === "user-parent-cq-talent-acceptance")).toBe(true);
     } finally {
       if (original === undefined) {
@@ -238,12 +241,19 @@ describe("Chongqing Talent synthetic fixtures", () => {
     }));
     expect(seed.matches).toContainEqual(expect.objectContaining({
       eventId: "event-cq-talent-demo-match-completed",
+      matchType: "friendly",
+      homeScore: 3,
+      awayScore: 2,
       status: "completed",
     }));
     expect(seed.matchRosters?.filter((roster) => roster.matchId === "match-cq-talent-demo-completed").map((roster) => roster.studentId))
       .toEqual(coachDemoRosterStudentIds);
-    expect(seed.matchEvents?.filter((event) => event.matchId === "match-cq-talent-demo-completed").map((event) => event.type))
-      .toEqual(["goal", "assist"]);
+    const completedMatchEvents = seed.matchEvents?.filter((event) => event.matchId === "match-cq-talent-demo-completed") ?? [];
+    expect(completedMatchEvents.map((event) => event.type))
+      .toEqual(["goal", "assist", "yellow_card", "save"]);
+    expect(completedMatchEvents.every((event) => coachDemoRosterStudentIds.includes(event.studentId))).toBe(true);
+    expect(completedMatchEvents.find((event) => event.type === "yellow_card")?.minute)
+      .not.toBe(completedMatchEvents.find((event) => event.type === "save")?.minute);
     expect(seed.matchPlayerNotes?.filter((note) => note.matchId === "match-cq-talent-demo-completed").map((note) => note.studentId))
       .toEqual(coachDemoRosterStudentIds);
     for (const studentId of coachDemoRosterStudentIds) {

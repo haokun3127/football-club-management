@@ -260,6 +260,30 @@ describe("coach match-event create request boundary", () => {
       globalThis.wx.request = originalRequest;
     }
   });
+
+  it("rejects a body-bearing 200 response so C6.1 retains its device-local draft", async () => {
+    const originalRequest = globalThis.wx.request;
+    globalThis.wx.request = ({ success }) => {
+      success({
+        statusCode: 200,
+        data: { event: { id: "server-event", studentId: "student-1", type: "goal", minute: 12 } },
+      });
+    };
+
+    try {
+      await expect(createCoachMatchEvent(
+        "event-match-1",
+        { studentId: "student-1", type: "goal", minute: 12 },
+        "match-event-stable-key",
+      )).rejects.toEqual({
+        code: "unexpected_status",
+        message: "Unexpected response status",
+        statusCode: 200,
+      });
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
 });
 
 describe("parent activity detail request boundary", () => {

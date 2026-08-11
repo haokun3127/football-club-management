@@ -1,0 +1,3 @@
+{"file":".trellis/tasks/08-12-08-12-coach-c6-match/research/sol-data-plan.md","reason":"Sol's read-only real-data, persistence and contract plan for C6/C6.1."}
+{"file":".trellis/tasks/08-12-08-12-coach-c6-match/design.md","reason":"Approved design/data boundaries, exact Figma targets and non-fabrication constraints."}
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Coach match-detail and match-event append API contract and authorization constraints."}
