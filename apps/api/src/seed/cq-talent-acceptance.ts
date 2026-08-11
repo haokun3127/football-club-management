@@ -7,6 +7,14 @@ const connectionId = "external-connection-wps-cq-talent";
 const importedAt = "2026-06-25T08:01:00.000Z";
 const acceptanceParentUserId = "user-parent-cq-talent-acceptance";
 const acceptanceParentId = "parent-cq-talent-acceptance";
+const acceptanceCoachId = "coach-cq-talent-acceptance-demo";
+const acceptanceDemoTeamId = "team-cq-talent-acceptance-demo";
+const acceptanceDemoEventIds = {
+  completedTraining: "event-cq-talent-demo-training-completed",
+  completedMatch: "event-cq-talent-demo-match-completed",
+  upcomingTraining: "event-cq-talent-demo-training-upcoming",
+  upcomingTacticalMatch: "event-cq-talent-demo-match-tactical",
+} as const;
 const talentAssessmentCatalog = createTalentEliteAssessmentCatalog();
 const talentRadarViewId = talentAssessmentCatalog.metricViews.find((view) => view.name.includes("核心能力雷达"))?.id;
 const talentRadarMetricIds = talentAssessmentCatalog.metricViewNodes
@@ -71,6 +79,7 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
     family.id,
     family.id === acceptanceFamilyId ? acceptanceParentId : `parent-${family.id}`,
   ]));
+  const acceptanceStudents = students.filter((student) => student.familyId === acceptanceFamilyId);
 
   return {
     users: [
@@ -87,7 +96,7 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
         id: familyUserIds.get(family.id)!,
         displayName: family.parentName,
         phone: family.phone,
-        roles: ["parent" as const],
+        roles: family.id === acceptanceFamilyId ? ["parent" as const, "coach" as const] : ["parent" as const],
         status: "active" as const,
         createdAt: now,
         updatedAt: now,
@@ -107,7 +116,7 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
         id: `club-member-${familyUserIds.get(family.id)!}`,
         clubId,
         userId: familyUserIds.get(family.id)!,
-        roles: ["parent" as const],
+        roles: family.id === acceptanceFamilyId ? ["parent" as const, "coach" as const] : ["parent" as const],
         status: "active" as const,
         createdAt: now,
         updatedAt: now,
@@ -131,7 +140,16 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
       status: "active" as const,
       createdAt: now,
       updatedAt: now,
-    })),
+    })).concat({
+      id: acceptanceCoachId,
+      clubId,
+      userId: acceptanceParentUserId,
+      name: "王教练（体验）",
+      specialties: ["双角色体验", "训练计划", "能力评测"],
+      status: "active" as const,
+      createdAt: now,
+      updatedAt: now,
+    }),
     teams: Array.from(teamIdByName.entries())
       .filter(([name]) => name !== "U10发展队")
       .map(([name, id]) => ({
@@ -144,7 +162,17 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
         status: "active" as const,
         createdAt: now,
         updatedAt: now,
-      })),
+      })).concat({
+        id: acceptanceDemoTeamId,
+        clubId,
+        name: "双角色体验队",
+        ageGroup: "U8-U9",
+        level: "development" as const,
+        defaultCoachId: acceptanceCoachId,
+        status: "active" as const,
+        createdAt: now,
+        updatedAt: now,
+      }),
     students: students.map((student) => ({
       id: student.id,
       clubId,
@@ -173,6 +201,16 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
       studentId: student.id,
       startsAt: membership.isPrimary ? "2026-06-01" : "2026-06-15",
       isPrimaryTeam: membership.isPrimary,
+      status: "active" as const,
+      createdAt: now,
+      updatedAt: now,
+    }))).concat(acceptanceStudents.map((student, index) => ({
+      id: `team-member-cq-talent-acceptance-demo-${index + 1}`,
+      clubId,
+      teamId: acceptanceDemoTeamId,
+      studentId: student.id,
+      startsAt: "2026-08-01",
+      isPrimaryTeam: false,
       status: "active" as const,
       createdAt: now,
       updatedAt: now,
@@ -225,6 +263,58 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
         createdAt: now,
         updatedAt: now,
       },
+      {
+        id: acceptanceDemoEventIds.completedTraining,
+        clubId,
+        type: "training" as const,
+        title: "演示 · 双角色体验队训练复盘",
+        timeRange: { startsAt: "2026-08-10T01:00:00.000Z", endsAt: "2026-08-10T02:30:00.000Z" },
+        primaryTeamId: acceptanceDemoTeamId,
+        ownerCoachId: acceptanceCoachId,
+        status: "completed" as const,
+        notes: "演示数据：签到、训练内容和能力测评回看。",
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: acceptanceDemoEventIds.completedMatch,
+        clubId,
+        type: "match" as const,
+        title: "演示 · 双角色体验队友谊赛",
+        timeRange: { startsAt: "2026-08-09T01:30:00.000Z", endsAt: "2026-08-09T03:00:00.000Z" },
+        primaryTeamId: acceptanceDemoTeamId,
+        ownerCoachId: acceptanceCoachId,
+        status: "completed" as const,
+        notes: "演示数据：比赛记录、球员表现和战术布置。",
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: acceptanceDemoEventIds.upcomingTraining,
+        clubId,
+        type: "training" as const,
+        title: "演示 · 双角色体验队本周训练",
+        timeRange: { startsAt: "2026-08-12T10:30:00.000Z", endsAt: "2026-08-12T12:00:00.000Z" },
+        primaryTeamId: acceptanceDemoTeamId,
+        ownerCoachId: acceptanceCoachId,
+        status: "scheduled" as const,
+        notes: "演示数据：可在教练端检查训练内容、点名和战术板。",
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: acceptanceDemoEventIds.upcomingTacticalMatch,
+        clubId,
+        type: "match" as const,
+        title: "演示 · 双角色体验队战术演练赛",
+        timeRange: { startsAt: "2026-08-13T10:30:00.000Z", endsAt: "2026-08-13T12:00:00.000Z" },
+        primaryTeamId: acceptanceDemoTeamId,
+        ownerCoachId: acceptanceCoachId,
+        status: "scheduled" as const,
+        notes: "演示数据：可在教练端保存阵型并验证重启后仍可读取。",
+        createdAt: now,
+        updatedAt: now,
+      },
     ],
     participants: [
       ...students.flatMap((student, index) => {
@@ -263,8 +353,124 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
           createdAt: now,
           updatedAt: now,
         })),
+      ...acceptanceStudents.flatMap((student, index) => [
+        {
+          id: `participant-cq-talent-demo-training-completed-${index + 1}`,
+          clubId,
+          eventId: acceptanceDemoEventIds.completedTraining,
+          studentId: student.id,
+          status: index === 0 ? "present" as const : "late" as const,
+          note: index === 0 ? "演示数据：已完成签到" : "演示数据：迟到 5 分钟",
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: `participant-cq-talent-demo-match-completed-${index + 1}`,
+          clubId,
+          eventId: acceptanceDemoEventIds.completedMatch,
+          studentId: student.id,
+          status: "present" as const,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: `participant-cq-talent-demo-training-upcoming-${index + 1}`,
+          clubId,
+          eventId: acceptanceDemoEventIds.upcomingTraining,
+          studentId: student.id,
+          status: "confirmed" as const,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: `participant-cq-talent-demo-match-tactical-${index + 1}`,
+          clubId,
+          eventId: acceptanceDemoEventIds.upcomingTacticalMatch,
+          studentId: student.id,
+          status: "confirmed" as const,
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]),
     ],
-    metricRecords: students.flatMap((student, index) => createMetricRecords(student, index)),
+    metricRecords: students.flatMap((student, index) => createMetricRecords(student, index)).concat(createAcceptanceDemoMetricRecords(acceptanceStudents)),
+    trainingSessions: [
+      {
+        id: "training-session-cq-talent-demo-completed",
+        clubId,
+        eventId: acceptanceDemoEventIds.completedTraining,
+        kind: "team" as const,
+        sessionPlanId: "session-plan-finishing",
+        intensity: "medium" as const,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: "training-session-cq-talent-demo-upcoming",
+        clubId,
+        eventId: acceptanceDemoEventIds.upcomingTraining,
+        kind: "team" as const,
+        sessionPlanId: "session-plan-finishing",
+        intensity: "medium" as const,
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
+    matches: [{
+      id: "match-cq-talent-demo-completed",
+      clubId,
+      eventId: acceptanceDemoEventIds.completedMatch,
+      matchType: "friendly" as const,
+      opponentName: "重庆青年体验队",
+      homeScore: 3,
+      awayScore: 2,
+      status: "completed" as const,
+      createdAt: now,
+      updatedAt: now,
+    }],
+    matchRosters: acceptanceStudents.map((student, index) => ({
+      id: `match-roster-cq-talent-demo-${index + 1}`,
+      clubId,
+      matchId: "match-cq-talent-demo-completed",
+      studentId: student.id,
+      teamId: acceptanceDemoTeamId,
+      started: true,
+      minutesPlayed: index === 0 ? 60 : 48,
+      position: index === 0 ? "FW" : "MF",
+      createdAt: now,
+      updatedAt: now,
+    })),
+    matchEvents: [{
+      id: "match-event-cq-talent-demo-goal-1",
+      clubId,
+      matchId: "match-cq-talent-demo-completed",
+      type: "goal" as const,
+      studentId: acceptanceStudents[0]!.id,
+      minute: 22,
+      linkedMetricId: "metric-goals",
+      createdAt: now,
+      updatedAt: now,
+    }, {
+      id: "match-event-cq-talent-demo-assist-1",
+      clubId,
+      matchId: "match-cq-talent-demo-completed",
+      type: "assist" as const,
+      studentId: acceptanceStudents[1]!.id,
+      minute: 22,
+      linkedMetricId: "metric-assists",
+      createdAt: now,
+      updatedAt: now,
+    }],
+    matchPlayerNotes: acceptanceStudents.map((student, index) => ({
+      id: `match-note-cq-talent-demo-${index + 1}`,
+      clubId,
+      matchId: "match-cq-talent-demo-completed",
+      studentId: student.id,
+      coachId: acceptanceCoachId,
+      note: index === 0 ? "演示数据：前场跑位积极，终结果断。" : "演示数据：中场衔接流畅，传接选择合理。",
+      createdAt: now,
+      updatedAt: now,
+    })),
     sessionObservations: students.slice(0, 40).map((student, index) => ({
       id: `session-observation-cq-talent-import-${String(index + 1).padStart(3, "0")}`,
       clubId,
@@ -449,6 +655,25 @@ function createMetricRecords(student: CqTalentSyntheticStudent, index: number) {
     },
     ...radarRecords,
   ];
+}
+
+function createAcceptanceDemoMetricRecords(students: CqTalentSyntheticStudent[]) {
+  return students.flatMap((student, studentIndex) => talentRadarMetricIds.map((metricId, metricIndex) => ({
+    id: `metric-record-cq-talent-demo-${student.id}-${metricIndex + 1}`,
+    clubId,
+    studentId: student.id,
+    metricId,
+    value: { kind: "measurement" as const, value: 70 + ((studentIndex * 5 + metricIndex * 3) % 18), unit: "score" },
+    source: "assessment" as const,
+    occurredAt: "2026-08-10T02:15:00.000Z",
+    eventId: acceptanceDemoEventIds.completedTraining,
+    templateVersionId: "assessment-template-version-cq-talent-elite-20260326",
+    recordedByCoachId: acceptanceCoachId,
+    visibility: "parent" as const,
+    note: "演示数据：双角色体验队本周能力评测。",
+    createdAt: now,
+    updatedAt: now,
+  })));
 }
 
 function coachIdByTeamName(teamName: string) {

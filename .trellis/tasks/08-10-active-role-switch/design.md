@@ -32,6 +32,12 @@ The role switch must not be discoverable only through account settings. The onli
 
 The mini-program renders either entry only when the restored authenticated session's `availableRoles` includes the opposite role. Tapping it keeps the same server-confirmed `switchActiveRole` flow: request the desired role, persist the complete rotated session response, then route to that response's role. A client never exposes a switch for a single-role session and does not locally assign a role.
 
+## Production Acceptance Demo Scenario
+
+The existing acceptance-family user is the only production demo identity for this task. Its source-controlled seed becomes an active `parent` + `coach` membership, retains the same parent profile and two guardian-scoped children, and gains one active coach profile and a non-primary `双角色体验队`. All scenario IDs are stable so boot seeding is idempotent and a container restart re-applies the intended membership rather than undoing a direct database-only patch.
+
+The scenario adds explicitly labelled August 2026 data: one completed training with present/late attendance, one completed friendly match with roster, goal, assist, and coach notes, one upcoming training using the existing `session-plan-finishing`, one scheduled friendly match reserved for tactical-board saving, and current eight-dimension assessment records for the two existing children. A tactical board is deliberately saved through the deployed coach route after deployment, then read back after an API restart; it is not faked in mini-program state. Before deployment, take a timestamped backup of the production SQLite database volume. Do not alter any other family, existing coach, or unrelated event.
+
 ## Risks and Rollback
 
 The phone authorization guard task has related login-page changes and must be used as the baseline rather than overwritten. The additive API field and durable session semantics land before any selector UI. `coach/account` remains unmodified because it has an existing visual contract; the coach switch control belongs in `coach/me`. Roll back the mini-program selector and switching controls before API layers if necessary; do not drop the additive session table in production.

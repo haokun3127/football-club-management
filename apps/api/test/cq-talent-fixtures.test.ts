@@ -136,6 +136,54 @@ describe("Chongqing Talent synthetic fixtures", () => {
       && allMemberships.some((membership) => membership.userId === coach.userId && membership.roles.includes("coach")),
     )).toBe(true);
   });
+
+  it("makes the acceptance family a restart-safe dual-role demo with current operational data", () => {
+    const seed = createCqTalentAcceptanceSeed();
+    const acceptanceUserId = "user-parent-cq-talent-acceptance";
+    const acceptanceStudentIds = ["student-cq-talent-001", "student-cq-talent-002"];
+    const demoEventIds = [
+      "event-cq-talent-demo-training-completed",
+      "event-cq-talent-demo-match-completed",
+      "event-cq-talent-demo-training-upcoming",
+      "event-cq-talent-demo-match-tactical",
+    ];
+
+    expect(seed.users?.find((user) => user.id === acceptanceUserId)?.roles).toEqual(["parent", "coach"]);
+    expect(seed.clubMemberships?.find((membership) => membership.userId === acceptanceUserId)?.roles).toEqual(["parent", "coach"]);
+    expect(seed.coaches).toContainEqual(expect.objectContaining({
+      id: "coach-cq-talent-acceptance-demo",
+      userId: acceptanceUserId,
+      status: "active",
+    }));
+    expect(seed.teams).toContainEqual(expect.objectContaining({
+      id: "team-cq-talent-acceptance-demo",
+      defaultCoachId: "coach-cq-talent-acceptance-demo",
+      status: "active",
+    }));
+    expect(seed.teamMembers?.filter((member) => member.teamId === "team-cq-talent-acceptance-demo").map((member) => member.studentId))
+      .toEqual(acceptanceStudentIds);
+    expect(seed.events?.filter((event) => demoEventIds.includes(event.id)).map((event) => event.id))
+      .toEqual(demoEventIds);
+    expect(seed.participants?.filter((participant) => demoEventIds.includes(participant.eventId))).toHaveLength(8);
+    expect(seed.events).toContainEqual(expect.objectContaining({
+      id: "event-cq-talent-demo-match-tactical",
+      type: "match",
+      status: "scheduled",
+    }));
+    expect(seed.trainingSessions).toContainEqual(expect.objectContaining({
+      eventId: "event-cq-talent-demo-training-upcoming",
+      sessionPlanId: "session-plan-finishing",
+    }));
+    expect(seed.matches).toContainEqual(expect.objectContaining({
+      eventId: "event-cq-talent-demo-match-completed",
+      status: "completed",
+    }));
+    expect(seed.metricRecords?.some((record) =>
+      acceptanceStudentIds.includes(record.studentId)
+      && record.recordedByCoachId === "coach-cq-talent-acceptance-demo"
+      && record.occurredAt.startsWith("2026-08-"),
+    )).toBe(true);
+  });
 });
 
 function countValues(values: Iterable<number>) {
