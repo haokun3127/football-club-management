@@ -15,6 +15,12 @@
 - The displayed values (`4`, `3`, `1`) came from the active account's live coach-home response and are not Figma fixtures. Screenshot capture omits the platform menu capsule, so it verifies page geometry but not physical capsule overlap.
 - C7 `233:2` was also routed with a coach session, but its available event ID returned the page's honest “read failed” state; it is not recorded as a ready-state visual acceptance.
 
+## 2026-08-11 Coach Runtime Sampling and Workflow Headers
+
+- C9 `93:924` and C11 `93:1002` were captured from the current authenticated coach session at `C:\Users\ASUS\AppData\Local\Temp\cq-coach-audit-20260811\C9-team-current.png` and `C11-test-tasks-current.png`. Their header, card, member/task, and bottom-navigation geometry is present. Current scope returns two members and two assessment tasks; unsupported Figma sample members and the task-creation affordance remain absent rather than fabricated.
+- C3, C4.1, C5.1, C10.1, and C15.1 now use the Figma-required left-title navigation geometry and fixed 88px safe-area envelope. C10.1's neutral header background and C15.1's pink left-title header were aligned without changing any capability or write contract.
+- Latest full workspace check: domain `19/19`, mini-program `293/293`, API `85/85`; all TypeScript checks and `git diff --check` passed. C7 ready-state screenshot remains data-blocked, not passed by inference.
+
 ## 2026-08-11 Dual Parent/Coach Role Switching: Backend Foundation
 
 - Added SQLite-backed app-client sessions with SHA-256 token storage, atomic token rotation, route-bound bearer revalidation, entrypoint-filtered `availableRoles`, and the server-confirmed role-selection endpoint.
