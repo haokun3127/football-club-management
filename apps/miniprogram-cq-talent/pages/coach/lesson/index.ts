@@ -1,6 +1,6 @@
 import { confirmCoachLesson, getCoachLessonConfirmation, getCoachWorkbench } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { formatCalendarDate, formatTimeRange, resolveNavInset } from "../../../utils/presentation";
+import { formatCalendarDate, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachLessonConfirmation, CoachWorkbench, LoadState } from "../../../utils/types";
 
 type LessonRosterItem = {
@@ -12,6 +12,7 @@ type LessonRosterItem = {
 
 interface LessonPageData {
   navInset: number;
+  menuInset: number;
   state: LoadState;
   message: string;
   retryLabel: string;
@@ -36,6 +37,7 @@ interface LessonPageData {
 Page<LessonPageData>({
   data: {
     navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     state: "loading",
     message: "正在读取课时记录",
     retryLabel: "",

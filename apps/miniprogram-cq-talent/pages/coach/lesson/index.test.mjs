@@ -17,6 +17,7 @@ vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/presentation", () => ({
   formatCalendarDate: (value) => String(value).slice(0, 10),
   formatTimeRange: () => "09:00-10:00",
+  resolveMenuInset: () => 0,
   resolveNavInset: () => 0,
 }));
 
@@ -195,5 +196,11 @@ describe("coach lesson confirmation", () => {
     expect(controller).not.toContain("correctCoachLesson");
     expect(controller).not.toContain("correctLesson");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
+  });
+
+  it("keeps C5 navigation compact and clear of the system menu", () => {
+    expect(controller).toContain("resolveMenuInset");
+    expect(template).toContain('padding-right:{{menuInset}}px');
+    expect(styles).toMatch(/\.c5-nav\s*\{[^}]*padding:\s*0\s+44rpx/s);
   });
 });

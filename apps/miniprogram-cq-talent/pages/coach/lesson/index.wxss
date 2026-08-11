@@ -8,7 +8,7 @@
   box-sizing: content-box;
   align-items: center;
   height: 176rpx;
-  padding: 28rpx 44rpx;
+  padding: 0 44rpx;
   background: #fceeef;
 }
 
