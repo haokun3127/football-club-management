@@ -209,5 +209,6 @@ describe("coach attendance", () => {
     expect(controller).toContain("resolveMenuInset");
     expect(template).toContain('padding-right:{{menuInset}}px');
     expect(stylesheet).toMatch(/\.c4-nav\s*\{[^}]*padding:\s*0\s+44rpx/s);
+    expect(stylesheet).toMatch(/\.c4-nav\s*\{[^}]*box-sizing:\s*border-box/s);
   });
 });

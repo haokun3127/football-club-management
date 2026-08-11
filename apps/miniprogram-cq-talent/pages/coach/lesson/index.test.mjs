@@ -202,5 +202,6 @@ describe("coach lesson confirmation", () => {
     expect(controller).toContain("resolveMenuInset");
     expect(template).toContain('padding-right:{{menuInset}}px');
     expect(styles).toMatch(/\.c5-nav\s*\{[^}]*padding:\s*0\s+44rpx/s);
+    expect(styles).toMatch(/\.c5-nav\s*\{[^}]*box-sizing:\s*border-box/s);
   });
 });

@@ -28,6 +28,7 @@ globalThis.wx = { reLaunch: vi.fn() };
 await import("./index.ts");
 
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
+const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 
 function createPageInstance(data = {}) {
   const instance = {
@@ -187,5 +188,6 @@ describe("coach schedule home", () => {
     const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
     expect(controller).toContain("resolveMenuInset");
     expect(template).toContain('padding-right:{{menuInset}}px');
+    expect(stylesheet).toMatch(/\.c1-nav\s*\{[^}]*box-sizing:\s*border-box/s);
   });
 });
