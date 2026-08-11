@@ -122,6 +122,7 @@ describe("coach attendance success", () => {
   });
 
   it("keeps the template state-gated, data-driven, and free of unsafe WXML expressions", () => {
+    expect(template).toContain('<app-header title="出勤管理" title-align="left" show-back />');
     expect(template).toContain('wx:elif="{{state === \'ready\'}}"');
     expect(template).toContain('bindtap="openWorkbench"');
     expect(template).toContain('bindtap="openSchedule"');

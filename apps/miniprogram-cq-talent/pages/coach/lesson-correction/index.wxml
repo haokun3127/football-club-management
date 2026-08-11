@@ -1,5 +1,5 @@
 <view class="correction-page">
-  <app-header title="课时更正" show-back />
+  <app-header title="课时更正" title-align="left" show-back />
   <view class="correction-page__body">
     <status-view
       state="{{state}}"

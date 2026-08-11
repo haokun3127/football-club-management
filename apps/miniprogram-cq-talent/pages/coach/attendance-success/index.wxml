@@ -1,5 +1,5 @@
 <view class="success-page">
-  <app-header title="出勤管理" show-back />
+  <app-header title="出勤管理" title-align="left" show-back />
 
   <view class="success-page__body" wx:if="{{state === 'loading'}}">
     <view class="page-state">正在读取出勤记录</view>

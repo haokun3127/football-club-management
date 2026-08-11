@@ -175,6 +175,7 @@ describe("coach lesson correction", () => {
   });
 
   it("uses safe precomputed template data without a fabricated anomaly source or Figma samples", () => {
+    expect(template).toContain('<app-header title="课时更正" title-align="left" show-back />');
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
     expect(template).not.toContain("系统差异");
     expect(template).not.toContain("课时记录异常");
