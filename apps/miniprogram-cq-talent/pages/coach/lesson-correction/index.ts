@@ -8,6 +8,8 @@ type LessonDelta = -0.5 | 0 | 0.5;
 interface CorrectionRow {
   studentId: string;
   name: string;
+  avatarLetter: string;
+  avatarColor: string;
   balanceText: string;
   delta: LessonDelta;
   deltaLabel: string;
@@ -23,7 +25,6 @@ interface PageData {
   eventId: string;
   rows: CorrectionRow[];
   hasRows: boolean;
-  reason: string;
   canSubmit: boolean;
   submitting: boolean;
   hasSubmitError: boolean;
@@ -39,7 +40,6 @@ Page<PageData>({
     eventId: "",
     rows: [],
     hasRows: false,
-    reason: "",
     canSubmit: false,
     submitting: false,
     hasSubmitError: false,
@@ -84,7 +84,7 @@ Page<PageData>({
         getCoachWorkbench(eventId),
         getCoachLessonConfirmation(eventId),
       ]);
-      const rows = mergeCorrectionRows(workbench, confirmation, this.data.rows, this.data.reason);
+      const rows = mergeCorrectionRows(workbench, confirmation, this.data.rows);
       const hasRows = rows.length > 0;
       this.setData({
         state: hasRows ? "ready" : "empty",
@@ -121,22 +121,11 @@ Page<PageData>({
     const rows = this.data.rows.map((row: CorrectionRow) => {
       if (row.studentId !== studentId) return row;
       const delta: LessonDelta = selectedDelta;
-      return updateRowOperation({ ...row, delta, deltaLabel: formatDelta(delta) }, this.data.reason);
+      return updateRowOperation({ ...row, delta, deltaLabel: formatDelta(delta) });
     });
     this.setData({
       rows,
       canSubmit: hasSelection(rows),
-      hasSubmitError: false,
-      submitError: "",
-    });
-  },
-
-  onReasonInput(event: { detail: { value: string } }) {
-    const reason = event.detail.value;
-    const rows = this.data.rows.map((row: CorrectionRow) => updateRowOperation(row, reason));
-    this.setData({
-      reason,
-      rows,
       hasSubmitError: false,
       submitError: "",
     });
@@ -160,11 +149,9 @@ Page<PageData>({
     this.setData({ submitting: true, hasSubmitError: false, submitError: "" });
     const savedStudentIds = new Set<string>();
     let failure: unknown;
-    const reason = this.data.reason.trim() || undefined;
-
     for (const row of pendingRows) {
       try {
-        await correctCoachLesson(this.data.eventId, row.studentId, row.delta as Exclude<LessonDelta, 0>, reason, row.operationKey);
+        await correctCoachLesson(this.data.eventId, row.studentId, row.delta as Exclude<LessonDelta, 0>, undefined, row.operationKey);
         savedStudentIds.add(row.studentId);
       } catch (error) {
         failure = error;
@@ -206,7 +193,6 @@ function mergeCorrectionRows(
   workbench: CoachWorkbench,
   confirmation: CoachLessonConfirmation,
   existingRows: CorrectionRow[],
-  reason: string,
 ) {
   const confirmationIds = new Set(confirmation.participants.map((participant) => participant.studentId));
   const ledgerByStudentId = new Map(confirmation.ledgers.map((ledger) => [ledger.studentId, ledger]));
@@ -218,24 +204,27 @@ function mergeCorrectionRows(
       const previous = previousByStudentId.get(student.studentId);
       const ledger = ledgerByStudentId.get(student.studentId);
       const balance = ledger?.remainingLessons ?? ledger?.balance ?? student.remainingLessons;
+      const name = student.name && student.name !== "学员" ? student.name : "姓名待同步";
       return updateRowOperation({
         studentId: student.studentId,
-        name: student.name && student.name !== "学员" ? student.name : "姓名待同步",
+        name,
+        avatarLetter: name.slice(0, 1),
+        avatarColor: correctionAvatarColor(student.studentId),
         balanceText: typeof balance === "number" ? `剩余 ${balance} 课时` : "课时余额待核对",
         delta: previous?.delta ?? 0,
         deltaLabel: formatDelta(previous?.delta ?? 0),
         operationKey: previous?.operationKey ?? "",
         operationSignature: previous?.operationSignature ?? "",
-      }, reason);
+      });
     });
 }
 
-function updateRowOperation(row: CorrectionRow, reason: string): CorrectionRow {
+function updateRowOperation(row: CorrectionRow): CorrectionRow {
   if (row.delta === 0) {
     return clearRowOperation(row);
   }
 
-  const operationSignature = `${row.studentId}|${row.delta}|${reason.trim()}`;
+  const operationSignature = `${row.studentId}|${row.delta}`;
   if (row.operationKey && row.operationSignature === operationSignature) {
     return row;
   }
@@ -263,6 +252,13 @@ function formatDelta(delta: LessonDelta) {
 
 function hasSelection(rows: CorrectionRow[]) {
   return rows.some((row) => row.delta !== 0);
+}
+
+function correctionAvatarColor(studentId: string) {
+  const colors = ["#dbeafe", "#fef3c7", "#dcfce7", "#fce7f3"];
+  let total = 0;
+  for (let index = 0; index < studentId.length; index += 1) total += studentId.charCodeAt(index);
+  return colors[total % colors.length] || "#f3f4f6";
 }
 
 function correctionFailureMessage(error: unknown, savedCount: number) {

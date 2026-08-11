@@ -1,6 +1,6 @@
 import { confirmCoachLesson, getCoachLessonConfirmation, getCoachWorkbench } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { formatCalendarDate, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import { formatCalendarDate, formatTimeRange } from "../../../utils/presentation";
 import type { CoachLessonConfirmation, CoachWorkbench, LoadState } from "../../../utils/types";
 
 type LessonRosterItem = {
@@ -8,11 +8,10 @@ type LessonRosterItem = {
   name: string;
   avatarLetter: string;
   balanceText: string;
+  lessonAmountText: string;
 };
 
 interface LessonPageData {
-  navInset: number;
-  menuInset: number;
   state: LoadState;
   message: string;
   retryLabel: string;
@@ -29,15 +28,12 @@ interface LessonPageData {
   selectionCount: number;
   canConfirm: boolean;
   saving: boolean;
-  lessonNote: string;
   hasSubmitError: boolean;
   submitError: string;
 }
 
 Page<LessonPageData>({
   data: {
-    navInset: resolveNavInset(),
-    menuInset: resolveMenuInset(),
     state: "loading",
     message: "正在读取课时记录",
     retryLabel: "",
@@ -54,7 +50,6 @@ Page<LessonPageData>({
     selectionCount: 0,
     canConfirm: false,
     saving: false,
-    lessonNote: "",
     hasSubmitError: false,
     submitError: "",
   },
@@ -180,12 +175,6 @@ Page<LessonPageData>({
   retry() {
     this.load(this.data.eventId);
   },
-  goBack() {
-    wx.navigateBack();
-  },
-  onLessonNoteInput(event: { detail: { value: string } }) {
-    this.setData({ lessonNote: event.detail.value, hasSubmitError: false, submitError: "" });
-  },
   async confirmLesson() {
     if (!this.data.eventId || this.data.saving) return;
     const studentIds = this.data.selectedStudentIds.filter(Boolean);
@@ -196,7 +185,7 @@ Page<LessonPageData>({
 
     this.setData({ saving: true, hasSubmitError: false, submitError: "" });
     try {
-      await confirmCoachLesson(this.data.eventId, studentIds, this.data.lessonNote);
+      await confirmCoachLesson(this.data.eventId, studentIds);
       const reloaded = await this.load(this.data.eventId);
       if (reloaded) wx.showToast({ title: "课时确认已提交", icon: "success" });
     } catch {
@@ -228,6 +217,7 @@ function mergeLessonRoster(workbench: CoachWorkbench, confirmation: CoachLessonC
       name,
       avatarLetter: name === "姓名待同步" ? "?" : name.slice(0, 1),
       balanceText: typeof balance === "number" ? `剩余 ${balance} 课时` : "课时余额待核对",
+      lessonAmountText: "1课时",
     });
   }
 

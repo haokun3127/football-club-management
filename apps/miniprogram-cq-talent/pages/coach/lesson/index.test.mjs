@@ -138,8 +138,8 @@ describe("coach lesson confirmation", () => {
       rosterCount: 2,
       selectedStudentIds: ["student-1", "student-2"],
       roster: [
-        { studentId: "student-1", name: "Athlete One", balanceText: "剩余 7 课时" },
-        { studentId: "student-2", name: "Athlete Two", balanceText: "剩余 5 课时" },
+        { studentId: "student-1", name: "Athlete One", balanceText: "剩余 7 课时", lessonAmountText: "1课时" },
+        { studentId: "student-2", name: "Athlete Two", balanceText: "剩余 5 课时", lessonAmountText: "1课时" },
       ],
     });
     expect(page.data.roster.map((student) => student.studentId)).not.toContain("student-workbench-only");
@@ -154,9 +154,8 @@ describe("coach lesson confirmation", () => {
 
     mocks.confirmCoachLesson.mockRejectedValueOnce(new Error("raw API details must not surface"));
     const page = await loadReadyPage();
-    page.onLessonNoteInput({ detail: { value: "Coach note" } });
     await page.confirmLesson();
-    expect(mocks.confirmCoachLesson).toHaveBeenCalledWith("event-1", ["student-1", "student-2"], "Coach note");
+    expect(mocks.confirmCoachLesson).toHaveBeenCalledWith("event-1", ["student-1", "student-2"]);
     expect(page.data).toMatchObject({ state: "ready", saving: false, hasSubmitError: true, submitError: "课时确认失败，请稍后重试。" });
     expect(page.data.roster).toHaveLength(2);
     expect(globalThis.wx.showToast).not.toHaveBeenCalled();
@@ -198,10 +197,24 @@ describe("coach lesson confirmation", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 
-  it("keeps C5 navigation compact and clear of the system menu", () => {
-    expect(controller).toContain("resolveMenuInset");
-    expect(template).toContain('padding-right:{{menuInset}}px');
-    expect(styles).toMatch(/\.c5-nav\s*\{[^}]*padding:\s*0\s+44rpx/s);
-    expect(styles).toMatch(/\.c5-nav\s*\{[^}]*box-sizing:\s*border-box/s);
+  it("uses the shared compact header instead of a page-owned system-menu layout", () => {
+    expect(template).toContain('<app-header theme="soft" title="课时确认" title-align="left" show-back />');
+    expect(template).not.toContain('class="c5-nav"');
+    expect(pageConfig).toContain('"app-header"');
+    expect(controller).not.toContain("resolveMenuInset");
+    expect(controller).not.toContain("resolveNavInset");
+  });
+
+  it("uses the C5 Figma header and compact confirmation hierarchy without a non-Figma note card", () => {
+    expect(template).toContain('<app-header theme="soft" title="课时确认" title-align="left" show-back />');
+    expect(template).not.toContain('class="c5-nav"');
+    expect(template).not.toContain('class="lesson-note-card"');
+    expect(template).not.toContain('class="c5-confirm-bar__hint"');
+    expect(template).not.toContain('class="c5-row__sub"');
+    expect(pageConfig).toContain('"app-header"');
+    expect(controller).not.toContain("resolveMenuInset");
+    expect(controller).not.toContain("resolveNavInset");
+    expect(styles).toContain("min-height: 104rpx");
+    expect(styles).toContain("bottom: 140rpx");
   });
 });

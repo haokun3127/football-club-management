@@ -1,10 +1,5 @@
 <view class="c5">
-  <view class="c5-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="c5-nav__left" bindtap="goBack">
-      <view class="c5-nav__back">‹</view>
-      <view class="c5-nav__title">课时确认</view>
-    </view>
-  </view>
+  <app-header theme="soft" title="课时确认" title-align="left" show-back />
 
   <view class="c5-body">
     <status-view state="{{state}}" title="课时确认" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
@@ -24,17 +19,9 @@
         </view>
         <view wx:for="{{roster}}" wx:key="studentId" class="c5-row">
           <view class="c5-row__avatar">{{item.avatarLetter}}</view>
-          <view class="c5-row__info">
-            <view class="c5-row__name">{{item.name}}</view>
-            <view class="c5-row__sub">{{item.balanceText}}</view>
-          </view>
-          <view class="c5-chip">本次扣除 1 课时</view>
+          <view class="c5-row__name">{{item.name}}</view>
+          <view class="c5-chip">{{item.lessonAmountText}}</view>
         </view>
-      </view>
-
-      <view class="lesson-note-card">
-        <view class="section-title">本次备注</view>
-        <textarea class="lesson-note" placeholder="本次课时确认备注，可选" value="{{lessonNote}}" disabled="{{saving}}" bindinput="onLessonNoteInput" />
       </view>
 
       <view wx:if="{{hasSubmitError}}" class="submit-error">{{submitError}}</view>
@@ -42,7 +29,6 @@
   </view>
 
   <view wx:if="{{state === 'ready' && hasRoster}}" class="c5-confirm-bar">
-    <view class="c5-confirm-bar__hint">确认 {{selectionCount}} 名学员，每人扣除 1 课时</view>
     <button class="c5-confirm-bar__button" loading="{{saving}}" disabled="{{saving || !canConfirm}}" bindtap="confirmLesson">确认全部</button>
   </view>
 

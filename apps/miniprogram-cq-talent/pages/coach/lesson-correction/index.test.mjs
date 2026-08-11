@@ -146,10 +146,6 @@ describe("coach lesson correction", () => {
     mocks.correctCoachLesson.mockRejectedValue({ code: "network_error" });
     await page.submit();
     expect(mocks.correctCoachLesson.mock.calls[1][4]).toBe(firstKey);
-
-    page.onReasonInput({ detail: { value: "Updated note" } });
-    await page.submit();
-    expect(mocks.correctCoachLesson.mock.calls[2][4]).not.toBe(firstKey);
   });
 
   it("saves serially, stops after a partial failure, rereads, and only returns after full success", async () => {
@@ -175,14 +171,34 @@ describe("coach lesson correction", () => {
   });
 
   it("uses safe precomputed template data without a fabricated anomaly source or Figma samples", () => {
-    expect(template).toContain('<app-header title="课时更正" title-align="left" show-back />');
+    expect(template).toContain('<app-header theme="soft" title="课时更正" title-align="left" show-back />');
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
     expect(template).not.toContain("系统差异");
+    expect(template).toContain("课时记录更正");
     expect(template).not.toContain("课时记录异常");
     expect(template).not.toContain("陈小宇");
     expect(template).not.toContain("王一涵");
     expect(template).not.toContain("1.5");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("error.message");
+  });
+
+  it("uses the C5.1 Figma soft header and fixed correction action above the coach tab bar", () => {
+    const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
+    expect(template).toContain('<app-header theme="soft" title="课时更正" title-align="left" show-back />');
+    expect(template).toContain('class="lesson-correction-submit"');
+    expect(styles).toContain("bottom: 140rpx");
+    expect(styles).toContain("min-height: 104rpx");
+  });
+
+  it("renders Figma-like compact correction rows from precomputed real student identity fields", () => {
+    const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
+    expect(template).toContain('class="student-row__avatar"');
+    expect(template).toContain('{{item.avatarLetter}}');
+    expect(template).toContain('background: {{item.avatarColor}}');
+    expect(template).not.toContain('class="reason-card"');
+    expect(controller).toContain("avatarColor");
+    expect(styles).toContain("width: 56rpx");
+    expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 });

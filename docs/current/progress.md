@@ -514,3 +514,10 @@
 - 数据契约：`confirmed` / `invited` 属于活动 RSVP，进入 C4 时被规范为 `pending`，因此教练必须选择真实出勤状态后才能写入；写入层仍只接受 `present`、`absent`、`late`、`leave_requested`、`excused`。显式空备注会传到 API，允许真实清除已存备注。
 - Opt-in acceptance seed 的完成训练现在有 16 名真实队员：10 到课、2 迟到、2 缺席、1 请假、1 免扣；未来训练的 16 个 RSVP 仍是后端持久化 `confirmed`，供 C4 演示待点名。新增 file-backed SQLite 回归：coach workbench 读到完整分布，真实 PUT 后重新 GET，再关闭和重开数据库后仍读回相同状态与备注。家长投影继续严格只有两名被监护孩子。
 - 验证：先记录 RSVP/空备注/状态分布的失败测试，后通过小程序 21 项聚焦测试、API 59 项聚焦测试、两端 typecheck 与 `git diff --check`；提交前完整仓库门禁亦通过：领域 19/19、小程序 297/297、API 85/85。本批尚未取得可信的 C4/C4.1/C4.2 运行时截图，因此不作视觉验收完成结论。
+
+## 2026-08-12 C5 课时确认与更正真实数据收口
+
+- 在线 Figma 唯一基准：`zZ6wKyOHKcO4UYXDd9jGwv / 93:734 / C5 Lesson Confirm` 与 `93:765 / C5.1 Lesson Correction`，均为 `375x812`。C5 复用粉色 88px 顶栏、深色活动摘要、紧凑名单、52px 确认按钮和教练 Tab；C5.1 复用警示卡、紧凑可更正名单、真实学员标识和底部保存区。
+- 数据边界：C5 继续只调用既有 `GET workbench` + `GET lesson-confirmation`，写入仍为既有 `POST lesson-confirmation`；C5.1 写入仍为既有带幂等键的 `PATCH lesson-confirmation`。角色守卫、BFF 的 coach/event 授权、持久化账本和写后重新读取均未替换。Figma 没有备注/更正原因输入，页面不再渲染它们；服务端原有审计默认值与可选字段契约仍保留，未加入伪造说明。
+- 演示数据：opt-in acceptance SQLite 种子已有 16 名教练可见学员及真实课时余额；即将开始的训练可经正常确认 API 产生账本记录，随后可经正常 PATCH 更正。种子为 insert-if-absent，只影响全新验收数据库；本批未重置、迁移或修改任何线上数据库。
+- 验证：先记录 C5/C5.1 Figma 结构的失败测试，再通过页面 Vitest 15/15、API lesson/seed 相关回归 59/59、两端 typecheck 和完整仓库门禁：领域 19/19、小程序 300/300、API 85/85；`git diff --check` 通过。尚未取得新的可信 375x812 运行时截图，故不作视觉验收完成结论。

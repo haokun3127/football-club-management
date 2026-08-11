@@ -1,5 +1,5 @@
 <view class="correction-page">
-  <app-header title="课时更正" title-align="left" show-back />
+  <app-header theme="soft" title="课时更正" title-align="left" show-back />
   <view class="correction-page__body">
     <status-view
       state="{{state}}"
@@ -12,16 +12,18 @@
     <block wx:if="{{state === 'ready' && hasRows}}">
       <view class="correction-intro">
         <view class="correction-intro__title">课时记录更正</view>
-        <view class="correction-intro__text">请核对活动参与者与当前课时余额后再保存。</view>
+        <view class="correction-intro__text">请核对以下学员的课时信息后再保存</view>
       </view>
 
       <view class="student-card">
         <view class="student-card__title">可更正学员</view>
         <view wx:for="{{rows}}" wx:key="studentId" class="student-row">
+          <view class="student-row__avatar" style="background: {{item.avatarColor}}">{{item.avatarLetter}}</view>
           <view class="student-row__info">
             <view class="student-row__name">{{item.name}}</view>
             <view class="student-row__balance">{{item.balanceText}}</view>
           </view>
+          <view class="student-row__tag">课时调整</view>
           <view class="student-row__stepper">
             <view class="student-row__button" data-student-id="{{item.studentId}}" data-direction="{{-1}}" bindtap="adjustDelta">-</view>
             <view class="student-row__delta {{item.delta !== 0 ? 'student-row__delta--changed' : ''}}">{{item.deltaLabel}}</view>
@@ -30,14 +32,11 @@
         </view>
       </view>
 
-      <view class="reason-card">
-        <view class="reason-card__title">更正原因（可选）</view>
-        <textarea class="reason-card__input" value="{{reason}}" maxlength="200" placeholder="填写本次更正原因" bindinput="onReasonInput" />
-      </view>
-
       <view wx:if="{{hasSubmitError}}" class="submit-error">{{submitError}}</view>
-      <view class="submit-button {{!canSubmit || submitting ? 'submit-button--disabled' : ''}}" bindtap="submit">{{submitting ? '保存中' : '保存更正'}}</view>
     </block>
+  </view>
+  <view wx:if="{{state === 'ready' && hasRows}}" class="lesson-correction-submit">
+    <button class="lesson-correction-submit__button" loading="{{submitting}}" disabled="{{!canSubmit || submitting}}" bindtap="submit">保存更正</button>
   </view>
   <role-tabbar role="coach" active="schedule" />
 </view>

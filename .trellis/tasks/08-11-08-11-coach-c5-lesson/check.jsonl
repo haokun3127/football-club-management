@@ -1,0 +1,3 @@
+{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python3 .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Review verifies coach-only BFF authorization is unchanged and no parent roster projection is added."}
+{"file":".trellis/tasks/08-11-08-11-coach-c5-lesson/implement.md","reason":"Review verifies scope, controlled SQLite testing and static WXML constraints."}
