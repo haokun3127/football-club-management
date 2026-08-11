@@ -6,6 +6,12 @@
 - 隔离的开发验收 SQLite 可通过 `FCM_CQ_TALENT_ACCEPTANCE_SEED=1` 提供 16 名教练可见队员、6 场活动、完整出勤分布、8 维指标、比赛事件和战术名单。生产模式被代码禁止加载该 seed，不能用该变量对共享/生产数据库“补数据”。
 - 本轮只读实测 `https://cqtc.pomi.tech/health` 正常且 OpenAPI 含所需教练路由；健康检查不能证明远端库此刻包含全部演示记录。生产数据核查需使用真实教练会话做只读 GET；任何备份、导入、迁移、重启或写入应另建可 dry-run、可回滚的部署任务。
 
+## 2026-08-12 C13 学员雷达安全区顶栏收口
+
+- 在线 Figma 基准：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1080 / C13 Student Radar`。粉色页内顶栏从 border-box 改为 content-box，确保状态栏安全区不会压缩画板所需的 88px 内容高度；现有 220×180 真数据雷达画布、总分、维度与训练 Tab 未改变。
+- 评语区域继续明确显示“暂未同步”，未把 Figma 的教练姓名和示例建议伪造为后端事实。C13 仍只读取当前教练可见的成员与该成员真实雷达指标。
+- 验证：C13 聚焦 Vitest `10/10`、小程序 TypeScript 与 `git diff --check` 通过；没有已登录 C13 的可信 `375×812` 截图，不作运行时视觉验收完成结论。
+
 ## 2026-08-12 C9 队伍详情统计语义与布局收口
 
 - 在线 Figma 基准：`zZ6wKyOHKcO4UYXDd9jGwv / 93:924 / C9 Team Detail`。C9 的“累计训练”现使用既有 `coach/team.stats.completedTrainingCount`，不再把滚动 30 天 `trainingCount` 误标为累计。非空出勤率沿用真实 BFF 值并使用绿色强调；缺失值保持 `--`。
