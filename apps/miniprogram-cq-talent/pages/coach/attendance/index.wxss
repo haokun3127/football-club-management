@@ -64,7 +64,5 @@
 /* 恢复自重写前样式（pre-b14） */
 .correction-alert__texts { flex: 1; }
 .save-error { padding: 20rpx 24rpx; border: 1rpx solid #fecaca; border-radius: 16rpx; background: #fff1f2; color: #b42318; font-size: 24rpx; line-height: 34rpx; }
-/* custom navigation: keep Figma 88px total height inclusive of safe area */
-.c4-nav { box-sizing: border-box; }
-/* Figma Top Nav is 375x88 (176rpx): safe area is inside this envelope. */
-.c4-nav { height: 176rpx; }
+/* Keep the 88px content bar intact below the device safe-area inset. */
+.c4-nav { box-sizing: content-box; }
