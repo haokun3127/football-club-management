@@ -17,7 +17,7 @@ vi.mock("../../../utils/api", () => ({
   submitCoachAssessment: mocks.submitCoachAssessment,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
-vi.mock("../../../utils/presentation", () => ({ resolveNavInset: () => 0 }));
+vi.mock("../../../utils/presentation", () => ({ resolveMenuInset: () => 16, resolveNavInset: () => 0 }));
 vi.mock("../../../utils/assessment-draft", () => ({
   loadAssessmentDraft: (eventId, versionId) => ({ ...(drafts.get(`${eventId}:${versionId}`) ?? {}) }),
   saveAssessmentDraftEntry: (eventId, versionId, entry) => {
@@ -321,5 +321,10 @@ describe("coach project score entry", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(stylesheet).toMatch(/\.c121-event-mask\s*\{[^}]*position:\s*fixed[^}]*z-index:\s*10000/s);
     expect(stylesheet).toMatch(/\.c121-modal\s*\{[^}]*width:\s*662rpx[^}]*border-radius:\s*32rpx/s);
+  });
+
+  it("keeps the submit action clear of the system capsule", () => {
+    expect(template).toContain('padding-right: {{menuInset}}px');
+    expect(stylesheet).toMatch(/\.c12-nav__left\s*\{[^}]*min-width:\s*0/s);
   });
 });

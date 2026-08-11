@@ -1,7 +1,7 @@
 import { getAssessmentForm, getCoachWorkbench, submitCoachAssessment } from "../../../utils/api";
 import { clearAssessmentDraftStudents, draftProgress, loadAssessmentDraft, saveAssessmentDraftEntry, type AssessmentDraftMap } from "../../../utils/assessment-draft";
 import { requireRole } from "../../../utils/auth";
-import { resolveNavInset } from "../../../utils/presentation";
+import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { AssessmentForm, CoachWorkbench, LoadState } from "../../../utils/types";
 
 type AssessmentField = AssessmentForm["fields"][number];
@@ -24,6 +24,7 @@ type DraftRow = {
 
 interface PageData {
   navInset: number;
+  menuInset: number;
   state: LoadState;
   statusTitle: string;
   message: string;
@@ -66,6 +67,7 @@ interface PageData {
 Page<PageData>({
   data: {
     navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     state: "idle",
     statusTitle: "项目评分录入",
     message: "",

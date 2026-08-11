@@ -19,6 +19,7 @@
   display: flex;
   align-items: center;
   gap: 24rpx;
+  min-width: 0;
 }
 
 .c12-nav__back {
@@ -27,6 +28,9 @@
 }
 
 .c12-nav__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 44rpx;
   font-weight: 700;
 }
