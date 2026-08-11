@@ -1,13 +1,24 @@
 import ExcelJS from "exceljs";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
 import { HeaderMembershipResolver } from "../src/auth/context.js";
 import { signWpsWebhookPayload } from "../src/integration/wps-webhook-security.js";
 import { createPlatformPersistence } from "../src/persistence/platform-persistence.js";
+import { rollbackCqTalentAcceptanceDemo } from "../src/ops/cq-talent-acceptance-demo.js";
 import { buildServer } from "../src/server.js";
 import { PersistentApiStore } from "../src/store.js";
-import { createSeedData } from "../src/seed.js";
+import { createSeedData, type SeedData } from "../src/seed.js";
 
 const initialAcceptanceSeed = process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED;
+const temporaryAcceptanceDemoDirectories: string[] = [];
+
+afterAll(() => {
+  for (const directory of temporaryAcceptanceDemoDirectories) {
+    rmSync(directory, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+  }
+});
 
 afterEach(() => {
   if (initialAcceptanceSeed === undefined) {
@@ -17,6 +28,62 @@ afterEach(() => {
   }
   vi.useRealTimers();
 });
+
+function createAcceptanceDemoIntegrationSeed(): SeedData {
+  const source = createSeedData();
+  const clubId = "club-chongqing-talent";
+  const acceptanceUserId = "user-parent-cq-talent-acceptance";
+  const acceptanceParentId = "parent-cq-talent-acceptance";
+  const acceptanceCoachId = "coach-cq-talent-acceptance-demo";
+  const acceptanceTeamId = "team-cq-talent-acceptance-demo";
+  const acceptanceStudentIds = new Set(["student-cq-talent-001", "student-cq-talent-002"]);
+  const acceptanceEventIds = new Set([
+    "event-cq-talent-demo-training-completed",
+    "event-cq-talent-demo-match-completed",
+    "event-cq-talent-demo-training-upcoming",
+    "event-cq-talent-demo-match-tactical",
+  ]);
+  const acceptanceMetricRecords = source.metricRecords.filter((record) =>
+    acceptanceStudentIds.has(record.studentId) && record.recordedByCoachId === acceptanceCoachId,
+  );
+  const acceptanceMetricIds = new Set(acceptanceMetricRecords.map((record) => record.metricId));
+  const acceptanceTemplateVersionIds = new Set(acceptanceMetricRecords.map((record) => record.templateVersionId).filter((id): id is string => Boolean(id)));
+  const acceptanceTemplateIds = new Set(source.assessmentTemplateVersions
+    .filter((version) => acceptanceTemplateVersionIds.has(version.id))
+    .map((version) => version.templateId));
+  const acceptanceGraphVersionIds = new Set(source.assessmentTemplateVersions
+    .filter((version) => acceptanceTemplateVersionIds.has(version.id))
+    .map((version) => version.graphVersionId)
+    .filter((id): id is string => Boolean(id)));
+  const empty = Object.fromEntries(Object.keys(source).map((key) => [key, []])) as unknown as SeedData;
+
+  return {
+    ...empty,
+    clubs: source.clubs.filter((club) => club.id === clubId),
+    users: source.users.filter((user) => user.id === acceptanceUserId),
+    clubMemberships: source.clubMemberships.filter((membership) => membership.userId === acceptanceUserId),
+    parents: source.parents.filter((parent) => parent.id === acceptanceParentId),
+    students: source.students.filter((student) => acceptanceStudentIds.has(student.id)),
+    guardianBindings: source.guardianBindings.filter((binding) => binding.parentId === acceptanceParentId && acceptanceStudentIds.has(binding.studentId)),
+    coaches: source.coaches.filter((coach) => coach.id === acceptanceCoachId),
+    teams: source.teams.filter((team) => team.id === acceptanceTeamId),
+    teamMembers: source.teamMembers.filter((member) => member.teamId === acceptanceTeamId),
+    metrics: source.metrics.filter((metric) => acceptanceMetricIds.has(metric.id)),
+    assessmentTemplates: source.assessmentTemplates.filter((template) => acceptanceTemplateIds.has(template.id)),
+    metricGraphVersions: source.metricGraphVersions.filter((version) => acceptanceGraphVersionIds.has(version.id)),
+    assessmentTemplateVersions: source.assessmentTemplateVersions.filter((version) => acceptanceTemplateVersionIds.has(version.id)),
+    sessionPlans: source.sessionPlans.filter((plan) => plan.id === "session-plan-finishing"),
+    events: source.events.filter((event) => acceptanceEventIds.has(event.id)),
+    participants: source.participants.filter((participant) => acceptanceEventIds.has(participant.eventId)),
+    trainingSessions: source.trainingSessions.filter((session) => acceptanceEventIds.has(session.eventId)),
+    matches: source.matches.filter((match) => match.id === "match-cq-talent-demo-completed"),
+    matchRosters: source.matchRosters.filter((roster) => roster.matchId === "match-cq-talent-demo-completed"),
+    matchEvents: source.matchEvents.filter((event) => event.matchId === "match-cq-talent-demo-completed"),
+    matchPlayerNotes: source.matchPlayerNotes.filter((note) => note.matchId === "match-cq-talent-demo-completed"),
+    metricRecords: acceptanceMetricRecords,
+    appClients: source.appClients.filter((client) => client.id === "app-client-cq-talent-wechat-main"),
+  };
+}
 
 describe("api server", () => {
   it("returns health status", async () => {
@@ -1259,6 +1326,138 @@ describe("api server", () => {
     await app.close();
     persistence.database.close();
   });
+
+  it("persists the acceptance dual-role demo through SQLite restart and supports targeted rollback", async () => {
+    process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED = "1";
+    const directory = mkdtempSync(join(tmpdir(), "cq-talent-acceptance-demo-"));
+    temporaryAcceptanceDemoDirectories.push(directory);
+    const databasePath = join(directory, "api.sqlite");
+    const acceptanceSeed = createAcceptanceDemoIntegrationSeed();
+    const base = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main";
+    const acceptanceUserId = "user-parent-cq-talent-acceptance";
+    const acceptanceStudentIds = ["student-cq-talent-001", "student-cq-talent-002"];
+    const demoEventIds = [
+      "event-cq-talent-demo-training-completed",
+      "event-cq-talent-demo-match-completed",
+      "event-cq-talent-demo-training-upcoming",
+      "event-cq-talent-demo-match-tactical",
+    ];
+    let firstPersistence: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
+    let firstApp: ReturnType<typeof buildServer> | undefined;
+    let restartedPersistence: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
+    let restartedApp: ReturnType<typeof buildServer> | undefined;
+
+    try {
+      firstPersistence = await createPlatformPersistence({ databasePath, seedData: acceptanceSeed });
+      const acceptanceUser = await firstPersistence.repositories.users.getById(acceptanceUserId);
+      expect(acceptanceUser?.phone).toBeTruthy();
+      firstApp = buildServer(new PersistentApiStore(firstPersistence.repositories, acceptanceSeed), {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(firstPersistence.repositories.users, firstPersistence.repositories.memberships, null),
+        wechatIdentityConnector: {
+          async resolve() {
+            return { openId: "openid-cq-talent-acceptance", phone: acceptanceUser!.phone };
+          },
+        },
+      });
+
+      const login = await firstApp.inject({
+        method: "POST",
+        url: `${base}/wechat-login`,
+        headers: { "x-app-client-capabilities": "active-role-switch-v1" },
+        payload: { wxLoginCode: "acceptance-wx-code", phoneCode: "acceptance-phone-code" },
+      });
+      expect(login.statusCode, login.body).toBe(200);
+      const loginBody = login.json() as { availableRoles: string[]; session: { token: string; activeRole: string | null } };
+      expect(loginBody.availableRoles).toEqual(["parent", "coach"]);
+      expect(loginBody.session.activeRole).toBeNull();
+
+      const parentRole = await firstApp.inject({
+        method: "POST",
+        url: `${base}/session/role`,
+        headers: { authorization: `Bearer ${loginBody.session.token}` },
+        payload: { role: "parent" },
+      });
+      expect(parentRole.statusCode, parentRole.body).toBe(200);
+      const parentToken = (parentRole.json() as { session: { token: string } }).session.token;
+      const children = await firstApp.inject({
+        method: "GET",
+        url: `${base}/parent/children`,
+        headers: { authorization: `Bearer ${parentToken}` },
+      });
+      expect(children.statusCode, children.body).toBe(200);
+      expect((children.json() as { children: Array<{ id: string }> }).children.map((student) => student.id)).toEqual(acceptanceStudentIds);
+
+      const coachRole = await firstApp.inject({
+        method: "POST",
+        url: `${base}/session/role`,
+        headers: { authorization: `Bearer ${parentToken}` },
+        payload: { role: "coach" },
+      });
+      expect(coachRole.statusCode, coachRole.body).toBe(200);
+      const coachToken = (coachRole.json() as { session: { token: string } }).session.token;
+      const tactical = await firstApp.inject({
+        method: "GET",
+        url: `${base}/coach/events/event-cq-talent-demo-match-tactical/tactical-board`,
+        headers: { authorization: `Bearer ${coachToken}` },
+      });
+      expect(tactical.statusCode, tactical.body).toBe(200);
+      const tacticalBody = tactical.json() as { roster: Array<{ studentId: string }>; board: { players: Array<Record<string, unknown>> } };
+      expect(tacticalBody.roster.map((student) => student.studentId)).toEqual(acceptanceStudentIds);
+      const saveTactical = await firstApp.inject({
+        method: "PUT",
+        url: `${base}/coach/events/event-cq-talent-demo-match-tactical/tactical-board`,
+        headers: { authorization: `Bearer ${coachToken}`, "idempotency-key": "acceptance-demo-tactical-board" },
+        payload: {
+          formationName: "4-3-3",
+          players: tacticalBody.board.players.map((player, index) => index === 0 ? { ...player, x: 0.42 } : player),
+        },
+      });
+      expect(saveTactical.statusCode, saveTactical.body).toBe(200);
+
+      await firstApp.close();
+      firstApp = undefined;
+      firstPersistence.database.close();
+      firstPersistence = undefined;
+
+      restartedPersistence = await createPlatformPersistence({ databasePath, seedData: acceptanceSeed });
+      restartedApp = buildServer(new PersistentApiStore(restartedPersistence.repositories, acceptanceSeed), {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(restartedPersistence.repositories.users, restartedPersistence.repositories.memberships, null),
+      });
+      const restoredTactical = await restartedApp.inject({
+        method: "GET",
+        url: `${base}/coach/events/event-cq-talent-demo-match-tactical/tactical-board`,
+        headers: { authorization: `Bearer ${coachToken}` },
+      });
+      expect(restoredTactical.statusCode, restoredTactical.body).toBe(200);
+      expect((restoredTactical.json() as { saved: boolean; board: { players: Array<{ x: number }> } }).saved).toBe(true);
+      expect((restoredTactical.json() as { board: { players: Array<{ x: number }> } }).board.players[0]?.x).toBe(0.42);
+
+      const rollback = rollbackCqTalentAcceptanceDemo(restartedPersistence.database);
+      expect(rollback.deletedEventIds).toEqual(demoEventIds);
+      expect(rollback.deletedSessions).toBeGreaterThan(0);
+      await restartedApp.close();
+      restartedApp = undefined;
+      restartedPersistence.database.close();
+      restartedPersistence = undefined;
+
+      const rolledBack = await createPlatformPersistence({ databasePath, seed: false });
+      const membership = await rolledBack.repositories.memberships.findActiveByClubAndUser("club-chongqing-talent", acceptanceUserId);
+      const user = await rolledBack.repositories.users.getById(acceptanceUserId);
+      expect(membership?.roles).toEqual(["parent"]);
+      expect(user?.roles).toEqual(["parent"]);
+      expect(rolledBack.repositories.calendar.listEvents("club-chongqing-talent").filter((event) => demoEventIds.includes(event.id))).toEqual([]);
+      expect(rolledBack.repositories.calendar.listParticipants("club-chongqing-talent").filter((participant) => demoEventIds.includes(participant.eventId))).toEqual([]);
+      expect(rolledBack.repositories.assessments.listMetricRecords("club-chongqing-talent").filter((record) => record.recordedByCoachId === "coach-cq-talent-acceptance-demo")).toEqual([]);
+      rolledBack.database.close();
+    } finally {
+      await firstApp?.close();
+      firstPersistence?.database.close();
+      await restartedApp?.close();
+      restartedPersistence?.database.close();
+    }
+  }, 60_000);
 
   it("sets private ETags for user-scoped reads and replays mutating requests by idempotency key", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });

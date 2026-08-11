@@ -164,7 +164,10 @@ describe("Chongqing Talent synthetic fixtures", () => {
       .toEqual(acceptanceStudentIds);
     expect(seed.events?.filter((event) => demoEventIds.includes(event.id)).map((event) => event.id))
       .toEqual(demoEventIds);
-    expect(seed.participants?.filter((participant) => demoEventIds.includes(participant.eventId))).toHaveLength(8);
+    for (const eventId of demoEventIds) {
+      expect(seed.participants?.filter((participant) => participant.eventId === eventId).map((participant) => participant.studentId))
+        .toEqual(acceptanceStudentIds);
+    }
     expect(seed.events).toContainEqual(expect.objectContaining({
       id: "event-cq-talent-demo-match-tactical",
       type: "match",
@@ -178,11 +181,19 @@ describe("Chongqing Talent synthetic fixtures", () => {
       eventId: "event-cq-talent-demo-match-completed",
       status: "completed",
     }));
-    expect(seed.metricRecords?.some((record) =>
-      acceptanceStudentIds.includes(record.studentId)
-      && record.recordedByCoachId === "coach-cq-talent-acceptance-demo"
-      && record.occurredAt.startsWith("2026-08-"),
-    )).toBe(true);
+    expect(seed.matchRosters?.filter((roster) => roster.matchId === "match-cq-talent-demo-completed").map((roster) => roster.studentId))
+      .toEqual(acceptanceStudentIds);
+    expect(seed.matchEvents?.filter((event) => event.matchId === "match-cq-talent-demo-completed").map((event) => event.type))
+      .toEqual(["goal", "assist"]);
+    expect(seed.matchPlayerNotes?.filter((note) => note.matchId === "match-cq-talent-demo-completed").map((note) => note.studentId))
+      .toEqual(acceptanceStudentIds);
+    for (const studentId of acceptanceStudentIds) {
+      expect(seed.metricRecords?.filter((record) =>
+        record.studentId === studentId
+        && record.recordedByCoachId === "coach-cq-talent-acceptance-demo"
+        && record.occurredAt.startsWith("2026-08-"),
+      )).toHaveLength(8);
+    }
   });
 });
 
