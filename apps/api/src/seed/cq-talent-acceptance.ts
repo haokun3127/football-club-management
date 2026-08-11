@@ -71,6 +71,7 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
   const tableRows = fixture.tables;
   const importedCoaches = fixture.coaches.filter((coach) => coach.name !== "陈教练");
   const acceptanceFamilyId = families[0]!.id;
+  const acceptancePhone = process.env.FCM_CQ_TALENT_ACCEPTANCE_PHONE?.trim() || families[0]!.phone;
   const familyUserIds = new Map(families.map((family) => [
     family.id,
     family.id === acceptanceFamilyId ? acceptanceParentUserId : `user-parent-${family.id}`,
@@ -95,7 +96,7 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
       ...families.map((family) => ({
         id: familyUserIds.get(family.id)!,
         displayName: family.parentName,
-        phone: family.phone,
+        phone: family.id === acceptanceFamilyId ? acceptancePhone : family.phone,
         roles: family.id === acceptanceFamilyId ? ["parent" as const, "coach" as const] : ["parent" as const],
         status: "active" as const,
         createdAt: now,
@@ -127,7 +128,7 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
       clubId,
       userId: familyUserIds.get(family.id)!,
       name: family.parentName,
-      phone: family.phone,
+      phone: family.id === acceptanceFamilyId ? acceptancePhone : family.phone,
       createdAt: now,
       updatedAt: now,
     })),

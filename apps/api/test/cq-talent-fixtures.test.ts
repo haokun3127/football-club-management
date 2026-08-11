@@ -42,6 +42,26 @@ describe("Chongqing Talent synthetic fixtures", () => {
     }
   });
 
+  it("uses the configured acceptance phone for the dual-role demo identity", () => {
+    const original = process.env.FCM_CQ_TALENT_ACCEPTANCE_PHONE;
+    const configuredPhone = "15500000000";
+    try {
+      process.env.FCM_CQ_TALENT_ACCEPTANCE_PHONE = configuredPhone;
+      const seed = createCqTalentAcceptanceSeed();
+      const user = seed.users?.find((candidate) => candidate.id === "user-parent-cq-talent-acceptance");
+      const parent = seed.parents?.find((candidate) => candidate.id === "parent-cq-talent-acceptance");
+
+      expect(user?.phone).toBe(configuredPhone);
+      expect(parent?.phone).toBe(configuredPhone);
+    } finally {
+      if (original === undefined) {
+        delete process.env.FCM_CQ_TALENT_ACCEPTANCE_PHONE;
+      } else {
+        process.env.FCM_CQ_TALENT_ACCEPTANCE_PHONE = original;
+      }
+    }
+  });
+
   it("generates 200 students across the real customer table fields with matching coach names", () => {
     const fixture = createCqTalentSyntheticFixture(200);
     const coachNames = new Set(fixture.coaches.map((coach) => coach.name));

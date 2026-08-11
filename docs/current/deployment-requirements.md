@@ -7,6 +7,7 @@
 - 小程序 API 基址为 `https://cqtc.pomi.tech`，不再使用裸 IP；`develop`、`trial`、`release` 三个运行环境均使用该 HTTPS 域名。
 - 域名配置写入客户端不等于部署验收完成。发布前仍须分别确认 DNS 解析、TLS 证书及续期、反向代理到 API、健康检查、微信公众平台 request 合法域名和真机实际请求。
 - 若启用正式微信手机号解析，服务器必须配置 `WECHAT_MINIPROGRAM_APP_ID` 与 `WECHAT_MINIPROGRAM_APP_SECRET`；不得把任何密码、token、私钥或服务器登录信息写入本文件或提交到仓库。
+- 若启用重庆天才双角色演示数据，服务器须同时显式配置 `FCM_CQ_TALENT_ACCEPTANCE_SEED=1` 与私密的 `FCM_CQ_TALENT_ACCEPTANCE_PHONE`。后者只用于将固定演示档案与真实微信授权手机号匹配，绝不写入源码、文档或日志。
 - API 路由、环境变量或部署构建变更后，必须重新 build 并重启 API 进程，再用 `/health` 和小程序实际请求确认没有继续访问旧 `dist`。
 
 ## 重庆天才当前服务器与域名清单
