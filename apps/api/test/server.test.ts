@@ -1436,13 +1436,34 @@ describe("api server", () => {
       expect(tacticalBody.roster.map((student) => student.studentId)).toEqual(coachDemoRosterStudentIds);
       expect(tacticalBody.board.players.filter((player) => player.role === "starter")).toHaveLength(11);
       expect(tacticalBody.board.players.filter((player) => player.role === "substitute")).toHaveLength(5);
+      const partialTactical = await firstApp.inject({
+        method: "PUT",
+        url: `${base}/coach/events/event-cq-talent-demo-match-tactical/tactical-board`,
+        headers: { authorization: `Bearer ${coachToken}`, "idempotency-key": "acceptance-demo-tactical-partial" },
+        payload: {
+          formationName: "4-3-3",
+          players: tacticalBody.board.players.slice(0, 2),
+        },
+      });
+      expect(partialTactical.statusCode, partialTactical.body).toBe(200);
+      const hydratedTactical = await firstApp.inject({
+        method: "GET",
+        url: `${base}/coach/events/event-cq-talent-demo-match-tactical/tactical-board`,
+        headers: { authorization: `Bearer ${coachToken}` },
+      });
+      expect(hydratedTactical.statusCode, hydratedTactical.body).toBe(200);
+      const hydratedTacticalBody = hydratedTactical.json() as { saved: boolean; board: { players: Array<Record<string, unknown>> } };
+      expect(hydratedTacticalBody.saved).toBe(true);
+      expect(hydratedTacticalBody.board.players).toHaveLength(16);
+      expect(hydratedTacticalBody.board.players.filter((player) => player.role === "starter")).toHaveLength(11);
+      expect(hydratedTacticalBody.board.players.filter((player) => player.role === "substitute")).toHaveLength(5);
       const saveTactical = await firstApp.inject({
         method: "PUT",
         url: `${base}/coach/events/event-cq-talent-demo-match-tactical/tactical-board`,
         headers: { authorization: `Bearer ${coachToken}`, "idempotency-key": "acceptance-demo-tactical-board" },
         payload: {
           formationName: "4-3-3",
-          players: tacticalBody.board.players.map((player, index) => index === 0 ? { ...player, x: 0.42 } : player),
+          players: hydratedTacticalBody.board.players.map((player, index) => index === 0 ? { ...player, x: 0.42 } : player),
         },
       });
       expect(saveTactical.statusCode, saveTactical.body).toBe(200);

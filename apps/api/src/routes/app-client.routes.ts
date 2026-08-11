@@ -101,7 +101,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       const saved = await context.store.getTacticalBoard(request.params.clubId, event.id);
       return {
         event: { id: event.id, title: event.title, status: event.status },
-        board: saved ?? createInitialTacticalBoard(request.params.clubId, event.id, roster),
+        board: mergeTacticalBoardRoster(saved, request.params.clubId, event.id, roster),
         roster,
         saved: Boolean(saved),
         readOnly: ["completed", "cancelled", "canceled"].includes(event.status),
@@ -2477,6 +2477,21 @@ function createInitialTacticalBoard(clubId: string, eventId: string, roster: Arr
     updatedByCoachId: "coach-1",
     createdAt: now,
     updatedAt: now,
+  };
+}
+
+function mergeTacticalBoardRoster(
+  saved: Awaited<ReturnType<RouteContext["store"]["getTacticalBoard"]>>,
+  clubId: string,
+  eventId: string,
+  roster: Array<{ studentId: string; displayName: string }>,
+) {
+  const initial = createInitialTacticalBoard(clubId, eventId, roster);
+  if (!saved) return initial;
+  const savedPlayersByStudentId = new Map(saved.players.map((player) => [player.studentId, player]));
+  return {
+    ...saved,
+    players: initial.players.map((player) => savedPlayersByStudentId.get(player.studentId) ?? player),
   };
 }
 
