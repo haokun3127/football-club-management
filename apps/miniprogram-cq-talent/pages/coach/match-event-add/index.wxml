@@ -1,5 +1,5 @@
 <view class="match-event-page">
-  <app-header theme="soft" title="添加比赛事件" show-back />
+  <app-header theme="soft" title="添加比赛事件" title-align="left" show-back />
 
   <view class="match-event-page__body">
     <status-view state="{{state}}" title="比赛事件" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />

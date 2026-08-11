@@ -176,7 +176,7 @@ describe("C6.1 match event add", () => {
   });
 
   it("keeps template expressions safe and has no Figma sample facts", () => {
-    expect(template).toContain('<app-header theme="soft" title="添加比赛事件" show-back />');
+    expect(template).toContain('<app-header theme="soft" title="添加比赛事件" title-align="left" show-back />');
     expect(pageConfig).toContain('"app-header": "/components/app-header/index"');
     expect(template).not.toContain("Chen");
     expect(template).not.toContain("45");

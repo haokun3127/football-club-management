@@ -8,6 +8,7 @@ Component({
     actionDot: { type: Boolean, value: false },
     actionPill: { type: Boolean, value: false },
     theme: { type: String, value: "light" },
+    titleAlign: { type: String, value: "center" },
   },
   data: {
     statusBarHeight: 20,

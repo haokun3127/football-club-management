@@ -3,6 +3,7 @@
 .app-header--soft { background: #fdf0f1; }
 .app-header__content { position: relative; display: flex; align-items: center; box-sizing: border-box; padding-left: 24rpx; }
 .app-header__heading { position: absolute; left: 128rpx; right: 128rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+.app-header__heading--left { position: static; min-width: 0; flex: 1; align-items: flex-start; text-align: left; }
 .app-header__title { overflow: hidden; max-width: 100%; font-size: 32rpx; font-weight: 650; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
 .app-header__subtitle { margin-top: 2rpx; overflow: hidden; max-width: 100%; color: #667085; font-size: 20rpx; text-overflow: ellipsis; white-space: nowrap; }
 .app-header--brand .app-header__subtitle { color: rgba(255,255,255,.76); }

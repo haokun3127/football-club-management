@@ -27,6 +27,8 @@ await import("./index.ts");
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
 const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
 const pageConfig = readFileSync(new URL("./index.json", import.meta.url), "utf8");
+const appHeaderTemplate = readFileSync(new URL("../../../components/app-header/index.wxml", import.meta.url), "utf8");
+const appHeaderStylesheet = readFileSync(new URL("../../../components/app-header/index.wxss", import.meta.url), "utf8");
 
 function createPageInstance(data = {}) {
   const instance = { ...pageDefinition, data: { ...pageDefinition.data, ...data } };
@@ -181,7 +183,7 @@ describe("coach match detail", () => {
   });
 
   it("uses the local role tab bar and excludes legacy writes, tactical UI, Figma samples, and template helpers", () => {
-    expect(template).toContain('<app-header theme="soft" title="比赛记录" show-back />');
+    expect(template).toContain('<app-header theme="soft" title="比赛记录" title-align="left" show-back />');
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"submit-bar"');
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
@@ -197,5 +199,10 @@ describe("coach match detail", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("recordCoachMatch");
     expect(controller).not.toContain("openTacticalBoard");
+  });
+
+  it("uses the reusable left-aligned soft header required by the match Figma screens", () => {
+    expect(appHeaderTemplate).toContain('app-header__heading--{{titleAlign}}');
+    expect(appHeaderStylesheet).toMatch(/\.app-header__heading--left\s*\{[^}]*position:\s*static[^}]*align-items:\s*flex-start/s);
   });
 });
