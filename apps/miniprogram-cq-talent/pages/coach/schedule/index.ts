@@ -1,6 +1,6 @@
 import { getCoachHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { DEV_TEST_DATE } from "../../../utils/config";
+import { currentLocalDate } from "../../../utils/date";
 import { openPage } from "../../../utils/navigation";
 import { activityStatus, formatCalendarDate, resolveNavInset } from "../../../utils/presentation";
 import type { CoachHome, CoachTask, CoachTaskAction, LoadState, ScheduleEvent } from "../../../utils/types";
@@ -12,6 +12,7 @@ type Filter = "all" | "training" | "match" | "pending";
 type CoachEventView = ScheduleEvent & {
   startTime: string;
   durationText: string;
+  hasDuration: boolean;
   statusLabel: string;
   statusTone: string;
   typeColor: string;
@@ -35,8 +36,8 @@ Page({
     state: "loading" as LoadState,
     message: "正在读取教练日程",
     home: null as CoachHome | null,
-    date: DEV_TEST_DATE,
-    selectedDate: DEV_TEST_DATE,
+    date: currentLocalDate(),
+    selectedDate: currentLocalDate(),
     viewMode: "day" as "day" | "week",
     activeFilter: "all" as Filter,
     dayStrip: [] as Array<{ date: string; weekLabel: string; dayNum: string }>,
@@ -52,6 +53,9 @@ Page({
     hasVisibleEvents: false,
     taskCards: [] as CoachTaskView[],
     hasTaskCards: false,
+    heroEvent: null as CoachEventView | null,
+    hasHeroEvent: false,
+    heroDateLabel: "",
   },
   onLoad() {
     this.load();
@@ -66,6 +70,7 @@ Page({
       const coachName = home.coachName?.trim() || "";
       const eventViews = home.events.map((event) => toCoachEventView(event, coachName));
       const taskCards = home.tasks.map(toCoachTaskView);
+      const heroEvent = eventViews.find((event) => event.status === "in_progress") ?? eventViews[0] ?? null;
       const hasWork = eventViews.length > 0 || taskCards.length > 0;
       this.setData({
         state: hasWork ? "ready" : "empty",
@@ -80,11 +85,14 @@ Page({
         teamChips: home.teams.map((name) => ({ name })),
         hasTeams: home.teams.length > 0,
         summaryItems: [
-          { key: "training", label: "训练", value: String(home.summary.training), tone: "brand" },
-          { key: "match", label: "比赛", value: String(home.summary.matches), tone: "blue" },
-          { key: "pending", label: "待处理", value: String(home.summary.pending), tone: "amber" },
+          { key: "training", label: `今日${home.summary.training}节训练课`, value: "", tone: "brand" },
+          { key: "match", label: `比赛${home.summary.matches}场`, value: "", tone: "blue" },
+          { key: "pending", label: `待处理${home.summary.pending}`, value: "", tone: "amber" },
         ],
         eventViews,
+        heroEvent,
+        hasHeroEvent: Boolean(heroEvent),
+        heroDateLabel: formatCalendarDate(this.data.date),
         taskCards,
         hasTaskCards: taskCards.length > 0,
       });
@@ -164,6 +172,7 @@ function toCoachEventView(event: ScheduleEvent, coachName: string): CoachEventVi
     ...event,
     startTime: event.startsAt?.slice(11, 16) || "",
     durationText: durationLabel(event.startsAt, event.endsAt),
+    hasDuration: Boolean(durationLabel(event.startsAt, event.endsAt)),
     statusLabel: status.label,
     statusTone: status.tone,
     typeColor: event.type === "training" ? "#a80f1b" : event.type === "match" ? "#1976d2" : "#6b7280",

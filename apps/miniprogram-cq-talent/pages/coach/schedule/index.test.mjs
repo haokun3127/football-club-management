@@ -78,7 +78,7 @@ describe("coach schedule home", () => {
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
   });
 
-  it("loads a Monday-to-Sunday range and presents only API-backed summary, teams, events, and tasks", async () => {
+  it("loads a Monday-to-Sunday range and presents only API-backed C1 summary, hero, and events", async () => {
     mocks.getCoachHome.mockResolvedValue(home);
     const page = createPageInstance({ date: "2026-08-13", selectedDate: "2026-08-13", viewMode: "week" });
 
@@ -88,15 +88,14 @@ describe("coach schedule home", () => {
     expect(page.data).toMatchObject({
       state: "ready",
       coachName: "Coach Chen",
-      hasTeams: true,
-      teamChips: [{ name: "U11 Red" }],
-      hasTaskCards: true,
-      taskCards: [{ eventId: "event-training-1", action: "attendance", label: "Record attendance" }],
       summaryItems: [
-        { key: "training", value: "1" },
-        { key: "match", value: "0" },
-        { key: "pending", value: "1" },
+        { key: "training", label: "今日1节训练课", value: "" },
+        { key: "match", label: "比赛0场", value: "" },
+        { key: "pending", label: "待处理1", value: "" },
       ],
+      hasHeroEvent: true,
+      heroDateLabel: "2026-08-13",
+      heroEvent: { id: "event-training-1", title: "Ball-control session", startTime: "09:00", hasDuration: true },
       hasVisibleEvents: true,
       visibleEvents: [{
         id: "event-training-1",
@@ -120,8 +119,7 @@ describe("coach schedule home", () => {
 
     expect(emptyPage.data).toMatchObject({
       state: "empty",
-      hasTeams: false,
-      hasTaskCards: false,
+      hasHeroEvent: false,
       hasVisibleEvents: false,
     });
 
@@ -151,10 +149,12 @@ describe("coach schedule home", () => {
   });
 
   it("uses precomputed template fields and excludes Figma sample facts", () => {
-    expect(template).toContain("hasTeams");
-    expect(template).toContain('wx:if="{{hasTaskCards}}"');
+    expect(template).toContain('wx:if="{{hasHeroEvent}}"');
+    expect(template).toContain("c1-hero");
     expect(template).toContain('wx:if="{{hasVisibleEvents}}"');
-    expect(template).toContain('catchtap="openTask"');
+    expect(template).not.toContain('<picker mode="date"');
+    expect(template).not.toContain('data-mode="week"');
+    expect(template).not.toContain("c1-task-section");
     expect(template).not.toContain("18/20");
     expect(template).not.toContain("出席");
     expect(template).not.toContain("林教练");
@@ -162,5 +162,11 @@ describe("coach schedule home", () => {
     expect(template).not.toContain("凤凰山");
     expect(template).not.toContain("17:30");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
+  });
+
+  it("uses the real local date rather than a fixed development date", () => {
+    const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
+    expect(controller).toContain("currentLocalDate");
+    expect(controller).not.toContain("DEV_TEST_DATE");
   });
 });

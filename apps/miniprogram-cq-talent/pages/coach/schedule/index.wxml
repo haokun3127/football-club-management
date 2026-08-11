@@ -18,33 +18,18 @@
     </view>
   </view>
 
-  <view wx:if="{{state === 'ready' && hasTeams}}" class="c1-teams">
-    <view wx:for="{{teamChips}}" wx:key="name" class="c1-team-chip">{{item.name}}</view>
-  </view>
-
   <view class="c1-body">
-    <view class="c1-list-heading">
-      <view class="c1-list-heading__title">{{viewMode === 'week' ? '本周日程' : '当日安排'}}</view>
-      <view class="c1-list-heading__tools">
-        <view class="view-switch">
-          <view class="switch-item {{viewMode === 'day' ? 'active' : ''}}" data-mode="day" bindtap="switchView">日</view>
-          <view class="switch-item {{viewMode === 'week' ? 'active' : ''}}" data-mode="week" bindtap="switchView">周</view>
-        </view>
-        <picker mode="date" value="{{date}}" bindchange="onDateChange"><view class="c1-tools__picker">{{rangeLabel}}</view></picker>
-      </view>
-    </view>
-
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '加载日程' : state === 'empty' ? '暂无日程或任务' : '日程读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready'}}">
-      <view wx:if="{{hasTaskCards}}" class="c1-task-section">
-        <view class="c1-section-title">待处理任务</view>
-        <view wx:for="{{taskCards}}" wx:key="eventId" class="c1-task-card" data-id="{{item.eventId}}" data-action="{{item.action}}" catchtap="openTask">
-          <view class="c1-task-card__content"><view class="c1-task-card__label">{{item.label}}</view><view wx:if="{{item.hasDueAt}}" class="c1-task-card__due">{{item.dueLabel}}</view></view>
-          <view class="c1-task-card__chevron">›</view>
-        </view>
+      <view wx:if="{{hasHeroEvent}}" class="c1-hero" data-id="{{heroEvent.id}}" bindtap="openEvent">
+        <view class="c1-hero__top"><view>{{heroDateLabel}}</view><view>重庆天才</view></view>
+        <view class="c1-hero__main"><view class="c1-hero__time">{{heroEvent.startTime}}</view><view class="c1-hero__title">{{heroEvent.title}}</view></view>
+        <view class="c1-hero__meta">{{heroEvent.locationLabel}}</view>
+        <view class="c1-hero__pills"><view class="c1-hero__pill">{{heroEvent.statusLabel}}</view><view wx:if="{{heroEvent.hasDuration}}" class="c1-hero__pill">{{heroEvent.durationText}}</view></view>
       </view>
 
+      <view class="c1-list-heading"><view class="c1-list-heading__title">活动安排</view></view>
       <view wx:if="{{hasVisibleEvents}}" class="c1-list">
         <view wx:for="{{visibleEvents}}" wx:key="id" class="acard" data-id="{{item.id}}" bindtap="openEvent">
           <view class="acard__accent" style="background:{{item.typeColor}}"></view>
