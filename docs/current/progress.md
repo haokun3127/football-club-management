@@ -1,5 +1,14 @@
 # 核心演示闭环 · 进度跟踪
 
+## 2026-08-11 Coach Figma Header Geometry Repair
+
+- Online Figma authority remains `zZ6wKyOHKcO4UYXDd9jGwv`. This batch corrects real layout causes without replacing missing API fields with Figma sample data.
+- C2 (`93:606`) now uses the required in-flow coach navigation below the 88px header; routes are whitelist-checked before `reLaunch`.
+- C6/C6.1 (`93:796`, `93:827`) use the new soft, left-aligned header variant, preserving existing match read/write contracts.
+- C1/C4/C5/C8/C10/C12/C13/C14/C15 custom headers now account for the status inset inside the fixed 176rpx envelope, with capsule clearance applied to right-side controls.
+- Commits: `4e60d35`, `61304f4`, `e61ce43`, `4136498`, `a58ed0b`, `bdcb807`, `5037efb`, `2936d68`, `a852ef3`.
+- Verification: full workspace check passed — domain `19/19`, mini-program `293/293`, API `85/85`; TypeScript and `git diff --check` passed. No authenticated post-change 375x812 coach capture was available, so this is not a runtime visual-acceptance claim.
+
 ## 2026-08-11 Dual Parent/Coach Role Switching: Backend Foundation
 
 - Added SQLite-backed app-client sessions with SHA-256 token storage, atomic token rotation, route-bound bearer revalidation, entrypoint-filtered `availableRoles`, and the server-confirmed role-selection endpoint.
