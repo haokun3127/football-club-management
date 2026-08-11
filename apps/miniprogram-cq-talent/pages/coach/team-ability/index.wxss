@@ -5,7 +5,7 @@
 
 .ability-nav {
   height: 176rpx;
-  box-sizing: border-box;
+  box-sizing: content-box;
   display: flex;
   align-items: center;
   gap: 24rpx;
@@ -30,28 +30,34 @@
 }
 
 .ability-nav__title {
+  min-width: 0;
+  overflow: hidden;
   flex: 1;
   font-size: 44rpx;
   font-weight: 700;
   text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: #202124;
 }
 
 .ability-nav__export {
+  display: flex;
+  width: 104rpx;
+  height: 58rpx;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
   margin: 0;
-  padding: 12rpx 24rpx;
+  padding: 0;
   flex: 0 0 auto;
   border: 0;
   border-radius: 24rpx;
   background: #ffffff;
   font-size: 28rpx;
   font-weight: 600;
+  line-height: 1;
   color: #a80f1b;
-}
-
-.ability-nav__export[disabled] {
-  color: #8e97a6;
-  opacity: 1;
 }
 
 .ability-page__body {

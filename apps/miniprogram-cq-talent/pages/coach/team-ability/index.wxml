@@ -1,10 +1,10 @@
 <view class="ability-page">
-  <view class="ability-nav">
+  <view class="ability-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="ability-nav__back" bindtap="goBack">
       <image class="ability-nav__back-icon" src="/assets/icons/c14-arrow-left.svg" mode="aspectFit" />
     </view>
     <view class="ability-nav__title">团队能力总览</view>
-    <button class="ability-nav__export" disabled="{{true}}">导出</button>
+    <view class="ability-nav__export">导出</view>
   </view>
 
   <view class="ability-page__body">
@@ -26,9 +26,9 @@
         <view class="ability-hero__plot">
           <radar-canvas wx:if="{{hasRadar}}" class="ability-hero__canvas" dark="{{true}}" metrics="{{radar}}" width="440rpx" height="360rpx"></radar-canvas>
           <view wx:else class="ability-hero__empty">暂无足够维度生成雷达图</view>
-          <view class="ability-hero__overall">综合 {{overall}}</view>
+          <view wx:if="{{showOverall}}" class="ability-hero__overall">综合 {{overall}}</view>
         </view>
-        <view wx:if="{{trendLabel}}" class="trend-chip {{trendPositive ? 'trend-chip--up' : 'trend-chip--down'}}">
+        <view wx:if="{{showTrend}}" class="trend-chip {{trendPositive ? 'trend-chip--up' : 'trend-chip--down'}}">
           <image wx:if="{{trendPositive}}" class="trend-chip__icon" src="/assets/icons/c14-trending-up.svg" mode="aspectFit" />
           <text>{{trendLabel}}</text>
         </view>

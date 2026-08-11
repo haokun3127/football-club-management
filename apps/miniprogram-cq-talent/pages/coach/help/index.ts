@@ -6,6 +6,7 @@ import type { ContentFaq, LoadState } from "../../../utils/types";
 interface HelpCategory {
   label: string;
   value: string;
+  icon: string;
 }
 
 interface FaqQuestion extends ContentFaq {
@@ -125,7 +126,21 @@ function presentCategories(questions: FaqQuestion[]): HelpCategory[] {
     if (category && !categories.includes(category)) categories.push(category);
     return categories;
   }, []);
-  return [{ label: "全部", value: "all" }, ...values.map((value) => ({ label: value, value }))];
+  return [
+    { label: "全部", value: "all", icon: categoryIcon("all") },
+    ...values.map((value) => ({ label: value, value, icon: categoryIcon(value) })),
+  ];
+}
+
+function categoryIcon(value: string) {
+  const label = value.trim();
+  if (label === "all" || label.includes("出勤")) return "/assets/icons/c164-category-attendance.svg";
+  if (label.includes("训练") || label.includes("活动")) return "/assets/icons/c164-category-training.svg";
+  if (label.includes("成长") || label.includes("评分") || label.includes("评估")) return "/assets/icons/c164-category-assessment.svg";
+  if (label.includes("私教")) return "/assets/icons/c164-category-private.svg";
+  if (label.includes("账号") || label.includes("权限")) return "/assets/icons/c164-category-account.svg";
+  if (label.includes("联系") || label.includes("客服") || label.includes("支持")) return "/assets/icons/c164-category-support.svg";
+  return "/assets/icons/c164-question.svg";
 }
 
 function visibleQuestionData(questions: FaqQuestion[], activeCategory: string, searchText: string) {

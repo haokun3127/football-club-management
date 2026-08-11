@@ -75,6 +75,11 @@ describe("coach help", () => {
         { id: "faq-3", q: "出勤如何更正？", a: "请提交出勤更正。", category: "出勤", open: false },
       ],
     });
+    expect(page.data.categories.map((item) => item.icon)).toEqual([
+      "/assets/icons/c164-category-attendance.svg",
+      "/assets/icons/c164-category-training.svg",
+      "/assets/icons/c164-category-attendance.svg",
+    ]);
     expect(page.data.visibleQuestions.map((item) => item.showDivider)).toEqual([true, true, false]);
     expect(Object.keys(page.data.questions[0]).sort()).toEqual(["a", "category", "id", "open", "q"]);
 
@@ -150,7 +155,7 @@ describe("coach help", () => {
     expect(pageConfig).not.toContain('"app-header"');
     expect(pageConfig).toContain('"role-tabbar"');
     expect(template).toContain('class="c164-nav"');
-    expect(template).toContain("/assets/icons/c164-question.svg");
+    expect(template).toContain('src="{{item.icon}}"');
     expect(template).toContain("支持方式待配置");
     expect([...template.matchAll(/\bbind(?:tap|input|longpress|change|submit|action)\s*=/g)]).toHaveLength(4);
     expect(template).toMatch(/class="c164-nav__back"[^>]*bindtap="goBack"/);

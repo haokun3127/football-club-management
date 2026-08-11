@@ -8,8 +8,10 @@
 .c2-body { display: flex; flex-direction: column; gap: 32rpx; padding: 32rpx 44rpx calc(200rpx + env(safe-area-inset-bottom)); }
 .shero { display: flex; flex-direction: column; gap: 24rpx; min-height: 248rpx; padding: 40rpx; box-sizing: border-box; border-radius: 32rpx; background: #07111f; box-shadow: 0 12rpx 28rpx rgba(7, 17, 31, 0.2); }
 .shero__heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20rpx; }
+.shero__content { min-width: 0; flex: 1; }
+.shero__status { flex: 0 0 auto; }
 .shero__eyebrow { color: rgba(255, 255, 255, 0.7); font-size: 22rpx; line-height: 30rpx; }
-.shero__title { margin-top: 6rpx; color: #ffffff; font-size: 34rpx; font-weight: 700; line-height: 44rpx; }
+.shero__title { margin-top: 6rpx; overflow: hidden; color: #ffffff; font-size: 34rpx; font-weight: 700; line-height: 44rpx; overflow-wrap: anywhere; }
 .shero__meta { color: rgba(255, 255, 255, 0.76); font-size: 24rpx; line-height: 32rpx; }
 .shero__chips { display: flex; flex-wrap: wrap; gap: 12rpx; }
 .shero__chip { max-width: 100%; padding: 8rpx 14rpx; overflow: hidden; border-radius: 8rpx; background: rgba(255, 255, 255, 0.12); color: #ffffff; font-size: 22rpx; line-height: 30rpx; text-overflow: ellipsis; white-space: nowrap; }

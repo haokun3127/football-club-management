@@ -10,13 +10,13 @@
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载活动' : state === 'empty' ? '暂无工作台数据' : '活动读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready'}}">
-    <view wx:if="{{eventView}}" class="shero">
+      <view wx:if="{{eventView}}" class="shero">
       <view class="shero__heading">
-        <view>
+        <view class="shero__content">
           <view class="shero__eyebrow">{{eventView.typeLabel}}</view>
           <view class="shero__title">{{eventView.title}}</view>
         </view>
-        <status-chip label="{{eventView.statusLabel}}" tone="{{eventView.statusTone}}" compact="{{true}}" />
+        <view class="shero__status"><status-chip label="{{eventView.statusLabel}}" tone="{{eventView.statusTone}}" compact="{{true}}" /></view>
       </view>
       <view wx:if="{{eventView.hasTime}}" class="shero__meta">{{eventView.timeLabel}}</view>
       <view class="shero__chips">

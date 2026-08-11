@@ -1,5 +1,6 @@
 import { getCoachTeam, getCoachTeamAbilityOverview } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachTeamAbilityOverview, LoadState, RadarMetricPoint } from "../../../utils/types";
 
 interface DimensionRow {
@@ -11,6 +12,8 @@ interface DimensionRow {
 }
 
 interface PageData {
+  navInset: number;
+  menuInset: number;
   state: LoadState;
   message: string;
   teamContext: string;
@@ -23,6 +26,8 @@ interface PageData {
   dimensions: DimensionRow[];
   hasOverview: boolean;
   hasRadar: boolean;
+  showOverall: boolean;
+  showTrend: boolean;
   rankingMessage: string;
 }
 
@@ -52,19 +57,24 @@ Page<PageData>({
     const dimensions = toDimensionRows(overview.dimensions);
     const radar = toRadar(overview.dimensions);
     const hasOverview = dimensions.length > 0;
+    const hasRadar = radar.length >= 3;
+    const overall = formatOverall(overview.overall);
+    const trendLabel = formatTrend(overview.trendDelta);
     this.setData({
       state: hasOverview ? "ready" : "empty",
       message: hasOverview ? "" : "暂无团队评测数据。",
       teamContext: toTeamContext(teamResult),
       assessmentPeriod: "评估时间待同步",
       studentCount: toCount(overview.studentCount),
-      overall: formatOverall(overview.overall),
-      trendLabel: formatTrend(overview.trendDelta),
+      overall,
+      trendLabel,
       trendPositive: overview.trendDelta === null || overview.trendDelta >= 0,
       radar: radar.length >= 3 ? radar : [],
       dimensions,
       hasOverview,
-      hasRadar: radar.length >= 3,
+      hasRadar,
+      showOverall: hasRadar && overall !== "-",
+      showTrend: hasRadar && Boolean(trendLabel),
       rankingMessage: "排名暂未同步",
     });
   },
@@ -78,6 +88,8 @@ Page<PageData>({
 
 function emptyPageData(state: LoadState, message: string): PageData {
   return {
+    navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     state,
     message,
     teamContext: "团队信息待同步",
@@ -90,6 +102,8 @@ function emptyPageData(state: LoadState, message: string): PageData {
     dimensions: [],
     hasOverview: false,
     hasRadar: false,
+    showOverall: false,
+    showTrend: false,
     rankingMessage: "排名暂未同步",
   };
 }

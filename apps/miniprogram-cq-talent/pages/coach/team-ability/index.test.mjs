@@ -13,6 +13,10 @@ vi.mock("../../../utils/api", () => ({
   getCoachTeam: mocks.getCoachTeam,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
+vi.mock("../../../utils/presentation", () => ({
+  resolveMenuInset: () => 0,
+  resolveNavInset: () => 0,
+}));
 
 globalThis.wx = { navigateBack: mocks.navigateBack };
 
@@ -79,6 +83,8 @@ describe("coach team ability overview", () => {
       assessmentPeriod: "评估时间待同步",
       studentCount: 3,
       overall: "74",
+      showOverall: true,
+      showTrend: true,
       hasRadar: true,
       radar: [
         { metricId: "passing", value: 74, maxValue: 100 },
@@ -133,7 +139,7 @@ describe("coach team ability overview", () => {
     });
     const page = createPageInstance();
     await page.load();
-    expect(page.data).toMatchObject({ state: "ready", hasOverview: true, hasRadar: false, radar: [] });
+    expect(page.data).toMatchObject({ state: "ready", hasOverview: true, hasRadar: false, showOverall: false, showTrend: false, radar: [] });
   });
 
   it("uses fixed Figma geometry and explicit unavailable states without sample data", () => {
@@ -146,13 +152,16 @@ describe("coach team ability overview", () => {
     expect(template).toMatch(/<radar-canvas[^>]*width="440rpx"[^>]*height="360rpx"/);
     expect(template).toContain("assessmentPeriod");
     expect(template).toContain("rankingMessage");
-    const exportButton = template.match(/<button[^>]*class="ability-nav__export"[^>]*>[\s\S]*?<\/button>/)?.[0] ?? "";
-    expect(exportButton).toContain("disabled");
-    expect(exportButton).not.toContain("bindtap");
+    expect(template).toContain('wx:if="{{showOverall}}"');
+    expect(template).toContain('style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"');
+    const exportControl = template.match(/<view[^>]*class="ability-nav__export"[^>]*>[\s\S]*?<\/view>/)?.[0] ?? "";
+    expect(exportControl).not.toContain("bindtap");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(template).not.toMatch(/2025|U10|李明辉|陈小宇|张伟|王浩|赵晨/);
     expect(stylesheet).toMatch(/\.ability-hero\s*\{[^}]*position:\s*relative[^}]*height:\s*520rpx[^}]*overflow:\s*hidden/s);
     expect(stylesheet).toMatch(/\.ability-hero__plot\s*\{[^}]*height:\s*360rpx[^}]*justify-content:\s*center/s);
     expect(stylesheet).toMatch(/\.ability-hero__overall\s*\{[^}]*position:\s*absolute[^}]*left:\s*0[^}]*right:\s*0[^}]*font-size:\s*40rpx/s);
+    expect(stylesheet).toMatch(/\.ability-nav\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*content-box/s);
+    expect(stylesheet).toMatch(/\.ability-nav__export\s*\{[^}]*display:\s*flex[^}]*width:\s*104rpx[^}]*height:\s*58rpx/s);
   });
 });

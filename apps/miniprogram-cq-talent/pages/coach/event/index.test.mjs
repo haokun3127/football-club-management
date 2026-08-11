@@ -29,6 +29,7 @@ globalThis.wx = { navigateBack: vi.fn() };
 await import("./index.ts");
 
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
+const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 
 function createPageInstance(data = {}) {
   const instance = {
@@ -199,5 +200,12 @@ describe("coach activity workbench", () => {
     expect(template).not.toContain("18/20");
     expect(template).not.toContain("凤凰山");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
+  });
+
+  it("keeps a long real activity title inside the session header without covering its status", () => {
+    expect(template).toContain('class="shero__content"');
+    expect(template).toContain('class="shero__status"');
+    expect(stylesheet).toMatch(/\.shero__content\s*\{[^}]*min-width:\s*0[^}]*flex:\s*1/s);
+    expect(stylesheet).toMatch(/\.shero__status\s*\{[^}]*flex:\s*0\s+0\s+auto/s);
   });
 });

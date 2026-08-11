@@ -23,7 +23,7 @@
           <view class="c164-category-grid">
             <block wx:for="{{categories}}" wx:key="value">
               <view class="c164-category-card {{activeCategory === item.value ? 'c164-category-card--active' : ''}}" data-value="{{item.value}}" bindtap="selectCategory">
-                <image class="c164-category-card__icon" src="/assets/icons/c164-question.svg" mode="aspectFit" />
+                <image class="c164-category-card__icon" src="{{item.icon}}" mode="aspectFit" />
                 <text class="c164-category-card__label">{{item.label}}</text>
               </view>
             </block>
