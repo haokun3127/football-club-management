@@ -32,6 +32,11 @@
       </view>
 
       <view class="c16-menu">
+        <view wx:if="{{canSwitchToParent}}" class="c16-menu__item" bindtap="switchToParent">
+          <image class="c16-menu__icon" src="/assets/icons/c16-user.svg" mode="aspectFit" />
+          <view class="c16-menu__label">切换到家长身份</view>
+          <image class="c16-menu__arrow" src="/assets/icons/c16-chevron-right.svg" mode="aspectFit" />
+        </view>
         <view class="c16-menu__item" bindtap="openPermissions">
           <image class="c16-menu__icon" src="/assets/icons/c16-shield.svg" mode="aspectFit" />
           <view class="c16-menu__label">权限范围</view>

@@ -1,7 +1,7 @@
-import { wechatLogin } from "../../utils/api";
+import { switchActiveRole, wechatLogin } from "../../utils/api";
 import { routeHome } from "../../utils/auth";
-import { getAppContext, setSession } from "../../utils/store";
-import type { LoadState } from "../../utils/types";
+import { getAppContext, persistAuthenticatedSession } from "../../utils/store";
+import type { AppRole, LoadState, LoginResult } from "../../utils/types";
 
 const AUTHORIZATION_CALLBACK_TIMEOUT_MS = 10_000;
 const runtimeTimers = globalThis as unknown as {
@@ -17,12 +17,17 @@ Page({
     wxLoginCode: "",
     submitting: false,
     authorizationLocked: false,
+    roleChooserVisible: false,
+    canChooseParent: false,
+    canChooseCoach: false,
     isBlocked: false,
     navTop: 88,
   },
   phoneAuthorizationReserved: false,
   phoneAuthorizationCallbackConsumed: false,
   phoneAuthorizationTimeoutId: undefined as number | undefined,
+  pendingRoleLogin: null as LoginResult | null,
+  roleSelectionInProgress: false,
   onLoad(query?: Record<string, string | undefined>) {
     const code = query?.code ? decodeURIComponent(query.code) : "";
     // Keep the G2 top navigation envelope at 88px.
@@ -95,17 +100,18 @@ Page({
         this.setData({ state: "pending", errorType: "parent_without_children", isBlocked: true, message: "家长档案尚未绑定孩子，请联系俱乐部补充资料。" });
         return;
       }
-      setSession({
-        ...context,
-        capabilities: result.capabilities,
-        role: result.role,
-        token: result.session.token,
-        userId: result.profile.userId,
-        displayName: result.profile.displayName,
-        currentStudentId: result.children[0]?.id,
-        expiresAt: new Date(Date.now() + result.session.expiresInSeconds * 1000).toISOString(),
-      });
-      routeHome(result.role);
+      if (!result.session.activeRole && result.availableRoles.length > 1) {
+        this.pendingRoleLogin = result;
+        this.setData({
+          state: "ready",
+          message: "请选择进入小程序的身份。",
+          roleChooserVisible: true,
+          canChooseParent: result.availableRoles.includes("parent"),
+          canChooseCoach: result.availableRoles.includes("coach"),
+        });
+        return;
+      }
+      this.finishAuthenticatedSession(result);
     } catch (error) {
       const record = error as { code?: string; message?: string };
       this.setData({ state: "error", errorType: record.code === "wechat_login_failed" ? "wechat_login_failed" : "login_failed", message: record.code === "wechat_login_failed" ? "微信验证失败，请重新授权手机号。" : "身份匹配失败，请稍后重试。" });
@@ -120,8 +126,58 @@ Page({
     }
     this.phoneAuthorizationReserved = false;
     this.phoneAuthorizationCallbackConsumed = false;
-    this.setData({ submitting: false, authorizationLocked: false, errorType: "" });
+    this.pendingRoleLogin = null;
+    this.roleSelectionInProgress = false;
+    this.setData({
+      submitting: false,
+      authorizationLocked: false,
+      errorType: "",
+      roleChooserVisible: false,
+      canChooseParent: false,
+      canChooseCoach: false,
+    });
     this.refreshWechatCode();
+  },
+  chooseParentRole() {
+    return this.chooseRole("parent");
+  },
+  chooseCoachRole() {
+    return this.chooseRole("coach");
+  },
+  async chooseRole(role: AppRole) {
+    const pending = this.pendingRoleLogin;
+    if (
+      this.roleSelectionInProgress
+      || !pending?.session
+      || pending.session.activeRole !== null
+      || !pending.availableRoles.includes(role)
+    ) return;
+
+    this.roleSelectionInProgress = true;
+    this.setData({ submitting: true, errorType: "", message: "正在切换身份。" });
+    try {
+      const result = await switchActiveRole(role, pending.session.token);
+      this.pendingRoleLogin = null;
+      this.setData({ roleChooserVisible: false, canChooseParent: false, canChooseCoach: false });
+      this.finishAuthenticatedSession(result);
+    } catch {
+      this.setData({ state: "ready", errorType: "role_selection_failed", message: "身份切换失败，请重新选择。" });
+    } finally {
+      this.roleSelectionInProgress = false;
+      this.setData({ submitting: false });
+    }
+  },
+  finishAuthenticatedSession(result: LoginResult) {
+    if (result.session?.activeRole === "parent" && !result.children.length) {
+      this.setData({ state: "pending", errorType: "parent_without_children", isBlocked: true, message: "家长档案尚未绑定孩子，请联系俱乐部补充资料。" });
+      return;
+    }
+    const session = persistAuthenticatedSession(result);
+    if (!session) {
+      this.setData({ state: "error", errorType: "login_rejected", message: "身份匹配失败，请稍后重试。" });
+      return;
+    }
+    routeHome(session.role);
   },
   backToLaunch() {
     wx.reLaunch({ url: "/pages/launch/index" });

@@ -3,17 +3,20 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   getCoachHome: vi.fn(),
+  switchActiveRole: vi.fn(),
   requireRole: vi.fn(),
+  routeHome: vi.fn(),
   openPage: vi.fn(),
+  persistAuthenticatedSession: vi.fn(),
   clearSession: vi.fn(),
   showModal: vi.fn(),
   reLaunch: vi.fn(),
 }));
 
-vi.mock("../../../utils/api", () => ({ getCoachHome: mocks.getCoachHome }));
-vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
+vi.mock("../../../utils/api", () => ({ getCoachHome: mocks.getCoachHome, switchActiveRole: mocks.switchActiveRole }));
+vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole, routeHome: mocks.routeHome }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
-vi.mock("../../../utils/store", () => ({ clearSession: mocks.clearSession }));
+vi.mock("../../../utils/store", () => ({ clearSession: mocks.clearSession, persistAuthenticatedSession: mocks.persistAuthenticatedSession }));
 vi.mock("../../../utils/presentation", () => ({ resolveNavInset: () => 0 }));
 
 globalThis.wx = {
@@ -34,7 +37,7 @@ const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
 const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 const pageConfig = readFileSync(new URL("./index.json", import.meta.url), "utf8");
 
-const session = { role: "coach", displayName: "Session coach" };
+const session = { role: "coach", availableRoles: ["coach", "parent"], displayName: "Session coach" };
 const home = {
   coachName: "Seed coach must not replace the session name",
   teams: ["Actual team"],
@@ -63,9 +66,12 @@ function createPageInstance(data = {}) {
 describe("coach profile", () => {
   beforeEach(() => {
     mocks.getCoachHome.mockReset().mockResolvedValue(home);
+    mocks.switchActiveRole.mockReset();
     mocks.requireRole.mockReset().mockReturnValue(session);
+    mocks.routeHome.mockReset();
     mocks.openPage.mockReset();
     mocks.clearSession.mockReset();
+    mocks.persistAuthenticatedSession.mockReset().mockImplementation((result) => ({ role: result.session.activeRole }));
     mocks.showModal.mockReset();
     mocks.reLaunch.mockReset();
     vi.useFakeTimers();
@@ -160,6 +166,49 @@ describe("coach profile", () => {
       ["/pages/coach/private-interest/index"],
       ["/pages/coach/help/index"],
     ]);
+  });
+
+  it("shows the parent switch only for a dual-role coach and routes after a confirmed session", async () => {
+    const selectedSession = {
+      clubId: "club-chongqing-talent",
+      client: { id: "client-cq-talent" },
+      status: "authenticated",
+      session: {
+        token: "parent-session-token",
+        expiresInSeconds: 3600,
+        expiresAt: "2099-01-01T00:00:00.000Z",
+        activeRole: "parent",
+      },
+      role: "coach",
+      availableRoles: ["parent", "coach"],
+      profile: { userId: "user-dual", displayName: "Dual role" },
+      children: [{ id: "student-1" }],
+      capabilities: {},
+    };
+    mocks.switchActiveRole.mockResolvedValue(selectedSession);
+    const page = createPageInstance();
+
+    await page.load();
+    expect(page.data.canSwitchToParent).toBe(true);
+
+    await page.switchToParent();
+
+    expect(mocks.switchActiveRole).toHaveBeenCalledWith("parent");
+    expect(mocks.persistAuthenticatedSession).toHaveBeenCalledWith(selectedSession);
+    expect(mocks.routeHome).toHaveBeenCalledWith("parent");
+    expect(template).toContain('wx:if="{{canSwitchToParent}}"');
+    expect(template).toContain('bindtap="switchToParent"');
+  });
+
+  it("does not expose the parent switch to a coach-only session", async () => {
+    mocks.requireRole.mockReturnValue({ ...session, availableRoles: ["coach"] });
+    const page = createPageInstance();
+
+    await page.load();
+    page.switchToParent();
+
+    expect(page.data.canSwitchToParent).toBe(false);
+    expect(mocks.switchActiveRole).not.toHaveBeenCalled();
   });
 
   it("does not clear a session on cancel and confirms logout only once", () => {

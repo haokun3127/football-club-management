@@ -21,6 +21,7 @@ globalThis.wx = {
 };
 
 const { request } = await import("./request.ts");
+const { clearSession, getSession } = await import("./store.ts");
 
 describe("request idempotency keys", () => {
   it("preserves a caller supplied key instead of creating a new one", async () => {
@@ -42,5 +43,44 @@ describe("request expected status", () => {
       code: "unexpected_status",
       statusCode: 200,
     });
+  });
+});
+
+describe("request authentication failures", () => {
+  it("clears the stored session when a temporary role-selection bearer is rejected", async () => {
+    clearSession();
+    storage.clear();
+    storage.set("cqTalentAppContext", {
+      clubId: "club-chongqing-talent",
+      clientId: "app-client-cq-talent-wechat-main",
+      capabilities: {},
+    });
+    storage.set("cqTalentSession", {
+      clubId: "club-chongqing-talent",
+      clientId: "app-client-cq-talent-wechat-main",
+      capabilities: {},
+      role: "coach",
+      availableRoles: ["parent", "coach"],
+      token: "active-session-token",
+      expiresAt: "2099-01-01T00:00:00.000Z",
+    });
+
+    const originalRequest = globalThis.wx.request;
+    const originalRelaunch = globalThis.wx.reLaunch;
+    globalThis.wx.request = ({ success }) => success({
+      statusCode: 401,
+      data: { error: { code: "authentication_required", message: "Role session expired" } },
+    });
+    globalThis.wx.reLaunch = () => {};
+
+    try {
+      await expect(request({ path: "/session/role", method: "POST", bearerToken: "pending-role-token" })).rejects.toMatchObject({
+        code: "authentication_required",
+      });
+      expect(getSession()).toBeNull();
+    } finally {
+      globalThis.wx.request = originalRequest;
+      globalThis.wx.reLaunch = originalRelaunch;
+    }
   });
 });

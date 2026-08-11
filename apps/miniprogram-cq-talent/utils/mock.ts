@@ -5,6 +5,7 @@ export function createDevSession(context: AppContext, role: AppRole): SessionSta
   return {
     ...context,
     role,
+    availableRoles: [role],
     token: `dev-${role}-session`,
     userId: DEV_USER_IDS[role],
     displayName: DEV_DISPLAY_NAMES[role],

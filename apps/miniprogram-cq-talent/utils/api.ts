@@ -47,6 +47,17 @@ export async function wechatLogin(wxLoginCode: string, phoneCode?: string): Prom
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/wechat-login`,
     method: "POST",
     data: { wxLoginCode, phoneCode },
+    headers: { "X-App-Client-Capabilities": "active-role-switch-v1" },
+  });
+}
+
+export async function switchActiveRole(role: "parent" | "coach", bearerToken?: string): Promise<LoginResult> {
+  const context = requireContext();
+  return request<LoginResult, { role: "parent" | "coach" }>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/session/role`,
+    method: "POST",
+    data: { role },
+    bearerToken,
   });
 }
 

@@ -16,6 +16,8 @@ export interface RequestOptions<TBody = unknown> {
   idempotent?: boolean;
   idempotencyKey?: string;
   expectedStatus?: number;
+  headers?: Record<string, string>;
+  bearerToken?: string;
 }
 
 export function request<TResponse = unknown, TBody = unknown>(options: RequestOptions<TBody>): Promise<TResponse> {
@@ -24,6 +26,7 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
   const requestId = createRequestId();
   const headers: Record<string, string> = {
     "X-Request-Id": requestId,
+    ...options.headers,
   };
 
   if (context) {
@@ -31,8 +34,9 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
     headers["X-Client-Id"] = context.clientId;
   }
 
-  if (session?.token && !session.token.startsWith("dev-")) {
-    headers.Authorization = `Bearer ${session.token}`;
+  const bearerToken = options.bearerToken ?? session?.token;
+  if (bearerToken && !bearerToken.startsWith("dev-")) {
+    headers.Authorization = `Bearer ${bearerToken}`;
   }
 
   if (DEV_MODE && session?.role) {

@@ -3,16 +3,22 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   wechatLogin: vi.fn(),
+  switchActiveRole: vi.fn(),
   getAppContext: vi.fn(),
   setSession: vi.fn(),
+  persistAuthenticatedSession: vi.fn(),
   routeHome: vi.fn(),
 }));
 
-vi.mock("../../utils/api", () => ({ wechatLogin: mocks.wechatLogin }));
+vi.mock("../../utils/api", () => ({
+  wechatLogin: mocks.wechatLogin,
+  switchActiveRole: mocks.switchActiveRole,
+}));
 vi.mock("../../utils/auth", () => ({ routeHome: mocks.routeHome }));
 vi.mock("../../utils/store", () => ({
   getAppContext: mocks.getAppContext,
   setSession: mocks.setSession,
+  persistAuthenticatedSession: mocks.persistAuthenticatedSession,
 }));
 
 let pageDefinition;
@@ -41,6 +47,10 @@ describe("login page", () => {
       clientId: "client-cq-talent",
     });
     mocks.setSession.mockReset();
+    mocks.persistAuthenticatedSession.mockReset().mockImplementation((result) => (
+      result.session?.activeRole ? { role: result.session.activeRole } : null
+    ));
+    mocks.switchActiveRole.mockReset();
     mocks.routeHome.mockReset();
     globalThis.wx.login.mockReset().mockImplementation(({ success }) => success({ code: "wx-code" }));
   });
@@ -58,9 +68,17 @@ describe("login page", () => {
 
   function authenticatedParent(children = [{ id: "student-1" }]) {
     return {
+      clubId: "club-chongqing-talent",
+      client: { id: "client-cq-talent" },
       status: "authenticated",
-      session: { token: "session-token", expiresInSeconds: 3600 },
+      session: {
+        token: "session-token",
+        expiresInSeconds: 3600,
+        expiresAt: "2099-01-01T00:00:00.000Z",
+        activeRole: "parent",
+      },
       role: "parent",
+      availableRoles: ["parent"],
       profile: { userId: "user-parent", displayName: "Parent" },
       children,
       capabilities: {},
@@ -123,9 +141,95 @@ describe("login page", () => {
     await Promise.all([firstCallback, duplicateCallback]);
 
     expect(mocks.wechatLogin).toHaveBeenCalledTimes(1);
-    expect(mocks.setSession).toHaveBeenCalledTimes(1);
+    expect(mocks.persistAuthenticatedSession).toHaveBeenCalledTimes(1);
     expect(mocks.routeHome).toHaveBeenCalledTimes(1);
     expect(globalThis.wx.login).not.toHaveBeenCalled();
+  });
+
+  it("waits for a dual-role choice before persisting or routing, then uses the pending token once", async () => {
+    let resolveSelection;
+    mocks.wechatLogin.mockResolvedValue({
+      clubId: "club-chongqing-talent",
+      client: { id: "client-cq-talent" },
+      status: "authenticated",
+      session: {
+        token: "pending-role-token",
+        expiresInSeconds: 3600,
+        expiresAt: "2099-01-01T00:00:00.000Z",
+        activeRole: null,
+      },
+      role: "coach",
+      availableRoles: ["parent", "coach"],
+      profile: { userId: "user-dual", displayName: "Dual role" },
+      children: [],
+      capabilities: {},
+    });
+    mocks.switchActiveRole.mockReturnValue(new Promise((resolve) => { resolveSelection = resolve; }));
+    const page = createPageInstance({ wxLoginCode: "wx-code" });
+
+    page.onPhoneAuthorizationTap();
+    await page.onGetPhoneNumber({ detail: { code: "phone-code" } });
+
+    expect(mocks.wechatLogin).toHaveBeenCalledTimes(1);
+    expect(mocks.persistAuthenticatedSession).not.toHaveBeenCalled();
+    expect(mocks.routeHome).not.toHaveBeenCalled();
+    expect(page.data).toMatchObject({ roleChooserVisible: true, canChooseParent: true, canChooseCoach: true });
+
+    const selection = page.chooseParentRole();
+    expect(mocks.switchActiveRole).toHaveBeenCalledWith("parent", "pending-role-token");
+    expect(mocks.switchActiveRole).toHaveBeenCalledTimes(1);
+    expect(mocks.persistAuthenticatedSession).not.toHaveBeenCalled();
+    expect(mocks.routeHome).not.toHaveBeenCalled();
+
+    resolveSelection(authenticatedParent());
+    await selection;
+
+    expect(mocks.persistAuthenticatedSession).toHaveBeenCalledWith(expect.objectContaining({
+      session: expect.objectContaining({ activeRole: "parent" }),
+    }));
+    expect(mocks.routeHome).toHaveBeenCalledWith("parent");
+    expect(mocks.wechatLogin).toHaveBeenCalledTimes(1);
+  });
+
+  it("rotates the pending token even when the compatible default role is chosen", async () => {
+    const pendingSession = {
+      clubId: "club-chongqing-talent",
+      client: { id: "client-cq-talent" },
+      status: "authenticated",
+      session: {
+        token: "pending-role-token",
+        expiresInSeconds: 3600,
+        expiresAt: "2099-01-01T00:00:00.000Z",
+        activeRole: null,
+      },
+      role: "coach",
+      availableRoles: ["parent", "coach"],
+      profile: { userId: "user-dual", displayName: "Dual role" },
+      children: [],
+      capabilities: {},
+    };
+    const selectedSession = {
+      ...pendingSession,
+      session: {
+        token: "rotated-coach-token",
+        expiresInSeconds: 3600,
+        expiresAt: "2099-01-01T01:00:00.000Z",
+        activeRole: "coach",
+      },
+    };
+    mocks.wechatLogin.mockResolvedValue(pendingSession);
+    mocks.switchActiveRole.mockResolvedValue(selectedSession);
+    const page = createPageInstance({ wxLoginCode: "wx-code" });
+
+    page.onPhoneAuthorizationTap();
+    await page.onGetPhoneNumber({ detail: { code: "phone-code" } });
+    await page.chooseCoachRole();
+
+    expect(mocks.switchActiveRole).toHaveBeenCalledTimes(1);
+    expect(mocks.switchActiveRole).toHaveBeenCalledWith("coach", "pending-role-token");
+    expect(mocks.persistAuthenticatedSession).toHaveBeenCalledWith(selectedSession);
+    expect(mocks.routeHome).toHaveBeenCalledWith("coach");
+    expect(mocks.wechatLogin).toHaveBeenCalledTimes(1);
   });
 
   it("does not auto-retry cancellation, frequency errors, empty code, or a missing login code", async () => {
@@ -200,6 +304,13 @@ describe("login page", () => {
     expect(template).not.toContain("login-field--wechat");
     expect(template).toContain('disabled="{{submitting || state === \'loading\' || authorizationLocked}}"');
     expect(template).toContain('bindtap="onPhoneAuthorizationTap"');
+  });
+
+  it("renders explicit role choices without JavaScript array calls in WXML", () => {
+    expect(template).toContain('wx:if="{{roleChooserVisible}}"');
+    expect(template).toContain('bindtap="chooseParentRole"');
+    expect(template).toContain('bindtap="chooseCoachRole"');
+    expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 
   it("keeps the G2 device-frame geometry for the login card stack", () => {

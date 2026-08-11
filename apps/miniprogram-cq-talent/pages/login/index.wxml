@@ -10,21 +10,30 @@
   </view>
 
   <block wx:else>
-    <view class="login-hero-card">
-      <view class="login-hero-card__badge"><image class="login-hero-card__icon" src="/assets/icons/login-link.svg" mode="aspectFit" /></view>
-      <view class="login-hero-card__title">连接重庆天才服务</view>
-      <view class="login-hero-card__desc">验证微信手机号，自动匹配俱乐部身份</view>
+    <view wx:if="{{roleChooserVisible}}" class="role-chooser">
+      <view class="role-chooser__title">选择身份</view>
+      <view class="role-chooser__desc">{{message}}</view>
+      <button wx:if="{{canChooseParent}}" class="role-chooser__button" disabled="{{submitting}}" bindtap="chooseParentRole">以家长身份进入</button>
+      <button wx:if="{{canChooseCoach}}" class="role-chooser__button" disabled="{{submitting}}" bindtap="chooseCoachRole">以教练身份进入</button>
     </view>
 
-    <view class="login-form-card">
-      <view class="login-field"><view class="login-field__label">微信手机号</view><view class="login-field__line"></view><view class="login-field__placeholder">授权后自动读取</view></view>
-      <view class="login-field login-field--status"><view class="login-field__label">身份匹配</view><view class="login-field__line"></view><view class="login-field__status">自动匹配俱乐部档案</view></view>
-    </view>
+    <block wx:else>
+      <view class="login-hero-card">
+        <view class="login-hero-card__badge"><image class="login-hero-card__icon" src="/assets/icons/login-link.svg" mode="aspectFit" /></view>
+        <view class="login-hero-card__title">连接重庆天才服务</view>
+        <view class="login-hero-card__desc">验证微信手机号，自动匹配俱乐部身份</view>
+      </view>
 
-    <view wx:if="{{state === 'loading'}}" class="login-feedback login-feedback--loading">{{message}}</view>
-    <view wx:elif="{{state === 'error'}}" class="login-feedback login-feedback--error" bindtap="retry">{{message}}<text class="login-feedback__action">重新连接</text></view>
+      <view class="login-form-card">
+        <view class="login-field"><view class="login-field__label">微信手机号</view><view class="login-field__line"></view><view class="login-field__placeholder">授权后自动读取</view></view>
+        <view class="login-field login-field--status"><view class="login-field__label">身份匹配</view><view class="login-field__line"></view><view class="login-field__status">自动匹配俱乐部档案</view></view>
+      </view>
 
-    <view class="login-cta-wrap"><button class="login-cta {{submitting || state === 'loading' || authorizationLocked ? 'login-cta--disabled' : ''}}" open-type="getPhoneNumber" loading="{{submitting}}" disabled="{{submitting || state === 'loading' || authorizationLocked}}" bindtap="onPhoneAuthorizationTap" bindgetphonenumber="onGetPhoneNumber">微信手机号授权并继续</button></view>
-    <view class="login-privacy">同意《用户协议》和《隐私政策》</view>
+      <view wx:if="{{state === 'loading'}}" class="login-feedback login-feedback--loading">{{message}}</view>
+      <view wx:elif="{{state === 'error'}}" class="login-feedback login-feedback--error" bindtap="retry">{{message}}<text class="login-feedback__action">重新连接</text></view>
+
+      <view class="login-cta-wrap"><button class="login-cta {{submitting || state === 'loading' || authorizationLocked ? 'login-cta--disabled' : ''}}" open-type="getPhoneNumber" loading="{{submitting}}" disabled="{{submitting || state === 'loading' || authorizationLocked}}" bindtap="onPhoneAuthorizationTap" bindgetphonenumber="onGetPhoneNumber">微信手机号授权并继续</button></view>
+      <view class="login-privacy">同意《用户协议》和《隐私政策》</view>
+    </block>
   </block>
 </view>

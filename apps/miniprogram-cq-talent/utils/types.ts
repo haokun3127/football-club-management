@@ -34,6 +34,7 @@ export interface AppContext {
 
 export interface SessionState extends AppContext {
   role: AppRole;
+  availableRoles: AppRole[];
   token: string;
   userId?: string;
   displayName?: string;
@@ -42,10 +43,13 @@ export interface SessionState extends AppContext {
 }
 
 export interface LoginResult {
+  clubId: string;
+  client: { id: string };
   status: "authenticated" | "binding_required";
   phoneBinding: "required" | "received" | "accepted" | "not_provided";
-  session: { token: string; expiresInSeconds: number } | null;
+  session: { token: string; expiresInSeconds: number; expiresAt: string; activeRole: AppRole | null } | null;
   role: AppRole | null;
+  availableRoles: AppRole[];
   profile: { userId: string; displayName: string; phone?: string } | null;
   children: StudentSummary[];
   capabilities: Capabilities;

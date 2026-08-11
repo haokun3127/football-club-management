@@ -21,6 +21,10 @@
 .login-cta { display: flex; box-sizing: border-box; align-items: center; justify-content: center; width: 100%; height: 100rpx; min-width: 100%; max-width: 100%; margin: 0; padding: 0; border-radius: 24rpx; background: var(--color-brand); color: #ffffff; font-size: 32rpx; font-weight: 700; line-height: 38rpx; }
 .login-cta--disabled { background: #d0d5dd; }
 .login-privacy { box-sizing: border-box; width: 662rpx; height: 50rpx; margin: 48rpx auto 0; padding: 24rpx 0 0; color: var(--color-text-secondary); font-size: 22rpx; line-height: 26rpx; text-align: center; }
+.role-chooser { box-sizing: border-box; width: 662rpx; margin: 148rpx auto 0; padding: 56rpx 40rpx; border-radius: 24rpx; background: var(--color-card); }
+.role-chooser__title { color: var(--color-text); font-size: 40rpx; font-weight: 700; text-align: center; }
+.role-chooser__desc { margin: 18rpx 0 36rpx; color: var(--color-text-secondary); font-size: 28rpx; text-align: center; }
+.role-chooser__button { margin-top: 20rpx; color: #ffffff; border-radius: 16rpx; background: var(--color-brand); }
 .blocked-card { display: flex; box-sizing: border-box; flex-direction: column; align-items: center; width: 662rpx; height: 648rpx; margin: 48rpx auto 0; padding: 64rpx; border-radius: 24rpx; background: var(--color-card); box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.12); }
 .blocked-card__icon { display: flex; align-items: center; justify-content: center; width: 128rpx; height: 128rpx; border-radius: 50%; background: #ffedd5; }
 .blocked-card__icon-image { width: 64rpx; height: 64rpx; }

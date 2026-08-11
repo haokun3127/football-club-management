@@ -1,6 +1,6 @@
-import { getParentChildren } from "../../../utils/api";
-import { requireRole } from "../../../utils/auth";
-import { clearSession } from "../../../utils/store";
+import { getParentChildren, switchActiveRole } from "../../../utils/api";
+import { requireRole, routeHome } from "../../../utils/auth";
+import { clearSession, persistAuthenticatedSession } from "../../../utils/store";
 import type { LoadState } from "../../../utils/types";
 
 interface PageData {
@@ -10,6 +10,7 @@ interface PageData {
   initial: string;
   profileLabel: string;
   phoneLabel: string;
+  canSwitchToCoach: boolean;
 }
 
 Page<PageData>({
@@ -20,6 +21,7 @@ Page<PageData>({
     initial: "家",
     profileLabel: "重庆天才足球俱乐部",
     phoneLabel: "已通过微信授权",
+    canSwitchToCoach: false,
   },
   onLoad() {
     this.load();
@@ -27,7 +29,7 @@ Page<PageData>({
   async load() {
     const session = requireRole("parent");
     if (!session) return;
-    this.setData({ state: "loading", message: "正在读取账号信息" });
+    this.setData({ state: "loading", message: "正在读取账号信息", canSwitchToCoach: session.availableRoles.includes("coach") });
     try {
       const children = await getParentChildren();
       const displayName = session.displayName || "家长";
@@ -47,6 +49,21 @@ Page<PageData>({
   },
   editPhone() {
     wx.showToast({ title: "请联系俱乐部管理员更新登记手机号", icon: "none" });
+  },
+  async switchToCoach() {
+    const session = requireRole("parent");
+    if (!session || !session.availableRoles.includes("coach")) return;
+    try {
+      const result = await switchActiveRole("coach");
+      const nextSession = persistAuthenticatedSession(result);
+      if (!nextSession) {
+        wx.showToast({ title: "身份切换失败，请稍后重试", icon: "none" });
+        return;
+      }
+      routeHome(nextSession.role);
+    } catch {
+      wx.showToast({ title: "身份切换失败，请稍后重试", icon: "none" });
+    }
   },
   logout() {
     wx.showModal({

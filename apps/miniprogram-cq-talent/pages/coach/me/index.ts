@@ -1,8 +1,8 @@
-import { getCoachHome } from "../../../utils/api";
-import { requireRole } from "../../../utils/auth";
+import { getCoachHome, switchActiveRole } from "../../../utils/api";
+import { requireRole, routeHome } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { resolveNavInset } from "../../../utils/presentation";
-import { clearSession } from "../../../utils/store";
+import { clearSession, persistAuthenticatedSession } from "../../../utils/store";
 import type { LoadState } from "../../../utils/types";
 
 interface PageData {
@@ -13,6 +13,7 @@ interface PageData {
   avatarLetter: string;
   teamsText: string;
   hasTeams: boolean;
+  canSwitchToParent: boolean;
 }
 
 Page<PageData>({
@@ -44,6 +45,7 @@ Page<PageData>({
         avatarLetter: displayName.slice(0, 1),
         teamsText: teams.length ? teams.join("、") : "暂无近30天负责球队",
         hasTeams: teams.length > 0,
+        canSwitchToParent: session.availableRoles.includes("parent"),
       });
     } catch {
       if (!isCurrentRequest(this, requestToken)) return;
@@ -68,6 +70,18 @@ Page<PageData>({
   },
   openHelp() {
     openPage("/pages/coach/help/index");
+  },
+  async switchToParent() {
+    const session = requireRole("coach");
+    if (!session || !session.availableRoles.includes("parent")) return;
+    try {
+      const result = await switchActiveRole("parent");
+      const nextSession = persistAuthenticatedSession(result);
+      if (!nextSession) return;
+      routeHome(nextSession.role);
+    } catch {
+      // The current coach session remains active so the user can try again.
+    }
   },
   logout() {
     const state = this as unknown as LogoutState;
@@ -102,6 +116,7 @@ function emptyPageData(state: LoadState, message: string): PageData {
     avatarLetter: "教",
     teamsText: "暂无近30天负责球队",
     hasTeams: false,
+    canSwitchToParent: false,
   };
 }
 

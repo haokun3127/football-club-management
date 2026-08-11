@@ -36,7 +36,48 @@ globalThis.wx = {
   }),
 };
 
-const { correctCoachLesson, createCoachMatchEvent, getCoachMatchDetail, getCoachWorkbench, getParentActivityDetail, getParentStudentHome, submitCoachAssessment } = await import("./api.ts");
+const { correctCoachLesson, createCoachMatchEvent, getCoachMatchDetail, getCoachWorkbench, getParentActivityDetail, getParentStudentHome, submitCoachAssessment, switchActiveRole, wechatLogin } = await import("./api.ts");
+
+describe("active-role session transport", () => {
+  it("advertises the role-switch capability when starting WeChat login", async () => {
+    const originalRequest = globalThis.wx.request;
+    let received;
+    globalThis.wx.request = ({ header, success }) => {
+      received = header;
+      success({ statusCode: 200, data: { status: "binding_required" } });
+    };
+
+    try {
+      await wechatLogin("wx-code", "phone-code");
+      expect(received).toMatchObject({
+        "X-App-Client-Capabilities": "active-role-switch-v1",
+      });
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
+
+  it("uses the pending login token only for the role-selection request", async () => {
+    const originalRequest = globalThis.wx.request;
+    let received;
+    globalThis.wx.request = ({ url, method, data, header, success }) => {
+      received = { url, method, data, header };
+      success({ statusCode: 200, data: { status: "authenticated" } });
+    };
+
+    try {
+      await switchActiveRole("parent", "pending-role-token");
+      expect(received).toMatchObject({
+        method: "POST",
+        url: expect.stringContaining("/session/role"),
+        data: { role: "parent" },
+        header: expect.objectContaining({ Authorization: "Bearer pending-role-token" }),
+      });
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
+});
 
 describe("coach workbench participant normalization", () => {
   it("uses backend participant.status and note fields", async () => {
