@@ -41,6 +41,91 @@ const flexibleObject = {
   additionalProperties: true,
 } as const;
 
+const appRole = {
+  type: "string",
+  enum: ["parent", "coach"],
+} as const;
+
+const appClientSession = {
+  type: "object",
+  additionalProperties: false,
+  required: ["token", "expiresInSeconds", "expiresAt", "activeRole"],
+  properties: {
+    token: { type: "string", minLength: 1 },
+    expiresInSeconds: { type: "integer", minimum: 1 },
+    expiresAt: { type: "string", minLength: 1 },
+    activeRole: { type: ["string", "null"], enum: ["parent", "coach", null] },
+  },
+} as const;
+
+const appClientProfile = {
+  type: "object",
+  additionalProperties: false,
+  required: ["userId", "displayName", "roles"],
+  properties: {
+    userId: { type: "string", minLength: 1 },
+    displayName: { type: "string" },
+    phone: { type: "string" },
+    roles: { type: "array", items: { type: "string" } },
+  },
+} as const;
+
+const appClientSessionResponse = {
+  type: "object",
+  additionalProperties: false,
+  required: ["clubId", "client", "status", "phoneBinding", "session", "profile", "role", "availableRoles", "children", "capabilities"],
+  properties: {
+    clubId: { type: "string", minLength: 1 },
+    client: {
+      type: "object",
+      additionalProperties: true,
+      required: ["id"],
+      properties: {
+        id: { type: "string", minLength: 1 },
+        channel: { type: "string" },
+        name: { type: "string" },
+        clientKey: { type: "string" },
+        appId: { type: "string" },
+        visibility: { type: "string" },
+      },
+    },
+    status: { type: "string", enum: ["authenticated", "binding_required"] },
+    phoneBinding: { type: "string", enum: ["accepted", "not_provided", "received", "required"] },
+    session: {
+      anyOf: [appClientSession, { type: "null" }],
+    },
+    profile: {
+      anyOf: [appClientProfile, { type: "null" }],
+    },
+    role: { type: ["string", "null"], enum: ["parent", "coach", null] },
+    availableRoles: { type: "array", items: appRole },
+    children: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: true,
+        required: ["id"],
+        properties: {
+          id: { type: "string", minLength: 1 },
+        },
+      },
+    },
+    capabilities: flexibleObject,
+  },
+} as const;
+
+const appClientAuthenticatedSessionResponse = {
+  ...appClientSessionResponse,
+  properties: {
+    ...appClientSessionResponse.properties,
+    status: { type: "string", const: "authenticated" },
+    phoneBinding: { type: "string", enum: ["accepted", "not_provided"] },
+    session: appClientSession,
+    profile: appClientProfile,
+    role: appRole,
+  },
+} as const;
+
 const metricValue = {
   oneOf: [
     {
@@ -475,6 +560,12 @@ export const schemas = {
     },
   },
   appClientWechatLogin: {
+    headers: {
+      type: "object",
+      properties: {
+        "x-app-client-capabilities": { type: "string", enum: ["active-role-switch-v1"] },
+      },
+    },
     body: {
       type: "object",
       additionalProperties: false,
@@ -487,7 +578,23 @@ export const schemas = {
       },
     },
     response: {
-      200: flexibleObject,
+      200: appClientSessionResponse,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientSessionRole: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["role"],
+      properties: {
+        role: { type: "string", enum: ["parent", "coach"] },
+      },
+    },
+    response: {
+      200: appClientAuthenticatedSessionResponse,
+      401: errorResponse,
       403: errorResponse,
       404: errorResponse,
     },

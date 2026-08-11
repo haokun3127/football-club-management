@@ -1,15 +1,18 @@
 import type { ClubUserMembership, EntityId, UserAccount } from "@football-club/domain";
 import type { FastifyRequest } from "fastify";
 import type { ClubUserMembershipRepository, UserAccountRepository } from "../persistence/platform-repositories.js";
+import type { AppClientSessionRecord } from "../persistence/app-client-session-repository.js";
 
 export interface AuthContext {
   user: UserAccount;
   clubId: EntityId;
   membership: ClubUserMembership;
+  appClientSession?: AppClientSessionRecord;
 }
 
 export interface MembershipResolver {
   resolve(request: FastifyRequest, clubId: EntityId): Promise<AuthContext | null>;
+  resolveByUserId?(clubId: EntityId, userId: EntityId): Promise<AuthContext | null>;
   resolveByPhone?(clubId: EntityId, phone: string): Promise<AuthContext | null>;
 }
 
@@ -41,6 +44,13 @@ export class HeaderMembershipResolver implements MembershipResolver {
 
   async resolveByPhone(clubId: EntityId, phone: string): Promise<AuthContext | null> {
     const user = await this.users.getByPhone(phone);
+    if (!user || user.status !== "active") return null;
+    const membership = await this.memberships.findActiveByClubAndUser(clubId, user.id);
+    return membership ? { user, clubId, membership } : null;
+  }
+
+  async resolveByUserId(clubId: EntityId, userId: EntityId): Promise<AuthContext | null> {
+    const user = await this.users.getById(userId);
     if (!user || user.status !== "active") return null;
     const membership = await this.memberships.findActiveByClubAndUser(clubId, user.id);
     return membership ? { user, clubId, membership } : null;

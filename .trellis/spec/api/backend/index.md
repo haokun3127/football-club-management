@@ -20,6 +20,7 @@ This directory contains guidelines for backend development. Fill in each file wi
 | [Quality Guidelines](./quality-guidelines.md) | Code standards, forbidden patterns | To fill |
 | [Logging Guidelines](./logging-guidelines.md) | Structured logging, log levels | To fill |
 | [App Client BFF Contracts](./app-client-bff-contracts.md) | Mini-program app-client API boundary and role contracts | Active |
+| [Active Role Sessions](./active-role-sessions.md) | Durable dual-role session and switching contract | Active |
 
 ---
 

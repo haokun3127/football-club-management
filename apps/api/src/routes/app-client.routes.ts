@@ -2,12 +2,13 @@ import crypto from "node:crypto";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { formationTemplates, validateTacticalBoardPlayers, type ClubUserRole, type MatchEventType, type TacticalBoardPlayer } from "@football-club/domain";
 import type { RecordAssessmentInput, RecordMatchInput } from "@football-club/domain";
+import { resolveAvailableAppRoles, resolveCompatibleAppRole, type AppRole } from "../auth/app-roles.js";
+import type { AuthContext } from "../auth/context.js";
+import { hasBearerAuthorization, parseBearerToken, type AppClientSessionDelivery } from "../auth/session-registry.js";
 import type { PrivacyRequestCreateInput } from "../data-capability/types.js";
 import type { ClubAppClient, StudentDetail, StudentListItem } from "../data-capability/types.js";
 import { schemas } from "../http/schemas.js";
 import type { RouteContext } from "./context.js";
-
-type AppRole = "parent" | "coach";
 
 interface AppEventDetail {
   id: string;
@@ -53,6 +54,28 @@ interface ParentReminder {
 }
 
 export async function registerAppClientRoutes(app: FastifyInstance, context: RouteContext) {
+  app.addHook("preHandler", async (request, reply) => {
+    const bffPath = appClientBffPath(request);
+    const requiredRole = requiredSessionRole(request);
+    if (!bffPath || bffPath === "wechat-login" || bffPath === "session/role" || !hasBearerAuthorization(request.headers.authorization)) {
+      return;
+    }
+    const params = request.params as { clubId?: unknown };
+    if (typeof params.clubId !== "string") {
+      return;
+    }
+    const auth = await context.resolveClubAuth(request, reply, params.clubId);
+    if (!auth) {
+      return reply;
+    }
+    if (auth.appClientSession?.activeRole === null) {
+      return context.sendError(reply, 401, "authentication_required", "Choose an active role before accessing app-client routes");
+    }
+    if (requiredRole && auth.appClientSession && auth.appClientSession.activeRole !== requiredRole) {
+      return context.sendError(reply, 403, "forbidden", "Session active role is not permitted for this operation");
+    }
+  });
+
   app.get<{ Params: { clubId: string; clientId: string } }>(
     "/clubs/:clubId/app-clients/:clientId/coach/tactical-board/formations",
     { schema: { ...schemas.appClientParams } },
@@ -356,6 +379,52 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
     Params: {
       clubId: string;
       clientId: string;
+    };
+    Body: {
+      role: AppRole;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/session/role",
+    {
+      schema: {
+        ...schemas.appClientParams,
+        ...schemas.appClientSessionRole,
+      },
+    },
+    async (request, reply) => {
+      const auth = await context.resolveClubAuth(request, reply, request.params.clubId);
+      if (!auth) {
+        return reply;
+      }
+      const client = await requireActiveAppClientAny(context, reply, request.params.clubId, request.params.clientId);
+      if (!client) {
+        return reply;
+      }
+      const availableRoles = resolveAvailableAppRoles(auth.membership.roles, client);
+      if (!availableRoles.includes(request.body.role)) {
+        return context.sendError(reply, 403, "forbidden", "Requested role is not available for this app client");
+      }
+      const session = await context.sessionRegistry.rotate(
+        parseBearerToken(request.headers.authorization),
+        {
+          clubId: request.params.clubId,
+          appClientId: client.id,
+          userId: auth.user.id,
+          membershipId: auth.membership.id,
+          activeRole: request.body.role,
+        },
+      );
+      if (!session) {
+        return context.sendError(reply, 401, "authentication_required", "Session is missing or expired");
+      }
+      return authenticatedSessionResponse(context, request.params.clubId, client, auth, availableRoles, request.body.role, session, "accepted");
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+      clientId: string;
       eventId: string;
     };
     Body: {
@@ -534,9 +603,15 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return reply;
       }
 
-      let auth = context.membershipResolver
-        ? await context.membershipResolver.resolve(request, request.params.clubId)
-        : null;
+      const hasBearer = hasBearerAuthorization(request.headers.authorization);
+      let auth = hasBearer
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : context.membershipResolver
+          ? await context.membershipResolver.resolve(request, request.params.clubId)
+          : null;
+      if (hasBearer && !auth) {
+        return reply;
+      }
       if (!auth && context.wechatIdentityConnector && context.membershipResolver?.resolveByPhone) {
         try {
           const identity = await context.wechatIdentityConnector.resolve(request.body.wxLoginCode, request.body.phoneCode);
@@ -556,41 +631,39 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
           phoneBinding: request.body.phoneCode || request.body.encryptedPhoneData ? "received" : "required",
           session: null,
           role: null,
+          availableRoles: [],
           profile: null,
           children: [],
           capabilities: await context.store.getClubCapabilities(request.params.clubId, { clientId: request.params.clientId }),
         };
       }
 
-      const role = resolveAppRole(auth?.membership.roles);
-      const entrypoints = client.roleEntrypoints?.[role];
-      if (!Array.isArray(entrypoints) || entrypoints.length === 0) {
-        return context.sendError(reply, 403, "forbidden", `App client does not expose ${role} entrypoints`);
+      const availableRoles = resolveAvailableAppRoles(auth.membership.roles, client);
+      const role = resolveCompatibleAppRole(availableRoles);
+      if (!role) {
+        return context.sendError(reply, 403, "forbidden", "App client does not expose an available membership role");
       }
-      const students = role === "parent"
-        ? (await context.store.listOperationalStudents(request.params.clubId))
-          .filter((student) => auth ? context.store.isGuardianOfStudent(request.params.clubId, auth.user.id, student.id) : true)
-        : [];
-      const session = context.sessionRegistry.create(auth);
-
-      return {
+      const activeRole = availableRoles.length > 1 && firstHeaderValue(request.headers["x-app-client-capabilities"]) === "active-role-switch-v1"
+        ? null
+        : role;
+      const session = await context.sessionRegistry.create({
         clubId: request.params.clubId,
-        client: summarizeClient(client),
-        status: "authenticated",
-        phoneBinding: request.body.phoneCode || request.body.encryptedPhoneData ? "accepted" : "not_provided",
-        session,
-        profile: auth
-          ? {
-            userId: auth.user.id,
-            displayName: auth.user.displayName,
-            phone: auth.user.phone,
-            roles: auth.membership.roles,
-          }
-          : null,
+        appClientId: client.id,
+        userId: auth.user.id,
+        membershipId: auth.membership.id,
+        activeRole,
+      });
+
+      return authenticatedSessionResponse(
+        context,
+        request.params.clubId,
+        client,
+        auth,
+        availableRoles,
         role,
-        children: students.map(summarizeStudent),
-        capabilities: await context.store.getClubCapabilities(request.params.clubId, { clientId: request.params.clientId }),
-      };
+        session,
+        request.body.phoneCode || request.body.encryptedPhoneData ? "accepted" : "not_provided",
+      );
     },
   );
 
@@ -1210,7 +1283,15 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return reply;
       }
 
-      const role = resolveAppRole(auth?.membership.roles);
+      const appClient = await requireActiveAppClientAny(context, reply, request.params.clubId, request.params.clientId);
+      if (!appClient) {
+        return reply;
+      }
+      const role = auth?.appClientSession?.activeRole
+        ?? (auth ? resolveCompatibleAppRole(resolveAvailableAppRoles(auth.membership.roles, appClient)) : "coach");
+      if (!role) {
+        return context.sendError(reply, 403, "forbidden", "No app role is available for this membership");
+      }
       const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, role);
       if (!client) {
         return reply;
@@ -2493,8 +2574,62 @@ function summarizeClient(client: ClubAppClient) {
   };
 }
 
+async function authenticatedSessionResponse(
+  context: RouteContext,
+  clubId: string,
+  client: ClubAppClient,
+  auth: AuthContext,
+  availableRoles: AppRole[],
+  role: AppRole,
+  session: AppClientSessionDelivery,
+  phoneBinding: "accepted" | "not_provided",
+) {
+  const includeParentChildren = session.activeRole === "parent";
+  const children = includeParentChildren
+    ? (await context.store.listOperationalStudents(clubId))
+      .filter((student) => context.store.isGuardianOfStudent(clubId, auth.user.id, student.id))
+      .map(summarizeStudent)
+    : [];
+
+  return {
+    clubId,
+    client: summarizeClient(client),
+    status: "authenticated" as const,
+    phoneBinding,
+    session,
+    profile: {
+      userId: auth.user.id,
+      displayName: auth.user.displayName,
+      phone: auth.user.phone,
+      roles: auth.membership.roles,
+    },
+    role,
+    availableRoles,
+    children,
+    capabilities: await context.store.getClubCapabilities(clubId, { clientId: client.id }),
+  };
+}
+
 function firstHeaderValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
+}
+
+function requiredSessionRole(request: FastifyRequest): AppRole | undefined {
+  const path = appClientBffPath(request);
+  if (!path) return undefined;
+  if (path.startsWith("parent/")) return "parent";
+  if (path.startsWith("coach/")) return "coach";
+  return undefined;
+}
+
+function appClientBffPath(request: FastifyRequest): string | undefined {
+  const params = request.params as { clubId?: unknown; clientId?: unknown };
+  if (typeof params.clubId !== "string" || typeof params.clientId !== "string") {
+    return undefined;
+  }
+  const prefix = `/clubs/${params.clubId}/app-clients/${params.clientId}/`;
+  const pathname = request.url.split("?", 1)[0] ?? "";
+  return pathname.startsWith(prefix) ? pathname.slice(prefix.length) : undefined;
 }
 
 function isMatchEventType(value: string): value is MatchEventType {
@@ -2775,16 +2910,4 @@ function metricNumericValue(value: unknown): number | null {
 
 function round1(value: number): number {
   return Math.round(value * 10) / 10;
-}
-
-function resolveAppRole(roles: ClubUserRole[] | undefined): AppRole {
-  if (!roles) {
-    return "coach";
-  }
-
-  if (roles.some((role) => adminRoles.has(role) || role === "coach")) {
-    return "coach";
-  }
-
-  return "parent";
 }

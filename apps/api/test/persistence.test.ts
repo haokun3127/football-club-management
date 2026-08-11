@@ -281,6 +281,7 @@ describe("platform persistence", () => {
       "0006_tactical_boards.sql",
       "0007_request_collections.sql",
       "0008_match_event_bundles.sql",
+      "0009_app_client_sessions.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);
@@ -317,12 +318,14 @@ describe("platform persistence", () => {
           'assessment_metric_bindings',
           'assessment_test_items',
           'assessment_raw_results'
-          ,'tactical_boards'
+          ,'tactical_boards',
+          'app_client_sessions'
         )
       ORDER BY name
     `).all() as Array<{ name: string }>;
 
     expect(tables.map((table) => table.name)).toEqual([
+      "app_client_sessions",
       "assessment_metric_bindings",
       "assessment_raw_results",
       "assessment_template_versions",

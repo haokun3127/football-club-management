@@ -1,5 +1,6 @@
 import type { DatabaseSync } from "node:sqlite";
 import { createSeedData, type SeedData } from "../seed.js";
+import { AppClientSessionRepository } from "./app-client-session-repository.js";
 import { AssessmentRepository } from "./assessment-repositories.js";
 import { CalendarRepository } from "./calendar-repositories.js";
 import { DataCapabilityRepository } from "./data-capability-repositories.js";
@@ -18,6 +19,7 @@ import { migrate, openSqliteDatabase } from "./sqlite.js";
 import { TacticalBoardRepository } from "./tactical-board-repository.js";
 
 export interface PlatformRepositories {
+  appClientSessions: AppClientSessionRepository;
   assessments: AssessmentRepository;
   calendar: CalendarRepository;
   matches: MatchRepository;
@@ -40,6 +42,7 @@ export interface PlatformPersistence {
 
 export function createPlatformRepositories(database: DatabaseSync): PlatformRepositories {
   return {
+    appClientSessions: new AppClientSessionRepository(database),
     assessments: new AssessmentRepository(database),
     calendar: new CalendarRepository(database),
     matches: new MatchRepository(database),

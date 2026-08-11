@@ -40,7 +40,17 @@ describe("api server", () => {
       url: "/openapi.json",
     });
 
-    const body = response.json() as { openapi: string; paths: Record<string, unknown> };
+    const body = response.json() as {
+      openapi: string;
+      paths: Record<string, {
+        post?: {
+          parameters?: Array<{ name: string; in: string; required: boolean; schema: unknown }>;
+          responses?: Record<string, {
+            content?: Record<string, { schema: unknown }>;
+          }>;
+        };
+      }>;
+    };
 
     expect(response.statusCode).toBe(200);
     expect(body.openapi).toBe("3.1.0");
@@ -49,6 +59,38 @@ describe("api server", () => {
     expect(body.paths["/clubs/{clubId}/admin/app-clients"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/children"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/wechat-login"]).toBeDefined();
+    expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/session/role"]).toBeDefined();
+    const loginOperation = body.paths["/clubs/{clubId}/app-clients/{clientId}/wechat-login"].post!;
+    const roleOperation = body.paths["/clubs/{clubId}/app-clients/{clientId}/session/role"].post!;
+    expect(loginOperation.parameters).toContainEqual({
+      name: "x-app-client-capabilities",
+      in: "header",
+      required: false,
+      schema: { type: "string", enum: ["active-role-switch-v1"] },
+    });
+    for (const operation of [loginOperation, roleOperation]) {
+      const responseSchema = operation.responses?.["200"]?.content?.["application/json"]?.schema as {
+        required: string[];
+        properties: {
+          availableRoles: unknown;
+          session: { anyOf?: unknown[] };
+        };
+      };
+      expect(responseSchema.required).toEqual(expect.arrayContaining(["availableRoles", "session"]));
+      expect(responseSchema.properties.availableRoles).toEqual({
+        type: "array",
+        items: { type: "string", enum: ["parent", "coach"] },
+      });
+      const sessionVariants = responseSchema.properties.session.anyOf ?? [responseSchema.properties.session];
+      expect(sessionVariants).toContainEqual(expect.objectContaining({
+        properties: expect.objectContaining({
+          activeRole: expect.objectContaining({
+            type: expect.arrayContaining(["string", "null"]),
+            enum: expect.arrayContaining(["parent", "coach", null]),
+          }),
+        }),
+      }));
+    }
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/home"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/schedule"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/calendar"]).toBeDefined();

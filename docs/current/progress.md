@@ -1,5 +1,11 @@
 # 核心演示闭环 · 进度跟踪
 
+## 2026-08-11 Dual Parent/Coach Role Switching: Backend Foundation
+
+- Added SQLite-backed app-client sessions with SHA-256 token storage, atomic token rotation, route-bound bearer revalidation, entrypoint-filtered `availableRoles`, and the server-confirmed role-selection endpoint.
+- Capability-aware dual-role logins receive a pending session; legacy clients retain the compatible scoped default session. Pending, stale, expired, revoked, inactive-user, inactive-membership, inactive-client, and wrong-role bearer sessions return `401 authentication_required` without development-header fallback.
+- A real file-backed restart test closes all original API/database instances before reopening and confirms a current active session remains valid. Full API Vitest `81/81`, API typecheck, and `git diff --check` passed; Terra xhigh approved the backend diff. Mini-program chooser and in-app switch controls remain the next independent batch.
+
 > 依据《Figma 全量补齐决策》（../design/figma/figma-full-implementation-decision.md）执行。
 > 本文档随每批工作实时更新：完成一项勾一项，新增发现随时补充。
 > 最后更新：2026-08-08

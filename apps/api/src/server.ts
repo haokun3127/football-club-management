@@ -6,7 +6,7 @@ import type { WechatIdentityConnector } from "./integrations/wechat-identity-con
 import { apiError } from "./http/errors.js";
 import { buildOpenApiDocument } from "./http/openapi.js";
 import { registerHttpRequestContracts } from "./http/request-contracts.js";
-import { InMemoryStore, type ApiStore } from "./store.js";
+import { InMemoryStore, PersistentApiStore, type ApiStore } from "./store.js";
 import { registerAppClientRoutes } from "./routes/app-client.routes.js";
 import { registerAssessmentRoutes } from "./routes/assessment.routes.js";
 import { registerCalendarRoutes } from "./routes/calendar.routes.js";
@@ -33,7 +33,11 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
       },
     },
   });
-  const context = createRouteContext(store, options.membershipResolver, options.sessionRegistry ?? new SessionRegistry(), options.wechatIdentityConnector);
+  const sessionRegistry = options.sessionRegistry
+    ?? (store instanceof PersistentApiStore
+      ? new SessionRegistry(store.repositories.appClientSessions)
+      : new SessionRegistry());
+  const context = createRouteContext(store, options.membershipResolver, sessionRegistry, options.wechatIdentityConnector);
   registerHttpRequestContracts(app, store);
 
   app.setErrorHandler((error: FastifyError, _request, reply) => {

@@ -3,6 +3,7 @@ import { errorResponse, schemas } from "./schemas.js";
 interface RouteSchema {
   params?: unknown;
   querystring?: unknown;
+  headers?: unknown;
   body?: unknown;
   response?: Record<string, unknown>;
 }
@@ -51,7 +52,14 @@ function parameters(schema: RouteSchema) {
     required: false,
     schema: property,
   }));
-  const allParameters = [...params, ...query];
+  const requiredHeaders = objectSchemaRequired(schema.headers);
+  const headers = objectSchemaProperties(schema.headers).map(([name, property]) => ({
+    name,
+    in: "header",
+    required: requiredHeaders.has(name),
+    schema: property,
+  }));
+  const allParameters = [...params, ...query, ...headers];
 
   return allParameters.length ? allParameters : undefined;
 }
@@ -63,6 +71,15 @@ function objectSchemaProperties(schema: unknown): Array<[string, unknown]> {
 
   const properties = (schema as { properties?: Record<string, unknown> }).properties;
   return properties ? Object.entries(properties) : [];
+}
+
+function objectSchemaRequired(schema: unknown) {
+  if (!schema || typeof schema !== "object" || !("required" in schema)) {
+    return new Set<string>();
+  }
+
+  const required = (schema as { required?: unknown }).required;
+  return new Set(Array.isArray(required) ? required.filter((name): name is string => typeof name === "string") : []);
 }
 
 function operation(method: string, path: string, schema: RouteSchema) {
@@ -115,6 +132,12 @@ export function buildOpenApiDocument() {
         post: operation("POST", "/clubs/{clubId}/app-clients/{clientId}/wechat-login", {
           ...schemas.appClientParams,
           ...schemas.appClientWechatLogin,
+        }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/session/role": {
+        post: operation("POST", "/clubs/{clubId}/app-clients/{clientId}/session/role", {
+          ...schemas.appClientParams,
+          ...schemas.appClientSessionRole,
         }),
       },
       "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/home": {

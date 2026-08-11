@@ -2406,7 +2406,7 @@ export class InMemoryStore extends SeedBackedStore {}
 
 export class PersistentApiStore extends SeedBackedStore {
   constructor(
-    private readonly repositories: PlatformRepositories,
+    readonly repositories: PlatformRepositories,
     data: SeedData = createSeedData(),
   ) {
     super(mergePersistedMatchData(repositories, mergePersistedAssessmentData(repositories, data)));
