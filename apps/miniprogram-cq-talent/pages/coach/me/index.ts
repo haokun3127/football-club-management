@@ -1,12 +1,13 @@
 import { getCoachHome, switchActiveRole } from "../../../utils/api";
 import { requireRole, routeHome } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import { resolveNavInset } from "../../../utils/presentation";
+import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { clearSession, persistAuthenticatedSession } from "../../../utils/store";
 import type { LoadState } from "../../../utils/types";
 
 interface PageData {
   navInset: number;
+  menuInset: number;
   state: LoadState;
   message: string;
   displayName: string;
@@ -110,6 +111,7 @@ interface LogoutState {
 function emptyPageData(state: LoadState, message: string): PageData {
   return {
     navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     state,
     message,
     displayName: "教练",

@@ -17,7 +17,7 @@ vi.mock("../../../utils/api", () => ({ getCoachHome: mocks.getCoachHome, switchA
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole, routeHome: mocks.routeHome }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
 vi.mock("../../../utils/store", () => ({ clearSession: mocks.clearSession, persistAuthenticatedSession: mocks.persistAuthenticatedSession }));
-vi.mock("../../../utils/presentation", () => ({ resolveNavInset: () => 0 }));
+vi.mock("../../../utils/presentation", () => ({ resolveMenuInset: () => 16, resolveNavInset: () => 0 }));
 
 globalThis.wx = {
   showModal: mocks.showModal,
@@ -242,6 +242,7 @@ describe("coach profile", () => {
     expect(pageConfig).not.toContain('"app-header"');
     expect(pageConfig).toContain('"role-tabbar"');
     expect(template).toContain('class="c16-bar"');
+    expect(template).toContain('padding-right:{{menuInset}}px');
     expect(template).toContain('class="c16-profile"');
     expect(template).not.toMatch(/主教练|本赛季执教|在队学员|平均出勤/);
     expect(controller).not.toContain("home.coachName");
