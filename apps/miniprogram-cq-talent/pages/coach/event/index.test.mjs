@@ -211,13 +211,12 @@ describe("coach activity workbench", () => {
     expect(stylesheet).toMatch(/\.shero__status\s*\{[^}]*flex:\s*0\s+0\s+auto/s);
   });
 
-  it("uses the Figma in-flow coach navigation instead of a fixed footer", () => {
-    expect(template).toContain('class="c2-route-tabs"');
-    expect(template).toContain('data-path="/pages/coach/schedule/index"');
-    expect(template).toContain('data-path="/pages/coach/training/index"');
-    expect(template).toContain('data-path="/pages/coach/me/index"');
-    expect(template).not.toContain("role-tabbar");
-    expect(pageConfig).not.toContain('"role-tabbar"');
+  it("uses the Figma bottom coach navigation and keeps the action grid inside its cards", () => {
+    expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
+    expect(template).not.toContain('class="c2-route-tabs"');
+    expect(pageConfig).toContain('"role-tabbar"');
+    expect(stylesheet).toMatch(/\.shero\s*\{[^}]*min-height:\s*280rpx/s);
+    expect(stylesheet).toMatch(/\.action-tile\s*\{[^}]*min-height:\s*200rpx/s);
   });
 
   it("relaunches only a supported in-flow coach root route", () => {

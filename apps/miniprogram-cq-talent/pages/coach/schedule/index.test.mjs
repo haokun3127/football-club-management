@@ -190,4 +190,10 @@ describe("coach schedule home", () => {
     expect(template).toContain('padding-right:{{menuInset}}px');
     expect(stylesheet).toMatch(/\.c1-nav\s*\{[^}]*box-sizing:\s*border-box/s);
   });
+
+  it("keeps the live hero title and cards inside the C1 Figma width budget", () => {
+    expect(stylesheet).toMatch(/\.c1-hero__title\s*\{[^}]*flex:\s*1[^}]*min-width:\s*0/s);
+    expect(stylesheet).toMatch(/\.c1-hero\s*\{[^}]*min-height:\s*360rpx[^}]*padding:\s*32rpx/s);
+    expect(stylesheet).toMatch(/\.acard\s*\{[^}]*min-height:\s*192rpx[^}]*padding:\s*24rpx/s);
+  });
 });
