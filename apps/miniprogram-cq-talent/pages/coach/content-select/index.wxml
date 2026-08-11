@@ -1,5 +1,5 @@
 <view class="select-page">
-  <view class="select-nav" style="padding-top:{{navInset}}px">
+  <view class="select-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="select-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
     <view class="select-nav__title">训练内容选择</view>
     <view class="select-nav__spacer"></view>

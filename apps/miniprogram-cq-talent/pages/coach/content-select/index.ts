@@ -1,6 +1,6 @@
 import { getCoachTrainingProjectTree, getCoachWorkbench, saveCoachTrainingProjects } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { resolveNavInset } from "../../../utils/presentation";
+import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachWorkbench, LoadState, TrainingProject, TrainingProjectTree } from "../../../utils/types";
 
 type CategoryView = {
@@ -25,6 +25,7 @@ type ProjectView = TrainingProject & {
 
 interface PageData {
   navInset: number;
+  menuInset: number;
   state: LoadState;
   statusTitle: string;
   statusActionText: string;
@@ -59,6 +60,7 @@ const TARGET_ICONS = [
 Page<PageData>({
   data: {
     navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     state: "idle",
     statusTitle: "训练内容选择",
     statusActionText: "",
