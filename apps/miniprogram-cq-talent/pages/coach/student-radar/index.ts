@@ -1,5 +1,6 @@
 import { getCoachStudentRadar, getCoachTeam } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { resolveNavInset } from "../../../utils/presentation";
 import type { LoadState, RadarMetricPoint } from "../../../utils/types";
 
 interface StudentChip {
@@ -15,6 +16,7 @@ interface RadarDimension {
 }
 
 interface PageData {
+  navInset: number;
   state: LoadState;
   message: string;
   students: StudentChip[];
@@ -118,6 +120,7 @@ Page<PageData>({
 
 function emptyPageData(state: LoadState, message: string): PageData {
   return {
+    navInset: resolveNavInset(),
     state,
     message,
     students: [],

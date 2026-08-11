@@ -1,5 +1,6 @@
 import { getAssessmentForm, getCoachTeam, submitCoachAssessment } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { AssessmentForm, CoachTeamDetail, LoadState } from "../../../utils/types";
 
 type AssessmentField = AssessmentForm["fields"][number];
@@ -43,6 +44,8 @@ interface AssessmentDraft {
 }
 
 interface PageData {
+  navInset: number;
+  menuInset: number;
   state: LoadState;
   statusTitle: string;
   statusActionText: string;
@@ -65,6 +68,8 @@ let latestLoadToken = 0;
 
 Page<PageData>({
   data: {
+    navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     state: "idle",
     statusTitle: "能力评估录入",
     statusActionText: "",

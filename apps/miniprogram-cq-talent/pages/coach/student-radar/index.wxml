@@ -1,5 +1,5 @@
 <view class="radar-page">
-  <view class="radar-nav">
+  <view class="radar-nav" style="padding-top:{{navInset}}px">
     <view class="radar-nav__back" bindtap="goBack">
       <image class="radar-nav__back-icon" src="/assets/icons/c13-arrow-left.svg" mode="aspectFit" />
     </view>

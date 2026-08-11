@@ -13,6 +13,7 @@ vi.mock("../../../utils/api", () => ({
   getCoachStudentRadar: mocks.getCoachStudentRadar,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
+vi.mock("../../../utils/presentation", () => ({ resolveNavInset: () => 0 }));
 
 globalThis.wx = { navigateBack: mocks.navigateBack };
 
@@ -224,6 +225,7 @@ describe("coach student radar", () => {
     expect(pageConfig).not.toContain('"app-header"');
     expect(pageConfig).toContain('"role-tabbar"');
     expect(template).toContain('class="radar-nav"');
+    expect(template).toContain('padding-top:{{navInset}}px');
     expect(template).toContain('/assets/icons/c13-arrow-left.svg');
     expect(template).toContain('feedbackMessage');
     expect(template).not.toContain("教练李");

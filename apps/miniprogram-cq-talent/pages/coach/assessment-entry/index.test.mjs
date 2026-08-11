@@ -18,6 +18,7 @@ vi.mock("../../../utils/api", () => ({
   submitCoachAssessment: mocks.submitCoachAssessment,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
+vi.mock("../../../utils/presentation", () => ({ resolveMenuInset: () => 16, resolveNavInset: () => 0 }));
 
 globalThis.wx = {
   getStorageSync: (key) => storage.get(key) ?? "",
@@ -235,6 +236,7 @@ describe("C15 coach assessment entry", () => {
     expect(template).not.toContain("U10精英队");
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"app-header"');
+    expect(template).toContain('padding-top:{{navInset}}px;padding-right:{{menuInset}}px');
     expect(stylesheet).toMatch(/\.c15-nav\s*\{[^}]*height:\s*176rpx/s);
   });
 });
