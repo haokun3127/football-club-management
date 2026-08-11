@@ -21,6 +21,12 @@
 - C3, C4.1, C5.1, C10.1, and C15.1 now use the Figma-required left-title navigation geometry and fixed 88px safe-area envelope. C10.1's neutral header background and C15.1's pink left-title header were aligned without changing any capability or write contract.
 - Latest full workspace check: domain `19/19`, mini-program `293/293`, API `85/85`; all TypeScript checks and `git diff --check` passed. C7 ready-state screenshot remains data-blocked, not passed by inference.
 
+## 2026-08-11 C16 Detail-Page Alignment
+
+- C16 account, permissions, private-interest, and help detail headers no longer reserve a right-side placeholder. The back arrow and title now share the left-aligned Figma geometry; account also uses the fixed safe-area-inclusive 88px header envelope.
+- The current account and permissions pages were sampled with the authenticated coach session. Dynamic phone, capability, and administrator-only content remains derived from real session/capability data; no edit, save, or contact affordance was invented where the BFF lacks that contract.
+- Verification after this batch: domain `19/19`, mini-program `293/293`, API `85/85`, all TypeScript checks, and `git diff --check` passed.
+
 ## 2026-08-11 Dual Parent/Coach Role Switching: Backend Foundation
 
 - Added SQLite-backed app-client sessions with SHA-256 token storage, atomic token rotation, route-bound bearer revalidation, entrypoint-filtered `availableRoles`, and the server-confirmed role-selection endpoint.
