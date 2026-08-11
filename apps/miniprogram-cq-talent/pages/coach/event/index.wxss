@@ -26,6 +26,6 @@
 .roster-count { flex: 0 0 auto; padding: 6rpx 12rpx; border-radius: 8rpx; background: #f2f4f7; color: #667085; font-size: 21rpx; line-height: 28rpx; }
 
 .action-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16rpx; }
-.action-tile { box-sizing: border-box; width: 100%; min-width: 0; min-height: 160rpx; margin: 0; padding: 0 8rpx; border: 0; border-radius: 24rpx; background: #ffffff; box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, .05); color: #202124; font-size: 23rpx; font-weight: 600; line-height: 1.35; }
+.action-tile { display: flex; box-sizing: border-box; width: 100%; min-width: 0; min-height: 160rpx; align-items: center; justify-content: center; margin: 0; padding: 0 8rpx; border: 0; border-radius: 24rpx; background: #ffffff; box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, .05); color: #202124; font-size: 23rpx; font-weight: 600; line-height: 1.35; text-align: center; }
 .action-tile--primary { border-color: #f7cdd1; background: #fceeef; color: #a80f1b; }
 .action-tile--match { border-color: #b2ddff; background: #eff8ff; color: #175cd3; }

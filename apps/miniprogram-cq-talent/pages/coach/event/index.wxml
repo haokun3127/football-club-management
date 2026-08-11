@@ -36,7 +36,7 @@
     <view wx:if="{{hasActionCards}}" class="workbench-card">
       <view class="section-title">可用操作</view>
       <view class="action-grid">
-        <button wx:for="{{actionCards}}" wx:key="id" class="action-tile {{item.toneClass}}" data-action="{{item.id}}" bindtap="openAction">{{item.label}}</button>
+        <view wx:for="{{actionCards}}" wx:key="id" class="action-tile {{item.toneClass}}" data-action="{{item.id}}" bindtap="openAction">{{item.label}}</view>
       </view>
     </view>
 
