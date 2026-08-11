@@ -78,6 +78,7 @@ const typeTabs: PageData["typeTabs"] = [
 ];
 
 const initialDate = resolveParentPageDate(new Date(), DEV_PARENT_PAGE_DATE_OVERRIDE);
+let scheduleLoadToken = 0;
 
 Page<PageData>({
   data: {
@@ -123,18 +124,22 @@ Page<PageData>({
   async load() {
     const session = requireRole("parent");
     if (!session) return;
+    const loadToken = ++scheduleLoadToken;
+    const selectedDate = this.data.selectedDate;
     this.setData({ state: "loading", message: "正在读取家庭日程" });
     try {
       const children = await getParentChildren();
+      if (loadToken !== scheduleLoadToken) return;
       if (!children.length) {
         this.setData({ state: "empty", message: "当前微信手机号尚未绑定孩子档案，请联系俱乐部确认登记信息。" });
         return;
       }
-      const events = await getParentCalendar(dateWindowStart(this.data.selectedDate), dateWindowEnd(this.data.selectedDate));
+      const events = await getParentCalendar(dateWindowStart(selectedDate), dateWindowEnd(selectedDate));
+      if (loadToken !== scheduleLoadToken) return;
       const active = children.find((child) => child.id === this.data.activeStudentId);
       const childEvents = filterEvents(events, this.data.activeStudentId, "", "all");
-      const visibleEvents = presentEvents(filterEvents(events, this.data.activeStudentId, this.data.selectedDate, this.data.selectedType));
-      const digest = buildScheduleDigest(childEvents, this.data.selectedDate);
+      const visibleEvents = presentEvents(filterEvents(events, this.data.activeStudentId, selectedDate, this.data.selectedType));
+      const digest = buildScheduleDigest(childEvents, selectedDate);
       this.setData({
         state: "ready",
         message: "",
@@ -143,8 +148,8 @@ Page<PageData>({
         activeStudentName: active?.name ?? "全部孩子",
         events,
         visibleEvents,
-        selectedDateLabel: formatCalendarDate(this.data.selectedDate),
-        dateOptions: buildDateOptions(this.data.selectedDate, events),
+        selectedDateLabel: formatCalendarDate(selectedDate),
+        dateOptions: buildDateOptions(selectedDate, events),
         todayLabel: digest.todayLabel,
         selectedCountLabel: selectedCountLabel(this.data.selectedDate, digest.todayCount),
         todayCount: digest.todayCount,
@@ -153,6 +158,7 @@ Page<PageData>({
         hero: digest.hero,
       });
     } catch (error) {
+      if (loadToken !== scheduleLoadToken) return;
       this.setData({ state: "error", message: readableError(error) });
     }
   },
