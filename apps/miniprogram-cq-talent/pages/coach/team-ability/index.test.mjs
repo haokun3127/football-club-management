@@ -149,7 +149,9 @@ describe("coach team ability overview", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(template).toContain('class="ability-nav"');
     expect(template).toContain('/assets/icons/c14-arrow-left.svg');
-    expect(template).toMatch(/<radar-canvas[^>]*width="440rpx"[^>]*height="360rpx"/);
+    expect(template).toContain('class="ability-hero__radar-state"');
+    expect(template).toContain('class="ability-hero__empty"');
+    expect(template).toMatch(/<radar-canvas[^>]*width="620rpx"[^>]*height="600rpx"/);
     expect(template).toContain("assessmentPeriod");
     expect(template).toContain("rankingMessage");
     expect(template).toContain('wx:if="{{showOverall}}"');
@@ -158,11 +160,13 @@ describe("coach team ability overview", () => {
     expect(exportControl).not.toContain("bindtap");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(template).not.toMatch(/2025|U10|李明辉|陈小宇|张伟|王浩|赵晨/);
-    expect(stylesheet).toMatch(/\.ability-hero\s*\{[^}]*position:\s*relative[^}]*height:\s*520rpx[^}]*overflow:\s*hidden/s);
-    expect(stylesheet).toMatch(/\.ability-hero__plot\s*\{[^}]*height:\s*360rpx[^}]*justify-content:\s*center/s);
-    expect(stylesheet).toMatch(/\.ability-hero__overall\s*\{[^}]*position:\s*absolute[^}]*left:\s*0[^}]*right:\s*0[^}]*font-size:\s*40rpx/s);
+    expect(stylesheet).toMatch(/\.ability-hero\s*\{[^}]*height:\s*1040rpx[^}]*overflow:\s*hidden/s);
+    expect(stylesheet).toMatch(/\.ability-hero__plot\s*\{[^}]*height:\s*720rpx[^}]*justify-content:\s*center/s);
+    expect(stylesheet).toMatch(/\.ability-hero__radar-state\s*\{[^}]*flex-direction:\s*column[^}]*align-items:\s*center/s);
+    expect(stylesheet).toMatch(/\.ability-hero__overall\s*\{[^}]*font-size:\s*40rpx[^}]*text-align:\s*center/s);
+    expect(stylesheet).not.toMatch(/\.ability-hero__overall\s*\{[^}]*position:\s*absolute/s);
     expect(stylesheet).toMatch(/\.ability-nav\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*border-box/s);
-    expect(stylesheet).toMatch(/\.ability-nav__title\s*\{[^}]*text-align:\s*left/s);
+    expect(stylesheet).toMatch(/\.ability-nav__title\s*\{[^}]*text-align:\s*center/s);
     expect(stylesheet).toMatch(/\.ability-nav__export\s*\{[^}]*display:\s*flex[^}]*width:\s*104rpx[^}]*height:\s*58rpx/s);
   });
 });

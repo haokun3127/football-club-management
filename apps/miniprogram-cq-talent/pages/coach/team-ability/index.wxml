@@ -24,9 +24,11 @@
           <view class="ability-hero__period">{{assessmentPeriod}}</view>
         </view>
         <view class="ability-hero__plot">
-          <radar-canvas wx:if="{{hasRadar}}" class="ability-hero__canvas" dark="{{true}}" metrics="{{radar}}" width="440rpx" height="360rpx"></radar-canvas>
+          <view wx:if="{{hasRadar}}" class="ability-hero__radar-state">
+            <radar-canvas class="ability-hero__canvas" dark="{{true}}" metrics="{{radar}}" width="620rpx" height="600rpx"></radar-canvas>
+            <view wx:if="{{showOverall}}" class="ability-hero__overall">综合 {{overall}}</view>
+          </view>
           <view wx:else class="ability-hero__empty">暂无足够维度生成雷达图</view>
-          <view wx:if="{{showOverall}}" class="ability-hero__overall">综合 {{overall}}</view>
         </view>
         <view wx:if="{{showTrend}}" class="trend-chip {{trendPositive ? 'trend-chip--up' : 'trend-chip--down'}}">
           <image wx:if="{{trendPositive}}" class="trend-chip__icon" src="/assets/icons/c14-trending-up.svg" mode="aspectFit" />
