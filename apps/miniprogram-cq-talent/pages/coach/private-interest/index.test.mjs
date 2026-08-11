@@ -101,6 +101,7 @@ describe("coach private interest", () => {
     expect(pageConfig).not.toContain('"app-header"');
     expect(pageConfig).toContain('"role-tabbar"');
     expect(template).toContain('class="c162-nav"');
+    expect(template).not.toContain("c162-nav__placeholder");
     expect(template).toContain("/assets/icons/c162-chevron-left.svg");
     expect(template).toContain('class="c162-pending-marker"');
     expect(template).not.toMatch(/class="c162-pending-marker"[^>]*bindtap/);

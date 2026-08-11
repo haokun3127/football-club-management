@@ -91,6 +91,7 @@ describe("coach permission scope", () => {
     expect(pageConfig).not.toContain('"app-header"');
     expect(pageConfig).toContain('"role-tabbar"');
     expect(template).toContain('class="c161-nav"');
+    expect(template).not.toContain("c161-nav__placeholder");
     expect(template).toContain("/assets/icons/c161-arrow-left.svg");
     expect(template).toContain("/assets/icons/c161-info.svg");
     expect(template).toContain("/assets/icons/c161-toggle-on.svg");

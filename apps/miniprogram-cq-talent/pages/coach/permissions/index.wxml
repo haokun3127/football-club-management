@@ -4,7 +4,6 @@
       <image class="c161-nav__back-icon" src="/assets/icons/c161-arrow-left.svg" mode="aspectFit" />
     </view>
     <view class="c161-nav__title">权限范围</view>
-    <view class="c161-nav__placeholder"></view>
   </view>
 
   <view class="c161-page__body">

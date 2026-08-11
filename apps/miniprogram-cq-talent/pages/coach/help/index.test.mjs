@@ -155,6 +155,7 @@ describe("coach help", () => {
     expect(pageConfig).not.toContain('"app-header"');
     expect(pageConfig).toContain('"role-tabbar"');
     expect(template).toContain('class="c164-nav"');
+    expect(template).not.toContain("c164-nav__placeholder");
     expect(template).toContain('src="{{item.icon}}"');
     expect(template).toContain("支持方式待配置");
     expect([...template.matchAll(/\bbind(?:tap|input|longpress|change|submit|action)\s*=/g)]).toHaveLength(4);

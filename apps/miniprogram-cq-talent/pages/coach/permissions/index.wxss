@@ -8,14 +8,13 @@
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 24rpx;
   padding-right: 44rpx;
   padding-left: 44rpx;
   background: #fceeef;
 }
 
-.c161-nav__back,
-.c161-nav__placeholder {
+.c161-nav__back {
   width: 48rpx;
   height: 48rpx;
   flex: 0 0 48rpx;
