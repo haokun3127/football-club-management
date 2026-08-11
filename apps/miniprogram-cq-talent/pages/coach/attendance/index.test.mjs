@@ -16,6 +16,7 @@ vi.mock("../../../utils/presentation", () => ({
   activityStatus: (status) => ({ label: status, tone: "info" }),
   formatCalendarDate: (value) => String(value).slice(0, 10),
   formatTimeRange: () => "09:00-10:00",
+  resolveMenuInset: () => 0,
   resolveNavInset: () => 0,
 }));
 
@@ -34,6 +35,7 @@ await import("./index.ts");
 
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
 const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
+const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 
 function createPageInstance(data = {}) {
   const instance = {
@@ -201,5 +203,11 @@ describe("coach attendance", () => {
     expect(template).not.toContain("家长异议");
     expect(controller).not.toContain("disputedCount");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
+  });
+
+  it("keeps C4 submit clear of the system menu without adding vertical header padding", () => {
+    expect(controller).toContain("resolveMenuInset");
+    expect(template).toContain('padding-right:{{menuInset}}px');
+    expect(stylesheet).toMatch(/\.c4-nav\s*\{[^}]*padding:\s*0\s+44rpx/s);
   });
 });

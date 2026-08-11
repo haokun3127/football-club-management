@@ -1,6 +1,6 @@
 import { getCoachWorkbench, saveCoachAttendance } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { activityStatus, formatCalendarDate, formatTimeRange, resolveNavInset } from "../../../utils/presentation";
+import { activityStatus, formatCalendarDate, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
 
 type RosterItem = CoachWorkbench["roster"][number];
@@ -19,6 +19,7 @@ const statusOptions = [
 
 interface AttendancePageData {
   navInset: number;
+  menuInset: number;
   state: LoadState;
   message: string;
   eventId: string;
@@ -41,6 +42,7 @@ interface AttendancePageData {
 Page<AttendancePageData>({
   data: {
     navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     state: "loading",
     message: "正在读取点名名单",
     eventId: "",

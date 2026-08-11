@@ -1,5 +1,5 @@
 <view class="c4">
-  <view class="c4-nav" style="padding-top:{{navInset}}px">
+  <view class="c4-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="c4-nav__left" bindtap="goBack">
       <view class="c4-nav__back">‹</view>
       <view class="c4-nav__title">{{correctionMode ? '出勤修改' : '出勤管理'}}</view>

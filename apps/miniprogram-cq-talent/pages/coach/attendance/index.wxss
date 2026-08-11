@@ -1,7 +1,7 @@
 .c4 { min-height: 100vh; background: #f6f7f9; }
 
 /* C4 Top Nav（粉底） */
-.c4-nav { display: flex; align-items: center; justify-content: space-between; height: 176rpx; padding: 28rpx 44rpx; background: #fceeef; }
+.c4-nav { display: flex; align-items: center; justify-content: space-between; height: 176rpx; padding: 0 44rpx; background: #fceeef; }
 .c4-nav__left { display: flex; align-items: center; gap: 24rpx; }
 .c4-nav__back { color: #202124; font-size: 56rpx; font-weight: 300; line-height: 1; }
 .c4-nav__title { color: #202124; font-size: 44rpx; font-weight: 700; }
