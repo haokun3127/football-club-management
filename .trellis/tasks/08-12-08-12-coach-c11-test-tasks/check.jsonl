@@ -1,0 +1,2 @@
+{"file":"apps/miniprogram-cq-talent/pages/coach/test-tasks/index.test.mjs","reason":"Focused task status, filtering, entry guard and header regression coverage."}
+{"file":"apps/miniprogram-cq-talent/pages/coach/test-tasks/index.wxss","reason":"Figma safe-area header box-model assertion."}

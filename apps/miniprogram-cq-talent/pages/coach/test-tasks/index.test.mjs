@@ -169,6 +169,6 @@ describe("coach assessment task list", () => {
     expect(template).not.toMatch(/体能综合测评|速度耐力体测|控球精度评估|2025-07-01|12\/18名学员|新增/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("createTask");
-    expect(stylesheet).toMatch(/\.tasks-nav\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*border-box/s);
+    expect(stylesheet).toMatch(/\.tasks-nav\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*content-box/s);
   });
 });

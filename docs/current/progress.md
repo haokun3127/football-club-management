@@ -12,6 +12,12 @@
 - 评语区域继续明确显示“暂未同步”，未把 Figma 的教练姓名和示例建议伪造为后端事实。C13 仍只读取当前教练可见的成员与该成员真实雷达指标。
 - 验证：C13 聚焦 Vitest `10/10`、小程序 TypeScript 与 `git diff --check` 通过；没有已登录 C13 的可信 `375×812` 截图，不作运行时视觉验收完成结论。
 
+## 2026-08-12 C11 测评任务安全区顶栏收口
+
+- 在线 Figma 基准：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1002 / C11 Test Task List`。C11 的粉色页内顶栏改为 content-box，使真实状态栏安全区不再压缩 88px 内容高度。
+- Figma 的“新增”浮动按钮没有对应创建任务 API，故继续不渲染；任务、进度、状态、筛选与可录入判断仍完全来自真实 assessment-task BFF。
+- 验证：C11 聚焦 Vitest `7/7`、小程序 TypeScript 与 `git diff --check` 通过；现有 C11 运行截图是先前版本，本批未取得新的可信 `375×812` 截图，故不作运行时视觉验收完成结论。
+
 ## 2026-08-12 C9 队伍详情统计语义与布局收口
 
 - 在线 Figma 基准：`zZ6wKyOHKcO4UYXDd9jGwv / 93:924 / C9 Team Detail`。C9 的“累计训练”现使用既有 `coach/team.stats.completedTrainingCount`，不再把滚动 30 天 `trainingCount` 误标为累计。非空出勤率沿用真实 BFF 值并使用绿色强调；缺失值保持 `--`。
