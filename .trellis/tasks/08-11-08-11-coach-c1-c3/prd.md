@@ -16,5 +16,5 @@ Bring the coach schedule, training workbench, and event-change pages into alignm
 - [ ] C1 has a 375x812 capture compared against node `93:578` after the repair.
 - [ ] C2 has a 375x812 capture compared against node `93:606` after the repair.
 - [ ] C3 has top and bottom captures compared against node `93:634` after the repair.
-- [ ] Focused tests, mini-program type/test checks, and `git diff --check` pass.
-- [ ] The batch is reviewed and committed without including unrelated dirty files.
+- [x] Focused tests, mini-program type/test checks, and `git diff --check` pass.
+- [x] The batch is reviewed and committed without including unrelated dirty files.

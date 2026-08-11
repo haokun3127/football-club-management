@@ -187,8 +187,9 @@ describe("coach activity change", () => {
   it("uses the C3 soft header and full-width Figma form controls", () => {
     expect(template).toContain('theme="soft"');
     expect(template).toContain('title-align="left"');
-    expect(stylesheet).toMatch(/\.change-page__body\s*\{[^}]*padding:\s*24rpx\s+32rpx\s+200rpx/s);
+    expect(stylesheet).toMatch(/\.change-page__body\s*\{[^}]*padding:\s*44rpx\s+44rpx\s+200rpx/s);
     expect(stylesheet).toMatch(/\.input-box\s*\{[^}]*width:\s*100%/s);
     expect(stylesheet).toMatch(/\.input-box\s*\{[^}]*box-sizing:\s*border-box/s);
+    expect(stylesheet).toMatch(/\.textarea-box\s*\{[^}]*min-height:\s*160rpx/s);
   });
 });
