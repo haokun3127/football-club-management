@@ -184,16 +184,10 @@ describe("Chongqing Talent synthetic fixtures", () => {
     const seed = createCqTalentAcceptanceSeed();
     const acceptanceUserId = "user-parent-cq-talent-acceptance";
     const acceptanceStudentIds = ["student-cq-talent-001", "student-cq-talent-002"];
-    const coachDemoRosterStudentIds = [
-      "student-cq-talent-001",
-      "student-cq-talent-002",
-      "student-cq-talent-003",
-      "student-cq-talent-004",
-      "student-cq-talent-005",
-      "student-cq-talent-006",
-      "student-cq-talent-007",
-      "student-cq-talent-008",
-    ];
+    const coachDemoRosterStudentIds = Array.from(
+      { length: 16 },
+      (_value, index) => `student-cq-talent-${String(index + 1).padStart(3, "0")}`,
+    );
     const demoEventIds = [
       "event-cq-talent-demo-training-foundation",
       "event-cq-talent-demo-training-finishing",

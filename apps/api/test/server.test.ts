@@ -37,16 +37,10 @@ function createAcceptanceDemoIntegrationSeed(): SeedData {
   const acceptanceCoachId = "coach-cq-talent-acceptance-demo";
   const acceptanceTeamId = "team-cq-talent-acceptance-demo";
   const acceptanceStudentIds = new Set(["student-cq-talent-001", "student-cq-talent-002"]);
-  const coachDemoRosterStudentIds = new Set([
-    "student-cq-talent-001",
-    "student-cq-talent-002",
-    "student-cq-talent-003",
-    "student-cq-talent-004",
-    "student-cq-talent-005",
-    "student-cq-talent-006",
-    "student-cq-talent-007",
-    "student-cq-talent-008",
-  ]);
+  const coachDemoRosterStudentIds = new Set(Array.from(
+    { length: 16 },
+    (_value, index) => `student-cq-talent-${String(index + 1).padStart(3, "0")}`,
+  ));
   const acceptanceEventIds = new Set([
     "event-cq-talent-demo-training-foundation",
     "event-cq-talent-demo-training-finishing",
@@ -1348,16 +1342,10 @@ describe("api server", () => {
     const base = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main";
     const acceptanceUserId = "user-parent-cq-talent-acceptance";
     const acceptanceStudentIds = ["student-cq-talent-001", "student-cq-talent-002"];
-    const coachDemoRosterStudentIds = [
-      "student-cq-talent-001",
-      "student-cq-talent-002",
-      "student-cq-talent-003",
-      "student-cq-talent-004",
-      "student-cq-talent-005",
-      "student-cq-talent-006",
-      "student-cq-talent-007",
-      "student-cq-talent-008",
-    ];
+    const coachDemoRosterStudentIds = Array.from(
+      { length: 16 },
+      (_value, index) => `student-cq-talent-${String(index + 1).padStart(3, "0")}`,
+    );
     const demoEventIds = [
       "event-cq-talent-demo-training-foundation",
       "event-cq-talent-demo-training-finishing",
@@ -1446,6 +1434,8 @@ describe("api server", () => {
       expect(tactical.statusCode, tactical.body).toBe(200);
       const tacticalBody = tactical.json() as { roster: Array<{ studentId: string }>; board: { players: Array<Record<string, unknown>> } };
       expect(tacticalBody.roster.map((student) => student.studentId)).toEqual(coachDemoRosterStudentIds);
+      expect(tacticalBody.board.players.filter((player) => player.role === "starter")).toHaveLength(11);
+      expect(tacticalBody.board.players.filter((player) => player.role === "substitute")).toHaveLength(5);
       const saveTactical = await firstApp.inject({
         method: "PUT",
         url: `${base}/coach/events/event-cq-talent-demo-match-tactical/tactical-board`,

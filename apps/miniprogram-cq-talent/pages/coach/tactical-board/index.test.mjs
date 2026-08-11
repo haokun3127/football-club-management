@@ -212,6 +212,10 @@ describe("C7 coach tactical board MVP", () => {
     expect(template).not.toMatch(/wx:else\s+wx:for=/);
     expect(template).toContain('<block wx:if="{{!readOnly}}">');
     expect(template).toContain('<block wx:else>');
+    expect(template).not.toContain('c7-pitch__circle');
+    expect(template).not.toContain('c7-pitch__box');
+    expect(template).not.toContain('c7-player__name');
+    expect(template).not.toContain('c7-player__position');
     expect(template).not.toContain("U10发展队");
     expect(template).not.toContain("梓睿");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
@@ -219,5 +223,10 @@ describe("C7 coach tactical board MVP", () => {
     expect(pageConfig).not.toContain('"submit-bar"');
     expect(stylesheet).toMatch(/\.c7-header\s*\{[^}]*height:\s*124rpx/s);
     expect(stylesheet).toMatch(/\.c7-pitch\s*\{[^}]*height:\s*860rpx/s);
+    expect(stylesheet).not.toContain("box-shadow");
+    expect(stylesheet).toMatch(/\.c7-player\s*\{[^}]*width:\s*80rpx[^}]*height:\s*80rpx/s);
+    expect(stylesheet).toMatch(/\.c7-player__badge\s*\{[^}]*width:\s*100%[^}]*height:\s*100%/s);
+    expect(controller).toContain("this.data.pitchWidth, 20");
+    expect(controller).toContain("this.data.pitchHeight, 20");
   });
 });

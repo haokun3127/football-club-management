@@ -8,7 +8,6 @@ type PlayerView = TacticalBoardPlayer & {
   px: number;
   py: number;
   className: string;
-  hasPosition: boolean;
 };
 
 interface BoardPageData {
@@ -185,11 +184,10 @@ Page<BoardPageData>({
     const currentSelectedStarterId = selectedStarterId ?? this.data.selectedStarterId;
     const toView = (player: TacticalBoardPlayer): PlayerView => ({
       ...player,
-      px: normalizedToPixel(player.x, this.data.pitchWidth, 24),
-      py: normalizedToPixel(player.y, this.data.pitchHeight, 24),
+      px: normalizedToPixel(player.x, this.data.pitchWidth, 20),
+      py: normalizedToPixel(player.y, this.data.pitchHeight, 20),
       initials: player.displayName.slice(0, 2),
       className: player.studentId === currentSelectedStarterId ? "c7-player c7-player--selected" : "c7-player",
-      hasPosition: Boolean(player.positionLabel),
     });
     this.setData({
       starters: currentPlayers.filter((player: TacticalBoardPlayer) => player.role === "starter").map(toView),
@@ -264,8 +262,8 @@ Page<BoardPageData>({
     if (this.data.readOnly || event.detail.source !== "touch") return;
     const studentId = event.currentTarget.dataset.id || "";
     if (!this.data.starters.some((player: PlayerView) => player.studentId === studentId)) return;
-    const x = pixelToNormalized(event.detail.x, this.data.pitchWidth, 24);
-    const y = pixelToNormalized(event.detail.y, this.data.pitchHeight, 24);
+    const x = pixelToNormalized(event.detail.x, this.data.pitchWidth, 20);
+    const y = pixelToNormalized(event.detail.y, this.data.pitchHeight, 20);
     const players = this.data.players.map((player: TacticalBoardPlayer) => player.studentId === studentId ? { ...player, x, y } : player);
     this.setData({
       players,

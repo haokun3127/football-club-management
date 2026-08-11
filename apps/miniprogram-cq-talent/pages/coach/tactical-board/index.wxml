@@ -41,22 +41,15 @@
       <movable-area id="c7-pitch" class="c7-pitch">
         <view class="c7-pitch__boundary"></view>
         <view class="c7-pitch__halfway"></view>
-        <view class="c7-pitch__circle"></view>
-        <view class="c7-pitch__box c7-pitch__box--top"></view>
-        <view class="c7-pitch__box c7-pitch__box--bottom"></view>
 
         <block wx:if="{{!readOnly}}">
           <movable-view wx:for="{{starters}}" wx:key="studentId" class="{{item.className}}" direction="all" x="{{item.px}}" y="{{item.py}}" inertia="{{false}}" out-of-bounds="{{false}}" data-id="{{item.studentId}}" bindchange="onPlayerMove" bindtap="selectStarter">
             <view class="c7-player__badge">{{item.initials}}</view>
-            <view class="c7-player__name">{{item.displayName}}</view>
-            <view wx:if="{{item.hasPosition}}" class="c7-player__position">{{item.positionLabel}}</view>
           </movable-view>
         </block>
         <block wx:else>
           <view wx:for="{{starters}}" wx:key="studentId" class="{{item.className}} c7-player--readonly" style="left: {{item.px}}px; top: {{item.py}}px;">
             <view class="c7-player__badge">{{item.initials}}</view>
-            <view class="c7-player__name">{{item.displayName}}</view>
-            <view wx:if="{{item.hasPosition}}" class="c7-player__position">{{item.positionLabel}}</view>
           </view>
         </block>
       </movable-area>

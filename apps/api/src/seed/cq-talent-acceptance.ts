@@ -84,7 +84,7 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
   ]));
   const acceptanceStudents = students.filter((student) => student.familyId === acceptanceFamilyId);
   const acceptanceDemoRosterStudents = acceptanceStudents.concat(
-    students.filter((student) => student.familyId !== acceptanceFamilyId).slice(0, 6),
+    students.filter((student) => student.familyId !== acceptanceFamilyId).slice(0, 14),
   );
 
   return {

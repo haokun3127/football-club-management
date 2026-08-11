@@ -163,7 +163,6 @@
   overflow: hidden;
   border-radius: 32rpx;
   background: #278a53;
-  box-shadow: 0 10rpx 30rpx rgba(16, 24, 40, 0.16);
 }
 
 .c7-pitch__boundary {
@@ -180,32 +179,9 @@
   border-top: 2rpx solid rgba(255, 255, 255, 0.75);
 }
 
-.c7-pitch__circle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 120rpx;
-  height: 120rpx;
-  border: 2rpx solid rgba(255, 255, 255, 0.75);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.c7-pitch__box {
-  position: absolute;
-  left: 50%;
-  width: 220rpx;
-  height: 90rpx;
-  border: 2rpx solid rgba(255, 255, 255, 0.75);
-  transform: translateX(-50%);
-}
-
-.c7-pitch__box--top { top: 24rpx; border-top: 0; }
-.c7-pitch__box--bottom { bottom: 24rpx; border-bottom: 0; }
-
 .c7-player {
-  width: 112rpx;
-  height: 132rpx;
+  width: 80rpx;
+  height: 80rpx;
   text-align: center;
 }
 
@@ -215,9 +191,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 80rpx;
-  height: 80rpx;
-  margin: 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
   border: 2rpx solid #ffffff;
   border-radius: 50%;
   background: #a80f1b;
@@ -227,18 +203,6 @@
 }
 
 .c7-player--selected .c7-player__badge { border-color: #ffd666; transform: scale(1.08); }
-
-.c7-player__name,
-.c7-player__position {
-  overflow: hidden;
-  color: #ffffff;
-  text-overflow: ellipsis;
-  text-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.65);
-  white-space: nowrap;
-}
-
-.c7-player__name { margin-top: 4rpx; font-size: 18rpx; font-weight: 700; }
-.c7-player__position { margin-top: 2rpx; font-size: 16rpx; }
 
 .c7-bench {
   box-sizing: border-box;
