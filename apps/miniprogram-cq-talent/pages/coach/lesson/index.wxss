@@ -5,7 +5,7 @@
 
 .c5-nav {
   display: flex;
-  box-sizing: border-box;
+  box-sizing: content-box;
   align-items: center;
   height: 176rpx;
   padding: 28rpx 44rpx;
