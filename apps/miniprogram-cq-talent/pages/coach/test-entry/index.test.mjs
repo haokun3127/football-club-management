@@ -206,6 +206,55 @@ describe("coach project score entry", () => {
     expect(mocks.showToast).toHaveBeenCalledTimes(1);
   });
 
+  it("projects at most four real fields into each student card and keeps later fields reachable", async () => {
+    mocks.getAssessmentForm.mockResolvedValueOnce(form({
+      fields: [
+        { id: "field-speed", testItemId: "item-speed", metricId: "metric-speed", groupId: "fitness", groupLabel: "Fitness", label: "Actual speed", valueKind: "score_0_100", inputType: "number", minValue: 0, maxValue: 100, unit: "score" },
+        { id: "field-endurance", testItemId: "item-endurance", metricId: "metric-endurance", groupId: "fitness", groupLabel: "Fitness", label: "Actual endurance", valueKind: "score_0_100", inputType: "number", minValue: 0, maxValue: 100, unit: "score" },
+        { id: "field-strength", testItemId: "item-strength", metricId: "metric-strength", groupId: "fitness", groupLabel: "Fitness", label: "Actual strength", valueKind: "score_0_100", inputType: "number", minValue: 0, maxValue: 100, unit: "score" },
+        { id: "field-agility", testItemId: "item-agility", metricId: "metric-agility", groupId: "fitness", groupLabel: "Fitness", label: "Actual agility", valueKind: "score_0_100", inputType: "number", minValue: 0, maxValue: 100, unit: "score" },
+        { id: "field-balance", testItemId: "item-balance", metricId: "metric-balance", groupId: "fitness", groupLabel: "Fitness", label: "Actual balance", valueKind: "score_0_100", inputType: "number", minValue: 0, maxValue: 100, unit: "score" },
+      ],
+    }));
+    const page = createPageInstance();
+    await page.load("event-assessment-1");
+
+    expect(page.data.draftRows[0].metricCells.map((cell) => cell.testItemId)).toEqual([
+      "item-speed", "item-endurance", "item-strength", "item-agility",
+    ]);
+    expect(page.data.draftRows[0].metricCells.every((cell) => cell.rawValue === "")).toBe(true);
+
+    page.nextField();
+    expect(page.data.draftRows[0].metricCells.map((cell) => cell.testItemId)).toEqual([
+      "item-endurance", "item-strength", "item-agility", "item-balance",
+    ]);
+  });
+
+  it("writes compact card inputs against the cell's real test item rather than the first field", async () => {
+    mocks.getAssessmentForm.mockResolvedValueOnce(form({
+      fields: [
+        { id: "field-speed", testItemId: "item-speed", metricId: "metric-speed", groupId: "fitness", groupLabel: "Fitness", label: "Actual speed", valueKind: "score_0_100", inputType: "number", minValue: 0, maxValue: 100, unit: "score" },
+        { id: "field-balance", testItemId: "item-balance", metricId: "metric-balance", groupId: "fitness", groupLabel: "Fitness", label: "Actual balance", valueKind: "score_0_100", inputType: "number", minValue: 0, maxValue: 100, unit: "score" },
+      ],
+    }));
+    const page = createPageInstance();
+    await page.load("event-assessment-1");
+    page.onValueInput({ currentTarget: { dataset: { studentId: "student-1", testItemId: "item-balance" } }, detail: { value: "76" } });
+
+    expect(page.data.draft["student-1:item-speed"]).toBeUndefined();
+    expect(page.data.draft["student-1:item-balance"]).toMatchObject({ status: "recorded", rawValue: "76" });
+  });
+
+  it("renders the Figma C12 student-card grid with only precomputed field cells", () => {
+    expect(template).toContain('class="c12-student-card"');
+    expect(template).toContain('wx:for="{{item.metricCells}}"');
+    expect(template).toContain('data-test-item-id="{{cell.testItemId}}"');
+    expect(template).toContain('class="c12-submit-wrap"');
+    expect(template).not.toContain('c12-field-card');
+    expect(stylesheet).toMatch(/\.c12-student-card__metrics\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/s);
+    expect(stylesheet).toMatch(/\.c12-submit-wrap\s*\{[^}]*bottom:\s*140rpx[^}]*min-height:\s*140rpx/s);
+  });
+
   it("serializes duplicate submits and keeps a safe page-local C12 shell", async () => {
     let resolveSubmission;
     mocks.submitCoachAssessment.mockImplementationOnce(() => new Promise((resolve) => { resolveSubmission = resolve; }));

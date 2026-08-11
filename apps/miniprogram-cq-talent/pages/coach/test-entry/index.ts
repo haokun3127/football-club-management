@@ -7,9 +7,21 @@ import type { AssessmentForm, CoachWorkbench, LoadState } from "../../../utils/t
 type AssessmentField = AssessmentForm["fields"][number];
 type RosterStudent = CoachWorkbench["roster"][number];
 type GroupView = { id: string; label: string; className: string };
+type MetricCell = {
+  testItemId: string;
+  label: string;
+  rawValue: string;
+  inputType: "digit" | "text";
+  placeholder: string;
+  status: "empty" | "recorded" | "missing";
+  statusLabel: string;
+  statusClass: string;
+  showInput: boolean;
+};
 type DraftRow = {
   studentId: string;
   name: string;
+  initials: string;
   status: "empty" | "recorded" | "missing";
   rawValue: string;
   missingReason: string;
@@ -20,6 +32,7 @@ type DraftRow = {
   showMissingReason: boolean;
   missingActionLabel: string;
   invalidHint: string;
+  metricCells: MetricCell[];
 };
 
 interface PageData {
@@ -99,7 +112,7 @@ Page<PageData>({
     saving: false,
     canSubmit: false,
     submitClass: "c12-submit c12-submit--disabled",
-    submitLabel: "提交评分",
+    submitLabel: "保存评分",
     submitMessage: "",
     draftResumeVisible: false,
     draftResumeUpdatedAtLabel: "",
@@ -147,7 +160,7 @@ Page<PageData>({
       saving: false,
       canSubmit: false,
       submitClass: "c12-submit c12-submit--disabled",
-      submitLabel: "提交评分",
+      submitLabel: "保存评分",
       submitMessage: "",
       draftResumeVisible: false,
       draftResumeUpdatedAtLabel: "",
@@ -205,7 +218,7 @@ Page<PageData>({
         draft,
         canSubmit: hasEntries && !draftResumeVisible,
         submitClass: hasEntries && !draftResumeVisible ? "c12-submit" : "c12-submit c12-submit--disabled",
-        submitLabel: "提交评分",
+        submitLabel: "保存评分",
         draftResumeVisible,
         draftResumeUpdatedAtLabel: draftResumeVisible ? latestLocalDraftLabel(validDrafts) : "",
         draftExitInProgress: false,
@@ -251,7 +264,7 @@ Page<PageData>({
       saving: false,
       canSubmit: false,
       submitClass: "c12-submit c12-submit--disabled",
-      submitLabel: "提交评分",
+      submitLabel: "保存评分",
       submitMessage: "",
       draftResumeVisible: false,
       draftResumeUpdatedAtLabel: "",
@@ -321,9 +334,9 @@ Page<PageData>({
     this.refreshDraftView();
   },
 
-  onValueInput(event: { currentTarget: { dataset: { studentId?: string } }; detail: { value: string | number } }) {
+  onValueInput(event: { currentTarget: { dataset: { studentId?: string; testItemId?: string } }; detail: { value: string | number } }) {
     const studentId = event.currentTarget.dataset.studentId;
-    const field = this.data.currentField;
+    const field = fieldForTestItem(this.data.form, event.currentTarget.dataset.testItemId) ?? this.data.currentField;
     const form = this.data.form;
     if (this.data.draftResumeVisible || !this.data.canSubmit || !studentId || !field?.testItemId || !form?.templateVersionId) return;
     const rawValue = String(event.detail.value);
@@ -337,9 +350,9 @@ Page<PageData>({
     this.refreshDraftView();
   },
 
-  toggleMissing(event: { currentTarget: { dataset: { studentId?: string } } }) {
+  toggleMissing(event: { currentTarget: { dataset: { studentId?: string; testItemId?: string } } }) {
     const studentId = event.currentTarget.dataset.studentId;
-    const field = this.data.currentField;
+    const field = fieldForTestItem(this.data.form, event.currentTarget.dataset.testItemId) ?? this.data.currentField;
     const form = this.data.form;
     if (this.data.draftResumeVisible || !this.data.canSubmit || !studentId || !field?.testItemId || !form?.templateVersionId) return;
     const current = this.rowFor(studentId, field.testItemId);
@@ -355,9 +368,9 @@ Page<PageData>({
     this.refreshDraftView();
   },
 
-  onMissingReasonInput(event: { currentTarget: { dataset: { studentId?: string } }; detail: { value: string } }) {
+  onMissingReasonInput(event: { currentTarget: { dataset: { studentId?: string; testItemId?: string } }; detail: { value: string } }) {
     const studentId = event.currentTarget.dataset.studentId;
-    const field = this.data.currentField;
+    const field = fieldForTestItem(this.data.form, event.currentTarget.dataset.testItemId) ?? this.data.currentField;
     const form = this.data.form;
     if (this.data.draftResumeVisible || !this.data.canSubmit || !studentId || !field?.testItemId || !form?.templateVersionId) return;
     const draft = saveAssessmentDraftEntry(this.data.eventId, form.templateVersionId, {
@@ -378,7 +391,8 @@ Page<PageData>({
     const field = this.data.currentField;
     const form = this.data.form;
     if (!field?.testItemId || !form) return;
-    const draftRows = this.data.roster.map((student: RosterStudent) => presentDraftRow(student, this.rowFor(student.studentId, field.testItemId!), field));
+    const visibleFields = this.data.fieldsInGroup.slice(this.data.fieldIndex, this.data.fieldIndex + 4);
+    const draftRows = this.data.roster.map((student: RosterStudent) => presentDraftRow(student, this.data.draft, field, visibleFields));
     const itemIds = form.fields.map((item: AssessmentField) => item.testItemId || "").filter(Boolean);
     const progress = draftProgress(this.data.draft, this.data.roster.map((student: RosterStudent) => student.studentId), itemIds);
     const totalCount = progress.total;
@@ -454,7 +468,7 @@ Page<PageData>({
       saving: false,
       draft,
       submitClass: this.data.canSubmit ? "c12-submit" : "c12-submit c12-submit--disabled",
-      submitLabel: "提交评分",
+      submitLabel: "保存评分",
       submitMessage,
     });
     this.refreshDraftView();
@@ -518,7 +532,13 @@ function presentGroups(fields: AssessmentField[], activeGroupId: string): GroupV
   }));
 }
 
-function presentDraftRow(student: CoachWorkbench["roster"][number], entry: { status: "empty" | "recorded" | "missing"; rawValue: string; missingReason?: string }, field: AssessmentField): DraftRow {
+function fieldForTestItem(form: AssessmentForm | null, testItemId?: string) {
+  if (!form || !testItemId) return null;
+  return form.fields.find((field) => field.testItemId === testItemId) ?? null;
+}
+
+function presentDraftRow(student: CoachWorkbench["roster"][number], draft: AssessmentDraftMap, field: AssessmentField, visibleFields: AssessmentField[]): DraftRow {
+  const entry = draft[`${student.studentId}:${field.testItemId}`] ?? { status: "empty" as const, rawValue: "", missingReason: "" };
   const invalid = entry.status === "recorded" && !validFieldValue(field, entry.rawValue);
   const status = invalid ? "invalid" : entry.status;
   const statusLabel = status === "recorded" ? "已录入" : status === "missing" ? "缺测" : status === "invalid" ? "超出范围" : "待录入";
@@ -526,6 +546,7 @@ function presentDraftRow(student: CoachWorkbench["roster"][number], entry: { sta
   return {
     studentId: student.studentId,
     name: student.name,
+    initials: student.name.trim().slice(0, 1) || "学",
     status: entry.status,
     rawValue: entry.rawValue,
     missingReason: entry.missingReason || "",
@@ -536,6 +557,27 @@ function presentDraftRow(student: CoachWorkbench["roster"][number], entry: { sta
     showMissingReason: entry.status === "missing",
     missingActionLabel: entry.status === "missing" ? "取消缺测" : "标记缺测",
     invalidHint,
+    metricCells: visibleFields
+      .filter((visibleField) => Boolean(visibleField.testItemId))
+      .map((visibleField) => presentMetricCell(
+        visibleField,
+        draft[`${student.studentId}:${visibleField.testItemId}`] ?? { status: "empty" as const, rawValue: "" },
+      )),
+  };
+}
+
+function presentMetricCell(field: AssessmentField, entry: { status: "empty" | "recorded" | "missing"; rawValue: string }): MetricCell {
+  const status = entry.status;
+  return {
+    testItemId: field.testItemId || "",
+    label: field.label,
+    rawValue: entry.rawValue,
+    inputType: field.inputType === "number" ? "digit" : "text",
+    placeholder: field.unit ? field.unit : "—",
+    status,
+    statusLabel: status === "recorded" ? "已录入" : status === "missing" ? "缺测" : "待录入",
+    statusClass: `c12-metric-cell__status c12-metric-cell__status--${status}`,
+    showInput: status !== "missing",
   };
 }
 

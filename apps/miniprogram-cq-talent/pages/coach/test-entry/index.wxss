@@ -279,6 +279,7 @@
   left: 0;
   z-index: 4;
   box-sizing: border-box;
+  min-height: 140rpx;
   padding: 14rpx 32rpx 18rpx;
   border-top: 1rpx solid #e7eaf0;
   background: #ffffff;
@@ -290,6 +291,16 @@
   margin-bottom: 8rpx;
   color: #667085;
   font-size: 20rpx;
+}
+
+.c12-submit__message {
+  display: block;
+  overflow: hidden;
+  margin-top: 2rpx;
+  color: #667085;
+  font-size: 20rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .c12-submit {
@@ -394,4 +405,197 @@
   box-sizing: border-box;
   border: 1rpx solid #e7eaf0;
   color: #667085;
+}
+
+.c12-field-window {
+  margin: 18rpx 0 22rpx;
+}
+
+.c12-field-window__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 72rpx;
+  padding: 0 20rpx;
+  border-radius: 12rpx;
+  background: #ffffff;
+}
+
+.c12-field-window__picker {
+  min-width: 0;
+  flex: 1;
+}
+
+.c12-field-window__selection {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2rpx;
+}
+
+.c12-field-window__label {
+  overflow: hidden;
+  color: #202124;
+  font-size: 26rpx;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.c12-field-window__unit,
+.c12-field-window__position,
+.c12-field-window__step {
+  color: #667085;
+  font-size: 20rpx;
+}
+
+.c12-field-window__steps {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 12rpx;
+  margin-left: 12rpx;
+}
+
+.c12-field-window__step {
+  color: #a80f1b;
+}
+
+.c12-students {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.c12-students__title {
+  padding: 0 2rpx;
+  color: #202124;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.c12-student-card {
+  box-sizing: border-box;
+  padding: 24rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
+  box-shadow: 0 4rpx 16rpx rgba(24, 32, 48, 0.04);
+}
+
+.c12-student-card__head {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.c12-student-card__avatar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 32rpx;
+  background: #f3f4f6;
+  color: #667085;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.c12-student-card__name {
+  overflow: hidden;
+  min-width: 0;
+  flex: 1;
+  margin-left: 18rpx;
+  color: #202124;
+  font-size: 28rpx;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.c12-student-card__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12rpx;
+  margin-top: 20rpx;
+}
+
+.c12-metric-cell {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.c12-metric-cell__label {
+  overflow: hidden;
+  color: #667085;
+  font-size: 20rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.c12-metric-cell__input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 64rpx;
+  padding: 0 8rpx;
+  border: 1rpx solid #e7eaf0;
+  border-radius: 12rpx;
+  color: #202124;
+  font-size: 24rpx;
+  text-align: center;
+}
+
+.c12-metric-cell__status {
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 64rpx;
+  border-radius: 12rpx;
+  background: #fff7e6;
+  color: #ad6800;
+  font-size: 20rpx;
+}
+
+.c12-metric-cell__status--recorded {
+  background: #e8f5e9;
+  color: #0f7a42;
+}
+
+.c12-student-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 28rpx;
+  margin-top: 14rpx;
+}
+
+.c12-student-card__missing,
+.c12-student-card__invalid {
+  font-size: 20rpx;
+}
+
+.c12-student-card__missing {
+  color: #a80f1b;
+}
+
+.c12-student-card__invalid {
+  color: #a80f1b;
+}
+
+.c12-student-card__reason {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 64rpx;
+  margin-top: 12rpx;
+  padding: 12rpx 16rpx;
+  border-radius: 12rpx;
+  background: #f6f7f9;
+  color: #202124;
+  font-size: 24rpx;
 }
