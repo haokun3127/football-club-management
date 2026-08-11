@@ -5,7 +5,7 @@
 
 .select-nav {
   height: 176rpx;
-  box-sizing: border-box;
+  box-sizing: content-box;
   display: flex;
   align-items: center;
   padding-right: 32rpx;
