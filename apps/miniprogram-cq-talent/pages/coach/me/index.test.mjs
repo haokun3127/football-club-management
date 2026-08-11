@@ -90,6 +90,11 @@ describe("coach profile", () => {
       displayName: "Session coach",
       avatarLetter: "S",
       teamsText: "Actual team",
+      profileStats: [
+        { label: "近 30 天日程", value: "0" },
+        { label: "训练场次", value: "0" },
+        { label: "比赛场次", value: "0" },
+      ],
     });
   });
 
@@ -243,6 +248,7 @@ describe("coach profile", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(template).toContain('class="c16-bar"');
     expect(template).toContain('padding-right:{{menuInset}}px');
+    expect(template).toContain('wx:for="{{profileStats}}"');
     expect(template).toContain('class="c16-profile"');
     expect(template).not.toMatch(/主教练|本赛季执教|在队学员|平均出勤/);
     expect(controller).not.toContain("home.coachName");

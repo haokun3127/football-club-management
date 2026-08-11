@@ -5,6 +5,8 @@ import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { clearSession, persistAuthenticatedSession } from "../../../utils/store";
 import type { LoadState } from "../../../utils/types";
 
+type ProfileStat = { label: string; value: string };
+
 interface PageData {
   navInset: number;
   menuInset: number;
@@ -14,6 +16,7 @@ interface PageData {
   avatarLetter: string;
   teamsText: string;
   hasTeams: boolean;
+  profileStats: ProfileStat[];
   canSwitchToParent: boolean;
 }
 
@@ -46,6 +49,7 @@ Page<PageData>({
         avatarLetter: displayName.slice(0, 1),
         teamsText: teams.length ? teams.join("、") : "暂无近30天负责球队",
         hasTeams: teams.length > 0,
+        profileStats: toProfileStats(home.summary),
         canSwitchToParent: session.availableRoles.includes("parent"),
       });
     } catch {
@@ -118,6 +122,7 @@ function emptyPageData(state: LoadState, message: string): PageData {
     avatarLetter: "教",
     teamsText: "暂无近30天负责球队",
     hasTeams: false,
+    profileStats: toProfileStats({ total: 0, training: 0, matches: 0 }),
     canSwitchToParent: false,
   };
 }
@@ -141,6 +146,14 @@ function sessionDisplayName(value: string | undefined) {
 
 function toTeams(teams: string[]) {
   return teams.filter((team, index) => Boolean(team?.trim()) && teams.indexOf(team) === index);
+}
+
+function toProfileStats(summary: { total: number; training: number; matches: number }): ProfileStat[] {
+  return [
+    { label: "近 30 天日程", value: String(summary.total) },
+    { label: "训练场次", value: String(summary.training) },
+    { label: "比赛场次", value: String(summary.matches) },
+  ];
 }
 
 function nextRequestToken(page: unknown) {

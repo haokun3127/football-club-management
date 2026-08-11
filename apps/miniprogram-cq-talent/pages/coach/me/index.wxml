@@ -23,11 +23,14 @@
           <view class="c16-profile__identity">
             <view class="c16-profile__name">{{displayName}}</view>
             <view class="c16-profile__role">教练</view>
+            <view class="c16-profile__team">{{teamsText}}</view>
           </view>
         </view>
-        <view class="c16-profile__teams">
-          <view class="c16-profile__teams-label">近30天负责球队</view>
-          <view class="c16-profile__teams-value">{{teamsText}}</view>
+        <view class="c16-profile__stats">
+          <view wx:for="{{profileStats}}" wx:key="label" class="c16-profile__stat">
+            <view class="c16-profile__stat-label">{{item.label}}</view>
+            <view class="c16-profile__stat-value">{{item.value}}</view>
+          </view>
         </view>
       </view>
 

@@ -96,17 +96,37 @@
   font-weight: 700;
 }
 
-.c16-profile__teams-label {
+.c16-profile__team {
+  overflow: hidden;
+  margin-top: 8rpx;
   color: rgba(255, 255, 255, 0.6);
   font-size: 24rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.c16-profile__teams-value {
-  margin-top: 8rpx;
+.c16-profile__stats {
+  display: flex;
+  gap: 16rpx;
+}
+
+.c16-profile__stat {
+  min-width: 0;
+  flex: 1;
+}
+
+.c16-profile__stat-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 22rpx;
+  line-height: 30rpx;
+}
+
+.c16-profile__stat-value {
+  margin-top: 4rpx;
   color: #ffffff;
-  font-size: 28rpx;
-  font-weight: 600;
-  line-height: 1.5;
+  font-size: 32rpx;
+  font-weight: 700;
+  line-height: 40rpx;
 }
 
 .c16-role-switch {
