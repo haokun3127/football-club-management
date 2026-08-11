@@ -1,0 +1,3 @@
+{"file":"apps/api/test/cq-talent-fixtures.test.ts","reason":"Validates the acceptance fixture's roster, events, metrics, match and guardian-boundary structure."}
+{"file":"apps/api/test/server.test.ts","reason":"Covers BFF behavior and persistent write/readback flows used by the audit."}
+{"file":"apps/api/test/persistence.test.ts","reason":"Covers file-backed SQLite restart persistence for operational coach data."}

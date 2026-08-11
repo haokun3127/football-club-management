@@ -1,0 +1,3 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Defines the coach BFF scope and the persistence/authorization constraints used to classify every coach page."}
+{"file":".trellis/tasks/08-12-08-12-coach-page-evidence-audit/research/coach-demo-data-coverage.md","reason":"Records the first-pass acceptance scenario and source-backed page coverage."}
+{"file":".trellis/tasks/08-12-08-12-coach-page-evidence-audit/research/coach-page-data-persistence-evidence.md","reason":"Records the P1 SQLite, P2 seed-backed and derived-view boundaries with concrete verification paths."}
