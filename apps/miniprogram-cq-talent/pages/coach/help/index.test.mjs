@@ -155,6 +155,7 @@ describe("coach help", () => {
     expect(pageConfig).not.toContain('"app-header"');
     expect(pageConfig).toContain('"role-tabbar"');
     expect(template).toContain('class="c164-nav"');
+    expect(template).toContain('class="c164-nav__spacer"');
     expect(template).not.toContain("c164-nav__placeholder");
     expect(template).toContain('src="{{item.icon}}"');
     expect(template).toContain("支持方式待配置");
@@ -165,6 +166,8 @@ describe("coach help", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toMatch(/TOPICS|showToast|showModal|getStorage|setStorage|contactWechat|openSupport/);
     expect(stylesheet).toMatch(/\.c164-nav\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*border-box[^}]*background:\s*#fceeef/s);
+    expect(stylesheet).toMatch(/\.c164-nav__title\s*\{[^}]*flex:\s*1[^}]*text-align:\s*center/s);
+    expect(stylesheet).toMatch(/\.c164-nav__spacer\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c164-page__body\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+180rpx/s);
     expect(stylesheet).toMatch(/\.c164-content\s*\{[^}]*gap:\s*40rpx/s);
     expect(stylesheet).toMatch(/\.c164-card\s*\{[^}]*border-radius:\s*24rpx/s);

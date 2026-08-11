@@ -32,9 +32,17 @@
 }
 
 .c164-nav__title {
+  flex: 1;
   color: #202124;
   font-size: 44rpx;
   font-weight: 700;
+  text-align: center;
+}
+
+.c164-nav__spacer {
+  width: 48rpx;
+  height: 48rpx;
+  flex: 0 0 48rpx;
 }
 
 .c164-page__body {

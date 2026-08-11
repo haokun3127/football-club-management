@@ -4,6 +4,7 @@
       <image class="c164-nav__back-icon" src="/assets/icons/c164-chevron-left.svg" mode="aspectFit" />
     </view>
     <view class="c164-nav__title">帮助中心</view>
+    <view class="c164-nav__spacer" aria-hidden="true"></view>
   </view>
 
   <view class="c164-page__body">
