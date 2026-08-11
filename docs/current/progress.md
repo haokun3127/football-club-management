@@ -9,6 +9,12 @@
 - Commits: `4e60d35`, `61304f4`, `e61ce43`, `4136498`, `a58ed0b`, `bdcb807`, `5037efb`, `2936d68`, `a852ef3`.
 - Verification: full workspace check passed — domain `19/19`, mini-program `293/293`, API `85/85`; TypeScript and `git diff --check` passed. No authenticated post-change 375x812 coach capture was available, so this is not a runtime visual-acceptance claim.
 
+## 2026-08-11 C16 Runtime Screenshot Recheck
+
+- A current authenticated coach-session `375x812` capture at `C:\Users\ASUS\AppData\Local\Temp\cq-coach-audit-20260811\C16-me-profile-stats.png` was compared against Figma C16 `93:1182`: the pink 88px top bar, dark profile card, three-stat row, role-switch card, menu block, logout outline, and coach bottom tab are present.
+- The displayed values (`4`, `3`, `1`) came from the active account's live coach-home response and are not Figma fixtures. Screenshot capture omits the platform menu capsule, so it verifies page geometry but not physical capsule overlap.
+- C7 `233:2` was also routed with a coach session, but its available event ID returned the page's honest “read failed” state; it is not recorded as a ready-state visual acceptance.
+
 ## 2026-08-11 Dual Parent/Coach Role Switching: Backend Foundation
 
 - Added SQLite-backed app-client sessions with SHA-256 token storage, atomic token rotation, route-bound bearer revalidation, entrypoint-filtered `availableRoles`, and the server-confirmed role-selection endpoint.
