@@ -1,5 +1,6 @@
 import { getCoachTrainingCoverage } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { resolveNavInset } from "../../../utils/presentation";
 import type { CoachTrainingCoverageStudent, LoadState } from "../../../utils/types";
 
 interface DimensionBar {
@@ -20,6 +21,7 @@ interface StudentRow {
 }
 
 interface PageData {
+  navInset: number;
   state: LoadState;
   statusTitle: string;
   message: string;
@@ -32,6 +34,7 @@ let loadToken = 0;
 
 Page<PageData>({
   data: {
+    navInset: resolveNavInset(),
     state: "loading",
     statusTitle: "覆盖预览",
     message: "正在读取训练覆盖信息",

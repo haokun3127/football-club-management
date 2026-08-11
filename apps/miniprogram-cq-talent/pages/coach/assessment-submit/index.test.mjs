@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
+vi.mock("../../../utils/presentation", () => ({ resolveNavInset: () => 0 }));
 
 globalThis.wx = { navigateBack: mocks.navigateBack };
 
@@ -97,6 +98,7 @@ describe("C15.1 coach assessment submit", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"app-header"');
+    expect(template).toContain('padding-top:{{navInset}}px');
     expect(stylesheet).toMatch(/\.c151-nav\s*\{[^}]*height:\s*176rpx/s);
     expect(stylesheet).toMatch(/\.c151-success\s*\{[^}]*gap:\s*0/s);
     expect(stylesheet).toMatch(/\.c151-success__title\s*\{[^}]*margin-top:\s*32rpx/s);

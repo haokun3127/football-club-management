@@ -1,5 +1,5 @@
 <view class="coverage-page">
-  <view class="coverage-nav">
+  <view class="coverage-nav" style="padding-top:{{navInset}}px">
     <view class="coverage-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
     <view class="coverage-nav__title">覆盖预览</view>
   </view>

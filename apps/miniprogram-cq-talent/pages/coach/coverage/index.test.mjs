@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("../../../utils/api", () => ({ getCoachTrainingCoverage: mocks.getCoachTrainingCoverage }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
+vi.mock("../../../utils/presentation", () => ({ resolveNavInset: () => 0 }));
 
 let pageDefinition;
 globalThis.Page = (definition) => {
@@ -123,6 +124,7 @@ describe("C10.1 coach coverage preview", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"app-header"');
     expect(template).toContain('class="coverage-nav"');
+    expect(template).toContain('padding-top:{{navInset}}px');
     expect(template).toContain('<role-tabbar role="coach" active="training" />');
     expect(template).not.toContain("陈小宇");
     expect(template).not.toContain("林一诺");

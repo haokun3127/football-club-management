@@ -1,8 +1,10 @@
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
+import { resolveNavInset } from "../../../utils/presentation";
 import type { LoadState } from "../../../utils/types";
 
 interface PageData {
+  navInset: number;
   state: LoadState;
   statusTitle: string;
   message: string;
@@ -14,6 +16,7 @@ interface PageData {
 
 Page<PageData>({
   data: {
+    navInset: resolveNavInset(),
     state: "idle",
     statusTitle: "评估提交",
     message: "",

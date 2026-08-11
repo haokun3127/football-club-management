@@ -7,10 +7,10 @@
   box-sizing: border-box;
   display: flex;
   height: 176rpx;
-  padding: 64rpx 44rpx 20rpx;
+  padding: 0 44rpx;
   align-items: center;
   gap: 24rpx;
-  background: #fceeef;
+  background: #f6f7f9;
 }
 
 .coverage-nav__back {
