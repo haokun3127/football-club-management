@@ -21,7 +21,9 @@ import { createPlatformSeed } from "../src/seed/platform.js";
 describe("Chongqing Talent synthetic fixtures", () => {
   it("includes the production acceptance seed only when explicitly enabled", () => {
     const original = process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED;
+    const originalNodeEnv = process.env.NODE_ENV;
     try {
+      process.env.NODE_ENV = "production";
       delete process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED;
       expect(createSeedData().users.some((user) => user.id === "user-parent-cq-talent-acceptance")).toBe(false);
       process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED = "1";
@@ -31,6 +33,11 @@ describe("Chongqing Talent synthetic fixtures", () => {
         delete process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED;
       } else {
         process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED = original;
+      }
+      if (originalNodeEnv === undefined) {
+        delete process.env.NODE_ENV;
+      } else {
+        process.env.NODE_ENV = originalNodeEnv;
       }
     }
   });

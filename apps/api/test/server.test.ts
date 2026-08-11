@@ -1434,6 +1434,88 @@ describe("api server", () => {
       expect((restoredTactical.json() as { saved: boolean; board: { players: Array<{ x: number }> } }).saved).toBe(true);
       expect((restoredTactical.json() as { board: { players: Array<{ x: number }> } }).board.players[0]?.x).toBe(0.42);
 
+      const acceptanceMembership = await restartedPersistence.repositories.memberships.findActiveByClubAndUser("club-chongqing-talent", acceptanceUserId);
+      const primaryClient = acceptanceSeed.appClients[0]!;
+      const otherClientId = "app-client-cq-talent-rollback-other";
+      const otherClubId = "club-cq-talent-rollback-other";
+      const otherClubMembershipId = "membership-cq-talent-rollback-other";
+      const otherClubClientId = "app-client-cq-talent-rollback-foreign";
+      const otherClubStudentId = "student-cq-talent-rollback-foreign";
+      const otherAppTokenHash = "rollback-scope-other-app-client";
+      const otherClubTokenHash = "rollback-scope-other-club";
+      const now = "2026-08-11T00:00:00.000Z";
+      await restartedPersistence.repositories.dataCapability.saveClubAppClient({
+        ...primaryClient,
+        id: otherClientId,
+        name: "Rollback scope peer client",
+        appId: undefined,
+        clientKey: "cq-talent-rollback-other-client",
+      });
+      await restartedPersistence.repositories.clubs.save({
+        id: otherClubId,
+        name: "Rollback scope foreign club",
+        code: "rollback-other",
+        timezone: "Asia/Shanghai",
+        locale: "zh-CN",
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+      });
+      await restartedPersistence.repositories.memberships.save({
+        id: otherClubMembershipId,
+        clubId: otherClubId,
+        userId: acceptanceUserId,
+        roles: ["parent"],
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+      });
+      await restartedPersistence.repositories.students.save({
+        ...acceptanceSeed.students[0]!,
+        id: otherClubStudentId,
+        clubId: otherClubId,
+      });
+      await restartedPersistence.repositories.dataCapability.saveClubAppClient({
+        ...primaryClient,
+        id: otherClubClientId,
+        clubId: otherClubId,
+        name: "Rollback scope foreign client",
+        appId: undefined,
+        clientKey: "cq-talent-rollback-foreign-client",
+      });
+      restartedPersistence.repositories.appClientSessions.create({
+        id: "app-client-session-rollback-other-app",
+        tokenHash: otherAppTokenHash,
+        clubId: "club-chongqing-talent",
+        appClientId: otherClientId,
+        userId: acceptanceUserId,
+        membershipId: acceptanceMembership!.id,
+        activeRole: "parent",
+        expiresAt: "2026-08-12T00:00:00.000Z",
+        createdAt: now,
+        updatedAt: now,
+      });
+      restartedPersistence.repositories.appClientSessions.create({
+        id: "app-client-session-rollback-other-club",
+        tokenHash: otherClubTokenHash,
+        clubId: otherClubId,
+        appClientId: otherClubClientId,
+        userId: acceptanceUserId,
+        membershipId: otherClubMembershipId,
+        activeRole: "parent",
+        expiresAt: "2026-08-12T00:00:00.000Z",
+        createdAt: now,
+        updatedAt: now,
+      });
+      const foreignMetric = acceptanceSeed.metricRecords[0]!;
+      restartedPersistence.repositories.assessments.insertMetricRecordIfAbsent({
+        ...foreignMetric,
+        id: "metric-record-cq-talent-rollback-foreign",
+        clubId: otherClubId,
+        studentId: otherClubStudentId,
+        eventId: undefined,
+      });
+
       const rollback = rollbackCqTalentAcceptanceDemo(restartedPersistence.database);
       expect(rollback.deletedEventIds).toEqual(demoEventIds);
       expect(rollback.deletedSessions).toBeGreaterThan(0);
@@ -1450,6 +1532,9 @@ describe("api server", () => {
       expect(rolledBack.repositories.calendar.listEvents("club-chongqing-talent").filter((event) => demoEventIds.includes(event.id))).toEqual([]);
       expect(rolledBack.repositories.calendar.listParticipants("club-chongqing-talent").filter((participant) => demoEventIds.includes(participant.eventId))).toEqual([]);
       expect(rolledBack.repositories.assessments.listMetricRecords("club-chongqing-talent").filter((record) => record.recordedByCoachId === "coach-cq-talent-acceptance-demo")).toEqual([]);
+      expect(rolledBack.repositories.appClientSessions.findByTokenHash(otherAppTokenHash)).not.toBeNull();
+      expect(rolledBack.repositories.appClientSessions.findByTokenHash(otherClubTokenHash)).not.toBeNull();
+      expect(rolledBack.repositories.assessments.listMetricRecords(otherClubId).map((record) => record.id)).toContain("metric-record-cq-talent-rollback-foreign");
       rolledBack.database.close();
     } finally {
       await firstApp?.close();
