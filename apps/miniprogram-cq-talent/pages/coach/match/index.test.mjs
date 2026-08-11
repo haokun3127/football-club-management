@@ -181,6 +181,7 @@ describe("coach match detail", () => {
   });
 
   it("uses the local role tab bar and excludes legacy writes, tactical UI, Figma samples, and template helpers", () => {
+    expect(template).toContain('<app-header theme="soft" title="比赛记录" show-back />');
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"submit-bar"');
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');

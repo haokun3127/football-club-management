@@ -35,6 +35,7 @@ await import("./index.ts");
 
 const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
+const pageConfig = readFileSync(new URL("./index.json", import.meta.url), "utf8");
 
 const detail = {
   event: {
@@ -175,7 +176,8 @@ describe("C6.1 match event add", () => {
   });
 
   it("keeps template expressions safe and has no Figma sample facts", () => {
-    expect(template).not.toContain("app-header");
+    expect(template).toContain('<app-header theme="soft" title="添加比赛事件" show-back />');
+    expect(pageConfig).toContain('"app-header": "/components/app-header/index"');
     expect(template).not.toContain("Chen");
     expect(template).not.toContain("45");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
