@@ -5,8 +5,11 @@ const mocks = vi.hoisted(() => ({
   getParentChildren: vi.fn(),
   getParentSchedule: vi.fn(),
   getParentStudentHome: vi.fn(),
+  switchActiveRole: vi.fn(),
   openPage: vi.fn(),
   requireRole: vi.fn(),
+  routeHome: vi.fn(),
+  persistAuthenticatedSession: vi.fn(),
   setCurrentStudentId: vi.fn(),
 }));
 
@@ -14,15 +17,19 @@ vi.mock("../../../utils/api", () => ({
   getParentChildren: mocks.getParentChildren,
   getParentSchedule: mocks.getParentSchedule,
   getParentStudentHome: mocks.getParentStudentHome,
+  switchActiveRole: mocks.switchActiveRole,
 }));
-vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
+vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole, routeHome: mocks.routeHome }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
 vi.mock("../../../utils/presentation", () => ({
   formatDateTime: (value) => value,
   resolveMenuInset: () => 0,
   resolveNavInset: () => 0,
 }));
-vi.mock("../../../utils/store", () => ({ setCurrentStudentId: mocks.setCurrentStudentId }));
+vi.mock("../../../utils/store", () => ({
+  persistAuthenticatedSession: mocks.persistAuthenticatedSession,
+  setCurrentStudentId: mocks.setCurrentStudentId,
+}));
 
 let pageDefinition;
 globalThis.Page = (definition) => {
@@ -58,7 +65,10 @@ describe("parent profile hub", () => {
       updatedAt: "2026-08-10T09:00:00.000Z",
     });
     mocks.openPage.mockReset();
-    mocks.requireRole.mockReset().mockReturnValue({ role: "parent", currentStudentId: "student-1" });
+    mocks.requireRole.mockReset().mockReturnValue({ role: "parent", availableRoles: ["parent"], currentStudentId: "student-1" });
+    mocks.switchActiveRole.mockReset();
+    mocks.routeHome.mockReset();
+    mocks.persistAuthenticatedSession.mockReset();
     mocks.setCurrentStudentId.mockReset();
   });
 
@@ -79,6 +89,47 @@ describe("parent profile hub", () => {
     await page.load();
 
     expect(page.data).toMatchObject({ state: "error", message: "home unavailable" });
+  });
+
+  it("shows a persistent coach switch only for a server-confirmed dual-role parent", async () => {
+    const selectedSession = {
+      clubId: "club-chongqing-talent",
+      client: { id: "client-cq-talent" },
+      status: "authenticated",
+      session: { token: "coach-session-token", expiresInSeconds: 3600, expiresAt: "2099-01-01T00:00:00.000Z", activeRole: "coach" },
+      role: "coach",
+      availableRoles: ["parent", "coach"],
+      profile: { userId: "user-dual", displayName: "Dual role" },
+      children: [],
+      capabilities: {},
+    };
+    mocks.requireRole.mockReturnValue({ role: "parent", availableRoles: ["parent", "coach"], currentStudentId: "student-1" });
+    mocks.switchActiveRole.mockResolvedValue(selectedSession);
+    mocks.persistAuthenticatedSession.mockReturnValue({ role: "coach" });
+    const page = createPageInstance();
+
+    await page.load();
+    expect(page.data.canSwitchToCoach).toBe(true);
+
+    await page.switchToCoach();
+
+    expect(mocks.switchActiveRole).toHaveBeenCalledWith("coach");
+    expect(mocks.persistAuthenticatedSession).toHaveBeenCalledWith(selectedSession);
+    expect(mocks.routeHome).toHaveBeenCalledWith("coach");
+    expect(template).toContain('wx:if="{{canSwitchToCoach}}"');
+    expect(template).toContain('bindtap="switchToCoach"');
+    expect(template).toContain('class="p7-role-switch"');
+    expect(template).toContain('wx:if="{{canSwitchToCoach && !studentHome}}"');
+  });
+
+  it("does not expose a role switch to a parent-only session", async () => {
+    const page = createPageInstance();
+
+    await page.load();
+    await page.switchToCoach();
+
+    expect(page.data.canSwitchToCoach).toBe(false);
+    expect(mocks.switchActiveRole).not.toHaveBeenCalled();
   });
 
   it("does not render invented activities or reminders and keeps template expressions precomputed", () => {

@@ -1,8 +1,8 @@
-import { getParentChildren, getParentSchedule, getParentStudentHome } from "../../../utils/api";
-import { requireRole } from "../../../utils/auth";
+import { getParentChildren, getParentSchedule, getParentStudentHome, switchActiveRole } from "../../../utils/api";
+import { requireRole, routeHome } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { formatDateTime, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
-import { setCurrentStudentId } from "../../../utils/store";
+import { persistAuthenticatedSession, setCurrentStudentId } from "../../../utils/store";
 import type { LoadState, ScheduleEvent, StudentHome, StudentSummary } from "../../../utils/types";
 
 Page({
@@ -19,6 +19,7 @@ Page({
     teamLabel: "",
     heroStats: [] as Array<{ label: string; value: string }>,
     recentActivities: [] as Array<{ title: string; date: string }>,
+    canSwitchToCoach: false,
   },
   onLoad() {
     this.load();
@@ -26,7 +27,11 @@ Page({
   async load() {
     const session = requireRole("parent");
     if (!session) return;
-    this.setData({ state: "loading", message: "正在读取孩子档案" });
+    this.setData({
+      state: "loading",
+      message: "正在读取孩子档案",
+      canSwitchToCoach: session.availableRoles.includes("coach"),
+    });
     try {
       const children = await getParentChildren();
       if (!children.length) {
@@ -91,6 +96,21 @@ Page({
   },
   openCoach() {
     openPage("/pages/parent/coaches/index");
+  },
+  async switchToCoach() {
+    const session = requireRole("parent");
+    if (!session || !session.availableRoles.includes("coach")) return;
+    try {
+      const result = await switchActiveRole("coach");
+      const nextSession = persistAuthenticatedSession(result);
+      if (!nextSession) {
+        wx.showToast({ title: "身份切换失败，请稍后重试", icon: "none" });
+        return;
+      }
+      routeHome(nextSession.role);
+    } catch {
+      wx.showToast({ title: "身份切换失败，请稍后重试", icon: "none" });
+    }
   },
 
 });

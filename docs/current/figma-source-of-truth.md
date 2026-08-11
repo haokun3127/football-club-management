@@ -82,6 +82,12 @@ https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/
 - 旧文件 `ATlfBRO0ruOCDDY5ICagFD` 的 `93:83` 节点和相关历史截图仅保留为切源前审计事实，不构成新的视觉验收依据；不代表 P1 Empty、其他家长页、教练页或真机矩阵已经验收。
 - 每次视觉改动仍必须先读取当前在线目标三元组和截图；不能用本地 `.fig`、旧导出或切源前历史规格反推当前设计。
 
+## 2026-08-11 双角色入口设计
+
+- 在线 Figma 新增复用组件集：`304:14 / RoleSwitchEntry`；变体为 `304:2 / role=parent` 与 `304:8 / role=coach`。该组件仅用于后端已确认同时拥有家长、教练两种入口的账号。
+- 家长日常入口：`zZ6wKyOHKcO4UYXDd9jGwv / 93:336 / P7 Parent Profile Hub` 中的 `305:340 / RoleSwitchEntry / parent / dual-role only`，位于孩子资料卡之后。
+- 教练日常入口：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1182 / C16 Coach Me` 中的 `305:430 / RoleSwitchEntry / coach / dual-role only`，位于教练资料卡之后。已于 2026-08-11 重新读取节点并生成在线 Figma 截图复核其位置；这不是小程序运行态视觉验收。
+
 ## 2026-08-05 P1 运行态 superseding 记录
 
 - 当前成功态对照节点为 `zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`。已取得可信 Windows PrintWindow 模拟器截图，路由为 `pages/parent/schedule/index`，逻辑视口为 `375×812`，原始 PNG 为 `563×1218`。

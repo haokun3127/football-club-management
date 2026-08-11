@@ -109,6 +109,46 @@
   line-height: 1.5;
 }
 
+.c16-role-switch {
+  display: flex;
+  box-sizing: border-box;
+  min-height: 144rpx;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 32rpx;
+  border: 2rpx solid #e7eaf0;
+  border-radius: 24rpx;
+  background: #ffffff;
+}
+
+.c16-role-switch__identity {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.c16-role-switch__label {
+  color: #667085;
+  font-size: 24rpx;
+  line-height: 36rpx;
+}
+
+.c16-role-switch__role {
+  color: #202124;
+  font-size: 32rpx;
+  font-weight: 600;
+  line-height: 48rpx;
+}
+
+.c16-role-switch__action {
+  padding: 16rpx 24rpx;
+  border-radius: 24rpx;
+  background: #fceeef;
+  color: #a80f1b;
+  font-size: 28rpx;
+  line-height: 44rpx;
+}
+
 .c16-menu {
   display: flex;
   flex-direction: column;

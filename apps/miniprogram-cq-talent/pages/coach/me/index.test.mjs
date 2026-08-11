@@ -198,6 +198,8 @@ describe("coach profile", () => {
     expect(mocks.routeHome).toHaveBeenCalledWith("parent");
     expect(template).toContain('wx:if="{{canSwitchToParent}}"');
     expect(template).toContain('bindtap="switchToParent"');
+    expect(template).toContain('class="c16-role-switch"');
+    expect(template).not.toContain('class="c16-menu__item" bindtap="switchToParent"');
   });
 
   it("does not expose the parent switch to a coach-only session", async () => {

@@ -26,6 +26,12 @@ An old mini-program storage entry with no `availableRoles` is treated as `[role]
 
 The persisted session is shared only when all API instances use the same durable `DATABASE_URL`/database volume with SQLite-compatible locking. The task adds an integration test using two server instances against one database file; it does not claim safe shared state over arbitrary NFS or across separate database files. API restart invalidates old process-memory sessions and requires those users to log in once again.
 
+## Persistent In-App Entry Design
+
+The role switch must not be discoverable only through account settings. The online Figma authority now contains the reusable `RoleSwitchEntry` component set at `304:14`: parent variant `304:2`, coach variant `304:8`. It appears on `93:336 / P7 Parent Profile Hub` as `305:340`, immediately after the child card, and on `93:1182 / C16 Coach Me` as `305:430`, immediately after the coach profile card. Both entries show the server-confirmed current role and a compact `切换 ›` action.
+
+The mini-program renders either entry only when the restored authenticated session's `availableRoles` includes the opposite role. Tapping it keeps the same server-confirmed `switchActiveRole` flow: request the desired role, persist the complete rotated session response, then route to that response's role. A client never exposes a switch for a single-role session and does not locally assign a role.
+
 ## Risks and Rollback
 
 The phone authorization guard task has related login-page changes and must be used as the baseline rather than overwritten. The additive API field and durable session semantics land before any selector UI. `coach/account` remains unmodified because it has an existing visual contract; the coach switch control belongs in `coach/me`. Roll back the mini-program selector and switching controls before API layers if necessary; do not drop the additive session table in production.

@@ -411,3 +411,9 @@
 - Parent schedule now provides previous/next week controls; each moves the selected date by seven days and reloads the corresponding Monday–Sunday BFF interval. No activities are fabricated for empty weeks.
 - Verification: focused API regression passed after a recorded red failure; mini-program date/week tests passed after recorded red failures; API and mini-program type checks passed; root `check` passed with domain `19/19`, mini-program `264/264`, API `79/79`; `git diff --check` passed. No visual or production deployment claim is made by this entry.
 - Dual parent/coach role switching remains a separate planning task. Terra review blocked implementation until sessions can survive API restart/multi-instance use and every bearer request revalidates active membership and role availability.
+
+## 2026-08-11 双角色日常切换入口
+
+- 在线 Figma 权威文件 `zZ6wKyOHKcO4UYXDd9jGwv` 已新增 `RoleSwitchEntry` 组件集（`304:14`），并放置到 P7 孩子档案（`93:336`，实例 `305:340`）及 C16 教练“我的”（`93:1182`，实例 `305:430`）。两处均显示“当前身份 / 家长端或教练端 / 切换 ›”。
+- 小程序将入口从隐藏账户项提升为日常入口：家长 P7 的孩子卡下、教练 C16 的资料卡下；只有 `availableRoles` 含另一真实角色时显示。切换继续调用后端 role endpoint，保存服务端轮换后的完整 session 后才跳转，单角色账号没有入口。
+- 验证：定向 Vitest 54 文件、278 用例通过；小程序 TypeScript 检查通过；`git diff --check` 通过。在线 Figma C16 节点截图已复核。尚未取得本轮小程序 375×812 DevTools/真机截图，故不作运行态视觉验收结论。
