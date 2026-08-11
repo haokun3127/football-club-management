@@ -229,7 +229,7 @@ describe("coach training content select", () => {
     expect(template).toContain('/assets/icons/chevron-left.svg');
     expect(template).not.toMatch(/传球训练（初级）|射门训练（中级）|战术转换练习|体能循环训练|45分钟/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(stylesheet).toMatch(/\.select-nav\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*border-box/s);
+    expect(stylesheet).toMatch(/\.select-nav\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*content-box/s);
     expect(controller).not.toContain("openCoverage");
   });
 });
