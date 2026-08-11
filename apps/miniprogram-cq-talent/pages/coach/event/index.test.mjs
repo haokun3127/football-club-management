@@ -211,12 +211,19 @@ describe("coach activity workbench", () => {
     expect(stylesheet).toMatch(/\.shero__status\s*\{[^}]*flex:\s*0\s+0\s+auto/s);
   });
 
-  it("uses the Figma bottom coach navigation and keeps the action grid inside its cards", () => {
-    expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
-    expect(template).not.toContain('class="c2-route-tabs"');
-    expect(pageConfig).toContain('"role-tabbar"');
-    expect(stylesheet).toMatch(/\.shero\s*\{[^}]*min-height:\s*280rpx/s);
+  it("uses the C2 in-flow coach tabs and neutral icon-led action tiles", () => {
+    expect(template).toContain('class="c2-route-tabs"');
+    expect(template).toContain('data-path="/pages/coach/schedule/index"');
+    expect(template).toContain('data-path="/pages/coach/training/index"');
+    expect(template).toContain('data-path="/pages/coach/me/index"');
+    expect(template).toContain('bindtap="openCoachRoot"');
+    expect(template).toContain('src="{{item.icon}}"');
+    expect(template).not.toContain('<role-tabbar role="coach" active="schedule" />');
+    expect(pageConfig).not.toContain('"role-tabbar"');
+    expect(stylesheet).toMatch(/\.c2-route-tabs\s*\{[^}]*height:\s*140rpx/s);
     expect(stylesheet).toMatch(/\.action-tile\s*\{[^}]*min-height:\s*200rpx/s);
+    expect(stylesheet).not.toContain('.action-tile--primary');
+    expect(stylesheet).not.toContain('.action-tile--match');
   });
 
   it("relaunches only a supported in-flow coach root route", () => {

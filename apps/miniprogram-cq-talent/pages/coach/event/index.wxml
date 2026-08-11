@@ -5,6 +5,21 @@
       <view class="c2-nav__title">{{eventTypeLabel}}工作台</view>
     </view>
   </view>
+  <view class="c2-route-tabs">
+    <view class="c2-route-tab c2-route-tab--active" data-path="/pages/coach/schedule/index" bindtap="openCoachRoot">
+      <image class="c2-route-tab__icon" src="/assets/icons/tab-calendar-active.png" mode="aspectFit" />
+      <view class="c2-route-tab__label">日程</view>
+      <view class="c2-route-tab__dot"></view>
+    </view>
+    <view class="c2-route-tab" data-path="/pages/coach/training/index" bindtap="openCoachRoot">
+      <image class="c2-route-tab__icon" src="/assets/icons/tab-training-inactive.png" mode="aspectFit" />
+      <view class="c2-route-tab__label">训练管理</view>
+    </view>
+    <view class="c2-route-tab" data-path="/pages/coach/me/index" bindtap="openCoachRoot">
+      <image class="c2-route-tab__icon" src="/assets/icons/tab-user-inactive.png" mode="aspectFit" />
+      <view class="c2-route-tab__label">我的</view>
+    </view>
+  </view>
 
   <view class="c2-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载活动' : state === 'empty' ? '暂无工作台数据' : '活动读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
@@ -33,10 +48,10 @@
       </view>
     </view>
 
-    <view wx:if="{{hasActionCards}}" class="workbench-card">
-      <view class="section-title">可用操作</view>
-      <view class="action-grid">
-        <view wx:for="{{actionCards}}" wx:key="id" class="action-tile {{item.toneClass}}" data-action="{{item.id}}" bindtap="openAction">{{item.label}}</view>
+    <view wx:if="{{hasActionCards}}" class="action-grid">
+      <view wx:for="{{actionCards}}" wx:key="id" class="action-tile" data-action="{{item.id}}" bindtap="openAction">
+        <image class="action-tile__icon" src="{{item.icon}}" mode="aspectFit" />
+        <view class="action-tile__label">{{item.label}}</view>
       </view>
     </view>
 
@@ -74,5 +89,4 @@
     </view>
     </block>
   </view>
-  <role-tabbar role="coach" active="schedule" />
 </view>

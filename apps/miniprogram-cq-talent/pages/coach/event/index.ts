@@ -15,7 +15,7 @@ const coachRootRoutes = new Set([
 type ActionCard = {
   id: WorkbenchAction;
   label: string;
-  toneClass: string;
+  icon: string;
 };
 
 type RosterRow = CoachWorkbench["roster"][number] & { statusLabel: string };
@@ -176,16 +176,29 @@ function buildActionCards(workbench: CoachWorkbench, canWrite: boolean): ActionC
   if (!canWrite) return [];
 
   const cards: ActionCard[] = [];
-  if (workflowPending(workbench, "点名")) cards.push({ id: "attendance", label: "点名", toneClass: "action-tile--primary" });
-  if (workbench.event.type !== "other" && workflowPending(workbench, "销课")) cards.push({ id: "lesson", label: "销课", toneClass: "" });
-  if (workbench.event.type === "training") cards.push({ id: "training", label: "训练内容", toneClass: "" });
+  if (workflowPending(workbench, "点名")) cards.push(actionCard("attendance", "点名"));
+  if (workbench.event.type !== "other" && workflowPending(workbench, "销课")) cards.push(actionCard("lesson", "销课"));
+  if (workbench.event.type === "training") cards.push(actionCard("training", "训练内容"));
   if (workbench.event.type === "match") {
-    cards.push({ id: "match", label: "比赛录入", toneClass: "action-tile--match" });
-    cards.push({ id: "tactical", label: "比赛战术板", toneClass: "action-tile--match" });
+    cards.push(actionCard("match", "比赛录入"));
+    cards.push(actionCard("tactical", "比赛战术板"));
   }
-  if (workbench.assessmentTemplateId) cards.push({ id: "assessment", label: "评测录入", toneClass: "" });
-  cards.push({ id: "change", label: "变更活动", toneClass: "" });
+  if (workbench.assessmentTemplateId) cards.push(actionCard("assessment", "评测录入"));
+  cards.push(actionCard("change", "变更活动"));
   return cards;
+}
+
+function actionCard(id: WorkbenchAction, label: string): ActionCard {
+  const icons: Record<WorkbenchAction, string> = {
+    attendance: "/assets/icons/check-circle.svg",
+    lesson: "/assets/icons/tab-calendar.svg",
+    match: "/assets/icons/c10-target-rose.svg",
+    tactical: "/assets/icons/c10-target-violet.svg",
+    training: "/assets/icons/tab-training.svg",
+    assessment: "/assets/icons/c164-category-assessment.svg",
+    change: "/assets/icons/alert.svg",
+  };
+  return { id, label, icon: icons[id] };
 }
 
 function workflowPending(workbench: CoachWorkbench, label: string) {

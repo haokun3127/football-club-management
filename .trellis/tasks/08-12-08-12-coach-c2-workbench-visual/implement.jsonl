@@ -1,0 +1,2 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"C2 must keep the existing authenticated coach workbench and action boundaries."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Use page-local presentation metadata instead of duplicating shared route or API behavior."}
