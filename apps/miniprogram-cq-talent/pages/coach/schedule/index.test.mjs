@@ -14,6 +14,7 @@ vi.mock("../../../utils/presentation", () => ({
   activityStatus: (status) => ({ label: status, tone: "info" }),
   formatCalendarDate: (value) => String(value).slice(0, 10),
   formatTimeRange: () => "",
+  resolveMenuInset: () => 0,
   resolveNavInset: () => 0,
 }));
 
@@ -180,5 +181,11 @@ describe("coach schedule home", () => {
     const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
     expect(controller).toContain("currentLocalDate");
     expect(controller).not.toContain("DEV_TEST_DATE");
+  });
+
+  it("keeps the coach avatar clear of the system menu capsule", () => {
+    const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
+    expect(controller).toContain("resolveMenuInset");
+    expect(template).toContain('padding-right:{{menuInset}}px');
   });
 });

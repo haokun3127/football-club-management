@@ -30,6 +30,7 @@ await import("./index.ts");
 
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
 const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
+const pageConfig = readFileSync(new URL("./index.json", import.meta.url), "utf8");
 
 function createPageInstance(data = {}) {
   const instance = {
@@ -207,5 +208,10 @@ describe("coach activity workbench", () => {
     expect(template).toContain('class="shero__status"');
     expect(stylesheet).toMatch(/\.shero__content\s*\{[^}]*min-width:\s*0[^}]*flex:\s*1/s);
     expect(stylesheet).toMatch(/\.shero__status\s*\{[^}]*flex:\s*0\s+0\s+auto/s);
+  });
+
+  it("keeps the Figma coach tab bar visible on the workbench", () => {
+    expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
+    expect(pageConfig).toContain('"role-tabbar": "/components/role-tabbar/index"');
   });
 });

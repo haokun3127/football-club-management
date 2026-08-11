@@ -2,7 +2,7 @@ import { getCoachHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { currentLocalDate } from "../../../utils/date";
 import { openPage } from "../../../utils/navigation";
-import { activityStatus, formatCalendarDate, resolveNavInset } from "../../../utils/presentation";
+import { activityStatus, formatCalendarDate, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachHome, CoachTask, CoachTaskAction, LoadState, ScheduleEvent } from "../../../utils/types";
 
 const WEEK_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -33,6 +33,7 @@ type CoachTaskView = CoachTask & {
 Page({
   data: {
     navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     state: "loading" as LoadState,
     message: "正在读取教练日程",
     home: null as CoachHome | null,

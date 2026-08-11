@@ -74,4 +74,5 @@
     </view>
     </block>
   </view>
+  <role-tabbar role="coach" active="schedule" />
 </view>
