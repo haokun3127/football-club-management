@@ -30,7 +30,7 @@ const pageConfig = readFileSync(new URL("./index.json", import.meta.url), "utf8"
 
 const teamDetail = {
   team: { id: "team-1", name: "Actual team", season: "2026-2027" },
-  stats: { memberCount: 1, trainingCount: 6, attendanceRate: 95 },
+  stats: { memberCount: 1, trainingCount: 6, completedTrainingCount: 3, attendanceRate: 95 },
   members: [{ id: "student-1", name: "Actual student" }],
 };
 
@@ -51,7 +51,7 @@ describe("coach team detail", () => {
   it("does not invent a team when the coach scope has no team", async () => {
     mocks.getCoachTeam.mockResolvedValueOnce({
       team: null,
-      stats: { memberCount: 0, trainingCount: 0, attendanceRate: null },
+      stats: { memberCount: 0, trainingCount: 0, completedTrainingCount: 0, attendanceRate: null },
       members: [],
     });
     const page = createPageInstance();
@@ -64,9 +64,9 @@ describe("coach team detail", () => {
       hasTeam: false,
       hasMembers: false,
       heroStats: [
-        { label: "在队人数", value: "--" },
-        { label: "近30天训练", value: "--" },
-        { label: "出勤率", value: "--" },
+        { label: "在队人数", value: "--", valueClass: "" },
+        { label: "累计训练", value: "--", valueClass: "" },
+        { label: "出勤率", value: "--", valueClass: "" },
       ],
     });
   });
@@ -74,7 +74,7 @@ describe("coach team detail", () => {
   it("keeps a real team hero when its member list is empty", async () => {
     mocks.getCoachTeam.mockResolvedValueOnce({
       team: { id: "team-1", name: "Actual team", season: "2026-2027" },
-      stats: { memberCount: 0, trainingCount: 5, attendanceRate: null },
+      stats: { memberCount: 0, trainingCount: 5, completedTrainingCount: 3, attendanceRate: null },
       members: [],
     });
     const page = createPageInstance();
@@ -88,14 +88,14 @@ describe("coach team detail", () => {
       season: "2026-2027",
       memberEmptyMessage: "近30天暂无执教学员",
       heroStats: [
-        { label: "在队人数", value: "0" },
-        { label: "近30天训练", value: "5" },
-        { label: "出勤率", value: "--" },
+        { label: "在队人数", value: "0", valueClass: "" },
+        { label: "累计训练", value: "3", valueClass: "" },
+        { label: "出勤率", value: "--", valueClass: "" },
       ],
     });
   });
 
-  it("uses the BFF's near-30-day metrics and only navigates with a real student id", async () => {
+  it("uses the BFF's cumulative completed-training metric and only navigates with a real student id", async () => {
     const page = createPageInstance();
     await page.load();
     page.openRadar({ currentTarget: { dataset: { id: "student-1" } } });
@@ -103,9 +103,9 @@ describe("coach team detail", () => {
     page.goBack();
 
     expect(page.data.heroStats).toEqual([
-      { label: "在队人数", value: "1" },
-      { label: "近30天训练", value: "6" },
-      { label: "出勤率", value: "95%" },
+      { label: "在队人数", value: "1", valueClass: "" },
+      { label: "累计训练", value: "3", valueClass: "" },
+      { label: "出勤率", value: "95%", valueClass: "hero-stat__value--positive" },
     ]);
     expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/student-radar/index?student=student-1");
     expect(mocks.openPage).toHaveBeenCalledTimes(1);
@@ -138,10 +138,14 @@ describe("coach team detail", () => {
     expect(pageConfig).not.toContain('"app-header"');
     expect(template).toContain('class="team-nav"');
     expect(template).toContain('active="training"');
+    expect(template).not.toContain('class="coaches-section"');
+    expect(template).not.toContain('class="coaches-scroll"');
     expect(template).toContain('/assets/icons/chevron-left.svg');
     expect(template).not.toMatch(/凤凰山|U10精英队|林教练|主教练|助理|体能/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(stylesheet).toMatch(/\.team-nav\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*border-box/s);
+    expect(stylesheet).toMatch(/\.team-nav\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*content-box/s);
+    expect(stylesheet).toContain(".hero-stat__value--positive { color: #10b981; }");
+    expect(stylesheet).toContain("gap: 24rpx;");
     expect(controller).not.toContain("app-header");
   });
 });

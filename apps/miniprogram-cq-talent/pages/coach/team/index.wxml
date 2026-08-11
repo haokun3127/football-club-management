@@ -16,7 +16,7 @@
         <view class="hero__stats">
           <view wx:for="{{heroStats}}" wx:key="label" class="hero-stat">
             <view class="hero-stat__label">{{item.label}}</view>
-            <view class="hero-stat__value">{{item.value}}</view>
+            <view class="hero-stat__value {{item.valueClass}}">{{item.value}}</view>
           </view>
         </view>
       </view>
@@ -29,6 +29,7 @@
         </view>
       </view>
       <view wx:else class="members-empty">{{memberEmptyMessage}}</view>
+
     </block>
   </view>
 

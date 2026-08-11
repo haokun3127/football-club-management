@@ -4,7 +4,7 @@ import { openPage } from "../../../utils/navigation";
 import { resolveNavInset } from "../../../utils/presentation";
 import type { CoachTeamDetail, LoadState } from "../../../utils/types";
 
-type HeroStat = { label: string; value: string };
+type HeroStat = { label: string; value: string; valueClass: string };
 
 type MemberView = {
   id: string;
@@ -93,17 +93,21 @@ function emptyPageData(state: LoadState, message: string, retryLabel = ""): Page
 
 function emptyHeroStats(): HeroStat[] {
   return [
-    { label: "在队人数", value: "--" },
-    { label: "近30天训练", value: "--" },
-    { label: "出勤率", value: "--" },
+    { label: "在队人数", value: "--", valueClass: "" },
+    { label: "累计训练", value: "--", valueClass: "" },
+    { label: "出勤率", value: "--", valueClass: "" },
   ];
 }
 
 function toHeroStats(detail: CoachTeamDetail): HeroStat[] {
   return [
-    { label: "在队人数", value: String(detail.stats.memberCount) },
-    { label: "近30天训练", value: String(detail.stats.trainingCount) },
-    { label: "出勤率", value: detail.stats.attendanceRate === null ? "--" : `${detail.stats.attendanceRate}%` },
+    { label: "在队人数", value: String(detail.stats.memberCount), valueClass: "" },
+    { label: "累计训练", value: String(detail.stats.completedTrainingCount), valueClass: "" },
+    {
+      label: "出勤率",
+      value: detail.stats.attendanceRate === null ? "--" : `${detail.stats.attendanceRate}%`,
+      valueClass: detail.stats.attendanceRate === null ? "" : "hero-stat__value--positive",
+    },
   ];
 }
 

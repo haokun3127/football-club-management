@@ -1,0 +1,3 @@
+{"file":"apps/miniprogram-cq-talent/pages/coach/team/index.test.mjs","reason":"Focused C9 behavior and static structure regression coverage."}
+{"file":"apps/miniprogram-cq-talent/pages/coach/team/index.wxml","reason":"WXML render structure and no inline JavaScript methods."}
+{"file":"apps/miniprogram-cq-talent/pages/coach/team/index.wxss","reason":"Figma geometry and safe-header styling assertions."}

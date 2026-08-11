@@ -1,5 +1,17 @@
 # 核心演示闭环 · 进度跟踪
 
+## 2026-08-12 教练端演示数据交付边界复核
+
+- 已把后端演示数据分层记录：身份、队伍、日历/签到、课时流水、测评指标、比赛和战术板为 SQLite 持久化实体；训练计划/训练课、评测任务、FAQ 和部分观察记录仍由后端 seed 提供；首页统计、雷达与能力总览是派生视图。它们均不是小程序前端 mock。
+- 隔离的开发验收 SQLite 可通过 `FCM_CQ_TALENT_ACCEPTANCE_SEED=1` 提供 16 名教练可见队员、6 场活动、完整出勤分布、8 维指标、比赛事件和战术名单。生产模式被代码禁止加载该 seed，不能用该变量对共享/生产数据库“补数据”。
+- 本轮只读实测 `https://cqtc.pomi.tech/health` 正常且 OpenAPI 含所需教练路由；健康检查不能证明远端库此刻包含全部演示记录。生产数据核查需使用真实教练会话做只读 GET；任何备份、导入、迁移、重启或写入应另建可 dry-run、可回滚的部署任务。
+
+## 2026-08-12 C9 队伍详情统计语义与布局收口
+
+- 在线 Figma 基准：`zZ6wKyOHKcO4UYXDd9jGwv / 93:924 / C9 Team Detail`。C9 的“累计训练”现使用既有 `coach/team.stats.completedTrainingCount`，不再把滚动 30 天 `trainingCount` 误标为累计。非空出勤率沿用真实 BFF 值并使用绿色强调；缺失值保持 `--`。
+- 页面同步收口了安全区顶栏的 content-box 高度、深色 hero 无额外阴影、14px 数值和 4 列学员网格间距。Figma 的教练组横滑卡暂未渲染：现有 `coach-team` 为俱乐部内容切片，不能保证是当前教练所辖队伍，不能挪用或伪造岗位/姓名。
+- 验证：C9 聚焦 Vitest `5/5`、小程序 TypeScript 与 `git diff --check` 通过；尚未取得已登录 C9 的可信 `375×812` 截图，故不作运行时视觉验收完成结论。
+
 ## 2026-08-11 Coach Figma Header Geometry Repair
 
 - Online Figma authority remains `zZ6wKyOHKcO4UYXDd9jGwv`. This batch corrects real layout causes without replacing missing API fields with Figma sample data.
