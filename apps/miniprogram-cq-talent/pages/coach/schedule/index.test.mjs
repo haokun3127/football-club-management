@@ -148,6 +148,15 @@ describe("coach schedule home", () => {
     });
   });
 
+  it("moves the coach date strip forward and backward by a full week", () => {
+    const page = createPageInstance({ date: "2026-08-13" });
+
+    page.changeWeek({ currentTarget: { dataset: { offset: 7 } } });
+    expect(page.data.date).toBe("2026-08-20");
+    page.changeWeek({ currentTarget: { dataset: { offset: -7 } } });
+    expect(page.data.date).toBe("2026-08-13");
+  });
+
   it("uses precomputed template fields and excludes Figma sample facts", () => {
     expect(template).toContain('wx:if="{{hasHeroEvent}}"');
     expect(template).toContain("c1-hero");
@@ -155,6 +164,9 @@ describe("coach schedule home", () => {
     expect(template).not.toContain('<picker mode="date"');
     expect(template).not.toContain('data-mode="week"');
     expect(template).not.toContain("c1-task-section");
+    expect(template).toContain('data-offset="-7"');
+    expect(template).toContain('data-offset="7"');
+    expect(template).toContain('bindtap="changeWeek"');
     expect(template).not.toContain("18/20");
     expect(template).not.toContain("出席");
     expect(template).not.toContain("林教练");

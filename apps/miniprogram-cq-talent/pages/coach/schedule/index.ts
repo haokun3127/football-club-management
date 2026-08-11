@@ -118,6 +118,12 @@ Page({
     this.setData({ date, viewMode: "day" });
     this.load();
   },
+  changeWeek(event: { currentTarget: { dataset: { offset?: string | number } } }) {
+    const offset = Number(event.currentTarget.dataset.offset);
+    if (offset !== -7 && offset !== 7) return;
+    this.setData({ date: addDays(this.data.date, offset), viewMode: "day" });
+    this.load();
+  },
   openMe() {
     openPage("/pages/coach/me/index");
   },
