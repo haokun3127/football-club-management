@@ -6,6 +6,21 @@
     </view>
   </view>
 
+  <view class="c2-route-tabs" aria-label="教练端主导航">
+    <view class="c2-route-tab c2-route-tab--active" data-path="/pages/coach/schedule/index" bindtap="openCoachRoot">
+      <image class="c2-route-tab__icon" src="/assets/icons/tab-calendar-active.png" mode="aspectFit" />
+      <view class="c2-route-tab__label">日程</view>
+    </view>
+    <view class="c2-route-tab" data-path="/pages/coach/training/index" bindtap="openCoachRoot">
+      <image class="c2-route-tab__icon" src="/assets/icons/tab-training-inactive.png" mode="aspectFit" />
+      <view class="c2-route-tab__label">训练管理</view>
+    </view>
+    <view class="c2-route-tab" data-path="/pages/coach/me/index" bindtap="openCoachRoot">
+      <image class="c2-route-tab__icon" src="/assets/icons/tab-user-inactive.png" mode="aspectFit" />
+      <view class="c2-route-tab__label">我的</view>
+    </view>
+  </view>
+
   <view class="c2-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载活动' : state === 'empty' ? '暂无工作台数据' : '活动读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
@@ -74,5 +89,4 @@
     </view>
     </block>
   </view>
-  <role-tabbar role="coach" active="schedule" />
 </view>

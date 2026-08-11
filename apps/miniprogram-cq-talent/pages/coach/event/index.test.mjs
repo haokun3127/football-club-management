@@ -24,7 +24,7 @@ globalThis.Page = (definition) => {
   pageDefinition = definition;
   return definition;
 };
-globalThis.wx = { navigateBack: vi.fn() };
+globalThis.wx = { navigateBack: vi.fn(), reLaunch: vi.fn() };
 
 await import("./index.ts");
 
@@ -76,6 +76,7 @@ describe("coach activity workbench", () => {
     mocks.getCoachWorkbench.mockReset();
     mocks.openPage.mockReset();
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
+    globalThis.wx.reLaunch.mockReset();
   });
 
   it("presents real workbench data and exposes entries only for the event type, workflow, and assessment template", async () => {
@@ -210,8 +211,20 @@ describe("coach activity workbench", () => {
     expect(stylesheet).toMatch(/\.shero__status\s*\{[^}]*flex:\s*0\s+0\s+auto/s);
   });
 
-  it("keeps the Figma coach tab bar visible on the workbench", () => {
-    expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
-    expect(pageConfig).toContain('"role-tabbar": "/components/role-tabbar/index"');
+  it("uses the Figma in-flow coach navigation instead of a fixed footer", () => {
+    expect(template).toContain('class="c2-route-tabs"');
+    expect(template).toContain('data-path="/pages/coach/schedule/index"');
+    expect(template).toContain('data-path="/pages/coach/training/index"');
+    expect(template).toContain('data-path="/pages/coach/me/index"');
+    expect(template).not.toContain("role-tabbar");
+    expect(pageConfig).not.toContain('"role-tabbar"');
+  });
+
+  it("relaunches only a supported in-flow coach root route", () => {
+    const page = createPageInstance();
+    page.openCoachRoot({ currentTarget: { dataset: { path: "/pages/coach/training/index" } } });
+    expect(globalThis.wx.reLaunch).toHaveBeenCalledWith({ url: "/pages/coach/training/index" });
+    page.openCoachRoot({ currentTarget: { dataset: { path: "/pages/parent/schedule/index" } } });
+    expect(globalThis.wx.reLaunch).toHaveBeenCalledTimes(1);
   });
 });
