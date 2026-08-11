@@ -37,6 +37,16 @@ function createAcceptanceDemoIntegrationSeed(): SeedData {
   const acceptanceCoachId = "coach-cq-talent-acceptance-demo";
   const acceptanceTeamId = "team-cq-talent-acceptance-demo";
   const acceptanceStudentIds = new Set(["student-cq-talent-001", "student-cq-talent-002"]);
+  const coachDemoRosterStudentIds = new Set([
+    "student-cq-talent-001",
+    "student-cq-talent-002",
+    "student-cq-talent-003",
+    "student-cq-talent-004",
+    "student-cq-talent-005",
+    "student-cq-talent-006",
+    "student-cq-talent-007",
+    "student-cq-talent-008",
+  ]);
   const acceptanceEventIds = new Set([
     "event-cq-talent-demo-training-foundation",
     "event-cq-talent-demo-training-finishing",
@@ -46,7 +56,7 @@ function createAcceptanceDemoIntegrationSeed(): SeedData {
     "event-cq-talent-demo-match-tactical",
   ]);
   const acceptanceMetricRecords = source.metricRecords.filter((record) =>
-    acceptanceStudentIds.has(record.studentId) && record.recordedByCoachId === acceptanceCoachId,
+    coachDemoRosterStudentIds.has(record.studentId) && record.recordedByCoachId === acceptanceCoachId,
   );
   const acceptanceMetricIds = new Set(acceptanceMetricRecords.map((record) => record.metricId));
   const acceptanceTemplateVersionIds = new Set(acceptanceMetricRecords.map((record) => record.templateVersionId).filter((id): id is string => Boolean(id)));
@@ -65,7 +75,7 @@ function createAcceptanceDemoIntegrationSeed(): SeedData {
     users: source.users.filter((user) => user.id === acceptanceUserId),
     clubMemberships: source.clubMemberships.filter((membership) => membership.userId === acceptanceUserId),
     parents: source.parents.filter((parent) => parent.id === acceptanceParentId),
-    students: source.students.filter((student) => acceptanceStudentIds.has(student.id)),
+    students: source.students.filter((student) => coachDemoRosterStudentIds.has(student.id)),
     guardianBindings: source.guardianBindings.filter((binding) => binding.parentId === acceptanceParentId && acceptanceStudentIds.has(binding.studentId)),
     coaches: source.coaches.filter((coach) => coach.id === acceptanceCoachId),
     teams: source.teams.filter((team) => team.id === acceptanceTeamId),
@@ -1338,6 +1348,16 @@ describe("api server", () => {
     const base = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main";
     const acceptanceUserId = "user-parent-cq-talent-acceptance";
     const acceptanceStudentIds = ["student-cq-talent-001", "student-cq-talent-002"];
+    const coachDemoRosterStudentIds = [
+      "student-cq-talent-001",
+      "student-cq-talent-002",
+      "student-cq-talent-003",
+      "student-cq-talent-004",
+      "student-cq-talent-005",
+      "student-cq-talent-006",
+      "student-cq-talent-007",
+      "student-cq-talent-008",
+    ];
     const demoEventIds = [
       "event-cq-talent-demo-training-foundation",
       "event-cq-talent-demo-training-finishing",
@@ -1391,6 +1411,24 @@ describe("api server", () => {
       });
       expect(children.statusCode, children.body).toBe(200);
       expect((children.json() as { children: Array<{ id: string }> }).children.map((student) => student.id)).toEqual(acceptanceStudentIds);
+      const parentCalendar = await firstApp.inject({
+        method: "GET",
+        url: `${base}/parent/calendar?from=2026-08-01&to=2026-08-31`,
+        headers: { authorization: `Bearer ${parentToken}` },
+      });
+      expect(parentCalendar.statusCode, parentCalendar.body).toBe(200);
+      expect([...new Set((parentCalendar.json() as {
+        events: Array<{ participants: Array<{ studentId: string }> }>;
+      }).events.flatMap((event) => event.participants.map((participant) => participant.studentId)))])
+        .toEqual(acceptanceStudentIds);
+      const parentEvent = await firstApp.inject({
+        method: "GET",
+        url: `${base}/events/event-cq-talent-demo-training-completed`,
+        headers: { authorization: `Bearer ${parentToken}` },
+      });
+      expect(parentEvent.statusCode, parentEvent.body).toBe(200);
+      expect((parentEvent.json() as { event: { participants: Array<{ studentId: string }> } }).event.participants.map((participant) => participant.studentId))
+        .toEqual(acceptanceStudentIds);
 
       const coachRole = await firstApp.inject({
         method: "POST",
@@ -1407,7 +1445,7 @@ describe("api server", () => {
       });
       expect(tactical.statusCode, tactical.body).toBe(200);
       const tacticalBody = tactical.json() as { roster: Array<{ studentId: string }>; board: { players: Array<Record<string, unknown>> } };
-      expect(tacticalBody.roster.map((student) => student.studentId)).toEqual(acceptanceStudentIds);
+      expect(tacticalBody.roster.map((student) => student.studentId)).toEqual(coachDemoRosterStudentIds);
       const saveTactical = await firstApp.inject({
         method: "PUT",
         url: `${base}/coach/events/event-cq-talent-demo-match-tactical/tactical-board`,
@@ -1519,6 +1557,14 @@ describe("api server", () => {
         studentId: otherClubStudentId,
         eventId: undefined,
       });
+      restartedPersistence.repositories.assessments.insertMetricRecordIfAbsent({
+        ...foreignMetric,
+        id: "metric-record-cq-talent-rollback-same-club",
+        clubId: "club-chongqing-talent",
+        studentId: acceptanceStudentIds[0]!,
+        recordedByCoachId: "coach-cq-talent-acceptance-demo",
+        eventId: undefined,
+      });
 
       const rollback = rollbackCqTalentAcceptanceDemo(restartedPersistence.database);
       expect(rollback.deletedEventIds).toEqual(demoEventIds);
@@ -1539,6 +1585,7 @@ describe("api server", () => {
       expect(rolledBack.repositories.appClientSessions.findByTokenHash(otherAppTokenHash)).not.toBeNull();
       expect(rolledBack.repositories.appClientSessions.findByTokenHash(otherClubTokenHash)).not.toBeNull();
       expect(rolledBack.repositories.assessments.listMetricRecords(otherClubId).map((record) => record.id)).toContain("metric-record-cq-talent-rollback-foreign");
+      expect(rolledBack.repositories.assessments.listMetricRecords("club-chongqing-talent").map((record) => record.id)).toContain("metric-record-cq-talent-rollback-same-club");
       rolledBack.database.close();
     } finally {
       await firstApp?.close();

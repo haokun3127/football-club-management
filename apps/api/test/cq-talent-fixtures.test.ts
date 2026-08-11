@@ -184,6 +184,16 @@ describe("Chongqing Talent synthetic fixtures", () => {
     const seed = createCqTalentAcceptanceSeed();
     const acceptanceUserId = "user-parent-cq-talent-acceptance";
     const acceptanceStudentIds = ["student-cq-talent-001", "student-cq-talent-002"];
+    const coachDemoRosterStudentIds = [
+      "student-cq-talent-001",
+      "student-cq-talent-002",
+      "student-cq-talent-003",
+      "student-cq-talent-004",
+      "student-cq-talent-005",
+      "student-cq-talent-006",
+      "student-cq-talent-007",
+      "student-cq-talent-008",
+    ];
     const demoEventIds = [
       "event-cq-talent-demo-training-foundation",
       "event-cq-talent-demo-training-finishing",
@@ -206,14 +216,14 @@ describe("Chongqing Talent synthetic fixtures", () => {
       status: "active",
     }));
     expect(seed.teamMembers?.filter((member) => member.teamId === "team-cq-talent-acceptance-demo").map((member) => member.studentId))
-      .toEqual(acceptanceStudentIds);
+      .toEqual(coachDemoRosterStudentIds);
     expect(seed.events?.filter((event) => demoEventIds.includes(event.id)).map((event) => event.id))
       .toEqual(demoEventIds);
     expect(seed.events?.filter((event) => demoEventIds.includes(event.id) && event.type === "training" && event.status === "completed"))
       .toHaveLength(3);
     for (const eventId of demoEventIds) {
       expect(seed.participants?.filter((participant) => participant.eventId === eventId).map((participant) => participant.studentId))
-        .toEqual(acceptanceStudentIds);
+        .toEqual(coachDemoRosterStudentIds);
     }
     expect(seed.events).toContainEqual(expect.objectContaining({
       id: "event-cq-talent-demo-match-tactical",
@@ -229,18 +239,20 @@ describe("Chongqing Talent synthetic fixtures", () => {
       status: "completed",
     }));
     expect(seed.matchRosters?.filter((roster) => roster.matchId === "match-cq-talent-demo-completed").map((roster) => roster.studentId))
-      .toEqual(acceptanceStudentIds);
+      .toEqual(coachDemoRosterStudentIds);
     expect(seed.matchEvents?.filter((event) => event.matchId === "match-cq-talent-demo-completed").map((event) => event.type))
       .toEqual(["goal", "assist"]);
     expect(seed.matchPlayerNotes?.filter((note) => note.matchId === "match-cq-talent-demo-completed").map((note) => note.studentId))
-      .toEqual(acceptanceStudentIds);
-    for (const studentId of acceptanceStudentIds) {
+      .toEqual(coachDemoRosterStudentIds);
+    for (const studentId of coachDemoRosterStudentIds) {
       expect(seed.metricRecords?.filter((record) =>
         record.studentId === studentId
         && record.recordedByCoachId === "coach-cq-talent-acceptance-demo"
         && record.occurredAt.startsWith("2026-08-"),
       )).toHaveLength(8);
     }
+    expect(seed.guardianBindings?.filter((binding) => binding.parentId === "parent-cq-talent-acceptance").map((binding) => binding.studentId))
+      .toEqual(acceptanceStudentIds);
   });
 });
 

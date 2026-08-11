@@ -475,3 +475,10 @@
 - 依据在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:250 / P4 Growth Home`，将错误的两段居中占位文字恢复为两种卡片结构：成长足迹的“更多”入口及三条状态项、训练历程的趋势柱与时间轴。
 - 三条状态和八个柱均由当前学员最近 30 天的真实完成训练/比赛及真实雷达数据预计算；无活动只显示“待达成”状态和最小基线，不伪造完成记录。
 - 验证：P4 目标回归与完整小程序 Vitest `54 files / 281 tests`、小程序 typecheck、`git diff --check` 通过。本批尚无新的 375×812 真机/DevTools 对照截图。
+
+## 2026-08-11 教练端验收演示数据扩展（待部署）
+
+- 为使教练端 C1–C16 有足够的真实 BFF 数据可检查，opt-in 的重庆天才双角色验收 seed 将演示队从两人扩展为八名既有 synthetic club 学员；新增六人只加入教练队、六条既有演示日程、已完成比赛、能力评测和战术名单，不新增任何家长监护绑定。
+- 家长端隐私边界保持不变：真实角色切换后的 `parent/children`、`parent/calendar` 和活动详情参与者仍只投影原两名被监护孩子；教练端战术板可读取完整八人名单。没有新增小程序 mock、伪 API、伪角色或伪 session。
+- 回滚收窄为固定 `metric-record-cq-talent-demo-*` 记录，不再按该体验教练删除全部指标，因此同俱乐部的非演示指标和其他俱乐部/客户端记录均保留。
+- 验证：先观察到旧两人 seed 使新增 fixture/server 回归按预期失败；最小实现后 API focused Vitest `59/59`、API typecheck、API build 和 `git diff --check` 均通过。此条仅为本地代码与数据契约证据，尚未发布到 `https://cqtc.pomi.tech`，也不构成真机视觉验收。

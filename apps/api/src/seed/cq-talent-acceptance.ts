@@ -83,6 +83,9 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
     family.id === acceptanceFamilyId ? acceptanceParentId : `parent-${family.id}`,
   ]));
   const acceptanceStudents = students.filter((student) => student.familyId === acceptanceFamilyId);
+  const acceptanceDemoRosterStudents = acceptanceStudents.concat(
+    students.filter((student) => student.familyId !== acceptanceFamilyId).slice(0, 6),
+  );
 
   return {
     users: [
@@ -207,7 +210,7 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
       status: "active" as const,
       createdAt: now,
       updatedAt: now,
-    }))).concat(acceptanceStudents.map((student, index) => ({
+    }))).concat(acceptanceDemoRosterStudents.map((student, index) => ({
       id: `team-member-cq-talent-acceptance-demo-${index + 1}`,
       clubId,
       teamId: acceptanceDemoTeamId,
@@ -382,7 +385,7 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
           createdAt: now,
           updatedAt: now,
         })),
-      ...acceptanceStudents.flatMap((student, index) => [
+      ...acceptanceDemoRosterStudents.flatMap((student, index) => [
         {
           id: `participant-cq-talent-demo-training-foundation-${index + 1}`,
           clubId,
@@ -442,7 +445,7 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
         },
       ]),
     ],
-    metricRecords: students.flatMap((student, index) => createMetricRecords(student, index)).concat(createAcceptanceDemoMetricRecords(acceptanceStudents)),
+    metricRecords: students.flatMap((student, index) => createMetricRecords(student, index)).concat(createAcceptanceDemoMetricRecords(acceptanceDemoRosterStudents)),
     trainingSessions: [
       {
         id: "training-session-cq-talent-demo-foundation",
@@ -497,7 +500,7 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
       createdAt: now,
       updatedAt: now,
     }],
-    matchRosters: acceptanceStudents.map((student, index) => ({
+    matchRosters: acceptanceDemoRosterStudents.map((student, index) => ({
       id: `match-roster-cq-talent-demo-${index + 1}`,
       clubId,
       matchId: "match-cq-talent-demo-completed",
@@ -530,7 +533,7 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
       createdAt: now,
       updatedAt: now,
     }],
-    matchPlayerNotes: acceptanceStudents.map((student, index) => ({
+    matchPlayerNotes: acceptanceDemoRosterStudents.map((student, index) => ({
       id: `match-note-cq-talent-demo-${index + 1}`,
       clubId,
       matchId: "match-cq-talent-demo-completed",
