@@ -19,6 +19,22 @@ import { createSeedData } from "../src/seed.js";
 import { createPlatformSeed } from "../src/seed/platform.js";
 
 describe("Chongqing Talent synthetic fixtures", () => {
+  it("includes the production acceptance seed only when explicitly enabled", () => {
+    const original = process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED;
+    try {
+      delete process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED;
+      expect(createSeedData().users.some((user) => user.id === "user-parent-cq-talent-acceptance")).toBe(false);
+      process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED = "1";
+      expect(createSeedData().users.some((user) => user.id === "user-parent-cq-talent-acceptance")).toBe(true);
+    } finally {
+      if (original === undefined) {
+        delete process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED;
+      } else {
+        process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED = original;
+      }
+    }
+  });
+
   it("generates 200 students across the real customer table fields with matching coach names", () => {
     const fixture = createCqTalentSyntheticFixture(200);
     const coachNames = new Set(fixture.coaches.map((coach) => coach.name));

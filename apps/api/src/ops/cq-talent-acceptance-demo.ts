@@ -1,6 +1,8 @@
 import type { DatabaseSync } from "node:sqlite";
 
 const acceptanceUserId = "user-parent-cq-talent-acceptance";
+const clubId = "club-chongqing-talent";
+const appClientId = "app-client-cq-talent-wechat-main";
 const acceptanceCoachId = "coach-cq-talent-acceptance-demo";
 const acceptanceTeamId = "team-cq-talent-acceptance-demo";
 const acceptanceMatchId = "match-cq-talent-demo-completed";
@@ -32,14 +34,14 @@ export interface CqTalentAcceptanceDemoRollbackResult {
 export function rollbackCqTalentAcceptanceDemo(database: DatabaseSync): CqTalentAcceptanceDemoRollbackResult {
   const presentEvents = database.prepare(`
     SELECT id FROM calendar_events
-    WHERE id IN (?, ?, ?, ?)
+    WHERE club_id = ? AND id IN (?, ?, ?, ?)
     ORDER BY id
-  `).all(...acceptanceDemoEventIds) as Array<{ id: string }>;
+  `).all(clubId, ...acceptanceDemoEventIds) as Array<{ id: string }>;
   if (presentEvents.length !== acceptanceDemoEventIds.length) {
     throw new Error("Acceptance demo rollback requires all fixed demo events to be present.");
   }
 
-  const membership = database.prepare("SELECT id FROM club_user_memberships WHERE user_id = ?").get(acceptanceUserId) as { id?: string } | undefined;
+  const membership = database.prepare("SELECT id FROM club_user_memberships WHERE club_id = ? AND user_id = ?").get(clubId, acceptanceUserId) as { id?: string } | undefined;
   const user = database.prepare("SELECT id FROM user_accounts WHERE id = ?").get(acceptanceUserId) as { id?: string } | undefined;
   if (!membership?.id || !user?.id) {
     throw new Error("Acceptance demo rollback requires the fixed acceptance user and membership.");
@@ -50,14 +52,14 @@ export function rollbackCqTalentAcceptanceDemo(database: DatabaseSync): CqTalent
   try {
     const deletedTacticalBoards = deleteForEvents(database, "tactical_boards", "event_id");
     const deletedParticipants = deleteForEvents(database, "event_participants", "event_id");
-    const deletedSessions = changeCount(database.prepare("DELETE FROM app_client_sessions WHERE user_id = ?").run(acceptanceUserId).changes);
-    const deletedMetricRecords = changeCount(database.prepare("DELETE FROM player_metric_records WHERE recorded_by_coach_id = ?").run(acceptanceCoachId).changes);
-    const deletedMatchEvents = changeCount(database.prepare("DELETE FROM match_events WHERE match_id = ?").run(acceptanceMatchId).changes);
-    const deletedMatches = changeCount(database.prepare("DELETE FROM matches WHERE id = ?").run(acceptanceMatchId).changes);
-    const deletedTeamMembers = changeCount(database.prepare("DELETE FROM team_members WHERE team_id = ?").run(acceptanceTeamId).changes);
+    const deletedSessions = changeCount(database.prepare("DELETE FROM app_client_sessions WHERE club_id = ? AND app_client_id = ? AND user_id = ?").run(clubId, appClientId, acceptanceUserId).changes);
+    const deletedMetricRecords = changeCount(database.prepare("DELETE FROM player_metric_records WHERE club_id = ? AND recorded_by_coach_id = ?").run(clubId, acceptanceCoachId).changes);
+    const deletedMatchEvents = changeCount(database.prepare("DELETE FROM match_events WHERE club_id = ? AND match_id = ?").run(clubId, acceptanceMatchId).changes);
+    const deletedMatches = changeCount(database.prepare("DELETE FROM matches WHERE club_id = ? AND id = ?").run(clubId, acceptanceMatchId).changes);
+    const deletedTeamMembers = changeCount(database.prepare("DELETE FROM team_members WHERE club_id = ? AND team_id = ?").run(clubId, acceptanceTeamId).changes);
     const deletedEvents = deleteForEvents(database, "calendar_events", "id");
-    const deletedTeams = changeCount(database.prepare("DELETE FROM teams WHERE id = ?").run(acceptanceTeamId).changes);
-    const deletedCoaches = changeCount(database.prepare("DELETE FROM coach_profiles WHERE id = ?").run(acceptanceCoachId).changes);
+    const deletedTeams = changeCount(database.prepare("DELETE FROM teams WHERE club_id = ? AND id = ?").run(clubId, acceptanceTeamId).changes);
+    const deletedCoaches = changeCount(database.prepare("DELETE FROM coach_profiles WHERE club_id = ? AND id = ?").run(clubId, acceptanceCoachId).changes);
     database.prepare("UPDATE user_accounts SET roles_json = ?, updated_at = ? WHERE id = ?").run("[\"parent\"]", now, acceptanceUserId);
     database.prepare("UPDATE club_user_memberships SET roles_json = ?, updated_at = ? WHERE id = ?").run("[\"parent\"]", now, membership.id);
     database.exec("COMMIT;");
@@ -81,7 +83,7 @@ export function rollbackCqTalentAcceptanceDemo(database: DatabaseSync): CqTalent
 }
 
 function deleteForEvents(database: DatabaseSync, table: "tactical_boards" | "event_participants" | "calendar_events", column: "event_id" | "id"): number {
-  return changeCount(database.prepare(`DELETE FROM ${table} WHERE ${column} IN (?, ?, ?, ?)`).run(...acceptanceDemoEventIds).changes);
+  return changeCount(database.prepare(`DELETE FROM ${table} WHERE club_id = ? AND ${column} IN (?, ?, ?, ?)`).run(clubId, ...acceptanceDemoEventIds).changes);
 }
 
 function changeCount(value: number | bigint): number {
