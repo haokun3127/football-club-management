@@ -5,11 +5,13 @@ const mocks = vi.hoisted(() => ({
   getParentChildren: vi.fn(),
   requireRole: vi.fn(),
   openPage: vi.fn(),
+  setCurrentStudentId: vi.fn(),
 }));
 
 vi.mock("../../../utils/api", () => ({ getParentChildren: mocks.getParentChildren }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
+vi.mock("../../../utils/store", () => ({ setCurrentStudentId: mocks.setCurrentStudentId }));
 vi.mock("../../../utils/presentation", () => ({
   resolveMenuActionTop: () => 24,
   resolveNavInset: () => 20,
@@ -50,6 +52,7 @@ describe("parent account binding", () => {
     mocks.getParentChildren.mockReset();
     mocks.requireRole.mockReset().mockReturnValue({ role: "parent" });
     mocks.openPage.mockReset();
+    mocks.setCurrentStudentId.mockReset();
     globalThis.wx.getStorageSync.mockReset().mockReturnValue("");
     globalThis.wx.setStorageSync.mockReset();
   });
@@ -70,6 +73,17 @@ describe("parent account binding", () => {
       avatarLetter: "陈",
       teamLabel: "U10 精英队",
     });
+  });
+
+  it("synchronizes the selected learner into the active session before returning to growth", () => {
+    const page = createPageInstance({
+      children: [{ id: "student-2", name: "李小雨", teams: [], coachNames: [], avatarLetter: "李", teamLabel: "所属球队信息待同步" }],
+    });
+
+    page.switchChild({ currentTarget: { dataset: { id: "student-2" } } });
+
+    expect(mocks.setCurrentStudentId).toHaveBeenCalledWith("student-2");
+    expect(page.data.activeChildId).toBe("student-2");
   });
 
   it("does not put collection indexing or a fictional family member in P10 WXML", () => {

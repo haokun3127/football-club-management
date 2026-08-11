@@ -2,6 +2,7 @@ import { getParentChildren } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { resolveMenuActionTop, resolveNavInset } from "../../../utils/presentation";
+import { setCurrentStudentId } from "../../../utils/store";
 import type { LoadState, StudentSummary } from "../../../utils/types";
 
 interface PageData {
@@ -66,7 +67,7 @@ Page<PageData>({
   goBack() { wx.navigateBack(); },
   switchChild(event: { currentTarget: { dataset: { id: string } } }) {
     const id = event.currentTarget.dataset.id;
-    wx.setStorageSync("activeStudentId", id);
+    setCurrentStudentId(id);
     const activeChild = this.data.children.find((child: BindingChild) => child.id === id) ?? null;
     this.setData({ activeChildId: id, activeChild });
     wx.showToast({ title: "已切换学员", icon: "success" });

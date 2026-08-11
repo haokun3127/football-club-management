@@ -1,5 +1,19 @@
 import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const mocks = vi.hoisted(() => ({
+  getParentCalendar: vi.fn(),
+  getParentChildren: vi.fn(),
+  getParentStudentHome: vi.fn(),
+  requireRole: vi.fn(),
+}));
+
+vi.mock("../../../utils/api", () => ({
+  getParentCalendar: mocks.getParentCalendar,
+  getParentChildren: mocks.getParentChildren,
+  getParentStudentHome: mocks.getParentStudentHome,
+}));
+vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 
 let pageDefinition;
 globalThis.Page = (definition) => {
@@ -21,6 +35,13 @@ function createPageInstance(data = {}) {
 }
 
 describe("parent lessons and insurance", () => {
+  beforeEach(() => {
+    mocks.getParentCalendar.mockReset();
+    mocks.getParentChildren.mockReset();
+    mocks.getParentStudentHome.mockReset();
+    mocks.requireRole.mockReset().mockReturnValue({ role: "parent" });
+  });
+
   it("counts only completed trainings explicitly associated with the active child", () => {
     const page = createPageInstance();
 
@@ -43,5 +64,18 @@ describe("parent lessons and insurance", () => {
     expect(template).toContain('wx:if="{{history.length}}"');
     expect(template).not.toContain("随队保险覆盖中");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
+  });
+
+  it("requests a live 30-day history window instead of the obsolete develop fixture date", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-08-11T12:00:00.000Z"));
+    mocks.getParentChildren.mockResolvedValue([{ id: "student-1", name: "Player", teams: [], coachNames: [] }]);
+    mocks.getParentStudentHome.mockResolvedValue({ profile: [], lessonStatus: [], insuranceStatus: [], clubInfo: [] });
+    mocks.getParentCalendar.mockResolvedValue([]);
+    const page = createPageInstance();
+
+    await page.load("student-1");
+
+    expect(mocks.getParentCalendar).toHaveBeenCalledWith("2026-07-13", "2026-08-11");
   });
 });

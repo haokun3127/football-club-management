@@ -1,6 +1,6 @@
 import { getParentCalendar, getParentChildren, getParentStudentHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { DEV_MODE, DEV_TEST_DATE } from "../../../utils/config";
+import { currentLocalDate, shiftCalendarDate } from "../../../utils/date";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { LoadState, ScheduleEvent, StudentHome, StudentSummary } from "../../../utils/types";
 
@@ -66,11 +66,11 @@ Page<PageData>({
         return;
       }
       const active = children.find((child) => child.id === studentId) ?? children[0] as StudentSummary;
-      const today = anchorDate();
-      const yearAgo = shiftDays(today, -365);
+      const today = currentLocalDate();
+      const thirtyDaysAgo = shiftCalendarDate(today, -29);
       const [studentHome, events] = await Promise.all([
         getParentStudentHome(active),
-        getParentCalendar(yearAgo, today),
+        getParentCalendar(thirtyDaysAgo, today),
       ]);
       this.render(active, studentHome, events, new Date(today));
     } catch (error) {
@@ -120,20 +120,6 @@ Page<PageData>({
     });
   },
 });
-
-function anchorDate(): string {
-  if (DEV_MODE) return DEV_TEST_DATE;
-  const now = new Date();
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-}
-
-function shiftDays(date: string, days: number): string {
-  const d = new Date(`${date}T00:00:00`);
-  d.setDate(d.getDate() + days);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
 
 function formatMonthDay(iso: string): string {
   const d = new Date(iso);

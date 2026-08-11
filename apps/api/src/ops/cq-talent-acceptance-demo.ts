@@ -7,6 +7,8 @@ const acceptanceCoachId = "coach-cq-talent-acceptance-demo";
 const acceptanceTeamId = "team-cq-talent-acceptance-demo";
 const acceptanceMatchId = "match-cq-talent-demo-completed";
 const acceptanceDemoEventIds = [
+  "event-cq-talent-demo-training-foundation",
+  "event-cq-talent-demo-training-finishing",
   "event-cq-talent-demo-training-completed",
   "event-cq-talent-demo-match-completed",
   "event-cq-talent-demo-training-upcoming",
@@ -34,7 +36,7 @@ export interface CqTalentAcceptanceDemoRollbackResult {
 export function rollbackCqTalentAcceptanceDemo(database: DatabaseSync): CqTalentAcceptanceDemoRollbackResult {
   const presentEvents = database.prepare(`
     SELECT id FROM calendar_events
-    WHERE club_id = ? AND id IN (?, ?, ?, ?)
+    WHERE club_id = ? AND id IN (?, ?, ?, ?, ?, ?)
     ORDER BY id
   `).all(clubId, ...acceptanceDemoEventIds) as Array<{ id: string }>;
   if (presentEvents.length !== acceptanceDemoEventIds.length) {
@@ -83,7 +85,7 @@ export function rollbackCqTalentAcceptanceDemo(database: DatabaseSync): CqTalent
 }
 
 function deleteForEvents(database: DatabaseSync, table: "tactical_boards" | "event_participants" | "calendar_events", column: "event_id" | "id"): number {
-  return changeCount(database.prepare(`DELETE FROM ${table} WHERE club_id = ? AND ${column} IN (?, ?, ?, ?)`).run(clubId, ...acceptanceDemoEventIds).changes);
+  return changeCount(database.prepare(`DELETE FROM ${table} WHERE club_id = ? AND ${column} IN (?, ?, ?, ?, ?, ?)`).run(clubId, ...acceptanceDemoEventIds).changes);
 }
 
 function changeCount(value: number | bigint): number {

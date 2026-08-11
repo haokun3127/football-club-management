@@ -1,9 +1,12 @@
-import { getParentChildren, getParentGrowth, getParentMetricDetail } from "../../../utils/api";
+import { getParentCalendar, getParentChildren, getParentGrowth, getParentMetricDetail } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { currentLocalDate, shiftCalendarDate } from "../../../utils/date";
 import { openPage } from "../../../utils/navigation";
 import { formatDateTime, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { setCurrentStudentId } from "../../../utils/store";
-import type { GrowthSummary, LoadState, MetricDetail, RadarMetricPoint, StudentSummary } from "../../../utils/types";
+import type { GrowthSummary, LoadState, MetricDetail, RadarMetricPoint, ScheduleEvent, StudentSummary } from "../../../utils/types";
+
+let growthRequestId = 0;
 
 Page({
   data: {
@@ -36,12 +39,19 @@ Page({
   onLoad() {
     this.load();
   },
+  onShow() {
+    const session = requireRole("parent");
+    if (!session || !this.data.activeStudentId || session.currentStudentId === this.data.activeStudentId) return;
+    return this.load();
+  },
   async load() {
     const session = requireRole("parent");
     if (!session) return;
+    const requestId = ++growthRequestId;
     this.setData({ state: "loading", message: "正在读取成长数据" });
     try {
       const children = await getParentChildren();
+      if (requestId !== growthRequestId) return;
       if (!children.length) {
         this.setData({ state: "empty", message: "当前账号没有绑定孩子，无法查看成长数据。" });
         return;
@@ -49,9 +59,15 @@ Page({
       const active = children.find((child) => child.id === session.currentStudentId) ?? children[0];
       if (!active) return;
       setCurrentStudentId(active.id);
-      const growth = await getParentGrowth(active.id, active);
+      const today = currentLocalDate();
+      const [growth, recentActivities] = await Promise.all([
+        getParentGrowth(active.id, active),
+        getParentCalendar(shiftCalendarDate(today, -29), today),
+      ]);
+      if (requestId !== growthRequestId) return;
       const radar = radarForView(growth, 0);
       const selectedMetric = radar[0] ?? null;
+      const activityMessages = growthActivityMessages(recentActivities, active.id);
       this.setData({
         state: radar.length >= 3 ? "ready" : "empty",
         message: radar.length >= 3 ? "" : "有效能力指标不足，完成训练或评测后生成雷达图。",
@@ -72,9 +88,9 @@ Page({
         heroSurname: active.name.slice(0, 1),
         heroName: active.name,
         heroTeam: active.teams.find(Boolean) || "球队待同步",
-        heroSummaryMessage: "训练概览待同步",
-        milestoneMessage: "成长足迹数据待同步",
-        trainingHistoryMessage: "训练历程数据待同步",
+        heroSummaryMessage: activityMessages.heroSummary,
+        milestoneMessage: activityMessages.milestone,
+        trainingHistoryMessage: activityMessages.trainingHistory,
       });
       if (selectedMetric) await this.loadMetricDetail(selectedMetric.metricId);
     } catch (error) {
@@ -114,6 +130,7 @@ Page({
     this.loadMetricDetail(metricId);
   },
   async loadMetricDetail(metricId: string) {
+    const studentId = this.data.activeStudentId;
     const cached = this.data.detailCache[metricId];
     if (cached) {
       this.applyMetricDetail(cached);
@@ -121,8 +138,8 @@ Page({
     }
     this.setData({ detailState: "loading", selectedDetail: null });
     try {
-      const detail = await getParentMetricDetail(this.data.activeStudentId, metricId);
-      if (this.data.selectedMetricId === metricId) {
+      const detail = await getParentMetricDetail(studentId, metricId);
+      if (this.data.activeStudentId === studentId && this.data.selectedMetricId === metricId) {
         this.applyMetricDetail(detail, metricId);
       } else {
         this.setData({ detailCache: { ...this.data.detailCache, [metricId]: detail } });
@@ -165,6 +182,26 @@ type RadarPreview = {
 function previewVertex(index: number, total: number, radiusPct: number) {
   const angle = -Math.PI / 2 + (Math.PI * 2 * index) / total;
   return `${(50 + Math.cos(angle) * radiusPct).toFixed(1)}% ${(50 + Math.sin(angle) * radiusPct).toFixed(1)}%`;
+}
+
+function growthActivityMessages(events: ScheduleEvent[], studentId: string) {
+  const completed = events
+    .filter((event) => event.status === "completed" && eventBelongsToStudent(event, studentId))
+    .sort((left, right) => new Date(right.startsAt).getTime() - new Date(left.startsAt).getTime());
+  const trainingCount = completed.filter((event) => event.type === "training").length;
+  const matchCount = completed.filter((event) => event.type === "match").length;
+  const latest = completed[0];
+
+  return {
+    heroSummary: completed.length ? `近30天完成 ${trainingCount} 次训练、${matchCount} 场比赛` : "近30天暂无已完成活动",
+    milestone: latest ? `最新足迹：${latest.title}` : "成长足迹正在积累",
+    trainingHistory: trainingCount ? `近30天已完成 ${trainingCount} 次训练，点击查看完整历程` : "近30天暂无完成训练",
+  };
+}
+
+function eventBelongsToStudent(event: ScheduleEvent, studentId: string) {
+  if (event.childIds?.length) return event.childIds.includes(studentId);
+  return event.children?.some((child) => child.id === studentId) ?? false;
 }
 
 function previewPolygon(points: RadarMetricPoint[], key: "value" | "peerAverage", inset: number) {

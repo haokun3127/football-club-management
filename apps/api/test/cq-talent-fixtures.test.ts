@@ -185,6 +185,8 @@ describe("Chongqing Talent synthetic fixtures", () => {
     const acceptanceUserId = "user-parent-cq-talent-acceptance";
     const acceptanceStudentIds = ["student-cq-talent-001", "student-cq-talent-002"];
     const demoEventIds = [
+      "event-cq-talent-demo-training-foundation",
+      "event-cq-talent-demo-training-finishing",
       "event-cq-talent-demo-training-completed",
       "event-cq-talent-demo-match-completed",
       "event-cq-talent-demo-training-upcoming",
@@ -207,6 +209,8 @@ describe("Chongqing Talent synthetic fixtures", () => {
       .toEqual(acceptanceStudentIds);
     expect(seed.events?.filter((event) => demoEventIds.includes(event.id)).map((event) => event.id))
       .toEqual(demoEventIds);
+    expect(seed.events?.filter((event) => demoEventIds.includes(event.id) && event.type === "training" && event.status === "completed"))
+      .toHaveLength(3);
     for (const eventId of demoEventIds) {
       expect(seed.participants?.filter((participant) => participant.eventId === eventId).map((participant) => participant.studentId))
         .toEqual(acceptanceStudentIds);

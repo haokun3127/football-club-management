@@ -38,6 +38,8 @@ function createAcceptanceDemoIntegrationSeed(): SeedData {
   const acceptanceTeamId = "team-cq-talent-acceptance-demo";
   const acceptanceStudentIds = new Set(["student-cq-talent-001", "student-cq-talent-002"]);
   const acceptanceEventIds = new Set([
+    "event-cq-talent-demo-training-foundation",
+    "event-cq-talent-demo-training-finishing",
     "event-cq-talent-demo-training-completed",
     "event-cq-talent-demo-match-completed",
     "event-cq-talent-demo-training-upcoming",
@@ -1337,6 +1339,8 @@ describe("api server", () => {
     const acceptanceUserId = "user-parent-cq-talent-acceptance";
     const acceptanceStudentIds = ["student-cq-talent-001", "student-cq-talent-002"];
     const demoEventIds = [
+      "event-cq-talent-demo-training-foundation",
+      "event-cq-talent-demo-training-finishing",
       "event-cq-talent-demo-training-completed",
       "event-cq-talent-demo-match-completed",
       "event-cq-talent-demo-training-upcoming",

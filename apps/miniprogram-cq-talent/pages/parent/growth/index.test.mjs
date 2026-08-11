@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   openPage: vi.fn(),
+  getParentCalendar: vi.fn(),
   getParentChildren: vi.fn(),
   getParentGrowth: vi.fn(),
   getParentMetricDetail: vi.fn(),
@@ -11,6 +12,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("../../../utils/api", () => ({
+  getParentCalendar: mocks.getParentCalendar,
   getParentChildren: mocks.getParentChildren,
   getParentGrowth: mocks.getParentGrowth,
   getParentMetricDetail: mocks.getParentMetricDetail,
@@ -48,6 +50,7 @@ function createPageInstance(data = {}) {
 describe("parent growth training history", () => {
   beforeEach(() => {
     mocks.openPage.mockReset();
+    mocks.getParentCalendar.mockReset().mockResolvedValue([]);
     mocks.getParentChildren.mockReset();
     mocks.getParentGrowth.mockReset();
     mocks.getParentMetricDetail.mockReset();
@@ -67,6 +70,44 @@ describe("parent growth training history", () => {
     expect(mocks.openPage).toHaveBeenCalledWith("/pages/parent/status/index?student=student-1");
   });
 
+  it("refreshes growth after returning from the child switch and renders real recent activity", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-08-11T12:00:00.000Z"));
+    mocks.requireRole.mockReturnValue({ role: "parent", currentStudentId: "student-2" });
+    mocks.getParentChildren.mockResolvedValue([
+      { id: "student-1", name: "第一位学员", teams: ["U8"], coachNames: [] },
+      { id: "student-2", name: "第二位学员", teams: ["U9"], coachNames: [] },
+    ]);
+    mocks.getParentGrowth.mockResolvedValue({
+      radar: [
+        { metricId: "speed", label: "速度", value: 8, maxValue: 10 },
+        { metricId: "passing", label: "传球", value: 7, maxValue: 10 },
+        { metricId: "control", label: "控球", value: 9, maxValue: 10 },
+      ],
+      metricItems: [],
+      views: [{ id: "overview", name: "能力概览", metricIds: ["speed", "passing", "control"] }],
+    });
+    mocks.getParentCalendar.mockResolvedValue([
+      { id: "training-1", type: "training", title: "训练复盘", startsAt: "2026-08-10T01:00:00.000Z", status: "completed", venue: "球场", childIds: ["student-2"] },
+      { id: "match-1", type: "match", title: "友谊赛", startsAt: "2026-08-09T01:00:00.000Z", status: "completed", venue: "球场", childIds: ["student-2"] },
+    ]);
+    mocks.getParentMetricDetail.mockResolvedValue({ metricId: "speed", label: "速度", records: [], sourceEvents: [] });
+    const page = createPageInstance({ activeStudentId: "student-1" });
+
+    await page.onShow();
+
+    expect(mocks.setCurrentStudentId).toHaveBeenCalledWith("student-2");
+    expect(mocks.getParentGrowth).toHaveBeenCalledWith("student-2", expect.objectContaining({ name: "第二位学员" }));
+    expect(mocks.getParentCalendar).toHaveBeenCalledWith("2026-07-13", "2026-08-11");
+    expect(page.data).toMatchObject({
+      activeStudentId: "student-2",
+      heroName: "第二位学员",
+      heroSummaryMessage: "近30天完成 1 次训练、1 场比赛",
+      milestoneMessage: "最新足迹：训练复盘",
+      trainingHistoryMessage: "近30天已完成 1 次训练，点击查看完整历程",
+    });
+  });
+
   it("does not navigate when no active student is available", () => {
     const page = createPageInstance({ activeStudentId: "" });
 
@@ -75,7 +116,7 @@ describe("parent growth training history", () => {
     expect(mocks.openPage).not.toHaveBeenCalled();
   });
 
-  it("draws the P4 radar only from three real metrics and leaves unsupported summary facts pending", async () => {
+  it("draws the P4 radar only from three real metrics and keeps activity copy explicit when none is returned", async () => {
     mocks.getParentChildren.mockResolvedValue([
       { id: "student-1", name: "真实球员", teams: [], coachNames: [] },
     ]);
@@ -97,9 +138,9 @@ describe("parent growth training history", () => {
       state: "ready",
       heroName: "真实球员",
       heroTeam: "球队待同步",
-      heroSummaryMessage: "训练概览待同步",
-      milestoneMessage: "成长足迹数据待同步",
-      trainingHistoryMessage: "训练历程数据待同步",
+      heroSummaryMessage: "近30天暂无已完成活动",
+      milestoneMessage: "成长足迹正在积累",
+      trainingHistoryMessage: "近30天暂无完成训练",
       canDrawRadar: true,
     });
     expect(page.data.radar).toHaveLength(3);
