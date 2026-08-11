@@ -27,6 +27,11 @@
 - The current account and permissions pages were sampled with the authenticated coach session. Dynamic phone, capability, and administrator-only content remains derived from real session/capability data; no edit, save, or contact affordance was invented where the BFF lacks that contract.
 - Verification after this batch: domain `19/19`, mini-program `293/293`, API `85/85`, all TypeScript checks, and `git diff --check` passed.
 
+## 2026-08-11 C14 Runtime Header Recheck
+
+- Authenticated runtime capture `C:\Users\ASUS\AppData\Local\Temp\cq-coach-audit-20260811\C14-team-ability-current.png` confirms the C14 custom top bar now uses the Figma-sized 88px envelope instead of the former over-height header. Back action, left-aligned title, export control, dark overview card, dimension card, and coach bottom tab are present.
+- The current API response does not have enough dimensions for a truthful radar polygon; the page displays its existing honest empty-radar state and does not borrow Figma's sample metrics.
+
 ## 2026-08-11 Dual Parent/Coach Role Switching: Backend Foundation
 
 - Added SQLite-backed app-client sessions with SHA-256 token storage, atomic token rotation, route-bound bearer revalidation, entrypoint-filtered `availableRoles`, and the server-confirmed role-selection endpoint.
