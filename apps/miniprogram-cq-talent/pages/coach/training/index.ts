@@ -1,7 +1,7 @@
 import { getCoachHome, getCoachTeam } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import { formatCalendarDate, formatTimeRange, resolveNavInset } from "../../../utils/presentation";
+import { formatCalendarDate, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachHome, CoachTeamDetail, LoadState, ScheduleEvent } from "../../../utils/types";
 
 type HeroMetric = { label: string; value: string };
@@ -21,6 +21,7 @@ type TrainingCard = {
 Page({
   data: {
     navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     state: "loading" as LoadState,
     message: "正在读取训练管理",
     retryLabel: "",

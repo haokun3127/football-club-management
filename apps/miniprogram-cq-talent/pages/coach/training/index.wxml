@@ -1,5 +1,5 @@
 <view class="c8">
-  <view class="c8-nav" style="padding-top:{{navInset}}px">
+  <view class="c8-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="c8-nav__title">训练管理</view>
   </view>
 

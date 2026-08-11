@@ -23,6 +23,7 @@ vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
 vi.mock("../../../utils/presentation", () => ({
   formatCalendarDate: (value) => value.slice(0, 10),
   formatTimeRange: () => "17:30",
+  resolveMenuInset: () => 88,
   resolveNavInset: () => 0,
 }));
 
@@ -174,5 +175,9 @@ describe("coach training management", () => {
     expect(template).not.toContain("U10精英队");
     expect(template).not.toContain("凤凰山");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
+  });
+
+  it("keeps the training title clear of the system capsule", () => {
+    expect(template).toContain('padding-right:{{menuInset}}px');
   });
 });
