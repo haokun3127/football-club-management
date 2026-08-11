@@ -30,13 +30,13 @@
 .p4-card__title { color: #202124; font-size: 28rpx; font-weight: 700; }
 .p4-card__link { color: #a80f1b; font-size: 26rpx; font-weight: 600; }
 .p4-card__empty { display: flex; align-items: center; justify-content: center; min-height: 96rpx; color: #667085; font-size: 24rpx; line-height: 34rpx; text-align: center; }
-.p4-milestones { gap: 24rpx; }
+.p4-milestones { gap: 24rpx; }.p4-milestones__list { display: flex; flex-direction: column; gap: 24rpx; width: 100%; }
 .p4-milestone { display: flex; align-items: center; gap: 24rpx; min-height: 48rpx; }
 .p4-milestone__dot { display: flex; flex: 0 0 48rpx; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; border-radius: 24rpx; background: #ecfdf5; color: #10b981; font-size: 24rpx; font-weight: 700; }
 .p4-milestone__dot--red { background: #fee2e2; color: #a80f1b; }.p4-milestone__dot--blue { background: #dbeafe; color: #3b82f6; }
 .p4-milestone__title { flex: 1; min-width: 0; color: #202124; font-size: 26rpx; }
-.p4-milestone__state { padding: 4rpx 12rpx; border-radius: 8rpx; background: #fee2e2; color: #a80f1b; font-size: 20rpx; font-weight: 600; }.p4-milestone__state--done { background: #ecfdf5; color: #10b981; }
-.p4-chart-card { gap: 28rpx; }.p4-bars { display: flex; align-items: flex-end; height: 160rpx; gap: 8rpx; }.p4-bar { flex: 1; border-radius: 20rpx 20rpx 0 0; background: #a80f1b; }.p4-bar--1 { height: 20rpx; }.p4-bar--2 { height: 28rpx; }.p4-bar--3 { height: 36rpx; }.p4-bar--4 { height: 44rpx; }.p4-months { display: flex; justify-content: space-between; color: #667085; font-size: 20rpx; }
+.p4-milestone__state { padding: 4rpx 12rpx; border-radius: 8rpx; background: #fee2e2; color: #a80f1b; font-size: 20rpx; font-weight: 600; }.p4-milestone__state--green { background: #ecfdf5; color: #10b981; }.p4-milestone__state--blue { background: #dbeafe; color: #3b82f6; }
+.p4-chart-card { gap: 28rpx; }.p4-bars { display: flex; align-items: flex-end; width: 100%; height: 160rpx; gap: 8rpx; }.p4-bar { flex: 1; min-height: 8rpx; border-radius: 4rpx 4rpx 0 0; background: linear-gradient(160deg, #a80f1b 25%, #c53030 75%); }.p4-months { display: flex; justify-content: space-between; width: 100%; color: #667085; font-size: 20rpx; }
 
 /* Figma P4: dark radar card */
 .p4-radar { display: flex; flex-direction: column; gap: 24rpx; padding: 32rpx; border-radius: 32rpx; background: #07111f; box-shadow: 0 4rpx 16rpx rgba(0,0,0,.05); }

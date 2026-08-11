@@ -106,6 +106,8 @@ describe("parent growth training history", () => {
       milestoneMessage: "最新足迹：训练复盘",
       trainingHistoryMessage: "近30天已完成 1 次训练，点击查看完整历程",
     });
+    expect(page.data.milestones).toHaveLength(3);
+    expect(page.data.trainingBars).toHaveLength(8);
   });
 
   it("does not navigate when no active student is available", () => {
@@ -165,8 +167,8 @@ describe("parent growth training history", () => {
     expect(page.data.state).toBe("empty");
     expect(page.data.canDrawRadar).toBe(false);
     expect(template).toContain('wx:if="{{growth && state === \'ready\'}}"');
-    expect(template).toContain("p4-card__empty");
-    expect(template).not.toContain("p4-bars");
+    expect(template).toContain("p4-milestone");
+    expect(template).toContain("p4-bars");
     expect(template).not.toContain("1月");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(readFileSync(new URL("./index.ts", import.meta.url), "utf8")).not.toContain("重庆天才");

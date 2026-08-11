@@ -19,14 +19,23 @@
 
       <!-- Figma P4 Milestones Card -->
       <view class="p4-card p4-milestones">
-        <view class="p4-card__head"><view class="p4-card__title">成长足迹 🏆</view></view>
-        <view class="p4-card__empty">{{milestoneMessage}}</view>
+        <view class="p4-card__head"><view class="p4-card__title">成长足迹 🏆</view><view class="p4-card__link">更多›</view></view>
+        <view class="p4-milestones__list">
+          <view wx:for="{{milestones}}" wx:key="id" class="p4-milestone">
+            <view class="p4-milestone__dot p4-milestone__dot--{{item.tone}}">{{item.icon}}</view>
+            <view class="p4-milestone__title">{{item.title}}</view>
+            <view class="p4-milestone__state p4-milestone__state--{{item.tone}}">{{item.state}}</view>
+          </view>
+        </view>
       </view>
 
       <!-- Figma P4 Training Chart Card -->
       <view class="p4-card p4-chart-card">
         <view class="p4-card__head"><view class="p4-card__title">训练历程 📊</view><view class="p4-card__link" bindtap="openTrainingHistory">查看›</view></view>
-        <view class="p4-card__empty">{{trainingHistoryMessage}}</view>
+        <view class="p4-bars">
+          <view wx:for="{{trainingBars}}" wx:key="id" class="p4-bar" style="height: {{item.height}}rpx"></view>
+        </view>
+        <view class="p4-months"><view wx:for="{{trainingBars}}" wx:key="id">{{item.label}}</view></view>
       </view>
 
       <!-- Figma P4 Ability Radar Card: dark surface -->

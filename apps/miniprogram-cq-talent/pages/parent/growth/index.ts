@@ -35,6 +35,8 @@ Page({
     heroSummaryMessage: "",
     milestoneMessage: "",
     trainingHistoryMessage: "",
+    milestones: [] as GrowthMilestone[],
+    trainingBars: [] as TrainingBar[],
   },
   onLoad() {
     this.load();
@@ -68,6 +70,7 @@ Page({
       const radar = radarForView(growth, 0);
       const selectedMetric = radar[0] ?? null;
       const activityMessages = growthActivityMessages(recentActivities, active.id);
+      const activityView = buildActivityView(recentActivities, active.id, radar.length > 0);
       this.setData({
         state: radar.length >= 3 ? "ready" : "empty",
         message: radar.length >= 3 ? "" : "有效能力指标不足，完成训练或评测后生成雷达图。",
@@ -91,6 +94,8 @@ Page({
         heroSummaryMessage: activityMessages.heroSummary,
         milestoneMessage: activityMessages.milestone,
         trainingHistoryMessage: activityMessages.trainingHistory,
+        milestones: activityView.milestones,
+        trainingBars: activityView.trainingBars,
       });
       if (selectedMetric) await this.loadMetricDetail(selectedMetric.metricId);
     } catch (error) {
@@ -196,6 +201,34 @@ function growthActivityMessages(events: ScheduleEvent[], studentId: string) {
     heroSummary: completed.length ? `近30天完成 ${trainingCount} 次训练、${matchCount} 场比赛` : "近30天暂无已完成活动",
     milestone: latest ? `最新足迹：${latest.title}` : "成长足迹正在积累",
     trainingHistory: trainingCount ? `近30天已完成 ${trainingCount} 次训练，点击查看完整历程` : "近30天暂无完成训练",
+  };
+}
+
+type GrowthMilestone = { id: string; title: string; state: string; tone: "green" | "red" | "blue"; icon: string };
+type TrainingBar = { id: string; height: number; label: string };
+
+function buildActivityView(events: ScheduleEvent[], studentId: string, hasMetrics: boolean) {
+  const completed = events
+    .filter((event) => event.status === "completed" && eventBelongsToStudent(event, studentId))
+    .sort((left, right) => new Date(left.startsAt).getTime() - new Date(right.startsAt).getTime());
+  const trainings = completed.filter((event) => event.type === "training");
+  const matches = completed.filter((event) => event.type === "match");
+  const bars = Array.from({ length: 8 }, (_, index) => {
+    const event = trainings[index];
+    const date = event ? new Date(event.startsAt) : null;
+    return {
+      id: `training-bar-${index + 1}`,
+      height: event ? 32 + ((index % 3) * 16) : 8,
+      label: date && !Number.isNaN(date.getTime()) ? `${date.getMonth() + 1}/${date.getDate()}` : "—",
+    };
+  });
+  return {
+    milestones: [
+      { id: "training", title: trainings.length ? `完成 ${trainings.length} 次训练` : "完成首次训练", state: trainings.length ? "已达成" : "待达成", tone: trainings.length ? "green" : "red", icon: trainings.length ? "✓" : "○" },
+      { id: "match", title: matches.length ? `完成 ${matches.length} 场比赛` : "首次参加比赛", state: matches.length ? "已达成" : "待达成", tone: matches.length ? "green" : "red", icon: matches.length ? "✓" : "○" },
+      { id: "assessment", title: "能力模型更新", state: hasMetrics ? "已更新" : "待达成", tone: hasMetrics ? "blue" : "red", icon: hasMetrics ? "•" : "○" },
+    ] as GrowthMilestone[],
+    trainingBars: bars,
   };
 }
 
