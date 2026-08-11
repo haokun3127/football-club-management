@@ -5,17 +5,16 @@
 
 .c163-nav {
   height: 176rpx;
-  box-sizing: content-box;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 24rpx;
   padding-right: 32rpx;
   padding-left: 32rpx;
   background: #fceeef;
 }
 
-.c163-nav__back,
-.c163-nav__placeholder {
+.c163-nav__back {
   width: 48rpx;
   height: 48rpx;
   flex: 0 0 48rpx;

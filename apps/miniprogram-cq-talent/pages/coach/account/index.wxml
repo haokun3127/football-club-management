@@ -4,7 +4,6 @@
       <image class="c163-nav__back-icon" src="/assets/icons/c163-chevron-left.svg" mode="aspectFit" />
     </view>
     <view class="c163-nav__title">账号设置</view>
-    <view class="c163-nav__placeholder"></view>
   </view>
 
   <view class="c163-page__body">
