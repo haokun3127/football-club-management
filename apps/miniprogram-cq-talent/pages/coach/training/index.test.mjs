@@ -37,6 +37,7 @@ await import("./index.ts");
 
 const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
+const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 const pageConfig = readFileSync(new URL("./index.json", import.meta.url), "utf8");
 
 const home = {
@@ -79,7 +80,7 @@ const home = {
 
 const team = {
   team: { id: "team-1", name: "Real team", season: "2026-2027" },
-  stats: { trainingCount: 5, attendanceRate: null, memberCount: 9 },
+  stats: { trainingCount: 5, completedTrainingCount: 46, attendanceRate: null, memberCount: 9 },
   members: [],
 };
 
@@ -111,9 +112,9 @@ describe("coach training management", () => {
     expect(page.data).toMatchObject({
       state: "ready",
       heroMetrics: [
-        { label: "近30天训练", value: "5" },
-        { label: "近30天出勤率", value: "--" },
-        { label: "近30天执教学员", value: "9" },
+        { label: "累计课时", value: "46" },
+        { label: "平均出勤", value: "--" },
+        { label: "在队人数", value: "9" },
         { label: "本月比赛", value: "1" },
       ],
     });
@@ -179,5 +180,15 @@ describe("coach training management", () => {
 
   it("keeps the training title clear of the system capsule", () => {
     expect(template).toContain('padding-right:{{menuInset}}px');
+  });
+
+  it("uses the node 93:896 hero, tabs, and session-card geometry", () => {
+    expect(styles).toContain("height: 360rpx");
+    expect(styles).toContain("padding: 40rpx");
+    expect(styles).toContain("gap: 24rpx");
+    expect(styles).toContain("min-height: 128rpx");
+    expect(styles).toContain("height: 96rpx");
+    expect(styles).toContain("padding: 32rpx 44rpx");
+    expect(styles).toContain("min-height: 228rpx");
   });
 });

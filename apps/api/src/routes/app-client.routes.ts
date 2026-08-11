@@ -1651,6 +1651,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       }
 
       const scope = await collectCoachScope(context, request.params.clubId, auth);
+      const completedTrainingCount = await collectCoachCompletedTrainingCount(context, request.params.clubId, auth);
       const team = scope.teams[0] ?? null;
       const decided = scope.events.flatMap((event) => event.participants ?? [])
         .filter((participant) => participant.status === "present" || participant.status === "absent" || participant.status === "excused");
@@ -1663,6 +1664,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         stats: {
           memberCount: scope.students.length,
           trainingCount: scope.events.filter((event) => event.type === "training").length,
+          completedTrainingCount,
           attendanceRate: decided.length ? Math.round((present / decided.length) * 100) : null,
         },
         members: scope.students,
@@ -2871,9 +2873,28 @@ function buildMetricTrends(metrics: Awaited<ReturnType<RouteContext["store"]["ge
 type CoachScopeAuth = Awaited<ReturnType<RouteContext["resolveClubAuth"]>> | null;
 
 interface CoachScopeEvent extends AppEventDetail {
+  ownerCoachId?: string;
   students?: Array<{ id: string; name: string }>;
   teams?: Array<{ id: string; name: string }>;
   participants?: Array<{ studentId: string; status: string }>;
+}
+
+async function collectCoachCompletedTrainingCount(context: RouteContext, clubId: string, auth: CoachScopeAuth): Promise<number> {
+  const roles = auth?.membership.roles ?? ["coach"];
+  const isAdmin = roles.some((role) => adminRoles.has(role));
+  const coachId = isAdmin
+    ? null
+    : context.store.listCoaches(clubId).find((coach) => coach.userId === (auth?.user.id ?? "user-coach-1"))?.id;
+  if (!isAdmin && !coachId) {
+    return 0;
+  }
+
+  const events = await context.store.listCalendarEvents(clubId) as CoachScopeEvent[];
+  return events.filter((event) =>
+    event.type === "training"
+    && event.status === "completed"
+    && (isAdmin || event.ownerCoachId === coachId),
+  ).length;
 }
 
 async function collectCoachScope(context: RouteContext, clubId: string, auth: CoachScopeAuth) {

@@ -719,10 +719,14 @@ describe("api server", () => {
     expect(team.statusCode, team.body).toBe(200);
     const teamBody = team.json() as {
       team: { id: string; name: string; season: string } | null;
-      stats: { memberCount: number; trainingCount: number; attendanceRate: number | null };
+      stats: { memberCount: number; trainingCount: number; completedTrainingCount: number; attendanceRate: number | null };
       members: Array<{ id: string; name: string }>;
     };
     expect(teamBody.stats.memberCount).toBeGreaterThanOrEqual(1);
+    // The C8 "cumulative classes" metric is deliberately separate from the
+    // rolling 30-day schedule count. This fixture has no completed training
+    // event for this coach at the frozen clock.
+    expect(teamBody.stats.completedTrainingCount).toBe(0);
     expect(teamBody.members.some((member) => member.id === "student-1")).toBe(true);
 
     const radar = await app.inject({
@@ -1426,6 +1430,13 @@ describe("api server", () => {
       });
       expect(coachRole.statusCode, coachRole.body).toBe(200);
       const coachToken = (coachRole.json() as { session: { token: string } }).session.token;
+      const coachTeam = await firstApp.inject({
+        method: "GET",
+        url: `${base}/coach/team`,
+        headers: { authorization: `Bearer ${coachToken}` },
+      });
+      expect(coachTeam.statusCode, coachTeam.body).toBe(200);
+      expect((coachTeam.json() as { stats: { completedTrainingCount: number } }).stats.completedTrainingCount).toBe(3);
       const tactical = await firstApp.inject({
         method: "GET",
         url: `${base}/coach/events/event-cq-talent-demo-match-tactical/tactical-board`,

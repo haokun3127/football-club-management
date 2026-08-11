@@ -657,7 +657,12 @@ interface CoachTeamDetailResponse {
   clubId: string;
   role: "coach";
   team: { id: string; name: string; season: string } | null;
-  stats: { memberCount: number; trainingCount: number; attendanceRate: number | null }; // attendanceRate 0-100, 无出勤数据时 null
+  stats: {
+    memberCount: number;
+    trainingCount: number; // coach-visible rolling 30-day training events
+    completedTrainingCount: number; // all completed events owned by this coach; used by C8's cumulative classes card
+    attendanceRate: number | null; // 0-100; null when there is no decided attendance data
+  };
   members: Array<{ id: string; name: string }>;
 }
 

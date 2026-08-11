@@ -101,18 +101,18 @@ function localDate(year: number, month: number, day: number): string {
 
 function emptyHeroMetrics(): HeroMetric[] {
   return [
-    { label: "近30天训练", value: "--" },
-    { label: "近30天出勤率", value: "--" },
-    { label: "近30天执教学员", value: "--" },
+    { label: "累计课时", value: "--" },
+    { label: "平均出勤", value: "--" },
+    { label: "在队人数", value: "--" },
     { label: "本月比赛", value: "--" },
   ];
 }
 
 function toHeroMetrics(home: CoachHome, team: CoachTeamDetail): HeroMetric[] {
   return [
-    { label: "近30天训练", value: String(team.stats.trainingCount) },
-    { label: "近30天出勤率", value: team.stats.attendanceRate === null ? "--" : `${team.stats.attendanceRate}%` },
-    { label: "近30天执教学员", value: String(team.stats.memberCount) },
+    { label: "累计课时", value: String(team.stats.completedTrainingCount) },
+    { label: "平均出勤", value: team.stats.attendanceRate === null ? "--" : `${team.stats.attendanceRate}%` },
+    { label: "在队人数", value: String(team.stats.memberCount) },
     { label: "本月比赛", value: String(home.summary.matches) },
   ];
 }

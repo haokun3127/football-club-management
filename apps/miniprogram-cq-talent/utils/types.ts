@@ -363,7 +363,7 @@ export interface PrivateLessonRequest {
 
 export interface CoachTeamDetail {
   team: { id: string; name: string; season: string } | null;
-  stats: { memberCount: number; trainingCount: number; attendanceRate: number | null };
+  stats: { memberCount: number; trainingCount: number; completedTrainingCount: number; attendanceRate: number | null };
   members: Array<{ id: string; name: string }>;
 }
 
