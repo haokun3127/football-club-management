@@ -57,7 +57,7 @@ interface PageData {
   selectedDateLabel: string;
   selectedType: "all" | ScheduleEvent["type"];
   typeTabs: Array<{ label: string; value: "all" | ScheduleEvent["type"] }>;
-  dateOptions: Array<{ date: string; day: string; weekday: string; weekShort: string; dayNumber: string; count: number }>;
+  dateOptions: Array<{ date: string; isToday: boolean; day: string; weekday: string; weekShort: string; dayNumber: string; count: number }>;
   hasUnreadReminders: boolean;
   unreadCount: number;
   todayLabel: string;
@@ -244,12 +244,14 @@ function filterEvents(events: ScheduleEvent[], studentId: string, selectedDate: 
 
 export function buildDateOptions(selectedDate: string, events: ScheduleEvent[]) {
   const base = weekWindowStart(selectedDate);
+  const todayKey = new Date().toISOString().slice(0, 10);
   return Array.from({ length: 7 }, (_, index) => {
     const date = new Date(base);
     date.setUTCDate(date.getUTCDate() + index);
     const key = date.toISOString().slice(0, 10);
     return {
       date: key,
+      isToday: key === todayKey,
       day: `${date.getUTCMonth() + 1}/${date.getUTCDate()}`,
       weekday: ["日", "一", "二", "三", "四", "五", "六"][date.getUTCDay()],
       weekShort: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][date.getUTCDay()] ?? "",
