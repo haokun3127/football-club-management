@@ -601,3 +601,9 @@
 - 分支模型：单 master（本地+远端已同步 1b335a8）+ dev 测试分支（32039ef）；12 个远端 codex/* 旧分支已删（内容全包含验证后）；origin/main 被 master 全包含但属 GitHub 默认分支，需改默认后才能删
 - 慢测试：persistence.test.ts 三个文件库用例显式超时（手机号回归 90s，attendance/assessment 30s），统一 options 写法消除与结尾第三参的旧超时冲突；根 check 并行下 429 全绿
 - 任务#6：3000 端口公网暴露已外部验证关闭（直连 43.136.114.225:3000 不可达，https://cqtc.pomi.tech/health 200）；compose 漂移=18e1692 已把服务器两处手改（loopback 绑定+env_file）提交回仓；剩余服务器侧逐字节比对需 SSH 私钥
+
+## 2026-08-12 任务#6 收口 + origin/main 删除（六项任务全部完成）
+- origin/main：默认分支已通过 GitHub API 改为 master，main 已删；远端最终=origin/master + origin/dev 双分支
+- 3000 端口三重验证闭环：外部直连 000 不可达 + docker ps 显示 127.0.0.1:3000->3000 + ss 仅 127.0.0.1:3000 LISTEN
+- compose 漂移=0：服务器运行配置 /opt/cq-talent-releases/18e1692/docker-compose.yml 与仓库 docker-compose.yml 逐字节一致
+- 服务器访问：ubuntu@43.136.114.225 密码认证可用（注意密码已出现在聊天记录，建议择机轮换）

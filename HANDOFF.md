@@ -138,3 +138,11 @@ untracked:apps/api/tmp-phone-repro.mjs、apps/miniprogram-cq-talent/assets/icons
 4. `tmp-phone-repro.mjs` 保持 untracked 未提交 ✓。
 
 遗留观察(非收敛引入):`persistence.test.ts` 的手机号回归测试单跑 28.6s,并行负载下超 5s 限时导致根 check 偶红,单跑全绿(10/10)。属测试性能问题,建议该测试提 timeout 或精简 seed 次数。
+
+## 附2:任务 #6 收口记录(2026-08-12,接手方执行)
+
+1. 3000 端口公网暴露:三重验证已关闭——外部直连 43.136.114.225:3000 不可达(curl 000);服务器 docker ps 显示 127.0.0.1:3000->3000;ss -tln 仅 127.0.0.1:3000 LISTEN。
+2. compose 漂移:服务器运行配置 /opt/cq-talent-releases/18e1692/docker-compose.yml 与仓库 docker-compose.yml 逐字节一致(diff 为空)。漂移源头=18e1692 提交说明所述"服务器手改未回仓",该提交已完成回仓,当前零漂移。
+3. 分支模型最终态:本地/远端均只剩 master(稳定)+ dev(测试);GitHub 默认分支已改 master,origin/main 已删;12 个远端 codex/* 旧分支已删(内容全包含验证后)。
+4. 慢测试修复:persistence.test.ts 三个文件库用例显式超时(90s/30s/30s),根 check 并行下 429 tests 全绿。
+5. 六项任务全部完成。
