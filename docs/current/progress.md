@@ -596,3 +596,8 @@
 - 诊断：9720b40≡fb1e268（hunk 一致）、b903456 patch-等价已在主分支、唯一独有 e83c4ae 已 cherry-pick 为 63961cf
 - master 快进至 63961cf = codex/chongqing-talent-business（单一主线）；两个 hotfix worktree+分支已清
 - 遗留：手机号回归测试单跑 28.6s，并行下 flake（非逻辑失败）
+
+## 2026-08-12 任务#6 外部验证 + 分支模型收敛 + 慢测试修复
+- 分支模型：单 master（本地+远端已同步 1b335a8）+ dev 测试分支（32039ef）；12 个远端 codex/* 旧分支已删（内容全包含验证后）；origin/main 被 master 全包含但属 GitHub 默认分支，需改默认后才能删
+- 慢测试：persistence.test.ts 三个文件库用例显式超时（手机号回归 90s，attendance/assessment 30s），统一 options 写法消除与结尾第三参的旧超时冲突；根 check 并行下 429 全绿
+- 任务#6：3000 端口公网暴露已外部验证关闭（直连 43.136.114.225:3000 不可达，https://cqtc.pomi.tech/health 200）；compose 漂移=18e1692 已把服务器两处手改（loopback 绑定+env_file）提交回仓；剩余服务器侧逐字节比对需 SSH 私钥
