@@ -6,6 +6,7 @@ import type {
   CoachProfile,
   EntityId,
   ParentProfile,
+  StudentGuardianBinding,
   StudentProfile,
   Team,
   TeamMember,
@@ -99,6 +100,11 @@ export class ClubRepository {
 export class UserAccountRepository {
   constructor(private readonly database: DatabaseSync) {}
 
+  listAll(): UserAccount[] {
+    const rows = this.database.prepare("SELECT * FROM user_accounts ORDER BY id").all() as SqlRow[];
+    return rows.map(mapUserAccount);
+  }
+
   async getById(id: EntityId): Promise<UserAccount | null> {
     const row = this.database.prepare("SELECT * FROM user_accounts WHERE id = ?").get(id) as SqlRow | undefined;
 
@@ -108,6 +114,11 @@ export class UserAccountRepository {
   async getByPhone(phone: string): Promise<UserAccount | null> {
     const row = this.database.prepare("SELECT * FROM user_accounts WHERE phone = ?").get(phone) as SqlRow | undefined;
     return row ? mapUserAccount(row) : null;
+  }
+
+  async listByPhone(phone: string): Promise<UserAccount[]> {
+    const rows = this.database.prepare("SELECT * FROM user_accounts WHERE phone = ? ORDER BY id").all(phone) as SqlRow[];
+    return rows.map(mapUserAccount);
   }
 
   async save(entity: UserAccount): Promise<void> {
@@ -136,6 +147,11 @@ abstract class BaseClubScopedRepository<TEntity extends ClubScoped> implements C
   protected abstract readonly tableName: string;
 
   constructor(protected readonly database: DatabaseSync) {}
+
+  listByClubSync(clubId: EntityId): TEntity[] {
+    const rows = this.database.prepare(`SELECT * FROM ${this.tableName} WHERE club_id = ? ORDER BY id`).all(clubId) as SqlRow[];
+    return rows.map((row) => this.map(row));
+  }
 
   async getById(): Promise<TEntity | null> {
     throw new Error("Club-scoped repositories require getByClubAndId(clubId, id).");
@@ -236,6 +252,52 @@ export class ParentProfileRepository extends BaseClubScopedRepository<ParentProf
       userId: requireString(row, "user_id"),
       name: requireString(row, "name"),
       phone: requireString(row, "phone"),
+      createdAt: requireString(row, "created_at"),
+      updatedAt: requireString(row, "updated_at"),
+    };
+  }
+}
+
+export class StudentGuardianBindingRepository extends BaseClubScopedRepository<StudentGuardianBinding> {
+  protected readonly tableName = "student_guardian_bindings";
+
+  async save(entity: StudentGuardianBinding): Promise<void> {
+    this.database.prepare(`
+      INSERT INTO student_guardian_bindings (
+        id, club_id, student_id, parent_id, relationship, is_primary_contact, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        club_id = excluded.club_id,
+        student_id = excluded.student_id,
+        parent_id = excluded.parent_id,
+        relationship = excluded.relationship,
+        is_primary_contact = excluded.is_primary_contact,
+        updated_at = excluded.updated_at
+      ON CONFLICT(club_id, parent_id, student_id) DO UPDATE SET
+        relationship = excluded.relationship,
+        is_primary_contact = excluded.is_primary_contact,
+        updated_at = excluded.updated_at
+    `).run(
+      entity.id,
+      entity.clubId,
+      entity.studentId,
+      entity.parentId,
+      entity.relationship,
+      entity.isPrimaryContact ? 1 : 0,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  protected map(row: SqlRow): StudentGuardianBinding {
+    return {
+      id: requireString(row, "id"),
+      clubId: requireString(row, "club_id"),
+      studentId: requireString(row, "student_id"),
+      parentId: requireString(row, "parent_id"),
+      relationship: requireString(row, "relationship") as StudentGuardianBinding["relationship"],
+      isPrimaryContact: booleanFromSql(row.is_primary_contact),
       createdAt: requireString(row, "created_at"),
       updatedAt: requireString(row, "updated_at"),
     };

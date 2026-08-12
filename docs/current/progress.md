@@ -1,5 +1,12 @@
 # 核心演示闭环 · 进度跟踪
 
+## 2026-08-12 Secure production identity and isolated dual-role test-account hardening
+
+- Production entrypoint rejects header-only identity; only the explicit local development entrypoint enables header smoke authentication. Phone identity resolution requires a unique active user and active club membership.
+- Added a transactional, fixed-ID, isolated three-account parent/coach import with separate child, guardian, coach-team, calendar, and participant scopes. Test-phone values are runtime-only and never returned by the controlled CLI.
+- The controlled file-SQLite CLI allows only dry-run import, confirmed import, and confirmed rollback. Dry-run does not migrate or mutate; confirmed import requires a private backup attestation; rollback refuses absent, partial, tampered, or ownership-inconsistent canonical installations.
+- Terra xhigh independently reviewed the final security boundaries. Final local verification: domain `8 files / 19 tests`, mini-program `54 files / 306 tests`, API `11 files / 103 tests`, root typecheck, task-context validation, and `git diff --check` all passed. A previous root-script run had a transient mini-program Vitest worker exit despite all assertions passing; an isolated rerun was clean. No server access, production database operation, deployment, restart, or device login occurred in this task.
+
 ## 2026-08-12 教练端演示数据交付边界复核
 
 - 已把后端演示数据分层记录：身份、队伍、日历/签到、课时流水、测评指标、比赛和战术板为 SQLite 持久化实体；训练计划/训练课、评测任务、FAQ 和部分观察记录仍由后端 seed 提供；首页统计、雷达与能力总览是派生视图。它们均不是小程序前端 mock。

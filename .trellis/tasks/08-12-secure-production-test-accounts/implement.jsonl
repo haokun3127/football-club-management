@@ -1,0 +1,4 @@
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"App-client role and parent privacy contract."}
+{"file":".trellis/spec/api/backend/active-role-sessions.md","reason":"Bearer session selection and revalidation contract."}
+{"file":".trellis/spec/api/backend/database-guidelines.md","reason":"SQLite migration and persistence conventions."}
+{"file":".trellis/spec/api/backend/secure-test-account-operations.md","reason":"Controlled import/rollback CLI contract."}

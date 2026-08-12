@@ -8,8 +8,9 @@
   "scripts": {
     "build": "pnpm run clean && tsc -p tsconfig.json",
     "clean": "node ../../scripts/clean.mjs dist tsconfig.tsbuildinfo",
-    "dev": "pnpm --filter @football-club/domain build && tsx watch src/index.ts",
+    "dev": "pnpm --filter @football-club/domain build && tsx watch src/dev.ts",
     "db:migrate": "tsx src/migrate.ts",
+    "secure-test-accounts": "tsx src/ops/secure-cq-talent-test-accounts-command.ts",
     "start": "node dist/index.js",
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc -p tsconfig.json --noEmit"

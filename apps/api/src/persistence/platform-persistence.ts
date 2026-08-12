@@ -10,6 +10,7 @@ import {
   ClubUserMembershipRepository,
   CoachProfileRepository,
   ParentProfileRepository,
+  StudentGuardianBindingRepository,
   StudentProfileRepository,
   TeamMemberRepository,
   TeamRepository,
@@ -27,6 +28,7 @@ export interface PlatformRepositories {
   users: UserAccountRepository;
   memberships: ClubUserMembershipRepository;
   parents: ParentProfileRepository;
+  guardianBindings: StudentGuardianBindingRepository;
   students: StudentProfileRepository;
   coaches: CoachProfileRepository;
   teams: TeamRepository;
@@ -50,6 +52,7 @@ export function createPlatformRepositories(database: DatabaseSync): PlatformRepo
     users: new UserAccountRepository(database),
     memberships: new ClubUserMembershipRepository(database),
     parents: new ParentProfileRepository(database),
+    guardianBindings: new StudentGuardianBindingRepository(database),
     students: new StudentProfileRepository(database),
     coaches: new CoachProfileRepository(database),
     teams: new TeamRepository(database),
@@ -78,6 +81,10 @@ export async function seedPlatformData(repositories: PlatformRepositories, data:
 
   for (const student of data.students) {
     await repositories.students.save(student);
+  }
+
+  for (const guardianBinding of data.guardianBindings) {
+    await repositories.guardianBindings.save(guardianBinding);
   }
 
   for (const coach of data.coaches) {

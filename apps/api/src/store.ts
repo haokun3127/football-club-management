@@ -51,6 +51,7 @@ import {
   type SessionObservation,
   type SessionPlan,
   type StudentProfile,
+  type StudentGuardianBinding,
   type Team,
   type TeamMember,
   type TrainingDrill,
@@ -2409,7 +2410,7 @@ export class PersistentApiStore extends SeedBackedStore {
     readonly repositories: PlatformRepositories,
     data: SeedData = createSeedData(),
   ) {
-    super(mergePersistedMatchData(repositories, mergePersistedAssessmentData(repositories, data)));
+    super(mergePersistedPlatformData(repositories, mergePersistedMatchData(repositories, mergePersistedAssessmentData(repositories, data))));
   }
 
   override listCalendarEvents(clubId: EntityId) {
@@ -3317,6 +3318,22 @@ function mergePersistedMatchData(repositories: PlatformRepositories, data: SeedD
     matches: mergeById(data.matches, clubIds.flatMap((clubId) => repositories.matches.listMatches(clubId))),
     matchEvents: mergeById(data.matchEvents, clubIds.flatMap((clubId) => repositories.matches.listEvents(clubId))),
     metricRecords: mergeById(data.metricRecords, clubIds.flatMap((clubId) => repositories.matches.listMetricRecords(clubId))),
+  };
+}
+
+function mergePersistedPlatformData(repositories: PlatformRepositories, data: SeedData): SeedData {
+  const clubIds = data.clubs.map((club) => club.id);
+  return {
+    ...data,
+    parents: mergeById(data.parents, clubIds.flatMap((clubId) => repositories.parents.listByClubSync(clubId))),
+    students: mergeById(data.students, clubIds.flatMap((clubId) => repositories.students.listByClubSync(clubId))),
+    guardianBindings: mergeById(
+      data.guardianBindings,
+      clubIds.flatMap((clubId) => repositories.guardianBindings.listByClubSync(clubId)),
+    ) as StudentGuardianBinding[],
+    coaches: mergeById(data.coaches, clubIds.flatMap((clubId) => repositories.coaches.listByClubSync(clubId))),
+    teams: mergeById(data.teams, clubIds.flatMap((clubId) => repositories.teams.listByClubSync(clubId))),
+    teamMembers: mergeById(data.teamMembers, clubIds.flatMap((clubId) => repositories.teamMembers.listByClubSync(clubId))),
   };
 }
 

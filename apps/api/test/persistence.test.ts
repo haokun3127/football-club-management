@@ -282,6 +282,7 @@ describe("platform persistence", () => {
       "0007_request_collections.sql",
       "0008_match_event_bundles.sql",
       "0009_app_client_sessions.sql",
+      "0010_student_guardian_bindings.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);
@@ -305,9 +306,10 @@ describe("platform persistence", () => {
           'external_record_links',
           'http_idempotency_records',
           'privacy_field_policies',
-          'privacy_notice_versions',
-          'student_consent_records',
-          'privacy_audit_logs',
+           'privacy_notice_versions',
+           'student_consent_records',
+           'student_guardian_bindings',
+           'privacy_audit_logs',
           'privacy_requests',
           'privacy_retention_policies',
           'metric_graph_versions',
@@ -353,6 +355,7 @@ describe("platform persistence", () => {
       "privacy_retention_policies",
       "student_consent_records",
       "student_contacts",
+      "student_guardian_bindings",
       "student_operational_profiles",
       "tactical_boards",
     ]);

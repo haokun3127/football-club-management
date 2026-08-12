@@ -106,6 +106,34 @@ describe("api server", () => {
     });
   });
 
+  it("rejects header-only app-client access when production header identity is disabled", async () => {
+    const data = createSeedData();
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:", seedData: data });
+    const app = buildServer(new PersistentApiStore(persistence.repositories, data), {
+      logger: false,
+      membershipResolver: new HeaderMembershipResolver(
+        persistence.repositories.users,
+        persistence.repositories.memberships,
+        null,
+        { allowHeaderIdentity: false },
+      ),
+    });
+
+    try {
+      const response = await app.inject({
+        method: "GET",
+        url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/children",
+        headers: { "x-user-id": "user-parent-1" },
+      });
+
+      expect(response.statusCode).toBe(403);
+      expect(response.json().error.code).toBe("club_membership_required");
+    } finally {
+      await app.close();
+      persistence.database.close();
+    }
+  });
+
   it("returns an OpenAPI document", async () => {
     const app = buildServer(undefined, { logger: false });
     const response = await app.inject({

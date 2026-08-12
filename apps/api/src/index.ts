@@ -1,4 +1,4 @@
-import { HeaderMembershipResolver } from "./auth/context.js";
+import { createEntrypointMembershipResolver } from "./auth/context.js";
 import { createPlatformPersistence } from "./persistence/platform-persistence.js";
 import { buildServer } from "./server.js";
 import { PersistentApiStore } from "./store.js";
@@ -9,7 +9,11 @@ const host = process.env.HOST ?? "127.0.0.1";
 const databasePath = process.env.DATABASE_URL ?? "apps/api/data/dev.sqlite";
 const persistence = await createPlatformPersistence({ databasePath });
 const store = new PersistentApiStore(persistence.repositories);
-const membershipResolver = new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships);
+const membershipResolver = createEntrypointMembershipResolver(
+  persistence.repositories.users,
+  persistence.repositories.memberships,
+  process.env,
+);
 
 const wechatIdentityConnector = WechatApiIdentityConnector.fromEnvironment();
 const server = buildServer(store, { membershipResolver, wechatIdentityConnector });
