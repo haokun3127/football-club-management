@@ -1,148 +1,86 @@
-# 交接文档 — 重庆天才足球俱乐部管理系统
+# 交接文档 — 重庆天才足球俱乐部管理系统（→ Claude）
 
-交接时间:2026-08-12
-交接原因:前一会话的工具执行后端故障,无法自行运行命令/读写文件,只能靠人工转贴输出,效率不可接受。
-仓库路径:C:\Users\ASUS\Desktop\football-club-management-codex-windows-2026-08-02
-当前分支:codex/chongqing-talent-business(HEAD = fb1e268)
+交接时间：2026-08-12（晚）
+交接人：Hermes Agent
+仓库路径：`C:\Users\ASUS\Desktop\football-club-management-codex-windows-2026-08-02`
+当前分支：**dev（HEAD = 4e0bd64）**；分支模型 = **master（稳定）+ dev（日常）**，本地远端各两个，无其他分支。
 
-## 一、总体进度
+## 〇、接手后最先要做的三件事
 
-六项任务,#1–#4 已完成,#5 进行中,#6 未开始。
+1. `git checkout dev && git pull origin dev`，然后跑门禁 `npx --yes pnpm@10.33.0 run check`（本机 pnpm 不在 PATH，必须用 npx 钉版；429 tests 全绿才算环境正常）。
+2. **让用户在微信开发者工具模拟器里点一次「微信手机号授权并继续」**——当前模拟器会话已被清空（原因见"已知坑 #4"），没有真实会话就无法做页面截图验收。
+3. 读 `docs/design/specifications/figma-online-frame-map-2026-08-12.md`——Figma 在线画板 id 映射表，Figma 复原任务的施工图纸。
 
-| # | 任务 | 状态 |
-|---|------|------|
-| 1 | 生产库备份与校验 | 已完成 |
-| 2 | 部署 18e1692 | 已完成 |
-| 3 | 重启后验证(migration 0010、seed 守卫、health check、凭据注入) | 已完成 |
-| 4 | 测试账号 dry-run 后受控导入 | 已完成 |
-| 5 | 救回手机号相关修复并收敛为单 master | **进行中** |
-| 6 | 收口 3000 端口公网暴露与 compose 漂移 | 未开始 |
+## 一、当前进行中的主任务：家长端+教练端按 Figma 全量复原
 
-**重要:全程只读。仓库没有任何写操作,生产环境自 #4 之后未再变更,没有留下任何中断的中间状态。**
+用户要求：家长端 + 教练端**完全按 Figma** 复原，验收标准 = **真实 375×812 截图逐页对照设计稿**，静态检查/测试通过不算数。
 
-## 二、任务 #5 现状(接手重点)
+- 权威设计：Figma 文件 `zZ6wKyOHKcO4UYXDd9jGwv`，家长端在页面 `4:6`（21 画板），教练端在 `4:7`（28 画板）。**CODE / 前缀的画板不是权威**（用户 2026-08-07 裁定）。
+- **已完成**：P1 Schedule Home（对齐 2026 年新设计 `269:250`：周历去箭头、今日红圈/选中深色圈双高亮，提交 `4e0bd64`，截图验收通过）。
+- **未完成**：家长端其余 20 板、教练端 28 板。逐页施工循环见下。
 
-### 已经查清的事实
+### 逐页施工循环（每页重复）
 
-1. **手机号修复没有丢。** `fb1e268 fix(api): preserve bound phones across seed restart` 就是当前分支 `codex/chongqing-talent-business` 的顶端提交,不是游离 HEAD,也不在 reflog 里。任务标题里"救回"这半件事实际已经不成立,**只剩收敛**。
-2. **没有残留的 git 中间态。** `git status` 没有 cherry-pick / merge 提示,不需要任何 `--abort`。
-3. **部署提交都在。** `51028d0` 和 `18e1692` 均在分支历史中(`git log --oneline -15` 里可见)。
-4. **master 落后很多。** master = `6a71669`,当前分支相对 origin 领先 205 个提交。
+1. Figma 取设计稿截图：`mcp__figma__get_screenshot(fileKey, nodeId)` → 返回短效 URL → `curl -sL -o design.png <url>`。
+2. 小程序截当前页：`node tmp/prod-verify/mp-route-shot.cjs "<route>?<query>" "<绝对路径>.png" force`（`force` 强制重导航，避免同路由不同 query 拍到旧页）。
+3. 合成对比图：`python tmp/figma-restore/sidebyside.py design.png current.png cmp.png`，用视觉模型逐项比对。
+4. 有差异 → 改 wxml/wxss/ts → `typecheck` + `vitest run` → 重截图复验 → 路径限定 `git add` 提交。
+5. 每页（或每小批）独立提交，禁 `git add -A`。
 
-### 分支全貌(git branch -vv 实测输出)
-archive/recovered-activity-training-services 459970a feat: add activity and training services
-archive/recovered-clean-build 0e27c45 build: guarantee clean build...
-archive/recovered-codegraph-ignore bd0f696 chore: ignore codegraph index
-archive/recovered-match-assessment-metrics 8fd6bc8 feat: add match assessment and metric services
+### 截图工具链状态
 
-codex/chongqing-talent-business fb1e268 [origin/...: ahead 205] fix(api): preserve bound phones across seed restart
-codex/data-capability-persistence 3bda482
-codex/e-wps-connector-runtime a9c024a
-codex/harden-contracts-metric-graph e4af640
-codex/phone-binding-seed-safe e83c4ae docs: record production phone binding verification ← worktree,无 upstream
-codex/phone-login-guard b903456 [origin/codex/phone-login-guard] fix(miniprogram): guard repeated phone authorization ← worktree
-master 6a71669 feat: harden contracts schedules and metric graph engine
+- 微信开发者工具 Stable v2.01.2510290，CLI 在 `D:\微信web开发者工具\cli.bat`。
+- 自动化端口当前 **9428**（会话失效就换端口重注册：`cli.bat auto --project <项目路径> --auto-port <新端口>`，并同步改 `tmp/prod-verify/mp-route-shot.cjs` 里的端口号）。
+- **automator 的 `reLaunch/navigateTo` promise 会挂起/报错**，必须用 `mp.callWxMethod("reLaunch", {url})` 通道（脚本已封装好）。
+- `mp.screenshot` 偶发超时 = 渲染面卡死，换端口不管用就 `cli.bat quit` 后重开。
 
-### 三个未决问题(收敛方案的前置条件)
-1. **两个并行 worktree。** `codex/phone-binding-seed-safe` 和 `codex/phone-login-guard` 各自检出在桌面的独立工作目录:
-   - `C:/Users/ASUS/Desktop/football-club-management-phone-binding-hotfix`
-   - `C:/Users/ASUS/Desktop/football-club-management-phone-login-hotfix`
-   收敛时必须一并处理,否则会留下三份不一致的工作副本。这很可能就是当初分裂的根源。
-2. **`codex/phone-binding-seed-safe` 定位不明。** 名字与手机号相关,但没有远端跟踪,顶端是一个 docs 提交。**必须先确认它相对 master 带了哪些提交、是否已被 `fb1e268` 覆盖**,再决定是丢弃、合并还是取其中一部分。
-3. **快进还是真合并未定。** 需要量化当前分支相对 master 的改动规模。
+## 二、生产环境
 
-### 接手后第一步:跑这四条只读命令
+- 生产 API：`https://cqtc.pomi.tech`（容器 `cq-talent-api`，文件型 SQLite `/var/lib/cq-talent/api.sqlite`）。
+- 服务器 `43.136.114.225`，Ubuntu 24.04，用户 `ubuntu`，密码用户已提供（问用户要；**不要写进任何仓库文件**）。接入方式：
+  ```
+  uv run --with paramiko python <script.py>   # 参考 tmp/prod-verify/query-participants.py 的写法
+  ```
+  复杂 SQL/JS 用 base64 编码后在容器内 `node -e` 执行（`node:sqlite` 的 DatabaseSync）。
+- **铁律：任何直接写库操作后必须 `docker restart cq-talent-api`**——运行进程的内存快照（`mergePersistedPlatformData`）不会自动重载，不重启前端看不到新数据。
+- 生产 API **不接受 `x-user-id` 头鉴权**（`createProductionMembershipResolver` 硬关），只能真实微信登录会话。
+- 写库前必先备份：`VACUUM INTO '/var/lib/cq-talent/api-backup-<标签>.sqlite'`。现有备份：`pre-51028d0-20260812T100034Z`、`api-backup-pre-enrich-20260812`。
+- 本机 shell 有 HTTP_PROXY=127.0.0.1:7890，curl 打 localhost/生产都要 `--noproxy '*'`。
+
+## 三、数据现状（2026-08-12 补数后）
+
+三个测试账号（家长+教练双角色）：`19922961921` 等三个手机号（其余两个问用户）。每账号：2 孩子、17 个事件（07-14→08-17，每周 2 训练+双周赛，未来 4 场）、32 条 metric 记录（8 雷达维度×4 采样点）、课时台账、保险至 2027-01-15、运营档案。**最近一个月（07-12→08-12）每天有数据的要求已满足**。
+- 未来赛事参与状态已修为 `enrolled`（显示"状态待确认"），已完成赛事保持 `confirmed`（显示"已到场"）。
+- 所有补数行 ID 带 `secure-test` 命名空间，可按模式清理；注意它们不在 secure-test-accounts 命令的 canonical manifest 里，rollback 命令不会清。
+
+## 四、验证命令
+
 ```bash
-git log --oneline --graph --all --decorate -20 | cat
-git log --oneline master..codex/phone-binding-seed-safe | cat
-git diff --stat master...HEAD | cat
-git worktree list
+npx --yes pnpm@10.33.0 run check        # 根门禁：typecheck + 全部测试（429）
+cd apps/miniprogram-cq-talent && npx --yes pnpm@10.33.0 run typecheck
+cd apps/miniprogram-cq-talent && npx --yes pnpm@10.33.0 exec vitest run   # 306
+curl -s --noproxy '*' https://cqtc.pomi.tech/health
 ```
-(| cat 是为了绕过 pager;之前人工转贴时输出卡在 : 提示符上过。)
 
-拿到这四条输出即可产出完整收敛方案。在这四条结果出来之前不要做任何写操作。
+## 五、已知坑（都是踩过的）
 
-## 三、任务 #5 的技术背景
+1. **终端 `cd` 会改会话工作目录**，之后 read_file/patch 相对路径全部失效——cd 过就用绝对路径。
+2. 路径含中文时 search_files(ripgrep) 会炸（os error 3），用 terminal grep/find 兜底。
+3. 小程序 WXML 禁 `.map()/.filter()`，WXSS 禁长 base64；图标用 `/assets/icons/*.svg` + `<image mode="aspectFit">`。
+4. **DEV_AUTO_SESSION 对生产无效且有毒**：它把伪造会话写进 wx storage，回滚配置后 storage 里的假会话还在，会持续 403。补救 = `mp.callWxMethod("clearStorage")` + 干净重启。生产只认真实微信会话，别再用它验生产页面。
+5. 强杀 DevTools 进程会导致 GUI 白屏（`Ctrl+Win+Shift+B` 重置显卡恢复）且丢登录态——用 `cli.bat quit`。
+6. 生产重跑全量 seed 会覆盖用户绑定手机号（fb1e268 已修的缺陷）——补数只能受控 INSERT。
 
-这不只是 git 整理,底下是一个真实的行为缺陷:API 重启后重跑 seed 会覆盖用户手动绑定的真实微信手机号。
+## 六、提交纪律
 
-### 相关文件
+- 路径限定 `git add <具体路径>`，禁 `git add -A`。
+- 这些文件**不要带进提交**（他人在途/用户文件）：`apps/api/src/store.ts` 的部分 hunks、`tmp-phone-repro.mjs`、`project.config.json`（仅 EOL 差异）、`docs/superpowers/`、根目录 xlsx、`settings.svg`、`login-wechat.svg`。
+- master 当前落后 dev 两个提交（613b653、4e0bd64），是否同步 master 由用户决定。
 
-apps/api/src/seed/index.ts — seed 入口,含生产守卫:
-```ts
-function shouldIncludeCqTalentAcceptanceSeed() {
-  return process.env.NODE_ENV !== "production"
-    && process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED === "1";
-}
-```
-`createSeedData()` 在守卫不通过时直接返回 base,通过时 `mergeSeedData(base, createCqTalentAcceptanceSeed())`。守卫本身已在任务 #3 验证通过。
+## 七、文档地图
 
-apps/api/src/persistence/platform-persistence.js — 尚未阅读。暴露 `createPlatformPersistence({ databasePath, seed, seedData })`,以及 `repositories.users` / `repositories.parents` 的 save / getById / getByClubAndId。「重开库时带 seed 会覆盖」的逻辑几乎肯定在这里,接手后建议优先读。
-
-apps/api/test/persistence.test.ts — 文件较大,可能已有手机号/seed 行为的回归覆盖,改动前先看。
-
-.trellis/spec/api/backend/phone-binding-seed.md — 权威契约文档,标题 "Restart-Safe Phone Binding Seed",状态 Active。改 seed 行为前必读。同目录 Active 的还有 secure-test-account-operations.md(管任务 #4 的导入与回滚)、app-client-bff-contracts.md、active-role-sessions.md。注意该 index 明确要求:所有文档用英文写。
-
-apps/api/tmp-phone-repro.mjs — 前会话建的临时复现脚本,当前是 untracked,收敛时千万不要提交进去。它的作用是:开库 → 手动改写 phone 为 13700000001(合成字面量,非真实 PII)→ 关库 → 带 seed 重开 → 读回验证 phone 是否被覆盖,同时打印两次 seed 耗时。
-
-### 工作区状态
-已改未暂存:apps/miniprogram-cq-talent/project.config.json
-untracked:apps/api/tmp-phone-repro.mjs、apps/miniprogram-cq-talent/assets/icons/login-wechat.svg、apps/miniprogram-cq-talent/assets/icons/settings.svg、docs/superpowers/、重庆天才足球俱乐部-WPS联调客户确认表(1).xlsx
-
-### 关联任务
-`.trellis/tasks/08-12-08-12-coach-page-evidence-audit/task.json` 是另一个 in_progress 任务,其 base_branch 正是 codex/chongqing-talent-business。收敛动分支时会影响它,需一并考虑。
-
-## 四、任务 #6 待办
-
-3000 端口存在公网暴露,需收口;同时服务器上的 docker compose 配置与仓库已经漂移,需对齐。尚未开始调查。
-
-## 五、运维事实与约束
-
-- 生产回滚点:备份文件 `pre-51028d0-20260812T100034Z.sqlite`
-- 已应用迁移:0010
-- 任务 #4 已导入三个测试账号(手机号 1991921、1872807、182****2170,完整值见此前部署记录)。按测试账号 PII 处理。
-- 持久化为文件型 SQLite,生命周期是「打开 → 变更 → 关闭 → 带 seed 重开」,这正是缺陷发生的路径。
-- 用户从未提出过安全约束或禁改文件清单。以下是前会话自行采取的操作纪律,建议延续:
-  - 任何变更前先只读诊断
-  - 不盲目重跑失败的操作
-  - 部署前必备份
-  - 对生产导入数据前必先 dry-run
-
-## 六、环境故障说明(与代码无关)
-
-前一会话的工具执行通道完全失效:shell、文件读、列目录、搜索全部无返回,没有 stdout/stderr/退出码,写文件返回 No exec result。排查结论:
-
-- 换会话无效 → 不是会话级断连
-- 重启整机无效 → 不是残留进程
-- 外部 cmd 里 git status 秒回且完整 → 文件系统与仓库健康,OneDrive 占位文件假设也被排除
-
-故障范围锁定在 IDE 客户端侧的工具执行后端。代码、仓库、机器本身都没有问题。接手方如果工具通道正常,直接照常干活即可,不必理会这段。
-
----
-
-要点就三条:手机号修复没丢,`fb1e268` 就是当前 HEAD;只剩收敛,卡在桌面那两个 worktree 和 `phone-binding-seed-safe` 的定位没查清;接手第一件事是跑那四条只读命令,拿到结果再动手。仓库和生产至今干净。
-
----
-
-## 附:任务 #5 收口记录(2026-08-12,接手方执行)
-
-**结论:手机号修复没丢,收敛已完成,当前为单一主线。**
-
-执行结果:
-1. 四条只读诊断+补充分析(cherry/patch-id/hunk 比对)证实:
-   - `9720b40` 的修复代码已等价存在于 `fb1e268`(手机号保留逻辑 hunk 逐行一致);
-   - `b903456`(登录 guard)已 patch-等价包含在主分支;
-   - 两条 hotfix 线唯一真实独有内容 = `e83c4ae`(生产验证文档),已 cherry-pick 为 `63961cf`。
-2. `master` 已快进到 `63961cf`,与 `codex/chongqing-talent-business` 同指一头(收敛完成,领先 origin 206)。
-3. 桌面两个 hotfix worktree 已注销并删除残留目录;`codex/phone-binding-seed-safe`、`codex/phone-login-guard` 分支已删(内容全包含,删除安全)。`.codex/worktrees/ec6b` detached worktree 按约定未动。
-4. `tmp-phone-repro.mjs` 保持 untracked 未提交 ✓。
-
-遗留观察(非收敛引入):`persistence.test.ts` 的手机号回归测试单跑 28.6s,并行负载下超 5s 限时导致根 check 偶红,单跑全绿(10/10)。属测试性能问题,建议该测试提 timeout 或精简 seed 次数。
-
-## 附2:任务 #6 收口记录(2026-08-12,接手方执行)
-
-1. 3000 端口公网暴露:三重验证已关闭——外部直连 43.136.114.225:3000 不可达(curl 000);服务器 docker ps 显示 127.0.0.1:3000->3000;ss -tln 仅 127.0.0.1:3000 LISTEN。
-2. compose 漂移:服务器运行配置 /opt/cq-talent-releases/18e1692/docker-compose.yml 与仓库 docker-compose.yml 逐字节一致(diff 为空)。漂移源头=18e1692 提交说明所述"服务器手改未回仓",该提交已完成回仓,当前零漂移。
-3. 分支模型最终态:本地/远端均只剩 master(稳定)+ dev(测试);GitHub 默认分支已改 master,origin/main 已删;12 个远端 codex/* 旧分支已删(内容全包含验证后)。
-4. 慢测试修复:persistence.test.ts 三个文件库用例显式超时(90s/30s/30s),根 check 并行下 429 tests 全绿。
-5. 六项任务全部完成。
+- 本文档：总交接
+- `docs/current/progress.md`：逐日进度流水
+- `docs/design/specifications/figma-online-frame-map-2026-08-12.md`：Figma 画板↔路由映射（施工图纸）
+- `docs/design/specifications/{parent,coach,shared}/`：逐画板规格导出
+- `.trellis/`：Trellis 任务/规范层（工作流见 `.trellis/workflow.md`）

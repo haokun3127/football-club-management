@@ -626,3 +626,12 @@
 - 每账号再补 8 个 7 月中下旬已完成事件（每周 2 训练+双周赛：07-14/17/19/21/24/26/28/31）×2 孩子参与；每孩子再补 2 轮 8 维度 metric 记录（07-22 训练观察 + 07-29 周期评测）
 - 全账号事件跨度 2026-07-14 ~ 2026-08-17（过去一个月每周有数据+未来一周排期）；测评时间线 07-15/07-22/07-29/08-05 四个采样点
 - 运营档案 total_checkins 同步为 10；重启 health 200
+
+
+## 2026-08-12 深夜：未来赛事出勤修正 + Figma 复原开工
+- 数据修正：24 行未来赛事（08-13/15/16/17 三个账号各 2 孩子）event_participants.status 由 confirmed 改为 enrolled（已完成赛事保持 confirmed）；已重启 API 刷新内存快照，health 200
+- 原因：未来赛事显示"已到场"不符合实际，家长端活动详情页出勤卡应按状态待确认呈现
+- Figma 复原开工：在线画板 id 映射固化 docs/design/specifications/figma-online-frame-map-2026-08-12.md（P1 在线已重设计为 269:250，新增 P1-Empty 269:479；本地旧 fig-out.json 部分 id 已失效）
+- P1 Schedule Home 已对齐新设计（周历去箭头、今日红圈/选中深色圈双高亮），提交 4e0bd64，375x812 截图验收通过
+- 教训：DEV_AUTO_SESSION 对生产 API 无效（生产硬关 x-user-id 头鉴权）且伪造会话残留 wx storage 致持续 403；补救=clearStorage+干净重启；生产页面验收必须真实微信会话
+- 截图工具链：automator reLaunch/navigateTo promise 挂起，须走 callWxMethod('reLaunch') 通道（tmp/prod-verify/mp-route-shot.cjs 已封装，当前自动化端口 9428）
