@@ -607,3 +607,10 @@
 - 3000 端口三重验证闭环：外部直连 000 不可达 + docker ps 显示 127.0.0.1:3000->3000 + ss 仅 127.0.0.1:3000 LISTEN
 - compose 漂移=0：服务器运行配置 /opt/cq-talent-releases/18e1692/docker-compose.yml 与仓库 docker-compose.yml 逐字节一致
 - 服务器访问：ubuntu@43.136.114.225 密码认证可用（注意密码已出现在聊天记录，建议择机轮换）
+
+## 2026-08-12 测试账号登录受限根因与修复
+- 现象：19922961921 能选身份但选家长后落「账号暂时受限」页
+- 排查：生产库三账号 users/memberships(parent+coach,active)/parent_profiles/guardian_bindings/student_profiles 全部完好；登录 children 链路=listStudents(实时 SQLite LEFT JOIN operational)×isGuardianOfStudent(内存 this.data)
+- 根因：PersistentApiStore 启动时 mergePersistedPlatformData 快照合并 parents/guardianBindings；任务#4 导入(19:06)晚于 API 进程启动（#3 重启验证在 #4 之前）→ 运行进程内存快照无导入绑定 → isGuardianOfStudent=false → children=[] → parent_without_children
+- 修复：docker restart cq-talent-api（重建快照），health 200 日志干净；三个账号同一根因一并修复
+- 架构教训：secure-test-accounts 导入后必须重启 API 才生效（内存快照启动时合并）；另观察：导入命令不创建 student_operational_profiles（登录不依赖，但学员运营字段视图会空）
