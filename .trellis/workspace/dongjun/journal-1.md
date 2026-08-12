@@ -515,3 +515,38 @@ Audited the current online Figma scope as 49 business states, repaired historica
 ### Next Steps
 
 - None - task complete
+
+
+## Session 14: Prepare Claude transfer and archive secure account task
+
+**Date**: 2026-08-12
+**Task**: Prepare Claude transfer and archive secure account task
+**Package**: api
+**Branch**: `codex/chongqing-talent-business`
+
+### Summary
+
+Committed the secure production identity and isolated test-account hardening, updated deployment/auth and project handoff docs for Claude, and archived only the completed secure-account Trellis task. Preserved all unrelated in-progress files.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `ddfbc29` | (see git log) |
+| `1fa975b` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
