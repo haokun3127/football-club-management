@@ -614,3 +614,10 @@
 - 根因：PersistentApiStore 启动时 mergePersistedPlatformData 快照合并 parents/guardianBindings；任务#4 导入(19:06)晚于 API 进程启动（#3 重启验证在 #4 之前）→ 运行进程内存快照无导入绑定 → isGuardianOfStudent=false → children=[] → parent_without_children
 - 修复：docker restart cq-talent-api（重建快照），health 200 日志干净；三个账号同一根因一并修复
 - 架构教训：secure-test-accounts 导入后必须重启 API 才生效（内存快照启动时合并）；另观察：导入命令不创建 student_operational_profiles（登录不依赖，但学员运营字段视图会空）
+
+## 2026-08-12 三个测试账号数据丰富化（192 行）
+- 备份：/var/lib/cq-talent/api-backup-pre-enrich-20260812.sqlite（VACUUM INTO，写前一致性快照）
+- 每账号新增：8 日程（4 已完成训练/友谊赛+3 未来训练+1 未来联赛，中文标题+备注，Asia/Shanghai）×2 孩子参与；8 核心雷达维度 ×（训练观察+周期评测）=16 条 metric 记录/孩子；运营档案（学校/区域/在读/课时余额21/保险期）；保险单（太平洋保险至 2027-01-15）；课时台账（充值24+余额21快照）
+- 三账号对称共 192 行，ID 全部带 secure-test 命名空间可识别清理；FK 约束逐一核对（payment_event_id 置 null 避开不存在引用）
+- 注意：这些行不在 secure-test-accounts 命令 canonical manifest 内，未来 rollback 不会自动清理，需按 %secure-test% 手动清
+- 已重启 cq-talent-api 刷新内存快照，health 200，读回核对三账号数据对称完整
