@@ -10,7 +10,8 @@ import { buildServer } from "../src/server.js";
 import { PersistentApiStore } from "../src/store.js";
 
 describe("platform persistence", () => {
-  it("preserves existing acceptance parent phones across a seeded file database reopen", async () => {
+  // 该用例需完整跑两遍文件库 seed（开库→改→关→带 seed 重开），单跑约 30s，并行负载下更久，显式放宽超时
+  it("preserves existing acceptance parent phones across a seeded file database reopen", { timeout: 90_000 }, async () => {
     const directory = mkdtempSync(join(tmpdir(), "football-parent-phone-"));
     const databasePath = join(directory, "club.sqlite");
     const originalAcceptanceSeed = process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED;
@@ -57,9 +58,9 @@ describe("platform persistence", () => {
       }
       rmSync(directory, { recursive: true, force: true });
     }
-  }, 30_000);
+  });
 
-  it("preserves attendance status and note after reopening a seeded file database", async () => {
+  it("preserves attendance status and note after reopening a seeded file database", { timeout: 30_000 }, async () => {
     const directory = mkdtempSync(join(tmpdir(), "football-attendance-"));
     const databasePath = join(directory, "club.sqlite");
     const data = createSeedData();
@@ -126,9 +127,9 @@ describe("platform persistence", () => {
       first?.database.close();
       rmSync(directory, { recursive: true, force: true });
     }
-  }, 15_000);
+  });
 
-  it("preserves app-client assessment records and parent metric reads after reopening a seeded file database", async () => {
+  it("preserves app-client assessment records and parent metric reads after reopening a seeded file database", { timeout: 30_000 }, async () => {
     const directory = mkdtempSync(join(tmpdir(), "football-assessment-"));
     const databasePath = join(directory, "club.sqlite");
     let first: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
@@ -255,7 +256,7 @@ describe("platform persistence", () => {
       first?.database.close();
       rmSync(directory, { recursive: true, force: true });
     }
-  }, 15_000);
+  });
 
   it("restores tactical board snapshots after reopening SQLite", async () => {
     const directory = mkdtempSync(join(tmpdir(), "football-tactical-board-"));
