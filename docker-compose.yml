@@ -28,6 +28,8 @@ services:
     depends_on:
       data-init:
         condition: service_completed_successfully
+    env_file:
+      - .env.runtime
     environment:
       NODE_ENV: production
       HOST: 0.0.0.0
@@ -35,7 +37,7 @@ services:
       DATABASE_URL: /var/lib/cq-talent/api.sqlite
       FCM_CQ_TALENT_ACCEPTANCE_SEED: "1"
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     volumes:
       - cq-talent-api-data:/var/lib/cq-talent
     networks:
