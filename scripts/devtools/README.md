@@ -43,7 +43,7 @@ python scripts/devtools/sidebyside.py \
 ## 已知坑（全部踩过，别再踩）
 
 1. **automator 的 `reLaunch`/`navigateTo` promise 会挂起或报空错 `{}`**——脚本已改用 `mp.callWxMethod("reLaunch", {url})` 通道，不要改回去
-2. `mp.screenshot` 超时（60s）= 模拟器渲染面卡死。换端口没用就 `cli.bat quit` 后重新 `cli auto`
+2. `mp.screenshot` 超时（60s）= 模拟器渲染面卡住。**先查 DevTools 主窗口是否失焦/最小化**——实测窗口不在前台会导致截图通道挂死，把窗口 ShowWindow 还原置前台即可恢复（无需重启）；不行再 `cli.bat quit` 后重新 `cli auto`
 3. 端口会莫名失效（`Failed connecting to ws://...`）——换个新端口重新 `cli auto` 注册即可，别在死端口上重试
 4. **不要用 `DEV_AUTO_SESSION=true` 验生产页面**：生产 API 硬关 x-user-id 头鉴权，假会话只会 403，且残留 wx storage 造成持续 403（补救：`mp.callWxMethod("clearStorage")` + 干净重启）
 5. 授权弹窗/身份选择自动化点不动，必须用户手动点
