@@ -6,6 +6,7 @@
 - Added a transactional, fixed-ID, isolated three-account parent/coach import with separate child, guardian, coach-team, calendar, and participant scopes. Test-phone values are runtime-only and never returned by the controlled CLI.
 - The controlled file-SQLite CLI allows only dry-run import, confirmed import, and confirmed rollback. Dry-run does not migrate or mutate; confirmed import requires a private backup attestation; rollback refuses absent, partial, tampered, or ownership-inconsistent canonical installations.
 - Terra xhigh independently reviewed the final security boundaries. Final local verification: domain `8 files / 19 tests`, mini-program `54 files / 306 tests`, API `11 files / 103 tests`, root typecheck, task-context validation, and `git diff --check` all passed. A previous root-script run had a transient mini-program Vitest worker exit despite all assertions passing; an isolated rerun was clean. No server access, production database operation, deployment, restart, or device login occurred in this task.
+- 交接更新：`docs/current/agent-handover-2026-08-12.md` 现为 Claude 接手入口；部署认证边界以 `deployment-requirements.md` 与安全账号专项交接为准。旧文档内的生产演示、`X-User-Id` smoke 与部署记录均须按其历史/本地限定解读，不得直接当作当前生产状态。
 
 ## 2026-08-12 教练端演示数据交付边界复核
 

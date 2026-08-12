@@ -31,7 +31,11 @@ POST /clubs/:clubId/app-clients/:clientId/wechat-login
 
 ## Auth headers
 
-开发环境使用 `x-user-id` 模拟登录用户。生产接入真实身份后，API 仍应解析为同一个 membership context：
+> 2026-08-12 安全边界：生产/release 的业务 app-client API 只接受经校验的 `Authorization: Bearer <app-client-session>` 身份。`X-User-Id` 不是生产认证方式，反向代理不得依赖、注入或转发它来建立身份。
+
+`x-user-id` 仅限显式启动的本地开发/测试 API（`apps/api/src/dev.ts`）做隔离 smoke。它不能发送到公网域名，也不能替代真实微信登录、Bearer session 或真机验证。
+
+无论身份来自已校验 Bearer session，还是本地开发 smoke，API 最终都应解析为同一个 membership context：
 
 - `user`
 - `clubId`

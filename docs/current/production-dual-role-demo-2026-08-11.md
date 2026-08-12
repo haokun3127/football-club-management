@@ -1,5 +1,7 @@
 # Production Dual-Role Acceptance Demo — 2026-08-11
 
+> 2026-08-12 安全覆盖说明：本文是当时的生产演示历史记录，不是当前部署状态或今后导入测试账号的操作手册。最新本地提交 `ddfbc29` 尚未在该专项任务中部署；其目标是禁止生产启动 acceptance seed，并以有备份证明的受控 CLI 替代。不得据本文重现、假设或修改当前服务器运行时配置；实际部署前先读 `agent-handover-2026-08-12.md` 与 `agent-handover-2026-08-12-secure-test-accounts.md`，并另建获授权的部署任务。
+
 - Production API release `b462561` was deployed from the clean tracked archive only.
 - Production API release `d472307` was subsequently deployed after the acceptance identity was found to retain its synthetic fixture phone on restart; the new release reads the intended binding only from the private runtime variable.
 - A timestamped backup of the named SQLite volume was created in the restricted server backup area before deployment. This record deliberately excludes credentials, phone numbers, and bearer values.

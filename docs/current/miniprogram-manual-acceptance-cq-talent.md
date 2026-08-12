@@ -1,5 +1,7 @@
 # 重庆天才小程序本地手工验收
 
+> 2026-08-12 身份安全覆盖：本文件出现的 `X-User-Id` 命令均只适用于显式本地开发 API 的隔离 smoke，绝不能请求公网域名或充当生产登录方式。公网/真机验收必须完成真实微信授权并使用服务端返回的 Bearer session。三套隔离双角色测试账号的生产导入尚未执行，见 `agent-handover-2026-08-12-secure-test-accounts.md`。
+
 ## 2026-08-09 Windows 当前截图标准（覆盖 08-05 PrintWindow 标准）
 
 - 当前首选取证通道是 `miniProgram.screenshot`（`tmp/prod-verify/mp-shot.cjs`，automator 端口 **9425**）：直出逻辑视口 `375×812` 页面 PNG，免疫窗口遮挡、最大化、GPU 白屏与前台竞争。
