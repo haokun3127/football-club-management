@@ -666,3 +666,9 @@
 根因：`contentArticles` / `contentFaqs` / `venues` 三个集合**只存在于验收 seed** `apps/api/src/seed/cq-talent-acceptance.ts:653`（4 篇文章、5 条 FAQ、3 个场地），而该 seed 在 `apps/api/src/seed/index.ts:44` 被限制为 `NODE_ENV !== "production"` 且 `FCM_CQ_TALENT_ACCEPTANCE_SEED === "1"`，**生产按设计永不加载**，因此线上三个集合为空。教练团队页有内容是因为 `coach-team` 路由（`apps/api/src/routes/app-client.routes.ts:2097`）读的是 `listTeams` / `listCoaches` 运营实体表，那里有 2026-08-12 补数写入的真实数据。
 
 结论：这不是页面渲染缺陷，页面的空态、跳转与入口都是对的（`venues`/`help`/`coaches` 三页的整页空态是这些页面本身没有静态设计内容，与内容中心的情况不同，属正确行为）。属内容运营数据缺失。待用户裁决灌数方式后另立任务，三条候选路径：① 受控 INSERT 进生产库（须先 `VACUUM INTO` 备份 + 写后 `docker restart cq-talent-api`）；② 只在本地带 `FCM_CQ_TALENT_ACCEPTANCE_SEED=1` 跑，小程序指向本地；③ 不灌数，按设计稿补更完整的空态引导。本轮未执行任何生产写库。
+
+## 2026-08-13 生产 API 重新部署（75fd0e9，用户授权）
+- 背景修正：小程序控制台 /content/venues|coaches 404 实为模拟器旧编译产物，非生产缺路由；但 diff 实测生产代码大幅落后 dev（缺 ops/、会话持久化仓储等）
+- 流程：docker exec VACUUM INTO 备份（api-backup-pre-75fd0e9-20260813.sqlite）→ 旧镜像打 rollback-pre-75fd0e9 标签 → git archive HEAD 上传解包 /opt/cq-talent-releases/75fd0e9 → docker build 新镜像（432f1457e0fe）→ sudo docker compose up -d --no-build --force-recreate（.env.runtime root 600 需 sudo，首次裸跑失败导致约 2 分钟停机）
+- 验证：容器跑新镜像 sha256:432f1457e0fe；迁移 0009/0010 自动应用（app_client_sessions、student_guardian_bindings 表已建）；/health 200；/venues 403 鉴权拦截（路由存在）；备份文件在卷内
+- 影响：会话表上线后旧内存会话失效，所有用户下次需重新授权一次（模拟器同）

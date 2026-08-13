@@ -2,7 +2,7 @@
 
 交接时间：2026-08-13
 仓库路径：`C:\Users\ASUS\Desktop\football-club-management-codex-windows-2026-08-02`
-当前分支：**dev（HEAD = `1ab6785`）**；分支模型 = **master（稳定）+ dev（日常）**，本地远端各两个，无其他分支。
+当前分支：**dev**。分支模型 = **master（稳定）+ dev（日常）**，本地远端各两个，无其他分支。生产 API 已于 2026-08-13 晚部署为 dev 代码（详见第三节末尾）。
 
 这份文档假设你没读过之前的对话。全部结论都可以自己复核，路径和行号都给了。
 
@@ -103,7 +103,9 @@ process.env.NODE_ENV !== "production" && process.env.FCM_CQ_TALENT_ACCEPTANCE_SE
 **用户已裁决（2026-08-13）：一律使用线上环境，小程序任何环境都直连生产，不走本地 API。** 路径 2（本地 seed）被否决。剩余待裁决：路径 1（受控 INSERT 进生产）或路径 3（空态引导做完整）。
 
 **已修正的误判（同日复查）：** 小程序控制台出现的 `/content/venues`、`/content/coaches` 404 来自**模拟器里的旧编译产物**，不是生产缺路由——当前 dev 客户端实际调用 `/venues` 与 `/coach-team`（`utils/api.ts:1156,1164`），这两条在生产都存在（403 只是鉴权拦截）。DevTools 里改过代码后留意强制重编译，别拿旧 bundle 的报错当生产事实。
-**另一个事实（同日 diff 实测）：** 生产运行代码整体大幅落后 dev（apps/api/src 与 packages/domain 几十个文件差异，缺 `ops/`、`app-client-session-repository.ts` 等——生产会话可能不持久）。是否重新部署由用户裁决；部署前备份与回滚镜像标签（`rollback-pre-75fd0e9`）已就位，release 树已传至 `/opt/cq-talent-releases/75fd0e9`。
+**另一个事实（同日 diff 实测）：** 生产运行代码整体大幅落后 dev（apps/api/src 与 packages/domain 几十个文件差异，缺 `ops/`、`app-client-session-repository.ts` 等——生产会话可能不持久）。~~是否重新部署由用户裁决~~ **已于 2026-08-13 晚完成部署（用户授权）**：生产现跑 dev HEAD 代码（镜像 432f1457e0fe，release 树 `/opt/cq-talent-releases/75fd0e9`，回滚标签 `cq-talent-api:rollback-pre-75fd0e9`，部署前备份 `api-backup-pre-75fd0e9-20260813.sqlite`）。迁移 0009/0010 已自动应用（`app_client_sessions`、`student_guardian_bindings` 建表），/health 200。注意：会话持久化上线后旧内存会话全部失效，**模拟器需重新点一次授权**。
+
+**部署坑（已踩）：** `/opt/cq-talent-api/.env.runtime` 是 root 600 权限，ubuntu 裸跑 `docker compose up` 会 `permission denied`——必须 `sudo docker compose up -d --no-build --force-recreate`（`--no-build` 防止 compose 用 /opt/cq-talent-api 旧上下文回盖新镜像；sudo 密码 = SSH 登录密码）。完整流程见 `docs/current/progress.md` 当日条目。
 
 本轮没有执行任何生产写库操作。
 
