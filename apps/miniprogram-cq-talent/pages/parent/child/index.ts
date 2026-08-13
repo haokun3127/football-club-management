@@ -1,6 +1,6 @@
 import { getParentChildren, getParentSchedule, getParentStudentHome, switchActiveRole } from "../../../utils/api";
 import { requireRole, routeHome } from "../../../utils/auth";
-import { openPage } from "../../../utils/navigation";
+import { openPage, openTab } from "../../../utils/navigation";
 import { formatDateTime, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { persistAuthenticatedSession, setCurrentStudentId } from "../../../utils/store";
 import type { LoadState, ScheduleEvent, StudentHome, StudentSummary } from "../../../utils/types";
@@ -77,7 +77,7 @@ Page({
     openPage(`/pages/parent/status/index?student=${this.data.activeStudentId}`);
   },
   openContent() {
-    openPage("/pages/parent/content/index");
+    openTab("/pages/parent/content/index");
   },
   openPrivate() {
     openPage(`/pages/parent/private/index?student=${this.data.activeStudentId}`);
@@ -86,10 +86,10 @@ Page({
     openPage("/pages/parent/binding/index");
   },
   openSchedule() {
-    openPage("/pages/parent/schedule/index");
+    openTab("/pages/parent/schedule/index");
   },
   openGrowth() {
-    openPage("/pages/parent/growth/index");
+    openTab("/pages/parent/growth/index");
   },
   openRadar() {
     openPage("/pages/parent/radar/index");

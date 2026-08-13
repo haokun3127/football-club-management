@@ -1,6 +1,6 @@
 import { getCoachWorkbench } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { openPage } from "../../../utils/navigation";
+import { openPage, openTab } from "../../../utils/navigation";
 import { formatCalendarDate, formatTimeRange } from "../../../utils/presentation";
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
 
@@ -91,7 +91,7 @@ Page<AttendanceSuccessPageData>({
     if (this.data.eventId) openPage(`/pages/coach/event/index?id=${encodeURIComponent(this.data.eventId)}`);
   },
   openSchedule() {
-    openPage("/pages/coach/schedule/index");
+    openTab("/pages/coach/schedule/index");
   },
 });
 

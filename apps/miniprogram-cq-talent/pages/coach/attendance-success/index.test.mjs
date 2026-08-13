@@ -4,12 +4,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   getCoachWorkbench: vi.fn(),
   openPage: vi.fn(),
+  openTab: vi.fn(),
   requireRole: vi.fn(),
 }));
 
 vi.mock("../../../utils/api", () => ({ getCoachWorkbench: mocks.getCoachWorkbench }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
-vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
+vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage, openTab: mocks.openTab }));
 vi.mock("../../../utils/presentation", () => ({
   formatCalendarDate: (value) => String(value).slice(0, 10),
   formatTimeRange: () => "09:00-10:00",
@@ -65,6 +66,7 @@ describe("coach attendance success", () => {
   beforeEach(() => {
     mocks.getCoachWorkbench.mockReset();
     mocks.openPage.mockReset();
+    mocks.openTab.mockReset();
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
   });
 
@@ -113,11 +115,11 @@ describe("coach attendance success", () => {
     page.openWorkbench();
     page.openSchedule();
     expect(mocks.openPage).toHaveBeenNthCalledWith(1, "/pages/coach/event/index?id=event-1");
-    expect(mocks.openPage).toHaveBeenNthCalledWith(2, "/pages/coach/schedule/index");
+    expect(mocks.openTab).toHaveBeenNthCalledWith(1, "/pages/coach/schedule/index");
 
     const emptyPage = createPageInstance();
     emptyPage.openWorkbench();
-    expect(mocks.openPage).toHaveBeenCalledTimes(2);
+    expect(mocks.openPage).toHaveBeenCalledTimes(1);
   });
 
   it("keeps the template state-gated, data-driven, and free of unsafe WXML expressions", () => {

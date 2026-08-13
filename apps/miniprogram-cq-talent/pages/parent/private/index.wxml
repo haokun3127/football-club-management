@@ -85,5 +85,5 @@
     <view wx:if="{{canSubmit && !submitting}}" class="submit-button" bindtap="submit">{{submitLabel}}</view>
     <view wx:else class="submit-button submit-button--disabled">{{submitLabel}}</view>
   </view>
-  <role-tabbar wx:if="{{state !== 'ready'}}" role="parent" active="child" />
+  <role-tabbar wx:if="{{state !== 'ready'}}" role="parent" active="discover" />
 </view>

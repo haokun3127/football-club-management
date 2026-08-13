@@ -38,5 +38,5 @@
     </block>
   </view>
 
-  <role-tabbar role="parent" active="child" />
+  <role-tabbar role="parent" active="discover" />
 </view>

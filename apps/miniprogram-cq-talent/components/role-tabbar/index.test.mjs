@@ -12,6 +12,7 @@ const expectedItems = {
     ["schedule", "/pages/parent/schedule/index"],
     ["growth", "/pages/parent/growth/index"],
     ["child", "/pages/parent/child/index"],
+    ["discover", "/pages/parent/content/index"],
   ],
   coach: [
     ["schedule", "/pages/coach/schedule/index"],
@@ -20,7 +21,7 @@ const expectedItems = {
   ],
 };
 
-const iconNames = ["calendar", "growth", "child", "training", "user"];
+const iconNames = ["calendar", "growth", "child", "discover", "training", "user"];
 
 describe("role tabbar real-device icon contract", () => {
   it("keeps both role manifests, keys, and paths unchanged", () => {

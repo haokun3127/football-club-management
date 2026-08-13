@@ -129,7 +129,7 @@ describe("parent private lesson result", () => {
   it("does not retain route-derived success data or unsupported confirmation promises", () => {
     expect(template).toContain('state="{{state}}"');
     expect(template).toContain('wx:if="{{state === \'ready\' && request}}"');
-    expect(template).toContain('<role-tabbar role="parent" active="child" />');
+    expect(template).toContain('<role-tabbar role="parent" active="discover" />');
     expect(template).not.toContain("24");
     expect(template).not.toContain("Coach Lin");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
