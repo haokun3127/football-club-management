@@ -83,7 +83,8 @@ describe("parent venues", () => {
         longitude: 106.5,
         monthlyCount: 4,
         canNavigate: true,
-        usageLabel: "近30天使用 4次",
+        usageLabel: "本月训练 4次",
+        heroImage: "/assets/venues/venue-1.jpg",
       }],
     });
     expect(page.data.venues[0]).not.toHaveProperty("gradient");

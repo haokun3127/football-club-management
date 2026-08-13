@@ -43,6 +43,7 @@ page {
 
   /* 间距（rpx） */
   --spacing-page: 24rpx;
+  --space-page: 32rpx; /* 新版画板 Body p-16px；venues/coaches/content-select 等页引用 */
   --spacing-card: 24rpx;
   --spacing-card-gap: 20rpx;
   --spacing-stack: 16rpx;

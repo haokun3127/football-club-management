@@ -36,6 +36,7 @@ type ActivityDetailView = ActivityDetail & {
   childInitial: string;
   childStatusLabel: string;
   confirmationText: string;
+  offlineConfirmText: string;
   attendanceConfirmed: boolean;
 };
 
@@ -128,6 +129,7 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
     childInitial: (child?.name || "学").slice(0, 1),
     childStatusLabel,
     confirmationText: childStatusLabel,
+    offlineConfirmText: `本次训练须经教练或家长在现场确认，无需在 APP 进行操作。请${child?.name || "学员"}准时到场。`,
     attendanceConfirmed: childStatusLabel === "已到场",
   };
 }

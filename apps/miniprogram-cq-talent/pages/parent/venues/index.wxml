@@ -25,11 +25,12 @@
         <view wx:if="{{hasVisibleVenues}}">
           <view wx:for="{{visibleVenues}}" wx:key="id" class="venue-card">
             <view class="venue-card__hero">
+              <image class="venue-card__photo" src="{{item.heroImage}}" mode="aspectFill" />
               <view class="venue-card__type">{{item.type}}</view>
             </view>
             <view class="venue-card__body">
               <view class="venue-card__name">{{item.name}}</view>
-              <view class="venue-card__address">📍 {{item.address}}</view>
+              <view class="venue-card__address"><image src="/assets/icons/map-pin.svg" mode="aspectFit" />{{item.address}}</view>
               <view wx:if="{{item.hasTags}}" class="venue-card__tags">
                 <view wx:for="{{item.tags}}" wx:key="*this" wx:for-item="tag" class="tag-chip">{{tag}}</view>
               </view>
@@ -48,5 +49,5 @@
       </view>
     </block>
   </view>
-  <role-tabbar role="parent" active="child" />
+  <role-tabbar role="parent" active="discover" />
 </view>

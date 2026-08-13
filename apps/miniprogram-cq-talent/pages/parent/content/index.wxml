@@ -13,7 +13,7 @@
     />
 
     <block wx:if="{{state === 'ready'}}">
-      <view class="section-title">分类导航</view>
+      <view class="section-title section-title--first">分类导航</view>
       <scroll-view scroll-x class="pills" enhanced show-scrollbar="{{false}}">
         <view class="pills__inner">
           <view
@@ -27,6 +27,16 @@
       </scroll-view>
 
 
+      <view class="featured-card" bindtap="openFeatured">
+        <image class="featured-card__photo" src="/assets/content/featured-venue.jpg" mode="aspectFill" />
+        <view class="featured-card__scrim"></view>
+        <view class="featured-card__content">
+          <view class="featured-card__chip">场地</view>
+          <view class="featured-card__title">球场预订指南</view>
+          <view class="featured-card__subtitle">了解各场地设施与预订流程</view>
+        </view>
+      </view>
+
       <view class="section-title">快速入口</view>
       <view class="quick-grid">
         <view
@@ -36,7 +46,7 @@
           data-category="{{item.category}}"
           bindtap="openQuickLink"
         >
-          <view class="quick-card__icon" style="background: {{item.color}}19; color: {{item.color}}">{{item.icon}}</view>
+          <view class="quick-card__icon" style="background: {{item.color}}1a"><image src="{{item.icon}}" mode="aspectFit" /></view>
           <view class="quick-card__label">{{item.label}}</view>
         </view>
       </view>
@@ -57,5 +67,5 @@
       </view>
     </block>
   </view>
-  <role-tabbar role="parent" active="child" />
+  <role-tabbar role="parent" active="discover" />
 </view>

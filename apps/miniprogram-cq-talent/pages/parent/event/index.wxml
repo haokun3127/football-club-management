@@ -18,8 +18,8 @@
       </view>
       <view class="detail-card detail-card--training"><view class="detail-card__head"><view class="detail-card__title">训练内容</view><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view><view class="detail-card__copy">{{detail.trainingSummary}}</view></view>
       <view class="detail-card detail-card--ability"><view class="detail-card__title">关联能力</view><view class="ability-tags"><view wx:for="{{detail.abilityChips}}" wx:key="*this" class="ability-tag">{{item}}</view></view></view>
-      <view class="detail-card detail-card--confirm"><view class="detail-card__head"><image src="/assets/icons/alert.svg" mode="aspectFit" /><view class="detail-card__title">出勤状态</view></view><view class="detail-card__copy">{{detail.confirmationText}}</view></view>
-      <view class="attendance-button {{detail.attendanceConfirmed ? 'attendance-button--confirmed' : ''}}">{{detail.attendanceConfirmed ? '已确认出席' : detail.confirmationText}}</view>
+      <view class="detail-card detail-card--confirm"><view class="detail-card__head"><image src="/assets/icons/alert.svg" mode="aspectFit" /><view class="detail-card__title">线下确认</view></view><view class="detail-card__copy">{{detail.offlineConfirmText}}</view></view>
+      <view class="attendance-button {{detail.attendanceConfirmed ? 'attendance-button--confirmed' : ''}}">{{detail.attendanceConfirmed ? '已确认出席' : '待现场确认'}}</view>
     </block>
 
     <block wx:elif="{{detail && detail.type === 'match'}}">

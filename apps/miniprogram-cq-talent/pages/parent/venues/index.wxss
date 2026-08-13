@@ -11,7 +11,7 @@
 .venues-nav__action image { width: 48rpx; height: 48rpx; }
 
 .venues-page__body {
-  padding: 24rpx var(--space-page) 180rpx;
+  padding: 32rpx var(--space-page) 180rpx;
 }
 
 /* 筛选 chips */
@@ -30,7 +30,7 @@
   border: 1rpx solid var(--color-line);
   border-radius: 40rpx;
   font-size: 26rpx;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-text-secondary);
 }
 
@@ -46,7 +46,7 @@
   display: flex;
   flex-direction: column;
   gap: 32rpx;
-  margin-top: 32rpx;
+  margin-top: 48rpx;
 }
 
 .venue-card {
@@ -57,16 +57,26 @@
 }
 
 .venue-card__hero {
+  position: relative;
   height: 320rpx;
   display: flex;
   align-items: flex-end;
   padding: 32rpx;
   box-sizing: border-box;
   background: var(--color-page);
+  overflow: hidden;
+}
+
+.venue-card__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .venue-card__type {
-  background: var(--color-brand);
+  position: relative;
+  background: #3b82f6;
   padding: 8rpx 16rpx;
   border-radius: 12rpx;
   font-size: 22rpx;
@@ -85,9 +95,18 @@
 }
 
 .venue-card__address {
-  margin-top: 16rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 24rpx;
   font-size: 26rpx;
   color: var(--color-text-secondary);
+}
+
+.venue-card__address image {
+  flex: 0 0 auto;
+  width: 28rpx;
+  height: 28rpx;
 }
 
 .venue-card__facilities {
@@ -117,7 +136,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 24rpx;
+  margin-top: 32rpx;
 }
 
 .venue-card__count {

@@ -8,6 +8,7 @@ interface VenueView extends VenueInfo {
   hasFacilities: boolean;
   hasTags: boolean;
   usageLabel: string;
+  heroImage: string;
 }
 
 interface PageData {
@@ -99,7 +100,7 @@ Page<PageData>({
 });
 
 function presentVenues(venues: VenueInfo[]): VenueView[] {
-  return venues.map(({ id, name, type, address, tags, facilities, latitude, longitude, monthlyCount }) => ({
+  return venues.map(({ id, name, type, address, tags, facilities, latitude, longitude, monthlyCount }, index) => ({
     id,
     name,
     type,
@@ -112,7 +113,8 @@ function presentVenues(venues: VenueInfo[]): VenueView[] {
     canNavigate: hasRealCoordinates(latitude, longitude),
     hasFacilities: facilities.length > 0,
     hasTags: tags.length > 0,
-    usageLabel: `近30天使用 ${monthlyCount}次`,
+    usageLabel: `本月训练 ${monthlyCount}次`,
+    heroImage: `/assets/venues/venue-${(index % 3) + 1}.jpg`,
   }));
 }
 

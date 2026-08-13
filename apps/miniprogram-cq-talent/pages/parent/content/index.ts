@@ -48,10 +48,10 @@ const CATEGORIES: Category[] = [
 ];
 
 const QUICK_LINKS: QuickLink[] = [
-  { icon: "场", color: "#2068d8", label: "场地信息", category: "venue", page: "/pages/parent/venues/index" },
-  { icon: "问", color: "#b06800", label: "帮助中心", category: "help", page: "/pages/parent/help/index" },
-  { icon: "教", color: "#188050", label: "教练团队", category: "coach", page: "/pages/parent/coaches/index" },
-  { icon: "训", color: "#a80818", label: "训练攻略", category: "guide" },
+  { icon: "/assets/icons/content-map-pin.svg", color: "#1976d2", label: "场地信息", category: "venue", page: "/pages/parent/venues/index" },
+  { icon: "/assets/icons/content-help-circle.svg", color: "#ff9800", label: "帮助中心", category: "help", page: "/pages/parent/help/index" },
+  { icon: "/assets/icons/content-users.svg", color: "#22c55e", label: "教练团队", category: "coach", page: "/pages/parent/coaches/index" },
+  { icon: "/assets/icons/content-book.svg", color: "#a80f1b", label: "训练攻略", category: "guide" },
 ];
 
 Page<PageData>({
@@ -100,6 +100,9 @@ Page<PageData>({
   },
   selectCategory(event: { currentTarget: { dataset: { value: string } } }) {
     this.applyFilter(event.currentTarget.dataset.value);
+  },
+  openFeatured() {
+    this.applyFilter("venue");
   },
   openQuickLink(event: { currentTarget: { dataset: { category: string } } }) {
     const link = QUICK_LINKS.find((item) => item.category === event.currentTarget.dataset.category);
