@@ -71,7 +71,7 @@ describe("parent content center", () => {
     expect(Object.keys(page.data.articles[0]).sort()).toEqual(["accent", "category", "id", "subtitle", "title"]);
   });
 
-  it("uses an error state for failed loads and empty states for missing content", async () => {
+  it("uses an error state for failed loads but keeps the static sections when no articles exist", async () => {
     mocks.getContentArticles.mockRejectedValue(new Error("network unavailable"));
     const failedPage = createPageInstance();
 
@@ -89,9 +89,9 @@ describe("parent content center", () => {
     await emptyPage.loadArticles();
 
     expect(emptyPage.data).toMatchObject({
-      state: "empty",
+      state: "ready",
       hasVisibleArticles: false,
-      message: "暂无可展示的内容",
+      emptyMessage: "暂无可展示的内容",
     });
   });
 
@@ -128,6 +128,16 @@ describe("parent content center", () => {
       hasVisibleArticles: true,
       visibleArticles: [{ id: "guide-1" }],
     });
+  });
+
+  it("renders the category, featured, and quick-link sections outside the article-availability gate", () => {
+    const gateIndex = template.indexOf('wx:if="{{hasVisibleArticles}}"');
+    expect(gateIndex).toBeGreaterThan(-1);
+
+    for (const marker of ['class="pills"', 'class="featured-card"', 'class="quick-grid"']) {
+      expect(template).toContain(marker);
+      expect(template.indexOf(marker)).toBeLessThan(gateIndex);
+    }
   });
 
   it("does not expose unsupported search or article-detail actions in the template", () => {

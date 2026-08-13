@@ -78,14 +78,13 @@ Page<PageData>({
     try {
       const articles = presentArticles(await getContentArticles());
       const visibleArticles = filterArticles(articles, this.data.activeCategory);
-      const hasArticles = articles.length > 0;
       this.setData({
-        state: hasArticles ? "ready" : "empty",
-        message: hasArticles ? "" : "暂无可展示的内容",
+        state: "ready",
+        message: "",
         articles,
         visibleArticles,
         hasVisibleArticles: visibleArticles.length > 0,
-        emptyMessage: hasArticles ? "当前分类暂无内容" : "暂无可展示的内容",
+        emptyMessage: articles.length > 0 ? "当前分类暂无内容" : "暂无可展示的内容",
       });
     } catch {
       this.setData({
