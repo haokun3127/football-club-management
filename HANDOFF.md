@@ -102,7 +102,8 @@ process.env.NODE_ENV !== "production" && process.env.FCM_CQ_TALENT_ACCEPTANCE_SE
 
 **用户已裁决（2026-08-13）：一律使用线上环境，小程序任何环境都直连生产，不走本地 API。** 路径 2（本地 seed）被否决。剩余待裁决：路径 1（受控 INSERT 进生产）或路径 3（空态引导做完整）。
 
-**新发现（同日实测）：生产部署的 API 版本落后于 dev 分支**——小程序当前调用的 `/content/venues`、`/content/coaches` 在生产返回 **404 路由不存在**，而旧路由 `/venues` 在生产存在（403 是鉴权拦截）。本地 dev 代码两条路由都有。含义：快速入口页要在线上出内容，除了灌数据，还需要把当前 API 代码部署到生产（用户授权的运维操作），或小程序改回旧路由。
+**已修正的误判（同日复查）：** 小程序控制台出现的 `/content/venues`、`/content/coaches` 404 来自**模拟器里的旧编译产物**，不是生产缺路由——当前 dev 客户端实际调用 `/venues` 与 `/coach-team`（`utils/api.ts:1156,1164`），这两条在生产都存在（403 只是鉴权拦截）。DevTools 里改过代码后留意强制重编译，别拿旧 bundle 的报错当生产事实。
+**另一个事实（同日 diff 实测）：** 生产运行代码整体大幅落后 dev（apps/api/src 与 packages/domain 几十个文件差异，缺 `ops/`、`app-client-session-repository.ts` 等——生产会话可能不持久）。是否重新部署由用户裁决；部署前备份与回滚镜像标签（`rollback-pre-75fd0e9`）已就位，release 树已传至 `/opt/cq-talent-releases/75fd0e9`。
 
 本轮没有执行任何生产写库操作。
 
