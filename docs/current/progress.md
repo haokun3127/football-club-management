@@ -672,3 +672,11 @@
 - 流程：docker exec VACUUM INTO 备份（api-backup-pre-75fd0e9-20260813.sqlite）→ 旧镜像打 rollback-pre-75fd0e9 标签 → git archive HEAD 上传解包 /opt/cq-talent-releases/75fd0e9 → docker build 新镜像（432f1457e0fe）→ sudo docker compose up -d --no-build --force-recreate（.env.runtime root 600 需 sudo，首次裸跑失败导致约 2 分钟停机）
 - 验证：容器跑新镜像 sha256:432f1457e0fe；迁移 0009/0010 自动应用（app_client_sessions、student_guardian_bindings 表已建）；/health 200；/venues 403 鉴权拦截（路由存在）；备份文件在卷内
 - 影响：会话表上线后旧内存会话失效，所有用户下次需重新授权一次（模拟器同）
+
+## 2026-08-13 发现区复原巡检 + 家长端 15 页全量 smoke（生产会话）
+- 发现区 4 画板（P8 内容中心/venues-premium/P8.2 帮助中心/coach-team）与实现逐项比对：结构均已对齐，tokens 即设计色（brand #a80f1b、card 白、quick-card 带边框圆角、coach-card 白卡+阴影）；vision 对比报的『灰色/无卡片』多为比对噪声
+- 真实缺口全部收敛为**后端字段缺失**（不伪造）：赛季目标行、教练角色 pill/角色色头像框、微信联系按钮——API coach-team 无 goal/role/contact 字段
+- 白屏根因修复：venues/help/coaches/content/private-success 五页 index.json 未注册 status-view（未注册组件静默不渲染）→ 全部补注册（adb44f0），venues/help 现为正确空态、coaches 真实列表
+- 家长端 15 路由 smoke（mp-smoke + 生产会话）：13 ready/empty 正确；metric、private-success 为参数页，无参时给正确错误态（非缺陷）
+- launch 页 reLaunch 推迟到 appLaunch 后执行，消除 non-empty page stack 报错（1fd4465）
+- P2 训练详情导航徽章改按孩子出勤状态着色（159d458）
