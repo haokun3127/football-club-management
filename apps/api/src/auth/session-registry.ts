@@ -28,11 +28,13 @@ export function parseBearerToken(authorization: string | undefined): string | un
 }
 
 export class SessionRegistry {
+  // 会话默认 30 天：俱乐部内部应用，家长/教练授权一次长期使用（原 7200s 导致每 2 小时强制重新授权）
+  static readonly DEFAULT_TTL_SECONDS = 30 * 24 * 60 * 60;
   private readonly sessions = new Map<string, AppClientSessionRecord>();
 
   constructor(private readonly repository?: AppClientSessionRepository) {}
 
-  async create(input: AppClientSessionInput, expiresInSeconds = 7200): Promise<AppClientSessionDelivery> {
+  async create(input: AppClientSessionInput, expiresInSeconds = SessionRegistry.DEFAULT_TTL_SECONDS): Promise<AppClientSessionDelivery> {
     const created = this.createRecord(input, expiresInSeconds);
     if (this.repository) {
       this.repository.create(created.record);
@@ -54,7 +56,7 @@ export class SessionRegistry {
     return session;
   }
 
-  async rotate(token: string | undefined, input: AppClientSessionInput, expiresInSeconds = 7200): Promise<AppClientSessionDelivery | null> {
+  async rotate(token: string | undefined, input: AppClientSessionInput, expiresInSeconds = SessionRegistry.DEFAULT_TTL_SECONDS): Promise<AppClientSessionDelivery | null> {
     if (!token) return null;
     const now = new Date().toISOString();
     const replacement = this.createRecord(input, expiresInSeconds, now);
