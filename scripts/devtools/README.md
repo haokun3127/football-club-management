@@ -46,9 +46,10 @@ python scripts/devtools/sidebyside.py \
 2. `mp.screenshot` 超时（60s）= 模拟器渲染面卡住。**先查 DevTools 主窗口是否失焦/最小化**——实测窗口不在前台会导致截图通道挂死，把窗口 ShowWindow 还原置前台即可恢复（无需重启）；不行再 `cli.bat quit` 后重新 `cli auto`
 3. 端口会莫名失效（`Failed connecting to ws://...`）——换个新端口重新 `cli auto` 注册即可，别在死端口上重试
 4. **不要用 `DEV_AUTO_SESSION=true` 验生产页面**：生产 API 硬关 x-user-id 头鉴权，假会话只会 403，且残留 wx storage 造成持续 403（补救：`mp.callWxMethod("clearStorage")` + 干净重启）
-5. 授权弹窗/身份选择自动化点不动，必须用户手动点
+5. 授权弹窗/身份选择可用 **cua-driver 前景真点击**全自动（2026-08-14 验证）：`uv tool install cua-driver` → `cua-driver serve` → `get_window_state`（须选对 title 含「开发者工具」的窗口，wechatdevtools 还有 nw.js 外壳窗）拿元素坐标 → `click` 带 `delivery_mode:"foreground"`（Chromium 上 background/UIA Invoke 无效）→ 弹窗「允许」**只点一次**（双点复用 phone code 会 wechat-login 400）
 6. 强杀 DevTools 进程会白屏（`Ctrl+Win+Shift+B` 恢复），用 `cli.bat quit`
 7. 截图前留 8-15s 给编译；脚本内已含等待与轮询
+8. **`cli.bat auto/open` 启动的项目窗口会整窗白屏**（2026-08-14，UIA 仅 5 元素、截图纯白；automator 导航正常但 page.screenshot 必超时；清 GPU/Shader/Code 缓存、换端口、Ctrl+Win+Shift+B、反复 quit+auto 全部无效）。**用户手动正常打开的实例无此问题——白屏后恢复 = 请用户手动重启 IDE**，勿再用 cli 循环重启
 
 ## 完整逐页验收循环
 
