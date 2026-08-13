@@ -4,6 +4,7 @@
 
 ## 从这里开始
 
+- [总交接文档 HANDOFF.md](../HANDOFF.md)：**接手第一篇**（2026-08-13，→ Kimi）。当前任务、待办优先级、环境接入、已知坑和提交纪律。
 - [当前项目进度](current/progress.md)：正在推进的工作、已知阻塞和真实验证状态。
 - [当前架构](current/architecture.md)：服务、数据和模块边界。
 - [API 契约](current/api-contract.md)：对外/客户端接口约定。
@@ -20,10 +21,16 @@
 
 ## 设计资料
 
+- [在线画板 ID 映射](design/specifications/figma-online-frame-map-2026-08-12.md)：Figma 画板 ↔ 小程序路由对照，复原任务的施工图纸。
+- [49 张设计稿离线 PNG](design/reference/figma/)：家长 21 + 教练 28，375 宽原尺寸，含画板↔文件对照表。日常比对优先用这里，不必每次调 Figma MCP。
 - [Figma 审计与 Token](design/figma/)：设计变量、全量实施决策和视觉审计。
 - [页面规格](design/specifications/)：按家长端、教练端、批次和通用页面分类的实现规格。
 
 这些规格来自历史 Figma 导出。页面实现和新修改必须以在线 Figma 文件为准，具体地址见“Figma 权威来源”。
+
+## 工具链
+
+- [DevTools 截图工具链](../scripts/devtools/README.md)：路由跳转 + 375×812 截图 + 设计稿合成对比，含全部已知坑。视觉验收全靠它。
 
 ## 计划与历史
 

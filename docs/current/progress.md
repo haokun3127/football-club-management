@@ -635,3 +635,34 @@
 - P1 Schedule Home 已对齐新设计（周历去箭头、今日红圈/选中深色圈双高亮），提交 4e0bd64，375x812 截图验收通过
 - 教训：DEV_AUTO_SESSION 对生产 API 无效（生产硬关 x-user-id 头鉴权）且伪造会话残留 wx storage 致持续 403；补救=clearStorage+干净重启；生产页面验收必须真实微信会话
 - 截图工具链：automator reLaunch/navigateTo promise 挂起，须走 callWxMethod('reLaunch') 通道（tmp/prod-verify/mp-route-shot.cjs 已封装，当前自动化端口 9428）
+
+## 2026-08-13 家长端导航补齐 + 内容中心整页空态根因修复
+
+### 已提交（5 个提交）
+
+- `d674b15` 家长端底部导航从三格补为设计稿的四格：新增 `discover` 图标与 `ROLE_TABS` 条目，内容/场地/帮助/教练团队/私教申请及结果页此前只能高亮「我的孩子」，现改为高亮「发现」。同时新增 `openTab` 走 `reLaunch`：tab 根页之间原用 `navigateTo`，页面栈会持续堆叠且超过 10 层后静默失败；`openPage` 的失败回调也降级到 `reLaunch` 兜底。
+- `df7085f` 三处入口缺口修复：日程页训练任务原跳 `/coach/training/index?eventId=x`，但训练管理页是 tab 根页、不读 `eventId`，点进去等于丢上下文，改跳 `content-select`；`lesson-correction` 与 `test-tasks` 两页在 `app.json` 注册但全站无入口，分别由课时确认页「发起更正」和训练管理页「测评任务」页签接入。
+- `d7a3309` 内容中心/场地/活动详情对齐设计稿：文字图标块换线性 SVG、补推荐大图卡、场地卡补实景图、地址行 emoji 换 `map-pin` 图标；活动详情训练类出勤区改「线下确认」文案，不再暗示 APP 内可确认出勤；tokens 补 `--space-page`。
+- `2613721`、`1ab6785` DevTools 工具链收编进仓库：`scripts/devtools/` 下 `mp-route-shot.cjs`、`mp-batch-shot.cjs`、`mp-eval.cjs`、`mp-smoke.cjs`、`page-data.cjs`、`focus-devtools.ps1`、`sidebyside.py` 加使用说明与已知坑。批量截图在单连接内跑完整条路由清单，比每页重连快一个量级。
+
+### 未提交：内容中心整页空态根因修复
+
+- 现象：内容中心点进去整页空白，只有顶栏。
+- 根因：`state` 把「加载失败」和「文章列表为空」混为一谈——文章数为 0 时置 `state: "empty"`，而 WXML 把分类导航、推荐卡、快速入口四格等**静态设计内容整体挂在 `state === 'ready'` 之下**，于是后端返回空文章列表会连带擦掉整页。页面本已有 `hasVisibleArticles` / `emptyMessage` 字段，但在旧逻辑下是不可达的死代码。
+- 修复：加载成功一律 `state: "ready"`；文章数为 0 只驱动「最近文章」段内的空提示。测试同步改为断言段级空提示，并加结构守卫防止静态块再次被文章数据门禁。小程序 Vitest `54 files / 307 tests` 通过。
+- 验证：模拟器实测 `state: "ready"` / `articles: 0`，整页正常渲染（顶栏、分类 pills、推荐卡、快速入口四格、最近文章段内空提示、四格底栏且「发现」高亮）。
+
+### 「除教练团队外都没内容」根因（数据侧，未修）
+
+用户报告快速入口点进去大多没内容。逐个接口实测（真实会话，Bearer 不记录）：
+
+| 接口 | 结果 |
+|---|---|
+| `/content/articles` | `200` `{"articles":[]}` |
+| `/content/faqs` | `200` `{"questions":[]}` |
+| `/venues` | `200` `{"venues":[]}` |
+| `/coach-team` | 有真实数据 |
+
+根因：`contentArticles` / `contentFaqs` / `venues` 三个集合**只存在于验收 seed** `apps/api/src/seed/cq-talent-acceptance.ts:653`（4 篇文章、5 条 FAQ、3 个场地），而该 seed 在 `apps/api/src/seed/index.ts:44` 被限制为 `NODE_ENV !== "production"` 且 `FCM_CQ_TALENT_ACCEPTANCE_SEED === "1"`，**生产按设计永不加载**，因此线上三个集合为空。教练团队页有内容是因为 `coach-team` 路由（`apps/api/src/routes/app-client.routes.ts:2097`）读的是 `listTeams` / `listCoaches` 运营实体表，那里有 2026-08-12 补数写入的真实数据。
+
+结论：这不是页面渲染缺陷，页面的空态、跳转与入口都是对的（`venues`/`help`/`coaches` 三页的整页空态是这些页面本身没有静态设计内容，与内容中心的情况不同，属正确行为）。属内容运营数据缺失。待用户裁决灌数方式后另立任务，三条候选路径：① 受控 INSERT 进生产库（须先 `VACUUM INTO` 备份 + 写后 `docker restart cq-talent-api`）；② 只在本地带 `FCM_CQ_TALENT_ACCEPTANCE_SEED=1` 跑，小程序指向本地；③ 不灌数，按设计稿补更完整的空态引导。本轮未执行任何生产写库。
