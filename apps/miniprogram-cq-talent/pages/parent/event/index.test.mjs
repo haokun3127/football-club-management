@@ -78,15 +78,26 @@ describe("parent activity detail", () => {
   it("derives missing match and other values as unavailable instead of Figma sample facts", async () => {
     mocks.getParentActivityDetail
       .mockResolvedValueOnce(detail({ type: "match", title: "真实比赛" }))
+      .mockResolvedValueOnce(detail({ type: "match", title: "真实完赛", status: "completed" }))
       .mockResolvedValueOnce(detail({ type: "other", title: "真实活动" }));
     const matchPage = createPageInstance();
 
     await matchPage.load("match-event");
 
+    // 设计稿语义：未开始的比赛显示 0:0
     expect(matchPage.data.detail).toMatchObject({
       type: "match",
       homeTeam: "主队待确认",
       awayTeam: "对手待确认",
+      scoreText: "0:0",
+    });
+
+    const finishedPage = createPageInstance();
+    await finishedPage.load("finished-match-event");
+
+    // 已结束但比分未录入：保持如实占位，不伪造比分
+    expect(finishedPage.data.detail).toMatchObject({
+      type: "match",
       scoreText: "比分待确认",
     });
 

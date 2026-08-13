@@ -417,6 +417,8 @@ describe("api server", () => {
       }),
     }));
     expect(eventBody.event.participants.every((participant) => participant.studentId === "student-1")).toBe(true);
+    // 事件无 teamName 字段时按 primaryTeamId 从 teams 表解析
+    expect((eventBody.event as { teamName?: string }).teamName).toBe("U10发展队");
     expect(parentUsingAdminClient.statusCode).toBe(403);
     expect(parentUsingAdminClient.json().error.code).toBe("forbidden");
     expect(parentOtherStudent.statusCode).toBe(403);

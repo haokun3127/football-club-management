@@ -128,7 +128,7 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
     abilityChips: collectAbilityChips(detail),
     homeTeam: displayValue(fieldValue(detail, ["主队", "队伍"]), "主队待确认"),
     awayTeam: sectionValue(detail, ["比赛信息"], ["对手"]) || "对手待确认",
-    scoreText: /^\d+\s*[:：]\s*\d+$/.test(rawScore) ? rawScore : "比分待确认",
+    scoreText: /^\d+\s*[:：]\s*\d+$/.test(rawScore) ? rawScore : status.label === "待开始" ? "0:0" : "比分待确认",
     roster: detail.participants.slice(0, 3).map((participant, index) => rosterItem(participant, index)),
     otherDescription,
     otherNotice,

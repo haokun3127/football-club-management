@@ -1314,11 +1314,19 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         visibleEvent = { ...event, participants: visibleParticipants };
       }
 
+      // 事件只存 primaryTeamId，详情展示需要队名——按 teams 表实时解析（真实数据）
+      const primaryTeamName = visibleEvent.primaryTeamId
+        ? context.store.listTeams(request.params.clubId).find((team) => team.id === visibleEvent.primaryTeamId)?.name
+        : undefined;
+      const enrichedEvent = !visibleEvent.teamName && primaryTeamName
+        ? { ...visibleEvent, teamName: primaryTeamName }
+        : visibleEvent;
+
       return {
         clubId: request.params.clubId,
         client: summarizeClient(client),
         role,
-        event: visibleEvent,
+        event: enrichedEvent,
       };
     },
   );
