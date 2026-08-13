@@ -42,18 +42,20 @@ Page<LaunchData>({
       setAppContext(context);
       const existing = getSession();
       if (existing?.role) {
-        routeHome(existing.role);
+        deferAfterLaunch(() => routeHome(existing.role as AppRole));
         return;
       }
       if (DEV_MODE && DEV_AUTO_SESSION) {
         const role = getDevRole();
         setSession(createDevSession(context, role));
         this.setData({ devHint: `开发身份：${role === "parent" ? "家长" : "教练"}` });
-        routeHome(role);
+        deferAfterLaunch(() => routeHome(role));
         return;
       }
       const code = await requestWechatCode();
-      wx.reLaunch({ url: `/pages/login/index?code=${encodeURIComponent(code)}` });
+      deferAfterLaunch(() => {
+        wx.reLaunch({ url: `/pages/login/index?code=${encodeURIComponent(code)}` });
+      });
     } catch (error) {
       this.setData({
         state: "error",
@@ -77,6 +79,15 @@ Page<LaunchData>({
 function readableError(error: unknown) {
   const record = error as { message?: string; code?: string };
   return record?.message || record?.code || "暂时无法连接俱乐部服务，请检查网络后重试。";
+}
+
+// 热重载/重启时页面栈非空，appLaunch 阶段直接 reLaunch 会被框架拒绝
+//（appLaunch with non-empty page stack）。推迟到启动阶段结束后执行。
+const runtimeTimers = globalThis as unknown as {
+  setTimeout: (callback: () => void, delay: number) => number;
+};
+function deferAfterLaunch(action: () => void) {
+  runtimeTimers.setTimeout(action, 0);
 }
 
 function requestWechatCode() {
