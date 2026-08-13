@@ -30,6 +30,7 @@
 
   <view wx:if="{{state === 'ready' && hasRoster}}" class="c5-confirm-bar">
     <button class="c5-confirm-bar__button" loading="{{saving}}" disabled="{{saving || !canConfirm}}" bindtap="confirmLesson">确认全部</button>
+    <view class="c5-confirm-bar__correction" bindtap="openCorrection">发起更正</view>
   </view>
 
   <role-tabbar role="coach" active="schedule" />

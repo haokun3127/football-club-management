@@ -136,3 +136,13 @@
   font-weight: 600;
   line-height: 104rpx;
 }
+
+.c5-confirm-bar__correction {
+  margin-top: 24rpx;
+  color: #a80f1b;
+  font-size: 28rpx;
+  font-weight: 500;
+  line-height: 34rpx;
+  text-align: center;
+  text-decoration: underline;
+}

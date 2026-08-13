@@ -77,6 +77,9 @@ Page({
   openTeam() {
     openPage("/pages/coach/team/index");
   },
+  openTestTasks() {
+    openPage("/pages/coach/test-tasks/index");
+  },
   retry() {
     this.load();
   },

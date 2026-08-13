@@ -16,6 +16,7 @@
     <view class="c8-tab c8-tab--active">训练管理</view>
     <view class="c8-tab" bindtap="openTeamAbility">能力评估</view>
     <view class="c8-tab" bindtap="openTeam">学员管理</view>
+    <view class="c8-tab" bindtap="openTestTasks">测评任务</view>
   </view>
 
   <view class="c8-body">

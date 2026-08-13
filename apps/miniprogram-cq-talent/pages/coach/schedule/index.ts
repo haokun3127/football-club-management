@@ -1,7 +1,7 @@
 import { getCoachHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { currentLocalDate } from "../../../utils/date";
-import { openPage } from "../../../utils/navigation";
+import { openPage, openTab } from "../../../utils/navigation";
 import { activityStatus, formatCalendarDate, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachHome, CoachTask, CoachTaskAction, LoadState, ScheduleEvent } from "../../../utils/types";
 
@@ -126,7 +126,7 @@ Page({
     this.load();
   },
   openMe() {
-    openPage("/pages/coach/me/index");
+    openTab("/pages/coach/me/index");
   },
   switchView(event: { currentTarget: { dataset: { mode?: "day" | "week" } } }) {
     const viewMode = event.currentTarget.dataset.mode;
@@ -162,7 +162,7 @@ Page({
       lesson: `/pages/coach/lesson/index?id=${id}`,
       match: `/pages/coach/match/index?id=${id}`,
       assessment: `/pages/coach/test-entry/index?eventId=${id}`,
-      training: `/pages/coach/training/index?eventId=${id}`,
+      training: `/pages/coach/content-select/index?eventId=${id}`,
       view: `/pages/coach/event/index?id=${id}`,
     };
     openPage(routes[action ?? "view"]);

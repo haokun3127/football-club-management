@@ -1,5 +1,6 @@
 import { confirmCoachLesson, getCoachLessonConfirmation, getCoachWorkbench } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { openPage } from "../../../utils/navigation";
 import { formatCalendarDate, formatTimeRange } from "../../../utils/presentation";
 import type { CoachLessonConfirmation, CoachWorkbench, LoadState } from "../../../utils/types";
 
@@ -174,6 +175,10 @@ Page<LessonPageData>({
   },
   retry() {
     this.load(this.data.eventId);
+  },
+  openCorrection() {
+    if (!this.data.eventId) return;
+    openPage(`/pages/coach/lesson-correction/index?id=${this.data.eventId}`);
   },
   async confirmLesson() {
     if (!this.data.eventId || this.data.saving) return;
