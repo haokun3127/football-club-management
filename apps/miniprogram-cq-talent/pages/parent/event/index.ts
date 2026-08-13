@@ -104,11 +104,18 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
   const dateTime = parseDateTimeParts(rawDateTime);
   const rawScore = sectionValue(detail, ["比赛信息"], ["比分"]).trim();
   const childStatusLabel = child ? participantStatusLabel(child.status) : "出勤状态待同步";
+  const trainingPill = detail.type === "training"
+    ? childStatusLabel === "已到场"
+      ? { label: "已到场", tone: "success" as const }
+      : childStatusLabel === "未到场"
+        ? { label: "未到场", tone: "muted" as const }
+        : { label: "待确认", tone: "warning" as const }
+    : { label: status.label, tone: statusTone as "warning" | "success" | "muted" };
   return {
     ...detail,
     navTitle: NAV_TITLES[detail.type],
-    statusLabel: status.label,
-    statusTone,
+    statusLabel: trainingPill.label,
+    statusTone: trainingPill.tone,
     typeLabel: activityTypeLabel(detail.type),
     coachName,
     coachInitial: coachName.slice(0, 1),
