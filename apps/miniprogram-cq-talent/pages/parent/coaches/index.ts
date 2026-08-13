@@ -7,6 +7,9 @@ interface Coach {
   id: string;
   surname: string;
   name: string;
+  role: string;
+  ringColor: string;
+  hasRole: boolean;
   bio: string;
   hasBio: boolean;
 }
@@ -17,6 +20,8 @@ interface PageData {
   teamName: string;
   teamCounts: string[];
   hasTeamCounts: boolean;
+  teamGoal: string;
+  hasGoal: boolean;
   coaches: Coach[];
   hasCoaches: boolean;
   emptyMessage: string;
@@ -31,6 +36,8 @@ Page<PageData>({
     teamName: "",
     teamCounts: [],
     hasTeamCounts: false,
+    teamGoal: "",
+    hasGoal: false,
     coaches: [],
     hasCoaches: false,
     emptyMessage: "暂无可展示的教练",
@@ -53,6 +60,8 @@ Page<PageData>({
           teamName: "",
           teamCounts: [],
           hasTeamCounts: false,
+          teamGoal: "",
+          hasGoal: false,
           coaches: [],
           hasCoaches: false,
           emptyMessage: "暂无可展示的教练",
@@ -61,12 +70,15 @@ Page<PageData>({
       }
       const coaches = presentCoaches(team.coaches);
       const teamCounts = presentTeamCounts(team.teamChips);
+      const teamGoal = (team.teamGoal ?? "").trim();
       this.setData({
         state: "ready",
         message: "",
         teamName: team.teamName,
         teamCounts,
         hasTeamCounts: teamCounts.length > 0,
+        teamGoal,
+        hasGoal: teamGoal.length > 0,
         coaches,
         hasCoaches: coaches.length > 0,
         emptyMessage: coaches.length > 0 ? "" : "暂无可展示的教练",
@@ -78,6 +90,8 @@ Page<PageData>({
         teamName: "",
         teamCounts: [],
         hasTeamCounts: false,
+        teamGoal: "",
+        hasGoal: false,
         coaches: [],
         hasCoaches: false,
         emptyMessage: "",
@@ -91,11 +105,24 @@ function presentTeamCounts(teamChips: ClubCoachTeam["teamChips"]): string[] {
 }
 
 function presentCoaches(coaches: ClubCoachTeam["coaches"]): Coach[] {
-  return coaches.map(({ id, name, bio }) => ({
-    id,
-    name,
-    surname: name.slice(0, 1),
-    bio,
-    hasBio: Boolean(bio),
-  }));
+  return coaches.map(({ id, name, role, bio }) => {
+    const trimmedRole = (role ?? "").trim();
+    return {
+      id,
+      name,
+      surname: name.slice(0, 1),
+      role: trimmedRole,
+      ringColor: roleColorOf(trimmedRole),
+      hasRole: trimmedRole.length > 0,
+      bio,
+      hasBio: Boolean(bio),
+    };
+  });
+}
+
+// 设计稿角色色：主教练红 / 助教蓝 / 体能橙；其他教练默认蓝
+function roleColorOf(role: string): string {
+  if (role.includes("主教练")) return "#a80f1b";
+  if (role.includes("体能")) return "#ea580c";
+  return "#2563eb";
 }

@@ -14,14 +14,21 @@
         <view wx:if="{{hasTeamCounts}}" class="team-card__chips">
           <view wx:for="{{teamCounts}}" wx:key="*this" class="team-chip">{{item}}</view>
         </view>
+        <block wx:if="{{hasGoal}}">
+          <view class="team-card__divider"></view>
+          <view class="team-card__goal">{{teamGoal}}</view>
+        </block>
       </view>
 
       <view class="coach-list">
         <view wx:if="{{hasCoaches}}">
           <view wx:for="{{coaches}}" wx:key="id" class="coach-card">
-            <view class="coach-card__avatar">{{item.surname}}</view>
+            <view class="coach-card__avatar" style="border-color:{{item.ringColor}};color:{{item.ringColor}}">{{item.surname}}</view>
             <view class="coach-card__info">
-              <view class="coach-card__name">{{item.name}}</view>
+              <view class="coach-card__name-row">
+                <view class="coach-card__name">{{item.name}}</view>
+                <view wx:if="{{item.hasRole}}" class="coach-card__role" style="background:{{item.ringColor}}">{{item.role}}</view>
+              </view>
               <view wx:if="{{item.hasBio}}" class="coach-card__bio">{{item.bio}}</view>
             </view>
           </view>

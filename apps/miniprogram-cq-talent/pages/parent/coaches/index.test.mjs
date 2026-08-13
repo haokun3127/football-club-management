@@ -42,8 +42,8 @@ function createPageInstance(data = {}) {
 const team = {
   teamName: "真实队伍",
   teamChips: ["17名球员", "2支队伍", "2020年成立"],
-  teamGoal: "不应展示的目标",
-  coaches: [{ id: "coach-1", name: "真实教练", role: "不应展示的角色", bio: "真实教练简介" }],
+  teamGoal: "本赛季目标：打磨传控与团队协作。",
+  coaches: [{ id: "coach-1", name: "真实教练", role: "主教练", bio: "真实教练简介" }],
 };
 
 describe("parent coach team", () => {
@@ -54,7 +54,7 @@ describe("parent coach team", () => {
     globalThis.wx.showToast.mockReset();
   });
 
-  it("maps only real team, count, coach-name, and bio fields", async () => {
+  it("maps team, counts, goal, coach role and bio fields from the payload", async () => {
     mocks.getClubCoachTeam.mockResolvedValue(team);
     const page = createPageInstance();
 
@@ -65,11 +65,20 @@ describe("parent coach team", () => {
       teamName: "真实队伍",
       teamCounts: ["17名球员", "2支队伍"],
       hasTeamCounts: true,
+      teamGoal: "本赛季目标：打磨传控与团队协作。",
+      hasGoal: true,
       hasCoaches: true,
-      coaches: [{ id: "coach-1", name: "真实教练", surname: "真", bio: "真实教练简介", hasBio: true }],
+      coaches: [{
+        id: "coach-1",
+        name: "真实教练",
+        surname: "真",
+        role: "主教练",
+        ringColor: "#a80f1b",
+        hasRole: true,
+        bio: "真实教练简介",
+        hasBio: true,
+      }],
     });
-    expect(page.data.coaches[0]).not.toHaveProperty("role");
-    expect(page.data.coaches[0]).not.toHaveProperty("ringColor");
     expect(page.data.teamCounts).not.toContain("2020年成立");
   });
 
@@ -112,20 +121,21 @@ describe("parent coach team", () => {
     });
   });
 
-  it("does not expose default teams, roles, tenure, goals, or direct-contact actions", () => {
+  it("renders goal and role from payload without direct-contact actions or hardcoded club content", () => {
     expect(template).toContain('state="{{state}}"');
     expect(template).toContain('bindaction="loadCoachTeam"');
     expect(template).toContain('wx:if="{{item.hasBio}}"');
+    expect(template).toContain("team-card__goal");
+    expect(template).toContain("coach-card__role");
+    expect(template).toContain("{{teamGoal}}");
+    expect(template).toContain("{{item.role}}");
     expect(template).not.toContain('bindtap="contactCoach"');
     expect(template).not.toContain("微信联系");
-    expect(template).not.toContain("本赛季目标");
-    expect(template).not.toContain("主教练");
     expect(template).not.toContain("执教年限");
     expect(template).not.toContain("凤凰山足球俱乐部");
     expect(template).not.toContain("重庆天才足球俱乐部");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("contactCoach(");
     expect(controller).not.toContain("重庆天才足球俱乐部");
-    expect(controller).not.toContain("teamGoal");
   });
 });
