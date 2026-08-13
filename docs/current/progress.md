@@ -680,3 +680,10 @@
 - 家长端 15 路由 smoke（mp-smoke + 生产会话）：13 ready/empty 正确；metric、private-success 为参数页，无参时给正确错误态（非缺陷）
 - launch 页 reLaunch 推迟到 appLaunch 后执行，消除 non-empty page stack 报错（1fd4465）
 - P2 训练详情导航徽章改按孩子出勤状态着色（159d458）
+
+## 2026-08-14 用户新纪律「figma 有的效果全复原、缺数据可补」后的复原批次
+- coaches 页：接上 API 已有的 teamGoal/role 字段——赛季目标行+角色 pill+角色色头像框（主教练红/体能橙/其他蓝），旧『防占位』测试改写为新纪律语义（4fe5b61）；微信联系按钮无真实数据来源，继续隐藏
+- P2.1 比赛详情：未开始比赛比分显示 0:0（设计稿语义，完赛未录仍『比分待确认』）、赛事名两行不截断、队名列 180rpx 完整显示（be30874 + 队名列宽后续提交）
+- API：事件详情按 primaryTeamId 从 teams 表解析 teamName（be30874，含 server.test 断言）——已二次部署生产（镜像 2dbab99eb370，缓存加速构建，sudo compose up -d --no-build，health 200）
+- 生产数据：3 支 secure-test 队重命名为中文『U10 测试队 1/2/3』（备份 api-backup-pre-teamname-20260813.sqlite）
+- 验收：P2.1 实机截图 sidebyside 通过——真实主队名、完整赛事名、0:0+待开始 pill、布局无挤压
