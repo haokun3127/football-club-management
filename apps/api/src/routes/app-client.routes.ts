@@ -978,10 +978,13 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         context.store.getStudentMetrics(request.params.clubId, request.params.studentId),
       ]);
 
-      // 同龄均值：全俱乐部每个学生的每指标最新记录取均值（与客户端原始分同量纲）
+      // 同龄均值：全俱乐部每个学生的每指标最新记录按 0-100 归一求均值，再折算回本学生记录的量纲
       const peerAverageByMetric = buildPeerAverages(context.store.listMetricRecords(request.params.clubId));
       const latest = buildLatestMetricRecords(metricRecords, metricCatalog)
-        .map((entry) => ({ ...entry, peerAverage: peerAverageByMetric.get(entry.metricId) ?? null }));
+        .map((entry) => {
+          const normalized = peerAverageByMetric.get(entry.metricId);
+          return { ...entry, peerAverage: normalized === undefined ? null : rescaleToRecordKind(normalized, entry.record?.value) };
+        });
 
       // P4 成长首页训练统计：课时总数/出勤率/本月训练/月度分布（真实参与记录推导）
       const trainingStats = await buildStudentTrainingStats(context, request.params.clubId, request.params.studentId);
@@ -2919,10 +2922,10 @@ function splitHomeSchedule(events: AppEventDetail[]) {
 }
 
 function buildPeerAverages(records: PlayerMetricRecord[]): Map<string, number> {
-  // 每（指标, 学生）取最新一条（records 已按 occurred_at 倒序不保证，此处显式比较），再跨学生求均值
+  // 每（指标, 学生）取最新一条并按 0-100 归一（metricNumericValue），再跨学生求均值
   const latestByStudentMetric = new Map<string, { occurredAt: string; score: number }>();
   for (const record of records) {
-    const score = rawMetricScore(record.value);
+    const score = metricNumericValue(record.value);
     if (score === null) continue;
     const key = `${record.metricId}::${record.studentId}`;
     const existing = latestByStudentMetric.get(key);
@@ -2942,12 +2945,12 @@ function buildPeerAverages(records: PlayerMetricRecord[]): Map<string, number> {
   return new Map([...sums.entries()].map(([metricId, bucket]) => [metricId, Number((bucket.sum / bucket.count).toFixed(1))]));
 }
 
-// 与客户端 normalizeRadarMetric 同量纲的原始分提取（rating_1_5 → 5 分制原值）
-function rawMetricScore(value: unknown): number | null {
-  const record = value as { score?: number; number?: number; value?: number; count?: number; percentage?: number } | null;
-  if (!record || typeof record !== "object") return null;
-  const candidate = record.score ?? record.number ?? record.value ?? record.count ?? record.percentage;
-  return typeof candidate === "number" && Number.isFinite(candidate) ? candidate : null;
+// 把 0-100 归一均值折算回目标记录的量纲（rating_1_5 → ÷20，rating_1_10 → ÷10，其余保持百分制）
+function rescaleToRecordKind(normalized: number, value: unknown): number {
+  const kind = (value as { kind?: string } | null)?.kind;
+  if (kind === "rating_1_5") return Number((normalized / 20).toFixed(1));
+  if (kind === "rating_1_10") return Number((normalized / 10).toFixed(1));
+  return normalized;
 }
 
 function buildLatestMetricRecords(
@@ -3048,6 +3051,9 @@ function metricNumericValue(value: unknown): number | null {
   }
   if (record.kind === "rating_1_5" && typeof record.score === "number") {
     return record.score * 20;
+  }
+  if (record.kind === "rating_1_10" && typeof record.score === "number") {
+    return record.score * 10;
   }
   if (record.kind === "percentage" && typeof record.percentage === "number") {
     return record.percentage;
