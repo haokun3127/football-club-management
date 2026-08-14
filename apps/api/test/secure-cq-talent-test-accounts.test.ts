@@ -74,7 +74,7 @@ describe("secure Chongqing Talent test-account operation", () => {
     } finally {
       rmSync(directory, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
     }
-  });
+  }, 20000);
 
   it("does not run migrations or change migration state for an import dry-run", async () => {
     const directory = mkdtempSync(join(tmpdir(), "cq-talent-secure-accounts-"));

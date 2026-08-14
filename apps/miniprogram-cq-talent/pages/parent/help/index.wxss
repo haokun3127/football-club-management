@@ -20,6 +20,11 @@
   margin: 48rpx 0 24rpx;
 }
 
+/* 搜索框 */
+.help-search { display: flex; align-items: center; gap: 16rpx; margin-top: 8rpx; padding: 0 28rpx; height: 88rpx; background: var(--color-card); border: 1rpx solid var(--color-line); border-radius: 44rpx; }
+.help-search__icon { width: 36rpx; height: 36rpx; opacity: 0.5; }
+.help-search__input { flex: 1; font-size: 28rpx; color: var(--color-text); }
+
 /* 分类网格 */
 .category-grid {
   display: grid;
@@ -30,15 +35,19 @@
 .category-card {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 20rpx;
   background: var(--color-card);
   border: 1rpx solid var(--color-line);
   border-radius: 24rpx;
-  padding: 32rpx;
+  padding: 28rpx 24rpx;
   font-size: 26rpx;
   font-weight: 600;
   color: var(--color-text);
 }
+
+.category-card__icon { display: flex; flex-shrink: 0; align-items: center; justify-content: center; width: 72rpx; height: 72rpx; border-radius: 20rpx; }
+.category-card__icon image { width: 40rpx; height: 40rpx; }
+.category-card__label { flex: 1; min-width: 0; }
 
 .category-card--active {
   border-color: var(--color-brand);
@@ -78,9 +87,17 @@
 }
 
 .question-row__icon {
-  font-size: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: var(--color-brand-soft, #fceeef);
   flex-shrink: 0;
 }
+
+.question-row__icon image { width: 28rpx; height: 28rpx; }
 
 .question-row__q {
   flex: 1;

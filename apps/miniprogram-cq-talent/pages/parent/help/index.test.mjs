@@ -65,9 +65,9 @@ describe("parent help center", () => {
       activeCategory: "真实分类一",
       hasVisibleQuestions: true,
       categories: [
-        { label: "全部", value: "all" },
         { label: "真实分类一", value: "真实分类一" },
         { label: "真实分类二", value: "真实分类二" },
+        { label: "更多问题", value: "all" },
       ],
       visibleQuestions: [
         { id: "faq-1", category: "真实分类一", q: "真实问题一", a: "真实回答一", open: false, showDivider: true },
@@ -75,6 +75,22 @@ describe("parent help center", () => {
       ],
     });
     expect(Object.keys(page.data.questions[0]).sort()).toEqual(["a", "category", "id", "open", "q"]);
+  });
+
+  it("filters questions by the search keyword across question and answer text", async () => {
+    mocks.getContentFaqs.mockResolvedValue(faqs);
+    const page = createPageInstance();
+    await page.loadFaqs();
+
+    page.onSearchInput({ detail: { value: "回答三" } });
+
+    expect(page.data.visibleQuestions).toEqual([
+      { id: "faq-3", category: "真实分类一", q: "真实问题三", a: "真实回答三", open: false, showDivider: false },
+    ]);
+
+    page.onSearchInput({ detail: { value: "不存在的关键词" } });
+    expect(page.data.hasVisibleQuestions).toBe(false);
+    expect(page.data.emptyMessage).toBe("没有匹配的常见问题");
   });
 
   it("expands only the selected real FAQ and keeps its category filtering", async () => {

@@ -9,7 +9,9 @@
       bindaction="loadFaqs"
     />
     <block wx:if="{{state === 'ready'}}">
-      <view class="section-title">问题分类</view>
+      <view class="help-search"><image class="help-search__icon" src="/assets/icons/search.svg" mode="aspectFit" /><input class="help-search__input" placeholder="搜索常见问题" value="{{searchKeyword}}" bindinput="onSearchInput" /></view>
+
+      <view class="section-title">帮助分类</view>
       <view class="category-grid">
         <view
           wx:for="{{categories}}"
@@ -17,15 +19,18 @@
           class="category-card {{activeCategory === item.value ? 'category-card--active' : ''}}"
           data-value="{{item.value}}"
           bindtap="selectCategory"
-        >{{item.label}}</view>
+        >
+          <view class="category-card__icon" style="background: {{item.color}}1a"><image src="{{item.icon}}" mode="aspectFit" /></view>
+          <view class="category-card__label">{{item.label}}</view>
+        </view>
       </view>
 
       <view class="card">
-        <view class="card__title">帮助问题</view>
+        <view class="card__title">热门问题</view>
         <view wx:if="{{hasVisibleQuestions}}">
           <view wx:for="{{visibleQuestions}}" wx:key="id" class="question-row {{item.showDivider ? 'question-row--border' : ''}}">
             <view class="question-row__head" data-id="{{item.id}}" bindtap="toggleQuestion">
-              <text class="question-row__icon">问</text>
+              <view class="question-row__icon"><image src="/assets/icons/content-help-circle.svg" mode="aspectFit" /></view>
               <view class="question-row__q">{{item.q}}</view>
               <view class="question-row__chevron {{item.open ? 'question-row__chevron--open' : ''}}">›</view>
             </view>
