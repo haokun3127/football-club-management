@@ -581,6 +581,7 @@ function normalizeMetricDetail(raw: Record<string, unknown>, fallbackMetricId: s
     metricId: String(metric?.id ?? fallbackMetricId),
     label: String(metric?.name ?? "能力指标"),
     unit: userFacingMetricUnit(metric?.unit),
+    maxValue: numberOrUndefined(metric?.maxScore) ?? inferMaxValue(asRecord(asRecord(recordsSource[0])?.value)),
     description: userFacingMetricDescription(metric?.description),
     latest: records[0],
     records,

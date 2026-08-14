@@ -147,6 +147,7 @@ export interface MetricDetail {
   metricId: string;
   label: string;
   unit?: string;
+  maxValue?: number;
   description?: string;
   latest?: MetricDetailRecord;
   records: MetricDetailRecord[];

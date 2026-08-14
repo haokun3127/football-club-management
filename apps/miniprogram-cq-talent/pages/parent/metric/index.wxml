@@ -3,6 +3,7 @@
   <view class="p6-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="p6-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
     <view class="p6-nav__title">{{detail ? detail.label : ''}} 指标详情</view>
+    <view class="p6-nav__range">本赛季 ▾</view>
   </view>
 
   <view class="p6-body">
@@ -16,11 +17,12 @@
       </view>
       <view class="mhero__score-row">
         <text class="mhero__score">{{heroValue}}</text>
-        <text class="mhero__score-unit">{{detail.unit || ''}}</text>
+        <text class="mhero__score-unit">{{heroMaxLabel}}</text>
       </view>
       <view class="mhero__divider"></view>
       <view class="mhero__foot">
-        <view class="mhero__badge">{{records.length}} 项记录</view>
+        <view wx:if="{{peerBadgeLabel}}" class="mhero__badge mhero__badge--{{peerBadgeTone}}">{{peerBadgeLabel}}</view>
+        <view wx:else class="mhero__badge">{{records.length}} 项记录</view>
         <view class="mhero__foot-text">{{latestDateLabel}} · 持续追踪中</view>
       </view>
     </view>
@@ -31,19 +33,58 @@
         <view class="chart-card__title">能力趋势</view>
         <view class="chart-card__range">近{{chartPoints.length}}次记录</view>
       </view>
-      <view class="chart-card__plot">
-        <view class="chart-grid" wx:for="{{[1,2,3,4]}}" wx:key="*this"></view>
-        <view
-          wx:for="{{chartPoints}}"
-          wx:key="id"
-          class="chart-dot {{item.current ? 'chart-dot--current' : ''}}"
-          style="left:{{item.left}}%;bottom:{{item.bottom}}%"
-        >
-          <view wx:if="{{item.current}}" class="chart-dot__label">{{item.valueLabel}}</view>
+      <view class="chart-card__body">
+        <view class="chart-card__y">
+          <text wx:for="{{yTicks}}" wx:key="*this" class="chart-card__y-label">{{item}}</text>
+        </view>
+        <view class="chart-card__plot">
+          <view class="chart-grid" wx:for="{{[1,2,3,4]}}" wx:key="*this"></view>
+          <view wx:if="{{chartAreaPath}}" class="chart-area" style="clip-path:{{chartAreaPath}}"></view>
+          <view
+            wx:for="{{chartSegments}}"
+            wx:key="id"
+            class="chart-segment"
+            style="left:{{item.left}}%;top:{{item.top}}%;width:{{item.width}}%;transform:rotate({{item.angle}}deg)"
+          ></view>
+          <view
+            wx:for="{{chartPoints}}"
+            wx:key="id"
+            class="chart-dot {{item.current ? 'chart-dot--current' : ''}}"
+            style="left:{{item.left}}%;bottom:{{item.bottom}}%"
+          >
+            <view wx:if="{{item.current}}" class="chart-dot__label">{{item.valueLabel}}</view>
+          </view>
         </view>
       </view>
       <view class="chart-card__x">
         <text wx:for="{{chartPoints}}" wx:key="id" class="chart-card__x-label">{{item.monthLabel}}</text>
+      </view>
+    </view>
+
+    <!-- P6 PeerCompare（同龄均值有真实数据时展示） -->
+    <view wx:if="{{detail && peerAverageLabel}}" class="metric-card">
+      <view class="section-title">同队对比</view>
+      <view class="peer-row">
+        <view class="peer-row__label">我的孩子</view>
+        <view class="peer-row__bar"><view class="peer-row__fill peer-row__fill--mine" style="width:{{peerMinePercent}}%"></view></view>
+        <view class="peer-row__value">{{heroValue}}</view>
+      </view>
+      <view class="peer-row">
+        <view class="peer-row__label">同龄均值</view>
+        <view class="peer-row__bar"><view class="peer-row__fill peer-row__fill--peer" style="width:{{peerAveragePercent}}%"></view></view>
+        <view class="peer-row__value">{{peerAverageLabel}}</view>
+      </view>
+    </view>
+
+    <!-- P6 CoachComment（最新记录带评语时展示） -->
+    <view wx:if="{{detail && coachCommentText}}" class="metric-card">
+      <view class="section-title">教练评语</view>
+      <view class="comment-row">
+        <view class="comment-row__avatar">林</view>
+        <view class="comment-row__content">
+          <view class="comment-row__name">林教练 <text class="comment-row__date">{{coachCommentDate}}</text></view>
+          <view class="comment-row__text">{{coachCommentText}}</view>
+        </view>
       </view>
     </view>
 
