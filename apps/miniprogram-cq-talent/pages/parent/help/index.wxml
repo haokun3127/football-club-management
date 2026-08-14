@@ -30,7 +30,7 @@
         <view wx:if="{{hasVisibleQuestions}}">
           <view wx:for="{{visibleQuestions}}" wx:key="id" class="question-row {{item.showDivider ? 'question-row--border' : ''}}">
             <view class="question-row__head" data-id="{{item.id}}" bindtap="toggleQuestion">
-              <view class="question-row__icon"><image src="/assets/icons/content-help-circle.svg" mode="aspectFit" /></view>
+              <view class="question-row__icon"><image src="/assets/icons/help-circle-brand.svg" mode="aspectFit" /></view>
               <view class="question-row__q">{{item.q}}</view>
               <view class="question-row__chevron {{item.open ? 'question-row__chevron--open' : ''}}">›</view>
             </view>

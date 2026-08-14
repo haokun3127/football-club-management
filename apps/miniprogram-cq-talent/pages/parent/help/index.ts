@@ -37,7 +37,7 @@ Page<PageData>({
     state: "loading",
     message: "正在加载帮助问题",
     categories: [],
-    activeCategory: "all",
+    activeCategory: "",
     searchKeyword: "",
     questions: [],
     visibleQuestions: [],
@@ -145,7 +145,7 @@ const CATEGORY_META: Record<string, { icon: string; color: string }> = {
 };
 
 function filterQuestions(questions: FaqQuestion[], category: string, keyword = ""): VisibleFaqQuestion[] {
-  const byCategory = category === "all" ? questions : questions.filter((question) => question.category === category);
+  const byCategory = !category || category === "all" ? questions : questions.filter((question) => question.category === category);
   const filtered = keyword
     ? byCategory.filter((question) => question.q.includes(keyword) || question.a.includes(keyword))
     : byCategory;

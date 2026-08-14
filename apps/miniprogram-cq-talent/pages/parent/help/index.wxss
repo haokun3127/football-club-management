@@ -34,24 +34,26 @@
 
 .category-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 20rpx;
+  justify-content: center;
+  gap: 16rpx;
   background: var(--color-card);
   border: 1rpx solid var(--color-line);
   border-radius: 24rpx;
-  padding: 28rpx 24rpx;
+  padding: 32rpx 24rpx;
   font-size: 26rpx;
   font-weight: 600;
   color: var(--color-text);
+  text-align: center;
 }
 
 .category-card__icon { display: flex; flex-shrink: 0; align-items: center; justify-content: center; width: 72rpx; height: 72rpx; border-radius: 20rpx; }
 .category-card__icon image { width: 40rpx; height: 40rpx; }
-.category-card__label { flex: 1; min-width: 0; }
+.category-card__label { flex-shrink: 0; }
 
 .category-card--active {
   border-color: var(--color-brand);
-  color: var(--color-brand);
 }
 
 /* 卡片 */
