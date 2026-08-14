@@ -1003,6 +1003,11 @@ describe("api server", () => {
       url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/assessments/templates/assessment-template-technical/form",
       headers: { "x-user-id": "user-parent-1" },
     });
+    const family = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/family",
+      headers: { "x-user-id": "user-parent-1" },
+    });
 
     const childrenBody = children.json() as { children: Array<{ id: string }> };
     const summariesBody = summaries.json() as { summaries: Array<{ event: { id: string; type: string }; metrics: unknown[] }> };
@@ -1040,6 +1045,13 @@ describe("api server", () => {
 
     expect(children.statusCode).toBe(200);
     expect(childrenBody.children).toEqual([expect.objectContaining({ id: "student-1" })]);
+    const familyBody = family.json() as {
+      members: Array<{ parentId: string; name: string; relationshipLabel: string; phoneMasked: string; isSelf: boolean }>;
+    };
+    expect(family.statusCode).toBe(200);
+    expect(familyBody.members.length).toBeGreaterThanOrEqual(1);
+    expect(familyBody.members.some((member) => member.isSelf && member.relationshipLabel.length > 0)).toBe(true);
+    expect(familyBody.members[0]?.phoneMasked).toMatch(/^\d{3}\*{4}\d{4}$|^\*{4}$|^$/);
     expect(summaries.statusCode).toBe(200);
     expect(summariesBody.summaries).toEqual([
       expect.objectContaining({

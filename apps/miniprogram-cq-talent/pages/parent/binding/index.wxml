@@ -25,7 +25,18 @@
 
       <view class="binding-card binding-card--family">
         <view class="binding-card__title">家庭成员</view>
-        <view class="family-unavailable">家庭成员信息暂不可显示</view>
+        <view wx:if="{{familyMembers.length}}">
+          <view wx:for="{{familyMembers}}" wx:key="parentId" class="family-row {{index < familyMembers.length - 1 ? 'family-row--border' : ''}}">
+            <view class="family-row__avatar"><image src="/assets/icons/content-users.svg" mode="aspectFit" /></view>
+            <view class="family-row__info">
+              <view class="family-row__name">{{item.relationshipLabel}}<text wx:if="{{item.isSelf}}" class="family-row__self">（我）</text></view>
+              <view class="family-row__phone">{{item.phoneMasked}}</view>
+            </view>
+            <view class="family-row__chip">已加入</view>
+          </view>
+          <view class="family-add" bindtap="addFamilyMember">+ 添加家庭成员</view>
+        </view>
+        <view wx:else class="family-unavailable">家庭成员信息暂不可显示</view>
       </view>
     </block>
   </view>

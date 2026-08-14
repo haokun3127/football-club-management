@@ -203,6 +203,59 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
     },
   );
 
+  // 家庭成员：同一学员的全部监护人（含关系与脱敏手机号），供账号绑定页展示
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      studentId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/parent/students/:studentId/family",
+    {
+      schema: {
+        ...schemas.appClientStudentParams,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "parent");
+      if (!client) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+      if (auth && !auth.membership.roles.includes("parent")) {
+        return context.sendError(reply, 403, "forbidden", "Parent role is required for this operation");
+      }
+      if (auth && !context.store.isGuardianOfStudent(request.params.clubId, auth.user.id, request.params.studentId)) {
+        return context.sendError(reply, 403, "forbidden", "Student is not a child of the authenticated guardian");
+      }
+
+      const members = context.store
+        .listStudentGuardians(request.params.clubId, request.params.studentId)
+        .map((binding) => ({
+          parentId: binding.parentId,
+          name: binding.parent.name,
+          relationship: binding.relationship,
+          relationshipLabel: relationshipLabel(binding.relationship),
+          phoneMasked: maskPhone(binding.parent.phone),
+          isPrimaryContact: binding.isPrimaryContact,
+          isSelf: auth ? binding.parent.userId === auth.user.id : false,
+        }));
+
+      return {
+        clubId: request.params.clubId,
+        studentId: request.params.studentId,
+        members,
+      };
+    },
+  );
+
   app.get<{
     Params: {
       clubId: string;
@@ -2651,6 +2704,18 @@ async function authenticatedSessionResponse(
 
 function firstHeaderValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
+}
+
+// 手机号脱敏：保留前 3 后 4（设计稿样式 138****6789）
+function maskPhone(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 7) return phone ? "****" : "";
+  return `${digits.slice(0, 3)}****${digits.slice(-4)}`;
+}
+
+function relationshipLabel(relationship: "father" | "mother" | "guardian" | "other"): string {
+  const labels = { father: "爸爸", mother: "妈妈", guardian: "监护人", other: "家人" } as const;
+  return labels[relationship];
 }
 
 function requiredSessionRole(request: FastifyRequest): AppRole | undefined {

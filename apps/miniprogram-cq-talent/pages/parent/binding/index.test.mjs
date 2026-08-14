@@ -3,12 +3,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   getParentChildren: vi.fn(),
+  getFamilyMembers: vi.fn(),
   requireRole: vi.fn(),
   openPage: vi.fn(),
   setCurrentStudentId: vi.fn(),
 }));
 
-vi.mock("../../../utils/api", () => ({ getParentChildren: mocks.getParentChildren }));
+vi.mock("../../../utils/api", () => ({
+  getParentChildren: mocks.getParentChildren,
+  getFamilyMembers: mocks.getFamilyMembers,
+}));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
 vi.mock("../../../utils/store", () => ({ setCurrentStudentId: mocks.setCurrentStudentId }));
@@ -28,6 +32,7 @@ globalThis.wx = {
   setStorageSync: vi.fn(),
   navigateBack: vi.fn(),
   showActionSheet: vi.fn(),
+  showModal: vi.fn(),
   showToast: vi.fn(),
 };
 
@@ -50,6 +55,7 @@ function createPageInstance(data = {}) {
 describe("parent account binding", () => {
   beforeEach(() => {
     mocks.getParentChildren.mockReset();
+    mocks.getFamilyMembers.mockReset().mockResolvedValue([]);
     mocks.requireRole.mockReset().mockReturnValue({ role: "parent" });
     mocks.openPage.mockReset();
     mocks.setCurrentStudentId.mockReset();
@@ -86,11 +92,37 @@ describe("parent account binding", () => {
     expect(page.data.activeChildId).toBe("student-2");
   });
 
+  it("renders real family members and shows the masked phone on the wechat row", async () => {
+    mocks.getParentChildren.mockResolvedValue([{
+      id: "student-1",
+      name: "陈小宇",
+      teams: ["U10 精英队"],
+      coachNames: [],
+    }]);
+    mocks.getFamilyMembers.mockResolvedValue([
+      { parentId: "parent-1", name: "陈爸爸", relationship: "father", relationshipLabel: "爸爸", phoneMasked: "138****6789", isPrimaryContact: true, isSelf: true },
+      { parentId: "parent-2", name: "陈小芳", relationship: "mother", relationshipLabel: "妈妈", phoneMasked: "139****1234", isPrimaryContact: false, isSelf: false },
+    ]);
+    const page = createPageInstance();
+
+    await page.load();
+
+    expect(mocks.getFamilyMembers).toHaveBeenCalledWith("student-1");
+    expect(page.data.wechatLabel).toBe("138****6789");
+    expect(page.data.familyMembers).toHaveLength(2);
+  });
+
+  it("keeps the add-family CTA behind an admin-contact modal", () => {
+    const page = createPageInstance();
+    page.addFamilyMember();
+    expect(globalThis.wx.showModal).toHaveBeenCalledWith(expect.objectContaining({ title: "添加家庭成员" }));
+  });
+
   it("does not put collection indexing or a fictional family member in P10 WXML", () => {
     expect(template).not.toMatch(/\.[A-Za-z_$][\w$]*\s*\[\s*\d+\s*\]/);
     expect(template).not.toContain("主监护人");
-    expect(template).not.toContain("添加家庭成员");
-    expect(template).toContain("家庭成员信息暂不可显示");
+    expect(template).toContain("添加家庭成员");
+    expect(template).toContain("familyMembers");
     expect(controller).toContain("teamLabel:");
   });
 });

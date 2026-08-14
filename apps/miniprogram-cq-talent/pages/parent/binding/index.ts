@@ -1,4 +1,4 @@
-import { getParentChildren } from "../../../utils/api";
+import { getFamilyMembers, getParentChildren, type FamilyMember } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { resolveMenuActionTop, resolveNavInset } from "../../../utils/presentation";
@@ -12,6 +12,7 @@ interface PageData {
   activeChild: BindingChild | null;
   activeChildId: string;
   wechatLabel: string;
+  familyMembers: FamilyMember[];
   navInset: number;
   navActionTop: number;
 }
@@ -29,6 +30,7 @@ Page<PageData>({
     activeChild: null,
     activeChildId: "",
     wechatLabel: "微信已绑定",
+    familyMembers: [],
     navInset: resolveNavInset(),
     navActionTop: resolveMenuActionTop(),
   },
@@ -50,12 +52,27 @@ Page<PageData>({
         ? stored
         : children[0]?.id || "";
       const activeChild = children.find((child: StudentSummary) => child.id === activeChildId) ?? null;
+      let familyMembers: FamilyMember[] = [];
+      let wechatLabel = "微信已绑定";
+      if (activeChild) {
+        try {
+          familyMembers = await getFamilyMembers(activeChild.id);
+          const self = familyMembers.find((member) => member.isSelf);
+          if (self?.phoneMasked) {
+            wechatLabel = self.phoneMasked;
+          }
+        } catch {
+          familyMembers = [];
+        }
+      }
       this.setData({
         state: children.length ? "ready" : "empty",
         message: children.length ? "" : "当前账号暂未绑定学员，请联系俱乐部管理员。",
         children,
         activeChild,
         activeChildId,
+        familyMembers,
+        wechatLabel,
       });
     } catch (error) {
       this.setData({ state: "error", message: error instanceof Error ? error.message : "绑定信息读取失败，请稍后重试。" });
@@ -99,5 +116,12 @@ Page<PageData>({
   },
   openAccount() {
     openPage("/pages/parent/account/index");
+  },
+  addFamilyMember() {
+    wx.showModal({
+      title: "添加家庭成员",
+      content: "请联系俱乐部管理员为学员添加家庭成员",
+      showCancel: false,
+    });
   },
 });

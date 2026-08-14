@@ -6,3 +6,12 @@
 .binding-child { display: flex; align-items: center; height: 88rpx; margin-top: 24rpx; }.binding-child__avatar { display: flex; flex: 0 0 88rpx; align-items: center; justify-content: center; width: 88rpx; height: 88rpx; border-radius: 50%; background: #f3f4f6; color: #202124; font-size: 28rpx; font-weight: 700; }.binding-child__info { flex: 1; min-width: 0; margin-left: 24rpx; }.binding-child__name { color: #202124; font-size: 30rpx; font-weight: 700; line-height: 36rpx; }.binding-child__team { overflow: hidden; margin-top: 4rpx; color: #667085; font-size: 26rpx; line-height: 32rpx; text-overflow: ellipsis; white-space: nowrap; }.binding-child__chip,.family-row__chip { flex: 0 0 auto; box-sizing: border-box; height: 42rpx; padding: 8rpx 16rpx; border-radius: 8rpx; background: #ecfdf5; color: #10b981; font-size: 22rpx; font-weight: 700; line-height: 26rpx; }
 .wechat-head { display: flex; align-items: center; gap: 16rpx; }.wechat-head image { width: 40rpx; height: 40rpx; }.wechat-detail { display: flex; align-items: center; gap: 16rpx; margin-top: 24rpx; color: #667085; font-size: 24rpx; line-height: 30rpx; }.wechat-detail image { width: 32rpx; height: 32rpx; }
 .family-unavailable { margin-top: 24rpx; color: #667085; font-size: 26rpx; line-height: 32rpx; }
+.family-row { display: flex; align-items: center; padding: 20rpx 0; }
+.family-row--border { border-bottom: 1rpx solid #e7eaf0; }
+.family-row__avatar { display: flex; align-items: center; justify-content: center; width: 64rpx; height: 64rpx; border-radius: 50%; background: #f3f4f6; flex-shrink: 0; }
+.family-row__avatar image { width: 36rpx; height: 36rpx; }
+.family-row__info { flex: 1; min-width: 0; margin-left: 20rpx; }
+.family-row__name { color: #202124; font-size: 28rpx; font-weight: 600; line-height: 34rpx; }
+.family-row__self { color: #667085; font-size: 24rpx; font-weight: 400; }
+.family-row__phone { margin-top: 2rpx; color: #667085; font-size: 24rpx; line-height: 30rpx; }
+.family-add { margin-top: 16rpx; padding: 20rpx 0 4rpx; border-top: 1rpx solid #e7eaf0; color: #a80f1b; font-size: 28rpx; font-weight: 600; text-align: center; }

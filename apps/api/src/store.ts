@@ -52,6 +52,7 @@ import {
   type SessionPlan,
   type StudentProfile,
   type StudentGuardianBinding,
+  type ParentProfile,
   type Team,
   type TeamMember,
   type TrainingDrill,
@@ -182,6 +183,7 @@ export interface ApiStore {
     input: ConfirmExternalRecordInput,
   ): ExternalRecordLink | null | Promise<ExternalRecordLink | null>;
   isGuardianOfStudent(clubId: EntityId, userId: EntityId, studentId: EntityId): boolean;
+  listStudentGuardians(clubId: EntityId, studentId: EntityId): Array<StudentGuardianBinding & { parent: ParentProfile }>;
   listCalendarEvents(clubId: EntityId): unknown[];
   listEventParticipants(clubId: EntityId): EventParticipant[];
   listMetricRecords(clubId: EntityId): PlayerMetricRecord[];
@@ -801,6 +803,15 @@ export abstract class SeedBackedStore implements ApiStore {
       && (selector.appId ? item.appId === selector.appId : true)
       && (selector.clientKey ? item.clientKey === selector.clientKey : true),
     );
+  }
+
+  listStudentGuardians(clubId: EntityId, studentId: EntityId): Array<StudentGuardianBinding & { parent: ParentProfile }> {
+    return this.data.guardianBindings
+      .filter((binding) => binding.clubId === clubId && binding.studentId === studentId)
+      .flatMap((binding) => {
+        const parent = this.data.parents.find((item) => item.clubId === clubId && item.id === binding.parentId);
+        return parent ? [{ ...binding, parent }] : [];
+      });
   }
 
   isGuardianOfStudent(clubId: EntityId, userId: EntityId, studentId: EntityId): boolean {

@@ -69,6 +69,24 @@ export async function getParentChildren() {
   return normalizeStudents(response.children ?? []);
 }
 
+export interface FamilyMember {
+  parentId: string;
+  name: string;
+  relationship: string;
+  relationshipLabel: string;
+  phoneMasked: string;
+  isPrimaryContact: boolean;
+  isSelf: boolean;
+}
+
+export async function getFamilyMembers(studentId: string): Promise<FamilyMember[]> {
+  const context = requireContext();
+  const response = await request<{ members?: FamilyMember[] }>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/parent/students/${studentId}/family`,
+  });
+  return response.members ?? [];
+}
+
 export async function getParentSchedule(studentId: string) {
   const context = requireContext();
   const response = await request<{ events?: Array<Record<string, unknown>> }>({
