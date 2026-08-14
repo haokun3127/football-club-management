@@ -43,6 +43,17 @@
       </view>
     </view>
 
+    <view wx:if="{{hasRoster}}" class="workbench-card">
+      <view class="row">
+        <view class="section-title">出勤情况 {{attendancePresent}}/{{attendanceTotal}}</view>
+        <view class="roster-detail" bindtap="openAttendance">查看详情</view>
+      </view>
+      <view class="roster-dots">
+        <view wx:for="{{rosterRows}}" wx:key="studentId" class="roster-dot {{item.present ? 'roster-dot--present' : ''}}">{{item.initial}}</view>
+      </view>
+      <view wx:if="{{joinedNames}}" class="subtitle">已加入：{{joinedNames}}</view>
+    </view>
+
     <view wx:if="{{hasWorkflow}}" class="workbench-card">
       <view class="section-title">流程状态</view>
       <view wx:for="{{workflowRows}}" wx:key="label" class="field-row">
@@ -56,17 +67,6 @@
         <image class="action-tile__icon" src="{{item.icon}}" mode="aspectFit" />
         <view class="action-tile__label">{{item.label}}</view>
       </view>
-    </view>
-
-    <view wx:if="{{hasRoster}}" class="workbench-card">
-      <view class="row">
-        <view class="section-title">出勤情况 {{attendancePresent}}/{{attendanceTotal}}</view>
-        <view class="roster-detail" bindtap="openAttendance">查看详情</view>
-      </view>
-      <view class="roster-dots">
-        <view wx:for="{{rosterRows}}" wx:key="studentId" class="roster-dot {{item.present ? 'roster-dot--present' : ''}}">{{item.initial}}</view>
-      </view>
-      <view wx:if="{{joinedNames}}" class="subtitle">已加入：{{joinedNames}}</view>
     </view>
 
     <view wx:if="{{hasTraining}}" class="workbench-card">

@@ -133,7 +133,7 @@ Page({
         attendanceTotal: rosterRows.length,
         joinedNames,
       });
-      this.syncCountdown(inProgress, workbench.event.endsAt);
+      this.syncCountdown(inProgress, workbench.event.startsAt);
     } catch {
       this.setData({
         state: "error",
@@ -185,19 +185,19 @@ Page({
     this.load(this.data.eventId);
   },
   countdownTimer: null as number | null,
-  syncCountdown(inProgress: boolean, endsAt?: string) {
+  syncCountdown(inProgress: boolean, startsAt?: string) {
     if (this.countdownTimer !== null) {
       timerHost.clearInterval(this.countdownTimer);
       this.countdownTimer = null;
     }
-    const endMs = Date.parse(endsAt ?? "");
-    if (!inProgress || !Number.isFinite(endMs)) {
+    const startMs = Date.parse(startsAt ?? "");
+    if (!inProgress || !Number.isFinite(startMs)) {
       if (this.data.countdownText) this.setData({ countdownText: "" });
       return;
     }
     const tick = () => {
-      const remain = Math.max(0, endMs - Date.now());
-      this.setData({ countdownText: formatCountdown(remain) });
+      const elapsed = Math.max(0, Date.now() - startMs);
+      this.setData({ countdownText: formatCountdown(elapsed) });
     };
     tick();
     this.countdownTimer = timerHost.setInterval(tick, 1000);
@@ -227,7 +227,8 @@ Page({
 });
 
 function presentEvent(workbench: CoachWorkbench): EventView {
-  const status = activityStatus(workbench.event.status);
+  const live = isInProgress(workbench.event.status, workbench.event.startsAt, workbench.event.endsAt);
+  const status = live ? { label: "进行中", tone: "info" } : activityStatus(workbench.event.status);
   const hasTime = Boolean(workbench.event.startsAt && workbench.event.endsAt);
   return {
     title: workbench.event.title,

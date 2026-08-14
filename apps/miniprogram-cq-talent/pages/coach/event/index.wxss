@@ -1,6 +1,6 @@
 .c2 { min-height: 100vh; background: #f6f7f9; }
 
-.c2-nav { box-sizing: content-box; display: flex; align-items: center; height: 176rpx; padding-left: 32rpx; background: #ffffff; }
+.c2-nav { box-sizing: content-box; display: flex; align-items: center; justify-content: space-between; height: 176rpx; padding-left: 32rpx; padding-right: 24rpx; background: #ffffff; }
 .c2-nav__left { display: flex; align-items: center; gap: 24rpx; min-width: 0; }
 .c2-nav__back { color: #202124; font-size: 48rpx; font-weight: 300; line-height: 1; }
 .c2-nav__title { overflow: hidden; color: #202124; font-size: 44rpx; font-weight: 700; line-height: 54rpx; text-overflow: ellipsis; white-space: nowrap; }

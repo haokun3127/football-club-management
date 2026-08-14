@@ -124,7 +124,7 @@ describe("coach activity workbench", () => {
     await page.load("event-training-1");
 
     expect(page.data).toMatchObject({ inProgress: true, attendancePresent: 1, attendanceTotal: 1 });
-    expect(page.data.countdownText).toMatch(/^00:4[0-9]:[0-9]{2}$/);
+    expect(page.data.countdownText).toMatch(/^00:1[0-9]:[0-9]{2}$/);
     page.onUnload();
     expect(page.countdownTimer).toBeNull();
   });
