@@ -35,11 +35,12 @@
         <view class="shero__status"><status-chip label="{{eventView.statusLabel}}" tone="{{eventView.statusTone}}" compact="{{true}}" /></view>
       </view>
       <view wx:if="{{eventView.hasTime}}" class="shero__meta">{{eventView.timeLabel}}</view>
-      <view wx:if="{{countdownText}}" class="shero__countdown">{{countdownText}}</view>
+      <view wx:if="{{countdownText}}" class="shero__countdown">⏱ {{countdownText}}</view>
       <view class="shero__chips">
         <view wx:if="{{eventView.hasTeamName}}" class="shero__chip">{{eventView.teamName}}</view>
         <view wx:if="{{eventView.hasVenue}}" class="shero__chip shero__chip--muted">{{eventView.venue}}</view>
-        <view wx:if="{{attendanceTotal > 0}}" class="shero__chip shero__chip--muted">出席{{attendancePresent}}/{{attendanceTotal}}人</view>
+        <view wx:if="{{attendanceTotal > 0}}" class="shero__chip shero__chip--muted">出席 {{attendancePresent}}/{{attendanceTotal}} 人</view>
+        <view wx:if="{{inProgress}}" class="shero__chip shero__chip--live">● 进行中</view>
       </view>
     </view>
 
