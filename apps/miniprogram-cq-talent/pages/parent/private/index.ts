@@ -3,6 +3,12 @@ import { requireRole } from "../../../utils/auth";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { LoadState, StudentSummary } from "../../../utils/types";
 
+interface ChipOption {
+  label: string;
+  value: string;
+  selected: boolean;
+}
+
 interface PageData {
   state: LoadState;
   message: string;
@@ -16,13 +22,11 @@ interface PageData {
   hasCoaches: boolean;
   date: string;
   dateLabel: string;
-  startTime: string;
-  startTimeLabel: string;
-  endTime: string;
-  endTimeLabel: string;
-  timeSlot: string;
-  goalsInput: string;
+  timeSlots: ChipOption[];
+  selectedSlot: string;
+  goalOptions: ChipOption[];
   goals: string[];
+  timeSlot: string;
   note: string;
   canSubmit: boolean;
   submitLabel: string;
@@ -35,15 +39,18 @@ interface FormValues {
   studentId: string;
   selectedCoachName: string;
   date: string;
-  startTime: string;
-  endTime: string;
-  goalsInput: string;
+  selectedSlot: string;
+  goals: string[];
   submitting: boolean;
 }
 
 interface PrivateLessonPage extends PageData {
   privateLessonSubmitting?: boolean;
 }
+
+// 设计稿时段/目标 chips：预约时段为整点课节，目标为四类专项
+const TIME_SLOTS = ["09:00-10:00", "10:30-11:30", "14:00-15:00", "16:00-17:00", "19:00-20:00"];
+const GOAL_OPTIONS = ["传球", "射门", "体能", "技巧"];
 
 Page<PageData>({
   data: {
@@ -61,16 +68,14 @@ Page<PageData>({
     hasCoaches: false,
     date: "",
     dateLabel: "请选择日期",
-    startTime: "",
-    startTimeLabel: "选择开始时间",
-    endTime: "",
-    endTimeLabel: "选择结束时间",
-    timeSlot: "",
-    goalsInput: "",
+    timeSlots: presentChips(TIME_SLOTS, ""),
+    selectedSlot: "",
+    goalOptions: presentChips(GOAL_OPTIONS, ""),
     goals: [],
+    timeSlot: "",
     note: "",
     canSubmit: false,
-    submitLabel: "暂无可用教练",
+    submitLabel: "提交预约",
     submitting: false,
     formMessage: "",
     hasFormMessage: false,
@@ -101,9 +106,8 @@ Page<PageData>({
         studentId: active.id,
         selectedCoachName,
         date: "",
-        startTime: "",
-        endTime: "",
-        goalsInput: "",
+        selectedSlot: "",
+        goals: [],
         submitting: false,
       });
       const formMessage = selectedCoachName ? "" : "当前孩子尚未分配教练，暂不能提交";
@@ -143,14 +147,19 @@ Page<PageData>({
   selectDate(event: { detail: { value: string } }) {
     this.updateForm({ date: event.detail.value });
   },
-  selectStartTime(event: { detail: { value: string } }) {
-    this.updateForm({ startTime: event.detail.value });
+  selectSlot(event: { currentTarget: { dataset: { value: string } } }) {
+    const value = event.currentTarget.dataset.value;
+    const selectedSlot = this.data.selectedSlot === value ? "" : value;
+    this.setData({ timeSlots: presentChips(TIME_SLOTS, selectedSlot) });
+    this.updateForm({ selectedSlot });
   },
-  selectEndTime(event: { detail: { value: string } }) {
-    this.updateForm({ endTime: event.detail.value });
-  },
-  inputGoals(event: { detail: { value: string } }) {
-    this.updateForm({ goalsInput: event.detail.value });
+  toggleGoal(event: { currentTarget: { dataset: { value: string } } }) {
+    const value = event.currentTarget.dataset.value;
+    const goals = this.data.goals.includes(value)
+      ? this.data.goals.filter((goal: string) => goal !== value)
+      : [...this.data.goals, value];
+    this.setData({ goalOptions: GOAL_OPTIONS.map((label) => ({ label, value: label, selected: goals.includes(label) })) });
+    this.updateForm({ goals });
   },
   inputNote(event: { detail: { value: string } }) {
     this.setData({ note: event.detail.value });
@@ -202,35 +211,27 @@ Page<PageData>({
   },
 });
 
+function presentChips(options: string[], selected: string): ChipOption[] {
+  return options.map((option) => ({ label: option, value: option, selected: option === selected }));
+}
+
 function buildFormState(values: FormValues) {
-  const goals = parseGoals(values.goalsInput);
-  const timeSlot = buildTimeSlot(values.startTime, values.endTime);
+  const timeSlot = values.selectedSlot;
   const canSubmit = Boolean(
     values.studentId
       && values.selectedCoachName
       && values.date
       && timeSlot
-      && goals.length
+      && values.goals.length
       && !values.submitting,
   );
   return {
-    goals,
     timeSlot,
-    coachDisplayName: values.selectedCoachName || "暂无可用教练",
+    coachDisplayName: values.selectedCoachName ? `${values.selectedCoachName}（主教练）` : "暂无可用教练",
     dateLabel: values.date || "请选择日期",
-    startTimeLabel: values.startTime || "选择开始时间",
-    endTimeLabel: values.endTime || "选择结束时间",
     canSubmit,
-    submitLabel: values.submitting ? "提交中…" : canSubmit ? "提交预约" : values.selectedCoachName ? "请完善必填信息" : "暂无可用教练",
+    submitLabel: values.submitting ? "提交中…" : "提交预约",
   };
-}
-
-function buildTimeSlot(startTime: string, endTime: string): string {
-  return startTime && endTime && startTime < endTime ? `${startTime}-${endTime}` : "";
-}
-
-function parseGoals(value: string): string[] {
-  return value.split(/[，,\n]/).map((goal) => goal.trim()).filter(Boolean);
 }
 
 function resolveSubmitMessage(error: unknown): string {

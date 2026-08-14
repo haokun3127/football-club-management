@@ -53,9 +53,9 @@ const child = {
 
 function completeForm(page) {
   page.selectDate({ detail: { value: "2026-08-12" } });
-  page.selectStartTime({ detail: { value: "10:00" } });
-  page.selectEndTime({ detail: { value: "11:00" } });
-  page.inputGoals({ detail: { value: "控球, 射门\n体能" } });
+  page.selectSlot({ currentTarget: { dataset: { value: "10:30-11:30" } } });
+  page.toggleGoal({ currentTarget: { dataset: { value: "传球" } } });
+  page.toggleGoal({ currentTarget: { dataset: { value: "体能" } } });
   page.inputNote({ detail: { value: "真实备注" } });
 }
 
@@ -69,7 +69,7 @@ describe("parent private lesson form", () => {
     globalThis.wx.showToast.mockReset();
   });
 
-  it("uses only real coaches and precomputes user-entered time and goals", async () => {
+  it("uses real coaches and chip-based slot/goal selection from the design contract", async () => {
     mocks.getParentChildren.mockResolvedValue([child]);
     const page = createPageInstance();
 
@@ -82,14 +82,27 @@ describe("parent private lesson form", () => {
       studentName: "真实孩子",
       coachOptions: ["真实教练"],
       selectedCoachName: "真实教练",
-      startTime: "10:00",
-      endTime: "11:00",
-      timeSlot: "10:00-11:00",
-      goals: ["控球", "射门", "体能"],
+      coachDisplayName: "真实教练（主教练）",
+      selectedSlot: "10:30-11:30",
+      timeSlot: "10:30-11:30",
+      goals: ["传球", "体能"],
       canSubmit: true,
+      submitLabel: "提交预约",
     });
-    expect(page.data).not.toHaveProperty("timeSlots");
-    expect(page.data).not.toHaveProperty("selectedGoals");
+    expect(page.data.timeSlots.find((slot) => slot.value === "10:30-11:30").selected).toBe(true);
+    expect(page.data.goalOptions.filter((goal) => goal.selected).map((goal) => goal.value)).toEqual(["传球", "体能"]);
+  });
+
+  it("toggles a selected slot off when tapped again", async () => {
+    mocks.getParentChildren.mockResolvedValue([child]);
+    const page = createPageInstance();
+    await page.load("student-1");
+
+    page.selectSlot({ currentTarget: { dataset: { value: "16:00-17:00" } } });
+    expect(page.data.selectedSlot).toBe("16:00-17:00");
+    page.selectSlot({ currentTarget: { dataset: { value: "16:00-17:00" } } });
+    expect(page.data.selectedSlot).toBe("");
+    expect(page.data.canSubmit).toBe(false);
   });
 
   it("submits once and redirects only with the returned request and real student IDs", async () => {
@@ -110,8 +123,8 @@ describe("parent private lesson form", () => {
       studentId: "student-1",
       coachName: "真实教练",
       date: "2026-08-12",
-      timeSlot: "10:00-11:00",
-      goals: ["控球", "射门", "体能"],
+      timeSlot: "10:30-11:30",
+      goals: ["传球", "体能"],
       note: "真实备注",
     });
 
@@ -170,20 +183,15 @@ describe("parent private lesson form", () => {
     expect(errorPage.data).toMatchObject({ state: "error", message: "预约信息读取失败，请点击重试" });
   });
 
-  it("does not expose sample slots, goals, prices, or unsupported confirmation promises", () => {
-    expect(template).toContain('bindchange="selectStartTime"');
-    expect(template).toContain('bindchange="selectEndTime"');
-    expect(template).toContain('bindinput="inputGoals"');
-    expect(template).toContain('wx:if="{{canSubmit && !submitting}}"');
-    expect(template).not.toContain("09:00-10:00");
-    expect(template).not.toContain("传球");
+  it("renders the design chip selectors and confirmation hint without payment promises", () => {
+    expect(template).toContain('bindtap="selectSlot"');
+    expect(template).toContain('bindtap="toggleGoal"');
+    expect(template).toContain("提交后等待教练确认，无需在线支付");
+    expect(template).toContain("role-tabbar");
     expect(template).not.toContain("预计费用");
-    expect(template).not.toContain("在线支付");
-    expect(template).not.toContain("等待教练确认");
+    expect(template).not.toContain("立即支付");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(controller).not.toContain("TIME_SLOTS");
-    expect(controller).not.toContain("const GOALS");
-    expect(controller).not.toContain("待分配教练");
     expect(controller).not.toContain("coach=");
+    expect(controller).not.toContain("待分配教练");
   });
 });

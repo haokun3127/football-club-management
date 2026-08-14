@@ -93,20 +93,44 @@
   min-width: 0;
 }
 
+/* 时段/目标 chips（Figma P9: 白底灰边，选中红底白字） */
+.chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.chip {
+  padding: 16rpx 28rpx;
+  border: 1rpx solid var(--color-line);
+  border-radius: 999rpx;
+  background: var(--color-card);
+  color: var(--color-text);
+  font-size: 26rpx;
+}
+
+.chip--active {
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: #ffffff;
+}
+
+.field__icon { width: 36rpx; height: 36rpx; opacity: 0.55; }
+
 .form-message {
   margin-top: 32rpx;
   font-size: 24rpx;
   color: var(--color-brand);
 }
 
-/* 提交区（Figma: 底部固定，上阴影） */
+/* 提交区（Figma: 底部固定，上阴影；位于 tabbar 之上） */
 .submit-area {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: calc(120rpx + env(safe-area-inset-bottom));
   background: var(--color-card);
-  padding: 32rpx 44rpx calc(32rpx + env(safe-area-inset-bottom));
+  padding: 24rpx 44rpx;
   box-shadow: 0 -8rpx 24rpx rgba(0, 0, 0, 0.05);
 }
 
@@ -122,4 +146,11 @@
 
 .submit-button--disabled {
   opacity: 0.6;
+}
+
+.submit-hint {
+  margin-top: 16rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
 }

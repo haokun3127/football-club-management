@@ -34,36 +34,35 @@
           <picker mode="date" value="{{date}}" bindchange="selectDate">
             <view class="field__picker">
               <text class="{{date ? '' : 'field__picker--placeholder'}}">{{dateLabel}}</text>
-              <text class="field__chevron">日期</text>
+              <image class="field__icon" src="/assets/icons/tab-calendar.svg" mode="aspectFit" />
             </view>
           </picker>
         </view>
 
         <view class="field">
-          <view class="field__label">预约时间</view>
-          <view class="time-grid">
-            <picker mode="time" value="{{startTime}}" bindchange="selectStartTime">
-              <view class="field__picker">
-                <text class="{{startTime ? '' : 'field__picker--placeholder'}}">{{startTimeLabel}}</text>
-              </view>
-            </picker>
-            <picker mode="time" value="{{endTime}}" bindchange="selectEndTime">
-              <view class="field__picker">
-                <text class="{{endTime ? '' : 'field__picker--placeholder'}}">{{endTimeLabel}}</text>
-              </view>
-            </picker>
+          <view class="field__label">时段选择</view>
+          <view class="chip-grid">
+            <view
+              wx:for="{{timeSlots}}"
+              wx:key="value"
+              class="chip {{item.selected ? 'chip--active' : ''}}"
+              data-value="{{item.value}}"
+              bindtap="selectSlot"
+            >{{item.label}}</view>
           </view>
         </view>
 
         <view class="field">
           <view class="field__label">训练目标</view>
-          <textarea
-            class="field__textarea"
-            placeholder="请输入训练目标，多个目标用换行或逗号分隔"
-            maxlength="500"
-            value="{{goalsInput}}"
-            bindinput="inputGoals"
-          />
+          <view class="chip-grid">
+            <view
+              wx:for="{{goalOptions}}"
+              wx:key="value"
+              class="chip {{item.selected ? 'chip--active' : ''}}"
+              data-value="{{item.value}}"
+              bindtap="toggleGoal"
+            >{{item.label}}</view>
+          </view>
         </view>
 
         <view class="field field--last">
@@ -82,8 +81,8 @@
   </view>
 
   <view wx:if="{{state === 'ready'}}" class="submit-area">
-    <view wx:if="{{canSubmit && !submitting}}" class="submit-button" bindtap="submit">{{submitLabel}}</view>
-    <view wx:else class="submit-button submit-button--disabled">{{submitLabel}}</view>
+    <view class="submit-button {{canSubmit && !submitting ? '' : 'submit-button--disabled'}}" bindtap="submit">{{submitLabel}}</view>
+    <view class="submit-hint">提交后等待教练确认，无需在线支付</view>
   </view>
-  <role-tabbar wx:if="{{state !== 'ready'}}" role="parent" active="discover" />
+  <role-tabbar role="parent" active="child" />
 </view>
