@@ -1008,7 +1008,7 @@ describe("api server", () => {
     const summariesBody = summaries.json() as { summaries: Array<{ event: { id: string; type: string }; metrics: unknown[] }> };
     const growthBody = growth.json() as {
       assessment: { views: unknown[]; viewNodes: unknown[] };
-      latest: Array<{ metricId: string; metric: { id: string } | null }>;
+      latest: Array<{ metricId: string; metric: { id: string } | null; peerAverage: number | null }>;
       trends: Array<{ metricId: string; records: unknown[] }>;
       trainingStats: {
         totalTrainings: number;
@@ -1055,6 +1055,7 @@ describe("api server", () => {
     expect(growthBody.trends.length).toBeGreaterThan(0);
     expect(growthBody.trainingStats.monthly).toHaveLength(8);
     expect(growthBody.trainingStats.totalTrainings).toBeGreaterThanOrEqual(0);
+    expect(growthBody.latest.some((entry) => typeof entry.peerAverage === "number")).toBe(true);
     expect(coachWorkbench.statusCode).toBe(200);
     expect(workbenchBody.event.id).toBe("event-training-1");
     expect(workbenchBody.rosterContext.participants.length).toBeGreaterThan(0);

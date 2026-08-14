@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { formationTemplates, validateTacticalBoardPlayers, type ClubUserRole, type MatchEventType, type TacticalBoardPlayer } from "@football-club/domain";
 import type { RecordAssessmentInput, RecordMatchInput } from "@football-club/domain";
+import type { PlayerMetricRecord } from "@football-club/domain";
 import { resolveAvailableAppRoles, resolveCompatibleAppRole, type AppRole } from "../auth/app-roles.js";
 import type { AuthContext } from "../auth/context.js";
 import { hasBearerAuthorization, parseBearerToken, type AppClientSessionDelivery } from "../auth/session-registry.js";
@@ -977,6 +978,11 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         context.store.getStudentMetrics(request.params.clubId, request.params.studentId),
       ]);
 
+      // 同龄均值：全俱乐部每个学生的每指标最新记录取均值（与客户端原始分同量纲）
+      const peerAverageByMetric = buildPeerAverages(context.store.listMetricRecords(request.params.clubId));
+      const latest = buildLatestMetricRecords(metricRecords, metricCatalog)
+        .map((entry) => ({ ...entry, peerAverage: peerAverageByMetric.get(entry.metricId) ?? null }));
+
       // P4 成长首页训练统计：课时总数/出勤率/本月训练/月度分布（真实参与记录推导）
       const trainingStats = await buildStudentTrainingStats(context, request.params.clubId, request.params.studentId);
 
@@ -992,7 +998,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
           metricBindings: [],
         },
         metrics: metricCatalog,
-        latest: buildLatestMetricRecords(metricRecords, metricCatalog),
+        latest,
         trends: buildMetricTrends(metricRecords),
         trainingStats,
         generatedAt: new Date().toISOString(),
@@ -2910,6 +2916,38 @@ function splitHomeSchedule(events: AppEventDetail[]) {
       .reverse()
       .filter((event) => event.status === "completed" || event.status === "cancelled" || Date.parse(event.timeRange.endsAt) < now),
   };
+}
+
+function buildPeerAverages(records: PlayerMetricRecord[]): Map<string, number> {
+  // 每（指标, 学生）取最新一条（records 已按 occurred_at 倒序不保证，此处显式比较），再跨学生求均值
+  const latestByStudentMetric = new Map<string, { occurredAt: string; score: number }>();
+  for (const record of records) {
+    const score = rawMetricScore(record.value);
+    if (score === null) continue;
+    const key = `${record.metricId}::${record.studentId}`;
+    const existing = latestByStudentMetric.get(key);
+    if (!existing || record.occurredAt > existing.occurredAt) {
+      latestByStudentMetric.set(key, { occurredAt: record.occurredAt, score });
+    }
+  }
+  const sums = new Map<string, { sum: number; count: number }>();
+  for (const [key, entry] of latestByStudentMetric) {
+    const metricId = key.split("::")[0] ?? "";
+    if (!metricId) continue;
+    const bucket = sums.get(metricId) ?? { sum: 0, count: 0 };
+    bucket.sum += entry.score;
+    bucket.count += 1;
+    sums.set(metricId, bucket);
+  }
+  return new Map([...sums.entries()].map(([metricId, bucket]) => [metricId, Number((bucket.sum / bucket.count).toFixed(1))]));
+}
+
+// 与客户端 normalizeRadarMetric 同量纲的原始分提取（rating_1_5 → 5 分制原值）
+function rawMetricScore(value: unknown): number | null {
+  const record = value as { score?: number; number?: number; value?: number; count?: number; percentage?: number } | null;
+  if (!record || typeof record !== "object") return null;
+  const candidate = record.score ?? record.number ?? record.value ?? record.count ?? record.percentage;
+  return typeof candidate === "number" && Number.isFinite(candidate) ? candidate : null;
 }
 
 function buildLatestMetricRecords(

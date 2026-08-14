@@ -184,6 +184,7 @@ export interface ApiStore {
   isGuardianOfStudent(clubId: EntityId, userId: EntityId, studentId: EntityId): boolean;
   listCalendarEvents(clubId: EntityId): unknown[];
   listEventParticipants(clubId: EntityId): EventParticipant[];
+  listMetricRecords(clubId: EntityId): PlayerMetricRecord[];
   getStudentTimeline(clubId: EntityId, studentId: EntityId): unknown[];
   listAbilityMetrics(clubId: EntityId): AbilityMetric[];
   listMetricGraphVersions(clubId: EntityId): MetricGraphVersion[];
@@ -2475,6 +2476,10 @@ export class PersistentApiStore extends SeedBackedStore {
       .listMetricRecords(clubId, studentId)
       .filter((record) => (sources ? sources.has(record.source) : true))
       .sort((left, right) => Date.parse(right.occurredAt) - Date.parse(left.occurredAt));
+  }
+
+  override listMetricRecords(clubId: EntityId) {
+    return this.repositories.assessments.listMetricRecords(clubId);
   }
 
   override async recordAssessment(input: RecordAssessmentInput) {
