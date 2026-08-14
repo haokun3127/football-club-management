@@ -61,3 +61,19 @@ node scripts/devtools/mp-route-shot.cjs "<路由>" "<tmp 输出.png>" force
 python scripts/devtools/sidebyside.py docs/design/reference/figma/<页面>.png <tmp 输出.png> <tmp 对比.png>
 # 4. 视觉比对 → 修代码 → typecheck + vitest → 重截复验 → 路径限定提交
 ```
+
+## 屏幕像素截图通道（2026-08-14，automator 截图超时时的主力通道）
+
+`page.screenshot` 在某些实例上持续超时（页面渲染正常也一样）。替代方案：
+
+```bash
+# 1. 整窗截图（win32 PrintWindow；前置：把遮挡的 Edge 等窗口最小化）
+uv run --with pillow python scripts/devtools/screen-shot.py <out.png>
+# 2. 裁剪模拟器手机区并缩放为 375x812（坐标按 1918x1030 窗口、模拟器右侧 101% 缩放实测）
+uv run --with pillow python scripts/devtools/crop-phone.py <in.png> <out.png> [left top right bottom]
+# 3. 合成对比
+python scripts/devtools/sidebyside.py docs/design/reference/figma/<页面>.png <out.png> <cmp.png>
+```
+
+- 默认裁剪框 `1395,90,1778,895`，窗口尺寸/模拟器位置变了就传参覆盖。
+- 页面内容超出首屏时用 automator `mp.callWxMethod('pageScrollTo',{scrollTop:N,duration:0})` 滚动后再截第二段。
