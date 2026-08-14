@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   getParentChildren: vi.fn(),
+  getParentGrowth: vi.fn(),
   getParentSchedule: vi.fn(),
   getParentStudentHome: vi.fn(),
   switchActiveRole: vi.fn(),
@@ -15,6 +16,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("../../../utils/api", () => ({
   getParentChildren: mocks.getParentChildren,
+  getParentGrowth: mocks.getParentGrowth,
   getParentSchedule: mocks.getParentSchedule,
   getParentStudentHome: mocks.getParentStudentHome,
   switchActiveRole: mocks.switchActiveRole,
@@ -23,6 +25,7 @@ vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole, routeHom
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
 vi.mock("../../../utils/presentation", () => ({
   formatDateTime: (value) => value,
+  formatTenure: (startsAt, prefix = "在队") => (startsAt ? `${prefix}1年7个月` : ""),
   resolveMenuInset: () => 0,
   resolveNavInset: () => 0,
 }));
@@ -65,6 +68,7 @@ describe("parent profile hub", () => {
       updatedAt: "2026-08-10T09:00:00.000Z",
     });
     mocks.openPage.mockReset();
+    mocks.getParentGrowth.mockReset().mockResolvedValue({});
     mocks.requireRole.mockReset().mockReturnValue({ role: "parent", availableRoles: ["parent"], currentStudentId: "student-1" });
     mocks.switchActiveRole.mockReset();
     mocks.routeHome.mockReset();
@@ -80,6 +84,24 @@ describe("parent profile hub", () => {
     expect(page.data).toMatchObject({ state: "ready", teamLabel: "Team A" });
     expect(page.data.heroStats).toEqual([{ label: "Remaining lessons", value: "12" }]);
     expect(page.data.recentActivities).toEqual([{ title: "Actual training", date: "2026-08-10T09:00:00.000Z" }]);
+  });
+
+  it("prefers real training stats for the stats row when growth summary supplies them", async () => {
+    mocks.getParentGrowth.mockResolvedValue({
+      trainingStats: { totalTrainings: 11, attendanceRate: 93, monthTrainings: 5, monthly: [] },
+    });
+    mocks.getParentChildren.mockResolvedValue([
+      { id: "student-1", name: "Player", teams: ["Team A"], coachNames: [], teamStartsAt: "2025-01-05" },
+    ]);
+    const page = createPageInstance();
+
+    await page.load();
+
+    expect(page.data.heroStats).toEqual([
+      { label: "训练课时", value: "11" },
+      { label: "出勤率", value: "93%" },
+      { label: "在队时长", value: "1年7个月" },
+    ]);
   });
 
   it("surfaces a student-home failure as the page error state", async () => {

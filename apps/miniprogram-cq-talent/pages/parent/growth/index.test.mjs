@@ -21,6 +21,7 @@ vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
 vi.mock("../../../utils/presentation", () => ({
   formatDateTime: () => "2026-08-10 10:00",
+  formatTenure: (startsAt, prefix = "在队") => (startsAt ? `${prefix}1年7个月` : ""),
   resolveMenuInset: () => 0,
   resolveNavInset: () => 0,
 }));

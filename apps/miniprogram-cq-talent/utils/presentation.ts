@@ -106,3 +106,19 @@ export function resolveNavInset() {
     return 20;
   }
 }
+
+// 在队时长：从队伍 startsAt 到今天的年月差（P4 英雄卡标签 / P7 统计行共用）
+export function formatTenure(startsAt?: string, prefix = "在队"): string {
+  if (!startsAt) return "";
+  const start = new Date(startsAt);
+  if (Number.isNaN(start.getTime())) return "";
+  const now = new Date();
+  let months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+  if (now.getDate() < start.getDate()) months -= 1;
+  if (months < 1) return `${prefix}不足1个月`;
+  const years = Math.floor(months / 12);
+  const rest = months % 12;
+  if (years && rest) return `${prefix}${years}年${rest}个月`;
+  if (years) return `${prefix}${years}年`;
+  return `${prefix}${rest}个月`;
+}

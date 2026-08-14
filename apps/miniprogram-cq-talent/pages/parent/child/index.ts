@@ -1,9 +1,9 @@
-import { getParentChildren, getParentSchedule, getParentStudentHome, switchActiveRole } from "../../../utils/api";
+import { getParentChildren, getParentGrowth, getParentSchedule, getParentStudentHome, switchActiveRole } from "../../../utils/api";
 import { requireRole, routeHome } from "../../../utils/auth";
 import { openPage, openTab } from "../../../utils/navigation";
-import { formatDateTime, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import { formatDateTime, formatTenure, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { persistAuthenticatedSession, setCurrentStudentId } from "../../../utils/store";
-import type { LoadState, ScheduleEvent, StudentHome, StudentSummary } from "../../../utils/types";
+import type { GrowthSummary, LoadState, ScheduleEvent, StudentHome, StudentSummary } from "../../../utils/types";
 
 Page({
   data: {
@@ -44,9 +44,10 @@ Page({
         return;
       }
       setCurrentStudentId(active.id);
-      const [studentHome, schedule] = await Promise.all([
+      const [studentHome, schedule, growth] = await Promise.all([
         getParentStudentHome(active),
         getParentSchedule(active.id),
+        getParentGrowth(active.id).catch(() => undefined),
       ]);
       this.setData({
         state: "ready",
@@ -57,7 +58,7 @@ Page({
         studentHome,
         avatarLetter: active.name.slice(0, 1),
         teamLabel: active.teams.filter(Boolean).join("、"),
-        heroStats: buildAvailableHeroStats(studentHome),
+        heroStats: buildTrainingHeroStats(growth, active) ?? buildAvailableHeroStats(studentHome),
         recentActivities: buildScheduledActivities(schedule),
       });
     } catch (error) {
@@ -148,6 +149,17 @@ function buildRecentActivities(home: StudentHome) {
     title: sources[index]?.value || fallback[index],
     date: sources[index]?.label || "近期更新",
   }));
+}
+
+// 训练统计行：课时总数/出勤率/在队时长（成长汇总 trainingStats 真实推导，取不到回退档案课时）
+function buildTrainingHeroStats(growth: GrowthSummary | undefined, active: StudentSummary) {
+  const stats = growth?.trainingStats;
+  if (!stats) return undefined;
+  return [
+    { label: "训练课时", value: String(stats.totalTrainings) },
+    { label: "出勤率", value: stats.attendanceRate === null ? "—" : `${stats.attendanceRate}%` },
+    { label: "在队时长", value: formatTenure(active.teamStartsAt, "") || "—" },
+  ];
 }
 
 function buildAvailableHeroStats(home: StudentHome) {

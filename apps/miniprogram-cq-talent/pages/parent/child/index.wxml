@@ -28,7 +28,6 @@
         <view wx:for="{{recentActivities}}" wx:key="title" class="p7-activity"><view class="p7-activity__dot {{index === 1 ? 'p7-activity__dot--green' : index === 2 ? 'p7-activity__dot--blue' : ''}}"></view><view><view class="p7-activity__title">{{item.title}}</view><view class="p7-activity__date">{{item.date}}</view></view></view>
       </view>
       <view wx:else class="p7-card p7-card--pending"><view class="p7-card__title">最近动态</view><view class="p7-pending">训练动态待同步</view></view>
-      <view class="p7-card p7-card--pending"><view class="p7-card__title">本周提醒</view><view class="p7-pending">提醒数据待同步</view></view>
     </view>
   </view>
   <role-tabbar role="parent" active="child" />

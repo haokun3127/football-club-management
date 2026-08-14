@@ -2,7 +2,7 @@ import { getParentCalendar, getParentChildren, getParentGrowth, getParentMetricD
 import { requireRole } from "../../../utils/auth";
 import { currentLocalDate, shiftCalendarDate } from "../../../utils/date";
 import { openPage } from "../../../utils/navigation";
-import { formatDateTime, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import { formatDateTime, formatTenure, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { setCurrentStudentId } from "../../../utils/store";
 import type { GrowthSummary, LoadState, MetricDetail, RadarMetricPoint, ScheduleEvent, StudentSummary } from "../../../utils/types";
 
@@ -242,20 +242,7 @@ function eventBelongsToStudent(event: ScheduleEvent, studentId: string) {
 }
 
 // 在队时长标签：从队伍 startsAt 到今天的年月差
-function tenureLabel(startsAt?: string) {
-  if (!startsAt) return "";
-  const start = new Date(startsAt);
-  if (Number.isNaN(start.getTime())) return "";
-  const now = new Date();
-  let months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
-  if (now.getDate() < start.getDate()) months -= 1;
-  if (months < 1) return "在队不足1个月";
-  const years = Math.floor(months / 12);
-  const rest = months % 12;
-  if (years && rest) return `在队${years}年${rest}个月`;
-  if (years) return `在队${years}年`;
-  return `在队${rest}个月`;
-}
+const tenureLabel = formatTenure;
 
 function buildHeroTags(student: StudentSummary, growth: GrowthSummary) {
   const tags: string[] = [];
