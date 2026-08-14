@@ -23,7 +23,7 @@ function race(p, ms, label) { return Promise.race([p, new Promise((_, rej) => se
     }
     console.log("route-after:", page && page.path);
   }
-  await new Promise((r) => setTimeout(r, 1500));
+  await new Promise((r) => setTimeout(r, Number(process.env.MP_SHOT_WAIT || 1500)));
   await race(mp.screenshot({ path: out }), 60000, "screenshot");
   console.log("shot ok", out);
   await mp.disconnect();

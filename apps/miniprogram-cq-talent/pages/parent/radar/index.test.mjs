@@ -82,6 +82,7 @@ describe("parent ability radar", () => {
       state: "ready",
       canDrawRadar: true,
       radarDimensionLabel: "3维能力模型",
+      compositeScore: 70,
     });
     expect(page.data.radar.map((point) => point.metricId)).toEqual(["speed", "control", "defence"]);
   });
@@ -104,13 +105,12 @@ describe("parent ability radar", () => {
     expect(page.data.radar).toHaveLength(2);
   });
 
-  it("does not present composite scores or peer baselines without a supplied contract", () => {
+  it("derives composite score from real dimension percents and keeps peer baselines contract-gated", () => {
     expect(template).toContain("{{radarDimensionLabel}}");
     expect(template).toContain('bindtap="openMetricHistory"');
-    expect(template).not.toContain("overallScore");
+    expect(template).toContain("{{compositeScore}}");
     expect(template).not.toContain("peerPercent");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(controller).not.toContain("overallScore");
     expect(controller).not.toContain("peerPercent");
     expect(controller).not.toContain("openCompare");
   });

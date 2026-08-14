@@ -6,7 +6,7 @@
       <view class="p5-nav__title">能力雷达</view>
       <view class="p5-nav__sub">{{activeChildName}}{{activeChildTeam ? ' · ' + activeChildTeam : ''}}</view>
     </view>
-    <view class="p5-nav__compare" bindtap="openMetricHistory">查看记录</view>
+    <view class="p5-nav__compare" bindtap="openMetricHistory">历史对比</view>
   </view>
 
   <!-- P5 Player Selector -->
@@ -36,6 +36,7 @@
           <radar-canvas wx:if="{{canDrawRadar}}" dark="{{true}}" metrics="{{radar}}" selectedMetricId="{{selectedMetricId}}" bindmetrictap="selectMetric"></radar-canvas>
           <view wx:else class="rhero__placeholder"></view>
         </view>
+        <view wx:if="{{compositeScore !== ''}}" class="rhero__score"><view class="rhero__score-label">综合评分</view><view class="rhero__score-value">{{compositeScore}}</view></view>
       </view>
 
       <!-- P5 Dimension Breakdown -->

@@ -995,6 +995,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         latest: buildLatestMetricRecords(metricRecords, metricCatalog),
         trends: buildMetricTrends(metricRecords),
         trainingStats,
+        generatedAt: new Date().toISOString(),
       };
     },
   );
