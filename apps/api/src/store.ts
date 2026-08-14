@@ -1804,6 +1804,7 @@ export abstract class SeedBackedStore implements ApiStore {
       note: input.note,
       status: "pending",
       requestedByUserId: input.requestedByUserId,
+      notifyParents: input.notifyParents,
       createdAt: now,
       updatedAt: now,
     };

@@ -448,9 +448,9 @@ export class DataCapabilityRepository {
     this.database.prepare(`
       INSERT INTO event_change_requests (
         id, club_id, event_id, reason, new_starts_at, new_venue,
-        note, status, requested_by_user_id, created_at, updated_at
+        note, status, requested_by_user_id, notify_parents, created_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         status = excluded.status,
         note = excluded.note,
@@ -465,6 +465,7 @@ export class DataCapabilityRepository {
       request.note ?? null,
       request.status,
       request.requestedByUserId ?? null,
+      request.notifyParents === undefined ? 1 : request.notifyParents ? 1 : 0,
       request.createdAt,
       request.updatedAt,
     );
@@ -2818,6 +2819,7 @@ function mapEventChangeRequest(row: SqlRow): EventChangeRequest {
     note: optionalString(row, "note"),
     status: requireString(row, "status") as EventChangeRequest["status"],
     requestedByUserId: optionalString(row, "requested_by_user_id"),
+    notifyParents: row.notify_parents === undefined || row.notify_parents === null ? undefined : Number(row.notify_parents) !== 0,
     createdAt: requireString(row, "created_at"),
     updatedAt: requireString(row, "updated_at"),
   };

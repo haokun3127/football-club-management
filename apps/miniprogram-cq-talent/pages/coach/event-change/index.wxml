@@ -31,7 +31,7 @@
         </view>
       </view>
 
-      <view wx:if="{{requiresTime}}" class="form-card">
+      <view class="form-card">
         <view class="form-card__title">新时间</view>
         <view class="picker-row">
           <picker mode="date" value="{{newDate}}" disabled="{{submitting}}" bindchange="selectDate">
@@ -49,18 +49,31 @@
         </view>
       </view>
 
-      <view wx:if="{{requiresVenue}}" class="form-card">
+      <view class="form-card">
         <view class="form-card__title">新场地</view>
-        <input class="input-box" placeholder="填写不同于原场地的新场地" value="{{newVenue}}" disabled="{{submitting}}" bindinput="inputVenue" />
+        <picker wx:if="{{venueNames.length > 0}}" mode="selector" range="{{venueNames}}" value="{{venueIndex}}" disabled="{{submitting}}" bindchange="selectVenue">
+          <view class="picker-box picker-box--row">
+            <text class="{{venueIndex >= 0 ? '' : 'picker-box--placeholder'}}">{{venueIndex >= 0 ? newVenue : '选择新场地'}}</text>
+            <text class="picker-box__arrow">›</text>
+          </view>
+        </picker>
+        <input wx:else class="input-box" placeholder="填写不同于原场地的新场地" value="{{newVenue}}" disabled="{{submitting}}" bindinput="inputVenue" />
       </view>
 
       <view class="form-card">
         <view class="form-card__title">说明</view>
-        <textarea class="textarea-box" placeholder="补充说明（可选）" maxlength="500" value="{{note}}" disabled="{{submitting}}" bindinput="inputNote" />
+        <textarea class="textarea-box" placeholder="请说明变更原因（选填）" maxlength="500" value="{{note}}" disabled="{{submitting}}" bindinput="inputNote" />
+      </view>
+
+      <view class="form-card notify-row">
+        <view class="notify-row__text">
+          <view class="form-card__title">通知学员家长</view>
+          <view class="notify-row__hint">本次变更将通知 {{affectedCount}} 位家长</view>
+        </view>
+        <switch checked="{{notifyParents}}" disabled="{{submitting}}" color="#a80f1b" bindchange="toggleNotify" />
       </view>
 
       <view wx:if="{{hasSubmitError}}" class="form-error">{{submitError}}</view>
-      <view class="hint">提交后等待管理员处理，活动本身不会立即变更。</view>
     </block>
   </view>
   <role-tabbar role="coach" active="schedule" />

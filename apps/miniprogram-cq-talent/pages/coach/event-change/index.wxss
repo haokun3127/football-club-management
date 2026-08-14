@@ -139,3 +139,8 @@
   font-size: 24rpx;
   line-height: 34rpx;
 }
+
+.picker-box--row { display: flex; align-items: center; justify-content: space-between; }
+.picker-box__arrow { color: #98a2b3; font-size: 32rpx; }
+.notify-row { display: flex; align-items: center; justify-content: space-between; }
+.notify-row__hint { margin-top: 8rpx; color: #98a2b3; font-size: 24rpx; }

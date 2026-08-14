@@ -696,6 +696,7 @@ export const schemas = {
         newStartsAt: { type: "string", minLength: 1 },
         newVenue: { type: "string", minLength: 1 },
         note: { type: "string", maxLength: 500 },
+        notifyParents: { type: "boolean" },
       },
     },
     response: {

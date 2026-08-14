@@ -1,4 +1,4 @@
-import { createCoachEventChangeRequest, getCoachWorkbench } from "../../../utils/api";
+import { createCoachEventChangeRequest, getCoachWorkbench, getVenues } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import type { LoadState } from "../../../utils/types";
 
@@ -14,6 +14,7 @@ interface ChangeRequestInput {
   newStartsAt?: string;
   newVenue?: string;
   note?: string;
+  notifyParents?: boolean;
 }
 
 interface PageData {
@@ -42,6 +43,10 @@ interface PageData {
   submitting: boolean;
   hasSubmitError: boolean;
   submitError: string;
+  venueNames: string[];
+  venueIndex: number;
+  notifyParents: boolean;
+  affectedCount: number;
 }
 
 const REASONS: ReasonOption[] = [
@@ -78,6 +83,10 @@ Page<PageData>({
     submitting: false,
     hasSubmitError: false,
     submitError: "",
+    venueNames: [],
+    venueIndex: -1,
+    notifyParents: true,
+    affectedCount: 0,
   },
   onLoad(query: { id?: string }) {
     this.load(query?.id || "");
@@ -98,7 +107,10 @@ Page<PageData>({
       submitError: "",
     });
     try {
-      const workbench = await getCoachWorkbench(eventId);
+      const [workbench, venues] = await Promise.all([
+        getCoachWorkbench(eventId),
+        getVenues().catch(() => []),
+      ]);
       const event = workbench.event;
       const isCancelled = event.status === "cancelled";
       const eventMeta = eventMetadata(event.teamName, event.startsAt, event.endsAt);
@@ -126,6 +138,10 @@ Page<PageData>({
         submitting: false,
         hasSubmitError: false,
         submitError: "",
+        venueNames: venues.map((venue) => venue.name),
+        venueIndex: -1,
+        notifyParents: true,
+        affectedCount: workbench.roster.length,
       });
     } catch {
       this.setData({ state: "error", message: "活动信息读取失败，请稍后重试。", canSubmit: false });
@@ -174,6 +190,23 @@ Page<PageData>({
       submitError: "",
     });
   },
+  selectVenue(event: { detail: { value: string | number } }) {
+    if (this.data.submitting) return;
+    const venueIndex = Number(event.detail.value);
+    const newVenue = this.data.venueNames[venueIndex] ?? "";
+    const reason = selectedReason(this.data.reasons, this.data.reasonIndex);
+    this.setData({
+      venueIndex,
+      newVenue,
+      canSubmit: canSubmitChange(reason, this.data.originalStartsAt, this.data.originalVenue, this.data.newDate, this.data.newTime, newVenue),
+      hasSubmitError: false,
+      submitError: "",
+    });
+  },
+  toggleNotify(event: { detail: { value: boolean } }) {
+    if (this.data.submitting) return;
+    this.setData({ notifyParents: Boolean(event.detail.value) });
+  },
   inputVenue(event: { detail: { value: string } }) {
     if (this.data.submitting) return;
     const newVenue = event.detail.value;
@@ -200,7 +233,7 @@ Page<PageData>({
 
     this.setData({ submitting: true, hasSubmitError: false, submitError: "" });
     try {
-      await createCoachEventChangeRequest(this.data.eventId, result.input);
+      await createCoachEventChangeRequest(this.data.eventId, { ...result.input, notifyParents: this.data.notifyParents });
       wx.navigateBack({ delta: 1 });
     } catch (error) {
       this.setData({ submitting: false, hasSubmitError: true, submitError: submitErrorMessage(error) });

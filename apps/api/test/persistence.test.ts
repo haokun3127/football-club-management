@@ -333,6 +333,7 @@ describe("platform persistence", () => {
       "0008_match_event_bundles.sql",
       "0009_app_client_sessions.sql",
       "0010_student_guardian_bindings.sql",
+      "0011_event_change_notify.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);

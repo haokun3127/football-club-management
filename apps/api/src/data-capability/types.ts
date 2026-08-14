@@ -620,6 +620,7 @@ export interface EventChangeRequest {
   note?: string;
   status: EventChangeRequestStatus;
   requestedByUserId?: EntityId;
+  notifyParents?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -668,4 +669,5 @@ export interface EventChangeRequestInput {
   newVenue?: string;
   note?: string;
   requestedByUserId?: EntityId;
+  notifyParents?: boolean;
 }

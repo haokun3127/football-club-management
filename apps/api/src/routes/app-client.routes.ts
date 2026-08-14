@@ -1971,6 +1971,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       newStartsAt?: string;
       newVenue?: string;
       note?: string;
+      notifyParents?: boolean;
     };
   }>(
     "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/change-requests",
@@ -2016,6 +2017,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         newVenue: request.body.newVenue,
         note: request.body.note,
         requestedByUserId: auth?.user.id,
+        notifyParents: request.body.notifyParents,
       });
       reply.code(201);
       return {

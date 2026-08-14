@@ -4,12 +4,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   createCoachEventChangeRequest: vi.fn(),
   getCoachWorkbench: vi.fn(),
+  getVenues: vi.fn(),
   requireRole: vi.fn(),
 }));
 
 vi.mock("../../../utils/api", () => ({
   createCoachEventChangeRequest: mocks.createCoachEventChangeRequest,
   getCoachWorkbench: mocks.getCoachWorkbench,
+  getVenues: mocks.getVenues,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 
@@ -70,6 +72,7 @@ describe("coach activity change", () => {
   beforeEach(() => {
     mocks.createCoachEventChangeRequest.mockReset().mockResolvedValue(undefined);
     mocks.getCoachWorkbench.mockReset();
+    mocks.getVenues.mockReset().mockResolvedValue([{ id: "venue-1", name: "凤凰山球场" }]);
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
     globalThis.wx.navigateBack.mockReset();
     globalThis.wx.showToast.mockReset();
@@ -89,6 +92,7 @@ describe("coach activity change", () => {
       reason: "venue",
       newVenue: "South field",
       note: "Venue maintenance",
+      notifyParents: true,
     });
 
     const timePage = await loadReadyPage();
@@ -106,6 +110,7 @@ describe("coach activity change", () => {
       reason: "time",
       newStartsAt: "2026-08-13T10:00:00+08:00",
       note: "Move later",
+      notifyParents: true,
     });
 
     const weatherPage = await loadReadyPage();
@@ -118,6 +123,7 @@ describe("coach activity change", () => {
     expect(mocks.createCoachEventChangeRequest).toHaveBeenLastCalledWith("event-1", {
       reason: "weather",
       note: "Weather alert",
+      notifyParents: true,
     });
   });
 
@@ -171,15 +177,16 @@ describe("coach activity change", () => {
     expect(cancelledPage.data).toMatchObject({ state: "empty", canSubmit: false });
   });
 
-  it("uses precomputed fields and excludes Figma examples and unsupported notification actions", () => {
-    expect(template).toContain('wx:if="{{requiresVenue}}"');
-    expect(template).toContain('wx:if="{{requiresTime}}"');
+  it("uses precomputed fields and C3 notify/venue affordances without Figma examples", () => {
     expect(template).toContain('wx:if="{{hasSubmitError}}"');
     expect(template).toContain('disabled="{{submitting}}"');
+    expect(template).toContain("通知学员家长");
+    expect(template).toContain("本次变更将通知 {{affectedCount}} 位家长");
+    expect(template).toContain('bindchange="toggleNotify"');
+    expect(template).toContain('bindchange="selectVenue"');
     expect(template).not.toContain("凤凰山");
     expect(template).not.toContain("U10精英队");
     expect(template).not.toContain("2025-07-10");
-    expect(template).not.toContain("通知学员家长");
     expect(template).not.toContain("20 位家长");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });

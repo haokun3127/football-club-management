@@ -1195,7 +1195,7 @@ export async function getCoachTeamAbilityOverview(): Promise<CoachTeamAbilityOve
 
 export async function createCoachEventChangeRequest(
   eventId: string,
-  input: { reason: "venue" | "time" | "weather" | "other"; newStartsAt?: string; newVenue?: string; note?: string },
+  input: { reason: "venue" | "time" | "weather" | "other"; newStartsAt?: string; newVenue?: string; note?: string; notifyParents?: boolean },
 ): Promise<void> {
   const context = requireContext();
   await request<unknown, typeof input>({
