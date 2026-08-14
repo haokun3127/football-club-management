@@ -114,7 +114,7 @@ describe("coach schedule home", () => {
         { key: "pending", label: "待处理1", value: "" },
       ],
       hasHeroEvent: true,
-      heroDateLabel: "2026-08-13",
+      heroDateLabel: "2026年8月13日 周四",
       heroEvent: { id: "event-training-1", title: "Ball-control session", startTime: "09:00", hasDuration: true },
       hasVisibleEvents: true,
       visibleEvents: [{

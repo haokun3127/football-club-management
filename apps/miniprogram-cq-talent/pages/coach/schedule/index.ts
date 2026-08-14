@@ -79,7 +79,7 @@ Page({
         message: hasWork ? "" : "所选日期范围内没有日程或待处理任务",
         home,
         selectedDate: this.data.date,
-        dayStrip: buildDayStrip(range.from),
+        dayStrip: buildDayStrip(startOfWeek(this.data.date)),
         rangeLabel: rangeLabel(range, this.data.viewMode),
         coachName,
         coachInitial: coachName.slice(0, 1),
@@ -97,7 +97,7 @@ Page({
         eventViews,
         heroEvent,
         hasHeroEvent: Boolean(heroEvent),
-        heroDateLabel: formatCalendarDate(this.data.date),
+        heroDateLabel: heroDateLabel(this.data.date),
         taskCards,
         hasTaskCards: taskCards.length > 0,
       });
@@ -203,6 +203,13 @@ function toCoachTaskView(task: CoachTask): CoachTaskView {
     hasDueAt: Boolean(task.dueAt),
     dueLabel: task.dueAt ? formatCalendarDate(task.dueAt) : "",
   };
+}
+
+function heroDateLabel(date: string): string {
+  const value = new Date(`${date}T00:00:00.000Z`);
+  if (!Number.isFinite(value.getTime())) return formatCalendarDate(date);
+  const weekLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+  return `${value.getUTCFullYear()}年${value.getUTCMonth() + 1}月${value.getUTCDate()}日 ${weekLabels[value.getUTCDay()]}`;
 }
 
 function buildHeroPills(home: CoachHome): string[] {
