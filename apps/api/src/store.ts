@@ -185,6 +185,8 @@ export interface ApiStore {
   isGuardianOfStudent(clubId: EntityId, userId: EntityId, studentId: EntityId): boolean;
   listStudentGuardians(clubId: EntityId, studentId: EntityId): Array<StudentGuardianBinding & { parent: ParentProfile }>;
   listCalendarEvents(clubId: EntityId): unknown[];
+  getCalendarEvent(eventId: EntityId): CalendarEvent | null | Promise<CalendarEvent | null>;
+  saveCalendarEvent(event: CalendarEvent): CalendarEvent | Promise<CalendarEvent>;
   listEventParticipants(clubId: EntityId): EventParticipant[];
   listMetricRecords(clubId: EntityId): PlayerMetricRecord[];
   getStudentTimeline(clubId: EntityId, studentId: EntityId): unknown[];

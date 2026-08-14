@@ -106,6 +106,27 @@ describe("coach activity workbench", () => {
       hasTeamName: true,
       hasVenue: true,
     });
+    expect(page.data).toMatchObject({ inProgress: false, countdownText: "", attendancePresent: 0, attendanceTotal: 2, joinedNames: "Athlete One" });
+  });
+
+  it("shows finish action and countdown for in-progress events", async () => {
+    mocks.getCoachWorkbench.mockResolvedValue({
+      ...trainingWorkbench,
+      event: {
+        ...trainingWorkbench.event,
+        status: "scheduled",
+        startsAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+        endsAt: new Date(Date.now() + 42 * 60 * 1000).toISOString(),
+      },
+      roster: [{ studentId: "student-1", name: "Athlete One", status: "present" }],
+    });
+    const page = createPageInstance();
+    await page.load("event-training-1");
+
+    expect(page.data).toMatchObject({ inProgress: true, attendancePresent: 1, attendanceTotal: 1 });
+    expect(page.data.countdownText).toMatch(/^00:4[0-9]:[0-9]{2}$/);
+    page.onUnload();
+    expect(page.countdownTimer).toBeNull();
   });
 
   it("keeps missing, forbidden, and empty workbenches honest", async () => {
@@ -191,14 +212,15 @@ describe("coach activity workbench", () => {
     expect(page.data).toMatchObject({ hasTraining: false, hasMatch: true, hasAssessmentTemplate: false });
   });
 
-  it("uses precomputed template fields and excludes unsupported timer, finish, sample attendance, and unsafe WXML expressions", () => {
+  it("uses precomputed template fields and C2 in-progress affordances without unsafe WXML expressions", () => {
     expect(template).toContain('wx:if="{{hasRoster}}"');
     expect(template).toContain('wx:if="{{hasWorkflow}}"');
     expect(template).toContain('wx:if="{{hasActionCards}}"');
     expect(template).toContain('bindtap="openAction"');
-    expect(template).not.toContain("finishSession");
-    expect(template).not.toContain("elapsed");
-    expect(template).not.toContain("结束训练");
+    expect(template).toContain('wx:if="{{inProgress}}"');
+    expect(template).toContain('bindtap="finishEvent"');
+    expect(template).toContain("结束训练");
+    expect(template).toContain('wx:if="{{countdownText}}"');
     expect(template).not.toContain("18/20");
     expect(template).not.toContain("凤凰山");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);

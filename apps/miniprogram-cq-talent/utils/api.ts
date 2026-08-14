@@ -169,6 +169,14 @@ export async function getCoachWorkbench(eventId: string): Promise<CoachWorkbench
   return normalizeCoachWorkbench(response, eventId);
 }
 
+export async function finishCoachEvent(eventId: string): Promise<void> {
+  const context = requireContext();
+  await request<Record<string, unknown>>({
+    method: "POST",
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/finish`,
+  });
+}
+
 export async function getCoachMatchDetail(eventId: string): Promise<CoachMatchDetail> {
   const context = requireContext();
   const response = await request<Record<string, unknown>>({

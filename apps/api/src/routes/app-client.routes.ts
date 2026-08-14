@@ -1109,6 +1109,53 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
     },
   );
 
+  app.post<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      eventId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/finish",
+    {
+      schema: {
+        ...schemas.appClientEventParams,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+
+      const event = await context.store.getCalendarEvent(request.params.eventId);
+      if (!event || event.clubId !== request.params.clubId) {
+        return context.sendError(reply, 404, "not_found", "Event not found");
+      }
+      if (event.status !== "scheduled") {
+        return context.sendError(reply, 409, "invalid_status", "Only scheduled events can be finished");
+      }
+
+      const saved = await context.store.saveCalendarEvent({
+        ...event,
+        status: "completed",
+        updatedAt: new Date().toISOString(),
+      });
+      return { event: { id: saved.id, status: saved.status } };
+    },
+  );
+
   app.get<{
     Params: {
       clubId: string;

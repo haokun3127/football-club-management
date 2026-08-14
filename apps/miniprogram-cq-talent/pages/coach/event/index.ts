@@ -1,8 +1,11 @@
-import { getCoachWorkbench } from "../../../utils/api";
+import { finishCoachEvent, getCoachWorkbench } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { activityStatus, activityTypeLabel, formatCalendarDate, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
+
+type TimerHost = { setInterval: (handler: () => void, timeout: number) => number; clearInterval: (id: number) => void };
+const timerHost = globalThis as unknown as TimerHost;
 
 type WorkbenchAction = "attendance" | "lesson" | "match" | "tactical" | "training" | "assessment" | "change";
 
@@ -18,7 +21,7 @@ type ActionCard = {
   icon: string;
 };
 
-type RosterRow = CoachWorkbench["roster"][number] & { statusLabel: string };
+type RosterRow = CoachWorkbench["roster"][number] & { statusLabel: string; present: boolean; initial: string };
 
 type EventView = {
   title: string;
@@ -58,6 +61,12 @@ Page({
     hasPendingRows: false,
     hasActionCards: false,
     hasAssessmentTemplate: false,
+    inProgress: false,
+    countdownText: "",
+    attendancePresent: 0,
+    attendanceTotal: 0,
+    joinedNames: "",
+    finishing: false,
   },
   onLoad(query?: Record<string, string | undefined>) {
     requireRole("coach");
@@ -73,7 +82,18 @@ Page({
       const workbench = await getCoachWorkbench(id);
       const eventView = presentEvent(workbench);
       const canWrite = workbench.event.status !== "cancelled";
-      const rosterRows = workbench.roster.map((item) => ({ ...item, statusLabel: rosterStatusLabel(item.status) }));
+      const rosterRows = workbench.roster.map((item) => ({
+        ...item,
+        statusLabel: rosterStatusLabel(item.status),
+        present: isPresentStatus(item.status),
+        initial: (item.name || "学").slice(0, 1),
+      }));
+      const attendancePresent = rosterRows.filter((item) => item.present).length;
+      const joinedNames = rosterRows
+        .filter((item) => item.present || item.status === "confirmed")
+        .map((item) => item.name)
+        .join(" · ");
+      const inProgress = isInProgress(workbench.event.status, workbench.event.startsAt, workbench.event.endsAt);
       const workflowRows = workbench.workflow.map((item) => ({ ...item }));
       const trainingRows = workbench.event.type === "training" ? workbench.training.map((item) => ({ ...item })) : [];
       const matchRows = workbench.event.type === "match" ? workbench.match.map((item) => ({ ...item })) : [];
@@ -108,7 +128,12 @@ Page({
         hasPendingRows: pendingRows.length > 0,
         hasActionCards: actionCards.length > 0,
         hasAssessmentTemplate: Boolean(workbench.assessmentTemplateId),
+        inProgress,
+        attendancePresent,
+        attendanceTotal: rosterRows.length,
+        joinedNames,
       });
+      this.syncCountdown(inProgress, workbench.event.endsAt);
     } catch {
       this.setData({
         state: "error",
@@ -131,7 +156,13 @@ Page({
         hasPendingRows: false,
         hasActionCards: false,
         hasAssessmentTemplate: false,
+        inProgress: false,
+        countdownText: "",
+        attendancePresent: 0,
+        attendanceTotal: 0,
+        joinedNames: "",
       });
+      this.syncCountdown(false, undefined);
     }
   },
   openAction(event: { currentTarget?: { dataset?: { action?: WorkbenchAction } } }) {
@@ -142,6 +173,9 @@ Page({
     const route = routeForAction(action, id, this.data.assessmentTemplateId);
     if (route) openPage(route);
   },
+  openAttendance() {
+    if (this.data.eventId) openPage(`/pages/coach/attendance/index?id=${this.data.eventId}`);
+  },
   openCoachRoot(event: { currentTarget?: { dataset?: { path?: string } } }) {
     const path = event.currentTarget?.dataset?.path;
     if (!path || !coachRootRoutes.has(path)) return;
@@ -149,6 +183,43 @@ Page({
   },
   retry() {
     this.load(this.data.eventId);
+  },
+  countdownTimer: null as number | null,
+  syncCountdown(inProgress: boolean, endsAt?: string) {
+    if (this.countdownTimer !== null) {
+      timerHost.clearInterval(this.countdownTimer);
+      this.countdownTimer = null;
+    }
+    const endMs = Date.parse(endsAt ?? "");
+    if (!inProgress || !Number.isFinite(endMs)) {
+      if (this.data.countdownText) this.setData({ countdownText: "" });
+      return;
+    }
+    const tick = () => {
+      const remain = Math.max(0, endMs - Date.now());
+      this.setData({ countdownText: formatCountdown(remain) });
+    };
+    tick();
+    this.countdownTimer = timerHost.setInterval(tick, 1000);
+  },
+  async finishEvent() {
+    if (this.data.finishing || !this.data.inProgress || !this.data.eventId) return;
+    this.setData({ finishing: true });
+    try {
+      await finishCoachEvent(this.data.eventId);
+      wx.showToast({ title: "训练已结束", icon: "success" });
+      await this.load(this.data.eventId);
+    } catch {
+      wx.showToast({ title: "结束失败，请重试", icon: "none" });
+    } finally {
+      this.setData({ finishing: false });
+    }
+  },
+  onUnload() {
+    if (this.countdownTimer !== null) {
+      timerHost.clearInterval(this.countdownTimer);
+      this.countdownTimer = null;
+    }
   },
   goBack() {
     wx.navigateBack();
@@ -216,6 +287,29 @@ function routeForAction(action: WorkbenchAction, eventId: string, templateId: st
   };
   if (action === "assessment") return templateId ? `/pages/coach/test-entry/index?eventId=${eventId}&templateId=${templateId}` : "";
   return routes[action];
+}
+
+function isInProgress(status: string, startsAt?: string, endsAt?: string) {
+  if (status !== "scheduled") return false;
+  const start = Date.parse(startsAt ?? "");
+  const end = Date.parse(endsAt ?? "");
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return false;
+  const now = Date.now();
+  return now >= start && now < end;
+}
+
+function isPresentStatus(value: string) {
+  const status = value.toLowerCase();
+  return status === "present" || status === "attended" || status === "late";
+}
+
+function formatCountdown(ms: number) {
+  const total = Math.floor(ms / 1000);
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const seconds = total % 60;
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
 function rosterStatusLabel(value: string) {

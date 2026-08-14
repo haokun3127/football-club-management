@@ -365,6 +365,21 @@ describe("api server", () => {
       url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/home?from=2026-07-01&to=2026-07-07",
       headers: { "x-user-id": "user-coach-1" },
     });
+    const coachEventFinishForbidden = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/finish",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+    const coachEventFinish = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/finish",
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    const coachEventFinishAgain = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/finish",
+      headers: { "x-user-id": "user-coach-1" },
+    });
     const parentCoachHome = await app.inject({
       method: "GET",
       url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/home?date=2026-07-01",
@@ -439,6 +454,10 @@ describe("api server", () => {
       expect.objectContaining({ eventId: "event-training-1", action: "attendance" }),
     ]));
     expect(parentCoachHome.statusCode).toBe(403);
+    expect(coachEventFinishForbidden.statusCode).toBe(403);
+    expect(coachEventFinish.statusCode).toBe(200);
+    expect((coachEventFinish.json() as { event: { id: string; status: string } }).event).toEqual({ id: "event-training-1", status: "completed" });
+    expect(coachEventFinishAgain.statusCode).toBe(409);
     expect(parentCoachHome.json().error.code).toBe("forbidden");
 
     await app.close();

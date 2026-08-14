@@ -37,3 +37,11 @@
 .action-tile { display: flex; box-sizing: border-box; width: 100%; min-width: 0; min-height: 200rpx; flex-direction: column; align-items: center; justify-content: center; gap: 16rpx; margin: 0; padding: 16rpx 8rpx; border: 0; border-radius: 24rpx; background: #ffffff; box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, .05); color: #202124; }
 .action-tile__icon { width: 56rpx; height: 56rpx; }
 .action-tile__label { max-width: 100%; overflow: hidden; font-size: 24rpx; font-weight: 500; line-height: 32rpx; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+
+.c2-nav__finish { color: #a80f1b; font-size: 28rpx; font-weight: 600; }
+.c2-nav__finish--disabled { opacity: .5; }
+.shero__countdown { color: #ffffff; font-size: 72rpx; font-weight: 800; line-height: 88rpx; font-variant-numeric: tabular-nums; }
+.roster-detail { color: #a80f1b; font-size: 24rpx; }
+.roster-dots { display: flex; flex-wrap: wrap; gap: 16rpx; margin-top: 16rpx; }
+.roster-dot { display: flex; align-items: center; justify-content: center; width: 56rpx; height: 56rpx; border-radius: 999rpx; background: #e7eaf0; color: #98a2b3; font-size: 24rpx; }
+.roster-dot--present { background: #a80f1b; color: #ffffff; }

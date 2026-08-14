@@ -4,6 +4,7 @@
       <view class="c2-nav__back">‹</view>
       <view class="c2-nav__title">{{eventTypeLabel}}工作台</view>
     </view>
+    <view wx:if="{{inProgress}}" class="c2-nav__finish {{finishing ? 'c2-nav__finish--disabled' : ''}}" bindtap="finishEvent">结束训练</view>
   </view>
   <view class="c2-route-tabs">
     <view class="c2-route-tab c2-route-tab--active" data-path="/pages/coach/schedule/index" bindtap="openCoachRoot">
@@ -34,9 +35,11 @@
         <view class="shero__status"><status-chip label="{{eventView.statusLabel}}" tone="{{eventView.statusTone}}" compact="{{true}}" /></view>
       </view>
       <view wx:if="{{eventView.hasTime}}" class="shero__meta">{{eventView.timeLabel}}</view>
+      <view wx:if="{{countdownText}}" class="shero__countdown">{{countdownText}}</view>
       <view class="shero__chips">
         <view wx:if="{{eventView.hasTeamName}}" class="shero__chip">{{eventView.teamName}}</view>
         <view wx:if="{{eventView.hasVenue}}" class="shero__chip shero__chip--muted">{{eventView.venue}}</view>
+        <view wx:if="{{attendanceTotal > 0}}" class="shero__chip shero__chip--muted">出席{{attendancePresent}}/{{attendanceTotal}}人</view>
       </view>
     </view>
 
@@ -57,14 +60,13 @@
 
     <view wx:if="{{hasRoster}}" class="workbench-card">
       <view class="row">
-        <view class="section-title">参与成员</view>
-        <view class="roster-count">{{rosterCount}} 人</view>
+        <view class="section-title">出勤情况 {{attendancePresent}}/{{attendanceTotal}}</view>
+        <view class="roster-detail" bindtap="openAttendance">查看详情</view>
       </view>
-      <view class="subtitle">状态来自活动名单确认，不作为出勤统计。</view>
-      <view wx:for="{{rosterRows}}" wx:key="studentId" class="field-row">
-        <view class="label">{{item.name}}</view>
-        <view class="field-value">{{item.statusLabel}}</view>
+      <view class="roster-dots">
+        <view wx:for="{{rosterRows}}" wx:key="studentId" class="roster-dot {{item.present ? 'roster-dot--present' : ''}}">{{item.initial}}</view>
       </view>
+      <view wx:if="{{joinedNames}}" class="subtitle">已加入：{{joinedNames}}</view>
     </view>
 
     <view wx:if="{{hasTraining}}" class="workbench-card">
