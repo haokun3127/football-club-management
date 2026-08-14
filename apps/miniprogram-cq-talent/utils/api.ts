@@ -666,10 +666,7 @@ function normalizeStudentHome(raw: Record<string, unknown>, student: StudentSumm
       { label: "剩余课时", value: lessonCountLabel(status?.lessonBalance ?? lesson?.balance ?? status?.remainingLessons ?? status?.remainingClassHours) },
       { label: "最近更新", value: updatedAt ? formatDateTime(updatedAt) : "尚未同步" },
     ],
-    insuranceStatus: [
-      { label: "保险状态", value: insuranceStatusLabel(insurance?.status ?? status?.insuranceStatus) },
-      { label: "到期日期", value: String(insurance?.expiresAt ?? status?.insuranceExpiresAt ?? status?.insuranceEndDate ?? "未登记") },
-    ],
+    insuranceStatus: buildInsuranceRows(profile, insurance, status),
     clubInfo: pendingClubInfo(requireContext()),
     updatedAt,
   };
@@ -684,6 +681,31 @@ function insuranceStatusLabel(value: unknown) {
   const labels: Record<string, string> = { active: "保障中", expired: "已到期", pending: "待审核", unknown: "未登记" };
   const key = String(value ?? "unknown").toLowerCase();
   return labels[key] ?? String(value ?? "未登记");
+}
+
+// 保险行：真实数据在 student.insuranceStatus（{approved, expiresAt, policyNumber}）或 status.insurance，
+// 显式 status 缺失时按 approved+到期日推导，badge 用的 status 字段必须随行下发
+function buildInsuranceRows(
+  profile: Record<string, unknown> | undefined,
+  insurance: Record<string, unknown> | undefined,
+  status: Record<string, unknown> | undefined,
+): StudentHome["insuranceStatus"] {
+  const record = asRecord(profile?.insuranceStatus) ?? insurance;
+  const expiresAt = stringOrUndefined(record?.expiresAt ?? status?.insuranceExpiresAt ?? status?.insuranceEndDate);
+  const explicit = stringOrUndefined(insurance?.status ?? status?.insuranceStatus);
+  let derived = explicit;
+  if (!derived) {
+    if (record?.approved === false) derived = "pending";
+    else if (expiresAt) derived = Date.parse(expiresAt) < Date.now() ? "expired" : "active";
+    else if (record?.approved === true) derived = "active";
+  }
+  const rows: StudentHome["insuranceStatus"] = [
+    { label: "保险状态", value: insuranceStatusLabel(derived), status: derived },
+    { label: "到期日期", value: expiresAt ?? "未登记" },
+  ];
+  const policyNumber = stringOrUndefined(record?.policyNumber);
+  if (policyNumber) rows.push({ label: "保单号", value: policyNumber });
+  return rows;
 }
 
 function normalizeCoachHome(raw: Record<string, unknown>, from: string, to: string): CoachHome {

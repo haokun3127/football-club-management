@@ -1,8 +1,9 @@
-import { getParentCalendar, getParentChildren, getParentStudentHome } from "../../../utils/api";
+import { getParentCalendar, getParentChildren, getParentGrowth, getParentStudentHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { currentLocalDate, shiftCalendarDate } from "../../../utils/date";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
-import type { LoadState, ScheduleEvent, StudentHome, StudentSummary } from "../../../utils/types";
+import { openPage } from "../../../utils/navigation";
+import type { GrowthSummary, LoadState, ScheduleEvent, StudentHome, StudentSummary } from "../../../utils/types";
 
 interface HistoryRow {
   id: string;
@@ -28,6 +29,7 @@ interface PageData {
   insuranceRows: StatusRow[];
   insuranceBadge: string;
   insuranceBadgeTone: string;
+  insuranceSubtitle: string;
   history: HistoryRow[];
   navInset: number;
   navActionTop: number;
@@ -46,6 +48,7 @@ Page<PageData>({
     insuranceRows: [],
     insuranceBadge: "",
     insuranceBadgeTone: "success",
+    insuranceSubtitle: "",
     history: [],
     navInset: resolveNavInset(),
     menuInset: resolveMenuInset(),
@@ -68,11 +71,12 @@ Page<PageData>({
       const active = children.find((child) => child.id === studentId) ?? children[0] as StudentSummary;
       const today = currentLocalDate();
       const thirtyDaysAgo = shiftCalendarDate(today, -29);
-      const [studentHome, events] = await Promise.all([
+      const [studentHome, events, growth] = await Promise.all([
         getParentStudentHome(active),
         getParentCalendar(thirtyDaysAgo, today),
+        getParentGrowth(active.id).catch(() => undefined),
       ]);
-      this.render(active, studentHome, events, new Date(today));
+      this.render(active, studentHome, events, new Date(today), growth);
     } catch (error) {
       this.setData({
         state: "error",
@@ -84,7 +88,7 @@ Page<PageData>({
     this.load(this.data.studentId);
   },
   goBack() { wx.navigateBack(); },
-  render(student: StudentSummary, home: StudentHome, events: ScheduleEvent[], today: Date) {
+  render(student: StudentSummary, home: StudentHome, events: ScheduleEvent[], today: Date, growth?: GrowthSummary) {
     const pastTrainings = events
       .filter((event) => event.type === "training" && eventBelongsToStudent(event, student.id) && new Date(event.startsAt).getTime() <= today.getTime())
       .sort((a, b) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime());
@@ -98,19 +102,24 @@ Page<PageData>({
       const d = new Date(event.startsAt);
       return `${d.getFullYear()}-${Math.floor(d.getMonth() / 3)}` === seasonKey;
     }).length;
+    // 设计口径=累计课时/本月/本季：trainingStats 优先（全时间轴真实统计），回退 30 天窗口计数
+    const stats = growth?.trainingStats;
+    const seasonTotal = stats ? stats.monthly.slice(-3).reduce((sum, item) => sum + item.count, 0) : seasonCount;
     const insuranceStatus = home.insuranceStatus[0]?.status ?? "";
+    const badge = insuranceBadge(insuranceStatus);
     this.setData({
       state: "ready",
       message: "",
       studentId: student.id,
       activeStudentName: student.name,
-      totalCount: pastTrainings.length,
-      monthCount,
-      seasonCount,
+      totalCount: stats?.totalTrainings ?? pastTrainings.length,
+      monthCount: stats?.monthTrainings ?? monthCount,
+      seasonCount: seasonTotal,
       lessonRows: home.lessonStatus.map((row) => ({ label: row.label, value: row.value })),
       insuranceRows: home.insuranceStatus.slice(0, 3).map((row) => ({ label: row.label, value: row.value })),
-      insuranceBadge: insuranceBadge(insuranceStatus).label,
-      insuranceBadgeTone: insuranceBadge(insuranceStatus).tone,
+      insuranceBadge: badge.label,
+      insuranceBadgeTone: badge.tone,
+      insuranceSubtitle: badge.tone === "success" ? "随队保险覆盖中" : "",
       history: pastTrainings.slice(0, 4).map((event) => ({
         id: event.id,
         dateLabel: formatMonthDay(event.startsAt),
@@ -118,6 +127,9 @@ Page<PageData>({
         hoursLabel: hoursLabel(event.startsAt, event.endsAt),
       })),
     });
+  },
+  openCoach() {
+    openPage("/pages/parent/coaches/index");
   },
 });
 

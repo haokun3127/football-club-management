@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   getParentCalendar: vi.fn(),
   getParentChildren: vi.fn(),
+  getParentGrowth: vi.fn(),
   getParentStudentHome: vi.fn(),
   requireRole: vi.fn(),
 }));
@@ -11,9 +12,11 @@ const mocks = vi.hoisted(() => ({
 vi.mock("../../../utils/api", () => ({
   getParentCalendar: mocks.getParentCalendar,
   getParentChildren: mocks.getParentChildren,
+  getParentGrowth: mocks.getParentGrowth,
   getParentStudentHome: mocks.getParentStudentHome,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
+vi.mock("../../../utils/navigation", () => ({ openPage: vi.fn() }));
 
 let pageDefinition;
 globalThis.Page = (definition) => {
@@ -38,6 +41,7 @@ describe("parent lessons and insurance", () => {
   beforeEach(() => {
     mocks.getParentCalendar.mockReset();
     mocks.getParentChildren.mockReset();
+    mocks.getParentGrowth.mockReset().mockResolvedValue({});
     mocks.getParentStudentHome.mockReset();
     mocks.requireRole.mockReset().mockReturnValue({ role: "parent" });
   });
