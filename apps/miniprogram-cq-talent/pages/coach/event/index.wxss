@@ -46,3 +46,5 @@
 .roster-dot { display: flex; align-items: center; justify-content: center; width: 56rpx; height: 56rpx; border-radius: 999rpx; background: #e7eaf0; color: #98a2b3; font-size: 24rpx; }
 .roster-dot--present { background: #a80f1b; color: #ffffff; }
 .shero__chip--live { background: rgba(46, 204, 113, .25); color: #7bf1a8; }
+.shero__countdown { display: flex; align-items: center; gap: 16rpx; }
+.shero__countdown-icon { width: 48rpx; height: 48rpx; }
