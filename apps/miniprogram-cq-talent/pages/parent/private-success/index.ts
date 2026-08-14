@@ -16,6 +16,7 @@ interface PrivateLessonView {
   status: PrivateLessonRequest["status"];
   statusLabel: string;
   headline: string;
+  confirmHint: string;
   hasConfirmation: boolean;
 }
 
@@ -81,8 +82,8 @@ Page<PageData>({
   backToSchedule() {
     wx.reLaunch({ url: "/pages/parent/schedule/index" });
   },
-  backToChild() {
-    wx.reLaunch({ url: "/pages/parent/child/index" });
+  backToHome() {
+    wx.reLaunch({ url: "/pages/parent/schedule/index" });
   },
   goBack() {
     wx.navigateBack();
@@ -104,6 +105,7 @@ function presentRequest(request: PrivateLessonRequest): PrivateLessonView {
     status: request.status,
     statusLabel: statusLabel(request.status),
     headline: statusHeadline(request.status),
+    confirmHint: request.status === "pending" ? `${request.coachName}将在 24 小时内确认` : `当前状态：${statusLabel(request.status)}`,
     hasConfirmation,
   };
 }

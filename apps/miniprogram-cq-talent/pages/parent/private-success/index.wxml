@@ -1,7 +1,7 @@
 <view class="private-success-page">
   <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="page-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
-    <view class="page-nav__title">预约详情</view>
+    <view class="page-nav__title">预约成功</view>
   </view>
 
   <view class="private-success-page__body">
@@ -20,23 +20,22 @@
         <text wx:else class="request-marker__status">{{request.statusLabel}}</text>
       </view>
       <view class="request-title">{{request.headline}}</view>
-      <view class="request-subtitle">当前状态：{{request.statusLabel}}</view>
+      <view class="request-subtitle">{{request.confirmHint}}</view>
 
       <view class="summary-card">
         <view class="summary-row"><view class="summary-row__label">教练</view><view class="summary-row__value">{{request.coachName}}</view></view>
         <view class="summary-row"><view class="summary-row__label">日期</view><view class="summary-row__value">{{request.date}}</view></view>
         <view class="summary-row"><view class="summary-row__label">时段</view><view class="summary-row__value">{{request.timeSlot}}</view></view>
-        <view class="summary-row"><view class="summary-row__label">状态</view><view class="summary-row__value">{{request.statusLabel}}</view></view>
-        <view wx:if="{{request.hasGoals}}" class="summary-row"><view class="summary-row__label">目标</view><view class="summary-row__value summary-row__value--wrap">{{request.goalsLabel}}</view></view>
+        <view wx:if="{{request.hasGoals}}" class="summary-row"><view class="summary-row__label">内容</view><view class="summary-row__value summary-row__value--wrap">{{request.goalsLabel}}</view></view>
         <view wx:if="{{request.hasNote}}" class="summary-row summary-row--last"><view class="summary-row__label">备注</view><view class="summary-row__value summary-row__value--wrap">{{request.note}}</view></view>
       </view>
 
       <view class="actions">
         <view class="actions__primary" bindtap="backToSchedule">查看训练日程</view>
-        <view class="actions__outline" bindtap="backToChild">返回孩子主页</view>
+        <view class="actions__outline" bindtap="backToHome">返回首页</view>
       </view>
     </block>
   </view>
 
-  <role-tabbar role="parent" active="discover" />
+  <role-tabbar role="parent" active="child" />
 </view>

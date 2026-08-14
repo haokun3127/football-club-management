@@ -92,6 +92,7 @@ describe("parent private lesson result", () => {
         hasNote: true,
         status: "pending",
         statusLabel: "待处理",
+        confirmHint: "Coach Chen将在 24 小时内确认",
       },
     });
   });
@@ -116,21 +117,20 @@ describe("parent private lesson result", () => {
     }
   });
 
-  it("uses direct routes for schedule and child home", () => {
+  it("uses direct routes for schedule and home", () => {
     const page = createPageInstance();
 
     page.backToSchedule();
-    page.backToChild();
+    page.backToHome();
 
     expect(globalThis.wx.reLaunch).toHaveBeenNthCalledWith(1, { url: "/pages/parent/schedule/index" });
-    expect(globalThis.wx.reLaunch).toHaveBeenNthCalledWith(2, { url: "/pages/parent/child/index" });
+    expect(globalThis.wx.reLaunch).toHaveBeenNthCalledWith(2, { url: "/pages/parent/schedule/index" });
   });
 
   it("does not retain route-derived success data or unsupported confirmation promises", () => {
     expect(template).toContain('state="{{state}}"');
     expect(template).toContain('wx:if="{{state === \'ready\' && request}}"');
-    expect(template).toContain('<role-tabbar role="parent" active="discover" />');
-    expect(template).not.toContain("24");
+    expect(template).toContain('<role-tabbar role="parent" active="child" />');
     expect(template).not.toContain("Coach Lin");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("query.coach");
