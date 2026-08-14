@@ -48,7 +48,7 @@ Page({
     hasCoachInitial: false,
     teamChips: [] as Array<{ name: string }>,
     hasTeams: false,
-    summaryItems: [] as Array<{ key: "training" | "match" | "pending"; label: string; value: string; tone: string }>,
+    summaryItems: [] as Array<{ key: "training" | "attendance" | "match" | "pending"; label: string; value: string; tone: string }>,
     eventViews: [] as CoachEventView[],
     visibleEvents: [] as CoachEventView[],
     hasVisibleEvents: false,
@@ -57,6 +57,7 @@ Page({
     heroEvent: null as CoachEventView | null,
     hasHeroEvent: false,
     heroDateLabel: "",
+    heroPills: [] as string[],
   },
   onLoad() {
     this.load();
@@ -87,9 +88,12 @@ Page({
         hasTeams: home.teams.length > 0,
         summaryItems: [
           { key: "training", label: `今日${home.summary.training}节训练课`, value: "", tone: "brand" },
-          { key: "match", label: `比赛${home.summary.matches}场`, value: "", tone: "blue" },
+          home.summary.attendance
+            ? { key: "attendance" as const, label: `出席${home.summary.attendance.confirmed}/${home.summary.attendance.total}人`, value: "", tone: "green" }
+            : { key: "match" as const, label: `比赛${home.summary.matches}场`, value: "", tone: "blue" },
           { key: "pending", label: `待处理${home.summary.pending}`, value: "", tone: "amber" },
         ],
+        heroPills: buildHeroPills(home),
         eventViews,
         heroEvent,
         hasHeroEvent: Boolean(heroEvent),
@@ -199,6 +203,18 @@ function toCoachTaskView(task: CoachTask): CoachTaskView {
     hasDueAt: Boolean(task.dueAt),
     dueLabel: task.dueAt ? formatCalendarDate(task.dueAt) : "",
   };
+}
+
+function buildHeroPills(home: CoachHome): string[] {
+  const stats = home.weekStats;
+  if (!stats) return [];
+  const pills: string[] = [];
+  if (stats.attendanceRate !== null && stats.attendanceRate !== undefined) {
+    pills.push(`${stats.attendanceRate}% 出席率`);
+  }
+  pills.push(`${stats.hours}h 本周训练`);
+  pills.push(`${stats.sessions}节 本周课次`);
+  return pills;
 }
 
 function durationLabel(startsAt?: string, endsAt?: string): string {

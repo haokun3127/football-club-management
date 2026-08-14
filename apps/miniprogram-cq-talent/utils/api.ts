@@ -12,6 +12,7 @@ import type {
   CoachMatchEventCreateResult,
   CoachMatchPlayerEvent,
   CoachHome,
+  CoachWeekStats,
   CoachTeamDetail,
   CoachTeamAbilityOverview,
   CoachTrainingCoverageStudent,
@@ -754,6 +755,7 @@ function normalizeCoachHome(raw: Record<string, unknown>, from: string, to: stri
     events,
     tasks,
     summary: normalizeCoachSummary(asRecord(workbench.summary), events, tasks.length),
+    weekStats: normalizeCoachWeekStats(asRecord(workbench.weekStats)),
     pendingItems: [],
   };
 }
@@ -965,11 +967,24 @@ function normalizeCoachTaskAction(value: unknown): "attendance" | "lesson" | "ma
 }
 
 function normalizeCoachSummary(raw: Record<string, unknown> | undefined, events: ScheduleEvent[], taskCount: number) {
+  const attendance = asRecord(raw?.attendance);
   return {
     total: numberOrUndefined(raw?.total) ?? events.length,
     training: numberOrUndefined(raw?.training) ?? events.filter((event) => event.type === "training").length,
     matches: numberOrUndefined(raw?.matches) ?? events.filter((event) => event.type === "match").length,
     pending: numberOrUndefined(raw?.pending) ?? taskCount,
+    attendance: attendance
+      ? { confirmed: numberOrUndefined(attendance.confirmed) ?? 0, total: numberOrUndefined(attendance.total) ?? 0 }
+      : undefined,
+  };
+}
+
+function normalizeCoachWeekStats(raw: Record<string, unknown> | undefined): CoachWeekStats | undefined {
+  if (!raw) return undefined;
+  return {
+    sessions: numberOrUndefined(raw.sessions) ?? 0,
+    hours: numberOrUndefined(raw.hours) ?? 0,
+    attendanceRate: numberOrUndefined(raw.attendanceRate) ?? null,
   };
 }
 

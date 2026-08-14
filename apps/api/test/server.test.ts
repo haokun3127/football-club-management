@@ -385,7 +385,7 @@ describe("api server", () => {
       events: Array<{ id: string; participants: Array<{ studentId: string }>; childIds: string[] }>;
     };
     const eventBody = parentEvent.json() as { role: string; event: { id: string; participants: Array<{ studentId: string }> } };
-    const coachBody = coachHome.json() as { role: string; workbench: { coachId: string; events: Array<{ id: string }> } };
+    const coachBody = coachHome.json() as { role: string; workbench: { coachId: string; coachName?: string | null; events: Array<{ id: string }>; weekStats?: { sessions: number; hours: number; attendanceRate: number | null } } };
     const coachWeekBody = coachWeek.json() as {
       workbench: { dateRange: { from: string; to: string }; summary: { total: number; pending: number }; tasks: Array<{ eventId: string; action: string }> };
     };
@@ -427,6 +427,11 @@ describe("api server", () => {
     expect(coachBody.role).toBe("coach");
     expect(coachBody.workbench.coachId).toBe("coach-1");
     expect(coachBody.workbench.events.map((event) => event.id)).toEqual(["event-training-1"]);
+    expect(coachBody.workbench.coachName).toBeTruthy();
+    expect(coachBody.workbench.weekStats).toEqual(expect.objectContaining({
+      sessions: expect.any(Number),
+      hours: expect.any(Number),
+    }));
     expect(coachWeek.statusCode).toBe(200);
     expect(coachWeekBody.workbench.dateRange).toEqual({ from: "2026-07-01", to: "2026-07-07" });
     expect(coachWeekBody.workbench.summary.total).toBeGreaterThan(0);

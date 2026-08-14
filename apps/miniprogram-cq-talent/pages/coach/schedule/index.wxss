@@ -23,7 +23,7 @@
 
 .c1-summary { display: flex; gap: 16rpx; padding: 24rpx 44rpx 0; overflow: hidden; }
 .c1-summary__item { display: flex; flex: 1; align-items: center; justify-content: center; gap: 8rpx; min-width: 0; height: 88rpx; padding: 0 18rpx; border-radius: 24rpx; box-sizing: border-box; color: #ffffff; white-space: nowrap; }
-.c1-summary__item--brand { background: #a80f1b; }.c1-summary__item--blue { background: #1976d2; }.c1-summary__item--amber { background: #f59e0b; }
+.c1-summary__item--brand { background: #a80f1b; }.c1-summary__item--blue { background: #1976d2; }.c1-summary__item--green { background: #1a7f37; }.c1-summary__item--amber { background: #f59e0b; }
 .c1-summary__label { font-size: 24rpx; font-weight: 600; }.c1-summary__value { font-size: 30rpx; font-weight: 700; }
 .c1-teams { padding-top: 16rpx; }.c1-team-chip { flex: 0 0 auto; padding: 10rpx 18rpx; border-radius: 20rpx; background: #ffffff; color: #667085; font-size: 22rpx; border: 1rpx solid #e7eaf0; }
 

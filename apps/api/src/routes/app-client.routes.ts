@@ -1669,6 +1669,30 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         const teams = Array.isArray(event.teams) ? event.teams : [];
         return teams.map((team) => typeof team === "string" ? team : String((team as Record<string, unknown>).name ?? "")).filter(Boolean);
       })));
+      const coachId = dailyWorkbenches.find((item) => item.coachId)?.coachId;
+      const coachProfile = coachId
+        ? context.store.listCoaches(request.params.clubId).find((coach) => coach.id === coachId)
+        : undefined;
+      const participants = events.flatMap((event) => Array.isArray(event.participants) ? event.participants : []);
+      const attendanceTotal = participants.length;
+      const attendanceConfirmed = participants.filter((participant) => {
+        const status = String((participant as Record<string, unknown>).status ?? "");
+        return status === "confirmed" || status === "present" || status === "late";
+      }).length;
+      const weekStart = startOfWeekIso(from);
+      const weekDates = enumerateDateRange(weekStart, addDaysIso(weekStart, 6)) ?? [];
+      const weekEvents = (await Promise.all(weekDates.map((date) => context.store.getCoachToday(request.params.clubId, {
+        date,
+        userId: auth?.user.id ?? "user-coach-1",
+        roles: auth?.membership.roles ?? ["coach"],
+      })))).flatMap((item) => (item as { events?: Array<Record<string, unknown>> }).events ?? []);
+      const weekHours = Math.round(weekEvents.reduce((sum, event) => {
+        const range = event.timeRange as { startsAt?: string; endsAt?: string } | undefined;
+        const startMs = Date.parse(range?.startsAt ?? "");
+        const endMs = Date.parse(range?.endsAt ?? "");
+        if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) return sum;
+        return sum + (endMs - startMs) / 3_600_000;
+      }, 0) * 10) / 10;
 
       return {
         clubId: request.params.clubId,
@@ -1677,7 +1701,8 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         workbench: {
           date: from,
           dateRange: { from, to },
-          coachId: dailyWorkbenches.find((item) => item.coachId)?.coachId,
+          coachId,
+          coachName: coachProfile?.name ?? null,
           teams: teamNames,
           events,
           tasks,
@@ -1686,6 +1711,12 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
             training: events.filter((event) => event.type === "training").length,
             matches: events.filter((event) => event.type === "match").length,
             pending: tasks.filter((task) => task.action !== "view").length,
+            attendance: { confirmed: attendanceConfirmed, total: attendanceTotal },
+          },
+          weekStats: {
+            sessions: weekEvents.length,
+            hours: weekHours,
+            attendanceRate: attendanceTotal > 0 ? Math.round((attendanceConfirmed / attendanceTotal) * 100) : null,
           },
         },
         sync: {
@@ -2755,6 +2786,18 @@ function enumerateDateRange(from: string, to: string): string[] | null {
     date.setUTCDate(date.getUTCDate() + index);
     return date.toISOString().slice(0, 10);
   });
+}
+
+function addDaysIso(date: string, amount: number): string {
+  const value = new Date(`${date}T00:00:00.000Z`);
+  value.setUTCDate(value.getUTCDate() + amount);
+  return value.toISOString().slice(0, 10);
+}
+
+function startOfWeekIso(date: string): string {
+  const value = new Date(`${date}T00:00:00.000Z`);
+  value.setUTCDate(value.getUTCDate() - ((value.getUTCDay() + 6) % 7));
+  return value.toISOString().slice(0, 10);
 }
 
 function buildCoachTask(event: AppEventDetail & { workflow?: Record<string, unknown> }) {

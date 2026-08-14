@@ -80,6 +80,24 @@ describe("coach schedule home", () => {
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
   });
 
+  it("shows the attendance capsule and weekly hero pills when the API provides them", async () => {
+    mocks.getCoachHome.mockResolvedValue({
+      ...home,
+      summary: { total: 1, training: 1, matches: 0, pending: 1, attendance: { confirmed: 9, total: 10 } },
+      weekStats: { sessions: 3, hours: 4.5, attendanceRate: 90 },
+    });
+    const page = createPageInstance();
+
+    await page.load();
+
+    expect(page.data.summaryItems).toEqual([
+      { key: "training", label: "今日1节训练课", value: "", tone: "brand" },
+      { key: "attendance", label: "出席9/10人", value: "", tone: "green" },
+      { key: "pending", label: "待处理1", value: "", tone: "amber" },
+    ]);
+    expect(page.data.heroPills).toEqual(["90% 出席率", "4.5h 本周训练", "3节 本周课次"]);
+  });
+
   it("loads a Monday-to-Sunday range and presents only API-backed C1 summary, hero, and events", async () => {
     mocks.getCoachHome.mockResolvedValue(home);
     const page = createPageInstance({ date: "2026-08-13", selectedDate: "2026-08-13", viewMode: "week" });

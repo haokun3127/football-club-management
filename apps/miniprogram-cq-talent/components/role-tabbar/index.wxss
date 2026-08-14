@@ -7,4 +7,4 @@
 .tabbar--parent .tabbar-item.active { color: #a80f1b; font-weight: 650; }
 .tabbar--parent .tabbar-item.active .tabbar-dot { top: 96rpx; width: 4rpx; height: 4rpx; margin-left: -2rpx; border-radius: 999rpx; background: #a80f1b; }
 .tabbar--coach .tabbar-item.active { color: var(--color-brand); font-weight: 650; }
-.tabbar--coach .tabbar-dot { display: none; }
+.tabbar--coach .tabbar-item.active .tabbar-dot { top: 96rpx; width: 4rpx; height: 4rpx; margin-left: -2rpx; border-radius: 999rpx; background: var(--color-brand); }

@@ -106,6 +106,13 @@ export interface CoachTaskSummary {
   training: number;
   matches: number;
   pending: number;
+  attendance?: { confirmed: number; total: number };
+}
+
+export interface CoachWeekStats {
+  sessions: number;
+  hours: number;
+  attendanceRate: number | null;
 }
 
 export interface ActivityDetail {
@@ -180,6 +187,7 @@ export interface CoachHome {
   events: ScheduleEvent[];
   tasks: CoachTask[];
   summary: CoachTaskSummary;
+  weekStats?: CoachWeekStats;
   pendingItems: Array<{ label: string; value: string }>;
 }
 

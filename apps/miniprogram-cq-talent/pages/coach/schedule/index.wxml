@@ -30,7 +30,15 @@
         <view class="c1-hero__top"><view>{{heroDateLabel}}</view><view>重庆天才</view></view>
         <view class="c1-hero__main"><view class="c1-hero__time">{{heroEvent.startTime}}</view><view class="c1-hero__title">{{heroEvent.title}}</view></view>
         <view class="c1-hero__meta">{{heroEvent.locationLabel}}</view>
-        <view class="c1-hero__pills"><view class="c1-hero__pill">{{heroEvent.statusLabel}}</view><view wx:if="{{heroEvent.hasDuration}}" class="c1-hero__pill">{{heroEvent.durationText}}</view></view>
+        <view class="c1-hero__pills">
+          <block wx:if="{{heroPills.length}}">
+            <view wx:for="{{heroPills}}" wx:key="*this" class="c1-hero__pill">{{item}}</view>
+          </block>
+          <block wx:else>
+            <view class="c1-hero__pill">{{heroEvent.statusLabel}}</view>
+            <view wx:if="{{heroEvent.hasDuration}}" class="c1-hero__pill">{{heroEvent.durationText}}</view>
+          </block>
+        </view>
       </view>
 
       <view class="c1-list-heading"><view class="c1-list-heading__title">活动安排</view></view>
