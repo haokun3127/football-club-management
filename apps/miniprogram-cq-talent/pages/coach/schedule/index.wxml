@@ -41,7 +41,6 @@
         </view>
       </view>
 
-      <view class="c1-list-heading"><view class="c1-list-heading__title">活动安排</view></view>
       <view wx:if="{{hasVisibleEvents}}" class="c1-list">
         <view wx:for="{{visibleEvents}}" wx:key="id" class="acard" data-id="{{item.id}}" bindtap="openEvent">
           <view class="acard__accent" style="background:{{item.typeColor}}"></view>
