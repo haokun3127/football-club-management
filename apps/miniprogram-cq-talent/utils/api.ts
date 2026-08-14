@@ -775,6 +775,11 @@ function normalizeCoachHome(raw: Record<string, unknown>, from: string, to: stri
 function normalizeCoachWorkbench(raw: Record<string, unknown>, eventId: string): CoachWorkbench {
   const event = normalizeEvent((raw.event && typeof raw.event === "object" ? raw.event : { id: eventId, title: "活动" }) as Record<string, unknown>);
   const rosterContext = asRecord(raw.rosterContext);
+  const contextTeams = Array.isArray(rosterContext?.teams) ? rosterContext?.teams as Array<Record<string, unknown>> : [];
+  const contextTeamName = stringOrUndefined(contextTeams[0]?.name ?? contextTeams[0]?.teamName);
+  if (!event.teamName && contextTeamName) {
+    event.teamName = contextTeamName;
+  }
   const participants = Array.isArray(rosterContext?.participants) ? rosterContext?.participants as Array<Record<string, unknown>> : [];
   const students = Array.isArray(rosterContext?.students) ? rosterContext?.students as Array<Record<string, unknown>> : [];
   const studentsById = new Map(students.map((student) => [String(student.id ?? student.studentId ?? ""), student]));
