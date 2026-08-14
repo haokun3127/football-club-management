@@ -34,7 +34,15 @@ function mergeSeedData(base: SeedData, extra: Partial<SeedData>): SeedData {
     if (!Array.isArray(additions)) {
       continue;
     }
-    merged[key] = [...merged[key], ...additions] as never;
+    // 同 id 实体只保留先出现的一份：base 种子与验收种子可能携带同 id 内容（如场地/文章），避免重复下发
+    const seen = new Set<string>();
+    const combined = [...merged[key], ...additions] as Array<{ id?: string }>;
+    merged[key] = combined.filter((item) => {
+      if (!item || typeof item.id !== "string") return true;
+      if (seen.has(item.id)) return false;
+      seen.add(item.id);
+      return true;
+    }) as never;
   }
 
   return merged;

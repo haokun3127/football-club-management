@@ -364,9 +364,25 @@ export function createDataCapabilitySeed(): Pick<
     privateLessonRequests: [],
     eventChangeRequests: [],
     assessmentTasks: [],
-    contentArticles: [],
-    contentFaqs: [],
-    venues: [],
+    // 内容中心/帮助中心/场地信息：与 Figma P8 内容中心、P8-2 帮助中心同源的真实内容
+    contentArticles: [
+      { id: "article-cq-talent-autumn-plan", clubId, title: "2026秋季训练计划", subtitle: "了解最新的训练课程安排与重点内容", accent: "#a80f1b", category: "guide" },
+      { id: "article-cq-talent-growth-report", clubId, title: "球员成长评估报告", subtitle: "详细分析球员近期训练表现与成长点", accent: "#1976d2", category: "help" },
+      { id: "article-cq-talent-venue-guide", clubId, title: "新手入门：如何选择合适场地", subtitle: "为您提供最优的场地选择与预订技巧", accent: "#ff9800", category: "venue" },
+      { id: "article-cq-talent-coach-team", clubId, title: "认识我们的教练团队", subtitle: "主教练与专项教练的执教理念介绍", accent: "#22c55e", category: "coach" },
+    ],
+    contentFaqs: [
+      { id: "faq-cq-talent-attendance", clubId, q: "家长如何确认孩子到场？", a: "教练在活动开始时会进行点名，点名结果会同步到日程页的活动卡片上。您可以在「日程」页点击当天活动查看出勤状态。", category: "出勤说明" },
+      { id: "faq-cq-talent-cancel", clubId, q: "训练取消如何通知？", a: "训练取消或时间变更时，系统会在「提醒中心」推送通知，日程页铃铛出现红点即表示有新提醒，请及时查看。", category: "训练规则" },
+      { id: "faq-cq-talent-growth", clubId, q: "如何查看孩子的成长报告？", a: "在底部「成长」标签页可查看孩子的能力雷达图与最新评测数据；点击具体指标可查看历史趋势与教练评语。", category: "成长报告" },
+      { id: "faq-cq-talent-account", clubId, q: "如何切换绑定的孩子？", a: "在「账号绑定」页可查看已绑定的学员，点击「切换学员」即可切换当前查看的孩子。", category: "账号设置" },
+      { id: "faq-cq-talent-contact", clubId, q: "如何联系俱乐部？", a: "工作日 9:00-18:00 可通过俱乐部前台电话联系；训练相关问题也可在活动现场直接与教练沟通。", category: "联系客服" },
+    ],
+    venues: [
+      { id: "venue-cq-talent-jiulongpo", clubId, name: "九龙坡足球公园", type: "11人制场地", address: "九龙坡区科园四路", tags: ["outdoor", "natural"], facilities: ["照明设施", "更衣室", "停车场"], latitude: 29.5063, longitude: 106.5108 },
+      { id: "venue-cq-talent-sport-uni", clubId, name: "重庆体育学院训练馆", type: "5人制场地", address: "沙坪坝区大学城", tags: ["indoor", "artificial"], facilities: ["恒温室内", "淋浴间", "储物柜"], latitude: 29.6077, longitude: 106.2832 },
+      { id: "venue-cq-talent-nanan", clubId, name: "南岸足球公园", type: "7人制场地", address: "南岸区茶园路", tags: ["outdoor", "artificial"], facilities: ["照明设施", "停车场"], latitude: 29.5319, longitude: 106.6442 },
+    ],
   };
 }
 
