@@ -9,7 +9,7 @@ const SESSION = {
   clubId: 'club-chongqing-talent',
   clientId: 'app-client-cq-talent-wechat-main',
   capabilities: [],
-  role: 'parent',
+  role: process.env.PLANT_ROLE || 'parent',
   availableRoles: ['parent', 'coach'],
   token: process.env.PLANT_TOKEN,
   userId: 'user-cq-talent-secure-test-1',
