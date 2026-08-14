@@ -28,6 +28,7 @@
         </view>
       </view>
     </block>
+    <view wx:if="{{state === 'ready'}}" class="reminders-empty reminders-empty--footer"><view class="reminders-empty__icon reminders-empty__icon--sm"><image src="/assets/icons/empty-reminders.svg" mode="aspectFit" /></view><view>暂无新提醒</view></view>
     <view wx:if="{{state === 'empty'}}" class="reminders-empty"><view class="reminders-empty__icon"><image src="/assets/icons/empty-reminders.svg" mode="aspectFit" /></view><view>暂无新提醒</view></view>
   </view>
   <role-tabbar role="parent" active="schedule" />

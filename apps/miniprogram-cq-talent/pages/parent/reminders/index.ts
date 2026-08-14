@@ -95,7 +95,7 @@ Page<PageData>({
 });
 
 function presentReminder(item: ReminderItem, read: boolean): ReminderView {
-  const meta = TYPE_META[item.type];
+  const meta = reminderMeta(item);
   return {
     id: item.id,
     title: reminderTitle(item),
@@ -106,6 +106,14 @@ function presentReminder(item: ReminderItem, read: boolean): ReminderView {
     dotColor: meta.dotColor,
     read,
   };
+}
+
+// 比赛类事件用徽章蓝底（设计稿「比赛通知」语义），训练/其他保持日历红
+function reminderMeta(item: ReminderItem): Omit<ReminderView, "id" | "title" | "timeAgo" | "timeLabel" | "read"> {
+  if (item.type === "event_upcoming" && item.event?.type === "match") {
+    return { iconSrc: "/assets/icons/reminder-badge.svg", iconBg: "#eff6ff", dotColor: "#1976d2" };
+  }
+  return TYPE_META[item.type];
 }
 
 function reminderTitle(item: ReminderItem) {

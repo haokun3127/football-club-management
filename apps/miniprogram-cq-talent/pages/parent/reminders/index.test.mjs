@@ -93,4 +93,19 @@ describe("parent reminders", () => {
     expect(template).toContain('wx:if="{{state === \'empty\'}}"');
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
+
+  it("uses the badge icon and blue accents for match reminders, calendar red for training", () => {
+    const reminders = [
+      { id: "match", type: "event_upcoming", severity: "info", studentId: "student-1", studentName: "真实球员", dueAt: dueAt(1), event: { id: "event-m", type: "match", title: "周末联赛", startsAt: dueAt(1), endsAt: dueAt(1) } },
+      { id: "training", type: "event_upcoming", severity: "info", studentId: "student-1", studentName: "真实球员", dueAt: dueAt(1), event: { id: "event-t", type: "training", title: "体能训练", startsAt: dueAt(1), endsAt: dueAt(1) } },
+    ];
+    const page = createPageInstance();
+
+    page.render(reminders);
+
+    expect(page.data.earlier).toEqual([
+      expect.objectContaining({ id: "match", iconSrc: "/assets/icons/reminder-badge.svg", iconBg: "#eff6ff", dotColor: "#1976d2" }),
+      expect.objectContaining({ id: "training", iconSrc: "/assets/icons/tab-calendar.svg", iconBg: "#f3f4f6", dotColor: "#a80f1b" }),
+    ]);
+  });
 });
