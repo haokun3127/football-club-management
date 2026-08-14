@@ -14,7 +14,9 @@
           <view class="p4-hero__avatar">{{heroSurname}}</view>
           <view class="p4-hero__identity"><view class="p4-hero__name">{{heroName}}</view><view class="p4-hero__team">{{heroTeam}}</view></view>
         </view>
-        <view class="p4-hero__pending">{{heroSummaryMessage}}</view>
+        <view wx:if="{{heroTags.length}}" class="p4-hero__tags"><view wx:for="{{heroTags}}" wx:key="*this" class="p4-hero__tag {{index === 1 ? 'p4-hero__tag--accent' : ''}}">{{item}}</view></view>
+        <view wx:if="{{heroStats.length}}" class="p4-hero__stats"><view wx:for="{{heroStats}}" wx:key="label" class="p4-hero__stat"><view class="p4-hero__stat-value {{item.accent ? 'p4-hero__stat-value--accent' : ''}}">{{item.value}}</view><view class="p4-hero__stat-label">{{item.label}}</view></view></view>
+        <view wx:if="{{!heroStats.length}}" class="p4-hero__pending">{{heroSummaryMessage}}</view>
       </view>
 
       <!-- Figma P4 Milestones Card -->

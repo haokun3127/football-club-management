@@ -183,6 +183,7 @@ export interface ApiStore {
   ): ExternalRecordLink | null | Promise<ExternalRecordLink | null>;
   isGuardianOfStudent(clubId: EntityId, userId: EntityId, studentId: EntityId): boolean;
   listCalendarEvents(clubId: EntityId): unknown[];
+  listEventParticipants(clubId: EntityId): EventParticipant[];
   getStudentTimeline(clubId: EntityId, studentId: EntityId): unknown[];
   listAbilityMetrics(clubId: EntityId): AbilityMetric[];
   listMetricGraphVersions(clubId: EntityId): MetricGraphVersion[];

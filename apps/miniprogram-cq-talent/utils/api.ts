@@ -382,6 +382,7 @@ function normalizeStudents(students: Array<Record<string, unknown>>): StudentSum
       teams: teamNames,
       coachNames: Array.from(new Set(coachNames)),
       trainingStatus: stringOrUndefined(raw.status ?? raw.trainingStatus),
+      teamStartsAt: teams.map((team) => (typeof team === "string" ? undefined : stringOrUndefined((team as Record<string, unknown>).startsAt))).find(Boolean),
     };
   }).filter((student) => student.id);
 }
@@ -532,6 +533,24 @@ function normalizeGrowth(raw: Record<string, unknown>, student?: StudentSummary)
     metricItems: metrics,
     views: views.length ? views : [{ id: "default", name: "能力概览", metricIds: radar.map((point) => point.metricId) }],
     updatedAt: stringOrUndefined(raw.updatedAt ?? raw.generatedAt),
+    trainingStats: normalizeTrainingStats(raw.trainingStats),
+  };
+}
+
+function normalizeTrainingStats(raw: unknown): GrowthSummary["trainingStats"] {
+  const record = asRecord(raw);
+  if (!record) return undefined;
+  const monthlySource = Array.isArray(record.monthly) ? record.monthly : [];
+  return {
+    totalTrainings: Number(record.totalTrainings ?? 0),
+    attendanceRate: typeof record.attendanceRate === "number" ? record.attendanceRate : null,
+    monthTrainings: Number(record.monthTrainings ?? 0),
+    monthly: monthlySource
+      .map((item) => {
+        const entry = asRecord(item);
+        return { month: Number(entry?.month ?? 0), count: Number(entry?.count ?? 0) };
+      })
+      .filter((entry) => entry.month >= 1 && entry.month <= 12),
   };
 }
 

@@ -1010,6 +1010,12 @@ describe("api server", () => {
       assessment: { views: unknown[]; viewNodes: unknown[] };
       latest: Array<{ metricId: string; metric: { id: string } | null }>;
       trends: Array<{ metricId: string; records: unknown[] }>;
+      trainingStats: {
+        totalTrainings: number;
+        attendanceRate: number | null;
+        monthTrainings: number;
+        monthly: Array<{ month: number; count: number }>;
+      };
     };
     const workbenchBody = coachWorkbench.json() as {
       event: { id: string };
@@ -1047,6 +1053,8 @@ describe("api server", () => {
       expect.objectContaining({ metricId: "metric-finishing", metric: expect.objectContaining({ id: "metric-finishing" }) }),
     ]));
     expect(growthBody.trends.length).toBeGreaterThan(0);
+    expect(growthBody.trainingStats.monthly).toHaveLength(8);
+    expect(growthBody.trainingStats.totalTrainings).toBeGreaterThanOrEqual(0);
     expect(coachWorkbench.statusCode).toBe(200);
     expect(workbenchBody.event.id).toBe("event-training-1");
     expect(workbenchBody.rosterContext.participants.length).toBeGreaterThan(0);

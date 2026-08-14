@@ -977,6 +977,9 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         context.store.getStudentMetrics(request.params.clubId, request.params.studentId),
       ]);
 
+      // P4 成长首页训练统计：课时总数/出勤率/本月训练/月度分布（真实参与记录推导）
+      const trainingStats = await buildStudentTrainingStats(context, request.params.clubId, request.params.studentId);
+
       return {
         clubId: request.params.clubId,
         client: summarizeClient(client),
@@ -991,6 +994,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         metrics: metricCatalog,
         latest: buildLatestMetricRecords(metricRecords, metricCatalog),
         trends: buildMetricTrends(metricRecords),
+        trainingStats,
       };
     },
   );
@@ -2770,6 +2774,66 @@ function sortEvents(events: unknown[]): AppEventDetail[] {
   return (events as AppEventDetail[])
     .filter((event) => event.timeRange?.startsAt && event.timeRange?.endsAt)
     .sort((left, right) => Date.parse(left.timeRange.startsAt) - Date.parse(right.timeRange.startsAt));
+}
+
+type StudentTrainingStats = {
+  totalTrainings: number;
+  attendanceRate: number | null;
+  monthTrainings: number;
+  monthly: Array<{ month: number; count: number }>;
+};
+
+const TRAINING_STATS_MONTH_WINDOW = 8;
+
+// P4 成长首页英雄卡统计：从真实参与记录推导课时/出勤/月度分布（月份按北京时间归属）
+async function buildStudentTrainingStats(context: RouteContext, clubId: string, studentId: string): Promise<StudentTrainingStats> {
+  const events = sortEvents(await context.store.getStudentTimeline(clubId, studentId));
+  const statusByEvent = new Map(
+    context.store.listEventParticipants(clubId)
+      .filter((participant) => participant.studentId === studentId)
+      .map((participant) => [participant.eventId, participant.status] as const),
+  );
+  const now = Date.now();
+  const past = events.filter((event) => {
+    const startsAt = Date.parse(event.timeRange?.startsAt ?? "");
+    return Number.isFinite(startsAt) && startsAt <= now && event.status !== "cancelled";
+  });
+  const pastTrainings = past.filter((event) => event.type === "training");
+
+  let attended = 0;
+  let recorded = 0;
+  for (const event of past) {
+    const status = statusByEvent.get(event.id);
+    if (status === "present" || status === "absent" || status === "excused") {
+      recorded += 1;
+      if (status === "present") attended += 1;
+    }
+  }
+
+  const cnMonthKey = (iso: string) => {
+    const shifted = new Date(Date.parse(iso) + 8 * 60 * 60 * 1000);
+    return `${shifted.getUTCFullYear()}-${shifted.getUTCMonth() + 1}`;
+  };
+  const monthlyCount = new Map<string, number>();
+  for (const event of pastTrainings) {
+    const key = cnMonthKey(event.timeRange.startsAt);
+    monthlyCount.set(key, (monthlyCount.get(key) ?? 0) + 1);
+  }
+  const nowCn = new Date(now + 8 * 60 * 60 * 1000);
+  const monthly: StudentTrainingStats["monthly"] = [];
+  for (let offset = TRAINING_STATS_MONTH_WINDOW - 1; offset >= 0; offset -= 1) {
+    const cursor = new Date(Date.UTC(nowCn.getUTCFullYear(), nowCn.getUTCMonth() - offset, 1));
+    const month = cursor.getUTCMonth() + 1;
+    monthly.push({ month, count: monthlyCount.get(`${cursor.getUTCFullYear()}-${month}`) ?? 0 });
+  }
+  const monthTrainings = monthlyCount.get(`${nowCn.getUTCFullYear()}-${nowCn.getUTCMonth() + 1}`) ?? 0;
+
+  return {
+    totalTrainings: pastTrainings.length,
+    attendanceRate: recorded ? Math.round((attended / recorded) * 100) : null,
+    monthTrainings,
+    monthly,
+  };
 }
 
 const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;

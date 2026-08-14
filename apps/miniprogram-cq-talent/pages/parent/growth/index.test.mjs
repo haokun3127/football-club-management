@@ -173,4 +173,43 @@ describe("parent growth training history", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(readFileSync(new URL("./index.ts", import.meta.url), "utf8")).not.toContain("重庆天才");
   });
+
+  it("renders hero tags, stats panel, and monthly bars from server trainingStats", async () => {
+    mocks.getParentChildren.mockResolvedValue([
+      { id: "student-1", name: "真实球员", teams: ["U10 精英队"], coachNames: [], teamStartsAt: "2025-01-05" },
+    ]);
+    mocks.getParentGrowth.mockResolvedValue({
+      radar: [
+        { metricId: "speed", label: "速度", value: 8, maxValue: 10 },
+        { metricId: "passing", label: "传球", value: 7, maxValue: 10 },
+        { metricId: "control", label: "控球", value: 9, maxValue: 10 },
+      ],
+      metricItems: [],
+      views: [{ id: "overview", name: "能力概览", metricIds: ["speed", "passing", "control"] }],
+      trainingStats: {
+        totalTrainings: 46,
+        attendanceRate: 89,
+        monthTrainings: 12,
+        monthly: [
+          { month: 1, count: 4 }, { month: 2, count: 6 }, { month: 3, count: 5 }, { month: 4, count: 8 },
+          { month: 5, count: 7 }, { month: 6, count: 9 }, { month: 7, count: 5 }, { month: 8, count: 2 },
+        ],
+      },
+    });
+    mocks.getParentMetricDetail.mockResolvedValue({ metricId: "speed", label: "速度", records: [], sourceEvents: [] });
+    const page = createPageInstance();
+
+    await page.load();
+
+    expect(page.data.heroTags).toEqual(["在队1年7个月", "训练46课"]);
+    expect(page.data.heroStats).toEqual([
+      { value: "46", label: "训练课时", accent: false },
+      { value: "89%", label: "出勤率", accent: true },
+      { value: "12", label: "本月训练", accent: false },
+    ]);
+    expect(page.data.trainingBars.map((bar) => bar.label)).toEqual(["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月"]);
+    expect(Math.max(...page.data.trainingBars.map((bar) => bar.height))).toBe(80);
+    expect(template).toContain("p4-hero__stats");
+    expect(template).toContain("p4-hero__tags");
+  });
 });

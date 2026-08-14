@@ -62,6 +62,7 @@ export interface StudentSummary {
   teams: string[];
   coachNames: string[];
   trainingStatus?: string;
+  teamStartsAt?: string;
 }
 
 export interface StudentHome {
@@ -152,6 +153,13 @@ export interface MetricDetail {
   sourceEvents: Array<{ recordId: string; eventId: string; title: string; type: ScheduleEvent["type"]; startsAt?: string }>;
 }
 
+export interface GrowthTrainingStats {
+  totalTrainings: number;
+  attendanceRate: number | null;
+  monthTrainings: number;
+  monthly: Array<{ month: number; count: number }>;
+}
+
 export interface GrowthSummary {
   student?: StudentSummary;
   radar: RadarMetricPoint[];
@@ -160,6 +168,7 @@ export interface GrowthSummary {
   metricItems: Array<{ metricId: string; label: string; value: string; peerAverage?: string }>;
   views: MetricViewOption[];
   updatedAt?: string;
+  trainingStats?: GrowthTrainingStats;
 }
 
 export interface CoachHome {

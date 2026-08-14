@@ -33,6 +33,8 @@ Page({
     heroName: "",
     heroTeam: "",
     heroSummaryMessage: "",
+    heroTags: [] as string[],
+    heroStats: [] as Array<{ value: string; label: string; accent: boolean }>,
     milestoneMessage: "",
     trainingHistoryMessage: "",
     milestones: [] as GrowthMilestone[],
@@ -92,10 +94,12 @@ Page({
         heroName: active.name,
         heroTeam: active.teams.find(Boolean) || "球队待同步",
         heroSummaryMessage: activityMessages.heroSummary,
+        heroTags: buildHeroTags(active, growth),
+        heroStats: buildHeroStats(growth),
         milestoneMessage: activityMessages.milestone,
         trainingHistoryMessage: activityMessages.trainingHistory,
         milestones: activityView.milestones,
-        trainingBars: activityView.trainingBars,
+        trainingBars: buildMonthlyBars(growth) ?? activityView.trainingBars,
       });
       if (selectedMetric) await this.loadMetricDetail(selectedMetric.metricId);
     } catch (error) {
@@ -235,6 +239,53 @@ function buildActivityView(events: ScheduleEvent[], studentId: string, hasMetric
 function eventBelongsToStudent(event: ScheduleEvent, studentId: string) {
   if (event.childIds?.length) return event.childIds.includes(studentId);
   return event.children?.some((child) => child.id === studentId) ?? false;
+}
+
+// 在队时长标签：从队伍 startsAt 到今天的年月差
+function tenureLabel(startsAt?: string) {
+  if (!startsAt) return "";
+  const start = new Date(startsAt);
+  if (Number.isNaN(start.getTime())) return "";
+  const now = new Date();
+  let months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+  if (now.getDate() < start.getDate()) months -= 1;
+  if (months < 1) return "在队不足1个月";
+  const years = Math.floor(months / 12);
+  const rest = months % 12;
+  if (years && rest) return `在队${years}年${rest}个月`;
+  if (years) return `在队${years}年`;
+  return `在队${rest}个月`;
+}
+
+function buildHeroTags(student: StudentSummary, growth: GrowthSummary) {
+  const tags: string[] = [];
+  const tenure = tenureLabel(student.teamStartsAt);
+  if (tenure) tags.push(tenure);
+  const total = growth.trainingStats?.totalTrainings ?? 0;
+  if (total > 0) tags.push(`训练${total}课`);
+  return tags;
+}
+
+function buildHeroStats(growth: GrowthSummary) {
+  const stats = growth.trainingStats;
+  if (!stats) return [];
+  return [
+    { value: `${stats.totalTrainings}`, label: "训练课时", accent: false },
+    { value: stats.attendanceRate === null ? "—" : `${stats.attendanceRate}%`, label: "出勤率", accent: stats.attendanceRate !== null },
+    { value: `${stats.monthTrainings}`, label: "本月训练", accent: false },
+  ];
+}
+
+// 训练历程：服务端月度分布（近8个月），高度按当月最大值归一
+function buildMonthlyBars(growth: GrowthSummary): TrainingBar[] | null {
+  const monthly = growth.trainingStats?.monthly;
+  if (!monthly?.length) return null;
+  const max = Math.max(...monthly.map((item) => item.count), 0);
+  return monthly.map((item, index) => ({
+    id: `training-month-${index + 1}`,
+    height: item.count > 0 ? 32 + Math.round((item.count / max) * 48) : 8,
+    label: `${item.month}月`,
+  }));
 }
 
 function previewPolygon(points: RadarMetricPoint[], key: "value" | "peerAverage", inset: number) {
