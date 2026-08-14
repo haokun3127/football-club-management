@@ -1,4 +1,7 @@
 import { describe, expect, it } from "vitest";
+
+// 文件级超时：本文件均为真实 SQLite 文件库操作，Windows 全量门禁并行负载下单用例可达 5s+
+const FILE_DB_TIMEOUT = 20000;
 import { createHash } from "node:crypto";
 import { mkdtempSync, rmSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
@@ -21,7 +24,7 @@ describe("secure Chongqing Talent test-account operation", () => {
       SECURE_CQ_TALENT_TEST_PHONE_2: runtimePhones[1],
       SECURE_CQ_TALENT_TEST_PHONE_3: runtimePhones[2],
     })).toEqual(runtimePhones);
-  });
+  }, FILE_DB_TIMEOUT);
 
   it("runs import and rollback only through explicitly confirmed file-database commands", async () => {
     const directory = mkdtempSync(join(tmpdir(), "cq-talent-secure-accounts-"));
@@ -74,7 +77,7 @@ describe("secure Chongqing Talent test-account operation", () => {
     } finally {
       rmSync(directory, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
     }
-  }, 20000);
+  }, FILE_DB_TIMEOUT);
 
   it("does not run migrations or change migration state for an import dry-run", async () => {
     const directory = mkdtempSync(join(tmpdir(), "cq-talent-secure-accounts-"));
@@ -110,7 +113,7 @@ describe("secure Chongqing Talent test-account operation", () => {
     } finally {
       rmSync(directory, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
     }
-  });
+  }, FILE_DB_TIMEOUT);
 
   it("supports dry-run and imports three isolated dual-role scopes transactionally", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
@@ -195,7 +198,7 @@ describe("secure Chongqing Talent test-account operation", () => {
     } finally {
       persistence.database.close();
     }
-  });
+  }, FILE_DB_TIMEOUT);
 
   it("enforces each imported identity's parent and coach scope through WeChat-issued bearer sessions", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
@@ -274,7 +277,7 @@ describe("secure Chongqing Talent test-account operation", () => {
       await app?.close();
       persistence.database.close();
     }
-  });
+  }, FILE_DB_TIMEOUT);
 
   it("rolls back owned rows, scenario sessions, and write-side effects while preserving unrelated club data", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
@@ -573,7 +576,7 @@ describe("secure Chongqing Talent test-account operation", () => {
     } finally {
       persistence.database.close();
     }
-  });
+  }, FILE_DB_TIMEOUT);
 
   it("refuses a tampered rollback manifest before it can target an unrelated user", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
@@ -596,7 +599,7 @@ describe("secure Chongqing Talent test-account operation", () => {
     } finally {
       persistence.database.close();
     }
-  });
+  }, FILE_DB_TIMEOUT);
 
   it("refuses a rollback side-effect id outside the secure operation namespace", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
@@ -628,7 +631,7 @@ describe("secure Chongqing Talent test-account operation", () => {
     } finally {
       persistence.database.close();
     }
-  });
+  }, FILE_DB_TIMEOUT);
 
   it("refuses rollback when canonical account ownership rows are incomplete", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
@@ -649,7 +652,7 @@ describe("secure Chongqing Talent test-account operation", () => {
     } finally {
       persistence.database.close();
     }
-  });
+  }, FILE_DB_TIMEOUT);
 
   it("aborts before writing when a fixed identity id is owned by an incompatible row", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
@@ -677,7 +680,7 @@ describe("secure Chongqing Talent test-account operation", () => {
     } finally {
       persistence.database.close();
     }
-  });
+  }, FILE_DB_TIMEOUT);
 
   it("rejects an incomplete installation even when all fixed users still own the requested phones", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
@@ -698,7 +701,7 @@ describe("secure Chongqing Talent test-account operation", () => {
     } finally {
       persistence.database.close();
     }
-  });
+  }, FILE_DB_TIMEOUT);
 });
 
 function count(database: DatabaseSync, table: string): number {
