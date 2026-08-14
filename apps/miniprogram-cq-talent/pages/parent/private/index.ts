@@ -49,7 +49,7 @@ interface PrivateLessonPage extends PageData {
 }
 
 // 设计稿时段/目标 chips：预约时段为整点课节，目标为四类专项
-const TIME_SLOTS = ["09:00-10:00", "10:30-11:30", "14:00-15:00", "16:00-17:00", "19:00-20:00"];
+const TIME_SLOTS = ["09:00-10:00", "10:00-11:00", "14:00-15:00", "15:00-16:00", "16:00-17:00", "17:00-18:00"];
 const GOAL_OPTIONS = ["传球", "射门", "体能", "技巧"];
 
 Page<PageData>({
@@ -242,3 +242,4 @@ function resolveSubmitMessage(error: unknown): string {
   if (status === 403) return "当前账号无权为该孩子提交申请";
   return "提交失败，请稍后重试";
 }
+

@@ -53,7 +53,7 @@ const child = {
 
 function completeForm(page) {
   page.selectDate({ detail: { value: "2026-08-12" } });
-  page.selectSlot({ currentTarget: { dataset: { value: "10:30-11:30" } } });
+  page.selectSlot({ currentTarget: { dataset: { value: "16:00-17:00" } } });
   page.toggleGoal({ currentTarget: { dataset: { value: "传球" } } });
   page.toggleGoal({ currentTarget: { dataset: { value: "体能" } } });
   page.inputNote({ detail: { value: "真实备注" } });
@@ -83,13 +83,13 @@ describe("parent private lesson form", () => {
       coachOptions: ["真实教练"],
       selectedCoachName: "真实教练",
       coachDisplayName: "真实教练（主教练）",
-      selectedSlot: "10:30-11:30",
-      timeSlot: "10:30-11:30",
+      selectedSlot: "16:00-17:00",
+      timeSlot: "16:00-17:00",
       goals: ["传球", "体能"],
       canSubmit: true,
       submitLabel: "提交预约",
     });
-    expect(page.data.timeSlots.find((slot) => slot.value === "10:30-11:30").selected).toBe(true);
+    expect(page.data.timeSlots.find((slot) => slot.value === "16:00-17:00").selected).toBe(true);
     expect(page.data.goalOptions.filter((goal) => goal.selected).map((goal) => goal.value)).toEqual(["传球", "体能"]);
   });
 
@@ -123,7 +123,7 @@ describe("parent private lesson form", () => {
       studentId: "student-1",
       coachName: "真实教练",
       date: "2026-08-12",
-      timeSlot: "10:30-11:30",
+      timeSlot: "16:00-17:00",
       goals: ["传球", "体能"],
       note: "真实备注",
     });
