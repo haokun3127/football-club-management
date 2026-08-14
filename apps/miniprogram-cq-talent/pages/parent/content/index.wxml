@@ -61,6 +61,7 @@
               <view class="article-card__title">{{item.title}}</view>
               <view class="article-card__subtitle">{{item.subtitle}}</view>
             </view>
+            <image class="article-card__chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
           </view>
         </view>
         <view wx:else class="article-empty">{{emptyMessage}}</view>

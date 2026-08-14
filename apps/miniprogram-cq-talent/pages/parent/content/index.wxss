@@ -177,6 +177,13 @@
   min-width: 0;
 }
 
+.article-card__chevron {
+  width: 32rpx;
+  height: 32rpx;
+  flex-shrink: 0;
+  opacity: 0.45;
+}
+
 .article-card__title {
   font-size: 28rpx;
   font-weight: 700;
