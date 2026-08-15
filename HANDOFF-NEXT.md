@@ -22,3 +22,4 @@
 3. 代码提交后模拟器常跑旧 bundle → 让用户点一次「编译」再截图
 4. DevTools 白屏死态：唯一恢复 = 用户手动完全退出 IDE 重开；**绝不要 kill DevTools 进程**
 5. 「进行中」是推导态（scheduled 且 now∈[start,end]），不是存储状态；C2 验收用的进行中窗口数据会过期，过期重跑 tmp/prod-verify/c2-extend-run.py
+6. **每页开工前先抽查该板在线稿是否变更**：离线 PNG 是 2026-08-12 快照（已验证与在线一致），但若用户后来在线改过，必须重拉。方法：frame-map 查该板 node id → Figma MCP `get_screenshot`（file `zZ6wKyOHKcO4UYXDd9jGwv`）→ 与离线 PNG 像素 diff；有实质差异就下载覆盖 `docs/design/reference/figma/<页面>.png` 并提交，再按新稿复原。
