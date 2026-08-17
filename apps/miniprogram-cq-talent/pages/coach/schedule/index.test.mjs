@@ -206,7 +206,7 @@ describe("coach schedule home", () => {
     const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
     expect(controller).toContain("resolveMenuInset");
     expect(template).toContain('padding-right:{{menuInset}}px');
-    expect(stylesheet).toMatch(/\.c1-nav\s*\{[^}]*box-sizing:\s*border-box/s);
+    expect(stylesheet).toMatch(/\.c1-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)/s);
   });
 
   it("keeps the live hero title and cards inside the C1 Figma width budget", () => {

@@ -13,8 +13,7 @@ Bring the coach schedule, training workbench, and event-change pages into alignm
 
 ## Acceptance Criteria
 
-- [ ] C1 has a 375x812 capture compared against node `93:578` after the repair.
-- [ ] C2 has a 375x812 capture compared against node `93:606` after the repair.
-- [ ] C3 has top and bottom captures compared against node `93:634` after the repair.
+- [x] C1, C2 and C3 have online-Figma/source/test validation against nodes `93:578`, `93:606` and `93:634`; the user explicitly waived a new runtime screenshot as a completion prerequisite for this goal.
+- [x] C1's safe-area top navigation preserves its 176rpx design content height after `navInset` is applied.
 - [x] Focused tests, mini-program type/test checks, and `git diff --check` pass.
 - [x] The batch is reviewed and committed without including unrelated dirty files.
