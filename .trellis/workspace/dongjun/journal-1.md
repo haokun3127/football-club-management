@@ -789,3 +789,38 @@ Re-read Figma node 93:1262, route-confirmed and captured C16.3 at 375x812, align
 ### Next Steps
 
 - None - task complete
+
+
+## Session 22: 收口 C12 视觉验收
+
+**Date**: 2026-08-18
+**Task**: 收口 C12 视觉验收
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+收口 C12 Project Score Entry：复核真实 375x812 对照证据，更新设计规格和 progress，刷新 C12 定向 18/18、全仓 domain 19/19、miniprogram 332/332、API 105/105，归档任务。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `8ea70f0` | (see git log) |
+| `a04ee5c` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
