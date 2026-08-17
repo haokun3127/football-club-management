@@ -1,5 +1,6 @@
 import { getCoachTacticalBoard, getTacticalBoardFormations, saveCoachTacticalBoard } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { normalizedToPixel, pixelToNormalized } from "../../../utils/tactical-board";
 import type { FormationTemplate, LoadState, TacticalBoardPlayer, TacticalBoardState } from "../../../utils/types";
 
@@ -11,6 +12,8 @@ type PlayerView = TacticalBoardPlayer & {
 };
 
 interface BoardPageData {
+  navInset: number;
+  menuInset: number;
   state: LoadState;
   stateTitle: string;
   message: string;
@@ -39,6 +42,8 @@ let latestLoadToken = 0;
 
 Page<BoardPageData>({
   data: {
+    navInset: 20,
+    menuInset: 16,
     state: "idle",
     stateTitle: "比赛战术板",
     message: "",
@@ -64,6 +69,7 @@ Page<BoardPageData>({
   },
   onLoad(query?: Record<string, string | undefined>) {
     if (!requireRole("coach")) return;
+    this.setData({ navInset: resolveNavInset(), menuInset: resolveMenuInset() });
     const eventId = (query?.eventId || "").trim();
     if (!eventId) {
       this.setData({
@@ -78,6 +84,24 @@ Page<BoardPageData>({
   },
   goBack() {
     wx.navigateBack({ delta: 1 });
+  },
+  shareBoard() {
+    wx.showToast({ title: "分享功能暂未开放", icon: "none" });
+  },
+  onToolbarTap(event: { currentTarget: { dataset: { action?: string } } }) {
+    const action = event.currentTarget.dataset.action || "";
+    if (action === "share") {
+      this.shareBoard();
+      return;
+    }
+    if (action === "undo" || action === "clear") {
+      if (this.data.readOnly) return;
+      this.resetBoard();
+      return;
+    }
+    if (action === "draw" || action === "move") {
+      wx.showToast({ title: "该工具暂未开放", icon: "none" });
+    }
   },
   async load(eventId?: string) {
     const currentEventId = eventId ?? this.data.eventId;

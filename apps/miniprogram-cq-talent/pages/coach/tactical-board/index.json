@@ -1,4 +1,7 @@
 {
-  "navigationBarTitleText": "比赛战术板",
+  "navigationBarTitleText": "战术板",
+  "usingComponents": {
+    "role-tabbar": "/components/role-tabbar/index"
+  },
   "navigationStyle": "custom"
 }

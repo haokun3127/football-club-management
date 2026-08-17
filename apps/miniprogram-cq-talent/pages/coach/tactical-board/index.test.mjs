@@ -16,7 +16,7 @@ vi.mock("../../../utils/api", () => ({
   saveCoachTacticalBoard: mocks.saveCoachTacticalBoard,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
-vi.mock("../../../utils/presentation", () => ({ resolveNavInset: () => 0 }));
+vi.mock("../../../utils/presentation", () => ({ resolveMenuInset: () => 16, resolveNavInset: () => 0 }));
 
 globalThis.wx = {
   navigateBack: mocks.navigateBack,
@@ -201,7 +201,7 @@ describe("C7 coach tactical board MVP", () => {
     expect(mocks.showToast).toHaveBeenCalledWith({ title: "保存失败，未保存的调整已保留", icon: "none" });
   });
 
-  it("keeps page-owned Figma structure without legacy APIs, samples, or WXML helpers", () => {
+  it("matches the current online C7 tactical-board composition without fixture data or WXML helpers", () => {
     expect(controller).toContain('requireRole("coach")');
     expect(controller).not.toContain("query?.id");
     expect(controller).not.toContain("readableError");
@@ -212,19 +212,27 @@ describe("C7 coach tactical board MVP", () => {
     expect(template).not.toMatch(/wx:else\s+wx:for=/);
     expect(template).toContain('<block wx:if="{{!readOnly}}">');
     expect(template).toContain('<block wx:else>');
-    expect(template).not.toContain('c7-pitch__circle');
-    expect(template).not.toContain('c7-pitch__box');
+    expect(template).toContain('>战术板<');
+    expect(template).toContain('class="c7-header__share"');
+    expect(template).toContain('class="c7-pitch__circle c7-pitch__circle--top"');
+    expect(template).toContain('class="c7-pitch__circle c7-pitch__circle--middle"');
+    expect(template).toContain('class="c7-pitch__circle c7-pitch__circle--bottom"');
+    expect(template).toContain('class="c7-toolbar"');
+    expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
     expect(template).not.toContain('c7-player__name');
     expect(template).not.toContain('c7-player__position');
+    expect(template).not.toContain('c7-context');
+    expect(template).not.toContain('c7-readonly');
     expect(template).not.toContain("U10发展队");
     expect(template).not.toContain("梓睿");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
+    expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"app-header"');
     expect(pageConfig).not.toContain('"submit-bar"');
-    expect(stylesheet).toMatch(/\.c7-header\s*\{[^}]*height:\s*124rpx/s);
-    expect(stylesheet).toMatch(/\.c7-pitch\s*\{[^}]*height:\s*860rpx/s);
-    expect(stylesheet).not.toContain("box-shadow");
-    expect(stylesheet).toMatch(/\.c7-player\s*\{[^}]*width:\s*80rpx[^}]*height:\s*80rpx/s);
+    expect(stylesheet).toMatch(/\.c7-header\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*content-box/s);
+    expect(stylesheet).toMatch(/\.c7-pitch\s*\{[^}]*width:\s*686rpx[^}]*height:\s*760rpx[^}]*background:\s*#1a1a2e/s);
+    expect(stylesheet).toMatch(/\.c7-toolbar\s*\{[^}]*position:\s*fixed[^}]*bottom:\s*140rpx/s);
+    expect(stylesheet).toMatch(/\.c7-player\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c7-player__badge\s*\{[^}]*width:\s*100%[^}]*height:\s*100%/s);
     expect(controller).toContain("this.data.pitchWidth, 20");
     expect(controller).toContain("this.data.pitchHeight, 20");

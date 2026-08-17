@@ -1,3 +1,9 @@
 # Figma 画板规格: C7 Tactical Board PoC
 
-- [13] | C7 Tactical Board PoC | 478x17 @(24,462) | fill=#92400e | font=Inter/Regular 12px | text="coach.tactical                               coach    coach.tactical.fixture                        pending"
+在线权威：`zZ6wKyOHKcO4UYXDd9jGwv`，节点 `93:877`（`LEGACY / C7 Tactical Board PoC`）。本页仅保留在线稿的可执行规格；旧离线枚举文本不再作为实现依据。
+
+- 顶栏：白色，设计内容高度 `88px`（小程序 `176rpx`），动态状态栏通过 `padding-top` 叠加，`box-sizing: content-box`；左侧返回箭头与标题「战术板」，右侧分享图标。
+- 球场：外层容器高 `420px`，内层 `343×380px`、圆角 `16px`、背景 `#1a1a2e`；三枚 `70px` 中轴圆，中心半场线高 `2px`，边界线为低透明白色。
+- 球员：视觉标记 `24px` 红色圆点，显示字段必须来自真实教练战术板响应；画板中的蓝色对方球员和数字仅为设计示例，不得在没有 API 契约时伪造。
+- 底部：阵型文字位于球场下方；固定工具栏包含「绘制 / 撤销 / 移动 / 清除 / 分享」，红色圆形按钮继续承载真实战术板保存入口；教练角色 TabBar 使用共享 `role-tabbar` 组件。
+- 验收：优先使用微信开发者工具真实 `375×812` 模拟器截图与离线 PNG 对照；动态学员姓名、阵型、权限和比赛数据可与画板样例不同，但不能把静态/测试通过误报为真实数据通过。

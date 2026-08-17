@@ -848,6 +848,14 @@
 - 复核发现并修复两处此前遗漏的同根因：C1 `.c1-nav` 与 C8 `.c8-nav` 均同时接收 `navInset` 和声明 176rpx，现统一使用 `content-box`；对应 C1/C8 红→绿回归已提交。
 - C4、C5、C6、C2 视觉任务和证据审计的剩余未勾选项仅是新的已认证截图前置。根据用户本轮明确授权，已改为“Figma/source/data/test evidence only；截图不阻塞完成”，并补齐逐路由 node/evidence matrix；不把静态结果表述为像素级视觉通过。
 
+## 2026-08-17 C7 战术板在线 Figma 复原与真实截图复验
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:877 / LEGACY / C7 Tactical Board PoC`。页面从旧的绿色比赛战术布局改为 Figma 的白色 88px 顶栏、深紫 `343×380px` 球场、三个中轴圆、半场线、红色真实球员标记、阵型文字、五项工具栏、红色录制/保存按钮和教练 TabBar。
+- 真实业务边界保持：球员、阵型、比赛、只读权限、拖动、换位、重置和保存仍由既有 API/角色守卫驱动；没有加入 Figma 中不存在于当前 API 的蓝色对方球员、样例姓名或伪保存响应。WXML 未使用 `.map()`、`.filter()`、`.slice()`、`.indexOf()`。
+- 新增 C7 局部 SVG 图标，避免 WXSS 长 base64；顶栏继续使用动态 `navInset/menuInset`，并采用 `height:176rpx + box-sizing:content-box`，保证微信状态栏不侵占 Figma 内容高度。
+- 可信运行态证据：`tmp/coach-runtime-acceptance/C7-acceptance-phone-final.png`，屏幕裁剪结果严格 `375×812`；Figma 离线对照图为 `docs/design/reference/figma/c7-tactical-board-poc.png`。动态真实学员短名和只读比赛数据与画板样例数字不同，属于数据差异；结构、色彩、层级和固定底部工具区已按截图复验。
+- 验证：C7 聚焦 Vitest `6/6`、小程序 typecheck、根 `check`（domain `19/19`、小程序 `327/327`、API `104/104`）和 `git diff --check` 均通过。
+
 ## 2026-08-17 C6/C6.1/C6.2 教练端运行态截图补证
 
 - 在线 Figma 基准：`zZ6wKyOHKcO4UYXDd9jGwv`，C6 `93:796`、C6.1 `93:827`、C6.2 `93:858`。本轮使用真实受保护教练会话和比赛 `event-cq-talent-demo-match-completed`，确认 C6 返回 `200`、真实比分 `3:2`、真实名单 16 人和真实比赛事件；不使用 secure-test 的 `403` 响应或 Figma 示例数据替代业务数据。
