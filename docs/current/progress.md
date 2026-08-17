@@ -743,6 +743,12 @@
 - 验证：先红后绿的 C9 小程序测试 `7/7`、API 安全账号测试 `11/11`；全仓门禁 domain `19/19`、小程序 `324/324`、API `104/104`，两端 typecheck、API build、`git diff --check` 通过。
 - DevTools Automator 已连接 `9424`，路由已切到 `pages/coach/team/index`，运行时确认 iPhone X 逻辑视口 `375×812`；屏幕像素裁剪因当前 Windows 主窗口找不到 iPhone X 刘海锚点而拒绝生成 PNG，未宣称视觉截图通过。此前本地 API `tsx watch` 进程仍存在但 `/health` 无响应，重启/启动动作被当前 Windows 执行策略阻止，需后续在可控终端重启本地 API 后再做运行态联调。
 
+### C9 运行态补证
+
+- 在线节点 `93:924` 已重新读取；真实教练会话导航到 `pages/coach/team/index` 后取得 `tmp/coach-runtime-acceptance/C9-acceptance-phone-current.png`，裁剪结果严格 `375×812`。
+- 顶栏、队伍摘要卡、四列真实学员网格、教练组区域和教练 TabBar 的结构/间距与在线稿一致。当前 BFF 返回的真实队伍没有教练组成员，因此页面如实显示“暂未配置队伍教练”；没有把 Figma 示例的林教练、王助教、李体能写成测试数据。
+- C9 聚焦 Vitest `7/7` 通过；本项无业务代码变更，记录为“视觉结构通过，教练组真实数据为空态”。
+
 ## 2026-08-17 C10 训练内容选择与 C10.1 覆盖预览复原
 
 - 在线 Figma 已在本批开工前重新读取：C10 `93:952`、C10.1 `93:983`（文件 `zZ6wKyOHKcO4UYXDd9jGwv`）。C10 收口为软粉 88px 安全区顶栏、44px 搜索、32px 分类 pills、64px 紧凑训练项目行与 70px 选择底栏；训练项目名称、标签、难度、时长、选中数和总时长仍由既有真实项目树及 workbench 返回派生。
@@ -751,11 +757,11 @@
 - 测试先行：先让 C10/C10.1 的布局/派生字段/本地确认回归按预期失败，再完成最小实现；聚焦 Vitest `14/14`、小程序 typecheck、`git diff --check`、全仓门禁均通过（domain `19/19`、mini-program `325/325`、API `104/104`）。
 - DevTools 自动化已复用当前实例 `9424` 并路由到 C10/C10.1；C10.1 的运行态仍是旧 bundle（页面 `ready` 但没有新 `coverageSummary` 字段），`devtools-simulator-capture.py` 因无法定位当前嵌入式模拟器刘海而拒绝生成 PNG。故本批**没有**新的可信 375×812 视觉截图，不将静态/单测结果表述为运行态视觉验收。
 
-### C9 运行态补证
+### C10/C10.1 运行态补证
 
-- 在线节点 `93:924` 已重新读取；真实教练会话导航到 `pages/coach/team/index` 后取得 `tmp/coach-runtime-acceptance/C9-acceptance-phone-current.png`，裁剪结果严格 `375×812`。
-- 顶栏、队伍摘要卡、四列真实学员网格、教练组区域和教练 TabBar 的结构/间距与在线稿一致。当前 BFF 返回的真实队伍没有教练组成员，因此页面如实显示“暂未配置队伍教练”；没有把 Figma 示例的林教练、王助教、李体能写成测试数据。
-- C9 聚焦 Vitest `7/7` 通过；本项无业务代码变更，记录为“视觉结构通过，教练组真实数据为空态”。
+- 在线节点 `93:952`、`93:983` 已重新读取；真实教练会话导航到 `pages/coach/content-select/index?eventId=event-cq-talent-demo-training-upcoming` 和 `pages/coach/coverage/index?eventId=event-cq-talent-demo-training-upcoming`，取得 `tmp/coach-runtime-acceptance/C10-acceptance-phone-current.png`、`tmp/coach-runtime-acceptance/C10-1-acceptance-phone-current.png`，两张裁剪结果均严格 `375×812`。
+- C10 的搜索、分类 pills、训练项目卡、选择圆、底部选择栏和 C10.1 的学员覆盖卡/6px 轨道/确认栏与在线稿结构一致；训练项目、标签、时长、已选数量、覆盖比例和维度数量全部来自真实 API，未用画板示例内容替代。
+- C10/C10.1 聚焦 Vitest `8/8`、`6/6` 通过；本批无业务代码变更，记录为“视觉结构通过，动态真实数据差异已豁免”。
 
 ## 2026-08-17 C11 测评任务列表 Figma 复原
 
