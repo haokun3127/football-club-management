@@ -969,3 +969,9 @@
 - 修复后可信屏幕像素证据为 `tmp/coach-runtime-acceptance/C16.4-after-height-fix.png`（首屏）和 `tmp/coach-runtime-acceptance/C16.4-bottom.png`（下段），均严格 `375×812`，来源 `print_window`。搜索框、快速上手区、FAQ 起点与在线稿垂直结构对齐；真实接口当前返回的分类/问题数量及“支持方式待配置”与 Figma 样例不同，属于数据/契约差异，未伪造样例客服、公众号或咨询操作。
 - 排障确认微信提示来自 `apps/miniprogram-cq-talent/scripts/__pycache__` 的 Python 生成缓存；该目录及 `.pyc` 已移除，后续截图统一使用 `python -B`，未修改 `project.config.json`。`donutAuthorize__` 是微信工具保留目录名提示，不是业务页面目录。
 - 验证先红后绿：C16.4 定向 Vitest `4/4`、小程序 typecheck、`git diff --check` 和串行根门禁均通过；根门禁为 domain `19/19`、小程序 `332/332`、API `105/105`，退出码 `0`。
+
+## 2026-08-17 P0 微信手机号授权单飞防重入任务收口
+
+- 已确认实现提交 `3d4837b` 已在当前 `dev` 分支，不在遗留 hotfix worktree：登录按钮触摸入口同步取得锁，原生回调只消费一次；取消、空 code、`getPhoneNumber too frequently` 和超时均不自动重试，只有用户显式重试才释放锁。
+- 真实登录契约未改变：没有伪造手机号、验证码、session、角色或 API 响应；`binding_required`、无孩子家长档案和错误提示继续保持受限状态，错误文案不回显原始授权/API payload。
+- 验证：`pages/login/index.test.mjs` 定向 Vitest `15/15`，小程序 TypeScript typecheck 通过；该实现已随最近一次串行根门禁验证（domain `19/19`、mini-program `332/332`、API `105/105`）。
