@@ -26,9 +26,30 @@
         </view>
       </view>
 
-      <view class="c12-progress"><view class="c12-progress__value" style="{{progressStyle}}"></view></view>
+      <view wx:if="{{hasCurrentField}}" class="c12-students">
+        <text class="c12-students__title">待录入学员</text>
+        <view wx:for="{{draftRows}}" wx:key="studentId" class="c12-student-card">
+          <view class="c12-student-card__head">
+            <view class="c12-student-card__avatar">{{item.initials}}</view>
+            <text class="c12-student-card__name">{{item.name}}</text>
+          </view>
+          <view class="c12-student-card__metrics">
+            <view wx:for="{{item.metricCells}}" wx:for-item="cell" wx:key="testItemId" class="c12-metric-cell">
+              <text class="c12-metric-cell__label">{{cell.displayLabel}}</text>
+              <input wx:if="{{cell.showInput}}" class="c12-metric-cell__input" type="{{cell.inputType}}" placeholder="{{cell.placeholder}}" value="{{cell.rawValue}}" data-student-id="{{item.studentId}}" data-test-item-id="{{cell.testItemId}}" bindinput="onValueInput" />
+              <text wx:else class="{{cell.statusClass}}">{{cell.statusLabel}}</text>
+            </view>
+          </view>
+          <view class="c12-student-card__actions">
+            <text wx:if="{{item.invalid}}" class="c12-student-card__invalid">{{item.invalidHint}}</text>
+            <text class="c12-student-card__missing" data-student-id="{{item.studentId}}" data-test-item-id="{{currentField.testItemId}}" bindtap="toggleMissing">{{item.missingActionLabel}}</text>
+          </view>
+          <input wx:if="{{item.showMissingReason}}" class="c12-student-card__reason" placeholder="缺测原因（选填）" value="{{item.missingReason}}" data-student-id="{{item.studentId}}" data-test-item-id="{{currentField.testItemId}}" bindinput="onMissingReasonInput" />
+        </view>
+      </view>
 
-      <view wx:if="{{hasCurrentField}}" class="c12-field-window">
+      <view wx:if="{{hasCurrentField}}" class="c12-field-navigation">
+        <view class="c12-progress"><view class="c12-progress__value" style="{{progressStyle}}"></view></view>
         <scroll-view scroll-x class="c12-groups" enhanced show-scrollbar="{{false}}">
           <view class="c12-groups__row">
             <view wx:for="{{groupOptions}}" wx:key="id" class="{{item.className}}" data-id="{{item.id}}" bindtap="switchGroup">{{item.label}}</view>
@@ -46,29 +67,6 @@
             <text class="c12-field-window__step" bindtap="previousField">上一项</text>
             <text class="c12-field-window__step" bindtap="nextField">下一项</text>
           </view>
-        </view>
-      </view>
-
-      <view wx:if="{{hasCurrentField}}" class="c12-students">
-        <text class="c12-students__title">待录入学员</text>
-        <view wx:for="{{draftRows}}" wx:key="studentId" class="c12-student-card">
-          <view class="c12-student-card__head">
-            <view class="c12-student-card__avatar">{{item.initials}}</view>
-            <text class="c12-student-card__name">{{item.name}}</text>
-            <text class="{{item.statusClass}}">{{item.statusLabel}}</text>
-          </view>
-          <view class="c12-student-card__metrics">
-            <view wx:for="{{item.metricCells}}" wx:for-item="cell" wx:key="testItemId" class="c12-metric-cell">
-              <text class="c12-metric-cell__label">{{cell.label}}</text>
-              <input wx:if="{{cell.showInput}}" class="c12-metric-cell__input" type="{{cell.inputType}}" placeholder="{{cell.placeholder}}" value="{{cell.rawValue}}" data-student-id="{{item.studentId}}" data-test-item-id="{{cell.testItemId}}" bindinput="onValueInput" />
-              <text wx:else class="{{cell.statusClass}}">{{cell.statusLabel}}</text>
-            </view>
-          </view>
-          <view class="c12-student-card__actions">
-            <text wx:if="{{item.invalid}}" class="c12-student-card__invalid">{{item.invalidHint}}</text>
-            <text class="c12-student-card__missing" data-student-id="{{item.studentId}}" data-test-item-id="{{currentField.testItemId}}" bindtap="toggleMissing">{{item.missingActionLabel}}</text>
-          </view>
-          <input wx:if="{{item.showMissingReason}}" class="c12-student-card__reason" placeholder="缺测原因（选填）" value="{{item.missingReason}}" data-student-id="{{item.studentId}}" data-test-item-id="{{currentField.testItemId}}" bindinput="onMissingReasonInput" />
         </view>
       </view>
     </block>

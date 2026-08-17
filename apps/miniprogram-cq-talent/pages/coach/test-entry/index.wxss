@@ -9,7 +9,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 176rpx;
+  height: 88rpx;
   padding-right: 44rpx;
   padding-left: 44rpx;
   background: #fceeef;
@@ -51,7 +51,8 @@
   flex-direction: column;
   gap: 10rpx;
   box-sizing: border-box;
-  min-height: 192rpx;
+  height: 192rpx;
+  overflow: hidden;
   padding: 30rpx 32rpx;
   border-radius: 16rpx;
   background: #07111f;
@@ -59,8 +60,11 @@
 }
 
 .c12-task-header__title {
+  overflow: hidden;
   font-size: 36rpx;
   font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .c12-task-header__meta {
@@ -96,7 +100,7 @@
 
 .c12-progress {
   height: 10rpx;
-  margin: 18rpx 0 22rpx;
+  margin: 0 0 22rpx;
   overflow: hidden;
   border-radius: 999rpx;
   background: #e7eaf0;
@@ -407,8 +411,8 @@
   color: #667085;
 }
 
-.c12-field-window {
-  margin: 18rpx 0 22rpx;
+.c12-field-navigation {
+  margin: 28rpx 32rpx 22rpx;
 }
 
 .c12-field-window__bar {
@@ -464,7 +468,9 @@
 .c12-students {
   display: flex;
   flex-direction: column;
-  gap: 18rpx;
+  gap: 24rpx;
+  margin-top: 40rpx;
+  padding: 16rpx 32rpx 0;
 }
 
 .c12-students__title {
@@ -475,7 +481,13 @@
 }
 
 .c12-student-card {
+  position: relative;
+  display: flex;
   box-sizing: border-box;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16rpx;
+  min-height: 136rpx;
   padding: 24rpx;
   border-radius: 24rpx;
   background: #ffffff;
@@ -484,8 +496,10 @@
 
 .c12-student-card__head {
   display: flex;
+  flex: 0 0 112rpx;
   align-items: center;
   min-width: 0;
+  gap: 12rpx;
 }
 
 .c12-student-card__avatar {
@@ -506,26 +520,28 @@
   overflow: hidden;
   min-width: 0;
   flex: 1;
-  margin-left: 18rpx;
+  margin-left: 0;
   color: #202124;
   font-size: 28rpx;
   font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.25;
+  word-break: break-all;
 }
 
 .c12-student-card__metrics {
   display: grid;
+  min-width: 0;
+  flex: 1;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12rpx;
-  margin-top: 20rpx;
+  gap: 8rpx;
+  margin-top: 0;
 }
 
 .c12-metric-cell {
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 8rpx;
+  gap: 4rpx;
 }
 
 .c12-metric-cell__label {
@@ -569,10 +585,11 @@
 
 .c12-student-card__actions {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: space-between;
-  min-height: 28rpx;
-  margin-top: 14rpx;
+  min-height: 0;
+  margin-top: 0;
 }
 
 .c12-student-card__missing,
@@ -590,6 +607,7 @@
 
 .c12-student-card__reason {
   box-sizing: border-box;
+  flex-basis: 100%;
   width: 100%;
   min-height: 64rpx;
   margin-top: 12rpx;

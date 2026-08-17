@@ -10,6 +10,7 @@ type GroupView = { id: string; label: string; className: string };
 type MetricCell = {
   testItemId: string;
   label: string;
+  displayLabel: string;
   rawValue: string;
   inputType: "digit" | "text";
   placeholder: string;
@@ -561,7 +562,7 @@ function presentDraftRow(student: CoachWorkbench["roster"][number], draft: Asses
     statusClass: `c12-row__status c12-row__status--${status}`,
     showInput: entry.status !== "missing",
     showMissingReason: entry.status === "missing",
-    missingActionLabel: entry.status === "missing" ? "取消缺测" : "标记缺测",
+    missingActionLabel: entry.status === "missing" ? "恢复" : "缺测",
     invalidHint,
     metricCells: visibleFields
       .filter((visibleField) => Boolean(visibleField.testItemId))
@@ -577,6 +578,7 @@ function presentMetricCell(field: AssessmentField, entry: { status: "empty" | "r
   return {
     testItemId: field.testItemId || "",
     label: field.label,
+    displayLabel: compactMetricLabel(field.label),
     rawValue: entry.rawValue,
     inputType: field.inputType === "number" ? "digit" : "text",
     placeholder: field.unit ? field.unit : "—",
@@ -585,6 +587,11 @@ function presentMetricCell(field: AssessmentField, entry: { status: "empty" | "r
     statusClass: `c12-metric-cell__status c12-metric-cell__status--${status}`,
     showInput: status !== "missing",
   };
+}
+
+function compactMetricLabel(label: string) {
+  const characters = Array.from(label.trim());
+  return characters.length > 5 ? `${characters.slice(0, 5).join("")}…` : characters.join("");
 }
 
 function rangeHint(field: AssessmentField) {

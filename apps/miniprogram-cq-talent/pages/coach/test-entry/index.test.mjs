@@ -230,6 +230,30 @@ describe("coach project score entry", () => {
     ]);
   });
 
+  it("precomputes a compact label for long real assessment metrics", async () => {
+    mocks.getAssessmentForm.mockResolvedValueOnce(form({
+      fields: [
+        { id: "field-juggling", testItemId: "item-juggling", metricId: "metric-juggling", groupId: "fitness", groupLabel: "Fitness", label: "1分钟颠球次数", valueKind: "score_0_100", inputType: "number", minValue: 0, maxValue: 100, unit: "score" },
+      ],
+    }));
+    const page = createPageInstance();
+    await page.load("event-assessment-1");
+
+    expect(page.data.draftRows[0].metricCells[0]).toMatchObject({
+      label: "1分钟颠球次数",
+      displayLabel: "1分钟颠球…",
+    });
+  });
+
+  it("keeps the compact missing toggle label truthful after its state changes", async () => {
+    const page = createPageInstance();
+    await page.load("event-assessment-1");
+
+    expect(page.data.draftRows[0].missingActionLabel).toBe("缺测");
+    page.toggleMissing({ currentTarget: { dataset: { studentId: "student-1" } } });
+    expect(page.data.draftRows[0].missingActionLabel).toBe("恢复");
+  });
+
   it("writes compact card inputs against the cell's real test item rather than the first field", async () => {
     mocks.getAssessmentForm.mockResolvedValueOnce(form({
       fields: [
@@ -255,6 +279,17 @@ describe("coach project score entry", () => {
     expect(stylesheet).toMatch(/\.c12-submit-wrap\s*\{[^}]*bottom:\s*140rpx[^}]*min-height:\s*140rpx/s);
   });
 
+  it("keeps the Figma C12 first viewport focused on learner cards before field navigation", () => {
+    const studentsIndex = template.indexOf('class="c12-students"');
+    const navigationIndex = template.indexOf('class="c12-field-navigation"');
+    const progressIndex = template.indexOf('class="c12-progress"');
+
+    expect(template).toContain("{{cell.displayLabel}}");
+    expect(studentsIndex).toBeGreaterThan(-1);
+    expect(navigationIndex).toBeGreaterThan(studentsIndex);
+    expect(progressIndex).toBeGreaterThan(studentsIndex);
+  });
+
   it("serializes duplicate submits and keeps a safe page-local C12 shell", async () => {
     let resolveSubmission;
     mocks.submitCoachAssessment.mockImplementationOnce(() => new Promise((resolve) => { resolveSubmission = resolve; }));
@@ -277,8 +312,11 @@ describe("coach project score entry", () => {
     expect(template).toContain('/assets/icons/c12-arrow-left.svg');
     expect(stylesheet).toMatch(/\.c12-submit-wrap\s*\{[^}]*bottom:\s*140rpx/s);
     expect(template).toContain("{{navTitle}}");
-    expect(stylesheet).toMatch(/\.c12-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+    expect(stylesheet).toMatch(/\.c12-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).toMatch(/\.c12-body\s*\{[^}]*padding:\s*32rpx 44rpx 320rpx/s);
+    expect(stylesheet).toMatch(/\.c12-students\s*\{[^}]*margin-top:\s*40rpx/s);
+    expect(stylesheet).toMatch(/\.c12-task-header\s*\{(?=[^}]*height:\s*192rpx)(?=[^}]*overflow:\s*hidden)/s);
+    expect(stylesheet).toMatch(/\.c12-students\s*\{[^}]*padding:\s*16rpx 32rpx 0/s);
     expect(stylesheet).toMatch(/\.c12-submit-wrap\s*\{[^}]*padding:\s*14rpx 44rpx 18rpx/s);
   });
 

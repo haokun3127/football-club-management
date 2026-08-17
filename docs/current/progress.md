@@ -886,3 +886,11 @@
 - C11 顶栏使用 `height:calc(176rpx - navInset)` 与 `padding-top:navInset` 保持合计 `88px` 的安全区包络，不再因状态栏内边距把正文向下推移。真实 BFF 的任务、日期、状态、进度、筛选、角色守卫和无创建 API 时的诚实提示均未改变。
 - 可信 375×812 证据：`tmp/coach-runtime-acceptance/C11-acceptance-phone-final.png`；在线稿对照：`tmp/coach-runtime-acceptance/C11-figma-online-20260817.png`；并排图：`tmp/coach-runtime-acceptance/C11-acceptance-compare-final.png`。筛选、卡片、进度轨、FAB、底栏的几何已复验；具体日期/状态/进度和原生状态栏、微信胶囊是动态数据或设备系统层差异。
 - 验证先红后绿：C11 聚焦 Vitest `8/8`、小程序 typecheck 与 `git diff --check` 通过；根 `npx --yes pnpm@10.33.0 run check` 全绿（domain `19/19`、mini-program `327/327`、API `105/105`）。
+
+## 2026-08-17 C12 项目评分录入真实运行态视觉收口
+
+- 在线唯一基准已重读：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1030 / C12 Project Score Entry`。真实教练路由为 `pages/coach/test-entry/index?eventId=event-cq-talent-demo-training-upcoming`；安全测试活动返回 `403 Event is not accessible for this coach membership`，未绕过该权限契约。
+- C12 保留真实的 16 名学员、62 个评分字段、活动/模板名称、评分草稿、缺测和提交链路。为避免真实长指标撑高卡片，`displayLabel` 在 TypeScript view model 中预计算并在 WXML 单行展示；项目分组与上一项/下一项导航移至学员列表之后，首屏不再被导航控制区占据。
+- 运行态对照发现 C12 自定义顶栏仍把 `176rpx` 内容高度与 `navInset` 相加，令正文整体下移约一个状态栏高度。已改为 88px 安全区包络并固定 `331×96px` 任务卡；学员区恢复任务卡后的 20px 间距和 8px 内上边距。没有改动 API、角色、草稿或真实数据。
+- 可信证据：在线稿 `tmp/coach-runtime-acceptance/C12-figma-online-20260817.png`；真实模拟器图 `tmp/coach-runtime-acceptance/C12-acceptance-phone-final.png`（严格 `375×812`）；并排图 `tmp/coach-runtime-acceptance/C12-acceptance-compare-final.png`。顶栏、任务卡、列表、保存区、TabBar 已复验；状态栏/微信胶囊和真实数据文本为允许差异。
+- 已完成红→绿 C12 定向回归、Mini Program typecheck 和 `git diff --check`。全仓门禁类型检查、domain `19/19` 与 mini-program `330/330` 已通过；API `103/105` 通过但有两项独立 SQLite 重开超时：`apps/api/test/app-client-match-event-create.test.ts:135`（10 秒）与 `apps/api/test/persistence.test.ts:13`（15 秒）。两项均在 API persistence/test 在途区域，未为 C12 视觉任务擅自修改。
