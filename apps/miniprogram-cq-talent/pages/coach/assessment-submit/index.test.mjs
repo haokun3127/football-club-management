@@ -99,7 +99,7 @@ describe("C15.1 coach assessment submit", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"app-header"');
     expect(template).toContain('padding-top:{{navInset}}px');
-    expect(stylesheet).toMatch(/\.c151-nav\s*\{[^}]*height:\s*176rpx/s);
+    expect(stylesheet).toMatch(/\.c151-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).toMatch(/\.c151-success\s*\{[^}]*gap:\s*0/s);
     expect(stylesheet).toMatch(/\.c151-success__title\s*\{[^}]*margin-top:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.c151-success__subtitle\s*\{[^}]*margin-top:\s*16rpx/s);
