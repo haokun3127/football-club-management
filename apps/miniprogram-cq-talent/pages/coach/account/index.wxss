@@ -4,12 +4,12 @@
 }
 
 .c163-nav {
-  height: 176rpx;
+  height: 88rpx;
   box-sizing: content-box;
   display: flex;
   align-items: center;
   gap: 24rpx;
-  padding-right: 32rpx;
+  padding-right: 200rpx;
   padding-left: 32rpx;
   background: #fceeef;
 }
@@ -32,9 +32,17 @@
 }
 
 .c163-nav__title {
+  flex: 1;
   color: #202124;
   font-size: 44rpx;
   font-weight: 700;
+  text-align: center;
+}
+
+.c163-nav__placeholder {
+  width: 48rpx;
+  height: 48rpx;
+  flex: 0 0 48rpx;
 }
 
 .c163-page__body {

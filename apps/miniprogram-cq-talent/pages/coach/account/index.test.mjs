@@ -156,8 +156,10 @@ describe("coach account", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("home.coachName");
     expect(controller).not.toMatch(/clearSession|getStorage|setStorage|showToast|showModal|reLaunch/);
-    expect(template).not.toContain("c163-nav__placeholder");
-    expect(stylesheet).toMatch(/\.c163-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*background:\s*#fceeef)/s);
+    expect(template).toContain('class="c163-nav__placeholder"');
+    expect(stylesheet).toMatch(/\.c163-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*padding-right:\s*200rpx)(?=[^}]*padding-left:\s*32rpx)(?=[^}]*background:\s*#fceeef)/s);
+    expect(stylesheet).toMatch(/\.c163-nav__title\s*\{(?=[^}]*flex:\s*1)(?=[^}]*font-size:\s*44rpx)(?=[^}]*text-align:\s*center)/s);
+    expect(stylesheet).toMatch(/\.c163-nav__placeholder\s*\{(?=[^}]*width:\s*48rpx)(?=[^}]*height:\s*48rpx)/s);
     expect(stylesheet).toMatch(/\.c163-page__body\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+180rpx/s);
     expect(stylesheet).toMatch(/\.c163-content\s*\{[^}]*gap:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.c163-card\s*\{[^}]*border-radius:\s*24rpx/s);

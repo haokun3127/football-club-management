@@ -953,3 +953,11 @@
 - 真实数据边界保持不变：当前会话只提供 `capabilities.features.private_lessons`，没有接单状态、周时段、价格或持久化契约。运行截图中的“暂无法确认俱乐部是否已开通私教服务 / 状态待同步 / 当前教练可用时段尚未接入”保留为诚实状态，未伪造 Figma 的 17:00–20:00 样例、绿色开关或确认排期。
 - 可信证据：`tmp/coach-runtime-acceptance/C162-runtime-baseline.png`、`C162-runtime-baseline-compare.png`、`C162-acceptance-phone-final.png`、`C162-acceptance-compare-final.png`；均由当前 DevTools Automator 端口 `9420` 路由确认后使用 `print_window` 通道生成，最终 PNG 严格 `375×812`。状态栏、微信胶囊、TabBar 图标细节及配置样例/真实空契约差异按环境与数据边界豁免。
 - 验证先红后绿：C16.2 定向 Vitest 先因缺少居中标题/占位和旧顶栏失败（1 failed / 4），补齐最小结构与样式后 `4/4` 通过；尚待本任务最后一次全仓门禁与独立提交。
+
+## 2026-08-17 C16.3 教练账号真实运行态视觉收口
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1262 / C16.3 Coach Account`。在线稿为 88px 粉色 TopNav，标题居中，左侧返回与右侧 24px 占位维持视觉平衡。
+- 运行态基线确认当前页仍有 `176rpx` 顶栏、无右侧占位和标题左对齐。现将 `.c163-nav` 收口为 `88rpx + content-box`，右侧按在线稿胶囊避让为 `200rpx`，增加无交互 `c163-nav__placeholder`，标题改为 `flex: 1; text-align: center`。
+- 真实数据边界不变：显示名来自认证 coach session；球队来自单一的近 30 天 `getCoachHome()` 请求并受已有 request-token 防过期保护。手机号、微信绑定、密码、设备、缓存、编辑、认证及所有写操作没有可靠契约，运行图继续诚实显示“当前会话未提供 / 状态待同步”，未伪造 Figma 样例。
+- 可信证据：`tmp/coach-runtime-acceptance/C163-runtime-baseline.png`、`C163-runtime-baseline-compare.png`、`C163-acceptance-phone-final.png`、`C163-acceptance-compare-final.png`。均先通过 Automator `9420` 确认路由 `pages/coach/account/index`，再经 `print_window` 生成严格 `375×812`。状态栏、微信胶囊、TabBar 图标细节及样例账号内容属于系统/真实数据差异。
+- 验证先红后绿：C16.3 定向 Vitest 先因缺少右侧占位和旧顶栏失败（1 failed / 5），最小 WXML/WXSS 修复后 `5/5` 通过；尚待本任务最后一次全仓门禁与独立提交。
