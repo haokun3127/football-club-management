@@ -34,4 +34,4 @@ Align the coach permission-scope page with the live Figma design while preservin
 - [x] The route continues to show only the server-confirmed permission state and issues no invented API/storage/action side effects.
 - [x] A real DevTools `PrintWindow` capture is exactly 375×812 and shows the corrected top-bar/body vertical structure; real empty-state data is explicitly classified as a data-state deviation from the configured Figma sample.
 - [x] `npx --yes pnpm@10.33.0 run check` exits 0 in a single serial session, and `git diff --check` passes.
-- [ ] Only scoped files are committed and pushed to `origin/dev`; unrelated worktree paths remain uncommitted.
+- [x] Only scoped files are committed and pushed to `origin/dev`; unrelated worktree paths remain uncommitted.
