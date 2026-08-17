@@ -101,7 +101,7 @@ describe("coach private interest", () => {
     expect(pageConfig).not.toContain('"app-header"');
     expect(pageConfig).toContain('"role-tabbar"');
     expect(template).toContain('class="c162-nav"');
-    expect(template).not.toContain("c162-nav__placeholder");
+    expect(template).toContain('class="c162-nav__placeholder"');
     expect(template).toContain("/assets/icons/c162-chevron-left.svg");
     expect(template).toContain('class="c162-pending-marker"');
     expect(template).not.toMatch(/class="c162-pending-marker"[^>]*bindtap/);
@@ -110,8 +110,9 @@ describe("coach private interest", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toMatch(/WEEK_DAYS|SLOT_LABELS|toggleAccepting|toggleSlot|persist|getStorage|setStorage|showToast/);
     expect(stylesheet).toMatch(/\.c162-page\s*\{[^}]*background:\s*#f6f7f9/s);
-    expect(stylesheet).toMatch(/\.c162-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*padding-right:\s*32rpx)(?=[^}]*padding-left:\s*32rpx)(?=[^}]*background:\s*#fceeef)/s);
-    expect(stylesheet).toMatch(/\.c162-nav__title\s*\{[^}]*font-size:\s*44rpx/s);
+    expect(stylesheet).toMatch(/\.c162-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*padding-right:\s*200rpx)(?=[^}]*padding-left:\s*32rpx)(?=[^}]*background:\s*#fceeef)/s);
+    expect(stylesheet).toMatch(/\.c162-nav__title\s*\{(?=[^}]*flex:\s*1)(?=[^}]*font-size:\s*44rpx)(?=[^}]*text-align:\s*center)/s);
+    expect(stylesheet).toMatch(/\.c162-nav__placeholder\s*\{(?=[^}]*width:\s*48rpx)(?=[^}]*height:\s*48rpx)/s);
     expect(stylesheet).toMatch(/\.c162-page__body\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+180rpx/s);
     expect(stylesheet).toMatch(/\.c162-content\s*\{[^}]*gap:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.c162-info-card\s*,\s*\.c162-status-card\s*,\s*\.c162-schedule-card\s*\{[^}]*border-radius:\s*24rpx/s);

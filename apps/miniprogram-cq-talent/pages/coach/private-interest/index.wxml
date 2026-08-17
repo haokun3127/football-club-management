@@ -4,6 +4,7 @@
       <image class="c162-nav__back-icon" src="/assets/icons/c162-chevron-left.svg" mode="aspectFit" />
     </view>
     <view class="c162-nav__title">私教兴趣</view>
+    <view class="c162-nav__placeholder" aria-hidden="true"></view>
   </view>
 
   <view class="c162-page__body">

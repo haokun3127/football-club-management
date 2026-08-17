@@ -945,3 +945,11 @@
 - 曾出现 `9424` Automator 连接拒绝，根因是旧会话端口失效而非页面或 API。重新读取当前 IDE HTTP 端口 `61245` 并通过唯一注册入口更新为 `9420` 后，路由握手确认 `pages/coach/permissions/index`，再取得可信截图。
 - 可信证据：`tmp/coach-runtime-acceptance/C161-runtime-baseline-valid.png`、`C161-runtime-baseline-valid-compare.png`、`C161-acceptance-phone-final.png`、`C161-acceptance-compare-final.png`；均由 DevTools `print_window` 通道生成，最终图严格 `375×812`。修复后顶栏粉色边界、标题位置和 body 起点与在线稿的几何结构一致；系统状态栏、微信胶囊、TabBar 图标细节及空态/就绪态数据差异按运行环境与服务端数据豁免。
 - 验证先红后绿：C16.1 定向 Vitest 先因旧 `176rpx/44rpx` 失败（1 failed / 4），改动后 `4/4` 通过；尚待本任务最后一次全仓门禁与独立提交。
+
+## 2026-08-17 C16.2 教练私教兴趣真实运行态视觉收口
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1238 / C16.2 Private Interest`。在线稿要求 88px 粉色顶栏、返回箭头、居中标题和右侧 24px 占位；内容卡片左右内边距为 22px。
+- 运行态基线发现两个确定的视觉差异：`.c162-nav` 仍为 `176rpx`，且 WXML 没有右侧占位，导致标题靠左。现将顶栏收口为 `88rpx + content-box`、右侧避让为 `200rpx`，补齐 `c162-nav__placeholder`，并使标题 `flex: 1; text-align: center`。
+- 真实数据边界保持不变：当前会话只提供 `capabilities.features.private_lessons`，没有接单状态、周时段、价格或持久化契约。运行截图中的“暂无法确认俱乐部是否已开通私教服务 / 状态待同步 / 当前教练可用时段尚未接入”保留为诚实状态，未伪造 Figma 的 17:00–20:00 样例、绿色开关或确认排期。
+- 可信证据：`tmp/coach-runtime-acceptance/C162-runtime-baseline.png`、`C162-runtime-baseline-compare.png`、`C162-acceptance-phone-final.png`、`C162-acceptance-compare-final.png`；均由当前 DevTools Automator 端口 `9420` 路由确认后使用 `print_window` 通道生成，最终 PNG 严格 `375×812`。状态栏、微信胶囊、TabBar 图标细节及配置样例/真实空契约差异按环境与数据边界豁免。
+- 验证先红后绿：C16.2 定向 Vitest 先因缺少居中标题/占位和旧顶栏失败（1 failed / 4），补齐最小结构与样式后 `4/4` 通过；尚待本任务最后一次全仓门禁与独立提交。
