@@ -1,8 +1,9 @@
 <view class="select-page">
   <view class="select-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="select-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
-    <view class="select-nav__title">训练内容选择</view>
-    <view class="select-nav__spacer"></view>
+    <view class="select-nav__left">
+      <view class="select-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+      <view class="select-nav__title">训练内容选择</view>
+    </view>
   </view>
 
   <view class="select-page__body">
@@ -11,7 +12,7 @@
     <block wx:if="{{state === 'ready'}}">
       <view class="search-bar">
         <image class="search-bar__icon" src="/assets/icons/search.svg" mode="aspectFit" />
-        <input class="search-bar__input" placeholder="搜索训练内容" value="{{searchText}}" bindinput="onSearchInput" />
+        <input class="search-bar__input" placeholder="搜索训练项目" value="{{searchText}}" bindinput="onSearchInput" />
       </view>
 
       <scroll-view scroll-x class="category-strip" enhanced show-scrollbar="{{false}}">
@@ -22,15 +23,15 @@
 
       <view wx:if="{{hasVisibleProjects}}" class="project-list">
         <view wx:for="{{visibleProjects}}" wx:key="id" class="{{item.cardClass}}" data-id="{{item.id}}" bindtap="toggleProject">
-          <view class="{{item.iconClass}}"><image src="{{item.iconSrc}}" mode="aspectFit" /><image wx:if="{{item.isSelected}}" class="project-card__check" src="/assets/icons/c10-check-circle.svg" mode="aspectFit" /></view>
+          <view class="{{item.iconClass}}"><image src="{{item.iconSrc}}" mode="aspectFit" /></view>
           <view class="project-card__info">
             <view class="project-card__name">{{item.name}}</view>
-            <view wx:if="{{item.hasDescription}}" class="project-card__description">{{item.description}}</view>
             <view class="project-card__meta">
               <text wx:if="{{item.hasDifficulty}}" class="project-card__level">{{item.difficulty}}</text>
               <text wx:if="{{item.hasDuration}}" class="project-card__duration">{{item.durationLabel}}</text>
             </view>
           </view>
+          <view class="{{item.selectClass}}"><image wx:if="{{item.isSelected}}" src="/assets/icons/c10-check-circle.svg" mode="aspectFit" /></view>
         </view>
       </view>
       <view wx:else class="inline-empty">当前分类暂无训练内容。</view>
@@ -40,10 +41,7 @@
   </view>
 
   <view wx:if="{{state === 'ready'}}" class="select-bar">
-    <view class="select-bar__summary">
-      <text class="select-bar__count">已选 {{selectedCount}} 项</text>
-      <text wx:if="{{durationText}}" class="select-bar__duration">{{durationText}}</text>
-    </view>
+    <text class="select-bar__summary">{{summaryLabel}}</text>
     <view class="{{confirmClass}}" bindtap="confirmSelection" aria-disabled="{{isConfirmDisabled}}">{{confirmLabel}}</view>
   </view>
 

@@ -12,13 +12,13 @@ type CategoryView = {
 type ProjectView = TrainingProject & {
   groupIds: string[];
   groupNames: string[];
-  hasDescription: boolean;
   hasDifficulty: boolean;
   hasDuration: boolean;
   durationLabel: string;
   isSelected: boolean;
   cardClass: string;
   iconClass: string;
+  selectClass: string;
   iconSrc: string;
   searchText: string;
 };
@@ -41,6 +41,7 @@ interface PageData {
   selectedIds: string[];
   selectedCount: number;
   durationText: string;
+  summaryLabel: string;
   canSave: boolean;
   isConfirmDisabled: boolean;
   confirmClass: string;
@@ -52,9 +53,9 @@ interface PageData {
 
 const TARGET_ICONS = [
   "/assets/icons/c10-target-rose.svg",
-  "/assets/icons/c10-target-green.svg",
-  "/assets/icons/c10-target-violet.svg",
   "/assets/icons/c10-target-amber.svg",
+  "/assets/icons/c10-target-violet.svg",
+  "/assets/icons/c10-target-green.svg",
 ];
 
 Page<PageData>({
@@ -76,10 +77,11 @@ Page<PageData>({
     selectedIds: [],
     selectedCount: 0,
     durationText: "",
+    summaryLabel: "已选 0 项",
     canSave: false,
     isConfirmDisabled: true,
     confirmClass: "select-bar__confirm select-bar__confirm--disabled",
-    confirmLabel: "确认选择",
+    confirmLabel: "选择 (0)",
     submitting: false,
     hasSaveError: false,
     saveError: "",
@@ -241,7 +243,7 @@ Page<PageData>({
         submitting: false,
         isConfirmDisabled: false,
         confirmClass: "select-bar__confirm",
-        confirmLabel: "确认选择",
+        confirmLabel: `选择 (${selectedIds.length})`,
         hasSaveError: false,
         saveError: "",
       });
@@ -265,10 +267,11 @@ Page<PageData>({
       selectedIds: [],
       selectedCount: 0,
       durationText: "",
+      summaryLabel: "已选 0 项",
       canSave: false,
       isConfirmDisabled: true,
       confirmClass: "select-bar__confirm select-bar__confirm--disabled",
-      confirmLabel: "确认选择",
+      confirmLabel: "选择 (0)",
       submitting: false,
       hasSaveError: false,
       saveError: "",
@@ -322,13 +325,13 @@ function presentProject(project: TrainingProject, groupIds: string[], groupNames
     tags: [...project.tags],
     groupIds,
     groupNames,
-    hasDescription: Boolean(project.description),
     hasDifficulty: Boolean(project.difficulty),
     hasDuration,
     durationLabel: hasDuration ? `${durationMinutes} 分钟` : "",
     isSelected,
     cardClass: isSelected ? "project-card project-card--selected" : "project-card",
-    iconClass: isSelected ? "project-card__icon project-card__icon--selected" : "project-card__icon",
+    iconClass: `project-card__icon project-card__icon--tone-${index % TARGET_ICONS.length}`,
+    selectClass: isSelected ? "project-card__select project-card__select--selected" : "project-card__select",
     iconSrc: TARGET_ICONS[index % TARGET_ICONS.length] || TARGET_ICONS[0] || "",
     searchText,
   };
@@ -348,6 +351,7 @@ function buildSelectionPatch(
   const presentedProjects = projects.map((project, index) => presentProject(project, project.groupIds, project.groupNames, index, selected.has(project.id)));
   const presentedCategories = presentCategories(categories, activeCategoryId);
   const visibleProjects = filterProjects(presentedProjects, activeCategoryId, searchText);
+  const durationText = selectedDurationText(selectedIds, presentedProjects);
   const isConfirmDisabled = !canSave || submitting || selectedIds.length === 0;
   return {
     searchText,
@@ -358,10 +362,11 @@ function buildSelectionPatch(
     hasVisibleProjects: visibleProjects.length > 0,
     selectedIds,
     selectedCount: selectedIds.length,
-    durationText: selectedDurationText(selectedIds, presentedProjects),
+    durationText,
+    summaryLabel: selectedSummaryLabel(selectedIds.length, durationText),
     isConfirmDisabled,
     confirmClass: isConfirmDisabled ? "select-bar__confirm select-bar__confirm--disabled" : "select-bar__confirm",
-    confirmLabel: submitting ? "保存中" : "确认选择",
+    confirmLabel: submitting ? "保存中" : `选择 (${selectedIds.length})`,
   };
 }
 
@@ -404,6 +409,11 @@ function selectedDurationText(selectedIds: string[], projects: ProjectView[]) {
   if (durations.length === selectedProjects.length) return `约 ${total} 分钟`;
   if (durations.length > 0) return `已知 ${total} 分钟，部分时长待补充`;
   return "时长待补充";
+}
+
+function selectedSummaryLabel(selectedCount: number, durationText: string) {
+  const countLabel = `已选 ${selectedCount} 项`;
+  return durationText ? `${countLabel} · ${durationText}` : countLabel;
 }
 
 function isWritableTrainingWorkbench(workbench: CoachWorkbench, eventId: string) {

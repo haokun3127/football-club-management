@@ -1,6 +1,6 @@
 import { getCoachTrainingCoverage } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { resolveNavInset } from "../../../utils/presentation";
+import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachTrainingCoverageStudent, LoadState } from "../../../utils/types";
 
 interface DimensionBar {
@@ -22,11 +22,13 @@ interface StudentRow {
 
 interface PageData {
   navInset: number;
+  menuInset: number;
   state: LoadState;
   statusTitle: string;
   message: string;
   retryLabel: string;
   hasStudents: boolean;
+  coverageSummary: string;
   students: StudentRow[];
 }
 
@@ -35,11 +37,13 @@ let loadToken = 0;
 Page<PageData>({
   data: {
     navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     state: "loading",
     statusTitle: "覆盖预览",
     message: "正在读取训练覆盖信息",
     retryLabel: "",
     hasStudents: false,
+    coverageSummary: "",
     students: [],
   },
   onLoad() {
@@ -56,6 +60,7 @@ Page<PageData>({
       message: "正在读取训练覆盖信息",
       retryLabel: "",
       hasStudents: false,
+      coverageSummary: "",
       students: [],
     });
 
@@ -69,6 +74,7 @@ Page<PageData>({
         message: "",
         retryLabel: "",
         hasStudents: true,
+        coverageSummary: coverageSummary(students),
         students,
       } : {
         state: "empty",
@@ -76,6 +82,7 @@ Page<PageData>({
         message: "近 30 天暂无可展示的执教覆盖信息",
         retryLabel: "",
         hasStudents: false,
+        coverageSummary: "",
         students: [],
       });
     } catch {
@@ -86,6 +93,7 @@ Page<PageData>({
         message: "请稍后重试",
         retryLabel: "重试",
         hasStudents: false,
+        coverageSummary: "",
         students: [],
       });
     }
@@ -95,6 +103,9 @@ Page<PageData>({
   },
   goBack() {
     wx.navigateBack({ delta: 1 });
+  },
+  confirmCoverage() {
+    this.goBack();
   },
 });
 
@@ -124,6 +135,16 @@ function coverageLabel(coveredCount: number, totalCount: number) {
   return Number.isInteger(coveredCount) && coveredCount >= 0 && Number.isInteger(totalCount) && totalCount >= 0
     ? `覆盖 ${coveredCount}/${totalCount}`
     : "覆盖待同步";
+}
+
+function coverageSummary(students: StudentRow[]) {
+  const coveredDimensions = new Set<string>();
+  students.forEach((student) => {
+    student.dimensions.forEach((dimension) => {
+      if (dimension.covered) coveredDimensions.add(dimension.dimensionId);
+    });
+  });
+  return `已覆盖 ${coveredDimensions.size} 项`;
 }
 
 function validScorePercent(value: number | null) {

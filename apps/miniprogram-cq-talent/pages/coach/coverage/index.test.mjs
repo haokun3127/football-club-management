@@ -9,7 +9,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("../../../utils/api", () => ({ getCoachTrainingCoverage: mocks.getCoachTrainingCoverage }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
-vi.mock("../../../utils/presentation", () => ({ resolveNavInset: () => 0 }));
+vi.mock("../../../utils/presentation", () => ({ resolveMenuInset: () => 16, resolveNavInset: () => 0 }));
 
 let pageDefinition;
 globalThis.Page = (definition) => {
@@ -64,7 +64,7 @@ describe("C10.1 coach coverage preview", () => {
     await page.onLoad();
 
     expect(mocks.getCoachTrainingCoverage).toHaveBeenCalledTimes(1);
-    expect(page.data).toMatchObject({ state: "ready", hasStudents: true });
+    expect(page.data).toMatchObject({ state: "ready", hasStudents: true, menuInset: 16, coverageSummary: "已覆盖 2 项" });
     expect(page.data.students).toEqual([expect.objectContaining({
       studentId: "student-1",
       name: "Actual athlete",
@@ -91,6 +91,15 @@ describe("C10.1 coach coverage preview", () => {
 
     await failed.retry();
     expect(mocks.getCoachTrainingCoverage).toHaveBeenCalledTimes(3);
+  });
+
+  it("treats the Figma confirmation as an honest local return instead of a fake coverage write", async () => {
+    const page = createPageInstance();
+    await page.onLoad();
+
+    page.confirmCoverage();
+
+    expect(mocks.navigateBack).toHaveBeenCalledWith({ delta: 1 });
   });
 
   it("ignores stale success and failure completions", async () => {
@@ -120,21 +129,28 @@ describe("C10.1 coach coverage preview", () => {
     expect(page.data).toMatchObject({ state: "ready", hasStudents: true });
   });
 
-  it("uses the C10.1 local layout without a confirmation write or Figma sample facts", () => {
+  it("uses the C10.1 Figma-safe layout without a confirmation write or Figma sample facts", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"app-header"');
     expect(template).toContain('class="coverage-nav"');
     expect(template).toContain('padding-top:{{navInset}}px');
+    expect(template).toContain('padding-right:{{menuInset}}px');
+    expect(template).toContain('class="coverage-confirm"');
+    expect(template).toContain('{{coverageSummary}}');
+    expect(template).toContain('bindtap="confirmCoverage"');
     expect(template).toContain('<role-tabbar role="coach" active="training" />');
     expect(template).not.toContain("陈小宇");
     expect(template).not.toContain("林一诺");
     expect(template).not.toContain("王明");
     expect(template).not.toContain("已覆盖 3 项");
-    expect(template).not.toContain('bindtap="confirm');
+    expect(template).not.toContain('bindtap="save');
+    expect(controller).toContain("confirmCoverage");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("saveCoachTrainingProjects");
     expect(stylesheet).toMatch(/\.coverage-nav\s*\{[^}]*height:\s*176rpx/s);
-    expect(stylesheet).toMatch(/\.coverage-nav\s*\{[^}]*box-sizing:\s*border-box/s);
+    expect(stylesheet).toMatch(/\.coverage-nav\s*\{[^}]*box-sizing:\s*content-box/s);
+    expect(stylesheet).toMatch(/\.coverage-nav\s*\{[^}]*background:\s*#fceeef/s);
     expect(stylesheet).toMatch(/\.student-card\s*\{[^}]*border-radius:\s*24rpx/s);
+    expect(stylesheet).toMatch(/\.coverage-confirm\s*\{[^}]*min-height:\s*140rpx/s);
   });
 });

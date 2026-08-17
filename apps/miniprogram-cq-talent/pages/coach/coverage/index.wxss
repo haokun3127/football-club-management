@@ -4,13 +4,13 @@
 }
 
 .coverage-nav {
-  box-sizing: border-box;
+  box-sizing: content-box;
   display: flex;
   height: 176rpx;
-  padding: 0 44rpx;
+  padding-left: 32rpx;
   align-items: center;
   gap: 24rpx;
-  background: #f6f7f9;
+  background: #fceeef;
 }
 
 .coverage-nav__back {
@@ -34,7 +34,7 @@
 }
 
 .coverage-page__body {
-  padding: 32rpx 44rpx calc(176rpx + env(safe-area-inset-bottom));
+  padding: 32rpx 44rpx calc(280rpx + env(safe-area-inset-bottom));
 }
 
 .coverage-title {
@@ -120,4 +120,46 @@
   flex: 0 0 auto;
   color: #98a2b3;
   font-size: 20rpx;
+}
+
+.coverage-confirm {
+  position: fixed;
+  right: 0;
+  bottom: 140rpx;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  min-height: 140rpx;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24rpx;
+  box-sizing: border-box;
+  padding: 0 44rpx;
+  border-top: 1rpx solid #e7eaf0;
+  background: #ffffff;
+}
+
+.coverage-confirm__summary {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  color: #667085;
+  font-size: 26rpx;
+  line-height: 32rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coverage-confirm__button {
+  display: flex;
+  min-width: 152rpx;
+  min-height: 74rpx;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24rpx;
+  border-radius: 24rpx;
+  background: #a80f1b;
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 600;
 }

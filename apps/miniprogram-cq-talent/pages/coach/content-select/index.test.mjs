@@ -124,6 +124,7 @@ describe("coach training content select", () => {
       selectedIds: ["project-1"],
       selectedCount: 1,
       durationText: "约 30 分钟",
+      summaryLabel: "已选 1 项 · 约 30 分钟",
     });
     expect(page.data.projects).toHaveLength(2);
     expect(page.data.projects[0]).toMatchObject({
@@ -221,7 +222,7 @@ describe("coach training content select", () => {
     expect(page.data).toMatchObject({ state: "error", canSave: false, selectedIds: [] });
   });
 
-  it("uses a local Figma navigation and contains no app header, sample facts, or WXML helpers", () => {
+  it("uses the compact C10 Figma hierarchy without app headers, sample facts, or WXML helpers", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).toContain('"status-view"');
     expect(pageConfig).not.toContain('"app-header"');
@@ -230,7 +231,14 @@ describe("coach training content select", () => {
     expect(template).not.toMatch(/传球训练（初级）|射门训练（中级）|战术转换练习|体能循环训练|45分钟/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(template).toContain('padding-right:{{menuInset}}px');
-    expect(stylesheet).toMatch(/\.select-nav\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*border-box/s);
+    expect(template).toContain('class="{{item.selectClass}}"');
+    expect(template).toContain('{{summaryLabel}}');
+    expect(stylesheet).toMatch(/\.select-nav\s*\{[^}]*height:\s*176rpx/s);
+    expect(stylesheet).toMatch(/\.select-nav\s*\{[^}]*box-sizing:\s*content-box/s);
+    expect(stylesheet).toMatch(/\.select-nav\s*\{[^}]*background:\s*#fceeef/s);
+    expect(stylesheet).toMatch(/\.search-bar\s*\{[^}]*min-height:\s*88rpx[^}]*border-radius:\s*44rpx/s);
+    expect(stylesheet).toMatch(/\.project-card\s*\{[^}]*min-height:\s*128rpx/s);
+    expect(controller).toContain("summaryLabel");
     expect(controller).not.toContain("openCoverage");
   });
 });

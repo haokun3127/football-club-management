@@ -742,3 +742,11 @@
 - C9 前端增加真实教练组 view model、滚动卡片、菜单胶囊避让和 ready 状态门禁；成员仍从真实 scope 读取，点击继续进入真实学生雷达页。旧 BFF 没有 `coaches` 字段时归一为空数组，队伍正文不进入错误态。
 - 验证：先红后绿的 C9 小程序测试 `7/7`、API 安全账号测试 `11/11`；全仓门禁 domain `19/19`、小程序 `324/324`、API `104/104`，两端 typecheck、API build、`git diff --check` 通过。
 - DevTools Automator 已连接 `9424`，路由已切到 `pages/coach/team/index`，运行时确认 iPhone X 逻辑视口 `375×812`；屏幕像素裁剪因当前 Windows 主窗口找不到 iPhone X 刘海锚点而拒绝生成 PNG，未宣称视觉截图通过。此前本地 API `tsx watch` 进程仍存在但 `/health` 无响应，重启/启动动作被当前 Windows 执行策略阻止，需后续在可控终端重启本地 API 后再做运行态联调。
+
+## 2026-08-17 C10 训练内容选择与 C10.1 覆盖预览复原
+
+- 在线 Figma 已在本批开工前重新读取：C10 `93:952`、C10.1 `93:983`（文件 `zZ6wKyOHKcO4UYXDd9jGwv`）。C10 收口为软粉 88px 安全区顶栏、44px 搜索、32px 分类 pills、64px 紧凑训练项目行与 70px 选择底栏；训练项目名称、标签、难度、时长、选中数和总时长仍由既有真实项目树及 workbench 返回派生。
+- C10 保存链路未改：仍是 `getCoachTrainingProjectTree()` + `getCoachWorkbench(eventId)` → `saveCoachTrainingProjects(eventId, ids)` → 精确 workbench 回读；未加入 Figma 示例训练项目、时长、选择或伪 API 结果。
+- C10.1 收口为软粉 88px 顶栏、真实学员覆盖卡、6px 覆盖轨道与 Figma 固定底栏。示例“已覆盖 3 项”改从真实响应中按已覆盖维度去重计算；“确认”只执行本地返回，不发写请求、不产生伪成功态。返回的维度数可以大于画板示例的三行，页面保留全部真实维度。
+- 测试先行：先让 C10/C10.1 的布局/派生字段/本地确认回归按预期失败，再完成最小实现；聚焦 Vitest `14/14`、小程序 typecheck、`git diff --check`、全仓门禁均通过（domain `19/19`、mini-program `325/325`、API `104/104`）。
+- DevTools 自动化已复用当前实例 `9424` 并路由到 C10/C10.1；C10.1 的运行态仍是旧 bundle（页面 `ready` 但没有新 `coverageSummary` 字段），`devtools-simulator-capture.py` 因无法定位当前嵌入式模拟器刘海而拒绝生成 PNG。故本批**没有**新的可信 375×812 视觉截图，不将静态/单测结果表述为运行态视觉验收。
