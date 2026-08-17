@@ -5,7 +5,7 @@
 
 .c161-nav {
   height: 176rpx;
-  box-sizing: border-box;
+  box-sizing: content-box;
   display: flex;
   align-items: center;
   gap: 24rpx;
@@ -49,9 +49,9 @@
 
 .c161-explain {
   display: flex;
-  gap: 16rpx;
-  align-items: center;
-  padding: 24rpx;
+  gap: 24rpx;
+  align-items: flex-start;
+  padding: 32rpx;
   background: #ffffff;
   border-radius: 24rpx;
 }
@@ -63,7 +63,7 @@
   width: 64rpx;
   height: 64rpx;
   flex: 0 0 64rpx;
-  background: #e6f2ff;
+  background: #dbeafe;
   border-radius: 50%;
 }
 
@@ -88,8 +88,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 104rpx;
-  padding: 0 24rpx;
+  min-height: 112rpx;
+  padding: 0 32rpx;
   border-bottom: 1rpx solid #edf0f5;
 }
 
@@ -115,7 +115,7 @@
   min-height: 104rpx;
   padding: 0 32rpx;
   color: #ffffff;
-  background: #e8515d;
+  background: #a80f1b;
   border-radius: 52rpx;
   font-size: 32rpx;
   font-weight: 600;
