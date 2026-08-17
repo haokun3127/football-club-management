@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   getCoachTeam: vi.fn(),
   requireRole: vi.fn(),
   navigateBack: vi.fn(),
+  nextTick: vi.fn(),
 }));
 
 vi.mock("../../../utils/api", () => ({
@@ -18,7 +19,7 @@ vi.mock("../../../utils/presentation", () => ({
   resolveNavInset: () => 0,
 }));
 
-globalThis.wx = { navigateBack: mocks.navigateBack };
+globalThis.wx = { navigateBack: mocks.navigateBack, nextTick: mocks.nextTick };
 
 let pageDefinition;
 globalThis.Page = (definition) => {
@@ -68,6 +69,7 @@ describe("coach team ability overview", () => {
     mocks.getCoachTeam.mockReset().mockResolvedValue(team);
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
     mocks.navigateBack.mockReset();
+    mocks.nextTick.mockReset().mockImplementation((callback) => callback());
   });
 
   it("reads overview and team once, then renders only real summary data", async () => {
@@ -86,6 +88,7 @@ describe("coach team ability overview", () => {
       showOverall: true,
       showTrend: true,
       hasRadar: true,
+      radarMounted: true,
       radar: [
         { metricId: "passing", value: 74, maxValue: 100 },
         { metricId: "shooting", value: 100, maxValue: 100 },
@@ -149,7 +152,10 @@ describe("coach team ability overview", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(template).toContain('class="ability-nav"');
     expect(template).toContain('/assets/icons/c14-arrow-left.svg');
-    expect(template).toContain('class="ability-hero__radar-state"');
+    expect(template).toContain('host-class="ability-hero__canvas"');
+    expect(template).toContain('wx:if="{{radarMounted}}"');
+    expect(template).not.toContain('class="ability-hero__radar-state"');
+    expect(template).not.toContain('class="ability-hero__canvas-slot"');
     expect(template).toContain('class="ability-hero__empty"');
     expect(template).toMatch(/<radar-canvas[^>]*width="620rpx"[^>]*height="600rpx"/);
     expect(template).toContain("assessmentPeriod");
@@ -160,12 +166,14 @@ describe("coach team ability overview", () => {
     expect(exportControl).not.toContain("bindtap");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(template).not.toMatch(/2025|U10|李明辉|陈小宇|张伟|王浩|赵晨/);
+    expect(controller).toContain("wx.nextTick");
     expect(stylesheet).toMatch(/\.ability-hero\s*\{[^}]*height:\s*1040rpx[^}]*overflow:\s*hidden/s);
     expect(stylesheet).toMatch(/\.ability-hero__plot\s*\{[^}]*height:\s*720rpx[^}]*justify-content:\s*center/s);
-    expect(stylesheet).toMatch(/\.ability-hero__radar-state\s*\{[^}]*flex-direction:\s*column[^}]*align-items:\s*center/s);
-    expect(stylesheet).toMatch(/\.ability-hero__overall\s*\{[^}]*font-size:\s*40rpx[^}]*text-align:\s*center/s);
+    expect(stylesheet).toMatch(/\.ability-hero__plot\s*\{(?=[^}]*flex-direction:\s*column)(?=[^}]*align-items:\s*center)/s);
+    expect(stylesheet).toMatch(/\.ability-hero__canvas\s*\{[^}]*width:\s*620rpx[^}]*height:\s*600rpx[^}]*flex:\s*0\s+0\s+600rpx/s);
+    expect(stylesheet).toMatch(/\.ability-hero__overall\s*\{[^}]*font-size:\s*96rpx[^}]*text-align:\s*center/s);
     expect(stylesheet).not.toMatch(/\.ability-hero__overall\s*\{[^}]*position:\s*absolute/s);
-    expect(stylesheet).toMatch(/\.ability-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+    expect(stylesheet).toMatch(/\.ability-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).toMatch(/\.ability-nav__title\s*\{[^}]*text-align:\s*center/s);
     expect(stylesheet).toMatch(/\.ability-nav__export\s*\{[^}]*display:\s*flex[^}]*width:\s*104rpx[^}]*height:\s*58rpx/s);
   });

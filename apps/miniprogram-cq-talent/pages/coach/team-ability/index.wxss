@@ -4,7 +4,7 @@
 }
 
 .ability-nav {
-  height: 176rpx;
+  height: 88rpx;
   box-sizing: content-box;
   display: flex;
   align-items: center;
@@ -104,26 +104,20 @@
   min-height: 720rpx;
   margin-top: 40rpx;
   align-items: center;
-  display: flex;
-  justify-content: center;
-}
-
-.ability-hero__radar-state {
-  display: flex;
-  height: 100%;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
 }
 
 .ability-hero__canvas {
   display: block;
+  width: 620rpx;
+  height: 600rpx;
   flex: 0 0 600rpx;
 }
 
 .ability-hero__overall {
   margin-top: 8rpx;
-  font-size: 40rpx;
+  font-size: 96rpx;
   font-weight: 700;
   line-height: 1.2;
   text-align: center;

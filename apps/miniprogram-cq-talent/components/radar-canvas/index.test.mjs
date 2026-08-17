@@ -74,6 +74,8 @@ describe("radar canvas dimensions", () => {
   it("keeps the default 100% by 520rpx dimensions for existing callers", () => {
     expect(componentDefinition.properties.width.value).toBe("100%");
     expect(componentDefinition.properties.height.value).toBe("520rpx");
+    expect(componentDefinition.externalClasses).toContain("host-class");
+    expect(template).toContain('class="radar host-class"');
     expect(template).toContain('style="width: {{width}}; height: {{height}};"');
     expect(stylesheet).toMatch(/\.radar\s*\{[^}]*width:\s*100%[^}]*height:\s*520rpx/s);
     expect(stylesheet).toMatch(/\.radar-canvas\s*\{[^}]*width:\s*100%[^}]*height:\s*520rpx/s);

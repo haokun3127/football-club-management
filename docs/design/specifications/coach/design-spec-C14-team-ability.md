@@ -121,3 +121,11 @@
         - [6] | Vector | 8x8 @(388,5371) | stroke=#8e97a6 w1.6
         - [6] | Vector | 16x8 @(384,5380) | stroke=#8e97a6 w1.6
       - [13] | 我的 | 121x14 @(332,5393) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"
+
+## 2026-08-17 运行态验收记录
+
+- 在线唯一基准为 Figma file `zZ6wKyOHKcO4UYXDd9jGwv`、节点 `93:1106`；在线节点原图为 `375×1258`，首屏对照裁剪为 `tmp/coach-runtime-acceptance/C14-figma-online-top-20260817.png`。
+- 可信 DevTools 屏幕像素证据：`tmp/coach-runtime-acceptance/C14-acceptance-phone-final.png` 与 `tmp/coach-runtime-acceptance/C14-acceptance-compare-final.png`，两者均使用真实教练会话并严格输出 `375×812`。
+- 已修复团队雷达的原生图层布局：`radar-canvas` 现通过受控 `host-class` 接收 C14 的 flex 尺寸，页面仅在 `wx.nextTick` 后挂载 canvas，避免外部 WXSS 因组件样式隔离失效、canvas 在卡片标题区上浮。综合分展示按在线截图的实际字形几何调整为 `96rpx`。
+- 真实数据差异保留：当前团队为 `2026-2027赛季 · 凤凰山U10精英队`、8 个真实能力维度、综合 `81`、趋势 `+1.3`，评估时间和排名尚未同步；不把 Figma 的 2025 样例、6 个维度、综合 `74` 或示例排名写入 view model。
+- 验证：C14 与 `radar-canvas` 定向 Vitest `7/7`、小程序 typecheck、`git diff --check` 和根 `npx --yes pnpm@10.33.0 run check` 均通过（domain `19/19`、小程序 `330/330`、API `105/105`）。

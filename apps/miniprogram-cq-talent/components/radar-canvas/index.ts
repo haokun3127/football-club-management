@@ -52,6 +52,7 @@ interface RadarComponentThis {
 }
 
 Component({
+  externalClasses: ["host-class"],
   properties: {
     metrics: {
       type: Array,

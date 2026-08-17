@@ -902,3 +902,11 @@
 - 可信屏幕像素证据已保存：`tmp/coach-runtime-acceptance/C13-acceptance-phone-final.png`（首屏）、`tmp/coach-runtime-acceptance/C13-acceptance-phone-bottom.png`（底部评语区）和 `tmp/coach-runtime-acceptance/C13-acceptance-compare-final.png`，输出均严格 `375×812`。顶栏、chips、`343×260px` 雷达卡、维度评分卡、评语容器和 70px 教练 TabBar 的几何已完成对照。
 - 真实数据不替换为 Figma 样例：当前会话返回 2 名学员、8 个维度、总分 `83`、评估期 `2026-08-05`，评语显示“能力评语暂未同步”；这些是 API 数据/空态差异。状态栏、微信胶囊和 Home Indicator 属系统壳层差异。
 - 验证：小程序 `54/54` 文件、`330/330` 测试，domain `19/19`，API `105/105`；全仓 typecheck、`git diff --check` 均通过。C13 变更仅涉及 `apps/miniprogram-cq-talent/pages/coach/student-radar/` 和对应文档/任务记录。
+
+## 2026-08-17 C14 团队能力总览真实运行态视觉收口
+
+- 在线唯一基准已重读：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1106 / C14 Team Ability Overview`；在线节点实际为 `375×1258`，首屏以 `tmp/coach-runtime-acceptance/C14-figma-online-top-20260817.png` 对照。
+- 真实截图发现 `radar-canvas` 在 C14 的纵向 flex 容器中没有取得页面传入的 `.ability-hero__canvas` 尺寸：普通 `class` 被组件样式隔离，原生 canvas 图层上浮进标题区。共享组件现声明受控 `host-class` 并把它应用于根容器；C14 同时在 `wx.nextTick` 后挂载 canvas，确保布局稳定后才创建原生节点。该外部样式类没有改变其它调用方。
+- `综合 81` 的真实值继续来自团队能力 BFF；仅将字号从 `40rpx` 调整为在线截图对应的 `96rpx`。当前团队名称、8 个能力维度、综合 `81`、趋势 `+1.3`、评估时间/排名未同步均为真实数据差异，未填入 Figma 样例。
+- 可信 `375×812` 最终证据：`tmp/coach-runtime-acceptance/C14-acceptance-phone-final.png` 与 `tmp/coach-runtime-acceptance/C14-acceptance-compare-final.png`。顶栏、上下文、深色雷达卡、综合分/趋势、统计卡及教练 TabBar 已完成首屏对照；状态栏与微信胶囊属于系统壳层差异。
+- 验证：C14/共享雷达组件定向 Vitest `7/7`、小程序 typecheck、`git diff --check` 与根 `npx --yes pnpm@10.33.0 run check` 全绿（domain `19/19`、小程序 `330/330`、API `105/105`）。

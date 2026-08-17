@@ -1,4 +1,4 @@
-<view class="radar" style="width: {{width}}; height: {{height}};">
+<view class="radar host-class" style="width: {{width}}; height: {{height}};">
   <canvas id="radarCanvas" type="2d" class="radar-canvas" style="width: {{width}}; height: {{height}};" bindtap="handleTap"></canvas>
   <view wx:if="{{empty}}" class="radar-empty">暂无能力数据</view>
 </view>

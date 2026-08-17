@@ -26,6 +26,7 @@ interface PageData {
   dimensions: DimensionRow[];
   hasOverview: boolean;
   hasRadar: boolean;
+  radarMounted: boolean;
   showOverall: boolean;
   showTrend: boolean;
   rankingMessage: string;
@@ -73,10 +74,19 @@ Page<PageData>({
       dimensions,
       hasOverview,
       hasRadar,
+      radarMounted: false,
       showOverall: hasRadar && overall !== "-",
       showTrend: hasRadar && Boolean(trendLabel),
       rankingMessage: "排名暂未同步",
     });
+
+    if (hasRadar) {
+      wx.nextTick(() => {
+        if (this.data.state === "ready" && this.data.hasRadar) {
+          this.setData({ radarMounted: true });
+        }
+      });
+    }
   },
   retry() {
     return this.load();
@@ -102,6 +112,7 @@ function emptyPageData(state: LoadState, message: string): PageData {
     dimensions: [],
     hasOverview: false,
     hasRadar: false,
+    radarMounted: false,
     showOverall: false,
     showTrend: false,
     rankingMessage: "排名暂未同步",
