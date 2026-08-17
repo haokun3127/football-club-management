@@ -27,7 +27,7 @@ Page<AttendanceSuccessPageData>({
     eventDate: "",
     eventTime: "",
     attendanceText: "",
-    detailActionText: "查看活动详情",
+    detailActionText: "查看训练详情",
     summary: emptySummary(),
   },
   onLoad(query?: Record<string, string | undefined>) {
@@ -44,7 +44,7 @@ Page<AttendanceSuccessPageData>({
       eventDate: "",
       eventTime: "",
       attendanceText: "",
-      detailActionText: "查看活动详情",
+      detailActionText: "查看训练详情",
       summary: emptySummary(),
       });
       return;
@@ -70,7 +70,7 @@ Page<AttendanceSuccessPageData>({
         eventDate: formatCalendarDate(workbench.event.startsAt),
         eventTime: formatTimeRange(workbench.event.startsAt, workbench.event.endsAt),
         attendanceText: attendanceText(summarizeAttendance(workbench)),
-        detailActionText: "查看活动详情",
+        detailActionText: "查看训练详情",
         summary: summarizeAttendance(workbench),
       });
     } catch {

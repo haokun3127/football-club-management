@@ -32,15 +32,15 @@
     </view>
 
     <view class="actions">
-      <button class="actions__primary" bindtap="openWorkbench">{{detailActionText}}</button>
+      <view class="actions__primary" bindtap="openWorkbench">{{detailActionText}}</view>
     </view>
   </view>
 
   <view class="success-page__body" wx:else>
     <view class="page-state">
       <view class="page-state__message">{{message}}</view>
-      <button class="actions__primary" wx:if="{{state === 'error'}}" bindtap="retry">重新读取</button>
-      <button class="actions__secondary" bindtap="openSchedule">返回日程</button>
+      <view class="actions__primary" wx:if="{{state === 'error'}}" bindtap="retry">重新读取</view>
+      <view class="actions__secondary" bindtap="openSchedule">返回日程</view>
     </view>
   </view>
 

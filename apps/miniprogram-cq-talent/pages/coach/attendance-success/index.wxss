@@ -81,6 +81,10 @@
   gap: 24rpx;
 }
 
+.actions {
+  width: 100%;
+}
+
 .page-state {
   align-items: stretch;
   justify-content: center;
@@ -90,12 +94,15 @@
 
 .actions__primary,
 .actions__secondary {
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   min-height: 96rpx;
   border-radius: 24rpx;
   font-size: 30rpx;
   font-weight: 600;
-  line-height: 96rpx;
 }
 
 .actions__primary {
