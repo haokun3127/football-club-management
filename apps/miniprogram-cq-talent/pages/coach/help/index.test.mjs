@@ -165,7 +165,7 @@ describe("coach help", () => {
     expect(template).not.toMatch(/出勤操作|活动管理|评分评估|私教流程|账号权限|客服电话|公众号|在线咨询|工作日\s*9:00|文字图标/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toMatch(/TOPICS|showToast|showModal|getStorage|setStorage|contactWechat|openSupport/);
-    expect(stylesheet).toMatch(/\.c164-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*background:\s*#fceeef)/s);
+    expect(stylesheet).toMatch(/\.c164-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*background:\s*#fceeef)/s);
     expect(stylesheet).toMatch(/\.c164-nav__title\s*\{[^}]*flex:\s*1[^}]*text-align:\s*center/s);
     expect(stylesheet).toMatch(/\.c164-nav__spacer\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c164-page__body\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+180rpx/s);

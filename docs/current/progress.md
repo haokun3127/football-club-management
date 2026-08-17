@@ -961,3 +961,11 @@
 - 真实数据边界不变：显示名来自认证 coach session；球队来自单一的近 30 天 `getCoachHome()` 请求并受已有 request-token 防过期保护。手机号、微信绑定、密码、设备、缓存、编辑、认证及所有写操作没有可靠契约，运行图继续诚实显示“当前会话未提供 / 状态待同步”，未伪造 Figma 样例。
 - 可信证据：`tmp/coach-runtime-acceptance/C163-runtime-baseline.png`、`C163-runtime-baseline-compare.png`、`C163-acceptance-phone-final.png`、`C163-acceptance-compare-final.png`。均先通过 Automator `9420` 确认路由 `pages/coach/account/index`，再经 `print_window` 生成严格 `375×812`。状态栏、微信胶囊、TabBar 图标细节及样例账号内容属于系统/真实数据差异。
 - 验证先红后绿：C16.3 定向 Vitest 先因缺少右侧占位和旧顶栏失败（1 failed / 5），最小 WXML/WXSS 修复后 `5/5` 通过；尚待本任务最后一次全仓门禁与独立提交。
+
+## 2026-08-17 C16.4 教练帮助中心真实运行态视觉收口
+
+- 在线唯一基准已通过 Figma MCP 重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1286 / C16.4 Coach Help`。画板 TopNav 内容区为 88px；之前 `.c164-nav` 声明 `176rpx + content-box`，与 WXML 的真实 `navInset` 叠加后把搜索框和正文整体下移。
+- 运行态基线 `tmp/coach-runtime-acceptance/C16.4-baseline.png` 证实该几何偏差。按已验收 C16.2/C16.3 的同型安全区规则，将 `.c164-nav` 收口为 `88rpx + box-sizing: content-box`；返回、居中标题、右侧占位、真实 FAQ 搜索/筛选/展开、支持空态和教练 TabBar 均保持不变。
+- 修复后可信屏幕像素证据为 `tmp/coach-runtime-acceptance/C16.4-after-height-fix.png`（首屏）和 `tmp/coach-runtime-acceptance/C16.4-bottom.png`（下段），均严格 `375×812`，来源 `print_window`。搜索框、快速上手区、FAQ 起点与在线稿垂直结构对齐；真实接口当前返回的分类/问题数量及“支持方式待配置”与 Figma 样例不同，属于数据/契约差异，未伪造样例客服、公众号或咨询操作。
+- 排障确认微信提示来自 `apps/miniprogram-cq-talent/scripts/__pycache__` 的 Python 生成缓存；该目录及 `.pyc` 已移除，后续截图统一使用 `python -B`，未修改 `project.config.json`。`donutAuthorize__` 是微信工具保留目录名提示，不是业务页面目录。
+- 验证先红后绿：C16.4 定向 Vitest `4/4`、小程序 typecheck、`git diff --check` 和串行根门禁均通过；根门禁为 domain `19/19`、小程序 `332/332`、API `105/105`，退出码 `0`。
