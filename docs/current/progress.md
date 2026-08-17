@@ -751,6 +751,12 @@
 - 测试先行：先让 C10/C10.1 的布局/派生字段/本地确认回归按预期失败，再完成最小实现；聚焦 Vitest `14/14`、小程序 typecheck、`git diff --check`、全仓门禁均通过（domain `19/19`、mini-program `325/325`、API `104/104`）。
 - DevTools 自动化已复用当前实例 `9424` 并路由到 C10/C10.1；C10.1 的运行态仍是旧 bundle（页面 `ready` 但没有新 `coverageSummary` 字段），`devtools-simulator-capture.py` 因无法定位当前嵌入式模拟器刘海而拒绝生成 PNG。故本批**没有**新的可信 375×812 视觉截图，不将静态/单测结果表述为运行态视觉验收。
 
+### C9 运行态补证
+
+- 在线节点 `93:924` 已重新读取；真实教练会话导航到 `pages/coach/team/index` 后取得 `tmp/coach-runtime-acceptance/C9-acceptance-phone-current.png`，裁剪结果严格 `375×812`。
+- 顶栏、队伍摘要卡、四列真实学员网格、教练组区域和教练 TabBar 的结构/间距与在线稿一致。当前 BFF 返回的真实队伍没有教练组成员，因此页面如实显示“暂未配置队伍教练”；没有把 Figma 示例的林教练、王助教、李体能写成测试数据。
+- C9 聚焦 Vitest `7/7` 通过；本项无业务代码变更，记录为“视觉结构通过，教练组真实数据为空态”。
+
 ## 2026-08-17 C11 测评任务列表 Figma 复原
 
 - 在线 Figma 基准：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1002 / C11 Test Task List`。页面复原为软粉 88px 顶栏、左侧返回与 22px 标题、菜单胶囊避让的“新增”、32px 筛选、12px 圆角/16px 内边距任务卡、4px 轨道、全任务卡右箭头和 56px 红色 FAB。
