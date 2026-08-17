@@ -847,3 +847,10 @@
 - 全量在线画板↔路由表已核对到 C16.4：C1 `93:578`、C2 `93:606`、C3 `93:634`、C4/C4.1/C4.2 `93:665/696/715`、C5/C5.1 `93:734/765`、C6/C6.1/C6.2 `93:796/827/858`、C7 `93:877`、C8 `93:896`、C9 `93:924`、C10/C10.1 `93:952/983`、C11 `93:1002`、C12/C12.1 `93:1030/1061`、C13 `93:1080`、C14 `93:1106`、C15/C15.1 `93:1132/1163`、C16–C16.4 `93:1182/1210/1238/1262/1286`。
 - 复核发现并修复两处此前遗漏的同根因：C1 `.c1-nav` 与 C8 `.c8-nav` 均同时接收 `navInset` 和声明 176rpx，现统一使用 `content-box`；对应 C1/C8 红→绿回归已提交。
 - C4、C5、C6、C2 视觉任务和证据审计的剩余未勾选项仅是新的已认证截图前置。根据用户本轮明确授权，已改为“Figma/source/data/test evidence only；截图不阻塞完成”，并补齐逐路由 node/evidence matrix；不把静态结果表述为像素级视觉通过。
+
+## 2026-08-17 C6/C6.1/C6.2 教练端运行态截图补证
+
+- 在线 Figma 基准：`zZ6wKyOHKcO4UYXDd9jGwv`，C6 `93:796`、C6.1 `93:827`、C6.2 `93:858`。本轮使用真实受保护教练会话和比赛 `event-cq-talent-demo-match-completed`，确认 C6 返回 `200`、真实比分 `3:2`、真实名单 16 人和真实比赛事件；不使用 secure-test 的 `403` 响应或 Figma 示例数据替代业务数据。
+- C6.1 通过真实页面录入分钟 `45` 后回到 C6；C6.2 真实显示“未提交草稿已保存”，并明确“这条未提交的比赛事件仅保存在当前设备”。这是设备本机草稿契约，不宣称服务端自动保存。
+- 可信屏幕像素证据：C6 `tmp/coach-runtime-acceptance/C6-acceptance-coach-final.png`、C6.1 `tmp/coach-runtime-acceptance/C6-1-acceptance-coach-final.png`、C6.2 严格 `375×812` 的 `tmp/coach-runtime-acceptance/C6-2-acceptance-phone-clean.png`；C6.2 对照图为 `tmp/coach-runtime-acceptance/C6-2-acceptance-compare-final.png`。C6.2 的遮罩、弹层层级、圆角卡片、继续/退出按钮顺序和底部教练导航与在线画板结构一致；比赛标题、比分、时间和本机保存时间属于动态真实数据差异。
+- C6 视觉修复仍为最小改动：`apps/miniprogram-cq-talent/pages/coach/match/index.wxss` 将内容区顶部留白调整为 `88rpx`，并在 `index.test.mjs` 增加布局回归断言。C6/C6.1 聚焦测试先红后绿 `15/15`；本批提交前已重新运行全仓门禁、TypeScript 与 `git diff --check`。

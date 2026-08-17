@@ -222,4 +222,9 @@ describe("coach match detail", () => {
     expect(appHeaderTemplate).toContain('app-header__heading--{{titleAlign}}');
     expect(appHeaderStylesheet).toMatch(/\.app-header__heading--left\s*\{[^}]*position:\s*static[^}]*align-items:\s*flex-start/s);
   });
+
+  it("keeps the match content below the Figma hero breathing room", () => {
+    const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
+    expect(styles).toMatch(/\.match-page__content\s*\{[^}]*padding:\s*88rpx 32rpx 200rpx/s);
+  });
 });

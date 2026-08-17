@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   gap: 32rpx;
-  padding: 32rpx 32rpx 200rpx;
+  padding: 88rpx 32rpx 200rpx;
 }
 
 .match-hero {
