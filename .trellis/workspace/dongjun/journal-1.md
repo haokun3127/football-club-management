@@ -618,3 +618,37 @@ Captured real 375x812 C11 runtime evidence, restored the Figma list gutters and 
 ### Next Steps
 
 - None - task complete
+
+
+## Session 17: C16 coach profile runtime visual alignment
+
+**Date**: 2026-08-18
+**Task**: C16 coach profile runtime visual alignment
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+Aligned C16 coach profile top bar to the online Figma 88px content height, retained service-confirmed role/data contracts, captured a strict 375x812 DevTools PrintWindow evidence pair, added a serial root-check isolation rule, passed the root quality gate, and pushed the work commit.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `c366ec6` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
