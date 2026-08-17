@@ -34,4 +34,4 @@ Align the coach account page with online Figma node `93:1262` in the real DevToo
 - [x] Session/team data flow and non-interactive account safety boundary remain unchanged.
 - [x] A route-confirmed `PrintWindow` image is exactly 375×812, with header/body geometry compared to Figma and account sample content classified accurately.
 - [x] One serial root check exits 0 and `git diff --check` passes.
-- [ ] Scoped work is committed/pushed without staging unrelated dirty files.
+- [x] Scoped work is committed/pushed without staging unrelated dirty files.
