@@ -749,13 +749,69 @@ v1 存储为进程内集合（同私教申请语义），SQLite 持久化是已�
 
 - **200**：`{ clubId, role: "coach", tasks: [{ id, title, templateId, startsOn, dueOn, status, completedStudents, totalStudents }] }`
 - 语义：`status` = `not_started`（startsOn 晚于今天）/ `completed`（完成学员数 ≥ 总学员数且总学员数 > 0）/ `in_progress`；`completedStudents` = 窗口内（occurredAt ≥ startsOn）存在任一能力指标记录的学员数；`totalStudents` = 教练作用域学员数。
-- 存储：进程内集合 + 种子数据（与私教申请/变更申请一致，持久化是已声明后续项）。
+- 存储：SQLite `assessment_tasks`；开发验收种子仅以 `ON CONFLICT(id) DO NOTHING` 填充缺失记录，生产不依赖 `FCM_CQ_TALENT_ACCEPTANCE_SEED` 提供任务。
 - **403**：非教练成员。
 
 ### 复用既有端点
 
 - C10 训练内容选择：`GET /coach/training-project-tree` + `PUT /coach/events/{eventId}/training-projects`（已存在）。
 - C15 测评录入提交：`POST /coach/assessments`（已存在，按学员逐条提交）。
+
+## Scenario: Persistent Coach Assessment Task Lists
+
+### 1. Scope / Trigger
+
+- Trigger: C11 reads `GET /clubs/:clubId/app-clients/:clientId/coach/assessment-tasks` in a production API process where acceptance seeds are intentionally disabled.
+- The task definitions are operational club data; a production empty list must reflect an empty persisted collection, not a frontend fixture or a production-only seed escape hatch.
+
+### 2. Signatures
+
+- Migration: `apps/api/db/migrations/0012_assessment_tasks.sql` creates `assessment_tasks(id, club_id, title, template_id, starts_on, due_on, created_at, updated_at)`.
+- Repository: `AssessmentTaskRepository.listByClub(clubId)`, `.save(task)`, and `.insertIfAbsent(task)`.
+- Store: `PersistentApiStore` merges persisted task rows over same-id development seed records before the existing C11 BFF computes status and progress.
+
+### 3. Contracts
+
+- Every task row is club-scoped and references an existing assessment template. Reads are ordered by `starts_on`, `due_on`, then `id`.
+- Normal seed replay only inserts an absent fixed-id task. It never overwrites a persisted task edited by an operator.
+- Production does not load the acceptance seed even if `FCM_CQ_TALENT_ACCEPTANCE_SEED=1` is present; production test tasks, when explicitly authorized, are controlled SQLite rows after a backup and API restart.
+- The BFF keeps its response shape and derives `status`, `completedStudents`, and `totalStudents` from the authenticated coach scope. A zero-row table returns `{ tasks: [] }`; it must not synthesize a Figma sample card.
+
+### 4. Validation & Error Matrix
+
+- Missing/inactive app client -> `404 not_found`; non-coach membership -> `403 forbidden`.
+- Missing club or assessment-template reference on a task write -> SQLite foreign-key rejection and no partial task row.
+- `due_on < starts_on` -> SQLite check rejection and no task row.
+- No persisted tasks for the club -> `200` with an empty `tasks` array, not an API or rendering error.
+
+### 5. Good / Base / Bad Cases
+
+- Good: an authorized club task survives a database close/reopen and C11 returns its real title/template/date range.
+- Base: a local acceptance seed inserts its two fixed tasks into a fresh SQLite database, then re-seeding preserves the same persisted rows.
+- Bad: make C11 render static Figma tasks when `/assessment-tasks` returns `[]`, or bypass the production seed guard to make test data appear.
+
+### 6. Tests Required
+
+- Migration test asserts `0012_assessment_tasks.sql` is applied once and the table is present.
+- File-backed persistence test saves one task, closes/reopens the SQLite database, and asserts both repository and `PersistentApiStore` return it.
+- Existing C11 BFF contract test continues to assert coach access, task statuses, and non-empty seeded development task data.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+return { tasks: figmaExampleTasks };
+```
+
+#### Correct
+
+```ts
+assessmentTasks: mergeById(
+  data.assessmentTasks,
+  clubIds.flatMap((clubId) => repositories.assessmentTasks.listByClub(clubId)),
+)
+```
 
 
 ## Scenario: Coach Match Event Append

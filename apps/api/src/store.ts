@@ -3328,6 +3328,10 @@ function mergePersistedAssessmentData(repositories: PlatformRepositories, data: 
       data.metricLineages,
       clubIds.flatMap((clubId) => repositories.assessments.listMetricLineages(clubId)),
     ),
+    assessmentTasks: mergeById(
+      data.assessmentTasks,
+      clubIds.flatMap((clubId) => repositories.assessmentTasks.listByClub(clubId)),
+    ),
   };
 }
 

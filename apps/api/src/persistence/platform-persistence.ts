@@ -2,6 +2,7 @@ import type { DatabaseSync } from "node:sqlite";
 import { createSeedData, type SeedData } from "../seed.js";
 import { AppClientSessionRepository } from "./app-client-session-repository.js";
 import { AssessmentRepository } from "./assessment-repositories.js";
+import { AssessmentTaskRepository } from "./assessment-task-repository.js";
 import { CalendarRepository } from "./calendar-repositories.js";
 import { DataCapabilityRepository } from "./data-capability-repositories.js";
 import { MatchRepository } from "./match-repository.js";
@@ -22,6 +23,7 @@ import { TacticalBoardRepository } from "./tactical-board-repository.js";
 export interface PlatformRepositories {
   appClientSessions: AppClientSessionRepository;
   assessments: AssessmentRepository;
+  assessmentTasks: AssessmentTaskRepository;
   calendar: CalendarRepository;
   matches: MatchRepository;
   clubs: ClubRepository;
@@ -46,6 +48,7 @@ export function createPlatformRepositories(database: DatabaseSync): PlatformRepo
   return {
     appClientSessions: new AppClientSessionRepository(database),
     assessments: new AssessmentRepository(database),
+    assessmentTasks: new AssessmentTaskRepository(database),
     calendar: new CalendarRepository(database),
     matches: new MatchRepository(database),
     clubs: new ClubRepository(database),
@@ -169,6 +172,10 @@ export async function seedPlatformData(repositories: PlatformRepositories, data:
 
   for (const assessmentMetricBinding of data.assessmentMetricBindings) {
     repositories.dataCapability.saveAssessmentMetricBinding(assessmentMetricBinding);
+  }
+
+  for (const assessmentTask of data.assessmentTasks) {
+    repositories.assessmentTasks.insertIfAbsent(assessmentTask);
   }
 
   for (const assessment of data.playerAssessments) {

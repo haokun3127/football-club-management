@@ -10,6 +10,40 @@ import { buildServer } from "../src/server.js";
 import { PersistentApiStore } from "../src/store.js";
 
 describe("platform persistence", () => {
+  it("persists assessment tasks across a file database reopen", { timeout: 15_000 }, async () => {
+    const directory = mkdtempSync(join(tmpdir(), "football-assessment-tasks-"));
+    const databasePath = join(directory, "club.sqlite");
+    const task = {
+      id: "assessment-task-persistence-regression",
+      clubId: "club-chongqing-talent",
+      title: "Persistence regression assessment",
+      templateId: "assessment-template-technical",
+      startsOn: "2026-08-01",
+      dueOn: "2026-08-31",
+    };
+    let first: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
+    let reopened: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
+
+    try {
+      first = await createPlatformPersistence({ databasePath, seed: true });
+      await first.repositories.assessmentTasks.save(task);
+      first.database.close();
+      first = undefined;
+
+      reopened = await createPlatformPersistence({ databasePath, seed: true });
+      const store = new PersistentApiStore(reopened.repositories, createSeedData());
+
+      expect(await reopened.repositories.assessmentTasks.listByClub("club-chongqing-talent")).toEqual([task]);
+      expect(store.listAssessmentTasks("club-chongqing-talent")).toEqual([task]);
+      reopened.database.close();
+      reopened = undefined;
+    } finally {
+      reopened?.database.close();
+      first?.database.close();
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   // 该用例需完整跑两遍文件库 seed（开库→改→关→带 seed 重开），单跑约 30s，并行负载下更久，显式放宽超时
   it("preserves existing acceptance parent phones across a seeded file database reopen", { timeout: 90_000 }, async () => {
     const directory = mkdtempSync(join(tmpdir(), "football-parent-phone-"));
@@ -334,6 +368,7 @@ describe("platform persistence", () => {
       "0009_app_client_sessions.sql",
       "0010_student_guardian_bindings.sql",
       "0011_event_change_notify.sql",
+      "0012_assessment_tasks.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);
@@ -373,6 +408,7 @@ describe("platform persistence", () => {
           'assessment_raw_results'
           ,'tactical_boards',
           'app_client_sessions'
+          ,'assessment_tasks'
         )
       ORDER BY name
     `).all() as Array<{ name: string }>;
@@ -381,6 +417,7 @@ describe("platform persistence", () => {
       "app_client_sessions",
       "assessment_metric_bindings",
       "assessment_raw_results",
+      "assessment_tasks",
       "assessment_template_versions",
       "assessment_test_items",
       "calendar_events",
