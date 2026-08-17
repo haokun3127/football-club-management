@@ -754,3 +754,38 @@ Re-read Figma node 93:1262, route-confirmed and captured C16.3 at 375x812, align
 ### Next Steps
 
 - None - task complete
+
+
+## Session 21: 收口双角色切换任务
+
+**Date**: 2026-08-18
+**Task**: 收口双角色切换任务
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+复核并收口家长/教练双角色切换：验证持久 session、服务端角色轮换、OpenAPI 契约和小程序入口；全仓门禁 domain 19/19、miniprogram 332/332、API 105/105 通过；更新进度并归档 active-role-switch。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `b8da498` | (see git log) |
+| `2e0ed61` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

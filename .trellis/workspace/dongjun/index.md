@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 20
+- **Total Sessions**: 21
 - **Last Active**: 2026-08-18
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~756 | Active |
+| `journal-1.md` | ~791 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 21 | 2026-08-18 | 收口双角色切换任务 | `b8da498`, `2e0ed61` | `dev` |
 | 20 | 2026-08-18 | C16.3 coach-account runtime visual alignment | `4f6398d` | `dev` |
 | 19 | 2026-08-18 | C16.2 private-interest runtime visual alignment | `edf86d7` | `dev` |
 | 18 | 2026-08-18 | C16.1 permission scope runtime visual alignment | `048e4b1` | `dev` |
