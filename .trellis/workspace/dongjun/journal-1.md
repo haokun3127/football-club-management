@@ -584,3 +584,37 @@ Read online Figma C9 node 93:924, restored the coach-card section with a scoped 
 ### Next Steps
 
 - None - task complete
+
+
+## Session 16: C11 runtime visual correction
+
+**Date**: 2026-08-17
+**Task**: C11 runtime visual correction
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+Captured real 375x812 C11 runtime evidence, restored the Figma list gutters and safe-area header envelope, passed the full workspace gate, and pushed the focused fix.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `5452be7` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

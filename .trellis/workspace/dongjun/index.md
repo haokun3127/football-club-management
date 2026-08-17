@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 15
+- **Total Sessions**: 16
 - **Last Active**: 2026-08-17
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~586 | Active |
+| `journal-1.md` | ~620 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 16 | 2026-08-17 | C11 runtime visual correction | `5452be7` | `dev` |
 | 15 | 2026-08-17 | C9 team detail Figma restoration | `e804cc0` | `dev` |
 | 14 | 2026-08-12 | Prepare Claude transfer and archive secure account task | `ddfbc29`, `1fa975b` | `codex/chongqing-talent-business` |
 | 13 | 2026-08-10 | Figma 49-state completion audit | `c8244b4`, `fbfe34e` | `codex/chongqing-talent-business` |
