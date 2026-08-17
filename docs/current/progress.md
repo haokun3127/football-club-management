@@ -835,3 +835,9 @@
 - 全教练端顶栏审计发现 C1 `pages/coach/schedule` 的 WXML 已传入 `navInset`，但 `.c1-nav` 仍是 `border-box`；在线 Figma C1 `zZ6wKyOHKcO4UYXDd9jGwv / 93:578` 指定 88px 顶栏，动态状态栏不应侵占 176rpx 的设计内容区。
 - 已将 C1 顶栏改为 `content-box`，保持原有菜单胶囊避让、实时日期/周导航、真实日程数据和角色跳转逻辑不变；不改任何 API 或展示样例数据。
 - 验证：先让 C1 安全区断言对旧 `border-box` 失败，后 C1/C2/C3 聚焦 Vitest `24/24`、小程序 typecheck 和 `git diff --check` 通过。C2/C3 前一批的在线 Figma/源码/测试验收保持有效；用户已明确本目标不再以新模拟器截图作为完成前置。
+
+## 2026-08-17 C8 训练管理安全区回归收口
+
+- 在线 Figma 基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:896 / C8 Training Management`；训练管理页顶栏为 88px 内容区，WXML 同时注入动态 `navInset` 和菜单避让。
+- 全教练端顶栏审计发现 `.c8-nav` 仍为 `border-box`，会将动态状态栏内边距从设计内容高度中扣除。现改为 `content-box`，保留真实训练统计、训练卡、真实 eventId 跳转以及已移除 C10 写入边界。
+- 验证：先让 C8 安全区断言对旧 `border-box` 失败，后 C8 定向 Vitest `6/6`、小程序 typecheck 和 `git diff --check` 通过；用户已明确本目标不再以新模拟器截图作为完成前置。
