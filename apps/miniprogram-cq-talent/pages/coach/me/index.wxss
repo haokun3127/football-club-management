@@ -6,7 +6,7 @@
 .c16-bar {
   display: flex;
   height: 176rpx;
-  box-sizing: border-box;
+  box-sizing: content-box;
   align-items: center;
   justify-content: space-between;
   padding-right: 44rpx;

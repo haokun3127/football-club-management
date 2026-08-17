@@ -254,7 +254,7 @@ describe("coach profile", () => {
     expect(controller).not.toContain("home.coachName");
     expect(controller).not.toContain("readableError");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(stylesheet).toMatch(/\.c16-bar\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*border-box/s);
+    expect(stylesheet).toMatch(/\.c16-bar\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).toMatch(/\.c16-profile\s*\{[^}]*border-radius:\s*24rpx[^}]*background:\s*#07111f/s);
   });
 });
