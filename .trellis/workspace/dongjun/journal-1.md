@@ -720,3 +720,37 @@ Re-read live Figma node 93:1238, route-confirmed and captured C16.2 at 375x812 t
 ### Next Steps
 
 - None - task complete
+
+
+## Session 20: C16.3 coach-account runtime visual alignment
+
+**Date**: 2026-08-18
+**Task**: C16.3 coach-account runtime visual alignment
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+Re-read Figma node 93:1262, route-confirmed and captured C16.3 at 375x812, aligned the 88rpx centered account header with its capsule-safe placeholder, retained real session/team data and all read-only account safety boundaries, passed red-green tests and the serial root gate, and pushed the work commit.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `4f6398d` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
