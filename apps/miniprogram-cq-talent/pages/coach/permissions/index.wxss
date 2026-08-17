@@ -4,13 +4,13 @@
 }
 
 .c161-nav {
-  height: 176rpx;
+  height: 88rpx;
   box-sizing: content-box;
   display: flex;
   align-items: center;
   gap: 24rpx;
   padding-right: 44rpx;
-  padding-left: 44rpx;
+  padding-left: 32rpx;
   background: #fceeef;
 }
 

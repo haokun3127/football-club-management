@@ -936,3 +936,12 @@
 - 真实业务边界未改：教练姓名、球队和三项统计继续来自 `getCoachHome()`；身份切换仍由 `switchActiveRole` 的服务端会话确认，四项菜单和退出登录行为不变。截图中的 `Secure parent 1`、球队和统计与 Figma 示例不同，属于真实数据差异。
 - 可信证据保留在本机忽略目录：`tmp/coach-runtime-acceptance/C16-acceptance-phone-final.png`（`print_window` 通道、严格 `375×812`）及 `tmp/coach-runtime-acceptance/C16-acceptance-compare-final.png`。顶栏底线、首张卡片起点、角色入口、菜单、退出按钮和教练 TabBar 已完成对照；系统状态栏、微信胶囊与真实数据文案按设备/数据差异豁免。
 - 验证先红后绿：C16 定向 Vitest `9/9`、小程序 TypeScript 和 `git diff --check` 通过。最初两次根检查在 30 秒命令窗口后留下重叠的 SQLite 测试进程，曾诱发 `apps/api/test/app-client-match-event-create.test.ts:135`（10 秒）与 `apps/api/test/persistence.test.ts:13`（15 秒）的重开超时；这不是本次 C16 或仓库的最终门禁结果。确认没有残留进程后，以单一串行会话复跑 `npx --yes pnpm@10.33.0 run check`，明确 exit `0`：domain `19/19`、mini-program `332/332`、API `105/105` 全部通过。后续根检查必须等待前一轮完全退出，避免并行 SQLite worker 制造假失败。
+
+## 2026-08-17 C16.1 教练权限范围真实运行态视觉收口
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1210 / C16.1 Permission Scope`。在线稿 TopNav 内容区为 88px，左内边距为 16px；换算到当前小程序为 `88rpx` 与 `32rpx`。
+- 运行态基线证实 `.c161-nav` 的 `176rpx` 内容高度与 WXML 的真实 `navInset` 叠加，令标题和后续内容下移；现按 C16 同一安全区规则收口为 `88rpx + box-sizing: content-box`，左内边距收口为 `32rpx`。返回动作、右侧胶囊避让、TabBar 和背景未改。
+- 当前真实 coach 会话没有已配置的 `roleEntrypoints.coach`，因此页面显示“暂无可用入口 / 仅管理员可调整”。在线稿的五项权限、开关和“保存更改”属于配置就绪样例；没有服务端契约时未伪造成真实数据或可用操作。
+- 曾出现 `9424` Automator 连接拒绝，根因是旧会话端口失效而非页面或 API。重新读取当前 IDE HTTP 端口 `61245` 并通过唯一注册入口更新为 `9420` 后，路由握手确认 `pages/coach/permissions/index`，再取得可信截图。
+- 可信证据：`tmp/coach-runtime-acceptance/C161-runtime-baseline-valid.png`、`C161-runtime-baseline-valid-compare.png`、`C161-acceptance-phone-final.png`、`C161-acceptance-compare-final.png`；均由 DevTools `print_window` 通道生成，最终图严格 `375×812`。修复后顶栏粉色边界、标题位置和 body 起点与在线稿的几何结构一致；系统状态栏、微信胶囊、TabBar 图标细节及空态/就绪态数据差异按运行环境与服务端数据豁免。
+- 验证先红后绿：C16.1 定向 Vitest 先因旧 `176rpx/44rpx` 失败（1 failed / 4），改动后 `4/4` 通过；尚待本任务最后一次全仓门禁与独立提交。

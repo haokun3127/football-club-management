@@ -106,7 +106,7 @@ describe("coach permission scope", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toMatch(/showToast|setStorage|wx\.request/);
     expect(stylesheet).toMatch(/\.c161-page\s*\{[^}]*background:\s*#f6f7f9/s);
-    expect(stylesheet).toMatch(/\.c161-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*padding-right:\s*44rpx)(?=[^}]*padding-left:\s*44rpx)(?=[^}]*background:\s*#fceeef)/s);
+    expect(stylesheet).toMatch(/\.c161-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*padding-right:\s*44rpx)(?=[^}]*padding-left:\s*32rpx)(?=[^}]*background:\s*#fceeef)/s);
     expect(stylesheet).toMatch(/\.c161-nav__title\s*\{[^}]*font-size:\s*44rpx/s);
     expect(stylesheet).toMatch(/\.c161-page__body\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+180rpx/s);
     expect(stylesheet).toMatch(/\.c161-content\s*\{[^}]*gap:\s*32rpx/s);
