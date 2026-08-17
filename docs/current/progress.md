@@ -805,3 +805,11 @@
 - 业务边界保持：权限清单继续只由会话 `client.roleEntrypoints.coach` 投影；不可点、不可写的“仅管理员可调整”不会假装成 Figma 的“保存更改”。未添加画板中无后端契约的私教、财务、开关状态或保存请求。
 - 验证：C16.1 定向 Vitest 先红后绿 `4/4`，小程序 typecheck、`git diff --check` 与全仓门禁通过（domain `19/19`、mini-program `326/326`、API `104/104`）。
 - 运行态边界：用户已授权本阶段不以新截图作为完成前置，因此本项为在线 Figma/源码/测试验收，不表述为新的 375×812 像素级运行态验收。
+
+## 2026-08-17 C16.2 私教兴趣安全区顶栏收口
+
+- 在线 Figma 基准已在改动前读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1238 / C16.2 Private Interest`；顶栏为 88px 的软粉内容区，叠加设备动态状态栏安全区。
+- 根因与已收口的 C14-C16.1 相同：WXML 向 `.c162-nav` 注入 `navInset`，而旧 `border-box` 会从设计规定的 176rpx 内容高度中扣除这段安全区内边距。现改为 `content-box`，不改标题、返回、正文卡片或教练 tabbar。
+- 真实业务边界保持不变：仍只投影 `session.capabilities.features.private_lessons` 的 enabled / unavailable / pending 状态；没有伪造 Figma 示例中的“接受私教预约”、周时段、17:00-20:00、价格、存储或 API 写入。
+- 验证：先让新的安全区断言因旧 `border-box` 失败，再以最小 WXSS 修改转绿；C16.2 定向 Vitest `4/4`、小程序 typecheck、`git diff --check` 和全仓门禁均通过（domain `19/19`、mini-program `326/326`、API `104/104`）。
+- 运行态边界：用户已授权本阶段不以新截图作为完成前置，因此本项为在线 Figma/源码/测试验收，不表述为新的 375×812 像素级运行态验收。

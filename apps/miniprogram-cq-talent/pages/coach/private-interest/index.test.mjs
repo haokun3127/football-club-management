@@ -110,7 +110,7 @@ describe("coach private interest", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toMatch(/WEEK_DAYS|SLOT_LABELS|toggleAccepting|toggleSlot|persist|getStorage|setStorage|showToast/);
     expect(stylesheet).toMatch(/\.c162-page\s*\{[^}]*background:\s*#f6f7f9/s);
-    expect(stylesheet).toMatch(/\.c162-nav\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*border-box[^}]*padding-right:\s*32rpx[^}]*padding-left:\s*32rpx[^}]*background:\s*#fceeef/s);
+    expect(stylesheet).toMatch(/\.c162-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*padding-right:\s*32rpx)(?=[^}]*padding-left:\s*32rpx)(?=[^}]*background:\s*#fceeef)/s);
     expect(stylesheet).toMatch(/\.c162-nav__title\s*\{[^}]*font-size:\s*44rpx/s);
     expect(stylesheet).toMatch(/\.c162-page__body\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+180rpx/s);
     expect(stylesheet).toMatch(/\.c162-content\s*\{[^}]*gap:\s*32rpx/s);
