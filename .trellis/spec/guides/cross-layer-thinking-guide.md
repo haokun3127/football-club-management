@@ -447,3 +447,24 @@ state correctly, but several commands still re-parsed event payload fields with
 local casts. The fix was to make the core event layer own `ThreadChannelEvent`
 and `isThreadEvent`, make `reduceChannelMetadata` the only channel metadata
 projection, and make `reduceThreads` the only thread replay reducer.
+
+---
+
+## Full Quality-Gate Process Isolation
+
+The root command `npx --yes pnpm@10.33.0 run check` runs the API's file-backed
+SQLite integration tests. Start only one root check at a time and wait for its
+actual exit code before launching another.
+
+- Good: start one TTY session, poll that same session until it exits, then
+  report its exact result.
+- Base: a command tool reaches its short output window; inspect its session or
+  child processes and wait, rather than starting a second root check.
+- Bad: start another `pnpm run check` while a prior API Vitest process is still
+  reopening SQLite files. This can produce artificial reopen timeouts in
+  otherwise passing persistence tests.
+
+Before classifying a SQLite reopen timeout as a repository regression, inspect
+for active `pnpm run check` / API Vitest process trees launched by the current
+session, let or stop only those known task-owned processes, then retry exactly
+one clean serial gate.

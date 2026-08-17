@@ -5,12 +5,12 @@
 
 .c16-bar {
   display: flex;
-  height: 176rpx;
+  height: 88rpx;
   box-sizing: content-box;
   align-items: center;
   justify-content: space-between;
   padding-right: 44rpx;
-  padding-left: 44rpx;
+  padding-left: 32rpx;
   background: #fceeef;
 }
 

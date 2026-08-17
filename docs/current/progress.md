@@ -928,3 +928,11 @@
 - 可信 375×812 证据：`tmp/coach-runtime-acceptance/C151-acceptance-phone-final.png` 与 `tmp/coach-runtime-acceptance/C151-acceptance-compare-final.png`；截图通道为 DevTools `print_window`。摘要卡和操作区已对齐在线稿；动态真实数据、状态栏、微信胶囊及 Home Indicator 属允许差异。
 - 截图链路同步修复：当 DevTools 不在前台时，`PrintWindow` 会得到纯白帧、桌面 fallback 会截到 Codex。现在在捕获前桥接当前前台输入线程并在 `finally` 解除桥接，实测可自行切回 DevTools 后输出严格 `375×812`。
 - 验证先红后绿：C15.1 定向 Vitest `4/4`、截图脚本 Python 回归 `6/6`、`git diff --check` 与根 `npx --yes pnpm@10.33.0 run check` 全绿（domain `19/19`、mini-program `332/332`、API `105/105`）。
+
+## 2026-08-17 C16 教练“我的”真实运行态视觉复验
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1182 / C16 Coach Me`。Figma 顶栏内容区为 88px，标题左内边距为 16px；身份切换组件仍只应在服务端确认的双角色会籍下显示。
+- 运行态根因是 `.c16-bar` 使用 `176rpx` 内容高度，同时 WXML 已为真实状态栏注入 `navInset`，令顶栏及后续内容整体下移。现将该内容区收口为 `88rpx + box-sizing: content-box`，并把左内边距从 `44rpx` 收口为与在线稿对应的 `32rpx`；右侧仍由现有 `menuInset` 避让真实微信胶囊。
+- 真实业务边界未改：教练姓名、球队和三项统计继续来自 `getCoachHome()`；身份切换仍由 `switchActiveRole` 的服务端会话确认，四项菜单和退出登录行为不变。截图中的 `Secure parent 1`、球队和统计与 Figma 示例不同，属于真实数据差异。
+- 可信证据保留在本机忽略目录：`tmp/coach-runtime-acceptance/C16-acceptance-phone-final.png`（`print_window` 通道、严格 `375×812`）及 `tmp/coach-runtime-acceptance/C16-acceptance-compare-final.png`。顶栏底线、首张卡片起点、角色入口、菜单、退出按钮和教练 TabBar 已完成对照；系统状态栏、微信胶囊与真实数据文案按设备/数据差异豁免。
+- 验证先红后绿：C16 定向 Vitest `9/9`、小程序 TypeScript 和 `git diff --check` 通过。最初两次根检查在 30 秒命令窗口后留下重叠的 SQLite 测试进程，曾诱发 `apps/api/test/app-client-match-event-create.test.ts:135`（10 秒）与 `apps/api/test/persistence.test.ts:13`（15 秒）的重开超时；这不是本次 C16 或仓库的最终门禁结果。确认没有残留进程后，以单一串行会话复跑 `npx --yes pnpm@10.33.0 run check`，明确 exit `0`：domain `19/19`、mini-program `332/332`、API `105/105` 全部通过。后续根检查必须等待前一轮完全退出，避免并行 SQLite worker 制造假失败。
