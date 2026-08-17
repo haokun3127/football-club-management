@@ -1,6 +1,7 @@
 import importlib.util
-import unittest
 from pathlib import Path
+from tempfile import TemporaryDirectory
+import unittest
 
 
 MODULE_PATH = Path(__file__).with_name("devtools-simulator-capture.py")
@@ -86,6 +87,17 @@ class SimulatorViewportTests(unittest.TestCase):
         self.assertEqual(captured, fallback)
         self.assertEqual(crop, (1166, 91, 375, 812))
         self.assertEqual(source, "screen")
+
+    def test_resizes_a_high_dpi_physical_crop_to_the_logical_output_size(self):
+        pixels = bytes([0, 0, 0, 255] * (4 * 4))
+        with TemporaryDirectory() as directory:
+            output = Path(directory) / "scaled.png"
+            MODULE.write_png(output, pixels, 4, (0, 0, 4, 4), (2, 2))
+
+            from PIL import Image
+
+            with Image.open(output) as image:
+                self.assertEqual(image.size, (2, 2))
 
 
 if __name__ == "__main__":

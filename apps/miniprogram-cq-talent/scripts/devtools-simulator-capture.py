@@ -327,15 +327,38 @@ def png_chunk(kind: bytes, payload: bytes) -> bytes:
     return struct.pack(">I", len(payload)) + kind + payload + struct.pack(">I", zlib.crc32(kind + payload) & 0xFFFFFFFF)
 
 
-def write_png(path: Path, bgra: bytes, source_width: int, crop: tuple[int, int, int, int]) -> None:
+def write_png(
+    path: Path,
+    bgra: bytes,
+    source_width: int,
+    crop: tuple[int, int, int, int],
+    output_size: tuple[int, int] | None = None,
+) -> None:
     left, top, width, height = crop
-    raw = bytearray()
+    rgba = bytearray()
     for row_index in range(top, top + height):
-        raw.append(0)
         start = (row_index * source_width + left) * 4
         row = bytearray(bgra[start:start + width * 4])
         row[0::4], row[2::4] = row[2::4], row[0::4]
-        raw.extend(row)
+        rgba.extend(row)
+
+    target_width, target_height = output_size or (width, height)
+    if (target_width, target_height) != (width, height):
+        try:
+            from PIL import Image
+        except ImportError as error:
+            raise RuntimeError("High-DPI output resizing requires Pillow") from error
+        image = Image.frombytes("RGBA", (width, height), bytes(rgba))
+        resampling = getattr(Image, "Resampling", Image)
+        image = image.resize((target_width, target_height), resampling.LANCZOS)
+        rgba = bytearray(image.tobytes())
+        width, height = target_width, target_height
+
+    raw = bytearray()
+    for row_index in range(height):
+        raw.append(0)
+        start = row_index * width * 4
+        raw.extend(rgba[start:start + width * 4])
     payload = b"\x89PNG\r\n\x1a\n"
     payload += png_chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0))
     payload += png_chunk(b"IDAT", zlib.compress(bytes(raw), level=9))
@@ -365,13 +388,14 @@ def main() -> int:
         args.logical_height,
     )
     bgra, window_width, window_height, dpi = captured
-    write_png(output, bgra, window_width, crop)
+    write_png(output, bgra, window_width, crop, (args.logical_width, args.logical_height))
     print(json.dumps({
         "title": title,
         "window": {"width": window_width, "height": window_height},
         "crop": {"x": crop[0], "y": crop[1], "width": crop[2], "height": crop[3]},
         "dpi": dpi,
         "source": source,
+        "output": {"width": args.logical_width, "height": args.logical_height},
     }, ensure_ascii=True))
     return 0
 
