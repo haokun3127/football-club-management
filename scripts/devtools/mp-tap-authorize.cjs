@@ -1,8 +1,9 @@
 // 点登录页的授权按钮（WXML button，automator 可点）
 const path = require("path");
 const automator = require(path.resolve(__dirname, "../../apps/miniprogram-cq-talent/node_modules/miniprogram-automator"));
+const { resolveAutomationPort } = require("./automation-session.cjs");
 (async () => {
-  const port = process.env.MP_AUTO_PORT || "9432";
+  const port = String(resolveAutomationPort());
   const mp = await automator.connect({ wsEndpoint: `ws://127.0.0.1:${port}` });
   const page = await mp.currentPage();
   console.log("route:", page.path);

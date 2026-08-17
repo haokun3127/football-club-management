@@ -1,8 +1,9 @@
 /* 直接向模拟器 wx storage 写入已种好的真实会话（绕过授权弹窗），然后 reLaunch 走正常启动流程 */
 const path = require('path');
 const automator = require(path.resolve(__dirname, '../../apps/miniprogram-cq-talent/node_modules/miniprogram-automator'));
+const { resolveAutomationPort } = require('./automation-session.cjs');
 
-const port = process.env.MP_AUTO_PORT || '9432';
+const port = String(resolveAutomationPort());
 const step = (m) => console.log('[' + new Date().toISOString().slice(11, 19) + ']', m);
 
 const SESSION = {

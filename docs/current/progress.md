@@ -696,3 +696,17 @@
 - C4.1：继续按 eventId 重新 GET workbench 读取真实统计；移除未声明的 `venue`/`hasVenue` 写入，主按钮改为中性“查看活动详情”。共享顶栏新增按页启用的 22px 标题变体，未改变其他页面的默认标题尺寸。
 - 验证：先新增会失败的回归测试，再完成最小实现；聚焦 Vitest `23/23`、小程序 `typecheck`、`git diff --check` 及全仓门禁均通过（domain `19/19`、小程序 `319/319`、API `104/104`）。
 - 运行时截图：先前自动化已确认 C4 路由和 iPhone X 逻辑 `375×812`，但提交前 `9432` 端口已失效，且 Windows 未发现可见的“的模拟器”窗口；未生成或接受任何截图证据，因此明确不宣称视觉运行态验收完成。
+
+## 2026-08-17 DevTools Automator 拒绝连接根治（截图连接层）
+
+- 根因：仓库内各截图/诊断脚本私自默认 `9421`、`9425`、`9429`、`9430` 或 `9432`，而 DevTools 的 `.ide` HTTP 服务端口又与 Automator WebSocket 端口混用；手动打开 IDE 后，脚本仍可能盲连已经不存在的旧端口。
+- 修复：新增 `scripts/devtools/automation-session.cjs` 作为唯一端口状态；`devtools:automator:open` 先只读探测可用 Automator，再在需要时把当前 `.ide` HTTP 端口传给 `cli auto --port`、注册独立 `--auto-port`，仅在 `currentPage()` 握手成功后写入忽略的 `tmp/devtools-automation-session.json`。所有已跟踪的 Automator helper 已改为读取它，`MP_AUTO_PORT` 只保留为一次性覆盖。
+- 实测：2026-08-17 手动打开的 DevTools 经 `cli auto --project <小程序目录> --port 14535 --auto-port 9432` 后监听 9432；新的 canonical opener 复用该端点、写入状态文件，并真实读到 `pages/coach/schedule/index`。这证明“拒绝连接”已解决。
+- 边界：后续一次有界 `MiniProgram.screenshot()` 探针未能在约 55 秒内完整返回（其中断开阶段也未结束），已中止且未接受 PNG；这是 SDK 截图/断开能力边界，不是再度拒绝连接。C4/C4.1/C4.2 仍须另取可信 375×812 图片后才可声明视觉验收。
+
+## 2026-08-17 DevTools 嵌入式模拟器截图回退修复
+
+- 新根因：DevTools Stable `v2.01.2510290` 当前只有一个主窗口 `重庆天才俱乐部 - 微信开发者工具`，iPhone X 模拟器嵌在主窗口右侧，不会暴露旧脚本要求的“××的模拟器”独立窗口。此前因此在 Automator 已连通后仍报找不到模拟器窗口。
+- 修复：`devtools-simulator-capture.py` 保留独立窗口路径；没有独立窗口时，选择唯一可见的 DevTools 主窗口，并搜索 iPhone X 刘海的纵向+横向黑色签名，以 DPI 比例裁出完整视口。新增偏离主窗口中心的 Python 回归测试，防止算法退回“只看正中心”的假设。
+- 实测：真实 `.ide` HTTP `61245` 通过 CLI 注册 Automator `9424`，`devtools:screenshot` 已读取 `/pages/coach/schedule/index`，输出 `563×1218` PNG；`systemInfo` 同时确认逻辑视口 `375×812`、`devicePixelRatio: 3`、均匀栅格比例约 `1.5`。图像只含小程序画布，没有 DevTools 边栏或弹窗。
+- 范围：这证明截图工具链恢复，不替代 C4/C4.1/C4.2 各自的 Figma 对照验收；下一页验收前仍须导航到目标路由并重新截图。

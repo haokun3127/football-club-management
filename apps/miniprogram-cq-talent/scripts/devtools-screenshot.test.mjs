@@ -8,6 +8,7 @@ import { tmpdir } from "node:os";
 import { openAutomation, parseArgs, runCli } from "./devtools-screenshot.mjs";
 
 const tempDirectories = [];
+process.env.MP_AUTO_PORT = "9421";
 
 function createPng(width = 375, height = 812) {
   const bytes = Buffer.alloc(33);
@@ -271,6 +272,7 @@ describe("DevTools Automator screenshot CLI", () => {
       cliPath: "D:\\微信web开发者工具\\cli.bat",
       projectPath: "C:\\workspace\\mini-program",
       port: 9431,
+      ideHttpPort: 14535,
       timeoutMs: 12_000,
       isWindows: true,
       commandShell: "cmd.exe",
@@ -284,7 +286,7 @@ describe("DevTools Automator screenshot CLI", () => {
     expect(fake.calls.connect).toEqual([{ wsEndpoint: "ws://127.0.0.1:9431" }]);
     expect(spawnCalls).toEqual([{
       command: "cmd.exe",
-      args: ["/d", "/s", "/c", "\"\"D:\\微信web开发者工具\\cli.bat\" auto --project \"C:\\workspace\\mini-program\" --auto-port 9431 --lang zh\""],
+      args: ["/d", "/s", "/c", "\"\"D:\\微信web开发者工具\\cli.bat\" auto --project \"C:\\workspace\\mini-program\" --auto-port 9431 --port 14535 --lang zh\""],
       options: { stdio: "ignore", windowsHide: true, shell: false },
     }]);
     expect(unrefCalls).toBe(1);
@@ -301,6 +303,7 @@ describe("DevTools Automator screenshot CLI", () => {
       cliPath: "D:\\微信web开发者工具\\cli.bat",
       projectPath: "C:\\workspace\\mini-program",
       port: 9431,
+      ideHttpPort: 14535,
       isWindows: true,
       spawnImpl() { return { unref() {} }; },
       retryDelayMs: 1,
@@ -315,9 +318,65 @@ describe("DevTools Automator screenshot CLI", () => {
     expect(fake.calls.disconnects).toBe(1);
   });
 
+  it("reuses a discovered active Automator port before attempting to launch another IDE window", async () => {
+    const originalPort = process.env.MP_AUTO_PORT;
+    delete process.env.MP_AUTO_PORT;
+    try {
+      const result = await openAutomation({
+        cliPath: "C:\\missing\\cli.bat",
+        projectPath: "C:\\workspace\\mini-program",
+        statePath: join(tmpdir(), "missing-cq-devtools-session.json"),
+        discoverAutomationPortImpl: async () => ({ port: 9432, route: "/pages/launch/index" }),
+        spawnImpl() { throw new Error("CLI must not be launched when Automator is already reachable"); },
+      });
+
+      expect(result).toEqual({ port: 9432, route: "/pages/launch/index" });
+    } finally {
+      process.env.MP_AUTO_PORT = originalPort;
+    }
+  });
+
+  it("re-registers a stale saved session on a fresh port instead of retrying the poisoned endpoint", async () => {
+    const directory = createOutputDirectory();
+    const statePath = join(directory, "session.json");
+    const cliPath = join(directory, "cli.bat");
+    writeFileSync(cliPath, "@echo off\n");
+    writeFileSync(statePath, JSON.stringify({
+      version: 1,
+      automationPort: 9432,
+      projectPath: "C:\\workspace\\mini-program",
+      createdAt: "2026-08-17T00:00:00.000Z",
+    }));
+    const originalPort = process.env.MP_AUTO_PORT;
+    delete process.env.MP_AUTO_PORT;
+    try {
+      const fake = createAutomator({ route: "/pages/launch/index" });
+      const spawnCalls = [];
+      const result = await openAutomation({
+        automatorImpl: fake.automatorImpl,
+        cliPath,
+        projectPath: "C:\\workspace\\mini-program",
+        statePath,
+        probeAutomationPortImpl: async () => null,
+        findFreeAutomationPortImpl: async () => 9433,
+        spawnImpl(command, args) { spawnCalls.push({ command, args }); return { unref() {} }; },
+      });
+
+      expect(result).toEqual({ port: 9433, route: "/pages/launch/index" });
+      expect(spawnCalls[0].args.join(" ")).toContain("--auto-port 9433");
+    } finally {
+      process.env.MP_AUTO_PORT = originalPort;
+    }
+  });
+
   it("ships no direct CDP screenshot command", () => {
     const source = readFileSync(new URL("./devtools-screenshot.mjs", import.meta.url), "utf8");
     expect(source).not.toContain("App.captureScreenshot");
     expect(source).toContain("miniprogram-automator");
+  });
+
+  it("bounds each Automator connection attempt so a half-open WebSocket cannot block recovery", () => {
+    const source = readFileSync(new URL("./devtools-screenshot.mjs", import.meta.url), "utf8");
+    expect(source).toMatch(/async function connectAfterLaunch[\s\S]{0,800}withOperationTimeout\(\s*\n?\s*automatorImpl\.connect/);
   });
 });

@@ -4,14 +4,16 @@
 
 ## 2026-08-09 Windows 当前截图标准（覆盖 08-05 PrintWindow 标准）
 
-- 当前首选取证通道是 `miniProgram.screenshot`（`tmp/prod-verify/mp-shot.cjs`，automator 端口 **9425**）：直出逻辑视口 `375×812` 页面 PNG，免疫窗口遮挡、最大化、GPU 白屏与前台竞争。
-- 两条已知限制：① 拍不到原生 canvas 2d 内容（radar 详情页雷达图须用 dxcam 窗口裁剪兜底）；② `screenshot` 超时但 `currentPage()` 仍应答 = 渲染进程死亡，先发 **Ctrl+Win+Shift+B** 显卡重启（已验证可恢复），不行再换端口冷启动。
+- 当前 Windows 取证通道由 Automator 复核路由/视口，再由 `PrintWindow(PW_RENDERFULLCONTENT)` 抓取画面；不依赖可能超时的 `miniProgram.screenshot`。脚本优先找旧版独立“××的模拟器”窗口；新版 DevTools 没有独立模拟器窗口时，回退到唯一可见的 DevTools 主窗口，在其中定位 iPhone X 刘海后裁出完整逻辑视口。
+- 从 **2026-08-17** 起，所有仓库内已跟踪的 Automator 脚本从忽略文件 `tmp/devtools-automation-session.json` 读取同一个握手成功的 WebSocket 端口；绝不再把 `9421`、`9425`、`9429`、`9430` 或 `9432` 写成各脚本私有默认值。会话由 `pnpm --filter @football-club/miniprogram-cq-talent devtools:automator:open` 建立：它把 DevTools `.ide` 的 HTTP 服务端口作为 `cli auto --port` 传入，再注册不同的 `--auto-port`，并以 `currentPage()` 握手后才落盘。
+- 截图命令可省略 `--port`；缺少会话会明确失败，不会盲连旧端口。`MP_AUTO_PORT` 仅作一次性排障覆盖，不能写回文档、脚本或提交。
+- 两条已知限制：① 拍不到原生 canvas 2d 内容（radar 详情页雷达图须用 dxcam 窗口裁剪兜底）；② 若 `currentPage()` 或窗口捕获失败，先确认 DevTools 主窗口未最小化，再重新建立 Automator 会话；不要通过改页面代码、角色或 API 数据来绕过截图链路失败。
 - 路由/滚动配套：`nav-to.cjs`（navigateTo promise 挂起属正常，以 currentPage 轮询为准）、`current-route.cjs`、`scroll-to.cjs`（`callWxMethod("pageScrollTo")`）。
 - 下文 2026-08-05 的 PrintWindow 标准保留为历史事实与兜底通道；取证优先级以本节为准。
 
 ## 2026-08-05 Windows 当前截图标准（覆盖运行态取证）
 
-- 当前 Windows 标准是 `apps/miniprogram-cq-talent/scripts/devtools-screenshot.mjs` 的 Automator 路由/路由栈复核，加上唯一可见“××的模拟器”窗口的 `PrintWindow(PW_RENDERFULLCONTENT)` 精确捕获。
+- 当前 Windows 标准是 `apps/miniprogram-cq-talent/scripts/devtools-screenshot.mjs` 的 Automator 路由/路由栈复核，加上 `PrintWindow(PW_RENDERFULLCONTENT)` 精确捕获。它兼容唯一可见的旧版“××的模拟器”窗口，以及新版唯一可见 DevTools 主窗口中的嵌入式 iPhone X 模拟器。
 - 合格证据必须确认路由为 `pages/parent/schedule/index`（或本次目标页面的严格路由）、逻辑视口 `375×812`，并保存未裁剪小程序画布 PNG；既有家长日程样本的原始 PNG 为 `563×1218`，capture method 为 Windows PrintWindow DevTools simulator capture，并应有可解析 sidecar 与二次路由复核。
 - 截图只证明捕获到了指定 DevTools 模拟器窗口和路由/视口；不证明真实 parent/coach 角色、session、API 200、在线 Figma 几何或视觉验收通过。视觉结论必须另行对照当前在线 Figma 三元组。
 - Superseding 说明：下文 `2026-08-04` “窗口捕获不可用”条目继续保留为历史事实；2026-08-05 的 PrintWindow 标准和已取得的有效样本覆盖该条目的当前运行结论，但不删除或改写历史排障过程。
@@ -194,14 +196,13 @@ pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client
 
 ## 11. 2026-08-04 官方 Automator 截图取证
 
-截图命令使用 `miniprogram-automator@0.12.1` 的官方 `connect`、`currentPage`、`pageStack`、`screenshot`、`systemInfo` 与 `disconnect` API；项目代码不直接发送 DevTools RPC。`devtools:automator:open` 通过 Windows `.bat` 兼容方式执行 `cli auto --auto-port 9421`，连接可用前会轮询，且不会自动关闭 DevTools 窗口。
+截图命令使用 `miniprogram-automator@0.12.1` 的官方 `connect`、`currentPage`、`pageStack`、`screenshot`、`systemInfo` 与 `disconnect` API；项目代码不直接发送 DevTools RPC。`devtools:automator:open` 通过 Windows `.bat` 兼容方式执行 `cli auto --project <path> --auto-port <动态端口> --port <当前 .ide HTTP 端口>`，连接可用前会轮询，且不会自动关闭 DevTools 窗口。
 
 ```bash
 pnpm --filter @football-club/miniprogram-cq-talent devtools:automator:open
 pnpm --filter @football-club/miniprogram-cq-talent devtools:screenshot -- \
   --output C:\Users\ASUS\AppData\Local\Temp\cq-talent-parent.png \
-  --expect-route-prefix /pages/parent/ \
-  --port 9421
+  --expect-route-prefix /pages/parent/
 ```
 
 ### 证据契约

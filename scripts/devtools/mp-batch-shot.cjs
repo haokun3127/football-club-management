@@ -1,10 +1,11 @@
 const path = require("path");
 const automator = require(path.resolve(__dirname, "../../apps/miniprogram-cq-talent/node_modules/miniprogram-automator"));
+const { resolveAutomationPort } = require("./automation-session.cjs");
 function race(p, ms, label) { return Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error("timeout:" + label)), ms))]); }
 // Batch screenshots in ONE connection: node mp-batch-shot.cjs <manifest.json>
 // manifest: [{ "route": "pages/...?id=x", "out": "abs path.png", "settleMs": 800 }, ...]
 (async () => {
-  const port = process.env.MP_AUTO_PORT || "9430";
+  const port = String(resolveAutomationPort());
   const manifest = require(path.resolve(process.argv[2]));
   const mp = await race(automator.connect({ wsEndpoint: "ws://127.0.0.1:" + port }), 10000, "connect");
   for (const item of manifest) {

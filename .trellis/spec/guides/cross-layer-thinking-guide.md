@@ -144,6 +144,19 @@ devtools:screenshot -- --output <absolute-outside-repo.png>
 ### 3. Contracts
 
 - Use `miniprogram-automator`, not project-owned raw DevTools RPC.
+- On Windows, treat the DevTools HTTP service port and the Automator WebSocket
+  port as different contracts. `cli auto --port <ide-http-port>` attaches to
+  the manually opened IDE; `--auto-port <automator-port>` exposes the SDK
+  endpoint. Never pass one as the other.
+- `scripts/devtools/automation-session.cjs` is the one source of truth for
+  the successful Automator endpoint. After a real `currentPage()` handshake,
+  `devtools:automator:open` writes only the port, project path, CLI path, and
+  creation time to ignored `tmp/devtools-automation-session.json`; it must not
+  store a token, phone number, session, role, or API response.
+- Before launching another IDE window, the opener performs read-only discovery
+  over its bounded Automator range and adopts an already reachable endpoint.
+  Every tracked helper resolves the same state file; `MP_AUTO_PORT` is a
+  temporary explicit override, not a new default to copy into a script.
 - Capture PNG and inspect `systemInfo` through two consecutive read-only SDK
   connections; re-check the route before accepting the second connection.
 - `windowWidth` and `windowHeight` must be `375×812`. Preserve the raw PNG and
@@ -156,6 +169,8 @@ devtools:screenshot -- --output <absolute-outside-repo.png>
 
 | Condition | Required behavior |
 | --- | --- |
+| No stored/explicit Automator port | Fail with the state-file recovery command; do not guess a legacy port. |
+| Existing Automator endpoint is discovered | Handshake and persist it before any CLI launch. |
 | CLI path or automation endpoint unavailable | Fail with the endpoint/path; do not publish evidence. |
 | Route prefix mismatch or route changes between connections | Fail before publishing PNG or sidecar. |
 | Runtime logical viewport is not `375×812` | Reject the capture. |
@@ -174,6 +189,9 @@ devtools:screenshot -- --output <absolute-outside-repo.png>
 
 - Unit test the Windows `.bat` launch and endpoint retry without closing
   DevTools.
+- Unit test session read/write, explicit-port override, HTTP-versus-WebSocket
+  CLI arguments, empty-session failure, and that each tracked helper imports
+  the shared resolver instead of a private numeric fallback.
 - Unit test route verification, route re-check, atomic no-output failure,
   `375×812` logical-viewport validation, normal and high-density rasters, and
   non-uniform raster rejection.
@@ -204,13 +222,26 @@ const viewport = await inspectionProgram.systemInfo();
 - Before treating a timeout as a version incompatibility, verify process freshness: the requested automation port must be newly listening after the entire IDE process has exited. A project-window reopen that leaves the old port owned by the old process is not a clean retry.
 - Retry after that full-process restart or an external compatibility change (for example, a verified real device). Repeated page rebuilds and reconnect-order tweaks do not constitute visual acceptance.
 
+### 8.1 Connection Refused Retrospective (2026-08-17)
+
+- Symptom: a user could have a healthy manually opened DevTools window while
+  different repository scripts still attempted `ws://127.0.0.1:9421`, `9425`,
+  `9429`, `9430`, or `9432` and reported connection refused.
+- Root cause: private fallback ports were copied across scripts, and launcher
+  code omitted the active `.ide` HTTP port. That can ask the CLI to create a
+  different project window instead of attaching to the user's healthy IDE.
+- Correct recovery: run `devtools:automator:open`; it first reuses a verified
+  active endpoint, otherwise registers one against the active `.ide` HTTP
+  service and persists the handshake. Do not change page code, API state,
+  roles, or authentication while this boundary is failing.
+
 ### 9. Windows Simulator Capture Fallback (2026-08-05)
 
 - When the Automator route, page-stack, and `systemInfo` calls work but the SDK screenshot call times out, Windows may use `scripts/devtools-simulator-capture.py` through `devtools-screenshot.mjs`.
-- This fallback is valid only when all of the following hold: the tool finds exactly one visible DevTools simulator title ending in “的模拟器”; `PrintWindow(PW_RENDERFULLCONTENT)` renders that window; the script crops the full DPI-scaled iPhone X canvas to the verified logical viewport; and the outer Node command completes the second route check plus uniform-PNG validation before atomically publishing evidence.
+- This fallback is valid only when all of the following hold: the tool finds exactly one visible legacy DevTools simulator title ending in “的模拟器”, or (when no standalone simulator exists) exactly one visible DevTools main window; `PrintWindow(PW_RENDERFULLCONTENT)` renders that window; the script locates the full DPI-scaled iPhone X canvas from its vertical-and-horizontal black notch signature and crops it to the verified logical viewport; and the outer Node command completes the second route check plus uniform-PNG validation before atomically publishing evidence.
 - Do not replace this with a screen-coordinate crop. A normal desktop screenshot cannot prove which DevTools runtime, route, or device canvas was captured.
-- If multiple simulator windows are visible, reject by default and require `WECHAT_DEVTOOLS_SIMULATOR_TITLE`; if the Python helper, crop, or later route/PNG validation fails, publish neither final PNG nor sidecar.
-- Required regression checks: Windows code path bypasses SDK screenshot; timeout leaves no evidence; a missing explicit title fails; and metadata remains parseable across the Python/Node UTF-8 boundary.
+- If multiple standalone simulators or multiple fallback main windows are visible, reject by default and require `WECHAT_DEVTOOLS_SIMULATOR_TITLE`; if the Python helper, crop, or later route/PNG validation fails, publish neither final PNG nor sidecar.
+- Required regression checks: Windows code path bypasses SDK screenshot; timeout leaves no evidence; a missing explicit title fails; an iPhone X notch offset from its host-window center still produces the exact crop; and metadata remains parseable across the Python/Node UTF-8 boundary.
 
 ---
 

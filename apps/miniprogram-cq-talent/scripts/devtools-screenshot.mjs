@@ -8,18 +8,27 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const automator = require("miniprogram-automator");
+const {
+  AUTOMATION_PORT_RANGE,
+  buildCliArgs,
+  findFreeAutomationPort,
+  isTcpPortOpen,
+  readIdeHttpPort,
+  resolveAutomationPort,
+  writeAutomationSession,
+} = require(resolve(import.meta.dirname, "../../../scripts/devtools/automation-session.cjs"));
 
 const REPO_ROOT = resolve(import.meta.dirname, "../../..");
-const DEFAULT_PORT = 9421;
 const DEFAULT_TIMEOUT_MS = 30_000;
 const DEFAULT_RETRY_DELAY_MS = 500;
+const DEFAULT_CONNECT_ATTEMPT_TIMEOUT_MS = 2_000;
 const REQUIRED_VIEWPORT = Object.freeze({ width: 375, height: 812 });
 const DEFAULT_CLI_PATH = process.platform === "win32"
   ? "D:\\微信web开发者工具\\cli.bat"
   : "/Applications/wechatwebdevtools.app/Contents/MacOS/cli";
 const DEFAULT_PROJECT_PATH = resolve(import.meta.dirname, "..");
 const WINDOWS_SIMULATOR_CAPTURE_HELPER = resolve(import.meta.dirname, "devtools-simulator-capture.py");
-const USAGE = "Usage: devtools:screenshot -- --output C:\\temp\\shot.png --expect-route-prefix /pages/parent/ [--port 9421]";
+const USAGE = "Usage: devtools:screenshot -- --output C:\\temp\\shot.png --expect-route-prefix /pages/parent/ [--port <automator-port>]";
 
 export function parseArgs(argv) {
   const args = [...argv];
@@ -27,7 +36,7 @@ export function parseArgs(argv) {
   if (args.includes("--")) throw new Error("only one leading pnpm separator is supported");
   if (args.length === 1 && args[0] === "--help") return { help: true };
 
-  const options = { output: "", expectRoutePrefix: "", port: DEFAULT_PORT };
+  const options = { output: "", expectRoutePrefix: "", port: undefined };
   for (let index = 0; index < args.length; index += 1) {
     const key = args[index];
     if (!key.startsWith("--")) throw new Error(`unknown argument: ${key}`);
@@ -45,7 +54,7 @@ export function parseArgs(argv) {
       options.expectRoutePrefix = value;
     }
     if (key === "--port") {
-      if (options.port !== DEFAULT_PORT) throw new Error("duplicate --port option");
+      if (options.port !== undefined) throw new Error("duplicate --port option");
       options.port = parsePort(value);
     }
   }
@@ -189,11 +198,12 @@ async function captureWindowsSimulator({
   }
 }
 
-function buildWindowsBatchCommand(cliPath, projectPath, port) {
+function buildWindowsBatchCommand(cliPath, projectPath, port, ideHttpPort) {
   for (const [label, value] of [["CLI path", cliPath], ["project path", projectPath]]) {
     if (/[\"%&|<>()^!\r\n]/.test(value)) throw new Error(`Windows ${label} contains unsupported cmd metacharacters`);
   }
-  return `\"\"${cliPath}\" auto --project \"${projectPath}\" --auto-port ${port} --lang zh\"`;
+  const ideArgument = ideHttpPort ? ` --port ${parsePort(String(ideHttpPort))}` : "";
+  return `\"\"${cliPath}\" auto --project \"${projectPath}\" --auto-port ${port}${ideArgument} --lang zh\"`;
 }
 
 function sleep(milliseconds) {
@@ -209,41 +219,121 @@ function withOperationTimeout(operation, label, timeoutMs) {
   });
 }
 
-async function connectAfterLaunch({ automatorImpl, endpoint, timeoutMs, retryDelayMs, sleepImpl }) {
+async function connectAfterLaunch({ automatorImpl, endpoint, timeoutMs, retryDelayMs, sleepImpl, connectAttemptTimeoutMs }) {
   const deadline = Date.now() + timeoutMs;
   let lastError;
   do {
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) break;
     try {
-      return await automatorImpl.connect({ wsEndpoint: endpoint });
+      return await withOperationTimeout(
+        automatorImpl.connect({ wsEndpoint: endpoint }),
+        `automation connect ${endpoint}`,
+        Math.min(connectAttemptTimeoutMs, remaining),
+      );
     } catch (error) {
       lastError = error;
-      const remaining = deadline - Date.now();
-      if (remaining <= 0) break;
-      await sleepImpl(Math.min(retryDelayMs, remaining));
+      const afterAttempt = deadline - Date.now();
+      if (afterAttempt <= 0) break;
+      await sleepImpl(Math.min(retryDelayMs, afterAttempt));
     }
   } while (Date.now() < deadline);
   throw new Error(`automation endpoint did not become available at ${endpoint}: ${lastError?.message ?? "unknown connection error"}`);
+}
+
+export async function probeAutomationPort({
+  automatorImpl = automator,
+  port,
+  timeoutMs = 500,
+  isPortOpenImpl = isTcpPortOpen,
+} = {}) {
+  if (!await isPortOpenImpl({ port, timeoutMs })) return null;
+  let miniProgram;
+  try {
+    const endpoint = `ws://127.0.0.1:${port}`;
+    miniProgram = await withOperationTimeout(automatorImpl.connect({ wsEndpoint: endpoint }), `Automator probe ${port}`, timeoutMs);
+    const route = routeOf(await withOperationTimeout(miniProgram.currentPage(), `Automator currentPage probe ${port}`, timeoutMs));
+    return { port, route };
+  } catch {
+    return null;
+  } finally {
+    safeDisconnect(miniProgram);
+  }
+}
+
+export async function discoverAutomationPort({
+  automatorImpl = automator,
+  range = AUTOMATION_PORT_RANGE,
+  timeoutMs = 500,
+  probeAutomationPortImpl = probeAutomationPort,
+} = {}) {
+  for (let port = range.start; port <= range.end; port += 1) {
+    const existing = await probeAutomationPortImpl({ automatorImpl, port, timeoutMs });
+    if (existing) return existing;
+  }
+  return null;
 }
 
 export async function openAutomation({
   automatorImpl = automator,
   cliPath = process.env.WECHAT_DEVTOOLS_CLI ?? DEFAULT_CLI_PATH,
   projectPath = process.env.PROJECT_PATH ?? DEFAULT_PROJECT_PATH,
-  port = Number(process.env.DEVTOOLS_AUTOMATOR_PORT ?? DEFAULT_PORT),
+  port,
+  ideHttpPort,
+  detectIdeHttpPort = false,
+  persistSession = false,
+  statePath,
   timeoutMs = DEFAULT_TIMEOUT_MS,
   retryDelayMs = DEFAULT_RETRY_DELAY_MS,
+  connectAttemptTimeoutMs = DEFAULT_CONNECT_ATTEMPT_TIMEOUT_MS,
   sleepImpl = sleep,
   isWindows = process.platform === "win32",
   commandShell = process.env.ComSpec ?? "cmd.exe",
   spawnImpl = spawn,
+  discoverAutomationPortImpl = discoverAutomationPort,
+  probeAutomationPortImpl = probeAutomationPort,
+  findFreeAutomationPortImpl = findFreeAutomationPort,
 } = {}) {
+  const requestedPort = port ?? process.env.DEVTOOLS_AUTOMATOR_PORT ?? process.env.MP_AUTO_PORT;
+  const hasRequestedPort = requestedPort !== undefined && requestedPort !== null && requestedPort !== "";
+  let automationPort;
+  if (hasRequestedPort) {
+    automationPort = resolveAutomationPort({ explicitPort: requestedPort, statePath });
+  } else {
+    let savedPort;
+    try {
+      savedPort = resolveAutomationPort({ statePath });
+    } catch (error) {
+      if (!/No active WeChat DevTools Automator session/.test(error.message)) throw error;
+    }
+    if (savedPort !== undefined) {
+      const existing = await probeAutomationPortImpl({ automatorImpl, port: savedPort });
+      if (existing) {
+        const sessionFile = persistSession
+          ? writeAutomationSession({ automationPort: existing.port, projectPath, cliPath }, statePath)
+          : undefined;
+        return { port: existing.port, route: existing.route, ...(sessionFile ? { sessionFile } : {}) };
+      }
+      automationPort = await findFreeAutomationPortImpl();
+    }
+  }
+  if (automationPort === undefined) {
+    const existing = await discoverAutomationPortImpl({ automatorImpl });
+    if (existing) {
+      const sessionFile = persistSession
+        ? writeAutomationSession({ automationPort: existing.port, projectPath, cliPath }, statePath)
+        : undefined;
+      return { port: existing.port, route: existing.route, ...(sessionFile ? { sessionFile } : {}) };
+    }
+    automationPort = await findFreeAutomationPortImpl();
+  }
   if (!existsSync(cliPath)) throw new Error(`WeChat DevTools CLI not found: ${cliPath}`);
-  const automationPort = parsePort(String(port));
+  const activeIdeHttpPort = ideHttpPort ?? (detectIdeHttpPort ? readIdeHttpPort() : undefined);
   const endpoint = `ws://127.0.0.1:${automationPort}`;
-  const cliArgs = ["auto", "--project", projectPath, "--auto-port", String(automationPort), "--lang", "zh"];
+  const cliArgs = buildCliArgs({ projectPath, automationPort, ideHttpPort: activeIdeHttpPort });
   const isWindowsBatch = isWindows && /\.(bat|cmd)$/i.test(cliPath);
   const child = isWindowsBatch
-    ? spawnImpl(commandShell, ["/d", "/s", "/c", buildWindowsBatchCommand(cliPath, projectPath, automationPort)], {
+    ? spawnImpl(commandShell, ["/d", "/s", "/c", buildWindowsBatchCommand(cliPath, projectPath, automationPort, activeIdeHttpPort)], {
       stdio: "ignore",
       windowsHide: true,
       shell: false,
@@ -254,9 +344,13 @@ export async function openAutomation({
       shell: false,
     });
   child?.unref?.();
-  const miniProgram = await connectAfterLaunch({ automatorImpl, endpoint, timeoutMs, retryDelayMs, sleepImpl });
+  const miniProgram = await connectAfterLaunch({ automatorImpl, endpoint, timeoutMs, retryDelayMs, sleepImpl, connectAttemptTimeoutMs });
   try {
-    return { port: automationPort, route: routeOf(await miniProgram.currentPage()) };
+    const route = routeOf(await miniProgram.currentPage());
+    const sessionFile = persistSession
+      ? writeAutomationSession({ automationPort, projectPath, ideHttpPort: activeIdeHttpPort, cliPath }, statePath)
+      : undefined;
+    return { port: automationPort, route, ...(sessionFile ? { sessionFile } : {}) };
   } finally {
     safeDisconnect(miniProgram);
   }
@@ -274,7 +368,8 @@ export async function runCli({
   const options = parseArgs(argv ?? []);
   if (options.help) return { help: true, usage: USAGE };
   const targets = validateOutputPath(options.output, repoRoot);
-  const endpoint = `ws://127.0.0.1:${options.port}`;
+  const automationPort = resolveAutomationPort({ explicitPort: options.port });
+  const endpoint = `ws://127.0.0.1:${automationPort}`;
   const captureTemp = win32.join(targets.parent, `.${basename(targets.output)}.${process.pid}-${randomUUID()}.capture`);
 
   try {

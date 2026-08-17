@@ -1,9 +1,10 @@
 // 微信开发者工具模拟器：路由跳转 + 375x812 截图
 // 用法: node scripts/devtools/mp-route-shot.cjs "<route><?query>" "<输出绝对路径>.png" [force]
-// 端口: 默认 9429，可用环境变量 MP_AUTO_PORT 覆盖（会话失效就换端口并重新 cli auto 注册）
+// 端口: 从 tmp/devtools-automation-session.json 读取；MP_AUTO_PORT 仅用于一次性覆盖。
 const path = require("path");
 const automator = require(path.resolve(__dirname, "../../apps/miniprogram-cq-talent/node_modules/miniprogram-automator"));
-const PORT = process.env.MP_AUTO_PORT || "9429";
+const { resolveAutomationPort } = require("./automation-session.cjs");
+const PORT = String(resolveAutomationPort());
 function race(p, ms, label) { return Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error("timeout:" + label)), ms))]); }
 (async () => {
   const mp = await race(automator.connect({ wsEndpoint: "ws://127.0.0.1:" + PORT }), 10000, "connect");

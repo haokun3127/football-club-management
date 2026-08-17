@@ -1,9 +1,10 @@
 /* 监听模拟器 console 输出：reLaunch 目标页并打印 15s 内所有 console 消息（定位 TS 未生效原因） */
 const path = require('path');
 const automator = require(path.resolve(__dirname, '../../apps/miniprogram-cq-talent/node_modules/miniprogram-automator'));
+const { resolveAutomationPort } = require('./automation-session.cjs');
 
 async function main() {
-  const mp = await automator.connect({ wsEndpoint: `ws://localhost:${process.env.MP_AUTO_PORT || 9432}` });
+  const mp = await automator.connect({ wsEndpoint: `ws://localhost:${resolveAutomationPort()}` });
   mp.on('console', (msg) => {
     const items = (msg.args || []).map((a) => {
       try { return typeof a === 'string' ? a : JSON.stringify(a); } catch { return String(a); }

@@ -7,13 +7,13 @@
 
 1. 微信开发者工具 Stable（本机 v2.01.2510290）已安装，CLI 在 `D:\微信web开发者工具\cli.bat`
 2. 模拟器里用户已手动点过一次「微信手机号授权并继续」（自动化点不动授权弹窗，这是唯一人工步骤）
-3. 已注册自动化端口（会话失效/换端口时重跑一次）：
+3. 在 DevTools 中手动打开本项目，并在「设置 → 安全设置」启用 CLI/HTTP 调用。随后用**唯一入口**注册 Automator 会话：
 
 ```bash
-"/d/微信web开发者工具/cli.bat" auto \
-  --project "C:\Users\ASUS\Desktop\football-club-management-codex-windows-2026-08-02\apps\miniprogram-cq-talent" \
-  --auto-port 9429
+npx --yes pnpm@10.33.0 --filter @football-club/miniprogram-cq-talent devtools:automator:open
 ```
+
+该命令读取当前 DevTools 的 IDE HTTP 服务端口（`.ide`），把它作为 `cli auto --port` 传入；再注册**独立的** Automator WebSocket 端口，并在握手成功后写入忽略文件 `tmp/devtools-automation-session.json`。该文件只保存端口、项目路径和时间，**不保存 token、手机号或 session**。
 
 ## 单页截图
 
@@ -27,7 +27,7 @@ node scripts/devtools/mp-route-shot.cjs \
 - 第 1 参数：页面路由（可带 query）
 - 第 2 参数：输出 PNG **绝对路径**
 - 第 3 参数 `force`：强制重新导航。同一路由不同 query 时必须加，否则拍到旧页
-- 端口默认 9429，`MP_AUTO_PORT=9430 node ...` 覆盖；换端口后要用上面的 `cli auto` 重新注册
+- 默认从 `tmp/devtools-automation-session.json` 读取已握手的唯一端口；仅在临时排障时用 `MP_AUTO_PORT=<port>` 覆盖。
 
 ## 合成对比图
 
@@ -44,12 +44,13 @@ python scripts/devtools/sidebyside.py \
 
 1. **automator 的 `reLaunch`/`navigateTo` promise 会挂起或报空错 `{}`**——脚本已改用 `mp.callWxMethod("reLaunch", {url})` 通道，不要改回去
 2. `mp.screenshot` 超时（60s）= 模拟器渲染面卡住。**先查 DevTools 主窗口是否失焦/最小化**——实测窗口不在前台会导致截图通道挂死，把窗口 ShowWindow 还原置前台即可恢复（无需重启）；不行再 `cli.bat quit` 后重新 `cli auto`
-3. 端口会莫名失效（`Failed connecting to ws://...`）——换个新端口重新 `cli auto` 注册即可，别在死端口上重试
+3. 端口拒绝连接（`Failed connecting to ws://...`）——不要猜 9421/9425/9429/9430/9432。重新执行上面的 `devtools:automator:open`；它会读取当前 IDE HTTP 端口并在真实 Automator 握手成功后更新唯一会话状态。
 4. **不要用 `DEV_AUTO_SESSION=true` 验生产页面**：生产 API 硬关 x-user-id 头鉴权，假会话只会 403，且残留 wx storage 造成持续 403（补救：`mp.callWxMethod("clearStorage")` + 干净重启）
 5. 授权弹窗/身份选择可用 **cua-driver 前景真点击**全自动（2026-08-14 验证）：`uv tool install cua-driver` → `cua-driver serve` → `get_window_state`（须选对 title 含「开发者工具」的窗口，wechatdevtools 还有 nw.js 外壳窗）拿元素坐标 → `click` 带 `delivery_mode:"foreground"`（Chromium 上 background/UIA Invoke 无效）→ 弹窗「允许」**只点一次**（双点复用 phone code 会 wechat-login 400）
-6. 强杀 DevTools 进程会白屏（`Ctrl+Win+Shift+B` 恢复），用 `cli.bat quit`
+6. 强杀 DevTools 进程会白屏；白屏或失效时由用户手动完全退出并重新打开 IDE，不要杀进程、反复 `cli auto`，也不要把问题误改到页面代码。
 7. 截图前留 8-15s 给编译；脚本内已含等待与轮询
-8. **`cli.bat auto/open` 启动的项目窗口会整窗白屏**（2026-08-14，UIA 仅 5 元素、截图纯白；automator 导航正常但 page.screenshot 必超时；清 GPU/Shader/Code 缓存、换端口、Ctrl+Win+Shift+B、反复 quit+auto 全部无效）。**用户手动正常打开的实例无此问题——白屏后恢复 = 请用户手动重启 IDE**，勿再用 cli 循环重启
+8. **不要把 CLI HTTP 端口当成 Automator 端口**：前者来自 DevTools `.ide`，后者由 `--auto-port` 独立注册。历史上的白屏多发生在未指定当前 IDE HTTP 端口、由 CLI 另起项目窗口时；现在只允许使用本 README 的唯一入口，白屏恢复仍由用户手动重启 IDE，禁止循环 `cli auto/open`。
+9. **新版 DevTools 可能没有独立“××的模拟器”窗口**：`devtools-simulator-capture.py` 会先兼容旧标题；若没有，再在唯一可见的 DevTools 主窗口内以 iPhone X 的纵向和横向黑色刘海定位完整 375×812 画布。不要改用固定屏幕坐标裁图，也不要手填过时窗口标题。
 
 ## 完整逐页验收循环
 

@@ -1,8 +1,9 @@
 // 只截当前页，不导航。用法: node scripts/devtools/mp-snap.cjs "<输出绝对路径>.png"
 const automator = require("miniprogram-automator");
+const { resolveAutomationPort } = require("./automation-session.cjs");
 
 const out = process.argv[2];
-const port = process.env.MP_AUTO_PORT || "9432";
+const port = String(resolveAutomationPort());
 if (!out) { console.error("usage: node scripts/devtools/mp-snap.cjs <out.png>"); process.exit(2); }
 
 (async () => {

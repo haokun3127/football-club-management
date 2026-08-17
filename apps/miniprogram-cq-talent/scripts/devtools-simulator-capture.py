@@ -132,10 +132,20 @@ def find_simulator_window(title: str | None) -> tuple[wintypes.HWND, str]:
     matches = [(hwnd, candidate) for hwnd, candidate in windows if candidate == title] if title else [
         (hwnd, candidate) for hwnd, candidate in windows if candidate.endswith(suffix)
     ]
+    if not matches and not title:
+        embedded_matches = [
+            (hwnd, candidate)
+            for hwnd, candidate in windows
+            if "\u5fae\u4fe1\u5f00\u53d1\u8005\u5de5\u5177" in candidate or "WeChat Web Devtools" in candidate
+        ]
+        if len(embedded_matches) == 1:
+            return embedded_matches[0]
+        if len(embedded_matches) > 1:
+            raise RuntimeError("Found multiple visible WeChat DevTools windows; set WECHAT_DEVTOOLS_SIMULATOR_TITLE to the exact simulator window title")
     if not matches:
         if title:
             raise RuntimeError(f"No visible WeChat DevTools simulator window found titled {title!r}")
-        raise RuntimeError("No visible WeChat DevTools simulator window found ending in the simulator suffix")
+        raise RuntimeError("No visible standalone DevTools simulator or unique DevTools main window found")
     if len(matches) > 1:
         raise RuntimeError("Found multiple visible DevTools simulator windows; set WECHAT_DEVTOOLS_SIMULATOR_TITLE to the exact window title")
     return matches[0]
@@ -196,23 +206,29 @@ def capture_window_bgra(hwnd: wintypes.HWND) -> tuple[bytes, int, int, int]:
         user32.ReleaseDC(0, screen_dc)
 
 
+def is_dark_pixel(bgra: bytes, window_width: int, x: int, y: int) -> bool:
+    index = (y * window_width + x) * 4
+    blue, green, red = bgra[index], bgra[index + 1], bgra[index + 2]
+    return red <= 12 and green <= 12 and blue <= 12
+
+
 def locate_iphone_x_viewport(bgra: bytes, window_width: int, window_height: int, dpi: int, logical_width: int, logical_height: int) -> tuple[int, int, int, int]:
     scale = dpi / 96.0
     width = rounded_pixels(logical_width * scale)
     height = rounded_pixels(logical_height * scale)
     if width > window_width or height > window_height:
         raise RuntimeError("Simulator window is smaller than the requested logical viewport at its current Windows scale")
-    center_x = window_width // 2
     notch_run = max(16, rounded_pixels(28 * scale))
+    notch_half_width = max(16, rounded_pixels(32 * scale))
     max_top = window_height - height
     for top in range(max_top + 1):
-        for offset in range(notch_run):
-            index = ((top + offset) * window_width + center_x) * 4
-            blue, green, red = bgra[index], bgra[index + 1], bgra[index + 2]
-            if red > 12 or green > 12 or blue > 12:
-                break
-        else:
-            return (window_width - width) // 2, top, width, height
+        for center_x in range(width // 2, window_width - (width - width // 2) + 1):
+            if not all(is_dark_pixel(bgra, window_width, center_x, top + offset) for offset in range(notch_run)):
+                continue
+            notch_y = top + notch_run // 2
+            if not all(is_dark_pixel(bgra, window_width, x, notch_y) for x in range(center_x - notch_half_width, center_x + notch_half_width + 1)):
+                continue
+            return center_x - width // 2, top, width, height
     raise RuntimeError("Could not locate the iPhone X simulator notch needed to crop the logical viewport")
 
 
