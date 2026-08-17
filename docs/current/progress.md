@@ -813,3 +813,11 @@
 - 真实业务边界保持不变：仍只投影 `session.capabilities.features.private_lessons` 的 enabled / unavailable / pending 状态；没有伪造 Figma 示例中的“接受私教预约”、周时段、17:00-20:00、价格、存储或 API 写入。
 - 验证：先让新的安全区断言因旧 `border-box` 失败，再以最小 WXSS 修改转绿；C16.2 定向 Vitest `4/4`、小程序 typecheck、`git diff --check` 和全仓门禁均通过（domain `19/19`、mini-program `326/326`、API `104/104`）。
 - 运行态边界：用户已授权本阶段不以新截图作为完成前置，因此本项为在线 Figma/源码/测试验收，不表述为新的 375×812 像素级运行态验收。
+
+## 2026-08-17 C16.3 教练账号安全区顶栏收口
+
+- 在线 Figma 基准已在改动前读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1262 / C16.3 Coach Account`；顶栏设计为 88px 软粉内容高度并叠加设备状态栏安全区。
+- 根因是 `.c163-nav` 通过 WXML 注入 `navInset` 后仍使用 `border-box`，导致动态状态栏内边距侵占 176rpx 的设计内容高度。现改为 `content-box`，其余卡片、资料和底部角色 tabbar 保持不变。
+- 真实数据边界保持：页面继续只读取当前登录教练和 `getCoachHome()` 返回的数据；没有采用在线稿的林教练、U10、手机号、认证、修改资料、密码、设备或清缓存样例，也没有新增未经契约支持的操作。
+- 验证：先让 C16.3 的安全区布局断言因旧 `border-box` 失败，再以最小 WXSS 改动转绿；C16.3 定向 Vitest `5/5`、小程序 typecheck、`git diff --check` 和全仓门禁通过（domain `19/19`、mini-program `326/326`、API `104/104`）。
+- 运行态边界：用户已授权本阶段不以新截图作为完成前置，因此本项为在线 Figma/源码/测试验收，不表述为新的 375×812 像素级运行态验收。

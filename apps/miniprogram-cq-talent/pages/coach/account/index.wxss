@@ -5,7 +5,7 @@
 
 .c163-nav {
   height: 176rpx;
-  box-sizing: border-box;
+  box-sizing: content-box;
   display: flex;
   align-items: center;
   gap: 24rpx;

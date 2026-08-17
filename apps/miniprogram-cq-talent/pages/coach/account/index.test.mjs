@@ -157,7 +157,7 @@ describe("coach account", () => {
     expect(controller).not.toContain("home.coachName");
     expect(controller).not.toMatch(/clearSession|getStorage|setStorage|showToast|showModal|reLaunch/);
     expect(template).not.toContain("c163-nav__placeholder");
-    expect(stylesheet).toMatch(/\.c163-nav\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*border-box[^}]*background:\s*#fceeef/s);
+    expect(stylesheet).toMatch(/\.c163-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*background:\s*#fceeef)/s);
     expect(stylesheet).toMatch(/\.c163-page__body\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+180rpx/s);
     expect(stylesheet).toMatch(/\.c163-content\s*\{[^}]*gap:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.c163-card\s*\{[^}]*border-radius:\s*24rpx/s);
