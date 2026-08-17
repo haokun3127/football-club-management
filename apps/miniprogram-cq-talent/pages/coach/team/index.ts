@@ -1,7 +1,7 @@
 import { getCoachTeam } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import { resolveNavInset } from "../../../utils/presentation";
+import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachTeamDetail, LoadState } from "../../../utils/types";
 
 type HeroStat = { label: string; value: string; valueClass: string };
@@ -14,8 +14,18 @@ type MemberView = {
   avatarColor: string;
 };
 
+type CoachView = {
+  id: string;
+  name: string;
+  initial: string;
+  roleLabel: string;
+  avatarBg: string;
+  avatarColor: string;
+};
+
 interface PageData {
   navInset: number;
+  menuInset: number;
   state: LoadState;
   message: string;
   retryLabel: string;
@@ -26,6 +36,9 @@ interface PageData {
   heroStats: HeroStat[];
   members: MemberView[];
   memberEmptyMessage: string;
+  hasCoaches: boolean;
+  coaches: CoachView[];
+  coachEmptyMessage: string;
 }
 
 const AVATAR_THEMES = [
@@ -47,6 +60,7 @@ Page<PageData>({
       const detail = await getCoachTeam();
       const hasTeam = detail.team !== null;
       const members = hasTeam ? toMembers(detail) : [];
+      const coaches = hasTeam ? toCoaches(detail) : [];
       this.setData({
         state: hasTeam ? "ready" : "empty",
         message: hasTeam ? "" : "近30天暂无可展示的球队",
@@ -58,6 +72,9 @@ Page<PageData>({
         heroStats: hasTeam ? toHeroStats(detail) : emptyHeroStats(),
         members,
         memberEmptyMessage: hasTeam && !members.length ? "近30天暂无执教学员" : "",
+        hasCoaches: coaches.length > 0,
+        coaches,
+        coachEmptyMessage: hasTeam && !coaches.length ? "暂未配置队伍教练" : "",
       });
     } catch {
       this.setData(emptyPageData("error", "队伍信息读取失败，请稍后重试。", "重新读取"));
@@ -78,6 +95,7 @@ Page<PageData>({
 function emptyPageData(state: LoadState, message: string, retryLabel = ""): PageData {
   return {
     navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     state,
     message,
     retryLabel,
@@ -88,6 +106,9 @@ function emptyPageData(state: LoadState, message: string, retryLabel = ""): Page
     heroStats: emptyHeroStats(),
     members: [],
     memberEmptyMessage: "",
+    hasCoaches: false,
+    coaches: [],
+    coachEmptyMessage: "",
   };
 }
 
@@ -118,6 +139,20 @@ function toMembers(detail: CoachTeamDetail): MemberView[] {
       id: member.id,
       name: member.name,
       initial: member.name.slice(0, 1),
+      avatarBg: theme.bg,
+      avatarColor: theme.color,
+    };
+  });
+}
+
+function toCoaches(detail: CoachTeamDetail): CoachView[] {
+  return (detail.coaches ?? []).map((coach, index) => {
+    const theme = AVATAR_THEMES[index % AVATAR_THEMES.length] ?? AVATAR_THEMES[0]!;
+    return {
+      id: coach.id,
+      name: coach.name,
+      initial: coach.name.slice(0, 1),
+      roleLabel: coach.role,
       avatarBg: theme.bg,
       avatarColor: theme.color,
     };

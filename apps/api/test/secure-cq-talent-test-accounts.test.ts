@@ -270,7 +270,12 @@ describe("secure Chongqing Talent test-account operation", () => {
         headers: { authorization: "Bearer " + coachToken },
       });
       expect(coach.statusCode).toBe(200);
-      expect(coach.json().members.map((student: { id: string }) => student.id)).toEqual(first.studentIds);
+      const coachBody = coach.json() as {
+        members: Array<{ id: string }>;
+        coaches?: Array<{ id: string; name: string; role: string }>;
+      };
+      expect(coachBody.members.map((student) => student.id)).toEqual(first.studentIds);
+      expect(coachBody.coaches).toEqual(expect.any(Array));
       expect(coach.payload).not.toContain(second.studentIds[0]!);
       expect(coach.payload).not.toContain("phone");
     } finally {

@@ -383,6 +383,7 @@ export interface CoachTeamDetail {
   team: { id: string; name: string; season: string } | null;
   stats: { memberCount: number; trainingCount: number; completedTrainingCount: number; attendanceRate: number | null };
   members: Array<{ id: string; name: string }>;
+  coaches?: Array<{ id: string; name: string; role: string }>;
 }
 
 export interface CoachTeamAbilityOverview {

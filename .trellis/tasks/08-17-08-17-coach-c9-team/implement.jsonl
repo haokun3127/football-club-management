@@ -1,0 +1,5 @@
+{"file":"docs/design/specifications/coach/design-spec-C9-team-detail.md","reason":"Local extraction of the C9 Figma hierarchy and geometry."}
+{"file":"docs/design/specifications/figma-online-frame-map-2026-08-12.md","reason":"Authoritative online Figma node mapping; C9 is node 93:924."}
+{"file":".trellis/spec/api/frontend/index.md","reason":"Miniprogram frontend development and verification conventions."}
+{"file":".trellis/spec/api/backend/index.md","reason":"Required if the established coach-team BFF needs the minimal real coach-card field."}
+{"file":".trellis/spec/guides/index.md","reason":"Cross-package engineering guides required by Trellis."}

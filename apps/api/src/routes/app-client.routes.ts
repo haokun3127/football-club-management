@@ -1806,6 +1806,15 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       const scope = await collectCoachScope(context, request.params.clubId, auth);
       const completedTrainingCount = await collectCoachCompletedTrainingCount(context, request.params.clubId, auth);
       const team = scope.teams[0] ?? null;
+      const primaryCoach = team
+        ? context.store.listTeams(request.params.clubId)
+          .find((candidate) => candidate.id === team.id)?.defaultCoachId
+        : undefined;
+      const coaches = primaryCoach
+        ? context.store.listCoaches(request.params.clubId)
+          .filter((coach) => coach.id === primaryCoach && coach.status === "active")
+          .map((coach) => ({ id: coach.id, name: coach.name, role: "教练" }))
+        : [];
       const decided = scope.events.flatMap((event) => event.participants ?? [])
         .filter((participant) => participant.status === "present" || participant.status === "absent" || participant.status === "excused");
       const present = decided.filter((participant) => participant.status === "present").length;
@@ -1821,6 +1830,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
           attendanceRate: decided.length ? Math.round((present / decided.length) * 100) : null,
         },
         members: scope.students,
+        coaches,
       };
     },
   );

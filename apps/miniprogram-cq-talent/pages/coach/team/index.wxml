@@ -1,5 +1,5 @@
 <view class="team-page">
-  <view class="team-nav" style="padding-top:{{navInset}}px">
+  <view class="team-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="team-nav__left" bindtap="goBack">
       <image class="team-nav__back" src="/assets/icons/chevron-left.svg" mode="aspectFit" />
       <view class="team-nav__title">队伍详情</view>
@@ -7,9 +7,9 @@
   </view>
 
   <view class="team-page__body">
-    <status-view state="{{state}}" title="队伍详情" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
+    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="队伍详情" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
 
-    <block wx:if="{{hasTeam}}">
+    <block wx:if="{{state === 'ready' && hasTeam}}">
       <view class="hero">
         <view class="hero__name">{{teamName}}</view>
         <view wx:if="{{season}}" class="hero__season">{{season}}</view>
@@ -30,6 +30,19 @@
       </view>
       <view wx:else class="members-empty">{{memberEmptyMessage}}</view>
 
+      <view class="coaches-section">
+        <view class="coaches-title">教练组</view>
+        <scroll-view wx:if="{{hasCoaches}}" class="coaches-scroll" scroll-x enable-flex show-scrollbar="{{false}}">
+          <view class="coaches-scroll__content">
+            <view wx:for="{{coaches}}" wx:key="id" class="coach-card">
+              <view class="coach-card__avatar" style="background: {{item.avatarBg}}; color: {{item.avatarColor}}">{{item.initial}}</view>
+              <view class="coach-card__name">{{item.name}}</view>
+              <view class="coach-card__role">{{item.roleLabel}}</view>
+            </view>
+          </view>
+        </scroll-view>
+        <view wx:else class="coaches-empty">{{coachEmptyMessage}}</view>
+      </view>
     </block>
   </view>
 

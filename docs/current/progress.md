@@ -734,3 +734,11 @@
 - 页面收口：ready 状态不再同时渲染 `status-view`；C6 去掉非画板眉题和额外状态 pill，时间线改为无分割线紧凑行；C6.1 将事件类型移到表单外、时间/球员/备注按画板顺序布局，备注改为真实多行输入；本机草稿弹层按钮顺序和颜色与画板一致。
 - 验证：先让新增 C6 结构回归失败，再完成最小实现；聚焦 C6/C6.1 Vitest `15/15`、全仓门禁通过（domain `19/19`、mini-program `322/322`、API `104/104`），小程序 typecheck 和 `git diff --check` 通过。
 - 运行态边界：Automator 成功从 C5 跳到 `/pages/coach/match/index`，屏幕像素通道输出严格 `375×812`，但画布仍显示旧 C4.2 页面；因此不把 C6 图片作为可信视觉通过，准确记录为 IDE 未刷新编译产物，未因此回滚页面实现。
+
+## 2026-08-17 C9 队伍详情页 Figma 复原
+
+- 在线 Figma 已读取 `zZ6wKyOHKcO4UYXDd9jGwv` 的 C9 节点 `93:924`，确认结构为软粉 88px 顶栏、深色队伍摘要、四列学员网格和横向教练卡。
+- `/coach/team` BFF 增加真实 `coaches` 数组：仅从当前教练可访问队伍的真实 `defaultCoachId` 查找 active 教练，返回 `id/name/role`，不返回全俱乐部教练目录或联系方式。
+- C9 前端增加真实教练组 view model、滚动卡片、菜单胶囊避让和 ready 状态门禁；成员仍从真实 scope 读取，点击继续进入真实学生雷达页。旧 BFF 没有 `coaches` 字段时归一为空数组，队伍正文不进入错误态。
+- 验证：先红后绿的 C9 小程序测试 `7/7`、API 安全账号测试 `11/11`；全仓门禁 domain `19/19`、小程序 `324/324`、API `104/104`，两端 typecheck、API build、`git diff --check` 通过。
+- DevTools Automator 已连接 `9424`，路由已切到 `pages/coach/team/index`，运行时确认 iPhone X 逻辑视口 `375×812`；屏幕像素裁剪因当前 Windows 主窗口找不到 iPhone X 刘海锚点而拒绝生成 PNG，未宣称视觉截图通过。此前本地 API `tsx watch` 进程仍存在但 `/health` 无响应，重启/启动动作被当前 Windows 执行策略阻止，需后续在可控终端重启本地 API 后再做运行态联调。

@@ -39,6 +39,12 @@
 - Base: coach saves two catalog project ids to a training event and receives `trainingSession.sessionPlanId`.
 - Bad: frontend passes `roleHint: "parent"` for a coach membership and expects parent privileges. Backend must still return coach role or reject by app client entrypoint.
 
+### Coach Team Detail Additive Response Fields
+
+- `GET /clubs/:clubId/app-clients/:clientId/coach/team` remains coach-scoped by active app client, club role and membership scope.
+- The response may include `coaches: [{ id, name, role }]`, derived only from the current scoped team's active default coach. It must not return the club-wide coach directory or phone/contact data.
+- Additive fields are compatible with rolling deployment: mini-program clients must normalize an absent `coaches` field to an empty list and keep the real team/member content visible.
+
 ### 6. Tests Required
 
 - OpenAPI path exists for each app-client BFF route.
