@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 17
+- **Total Sessions**: 18
 - **Last Active**: 2026-08-18
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~654 | Active |
+| `journal-1.md` | ~688 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 18 | 2026-08-18 | C16.1 permission scope runtime visual alignment | `048e4b1` | `dev` |
 | 17 | 2026-08-18 | C16 coach profile runtime visual alignment | `c366ec6` | `dev` |
 | 16 | 2026-08-17 | C11 runtime visual correction | `5452be7` | `dev` |
 | 15 | 2026-08-17 | C9 team detail Figma restoration | `e804cc0` | `dev` |

@@ -652,3 +652,37 @@ Aligned C16 coach profile top bar to the online Figma 88px content height, retai
 ### Next Steps
 
 - None - task complete
+
+
+## Session 18: C16.1 permission scope runtime visual alignment
+
+**Date**: 2026-08-18
+**Task**: C16.1 permission scope runtime visual alignment
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+Re-read live Figma node 93:1210, diagnosed stale Automator port 9424 versus active IDE HTTP port 61245, re-registered port 9420, captured strict 375x812 PrintWindow evidence, aligned the C16.1 top bar from 176rpx/44rpx to 88rpx/32rpx, preserved the honest server-driven empty permission state, passed red-green targeted tests and the serial root gate, and pushed the work commit.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `048e4b1` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
