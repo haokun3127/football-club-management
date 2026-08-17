@@ -27,6 +27,7 @@ interface AttendancePageData {
   roster: RosterUiItem[];
   hasRoster: boolean;
   rosterFooter: string;
+  correctionRosterFooter: string;
   saving: boolean;
   canSave: boolean;
   statusOptions: typeof statusOptions;
@@ -49,6 +50,7 @@ Page<AttendancePageData>({
     roster: [],
     hasRoster: false,
     rosterFooter: "",
+    correctionRosterFooter: "",
     saving: false,
     canSave: false,
     statusOptions,
@@ -71,6 +73,7 @@ Page<AttendancePageData>({
         roster: [],
         hasRoster: false,
         rosterFooter: "",
+        correctionRosterFooter: "",
         canSave: false,
         summary: emptySummary(),
         hasSaveError: false,
@@ -97,6 +100,7 @@ Page<AttendancePageData>({
         roster,
         hasRoster: roster.length > 0,
         rosterFooter: rosterFooterText(roster.length),
+        correctionRosterFooter: rosterFooterText(roster.length),
         canSave,
         summary: summarizeRoster(roster),
         saving: false,
@@ -110,6 +114,7 @@ Page<AttendancePageData>({
         roster: [],
         hasRoster: false,
         rosterFooter: "",
+        correctionRosterFooter: "",
         canSave: false,
         summary: emptySummary(),
         saving: false,

@@ -174,6 +174,7 @@ describe("coach attendance", () => {
     await page.onLoad({ id: "event-1", correction: "1" });
     expect(page.data).toMatchObject({
       correctionMode: true,
+      correctionRosterFooter: "共 3 名学员",
       roster: [
         { studentId: "student-late", status: "late" },
         { studentId: "student-leave", status: "leave_requested" },
@@ -216,7 +217,9 @@ describe("coach attendance", () => {
     expect(template).toContain('wx:for="{{roster}}"');
     expect(template).toContain("hasRoster");
     expect(template).toContain('wx:if="{{hasSaveError}}"');
-    expect(template).toContain('loading="{{saving}}"');
+    expect(template).toContain('<status-view wx:if="{{state !== \'ready\' && state !== \'idle\'}}"');
+    expect(template).toContain('wx:if="{{saving}}"');
+    expect(template).toContain("提交中...");
     expect(template).toContain('class="roster-footer"');
     expect(template).toContain('{{rosterFooter}}');
     expect(template).toContain('wx:if="{{item.statusIsPresent}}"');
@@ -226,7 +229,11 @@ describe("coach attendance", () => {
     expect(template).not.toContain("陈小宇");
     expect(template).not.toContain("林一诺");
     expect(template).not.toContain("共 20 名学员");
-    expect(template).toContain("请核对当前名单中的出勤状态和备注，再重新提交。");
+    expect(template).toContain("⚠️ 出勤记录需要修改");
+    expect(template).toContain("请核实后重新提交");
+    expect(template).toContain('<view wx:if="{{correctionMode}}" class="correction-list-header">');
+    expect(template).toContain("{{correctionRosterFooter}}");
+    expect(template).not.toContain("补充迟到、请假等说明（选填）");
     expect(template).not.toContain("异常");
     expect(template).not.toContain("家长异议");
     expect(controller).not.toContain("disputedCount");
@@ -242,6 +249,7 @@ describe("coach attendance", () => {
     expect(template).toContain('style="background: {{item.avatarColor}}"');
     expect(template).toContain('wx:if="{{correctionMode}}"');
     expect(controller).toContain("function avatarColor");
-    expect(stylesheet).toMatch(/\.c4-correction-submit\s*\{[^}]*bottom:\s*140rpx/s);
+    expect(stylesheet).toMatch(/\.c4-correction-submit\s*\{[^}]*bottom:\s*140rpx[^}]*padding:\s*44rpx/s);
+    expect(stylesheet).toMatch(/\.c4-correction-submit__button\s*\{[^}]*display:\s*flex/s);
   });
 });

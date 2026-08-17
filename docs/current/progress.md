@@ -710,3 +710,11 @@
 - 修复：`devtools-simulator-capture.py` 保留独立窗口路径；没有独立窗口时，选择唯一可见的 DevTools 主窗口，并搜索 iPhone X 刘海的纵向+横向黑色签名，以 DPI 比例裁出完整视口。新增偏离主窗口中心的 Python 回归测试，防止算法退回“只看正中心”的假设。
 - 实测：真实 `.ide` HTTP `61245` 通过 CLI 注册 Automator `9424`，`devtools:screenshot` 已读取 `/pages/coach/schedule/index`，输出 `563×1218` PNG；`systemInfo` 同时确认逻辑视口 `375×812`、`devicePixelRatio: 3`、均匀栅格比例约 `1.5`。图像只含小程序画布，没有 DevTools 边栏或弹窗。
 - 范围：这证明截图工具链恢复，不替代 C4/C4.1/C4.2 各自的 Figma 对照验收；下一页验收前仍须导航到目标路由并重新截图。
+
+## 2026-08-17 C4 出勤页复验与截图 DPI 收口
+
+- 在线 Figma 已逐页重新读取：C4 `93:665`、C4.1 `93:696`、C4.2 `93:715`（文件 `zZ6wKyOHKcO4UYXDd9jGwv`）。C4.1 的真实运行时对照确认 80px 成功图标、四行摘要、48px 通宽红色 CTA；CTA 文案收敛为画板的“查看训练详情”。
+- 真实读写证据：教练会话对安全测试活动 `event-cq-talent-secure-test-1-trn-0817` 执行页面既有“全员到场 → 提交”；两名真实学员由 `pending` 持久化为 `present`，C4.1 按 eventId 重新 GET 后读回 `2/2`。未创建前端 mock、伪 session、伪角色或伪名单。
+- C4.2 依据 `93:715` 重建通用订正态：警示卡、48px 三角图标、紧凑“学员列表 / 共 N 名学员”卡和 52px 固定重新提交区与画板结构一致；真实到课状态仍以绿色确认圈呈现。没有伪造“家长异议”“异常数量”或不受 API 支持的全局修改说明，原来的逐人空备注输入也不再冒充该设计字段。
+- 可信截图通道补齐 Windows DPI：当 DevTools 在 150% 缩放下捕获 `563×1218` 物理画布时，`devtools-simulator-capture.py` 仍以高质量缩放输出严格的 `375×812` PNG，并由 Python 回归覆盖。Automator 的 `mp.screenshot` 仍可能在路由成功后超时；该 SDK 限制不影响屏幕像素通道。
+- 验证：C4 聚焦 Vitest `7/7`、C4.1 聚焦 Vitest `4/4`、截图脚本 Python `4/4`、小程序 typecheck、`git diff --check` 与完整门禁均通过（domain `19/19`、mini-program `322/322`、API `104/104`）。已产出真实 C4、C4.1、C4.2 375×812 截图与左右对比图；最后一次 ready 状态宿主消除由页面回归覆盖。DevTools CLI 无“仅编译当前已打开 IDE”的安全命令，故在用户已允许不以最后一次视觉截图为完成前置的前提下，不将该最后一处宿主变更误报为新鲜运行态像素验收。

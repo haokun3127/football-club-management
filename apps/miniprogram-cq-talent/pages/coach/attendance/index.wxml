@@ -2,14 +2,19 @@
   <app-header theme="soft" title="{{correctionMode ? '出勤修改' : '出勤管理'}}" title-align="left" large-title action-text="{{canSave && !saving && !correctionMode ? '提交' : ''}}" bindaction="saveAttendance" show-back />
 
   <view class="c4-body">
-    <status-view state="{{state}}" title="{{state === 'loading' ? '正在读取名单' : state === 'empty' ? '暂无学员' : '名单读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重新加载' : ''}}" bindaction="retry" />
+    <status-view wx:if="{{state !== 'ready' && state !== 'idle'}}" state="{{state}}" title="{{state === 'loading' ? '正在读取名单' : state === 'empty' ? '暂无学员' : '名单读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重新加载' : ''}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready' && hasRoster}}">
       <view wx:if="{{correctionMode}}" class="correction-alert">
-        <view class="correction-alert__icon">!</view>
+        <view class="correction-alert__icon">
+          <view class="correction-alert__triangle">
+            <view class="correction-alert__triangle-bar"></view>
+            <view class="correction-alert__triangle-dot"></view>
+          </view>
+        </view>
         <view class="correction-alert__texts">
-          <view class="correction-alert__title">出勤更正模式</view>
-          <view class="correction-alert__text">请核对当前名单中的出勤状态和备注，再重新提交。</view>
+          <view class="correction-alert__title">⚠️ 出勤记录需要修改</view>
+          <view class="correction-alert__text">请核实后重新提交</view>
         </view>
       </view>
 
@@ -29,6 +34,10 @@
       </view>
 
       <view class="roster-card">
+        <view wx:if="{{correctionMode}}" class="correction-list-header">
+          <view class="correction-list-header__title">学员列表</view>
+          <view class="correction-list-header__count">{{correctionRosterFooter}}</view>
+        </view>
         <view wx:for="{{roster}}" wx:key="studentId" class="attendance-row">
           <view class="attendance-main">
             <view class="student-info">
@@ -43,17 +52,17 @@
               <status-chip wx:else label="{{item.statusLabel}}" tone="{{item.statusTone}}" />
             </picker>
           </view>
-          <input wx:if="{{correctionMode}}" class="note-input" placeholder="补充迟到、请假等说明（选填）" value="{{item.note}}" disabled="{{saving || !canSave}}" data-index="{{index}}" bindinput="onNoteInput" />
         </view>
       </view>
 
-      <view wx:if="{{rosterFooter}}" class="roster-footer">{{rosterFooter}}</view>
+      <view wx:if="{{rosterFooter && !correctionMode}}" class="roster-footer">{{rosterFooter}}</view>
 
       <view wx:if="{{hasSaveError}}" class="save-error">{{saveError}}</view>
     </block>
   </view>
   <view wx:if="{{state === 'ready' && hasRoster && correctionMode}}" class="c4-correction-submit">
-    <button class="c4-correction-submit__button" loading="{{saving}}" disabled="{{saving || !canSave}}" bindtap="saveAttendance">重新提交</button>
+    <view wx:if="{{saving}}" class="c4-correction-submit__button c4-correction-submit__button--disabled">提交中...</view>
+    <view wx:else class="c4-correction-submit__button" bindtap="saveAttendance">重新提交</view>
   </view>
   <role-tabbar role="coach" active="schedule" />
 </view>
