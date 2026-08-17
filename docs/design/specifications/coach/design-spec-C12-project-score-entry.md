@@ -38,4 +38,4 @@
 
 `npx --yes pnpm@10.33.0 run check`
 
-> 全仓门禁于 2026-08-17 的 API 测试阶段退出 1：`apps/api/test/app-client-match-event-create.test.ts:135`（10 秒超时）和 `apps/api/test/persistence.test.ts:13`（15 秒超时）。它们是 API SQLite 持久化在途区域，不属于本 C12 页面改动；C12 定向回归、Mini Program typecheck、`git diff --check` 和真实截图验收均独立通过。
+> 2026-08-17 串行复跑全仓门禁通过：domain `19/19`、mini-program `332/332`、API `105/105`，退出码 `0`。C12 定向 Vitest 最新为 `18/18`；此前 API SQLite 重开超时属于旧并发检查记录，已不再代表当前门禁状态。

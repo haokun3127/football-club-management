@@ -21,11 +21,17 @@ Verify the live coach-facing project-score-entry route against online Figma node
 
 ## Acceptance Criteria
 
-- [ ] A real C12 route with production-backed assessment data is reached without using Figma fixtures.
-- [ ] A trustworthy 375×812 runtime screenshot and an online-Figma comparison artifact exist.
-- [ ] Header, task summary, student-grid, fixed submit area, and coach TabBar are classified against the design; any actual layout differences are repaired and rechecked.
-- [ ] Focused C12 tests, mini-program typecheck, `git diff --check`, and the full workspace `check` pass.
-- [ ] Only task-owned paths are included in the commit; pre-existing dirty paths remain untouched.
+- [x] A real C12 route with production-backed assessment data is reached without using Figma fixtures.
+- [x] A trustworthy 375×812 runtime screenshot and an online-Figma comparison artifact exist.
+- [x] Header, task summary, student-grid, fixed submit area, and coach TabBar are classified against the design; any actual layout differences are repaired and rechecked.
+- [x] Focused C12 tests, mini-program typecheck, `git diff --check`, and the full workspace `check` pass.
+- [x] Only task-owned paths are included in the commit; pre-existing dirty paths remain untouched.
+
+## Verification record
+
+- 2026-08-17: The real route `pages/coach/test-entry/index?eventId=event-cq-talent-demo-training-upcoming` was reached with production-backed assessment data; Figma fixtures were not used.
+- 2026-08-17: Runtime evidence exists at `tmp/coach-runtime-acceptance/C12-acceptance-phone-final.png`, with the online reference and side-by-side comparison in the same directory; all are logical `375×812` artifacts.
+- 2026-08-17: Focused C12 Vitest passed `18/18`; mini-program typecheck passed; the serial workspace gate passed with domain `19/19`, mini-program `332/332`, and API `105/105`; `git diff --check` passed.
 
 ## Out of Scope
 
