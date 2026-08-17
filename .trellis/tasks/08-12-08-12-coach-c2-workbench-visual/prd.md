@@ -28,15 +28,16 @@ existing authenticated event/workbench actions and truthful backend data.
 
 ## Acceptance Criteria
 
-- [ ] A focused regression fails against the old C2 bottom-tab/multi-colour
+- [x] A focused regression fails against the old C2 bottom-tab/multi-colour
   action-card structure and passes after the Figma page structure is restored.
-- [ ] C2 preserves real workbench states: long titles, cancelled activities,
+- [x] C2 preserves real workbench states: long titles, cancelled activities,
   training/match action availability, and unsupported Figma sample values are
   still absent.
-- [ ] The focused C2 suite, mini-program typecheck, `git diff --check`, and
+- [x] The focused C2 suite, mini-program typecheck, `git diff --check`, and
   root check pass before the batch commit.
-- [ ] A current Figma read and runtime-capture boundary are recorded. No
-  visual completion is claimed without an authenticated 375x812 capture.
+- [x] A current Figma read and runtime-capture boundary are recorded. The user
+  explicitly waived a new runtime screenshot as a completion prerequisite for
+  this goal; the task does not claim pixel-level visual acceptance.
 
 ## Notes
 

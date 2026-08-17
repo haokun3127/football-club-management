@@ -16,12 +16,12 @@ Restore C6 match entry, C6.1 match-event add, and C6.2 saved-draft state against
 
 ## Acceptance Criteria
 
-- [ ] C6 loads a real coach match detail and renders only real teams, score status and events; its add-event entry remains available only when permitted by the current API result.
-- [ ] C6.1 writes one real event through the existing API, preserves retry-safe idempotency and rereads correctly after returning to C6.
-- [ ] C6.2 exposes only a locally persisted, not-yet-submitted event draft with a truthful continuation/exit flow.
-- [ ] C6/C6.1/C6.2 match the online Figma hierarchy and key geometry without copying unsupported example data.
-- [ ] Focused miniprogram/API regressions, typecheck, `git diff --check`, and the full repository check pass before the scoped commit.
-- [ ] A trustworthy 375x812 capture is attempted for C6/C6.1; if IDE compilation fails to refresh, the exact boundary is recorded and visual completion is not overstated.
+- [x] C6 loads a real coach match detail and renders only real teams, score status and events; its add-event entry remains available only when permitted by the current API result.
+- [x] C6.1 writes one real event through the existing API, preserves retry-safe idempotency and rereads correctly after returning to C6.
+- [x] C6.2 exposes only a locally persisted, not-yet-submitted event draft with a truthful continuation/exit flow.
+- [x] C6/C6.1/C6.2 match the online Figma hierarchy and key geometry without copying unsupported example data.
+- [x] Focused miniprogram/API regressions, typecheck, `git diff --check`, and the full repository check pass before the scoped commit.
+- [x] The user explicitly waived new runtime screenshots as a completion prerequisite for this goal; C6/C6.1/C6.2 remain documented as source/data/test evidence only and are not called pixel-accepted.
 
 ## Notes
 

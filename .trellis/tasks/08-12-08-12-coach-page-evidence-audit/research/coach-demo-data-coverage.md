@@ -58,3 +58,42 @@ The DevTools screenshot channel has been proven to write a genuine 375x812
 PNG, but the active simulator route is the real login page. It has not yet
 been authenticated as a coach in this audit. Therefore no coach screen in
 this task is labelled visually accepted merely because its data is ready.
+
+## Route-level evidence classification — 2026-08-17
+
+The following is the durable route/node inventory used for the final coach
+restoration audit. Every row has online-Figma/source/test evidence. The current
+goal explicitly waives a new authenticated simulator screenshot as a blocking
+criterion, so every row is classified as `static-only (screenshot waived)`;
+none is described as pixel-level runtime accepted.
+
+| Page | Online node | Route | Evidence classification |
+| --- | --- | --- | --- |
+| C1 Schedule Home | `93:578` | `/pages/coach/schedule` | static-only (screenshot waived) |
+| C2 Activity Workbench | `93:606` | `/pages/coach/event` | static-only (screenshot waived) |
+| C3 Activity Change | `93:634` | `/pages/coach/event-change` | static-only (screenshot waived) |
+| C4 Attendance | `93:665` | `/pages/coach/attendance` | static-only (screenshot waived) |
+| C4.1 Attendance Success | `93:696` | `/pages/coach/attendance-success` | static-only (screenshot waived) |
+| C4.2 Attendance Correction | `93:715` | `/pages/coach/attendance?correction=1` | static-only (screenshot waived) |
+| C5 Lesson Confirm | `93:734` | `/pages/coach/lesson` | static-only (screenshot waived) |
+| C5.1 Lesson Correction | `93:765` | `/pages/coach/lesson-correction` | static-only (screenshot waived) |
+| C6 Match Entry | `93:796` | `/pages/coach/match` | static-only (screenshot waived) |
+| C6.1 Add Match Event | `93:827` | `/pages/coach/match-event-add` | static-only (screenshot waived) |
+| C6.2 Match Save State | `93:858` | match `savedFlash` state | static-only (screenshot waived) |
+| C7 Tactical Board | `93:877` | `/pages/coach/tactical-board` | static-only (screenshot waived) |
+| C8 Training Management | `93:896` | `/pages/coach/training` | static-only (screenshot waived) |
+| C9 Team Detail | `93:924` | `/pages/coach/team` | static-only (screenshot waived) |
+| C10 Training Content Select | `93:952` | `/pages/coach/content-select` | static-only (screenshot waived) |
+| C10.1 Coverage Preview | `93:983` | `/pages/coach/coverage` | static-only (screenshot waived) |
+| C11 Test Task List | `93:1002` | `/pages/coach/test-tasks` | static-only (screenshot waived) |
+| C12 Project Score Entry | `93:1030` | `/pages/coach/test-entry` | static-only (screenshot waived) |
+| C12.1 Autosave State | `93:1061` | `/pages/coach/assessment-entry` draft state | static-only (screenshot waived) |
+| C13 Student Radar | `93:1080` | `/pages/coach/student-radar` | static-only (screenshot waived) |
+| C14 Team Ability Overview | `93:1106` | `/pages/coach/team-ability` | static-only (screenshot waived) |
+| C15 Assessment Entry | `93:1132` | `/pages/coach/assessment-entry` | static-only (screenshot waived) |
+| C15.1 Assessment Submit | `93:1163` | `/pages/coach/assessment-submit` | static-only (screenshot waived) |
+| C16 Coach Me | `93:1182` | `/pages/coach/me` | static-only (screenshot waived) |
+| C16.1 Permission Scope | `93:1210` | `/pages/coach/permissions` | static-only (screenshot waived) |
+| C16.2 Private Interest | `93:1238` | `/pages/coach/private-interest` | static-only (screenshot waived) |
+| C16.3 Coach Account | `93:1262` | `/pages/coach/account` | static-only (screenshot waived) |
+| C16.4 Coach Help | `93:1286` | `/pages/coach/help` | static-only (screenshot waived) |

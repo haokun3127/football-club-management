@@ -25,15 +25,17 @@ that each page needs for meaningful inspection.
 
 ## Acceptance Criteria
 
-- [ ] A durable data coverage matrix distinguishes currently available
+- [x] A durable data coverage matrix distinguishes currently available
   backend records from pages that still require a real write/readback.
-- [ ] The focused fixture/server suite proves the demo data can be read after
+- [x] The focused fixture/server suite proves the demo data can be read after
   file-backed SQLite restart, including role switch, attendance, assessment,
   match, and tactical-board paths.
-- [ ] Every page has an explicit evidence classification: runtime captured,
+- [x] Every page has an explicit evidence classification: runtime captured,
   static-only, data-ready but awaiting authenticated capture, or data-blocked.
-- [ ] The audit does not claim visual acceptance without an authenticated
-  375x812 route capture and a comparison to the matching online Figma node.
+- [x] The audit does not claim visual acceptance without an authenticated
+  375x812 route capture and a comparison to the matching online Figma node;
+  this remains a static/data/test audit because the user waived screenshots as
+  a completion prerequisite for the current goal.
 
 ## Notes
 

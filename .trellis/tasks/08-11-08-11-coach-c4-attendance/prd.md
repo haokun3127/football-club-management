@@ -15,12 +15,12 @@ Restore coach attendance, success, and correction pages against Figma nodes 93:6
 
 ## Acceptance Criteria
 
-- [ ] C4 reads and writes real persisted attendance through the existing event-scoped API, including a reload/readback after saving.
-- [ ] The opt-in acceptance seed provides a coach-visible roster and real event participants sufficient to inspect pending, present, late and absent attendance states without exposing extra children to a parent.
-- [ ] C4 and C4.1 match their corresponding online Figma node structure and specified visual geometry. C4.2 is a truthful general correction variant: it adopts the warning-card and submit layout of node `93:715`, but must not claim or fabricate its unsupported parent-dispute list or correction-note data.
-- [ ] Focused page tests and mini-program typecheck pass; API seed tests run if seed data changes.
-- [ ] C4, C4.1 and C4.2 each use a full 375x812 runtime capture. If the known capture capability boundary recurs, no visual completion claim is made and the exact failure is recorded.
-- [ ] The task documentation, progress log and a scoped commit contain only this batch's files.
+- [x] C4 reads and writes real persisted attendance through the existing event-scoped API, including a reload/readback after saving.
+- [x] The opt-in acceptance seed provides a coach-visible roster and real event participants sufficient to inspect pending, present, late and absent attendance states without exposing extra children to a parent.
+- [x] C4 and C4.1 match their corresponding online Figma node structure and specified visual geometry. C4.2 is a truthful general correction variant: it adopts the warning-card and submit layout of node `93:715`, but does not claim or fabricate its unsupported parent-dispute list or correction-note data.
+- [x] Focused page tests and mini-program typecheck pass; API seed tests run if seed data changes.
+- [x] The user explicitly waived new runtime screenshots as a completion prerequisite for this goal; C4/C4.1/C4.2 remain documented as source/data/test evidence only and are not called pixel-accepted.
+- [x] The task documentation, progress log and scoped implementation commits contain only this batch's files.
 
 ## Notes
 

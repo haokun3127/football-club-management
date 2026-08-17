@@ -19,12 +19,12 @@ Restore coach lesson and lesson-correction pages against the current online Figm
 
 ## Acceptance Criteria
 
-- [ ] C5 reads real lesson-confirmation data, confirms through the existing API, and reloads the event-scoped result.
-- [ ] C5.1 writes and re-reads a real per-student lesson correction while retaining existing idempotency and coach event scope.
-- [ ] The opt-in acceptance seed or normal write path provides a real, coach-visible lesson roster and ledger sufficient to inspect a confirmation and a correction without exposing unguarded students to a parent.
-- [ ] Focused lesson/correction tests, API tests when seed data changes, mini-program typecheck, the full repository check and `git diff --check` pass.
-- [ ] The C5/C5.1 API contract remains covered for non-coach/unauthorized-event rejection and parent participant projection remains unchanged.
-- [ ] C5 and C5.1 each have a trustworthy 375x812 runtime capture, or the exact capture failure is recorded without claiming visual acceptance.
+- [x] C5 reads real lesson-confirmation data, confirms through the existing API, and reloads the event-scoped result.
+- [x] C5.1 writes and re-reads a real per-student lesson correction while retaining existing idempotency and coach event scope.
+- [x] The opt-in acceptance seed or normal write path provides a real, coach-visible lesson roster and ledger sufficient to inspect a confirmation and a correction without exposing unguarded students to a parent.
+- [x] Focused lesson/correction tests, API tests when seed data changes, mini-program typecheck, the full repository check and `git diff --check` pass.
+- [x] The C5/C5.1 API contract remains covered for non-coach/unauthorized-event rejection and parent participant projection remains unchanged.
+- [x] The user explicitly waived new runtime screenshots as a completion prerequisite for this goal; C5/C5.1 remain documented as source/data/test evidence only and are not called pixel-accepted.
 
 ## Notes
 
