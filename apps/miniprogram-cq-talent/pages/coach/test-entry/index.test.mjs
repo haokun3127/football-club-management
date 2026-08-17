@@ -276,7 +276,10 @@ describe("coach project score entry", () => {
     expect(pageConfig).not.toContain('"submit-bar"');
     expect(template).toContain('/assets/icons/c12-arrow-left.svg');
     expect(stylesheet).toMatch(/\.c12-submit-wrap\s*\{[^}]*bottom:\s*140rpx/s);
-    expect(stylesheet).toMatch(/\.c12-body\s*\{[^}]*padding:\s*32rpx 32rpx 320rpx/s);
+    expect(template).toContain("{{navTitle}}");
+    expect(stylesheet).toMatch(/\.c12-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+    expect(stylesheet).toMatch(/\.c12-body\s*\{[^}]*padding:\s*32rpx 44rpx 320rpx/s);
+    expect(stylesheet).toMatch(/\.c12-submit-wrap\s*\{[^}]*padding:\s*14rpx 44rpx 18rpx/s);
   });
 
   it("offers only the latest valid local draft and blocks the underlying assessment until continuing", async () => {
@@ -290,7 +293,7 @@ describe("coach project score entry", () => {
     const page = createPageInstance();
     await page.load("event-assessment-1");
 
-    expect(page.data).toMatchObject({ draftResumeVisible: true, canSubmit: false });
+    expect(page.data).toMatchObject({ draftResumeVisible: true, canSubmit: false, navTitle: "成绩录入" });
     expect(page.data.draftResumeUpdatedAtLabel).toContain("本机草稿");
     expect(page.data.draftResumeUpdatedAtLabel).toContain("2026-08-10 10:12");
     page.onValueInput({ currentTarget: { dataset: { studentId: "student-2" } }, detail: { value: "72" } });
@@ -301,7 +304,7 @@ describe("coach project score entry", () => {
     expect(mocks.submitCoachAssessment).not.toHaveBeenCalled();
 
     page.continueDraft();
-    expect(page.data).toMatchObject({ draftResumeVisible: false, canSubmit: true });
+    expect(page.data).toMatchObject({ draftResumeVisible: false, canSubmit: true, navTitle: "项目评分录入" });
     page.onValueInput({ currentTarget: { dataset: { studentId: "student-2" } }, detail: { value: "72" } });
     expect(page.data.draft["student-2:item-speed"]).toMatchObject({ status: "recorded", rawValue: "72" });
   });

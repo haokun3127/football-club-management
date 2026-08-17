@@ -2,7 +2,7 @@
   <view class="c12-nav" style="padding-top: {{navInset}}px; padding-right: {{menuInset}}px">
     <view class="c12-nav__left" bindtap="goBack">
       <image class="c12-nav__back" src="/assets/icons/c12-arrow-left.svg" mode="aspectFit" />
-      <text class="c12-nav__title">项目评分录入</text>
+      <text class="c12-nav__title">{{navTitle}}</text>
     </view>
     <text class="c12-nav__action" bindtap="submitAssessment">提交</text>
   </view>

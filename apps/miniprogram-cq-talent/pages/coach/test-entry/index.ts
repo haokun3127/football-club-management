@@ -38,6 +38,7 @@ type DraftRow = {
 interface PageData {
   navInset: number;
   menuInset: number;
+  navTitle: string;
   state: LoadState;
   statusTitle: string;
   message: string;
@@ -81,6 +82,7 @@ Page<PageData>({
   data: {
     navInset: resolveNavInset(),
     menuInset: resolveMenuInset(),
+    navTitle: "项目评分录入",
     state: "idle",
     statusTitle: "项目评分录入",
     message: "",
@@ -138,6 +140,7 @@ Page<PageData>({
 
     this.setData({
       state: "loading",
+      navTitle: "项目评分录入",
       statusTitle: "正在读取评分项目",
       message: "",
       eventId,
@@ -202,6 +205,7 @@ Page<PageData>({
       const draftResumeVisible = hasEntries && validDrafts.length > 0;
       this.setData({
         state: hasEntries ? "ready" : "empty",
+        navTitle: draftResumeVisible ? "成绩录入" : "项目评分录入",
         statusTitle: hasEntries ? "" : "暂无可录入内容",
         message: hasEntries ? "" : "当前活动没有可录入的学员或评分项目。",
         eventId,
@@ -242,6 +246,7 @@ Page<PageData>({
     if (!this.isCurrentLoad(loadToken)) return;
     this.setData({
       state: "error",
+      navTitle: "项目评分录入",
       statusTitle: "暂时无法录入",
       message,
       eventId,
@@ -282,6 +287,7 @@ Page<PageData>({
     const canSubmit = this.data.state === "ready" && Boolean(this.data.roster.length && this.data.currentField);
     this.setData({
       draftResumeVisible: false,
+      navTitle: "项目评分录入",
       canSubmit,
       submitClass: canSubmit ? "c12-submit" : "c12-submit c12-submit--disabled",
     });

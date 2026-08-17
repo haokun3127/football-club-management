@@ -5,7 +5,7 @@
 }
 
 .c12-nav {
-  box-sizing: border-box;
+  box-sizing: content-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -43,7 +43,7 @@
 
 .c12-body {
   box-sizing: border-box;
-  padding: 32rpx 32rpx 320rpx;
+  padding: 32rpx 44rpx 320rpx;
 }
 
 .c12-task-header {
@@ -280,7 +280,7 @@
   z-index: 4;
   box-sizing: border-box;
   min-height: 140rpx;
-  padding: 14rpx 32rpx 18rpx;
+  padding: 14rpx 44rpx 18rpx;
   border-top: 1rpx solid #e7eaf0;
   background: #ffffff;
 }
