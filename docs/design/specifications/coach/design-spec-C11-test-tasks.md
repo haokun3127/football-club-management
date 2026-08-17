@@ -78,7 +78,7 @@
         - [6] | Vector | 5x0 @(264,4485) | fill=#000000 | stroke=#a80f1b w1.3
       - [13] | 训练管理 | 121x14 @(207,4493) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="训练管理"
       - [9] | Ellipse | 4x4 @(266,4510) | fill=#a80f1b
-  - [4] | tab_2 | 125x56 @(330,4462)
+    - [4] | tab_2 | 125x56 @(330,4462)
       - [4] | icon_2 | 22x22 @(382,4468)
         - [6] | Vector | 8x8 @(388,4471) | stroke=#8e97a6 w1.6
         - [6] | Vector | 16x8 @(384,4480) | stroke=#8e97a6 w1.6
