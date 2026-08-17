@@ -116,8 +116,8 @@ describe("coach lesson correction", () => {
   it("renders only the truthful dual-read intersection and fixed half-lesson edits", async () => {
     const page = await loadReadyPage();
     expect(page.data.rows).toEqual([
-      expect.objectContaining({ studentId: "student-1", name: "Athlete One", balanceText: "剩余 7 课时", delta: 0 }),
-      expect.objectContaining({ studentId: "student-2", name: "Athlete Two", balanceText: "剩余 5 课时", delta: 0 }),
+      expect.objectContaining({ studentId: "student-1", name: "Athlete One", balanceText: "原值: 7课时", delta: 0 }),
+      expect.objectContaining({ studentId: "student-2", name: "Athlete Two", balanceText: "原值: 5课时", delta: 0 }),
     ]);
 
     setDelta(page, "student-1", 1);
@@ -170,12 +170,14 @@ describe("coach lesson correction", () => {
     expect(globalThis.wx.navigateBack).toHaveBeenCalledWith({ delta: 1 });
   });
 
-  it("uses safe precomputed template data without a fabricated anomaly source or Figma samples", () => {
+  it("uses the C5.1 warning copy without fabricating sample students or anomaly data", () => {
     expect(template).toContain('<app-header theme="soft" title="课时更正" title-align="left" show-back />');
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
     expect(template).not.toContain("系统差异");
-    expect(template).toContain("课时记录需要更正");
-    expect(template).not.toContain("课时记录异常");
+    expect(template).toContain('class="correction-intro__warning"');
+    expect(template).toContain(">课时记录异常</text>");
+    expect(template).toContain("请检查并更正以下学员的课时记录");
+    expect(template).not.toContain("课时记录需要更正");
     expect(template).not.toContain("陈小宇");
     expect(template).not.toContain("王一涵");
     expect(template).not.toContain("1.5");
@@ -183,12 +185,15 @@ describe("coach lesson correction", () => {
     expect(controller).not.toContain("error.message");
   });
 
-  it("uses the C5.1 Figma soft header and fixed correction action above the coach tab bar", () => {
+  it("uses the C5.1 Figma content inset and normal-flow correction action", () => {
     const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
     expect(template).toContain('<app-header theme="soft" title="课时更正" title-align="left" show-back />');
     expect(template).toContain('<status-view wx:if="{{state !== \'ready\' && state !== \'idle\'}}"');
     expect(template).toContain('class="lesson-correction-submit"');
-    expect(styles).toContain("bottom: 140rpx");
+    expect(styles).toContain("padding: 44rpx 44rpx calc(120rpx + env(safe-area-inset-bottom));");
+    expect(styles).toMatch(/\.correction-intro__warning\s*\{[^}]*clip-path:\s*polygon/s);
+    expect(styles).not.toMatch(/\.lesson-correction-submit\s*\{[^}]*position:\s*fixed/s);
+    expect(styles).not.toMatch(/\.lesson-correction-submit\s*\{[^}]*bottom:/s);
     expect(styles).toMatch(/\.lesson-correction-submit__button\s*\{[^}]*height:\s*104rpx/s);
     expect(styles).not.toMatch(/\.lesson-correction-submit\s*\{[^}]*box-shadow/s);
   });

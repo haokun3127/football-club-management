@@ -11,7 +11,13 @@
 
     <block wx:if="{{state === 'ready' && hasRows}}">
       <view class="correction-intro">
-        <view class="correction-intro__title">课时记录需要更正</view>
+        <view class="correction-intro__title">
+          <view class="correction-intro__warning">
+            <view class="correction-intro__warning-bar"></view>
+            <view class="correction-intro__warning-dot"></view>
+          </view>
+          <text>课时记录异常</text>
+        </view>
         <view class="correction-intro__text">请检查并更正以下学员的课时记录</view>
       </view>
 
@@ -34,12 +40,13 @@
         </view>
       </view>
 
+      <view wx:if="{{hasRows}}" class="lesson-correction-submit">
+        <view wx:if="{{submitting}}" class="lesson-correction-submit__button lesson-correction-submit__button--disabled">保存中...</view>
+        <view wx:else class="lesson-correction-submit__button" bindtap="submit">保存更正</view>
+      </view>
+
       <view wx:if="{{hasSubmitError}}" class="submit-error">{{submitError}}</view>
     </block>
-  </view>
-  <view wx:if="{{state === 'ready' && hasRows}}" class="lesson-correction-submit">
-    <view wx:if="{{submitting}}" class="lesson-correction-submit__button lesson-correction-submit__button--disabled">保存中...</view>
-    <view wx:else class="lesson-correction-submit__button" bindtap="submit">保存更正</view>
   </view>
   <role-tabbar role="coach" active="schedule" />
 </view>

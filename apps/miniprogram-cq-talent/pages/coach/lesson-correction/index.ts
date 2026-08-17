@@ -210,7 +210,7 @@ function mergeCorrectionRows(
         name,
         avatarLetter: name.slice(0, 1),
         avatarColor: correctionAvatarColor(student.studentId),
-        balanceText: typeof balance === "number" ? `剩余 ${balance} 课时` : "课时余额待核对",
+        balanceText: typeof balance === "number" ? `原值: ${balance}课时` : "课时余额待核对",
         delta: previous?.delta ?? 0,
         deltaLabel: formatDelta(previous?.delta ?? 0),
         operationKey: previous?.operationKey ?? "",
