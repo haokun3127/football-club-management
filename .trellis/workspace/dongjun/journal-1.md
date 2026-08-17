@@ -550,3 +550,37 @@ Committed the secure production identity and isolated test-account hardening, up
 ### Next Steps
 
 - None - task complete
+
+
+## Session 15: C9 team detail Figma restoration
+
+**Date**: 2026-08-17
+**Task**: C9 team detail Figma restoration
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+Read online Figma C9 node 93:924, restored the coach-card section with a scoped default-coach BFF field, added rolling-deployment compatibility and regression tests, passed the full check, pushed dev, and recorded the DevTools screenshot boundary.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `e804cc0` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
