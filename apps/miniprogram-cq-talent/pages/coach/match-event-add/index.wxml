@@ -2,14 +2,25 @@
   <app-header theme="soft" title="添加比赛事件" title-align="left" show-back />
 
   <view class="match-event-page__body">
-    <status-view state="{{state}}" title="比赛事件" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
+    <status-view wx:if="{{state !== 'ready' && state !== 'idle'}}" state="{{state}}" title="比赛事件" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready'}}">
+      <view class="match-event-types">
+        <view class="section-title">事件类型</view>
+        <view class="type-grid">
+          <view wx:for="{{eventTypes}}" wx:key="value" class="type-chip {{activeType === item.value ? 'type-chip--active' : ''}}" data-value="{{item.value}}" bindtap="selectType">{{item.label}}</view>
+        </view>
+      </view>
+
       <view class="match-event-form">
         <view class="match-event-form__field">
-          <view class="section-title">事件类型</view>
-          <view class="type-grid">
-            <view wx:for="{{eventTypes}}" wx:key="value" class="type-chip {{activeType === item.value ? 'type-chip--active' : ''}}" data-value="{{item.value}}" bindtap="selectType">{{item.label}}</view>
+          <view class="section-title">时间</view>
+          <view class="minute-control">
+            <input class="minute-control__input" type="number" placeholder="请输入分钟（可选）" value="{{minute}}" bindinput="onMinuteInput" />
+            <view class="minute-control__arrows">
+              <view class="minute-control__arrow minute-control__arrow--up"></view>
+              <view class="minute-control__arrow minute-control__arrow--down"></view>
+            </view>
           </view>
         </view>
 
@@ -17,25 +28,20 @@
           <view class="section-title">球员</view>
           <picker mode="selector" range="{{playerNames}}" value="{{playerIndex}}" bindchange="onPlayerChange">
             <view class="picker-row">
-              <text>{{selectedPlayerName}}</text>
-              <text class="picker-row__chevron">›</text>
+              <view class="picker-row__name">{{selectedPlayerName}}</view>
+              <view class="picker-row__chevron"></view>
             </view>
           </picker>
         </view>
 
         <view class="match-event-form__field">
-          <view class="section-title">发生分钟</view>
-          <input class="text-input" type="number" placeholder="0-300 分钟（可选）" value="{{minute}}" bindinput="onMinuteInput" />
+          <view class="section-title">备注</view>
+          <textarea class="note-input" maxlength="500" placeholder="补充说明（选填）" value="{{note}}" bindinput="onNoteInput" />
         </view>
-
-        <view class="match-event-form__field">
-          <view class="section-title">备注（可选）</view>
-          <input class="text-input" placeholder="补充说明" value="{{note}}" bindinput="onNoteInput" />
-        </view>
-
-        <view wx:if="{{hasSubmitError}}" class="submit-error">{{submitError}}</view>
-        <button class="save-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="saveEvent">保存事件</button>
       </view>
+      <view wx:if="{{hasSubmitError}}" class="submit-error">{{submitError}}</view>
+      <view wx:if="{{submitting}}" class="save-button save-button--disabled">提交中...</view>
+      <view wx:else class="save-button" bindtap="saveEvent">提交事件</view>
     </block>
   </view>
 

@@ -202,9 +202,19 @@ describe("coach match detail", () => {
   });
 
   it("keeps the Figma match structure neutral with period chips and an outlined add-event action", () => {
+    const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
+    expect(template).toContain('<status-view wx:if="{{state !== \'ready\' && state !== \'idle\'}}"');
+    expect(template).not.toContain('class="match-hero__eyebrow"');
     expect(template).toContain('class="match-periods"');
     expect(template).toContain('class="match-card__action match-card__action--outlined"');
     expect(template).toContain('class="timeline__pill timeline__pill--{{item.tone}}"');
+    expect(template).toContain("未提交草稿已保存");
+    expect(styles).toMatch(/\.match-page\s*\{[^}]*background:\s*#f6f7f9/s);
+    expect(styles).toMatch(/\.match-hero\s*\{[^}]*padding:\s*40rpx/s);
+    expect(styles).toMatch(/\.match-card__action\s*\{[^}]*border:\s*1rpx solid #a80f1b[^}]*border-radius:\s*8rpx/s);
+    expect(styles).toMatch(/\.match-draft-mask\s*\{[^}]*background:\s*rgba\(0, 0, 0, 0\.5\)/s);
+    expect(styles).toMatch(/\.match-draft-modal\s*\{[^}]*padding:\s*48rpx[^}]*text-align:\s*left/s);
+    expect(styles).toMatch(/\.match-draft-modal__exit\s*\{[^}]*background:\s*#a80f1b/s);
     expect(template).not.toMatch(/\b(?:0|1|2|3|4|5):(?:0|1|2|3|4|5)\b/);
   });
 

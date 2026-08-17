@@ -2,11 +2,10 @@
   <app-header theme="soft" title="比赛记录" title-align="left" show-back />
 
   <view class="match-page__content">
-    <status-view state="{{state}}" title="比赛记录" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
+    <status-view wx:if="{{state !== 'ready' && state !== 'idle'}}" state="{{state}}" title="比赛记录" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready' && hasMatch}}">
       <view class="match-hero">
-        <view class="match-hero__eyebrow">比赛活动</view>
         <view class="match-hero__title">{{eventTitle}}</view>
         <view wx:if="{{hasTeamName || hasOpponentName}}" class="match-hero__teams">
           <view wx:if="{{hasTeamName}}" class="match-hero__team">{{teamName}}</view>
@@ -14,7 +13,6 @@
           <view wx:if="{{hasOpponentName}}" class="match-hero__team">{{opponentName}}</view>
         </view>
         <view wx:else class="match-hero__score match-hero__score--pending">{{scoreLabel}}</view>
-        <view wx:if="{{hasMatchStatus}}" class="match-hero__status">{{matchStatus}}</view>
         <view class="match-periods">
           <view wx:for="{{periodChips}}" wx:key="id" class="match-periods__chip">{{item.label}}</view>
         </view>
@@ -46,11 +44,11 @@
     <view class="match-draft-mask">
       <view class="match-draft-modal">
         <view class="match-draft-modal__icon"><view class="match-draft-modal__check"></view></view>
-        <view class="match-draft-modal__title">本机草稿已保存</view>
+        <view class="match-draft-modal__title">未提交草稿已保存</view>
         <view class="match-draft-modal__message">这条未提交的比赛事件仅保存在当前设备</view>
         <view class="match-draft-modal__updated">{{localDraftUpdatedAtLabel}}</view>
         <view class="match-draft-modal__actions">
-          <view class="match-draft-modal__continue" bindtap="continueLocalDraft">继续填写</view>
+          <view class="match-draft-modal__continue" bindtap="continueLocalDraft">继续编辑</view>
           <view class="match-draft-modal__exit" bindtap="exitLocalDraft">退出</view>
         </view>
       </view>

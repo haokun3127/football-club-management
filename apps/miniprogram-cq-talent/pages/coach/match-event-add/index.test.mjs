@@ -184,9 +184,20 @@ describe("C6.1 match event add", () => {
   });
 
   it("uses the Figma form hierarchy without adding non-capability event options", () => {
+    const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
+    expect(template).toContain('<status-view wx:if="{{state !== \'ready\' && state !== \'idle\'}}"');
+    expect(template).toContain('class="match-event-types"');
     expect(template).toContain('class="match-event-form"');
     expect(template).toContain('class="match-event-form__field"');
+    expect(template).toContain('<textarea class="note-input"');
+    expect(template).toContain('<view class="section-title">时间</view>');
+    expect(template).toContain('class="minute-control"');
     expect(template).toContain('class="save-button"');
+    expect(template).toContain("提交事件");
+    expect(styles).toMatch(/\.match-event-page__body\s*\{[^}]*gap:\s*48rpx/s);
+    expect(styles).toMatch(/\.type-chip--active\s*\{[^}]*background:\s*#a80f1b/s);
+    expect(styles).toMatch(/\.picker-row\s*\{[^}]*height:\s*96rpx/s);
+    expect(styles).toMatch(/\.save-button\s*\{[^}]*height:\s*104rpx[^}]*border-radius:\s*52rpx/s);
     expect(template).not.toContain("换人");
     expect(template).not.toContain("其他");
   });
