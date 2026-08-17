@@ -206,6 +206,43 @@ def capture_window_bgra(hwnd: wintypes.HWND) -> tuple[bytes, int, int, int]:
         user32.ReleaseDC(0, screen_dc)
 
 
+def capture_screen_bgra(hwnd: wintypes.HWND) -> tuple[bytes, int, int, int]:
+    """Capture the visible DevTools window from the desktop compositor.
+
+    Electron's embedded simulator intermittently paints a blank frame through
+    PrintWindow. ImageGrab reads the same pixels the operator can see, which
+    keeps the output trustworthy while the dynamic viewport locator avoids any
+    display-specific crop coordinates.
+    """
+    user32.SetProcessDPIAware()
+    rect = RECT()
+    if not user32.GetWindowRect(hwnd, ctypes.byref(rect)):
+        raise RuntimeError("Could not read simulator window bounds for screen capture")
+    width = rect.right - rect.left
+    height = rect.bottom - rect.top
+    if width < 1 or height < 1:
+        raise RuntimeError("Simulator window has invalid bounds for screen capture")
+    dpi = int(user32.GetDpiForWindow(hwnd)) if hasattr(user32, "GetDpiForWindow") else 96
+    if dpi <= 0:
+        raise RuntimeError("Could not determine simulator window DPI for screen capture")
+
+    try:
+        from PIL import ImageGrab
+    except ImportError as error:
+        raise RuntimeError("Screen capture fallback requires Pillow") from error
+
+    image = ImageGrab.grab(
+        bbox=(rect.left, rect.top, rect.right, rect.bottom),
+        all_screens=True,
+    ).convert("RGBA")
+    if image.size != (width, height):
+        raise RuntimeError(f"Screen capture size {image.size} did not match simulator window {(width, height)}")
+    rgba = image.tobytes()
+    bgra = bytearray(rgba)
+    bgra[0::4], bgra[2::4] = rgba[2::4], rgba[0::4]
+    return bytes(bgra), width, height, dpi
+
+
 def is_dark_pixel(bgra: bytes, window_width: int, x: int, y: int) -> bool:
     index = (y * window_width + x) * 4
     blue, green, red = bgra[index], bgra[index + 1], bgra[index + 2]
@@ -221,15 +258,69 @@ def locate_iphone_x_viewport(bgra: bytes, window_width: int, window_height: int,
     notch_run = max(16, rounded_pixels(28 * scale))
     notch_half_width = max(16, rounded_pixels(32 * scale))
     max_top = window_height - height
+    best_notch: tuple[int, int, int] | None = None
     for top in range(max_top + 1):
+        valid_centers: list[int] = []
         for center_x in range(width // 2, window_width - (width - width // 2) + 1):
             if not all(is_dark_pixel(bgra, window_width, center_x, top + offset) for offset in range(notch_run)):
                 continue
             notch_y = top + notch_run // 2
             if not all(is_dark_pixel(bgra, window_width, x, notch_y) for x in range(center_x - notch_half_width, center_x + notch_half_width + 1)):
                 continue
-            return center_x - width // 2, top, width, height
+            valid_centers.append(center_x)
+        if not valid_centers:
+            continue
+        group_start = valid_centers[0]
+        group_end = group_start
+        for center_x in valid_centers[1:]:
+            if center_x == group_end + 1:
+                group_end = center_x
+                continue
+            candidate = (group_end - group_start + 1, top, (group_start + group_end) // 2)
+            if best_notch is None or candidate[0] > best_notch[0]:
+                best_notch = candidate
+            group_start = center_x
+            group_end = center_x
+        candidate = (group_end - group_start + 1, top, (group_start + group_end) // 2)
+        if best_notch is None or candidate[0] > best_notch[0]:
+            best_notch = candidate
+    if best_notch:
+        _, top, center_x = best_notch
+        return center_x - width // 2, top, width, height
     raise RuntimeError("Could not locate the iPhone X simulator notch needed to crop the logical viewport")
+
+
+def capture_logical_viewport(
+    primary_capture,
+    screen_capture,
+    logical_width: int,
+    logical_height: int,
+    *,
+    locator=locate_iphone_x_viewport,
+) -> tuple[tuple[bytes, int, int, int], tuple[int, int, int, int], str]:
+    """Locate the simulator viewport, falling back to visible screen pixels.
+
+    The fallback is deliberately triggered by the proof that matters: whether
+    the frame contains a recognisable iPhone viewport, not by a fragile
+    brightness heuristic for Electron's PrintWindow result.
+    """
+    primary_error: RuntimeError | None = None
+    try:
+        captured = primary_capture()
+        crop = locator(*captured, logical_width, logical_height)
+        return captured, crop, "print_window"
+    except RuntimeError as error:
+        primary_error = error
+
+    try:
+        captured = screen_capture()
+        crop = locator(*captured, logical_width, logical_height)
+        return captured, crop, "screen"
+    except RuntimeError as screen_error:
+        raise RuntimeError(
+            f"Unable to locate the simulator viewport from PrintWindow ({primary_error}) "
+            f"or visible screen pixels ({screen_error})"
+        ) from screen_error
 
 
 def png_chunk(kind: bytes, payload: bytes) -> bytes:
@@ -267,14 +358,20 @@ def main() -> int:
     if not output.parent.is_dir():
         raise RuntimeError("Capture output parent directory does not exist")
     hwnd, title = find_simulator_window(args.simulator_title or None)
-    bgra, window_width, window_height, dpi = capture_window_bgra(hwnd)
-    crop = locate_iphone_x_viewport(bgra, window_width, window_height, dpi, args.logical_width, args.logical_height)
+    captured, crop, source = capture_logical_viewport(
+        lambda: capture_window_bgra(hwnd),
+        lambda: capture_screen_bgra(hwnd),
+        args.logical_width,
+        args.logical_height,
+    )
+    bgra, window_width, window_height, dpi = captured
     write_png(output, bgra, window_width, crop)
     print(json.dumps({
         "title": title,
         "window": {"width": window_width, "height": window_height},
         "crop": {"x": crop[0], "y": crop[1], "width": crop[2], "height": crop[3]},
         "dpi": dpi,
+        "source": source,
     }, ensure_ascii=True))
     return 0
 

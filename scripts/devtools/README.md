@@ -50,7 +50,7 @@ python scripts/devtools/sidebyside.py \
 6. 强杀 DevTools 进程会白屏；白屏或失效时由用户手动完全退出并重新打开 IDE，不要杀进程、反复 `cli auto`，也不要把问题误改到页面代码。
 7. 截图前留 8-15s 给编译；脚本内已含等待与轮询
 8. **不要把 CLI HTTP 端口当成 Automator 端口**：前者来自 DevTools `.ide`，后者由 `--auto-port` 独立注册。历史上的白屏多发生在未指定当前 IDE HTTP 端口、由 CLI 另起项目窗口时；现在只允许使用本 README 的唯一入口，白屏恢复仍由用户手动重启 IDE，禁止循环 `cli auto/open`。
-9. **新版 DevTools 可能没有独立“××的模拟器”窗口**：`devtools-simulator-capture.py` 会先兼容旧标题；若没有，再在唯一可见的 DevTools 主窗口内以 iPhone X 的纵向和横向黑色刘海定位完整 375×812 画布。不要改用固定屏幕坐标裁图，也不要手填过时窗口标题。
+9. **新版 DevTools 可能没有独立“××的模拟器”窗口**：`devtools-simulator-capture.py` 会先兼容旧标题；若没有，再在唯一可见的 DevTools 主窗口内以 iPhone X 的纵向和横向黑色刘海定位完整 375×812 画布。它先尝试 `PrintWindow`，找不到画布时自动改用前台屏幕像素；不要改用固定屏幕坐标裁图，也不要手填过时窗口标题。
 
 ## 完整逐页验收循环
 
@@ -63,18 +63,23 @@ python scripts/devtools/sidebyside.py docs/design/reference/figma/<页面>.png <
 # 4. 视觉比对 → 修代码 → typecheck + vitest → 重截复验 → 路径限定提交
 ```
 
-## 屏幕像素截图通道（2026-08-14，automator 截图超时时的主力通道）
+## 可信 375×812 截图通道（automator 截图超时时的主力通道）
 
-`page.screenshot` 在某些实例上持续超时（页面渲染正常也一样）。替代方案：
+`page.screenshot` 在某些实例上持续超时（页面渲染正常也一样）。使用动态定位脚本，不依赖显示器分辨率或模拟器摆放位置：
 
 ```bash
-# 1. 整窗截图（win32 PrintWindow；前置：把遮挡的 Edge 等窗口最小化）
-uv run --with pillow python scripts/devtools/screen-shot.py <out.png>
-# 2. 裁剪模拟器手机区并缩放为 375x812（坐标按 1918x1030 窗口、模拟器右侧 101% 缩放实测）
-uv run --with pillow python scripts/devtools/crop-phone.py <in.png> <out.png> [left top right bottom]
-# 3. 合成对比
-python scripts/devtools/sidebyside.py docs/design/reference/figma/<页面>.png <out.png> <cmp.png>
+# 1. 抓当前可见模拟器并自动定位 iPhone X 画布
+python apps/miniprogram-cq-talent/scripts/devtools-simulator-capture.py \
+  --output tmp/figma-restore/<页面>-current.png \
+  --logical-width 375 \
+  --logical-height 812
+# 2. 合成对比
+python scripts/devtools/sidebyside.py \
+  docs/design/reference/figma/<页面>.png \
+  tmp/figma-restore/<页面>-current.png \
+  tmp/figma-restore/<页面>-cmp.png
 ```
 
-- 默认裁剪框 `1395,90,1778,895`，窗口尺寸/模拟器位置变了就传参覆盖。
+- 输出 JSON 的 `source` 为 `print_window` 或 `screen`；两者都必须生成真实的 375×812 画布，不能接受纯白、固定坐标或左偏截图。
+- 整窗 `screen-shot.py` 和坐标裁剪 `crop-phone.py` 仅保留给历史排障，不作为视觉验收通道。
 - 页面内容超出首屏时用 automator `mp.callWxMethod('pageScrollTo',{scrollTop:N,duration:0})` 滚动后再截第二段。
