@@ -35,4 +35,4 @@ Align the coach private-interest page with live Figma node `93:1238` in the real
 - [x] Real `private_lessons` feature state remains the only source for availability copy; no invented controls or data are added.
 - [x] A route-confirmed DevTools `PrintWindow` capture is exactly 375×812; top-bar and page landmarks are compared to Figma, and sample-data differences are explicitly classified.
 - [x] `npx --yes pnpm@10.33.0 run check` exits 0 serially and `git diff --check` passes.
-- [ ] Only scoped files are committed and pushed; unrelated worktree paths remain uncommitted.
+- [x] Only scoped files are committed and pushed; unrelated worktree paths remain uncommitted.
