@@ -43,7 +43,7 @@ python scripts/devtools/sidebyside.py \
 ## 已知坑（全部踩过，别再踩）
 
 1. **automator 的 `reLaunch`/`navigateTo` promise 会挂起或报空错 `{}`**——脚本已改用 `mp.callWxMethod("reLaunch", {url})` 通道，不要改回去
-2. `mp.screenshot` 超时（60s）= 模拟器渲染面卡住。**先查 DevTools 主窗口是否失焦/最小化**——实测窗口不在前台会导致截图通道挂死，把窗口 ShowWindow 还原置前台即可恢复（无需重启）；不行再 `cli.bat quit` 后重新 `cli auto`
+2. `mp.screenshot` 超时（60s）或 `PrintWindow` 取得纯白帧，不等于页面没有渲染。新版 `devtools-simulator-capture.py` 会在截图前把当前前台输入队列短暂桥接到 DevTools，再依次 `ShowWindow`、`BringWindowToTop`、`SetForegroundWindow` 并在 `finally` 解除桥接；**不要**只追加一次普通 `SetForegroundWindow`，Windows 会拒绝后台进程的该请求。输出仍必须定位出真实 iPhone X 刘海和严格 `375×812` 画布，纯白帧或桌面/Codex 截图均无效。
 3. 端口拒绝连接（`Failed connecting to ws://...`）——不要猜 9421/9425/9429/9430/9432。重新执行上面的 `devtools:automator:open`；它会读取当前 IDE HTTP 端口并在真实 Automator 握手成功后更新唯一会话状态。
 4. **不要用 `DEV_AUTO_SESSION=true` 验生产页面**：生产 API 硬关 x-user-id 头鉴权，假会话只会 403，且残留 wx storage 造成持续 403（补救：`mp.callWxMethod("clearStorage")` + 干净重启）
 5. 授权弹窗/身份选择可用 **cua-driver 前景真点击**全自动（2026-08-14 验证）：`uv tool install cua-driver` → `cua-driver serve` → `get_window_state`（须选对 title 含「开发者工具」的窗口，wechatdevtools 还有 nw.js 外壳窗）拿元素坐标 → `click` 带 `delivery_mode:"foreground"`（Chromium 上 background/UIA Invoke 无效）→ 弹窗「允许」**只点一次**（双点复用 phone code 会 wechat-login 400）
@@ -80,6 +80,6 @@ python scripts/devtools/sidebyside.py \
   tmp/figma-restore/<页面>-cmp.png
 ```
 
-- 输出 JSON 的 `source` 为 `print_window` 或 `screen`；两者都必须生成真实的 375×812 画布，不能接受纯白、固定坐标或左偏截图。
+- 输出 JSON 的 `source` 为 `print_window` 或 `screen`；两者都必须生成真实的 `375×812` 画布，不能接受纯白、固定坐标、桌面/Codex 内容或左偏截图。若 `print_window` 曾返回纯白帧，先运行当前脚本的前台桥接版本，不要为此重启 DevTools 或改页面代码。
 - 整窗 `screen-shot.py` 和坐标裁剪 `crop-phone.py` 仅保留给历史排障，不作为视觉验收通道。
 - 页面内容超出首屏时用 automator `mp.callWxMethod('pageScrollTo',{scrollTop:N,duration:0})` 滚动后再截第二段。

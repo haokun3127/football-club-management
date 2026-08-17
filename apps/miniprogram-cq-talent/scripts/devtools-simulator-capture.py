@@ -11,6 +11,7 @@ import math
 from pathlib import Path
 import struct
 import sys
+import time
 import zlib
 
 
@@ -59,6 +60,7 @@ class BITMAPINFO(ctypes.Structure):
 
 user32 = ctypes.WinDLL("user32", use_last_error=True)
 gdi32 = ctypes.WinDLL("gdi32", use_last_error=True)
+kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
 
 EnumWindowsProc = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
 user32.EnumWindows.argtypes = [EnumWindowsProc, wintypes.LPARAM]
@@ -71,6 +73,20 @@ user32.GetWindowTextW.argtypes = [wintypes.HWND, wintypes.LPWSTR, ctypes.c_int]
 user32.GetWindowTextW.restype = ctypes.c_int
 user32.GetWindowRect.argtypes = [wintypes.HWND, ctypes.POINTER(RECT)]
 user32.GetWindowRect.restype = wintypes.BOOL
+user32.GetForegroundWindow.argtypes = []
+user32.GetForegroundWindow.restype = wintypes.HWND
+user32.GetWindowThreadProcessId.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.DWORD)]
+user32.GetWindowThreadProcessId.restype = wintypes.DWORD
+user32.AttachThreadInput.argtypes = [wintypes.DWORD, wintypes.DWORD, wintypes.BOOL]
+user32.AttachThreadInput.restype = wintypes.BOOL
+user32.ShowWindow.argtypes = [wintypes.HWND, ctypes.c_int]
+user32.ShowWindow.restype = wintypes.BOOL
+user32.BringWindowToTop.argtypes = [wintypes.HWND]
+user32.BringWindowToTop.restype = wintypes.BOOL
+user32.SetForegroundWindow.argtypes = [wintypes.HWND]
+user32.SetForegroundWindow.restype = wintypes.BOOL
+user32.SetFocus.argtypes = [wintypes.HWND]
+user32.SetFocus.restype = wintypes.HWND
 user32.PrintWindow.argtypes = [wintypes.HWND, wintypes.HDC, wintypes.UINT]
 user32.PrintWindow.restype = wintypes.BOOL
 user32.GetDC.argtypes = [wintypes.HWND]
@@ -78,6 +94,8 @@ user32.GetDC.restype = wintypes.HDC
 user32.ReleaseDC.argtypes = [wintypes.HWND, wintypes.HDC]
 user32.ReleaseDC.restype = ctypes.c_int
 user32.SetProcessDPIAware.restype = wintypes.BOOL
+kernel32.GetCurrentThreadId.argtypes = []
+kernel32.GetCurrentThreadId.restype = wintypes.DWORD
 if hasattr(user32, "GetDpiForWindow"):
     user32.GetDpiForWindow.argtypes = [wintypes.HWND]
     user32.GetDpiForWindow.restype = wintypes.UINT
@@ -151,8 +169,36 @@ def find_simulator_window(title: str | None) -> tuple[wintypes.HWND, str]:
     return matches[0]
 
 
+def activate_window_for_capture(hwnd: wintypes.HWND) -> bool:
+    """Bring DevTools forward before Electron renders the simulator frame.
+
+    Windows rejects a background process's ordinary SetForegroundWindow call.
+    Temporarily joining the current foreground input queue grants the request
+    the same focus context, then always detaches before image capture.
+    """
+    current_thread = int(kernel32.GetCurrentThreadId())
+    foreground = user32.GetForegroundWindow()
+    foreground_thread = 0
+    if foreground:
+        foreground_thread = int(user32.GetWindowThreadProcessId(foreground, None))
+
+    attached = False
+    if foreground and foreground != hwnd and foreground_thread and foreground_thread != current_thread:
+        attached = bool(user32.AttachThreadInput(current_thread, foreground_thread, True))
+    try:
+        user32.ShowWindow(hwnd, 9)
+        user32.BringWindowToTop(hwnd)
+        user32.SetForegroundWindow(hwnd)
+        user32.SetFocus(hwnd)
+        return user32.GetForegroundWindow() == hwnd
+    finally:
+        if attached:
+            user32.AttachThreadInput(current_thread, foreground_thread, False)
+
+
 def capture_window_bgra(hwnd: wintypes.HWND) -> tuple[bytes, int, int, int]:
     user32.SetProcessDPIAware()
+    activate_window_for_capture(hwnd)
     rect = RECT()
     if not user32.GetWindowRect(hwnd, ctypes.byref(rect)):
         raise RuntimeError("Could not read simulator window bounds")
@@ -215,6 +261,8 @@ def capture_screen_bgra(hwnd: wintypes.HWND) -> tuple[bytes, int, int, int]:
     display-specific crop coordinates.
     """
     user32.SetProcessDPIAware()
+    activate_window_for_capture(hwnd)
+    time.sleep(0.2)
     rect = RECT()
     if not user32.GetWindowRect(hwnd, ctypes.byref(rect)):
         raise RuntimeError("Could not read simulator window bounds for screen capture")

@@ -88,6 +88,20 @@ class SimulatorViewportTests(unittest.TestCase):
         self.assertEqual(crop, (1166, 91, 375, 812))
         self.assertEqual(source, "screen")
 
+    def test_screen_capture_restores_the_devtools_window_before_reading_desktop_pixels(self):
+        source = MODULE_PATH.read_text(encoding="utf-8")
+
+        self.assertIn("user32.ShowWindow(hwnd, 9)", source)
+        self.assertIn("user32.SetForegroundWindow(hwnd)", source)
+
+    def test_capture_bridges_the_foreground_input_thread_before_requesting_focus(self):
+        source = MODULE_PATH.read_text(encoding="utf-8")
+
+        self.assertIn("def activate_window_for_capture", source)
+        self.assertIn("user32.AttachThreadInput", source)
+        self.assertIn("user32.GetForegroundWindow", source)
+        self.assertIn("user32.BringWindowToTop(hwnd)", source)
+
     def test_resizes_a_high_dpi_physical_crop_to_the_logical_output_size(self):
         pixels = bytes([0, 0, 0, 255] * (4 * 4))
         with TemporaryDirectory() as directory:
