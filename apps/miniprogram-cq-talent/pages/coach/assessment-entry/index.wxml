@@ -23,29 +23,35 @@
         </view>
       </scroll-view>
 
-      <view wx:for="{{students}}" wx:for-item="student" wx:key="id" class="c15-student-card">
-        <view class="c15-student-card__head">
-          <view class="c15-student-card__avatar">{{student.initial}}</view>
-          <text class="c15-student-card__name">{{student.name}}</text>
-          <text class="c15-student-card__average">{{student.averageLabel}}</text>
-        </view>
-        <view class="c15-rows">
-          <view wx:for="{{student.rows}}" wx:for-item="row" wx:key="fieldId" class="c15-row">
-            <text class="c15-row__label">{{row.label}}</text>
-            <slider
-              class="c15-row__slider"
-              min="{{row.sliderMin}}"
-              max="{{row.sliderMax}}"
-              step="{{row.sliderStep}}"
-              value="{{row.sliderValue}}"
-              activeColor="#a80f1b"
-              backgroundColor="#e7eaf0"
-              block-size="20"
-              data-student-id="{{student.id}}"
-              data-field-id="{{row.fieldId}}"
-              bindchange="onSliderChange"
-            />
-            <text class="c15-row__value">{{row.valueLabel}}</text>
+        <view wx:for="{{students}}" wx:for-item="student" wx:key="id" class="c15-student-card">
+          <view class="c15-student-card__head">
+            <view class="c15-student-card__avatar">{{student.initial}}</view>
+            <view class="c15-student-card__identity">
+              <text class="c15-student-card__name">{{student.name}}</text>
+              <text wx:if="{{student.teamLabel}}" class="c15-student-card__team">{{student.teamLabel}}</text>
+            </view>
+            <text class="c15-student-card__average">{{student.averageLabel}}</text>
+          </view>
+          <view class="c15-rows">
+            <view wx:for="{{student.rows}}" wx:for-item="row" wx:key="fieldId" class="c15-row">
+              <text class="c15-row__label">{{row.label}}</text>
+              <view class="c15-row__track">
+                <view class="c15-row__track-line"><view class="c15-row__progress" style="width: {{row.progressPercent}}%;"></view></view>
+                <slider
+                  class="c15-row__slider-input"
+                  min="{{row.sliderMin}}"
+                  max="{{row.sliderMax}}"
+                  step="{{row.sliderStep}}"
+                  value="{{row.sliderValue}}"
+                  activeColor="#a80f1b"
+                  backgroundColor="#e7eaf0"
+                  block-size="12"
+                  data-student-id="{{student.id}}"
+                  data-field-id="{{row.fieldId}}"
+                  bindchange="onSliderChange"
+                />
+              </view>
+              <text class="c15-row__value">{{row.valueLabel}}</text>
           </view>
         </view>
       </view>
@@ -57,5 +63,5 @@
     </block>
   </view>
 
-  <role-tabbar role="coach" active="training" />
+  <role-tabbar role="coach" active="training" flow="{{true}}" />
 </view>

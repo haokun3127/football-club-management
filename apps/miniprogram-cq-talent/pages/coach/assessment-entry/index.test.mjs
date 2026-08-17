@@ -184,6 +184,19 @@ describe("C15 coach assessment entry", () => {
     }));
   });
 
+  it("projects only real team metadata and precomputes compact slider progress for the C15 view", async () => {
+    const page = createPageInstance();
+    await page.load("template-real", "Real task");
+
+    expect(page.data.students[0]).toMatchObject({
+      teamLabel: "Actual team",
+      rows: [expect.objectContaining({ fieldId: "field-speed", progressPercent: 0 })],
+    });
+
+    page.onSliderChange({ currentTarget: { dataset: { studentId: "student-1", fieldId: "field-speed" } }, detail: { value: 80 } });
+    expect(page.data.students[0].rows[0]).toMatchObject({ valueLabel: "80", progressPercent: 80 });
+  });
+
   it("clears only confirmed students and stays on C15 after a partial or unknown result", async () => {
     mocks.submitCoachAssessment
       .mockResolvedValueOnce({ assessment: { id: "assessment-1" } })
@@ -234,9 +247,16 @@ describe("C15 coach assessment entry", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(template).not.toContain("陈小宇");
     expect(template).not.toContain("U10精英队");
+    expect(template).toContain('class="c15-student-card__team"');
+    expect(template).toContain('class="c15-row__progress" style="width: {{row.progressPercent}}%;"');
+    expect(template).toContain('class="c15-row__slider-input"');
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"app-header"');
+    expect(template).toContain('<role-tabbar role="coach" active="training" flow="{{true}}" />');
     expect(template).toContain('padding-top:{{navInset}}px;padding-right:{{menuInset}}px');
-    expect(stylesheet).toMatch(/\.c15-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+    expect(stylesheet).toMatch(/\.c15-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+    expect(stylesheet).toMatch(/\.c15-nav__left\s*\{[^}]*gap:\s*0/s);
+    expect(stylesheet).toMatch(/\.c15-submit-wrap\s*\{(?=[^}]*position:\s*static)(?=[^}]*margin-top:\s*32rpx)/s);
+    expect(stylesheet).toMatch(/\.c15-row__track\s*\{(?=[^}]*width:\s*320rpx)(?=[^}]*height:\s*12rpx)/s);
   });
 });

@@ -910,3 +910,12 @@
 - `综合 81` 的真实值继续来自团队能力 BFF；仅将字号从 `40rpx` 调整为在线截图对应的 `96rpx`。当前团队名称、8 个能力维度、综合 `81`、趋势 `+1.3`、评估时间/排名未同步均为真实数据差异，未填入 Figma 样例。
 - 可信 `375×812` 最终证据：`tmp/coach-runtime-acceptance/C14-acceptance-phone-final.png` 与 `tmp/coach-runtime-acceptance/C14-acceptance-compare-final.png`。顶栏、上下文、深色雷达卡、综合分/趋势、统计卡及教练 TabBar 已完成首屏对照；状态栏与微信胶囊属于系统壳层差异。
 - 验证：C14/共享雷达组件定向 Vitest `7/7`、小程序 typecheck、`git diff --check` 与根 `npx --yes pnpm@10.33.0 run check` 全绿（domain `19/19`、小程序 `330/330`、API `105/105`）。
+
+## 2026-08-17 C15 能力评估录入真实运行态视觉收口
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1132 / C15 Assessment Entry`。在线画板当前为 `375×1002`，故保存动作和教练 TabBar 应位于学员列表之后；此前仅作静态验收时沿用的固定底部布局会遮住首屏真实学员内容。
+- 运行态确认 C15 将 `navInset` 与 `176rpx` 内容高度叠加，令顶栏比 Figma 高一个状态栏。现改为 `88rpx + content-box`，并移除返回箭头与标题间多余间隔；真实模板、草稿和逐学员提交契约没有改动。
+- 共享 `role-tabbar` 新增默认关闭的 `flow` 属性，只有 C15 显式开启，其他页面继续固定底栏。C15 的保存动作和 TabBar 因此按在线长页顺序流动，不再覆盖首屏。
+- 为匹配 6px Figma 指标轨道，同时保持真实触控录入，C15 将原生 slider 设为透明交互层，TS view model 预计算 `progressPercent`，WXML 仅渲染预计算宽度的轨道；未在 WXML 调用 JS 方法。学员副标题取真实 `getCoachTeam()` 的团队名。
+- 可信证据：`tmp/coach-runtime-acceptance/C15-acceptance-phone-final.png` 与 `tmp/coach-runtime-acceptance/C15-acceptance-compare-final.png`，均为 DevTools `print_window` 通道生成的严格 `375×812` 图。真实服务器目前提供两名学员、七个指标、真实团队名和空草稿，而在线稿为三名/六项/样例分数；这些是数据差异，未伪造以求像素相同。
+- 验证先红后绿：C15 + `role-tabbar` 定向 Vitest `332/332`、小程序 typecheck、`git diff --check` 通过；根 `npx --yes pnpm@10.33.0 run check` 已以完整后台日志得到 `CHECK_EXIT_0`（domain `19/19`、mini-program `332/332`、API `105/105`）。

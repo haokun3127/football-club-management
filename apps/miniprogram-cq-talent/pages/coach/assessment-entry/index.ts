@@ -27,12 +27,14 @@ interface StudentRow {
   sliderValue: number;
   value: number | null;
   valueLabel: string;
+  progressPercent: number;
 }
 
 interface StudentEntry {
   id: string;
   name: string;
   initial: string;
+  teamLabel: string;
   averageLabel: string;
   rows: StudentRow[];
 }
@@ -56,6 +58,7 @@ interface PageData {
   groups: GroupOption[];
   activeGroupId: string;
   fields: EntryField[];
+  teamName: string;
   members: CoachTeamDetail["members"];
   students: StudentEntry[];
   valuesByStudent: ValuesByStudent;
@@ -80,6 +83,7 @@ Page<PageData>({
     groups: [],
     activeGroupId: "",
     fields: [],
+    teamName: "",
     members: [],
     students: [],
     valuesByStudent: {},
@@ -129,6 +133,7 @@ Page<PageData>({
           groups: [],
           activeGroupId: "",
           fields: [],
+          teamName: "",
           members: [],
           students: [],
           valuesByStudent: {},
@@ -158,6 +163,7 @@ Page<PageData>({
 
       const groups = buildGroups(fields);
       const activeGroupId = groups[0]?.id || "";
+      const teamName = team.team?.name?.trim() || "";
       const signature = createDraftSignature(fields, members);
       const valuesByStudent = restoreDraft(templateId, form.templateVersionId, signature, fields, members);
       this.setData({
@@ -169,8 +175,9 @@ Page<PageData>({
         groups,
         activeGroupId,
         fields,
+        teamName,
         members,
-        students: buildStudentEntries(members, fields, activeGroupId, valuesByStudent),
+        students: buildStudentEntries(teamName, members, fields, activeGroupId, valuesByStudent),
         valuesByStudent,
         draftSignature: signature,
         lastSavedLabel: hasValues(valuesByStudent) ? "已恢复本机草稿" : "",
@@ -197,7 +204,7 @@ Page<PageData>({
     this.setData({
       activeGroupId,
       groups: updateGroupClasses(this.data.groups, activeGroupId),
-      students: buildStudentEntries(this.data.members, this.data.fields, activeGroupId, this.data.valuesByStudent),
+      students: buildStudentEntries(this.data.teamName, this.data.members, this.data.fields, activeGroupId, this.data.valuesByStudent),
     });
   },
   onSliderChange(event: { currentTarget: { dataset: { studentId: string; fieldId: string } }; detail: { value: number } }) {
@@ -216,7 +223,7 @@ Page<PageData>({
     };
     this.setData({
       valuesByStudent,
-      students: buildStudentEntries(this.data.members, this.data.fields, this.data.activeGroupId, valuesByStudent),
+      students: buildStudentEntries(this.data.teamName, this.data.members, this.data.fields, this.data.activeGroupId, valuesByStudent),
     });
     this.persistDraft(valuesByStudent);
   },
@@ -271,7 +278,7 @@ Page<PageData>({
     this.setData({
       submitting: false,
       valuesByStudent,
-      students: buildStudentEntries(this.data.members, this.data.fields, this.data.activeGroupId, valuesByStudent),
+      students: buildStudentEntries(this.data.teamName, this.data.members, this.data.fields, this.data.activeGroupId, valuesByStudent),
     });
 
     if (unconfirmedStudentIds.length) {
@@ -332,6 +339,7 @@ function updateGroupClasses(groups: GroupOption[], activeGroupId: string) {
 }
 
 function buildStudentEntries(
+  teamName: string,
   members: CoachTeamDetail["members"],
   fields: EntryField[],
   activeGroupId: string,
@@ -345,6 +353,7 @@ function buildStudentEntries(
       id: member.id,
       name: member.name,
       initial: member.name.slice(0, 1),
+      teamLabel: teamName,
       averageLabel: numericValues.length ? String(Math.round(numericValues.reduce((sum, value) => sum + value, 0) / numericValues.length)) : "--",
       rows: activeFields.map((field) => {
         const value = values[field.id];
@@ -357,10 +366,16 @@ function buildStudentEntries(
           sliderValue: value ?? field.sliderMin,
           value: value ?? null,
           valueLabel: value === undefined ? "--" : String(value),
+          progressPercent: value === undefined ? 0 : toProgressPercent(value, field.sliderMin, field.sliderMax),
         };
       }),
     } satisfies StudentEntry;
   });
+}
+
+function toProgressPercent(value: number, min: number, max: number) {
+  if (!Number.isFinite(value) || !Number.isFinite(min) || !Number.isFinite(max) || max <= min) return 0;
+  return Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
 }
 
 function draftKey(templateId: string, templateVersionId: string) {

@@ -46,13 +46,13 @@ describe("role tabbar real-device icon contract", () => {
     expect(controller).not.toContain("tab-training.svg");
     expect(controller).not.toContain("tab-user.svg");
     expect(template).not.toMatch(/\.(map|filter|slice|indexOf)\s*\(/);
-    expect(template).toContain('<cover-view class="tabbar tabbar--{{role}}">');
+    expect(template).toContain('class="tabbar tabbar--{{role}} {{flow ? \'tabbar--flow\' : \'\'}}"');
     expect(template).toContain("<cover-image class=\"tabbar-icon\" src=\"{{item.icon}}\" />");
     expect(styles).not.toContain("opacity: .48");
   });
 
   it("keeps parent activity affordances separate from coach tab states", () => {
-    expect(template).toContain('class="tabbar tabbar--{{role}}"');
+    expect(template).toContain('class="tabbar tabbar--{{role}} {{flow ? \'tabbar--flow\' : \'\'}}"');
     expect(styles).toContain(".tabbar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 9999; display: flex; box-sizing: border-box; height: 140rpx;");
     expect(styles).toContain(".tabbar-icon-wrap { position: static; display: flex; align-items: center; justify-content: center; width: 44rpx; height: 44rpx;");
     expect(styles).toContain(".tabbar-icon { width: 44rpx; height: 44rpx; }");
@@ -74,6 +74,11 @@ describe("role tabbar real-device icon contract", () => {
     expect(styles).toContain("margin-top: 6rpx;");
     expect(styles).toContain("line-height: 28rpx;");
     expect(styles).toContain("top: 96rpx;");
+  });
+
+  it("supports an opt-in flowing layout without changing the default fixed tab bar", () => {
+    expect(controller).toMatch(/flow:\s*\{\s*type:\s*Boolean,\s*value:\s*false/s);
+    expect(styles).toContain(".tabbar--flow { position: static; }");
   });
 
   it("ships all active and inactive icons as valid PNG files", () => {

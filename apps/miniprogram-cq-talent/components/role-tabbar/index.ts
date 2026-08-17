@@ -39,6 +39,10 @@ Component({
       type: String,
       value: "schedule",
     },
+    flow: {
+      type: Boolean,
+      value: false,
+    },
   },
   data: {
     items: buildItems("parent", "schedule"),
