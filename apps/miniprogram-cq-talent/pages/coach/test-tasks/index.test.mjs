@@ -12,7 +12,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("../../../utils/api", () => ({ getCoachAssessmentTasks: mocks.getCoachAssessmentTasks }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
-vi.mock("../../../utils/presentation", () => ({ resolveNavInset: () => 0 }));
+vi.mock("../../../utils/presentation", () => ({ resolveMenuInset: () => 16, resolveNavInset: () => 0 }));
 
 globalThis.wx = { navigateBack: mocks.navigateBack, showToast: mocks.showToast };
 
@@ -119,6 +119,17 @@ describe("coach assessment task list", () => {
     expect(mocks.showToast).toHaveBeenCalledTimes(2);
   });
 
+  it("keeps the Figma creation affordances honest when no create API exists", async () => {
+    const page = createPageInstance();
+    await page.load();
+
+    page.showCreateUnavailable();
+
+    expect(mocks.showToast).toHaveBeenCalledWith({ title: "当前端暂不支持新增测评任务。", icon: "none" });
+    expect(mocks.getCoachAssessmentTasks).toHaveBeenCalledTimes(1);
+    expect(page.data.tasks.map((task) => task.id)).toEqual(realTasks.map((task) => task.id));
+  });
+
   it("uses a safe generic message when the list request fails", async () => {
     mocks.getCoachAssessmentTasks.mockRejectedValueOnce(new Error("raw backend detail"));
     const page = createPageInstance();
@@ -159,16 +170,24 @@ describe("coach assessment task list", () => {
     expect(page.data.state).toBe("ready");
   });
 
-  it("uses the C11 local navigation without create affordances, Figma samples, or WXML helpers", () => {
+  it("uses the C11 Figma navigation, unavailable create affordances, and WXML-safe real-data layout", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).toContain('"status-view"');
     expect(pageConfig).not.toContain('"app-header"');
     expect(template).toContain('class="tasks-nav"');
+    expect(template).toContain('padding-right:{{menuInset}}px');
+    expect(template).toContain('class="tasks-nav__create"');
+    expect(template).toContain('class="tasks-fab"');
+    expect(template).toContain('bindtap="showCreateUnavailable"');
     expect(template).toContain('/assets/icons/c11-arrow-left.svg');
     expect(template).toContain('<role-tabbar role="coach" active="training"');
-    expect(template).not.toMatch(/体能综合测评|速度耐力体测|控球精度评估|2025-07-01|12\/18名学员|新增/);
+    expect(template).toContain('<image class="task-card__chevron"');
+    expect(template).not.toContain('wx:if="{{item.isEntryEnabled}}" class="task-card__chevron"');
+    expect(template).not.toMatch(/体能综合测评|速度耐力体测|控球精度评估|2025-07-01|12\/18名学员/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("createTask");
+    expect(controller).toContain("resolveMenuInset");
     expect(stylesheet).toMatch(/\.tasks-nav\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*content-box/s);
+    expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*width:\s*112rpx[^}]*height:\s*112rpx/s);
   });
 });

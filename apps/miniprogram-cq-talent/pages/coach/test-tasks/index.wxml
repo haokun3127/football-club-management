@@ -1,8 +1,10 @@
 <view class="tasks-page">
-  <view class="tasks-nav" style="padding-top:{{navInset}}px">
-    <view class="tasks-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/c11-arrow-left.svg" mode="aspectFit" /></view>
-    <view class="tasks-nav__title">测评任务</view>
-    <view class="tasks-nav__spacer"></view>
+  <view class="tasks-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
+    <view class="tasks-nav__left">
+      <view class="tasks-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/c11-arrow-left.svg" mode="aspectFit" /></view>
+      <view class="tasks-nav__title">测评任务</view>
+    </view>
+    <view class="tasks-nav__create" bindtap="showCreateUnavailable" aria-label="新增测评任务" aria-disabled="true">新增</view>
   </view>
 
   <view class="tasks-page__body">
@@ -23,9 +25,9 @@
           <view class="task-card__foot">
             <view class="task-card__progress">
               <view class="task-card__progress-label">{{item.progressLabel}}</view>
-              <view class="task-card__track"><view class="task-card__bar" style="{{item.progressStyle}}"></view></view>
+              <view class="task-card__track"><view class="task-card__bar {{item.progressClass}}" style="{{item.progressStyle}}"></view></view>
             </view>
-            <image wx:if="{{item.isEntryEnabled}}" class="task-card__chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
+            <image class="task-card__chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
           </view>
         </view>
       </view>
@@ -33,5 +35,6 @@
     </block>
   </view>
 
+  <view class="tasks-fab" bindtap="showCreateUnavailable" aria-label="新增测评任务" aria-disabled="true"><image src="/assets/icons/plus.svg" mode="aspectFit" /></view>
   <role-tabbar role="coach" active="training" />
 </view>

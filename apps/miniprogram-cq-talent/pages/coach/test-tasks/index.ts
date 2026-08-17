@@ -1,7 +1,7 @@
 import { getCoachAssessmentTasks } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import { resolveNavInset } from "../../../utils/presentation";
+import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachAssessmentTask, LoadState } from "../../../utils/types";
 
 type FilterId = "all" | "unfinished" | "completed";
@@ -18,11 +18,13 @@ interface TaskCard extends CoachAssessmentTask {
   dateRange: string;
   progressLabel: string;
   progressStyle: string;
+  progressClass: string;
   isEntryEnabled: boolean;
 }
 
 interface PageData {
   navInset: number;
+  menuInset: number;
   state: LoadState;
   statusTitle: string;
   statusActionText: string;
@@ -49,6 +51,7 @@ const STATUS_LABELS: Record<CoachAssessmentTask["status"], string> = {
 Page<PageData>({
   data: {
     navInset: resolveNavInset(),
+    menuInset: resolveMenuInset(),
     state: "idle",
     statusTitle: "测评任务",
     statusActionText: "",
@@ -127,6 +130,10 @@ Page<PageData>({
     wx.navigateBack({ delta: 1 });
   },
 
+  showCreateUnavailable() {
+    wx.showToast({ title: "当前端暂不支持新增测评任务。", icon: "none" });
+  },
+
   selectFilter(event: { currentTarget: { dataset: { id: FilterId } } }) {
     const activeFilter = event.currentTarget.dataset.id;
     if (!isFilterId(activeFilter)) return;
@@ -170,6 +177,7 @@ function presentTask(task: CoachAssessmentTask): TaskCard {
     dateRange: `${task.startsOn} ~ ${task.dueOn}`,
     progressLabel: `${task.completedStudents}/${task.totalStudents}名学员`,
     progressStyle: `width: ${progressPercent}%`,
+    progressClass: task.status === "not_started" ? "task-card__bar--muted" : "",
     isEntryEnabled: task.status === "in_progress" && Boolean(task.templateId),
   };
 }
