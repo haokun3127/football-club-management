@@ -765,3 +765,11 @@
 - C12.1 的本机草稿遮罩出现时，顶栏展示文案切换为“成绩录入”；点击“继续录入”后恢复“项目评分录入”。这只新增展示字段 `navTitle`，不改 `assessment-draft`、真实评分表、活动数据、提交 API 或任何草稿写入行为。
 - 测试先确认新增标题/栅格断言会因旧实现失败，随后完成最小显示层修改。聚焦 C12 Vitest `15/15`、小程序 TypeScript、`git diff --check` 均通过；全仓门禁复核为 domain `19/19`、mini-program `326/326`、API `104/104`。
 - 运行态边界：本批未生成新的 C12/C12.1 375×812 DevTools 截图。用户已授权本阶段不以截图作为完成前置，因此以上为 Figma 源码/测试验收结论，不冒充新的运行时像素验收。
+
+## 2026-08-17 C14 团队能力总览安全区顶栏收口
+
+- 在线 Figma 基准已在改动前重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1106 / C14 Team Ability Overview`；标题栏设计高度为 88px、底色 `#fceeef`。
+- 根因是 C14 已通过 WXML 注入动态状态栏高度 `navInset`，但 `.ability-nav` 仍使用 `box-sizing: border-box`，会侵占设计要求的 176rpx 内容高度。现改为与 C12/C13/C10 已验证页面一致的 `box-sizing: content-box`。
+- 业务边界未变：团队雷达、维度统计、真实 API 读取、导出不可用状态及教练 tabbar 均未改动；没有新增样例数据或伪造接口结果。
+- 验证：回归先红后绿（C14 定向 Vitest `5/5`）；小程序 typecheck、`git diff --check` 与全仓门禁均通过（domain `19/19`、mini-program `326/326`、API `104/104`）。
+- 运行态边界：用户已授权本阶段不以新截图作为完成前置，因此本项为在线 Figma/源码/测试验收，不表述为新的 375×812 像素级运行态验收。

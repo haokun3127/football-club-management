@@ -165,7 +165,7 @@ describe("coach team ability overview", () => {
     expect(stylesheet).toMatch(/\.ability-hero__radar-state\s*\{[^}]*flex-direction:\s*column[^}]*align-items:\s*center/s);
     expect(stylesheet).toMatch(/\.ability-hero__overall\s*\{[^}]*font-size:\s*40rpx[^}]*text-align:\s*center/s);
     expect(stylesheet).not.toMatch(/\.ability-hero__overall\s*\{[^}]*position:\s*absolute/s);
-    expect(stylesheet).toMatch(/\.ability-nav\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*border-box/s);
+    expect(stylesheet).toMatch(/\.ability-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).toMatch(/\.ability-nav__title\s*\{[^}]*text-align:\s*center/s);
     expect(stylesheet).toMatch(/\.ability-nav__export\s*\{[^}]*display:\s*flex[^}]*width:\s*104rpx[^}]*height:\s*58rpx/s);
   });
