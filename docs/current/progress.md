@@ -975,3 +975,10 @@
 - 已确认实现提交 `3d4837b` 已在当前 `dev` 分支，不在遗留 hotfix worktree：登录按钮触摸入口同步取得锁，原生回调只消费一次；取消、空 code、`getPhoneNumber too frequently` 和超时均不自动重试，只有用户显式重试才释放锁。
 - 真实登录契约未改变：没有伪造手机号、验证码、session、角色或 API 响应；`binding_required`、无孩子家长档案和错误提示继续保持受限状态，错误文案不回显原始授权/API payload。
 - 验证：`pages/login/index.test.mjs` 定向 Vitest `15/15`，小程序 TypeScript typecheck 通过；该实现已随最近一次串行根门禁验证（domain `19/19`、mini-program `332/332`、API `105/105`）。
+
+## 2026-08-17 双角色切换任务收口
+
+- 复核 `08-10-active-role-switch`：服务端通过 SQLite 持久化哈希 bearer session，能力声明为 `X-App-Client-Capabilities: active-role-switch-v1`；双角色登录先创建 `activeRole: null` 的待选择 session，选择和日常切换都必须经过服务端 `POST /session/role`，每次轮换 token，旧 token 立即失效。
+- 复核授权边界：每次 bearer 请求重新检查 club、app-client、用户、精确 membership、当前 entrypoint-filtered `availableRoles` 和 active role；本地修改 active role、`roleHint` 或旧 token 都不能获得另一端权限。父端只投影 guardian children，教练端不返回家长 children。
+- 复验：`apps/api/test/app-client-role-switch.test.ts` 为 `2/2`（双实例、关闭全部实例后文件型 SQLite 重开、角色删除/用户/会籍/client 失效和 token 轮换）；OpenAPI/login 契约为 `2/2`；小程序登录选择器、家长/孩子/教练切换入口为 `44/44`。
+- 本仓库任务的实现验收已满足；生产双角色测试账号导入、真实微信授权和真机运行态登录仍属于独立部署/设备验收，不以本地测试冒充生产证据。

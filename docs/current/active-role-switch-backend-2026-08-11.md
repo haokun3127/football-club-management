@@ -6,4 +6,6 @@ This batch adds the server-side foundation for one real membership to use the pa
 
 The capability-aware login protocol is `X-App-Client-Capabilities: active-role-switch-v1`. A capable dual-role client receives a pending session and cannot call either role BFF before selection; a legacy client retains its old compatibility-default active session. `POST /session/role` is the sole authority for changing active role.
 
-Verification on this checkout: full API test suite 81/81, API typecheck, and `git diff --check` all passed. Terra xhigh reviewed the corrected backend diff and approved it. The remaining work is a separate mini-program batch: login chooser, persisted `availableRoles`, and parent/coach in-app switch controls.
+The backend contract was followed by the mini-program batch: the login chooser keeps capable dual-role sessions pending until a server-confirmed selection, and parent/coach in-app entries switch only through the rotating role endpoint. The authoritative contract is now recorded in `.trellis/spec/api/backend/active-role-sessions.md`; production test-account import and device-side login remain separate deployment/runtime work and are not implied by repository tests.
+
+Verification on this checkout: API role-switch integration `2/2`, OpenAPI/login contract checks `2/2`, mini-program role-switch checks `44/44`; the full repository gate is run during task closeout.
