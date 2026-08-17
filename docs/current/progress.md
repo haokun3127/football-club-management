@@ -894,3 +894,11 @@
 - 运行态对照发现 C12 自定义顶栏仍把 `176rpx` 内容高度与 `navInset` 相加，令正文整体下移约一个状态栏高度。已改为 88px 安全区包络并固定 `331×96px` 任务卡；学员区恢复任务卡后的 20px 间距和 8px 内上边距。没有改动 API、角色、草稿或真实数据。
 - 可信证据：在线稿 `tmp/coach-runtime-acceptance/C12-figma-online-20260817.png`；真实模拟器图 `tmp/coach-runtime-acceptance/C12-acceptance-phone-final.png`（严格 `375×812`）；并排图 `tmp/coach-runtime-acceptance/C12-acceptance-compare-final.png`。顶栏、任务卡、列表、保存区、TabBar 已复验；状态栏/微信胶囊和真实数据文本为允许差异。
 - 已完成红→绿 C12 定向回归、Mini Program typecheck 和 `git diff --check`。全仓门禁类型检查、domain `19/19` 与 mini-program `330/330` 已通过；API `103/105` 通过但有两项独立 SQLite 重开超时：`apps/api/test/app-client-match-event-create.test.ts:135`（10 秒）与 `apps/api/test/persistence.test.ts:13`（15 秒）。两项均在 API persistence/test 在途区域，未为 C12 视觉任务擅自修改。
+
+## 2026-08-17 C13 学员能力雷达真实运行态视觉收口
+
+- 在线唯一基准已通过 Figma MCP 重读：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1080 / C13 Student Radar`；真实路由为 `pages/coach/student-radar/index`。
+- 运行态发现并修复 C13 顶栏安全区问题：`.radar-nav` 原为 `176rpx + navInset`，导致自定义顶栏比画板高约一个状态栏高度；现改为 `88rpx + box-sizing:content-box`，保留动态状态栏和菜单胶囊避让。
+- 可信屏幕像素证据已保存：`tmp/coach-runtime-acceptance/C13-acceptance-phone-final.png`（首屏）、`tmp/coach-runtime-acceptance/C13-acceptance-phone-bottom.png`（底部评语区）和 `tmp/coach-runtime-acceptance/C13-acceptance-compare-final.png`，输出均严格 `375×812`。顶栏、chips、`343×260px` 雷达卡、维度评分卡、评语容器和 70px 教练 TabBar 的几何已完成对照。
+- 真实数据不替换为 Figma 样例：当前会话返回 2 名学员、8 个维度、总分 `83`、评估期 `2026-08-05`，评语显示“能力评语暂未同步”；这些是 API 数据/空态差异。状态栏、微信胶囊和 Home Indicator 属系统壳层差异。
+- 验证：小程序 `54/54` 文件、`330/330` 测试，domain `19/19`，API `105/105`；全仓 typecheck、`git diff --check` 均通过。C13 变更仅涉及 `apps/miniprogram-cq-talent/pages/coach/student-radar/` 和对应文档/任务记录。

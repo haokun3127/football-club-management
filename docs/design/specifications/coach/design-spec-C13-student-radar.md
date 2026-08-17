@@ -111,3 +111,11 @@
         - [6] | Vector | 8x8 @(1678,4471) | stroke=#8e97a6 w1.6
         - [6] | Vector | 16x8 @(1674,4480) | stroke=#8e97a6 w1.6
       - [13] | 我的 | 121x14 @(1622,4493) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"
+
+## 2026-08-17 运行态验收记录
+
+- 在线唯一基准为 Figma file `zZ6wKyOHKcO4UYXDd9jGwv`、节点 `93:1080`；真实路由为 `pages/coach/student-radar/index`。
+- 真实 DevTools 屏幕像素证据：`tmp/coach-runtime-acceptance/C13-acceptance-phone-final.png`（首屏）、`tmp/coach-runtime-acceptance/C13-acceptance-phone-bottom.png`（滚动后的评语区）和 `tmp/coach-runtime-acceptance/C13-acceptance-compare-final.png`，均按 `375×812` 输出。
+- 已修复顶栏安全区：`.radar-nav` 使用 `height:88rpx` 与 `box-sizing:content-box`，避免 `navInset` 把设计内容高度推高。首屏和滚动后的卡片/TabBar 几何已复验。
+- 真实数据差异保留：当前会话返回 2 名学员、8 个雷达维度、总分 `83`、评估期 `2026-08-05`，评语暂无同步；不把 Figma 的 5 名学员、6 个维度、分数 `76` 和示例教练评语写入业务。
+- 验证：小程序 `54/54` 文件、`330/330` 测试，domain `19/19`，API `105/105`，全仓 typecheck 和 `git diff --check` 均通过。

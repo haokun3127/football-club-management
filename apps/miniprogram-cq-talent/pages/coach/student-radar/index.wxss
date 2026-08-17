@@ -4,7 +4,7 @@
 }
 
 .radar-nav {
-  height: 176rpx;
+  height: 88rpx;
   box-sizing: content-box;
   display: flex;
   align-items: center;
