@@ -5,7 +5,7 @@
 }
 
 .c15-nav {
-  box-sizing: border-box;
+  box-sizing: content-box;
   display: flex;
   align-items: center;
   justify-content: space-between;

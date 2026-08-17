@@ -237,6 +237,6 @@ describe("C15 coach assessment entry", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"app-header"');
     expect(template).toContain('padding-top:{{navInset}}px;padding-right:{{menuInset}}px');
-    expect(stylesheet).toMatch(/\.c15-nav\s*\{[^}]*height:\s*176rpx/s);
+    expect(stylesheet).toMatch(/\.c15-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)/s);
   });
 });
