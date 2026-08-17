@@ -1,5 +1,5 @@
 <view class="tasks-page">
-  <view class="tasks-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
+  <view class="tasks-nav" style="height:calc(176rpx - {{navInset}}px);padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="tasks-nav__left">
       <view class="tasks-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/c11-arrow-left.svg" mode="aspectFit" /></view>
       <view class="tasks-nav__title">测评任务</view>

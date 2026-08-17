@@ -53,13 +53,14 @@
 }
 
 .tasks-page__body {
-  padding: 32rpx 44rpx 220rpx;
+  /* Figma's 331px content frame keeps 16px inner gutters and a 16px filter inset. */
+  padding: 64rpx 76rpx 220rpx;
 }
 
 .filter-row {
   display: flex;
   gap: 24rpx;
-  margin-bottom: 48rpx;
+  margin-bottom: 28rpx;
 }
 
 .filter-chip {

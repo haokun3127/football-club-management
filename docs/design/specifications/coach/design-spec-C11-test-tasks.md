@@ -15,7 +15,7 @@
     - [4] | Frame | 71x32 @(255,3824) | fill=#ffffff | stroke=#e7eaf0 w1 | r=16 | layout=H pad=8/16
       - [13] | 已完成 | 39x16 @(271,3832) | fill=#667085 | font=Inter/Medium 13px | text="已完成"
   - [4] | Task List | 331x380 @(102,3880) | layout=V gap=16
-    - [4] | Task Card | 331x116 @(102,3880) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+    - [4] | Task Card (visible) | 299x116 @(118,3880) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
       - [4] | Frame | 299x21 @(118,3896) | layout=H
         - [13] | 体能综合测评 | 96x19 @(118,3897) | fill=#202124 | font=Inter/Bold 16px | text="体能综合测评"
         - [4] | Frame | 49x21 @(368,3896) | fill=#e8f5e9 | r=4 | layout=H pad=4/8
@@ -28,7 +28,7 @@
             - [12] | Rectangle | 80x4 @(118,3976) | fill=#a80f1b | r=2
         - [4] | chevron-right | 16x16 @(401,3960)
           - [6] | Vector | 4x8 @(407,3964) | stroke=#667085 w2
-    - [4] | Task Card | 331x116 @(102,4012) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+    - [4] | Task Card (visible) | 299x116 @(118,4012) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
       - [4] | Frame | 299x21 @(118,4028) | layout=H
         - [13] | 速度耐力体测 | 96x19 @(118,4029) | fill=#202124 | font=Inter/Bold 16px | text="速度耐力体测"
         - [4] | Frame | 49x21 @(368,4028) | fill=#f3f4f6 | r=4 | layout=H pad=4/8
@@ -41,7 +41,7 @@
             - [12] | Rectangle | 0x4 @(118,4108) | fill=#94a3b8 | r=2
         - [4] | chevron-right | 16x16 @(401,4092)
           - [6] | Vector | 4x8 @(407,4096) | stroke=#667085 w2
-    - [4] | Task Card | 331x116 @(102,4144) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
+    - [4] | Task Card (visible) | 299x116 @(118,4144) | fill=#ffffff | r=12 | layout=V gap=12 pad=16/16 | shadow=0,4,12,#000000@0.05
       - [4] | Frame | 299x21 @(118,4160) | layout=H
         - [13] | 控球精度评估 | 96x19 @(118,4161) | fill=#202124 | font=Inter/Bold 16px | text="控球精度评估"
         - [4] | Frame | 49x21 @(368,4160) | fill=#e8f5e9 | r=4 | layout=H pad=4/8
@@ -91,3 +91,10 @@
 - 画板中的两个“新增”没有创建测评任务 API，因此两个入口只提示“当前端暂不支持新增测评任务。”，不发送写请求、不创建本地任务、不显示伪成功。
 - 验证：C11 聚焦 Vitest `8/8`、小程序 typecheck、`git diff --check` 通过；全仓门禁的 domain `19/19` 与小程序 `326/326` 通过，API 单独复核 `104/104`、exit `0`。
 - 本批未获取一次新的 375×812 页面截图；按当前用户授权，截图不是完成前置。上述测试/静态证据不构成新的运行时视觉验收结论。
+
+## 运行态视觉复验（2026-08-17）
+
+- 重新读取在线节点 `93:1002` 后确认：`331px` 的 Task List 是带左右 `16px` 内边距的外层，实际可见 Task Card 为 `299×116px`，不能把卡片撑满页面内容宽度。
+- 页面以 `height:calc(176rpx - navInset) + padding-top:navInset` 保持 Figma 的总计 `88px` 顶栏包络；筛选器按画板的内嵌结构使用 `64rpx` 顶部间距与 `28rpx` 卡片前间距。业务数据、角色控制、筛选和两个无 API 的“新增”入口均未改。
+- 可信运行态证据：`tmp/coach-runtime-acceptance/C11-acceptance-phone-final.png`（严格 `375×812`），并已生成 `tmp/coach-runtime-acceptance/C11-acceptance-compare-final.png` 与在线 Figma 对照。筛选器、卡片横纵几何、轨道、FAB 和 TabBar 通过复验；日期、状态、进度和系统状态栏/微信胶囊属于真实运行态数据或系统层差异。
+- 验证：C11 聚焦 Vitest `8/8`、小程序 typecheck、`git diff --check` 和根 `npx --yes pnpm@10.33.0 run check` 均通过（domain `19/19`、mini-program `327/327`、API `105/105`）。

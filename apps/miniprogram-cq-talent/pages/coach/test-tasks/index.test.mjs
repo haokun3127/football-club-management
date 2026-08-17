@@ -175,6 +175,7 @@ describe("coach assessment task list", () => {
     expect(pageConfig).toContain('"status-view"');
     expect(pageConfig).not.toContain('"app-header"');
     expect(template).toContain('class="tasks-nav"');
+    expect(template).toContain('height:calc(176rpx - {{navInset}}px)');
     expect(template).toContain('padding-right:{{menuInset}}px');
     expect(template).toContain('class="tasks-nav__create"');
     expect(template).toContain('class="tasks-fab"');
@@ -188,6 +189,8 @@ describe("coach assessment task list", () => {
     expect(controller).not.toContain("createTask");
     expect(controller).toContain("resolveMenuInset");
     expect(stylesheet).toMatch(/\.tasks-nav\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*content-box/s);
+    expect(stylesheet).toMatch(/\.tasks-page__body\s*\{[^}]*padding:\s*64rpx\s+76rpx\s+220rpx/s);
+    expect(stylesheet).toMatch(/\.filter-row\s*\{[^}]*margin-bottom:\s*28rpx/s);
     expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*width:\s*112rpx[^}]*height:\s*112rpx/s);
   });
 });

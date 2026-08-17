@@ -879,3 +879,10 @@
 - C6.1 通过真实页面录入分钟 `45` 后回到 C6；C6.2 真实显示“未提交草稿已保存”，并明确“这条未提交的比赛事件仅保存在当前设备”。这是设备本机草稿契约，不宣称服务端自动保存。
 - 可信屏幕像素证据：C6 `tmp/coach-runtime-acceptance/C6-acceptance-coach-final.png`、C6.1 `tmp/coach-runtime-acceptance/C6-1-acceptance-coach-final.png`、C6.2 严格 `375×812` 的 `tmp/coach-runtime-acceptance/C6-2-acceptance-phone-clean.png`；C6.2 对照图为 `tmp/coach-runtime-acceptance/C6-2-acceptance-compare-final.png`。C6.2 的遮罩、弹层层级、圆角卡片、继续/退出按钮顺序和底部教练导航与在线画板结构一致；比赛标题、比分、时间和本机保存时间属于动态真实数据差异。
 - C6 视觉修复仍为最小改动：`apps/miniprogram-cq-talent/pages/coach/match/index.wxss` 将内容区顶部留白调整为 `88rpx`，并在 `index.test.mjs` 增加布局回归断言。C6/C6.1 聚焦测试先红后绿 `15/15`；本批提交前已重新运行全仓门禁、TypeScript 与 `git diff --check`。
+
+## 2026-08-17 C11 测评任务运行态视觉复验与几何收口
+
+- 在线唯一基准已重读：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1002 / C11 Test Task List`。Figma 的 `331px` Task List 是外层容器，内含左右 `16px` gutter；可见任务卡应为 `299×116px`。已将页面内容横向内边距收口为 `76rpx`，并按画板的筛选器内嵌节奏调整为 `64rpx` 顶部/`28rpx` 卡前间距。
+- C11 顶栏使用 `height:calc(176rpx - navInset)` 与 `padding-top:navInset` 保持合计 `88px` 的安全区包络，不再因状态栏内边距把正文向下推移。真实 BFF 的任务、日期、状态、进度、筛选、角色守卫和无创建 API 时的诚实提示均未改变。
+- 可信 375×812 证据：`tmp/coach-runtime-acceptance/C11-acceptance-phone-final.png`；在线稿对照：`tmp/coach-runtime-acceptance/C11-figma-online-20260817.png`；并排图：`tmp/coach-runtime-acceptance/C11-acceptance-compare-final.png`。筛选、卡片、进度轨、FAB、底栏的几何已复验；具体日期/状态/进度和原生状态栏、微信胶囊是动态数据或设备系统层差异。
+- 验证先红后绿：C11 聚焦 Vitest `8/8`、小程序 typecheck 与 `git diff --check` 通过；根 `npx --yes pnpm@10.33.0 run check` 全绿（domain `19/19`、mini-program `327/327`、API `105/105`）。
