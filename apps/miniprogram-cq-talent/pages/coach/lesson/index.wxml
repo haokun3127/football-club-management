@@ -2,14 +2,16 @@
   <app-header theme="soft" title="课时确认" title-align="left" show-back />
 
   <view class="c5-body">
-    <status-view state="{{state}}" title="课时确认" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
+    <status-view wx:if="{{state !== 'ready' && state !== 'idle'}}" state="{{state}}" title="课时确认" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready' && hasRoster}}">
       <view class="c5-hero">
         <view class="c5-hero__title">{{eventTitle}}</view>
-        <view class="c5-hero__meta" wx:if="{{hasEventTeam}}">{{eventTeam}} · {{eventDate}}</view>
-        <view class="c5-hero__meta" wx:else>{{eventDate}}</view>
-        <view class="c5-hero__meta">{{eventTime}}</view>
+        <view class="c5-hero__meta-group">
+          <view class="c5-hero__meta" wx:if="{{hasEventTeam}}">{{eventTeam}} · {{eventDate}}</view>
+          <view class="c5-hero__meta" wx:else>{{eventDate}}</view>
+          <view class="c5-hero__meta">{{eventTime}}</view>
+        </view>
       </view>
 
       <view class="c5-list">
@@ -29,7 +31,8 @@
   </view>
 
   <view wx:if="{{state === 'ready' && hasRoster}}" class="c5-confirm-bar">
-    <button class="c5-confirm-bar__button" loading="{{saving}}" disabled="{{saving || !canConfirm}}" bindtap="confirmLesson">确认全部</button>
+    <view wx:if="{{saving}}" class="c5-confirm-bar__button c5-confirm-bar__button--disabled">确认中...</view>
+    <view wx:else class="c5-confirm-bar__button" bindtap="confirmLesson">确认全部</view>
     <view class="c5-confirm-bar__correction" bindtap="openCorrection">发起更正</view>
   </view>
 

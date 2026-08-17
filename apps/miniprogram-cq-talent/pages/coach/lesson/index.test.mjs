@@ -207,6 +207,8 @@ describe("coach lesson confirmation", () => {
 
   it("uses the C5 Figma header and compact confirmation hierarchy without a non-Figma note card", () => {
     expect(template).toContain('<app-header theme="soft" title="课时确认" title-align="left" show-back />');
+    expect(template).toContain('<status-view wx:if="{{state !== \'ready\' && state !== \'idle\'}}"');
+    expect(template).toContain('class="c5-hero__meta-group"');
     expect(template).not.toContain('class="c5-nav"');
     expect(template).not.toContain('class="lesson-note-card"');
     expect(template).not.toContain('class="c5-confirm-bar__hint"');
@@ -214,7 +216,11 @@ describe("coach lesson confirmation", () => {
     expect(pageConfig).toContain('"app-header"');
     expect(controller).not.toContain("resolveMenuInset");
     expect(controller).not.toContain("resolveNavInset");
-    expect(styles).toContain("min-height: 104rpx");
+    expect(styles).toMatch(/\.c5-row\s*\{[^}]*padding:\s*32rpx/s);
+    expect(styles).toMatch(/\.c5-chip\s*\{[^}]*padding:\s*8rpx\s+16rpx/s);
+    expect(styles).toMatch(/\.c5-confirm-bar\s*\{[^}]*padding:\s*44rpx/s);
+    expect(styles).toMatch(/\.c5-confirm-bar__button\s*\{[^}]*height:\s*104rpx/s);
+    expect(styles).not.toMatch(/\.c5-confirm-bar\s*\{[^}]*box-shadow/s);
     expect(styles).toContain("bottom: 140rpx");
   });
 });

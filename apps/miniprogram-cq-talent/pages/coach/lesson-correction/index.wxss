@@ -4,14 +4,17 @@
 }
 
 .correction-page__body {
-  padding: 44rpx var(--space-page) calc(268rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 40rpx;
+  padding: 44rpx var(--space-page) calc(320rpx + env(safe-area-inset-bottom));
 }
 
 .correction-intro,
 .student-card {
-  margin-bottom: 24rpx;
-  padding: 24rpx;
-  border-radius: 16rpx;
+  box-sizing: border-box;
+  margin: 0;
+  border-radius: 24rpx;
   background: var(--color-card);
 }
 
@@ -23,47 +26,53 @@
 }
 
 .correction-intro__text {
-  margin-top: 8rpx;
   font-size: 24rpx;
+  line-height: 32rpx;
   color: var(--color-text-secondary);
 }
 
 .correction-intro {
   position: relative;
-  padding-left: 36rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  padding: 32rpx 32rpx 32rpx 56rpx;
 }
 
 .correction-intro::before {
   position: absolute;
-  top: 30rpx;
-  bottom: 30rpx;
-  left: 16rpx;
-  width: 6rpx;
-  border-radius: 999rpx;
+  top: 32rpx;
+  bottom: 32rpx;
+  left: 32rpx;
+  width: 8rpx;
+  border-radius: 4rpx;
   background: #f59e0b;
   content: "";
+}
+
+.student-card {
+  display: flex;
+  flex-direction: column;
+  gap: 32rpx;
+  padding: 32rpx;
 }
 
 .student-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16rpx;
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid var(--color-line);
-}
-
-.student-row:last-child {
-  border-bottom: 0;
+  min-height: 80rpx;
 }
 
 .student-row__avatar {
   display: flex;
-  flex: 0 0 56rpx;
-  width: 56rpx;
-  height: 56rpx;
+  flex: 0 0 80rpx;
+  width: 80rpx;
+  height: 80rpx;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: 40rpx;
   color: var(--color-text);
   font-size: 22rpx;
   font-weight: 600;
@@ -76,7 +85,7 @@
 
 .student-row__name {
   overflow: hidden;
-  font-size: 26rpx;
+  font-size: 28rpx;
   font-weight: 600;
   color: var(--color-text);
   text-overflow: ellipsis;
@@ -84,14 +93,14 @@
 }
 
 .student-row__balance {
-  margin-top: 6rpx;
+  margin-top: 4rpx;
   font-size: 22rpx;
   color: var(--color-text-secondary);
 }
 
 .student-row__tag {
   flex: 0 0 auto;
-  padding: 8rpx 12rpx;
+  padding: 8rpx 16rpx;
   border-radius: 8rpx;
   background: #fff7ed;
   color: #d97706;
@@ -99,34 +108,63 @@
   font-weight: 600;
 }
 
-.student-row__stepper {
+.student-row__adjustment {
   display: flex;
   align-items: center;
-  gap: 12rpx;
-}
-
-.student-row__button {
-  display: flex;
-  width: 56rpx;
-  height: 56rpx;
-  align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  width: 160rpx;
+  height: 80rpx;
   border: 1rpx solid var(--color-line);
-  border-radius: 10rpx;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
   color: var(--color-text);
-  font-size: 32rpx;
 }
 
 .student-row__delta {
-  min-width: 72rpx;
+  min-width: 44rpx;
   color: var(--color-text-secondary);
-  font-size: 26rpx;
-  font-weight: 700;
+  font-size: 28rpx;
+  font-weight: 600;
   text-align: center;
 }
 
 .student-row__delta--changed {
   color: var(--color-brand);
+}
+
+.student-row__adjustment-arrows {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  align-items: center;
+}
+
+.student-row__adjustment-arrow {
+  position: relative;
+  width: 24rpx;
+  height: 24rpx;
+}
+
+.student-row__adjustment-arrow::after {
+  position: absolute;
+  left: 7rpx;
+  width: 10rpx;
+  height: 10rpx;
+  border-color: var(--color-text);
+  border-style: solid;
+  border-width: 0 2rpx 2rpx 0;
+  content: "";
+}
+
+.student-row__adjustment-arrow--up::after {
+  top: 8rpx;
+  transform: rotate(225deg);
+}
+
+.student-row__adjustment-arrow--down::after {
+  top: 2rpx;
+  transform: rotate(45deg);
 }
 
 .submit-error {
@@ -142,19 +180,24 @@
   left: 0;
   z-index: 50;
   box-sizing: border-box;
-  padding: 22rpx var(--space-page);
-  border-top: 1rpx solid var(--color-line);
-  background: rgba(246, 247, 249, 0.98);
-  box-shadow: 0 -8rpx 24rpx rgba(16, 24, 40, 0.06);
+  padding: 0 var(--space-page) 40rpx;
+  background: transparent;
 }
 
 .lesson-correction-submit__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
   width: 100%;
-  min-height: 104rpx;
-  border-radius: 24rpx;
+  height: 104rpx;
+  border-radius: 52rpx;
   background: var(--color-brand);
   color: #ffffff;
   font-size: 30rpx;
   font-weight: 600;
-  line-height: 104rpx;
+}
+
+.lesson-correction-submit__button--disabled {
+  opacity: 0.72;
 }

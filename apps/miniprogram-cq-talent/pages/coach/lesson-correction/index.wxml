@@ -1,7 +1,7 @@
 <view class="correction-page">
   <app-header theme="soft" title="课时更正" title-align="left" show-back />
   <view class="correction-page__body">
-    <status-view
+    <status-view wx:if="{{state !== 'ready' && state !== 'idle'}}"
       state="{{state}}"
       title="{{statusTitle}}"
       message="{{message}}"
@@ -11,12 +11,12 @@
 
     <block wx:if="{{state === 'ready' && hasRows}}">
       <view class="correction-intro">
-        <view class="correction-intro__title">课时记录更正</view>
-        <view class="correction-intro__text">请核对以下学员的课时信息后再保存</view>
+        <view class="correction-intro__title">课时记录需要更正</view>
+        <view class="correction-intro__text">请检查并更正以下学员的课时记录</view>
       </view>
 
       <view class="student-card">
-        <view class="student-card__title">可更正学员</view>
+        <view class="student-card__title">需要更正的学员</view>
         <view wx:for="{{rows}}" wx:key="studentId" class="student-row">
           <view class="student-row__avatar" style="background: {{item.avatarColor}}">{{item.avatarLetter}}</view>
           <view class="student-row__info">
@@ -24,10 +24,12 @@
             <view class="student-row__balance">{{item.balanceText}}</view>
           </view>
           <view class="student-row__tag">课时调整</view>
-          <view class="student-row__stepper">
-            <view class="student-row__button" data-student-id="{{item.studentId}}" data-direction="{{-1}}" bindtap="adjustDelta">-</view>
+          <view class="student-row__adjustment">
             <view class="student-row__delta {{item.delta !== 0 ? 'student-row__delta--changed' : ''}}">{{item.deltaLabel}}</view>
-            <view class="student-row__button" data-student-id="{{item.studentId}}" data-direction="{{1}}" bindtap="adjustDelta">+</view>
+            <view class="student-row__adjustment-arrows">
+              <view class="student-row__adjustment-arrow student-row__adjustment-arrow--up" data-student-id="{{item.studentId}}" data-direction="{{1}}" bindtap="adjustDelta"></view>
+              <view class="student-row__adjustment-arrow student-row__adjustment-arrow--down" data-student-id="{{item.studentId}}" data-direction="{{-1}}" bindtap="adjustDelta"></view>
+            </view>
           </view>
         </view>
       </view>
@@ -36,7 +38,8 @@
     </block>
   </view>
   <view wx:if="{{state === 'ready' && hasRows}}" class="lesson-correction-submit">
-    <button class="lesson-correction-submit__button" loading="{{submitting}}" disabled="{{!canSubmit || submitting}}" bindtap="submit">保存更正</button>
+    <view wx:if="{{submitting}}" class="lesson-correction-submit__button lesson-correction-submit__button--disabled">保存中...</view>
+    <view wx:else class="lesson-correction-submit__button" bindtap="submit">保存更正</view>
   </view>
   <role-tabbar role="coach" active="schedule" />
 </view>

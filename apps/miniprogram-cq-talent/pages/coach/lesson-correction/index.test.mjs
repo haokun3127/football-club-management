@@ -174,7 +174,7 @@ describe("coach lesson correction", () => {
     expect(template).toContain('<app-header theme="soft" title="课时更正" title-align="left" show-back />');
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
     expect(template).not.toContain("系统差异");
-    expect(template).toContain("课时记录更正");
+    expect(template).toContain("课时记录需要更正");
     expect(template).not.toContain("课时记录异常");
     expect(template).not.toContain("陈小宇");
     expect(template).not.toContain("王一涵");
@@ -186,9 +186,11 @@ describe("coach lesson correction", () => {
   it("uses the C5.1 Figma soft header and fixed correction action above the coach tab bar", () => {
     const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
     expect(template).toContain('<app-header theme="soft" title="课时更正" title-align="left" show-back />');
+    expect(template).toContain('<status-view wx:if="{{state !== \'ready\' && state !== \'idle\'}}"');
     expect(template).toContain('class="lesson-correction-submit"');
     expect(styles).toContain("bottom: 140rpx");
-    expect(styles).toContain("min-height: 104rpx");
+    expect(styles).toMatch(/\.lesson-correction-submit__button\s*\{[^}]*height:\s*104rpx/s);
+    expect(styles).not.toMatch(/\.lesson-correction-submit\s*\{[^}]*box-shadow/s);
   });
 
   it("renders Figma-like compact correction rows from precomputed real student identity fields", () => {
@@ -196,9 +198,15 @@ describe("coach lesson correction", () => {
     expect(template).toContain('class="student-row__avatar"');
     expect(template).toContain('{{item.avatarLetter}}');
     expect(template).toContain('background: {{item.avatarColor}}');
+    expect(template).toContain('class="student-row__adjustment"');
+    expect(template).toContain('class="student-row__adjustment-arrow student-row__adjustment-arrow--up"');
+    expect(template).toContain('class="student-row__adjustment-arrow student-row__adjustment-arrow--down"');
+    expect(template).toContain("需要更正的学员");
     expect(template).not.toContain('class="reason-card"');
     expect(controller).toContain("avatarColor");
-    expect(styles).toContain("width: 56rpx");
+    expect(styles).toMatch(/\.correction-page__body\s*\{[^}]*gap:\s*40rpx/s);
+    expect(styles).toMatch(/\.student-row__avatar\s*\{[^}]*width:\s*80rpx/s);
+    expect(styles).toMatch(/\.student-row__adjustment\s*\{[^}]*width:\s*160rpx[^}]*height:\s*80rpx/s);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 });
