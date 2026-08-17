@@ -1,6 +1,7 @@
 .c4 { min-height: 100vh; background: #f6f7f9; }
 
 .c4-body { padding: 44rpx 44rpx calc(180rpx + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 32rpx; }
+.c4--correction .c4-body { gap: 40rpx; }
 
 /* C4 Session Header */
 .c4-hero {
@@ -53,10 +54,15 @@
 .student-avatar { width: 72rpx; height: 72rpx; border-radius: 36rpx; background: #3b82f6; color: #ffffff; font-size: 26rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; }
 .student-name { overflow: hidden; color: #202124; font-size: 28rpx; font-weight: 700; line-height: 34rpx; text-overflow: ellipsis; white-space: nowrap; }
 .lesson-state { color: #667085; font-size: 22rpx; margin-top: 4rpx; }
+.attendance-confirmation { display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: 40rpx; height: 40rpx; border: 4rpx solid #188754; border-radius: 50%; color: #188754; font-size: 28rpx; font-weight: 700; line-height: 1; }
 .note-input { box-sizing: border-box; width: 100%; margin-top: 16rpx; padding: 14rpx 20rpx; border-radius: 12rpx; background: #f8f9fb; color: #202124; font-size: 24rpx; }
+.roster-footer { padding: 0 16rpx; color: #667085; font-size: 24rpx; line-height: 30rpx; text-align: right; }
 
 /* 恢复自重写前样式（pre-b14） */
 .correction-alert__texts { width: 100%; }
+.c4--correction .roster-card { gap: 0; overflow: hidden; border-radius: 24rpx; background: #ffffff; }
+.c4--correction .attendance-row { min-height: 120rpx; border-radius: 0; box-shadow: none; }
+.c4--correction .attendance-row + .attendance-row { border-top: 1rpx solid #e7eaf0; }
 .save-error { padding: 20rpx 24rpx; border: 1rpx solid #fecaca; border-radius: 16rpx; background: #fff1f2; color: #b42318; font-size: 24rpx; line-height: 34rpx; }
 .c4-correction-submit { position: fixed; right: 0; bottom: 140rpx; left: 0; z-index: 50; box-sizing: border-box; padding: 32rpx 44rpx; background: rgba(246, 247, 249, 0.98); }
 .c4-correction-submit__button { width: 100%; min-height: 104rpx; border-radius: 24rpx; background: #a80f1b; color: #ffffff; font-size: 32rpx; font-weight: 600; line-height: 104rpx; }

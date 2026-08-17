@@ -5,7 +5,7 @@
       <view wx:if="{{showBack}}" class="app-header__back" role="button" aria-label="返回" bindtap="handleBack">‹</view>
     </view>
     <view class="app-header__heading app-header__heading--{{titleAlign}}">
-      <view class="app-header__title">{{title}}</view>
+      <view class="app-header__title {{largeTitle ? 'app-header__title--large' : ''}}">{{title}}</view>
       <view wx:if="{{subtitle}}" class="app-header__subtitle">{{subtitle}}</view>
     </view>
     <view class="app-header__side app-header__side--right">

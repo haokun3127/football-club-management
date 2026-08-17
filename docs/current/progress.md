@@ -687,3 +687,12 @@
 - API：事件详情按 primaryTeamId 从 teams 表解析 teamName（be30874，含 server.test 断言）——已二次部署生产（镜像 2dbab99eb370，缓存加速构建，sudo compose up -d --no-build，health 200）
 - 生产数据：3 支 secure-test 队重命名为中文『U10 测试队 1/2/3』（备份 api-backup-pre-teamname-20260813.sqlite）
 - 验收：P2.1 实机截图 sidebyside 通过——真实主队名、完整赛事名、0:0+待开始 pill、布局无挤压
+
+## 2026-08-17 C4 出勤页最终 UI 收口（静态/API 验证通过，运行时视觉待补）
+
+- 在线 Figma 抽查：`zZ6wKyOHKcO4UYXDd9jGwv` 的 C4 `93:665`、C4.1 `93:696`、C4.2 `93:715` 与本地参考 PNG 仅有非实质像素差异；不覆盖参考图。
+- C4：保留真实 workbench 名单和既有出勤 PUT；`confirmed`/`invited` 在页面 view model 中仍按未点名处理，动态新增“共 N 名学员”尾栏，到课状态改为可点击、仍可打开真实选择器的绿色确认圆形。
+- C4.2：同时兼容规范路由 `?correction=1` 和旧 `?mode=correction`；不再继承深色活动摘要，只保留真实警示、真实名单、逐人备注和固定重新提交区，不添加“家长异议”“异常数量”“全局修改说明”等无 API 支持的数据。
+- C4.1：继续按 eventId 重新 GET workbench 读取真实统计；移除未声明的 `venue`/`hasVenue` 写入，主按钮改为中性“查看活动详情”。共享顶栏新增按页启用的 22px 标题变体，未改变其他页面的默认标题尺寸。
+- 验证：先新增会失败的回归测试，再完成最小实现；聚焦 Vitest `23/23`、小程序 `typecheck`、`git diff --check` 及全仓门禁均通过（domain `19/19`、小程序 `319/319`、API `104/104`）。
+- 运行时截图：先前自动化已确认 C4 路由和 iPhone X 逻辑 `375×812`，但提交前 `9432` 端口已失效，且 Windows 未发现可见的“的模拟器”窗口；未生成或接受任何截图证据，因此明确不宣称视觉运行态验收完成。

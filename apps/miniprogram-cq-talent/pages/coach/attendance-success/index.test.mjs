@@ -25,6 +25,7 @@ globalThis.Page = (definition) => {
 await import("./index.ts");
 
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
+const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
 
 function createPageInstance(data = {}) {
   const instance = {
@@ -84,6 +85,7 @@ describe("coach attendance success", () => {
       eventDate: "2026-08-13",
       eventTime: "09:00-10:00",
       attendanceText: "2/5人",
+      detailActionText: "查看活动详情",
       summary: { total: 5, present: 2, absent: 2, pending: 1 },
     });
   });
@@ -123,17 +125,22 @@ describe("coach attendance success", () => {
   });
 
   it("keeps the template state-gated, data-driven, and free of unsafe WXML expressions", () => {
-    expect(template).toContain('<app-header theme="soft" title="出勤管理" title-align="left" show-back />');
+    expect(template).toContain('<app-header theme="soft" title="出勤管理" title-align="left" large-title show-back />');
     expect(template).toContain('wx:elif="{{state === \'ready\'}}"');
     expect(template).toContain('bindtap="openWorkbench"');
     expect(template).toContain('bindtap="openSchedule"');
     expect(template).toContain("attendanceText");
     expect(template).toContain(">课程</text>");
     expect(template).toContain(">出席</text>");
+    expect(template).toContain("{{detailActionText}}");
     expect(template).not.toContain("hasVenue");
+    expect(template).not.toContain("查看训练详情");
     expect(template).not.toContain("18/20");
     expect(template).not.toContain("20人");
     expect(template).not.toContain("技术专项训练");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
+    expect(controller).toContain('detailActionText: "查看活动详情"');
+    expect(controller).not.toContain("venue:");
+    expect(controller).not.toContain("hasVenue:");
   });
 });

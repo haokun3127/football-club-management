@@ -4,7 +4,7 @@ import { activityStatus, formatCalendarDate, formatTimeRange } from "../../../ut
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
 
 type RosterItem = CoachWorkbench["roster"][number];
-type RosterUiItem = RosterItem & { avatarLetter: string; avatarColor: string; statusLabel: string; statusTone: string; statusIndex: number; hasLessonAction: boolean };
+type RosterUiItem = RosterItem & { avatarLetter: string; avatarColor: string; statusLabel: string; statusTone: string; statusIndex: number; statusIsPresent: boolean; hasLessonAction: boolean };
 
 const statusOptions = [
   { label: "未点名", value: "pending" },
@@ -26,6 +26,7 @@ interface AttendancePageData {
   eventStatusTone: string;
   roster: RosterUiItem[];
   hasRoster: boolean;
+  rosterFooter: string;
   saving: boolean;
   canSave: boolean;
   statusOptions: typeof statusOptions;
@@ -47,6 +48,7 @@ Page<AttendancePageData>({
     eventStatusTone: "neutral",
     roster: [],
     hasRoster: false,
+    rosterFooter: "",
     saving: false,
     canSave: false,
     statusOptions,
@@ -57,7 +59,7 @@ Page<AttendancePageData>({
   },
   onLoad(query?: Record<string, string | undefined>) {
     requireRole("coach");
-    this.setData({ correctionMode: query?.mode === "correction" });
+    this.setData({ correctionMode: query?.correction === "1" || query?.mode === "correction" });
     this.load(query?.id || "");
   },
   async load(id: string) {
@@ -68,6 +70,7 @@ Page<AttendancePageData>({
         eventId: "",
         roster: [],
         hasRoster: false,
+        rosterFooter: "",
         canSave: false,
         summary: emptySummary(),
         hasSaveError: false,
@@ -93,6 +96,7 @@ Page<AttendancePageData>({
         eventStatusTone: eventStatus.tone,
         roster,
         hasRoster: roster.length > 0,
+        rosterFooter: rosterFooterText(roster.length),
         canSave,
         summary: summarizeRoster(roster),
         saving: false,
@@ -105,6 +109,7 @@ Page<AttendancePageData>({
         message: "点名名单读取失败，请稍后重试。",
         roster: [],
         hasRoster: false,
+        rosterFooter: "",
         canSave: false,
         summary: emptySummary(),
         saving: false,
@@ -182,6 +187,7 @@ function withRosterUi(roster: RosterItem[]): RosterUiItem[] {
       statusLabel: option.label,
       statusTone: statusTone(option.value),
       statusIndex: Math.max(0, statusIndex),
+      statusIsPresent: option.value === "present",
       hasLessonAction: Boolean(student.lessonAction),
     };
   });
@@ -202,6 +208,10 @@ function summarizeRoster(roster: RosterItem[]) {
 
 function emptySummary() {
   return { total: 0, present: 0, absent: 0, pendingCount: 0 };
+}
+
+function rosterFooterText(total: number) {
+  return total ? `共 ${total} 名学员` : "";
 }
 
 function statusTone(status: string) {

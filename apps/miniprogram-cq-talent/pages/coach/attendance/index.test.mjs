@@ -103,6 +103,28 @@ describe("coach attendance", () => {
     expect(page.data.summary).toMatchObject({ total: 3, present: 1, absent: 2, pendingCount: 0 });
   });
 
+  it("normalizes RSVP statuses and precomputes the real roster footer plus present confirmation", async () => {
+    mocks.getCoachWorkbench.mockResolvedValue({
+      ...workbench,
+      roster: [
+        { studentId: "student-confirmed", name: "Athlete Confirmed", status: "confirmed" },
+        { studentId: "student-invited", name: "Athlete Invited", status: "invited" },
+        { studentId: "student-present", name: "Athlete Present", status: "present" },
+      ],
+    });
+    const page = createPageInstance();
+    await page.load("event-1");
+
+    expect(page.data).toMatchObject({
+      rosterFooter: "共 3 名学员",
+      roster: [
+        { studentId: "student-confirmed", status: "pending", statusIsPresent: false },
+        { studentId: "student-invited", status: "pending", statusIsPresent: false },
+        { studentId: "student-present", status: "present", statusIsPresent: true },
+      ],
+    });
+  });
+
   it("blocks pending attendance, keeps edits after a failed PUT, and submits at most one PUT", async () => {
     mocks.getCoachWorkbench.mockResolvedValue({
       ...workbench,
@@ -144,12 +166,12 @@ describe("coach attendance", () => {
     expect(failedPage.data.roster[0]).toMatchObject({ note: "Keep this edit" });
   });
 
-  it("uses correction mode to revise the real roster without inventing a parent dispute", async () => {
+  it("accepts the canonical correction query and legacy mode alias without inventing a parent dispute", async () => {
     mocks.getCoachWorkbench.mockResolvedValue(workbench);
     mocks.saveCoachAttendance.mockRejectedValueOnce(Object.assign(new Error("forbidden"), { status: 403 }));
     const page = createPageInstance();
 
-    await page.onLoad({ id: "event-1", mode: "correction" });
+    await page.onLoad({ id: "event-1", correction: "1" });
     expect(page.data).toMatchObject({
       correctionMode: true,
       roster: [
@@ -167,6 +189,10 @@ describe("coach attendance", () => {
     ]));
     expect(page.data).toMatchObject({ saving: false, hasSaveError: true });
     expect(globalThis.wx.redirectTo).not.toHaveBeenCalled();
+
+    const legacyPage = createPageInstance();
+    await legacyPage.onLoad({ id: "event-1", mode: "correction" });
+    expect(legacyPage.data.correctionMode).toBe(true);
   });
 
   it("keeps missing IDs, empty rosters, and workbench failures as safe page states", async () => {
@@ -191,6 +217,10 @@ describe("coach attendance", () => {
     expect(template).toContain("hasRoster");
     expect(template).toContain('wx:if="{{hasSaveError}}"');
     expect(template).toContain('loading="{{saving}}"');
+    expect(template).toContain('class="roster-footer"');
+    expect(template).toContain('{{rosterFooter}}');
+    expect(template).toContain('wx:if="{{item.statusIsPresent}}"');
+    expect(template).toContain('wx:if="{{!correctionMode}}" class="c4-hero"');
     expect(template).not.toContain("技术专项训练");
     expect(template).not.toContain("U10精英队");
     expect(template).not.toContain("陈小宇");
@@ -205,6 +235,7 @@ describe("coach attendance", () => {
 
   it("uses the shared 88px Figma header and coach tab bar without an overlapping submit bar", () => {
     expect(template).toContain('<app-header theme="soft"');
+    expect(template).toContain('large-title');
     expect(template).toContain('action-text="{{canSave && !saving && !correctionMode ? \'提交\' : \'\'}}"');
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
     expect(template).not.toContain("<submit-bar");

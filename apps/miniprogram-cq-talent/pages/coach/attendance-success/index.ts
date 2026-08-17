@@ -14,6 +14,7 @@ interface AttendanceSuccessPageData {
   eventDate: string;
   eventTime: string;
   attendanceText: string;
+  detailActionText: string;
   summary: AttendanceSummary;
 }
 
@@ -26,6 +27,7 @@ Page<AttendanceSuccessPageData>({
     eventDate: "",
     eventTime: "",
     attendanceText: "",
+    detailActionText: "查看活动详情",
     summary: emptySummary(),
   },
   onLoad(query?: Record<string, string | undefined>) {
@@ -39,10 +41,11 @@ Page<AttendanceSuccessPageData>({
         message: "缺少活动 ID",
         eventId: "",
         eventTitle: "",
-        eventDate: "",
-        eventTime: "",
-        attendanceText: "",
-        summary: emptySummary(),
+      eventDate: "",
+      eventTime: "",
+      attendanceText: "",
+      detailActionText: "查看活动详情",
+      summary: emptySummary(),
       });
       return;
     }
@@ -54,8 +57,6 @@ Page<AttendanceSuccessPageData>({
       eventTitle: "",
       eventDate: "",
       eventTime: "",
-      venue: "",
-      hasVenue: false,
       summary: emptySummary(),
     });
 
@@ -69,6 +70,7 @@ Page<AttendanceSuccessPageData>({
         eventDate: formatCalendarDate(workbench.event.startsAt),
         eventTime: formatTimeRange(workbench.event.startsAt, workbench.event.endsAt),
         attendanceText: attendanceText(summarizeAttendance(workbench)),
+        detailActionText: "查看活动详情",
         summary: summarizeAttendance(workbench),
       });
     } catch {
@@ -80,6 +82,7 @@ Page<AttendanceSuccessPageData>({
         eventDate: "",
         eventTime: "",
         attendanceText: "",
+        detailActionText: "查看活动详情",
         summary: emptySummary(),
       });
     }

@@ -1,5 +1,5 @@
-<view class="c4">
-  <app-header theme="soft" title="{{correctionMode ? '出勤修改' : '出勤管理'}}" title-align="left" action-text="{{canSave && !saving && !correctionMode ? '提交' : ''}}" bindaction="saveAttendance" show-back />
+<view class="c4 {{correctionMode ? 'c4--correction' : ''}}">
+  <app-header theme="soft" title="{{correctionMode ? '出勤修改' : '出勤管理'}}" title-align="left" large-title action-text="{{canSave && !saving && !correctionMode ? '提交' : ''}}" bindaction="saveAttendance" show-back />
 
   <view class="c4-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '正在读取名单' : state === 'empty' ? '暂无学员' : '名单读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重新加载' : ''}}" bindaction="retry" />
@@ -13,7 +13,7 @@
         </view>
       </view>
 
-      <view class="c4-hero">
+      <view wx:if="{{!correctionMode}}" class="c4-hero">
         <view class="c4-hero__title">{{eventTitle}}</view>
         <view wx:if="{{hasEventMeta}}" class="c4-hero__meta">{{eventMeta}}</view>
         <view class="c4-hero__counts">
@@ -39,12 +39,15 @@
               </view>
             </view>
             <picker mode="selector" range="{{statusOptions}}" range-key="label" value="{{item.statusIndex}}" disabled="{{saving || !canSave}}" data-index="{{index}}" bindchange="onStatusChange">
-              <status-chip label="{{item.statusLabel}}" tone="{{item.statusTone}}" />
+              <view wx:if="{{item.statusIsPresent}}" class="attendance-confirmation" aria-label="到课">✓</view>
+              <status-chip wx:else label="{{item.statusLabel}}" tone="{{item.statusTone}}" />
             </picker>
           </view>
           <input wx:if="{{correctionMode}}" class="note-input" placeholder="补充迟到、请假等说明（选填）" value="{{item.note}}" disabled="{{saving || !canSave}}" data-index="{{index}}" bindinput="onNoteInput" />
         </view>
       </view>
+
+      <view wx:if="{{rosterFooter}}" class="roster-footer">{{rosterFooter}}</view>
 
       <view wx:if="{{hasSaveError}}" class="save-error">{{saveError}}</view>
     </block>

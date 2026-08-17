@@ -1,5 +1,5 @@
 <view class="success-page">
-  <app-header theme="soft" title="出勤管理" title-align="left" show-back />
+  <app-header theme="soft" title="出勤管理" title-align="left" large-title show-back />
 
   <view class="success-page__body" wx:if="{{state === 'loading'}}">
     <view class="page-state">正在读取出勤记录</view>
@@ -32,7 +32,7 @@
     </view>
 
     <view class="actions">
-      <button class="actions__primary" bindtap="openWorkbench">查看训练详情</button>
+      <button class="actions__primary" bindtap="openWorkbench">{{detailActionText}}</button>
     </view>
   </view>
 
