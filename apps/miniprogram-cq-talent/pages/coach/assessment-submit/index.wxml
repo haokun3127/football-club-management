@@ -19,7 +19,7 @@
         <view class="c151-success__circle">
           <image class="c151-success__check" src="/assets/icons/c151-check.svg" mode="aspectFit" />
         </view>
-        <view class="c151-success__title">评估已提交</view>
+        <view class="c151-success__title">{{taskTitle}}已提交</view>
         <view class="c151-success__subtitle">已记录本次评估提交</view>
       </view>
 
@@ -41,7 +41,7 @@
       </view>
 
       <view class="c151-actions">
-        <view class="c151-actions__primary" bindtap="viewResults">查看当前结果</view>
+        <view class="c151-actions__primary" bindtap="viewResults">查看结果</view>
         <view class="c151-actions__secondary" bindtap="backToList">返回列表</view>
       </view>
     </block>

@@ -919,3 +919,12 @@
 - 为匹配 6px Figma 指标轨道，同时保持真实触控录入，C15 将原生 slider 设为透明交互层，TS view model 预计算 `progressPercent`，WXML 仅渲染预计算宽度的轨道；未在 WXML 调用 JS 方法。学员副标题取真实 `getCoachTeam()` 的团队名。
 - 可信证据：`tmp/coach-runtime-acceptance/C15-acceptance-phone-final.png` 与 `tmp/coach-runtime-acceptance/C15-acceptance-compare-final.png`，均为 DevTools `print_window` 通道生成的严格 `375×812` 图。真实服务器目前提供两名学员、七个指标、真实团队名和空草稿，而在线稿为三名/六项/样例分数；这些是数据差异，未伪造以求像素相同。
 - 验证先红后绿：C15 + `role-tabbar` 定向 Vitest `332/332`、小程序 typecheck、`git diff --check` 通过；根 `npx --yes pnpm@10.33.0 run check` 已以完整后台日志得到 `CHECK_EXIT_0`（domain `19/19`、mini-program `332/332`、API `105/105`）。
+
+## 2026-08-17 C15.1 评估提交真实运行态视觉收口
+
+- 在线唯一基准已重读：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1163 / C15.1 Assessment Submit`。真实教练路由为 `pages/coach/assessment-submit/index?title=%E8%83%BD%E5%8A%9B%E8%AF%84%E4%BC%B0&count=2`，页面只接受已认证 coach、经过解码的标题及正整数人数。
+- 运行态发现顶栏仍将 `176rpx` 与 `navInset` 叠加，令粉色导航和后续内容整体下移一个状态栏高度。现按画板的 88px 安全区包络收口为 `88rpx + content-box`，同时把左右内边距/标题间距调为画板的 16px/8px 节奏。
+- 为保持真实语义，成功标题现在由合法路由标题派生（如“能力评估已提交”）；主按钮收敛为“查看结果”，仍只跳转既有团队能力总览。画板的“24小时 / 处理中 / 18名 / 技术评估”未被伪装成生产数据。
+- 可信 375×812 证据：`tmp/coach-runtime-acceptance/C151-acceptance-phone-final.png` 与 `tmp/coach-runtime-acceptance/C151-acceptance-compare-final.png`；截图通道为 DevTools `print_window`。摘要卡和操作区已对齐在线稿；动态真实数据、状态栏、微信胶囊及 Home Indicator 属允许差异。
+- 截图链路同步修复：当 DevTools 不在前台时，`PrintWindow` 会得到纯白帧、桌面 fallback 会截到 Codex。现在在捕获前桥接当前前台输入线程并在 `finally` 解除桥接，实测可自行切回 DevTools 后输出严格 `375×812`。
+- 验证先红后绿：C15.1 定向 Vitest `4/4`、截图脚本 Python 回归 `6/6`、`git diff --check` 与根 `npx --yes pnpm@10.33.0 run check` 全绿（domain `19/19`、mini-program `332/332`、API `105/105`）。

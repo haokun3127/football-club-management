@@ -90,7 +90,8 @@ describe("C15.1 coach assessment submit", () => {
     expect(template).toContain('bindtap="viewResults"');
     expect(template).toContain('bindtap="backToList"');
     expect(template).toContain('role="coach" active="training"');
-    expect(template).toContain("查看当前结果");
+    expect(template).toContain("{{taskTitle}}已提交");
+    expect(template).toContain(">查看结果</view>");
     expect(template).not.toContain("24小时");
     expect(template).not.toContain("处理中");
     expect(template).not.toContain("技术评估");
@@ -99,12 +100,15 @@ describe("C15.1 coach assessment submit", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"app-header"');
     expect(template).toContain('padding-top:{{navInset}}px');
-    expect(stylesheet).toMatch(/\.c151-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+    expect(stylesheet).toMatch(/\.c151-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*padding:\s*0\s+32rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+    expect(stylesheet).toMatch(/\.c151-nav__title\s*\{[^}]*margin-left:\s*16rpx/s);
     expect(stylesheet).toMatch(/\.c151-success\s*\{[^}]*gap:\s*0/s);
     expect(stylesheet).toMatch(/\.c151-success__title\s*\{[^}]*margin-top:\s*32rpx/s);
-    expect(stylesheet).toMatch(/\.c151-success__subtitle\s*\{[^}]*margin-top:\s*16rpx/s);
+    expect(stylesheet).toMatch(/\.c151-success__subtitle\s*\{(?=[^}]*margin-top:\s*16rpx)(?=[^}]*line-height:\s*34rpx)/s);
     expect(template).toContain('class="c151-summary__details"');
     expect(stylesheet).toMatch(/\.c151-summary\s*\{[^}]*gap:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.c151-summary__details\s*\{[^}]*gap:\s*24rpx/s);
+    expect(stylesheet).toMatch(/\.c151-summary__title,\s*\.c151-summary__value\s*\{[^}]*line-height:\s*34rpx/s);
+    expect(stylesheet).toMatch(/\.c151-summary__label\s*\{[^}]*line-height:\s*34rpx/s);
   });
 });
