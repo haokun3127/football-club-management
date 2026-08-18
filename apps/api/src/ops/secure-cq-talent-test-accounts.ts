@@ -254,6 +254,21 @@ function hasRows(database: DatabaseSync, table: string, ids: readonly string[]):
   return row.count === ids.length;
 }
 
+function hasOperationalProfilesForGuardianStudents(
+  database: DatabaseSync,
+  account: SecureCqTalentTestAccountManifestEntry,
+): boolean {
+  const guardianStudentIds = account.studentIds.slice(0, 2);
+  const placeholders = guardianStudentIds.map(() => "?").join(", ");
+  // The table is unique by (club_id, student_id). Older secure slots can retain
+  // their pre-existing operational rows under non-canonical IDs; do not overwrite
+  // those rows merely to make this controlled operation's ID manifest complete.
+  const row = database.prepare(
+    "SELECT COUNT(*) AS count FROM student_operational_profiles WHERE club_id = ? AND student_id IN (" + placeholders + ")",
+  ).get(clubId, ...guardianStudentIds) as { count: number };
+  return row.count === guardianStudentIds.length;
+}
+
 function hasExpectedOwnership(
   database: DatabaseSync,
   account: SecureCqTalentTestAccountManifestEntry,
@@ -348,7 +363,7 @@ function hasCompleteDemoData(
       && hasRows(database, "matches", records.matchIds)
       && hasRows(database, "match_events", records.matchEventIds)
       && hasRows(database, "tactical_boards", records.tacticalBoardIds)
-      && hasRows(database, "student_operational_profiles", records.operationalProfileIds)
+      && hasOperationalProfilesForGuardianStudents(database, account)
       && hasRows(database, "insurance_policies", records.insurancePolicyIds)
       && hasRows(database, "private_lesson_requests", records.privateLessonRequestIds)
       && hasRows(database, "communication_logs", records.communicationLogIds);

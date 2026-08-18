@@ -293,6 +293,61 @@ describe("secure Chongqing Talent test-account operation", () => {
     }
   }, FILE_DB_TIMEOUT);
 
+  it("keeps legacy guardian operational profiles while recognizing the secure demo as complete", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+
+    try {
+      const imported = importSecureCqTalentTestAccounts(persistence.database, {
+        phones: runtimePhones,
+        now: "2026-08-18T08:00:00.000Z",
+      });
+      const first = imported.manifest.accountIds[0]!;
+      const guardianStudents = first.studentIds.slice(0, 2);
+
+      persistence.database.prepare(
+        "DELETE FROM student_operational_profiles WHERE id IN (?, ?)",
+      ).run(
+        "operational-profile-cq-talent-secure-test-1-1",
+        "operational-profile-cq-talent-secure-test-1-2",
+      );
+      guardianStudents.forEach((studentId, index) => {
+        persistence.database.prepare(`
+          INSERT INTO student_operational_profiles (
+            id, club_id, student_id, region, school, student_status,
+            communication_stage, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          "legacy-operational-profile-" + (index + 1),
+          "club-chongqing-talent",
+          studentId,
+          "重庆",
+          "Legacy demo school " + (index + 1),
+          "active",
+          "follow_up",
+          "2026-08-01T00:00:00.000Z",
+          "2026-08-01T00:00:00.000Z",
+        );
+      });
+
+      const rerun = importSecureCqTalentTestAccounts(persistence.database, {
+        phones: runtimePhones,
+        now: "2026-08-18T08:00:00.000Z",
+      });
+
+      expect(rerun.status).toBe("already_present");
+      expect(countForIds(persistence.database, "student_operational_profiles", "id", [
+        "legacy-operational-profile-1",
+        "legacy-operational-profile-2",
+      ])).toBe(2);
+      expect(countForIds(persistence.database, "student_operational_profiles", "id", [
+        "operational-profile-cq-talent-secure-test-1-1",
+        "operational-profile-cq-talent-secure-test-1-2",
+      ])).toBe(0);
+    } finally {
+      persistence.database.close();
+    }
+  }, FILE_DB_TIMEOUT);
+
   it("enforces each imported identity's parent and coach scope through WeChat-issued bearer sessions", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
     let app: ReturnType<typeof buildServer> | undefined;
