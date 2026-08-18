@@ -98,3 +98,9 @@
 - 页面以 `height:calc(176rpx - navInset) + padding-top:navInset` 保持 Figma 的总计 `88px` 顶栏包络；筛选器按画板的内嵌结构使用 `64rpx` 顶部间距与 `28rpx` 卡片前间距。业务数据、角色控制、筛选和两个无 API 的“新增”入口均未改。
 - 可信运行态证据：`tmp/coach-runtime-acceptance/C11-acceptance-phone-final.png`（严格 `375×812`），并已生成 `tmp/coach-runtime-acceptance/C11-acceptance-compare-final.png` 与在线 Figma 对照。筛选器、卡片横纵几何、轨道、FAB 和 TabBar 通过复验；日期、状态、进度和系统状态栏/微信胶囊属于真实运行态数据或系统层差异。
 - 验证：C11 聚焦 Vitest `8/8`、小程序 typecheck、`git diff --check` 和根 `npx --yes pnpm@10.33.0 run check` 均通过（domain `19/19`、mini-program `327/327`、API `105/105`）。
+
+## 更新后在线稿复核（2026-08-18）
+
+- 本轮再次读取在线唯一基准 `zZ6wKyOHKcO4UYXDd9jGwv / 93:1002 / C11 Test Task List`，并取得原尺寸 `375×812` 在线截图；顶栏、三枚筛选胶囊、`299×116px` 任务卡、进度轨道、`56px` FAB 与三栏 TabBar 的结构和几何保持一致。
+- 可信运行态截图为 `tmp/coach-runtime-acceptance/C11-20260818-fresh-mcp.png`，同目录 sidecar 已确认路由 `/pages/coach/test-tasks/index`、原始与归一化尺寸均为严格 `375×812`、采集方式为 WeChatIDE MCP `simulator_screenshot`；并排对照为 `C11-20260818-fresh-compare.png`。
+- 对照中任务名称、日期、状态、完成数与在线稿示例不同，均来自当前真实 API；微信状态栏、原生胶囊和 Home Indicator 属系统层差异。未把设计样例硬编码进 UI，本页不需要业务代码改动。
