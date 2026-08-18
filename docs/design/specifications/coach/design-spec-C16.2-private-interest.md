@@ -124,3 +124,9 @@
         - [6] | Vector | 16x8 @(814,6280) | stroke=#a80f1b w1.6
       - [13] | 我的 | 121x14 @(762,6293) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="我的"
       - [9] | Ellipse | 4x4 @(820,6310) | fill=#a80f1b
+
+## 2026-08-18 在线稿刷新实施记录
+
+- 在线唯一基准：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1238`，本轮重新读取并取得严格 `375×812` 截图。
+- 页面已按当前稿收口为左对齐顶栏、私教说明卡、44×24px 接单开关、7 列×4 行时段网格和费用说明卡；视图模型预计算周列与时段格，WXML 不调用 JavaScript 数组方法。
+- 当前 BFF 仅提供 `capabilities.features.private_lessons`，没有教练接单状态或可用时段读写契约，因此运行态开关保持待同步、时段格保持不可用灰态；未填入 Figma 的绿色样例排期，也未新增本地保存/API 写入。最终运行证据：`C:\Users\ASUS\AppData\Local\Temp\c162-runtime-latest.png`；并排图：`C:\Users\ASUS\AppData\Local\Temp\c162-compare-latest.png`。

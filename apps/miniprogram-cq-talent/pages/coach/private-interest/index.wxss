@@ -8,7 +8,6 @@
   box-sizing: content-box;
   display: flex;
   align-items: center;
-  gap: 24rpx;
   padding-right: 200rpx;
   padding-left: 32rpx;
   background: #fceeef;
@@ -34,9 +33,9 @@
 .c162-nav__title {
   flex: 1;
   color: #202124;
-  font-size: 44rpx;
+  font-size: 36rpx;
   font-weight: 700;
-  text-align: center;
+  text-align: left;
 }
 
 .c162-nav__placeholder {
@@ -46,7 +45,7 @@
 }
 
 .c162-page__body {
-  padding: 32rpx 44rpx 180rpx;
+  padding: 32rpx 44rpx 80rpx;
 }
 
 .c162-content {
@@ -56,16 +55,22 @@
 }
 
 .c162-info-card,
-.c162-status-card,
+.c162-toggle-row,
 .c162-schedule-card {
+  box-sizing: border-box;
   padding: 32rpx;
   background: #ffffff;
   border-radius: 24rpx;
   box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.05);
 }
 
+.c162-info-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
 .c162-info-card__title,
-.c162-status-card__title,
 .c162-schedule-card__title {
   color: #202124;
   font-size: 28rpx;
@@ -73,47 +78,108 @@
 }
 
 .c162-info-card__text,
-.c162-status-card__message,
-.c162-schedule-card__message,
-.c162-schedule-card__feature {
+.c162-schedule-card__fee {
   color: #667085;
   font-size: 24rpx;
-  line-height: 36rpx;
+  line-height: 32rpx;
 }
 
-.c162-info-card__text,
-.c162-schedule-card__message {
-  margin-top: 16rpx;
-}
-
-.c162-status-card {
+.c162-toggle-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-height: 112rpx;
 }
 
-.c162-status-card__message {
-  margin-top: 8rpx;
+.c162-toggle-row__label {
+  color: #202124;
+  font-size: 28rpx;
+  font-weight: 600;
 }
 
-.c162-pending-marker {
+.c162-toggle {
   display: flex;
   align-items: center;
-  justify-content: center;
   width: 88rpx;
   height: 48rpx;
-  background: #e7eaf0;
+  box-sizing: border-box;
+  padding: 4rpx;
   border-radius: 24rpx;
 }
 
-.c162-pending-marker__dash {
-  width: 24rpx;
-  height: 4rpx;
-  background: #8e97a6;
-  border-radius: 2rpx;
+.c162-toggle--pending,
+.c162-toggle--off {
+  justify-content: flex-start;
+  background: #e7eaf0;
 }
 
-.c162-schedule-card__feature {
-  margin-top: 16rpx;
-  color: #8e97a6;
+.c162-toggle__thumb {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.c162-schedule-card {
+  display: flex;
+  flex-direction: column;
+  gap: 32rpx;
+}
+
+.c162-schedule-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.c162-schedule-grid__headers,
+.c162-schedule-grid__columns {
+  display: flex;
+  gap: 8rpx;
+}
+
+.c162-schedule-grid__header,
+.c162-schedule-grid__column {
+  flex: 1;
+  min-width: 0;
+}
+
+.c162-schedule-grid__header {
+  color: #667085;
+  font-size: 22rpx;
+  font-weight: 600;
+  line-height: 26rpx;
+  text-align: center;
+}
+
+.c162-schedule-grid__column {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.c162-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64rpx;
+  border-radius: 8rpx;
+}
+
+.c162-slot--unavailable {
+  background: #e7eaf0;
+}
+
+.c162-slot__text {
+  font-size: 20rpx;
+  line-height: 24rpx;
+  white-space: nowrap;
+}
+
+.c162-slot__text--unavailable {
+  color: #667085;
+}
+
+.c162-schedule-card__fee {
+  text-align: center;
 }
