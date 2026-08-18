@@ -1,19 +1,19 @@
 import { requireRole } from "../../../utils/auth";
 import { resolveNavInset } from "../../../utils/presentation";
-import type { LoadState } from "../../../utils/types";
+import type { Capabilities, LoadState } from "../../../utils/types";
 
 const ENTRYPOINTS = [
-  { key: "calendar", label: "日程" },
-  { key: "attendance", label: "出勤" },
-  { key: "training", label: "训练" },
-  { key: "matches", label: "比赛" },
-  { key: "assessment", label: "能力评估" },
+  { key: "modify_activity", label: "修改活动", aliases: ["modify_activity", "event_change", "eventChangeRequests", "event-change-requests", "change-requests"] },
+  { key: "bulk_attendance", label: "批量出勤", aliases: ["bulk_attendance", "batch_attendance", "attendance"] },
+  { key: "assessment", label: "能力评估", aliases: ["assessment", "assessments"] },
+  { key: "private_lesson", label: "发起私教", aliases: ["private_lesson", "private_lessons", "privateLessons"] },
+  { key: "finance", label: "查看财务", aliases: ["finance", "payments", "view_finance"] },
 ] as const;
 
 interface PermissionRow {
-  key: (typeof ENTRYPOINTS)[number]["key"];
+  key: string;
   label: string;
-  enabled: true;
+  enabled: boolean;
 }
 
 interface PageData {
@@ -37,10 +37,10 @@ Page<PageData>({
     const session = requireRole("coach");
     if (!session) return;
 
-    const permissions = projectEntrypoints(session.capabilities?.client?.roleEntrypoints?.coach);
+    const permissions = projectPermissions(session.capabilities);
     this.setData({
-      state: permissions.length ? "ready" : "empty",
-      message: permissions.length ? "" : "当前未配置可用入口",
+      state: "ready",
+      message: "",
       permissions,
     });
   },
@@ -49,10 +49,15 @@ Page<PageData>({
   },
 });
 
-function projectEntrypoints(entrypoints: unknown): PermissionRow[] {
-  const available = new Set(Array.isArray(entrypoints) ? entrypoints : []);
-  return ENTRYPOINTS.filter((entrypoint) => available.has(entrypoint.key)).map((entrypoint) => ({
-    ...entrypoint,
-    enabled: true,
+function projectPermissions(capabilities: Capabilities | undefined): PermissionRow[] {
+  const roleEntrypoints = capabilities?.client?.roleEntrypoints?.coach ?? [];
+  const available = new Set(roleEntrypoints);
+  const features = capabilities?.features ?? {};
+  return ENTRYPOINTS.map((entrypoint) => ({
+    key: entrypoint.key,
+    label: entrypoint.label,
+    enabled: entrypoint.aliases.some((alias) => available.has(alias))
+      || (entrypoint.key === "private_lesson" && features.private_lessons === true)
+      || (entrypoint.key === "finance" && features.payments === true),
   }));
 }

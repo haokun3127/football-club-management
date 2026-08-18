@@ -12,24 +12,25 @@
         <view class="c161-explain__icon-wrap">
           <image class="c161-explain__icon" src="/assets/icons/c161-info.svg" mode="aspectFit" />
         </view>
-        <view class="c161-explain__text">以下入口由俱乐部管理员配置，如需调整请联系管理员</view>
+        <view class="c161-explain__text">以下权限由俱乐部管理员分配，如需调整请联系管理员</view>
       </view>
 
       <view class="c161-permission-list">
         <view wx:for="{{permissions}}" wx:key="key" class="c161-permission-row">
           <view class="c161-permission-row__label">{{item.label}}</view>
-          <image class="c161-switch" src="/assets/icons/c161-toggle-on.svg" mode="aspectFit" />
+          <image wx:if="{{item.enabled}}" class="c161-switch" src="/assets/icons/c161-toggle-on.svg" mode="aspectFit" />
+          <image wx:else class="c161-switch" src="/assets/icons/c161-toggle-off.svg" mode="aspectFit" />
         </view>
       </view>
 
-      <view class="c161-admin-cta">仅管理员可调整</view>
+      <view class="c161-admin-cta" aria-disabled="true">保存更改</view>
     </view>
 
     <view wx:elif="{{state === 'empty'}}" class="c161-empty">
       <image class="c161-empty__toggle" src="/assets/icons/c161-toggle-off.svg" mode="aspectFit" />
       <view class="c161-empty__title">暂无可用入口</view>
       <view class="c161-empty__message">{{message}}</view>
-      <view class="c161-admin-cta">仅管理员可调整</view>
+      <view class="c161-admin-cta" aria-disabled="true">保存更改</view>
     </view>
   </view>
 

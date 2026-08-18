@@ -8,8 +8,7 @@
   box-sizing: content-box;
   display: flex;
   align-items: center;
-  gap: 24rpx;
-  padding-right: 44rpx;
+  padding-right: 200rpx;
   padding-left: 32rpx;
   background: #fceeef;
 }
@@ -32,13 +31,15 @@
 }
 
 .c161-nav__title {
+  flex: 1;
   color: #1f2937;
-  font-size: 44rpx;
+  font-size: 36rpx;
   font-weight: 700;
+  text-align: left;
 }
 
 .c161-page__body {
-  padding: 32rpx 44rpx 180rpx;
+  padding: 32rpx 44rpx 80rpx;
 }
 
 .c161-content {
@@ -112,7 +113,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 104rpx;
+  height: 104rpx;
   padding: 0 32rpx;
   color: #ffffff;
   background: #a80f1b;

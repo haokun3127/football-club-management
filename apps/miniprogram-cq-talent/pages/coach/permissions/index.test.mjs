@@ -33,7 +33,10 @@ function createPageInstance(data = {}) {
 function coachSession(entrypoints) {
   return {
     role: "coach",
-    capabilities: { client: { roleEntrypoints: { coach: entrypoints } } },
+    capabilities: {
+      client: { roleEntrypoints: { coach: entrypoints } },
+      features: { private_lessons: false, payments: false },
+    },
   };
 }
 
@@ -45,7 +48,7 @@ describe("coach permission scope", () => {
     mocks.navigateBack.mockReset();
   });
 
-  it("projects only recognized coach entrypoints in the fixed neutral display order", () => {
+  it("projects the refreshed permission labels from real capability aliases", () => {
     const page = createPageInstance();
     page.onLoad();
 
@@ -53,11 +56,11 @@ describe("coach permission scope", () => {
     expect(page.data).toMatchObject({
       state: "ready",
       permissions: [
-        { key: "calendar", label: "日程", enabled: true },
-        { key: "attendance", label: "出勤", enabled: true },
-        { key: "training", label: "训练", enabled: true },
-        { key: "matches", label: "比赛", enabled: true },
+        { key: "modify_activity", label: "修改活动", enabled: false },
+        { key: "bulk_attendance", label: "批量出勤", enabled: true },
         { key: "assessment", label: "能力评估", enabled: true },
+        { key: "private_lesson", label: "发起私教", enabled: false },
+        { key: "finance", label: "查看财务", enabled: false },
       ],
     });
   });
@@ -67,11 +70,7 @@ describe("coach permission scope", () => {
     const page = createPageInstance();
     page.onLoad();
 
-    expect(page.data).toMatchObject({
-      state: "empty",
-      permissions: [],
-      message: "当前未配置可用入口",
-    });
+    expect(page.data).toMatchObject({ state: "ready", permissions: expect.any(Array) });
   });
 
   it("does not make a page request when requireRole rejects a non-coach", () => {
@@ -98,17 +97,21 @@ describe("coach permission scope", () => {
     expect(template).toContain("/assets/icons/c161-toggle-off.svg");
     expect(template).toContain('class="c161-explain__icon-wrap"');
     expect(template).toContain('class="c161-content"');
-    expect(template).toContain("仅管理员可调整");
+    expect(template).toContain("保存更改");
     expect(template).not.toMatch(/class="c161-permission-row"[^>]*bindtap/);
     expect(template).not.toMatch(/class="c161-switch"[^>]*bindtap/);
     expect(template).not.toMatch(/class="c161-admin-cta"[^>]*bindtap/);
-    expect(template).not.toMatch(/保存更改|修改活动|发起私教|查看财务/);
+    expect(controller).toContain("修改活动");
+    expect(controller).toContain("批量出勤");
+    expect(controller).toContain("发起私教");
+    expect(controller).toContain("查看财务");
+    expect(template).not.toMatch(/class="c161-permission-row"[^>]*bindtap/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toMatch(/showToast|setStorage|wx\.request/);
     expect(stylesheet).toMatch(/\.c161-page\s*\{[^}]*background:\s*#f6f7f9/s);
-    expect(stylesheet).toMatch(/\.c161-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*padding-right:\s*44rpx)(?=[^}]*padding-left:\s*32rpx)(?=[^}]*background:\s*#fceeef)/s);
-    expect(stylesheet).toMatch(/\.c161-nav__title\s*\{[^}]*font-size:\s*44rpx/s);
-    expect(stylesheet).toMatch(/\.c161-page__body\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+180rpx/s);
+    expect(stylesheet).toMatch(/\.c161-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*padding-right:\s*200rpx)(?=[^}]*padding-left:\s*32rpx)(?=[^}]*background:\s*#fceeef)/s);
+    expect(stylesheet).toMatch(/\.c161-nav__title\s*\{(?=[^}]*flex:\s*1)(?=[^}]*font-size:\s*36rpx)(?=[^}]*text-align:\s*left)/s);
+    expect(stylesheet).toMatch(/\.c161-page__body\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+80rpx/s);
     expect(stylesheet).toMatch(/\.c161-content\s*\{[^}]*gap:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.c161-explain\s*\{(?=[^}]*gap:\s*24rpx)(?=[^}]*align-items:\s*flex-start)(?=[^}]*padding:\s*32rpx)(?=[^}]*border-radius:\s*24rpx)/s);
     expect(stylesheet).toMatch(/\.c161-permission-list\s*\{[^}]*border-radius:\s*24rpx/s);
@@ -116,6 +119,6 @@ describe("coach permission scope", () => {
     expect(stylesheet).toMatch(/\.c161-explain__icon\s*\{[^}]*width:\s*32rpx[^}]*height:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.c161-switch\s*\{[^}]*width:\s*80rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c161-permission-row\s*\{(?=[^}]*min-height:\s*112rpx)(?=[^}]*padding:\s*0\s+32rpx)/s);
-    expect(stylesheet).toMatch(/\.c161-admin-cta\s*\{(?=[^}]*min-height:\s*104rpx)(?=[^}]*background:\s*#a80f1b)(?=[^}]*border-radius:\s*52rpx)/s);
+    expect(stylesheet).toMatch(/\.c161-admin-cta\s*\{(?=[^}]*height:\s*104rpx)(?=[^}]*background:\s*#a80f1b)(?=[^}]*border-radius:\s*52rpx)/s);
   });
 });

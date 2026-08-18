@@ -65,3 +65,9 @@
         - [6] | Vector | 16x8 @(384,6280) | stroke=#a80f1b w1.6
       - [13] | 我的 | 121x14 @(332,6293) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="我的"
       - [9] | Ellipse | 4x4 @(390,6310) | fill=#a80f1b
+
+## 2026-08-18 在线稿刷新实施记录
+
+- 在线唯一基准：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1210`，本轮重新读取并取得严格 `375×812` 截图。
+- 页面已按当前稿收口为 88px 粉色左对齐顶栏、16/22px 内容边距、五行权限卡和 52px“保存更改”视觉按钮；按钮没有绑定点击或伪保存逻辑，因为当前 BFF 只提供只读 capabilities。
+- 开关状态继续来自真实 coach session 的 `roleEntrypoints` / `features`，Figma 样例中的绿色前三项不写入页面。最终运行证据：`C:\Users\ASUS\AppData\Local\Temp\c161-runtime-latest.png`；并排图：`C:\Users\ASUS\AppData\Local\Temp\c161-compare-latest.png`。
