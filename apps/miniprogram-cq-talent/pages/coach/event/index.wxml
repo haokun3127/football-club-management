@@ -27,15 +27,14 @@
 
     <block wx:if="{{state === 'ready'}}">
       <view wx:if="{{eventView}}" class="shero">
-      <view class="shero__heading">
-        <view class="shero__content">
-          <view class="shero__eyebrow">{{eventView.typeLabel}}</view>
-          <view class="shero__title">{{eventView.title}}</view>
-        </view>
-        <view wx:if="{{!inProgress}}" class="shero__status"><status-chip label="{{eventView.statusLabel}}" tone="{{eventView.statusTone}}" compact="{{true}}" /></view>
-      </view>
-      <view wx:if="{{eventView.hasTime}}" class="shero__meta">{{eventView.timeLabel}}</view>
-      <view wx:if="{{countdownText}}" class="shero__countdown"><image class="shero__countdown-icon" src="/assets/icons/clock-white.svg" mode="aspectFit" />{{countdownText}}</view>
+       <view class="shero__heading">
+         <view class="shero__content">
+           <view class="shero__title">{{eventView.title}}</view>
+           <view wx:if="{{eventView.sessionMeta}}" class="shero__session-meta">{{eventView.sessionMeta}}</view>
+         </view>
+         <view wx:if="{{!inProgress}}" class="shero__status"><status-chip label="{{eventView.statusLabel}}" tone="{{eventView.statusTone}}" compact="{{true}}" /></view>
+       </view>
+       <view wx:if="{{countdownText}}" class="shero__countdown"><image class="shero__countdown-icon" src="/assets/icons/clock-white.svg" mode="aspectFit" />{{countdownText}}</view>
       <view class="shero__chips">
         <view wx:if="{{eventView.hasTeamName}}" class="shero__chip">{{eventView.teamName}}</view>
         <view wx:if="{{eventView.hasVenue}}" class="shero__chip shero__chip--muted">{{eventView.venue}}</view>

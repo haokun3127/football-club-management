@@ -105,6 +105,7 @@ describe("coach activity workbench", () => {
       typeLabel: "Training",
       hasTeamName: true,
       hasVenue: true,
+      sessionMeta: "U11 Red · 2026-08-13 · 09:00-10:00",
     });
     expect(page.data).toMatchObject({ inProgress: false, countdownText: "", attendancePresent: 0, attendanceTotal: 2, joinedNames: "Athlete One" });
   });
@@ -231,6 +232,16 @@ describe("coach activity workbench", () => {
     expect(template).toContain('class="shero__status"');
     expect(stylesheet).toMatch(/\.shero__content\s*\{[^}]*min-width:\s*0[^}]*flex:\s*1/s);
     expect(stylesheet).toMatch(/\.shero__status\s*\{[^}]*flex:\s*0\s+0\s+auto/s);
+  });
+
+  it("uses the refreshed C2 session header hierarchy while keeping every hero field API-backed", () => {
+    expect(template).toContain('class="shero__title"');
+    expect(template).toContain('class="shero__session-meta"');
+    expect(template).toContain("{{eventView.sessionMeta}}");
+    expect(template).not.toContain('class="shero__eyebrow"');
+    expect(stylesheet).toMatch(/\.shero\s*\{[^}]*min-height:\s*378rpx/s);
+    expect(stylesheet).toMatch(/\.shero__countdown\s*\{[^}]*font-size:\s*104rpx/s);
+    expect(stylesheet).toMatch(/\.shero__countdown-icon\s*\{[^}]*width:\s*40rpx[^}]*height:\s*40rpx/s);
   });
 
   it("uses the C2 in-flow coach tabs and neutral icon-led action tiles", () => {

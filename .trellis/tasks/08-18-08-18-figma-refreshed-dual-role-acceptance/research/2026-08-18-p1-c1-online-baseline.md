@@ -26,3 +26,11 @@
 - 调整前的有数据 C1 诊断截图：`tmp/figma-refresh-audit/runtime/C1-after-date-strip-20260818.raw.png`。
 - 调整后 C1 截图在系统日切换到无日程的真实 empty state：`tmp/figma-refresh-audit/runtime/C1-after-geometry-20260818.raw.png`；它验证顶栏和日期条，不验证 Hero/活动列表的有数据内容态。
 - 本轮不能声明 C1 全页视觉验收完成；待可读的有活动日期后，用稳定截图通道补取 Hero/统计/卡片状态。
+
+## C2 Activity Workbench 首批审计
+
+- 在线来源：`zZ6wKyOHKcO4UYXDd9jGwv / 93:606 / C2 Activity Workbench`。已在改动前读取 design context、screenshot 与 metadata。
+- 新在线 Hero 使用“真实活动标题 → 队伍/场次信息 → 大号进行时长 → 状态胶囊”的层级；不再显示旧实现中的类型眉题。
+- 现有 API 没有 Figma 示例的学分、脱敏头像和固定三项快捷操作的等价字段，故未伪造。保留数据驱动的考勤、流程、操作和训练/比赛区块，并只让 Hero 重排已有真实字段。
+- C2 首批实现：新增预计算 `sessionMeta`，移除类型眉题，将标题/场次信息置入新版 Hero，Hero 高度改为 189px，倒计时改为 52px，时钟图标改为 20px。
+- 验证：C2 定向 Vitest `10/10`、小程序 TypeScript 与限定路径 `git diff --check` 通过。当前 MCP 会话未提供可重用的活动 ID，尚无 C2 有数据运行态截图；该项仍待视觉验收，不宣称完成。

@@ -34,6 +34,7 @@ type EventView = {
   hasVenue: boolean;
   timeLabel: string;
   hasTime: boolean;
+  sessionMeta: string;
 };
 
 Page({
@@ -230,6 +231,8 @@ function presentEvent(workbench: CoachWorkbench): EventView {
   const live = isInProgress(workbench.event.status, workbench.event.startsAt, workbench.event.endsAt);
   const status = live ? { label: "进行中", tone: "info" } : activityStatus(workbench.event.status);
   const hasTime = Boolean(workbench.event.startsAt && workbench.event.endsAt);
+  const timeLabel = hasTime ? `${formatCalendarDate(workbench.event.startsAt)} · ${formatTimeRange(workbench.event.startsAt, workbench.event.endsAt)}` : "";
+  const sessionMeta = [workbench.event.teamName || workbench.event.venue || "", timeLabel].filter(Boolean).join(" · ");
   return {
     title: workbench.event.title,
     typeLabel: activityTypeLabel(workbench.event.type),
@@ -239,8 +242,9 @@ function presentEvent(workbench: CoachWorkbench): EventView {
     hasTeamName: Boolean(workbench.event.teamName),
     venue: workbench.event.venue || "",
     hasVenue: Boolean(workbench.event.venue),
-    timeLabel: hasTime ? `${formatCalendarDate(workbench.event.startsAt)} · ${formatTimeRange(workbench.event.startsAt, workbench.event.endsAt)}` : "",
+    timeLabel,
     hasTime,
+    sessionMeta,
   };
 }
 
