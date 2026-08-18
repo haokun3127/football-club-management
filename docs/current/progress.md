@@ -1,9 +1,16 @@
 # 核心演示闭环 · 进度跟踪
 
+## 2026-08-18 七个独立双角色真机演示账号（本地待部署）
+
+- 安全受控导入由 3 个固定槽位扩展为 7 个：每个运行时手机号均对应同一 club 内独立的 `parent + coach` 会籍、家长档案、教练档案与单独 8 人球队。家长端严格只投影其中 2 名已绑定学员；教练端只可查看本账号所属的完整 8 人阵容，账号之间不共享家长绑定、球队、日程或业务记录。
+- 每个账号均准备相对当前导入时间生成的 5 条历史/当前/未来训练与比赛日程、40 条活动参与记录（含到课、迟到、缺席、请假、待确认等状态）、16 条课时流水、8 名队员的 8 维评测原始值/归一化分数/指标记录/血缘、已完成与待进行比赛及 8 条比赛事件、已保存 4-3-3 战术板；两个家长可见学员另有运营档案、保险、私教申请与沟通记录。
+- 真实手机号只以私有运行时变量 `SECURE_CQ_TALENT_TEST_PHONE_1` 至 `_7` 注入；仓库、文档、日志、测试输出和提交均不保存其值。生产尚未写库、未重启、未执行真实设备登录验证。
+- 本地验证：安全导入聚焦测试 `14/14`、API typecheck/build、串行全仓门禁均完成；全仓结果为 domain `19/19`、小程序 `332/332`、API `108/108`，命令退出码 `0`。仍需在生产执行受限备份（含 SQLite WAL/SHM）→ dry-run → 用户一次性确认 → confirmed import → 仅重启 API → `/health` 与双角色聚合读回。
+
 ## 2026-08-12 Secure production identity and isolated dual-role test-account hardening
 
 - Production entrypoint rejects header-only identity; only the explicit local development entrypoint enables header smoke authentication. Phone identity resolution requires a unique active user and active club membership.
-- Added a transactional, fixed-ID, isolated three-account parent/coach import with separate child, guardian, coach-team, calendar, and participant scopes. Test-phone values are runtime-only and never returned by the controlled CLI.
+- Added the original transactional, fixed-ID, isolated three-account parent/coach import with separate child, guardian, coach-team, calendar, and participant scopes. As of 2026-08-18, the controlled operation is extended to seven slots; test-phone values remain runtime-only and are never returned by the controlled CLI.
 - The controlled file-SQLite CLI allows only dry-run import, confirmed import, and confirmed rollback. Dry-run does not migrate or mutate; confirmed import requires a private backup attestation; rollback refuses absent, partial, tampered, or ownership-inconsistent canonical installations.
 - Terra xhigh independently reviewed the final security boundaries. Final local verification: domain `8 files / 19 tests`, mini-program `54 files / 306 tests`, API `11 files / 103 tests`, root typecheck, task-context validation, and `git diff --check` all passed. A previous root-script run had a transient mini-program Vitest worker exit despite all assertions passing; an isolated rerun was clean. No server access, production database operation, deployment, restart, or device login occurred in this task.
 - 交接更新：`docs/current/agent-handover-2026-08-12.md` 现为 Claude 接手入口；部署认证边界以 `deployment-requirements.md` 与安全账号专项交接为准。旧文档内的生产演示、`X-User-Id` smoke 与部署记录均须按其历史/本地限定解读，不得直接当作当前生产状态。
@@ -982,3 +989,32 @@
 - 复核授权边界：每次 bearer 请求重新检查 club、app-client、用户、精确 membership、当前 entrypoint-filtered `availableRoles` 和 active role；本地修改 active role、`roleHint` 或旧 token 都不能获得另一端权限。父端只投影 guardian children，教练端不返回家长 children。
 - 复验：`apps/api/test/app-client-role-switch.test.ts` 为 `2/2`（双实例、关闭全部实例后文件型 SQLite 重开、角色删除/用户/会籍/client 失效和 token 轮换）；OpenAPI/login 契约为 `2/2`；小程序登录选择器、家长/孩子/教练切换入口为 `44/44`。
 - 本仓库任务的实现验收已满足；生产双角色测试账号导入、真实微信授权和真机运行态登录仍属于独立部署/设备验收，不以本地测试冒充生产证据。
+
+## 2026-08-18 WeChatIDE MCP 截图通道迁移
+
+- 已将可信视觉截图默认切换为 `scripts/devtools/wechatide-mcp-capture.cjs`：通过 WeChatIDE MCP 编译/打开精确路由，读取 `currentPage` 与 `systemInfo`，请求 `simulator_screenshot(optimize=false)`，再用 Pillow 归一化输出严格 `375×812` PNG + JSON sidecar。
+- 已补充 MCP stdio JSON-RPC 客户端、Windows 中文安装路径的 encoded PowerShell 启动、路由/视口/PNG 比例 fail-closed 校验和原子发布；不触碰登录、授权、session、角色或 API 数据。
+- 已更新 `scripts/devtools/README.md`、本地手工验收文档和两份交接文档。旧 Automator/PrintWindow/桌面裁图仅保留为人工明确指定的紧急回退。
+- 当前真实 MCP smoke 已完成 Codex 客户端授权、工具发现和路由调用；当前模拟器实际是 iPhone 12/13 (Pro) 的 `390×844`，命令按 375×812 门禁停止，未伪造截图证据。切回 iPhone X 后可直接重跑同一命令完成最终 PNG/sidecar smoke。
+
+## 2026-08-18 C11 测评任务浮动新增按钮层级复验
+
+- 在线 Figma 基准已重读：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1002 / C11 Test Task List`。真实 iPhone X `375×812` 截图确认原 `.tasks-fab` 的 `z-index: 20` 被固定教练 TabBar（`z-index: 9999`）遮盖，只露出圆形按钮上半部。
+- 已按测试先行将 C11 的布局断言从旧层级升级为 `z-index: 10000`：先观察到定向 Vitest 因旧值失败，再以单行 WXSS 改动使新增按钮浮于 TabBar 之上。没有改变测评任务 API、创建能力提示、真实任务数据或跳转行为。
+- 新的可信证据：`tmp/coach-runtime-acceptance/C11-20260818-fab-layer.png`（真实 WeChatIDE MCP 模拟器）与 `tmp/coach-runtime-acceptance/C11-20260818-figma-online.png`（在线画板）。两张均为 `375×812`；任务日期、进度和状态仍为真实 API 数据差异。
+- 验证：C11 定向 Vitest `332/332`、小程序 TypeScript `tsc --noEmit`、限定路径 `git diff --check` 均通过；全仓串行门禁待本轮其他页面审计结束后统一复跑。
+
+## 2026-08-18 C15/C15.1 WeChatIDE MCP 运行态复验
+
+- 在线 Figma 已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1132 / C15 Assessment Entry` 与 `93:1163 / C15.1 Assessment Submit`。本轮截图改走 `scripts/devtools/wechatide-mcp-capture.cjs`，不是旧 Automator/PrintWindow 通道。
+- C15 使用真实教练会话与接口任务 `assessment-template-technical`（“速度耐力体测”）打开；MCP sidecar 确认路由 `/pages/coach/assessment-entry/index`、原始及归一化 PNG 均为 `375×812`。证据：`tmp/coach-runtime-acceptance/C15-20260818-mcp-3.png`、`C15-20260818-mcp-3.png.json`、`C15-20260818-mcp-compare.png`。
+- C15 顶栏、左返回、保存草稿、能力分组胶囊、学员卡、真实滑杆轨道、保存按钮和教练 TabBar 的几何与在线稿一致。Figma 示例有三组分组、三名学员和六项评分；当前真实模板只返回一个可录入分组、两名学员和真实指标，因此完整样例数量/分组差异标为数据/契约阻塞，不补造 Figma 数据。
+- C15.1 使用 coach 角色、正整数真实确认人数契约打开提交态；MCP sidecar 确认 `/pages/coach/assessment-submit/index` 为 `375×812`。证据：`tmp/coach-runtime-acceptance/C151-20260818-mcp-1.png`、`C151-20260818-mcp-1.png.json`、`C151-20260818-mcp-compare.png`。成功图标、标题区、摘要卡、状态胶囊、双按钮和 TabBar 结构复验通过；任务标题、人数与状态按真实路由数据展示，未伪造在线稿中的“技术评估/18名/处理中”。本轮未重复写入生产评估，仅复验已存在的提交态路由契约。
+- 诊断记录：第一次 C15 失败截图由 shell query 转义把模板 ID 变为 `assessment-template-technical^`，MCP network 明确返回 404；改用正确的 `&` 查询后复验成功。该问题属于取证命令，不是页面/API 业务缺陷。
+
+## 2026-08-18 C16 退出登录按钮宽度收口
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1182 / C16 Coach Me`。Figma 的退出登录 CTA 横向占满正文内容区（375px 画板中约 331px），而真实 MCP 截图中的原生 `<button>` 仅渲染为约 183px，属于明确的运行态视觉差异。
+- 根因是该 CTA 继续使用微信原生 `button` 的默认布局行为；在相同 WXSS `width: 100%` 下仍被收缩。按项目其他自定义 CTA 的模式改为普通 `view` 交互节点，并显式使用 `display: flex`、`box-sizing: border-box`、`align-items/justify-content: center`，保留原有 `logout` 逻辑、确认弹窗和会话清理边界。
+- 可信复验：`tmp/coach-runtime-acceptance/C16-20260818-mcp-after-logout-fix.png`，WeChatIDE MCP `simulator_screenshot`，严格 `375×812`；按钮已从约 183px 恢复为正文全宽约 331px，位置、红色描边、圆角和文字居中与在线稿一致。教练姓名、球队、统计、状态栏和微信胶囊仍按真实数据/系统壳层豁免。
+- 验证先红后绿：C16 定向 Vitest 先因原生 button 标记与布局断言失败（1 failed / 9），改动后 `54` 个测试文件、`332/332` 用例通过；小程序 typecheck、`git diff --check` 和 MCP 截图均通过。本批代码文件待路径限定独立提交。

@@ -8,7 +8,7 @@
 - 域名配置写入客户端不等于部署验收完成。发布前仍须分别确认 DNS 解析、TLS 证书及续期、反向代理到 API、健康检查、微信公众平台 request 合法域名和真机实际请求。
 - 若启用正式微信手机号解析，服务器必须配置 `WECHAT_MINIPROGRAM_APP_ID` 与 `WECHAT_MINIPROGRAM_APP_SECRET`；不得把任何密码、token、私钥或服务器登录信息写入本文件或提交到仓库。
 - 生产/release app-client API 只能使用经校验的 Bearer session；不得把 `X-User-Id` 当认证，也不得由反向代理注入、保留或转发该头来建立用户身份。`x-user-id` 仅是显式本地开发入口的 smoke 工具。
-- 2026-08-12 起，不能用启动时 acceptance seed 向生产或共享数据库“补测试数据”。如确实需要三套隔离的双角色测试账号，必须使用 `secure-test-accounts` 受控 CLI：先建立受限 SQLite 备份（含 WAL/SHM）并取得单次授权，再以私有运行时变量提供号码、设置备份证明、先 dry-run、后 confirmed import。详情见 `agent-handover-2026-08-12-secure-test-accounts.md`；变量值不得写入仓库、文档、日志或 shell 历史。
+- 2026-08-12 起，不能用启动时 acceptance seed 向生产或共享数据库“补测试数据”。如确实需要七套隔离的双角色测试账号，必须使用 `secure-test-accounts` 受控 CLI：先建立受限 SQLite 备份（含 WAL/SHM）并取得单次授权，再以私有运行时变量提供号码、设置备份证明、先 dry-run、后 confirmed import。详情见 `agent-handover-2026-08-12-secure-test-accounts.md`；变量值不得写入仓库、文档、日志或 shell 历史。
 - API 路由、环境变量或部署构建变更后，必须重新 build 并重启 API 进程，再用 `/health` 和小程序实际请求确认没有继续访问旧 `dist`。
 
 ## 重庆天才服务器与域名记录（历史证据，非当前部署断言）
@@ -50,7 +50,7 @@ pnpm install --frozen-lockfile
 | `PORT` | 否 | `3000` | API 监听端口。 |
 | `HOST` | 否 | `127.0.0.1` | API 监听地址；容器或反向代理环境按部署拓扑设置。 |
 | `WECHAT_MINIPROGRAM_APP_ID` / `WECHAT_MINIPROGRAM_APP_SECRET` | 正式微信登录需要 | — | 仅保存在服务器私有运行时环境。 |
-| `SECURE_CQ_TALENT_TEST_PHONE_1` / `_2` / `_3` | 受控测试账号导入需要 | — | 仅运行时读取，绝不记录值。 |
+| `SECURE_CQ_TALENT_TEST_PHONE_1` 至 `_7` | 受控测试账号导入需要 | — | 七个独立双角色测试账号仅在运行时读取，绝不记录值。 |
 | `SECURE_CQ_TALENT_TEST_ACCOUNTS_BACKUP_ATTESTED` | confirmed import 需要 | — | 仅在完成受限备份后短时设置为规定证明值。 |
 
 SQLite 文件所在目录必须满足：

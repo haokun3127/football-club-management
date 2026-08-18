@@ -4,7 +4,7 @@
 
 ### 1. Scope / Trigger
 
-- Trigger: a separately authorized operator needs to create or remove the three fixed Chongqing Talent test-account scopes in a file-backed SQLite database.
+- Trigger: a separately authorized operator needs to create or remove the seven fixed Chongqing Talent test-account scopes in a file-backed SQLite database.
 - This operation is never a startup seed and must not run from a route handler.
 - Deployment, backup, server access, and production execution are outside the command implementation and require their own reviewed runbook.
 
@@ -17,7 +17,7 @@
 
 ### 3. Contracts
 
-- Required private environment keys: `DATABASE_URL`, `SECURE_CQ_TALENT_TEST_PHONE_1`, `SECURE_CQ_TALENT_TEST_PHONE_2`, and `SECURE_CQ_TALENT_TEST_PHONE_3`. A confirmed import additionally requires `SECURE_CQ_TALENT_TEST_ACCOUNTS_BACKUP_ATTESTED=1`, set only after the operator has completed the separately approved restricted backup.
+- Required private environment keys: `DATABASE_URL` and `SECURE_CQ_TALENT_TEST_PHONE_1` through `SECURE_CQ_TALENT_TEST_PHONE_7`. A confirmed import additionally requires `SECURE_CQ_TALENT_TEST_ACCOUNTS_BACKUP_ATTESTED=1`, set only after the operator has completed the separately approved restricted backup.
 - `DATABASE_URL` must identify a file database; `:memory:` is rejected for the command.
 - Test phones are runtime-only. They must not be logged or included in result objects, source-controlled data, fixtures, documentation, manifests, or commit messages.
 - Import creates only the canonical fixed IDs. Re-running a complete installation returns `already_present`.
@@ -36,14 +36,14 @@
 
 ### 5. Good / Base / Bad Cases
 
-- Good: three runtime phones import to three separate parent/coach account scopes; parent and coach Bearer sessions each see only their own two students.
+- Good: seven runtime phones import to seven separate parent/coach account scopes; every parent session sees only its two guardian-bound students, while the matching coach session sees only its own eight-player team.
 - Base: a complete matching installation re-runs as `already_present` without duplicating records.
 - Bad: a command accepts arbitrary IDs or prints a manifest/phone/token in its result; this expands deletion scope or leaks identity data.
 
 ### 6. Tests Required
 
 - CLI test asserts confirmation for mutation, backup attestation, exact result projection, file-database enforcement, empty-install rollback rejection, and dry-run migration-count stability.
-- Import test asserts three isolated roles, guardian bindings, teams, calendars, idempotency, and conflict/partial-install rejection.
+- Import test asserts seven isolated dual-role scopes, two guardian bindings per parent, eight-player coach teams, relative historical/current/future calendars, attendance, lesson history, eight-dimensional assessments, matches, tactical boards, idempotency, and conflict/partial-install rejection.
 - BFF test asserts real Bearer role switching, parent and coach scoping, and absence of phone fields in projected payloads.
 - Rollback test asserts canonical-manifest rejection for tampering, namespace checks for direct rollback tests, owned-row cleanup, and unrelated-row preservation.
 
