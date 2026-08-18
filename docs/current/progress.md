@@ -1055,3 +1055,9 @@
 - 真实 `375×812` 基线确认 `.match-page__content` 仍保留旧的 `44px` 顶部留白，使英雄卡与事件卡整体下移约 `28px`。现按在线节点改为 `padding: 32rpx 32rpx 200rpx`；刷新模拟器并重截后，英雄卡顶边已与画板对齐，事件卡也回到正确首屏位置。
 - 截图使用当前教练有权限的完成比赛 `event-cq-talent-secure-test-1-completed-match`。比赛标题、`4:2` 比分、七条事件、事件标签和当前 BFF 没有提供的分半场明细均保持真实数据；没有把 Figma 的样例对手、0:0 或四条事件写入前端。
 - 可信在线稿、最终运行图和并排图位于系统临时目录，前缀为 `cq-talent-figma-c6-current-20260818`、`cq-talent-runtime-c6-after-gap-20260818`、`cq-talent-c6-after-gap-compare-20260818`。验证先红→绿：C6 定向 Vitest `10/10`、小程序 TypeScript `tsc --noEmit` 和限定路径 `git diff --check` 通过。
+
+## 2026-08-18 C6.1 添加比赛事件最新在线稿验收状态
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:827 / C6.1 Add Match Event`。该画板要求事件类型、时间、球员、备注和提交动作；源码仍按真实 `capabilities.match.eventTypes`、真实比赛详情和名单构建，没有硬编码 Figma 的六个样例选项、45 分钟、球员头像或备注。
+- 当前已认证教练会话打开 `event-cq-talent-secure-test-1-completed-match` 后，BFF 真实返回“当前客户端未配置可记录的比赛事件类型”，因此页面进入安全空态而不是 Figma 的可录入样例。该空态截图已由 WeChatIDE MCP 生成，sidecar 确认路由和图片均为严格 `375×812`；证据前缀为 `cq-talent-runtime-c61-baseline-20260818`，在线稿/并排图为 `cq-talent-figma-c61-current-20260818`、`cq-talent-c61-baseline-compare-20260818`。
+- 此项不能宣称 C6.1 成功态视觉通过。阻塞点是生产会话的客户端能力配置，非 WXML/WXSS 几何缺陷；未改写真实 API 契约，也没有生成或提交任何比赛事件。
