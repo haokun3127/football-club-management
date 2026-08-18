@@ -205,18 +205,19 @@
 }
 
 .c16-logout {
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 96rpx;
   margin: 0;
+  padding: 0;
   border: 2rpx solid #a80f1b;
   border-radius: 48rpx;
   background: #ffffff;
   color: #a80f1b;
   font-size: 28rpx;
   font-weight: 600;
-  line-height: 92rpx;
-}
-
-.c16-logout::after {
-  border: 0;
+  line-height: 1.2;
 }

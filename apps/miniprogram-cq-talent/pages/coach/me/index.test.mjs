@@ -250,6 +250,8 @@ describe("coach profile", () => {
     expect(template).toContain('padding-right:{{menuInset}}px');
     expect(template).toContain('wx:for="{{profileStats}}"');
     expect(template).toContain('class="c16-profile"');
+    expect(template).toContain('<view class="c16-logout" bindtap="logout">退出登录</view>');
+    expect(template).not.toContain('<button class="c16-logout"');
     expect(template).not.toMatch(/主教练|本赛季执教|在队学员|平均出勤/);
     expect(controller).not.toContain("home.coachName");
     expect(controller).not.toContain("readableError");
@@ -257,5 +259,6 @@ describe("coach profile", () => {
     expect(stylesheet).toMatch(/\.c16-bar\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).toMatch(/\.c16-bar\s*\{(?=[^}]*padding-left:\s*32rpx)/s);
     expect(stylesheet).toMatch(/\.c16-profile\s*\{[^}]*border-radius:\s*24rpx[^}]*background:\s*#07111f/s);
+    expect(stylesheet).toMatch(/\.c16-logout\s*\{(?=[^}]*display:\s*flex)(?=[^}]*box-sizing:\s*border-box)(?=[^}]*width:\s*100%)(?=[^}]*align-items:\s*center)(?=[^}]*justify-content:\s*center)/s);
   });
 });

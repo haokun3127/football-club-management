@@ -62,7 +62,7 @@
         </view>
       </view>
 
-      <button class="c16-logout" bindtap="logout">退出登录</button>
+      <view class="c16-logout" bindtap="logout">退出登录</view>
     </view>
   </view>
 
