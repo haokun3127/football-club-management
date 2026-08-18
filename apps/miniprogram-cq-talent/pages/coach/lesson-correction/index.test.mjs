@@ -206,7 +206,7 @@ describe("coach lesson correction", () => {
     expect(template).toContain('class="student-row__adjustment"');
     expect(template).toContain('class="student-row__adjustment-arrow student-row__adjustment-arrow--up"');
     expect(template).toContain('class="student-row__adjustment-arrow student-row__adjustment-arrow--down"');
-    expect(template).toContain("需要更正的学员");
+    expect(template).toContain("需更正学员");
     expect(template).not.toContain('class="reason-card"');
     expect(controller).toContain("avatarColor");
     expect(styles).toMatch(/\.correction-page__body\s*\{[^}]*gap:\s*40rpx/s);

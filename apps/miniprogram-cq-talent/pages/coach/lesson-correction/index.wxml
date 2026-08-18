@@ -22,7 +22,7 @@
       </view>
 
       <view class="student-card">
-        <view class="student-card__title">需要更正的学员</view>
+        <view class="student-card__title">需更正学员</view>
         <view wx:for="{{rows}}" wx:key="studentId" class="student-row">
           <view class="student-row__avatar" style="background: {{item.avatarColor}}">{{item.avatarLetter}}</view>
           <view class="student-row__info">

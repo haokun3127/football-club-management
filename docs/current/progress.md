@@ -1041,3 +1041,10 @@
 - 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:734 / C5 Lesson Confirm`。本轮在施工前取得 design context 与原始 `375×812` 在线截图，确认最新画板仍是软粉 88px 顶栏、深色活动摘要、紧凑课时名单、底部“确认全部 / 发起更正”和三栏教练 TabBar。
 - 使用当前已认证教练会话的真实活动 `event-cq-talent-secure-test-1-trn-0813` 打开 C5 成功态。WeChatIDE MCP sidecar 证实路由为 `/pages/coach/lesson/index`、运行窗口及输出 PNG 均为严格 `375×812`；证据位于系统临时目录 `cq-talent-runtime-c5-success-20260818-a.png`，在线稿及并排图为 `cq-talent-figma-c5-current-20260818.png`、`cq-talent-c5-compare-20260818.png`。
 - 运行截图的活动标题、队名/时间、两名名单和“1课时”均来自真实 BFF；在线稿中的五名样例、日期和“1.5课时”不写回页面。除真实数据数量造成的白色内容区长度不同外，顶栏、活动卡、名单几何、确认操作和 TabBar 对齐，无需新增代码改动。
+
+## 2026-08-18 C5.1 课时更正最新在线稿运行态复验
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:765 / C5.1 Lesson Correction`。当前在线稿为软粉顶栏、警示卡、紧凑更正名单、正常内容流保存按钮和三栏教练 TabBar。
+- 对照同一真实教练活动的 MCP 截图，修正了一处静态标题文案：`需要更正的学员` → `需更正学员`。真实服务端没有“系统差异”字段，因此保留真实的“课时调整”、实际姓名和“课时余额待核对”状态，未填入 Figma 样例头像、异常标签或 `1.5课时`。
+- 截图前已调用 WeChatIDE MCP `simulator_refresh`，避免旧 bundle；最终 sidecar 证实 `/pages/coach/lesson-correction/index` 和 PNG 为严格 `375×812`。在线稿、最终运行图和并排图均位于系统临时目录，文件前缀分别为 `cq-talent-figma-c51-current-20260818`、`cq-talent-runtime-c51-after-refresh-20260818`、`cq-talent-c51-after-refresh-compare-20260818`。
+- 验证按红→绿完成：C5.1 定向 Vitest `7/7`、小程序 TypeScript `tsc --noEmit`、限定路径 `git diff --check` 均通过。
