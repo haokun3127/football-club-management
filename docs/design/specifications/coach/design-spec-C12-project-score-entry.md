@@ -39,3 +39,11 @@
 `npx --yes pnpm@10.33.0 run check`
 
 > 2026-08-17 串行复跑全仓门禁通过：domain `19/19`、mini-program `332/332`、API `105/105`，退出码 `0`。C12 定向 Vitest 最新为 `18/18`；此前 API SQLite 重开超时属于旧并发检查记录，已不再代表当前门禁状态。
+
+## 更新后在线稿复核与真实数据收口（2026-08-18）
+
+- 本轮再次读取在线唯一基准 `zZ6wKyOHKcO4UYXDd9jGwv / 93:1030 / C12 Project Score Entry`，并取得原尺寸 `375×894` 在线截图。顶栏、96px 摘要卡、待录入学员区、固定保存区及三栏 TabBar 的首屏结构仍以在线稿为准。
+- 初次按旧记录打开 `event-cq-talent-demo-training-upcoming` 时，真实后端返回 `403 Event is not accessible for this coach membership`；这是该活动属于另一教练会籍的访问控制，不是页面渲染故障。改用当前认证教练可访问的 `event-cq-talent-secure-test-1` 后，工作台和评分表单均能真实加载。
+- 真实八维表单中的 `Secure player 1-3` 等长姓名曾被固定 `112rpx` 头像/姓名区域和 `word-break: break-all` 挤成竖排。现将区域锁定为 `140rpx` 并对姓名使用单行省略，保留四列评分格和 Figma 首屏密度；不截断 API 数据、不改变草稿或提交契约。
+- 可信运行态图为 `tmp/coach-runtime-acceptance/C12-20260818-after-long-name-fix.png`，同目录 sidecar 证实路由 `/pages/coach/test-entry/index` 与严格 `375×812`；在线稿和复验对照分别为 `C12-20260818-figma-online.png`、`C12-20260818-after-long-name-fix-compare.png`。真实模板标题、评分项、`0 / 496` 进度、姓名与分数均属于数据差异。
+- 验证按红→绿完成：新增回归测试先失败，再修复后 C12 定向 Vitest `19/19`、小程序 TypeScript `tsc --noEmit` 与 `git diff --check` 通过。

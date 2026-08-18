@@ -496,7 +496,7 @@
 
 .c12-student-card__head {
   display: flex;
-  flex: 0 0 112rpx;
+  flex: 0 0 140rpx;
   align-items: center;
   min-width: 0;
   gap: 12rpx;
@@ -525,7 +525,8 @@
   font-size: 28rpx;
   font-weight: 600;
   line-height: 1.25;
-  word-break: break-all;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .c12-student-card__metrics {

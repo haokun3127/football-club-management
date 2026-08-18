@@ -279,6 +279,12 @@ describe("coach project score entry", () => {
     expect(stylesheet).toMatch(/\.c12-submit-wrap\s*\{[^}]*bottom:\s*140rpx[^}]*min-height:\s*140rpx/s);
   });
 
+  it("keeps long real student names on one compact card line", () => {
+    expect(stylesheet).toMatch(/\.c12-student-card__head\s*\{[^}]*flex:\s*0\s+0\s+140rpx/s);
+    expect(stylesheet).toMatch(/\.c12-student-card__name\s*\{[^}]*text-overflow:\s*ellipsis[^}]*white-space:\s*nowrap/s);
+    expect(stylesheet).not.toMatch(/\.c12-student-card__name\s*\{[^}]*word-break:\s*break-all/s);
+  });
+
   it("keeps the Figma C12 first viewport focused on learner cards before field navigation", () => {
     const studentsIndex = template.indexOf('class="c12-students"');
     const navigationIndex = template.indexOf('class="c12-field-navigation"');
