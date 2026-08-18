@@ -15,14 +15,38 @@ import { HeaderMembershipResolver } from "../src/auth/context.js";
 import { buildServer } from "../src/server.js";
 import { PersistentApiStore } from "../src/store.js";
 
-const runtimePhones = ["10000000001", "10000000002", "10000000003"] as const;
+const runtimePhones = [
+  "10000000001",
+  "10000000002",
+  "10000000003",
+  "10000000004",
+  "10000000005",
+  "10000000006",
+  "10000000007",
+] as const;
 
 describe("secure Chongqing Talent test-account operation", () => {
-  it("reads three phones from runtime input without embedding phone values in the operation", () => {
+  it("reads seven phones from runtime input without embedding phone values in the operation", () => {
     expect(readSecureCqTalentTestAccountPhones({
       SECURE_CQ_TALENT_TEST_PHONE_1: runtimePhones[0],
       SECURE_CQ_TALENT_TEST_PHONE_2: runtimePhones[1],
       SECURE_CQ_TALENT_TEST_PHONE_3: runtimePhones[2],
+      SECURE_CQ_TALENT_TEST_PHONE_4: runtimePhones[3],
+      SECURE_CQ_TALENT_TEST_PHONE_5: runtimePhones[4],
+      SECURE_CQ_TALENT_TEST_PHONE_6: runtimePhones[5],
+      SECURE_CQ_TALENT_TEST_PHONE_7: runtimePhones[6],
+    })).toEqual(runtimePhones);
+  }, FILE_DB_TIMEOUT);
+
+  it("requires seven private runtime phones for the canonical dual-role test-account slots", () => {
+    expect(readSecureCqTalentTestAccountPhones({
+      SECURE_CQ_TALENT_TEST_PHONE_1: runtimePhones[0],
+      SECURE_CQ_TALENT_TEST_PHONE_2: runtimePhones[1],
+      SECURE_CQ_TALENT_TEST_PHONE_3: runtimePhones[2],
+      SECURE_CQ_TALENT_TEST_PHONE_4: runtimePhones[3],
+      SECURE_CQ_TALENT_TEST_PHONE_5: runtimePhones[4],
+      SECURE_CQ_TALENT_TEST_PHONE_6: runtimePhones[5],
+      SECURE_CQ_TALENT_TEST_PHONE_7: runtimePhones[6],
     })).toEqual(runtimePhones);
   }, FILE_DB_TIMEOUT);
 
@@ -39,6 +63,10 @@ describe("secure Chongqing Talent test-account operation", () => {
         SECURE_CQ_TALENT_TEST_PHONE_1: runtimePhones[0],
         SECURE_CQ_TALENT_TEST_PHONE_2: runtimePhones[1],
         SECURE_CQ_TALENT_TEST_PHONE_3: runtimePhones[2],
+        SECURE_CQ_TALENT_TEST_PHONE_4: runtimePhones[3],
+        SECURE_CQ_TALENT_TEST_PHONE_5: runtimePhones[4],
+        SECURE_CQ_TALENT_TEST_PHONE_6: runtimePhones[5],
+        SECURE_CQ_TALENT_TEST_PHONE_7: runtimePhones[6],
       };
 
       expect(() => runSecureCqTalentTestAccountCommand(["import"], environment)).toThrow(/confirmation/i);
@@ -56,7 +84,7 @@ describe("secure Chongqing Talent test-account operation", () => {
       expect(runSecureCqTalentTestAccountCommand(["import", "--dry-run"], environment)).toEqual({
         operation: "import",
         status: "dry_run",
-        accountCount: 3,
+        accountCount: 7,
       });
       expect(runSecureCqTalentTestAccountCommand([
         "import",
@@ -64,7 +92,7 @@ describe("secure Chongqing Talent test-account operation", () => {
       ], environment)).toEqual({
         operation: "import",
         status: "imported",
-        accountCount: 3,
+        accountCount: 7,
       });
       expect(runSecureCqTalentTestAccountCommand([
         "rollback",
@@ -72,7 +100,7 @@ describe("secure Chongqing Talent test-account operation", () => {
       ], environment)).toEqual({
         operation: "rollback",
         status: "rolled_back",
-        accountCount: 3,
+        accountCount: 7,
       });
     } finally {
       rmSync(directory, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
@@ -94,12 +122,16 @@ describe("secure Chongqing Talent test-account operation", () => {
         SECURE_CQ_TALENT_TEST_PHONE_1: runtimePhones[0],
         SECURE_CQ_TALENT_TEST_PHONE_2: runtimePhones[1],
         SECURE_CQ_TALENT_TEST_PHONE_3: runtimePhones[2],
+        SECURE_CQ_TALENT_TEST_PHONE_4: runtimePhones[3],
+        SECURE_CQ_TALENT_TEST_PHONE_5: runtimePhones[4],
+        SECURE_CQ_TALENT_TEST_PHONE_6: runtimePhones[5],
+        SECURE_CQ_TALENT_TEST_PHONE_7: runtimePhones[6],
       };
 
       expect(runSecureCqTalentTestAccountCommand(["import", "--dry-run"], environment)).toEqual({
         operation: "import",
         status: "dry_run",
-        accountCount: 3,
+        accountCount: 7,
       });
 
       const reopened = new DatabaseSync(databasePath);
@@ -115,7 +147,7 @@ describe("secure Chongqing Talent test-account operation", () => {
     }
   }, FILE_DB_TIMEOUT);
 
-  it("supports dry-run and imports three isolated dual-role scopes transactionally", async () => {
+  it("supports dry-run and imports seven isolated dual-role scopes transactionally", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
 
     try {
@@ -135,17 +167,17 @@ describe("secure Chongqing Talent test-account operation", () => {
       });
 
       expect(imported.status).toBe("imported");
-      expect(imported.manifest.accountIds).toHaveLength(3);
-      expect(imported.manifest.accountIds.every((account) => account.studentIds.length === 2)).toBe(true);
-      expect(count(persistence.database, "user_accounts")).toBe(6);
-      expect(count(persistence.database, "club_user_memberships")).toBe(6);
-      expect(count(persistence.database, "parent_profiles")).toBe(4);
-      expect(count(persistence.database, "coach_profiles")).toBe(4);
-      expect(count(persistence.database, "student_profiles")).toBe(7);
-      expect(count(persistence.database, "teams")).toBe(5);
-      expect(countWhere(persistence.database, "calendar_events", "id LIKE 'event-cq-talent-secure-test-%'")).toBe(3);
-      expect(countWhere(persistence.database, "event_participants", "id LIKE 'participant-cq-talent-secure-test-%'")).toBe(6);
-      expect(countWhere(persistence.database, "student_contacts", "id LIKE 'contact-cq-talent-secure-test-%'")).toBe(6);
+      expect(imported.manifest.accountIds).toHaveLength(7);
+      expect(imported.manifest.accountIds.every((account) => account.studentIds.length === 8)).toBe(true);
+      expect(count(persistence.database, "user_accounts")).toBe(10);
+      expect(count(persistence.database, "club_user_memberships")).toBe(10);
+      expect(count(persistence.database, "parent_profiles")).toBe(8);
+      expect(count(persistence.database, "coach_profiles")).toBe(8);
+      expect(count(persistence.database, "student_profiles")).toBe(57);
+      expect(count(persistence.database, "teams")).toBe(9);
+      expect(countWhere(persistence.database, "calendar_events", "id LIKE 'event-cq-talent-secure-test-%'")).toBe(35);
+      expect(countWhere(persistence.database, "event_participants", "id LIKE 'participant-cq-talent-secure-test-%'")).toBe(280);
+      expect(countWhere(persistence.database, "student_contacts", "id LIKE 'contact-cq-talent-secure-test-%'")).toBe(14);
 
       const importedAccounts = persistence.database.prepare(`
         SELECT u.id, u.phone, u.roles_json, m.roles_json AS membership_roles
@@ -166,11 +198,10 @@ describe("secure Chongqing Talent test-account operation", () => {
         GROUP BY p.user_id
         ORDER BY p.user_id
       `).all() as Array<{ user_id: string; child_count: number }>;
-      expect(parentChildren).toEqual([
-        { user_id: "user-cq-talent-secure-test-1", child_count: 2 },
-        { user_id: "user-cq-talent-secure-test-2", child_count: 2 },
-        { user_id: "user-cq-talent-secure-test-3", child_count: 2 },
-      ]);
+      expect(parentChildren).toEqual(Array.from({ length: 7 }, (_, index) => ({
+        user_id: "user-cq-talent-secure-test-" + (index + 1),
+        child_count: 2,
+      })));
 
       const coachScopes = persistence.database.prepare(`
         SELECT c.user_id, COUNT(DISTINCT tm.student_id) AS roster_count
@@ -181,20 +212,82 @@ describe("secure Chongqing Talent test-account operation", () => {
         GROUP BY c.user_id
         ORDER BY c.user_id
       `).all() as Array<{ user_id: string; roster_count: number }>;
-      expect(coachScopes).toEqual([
-        { user_id: "user-cq-talent-secure-test-1", roster_count: 2 },
-        { user_id: "user-cq-talent-secure-test-2", roster_count: 2 },
-        { user_id: "user-cq-talent-secure-test-3", roster_count: 2 },
-      ]);
+      expect(coachScopes).toEqual(Array.from({ length: 7 }, (_, index) => ({
+        user_id: "user-cq-talent-secure-test-" + (index + 1),
+        roster_count: 8,
+      })));
 
       const rerun = importSecureCqTalentTestAccounts(persistence.database, {
         phones: runtimePhones,
         now: "2026-08-12T00:00:00.000Z",
       });
       expect(rerun.status).toBe("already_present");
-      expect(count(persistence.database, "user_accounts")).toBe(6);
-      expect(count(persistence.database, "student_profiles")).toBe(7);
+      expect(count(persistence.database, "user_accounts")).toBe(10);
+      expect(count(persistence.database, "student_profiles")).toBe(57);
       expect(rerun.manifest).toEqual(imported.manifest);
+    } finally {
+      persistence.database.close();
+    }
+  }, FILE_DB_TIMEOUT);
+
+  it("creates rich, restart-safe demo records for each dual-role account", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+
+    try {
+      const now = "2026-08-18T08:00:00.000Z";
+      const imported = importSecureCqTalentTestAccounts(persistence.database, {
+        phones: runtimePhones,
+        now,
+      });
+      const account = imported.manifest.accountIds[0]!;
+
+      expect(countWhere(persistence.database, "calendar_events", "id LIKE 'event-cq-talent-secure-test-1%'")).toBe(5);
+      expect(countWhere(persistence.database, "event_participants", "event_id LIKE 'event-cq-talent-secure-test-1%'")).toBe(40);
+      expect(countWhere(persistence.database, "event_participants", "event_id LIKE 'event-cq-talent-secure-test-1%' AND status IN ('present', 'late', 'absent', 'leave_requested', 'invited', 'confirmed')")).toBeGreaterThanOrEqual(6);
+      expect(countForIds(persistence.database, "lesson_credit_ledger", "student_id", account.studentIds)).toBe(16);
+      expect(countForIds(persistence.database, "player_assessments", "student_id", account.studentIds)).toBe(8);
+      expect(countForIds(persistence.database, "assessment_raw_results", "assessment_id", assessmentIdsForStudents(persistence.database, account.studentIds))).toBe(64);
+      expect(countForIds(persistence.database, "assessment_scores", "assessment_id", assessmentIdsForStudents(persistence.database, account.studentIds))).toBe(64);
+      expect(countForIds(persistence.database, "player_metric_records", "student_id", account.studentIds)).toBe(64);
+      expect(countWhere(persistence.database, "metric_lineages", "id LIKE 'metric-lineage-cq-talent-secure-test-1-%'")).toBe(64);
+      expect(countWhere(persistence.database, "matches", "event_id LIKE 'event-cq-talent-secure-test-1%'")).toBe(2);
+      expect(countWhere(persistence.database, "match_events", "id LIKE 'match-event-cq-talent-secure-test-1-%'")).toBe(8);
+      expect(countWhere(persistence.database, "tactical_boards", "event_id LIKE 'event-cq-talent-secure-test-1%'")).toBe(1);
+      expect(countForIds(persistence.database, "insurance_policies", "student_id", account.studentIds.slice(0, 2))).toBe(2);
+      expect(countForIds(persistence.database, "private_lesson_requests", "student_id", account.studentIds.slice(0, 2))).toBe(2);
+      expect(countForIds(persistence.database, "communication_logs", "student_id", account.studentIds.slice(0, 2))).toBe(4);
+      expect(countForIds(persistence.database, "student_operational_profiles", "student_id", account.studentIds.slice(0, 2))).toBe(2);
+      expect(countWhere(persistence.database, "calendar_events", "id LIKE 'event-cq-talent-secure-test-1%' AND starts_at > '2026-08-18T08:00:00.000Z'")).toBeGreaterThanOrEqual(2);
+    } finally {
+      persistence.database.close();
+    }
+  }, FILE_DB_TIMEOUT);
+
+  it("upgrades an existing two-child secure slot into the eight-player coach roster", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+
+    try {
+      const imported = importSecureCqTalentTestAccounts(persistence.database, {
+        phones: runtimePhones,
+        now: "2026-08-18T08:00:00.000Z",
+      });
+      const first = imported.manifest.accountIds[0]!;
+      const legacyCoachOnlyIds = first.studentIds.slice(2);
+      const placeholders = legacyCoachOnlyIds.map(() => "?").join(", ");
+
+      persistence.database.prepare(
+        "DELETE FROM student_profiles WHERE id IN (" + placeholders + ")",
+      ).run(...legacyCoachOnlyIds);
+
+      const upgraded = importSecureCqTalentTestAccounts(persistence.database, {
+        phones: runtimePhones,
+        now: "2026-08-18T08:00:00.000Z",
+      });
+
+      expect(upgraded.status).toBe("imported");
+      expect(countForIds(persistence.database, "student_profiles", "id", first.studentIds)).toBe(8);
+      expect(countForIds(persistence.database, "team_members", "student_id", first.studentIds)).toBe(8);
+      expect(countForIds(persistence.database, "student_guardian_bindings", "student_id", first.studentIds)).toBe(2);
     } finally {
       persistence.database.close();
     }
@@ -252,9 +345,25 @@ describe("secure Chongqing Talent test-account operation", () => {
         headers: { authorization: "Bearer " + parentToken },
       });
       expect(parent.statusCode).toBe(200);
-      expect(parent.json().children.map((child: { id: string }) => child.id)).toEqual(first.studentIds);
+      expect(parent.json().children.map((child: { id: string }) => child.id)).toEqual(first.studentIds.slice(0, 2));
       expect(parent.payload).not.toContain("phone");
       expect(parent.payload).not.toContain(second.studentIds[0]!);
+
+      const parentCalendar = await app.inject({
+        method: "GET",
+        url: base + "/parent/calendar?from=2026-07-29&to=2026-08-28",
+        headers: { authorization: "Bearer " + parentToken },
+      });
+      expect(parentCalendar.statusCode).toBe(200);
+      expect((parentCalendar.json() as { events: unknown[] }).events).toHaveLength(5);
+
+      const growth = await app.inject({
+        method: "GET",
+        url: base + "/parent/students/" + first.studentIds[0] + "/growth-summary",
+        headers: { authorization: "Bearer " + parentToken },
+      });
+      expect(growth.statusCode).toBe(200);
+      expect((growth.json() as { latest: unknown[] }).latest).toHaveLength(8);
 
       const coachSession = await app.inject({
         method: "POST",
@@ -278,6 +387,32 @@ describe("secure Chongqing Talent test-account operation", () => {
       expect(coachBody.coaches).toEqual(expect.any(Array));
       expect(coach.payload).not.toContain(second.studentIds[0]!);
       expect(coach.payload).not.toContain("phone");
+
+      const coachHome = await app.inject({
+        method: "GET",
+        url: base + "/coach/home?from=2026-07-29&to=2026-08-28",
+        headers: { authorization: "Bearer " + coachToken },
+      });
+      expect(coachHome.statusCode).toBe(200);
+      expect((coachHome.json() as { workbench: { events: unknown[] } }).workbench.events).toHaveLength(5);
+
+      const scheduledMatchId = "event-cq-talent-secure-test-" + first.slot + "-scheduled-match";
+      const match = await app.inject({
+        method: "GET",
+        url: base + "/coach/events/" + scheduledMatchId + "/match",
+        headers: { authorization: "Bearer " + coachToken },
+      });
+      expect(match.statusCode).toBe(200);
+      expect((match.json() as { match: { status: string } | null }).match?.status).toBe("scheduled");
+
+      const tactical = await app.inject({
+        method: "GET",
+        url: base + "/coach/events/" + scheduledMatchId + "/tactical-board",
+        headers: { authorization: "Bearer " + coachToken },
+      });
+      expect(tactical.statusCode).toBe(200);
+      expect((tactical.json() as { saved: boolean; board: { players: unknown[] } }).saved).toBe(true);
+      expect((tactical.json() as { board: { players: unknown[] } }).board.players).toHaveLength(8);
     } finally {
       await app?.close();
       persistence.database.close();
@@ -600,7 +735,7 @@ describe("secure Chongqing Talent test-account operation", () => {
 
       expect(() => rollbackSecureCqTalentTestAccounts(persistence.database, tampered)).toThrow(/unsupported secure test-account rollback manifest/i);
       expect(countWhere(persistence.database, "user_accounts", "id = 'user-parent-1'")).toBe(1);
-      expect(countWhere(persistence.database, "user_accounts", "id LIKE 'user-cq-talent-secure-test-%'")).toBe(3);
+      expect(countWhere(persistence.database, "user_accounts", "id LIKE 'user-cq-talent-secure-test-%'")).toBe(7);
     } finally {
       persistence.database.close();
     }
@@ -716,4 +851,15 @@ function count(database: DatabaseSync, table: string): number {
 function countWhere(database: DatabaseSync, table: string, predicate: string): number {
   const row = database.prepare(`SELECT COUNT(*) AS count FROM ${table} WHERE ${predicate}`).get() as { count: number };
   return row.count;
+}
+
+function countForIds(database: DatabaseSync, table: string, column: string, ids: readonly string[]): number {
+  const placeholders = ids.map(() => "?").join(", ");
+  const row = database.prepare(`SELECT COUNT(*) AS count FROM ${table} WHERE ${column} IN (${placeholders})`).get(...ids) as { count: number };
+  return row.count;
+}
+
+function assessmentIdsForStudents(database: DatabaseSync, studentIds: readonly string[]): string[] {
+  const placeholders = studentIds.map(() => "?").join(", ");
+  return (database.prepare(`SELECT id FROM player_assessments WHERE student_id IN (${placeholders})`).all(...studentIds) as Array<{ id: string }>).map((row) => row.id);
 }
