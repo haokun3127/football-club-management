@@ -1114,3 +1114,11 @@
 - 新版稿的 TabBar 图标框为 16px、标签为 9px、内容区高 56px；共享 `components/role-tabbar` 已同步为 `32rpx` 图标、`18rpx` 标签、`16rpx` 顶部内边距和 `84rpx` 指示点位置，家长端与教练端共用。
 - 在线稿截图：`C:\Users\ASUS\AppData\Local\Temp\c163-figma-current.png`；运行态截图：`C:\Users\ASUS\AppData\Local\Temp\c163-coach-runtime-after-tabbar-ed2e646615534f91b581683fbbb3050d.png`，sidecar 证实 `/pages/coach/account/index` 严格为 `375×812`；并排图：`C:\Users\ASUS\AppData\Local\Temp\c163-compare-1dcb603d1043494a9f7f0de37b1a616a.png`。状态栏、微信胶囊、真实账号文案作为平台/数据差异保留。
 - 验证通过：C16.3 与共享 TabBar 定向 Vitest `12/12`、小程序 `tsc --noEmit`、限定路径 `git diff --check` 均通过。该批次尚待路径限定提交后继续下一页。
+
+## 2026-08-18 C16.4 新版 Figma 复原
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1286 / C16.4 Coach Help`。新版稿确认 88px 粉色顶栏、44px 搜索栏、三行两列快速上手卡、FAQ 分组卡、支持卡和 70px 三栏底部导航。
+- `pages/coach/help` 已将顶栏改为与新版稿一致的左对齐标题和返回间距；初始“全部”筛选不再显示未在新版稿出现的红色选中边框，选择具体真实分类时仍保留本地筛选反馈。搜索、分类、展开 FAQ 和返回行为不变。
+- 真实 API 返回的分类、问题、文案和支持配置继续原样展示；当前运行态的“全部/出勤说明/训练规则/成长报告/账号设置/联系客服”等内容与在线稿示例不同，属于真实内容差异，未把 Figma FAQ 或联系渠道写进客户端。
+- 在线稿截图：`C:\Users\ASUS\AppData\Local\Temp\c164-figma-current.png`；最终运行态截图：`C:\Users\ASUS\AppData\Local\Temp\c164-coach-runtime-after-6439cb84603e4eedafa1fa1f04971996.png`，sidecar 证实 `/pages/coach/help/index` 严格为 `375×812`；并排图：`C:\Users\ASUS\AppData\Local\Temp\c164-compare-after-ba93df7869ab4f658e108ef3461b51be.png`。
+- 验证通过：C16.4 定向 Vitest `4/4`、小程序 `tsc --noEmit`、限定路径 `git diff --check` 均通过；该批次待路径限定提交。

@@ -166,13 +166,13 @@ describe("coach help", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toMatch(/TOPICS|showToast|showModal|getStorage|setStorage|contactWechat|openSupport/);
     expect(stylesheet).toMatch(/\.c164-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*background:\s*#fceeef)/s);
-    expect(stylesheet).toMatch(/\.c164-nav__title\s*\{[^}]*flex:\s*1[^}]*text-align:\s*center/s);
+    expect(stylesheet).toMatch(/\.c164-nav__title\s*\{[^}]*flex:\s*1[^}]*font-size:\s*36rpx[^}]*text-align:\s*left/s);
     expect(stylesheet).toMatch(/\.c164-nav__spacer\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c164-page__body\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+180rpx/s);
     expect(stylesheet).toMatch(/\.c164-content\s*\{[^}]*gap:\s*40rpx/s);
     expect(stylesheet).toMatch(/\.c164-card\s*\{[^}]*border-radius:\s*24rpx/s);
     expect(stylesheet).toMatch(/\.c164-category-grid\s*\{[^}]*gap:\s*24rpx/s);
-    expect(stylesheet).toMatch(/\.c164-category-card\s*\{[^}]*width:\s*280rpx/s);
+    expect(stylesheet).toMatch(/\.c164-category-card\s*\{(?=[^}]*flex:\s*1\s+0\s+calc\(\(100%\s+-\s+24rpx\)\s*\/\s*2\))(?=[^}]*height:\s*160rpx)/s);
     expect(stylesheet).toMatch(/\.c164-faq-card__header\s*\{[^}]*border-bottom:\s*1rpx\s+solid\s+#e7eaf0/s);
     expect(stylesheet).toMatch(/\.c164-faq-item--line\s*\{[^}]*border-bottom:\s*1rpx\s+solid\s+#e7eaf0/s);
   });

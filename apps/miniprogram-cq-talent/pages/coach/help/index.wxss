@@ -8,8 +8,7 @@
   box-sizing: content-box;
   display: flex;
   align-items: center;
-  gap: 24rpx;
-  padding-right: 32rpx;
+  padding-right: 200rpx;
   padding-left: 32rpx;
   background: #fceeef;
 }
@@ -34,9 +33,10 @@
 .c164-nav__title {
   flex: 1;
   color: #202124;
-  font-size: 44rpx;
+  font-size: 36rpx;
   font-weight: 700;
-  text-align: center;
+  line-height: 44rpx;
+  text-align: left;
 }
 
 .c164-nav__spacer {
@@ -110,7 +110,8 @@
 }
 
 .c164-category-card {
-  width: 280rpx;
+  min-width: 0;
+  flex: 1 0 calc((100% - 24rpx) / 2);
   height: 160rpx;
   background: #ffffff;
   border-radius: 16rpx;
