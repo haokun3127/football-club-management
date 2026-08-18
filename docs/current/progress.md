@@ -1082,3 +1082,11 @@
 - 运行态使用认证 coach 的实际数据：统计为 `10 / 93% / 8 / 5`，训练名称、日期、地点、人数及已结束状态均来自 BFF；在线稿中的 `46 / 89% / 18 / 3`、U10 队和三个样例地点没有写入小程序。微信系统状态栏、胶囊和 Home Indicator 作为平台壳层差异保留。
 - 在线稿、最终运行图及并排图位于系统临时目录，前缀分别为 `cq-talent-figma-c8-current-20260818.png`、`cq-talent-runtime-c8-refresh-20260818.png`、`cq-talent-c8-refresh-compare-20260818.png`；运行 PNG sidecar 确认路由 `/pages/coach/training/index`、原始和归一化尺寸均为严格 `375×812`。
 - 验证先红→绿：C8 定向 Vitest 从 `3 failed / 4 passed` 到 `7/7` 通过，小程序 TypeScript `tsc --noEmit` 与限定路径 `git diff --check` 通过。
+
+## 2026-08-18 C9 队伍详情最新在线稿运行态复验
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:924 / C9 Team Detail`。当前画板为软粉 TopNav、16px 圆角深色队伍摘要、四列学员网格、横向教练卡和固定教练 TabBar；设计稿的完整高度为 `375×871`，首屏按 `375×812` 运行态对照。
+- 真实基线确认 `.team-nav` 的旧 `176rpx` 内容高度与注入的 `navInset` 叠加，令 Hero 从约 `y=104` 下移至 `y=148`。现收口为 `88rpx + content-box`，并同步按在线稿调整返回/标题的 8px 间距、18px 标题字级和 Hero 的 16px 圆角；读取、返回和学员雷达跳转契约不变。
+- 最终 MCP 截图中 Hero 已回到 `y≈104`，成员区和设计稿首屏的结构起点恢复一致。实际会话返回 8 名学员、1 名教练、`10 / 93% / 8` 等真实数据，而在线稿为 12 名学员、3 名教练和示例数值，因此教练卡更早进入首屏；未填充或伪造名单。
+- 在线稿、基线及最终运行证据位于系统临时目录：`cq-talent-figma-c9-current-20260818.png`、`cq-talent-runtime-c9-baseline-20260818.png`、`cq-talent-runtime-c9-after-20260818.png`。最终 sidecar 确认路由 `/pages/coach/team/index`，原始和归一化 PNG 均为严格 `375×812`。
+- 验证先红→绿：C9 定向 Vitest 从 `1 failed / 6 passed` 到 `7/7` 通过，小程序 TypeScript `tsc --noEmit` 与限定路径 `git diff --check` 通过。
