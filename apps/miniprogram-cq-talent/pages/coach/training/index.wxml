@@ -13,7 +13,7 @@
   </view>
 
   <view class="c8-tabs">
-    <view class="c8-tab c8-tab--active">训练管理</view>
+    <view class="c8-tab c8-tab--active">训练计划</view>
     <view class="c8-tab" bindtap="openTeamAbility">能力评估</view>
     <view class="c8-tab" bindtap="openTeam">学员管理</view>
     <view class="c8-tab" bindtap="openTestTasks">测评任务</view>
@@ -30,7 +30,7 @@
         </view>
         <view wx:if="{{item.hasVenue}}" class="session-card__venue">{{item.venue}}</view>
         <view class="session-card__foot">
-          <view wx:if="{{item.hasStatus}}" class="session-card__status">{{item.status}}</view>
+          <view wx:if="{{item.hasStatus}}" class="session-card__status session-card__status--{{item.statusTone}}">{{item.statusLabel}}</view>
           <view wx:if="{{item.hasParticipantCount}}" class="session-card__count">{{item.participantLabel}}</view>
         </view>
       </view>

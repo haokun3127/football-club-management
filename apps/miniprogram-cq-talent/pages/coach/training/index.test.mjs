@@ -73,7 +73,7 @@ const home = {
       title: "Normalized safe training title",
       startsAt: "2026-08-14T09:00:00.000Z",
       venue: "地点待确认",
-      status: "",
+      status: "completed",
     },
   ],
 };
@@ -123,13 +123,17 @@ describe("coach training management", () => {
       title: "Real training title",
       venue: "Real venue",
       hasVenue: true,
+      statusLabel: "已排定",
+      statusTone: "scheduled",
       participantLabel: "12 人",
       hasParticipantCount: true,
     });
     expect(page.data.trainingCards[1]).toMatchObject({
       venue: "地点待确认",
       hasParticipantCount: false,
-      hasStatus: false,
+      statusLabel: "已结束",
+      statusTone: "completed",
+      hasStatus: true,
     });
   });
 
@@ -180,16 +184,22 @@ describe("coach training management", () => {
 
   it("keeps the training title clear of the system capsule", () => {
     expect(template).toContain('padding-right:{{menuInset}}px');
-    expect(styles).toMatch(/\.c8-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+    expect(styles).toMatch(/\.c8-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
   });
 
   it("uses the node 93:896 hero, tabs, and session-card geometry", () => {
     expect(styles).toContain("height: 360rpx");
     expect(styles).toContain("padding: 40rpx");
+    expect(styles).toContain("border-radius: 32rpx");
     expect(styles).toContain("gap: 24rpx");
     expect(styles).toContain("min-height: 128rpx");
-    expect(styles).toContain("height: 96rpx");
+    expect(styles).toContain("height: 80rpx");
     expect(styles).toContain("padding: 32rpx 44rpx");
     expect(styles).toContain("min-height: 228rpx");
+  });
+
+  it("uses the refreshed C8 training-plan copy and localized status chips", () => {
+    expect(template).toContain('<view class="c8-tab c8-tab--active">训练计划</view>');
+    expect(template).toContain('session-card__status--{{item.statusTone}}');
   });
 });

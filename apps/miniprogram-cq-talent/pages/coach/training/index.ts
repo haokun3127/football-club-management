@@ -13,6 +13,8 @@ type TrainingCard = {
   venue: string;
   hasVenue: boolean;
   status: string;
+  statusLabel: string;
+  statusTone: string;
   hasStatus: boolean;
   participantLabel: string;
   hasParticipantCount: boolean;
@@ -123,15 +125,28 @@ function toHeroMetrics(home: CoachHome, team: CoachTeamDetail): HeroMetric[] {
 function toTrainingCards(events: ScheduleEvent[]): TrainingCard[] {
   return events
     .filter((event) => event.type === "training")
-    .map((event) => ({
-      id: event.id,
-      title: event.title,
-      timeLabel: `${formatCalendarDate(event.startsAt)} · ${formatTimeRange(event.startsAt, event.endsAt)}`,
-      venue: event.venue,
-      hasVenue: Boolean(event.venue),
-      status: event.status,
-      hasStatus: Boolean(event.status),
-      participantLabel: typeof event.participantCount === "number" ? `${event.participantCount} 人` : "",
-      hasParticipantCount: typeof event.participantCount === "number",
-    }));
+    .map((event) => {
+      const status = trainingStatus(event.status);
+      return {
+        id: event.id,
+        title: event.title,
+        timeLabel: `${formatCalendarDate(event.startsAt)} · ${formatTimeRange(event.startsAt, event.endsAt)}`,
+        venue: event.venue,
+        hasVenue: Boolean(event.venue),
+        status: event.status,
+        statusLabel: status.label,
+        statusTone: status.tone,
+        hasStatus: Boolean(status.label),
+        participantLabel: typeof event.participantCount === "number" ? `${event.participantCount} 人` : "",
+        hasParticipantCount: typeof event.participantCount === "number",
+      };
+    });
+}
+
+function trainingStatus(value: string): { label: string; tone: string } {
+  const normalized = value.trim().toLowerCase();
+  if (["scheduled", "published", "active", "upcoming", "已排定"].includes(normalized)) return { label: "已排定", tone: "scheduled" };
+  if (["pending", "draft", "unconfirmed", "待确认"].includes(normalized)) return { label: "待确认", tone: "pending" };
+  if (["completed", "finished", "done", "已结束", "已完成"].includes(normalized)) return { label: "已结束", tone: "completed" };
+  return value ? { label: value, tone: "neutral" } : { label: "", tone: "" };
 }

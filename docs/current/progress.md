@@ -1074,3 +1074,11 @@
 - 真实 `375×812` 截图发现 `.c7-header` 仍为旧 `176rpx` 内容高度，加上真实状态栏后将球场整体推低约 `44px`。按画板的 88px 顶栏收口为 `height: 88rpx; box-sizing: content-box`，刷新后球场首尾与在线图对齐：从约 `y=136` 至 `y=516`。
 - 验证使用有真实持久化战术板的 `event-cq-talent-secure-test-1-scheduled-match`。红色球员圆点、实际阵型 `4-3-3` 和仅当前会籍可见的名单均来自 BFF；未填入画板左右两队的假蓝方球员或编号。定向 Vitest `6/6`、小程序 TypeScript、限定路径 `git diff --check` 通过；在线稿、最终图和并排图的临时前缀分别为 `cq-talent-figma-c7-current-20260818`、`cq-talent-runtime-c7-after-header-20260818`、`cq-talent-c7-after-header-compare-20260818`。
 - 画板的 LEGACY 布局将 TabBar 置于球场正下方，并让工具栏绝对覆盖其下方；生产小程序的共享 `role-tabbar` 是固定底栏，当前 C7 工具栏也固定在其上。这一处是画板自身与全局导航组件的结构冲突，尚不能宣称 C7 全页像素通过；本轮不为匹配该旧 PoC 而破坏全局 TabBar 行为。
+
+## 2026-08-18 C8 训练管理最新在线稿运行态复验
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:896 / C8 Training Management`。当前画板要求 88px 安全顶栏、16px 圆角的深色统计 Hero、40px 四项标签栏，首项文案为“训练计划”，训练状态标签按已排定/待确认/已结束区分色彩。
+- 真实 `375×812` MCP 截图确认旧页面缺少 Hero 圆角、标签栏偏高 8px，且直接显示 API 原始状态码。现将 Hero 收口为 `32rpx` 圆角、标签栏改为 `80rpx`、激活文案改为“训练计划”；TypeScript view model 预计算真实状态的中文标签和色调，WXML 不执行 JavaScript 方法。
+- 运行态使用认证 coach 的实际数据：统计为 `10 / 93% / 8 / 5`，训练名称、日期、地点、人数及已结束状态均来自 BFF；在线稿中的 `46 / 89% / 18 / 3`、U10 队和三个样例地点没有写入小程序。微信系统状态栏、胶囊和 Home Indicator 作为平台壳层差异保留。
+- 在线稿、最终运行图及并排图位于系统临时目录，前缀分别为 `cq-talent-figma-c8-current-20260818.png`、`cq-talent-runtime-c8-refresh-20260818.png`、`cq-talent-c8-refresh-compare-20260818.png`；运行 PNG sidecar 确认路由 `/pages/coach/training/index`、原始和归一化尺寸均为严格 `375×812`。
+- 验证先红→绿：C8 定向 Vitest 从 `3 failed / 4 passed` 到 `7/7` 通过，小程序 TypeScript `tsc --noEmit` 与限定路径 `git diff --check` 通过。
