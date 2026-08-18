@@ -50,6 +50,14 @@ Required private runtime keys: `DATABASE_URL` and `SECURE_CQ_TALENT_TEST_PHONE_1
 - A bounded HTTPS BFF readback then created 14 short-lived, role-specific bearer sessions and deleted those exact session rows after verification. Every slot returned only its two parent-bound children, all five canonical events, and eight latest growth metrics for `parent`; its own eight-member roster, five canonical workbench events, eight radar metrics, and a saved eight-player tactical board for `coach`. Response projections did not contain phone fields.
 - This is production API readback evidence, not real-device WeChat login evidence. A subsequent code-only release must re-run the controlled dry-run and expect `already_present`; real-device authorization, first role choice, and role switching remain required before declaring the production demo operation fully closed.
 
+## 2026-08-18 authorized code-only release
+
+- API releases `afd20e0` and `30d2869` were pushed to `dev`; `30d2869` was built from the committed Git tree and deployed as the running `cq-talent-api` image. The release changes only the secure importer's legacy operational-profile completeness check and related documentation; it does not re-import, seed, or overwrite production demo records.
+- A new restricted SQLite snapshot was created before the container change, retaining the server-private WAL/SHM state. The previous API image remains tagged for controlled rollback. Only the API container was recreated.
+- The first health poll used a zero-delay retry loop and elapsed before Node completed startup. Read-only diagnosis then confirmed the release container exited `0`, listened only on the loopback-published API port, and served the internal health route. Internal and public HTTPS health each returned HTTP `200` after startup.
+- The deployed CLI dry-run returned `already_present` for all seven slots. A bounded BFF re-read again verified two parent children and eight latest metrics per slot, plus an eight-member coach roster, eight latest radar metrics, and one saved eight-player tactical board per slot. The exact temporary verification sessions were deleted in cleanup.
+- This remains server-side evidence only. The seven physical-device authorization/role-switch checks in the table above are still pending.
+
 ## Real-device verification checklist (seven anonymous slots)
 
 Run this once for each operator-supplied phone, recording only the slot number and pass/fail outcome in the operator's private acceptance record. Do not put the phone, authorization code, bearer token, screenshot containing personal data, or session payload in this repository.
@@ -70,10 +78,10 @@ Run this once for each operator-supplied phone, recording only the slot number a
 | 6 | pending | pending | pending | pending | pending |
 | 7 | pending | pending | pending | pending | pending |
 
-## Not performed
+## Original task boundary (historical)
 
-- No SSH, server access, production database access, backup, import, rollback, deployment, restart, or real device login occurred in this task.
-- Production execution needs its own explicitly authorized runbook: verify target/volume, make a restricted backup including WAL/SHM, run dry-run, obtain a one-shot approval, run confirmed import, make bounded non-secret readback checks, restart only the API, then read back again.
+- The original 2026-08-12 code-only task did not itself access the server. The explicitly authorized 2026-08-18 production import/readback and later code-only release are recorded above and supersede this historical boundary for current deployment evidence.
+- Real-device WeChat authorization, first role selection, role switching and visual acceptance have not been performed by these server operations.
 
 ## Files owned by this task
 

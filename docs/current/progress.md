@@ -1018,3 +1018,12 @@
 - 根因是该 CTA 继续使用微信原生 `button` 的默认布局行为；在相同 WXSS `width: 100%` 下仍被收缩。按项目其他自定义 CTA 的模式改为普通 `view` 交互节点，并显式使用 `display: flex`、`box-sizing: border-box`、`align-items/justify-content: center`，保留原有 `logout` 逻辑、确认弹窗和会话清理边界。
 - 可信复验：`tmp/coach-runtime-acceptance/C16-20260818-mcp-after-logout-fix.png`，WeChatIDE MCP `simulator_screenshot`，严格 `375×812`；按钮已从约 183px 恢复为正文全宽约 331px，位置、红色描边、圆角和文字居中与在线稿一致。教练姓名、球队、统计、状态栏和微信胶囊仍按真实数据/系统壳层豁免。
 - 验证先红后绿：C16 定向 Vitest 先因原生 button 标记与布局断言失败（1 failed / 9），改动后 `54` 个测试文件、`332/332` 用例通过；小程序 typecheck、`git diff --check` 和 MCP 截图均通过。本批代码文件待路径限定独立提交。
+
+## 2026-08-18 七槽位安全演示账号幂等性修复与生产发布
+
+- 提交 `afd20e0` 将 secure demo 的运营档案完整性由不可靠的固定行 ID 改为真实 SQLite 唯一边界 `(club_id, student_id)`：已存在的合法旧运营档案不被覆盖，完整安装的受控导入会正确返回 `already_present`。回归测试覆盖两个旧 ID 档案保留场景；提交 `30d2869` 同步记录脱敏交接与生产回读。
+- 本地最终门禁：`npx --yes pnpm@10.33.0 run check` 退出 `0`（domain `19/19`、mini-program `332/332`、API `109/109`）；白名单 diff 检查通过。两笔提交均已推送 `dev`，未连带任何小程序、任务归档、工具或用户文件的在途改动。
+- 经明确生产授权，已由纯 Git 提交树构建并发布 API release `30d2869`。发布前建立了受限 SQLite 一致性快照，并在私有服务器区域保留 WAL/SHM 状态；旧镜像以仅供回退的标签保留。发布只重建 `cq-talent-api`，不重跑 confirmed import、不清理数据库、不重建其他服务。
+- 启动发布器最初把无间隔的 18 次 `/health` 查询误判为失败；只读诊断确认容器随后正常启动、退出码为 `0`、监听仍仅限 `127.0.0.1:3000`。之后内网和 `https://cqtc.pomi.tech/health` 均为 HTTP `200`，运行镜像标签为 `30d2869`。
+- 生产受控 CLI dry-run 返回且仅返回 `{"operation":"import","status":"already_present","accountCount":7}`。临时创建并在 `finally` 精确删除的 14 个短时 bearer session 完成 BFF 回读：7 个家长 scope 合计 14 名绑定孩子、每槽至少 8 条能力指标；7 个教练 scope 合计 56 名队员、每槽 8 维雷达数据和一个已保存的 8 人战术板。日志、文档与结果均未记录手机号、token 或凭据。
+- 本条是生产 API/数据回读证据，不替代任何真机微信手机号授权、首次角色选择、双角色切换或视觉验收。
