@@ -33,6 +33,7 @@ interface RadarComponentThis {
     dark?: boolean;
     width?: string;
     height?: string;
+    geometry?: string;
     canvasWidth?: number;
     canvasHeight?: number;
   };
@@ -74,6 +75,10 @@ Component({
       type: String,
       value: "520rpx",
     },
+    geometry: {
+      type: String,
+      value: "default",
+    },
   },
   data: {
     empty: true,
@@ -91,6 +96,9 @@ Component({
       this.draw();
     },
     "width, height"(this: RadarComponentThis, _width: unknown, _height: unknown) {
+      this.draw();
+    },
+    geometry(this: RadarComponentThis, _geometry: unknown) {
       this.draw();
     },
   },
@@ -116,7 +124,7 @@ Component({
         canvas.height = res.height * pixelRatio;
         ctx.scale(pixelRatio, pixelRatio);
         component.setData({ canvasWidth: res.width, canvasHeight: res.height });
-        renderRadar(ctx, metrics, res.width, res.height, component.data.selectedMetricId, component.data.dark);
+        renderRadar(ctx, metrics, res.width, res.height, component.data.selectedMetricId, component.data.dark, component.data.geometry);
         component._drawing = false;
         if (component._dirty) {
           component._dirty = false;
@@ -143,7 +151,11 @@ Component({
   },
 });
 
-function renderRadar(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], width: number, height: number, selectedMetricId?: string, dark = false) {
+function renderRadar(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], width: number, height: number, selectedMetricId?: string, dark = false, geometry = "default") {
+  if (geometry === "p5" && metrics.length === 6) {
+    renderP5Radar(ctx, metrics, width, height);
+    return;
+  }
   const centerX = width / 2;
   const centerY = height / 2;
   const radius = Math.min(width, height) * 0.34;
@@ -157,21 +169,33 @@ function renderRadar(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[],
   drawSelection(ctx, metrics, selectedMetricId, centerX, centerY, radius);
 }
 
-function pointAt(index: number, total: number, centerX: number, centerY: number, radius: number) {
-  const angle = -Math.PI / 2 + (Math.PI * 2 * index) / total;
+function renderP5Radar(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], width: number, height: number) {
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const radius = Math.min(width, height) * 0.34;
+  const startAngle = -(Math.PI * 2) / 3;
+  ctx.clearRect(0, 0, width, height);
+  drawGrid(ctx, metrics.length, centerX, centerY, radius, true, 5, startAngle);
+  drawPolygon(ctx, metrics, "value", centerX, centerY, radius, "rgba(212, 24, 42, 0.42)", "#ff3140", startAngle);
+  drawP5Points(ctx, metrics, centerX, centerY, radius, startAngle);
+  drawP5Labels(ctx, metrics, width, height);
+}
+
+function pointAt(index: number, total: number, centerX: number, centerY: number, radius: number, startAngle = -Math.PI / 2) {
+  const angle = startAngle + (Math.PI * 2 * index) / total;
   return {
     x: centerX + Math.cos(angle) * radius,
     y: centerY + Math.sin(angle) * radius,
   };
 }
 
-function drawGrid(ctx: CanvasRenderingContext2D, total: number, centerX: number, centerY: number, radius: number, dark = false) {
+function drawGrid(ctx: CanvasRenderingContext2D, total: number, centerX: number, centerY: number, radius: number, dark = false, rings = 4, startAngle = -Math.PI / 2) {
   ctx.strokeStyle = dark ? "rgba(255,255,255,0.20)" : "#E5E6EB";
   ctx.lineWidth = 1;
-  for (let ring = 1; ring <= 4; ring += 1) {
+  for (let ring = 1; ring <= rings; ring += 1) {
     ctx.beginPath();
     for (let index = 0; index < total; index += 1) {
-      const point = pointAt(index, total, centerX, centerY, (radius * ring) / 4);
+      const point = pointAt(index, total, centerX, centerY, (radius * ring) / rings, startAngle);
       if (index === 0) ctx.moveTo(point.x, point.y);
       else ctx.lineTo(point.x, point.y);
     }
@@ -179,7 +203,7 @@ function drawGrid(ctx: CanvasRenderingContext2D, total: number, centerX: number,
     ctx.stroke();
   }
   for (let index = 0; index < total; index += 1) {
-    const point = pointAt(index, total, centerX, centerY, radius);
+    const point = pointAt(index, total, centerX, centerY, radius, startAngle);
     ctx.beginPath();
     ctx.moveTo(centerX, centerY);
     ctx.lineTo(point.x, point.y);
@@ -187,12 +211,12 @@ function drawGrid(ctx: CanvasRenderingContext2D, total: number, centerX: number,
   }
 }
 
-function drawPolygon(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], key: "value" | "peerAverage", centerX: number, centerY: number, radius: number, fill: string, stroke: string) {
+function drawPolygon(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], key: "value" | "peerAverage", centerX: number, centerY: number, radius: number, fill: string, stroke: string, startAngle = -Math.PI / 2) {
   ctx.beginPath();
   metrics.forEach((metric, index) => {
     const raw = metric[key];
     const value = typeof raw === "number" ? raw : 0;
-    const point = pointAt(index, metrics.length, centerX, centerY, radius * Math.max(0, Math.min(value / metric.maxValue, 1)));
+    const point = pointAt(index, metrics.length, centerX, centerY, radius * Math.max(0, Math.min(value / metric.maxValue, 1)), startAngle);
     if (index === 0) ctx.moveTo(point.x, point.y);
     else ctx.lineTo(point.x, point.y);
   });
@@ -202,6 +226,77 @@ function drawPolygon(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[],
   ctx.lineWidth = 2;
   ctx.fill();
   ctx.stroke();
+}
+
+function drawP5Points(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], centerX: number, centerY: number, radius: number, startAngle: number) {
+  metrics.forEach((metric, index) => {
+    const value = typeof metric.value === "number" ? metric.value : 0;
+    const point = pointAt(index, metrics.length, centerX, centerY, radius * Math.max(0, Math.min(value / metric.maxValue, 1)), startAngle);
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, 2, 0, Math.PI * 2);
+    ctx.fillStyle = "#f5222d";
+    ctx.fill();
+  });
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, 2.5, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(255,255,255,0.42)";
+  ctx.fill();
+}
+
+function drawP5Labels(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], width: number, height: number) {
+  const labelPositions: ReadonlyArray<readonly [number, number]> = [
+    [0.238, 0.163], [0.683, 0.163], [0.847, 0.404],
+    [0.683, 0.772], [0.238, 0.772], [0.074, 0.404],
+  ];
+  const badgePositions: ReadonlyArray<readonly [number, number]> = [
+    [0.201, 0.053], [0.683, 0.053], [0.847, 0.471],
+    [0.683, 0.839], [0.201, 0.839], [0.048, 0.471],
+  ];
+  ctx.font = "12px sans-serif";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "#b3b3b3";
+  metrics.forEach((metric, index) => {
+    const label = labelPositions[index];
+    const badge = badgePositions[index];
+    if (!label || !badge) return;
+    const [labelX, labelY] = label;
+    const [badgeX, badgeY] = badge;
+    ctx.fillText(metric.label, width * labelX, height * labelY);
+    const value = typeof metric.value === "number" ? metric.value : 0;
+    drawP5Badge(ctx, String(Math.round(value)), width * badgeX, height * badgeY);
+  });
+}
+
+function drawP5Badge(ctx: CanvasRenderingContext2D, value: string, x: number, y: number) {
+  const width = 34;
+  const height = 24;
+  const radius = 4;
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.arc(x + width - radius, y + radius, radius, -(Math.PI / 2), 0);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.arc(x + width - radius, y + height - radius, radius, 0, Math.PI / 2);
+  ctx.lineTo(x + radius, y + height);
+  ctx.arc(x + radius, y + height - radius, radius, Math.PI / 2, Math.PI);
+  ctx.lineTo(x, y + radius);
+  ctx.arc(x + radius, y + radius, radius, Math.PI, (Math.PI * 3) / 2);
+  ctx.closePath();
+  ctx.fillStyle = "rgba(255,255,255,0.10)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,0.24)";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.font = "bold 14px sans-serif";
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(value, x + width / 2, y + height / 2 + 0.5);
 }
 
 function drawLabels(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], centerX: number, centerY: number, radius: number, dark = false) {

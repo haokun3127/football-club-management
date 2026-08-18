@@ -87,6 +87,39 @@ describe("parent ability radar", () => {
     expect(page.data.radar.map((point) => point.metricId)).toEqual(["speed", "control", "defence"]);
   });
 
+  it("projects a complete real metric view into the refreshed six-dimension P5 model", async () => {
+    mocks.getParentGrowth.mockResolvedValue({
+      radar: [
+        { metricId: "teamwork", label: "Teamwork", value: 65, maxValue: 100 },
+        { metricId: "speed", label: "Speed", value: 75, maxValue: 100 },
+        { metricId: "fitness", label: "Fitness", value: 90, maxValue: 100 },
+        { metricId: "passing", label: "Passing", value: 68, maxValue: 100 },
+        { metricId: "defence", label: "Defence", value: 82, maxValue: 100 },
+        { metricId: "shooting", label: "Shooting", value: 71, maxValue: 100 },
+        { metricId: "control", label: "Control", value: 86, maxValue: 100 },
+        { metricId: "balance", label: "Balance", value: 78, maxValue: 100 },
+      ],
+      metricItems: [],
+      views: [{ id: "overview", name: "Overview", metricIds: ["teamwork", "speed", "fitness", "passing", "defence", "shooting", "control", "balance"] }],
+    });
+    const page = createPageInstance();
+
+    const loading = page.load();
+    await vi.runAllTimersAsync();
+    await loading;
+
+    expect(page.data).toMatchObject({
+      state: "ready",
+      radarDimensionLabel: "六维能力模型",
+      compositeScore: 75,
+      radarGeometry: "p5",
+    });
+    expect(page.data.radar.map((point) => point.metricId)).toEqual([
+      "teamwork", "speed", "fitness", "passing", "defence", "shooting",
+    ]);
+    expect(template).toContain('geometry="{{radarGeometry}}"');
+  });
+
   it("keeps the radar empty when fewer than three real values are available", async () => {
     mocks.getParentGrowth.mockResolvedValue({
       radar: [

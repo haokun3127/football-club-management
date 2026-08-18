@@ -1,7 +1,7 @@
 import { getParentChildren, getParentGrowth } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import { formatDateTime, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import { formatShortDate, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { setCurrentStudentId } from "../../../utils/store";
 import type { GrowthSummary, LoadState, RadarMetricPoint, StudentSummary } from "../../../utils/types";
 
@@ -30,6 +30,7 @@ Page({
     selectedMetricId: "",
     canDrawRadar: false,
     radarDimensionLabel: "",
+    radarGeometry: "default",
     updatedAtLabel: "",
     compositeScore: "" as number | "",
   },
@@ -71,7 +72,7 @@ Page({
         growth = await getParentGrowth(active.id, active);
         if (gen !== loadGeneration) return;
       }
-      const radar = presentRadar(radarForView(growth));
+      const radar = presentP5Radar(radarForView(growth));
       this.setData({
         state: radar.length >= 3 ? "ready" : "empty",
         message: radar.length >= 3 ? "" : "有效能力指标不足，完成训练或评测后生成雷达图。",
@@ -82,8 +83,9 @@ Page({
         radar,
         selectedMetricId: radar[0]?.metricId ?? "",
         canDrawRadar: false,
-        radarDimensionLabel: radar.length >= 3 ? `${radar.length}维能力模型` : "",
-        updatedAtLabel: growth.updatedAt ? formatDateTime(growth.updatedAt) : "更新时间待同步",
+        radarDimensionLabel: radar.length === 6 ? "六维能力模型" : radar.length >= 3 ? `${radar.length}维能力模型` : "",
+        radarGeometry: radar.length === 6 ? "p5" : "default",
+        updatedAtLabel: growth.updatedAt ? `本周评估 · ${formatShortDate(growth.updatedAt)}` : "评估时间待同步",
         compositeScore: compositeScoreOf(radar),
       });
       // 首帧门控：让 webview 内容（导航/hero/维度行）先上屏，下一帧再挂载原生 canvas，避免 canvas 合成层抢跑
@@ -142,6 +144,10 @@ function presentRadar(points: RadarMetricPoint[]): RadarPointView[] {
     ...point,
     percent: !point.maxValue ? 0 : Math.min(100, Math.round(((point.value ?? 0) / point.maxValue) * 100)),
   }));
+}
+
+function presentP5Radar(points: RadarMetricPoint[]): RadarPointView[] {
+  return presentRadar(points).slice(0, 6);
 }
 
 // 综合评分：各维度得分率（value/maxValue）的均值折算百分制

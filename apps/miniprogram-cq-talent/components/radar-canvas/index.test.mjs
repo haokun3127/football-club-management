@@ -81,6 +81,11 @@ describe("radar canvas dimensions", () => {
     expect(stylesheet).toMatch(/\.radar-canvas\s*\{[^}]*width:\s*100%[^}]*height:\s*520rpx/s);
   });
 
+  it("offers an opt-in P5 geometry without changing the default callers", () => {
+    expect(componentDefinition.properties.geometry.value).toBe("default");
+    expect(componentDefinition.properties.geometry).toMatchObject({ type: String });
+  });
+
   it("accepts custom dimensions and remeasures then redraws after a size change", () => {
     const { instance, context } = createInstance([
       { width: 375, height: 260 },

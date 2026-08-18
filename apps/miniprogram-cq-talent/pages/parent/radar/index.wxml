@@ -33,7 +33,7 @@
           <view class="rhero__date">{{updatedAtLabel}}</view>
         </view>
         <view class="rhero__canvas">
-          <radar-canvas wx:if="{{canDrawRadar}}" dark="{{true}}" metrics="{{radar}}" selectedMetricId="{{selectedMetricId}}" bindmetrictap="selectMetric"></radar-canvas>
+          <radar-canvas wx:if="{{canDrawRadar}}" dark="{{true}}" geometry="{{radarGeometry}}" metrics="{{radar}}" selectedMetricId="{{selectedMetricId}}" bindmetrictap="selectMetric"></radar-canvas>
           <view wx:else class="rhero__placeholder"></view>
         </view>
         <view wx:if="{{compositeScore !== ''}}" class="rhero__score"><view class="rhero__score-label">综合评分</view><view class="rhero__score-value">{{compositeScore}}</view></view>

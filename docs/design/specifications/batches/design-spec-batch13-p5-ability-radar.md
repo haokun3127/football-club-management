@@ -1,5 +1,13 @@
 # Figma 画板规格: P5 Ability Radar
 
+## 2026-08-18 refreshed online baseline
+
+当前唯一在线来源为 `zZ6wKyOHKcO4UYXDd9jGwv / 93:278 / P5 Ability Radar`。本轮通过 Figma MCP `get_design_context` 与 `get_screenshot` 重新读取，画板仍为 `375×812`，但视觉实现以当前在线结构为准：六维深色雷达、五层网格、六个值胶囊、纵向综合评分和六行维度详情。
+
+小程序使用现有真实 `GrowthSummary.radar` 数据。展示投影只保留前六个有效数值指标以匹配画板维度数量，不写入或覆盖后端指标；完整数据继续由成长与指标详情页面读取。`radar-canvas` 的 `geometry="p5"` 是显式 opt-in，未传该属性的教练端雷达保持原方向、网格数量和同龄基准绘制。
+
+本轮代码静态验证通过，但因当前 DevTools 会话是 coach-only，家长 P5 运行态截图需在双角色家长会话下补取；未将静态验证写成视觉验收结论。
+
 - [4] | P5 Ability Radar | 375x812 @(940,1920) | fill=#f6f7f9 | r=28 | layout=V
   - [4] | Header | 375x88 @(940,1920) | fill=#ffffff | stroke=#e7eaf0 w1 | layout=H pad=14/22
     - [4] | Back Button | 40x40 @(962,1944) | fill=#ffffff | r=20 | layout=H
