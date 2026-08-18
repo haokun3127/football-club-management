@@ -1122,3 +1122,10 @@
 - 真实 API 返回的分类、问题、文案和支持配置继续原样展示；当前运行态的“全部/出勤说明/训练规则/成长报告/账号设置/联系客服”等内容与在线稿示例不同，属于真实内容差异，未把 Figma FAQ 或联系渠道写进客户端。
 - 在线稿截图：`C:\Users\ASUS\AppData\Local\Temp\c164-figma-current.png`；最终运行态截图：`C:\Users\ASUS\AppData\Local\Temp\c164-coach-runtime-after-6439cb84603e4eedafa1fa1f04971996.png`，sidecar 证实 `/pages/coach/help/index` 严格为 `375×812`；并排图：`C:\Users\ASUS\AppData\Local\Temp\c164-compare-after-ba93df7869ab4f658e108ef3461b51be.png`。
 - 验证通过：C16.4 定向 Vitest `4/4`、小程序 `tsc --noEmit`、限定路径 `git diff --check` 均通过；该批次待路径限定提交。
+
+## 2026-08-18 C16.1/C16.2 新版 Figma 刷新复原
+
+- C16.1 在线节点 `93:1210` 已重新读取。权限页按新版稿收口为左对齐 18px 标题、16/22px 内容边距、五行 40×24px 只读开关和 52px“保存更改”视觉按钮；按钮不绑定伪保存逻辑，权限仍由真实 coach session capabilities 投影。
+- C16.2 在线节点 `93:1238` 已重新读取。私教兴趣页按新版稿收口为说明卡、接单开关、7 列×4 行可用时段网格和费用说明；周列/时段格在 TypeScript view model 中预计算，WXML 没有 `.map()` 等方法调用。
+- 真实运行态 MCP 截图均为严格 `375×812`：`c161-runtime-latest.png` / `c162-runtime-latest.png`；并排证据为 `c161-compare-latest.png` / `c162-compare-latest.png`。C16.1 当前会话未提供 Figma 样例中的前三项权限；C16.2 BFF 未提供接单/排期契约，因此保留真实待同步/不可用状态，不伪造绿色样例数据。
+- 验证：C16.1 + C16.2 定向 Vitest `8/8`、小程序 `tsc --noEmit`、限定路径 `git diff --check` 通过。
