@@ -8,7 +8,6 @@
   box-sizing: content-box;
   display: flex;
   align-items: center;
-  gap: 24rpx;
   padding-right: 200rpx;
   padding-left: 32rpx;
   background: #fceeef;
@@ -34,9 +33,10 @@
 .c163-nav__title {
   flex: 1;
   color: #202124;
-  font-size: 44rpx;
+  font-size: 36rpx;
   font-weight: 700;
-  text-align: center;
+  line-height: 44rpx;
+  text-align: left;
 }
 
 .c163-nav__placeholder {
@@ -65,6 +65,8 @@
   display: flex;
   align-items: center;
   gap: 24rpx;
+  box-sizing: border-box;
+  min-height: 184rpx;
   padding: 32rpx;
 }
 
@@ -87,17 +89,51 @@
   flex: 1;
 }
 
+.c163-profile__name-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
 .c163-profile__name {
   color: #202124;
   font-size: 32rpx;
   font-weight: 700;
+  line-height: 38rpx;
+}
+
+.c163-profile__edit {
+  box-sizing: border-box;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  background: #fceeef;
+  color: #a80f1b;
+  font-size: 22rpx;
+  font-weight: 600;
+  line-height: 26rpx;
 }
 
 .c163-profile__team {
   margin-top: 8rpx;
   color: #667085;
   font-size: 24rpx;
-  line-height: 36rpx;
+  line-height: 32rpx;
+}
+
+.c163-profile__badge {
+  display: inline-flex;
+  box-sizing: border-box;
+  margin-top: 4rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  line-height: 26rpx;
+}
+
+.c163-profile__badge--pending {
+  background: #f2f4f7;
+  color: #667085;
 }
 
 .c163-list {
@@ -105,7 +141,7 @@
 }
 
 .c163-row {
-  min-height: 84rpx;
+  min-height: 90rpx;
   padding: 0 32rpx;
   display: flex;
   align-items: center;
@@ -128,4 +164,50 @@
   color: #667085;
   font-size: 24rpx;
   text-align: right;
+}
+
+.c163-row__right {
+  display: flex;
+  align-items: center;
+  gap: 32rpx;
+  min-width: 0;
+}
+
+.c163-row__action {
+  flex: 0 0 auto;
+  color: #a80f1b;
+  font-size: 28rpx;
+  font-weight: 600;
+  line-height: 34rpx;
+}
+
+.c163-row__label-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.c163-row__binding-icon {
+  display: flex;
+  width: 36rpx;
+  height: 36rpx;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 4rpx solid #34c759;
+  border-radius: 50%;
+  color: #34c759;
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 28rpx;
+}
+
+.c163-row__value--pending {
+  color: #667085;
+}
+
+.c163-row__arrow {
+  width: 32rpx;
+  height: 32rpx;
+  flex: 0 0 32rpx;
 }

@@ -1106,3 +1106,11 @@
 - 最终 MCP 截图中“学员覆盖”从 `y≈153` 回到 `y≈109`，第一张真实覆盖卡紧随其后，确认栏与 TabBar 位置不变。运行态实际返回两名学员、每人 8 个维度、`覆盖 8/10` 和若干待同步项；在线稿为三名学员、三维样例，属真实数据/契约差异，未删减或填充。
 - 在线稿、基线与最终证据位于系统临时目录：`cq-talent-figma-c101-current-20260818.png`、`cq-talent-runtime-c101-baseline-20260818.png`、`cq-talent-runtime-c101-after-20260818.png`。最终 sidecar 确认路由 `/pages/coach/coverage/index`，PNG 归一化为严格 `375×812`。
 - 验证先红→绿：C10.1 定向 Vitest 从 `1 failed / 5 passed` 到 `6/6` 通过，小程序 TypeScript `tsc --noEmit` 与限定路径 `git diff --check` 通过。
+
+## 2026-08-18 C16.3 新版 Figma 复原与共享 TabBar 校准
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1262 / C16.3 Coach Account`。新版稿确认 88px 粉色顶栏、左对齐“账号设置”、92px 资料卡、45px 分组行、16px 内容边距和 70px 三栏底部导航。
+- `pages/coach/account` 已按新版结构收口：资料卡补齐编辑标签、状态徽标、微信绑定图标、手机号右侧动作和三组箭头行；账号字段仍显示真实会话可提供的信息（当前会话未提供/状态待同步），没有写入 Figma 示例手机号、姓名、认证结果或伪造 API 能力。
+- 新版稿的 TabBar 图标框为 16px、标签为 9px、内容区高 56px；共享 `components/role-tabbar` 已同步为 `32rpx` 图标、`18rpx` 标签、`16rpx` 顶部内边距和 `84rpx` 指示点位置，家长端与教练端共用。
+- 在线稿截图：`C:\Users\ASUS\AppData\Local\Temp\c163-figma-current.png`；运行态截图：`C:\Users\ASUS\AppData\Local\Temp\c163-coach-runtime-after-tabbar-ed2e646615534f91b581683fbbb3050d.png`，sidecar 证实 `/pages/coach/account/index` 严格为 `375×812`；并排图：`C:\Users\ASUS\AppData\Local\Temp\c163-compare-1dcb603d1043494a9f7f0de37b1a616a.png`。状态栏、微信胶囊、真实账号文案作为平台/数据差异保留。
+- 验证通过：C16.3 与共享 TabBar 定向 Vitest `12/12`、小程序 `tsc --noEmit`、限定路径 `git diff --check` 均通过。该批次尚待路径限定提交后继续下一页。

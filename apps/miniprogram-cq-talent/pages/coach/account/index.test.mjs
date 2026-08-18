@@ -75,6 +75,8 @@ describe("coach account", () => {
       avatarLetter: "会",
       teamText: "真实 U10 队",
       teamState: "ready",
+      phoneText: "当前会话未提供",
+      bindingText: "状态待同步",
     });
   });
 
@@ -152,16 +154,24 @@ describe("coach account", () => {
     expect(template).toContain("/assets/icons/c163-chevron-left.svg");
     expect([...template.matchAll(/\bbind(?:tap|longpress|change|input|submit|action)\s*=/g)]).toHaveLength(1);
     expect(template).toMatch(/class="c163-nav__back"[^>]*bindtap="goBack"/);
-    expect(template).not.toMatch(/138\*|已绑定|已认证|编辑|修改|退出登录|清除缓存/);
+    expect(template).toContain("修改密码");
+    expect(template).toContain("设备管理");
+    expect(template).toContain("清除缓存");
+    expect(existsSync(new URL("../../../assets/icons/c16-chevron-right.svg", import.meta.url))).toBe(true);
+    expect(template).toContain("/assets/icons/c16-chevron-right.svg");
+    expect(template).not.toContain("/assets/icons/c163-chevron-right.svg");
+    expect(template).not.toMatch(/138\*|已绑定|已认证|退出登录/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("home.coachName");
     expect(controller).not.toMatch(/clearSession|getStorage|setStorage|showToast|showModal|reLaunch/);
     expect(template).toContain('class="c163-nav__placeholder"');
     expect(stylesheet).toMatch(/\.c163-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*padding-right:\s*200rpx)(?=[^}]*padding-left:\s*32rpx)(?=[^}]*background:\s*#fceeef)/s);
-    expect(stylesheet).toMatch(/\.c163-nav__title\s*\{(?=[^}]*flex:\s*1)(?=[^}]*font-size:\s*44rpx)(?=[^}]*text-align:\s*center)/s);
+    expect(stylesheet).toMatch(/\.c163-nav__title\s*\{(?=[^}]*flex:\s*1)(?=[^}]*font-size:\s*36rpx)(?=[^}]*text-align:\s*left)/s);
     expect(stylesheet).toMatch(/\.c163-nav__placeholder\s*\{(?=[^}]*width:\s*48rpx)(?=[^}]*height:\s*48rpx)/s);
     expect(stylesheet).toMatch(/\.c163-page__body\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+180rpx/s);
     expect(stylesheet).toMatch(/\.c163-content\s*\{[^}]*gap:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.c163-card\s*\{[^}]*border-radius:\s*24rpx/s);
+    expect(stylesheet).toMatch(/\.c163-profile\s*\{(?=[^}]*min-height:\s*184rpx)(?=[^}]*padding:\s*32rpx)/s);
+    expect(stylesheet).toMatch(/\.c163-row\s*\{[^}]*min-height:\s*90rpx/s);
   });
 });

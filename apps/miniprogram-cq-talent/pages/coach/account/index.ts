@@ -10,6 +10,8 @@ interface PageData {
   avatarLetter: string;
   teamState: TeamState;
   teamText: string;
+  phoneText: string;
+  bindingText: string;
 }
 
 Page<PageData>({
@@ -56,6 +58,8 @@ function accountPageData(
     avatarLetter: displayName.slice(0, 1),
     teamState,
     teamText,
+    phoneText: "当前会话未提供",
+    bindingText: "状态待同步",
   };
 }
 
