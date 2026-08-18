@@ -1048,3 +1048,10 @@
 - 对照同一真实教练活动的 MCP 截图，修正了一处静态标题文案：`需要更正的学员` → `需更正学员`。真实服务端没有“系统差异”字段，因此保留真实的“课时调整”、实际姓名和“课时余额待核对”状态，未填入 Figma 样例头像、异常标签或 `1.5课时`。
 - 截图前已调用 WeChatIDE MCP `simulator_refresh`，避免旧 bundle；最终 sidecar 证实 `/pages/coach/lesson-correction/index` 和 PNG 为严格 `375×812`。在线稿、最终运行图和并排图均位于系统临时目录，文件前缀分别为 `cq-talent-figma-c51-current-20260818`、`cq-talent-runtime-c51-after-refresh-20260818`、`cq-talent-c51-after-refresh-compare-20260818`。
 - 验证按红→绿完成：C5.1 定向 Vitest `7/7`、小程序 TypeScript `tsc --noEmit`、限定路径 `git diff --check` 均通过。
+
+## 2026-08-18 C6 比赛记录最新在线稿运行态复验
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:796 / C6 Match Entry`。最新画板的内容区为顶栏后 `16px` 间距、深色比赛摘要、白色事件卡和固定教练 TabBar。
+- 真实 `375×812` 基线确认 `.match-page__content` 仍保留旧的 `44px` 顶部留白，使英雄卡与事件卡整体下移约 `28px`。现按在线节点改为 `padding: 32rpx 32rpx 200rpx`；刷新模拟器并重截后，英雄卡顶边已与画板对齐，事件卡也回到正确首屏位置。
+- 截图使用当前教练有权限的完成比赛 `event-cq-talent-secure-test-1-completed-match`。比赛标题、`4:2` 比分、七条事件、事件标签和当前 BFF 没有提供的分半场明细均保持真实数据；没有把 Figma 的样例对手、0:0 或四条事件写入前端。
+- 可信在线稿、最终运行图和并排图位于系统临时目录，前缀为 `cq-talent-figma-c6-current-20260818`、`cq-talent-runtime-c6-after-gap-20260818`、`cq-talent-c6-after-gap-compare-20260818`。验证先红→绿：C6 定向 Vitest `10/10`、小程序 TypeScript `tsc --noEmit` 和限定路径 `git diff --check` 通过。
