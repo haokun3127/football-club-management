@@ -185,7 +185,7 @@
   position: fixed;
   right: 56rpx;
   bottom: 112rpx;
-  z-index: 20;
+  z-index: 10000;
   display: flex;
   width: 112rpx;
   height: 112rpx;
