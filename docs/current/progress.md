@@ -1149,3 +1149,9 @@
 - 按在线稿修正 `pages/parent/radar`：返回区改为 `24×40px` 并使用共享 `chevron-left.svg`；标题、副标题回到 `18px/13px`；玩家选择区使用页面底色；内容区上边距为 `16px`；雷达 Hero 内部垂直间距为 `20px`；雷达 canvas 显式传入 `100% × 560rpx`，确保运行态为 `303×280px`，不再落回组件默认 `520rpx` 高度。
 - 先红后绿：P5 页面/雷达组件定向 Vitest 从 `6/8`（新增契约预期未满足）到 `8/8`，小程序 TypeScript `tsc --noEmit` 与限定路径 `git diff --check` 通过。
 - 证据：在线截图 `C:\Users\ASUS\AppData\Local\Temp\p5-ability-radar-figma-current.png`；由于当前微信开发者工具会话为 coach-only，无法合法进入 parent 路由，尚未取得家长端真实 `375×812` 运行截图；本批只宣称 Figma/静态/类型/测试通过，不宣称运行态视觉验收通过。
+
+## 2026-08-18 新版双端门禁复核
+
+- 重新读取新版 Figma 两个页面：`4:6 / 05 Parent Generated` 与 `4:7 / 06 Coach Generated`；当前唯一来源仍为 `zZ6wKyOHKcO4UYXDd9jGwv`。已确认当前任务识别的实质变化均已分别落在 C5、P5、C14 三个独立提交中。
+- 全仓门禁：`npx --yes pnpm@10.33.0 run check` exit `0`；domain `19/19`、小程序 `340/340`、API `109/109`，三层 typecheck 均通过。
+- 双端视觉剩余边界仍如实保留：P5 当前没有合法 parent 运行会话，历史 C1–C14 等页面的运行态证据按各自记录中的“真实截图/平台或数据豁免”处理；没有把全仓测试绿灯解释为所有页面的像素级视觉通过。
