@@ -1137,6 +1137,12 @@
 - 已用当前在线截图刷新 `docs/design/reference/figma/c5-lesson-confirm.png`。真实 MCP 运行证据：`C:\Users\ASUS\AppData\Local\Temp\c5-runtime-latest-before.png`；并排图：`C:\Users\ASUS\AppData\Local\Temp\c5-runtime-compare-before.png`，均严格 `375×812`。样例五名学员与 `1.5课时` 和真实会话数据不同，继续按数据差异豁免。
 - C5 定向回归仍通过；本批没有业务代码变更，仅提交设计参考快照与记录。
 
+## 2026-08-18 C14 在线参考图尺寸修正
+
+- 重新读取在线唯一基准 `zZ6wKyOHKcO4UYXDd9jGwv / 93:1106 / C14 Team Ability Overview` 的 `get_design_context` 与 `get_screenshot`；在线稿为完整 `375×1258`。
+- 发现仓库 `docs/design/reference/figma/c14-team-ability-overview.png` 历史上被错误保存为 `306×1024` 裁剪图；已用当前在线 PNG 替换为完整 `375×1258`，未修改 C14 业务代码、真实数据或接口契约。
+- 证据：`C:\Users\ASUS\AppData\Local\Temp\c14-team-ability-overview-figma-current.png`；由于本批没有运行代码改动，不宣称新增运行态视觉通过。
+
 ## 2026-08-18 P5 新版几何校准（运行态家长会话待补）
 
 - 重新读取在线唯一基准 `zZ6wKyOHKcO4UYXDd9jGwv / 93:278 / P5 Ability Radar`，并与仓库离线快照 `docs/design/reference/figma/p5-ability-radar.png` 做像素比对；两者均为 `375×812`，当前 `diffbbox=None`，无需刷新离线 PNG。

@@ -1,5 +1,9 @@
 # Figma 画板规格: C14 Team Ability Overview
 
+## 2026-08-18 refreshed online reference
+
+在线唯一基准为 `zZ6wKyOHKcO4UYXDd9jGwv / 93:1106 / C14 Team Ability Overview`。本次重新读取确认完整画板为 `375×1258`；仓库离线参考图已从历史错误裁剪的 `306×1024` 替换为完整在线 PNG。业务代码与真实数据契约没有改动，本条只更新设计参考资产。
+
 - [4] | C14 Team Ability Overview | 375x812 @(80,4620) | fill=#f6f7f9 | r=28 | layout=V
   - [4] | Header | 375x88 @(80,4620) | fill=#fceeef | layout=H gap=12 pad=0/16
     - [4] | Back | 32x32 @(96,4648) | fill=#ffffff | r=16 | layout=H
