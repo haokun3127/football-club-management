@@ -4,7 +4,7 @@
 }
 
 .select-nav {
-  height: 176rpx;
+  height: 88rpx;
   box-sizing: content-box;
   display: flex;
   align-items: center;
@@ -16,7 +16,7 @@
   display: flex;
   min-height: 56rpx;
   align-items: center;
-  gap: 24rpx;
+  gap: 16rpx;
 }
 
 .select-nav__back {
@@ -34,9 +34,9 @@
 
 .select-nav__title {
   color: #202124;
-  font-size: 44rpx;
+  font-size: 36rpx;
   font-weight: 700;
-  line-height: 52rpx;
+  line-height: 44rpx;
 }
 
 .select-page__body {

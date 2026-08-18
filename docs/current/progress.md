@@ -1090,3 +1090,11 @@
 - 最终 MCP 截图中 Hero 已回到 `y≈104`，成员区和设计稿首屏的结构起点恢复一致。实际会话返回 8 名学员、1 名教练、`10 / 93% / 8` 等真实数据，而在线稿为 12 名学员、3 名教练和示例数值，因此教练卡更早进入首屏；未填充或伪造名单。
 - 在线稿、基线及最终运行证据位于系统临时目录：`cq-talent-figma-c9-current-20260818.png`、`cq-talent-runtime-c9-baseline-20260818.png`、`cq-talent-runtime-c9-after-20260818.png`。最终 sidecar 确认路由 `/pages/coach/team/index`，原始和归一化 PNG 均为严格 `375×812`。
 - 验证先红→绿：C9 定向 Vitest 从 `1 failed / 6 passed` 到 `7/7` 通过，小程序 TypeScript `tsc --noEmit` 与限定路径 `git diff --check` 通过。
+
+## 2026-08-18 C10 训练内容选择最新在线稿运行态复验
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:952 / C10 Training Content Select`。当前画板为软粉返回顶栏、搜索、横向分类、64px 训练卡、70px 底部选择栏和教练 TabBar；内容区左右为 22px、上下为 16px。
+- 真实基线中旧 `.select-nav` 的 `176rpx` 使搜索框、分类和训练库列表整体下移约 44px；返回标题也比在线稿更大且与图标距离过宽。现收口为 `88rpx + content-box`，并将标题改为 18px、标题与返回图标的间距改为 8px；筛选、选择、保存后 BFF readback 和返回行为未改动。
+- 最终 MCP 截图中搜索框起点为 `y≈105`，训练列表、底部选择栏和 TabBar 与在线稿首屏结构对应。当前真实训练库返回运控球、1v1 等分类/项目，当前活动也没有已选内容，故显示真实的空心选择圈、`已选 0 项`和禁用按钮；未填充 Figma 的四个样例项目和三项已选状态。
+- 在线稿、基线和最终证据位于系统临时目录：`cq-talent-figma-c10-current-20260818.png`、`cq-talent-runtime-c10-baseline-20260818.png`、`cq-talent-runtime-c10-after-20260818.png`。最终 sidecar 证实路由 `/pages/coach/content-select/index`、查询为当前训练活动，归一化 PNG 严格为 `375×812`。
+- 验证先红→绿：C10 定向 Vitest 从 `1 failed / 7 passed` 到 `8/8` 通过，小程序 TypeScript `tsc --noEmit` 与限定路径 `git diff --check` 通过。
