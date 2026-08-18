@@ -16,7 +16,7 @@
 - 保留 `user-parent-cq-talent-acceptance` 与 `parent-cq-talent-acceptance` 两个稳定 ID，避免修改小程序 dev 配置和人工命令。
 - 这两个 ID 不再代表额外的“万能验收家长”，而是直接作为第一个真实生成家庭的 user/profile ID；姓名、手机号、微信和关系均来自该家庭。
 - 删除第二组覆盖 200 人的非主要 guardian bindings。每名导入学员只保留一个主要家庭绑定。
-- 登录手机号因此唯一，且可解析到真实家庭；不再与 `user-coach-1` 共用 `13900000000`。
+- 登录手机号因此唯一，且可解析到真实家庭；不再与 `user-coach-1` 共用任何运行时测试手机号。
 
 ## 球队与教练完整性
 

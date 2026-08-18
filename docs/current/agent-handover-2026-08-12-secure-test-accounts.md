@@ -42,6 +42,34 @@ Required private runtime keys: `DATABASE_URL` and `SECURE_CQ_TALENT_TEST_PHONE_1
 - API typecheck and API build passed.
 - Final serial root check exited `0`: domain `19/19`, mini-program `332/332`, API `108/108`. `git diff --check` passed.
 
+## 2026-08-18 production execution (continuation)
+
+- A restricted production SQLite backup was made before mutation; the main file was retained in the server-only backup location and the WAL/SHM state was recorded privately. Runtime phone values remained only in root-owned server environment files.
+- The production dry-run returned only `{"operation":"import","status":"dry_run","accountCount":7}`. After explicit operator confirmation, the confirmed import returned only `{"operation":"import","status":"imported","accountCount":7}`.
+- Only `cq-talent-api` was restarted after the write. Both the internal health probe and `https://cqtc.pomi.tech/health` returned HTTP 200.
+- A bounded HTTPS BFF readback then created 14 short-lived, role-specific bearer sessions and deleted those exact session rows after verification. Every slot returned only its two parent-bound children, all five canonical events, and eight latest growth metrics for `parent`; its own eight-member roster, five canonical workbench events, eight radar metrics, and a saved eight-player tactical board for `coach`. Response projections did not contain phone fields.
+- This is production API readback evidence, not real-device WeChat login evidence. A subsequent code-only release must re-run the controlled dry-run and expect `already_present`; real-device authorization, first role choice, and role switching remain required before declaring the production demo operation fully closed.
+
+## Real-device verification checklist (seven anonymous slots)
+
+Run this once for each operator-supplied phone, recording only the slot number and pass/fail outcome in the operator's private acceptance record. Do not put the phone, authorization code, bearer token, screenshot containing personal data, or session payload in this repository.
+
+1. On a physical phone, force-close the mini program, reopen it, and use the real WeChat phone authorization control once. Do not retry automatically after a cancellation or rate-limit message.
+2. Confirm the first authenticated response offers both `parent` and `coach`, then choose `parent`. Verify that the home/schedule and growth pages show exactly two children for this slot, five current demo calendar entries across the supplied date window, and an eight-dimension growth view. Verify no other slot's children are visible.
+3. Use the in-app role-switch entry to choose `coach`. Verify that the schedule/workbench, team, student radar, attendance, training plan, match and tactical-board pages all load. The team must contain exactly eight players; the scheduled match must show a saved 4-3-3 board with eight players.
+4. Switch back to `parent`, then exit the current session using the in-app logout entry. Reopen and authorize again; confirm the expected role picker and role isolation still apply.
+5. Mark the slot as accepted only when both roles complete the above path without a fallback identity, fabricated data, or cross-slot visibility. A server-side BFF readback is supporting evidence only; it does not replace this physical-device step.
+
+| Slot | Real WeChat authorization | Parent scope | Coach scope | Role switch / re-login | Operator sign-off |
+| --- | --- | --- | --- | --- | --- |
+| 1 | pending | pending | pending | pending | pending |
+| 2 | pending | pending | pending | pending | pending |
+| 3 | pending | pending | pending | pending | pending |
+| 4 | pending | pending | pending | pending | pending |
+| 5 | pending | pending | pending | pending | pending |
+| 6 | pending | pending | pending | pending | pending |
+| 7 | pending | pending | pending | pending | pending |
+
 ## Not performed
 
 - No SSH, server access, production database access, backup, import, rollback, deployment, restart, or real device login occurred in this task.

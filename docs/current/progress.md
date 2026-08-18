@@ -1,10 +1,10 @@
 # 核心演示闭环 · 进度跟踪
 
-## 2026-08-18 七个独立双角色真机演示账号（本地待部署）
+## 2026-08-18 七个独立双角色真机演示账号（已生产导入，真机待验）
 
 - 安全受控导入由 3 个固定槽位扩展为 7 个：每个运行时手机号均对应同一 club 内独立的 `parent + coach` 会籍、家长档案、教练档案与单独 8 人球队。家长端严格只投影其中 2 名已绑定学员；教练端只可查看本账号所属的完整 8 人阵容，账号之间不共享家长绑定、球队、日程或业务记录。
 - 每个账号均准备相对当前导入时间生成的 5 条历史/当前/未来训练与比赛日程、40 条活动参与记录（含到课、迟到、缺席、请假、待确认等状态）、16 条课时流水、8 名队员的 8 维评测原始值/归一化分数/指标记录/血缘、已完成与待进行比赛及 8 条比赛事件、已保存 4-3-3 战术板；两个家长可见学员另有运营档案、保险、私教申请与沟通记录。
-- 真实手机号只以私有运行时变量 `SECURE_CQ_TALENT_TEST_PHONE_1` 至 `_7` 注入；仓库、文档、日志、测试输出和提交均不保存其值。生产尚未写库、未重启、未执行真实设备登录验证。
+- 真实手机号只以私有运行时变量 `SECURE_CQ_TALENT_TEST_PHONE_1` 至 `_7` 注入；仓库、文档、日志、测试输出和提交均不保存其值。2026-08-18 已完成生产受限备份、无写 dry-run、已确认导入和仅 API 重启；内网与 HTTPS 健康检查均返回 200。随后以 14 个短时、精确删除的 bearer 会话对公网 BFF 逐槽回读：每个 parent 仅见 2 名绑定学员、5 条基准日程及 8 项成长指标；每个 coach 仅见本队 8 人、5 条基准日程、8 项雷达指标和已保存的 8 人战术板，响应未投影手机号。真实微信设备授权、首次角色选择及两端切换仍必须由持有对应手机号的测试人员完成，不能以服务端回读替代。
 - 本地验证：安全导入聚焦测试 `14/14`、API typecheck/build、串行全仓门禁均完成；全仓结果为 domain `19/19`、小程序 `332/332`、API `108/108`，命令退出码 `0`。仍需在生产执行受限备份（含 SQLite WAL/SHM）→ dry-run → 用户一次性确认 → confirmed import → 仅重启 API → `/health` 与双角色聚合读回。
 
 ## 2026-08-12 Secure production identity and isolated dual-role test-account hardening
@@ -616,7 +616,7 @@
 - 服务器访问：ubuntu@43.136.114.225 密码认证可用（注意密码已出现在聊天记录，建议择机轮换）
 
 ## 2026-08-12 测试账号登录受限根因与修复
-- 现象：19922961921 能选身份但选家长后落「账号暂时受限」页
+- 现象：已授权的测试手机号能选身份但选家长后落「账号暂时受限」页
 - 排查：生产库三账号 users/memberships(parent+coach,active)/parent_profiles/guardian_bindings/student_profiles 全部完好；登录 children 链路=listStudents(实时 SQLite LEFT JOIN operational)×isGuardianOfStudent(内存 this.data)
 - 根因：PersistentApiStore 启动时 mergePersistedPlatformData 快照合并 parents/guardianBindings；任务#4 导入(19:06)晚于 API 进程启动（#3 重启验证在 #4 之前）→ 运行进程内存快照无导入绑定 → isGuardianOfStudent=false → children=[] → parent_without_children
 - 修复：docker restart cq-talent-api（重建快照），health 200 日志干净；三个账号同一根因一并修复
