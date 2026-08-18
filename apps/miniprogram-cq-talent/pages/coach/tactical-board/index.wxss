@@ -1,6 +1,6 @@
 .c7-page { min-height: 100vh; box-sizing: border-box; padding-bottom: 300rpx; background: #f6f7f9; }
 
-.c7-header { display: flex; height: 176rpx; box-sizing: content-box; align-items: center; justify-content: space-between; padding-left: 32rpx; background: #ffffff; }
+.c7-header { display: flex; height: 88rpx; box-sizing: content-box; align-items: center; justify-content: space-between; padding-left: 32rpx; background: #ffffff; }
 .c7-header__left { display: flex; align-items: center; gap: 24rpx; min-width: 0; height: 100%; }
 .c7-header__back, .c7-header__share { display: flex; align-items: center; justify-content: center; flex: 0 0 48rpx; width: 48rpx; height: 48rpx; }
 .c7-header__back image, .c7-header__share image { display: block; width: 48rpx; height: 48rpx; }

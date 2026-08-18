@@ -1067,3 +1067,10 @@
 - 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:858 / C6.2 Save State`。新版画板是“比赛进行中”的全场暂停/结束背景上的自动保存弹层，文案为“已自动保存 / 比赛记录已暂存，可稍后继续编辑”。
 - 当前实现的唯一可用状态是 C6.1 为一条未提交比赛事件生成的设备本机草稿：C6 再读取同一活动后才显示 `hasLocalDraftOverlay`。它不声称保存整场比赛，故现有“未提交草稿已保存 / 这条未提交的比赛事件仅保存在当前设备”文案是对真实存储范围的准确描述。
 - 本会话的 C6.1 缺少 `capabilities.match.eventTypes`，没有真实可录入事件，因而不能无写入地形成可验证本机草稿；同时后端没有画板所示的比赛进行中、暂停、结束和整场自动保存契约。此页面当前仅完成在线稿/源码契约审查，不能标为成功态视觉通过，也不会用 setData、mock 或伪草稿强行截图。
+
+## 2026-08-18 C7 战术板最新在线稿运行态复验
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:877 / LEGACY / C7 Tactical Board PoC`。该节点虽标记为 LEGACY，仍是当前画板↔路由表中 `pages/coach/tactical-board` 的唯一节点；本轮以它作为只读设计参照。
+- 真实 `375×812` 截图发现 `.c7-header` 仍为旧 `176rpx` 内容高度，加上真实状态栏后将球场整体推低约 `44px`。按画板的 88px 顶栏收口为 `height: 88rpx; box-sizing: content-box`，刷新后球场首尾与在线图对齐：从约 `y=136` 至 `y=516`。
+- 验证使用有真实持久化战术板的 `event-cq-talent-secure-test-1-scheduled-match`。红色球员圆点、实际阵型 `4-3-3` 和仅当前会籍可见的名单均来自 BFF；未填入画板左右两队的假蓝方球员或编号。定向 Vitest `6/6`、小程序 TypeScript、限定路径 `git diff --check` 通过；在线稿、最终图和并排图的临时前缀分别为 `cq-talent-figma-c7-current-20260818`、`cq-talent-runtime-c7-after-header-20260818`、`cq-talent-c7-after-header-compare-20260818`。
+- 画板的 LEGACY 布局将 TabBar 置于球场正下方，并让工具栏绝对覆盖其下方；生产小程序的共享 `role-tabbar` 是固定底栏，当前 C7 工具栏也固定在其上。这一处是画板自身与全局导航组件的结构冲突，尚不能宣称 C7 全页像素通过；本轮不为匹配该旧 PoC 而破坏全局 TabBar 行为。

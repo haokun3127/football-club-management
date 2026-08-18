@@ -229,7 +229,7 @@ describe("C7 coach tactical board MVP", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"app-header"');
     expect(pageConfig).not.toContain('"submit-bar"');
-    expect(stylesheet).toMatch(/\.c7-header\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*content-box/s);
+    expect(stylesheet).toMatch(/\.c7-header\s*\{[^}]*height:\s*88rpx[^}]*box-sizing:\s*content-box/s);
     expect(stylesheet).toMatch(/\.c7-pitch\s*\{[^}]*width:\s*686rpx[^}]*height:\s*760rpx[^}]*background:\s*#1a1a2e/s);
     expect(stylesheet).toMatch(/\.c7-toolbar\s*\{[^}]*position:\s*fixed[^}]*bottom:\s*140rpx/s);
     expect(stylesheet).toMatch(/\.c7-player\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
