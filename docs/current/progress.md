@@ -1035,3 +1035,9 @@
 - 本批已完成 P5 顶栏、玩家胶囊、主卡/画布高度、综合分、维度条和 P5 专用雷达绘制参数；没有改 API、登录、角色或生产数据。
 - 静态证据：P5 定向 Vitest `7/7`、小程序 TypeScript `tsc --noEmit`、限定路径 `git diff --check` 通过。在线 Figma PNG 临时取证已获取并保存于系统临时目录；可信运行态截图尚未发布。
 - 运行态阻塞如实记录：当前微信开发者工具会话为不含 `parent` 可选角色的 coach 会话，尝试打开 `/pages/parent/radar/index` 被守卫留在 `/pages/coach/me/index`；C16 页面也没有渲染 `.c16-role-switch`。未执行会写入生产 SQLite 的旧种会话脚本，因此本条不能宣称 P5 视觉验收通过。
+
+## 2026-08-18 C5 课时确认最新在线稿运行态复验
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:734 / C5 Lesson Confirm`。本轮在施工前取得 design context 与原始 `375×812` 在线截图，确认最新画板仍是软粉 88px 顶栏、深色活动摘要、紧凑课时名单、底部“确认全部 / 发起更正”和三栏教练 TabBar。
+- 使用当前已认证教练会话的真实活动 `event-cq-talent-secure-test-1-trn-0813` 打开 C5 成功态。WeChatIDE MCP sidecar 证实路由为 `/pages/coach/lesson/index`、运行窗口及输出 PNG 均为严格 `375×812`；证据位于系统临时目录 `cq-talent-runtime-c5-success-20260818-a.png`，在线稿及并排图为 `cq-talent-figma-c5-current-20260818.png`、`cq-talent-c5-compare-20260818.png`。
+- 运行截图的活动标题、队名/时间、两名名单和“1课时”均来自真实 BFF；在线稿中的五名样例、日期和“1.5课时”不写回页面。除真实数据数量造成的白色内容区长度不同外，顶栏、活动卡、名单几何、确认操作和 TabBar 对齐，无需新增代码改动。
