@@ -1129,3 +1129,10 @@
 - C16.2 在线节点 `93:1238` 已重新读取。私教兴趣页按新版稿收口为说明卡、接单开关、7 列×4 行可用时段网格和费用说明；周列/时段格在 TypeScript view model 中预计算，WXML 没有 `.map()` 等方法调用。
 - 真实运行态 MCP 截图均为严格 `375×812`：`c161-runtime-latest.png` / `c162-runtime-latest.png`；并排证据为 `c161-compare-latest.png` / `c162-compare-latest.png`。C16.1 当前会话未提供 Figma 样例中的前三项权限；C16.2 BFF 未提供接单/排期契约，因此保留真实待同步/不可用状态，不伪造绿色样例数据。
 - 验证：C16.1 + C16.2 定向 Vitest `8/8`、小程序 `tsc --noEmit`、限定路径 `git diff --check` 通过。
+
+## 2026-08-18 C5 在线稿刷新抽查
+
+- 在线唯一基准 `zZ6wKyOHKcO4UYXDd9jGwv / 93:734` 的当前截图与仓库 2026-08-12 离线快照存在实质差异：底部确认区已明确包含“确认全部”和“发起更正”两项，并位于教练 TabBar 之上。
+- 复核现有 `pages/coach/lesson` 运行态后确认代码已经符合当前在线稿：真实活动摘要、学员课时记录、确认按钮、更正链接和底部导航的几何均已对齐；不新增代码、不改变真实 workbench/lesson-confirmation API 契约。
+- 已用当前在线截图刷新 `docs/design/reference/figma/c5-lesson-confirm.png`。真实 MCP 运行证据：`C:\Users\ASUS\AppData\Local\Temp\c5-runtime-latest-before.png`；并排图：`C:\Users\ASUS\AppData\Local\Temp\c5-runtime-compare-before.png`，均严格 `375×812`。样例五名学员与 `1.5课时` 和真实会话数据不同，继续按数据差异豁免。
+- C5 定向回归仍通过；本批没有业务代码变更，仅提交设计参考快照与记录。
