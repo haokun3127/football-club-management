@@ -147,9 +147,8 @@ describe("C10.1 coach coverage preview", () => {
     expect(controller).toContain("confirmCoverage");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("saveCoachTrainingProjects");
-    expect(stylesheet).toMatch(/\.coverage-nav\s*\{[^}]*height:\s*176rpx/s);
-    expect(stylesheet).toMatch(/\.coverage-nav\s*\{[^}]*box-sizing:\s*content-box/s);
-    expect(stylesheet).toMatch(/\.coverage-nav\s*\{[^}]*background:\s*#fceeef/s);
+    expect(stylesheet).toMatch(/\.coverage-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*gap:\s*16rpx)(?=[^}]*background:\s*#fceeef)/s);
+    expect(stylesheet).toMatch(/\.coverage-nav__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
     expect(stylesheet).toMatch(/\.student-card\s*\{[^}]*border-radius:\s*24rpx/s);
     expect(stylesheet).toMatch(/\.coverage-confirm\s*\{[^}]*min-height:\s*140rpx/s);
   });

@@ -6,10 +6,10 @@
 .coverage-nav {
   box-sizing: content-box;
   display: flex;
-  height: 176rpx;
+  height: 88rpx;
   padding-left: 32rpx;
   align-items: center;
-  gap: 24rpx;
+  gap: 16rpx;
   background: #fceeef;
 }
 
@@ -28,9 +28,9 @@
 
 .coverage-nav__title {
   color: #202124;
-  font-size: 44rpx;
+  font-size: 36rpx;
   font-weight: 700;
-  line-height: 54rpx;
+  line-height: 44rpx;
 }
 
 .coverage-page__body {

@@ -1098,3 +1098,11 @@
 - 最终 MCP 截图中搜索框起点为 `y≈105`，训练列表、底部选择栏和 TabBar 与在线稿首屏结构对应。当前真实训练库返回运控球、1v1 等分类/项目，当前活动也没有已选内容，故显示真实的空心选择圈、`已选 0 项`和禁用按钮；未填充 Figma 的四个样例项目和三项已选状态。
 - 在线稿、基线和最终证据位于系统临时目录：`cq-talent-figma-c10-current-20260818.png`、`cq-talent-runtime-c10-baseline-20260818.png`、`cq-talent-runtime-c10-after-20260818.png`。最终 sidecar 证实路由 `/pages/coach/content-select/index`、查询为当前训练活动，归一化 PNG 严格为 `375×812`。
 - 验证先红→绿：C10 定向 Vitest 从 `1 failed / 7 passed` 到 `8/8` 通过，小程序 TypeScript `tsc --noEmit` 与限定路径 `git diff --check` 通过。
+
+## 2026-08-18 C10.1 覆盖预览最新在线稿运行态复验
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:983 / C10.1 Coverage Preview`。当前画板为软粉返回顶栏、紧凑覆盖卡（12px 内边距、10px 行间距、6px 轨道）、70px 底部确认栏和教练 TabBar。
+- 基线中 `.coverage-nav` 仍为 `176rpx`，使“学员覆盖”和第一张卡片整体下移约 44px。现按在线稿将顶栏收口为 `88rpx + content-box`，返回/标题间距改为 8px，标题改为 18px/22px；确认仅调用本地返回，不新增或伪造覆盖写入。
+- 最终 MCP 截图中“学员覆盖”从 `y≈153` 回到 `y≈109`，第一张真实覆盖卡紧随其后，确认栏与 TabBar 位置不变。运行态实际返回两名学员、每人 8 个维度、`覆盖 8/10` 和若干待同步项；在线稿为三名学员、三维样例，属真实数据/契约差异，未删减或填充。
+- 在线稿、基线与最终证据位于系统临时目录：`cq-talent-figma-c101-current-20260818.png`、`cq-talent-runtime-c101-baseline-20260818.png`、`cq-talent-runtime-c101-after-20260818.png`。最终 sidecar 确认路由 `/pages/coach/coverage/index`，PNG 归一化为严格 `375×812`。
+- 验证先红→绿：C10.1 定向 Vitest 从 `1 failed / 5 passed` 到 `6/6` 通过，小程序 TypeScript `tsc --noEmit` 与限定路径 `git diff --check` 通过。
