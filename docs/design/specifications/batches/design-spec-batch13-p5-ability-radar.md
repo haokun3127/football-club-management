@@ -10,11 +10,11 @@
 
 - [4] | P5 Ability Radar | 375x812 @(940,1920) | fill=#f6f7f9 | r=28 | layout=V
   - [4] | Header | 375x88 @(940,1920) | fill=#ffffff | stroke=#e7eaf0 w1 | layout=H pad=14/22
-    - [4] | Back Button | 40x40 @(962,1944) | fill=#ffffff | r=20 | layout=H
+    - [4] | Back Button | 24x40 @(956,1944) | fill=#ffffff | r=20 | layout=H
       - [4] | chevron-left | 20x20 @(972,1954)
         - [6] | Vector | 5x10 @(980,1959) | stroke=#202124 w2
     - [4] | Title Group | 113x45 @(1047,1942) | layout=V gap=2
-      - [13] | 能力雷达 | 88x27 @(1060,1942) | fill=#202124 | font=Inter/Bold 22px | text="能力雷达"
+      - [13] | 能力雷达 | 88x22 @(980,1942) | fill=#202124 | font=Inter/Bold 18px | text="能力雷达"
       - [13] | 陈小宇 · U10精英队 | 113x16 @(1047,1970) | fill=#667085 | font=Inter/Regular 13px | text="陈小宇 · U10精英队"
     - [4] | History Compare Button | 88x33 @(1205,1948) | fill=#a80f1b | r=20 | layout=H pad=8/16
       - [13] | 历史对比 | 56x17 @(1221,1956) | fill=#ffffff | font=Inter/Semi Bold 14px | text="历史对比"

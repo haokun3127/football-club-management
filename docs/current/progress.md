@@ -1136,3 +1136,10 @@
 - 复核现有 `pages/coach/lesson` 运行态后确认代码已经符合当前在线稿：真实活动摘要、学员课时记录、确认按钮、更正链接和底部导航的几何均已对齐；不新增代码、不改变真实 workbench/lesson-confirmation API 契约。
 - 已用当前在线截图刷新 `docs/design/reference/figma/c5-lesson-confirm.png`。真实 MCP 运行证据：`C:\Users\ASUS\AppData\Local\Temp\c5-runtime-latest-before.png`；并排图：`C:\Users\ASUS\AppData\Local\Temp\c5-runtime-compare-before.png`，均严格 `375×812`。样例五名学员与 `1.5课时` 和真实会话数据不同，继续按数据差异豁免。
 - C5 定向回归仍通过；本批没有业务代码变更，仅提交设计参考快照与记录。
+
+## 2026-08-18 P5 新版几何校准（运行态家长会话待补）
+
+- 重新读取在线唯一基准 `zZ6wKyOHKcO4UYXDd9jGwv / 93:278 / P5 Ability Radar`，并与仓库离线快照 `docs/design/reference/figma/p5-ability-radar.png` 做像素比对；两者均为 `375×812`，当前 `diffbbox=None`，无需刷新离线 PNG。
+- 按在线稿修正 `pages/parent/radar`：返回区改为 `24×40px` 并使用共享 `chevron-left.svg`；标题、副标题回到 `18px/13px`；玩家选择区使用页面底色；内容区上边距为 `16px`；雷达 Hero 内部垂直间距为 `20px`；雷达 canvas 显式传入 `100% × 560rpx`，确保运行态为 `303×280px`，不再落回组件默认 `520rpx` 高度。
+- 先红后绿：P5 页面/雷达组件定向 Vitest 从 `6/8`（新增契约预期未满足）到 `8/8`，小程序 TypeScript `tsc --noEmit` 与限定路径 `git diff --check` 通过。
+- 证据：在线截图 `C:\Users\ASUS\AppData\Local\Temp\p5-ability-radar-figma-current.png`；由于当前微信开发者工具会话为 coach-only，无法合法进入 parent 路由，尚未取得家长端真实 `375×812` 运行截图；本批只宣称 Figma/静态/类型/测试通过，不宣称运行态视觉验收通过。

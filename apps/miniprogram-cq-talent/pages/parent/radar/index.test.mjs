@@ -142,9 +142,21 @@ describe("parent ability radar", () => {
     expect(template).toContain("{{radarDimensionLabel}}");
     expect(template).toContain('bindtap="openMetricHistory"');
     expect(template).toContain("{{compositeScore}}");
+    expect(template).toContain('src="/assets/icons/chevron-left.svg"');
+    expect(template).toContain('width="100%" height="560rpx"');
     expect(template).not.toContain("peerPercent");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("peerPercent");
     expect(controller).not.toContain("openCompare");
+  });
+
+  it("keeps the refreshed P5 geometry tokens aligned with the 375px Figma frame", () => {
+    const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
+    expect(stylesheet).toMatch(/\.p5-nav__back\s*\{[^}]*width:\s*48rpx[^}]*height:\s*80rpx/s);
+    expect(stylesheet).toContain("font-size: 36rpx");
+    expect(stylesheet).toContain(".p5-players { width: 100%; white-space: nowrap; background: #f6f7f9; }");
+    expect(stylesheet).toMatch(/\.p5-body\s*\{[^}]*padding:\s*32rpx\s+32rpx\s+calc\(200rpx/s);
+    expect(stylesheet).toContain(".rhero { display: flex; flex-direction: column; gap: 40rpx;");
+    expect(stylesheet).toContain(".rhero__canvas { border-radius: 32rpx; background: #1f1f24; height: 560rpx;");
   });
 });

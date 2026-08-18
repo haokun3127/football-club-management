@@ -1,7 +1,7 @@
 <view class="p5">
   <!-- P5 Header -->
   <view class="p5-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="p5-nav__back" bindtap="goBack">‹</view>
+    <view class="p5-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
     <view class="p5-nav__title-group">
       <view class="p5-nav__title">能力雷达</view>
       <view class="p5-nav__sub">{{activeChildName}}{{activeChildTeam ? ' · ' + activeChildTeam : ''}}</view>
@@ -33,7 +33,7 @@
           <view class="rhero__date">{{updatedAtLabel}}</view>
         </view>
         <view class="rhero__canvas">
-          <radar-canvas wx:if="{{canDrawRadar}}" dark="{{true}}" geometry="{{radarGeometry}}" metrics="{{radar}}" selectedMetricId="{{selectedMetricId}}" bindmetrictap="selectMetric"></radar-canvas>
+          <radar-canvas wx:if="{{canDrawRadar}}" dark="{{true}}" geometry="{{radarGeometry}}" metrics="{{radar}}" selectedMetricId="{{selectedMetricId}}" width="100%" height="560rpx" bindmetrictap="selectMetric"></radar-canvas>
           <view wx:else class="rhero__placeholder"></view>
         </view>
         <view wx:if="{{compositeScore !== ''}}" class="rhero__score"><view class="rhero__score-label">综合评分</view><view class="rhero__score-value">{{compositeScore}}</view></view>
