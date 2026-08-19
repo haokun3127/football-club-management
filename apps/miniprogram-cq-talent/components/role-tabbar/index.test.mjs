@@ -57,8 +57,8 @@ describe("role tabbar real-device icon contract", () => {
     expect(styles).toContain(".tabbar-icon-wrap { position: static; display: flex; align-items: center; justify-content: center; width: 32rpx; height: 32rpx;");
     expect(styles).toContain(".tabbar-icon { width: 32rpx; height: 32rpx; }");
     expect(styles).toContain(".tabbar--parent .tabbar-item.active { color: #a80f1b;");
-    expect(styles).toContain(".tabbar--parent .tabbar-item.active .tabbar-dot { top: 84rpx; width: 4rpx; height: 4rpx; margin-left: -2rpx; border-radius: 999rpx; background: #a80f1b; }");
-    expect(styles).toContain(".tabbar--coach .tabbar-item.active .tabbar-dot { top: 84rpx; width: 4rpx; height: 4rpx; margin-left: -2rpx; border-radius: 999rpx; background: var(--color-brand); }");
+    expect(styles).toContain(".tabbar--parent .tabbar-item.active .tabbar-dot { top: 84rpx; left: 24rpx; width: 4rpx; height: 4rpx; margin-left: 0; border-radius: 999rpx; background: #a80f1b; }");
+    expect(styles).toContain(".tabbar--coach .tabbar-item.active .tabbar-dot { top: 84rpx; left: 24rpx; width: 4rpx; height: 4rpx; margin-left: 0; border-radius: 999rpx; background: var(--color-brand); }");
     expect(styles).not.toContain(".tabbar-item.active .tabbar-icon-wrap { background: #fceeef; }");
     expect(styles).not.toContain(".tabbar-item.active .tabbar-dot { background: var(--color-brand); }");
   });
@@ -67,11 +67,9 @@ describe("role tabbar real-device icon contract", () => {
     expect(styles).toContain("height: 140rpx;");
     expect(styles).toContain("padding-bottom: 0;");
     expect(styles).not.toContain("padding-bottom: env(safe-area-inset-bottom);");
-    expect(styles).toContain("height: 112rpx;");
-    expect(styles).toContain("padding-top: 16rpx;");
-    expect(styles).toContain("justify-content: flex-start;");
+    expect(styles).toContain(".tabbar-item { position: relative; display: flex; flex: 1; box-sizing: border-box; flex-direction: column; align-items: flex-start; justify-content: flex-start; height: 112rpx; min-width: 0; padding-top: 16rpx; padding-left: 12rpx;");
     expect(styles).toContain("width: 32rpx; height: 32rpx;");
-    expect(styles).toContain("margin-top: 8rpx;");
+    expect(styles).toContain(".tabbar-label { width: 100%; margin-top: 8rpx;");
     expect(styles).toContain("line-height: 28rpx;");
     expect(styles).toContain("top: 84rpx;");
   });

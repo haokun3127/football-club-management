@@ -1,11 +1,11 @@
 .tabbar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 9999; display: flex; box-sizing: border-box; height: 140rpx; padding-bottom: 0; border-top: 1rpx solid #e7eaf0; background: #ffffff; box-shadow: 0 -6rpx 20rpx rgba(16,24,40,.04); }
 .tabbar--flow { position: static; }
-.tabbar-item { position: relative; display: flex; flex: 1; box-sizing: border-box; flex-direction: column; align-items: center; justify-content: flex-start; height: 112rpx; min-width: 0; padding-top: 16rpx; color: #667085; font-size: 18rpx; }
+.tabbar-item { position: relative; display: flex; flex: 1; box-sizing: border-box; flex-direction: column; align-items: flex-start; justify-content: flex-start; height: 112rpx; min-width: 0; padding-top: 16rpx; padding-left: 12rpx; color: #667085; font-size: 18rpx; }
 .tabbar-icon-wrap { position: static; display: flex; align-items: center; justify-content: center; width: 32rpx; height: 32rpx; border-radius: 18rpx; transition: background-color 180ms ease; }
 .tabbar-icon { width: 32rpx; height: 32rpx; }
-.tabbar-dot { position: absolute; top: 84rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: transparent; }
-.tabbar-label { margin-top: 8rpx; overflow: hidden; max-width: 100%; font-size: 18rpx; line-height: 28rpx; text-overflow: ellipsis; white-space: nowrap; }
+.tabbar-dot { position: absolute; top: 84rpx; left: 24rpx; width: 8rpx; height: 8rpx; margin-left: 0; border-radius: 999rpx; background: transparent; }
+.tabbar-label { width: 100%; margin-top: 8rpx; overflow: hidden; max-width: 100%; font-size: 18rpx; line-height: 28rpx; text-overflow: ellipsis; white-space: nowrap; }
 .tabbar--parent .tabbar-item.active { color: #a80f1b; font-weight: 650; }
-.tabbar--parent .tabbar-item.active .tabbar-dot { top: 84rpx; width: 4rpx; height: 4rpx; margin-left: -2rpx; border-radius: 999rpx; background: #a80f1b; }
+.tabbar--parent .tabbar-item.active .tabbar-dot { top: 84rpx; left: 24rpx; width: 4rpx; height: 4rpx; margin-left: 0; border-radius: 999rpx; background: #a80f1b; }
 .tabbar--coach .tabbar-item.active { color: var(--color-brand); font-weight: 650; }
-.tabbar--coach .tabbar-item.active .tabbar-dot { top: 84rpx; width: 4rpx; height: 4rpx; margin-left: -2rpx; border-radius: 999rpx; background: var(--color-brand); }
+.tabbar--coach .tabbar-item.active .tabbar-dot { top: 84rpx; left: 24rpx; width: 4rpx; height: 4rpx; margin-left: 0; border-radius: 999rpx; background: var(--color-brand); }
