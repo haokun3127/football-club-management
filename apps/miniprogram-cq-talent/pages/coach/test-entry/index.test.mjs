@@ -319,6 +319,9 @@ describe("coach project score entry", () => {
     expect(stylesheet).toMatch(/\.c12-submit-wrap\s*\{[^}]*bottom:\s*140rpx/s);
     expect(template).toContain("{{navTitle}}");
     expect(stylesheet).toMatch(/\.c12-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+    expect(stylesheet).toMatch(/\.c12-nav\s*\{[^}]*padding-left:\s*32rpx/s);
+    expect(stylesheet).toMatch(/\.c12-nav__left\s*\{[^}]*gap:\s*0/s);
+    expect(stylesheet).toMatch(/\.c12-nav__title\s*\{(?=[^}]*font-size:\s*36rpx)(?=[^}]*line-height:\s*44rpx)/s);
     expect(stylesheet).toMatch(/\.c12-body\s*\{[^}]*padding:\s*32rpx 44rpx 320rpx/s);
     expect(stylesheet).toMatch(/\.c12-students\s*\{[^}]*margin-top:\s*40rpx/s);
     expect(stylesheet).toMatch(/\.c12-task-header\s*\{(?=[^}]*height:\s*192rpx)(?=[^}]*overflow:\s*hidden)/s);

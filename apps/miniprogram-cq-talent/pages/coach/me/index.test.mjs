@@ -258,6 +258,7 @@ describe("coach profile", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(stylesheet).toMatch(/\.c16-bar\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).toMatch(/\.c16-bar\s*\{(?=[^}]*padding-left:\s*32rpx)/s);
+    expect(stylesheet).toMatch(/\.c16-bar__title\s*\{(?=[^}]*font-size:\s*36rpx)(?=[^}]*line-height:\s*44rpx)/s);
     expect(stylesheet).toMatch(/\.c16-profile\s*\{[^}]*border-radius:\s*24rpx[^}]*background:\s*#07111f/s);
     expect(stylesheet).toMatch(/\.c16-logout\s*\{(?=[^}]*display:\s*flex)(?=[^}]*box-sizing:\s*border-box)(?=[^}]*width:\s*100%)(?=[^}]*align-items:\s*center)(?=[^}]*justify-content:\s*center)/s);
   });

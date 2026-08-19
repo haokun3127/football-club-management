@@ -1,9 +1,10 @@
 <view class="c151-page">
   <view class="c151-nav" style="padding-top:{{navInset}}px">
     <view class="c151-nav__back" bindtap="backToList" aria-label="返回列表">
-      <image class="c151-nav__back-icon" src="/assets/icons/c12-arrow-left.svg" mode="aspectFit" />
+      <image class="c151-nav__back-icon" src="/assets/icons/chevron-left.svg" mode="aspectFit" />
     </view>
     <view class="c151-nav__title">评估提交</view>
+    <view class="c151-nav__placeholder" aria-hidden="true"></view>
   </view>
 
   <view class="c151-page__body">

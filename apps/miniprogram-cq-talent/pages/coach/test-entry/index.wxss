@@ -11,14 +11,14 @@
   justify-content: space-between;
   height: 88rpx;
   padding-right: 44rpx;
-  padding-left: 44rpx;
+  padding-left: 32rpx;
   background: #fceeef;
 }
 
 .c12-nav__left {
   display: flex;
   align-items: center;
-  gap: 24rpx;
+  gap: 0;
   min-width: 0;
 }
 
@@ -31,8 +31,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 44rpx;
+  font-size: 36rpx;
   font-weight: 700;
+  line-height: 44rpx;
 }
 
 .c12-nav__action {

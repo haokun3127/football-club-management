@@ -189,6 +189,9 @@ describe("coach assessment task list", () => {
     expect(controller).not.toContain("createTask");
     expect(controller).toContain("resolveMenuInset");
     expect(stylesheet).toMatch(/\.tasks-nav\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*content-box/s);
+    expect(stylesheet).toMatch(/\.tasks-nav\s*\{[^}]*padding-left:\s*32rpx/s);
+    expect(stylesheet).toMatch(/\.tasks-nav__left\s*\{[^}]*gap:\s*0/s);
+    expect(stylesheet).toMatch(/\.tasks-nav__title\s*\{(?=[^}]*font-size:\s*36rpx)(?=[^}]*line-height:\s*44rpx)/s);
     expect(stylesheet).toMatch(/\.tasks-page__body\s*\{[^}]*padding:\s*64rpx\s+76rpx\s+220rpx/s);
     expect(stylesheet).toMatch(/\.filter-row\s*\{[^}]*margin-bottom:\s*28rpx/s);
     expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*width:\s*112rpx[^}]*height:\s*112rpx/s);

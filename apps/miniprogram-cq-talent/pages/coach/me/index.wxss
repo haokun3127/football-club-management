@@ -16,8 +16,9 @@
 
 .c16-bar__title {
   color: #202124;
-  font-size: 44rpx;
+  font-size: 36rpx;
   font-weight: 700;
+  line-height: 44rpx;
 }
 
 .c16-bar__settings {

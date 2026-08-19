@@ -100,8 +100,11 @@ describe("C15.1 coach assessment submit", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"app-header"');
     expect(template).toContain('padding-top:{{navInset}}px');
+    expect(template).toContain('/assets/icons/chevron-left.svg');
+    expect(template).toContain('class="c151-nav__placeholder"');
     expect(stylesheet).toMatch(/\.c151-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*padding:\s*0\s+32rpx)(?=[^}]*box-sizing:\s*content-box)/s);
-    expect(stylesheet).toMatch(/\.c151-nav__title\s*\{[^}]*margin-left:\s*16rpx/s);
+    expect(stylesheet).toMatch(/\.c151-nav__back,\s*\.c151-nav__placeholder\s*\{(?=[^}]*width:\s*48rpx)(?=[^}]*height:\s*48rpx)/s);
+    expect(stylesheet).toMatch(/\.c151-nav__title\s*\{(?=[^}]*flex:\s*1)(?=[^}]*margin-left:\s*0)(?=[^}]*font-size:\s*36rpx)(?=[^}]*line-height:\s*44rpx)/s);
     expect(stylesheet).toMatch(/\.c151-success\s*\{[^}]*gap:\s*0/s);
     expect(stylesheet).toMatch(/\.c151-success__title\s*\{[^}]*margin-top:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.c151-success__subtitle\s*\{(?=[^}]*margin-top:\s*16rpx)(?=[^}]*line-height:\s*34rpx)/s);
