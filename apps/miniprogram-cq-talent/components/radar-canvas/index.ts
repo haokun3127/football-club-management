@@ -142,7 +142,7 @@ Component({
       const y = event.detail?.y ?? height / 2;
       const centerX = width / 2;
       const centerY = height / 2;
-      const labelRadius = Math.min(width, height) * 0.34 + 28;
+      const labelRadius = Math.min(width, height) * 0.30 + 47;
       const selected = metrics
         .map((metric, index) => ({ metric, point: pointAt(index, metrics.length, centerX, centerY, labelRadius) }))
         .sort((left, right) => distance(left.point, { x, y }) - distance(right.point, { x, y }))[0];
@@ -172,13 +172,13 @@ function renderRadar(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[],
 function renderP5Radar(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], width: number, height: number) {
   const centerX = width / 2;
   const centerY = height / 2;
-  const radius = Math.min(width, height) * 0.34;
+  const radius = Math.min(width, height) * 0.30;
   const startAngle = -(Math.PI * 2) / 3;
   ctx.clearRect(0, 0, width, height);
   drawGrid(ctx, metrics.length, centerX, centerY, radius, true, 5, startAngle);
   drawPolygon(ctx, metrics, "value", centerX, centerY, radius, "rgba(212, 24, 42, 0.42)", "#ff3140", startAngle);
   drawP5Points(ctx, metrics, centerX, centerY, radius, startAngle);
-  drawP5Labels(ctx, metrics, width, height);
+  drawP5Labels(ctx, metrics, centerX, centerY, radius, startAngle);
 }
 
 function pointAt(index: number, total: number, centerX: number, centerY: number, radius: number, startAngle = -Math.PI / 2) {
@@ -247,34 +247,30 @@ function drawP5Points(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[]
   ctx.fill();
 }
 
-function drawP5Labels(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], width: number, height: number) {
-  const labelPositions: ReadonlyArray<readonly [number, number]> = [
-    [0.238, 0.163], [0.683, 0.163], [0.847, 0.404],
-    [0.683, 0.772], [0.238, 0.772], [0.074, 0.404],
-  ];
-  const badgePositions: ReadonlyArray<readonly [number, number]> = [
-    [0.201, 0.053], [0.683, 0.053], [0.847, 0.471],
-    [0.683, 0.839], [0.201, 0.839], [0.048, 0.471],
-  ];
+function drawP5Labels(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[], centerX: number, centerY: number, radius: number, startAngle: number) {
+  // 按顶点实际角度定位：标签在内（靠近雷达）、数值徽标在外，二者沿顶点-中心射线排列
   ctx.font = "12px sans-serif";
-  ctx.textAlign = "left";
+  ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillStyle = "#b3b3b3";
   metrics.forEach((metric, index) => {
-    const label = labelPositions[index];
-    const badge = badgePositions[index];
-    if (!label || !badge) return;
-    const [labelX, labelY] = label;
-    const [badgeX, badgeY] = badge;
-    ctx.fillText(metric.label, width * labelX, height * labelY);
+    const vertex = pointAt(index, metrics.length, centerX, centerY, radius, startAngle);
+    const dx = vertex.x - centerX;
+    const dy = vertex.y - centerY;
+    const length = Math.hypot(dx, dy) || 1;
+    const ux = dx / length;
+    const uy = dy / length;
+    ctx.fillText(metric.label, vertex.x + ux * 18, vertex.y + uy * 18);
     const value = typeof metric.value === "number" ? metric.value : 0;
-    drawP5Badge(ctx, String(Math.round(value)), width * badgeX, height * badgeY);
+    drawP5Badge(ctx, String(Math.round(value)), vertex.x + ux * 47, vertex.y + uy * 47);
   });
 }
 
-function drawP5Badge(ctx: CanvasRenderingContext2D, value: string, x: number, y: number) {
+function drawP5Badge(ctx: CanvasRenderingContext2D, value: string, cx: number, cy: number) {
   const width = 34;
   const height = 24;
+  const x = cx - width / 2;
+  const y = cy - height / 2;
   const radius = 4;
   ctx.beginPath();
   ctx.moveTo(x + radius, y);

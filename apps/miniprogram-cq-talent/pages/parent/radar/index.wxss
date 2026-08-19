@@ -17,7 +17,7 @@
 .p5-content { display: flex; flex-direction: column; gap: 32rpx; }
 
 /* P5 Radar Hero */
-.rhero { display: flex; flex-direction: column; gap: 40rpx; padding: 40rpx; border-radius: 32rpx; background: #07111f; }
+.rhero { display: flex; flex-direction: column; gap: 40rpx; padding: 40rpx 40rpx 64rpx; border-radius: 32rpx; background: #07111f; }
 .rhero__head { display: flex; align-items: center; justify-content: space-between; }
 .rhero__title { color: #ffffff; font-size: 32rpx; font-weight: 700; }
 .rhero__date { color: rgba(255, 255, 255, 0.6); font-size: 24rpx; }
