@@ -13,21 +13,7 @@
     />
 
     <block wx:if="{{state === 'ready'}}">
-      <view class="section-title section-title--first">分类导航</view>
-      <scroll-view scroll-x class="pills" enhanced show-scrollbar="{{false}}">
-        <view class="pills__inner">
-          <view
-            wx:for="{{categories}}"
-            wx:key="value"
-            class="pill {{activeCategory === item.value ? 'pill--active' : ''}}"
-            data-value="{{item.value}}"
-            bindtap="selectCategory"
-          >{{item.label}}</view>
-        </view>
-      </scroll-view>
-
-
-      <view class="featured-card" bindtap="openFeatured">
+      <view class="featured-card">
         <image class="featured-card__photo" src="/assets/content/featured-venue.jpg" mode="aspectFill" />
         <view class="featured-card__scrim"></view>
         <view class="featured-card__content">

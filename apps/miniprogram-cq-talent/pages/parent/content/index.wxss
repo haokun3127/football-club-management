@@ -23,37 +23,6 @@
   margin: 48rpx 0 24rpx;
 }
 
-.section-title--first {
-  margin-top: 0;
-}
-
-/* 分类 pills（Figma: 32px 高, r20, active #a80f1b） */
-.pills {
-  white-space: nowrap;
-}
-
-.pills__inner {
-  display: inline-flex;
-  gap: 16rpx;
-}
-
-.pill {
-  padding: 16rpx 32rpx;
-  background: var(--color-card);
-  border: 1rpx solid var(--color-line);
-  border-radius: 40rpx;
-  font-size: 26rpx;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-}
-
-.pill--active {
-  background: var(--color-brand);
-  border-color: var(--color-brand);
-  color: #ffffff;
-  font-weight: 700;
-}
-
 /* 推荐大图卡（Figma: 180px 高, r16, 底部渐变文字） */
 .featured-card {
   position: relative;

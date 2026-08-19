@@ -20,7 +20,7 @@ globalThis.Page = (definition) => {
   pageDefinition = definition;
   return definition;
 };
-globalThis.wx = { showToast: vi.fn() };
+globalThis.wx = { showToast: vi.fn(), pageScrollTo: vi.fn() };
 
 await import("./index.ts");
 
@@ -46,7 +46,7 @@ describe("parent content center", () => {
     globalThis.wx.showToast.mockReset();
   });
 
-  it("presents only contract-backed article fields and filters the loaded articles", async () => {
+  it("presents only contract-backed article fields without category filtering", async () => {
     mocks.getContentArticles.mockResolvedValue([
       { id: "guide-1", title: "真实训练攻略", subtitle: "来自内容接口", accent: "#a80818", category: "guide" },
       { id: "venue-1", title: "真实场地信息", subtitle: "来自内容接口", accent: "#2068d8", category: "venue" },
@@ -54,20 +54,16 @@ describe("parent content center", () => {
     const page = createPageInstance();
 
     await page.loadArticles();
-    page.selectCategory({ currentTarget: { dataset: { value: "guide" } } });
 
     expect(page.data).toMatchObject({
       state: "ready",
       hasVisibleArticles: true,
-      activeCategory: "guide",
-      visibleArticles: [{
-        id: "guide-1",
-        title: "真实训练攻略",
-        subtitle: "来自内容接口",
-        accent: "#a80818",
-        category: "guide",
-      }],
+      visibleArticles: [
+        { id: "guide-1", title: "真实训练攻略" },
+        { id: "venue-1", title: "真实场地信息" },
+      ],
     });
+    expect(page.data).not.toHaveProperty("activeCategory");
     expect(Object.keys(page.data.articles[0]).sort()).toEqual(["accent", "category", "id", "subtitle", "title"]);
   });
 
@@ -113,7 +109,7 @@ describe("parent content center", () => {
     expect(page.data.state).toBe("ready");
   });
 
-  it("keeps only real quick-link routes and makes guide navigation a category filter", () => {
+  it("keeps only real quick-link routes and scrolls to articles for the guide entry", () => {
     const page = createPageInstance({
       articles: [{ id: "guide-1", title: "真实训练攻略", subtitle: "来自内容接口", accent: "#a80818", category: "guide" }],
       visibleArticles: [],
@@ -123,18 +119,14 @@ describe("parent content center", () => {
     page.openQuickLink({ currentTarget: { dataset: { category: "guide" } } });
 
     expect(mocks.openPage).toHaveBeenCalledWith("/pages/parent/venues/index");
-    expect(page.data).toMatchObject({
-      activeCategory: "guide",
-      hasVisibleArticles: true,
-      visibleArticles: [{ id: "guide-1" }],
-    });
+    expect(globalThis.wx.pageScrollTo).toHaveBeenCalledWith({ selector: ".article-list", duration: 200 });
   });
 
-  it("renders the category, featured, and quick-link sections outside the article-availability gate", () => {
+  it("renders the featured and quick-link sections outside the article-availability gate", () => {
     const gateIndex = template.indexOf('wx:if="{{hasVisibleArticles}}"');
     expect(gateIndex).toBeGreaterThan(-1);
 
-    for (const marker of ['class="pills"', 'class="featured-card"', 'class="quick-grid"']) {
+    for (const marker of ['class="featured-card"', 'class="quick-grid"']) {
       expect(template).toContain(marker);
       expect(template.indexOf(marker)).toBeLessThan(gateIndex);
     }

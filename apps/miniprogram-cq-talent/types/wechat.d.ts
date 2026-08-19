@@ -53,6 +53,7 @@ declare const wx: {
   showModal: (options: { title: string; content: string; showCancel?: boolean; success?: WechatCallback<{ confirm: boolean }> }) => void;
   showActionSheet: (options: { itemList: string[]; success?: WechatCallback<{ tapIndex: number }> }) => void;
   nextTick: (callback: () => void) => void;
+  pageScrollTo: (options: { selector?: string; scrollTop?: number; duration?: number }) => void;
 };
 
 declare function App(options: WechatAppOptions): void;
