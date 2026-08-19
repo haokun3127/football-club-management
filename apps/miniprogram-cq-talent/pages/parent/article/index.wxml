@@ -1,0 +1,22 @@
+<view class="article-page">
+  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="page-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="page-nav__title">文章详情</view><view class="page-nav__more"><image src="/assets/icons/more-horizontal.svg" mode="aspectFit" /></view></view>
+  <view class="article-page__body">
+    <status-view
+      state="{{state}}"
+      title="{{state === 'loading' ? '加载文章' : state === 'empty' ? '文章不存在' : '读取失败'}}"
+      message="{{message}}"
+      action-text="{{state === 'error' ? '重试' : ''}}"
+      bindaction="retryLoad"
+    />
+
+    <block wx:if="{{state === 'ready'}}">
+      <view class="article-hero" style="border-top-color: {{accent}}">
+        <view class="article-hero__title">{{title}}</view>
+        <view wx:if="{{hasSubtitle}}" class="article-hero__subtitle">{{subtitle}}</view>
+      </view>
+      <view class="article-body">
+        <view wx:for="{{paragraphs}}" wx:key="index" class="article-body__paragraph">{{item}}</view>
+      </view>
+    </block>
+  </view>
+</view>

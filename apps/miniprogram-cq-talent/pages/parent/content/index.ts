@@ -78,6 +78,11 @@ Page<PageData>({
       });
     }
   },
+  openArticle(event: { currentTarget: { dataset: { id: string } } }) {
+    const id = event.currentTarget.dataset.id;
+    if (!id) return;
+    openPage(`/pages/parent/article/index?id=${encodeURIComponent(id)}`);
+  },
   openQuickLink(event: { currentTarget: { dataset: { category: string } } }) {
     const link = QUICK_LINKS.find((item) => item.category === event.currentTarget.dataset.category);
     if (link?.page) {

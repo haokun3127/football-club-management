@@ -132,15 +132,22 @@ describe("parent content center", () => {
     }
   });
 
-  it("does not expose unsupported search or article-detail actions in the template", () => {
+  it("exposes article-detail navigation but no unsupported search action", () => {
     expect(template).toContain('state="{{state}}"');
     expect(template).toContain('bindaction="loadArticles"');
     expect(template).toContain('wx:if="{{hasVisibleArticles}}"');
+    expect(template).toContain('bindtap="openArticle"');
     expect(template).not.toContain('bindtap="openSearch"');
-    expect(template).not.toContain('bindtap="openArticle"');
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(template).not.toContain("2023");
     expect(controller).not.toContain("openSearch()");
-    expect(controller).not.toContain("openArticle()");
+  });
+
+  it("navigates to the article detail with the tapped article id", () => {
+    const page = createPageInstance();
+
+    page.openArticle({ currentTarget: { dataset: { id: "a-1" } } });
+
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/parent/article/index?id=a-1");
   });
 });

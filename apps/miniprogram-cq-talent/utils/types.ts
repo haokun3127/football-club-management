@@ -429,6 +429,7 @@ export interface ContentArticle {
   subtitle: string;
   accent: string;
   category: "venue" | "help" | "coach" | "guide";
+  body?: string;
 }
 
 export interface ContentFaq {

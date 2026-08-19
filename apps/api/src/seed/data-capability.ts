@@ -366,10 +366,10 @@ export function createDataCapabilitySeed(): Pick<
     assessmentTasks: [],
     // 内容中心/帮助中心/场地信息：与 Figma P8 内容中心、P8-2 帮助中心同源的真实内容
     contentArticles: [
-      { id: "article-cq-talent-autumn-plan", clubId, title: "2026秋季训练计划", subtitle: "了解最新的训练课程安排与重点内容", accent: "#a80f1b", category: "guide" },
-      { id: "article-cq-talent-growth-report", clubId, title: "球员成长评估报告", subtitle: "详细分析球员近期训练表现与成长点", accent: "#1976d2", category: "help" },
-      { id: "article-cq-talent-venue-guide", clubId, title: "新手入门：如何选择合适场地", subtitle: "为您提供最优的场地选择与预订技巧", accent: "#ff9800", category: "venue" },
-      { id: "article-cq-talent-coach-team", clubId, title: "认识我们的教练团队", subtitle: "主教练与专项教练的执教理念介绍", accent: "#22c55e", category: "coach" },
+      { id: "article-cq-talent-autumn-plan", clubId, title: "2026秋季训练计划", subtitle: "了解最新的训练课程安排与重点内容", accent: "#a80f1b", category: "guide", body: "秋季学期训练将于 9 月第一周正式开始，每周二、四晚间及周六上午安排训练课。\n\n本学期重点：一是夯实传接球与控球基本功，二是引入小场地对抗提升实战决策能力，三是为 11 月区青少年联赛选拔阵容。\n\n请家长关注「日程」页的课程安排，如有时间冲突请提前在变更申请中说明。" },
+      { id: "article-cq-talent-growth-report", clubId, title: "球员成长评估报告", subtitle: "详细分析球员近期训练表现与成长点", accent: "#1976d2", category: "help", body: "俱乐部每学期为每位学员生成成长评估报告，覆盖技术、体能、战术理解、心理四个维度。\n\n报告由带训教练根据测评任务与日常观察填写，可在「成长」页查看雷达图与各指标明细。\n\n如对评估结果有疑问，可通过私教沟通渠道与教练预约一对一反馈。" },
+      { id: "article-cq-talent-venue-guide", clubId, title: "新手入门：如何选择合适场地", subtitle: "为您提供最优的场地选择与预订技巧", accent: "#ff9800", category: "venue", body: "俱乐部现有三处合作场地：九龙坡足球公园（11 人制天然草）、奥体中心副场（8 人制人工草）与大学城训练基地（5 人制室内）。\n\nU8 以下年龄组默认安排室内或人工草场地；正式比赛优先使用九龙坡足球公园。\n\n场地信息与导航可在内容中心「场地信息」入口查看。" },
+      { id: "article-cq-talent-coach-team", clubId, title: "认识我们的教练团队", subtitle: "主教练与专项教练的执教理念介绍", accent: "#22c55e", category: "coach", body: "俱乐部教练团队均持有中国足协 D 级及以上教练证书，主教练具备多年青训梯队执教经验。\n\n我们的理念：先做人、再踢球。技术训练之外，同样重视孩子的团队意识与抗挫折能力。\n\n教练简介与负责队伍可在内容中心「教练团队」入口查看。" },
     ],
     contentFaqs: [
       { id: "faq-cq-talent-attendance", clubId, q: "家长如何确认孩子到场？", a: "教练在活动开始时会进行点名，点名结果会同步到日程页的活动卡片上。您可以在「日程」页点击当天活动查看出勤状态。", category: "出勤说明" },

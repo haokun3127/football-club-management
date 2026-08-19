@@ -41,7 +41,7 @@
       <view class="section-title">最近文章</view>
       <view class="article-list">
         <view wx:if="{{hasVisibleArticles}}">
-          <view wx:for="{{visibleArticles}}" wx:key="id" class="article-card">
+          <view wx:for="{{visibleArticles}}" wx:key="id" class="article-card" data-id="{{item.id}}" bindtap="openArticle">
             <view class="article-card__accent" style="background: {{item.accent}}"></view>
             <view class="article-card__content">
               <view class="article-card__title">{{item.title}}</view>
