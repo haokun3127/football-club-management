@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     image: cq-talent-api:latest
     user: "0:0"
-    command: ["sh", "-c", "mkdir -p /var/lib/cq-talent && chown -R node:node /var/lib/cq-talent"]
+    command: ["sh", "-c", "mkdir -p /var/lib/cq-talent && find /var/lib/cq-talent -path /var/lib/cq-talent/secure-backups -prune -o -exec chown node:node {} +"]
     volumes:
       - cq-talent-api-data:/var/lib/cq-talent
     networks:
