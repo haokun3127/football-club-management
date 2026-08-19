@@ -260,9 +260,13 @@ function drawP5Labels(ctx: CanvasRenderingContext2D, metrics: RadarMetricPoint[]
     const length = Math.hypot(dx, dy) || 1;
     const ux = dx / length;
     const uy = dy / length;
-    ctx.fillText(metric.label, vertex.x + ux * 18, vertex.y + uy * 18);
+    // 水平顶点（左/右）标签文字更宽，徽标需要更大偏移避免与标签粘连
+    const horizontal = Math.abs(ux) > 0.7;
+    const labelOffset = horizontal ? 16 : 18;
+    const badgeOffset = horizontal ? 64 : 47;
+    ctx.fillText(metric.label, vertex.x + ux * labelOffset, vertex.y + uy * labelOffset);
     const value = typeof metric.value === "number" ? metric.value : 0;
-    drawP5Badge(ctx, String(Math.round(value)), vertex.x + ux * 47, vertex.y + uy * 47);
+    drawP5Badge(ctx, String(Math.round(value)), vertex.x + ux * badgeOffset, vertex.y + uy * badgeOffset);
   });
 }
 
