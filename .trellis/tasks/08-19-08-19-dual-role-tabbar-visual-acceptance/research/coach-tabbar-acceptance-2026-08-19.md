@@ -24,7 +24,7 @@ All runtime captures below were produced through `scripts/devtools/wechatide-mcp
 | `/pages/coach/coverage/index` | C10.1 `93:983` | `captures/c10-1-coverage-2026-08-19.png` | Pass — bottom confirmation footer stays above the fixed TabBar. |
 | `/pages/coach/test-tasks/index` | C11 `93:1002` | `captures/c11-test-tasks-2026-08-19.png` | Pass — active 训练管理 state aligns. |
 | `/pages/coach/test-entry/index` | C12 `93:1030` | `captures/c12-test-entry-2026-08-19.png` | Pass — active 训练管理 state aligns. |
-| `/pages/coach/assessment-entry/index` | C12.1 `93:1061`, C15 `93:1132` | `captures/c12-1-assessment-autosave-2026-08-19.png`; fixed rerun `captures/c15-assessment-entry-fixed-2026-08-19.png` | **Fixed** — online C12.1/C15 keep TabBar at the bottom. The old `flow="{{true}}"` rendered it immediately after content; removing `flow` restored the fixed shell. |
+| `/pages/coach/assessment-entry/index` | C12.1 `93:1061`, C15 `93:1132` | `captures/c12-1-assessment-autosave-2026-08-19.png`; `captures/c15-assessment-entry-fixed-2026-08-19.png`; refreshed `captures/c15-assessment-entry-bottom-reserved-2026-08-19.png` and `captures/c15-assessment-entry-bottom-reserved-scroll-2026-08-19.png` | **Fixed** — online C12.1/C15 keep TabBar at the bottom. The old `flow="{{true}}"` rendered it immediately after content; removing `flow` restored the fixed shell. The long C15 form now reserves enough bottom space for the full “保存所有” button to remain above the fixed shell after a real `pageScrollTo(9999)` capture. |
 | `/pages/coach/student-radar/index` | C13 `93:1080` | `captures/c13-student-radar-2026-08-19.png` | Pass — active 训练管理 state aligns. |
 | `/pages/coach/team-ability/index` | C14 `93:1106` | `captures/c14-team-ability-2026-08-19.png` | Pass — active 训练管理 state aligns on the long board. |
 | `/pages/coach/assessment-submit/index` | C15.1 `93:1163` | `captures/c15-1-assessment-submit-2026-08-19.png` | Pass — active 训练管理 state aligns. |
@@ -45,3 +45,4 @@ All runtime captures below were produced through `scripts/devtools/wechatide-mcp
 
 - `apps/miniprogram-cq-talent/pages/coach/assessment-entry/index.wxml`: removed `flow="{{true}}"` so the shared TabBar remains fixed at the viewport bottom.
 - `apps/miniprogram-cq-talent/pages/coach/assessment-entry/index.test.mjs`: regression assertion now forbids the flowing layout on this Figma-fixed page.
+- `apps/miniprogram-cq-talent/pages/coach/assessment-entry/index.wxss`: increased the C15 page's bottom reservation from `48rpx` to `180rpx`; the Figma C15 “保存所有” button is no longer covered by the 70px fixed TabBar on long real-data forms.

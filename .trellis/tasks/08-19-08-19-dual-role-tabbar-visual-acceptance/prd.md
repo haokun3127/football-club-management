@@ -17,12 +17,12 @@ Using the current online Figma file `zZ6wKyOHKcO4UYXDd9jGwv` as the only design 
 
 ## Acceptance Criteria
 
-- [ ] Every route that contains `<role-tabbar>` is listed with its Figma node, capture path, and disposition.
-- [ ] Parent TabBar routes have fresh 375×812 DevTools screenshot evidence and no unresolved TabBar visual differences from current online Figma.
-- [ ] Coach TabBar routes have fresh 375×812 DevTools screenshot evidence and no unresolved TabBar visual differences from current online Figma.
-- [ ] Every discovered difference is either fixed and re-captured, or explicitly documented as a data-only/design-exempt variance.
-- [ ] Each logic batch is independently committed without staging unrelated files.
-- [ ] The final mini-program quality gate and `git diff --check` pass for files owned by this task.
+- [x] Every route that contains `<role-tabbar>` is listed with its Figma node, capture path, and disposition.
+- [x] Parent TabBar routes have fresh 375×812 DevTools screenshot evidence and no unresolved TabBar visual differences from current online Figma.
+- [x] Coach TabBar routes have fresh 375×812 DevTools screenshot evidence and no unresolved TabBar visual differences from current online Figma.
+- [x] Every discovered difference is either fixed and re-captured, or explicitly documented as a data-only/design-exempt variance.
+- [x] Each logic batch is independently committed without staging unrelated files.
+- [x] The final mini-program quality gate and `git diff --check` pass for files owned by this task.
 
 ## Notes
 

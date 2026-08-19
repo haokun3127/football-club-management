@@ -255,6 +255,7 @@ describe("C15 coach assessment entry", () => {
     expect(template).toContain('<role-tabbar role="coach" active="training" />');
     expect(template).not.toContain('flow="{{true}}"');
     expect(template).toContain('padding-top:{{navInset}}px;padding-right:{{menuInset}}px');
+    expect(stylesheet).toMatch(/\.c15-body\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+180rpx/s);
     expect(stylesheet).toMatch(/\.c15-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).toMatch(/\.c15-nav__left\s*\{[^}]*gap:\s*0/s);
     expect(stylesheet).toMatch(/\.c15-submit-wrap\s*\{(?=[^}]*position:\s*static)(?=[^}]*margin-top:\s*32rpx)/s);
