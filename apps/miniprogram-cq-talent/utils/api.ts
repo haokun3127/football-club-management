@@ -490,7 +490,7 @@ function normalizeActivityDetail(raw: Record<string, unknown>): ActivityDetail {
           items: [
             { label: "对手", value: String(match?.opponentName ?? "待确认") },
             { label: "比分", value: scoreText(match) },
-            { label: "比赛类型", value: String(match?.matchType ?? "待确认") },
+            { label: "比赛类型", value: matchTypeLabel(match?.matchType) },
           ],
         },
         {
@@ -1109,6 +1109,17 @@ function scoreText(match: Record<string, unknown> | undefined) {
   const home = numberOrUndefined(match?.homeScore);
   const away = numberOrUndefined(match?.awayScore);
   return home === undefined || away === undefined ? "比赛结束后更新" : `${home} : ${away}`;
+}
+
+function matchTypeLabel(value: unknown) {
+  const labels: Record<string, string> = {
+    friendly: "友谊赛",
+    league: "联赛",
+    cup: "杯赛",
+    internal: "队内赛",
+  };
+  const raw = stringOrUndefined(value);
+  return raw ? labels[raw] ?? raw : "待确认";
 }
 
 function statusLabel(value: unknown) {

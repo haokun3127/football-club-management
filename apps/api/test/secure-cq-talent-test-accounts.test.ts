@@ -263,6 +263,74 @@ describe("secure Chongqing Talent test-account operation", () => {
     }
   }, FILE_DB_TIMEOUT);
 
+  it("refreshes complete secure demo data into three calendar weeks with Chinese display copy", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+
+    try {
+      const firstRun = importSecureCqTalentTestAccounts(persistence.database, {
+        phones: runtimePhones,
+        now: "2026-08-12T08:00:00.000Z",
+      });
+      const account = firstRun.manifest.accountIds[0]!;
+
+      const refreshed = importSecureCqTalentTestAccounts(persistence.database, {
+        phones: runtimePhones,
+        now: "2026-08-19T08:00:00.000Z",
+      });
+
+      expect(refreshed.status).toBe("refreshed");
+
+      const events = persistence.database.prepare(`
+        SELECT title, notes, starts_at
+        FROM calendar_events
+        WHERE id IN (?, ?, ?, ?, ?)
+        ORDER BY starts_at
+      `).all(
+        account.eventId,
+        "event-cq-talent-secure-test-1-history-training",
+        "event-cq-talent-secure-test-1-completed-match",
+        "event-cq-talent-secure-test-1-future-training",
+        "event-cq-talent-secure-test-1-scheduled-match",
+      ) as Array<{ title: string; notes: string; starts_at: string }>;
+      const weekStarts = events.map((event) => {
+        const date = new Date(event.starts_at);
+        date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7));
+        return date.toISOString().slice(0, 10);
+      });
+      expect(new Set(weekStarts)).toEqual(new Set([
+        "2026-08-03",
+        "2026-08-10",
+        "2026-08-17",
+        "2026-08-24",
+      ]));
+      expect(events.map((event) => event.title + event.notes).join("\n")).not.toMatch(/[A-Za-z]{3,}/);
+
+      const displayValues = persistence.database.prepare(`
+        SELECT display_name AS value FROM user_accounts WHERE id = ?
+        UNION ALL SELECT name AS value FROM parent_profiles WHERE id = ?
+        UNION ALL SELECT name AS value FROM coach_profiles WHERE id = ?
+        UNION ALL SELECT name AS value FROM teams WHERE id = ?
+        UNION ALL SELECT name AS value FROM student_profiles WHERE id IN (?, ?)
+        UNION ALL SELECT opponent_name AS value FROM matches WHERE id IN (?, ?)
+        UNION ALL SELECT coach_name AS value FROM private_lesson_requests WHERE id IN (?, ?)
+      `).all(
+        account.userId,
+        account.parentId,
+        account.coachId,
+        account.teamId,
+        account.studentIds[0],
+        account.studentIds[1],
+        "match-cq-talent-secure-test-1-completed",
+        "match-cq-talent-secure-test-1-scheduled",
+        "private-lesson-cq-talent-secure-test-1-1",
+        "private-lesson-cq-talent-secure-test-1-2",
+      ) as Array<{ value: string }>;
+      expect(displayValues.map((row) => row.value).join("\n")).not.toMatch(/[A-Za-z]{3,}/);
+    } finally {
+      persistence.database.close();
+    }
+  }, FILE_DB_TIMEOUT);
+
   it("upgrades an existing two-child secure slot into the eight-player coach roster", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
 

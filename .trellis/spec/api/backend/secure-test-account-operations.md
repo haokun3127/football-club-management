@@ -20,7 +20,7 @@
 - Required private environment keys: `DATABASE_URL` and `SECURE_CQ_TALENT_TEST_PHONE_1` through `SECURE_CQ_TALENT_TEST_PHONE_7`. A confirmed import additionally requires `SECURE_CQ_TALENT_TEST_ACCOUNTS_BACKUP_ATTESTED=1`, set only after the operator has completed the separately approved restricted backup.
 - `DATABASE_URL` must identify a file database; `:memory:` is rejected for the command.
 - Test phones are runtime-only. They must not be logged or included in result objects, source-controlled data, fixtures, documentation, manifests, or commit messages.
-- Import creates only the canonical fixed IDs. Re-running a complete installation returns `already_present`.
+- Import creates only the canonical fixed IDs. Re-running a complete, current installation returns `already_present`; a complete installation whose rolling demonstration window or controlled display copy is stale returns `refreshed` after the confirmed operation updates only its canonical rows.
 - Dry-run performs read-only validation and must not change SQLite rows, schema migration state, or files.
 - Rollback constructs the canonical manifest internally and supplies no caller-provided side effects. It may only remove rows derived from canonical account scopes.
 
@@ -30,14 +30,14 @@
 - Unknown operation, extra flags, or missing confirmation -> error; no database mutation.
 - `import --dry-run` -> `dry_run` or `already_present`; no migration and no mutation.
 - Confirmed import without backup attestation -> error; no mutation.
-- Confirmed import with backup attestation -> migrate then `imported` or `already_present`.
+- Confirmed import with backup attestation -> migrate then `imported`, `refreshed`, or `already_present`.
 - Confirmed rollback with no complete canonical installation -> error; do not report a false successful rollback.
 - Ambiguous, duplicate, inactive, or conflicting phone/account rows -> error; transaction rolls back without partial rows.
 
 ### 5. Good / Base / Bad Cases
 
 - Good: seven runtime phones import to seven separate parent/coach account scopes; every parent session sees only its two guardian-bound students, while the matching coach session sees only its own eight-player team.
-- Base: a complete matching installation re-runs as `already_present` without duplicating records.
+- Base: a complete matching installation that still matches its rolling calendar and controlled display copy re-runs as `already_present` without duplicating records.
 - Bad: a command accepts arbitrary IDs or prints a manifest/phone/token in its result; this expands deletion scope or leaks identity data.
 
 ### 6. Tests Required
@@ -125,3 +125,65 @@ WHERE club_id = ? AND student_id IN (?, ?)
 ```
 
 This checks the two guardian students' semantic operational-profile presence while preserving valid legacy rows.
+
+## Scenario: Rolling Chinese demo refresh
+
+### 1. Scope / Trigger
+
+- Trigger: operator-supplied test accounts must remain demonstrable on a real device after their initial import date has passed.
+- This applies only to the canonical `cq-talent-secure-test-*` rows. It must not update normal club data or a valid legacy operational profile.
+
+### 2. Signatures
+
+- `importSecureCqTalentTestAccounts(database, { phones, now })`
+- `hasCurrentDemoData(database, manifest, now)`
+- Result status: `imported | refreshed | already_present`.
+
+### 3. Contracts
+
+- A current demo set contains calendar records in each of the current and preceding two calendar weeks, plus upcoming training/match records for continued preview.
+- Every calendar date is derived from the invocation timestamp, never hard-coded to a historical week.
+- User-facing canonical data (account, parent, coach, team, student, activity, assessment, match, tactical-board, private-lesson, insurance, and communication copy) is Chinese.
+- Storage/API enum values remain their contract values (for example `friendly`, `league`, participant status); the mini-program display boundary maps any visible enum to Chinese rather than changing the API contract.
+- Refresh may upsert only the operation's canonical IDs. If a guardian student has a legacy operational profile under the table's `(club_id, student_id)` uniqueness boundary, retain it.
+
+### 4. Validation & Error Matrix
+
+| Condition | Required behavior |
+| --- | --- |
+| Complete scope has calendar dates outside the rolling window or stale canonical display copy | Confirmed import returns `refreshed` and updates only canonical rows. |
+| Complete scope matches the rolling window and controlled labels | Return `already_present`; do not write rows. |
+| `--dry-run` finds stale data | Return `dry_run`; do not mutate or migrate. |
+| A legacy operational profile occupies its unique student slot | Preserve it; do not replace it to force canonical copy. |
+| A visible API enum would otherwise appear raw in the mini-program | Translate at the client presentation boundary; do not store a localized enum. |
+
+### 5. Good / Base / Bad Cases
+
+- Good: a re-run on Wednesday, August 19, 2026 keeps events in the weeks beginning August 3, August 10, and August 17, while still providing upcoming records.
+- Base: an unchanged current set returns `already_present` and does not duplicate data.
+- Bad: considering five old event rows sufficient forever, or writing `友谊赛` into a `match_type` field whose contract is the enum `friendly`.
+
+### 6. Tests Required
+
+- Import once with an older `now`, then import with a later `now`; assert the result is `refreshed`, the rolling calendar weeks move, and canonical names/copy contain no English display words.
+- Preserve the existing partial eight-player upgrade and legacy operational-profile idempotency tests.
+- Mini-program API normalization test asserts `friendly`, `league`, `cup`, and `internal` display as Chinese labels.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+if (hasCompleteDemoData(database, manifest)) return alreadyPresent;
+```
+
+This treats row count as freshness and leaves a real-device demo stuck in an old week.
+
+#### Correct
+
+```ts
+if (hasCurrentDemoData(database, manifest, now)) return alreadyPresent;
+return refreshCanonicalDemoRows(database, manifest, now);
+```
+
+The importer distinguishes a complete scope from a current, presentation-ready one.

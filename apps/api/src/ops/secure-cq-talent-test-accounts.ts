@@ -52,6 +52,7 @@ export interface SecureCqTalentTestAccountManifest {
 export type SecureCqTalentTestAccountResult =
   | { status: "dry_run"; manifest: SecureCqTalentTestAccountManifest }
   | { status: "imported"; manifest: SecureCqTalentTestAccountManifest }
+  | { status: "refreshed"; manifest: SecureCqTalentTestAccountManifest }
   | { status: "already_present"; manifest: SecureCqTalentTestAccountManifest };
 
 export function readSecureCqTalentTestAccountPhones(
@@ -75,15 +76,16 @@ export function importSecureCqTalentTestAccounts(
   if (input.dryRun) {
     validateTarget(database, input.phones, manifest);
     const existing = readExistingManifest(database, input.phones, manifest);
-    return existing && hasCompleteDemoData(database, existing)
+    return existing && hasCurrentDemoData(database, existing, now)
       ? { status: "already_present", manifest: existing }
       : { status: "dry_run", manifest };
   }
 
   validateTarget(database, input.phones, manifest);
   const existing = readExistingManifest(database, input.phones, manifest);
-  const alreadyComplete = existing !== null && hasCompleteDemoData(database, existing);
-  if (alreadyComplete) {
+  const wasComplete = existing !== null && hasCompleteDemoData(database, existing);
+  const alreadyCurrent = wasComplete && existing !== null && hasCurrentDemoData(database, existing, now);
+  if (alreadyCurrent) {
     return { status: "already_present", manifest: existing };
   }
   database.exec("BEGIN IMMEDIATE;");
@@ -101,7 +103,7 @@ export function importSecureCqTalentTestAccounts(
     database.exec("ROLLBACK;");
     throw error;
   }
-  return { status: "imported", manifest };
+  return { status: wasComplete ? "refreshed" : "imported", manifest };
 }
 
 export function assertCompleteSecureCqTalentTestAccountInstallation(
@@ -370,33 +372,102 @@ function hasCompleteDemoData(
   });
 }
 
+function hasCurrentDemoData(
+  database: DatabaseSync,
+  manifest: SecureCqTalentTestAccountManifest,
+  now: string,
+): boolean {
+  if (!hasCompleteDemoData(database, manifest)) return false;
+
+  return manifest.accountIds.every((account) => {
+    const labels = demoLabels(account);
+    const events = buildDemoEvents(account, now);
+    const storedEvents = database.prepare(`
+      SELECT id, type, title, starts_at, ends_at, status, notes
+      FROM calendar_events
+      WHERE club_id = ? AND id IN (${events.map(() => "?").join(", ")})
+    `).all(clubId, ...events.map((event) => event.id)) as Array<{
+      id: string;
+      type: string;
+      title: string;
+      starts_at: string;
+      ends_at: string;
+      status: string;
+      notes: string | null;
+    }>;
+    const eventById = new Map(storedEvents.map((event) => [event.id, event]));
+    const eventsMatch = events.every((event) => {
+      const stored = eventById.get(event.id);
+      return stored
+        && stored.type === event.type
+        && stored.title === event.title
+        && stored.starts_at === event.startsAt
+        && stored.ends_at === event.endsAt
+        && stored.status === event.status
+        && stored.notes === event.notes;
+    });
+    if (!eventsMatch) return false;
+
+    const identity = database.prepare(`
+      SELECT
+        (SELECT display_name FROM user_accounts WHERE id = ?) AS account_name,
+        (SELECT name FROM parent_profiles WHERE id = ?) AS parent_name,
+        (SELECT name FROM coach_profiles WHERE id = ?) AS coach_name,
+        (SELECT name FROM teams WHERE id = ?) AS team_name,
+        (SELECT opponent_name FROM matches WHERE id = ?) AS completed_opponent,
+        (SELECT opponent_name FROM matches WHERE id = ?) AS scheduled_opponent
+    `).get(
+      account.userId,
+      account.parentId,
+      account.coachId,
+      account.teamId,
+      "match-cq-talent-secure-test-" + account.slot + "-completed",
+      "match-cq-talent-secure-test-" + account.slot + "-scheduled",
+    ) as {
+      account_name?: string;
+      parent_name?: string;
+      coach_name?: string;
+      team_name?: string;
+      completed_opponent?: string;
+      scheduled_opponent?: string;
+    };
+    return identity.account_name === labels.accountName
+      && identity.parent_name === labels.parentName
+      && identity.coach_name === labels.coachName
+      && identity.team_name === labels.teamName
+      && identity.completed_opponent === labels.completedOpponent
+      && identity.scheduled_opponent === labels.scheduledOpponent;
+  });
+}
+
 function insertAccount(
   database: DatabaseSync,
   account: SecureCqTalentTestAccountManifestEntry,
   phone: string,
   now: string,
 ): void {
+  const labels = demoLabels(account);
   database.prepare(
     "INSERT INTO user_accounts (id, display_name, phone, roles_json, status, created_at, updated_at) VALUES (?, ?, ?, ?, 'active', ?, ?)",
-  ).run(account.userId, "Secure test account " + account.slot, phone, roleJson, now, now);
+  ).run(account.userId, labels.accountName, phone, roleJson, now, now);
   database.prepare(
     "INSERT INTO club_user_memberships (id, club_id, user_id, roles_json, status, created_at, updated_at) VALUES (?, ?, ?, ?, 'active', ?, ?)",
   ).run(account.membershipId, clubId, account.userId, roleJson, now, now);
   database.prepare(
     "INSERT INTO parent_profiles (id, club_id, user_id, name, phone, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-  ).run(account.parentId, clubId, account.userId, "Secure parent " + account.slot, phone, now, now);
+  ).run(account.parentId, clubId, account.userId, labels.parentName, phone, now, now);
   database.prepare(
     "INSERT INTO coach_profiles (id, club_id, user_id, name, specialties_json, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 'active', ?, ?)",
-  ).run(account.coachId, clubId, account.userId, "Secure coach " + account.slot, JSON.stringify(["U10", "technical"]), now, now);
+  ).run(account.coachId, clubId, account.userId, labels.coachName, JSON.stringify(["少儿训练", "技术训练"]), now, now);
   database.prepare(
     "INSERT INTO teams (id, club_id, name, age_group, level, default_coach_id, status, created_at, updated_at) VALUES (?, ?, ?, 'U10', 'development', ?, 'active', ?, ?)",
-  ).run(account.teamId, clubId, "Secure test team " + account.slot, account.coachId, now, now);
+  ).run(account.teamId, clubId, labels.teamName, account.coachId, now, now);
   database.prepare(
     "INSERT INTO calendar_events (id, club_id, type, title, starts_at, ends_at, timezone, primary_team_id, owner_coach_id, status, created_at, updated_at) VALUES (?, ?, 'training', ?, ?, ?, 'Asia/Shanghai', ?, ?, 'scheduled', ?, ?)",
   ).run(
     account.eventId,
     clubId,
-    "Secure demo current training " + account.slot,
+    "本周技术训练",
     shiftIso(now, 0, 2),
     shiftIso(now, 0, 4),
     account.teamId,
@@ -407,15 +478,15 @@ function insertAccount(
 
   account.studentIds.forEach((studentId, index) => {
     database.prepare(
-      "INSERT INTO student_profiles (id, club_id, name, birth_date, gender, dominant_foot, current_level, created_at, updated_at) VALUES (?, ?, ?, '2015-01-01', 'unspecified', 'right', 'U10 development', ?, ?)",
-    ).run(studentId, clubId, "Secure player " + account.slot + "-" + (index + 1), now, now);
+      "INSERT INTO student_profiles (id, club_id, name, birth_date, gender, dominant_foot, current_level, created_at, updated_at) VALUES (?, ?, ?, '2015-01-01', 'unspecified', 'right', '少儿基础组', ?, ?)",
+    ).run(studentId, clubId, labels.playerNames[index]!, now, now);
     if (index < 2) {
       database.prepare(
         "INSERT INTO student_guardian_bindings (id, club_id, student_id, parent_id, relationship, is_primary_contact, created_at, updated_at) VALUES (?, ?, ?, ?, 'guardian', 1, ?, ?)",
       ).run(account.guardianBindingIds[index]!, clubId, studentId, account.parentId, now, now);
       database.prepare(
         "INSERT INTO student_contacts (id, club_id, student_id, name, relationship, phone, is_primary_contact, receives_notifications, created_at, updated_at) VALUES (?, ?, ?, ?, 'guardian', ?, 1, 1, ?, ?)",
-      ).run(account.contactIds[index]!, clubId, studentId, "Secure parent " + account.slot, phone, now, now);
+      ).run(account.contactIds[index]!, clubId, studentId, labels.parentName, phone, now, now);
     }
     database.prepare(
       "INSERT INTO team_members (id, club_id, team_id, student_id, starts_at, is_primary_team, status, created_at, updated_at) VALUES (?, ?, ?, ?, '2026-08-01', 1, 'active', ?, ?)",
@@ -432,16 +503,20 @@ function ensureDemoData(
   now: string,
 ): void {
   const records = demoRecordIds(account);
+  const labels = demoLabels(account);
   const events = buildDemoEvents(account, now);
   const assessmentCatalog = loadDemoAssessmentCatalog(database);
 
+  refreshDemoIdentity(database, account, labels, now);
+
   database.prepare(
-    "UPDATE calendar_events SET title = ?, starts_at = ?, ends_at = ?, status = ?, updated_at = ? WHERE id = ? AND club_id = ? AND primary_team_id = ? AND owner_coach_id = ?",
+    "UPDATE calendar_events SET title = ?, starts_at = ?, ends_at = ?, status = ?, notes = ?, updated_at = ? WHERE id = ? AND club_id = ? AND primary_team_id = ? AND owner_coach_id = ?",
   ).run(
     events[0]!.title,
     events[0]!.startsAt,
     events[0]!.endsAt,
     events[0]!.status,
+    events[0]!.notes,
     now,
     events[0]!.id,
     clubId,
@@ -450,48 +525,40 @@ function ensureDemoData(
   );
 
   events.slice(1).forEach((event) => {
-    insertDemoRow(database, "calendar_events",
+    upsertDemoRow(database, "calendar_events",
       "id, club_id, type, title, starts_at, ends_at, timezone, primary_team_id, owner_coach_id, status, notes, created_at, updated_at",
       [event.id, clubId, event.type, event.title, event.startsAt, event.endsAt, "Asia/Shanghai", account.teamId, account.coachId, event.status, event.notes, now, now]);
   });
 
   account.studentIds.forEach((studentId, index) => {
-    database.prepare(
-      "INSERT INTO student_profiles (id, club_id, name, birth_date, gender, dominant_foot, current_level, created_at, updated_at) VALUES (?, ?, ?, ?, 'unspecified', ?, 'U10 development', ?, ?) ON CONFLICT(id) DO NOTHING",
-    ).run(
-      studentId,
-      clubId,
-      "Secure player " + account.slot + "-" + (index + 1),
-      "2015-" + String((index % 9) + 1).padStart(2, "0") + "-" + String((index % 20) + 1).padStart(2, "0"),
-      index % 3 === 0 ? "left" : "right",
-      now,
-      now,
-    );
+    upsertDemoRow(database, "student_profiles",
+      "id, club_id, name, birth_date, gender, dominant_foot, current_level, created_at, updated_at",
+      [studentId, clubId, labels.playerNames[index]!, "2015-" + String((index % 9) + 1).padStart(2, "0") + "-" + String((index % 20) + 1).padStart(2, "0"), "unspecified", index % 3 === 0 ? "left" : "right", "少儿基础组", now, now]);
     database.prepare(
       "INSERT INTO team_members (id, club_id, team_id, student_id, starts_at, is_primary_team, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 1, 'active', ?, ?) ON CONFLICT DO NOTHING",
     ).run(account.teamMemberIds[index]!, clubId, account.teamId, studentId, now.slice(0, 10), now, now);
-    database.prepare(
-      "INSERT INTO event_participants (id, club_id, event_id, student_id, status, note, created_at, updated_at) VALUES (?, ?, ?, ?, 'confirmed', ?, ?, ?) ON CONFLICT DO NOTHING",
-    ).run(account.participantIds[index]!, clubId, account.eventId, studentId, "secure demo roster", now, now);
+    upsertDemoRow(database, "event_participants",
+      "id, club_id, event_id, student_id, status, note, created_at, updated_at",
+      [account.participantIds[index]!, clubId, account.eventId, studentId, "confirmed", "已加入本周训练", now, now]);
 
     events.slice(1).forEach((event) => {
-      insertDemoRow(database, "event_participants",
+      upsertDemoRow(database, "event_participants",
         "id, club_id, event_id, student_id, status, note, created_at, updated_at",
-        [participantIdForEvent(account, event.id, index), clubId, event.id, studentId, event.participantStatuses[index]!, "secure demo " + event.participantStatuses[index], now, now]);
+        [participantIdForEvent(account, event.id, index), clubId, event.id, studentId, event.participantStatuses[index]!, participantNote(event.participantStatuses[index]!), now, now]);
     });
 
     const openingBalance = 12 - index;
-    insertDemoRow(database, "lesson_credit_ledger",
+    upsertDemoRow(database, "lesson_credit_ledger",
       "id, club_id, student_id, team_id, event_id, occurred_at, entry_type, lesson_delta, balance_after, source, source_id, actor_user_id, note, created_at, updated_at",
-      [records.lessonLedgerIds[index * 2]!, clubId, studentId, account.teamId, null, shiftIso(now, -30, 0), "credit", openingBalance, openingBalance, "secure_demo", "secure-demo-opening-" + account.slot + "-" + (index + 1), account.userId, "Secure demo opening lesson balance", now, now]);
-    insertDemoRow(database, "lesson_credit_ledger",
+      [records.lessonLedgerIds[index * 2]!, clubId, studentId, account.teamId, null, shiftIso(now, -30, 0), "credit", openingBalance, openingBalance, "secure_demo", "secure-demo-opening-" + account.slot + "-" + (index + 1), account.userId, "开通体验课时", now, now]);
+    upsertDemoRow(database, "lesson_credit_ledger",
       "id, club_id, student_id, team_id, event_id, occurred_at, entry_type, lesson_delta, balance_after, source, source_id, actor_user_id, note, created_at, updated_at",
-      [records.lessonLedgerIds[index * 2 + 1]!, clubId, studentId, account.teamId, eventIdFor(account, "history-training"), shiftIso(now, -14, 2), "debit", -1, openingBalance - 1, "attendance", eventIdFor(account, "history-training") + "-" + studentId, account.userId, "Secure demo attendance debit", now, now]);
+      [records.lessonLedgerIds[index * 2 + 1]!, clubId, studentId, account.teamId, eventIdFor(account, "history-training"), shiftIso(now, -14, 2), "debit", -1, openingBalance - 1, "attendance", eventIdFor(account, "history-training") + "-" + studentId, account.userId, "训练出勤扣课", now, now]);
 
     const assessmentId = records.assessmentIds[index]!;
-    insertDemoRow(database, "player_assessments",
+    upsertDemoRow(database, "player_assessments",
       "id, club_id, student_id, template_id, template_version_id, assessed_by_coach_id, assessed_at, event_id, summary, created_at, updated_at",
-      [assessmentId, clubId, studentId, assessmentCatalog.templateId, assessmentCatalog.templateVersionId, account.coachId, shiftIso(now, -6, 0), eventIdFor(account, "history-training"), "Secure demo eight-dimension assessment", now, now]);
+      [assessmentId, clubId, studentId, assessmentCatalog.templateId, assessmentCatalog.templateVersionId, account.coachId, shiftIso(now, -6, 0), eventIdFor(account, "history-training"), "八项能力综合测评", now, now]);
 
     assessmentCatalog.rawItems.forEach((item, metricIndex) => {
       const score = 62 + ((account.slot * 7 + index * 5 + metricIndex * 4) % 31);
@@ -502,43 +569,43 @@ function ensureDemoData(
       const radarMetric = assessmentCatalog.radarMetrics[metricIndex]!;
       const valueJson = JSON.stringify({ kind: "score_0_100", score });
 
-      insertDemoRow(database, "assessment_raw_results",
+      upsertDemoRow(database, "assessment_raw_results",
         "id, club_id, assessment_id, test_item_id, metric_id, value_json, recorded_by_coach_id, note, created_at, updated_at",
-        [rawId, clubId, assessmentId, item.id, item.metricId, valueJson, account.coachId, "Secure demo raw test result", now, now]);
-      insertDemoRow(database, "assessment_scores",
+        [rawId, clubId, assessmentId, item.id, item.metricId, valueJson, account.coachId, "本次测评原始成绩", now, now]);
+      upsertDemoRow(database, "assessment_scores",
         "id, club_id, assessment_id, metric_id, value_json, normalized_score, raw_result_id, comment, created_at, updated_at",
-        [scoreId, clubId, assessmentId, item.metricId, valueJson, Number((score / 100).toFixed(2)), rawId, "Secure demo normalized score", now, now]);
-      insertDemoRow(database, "player_metric_records",
+        [scoreId, clubId, assessmentId, item.metricId, valueJson, Number((score / 100).toFixed(2)), rawId, "已换算为能力得分", now, now]);
+      upsertDemoRow(database, "player_metric_records",
         "id, club_id, student_id, metric_id, value_json, source, occurred_at, event_id, assessment_id, template_version_id, raw_result_id, source_record_id, recorded_by_coach_id, visibility, confidence, note, lineage_id, created_at, updated_at",
-        [recordId, clubId, studentId, radarMetric.metricId, valueJson, "assessment", shiftIso(now, -6, 0), eventIdFor(account, "history-training"), assessmentId, assessmentCatalog.templateVersionId, rawId, scoreId, account.coachId, "published_summary", 0.92, "Secure demo radar metric", lineageId, now, now]);
-      insertDemoRow(database, "metric_lineages",
+        [recordId, clubId, studentId, radarMetric.metricId, valueJson, "assessment", shiftIso(now, -6, 0), eventIdFor(account, "history-training"), assessmentId, assessmentCatalog.templateVersionId, rawId, scoreId, account.coachId, "published_summary", 0.92, "本次测评能力指标", lineageId, now, now]);
+      upsertDemoRow(database, "metric_lineages",
         "id, club_id, output_record_id, definition_id, definition_version, input_record_ids_json, computed_at, created_at, updated_at",
         [lineageId, clubId, recordId, radarMetric.definitionId, radarMetric.definitionVersion, JSON.stringify([rawId]), shiftIso(now, -6, 0), now, now]);
     });
   });
 
-  insertDemoRow(database, "matches",
+  upsertDemoRow(database, "matches",
     "id, club_id, event_id, match_type, opponent_name, home_score, away_score, status, created_at, updated_at",
-    [records.matchIds[0]!, clubId, eventIdFor(account, "completed-match"), "friendly", "Secure Demo Opponent " + account.slot, 4, 2, "completed", now, now]);
-  insertDemoRow(database, "matches",
+    [records.matchIds[0]!, clubId, eventIdFor(account, "completed-match"), "friendly", labels.completedOpponent, 4, 2, "completed", now, now]);
+  upsertDemoRow(database, "matches",
     "id, club_id, event_id, match_type, opponent_name, home_score, away_score, status, created_at, updated_at",
-    [records.matchIds[1]!, clubId, eventIdFor(account, "scheduled-match"), "league", "Secure Demo Future Opponent " + account.slot, null, null, "scheduled", now, now]);
+    [records.matchIds[1]!, clubId, eventIdFor(account, "scheduled-match"), "league", labels.scheduledOpponent, null, null, "scheduled", now, now]);
   account.studentIds.forEach((studentId, index) => {
-    insertDemoRow(database, "match_events",
+    upsertDemoRow(database, "match_events",
       "id, club_id, match_id, type, student_id, minute, linked_metric_id, note, created_at, updated_at",
-      [records.matchEventIds[index]!, clubId, records.matchIds[0]!, ["goal", "assist", "interception", "save"][index % 4]!, studentId, 8 + index * 7, assessmentCatalog.radarMetrics[index]!.metricId, "Secure demo match event", now, now]);
+      [records.matchEventIds[index]!, clubId, records.matchIds[0]!, ["goal", "assist", "interception", "save"][index % 4]!, studentId, 8 + index * 7, assessmentCatalog.radarMetrics[index]!.metricId, "比赛关键事件记录", now, now]);
   });
 
   const tacticalPositions = [
-    ["GK", 0.5, 0.08], ["LB", 0.2, 0.28], ["CB", 0.4, 0.24], ["RB", 0.72, 0.3],
-    ["CM", 0.32, 0.5], ["CM", 0.54, 0.5], ["LW", 0.18, 0.74], ["ST", 0.56, 0.78],
+    ["守门员", 0.5, 0.08], ["左后卫", 0.2, 0.28], ["中后卫", 0.4, 0.24], ["右后卫", 0.72, 0.3],
+    ["中场", 0.32, 0.5], ["中场", 0.54, 0.5], ["左边锋", 0.18, 0.74], ["前锋", 0.56, 0.78],
   ] as const;
-  insertDemoRow(database, "tactical_boards",
+  upsertDemoRow(database, "tactical_boards",
     "id, club_id, event_id, formation_name, pitch_type, players_json, updated_by_coach_id, created_at, updated_at",
     [records.tacticalBoardIds[0]!, clubId, eventIdFor(account, "scheduled-match"), "4-3-3", "full",
       JSON.stringify(account.studentIds.map((studentId, index) => ({
         studentId,
-        displayName: "Secure player " + account.slot + "-" + (index + 1),
+        displayName: labels.playerNames[index]!,
         role: "starter",
         positionLabel: tacticalPositions[index]![0],
         x: tacticalPositions[index]![1],
@@ -546,19 +613,19 @@ function ensureDemoData(
       }))), account.coachId, now, now]);
 
   account.studentIds.slice(0, 2).forEach((studentId, index) => {
-    insertDemoRow(database, "student_operational_profiles",
+    upsertCanonicalDemoRow(database, "student_operational_profiles",
       "id, club_id, student_id, region, school, acquisition_channel, student_status, communication_stage, responsible_coach_id, insurance_expires_at, total_checkins, latest_checkin_at, total_recharges, lesson_balance, notes, created_at, updated_at",
-      [records.operationalProfileIds[index]!, clubId, studentId, "重庆", "Secure Demo School " + (index + 1), "secure_demo", "active", index === 0 ? "training_follow_up" : "assessment_complete", account.coachId, shiftIso(now, 365, 0).slice(0, 10), 18 + index * 3, shiftIso(now, -14, 2), 2, 11 - index, "Secure demo operational profile", now, now]);
-    insertDemoRow(database, "insurance_policies",
+      [records.operationalProfileIds[index]!, clubId, studentId, "重庆", "重庆天才足球训练营", "secure_demo", "active", index === 0 ? "training_follow_up" : "assessment_complete", account.coachId, shiftIso(now, 365, 0).slice(0, 10), 18 + index * 3, shiftIso(now, -14, 2), 2, 11 - index, "成长档案已更新", now, now]);
+    upsertDemoRow(database, "insurance_policies",
       "id, club_id, student_id, purchased_at, expires_at, policy_number, provider, sport, approved, review_status, source, source_id, actor_user_id, external_ref, note, created_at, updated_at",
-      [records.insurancePolicyIds[index]!, clubId, studentId, shiftIso(now, -120, 0).slice(0, 10), shiftIso(now, 365, 0).slice(0, 10), "SECURE-DEMO-" + account.slot + "-" + (index + 1), "Secure Demo Insurance", "football", 1, "approved", "secure_demo", "secure-demo-insurance-" + account.slot + "-" + (index + 1), account.userId, "secure-demo-insurance-" + account.slot + "-" + (index + 1), "Secure demo insurance policy", now, now]);
-    insertDemoRow(database, "private_lesson_requests",
+      [records.insurancePolicyIds[index]!, clubId, studentId, shiftIso(now, -120, 0).slice(0, 10), shiftIso(now, 365, 0).slice(0, 10), "演示保单" + account.slot + "-" + (index + 1), "重庆天才运动保障", "足球", 1, "approved", "secure_demo", "secure-demo-insurance-" + account.slot + "-" + (index + 1), account.userId, "secure-demo-insurance-" + account.slot + "-" + (index + 1), "运动保障已审核通过", now, now]);
+    upsertDemoRow(database, "private_lesson_requests",
       "id, club_id, student_id, coach_name, date, time_slot, goals_json, note, status, requested_by_user_id, created_at, updated_at",
-      [records.privateLessonRequestIds[index]!, clubId, studentId, "Secure coach " + account.slot, shiftIso(now, 9 + index, 0).slice(0, 10), "18:00-19:00", JSON.stringify(index === 0 ? ["first_touch", "passing"] : ["confidence", "shooting"]), "Secure demo private lesson request", "pending", account.userId, now, now]);
+      [records.privateLessonRequestIds[index]!, clubId, studentId, labels.coachName, shiftIso(now, 9 + index, 0).slice(0, 10), "18:00-19:00", JSON.stringify(index === 0 ? ["控球", "传球"] : ["信心", "射门"]), "针对本周训练表现进行强化", "pending", account.userId, now, now]);
     [0, 1].forEach((entry) => {
-      insertDemoRow(database, "communication_logs",
+      upsertDemoRow(database, "communication_logs",
         "id, club_id, student_id, occurred_at, channel, stage, contact_name, operator_user_id, summary, next_follow_up_at, created_at, updated_at",
-        [records.communicationLogIds[index * 2 + entry]!, clubId, studentId, shiftIso(now, -7 + entry * 3, 0), "wechat", entry === 0 ? "training_feedback" : "follow_up", "Secure parent " + account.slot, account.userId, entry === 0 ? "Secure demo training feedback sent." : "Secure demo follow-up confirmed.", shiftIso(now, 7 + entry, 0), now, now]);
+        [records.communicationLogIds[index * 2 + entry]!, clubId, studentId, shiftIso(now, -7 + entry * 3, 0), "wechat", entry === 0 ? "training_feedback" : "follow_up", labels.parentName, account.userId, entry === 0 ? "已发送本周训练反馈。" : "已确认下次训练跟进。", shiftIso(now, 7 + entry, 0), now, now]);
     });
   });
 }
@@ -583,14 +650,108 @@ type DemoAssessmentCatalog = {
 
 const demoMetricCount = 8;
 
+type DemoLabels = {
+  accountName: string;
+  parentName: string;
+  coachName: string;
+  teamName: string;
+  playerNames: string[];
+  completedOpponent: string;
+  scheduledOpponent: string;
+};
+
+function demoLabels(account: SecureCqTalentTestAccountManifestEntry): DemoLabels {
+  const suffix = "第" + account.slot + "组";
+  return {
+    accountName: "演示测试账号" + suffix,
+    parentName: "测试家长" + suffix,
+    coachName: "测试教练" + suffix,
+    teamName: "重庆天才演示球队" + suffix,
+    playerNames: account.studentIds.map((_, index) => "测试球员" + suffix + "-" + (index + 1)),
+    completedOpponent: "山城少年足球队",
+    scheduledOpponent: "两江青训足球队",
+  };
+}
+
+function refreshDemoIdentity(
+  database: DatabaseSync,
+  account: SecureCqTalentTestAccountManifestEntry,
+  labels: DemoLabels,
+  now: string,
+): void {
+  database.prepare("UPDATE user_accounts SET display_name = ?, updated_at = ? WHERE id = ?").run(
+    labels.accountName,
+    now,
+    account.userId,
+  );
+  database.prepare("UPDATE parent_profiles SET name = ?, updated_at = ? WHERE id = ? AND club_id = ?").run(
+    labels.parentName,
+    now,
+    account.parentId,
+    clubId,
+  );
+  database.prepare("UPDATE coach_profiles SET name = ?, specialties_json = ?, updated_at = ? WHERE id = ? AND club_id = ?").run(
+    labels.coachName,
+    JSON.stringify(["少儿训练", "技术训练"]),
+    now,
+    account.coachId,
+    clubId,
+  );
+  database.prepare("UPDATE teams SET name = ?, age_group = ?, updated_at = ? WHERE id = ? AND club_id = ?").run(
+    labels.teamName,
+    "少儿组",
+    now,
+    account.teamId,
+    clubId,
+  );
+  account.studentIds.forEach((studentId, index) => {
+    database.prepare("UPDATE student_profiles SET name = ?, current_level = ?, updated_at = ? WHERE id = ? AND club_id = ?").run(
+      labels.playerNames[index]!,
+      "少儿基础组",
+      now,
+      studentId,
+      clubId,
+    );
+    if (index < 2) {
+      database.prepare("UPDATE student_contacts SET name = ?, updated_at = ? WHERE id = ? AND club_id = ?").run(
+        labels.parentName,
+        now,
+        account.contactIds[index]!,
+        clubId,
+      );
+    }
+  });
+}
+
 function buildDemoEvents(account: SecureCqTalentTestAccountManifestEntry, now: string): DemoEvent[] {
+  const anchor = startOfDemoDay(now);
   return [
-    { id: account.eventId, type: "training", title: "本周技术训练 · 演示 " + account.slot, startsAt: shiftIso(now, 0, 2), endsAt: shiftIso(now, 0, 4), status: "scheduled", notes: "Secure demo current technical training.", participantStatuses: ["confirmed", "confirmed", "invited", "confirmed", "confirmed", "invited", "confirmed", "confirmed"] },
-    { id: eventIdFor(account, "history-training"), type: "training", title: "基础技术训练 · 演示回顾 " + account.slot, startsAt: shiftIso(now, -14, 0), endsAt: shiftIso(now, -14, 2), status: "completed", notes: "Secure demo historical training with attendance.", participantStatuses: ["present", "late", "absent", "leave_requested", "present", "excused", "present", "present"] },
-    { id: eventIdFor(account, "future-training"), type: "training", title: "下周进攻训练 · 演示预告 " + account.slot, startsAt: shiftIso(now, 4, 1), endsAt: shiftIso(now, 4, 3), status: "scheduled", notes: "Secure demo future training.", participantStatuses: ["confirmed", "invited", "confirmed", "confirmed", "invited", "confirmed", "confirmed", "confirmed"] },
-    { id: eventIdFor(account, "completed-match"), type: "match", title: "周末友谊赛 · 演示战报 " + account.slot, startsAt: shiftIso(now, -10, 0), endsAt: shiftIso(now, -10, 2), status: "completed", notes: "Secure demo completed match.", participantStatuses: ["present", "present", "present", "late", "present", "present", "present", "present"] },
-    { id: eventIdFor(account, "scheduled-match"), type: "match", title: "周末联赛 · 演示排兵 " + account.slot, startsAt: shiftIso(now, 8, 0), endsAt: shiftIso(now, 8, 2), status: "scheduled", notes: "Secure demo scheduled match with tactical board.", participantStatuses: ["confirmed", "confirmed", "confirmed", "invited", "confirmed", "confirmed", "confirmed", "confirmed"] },
+    { id: account.eventId, type: "training", title: "本周技术训练", startsAt: shiftIso(anchor, 0, 2), endsAt: shiftIso(anchor, 0, 4), status: "scheduled", notes: "围绕控球、传接和小组配合开展训练。", participantStatuses: ["confirmed", "confirmed", "invited", "confirmed", "confirmed", "invited", "confirmed", "confirmed"] },
+    { id: eventIdFor(account, "history-training"), type: "training", title: "基础技术训练回顾", startsAt: shiftIso(anchor, -14, 0), endsAt: shiftIso(anchor, -14, 2), status: "completed", notes: "已完成带球、传球和射门基础训练。", participantStatuses: ["present", "late", "absent", "leave_requested", "present", "excused", "present", "present"] },
+    { id: eventIdFor(account, "future-training"), type: "training", title: "周末进攻训练", startsAt: shiftIso(anchor, 4, 1), endsAt: shiftIso(anchor, 4, 3), status: "scheduled", notes: "安排进攻跑位、边路配合和小范围对抗。", participantStatuses: ["confirmed", "invited", "confirmed", "confirmed", "invited", "confirmed", "confirmed", "confirmed"] },
+    { id: eventIdFor(account, "completed-match"), type: "match", title: "周末友谊赛战报", startsAt: shiftIso(anchor, -9, 0), endsAt: shiftIso(anchor, -9, 2), status: "completed", notes: "友谊赛已完成，已记录关键比赛事件。", participantStatuses: ["present", "present", "present", "late", "present", "present", "present", "present"] },
+    { id: eventIdFor(account, "scheduled-match"), type: "match", title: "周末联赛排兵", startsAt: shiftIso(anchor, 8, 0), endsAt: shiftIso(anchor, 8, 2), status: "scheduled", notes: "联赛前已完成首发阵容和战术布置。", participantStatuses: ["confirmed", "confirmed", "confirmed", "invited", "confirmed", "confirmed", "confirmed", "confirmed"] },
   ];
+}
+
+function startOfDemoDay(now: string): string {
+  const date = new Date(now);
+  if (!Number.isFinite(date.getTime())) throw new Error("Secure demo data requires a valid ISO timestamp.");
+  date.setUTCHours(8, 0, 0, 0);
+  return date.toISOString();
+}
+
+function participantNote(status: string): string {
+  const labels: Record<string, string> = {
+    confirmed: "已确认参加",
+    invited: "已发送邀请",
+    present: "已到场",
+    late: "迟到到场",
+    absent: "未到场",
+    leave_requested: "已提交请假",
+    excused: "已批准请假",
+  };
+  return labels[status] ?? "已记录出勤状态";
 }
 
 function demoRecordIds(account: SecureCqTalentTestAccountManifestEntry) {
@@ -655,6 +816,28 @@ type DemoSqlValue = string | number | null;
 function insertDemoRow(database: DatabaseSync, table: string, columns: string, values: DemoSqlValue[]): void {
   const placeholders = values.map(() => "?").join(", ");
   database.prepare("INSERT INTO " + table + " (" + columns + ") VALUES (" + placeholders + ") ON CONFLICT DO NOTHING").run(...values);
+}
+
+function upsertDemoRow(database: DatabaseSync, table: string, columns: string, values: DemoSqlValue[]): void {
+  const columnNames = columns.split(",").map((column) => column.trim());
+  const placeholders = values.map(() => "?").join(", ");
+  const updates = columnNames
+    .filter((column) => column !== "id" && column !== "created_at")
+    .map((column) => column + " = excluded." + column)
+    .join(", ");
+  database.prepare(
+    "INSERT INTO " + table + " (" + columns + ") VALUES (" + placeholders + ") ON CONFLICT(id) DO UPDATE SET " + updates,
+  ).run(...values);
+}
+
+function upsertCanonicalDemoRow(database: DatabaseSync, table: string, columns: string, values: DemoSqlValue[]): void {
+  const id = values[0];
+  if (typeof id !== "string") throw new Error("Canonical secure demo rows require a string id.");
+  if (database.prepare("SELECT id FROM " + table + " WHERE id = ?").get(id)) {
+    upsertDemoRow(database, table, columns, values);
+    return;
+  }
+  insertDemoRow(database, table, columns, values);
 }
 
 type Row = Record<string, string | null>;

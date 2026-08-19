@@ -287,6 +287,32 @@ describe("coach match-event create request boundary", () => {
 });
 
 describe("parent activity detail request boundary", () => {
+  it("renders internal match types as Chinese labels in parent activity details", async () => {
+    const originalRequest = globalThis.wx.request;
+    globalThis.wx.request = ({ success }) => success({
+      statusCode: 200,
+      data: {
+        event: {
+          id: "event-match-label",
+          title: "周末友谊赛战报",
+          type: "match",
+          startsAt: "2026-08-17T09:00:00.000Z",
+          endsAt: "2026-08-17T11:00:00.000Z",
+          status: "completed",
+        },
+        match: { opponentName: "山城少年足球队", matchType: "friendly", homeScore: 4, awayScore: 2 },
+      },
+    });
+
+    try {
+      const detail = await getParentActivityDetail("event-match-label");
+      const matchSection = detail.sections.find((section) => section.title === "比赛信息");
+      expect(matchSection?.items).toContainEqual({ label: "比赛类型", value: "友谊赛" });
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
+
   it("rejects an unavailable activity instead of returning a fictional pending detail", async () => {
     const originalRequest = globalThis.wx.request;
     globalThis.wx.request = ({ fail }) => fail({ errMsg: "activity missing" });

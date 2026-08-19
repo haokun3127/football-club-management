@@ -9,7 +9,7 @@ const confirmationFlag = "--confirm-secure-cq-talent-test-accounts";
 
 export interface SecureCqTalentTestAccountCommandResult {
   operation: "import" | "rollback";
-  status: "dry_run" | "imported" | "already_present" | "rolled_back";
+  status: "dry_run" | "imported" | "refreshed" | "already_present" | "rolled_back";
   accountCount: number;
 }
 
