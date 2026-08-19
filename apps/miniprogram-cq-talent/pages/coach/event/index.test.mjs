@@ -14,6 +14,7 @@ vi.mock("../../../utils/presentation", () => ({
   activityStatus: (status) => ({ label: status, tone: "info" }),
   activityTypeLabel: (type) => ({ training: "Training", match: "Match" }[type] ?? "Activity"),
   formatCalendarDate: (value) => String(value).slice(0, 10),
+  formatShortDate: (value) => String(value).slice(5, 10).replace("-", "月") + "日",
   formatTimeRange: () => "09:00-10:00",
   resolveMenuInset: () => 0,
   resolveNavInset: () => 0,
@@ -105,7 +106,7 @@ describe("coach activity workbench", () => {
       typeLabel: "Training",
       hasTeamName: true,
       hasVenue: true,
-      sessionMeta: "U11 Red · 2026-08-13 · 09:00-10:00",
+      sessionMeta: "U11 Red · 08月13日 09:00-10:00",
     });
     expect(page.data).toMatchObject({ inProgress: false, countdownText: "", attendancePresent: 0, attendanceTotal: 2, joinedNames: "Athlete One" });
   });

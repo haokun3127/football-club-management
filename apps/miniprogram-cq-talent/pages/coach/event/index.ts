@@ -1,7 +1,7 @@
 import { finishCoachEvent, getCoachWorkbench } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import { activityStatus, activityTypeLabel, formatCalendarDate, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import { activityStatus, activityTypeLabel, formatShortDate, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
 
 type TimerHost = { setInterval: (handler: () => void, timeout: number) => number; clearInterval: (id: number) => void };
@@ -34,6 +34,7 @@ type EventView = {
   hasVenue: boolean;
   timeLabel: string;
   hasTime: boolean;
+  sessionTeam: string;
   sessionMeta: string;
 };
 
@@ -231,8 +232,9 @@ function presentEvent(workbench: CoachWorkbench): EventView {
   const live = isInProgress(workbench.event.status, workbench.event.startsAt, workbench.event.endsAt);
   const status = live ? { label: "进行中", tone: "info" } : activityStatus(workbench.event.status);
   const hasTime = Boolean(workbench.event.startsAt && workbench.event.endsAt);
-  const timeLabel = hasTime ? `${formatCalendarDate(workbench.event.startsAt)} · ${formatTimeRange(workbench.event.startsAt, workbench.event.endsAt)}` : "";
-  const sessionMeta = [workbench.event.teamName || workbench.event.venue || "", timeLabel].filter(Boolean).join(" · ");
+  const timeLabel = hasTime ? `${formatShortDate(workbench.event.startsAt)} ${formatTimeRange(workbench.event.startsAt, workbench.event.endsAt)}` : "";
+  const sessionTeam = workbench.event.teamName || workbench.event.venue || "";
+  const sessionMeta = [sessionTeam, timeLabel].filter(Boolean).join(" · ");
   return {
     title: workbench.event.title,
     typeLabel: activityTypeLabel(workbench.event.type),
@@ -244,6 +246,7 @@ function presentEvent(workbench: CoachWorkbench): EventView {
     hasVenue: Boolean(workbench.event.venue),
     timeLabel,
     hasTime,
+    sessionTeam,
     sessionMeta,
   };
 }

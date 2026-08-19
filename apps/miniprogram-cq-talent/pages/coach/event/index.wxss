@@ -17,7 +17,9 @@
 .shero__content { min-width: 0; flex: 1; }
 .shero__status { flex: 0 0 auto; }
 .shero__title { overflow: hidden; color: #ffffff; font-size: 32rpx; font-weight: 600; line-height: 38rpx; overflow-wrap: anywhere; }
-.shero__session-meta { margin-top: 8rpx; overflow: hidden; color: rgba(255, 255, 255, 0.7); font-size: 26rpx; line-height: 32rpx; text-overflow: ellipsis; white-space: nowrap; }
+.shero__session-meta { margin-top: 8rpx; display: flex; align-items: baseline; min-width: 0; color: rgba(255, 255, 255, 0.7); font-size: 26rpx; line-height: 32rpx; }
+.shero__session-team { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.shero__session-time { flex-shrink: 0; white-space: nowrap; }
 .shero__chips { display: flex; flex-wrap: wrap; gap: 12rpx; }
 .shero__chip { max-width: 100%; padding: 8rpx 14rpx; overflow: hidden; border-radius: 8rpx; background: rgba(255, 255, 255, 0.12); color: #ffffff; font-size: 22rpx; line-height: 30rpx; text-overflow: ellipsis; white-space: nowrap; }
 .shero__chip--muted { color: #d0d5dd; }

@@ -30,13 +30,12 @@
        <view class="shero__heading">
          <view class="shero__content">
            <view class="shero__title">{{eventView.title}}</view>
-           <view wx:if="{{eventView.sessionMeta}}" class="shero__session-meta">{{eventView.sessionMeta}}</view>
+           <view wx:if="{{eventView.sessionMeta}}" class="shero__session-meta"><text class="shero__session-team">{{eventView.sessionTeam}}</text><text wx:if="{{eventView.hasTime}}" class="shero__session-time"> · {{eventView.timeLabel}}</text></view>
          </view>
          <view wx:if="{{!inProgress}}" class="shero__status"><status-chip label="{{eventView.statusLabel}}" tone="{{eventView.statusTone}}" compact="{{true}}" /></view>
        </view>
        <view wx:if="{{countdownText}}" class="shero__countdown"><image class="shero__countdown-icon" src="/assets/icons/clock-white.svg" mode="aspectFit" />{{countdownText}}</view>
       <view class="shero__chips">
-        <view wx:if="{{eventView.hasTeamName}}" class="shero__chip">{{eventView.teamName}}</view>
         <view wx:if="{{eventView.hasVenue}}" class="shero__chip shero__chip--muted">{{eventView.venue}}</view>
         <view wx:if="{{attendanceTotal > 0}}" class="shero__chip shero__chip--muted">出席 {{attendancePresent}}/{{attendanceTotal}} 人</view>
         <view wx:if="{{inProgress}}" class="shero__chip shero__chip--live">● 进行中</view>
