@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-08-19T00:43:04.412Z",
+  "route": "/pages/coach/student-radar/index",
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 3
+  },
+  "rawPng": {
+    "width": 375,
+    "height": 812,
+    "scaleX": 1,
+    "scaleY": 1
+  },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 47265,
+    "sha256": "ae08e8987de237e0e43e4f67f38bd92668c36bc332a138beb27fb6bb6b5b074e"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot"
+}

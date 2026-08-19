@@ -63,5 +63,5 @@
     </block>
   </view>
 
-  <role-tabbar role="coach" active="training" flow="{{true}}" />
+  <role-tabbar role="coach" active="training" />
 </view>

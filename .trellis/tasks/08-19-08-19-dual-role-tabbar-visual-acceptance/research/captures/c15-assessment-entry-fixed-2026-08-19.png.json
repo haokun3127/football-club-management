@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-08-19T00:55:10.798Z",
+  "route": "/pages/coach/assessment-entry/index",
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 3
+  },
+  "rawPng": {
+    "width": 375,
+    "height": 812,
+    "scaleX": 1,
+    "scaleY": 1
+  },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 25177,
+    "sha256": "89e610d9a7d9e3829a3f86a4e691a1d71f7920f02caf2d95407db5eb0aacf2fb"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot"
+}

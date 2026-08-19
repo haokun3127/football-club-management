@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-08-19T00:45:42.681Z",
+  "route": "/pages/coach/private-interest/index",
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 3
+  },
+  "rawPng": {
+    "width": 375,
+    "height": 812,
+    "scaleX": 1,
+    "scaleY": 1
+  },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 38574,
+    "sha256": "6cd6531c2d23fda51c48907a3872e0b8299f3c6a7766790ba3bcfb455c46dee2"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot"
+}
