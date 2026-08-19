@@ -159,4 +159,20 @@ describe("parent ability radar", () => {
     expect(stylesheet).toContain(".rhero { display: flex; flex-direction: column; gap: 40rpx;");
     expect(stylesheet).toContain(".rhero__canvas { border-radius: 32rpx; background: #1f1f24; height: 560rpx;");
   });
+
+  it("keeps the top bar focused on the page action instead of repeating a long student and team label", () => {
+    expect(template).toContain('<view class="p5-nav__title">能力雷达</view>');
+    expect(template).not.toContain("p5-nav__title-group");
+    expect(template).not.toContain("activeChildName");
+    expect(template).not.toContain("activeChildTeam");
+    expect(controller).not.toContain("activeChildTeam");
+  });
+
+  it("keeps the history action at the Figma right edge instead of applying an oversized runtime menu inset", () => {
+    const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
+    expect(template).toContain('style="padding-top:{{navInset}}px"');
+    expect(template).not.toContain("padding-right:{{menuInset}}px");
+    expect(controller).not.toContain("resolveMenuInset");
+    expect(stylesheet).toMatch(/\.p5-nav\s*\{[^}]*padding:\s*0\s+200rpx\s+0\s+32rpx/s);
+  });
 });

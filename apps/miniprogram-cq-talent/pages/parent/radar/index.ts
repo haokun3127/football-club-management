@@ -1,7 +1,7 @@
 import { getParentChildren, getParentGrowth } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import { formatShortDate, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import { formatShortDate, resolveNavInset } from "../../../utils/presentation";
 import { setCurrentStudentId } from "../../../utils/store";
 import type { GrowthSummary, LoadState, RadarMetricPoint, StudentSummary } from "../../../utils/types";
 
@@ -19,13 +19,10 @@ const runtimeTimers = globalThis as unknown as {
 Page({
   data: {
     navInset: resolveNavInset(),
-    menuInset: resolveMenuInset(),
     state: "loading" as LoadState,
     message: "正在读取能力雷达",
     children: [] as StudentSummary[],
     activeStudentId: "",
-    activeChildName: "",
-    activeChildTeam: "",
     radar: [] as RadarPointView[],
     selectedMetricId: "",
     canDrawRadar: false,
@@ -78,8 +75,6 @@ Page({
         message: radar.length >= 3 ? "" : "有效能力指标不足，完成训练或评测后生成雷达图。",
         children,
         activeStudentId: active.id,
-        activeChildName: active.name,
-        activeChildTeam: active.teams?.[0] ?? "",
         radar,
         selectedMetricId: radar[0]?.metricId ?? "",
         canDrawRadar: false,

@@ -1,11 +1,8 @@
 <view class="p5">
   <!-- P5 Header -->
-  <view class="p5-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
+  <view class="p5-nav" style="padding-top:{{navInset}}px">
     <view class="p5-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
-    <view class="p5-nav__title-group">
-      <view class="p5-nav__title">能力雷达</view>
-      <view class="p5-nav__sub">{{activeChildName}}{{activeChildTeam ? ' · ' + activeChildTeam : ''}}</view>
-    </view>
+    <view class="p5-nav__title">能力雷达</view>
     <view class="p5-nav__compare" bindtap="openMetricHistory">历史对比</view>
   </view>
 

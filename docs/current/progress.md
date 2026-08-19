@@ -1163,3 +1163,24 @@
 - C1 根因是 `.c1-nav` 的 `176rpx` 内容高度与动态 `navInset` 叠加。已收口为在线稿要求的 `88rpx + box-sizing: content-box`，避免标题、头像和日期条整体下沉；真实 WeChatIDE 模拟器截图 `C:\Users\ASUS\AppData\Local\Temp\c1-current-after-week-arrows.png` 显示异常白区消失，箭头可见。
 - 已刷新离线参考图：`docs/design/reference/figma/p1-schedule-home.png` 与 `docs/design/reference/figma/c1-coach-schedule-home.png`，均直接导自本次在线 Figma 截图（375×812）。
 - P1 运行态截图尚不能标为通过：当时真实双角色会话的激活身份为 `coach`，家长页的 `requireRole("parent")` 会按真实身份守卫回跳。不得使用生产库直写/伪造会话脚本取证；后续应通过小程序现有“切换身份”界面或重新完成真实微信手机号登录后，以 `parent` 身份补拍。
+
+## 2026-08-19 P5 能力雷达顶栏信息密度优化
+
+- 用户反馈真实测试数据中的“学员名 · 球队名”在 P5 顶栏换行，与下方学员选择胶囊重复，造成首屏拥挤。已重新读取在线唯一基准 `zZ6wKyOHKcO4UYXDd9jGwv / 93:278 / P5 Ability Radar`，确认副标题节点原为 `196:735`。
+- 现将学员识别与切换统一交给下方横向选择器：P5 顶栏仅保留“能力雷达”和“历史对比”。页面不再把 `activeChildName` / `activeChildTeam` 写进 view model，真实学员选择、雷达读取与历史对比路由均保持不变。
+- 在线 Figma 已同步删除 `196:735`，并将 `196:733` 重命名为 `Title`；最新在线截图已刷新 `docs/design/reference/figma/p5-ability-radar.png`（严格 `375×812`）。
+- 验证：新增 P5 顶栏重复信息回归用例先红后绿，定向 Vitest `6/6` 与小程序 `tsc --noEmit` 均通过；本批未伪造 parent session，未宣称新增运行态视觉验收。
+
+## 2026-08-19 P5 历史对比按钮右侧定位修复
+
+- 真实 375×812 模拟器截图显示“历史对比”被挤在标题旁。根因是 P5 把 `resolveMenuInset()` 的动态微信胶囊避让值写入顶栏 `padding-right`，但该页 WXSS 已按 Figma 固定预留 `200rpx`；两套避让规则叠加后，按钮被过度向左推移。
+- P5 现仅注入顶部安全区 `navInset`，保留 Figma 的 `padding: 0 200rpx 0 32rpx`。在线 Figma `93:278` 当前 Header 仍为标题 `x=40`、历史对比按钮 `x=187`–`275`，设计稿无需另行改动。
+- WeChatIDE MCP 已重新导航至 `/pages/parent/radar/index` 并取得真实 `375×812` 运行截图：`C:\Users\ASUS\AppData\Local\Temp\p5-radar-history-action-after-2026-08-19-final.png`；标题与按钮现保持清晰间距，右侧按钮不与微信胶囊重叠。
+- 验证：新增定位回归用例先红后绿，P5 定向 Vitest `7/7`、小程序 `tsc --noEmit` 与 `git diff --check` 均通过。
+
+## 2026-08-19 全端顶栏右侧操作审计
+
+- 针对 P5 暴露的“标题与右侧操作过近”问题，重新读取在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv` 的 C1/C2/C3/C4/C11/C12/C14/C15/C16 节点，并用真实教练身份在 WeChatIDE MCP 取得路由核验的 `375×812` 截图。
+- 教练端 C1 头像、C2 结束训练（真实数据为待开始，按钮未出现）、C3 保存、C4 提交、C7 分享、C11 新增、C12 提交、C14 导出、C15 保存草稿、C16 设置均与最新在线稿保持安全间距；C5/C5.1/C6/C6.1/C8/C9/C10/C10.1/C13/C16.1–C16.4 没有右侧文字动作，不属于同一挤压模式。
+- 家长端已完成的 P2/P3/P4/P6/P7/P7.1/P8/场地/P8.2/P9/P9.1 截图审计也未发现同类碰撞。平台胶囊坐标为 `left=281px,width=87px`，`resolveMenuInset()` 为 `102px`，与在线稿固定 `100px` 右预留相容。
+- 本轮没有继续改代码或在线 Figma：P5 是重复副标题与动态右预留叠加造成的页面特例，其他页面未发现需要跟随修改的真实缺陷。详细证据见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-19/coach-header-action-audit.md`。
