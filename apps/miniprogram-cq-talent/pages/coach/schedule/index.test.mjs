@@ -177,13 +177,11 @@ describe("coach schedule home", () => {
     expect(page.data.date).toBe("2026-08-13");
   });
 
-  it("keeps C1 week navigation as invisible edge hit zones in the current Figma date strip", () => {
-    expect(template).toContain('class="c1-dates__arrow c1-dates__arrow--previous" data-offset="-7" bindtap="changeWeek"');
-    expect(template).toContain('class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek"');
-    expect(template).not.toContain('data-offset="-7" bindtap="changeWeek">‹</view>');
-    expect(template).not.toContain('data-offset="7" bindtap="changeWeek">›</view>');
+  it("keeps C1 week navigation visible and separately tappable", () => {
+    expect(template).toContain('class="c1-dates__arrow c1-dates__arrow--previous" data-offset="-7" bindtap="changeWeek">‹</view>');
+    expect(template).toContain('class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek">›</view>');
     expect(stylesheet).toMatch(/\.c1-dates\s*\{[^}]*padding:\s*24rpx\s+0/s);
-    expect(stylesheet).toMatch(/\.c1-dates__arrow\s*\{[^}]*flex:\s*0\s+0\s+44rpx/s);
+    expect(stylesheet).toMatch(/\.c1-dates__arrow\s*\{[^}]*flex:\s*0\s+0\s+44rpx[^}]*color:\s*#667085[^}]*font-size:\s*36rpx/s);
   });
 
   it("matches the C1 online hero and stats-row offsets without moving activity cards off their 22px rail", () => {
@@ -223,7 +221,8 @@ describe("coach schedule home", () => {
     const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
     expect(controller).toContain("resolveMenuInset");
     expect(template).toContain('padding-right:{{menuInset}}px');
-    expect(stylesheet).toMatch(/\.c1-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+    expect(stylesheet).toMatch(/\.c1-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+    expect(stylesheet).not.toMatch(/\.c1-nav\s*\{[^}]*height:\s*176rpx/s);
   });
 
   it("uses the live C1 root-page title typography", () => {

@@ -150,10 +150,14 @@ describe("parent schedule hero", () => {
     expect(options[6]?.date).toBe("2026-08-09");
   });
 
-  it("renders the Figma week strip without arrow controls and marks today in red", () => {
-    expect(template).not.toContain('bindtap="changeWeek"');
+  it("renders visible previous and next week controls without shrinking the seven-day strip", () => {
+    expect(template).toContain('class="week-switcher__arrow week-switcher__arrow--previous" data-offset="-7" bindtap="changeWeek">‹</view>');
+    expect(template).toContain('class="week-switcher__arrow week-switcher__arrow--next" data-offset="7" bindtap="changeWeek">›</view>');
     expect(template).toContain("week-day--today");
     expect(template).toContain("week-day--active");
+    expect(styles).toMatch(/\.week-switcher\s*\{[^}]*gap:\s*8rpx/s);
+    expect(styles).toMatch(/\.week-switcher__arrow\s*\{[^}]*flex:\s*0\s+0\s+44rpx[^}]*width:\s*44rpx[^}]*height:\s*56rpx/s);
+    expect(styles).toMatch(/\.week-nav\s*\{[^}]*flex:\s*1[^}]*min-width:\s*0/s);
     expect(styles).toMatch(/\.week-day--today \.week-day__number \{[^}]*background: #a80f1b/);
     expect(styles).toMatch(/\.week-day--active \.week-day__number \{[^}]*background: #101828/);
   });

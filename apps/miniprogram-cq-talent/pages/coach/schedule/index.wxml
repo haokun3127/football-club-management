@@ -5,14 +5,14 @@
   </view>
 
   <view class="c1-dates">
-    <view class="c1-dates__arrow c1-dates__arrow--previous" data-offset="-7" bindtap="changeWeek"></view>
+    <view class="c1-dates__arrow c1-dates__arrow--previous" data-offset="-7" bindtap="changeWeek">‹</view>
     <view class="c1-dates__days">
       <view wx:for="{{dayStrip}}" wx:key="date" class="c1-day {{selectedDate === item.date ? 'c1-day--selected' : ''}}" data-date="{{item.date}}" bindtap="selectDay">
         <view class="c1-day__week">{{item.weekLabel}}</view>
         <view class="c1-day__num">{{item.dayNum}}</view>
       </view>
     </view>
-    <view class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek"></view>
+    <view class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek">›</view>
   </view>
 
   <view wx:if="{{state === 'ready'}}" class="c1-summary">

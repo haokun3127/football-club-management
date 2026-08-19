@@ -1155,3 +1155,11 @@
 - 重新读取新版 Figma 两个页面：`4:6 / 05 Parent Generated` 与 `4:7 / 06 Coach Generated`；当前唯一来源仍为 `zZ6wKyOHKcO4UYXDd9jGwv`。已确认当前任务识别的实质变化均已分别落在 C5、P5、C14 三个独立提交中。
 - 全仓门禁：`npx --yes pnpm@10.33.0 run check` exit `0`；domain `19/19`、小程序 `340/340`、API `109/109`，三层 typecheck 均通过。
 - 双端视觉剩余边界仍如实保留：P5 当前没有合法 parent 运行会话，历史 C1–C14 等页面的运行态证据按各自记录中的“真实截图/平台或数据豁免”处理；没有把全仓测试绿灯解释为所有页面的像素级视觉通过。
+
+## 2026-08-19 P1/C1 周切换箭头与 C1 顶栏回归修复
+
+- 在线唯一基准已重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home` 与 `zZ6wKyOHKcO4UYXDd9jGwv / 93:578 / C1 Coach Schedule Home`。两张画板均要求周日期条两侧持续显示上一周/下一周箭头；在线稿已同步新增 P1 节点 `456:177`–`456:179` 和 C1 节点 `456:185`–`456:186`。
+- P1 `pages/parent/schedule` 复用既有 `changeWeek`，新增可点击的 `‹` / `›`；C1 `pages/coach/schedule` 同样显示既有周切换动作。两处都不在 WXML 内调用数组或字符串方法，日期继续由 TypeScript view model 生成。
+- C1 根因是 `.c1-nav` 的 `176rpx` 内容高度与动态 `navInset` 叠加。已收口为在线稿要求的 `88rpx + box-sizing: content-box`，避免标题、头像和日期条整体下沉；真实 WeChatIDE 模拟器截图 `C:\Users\ASUS\AppData\Local\Temp\c1-current-after-week-arrows.png` 显示异常白区消失，箭头可见。
+- 已刷新离线参考图：`docs/design/reference/figma/p1-schedule-home.png` 与 `docs/design/reference/figma/c1-coach-schedule-home.png`，均直接导自本次在线 Figma 截图（375×812）。
+- P1 运行态截图尚不能标为通过：当时真实双角色会话的激活身份为 `coach`，家长页的 `requireRole("parent")` 会按真实身份守卫回跳。不得使用生产库直写/伪造会话脚本取证；后续应通过小程序现有“切换身份”界面或重新完成真实微信手机号登录后，以 `parent` 身份补拍。
