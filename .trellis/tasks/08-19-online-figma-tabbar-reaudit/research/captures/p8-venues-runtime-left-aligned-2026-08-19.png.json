@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-08-19T04:03:55.837Z",
+  "route": "/pages/parent/venues/index",
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 3
+  },
+  "rawPng": {
+    "width": 375,
+    "height": 812,
+    "scaleX": 1,
+    "scaleY": 1
+  },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 237730,
+    "sha256": "80a333b7d204d9067bb9fb02733e557233455abd55cc1b0855b4e5b15251793d"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot"
+}

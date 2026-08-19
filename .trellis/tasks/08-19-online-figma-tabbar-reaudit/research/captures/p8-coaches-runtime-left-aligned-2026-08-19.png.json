@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-08-19T04:04:38.163Z",
+  "route": "/pages/parent/coaches/index",
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 3
+  },
+  "rawPng": {
+    "width": 375,
+    "height": 812,
+    "scaleX": 1,
+    "scaleY": 1
+  },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 63013,
+    "sha256": "de3c58909420d2f520d49f24f8fec69fa64dd80f8e18cad649ed9e6a4bd3f6b1"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot"
+}

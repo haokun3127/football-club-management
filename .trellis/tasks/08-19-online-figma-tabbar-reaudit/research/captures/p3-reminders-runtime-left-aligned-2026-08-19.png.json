@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-08-19T04:00:55.884Z",
+  "route": "/pages/parent/reminders/index",
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 3
+  },
+  "rawPng": {
+    "width": 375,
+    "height": 812,
+    "scaleX": 1,
+    "scaleY": 1
+  },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 25935,
+    "sha256": "6bdcf6c10b9e4131d547aaf6b9e0acdd0c14ce11e593f71598f1e1cfee5a6ff1"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot"
+}

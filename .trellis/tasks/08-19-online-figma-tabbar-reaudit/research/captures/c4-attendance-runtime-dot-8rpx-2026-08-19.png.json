@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-08-19T04:31:43.618Z",
+  "route": "/pages/coach/attendance/index",
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 3
+  },
+  "rawPng": {
+    "width": 375,
+    "height": 812,
+    "scaleX": 1,
+    "scaleY": 1
+  },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 18393,
+    "sha256": "139b2085d5e2056f2dcc8b89c997b401cf427529e991d1431177dc9508aef6f4"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot"
+}

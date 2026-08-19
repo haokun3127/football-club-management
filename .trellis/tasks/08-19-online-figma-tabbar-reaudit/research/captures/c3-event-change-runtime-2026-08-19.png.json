@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-08-19T03:06:41.849Z",
+  "route": "/pages/coach/event-change/index",
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 3
+  },
+  "rawPng": {
+    "width": 564,
+    "height": 1220,
+    "scaleX": 1.504,
+    "scaleY": 1.5024630541871922
+  },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 35137,
+    "sha256": "9db48f3e83362a7f66f0877145ee1e8b11bb04cfff2be34de593a6d74fd9964e"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot"
+}

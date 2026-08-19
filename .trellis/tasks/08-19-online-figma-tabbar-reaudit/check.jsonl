@@ -1,0 +1,5 @@
+{"file":".trellis/tasks/08-19-online-figma-tabbar-reaudit/prd.md","reason":"Acceptance requirements include a focused regression test, current Figma evidence, 375×812 runtime captures, and scoped verification for every confirmed visual repair."}
+{"file":".trellis/tasks/08-19-online-figma-tabbar-reaudit/research/coach-tabbar-reaudit-2026-08-19.md","reason":"Records the online nodes, corrected measurements, capture paths, and explicit visual-comparison conclusion for the root-navigation correction."}
+{"file":"apps/miniprogram-cq-talent/pages/coach/schedule/index.test.mjs","reason":"Locks C1 root-page title typography to the live 18px/22px Figma treatment before changing its WXSS."}
+{"file":"apps/miniprogram-cq-talent/pages/coach/tactical-board/index.test.mjs","reason":"Locks C7's no-gap 24px chevron, 18px title, and source asset so the old shafted arrow cannot return."}
+{"file":"apps/miniprogram-cq-talent/pages/coach/training/index.test.mjs","reason":"Locks C8 root-page title typography to the live 18px/22px Figma treatment before changing its WXSS."}

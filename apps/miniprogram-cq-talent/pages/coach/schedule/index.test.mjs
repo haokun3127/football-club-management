@@ -226,6 +226,10 @@ describe("coach schedule home", () => {
     expect(stylesheet).toMatch(/\.c1-nav\s*\{(?=[^}]*height:\s*176rpx)(?=[^}]*box-sizing:\s*content-box)/s);
   });
 
+  it("uses the live C1 root-page title typography", () => {
+    expect(stylesheet).toMatch(/\.c1-nav__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
+  });
+
   it("keeps the live hero title and cards inside the C1 Figma width budget", () => {
     expect(stylesheet).toMatch(/\.c1-hero__title\s*\{[^}]*flex:\s*1[^}]*min-width:\s*0/s);
     expect(stylesheet).toMatch(/\.c1-hero\s*\{[^}]*min-height:\s*360rpx[^}]*padding:\s*32rpx/s);

@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-08-19T02:38:50.003Z",
+  "route": "/pages/parent/schedule/index",
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 3
+  },
+  "rawPng": {
+    "width": 564,
+    "height": 1220,
+    "scaleX": 1.504,
+    "scaleY": 1.5024630541871922
+  },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 87143,
+    "sha256": "b387f9485204612bbedf0369e89cc8acb216d01ca75454d18261b5144bfc9c00"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot"
+}

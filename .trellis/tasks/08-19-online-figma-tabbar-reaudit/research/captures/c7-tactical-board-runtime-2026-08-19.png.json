@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-08-19T03:11:27.205Z",
+  "route": "/pages/coach/tactical-board/index",
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 3
+  },
+  "rawPng": {
+    "width": 564,
+    "height": 1220,
+    "scaleX": 1.504,
+    "scaleY": 1.5024630541871922
+  },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 32495,
+    "sha256": "e236a1e2a03ef04ee6572167a7c5ae47fa06a320fa8e51f5937a622a380be087"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot"
+}

@@ -2,7 +2,7 @@
   <view class="c7-header" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="c7-header__left">
       <view class="c7-header__back" bindtap="goBack" aria-label="返回">
-        <image src="/assets/icons/c11-arrow-left.svg" mode="aspectFit" />
+        <image src="/assets/icons/chevron-left.svg" mode="aspectFit" />
       </view>
       <view class="c7-header__title">战术板</view>
     </view>

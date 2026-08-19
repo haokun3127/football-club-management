@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-08-19T03:06:22.909Z",
+  "route": "/pages/coach/schedule/index",
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 3
+  },
+  "rawPng": {
+    "width": 564,
+    "height": 1220,
+    "scaleX": 1.504,
+    "scaleY": 1.5024630541871922
+  },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 44422,
+    "sha256": "d60649989ec13ef6db6e6cc59e1010e9b9a111fb742567354e15225086014e12"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot"
+}

@@ -10,7 +10,7 @@
   background: #ffffff;
   border-bottom: 1rpx solid #e7eaf0;
 }
-.c1-nav__title { color: #202124; font-size: 44rpx; font-weight: 700; line-height: 54rpx; }
+.c1-nav__title { color: #202124; font-size: 36rpx; font-weight: 700; line-height: 44rpx; }
 .c1-nav__avatar { display: flex; align-items: center; justify-content: center; width: 72rpx; height: 72rpx; border-radius: 36rpx; background: #a80f1b; color: #ffffff; font-size: 28rpx; font-weight: 700; }
 
 .c1-dates { display: flex; align-items: center; height: 128rpx; box-sizing: border-box; padding: 24rpx 0; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }

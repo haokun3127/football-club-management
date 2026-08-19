@@ -213,6 +213,8 @@ describe("C7 coach tactical board MVP", () => {
     expect(template).toContain('<block wx:if="{{!readOnly}}">');
     expect(template).toContain('<block wx:else>');
     expect(template).toContain('>战术板<');
+    expect(template).toContain('src="/assets/icons/chevron-left.svg"');
+    expect(template).not.toContain('src="/assets/icons/c11-arrow-left.svg"');
     expect(template).toContain('class="c7-header__share"');
     expect(template).toContain('class="c7-pitch__circle c7-pitch__circle--top"');
     expect(template).toContain('class="c7-pitch__circle c7-pitch__circle--middle"');
@@ -230,6 +232,8 @@ describe("C7 coach tactical board MVP", () => {
     expect(pageConfig).not.toContain('"app-header"');
     expect(pageConfig).not.toContain('"submit-bar"');
     expect(stylesheet).toMatch(/\.c7-header\s*\{[^}]*height:\s*88rpx[^}]*box-sizing:\s*content-box/s);
+    expect(stylesheet).toMatch(/\.c7-header__left\s*\{[^}]*gap:\s*0/s);
+    expect(stylesheet).toMatch(/\.c7-header__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
     expect(stylesheet).toMatch(/\.c7-pitch\s*\{[^}]*width:\s*686rpx[^}]*height:\s*760rpx[^}]*background:\s*#1a1a2e/s);
     expect(stylesheet).toMatch(/\.c7-toolbar\s*\{[^}]*position:\s*fixed[^}]*bottom:\s*140rpx/s);
     expect(stylesheet).toMatch(/\.c7-player\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);

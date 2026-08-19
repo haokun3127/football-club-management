@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-08-19T04:25:23.975Z",
+  "route": "/pages/coach/training/index",
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 3
+  },
+  "rawPng": {
+    "width": 375,
+    "height": 812,
+    "scaleX": 1,
+    "scaleY": 1
+  },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 61835,
+    "sha256": "9175df45cfc554d6c27eead17b74edc9a801a684c61effafbb449a71c0c172f1"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot"
+}

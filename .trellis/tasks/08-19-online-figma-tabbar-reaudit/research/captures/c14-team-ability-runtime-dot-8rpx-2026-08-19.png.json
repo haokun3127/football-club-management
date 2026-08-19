@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-08-19T04:28:20.917Z",
+  "route": "/pages/coach/team-ability/index",
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 3
+  },
+  "rawPng": {
+    "width": 375,
+    "height": 812,
+    "scaleX": 1,
+    "scaleY": 1
+  },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 52122,
+    "sha256": "a446856a875283e733be9ebb60c0e0c70931bf9c472bc7471793baf3e14b8c82"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot"
+}

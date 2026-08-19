@@ -185,6 +185,7 @@ describe("coach training management", () => {
   it("keeps the training title clear of the system capsule", () => {
     expect(template).toContain('padding-right:{{menuInset}}px');
     expect(styles).toMatch(/\.c8-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+    expect(styles).toMatch(/\.c8-nav__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
   });
 
   it("uses the node 93:896 hero, tabs, and session-card geometry", () => {

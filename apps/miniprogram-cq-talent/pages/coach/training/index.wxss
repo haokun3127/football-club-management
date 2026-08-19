@@ -1,6 +1,6 @@
 .c8 { min-height: 100vh; padding-bottom: calc(140rpx + env(safe-area-inset-bottom)); background: #f6f7f9; }
 .c8-nav { box-sizing: content-box; display: flex; align-items: center; height: 88rpx; padding: 0 32rpx; background: #ffffff; }
-.c8-nav__title { color: #202124; font-size: 40rpx; font-weight: 700; line-height: 48rpx; }
+.c8-nav__title { color: #202124; font-size: 36rpx; font-weight: 700; line-height: 44rpx; }
 
 .c8-hero { box-sizing: border-box; height: 360rpx; padding: 40rpx; border-radius: 32rpx; background: #07111f; box-shadow: 0 8rpx 12rpx rgba(0, 0, 0, 0.1); }
 .c8-hero__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24rpx; }

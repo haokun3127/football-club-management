@@ -1,0 +1,6 @@
+{"file":"docs/design/specifications/figma-online-frame-map-2026-08-12.md","reason":"Maps C2/C4/C9 runtime routes to their online Figma boards; the root-page re-read then supplies updated shared navigation geometry."}
+{"file":".trellis/tasks/08-19-online-figma-tabbar-reaudit/research/coach-tabbar-reaudit-2026-08-19.md","reason":"Contains previous TabBar evidence plus the corrected root-page top-navigation findings and runtime capture paths."}
+{"file":"apps/miniprogram-cq-talent/pages/coach/schedule/index.wxss","reason":"C1 route-local header bypasses app-header; its title must match online node 196:1423 at 18px."}
+{"file":"apps/miniprogram-cq-talent/pages/coach/tactical-board/index.wxml","reason":"C7 route-local header must use the same 24px chevron asset as online node 196:2189, without a shafted arrow substitute."}
+{"file":"apps/miniprogram-cq-talent/pages/coach/tactical-board/index.wxss","reason":"C7 root-page node 196:2187 fixes the arrow-title gap and title type scale."}
+{"file":"apps/miniprogram-cq-talent/pages/coach/training/index.wxss","reason":"C8 route-local header bypasses app-header; its title must match online node 196:2283 at 18px."}
