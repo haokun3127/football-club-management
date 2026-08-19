@@ -1,0 +1,26 @@
+<view class="guide-page">
+  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="page-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="page-nav__title">训练攻略</view><view class="page-nav__more"><image src="/assets/icons/more-horizontal.svg" mode="aspectFit" /></view></view>
+  <view class="guide-page__body">
+    <status-view
+      state="{{state}}"
+      title="{{state === 'loading' ? '加载训练攻略' : state === 'empty' ? '暂无攻略' : '读取失败'}}"
+      message="{{message}}"
+      action-text="{{state === 'error' ? '重试' : ''}}"
+      bindaction="loadGuides"
+    />
+
+    <block wx:if="{{state === 'ready'}}">
+      <view wx:if="{{hasGuides}}" class="guide-list">
+        <view wx:for="{{guides}}" wx:key="id" class="guide-card" data-id="{{item.id}}" bindtap="openGuide">
+          <view class="guide-card__accent" style="background: {{item.accent}}"></view>
+          <view class="guide-card__content">
+            <view class="guide-card__title">{{item.title}}</view>
+            <view class="guide-card__subtitle">{{item.subtitle}}</view>
+          </view>
+          <image class="guide-card__chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
+        </view>
+      </view>
+      <view wx:else class="guide-empty">暂无攻略内容</view>
+    </block>
+  </view>
+</view>

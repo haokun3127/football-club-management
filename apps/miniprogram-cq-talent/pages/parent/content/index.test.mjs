@@ -109,17 +109,14 @@ describe("parent content center", () => {
     expect(page.data.state).toBe("ready");
   });
 
-  it("keeps only real quick-link routes and scrolls to articles for the guide entry", () => {
-    const page = createPageInstance({
-      articles: [{ id: "guide-1", title: "真实训练攻略", subtitle: "来自内容接口", accent: "#a80818", category: "guide" }],
-      visibleArticles: [],
-    });
+  it("keeps only real quick-link routes including the guide list page", () => {
+    const page = createPageInstance();
 
     page.openQuickLink({ currentTarget: { dataset: { category: "venue" } } });
     page.openQuickLink({ currentTarget: { dataset: { category: "guide" } } });
 
     expect(mocks.openPage).toHaveBeenCalledWith("/pages/parent/venues/index");
-    expect(globalThis.wx.pageScrollTo).toHaveBeenCalledWith({ selector: ".article-list", duration: 200 });
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/parent/guide/index");
   });
 
   it("renders the featured and quick-link sections outside the article-availability gate", () => {

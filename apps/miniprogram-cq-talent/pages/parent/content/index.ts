@@ -35,7 +35,7 @@ const QUICK_LINKS: QuickLink[] = [
   { icon: "/assets/icons/content-map-pin.svg", color: "#1976d2", label: "场地信息", category: "venue", page: "/pages/parent/venues/index" },
   { icon: "/assets/icons/content-help-circle.svg", color: "#ff9800", label: "帮助中心", category: "help", page: "/pages/parent/help/index" },
   { icon: "/assets/icons/content-users.svg", color: "#22c55e", label: "教练团队", category: "coach", page: "/pages/parent/coaches/index" },
-  { icon: "/assets/icons/content-book.svg", color: "#a80f1b", label: "训练攻略", category: "guide" },
+  { icon: "/assets/icons/content-book.svg", color: "#a80f1b", label: "训练攻略", category: "guide", page: "/pages/parent/guide/index" },
 ];
 
 Page<PageData>({
@@ -87,9 +87,7 @@ Page<PageData>({
     const link = QUICK_LINKS.find((item) => item.category === event.currentTarget.dataset.category);
     if (link?.page) {
       openPage(link.page);
-      return;
     }
-    wx.pageScrollTo({ selector: ".article-list", duration: 200 });
   },
 });
 

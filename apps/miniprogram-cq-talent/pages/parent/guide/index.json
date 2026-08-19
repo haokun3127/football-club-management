@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "训练攻略",
+  "usingComponents": {
+    "status-view": "/components/status-view/index"
+  },
+  "navigationStyle": "custom"
+}
