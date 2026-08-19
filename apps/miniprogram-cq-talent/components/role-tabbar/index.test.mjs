@@ -57,8 +57,8 @@ describe("role tabbar real-device icon contract", () => {
     expect(styles).toContain(".tabbar-icon-wrap { position: static; display: flex; align-items: center; justify-content: center; width: 32rpx; height: 32rpx;");
     expect(styles).toContain(".tabbar-icon { width: 32rpx; height: 32rpx; }");
     expect(styles).toContain(".tabbar--parent .tabbar-item.active { color: #a80f1b;");
-    expect(styles).toContain(".tabbar--parent .tabbar-item.active .tabbar-dot { top: 84rpx; left: 24rpx; width: 8rpx; height: 8rpx; margin-left: 0; border-radius: 999rpx; background: #a80f1b; }");
-    expect(styles).toContain(".tabbar--coach .tabbar-item.active .tabbar-dot { top: 84rpx; left: 24rpx; width: 8rpx; height: 8rpx; margin-left: 0; border-radius: 999rpx; background: var(--color-brand); }");
+    expect(styles).toContain(".tabbar--parent .tabbar-item.active .tabbar-dot { top: 84rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: #a80f1b; }");
+    expect(styles).toContain(".tabbar--coach .tabbar-item.active .tabbar-dot { top: 88rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: var(--color-brand); }");
     expect(styles).not.toContain(".tabbar-item.active .tabbar-icon-wrap { background: #fceeef; }");
     expect(styles).not.toContain(".tabbar-item.active .tabbar-dot { background: var(--color-brand); }");
   });
@@ -67,11 +67,19 @@ describe("role tabbar real-device icon contract", () => {
     expect(styles).toContain("height: 140rpx;");
     expect(styles).toContain("padding-bottom: 0;");
     expect(styles).not.toContain("padding-bottom: env(safe-area-inset-bottom);");
-    expect(styles).toContain(".tabbar-item { position: relative; display: flex; flex: 1; box-sizing: border-box; flex-direction: column; align-items: flex-start; justify-content: flex-start; height: 112rpx; min-width: 0; padding-top: 16rpx; padding-left: 12rpx;");
+    expect(styles).toContain(".tabbar-item { position: relative; display: flex; flex: 1; box-sizing: border-box; flex-direction: column; align-items: center; justify-content: flex-start; height: 112rpx; min-width: 0; padding-top: 16rpx;");
     expect(styles).toContain("width: 32rpx; height: 32rpx;");
     expect(styles).toContain(".tabbar-label { width: 100%; margin-top: 8rpx;");
-    expect(styles).toContain("line-height: 28rpx;");
-    expect(styles).toContain("top: 84rpx;");
+    expect(styles).toContain("line-height: 22rpx;");
+    expect(styles).toContain("text-align: center;");
+    expect(styles).toContain("top: 88rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx;");
+  });
+
+  it("uses the live Figma tab typography and inactive color", () => {
+    expect(styles).toContain("color: #8e97a6;");
+    expect(styles).toContain("font-family: \"Noto Sans SC\", sans-serif;");
+    expect(styles).toContain("font-weight: 400;");
+    expect(styles).not.toContain("font-weight: 650;");
   });
 
   it("supports an opt-in flowing layout without changing the default fixed tab bar", () => {
