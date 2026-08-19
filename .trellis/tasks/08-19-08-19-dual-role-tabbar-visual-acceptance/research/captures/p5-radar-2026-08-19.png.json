@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-08-19T00:25:40.453Z",
+  "route": "/pages/parent/radar/index",
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 3
+  },
+  "rawPng": {
+    "width": 375,
+    "height": 812,
+    "scaleX": 1,
+    "scaleY": 1
+  },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 51872,
+    "sha256": "f43fe2b6d5d6bec459a0e1805802a53a3535b5b888acdd445836345f17d54a8c"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot"
+}
