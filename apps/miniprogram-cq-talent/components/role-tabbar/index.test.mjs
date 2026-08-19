@@ -57,8 +57,8 @@ describe("role tabbar real-device icon contract", () => {
     expect(styles).toContain(".tabbar-icon-wrap { position: static; display: flex; align-items: center; justify-content: center; width: 32rpx; height: 32rpx;");
     expect(styles).toContain(".tabbar-icon { width: 32rpx; height: 32rpx; }");
     expect(styles).toContain(".tabbar--parent .tabbar-item.active { color: #a80f1b;");
-    expect(styles).toContain(".tabbar--parent .tabbar-item.active .tabbar-dot { top: 84rpx; left: 24rpx; width: 4rpx; height: 4rpx; margin-left: 0; border-radius: 999rpx; background: #a80f1b; }");
-    expect(styles).toContain(".tabbar--coach .tabbar-item.active .tabbar-dot { top: 84rpx; left: 24rpx; width: 4rpx; height: 4rpx; margin-left: 0; border-radius: 999rpx; background: var(--color-brand); }");
+    expect(styles).toContain(".tabbar--parent .tabbar-item.active .tabbar-dot { top: 84rpx; left: 24rpx; width: 8rpx; height: 8rpx; margin-left: 0; border-radius: 999rpx; background: #a80f1b; }");
+    expect(styles).toContain(".tabbar--coach .tabbar-item.active .tabbar-dot { top: 84rpx; left: 24rpx; width: 8rpx; height: 8rpx; margin-left: 0; border-radius: 999rpx; background: var(--color-brand); }");
     expect(styles).not.toContain(".tabbar-item.active .tabbar-icon-wrap { background: #fceeef; }");
     expect(styles).not.toContain(".tabbar-item.active .tabbar-dot { background: var(--color-brand); }");
   });
