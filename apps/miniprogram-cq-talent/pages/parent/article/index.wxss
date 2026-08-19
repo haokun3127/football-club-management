@@ -7,6 +7,12 @@
   padding: 32rpx 32rpx 64rpx;
 }
 
+.page-nav { height: 88rpx; box-sizing: content-box; display: flex; align-items: center; padding: 0 200rpx 0 32rpx; background: var(--color-card); }
+.page-nav__back, .page-nav__more { width: 48rpx; height: 48rpx; display: flex; align-items: center; justify-content: center; }
+.page-nav__back image, .page-nav__more image { width: 48rpx; height: 48rpx; }
+.page-nav__title { margin-left: 24rpx; flex: 1; font-size: 36rpx; font-weight: 700; color: var(--color-text); }
+.page-nav__more { font-size: 28rpx; letter-spacing: 4rpx; }
+
 .article-hero {
   background: var(--color-card);
   border-radius: 24rpx;
