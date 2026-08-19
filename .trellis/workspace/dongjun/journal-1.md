@@ -58,7 +58,9 @@ Added the coach daily/weekly task workbench, all-children family calendar, diffe
 
 ### Main Changes
 
-(Add details)
+- Enumerated all 38 `<role-tabbar>` consumers: 15 parent routes and 23 coach routes; every route appears in the archived parent/coach acceptance evidence tables with an online Figma node and a route-verified 375×812 capture.
+- Fixed C15 `pages/coach/assessment-entry`: retained the fixed TabBar and increased `.c15-body` bottom reservation from `48rpx` to `180rpx`, keeping “保存所有” above the 70px fixed shell on a long real-data form.
+- Added the regression assertion and fresh MCP evidence for C15's ready and scrolled-to-bottom states. No relevant mini-program code-spec layer exists, so the durable, route-specific safeguard is recorded in the task acceptance report rather than an unrelated API/domain specification.
 
 ### Git Commits
 
@@ -68,7 +70,10 @@ Added the coach daily/weekly task workbench, all-children family calendar, diffe
 
 ### Testing
 
-- [OK] (Add test results)
+- [OK] `npx --yes pnpm@10.33.0 --filter @football-club/miniprogram-cq-talent test -- pages/coach/assessment-entry/index.test.mjs` — 54 files / 340 tests passed after the red-green regression cycle.
+- [OK] `npx --yes pnpm@10.33.0 run check` — domain 19 tests, mini-program 340 tests, API 109 tests; all workspace typechecks passed.
+- [OK] `git diff --check` and scoped staged-diff checks passed.
+- [OK] WeChatIDE MCP route-verified 375×812 screenshot after `pageScrollTo(9999)` visibly shows the full “保存所有” button above the fixed TabBar.
 
 ### Status
 
@@ -812,6 +817,41 @@ Re-read Figma node 93:1262, route-confirmed and captured C16.3 at 375x812, align
 |------|---------|
 | `8ea70f0` | (see git log) |
 | `a04ee5c` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 23: Dual-role TabBar visual acceptance
+
+**Date**: 2026-08-19
+**Task**: Dual-role TabBar visual acceptance
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+Verified all 38 role-tabbar consumers against the current online Figma evidence inventory; repaired C15 assessment-entry bottom reservation, captured the real 375x812 scrolled result, ran the full quality gate, and archived the completed task.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `5ef08e3` | (see git log) |
+| `de899a8` | (see git log) |
 
 ### Testing
 
