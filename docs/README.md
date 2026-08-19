@@ -4,7 +4,8 @@
 
 ## 从这里开始
 
-- [总交接文档 HANDOFF.md](../HANDOFF.md)：**接手第一篇**（2026-08-13，→ Kimi）。当前任务、待办优先级、环境接入、已知坑和提交纪律。
+- [Kimi 当前交接 HANDOFF-KIMI-2026-08-19.md](../HANDOFF-KIMI-2026-08-19.md)：**当前接手第一篇**（2026-08-19）。工作区状态、在线 Figma 权威、真实截图 SOP、生产边界、未完成事项和未提交改动白名单。
+- [历史总交接 HANDOFF.md](../HANDOFF.md)：2026-08-13 历史全量背景；若与当前交接冲突，以当前交接、`docs/current/` 和最新进度记录为准。
 - [当前项目进度](current/progress.md)：正在推进的工作、已知阻塞和真实验证状态。
 - [当前架构](current/architecture.md)：服务、数据和模块边界。
 - [API 契约](current/api-contract.md)：对外/客户端接口约定。

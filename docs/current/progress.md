@@ -1,5 +1,19 @@
 # 核心演示闭环 · 进度跟踪
 
+## 2026-08-19 P8 最近文章可点开 + 文章详情页（新页面）
+
+- 用户反馈：最近文章应可点击打开。新增 `pages/parent/article/` 详情页（导航+标题卡+正文分段，段落 TS 预计算）；`ContentArticle` 增加可选 `body` 字段（契约响应本就 permissive，无需改 schema）；两个种子文件为 4 篇文章补真实正文；内容中心文章卡 bindtap → 详情页。
+- 部署链路发现并修复一个真实缺陷：`docker-compose.yml` 的 data-init `chown -R` 会被 0700 的 `secure-backups`（2026-08-18 安全导入产物）卡住导致整个部署失败 → 改 `find -prune` 跳过，compose 修复已随部署同步到服务器。
+- 部署：生产已升级到 `dee875d`（构建+重建+health 200）；生产读回确认 4 篇文章均带正文（body 长度 111–133）。
+- 验证：门禁 exit=0（domain 19 / miniprogram 352 / api 110）；WeChatIDE MCP 真实 375×812 截图 `C:\Users\ASUS\AppData\Local\Temp\p8-article-detail-2.png` 确认导航/标题卡/三段正文正常。首轮截图曾暴露详情页缺 page-nav 样式（巨型箭头）与生产无正文两个缺陷，均已修复并复验。
+- 注意：文章详情页无对应在线 Figma 画板（P8 仅列表），详情页版式为按现有页面规范的保守补全。
+
+## 2026-08-19 P8 内容中心去除重复分类胶囊（用户裁决）
+
+- 用户裁决：内容中心顶部「分类导航」胶囊与下方「快速入口」功能重复（点击效果一致），移除胶囊区。**在线 Figma `93:388` 已同步删除 Category Section（196:1068）并将下方三区块上移 87px，回读截图确认无残留空白**；离线缓存 `docs/design/reference/figma/p8-content-center.png` 已用新在线截图覆盖。
+- 代码：`pages/parent/content` 删除 pills UI 与 `selectCategory/applyFilter/openFeatured`，文章列表恒展示全部；「训练攻略」快捷卡由分类过滤改为 `pageScrollTo` 滚动至文章列表；`types/wechat.d.ts` 补 `pageScrollTo` 声明。提交 `cc9ba99`（未推送，本地 dev 现超前 origin/dev 3 个提交）。
+- 验证：门禁 exit=0（domain 19 / miniprogram 347 / api 110 全过）；WeChatIDE MCP 真实 375×812 截图 `C:\Users\ASUS\AppData\Local\Temp\p8-content-nopills.png` 确认无胶囊区、特色大卡居首、快速入口与最近文章正常。注意：同次全量门禁曾见两个 SQLite 重开持久化测试超时（10s/15s 预算），隔离重跑 16/16 通过，判定为并行负载抖动，非回归。
+
 ## 2026-08-18 七个独立双角色真机演示账号（已生产导入，真机待验）
 
 - 安全受控导入由 3 个固定槽位扩展为 7 个：每个运行时手机号均对应同一 club 内独立的 `parent + coach` 会籍、家长档案、教练档案与单独 8 人球队。家长端严格只投影其中 2 名已绑定学员；教练端只可查看本账号所属的完整 8 人阵容，账号之间不共享家长绑定、球队、日程或业务记录。
@@ -1184,3 +1198,10 @@
 - 教练端 C1 头像、C2 结束训练（真实数据为待开始，按钮未出现）、C3 保存、C4 提交、C7 分享、C11 新增、C12 提交、C14 导出、C15 保存草稿、C16 设置均与最新在线稿保持安全间距；C5/C5.1/C6/C6.1/C8/C9/C10/C10.1/C13/C16.1–C16.4 没有右侧文字动作，不属于同一挤压模式。
 - 家长端已完成的 P2/P3/P4/P6/P7/P7.1/P8/场地/P8.2/P9/P9.1 截图审计也未发现同类碰撞。平台胶囊坐标为 `left=281px,width=87px`，`resolveMenuInset()` 为 `102px`，与在线稿固定 `100px` 右预留相容。
 - 本轮没有继续改代码或在线 Figma：P5 是重复副标题与动态右预留叠加造成的页面特例，其他页面未发现需要跟随修改的真实缺陷。详细证据见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-19/coach-header-action-audit.md`。
+
+## 2026-08-19 Kimi 交接文档更新
+
+- 新增仓库根交接入口 `HANDOFF-KIMI-2026-08-19.md`，统一记录当前 `dev` 分支 HEAD `6b48372`、比 `origin/dev` 超前的两个提交、在线 Figma 根节点 `4:6/4:7`、真实 `375×812` WeChatIDE MCP 截图 SOP、生产 API 边界、七槽位双角色测试数据边界和未提交改动白名单。
+- `docs/README.md` 已将该文件列为当前接手第一篇；旧 `HANDOFF.md`、`HANDOFF-2026-08-14.md`、`HANDOFF-NEXT.md` 保留为历史/增量材料，不再作为唯一当前事实源。
+- `docs/current/figma-source-of-truth.md` 已更新为 2026-08-19，并补充 P5 顶栏及 C1/C2/C3/C4/C11/C12/C14/C15/C16 审计记录。
+- 本批只更新交接和当前事实文档，没有修改业务代码、生产数据库或微信开发者工具状态；当前 Trellis 任务 `.trellis/tasks/08-19-online-figma-tabbar-reaudit` 仍为 `in_progress`，不能把本次文档整理写成该任务已归档。
