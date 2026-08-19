@@ -1,7 +1,7 @@
 <view class="c2">
   <view class="c2-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="c2-nav__left" bindtap="goBack">
-      <view class="c2-nav__back">‹</view>
+      <image class="c2-nav__back" src="/assets/icons/chevron-left.svg" mode="aspectFit" />
       <view class="c2-nav__title">{{eventTypeLabel}}工作台</view>
     </view>
     <view wx:if="{{inProgress}}" class="c2-nav__finish {{finishing ? 'c2-nav__finish--disabled' : ''}}" bindtap="finishEvent">结束训练</view>

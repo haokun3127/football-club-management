@@ -259,6 +259,14 @@ describe("coach activity workbench", () => {
     expect(stylesheet).not.toContain('.action-tile--match');
   });
 
+  it("matches the live Figma C2 top navigation geometry", () => {
+    expect(template).toContain('class="c2-nav__back" src="/assets/icons/chevron-left.svg"');
+    expect(stylesheet).toMatch(/\.c2-nav__left\s*\{[^}]*gap:\s*0/s);
+    expect(stylesheet).toMatch(/\.c2-nav__back\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
+    expect(stylesheet).toMatch(/\.c2-nav__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
+    expect(stylesheet).toMatch(/\.c2-nav__finish\s*\{[^}]*font-size:\s*30rpx/s);
+  });
+
   it("relaunches only a supported in-flow coach root route", () => {
     const page = createPageInstance();
     page.openCoachRoot({ currentTarget: { dataset: { path: "/pages/coach/training/index" } } });
