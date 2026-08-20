@@ -1,5 +1,5 @@
 <view class="venues-page">
-  <view class="venues-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="venues-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="venues-nav__title">场地信息</view><view class="venues-nav__action venues-nav__action--disabled" aria-disabled="true"><image src="/assets/icons/search.svg" mode="aspectFit" /></view></view>
+  <view class="venues-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="venues-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="venues-nav__title">场地信息</view><view class="venues-nav__action" bindtap="toggleSearch" aria-label="搜索场地"><image src="/assets/icons/search.svg" mode="aspectFit" /></view></view>
   <view class="venues-page__body">
     <status-view
       state="{{state}}"
@@ -9,6 +9,9 @@
       bindaction="loadVenues"
     />
     <block wx:if="{{state === 'ready'}}">
+      <view wx:if="{{searchOpen}}" class="search-bar">
+        <input class="search-bar__input" value="{{searchQuery}}" placeholder="搜索场地名称或地址" bindinput="onSearchInput" focus="{{true}}" />
+      </view>
       <scroll-view scroll-x class="filters" enhanced show-scrollbar="{{false}}">
         <view class="filters__inner">
           <view

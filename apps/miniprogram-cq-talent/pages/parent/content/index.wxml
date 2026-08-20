@@ -1,7 +1,7 @@
 <view class="content-page">
   <view class="page-nav page-nav--plain" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="page-nav__title">内容中心</view>
-    <view class="page-nav__action page-nav__action--disabled" aria-disabled="true"><image class="page-nav__action-icon" src="/assets/icons/search.svg" mode="aspectFit" /></view>
+    <view class="page-nav__action" bindtap="toggleSearch" aria-label="搜索文章"><image class="page-nav__action-icon" src="/assets/icons/search.svg" mode="aspectFit" /></view>
   </view>
   <view class="content-page__body">
     <status-view
@@ -40,6 +40,9 @@
 
       <view class="section-title">最近文章</view>
       <view class="article-list">
+        <view wx:if="{{searchOpen}}" class="search-bar">
+          <input class="search-bar__input" value="{{searchQuery}}" placeholder="搜索文章标题或内容" bindinput="onSearchInput" focus="{{true}}" />
+        </view>
         <view wx:if="{{hasVisibleArticles}}">
           <view wx:for="{{visibleArticles}}" wx:key="id" class="article-card" data-id="{{item.id}}" bindtap="openArticle">
             <view class="article-card__accent" style="background: {{item.accent}}"></view>

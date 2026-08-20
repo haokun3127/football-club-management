@@ -29,6 +29,8 @@ interface PageData {
   visibleArticles: ArticleView[];
   hasVisibleArticles: boolean;
   emptyMessage: string;
+  searchOpen: boolean;
+  searchQuery: string;
 }
 
 const QUICK_LINKS: QuickLink[] = [
@@ -50,6 +52,30 @@ Page<PageData>({
     visibleArticles: [],
     hasVisibleArticles: false,
     emptyMessage: "暂无可展示的内容",
+    searchOpen: false,
+    searchQuery: "",
+  },
+  toggleSearch() {
+    const searchOpen = !this.data.searchOpen;
+    const searchQuery = searchOpen ? this.data.searchQuery : "";
+    this.applySearch(searchQuery);
+    this.setData({ searchOpen, searchQuery });
+  },
+  onSearchInput(event: { detail: { value: string } }) {
+    const searchQuery = event.detail.value;
+    this.applySearch(searchQuery);
+    this.setData({ searchQuery });
+  },
+  applySearch(searchQuery: string) {
+    const keyword = searchQuery.trim();
+    const visibleArticles = keyword
+      ? this.data.articles.filter((article: ArticleView) => article.title.includes(keyword) || article.subtitle.includes(keyword))
+      : this.data.articles;
+    this.setData({
+      visibleArticles,
+      hasVisibleArticles: visibleArticles.length > 0,
+      emptyMessage: this.data.articles.length > 0 ? "没有匹配的文章" : "暂无可展示的内容",
+    });
   },
   onLoad() {
     requireRole("parent");

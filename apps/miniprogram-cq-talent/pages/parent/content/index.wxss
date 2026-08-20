@@ -177,3 +177,6 @@
   font-size: 26rpx;
   color: var(--color-text-secondary);
 }
+
+.search-bar { margin-bottom: 24rpx; }
+.search-bar__input { box-sizing: border-box; width: 100%; height: 72rpx; padding: 0 28rpx; border-radius: 16rpx; background: #f3f4f6; font-size: 26rpx; }

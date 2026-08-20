@@ -20,6 +20,8 @@ interface PageData {
   visibleVenues: VenueView[];
   hasVisibleVenues: boolean;
   emptyMessage: string;
+  searchOpen: boolean;
+  searchQuery: string;
 }
 
 const FILTERS = [
@@ -42,9 +44,31 @@ Page<PageData>({
     visibleVenues: [],
     hasVisibleVenues: false,
     emptyMessage: "暂无可展示的场地",
+    searchOpen: false,
+    searchQuery: "",
   },
   goBack() {
     wx.navigateBack();
+  },
+  toggleSearch() {
+    const searchOpen = !this.data.searchOpen;
+    const searchQuery = searchOpen ? this.data.searchQuery : "";
+    this.applyFilters(this.data.activeFilter, searchQuery);
+    this.setData({ searchOpen, searchQuery });
+  },
+  onSearchInput(event: { detail: { value: string } }) {
+    const searchQuery = event.detail.value;
+    this.applyFilters(this.data.activeFilter, searchQuery);
+    this.setData({ searchQuery });
+  },
+  applyFilters(activeFilter: string, searchQuery: string) {
+    const visibleVenues = filterVenues(this.data.venues, activeFilter, searchQuery);
+    this.setData({
+      activeFilter,
+      visibleVenues,
+      hasVisibleVenues: visibleVenues.length > 0,
+      emptyMessage: this.data.venues.length > 0 ? (searchQuery ? "没有匹配的场地" : "当前分类暂无场地") : "暂无可展示的场地",
+    });
   },
   onLoad() {
     requireRole("parent");
@@ -79,13 +103,7 @@ Page<PageData>({
     const activeFilter = FILTERS.some((filter) => filter.value === event.currentTarget.dataset.value)
       ? event.currentTarget.dataset.value
       : "all";
-    const visibleVenues = filterVenues(this.data.venues, activeFilter);
-    this.setData({
-      activeFilter,
-      visibleVenues,
-      hasVisibleVenues: visibleVenues.length > 0,
-      emptyMessage: this.data.venues.length > 0 ? "当前分类暂无场地" : "暂无可展示的场地",
-    });
+    this.applyFilters(activeFilter, this.data.searchQuery);
   },
   navigate(event: { currentTarget: { dataset: { id: string } } }) {
     const venue = this.data.venues.find((item: VenueView) => item.id === event.currentTarget.dataset.id);
@@ -118,8 +136,11 @@ function presentVenues(venues: VenueInfo[]): VenueView[] {
   }));
 }
 
-function filterVenues(venues: VenueView[], filter: string): VenueView[] {
-  return filter === "all" ? venues : venues.filter((venue) => venue.tags.includes(filter));
+function filterVenues(venues: VenueView[], filter: string, query = ""): VenueView[] {
+  const byType = filter === "all" ? venues : venues.filter((venue) => venue.tags.includes(filter));
+  const keyword = query.trim();
+  if (!keyword) return byType;
+  return byType.filter((venue) => venue.name.includes(keyword) || venue.address.includes(keyword));
 }
 
 function hasRealCoordinates(latitude: number, longitude: number): boolean {
