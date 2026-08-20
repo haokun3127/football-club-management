@@ -6,22 +6,6 @@
     </view>
     <view wx:if="{{inProgress}}" class="c2-nav__finish {{finishing ? 'c2-nav__finish--disabled' : ''}}" bindtap="finishEvent">结束训练</view>
   </view>
-  <view class="c2-route-tabs">
-    <view class="c2-route-tab c2-route-tab--active" data-path="/pages/coach/schedule/index" bindtap="openCoachRoot">
-      <image class="c2-route-tab__icon" src="/assets/icons/tab-calendar-active.png" mode="aspectFit" />
-      <view class="c2-route-tab__label">日程</view>
-      <view class="c2-route-tab__dot"></view>
-    </view>
-    <view class="c2-route-tab" data-path="/pages/coach/training/index" bindtap="openCoachRoot">
-      <image class="c2-route-tab__icon" src="/assets/icons/tab-training-inactive.png" mode="aspectFit" />
-      <view class="c2-route-tab__label">训练管理</view>
-    </view>
-    <view class="c2-route-tab" data-path="/pages/coach/me/index" bindtap="openCoachRoot">
-      <image class="c2-route-tab__icon" src="/assets/icons/tab-user-inactive.png" mode="aspectFit" />
-      <view class="c2-route-tab__label">我的</view>
-    </view>
-  </view>
-
   <view class="c2-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载活动' : state === 'empty' ? '暂无工作台数据' : '活动读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
@@ -87,4 +71,5 @@
     </view>
     </block>
   </view>
+  <role-tabbar role="coach" active="schedule" />
 </view>

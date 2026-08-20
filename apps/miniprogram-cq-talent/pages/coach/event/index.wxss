@@ -4,14 +4,8 @@
 .c2-nav__left { display: flex; align-items: center; gap: 0; min-width: 0; }
 .c2-nav__back { flex: 0 0 auto; width: 48rpx; height: 48rpx; }
 .c2-nav__title { overflow: hidden; color: #202124; font-size: 36rpx; font-weight: 700; line-height: 44rpx; text-overflow: ellipsis; white-space: nowrap; }
-.c2-route-tabs { display: flex; box-sizing: border-box; height: 104rpx; background: #ffffff; border-bottom: 1rpx solid #f0f1f3; }
-.c2-route-tab { position: relative; display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4rpx; padding-top: 6rpx; color: #8e97a6; }
-.c2-route-tab--active { color: #a80f1b; }
-.c2-route-tab__icon { width: 44rpx; height: 44rpx; }
-.c2-route-tab__label { max-width: 100%; overflow: hidden; font-size: 20rpx; line-height: 28rpx; text-overflow: ellipsis; white-space: nowrap; }
-.c2-route-tab__dot { width: 8rpx; height: 8rpx; margin-top: 2rpx; border-radius: 50%; background: #a80f1b; }
 
-.c2-body { display: flex; flex-direction: column; gap: 24rpx; padding: 16rpx 44rpx calc(64rpx + env(safe-area-inset-bottom)); }
+.c2-body { display: flex; flex-direction: column; gap: 24rpx; padding: 16rpx 44rpx calc(180rpx + env(safe-area-inset-bottom)); }
 .shero { display: flex; flex-direction: column; gap: 8rpx; min-height: 320rpx; padding: 28rpx 32rpx; box-sizing: border-box; border-radius: 32rpx; background: #07111f; color: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0,0,0,.08); }
 .shero__top { display: flex; justify-content: space-between; color: rgba(255,255,255,.7); font-size: 22rpx; }
 .shero__main { display: flex; flex-direction: column; gap: 8rpx; min-width: 0; }

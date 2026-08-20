@@ -9,12 +9,6 @@ const timerHost = globalThis as unknown as TimerHost;
 
 type WorkbenchAction = "attendance" | "lesson" | "match" | "tactical" | "training" | "assessment" | "change";
 
-const coachRootRoutes = new Set([
-  "/pages/coach/schedule/index",
-  "/pages/coach/training/index",
-  "/pages/coach/me/index",
-]);
-
 type ActionCard = {
   id: WorkbenchAction;
   label: string;
@@ -180,11 +174,6 @@ Page({
   },
   openAttendance() {
     if (this.data.eventId) openPage(`/pages/coach/attendance/index?id=${this.data.eventId}`);
-  },
-  openCoachRoot(event: { currentTarget?: { dataset?: { path?: string } } }) {
-    const path = event.currentTarget?.dataset?.path;
-    if (!path || !coachRootRoutes.has(path)) return;
-    wx.reLaunch({ url: path });
   },
   retry() {
     this.load(this.data.eventId);

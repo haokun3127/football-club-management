@@ -242,16 +242,11 @@ describe("coach activity workbench", () => {
     expect(stylesheet).toMatch(/\.shero__pill\s*\{[^}]*border-radius:\s*999rpx/s);
   });
 
-  it("uses the C2 in-flow coach tabs and neutral icon-led action tiles", () => {
-    expect(template).toContain('class="c2-route-tabs"');
-    expect(template).toContain('data-path="/pages/coach/schedule/index"');
-    expect(template).toContain('data-path="/pages/coach/training/index"');
-    expect(template).toContain('data-path="/pages/coach/me/index"');
-    expect(template).toContain('bindtap="openCoachRoot"');
+  it("uses the coach bottom tabbar (Figma 2026-08-20: tabs moved to page bottom) and neutral icon-led action tiles", () => {
+    expect(template).not.toContain('class="c2-route-tabs"');
+    expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
+    expect(pageConfig).toContain('"role-tabbar"');
     expect(template).toContain('src="{{item.icon}}"');
-    expect(template).not.toContain('<role-tabbar role="coach" active="schedule" />');
-    expect(pageConfig).not.toContain('"role-tabbar"');
-    expect(stylesheet).toMatch(/\.c2-route-tabs\s*\{[^}]*height:\s*104rpx/s);
     expect(stylesheet).toMatch(/\.action-tile\s*\{[^}]*min-height:\s*200rpx/s);
     expect(stylesheet).not.toContain('.action-tile--primary');
     expect(stylesheet).not.toContain('.action-tile--match');
@@ -263,13 +258,5 @@ describe("coach activity workbench", () => {
     expect(stylesheet).toMatch(/\.c2-nav__back\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c2-nav__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
     expect(stylesheet).toMatch(/\.c2-nav__finish\s*\{[^}]*font-size:\s*30rpx/s);
-  });
-
-  it("relaunches only a supported in-flow coach root route", () => {
-    const page = createPageInstance();
-    page.openCoachRoot({ currentTarget: { dataset: { path: "/pages/coach/training/index" } } });
-    expect(globalThis.wx.reLaunch).toHaveBeenCalledWith({ url: "/pages/coach/training/index" });
-    page.openCoachRoot({ currentTarget: { dataset: { path: "/pages/parent/schedule/index" } } });
-    expect(globalThis.wx.reLaunch).toHaveBeenCalledTimes(1);
   });
 });
