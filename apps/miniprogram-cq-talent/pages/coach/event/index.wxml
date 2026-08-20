@@ -29,7 +29,7 @@
       <view wx:if="{{eventView}}" class="shero">
         <view class="shero__top"><view>{{eventView.heroDateLabel}}</view><view>重庆天才</view></view>
         <view class="shero__main">
-          <view class="shero__big">{{inProgress ? countdownText : eventView.startTime}}</view>
+          <view class="shero__big"><image wx:if="{{inProgress}}" class="shero__big-icon" src="/assets/icons/clock-white.svg" mode="aspectFit" />{{inProgress ? countdownText : eventView.startTime}}</view>
           <view class="shero__title">{{eventView.title}}</view>
         </view>
         <view wx:if="{{eventView.heroMeta}}" class="shero__meta">{{eventView.heroMeta}}</view>
