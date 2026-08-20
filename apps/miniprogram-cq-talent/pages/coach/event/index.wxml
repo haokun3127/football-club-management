@@ -58,7 +58,7 @@
       </view>
     </view>
 
-    <view wx:if="{{hasTraining}}" class="workbench-card">
+    <view wx:if="{{hasTraining && !hasContentProgress}}" class="workbench-card">
       <view class="section-title">训练内容</view>
       <view wx:for="{{trainingRows}}" wx:key="label" class="field-row">
         <view class="label">{{item.label}}</view>
