@@ -85,24 +85,6 @@ Page<BoardPageData>({
   goBack() {
     wx.navigateBack({ delta: 1 });
   },
-  shareBoard() {
-    wx.showToast({ title: "分享功能暂未开放", icon: "none" });
-  },
-  onToolbarTap(event: { currentTarget: { dataset: { action?: string } } }) {
-    const action = event.currentTarget.dataset.action || "";
-    if (action === "share") {
-      this.shareBoard();
-      return;
-    }
-    if (action === "undo" || action === "clear") {
-      if (this.data.readOnly) return;
-      this.resetBoard();
-      return;
-    }
-    if (action === "draw" || action === "move") {
-      wx.showToast({ title: "该工具暂未开放", icon: "none" });
-    }
-  },
   async load(eventId?: string) {
     const currentEventId = eventId ?? this.data.eventId;
     if (!currentEventId) {

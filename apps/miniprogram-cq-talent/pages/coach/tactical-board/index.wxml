@@ -6,9 +6,6 @@
       </view>
       <view class="c7-header__title">战术板</view>
     </view>
-    <view class="c7-header__share" bindtap="shareBoard" aria-label="分享">
-      <image src="/assets/icons/c7-share.svg" mode="aspectFit" />
-    </view>
   </view>
 
   <view class="c7-content">
@@ -55,28 +52,6 @@
     </block>
   </view>
 
-  <view wx:if="{{state === 'ready'}}" class="c7-toolbar">
-    <view class="c7-toolbar__item c7-toolbar__item--active" data-action="draw" bindtap="onToolbarTap">
-      <image src="/assets/icons/c7-edit.svg" mode="aspectFit" />
-      <text>绘制</text>
-    </view>
-    <view class="c7-toolbar__item" data-action="undo" bindtap="onToolbarTap">
-      <image src="/assets/icons/c7-undo.svg" mode="aspectFit" />
-      <text>撤销</text>
-    </view>
-    <view class="c7-toolbar__item" data-action="move" bindtap="onToolbarTap">
-      <image src="/assets/icons/c7-move.svg" mode="aspectFit" />
-      <text>移动</text>
-    </view>
-    <view class="c7-toolbar__item" data-action="clear" bindtap="onToolbarTap">
-      <image src="/assets/icons/c7-trash.svg" mode="aspectFit" />
-      <text>清除</text>
-    </view>
-    <view class="c7-toolbar__item" data-action="share" bindtap="onToolbarTap">
-      <image src="/assets/icons/c7-share-muted.svg" mode="aspectFit" />
-      <text>分享</text>
-    </view>
-  </view>
   <view wx:if="{{state === 'ready'}}" class="c7-record {{dirty ? '' : 'c7-record--disabled'}}" bindtap="saveBoard" aria-label="保存战术板">
     <image src="/assets/icons/c7-video.svg" mode="aspectFit" />
   </view>

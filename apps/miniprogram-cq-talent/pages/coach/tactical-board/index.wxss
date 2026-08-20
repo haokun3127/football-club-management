@@ -68,10 +68,5 @@
 .c7-formation-label { display: flex; align-items: center; justify-content: center; height: 48rpx; color: #667085; font-size: 28rpx; line-height: 36rpx; text-align: center; }
 .c7-save-error { margin: 12rpx 32rpx 0; padding: 16rpx 20rpx; border-radius: 16rpx; background: #fff1f0; color: #a80f1b; font-size: 24rpx; line-height: 34rpx; }
 
-.c7-toolbar { position: fixed; right: 0; bottom: 140rpx; left: 0; z-index: 1000; display: flex; box-sizing: border-box; align-items: center; justify-content: space-between; height: 160rpx; padding: 0 48rpx; border-radius: 48rpx 48rpx 0 0; background: #ffffff; box-shadow: 0 -8rpx 24rpx rgba(0,0,0,.05); }
-.c7-toolbar__item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8rpx; min-width: 72rpx; color: #667085; font-size: 22rpx; line-height: 28rpx; }
-.c7-toolbar__item image { display: block; width: 48rpx; height: 48rpx; }
-.c7-toolbar__item--active { color: #a80f1b; font-weight: 600; }
-.c7-record { position: fixed; right: 32rpx; bottom: 140rpx; z-index: 1001; display: flex; align-items: center; justify-content: center; width: 88rpx; height: 88rpx; border-radius: 50%; background: #a80f1b; box-shadow: 0 8rpx 20rpx rgba(168,15,27,.25); }
 .c7-record image { display: block; width: 40rpx; height: 40rpx; }
 .c7-record--disabled { opacity: .92; }

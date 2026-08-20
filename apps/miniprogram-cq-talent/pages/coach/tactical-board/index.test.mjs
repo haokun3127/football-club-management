@@ -215,11 +215,12 @@ describe("C7 coach tactical board MVP", () => {
     expect(template).toContain('>战术板<');
     expect(template).toContain('src="/assets/icons/chevron-left.svg"');
     expect(template).not.toContain('src="/assets/icons/c11-arrow-left.svg"');
-    expect(template).toContain('class="c7-header__share"');
+    expect(template).not.toContain('class="c7-header__share"');
     expect(template).toContain('class="c7-pitch__circle c7-pitch__circle--top"');
     expect(template).toContain('class="c7-pitch__circle c7-pitch__circle--middle"');
     expect(template).toContain('class="c7-pitch__circle c7-pitch__circle--bottom"');
-    expect(template).toContain('class="c7-toolbar"');
+    expect(template).not.toContain('class="c7-toolbar"');
+    expect(template).not.toContain("暂未开放");
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
     expect(template).not.toContain('c7-player__name');
     expect(template).not.toContain('c7-player__position');
@@ -235,7 +236,6 @@ describe("C7 coach tactical board MVP", () => {
     expect(stylesheet).toMatch(/\.c7-header__left\s*\{[^}]*gap:\s*0/s);
     expect(stylesheet).toMatch(/\.c7-header__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
     expect(stylesheet).toMatch(/\.c7-pitch\s*\{[^}]*width:\s*686rpx[^}]*height:\s*760rpx[^}]*background:\s*#1a1a2e/s);
-    expect(stylesheet).toMatch(/\.c7-toolbar\s*\{[^}]*position:\s*fixed[^}]*bottom:\s*140rpx/s);
     expect(stylesheet).toMatch(/\.c7-player\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c7-player__badge\s*\{[^}]*width:\s*100%[^}]*height:\s*100%/s);
     expect(controller).toContain("this.data.pitchWidth, 20");
