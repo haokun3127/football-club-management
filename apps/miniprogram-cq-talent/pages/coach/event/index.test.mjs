@@ -15,6 +15,7 @@ vi.mock("../../../utils/presentation", () => ({
   activityTypeLabel: (type) => ({ training: "Training", match: "Match" }[type] ?? "Activity"),
   formatCalendarDate: (value) => String(value).slice(0, 10),
   formatShortDate: (value) => String(value).slice(5, 10).replace("-", "月") + "日",
+  formatTimeOnly: (value) => String(value).slice(11, 16),
   formatTimeRange: () => "09:00-10:00",
   resolveMenuInset: () => 0,
   resolveNavInset: () => 0,
@@ -222,27 +223,23 @@ describe("coach activity workbench", () => {
     expect(template).toContain('wx:if="{{inProgress}}"');
     expect(template).toContain('bindtap="finishEvent"');
     expect(template).toContain("结束训练");
-    expect(template).toContain('wx:if="{{countdownText}}"');
+    expect(template).toContain("{{inProgress ? countdownText : eventView.startTime}}");
     expect(template).not.toContain("18/20");
     expect(template).not.toContain("凤凰山");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 
-  it("keeps a long real activity title inside the session header without covering its status", () => {
-    expect(template).toContain('class="shero__content"');
-    expect(template).toContain('class="shero__status"');
-    expect(stylesheet).toMatch(/\.shero__content\s*\{[^}]*min-width:\s*0[^}]*flex:\s*1/s);
-    expect(stylesheet).toMatch(/\.shero__status\s*\{[^}]*flex:\s*0\s+0\s+auto/s);
-  });
-
-  it("uses the refreshed C2 session header hierarchy while keeping every hero field API-backed", () => {
+  it("uses the C1-style hero hierarchy with API-backed fields only", () => {
+    expect(template).toContain('class="shero__top"');
+    expect(template).toContain('class="shero__big"');
     expect(template).toContain('class="shero__title"');
-    expect(template).toContain('class="shero__session-meta"');
-    expect(template).toContain("{{eventView.sessionMeta}}");
-    expect(template).not.toContain('class="shero__eyebrow"');
-    expect(stylesheet).toMatch(/\.shero\s*\{[^}]*min-height:\s*378rpx/s);
-    expect(stylesheet).toMatch(/\.shero__countdown\s*\{[^}]*font-size:\s*104rpx/s);
-    expect(stylesheet).toMatch(/\.shero__countdown-icon\s*\{[^}]*width:\s*40rpx[^}]*height:\s*40rpx/s);
+    expect(template).toContain('class="shero__pills"');
+    expect(template).toContain("{{eventView.heroDateLabel}}");
+    expect(template).toContain("{{eventView.heroMeta}}");
+    expect(template).toContain("{{eventView.statusLabel}}");
+    expect(stylesheet).toMatch(/\.shero\s*\{[^}]*min-height:\s*360rpx/s);
+    expect(stylesheet).toMatch(/\.shero__big\s*\{[^}]*font-size:\s*70rpx/s);
+    expect(stylesheet).toMatch(/\.shero__pill\s*\{[^}]*border-radius:\s*999rpx/s);
   });
 
   it("uses the C2 in-flow coach tabs and neutral icon-led action tiles", () => {

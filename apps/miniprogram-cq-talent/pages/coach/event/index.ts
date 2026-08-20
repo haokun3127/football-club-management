@@ -1,7 +1,7 @@
 import { finishCoachEvent, getCoachWorkbench } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import { activityStatus, activityTypeLabel, formatShortDate, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import { activityStatus, activityTypeLabel, formatCalendarDate, formatShortDate, formatTimeOnly, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
 
 type TimerHost = { setInterval: (handler: () => void, timeout: number) => number; clearInterval: (id: number) => void };
@@ -36,6 +36,9 @@ type EventView = {
   hasTime: boolean;
   sessionTeam: string;
   sessionMeta: string;
+  heroDateLabel: string;
+  startTime: string;
+  heroMeta: string;
 };
 
 Page({
@@ -248,6 +251,9 @@ function presentEvent(workbench: CoachWorkbench): EventView {
     hasTime,
     sessionTeam,
     sessionMeta,
+    heroDateLabel: formatCalendarDate(workbench.event.startsAt),
+    startTime: formatTimeOnly(workbench.event.startsAt),
+    heroMeta: [sessionTeam, workbench.event.venue || ""].filter(Boolean).join(" · "),
   };
 }
 

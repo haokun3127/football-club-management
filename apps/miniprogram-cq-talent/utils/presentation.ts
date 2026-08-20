@@ -56,6 +56,10 @@ export function formatTimeRange(startsAt?: string, endsAt?: string) {
   return end ? `${start}–${end}` : start;
 }
 
+export function formatTimeOnly(value?: string) {
+  return timePart(value) || "时间待确认";
+}
+
 export function childNames(event: ScheduleEvent) {
   const names = event.children?.map((child) => child.name).filter(Boolean) ?? [];
   if (names.length) return names.join("、");
