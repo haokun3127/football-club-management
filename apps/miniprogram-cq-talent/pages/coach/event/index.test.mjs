@@ -118,8 +118,8 @@ describe("coach activity workbench", () => {
       event: {
         ...trainingWorkbench.event,
         status: "scheduled",
-        startsAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-        endsAt: new Date(Date.now() + 42 * 60 * 1000).toISOString(),
+        startsAt: new Date(Date.now() + 8 * 60 * 60 * 1000 - 10 * 60 * 1000).toISOString(),
+        endsAt: new Date(Date.now() + 8 * 60 * 60 * 1000 + 42 * 60 * 1000).toISOString(),
       },
       roster: [{ studentId: "student-1", name: "Athlete One", status: "present" }],
     });
@@ -139,8 +139,8 @@ describe("coach activity workbench", () => {
       event: {
         ...trainingWorkbench.event,
         status: "scheduled",
-        startsAt: new Date(now - 25 * 60 * 1000).toISOString(),
-        endsAt: new Date(now + 35 * 60 * 1000).toISOString(),
+        startsAt: new Date(now + 8 * 60 * 60 * 1000 - 25 * 60 * 1000).toISOString(),
+        endsAt: new Date(now + 8 * 60 * 60 * 1000 + 35 * 60 * 1000).toISOString(),
       },
       selectedTrainingProjects: [
         { id: "p1", name: "热身", metricIds: [], tags: [], durationMinutes: 20 },
@@ -163,8 +163,8 @@ describe("coach activity workbench", () => {
       event: {
         ...trainingWorkbench.event,
         status: "completed",
-        startsAt: new Date(now - 90 * 60 * 1000).toISOString(),
-        endsAt: new Date(now - 30 * 60 * 1000).toISOString(),
+        startsAt: new Date(now + 8 * 60 * 60 * 1000 - 90 * 60 * 1000).toISOString(),
+        endsAt: new Date(now + 8 * 60 * 60 * 1000 - 30 * 60 * 1000).toISOString(),
       },
       selectedTrainingProjects: [
         { id: "p1", name: "热身", metricIds: [], tags: [], durationMinutes: 20 },

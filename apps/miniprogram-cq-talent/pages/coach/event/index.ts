@@ -197,7 +197,7 @@ Page({
       timerHost.clearInterval(this.countdownTimer);
       this.countdownTimer = null;
     }
-    const startMs = Date.parse(startsAt ?? "");
+    const startMs = parseEventTime(startsAt);
     if (!inProgress || !Number.isFinite(startMs)) {
       if (this.data.countdownText) this.setData({ countdownText: "" });
       return;
@@ -271,8 +271,8 @@ function buildContentProgress(workbench: CoachWorkbench, now: number): ContentPr
   if (workbench.event.status === "completed") {
     return projects.map((project) => ({ id: project.id, name: project.name, ...statusOf("done") }));
   }
-  const startMs = Date.parse(workbench.event.startsAt || "");
-  const endMs = Date.parse(workbench.event.endsAt || "");
+  const startMs = parseEventTime(workbench.event.startsAt);
+  const endMs = parseEventTime(workbench.event.endsAt);
   if (Number.isNaN(startMs) || Number.isNaN(endMs) || endMs <= startMs) return [];
   if (now < startMs) {
     return projects.map((project) => ({ id: project.id, name: project.name, ...statusOf("todo") }));
@@ -341,11 +341,18 @@ function routeForAction(action: WorkbenchAction, eventId: string, templateId: st
 
 function isInProgress(status: string, startsAt?: string, endsAt?: string) {
   if (status !== "scheduled") return false;
-  const start = Date.parse(startsAt ?? "");
-  const end = Date.parse(endsAt ?? "");
+  const start = parseEventTime(startsAt);
+  const end = parseEventTime(endsAt);
   if (!Number.isFinite(start) || !Number.isFinite(end)) return false;
   const now = Date.now();
   return now >= start && now < end;
+}
+
+// 生产活动时间按「北京墙钟存 Z」约定存储（展示端直接截取字符串）。
+// 计时/状态推导须先换算成真实 epoch：真实时刻 = 字面 Z 值 - 8 小时。
+function parseEventTime(value?: string) {
+  const parsed = Date.parse(value ?? "");
+  return Number.isFinite(parsed) ? parsed - 8 * 60 * 60 * 1000 : parsed;
 }
 
 function isPresentStatus(value: string) {
