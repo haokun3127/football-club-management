@@ -132,6 +132,51 @@ describe("coach activity workbench", () => {
     expect(page.countdownTimer).toBeNull();
   });
 
+  it("derives per-item content progress from planned durations and the clock", async () => {
+    const now = Date.now();
+    mocks.getCoachWorkbench.mockResolvedValue({
+      ...trainingWorkbench,
+      event: {
+        ...trainingWorkbench.event,
+        status: "scheduled",
+        startsAt: new Date(now - 25 * 60 * 1000).toISOString(),
+        endsAt: new Date(now + 35 * 60 * 1000).toISOString(),
+      },
+      selectedTrainingProjects: [
+        { id: "p1", name: "热身", metricIds: [], tags: [], durationMinutes: 20 },
+        { id: "p2", name: "技术训练", metricIds: [], tags: [], durationMinutes: 20 },
+        { id: "p3", name: "对抗演练", metricIds: [], tags: [], durationMinutes: 20 },
+      ],
+    });
+    const page = createPageInstance();
+    await page.load("event-training-1");
+
+    expect(page.data.hasContentProgress).toBe(true);
+    expect(page.data.contentProgressRows.map((row) => row.statusLabel)).toEqual(["完成", "进行中", "待开始"]);
+    page.onUnload();
+  });
+
+  it("shows all content items as done after the session ends", async () => {
+    const now = Date.now();
+    mocks.getCoachWorkbench.mockResolvedValue({
+      ...trainingWorkbench,
+      event: {
+        ...trainingWorkbench.event,
+        status: "completed",
+        startsAt: new Date(now - 90 * 60 * 1000).toISOString(),
+        endsAt: new Date(now - 30 * 60 * 1000).toISOString(),
+      },
+      selectedTrainingProjects: [
+        { id: "p1", name: "热身", metricIds: [], tags: [], durationMinutes: 20 },
+      ],
+    });
+    const page = createPageInstance();
+    await page.load("event-training-1");
+
+    expect(page.data.contentProgressRows.map((row) => row.statusLabel)).toEqual(["完成"]);
+    page.onUnload();
+  });
+
   it("keeps missing, forbidden, and empty workbenches honest", async () => {
     const page = createPageInstance();
     await page.load("");

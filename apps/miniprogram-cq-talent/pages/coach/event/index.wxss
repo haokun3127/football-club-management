@@ -39,3 +39,11 @@
 .roster-dot--present { background: #a80f1b; color: #ffffff; }
 .shero__big { display: flex; align-items: center; gap: 16rpx; }
 .shero__big-icon { width: 40rpx; height: 40rpx; }
+.progress-row { display: flex; align-items: center; gap: 16rpx; padding: 8rpx 0; }
+.progress-row__icon { width: 32rpx; height: 32rpx; flex: 0 0 auto; }
+.progress-row__icon--done { filter: none; }
+.progress-row__name { flex: 1; min-width: 0; overflow: hidden; font-size: 28rpx; color: #202124; text-overflow: ellipsis; white-space: nowrap; }
+.progress-row__status { flex: 0 0 auto; font-size: 24rpx; }
+.progress-row__status--done { color: #10b981; }
+.progress-row__status--doing { color: #a80f1b; font-weight: 600; }
+.progress-row__status--todo { color: #98a2b3; }

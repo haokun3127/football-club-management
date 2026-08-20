@@ -15,6 +15,14 @@ type ActionCard = {
   icon: string;
 };
 
+type ContentProgressRow = {
+  id: string;
+  name: string;
+  status: "done" | "doing" | "todo";
+  statusLabel: string;
+  icon: string;
+};
+
 type RosterRow = CoachWorkbench["roster"][number] & { statusLabel: string; present: boolean; initial: string };
 
 type EventView = {
@@ -62,6 +70,8 @@ Page({
     hasAssessmentTemplate: false,
     inProgress: false,
     countdownText: "",
+    contentProgressRows: [] as ContentProgressRow[],
+    hasContentProgress: false,
     attendancePresent: 0,
     attendanceTotal: 0,
     joinedNames: "",
@@ -93,6 +103,7 @@ Page({
         .map((item) => item.name)
         .join(" · ");
       const inProgress = isInProgress(workbench.event.status, workbench.event.startsAt, workbench.event.endsAt);
+      const contentProgressRows = buildContentProgress(workbench, Date.now());
       const workflowRows = workbench.workflow.map((item) => ({ ...item }));
       const trainingRows = workbench.event.type === "training" ? workbench.training.map((item) => ({ ...item })) : [];
       const matchRows = workbench.event.type === "match" ? workbench.match.map((item) => ({ ...item })) : [];
@@ -111,6 +122,8 @@ Page({
         eventId: id,
         eventTypeLabel: activityTypeLabel(workbench.event.type),
         eventView,
+        contentProgressRows,
+        hasContentProgress: contentProgressRows.length > 0,
         rosterRows,
         rosterCount: rosterRows.length,
         workflowRows,
@@ -244,6 +257,40 @@ function presentEvent(workbench: CoachWorkbench): EventView {
     startTime: formatTimeOnly(workbench.event.startsAt),
     heroMeta: [sessionTeam, workbench.event.venue || ""].filter(Boolean).join(" · "),
   };
+}
+
+function buildContentProgress(workbench: CoachWorkbench, now: number): ContentProgressRow[] {
+  if (workbench.event.type !== "training") return [];
+  const projects = workbench.selectedTrainingProjects;
+  if (projects.length === 0) return [];
+  const statusOf = (status: "done" | "doing" | "todo"): Pick<ContentProgressRow, "status" | "statusLabel" | "icon"> => ({
+    done: { status, statusLabel: "完成", icon: "/assets/icons/c10-check-circle.svg" },
+    doing: { status, statusLabel: "进行中", icon: "/assets/icons/clock.svg" },
+    todo: { status, statusLabel: "待开始", icon: "/assets/icons/clock.svg" },
+  }[status]);
+  if (workbench.event.status === "completed") {
+    return projects.map((project) => ({ id: project.id, name: project.name, ...statusOf("done") }));
+  }
+  const startMs = Date.parse(workbench.event.startsAt || "");
+  const endMs = Date.parse(workbench.event.endsAt || "");
+  if (Number.isNaN(startMs) || Number.isNaN(endMs) || endMs <= startMs) return [];
+  if (now < startMs) {
+    return projects.map((project) => ({ id: project.id, name: project.name, ...statusOf("todo") }));
+  }
+  if (now >= endMs) {
+    return projects.map((project) => ({ id: project.id, name: project.name, ...statusOf("done") }));
+  }
+  const durations = projects.map((project) => (typeof project.durationMinutes === "number" && project.durationMinutes > 0 ? project.durationMinutes : 0));
+  const totalMinutes = durations.reduce((sum, value) => sum + value, 0);
+  const weights = totalMinutes > 0 ? durations.map((value) => value / totalMinutes) : projects.map(() => 1 / projects.length);
+  const sessionMs = endMs - startMs;
+  let cursor = startMs;
+  return projects.map((project, index) => {
+    const blockStart = cursor;
+    cursor += sessionMs * (weights[index] ?? 0);
+    const status = now < blockStart ? "todo" : now < cursor ? "doing" : "done";
+    return { id: project.id, name: project.name, ...statusOf(status) };
+  });
 }
 
 function buildActionCards(workbench: CoachWorkbench, canWrite: boolean): ActionCard[] {
