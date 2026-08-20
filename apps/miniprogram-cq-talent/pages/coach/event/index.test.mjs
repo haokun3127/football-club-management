@@ -251,7 +251,7 @@ describe("coach activity workbench", () => {
     expect(template).toContain('src="{{item.icon}}"');
     expect(template).not.toContain('<role-tabbar role="coach" active="schedule" />');
     expect(pageConfig).not.toContain('"role-tabbar"');
-    expect(stylesheet).toMatch(/\.c2-route-tabs\s*\{[^}]*height:\s*140rpx/s);
+    expect(stylesheet).toMatch(/\.c2-route-tabs\s*\{[^}]*height:\s*104rpx/s);
     expect(stylesheet).toMatch(/\.action-tile\s*\{[^}]*min-height:\s*200rpx/s);
     expect(stylesheet).not.toContain('.action-tile--primary');
     expect(stylesheet).not.toContain('.action-tile--match');

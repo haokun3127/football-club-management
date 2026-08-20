@@ -4,8 +4,8 @@
 .c2-nav__left { display: flex; align-items: center; gap: 0; min-width: 0; }
 .c2-nav__back { flex: 0 0 auto; width: 48rpx; height: 48rpx; }
 .c2-nav__title { overflow: hidden; color: #202124; font-size: 36rpx; font-weight: 700; line-height: 44rpx; text-overflow: ellipsis; white-space: nowrap; }
-.c2-route-tabs { display: flex; box-sizing: border-box; height: 140rpx; background: #ffffff; border-bottom: 1rpx solid #f0f1f3; }
-.c2-route-tab { position: relative; display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4rpx; padding-top: 12rpx; color: #8e97a6; }
+.c2-route-tabs { display: flex; box-sizing: border-box; height: 104rpx; background: #ffffff; border-bottom: 1rpx solid #f0f1f3; }
+.c2-route-tab { position: relative; display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4rpx; padding-top: 6rpx; color: #8e97a6; }
 .c2-route-tab--active { color: #a80f1b; }
 .c2-route-tab__icon { width: 44rpx; height: 44rpx; }
 .c2-route-tab__label { max-width: 100%; overflow: hidden; font-size: 20rpx; line-height: 28rpx; text-overflow: ellipsis; white-space: nowrap; }
