@@ -2,7 +2,7 @@
   <view class="p2-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="p2-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
     <view class="p2-nav__title">{{detail ? detail.navTitle : '活动详情'}}</view>
-    <view wx:if="{{detail && detail.type === 'match'}}" class="p2-nav__action" bindtap="inviteFriend">邀请好友</view>
+    <button wx:if="{{detail && detail.type === 'match'}}" class="p2-nav__action" open-type="share">邀请好友</button>
     <view wx:elif="{{detail}}" class="p2-nav__status p2-nav__status--{{detail.statusTone}}">{{detail.statusLabel}}</view>
     <view wx:else class="p2-nav__spacer"></view>
   </view>

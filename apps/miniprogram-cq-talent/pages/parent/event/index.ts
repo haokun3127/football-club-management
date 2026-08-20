@@ -73,8 +73,12 @@ Page({
   goBack() {
     wx.navigateBack();
   },
-  inviteFriend() {
-    wx.showToast({ title: "邀请海报即将上线", icon: "none" });
+  onShareAppMessage() {
+    const detail = this.data.detail;
+    return {
+      title: detail ? `${detail.title} · 邀请你来看比赛` : "重庆天才足球俱乐部",
+      path: detail ? `/pages/parent/event/index?id=${this.data.eventId}` : "/pages/parent/schedule/index",
+    };
   },
   retry() {
     this.load(this.data.eventId);
