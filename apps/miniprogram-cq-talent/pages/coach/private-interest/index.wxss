@@ -183,3 +183,21 @@
 .c162-schedule-card__fee {
   text-align: center;
 }
+
+.c162-toggle--on {
+  justify-content: flex-end;
+  background: #34c759;
+}
+
+.c162-toggle--disabled {
+  opacity: 0.5;
+}
+
+.c162-slot--selected {
+  background: #34c759;
+}
+
+.c162-slot__text--selected {
+  color: #ffffff;
+  font-weight: 600;
+}

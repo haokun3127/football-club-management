@@ -3599,4 +3599,37 @@ describe("api server", () => {
     expect(body.paths["/clubs/{clubId}/matches"]).toBeTruthy();
     expect(body.paths["/clubs/{clubId}/students/{studentId}/metrics"]).toBeTruthy();
   });
+
+  it("roundtrips coach preferences and rejects parents", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+    const base = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/preferences";
+
+    const parentGet = await app.inject({ method: "GET", url: base, headers: { "x-user-id": "user-parent-1" } });
+    expect(parentGet.statusCode).toBe(403);
+
+    const initial = await app.inject({ method: "GET", url: base, headers: { "x-user-id": "user-coach-1" } });
+    expect(initial.statusCode).toBe(200);
+    expect((initial.json() as { preferences: { acceptsPrivateLessons: boolean } }).preferences.acceptsPrivateLessons).toBe(true);
+
+    const updated = await app.inject({
+      method: "PUT",
+      url: base,
+      headers: { "x-user-id": "user-coach-1" },
+      payload: { acceptsPrivateLessons: false, availabilitySlots: ["1-evening", "6-morning"] },
+    });
+    expect(updated.statusCode).toBe(200);
+
+    const reread = await app.inject({ method: "GET", url: base, headers: { "x-user-id": "user-coach-1" } });
+    expect((reread.json() as { preferences: { acceptsPrivateLessons: boolean; availabilitySlots: string[] } }).preferences).toEqual({
+      acceptsPrivateLessons: false,
+      availabilitySlots: ["1-evening", "6-morning"],
+    });
+  });
 });

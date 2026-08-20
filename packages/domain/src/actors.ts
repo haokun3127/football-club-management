@@ -42,4 +42,6 @@ export interface CoachProfile extends AuditFields, ClubScoped {
   name: string;
   specialties: string[];
   status: "active" | "inactive";
+  acceptsPrivateLessons?: boolean;
+  availabilitySlots?: string[];
 }

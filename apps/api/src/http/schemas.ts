@@ -700,8 +700,33 @@ export const schemas = {
       },
     },
     response: {
-      201: flexibleObject,
+      201: { type: "object", additionalProperties: true },
       400: errorResponse,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientCoachPreferences: {
+    response: {
+      200: { type: "object", additionalProperties: true },
+      401: errorResponse,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientCoachPreferencesUpdate: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["acceptsPrivateLessons"],
+      properties: {
+        acceptsPrivateLessons: { type: "boolean" },
+        availabilitySlots: { type: "array", items: { type: "string" }, maxItems: 100 },
+      },
+    },
+    response: {
+      200: { type: "object", additionalProperties: true },
+      401: errorResponse,
       403: errorResponse,
       404: errorResponse,
     },

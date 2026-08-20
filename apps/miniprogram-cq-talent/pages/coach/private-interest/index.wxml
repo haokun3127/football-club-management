@@ -16,7 +16,7 @@
 
       <view class="c162-toggle-row">
         <view class="c162-toggle-row__label">接受私教预约</view>
-        <view class="{{acceptingToggleClass}}" aria-disabled="true" aria-label="私教预约状态待同步">
+        <view class="c162-toggle {{accepting ? 'c162-toggle--on' : 'c162-toggle--off'}} {{interactive ? '' : 'c162-toggle--disabled'}}" bindtap="toggleAccepting" aria-label="接受私教预约">
           <view class="c162-toggle__thumb"></view>
         </view>
       </view>
@@ -29,8 +29,8 @@
           </view>
           <view class="c162-schedule-grid__columns">
             <view wx:for="{{availabilityColumns}}" wx:key="day" class="c162-schedule-grid__column">
-              <view wx:for="{{item.slots}}" wx:key="label" class="c162-slot {{item.stateClass}}">
-                <view class="c162-slot__text {{item.textClass}}">{{item.label}}</view>
+              <view wx:for="{{item.slots}}" wx:key="key" class="c162-slot {{item.selected ? 'c162-slot--selected' : 'c162-slot--unavailable'}}" data-key="{{item.key}}" bindtap="toggleSlot">
+                <view class="c162-slot__text {{item.selected ? 'c162-slot__text--selected' : 'c162-slot__text--unavailable'}}">{{item.label}}</view>
               </view>
             </view>
           </view>

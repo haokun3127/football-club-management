@@ -1156,6 +1156,67 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
     },
   );
 
+  // ---- Coach preferences (C16.2 private-lesson interest) ----
+
+  app.get<{ Params: { clubId: string; clientId: string } }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/preferences",
+    { schema: { ...schemas.appClientParams, ...schemas.appClientCoachPreferences } },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+      const userId = auth?.user.id ?? "user-coach-1";
+      const preferences = await context.store.getCoachPreferences(request.params.clubId, userId);
+      if (!preferences) {
+        return context.sendError(reply, 404, "not_found", "Coach profile not found");
+      }
+      return { clubId: request.params.clubId, preferences };
+    },
+  );
+
+  app.put<{
+    Params: { clubId: string; clientId: string };
+    Body: { acceptsPrivateLessons: boolean; availabilitySlots?: string[] };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/preferences",
+    { schema: { ...schemas.appClientParams, ...schemas.appClientCoachPreferencesUpdate } },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+      const userId = auth?.user.id ?? "user-coach-1";
+      const existing = await context.store.getCoachPreferences(request.params.clubId, userId);
+      if (!existing) {
+        return context.sendError(reply, 404, "not_found", "Coach profile not found");
+      }
+      const preferences = await context.store.saveCoachPreferences(request.params.clubId, userId, {
+        acceptsPrivateLessons: request.body.acceptsPrivateLessons,
+        availabilitySlots: Array.isArray(request.body.availabilitySlots) ? request.body.availabilitySlots : existing.availabilitySlots,
+      });
+      return { clubId: request.params.clubId, preferences };
+    },
+  );
+
   app.get<{
     Params: {
       clubId: string;

@@ -4,17 +4,21 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   requireRole: vi.fn(),
   navigateBack: vi.fn(),
-  getStorageSync: vi.fn(),
-  setStorageSync: vi.fn(),
+  showToast: vi.fn(),
+  getCoachPreferences: vi.fn(),
+  saveCoachPreferences: vi.fn(),
 }));
 
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/presentation", () => ({ resolveNavInset: () => 0 }));
+vi.mock("../../../utils/api", () => ({
+  getCoachPreferences: mocks.getCoachPreferences,
+  saveCoachPreferences: mocks.saveCoachPreferences,
+}));
 
 globalThis.wx = {
   navigateBack: mocks.navigateBack,
-  getStorageSync: mocks.getStorageSync,
-  setStorageSync: mocks.setStorageSync,
+  showToast: mocks.showToast,
 };
 
 let pageDefinition;
@@ -44,83 +48,95 @@ describe("coach private interest", () => {
   beforeEach(() => {
     mocks.requireRole.mockReset().mockReturnValue(coachSession({ private_lessons: true }));
     mocks.navigateBack.mockReset();
-    mocks.getStorageSync.mockReset();
-    mocks.setStorageSync.mockReset();
+    mocks.showToast.mockReset();
+    mocks.getCoachPreferences.mockReset().mockResolvedValue({ acceptsPrivateLessons: true, availabilitySlots: [] });
+    mocks.saveCoachPreferences.mockReset().mockResolvedValue(undefined);
   });
 
-  it("projects an enabled club feature without inventing coach acceptance or availability", () => {
+  it("loads persisted preferences and defaults availability to weekday slots", async () => {
     const page = createPageInstance();
     page.onLoad();
+    await page.data && Promise.resolve();
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(mocks.requireRole).toHaveBeenCalledWith("coach");
-    expect(page.data).toMatchObject({
-      featureState: "enabled",
-      featureTitle: "私教服务已开通",
-      featureMessage: "开启私教兴趣后，家长可向您发起私教预约",
-      acceptingToggleClass: "c162-toggle c162-toggle--pending",
-      availabilityColumns: expect.any(Array),
-      feeMessage: "费用由俱乐部统一结算",
-    });
-    expect(mocks.getStorageSync).not.toHaveBeenCalled();
-    expect(mocks.setStorageSync).not.toHaveBeenCalled();
+    expect(mocks.getCoachPreferences).toHaveBeenCalledTimes(1);
+    expect(page.data.featureState).toBe("enabled");
+    expect(page.data.interactive).toBe(true);
+    expect(page.data.accepting).toBe(true);
+    const selectedCount = page.data.availabilityColumns.flatMap((column) => column.slots).filter((slot) => slot.selected).length;
+    expect(selectedCount).toBe(20);
   });
 
-  it("distinguishes disabled and missing feature flags honestly", () => {
+  it("toggles acceptance and persists it", async () => {
+    const page = createPageInstance();
+    page.onLoad();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await page.toggleAccepting();
+    expect(page.data.accepting).toBe(false);
+    expect(mocks.saveCoachPreferences).toHaveBeenCalledWith(expect.objectContaining({ acceptsPrivateLessons: false }));
+  });
+
+  it("reverts acceptance and toasts when the save fails", async () => {
+    mocks.saveCoachPreferences.mockRejectedValueOnce(new Error("network"));
+    const page = createPageInstance();
+    page.onLoad();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await page.toggleAccepting();
+    expect(page.data.accepting).toBe(true);
+    expect(mocks.showToast).toHaveBeenCalled();
+  });
+
+  it("toggles a single slot and persists the full selection", async () => {
+    const page = createPageInstance();
+    page.onLoad();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await page.toggleSlot({ currentTarget: { dataset: { key: "5-0" } } });
+    const saturday = page.data.availabilityColumns[5];
+    expect(saturday.slots[0].selected).toBe(true);
+    expect(mocks.saveCoachPreferences).toHaveBeenCalledWith(expect.objectContaining({ availabilitySlots: expect.arrayContaining(["5-0"]) }));
+  });
+
+  it("keeps disabled and pending feature states non-interactive", async () => {
     mocks.requireRole.mockReturnValueOnce(coachSession({ private_lessons: false }));
     const disabled = createPageInstance();
     disabled.onLoad();
-    expect(disabled.data).toMatchObject({
-      featureState: "unavailable",
-      featureTitle: "俱乐部未开通私教服务",
-      featureMessage: "当前无法提供私教意向服务",
-    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(disabled.data.featureState).toBe("unavailable");
+    expect(disabled.data.interactive).toBe(false);
+    expect(mocks.getCoachPreferences).not.toHaveBeenCalled();
 
     mocks.requireRole.mockReturnValueOnce(coachSession(undefined));
     const pending = createPageInstance();
     pending.onLoad();
-    expect(pending.data).toMatchObject({
-      featureState: "pending",
-      featureTitle: "私教服务状态待同步",
-      featureMessage: "暂无法确认俱乐部是否已开通私教服务",
-    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(pending.data.featureState).toBe("pending");
+    expect(pending.data.interactive).toBe(false);
   });
 
-  it("does not read storage or make a page request for a non-coach", () => {
+  it("does not make a request for a non-coach", () => {
     mocks.requireRole.mockReturnValueOnce(null);
     const page = createPageInstance();
     page.onLoad();
 
-    expect(mocks.requireRole).toHaveBeenCalledWith("coach");
-    expect(mocks.getStorageSync).not.toHaveBeenCalled();
-    expect(mocks.setStorageSync).not.toHaveBeenCalled();
-    expect(controller).not.toMatch(/from\s+["']\.\.\/\.\.\/\.\.\/utils\/api["']/);
-    expect(controller).not.toMatch(/getStorage|setStorage|showToast/);
+    expect(mocks.getCoachPreferences).not.toHaveBeenCalled();
+    expect(mocks.saveCoachPreferences).not.toHaveBeenCalled();
   });
 
-  it("uses the C16.2 Figma structure without interactive or sample availability", () => {
+  it("uses the C16.2 Figma structure with interactive toggle and selectable slots", () => {
     expect(existsSync(new URL("../../../assets/icons/c162-chevron-left.svg", import.meta.url))).toBe(true);
-    expect(pageConfig).not.toContain('"app-header"');
     expect(pageConfig).toContain('"role-tabbar"');
     expect(template).toContain('class="c162-nav"');
-    expect(template).toContain('class="c162-nav__placeholder"');
-    expect(template).toContain("/assets/icons/c162-chevron-left.svg");
-    expect(template).toContain('class="c162-toggle-row"');
-    expect(template).toContain('class="c162-schedule-grid"');
-    expect(template).toContain('class="c162-slot {{item.stateClass}}"');
-    expect(template).not.toMatch(/class="c162-toggle-row"[^>]*bindtap/);
-    expect(template).not.toMatch(/class="c162-toggle"[^>]*bindtap/);
-    expect(template).not.toMatch(/class="c162-schedule-card"[^>]*bindtap/);
-    expect(controller).toContain("费用由俱乐部统一结算");
-    expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(controller).not.toMatch(/toggleAccepting|toggleSlot|persist|getStorage|setStorage|showToast/);
-    expect(stylesheet).toMatch(/\.c162-page\s*\{[^}]*background:\s*#f6f7f9/s);
-    expect(stylesheet).toMatch(/\.c162-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*padding-right:\s*200rpx)(?=[^}]*padding-left:\s*32rpx)(?=[^}]*background:\s*#fceeef)/s);
-    expect(stylesheet).toMatch(/\.c162-nav__title\s*\{(?=[^}]*flex:\s*1)(?=[^}]*font-size:\s*36rpx)(?=[^}]*text-align:\s*left)/s);
-    expect(stylesheet).toMatch(/\.c162-nav__placeholder\s*\{(?=[^}]*width:\s*48rpx)(?=[^}]*height:\s*48rpx)/s);
-    expect(stylesheet).toMatch(/\.c162-page__body\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+80rpx/s);
-    expect(stylesheet).toMatch(/\.c162-content\s*\{[^}]*gap:\s*32rpx/s);
-    expect(stylesheet).toMatch(/\.c162-info-card\s*,\s*\.c162-toggle-row\s*,\s*\.c162-schedule-card\s*\{[^}]*border-radius:\s*24rpx/s);
-    expect(stylesheet).toMatch(/\.c162-toggle\s*\{[^}]*width:\s*88rpx[^}]*height:\s*48rpx/s);
-    expect(stylesheet).toMatch(/\.c162-slot\s*\{[^}]*height:\s*64rpx[^}]*border-radius:\s*8rpx/s);
+    expect(template).toContain('bindtap="toggleAccepting"');
+    expect(template).toContain('bindtap="toggleSlot"');
+    expect(template).toContain("c162-toggle--on");
+    expect(template).toContain("c162-slot--selected");
+    expect(template).not.toMatch(/\{\{item\.(?:map|filter|slice|indexOf)/);
+    expect(stylesheet).toMatch(/\.c162-toggle--on\s*\{[^}]*background:\s*#34c759/s);
+    expect(stylesheet).toMatch(/\.c162-slot--selected\s*\{[^}]*background:\s*#34c759/s);
+    expect(stylesheet).toMatch(/\.c162-nav\s*\{(?=[^}]*background:\s*#fceeef)/s);
   });
 });

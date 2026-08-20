@@ -672,3 +672,8 @@ export interface EventChangeRequestInput {
   requestedByUserId?: EntityId;
   notifyParents?: boolean;
 }
+
+export interface CoachPreferences {
+  acceptsPrivateLessons: boolean;
+  availabilitySlots: string[];
+}

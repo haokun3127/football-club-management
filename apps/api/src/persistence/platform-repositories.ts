@@ -357,14 +357,16 @@ export class CoachProfileRepository extends BaseClubScopedRepository<CoachProfil
 
   async save(entity: CoachProfile): Promise<void> {
     this.database.prepare(`
-      INSERT INTO coach_profiles (id, club_id, user_id, name, specialties_json, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO coach_profiles (id, club_id, user_id, name, specialties_json, status, accepts_private_lessons, availability_json, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         club_id = excluded.club_id,
         user_id = excluded.user_id,
         name = excluded.name,
         specialties_json = excluded.specialties_json,
         status = excluded.status,
+        accepts_private_lessons = excluded.accepts_private_lessons,
+        availability_json = excluded.availability_json,
         updated_at = excluded.updated_at
     `).run(
       entity.id,
@@ -373,6 +375,8 @@ export class CoachProfileRepository extends BaseClubScopedRepository<CoachProfil
       entity.name,
       JSON.stringify(entity.specialties),
       entity.status,
+      entity.acceptsPrivateLessons === undefined ? 1 : entity.acceptsPrivateLessons ? 1 : 0,
+      entity.availabilitySlots === undefined ? null : JSON.stringify(entity.availabilitySlots),
       entity.createdAt,
       entity.updatedAt,
     );
@@ -386,6 +390,8 @@ export class CoachProfileRepository extends BaseClubScopedRepository<CoachProfil
       name: requireString(row, "name"),
       specialties: parseStringArray(requireString(row, "specialties_json")),
       status: requireString(row, "status") as CoachProfile["status"],
+      acceptsPrivateLessons: row.accepts_private_lessons === undefined || row.accepts_private_lessons === null ? undefined : Number(row.accepts_private_lessons) !== 0,
+      availabilitySlots: typeof row.availability_json === "string" ? parseStringArray(row.availability_json) : undefined,
       createdAt: requireString(row, "created_at"),
       updatedAt: requireString(row, "updated_at"),
     };

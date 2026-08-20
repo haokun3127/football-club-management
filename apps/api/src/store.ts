@@ -63,6 +63,7 @@ import {
 import type {
   ClubCapabilities,
   ClubAppClient,
+  CoachPreferences,
   ConfirmExternalRecordInput,
   DataCapabilityConfig,
   CreateExternalSyncPolicyInput,
@@ -187,6 +188,8 @@ export interface ApiStore {
   listCalendarEvents(clubId: EntityId): unknown[];
   getCalendarEvent(eventId: EntityId): CalendarEvent | null | Promise<CalendarEvent | null>;
   saveCalendarEvent(event: CalendarEvent): CalendarEvent | Promise<CalendarEvent>;
+  getCoachPreferences(clubId: EntityId, userId: EntityId): CoachPreferences | null | Promise<CoachPreferences | null>;
+  saveCoachPreferences(clubId: EntityId, userId: EntityId, preferences: CoachPreferences): CoachPreferences | Promise<CoachPreferences>;
   listEventParticipants(clubId: EntityId): EventParticipant[];
   listMetricRecords(clubId: EntityId): PlayerMetricRecord[];
   getStudentTimeline(clubId: EntityId, studentId: EntityId): unknown[];
@@ -902,6 +905,24 @@ export abstract class SeedBackedStore implements ApiStore {
 
   saveCalendarEvent(event: CalendarEvent) {
     return upsertById(this.data.events, event);
+  }
+
+  getCoachPreferences(clubId: EntityId, userId: EntityId): CoachPreferences | null {
+    const coach = this.data.coaches.find((item) => item.clubId === clubId && item.userId === userId);
+    if (!coach) return null;
+    return {
+      acceptsPrivateLessons: coach.acceptsPrivateLessons ?? true,
+      availabilitySlots: coach.availabilitySlots ?? [],
+    };
+  }
+
+  saveCoachPreferences(clubId: EntityId, userId: EntityId, preferences: CoachPreferences): CoachPreferences | Promise<CoachPreferences> {
+    const coach = this.data.coaches.find((item) => item.clubId === clubId && item.userId === userId);
+    if (!coach) throw new Error("coach profile not found");
+    coach.acceptsPrivateLessons = preferences.acceptsPrivateLessons;
+    coach.availabilitySlots = [...preferences.availabilitySlots];
+    coach.updatedAt = this.now();
+    return { acceptsPrivateLessons: coach.acceptsPrivateLessons, availabilitySlots: [...coach.availabilitySlots] };
   }
 
   listEventParticipants(clubId: EntityId) {
@@ -2451,6 +2472,15 @@ export class PersistentApiStore extends SeedBackedStore {
   override saveCalendarEvent(event: CalendarEvent) {
     const saved = this.repositories.calendar.saveEvent(event);
     upsertById(this.data.events, saved);
+    return saved;
+  }
+
+  override async saveCoachPreferences(clubId: EntityId, userId: EntityId, preferences: CoachPreferences): Promise<CoachPreferences> {
+    const saved = super.saveCoachPreferences(clubId, userId, preferences);
+    const coach = this.data.coaches.find((item) => item.clubId === clubId && item.userId === userId);
+    if (coach) {
+      await this.repositories.coaches.save(coach);
+    }
     return saved;
   }
 

@@ -177,6 +177,35 @@ export async function finishCoachEvent(eventId: string): Promise<void> {
   });
 }
 
+export interface CoachPreferences {
+  acceptsPrivateLessons: boolean;
+  availabilitySlots: string[];
+}
+
+export async function getCoachPreferences(): Promise<CoachPreferences> {
+  const context = requireContext();
+  const raw = await request<Record<string, unknown>>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/preferences`,
+  });
+  const preferences = (raw.preferences ?? {}) as Record<string, unknown>;
+  return {
+    acceptsPrivateLessons: preferences.acceptsPrivateLessons !== false,
+    availabilitySlots: Array.isArray(preferences.availabilitySlots) ? (preferences.availabilitySlots as unknown[]).map(String).filter(Boolean) : [],
+  };
+}
+
+export async function saveCoachPreferences(preferences: CoachPreferences): Promise<void> {
+  const context = requireContext();
+  await request<Record<string, unknown>>({
+    method: "PUT",
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/preferences`,
+    data: {
+      acceptsPrivateLessons: preferences.acceptsPrivateLessons,
+      availabilitySlots: preferences.availabilitySlots,
+    },
+  });
+}
+
 export async function getCoachMatchDetail(eventId: string): Promise<CoachMatchDetail> {
   const context = requireContext();
   const response = await request<Record<string, unknown>>({
