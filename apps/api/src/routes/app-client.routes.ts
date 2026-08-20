@@ -2346,6 +2346,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
           name: coach.name,
           role: index === 0 ? "主教练" : "教练",
           bio: coach.specialties.filter((item) => item !== "重庆天才导入数据").join(" · ") || "青训教练",
+          wechatId: coach.wechatId ?? null,
         })),
       };
     },

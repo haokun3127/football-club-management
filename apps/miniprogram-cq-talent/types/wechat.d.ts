@@ -54,6 +54,7 @@ declare const wx: {
   showActionSheet: (options: { itemList: string[]; success?: WechatCallback<{ tapIndex: number }> }) => void;
   nextTick: (callback: () => void) => void;
   pageScrollTo: (options: { selector?: string; scrollTop?: number; duration?: number }) => void;
+  setClipboardData: (options: { data: string; success?: WechatCallback<unknown>; fail?: WechatCallback<unknown> }) => void;
 };
 
 declare function App(options: WechatAppOptions): void;

@@ -12,6 +12,8 @@ interface Coach {
   hasRole: boolean;
   bio: string;
   hasBio: boolean;
+  wechatId: string;
+  hasWechat: boolean;
 }
 
 interface PageData {
@@ -44,6 +46,11 @@ Page<PageData>({
   },
   goBack() {
     wx.navigateBack();
+  },
+  copyCoachWechat(event: { currentTarget: { dataset: { wechat: string } } }) {
+    const wechatId = event.currentTarget.dataset.wechat;
+    if (!wechatId) return;
+    wx.setClipboardData({ data: wechatId });
   },
   onLoad() {
     requireRole("parent");
@@ -105,8 +112,9 @@ function presentTeamCounts(teamChips: ClubCoachTeam["teamChips"]): string[] {
 }
 
 function presentCoaches(coaches: ClubCoachTeam["coaches"]): Coach[] {
-  return coaches.map(({ id, name, role, bio }) => {
+  return coaches.map(({ id, name, role, bio, wechatId }) => {
     const trimmedRole = (role ?? "").trim();
+    const contact = (wechatId ?? "").trim();
     return {
       id,
       name,
@@ -116,6 +124,8 @@ function presentCoaches(coaches: ClubCoachTeam["coaches"]): Coach[] {
       hasRole: trimmedRole.length > 0,
       bio,
       hasBio: Boolean(bio),
+      wechatId: contact,
+      hasWechat: contact.length > 0,
     };
   });
 }

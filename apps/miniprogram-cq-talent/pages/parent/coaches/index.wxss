@@ -134,3 +134,7 @@
   font-size: 26rpx;
   color: var(--color-text-secondary);
 }
+
+.coach-card__wechat { flex: 0 0 auto; display: flex; align-items: center; gap: 8rpx; align-self: center; padding: 12rpx 20rpx; border: 1rpx solid #e7eaf0; border-radius: 999rpx; background: #f6f7f9; }
+.coach-card__wechat-icon { width: 28rpx; height: 28rpx; }
+.coach-card__wechat-text { font-size: 24rpx; color: #202124; }

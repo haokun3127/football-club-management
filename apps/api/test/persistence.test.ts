@@ -370,6 +370,7 @@ describe("platform persistence", () => {
       "0011_event_change_notify.sql",
       "0012_assessment_tasks.sql",
       "0013_coach_preferences.sql",
+      "0014_coach_wechat.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);

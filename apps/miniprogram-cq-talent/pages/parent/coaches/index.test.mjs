@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   getClubCoachTeam: vi.fn(),
   requireRole: vi.fn(),
+  setClipboardData: vi.fn(),
 }));
 
 vi.mock("../../../utils/api", () => ({ getClubCoachTeam: mocks.getClubCoachTeam }));
@@ -21,6 +22,7 @@ globalThis.Page = (definition) => {
 globalThis.wx = {
   navigateBack: vi.fn(),
   showToast: vi.fn(),
+  setClipboardData: mocks.setClipboardData,
 };
 
 await import("./index.ts");
@@ -130,12 +132,23 @@ describe("parent coach team", () => {
     expect(template).toContain("{{teamGoal}}");
     expect(template).toContain("{{item.role}}");
     expect(template).not.toContain('bindtap="contactCoach"');
-    expect(template).not.toContain("微信联系");
+    expect(template).toContain("微信联系");
+    expect(template).toContain('bindtap="copyCoachWechat"');
+    expect(template).toContain('data-wechat="{{item.wechatId}}"');
+    expect(template).toContain('wx:if="{{item.hasWechat}}"');
     expect(template).not.toContain("执教年限");
     expect(template).not.toContain("凤凰山足球俱乐部");
     expect(template).not.toContain("重庆天才足球俱乐部");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("contactCoach(");
     expect(controller).not.toContain("重庆天才足球俱乐部");
+  });
+
+  it("copies the coach wechat id to the clipboard", () => {
+    const page = createPageInstance();
+    page.copyCoachWechat({ currentTarget: { dataset: { wechat: "cq-coach-chen" } } });
+    expect(mocks.setClipboardData).toHaveBeenCalledWith({ data: "cq-coach-chen" });
+    page.copyCoachWechat({ currentTarget: { dataset: { wechat: "" } } });
+    expect(mocks.setClipboardData).toHaveBeenCalledTimes(1);
   });
 });

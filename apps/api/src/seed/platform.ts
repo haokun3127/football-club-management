@@ -174,6 +174,7 @@ export function createPlatformSeed(): Pick<
         name: "陈教练",
         specialties: ["technical", "U10"],
         status: "active",
+        wechatId: "cq-coach-chen",
         createdAt: now,
         updatedAt: now,
       },

@@ -44,4 +44,5 @@ export interface CoachProfile extends AuditFields, ClubScoped {
   status: "active" | "inactive";
   acceptsPrivateLessons?: boolean;
   availabilitySlots?: string[];
+  wechatId?: string;
 }

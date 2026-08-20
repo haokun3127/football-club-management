@@ -31,6 +31,10 @@
               </view>
               <view wx:if="{{item.hasBio}}" class="coach-card__bio">{{item.bio}}</view>
             </view>
+            <view wx:if="{{item.hasWechat}}" class="coach-card__wechat" data-wechat="{{item.wechatId}}" bindtap="copyCoachWechat">
+              <image class="coach-card__wechat-icon" src="/assets/icons/login-wechat.svg" mode="aspectFit" />
+              <view class="coach-card__wechat-text">微信联系</view>
+            </view>
           </view>
         </view>
         <view wx:else class="coach-empty">{{emptyMessage}}</view>

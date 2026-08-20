@@ -460,5 +460,6 @@ export interface ClubCoachTeam {
     name: string;
     role: string;
     bio: string;
+    wechatId?: string | null;
   }>;
 }
