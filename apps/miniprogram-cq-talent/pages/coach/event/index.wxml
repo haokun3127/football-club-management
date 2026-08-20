@@ -30,7 +30,7 @@
        <view class="shero__heading">
          <view class="shero__content">
            <view class="shero__title">{{eventView.title}}</view>
-           <view wx:if="{{eventView.sessionMeta}}" class="shero__session-meta"><text class="shero__session-team">{{eventView.sessionTeam}}</text><text wx:if="{{eventView.hasTime}}" class="shero__session-time"> · {{eventView.timeLabel}}</text></view>
+           <view wx:if="{{eventView.sessionMeta}}" class="shero__session-meta"><text class="shero__session-team">{{eventView.sessionTeam}}</text><text wx:if="{{eventView.hasTime}}" class="shero__session-time">{{eventView.timeLabel}}</text></view>
          </view>
          <view wx:if="{{!inProgress}}" class="shero__status"><status-chip label="{{eventView.statusLabel}}" tone="{{eventView.statusTone}}" compact="{{true}}" /></view>
        </view>
