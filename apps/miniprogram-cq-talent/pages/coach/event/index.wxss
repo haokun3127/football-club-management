@@ -15,7 +15,7 @@
 .shero { display: flex; flex-direction: column; gap: 8rpx; min-height: 320rpx; padding: 28rpx 32rpx; box-sizing: border-box; border-radius: 32rpx; background: #07111f; color: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0,0,0,.08); }
 .shero__top { display: flex; justify-content: space-between; color: rgba(255,255,255,.7); font-size: 22rpx; }
 .shero__main { display: flex; flex-direction: column; gap: 8rpx; min-width: 0; }
-.shero__big { color: #ffffff; font-size: 70rpx; font-weight: 800; line-height: 86rpx; font-variant-numeric: tabular-nums; }
+.shero__big { color: #ffffff; font-size: 104rpx; font-weight: 800; line-height: 126rpx; font-variant-numeric: tabular-nums; }
 .shero__title { min-width: 0; overflow: hidden; color: #ffffff; font-size: 30rpx; font-weight: 600; line-height: 38rpx; overflow-wrap: anywhere; }
 .shero__meta { overflow: hidden; color: rgba(255,255,255,.8); font-size: 24rpx; overflow-wrap: anywhere; }
 .shero__pills { display: flex; flex-wrap: wrap; gap: 16rpx; margin-top: auto; }

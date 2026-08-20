@@ -238,7 +238,7 @@ describe("coach activity workbench", () => {
     expect(template).toContain("{{eventView.heroMeta}}");
     expect(template).toContain("{{eventView.statusLabel}}");
     expect(stylesheet).toMatch(/\.shero\s*\{[^}]*min-height:\s*320rpx/s);
-    expect(stylesheet).toMatch(/\.shero__big\s*\{[^}]*font-size:\s*70rpx/s);
+    expect(stylesheet).toMatch(/\.shero__big\s*\{[^}]*font-size:\s*104rpx/s);
     expect(stylesheet).toMatch(/\.shero__pill\s*\{[^}]*border-radius:\s*999rpx/s);
   });
 
