@@ -25,6 +25,8 @@ interface PageData {
   date: string;
   dateLabel: string;
   events: DayEventView[];
+  allEvents: DayEventView[];
+  activeType: DayEventView["type"] | "all";
   navInset: number;
   menuInset: number;
   navActionTop: number;
@@ -45,6 +47,8 @@ Page<PageData>({
     date: "",
     dateLabel: "",
     events: [],
+    allEvents: [],
+    activeType: "all",
     navInset: resolveNavInset(),
     menuInset: resolveMenuInset(),
     navActionTop: resolveMenuActionTop(),
@@ -64,10 +68,12 @@ Page<PageData>({
     });
     try {
       const events = await getParentCalendar(date, date);
+      const presented = events.map((event: ScheduleEvent) => presentEvent(event));
       this.setData({
-        state: events.length ? "ready" : "empty",
-        message: events.length ? "" : "当天暂无活动安排。",
-        events: events.map((event: ScheduleEvent) => presentEvent(event)),
+        state: presented.length ? "ready" : "empty",
+        message: presented.length ? "" : "当天暂无活动安排。",
+        allEvents: presented,
+        events: applyTypeFilter(presented, this.data.activeType),
       });
     } catch (error) {
       this.setData({ state: "error", message: error instanceof Error ? error.message : "活动读取失败，请稍后重试。" });
@@ -77,7 +83,26 @@ Page<PageData>({
     this.load(this.data.date || parentPageToday());
   },
   openFilter() {
-    wx.showToast({ title: "筛选条件待同步", icon: "none" });
+    const options: Array<{ key: DayEventView["type"] | "all"; label: string }> = [
+      { key: "all", label: "全部" },
+      { key: "training", label: "训练" },
+      { key: "match", label: "比赛" },
+      { key: "other", label: "其他" },
+    ];
+    wx.showActionSheet({
+      itemList: options.map((option) => option.label),
+      success: ({ tapIndex }) => {
+        const selected = options[tapIndex];
+        if (!selected) return;
+        const filtered = applyTypeFilter(this.data.allEvents, selected.key);
+        this.setData({
+          activeType: selected.key,
+          events: filtered,
+          state: filtered.length ? "ready" : "empty",
+          message: filtered.length ? "" : `当天暂无${selected.label === "全部" ? "" : selected.label}活动。`,
+        });
+      },
+    });
   },
   goBack() {
     wx.navigateBack();
@@ -86,6 +111,11 @@ Page<PageData>({
     openPage(`/pages/parent/event/index?id=${event.currentTarget.dataset.id}`);
   },
 });
+
+function applyTypeFilter(events: DayEventView[], type: DayEventView["type"] | "all"): DayEventView[] {
+  if (type === "all") return events;
+  return events.filter((event) => event.type === type);
+}
 
 function presentEvent(event: ScheduleEvent): DayEventView {
   const status = statusOf(event);
