@@ -1,5 +1,49 @@
 # 核心演示闭环 · 进度跟踪
 
+## 2026-08-20 「设计目标模式全做」批次（g1-g7 完成，g8 已排期）
+
+- **C2 训练内容进度卡**：按计划时长×当前时间推导每项 完成/进行中/待开始（诚实推导非虚构）；今晚演示事件（控球与盘带训练 19:00-20:30）已通过真实 PUT 接口挂上 6 项训练内容。关键坑：session plan 仅存内存，API 重启即失，演示前需重放 PUT（脚本见 tmp/prod-verify）。
+- **活动时间墙钟约定**：生产活动时间按「北京墙钟存 Z」存储（展示端直接截字符串）。C2 页 `parseEventTime` 换算真实时刻（字面-8h）用于进行中/倒计时/进度推导——否则今晚 19:00 北京不会触发进行中。测试夹具同步按墙钟约定。
+- **C16.2 私教兴趣全链路**：迁移 0013（accepts_private_lessons + availability_json）+ GET/PUT `/coach/preferences` + 页面开关/时段格可交互持久化（设计稿绿开关、周一至周五默认全选）。生产部署 c308be4 已读回验证。
+- **教练团队微信联系**：迁移 0014（wechat_id）+ coach-team 接口投影 + 卡片「微信联系」按钮复制微信号到剪贴板；生产 16 名教练已补演示微信号。
+- **战术板占位清除**：当前权威设计 C7 CODE MVP（233:2）无工具栏/分享按钮 → 删除 LEGACY 遗留工具栏（绘制/撤销/移动/清除/分享）与两个「暂未开放」toast。
+- **邀请好友=真实分享**：P2 比赛详情改 `button open-type="share"` + onShareAppMessage（带比赛标题与页面路径）。
+- **日程按天筛选做真**：ActionSheet 按类型过滤（全部/训练/比赛/其他）。
+- **内容中心/场地搜索做真**：可展开搜索栏，按名称/标题/地址关键词过滤。
+- **g8**：19:06 已排一次性 cron（c2-inprogress-verify）自动截图验证 C2 进行中态（计时/结束训练/进度混合态）。
+- 门禁全程 exit=0（最新 19/361/111）；生产 API 部署至 g3 版（wechat_id），health 200。
+
+## 2026-08-20 C2 用户改版同步：Tab 栏移至页底 + 全端在线稿新鲜度核查
+
+- 用户在线改版 `93:606`：TabIconsOverlay 从页顶（y=88）移到页底（y=750），顶部导航后直接进入深色 hero。小程序同步：删除页顶 in-flow c2-route-tabs 与 openCoachRoot，页底接入 `role-tabbar`（coach/schedule），body 底 padding 补 180rpx。
+- 同日修复：hero 大时间字号 70rpx→104rpx（读设计节点 fontSize=52px ExtraBold，之前目测误判为一致，用户指出后纠正）。
+- 全端在线稿新鲜度核查：4:7 全部 27 块业务板重新 get_screenshot 并与离线缓存像素 diff——除当日有意修改的 C2/P8/P5 外全部一致；C3/C4/C9/C12/C13/C14/C15/C16.4 高度≠812 属正常（内容超高画板），未被删除。证据留档 `tmp/figma-audit-now/`（未入库）。
+- 验证：门禁 exit=0（19/355/110）；MCP 真实截图与用户改后在线稿比对：顶部无 Tab、底部 Tab 栏、hero 结构全部一致 ✅。已知豁免：设计稿「训练内容进度」卡因无 per-item 进度数据模型，运行态显示「流程状态」卡（真实数据）。
+
+## 2026-08-19 C2 工作台 hero 改日程页同款版式（用户裁决，在线稿已同步）
+
+- 用户裁决：C2 深色卡改成日程页（C1/P1）hero 样式。新结构：顶部「日期·周几 / 重庆天才」小字行 → 超大开始时间（进行中时切换为已进行时长+时钟图标）→ 标题 → meta（队伍 · 场地）→ 底部 pills（出席 X/X 人 + 状态）。
+- 在线 Figma `93:606` 已同步改版（Session Header 垂直自动布局重排：TopRow/大计时/标题+meta/pills；删除「学分 0点」chip）；离线缓存 `c2-activity-workbench.png` 已用新在线截图覆盖。注意：use_figma 代码抛错会整体回滚（首个脚本自检误触发导致部分修改丢失，已按节点树核实后补齐）。
+- 同时修复：副标题截断与队伍名重复（chips 去重、meta 行完整显示）；`formatTimeOnly` 加入 presentation 工具库。
+- 验证：门禁 exit=0（19/356/110）；MCP 真实 375×812 截图与改后在线稿逐区比对一致 ✅。
+
+## 2026-08-19 七个测试账号演示数据充实（客服预览）
+
+- 受控直写生产库（先备份 `backups/api-pre-enrich-20260819.sqlite`）：每个账号球队在上周（8/10-8/16）与本周（8/17-8/23）各铺 6 天活动（5 训练+1 周末教学赛，确定性 id、INSERT OR IGNORE 可重入）；共新增 69 场活动、642 条参与记录（过去活动含 present/late/absent/leave_requested 混合状态）、353 条课时扣减流水（余额按学生逐条递减）、14 条私教申请（pending/confirmed 各半，匹配真实表结构 coach_name/date/time_slot/goals_json）。
+- 读回：每队上周/本周均 6 天有数据（≥5 达标）；compose restart api 后 health 200；新建 parent 会话公网读回 parent/calendar 与学生 schedule 均返回本周 8 场活动。
+- 脚本留档：`tmp/prod-verify/enrich-accounts.cjs`、`enrich-lesson-req.cjs`、`enrich-verify.cjs`（未入库，tmp 约定）。
+
+## 2026-08-19 P8 训练攻略独立列表页
+
+- 用户裁决：「训练攻略」做独立列表页（只列攻略类文章）。新增 `pages/parent/guide/`（列表卡复用内容页文章卡样式，点击进入文章详情页）；内容中心「训练攻略」快捷卡由滚动兜底改为打开该页，pageScrollTo 兜底死代码随之删除。无对应在线 Figma 画板，版式为按现有页面规范的保守补全。
+- 验证：门禁 exit=0（19/357/110）；MCP 真实 375×812 截图确认导航/攻略卡（2026秋季训练计划）正常渲染（`C:\Users\ASUS\AppData\Local\Temp\p8-guide-list.png`）。
+
+## 2026-08-19 P8 快速入口三页顶栏对齐在线稿
+
+- 用户反馈：快速入口各页 topbar 不对。对照在线稿（venues `93:416` / help `93:444` / coaches `93:472`）：设计均为白底、返回箭头+左对齐标题；venues 右侧搜索图标、help 右侧更多、coaches 右侧无。
+- 缺陷与修复：venues 标题 `text-align:center`→左对齐；coaches 标题 44rpx 居中→36rpx 左对齐；help 原本已符合（无需改）。右侧的「…+圆圈」是微信原生胶囊，非缺陷。提交（本地，未推送）。
+- 验证：门禁 exit=0（19/352/110）；WeChatIDE MCP 真实截图逐页对照在线稿——标题左对齐、字号一致、右侧动作符合设计 ✅（`nav-cmp2` 四条横条比对）。
+
 ## 2026-08-19 P8 最近文章可点开 + 文章详情页（新页面）
 
 - 用户反馈：最近文章应可点击打开。新增 `pages/parent/article/` 详情页（导航+标题卡+正文分段，段落 TS 预计算）；`ContentArticle` 增加可选 `body` 字段（契约响应本就 permissive，无需改 schema）；两个种子文件为 4 篇文章补真实正文；内容中心文章卡 bindtap → 详情页。

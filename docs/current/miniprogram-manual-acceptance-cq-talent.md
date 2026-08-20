@@ -2,7 +2,23 @@
 
 > 2026-08-12 身份安全覆盖：本文件出现的 `X-User-Id` 命令均只适用于显式本地开发 API 的隔离 smoke，绝不能请求公网域名或充当生产登录方式。公网/真机验收必须完成真实微信授权并使用服务端返回的 Bearer session。三套隔离双角色测试账号的生产导入尚未执行，见 `agent-handover-2026-08-12-secure-test-accounts.md`。
 
-## 2026-08-09 Windows 当前截图标准（覆盖 08-05 PrintWindow 标准）
+## 2026-08-18 当前截图标准：WeChatIDE MCP（覆盖此前默认通道）
+
+- 可信视觉证据默认走仓库脚本 `node scripts/devtools/wechatide-mcp-capture.cjs --route /<exact-route> --output <absolute.png>`，底层通过 `D:\微信web开发者工具\wechatide.cmd mcp` 调用开发者工具的模拟器能力。
+- MCP 先编译并打开路由，再读取 `currentPage` 和 `systemInfo`；只有路由精确匹配、逻辑视口为 `375×812`、原始 PNG 比例在 DevTools 四舍五入容差内时才继续。
+- 原始 PNG 通过 `simulator_screenshot(optimize=false, waitForSelector="view")` 获取；先等待新路由的页面根节点完成挂载，避免只校验 `currentPage` 后抢到白屏，再由 Pillow 归一化为严格 `375×812`，并生成同名 JSON sidecar。sidecar 不保存 token、手机号、session、角色或 API 响应。
+- MCP 授权/编译/路由/截图/归一化任一步失败都 fail-closed，不自动退回 PrintWindow、桌面截图或旧 Automator 端口。旧脚本仅在人工明确指定时使用，且必须在证据中标明来源。
+- Codex 用户配置需要注册 `wechat-devtools` MCP server；配置后重开 Codex。开发者工具窗口需由用户正常打开，页面需完成真实微信授权；本工具不负责登录、授权或角色切换。
+
+命令示例：
+
+```bash
+node scripts/devtools/wechatide-mcp-capture.cjs \
+  --route /pages/coach/schedule/index \
+  --output C:\Users\ASUS\AppData\Local\Temp\coach-schedule.png
+```
+
+## 2026-08-09 Windows 历史截图标准（不再是默认通道）
 
 - 当前 Windows 取证通道由 Automator 复核路由/视口，再由 `PrintWindow(PW_RENDERFULLCONTENT)` 抓取画面；不依赖可能超时的 `miniProgram.screenshot`。脚本优先找旧版独立“××的模拟器”窗口；新版 DevTools 没有独立模拟器窗口时，回退到唯一可见的 DevTools 主窗口，在其中定位 iPhone X 刘海后裁出完整逻辑视口。
 - 从 **2026-08-17** 起，所有仓库内已跟踪的 Automator 脚本从忽略文件 `tmp/devtools-automation-session.json` 读取同一个握手成功的 WebSocket 端口；绝不再把 `9421`、`9425`、`9429`、`9430` 或 `9432` 写成各脚本私有默认值。会话由 `pnpm --filter @football-club/miniprogram-cq-talent devtools:automator:open` 建立：它把 DevTools `.ide` 的 HTTP 服务端口作为 `cli auto --port` 传入，再注册不同的 `--auto-port`，并以 `currentPage()` 握手后才落盘。
