@@ -32,6 +32,8 @@
 | 93:198 | P2.2 Other Activity Detail | pages/parent/event（other） |
 | 93:222 | P3 Reminder Center | pages/parent/reminders |
 | 93:250 | P4 Growth Home | pages/parent/growth |
+| 499:2 | P4.1 Milestones List | pages/parent/milestones |
+| 499:18 | P4.2 Training History | pages/parent/training-history |
 | 93:278 | P5 Ability Radar | pages/parent/radar |
 | 93:308 | P6 Metric Detail | pages/parent/metric |
 | 93:336 | P7 Parent Profile Hub | pages/parent/child |

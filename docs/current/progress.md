@@ -1,5 +1,13 @@
 # 核心演示闭环 · 进度跟踪
 
+## 2026-08-20 家长端四连修（P2 导航/P4 死链×2/P5 雷达）
+
+- P2 训练详情 topbar：标题 44rpx 居中 → 36rpx 左对齐（设计稿即左对齐，居中版受原生胶囊挤压视觉偏移）。
+- P4 死链修复：「成长足迹·更多›」原本无 bindtap；「训练历程·查看›」错链到课时与保障页。新建两个真实页面 `pages/parent/milestones/`（足迹列表）与 `pages/parent/training-history/`（训练历程列表），数据来自日程接口（服务端单次上限 31 天，分块并行拉取近 180 天）。在线稿补板 P4.1（499:2）/P4.2（499:18）。
+- P5 雷达按用户裁决改教练端干净样式（default 几何、纯标签无数值徽标）；在线稿删除 Radar Canvas 内 6 个 Chip 徽标，离线缓存已同步。
+- 验证：门禁 exit=0（19/365/112）；两新页真实截图均有真实数据（足迹 3 条/历程 7 条）。
+- 附带披露：本次 `git add pages/parent/` 扫入了上一棒 agent 的 private/private-success 4 个小改（role-tabbar active child→discover 修正），内容无害且正确，已随提交带上。
+
 ## 2026-08-20 C11 测评任务新增做真 + 在线稿补板
 
 - 后端：`POST /coach/assessment-tasks`（模板校验+日期不倒挂校验，`saveAssessmentTask` 真持久化到 SQLite）；GET 响应新增 `templates` 供表单选择器。
