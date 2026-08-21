@@ -2228,7 +2228,57 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         clubId: request.params.clubId,
         role: "coach",
         tasks: views,
+        templates: (await context.store.listAssessmentTemplates(request.params.clubId))
+          .map((template) => ({ id: template.id, name: template.name })),
       };
+    },
+  );
+
+  app.post<{
+    Params: { clubId: string; clientId: string };
+    Body: { title: string; templateId: string; startsOn: string; dueOn: string };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/assessment-tasks",
+    {
+      schema: {
+        ...schemas.appClientParams,
+        ...schemas.appClientCoachAssessmentTaskCreate,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+
+      const templates = await context.store.listAssessmentTemplates(request.params.clubId);
+      const template = templates.find((item) => item.id === request.body.templateId);
+      if (!template) {
+        return context.sendError(reply, 400, "invalid_template", "Assessment template not found");
+      }
+      if (request.body.dueOn < request.body.startsOn) {
+        return context.sendError(reply, 400, "invalid_period", "截止日期不能早于开始日期");
+      }
+
+      const task = await context.store.saveAssessmentTask({
+        id: `assessment-task-app-client-${crypto.randomUUID()}`,
+        clubId: request.params.clubId,
+        title: request.body.title.trim(),
+        templateId: template.id,
+        startsOn: request.body.startsOn,
+        dueOn: request.body.dueOn,
+      });
+      reply.code(201);
+      return { clubId: request.params.clubId, task };
     },
   );
 

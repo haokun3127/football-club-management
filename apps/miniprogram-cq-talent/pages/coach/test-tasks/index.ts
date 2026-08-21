@@ -130,8 +130,8 @@ Page<PageData>({
     wx.navigateBack({ delta: 1 });
   },
 
-  showCreateUnavailable() {
-    wx.showToast({ title: "当前端暂不支持新增测评任务。", icon: "none" });
+  openCreate() {
+    wx.navigateTo({ url: "/pages/coach/test-task-create/index" });
   },
 
   selectFilter(event: { currentTarget: { dataset: { id: FilterId } } }) {

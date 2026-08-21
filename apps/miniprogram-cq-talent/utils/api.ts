@@ -206,6 +206,17 @@ export async function saveCoachPreferences(preferences: CoachPreferences): Promi
   });
 }
 
+export async function createCoachAssessmentTask(input: { title: string; templateId: string; startsOn: string; dueOn: string }): Promise<{ id: string }> {
+  const context = requireContext();
+  const raw = await request<Record<string, unknown>>({
+    method: "POST",
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessment-tasks`,
+    data: input,
+  });
+  const task = (raw.task ?? {}) as Record<string, unknown>;
+  return { id: String(task.id ?? "") };
+}
+
 export async function getCoachMatchDetail(eventId: string): Promise<CoachMatchDetail> {
   const context = requireContext();
   const response = await request<Record<string, unknown>>({
@@ -1264,6 +1275,17 @@ export async function getCoachAssessmentTasks(): Promise<CoachAssessmentTask[]> 
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessment-tasks`,
   });
   return Array.isArray(response.tasks) ? response.tasks : [];
+}
+
+export async function getCoachAssessmentTaskOptions(): Promise<{ tasks: CoachAssessmentTask[]; templates: Array<{ id: string; name: string }> }> {
+  const context = requireContext();
+  const response = await request<{ tasks?: CoachAssessmentTask[]; templates?: Array<{ id: string; name: string }> }>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessment-tasks`,
+  });
+  return {
+    tasks: Array.isArray(response.tasks) ? response.tasks : [],
+    templates: Array.isArray(response.templates) ? response.templates : [],
+  };
 }
 
 export async function getContentArticles(): Promise<ContentArticle[]> {

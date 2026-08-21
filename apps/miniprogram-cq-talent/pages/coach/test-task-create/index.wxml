@@ -1,0 +1,36 @@
+<view class="task-create-page">
+  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
+    <view class="page-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+    <view class="page-nav__title">新增测评任务</view>
+    <view class="page-nav__spacer"></view>
+  </view>
+
+  <view class="task-create-page__body">
+    <view class="form-card">
+      <view class="form-field">
+        <view class="form-field__label">任务名称</view>
+        <input class="form-field__input" value="{{title}}" placeholder="例如：月度技术测评" maxlength="60" bindinput="onTitleInput" />
+      </view>
+      <view class="form-field">
+        <view class="form-field__label">测评模板</view>
+        <picker class="form-field__picker" mode="selector" range="{{templateNames}}" value="{{templateIndex}}" bindchange="onTemplateChange">
+          <view class="form-field__picker-box">{{templateNames.length ? templateNames[templateIndex] : '模板加载中'}}<text class="form-field__picker-arrow">›</text></view>
+        </picker>
+      </view>
+      <view class="form-field">
+        <view class="form-field__label">开始日期</view>
+        <picker class="form-field__picker" mode="date" value="{{startsOn}}" bindchange="onStartDateChange">
+          <view class="form-field__picker-box">{{startsOn}}<text class="form-field__picker-arrow">›</text></view>
+        </picker>
+      </view>
+      <view class="form-field">
+        <view class="form-field__label">截止日期</view>
+        <picker class="form-field__picker" mode="date" value="{{dueOn}}" bindchange="onDueDateChange">
+          <view class="form-field__picker-box">{{dueOn}}<text class="form-field__picker-arrow">›</text></view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="submit-button {{canSubmit && !submitting ? '' : 'submit-button--disabled'}}" bindtap="submit">{{submitting ? '创建中' : '创建任务'}}</view>
+  </view>
+</view>

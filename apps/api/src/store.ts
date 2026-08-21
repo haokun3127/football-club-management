@@ -175,6 +175,7 @@ export interface ApiStore {
   listEventChangeRequests(clubId: EntityId, eventId?: EntityId): EventChangeRequest[] | Promise<EventChangeRequest[]>;
   createEventChangeRequest(clubId: EntityId, eventId: EntityId, input: EventChangeRequestInput): EventChangeRequest | Promise<EventChangeRequest>;
   listAssessmentTasks(clubId: EntityId): AssessmentTask[] | Promise<AssessmentTask[]>;
+  saveAssessmentTask(task: AssessmentTask): AssessmentTask | Promise<AssessmentTask>;
   listContentArticles(clubId: EntityId): ContentArticle[] | Promise<ContentArticle[]>;
   listContentFaqs(clubId: EntityId): ContentFaq[] | Promise<ContentFaq[]>;
   listVenues(clubId: EntityId): VenueInfo[] | Promise<VenueInfo[]>;
@@ -1838,6 +1839,10 @@ export abstract class SeedBackedStore implements ApiStore {
     return this.data.assessmentTasks.filter((item) => item.clubId === clubId);
   }
 
+  saveAssessmentTask(task: AssessmentTask): AssessmentTask | Promise<AssessmentTask> {
+    return upsertById(this.data.assessmentTasks, task);
+  }
+
   listContentArticles(clubId: EntityId): ContentArticle[] {
     return this.data.contentArticles.filter((item) => item.clubId === clubId);
   }
@@ -2481,6 +2486,12 @@ export class PersistentApiStore extends SeedBackedStore {
     if (coach) {
       await this.repositories.coaches.save(coach);
     }
+    return saved;
+  }
+
+  override async saveAssessmentTask(task: AssessmentTask): Promise<AssessmentTask> {
+    const saved = await super.saveAssessmentTask(task);
+    await this.repositories.assessmentTasks.save(saved);
     return saved;
   }
 

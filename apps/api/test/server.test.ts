@@ -3600,6 +3600,55 @@ describe("api server", () => {
     expect(body.paths["/clubs/{clubId}/students/{studentId}/metrics"]).toBeTruthy();
   });
 
+  it("creates assessment tasks and lists them with templates", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+    const base = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/assessment-tasks";
+
+    const listed = await app.inject({ method: "GET", url: base, headers: { "x-user-id": "user-coach-1" } });
+    expect(listed.statusCode).toBe(200);
+    const listedBody = listed.json() as { tasks: unknown[]; templates: Array<{ id: string; name: string }> };
+    expect(Array.isArray(listedBody.templates)).toBe(true);
+    const templateId = listedBody.templates[0]?.id;
+    expect(templateId).toBeTruthy();
+
+    const created = await app.inject({
+      method: "POST",
+      url: base,
+      headers: { "x-user-id": "user-coach-1" },
+      payload: { title: "月度技术测评", templateId, startsOn: "2026-08-21", dueOn: "2026-08-31" },
+    });
+    expect(created.statusCode).toBe(201);
+    const createdTask = (created.json() as { task: { id: string; title: string } }).task;
+    expect(createdTask.title).toBe("月度技术测评");
+
+    const relisted = await app.inject({ method: "GET", url: base, headers: { "x-user-id": "user-coach-1" } });
+    const relistedTasks = (relisted.json() as { tasks: Array<{ id: string }> }).tasks;
+    expect(relistedTasks.some((task) => task.id === createdTask.id)).toBe(true);
+
+    const badTemplate = await app.inject({
+      method: "POST",
+      url: base,
+      headers: { "x-user-id": "user-coach-1" },
+      payload: { title: "无效模板", templateId: "nope", startsOn: "2026-08-21", dueOn: "2026-08-31" },
+    });
+    expect(badTemplate.statusCode).toBe(400);
+
+    const badPeriod = await app.inject({
+      method: "POST",
+      url: base,
+      headers: { "x-user-id": "user-coach-1" },
+      payload: { title: "日期倒挂", templateId, startsOn: "2026-08-31", dueOn: "2026-08-21" },
+    });
+    expect(badPeriod.statusCode).toBe(400);
+  });
+
   it("roundtrips coach preferences and rejects parents", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
     const app = buildServer(

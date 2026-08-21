@@ -714,6 +714,25 @@ export const schemas = {
       404: errorResponse,
     },
   },
+  appClientCoachAssessmentTaskCreate: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["title", "templateId", "startsOn", "dueOn"],
+      properties: {
+        title: { type: "string", minLength: 1, maxLength: 60 },
+        templateId: { type: "string", minLength: 1 },
+        startsOn: { type: "string", pattern: "^\\d{4}-\\d{2}-\\d{2}$" },
+        dueOn: { type: "string", pattern: "^\\d{4}-\\d{2}-\\d{2}$" },
+      },
+    },
+    response: {
+      201: { type: "object", additionalProperties: true },
+      400: errorResponse,
+      401: errorResponse,
+      403: errorResponse,
+    },
+  },
   appClientCoachPreferencesUpdate: {
     body: {
       type: "object",

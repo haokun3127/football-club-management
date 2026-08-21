@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   requireRole: vi.fn(),
   openPage: vi.fn(),
   navigateBack: vi.fn(),
+  navigateTo: vi.fn(),
   showToast: vi.fn(),
 }));
 
@@ -14,7 +15,7 @@ vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
 vi.mock("../../../utils/presentation", () => ({ resolveMenuInset: () => 16, resolveNavInset: () => 0 }));
 
-globalThis.wx = { navigateBack: mocks.navigateBack, showToast: mocks.showToast };
+globalThis.wx = { navigateBack: mocks.navigateBack, navigateTo: mocks.navigateTo, showToast: mocks.showToast };
 
 let pageDefinition;
 globalThis.Page = (definition) => {
@@ -119,13 +120,13 @@ describe("coach assessment task list", () => {
     expect(mocks.showToast).toHaveBeenCalledTimes(2);
   });
 
-  it("keeps the Figma creation affordances honest when no create API exists", async () => {
+  it("opens the real create form for the Figma creation affordances", async () => {
     const page = createPageInstance();
     await page.load();
 
-    page.showCreateUnavailable();
+    page.openCreate();
 
-    expect(mocks.showToast).toHaveBeenCalledWith({ title: "当前端暂不支持新增测评任务。", icon: "none" });
+    expect(mocks.navigateTo).toHaveBeenCalledWith({ url: "/pages/coach/test-task-create/index" });
     expect(mocks.getCoachAssessmentTasks).toHaveBeenCalledTimes(1);
     expect(page.data.tasks.map((task) => task.id)).toEqual(realTasks.map((task) => task.id));
   });
@@ -179,7 +180,7 @@ describe("coach assessment task list", () => {
     expect(template).toContain('padding-right:{{menuInset}}px');
     expect(template).toContain('class="tasks-nav__create"');
     expect(template).toContain('class="tasks-fab"');
-    expect(template).toContain('bindtap="showCreateUnavailable"');
+    expect(template).toContain('bindtap="openCreate"');
     expect(template).toContain('/assets/icons/c11-arrow-left.svg');
     expect(template).toContain('<role-tabbar role="coach" active="training"');
     expect(template).toContain('<image class="task-card__chevron"');
