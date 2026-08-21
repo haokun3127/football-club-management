@@ -363,8 +363,29 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         }
       }
 
+      // 同一球队的多个孩子会产生完全相同的日程提醒，按事件合并并把学员名合并展示
+      const mergedByEvent = new Map<string, ParentReminder>();
+      for (const reminder of reminders) {
+        if (reminder.type !== "event_upcoming" || !reminder.event) {
+          mergedByEvent.set(reminder.id, reminder);
+          continue;
+        }
+        const key = `event_upcoming:${reminder.event.id}`;
+        const existing = mergedByEvent.get(key);
+        if (existing) {
+          const names = new Set([existing.studentName, reminder.studentName]);
+          existing.studentName = [...names].join("、");
+          if (reminder.severity === "warning" || existing.severity === "warning") {
+            existing.severity = "warning";
+          }
+        } else {
+          mergedByEvent.set(key, { ...reminder, id: key });
+        }
+      }
+      const dedupedReminders = [...mergedByEvent.values()];
+
       const severityRank: Record<ParentReminder["severity"], number> = { urgent: 0, warning: 1, info: 2 };
-      reminders.sort((left, right) =>
+      dedupedReminders.sort((left, right) =>
         severityRank[left.severity] - severityRank[right.severity] || Date.parse(left.dueAt) - Date.parse(right.dueAt)
       );
 
@@ -373,7 +394,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         client: summarizeClient(client),
         role: "parent",
         generatedAt: new Date(now).toISOString(),
-        reminders,
+        reminders: dedupedReminders,
       };
     },
   );
