@@ -187,7 +187,7 @@ describe("parent private lesson form", () => {
     expect(template).toContain('bindtap="selectSlot"');
     expect(template).toContain('bindtap="toggleGoal"');
     expect(template).toContain("提交后等待教练确认，无需在线支付");
-    expect(template).toContain("role-tabbar");
+    expect(template).toContain('<role-tabbar role="parent" active="discover" />');
     expect(template).not.toContain("预计费用");
     expect(template).not.toContain("立即支付");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);

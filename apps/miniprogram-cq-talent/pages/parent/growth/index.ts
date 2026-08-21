@@ -116,8 +116,10 @@ Page({
     openPage("/pages/parent/binding/index");
   },
   openTrainingHistory() {
-    if (!this.data.activeStudentId) return;
-    openPage(`/pages/parent/status/index?student=${this.data.activeStudentId}`);
+    openPage("/pages/parent/training-history/index");
+  },
+  openMilestones() {
+    openPage("/pages/parent/milestones/index");
   },
   openRadar() {
     console.info("[growth] openRadar tapped", { pageStackDepth: getCurrentPages().length });

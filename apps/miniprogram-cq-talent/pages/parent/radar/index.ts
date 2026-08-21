@@ -79,7 +79,7 @@ Page({
         selectedMetricId: radar[0]?.metricId ?? "",
         canDrawRadar: false,
         radarDimensionLabel: radar.length === 6 ? "六维能力模型" : radar.length >= 3 ? `${radar.length}维能力模型` : "",
-        radarGeometry: radar.length === 6 ? "p5" : "default",
+        radarGeometry: "default",
         updatedAtLabel: growth.updatedAt ? `本周评估 · ${formatShortDate(growth.updatedAt)}` : "评估时间待同步",
         compositeScore: compositeScoreOf(radar),
       });

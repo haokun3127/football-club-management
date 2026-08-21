@@ -1,0 +1,18 @@
+<view class="milestones-page">
+  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
+    <view class="page-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+    <view class="page-nav__title">成长足迹</view>
+    <view class="page-nav__spacer"></view>
+  </view>
+
+  <view class="milestones-page__body">
+    <status-view state="{{state}}" title="{{state === 'loading' ? '加载成长足迹' : state === 'empty' ? '暂无成长足迹' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <block wx:if="{{state === 'ready'}}">
+      <view wx:for="{{milestones}}" wx:key="id" class="milestone-card milestone-card--{{item.tone}}">
+        <view class="milestone-card__icon milestone-card__icon--{{item.tone}}">{{item.icon}}</view>
+        <view class="milestone-card__title">{{item.title}}</view>
+        <view class="milestone-card__state milestone-card__state--{{item.tone}}">{{item.state}}</view>
+      </view>
+    </block>
+  </view>
+</view>

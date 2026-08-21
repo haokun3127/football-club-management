@@ -14,6 +14,8 @@
     "pages/parent/content/index",
     "pages/parent/article/index",
     "pages/parent/guide/index",
+    "pages/parent/milestones/index",
+    "pages/parent/training-history/index",
     "pages/parent/help/index",
     "pages/parent/coaches/index",
     "pages/parent/venues/index",

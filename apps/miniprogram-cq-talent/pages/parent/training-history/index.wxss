@@ -1,0 +1,24 @@
+.history-page {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.history-page__body {
+  padding: 32rpx 32rpx 64rpx;
+}
+
+.page-nav { height: 88rpx; box-sizing: content-box; display: flex; align-items: center; padding: 0 200rpx 0 32rpx; background: var(--color-card); }
+.page-nav__back { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; }
+.page-nav__back image { width: 48rpx; height: 48rpx; }
+.page-nav__title { flex: 1; margin-left: 24rpx; color: #202124; font-size: 36rpx; font-weight: 700; }
+.page-nav__spacer { width: 48rpx; height: 48rpx; }
+
+.history-card { display: flex; align-items: center; gap: 24rpx; margin-bottom: 20rpx; padding: 28rpx 32rpx; border-radius: 24rpx; background: #ffffff; }
+.history-card__bar { flex: 0 0 auto; width: 8rpx; height: 72rpx; border-radius: 4rpx; background: #a80f1b; }
+.history-card__bar--pending { background: #d0d5dd; }
+.history-card__main { flex: 1; min-width: 0; }
+.history-card__title { overflow: hidden; font-size: 30rpx; font-weight: 600; color: #202124; text-overflow: ellipsis; white-space: nowrap; }
+.history-card__meta { margin-top: 8rpx; font-size: 24rpx; color: #667085; }
+.history-card__place { overflow: hidden; margin-top: 4rpx; font-size: 24rpx; color: #98a2b3; text-overflow: ellipsis; white-space: nowrap; }
+.history-card__status { flex: 0 0 auto; font-size: 24rpx; color: #98a2b3; }
+.history-card__status--done { color: #10b981; font-weight: 600; }

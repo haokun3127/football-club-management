@@ -63,12 +63,12 @@ describe("parent growth training history", () => {
     expect(template).toContain('<view class="p4-card__title">训练历程 📊</view><view class="p4-card__link" bindtap="openTrainingHistory">查看›</view>');
   });
 
-  it("opens the existing status page for the active student", () => {
+  it("opens the training-history page", () => {
     const page = createPageInstance({ activeStudentId: "student-1" });
 
     page.openTrainingHistory();
 
-    expect(mocks.openPage).toHaveBeenCalledWith("/pages/parent/status/index?student=student-1");
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/parent/training-history/index");
   });
 
   it("refreshes growth after returning from the child switch and renders real recent activity", async () => {
@@ -111,12 +111,12 @@ describe("parent growth training history", () => {
     expect(page.data.trainingBars).toHaveLength(8);
   });
 
-  it("does not navigate when no active student is available", () => {
+  it("opens the milestones page from the footprint card", () => {
     const page = createPageInstance({ activeStudentId: "" });
 
-    page.openTrainingHistory();
+    page.openMilestones();
 
-    expect(mocks.openPage).not.toHaveBeenCalled();
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/parent/milestones/index");
   });
 
   it("draws the P4 radar only from three real metrics and keeps activity copy explicit when none is returned", async () => {

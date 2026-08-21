@@ -1,0 +1,22 @@
+<view class="history-page">
+  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
+    <view class="page-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+    <view class="page-nav__title">训练历程</view>
+    <view class="page-nav__spacer"></view>
+  </view>
+
+  <view class="history-page__body">
+    <status-view state="{{state}}" title="{{state === 'loading' ? '加载训练历程' : state === 'empty' ? '暂无训练历程' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <block wx:if="{{state === 'ready'}}">
+      <view wx:for="{{rows}}" wx:key="id" class="history-card">
+        <view class="history-card__bar {{item.done ? '' : 'history-card__bar--pending'}}"></view>
+        <view class="history-card__main">
+          <view class="history-card__title">{{item.title}}</view>
+          <view class="history-card__meta">{{item.dateLabel}} · {{item.timeLabel}}</view>
+          <view wx:if="{{item.placeLabel}}" class="history-card__place">{{item.placeLabel}}</view>
+        </view>
+        <view class="history-card__status {{item.done ? 'history-card__status--done' : ''}}">{{item.statusLabel}}</view>
+      </view>
+    </block>
+  </view>
+</view>

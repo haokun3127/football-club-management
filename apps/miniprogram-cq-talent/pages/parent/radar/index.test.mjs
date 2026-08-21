@@ -112,7 +112,7 @@ describe("parent ability radar", () => {
       state: "ready",
       radarDimensionLabel: "六维能力模型",
       compositeScore: 75,
-      radarGeometry: "p5",
+      radarGeometry: "default",
     });
     expect(page.data.radar.map((point) => point.metricId)).toEqual([
       "teamwork", "speed", "fitness", "passing", "defence", "shooting",
