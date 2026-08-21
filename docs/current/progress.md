@@ -1,5 +1,13 @@
 # 核心演示闭环 · 进度跟踪
 
+## 2026-08-20 C11 测评任务新增做真 + 在线稿补板
+
+- 后端：`POST /coach/assessment-tasks`（模板校验+日期不倒挂校验，`saveAssessmentTask` 真持久化到 SQLite）；GET 响应新增 `templates` 供表单选择器。
+- 小程序：新页 `pages/coach/test-task-create/`（名称+模板+起止日期+校验+失败回滚）；C11 列表「新增」两处入口接通，返回自动刷新。
+- 在线 Figma 补板 `C11.1 Assessment Task Create`（487:2，教练页 4:7），离线缓存 `c11-1-assessment-task-create.png` 与 frame-map 已同步。
+- 验证：门禁 exit=0（19/365/112）；生产部署后真实 POST 创建「8月下旬技术测评」并在列表读回 ✅；表单页截图正常。
+- 注意：部署重启会清空内存 session plan（今晚 19:00 演示的训练内容已重放）。
+
 ## 2026-08-20 「设计目标模式全做」批次（g1-g7 完成，g8 已排期）
 
 - **C2 训练内容进度卡**：按计划时长×当前时间推导每项 完成/进行中/待开始（诚实推导非虚构）；今晚演示事件（控球与盘带训练 19:00-20:30）已通过真实 PUT 接口挂上 6 项训练内容。关键坑：session plan 仅存内存，API 重启即失，演示前需重放 PUT（脚本见 tmp/prod-verify）。
