@@ -25,6 +25,58 @@ The API currently uses SQLite persistence with ordered SQL migrations and reposi
 - Calendar and participant list/natural-key reads must include `club_id`; `PersistentApiStore` may merge associated seed-backed event details, but persisted participant state remains authoritative when the natural key exists.
 - Cover both an in-memory repository regression and a file-database close/reopen regression. The latter must verify status, non-empty note, an unchanged participant, and exactly one natural-key row.
 
+## Catalog Session Plan Persistence
+
+### 1. Scope / Trigger
+
+- Trigger: Persisting coach-selected `SessionPlan` data across API restarts without changing the mini-program route contract.
+
+### 2. Signatures
+
+- `SessionPlanRepository.listByClub(clubId)` returns system catalog plans plus plans whose `catalog_club_id` equals `clubId`.
+- `SessionPlanRepository.getById(clubId, id)` applies the same visibility rule.
+- `SessionPlanRepository.save(plan)` upserts by stable `id` and returns the mapped domain object.
+- `SessionPlanRepository.insertIfAbsent(plan)` seeds without overwriting user-edited data.
+
+### 3. Contracts
+
+- `catalog_scope = 'system'` stores `catalog_club_id = NULL`; `catalog_scope = 'club'` requires a valid `catalog_club_id`.
+- Nested `objectiveIds`, `metricIds`, and ordered `blocks` are stored as JSON columns and reconstructed as the domain arrays.
+- `PersistentApiStore` merges persisted plans over seed plans by `id`, then writes `saveSessionPlan` through the repository.
+
+### 4. Validation & Error Matrix
+
+- Unknown catalog scope or invalid scope/club combination → SQLite `CHECK` failure.
+- Cross-club `getById` or `listByClub` → no row returned for another club's plan.
+- Invalid persisted JSON array → repository read throws instead of returning partial training content.
+
+### 5. Good/Base/Bad Cases
+
+- Good: save a club-scoped plan, close the file database, reopen, and read the same block order, notes, and duration.
+- Base: seed an existing plan with `insertIfAbsent`; preserve the persisted user edit on reopen.
+- Bad: query `session_plans` without the system-or-club visibility predicate.
+
+### 6. Tests Required
+
+- Migration idempotency includes `0015_session_plans.sql` and the `session_plans` table.
+- File-backed persistence regression asserts repository and `PersistentApiStore` readback after close/reopen.
+- API route tests continue to assert the training-project PUT response contract.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+this.data.sessionPlans = nextPlans;
+```
+
+#### Correct
+
+```ts
+const saved = this.repositories.sessionPlans.save(sessionPlan);
+upsertById(this.data.sessionPlans, saved);
+```
+
 ## Examples
 
 - Migration runner test: `apps/api/test/persistence.test.ts`

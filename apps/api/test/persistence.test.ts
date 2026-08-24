@@ -10,6 +10,61 @@ import { buildServer } from "../src/server.js";
 import { PersistentApiStore } from "../src/store.js";
 
 describe("platform persistence", () => {
+  it("persists coach session plans across a file database reopen", { timeout: 30_000 }, async () => {
+    const directory = mkdtempSync(join(tmpdir(), "football-session-plan-"));
+    const databasePath = join(directory, "club.sqlite");
+    const data = createSeedData();
+    const plan = {
+      id: "session-plan-persistence-regression",
+      catalogScope: { scope: "club" as const, clubId: "club-chongqing-talent" },
+      name: "持久化训练内容",
+      objectiveIds: ["objective-finishing"],
+      metricIds: ["metric-finishing"],
+      blocks: [
+        {
+          id: "session-plan-block-persistence-01",
+          drillId: "drill-finishing-01",
+          order: 1,
+          plannedMinutes: 18,
+          notes: "先完成射门热身",
+        },
+        {
+          id: "session-plan-block-persistence-02",
+          drillId: "drill-finishing-02",
+          order: 2,
+          plannedMinutes: 22,
+          notes: "再进行对抗练习",
+        },
+      ],
+      estimatedMinutes: 40,
+      createdAt: "2026-08-24T08:00:00.000Z",
+      updatedAt: "2026-08-24T08:05:00.000Z",
+    };
+    let first: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
+    let reopened: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
+
+    try {
+      first = await createPlatformPersistence({ databasePath, seedData: data });
+      const firstStore = new PersistentApiStore(first.repositories, data);
+      expect(firstStore.saveSessionPlan(plan)).toEqual(plan);
+      first.database.close();
+      first = undefined;
+
+      reopened = await createPlatformPersistence({ databasePath, seed: true, seedData: data });
+      const reopenedStore = new PersistentApiStore(reopened.repositories, data);
+
+      expect(reopened.repositories.sessionPlans.getById("club-chongqing-talent", plan.id)).toEqual(plan);
+      expect(reopenedStore.getSessionPlan(plan.id)).toEqual(plan);
+      expect(reopenedStore.listSessionPlans("club-chongqing-talent")).toEqual(
+        expect.arrayContaining([plan]),
+      );
+    } finally {
+      reopened?.database.close();
+      first?.database.close();
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   it("persists assessment tasks across a file database reopen", { timeout: 15_000 }, async () => {
     const directory = mkdtempSync(join(tmpdir(), "football-assessment-tasks-"));
     const databasePath = join(directory, "club.sqlite");
@@ -371,6 +426,7 @@ describe("platform persistence", () => {
       "0012_assessment_tasks.sql",
       "0013_coach_preferences.sql",
       "0014_coach_wechat.sql",
+      "0015_session_plans.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);
@@ -411,6 +467,7 @@ describe("platform persistence", () => {
           ,'tactical_boards',
           'app_client_sessions'
           ,'assessment_tasks'
+          ,'session_plans'
         )
       ORDER BY name
     `).all() as Array<{ name: string }>;
@@ -443,6 +500,7 @@ describe("platform persistence", () => {
       "privacy_notice_versions",
       "privacy_requests",
       "privacy_retention_policies",
+      "session_plans",
       "student_consent_records",
       "student_contacts",
       "student_guardian_bindings",

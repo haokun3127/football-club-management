@@ -2452,7 +2452,7 @@ export class PersistentApiStore extends SeedBackedStore {
     readonly repositories: PlatformRepositories,
     data: SeedData = createSeedData(),
   ) {
-    super(mergePersistedPlatformData(repositories, mergePersistedMatchData(repositories, mergePersistedAssessmentData(repositories, data))));
+    super(mergePersistedSessionPlanData(repositories, mergePersistedPlatformData(repositories, mergePersistedMatchData(repositories, mergePersistedAssessmentData(repositories, data)))));
   }
 
   override listCalendarEvents(clubId: EntityId) {
@@ -2492,6 +2492,12 @@ export class PersistentApiStore extends SeedBackedStore {
   override async saveAssessmentTask(task: AssessmentTask): Promise<AssessmentTask> {
     const saved = await super.saveAssessmentTask(task);
     await this.repositories.assessmentTasks.save(saved);
+    return saved;
+  }
+
+  override saveSessionPlan(sessionPlan: SessionPlan): SessionPlan {
+    const saved = this.repositories.sessionPlans.save(sessionPlan);
+    upsertById(this.data.sessionPlans, saved);
     return saved;
   }
 
@@ -3372,6 +3378,17 @@ function mergePersistedAssessmentData(repositories: PlatformRepositories, data: 
     assessmentTasks: mergeById(
       data.assessmentTasks,
       clubIds.flatMap((clubId) => repositories.assessmentTasks.listByClub(clubId)),
+    ),
+  };
+}
+
+function mergePersistedSessionPlanData(repositories: PlatformRepositories, data: SeedData): SeedData {
+  const clubIds = data.clubs.map((club) => club.id);
+  return {
+    ...data,
+    sessionPlans: mergeById(
+      data.sessionPlans,
+      clubIds.flatMap((clubId) => repositories.sessionPlans.listByClub(clubId)),
     ),
   };
 }
