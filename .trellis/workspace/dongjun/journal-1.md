@@ -864,3 +864,37 @@ Verified all 38 role-tabbar consumers against the current online Figma evidence 
 ### Next Steps
 
 - None - task complete
+
+
+## Session 24: Persist coach session plans
+
+**Date**: 2026-08-24
+**Task**: Persist coach session plans
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+Added SQLite migration and repository persistence for coach session plans, merged persisted plans at API startup, added close/reopen regression coverage, and passed API plus root checks.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `f0ce036` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
