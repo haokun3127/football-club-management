@@ -32,3 +32,9 @@ Make the parent schedule use the device's current local date in every mini-progr
 - Re-seeding, editing, or rolling real production events.
 - A new club timezone model.
 - Changes to coach schedule defaults.
+
+## Closure Reconciliation — 2026-08-28
+
+The parent schedule UI was intentionally superseded by the completed P1 Month V2 task on 2026-08-28. The current Figma contract is `zZ6wKyOHKcO4UYXDd9jGwv / 521:339`, a Monday-first month calendar, and the page loads the selected calendar month rather than a Monday–Sunday week. Therefore the original week-range request and week-strip navigation criteria are historical and must not be used to regress the month design.
+
+The still-current parts of this task are complete: parent pages use the shared local-date helper with the explicit develop-only override disabled, date-only calendar `to` values include the named UTC day, malformed/reversed/overlong ranges return `invalid_date_range`, and guardian projection/empty-child behavior remain covered. The focused API and mini-program checks were rerun on 2026-08-28 with no business-code changes required.

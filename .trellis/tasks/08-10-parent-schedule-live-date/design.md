@@ -15,3 +15,7 @@ Parent schedule/day pages call a shared date helper for the current local date. 
 ## Risks and Rollback
 
 Changing a develop default may reveal a genuine empty current week because fixtures are historical. That is correct. The API range correction and client live-date change land in separate commits, so either can be reverted without schema or data rollback.
+
+## Current Design Reconciliation — 2026-08-28
+
+P1 Month V2 (`521:339`) supersedes the former week-strip design. The client now derives the selected month from the live local date, requests that month's first and last date, and precomputes a six-row Monday-first grid. The API date-only contract remains unchanged and is validated independently. The existing `changeWeek` handler is retained only as inert compatibility code; it is not exposed by the current Figma UI.

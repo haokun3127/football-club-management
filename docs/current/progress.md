@@ -1584,3 +1584,10 @@
 - 运行时随后验证为 `/pages/coach/schedule/index`，`systemInfo` 返回 iPhone X、逻辑视口 `375×812`、`pixelRatio=3`；真实教练数据日期切到 `2026-08-27` 以展示已有活动，MCP 截图保存为 `C:\Users\ASUS\AppData\Local\Temp\cq-c1-coach-20260828-data.png`，PNG 严格 `375×812`。
 - 对照结论：顶栏、七日日期条及前后箭头、内容宽度统计胶囊、深色 Hero、活动卡、SVG 右箭头和教练 TabBar 的结构/层级均与在线稿一致。真实日期、教练/球队名称、数量、活动标题、状态及卡片数量属于 API 数据差异，未用 Figma 样例替换。
 - 新增的运行时教训：切换截图角色时必须走应用真实双角色切换链路；仅通过 Automator `setStorage` 修改 `cqTalentSession` 不会清除当前 JS 进程的 `sessionState` 缓存，下一次启动会把旧角色写回。截图工具仍保持 fail-closed，不以桌面裁剪或固定旧端口替代 MCP 证据。
+
+## 2026-08-28 家长端实时日期任务收口审计
+
+- 复核 `.trellis/tasks/08-10-parent-schedule-live-date/`：共享 `resolveParentPageDate` 已默认使用设备本地日期，开发固定日期开关保持关闭；家长日程当前按在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 521:339` 的月历 V2 请求所选月份，不能再按旧周历标准回退。
+- 最新 Figma MCP 截图 `C:\Users\ASUS\AppData\Local\Temp\cq-p1-month-figma-20260828.png` 严格为 `375×812`；确认当前画板只有右侧月份箭头，前一月处理器保留但未暴露为未批准视觉控件。
+- API 日期边界定向回归 `12 files / 115 tests` 通过；小程序定向范围实际执行为当前全量 `66 files / 405 tests` 通过。覆盖 date-only `to` 全天包含、次日排除、非法/倒序/超长范围及家长数据权限。
+- 本轮无业务代码修改；旧任务的“周一至周日初始请求/周切换”标准已记录为被 P1 Month V2 supersede，避免后续误把现行月历改回周历。
