@@ -14,26 +14,8 @@ Synchronize the coach tactical-board mini-program page with the current online F
 
 ## Acceptance criteria
 
-- [ ] C7 WXML contains the Figma sections and no invalid `wx:else`/`wx:for` combination.
-- [ ] C7 styles match the current node geometry and colors at logical 375px width.
-- [ ] All existing API-backed interactions remain covered by focused tests.
-- [ ] Focused tests, mini-program TypeScript check, and `git diff --check` pass.
-- [ ] Only C7 files plus the progress entry are committed.
-
-## Goal
-
-TBD.
-
-## Requirements
-
-- TBD
-
-## Acceptance Criteria
-
-- [ ] TBD
-
-## Notes
-
-- Keep `prd.md` focused on requirements, constraints, and acceptance criteria.
-- Lightweight tasks can remain PRD-only.
-- For complex tasks, add `design.md` for technical design and `implement.md` for execution planning before `task.py start`.
+- [x] C7 WXML contains the Figma sections and no invalid `wx:else`/`wx:for` combination.
+- [x] C7 styles match the current node geometry and colors at logical 375px width.
+- [x] All existing API-backed interactions remain covered by focused tests.
+- [x] Focused tests, mini-program TypeScript check, and `git diff --check` pass.
+- [x] Only C7 implementation/task records and the progress entry are committed.

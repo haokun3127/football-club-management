@@ -1,0 +1,36 @@
+{
+  "id": "c7-tactical-board-current-sync",
+  "name": "c7-tactical-board-current-sync",
+  "title": "C7 tactical board current Figma sync",
+  "description": "Synchronize the coach tactical-board page with the current online Figma CODE MVP node 233:2 while preserving real API-backed roster, formation, movement, substitution, reset, save, read-only, loading, empty, and error behavior.",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": "coach mini-program presentation and focused regression/documentation records; no API, database, session, or seed-data changes",
+  "package": "api",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-08-28",
+  "completedAt": null,
+  "branch": "dev",
+  "base_branch": "dev",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "apps/miniprogram-cq-talent/pages/coach/tactical-board/index.wxml",
+    "apps/miniprogram-cq-talent/pages/coach/tactical-board/index.wxss",
+    "apps/miniprogram-cq-talent/pages/coach/tactical-board/index.ts",
+    "apps/miniprogram-cq-talent/pages/coach/tactical-board/index.test.mjs",
+    "apps/miniprogram-cq-talent/pages/coach/tactical-board/index.json",
+    "docs/current/progress.md",
+    "tmp/c7-figma-current.png",
+    "tmp/goal-c7-coach-current.png",
+    "tmp/goal-c7-coach-bottom-current.png"
+  ],
+  "notes": "Online Figma node 233:2 was re-read on 2026-08-28 and remains 375x812. WeChatIDE MCP reopened the real coach route with eventId event-cq-talent-secure-test-1-scheduled-match; screenshot returned 563x1218, equivalent to 375x812 logical viewport. WXML/WXSS compile succeeded and filtered simulator console returned no error, wx:else, or route-is-not-defined lines. Generated WeChatIDE index.js files are build artifacts and must remain excluded from commits."
+  "meta": {}
+}

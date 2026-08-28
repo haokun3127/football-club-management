@@ -1412,3 +1412,11 @@
 - 可信运行态证据：`tmp/goal-c14-runtime.png` 为 WeChatIDE MCP 模拟器原始截图，返回 `563×1218`，系统信息为 iPhone X 逻辑 `375×812`；Figma 对照图为 `tmp/goal-c14-figma.png`。真实账号显示 8 维能力和真实队伍信息，Figma 样例显示 6 维，属于数据契约差异，不能据此伪造或判定结构未完成。
 - 同轮还复核 C7 战术板：当前 `index.wxml` 的 `wx:else` 已置于独立 `<block>`，微信开发者工具 WXML/WXSS 编译成功；刷新后模拟器控制台无 `wx:else` 或 `route is not defined`。旧报错来自刷新前缓存 bundle，重新编译/刷新后不再复现。
 - 验证：C14 与 C7 定向 Vitest `11/11`；微信 WXML/WXSS 编译成功；后续全仓门禁与 `git diff --check` 见本批提交记录。
+
+## 2026-08-28 C7 战术板当前在线稿复核与证据收口
+
+- 在线唯一基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 233:2 / CODE / C7 Tactical Board MVP`。本次 Figma MCP 返回 `375×812`，结构仍为白色圆角顶栏、`MATCH TACTICS`、比赛标题/保存状态、阵型卡、绿色球场、红色球员圆点、替补席和重置/保存操作区；未发现需要重新施工的在线稿变化。
+- WeChatIDE MCP 重新打开真实教练路由：`pages/coach/tactical-board/index?eventId=event-cq-talent-secure-test-1-scheduled-match`。页面读取真实比赛“周末联赛排兵”、真实 `4-3-3` 阵型和真实名单；截图 `tmp/goal-c7-coach-current-rerun.png` 返回 `563×1218` 原始像素，对应 iPhone X 逻辑视口 `375×812`。
+- 本次 WXML 编译与 WXSS 编译均成功；模拟器控制台按 `error|exception|wx:else|route is not defined` 过滤无命中。此前 `wx:else`/`route` 报错不再复现，结论仍是旧缓存 bundle/旧运行态问题，不是当前 C7 源码错误。
+- C7 页面保持真实 API 与交互闭环：名单过滤、阵型切换、拖拽、首发/替补换位、重置、保存、只读、加载、空态和错误态均未被证据复核改变；没有新增伪球员、伪数据、伪会话或 API。
+- 文档收口：C7 `prd.md` 删除重复 `TBD` 模板段；`implement.jsonl` 改为真实设计上下文；`task.json` 补齐描述、范围、关联文件和运行证据。截图证据与当前任务记录同步保留，生成的微信开发者工具 `index.js` 不纳入提交。
