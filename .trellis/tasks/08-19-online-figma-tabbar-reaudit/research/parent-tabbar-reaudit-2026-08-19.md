@@ -36,4 +36,12 @@ The audit was re-opened after the user correctly pointed out that reviewing only
 - Fresh runtime frame after the repair: `captures/p1-schedule-runtime-dot-8rpx-2026-08-19.png`; direct 70px crop `captures/p1-schedule-tabbar-crop-dot-8rpx-2026-08-19.png`.
 - Direct comparison: `captures/parent-tabbar-overlay-vs-runtime-dot-8rpx-2026-08-19.png`.
 
-**Confirmed repair.** The prior left-alignment repair already matched icon/label `x/y` and label sizing, but active dots still used `4rpx`, which is only 2 CSS pixels in the 375px viewport. The live Figma dot is 4 CSS pixels. The shared component now uses `8rpx` for the active dot, preserving `left:24rpx; top:84rpx`. The grey home-indicator in the Figma overlay versus the simulator's black system indicator is a platform-only exclusion.
+**Confirmed repair.** The prior left-alignment repair already matched icon/label `x/y` and label sizing, but active dots still used `4rpx`, which is only 2 CSS pixels in the 375px viewport. The live Figma dot is 4 CSS pixels. The shared component now uses `8rpx` for the active dot; the parent-specific vertical offset was later corrected to the live `88rpx` position. The grey home-indicator in the Figma overlay versus the simulator's black system indicator is a platform-only exclusion.
+
+## Follow-up evidence batch — 2026-08-28
+
+The live online file was re-read through the Figma MCP using file key `zZ6wKyOHKcO4UYXDd9jGwv`. The parent root remains `4:6`; the current parent TabBar overlay is `269:376`. The fresh online reference is retained at `research/live-2026-08-28/parent-tabbar-online.png`.
+
+- Runtime attempt: `research/live-2026-08-28/parent-route-attempt-runtime.png` (`375×812`). The WeChatIDE session was still a coach session; `/pages/parent/reminders` returned HTTP 403 with `Session active role is not permitted for this operation`. This is a blocked parent runtime capture, not a visual pass.
+- Repair scope: parent active-dot override in `components/role-tabbar/index.wxss` and its focused contract test. The online parent overlay places the active dot at `y=44px`, which maps to `88rpx`; the previous `84rpx` override was 2px too high.
+- Disposition: parent TabBar visual acceptance remains **blocked pending a real parent-role session**. The static online Figma read and the route-block evidence are recorded separately from visual comparison.

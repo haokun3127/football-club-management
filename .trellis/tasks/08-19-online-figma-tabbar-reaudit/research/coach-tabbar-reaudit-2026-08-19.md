@@ -59,3 +59,11 @@ Focused Vitest after repairs: 25/25 passing across C1, C7 and C8. Workspace type
 - `apps/api/test/persistence.test.ts:13` — `persists assessment tasks across a file database reopen` timed out at its 15-second limit.
 
 This is recorded as a distinct workspace-gate failure, not a claim that the visual repair caused or resolved it. The scoped C1/C7/C8 regressions and root typecheck are green.
+
+## Follow-up evidence batch — 2026-08-28
+
+The live online file was re-read through the Figma MCP using file key `zZ6wKyOHKcO4UYXDd9jGwv`. The coach root remains `4:7`; the current coach TabBar overlay is `529:124`. The fresh online reference is retained at `research/live-2026-08-28/coach-tabbar-online.png`.
+
+- Fresh runtime frame: `research/live-2026-08-28/coach-schedule-runtime-after-fix.png` (`375×812`), route `/pages/coach/schedule/index`.
+- Comparison: the three-item coach shell, 70px height, 16px icons, 4px active dot, active schedule state, and safe-area placement agree with the online overlay. The schedule body is live data and is not part of this TabBar disposition.
+- Disposition: coach TabBar comparison **passed** for this batch. The parent and coach results remain separate because the parent route could not be entered with the current coach session.

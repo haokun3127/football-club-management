@@ -57,7 +57,7 @@ describe("role tabbar real-device icon contract", () => {
     expect(styles).toContain(".tabbar-icon-wrap { position: static; display: flex; align-items: center; justify-content: center; width: 32rpx; height: 32rpx;");
     expect(styles).toContain(".tabbar-icon { width: 32rpx; height: 32rpx; }");
     expect(styles).toContain(".tabbar--parent .tabbar-item.active { color: #a80f1b;");
-    expect(styles).toContain(".tabbar--parent .tabbar-item.active .tabbar-dot { top: 84rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: #a80f1b; }");
+    expect(styles).toContain(".tabbar--parent .tabbar-item.active .tabbar-dot { top: 88rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: #a80f1b; }");
     expect(styles).toContain(".tabbar--coach .tabbar-item.active .tabbar-dot { top: 88rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: var(--color-brand); }");
     expect(styles).not.toContain(".tabbar-item.active .tabbar-icon-wrap { background: #fceeef; }");
     expect(styles).not.toContain(".tabbar-item.active .tabbar-dot { background: var(--color-brand); }");

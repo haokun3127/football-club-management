@@ -6,6 +6,6 @@
 .tabbar-dot { position: absolute; top: 88rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: transparent; }
 .tabbar-label { width: 100%; margin-top: 8rpx; overflow: hidden; max-width: 100%; font-size: 18rpx; line-height: 22rpx; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
 .tabbar--parent .tabbar-item.active { color: #a80f1b; }
-.tabbar--parent .tabbar-item.active .tabbar-dot { top: 84rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: #a80f1b; }
+.tabbar--parent .tabbar-item.active .tabbar-dot { top: 88rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: #a80f1b; }
 .tabbar--coach .tabbar-item.active { color: var(--color-brand); }
 .tabbar--coach .tabbar-item.active .tabbar-dot { top: 88rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: var(--color-brand); }

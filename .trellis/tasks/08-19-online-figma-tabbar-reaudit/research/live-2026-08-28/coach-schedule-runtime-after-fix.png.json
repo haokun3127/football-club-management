@@ -1,0 +1,13 @@
+{
+  "capturedOn": "2026-08-28",
+  "route": "/pages/coach/schedule/index",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 24503,
+    "sha256": "8a9da8b037fdfdbbe9e11cb7e9d6ee31b814030546fac9db07465e89322a7ed3"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot",
+  "visualDisposition": "passed against live Figma coach TabBar overlay 529:124"
+}

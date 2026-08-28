@@ -1,0 +1,14 @@
+{
+  "capturedOn": "2026-08-28",
+  "route": "/pages/parent/reminders",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 24478,
+    "sha256": "966a659b518e714a49ba8357ac979e1f8dc5b1a71b28a2f1e43278f9f80dbad6"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot",
+  "routeResult": "blocked: HTTP 403 Session active role is not permitted for this operation",
+  "visualDisposition": "blocked; no parent-role visual acceptance claimed"
+}
