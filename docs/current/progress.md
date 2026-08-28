@@ -1293,4 +1293,10 @@
 - 在线唯一基准为 `zZ6wKyOHKcO4UYXDd9jGwv / 93:952 / C10 Training Content Select`。当前稿要求 22px 顶栏标题、22px 左侧内边距、12px 返回/标题间距、20px 搜索图标、13px 搜索占位文案，以及 32px 高分类胶囊。
 - `pages/coach/content-select` 仅调整页面级 WXSS：顶栏标题/间距、搜索图标与文字、分类胶囊高度和内边距；真实训练内容读取、筛选、选择、保存回读和不可编辑状态不变。
 - 当前教练会话在未携带真实 `eventId` 时显示“无法读取训练内容”，这是页面契约要求的安全空态；未将 Figma 示例训练项目写进客户端，也未新增伪训练数据。
-- 验证：C10 定向 Vitest 先红后绿，最终 `9/9`；小程序类型检查和全仓门禁待提交前复验。微信开发者工具当前空态截图为 `C:\Users\ASUS\Desktop\football-club-management-codex-windows-2026-08-28-c10-current.png`，不作为有数据页面的视觉通过证据。
+- 验证：C10 定向 Vitest 先红后绿，最终 `9/9`；小程序 TypeScript 检查通过；随后全仓门禁通过（domain `19/19`、小程序 `368/368`、API `113/113`）。微信开发者工具当前空态截图为 `C:\Users\ASUS\Desktop\football-club-management-codex-windows-2026-08-28-c10-current.png`，不作为有数据页面的视觉通过证据。
+
+## 2026-08-28 C11 悬浮新增按钮图标修复
+
+- 在线唯一基准为 `zZ6wKyOHKcO4UYXDd9jGwv / 93:1002 / C11 Test Task List`。复核真实 `564×1220` 模拟器输出（按设备倍率归一前）发现悬浮新增按钮只有正红色圆形，原因是 `plus.svg` 的线条颜色与按钮背景相同。
+- 将 `/assets/icons/plus.svg` 线条改为白色；不改变新增入口的导航、真实测评任务读取或任何 API 契约。
+- C11 定向测试先红后绿，最终 `9/9`；修复后 MCP 复拍为严格 `375×812`：`C:\Users\ASUS\Desktop\football-club-management-codex-windows-2026-08-28-c11-after-fix.png`，白色加号已可见。日期、状态、进度仍按真实 API 展示；本批全仓门禁通过（domain `19/19`、小程序 `369/369`、API `113/113`）。

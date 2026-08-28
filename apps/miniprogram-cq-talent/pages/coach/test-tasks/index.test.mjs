@@ -29,6 +29,7 @@ const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
 const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 const pageConfig = readFileSync(new URL("./index.json", import.meta.url), "utf8");
+const plusIcon = readFileSync(new URL("../../../assets/icons/plus.svg", import.meta.url), "utf8");
 
 const realTasks = [
   {
@@ -197,5 +198,9 @@ describe("coach assessment task list", () => {
     expect(stylesheet).toMatch(/\.filter-row\s*\{[^}]*margin-bottom:\s*28rpx/s);
     expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*width:\s*112rpx[^}]*height:\s*112rpx/s);
     expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*z-index:\s*10000/s);
+  });
+
+  it("keeps the floating create icon visible on the red Figma FAB", () => {
+    expect(plusIcon).toContain('stroke="#FFFFFF"');
   });
 });
