@@ -1484,3 +1484,9 @@
 - 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:924`，在线画板完整高度 `375×871`；截图保留为 `tmp/figma-c9-93-924-live.png`。
 - 真实教练会话打开 `pages/coach/team/index` 并返回 `ready`：真实队伍摘要、在队人数 `8`、累计训练 `13`、出勤率 `88%`、8 名学员和 1 名教练均已进入 view model。运行截图为 `tmp/goal-c9-team-detail-top-live.png`，严格 `375×812`。
 - 结构核对通过：软粉顶栏、深色摘要卡、三项统计、四列学员网格、横向教练卡与教练 TabBar 均存在；真实队名/赛季/姓名较 Figma 示例不同，按真实 API 数据差异处理。控制台错误过滤无命中。
+
+## 2026-08-28 C11 测评任务列表最新运行复核
+
+- 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1002`，截图为 `tmp/figma-c11-93-1002-live.png`。
+- 真实教练会话打开 `pages/coach/test-tasks/index`，页面状态为 `ready`，返回 4 个真实任务；截图为 `tmp/goal-c11-test-tasks-live.png`，严格 `375×812`。首屏的顶栏、新增、筛选、任务卡、进度轨道、悬浮新增按钮和教练 TabBar 均已复核。
+- 真实任务日期、标题、状态和进度与 Figma 示例不同，保持 API 数据；控制台错误过滤无命中。本轮无需业务代码或 API 改动。

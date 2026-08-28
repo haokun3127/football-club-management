@@ -104,3 +104,10 @@
 - 本轮再次读取在线唯一基准 `zZ6wKyOHKcO4UYXDd9jGwv / 93:1002 / C11 Test Task List`，并取得原尺寸 `375×812` 在线截图；顶栏、三枚筛选胶囊、`299×116px` 任务卡、进度轨道、`56px` FAB 与三栏 TabBar 的结构和几何保持一致。
 - 可信运行态截图为 `tmp/coach-runtime-acceptance/C11-20260818-fresh-mcp.png`，同目录 sidecar 已确认路由 `/pages/coach/test-tasks/index`、原始与归一化尺寸均为严格 `375×812`、采集方式为 WeChatIDE MCP `simulator_screenshot`；并排对照为 `C11-20260818-fresh-compare.png`。
 - 对照中任务名称、日期、状态、完成数与在线稿示例不同，均来自当前真实 API；微信状态栏、原生胶囊和 Home Indicator 属系统层差异。未把设计样例硬编码进 UI，本页不需要业务代码改动。
+
+## 2026-08-28 真实运行证据
+
+- 在线稿节点：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1002`；本次在线截图保存为 `tmp/figma-c11-93-1002-live.png`。
+- 真实 WeChatIDE MCP 截图：`tmp/goal-c11-test-tasks-live.png`，严格 `375×812`。顶栏、右侧“新增”、三枚筛选胶囊、真实任务卡、进度轨道、悬浮新增按钮和教练 TabBar 均已渲染。
+- 当前真实账号返回 4 个任务（进行中/已完成/进行中/未开始），首屏可见 3 个；标题、日期、完成数和状态来自接口，和 Figma 示例不同不属于设计缺陷。
+- 控制台过滤 `error|exception|fail|undefined|route is not defined|wx:else` 无命中；本轮没有修改业务代码、API、数据库或 Figma。
