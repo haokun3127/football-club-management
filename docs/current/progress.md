@@ -1387,3 +1387,11 @@
 - 真实闭环验证：通过现有教练 `PUT .../coach/events/event-training-1/training-projects` 保存真实训练项目和 `high` 强度，关闭文件数据库并以新 seed 数据重开后，coach workbench 仍返回相同 `sessionPlanId`、强度、已选项目 ID 和训练项目详情。
 - 定向验证：训练课重启回归、session plan 回归、迁移幂等共 `3/3`；训练内容 BFF 聚合用例 `1/1`；完整 API persistence `13/13`；API 类型检查通过。
 - 视觉边界：本批没有修改小程序页面，也没有新增可信 `375×812` Figma/微信开发者工具截图；API/数据库通过不等于视觉验收通过。
+
+## 2026-08-28 家长成长子页面当前学员一致性修复
+
+- 在线 Figma 目标复核：P4.1 成长足迹 `zZ6wKyOHKcO4UYXDd9jGwv / 499:2`、P4.2 训练历程 `zZ6wKyOHKcO4UYXDd9jGwv / 499:18`；本批只修复数据选择逻辑，不改变现有画板结构。
+- 根因：成长首页已经按会话 `currentStudentId` 解析当前学员，但 `pages/parent/milestones` 和 `pages/parent/training-history` 仍固定使用 `children[0]`，切换学员后会继续显示第一位学员的成长足迹或训练历程。
+- 修复：两个页面的 `load()` 现在调用 `requireRole("parent")` 并使用 `children.find(child.id === session.currentStudentId) ?? children[0]`；页面首次加载和重试都读取持久会话中的当前学员，原有 API、空态、错误态和 Figma 全屏布局保持不变。
+- 回归覆盖：新增两个页面测试，证明第二位绑定学员会被用于训练历程筛选和成长足迹统计；测试先按旧实现进入 RED，修复后 `2/2` 通过。
+- 验证：家长定向测试 `2/2`；完整门禁 domain `20/20`、小程序 `388/388`、API `115/115` 全绿；`git diff --check` 通过。本批没有修改 API、生产数据库或 Figma，也没有宣称新增视觉验收证据。

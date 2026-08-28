@@ -23,15 +23,15 @@ Page({
     rows: [] as HistoryRow[],
   },
   onLoad() {
-    const session = requireRole("parent");
-    if (!session) return;
     void this.load();
   },
   async load() {
+    const session = requireRole("parent");
+    if (!session) return;
     this.setData({ state: "loading", message: "正在读取训练历程" });
     try {
       const children = await getParentChildren();
-      const active = children[0];
+      const active = children.find((child) => child.id === session.currentStudentId) ?? children[0];
       if (!active) {
         this.setData({ state: "empty", message: "暂无绑定学员", rows: [] });
         return;
