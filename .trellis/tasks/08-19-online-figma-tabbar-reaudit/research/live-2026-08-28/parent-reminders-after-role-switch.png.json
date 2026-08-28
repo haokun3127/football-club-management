@@ -1,0 +1,14 @@
+{
+  "capturedOn": "2026-08-28",
+  "route": "/pages/parent/reminders/index",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 25037,
+    "sha256": "1dbb09e4a597732f0846eb82262456723358916d708b67823910f1a9bafbb4c5"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot",
+  "roleSwitch": "coach to parent via existing switchToParent flow",
+  "visualDisposition": "passed against live Figma parent TabBar overlay 269:376"
+}

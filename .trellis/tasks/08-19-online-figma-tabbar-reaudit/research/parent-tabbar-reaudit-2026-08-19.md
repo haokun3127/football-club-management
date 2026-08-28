@@ -45,3 +45,12 @@ The live online file was re-read through the Figma MCP using file key `zZ6wKyOHK
 - Runtime attempt: `research/live-2026-08-28/parent-route-attempt-runtime.png` (`375×812`). The WeChatIDE session was still a coach session; `/pages/parent/reminders` returned HTTP 403 with `Session active role is not permitted for this operation`. This is a blocked parent runtime capture, not a visual pass.
 - Repair scope: parent active-dot override in `components/role-tabbar/index.wxss` and its focused contract test. The online parent overlay places the active dot at `y=44px`, which maps to `88rpx`; the previous `84rpx` override was 2px too high.
 - Disposition: parent TabBar visual acceptance remains **blocked pending a real parent-role session**. The static online Figma read and the route-block evidence are recorded separately from visual comparison.
+
+## Role-switch recovery evidence — 2026-08-28
+
+The dual-role coach session was switched through the existing coach “我的” page action (`switchToParent`), which calls the real active-role API and persists the returned parent session. The simulator was then re-launched to `/pages/parent/reminders/index` and captured at `375×812`.
+
+- Fresh runtime frame: `research/live-2026-08-28/parent-reminders-after-role-switch.png` + sidecar.
+- Online reference: `research/live-2026-08-28/parent-tabbar-online.png`, parent overlay node `269:376`.
+- Comparison: the four-item parent shell, 70px height, 16px icons, 4px active dot, schedule-active red state, label rhythm, and bottom safe-area placement agree with the online overlay. The reminder card content is live account data.
+- Disposition: parent TabBar comparison **passed after real role switch**. The earlier 403 is retained as a navigation/session diagnostic, not as the final disposition.
