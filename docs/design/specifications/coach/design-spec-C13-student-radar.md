@@ -119,3 +119,10 @@
 - 已修复顶栏安全区：`.radar-nav` 使用 `height:88rpx` 与 `box-sizing:content-box`，避免 `navInset` 把设计内容高度推高。首屏和滚动后的卡片/TabBar 几何已复验。
 - 真实数据差异保留：当前会话返回 2 名学员、8 个雷达维度、总分 `83`、评估期 `2026-08-05`，评语暂无同步；不把 Figma 的 5 名学员、6 个维度、分数 `76` 和示例教练评语写入业务。
 - 验证：小程序 `54/54` 文件、`330/330` 测试，domain `19/19`，API `105/105`，全仓 typecheck 和 `git diff --check` 均通过。
+
+## 2026-08-28 最新运行态复核
+
+- 在线唯一基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1080`；本轮在线截图为 `tmp/figma-c13-93-1080-live-20260828.png`，原始画板高度 `908px`。
+- WeChatIDE MCP 打开真实路由 `pages/coach/student-radar/index?source=goal`，稳定态截图为 `tmp/goal-c13-student-radar-live-ready-20260828.png`，滚动底部截图为 `tmp/goal-c13-student-radar-live-bottom-20260828.png`；两张均为 `375×812`。
+- 页面 data 为 `state=ready`、8 名真实学员、当前学员“测试球员第1组-1”、8 个中文能力维度、综合分 `75`、评估时间 `2026-08-13 评估`；雷达、维度评分、评语空态和教练 TabBar 均在真实运行态渲染。
+- 与在线稿示例的 5 名学员、6 个维度、分数 `76` 和示例评语不同，属于真实 API 数据差异；没有用 Figma 示例替换生产数据。console 过滤 `error|exception|wx:else|route is not defined` 无命中。本轮没有业务代码、API、数据库或 Figma 写回。

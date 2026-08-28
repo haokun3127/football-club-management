@@ -1519,3 +1519,10 @@
 - 真实页面读取活动“传接球配合训练”、日期“8月18日 周二”、时间“10:30–12:00”和 8 名学员，其中 6 名到场、2 名未到场；摘要由真实 workbench 计算为 `6/8人`，没有复制 Figma 示例的 18/20 和示例文案。
 - 结构核对通过：软粉顶栏与返回键、成功圆、标题/副标题、四行摘要卡、单一“查看训练详情”主按钮和教练 TabBar 均存在；workbench 请求返回 `200`，console 过滤 `error|exception|wx:else|route is not defined` 无命中。
 - 本批没有修改业务代码、API、生产数据库或 Figma；结论为 C4.1 真实运行态结构复核通过，动态数据差异按真实 API 契约豁免。
+
+## 2026-08-28 C13 学员雷达最新运行复核
+
+- 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1080`；在线截图保存为 `tmp/figma-c13-93-1080-live-20260828.png`。
+- WeChatIDE MCP 首次截图捕获到加载态，已等待 `.radar-hero` 出现后重新取得稳定截图：`tmp/goal-c13-student-radar-live-ready-20260828.png`；滚动到底部截图为 `tmp/goal-c13-student-radar-live-bottom-20260828.png`，均严格 `375×812`。
+- 真实页面返回 `state=ready`，当前学员为“测试球员第1组-1”，真实名单 8 人、8 个中文雷达维度、综合分 `75`、评估时间 `2026-08-13 评估`；雷达图、维度评分、评语空态和教练 TabBar 均已复核。
+- 在线稿中的 5 名学员、6 个维度、示例分数 `76` 与教练评语不属于当前真实 API 数据，未伪造替换。console 过滤 `error|exception|wx:else|route is not defined` 无命中；本批没有业务代码、API、生产数据库或 Figma 写回。
