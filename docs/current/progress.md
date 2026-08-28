@@ -1300,3 +1300,10 @@
 - 在线唯一基准为 `zZ6wKyOHKcO4UYXDd9jGwv / 93:1002 / C11 Test Task List`。复核真实 `564×1220` 模拟器输出（按设备倍率归一前）发现悬浮新增按钮只有正红色圆形，原因是 `plus.svg` 的线条颜色与按钮背景相同。
 - 将 `/assets/icons/plus.svg` 线条改为白色；不改变新增入口的导航、真实测评任务读取或任何 API 契约。
 - C11 定向测试先红后绿，最终 `9/9`；修复后 MCP 复拍为严格 `375×812`：`C:\Users\ASUS\Desktop\football-club-management-codex-windows-2026-08-28-c11-after-fix.png`，白色加号已可见。日期、状态、进度仍按真实 API 展示；本批全仓门禁通过（domain `19/19`、小程序 `369/369`、API `113/113`）。
+
+## 2026-08-28 C14 雷达画布尺寸复核
+
+- 重新读取在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:1106`。当前稿的雷达图外框为 `320×320px`，位于 `295×360px` 的 Plot 中并允许横向溢出；顶部、统计卡和底部 TabIconsOverlay 结构保持不变。
+- `pages/coach/team-ability` 将雷达组件从 `620rpx × 600rpx` 调整为 `640rpx × 640rpx`，使小程序逻辑尺寸与在线稿一致；未修改真实团队能力接口、8 维数据、趋势或排名不可用状态。
+- WeChatIDE MCP 真实截图：`C:\Users\ASUS\Desktop\football-club-management-codex-windows-2026-08-28-c14-after-radar-size.png`，返回严格 `375×812`；运行态可进入 C14，真实账号返回 8 个维度，因此与 Figma 6 维示例存在数据结构差异，记录为真实数据差异而非伪造修复项。
+- 验证：C14 定向 Vitest `5/5`；小程序 `tsc --noEmit` 通过；限定路径 `git diff --check` 通过。在线 Figma 当前账号仍为 View seat，本批没有伪称完成 Figma 写回。

@@ -157,7 +157,7 @@ describe("coach team ability overview", () => {
     expect(template).not.toContain('class="ability-hero__radar-state"');
     expect(template).not.toContain('class="ability-hero__canvas-slot"');
     expect(template).toContain('class="ability-hero__empty"');
-    expect(template).toMatch(/<radar-canvas[^>]*width="620rpx"[^>]*height="600rpx"/);
+    expect(template).toMatch(/<radar-canvas[^>]*width="640rpx"[^>]*height="640rpx"/);
     expect(template).toContain("assessmentPeriod");
     expect(template).toContain("rankingMessage");
     expect(template).toContain('class="dim-row__track"');
@@ -173,7 +173,7 @@ describe("coach team ability overview", () => {
     expect(stylesheet).toMatch(/\.ability-hero\s*\{[^}]*height:\s*1040rpx[^}]*overflow:\s*hidden/s);
     expect(stylesheet).toMatch(/\.ability-hero__plot\s*\{[^}]*height:\s*720rpx[^}]*justify-content:\s*center/s);
     expect(stylesheet).toMatch(/\.ability-hero__plot\s*\{(?=[^}]*flex-direction:\s*column)(?=[^}]*align-items:\s*center)/s);
-    expect(stylesheet).toMatch(/\.ability-hero__canvas\s*\{[^}]*width:\s*620rpx[^}]*height:\s*600rpx[^}]*flex:\s*0\s+0\s+600rpx/s);
+    expect(stylesheet).toMatch(/\.ability-hero__canvas\s*\{[^}]*width:\s*640rpx[^}]*height:\s*640rpx[^}]*flex:\s*0\s+0\s+640rpx/s);
     expect(stylesheet).toMatch(/\.ability-hero__overall\s*\{[^}]*font-size:\s*96rpx[^}]*text-align:\s*center/s);
     expect(stylesheet).not.toMatch(/\.ability-hero__overall\s*\{[^}]*position:\s*absolute/s);
     expect(stylesheet).toMatch(/\.dim-row__track\s*\{[^}]*height:\s*12rpx[^}]*border-radius:\s*6rpx/s);

@@ -25,7 +25,7 @@
         </view>
         <view class="ability-hero__plot">
           <block wx:if="{{hasRadar}}">
-            <radar-canvas wx:if="{{radarMounted}}" host-class="ability-hero__canvas" dark="{{true}}" metrics="{{radar}}" width="620rpx" height="600rpx"></radar-canvas>
+            <radar-canvas wx:if="{{radarMounted}}" host-class="ability-hero__canvas" dark="{{true}}" metrics="{{radar}}" width="640rpx" height="640rpx"></radar-canvas>
             <view wx:if="{{showOverall}}" class="ability-hero__overall">综合 {{overall}}</view>
           </block>
           <view wx:else class="ability-hero__empty">暂无足够维度生成雷达图</view>

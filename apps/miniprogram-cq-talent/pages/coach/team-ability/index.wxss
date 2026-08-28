@@ -110,9 +110,9 @@
 
 .ability-hero__canvas {
   display: block;
-  width: 620rpx;
-  height: 600rpx;
-  flex: 0 0 600rpx;
+  width: 640rpx;
+  height: 640rpx;
+  flex: 0 0 640rpx;
 }
 
 .ability-hero__overall {
