@@ -100,6 +100,10 @@ describe("parent schedule hero", () => {
     expect(template).toContain("{{hero.description}}");
     expect(styles).toMatch(/\.hero\s*\{[^}]*width:\s*686rpx;[^}]*height:\s*360rpx;/);
     expect(template).toContain('class="p1-empty-list"');
+    expect(template).toContain('class="p1-empty-list__calendar"');
+    expect(template).toContain('class="p1-empty-list__calendar-x"');
+    expect(styles).toMatch(/\.p1-empty-list\s*\{[^}]*height:\s*360rpx;[^}]*background:\s*#ffffff/);
+    expect(styles).toMatch(/\.p1-empty-list__icon\s*\{[^}]*width:\s*96rpx;[^}]*height:\s*96rpx;[^}]*background:\s*#f3f4f6/);
   });
 
   it("keeps both hero statistic rows at the Figma-aligned offset", () => {
@@ -158,8 +162,8 @@ describe("parent schedule hero", () => {
     expect(styles).toMatch(/\.week-switcher\s*\{[^}]*gap:\s*8rpx/s);
     expect(styles).toMatch(/\.week-switcher__arrow\s*\{[^}]*flex:\s*0\s+0\s+44rpx[^}]*width:\s*44rpx[^}]*height:\s*56rpx/s);
     expect(styles).toMatch(/\.week-nav\s*\{[^}]*flex:\s*1[^}]*min-width:\s*0/s);
-    expect(styles).toMatch(/\.week-day--today \.week-day__number \{[^}]*background: #a80f1b/);
-    expect(styles).toMatch(/\.week-day--active \.week-day__number \{[^}]*background: #101828/);
+    expect(styles).toMatch(/\.week-day--today \.week-day__number\s*\{[^}]*background: #a80f1b/);
+    expect(styles).toMatch(/\.week-day--active \.week-day__number\s*\{[^}]*background: #101828/);
   });
 
   it("uses the approved CSS and text fallback icon nodes instead of unverified SVG assets", () => {

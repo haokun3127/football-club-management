@@ -142,3 +142,10 @@
 - 页面标题和提醒按钮均使用运行时 `navActionTop` 对齐；标题在 `64rpx` 操作区内垂直居中，避免不同安全区下标题与按钮基线漂移。
 - Hero 统计值必须禁止收缩和换行，特别是 CJK 字体环境中的“`2节`”；三枚统计胶囊保持单行可读。
 - 成功态已取得可信 DevTools iPhone X `375×812` 截图并与该节点对照。P1 Empty 状态仍缺可信运行截图和完整对照，不能据此宣称整个 P1 已完成视觉验收。
+
+## 2026-08-28 当前稿复验与空态修复
+
+- 当前在线稿仍为周历：成功态 `zZ6wKyOHKcO4UYXDd9jGwv / 269:250`，空态 `zZ6wKyOHKcO4UYXDd9jGwv / 269:479`；两态均保留左右周切换箭头。P1 不继续采用月历方案。
+- 真实家长会话已通过 WeChatIDE MCP 重建并进入 `pages/parent/schedule/index`。空态截图 `C:\\Users\\ASUS\\Desktop\\football-club-management-codex-windows-2026-08-02\\tmp\\goal-p1-parent-empty-after-fix.png`、有活动态截图 `C:\\Users\\ASUS\\Desktop\\football-club-management-codex-windows-2026-08-02\\tmp\\goal-p1-parent-upcoming-after-fix.png` 均为严格 `375×812`。
+- 空态与在线稿的实质差异已修复：`.p1-empty-list` 改为 `686rpx × 360rpx` 白色实心圆角卡片，加入 `96rpx` 浅灰图标圆和 CSS 日历图标；不新增伪活动、伪统计或伪 API。
+- P1 定向测试 `13/13`、小程序 TypeScript、WXML/WXSS 编译及限定 diff 检查通过。成功态真实活动内容与 Figma 示例不同，按真实数据差异豁免；本节截图证据仅覆盖当前本地运行态和在线节点对照，不外推其他页面已验收。

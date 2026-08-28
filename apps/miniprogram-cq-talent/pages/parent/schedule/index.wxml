@@ -63,7 +63,7 @@
         <view class="acard__chevron">›</view>
       </view>
       <view wx:if="{{!visibleEvents.length}}" class="p1-empty-list">
-        <view class="p1-empty-list__icon"></view>
+        <view class="p1-empty-list__icon"><view class="p1-empty-list__calendar"><view class="p1-empty-list__calendar-x"></view></view></view>
         <view class="p1-empty-list__title">暂无活动</view>
         <view class="p1-empty-list__copy">该日期暂未安排训练、比赛或其他活动</view>
       </view>

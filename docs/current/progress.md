@@ -1307,3 +1307,11 @@
 - `pages/coach/team-ability` 将雷达组件从 `620rpx × 600rpx` 调整为 `640rpx × 640rpx`，使小程序逻辑尺寸与在线稿一致；未修改真实团队能力接口、8 维数据、趋势或排名不可用状态。
 - WeChatIDE MCP 真实截图：`C:\Users\ASUS\Desktop\football-club-management-codex-windows-2026-08-28-c14-after-radar-size.png`，返回严格 `375×812`；运行态可进入 C14，真实账号返回 8 个维度，因此与 Figma 6 维示例存在数据结构差异，记录为真实数据差异而非伪造修复项。
 - 验证：C14 定向 Vitest `5/5`；小程序 `tsc --noEmit` 通过；限定路径 `git diff --check` 通过。在线 Figma 当前账号仍为 View seat，本批没有伪称完成 Figma 写回。
+
+## 2026-08-28 P1 家长日程周历与空态复验
+
+- 在线唯一基准重新读取为 `zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home` 与 `269:479 / P1 Schedule Home — Empty`；当前稿仍是周一至周日周历，左右保留上一周/下一周箭头，不是月历。此前月历尝试已撤回。
+- 运行态先发现微信开发者工具模块内存仍保留旧教练会话，导致家长路由被 `requireRole("parent")` 送回教练页；通过 MCP 关闭并重新打开项目窗口重建运行时后，`wx` 存储与内存会话均恢复为真实双角色家长会话，未结束微信开发者工具进程、未清理生产数据。
+- 真实运行截图：`C:\\Users\\ASUS\\Desktop\\football-club-management-codex-windows-2026-08-02\\tmp\\goal-p1-parent-empty-after-fix.png`（2026-08-28 空态）和 `C:\\Users\\ASUS\\Desktop\\football-club-management-codex-windows-2026-08-02\\tmp\\goal-p1-parent-upcoming-after-fix.png`（2026-08-27 有活动态），均由 WeChatIDE MCP 返回严格 `375×812`。有活动态使用真实比赛数据；Figma 示例中的训练名称、人数和统计值不写入客户端。
+- 空态按在线 `269:479` 修复为白色实心圆角卡片、浅灰圆形日历图标和居中文字；原虚线框/圆形占位符已移除。周历、箭头、Hero 固定高度、胶囊区和 TabBar 保持在线稿结构。
+- 验证：P1 定向 Vitest `13/13`、小程序 `tsc --noEmit`、WXML/WXSS 编译和限定路径 `git diff --check` 通过；本批仍不把运行截图中的真实数据差异误报为设计缺陷。

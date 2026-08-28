@@ -244,7 +244,7 @@ function filterEvents(events: ScheduleEvent[], studentId: string, selectedDate: 
 
 export function buildDateOptions(selectedDate: string, events: ScheduleEvent[]) {
   const base = weekWindowStart(selectedDate);
-  const todayKey = new Date().toISOString().slice(0, 10);
+  const todayKey = currentLocalDate();
   return Array.from({ length: 7 }, (_, index) => {
     const date = new Date(base);
     date.setUTCDate(date.getUTCDate() + index);
