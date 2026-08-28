@@ -1273,3 +1273,10 @@
 - `pages/coach/lesson` 已同步新版待处理状态：共享顶栏改为“销课处理”，状态视图同步改名，列表标题改为“待确认学员”，人数改为“人待处理”；真实 workbench、lesson-confirmation 读取和确认提交逻辑不变。
 - `pages/coach/lesson-correction` 保持独立全屏更正流程，继续使用真实双读、幂等 PATCH、重新读取和失败提示；没有新增伪造学员或课时数据。
 - C5 定向测试 `17/17` 通过。小程序类型检查与最终限定路径 diff 检查待本批提交前完成；未进行生产部署或数据库写入。
+
+## 2026-08-28 C7 战术板当前在线稿同步
+
+- 当前在线唯一基准为 `zZ6wKyOHKcO4UYXDd9jGwv / 233:2 / CODE / C7 Tactical Board MVP`。在线稿明确为 375px 画板：白色圆角顶栏、`MATCH TACTICS` 上下文、比赛标题与保存状态、阵型卡、351×430px 绿色球场、40px 红色球员圆点、86px 替补卡和两个 48px 操作按钮。
+- `pages/coach/tactical-board` 已从旧的深色长球场/悬浮保存入口同步为上述结构：保留真实战术板 API、真实名单过滤、阵型切换、拖拽、选中换位、重置、保存、只读和失败保留 dirty 状态；显示字段继续由 TypeScript view model 预计算。
+- 战术板是全屏工作页，本页移除会覆盖底部操作区的全局 `role-tabbar`，不引入第二套导航；页面配置同步移除不再使用的组件声明。未新增伪球员、伪 API、伪会话或前端假数据。
+- 验证：C7 定向 Vitest `6/6`、小程序 TypeScript `tsc --noEmit`、限定路径 `git diff --check` 通过。本批按当前用户要求以在线 Figma 结构和静态/代码验证收口，未把静态通过表述为真实设备视觉验收。
