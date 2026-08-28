@@ -1,8 +1,8 @@
 <view class="p1">
   <view class="p1-nav" style="padding-top:{{navInset}}px">
-    <view class="p1-nav__title" style="top:{{navActionTop}}px">日程</view>
-    <view class="p1-nav__bell" style="right:{{menuInset}}px;top:{{navActionTop}}px" bindtap="openReminders">
-      <view class="p1-nav__bell-shape"><view class="p1-nav__bell-clapper"></view></view>
+    <view class="p1-nav__title">日程</view>
+    <view class="p1-nav__bell" style="margin-right:{{menuInset}}px" bindtap="openReminders">
+      <image class="p1-nav__bell-icon" src="/assets/icons/bell.svg" mode="aspectFit" />
       <view wx:if="{{hasUnreadReminders}}" class="p1-nav__bell-dot"></view>
     </view>
   </view>

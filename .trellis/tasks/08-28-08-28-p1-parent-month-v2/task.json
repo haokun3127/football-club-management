@@ -2,10 +2,16 @@
   "id": "08-28-p1-parent-month-v2",
   "name": "08-28-p1-parent-month-v2",
   "title": "P1 parent month schedule V2",
-  "description": "",
+  "description": "Synchronize the parent schedule home page with the current online Figma month-calendar design 521:339 while keeping events, summaries, and selected-child filtering sourced from the authenticated parent API.",
   "status": "in_progress",
   "dev_type": null,
-  "scope": null,
+  "scope": [
+    "apps/miniprogram-cq-talent/pages/parent/schedule/index.ts",
+    "apps/miniprogram-cq-talent/pages/parent/schedule/index.wxml",
+    "apps/miniprogram-cq-talent/pages/parent/schedule/index.wxss",
+    "apps/miniprogram-cq-talent/pages/parent/schedule/month-v2.test.mjs",
+    "docs/current/progress.md"
+  ],
   "package": "api",
   "priority": "P2",
   "creator": "dongjun",
@@ -20,7 +26,15 @@
   "subtasks": [],
   "children": [],
   "parent": null,
-  "relatedFiles": [],
-  "notes": "",
+  "relatedFiles": [
+    "apps/miniprogram-cq-talent/pages/parent/schedule/index.ts",
+    "apps/miniprogram-cq-talent/pages/parent/schedule/index.wxml",
+    "apps/miniprogram-cq-talent/pages/parent/schedule/index.wxss",
+    "apps/miniprogram-cq-talent/pages/parent/schedule/month-v2.test.mjs",
+    "docs/current/progress.md",
+    "tmp/goal-p1-figma-521-339-rerun.png",
+    "tmp/goal-p1-parent-month-current.png"
+  ],
+  "notes": "Online Figma zZ6wKyOHKcO4UYXDd9jGwv / 521:339 was re-read. The parent runtime screenshot was captured through WeChatIDE MCP after planting a real parent session: 563x1218 raster at equal scale to logical 375x812. Dynamic dates, activities, and summary values remain real API data and are not compared as static sample content.",
   "meta": {}
 }

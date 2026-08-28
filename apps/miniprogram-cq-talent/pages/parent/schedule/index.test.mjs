@@ -128,12 +128,16 @@ describe("parent schedule hero", () => {
     const nav = styles.match(/\.p1-nav\s*\{([^}]*)\}/)?.[1] ?? "";
     const title = styles.match(/\.p1-nav__title\s*\{([^}]*)\}/)?.[1] ?? "";
 
-    expect(template).toContain('<view class="p1-nav__title" style="top:{{navActionTop}}px">日程</view>');
+    expect(template).toContain('<view class="p1-nav__title">日程</view>');
+    expect(template).toContain('<image class="p1-nav__bell-icon" src="/assets/icons/bell.svg" mode="aspectFit" />');
     expect(nav).toContain("align-items: center");
-    expect(title).toContain("position: absolute");
-    expect(title).toContain("height: 64rpx");
+    expect(nav).toContain("justify-content: space-between");
+    expect(nav).not.toContain("padding-bottom");
+    expect(title).not.toContain("position: absolute");
     expect(title).toContain("display: flex");
     expect(title).toContain("align-items: center");
+    expect(title).toContain("font-size: 36rpx");
+    expect(title).toContain("line-height: 44rpx");
   });
 
   it("keeps one 88rpx content-box custom navigation rule", () => {
@@ -167,51 +171,26 @@ describe("parent schedule hero", () => {
     expect(styles).toMatch(/\.month-day--selected \.month-day__number\s*\{[^}]*background: #a80f1b/);
   });
 
-  it("uses the approved CSS and text fallback icon nodes instead of unverified SVG assets", () => {
+  it("uses the Figma bell asset with explicit outer and leaf sizing", () => {
     const bell = styles.match(/\.p1-nav__bell\s*\{([^}]*)\}/)?.[1] ?? "";
-    const bellShape = styles.match(/\.p1-nav__bell-shape\s*\{([^}]*)\}/)?.[1] ?? "";
-    const bellShapeBefore = styles.match(/\.p1-nav__bell-shape::before\s*\{([^}]*)\}/)?.[1] ?? "";
-    const bellShapeAfter = styles.match(/\.p1-nav__bell-shape::after\s*\{([^}]*)\}/)?.[1] ?? "";
-    const bellClapper = styles.match(/\.p1-nav__bell-clapper\s*\{([^}]*)\}/)?.[1] ?? "";
+    const bellIcon = styles.match(/\.p1-nav__bell-icon\s*\{([^}]*)\}/)?.[1] ?? "";
     const clock = styles.match(/\.acard__clock\s*\{([^}]*)\}/)?.[1] ?? "";
     const chevron = styles.match(/\.acard__chevron\s*\{([^}]*)\}/)?.[1] ?? "";
     const bellDot = styles.match(/\.p1-nav__bell-dot\s*\{([^}]*)\}/)?.[1] ?? "";
 
-    expect(template).not.toContain('/assets/icons/bell.svg');
+    expect(template).toContain('/assets/icons/bell.svg');
     expect(template).not.toContain('/assets/icons/clock.svg');
     expect(template).not.toContain('/assets/icons/chevron-right.svg');
-    expect(template).toContain('style="right:{{menuInset}}px;top:{{navActionTop}}px"');
+    expect(template).toContain('style="margin-right:{{menuInset}}px"');
     expect(template).toContain('bindtap="openReminders"');
-    expect(template).toContain('<view class="p1-nav__bell-shape"><view class="p1-nav__bell-clapper"></view></view>');
+    expect(template).not.toContain('p1-nav__bell-shape');
     expect(template).toContain('<view class="acard__clock"></view>');
     expect(template).toContain('<view class="acard__chevron">›</view>');
     expect(bell).toContain("width: 64rpx");
     expect(bell).toContain("height: 64rpx");
-    expect(bellShape).toContain("width: 36rpx");
-    expect(bellShape).toContain("height: 40rpx");
-    expect(bellShape).toContain("box-sizing: border-box");
-    expect(bellShape).not.toMatch(/(?:^|;)\s*border\s*:/);
-    expect(bellShapeBefore).toContain("top: 0");
-    expect(bellShapeBefore).toContain("left: 0");
-    expect(bellShapeBefore).toContain("width: 36rpx");
-    expect(bellShapeBefore).toContain("height: 32rpx");
-    expect(bellShapeBefore).toContain("box-sizing: border-box");
-    expect(bellShapeBefore).toContain("border: 4rpx solid #0d0d0d");
-    expect(bellShapeBefore).toContain("border-bottom: 0");
-    expect(bellShapeBefore).toContain('content: ""');
-    expect(bellShapeAfter).toContain("top: 32rpx");
-    expect(bellShapeAfter).toContain("left: 0");
-    expect(bellShapeAfter).toContain("width: 36rpx");
-    expect(bellShapeAfter).toContain("height: 4rpx");
-    expect(bellShapeAfter).toContain("box-sizing: border-box");
-    expect(bellShapeAfter).toContain("background: #0d0d0d");
-    expect(bellShapeAfter).toContain('content: ""');
-    expect(bellClapper).toContain("top: 36rpx");
-    expect(bellClapper).toContain("left: 13rpx");
-    expect(bellClapper).toContain("width: 10rpx");
-    expect(bellClapper).toContain("height: 4rpx");
-    expect(bellClapper).toContain("box-sizing: border-box");
-    expect(bellClapper).toContain("background: #0d0d0d");
+    expect(bellIcon).toContain("width: 64rpx");
+    expect(bellIcon).toContain("height: 64rpx");
+    expect(bellIcon).toContain("display: block");
     expect(clock).toContain("width: 20rpx");
     expect(clock).toContain("height: 20rpx");
     expect(clock).toContain("border: 3rpx solid #6b7280");

@@ -1402,7 +1402,7 @@
 - `pages/parent/schedule` 已同步到月历数据模型：固定 42 格、周一开周、前后月日期、今天/选中状态、训练/比赛/多事件标记；月份范围请求、绑定学员过滤、选中日期卡片和真实 Hero/提醒/TabBar 均继续使用现有真实 API 与 view model。
 - 在线稿当前可见的月份标题栏仅有右侧 `›`，因此 WXML 最终只保留右侧视觉控件；`changeMonth` 仍支持 `-1/1` 偏移，便于后续在 Figma 明确补齐上一月入口后启用。没有伪造月份数据、活动、统计或会话。
 - 验证：P1 定向 Vitest `16/16`；小程序 TypeScript 通过；微信 WXML/WXSS 编译通过；完整门禁通过（domain `20/20`、小程序 `391/391`、API `115/115`）；`git diff --check` 通过。
-- 视觉证据边界：Figma 截图已保存为 `tmp/p1-month-v2-figma-latest.png`。WeChatIDE MCP 能成功输出 `563×1218` 等比例截图，但当前模拟器实际仍是 coach 会话，家长路由被角色守卫回到旧教练周历；该截图不作为 P1 运行态视觉通过。需要用真实 parent 会话重新编译并复拍后，才能完成视觉验收。
+- 视觉证据与顶栏修正（已补齐）：Figma 对照图保存为 `tmp/goal-p1-figma-521-339-rerun.png`；通过现有生产验证脚本建立真实 parent 会话，WeChatIDE MCP 打开 `pages/parent/schedule/index` 并保存最终截图 `tmp/goal-p1-parent-month-after-nav-fix.png`。返回原始 `563×1218`，与逻辑 `375×812` 等比例，截图确认月历、真实活动日期标记、提醒角标、空活动卡和家长 TabBar 均已渲染；同时确认顶栏安全区、18px 标题、32px Figma bell 资产和 Hero 起始位置已对齐。Figma 示例中的日期/活动/统计与真实 API 数据不同，按动态数据差异豁免；系统状态栏属于模拟器壳层，不计入业务页面偏移。P1 视觉验收证据已收口。
 
 ## 2026-08-28 C14 团队能力总览当前在线稿收口
 

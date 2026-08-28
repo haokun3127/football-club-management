@@ -29,11 +29,12 @@
 
 - [x] Run focused P1 tests, mini-program typecheck, full repository check, and `git diff --check`.
 - [x] Record node `521:339`, implementation status, and screenshot evidence boundary.
-- [x] Commit only the P1 page source/test, task artifacts, and progress entry.
+- [x] Commit only the P1 task artifacts and progress entry; page source/test were already committed in `8c9c503`.
 
 ## Verification record — 2026-08-28
 
 - Online Figma MCP confirmed `zZ6wKyOHKcO4UYXDd9jGwv / 521:339 / P1 Schedule Home — Month V2`, `375×812`.
-- Focused Vitest: `16/16` passed. Mini-program TypeScript check passed. WXML and WXSS compilation passed. Full repository gate passed: domain `20/20`, mini-program `391/391`, API `115/115`. `git diff --check` passed.
+- Focused Vitest: `16/16` passed after the top-navigation regression fix. Mini-program TypeScript check passed. WXML and WXSS compilation passed. Full repository gate passed: domain `20/20`, mini-program `391/391`, API `115/115`. `git diff --check` passed.
 - The final WXML follows the online node's visible structure and retains only the right-side month arrow shown by the current Figma node. The previous-month behavior remains implemented in the page handler for future UI exposure without adding an unapproved visual control.
-- A WeChatIDE MCP screenshot was successfully captured at `563×1218`, which is an equal-scale raster for logical `375×812`. The simulator was still holding a real coach session and rendered the old coach week schedule after the parent route request was guarded; this is runtime/session evidence only, not P1 visual acceptance. A fresh parent-role compile and screenshot remain required before marking the visual criterion complete.
+- A fresh WeChatIDE MCP screenshot was captured from `pages/parent/schedule/index` after establishing a real parent session: `tmp/goal-p1-parent-month-after-nav-fix.png`, returned at `563×1218`, an equal-scale raster for logical `375×812`. It shows the parent month grid, real event markers, selected date, empty activity state, reminder badge, and parent TabBar. The Figma sample's dates, activities, and summary values differ from the authenticated API response and are correctly treated as dynamic-data differences.
+- The final visual review also fixed the real top-navigation drift: removed the extra bottom padding, restored flex-flow alignment, changed the title to the Figma `18px` equivalent (`36rpx`), and replaced the CSS hand-drawn bell with `/assets/icons/bell.svg` at the designed `32px` outer size. The fresh screenshot confirms the Hero starts at the designed content offset; no Figma write-back was required.

@@ -3,7 +3,7 @@ import { requireRole } from "../../../utils/auth";
 import { DEV_PARENT_PAGE_DATE_OVERRIDE } from "../../../utils/config";
 import { currentLocalDate, resolveParentPageDate, shiftCalendarDate } from "../../../utils/date";
 import { openPage } from "../../../utils/navigation";
-import { activityStatus, childNames, formatCalendarDate, formatShortDate, formatTimeRange, resolveMenuActionTop, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import { activityStatus, childNames, formatCalendarDate, formatShortDate, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { countUnreadReminders } from "../../../utils/reminders";
 import { setCurrentStudentId } from "../../../utils/store";
 import type { LoadState, ScheduleEvent, StudentSummary } from "../../../utils/types";
@@ -67,7 +67,6 @@ interface PageData {
   todayLabel: string;
   selectedCountLabel: string;
   menuInset: number;
-  navActionTop: number;
   todayCount: number;
   weekCount: number;
   weekHours: string;
@@ -99,7 +98,6 @@ Page<PageData>({
   data: {
     navInset: resolveNavInset(),
     menuInset: resolveMenuInset(),
-    navActionTop: resolveMenuActionTop(),
     state: "loading",
     message: "正在读取家庭日程",
     children: [],
