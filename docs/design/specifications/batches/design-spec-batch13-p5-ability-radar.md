@@ -6,7 +6,9 @@
 
 小程序使用现有真实 `GrowthSummary.radar` 数据。展示投影只保留前六个有效数值指标以匹配画板维度数量，不写入或覆盖后端指标；完整数据继续由成长与指标详情页面读取。`radar-canvas` 的 `geometry="p5"` 是显式 opt-in，未传该属性的教练端雷达保持原方向、网格数量和同龄基准绘制。
 
-本轮代码静态验证通过，但因当前 DevTools 会话是 coach-only，家长 P5 运行态截图需在双角色家长会话下补取；未将静态验证写成视觉验收结论。
+2026-08-28 运行态复验已补齐：WeChatIDE MCP 在真实家长会话下取得首屏与底部 `375×812` 截图。真实数据中的“整体战术”“小组配合”属于四字维度标签，运行态验证发现旧的 `96rpx` 标签列会导致换行；现将标签列调整为 `120rpx` 并设置 `white-space: nowrap`，不改变真实数据或 Figma 示例数据。
+
+本轮验证证据：`tmp/goal-p5-parent-radar-label-fix-20260828.png`、`tmp/goal-p5-parent-radar-label-fix-bottom-20260828.png`；Figma 在线基准截图为 `tmp/figma-p5-93-278-live-20260828.png`。底部截图确认四字标签保持单行，维度详情卡与家长 TabBar 可见。
 
 - [4] | P5 Ability Radar | 375x812 @(940,1920) | fill=#f6f7f9 | r=28 | layout=V
   - [4] | Header | 375x88 @(940,1920) | fill=#ffffff | stroke=#e7eaf0 w1 | layout=H pad=14/22

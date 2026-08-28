@@ -168,6 +168,11 @@ describe("parent ability radar", () => {
     expect(controller).not.toContain("activeChildTeam");
   });
 
+  it("keeps longer Chinese dimension labels on one line", () => {
+    const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
+    expect(stylesheet).toMatch(/\.dim-row__label\s*\{[^}]*width:\s*120rpx[^}]*white-space:\s*nowrap/s);
+  });
+
   it("keeps the history action at the Figma right edge instead of applying an oversized runtime menu inset", () => {
     const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
     expect(template).toContain('style="padding-top:{{navInset}}px"');

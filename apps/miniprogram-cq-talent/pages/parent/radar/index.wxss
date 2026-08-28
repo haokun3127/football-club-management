@@ -31,7 +31,7 @@
 .dim-card { display: flex; flex-direction: column; gap: 24rpx; padding: 32rpx; border-radius: 24rpx; background: #ffffff; }
 .dim-card__title { color: #202124; font-size: 28rpx; font-weight: 700; }
 .dim-row { display: flex; align-items: center; gap: 24rpx; }
-.dim-row__label { width: 96rpx; color: #667085; font-size: 28rpx; flex-shrink: 0; }
+.dim-row__label { width: 120rpx; color: #667085; font-size: 28rpx; flex-shrink: 0; white-space: nowrap; }
 .dim-row__bar { position: relative; flex: 1; height: 8rpx; border-radius: 4rpx; background: #e7eaf0; }
 .dim-row__fill { height: 100%; border-radius: 4rpx; background: #a80f1b; }
 .dim-row__value { width: 48rpx; text-align: right; color: #a80f1b; font-size: 28rpx; font-weight: 700; }

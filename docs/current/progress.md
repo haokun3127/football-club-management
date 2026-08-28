@@ -1555,6 +1555,13 @@
 - 真实页面返回 `state=ready`、6 个中文分类、5 条 FAQ；搜索、快速上手卡、FAQ 列表、支持卡和教练 TabBar 均已复核，console 过滤 `error|exception|wx:else|route is not defined` 无命中。
 - Figma 示例的分类文案、工作时间、在线咨询和公众号按钮不属于当前 API 契约，页面显示“支持方式待配置”，未伪造示例支持能力。本批没有业务代码、API、生产数据库或 Figma 写回。
 
+## 2026-08-28 P5 家长能力雷达长标签换行修复与运行复验
+
+- 根因：真实 P5 维度数据包含“整体战术”“小组配合”等四字中文标签，旧 `.dim-row__label { width: 96rpx; }` 在 28rpx 字号下不足以容纳整行，导致底部维度详情换行；这不是 Figma 结构变更，也不涉及数据伪造。
+- 修复：`apps/miniprogram-cq-talent/pages/parent/radar/index.wxss` 将标签列调整为 `120rpx` 并增加 `white-space: nowrap`；新增 `index.test.mjs` 回归断言，确保较长中文维度标签保持单行。
+- 运行证据：WeChatIDE MCP 真实家长会话重新打开 `pages/parent/radar/index`，取得严格 `375×812` 截图 `tmp/goal-p5-parent-radar-label-fix-20260828.png` 与 `tmp/goal-p5-parent-radar-label-fix-bottom-20260828.png`；底部截图确认“整体战术”“小组配合”单行显示。在线 Figma 基准仍为 `zZ6wKyOHKcO4UYXDd9jGwv / 93:278`，对照图 `tmp/figma-p5-93-278-live-20260828.png`，本轮无需修改 Figma。
+- 验证：P5 定向 Vitest `8/8`；全仓 `check` 通过（domain `20/20`、小程序 `403/403`、API `115/115`），小程序 TypeScript 与 P5 WXSS 编译均通过。
+
 ## 2026-08-28 C4 主出勤最新运行复核
 
 - 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:665`；在线截图保存为 `tmp/figma-c4-93-665-live-20260828.png`。
