@@ -1403,3 +1403,12 @@
 - 在线稿当前可见的月份标题栏仅有右侧 `›`，因此 WXML 最终只保留右侧视觉控件；`changeMonth` 仍支持 `-1/1` 偏移，便于后续在 Figma 明确补齐上一月入口后启用。没有伪造月份数据、活动、统计或会话。
 - 验证：P1 定向 Vitest `16/16`；小程序 TypeScript 通过；微信 WXML/WXSS 编译通过；完整门禁通过（domain `20/20`、小程序 `391/391`、API `115/115`）；`git diff --check` 通过。
 - 视觉证据边界：Figma 截图已保存为 `tmp/p1-month-v2-figma-latest.png`。WeChatIDE MCP 能成功输出 `563×1218` 等比例截图，但当前模拟器实际仍是 coach 会话，家长路由被角色守卫回到旧教练周历；该截图不作为 P1 运行态视觉通过。需要用真实 parent 会话重新编译并复拍后，才能完成视觉验收。
+
+## 2026-08-28 C14 团队能力总览当前在线稿收口
+
+- 在线 Figma MCP 已重新读取唯一文件 `zZ6wKyOHKcO4UYXDd9jGwv / 93:1106 / C14 Team Ability Overview`。当前稿的关键结构为 88px 软粉顶栏、24×32px 返回控件、左对齐标题、52×29px 导出控件、深色团队能力雷达卡、趋势胶囊、维度统计、TOP 3 排名区和教练 TabBar。
+- 对照现有代码后确认 C14 业务实现已经完成：页面继续读取真实 `getCoachTeamAbilityOverview()` 与 `getCoachTeam()`，雷达/综合分/趋势/维度摘要均由 TypeScript view model 生成；评估时间、排名和导出能力在 API 未提供时保持明确不可用，不复制 Figma 样例。
+- C14 任务材料已从 `TBD/_example` 补成可追溯的真实 PRD、上下文清单和验收记录。没有新增 API、数据库、伪统计或无关代码改动。
+- 可信运行态证据：`tmp/goal-c14-runtime.png` 为 WeChatIDE MCP 模拟器原始截图，返回 `563×1218`，系统信息为 iPhone X 逻辑 `375×812`；Figma 对照图为 `tmp/goal-c14-figma.png`。真实账号显示 8 维能力和真实队伍信息，Figma 样例显示 6 维，属于数据契约差异，不能据此伪造或判定结构未完成。
+- 同轮还复核 C7 战术板：当前 `index.wxml` 的 `wx:else` 已置于独立 `<block>`，微信开发者工具 WXML/WXSS 编译成功；刷新后模拟器控制台无 `wx:else` 或 `route is not defined`。旧报错来自刷新前缓存 bundle，重新编译/刷新后不再复现。
+- 验证：C14 与 C7 定向 Vitest `11/11`；微信 WXML/WXSS 编译成功；后续全仓门禁与 `git diff --check` 见本批提交记录。

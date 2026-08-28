@@ -1,0 +1,2 @@
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Verify the existing BFF response remains the source of team metrics and that unavailable fields are not replaced with Figma samples."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Reuse the existing mini-program header, token, role guard, and radar patterns instead of introducing duplicate conventions."}

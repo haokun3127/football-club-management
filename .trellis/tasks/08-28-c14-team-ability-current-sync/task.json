@@ -1,0 +1,32 @@
+{
+  "id": "c14-team-ability-current-sync",
+  "name": "c14-team-ability-current-sync",
+  "title": "C14 team ability current Figma sync",
+  "description": "Synchronize coach team ability overview with online Figma node 93:1106 while preserving real API data and explicit unavailable states.",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": "miniprogram-coach-c14-team-ability",
+  "package": "api",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-08-28",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "dev",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "apps/miniprogram-cq-talent/pages/coach/team-ability/index.ts",
+    "apps/miniprogram-cq-talent/pages/coach/team-ability/index.wxml",
+    "apps/miniprogram-cq-talent/pages/coach/team-ability/index.wxss",
+    "apps/miniprogram-cq-talent/pages/coach/team-ability/index.test.mjs",
+    "docs/current/progress.md"
+  ],
+  "notes": "Online authority: zZ6wKyOHKcO4UYXDd9jGwv / 93:1106. No API or database changes. Runtime screenshot is evidence only; the current authenticated simulator data differs from Figma sample content.",
+  "meta": {}
+}
