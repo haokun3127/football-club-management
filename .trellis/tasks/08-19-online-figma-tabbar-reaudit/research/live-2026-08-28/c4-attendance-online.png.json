@@ -1,0 +1,14 @@
+{
+  "capturedOn": "2026-08-28",
+  "figmaFileKey": "zZ6wKyOHKcO4UYXDd9jGwv",
+  "figmaNode": "93:665",
+  "board": "C4 Attendance",
+  "png": {
+    "width": 375,
+    "height": 922,
+    "bytes": 61721,
+    "sha256": "0D80CE5F4AD999A8E831C1868D59F8F42F9BA2DD28E898C7A3F13E1113728F8C"
+  },
+  "captureMethod": "figma-mcp get_screenshot",
+  "designContext": "figma-mcp get_design_context read before comparison"
+}

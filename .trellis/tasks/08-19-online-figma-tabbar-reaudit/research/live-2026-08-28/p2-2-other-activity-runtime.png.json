@@ -1,0 +1,15 @@
+{
+  "capturedOn": "2026-08-28",
+  "route": "/pages/parent/event/index?id=event-cq-talent-family-assessment-day",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 47424,
+    "sha256": "D17D6AD69A8935A4882C8D7EE028DF08406C0A81FCB217844DF747B7A7006025"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot",
+  "role": "parent after real coach-to-parent role switch",
+  "apiState": "ready; real other-activity title, statuses, participant and venue fields",
+  "visualDisposition": "pass with live API data-state exemption against Figma node 93:198"
+}

@@ -1,0 +1,13 @@
+{
+  "capturedOn": "2026-08-28",
+  "route": "/pages/coach/attendance/index?id=event-cq-talent-secure-test-1-trn-0818",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 53447,
+    "sha256": "E35E9AFAD44C7D854DF558F41C4BF987EE8DB1461D74BA1F8F348F7F7E20C9B5"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot after pageScrollTo",
+  "visualDisposition": "bottom viewport confirms all eight roster states, count and fixed coach TabBar are unobscured"
+}

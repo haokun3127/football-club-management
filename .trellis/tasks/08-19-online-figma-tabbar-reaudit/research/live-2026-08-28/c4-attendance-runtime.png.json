@@ -1,0 +1,16 @@
+{
+  "capturedOn": "2026-08-28",
+  "route": "/pages/coach/attendance/index?id=event-cq-talent-secure-test-1-trn-0818",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 58849,
+    "sha256": "DB5AEB803D9B35627FABE002D984683562DEEC2906C7B0E0AC2AB8CEAAA9138E"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot",
+  "role": "coach",
+  "apiState": "ready; real eight-person roster with attendance states",
+  "visualDisposition": "pass with live API data-state exemption against Figma node 93:665",
+  "bottomViewport": "c4-attendance-runtime-bottom.png"
+}
