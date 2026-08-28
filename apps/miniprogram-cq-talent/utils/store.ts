@@ -15,6 +15,15 @@ export function setAppContext(context: AppContext) {
   wx.setStorageSync(STORAGE_KEYS.context, context);
 }
 
+export function mergeSessionContext(session: SessionState, context: AppContext): SessionState {
+  return {
+    ...session,
+    clubId: context.clubId,
+    clientId: context.clientId,
+    capabilities: context.capabilities,
+  };
+}
+
 export function getAppContext() {
   if (appContext) return appContext;
   const stored = wx.getStorageSync<AppContext | "">(STORAGE_KEYS.context);

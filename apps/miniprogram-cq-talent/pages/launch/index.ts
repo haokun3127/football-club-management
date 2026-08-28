@@ -3,7 +3,7 @@ import { routeHome } from "../../utils/auth";
 import { DEV_AUTO_SESSION, DEV_MODE } from "../../utils/config";
 import { createDevSession } from "../../utils/mock";
 import { resolveNavInset } from "../../utils/presentation";
-import { getDevRole, getSession, setAppContext, setSession, toggleDevRole } from "../../utils/store";
+import { getDevRole, getSession, mergeSessionContext, setAppContext, setSession, toggleDevRole } from "../../utils/store";
 import type { AppRole, LoadState } from "../../utils/types";
 
 interface LaunchData {
@@ -42,6 +42,7 @@ Page<LaunchData>({
       setAppContext(context);
       const existing = getSession();
       if (existing?.role) {
+        setSession(mergeSessionContext(existing, context));
         deferAfterLaunch(() => routeHome(existing.role as AppRole));
         return;
       }

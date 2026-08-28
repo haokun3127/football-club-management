@@ -8,7 +8,7 @@ globalThis.wx = {
   removeStorageSync: (key) => storage.delete(key),
 };
 
-const { clearSession, getSession, persistAuthenticatedSession } = await import("./store.ts");
+const { clearSession, getSession, persistAuthenticatedSession, mergeSessionContext } = await import("./store.ts");
 
 describe("session storage compatibility", () => {
   beforeEach(() => {
@@ -53,5 +53,29 @@ describe("session storage compatibility", () => {
 
     expect(persisted).toBeNull();
     expect(getSession()).toBeNull();
+  });
+
+  it("refreshes stale session capabilities from the latest resolved client context", () => {
+    const existing = {
+      clubId: "club-1",
+      clientId: "client-1",
+      capabilities: {},
+      role: "coach",
+      availableRoles: ["coach"],
+      token: "server-token",
+      userId: "user-1",
+      expiresAt: "2099-01-01T00:00:00.000Z",
+    };
+    const context = {
+      clubId: "club-1",
+      clientId: "client-1",
+      capabilities: { match: { eventTypes: ["goal", "assist"] } },
+    };
+
+    expect(mergeSessionContext(existing, context)).toMatchObject({
+      role: "coach",
+      token: "server-token",
+      capabilities: { match: { eventTypes: ["goal", "assist"] } },
+    });
   });
 });
