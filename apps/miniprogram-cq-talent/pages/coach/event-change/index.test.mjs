@@ -199,4 +199,25 @@ describe("coach activity change", () => {
     expect(stylesheet).toMatch(/\.input-box\s*\{[^}]*box-sizing:\s*border-box/s);
     expect(stylesheet).toMatch(/\.textarea-box\s*\{[^}]*min-height:\s*160rpx/s);
   });
+
+  it("renders date and time as single Figma-style fields without duplicate suffix labels", () => {
+    expect(template).not.toMatch(/<text>日期<\/text>/);
+    expect(template).not.toMatch(/<text>时间<\/text>/);
+    expect(template).toContain('src="/assets/icons/c3-calendar.svg"');
+    expect(template).toContain('class="picker-box__icon"');
+    expect(template).toContain('class="picker-box picker-box--combined"');
+    expect(template).toContain('class="picker-box__hitarea picker-box__hitarea--date"');
+    expect(template).toContain('class="picker-box__hitarea picker-box__hitarea--time"');
+  });
+
+  it("keeps one combined display value while date and time pickers update independently", async () => {
+    const page = await loadReadyPage();
+    expect(page.data.dateTimeDisplay).toBe("选择日期 选择时间");
+
+    page.selectDate({ detail: { value: "2026-08-27" } });
+    expect(page.data.dateTimeDisplay).toBe("2026-08-27 选择时间");
+
+    page.selectTime({ detail: { value: "18:00" } });
+    expect(page.data.dateTimeDisplay).toBe("2026-08-27 18:00");
+  });
 });

@@ -1,5 +1,12 @@
 # 核心演示闭环 · 进度跟踪
 
+## 2026-08-28 C3 活动变更时间控件同步在线稿
+
+- 在线唯一基准重新读取为 `zZ6wKyOHKcO4UYXDd9jGwv / 93:634 / C3 Activity Change`；当前稿的“新时间”是一个整宽 299×44px 输入框，右侧为 16×16 日历图标，不显示重复的“日期/时间”尾缀。
+- `pages/coach/event-change` 删除重复尾缀，将日期与时间两个真实选择器收纳到同一视觉输入框的左右透明触控区域；`dateTimeDisplay` 由 TypeScript 预计算，真实日期/时间选择与变更申请 payload 保持不变。
+- 新增本地图标 `assets/icons/c3-calendar.svg`，未使用远程 Figma 资产或示例日期/场地/家长数量。
+- 验证：C3 定向 Vitest 先红后绿，最终 `8/8`；小程序 TypeScript、WXML/WXSS 编译、`git diff --check` 通过。WeChatIDE MCP 真实模拟器截图 `tmp/goal-c3-coach-after-combined-time.png` 与 `tmp/goal-c3-coach-bottom-after-combined-time.png` 均严格 `375×812`，分别复核首屏和滚动后的通知卡。
+
 ## 2026-08-20 家长端四连修（P2 导航/P4 死链×2/P5 雷达）
 
 - P2 训练详情 topbar：标题 44rpx 居中 → 36rpx 左对齐（设计稿即左对齐，居中版受原生胶囊挤压视觉偏移）。

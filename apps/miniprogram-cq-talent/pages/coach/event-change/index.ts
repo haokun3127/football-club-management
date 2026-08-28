@@ -39,6 +39,7 @@ interface PageData {
   hasNewTime: boolean;
   dateDisplay: string;
   timeDisplay: string;
+  dateTimeDisplay: string;
   canSubmit: boolean;
   submitting: boolean;
   hasSubmitError: boolean;
@@ -79,6 +80,7 @@ Page<PageData>({
     hasNewTime: false,
     dateDisplay: "选择日期",
     timeDisplay: "选择时间",
+    dateTimeDisplay: "选择日期 选择时间",
     canSubmit: false,
     submitting: false,
     hasSubmitError: false,
@@ -134,6 +136,7 @@ Page<PageData>({
         hasNewTime: false,
         dateDisplay: "选择日期",
         timeDisplay: "选择时间",
+        dateTimeDisplay: "选择日期 选择时间",
         canSubmit: false,
         submitting: false,
         hasSubmitError: false,
@@ -172,6 +175,7 @@ Page<PageData>({
       newDate,
       hasNewDate: Boolean(newDate),
       dateDisplay: newDate || "选择日期",
+      dateTimeDisplay: formatDateTimeDisplay(newDate, this.data.newTime),
       canSubmit: canSubmitChange(reason, this.data.originalStartsAt, this.data.originalVenue, newDate, this.data.newTime, this.data.newVenue),
       hasSubmitError: false,
       submitError: "",
@@ -185,6 +189,7 @@ Page<PageData>({
       newTime,
       hasNewTime: Boolean(newTime),
       timeDisplay: newTime || "选择时间",
+      dateTimeDisplay: formatDateTimeDisplay(this.data.newDate, newTime),
       canSubmit: canSubmitChange(reason, this.data.originalStartsAt, this.data.originalVenue, this.data.newDate, newTime, this.data.newVenue),
       hasSubmitError: false,
       submitError: "",
@@ -243,6 +248,10 @@ Page<PageData>({
 
 function selectedReason(reasons: ReasonOption[], index: number): ChangeReason {
   return reasons[index]?.value ?? "other";
+}
+
+function formatDateTimeDisplay(date: string, time: string) {
+  return `${date || "选择日期"} ${time || "选择时间"}`;
 }
 
 function canSubmitChange(reason: ChangeReason, originalStartsAt: string, originalVenue: string, newDate: string, newTime: string, newVenue: string) {

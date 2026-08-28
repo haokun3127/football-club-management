@@ -33,18 +33,14 @@
 
       <view class="form-card">
         <view class="form-card__title">新时间</view>
-        <view class="picker-row">
+        <view class="picker-box picker-box--combined">
+          <text class="{{hasNewDate && hasNewTime ? '' : 'picker-box--placeholder'}}">{{dateTimeDisplay}}</text>
+          <image class="picker-box__icon" src="/assets/icons/c3-calendar.svg" mode="aspectFit" />
           <picker mode="date" value="{{newDate}}" disabled="{{submitting}}" bindchange="selectDate">
-            <view class="picker-box">
-              <text class="{{hasNewDate ? '' : 'picker-box--placeholder'}}">{{dateDisplay}}</text>
-              <text>日期</text>
-            </view>
+            <view class="picker-box__hitarea picker-box__hitarea--date" aria-label="选择日期" />
           </picker>
           <picker mode="time" value="{{newTime}}" disabled="{{submitting}}" bindchange="selectTime">
-            <view class="picker-box">
-              <text class="{{hasNewTime ? '' : 'picker-box--placeholder'}}">{{timeDisplay}}</text>
-              <text>时间</text>
-            </view>
+            <view class="picker-box__hitarea picker-box__hitarea--time" aria-label="选择时间" />
           </picker>
         </view>
       </view>
