@@ -1511,3 +1511,11 @@
 - WeChatIDE MCP 真实教练会话打开 `pages/coach/event-change/index?id=event-cq-talent-secure-test-1-trn-0818`；首屏截图 `tmp/goal-c3-activity-change-live.png`，滚动底部截图 `tmp/goal-c3-activity-change-live-bottom.png`，均严格 `375×812`。
 - workbench 与 venues 请求均返回 `200`，页面状态 `ready`；真实活动、3 个场地和 8 位受影响家长进入 view model。首屏/底部验证变更原因、时间、场地、说明、通知开关、保存入口和教练 TabBar，console 错误过滤无命中。
 - Figma 预填的新时间、新场地、示例队名和 `20` 位家长不是当前真实状态；页面保持真实活动与空的新值，没有伪造变更申请。本轮没有业务代码、API、数据库或 Figma 写回。
+
+## 2026-08-28 C4.1 出勤成功最新运行复核
+
+- 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:696`；截图保存为 `tmp/figma-c4-1-93-696-live.png`。
+- WeChatIDE MCP 真实教练会话打开 `pages/coach/attendance-success/index?eventId=event-cq-talent-secure-test-1-trn-0818`；截图保存为 `tmp/goal-c4-1-attendance-success-live-rerun.png`，页面返回 `ready`，截图为严格 `375×812` 逻辑视口对应的模拟器图。
+- 真实页面读取活动“传接球配合训练”、日期“8月18日 周二”、时间“10:30–12:00”和 8 名学员，其中 6 名到场、2 名未到场；摘要由真实 workbench 计算为 `6/8人`，没有复制 Figma 示例的 18/20 和示例文案。
+- 结构核对通过：软粉顶栏与返回键、成功圆、标题/副标题、四行摘要卡、单一“查看训练详情”主按钮和教练 TabBar 均存在；workbench 请求返回 `200`，console 过滤 `error|exception|wx:else|route is not defined` 无命中。
+- 本批没有修改业务代码、API、生产数据库或 Figma；结论为 C4.1 真实运行态结构复核通过，动态数据差异按真实 API 契约豁免。

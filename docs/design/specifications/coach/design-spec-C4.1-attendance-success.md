@@ -58,3 +58,11 @@
         - [6] | Vector | 8x8 @(388,1771) | stroke=#8e97a6 w1.6
         - [6] | Vector | 16x8 @(384,1780) | stroke=#8e97a6 w1.6
       - [13] | 我的 | 121x14 @(332,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"
+
+## 2026-08-28 运行态复核
+
+- 在线基准：`zZ6wKyOHKcO4UYXDd9jGwv / 93:696`；本轮重新保存为 `tmp/figma-c4-1-93-696-live.png`。
+- 真实路由：`pages/coach/attendance-success/index?eventId=event-cq-talent-secure-test-1-trn-0818`。
+- WeChatIDE MCP 截图：`tmp/goal-c4-1-attendance-success-live-rerun.png`，返回严格 `375×812` 逻辑视口对应的模拟器图。软粉顶栏、返回箭头、绿色成功圆、成功标题与摘要、四行活动信息、单一主按钮和教练 TabBar 均存在，结构与在线稿一致。
+- 页面 data 为 `state=ready`，活动标题为“传接球配合训练”，摘要为 `6/8人`，由真实 `getCoachWorkbench` 读回并在 TS view model 中计算；在线稿示例的 `18/20`、示例课程和日期未被复制。
+- 真实 workbench 请求返回 `200`；模拟器 console 过滤 `error|exception|wx:else|route is not defined` 无命中。当前结论：C4.1 运行态结构复核通过；动态文案差异属于真实数据差异。
