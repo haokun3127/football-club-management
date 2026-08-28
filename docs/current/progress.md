@@ -1315,3 +1315,10 @@
 - 真实运行截图：`C:\\Users\\ASUS\\Desktop\\football-club-management-codex-windows-2026-08-02\\tmp\\goal-p1-parent-empty-after-fix.png`（2026-08-28 空态）和 `C:\\Users\\ASUS\\Desktop\\football-club-management-codex-windows-2026-08-02\\tmp\\goal-p1-parent-upcoming-after-fix.png`（2026-08-27 有活动态），均由 WeChatIDE MCP 返回严格 `375×812`。有活动态使用真实比赛数据；Figma 示例中的训练名称、人数和统计值不写入客户端。
 - 空态按在线 `269:479` 修复为白色实心圆角卡片、浅灰圆形日历图标和居中文字；原虚线框/圆形占位符已移除。周历、箭头、Hero 固定高度、胶囊区和 TabBar 保持在线稿结构。
 - 验证：P1 定向 Vitest `13/13`、小程序 `tsc --noEmit`、WXML/WXSS 编译和限定路径 `git diff --check` 通过；本批仍不把运行截图中的真实数据差异误报为设计缺陷。
+
+## 2026-08-28 C7 战术板真实运行态复验
+
+- 重新读取在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 233:2`，并用真实教练会话打开 `pages/coach/tactical-board/index?eventId=event-cq-talent-secure-test-1-scheduled-match`。
+- 真实运行态确认：`state=ready`、真实活动“周末联赛排兵”、真实阵型 `4-3-3`、8 名首发球员；球场、红色圆形球员标记、替补席、重置/保存操作区均存在。真实名单数量与 Figma 示例不同，未补写伪替补或伪球员。
+- WXML 编译返回成功，模拟器控制台未出现 `wx:else` 编译错误；滚动 500px 后底部“重置阵型/保存战术板”仍可见。截图证据：`tmp/goal-c7-coach-current.png`、`tmp/goal-c7-coach-bottom-current.png`。
+- 验证：C7 定向 Vitest `6/6`、小程序 TypeScript、WXML 编译均通过；本轮没有新增业务代码或 Figma 写回。
