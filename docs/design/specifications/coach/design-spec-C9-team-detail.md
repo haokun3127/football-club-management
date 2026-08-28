@@ -124,3 +124,10 @@
         - [6] | Vector | 8x8 @(818,3571) | stroke=#8e97a6 w1.6
         - [6] | Vector | 16x8 @(814,3580) | stroke=#8e97a6 w1.6
       - [13] | 我的 | 121x14 @(762,3593) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"
+
+## 2026-08-28 真实运行证据
+
+- 在线稿节点：`zZ6wKyOHKcO4UYXDd9jGwv / 93:924`；在线截图保存为 `tmp/figma-c9-93-924-live.png`，完整画板高度为 `375×871`。
+- 真实 WeChatIDE MCP 截图：`tmp/goal-c9-team-detail-top-live.png`，严格 `375×812`。真实教练会话成功读取队伍摘要、统计、8 名学员和 1 名教练；队名、赛季、人数和姓名来自 API，不替换为 Figma 示例。
+- 顶栏、深色 Hero、三项统计、四列学员网格、教练横向卡和教练 TabBar 与在线稿结构对应；长姓名在真实设备上按单行省略，属于真实数据的展示约束。
+- 控制台过滤 `error|exception|fail|undefined|route is not defined|wx:else` 无命中；本轮没有修改业务代码、API、数据库或 Figma。

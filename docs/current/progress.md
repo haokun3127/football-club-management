@@ -1478,3 +1478,9 @@
 - C6.1 真实截图为 `tmp/goal-c6-1-match-event-add-fixed.png`，严格 `375×812`；真实比赛详情 `200`，表单结构可用，控制台错误过滤无命中。Figma 示例中的 `黄牌/红牌/换人/其他` 未被当前客户端 capability 返回，页面保持能力驱动，不硬编码示例配置。
 - C6.2 通过真实输入分钟 `54` 触发设备草稿，再打开比赛页复现遮罩；截图为 `tmp/goal-c6-2-match-current.png`，严格 `375×812`，`hasLocalDraftOverlay=true`。该状态仅保存在当前设备，文案明确说明本机范围，未误报为 API 持久化。
 - 本轮小程序定向回归与 TypeScript 检查通过；WeChatIDE MCP 页面/截图通道已恢复。下一步继续检查尚缺当前运行证据的教练端页面。
+
+## 2026-08-28 C9 队伍详情最新运行复核
+
+- 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:924`，在线画板完整高度 `375×871`；截图保留为 `tmp/figma-c9-93-924-live.png`。
+- 真实教练会话打开 `pages/coach/team/index` 并返回 `ready`：真实队伍摘要、在队人数 `8`、累计训练 `13`、出勤率 `88%`、8 名学员和 1 名教练均已进入 view model。运行截图为 `tmp/goal-c9-team-detail-top-live.png`，严格 `375×812`。
+- 结构核对通过：软粉顶栏、深色摘要卡、三项统计、四列学员网格、横向教练卡与教练 TabBar 均存在；真实队名/赛季/姓名较 Figma 示例不同，按真实 API 数据差异处理。控制台错误过滤无命中。
