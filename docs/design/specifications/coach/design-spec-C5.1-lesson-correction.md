@@ -74,3 +74,11 @@
         - [6] | Vector | 8x8 @(1678,1771) | stroke=#8e97a6 w1.6
         - [6] | Vector | 16x8 @(1674,1780) | stroke=#8e97a6 w1.6
       - [13] | 我的 | 121x14 @(1622,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"
+
+## 2026-08-28 真实运行态复核
+
+- 在线 Figma 节点 `zZ6wKyOHKcO4UYXDd9jGwv / 93:765` 已重新读取，截图保存为 `tmp/figma-c5-1-93-765-live.png`，画板严格 `375×812`。
+- 使用真实教练会话打开 `pages/coach/lesson-correction/index?id=event-cq-talent-secure-test-1-trn-0818`；首屏截图为 `tmp/goal-c5-1-lesson-correction-live.png`，滚动到底部截图为 `tmp/goal-c5-1-lesson-correction-live-bottom.png`，均严格 `375×812`。
+- 页面 data 为 `ready`，真实 workbench 与 `lesson-confirmation` 请求均返回 `200`；当前返回 8 名真实学员，课时余额和姓名均由 API 回读后在 TS view model 预计算，未复制 Figma 的两名示例学员。
+- 结构复核通过：软粉顶栏、橙色异常提示条、需更正学员卡、课时调整步进器、底部“保存更正”和教练 TabBar 均存在；滚动到底部后主按钮完整可见。模拟器 console 按 `error|exception|fail|undefined|route is not defined|wx:else` 过滤无命中。
+- Figma 的“系统差异”、示例姓名和 `0.5` 默认值属于静态样例；当前页面保留真实课时余额与 `±0` 初始选择，避免伪造接口状态。因此本页结论为：**结构与交互运行态复核通过；真实数据差异按 API 契约豁免；本轮无需业务代码改动。**
