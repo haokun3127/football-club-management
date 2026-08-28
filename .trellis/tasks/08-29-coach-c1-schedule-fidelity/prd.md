@@ -21,11 +21,11 @@ Bring the coach schedule home page back to the current online Figma structure an
 
 ## Acceptance Criteria
 
-- [ ] Current online Figma node `93:578` has been re-read immediately before implementation and its `375x812` screenshot is retained as evidence.
-- [ ] C1 focused tests pass and assert corrected geometry without asserting Figma sample names or counts.
-- [ ] Full `npx --yes pnpm@10.33.0 run check` exits `0`.
-- [ ] WeChatIDE MCP opens `pages/coach/schedule/index` in a real coach session and produces fresh `375x812` PNG evidence; comparison distinguishes structural/style alignment from legitimate real-data differences.
-- [ ] The page code/tests plus C1 specification and progress log are path-limited, `git diff --check` clean, independently committed, and pushed to `origin/dev`.
+- [x] Current online Figma node `93:578` has been re-read immediately before implementation and its `375x812` screenshot is retained as evidence.
+- [x] C1 focused tests pass and assert corrected geometry without asserting Figma sample names or counts.
+- [x] Full `npx --yes pnpm@10.33.0 run check` exits `0`.
+- [x] WeChatIDE MCP opens `pages/coach/schedule/index` in a real coach session and produces fresh `375x812` PNG evidence; comparison distinguishes structural/style alignment from legitimate real-data differences.
+- [x] The page code/tests plus C1 specification and progress log are path-limited, `git diff --check` clean, independently committed, and pushed to `origin/dev`.
 
 ## Scope decision
 
