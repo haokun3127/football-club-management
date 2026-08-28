@@ -280,7 +280,7 @@ export interface TrainingProjectTree {
 
 export interface CoachLessonConfirmation {
   participants: CoachWorkbench["roster"];
-  ledgers: Array<{ studentId: string; remainingLessons?: number; balance?: number; status?: string }>;
+  ledgers: Array<{ studentId: string; remainingLessons?: number; balance?: number; status?: string; sourceIds?: string[] }>;
   pending: Array<{ title: string; message: string }>;
 }
 

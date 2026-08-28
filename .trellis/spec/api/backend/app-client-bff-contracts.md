@@ -377,6 +377,61 @@ const selectedProjectIds = workbench.training.selectedProjectIds;
 - Each selected student is saved serially in fixed `-0.5` or `0.5` steps. A row keeps its idempotency key while its payload is unchanged; changing the row's sign or shared reason creates a new key.
 - After a partial or unknown result, the client rereads both sources and stays on the correction page. It must not present sample names, synthetic balances, a system-difference diagnosis, or an unverified success state.
 
+## Scenario: Coach Lesson Confirmation Ledger Projection
+
+### 1. Scope / Trigger
+
+- Trigger: coach C5 pending, history, detail, and correction pages read `GET /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/lesson-confirmation`.
+- This is a response-normalization boundary: the BFF returns one ledger wrapper per participant rather than a flat ledger row.
+
+### 2. Signatures
+
+- `GET /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/lesson-confirmation`
+- Response ledger item: `{ studentId, ledger: { balance, entries: [{ sourceId, ... }] } }`
+
+### 3. Contracts
+
+- The mini-program API layer unwraps `ledger.balance` and `ledger.entries` into the stable view model fields `balance`, `remainingLessons`, and `sourceIds`.
+- `sourceIds` is derived from `entries[].sourceId`; an explicit `ledger.sourceIds` array is accepted when supplied by a compatible backend.
+- The normalizer remains backward-compatible with a flat ledger item containing `balance`, `balanceAfter`, or `remainingLessons`.
+- A completed training is eligible for history only when every returned confirmation participant has the event-specific source id `app-client-lesson-${eventId}-${studentId}`. A partial ledger must remain out of history.
+
+### 4. Validation & Error Matrix
+
+- Missing or empty `participants` -> the page renders its normal empty state; it does not fabricate a completed record.
+- Missing ledger source id for any participant -> the history page omits that activity.
+- Nested ledger with a finite balance -> pending/detail pages display the returned balance.
+- Request/API failure -> pages render a generic retryable error and do not expose raw backend text.
+
+### 5. Good / Base / Bad Cases
+
+- Good: `{ studentId: "student-1", ledger: { balance: 8, entries: [{ sourceId: "app-client-lesson-event-1-student-1" }] } }` normalizes to balance `8` and that source id.
+- Base: a flat legacy item with `balanceAfter` remains readable.
+- Bad: checking only one participant's source id and presenting a partially settled activity as completed history.
+
+### 6. Tests Required
+
+- API normalization test asserts nested balance, participant balance propagation, and `entries[].sourceId` extraction.
+- History page test asserts all-participant source validation and excludes a partial ledger.
+- Detail page test asserts workbench/confirmation participant intersection and generic retry errors.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```typescript
+const balance = numberOrUndefined(ledger.balance ?? ledger.balanceAfter);
+const sourceIds = [];
+```
+
+#### Correct
+
+```typescript
+const detail = asRecord(ledger.ledger) ?? ledger;
+const balance = numberOrUndefined(detail.balance ?? detail.balanceAfter);
+const sourceIds = entries.map((entry) => String(entry.sourceId));
+```
+
 ## Scenario: Parent Metric Drilldown and Assessment Form Grouping
 
 ### 1. Scope / Trigger

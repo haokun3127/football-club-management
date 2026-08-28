@@ -1358,3 +1358,14 @@
 - `pages/coach/lesson` 摘要主标题改为“待处理销课”，真实活动日期、时间、队伍和场地继续由 workbench 字段预计算；学员状态胶囊改为“待确认”。确认操作区由固定定位改为页面正常流，并保留教练 TabBar，避免底部遮挡。
 - `pages/coach/lesson-correction` 未改动真实更正链路：继续使用 workbench 与 lesson-confirmation 双读、幂等 PATCH、重新读取和失败保留。
 - 验证：C5/C5.1 定向测试 `18/18`，小程序 `tsc --noEmit` 通过，限定路径 `git diff --check` 通过；WXML/WXSS 编译通过。WeChatIDE MCP 返回严格 `375×812`，但当前真实教练会话访问固定种子活动 `event-training-1` 返回 `403 Event is not accessible for this coach membership`，截图仅证明错误态，未作为有数据视觉通过证据。
+
+## 2026-08-28 C5 销课历史与详情真实闭环
+
+- 在线唯一基准仍为 `zZ6wKyOHKcO4UYXDd9jGwv`：历史 `537:79`、详情 `537:156`、待处理 `537:2`。在已有 C5 待处理/更正流程基础上，新增两个独立全屏路由：`pages/coach/lesson-history` 与 `pages/coach/lesson-detail`。
+- 历史页只读取最近 30 天真实教练首页活动，筛选已完成训练，并逐个读取现有 `lesson-confirmation`；只有确认参与学员存在 `app-client-lesson-${eventId}-${studentId}` 台账来源时才展示，未新增伪历史 API、伪学员或 Figma 示例数据。
+- 详情页复用现有 workbench 与 lesson-confirmation，只展示两者 `studentId` 交集，展示真实活动日期、时间、队伍、场地、训练内容、出勤与课时，并通过现有更正页完成回溯修正。
+- 修复小程序 API 归一化：后端 `ledgers` 的嵌套 `ledger.balance/entries` 现在展开为余额与 `sourceIds`，同时兼容旧扁平字段；因此页面不会因真实嵌套响应丢失课时余额或误判销课状态。
+- C5 待处理页新增“查看历史销课”入口，`app.json` 已登记两个路由。生成的微信开发者工具 `index.js` 仍属于构建产物，未纳入本批提交。
+- 验证：C5 相关 5 个测试文件 `39/39` 通过，小程序 TypeScript 检查、全仓门禁和限定路径 `git diff --check` 均通过；全仓结果为 domain `19/19`、小程序 `381/381`、API `113/113`。本批未进行生产部署，API 路由契约未改变。
+- 提交边界：本批仅包含 C5 页面、前端 API 归一化、类型、回归测试、任务记录、当前进度和对应 API 规范；微信开发者工具生成的 `pages/coach/lesson/index.js` 及工作区其他在途文件不纳入提交。
+- 视觉边界：已按在线 Figma `537:2 / 537:79 / 537:156` 对齐页面结构与文案，但本批没有新增可信有数据 `375×812` 微信开发者工具截图，不宣称运行态像素级视觉验收通过。

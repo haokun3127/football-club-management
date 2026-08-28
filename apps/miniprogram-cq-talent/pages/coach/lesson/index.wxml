@@ -28,6 +28,7 @@
       </view>
 
       <view wx:if="{{hasSubmitError}}" class="submit-error">{{submitError}}</view>
+      <view class="c5-history-link" bindtap="openHistory">查看历史销课</view>
     </block>
   </view>
 

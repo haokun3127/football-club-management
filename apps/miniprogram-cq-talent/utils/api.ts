@@ -951,7 +951,8 @@ function normalizeLessonConfirmation(raw: Record<string, unknown>): CoachLessonC
   const ledgerByStudentId = new Map<string, Record<string, unknown>>();
   ledgers.forEach((ledger) => {
     const studentId = String(ledger.studentId ?? "");
-    if (studentId) ledgerByStudentId.set(studentId, ledger);
+    const detail = asRecord(ledger.ledger) ?? ledger;
+    if (studentId) ledgerByStudentId.set(studentId, { ...ledger, ...detail });
   });
   return {
     participants: participants.map((item) => {
@@ -964,15 +965,23 @@ function normalizeLessonConfirmation(raw: Record<string, unknown>): CoachLessonC
         lessonAction: stringOrUndefined(item.lessonAction ?? item.lessonStatus),
         shouldConsume: item.shouldConsume === undefined ? true : Boolean(item.shouldConsume),
         exceptionReason: stringOrUndefined(item.exceptionReason),
-        remainingLessons: numberOrUndefined(item.remainingLessons ?? item.remainingClassHours ?? item.balance ?? ledger?.balanceAfter ?? ledger?.remainingLessons),
+        remainingLessons: numberOrUndefined(item.remainingLessons ?? item.remainingClassHours ?? item.balance ?? ledger?.balanceAfter ?? ledger?.remainingLessons ?? ledger?.balance),
       };
     }).filter((item) => item.studentId),
-    ledgers: ledgers.map((ledger) => ({
-      studentId: String(ledger.studentId ?? ""),
-      remainingLessons: numberOrUndefined(ledger.remainingLessons ?? ledger.balanceAfter),
-      balance: numberOrUndefined(ledger.balance ?? ledger.balanceAfter),
-      status: stringOrUndefined(ledger.status),
-    })).filter((ledger) => ledger.studentId),
+    ledgers: ledgers.map((ledger) => {
+      const detail = asRecord(ledger.ledger) ?? ledger;
+      const entries = Array.isArray(detail.entries) ? detail.entries as Array<Record<string, unknown>> : [];
+      const sourceIds = (Array.isArray(detail.sourceIds) ? detail.sourceIds : entries.map((entry) => entry.sourceId ?? entry.id))
+        .map((sourceId) => stringOrUndefined(sourceId))
+        .filter((sourceId): sourceId is string => Boolean(sourceId));
+      return {
+        studentId: String(ledger.studentId ?? detail.studentId ?? ""),
+        remainingLessons: numberOrUndefined(detail.remainingLessons ?? detail.balanceAfter ?? detail.balance),
+        balance: numberOrUndefined(detail.balance ?? detail.balanceAfter),
+        status: stringOrUndefined(detail.status),
+        sourceIds,
+      };
+    }).filter((ledger) => ledger.studentId),
     pending: [{ title: "课时余额", message: ledgers.length ? "余额已按最近一次课时记录更新。" : "余额暂未核对时仍可确认，俱乐部会按课时规则更新。" }],
   };
 }

@@ -168,6 +168,42 @@ describe("coach lesson correction request boundary", () => {
   });
 });
 
+describe("coach lesson confirmation ledger normalization", () => {
+  it("unwraps the backend ledger object and keeps source ids for settlement checks", async () => {
+    const originalRequest = globalThis.wx.request;
+    globalThis.wx.request = ({ success }) => success({
+      statusCode: 200,
+      data: {
+        participants: [{ studentId: "student-1", status: "present" }],
+        ledgers: [{
+          studentId: "student-1",
+          ledger: {
+            balance: 8,
+            entries: [{ sourceId: "app-client-lesson-event-1-student-1" }],
+          },
+        }],
+      },
+    });
+
+    try {
+      const { getCoachLessonConfirmation } = await import("./api.ts");
+      await expect(getCoachLessonConfirmation("event-1")).resolves.toMatchObject({
+        participants: [{
+          studentId: "student-1",
+          remainingLessons: 8,
+        }],
+        ledgers: [{
+          studentId: "student-1",
+          balance: 8,
+          sourceIds: ["app-client-lesson-event-1-student-1"],
+        }],
+      });
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
+});
+
 describe("coach assessment submission boundary", () => {
   it("sends the BFF-owned actor-free assessment body and treats 200 as unconfirmed", async () => {
     const originalRequest = globalThis.wx.request;

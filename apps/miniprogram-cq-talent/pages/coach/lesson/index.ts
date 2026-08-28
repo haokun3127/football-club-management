@@ -193,6 +193,9 @@ Page<LessonPageData>({
     if (!this.data.eventId) return;
     openPage(`/pages/coach/lesson-correction/index?id=${this.data.eventId}`);
   },
+  openHistory() {
+    openPage("/pages/coach/lesson-history/index");
+  },
   async confirmLesson() {
     if (!this.data.eventId || this.data.saving) return;
     const studentIds = this.data.selectedStudentIds.filter(Boolean);

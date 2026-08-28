@@ -155,3 +155,11 @@
   text-align: center;
   text-decoration: underline;
 }
+
+.c5-history-link {
+  margin-top: 24rpx;
+  color: var(--color-text-secondary);
+  font-size: 26rpx;
+  line-height: 36rpx;
+  text-align: center;
+}

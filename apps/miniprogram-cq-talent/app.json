@@ -41,6 +41,8 @@
     "pages/coach/assessment-submit/index",
     "pages/coach/attendance-success/index",
     "pages/coach/lesson-correction/index",
+    "pages/coach/lesson-history/index",
+    "pages/coach/lesson-detail/index",
     "pages/coach/match-event-add/index",
     "pages/coach/permissions/index",
     "pages/coach/private-interest/index",

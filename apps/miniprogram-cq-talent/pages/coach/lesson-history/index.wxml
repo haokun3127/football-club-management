@@ -1,0 +1,53 @@
+<view class="lesson-history-page">
+  <app-header theme="soft" title="销课历史" title-align="left" show-back />
+
+  <view class="lesson-history-page__body">
+    <status-view
+      wx:if="{{state !== 'ready' && state !== 'idle' && state !== 'empty'}}"
+      state="{{state}}"
+      title="销课历史"
+      message="{{message}}"
+      action-text="{{retryLabel}}"
+      bindaction="retry"
+    />
+
+    <block wx:if="{{state === 'ready'}}">
+      <view class="history-heading">
+        <view class="history-heading__title">历史销课记录</view>
+        <view class="history-heading__filter">按日期筛选</view>
+      </view>
+
+      <view class="history-card">
+        <view class="history-card__header">
+          <view class="history-card__title">最近销课记录</view>
+          <view class="history-card__action">查看全部记录</view>
+        </view>
+        <view wx:for="{{rows}}" wx:key="id" class="history-row" data-id="{{item.id}}" bindtap="openDetail">
+          <view class="history-row__date">
+            <view class="history-row__day">{{item.dateLabel}}</view>
+            <view class="history-row__time">{{item.timeLabel}}</view>
+          </view>
+          <view class="history-row__main">
+            <view class="history-row__title">{{item.title}}</view>
+            <view class="history-row__meta">
+              <text wx:if="{{item.hasTeam}}">{{item.teamLabel}}</text>
+              <text wx:else>{{item.teamLabel}}</text>
+              <text> · {{item.venueLabel}}</text>
+            </view>
+            <view class="history-row__count">{{item.studentCountLabel}}</view>
+          </view>
+          <view class="history-row__status">{{item.statusLabel}}</view>
+          <image class="history-row__chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
+        </view>
+      </view>
+    </block>
+
+    <view wx:if="{{state === 'empty'}}" class="history-empty">
+      <view class="history-empty__icon">✓</view>
+      <view class="history-empty__title">暂无历史销课</view>
+      <view class="history-empty__message">最近 30 天还没有可回溯的已完成训练。</view>
+    </view>
+  </view>
+
+  <role-tabbar role="coach" active="schedule" />
+</view>
