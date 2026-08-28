@@ -8,7 +8,7 @@
   box-sizing: content-box;
   display: flex;
   align-items: center;
-  padding-left: 32rpx;
+  padding-left: 44rpx;
   background: #fceeef;
 }
 
@@ -16,7 +16,7 @@
   display: flex;
   min-height: 56rpx;
   align-items: center;
-  gap: 16rpx;
+  gap: 24rpx;
 }
 
 .select-nav__back {
@@ -34,9 +34,9 @@
 
 .select-nav__title {
   color: #202124;
-  font-size: 36rpx;
+  font-size: 44rpx;
   font-weight: 700;
-  line-height: 44rpx;
+  line-height: 54rpx;
 }
 
 .select-page__body {
@@ -56,15 +56,15 @@
 }
 
 .search-bar__icon {
-  width: 32rpx;
-  height: 32rpx;
-  flex: 0 0 32rpx;
+  width: 40rpx;
+  height: 40rpx;
+  flex: 0 0 40rpx;
 }
 
 .search-bar__input {
   flex: 1;
   min-width: 0;
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: var(--color-text);
 }
 
@@ -82,12 +82,17 @@
 
 .category-chip {
   flex: 0 0 auto;
-  padding: 12rpx 24rpx;
+  display: flex;
+  height: 64rpx;
+  box-sizing: border-box;
+  align-items: center;
+  padding: 0 32rpx;
   border: 1rpx solid #e7eaf0;
   border-radius: 32rpx;
   background: #ffffff;
   color: #667085;
-  font-size: 24rpx;
+  font-size: 26rpx;
+  line-height: 32rpx;
 }
 
 .category-chip--active {

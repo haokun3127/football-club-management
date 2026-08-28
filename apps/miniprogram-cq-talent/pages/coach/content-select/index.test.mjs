@@ -234,11 +234,20 @@ describe("coach training content select", () => {
     expect(template).toContain('class="{{item.selectClass}}"');
     expect(template).toContain('{{summaryLabel}}');
     expect(stylesheet).toMatch(/\.select-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*background:\s*#fceeef)/s);
-    expect(stylesheet).toMatch(/\.select-nav__left\s*\{[^}]*gap:\s*16rpx/s);
-    expect(stylesheet).toMatch(/\.select-nav__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
+    expect(stylesheet).toMatch(/\.select-nav__left\s*\{[^}]*gap:\s*24rpx/s);
+    expect(stylesheet).toMatch(/\.select-nav__title\s*\{[^}]*font-size:\s*44rpx[^}]*line-height:\s*54rpx/s);
     expect(stylesheet).toMatch(/\.search-bar\s*\{[^}]*min-height:\s*88rpx[^}]*border-radius:\s*44rpx/s);
     expect(stylesheet).toMatch(/\.project-card\s*\{[^}]*min-height:\s*128rpx/s);
     expect(controller).toContain("summaryLabel");
     expect(controller).not.toContain("openCoverage");
+  });
+
+  it("uses the online C10 navigation, search, and category geometry", () => {
+    expect(stylesheet).toMatch(/\.select-nav\s*\{[^}]*padding-left:\s*44rpx/s);
+    expect(stylesheet).toMatch(/\.select-nav__left\s*\{[^}]*gap:\s*24rpx/s);
+    expect(stylesheet).toMatch(/\.select-nav__title\s*\{[^}]*font-size:\s*44rpx[^}]*line-height:\s*54rpx/s);
+    expect(stylesheet).toMatch(/\.search-bar__icon\s*\{[^}]*width:\s*40rpx[^}]*height:\s*40rpx[^}]*flex:\s*0 0 40rpx/s);
+    expect(stylesheet).toMatch(/\.search-bar__input\s*\{[^}]*font-size:\s*26rpx/s);
+    expect(stylesheet).toMatch(/\.category-chip\s*\{[^}]*height:\s*64rpx[^}]*padding:\s*0 32rpx[^}]*font-size:\s*26rpx/s);
   });
 });
