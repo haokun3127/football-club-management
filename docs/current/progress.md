@@ -1554,3 +1554,10 @@
 - WeChatIDE MCP 打开真实教练路由 `pages/coach/help/index?source=goal`；首屏截图 `tmp/goal-c16-4-coach-help-live-20260828.png`，滚动底部截图 `tmp/goal-c16-4-coach-help-live-bottom-20260828.png`，均严格 `375×812`。
 - 真实页面返回 `state=ready`、6 个中文分类、5 条 FAQ；搜索、快速上手卡、FAQ 列表、支持卡和教练 TabBar 均已复核，console 过滤 `error|exception|wx:else|route is not defined` 无命中。
 - Figma 示例的分类文案、工作时间、在线咨询和公众号按钮不属于当前 API 契约，页面显示“支持方式待配置”，未伪造示例支持能力。本批没有业务代码、API、生产数据库或 Figma 写回。
+
+## 2026-08-28 C4 主出勤最新运行复核
+
+- 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:665`；在线截图保存为 `tmp/figma-c4-93-665-live-20260828.png`。
+- WeChatIDE MCP 真实教练会话打开 `pages/coach/attendance/index?id=event-cq-talent-secure-test-1-trn-0818`；首屏截图 `tmp/goal-c4-attendance-live-20260828.png`，滚动底部截图 `tmp/goal-c4-attendance-live-bottom-20260828.png`，均严格 `375×812`。
+- 真实页面返回 `state=ready`，活动“传接球配合训练”读取 8 名学员，6 名到场、2 名未到场，实际状态包含到课、缺席、请假和迟到；操作区、状态选择、总人数和教练 TabBar 均已复核。
+- 在线稿示例的 20 人名单、示例姓名和统计未被伪造；console 过滤 `error|exception|wx:else|route is not defined` 无命中。本批没有业务代码、API、生产数据库或 Figma 写回。

@@ -113,3 +113,10 @@
         - [6] | Vector | 8x8 @(1678,871) | stroke=#8e97a6 w1.6
         - [6] | Vector | 16x8 @(1674,880) | stroke=#8e97a6 w1.6
       - [13] | 我的 | 121x14 @(1622,893) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"
+
+## 2026-08-28 最新运行态复核
+
+- 在线唯一基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:665`；在线截图保存为 `tmp/figma-c4-93-665-live-20260828.png`，原始画板高度 `922px`。
+- WeChatIDE MCP 打开真实路由 `pages/coach/attendance/index?id=event-cq-talent-secure-test-1-trn-0818`；首屏截图为 `tmp/goal-c4-attendance-live-20260828.png`，滚动底部截图为 `tmp/goal-c4-attendance-live-bottom-20260828.png`，均严格 `375×812`。
+- 页面 data 为 `state=ready`，真实活动为“传接球配合训练”，8 名学员中 6 名到场、2 名未到场，状态包含到课、缺席、请假和迟到；标题、活动元信息、三项计数、全员到场/清空操作、逐人状态和总人数均由真实 workbench 生成。
+- 粉色顶栏、深色活动摘要、绿色/红色/灰色计数点、操作胶囊、名单卡、状态控件、底部总人数和教练 TabBar 的结构与在线稿一致。在线稿的示例活动、20 人名单和示例姓名未被复制；console 过滤 `error|exception|wx:else|route is not defined` 无命中。本轮没有业务代码、API、生产数据库或 Figma 写回。
