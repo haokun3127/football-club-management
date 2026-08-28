@@ -54,3 +54,11 @@ The dual-role coach session was switched through the existing coach “我的”
 - Online reference: `research/live-2026-08-28/parent-tabbar-online.png`, parent overlay node `269:376`.
 - Comparison: the four-item parent shell, 70px height, 16px icons, 4px active dot, schedule-active red state, label rhythm, and bottom safe-area placement agree with the online overlay. The reminder card content is live account data.
 - Disposition: parent TabBar comparison **passed after real role switch**. The earlier 403 is retained as a navigation/session diagnostic, not as the final disposition.
+
+## P2 follow-up evidence — 2026-08-28
+
+The live P2 Training Detail board was re-read from node `93:139`; online reference and runtime frame are retained in `research/live-2026-08-28/`.
+
+- Runtime route: `/pages/parent/event/index?id=event-cq-talent-secure-test-1-trn-0818`; screenshot `p2-parent-event-runtime.png` is `375×812` after the real coach→parent role switch.
+- Comparison: the top navigation, dark activity hero, training-content card, related-ability card, line-confirmation card, CTA and parent TabBar structure agree with the online board. The actual activity is already marked present and has no training-content records, so the status/content text differs from the Figma sample by API data state.
+- Disposition: P2 structure and TabBar **passed with data-state exemption**; no code or Figma change was warranted.

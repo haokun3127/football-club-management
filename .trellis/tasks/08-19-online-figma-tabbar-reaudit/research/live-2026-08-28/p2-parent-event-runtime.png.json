@@ -1,0 +1,14 @@
+{
+  "capturedOn": "2026-08-28",
+  "route": "/pages/parent/event/index?id=event-cq-talent-secure-test-1-trn-0818",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 53742,
+    "sha256": "e3b5966ec2b1839ceef9c5df7aeea06810103d312117e78478a076183c61f02e"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot",
+  "role": "parent after real coach-to-parent role switch",
+  "visualDisposition": "passed with live API data-state exemption against Figma node 93:139"
+}

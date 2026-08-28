@@ -67,3 +67,11 @@ The live online file was re-read through the Figma MCP using file key `zZ6wKyOHK
 - Fresh runtime frame: `research/live-2026-08-28/coach-schedule-runtime-after-fix.png` (`375×812`), route `/pages/coach/schedule/index`.
 - Comparison: the three-item coach shell, 70px height, 16px icons, 4px active dot, active schedule state, and safe-area placement agree with the online overlay. The schedule body is live data and is not part of this TabBar disposition.
 - Disposition: coach TabBar comparison **passed** for this batch. The parent and coach results remain separate because the parent route could not be entered with the current coach session.
+
+## C2 follow-up evidence — 2026-08-28
+
+The live C2 Activity Workbench board was re-read from node `93:606`; online reference and runtime frame are retained in `research/live-2026-08-28/`.
+
+- Runtime route: `/pages/coach/event/index?id=event-cq-talent-secure-test-1-trn-0818`; screenshot `c2-coach-event-runtime.png` is `375×812`.
+- Comparison: the top navigation, dark activity hero, attendance card, workflow card, bottom action area and coach TabBar structure agree with the online board. The real activity is outside its in-progress window and therefore shows the truthful completed state; the online timer, progress items and `结束训练` action are dynamic in-progress content, not a visual implementation defect.
+- Disposition: C2 structure and TabBar **passed with data-state exemption**; no code or Figma change was warranted.
