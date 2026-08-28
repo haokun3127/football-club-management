@@ -1435,3 +1435,10 @@
 - 实施顺序固定为：报告页与“我的孩子”入口 → `content/articles` 的 `notice` 内容切片与日程 Banner → 定向测试、全仓门禁、可信模拟器截图、路径限定提交。未完成前不把 Figma 静态复核或接口存在误报为运行态验收。
 - 代码已完成并验证：新增 `pages/parent/semester-report`，成长报告入口改为全屏页；`ContentArticle` 增加 `notice/publishedAt/expiresAt`，日程通过 `presentNoticeBanner()` 读取真实通知并预计算摘要。报告页运行截图为 `tmp/goal-p4-3-semester-report-runtime.png`（WeChatIDE 返回 564×1218 设备栅格）；当前线上服务尚未部署本批 API 种子，因此 `tmp/goal-p1-notice-banner-runtime.png` 只证明无通知空态，不能作为 Banner 有数据视觉通过证据。
 - 定向检查：报告/入口 `10/10`、日程 Banner `15/15`、API `server.test.ts 55/55`；domain 20/20、小程序 401/401、API 115/115 全仓门禁通过；WXML/WXSS 编译通过。下一步必须路径限定提交并部署 API 后，重新采集有通知的 375×812 截图。
+
+## 2026-08-28 家长端学期报告与通知 Banner 部署复验
+
+- 提交 `87ab316` 已推送到 `origin/dev`。部署前在生产 SQLite 卷内创建受限一致性备份；使用提交归档上传到 `/opt/cq-talent-releases/87ab316`，构建并标记 `cq-talent-api:87ab316` 与 `cq-talent-api:latest`，保留旧镜像回滚标签。
+- 通过 `sudo docker compose -f /opt/cq-talent-api/docker-compose.yml up -d --no-build --force-recreate api` 重建 API；启动初期的两次连接重置属于容器启动窗口，随后内部 `http://127.0.0.1:3000/health` 与公网 `https://cqtc.pomi.tech/health` 均返回 200。部署未执行生产数据清理或重置。
+- WeChatIDE MCP 刷新并打开 `pages/parent/schedule/index`，实际返回 `375×812` PNG：`tmp/goal-p1-notice-banner-runtime-after-deploy.png`。截图中“秋季训练安排提醒” Banner 已出现，证明新通知内容经过生产 API → 小程序 BFF → TS view model → WXML 的真实链路；无通知空态证据仍保留在 `tmp/goal-p1-notice-banner-runtime.png`。
+- 本批最终本地门禁：`npx --yes pnpm@10.33.0 run check` 使用任务专用临时 npm cache 后 exit `0`，domain `20/20`、小程序 `401/401`、API `115/115`；`git diff --check` exit `0`。第一次直接 npx 被 Windows npm cache 的 `EEXIST/EBADF` 拦截，未进入项目检查，已通过隔离 cache 复验。
