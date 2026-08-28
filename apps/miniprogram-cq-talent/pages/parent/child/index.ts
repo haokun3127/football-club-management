@@ -90,7 +90,7 @@ Page({
     openTab("/pages/parent/schedule/index");
   },
   openGrowth() {
-    openTab("/pages/parent/growth/index");
+    openPage("/pages/parent/semester-report/index");
   },
   openRadar() {
     openPage("/pages/parent/radar/index");

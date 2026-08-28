@@ -13,7 +13,7 @@ globalThis.wx = {
 };
 globalThis.Page = () => {};
 
-const { buildDateOptions, buildScheduleDigest } = await import("./index.ts");
+const { buildDateOptions, buildScheduleDigest, presentNoticeBanner } = await import("./index.ts");
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
 const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 
@@ -229,5 +229,24 @@ describe("parent schedule hero", () => {
 
   it("does not execute JavaScript collection or string methods in WXML", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
+  });
+
+  it("presents only real notice articles with precomputed Chinese summaries", () => {
+    expect(presentNoticeBanner([
+      { id: "guide", title: "训练指南", subtitle: "普通内容", accent: "#a80f1b", category: "guide", body: "不应展示" },
+      { id: "notice-1", title: "本周训练安排提醒", subtitle: "请关注本周课程调整", accent: "#a80f1b", category: "notice", body: "本周六训练提前至上午九点，请家长及时查看日程安排。" },
+    ])).toEqual({
+      id: "notice-1",
+      title: "本周训练安排提醒",
+      summary: "本周六训练提前至上午九点，请家长及时查看日程安排。",
+      metaLabel: "俱乐部通知",
+      hasDetail: true,
+    });
+  });
+
+  it("returns no banner for an empty or non-notice article list", () => {
+    expect(presentNoticeBanner([])).toBeNull();
+    expect(presentNoticeBanner([{ id: "guide", title: "训练指南", subtitle: "帮助", accent: "#a80f1b", category: "guide" }])).toBeNull();
+    expect(presentNoticeBanner([{ id: "expired", title: "过期通知", subtitle: "不应展示", accent: "#a80f1b", category: "notice", expiresAt: "2020-01-01T00:00:00.000Z" }])).toBeNull();
   });
 });

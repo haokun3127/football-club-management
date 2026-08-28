@@ -1,0 +1,5 @@
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"检查 API 响应、前端 view model、WXML 空态和错误态的跨层一致性。"}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"检查新增报告/Banner 是否复用现有类型、数据读取和导航，而非引入重复实现。"}
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"复核 content/articles 扩展 notice 后仍满足认证、权限、俱乐部隔离和字段契约。"}
+{"file":".trellis/spec/api/backend/error-handling.md","reason":"复核内容接口失败和报告部分失败是否返回/展示明确可重试状态。"}
+{"file":".trellis/spec/api/backend/quality-guidelines.md","reason":"执行最终 API、小程序、测试、OpenAPI 和 diff 检查。"}

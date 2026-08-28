@@ -1,0 +1,33 @@
+{
+  "id": "parent-semester-report-notice-banner",
+  "name": "parent-semester-report-notice-banner",
+  "title": "Parent semester report and notice banner",
+  "description": "Add a real-data parent semester growth report and a club notice banner backed by the existing content/articles BFF.",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": null,
+  "package": "api",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-08-29",
+  "completedAt": null,
+  "branch": "dev",
+  "base_branch": "dev",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "08-28-08-28-parent-match-report-banner",
+  "relatedFiles": [
+    "apps/miniprogram-cq-talent/pages/parent/semester-report/index.ts",
+    "apps/miniprogram-cq-talent/pages/parent/schedule/index.ts",
+    "apps/api/src/data-capability/types.ts",
+    "apps/api/src/http/schemas.ts",
+    "apps/api/src/seed/data-capability.ts",
+    "docs/current/progress.md"
+  ],
+  "notes": "Figma nodes: P4.3 701:177; P1 notice variant 714:185; Banner group 717:2. Code and local tests are green. Production WeChat screenshot with a real notice remains pending API deployment/restart; no static fallback is allowed.",
+  "meta": {}
+}

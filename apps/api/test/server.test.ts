@@ -3537,7 +3537,7 @@ describe("api server", () => {
     expect(articles.statusCode, articles.body).toBe(200);
     const articlesBody = articles.json() as { articles: Array<{ id: string; category: string }> };
     expect(articlesBody.articles.length).toBeGreaterThanOrEqual(4);
-    expect(articlesBody.articles.map((item) => item.category)).toEqual(expect.arrayContaining(["guide", "venue", "coach", "help"]));
+    expect(articlesBody.articles.map((item) => item.category)).toEqual(expect.arrayContaining(["guide", "venue", "coach", "help", "notice"]));
 
     const faqs = await app.inject({
       method: "GET",

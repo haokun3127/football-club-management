@@ -35,6 +35,16 @@
       </view>
     </view>
 
+    <view wx:if="{{state === 'ready' && noticeBanner}}" class="notice-banner" data-id="{{noticeBanner.id}}" bindtap="openNotice">
+      <view class="notice-banner__accent"></view>
+      <view class="notice-banner__body">
+        <view class="notice-banner__meta">{{noticeBanner.metaLabel}}</view>
+        <view class="notice-banner__title">{{noticeBanner.title}}</view>
+        <view class="notice-banner__summary">{{noticeBanner.summary}}</view>
+      </view>
+      <view wx:if="{{noticeBanner.hasDetail}}" class="notice-banner__arrow">›</view>
+    </view>
+
     <view class="month-calendar">
       <view class="month-calendar__header">
         <view class="month-calendar__title">{{monthLabel}}</view>

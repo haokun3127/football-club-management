@@ -1,0 +1,55 @@
+<view class="semester-report-page">
+  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
+    <view class="page-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+    <view class="page-nav__title">成长报告</view>
+    <view class="page-nav__spacer"></view>
+  </view>
+
+  <scroll-view class="semester-report-page__scroll" scroll-y enhanced show-scrollbar="{{false}}">
+    <status-view state="{{state}}" title="{{state === 'loading' ? '加载成长报告' : state === 'empty' ? '暂无成长记录' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+
+    <block wx:if="{{state !== 'loading' && state !== 'error' && activeStudentId}}">
+      <scroll-view scroll-x class="report-students" enhanced show-scrollbar="{{false}}">
+        <view class="report-students__inner">
+          <view wx:for="{{children}}" wx:key="id" class="report-student {{activeStudentId === item.id ? 'report-student--active' : ''}}" data-id="{{item.id}}" bindtap="switchChild">{{item.name}}</view>
+        </view>
+      </scroll-view>
+
+      <view class="report-card report-card--summary">
+        <view class="report-summary__eyebrow">{{report.periodLabel}}</view>
+        <view class="report-summary__name">{{report.studentName}}</view>
+        <view class="report-summary__team">{{report.teamLabel}}</view>
+        <view class="report-summary__update">{{report.updatedAtLabel}}</view>
+      </view>
+
+      <view class="report-card report-card--ability">
+        <view class="report-card__header"><view class="report-card__title">能力表现</view><view class="report-card__overall">{{report.overallLabel}}</view></view>
+        <view wx:if="{{report.dimensions.length}}" class="report-dimensions">
+          <view wx:for="{{report.dimensions}}" wx:key="label" class="report-dimension">
+            <view class="report-dimension__head"><view class="report-dimension__label">{{item.label}}</view><view class="report-dimension__value">{{item.valueLabel}}</view></view>
+            <view class="report-dimension__track"><view class="report-dimension__fill" style="width:{{item.percent}}%"></view></view>
+          </view>
+        </view>
+        <view wx:else class="report-empty">{{report.metricsEmptyLabel}}</view>
+      </view>
+
+      <view class="report-card">
+        <view class="report-card__title">训练与比赛</view>
+        <view class="report-stats">
+          <view class="report-stat"><view class="report-stat__value">{{report.trainingSummary.value}}</view><view class="report-stat__label">{{report.trainingSummary.label}}</view></view>
+          <view class="report-stat"><view class="report-stat__value">{{report.matchSummary.value}}</view><view class="report-stat__label">{{report.matchSummary.label}}</view></view>
+          <view class="report-stat"><view class="report-stat__value">{{report.attendanceSummary.value}}</view><view class="report-stat__label">{{report.attendanceSummary.label}}</view></view>
+        </view>
+        <view wx:if="{{report.state === 'empty'}}" class="report-empty report-empty--activities">{{report.activitiesEmptyLabel}}</view>
+      </view>
+
+      <view class="report-card report-card--note">
+        <view class="report-card__title">教练评语</view>
+        <view class="report-note">{{report.coachNoteLabel}}</view>
+      </view>
+
+      <view class="report-link" bindtap="openGrowth">查看详细成长数据 <text>›</text></view>
+    </block>
+  </scroll-view>
+  <role-tabbar role="parent" active="growth" />
+</view>

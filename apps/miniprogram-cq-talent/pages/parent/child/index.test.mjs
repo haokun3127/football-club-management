@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   getParentStudentHome: vi.fn(),
   switchActiveRole: vi.fn(),
   openPage: vi.fn(),
+  openTab: vi.fn(),
   requireRole: vi.fn(),
   routeHome: vi.fn(),
   persistAuthenticatedSession: vi.fn(),
@@ -22,7 +23,7 @@ vi.mock("../../../utils/api", () => ({
   switchActiveRole: mocks.switchActiveRole,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole, routeHome: mocks.routeHome }));
-vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
+vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage, openTab: mocks.openTab }));
 vi.mock("../../../utils/presentation", () => ({
   formatDateTime: (value) => value,
   formatTenure: (startsAt, prefix = "在队") => (startsAt ? `${prefix}1年7个月` : ""),
@@ -68,6 +69,7 @@ describe("parent profile hub", () => {
       updatedAt: "2026-08-10T09:00:00.000Z",
     });
     mocks.openPage.mockReset();
+    mocks.openTab.mockReset();
     mocks.getParentGrowth.mockReset().mockResolvedValue({});
     mocks.requireRole.mockReset().mockReturnValue({ role: "parent", availableRoles: ["parent"], currentStudentId: "student-1" });
     mocks.switchActiveRole.mockReset();
@@ -152,6 +154,16 @@ describe("parent profile hub", () => {
 
     expect(page.data.canSwitchToCoach).toBe(false);
     expect(mocks.switchActiveRole).not.toHaveBeenCalled();
+  });
+
+  it("opens the semester report as a full page for the active child", async () => {
+    const page = createPageInstance();
+
+    await page.load();
+    page.openGrowth();
+
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/parent/semester-report/index");
+    expect(mocks.openTab).not.toHaveBeenCalledWith("/pages/parent/semester-report/index");
   });
 
   it("does not render invented activities or reminders and keeps template expressions precomputed", () => {

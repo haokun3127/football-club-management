@@ -1,0 +1,5 @@
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"报告与通知 Banner 横跨 API、内容种子、前端数据模型和 WXML，需要按边界定义契约并验证空态。"}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"复用现有家长日程、成长摘要、文章 BFF 和公共 TabBar，避免复制数据映射与导航逻辑。"}
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"内容文章和家长成长接口属于 app-client BFF，需保持会话、俱乐部隔离和响应契约。"}
+{"file":".trellis/spec/api/backend/error-handling.md","reason":"报告辅助请求和 Banner 内容读取需要遵循现有 Fastify 错误与可重试状态约定。"}
+{"file":".trellis/spec/api/backend/quality-guidelines.md","reason":"涉及路由、OpenAPI、种子和小程序跨层变更，需运行 API 类型检查、测试和根门禁。"}

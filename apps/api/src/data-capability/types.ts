@@ -640,8 +640,10 @@ export interface ContentArticle {
   title: string;
   subtitle: string;
   accent: string;
-  category: "venue" | "help" | "coach" | "guide";
+  category: "venue" | "help" | "coach" | "guide" | "notice";
   body?: string;
+  publishedAt?: string;
+  expiresAt?: string;
 }
 
 export interface ContentFaq {

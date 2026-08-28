@@ -653,6 +653,7 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
     contentArticles: [
       { id: "article-cq-talent-autumn-plan", clubId, title: "2026秋季训练计划", subtitle: "了解最新的训练课程安排与重点内容", accent: "#a80f1b", category: "guide", body: "秋季学期训练将于 9 月第一周正式开始，每周二、四晚间及周六上午安排训练课。\n\n本学期重点：一是夯实传接球与控球基本功，二是引入小场地对抗提升实战决策能力，三是为 11 月区青少年联赛选拔阵容。\n\n请家长关注「日程」页的课程安排，如有时间冲突请提前在变更申请中说明。" },
       { id: "article-cq-talent-growth-report", clubId, title: "球员成长评估报告", subtitle: "详细分析球员近期训练表现与成长点", accent: "#1976d2", category: "help", body: "俱乐部每学期为每位学员生成成长评估报告，覆盖技术、体能、战术理解、心理四个维度。\n\n报告由带训教练根据测评任务与日常观察填写，可在「成长」页查看雷达图与各指标明细。\n\n如对评估结果有疑问，可通过私教沟通渠道与教练预约一对一反馈。" },
+      { id: "article-cq-talent-notice-autumn-opening", clubId, title: "秋季训练安排提醒", subtitle: "请家长留意近期训练安排", accent: "#a80f1b", category: "notice", publishedAt: "2026-08-25T09:00:00.000Z", expiresAt: "2026-09-30T23:59:59.000Z", body: "秋季训练将于 9 月第一周开始，请家长提前查看日程安排。若孩子无法参加，请在活动详情中及时提交请假说明。" },
       { id: "article-cq-talent-venue-guide", clubId, title: "新手入门：如何选择合适场地", subtitle: "为您提供最优的场地选择与预订技巧", accent: "#ff9800", category: "venue", body: "俱乐部现有三处合作场地：九龙坡足球公园（11 人制天然草）、奥体中心副场（8 人制人工草）与大学城训练基地（5 人制室内）。\n\nU8 以下年龄组默认安排室内或人工草场地；正式比赛优先使用九龙坡足球公园。\n\n场地信息与导航可在内容中心「场地信息」入口查看。" },
       { id: "article-cq-talent-coach-team", clubId, title: "认识我们的教练团队", subtitle: "主教练与专项教练的执教理念介绍", accent: "#22c55e", category: "coach", body: "俱乐部教练团队均持有中国足协 D 级及以上教练证书，主教练具备多年青训梯队执教经验。\n\n我们的理念：先做人、再踢球。技术训练之外，同样重视孩子的团队意识与抗挫折能力。\n\n教练简介与负责队伍可在内容中心「教练团队」入口查看。" },
     ],

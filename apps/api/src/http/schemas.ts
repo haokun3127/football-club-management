@@ -786,7 +786,24 @@ export const schemas = {
         required: ["clubId", "articles"],
         properties: {
           clubId: { type: "string" },
-          articles: { type: "array", items: { type: "object", additionalProperties: true } },
+          articles: {
+            type: "array",
+            items: {
+              type: "object",
+              additionalProperties: false,
+              required: ["id", "title", "subtitle", "accent", "category"],
+              properties: {
+                id: { type: "string" },
+                title: { type: "string" },
+                subtitle: { type: "string" },
+                accent: { type: "string" },
+                category: { type: "string", enum: ["venue", "help", "coach", "guide", "notice"] },
+                body: { type: "string" },
+                publishedAt: { type: "string" },
+                expiresAt: { type: "string" },
+              },
+            },
+          },
         },
       },
       403: errorResponse,

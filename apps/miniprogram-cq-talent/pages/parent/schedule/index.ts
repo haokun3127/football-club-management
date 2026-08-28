@@ -1,4 +1,4 @@
-import { getParentCalendar, getParentChildren, getParentReminders } from "../../../utils/api";
+import { getContentArticles, getParentCalendar, getParentChildren, getParentReminders } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { DEV_PARENT_PAGE_DATE_OVERRIDE } from "../../../utils/config";
 import { currentLocalDate, resolveParentPageDate, shiftCalendarDate } from "../../../utils/date";
@@ -6,7 +6,7 @@ import { openPage } from "../../../utils/navigation";
 import { activityStatus, childNames, formatCalendarDate, formatShortDate, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { countUnreadReminders } from "../../../utils/reminders";
 import { setCurrentStudentId } from "../../../utils/store";
-import type { LoadState, ScheduleEvent, StudentSummary } from "../../../utils/types";
+import type { ContentArticle, LoadState, ScheduleEvent, StudentSummary } from "../../../utils/types";
 
 type ScheduleEventView = ScheduleEvent & {
   timeLabel: string;
@@ -45,6 +45,14 @@ const TYPE_COLORS: Record<string, string> = {
   other: "#6b7280",
 };
 
+export interface NoticeBannerView {
+  id: string;
+  title: string;
+  summary: string;
+  metaLabel: string;
+  hasDetail: boolean;
+}
+
 interface PageData {
   state: LoadState;
   message: string;
@@ -71,6 +79,7 @@ interface PageData {
   weekCount: number;
   weekHours: string;
   hero: HeroView | null;
+  noticeBanner: NoticeBannerView | null;
 }
 
 const typeTabs: PageData["typeTabs"] = [
@@ -122,6 +131,7 @@ Page<PageData>({
     weekCount: 0,
     weekHours: "0",
     hero: null,
+    noticeBanner: null,
   },
   onLoad() {
     this.load();
@@ -151,13 +161,17 @@ Page<PageData>({
         this.setData({ state: "empty", message: "当前微信手机号尚未绑定孩子档案，请联系俱乐部确认登记信息。" });
         return;
       }
-      const events = await getParentCalendar(dateWindowStart(selectedDate), dateWindowEnd(selectedDate));
+      const [events, articles] = await Promise.all([
+        getParentCalendar(dateWindowStart(selectedDate), dateWindowEnd(selectedDate)),
+        getContentArticles(),
+      ]);
       if (loadToken !== scheduleLoadToken) return;
       const active = children.find((child) => child.id === session.currentStudentId) ?? children[0];
       if (active && active.id !== session.currentStudentId) setCurrentStudentId(active.id);
       const childEvents = filterEvents(events, active?.id ?? "", "", "all");
       const visibleEvents = presentEvents(filterEvents(events, active?.id ?? "", selectedDate, this.data.selectedType));
       const digest = buildScheduleDigest(childEvents, selectedDate);
+      const noticeBanner = presentNoticeBanner(articles);
       const monthKey = selectedDate.slice(0, 7);
       this.setData({
         state: "ready",
@@ -178,6 +192,7 @@ Page<PageData>({
         weekCount: digest.weekCount,
         weekHours: digest.weekHours,
         hero: digest.hero,
+        noticeBanner,
       });
     } catch (error) {
       if (loadToken !== scheduleLoadToken) return;
@@ -266,6 +281,10 @@ Page<PageData>({
   openReminders() {
     openPage("/pages/parent/reminders/index");
   },
+  openNotice(event: { currentTarget?: { dataset?: { id?: string } } }) {
+    const id = event.currentTarget?.dataset?.id;
+    if (id) openPage(`/pages/parent/article/index?id=${encodeURIComponent(id)}`);
+  },
   openDay() {
     openPage(`/pages/parent/day/index?date=${this.data.selectedDate}`);
   },
@@ -300,6 +319,31 @@ export function buildDateOptions(selectedDate: string, events: ScheduleEvent[]) 
       count: events.filter((event) => event.startsAt.slice(0, 10) === key).length,
     };
   });
+}
+
+export function presentNoticeBanner(articles: ContentArticle[]): NoticeBannerView | null {
+  const article = articles.find((item) => item.category === "notice" && !isExpired(item.expiresAt));
+  if (!article) return null;
+  const source = (article.body || article.subtitle || article.title).replace(/\s+/g, " ").trim();
+  return {
+    id: article.id,
+    title: article.title,
+    summary: source.length > 52 ? `${source.slice(0, 52)}…` : source,
+    metaLabel: article.expiresAt ? `有效期至${formatNoticeDate(article.expiresAt)}` : article.publishedAt ? `发布于${formatNoticeDate(article.publishedAt)}` : "俱乐部通知",
+    hasDetail: Boolean(article.body || article.subtitle),
+  };
+}
+
+function isExpired(value?: string) {
+  if (!value) return false;
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) && timestamp < Date.now();
+}
+
+function formatNoticeDate(value: string) {
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return "日期待同步";
+  return `${date.getMonth() + 1}月${date.getDate()}日`;
 }
 
 export function buildMonthDays(monthKey: string, selectedDate: string, events: ScheduleEvent[]): MonthDayView[] {

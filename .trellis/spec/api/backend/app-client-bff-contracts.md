@@ -1033,3 +1033,55 @@ const selectedProjectIds = workbench.training.selectedProjectIds;
 ### 错误与安全
 
 - 四个端点均要求已登录会话（家长或教练均可读）；未知俱乐部 → 404。
+
+## Scenario: Parent Notice Banner Article
+
+### 1. Scope / Trigger
+
+- Trigger: 家长日程首页需要展示俱乐部运营通知，但必须继续复用内容 BFF，不能在小程序中内置 Figma 示例文案。
+
+### 2. Signatures
+
+- `GET /clubs/{clubId}/app-clients/{clientId}/content/articles`
+- `ContentArticle.category`: `venue | help | coach | guide | notice`
+- 可选日期字段：`publishedAt?: string`、`expiresAt?: string`
+
+### 3. Contracts
+
+- 响应保持 `{ clubId, articles }`；每条文章至少包含 `id`、`title`、`subtitle`、`accent`、`category`。
+- `notice` 是俱乐部范围内容，家长日程只选取未过期的通知，并在 TypeScript view model 中生成摘要和日期标签。
+- WXML 只绑定 `NoticeBannerView` 的预计算字段，不调用字符串或数组方法；点击详情复用 `/pages/parent/article/index?id=...`。
+
+### 4. Validation & Error Matrix
+
+- 未登录、无效 app client 或越权俱乐部 -> 沿用内容 BFF 的 `401/403/404`。
+- `expiresAt` 无法解析 -> 客户端不按过期处理，但展示“日期待同步”，不阻断日程。
+- 没有有效 `notice` -> `noticeBanner = null`，不显示伪通知，日历与活动列表仍正常渲染。
+- 内容请求失败 -> 日程页进入已有可重试错误态，不把本地示例文案当作回退数据。
+
+### 5. Good / Base / Bad Cases
+
+- Good: API 返回一条未过期 `notice`，Banner 显示真实标题、摘要和有效期，点击后打开真实文章详情。
+- Base: API 返回空数组或全部过期，Banner 不渲染，页面仍显示日程。
+- Bad: 在 WXML 使用 `body.slice(...)`，或把 Figma 示例通知硬编码为默认 Banner。
+
+### 6. Tests Required
+
+- API 内容契约测试断言 `notice` 类别能够返回且 OpenAPI 枚举覆盖它。
+- 小程序 view-model 测试断言只选 `notice`、过滤过期内容、预计算摘要/日期和空态。
+- 真实微信开发者工具截图必须分别验证有通知和无通知布局；静态测试不等于视觉通过。
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```typescript
+const summary = article.body?.slice(0, 52) || "俱乐部最新通知";
+```
+
+#### Correct
+
+```typescript
+const noticeBanner = presentNoticeBanner(articles);
+// WXML 只使用 noticeBanner.summary / noticeBanner.metaLabel
+```

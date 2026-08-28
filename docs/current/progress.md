@@ -1427,3 +1427,11 @@
 - 本次 WXML 编译与 WXSS 编译均成功；模拟器控制台按 `error|exception|wx:else|route is not defined` 过滤无命中。此前 `wx:else`/`route` 报错不再复现，结论仍是旧缓存 bundle/旧运行态问题，不是当前 C7 源码错误。
 - C7 页面保持真实 API 与交互闭环：名单过滤、阵型切换、拖拽、首发/替补换位、重置、保存、只读、加载、空态和错误态均未被证据复核改变；没有新增伪球员、伪数据、伪会话或 API。
 - 文档收口：C7 `prd.md` 删除重复 `TBD` 模板段；`implement.jsonl` 改为真实设计上下文；`task.json` 补齐描述、范围、关联文件和运行证据。截图证据与当前任务记录同步保留，生成的微信开发者工具 `index.js` 不纳入提交。
+
+## 2026-08-28 家长端学期报告与通知 Banner 任务启动
+
+- 在线唯一 Figma 文件为 `zZ6wKyOHKcO4UYXDd9jGwv`，家长页根 `4:6`。本批设计已建立并由 Figma MCP 复核：P4.3 学期成长报告 `701:177`；P1 通知 Banner 变体 `714:185`；Banner 分组节点 `717:2`，画面基准为 375×812。
+- 本批进入代码实现前，已把节点、数据边界、真实 API 契约和空态要求写入 `.trellis/tasks/08-29-parent-semester-report-notice-banner/`，并补齐 implement/check 上下文清单。
+- 实施顺序固定为：报告页与“我的孩子”入口 → `content/articles` 的 `notice` 内容切片与日程 Banner → 定向测试、全仓门禁、可信模拟器截图、路径限定提交。未完成前不把 Figma 静态复核或接口存在误报为运行态验收。
+- 代码已完成并验证：新增 `pages/parent/semester-report`，成长报告入口改为全屏页；`ContentArticle` 增加 `notice/publishedAt/expiresAt`，日程通过 `presentNoticeBanner()` 读取真实通知并预计算摘要。报告页运行截图为 `tmp/goal-p4-3-semester-report-runtime.png`（WeChatIDE 返回 564×1218 设备栅格）；当前线上服务尚未部署本批 API 种子，因此 `tmp/goal-p1-notice-banner-runtime.png` 只证明无通知空态，不能作为 Banner 有数据视觉通过证据。
+- 定向检查：报告/入口 `10/10`、日程 Banner `15/15`、API `server.test.ts 55/55`；domain 20/20、小程序 401/401、API 115/115 全仓门禁通过；WXML/WXSS 编译通过。下一步必须路径限定提交并部署 API 后，重新采集有通知的 375×812 截图。
