@@ -73,3 +73,10 @@
         - [6] | Vector | 16x8 @(1244,6280) | stroke=#a80f1b w1.6
       - [13] | 我的 | 121x14 @(1192,6293) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="我的"
       - [9] | Ellipse | 4x4 @(1250,6310) | fill=#a80f1b
+
+## 2026-08-28 最新运行态复核
+
+- 在线唯一基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1262`；在线截图保存为 `tmp/figma-c16-3-93-1262-live-20260828.png`。
+- WeChatIDE MCP 打开真实路由 `pages/coach/account/index?source=goal`，截图为 `tmp/goal-c16-3-coach-account-live-20260828.png`，严格 `375×812`。
+- 页面 data 为 `teamState=ready`，真实教练名为“Secure coach 1”，负责球队为“重庆天才演示球队第1组、U10发展队”；当前会话没有提供手机号和微信绑定状态，因此页面显示“当前会话未提供/状态待同步”。
+- 资料卡、手机号/微信绑定卡、修改密码、设备管理、清除缓存和教练 TabBar 的结构与在线稿一致；英文姓名、球队数量及手机号/绑定状态属于真实会话数据差异，未用 Figma 示例替换。console 过滤 `error|exception|wx:else|route is not defined` 无命中。本轮没有业务代码、API、生产数据库或 Figma 写回。
