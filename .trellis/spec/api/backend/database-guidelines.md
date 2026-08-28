@@ -83,3 +83,56 @@ upsertById(this.data.sessionPlans, saved);
 - SQLite helper: `apps/api/src/persistence/sqlite.ts`
 - Repository assembly: `apps/api/src/persistence/platform-persistence.ts`
 - Natural-key reseed regression: `apps/api/test/persistence.test.ts`
+
+## Training Session Association Persistence
+
+### 1. Scope / Trigger
+
+- Trigger: a coach changes the selected training projects or intensity for a real calendar training event.
+- `session_plans` stores the catalog composition; `training_sessions` stores the event-to-plan association and must be durable as a separate boundary.
+
+### 2. Signatures
+
+- Migration: `apps/api/db/migrations/0016_training_sessions.sql`.
+- Repository: `TrainingSessionRepository.listByClub(clubId)`, `.getByEvent(clubId, eventId)`, `.save(session)`, `.insertIfAbsent(session)`.
+- Store: `PersistentApiStore.saveTrainingSession(session)` writes through the repository and updates the in-memory projection.
+
+### 3. Contracts
+
+- `training_sessions` is unique by `(club_id, event_id)`; an update keeps the existing stable session `id` so observations and other references are not orphaned.
+- `session_plan_id` is nullable, while `kind` and optional `intensity` are constrained by the domain enum values.
+- Seed replay uses `insertIfAbsent`; it must not replace a coach-saved session plan id or intensity after a restart.
+- Persistent store construction merges repository rows over seed rows before routes read `event.trainingSession` or coach workbench data.
+
+### 4. Validation & Error Matrix
+
+- Invalid kind/intensity or invalid club/event/plan foreign key -> SQLite constraint failure; no valid replacement row is returned.
+- Cross-club `listByClub` / `getByEvent` -> no row from another club.
+- Database close/reopen -> saved association remains available to the workbench.
+
+### 5. Good / Base / Bad Cases
+
+- Good: save a real event's selected plan and `high` intensity, restart against the same file, and read the same event/session-plan id and drill order.
+- Base: a seeded training session with no selected plan remains readable with `sessionPlanId` absent.
+- Bad: keep only `session_plans` durable, or update the natural-key row by replacing its id.
+
+### 6. Tests Required
+
+- Migration idempotency includes `0016_training_sessions.sql` and the table.
+- File-backed persistence test saves through the app-client training-project route, closes/reopens the database, and asserts coach workbench session, selected project ids, and resolved projects.
+- API route regression keeps the existing authorization and response contract green.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+this.data.trainingSessions = nextSessions;
+```
+
+#### Correct
+
+```ts
+const saved = this.repositories.trainingSessions.save(session);
+upsertById(this.data.trainingSessions, saved);
+```

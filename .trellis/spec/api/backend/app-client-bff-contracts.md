@@ -951,6 +951,59 @@ assertSummaryMatches(confirmed.match, payload);
 wx.navigateBack();
 ```
 
+## Scenario: Coach Training Session Association Persistence
+
+### 1. Scope / Trigger
+
+- Trigger: coach C10 saves catalog training projects and intensity for a real training event.
+- The project catalog (`training-project-tree`), the selected `session_plan`, and the event's `training_session` association are distinct persisted facts.
+
+### 2. Signatures
+
+- `PUT /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/training-projects`
+- Follow-up read: `GET /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/workbench`
+
+### 3. Contracts
+
+- The write is coach-scoped and accepts only real catalog project ids. It creates or updates one session plan for the event and one training-session association for `(clubId, eventId)`.
+- `training.session.sessionPlanId`, `training.session.intensity`, `training.selectedProjectIds`, and `training.projects` are read from the persistent store, not reconstructed from mini-program local state.
+- On API restart against the same file-backed database, the workbench must return the saved association and selected projects. Seed replay may fill absent rows but must not overwrite saved values.
+- Repeated saves for one event update the existing training-session natural-key row and preserve its stable id.
+
+### 4. Validation & Error Matrix
+
+- Missing/inactive/non-coach app client -> `404 not_found`.
+- Parent or out-of-scope coach -> `403 forbidden`.
+- Unknown event -> `404 not_found`; accessible non-training event -> `400 invalid_training_event`.
+- Unknown project id -> `400 invalid_training_project`.
+- Invalid persistence state -> API returns an error without claiming the plan was saved; the client retains a retryable error state.
+
+### 5. Good / Base / Bad Cases
+
+- Good: save two real drills, restart the API, and read the same two project ids in the coach workbench.
+- Base: a training event without selected projects returns a real session with no session plan or an explicit empty training projection.
+- Bad: show a success toast from the PUT response while a restart loses `trainingSession`, or hardcode Figma sample drills in the page.
+
+### 6. Tests Required
+
+- API route test covers authorization, project-id validation and the existing response shape.
+- File-backed restart test saves through the route, closes/reopens the API/database, and asserts session plan id, intensity, selected project ids and resolved project rows.
+- Mini-program tests remain method-free in WXML; this persistence slice has no visual acceptance claim without a trusted 375x812 screenshot.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+const selectedProjectIds = localDraft.projectIds;
+```
+
+#### Correct
+
+```ts
+const selectedProjectIds = workbench.training.selectedProjectIds;
+```
+
 ## Scenario: Parent Content Slices (articles / FAQs / venues / coach team)
 
 家长端内容中心四切片由静态数据切换为真实 BFF，全部只读、按俱乐部隔离。

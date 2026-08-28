@@ -10,6 +10,96 @@ import { buildServer } from "../src/server.js";
 import { PersistentApiStore } from "../src/store.js";
 
 describe("platform persistence", () => {
+  it("keeps the saved training session association after a file database reopen", { timeout: 45_000 }, async () => {
+    const directory = mkdtempSync(join(tmpdir(), "football-training-session-"));
+    const databasePath = join(directory, "club.sqlite");
+    const data = createSeedData();
+    let first: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
+    let firstApp: ReturnType<typeof buildServer> | undefined;
+    let reopened: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
+    let reopenedApp: ReturnType<typeof buildServer> | undefined;
+
+    try {
+      first = await createPlatformPersistence({ databasePath, seedData: data });
+      firstApp = buildServer(
+        new PersistentApiStore(first.repositories, data),
+        {
+          logger: false,
+          membershipResolver: new HeaderMembershipResolver(first.repositories.users, first.repositories.memberships),
+        },
+      );
+
+      const write = await firstApp.inject({
+        method: "PUT",
+        url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/training-projects",
+        headers: { "x-user-id": "user-coach-1", "idempotency-key": "training-session-restart-1" },
+        payload: {
+          projectIds: ["drill-finishing-1"],
+          intensity: "high",
+          note: "重启后仍保留",
+        },
+      });
+
+      expect(write.statusCode).toBe(200);
+      expect(write.json()).toEqual(expect.objectContaining({
+        trainingSession: expect.objectContaining({
+          eventId: "event-training-1",
+          sessionPlanId: "session-plan-app-client-event-training-1",
+          intensity: "high",
+        }),
+      }));
+
+      await firstApp.close();
+      firstApp = undefined;
+      first.database.close();
+      first = undefined;
+
+      const reopenedData = createSeedData();
+      reopened = await createPlatformPersistence({ databasePath, seed: true, seedData: reopenedData });
+      reopenedApp = buildServer(
+        new PersistentApiStore(reopened.repositories, reopenedData),
+        {
+          logger: false,
+          membershipResolver: new HeaderMembershipResolver(reopened.repositories.users, reopened.repositories.memberships),
+        },
+      );
+
+      const workbench = await reopenedApp.inject({
+        method: "GET",
+        url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/workbench",
+        headers: { "x-user-id": "user-coach-1" },
+      });
+      const body = workbench.json() as {
+        training: {
+          session: { eventId: string; sessionPlanId?: string; intensity?: string } | null;
+          selectedProjectIds: string[];
+          projects: Array<{ id: string }>;
+        };
+      };
+
+      expect(workbench.statusCode).toBe(200);
+      expect(body.training.session).toEqual(expect.objectContaining({
+        eventId: "event-training-1",
+        sessionPlanId: "session-plan-app-client-event-training-1",
+        intensity: "high",
+      }));
+      expect(body.training.selectedProjectIds).toEqual(["drill-finishing-1"]);
+      expect(body.training.projects).toEqual([expect.objectContaining({ id: "drill-finishing-1" })]);
+      const trainingSessionRows = reopened.database.prepare(`
+        SELECT COUNT(*) AS count
+        FROM training_sessions
+        WHERE club_id = ? AND event_id = ?
+      `).get("club-chongqing-talent", "event-training-1") as { count: number };
+      expect(trainingSessionRows.count).toBe(1);
+    } finally {
+      await reopenedApp?.close();
+      await firstApp?.close();
+      reopened?.database.close();
+      first?.database.close();
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   it("persists coach session plans across a file database reopen", { timeout: 30_000 }, async () => {
     const directory = mkdtempSync(join(tmpdir(), "football-session-plan-"));
     const databasePath = join(directory, "club.sqlite");
@@ -427,6 +517,7 @@ describe("platform persistence", () => {
       "0013_coach_preferences.sql",
       "0014_coach_wechat.sql",
       "0015_session_plans.sql",
+      "0016_training_sessions.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);
@@ -468,6 +559,7 @@ describe("platform persistence", () => {
           'app_client_sessions'
           ,'assessment_tasks'
           ,'session_plans'
+          ,'training_sessions'
         )
       ORDER BY name
     `).all() as Array<{ name: string }>;
@@ -506,6 +598,7 @@ describe("platform persistence", () => {
       "student_guardian_bindings",
       "student_operational_profiles",
       "tactical_boards",
+      "training_sessions",
     ]);
 
     database.close();

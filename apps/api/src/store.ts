@@ -2452,7 +2452,7 @@ export class PersistentApiStore extends SeedBackedStore {
     readonly repositories: PlatformRepositories,
     data: SeedData = createSeedData(),
   ) {
-    super(mergePersistedSessionPlanData(repositories, mergePersistedPlatformData(repositories, mergePersistedMatchData(repositories, mergePersistedAssessmentData(repositories, data)))));
+    super(mergePersistedTrainingSessionData(repositories, mergePersistedSessionPlanData(repositories, mergePersistedPlatformData(repositories, mergePersistedMatchData(repositories, mergePersistedAssessmentData(repositories, data))))));
   }
 
   override listCalendarEvents(clubId: EntityId) {
@@ -2517,6 +2517,12 @@ export class PersistentApiStore extends SeedBackedStore {
   override saveSessionPlan(sessionPlan: SessionPlan): SessionPlan {
     const saved = this.repositories.sessionPlans.save(sessionPlan);
     upsertById(this.data.sessionPlans, saved);
+    return saved;
+  }
+
+  override saveTrainingSession(trainingSession: TrainingSession): TrainingSession {
+    const saved = this.repositories.trainingSessions.save(trainingSession);
+    upsertByTrainingEvent(this.data.trainingSessions, saved);
     return saved;
   }
 
@@ -3412,6 +3418,17 @@ function mergePersistedSessionPlanData(repositories: PlatformRepositories, data:
   };
 }
 
+function mergePersistedTrainingSessionData(repositories: PlatformRepositories, data: SeedData): SeedData {
+  const clubIds = data.clubs.map((club) => club.id);
+  return {
+    ...data,
+    trainingSessions: mergeByTrainingEvent(
+      data.trainingSessions,
+      clubIds.flatMap((clubId) => repositories.trainingSessions.listByClub(clubId)),
+    ),
+  };
+}
+
 function mergePersistedMatchData(repositories: PlatformRepositories, data: SeedData): SeedData {
   const clubIds = data.clubs.map((club) => club.id);
   return {
@@ -3456,6 +3473,24 @@ function mergeById<TEntity extends { id: EntityId }>(seeded: TEntity[], persiste
     byId.set(item.id, item);
   }
   return [...byId.values()];
+}
+
+function mergeByTrainingEvent(seeded: TrainingSession[], persisted: TrainingSession[]): TrainingSession[] {
+  const byEvent = new Map(seeded.map((session) => [`${session.clubId}:${session.eventId}`, session]));
+  for (const session of persisted) {
+    byEvent.set(`${session.clubId}:${session.eventId}`, session);
+  }
+  return [...byEvent.values()];
+}
+
+function upsertByTrainingEvent(items: TrainingSession[], session: TrainingSession): TrainingSession {
+  const index = items.findIndex((item) => item.clubId === session.clubId && item.eventId === session.eventId);
+  if (index < 0) {
+    items.push(session);
+  } else {
+    items[index] = session;
+  }
+  return session;
 }
 
 function participantKey(participant: EventParticipant): string {

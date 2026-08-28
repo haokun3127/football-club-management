@@ -20,6 +20,7 @@ import {
 import { migrate, openSqliteDatabase } from "./sqlite.js";
 import { TacticalBoardRepository } from "./tactical-board-repository.js";
 import { SessionPlanRepository } from "./session-plan-repository.js";
+import { TrainingSessionRepository } from "./training-session-repository.js";
 
 export interface PlatformRepositories {
   appClientSessions: AppClientSessionRepository;
@@ -39,6 +40,7 @@ export interface PlatformRepositories {
   dataCapability: DataCapabilityRepository;
   tacticalBoards: TacticalBoardRepository;
   sessionPlans: SessionPlanRepository;
+  trainingSessions: TrainingSessionRepository;
 }
 
 export interface PlatformPersistence {
@@ -65,6 +67,7 @@ export function createPlatformRepositories(database: DatabaseSync): PlatformRepo
     dataCapability: new DataCapabilityRepository(database),
     tacticalBoards: new TacticalBoardRepository(database),
     sessionPlans: new SessionPlanRepository(database),
+    trainingSessions: new TrainingSessionRepository(database),
   };
 }
 
@@ -183,6 +186,10 @@ export async function seedPlatformData(repositories: PlatformRepositories, data:
 
   for (const sessionPlan of data.sessionPlans) {
     repositories.sessionPlans.insertIfAbsent(sessionPlan);
+  }
+
+  for (const trainingSession of data.trainingSessions) {
+    repositories.trainingSessions.insertIfAbsent(trainingSession);
   }
 
   for (const assessment of data.playerAssessments) {

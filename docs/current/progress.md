@@ -1378,3 +1378,12 @@
 - 修复持久化比赛更新边界：`PersistentApiStore` 按活动复用已有比赛 ID，避免 SQLite `UNIQUE (club_id,event_id)` 冲突；新增 API 回归证明编辑同一活动不会插入第二条比赛。
 - 定向验证：小程序比赛编辑/家长详情 `8/8`；API 比赛保存/详情/事件 `8/8`；小程序 TypeScript `tsc --noEmit` 通过；domain 已重新 build。全仓门禁与本批 diff 检查在提交前执行。
 - 视觉边界：本批未新增可信 375×812 Figma 对照截图；静态与 API 通过不等于视觉验收通过，真实截图仍需用户在微信开发者工具编译后复拍。
+
+## 2026-08-28 训练计划与训练课关联持久化
+
+- 根因确认：`session_plans` 已经落 SQLite，但 `TrainingSession` 仍只存在 `SeedBackedStore.data`；API 重启后活动会回到 seed 中的旧 `sessionPlanId/intensity`，导致教练保存的训练内容关联无法稳定演示。
+- 新增 `apps/api/db/migrations/0016_training_sessions.sql` 与 `TrainingSessionRepository`。训练课按 `(club_id,event_id)` 唯一更新，保留已有稳定 session id；`session_plan_id`、训练类型、强度和审计时间均持久化。
+- `PersistentApiStore` 现在在启动时合并持久化训练课，在保存时写入仓储；种子回放使用 `insertIfAbsent`，不会覆盖教练已保存的训练计划关联。
+- 真实闭环验证：通过现有教练 `PUT .../coach/events/event-training-1/training-projects` 保存真实训练项目和 `high` 强度，关闭文件数据库并以新 seed 数据重开后，coach workbench 仍返回相同 `sessionPlanId`、强度、已选项目 ID 和训练项目详情。
+- 定向验证：训练课重启回归、session plan 回归、迁移幂等共 `3/3`；训练内容 BFF 聚合用例 `1/1`；完整 API persistence `13/13`；API 类型检查通过。
+- 视觉边界：本批没有修改小程序页面，也没有新增可信 `375×812` Figma/微信开发者工具截图；API/数据库通过不等于视觉验收通过。
