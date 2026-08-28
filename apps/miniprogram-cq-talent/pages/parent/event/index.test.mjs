@@ -148,4 +148,10 @@ describe("parent activity detail", () => {
     expect(template).toContain("detail.hasMatchEvents");
     expect(template).toContain("detail.matchEvents");
   });
+
+  it("keeps the P2 navigation aligned to the live 24px back slot", () => {
+    expect(styles).toContain(".p2-nav__back { display: flex; align-items: center; justify-content: center; width: 48rpx; height: 80rpx; }");
+    expect(styles).toContain(".p2-nav__back image { width: 48rpx; height: 48rpx; }");
+    expect(styles).toContain("button.p2-nav__action { width: auto; min-width: 0; margin: 0; padding: 0; border: none; background: transparent; line-height: 34rpx; }");
+  });
 });

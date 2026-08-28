@@ -1,0 +1,14 @@
+{
+  "capturedOn": "2026-08-28",
+  "figmaFileKey": "zZ6wKyOHKcO4UYXDd9jGwv",
+  "figmaNode": "93:170",
+  "board": "P2.1 Match Detail",
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 38129,
+    "sha256": "26FDF990B1028DBCCA71EB07BFE05F62673A5BD59AC5F43388D935496AEF614F"
+  },
+  "captureMethod": "figma-mcp get_screenshot",
+  "designContext": "figma-mcp get_design_context read before comparison"
+}

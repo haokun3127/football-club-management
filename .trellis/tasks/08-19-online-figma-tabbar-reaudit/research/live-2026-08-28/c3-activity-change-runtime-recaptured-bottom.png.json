@@ -1,0 +1,13 @@
+{
+  "capturedOn": "2026-08-28",
+  "route": "/pages/coach/event-change/index?id=event-cq-talent-secure-test-1-trn-0818",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 39867,
+    "sha256": "D4AEC512E4D488FE851662A0BD00D813C3B09155208BDB4FB022C681077BF0E0"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot after pageScrollTo",
+  "visualDisposition": "bottom viewport confirms notification card and coach TabBar are unobscured"
+}

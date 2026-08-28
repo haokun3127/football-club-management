@@ -1,0 +1,16 @@
+{
+  "capturedOn": "2026-08-28",
+  "route": "/pages/parent/event/index?id=event-cq-talent-secure-test-1-scheduled-match",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 43236,
+    "sha256": "CC0BD5ED0ADD6B2F5DDD0CE3FB63C023D91AE863EE48F50CACB4283C8875F77A"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot",
+  "role": "parent after real coach-to-parent role switch",
+  "apiState": "scheduled match; real roster and score/status fields",
+  "visualDisposition": "repaired-and-recaptured against Figma node 93:170",
+  "repair": "P2 local back slot 48rpx and native share button width:auto/min-width:0/margin:0"
+}

@@ -1,5 +1,12 @@
 # 核心演示闭环 · 进度跟踪
 
+## 2026-08-28 P2.1 / C3 在线 Figma 复核
+
+- P2.1 `93:170` 经在线稿与真实家长会话 `375×812` 复核，发现活动详情本地顶栏的返回槽位为 `80rpx` 且原生分享按钮默认占满布局，导致标题从错误位置开始并显示为“比…”。已在 `pages/parent/event/index.wxss` 最小修复为 24px 返回槽位及 `width:auto; min-width:0; margin:0`，重新截图后“比赛详情”完整显示，标题 x=40，分享按钮实际宽 56px。
+- P2.1 定向测试按先红后绿完成：修复前 `1 failed / 4 passed`，修复后 `5/5`；小程序 TypeScript 检查退出 0。运行截图与 Figma 在线截图保存在 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-28/`。
+- C3 `93:634` 重新读取在线稿，并用真实家长→教练角色切换后的活动变更路由取得首屏和底部 `375×812` 截图；通知卡、保存动作和教练 TabBar 未发现结构或遮挡缺陷。示例日期/场地/家长数与真实 API 不同，按数据状态豁免记录，未伪造数据。
+- 详细记录：`.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/p21-c3-reaudit-2026-08-28.md`。
+
 ## 2026-08-28 家长端比赛历史列表
 
 - 新增 `pages/parent/match-history` 全屏比赛记录页，复用在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 499:18 / P4.2 Training History` 的返回顶栏、列表卡、左侧状态条和信息层级；比赛内容结合 `zZ6wKyOHKcO4UYXDd9jGwv / 93:170 / P2.1 Match Detail` 的比赛语义。在线文件没有独立比赛历史画板，已明确记录为组合设计，不宣称独立画板逐像素复原。
