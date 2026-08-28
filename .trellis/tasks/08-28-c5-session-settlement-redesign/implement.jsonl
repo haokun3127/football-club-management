@@ -1,1 +1,2 @@
-{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python3 .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file":"docs/design/specifications/coach/design-spec-C5.1-lesson-correction.md","reason":"C5.1 correction page layout, full-screen flow, spacing, and tab bar geometry used for implementation validation."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"C5 reads real workbench and lesson-confirmation data and must preserve the API boundary without inventing cross-activity history."}

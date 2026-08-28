@@ -1351,3 +1351,10 @@
 - 修改说明沿用现有出勤参与人的 `note` 契约：已有学员备注优先，未填写备注的学员使用本次核实说明；没有新增家长异议、异常人数或其他伪 API 字段。当前真实活动返回 8 名 `pending` 学员，不能套用 Figma 示例的“共 2 条异常”和示例姓名。
 - 真实 WeChatIDE MCP 截图（严格 `375×812`）：`tmp/goal-c4-2-coach-final-top.png` 与 `tmp/goal-c4-2-coach-final-bottom.png`。顶部警示/名单与滚动后的名单/修改说明/重新提交均已取证；真实数据差异按契约豁免，不误报为设计缺陷。
 - 验证：C4 点名定向 Vitest `7/7`、小程序 `tsc --noEmit`、WXML/WXSS 编译和 `git diff --check` 通过；此前同批全仓门禁为 domain `19/19`、小程序 `372/372`、API `113/113`，本次仅追加 WXSS 留白规则，未改 API。
+
+## 2026-08-28 C5 待处理销课页按新版在线稿同步
+
+- 在线唯一基准为 `zZ6wKyOHKcO4UYXDd9jGwv / 537:2 / C5 Session Settlement — Pending`；同时复核了 `537:79` 历史稿和 `537:156` 详情稿。历史/详情仍是目标设计状态，当前后端没有跨活动销课历史聚合契约，因此没有伪造历史列表或 Figma 示例学员数据。
+- `pages/coach/lesson` 摘要主标题改为“待处理销课”，真实活动日期、时间、队伍和场地继续由 workbench 字段预计算；学员状态胶囊改为“待确认”。确认操作区由固定定位改为页面正常流，并保留教练 TabBar，避免底部遮挡。
+- `pages/coach/lesson-correction` 未改动真实更正链路：继续使用 workbench 与 lesson-confirmation 双读、幂等 PATCH、重新读取和失败保留。
+- 验证：C5/C5.1 定向测试 `18/18`，小程序 `tsc --noEmit` 通过，限定路径 `git diff --check` 通过；WXML/WXSS 编译通过。WeChatIDE MCP 返回严格 `375×812`，但当前真实教练会话访问固定种子活动 `event-training-1` 返回 `403 Event is not accessible for this coach membership`，截图仅证明错误态，未作为有数据视觉通过证据。

@@ -138,8 +138,8 @@ describe("coach lesson confirmation", () => {
       rosterCount: 2,
       selectedStudentIds: ["student-1", "student-2"],
       roster: [
-        { studentId: "student-1", name: "Athlete One", balanceText: "剩余 7 课时", lessonAmountText: "1课时" },
-        { studentId: "student-2", name: "Athlete Two", balanceText: "剩余 5 课时", lessonAmountText: "1课时" },
+        { studentId: "student-1", name: "Athlete One", balanceText: "剩余 7 课时", lessonAmountText: "待确认" },
+        { studentId: "student-2", name: "Athlete Two", balanceText: "剩余 5 课时", lessonAmountText: "待确认" },
       ],
     });
     expect(page.data.roster.map((student) => student.studentId)).not.toContain("student-workbench-only");
@@ -183,7 +183,7 @@ describe("coach lesson confirmation", () => {
     expect(template).toContain('class="c5-confirm-bar"');
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
     expect(template).toContain('<app-header theme="soft" title="销课处理" title-align="left" show-back />');
-    expect(styles).toContain("bottom: 140rpx");
+    expect(styles).not.toContain("bottom: 140rpx");
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"submit-bar"');
     expect(template).not.toContain("submit-bar");
@@ -200,9 +200,18 @@ describe("coach lesson confirmation", () => {
 
   it("uses the revised settlement vocabulary for the pending C5 state", () => {
     expect(template).toContain('<app-header theme="soft" title="销课处理" title-align="left" show-back />');
+    expect(template).toContain('<view class="c5-hero__title">待处理销课</view>');
     expect(template).toContain("待确认学员");
+    expect(template).toContain("待确认");
     expect(template).toContain("确认全部");
     expect(template).toContain("发起更正");
+  });
+
+  it("keeps the pending action block in normal page flow like the refreshed C5 board", () => {
+    expect(styles).toMatch(/\.c5-confirm-bar\s*\{[^}]*position:\s*relative/s);
+    expect(styles).not.toMatch(/\.c5-confirm-bar\s*\{[^}]*position:\s*fixed/s);
+    expect(styles).toMatch(/\.c5-confirm-bar\s*\{[^}]*padding:\s*0\s+44rpx\s+44rpx/s);
+    expect(styles).not.toContain("bottom: 140rpx");
   });
 
   it("uses the shared compact header instead of a page-owned system-menu layout", () => {
@@ -226,9 +235,9 @@ describe("coach lesson confirmation", () => {
     expect(controller).not.toContain("resolveNavInset");
     expect(styles).toMatch(/\.c5-row\s*\{[^}]*padding:\s*32rpx/s);
     expect(styles).toMatch(/\.c5-chip\s*\{[^}]*padding:\s*8rpx\s+16rpx/s);
-    expect(styles).toMatch(/\.c5-confirm-bar\s*\{[^}]*padding:\s*44rpx/s);
+    expect(styles).toMatch(/\.c5-confirm-bar\s*\{[^}]*padding:\s*0\s+44rpx\s+44rpx/s);
     expect(styles).toMatch(/\.c5-confirm-bar__button\s*\{[^}]*height:\s*104rpx/s);
     expect(styles).not.toMatch(/\.c5-confirm-bar\s*\{[^}]*box-shadow/s);
-    expect(styles).toContain("bottom: 140rpx");
+    expect(styles).not.toContain("bottom: 140rpx");
   });
 });

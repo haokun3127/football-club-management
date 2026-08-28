@@ -22,6 +22,8 @@ interface LessonPageData {
   eventTime: string;
   eventTeam: string;
   hasEventTeam: boolean;
+  eventVenue: string;
+  hasVenue: boolean;
   roster: LessonRosterItem[];
   hasRoster: boolean;
   rosterCount: number;
@@ -44,6 +46,8 @@ Page<LessonPageData>({
     eventTime: "",
     eventTeam: "",
     hasEventTeam: false,
+    eventVenue: "",
+    hasVenue: false,
     roster: [],
     hasRoster: false,
     rosterCount: 0,
@@ -70,6 +74,8 @@ Page<LessonPageData>({
         eventTime: "",
         eventTeam: "",
         hasEventTeam: false,
+        eventVenue: "",
+        hasVenue: false,
         roster: [],
         hasRoster: false,
         rosterCount: 0,
@@ -110,6 +116,7 @@ Page<LessonPageData>({
       const roster = mergeLessonRoster(workbench, confirmation);
       const selectedStudentIds = roster.map((student) => student.studentId);
       const eventTeam = workbench.event.teamName || "";
+      const eventVenue = workbench.event.venue || "";
 
       if (!selectedStudentIds.length) {
         this.setData({
@@ -122,6 +129,8 @@ Page<LessonPageData>({
           eventTime: formatTimeRange(workbench.event.startsAt, workbench.event.endsAt),
           eventTeam,
           hasEventTeam: Boolean(eventTeam),
+          eventVenue,
+          hasVenue: Boolean(eventVenue),
           roster,
           hasRoster: false,
           rosterCount: 0,
@@ -142,6 +151,8 @@ Page<LessonPageData>({
         eventTime: formatTimeRange(workbench.event.startsAt, workbench.event.endsAt),
         eventTeam,
         hasEventTeam: Boolean(eventTeam),
+        eventVenue,
+        hasVenue: Boolean(eventVenue),
         roster,
         hasRoster: true,
         rosterCount: roster.length,
@@ -161,6 +172,8 @@ Page<LessonPageData>({
         eventTime: "",
         eventTeam: "",
         hasEventTeam: false,
+        eventVenue: "",
+        hasVenue: false,
         roster: [],
         hasRoster: false,
         rosterCount: 0,
@@ -222,7 +235,7 @@ function mergeLessonRoster(workbench: CoachWorkbench, confirmation: CoachLessonC
       name,
       avatarLetter: name === "姓名待同步" ? "?" : name.slice(0, 1),
       balanceText: typeof balance === "number" ? `剩余 ${balance} 课时` : "课时余额待核对",
-      lessonAmountText: "1课时",
+      lessonAmountText: "待确认",
     });
   }
 

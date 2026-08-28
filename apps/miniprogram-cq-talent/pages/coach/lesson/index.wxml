@@ -6,11 +6,12 @@
 
     <block wx:if="{{state === 'ready' && hasRoster}}">
       <view class="c5-hero">
-        <view class="c5-hero__title">{{eventTitle}}</view>
+        <view class="c5-hero__title">待处理销课</view>
         <view class="c5-hero__meta-group">
           <view class="c5-hero__meta" wx:if="{{hasEventTeam}}">{{eventTeam}} · {{eventDate}}</view>
           <view class="c5-hero__meta" wx:else>{{eventDate}}</view>
-          <view class="c5-hero__meta">{{eventTime}}</view>
+          <view class="c5-hero__meta" wx:if="{{hasVenue}}">{{eventTime}} · {{eventVenue}}</view>
+          <view class="c5-hero__meta" wx:else>{{eventTime}}</view>
         </view>
       </view>
 
