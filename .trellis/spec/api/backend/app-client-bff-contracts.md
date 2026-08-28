@@ -893,6 +893,64 @@ The body is exactly `{ studentId, type, minute?, note? }`. The client must send 
 - The same key with the canonical payload replays the original `201`; a changed canonical payload returns `409 idempotency_conflict`.
 - Only an exact `201` is a client-side success. C6 re-reads its match detail after C6.1 returns; it does not accept an opener-channel or optimistic event payload.
 
+## Scenario: Coach Match Summary Save
+
+### 1. Scope / Trigger
+
+- Trigger: coach C6 match editor (`/pages/coach/match-edit`) saves the match summary through the existing app-client BFF.
+- The summary write and the event append are separate operations; a summary save must not replace or rewrite the persisted roster/events.
+
+### 2. Signatures
+
+- `POST /clubs/:clubId/app-clients/:clientId/coach/matches`
+- Request body: `{ eventId, matchType, status, opponentName?, homeScore?, awayScore? }` plus the existing server-supported roster/event fields when supplied by the route contract.
+- Follow-up read: `GET /clubs/:clubId/app-clients/:clientId/coach/events/:eventId/match`
+
+### 3. Contracts
+
+- The caller must be an active coach app client with access to the match event; role hints and client-side route access are not authorization.
+- `matchType` and `status` use the existing domain enums. Scores are non-negative integers when present; a completed match requires both scores, while a cancelled match cannot carry score data or player events.
+- The client treats the write as confirmed only after a fresh match-detail read returns the submitted summary. A successful POST response alone is not sufficient for navigation or a success toast.
+- The server preserves existing match events and roster rows when updating the summary. A repeated save for the same event is an update, not a second match record.
+
+### 4. Validation & Error Matrix
+
+- Missing/inactive/non-coach app client -> `404 not_found`.
+- Parent or out-of-scope coach -> `403 forbidden`.
+- Unknown event -> `404 not_found`; accessible non-match event -> `400 invalid_match_event`.
+- Negative, fractional, non-numeric, or incomplete completed-match scores -> `400 validation_failed`.
+- Cancelled match with score or event payload -> `400 validation_failed`.
+
+### 5. Good / Base / Bad Cases
+
+- Good: save a completed 2–1 match, re-read the detail, and see the same opponent/status/scores plus the unchanged real roster/events.
+- Base: save a scheduled match without scores; the detail remains readable and scores remain unavailable.
+- Bad: navigate away after `POST 201` without re-reading, or create a new persistent match id for every edit of one event.
+
+### 6. Tests Required
+
+- API contract test asserts coach authorization, score validation, update idempotence by event, and preservation of existing roster/events.
+- Persistence test closes and reopens the file-backed database, then reads the saved match summary from the same event.
+- Mini-program controller test asserts initial real-data load, local validation without an API call, POST payload, fresh detail read, and navigation only after readback matches.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```typescript
+await saveCoachMatch(payload);
+wx.navigateBack();
+```
+
+#### Correct
+
+```typescript
+await saveCoachMatch(payload);
+const confirmed = await getCoachMatchDetail(eventId);
+assertSummaryMatches(confirmed.match, payload);
+wx.navigateBack();
+```
+
 ## Scenario: Parent Content Slices (articles / FAQs / venues / coach team)
 
 家长端内容中心四切片由静态数据切换为真实 BFF，全部只读、按俱乐部隔离。
