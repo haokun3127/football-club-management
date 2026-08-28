@@ -1518,11 +1518,23 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         ? { ...visibleEvent, teamName: primaryTeamName }
         : visibleEvent;
 
+      const matchDetail = event.type === "match"
+        ? await context.store.getMatchDetailByEvent(request.params.clubId, request.params.eventId)
+        : null;
+      const visibleStudentIds = new Set((visibleEvent.participants ?? []).map((participant) => participant.studentId));
+      const students = event.type === "match" ? await context.store.listOperationalStudents(request.params.clubId) : [];
+      const studentNames = new Map(students.map((student) => [student.id, student.name]));
+      const matchEvents = (matchDetail?.events ?? [])
+        .filter((matchEvent) => role !== "parent" || visibleStudentIds.has(matchEvent.studentId))
+        .map((matchEvent) => ({ ...matchEvent, studentName: studentNames.get(matchEvent.studentId) }));
+
       return {
         clubId: request.params.clubId,
         client: summarizeClient(client),
         role,
         event: enrichedEvent,
+        match: matchDetail?.match ?? null,
+        matchEvents,
       };
     },
   );
@@ -2682,8 +2694,10 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       }
 
       try {
+        const existing = await context.store.getMatchDetailByEvent(request.params.clubId, request.body.eventId);
         const result = await context.store.recordMatchSummary({
           ...request.body,
+          matchId: request.body.matchId ?? existing?.match?.id,
           clubId: request.params.clubId,
         });
         return reply.code(201).send({

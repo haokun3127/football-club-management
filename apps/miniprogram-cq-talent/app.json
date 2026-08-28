@@ -28,6 +28,7 @@
     "pages/coach/attendance/index",
     "pages/coach/lesson/index",
     "pages/coach/match/index",
+    "pages/coach/match-edit/index",
     "pages/coach/tactical-board/index",
     "pages/coach/team/index",
     "pages/coach/student-radar/index",

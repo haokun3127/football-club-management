@@ -309,6 +309,7 @@ export async function correctCoachLesson(
 
 export async function recordCoachMatch(input: {
   eventId: string;
+  matchId?: string;
   matchType: string;
   status: string;
   opponentName?: string;
@@ -495,6 +496,7 @@ function normalizeActivityDetail(raw: Record<string, unknown>): ActivityDetail {
   const event = normalizeEvent(eventSource);
   const training = asRecord(raw.training ?? eventSource.trainingSession);
   const match = asRecord(raw.match ?? eventSource.match);
+  const matchEventsSource = Array.isArray(raw.matchEvents) ? raw.matchEvents as Array<Record<string, unknown>> : [];
   const other = asRecord(raw.other ?? eventSource.otherActivity);
   const participants = Array.isArray(eventSource.participants) ? eventSource.participants as Array<Record<string, unknown>> : [];
   const participantStatus = participants.map((item) => statusLabel(item.status)).filter(Boolean).join("、") || "待更新";
@@ -551,6 +553,20 @@ function normalizeActivityDetail(raw: Record<string, unknown>): ActivityDetail {
           ],
         },
       ];
+  const matchEvents = matchEventsSource.flatMap((item) => {
+    const id = stringOrUndefined(item.id);
+    const studentId = stringOrUndefined(item.studentId);
+    const type = stringOrUndefined(item.type);
+    if (!id || !studentId || !isCoachMatchEventType(type)) return [];
+    return [{
+      id,
+      type,
+      studentId,
+      studentName: stringOrUndefined(item.studentName),
+      minute: numberOrUndefined(item.minute),
+      note: stringOrUndefined(item.note),
+    }];
+  });
   return {
     id: event.id,
     type: event.type,
@@ -564,6 +580,7 @@ function normalizeActivityDetail(raw: Record<string, unknown>): ActivityDetail {
     fields,
     sections,
     pending: [],
+    matchEvents,
   };
 }
 

@@ -1,0 +1,47 @@
+<view class="match-edit-page">
+  <app-header theme="soft" title="编辑比赛" title-align="left" show-back />
+
+  <view class="match-edit-page__body">
+    <status-view wx:if="{{state !== 'ready' && state !== 'idle'}}" state="{{state}}" title="比赛信息" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
+
+    <block wx:if="{{state === 'ready'}}">
+      <view class="match-edit-hero">
+        <view class="match-edit-hero__eyebrow">比赛记录</view>
+        <view class="match-edit-hero__title">{{eventTitle}}</view>
+        <view wx:if="{{teamName}}" class="match-edit-hero__team">{{teamName}}</view>
+      </view>
+
+      <view class="match-edit-card">
+        <view class="match-edit-field">
+          <view class="match-edit-field__label">对手</view>
+          <input class="match-edit-field__input" value="{{opponentName}}" placeholder="请输入对手名称" maxlength="60" bindinput="onOpponentInput" />
+        </view>
+        <view class="match-edit-field">
+          <view class="match-edit-field__label">比赛类型</view>
+          <picker mode="selector" range="{{matchTypes}}" range-key="label" value="{{matchTypeIndex}}" bindchange="onMatchTypeChange">
+            <view class="match-edit-picker">{{matchTypes[matchTypeIndex].label}}<text>›</text></view>
+          </picker>
+        </view>
+        <view class="match-edit-field">
+          <view class="match-edit-field__label">比赛状态</view>
+          <picker mode="selector" range="{{statuses}}" range-key="label" value="{{statusIndex}}" bindchange="onStatusChange">
+            <view class="match-edit-picker">{{statuses[statusIndex].label}}<text>›</text></view>
+          </picker>
+        </view>
+        <view class="match-edit-field match-edit-field--score">
+          <view class="match-edit-field__label">比分</view>
+          <view class="match-edit-score">
+            <input class="match-edit-score__input" type="number" value="{{homeScore}}" placeholder="主队" bindinput="onHomeScoreInput" />
+            <view class="match-edit-score__colon">:</view>
+            <input class="match-edit-score__input" type="number" value="{{awayScore}}" placeholder="对手" bindinput="onAwayScoreInput" />
+          </view>
+        </view>
+      </view>
+
+      <view wx:if="{{hasSaveError}}" class="match-edit-error">{{saveError}}</view>
+      <view class="match-edit-save {{submitting ? 'match-edit-save--disabled' : ''}}" bindtap="save">{{submitting ? '保存中' : '保存比赛记录'}}</view>
+    </block>
+  </view>
+
+  <role-tabbar role="coach" active="schedule" />
+</view>

@@ -2495,6 +2495,25 @@ export class PersistentApiStore extends SeedBackedStore {
     return saved;
   }
 
+  override async recordMatchSummary(input: RecordMatchInput) {
+    const existing = this.getMatchDetailByEvent(input.clubId, input.eventId);
+    const persistedInput = existing?.match
+      ? { ...input, matchId: existing.match.id }
+      : input;
+    const result = await this.repositories.matches.transaction(async () => {
+      const saved = await super.recordMatchSummary(persistedInput);
+      this.repositories.matches.saveMatch(saved.match);
+      for (const event of saved.events) {
+        this.repositories.matches.saveEvent(event);
+      }
+      for (const record of saved.metricRecords) {
+        this.repositories.matches.saveMetricRecord(record);
+      }
+      return saved;
+    });
+    return result;
+  }
+
   override saveSessionPlan(sessionPlan: SessionPlan): SessionPlan {
     const saved = this.repositories.sessionPlans.save(sessionPlan);
     upsertById(this.data.sessionPlans, saved);

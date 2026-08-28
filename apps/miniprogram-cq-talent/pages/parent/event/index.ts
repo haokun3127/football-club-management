@@ -12,7 +12,18 @@ type RosterItem = {
   statusTone: "present" | "pending";
 };
 
-type ActivityDetailView = ActivityDetail & {
+type MatchEventView = {
+  id: string;
+  label: string;
+  tone: "score" | "assist" | "defense" | "discipline" | "neutral";
+  studentName: string;
+  minuteLabel: string;
+  hasMinute: boolean;
+  note: string;
+  hasNote: boolean;
+};
+
+type ActivityDetailView = Omit<ActivityDetail, "matchEvents"> & {
   navTitle: string;
   statusLabel: string;
   statusTone: "warning" | "success" | "muted";
@@ -38,6 +49,8 @@ type ActivityDetailView = ActivityDetail & {
   confirmationText: string;
   offlineConfirmText: string;
   attendanceConfirmed: boolean;
+  matchEvents: MatchEventView[];
+  hasMatchEvents: boolean;
 };
 
 const NAV_TITLES = { training: "训练详情", match: "比赛详情", other: "活动详情" } as const;
@@ -142,7 +155,44 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
     confirmationText: childStatusLabel,
     offlineConfirmText: `本次训练须经教练或家长在现场确认，无需在 APP 进行操作。请${child?.name || "学员"}准时到场。`,
     attendanceConfirmed: childStatusLabel === "已到场",
+    matchEvents: toMatchEvents(detail.matchEvents),
+    hasMatchEvents: toMatchEvents(detail.matchEvents).length > 0,
   };
+}
+
+function toMatchEvents(events: ActivityDetail["matchEvents"]): MatchEventView[] {
+  return (events ?? []).map((event) => ({
+    id: event.id,
+    label: matchEventLabel(event.type),
+    tone: matchEventTone(event.type),
+    studentName: event.studentName || "学员待同步",
+    minuteLabel: typeof event.minute === "number" ? `${event.minute}分钟` : "时间待同步",
+    hasMinute: typeof event.minute === "number",
+    note: event.note || "",
+    hasNote: Boolean(event.note),
+  }));
+}
+
+function matchEventLabel(type: NonNullable<ActivityDetail["matchEvents"]>[number]["type"]) {
+  const labels: Record<typeof type, string> = {
+    goal: "进球",
+    assist: "助攻",
+    save: "扑救",
+    tackle: "抢断",
+    yellow_card: "黄牌",
+    red_card: "红牌",
+    penalty: "点球",
+    own_goal: "乌龙球",
+  };
+  return labels[type];
+}
+
+function matchEventTone(type: NonNullable<ActivityDetail["matchEvents"]>[number]["type"]): MatchEventView["tone"] {
+  if (type === "goal" || type === "penalty" || type === "own_goal") return "score";
+  if (type === "assist") return "assist";
+  if (type === "save" || type === "tackle") return "defense";
+  if (type === "yellow_card" || type === "red_card") return "discipline";
+  return "neutral";
 }
 
 function displayValue(value: string, fallback: string) {

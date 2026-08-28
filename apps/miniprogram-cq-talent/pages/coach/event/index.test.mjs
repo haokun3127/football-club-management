@@ -230,7 +230,7 @@ describe("coach activity workbench", () => {
     const routes = {
       attendance: "/pages/coach/attendance/index?id=event-1",
       lesson: "/pages/coach/lesson/index?id=event-1",
-      match: "/pages/coach/match/index?id=event-1",
+      match: "/pages/coach/match-edit/index?eventId=event-1",
       tactical: "/pages/coach/tactical-board/index?eventId=event-1",
       training: "/pages/coach/content-select/index?eventId=event-1",
       assessment: "/pages/coach/test-entry/index?eventId=event-1&templateId=template-1",

@@ -111,6 +111,28 @@ describe("parent activity detail", () => {
     });
   });
 
+  it("projects only API-backed match events into the parent match detail", async () => {
+    mocks.getParentActivityDetail.mockResolvedValueOnce(detail({
+      type: "match",
+      title: "真实比赛",
+      matchEvents: [
+        { id: "match-event-1", type: "goal", studentId: "student-1", studentName: "小明", minute: 18, note: "右脚推射" },
+        { id: "match-event-2", type: "own_goal", studentId: "student-1", studentName: "小明", minute: 42 },
+      ],
+    }));
+    const page = createPageInstance();
+
+    await page.load("match-event");
+
+    expect(page.data.detail).toMatchObject({
+      matchEvents: [
+        { id: "match-event-1", label: "进球", studentName: "小明", minuteLabel: "18分钟" },
+        { id: "match-event-2", label: "乌龙球", studentName: "小明", minuteLabel: "42分钟" },
+      ],
+      hasMatchEvents: true,
+    });
+  });
+
   it("keeps the three P2 hierarchies page-owned and method-free in WXML", () => {
     expect(template).toContain("detail.type === 'training'");
     expect(template).toContain("detail.type === 'match'");
@@ -123,5 +145,7 @@ describe("parent activity detail", () => {
     expect(styles).toContain(".training-hero");
     expect(styles).toContain(".match-hero");
     expect(styles).toContain(".other-hero");
+    expect(template).toContain("detail.hasMatchEvents");
+    expect(template).toContain("detail.matchEvents");
   });
 });

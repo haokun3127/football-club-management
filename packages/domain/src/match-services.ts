@@ -43,6 +43,7 @@ export interface MatchPlayerNoteInput {
 export interface RecordMatchInput {
   clubId: EntityId;
   eventId: EntityId;
+  matchId?: EntityId;
   matchType: MatchType;
   status: MatchStatus;
   opponentName?: string;
@@ -189,7 +190,7 @@ export function createMatchService(dependencies: MatchServiceDependencies) {
     async recordMatchSummary(input: RecordMatchInput): Promise<MatchSummaryResult> {
       const now = dependencies.clock.now();
       const match: Match = {
-        id: dependencies.ids.next("match"),
+        id: input.matchId ?? dependencies.ids.next("match"),
         clubId: input.clubId,
         eventId: input.eventId,
         matchType: input.matchType,

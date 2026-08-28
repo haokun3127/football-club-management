@@ -144,4 +144,35 @@ describe("createMatchService", () => {
     expect(result.metricRecords.every((record) => record.source === "match_event")).toBe(true);
     expect(saved.notes).toHaveLength(1);
   });
+
+  it("keeps the existing match identity when a summary is edited", async () => {
+    const saved: Array<{ id: string; eventId: string; opponentName?: string }> = [];
+    const service = createMatchService({
+      clock: { now: () => now },
+      ids: { next: (prefix = "id") => `${prefix}-new` },
+      store: {
+        saveMatch: async (match) => { saved.push(match); },
+        saveRoster: async () => {},
+        saveEvent: async () => {},
+        saveNote: async () => {},
+        saveMetricRecord: async () => {},
+      },
+      catalog: { findMetricById: async () => null, findMetricByCode: async () => null },
+    });
+
+    const result = await service.recordMatchSummary({
+      clubId: "club-chongqing-talent",
+      eventId: "event-match-1",
+      matchId: "match-existing",
+      matchType: "friendly",
+      status: "completed",
+      opponentName: "更新后的对手",
+      homeScore: 3,
+      awayScore: 2,
+    });
+
+    expect(result.match.id).toBe("match-existing");
+    expect(saved).toHaveLength(1);
+    expect(saved[0]).toMatchObject({ id: "match-existing", opponentName: "更新后的对手" });
+  });
 });

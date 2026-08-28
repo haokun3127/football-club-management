@@ -164,6 +164,10 @@ Page<MatchPageData>({
     if (!this.data.eventId || !this.data.canAddEvent) return;
     openPage(`/pages/coach/match-event-add/index?eventId=${this.data.eventId}`);
   },
+  openMatchEdit() {
+    if (!this.data.eventId || !this.data.hasMatch) return;
+    openPage(`/pages/coach/match-edit/index?eventId=${this.data.eventId}`);
+  },
   continueLocalDraft() {
     if (!this.data.eventId || !this.data.hasLocalDraftOverlay || this.data.localDraftNavigationLocked) return;
     this.setData({ localDraftNavigationLocked: true });

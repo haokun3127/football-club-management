@@ -28,6 +28,19 @@
         <view class="match-score"><view class="match-team"><view class="match-team__avatar">A</view><view>{{detail.homeTeam}}</view></view><view class="match-score__center"><view>{{detail.scoreText}}</view><view class="match-score__status">{{detail.statusLabel}}</view></view><view class="match-team"><view class="match-team__avatar">B</view><view>{{detail.awayTeam}}</view></view></view>
       </view>
       <view class="roster-card"><view class="roster-card__head"><view>出席名单</view><view>{{detail.roster.length}}人</view></view><view wx:for="{{detail.roster}}" wx:key="id" class="roster-row"><view class="roster-row__avatar roster-row__avatar--{{item.tone}}">{{item.initial}}</view><view class="roster-row__name">{{item.name}}</view><view class="roster-row__state roster-row__state--{{item.statusTone}}">{{item.statusLabel}}</view></view><view wx:if="{{!detail.roster.length}}" class="roster-empty">出席名单待同步</view></view>
+      <view class="match-events-card">
+        <view class="match-events-card__head"><view>比赛事件</view><view wx:if="{{detail.hasMatchEvents}}">{{detail.matchEvents.length}}条</view></view>
+        <view wx:if="{{detail.hasMatchEvents}}" class="match-events-list">
+          <view wx:for="{{detail.matchEvents}}" wx:key="id" class="match-event-row">
+            <view class="match-event-row__minute">{{item.minuteLabel}}</view>
+            <view class="match-event-row__main">
+              <view class="match-event-row__line"><view class="match-event-row__pill match-event-row__pill--{{item.tone}}">{{item.label}}</view><view class="match-event-row__name">{{item.studentName}}</view></view>
+              <view wx:if="{{item.hasNote}}" class="match-event-row__note">{{item.note}}</view>
+            </view>
+          </view>
+        </view>
+        <view wx:else class="match-events-empty">暂无已记录的比赛事件</view>
+      </view>
     </block>
 
     <block wx:elif="{{detail}}">

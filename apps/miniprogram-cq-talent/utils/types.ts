@@ -124,6 +124,14 @@ export interface ActivityDetail {
   fields: Array<{ label: string; value: string }>;
   sections: Array<{ title: string; items: Array<{ label: string; value: string; status?: string }> }>;
   pending: Array<{ title: string; message: string }>;
+  matchEvents?: Array<{
+    id: string;
+    type: CoachMatchPlayerEvent["type"];
+    studentId: string;
+    studentName?: string;
+    minute?: number;
+    note?: string;
+  }>;
 }
 
 export interface RadarMetricPoint {

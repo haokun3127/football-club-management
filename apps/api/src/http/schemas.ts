@@ -1053,6 +1053,7 @@ export const schemas = {
       required: ["eventId", "matchType", "status"],
       properties: {
         eventId: { type: "string", minLength: 1 },
+        matchId: { type: "string", minLength: 1 },
         matchType: { type: "string", enum: ["friendly", "league", "cup", "internal"] },
         status: { type: "string", enum: ["scheduled", "completed", "cancelled"] },
         opponentName: { type: "string" },

@@ -46,6 +46,21 @@ export class MatchRepository {
     `).run(...matchValues(match));
   }
 
+  saveMatch(match: Match): void {
+    this.database.prepare(`
+      INSERT INTO matches (
+        id, club_id, event_id, match_type, opponent_name, home_score, away_score, status, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        match_type = excluded.match_type,
+        opponent_name = excluded.opponent_name,
+        home_score = excluded.home_score,
+        away_score = excluded.away_score,
+        status = excluded.status,
+        updated_at = excluded.updated_at
+    `).run(...matchValues(match));
+  }
+
   insertEventIfAbsent(event: MatchEvent): void {
     this.database.prepare(`
       INSERT INTO match_events (
