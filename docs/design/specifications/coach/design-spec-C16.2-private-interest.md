@@ -130,3 +130,10 @@
 - 在线唯一基准：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1238`，本轮重新读取并取得严格 `375×812` 截图。
 - 页面已按当前稿收口为左对齐顶栏、私教说明卡、44×24px 接单开关、7 列×4 行时段网格和费用说明卡；视图模型预计算周列与时段格，WXML 不调用 JavaScript 数组方法。
 - 当前 BFF 仅提供 `capabilities.features.private_lessons`，没有教练接单状态或可用时段读写契约，因此运行态开关保持待同步、时段格保持不可用灰态；未填入 Figma 的绿色样例排期，也未新增本地保存/API 写入。最终运行证据：`C:\Users\ASUS\AppData\Local\Temp\c162-runtime-latest.png`；并排图：`C:\Users\ASUS\AppData\Local\Temp\c162-compare-latest.png`。
+
+## 2026-08-28 最新运行态复核
+
+- 在线唯一基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1238`；在线截图保存为 `tmp/figma-c16-2-93-1238-live-20260828.png`。
+- WeChatIDE MCP 打开真实路由 `pages/coach/private-interest/index?source=goal`，截图为 `tmp/goal-c16-2-private-interest-live-20260828.png`，严格 `375×812`。
+- 页面 data 为 `featureState=enabled`、`interactive=true`、接受预约开启；真实偏好为周一至周五 17:00/18:00/19:00/20:00 全选，周六周日全部未选，费用文案为“费用由俱乐部统一结算”。
+- 顶栏、说明卡、开关、7 列×4 行时段网格、周末灰态、费用说明和教练 TabBar 的结构/位置已对照通过；console 过滤 `error|exception|wx:else|route is not defined` 无命中。本轮没有业务代码、API、生产数据库或 Figma 写回。

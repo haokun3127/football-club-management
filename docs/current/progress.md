@@ -1533,3 +1533,10 @@
 - WeChatIDE MCP 打开真实教练路由 `pages/coach/permissions/index?source=goal`；稳定截图 `tmp/goal-c16-1-permissions-live-20260828.png`，严格 `375×812`。
 - 页面返回 `state=ready`，真实 capabilities 映射出 5 项权限：修改活动关闭、批量出勤开启、能力评估开启、发起私教开启、查看财务关闭。动态开关状态与 Figma 示例不同，按真实 session 保留，未伪造。
 - 顶栏、说明卡、五行权限卡、只读开关、保存更改视觉按钮和教练 TabBar 已核对；console 过滤 `error|exception|wx:else|route is not defined` 无命中。本批没有业务代码、API、生产数据库或 Figma 写回。
+
+## 2026-08-28 C16.2 私教兴趣最新运行复核
+
+- 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1238`；在线截图保存为 `tmp/figma-c16-2-93-1238-live-20260828.png`。
+- WeChatIDE MCP 打开真实教练路由 `pages/coach/private-interest/index?source=goal`；截图保存为 `tmp/goal-c16-2-private-interest-live-20260828.png`，严格 `375×812`。
+- 真实页面返回私教服务已开通、接受预约开启；真实偏好为周一至周五四个时段全选、周末四个时段未选，费用说明为“费用由俱乐部统一结算”。
+- 顶栏、说明卡、预约开关、7 列×4 行网格、周末灰态、费用说明和教练 TabBar 已核对；console 过滤 `error|exception|wx:else|route is not defined` 无命中。本批没有业务代码、API、生产数据库或 Figma 写回。
