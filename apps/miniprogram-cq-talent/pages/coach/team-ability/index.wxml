@@ -42,12 +42,12 @@
           <view class="dim-table__hint">队均 / TOP / 底</view>
         </view>
         <view wx:for="{{dimensions}}" wx:key="metricId" class="dim-row">
-          <view class="dim-row__label">{{item.label}}</view>
-          <view class="dim-row__values">
+          <view class="dim-row__head">
+            <view class="dim-row__label">{{item.label}}</view>
             <text class="dim-row__avg">{{item.average}}</text>
-            <text class="dim-row__top">{{item.top}}</text>
-            <text class="dim-row__bottom">{{item.bottom}}</text>
           </view>
+          <view class="dim-row__track"><view class="dim-row__fill" style="width: {{item.progressStyle}}"></view></view>
+          <view class="dim-row__summary">{{item.summaryLabel}}</view>
         </view>
       </view>
 

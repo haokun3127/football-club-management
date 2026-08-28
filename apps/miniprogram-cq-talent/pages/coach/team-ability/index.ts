@@ -9,6 +9,8 @@ interface DimensionRow {
   average: string;
   top: string;
   bottom: string;
+  progressStyle: string;
+  summaryLabel: string;
 }
 
 interface PageData {
@@ -122,13 +124,18 @@ function emptyPageData(state: LoadState, message: string): PageData {
 function toDimensionRows(dimensions: CoachTeamAbilityOverview["dimensions"]): DimensionRow[] {
   return dimensions
     .filter((dimension) => Boolean(dimension.metricId) && Boolean(dimension.label))
-    .map((dimension) => ({
-      metricId: dimension.metricId,
-      label: dimension.label,
-      average: formatScore(dimension.average),
-      top: formatScore(dimension.top),
-      bottom: formatScore(dimension.bottom),
-    }));
+    .map((dimension) => {
+      const average = formatScore(dimension.average);
+      return {
+        metricId: dimension.metricId,
+        label: dimension.label,
+        average,
+        top: formatScore(dimension.top),
+        bottom: formatScore(dimension.bottom),
+        progressStyle: `${isFiniteNumber(dimension.average) ? clamp(dimension.average) : 0}%`,
+        summaryLabel: `队均 ${average} · TOP ${formatScore(dimension.top)} · 底 ${formatScore(dimension.bottom)}`,
+      };
+    });
 }
 
 function toRadar(dimensions: CoachTeamAbilityOverview["dimensions"]): RadarMetricPoint[] {
