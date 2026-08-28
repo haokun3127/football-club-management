@@ -105,3 +105,10 @@
         - [6] | Vector | 16x8 @(1674,6280) | stroke=#a80f1b w1.6
       - [13] | 我的 | 121x14 @(1622,6293) | fill=#a80f1b | font=Noto Sans SC/Regular 10px | text="我的"
       - [9] | Ellipse | 4x4 @(1680,6310) | fill=#a80f1b
+
+## 2026-08-28 最新运行态复核
+
+- 在线唯一基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1286`；在线截图保存为 `tmp/figma-c16-4-93-1286-live-20260828.png`，原始画板高度 `924px`。
+- WeChatIDE MCP 打开真实路由 `pages/coach/help/index?source=goal`；首屏截图为 `tmp/goal-c16-4-coach-help-live-20260828.png`，滚动底部截图为 `tmp/goal-c16-4-coach-help-live-bottom-20260828.png`，均严格 `375×812`。
+- 页面 data 为 `state=ready`，真实返回 6 个中文帮助分类和 5 条 FAQ；搜索栏、快速上手两列卡片、常见问题列表、支持卡和教练 TabBar 均在真实运行态渲染。
+- 在线稿的分类示例名称、工作时间、在线咨询和公众号按钮不属于当前 API 契约；当前支持区域明确显示“支持方式待配置”，没有伪造联系入口。console 过滤 `error|exception|wx:else|route is not defined` 无命中。本轮没有业务代码、API、生产数据库或 Figma 写回。

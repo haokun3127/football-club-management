@@ -1547,3 +1547,10 @@
 - WeChatIDE MCP 打开真实教练路由 `pages/coach/account/index?source=goal`；截图保存为 `tmp/goal-c16-3-coach-account-live-20260828.png`，严格 `375×812`。
 - 页面返回 `teamState=ready`，真实会话显示教练“Secure coach 1”、两支负责球队；手机号和微信绑定字段未由当前会话提供，页面保持“当前会话未提供/状态待同步”。
 - 资料卡、联系方式卡、设置行、清除缓存和教练 TabBar 已对照在线稿复核；动态姓名、球队、手机号和绑定状态未用 Figma 示例伪造。console 过滤 `error|exception|wx:else|route is not defined` 无命中；本批没有业务代码、API、生产数据库或 Figma 写回。
+
+## 2026-08-28 C16.4 教练帮助中心最新运行复核
+
+- 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1286`；在线截图保存为 `tmp/figma-c16-4-93-1286-live-20260828.png`。
+- WeChatIDE MCP 打开真实教练路由 `pages/coach/help/index?source=goal`；首屏截图 `tmp/goal-c16-4-coach-help-live-20260828.png`，滚动底部截图 `tmp/goal-c16-4-coach-help-live-bottom-20260828.png`，均严格 `375×812`。
+- 真实页面返回 `state=ready`、6 个中文分类、5 条 FAQ；搜索、快速上手卡、FAQ 列表、支持卡和教练 TabBar 均已复核，console 过滤 `error|exception|wx:else|route is not defined` 无命中。
+- Figma 示例的分类文案、工作时间、在线咨询和公众号按钮不属于当前 API 契约，页面显示“支持方式待配置”，未伪造示例支持能力。本批没有业务代码、API、生产数据库或 Figma 写回。
