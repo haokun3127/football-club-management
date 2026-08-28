@@ -1504,3 +1504,10 @@
 - WeChatIDE MCP 真实教练会话打开 `pages/coach/lesson-correction/index?id=event-cq-talent-secure-test-1-trn-0818`；首屏截图 `tmp/goal-c5-1-lesson-correction-live.png`，滚动到底部截图 `tmp/goal-c5-1-lesson-correction-live-bottom.png`，均严格 `375×812`。
 - 真实 workbench 与 `lesson-confirmation` 均返回 `200`，页面状态 `ready`，读取 8 名真实学员和课时余额；首屏/底部验证异常提示、学员更正卡、步进器、保存按钮和教练 TabBar，console 错误过滤无命中。
 - Figma 的两名示例学员、系统差异标签和 `0.5` 初始值不属于当前 API 真实状态；页面保留真实学员、余额和 `±0` 初始选择，没有伪造数据。本轮没有业务代码、API、数据库或 Figma 写回。
+
+## 2026-08-28 C3 活动变更最新运行复核
+
+- 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:634`；在线画板原始高度 `903`，截图保存为 `tmp/figma-c3-93-634-live.png`。
+- WeChatIDE MCP 真实教练会话打开 `pages/coach/event-change/index?id=event-cq-talent-secure-test-1-trn-0818`；首屏截图 `tmp/goal-c3-activity-change-live.png`，滚动底部截图 `tmp/goal-c3-activity-change-live-bottom.png`，均严格 `375×812`。
+- workbench 与 venues 请求均返回 `200`，页面状态 `ready`；真实活动、3 个场地和 8 位受影响家长进入 view model。首屏/底部验证变更原因、时间、场地、说明、通知开关、保存入口和教练 TabBar，console 错误过滤无命中。
+- Figma 预填的新时间、新场地、示例队名和 `20` 位家长不是当前真实状态；页面保持真实活动与空的新值，没有伪造变更申请。本轮没有业务代码、API、数据库或 Figma 写回。

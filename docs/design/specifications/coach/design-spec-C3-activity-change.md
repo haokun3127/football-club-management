@@ -74,3 +74,11 @@
         - [6] | Vector | 8x8 @(1248,871) | stroke=#8e97a6 w1.6
         - [6] | Vector | 16x8 @(1244,880) | stroke=#8e97a6 w1.6
       - [13] | 我的 | 121x14 @(1192,893) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"
+
+## 2026-08-28 真实运行态复核
+
+- 在线 Figma 节点为 `zZ6wKyOHKcO4UYXDd9jGwv / 93:634`，重新读取后画板原始尺寸为 `375×903`；截图保存为 `tmp/figma-c3-93-634-live.png`。
+- 使用真实教练会话打开 `pages/coach/event-change/index?id=event-cq-talent-secure-test-1-trn-0818`；首屏截图 `tmp/goal-c3-activity-change-live.png`，滚动底部截图 `tmp/goal-c3-activity-change-live-bottom.png`，均严格 `375×812`。
+- 真实 workbench 与 venues 请求均返回 `200`。页面 data 为 `ready`：活动标题为“传接球配合训练”、场地选项为俱乐部真实场地列表、受影响家长数为真实名单长度 `8`；原因、时间、场地、说明和通知开关均由现有页面状态驱动。
+- 结构复核通过：软粉顶栏与“保存”、活动信息卡、变更原因胶囊、新时间、新场地、说明、通知家长开关和教练 TabBar 均存在；滚动后底部通知卡完整可见。模拟器 console 按 `error|exception|fail|undefined|route is not defined|wx:else` 过滤无命中。
+- Figma 的预填日期时间、预填场地、示例队名和 `20` 位家长属于静态示例；当前活动没有待提交变更，页面保留真实原活动信息和空的新值，不伪造变更请求。因此本页结论为：**结构与交互运行态复核通过；示例数据差异按 API 契约豁免；本轮无需业务代码改动。**
