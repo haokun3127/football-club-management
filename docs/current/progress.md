@@ -1265,3 +1265,11 @@
 - `docs/README.md` 已将该文件列为当前接手第一篇；旧 `HANDOFF.md`、`HANDOFF-2026-08-14.md`、`HANDOFF-NEXT.md` 保留为历史/增量材料，不再作为唯一当前事实源。
 - `docs/current/figma-source-of-truth.md` 已更新为 2026-08-19，并补充 P5 顶栏及 C1/C2/C3/C4/C11/C12/C14/C15/C16 审计记录。
 - 本批只更新交接和当前事实文档，没有修改业务代码、生产数据库或微信开发者工具状态；当前 Trellis 任务 `.trellis/tasks/08-19-online-figma-tabbar-reaudit` 仍为 `in_progress`，不能把本次文档整理写成该任务已归档。
+
+## 2026-08-28 C5 销课流程新版 Figma 与小程序首批同步
+
+- 在线唯一基准仍为 `zZ6wKyOHKcO4UYXDd9jGwv`。保留原 `93:734 / C5 Lesson Confirm`，新增三个设计状态：`537:2 / C5 Session Settlement — Pending`、`537:79 / C5 Session Settlement — History`、`537:156 / C5.1 Session Settlement — Detail`。
+- 新版待处理稿将页面语义明确为“销课处理 / 待确认学员 / 人数待处理”；历史稿和详情稿补充了销课回溯、活动信息、场地和更正入口的目标结构。由于后端当前没有跨活动销课历史聚合接口，代码没有伪造历史列表。
+- `pages/coach/lesson` 已同步新版待处理状态：共享顶栏改为“销课处理”，状态视图同步改名，列表标题改为“待确认学员”，人数改为“人待处理”；真实 workbench、lesson-confirmation 读取和确认提交逻辑不变。
+- `pages/coach/lesson-correction` 保持独立全屏更正流程，继续使用真实双读、幂等 PATCH、重新读取和失败提示；没有新增伪造学员或课时数据。
+- C5 定向测试 `17/17` 通过。小程序类型检查与最终限定路径 diff 检查待本批提交前完成；未进行生产部署或数据库写入。

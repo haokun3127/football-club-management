@@ -185,6 +185,12 @@ describe("coach lesson correction", () => {
     expect(controller).not.toContain("error.message");
   });
 
+  it("keeps the correction flow full-screen and distinct from the pending settlement page", () => {
+    expect(template).toContain('<app-header theme="soft" title="课时更正" title-align="left" show-back />');
+    expect(template).not.toContain("销课历史");
+    expect(template).not.toContain("确认全部");
+  });
+
   it("uses the C5.1 Figma content inset and normal-flow correction action", () => {
     const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
     expect(template).toContain('<app-header theme="soft" title="课时更正" title-align="left" show-back />');
