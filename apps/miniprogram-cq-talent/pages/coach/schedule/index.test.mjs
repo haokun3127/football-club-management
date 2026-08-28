@@ -234,4 +234,9 @@ describe("coach schedule home", () => {
     expect(stylesheet).toMatch(/\.c1-hero\s*\{[^}]*min-height:\s*360rpx[^}]*padding:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.acard\s*\{[^}]*min-height:\s*192rpx[^}]*padding:\s*24rpx/s);
   });
+
+  it("keeps the hero time and activity title on one aligned row", () => {
+    expect(stylesheet).toMatch(/\.c1-hero__main\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-direction:\s*row)(?=[^}]*align-items:\s*baseline)/s);
+    expect(stylesheet).toMatch(/\.c1-hero__title\s*\{[^}]*flex:\s*1[^}]*min-width:\s*0/s);
+  });
 });
