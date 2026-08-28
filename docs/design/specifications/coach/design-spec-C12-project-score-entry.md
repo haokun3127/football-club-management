@@ -47,3 +47,10 @@
 - 真实八维表单中的 `Secure player 1-3` 等长姓名曾被固定 `112rpx` 头像/姓名区域和 `word-break: break-all` 挤成竖排。现将区域锁定为 `140rpx` 并对姓名使用单行省略，保留四列评分格和 Figma 首屏密度；不截断 API 数据、不改变草稿或提交契约。
 - 可信运行态图为 `tmp/coach-runtime-acceptance/C12-20260818-after-long-name-fix.png`，同目录 sidecar 证实路由 `/pages/coach/test-entry/index` 与严格 `375×812`；在线稿和复验对照分别为 `C12-20260818-figma-online.png`、`C12-20260818-after-long-name-fix-compare.png`。真实模板标题、评分项、`0 / 496` 进度、姓名与分数均属于数据差异。
 - 验证按红→绿完成：新增回归测试先失败，再修复后 C12 定向 Vitest `19/19`、小程序 TypeScript `tsc --noEmit` 与 `git diff --check` 通过。
+
+## 2026-08-28 运行态复核
+
+- 在线 Figma 节点 `zZ6wKyOHKcO4UYXDd9jGwv / 93:1030` 已重新读取，在线稿原图为 `375×894`；首屏对照仍以 375×812 视口为准。
+- WeChatIDE MCP 真实教练会话截图：`tmp/goal-c12-test-entry-live-final.png`，严格 `375×812`；顶栏、任务摘要卡、待录入学员区、固定保存区和训练管理 TabBar 均可见，模拟器 console 未命中错误、异常或路由变量错误。
+- 真实活动返回的任务名、8 名学员、62 个中文指标、`0 / 496` 进度和空评分与 Figma 示例的 5 名学员、4 个示例指标、`12/20` 不同，属于真实数据契约差异；没有用设计样例替换服务端数据。
+- 本次只补充最新运行证据，没有修改业务代码、API、数据库或 Figma。

@@ -80,3 +80,10 @@
         - [6] | Vector | 8x8 @(1248,2671) | stroke=#8e97a6 w1.6
         - [6] | Vector | 16x8 @(1244,2680) | stroke=#8e97a6 w1.6
       - [13] | 我的 | 121x14 @(1192,2693) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"
+
+## 2026-08-28 真实运行证据
+
+- 在线稿节点：`zZ6wKyOHKcO4UYXDd9jGwv / 93:858`；在线截图保存为 `tmp/figma-c6-2-93-858-live.png`。
+- 通过 C6.1 真实输入分钟 `54` 触发本机草稿保存，再打开真实比赛路由，WeChatIDE MCP 截图保存为 `tmp/goal-c6-2-match-current.png`，严格 `375×812`；`hasLocalDraftOverlay=true`，并显示“本机保存于 2026-08-29 04:09”。
+- 真实运行结构与 Figma 对应：比赛顶栏、比赛摘要卡、事件区、半透明遮罩、白色保存卡片、继续编辑/退出按钮和教练 TabBar 均存在。实现文案明确为“未提交草稿已保存 / 仅保存在当前设备”，因为本轮没有把草稿写入 API；不将本机状态误报为服务器保存。
+- 控制台过滤 `error|exception|fail|undefined|route is not defined` 无命中。该验证只证明设备草稿恢复闭环，不替代生产持久化验证。

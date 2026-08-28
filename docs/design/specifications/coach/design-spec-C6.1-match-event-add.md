@@ -73,3 +73,11 @@
         - [6] | Vector | 8x8 @(818,2671) | stroke=#8e97a6 w1.6
         - [6] | Vector | 16x8 @(814,2680) | stroke=#8e97a6 w1.6
       - [13] | 我的 | 121x14 @(762,2693) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"
+
+## 2026-08-28 真实运行证据
+
+- 在线稿节点：`zZ6wKyOHKcO4UYXDd9jGwv / 93:827`；在线截图保存为 `tmp/figma-c6-1-93-827-live.png`。
+- 真实 WeChatIDE MCP 截图：`tmp/goal-c6-1-match-event-add-fixed.png`，返回严格 `375×812`。顶栏、事件类型区、时间/球员/备注表单、提交按钮和教练 TabBar 均已渲染。
+- 真实会话先暴露出一个缓存根因：启动页刷新了 `/app-clients/resolve`，但复用已有登录会话时没有把最新 `capabilities.match.eventTypes` 写回 session，导致页面错误进入“未配置事件类型”兜底态。已在小程序启动流程补上 session context 合并，并增加回归测试；重新走启动流程后真实页面得到 `进球/助攻/扑救/抢断` 四个后端允许类型。
+- Figma 示例的 `黄牌/红牌/换人/其他` 未由当前客户端能力返回，因此页面不硬编码这些选项；这是能力契约差异，不伪造配置。中文标签和真实名单均在 TypeScript 中预计算。
+- 控制台过滤 `error|exception|fail|undefined|route is not defined` 无命中；真实比赛详情请求返回 `200`，未使用 mock API。

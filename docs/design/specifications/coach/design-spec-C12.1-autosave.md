@@ -7,6 +7,13 @@
 - C12 与 C12.1 共用 88px 内容高度的安全区顶栏，以及 22px（44rpx）页面和提交区横向栅格；右侧仍使用动态系统胶囊避让。
 - 该批的定向测试、TypeScript、`git diff --check` 和全仓门禁已通过；没有在本批生成新的 C12/C12.1 375×812 运行时截图，故不将此记录表述为新的像素级运行态验收。
 
+## 2026-08-28 运行态复核
+
+- 在线 Figma 节点 `zZ6wKyOHKcO4UYXDd9jGwv / 93:1061` 已重新读取，画板为 `375×812`。
+- 使用 C12 真实页面返回的活动 ID、模板版本 ID、学员 ID 和评分项 ID，仅在微信模拟器本机写入一条有效草稿；重新打开 `pages/coach/test-entry/index` 后真实触发 `draftResumeVisible`，未写入生产数据库，也未 mock API。
+- WeChatIDE MCP 截图：`tmp/goal-c12-1-autosave-live.png`，严格 `375×812`；遮罩、顶部“成绩录入/提交”、自动保存弹层、继续录入/退出按钮和教练 TabBar 均与在线稿结构对应。时间文案按真实本机当前时间显示，不复制 Figma 的“1分钟前”示例。
+- 模拟器 console 过滤 `error|exception|fail|undefined|route is not defined` 无命中。本次补齐了新的本机草稿运行证据，不改变自动保存的设备本地契约。
+
 - [4] | C12.1 Autosave State | 375x812 @(940,3720) | fill=#f6f7f9 | r=28
   - [4] | Top Nav | 375x88 @(940,3720) | fill=#fceeef | layout=H pad=14/22
     - [4] | Frame | 124x27 @(962,3750) | layout=H gap=12

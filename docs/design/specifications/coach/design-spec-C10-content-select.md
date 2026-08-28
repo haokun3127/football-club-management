@@ -102,3 +102,10 @@
         - [6] | Vector | 8x8 @(1248,3571) | stroke=#8e97a6 w1.6
         - [6] | Vector | 16x8 @(1244,3580) | stroke=#8e97a6 w1.6
       - [13] | 我的 | 121x14 @(1192,3593) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"
+
+## 真实运行态复核（2026-08-28）
+
+- 在线稿已通过 Figma MCP 重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:952`，输出为 `375×812`。
+- WeChatIDE MCP 真实教练会话截图：`tmp/goal-c10-content-select-live-rerun.png`，严格 `375×812`。顶栏、搜索框、横向分类胶囊、训练项目卡、底部选择栏和教练 TabBar 均存在，页面没有出现 WXML 编译或控制台错误。
+- 运行态使用真实训练内容树，项目名称、分类数量、难度、时长和选择状态与 Figma 示例不同；这些差异按真实 API 数据展示，不写入示例训练项目，也不据此判定结构不一致。
+- 本次只补充运行证据，没有修改业务代码、API、数据库或 Figma。

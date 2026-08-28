@@ -1442,3 +1442,39 @@
 - 通过 `sudo docker compose -f /opt/cq-talent-api/docker-compose.yml up -d --no-build --force-recreate api` 重建 API；启动初期的两次连接重置属于容器启动窗口，随后内部 `http://127.0.0.1:3000/health` 与公网 `https://cqtc.pomi.tech/health` 均返回 200。部署未执行生产数据清理或重置。
 - WeChatIDE MCP 刷新并打开 `pages/parent/schedule/index`，实际返回 `375×812` PNG：`tmp/goal-p1-notice-banner-runtime-after-deploy.png`。截图中“秋季训练安排提醒” Banner 已出现，证明新通知内容经过生产 API → 小程序 BFF → TS view model → WXML 的真实链路；无通知空态证据仍保留在 `tmp/goal-p1-notice-banner-runtime.png`。
 - 本批最终本地门禁：`npx --yes pnpm@10.33.0 run check` 使用任务专用临时 npm cache 后 exit `0`，domain `20/20`、小程序 `401/401`、API `115/115`；`git diff --check` exit `0`。第一次直接 npx 被 Windows npm cache 的 `EEXIST/EBADF` 拦截，未进入项目检查，已通过隔离 cache 复验。
+
+## 2026-08-28 C5 销课历史与详情真实运行态补证
+
+- 重新读取在线唯一 Figma 画板：`zZ6wKyOHKcO4UYXDd9jGwv / 537:2`（待处理）、`537:79`（历史）、`537:156`（详情）；三张画板均为 `375×812`。未发现需要更新离线结构参考的实质变化。
+- 通过真实教练会话和 WeChatIDE MCP 打开 `pages/coach/lesson/index?id=event-cq-talent-secure-test-1-trn-0818`，读取真实 8 名学员；确认“确认全部”后，历史页出现真实销课记录，点击记录进入详情页，详情页滚动到底部可见训练内容空态和“更正本次销课”入口。
+- 运行证据：`tmp/goal-c5-coach-current-live.png`、`tmp/goal-c5-history-after-confirm-live.png`、`tmp/goal-c5-detail-live.png`、`tmp/goal-c5-detail-live-bottom.png`，均由 WeChatIDE MCP 返回严格 `375×812`；模拟器 console 过滤 `error|exception|wx:else|route is not defined` 无命中。训练内容显示 `0 项` 是当前真实 API 数据，不以 Figma 示例内容替代。
+- 本轮没有修改业务代码或 Figma；通过页面现有提交操作补齐了受控测试教练账号的一条真实销课台账。完整门禁重新通过：domain `20/20`、小程序 `401/401`、API `115/115`；`git diff --check` 通过。C5 运行态证据已补齐，继续总目标时优先审计仍缺有数据运行证据的其他页面。
+
+## 2026-08-28 C15/C15.1 能力评估录入与提交态运行复验
+
+- 在线唯一 Figma 基准重新读取：C15 `93:1132`（原图 `375×1002`）与 C15.1 `93:1163`（`375×812`）。C15 运行态已覆盖首屏与滚动到底部，C15.1 已覆盖提交成功页。
+- WeChatIDE MCP 真实教练会话证据：`tmp/goal-c15-assessment-entry-live.png`、`tmp/goal-c15-assessment-entry-live-bottom.png`、`tmp/goal-c15-1-submit-live.png`，均返回严格 `375×812`；console 过滤 `error|exception|wx:else|route is not defined` 无命中。
+- C15 的顶栏、保存草稿、能力分组、学员卡、指标滑杆、底部“保存所有”和教练 TabBar 已与在线稿结构核对；C15.1 的成功图标、摘要卡、按钮和 TabBar 已核对。在线稿示例的 3 组/6 项/分数与真实 API 当前返回的 1 组/1 项/空值是数据契约差异，未伪造补齐。
+- 本轮没有业务代码或 Figma 写回；完整门禁已通过：domain `20/20`、小程序 `401/401`、API `115/115`，`git diff --check` 通过。下一步继续处理仍缺当前运行证据的教练端页面，并保持测试数据与真实 API 隔离。
+
+## 2026-08-28 C10/C10.1 训练内容选择与覆盖预览运行复核
+
+- 在线唯一 Figma 基准重新读取：C10 `zZ6wKyOHKcO4UYXDd9jGwv / 93:952`、C10.1 `zZ6wKyOHKcO4UYXDd9jGwv / 93:983`，两张画板均为 `375×812`。
+- C10 真实教练会话截图为 `tmp/goal-c10-content-select-live-rerun.png`：顶栏、搜索、横向分类、训练项目卡、底部选择栏和训练管理 TabBar 结构存在；真实训练内容数量、分类和选择状态与 Figma 示例不同，按真实 API 展示。
+- C10.1 真实教练会话截图为 `tmp/goal-c10-1-coverage-live.png`：覆盖预览、学员卡、能力进度条、底部确认栏和训练管理 TabBar 结构存在；真实接口返回 10 个维度和真实学员/进度，在线稿 3 个示例维度属于数据差异。
+- 两页均通过 WXML 编译与模拟器 console 错误过滤；本轮没有修改业务代码、API、数据库或 Figma，仅补充规格和运行证据。当前 C10/C10.1 可按“结构复核通过、示例数据不替换”记录，继续检查仍缺当前运行证据的教练端页面。
+
+## 2026-08-28 C12/C12.1 评分录入与本机自动保存运行复核
+
+- 在线唯一 Figma 基准重新读取：C12 `zZ6wKyOHKcO4UYXDd9jGwv / 93:1030`（原图 `375×894`）、C12.1 `zZ6wKyOHKcO4UYXDd9jGwv / 93:1061`（`375×812`）。
+- C12 真实教练会话截图为 `tmp/goal-c12-test-entry-live-final.png`：顶栏、任务摘要卡、待录入学员列表、固定保存区和训练管理 TabBar 均可见；真实任务返回 8 名学员、62 个中文指标和 `0 / 496` 进度，未替换为 Figma 示例数据。
+- C12.1 使用真实活动/模板/学员/评分项 ID 仅在模拟器本机写入一条有效草稿后复现，截图为 `tmp/goal-c12-1-autosave-live.png`。自动保存遮罩、标题、按钮和 TabBar 与在线稿结构对应；时间显示本机真实时间，不伪造“1分钟前”。
+- 两页均通过模拟器 console 错误过滤；本轮没有修改业务代码、API、生产数据库或 Figma。C12/C12.1 运行证据已补齐，继续检查仍缺当前运行证据的教练端页面。
+
+## 2026-08-28 C6.1/C6.2 比赛事件与本机草稿运行复核
+
+- 在线唯一 Figma 基准重新读取：C6.1 `zZ6wKyOHKcO4UYXDd9jGwv / 93:827`、C6.2 `zZ6wKyOHKcO4UYXDd9jGwv / 93:858`；在线截图保存为 `tmp/figma-c6-1-93-827-live.png` 与 `tmp/figma-c6-2-93-858-live.png`。
+- 修复一个真实缓存根因：启动页调用 `/app-clients/resolve` 后，复用已有登录 session 时未刷新 session 内的客户端能力，导致 C6.1 错误进入“未配置事件类型”空态。现在会合并最新 club/client/capabilities；回归测试先红后绿，随后真实启动流程得到后端返回的 `进球/助攻/扑救/抢断` 四类事件。
+- C6.1 真实截图为 `tmp/goal-c6-1-match-event-add-fixed.png`，严格 `375×812`；真实比赛详情 `200`，表单结构可用，控制台错误过滤无命中。Figma 示例中的 `黄牌/红牌/换人/其他` 未被当前客户端 capability 返回，页面保持能力驱动，不硬编码示例配置。
+- C6.2 通过真实输入分钟 `54` 触发设备草稿，再打开比赛页复现遮罩；截图为 `tmp/goal-c6-2-match-current.png`，严格 `375×812`，`hasLocalDraftOverlay=true`。该状态仅保存在当前设备，文案明确说明本机范围，未误报为 API 持久化。
+- 本轮小程序定向回归与 TypeScript 检查通过；WeChatIDE MCP 页面/截图通道已恢复。下一步继续检查尚缺当前运行证据的教练端页面。

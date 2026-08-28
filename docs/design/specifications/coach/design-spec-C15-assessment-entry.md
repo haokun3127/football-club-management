@@ -160,3 +160,10 @@
         - [6] | Vector | 8x8 @(818,5371) | stroke=#8e97a6 w1.6
         - [6] | Vector | 16x8 @(814,5380) | stroke=#8e97a6 w1.6
       - [13] | 我的 | 121x14 @(762,5393) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"
+
+## 2026-08-28 真实运行态复验
+
+- 在线 Figma 基准重新读取为 `zZ6wKyOHKcO4UYXDd9jGwv / 93:1132 / C15 Assessment Entry`，在线原图尺寸为 `375×1002`。
+- WeChatIDE MCP 真实教练会话打开 `pages/coach/assessment-entry/index?templateId=assessment-template-technical&title=体能综合测评`，首屏与滚动底部截图分别为 `tmp/goal-c15-assessment-entry-live.png`、`tmp/goal-c15-assessment-entry-live-bottom.png`，均严格 `375×812`。
+- 运行态结构已核对：软粉顶栏、保存草稿、能力分组、学员卡、指标滑杆、底部保存按钮和教练 TabBar 均存在并可交互。在线稿的 3 组/6 项示例与当前真实表单仅返回 1 组/1 项属于 API 数据差异，不硬编码 Figma 示例分数或学员。
+- 模拟器 console 过滤 `error|exception|wx:else|route is not defined` 无命中；完整门禁 domain `20/20`、小程序 `401/401`、API `115/115` 通过。本轮未修改业务代码或 Figma。

@@ -57,3 +57,9 @@
         - [6] | Vector | 8x8 @(1248,5371) | stroke=#8e97a6 w1.6
         - [6] | Vector | 16x8 @(1244,5380) | stroke=#8e97a6 w1.6
       - [13] | 我的 | 121x14 @(1192,5393) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"
+
+## 2026-08-28 真实运行态复验
+
+- 在线 Figma 基准重新读取为 `zZ6wKyOHKcO4UYXDd9jGwv / 93:1163 / C15.1 Assessment Submit`，在线与运行态画板均为 `375×812`。
+- WeChatIDE MCP 真实教练会话打开 `pages/coach/assessment-submit/index?title=体能综合测评&count=2`，运行截图为 `tmp/goal-c15-1-submit-live.png`；模拟器 console 过滤 `error|exception|wx:else|route is not defined` 无命中。
+- 顶栏、成功状态、摘要卡、查看结果/返回列表按钮、底部教练 TabBar 的结构和层级与在线稿一致；标题、状态、学员数由真实路由参数/业务状态产生，未复制画板示例文案。无业务代码或 Figma 写回。
