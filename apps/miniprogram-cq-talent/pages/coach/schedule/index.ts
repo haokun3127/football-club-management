@@ -30,6 +30,12 @@ type CoachTaskView = CoachTask & {
   dueLabel: string;
 };
 
+type HeroPillView = {
+  value: string;
+  label: string;
+  tone: "primary" | "neutral";
+};
+
 Page({
   data: {
     navInset: resolveNavInset(),
@@ -57,7 +63,7 @@ Page({
     heroEvent: null as CoachEventView | null,
     hasHeroEvent: false,
     heroDateLabel: "",
-    heroPills: [] as string[],
+    heroPills: [] as HeroPillView[],
   },
   onLoad() {
     this.load();
@@ -212,15 +218,15 @@ function heroDateLabel(date: string): string {
   return `${value.getUTCFullYear()}年${value.getUTCMonth() + 1}月${value.getUTCDate()}日 ${weekLabels[value.getUTCDay()]}`;
 }
 
-function buildHeroPills(home: CoachHome): string[] {
+function buildHeroPills(home: CoachHome): HeroPillView[] {
   const stats = home.weekStats;
   if (!stats) return [];
-  const pills: string[] = [];
+  const pills: HeroPillView[] = [];
   if (stats.attendanceRate !== null && stats.attendanceRate !== undefined) {
-    pills.push(`${stats.attendanceRate}% 出席率`);
+    pills.push({ value: `${stats.attendanceRate}%`, label: "出席率", tone: "primary" });
   }
-  pills.push(`${stats.hours}h 本周训练`);
-  pills.push(`${stats.sessions}节 本周课次`);
+  pills.push({ value: `${stats.hours}h`, label: "本周训练", tone: "neutral" });
+  pills.push({ value: `${stats.sessions}节`, label: "本周课次", tone: "neutral" });
   return pills;
 }
 

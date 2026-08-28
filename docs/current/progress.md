@@ -1562,6 +1562,14 @@
 - 运行证据：WeChatIDE MCP 真实家长会话重新打开 `pages/parent/radar/index`，取得严格 `375×812` 截图 `tmp/goal-p5-parent-radar-label-fix-20260828.png` 与 `tmp/goal-p5-parent-radar-label-fix-bottom-20260828.png`；底部截图确认“整体战术”“小组配合”单行显示。在线 Figma 基准仍为 `zZ6wKyOHKcO4UYXDd9jGwv / 93:278`，对照图 `tmp/figma-p5-93-278-live-20260828.png`，本轮无需修改 Figma。
 - 验证：P5 定向 Vitest `8/8`；全仓 `check` 通过（domain `20/20`、小程序 `403/403`、API `115/115`），小程序 TypeScript 与 P5 WXSS 编译均通过。
 
+## 2026-08-28 C1 教练日程首页设计契约修正
+
+- 在线唯一 Figma 基准在开工前重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:578`，画板为 `375×812`；确认当前稿为 88px 顶栏、64px 周日期条、内容宽度统计胶囊、180px Hero、96px 活动卡和 70px 教练 TabBar。
+- 最小改动范围：`apps/miniprogram-cq-talent/pages/coach/schedule/index.ts`、`index.wxml`、`index.wxss` 与定向测试。Hero 统计从单一字符串改为预计算的值/标签/色调字段，第一项按在线稿使用正红主强调；统计胶囊改为内容宽度；Hero 时间调整到 54px 视觉尺寸；活动卡右侧改用已有 `assets/icons/chevron-right.svg`，不再使用文本字符箭头。
+- 数据仍完全来自 `getCoachHome({ from, to })`；没有新增 Figma 示例日期、姓名、球队、场地、人数或状态。
+- 验证：C1 定向 Vitest `15/15`；小程序 TypeScript `exit=0`；全仓 `check` `exit=0`（domain `20/20`、小程序 `405/405`、API `115/115`）；`git diff --check` 通过。
+- 视觉验收暂未收口：WeChatIDE MCP 可返回 `simulator_open_page` 成功，但运行时随后仍读到家长端 `/pages/parent/schedule/index`；`simulator_screenshot` 超时，动态窗口兜底也未发现唯一可见 DevTools 模拟器窗口。故本批不能标记为“Figma 视觉通过”，待运行时恢复后需重新导航到教练会话、取得真实 `375×812` 截图并对照复验。
+
 ## 2026-08-28 C4 主出勤最新运行复核
 
 - 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:665`；在线截图保存为 `tmp/figma-c4-93-665-live-20260828.png`。

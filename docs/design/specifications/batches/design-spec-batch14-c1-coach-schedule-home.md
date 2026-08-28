@@ -109,3 +109,12 @@
         - [6] | Vector | 8x8 @(388,871) | stroke=#8e97a6 w1.6
         - [6] | Vector | 16x8 @(384,880) | stroke=#8e97a6 w1.6
       - [13] | 我的 | 121x14 @(332,893) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"
+
+## Implementation update
+
+- Online authority re-read immediately before implementation: Figma file `zZ6wKyOHKcO4UYXDd9jGwv`, node `93:578`.
+- The coach schedule view model now exposes Hero statistics as `{ value, label, tone }`, allowing the attendance metric to use the red primary treatment while keeping all values API-backed.
+- The stats row uses content-sized capsules (`88rpx` height, `24rpx` horizontal padding); the Hero uses the current `54px` time scale (`108rpx`) and `24rpx` layout gap; activity cards use the existing `/assets/icons/chevron-right.svg` at `40rpx`.
+- No Figma sample date, name, team, venue, count, or status was copied into runtime data.
+- Code evidence: C1 Vitest `15/15`, mini-program TypeScript `exit=0`, full repository `check` `exit=0` (`domain 20/20`, `miniprogram 405/405`, `api 115/115`), and `git diff --check` clean.
+- Visual evidence is pending: WeChatIDE MCP navigation reported success but the subsequent runtime route remained `/pages/parent/schedule/index`; `simulator_screenshot` and WXML compilation timed out. This batch is not visually accepted yet.

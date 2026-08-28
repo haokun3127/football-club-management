@@ -32,7 +32,10 @@
         <view class="c1-hero__meta">{{heroEvent.locationLabel}}</view>
         <view class="c1-hero__pills">
           <block wx:if="{{heroPills.length}}">
-            <view wx:for="{{heroPills}}" wx:key="*this" class="c1-hero__pill">{{item}}</view>
+            <view wx:for="{{heroPills}}" wx:key="label" class="c1-hero__pill c1-hero__pill--{{item.tone}}">
+              <text class="c1-hero__pill-value">{{item.value}}</text>
+              <text class="c1-hero__pill-label">{{item.label}}</text>
+            </view>
           </block>
           <block wx:else>
             <view class="c1-hero__pill">{{heroEvent.statusLabel}}</view>
@@ -50,7 +53,7 @@
             <view wx:if="{{item.hasLocationDetail}}" class="acard__meta">{{item.locationLabel}}</view>
             <view wx:if="{{item.hasNextAction}}" class="acard__action" data-id="{{item.id}}" data-action="{{item.nextAction}}" catchtap="openTask">{{item.nextActionLabel}}</view>
           </view>
-          <view class="acard__right"><view class="acard__pill pill--{{item.statusTone}}">{{item.statusLabel}}</view><view class="acard__chevron">›</view></view>
+          <view class="acard__right"><view class="acard__pill pill--{{item.statusTone}}">{{item.statusLabel}}</view><image class="acard__chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
         </view>
       </view>
       <view wx:if="{{!hasVisibleEvents}}" class="c1-empty">当前筛选下没有日程</view>

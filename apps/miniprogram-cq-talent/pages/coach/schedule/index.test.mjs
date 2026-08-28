@@ -95,7 +95,11 @@ describe("coach schedule home", () => {
       { key: "attendance", label: "出席9/10人", value: "", tone: "green" },
       { key: "pending", label: "待处理1", value: "", tone: "amber" },
     ]);
-    expect(page.data.heroPills).toEqual(["90% 出席率", "4.5h 本周训练", "3节 本周课次"]);
+    expect(page.data.heroPills).toEqual([
+      { value: "90%", label: "出席率", tone: "primary" },
+      { value: "4.5h", label: "本周训练", tone: "neutral" },
+      { value: "3节", label: "本周课次", tone: "neutral" },
+    ]);
   });
 
   it("loads a Monday-to-Sunday range and presents only API-backed C1 summary, hero, and events", async () => {
@@ -238,5 +242,21 @@ describe("coach schedule home", () => {
   it("keeps the hero time and activity title on one aligned row", () => {
     expect(stylesheet).toMatch(/\.c1-hero__main\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-direction:\s*row)(?=[^}]*align-items:\s*baseline)/s);
     expect(stylesheet).toMatch(/\.c1-hero__title\s*\{[^}]*flex:\s*1[^}]*min-width:\s*0/s);
+  });
+
+  it("matches the live C1 stat-pill and hero scale", () => {
+    expect(stylesheet).toMatch(/\.c1-summary__item\s*\{(?=[^}]*flex:\s*0\s+0\s+auto)(?=[^}]*height:\s*88rpx)(?=[^}]*padding:\s*0\s+24rpx)/s);
+    expect(stylesheet).toMatch(/\.c1-hero\s*\{[^}]*gap:\s*24rpx[^}]*min-height:\s*360rpx/s);
+    expect(stylesheet).toMatch(/\.c1-hero__time\s*\{[^}]*font-size:\s*108rpx[^}]*line-height:\s*108rpx/s);
+    expect(stylesheet).toMatch(/\.c1-hero__pill\s*\{[^}]*padding:\s*16rpx\s+20rpx/s);
+    expect(stylesheet).toMatch(/\.c1-hero__pill--primary\s*\{[^}]*background:\s*rgba\(168,15,27,\.1\)/s);
+    expect(stylesheet).toMatch(/\.c1-hero__pill--primary\s*\{[^}]*border-color:\s*rgba\(168,15,27,\.2\)/s);
+    expect(template).toContain('class="c1-hero__pill c1-hero__pill--{{item.tone}}"');
+  });
+
+  it("uses the project chevron asset for every activity card", () => {
+    expect(template).toContain('<image class="acard__chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />');
+    expect(template).not.toContain('<view class="acard__chevron">›</view>');
+    expect(stylesheet).toMatch(/\.acard__chevron\s*\{[^}]*width:\s*40rpx[^}]*height:\s*40rpx[^}]*flex:\s*0\s+0\s+40rpx/s);
   });
 });
