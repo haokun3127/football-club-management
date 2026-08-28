@@ -182,11 +182,13 @@ describe("coach attendance", () => {
       ],
     });
 
+    page.onCorrectionNoteInput({ detail: { value: "已核实训练出勤记录" } });
+
     await page.saveAttendance();
     expect(mocks.saveCoachAttendance).toHaveBeenCalledWith("event-1", expect.arrayContaining([
       expect.objectContaining({ studentId: "student-late", status: "late" }),
       expect.objectContaining({ studentId: "student-leave", status: "leave_requested" }),
-      expect.objectContaining({ studentId: "student-excused", status: "excused" }),
+      expect.objectContaining({ studentId: "student-excused", status: "excused", note: "已核实训练出勤记录" }),
     ]));
     expect(page.data).toMatchObject({ saving: false, hasSaveError: true });
     expect(globalThis.wx.redirectTo).not.toHaveBeenCalled();
@@ -233,10 +235,12 @@ describe("coach attendance", () => {
     expect(template).toContain("请核实后重新提交");
     expect(template).toContain('<view wx:if="{{correctionMode}}" class="correction-list-header">');
     expect(template).toContain("{{correctionRosterFooter}}");
-    expect(template).not.toContain("补充迟到、请假等说明（选填）");
+    expect(template).toContain("修改说明");
+    expect(template).toContain("请填写核实结果...");
     expect(template).not.toContain("异常");
     expect(template).not.toContain("家长异议");
     expect(controller).not.toContain("disputedCount");
+    expect(controller).toContain("correctionNote");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 

@@ -1343,3 +1343,11 @@
 - 发现 C2 顶栏仍使用 `176rpx` 高度，导致活动 Hero 和后续工作台内容整体下移；改为标准 `88rpx` 内容高度，保留 `navInset/menuInset` 安全区避让和原有真实工作台逻辑。
 - 修复后截图：`tmp/goal-c2-coach-after-nav-fix.png`。运行态顶栏、深色活动 Hero、真实 8 人出勤摘要、流程状态、比赛录入/战术板等动作均可见；在线稿中的进行中训练计时和训练内容进度不属于当前比赛数据，未伪造填入。
 - 验证：C2 定向 Vitest `11/11`、小程序 TypeScript、微信 WXML/控制台错误检查通过；本批没有修改 API、数据库或 Figma。
+
+## 2026-08-28 C4.2 教练端出勤修改页结构同步
+
+- 在线唯一基准为 `zZ6wKyOHKcO4UYXDd9jGwv / 93:715 / C4.2 Attendance Failed/Correction`。重新读取的稿面结构为橙色出勤修改警示卡、学员列表、修改说明输入区、底部重新提交按钮和教练 TabBar。
+- `pages/coach/attendance` 的 correction 状态补齐“修改说明”全屏卡片与 `textarea`，并为 correction 页面增加滚动底部安全留白，避免真实名单超过 2 行时被固定重新提交按钮遮挡。
+- 修改说明沿用现有出勤参与人的 `note` 契约：已有学员备注优先，未填写备注的学员使用本次核实说明；没有新增家长异议、异常人数或其他伪 API 字段。当前真实活动返回 8 名 `pending` 学员，不能套用 Figma 示例的“共 2 条异常”和示例姓名。
+- 真实 WeChatIDE MCP 截图（严格 `375×812`）：`tmp/goal-c4-2-coach-final-top.png` 与 `tmp/goal-c4-2-coach-final-bottom.png`。顶部警示/名单与滚动后的名单/修改说明/重新提交均已取证；真实数据差异按契约豁免，不误报为设计缺陷。
+- 验证：C4 点名定向 Vitest `7/7`、小程序 `tsc --noEmit`、WXML/WXSS 编译和 `git diff --check` 通过；此前同批全仓门禁为 domain `19/19`、小程序 `372/372`、API `113/113`，本次仅追加 WXSS 留白规则，未改 API。

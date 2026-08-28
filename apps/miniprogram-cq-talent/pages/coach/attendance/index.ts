@@ -28,6 +28,7 @@ interface AttendancePageData {
   hasRoster: boolean;
   rosterFooter: string;
   correctionRosterFooter: string;
+  correctionNote: string;
   saving: boolean;
   canSave: boolean;
   statusOptions: typeof statusOptions;
@@ -51,6 +52,7 @@ Page<AttendancePageData>({
     hasRoster: false,
     rosterFooter: "",
     correctionRosterFooter: "",
+    correctionNote: "",
     saving: false,
     canSave: false,
     statusOptions,
@@ -74,6 +76,7 @@ Page<AttendancePageData>({
         hasRoster: false,
         rosterFooter: "",
         correctionRosterFooter: "",
+        correctionNote: "",
         canSave: false,
         summary: emptySummary(),
         hasSaveError: false,
@@ -81,7 +84,7 @@ Page<AttendancePageData>({
       });
       return;
     }
-    this.setData({ state: "loading", message: "正在读取点名名单", eventId: id, hasSaveError: false, saveError: "" });
+    this.setData({ state: "loading", message: "正在读取点名名单", eventId: id, hasSaveError: false, saveError: "", correctionNote: "" });
     try {
       const workbench = await getCoachWorkbench(id);
       const roster = withRosterUi(workbench.roster);
@@ -115,6 +118,7 @@ Page<AttendancePageData>({
         hasRoster: false,
         rosterFooter: "",
         correctionRosterFooter: "",
+        correctionNote: "",
         canSave: false,
         summary: emptySummary(),
         saving: false,
@@ -151,6 +155,10 @@ Page<AttendancePageData>({
     const roster = this.data.roster.map((student: RosterUiItem, rosterIndex: number) => rosterIndex === index ? { ...student, note: event.detail.value } : student);
     this.setData({ roster, hasSaveError: false, saveError: "" });
   },
+  onCorrectionNoteInput(event: { detail: { value: string } }) {
+    if (!this.data.correctionMode || this.data.saving) return;
+    this.setData({ correctionNote: event.detail.value, hasSaveError: false, saveError: "" });
+  },
   async saveAttendance() {
     if (!this.data.canSave || !this.data.eventId || this.data.saving) return;
     if (this.data.roster.some((student: RosterUiItem) => student.status === "pending")) {
@@ -159,7 +167,7 @@ Page<AttendancePageData>({
     }
     this.setData({ saving: true, hasSaveError: false, saveError: "" });
     try {
-      await saveCoachAttendance(this.data.eventId, this.data.roster.map(toAttendanceParticipant));
+      await saveCoachAttendance(this.data.eventId, this.data.roster.map((student: RosterUiItem) => toAttendanceParticipant(student, this.data.correctionNote)));
       wx.redirectTo({ url: `/pages/coach/attendance-success/index?eventId=${encodeURIComponent(this.data.eventId)}` });
     } catch (error) {
       this.setData({ saving: false, hasSaveError: true, saveError: attendanceSaveError(error) });
@@ -167,12 +175,12 @@ Page<AttendancePageData>({
   },
 });
 
-function toAttendanceParticipant(student: RosterUiItem): RosterItem {
+function toAttendanceParticipant(student: RosterUiItem, correctionNote = ""): RosterItem {
   return {
     studentId: student.studentId,
     name: student.name,
     status: student.status,
-    note: student.note,
+    note: student.note || correctionNote || undefined,
     lessonAction: student.lessonAction,
     shouldConsume: student.shouldConsume,
     exceptionReason: student.exceptionReason,
