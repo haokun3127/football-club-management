@@ -31,6 +31,11 @@
         </view>
       </view>
 
+      <view class="p4-card p4-match-history">
+        <view class="p4-card__head"><view class="p4-card__title">比赛记录 ⚽</view><view class="p4-card__link" bindtap="openMatchHistory">查看›</view></view>
+        <view class="p4-card__summary">{{matchHistoryMessage}}</view>
+      </view>
+
       <!-- Figma P4 Training Chart Card -->
       <view class="p4-card p4-chart-card">
         <view class="p4-card__head"><view class="p4-card__title">训练历程 📊</view><view class="p4-card__link" bindtap="openTrainingHistory">查看›</view></view>

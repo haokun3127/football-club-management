@@ -37,6 +37,7 @@ Page({
     heroStats: [] as Array<{ value: string; label: string; accent: boolean }>,
     milestoneMessage: "",
     trainingHistoryMessage: "",
+    matchHistoryMessage: "",
     milestones: [] as GrowthMilestone[],
     trainingBars: [] as TrainingBar[],
   },
@@ -98,6 +99,7 @@ Page({
         heroStats: buildHeroStats(growth),
         milestoneMessage: activityMessages.milestone,
         trainingHistoryMessage: activityMessages.trainingHistory,
+        matchHistoryMessage: activityMessages.matchHistory,
         milestones: activityView.milestones,
         trainingBars: buildMonthlyBars(growth) ?? activityView.trainingBars,
       });
@@ -117,6 +119,9 @@ Page({
   },
   openTrainingHistory() {
     openPage("/pages/parent/training-history/index");
+  },
+  openMatchHistory() {
+    openPage("/pages/parent/match-history/index");
   },
   openMilestones() {
     openPage("/pages/parent/milestones/index");
@@ -207,6 +212,7 @@ function growthActivityMessages(events: ScheduleEvent[], studentId: string) {
     heroSummary: completed.length ? `近30天完成 ${trainingCount} 次训练、${matchCount} 场比赛` : "近30天暂无已完成活动",
     milestone: latest ? `最新足迹：${latest.title}` : "成长足迹正在积累",
     trainingHistory: trainingCount ? `近30天已完成 ${trainingCount} 次训练，点击查看完整历程` : "近30天暂无完成训练",
+    matchHistory: matchCount ? `近30天已完成 ${matchCount} 场比赛，点击查看比赛记录` : "近30天暂无完成比赛",
   };
 }
 

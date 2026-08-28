@@ -467,6 +467,15 @@ function normalizeEvent(raw: Record<string, unknown>): ScheduleEvent {
     ? (raw.childIds as unknown[]).map(String).filter(Boolean)
     : children.map((child) => String(child.id ?? child.studentId ?? "")).filter(Boolean);
   const participants = Array.isArray(raw.participants) ? raw.participants : Array.isArray(raw.students) ? raw.students : [];
+  const matchSource = asRecord(event.match ?? raw.match);
+  const match = matchSource
+    ? {
+      opponentName: stringOrUndefined(matchSource.opponentName),
+      homeScore: numberOrUndefined(matchSource.homeScore),
+      awayScore: numberOrUndefined(matchSource.awayScore),
+      status: stringOrUndefined(matchSource.status),
+    }
+    : undefined;
   const rawTeams = Array.isArray(raw.teams) ? raw.teams as Array<unknown> : [];
   const firstTeamName = rawTeams.length
     ? (typeof rawTeams[0] === "string" ? rawTeams[0] : String((rawTeams[0] as Record<string, unknown>).name ?? ""))
@@ -488,6 +497,7 @@ function normalizeEvent(raw: Record<string, unknown>): ScheduleEvent {
     status: String(event.status ?? raw.status ?? "待确认"),
     summary: stringOrUndefined(event.summary ?? raw.summary),
     participantCount: participants.length || undefined,
+    ...(match ? { match } : {}),
   };
 }
 

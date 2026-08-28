@@ -89,6 +89,12 @@ export interface ScheduleEvent {
   participantCount?: number;
   nextAction?: CoachTaskAction;
   nextActionLabel?: string;
+  match?: {
+    opponentName?: string;
+    homeScore?: number;
+    awayScore?: number;
+    status?: string;
+  };
 }
 
 export type CoachTaskAction = "attendance" | "lesson" | "match" | "assessment" | "training" | "view";

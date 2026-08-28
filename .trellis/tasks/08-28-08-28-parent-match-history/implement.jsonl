@@ -1,0 +1,2 @@
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Reuse the existing parent history loader and page navigation patterns before adding new code."}
+{"file":"docs/design/specifications/figma-online-frame-map-2026-08-12.md","reason":"Records the authoritative online Figma node IDs used by this adaptation."}

@@ -1,0 +1,2 @@
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"The page consumes and projects the existing calendar BFF response across the API-to-mini-program boundary."}
+{"file":"docs/design/reference/figma/README.md","reason":"The visual reference mapping identifies the reusable P4.2 and P2.1 Figma boards."}

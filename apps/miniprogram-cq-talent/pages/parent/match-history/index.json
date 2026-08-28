@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "status-view": "/components/status-view/index"
+  }
+}

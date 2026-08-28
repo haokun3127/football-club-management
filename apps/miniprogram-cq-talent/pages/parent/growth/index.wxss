@@ -37,6 +37,7 @@
 .p4-card__head { display: flex; align-items: center; justify-content: space-between; }
 .p4-card__title { color: #202124; font-size: 28rpx; font-weight: 700; }
 .p4-card__link { color: #a80f1b; font-size: 26rpx; font-weight: 600; }
+.p4-match-history .p4-card__summary { color: #667085; font-size: 24rpx; line-height: 34rpx; }
 .p4-card__empty { display: flex; align-items: center; justify-content: center; min-height: 96rpx; color: #667085; font-size: 24rpx; line-height: 34rpx; text-align: center; }
 .p4-milestones { gap: 24rpx; }.p4-milestones__list { display: flex; flex-direction: column; gap: 24rpx; width: 100%; }
 .p4-milestone { display: flex; align-items: center; gap: 24rpx; min-height: 48rpx; }
