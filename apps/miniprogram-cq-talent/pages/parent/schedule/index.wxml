@@ -35,15 +35,26 @@
       </view>
     </view>
 
-    <view class="week-switcher">
-      <view class="week-switcher__arrow week-switcher__arrow--previous" data-offset="-7" bindtap="changeWeek">‹</view>
-      <view class="week-nav">
-        <view wx:for="{{dateOptions}}" wx:key="date" class="week-day {{item.isToday ? 'week-day--today' : selectedDate === item.date ? 'week-day--active' : ''}}" data-date="{{item.date}}" bindtap="selectDate" bindlongpress="openDay">
-          <view class="week-day__name">{{item.weekShort}}</view>
-          <view class="week-day__number">{{item.dayNumber}}</view>
+    <view class="month-calendar">
+      <view class="month-calendar__header">
+        <view class="month-calendar__title">{{monthLabel}}</view>
+        <view class="month-calendar__actions">
+          <view class="month-calendar__arrow" data-offset="1" bindtap="changeMonth">›</view>
         </view>
       </view>
-      <view class="week-switcher__arrow week-switcher__arrow--next" data-offset="7" bindtap="changeWeek">›</view>
+      <view class="month-calendar__weekdays">
+        <view wx:for="{{monthWeekdays}}" wx:key="*this" class="month-calendar__weekday">{{item}}</view>
+      </view>
+      <view class="month-calendar__grid">
+        <view wx:for="{{monthDays}}" wx:key="key" class="month-day {{item.isCurrentMonth ? '' : 'month-day--outside'}} {{item.isToday ? 'month-day--today' : ''}} {{item.isSelected ? 'month-day--selected' : ''}}" data-date="{{item.key}}" bindtap="selectDate">
+          <view class="month-day__number">{{item.dayNumber}}</view>
+          <view class="month-day__markers">
+            <view wx:if="{{item.hasTraining}}" class="month-day__marker month-day__marker--training"></view>
+            <view wx:if="{{item.hasMatch}}" class="month-day__marker month-day__marker--match"></view>
+            <view wx:if="{{item.hasMultiple}}" class="month-day__marker month-day__marker--multiple"></view>
+          </view>
+        </view>
+      </view>
     </view>
 
     <view class="chips">

@@ -1,0 +1,3 @@
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Review month range loading, child scoping, and view-model derivation at the API/UI boundary."}
+{"file":".trellis/spec/api/backend/quality-guidelines.md","reason":"Confirm no API contract or backend behavior changes are introduced by the page-only batch."}
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Validate continued use of the documented parent calendar endpoint."}

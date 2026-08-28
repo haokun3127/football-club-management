@@ -1,0 +1,3 @@
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"The month view maps date-cell presentation from the authenticated event payload across API, page state, and WXML."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"The implementation reuses existing date, event filtering, navigation, and status presentation helpers."}
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"The page must continue using the existing parent calendar contract and its 31-day query boundary."}

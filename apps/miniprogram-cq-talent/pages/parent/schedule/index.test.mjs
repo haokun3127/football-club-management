@@ -154,16 +154,17 @@ describe("parent schedule hero", () => {
     expect(options[6]?.date).toBe("2026-08-09");
   });
 
-  it("renders visible previous and next week controls without shrinking the seven-day strip", () => {
-    expect(template).toContain('class="week-switcher__arrow week-switcher__arrow--previous" data-offset="-7" bindtap="changeWeek">‹</view>');
-    expect(template).toContain('class="week-switcher__arrow week-switcher__arrow--next" data-offset="7" bindtap="changeWeek">›</view>');
-    expect(template).toContain("week-day--today");
-    expect(template).toContain("week-day--active");
-    expect(styles).toMatch(/\.week-switcher\s*\{[^}]*gap:\s*8rpx/s);
-    expect(styles).toMatch(/\.week-switcher__arrow\s*\{[^}]*flex:\s*0\s+0\s+44rpx[^}]*width:\s*44rpx[^}]*height:\s*56rpx/s);
-    expect(styles).toMatch(/\.week-nav\s*\{[^}]*flex:\s*1[^}]*min-width:\s*0/s);
-    expect(styles).toMatch(/\.week-day--today \.week-day__number\s*\{[^}]*background: #a80f1b/);
-    expect(styles).toMatch(/\.week-day--active \.week-day__number\s*\{[^}]*background: #101828/);
+  it("renders the month calendar controls and date markers", () => {
+    expect(template).toContain('class="month-calendar"');
+    expect(template).toContain('data-offset="1" bindtap="changeMonth"');
+    expect(template).not.toContain('data-offset="-1" bindtap="changeMonth"');
+    expect(template).toContain("month-day--today");
+    expect(template).toContain("month-day--selected");
+    expect(template).toContain("month-day__marker--training");
+    expect(template).toContain("month-day__marker--match");
+    expect(styles).toMatch(/\.month-calendar\s*\{[^}]*width:\s*686rpx[^}]*height:\s*504rpx/s);
+    expect(styles).toMatch(/\.month-calendar__grid\s*\{[^}]*grid-template-columns:\s*repeat\(7,\s*1fr\)/s);
+    expect(styles).toMatch(/\.month-day--selected \.month-day__number\s*\{[^}]*background: #a80f1b/);
   });
 
   it("uses the approved CSS and text fallback icon nodes instead of unverified SVG assets", () => {

@@ -58,6 +58,10 @@ interface PageData {
   selectedType: "all" | ScheduleEvent["type"];
   typeTabs: Array<{ label: string; value: "all" | ScheduleEvent["type"] }>;
   dateOptions: Array<{ date: string; isToday: boolean; day: string; weekday: string; weekShort: string; dayNumber: string; count: number }>;
+  monthKey: string;
+  monthLabel: string;
+  monthWeekdays: string[];
+  monthDays: MonthDayView[];
   hasUnreadReminders: boolean;
   unreadCount: number;
   todayLabel: string;
@@ -80,6 +84,17 @@ const typeTabs: PageData["typeTabs"] = [
 const initialDate = resolveParentPageDate(new Date(), DEV_PARENT_PAGE_DATE_OVERRIDE);
 let scheduleLoadToken = 0;
 
+export interface MonthDayView {
+  key: string;
+  dayNumber: string;
+  isCurrentMonth: boolean;
+  isToday: boolean;
+  isSelected: boolean;
+  hasTraining: boolean;
+  hasMatch: boolean;
+  hasMultiple: boolean;
+}
+
 Page<PageData>({
   data: {
     navInset: resolveNavInset(),
@@ -94,6 +109,10 @@ Page<PageData>({
     visibleEvents: [],
     selectedDate: initialDate,
     selectedDateLabel: formatCalendarDate(initialDate),
+    monthKey: initialDate.slice(0, 7),
+    monthLabel: formatMonthLabel(initialDate.slice(0, 7)),
+    monthWeekdays: ["一", "二", "三", "四", "五", "六", "日"],
+    monthDays: [],
     selectedType: "all",
     typeTabs,
     dateOptions: [],
@@ -136,10 +155,12 @@ Page<PageData>({
       }
       const events = await getParentCalendar(dateWindowStart(selectedDate), dateWindowEnd(selectedDate));
       if (loadToken !== scheduleLoadToken) return;
-      const active = children.find((child) => child.id === this.data.activeStudentId);
-      const childEvents = filterEvents(events, this.data.activeStudentId, "", "all");
-      const visibleEvents = presentEvents(filterEvents(events, this.data.activeStudentId, selectedDate, this.data.selectedType));
+      const active = children.find((child) => child.id === session.currentStudentId) ?? children[0];
+      if (active && active.id !== session.currentStudentId) setCurrentStudentId(active.id);
+      const childEvents = filterEvents(events, active?.id ?? "", "", "all");
+      const visibleEvents = presentEvents(filterEvents(events, active?.id ?? "", selectedDate, this.data.selectedType));
       const digest = buildScheduleDigest(childEvents, selectedDate);
+      const monthKey = selectedDate.slice(0, 7);
       this.setData({
         state: "ready",
         message: "",
@@ -150,6 +171,9 @@ Page<PageData>({
         visibleEvents,
         selectedDateLabel: formatCalendarDate(selectedDate),
         dateOptions: buildDateOptions(selectedDate, events),
+        monthKey,
+        monthLabel: formatMonthLabel(monthKey),
+        monthDays: buildMonthDays(monthKey, selectedDate, childEvents),
         todayLabel: digest.todayLabel,
         selectedCountLabel: selectedCountLabel(this.data.selectedDate, digest.todayCount),
         todayCount: digest.todayCount,
@@ -167,6 +191,7 @@ Page<PageData>({
     const child = this.data.children.find((item: StudentSummary) => item.id === id);
     if (id) setCurrentStudentId(id);
     const digest = buildScheduleDigest(filterEvents(this.data.events, id, "", "all"), this.data.selectedDate);
+    const childEvents = filterEvents(this.data.events, id, "", "all");
     this.setData({
       activeStudentId: id,
       activeStudentName: child?.name ?? "全部孩子",
@@ -174,6 +199,7 @@ Page<PageData>({
       weekCount: digest.weekCount,
       weekHours: digest.weekHours,
       hero: digest.hero,
+      monthDays: buildMonthDays(this.data.monthKey, this.data.selectedDate, childEvents),
     });
     this.applyFilters();
   },
@@ -184,10 +210,17 @@ Page<PageData>({
   selectDate(event: { currentTarget: { dataset: { date?: string } } }) {
     const date = event.currentTarget.dataset.date;
     if (!date || date === this.data.selectedDate) return;
+    const monthKey = date.slice(0, 7);
+    if (monthKey !== this.data.monthKey) {
+      this.setData({ selectedDate: date, selectedDateLabel: formatCalendarDate(date), monthKey, monthLabel: formatMonthLabel(monthKey) });
+      this.load();
+      return;
+    }
     const digest = buildScheduleDigest(filterEvents(this.data.events, this.data.activeStudentId, "", "all"), date);
     this.setData({
       selectedDate: date,
       selectedDateLabel: formatCalendarDate(date),
+      monthDays: buildMonthDays(monthKey, date, filterEvents(this.data.events, this.data.activeStudentId, "", "all")),
       todayLabel: digest.todayLabel,
       selectedCountLabel: selectedCountLabel(date, digest.todayCount),
       todayCount: digest.todayCount,
@@ -196,6 +229,16 @@ Page<PageData>({
       hero: digest.hero,
     });
     this.applyFilters();
+  },
+  changeMonth(event: { currentTarget: { dataset: { offset?: string | number } } }) {
+    const offset = Number(event.currentTarget.dataset.offset);
+    if (offset !== -1 && offset !== 1) return;
+    const current = new Date(`${this.data.monthKey}-01T00:00:00.000Z`);
+    current.setUTCMonth(current.getUTCMonth() + offset);
+    const monthKey = `${current.getUTCFullYear()}-${String(current.getUTCMonth() + 1).padStart(2, "0")}`;
+    const selectedDate = `${monthKey}-01`;
+    this.setData({ selectedDate, selectedDateLabel: formatCalendarDate(selectedDate), monthKey, monthLabel: formatMonthLabel(monthKey) });
+    this.load();
   },
   changeWeek(event: { currentTarget: { dataset: { offset?: string | number } } }) {
     const offset = Number(event.currentTarget.dataset.offset);
@@ -261,14 +304,63 @@ export function buildDateOptions(selectedDate: string, events: ScheduleEvent[]) 
   });
 }
 
+export function buildMonthDays(monthKey: string, selectedDate: string, events: ScheduleEvent[]): MonthDayView[] {
+  const [yearText, monthText] = monthKey.split("-");
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const first = new Date(Date.UTC(year, month - 1, 1));
+  const leadingDays = (first.getUTCDay() + 6) % 7;
+  const eventByDate = new Map<string, { training: boolean; match: boolean; count: number }>();
+  events.forEach((event) => {
+    const date = event.startsAt.slice(0, 10);
+    const current = eventByDate.get(date) ?? { training: false, match: false, count: 0 };
+    current.training = current.training || event.type === "training";
+    current.match = current.match || event.type === "match";
+    current.count += 1;
+    eventByDate.set(date, current);
+  });
+  const today = currentLocalDate();
+  return Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(first);
+    date.setUTCDate(date.getUTCDate() + index - leadingDays);
+    const key = date.toISOString().slice(0, 10);
+    const markers = eventByDate.get(key);
+    return {
+      key,
+      dayNumber: String(date.getUTCDate()),
+      isCurrentMonth: key.slice(0, 7) === monthKey,
+      isToday: key === today,
+      isSelected: key === selectedDate,
+      hasTraining: markers?.training ?? false,
+      hasMatch: markers?.match ?? false,
+      hasMultiple: (markers?.count ?? 0) > 1,
+    };
+  });
+}
+
+function formatMonthLabel(monthKey: string) {
+  const [year, month] = monthKey.split("-");
+  return `${year}年${Number(month)}月`;
+}
+
 function dateWindowStart(date: string) {
-  return weekWindowStart(date).toISOString().slice(0, 10);
+  const month = monthWindow(date);
+  return month.start.toISOString().slice(0, 10);
 }
 
 function dateWindowEnd(date: string) {
-  const base = weekWindowStart(date);
-  base.setUTCDate(base.getUTCDate() + 6);
-  return base.toISOString().slice(0, 10);
+  const month = monthWindow(date);
+  return month.end.toISOString().slice(0, 10);
+}
+
+function monthWindow(date: string) {
+  const [yearText, monthText] = (date || initialDate).slice(0, 7).split("-");
+  const year = Number(yearText);
+  const month = Number(monthText);
+  return {
+    start: new Date(Date.UTC(year, month - 1, 1)),
+    end: new Date(Date.UTC(year, month, 0)),
+  };
 }
 
 function weekWindowStart(date: string) {

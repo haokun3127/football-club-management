@@ -1395,3 +1395,11 @@
 - 修复：两个页面的 `load()` 现在调用 `requireRole("parent")` 并使用 `children.find(child.id === session.currentStudentId) ?? children[0]`；页面首次加载和重试都读取持久会话中的当前学员，原有 API、空态、错误态和 Figma 全屏布局保持不变。
 - 回归覆盖：新增两个页面测试，证明第二位绑定学员会被用于训练历程筛选和成长足迹统计；测试先按旧实现进入 RED，修复后 `2/2` 通过。
 - 验证：家长定向测试 `2/2`；完整门禁 domain `20/20`、小程序 `388/388`、API `115/115` 全绿；`git diff --check` 通过。本批没有修改 API、生产数据库或 Figma，也没有宣称新增视觉验收证据。
+
+## 2026-08-28 P1 家长日程月历 V2 同步
+
+- 当前在线唯一基准已通过 Figma MCP 重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 521:339 / P1 Schedule Home — Month V2`，画板尺寸 `375×812`。该节点明确使用白色月历卡、周一至周日列、日期标记、选中日期、活动列表和家长 TabBar；此前进度中“月历尝试已撤回”的记录已被当前在线稿 supersede。
+- `pages/parent/schedule` 已同步到月历数据模型：固定 42 格、周一开周、前后月日期、今天/选中状态、训练/比赛/多事件标记；月份范围请求、绑定学员过滤、选中日期卡片和真实 Hero/提醒/TabBar 均继续使用现有真实 API 与 view model。
+- 在线稿当前可见的月份标题栏仅有右侧 `›`，因此 WXML 最终只保留右侧视觉控件；`changeMonth` 仍支持 `-1/1` 偏移，便于后续在 Figma 明确补齐上一月入口后启用。没有伪造月份数据、活动、统计或会话。
+- 验证：P1 定向 Vitest `16/16`；小程序 TypeScript 通过；微信 WXML/WXSS 编译通过；完整门禁通过（domain `20/20`、小程序 `391/391`、API `115/115`）；`git diff --check` 通过。
+- 视觉证据边界：Figma 截图已保存为 `tmp/p1-month-v2-figma-latest.png`。WeChatIDE MCP 能成功输出 `563×1218` 等比例截图，但当前模拟器实际仍是 coach 会话，家长路由被角色守卫回到旧教练周历；该截图不作为 P1 运行态视觉通过。需要用真实 parent 会话重新编译并复拍后，才能完成视觉验收。
