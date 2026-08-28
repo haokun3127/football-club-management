@@ -1526,3 +1526,10 @@
 - WeChatIDE MCP 首次截图捕获到加载态，已等待 `.radar-hero` 出现后重新取得稳定截图：`tmp/goal-c13-student-radar-live-ready-20260828.png`；滚动到底部截图为 `tmp/goal-c13-student-radar-live-bottom-20260828.png`，均严格 `375×812`。
 - 真实页面返回 `state=ready`，当前学员为“测试球员第1组-1”，真实名单 8 人、8 个中文雷达维度、综合分 `75`、评估时间 `2026-08-13 评估`；雷达图、维度评分、评语空态和教练 TabBar 均已复核。
 - 在线稿中的 5 名学员、6 个维度、示例分数 `76` 与教练评语不属于当前真实 API 数据，未伪造替换。console 过滤 `error|exception|wx:else|route is not defined` 无命中；本批没有业务代码、API、生产数据库或 Figma 写回。
+
+## 2026-08-28 C16.1 权限范围最新运行复核
+
+- 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1210`；在线截图保存为 `tmp/figma-c16-1-93-1210-live-20260828.png`。
+- WeChatIDE MCP 打开真实教练路由 `pages/coach/permissions/index?source=goal`；稳定截图 `tmp/goal-c16-1-permissions-live-20260828.png`，严格 `375×812`。
+- 页面返回 `state=ready`，真实 capabilities 映射出 5 项权限：修改活动关闭、批量出勤开启、能力评估开启、发起私教开启、查看财务关闭。动态开关状态与 Figma 示例不同，按真实 session 保留，未伪造。
+- 顶栏、说明卡、五行权限卡、只读开关、保存更改视觉按钮和教练 TabBar 已核对；console 过滤 `error|exception|wx:else|route is not defined` 无命中。本批没有业务代码、API、生产数据库或 Figma 写回。

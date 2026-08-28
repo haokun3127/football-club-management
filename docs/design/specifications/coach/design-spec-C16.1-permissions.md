@@ -71,3 +71,10 @@
 - 在线唯一基准：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1210`，本轮重新读取并取得严格 `375×812` 截图。
 - 页面已按当前稿收口为 88px 粉色左对齐顶栏、16/22px 内容边距、五行权限卡和 52px“保存更改”视觉按钮；按钮没有绑定点击或伪保存逻辑，因为当前 BFF 只提供只读 capabilities。
 - 开关状态继续来自真实 coach session 的 `roleEntrypoints` / `features`，Figma 样例中的绿色前三项不写入页面。最终运行证据：`C:\Users\ASUS\AppData\Local\Temp\c161-runtime-latest.png`；并排图：`C:\Users\ASUS\AppData\Local\Temp\c161-compare-latest.png`。
+
+## 2026-08-28 最新运行态复核
+
+- 在线唯一基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1210`；在线截图保存为 `tmp/figma-c16-1-93-1210-live-20260828.png`。
+- WeChatIDE MCP 打开真实路由 `pages/coach/permissions/index?source=goal`，稳定截图为 `tmp/goal-c16-1-permissions-live-20260828.png`，尺寸严格 `375×812`。
+- 页面 data 为 `state=ready`，真实权限列表为“修改活动”关闭、“批量出勤”开启、“能力评估”开启、“发起私教”开启、“查看财务”关闭。开关状态由真实 coach session 的 capabilities 投影，不能复制在线稿示例的开关状态。
+- 顶栏、说明卡、五行列表、只读开关、红色“保存更改”视觉按钮和教练 TabBar 的结构/位置已对照通过；console 过滤 `error|exception|wx:else|route is not defined` 无命中。本轮没有业务代码、API、生产数据库或 Figma 写回。
