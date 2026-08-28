@@ -1329,3 +1329,10 @@
 - 发现真实运行态 Hero 中时间与活动标题纵向堆叠，和在线稿的同一行层级不一致；将 `.c1-hero__main` 调整为横向 flex、基线对齐并保留标题省略保护。未修改日期、接口、真实数据或活动卡契约。
 - 真实复拍：`tmp/goal-c1-coach-upcoming-after-hero-fix.png`，确认 `08:00` 与“周末联赛排兵”同一行显示；真实数据和 Figma 示例不同的队伍、日期、活动数量不作伪造对齐。
 - 验证：C1 定向 Vitest `13/13`、小程序 TypeScript 通过；本批仅修改 C1 WXSS/测试和当前进度，生成的微信开发者工具 `index.js` 未纳入提交。
+
+## 2026-08-28 C2 教练端活动工作台顶栏修复与复验
+
+- 重新读取在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:606`，对照真实比赛活动 `event-cq-talent-secure-test-1-scheduled-match` 的 375×812 运行截图。
+- 发现 C2 顶栏仍使用 `176rpx` 高度，导致活动 Hero 和后续工作台内容整体下移；改为标准 `88rpx` 内容高度，保留 `navInset/menuInset` 安全区避让和原有真实工作台逻辑。
+- 修复后截图：`tmp/goal-c2-coach-after-nav-fix.png`。运行态顶栏、深色活动 Hero、真实 8 人出勤摘要、流程状态、比赛录入/战术板等动作均可见；在线稿中的进行中训练计时和训练内容进度不属于当前比赛数据，未伪造填入。
+- 验证：C2 定向 Vitest `11/11`、小程序 TypeScript、微信 WXML/控制台错误检查通过；本批没有修改 API、数据库或 Figma。

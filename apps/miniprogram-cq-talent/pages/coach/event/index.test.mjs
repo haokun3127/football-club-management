@@ -299,9 +299,11 @@ describe("coach activity workbench", () => {
 
   it("matches the live Figma C2 top navigation geometry", () => {
     expect(template).toContain('class="c2-nav__back" src="/assets/icons/chevron-left.svg"');
+    expect(template).toContain('style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"');
     expect(stylesheet).toMatch(/\.c2-nav__left\s*\{[^}]*gap:\s*0/s);
     expect(stylesheet).toMatch(/\.c2-nav__back\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c2-nav__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
     expect(stylesheet).toMatch(/\.c2-nav__finish\s*\{[^}]*font-size:\s*30rpx/s);
+    expect(stylesheet).toMatch(/\.c2-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
   });
 });
