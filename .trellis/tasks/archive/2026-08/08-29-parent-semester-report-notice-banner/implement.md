@@ -59,8 +59,8 @@
 
 ### Task 5：验证与提交
 
-- [ ] 运行报告/Banner 定向测试、API 内容测试、小程序 TypeScript 和 WXML/WXSS 编译。
-- [ ] 运行 `npx --yes pnpm@10.33.0 run check` 和 `git diff --check`。
-- [ ] Figma MCP 截图与可信微信模拟器截图分别记录，不把静态检查当作视觉验收。
-- [ ] 只 `git add` 本任务列出的路径，提交信息为 `feat(parent): add semester report and notice banner`。
-- [ ] 更新 `docs/current/progress.md`，然后执行 `python ./.trellis/scripts/task.py finish` 和 `archive 08-29-parent-semester-report-notice-banner`。
+- [x] 运行报告/Banner 定向测试、API 内容测试、小程序 TypeScript 和 WXML/WXSS 编译。
+- [x] 运行 `npx --yes pnpm@10.33.0 run check` 和 `git diff --check`。
+- [x] Figma MCP 截图与可信微信模拟器截图分别记录，不把静态检查当作视觉验收。
+- [x] 只 `git add` 本任务列出的路径，提交信息为 `feat(parent): add semester report and notice banner`。
+- [x] 更新 `docs/current/progress.md`，完成生产 API 部署和有通知的 `375×812` 运行态复拍，然后执行 `python ./.trellis/scripts/task.py finish` 和 `archive 08-29-parent-semester-report-notice-banner`。
