@@ -1490,3 +1490,10 @@
 - 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:1002`，截图为 `tmp/figma-c11-93-1002-live.png`。
 - 真实教练会话打开 `pages/coach/test-tasks/index`，页面状态为 `ready`，返回 4 个真实任务；截图为 `tmp/goal-c11-test-tasks-live.png`，严格 `375×812`。首屏的顶栏、新增、筛选、任务卡、进度轨道、悬浮新增按钮和教练 TabBar 均已复核。
 - 真实任务日期、标题、状态和进度与 Figma 示例不同，保持 API 数据；控制台错误过滤无命中。本轮无需业务代码或 API 改动。
+
+## 2026-08-28 C4.2 出勤修改最新运行复核
+
+- 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:715`；截图保存为 `tmp/figma-c4-2-93-715-live.png`，画板严格 `375×812`。
+- WeChatIDE MCP 真实教练会话打开 `pages/coach/attendance/index?id=event-cq-talent-secure-test-1-trn-0818&correction=1`；首屏截图 `tmp/goal-c4-2-attendance-correction-live.png`，滚动到底部截图 `tmp/goal-c4-2-attendance-correction-live-bottom.png`，均严格 `375×812`。
+- 真实 workbench 请求返回 `200`，页面 data 确认 `correctionMode=true`、8 名真实学员和真实出勤状态；首屏/底部均验证警示卡、学员列表、修改说明、固定“重新提交”和教练 TabBar，console 错误过滤无命中。
+- Figma 的 2 条“家长异议”是画板示例数据，当前 API 没有家长异议字段且真实返回 8 人，不能伪造过滤或改名；本页按真实数据呈现，结论为结构与交互运行态复核通过，动态示例差异豁免。本轮没有业务代码、API、数据库或 Figma 写回。

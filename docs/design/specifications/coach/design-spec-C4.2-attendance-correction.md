@@ -65,3 +65,11 @@
         - [6] | Vector | 8x8 @(818,1771) | stroke=#8e97a6 w1.6
         - [6] | Vector | 16x8 @(814,1780) | stroke=#8e97a6 w1.6
       - [13] | 我的 | 121x14 @(762,1793) | fill=#8e97a6 | font=Noto Sans SC/Regular 10px | text="我的"
+
+## 2026-08-28 真实运行态复核
+
+- 在线 Figma 截图已重新读取并保存为 `tmp/figma-c4-2-93-715-live.png`，原始画板为严格 `375×812`。
+- 使用 WeChatIDE MCP 真实教练会话打开 `pages/coach/attendance/index?id=event-cq-talent-secure-test-1-trn-0818&correction=1`；首屏截图为 `tmp/goal-c4-2-attendance-correction-live.png`，滚动到底部截图为 `tmp/goal-c4-2-attendance-correction-live-bottom.png`，两张均为严格 `375×812`。
+- 真实接口 `GET /clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-cq-talent-secure-test-1-trn-0818/workbench` 返回 `200`。页面 data 确认 `correctionMode=true`、`roster` 为 8 名真实学员、页头为“共 8 名学员”；出勤、缺席、请假、迟到状态均由接口回读并在 TS view model 预计算。
+- 结构复核通过：软粉顶栏、橙色警示卡、学员列表、真实状态标签、修改说明 textarea、固定“重新提交”和教练 TabBar 均可见；滚动后修改说明与底部操作未被遮挡。模拟器 console 按 `error|exception|fail|undefined|route is not defined|wx:else` 过滤无命中。
+- Figma 示例中的“共 2 条异常 / 家长异议 / 陈小宇 / 王一涵”不是当前后端契约字段；当前接口返回 8 名真实学员，不能为了像示例而伪造异常数量、家长异议或示例姓名。因此本页结论为：**结构与交互运行态复核通过；示例数据差异按真实 API 数据豁免；本轮无需业务代码改动。**
