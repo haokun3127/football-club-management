@@ -26,12 +26,17 @@
     <view wx:if="{{hasRoster}}" class="workbench-card">
       <view class="row">
         <view class="section-title">出勤情况 {{attendancePresent}}/{{attendanceTotal}}</view>
-        <view class="roster-detail" bindtap="openAttendance">查看详情</view>
+        <view class="subtitle">点击头像切换</view>
       </view>
-      <view class="roster-dots">
-        <view wx:for="{{rosterRows}}" wx:key="studentId" class="roster-dot {{item.present ? 'roster-dot--present' : ''}}">{{item.initial}}</view>
+      <view class="roster-grid">
+        <view wx:for="{{rosterRows}}" wx:key="studentId" class="roster-person" data-index="{{index}}" bindtap="toggleAttendance">
+          <view class="roster-avatar {{item.present ? 'roster-avatar--present' : 'roster-avatar--absent'}}">{{item.initial}}</view>
+          <view class="roster-name">{{item.name}}</view>
+          <view class="roster-status {{item.present ? 'roster-status--present' : 'roster-status--absent'}}">{{item.statusLabel}}</view>
+        </view>
       </view>
-      <view wx:if="{{joinedNames}}" class="subtitle">已加入：{{joinedNames}}</view>
+      <view wx:if="{{attendanceSaving}}" class="subtitle">正在保存出勤...</view>
+      <view wx:if="{{attendanceError}}" class="attendance-error">{{attendanceError}}</view>
     </view>
 
     <view wx:if="{{hasContentProgress}}" class="workbench-card">
@@ -40,14 +45,6 @@
         <image class="progress-row__icon progress-row__icon--{{item.status}}" src="{{item.icon}}" mode="aspectFit" />
         <view class="progress-row__name">{{item.name}}</view>
         <view class="progress-row__status progress-row__status--{{item.status}}">{{item.statusLabel}}</view>
-      </view>
-    </view>
-
-    <view wx:if="{{hasWorkflow}}" class="workbench-card">
-      <view class="section-title">流程状态</view>
-      <view wx:for="{{workflowRows}}" wx:key="label" class="field-row">
-        <view class="label">{{item.label}}</view>
-        <status-chip label="{{item.value}}" tone="{{item.status === 'ready' ? 'success' : 'pending'}}" compact="{{true}}" />
       </view>
     </view>
 

@@ -3,11 +3,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   getCoachWorkbench: vi.fn(),
+  saveCoachAttendance: vi.fn(),
   openPage: vi.fn(),
   requireRole: vi.fn(),
 }));
 
-vi.mock("../../../utils/api", () => ({ getCoachWorkbench: mocks.getCoachWorkbench }));
+vi.mock("../../../utils/api", () => ({
+  getCoachWorkbench: mocks.getCoachWorkbench,
+  saveCoachAttendance: mocks.saveCoachAttendance,
+}));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
 vi.mock("../../../utils/presentation", () => ({
@@ -76,6 +80,7 @@ const trainingWorkbench = {
 describe("coach activity workbench", () => {
   beforeEach(() => {
     mocks.getCoachWorkbench.mockReset();
+    mocks.saveCoachAttendance.mockReset().mockResolvedValue({ eventId: "event-training-1", participants: [] });
     mocks.openPage.mockReset();
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
     globalThis.wx.reLaunch.mockReset();
@@ -93,15 +98,15 @@ describe("coach activity workbench", () => {
       hasRoster: true,
       rosterCount: 2,
       rosterRows: [
-        { studentId: "student-1", name: "Athlete One", statusLabel: "已确认" },
-        { studentId: "student-2", name: "Athlete Two", statusLabel: "待确认" },
+        { studentId: "student-1", name: "Athlete One", statusLabel: "未到" },
+        { studentId: "student-2", name: "Athlete Two", statusLabel: "未到" },
       ],
-      hasWorkflow: true,
+      hasWorkflow: false,
       hasTraining: true,
       hasMatch: false,
       hasAssessmentTemplate: true,
     });
-    expect(page.data.actionCards.map((item) => item.id)).toEqual(["attendance", "lesson", "training", "assessment", "change"]);
+    expect(page.data.actionCards.map((item) => item.id)).toEqual(["training", "assessment", "change"]);
     expect(page.data.eventView).toMatchObject({
       title: "Ball-control session",
       typeLabel: "Training",
@@ -109,7 +114,51 @@ describe("coach activity workbench", () => {
       hasVenue: true,
       sessionMeta: "U11 Red · 08月13日 09:00-10:00",
     });
-    expect(page.data).toMatchObject({ inProgress: false, countdownText: "", attendancePresent: 0, attendanceTotal: 2, joinedNames: "Athlete One" });
+    expect(page.data).toMatchObject({ inProgress: false, countdownText: "", attendancePresent: 0, attendanceTotal: 2, joinedNames: "" });
+  });
+
+  it("toggles attendance directly on the workbench and persists a simple present/absent state", async () => {
+    mocks.getCoachWorkbench.mockResolvedValue({
+      ...trainingWorkbench,
+      roster: [
+        { studentId: "student-1", name: "陈小宇", status: "present" },
+        { studentId: "student-2", name: "林一诺", status: "absent" },
+      ],
+    });
+    const page = createPageInstance();
+    await page.load("event-training-1");
+
+    expect(page.data.rosterRows).toMatchObject([
+      { studentId: "student-1", name: "陈小宇", present: true },
+      { studentId: "student-2", name: "林一诺", present: false },
+    ]);
+    await page.toggleAttendance({ currentTarget: { dataset: { index: "0" } } });
+    expect(mocks.saveCoachAttendance).toHaveBeenCalledWith("event-training-1", [
+      expect.objectContaining({ studentId: "student-1", status: "absent" }),
+      expect.objectContaining({ studentId: "student-2", status: "absent" }),
+    ]);
+    expect(page.data).toMatchObject({ attendancePresent: 0, attendanceSaving: false });
+    expect(page.data.rosterRows[0]).toMatchObject({ present: false, status: "absent" });
+
+    await page.toggleAttendance({ currentTarget: { dataset: { index: "1" } } });
+    expect(page.data).toMatchObject({ attendancePresent: 1, rosterRows: [{ present: false }, { present: true }] });
+    expect(mocks.saveCoachAttendance).toHaveBeenLastCalledWith("event-training-1", [
+      expect.objectContaining({ studentId: "student-1", status: "absent" }),
+      expect.objectContaining({ studentId: "student-2", status: "present" }),
+    ]);
+  });
+
+  it("does not leave a workflow or settlement entry point on the workbench", async () => {
+    mocks.getCoachWorkbench.mockResolvedValue(trainingWorkbench);
+    const page = createPageInstance();
+    await page.load("event-training-1");
+
+    expect(page.data).toMatchObject({ hasWorkflow: false, workflowRows: [] });
+    expect(page.data.actionCards.map((item) => item.id)).not.toContain("lesson");
+    expect(template).not.toContain("流程状态");
+    expect(template).not.toContain("查看详情");
+    expect(template).toContain('bindtap="toggleAttendance"');
+    expect(template).toContain("{{item.name}}");
   });
 
   it("shows finish action and countdown for in-progress events", async () => {
@@ -262,7 +311,6 @@ describe("coach activity workbench", () => {
 
   it("uses precomputed template fields and C2 in-progress affordances without unsafe WXML expressions", () => {
     expect(template).toContain('wx:if="{{hasRoster}}"');
-    expect(template).toContain('wx:if="{{hasWorkflow}}"');
     expect(template).toContain('wx:if="{{hasActionCards}}"');
     expect(template).toContain('bindtap="openAction"');
     expect(template).toContain('wx:if="{{inProgress}}"');

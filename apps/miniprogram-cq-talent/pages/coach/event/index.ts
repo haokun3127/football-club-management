@@ -1,4 +1,4 @@
-import { finishCoachEvent, getCoachWorkbench } from "../../../utils/api";
+import { finishCoachEvent, getCoachWorkbench, saveCoachAttendance } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { activityStatus, activityTypeLabel, formatCalendarDate, formatShortDate, formatTimeOnly, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
@@ -75,6 +75,8 @@ Page({
     attendancePresent: 0,
     attendanceTotal: 0,
     joinedNames: "",
+    attendanceSaving: false,
+    attendanceError: "",
     finishing: false,
   },
   onLoad(query?: Record<string, string | undefined>) {
@@ -93,24 +95,23 @@ Page({
       const canWrite = workbench.event.status !== "cancelled";
       const rosterRows = workbench.roster.map((item) => ({
         ...item,
-        statusLabel: rosterStatusLabel(item.status),
+        statusLabel: isPresentStatus(item.status) ? "已到" : "未到",
         present: isPresentStatus(item.status),
         initial: (item.name || "学").slice(0, 1),
       }));
       const attendancePresent = rosterRows.filter((item) => item.present).length;
       const joinedNames = rosterRows
-        .filter((item) => item.present || item.status === "confirmed")
+        .filter((item) => item.present)
         .map((item) => item.name)
         .join(" · ");
       const inProgress = isInProgress(workbench.event.status, workbench.event.startsAt, workbench.event.endsAt);
       const contentProgressRows = buildContentProgress(workbench, Date.now());
-      const workflowRows = workbench.workflow.map((item) => ({ ...item }));
+      const workflowRows: CoachWorkbench["workflow"] = [];
       const trainingRows = workbench.event.type === "training" ? workbench.training.map((item) => ({ ...item })) : [];
       const matchRows = workbench.event.type === "match" ? workbench.match.map((item) => ({ ...item })) : [];
       const pendingRows = workbench.pending.map((item) => ({ ...item }));
       const actionCards = buildActionCards(workbench, canWrite);
       const hasDetails = rosterRows.length > 0
-        || workflowRows.length > 0
         || trainingRows.length > 0
         || matchRows.length > 0
         || pendingRows.length > 0
@@ -144,6 +145,8 @@ Page({
         attendancePresent,
         attendanceTotal: rosterRows.length,
         joinedNames,
+        attendanceSaving: false,
+        attendanceError: "",
       });
       this.syncCountdown(inProgress, workbench.event.startsAt);
     } catch {
@@ -173,6 +176,8 @@ Page({
         attendancePresent: 0,
         attendanceTotal: 0,
         joinedNames: "",
+        attendanceSaving: false,
+        attendanceError: "",
       });
       this.syncCountdown(false, undefined);
     }
@@ -187,6 +192,29 @@ Page({
   },
   openAttendance() {
     if (this.data.eventId) openPage(`/pages/coach/attendance/index?id=${this.data.eventId}`);
+  },
+  async toggleAttendance(event: { currentTarget?: { dataset?: { index?: string | number } } }) {
+    if (!this.data.canWrite || this.data.attendanceSaving) return;
+    const index = Number(event.currentTarget?.dataset?.index);
+    const current = this.data.rosterRows[index];
+    if (!Number.isInteger(index) || !current || !this.data.eventId) return;
+    const previousRows = this.data.rosterRows;
+    const nextStatus = current.present ? "absent" : "present";
+    const nextRows = previousRows.map((item: RosterRow, rowIndex: number) => rowIndex === index
+      ? { ...item, status: nextStatus, statusLabel: nextStatus === "present" ? "已到" : "未到", present: nextStatus === "present" }
+      : item);
+    this.setData({ ...attendanceSummary(nextRows), rosterRows: nextRows, attendanceSaving: true, attendanceError: "" });
+    try {
+      await saveCoachAttendance(this.data.eventId, nextRows.map((item: RosterRow) => ({
+        studentId: item.studentId,
+        name: item.name,
+        status: item.present ? "present" : "absent",
+        note: item.note,
+      })));
+      this.setData({ attendanceSaving: false });
+    } catch {
+      this.setData({ ...attendanceSummary(previousRows), rosterRows: previousRows, attendanceSaving: false, attendanceError: "出勤保存失败，请重试" });
+    }
   },
   retry() {
     this.load(this.data.eventId);
@@ -297,8 +325,6 @@ function buildActionCards(workbench: CoachWorkbench, canWrite: boolean): ActionC
   if (!canWrite) return [];
 
   const cards: ActionCard[] = [];
-  if (workflowPending(workbench, "点名")) cards.push(actionCard("attendance", "点名"));
-  if (workbench.event.type !== "other" && workflowPending(workbench, "销课")) cards.push(actionCard("lesson", "销课"));
   if (workbench.event.type === "training") cards.push(actionCard("training", "训练内容"));
   if (workbench.event.type === "match") {
     cards.push(actionCard("match", "比赛录入"));
@@ -326,11 +352,20 @@ function workflowPending(workbench: CoachWorkbench, label: string) {
   return workbench.workflow.some((item) => item.label === label && item.status === "pending");
 }
 
+function attendanceSummary(rosterRows: RosterRow[]) {
+  const presentRows = rosterRows.filter((item) => item.present);
+  return {
+    attendancePresent: presentRows.length,
+    attendanceTotal: rosterRows.length,
+    joinedNames: presentRows.map((item) => item.name).join(" · "),
+  };
+}
+
 function routeForAction(action: WorkbenchAction, eventId: string, templateId: string) {
   const routes: Record<Exclude<WorkbenchAction, "assessment">, string> = {
     attendance: `/pages/coach/attendance/index?id=${eventId}`,
     lesson: `/pages/coach/lesson/index?id=${eventId}`,
-    match: `/pages/coach/match/index?id=${eventId}`,
+    match: `/pages/coach/match-edit/index?eventId=${eventId}`,
     tactical: `/pages/coach/tactical-board/index?eventId=${eventId}`,
     training: `/pages/coach/content-select/index?eventId=${eventId}`,
     change: `/pages/coach/event-change/index?id=${eventId}`,

@@ -33,10 +33,16 @@
 
 .c2-nav__finish { color: #a80f1b; font-size: 30rpx; font-weight: 600; }
 .c2-nav__finish--disabled { opacity: .5; }
-.roster-detail { color: #a80f1b; font-size: 24rpx; }
-.roster-dots { display: flex; flex-wrap: wrap; gap: 16rpx; margin-top: 16rpx; }
-.roster-dot { display: flex; align-items: center; justify-content: center; width: 56rpx; height: 56rpx; border-radius: 999rpx; background: #e7eaf0; color: #98a2b3; font-size: 24rpx; }
-.roster-dot--present { background: #a80f1b; color: #ffffff; }
+.roster-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24rpx 16rpx; margin-top: 8rpx; }
+.roster-person { display: flex; min-width: 0; flex-direction: column; align-items: center; }
+.roster-avatar { display: flex; align-items: center; justify-content: center; width: 72rpx; height: 72rpx; border-radius: 50%; font-size: 28rpx; font-weight: 700; }
+.roster-avatar--present { background: #10b981; color: #ffffff; }
+.roster-avatar--absent { background: #e5e7eb; color: #667085; }
+.roster-name { width: 100%; margin-top: 10rpx; overflow: hidden; color: #202124; font-size: 23rpx; line-height: 30rpx; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+.roster-status { margin-top: 4rpx; font-size: 20rpx; line-height: 26rpx; }
+.roster-status--present { color: #059669; }
+.roster-status--absent { color: #98a2b3; }
+.attendance-error { padding: 16rpx 20rpx; border-radius: 12rpx; background: #fff1f2; color: #b42318; font-size: 22rpx; line-height: 30rpx; }
 .shero__big { display: flex; align-items: center; gap: 16rpx; }
 .shero__big-icon { width: 40rpx; height: 40rpx; }
 .progress-row { display: flex; align-items: center; gap: 16rpx; padding: 8rpx 0; }
