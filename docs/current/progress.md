@@ -1716,3 +1716,10 @@
 - 当前在线 Figma 唯一基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 537:2`（`C5 Session Settlement — Pending`）。该稿将待处理页命名为“销课处理”，并要求“待处理销课”摘要、“待确认学员”名单和 `N 人待处理` 状态。
 - 最小修改仅限 `pages/coach/lesson/index.wxml`：同步顶栏和状态页标题，替换摘要与名单层级文案；保留真实活动时间/场地、真实学员列表、确认写入、历史回溯入口和课时更正链路，未引入 Figma 样例姓名、队伍、场地或课时值。
 - WeChatIDE MCP 真实教练会话在 `/pages/coach/lesson/index?id=event-cq-talent-secure-test-1-trn-0818` 重编译后取得严格 `375×812` 截图 `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1787984889950-kwee29.png`；路由正确，控制台错误过滤无命中。定向 Vitest `11/11`、小程序 TypeScript 与 WXML 编译均通过。
+
+## 2026-08-29 C5 销课历史与详情在线稿复核、真实流水可见性修复
+
+- 在线唯一 Figma 基准重新读取：销课历史 `zZ6wKyOHKcO4UYXDd9jGwv / 537:79`、销课详情 `zZ6wKyOHKcO4UYXDd9jGwv / 537:156`，两张在线稿均为 `375×812`。历史页恢复深色历史摘要、紧凑白色记录卡和“查看全部记录 / 按日期筛选”底部层级；详情页恢复深色活动摘要、绿色确认课时标签与“查看训练内容 / 更正本次销课”动作层级。
+- 历史页原先只接受 `app-client-lesson-*` 形式的手工确认流水，错误隐藏了受控导入写入、但同样归属活动的真实扣课流水。现改为按活动 ID 识别两类受控 source ID；默认只展示同一真实 30 天窗口的前 5 条，"查看全部记录" 在该窗口内展开全部数据，不再发送 API 明确拒绝的一年范围请求。
+- WeChatIDE MCP 实测连接 `https://cqtc.pomi.tech`，默认历史页从真实接口读到 2 条已完成销课记录；详情页读到 8 名真实队员及其账本状态。历史默认图与展开图均严格 `375×812`，控制台错误过滤无命中。定向 Vitest `9/9`、小程序 TypeScript、对应 WXML/WXSS 编译均通过。
+- 当前生产数据的 30 天窗口内仅有 2 条符合“训练 + 已完成 + 已销课”条件的记录，低于在线稿示例的 5 条；这是生产演示数据密度缺口，未在客户端伪造记录。下一批应扩充受控导入器的近三周已完成训练/销课数据，完成受限 SQLite 备份、dry-run、confirmed import、API 重启与角色受限回读后再更新本条记录。

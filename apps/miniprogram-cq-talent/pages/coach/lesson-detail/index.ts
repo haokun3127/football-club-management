@@ -8,7 +8,6 @@ type DetailRow = {
   studentId: string;
   name: string;
   avatarLetter: string;
-  statusLabel: string;
   lessonLabel: string;
 };
 
@@ -19,14 +18,10 @@ interface PageData {
   message: string;
   eventId: string;
   eventTitle: string;
-  eventName: string;
-  eventDate: string;
-  eventTime: string;
-  eventTeam: string;
-  hasEventTeam: boolean;
-  eventVenue: string;
-  hasVenue: boolean;
+  eventPrimaryMeta: string;
+  eventSecondaryMeta: string;
   rosterCount: number;
+  rosterStatusLabel: string;
   rows: DetailRow[];
   hasRows: boolean;
   trainingProjects: TrainingProject[];
@@ -42,14 +37,10 @@ Page<PageData>({
     message: "",
     eventId: "",
     eventTitle: "",
-    eventName: "",
-    eventDate: "",
-    eventTime: "",
-    eventTeam: "",
-    hasEventTeam: false,
-    eventVenue: "",
-    hasVenue: false,
+    eventPrimaryMeta: "",
+    eventSecondaryMeta: "",
     rosterCount: 0,
+    rosterStatusLabel: "",
     rows: [],
     hasRows: false,
     trainingProjects: [],
@@ -71,14 +62,10 @@ Page<PageData>({
         message: "缺少活动 ID，暂时无法读取销课详情。",
         eventId: "",
         eventTitle: "",
-        eventName: "",
-        eventDate: "",
-        eventTime: "",
-        eventTeam: "",
-        hasEventTeam: false,
-        eventVenue: "",
-        hasVenue: false,
+        eventPrimaryMeta: "",
+        eventSecondaryMeta: "",
         rosterCount: 0,
+        rosterStatusLabel: "",
         rows: [],
         hasRows: false,
         trainingProjects: [],
@@ -95,14 +82,10 @@ Page<PageData>({
       message: "",
       eventId,
       eventTitle: "",
-      eventName: "",
-      eventDate: "",
-      eventTime: "",
-      eventTeam: "",
-      hasEventTeam: false,
-      eventVenue: "",
-      hasVenue: false,
+      eventPrimaryMeta: "",
+      eventSecondaryMeta: "",
       rosterCount: 0,
+      rosterStatusLabel: "",
       rows: [],
       hasRows: false,
       trainingProjects: [],
@@ -116,8 +99,10 @@ Page<PageData>({
         getCoachLessonConfirmation(eventId),
       ]);
       const rows = mergeDetailRows(workbench, confirmation);
-      const eventTeam = workbench.event.teamName || "";
-      const eventVenue = workbench.event.venue || "";
+      const eventTeam = workbench.event.teamName || "队伍待同步";
+      const eventVenue = workbench.event.venue || "场地待同步";
+      const eventDate = formatCalendarDate(workbench.event.startsAt);
+      const eventTime = formatTimeRange(workbench.event.startsAt, workbench.event.endsAt);
       this.setData({
         state: rows.length ? "ready" : "empty",
         statusTitle: rows.length ? "" : "暂无销课学员",
@@ -125,14 +110,10 @@ Page<PageData>({
         message: rows.length ? "" : "当前活动没有可展示的销课学员。",
         eventId,
         eventTitle: `${eventTypeLabel(workbench.event.type)}课 · 销课详情`,
-        eventName: workbench.event.title && workbench.event.title !== "活动" ? workbench.event.title : "活动信息待同步",
-        eventDate: formatCalendarDate(workbench.event.startsAt),
-        eventTime: formatTimeRange(workbench.event.startsAt, workbench.event.endsAt),
-        eventTeam,
-        hasEventTeam: Boolean(eventTeam),
-        eventVenue,
-        hasVenue: Boolean(eventVenue),
+        eventPrimaryMeta: `${eventTeam} · ${eventDate}`,
+        eventSecondaryMeta: `${eventTime} · ${eventVenue}`,
         rosterCount: rows.length,
+        rosterStatusLabel: `${rows.length} 名学员 · 已完成`,
         rows,
         hasRows: rows.length > 0,
         trainingProjects: workbench.selectedTrainingProjects,
@@ -148,14 +129,10 @@ Page<PageData>({
         message: "销课详情读取失败，请稍后重试。",
         eventId,
         eventTitle: "",
-        eventName: "",
-        eventDate: "",
-        eventTime: "",
-        eventTeam: "",
-        hasEventTeam: false,
-        eventVenue: "",
-        hasVenue: false,
+        eventPrimaryMeta: "",
+        eventSecondaryMeta: "",
         rosterCount: 0,
+        rosterStatusLabel: "",
         rows: [],
         hasRows: false,
         trainingProjects: [],
@@ -172,6 +149,10 @@ Page<PageData>({
 
   openCorrection() {
     if (this.data.eventId) openPage(`/pages/coach/lesson-correction/index?id=${encodeURIComponent(this.data.eventId)}`);
+  },
+
+  openTrainingContent() {
+    if (this.data.eventId) openPage(`/pages/coach/content-select/index?eventId=${encodeURIComponent(this.data.eventId)}`);
   },
 });
 
@@ -190,19 +171,10 @@ function mergeDetailRows(workbench: CoachWorkbench, confirmation: CoachLessonCon
       studentId: student.studentId,
       name,
       avatarLetter: name === "姓名待同步" ? "?" : name.slice(0, 1),
-      statusLabel: participantStatusLabel(confirmationById.get(student.studentId)?.status || student.status),
       lessonLabel: typeof balance === "number" ? `${balance}课时 · 已确认` : "课时余额待核对",
     });
   }
   return rows;
-}
-
-function participantStatusLabel(status: string) {
-  if (status === "present" || status === "已到" || status === "出勤") return "已出勤";
-  if (status === "late" || status === "迟到") return "迟到";
-  if (status === "absent" || status === "缺勤") return "缺勤";
-  if (status === "excused" || status === "请假") return "已请假";
-  return "已核对";
 }
 
 function eventTypeLabel(type: CoachWorkbench["event"]["type"]) {

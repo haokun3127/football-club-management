@@ -12,33 +12,29 @@
     />
 
     <block wx:if="{{state === 'ready'}}">
-      <view class="history-heading">
-        <view class="history-heading__title">历史销课记录</view>
-        <view class="history-heading__filter">按日期筛选</view>
+      <view class="history-hero">
+        <view class="history-hero__title">历史销课记录</view>
+        <view class="history-hero__meta history-hero__meta--muted">{{historyTeamDateLabel}}</view>
+        <view class="history-hero__meta">{{historyTimeVenueLabel}}</view>
       </view>
 
       <view class="history-card">
         <view class="history-card__header">
           <view class="history-card__title">最近销课记录</view>
-          <view class="history-card__action">查看全部记录</view>
+          <view class="history-card__summary">{{recordWindowLabel}} · {{recentRecordCount}} 条</view>
         </view>
         <view wx:for="{{rows}}" wx:key="id" class="history-row" data-id="{{item.id}}" bindtap="openDetail">
-          <view class="history-row__date">
-            <view class="history-row__day">{{item.dateLabel}}</view>
-            <view class="history-row__time">{{item.timeLabel}}</view>
-          </view>
+          <view class="history-row__avatar">{{item.avatarLetter}}</view>
           <view class="history-row__main">
             <view class="history-row__title">{{item.title}}</view>
-            <view class="history-row__meta">
-              <text wx:if="{{item.hasTeam}}">{{item.teamLabel}}</text>
-              <text wx:else>{{item.teamLabel}}</text>
-              <text> · {{item.venueLabel}}</text>
-            </view>
-            <view class="history-row__count">{{item.studentCountLabel}}</view>
           </view>
           <view class="history-row__status">{{item.statusLabel}}</view>
-          <image class="history-row__chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
         </view>
+      </view>
+
+      <view class="history-actions">
+        <view class="history-actions__primary" bindtap="showAll">查看全部记录</view>
+        <view class="history-actions__filter">按日期筛选</view>
       </view>
     </block>
 

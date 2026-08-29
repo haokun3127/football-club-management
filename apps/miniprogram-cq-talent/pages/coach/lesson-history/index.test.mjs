@@ -132,16 +132,51 @@ describe("coach lesson history", () => {
     expect(page.data.rows).toEqual([]);
   });
 
-  it("matches the current C5 history board without Figma sample records", () => {
+  it("keeps importer-backed lesson debits in history when their source belongs to the completed event", async () => {
+    mocks.getCoachLessonConfirmation.mockResolvedValueOnce({
+      participants: [{ studentId: "student-1" }, { studentId: "student-2" }],
+      ledgers: [
+        { studentId: "student-1", sourceIds: ["event-completed-student-1"] },
+        { studentId: "student-2", sourceIds: ["event-completed-student-2"] },
+      ],
+      pending: [],
+    });
+
+    const page = createPageInstance();
+    await page.onLoad();
+
+    expect(page.data.state).toBe("ready");
+    expect(page.data.rows).toHaveLength(1);
+    expect(page.data.rows[0]).toMatchObject({ id: "event-completed", title: "真实训练课" });
+  });
+
+  it("matches the current C5 history board hierarchy without Figma sample records", () => {
     expect(template).toContain('<app-header theme="soft" title="销课历史" title-align="left" show-back />');
-    expect(template).toContain("历史销课记录");
+    expect(template).toContain('<view class="history-hero">');
+    expect(template).toContain('<view class="history-hero__title">历史销课记录</view>');
+    expect(template).toContain('{{historyTeamDateLabel}}');
+    expect(template).toContain('{{historyTimeVenueLabel}}');
     expect(template).toContain("最近销课记录");
-    expect(template).toContain("查看全部记录");
-    expect(template).toContain("按日期筛选");
+    expect(template).toContain("{{recordWindowLabel}} · {{recentRecordCount}} 条");
+    expect(template).toContain('<view class="history-row__avatar">{{item.avatarLetter}}</view>');
+    expect(template).toContain('<view class="history-actions__primary" bindtap="showAll">查看全部记录</view>');
+    expect(template).toContain('<view class="history-actions__filter">按日期筛选</view>');
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
     expect(template).not.toContain("U10精英队");
     expect(template).not.toContain("技术专项训练");
+    expect(template).not.toContain('class="history-heading"');
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(styles).toContain("padding: 22rpx 44rpx 0;");
+    expect(styles).toContain("padding: 44rpx 44rpx 0;");
+    expect(styles).toContain("padding-bottom: calc(324rpx + env(safe-area-inset-bottom));");
+  });
+
+  it("expands all real records without exceeding the API's 31-day history window", async () => {
+    const page = createPageInstance();
+    await page.onLoad();
+    expect(page.data.recordWindowLabel).toBe("近 30 天");
+    await page.showAll();
+
+    expect(mocks.getCoachHome).toHaveBeenLastCalledWith({ from: "2026-07-30", to: "2026-08-28" });
+    expect(page.data.recordWindowLabel).toBe("全部记录");
   });
 });

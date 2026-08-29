@@ -13,45 +13,29 @@
 
     <block wx:if="{{state === 'ready'}}">
       <view class="detail-hero">
-        <view class="detail-hero__eyebrow">{{eventTitle}}</view>
-        <view class="detail-hero__name">{{eventName}}</view>
-        <view class="detail-hero__meta">{{eventDate}} · {{eventTime}}</view>
-        <view wx:if="{{hasEventTeam || hasVenue}}" class="detail-hero__meta">
-          <text wx:if="{{hasEventTeam}}">{{eventTeam}}</text>
-          <text wx:if="{{hasVenue}}"> · {{eventVenue}}</text>
-        </view>
+        <view class="detail-hero__title">{{eventTitle}}</view>
+        <view class="detail-hero__meta detail-hero__meta--muted">{{eventPrimaryMeta}}</view>
+        <view class="detail-hero__meta">{{eventSecondaryMeta}}</view>
       </view>
 
       <view class="detail-card">
         <view class="detail-card__header">
           <view class="detail-card__title">出勤与课时</view>
-          <view class="detail-card__count">{{rosterCount}} 人</view>
+          <view class="detail-card__count">{{rosterStatusLabel}}</view>
         </view>
         <view wx:for="{{rows}}" wx:key="studentId" class="detail-row">
           <view class="detail-row__avatar">{{item.avatarLetter}}</view>
           <view class="detail-row__main">
             <view class="detail-row__name">{{item.name}}</view>
-            <view class="detail-row__meta">{{item.statusLabel}}</view>
           </view>
-          <view class="detail-row__lesson">{{item.lessonLabel}}</view>
+          <view class="detail-row__lesson-chip">{{item.lessonLabel}}</view>
         </view>
       </view>
 
-      <view class="detail-card">
-        <view class="detail-card__header">
-          <view class="detail-card__title">查看训练内容</view>
-          <view class="detail-card__count">{{trainingProjectCount}} 项</view>
-        </view>
-        <block wx:if="{{hasTrainingProjects}}">
-          <view wx:for="{{trainingProjects}}" wx:key="id" class="project-row">
-            <view class="project-row__dot"></view>
-            <view class="project-row__name">{{item.name}}</view>
-          </view>
-        </block>
-        <view wx:else class="detail-card__empty">本次活动未记录训练内容</view>
+      <view class="detail-actions">
+        <view class="detail-actions__primary" bindtap="openTrainingContent">查看训练内容</view>
+        <view class="detail-actions__correction" bindtap="openCorrection">更正本次销课</view>
       </view>
-
-      <view class="detail-correction" bindtap="openCorrection">更正本次销课</view>
     </block>
 
     <view wx:if="{{state === 'empty'}}" class="detail-empty">

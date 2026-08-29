@@ -91,8 +91,9 @@ describe("coach lesson detail", () => {
     expect(page.data).toMatchObject({
       state: "ready",
       eventTitle: "训练课 · 销课详情",
-      eventTeam: "真实队伍",
-      eventVenue: "真实场地",
+      eventPrimaryMeta: "真实队伍 · 8月21日 周五",
+      eventSecondaryMeta: "09:00–10:30 · 真实场地",
+      rosterStatusLabel: "2 名学员 · 已完成",
       rosterCount: 2,
       rows: [
         expect.objectContaining({ studentId: "student-1", name: "真实学员一", lessonLabel: "8课时 · 已确认" }),
@@ -110,21 +111,30 @@ describe("coach lesson detail", () => {
     page.openCorrection();
     expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/lesson-correction/index?id=event-1");
 
+    page.openTrainingContent();
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/content-select/index?eventId=event-1");
+
     mocks.getCoachWorkbench.mockRejectedValueOnce(new Error("raw backend detail"));
     await page.retry();
     expect(page.data).toMatchObject({ state: "error", rows: [], message: "销课详情读取失败，请稍后重试。" });
     expect(page.data.message).not.toContain("raw backend detail");
   });
 
-  it("keeps the detail board full-screen and does not embed Figma sample names", () => {
+  it("keeps the detail board full-screen with the current C5 detail hierarchy", () => {
     expect(template).toContain('<app-header theme="soft" title="销课详情" title-align="left" show-back />');
+    expect(template).toContain('<view class="detail-hero__title">{{eventTitle}}</view>');
+    expect(template).toContain('{{eventPrimaryMeta}}');
+    expect(template).toContain('{{eventSecondaryMeta}}');
     expect(template).toContain("出勤与课时");
-    expect(template).toContain("查看训练内容");
-    expect(template).toContain("更正本次销课");
+    expect(template).toContain('<view class="detail-card__count">{{rosterStatusLabel}}</view>');
+    expect(template).toContain('<view class="detail-row__lesson-chip">{{item.lessonLabel}}</view>');
+    expect(template).toContain('<view class="detail-actions__primary" bindtap="openTrainingContent">查看训练内容</view>');
+    expect(template).toContain('<view class="detail-actions__correction" bindtap="openCorrection">更正本次销课</view>');
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
     expect(template).not.toContain("陈小宇");
     expect(template).not.toContain("周亦辰");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(styles).toContain("padding: 22rpx 44rpx 0;");
+    expect(styles).toContain("padding: 44rpx 44rpx 0;");
+    expect(styles).toContain("padding-bottom: calc(324rpx + env(safe-area-inset-bottom));");
   });
 });
