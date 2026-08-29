@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { readFileSync } from "node:fs";
 
 const mocks = vi.hoisted(() => ({
   getParentCalendar: vi.fn(),
@@ -30,6 +31,8 @@ globalThis.Page = (definition) => {
 };
 
 const { buildSemesterReportView } = await import("./index.ts");
+const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
+const pageConfig = readFileSync(new URL("./index.json", import.meta.url), "utf8");
 
 function createPageInstance(data = {}) {
   const instance = { ...pageDefinition, data: { ...pageDefinition.data, ...data } };
@@ -101,6 +104,8 @@ describe("parent semester report", () => {
           { metricId: "speed", label: "速度", value: 82, maxValue: 100 },
           { metricId: "control", label: "控球", value: 74, maxValue: 100 },
           { metricId: "pass", label: "传球", value: 68, maxValue: 100 },
+          { metricId: "stamina", label: "体能", value: 64, maxValue: 100 },
+          { metricId: "tactics", label: "战术", value: 61, maxValue: 100 },
         ],
         trainingStats: { totalTrainings: 12, attendanceRate: 92, monthTrainings: 4, monthly: [] },
         updatedAt: "2026-08-27T09:00:00.000Z",
@@ -116,12 +121,51 @@ describe("parent semester report", () => {
     expect(report.state).toBe("ready");
     expect(report.periodLabel).toBe("最近阶段");
     expect(report.updatedAtLabel).toBe("更新时间：2026-08-27T09:00:00.000Z");
-    expect(report.overallLabel).toBe("75 分");
+    expect(report.overallLabel).toBe("72 分");
+    expect(report.overallScore).toBe("72");
+    expect(report.freshnessLabel).toBe("数据已更新");
     expect(report.dimensions).toEqual([
       { label: "速度", valueLabel: "82分", percent: 82 },
       { label: "控球", valueLabel: "74分", percent: 74 },
       { label: "传球", valueLabel: "68分", percent: 68 },
+      { label: "体能", valueLabel: "64分", percent: 64 },
     ]);
     expect(report.coachNoteLabel).toBe("暂无教练评语");
+  });
+
+  it("counts only completed activities for completed summary labels", () => {
+    const report = buildSemesterReportView(
+      { radar: [], trainingStats: { totalTrainings: 0, attendanceRate: null, monthTrainings: 0, monthly: [] }, milestones: [], trainingHistory: [], metricItems: [], views: [] },
+      [
+        { id: "training-completed", type: "training", title: "已完成训练", startsAt: "2026-08-20T09:00:00.000Z", endsAt: "2026-08-20T10:30:00.000Z", status: "completed", childIds: ["student-1"] },
+        { id: "training-scheduled", type: "training", title: "未来训练", startsAt: "2026-08-21T09:00:00.000Z", endsAt: "2026-08-21T10:30:00.000Z", status: "scheduled", childIds: ["student-1"] },
+        { id: "match-completed", type: "match", title: "已完成比赛", startsAt: "2026-08-22T09:00:00.000Z", endsAt: "2026-08-22T10:30:00.000Z", status: "completed", childIds: ["student-1"] },
+      ],
+      first,
+    );
+
+    expect(report.trainingSummary.value).toBe("1 次");
+    expect(report.matchSummary.value).toBe("1 场");
+  });
+
+  it("matches the five Figma body sections and moves child selection into the student card", () => {
+    expect(template).toContain("class=\"report-card report-card--period\"");
+    expect(template).toContain("class=\"report-card report-card--student\"");
+    expect(template).toContain("class=\"report-section-title\">能力表现</view>");
+    expect(template).toContain("class=\"report-card report-card--ability\"");
+    expect(template).toContain("class=\"report-card report-card--summary\"");
+    expect(template).toContain("class=\"report-card report-card--note\"");
+    expect(template).not.toContain("report-students");
+    expect(template).toContain('bindtap="openStudentPicker"');
+  });
+
+  it("uses a custom navigation shell so the body starts at the Figma top edge", () => {
+    expect(pageConfig).toContain('"navigationStyle": "custom"');
+  });
+
+  it("keeps long ability labels on one row and uses the measured ability-card gap", () => {
+    const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
+    expect(styles).toMatch(/\.report-dimension__label\s*\{[^}]*white-space:\s*nowrap/s);
+    expect(styles).toMatch(/\.report-card--ability\s*\{[^}]*margin-top:\s*8rpx/s);
   });
 });

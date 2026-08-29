@@ -9,21 +9,23 @@
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载成长报告' : state === 'empty' ? '暂无成长记录' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
     <block wx:if="{{state !== 'loading' && state !== 'error' && activeStudentId}}">
-      <scroll-view scroll-x class="report-students" enhanced show-scrollbar="{{false}}">
-        <view class="report-students__inner">
-          <view wx:for="{{children}}" wx:key="id" class="report-student {{activeStudentId === item.id ? 'report-student--active' : ''}}" data-id="{{item.id}}" bindtap="switchChild">{{item.name}}</view>
-        </view>
-      </scroll-view>
-
-      <view class="report-card report-card--summary">
-        <view class="report-summary__eyebrow">{{report.periodLabel}}</view>
-        <view class="report-summary__name">{{report.studentName}}</view>
-        <view class="report-summary__team">{{report.teamLabel}}</view>
-        <view class="report-summary__update">{{report.updatedAtLabel}}</view>
+      <view class="report-card report-card--period">
+        <view class="report-period__label">{{report.periodLabel}}</view>
+        <view class="report-period__description">{{report.periodDescription}}</view>
+        <view class="report-period__freshness">{{report.freshnessLabel}}</view>
       </view>
 
+      <view class="report-card report-card--student" bindtap="openStudentPicker">
+        <view class="report-student__avatar">{{report.studentInitial}}</view>
+        <view class="report-student__identity"><view class="report-student__name">{{report.studentName}}</view><view class="report-student__team">{{report.teamLabel}}</view></view>
+        <view class="report-student__current">{{report.currentStudentLabel}}</view>
+      </view>
+
+      <view class="report-section-title">能力表现</view>
+
       <view class="report-card report-card--ability">
-        <view class="report-card__header"><view class="report-card__title">能力表现</view><view class="report-card__overall">{{report.overallLabel}}</view></view>
+        <view class="report-ability__copy"><view class="report-ability__title">{{report.abilityTitle}}</view><view class="report-ability__subtitle">{{report.abilitySubtitle}}</view></view>
+        <view class="report-ability__score"><view class="report-ability__score-value">{{report.overallScore}}</view><view class="report-ability__score-label">{{report.overallScoreLabel}}</view></view>
         <view wx:if="{{report.dimensions.length}}" class="report-dimensions">
           <view wx:for="{{report.dimensions}}" wx:key="label" class="report-dimension">
             <view class="report-dimension__head"><view class="report-dimension__label">{{item.label}}</view><view class="report-dimension__value">{{item.valueLabel}}</view></view>
@@ -33,22 +35,17 @@
         <view wx:else class="report-empty">{{report.metricsEmptyLabel}}</view>
       </view>
 
-      <view class="report-card">
-        <view class="report-card__title">训练与比赛</view>
+      <view class="report-card report-card--summary">
         <view class="report-stats">
-          <view class="report-stat"><view class="report-stat__value">{{report.trainingSummary.value}}</view><view class="report-stat__label">{{report.trainingSummary.label}}</view></view>
-          <view class="report-stat"><view class="report-stat__value">{{report.matchSummary.value}}</view><view class="report-stat__label">{{report.matchSummary.label}}</view></view>
-          <view class="report-stat"><view class="report-stat__value">{{report.attendanceSummary.value}}</view><view class="report-stat__label">{{report.attendanceSummary.label}}</view></view>
+          <view class="report-stat"><view class="report-stat__value">{{report.trainingSummary.value}}</view><view class="report-stat__label">已完成训练</view></view>
+          <view class="report-stat report-stat--accent"><view class="report-stat__value">{{report.matchSummary.value}}</view><view class="report-stat__label">已完成比赛</view></view>
+          <view class="report-stat"><view class="report-stat__value">{{report.attendanceSummary.value}}</view><view class="report-stat__label">出勤率</view></view>
         </view>
-        <view wx:if="{{report.state === 'empty'}}" class="report-empty report-empty--activities">{{report.activitiesEmptyLabel}}</view>
       </view>
 
       <view class="report-card report-card--note">
-        <view class="report-card__title">教练评语</view>
-        <view class="report-note">{{report.coachNoteLabel}}</view>
+        <view class="report-note__title">教练评语</view><view class="report-note">{{report.coachNoteLabel}}</view>
       </view>
-
-      <view class="report-link" bindtap="openGrowth">查看详细成长数据 <text>›</text></view>
     </block>
   </scroll-view>
   <role-tabbar role="parent" active="growth" />

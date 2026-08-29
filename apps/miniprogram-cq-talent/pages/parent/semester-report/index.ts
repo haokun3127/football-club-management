@@ -15,8 +15,16 @@ export interface SemesterReportDimensionView {
 export interface SemesterReportView {
   state: "ready" | "empty";
   studentName: string;
+  studentInitial: string;
   teamLabel: string;
   periodLabel: string;
+  periodDescription: string;
+  freshnessLabel: string;
+  currentStudentLabel: string;
+  abilityTitle: string;
+  abilitySubtitle: string;
+  overallScore: string;
+  overallScoreLabel: string;
   overallLabel: string;
   dimensions: SemesterReportDimensionView[];
   trainingSummary: { label: string; value: string };
@@ -101,6 +109,16 @@ Page<PageData>({
     setCurrentStudentId(id);
     void this.load();
   },
+  openStudentPicker() {
+    if (this.data.children.length < 2) return;
+    wx.showActionSheet({
+      itemList: this.data.children.map((child: StudentSummary) => child.name),
+      success: ({ tapIndex }) => {
+        const child = this.data.children[tapIndex];
+        if (child) this.switchChild({ currentTarget: { dataset: { id: child.id } } });
+      },
+    });
+  },
   goBack() {
     wx.navigateBack();
   },
@@ -123,8 +141,9 @@ export function buildSemesterReportView(growth: GrowthSummary, events: ScheduleE
         valueLabel: `${value}分`,
         percent: Math.max(0, Math.min(100, Math.round((value / maxValue) * 100))),
       };
-    });
-  const activeEvents = events.filter((event) => belongsToStudent(event, active.id) && event.status !== "cancelled");
+    })
+    .slice(0, 4);
+  const activeEvents = events.filter((event) => belongsToStudent(event, active.id) && event.status === "completed");
   const trainingCount = activeEvents.filter((event) => event.type === "training").length;
   const matchCount = activeEvents.filter((event) => event.type === "match").length;
   const attendanceRate = growth.trainingStats?.attendanceRate;
@@ -132,11 +151,20 @@ export function buildSemesterReportView(growth: GrowthSummary, events: ScheduleE
     ? Math.round(dimensions.reduce((total, dimension) => total + dimension.percent, 0) / dimensions.length)
     : undefined;
   const updatedAt = growth.updatedAt;
+  const studentName = active.name || "姓名待同步";
   return {
     state: dimensions.length || activeEvents.length ? "ready" : "empty",
-    studentName: active.name,
+    studentName,
+    studentInitial: studentName.slice(0, 1),
     teamLabel: active.teams.filter(Boolean).join("、") || "队伍待同步",
     periodLabel: "最近阶段",
+    periodDescription: "根据最近 180 天训练与比赛数据生成",
+    freshnessLabel: updatedAt ? "数据已更新" : "等待数据同步",
+    currentStudentLabel: "当前学员",
+    abilityTitle: "综合能力",
+    abilitySubtitle: "基于最近一次有效评测",
+    overallScore: average === undefined ? "暂无" : `${average}`,
+    overallScoreLabel: "综合评分",
     overallLabel: average === undefined ? "暂无" : `${average} 分`,
     dimensions,
     trainingSummary: { label: "训练", value: trainingCount ? `${trainingCount} 次` : "暂无" },
@@ -153,8 +181,16 @@ function emptyReport(studentName: string): SemesterReportView {
   return {
     state: "empty",
     studentName,
+    studentInitial: studentName ? studentName.slice(0, 1) : "学",
     teamLabel: "队伍待同步",
     periodLabel: "最近阶段",
+    periodDescription: "根据最近 180 天训练与比赛数据生成",
+    freshnessLabel: "等待数据同步",
+    currentStudentLabel: "当前学员",
+    abilityTitle: "综合能力",
+    abilitySubtitle: "基于最近一次有效评测",
+    overallScore: "暂无",
+    overallScoreLabel: "综合评分",
     overallLabel: "暂无",
     dimensions: [],
     trainingSummary: { label: "训练", value: "暂无" },
