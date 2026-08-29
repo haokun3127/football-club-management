@@ -6,6 +6,12 @@
 - 根因是该页 WXML 已使用自定义导航，但 `index.json` 未声明 `navigationStyle: custom`。新增同页回归测试后先得到预期失败，再补齐配置；定向测试最终 `5/5`。
 - 本批只修改比赛记录页配置和测试，不改变 API、角色/session 或比赛数据。当前模拟器是 coach 会话，无法在本批重新取得 parent 角色截图；修复后的家长视觉证据需在真实 parent 会话重新编译后复拍。
 
+## 2026-08-29 C8 训练管理页新鲜运行复核
+
+- 在线唯一 Figma 基准为 `zZ6wKyOHKcO4UYXDd9jGwv / 93:896`；真实教练会话打开 `pages/coach/training/index` 并取得严格 `375×812` 截图 `tmp/goal-c8-training-runtime-final-20260829.png`。
+- 顶栏、深色四项统计卡、训练计划/能力评估/学员管理/测评任务分栏、训练卡片和固定教练 TabBar 均可见；训练名称、日期、人数、统计值由真实 API 返回，与 Figma 示例不同按动态数据差异处理。
+- 当前路由回读为 `/pages/coach/training/index`，模拟器 console 过滤 `error|exception|fail|undefined|wx:else|route is not defined|appid missing` 无命中；本轮未修改业务代码或 API。
+
 ## 2026-08-28 P2.2 / C4 在线 Figma 复核
 
 - P2.2 `93:198` 在线稿与真实家长会话复核通过：顶栏、状态胶囊、活动卡、信息行、参与孩子、教练、底部说明和家长 TabBar 均存在且位置关系一致；活动标题/状态/场地等差异来自真实 API 数据，未伪造 Figma 示例。
