@@ -1,0 +1,15 @@
+{
+  "capturedOn": "2026-08-29",
+  "figmaFileKey": "zZ6wKyOHKcO4UYXDd9jGwv",
+  "nodeId": "93:765",
+  "board": "C5.1 Lesson Correction",
+  "viewport": { "width": 375, "height": 812 },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 34047,
+    "sha256": "742311CB4C421B0F64C09FF7F3F1448C2F33E08B3CB1E88DB12A8B0845857E7B"
+  },
+  "captureMethod": "figma-mcp get_screenshot",
+  "designContext": "figma-mcp get_design_context read before screenshot"
+}

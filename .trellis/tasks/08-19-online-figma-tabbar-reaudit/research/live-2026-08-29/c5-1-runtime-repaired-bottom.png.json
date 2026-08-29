@@ -1,0 +1,14 @@
+{
+  "capturedOn": "2026-08-29",
+  "route": "/pages/coach/lesson-correction/index?id=event-cq-talent-secure-test-1-trn-0818",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 71456,
+    "sha256": "CF1080B3C4E8BDF2C4E5B9A2C3C84736A573D090BF170886B234357D8805AF66"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot after wx.pageScrollTo",
+  "role": "coach",
+  "visualDisposition": "repaired-and-recaptured; save button remains fully above fixed coach TabBar"
+}

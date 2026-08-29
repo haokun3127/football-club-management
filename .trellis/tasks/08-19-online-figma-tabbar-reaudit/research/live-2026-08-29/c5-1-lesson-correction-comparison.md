@@ -1,0 +1,10 @@
+# C5.1 Lesson Correction — 2026-08-29 live comparison
+
+- Online design source: Figma file `zZ6wKyOHKcO4UYXDd9jGwv`, node `93:765`; `get_design_context` and `get_screenshot` were read on 2026-08-29. The live board is `375×812` and contains a soft brand top bar, warning card, student list, `系统差异` tag, original-value strikethrough, half-lesson adjustment control, save action, and the three-item coach TabBar.
+- Online screenshot: `c5-1-online.png` with sidecar `c5-1-online.png.json`.
+- Runtime route: `/pages/coach/lesson-correction/index?id=event-cq-talent-secure-test-1-trn-0818`, opened through WeChatIDE MCP with the real coach session. Initial and repaired captures are retained as `c5-1-runtime.png`, `c5-1-runtime-bottom.png`, `c5-1-runtime-repaired.png`, and `c5-1-runtime-repaired-bottom.png`; the repaired captures have sidecars.
+- Initial comparison found two implementation defects: the row semantic label was `课时调整` instead of the live-board `系统差异` label, and the original balance value was not rendered with the required strikethrough. The long eight-student roster was also checked in a bottom viewport and did not cover the save action or fixed TabBar.
+- Repair: changed the row label to `系统差异` and applied `text-decoration: line-through` to the precomputed original-balance field. The roster names, balances, and `±0` adjustment state remain real API data; Figma sample names and `1.5课时` were not fabricated.
+- Focused TDD: the updated C5.1 assertions failed first (`2` failures for the live-board label and strikethrough), then passed after repair (`8/8`).
+- Final runtime: repaired first viewport and bottom viewport are both strict `375×812`; the bottom capture confirms the save button remains fully above the fixed coach TabBar. Simulator console filtering for `error|exception|fail|undefined|route is not defined|wx:else|appid missing` returned no hits.
+- Comparison levels: (1) online Figma read — passed; (2) route-verified runtime screenshots — passed; (3) visual comparison — repaired-and-recaptured. Data differences are explicitly exempted because they come from the live API rather than the Figma sample.

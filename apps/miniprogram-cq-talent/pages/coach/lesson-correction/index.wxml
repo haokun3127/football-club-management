@@ -29,7 +29,7 @@
             <view class="student-row__name">{{item.name}}</view>
             <view class="student-row__balance">{{item.balanceText}}</view>
           </view>
-          <view class="student-row__tag">课时调整</view>
+          <view class="student-row__tag">系统差异</view>
           <view class="student-row__adjustment">
             <view class="student-row__delta {{item.delta !== 0 ? 'student-row__delta--changed' : ''}}">{{item.deltaLabel}}</view>
             <view class="student-row__adjustment-arrows">

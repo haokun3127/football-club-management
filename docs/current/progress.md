@@ -1626,3 +1626,10 @@
 - 真实教练路由 `pages/coach/lesson/index?id=event-cq-talent-secure-test-1-trn-0818` 的首屏和底部视口均由 WeChatIDE MCP 取得严格 `375×812` 截图。真实活动标题、8 名学员和“待确认”状态继续来自 API；Figma 的 5 名示例学员与 `1.5课时` 未被复制。
 - 修复两个实际差异：恢复在线稿“课时确认 / 活动标题 / 学员课时记录 / 共 N 名学员”的层级和文案，活动元信息按在线稿区分主次透明度；根容器增加 `140rpx` 固定教练 TabBar 安全区，解决长名单底部确认按钮被遮挡。
 - C5 定向 Vitest `11/11`，WXML 编译成功，控制台错误过滤无命中；全仓门禁本轮输出为 domain `20/20`、小程序 `410/410`、API `115/115`。证据详见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c5-lesson-confirm-comparison.md`。
+
+## 2026-08-29 C5.1 课时更正页在线 Figma 修复复验
+
+- 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:765`；在线截图保存为 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c5-1-online.png`，画板严格 `375×812`。
+- 真实教练路由 `pages/coach/lesson-correction/index?id=event-cq-talent-secure-test-1-trn-0818` 首屏和底部视口均由 WeChatIDE MCP 重新取得严格 `375×812` 修复后截图；8 名学员的姓名、余额和 `±0` 调整状态继续来自真实 API，未复制 Figma 示例姓名或 `1.5课时`。
+- 修复两个实际视觉差异：更正列表标签从“课时调整”改为在线稿“系统差异”，原值余额增加删除线；底部视口确认保存按钮没有被固定教练 TabBar 遮挡。
+- C5.1 定向 Vitest `8/8`；WXML 编译成功；控制台过滤 `error|exception|fail|undefined|route is not defined|wx:else|appid missing` 无命中。证据详见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c5-1-lesson-correction-comparison.md`。

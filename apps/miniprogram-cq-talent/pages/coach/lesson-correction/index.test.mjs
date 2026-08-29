@@ -173,7 +173,7 @@ describe("coach lesson correction", () => {
   it("uses the C5.1 warning copy without fabricating sample students or anomaly data", () => {
     expect(template).toContain('<app-header theme="soft" title="课时更正" title-align="left" show-back />');
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
-    expect(template).not.toContain("系统差异");
+    expect(template).toContain(">系统差异</view>");
     expect(template).toContain('class="correction-intro__warning"');
     expect(template).toContain(">课时记录异常</text>");
     expect(template).toContain("请检查并更正以下学员的课时记录");
@@ -212,6 +212,7 @@ describe("coach lesson correction", () => {
     expect(template).toContain('class="student-row__adjustment"');
     expect(template).toContain('class="student-row__adjustment-arrow student-row__adjustment-arrow--up"');
     expect(template).toContain('class="student-row__adjustment-arrow student-row__adjustment-arrow--down"');
+    expect(styles).toMatch(/\.student-row__balance\s*\{[^}]*text-decoration:\s*line-through/s);
     expect(template).toContain("需更正学员");
     expect(template).not.toContain('class="reason-card"');
     expect(controller).toContain("avatarColor");

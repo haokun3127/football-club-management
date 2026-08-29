@@ -1,0 +1,14 @@
+{
+  "capturedOn": "2026-08-29",
+  "route": "/pages/coach/lesson-correction/index?id=event-cq-talent-secure-test-1-trn-0818",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 70857,
+    "sha256": "7455B48B62C4055908D0FFE137A8F3DFF6C9ACBE65FDCDF3D457E370971961C9"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot before repair",
+  "role": "coach",
+  "visualDisposition": "defect evidence; row label and original-value text decoration differed from live Figma"
+}
