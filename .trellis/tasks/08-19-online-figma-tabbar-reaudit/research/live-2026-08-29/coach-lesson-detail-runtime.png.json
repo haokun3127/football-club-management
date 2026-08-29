@@ -1,0 +1,8 @@
+{
+  "capturedAt": "2026-08-29T04:25:36.000Z",
+  "route": "/pages/coach/lesson-detail/index?id=event-cq-talent-secure-test-1-trn-0818",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "rawPng": { "width": 564, "height": 1220, "bytes": 148503 },
+  "png": { "width": 375, "height": 812, "bytes": 126869, "sha256": "5d9a9ac1dda6d3ea7221679898a59364f12ecafacd1153f00b59c5552221e670" },
+  "captureMethod": "wechatide-mcp simulator_screenshot"
+}

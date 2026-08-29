@@ -1,0 +1,8 @@
+{
+  "capturedAt": "2026-08-29T04:26:53.000Z",
+  "route": "/pages/coach/match-edit/index?eventId=event-cq-talent-secure-test-1-completed-match",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "rawPng": { "width": 564, "height": 1220, "bytes": 73113 },
+  "png": { "width": 375, "height": 812, "bytes": 64035, "sha256": "8587ef4862f303be57dd9ab0e3b6ef23b8497bf0b70690c7f65dce5f554b8b6e" },
+  "captureMethod": "wechatide-mcp simulator_screenshot"
+}

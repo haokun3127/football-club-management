@@ -1,0 +1,8 @@
+{
+  "capturedAt": "2026-08-29T04:17:10.000Z",
+  "route": "/pages/coach/lesson-history/index",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "rawPng": { "width": 564, "height": 1220, "bytes": 64788 },
+  "png": { "width": 375, "height": 812, "bytes": 55487, "sha256": "c0612ef2c78e3b411b92fe4294a1acda188122a001c4f09b98d900f87737a338" },
+  "captureMethod": "wechatide-mcp simulator_screenshot"
+}

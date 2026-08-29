@@ -1661,3 +1661,16 @@
 - 通过真实 C6.1 流程输入第 `54` 分钟并返回比赛页，复现兼容的本机草稿遮罩；没有注入页面 data、API 响应或 storage。修复前对照发现弹层宽度约 `327px`、成功圆容器 `52px`、手写 CSS 勾号和 `#d1fadf` 背景均与在线稿不一致。
 - 最小修复：恢复 Figma `315×270px` 弹层的 border-box 几何和 `#ecfdf5` 成功容器，替换为 Figma 导出的 `c6-2-cloud-check.svg`，并保持本机草稿真实范围文案。修复后真实首屏与底部视口均严格 `375×812`，TabBar 未遮挡，控制台错误过滤无命中。
 - C6 聚焦测试先红后绿 `10/10`；WXML/WXSS 编译成功。结论为 **修复后重新通过（真实数据/本机持久化范围差异豁免）**。证据详见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c6-2-match-save-state-comparison.md`。
+
+## 2026-08-29 C16.3/C16.4 在线 Figma 复审收口
+
+- C16.3 教练账号页在线节点 `93:1262` 已重新读取并取得在线 `375×812` 设计稿；真实路由 `/pages/coach/account/index` 由 WeChatIDE MCP 取得严格 `375×812` 运行截图并完成对照。顶栏、账号卡片、设置分组、教练 TabBar 一致；真实会话资料、未提供的账号字段和平台状态栏/胶囊按数据/平台差异豁免。定向测试 `5/5`、小程序 TypeScript 通过，证据见 `c163-coach-account-comparison.md`，提交 `9763a0d`。
+- C16.4 教练帮助页在线节点 `93:1286` 已重新读取并取得在线设计稿；真实路由 `/pages/coach/help/index` 取得首屏及滚动底部严格 `375×812` 截图并完成对照。搜索、分类网格、FAQ、支持卡和教练 TabBar 结构一致；真实 FAQ/分类内容、支持方式待配置和平台状态栏/胶囊按数据/契约/平台差异豁免。定向测试 `4/4`、小程序 TypeScript 通过，证据见 `c164-coach-help-comparison.md`，提交 `eb593d3`。
+- C16.3/C16.4 均未发现需要修改业务代码或回写 Figma 的新缺陷；当前线上 Figma 读稿与真实运行态证据已补齐。
+
+## 2026-08-29 剩余 TabBar 消费者复审收口
+
+- 本轮补齐四个此前遗漏的真实运行态消费者：`/pages/coach/lesson-history/index`、`/pages/coach/lesson-detail/index`、`/pages/coach/match-edit/index` 和 `/pages/parent/semester-report/index`。每个页面均取得 WeChatIDE MCP 路由核验后的 `375×812` PNG 与 sidecar；长页面另取底部视口，证据集中在 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/`。
+- 三个教练页面没有独立在线画板，本轮按在线教练根节点 `4:7` 与共享 TabBar overlay `529:124` 复核。共享顶栏、返回控制、TabBar 顺序/激活态、固定底部安全区和底部内容不遮挡均通过；真实活动、球队、学员、比分和 FAQ 数据与设计示例不同，按真实 API/配置差异记录，不复制 Figma 示例数据。
+- 家长学期报告在线节点为 `701:177`。成长 TabBar、顶栏和运行路由通过；但在线稿主体是阶段卡、深色学员卡、紧凑能力卡、三列汇总卡和教练评语卡，当前页面主体仍是另一套卡片结构。这是独立的 P4.3 页面主体复原缺口，不属于本轮 TabBar/top-navigation 范围，未修改业务代码。
+- 本轮控制台错误过滤 `error|exception|fail|undefined|route is not defined|wx:else|appid missing` 无命中。新增长期规则：没有独立 Figma 画板时，只能对共享壳和固定行为作明确结论，不能把共享壳通过写成整页视觉通过；该规则已同步到 `.trellis/spec/guides/cross-layer-thinking-guide.md` 的 8.3。

@@ -241,6 +241,21 @@ const viewport = await inspectionProgram.systemInfo();
 - Verify both the first viewport and a bottom viewport after `wx.pageScrollTo`; the bottom CTA, correction link, and final list row must be fully above the fixed TabBar.
 - Good: `.page { padding-bottom: 140rpx; }` with a bottom screenshot proving the action block is unobscured. Bad: checking only the first viewport or adding an unrelated fixed offset to the action bar.
 
+### 8.3 Shared Figma overlay when a route has no independent board (2026-08-29)
+
+- Some routes do not have a one-to-one Figma page board. For those routes, read the
+  current role root plus the shared navigation overlay before comparing the runtime
+  page. Record the exact nodes used; do not silently substitute an archived route
+  board or infer body layout from the shell alone.
+- A shared-overlay comparison can establish a pass for the top navigation, TabBar,
+  safe-area reservation, and fixed-bottom behavior only. It cannot establish full-page
+  visual acceptance when the route body has no matching board. Record that result as
+  shell pass / body blocked and create a separate page-body task for any real mismatch.
+- Dynamic API content, unavailable optional fields, and the platform-rendered WeChat
+  capsule may be exempted only when the structural and geometric comparison is
+  otherwise explicit. Never turn a data exemption into a visual pass for unrelated
+  body composition.
+
 ### 9. Windows Simulator Capture Fallback (2026-08-05)
 
 - When the Automator route, page-stack, and `systemInfo` calls work but the SDK screenshot call times out, Windows may use `scripts/devtools-simulator-capture.py` through `devtools-screenshot.mjs`.
