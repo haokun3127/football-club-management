@@ -1633,3 +1633,10 @@
 - 真实教练路由 `pages/coach/lesson-correction/index?id=event-cq-talent-secure-test-1-trn-0818` 首屏和底部视口均由 WeChatIDE MCP 重新取得严格 `375×812` 修复后截图；8 名学员的姓名、余额和 `±0` 调整状态继续来自真实 API，未复制 Figma 示例姓名或 `1.5课时`。
 - 修复两个实际视觉差异：更正列表标签从“课时调整”改为在线稿“系统差异”，原值余额增加删除线；底部视口确认保存按钮没有被固定教练 TabBar 遮挡。
 - C5.1 定向 Vitest `8/8`；WXML 编译成功；控制台过滤 `error|exception|fail|undefined|route is not defined|wx:else|appid missing` 无命中。证据详见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c5-1-lesson-correction-comparison.md`。
+
+## 2026-08-29 C6 比赛记录页在线 Figma 修复复验
+
+- 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:796`；在线截图保存为 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c6-online.png`，画板严格 `375×812`。
+- 真实教练路由 `pages/coach/match/index?id=event-cq-talent-secure-test-1-completed-match` 首屏和底部视口均由 WeChatIDE MCP 重新取得严格 `375×812` 修复后截图；比赛标题、球队、最终比分、事件列表和球员姓名继续来自真实 API，未复制 Figma 示例数据。
+- 修复两个实际视觉差异：Hero 胶囊从“比赛总览 / 事件记录”改为在线稿的“上半场 / 下半场”，因后端没有半场比分字段而显示“比分待同步”；事件卡移除在线稿不存在的“编辑比赛”额外按钮，编辑入口仍保留在活动工作台。
+- C6 定向 Vitest `10/10`；WXML 编译成功；控制台过滤 `error|exception|fail|undefined|route is not defined|wx:else|appid missing` 无命中。证据详见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c6-match-comparison.md`。

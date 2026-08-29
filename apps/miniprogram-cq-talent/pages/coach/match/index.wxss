@@ -66,13 +66,22 @@
 .match-periods__chip {
   display: flex;
   gap: 8rpx;
+  align-items: center;
   padding: 12rpx 24rpx;
   border: 0;
   border-radius: 999rpx;
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
-  font-size: 22rpx;
+  font-size: 24rpx;
   line-height: 1.2;
+}
+
+.match-periods__label {
+  font-weight: 400;
+}
+
+.match-periods__score {
+  font-weight: 700;
 }
 
 .match-card {
@@ -87,12 +96,6 @@
   align-items: center;
   justify-content: space-between;
   gap: 20rpx;
-}
-
-.match-card__actions {
-  display: flex;
-  flex: 0 0 auto;
-  gap: 12rpx;
 }
 
 .match-card__title {

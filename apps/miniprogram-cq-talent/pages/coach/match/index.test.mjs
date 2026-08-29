@@ -87,6 +87,10 @@ describe("coach match detail", () => {
     expect(page.data.timeline.map((item) => item.id)).toEqual(["event-18-a", "event-18-b", "event-42", "event-no-minute"]);
     expect(page.data.timeline[0]).toMatchObject({ studentName: "Athlete One" });
     expect(page.data.timeline[1]).not.toHaveProperty("assistStudentName");
+    expect(page.data.periodChips).toEqual([
+      { id: "first-half", periodLabel: "上半场", scoreLabel: "比分待同步" },
+      { id: "second-half", periodLabel: "下半场", scoreLabel: "比分待同步" },
+    ]);
   });
 
   it("keeps missing IDs, empty matches, and failed reads as safe states", async () => {
@@ -187,6 +191,8 @@ describe("coach match detail", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"submit-bar"');
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
+    expect(template).not.toContain("编辑比赛");
+    expect(template).not.toContain("openMatchEdit");
     expect(template).not.toContain("Phoenix");
     expect(template).not.toContain("Star team");
     expect(template).not.toContain("half-time");
@@ -206,7 +212,12 @@ describe("coach match detail", () => {
     expect(template).toContain('<status-view wx:if="{{state !== \'ready\' && state !== \'idle\'}}"');
     expect(template).not.toContain('class="match-hero__eyebrow"');
     expect(template).toContain('class="match-periods"');
+    expect(template).toContain('class="match-periods__label">{{item.periodLabel}}</view>');
+    expect(template).toContain('class="match-periods__score">{{item.scoreLabel}}</view>');
+    expect(template).not.toContain("比赛总览");
+    expect(template).not.toContain("事件记录");
     expect(template).toContain('class="match-card__action match-card__action--outlined"');
+    expect(template).toContain('bindtap="openMatchEventAdd"');
     expect(template).toContain('class="timeline__pill timeline__pill--{{item.tone}}"');
     expect(template).toContain("未提交草稿已保存");
     expect(styles).toMatch(/\.match-page\s*\{[^}]*background:\s*#f6f7f9/s);

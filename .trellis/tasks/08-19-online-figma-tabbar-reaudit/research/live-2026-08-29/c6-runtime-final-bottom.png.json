@@ -1,0 +1,14 @@
+{
+  "capturedOn": "2026-08-29",
+  "route": "/pages/coach/match/index?id=event-cq-talent-secure-test-1-completed-match",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 56213,
+    "sha256": "008CFA531E89E0D79BBB36B1C34A935921D73DF0ED9C82591F91028A8590D5CB"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot after wx.pageScrollTo",
+  "role": "coach",
+  "visualDisposition": "repaired-and-recaptured; event card and coach TabBar remain fully visible"
+}

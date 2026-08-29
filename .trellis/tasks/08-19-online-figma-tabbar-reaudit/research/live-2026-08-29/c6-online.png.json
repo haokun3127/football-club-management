@@ -1,0 +1,15 @@
+{
+  "capturedOn": "2026-08-29",
+  "figmaFileKey": "zZ6wKyOHKcO4UYXDd9jGwv",
+  "nodeId": "93:796",
+  "board": "C6 Match Entry",
+  "viewport": { "width": 375, "height": 812 },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 39555,
+    "sha256": "42DE583B0C4EC08D97C5C87B5DDCB02D56B65EC8B4CD1169D435493E9AD4E439"
+  },
+  "captureMethod": "figma-mcp get_screenshot",
+  "designContext": "figma-mcp get_design_context read before screenshot"
+}

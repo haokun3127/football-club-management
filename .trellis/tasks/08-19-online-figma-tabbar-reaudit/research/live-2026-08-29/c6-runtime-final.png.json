@@ -1,0 +1,14 @@
+{
+  "capturedOn": "2026-08-29",
+  "route": "/pages/coach/match/index?id=event-cq-talent-secure-test-1-completed-match",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 58788,
+    "sha256": "71468B25C0A475F7D100756C29C9F0282B039EE1531E3D6459D4FF873EF544F1"
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot",
+  "role": "coach",
+  "visualDisposition": "repaired-and-recaptured; real match data differs from Figma sample data"
+}

@@ -1,0 +1,10 @@
+# C6 Match Entry — 2026-08-29 live comparison
+
+- Online design source: Figma file `zZ6wKyOHKcO4UYXDd9jGwv`, node `93:796`; `get_design_context` and `get_screenshot` were read on 2026-08-29. The live board is `375×812` and contains a soft brand top bar, dark match hero, upper/lower-half score capsules, event card with one `+添加事件` action, event timeline, and the three-item coach TabBar.
+- Online screenshot: `c6-online.png` with sidecar `c6-online.png.json`.
+- Runtime route: `/pages/coach/match/index?id=event-cq-talent-secure-test-1-completed-match`, opened through WeChatIDE MCP with the real coach session. Final first and bottom viewport captures are `c6-runtime-final.png` and `c6-runtime-final-bottom.png`, both with sidecars.
+- Initial comparison found two implementation defects: the Hero capsules incorrectly said `比赛总览` and `事件记录` instead of `上半场` and `下半场`, and the event card exposed an extra `编辑比赛` action absent from the current board. The current API exposes only final match scores, not half-time scores, so half-time values remain `比分待同步` rather than copying Figma's sample `0-0`.
+- Repair: changed the period view model to two precomputed upper/lower-half items with truthful pending score labels; removed the extra match-page edit action while keeping edit reachable from the coach activity workbench. The match title, teams, final score, event timeline, and player names remain real API data.
+- Focused TDD: the updated C6 assertions failed first (`2` failures for period structure), then after the period repair the extra-action assertion failed (`1` failure), and finally passed after the minimal removal (`10/10`).
+- Final runtime: the single `+添加事件` action, period capsules, event list, and coach TabBar are visible; bottom viewport has no overlap. Simulator console filtering for `error|exception|fail|undefined|route is not defined|wx:else|appid missing` returned no hits.
+- Comparison levels: (1) online Figma read — passed; (2) route-verified runtime screenshots — passed; (3) visual comparison — repaired-and-recaptured. Final score, roster, event count, and unavailable half-time values are explicit API/data exemptions.

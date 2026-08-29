@@ -16,7 +16,7 @@ type TimelineItem = {
   createdAt?: string;
 };
 
-type PeriodChip = { id: "summary" | "timeline"; label: string };
+type PeriodChip = { id: "first-half" | "second-half"; periodLabel: string; scoreLabel: string };
 
 interface MatchPageData {
   state: LoadState;
@@ -164,10 +164,6 @@ Page<MatchPageData>({
     if (!this.data.eventId || !this.data.canAddEvent) return;
     openPage(`/pages/coach/match-event-add/index?eventId=${this.data.eventId}`);
   },
-  openMatchEdit() {
-    if (!this.data.eventId || !this.data.hasMatch) return;
-    openPage(`/pages/coach/match-edit/index?eventId=${this.data.eventId}`);
-  },
   continueLocalDraft() {
     if (!this.data.eventId || !this.data.hasLocalDraftOverlay || this.data.localDraftNavigationLocked) return;
     this.setData({ localDraftNavigationLocked: true });
@@ -242,8 +238,8 @@ function toTimeline(detail: CoachMatchDetail): TimelineItem[] {
 
 function toPeriodChips(): PeriodChip[] {
   return [
-    { id: "summary", label: "比赛总览" },
-    { id: "timeline", label: "事件记录" },
+    { id: "first-half", periodLabel: "上半场", scoreLabel: "比分待同步" },
+    { id: "second-half", periodLabel: "下半场", scoreLabel: "比分待同步" },
   ];
 }
 

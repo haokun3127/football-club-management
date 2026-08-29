@@ -14,17 +14,17 @@
         </view>
         <view wx:else class="match-hero__score match-hero__score--pending">{{scoreLabel}}</view>
         <view class="match-periods">
-          <view wx:for="{{periodChips}}" wx:key="id" class="match-periods__chip">{{item.label}}</view>
+          <view wx:for="{{periodChips}}" wx:key="id" class="match-periods__chip">
+            <view class="match-periods__label">{{item.periodLabel}}</view>
+            <view class="match-periods__score">{{item.scoreLabel}}</view>
+          </view>
         </view>
       </view>
 
       <view class="match-card">
         <view class="match-card__header">
           <view class="match-card__title">比赛事件</view>
-          <view wx:if="{{canAddEvent}}" class="match-card__actions">
-            <view class="match-card__action match-card__action--outlined" bindtap="openMatchEdit">编辑比赛</view>
-            <view class="match-card__action match-card__action--outlined" bindtap="openMatchEventAdd">+ 添加事件</view>
-          </view>
+          <view wx:if="{{canAddEvent}}" class="match-card__action match-card__action--outlined" bindtap="openMatchEventAdd">+ 添加事件</view>
         </view>
         <view wx:if="{{hasTimeline}}" class="timeline">
           <view wx:for="{{timeline}}" wx:key="id" class="timeline__item">
