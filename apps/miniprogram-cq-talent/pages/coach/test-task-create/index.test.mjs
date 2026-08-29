@@ -33,6 +33,7 @@ globalThis.Page = (definition) => {
 await import("./index.ts");
 
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
+const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 
 function createPageInstance() {
   const instance = { ...pageDefinition, data: { ...pageDefinition.data } };
@@ -106,5 +107,9 @@ describe("coach test-task create", () => {
     expect(template).toContain('mode="date"');
     expect(template).toContain('bindtap="submit"');
     expect(template).not.toMatch(/\{\{item\.(?:map|filter|slice|indexOf)/);
+  });
+
+  it("keeps the title at the Figma top-nav offset", () => {
+    expect(styles).toMatch(/\.page-nav__title\s*\{[^}]*margin-left:\s*8rpx;/s);
   });
 });

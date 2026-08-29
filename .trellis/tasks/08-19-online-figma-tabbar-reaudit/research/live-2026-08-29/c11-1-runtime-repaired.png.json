@@ -1,0 +1,9 @@
+{
+  "capturedAt": "2026-08-29T10:18:00+08:00",
+  "route": "/pages/coach/test-task-create/index",
+  "viewport": { "width": 375, "height": 812 },
+  "rawPng": { "width": 375, "height": 812 },
+  "captureMethod": "wechatide-mcp simulator_screenshot",
+  "consoleFilter": "error|exception|fail|wx:else|route is not defined|appid missing",
+  "consoleMatches": 0
+}
