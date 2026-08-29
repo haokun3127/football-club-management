@@ -30,6 +30,8 @@ globalThis.Page = (definition) => {
 
 await import("./index.ts");
 
+const pageConfig = readFileSync(new URL("./index.json", import.meta.url), "utf8");
+
 function createPageInstance() {
   const instance = {
     ...pageDefinition,
@@ -99,5 +101,8 @@ describe("parent match history", () => {
   it("keeps the WXML free of JavaScript array method calls", () => {
     const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
+  });
+  it("uses the custom navigation shell without a duplicate native bar", () => {
+    expect(pageConfig).toContain('"navigationStyle": "custom"');
   });
 });
