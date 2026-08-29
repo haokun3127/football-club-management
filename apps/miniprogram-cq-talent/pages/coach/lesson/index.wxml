@@ -1,12 +1,12 @@
 <view class="c5">
-  <app-header theme="soft" title="课时确认" title-align="left" show-back />
+  <app-header theme="soft" title="销课处理" title-align="left" show-back />
 
   <view class="c5-body">
-    <status-view wx:if="{{state !== 'ready' && state !== 'idle'}}" state="{{state}}" title="课时确认" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
+    <status-view wx:if="{{state !== 'ready' && state !== 'idle'}}" state="{{state}}" title="销课处理" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready' && hasRoster}}">
       <view class="c5-hero">
-        <view class="c5-hero__title">{{eventTitle}}</view>
+        <view class="c5-hero__title">待处理销课</view>
         <view class="c5-hero__meta-group">
           <view class="c5-hero__meta c5-hero__meta--primary" wx:if="{{hasEventTeam}}">{{eventTeam}} · {{eventDate}}</view>
           <view class="c5-hero__meta c5-hero__meta--primary" wx:else>{{eventDate}}</view>
@@ -17,8 +17,8 @@
 
       <view class="c5-list">
         <view class="c5-list__head">
-          <view class="c5-list__title">学员课时记录</view>
-          <view class="c5-list__count">共 {{rosterCount}} 名学员</view>
+          <view class="c5-list__title">待确认学员</view>
+          <view class="c5-list__count">{{rosterCount}} 人待处理</view>
         </view>
         <view wx:for="{{roster}}" wx:key="studentId" class="c5-row">
           <view class="c5-row__avatar">{{item.avatarLetter}}</view>
