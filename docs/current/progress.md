@@ -1767,3 +1767,9 @@
 - 在线唯一 Figma 基准仍为 `zZ6wKyOHKcO4UYXDd9jGwv / 1040:9`；本批没有修改设计稿，按已确认的“上球场、下全部球员、拖拽上下场”实现。
 - `pages/coach/tactical-board/` 现在用同一 `movable-area` 承载球场与名单：全部 roster 始终展示；首发拖到球场下方会转为替补，替补拖回球场会转为首发并保存归一化坐标；点选换位作为拖拽失败时的辅助操作仍保留。WXML 未新增 JS 方法调用。
 - 验证：定向 Vitest `8/8`、小程序 `tsc --noEmit`、WXML/WXSS 编译和限定路径 `git diff --check` 通过；真实教练运行态保存后重新加载同一比赛，`dirty=false` 且 8 名球员状态读回；控制台错误过滤无命中。严格 `375×812` 截图：`tmp/c7-final-runtime-20260829.png`。截图证明页面几何与真实数据展示，不把自动化调用页面方法等同于人工触摸手势验收。
+
+## 2026-08-29 C13/C14 微信开发者工具白屏恢复复验
+
+- 复现过的错误为共享组件 `components/radar-canvas/index` 被运行时解析为 `wx://not-found`，导致 C13/C14 白屏；源码组件只有 TypeScript 是项目既定形态，不能手工补写或提交伪造的 `index.js`。通过 WeChatIDE MCP 重新执行“打开项目→打开精确路由→等待 `view` 挂载→原始 PNG 截图”后，C13 与 C14 均恢复正常渲染。
+- 在线稿重新读取：C13 `93:1080`（`375×908`）与 C14 `93:1106`（`375×1258`），未发现需要回写 Figma 的新变化。运行证据：`tmp/goal-c13-after-refresh-20260829.png`、`tmp/goal-c14-after-refresh-20260829.png` 及对应 sidecar，均严格 `375×812`。
+- C13/C14 真实请求均返回 `200`；控制台过滤 `error|exception|fail|undefined|wx:else|route is not defined|appid missing|not-found` 无命中。当前结果证明 MCP 强制重新编译能够恢复旧惰性编译依赖状态；未修改业务代码、API、角色会话或数据。
