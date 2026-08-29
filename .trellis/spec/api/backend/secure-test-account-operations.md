@@ -143,6 +143,7 @@ This checks the two guardian students' semantic operational-profile presence whi
 
 - A current demo set contains calendar records in each of the current and preceding two calendar weeks, plus upcoming training/match records for continued preview.
 - A current demo set contains five completed training sessions across those three calendar weeks. Each one has all eight team participants and a canonical `lesson_credit_ledger` debit per participant, so C5 history is populated by database-backed records rather than client-side placeholders.
+- The current ledger shape is one opening credit plus five canonical training debits per roster student: 6 rows per student and 48 rows per slot. A slot therefore has 40 completed-training debit rows; read-only production audits must enumerate the suffixed IDs `-debit-1` through `-debit-5`, not the retired unsuffixed `-debit` IDs.
 - Every calendar date is derived from the invocation timestamp, never hard-coded to a historical week.
 - User-facing canonical data (account, parent, coach, team, student, activity, assessment, match, tactical-board, private-lesson, insurance, and communication copy) is Chinese.
 - Storage/API enum values remain their contract values (for example `friendly`, `league`, participant status); the mini-program display boundary maps any visible enum to Chinese rather than changing the API contract.
@@ -165,6 +166,7 @@ This checks the two guardian students' semantic operational-profile presence whi
 - Good: a re-run on Wednesday, August 19, 2026 keeps events in the weeks beginning August 3, August 10, and August 17, while still providing upcoming records.
 - Base: an unchanged current set returns `already_present` and does not duplicate data.
 - Bad: considering five old event rows sufficient forever, or writing `友谊赛` into a `match_type` field whose contract is the enum `friendly`.
+- Bad: leaving a production audit helper on the retired one-debit-per-student contract; it reports a false database failure even when the rolling five-session import and BFF readback are correct.
 
 ### 6. Tests Required
 
