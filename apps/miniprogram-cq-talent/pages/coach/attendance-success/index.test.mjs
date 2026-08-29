@@ -147,4 +147,9 @@ describe("coach attendance success", () => {
     expect(controller).not.toContain("venue:");
     expect(controller).not.toContain("hasVenue:");
   });
+
+  it("uses the live Figma white outline check asset inside the success circle", () => {
+    expect(template).toContain('<image class="hero__check" src="/assets/icons/c4-1-check.svg" mode="aspectFit" />');
+    expect(template).not.toContain('<view class="hero__circle">✓</view>');
+  });
 });

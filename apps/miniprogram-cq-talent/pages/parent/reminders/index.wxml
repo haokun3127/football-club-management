@@ -1,6 +1,6 @@
 <view class="reminders-page">
   <view class="reminders-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="reminders-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /><view>返回</view></view>
+    <view class="reminders-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
     <view class="reminders-nav__title">提醒中心</view>
     <view wx:if="{{unreadCount}}" class="reminders-nav__read" bindtap="markAllRead">全部已读</view>
   </view>

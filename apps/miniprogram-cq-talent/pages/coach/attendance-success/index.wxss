@@ -32,6 +32,12 @@
   font-weight: 700;
 }
 
+.hero__check {
+  display: block;
+  width: 80rpx;
+  height: 80rpx;
+}
+
 .hero__title {
   color: var(--color-text);
   font-size: 40rpx;

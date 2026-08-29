@@ -7,7 +7,7 @@
 
   <view class="success-page__body" wx:elif="{{state === 'ready'}}">
     <view class="hero">
-      <view class="hero__circle">✓</view>
+      <view class="hero__circle"><image class="hero__check" src="/assets/icons/c4-1-check.svg" mode="aspectFit" /></view>
       <view class="hero__title">出勤记录已提交</view>
       <view class="hero__subtitle">{{summary.present}}名已到场，{{summary.absent}}名未到场</view>
     </view>

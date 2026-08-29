@@ -108,4 +108,9 @@ describe("parent reminders", () => {
       expect.objectContaining({ id: "training", iconSrc: "/assets/icons/tab-calendar.svg", iconBg: "#f3f4f6", dotColor: "#a80f1b" }),
     ]);
   });
+
+  it("matches the live Figma top navigation without a visible back label", () => {
+    expect(template).not.toContain('<view>返回</view>');
+    expect(template).toContain('<image src="/assets/icons/chevron-left.svg" mode="aspectFit" />');
+  });
 });
