@@ -160,9 +160,6 @@ describe("coach team ability overview", () => {
     expect(template).toMatch(/<radar-canvas[^>]*width="640rpx"[^>]*height="640rpx"/);
     expect(template).toContain("assessmentPeriod");
     expect(template).toContain("rankingMessage");
-    expect(template).toContain('class="dim-row__track"');
-    expect(template).toContain('style="width: {{item.progressStyle}}"');
-    expect(template).toContain('class="dim-row__summary"');
     expect(template).toContain('wx:if="{{showOverall}}"');
     expect(template).toContain('style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"');
     const exportControl = template.match(/<view[^>]*class="ability-nav__export"[^>]*>[\s\S]*?<\/view>/)?.[0] ?? "";
@@ -176,13 +173,22 @@ describe("coach team ability overview", () => {
     expect(stylesheet).toMatch(/\.ability-hero__canvas\s*\{[^}]*width:\s*640rpx[^}]*height:\s*640rpx[^}]*flex:\s*0\s+0\s+640rpx/s);
     expect(stylesheet).toMatch(/\.ability-hero__overall\s*\{[^}]*font-size:\s*96rpx[^}]*text-align:\s*center/s);
     expect(stylesheet).not.toMatch(/\.ability-hero__overall\s*\{[^}]*position:\s*absolute/s);
-    expect(stylesheet).toMatch(/\.dim-row__track\s*\{[^}]*height:\s*12rpx[^}]*border-radius:\s*6rpx/s);
-    expect(stylesheet).toMatch(/\.dim-row__fill\s*\{[^}]*background:\s*#a80f1b/s);
-    expect(stylesheet).toMatch(/\.dim-row__summary\s*\{[^}]*font-size:\s*22rpx/s);
     expect(stylesheet).toMatch(/\.ability-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).toMatch(/\.ability-nav__title\s*\{[^}]*font-size:\s*36rpx[^}]*text-align:\s*left/s);
     expect(stylesheet).toMatch(/\.ability-nav__back\s*\{[^}]*width:\s*48rpx[^}]*height:\s*64rpx[^}]*flex:\s*0\s+0\s+48rpx/s);
     expect(stylesheet).toMatch(/\.ability-nav\s*\{[^}]*gap:\s*0/s);
     expect(stylesheet).toMatch(/\.ability-nav__export\s*\{[^}]*display:\s*flex[^}]*width:\s*104rpx[^}]*height:\s*58rpx/s);
+  });
+
+  it("uses the stacked progress-bar dimension rows from the live Figma board", () => {
+    expect(template).toContain('class="dim-row__head"');
+    expect(template).toContain('class="dim-row__track"');
+    expect(template).toContain('style="width: {{item.progressStyle}}"');
+    expect(template).toContain('class="dim-row__summary"');
+    expect(template).not.toContain('class="dim-row__stats"');
+    expect(stylesheet).toMatch(/\.dim-row\s*\{[^}]*display:\s*flex[^}]*flex-direction:\s*column[^}]*gap:\s*12rpx/s);
+    expect(stylesheet).toMatch(/\.dim-row__track\s*\{[^}]*height:\s*12rpx[^}]*border-radius:\s*6rpx/s);
+    expect(stylesheet).toMatch(/\.dim-row__fill\s*\{[^}]*background:\s*#a80f1b/s);
+    expect(stylesheet).toMatch(/\.dim-row__summary\s*\{[^}]*font-size:\s*22rpx/s);
   });
 });
