@@ -2974,7 +2974,7 @@ function appClientBffPath(request: FastifyRequest): string | undefined {
 }
 
 function isMatchEventType(value: string): value is MatchEventType {
-  return ["goal", "assist", "save", "tackle", "yellow_card", "red_card", "penalty", "own_goal"].includes(value);
+  return ["goal", "assist", "save", "tackle", "foul", "yellow_card", "red_card", "penalty", "own_goal"].includes(value);
 }
 
 function enumerateDateRange(from: string, to: string): string[] | null {

@@ -253,6 +253,7 @@ function matchEventTone(type: CoachMatchDetail["events"][number]["type"]): Timel
       return "assist";
     case "save":
     case "tackle":
+    case "foul":
       return "defense";
     case "yellow_card":
     case "red_card":
@@ -278,6 +279,7 @@ function matchEventLabel(type: CoachMatchDetail["events"][number]["type"]) {
     assist: "助攻",
     save: "扑救",
     tackle: "抢断",
+    foul: "犯规",
     yellow_card: "黄牌",
     red_card: "红牌",
     penalty: "点球",

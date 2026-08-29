@@ -52,6 +52,7 @@ pnpm install --frozen-lockfile
 | `WECHAT_MINIPROGRAM_APP_ID` / `WECHAT_MINIPROGRAM_APP_SECRET` | 正式微信登录需要 | — | 仅保存在服务器私有运行时环境。 |
 | `SECURE_CQ_TALENT_TEST_PHONE_1` 至 `_7` | 受控测试账号导入需要 | — | 七个独立双角色测试账号仅在运行时读取，绝不记录值。 |
 | `SECURE_CQ_TALENT_TEST_ACCOUNTS_BACKUP_ATTESTED` | confirmed import 需要 | — | 仅在完成受限备份后短时设置为规定证明值。 |
+| `CQ_TALENT_MATCH_EVENT_TYPES` | 可选 | 空 | 以英文契约值逗号分隔，追加小程序可录入的比赛事件类型；只在服务器私有运行时配置，界面统一显示中文。 |
 
 SQLite 文件所在目录必须满足：
 

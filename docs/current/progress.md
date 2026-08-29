@@ -1802,3 +1802,9 @@
 - 家长端原有“周日历→展开月历→前后月份→选日收起”和教练端同等流程均保留；没有改 API、角色会话或测试数据，家长 TabBar 顺序仍为“日程 / 成长 / 发现 / 我的孩子”。
 - 先红后绿：家长月历与教练日程定向 Vitest `22/22`；目标 WXML/WXSS 均通过 WeChatIDE MCP 编译，`git diff --check` 通过。
 - 真实教练运行态截图：`tmp/goal-c1-calendar-arrow-fixed.png`（折叠态）与 `tmp/goal-c1-calendar-arrow-fixed-expanded.png`（展开态），WeChatIDE MCP 返回严格 `375×812`。本批未新增教练端在线月历画板；代码复用家长在线月历结构，后续若要把教练月历单独纳入 Figma，需新增 C1 月历变体后再做像素复验。
+## 2026-08-29 教练比赛事件能力策略补齐（C6/C6.1）
+
+- C6/C6.1 已支持“犯规”事件，domain、API schema、路由校验、小程序类型/标签/草稿和家长端比赛事件展示已同步；旧数据中的 `interception` 读取时兼容归一为“抢断”。
+- 线上只读能力仍返回旧四项（进球、助攻、扑救、抢断），根因是生产 `match_event_types` 策略没有开放新增类型，不是页面入口缺失。新增受控运行时变量 `CQ_TALENT_MATCH_EVENT_TYPES`，用于在不改测试 seed 契约的前提下追加已支持事件；变量值只放服务器私有环境，不入库。
+- 本地验证：API typecheck 通过；API 全量 `117/117` 通过；开启受控事件变量后能力读回包含犯规、黄牌、红牌、乌龙；`git diff --check` 通过。WeChatIDE MCP 已取得 C6 与 C6.1 严格 `375×812` 运行截图 `tmp/goal-c6-after-foul-code.png`、`tmp/goal-c6-1-after-foul-code.png`。
+- 仍待生产闭环：备份后部署代码、私有配置并重启 API；用真实教练会话确认 C6.1 显示“犯规”，再保存一条犯规并经 C6/API 重启回读。C7 战术板和双端日历/出勤等改版不与本批混提。

@@ -179,6 +179,7 @@ function matchEventLabel(type: NonNullable<ActivityDetail["matchEvents"]>[number
     assist: "助攻",
     save: "扑救",
     tackle: "抢断",
+    foul: "犯规",
     yellow_card: "黄牌",
     red_card: "红牌",
     penalty: "点球",
@@ -190,7 +191,7 @@ function matchEventLabel(type: NonNullable<ActivityDetail["matchEvents"]>[number
 function matchEventTone(type: NonNullable<ActivityDetail["matchEvents"]>[number]["type"]): MatchEventView["tone"] {
   if (type === "goal" || type === "penalty" || type === "own_goal") return "score";
   if (type === "assist") return "assist";
-  if (type === "save" || type === "tackle") return "defense";
+  if (type === "save" || type === "tackle" || type === "foul") return "defense";
   if (type === "yellow_card" || type === "red_card") return "discipline";
   return "neutral";
 }

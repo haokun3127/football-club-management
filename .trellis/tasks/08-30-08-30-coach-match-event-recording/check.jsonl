@@ -1,0 +1,3 @@
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"检查 domain/API/小程序枚举和行为是否完整一致。"}
+{"file":".trellis/spec/api/backend/index.md","reason":"检查真实 API 契约、错误处理和生产边界。"}
+{"file":".trellis/spec/domain/backend/index.md","reason":"检查事件类型、服务逻辑和旧数据兼容。"}

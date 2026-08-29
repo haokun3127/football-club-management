@@ -566,8 +566,8 @@ function normalizeActivityDetail(raw: Record<string, unknown>): ActivityDetail {
   const matchEvents = matchEventsSource.flatMap((item) => {
     const id = stringOrUndefined(item.id);
     const studentId = stringOrUndefined(item.studentId);
-    const type = stringOrUndefined(item.type);
-    if (!id || !studentId || !isCoachMatchEventType(type)) return [];
+    const type = normalizeCoachMatchEventType(item.type);
+    if (!id || !studentId || !type) return [];
     return [{
       id,
       type,
@@ -930,8 +930,8 @@ function normalizeCoachMatchDetail(raw: Record<string, unknown>): CoachMatchDeta
   const events = eventsSource.flatMap((item) => {
     const id = stringOrUndefined(item.id);
     const studentId = stringOrUndefined(item.studentId);
-    const type = stringOrUndefined(item.type);
-    if (!id || !studentId || !isCoachMatchEventType(type)) return [];
+    const type = normalizeCoachMatchEventType(item.type);
+    if (!id || !studentId || !type) return [];
     return [{
       id,
       type,
@@ -966,10 +966,17 @@ function isCoachMatchEventType(value: string | undefined): value is CoachMatchPl
     || value === "assist"
     || value === "save"
     || value === "tackle"
+    || value === "foul"
     || value === "yellow_card"
     || value === "red_card"
     || value === "penalty"
     || value === "own_goal";
+}
+
+function normalizeCoachMatchEventType(value: unknown): CoachMatchPlayerEvent["type"] | undefined {
+  const raw = typeof value === "string" ? value : undefined;
+  if (raw === "interception") return "tackle";
+  return isCoachMatchEventType(raw) ? raw : undefined;
 }
 
 function normalizeLessonConfirmation(raw: Record<string, unknown>): CoachLessonConfirmation {

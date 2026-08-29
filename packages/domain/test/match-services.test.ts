@@ -18,6 +18,38 @@ function metric(id: string, code: string) {
 }
 
 describe("createMatchService", () => {
+  it("records a foul without inventing a player ability metric", async () => {
+    const saved: Array<{ event: { type: string; linkedMetricId?: string }; metricRecords: unknown[] }> = [];
+    const service = createMatchService({
+      clock: { now: () => now },
+      ids: { next: (prefix = "id") => `${prefix}-foul` },
+      store: {
+        saveMatch: async () => {},
+        saveRoster: async () => {},
+        saveEvent: async () => {},
+        saveNote: async () => {},
+        saveMetricRecord: async () => {},
+        saveEventBundle: async (bundle) => saved.push(bundle),
+      },
+      catalog: { findMetricById: async () => null, findMetricByCode: async () => null },
+    });
+
+    const result = await service.recordMatchEvent({
+      clubId: "club-chongqing-talent",
+      eventId: "event-match-1",
+      matchId: "match-1",
+      studentId: "student-1",
+      type: "foul",
+      minute: 36,
+      note: "战术犯规",
+    });
+
+    expect(result.event).toMatchObject({ type: "foul", minute: 36 });
+    expect(result.metricRecords).toEqual([]);
+    expect(saved).toHaveLength(1);
+    expect(saved[0]?.event.linkedMetricId).toBeUndefined();
+  });
+
   it("builds one match-event bundle before one atomic store save", async () => {
     const saved = { bundles: [] as Array<{ event: { id: string; type: string }; metricRecords: Array<{ id: string }> }> };
     const catalog: MatchCatalogLookup = {

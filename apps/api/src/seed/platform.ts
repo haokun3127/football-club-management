@@ -1,5 +1,27 @@
+import type { MatchEventType } from "@football-club/domain";
 import type { SeedData } from "./types.js";
 import { chongqingTalentClubId as clubId, seedNow as now } from "./types.js";
+
+const supportedMatchEventTypes = [
+  "goal",
+  "assist",
+  "save",
+  "tackle",
+  "foul",
+  "yellow_card",
+  "red_card",
+  "penalty",
+  "own_goal",
+] as const satisfies readonly MatchEventType[];
+
+function configuredMatchEventTypes(): MatchEventType[] {
+  const defaults: MatchEventType[] = ["goal", "assist", "save", "tackle"];
+  const runtimeTypes = (process.env.CQ_TALENT_MATCH_EVENT_TYPES ?? "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter((value): value is MatchEventType => (supportedMatchEventTypes as readonly string[]).includes(value));
+  return Array.from(new Set<MatchEventType>([...defaults, ...runtimeTypes]));
+}
 
 export function createPlatformSeed(): Pick<
   SeedData,
@@ -109,7 +131,7 @@ export function createPlatformSeed(): Pick<
         id: "policy-match-event-types",
         clubId,
         key: "match_event_types",
-        value: ["goal", "assist", "save", "tackle"],
+        value: configuredMatchEventTypes(),
         version: "1.0.0",
         active: true,
         createdAt: now,

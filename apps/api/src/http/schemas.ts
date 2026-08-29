@@ -1044,7 +1044,7 @@ export const schemas = {
       required: ["studentId", "type"],
       properties: {
         studentId: { type: "string", minLength: 1 },
-        type: { type: "string", enum: ["goal", "assist", "save", "tackle", "yellow_card", "red_card", "penalty", "own_goal"] },
+        type: { type: "string", enum: ["goal", "assist", "save", "tackle", "foul", "yellow_card", "red_card", "penalty", "own_goal"] },
         minute: { type: "integer", minimum: 0, maximum: 300 },
         note: { type: "string", maxLength: 500 },
       },
@@ -1099,7 +1099,7 @@ export const schemas = {
             required: ["studentId", "type"],
             properties: {
               studentId: { type: "string", minLength: 1 },
-              type: { type: "string", enum: ["goal", "assist", "save", "tackle", "yellow_card", "red_card", "penalty", "own_goal"] },
+              type: { type: "string", enum: ["goal", "assist", "save", "tackle", "foul", "yellow_card", "red_card", "penalty", "own_goal"] },
               minute: { type: "number" },
               note: { type: "string" },
               linkedMetricId: { type: "string", minLength: 1 },

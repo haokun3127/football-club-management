@@ -1,0 +1,4 @@
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"比赛事件类型跨 domain、API 和小程序，必须同步契约与验证。"}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"优先复用现有比赛编辑、事件草稿和导航实现，避免重复逻辑。"}
+{"file":".trellis/spec/api/backend/index.md","reason":"比赛事件 API schema、路由校验和真实数据边界。"}
+{"file":".trellis/spec/domain/backend/index.md","reason":"比赛事件领域类型及服务层约束。"}

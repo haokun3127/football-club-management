@@ -88,6 +88,7 @@ const eventMetricCodeMap: Record<MatchEventType, string | null> = {
   assist: "match_assists",
   save: null,
   tackle: null,
+  foul: null,
   yellow_card: null,
   red_card: null,
   penalty: null,

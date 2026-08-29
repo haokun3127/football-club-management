@@ -289,6 +289,7 @@ function eventTypeLabel(value: CoachMatchPlayerEvent["type"]) {
     assist: "助攻",
     save: "扑救",
     tackle: "抢断",
+    foul: "犯规",
     yellow_card: "黄牌",
     red_card: "红牌",
     penalty: "点球",

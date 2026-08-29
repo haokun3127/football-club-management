@@ -246,7 +246,10 @@ describe("coach match detail request boundary", () => {
           event: { id: "event-match-1", type: "match", title: "Real match", startsAt: "2026-08-13T09:00:00.000Z", endsAt: "2026-08-13T10:00:00.000Z", status: "completed" },
           roster: [{ studentId: "student-1", name: "Athlete One", status: "present" }],
           match: { id: "match-1", homeScore: 2, awayScore: 1, status: "completed" },
-          events: [{ id: "match-event-1", type: "goal", studentId: "student-1", minute: 18, createdAt: "2026-08-13T09:18:00.000Z" }],
+          events: [
+            { id: "match-event-1", type: "goal", studentId: "student-1", minute: 18, createdAt: "2026-08-13T09:18:00.000Z" },
+            { id: "match-event-2", type: "interception", studentId: "student-1", minute: 24, createdAt: "2026-08-13T09:24:00.000Z" },
+          ],
         },
       });
     };
@@ -260,6 +263,7 @@ describe("coach match detail request boundary", () => {
       expect(detail).toMatchObject({ event: { id: "event-match-1" }, match: { id: "match-1" } });
       expect(detail).not.toHaveProperty("summary");
       expect(detail.events[0]).not.toHaveProperty("assistStudentId");
+      expect(detail.events[1]).toMatchObject({ id: "match-event-2", type: "tackle" });
     } finally {
       globalThis.wx.request = originalRequest;
     }

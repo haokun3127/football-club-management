@@ -5,6 +5,7 @@ const MATCH_EVENT_TYPES = [
   "assist",
   "save",
   "tackle",
+  "foul",
   "yellow_card",
   "red_card",
   "penalty",

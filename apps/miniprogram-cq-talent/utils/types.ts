@@ -299,7 +299,7 @@ export interface CoachLessonConfirmation {
 }
 
 export interface CoachMatchPlayerEvent {
-  type: "goal" | "assist" | "save" | "tackle" | "yellow_card" | "red_card" | "penalty" | "own_goal";
+  type: "goal" | "assist" | "save" | "tackle" | "foul" | "yellow_card" | "red_card" | "penalty" | "own_goal";
   studentId: string;
   minute?: number;
   assistStudentId?: string;

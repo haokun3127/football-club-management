@@ -3,7 +3,7 @@ import type { ClubScoped } from "./clubs.js";
 
 export type MatchType = "internal" | "friendly" | "league" | "cup";
 export type MatchStatus = "scheduled" | "completed" | "cancelled";
-export type MatchEventType = "goal" | "assist" | "save" | "tackle" | "yellow_card" | "red_card" | "penalty" | "own_goal";
+export type MatchEventType = "goal" | "assist" | "save" | "tackle" | "foul" | "yellow_card" | "red_card" | "penalty" | "own_goal";
 
 export interface Match extends AuditFields, ClubScoped {
   id: EntityId;
