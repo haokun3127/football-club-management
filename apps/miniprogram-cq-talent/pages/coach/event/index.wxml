@@ -30,9 +30,11 @@
       </view>
       <view class="roster-grid">
         <view wx:for="{{rosterRows}}" wx:key="studentId" class="roster-person" data-index="{{index}}" bindtap="toggleAttendance">
-          <view class="roster-avatar {{item.present ? 'roster-avatar--present' : 'roster-avatar--absent'}}">{{item.initial}}</view>
+          <view class="roster-avatar {{item.present ? 'roster-avatar--present' : 'roster-avatar--absent'}}">
+            <image wx:if="{{item.present}}" class="roster-avatar__check" src="/assets/icons/c4-1-check.svg" mode="aspectFit" />
+            <view wx:else class="roster-avatar__initial">{{item.initial}}</view>
+          </view>
           <view class="roster-name">{{item.name}}</view>
-          <view class="roster-status {{item.present ? 'roster-status--present' : 'roster-status--absent'}}">{{item.statusLabel}}</view>
         </view>
       </view>
       <view wx:if="{{attendanceSaving}}" class="subtitle">正在保存出勤...</view>

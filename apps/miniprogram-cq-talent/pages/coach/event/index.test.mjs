@@ -161,6 +161,14 @@ describe("coach activity workbench", () => {
     expect(template).toContain("{{item.name}}");
   });
 
+  it("uses a binary check avatar for attendance and keeps names readable below it", () => {
+    expect(template).toContain('<image wx:if="{{item.present}}" class="roster-avatar__check" src="/assets/icons/c4-1-check.svg" mode="aspectFit" />');
+    expect(template).toContain('<view wx:else class="roster-avatar__initial">{{item.initial}}</view>');
+    expect(template).not.toContain('class="roster-status"');
+    expect(stylesheet).toMatch(/\.roster-avatar__check\s*\{[^}]*width:\s*40rpx[^}]*height:\s*40rpx/s);
+    expect(stylesheet).toMatch(/\.roster-name\s*\{[^}]*white-space:\s*nowrap/s);
+  });
+
   it("shows finish action and countdown for in-progress events", async () => {
     mocks.getCoachWorkbench.mockResolvedValue({
       ...trainingWorkbench,

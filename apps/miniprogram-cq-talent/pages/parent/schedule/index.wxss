@@ -54,5 +54,5 @@
 
 /* The Figma dropdown control sits inside the week strip, not below it. */
 .week-nav__expand { top: 50%; bottom: auto; height: 32rpx; transform: translateY(-50%); }
-.week-nav__expand-icon { display: block; width: 20rpx; height: 20rpx; border: 0; transform: rotate(90deg); }
-.month-calendar__collapse-icon { display: block; width: 20rpx; height: 20rpx; border: 0; transform: rotate(-90deg); }
+.week-nav__expand-icon { display: block; width: 20rpx; height: 20rpx; border: 0; transform: none; }
+.month-calendar__collapse-icon { display: block; width: 20rpx; height: 20rpx; border: 0; transform: rotate(180deg); }

@@ -199,7 +199,8 @@ describe("coach schedule home", () => {
     expect(template).toContain('<block wx:if="{{viewMode === \'month\'}}">');
     expect(template).toContain('class="c1-month-calendar"');
     expect(template).toMatch(/(?:bindtap|catchtap)="expandMonthPicker"/);
-    expect(template).toContain('<image class="c1-dates__expand-icon" src="/assets/icons/chevron-right.svg" mode="aspectFit" />');
+    expect(template).toContain('<image class="c1-dates__expand-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" />');
+    expect(template).toContain('<image class="c1-month-calendar__collapse-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" />');
     expect(stylesheet).toMatch(/\.c1-dates\s*\{[^}]*padding:\s*24rpx\s+0/s);
     expect(stylesheet).toMatch(/\.c1-dates__arrow\s*\{[^}]*flex:\s*0\s+0\s+44rpx/s);
     expect(stylesheet).toMatch(/\.c1-dates__arrow\s+image\s*\{[^}]*width:\s*28rpx[^}]*height:\s*28rpx/s);
@@ -209,7 +210,7 @@ describe("coach schedule home", () => {
     expect(expand).toContain("bottom: auto");
     expect(expand).toContain("transform: translateY(-50%)");
     expect(expand).not.toContain("bottom: -14rpx");
-    expect(stylesheet).toMatch(/\.c1-dates__expand-icon\s*\{[^}]*width:\s*20rpx[^}]*height:\s*20rpx[^}]*transform:\s*rotate\(90deg\)/s);
+    expect(stylesheet).toMatch(/\.c1-dates__expand-icon\s*\{[^}]*width:\s*20rpx[^}]*height:\s*20rpx[^}]*transform:\s*none/s);
   });
 
   it("renders the live C1 team selector before the hero and removes the legacy summary rail", async () => {

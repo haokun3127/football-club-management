@@ -43,7 +43,7 @@
 .c1-empty { padding: 64rpx 32rpx; border-radius: 24rpx; background: #ffffff; color: #8a8f99; font-size: 26rpx; text-align: center; }
 
 .c1-dates__expand { position: absolute; right: 12rpx; bottom: -14rpx; display: flex; align-items: center; justify-content: center; width: 48rpx; height: 28rpx; border-radius: 16rpx; background: #fff1f2; }
-.c1-dates__expand image { display: block; width: 20rpx; height: 20rpx; transform: rotate(90deg); }
+.c1-dates__expand image { display: block; width: 20rpx; height: 20rpx; transform: none; }
 
 .c1-month-calendar { box-sizing: border-box; width: 100%; min-height: 588rpx; padding: 28rpx 24rpx 24rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
 .c1-month-calendar__header { display: flex; align-items: center; justify-content: space-between; min-height: 48rpx; }
@@ -52,7 +52,7 @@
 .c1-month-calendar__arrow { display: flex; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; }
 .c1-month-calendar__arrow image { display: block; width: 28rpx; height: 28rpx; }
 .c1-month-calendar__collapse { display: flex; align-items: center; justify-content: center; gap: 6rpx; box-sizing: border-box; width: 104rpx; height: 48rpx; border-radius: 12rpx; background: #fff1f2; color: #a80f1b; font-size: 22rpx; font-weight: 600; line-height: 28rpx; }
-.c1-month-calendar__collapse-icon { display: block; width: 20rpx; height: 20rpx; transform: rotate(-90deg); }
+.c1-month-calendar__collapse-icon { display: block; width: 20rpx; height: 20rpx; transform: rotate(180deg); }
 .c1-month-calendar__weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-top: 24rpx; }
 .c1-month-calendar__weekday { color: #667085; font-size: 22rpx; line-height: 28rpx; text-align: center; }
 .c1-month-calendar__grid { display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 64rpx; margin-top: 12rpx; }
@@ -69,4 +69,4 @@
 
 /* Keep the coach entry control geometrically identical to the parent entry control. */
 .c1-dates__expand { top: 50%; bottom: auto; height: 32rpx; transform: translateY(-50%); }
-.c1-dates__expand-icon { display: block; width: 20rpx; height: 20rpx; transform: rotate(90deg); }
+.c1-dates__expand-icon { display: block; width: 20rpx; height: 20rpx; transform: none; }

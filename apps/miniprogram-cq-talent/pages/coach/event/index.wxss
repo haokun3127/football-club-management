@@ -38,10 +38,9 @@
 .roster-avatar { display: flex; align-items: center; justify-content: center; width: 72rpx; height: 72rpx; border-radius: 50%; font-size: 28rpx; font-weight: 700; }
 .roster-avatar--present { background: #10b981; color: #ffffff; }
 .roster-avatar--absent { background: #e5e7eb; color: #667085; }
-.roster-name { width: 100%; margin-top: 10rpx; overflow: hidden; color: #202124; font-size: 23rpx; line-height: 30rpx; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
-.roster-status { margin-top: 4rpx; font-size: 20rpx; line-height: 26rpx; }
-.roster-status--present { color: #059669; }
-.roster-status--absent { color: #98a2b3; }
+.roster-avatar__check { display: block; width: 40rpx; height: 40rpx; }
+.roster-avatar__initial { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+.roster-name { width: 100%; min-width: 96rpx; margin-top: 10rpx; overflow: hidden; color: #202124; font-size: 23rpx; line-height: 30rpx; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
 .attendance-error { padding: 16rpx 20rpx; border-radius: 12rpx; background: #fff1f2; color: #b42318; font-size: 22rpx; line-height: 30rpx; }
 .shero__big { display: flex; align-items: center; gap: 16rpx; }
 .shero__big-icon { width: 40rpx; height: 40rpx; }
