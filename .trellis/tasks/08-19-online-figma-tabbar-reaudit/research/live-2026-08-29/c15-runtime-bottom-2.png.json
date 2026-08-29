@@ -1,0 +1,14 @@
+{
+  "capturedAt": "2026-08-29T03:33:00.000Z",
+  "route": "/pages/coach/assessment-entry/index",
+  "query": "templateId=assessment-template-technical&title=体能综合测评",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "rawPng": { "width": 585, "height": 1266, "scaleX": 1.56, "scaleY": 1.5591133004926108 },
+  "png": {
+    "width": 375,
+    "height": 812,
+    "sha256": "9d81653738eb719eeac9e7ed38434498113100ca121ab06b0fe1f58fd83a283a"
+  },
+  "scroll": "bottom",
+  "captureMethod": "wechatide-mcp simulator_screenshot + pageScrollTo + normalize"
+}
