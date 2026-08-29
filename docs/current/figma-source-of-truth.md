@@ -99,6 +99,14 @@ https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/
   - `zZ6wKyOHKcO4UYXDd9jGwv / 1008:348 / P1 Schedule Home — Week + Month Picker / Empty`
 - 本批 Figma 三态均已通过在线 `375×812` 截图复核。小程序运行时截图仍须由能够进入家长会话的真实账号补取；教练会话跳转到家长 P1 会被真实角色守卫阻止，这不是视觉通过证据。
 
+## 2026-08-29 C1 我的球队／C1.1 全屏选择改版
+
+- 甲方确认：教练首页“我的球队”仅承担选择后台维护并同步的已分配队伍；不提供前台新建、编辑或删除。点击后进入有返回按钮的全屏 C1.1，不使用弹窗。
+- 在线 Figma 在保留历史 `529:7` 画板的前提下新增非破坏性改版区块 `1026:7 / 2026-08-28 甲方需求改版 · C1`。当前实现基准三元组：
+  - `zZ6wKyOHKcO4UYXDd9jGwv / 1026:9 / C1 Coach Home — Team Selector / Client Revision`
+  - `zZ6wKyOHKcO4UYXDd9jGwv / 1026:150 / C1.1 Coach Team Selection — Full Screen`
+- C1.1 的在线稿已截图复核。小程序真实教练会话已在 `375×812` 下复核全屏返回、单队已选态与“仅显示已分配队伍”边界；真实运行名称来自 API，未写入 Figma 示例队伍。
+
 ## 2026-08-11 双角色入口设计
 
 - 在线 Figma 新增复用组件集：`304:14 / RoleSwitchEntry`；变体为 `304:2 / role=parent` 与 `304:8 / role=coach`。该组件仅用于后端已确认同时拥有家长、教练两种入口的账号。

@@ -26,6 +26,7 @@
     "pages/parent/day/index",
     "pages/parent/binding/index",
     "pages/coach/schedule/index",
+    "pages/coach/team-selector/index",
     "pages/coach/event/index",
     "pages/coach/attendance/index",
     "pages/coach/lesson/index",

@@ -23,7 +23,7 @@ globalThis.Page = (definition) => {
   pageDefinition = definition;
   return definition;
 };
-globalThis.wx = { reLaunch: vi.fn() };
+globalThis.wx = { reLaunch: vi.fn(), getStorageSync: vi.fn(), setStorageSync: vi.fn() };
 
 await import("./index.ts");
 
@@ -78,6 +78,7 @@ describe("coach schedule home", () => {
     mocks.getCoachHome.mockReset();
     mocks.openPage.mockReset();
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
+    globalThis.wx.getStorageSync.mockReset().mockReturnValue("");
   });
 
   it("shows the attendance capsule and weekly hero pills when the API provides them", async () => {
@@ -194,6 +195,33 @@ describe("coach schedule home", () => {
     expect(template.indexOf("c1-team-selector")).toBeLessThan(template.indexOf("c1-hero"));
     expect(template).not.toContain('class="c1-summary"');
     expect(stylesheet).toMatch(/\.c1-team-selector\s*\{[^}]*height:\s*152rpx[^}]*border-radius:\s*24rpx/s);
+  });
+
+  it("restores a real selected team and limits C1 events to that team's API records", async () => {
+    globalThis.wx.getStorageSync.mockReturnValue("U12 Blue");
+    mocks.getCoachHome.mockResolvedValue({
+      ...home,
+      teams: ["U11 Red", "U12 Blue"],
+      events: [
+        home.events[0],
+        { ...home.events[0], id: "event-training-2", teamName: "U12 Blue", title: "U12 session" },
+      ],
+    });
+    const page = createPageInstance();
+
+    await page.load();
+
+    expect(page.data.selectedTeamName).toBe("U12 Blue");
+    expect(page.data.visibleEvents).toHaveLength(1);
+    expect(page.data.visibleEvents[0]).toMatchObject({ id: "event-training-2", teamName: "U12 Blue" });
+  });
+
+  it("opens the dedicated full-screen selector instead of the team-detail page", () => {
+    const page = createPageInstance({ hasTeams: true, selectedTeamName: "U11 Red" });
+
+    page.openTeam();
+
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/team-selector/index");
   });
 
   it("matches the C1 online hero and stats-row offsets without moving activity cards off their 22px rail", () => {

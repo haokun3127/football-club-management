@@ -6,6 +6,7 @@ import { activityStatus, formatCalendarDate, resolveMenuInset, resolveNavInset }
 import type { CoachHome, CoachTask, CoachTaskAction, LoadState, ScheduleEvent } from "../../../utils/types";
 
 const WEEK_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+const COACH_SELECTED_TEAM_KEY = "coach-selected-team";
 
 type Filter = "all" | "training" | "match" | "pending";
 
@@ -69,6 +70,9 @@ Page({
   onLoad() {
     this.load();
   },
+  onShow() {
+    if (this.data.state === "ready" || this.data.state === "empty") this.load();
+  },
   async load() {
     const session = requireRole("coach");
     if (!session) return;
@@ -78,11 +82,12 @@ Page({
       const home = await getCoachHome(range);
       const coachName = home.coachName?.trim() || "";
       const teamChips = home.teams.map((name) => ({ name }));
-      const selectedTeamName = teamChips[0]?.name ?? "";
+      const selectedTeamName = resolveSelectedTeam(teamChips, wx.getStorageSync<string>(COACH_SELECTED_TEAM_KEY));
       const eventViews = home.events.map((event) => toCoachEventView(event, coachName));
+      const selectedTeamEvents = selectedTeamName ? eventViews.filter((event) => event.teamName === selectedTeamName) : eventViews;
       const taskCards = home.tasks.map(toCoachTaskView);
-      const heroEvent = eventViews.find((event) => event.status === "in_progress") ?? eventViews[0] ?? null;
-      const hasWork = eventViews.length > 0 || taskCards.length > 0;
+      const heroEvent = selectedTeamEvents.find((event) => event.status === "in_progress") ?? selectedTeamEvents[0] ?? null;
+      const hasWork = selectedTeamEvents.length > 0 || taskCards.length > 0;
       this.setData({
         state: hasWork ? "ready" : "empty",
         message: hasWork ? "" : "所选日期范围内没有日程或待处理任务",
@@ -96,9 +101,9 @@ Page({
         teamChips,
         hasTeams: teamChips.length > 0,
         selectedTeamName,
-        teamMetaLabel: teamChips.length > 1 ? `共${teamChips.length}支队伍` : teamChips.length === 1 ? "后台同步" : "",
+        teamMetaLabel: teamChips.length > 1 ? `共${teamChips.length}支队伍 · 点击切换` : teamChips.length === 1 ? "后台同步" : "",
         heroPills: buildHeroPills(home),
-        eventViews,
+        eventViews: selectedTeamEvents,
         heroEvent,
         hasHeroEvent: Boolean(heroEvent),
         heroDateLabel: heroDateLabel(this.data.date),
@@ -137,7 +142,7 @@ Page({
     openTab("/pages/coach/me/index");
   },
   openTeam() {
-    if (this.data.hasTeams) openPage("/pages/coach/team/index");
+    if (this.data.hasTeams) openPage("/pages/coach/team-selector/index");
   },
   switchView(event: { currentTarget: { dataset: { mode?: "day" | "week" } } }) {
     const viewMode = event.currentTarget.dataset.mode;
@@ -236,6 +241,10 @@ function durationLabel(startsAt?: string, endsAt?: string): string {
   const end = Date.parse(endsAt ?? "");
   if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return "";
   return `${Math.round((end - start) / 60000)}分钟`;
+}
+
+function resolveSelectedTeam(teams: Array<{ name: string }>, stored: string): string {
+  return teams.find((team) => team.name === stored)?.name ?? teams[0]?.name ?? "";
 }
 
 function resolveRange(date: string, viewMode: "day" | "week") {
