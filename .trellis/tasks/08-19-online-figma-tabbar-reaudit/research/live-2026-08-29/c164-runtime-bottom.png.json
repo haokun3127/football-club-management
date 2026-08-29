@@ -1,0 +1,20 @@
+{
+  "capturedAt": "2026-08-29T11:58:00+08:00",
+  "route": "/pages/coach/help/index",
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 3
+  },
+  "rawPng": {
+    "width": 564,
+    "height": 1220,
+    "scaleX": 1.504,
+    "scaleY": 1.5024630541871922
+  },
+  "png": {
+    "width": 375,
+    "height": 812
+  },
+  "captureMethod": "wechatide-mcp simulator_screenshot after pageScrollTo(scrollTop=360,duration=0), normalized with wechatide-mcp-normalize.py"
+}
