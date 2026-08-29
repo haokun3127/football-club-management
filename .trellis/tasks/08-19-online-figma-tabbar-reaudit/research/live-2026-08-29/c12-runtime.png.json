@@ -1,0 +1,10 @@
+{
+  "capturedAt": "2026-08-29T10:33:00+08:00",
+  "route": "/pages/coach/test-entry/index?eventId=event-cq-talent-secure-test-1",
+  "viewport": { "width": 375, "height": 812 },
+  "rawPng": { "width": 375, "height": 812 },
+  "captureMethod": "wechatide-mcp simulator_screenshot",
+  "state": "ready",
+  "draftResumeVisible": false,
+  "consoleMatches": 0
+}
