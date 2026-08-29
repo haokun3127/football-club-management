@@ -108,7 +108,7 @@ describe("C7 coach tactical board MVP", () => {
     expect(mocks.getCoachTacticalBoard).not.toHaveBeenCalled();
   });
 
-  it("uses only current formation and roster facts, and marks the initial GET as loaded", async () => {
+  it("uses only current formation and roster facts, and marks the initial GET as saved", async () => {
     const page = createPageInstance();
     await page.onLoad({ eventId: "event-real" });
     await flush();
@@ -120,7 +120,7 @@ describe("C7 coach tactical board MVP", () => {
       eventId: "event-real",
       eventTitle: "真实比赛",
       formationLabel: "真实阵型",
-      saveLabel: "已载入",
+      saveLabel: "已保存",
       readOnly: false,
     });
     expect(page.data.starters).toEqual([expect.objectContaining({ studentId: "student-starter", displayName: "真实首发", positionLabel: "真实位置" })]);
@@ -212,13 +212,13 @@ describe("C7 coach tactical board MVP", () => {
     expect(template).not.toMatch(/wx:else\s+wx:for=/);
     expect(template).toContain('<block wx:if="{{!readOnly}}">');
     expect(template).toContain('<block wx:else>');
-    expect(template).toContain('>战术板<');
+    expect(template).toContain('>比赛战术板<');
     expect(template).toContain('src="/assets/icons/chevron-left.svg"');
     expect(template).not.toContain('src="/assets/icons/c11-arrow-left.svg"');
     expect(template).not.toContain('class="c7-header__share"');
-    expect(template).toContain('class="c7-pitch__circle c7-pitch__circle--top"');
-    expect(template).toContain('class="c7-pitch__circle c7-pitch__circle--middle"');
-    expect(template).toContain('class="c7-pitch__circle c7-pitch__circle--bottom"');
+    expect(template).not.toContain('c7-pitch__circle');
+    expect(template).toContain('class="c7-pitch__halfway"');
+    expect(template).toContain('class="c7-pitch__boundary"');
     expect(template).not.toContain('class="c7-toolbar"');
     expect(template).not.toContain("暂未开放");
     expect(template).not.toContain('<role-tabbar');
@@ -237,12 +237,16 @@ describe("C7 coach tactical board MVP", () => {
     expect(pageConfig).not.toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"app-header"');
     expect(pageConfig).not.toContain('"submit-bar"');
-    expect(stylesheet).toMatch(/\.c7-header\s*\{[^}]*height:\s*124rpx[^}]*box-sizing:\s*content-box/s);
+    expect(pageConfig).toContain('"navigationBarTitleText": "比赛战术板"');
+    expect(stylesheet).toMatch(/\.c7-header\s*\{[^}]*height:\s*124rpx[^}]*box-sizing:\s*border-box/s);
     expect(stylesheet).toMatch(/\.c7-header__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
     expect(stylesheet).toMatch(/\.c7-pitch\s*\{[^}]*width:\s*calc\(100vw - 48rpx\)[^}]*height:\s*860rpx[^}]*background:\s*#278a53/s);
+    expect(stylesheet).toMatch(/\.c7-formation-card\s*\{[^}]*margin:\s*28rpx 24rpx 0/s);
     expect(stylesheet).toMatch(/\.c7-player\s*\{[^}]*width:\s*80rpx[^}]*height:\s*80rpx/s);
-    expect(stylesheet).toMatch(/\.c7-player__badge\s*\{[^}]*width:\s*100%[^}]*height:\s*100%/s);
+    expect(stylesheet).toMatch(/\.c7-player__badge\s*\{[^}]*width:\s*100%[^}]*height:\s*100%[^}]*font-size:\s*18rpx/s);
     expect(stylesheet).toMatch(/\.c7-bench\s*\{[^}]*height:\s*172rpx/s);
+    expect(stylesheet).toMatch(/\.c7-bench__heading\s*\{[^}]*gap:\s*114rpx/s);
+    expect(stylesheet).toMatch(/\.c7-bench__players\s*\{[^}]*gap:\s*56rpx[^}]*margin-top:\s*24rpx/s);
     expect(stylesheet).toMatch(/\.c7-actions\s*\{[^}]*height:\s*96rpx/s);
     expect(controller).toContain("this.data.pitchWidth, 20");
     expect(controller).toContain("this.data.pitchHeight, 20");

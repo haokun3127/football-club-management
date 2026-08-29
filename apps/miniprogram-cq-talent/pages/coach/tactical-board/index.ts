@@ -132,7 +132,7 @@ Page<BoardPageData>({
           eventTitle: response.event.title,
           readOnly: response.readOnly,
           dirty: false,
-          saveLabel: "已载入",
+          saveLabel: "已保存",
           saveToneClass: "c7-status c7-status--loaded",
         });
         return;
@@ -151,7 +151,7 @@ Page<BoardPageData>({
         eventTitle: response.event.title,
         readOnly: response.readOnly,
         dirty: false,
-        saveLabel: "已载入",
+        saveLabel: "已保存",
         saveToneClass: "c7-status c7-status--loaded",
         saveError: "",
         selectedStarterId: "",

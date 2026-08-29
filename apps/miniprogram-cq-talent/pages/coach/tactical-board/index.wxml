@@ -3,7 +3,7 @@
     <view class="c7-header__back" bindtap="goBack" aria-label="返回">
       <image src="/assets/icons/chevron-left.svg" mode="aspectFit" />
     </view>
-    <view class="c7-header__title">战术板</view>
+    <view class="c7-header__title">比赛战术板</view>
     <view class="c7-header__subtitle">阵型与首发位置</view>
   </view>
 
@@ -41,9 +41,6 @@
 
       <view class="c7-board-container">
         <movable-area id="c7-pitch" class="c7-pitch">
-          <view class="c7-pitch__circle c7-pitch__circle--top"></view>
-          <view class="c7-pitch__circle c7-pitch__circle--middle"></view>
-          <view class="c7-pitch__circle c7-pitch__circle--bottom"></view>
           <view class="c7-pitch__halfway"></view>
           <view class="c7-pitch__boundary"></view>
 

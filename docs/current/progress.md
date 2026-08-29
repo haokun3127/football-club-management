@@ -1641,6 +1641,13 @@
 - 修复两个实际视觉差异：Hero 胶囊从“比赛总览 / 事件记录”改为在线稿的“上半场 / 下半场”，因后端没有半场比分字段而显示“比分待同步”；事件卡移除在线稿不存在的“编辑比赛”额外按钮，编辑入口仍保留在活动工作台。
 - C6 定向 Vitest `10/10`；WXML 编译成功；控制台过滤 `error|exception|fail|undefined|route is not defined|wx:else|appid missing` 无命中。证据详见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c6-match-comparison.md`。
 
+## 2026-08-29 C7 战术板在线稿复核与安全区布局修复
+
+- 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 233:2 / C7 Tactical Board MVP`；在线截图与真实运行截图均严格 `375×812`，证据详见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c7-tactical-board-comparison.md`。
+- 修复 C7 顶栏 `box-sizing` 导致的安全区额外撑高、标题文案与页面配置不一致、旧球场圆形装饰、球员字号，以及阵型/替补区间距差异。当前保留在线稿要求的边界线与中线，未新增 Figma 示例球员。
+- 真实教练路由读取 `event-cq-talent-secure-test-1-scheduled-match` 的真实比赛和 8 名真实球员；当前生产/测试数据未返回 11 名首发与 5 名替补，因此不伪造数据，数量差异按数据契约豁免。
+- 验证：C7 定向 Vitest `6/6`；WXML/WXSS 编译成功；WeChatIDE MCP 模拟器截图 `c7-runtime-final.png` 严格 `375×812`；错误过滤无命中。下一步为路径限定提交本批 C7 页面、测试和验收文档。
+
 ## 2026-08-29 C6.1 添加比赛事件在线 Figma 复核
 
 - 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:827`；在线截图保存为 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c6-1-online.png`，画板严格 `375×812`。

@@ -64,7 +64,7 @@ CODE 契约版 7 张（222:86-222:92）按 2026-08-07 用户裁定：设计画�
 | 93:796 | C6 Match Entry | 812 | pages/coach/match |
 | 93:827 | C6.1 Add Match Event | 812 | pages/coach/match-event-add |
 | 93:858 | C6.2 Save State | 812 | match 页内 savedFlash 态 |
-| 93:877 | LEGACY / C7 Tactical Board PoC | 812 | pages/coach/tactical-board |
+| 233:2 | C7 Tactical Board MVP | 812 | pages/coach/tactical-board |
 | 93:896 | C8 Training Management | 812 | pages/coach/training |
 | 93:924 | C9 Team Detail | 871 | pages/coach/team |
 | 93:952 | C10 Training Content Select | 812 | pages/coach/content-select |
@@ -83,7 +83,7 @@ CODE 契约版 7 张（222:86-222:92）按 2026-08-07 用户裁定：设计画�
 | 93:1262 | C16.3 Coach Account | 812 | pages/coach/account |
 | 93:1286 | C16.4 Coach Help | 924 | pages/coach/help |
 
-教练端 CODE 版 8 张（231:*, 233:2）同样不作权威。
+教练端其他 CODE 版画板（231:*）不作权威；C7 使用当前在线的 `233:2 / C7 Tactical Board MVP`。
 
 ## 枚举方法（复跑）
 
