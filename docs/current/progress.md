@@ -1611,4 +1611,11 @@
 - P3 修复提醒中心顶栏：移除在线稿不存在的“返回”文字，保留 24px 级别的左箭头槽位，并同步标题视觉尺寸；C4.1 用在线稿下载的白色描边勾选 SVG 替换文本 `✓`，图标尺寸为 40px。
 - 两页均通过 WeChatIDE MCP 取得严格 `375×812` 修复后截图并完成对照；P3 的提醒内容、C4.1 的出勤统计继续使用真实 API 数据，未复制 Figma 示例。
 - 定向回归 9/9 通过；独立缓存执行全仓 `check` 通过：domain 20/20、小程序 408/408、API 115/115；`git diff --check` 通过。
-- 证据详见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/p3-c4-1-repair-2026-08-29.md`。本批待路径限定提交后，继续检查剩余 role-tabbar 页面。
+- 证据详见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/p3-c4-1-repair-2026-08-28.md`。本批已完成路径限定提交，继续检查剩余 role-tabbar 页面。
+
+## 2026-08-29 C4.2 出勤修改页在线 Figma 修复复验
+
+- 在线唯一 Figma 基准为 `zZ6wKyOHKcO4UYXDd9jGwv / 93:715`。真实教练路由 `pages/coach/attendance/index?id=event-cq-talent-secure-test-1-trn-0818&correction=1` 已取得严格 `375×812` 首屏和底部视口截图。
+- 修复两个真实视觉/文案差异：移除误用的 `large-title`，恢复在线稿 18px 顶栏标题；下载并使用 Figma 的 `alert-triangle` SVG（外圆 48px、内图标 24px），并补齐“家长对出勤记录提出异议，请核实后重新提交”说明。
+- 真实接口返回 8 名学员而在线示例为 2 条异常，保留真实数据，不伪造 Figma 示例；底部视口确认修改说明、重新提交按钮和教练 TabBar 无遮挡。
+- C4.2 定向测试 8/8 通过，WXML/WXSS 编译成功，当前路由确认正确，模拟器错误过滤无命中。证据详见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/c4-2-repair-2026-08-29.md`。
