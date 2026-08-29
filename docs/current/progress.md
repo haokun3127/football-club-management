@@ -1604,3 +1604,11 @@
 - 最新 Figma MCP 截图 `C:\Users\ASUS\AppData\Local\Temp\cq-p1-month-figma-20260828.png` 严格为 `375×812`；确认当前画板只有右侧月份箭头，前一月处理器保留但未暴露为未批准视觉控件。
 - API 日期边界定向回归 `12 files / 115 tests` 通过；小程序定向范围实际执行为当前全量 `66 files / 405 tests` 通过。覆盖 date-only `to` 全天包含、次日排除、非法/倒序/超长范围及家长数据权限。
 - 本轮无业务代码修改；旧任务的“周一至周日初始请求/周切换”标准已记录为被 P1 Month V2 supersede，避免后续误把现行月历改回周历。
+
+## 2026-08-28 P3 / C4.1 在线 Figma 修复复验
+
+- 继续使用唯一在线 Figma 文件 `zZ6wKyOHKcO4UYXDd9jGwv`，分别复核 P3 `93:222` 与 C4.1 `93:696`。
+- P3 修复提醒中心顶栏：移除在线稿不存在的“返回”文字，保留 24px 级别的左箭头槽位，并同步标题视觉尺寸；C4.1 用在线稿下载的白色描边勾选 SVG 替换文本 `✓`，图标尺寸为 40px。
+- 两页均通过 WeChatIDE MCP 取得严格 `375×812` 修复后截图并完成对照；P3 的提醒内容、C4.1 的出勤统计继续使用真实 API 数据，未复制 Figma 示例。
+- 定向回归 9/9 通过；独立缓存执行全仓 `check` 通过：domain 20/20、小程序 408/408、API 115/115；`git diff --check` 通过。
+- 证据详见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/p3-c4-1-repair-2026-08-29.md`。本批待路径限定提交后，继续检查剩余 role-tabbar 页面。
