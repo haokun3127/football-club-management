@@ -30,7 +30,7 @@ function event(overrides = {}) {
   };
 }
 
-describe("P1 month schedule V2", () => {
+describe("P1 weekly schedule with expandable month picker", () => {
   it("builds a Monday-first August 2026 grid with leading and trailing days", () => {
     const days = buildMonthDays("2026-08", "2026-08-13", []);
 
@@ -59,12 +59,14 @@ describe("P1 month schedule V2", () => {
     });
   });
 
-  it("uses the month calendar structure and month navigation bindings", () => {
-    expect(template).toContain("month-calendar");
-    expect(template).toContain("monthDays");
-    expect(template).toContain('bindtap="changeMonth"');
+  it("keeps the week strip as the default and only renders the month grid while expanded", () => {
+    expect(template).toContain('wx:if="{{!isMonthPickerExpanded}}" class="week-switcher"');
+    expect(template).toContain('bindtap="expandMonthPicker"');
+    expect(template).toContain('wx:if="{{isMonthPickerExpanded}}" class="month-calendar"');
+    expect(template).toContain('data-offset="-1" bindtap="changeMonth"');
+    expect(template).toContain('data-offset="1" bindtap="changeMonth"');
+    expect(template).toContain('bindtap="collapseMonthPicker"');
     expect(template).toContain('bindtap="selectDate"');
-    expect(template).not.toContain("week-switcher");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 });

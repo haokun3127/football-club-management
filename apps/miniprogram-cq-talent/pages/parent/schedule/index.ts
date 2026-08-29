@@ -65,7 +65,8 @@ interface PageData {
   selectedDateLabel: string;
   selectedType: "all" | ScheduleEvent["type"];
   typeTabs: Array<{ label: string; value: "all" | ScheduleEvent["type"] }>;
-  dateOptions: Array<{ date: string; isToday: boolean; day: string; weekday: string; weekShort: string; dayNumber: string; count: number }>;
+  dateOptions: Array<{ date: string; isToday: boolean; isSelected: boolean; day: string; weekday: string; weekShort: string; dayNumber: string; count: number }>;
+  isMonthPickerExpanded: boolean;
   monthKey: string;
   monthLabel: string;
   monthWeekdays: string[];
@@ -120,6 +121,7 @@ Page<PageData>({
     monthLabel: formatMonthLabel(initialDate.slice(0, 7)),
     monthWeekdays: ["一", "二", "三", "四", "五", "六", "日"],
     monthDays: [],
+    isMonthPickerExpanded: false,
     selectedType: "all",
     typeTabs,
     dateOptions: [],
@@ -182,7 +184,7 @@ Page<PageData>({
         events,
         visibleEvents,
         selectedDateLabel: formatCalendarDate(selectedDate),
-        dateOptions: buildDateOptions(selectedDate, events),
+        dateOptions: buildDateOptions(selectedDate, childEvents),
         monthKey,
         monthLabel: formatMonthLabel(monthKey),
         monthDays: buildMonthDays(monthKey, selectedDate, childEvents),
@@ -212,6 +214,7 @@ Page<PageData>({
       weekCount: digest.weekCount,
       weekHours: digest.weekHours,
       hero: digest.hero,
+      dateOptions: buildDateOptions(this.data.selectedDate, childEvents),
       monthDays: buildMonthDays(this.data.monthKey, this.data.selectedDate, childEvents),
     });
     this.applyFilters();
@@ -222,18 +225,25 @@ Page<PageData>({
   },
   selectDate(event: { currentTarget: { dataset: { date?: string } } }) {
     const date = event.currentTarget.dataset.date;
-    if (!date || date === this.data.selectedDate) return;
+    if (!date) return;
+    if (date === this.data.selectedDate) {
+      this.setData({ isMonthPickerExpanded: false });
+      return;
+    }
     const monthKey = date.slice(0, 7);
     if (monthKey !== this.data.monthKey) {
-      this.setData({ selectedDate: date, selectedDateLabel: formatCalendarDate(date), monthKey, monthLabel: formatMonthLabel(monthKey) });
+      this.setData({ selectedDate: date, selectedDateLabel: formatCalendarDate(date), monthKey, monthLabel: formatMonthLabel(monthKey), isMonthPickerExpanded: false });
       this.load();
       return;
     }
-    const digest = buildScheduleDigest(filterEvents(this.data.events, this.data.activeStudentId, "", "all"), date);
+    const childEvents = filterEvents(this.data.events, this.data.activeStudentId, "", "all");
+    const digest = buildScheduleDigest(childEvents, date);
     this.setData({
       selectedDate: date,
       selectedDateLabel: formatCalendarDate(date),
-      monthDays: buildMonthDays(monthKey, date, filterEvents(this.data.events, this.data.activeStudentId, "", "all")),
+      dateOptions: buildDateOptions(date, childEvents),
+      monthDays: buildMonthDays(monthKey, date, childEvents),
+      isMonthPickerExpanded: false,
       todayLabel: digest.todayLabel,
       selectedCountLabel: selectedCountLabel(date, digest.todayCount),
       todayCount: digest.todayCount,
@@ -252,6 +262,12 @@ Page<PageData>({
     const selectedDate = `${monthKey}-01`;
     this.setData({ selectedDate, selectedDateLabel: formatCalendarDate(selectedDate), monthKey, monthLabel: formatMonthLabel(monthKey) });
     this.load();
+  },
+  expandMonthPicker() {
+    this.setData({ isMonthPickerExpanded: true });
+  },
+  collapseMonthPicker() {
+    this.setData({ isMonthPickerExpanded: false });
   },
   changeWeek(event: { currentTarget: { dataset: { offset?: string | number } } }) {
     const offset = Number(event.currentTarget.dataset.offset);
@@ -312,6 +328,7 @@ export function buildDateOptions(selectedDate: string, events: ScheduleEvent[]) 
     return {
       date: key,
       isToday: key === todayKey,
+      isSelected: key === selectedDate,
       day: `${date.getUTCMonth() + 1}/${date.getUTCDate()}`,
       weekday: ["日", "一", "二", "三", "四", "五", "六"][date.getUTCDay()],
       weekShort: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][date.getUTCDay()] ?? "",

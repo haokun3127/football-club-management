@@ -1,6 +1,6 @@
 # Figma 权威来源
 
-> 最后更新：2026-08-19
+> 最后更新：2026-08-29
 
 ## 唯一设计基准
 
@@ -88,6 +88,16 @@ https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/
 - 当前成功态画板来源三元组：`zZ6wKyOHKcO4UYXDd9jGwv / 269:250 / P1 Schedule Home`，尺寸 `375×812`。
 - 旧文件 `ATlfBRO0ruOCDDY5ICagFD` 的 `93:83` 节点和相关历史截图仅保留为切源前审计事实，不构成新的视觉验收依据；不代表 P1 Empty、其他家长页、教练页或真机矩阵已经验收。
 - 每次视觉改动仍必须先读取当前在线目标三元组和截图；不能用本地 `.fig`、旧导出或切源前历史规格反推当前设计。
+
+## 2026-08-29 P1 周日历／展开月历改版
+
+- 甲方已确认：P1 的默认日期控件是周日历；月历只在点击日期区的展开提示后出现，不是固定首页模块，也不是弹窗。选择日期后更新下方日期摘要与日程列表，并收起回周日历。
+- 在线 Figma 新增且已截图复核的非破坏性改版区块为 `1008:185 / 2026-08-28 甲方需求改版 · P1`。它保留历史画板 `269:250`、`269:479`、`521:339` 不变。
+- 当前实现基准三元组：
+  - `zZ6wKyOHKcO4UYXDd9jGwv / 1008:186 / P1 Schedule Home — Week + Month Picker / Collapsed`
+  - `zZ6wKyOHKcO4UYXDd9jGwv / 1008:436 / P1 Schedule Home — Week + Month Picker / Expanded`
+  - `zZ6wKyOHKcO4UYXDd9jGwv / 1008:348 / P1 Schedule Home — Week + Month Picker / Empty`
+- 本批 Figma 三态均已通过在线 `375×812` 截图复核。小程序运行时截图仍须由能够进入家长会话的真实账号补取；教练会话跳转到家长 P1 会被真实角色守卫阻止，这不是视觉通过证据。
 
 ## 2026-08-11 双角色入口设计
 

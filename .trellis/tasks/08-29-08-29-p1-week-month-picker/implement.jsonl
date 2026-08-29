@@ -1,0 +1,4 @@
+{"file":"docs/current/figma-source-of-truth.md","reason":"Records the online Figma authority and frame provenance rules."}
+{"file":"docs/current/progress.md","reason":"Records historical P1 Month V2 implementation and prior verification facts that this revised task supersedes."}
+{"file":".trellis/workflow.md","reason":"Required project workflow and phase gates for this non-trivial UI change."}
+{"file":".trellis/tasks/08-29-08-29-p1-week-month-picker/design.md","reason":"Approved interaction model and Figma node IDs for the revised P1 states."}

@@ -45,11 +45,25 @@
       <view wx:if="{{noticeBanner.hasDetail}}" class="notice-banner__arrow">›</view>
     </view>
 
-    <view class="month-calendar">
+    <view wx:if="{{!isMonthPickerExpanded}}" class="week-switcher">
+      <view class="week-switcher__arrow" data-offset="-7" bindtap="changeWeek" aria-label="上一周"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+      <view class="week-nav" bindtap="expandMonthPicker">
+        <view wx:for="{{dateOptions}}" wx:key="date" class="week-day {{item.isSelected ? 'week-day--selected' : ''}} {{item.isToday ? 'week-day--today' : ''}}" data-date="{{item.date}}" catchtap="selectDate">
+          <view class="week-day__name">{{item.weekShort}}</view>
+          <view class="week-day__number">{{item.dayNumber}}</view>
+        </view>
+        <view class="week-nav__expand" bindtap="expandMonthPicker" aria-label="展开月历"><view class="week-nav__expand-icon"></view></view>
+      </view>
+      <view class="week-switcher__arrow" data-offset="7" bindtap="changeWeek" aria-label="下一周"><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
+    </view>
+
+    <view wx:if="{{isMonthPickerExpanded}}" class="month-calendar">
       <view class="month-calendar__header">
         <view class="month-calendar__title">{{monthLabel}}</view>
         <view class="month-calendar__actions">
-          <view class="month-calendar__arrow" data-offset="1" bindtap="changeMonth">›</view>
+          <view class="month-calendar__arrow" data-offset="-1" bindtap="changeMonth" aria-label="上个月"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+          <view class="month-calendar__arrow" data-offset="1" bindtap="changeMonth" aria-label="下个月"><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
+          <view class="month-calendar__collapse" bindtap="collapseMonthPicker">收起<view class="month-calendar__collapse-icon"></view></view>
         </view>
       </view>
       <view class="month-calendar__weekdays">
