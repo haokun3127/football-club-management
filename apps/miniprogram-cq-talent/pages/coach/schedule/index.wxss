@@ -66,3 +66,7 @@
 .c1-month-day__marker--training { background: #10b981; }
 .c1-month-day__marker--match { background: #f59e0b; }
 .c1-month-day__marker--multiple { width: 6rpx; height: 6rpx; background: #667085; }
+
+/* Keep the coach entry control geometrically identical to the parent entry control. */
+.c1-dates__expand { top: 50%; bottom: auto; height: 32rpx; transform: translateY(-50%); }
+.c1-dates__expand-icon { display: block; width: 20rpx; height: 20rpx; transform: rotate(90deg); }

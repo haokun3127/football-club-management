@@ -52,7 +52,7 @@
           <view class="week-day__name">{{item.weekShort}}</view>
           <view class="week-day__number">{{item.dayNumber}}</view>
         </view>
-         <view class="week-nav__expand" bindtap="expandMonthPicker" aria-label="展开月历"><image class="week-nav__expand-icon" src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
+         <view class="week-nav__expand" catchtap="expandMonthPicker" aria-label="展开月历"><image class="week-nav__expand-icon" src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
       </view>
       <view class="week-switcher__arrow" data-offset="7" bindtap="changeWeek" aria-label="下一周"><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
     </view>

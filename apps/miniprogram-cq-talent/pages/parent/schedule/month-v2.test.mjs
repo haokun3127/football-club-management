@@ -72,6 +72,12 @@ describe("P1 weekly schedule with expandable month picker", () => {
     const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
     expect(stylesheet).toMatch(/\.week-nav__expand-icon\s*\{[^}]*width:\s*20rpx[^}]*height:\s*20rpx/s);
     expect(stylesheet).toMatch(/\.month-calendar__collapse-icon\s*\{[^}]*width:\s*20rpx[^}]*height:\s*20rpx/s);
+    const expandMatches = [...stylesheet.matchAll(/\.week-nav__expand\s*\{([^}]*)\}/g)];
+    const expand = expandMatches.at(-1)?.[1] ?? "";
+    expect(expand).toContain("top: 50%");
+    expect(expand).toContain("bottom: auto");
+    expect(expand).toContain("transform: translateY(-50%)");
+    expect(expand).not.toContain("bottom: -14rpx");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 });

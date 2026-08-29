@@ -38,7 +38,7 @@
       </view>
     </view>
     <view class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek"><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
-    <view class="c1-dates__expand" bindtap="expandMonthPicker" aria-label="展开月历"><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
+    <view class="c1-dates__expand" catchtap="expandMonthPicker" aria-label="展开月历"><image class="c1-dates__expand-icon" src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
   </view>
 
   <view wx:if="{{state === 'ready' && hasTeams}}" class="c1-team-selector" bindtap="openTeam">
