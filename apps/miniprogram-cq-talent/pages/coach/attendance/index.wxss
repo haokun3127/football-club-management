@@ -42,9 +42,7 @@
 /* C4 更正警示卡 */
 .correction-alert { display: flex; flex-direction: column; align-items: center; gap: 24rpx; padding: 40rpx; border: 2rpx solid #ff9800; border-radius: 24rpx; background: #fff3e0; text-align: center; }
 .correction-alert__icon { display: flex; align-items: center; justify-content: center; width: 96rpx; height: 96rpx; border-radius: 50%; background: #ff9800; }
-.correction-alert__triangle { position: relative; width: 44rpx; height: 40rpx; background: #ffffff; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
-.correction-alert__triangle-bar { position: absolute; top: 15rpx; left: 20rpx; width: 4rpx; height: 12rpx; border-radius: 4rpx; background: #ff9800; }
-.correction-alert__triangle-dot { position: absolute; bottom: 8rpx; left: 20rpx; width: 4rpx; height: 4rpx; border-radius: 50%; background: #ff9800; }
+.correction-alert__icon image { width: 48rpx; height: 48rpx; }
 .correction-alert__texts { display: flex; flex-direction: column; width: 100%; gap: 8rpx; }
 .correction-alert__title { color: #ff9800; font-size: 32rpx; font-weight: 700; line-height: 38rpx; }
 .correction-alert__text { color: #667085; font-size: 26rpx; line-height: 32rpx; }

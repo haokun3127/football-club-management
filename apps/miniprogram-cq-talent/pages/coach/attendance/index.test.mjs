@@ -246,7 +246,7 @@ describe("coach attendance", () => {
 
   it("uses the shared 88px Figma header and coach tab bar without an overlapping submit bar", () => {
     expect(template).toContain('<app-header theme="soft"');
-    expect(template).toContain('large-title');
+    expect(template).not.toContain('title-align="left" large-title');
     expect(template).toContain('action-text="{{canSave && !saving && !correctionMode ? \'提交\' : \'\'}}"');
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
     expect(template).not.toContain("<submit-bar");
@@ -255,5 +255,11 @@ describe("coach attendance", () => {
     expect(controller).toContain("function avatarColor");
     expect(stylesheet).toMatch(/\.c4-correction-submit\s*\{[^}]*bottom:\s*140rpx[^}]*padding:\s*44rpx/s);
     expect(stylesheet).toMatch(/\.c4-correction-submit__button\s*\{[^}]*display:\s*flex/s);
+  });
+
+  it("keeps the parent-dispute explanation required by the live C4.2 board", () => {
+    expect(template).toContain('src="/assets/icons/c4-2-alert-triangle.svg"');
+    expect(template).not.toContain("correction-alert__triangle");
+    expect(template).toContain("家长对出勤记录提出异议，请核实后重新提交");
   });
 });

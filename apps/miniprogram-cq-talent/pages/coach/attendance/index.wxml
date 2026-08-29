@@ -1,5 +1,5 @@
 <view class="c4 {{correctionMode ? 'c4--correction' : ''}}">
-  <app-header theme="soft" title="{{correctionMode ? '出勤修改' : '出勤管理'}}" title-align="left" large-title action-text="{{canSave && !saving && !correctionMode ? '提交' : ''}}" bindaction="saveAttendance" show-back />
+  <app-header theme="soft" title="{{correctionMode ? '出勤修改' : '出勤管理'}}" title-align="left" action-text="{{canSave && !saving && !correctionMode ? '提交' : ''}}" bindaction="saveAttendance" show-back />
 
   <view class="c4-body">
     <status-view wx:if="{{state !== 'ready' && state !== 'idle'}}" state="{{state}}" title="{{state === 'loading' ? '正在读取名单' : state === 'empty' ? '暂无学员' : '名单读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重新加载' : ''}}" bindaction="retry" />
@@ -7,14 +7,11 @@
     <block wx:if="{{state === 'ready' && hasRoster}}">
       <view wx:if="{{correctionMode}}" class="correction-alert">
         <view class="correction-alert__icon">
-          <view class="correction-alert__triangle">
-            <view class="correction-alert__triangle-bar"></view>
-            <view class="correction-alert__triangle-dot"></view>
-          </view>
+          <image src="/assets/icons/c4-2-alert-triangle.svg" mode="aspectFit" />
         </view>
         <view class="correction-alert__texts">
           <view class="correction-alert__title">⚠️ 出勤记录需要修改</view>
-          <view class="correction-alert__text">请核实后重新提交</view>
+          <view class="correction-alert__text">家长对出勤记录提出异议，请核实后重新提交</view>
         </view>
       </view>
 
