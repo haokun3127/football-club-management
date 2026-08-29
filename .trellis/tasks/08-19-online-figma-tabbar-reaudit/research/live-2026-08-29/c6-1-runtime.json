@@ -1,0 +1,16 @@
+{
+  "route": "/pages/coach/match-event-add/index?eventId=event-cq-talent-secure-test-1-completed-match",
+  "firstViewport": {
+    "path": "c6-1-runtime.png",
+    "width": 375,
+    "height": 812
+  },
+  "bottomViewport": {
+    "path": "c6-1-runtime-bottom.png",
+    "width": 375,
+    "height": 812,
+    "scrollTop": 1000
+  },
+  "capture": "wechatide-mcp",
+  "consoleErrorFilter": "no matches"
+}

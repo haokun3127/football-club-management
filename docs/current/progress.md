@@ -1640,3 +1640,10 @@
 - 真实教练路由 `pages/coach/match/index?id=event-cq-talent-secure-test-1-completed-match` 首屏和底部视口均由 WeChatIDE MCP 重新取得严格 `375×812` 修复后截图；比赛标题、球队、最终比分、事件列表和球员姓名继续来自真实 API，未复制 Figma 示例数据。
 - 修复两个实际视觉差异：Hero 胶囊从“比赛总览 / 事件记录”改为在线稿的“上半场 / 下半场”，因后端没有半场比分字段而显示“比分待同步”；事件卡移除在线稿不存在的“编辑比赛”额外按钮，编辑入口仍保留在活动工作台。
 - C6 定向 Vitest `10/10`；WXML 编译成功；控制台过滤 `error|exception|fail|undefined|route is not defined|wx:else|appid missing` 无命中。证据详见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c6-match-comparison.md`。
+
+## 2026-08-29 C6.1 添加比赛事件在线 Figma 复核
+
+- 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:827`；在线截图保存为 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c6-1-online.png`，画板严格 `375×812`。
+- 真实教练路由 `pages/coach/match-event-add/index?eventId=event-cq-talent-secure-test-1-completed-match` 由 WeChatIDE MCP 取得首屏和 `pageScrollTo` 后底部视口截图，均严格 `375×812`；共享顶栏、表单层级、红色提交按钮和教练 TabBar 几何一致。
+- 运行时只显示真实客户端能力返回的 `进球 / 助攻 / 扑救 / 抢断`，未复制在线稿示例的 `黄牌 / 红牌 / 换人 / 其他`；真实球员、空表单和平台状态栏/胶囊同样属于数据或平台差异。单行事件标签导致表单整体上移，是预期差异，不是布局缺陷。
+- 底部视口确认提交按钮未被固定 TabBar 遮挡；控制台错误过滤无命中。本页无业务代码修改、无回归测试新增，结论为 **通过（数据/平台差异豁免）**。证据详见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c6-1-match-event-add-comparison.md`。
