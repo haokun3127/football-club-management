@@ -8,6 +8,8 @@ type PlayerView = TacticalBoardPlayer & {
   initials: string;
   px: number;
   py: number;
+  rosterPx: number;
+  rosterPy: number;
   className: string;
 };
 
@@ -194,15 +196,23 @@ Page<BoardPageData>({
     const currentSelectedStarterId = selectedStarterId ?? this.data.selectedStarterId;
     const toView = (player: TacticalBoardPlayer): PlayerView => ({
       ...player,
-      px: normalizedToPixel(player.x, this.data.pitchWidth, 20),
+      px: normalizedToPixel(player.x, this.data.pitchWidth, 20) + 12,
       py: normalizedToPixel(player.y, this.data.pitchHeight, 20),
+      rosterPx: 0,
+      rosterPy: 0,
       initials: player.displayName.slice(0, 2),
       className: player.studentId === currentSelectedStarterId ? "c7-player c7-player--selected" : "c7-player",
     });
+    const rosterPlayers = currentPlayers
+      .map((player: TacticalBoardPlayer, index: number) => ({
+        ...toView(player),
+        rosterPx: 34 + (index % 6) * 50,
+        rosterPy: 340 + Math.floor(index / 6) * 54,
+      }));
     this.setData({
-      rosterPlayers: currentPlayers.map(toView),
-      starters: currentPlayers.filter((player: TacticalBoardPlayer) => player.role === "starter").map(toView),
-      substitutes: currentPlayers.filter((player: TacticalBoardPlayer) => player.role !== "starter").map(toView),
+      rosterPlayers,
+      starters: rosterPlayers.filter((player: PlayerView) => player.role === "starter"),
+      substitutes: rosterPlayers.filter((player: PlayerView) => player.role !== "starter"),
     });
   },
   onFormationChange(event: { detail: { value: string | number } }) {
@@ -237,7 +247,7 @@ Page<BoardPageData>({
   selectStarter(event: { currentTarget: { dataset: { id?: string } } }) {
     if (this.data.readOnly) return;
     const studentId = event.currentTarget.dataset.id || "";
-    if (!this.data.starters.some((player: PlayerView) => player.studentId === studentId)) return;
+    if (!this.data.players.some((player: TacticalBoardPlayer) => player.studentId === studentId && player.role === "starter")) return;
     const selectedStarterId = studentId === this.data.selectedStarterId ? "" : studentId;
     this.setData({ selectedStarterId });
     this.refreshViews(this.data.players, selectedStarterId);
@@ -272,10 +282,13 @@ Page<BoardPageData>({
   onPlayerMove(event: { currentTarget: { dataset: { id?: string } }; detail: { x: number; y: number; source?: string } }) {
     if (this.data.readOnly || event.detail.source !== "touch") return;
     const studentId = event.currentTarget.dataset.id || "";
-    if (!this.data.starters.some((player: PlayerView) => player.studentId === studentId)) return;
-    const x = pixelToNormalized(event.detail.x, this.data.pitchWidth, 20);
+    if (!this.data.players.some((player: TacticalBoardPlayer) => player.studentId === studentId && player.role === "starter")) return;
+    const movedBelowPitch = event.detail.y >= this.data.pitchHeight - 40;
+    const x = pixelToNormalized(event.detail.x - 12, this.data.pitchWidth, 20);
     const y = pixelToNormalized(event.detail.y, this.data.pitchHeight, 20);
-    const players = this.data.players.map((player: TacticalBoardPlayer) => player.studentId === studentId ? { ...player, x, y } : player);
+    const players = this.data.players.map((player: TacticalBoardPlayer) => player.studentId === studentId
+      ? movedBelowPitch ? { ...player, role: "substitute" as const, positionLabel: undefined } : { ...player, x, y }
+      : player);
     this.setData({
       players,
       dirty: true,
@@ -284,6 +297,27 @@ Page<BoardPageData>({
       saveError: "",
     });
     this.refreshViews(players);
+  },
+  onSubstituteMove(event: { currentTarget: { dataset: { id?: string } }; detail: { x: number; y: number; source?: string } }) {
+    if (this.data.readOnly || event.detail.source !== "touch") return;
+    const studentId = event.currentTarget.dataset.id || "";
+    if (!this.data.players.some((player: TacticalBoardPlayer) => player.studentId === studentId && player.role !== "starter")) return;
+    const movedIntoPitch = event.detail.y < this.data.pitchHeight - 40;
+    if (!movedIntoPitch) return;
+    const x = pixelToNormalized(event.detail.x - 12, this.data.pitchWidth, 20);
+    const y = pixelToNormalized(event.detail.y, this.data.pitchHeight, 20);
+    const players = this.data.players.map((player: TacticalBoardPlayer) => player.studentId === studentId
+      ? { ...player, role: "starter" as const, x, y }
+      : player);
+    this.setData({
+      players,
+      dirty: true,
+      saveLabel: "未保存",
+      saveToneClass: "c7-status c7-status--dirty",
+      saveError: "",
+      selectedStarterId: "",
+    });
+    this.refreshViews(players, "");
   },
   resetBoard() {
     if (this.data.readOnly) return;

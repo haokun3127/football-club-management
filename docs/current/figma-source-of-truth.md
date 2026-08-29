@@ -111,7 +111,7 @@ https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/
 
 - 旧 C7 MVP `233:2` 保留为历史基准；在线 Figma 新增非破坏性客户改版区块 `1040:7`，当前页面基准为 `zZ6wKyOHKcO4UYXDd9jGwv / 1040:9 / C7 Tactical Board — Full Screen / Client Revision`。
 - 新稿明确为无 TabBar 的全屏工作面：上部球场、下部圆形球员名单、全屏返回、阵型与保存操作；场上/名单交互设计为拖拽上下场。
-- 小程序本批已完成顶部安全区、上半球场和下部完整真实 roster 的视觉/数据收口；跨区拖拽上下场与保存重启读回仍在 C7 任务内继续，不得据此写作整项完成。
+- 小程序已按 `1040:9` 完成顶部安全区、上半球场、下部完整真实 roster 与无 TabBar 全屏工作面；首发拖回名单、替补拖入球场均有定向回归覆盖。真实 `375×812` 运行截图为 `tmp/c7-final-runtime-20260829.png`，与在线稿 `tmp/figma-c7-fullscreen-client-revision-20260829.png` 对照时，球员姓名/头像内容按真实 API 动态数据豁免。保存后重新加载同一真实比赛成功读回，未将该结果表述为 API 重启证据。
 
 ## 2026-08-11 双角色入口设计
 

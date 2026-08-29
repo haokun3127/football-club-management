@@ -179,6 +179,43 @@ describe("C7 coach tactical board MVP", () => {
     expect(mocks.saveCoachTacticalBoard).not.toHaveBeenCalled();
   });
 
+  it("moves a real starter back to the all-player area when it is dragged below the pitch", () => {
+    const page = createPageInstance({
+      state: "ready",
+      pitchWidth: 320,
+      pitchHeight: 284,
+      players: board().board.players,
+      readOnly: false,
+      dirty: false,
+      selectedStarterId: "",
+    });
+
+    page.onPlayerMove({ currentTarget: { dataset: { id: "student-starter" } }, detail: { x: 120, y: 300, source: "touch" } });
+
+    expect(page.data.players).toEqual(expect.arrayContaining([
+      expect.objectContaining({ studentId: "student-starter", role: "substitute" }),
+    ]));
+    expect(page.data.dirty).toBe(true);
+  });
+
+  it("moves a real substitute onto the pitch when it is dragged into the field", () => {
+    const page = createPageInstance({
+      state: "ready",
+      pitchWidth: 320,
+      pitchHeight: 284,
+      players: board().board.players,
+      readOnly: false,
+      dirty: false,
+    });
+
+    page.onSubstituteMove({ currentTarget: { dataset: { id: "student-substitute" } }, detail: { x: 120, y: 160, source: "touch" } });
+
+    expect(page.data.players).toEqual(expect.arrayContaining([
+      expect.objectContaining({ studentId: "student-substitute", role: "starter" }),
+    ]));
+    expect(page.data.dirty).toBe(true);
+  });
+
   it("serializes save, labels only a successful PUT as saved, and preserves dirty edits on failure", async () => {
     let resolveSave;
     mocks.saveCoachTacticalBoard.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
@@ -230,10 +267,12 @@ describe("C7 coach tactical board MVP", () => {
     expect(template).toContain('class="c7-context-label"');
     expect(template).toContain('class="c7-event-row"');
     expect(template).toContain('class="c7-formation-card"');
+    expect(template).toContain('id="c7-workspace"');
     expect(template).toContain('class="c7-roster"');
     expect(template).toContain('>全部球员<');
     expect(template).toContain('class="c7-actions"');
     expect(template).toContain('bindtap="swapSubstitute"');
+    expect(template).toContain('bindchange="onSubstituteMove"');
     expect(template).not.toContain('c7-player__name');
     expect(template).not.toContain('c7-player__position');
     expect(template).not.toContain('c7-readonly');
@@ -250,7 +289,8 @@ describe("C7 coach tactical board MVP", () => {
     expect(stylesheet).toMatch(/\.c7-formation-card\s*\{[^}]*margin:\s*16rpx 24rpx 0/s);
     expect(stylesheet).toMatch(/\.c7-player\s*\{[^}]*width:\s*80rpx[^}]*height:\s*80rpx/s);
     expect(stylesheet).toMatch(/\.c7-player__badge\s*\{[^}]*width:\s*100%[^}]*height:\s*100%[^}]*font-size:\s*18rpx/s);
-    expect(stylesheet).toMatch(/\.c7-roster__players\s*\{[^}]*flex-wrap:\s*wrap/s);
+    expect(stylesheet).toMatch(/\.c7-workspace\s*\{[^}]*height:\s*1012rpx/s);
+    expect(stylesheet).toMatch(/\.c7-roster__player--movable\s*\{[^}]*z-index:\s*2/s);
     expect(stylesheet).toMatch(/\.c7-roster__player\s*\{[^}]*width:\s*72rpx[^}]*height:\s*72rpx/s);
     expect(stylesheet).toMatch(/\.c7-actions\s*\{[^}]*height:\s*96rpx/s);
     expect(controller).toContain("this.data.pitchWidth, 20");

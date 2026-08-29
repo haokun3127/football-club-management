@@ -42,9 +42,11 @@
       </view>
 
       <view class="c7-board-container">
-        <movable-area id="c7-pitch" class="c7-pitch">
+        <movable-area id="c7-workspace" class="c7-workspace">
+          <view id="c7-pitch" class="c7-pitch">
           <view class="c7-pitch__halfway"></view>
           <view class="c7-pitch__boundary"></view>
+          </view>
 
           <block wx:if="{{!readOnly}}">
             <movable-view wx:for="{{starters}}" wx:key="studentId" class="{{item.className}}" direction="all" x="{{item.px}}" y="{{item.py}}" inertia="{{false}}" out-of-bounds="{{false}}" data-id="{{item.studentId}}" bindchange="onPlayerMove" bindtap="selectStarter">
@@ -56,19 +58,21 @@
               <view class="c7-player__badge">{{item.initials}}</view>
             </view>
           </block>
-        </movable-area>
-      </view>
-
-      <view class="c7-roster">
-        <view class="c7-roster__heading">
-          <view class="c7-roster__title">全部球员</view>
-          <view class="c7-roster__hint">点选场上球员后，点击下方球员换位</view>
-        </view>
-        <view class="c7-roster__players">
-          <view wx:for="{{rosterPlayers}}" wx:key="studentId" class="c7-roster__player" data-id="{{item.studentId}}" bindtap="swapSubstitute">
+          <view class="c7-roster">
+            <view class="c7-roster__heading">
+              <view class="c7-roster__title">全部球员</view>
+              <view class="c7-roster__hint">拖入足球场即可上场</view>
+            </view>
+          </view>
+          <view wx:for="{{rosterPlayers}}" wx:key="studentId" class="c7-roster__player c7-roster__player--listed" style="left: {{item.rosterPx}}px; top: {{item.rosterPy}}px;">
             <view class="c7-roster__avatar">{{item.initials}}</view>
           </view>
-        </view>
+          <block wx:if="{{!readOnly}}">
+            <movable-view wx:for="{{substitutes}}" wx:key="studentId" class="c7-roster__player c7-roster__player--movable" direction="all" x="{{item.rosterPx}}" y="{{item.rosterPy}}" inertia="{{false}}" out-of-bounds="{{false}}" data-id="{{item.studentId}}" bindchange="onSubstituteMove" bindtap="swapSubstitute">
+              <view class="c7-roster__avatar">{{item.initials}}</view>
+            </movable-view>
+          </block>
+        </movable-area>
       </view>
       <view wx:if="{{saveError}}" class="c7-save-error">{{saveError}}</view>
 
