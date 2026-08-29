@@ -3,7 +3,7 @@
   "name": "production-three-phone-demo-data",
   "title": "Production demo data for seven phone-bound accounts",
   "description": "",
-  "status": "in_progress",
+  "status": "completed",
   "dev_type": null,
   "scope": null,
   "package": "api",
@@ -11,7 +11,7 @@
   "creator": "dongjun",
   "assignee": "dongjun",
   "createdAt": "2026-08-18",
-  "completedAt": null,
+  "completedAt": "2026-08-29",
   "branch": null,
   "base_branch": "dev",
   "worktree_path": null,
@@ -21,6 +21,6 @@
   "children": [],
   "parent": null,
   "relatedFiles": [],
-  "notes": "",
+  "notes": "Production import and final audit completed: seven isolated dual-role slots, recent three-week rolling records, authenticated parent/coach BFF readback, health 200, and temporary verification sessions removed. Real WeChat authorization and visual acceptance remain separate operator checks.",
   "meta": {}
 }

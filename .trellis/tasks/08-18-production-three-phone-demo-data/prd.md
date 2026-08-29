@@ -23,11 +23,11 @@ Provide seven operator-supplied WeChat phone identities with isolated, durable p
 
 ## Acceptance criteria
 
-- [ ] A dry-run validates exactly seven unique runtime phones and reports only operation status/count, without mutating the file database.
-- [ ] A confirmed run accepts a complete existing slots 1–3 installation plus missing slots 4–7, and is safe to rerun after all seven slots are present.
-- [ ] Each slot has one active membership, parent profile, coach profile, team, eight students, two guardian bindings, eight team members, historical/current/future events, and eight participants per demo event.
-- [ ] Parent BFF returns exactly two students for each slot; coach BFF returns the eight-player roster and non-empty attendance, training, assessment, match, and tactical-board data.
-- [ ] Reopening the database and restarting the API preserves all imported rows and saved tactical-board data.
-- [ ] A scoped rollback rejects incomplete/tampered manifests and removes only the canonical seven-slot rows plus namespaced demo side effects.
-- [ ] Focused tests, API typecheck/build, root check, and `git diff --check` pass before production execution.
-- [ ] Production execution records backup path/attestation privately, restarts only the API, returns health 200, and supplies a per-phone parent/coach real-device verification checklist without exposing phone values in repository artifacts.
+- [x] A dry-run validates exactly seven unique runtime phones and reports only operation status/count, without mutating the file database.
+- [x] A confirmed run accepts a complete existing slots 1–3 installation plus missing slots 4–7, and is safe to rerun after all seven slots are present.
+- [x] Each slot has one active membership, parent profile, coach profile, team, eight students, two guardian bindings, eight team members, historical/current/future events, and eight participants per demo event.
+- [x] Parent BFF returns exactly two students for each slot; coach BFF returns the eight-player roster and non-empty attendance, training, assessment, match, and tactical-board data.
+- [x] Reopening the database and restarting the API preserves all imported rows and saved tactical-board data.
+- [x] A scoped rollback rejects incomplete/tampered manifests and removes only the canonical seven-slot rows plus namespaced demo side effects.
+- [x] Focused tests, API typecheck/build, root check, and `git diff --check` pass before production execution.
+- [x] Production execution records backup path/attestation privately, restarts only the API, returns health 200, and supplies a per-phone parent/coach real-device verification checklist without exposing phone values in repository artifacts.
