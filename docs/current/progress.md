@@ -1773,3 +1773,4 @@
 - 复现过的错误为共享组件 `components/radar-canvas/index` 被运行时解析为 `wx://not-found`，导致 C13/C14 白屏；源码组件只有 TypeScript 是项目既定形态，不能手工补写或提交伪造的 `index.js`。通过 WeChatIDE MCP 重新执行“打开项目→打开精确路由→等待 `view` 挂载→原始 PNG 截图”后，C13 与 C14 均恢复正常渲染。
 - 在线稿重新读取：C13 `93:1080`（`375×908`）与 C14 `93:1106`（`375×1258`），未发现需要回写 Figma 的新变化。运行证据：`tmp/goal-c13-after-refresh-20260829.png`、`tmp/goal-c14-after-refresh-20260829.png` 及对应 sidecar，均严格 `375×812`。
 - C13/C14 真实请求均返回 `200`；控制台过滤 `error|exception|fail|undefined|wx:else|route is not defined|appid missing|not-found` 无命中。当前结果证明 MCP 强制重新编译能够恢复旧惰性编译依赖状态；未修改业务代码、API、角色会话或数据。
+- C7 的隔离 SQLite 持久化回归 `persists the acceptance dual-role demo through SQLite restart and supports targeted rollback` 单测通过（`1 passed / 54 skipped`），覆盖战术板保存、关闭并重新创建 API/持久化层后的阵型与球员坐标读回；本轮没有写入生产库。
