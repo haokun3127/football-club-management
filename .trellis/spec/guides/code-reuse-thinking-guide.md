@@ -58,6 +58,24 @@ grep -r "keyword" .
 
 **Good**: Single source of truth, import everywhere
 
+### Pattern 5: Reusing visual assets instead of text glyphs
+
+**Problem**: Replacing a Figma icon with a Unicode character such as `✓` or `←` creates a platform-dependent shape, weight, and alignment that can pass structural tests while failing visual comparison.
+
+**Good**: Reuse the existing SVG asset or add the exact asset exported from the current online Figma board, then render it with an explicit `<image mode="aspectFit">` size.
+
+```xml
+<!-- Good: the asset is a stable visual contract -->
+<image class="hero__check" src="/assets/icons/c4-1-check.svg" mode="aspectFit" />
+
+<!-- Bad: the glyph varies by font/platform and is not the Figma icon -->
+<view class="hero__circle">✓</view>
+```
+
+**Why**: The online Figma file is the visual source of truth. Asset reuse keeps stroke, cap, proportions, and rendering independent of the simulator's fallback font.
+
+**Before commit**: Search the changed WXML for text-arrow/check glyphs and compare every icon-bearing node with the live Figma board before accepting a visual match.
+
 ### Pattern 4: Repeated Payload Field Extraction
 
 **Bad**: Multiple consumers cast the same JSON/event fields locally:
