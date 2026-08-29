@@ -56,3 +56,12 @@
 .week-nav__expand { top: 50%; bottom: auto; height: 32rpx; transform: translateY(-50%); }
 .week-nav__expand-icon { display: block; width: 20rpx; height: 20rpx; border: 0; transform: none; }
 .month-calendar__collapse-icon { display: block; width: 20rpx; height: 20rpx; border: 0; transform: rotate(180deg); }
+
+/* Keep the month affordance centered inside the date strip on every device width. */
+.week-switcher { height: 112rpx; }
+.week-nav__expand { top: 50%; bottom: auto; height: 32rpx; transform: translateY(-50%); }
+.week-nav__expand-icon { display: block; width: 20rpx; height: 20rpx; border: 0; transform: none; }
+
+/* Reserve the trailing control slot so it never covers Sunday or the selected date. */
+.week-nav { padding-right: 68rpx; }
+.week-nav__expand { top: 50%; right: 12rpx; bottom: auto; width: 48rpx; height: 32rpx; transform: translateY(-50%); }

@@ -78,6 +78,7 @@ describe("P1 weekly schedule with expandable month picker", () => {
     expect(expand).toContain("bottom: auto");
     expect(expand).toContain("transform: translateY(-50%)");
     expect(expand).not.toContain("bottom: -14rpx");
+    expect(stylesheet).toContain(".week-nav { padding-right: 68rpx; }");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 });
