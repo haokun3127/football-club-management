@@ -1,6 +1,6 @@
-# Figma 画板规格: C1 Coach Schedule Home
+# Figma 画板规格: C1 Coach Home — Team Selector V2
 
-- [4] | C1 Coach Schedule Home | 375x812 @(80,120) | fill=#f5f6f8 | r=28 | layout=V
+- [4] | C1 Coach Home — Team Selector V2 | 375x812 | fill=#f5f6f8 | r=28 | layout=V
   - [4] | Top Nav | 375x88 @(80,120) | fill=#ffffff | stroke=#e7eaf0 w1 | layout=H pad=14/22
     - [13] | Title | 44x27 @(102,150) | fill=#202124 | font=Inter/Bold 22px | text="日程"
     - [4] | Avatar | 36x36 @(397,146) | fill=#a80f1b | r=18 | layout=V
@@ -27,14 +27,13 @@
     - [4] | Day 7 | 44x40 @(389,220) | fill=#ffffff | r=8 | layout=V gap=2
       - [13] | SUN | 22x12 @(400,224) | fill=#667085 | font=Inter/Regular 10px | text="SUN"
       - [13] | 13 | 16x17 @(403,238) | fill=#202124 | font=Inter/Semi Bold 14px | text="13"
-  - [4] | Stats Row | 375x68 @(80,272) | layout=H gap=8 pad=12/22
-    - [4] | Stat Pill 1 | 127x44 @(102,284) | fill=#a80f1b | r=12 | layout=H gap=6 pad=0/12
-      - [13] | 📅 今日2节训练课 | 103x16 @(114,298) | fill=#ffffff | font=Inter/Semi Bold 13px | text="📅 今日2节训练课"
-    - [4] | Stat Pill 2 | 116x44 @(237,284) | fill=#10b981 | r=12 | layout=H gap=6 pad=0/12
-      - [13] | 👥 出席18/20人 | 92x16 @(249,298) | fill=#ffffff | font=Inter/Semi Bold 13px | text="👥 出席18/20人"
-    - [4] | Stat Pill 3 | 86x44 @(361,284) | fill=#f59e0b | r=12 | layout=H gap=6 pad=0/12
-      - [13] | ⚠️ 待处理1 | 62x16 @(373,298) | fill=#ffffff | font=Inter/Semi Bold 13px | text="⚠️ 待处理1"
-  - [4] | Activity List | 375x522 @(80,340) | layout=V gap=12 pad=0/22
+  - [4] | My Team Selector | 375x76 | fill=#ffffff | stroke=#e7eaf0 w1 | r=12 | layout=V
+    - [13] | 我的球队 | 60x15 | fill=#667085 | font=Inter/Bold 12px
+    - [13] | 当前球队名称 | fill=#202124 | font=Inter/Semi Bold 17px
+    - [13] | 球队元信息 | fill=#667085 | font=Inter/Regular 11px
+    - [6] | Chevron Right | 20x20 | stroke=#667085 w2
+  - [4] | Hero Card | 343x180 | fill=#07111f | r=16
+  - [4] | Activity List | 375x522 | layout=V gap=12 pad=0/22
     - [4] | Activity Card 1 | 331x96 @(102,340) | fill=#ffffff | r=16 | layout=H gap=12 pad=12/12 | shadow=0,4,16,#000000@0.08
       - [4] | accent | 4x72 @(114,352) | fill=#a80f1b | r=2 | layout=V
       - [4] | time | 56x33 @(130,372) | layout=V gap=2
@@ -112,10 +111,11 @@
 
 ## Implementation update
 
-- Online authority re-read immediately before implementation: Figma file `zZ6wKyOHKcO4UYXDd9jGwv`, node `93:578`.
-- The coach schedule view model now exposes Hero statistics as `{ value, label, tone }`, allowing the attendance metric to use the red primary treatment while keeping all values API-backed.
-- The stats row uses content-sized capsules (`88rpx` height, `24rpx` horizontal padding); the Hero uses the current `54px` time scale (`108rpx`) and `24rpx` layout gap; activity cards use the existing `/assets/icons/chevron-right.svg` at `40rpx`.
+- Online authority re-read immediately before this update: Figma file `zZ6wKyOHKcO4UYXDd9jGwv`, node `529:7` (`C1 Coach Home — Team Selector V2`).
+- The current V2 hierarchy places a full-width 76px-equivalent team selector between the date strip and Hero; the legacy standalone stats rail is not rendered. Hero statistics remain inside the Hero card.
+- The coach schedule view model exposes the first real API team as `selectedTeamName` and derives `teamMetaLabel` without copying Figma sample team/player facts. The selector arrow routes to the existing coach team detail page and does not expose team creation.
+- The Hero keeps the current `54px` time scale (`108rpx`) and `24rpx` layout gap; activity cards use the existing `/assets/icons/chevron-right.svg` at `40rpx`.
 - No Figma sample date, name, team, venue, count, or status was copied into runtime data.
-- Code evidence: C1 Vitest `15/15`, mini-program TypeScript `exit=0`, full repository `check` `exit=0` (`domain 20/20`, `miniprogram 405/405`, `api 115/115`), and `git diff --check` clean.
-- Visual evidence completed on 2026-08-28: after switching the existing dual-role session through the app's real `/session/role` flow, the runtime route was verified as `/pages/coach/schedule/index` and `systemInfo` returned an iPhone X logical viewport of `375×812` with `pixelRatio=3`. Fresh MCP screenshots were captured at `C:\Users\ASUS\AppData\Local\Temp\cq-c1-coach-20260828-data.png` and compared with the online Figma screenshot `C:\Users\ASUS\AppData\Local\Temp\cq-c1-figma-20260828.png` for node `93:578`.
-- Structural comparison passed for the top navigation, seven-day strip and arrows, content-sized statistic capsules, dark Hero, activity-card layout, chevrons, and coach TabBar. Runtime dates, coach/team names, counts, event titles, statuses, and the number of cards are real API data and therefore differ legitimately from the Figma sample values; no sample values were copied into the view model.
+- Code evidence: C1 Vitest `16/16`, mini-program TypeScript `exit=0`, WXML/WXSS MCP compilation passed, and the C1 focused `git diff --check` is clean.
+- Visual evidence completed on 2026-08-29: WeChatIDE MCP opened `/pages/coach/schedule/index` with a real coach session at logical `375×812`. Fresh runtime screenshots are `tmp/c1-coach-home-team-selector-v2-runtime-final-filled.png` (2026-08-15 data) and `tmp/c1-coach-home-team-selector-v2-runtime-final.png` (2026-08-29 empty state); the online node screenshot is `tmp/c1-coach-home-team-selector-v2-figma.png`.
+- Structural comparison passed for the V2 top navigation, seven-day strip and arrows, full-width team selector, 343px Hero, activity-card rail, chevrons, and coach TabBar. Runtime dates, coach/team names, counts, event titles, statuses, and card count are real API data and therefore differ legitimately from Figma sample values; the empty current-date state is truthful when no events are returned.

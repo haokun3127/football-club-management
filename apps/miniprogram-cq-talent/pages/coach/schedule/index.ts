@@ -54,7 +54,8 @@ Page({
     hasCoachInitial: false,
     teamChips: [] as Array<{ name: string }>,
     hasTeams: false,
-    summaryItems: [] as Array<{ key: "training" | "attendance" | "match" | "pending"; label: string; value: string; tone: string }>,
+    selectedTeamName: "",
+    teamMetaLabel: "",
     eventViews: [] as CoachEventView[],
     visibleEvents: [] as CoachEventView[],
     hasVisibleEvents: false,
@@ -76,6 +77,8 @@ Page({
     try {
       const home = await getCoachHome(range);
       const coachName = home.coachName?.trim() || "";
+      const teamChips = home.teams.map((name) => ({ name }));
+      const selectedTeamName = teamChips[0]?.name ?? "";
       const eventViews = home.events.map((event) => toCoachEventView(event, coachName));
       const taskCards = home.tasks.map(toCoachTaskView);
       const heroEvent = eventViews.find((event) => event.status === "in_progress") ?? eventViews[0] ?? null;
@@ -90,15 +93,10 @@ Page({
         coachName,
         coachInitial: coachName.slice(0, 1),
         hasCoachInitial: Boolean(coachName),
-        teamChips: home.teams.map((name) => ({ name })),
-        hasTeams: home.teams.length > 0,
-        summaryItems: [
-          { key: "training", label: `今日${home.summary.training}节训练课`, value: "", tone: "brand" },
-          home.summary.attendance
-            ? { key: "attendance" as const, label: `出席${home.summary.attendance.confirmed}/${home.summary.attendance.total}人`, value: "", tone: "green" }
-            : { key: "match" as const, label: `比赛${home.summary.matches}场`, value: "", tone: "blue" },
-          { key: "pending", label: `待处理${home.summary.pending}`, value: "", tone: "amber" },
-        ],
+        teamChips,
+        hasTeams: teamChips.length > 0,
+        selectedTeamName,
+        teamMetaLabel: teamChips.length > 1 ? `共${teamChips.length}支队伍` : teamChips.length === 1 ? "后台同步" : "",
         heroPills: buildHeroPills(home),
         eventViews,
         heroEvent,
@@ -137,6 +135,9 @@ Page({
   },
   openMe() {
     openTab("/pages/coach/me/index");
+  },
+  openTeam() {
+    if (this.data.hasTeams) openPage("/pages/coach/team/index");
   },
   switchView(event: { currentTarget: { dataset: { mode?: "day" | "week" } } }) {
     const viewMode = event.currentTarget.dataset.mode;

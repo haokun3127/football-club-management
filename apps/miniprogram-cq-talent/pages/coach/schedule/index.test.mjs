@@ -90,11 +90,6 @@ describe("coach schedule home", () => {
 
     await page.load();
 
-    expect(page.data.summaryItems).toEqual([
-      { key: "training", label: "今日1节训练课", value: "", tone: "brand" },
-      { key: "attendance", label: "出席9/10人", value: "", tone: "green" },
-      { key: "pending", label: "待处理1", value: "", tone: "amber" },
-    ]);
     expect(page.data.heroPills).toEqual([
       { value: "90%", label: "出席率", tone: "primary" },
       { value: "4.5h", label: "本周训练", tone: "neutral" },
@@ -112,11 +107,8 @@ describe("coach schedule home", () => {
     expect(page.data).toMatchObject({
       state: "ready",
       coachName: "Coach Chen",
-      summaryItems: [
-        { key: "training", label: "今日1节训练课", value: "" },
-        { key: "match", label: "比赛0场", value: "" },
-        { key: "pending", label: "待处理1", value: "" },
-      ],
+      selectedTeamName: "U11 Red",
+      teamMetaLabel: "后台同步",
       hasHeroEvent: true,
       heroDateLabel: "2026年8月13日 周四",
       heroEvent: { id: "event-training-1", title: "Ball-control session", startTime: "09:00", hasDuration: true },
@@ -188,9 +180,25 @@ describe("coach schedule home", () => {
     expect(stylesheet).toMatch(/\.c1-dates__arrow\s*\{[^}]*flex:\s*0\s+0\s+44rpx[^}]*color:\s*#667085[^}]*font-size:\s*36rpx/s);
   });
 
+  it("renders the live C1 team selector before the hero and removes the legacy summary rail", async () => {
+    mocks.getCoachHome.mockResolvedValue({ ...home, teams: ["U10精英队"] });
+    const page = createPageInstance();
+
+    await page.load();
+
+    expect(page.data).toMatchObject({
+      selectedTeamName: "U10精英队",
+      hasTeams: true,
+    });
+    expect(template).toContain('class="c1-team-selector"');
+    expect(template.indexOf("c1-team-selector")).toBeLessThan(template.indexOf("c1-hero"));
+    expect(template).not.toContain('class="c1-summary"');
+    expect(stylesheet).toMatch(/\.c1-team-selector\s*\{[^}]*height:\s*152rpx[^}]*border-radius:\s*24rpx/s);
+  });
+
   it("matches the C1 online hero and stats-row offsets without moving activity cards off their 22px rail", () => {
     expect(stylesheet).toMatch(/\.c1-nav\s*\{[^}]*padding:\s*0\s+32rpx/s);
-    expect(stylesheet).toMatch(/\.c1-summary\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+32rpx/s);
+    expect(stylesheet).toMatch(/\.c1-team-selector\s*\{[^}]*height:\s*152rpx[^}]*border-radius:\s*24rpx/s);
     expect(stylesheet).toMatch(/\.c1-body\s*\{[^}]*padding:\s*0\s+44rpx\s+calc\(148rpx\s*\+\s*env\(safe-area-inset-bottom\)\)/s);
     expect(stylesheet).toMatch(/\.c1-hero\s*\{[^}]*margin:\s*0\s+-12rpx/s);
     expect(stylesheet).toMatch(/\.c1-list\s*\{[^}]*margin-top:\s*24rpx/s);
@@ -245,7 +253,6 @@ describe("coach schedule home", () => {
   });
 
   it("matches the live C1 stat-pill and hero scale", () => {
-    expect(stylesheet).toMatch(/\.c1-summary__item\s*\{(?=[^}]*flex:\s*0\s+0\s+auto)(?=[^}]*height:\s*88rpx)(?=[^}]*padding:\s*0\s+24rpx)/s);
     expect(stylesheet).toMatch(/\.c1-hero\s*\{[^}]*gap:\s*24rpx[^}]*min-height:\s*360rpx/s);
     expect(stylesheet).toMatch(/\.c1-hero__time\s*\{[^}]*font-size:\s*108rpx[^}]*line-height:\s*108rpx/s);
     expect(stylesheet).toMatch(/\.c1-hero__pill\s*\{[^}]*padding:\s*16rpx\s+20rpx/s);

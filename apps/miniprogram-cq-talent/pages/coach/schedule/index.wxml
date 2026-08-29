@@ -15,11 +15,13 @@
     <view class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek">›</view>
   </view>
 
-  <view wx:if="{{state === 'ready'}}" class="c1-summary">
-    <view wx:for="{{summaryItems}}" wx:key="key" class="c1-summary__item c1-summary__item--{{item.tone}}">
-      <text class="c1-summary__label">{{item.label}}</text>
-      <text class="c1-summary__value">{{item.value}}</text>
+  <view wx:if="{{state === 'ready' && hasTeams}}" class="c1-team-selector" bindtap="openTeam">
+    <text class="c1-team-selector__label">我的球队</text>
+    <view class="c1-team-selector__line">
+      <text class="c1-team-selector__name">{{selectedTeamName}}</text>
+      <text wx:if="{{teamMetaLabel}}" class="c1-team-selector__meta">{{teamMetaLabel}}</text>
     </view>
+    <image class="c1-team-selector__chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
   </view>
 
   <view class="c1-body">

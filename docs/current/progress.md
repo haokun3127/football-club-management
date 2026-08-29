@@ -1682,3 +1682,11 @@
 - 发现并修复该页面缺少 `navigationStyle: custom` 导致原生导航栏额外占位、页面整体下移的问题；能力名称增加单行省略，能力卡按在线稿测量间距上移。
 - 运行时使用真实家长会话和真实成长/日程数据，Figma 示例姓名、分数、次数和阶段名称均未写入；无阶段名时诚实显示“最近阶段”，无评语时显示“暂无教练评语”。
 - P4.3 定向测试 `7/7`；小程序 TypeScript、WXML/WXSS 编译通过；全仓门禁通过：domain `20/20`、小程序 `415/415`、API `115/115`；真实截图严格 `375×812`，对照记录见 `p43-comparison.md`。
+
+## 2026-08-29 C1 教练首页 Team Selector V2 复原
+
+- 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 529:7`（`C1 Coach Home — Team Selector V2`），并保存原尺寸 `375×812` 设计截图：`tmp/c1-coach-home-team-selector-v2-figma.png`。
+- 根据新版画板调整 C1 页面层级：日期条后新增全宽“我的球队”选择模块，使用真实 `coach/home` 返回的球队名称和派生元信息；移除新版画板中已不存在的日期条下方独立统计胶囊，统计继续保留在 Hero 内。球队箭头进入现有教练队伍详情页，不提供前台新建球队入口。
+- 修复选择器与 Hero 之间多出的约 12px 顶部空隙，保持 Figma 的日期条 → 球队选择器 → Hero → 活动卡 → 教练 TabBar 垂直关系；未修改 API、角色/session、生产数据或其他页面。
+- WeChatIDE MCP 真实教练会话在 `/pages/coach/schedule/index` 取得严格 `375×812` 截图：有数据态为 `tmp/c1-coach-home-team-selector-v2-runtime-final-filled.png`（2026-08-15），当前日期无数据态为 `tmp/c1-coach-home-team-selector-v2-runtime-final.png`（2026-08-29）。真实活动标题较长导致活动卡标题省略，按 API 数据差异记录，未复制 Figma 示例。
+- 验证：C1 定向 Vitest `16/16`；小程序 TypeScript `exit=0`；WXML/WXSS MCP 编译通过；模拟器错误过滤 `error|exception|fail|wx:else|undefined|route is not defined|appid missing` 无命中。

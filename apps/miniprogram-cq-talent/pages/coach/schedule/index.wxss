@@ -21,11 +21,12 @@
 .c1-day__week { color: #667085; font-size: 20rpx; line-height: 24rpx; }.c1-day__num { color: #202124; font-size: 28rpx; font-weight: 600; line-height: 34rpx; }
 .c1-day--selected .c1-day__week, .c1-day--selected .c1-day__num { color: #ffffff; }
 
-.c1-summary { display: flex; gap: 16rpx; padding: 32rpx 44rpx 32rpx; overflow: hidden; }
-.c1-summary__item { display: flex; flex: 0 0 auto; align-items: center; justify-content: flex-start; gap: 8rpx; min-width: 0; height: 88rpx; padding: 0 24rpx; border-radius: 24rpx; box-sizing: border-box; color: #ffffff; white-space: nowrap; }
-.c1-summary__item--brand { background: #a80f1b; }.c1-summary__item--blue { background: #1976d2; }.c1-summary__item--green { background: #10b981; }.c1-summary__item--amber { background: #f59e0b; }
-.c1-summary__label { font-size: 26rpx; font-weight: 600; }.c1-summary__value { font-size: 30rpx; font-weight: 700; }
-.c1-teams { padding-top: 16rpx; }.c1-team-chip { flex: 0 0 auto; padding: 10rpx 18rpx; border-radius: 20rpx; background: #ffffff; color: #667085; font-size: 22rpx; border: 1rpx solid #e7eaf0; }
+.c1-team-selector { position: relative; display: flex; flex-direction: column; justify-content: center; height: 152rpx; padding: 22rpx 84rpx 22rpx 42rpx; box-sizing: border-box; border: 1rpx solid #e7eaf0; border-radius: 24rpx; background: #ffffff; }
+.c1-team-selector__label { color: #667085; font-size: 24rpx; font-weight: 700; line-height: 28rpx; }
+.c1-team-selector__line { display: flex; align-items: baseline; gap: 16rpx; min-width: 0; margin-top: 8rpx; }
+.c1-team-selector__name { overflow: hidden; color: #202124; font-size: 34rpx; font-weight: 600; line-height: 40rpx; text-overflow: ellipsis; white-space: nowrap; }
+.c1-team-selector__meta { flex: 0 0 auto; color: #667085; font-size: 22rpx; line-height: 28rpx; white-space: nowrap; }
+.c1-team-selector__chevron { position: absolute; top: 50%; right: 32rpx; width: 40rpx; height: 40rpx; transform: translateY(-50%); }
 
 .c1-body { padding: 0 44rpx calc(148rpx + env(safe-area-inset-bottom)); }
 .c1-hero { display: flex; flex-direction: column; gap: 24rpx; min-height: 360rpx; margin: 0 -12rpx; padding: 32rpx; box-sizing: border-box; border-radius: 32rpx; background: #07111f; color: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0,0,0,.08); }
