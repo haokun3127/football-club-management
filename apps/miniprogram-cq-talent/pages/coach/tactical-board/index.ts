@@ -25,6 +25,7 @@ interface BoardPageData {
   hasFormation: boolean;
   players: TacticalBoardPlayer[];
   roster: TacticalBoardState["roster"];
+  rosterPlayers: PlayerView[];
   starters: PlayerView[];
   substitutes: PlayerView[];
   pitchWidth: number;
@@ -55,6 +56,7 @@ Page<BoardPageData>({
     hasFormation: false,
     players: [],
     roster: [],
+    rosterPlayers: [],
     starters: [],
     substitutes: [],
     pitchWidth: 351,
@@ -155,6 +157,7 @@ Page<BoardPageData>({
         saveToneClass: "c7-status c7-status--loaded",
         saveError: "",
         selectedStarterId: "",
+        rosterPlayers: [],
         starters: [],
         substitutes: [],
       });
@@ -166,6 +169,7 @@ Page<BoardPageData>({
         state: "error",
         stateTitle: "读取失败",
         message: "当前比赛的战术板信息暂不可用，请稍后重试。",
+        rosterPlayers: [],
         starters: [],
         substitutes: [],
       });
@@ -196,6 +200,7 @@ Page<BoardPageData>({
       className: player.studentId === currentSelectedStarterId ? "c7-player c7-player--selected" : "c7-player",
     });
     this.setData({
+      rosterPlayers: currentPlayers.map(toView),
       starters: currentPlayers.filter((player: TacticalBoardPlayer) => player.role === "starter").map(toView),
       substitutes: currentPlayers.filter((player: TacticalBoardPlayer) => player.role !== "starter").map(toView),
     });
@@ -316,13 +321,17 @@ Page<BoardPageData>({
 });
 
 function presentBoardPlayers(response: TacticalBoardState) {
-  const namesByStudentId = new Map(
-    response.roster
-      .filter((member) => Boolean(member.studentId) && Boolean(member.displayName))
-      .map((member) => [member.studentId, member.displayName]),
-  );
-  return response.board.players.flatMap((player) => {
-    const displayName = namesByStudentId.get(player.studentId);
-    return displayName ? [{ ...player, displayName }] : [];
+  const boardPlayersByStudentId = new Map(response.board.players.map((player) => [player.studentId, player]));
+  return response.roster.flatMap((member) => {
+    if (!member.studentId || !member.displayName) return [];
+    const boardPlayer = boardPlayersByStudentId.get(member.studentId);
+    return [{
+      studentId: member.studentId,
+      displayName: member.displayName,
+      role: boardPlayer?.role ?? "substitute",
+      positionLabel: boardPlayer?.positionLabel,
+      x: boardPlayer?.x ?? 0.5,
+      y: boardPlayer?.y ?? 0.8,
+    }];
   });
 }

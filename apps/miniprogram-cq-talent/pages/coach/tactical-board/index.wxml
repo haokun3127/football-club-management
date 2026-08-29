@@ -1,10 +1,12 @@
 <view class="c7-page">
   <view class="c7-header" style="padding-top:{{navInset}}px">
-    <view class="c7-header__back" bindtap="goBack" aria-label="返回">
+    <view class="c7-header__back" style="top:{{navInset}}px" bindtap="goBack" aria-label="返回">
       <image src="/assets/icons/chevron-left.svg" mode="aspectFit" />
     </view>
-    <view class="c7-header__title">比赛战术板</view>
-    <view class="c7-header__subtitle">阵型与首发位置</view>
+    <view class="c7-header__titles">
+      <view class="c7-header__title">比赛战术板</view>
+      <view class="c7-header__subtitle">阵型与首发位置</view>
+    </view>
   </view>
 
   <view class="c7-content">
@@ -57,14 +59,14 @@
         </movable-area>
       </view>
 
-      <view class="c7-bench">
-        <view class="c7-bench__heading">
-          <view class="c7-bench__title">替补席</view>
-          <view class="c7-bench__hint">先选场上球员，再点替补换位</view>
+      <view class="c7-roster">
+        <view class="c7-roster__heading">
+          <view class="c7-roster__title">全部球员</view>
+          <view class="c7-roster__hint">点选场上球员后，点击下方球员换位</view>
         </view>
-        <view class="c7-bench__players">
-          <view wx:for="{{substitutes}}" wx:key="studentId" class="c7-substitute" data-id="{{item.studentId}}" bindtap="swapSubstitute">
-            <view class="c7-substitute__badge">{{item.initials}}</view>
+        <view class="c7-roster__players">
+          <view wx:for="{{rosterPlayers}}" wx:key="studentId" class="c7-roster__player" data-id="{{item.studentId}}" bindtap="swapSubstitute">
+            <view class="c7-roster__avatar">{{item.initials}}</view>
           </view>
         </view>
       </view>

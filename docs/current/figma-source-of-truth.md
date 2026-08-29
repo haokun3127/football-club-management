@@ -107,6 +107,12 @@ https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/
   - `zZ6wKyOHKcO4UYXDd9jGwv / 1026:150 / C1.1 Coach Team Selection — Full Screen`
 - C1.1 的在线稿已截图复核。小程序真实教练会话已在 `375×812` 下复核全屏返回、单队已选态与“仅显示已分配队伍”边界；真实运行名称来自 API，未写入 Figma 示例队伍。
 
+## 2026-08-29 C7 全屏战术板客户改版
+
+- 旧 C7 MVP `233:2` 保留为历史基准；在线 Figma 新增非破坏性客户改版区块 `1040:7`，当前页面基准为 `zZ6wKyOHKcO4UYXDd9jGwv / 1040:9 / C7 Tactical Board — Full Screen / Client Revision`。
+- 新稿明确为无 TabBar 的全屏工作面：上部球场、下部圆形球员名单、全屏返回、阵型与保存操作；场上/名单交互设计为拖拽上下场。
+- 小程序本批已完成顶部安全区、上半球场和下部完整真实 roster 的视觉/数据收口；跨区拖拽上下场与保存重启读回仍在 C7 任务内继续，不得据此写作整项完成。
+
 ## 2026-08-11 双角色入口设计
 
 - 在线 Figma 新增复用组件集：`304:14 / RoleSwitchEntry`；变体为 `304:2 / role=parent` 与 `304:8 / role=coach`。该组件仅用于后端已确认同时拥有家长、教练两种入口的账号。
