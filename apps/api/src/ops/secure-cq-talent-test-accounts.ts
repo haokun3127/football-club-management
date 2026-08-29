@@ -390,6 +390,7 @@ function hasCurrentDemoData(
   return manifest.accountIds.every((account) => {
     const labels = demoLabels(account);
     const events = buildDemoEvents(account, now);
+    if (hasSupersededSettlementLedgerRows(database, account)) return false;
     const storedEvents = database.prepare(`
       SELECT id, type, title, starts_at, ends_at, status, notes
       FROM calendar_events
@@ -517,6 +518,7 @@ function ensureDemoData(
   const assessmentCatalog = loadDemoAssessmentCatalog(database);
 
   refreshDemoIdentity(database, account, labels, now);
+  removeSupersededSettlementLedgerRows(database, account);
 
   database.prepare(
     "UPDATE calendar_events SET title = ?, starts_at = ?, ends_at = ?, status = ?, notes = ?, updated_at = ? WHERE id = ? AND club_id = ? AND primary_team_id = ? AND owner_coach_id = ?",
@@ -802,6 +804,35 @@ function demoRecordIds(account: SecureCqTalentTestAccountManifestEntry) {
     privateLessonRequestIds: account.studentIds.slice(0, 2).map((_, index) => "private-lesson-cq-talent-secure-test-" + account.slot + "-" + (index + 1)),
     communicationLogIds: account.studentIds.slice(0, 2).flatMap((_, index) => ["communication-cq-talent-secure-test-" + account.slot + "-" + (index + 1) + "-1", "communication-cq-talent-secure-test-" + account.slot + "-" + (index + 1) + "-2"]),
   };
+}
+
+function supersededSettlementLedgerIds(account: SecureCqTalentTestAccountManifestEntry): string[] {
+  return account.studentIds.map((_, index) =>
+    "lesson-ledger-cq-talent-secure-test-" + account.slot + "-" + (index + 1) + "-debit",
+  );
+}
+
+function hasSupersededSettlementLedgerRows(
+  database: DatabaseSync,
+  account: SecureCqTalentTestAccountManifestEntry,
+): boolean {
+  const ids = supersededSettlementLedgerIds(account);
+  const placeholders = ids.map(() => "?").join(", ");
+  const row = database.prepare(
+    "SELECT COUNT(*) AS count FROM lesson_credit_ledger WHERE club_id = ? AND id IN (" + placeholders + ")",
+  ).get(clubId, ...ids) as { count: number };
+  return row.count > 0;
+}
+
+function removeSupersededSettlementLedgerRows(
+  database: DatabaseSync,
+  account: SecureCqTalentTestAccountManifestEntry,
+): void {
+  const ids = supersededSettlementLedgerIds(account);
+  const placeholders = ids.map(() => "?").join(", ");
+  database.prepare(
+    "DELETE FROM lesson_credit_ledger WHERE club_id = ? AND id IN (" + placeholders + ")",
+  ).run(clubId, ...ids);
 }
 
 function loadDemoAssessmentCatalog(database: DatabaseSync): DemoAssessmentCatalog {

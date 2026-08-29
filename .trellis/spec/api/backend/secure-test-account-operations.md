@@ -147,6 +147,7 @@ This checks the two guardian students' semantic operational-profile presence whi
 - User-facing canonical data (account, parent, coach, team, student, activity, assessment, match, tactical-board, private-lesson, insurance, and communication copy) is Chinese.
 - Storage/API enum values remain their contract values (for example `friendly`, `league`, participant status); the mini-program display boundary maps any visible enum to Chinese rather than changing the API contract.
 - Refresh may upsert only the operation's canonical IDs. If a guardian student has a legacy operational profile under the table's `(club_id, student_id)` uniqueness boundary, retain it.
+- When the rolling settlement schema supersedes canonical ledger IDs, refresh must remove only the exact retired fixed IDs for the same secure slot before writing the new IDs. It must never delete by broad `student_id`, event, source, or name predicates because those can include coach-created records.
 
 ### 4. Validation & Error Matrix
 
@@ -156,6 +157,7 @@ This checks the two guardian students' semantic operational-profile presence whi
 | Complete scope matches the rolling window and controlled labels | Return `already_present`; do not write rows. |
 | `--dry-run` finds stale data | Return `dry_run`; do not mutate or migrate. |
 | A legacy operational profile occupies its unique student slot | Preserve it; do not replace it to force canonical copy. |
+| A complete slot retains retired `lesson-ledger-cq-talent-secure-test-<slot>-<student>-debit` rows | Return `refreshed`, remove only those exact retired IDs, and preserve the current five-session ledger rows. |
 | A visible API enum would otherwise appear raw in the mini-program | Translate at the client presentation boundary; do not store a localized enum. |
 
 ### 5. Good / Base / Bad Cases
@@ -168,6 +170,7 @@ This checks the two guardian students' semantic operational-profile presence whi
 
 - Import once with an older `now`, then import with a later `now`; assert the result is `refreshed`, the rolling calendar weeks move, and canonical names/copy contain no English display words.
 - Assert five completed training events cover the current and preceding two calendar weeks, contain eight participants each, and yield forty matching debit ledger rows per secure team.
+- Seed the eight retired fixed settlement IDs into an otherwise-current slot; assert rerun returns `refreshed` and removes those IDs without affecting the current canonical ledger rows.
 - Preserve the existing partial eight-player upgrade and legacy operational-profile idempotency tests.
 - Mini-program API normalization test asserts `friendly`, `league`, `cup`, and `internal` display as Chinese labels.
 

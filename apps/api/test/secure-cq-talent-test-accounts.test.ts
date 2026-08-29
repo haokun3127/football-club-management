@@ -304,6 +304,56 @@ describe("secure Chongqing Talent test-account operation", () => {
     }
   }, FILE_DB_TIMEOUT);
 
+  it("refreshes a complete secure slot when it still contains a superseded canonical settlement debit", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+
+    try {
+      const imported = importSecureCqTalentTestAccounts(persistence.database, {
+        phones: runtimePhones,
+        now: "2026-08-29T08:00:00.000Z",
+      });
+      const account = imported.manifest.accountIds[0]!;
+      account.studentIds.forEach((studentId, index) => {
+        persistence.database.prepare(`
+          INSERT INTO lesson_credit_ledger (
+            id, club_id, student_id, team_id, event_id, occurred_at, entry_type,
+            lesson_delta, balance_after, source, source_id, actor_user_id, note, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          `lesson-ledger-cq-talent-secure-test-1-${index + 1}-debit`,
+          "club-chongqing-talent",
+          studentId,
+          account.teamId,
+          "event-cq-talent-secure-test-1-history-training",
+          "2026-08-11T10:00:00.000Z",
+          "debit",
+          -1,
+          10 - index,
+          "attendance",
+          `event-cq-talent-secure-test-1-history-training-${studentId}`,
+          account.userId,
+          "旧版训练出勤扣课",
+          "2026-08-29T08:00:00.000Z",
+          "2026-08-29T08:00:00.000Z",
+        );
+      });
+
+      const refreshed = importSecureCqTalentTestAccounts(persistence.database, {
+        phones: runtimePhones,
+        now: "2026-08-29T08:00:00.000Z",
+      });
+
+      expect(refreshed.status).toBe("refreshed");
+      expect(countWhere(
+        persistence.database,
+        "lesson_credit_ledger",
+        "id LIKE 'lesson-ledger-cq-talent-secure-test-1-%-debit'",
+      )).toBe(0);
+    } finally {
+      persistence.database.close();
+    }
+  }, FILE_DB_TIMEOUT);
+
   it("refreshes complete secure demo data into three calendar weeks with Chinese display copy", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
 
