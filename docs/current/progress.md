@@ -1774,3 +1774,10 @@
 - 在线稿重新读取：C13 `93:1080`（`375×908`）与 C14 `93:1106`（`375×1258`），未发现需要回写 Figma 的新变化。运行证据：`tmp/goal-c13-after-refresh-20260829.png`、`tmp/goal-c14-after-refresh-20260829.png` 及对应 sidecar，均严格 `375×812`。
 - C13/C14 真实请求均返回 `200`；控制台过滤 `error|exception|fail|undefined|wx:else|route is not defined|appid missing|not-found` 无命中。当前结果证明 MCP 强制重新编译能够恢复旧惰性编译依赖状态；未修改业务代码、API、角色会话或数据。
 - C7 的隔离 SQLite 持久化回归 `persists the acceptance dual-role demo through SQLite restart and supports targeted rollback` 单测通过（`1 passed / 54 skipped`），覆盖战术板保存、关闭并重新创建 API/持久化层后的阵型与球员坐标读回；本轮没有写入生产库。
+
+## 2026-08-29 家长/教练日历与家长 TabBar 第一批收口
+
+- 家长端继续保留默认周日历，展开与收起箭头统一使用 `/assets/icons/chevron-right.svg`，以旋转控制方向，避免不同设备上的文字 glyph 偏移；教练端 C1 增加同样的周历→月历展开、前后月份切换、选日后回到日视图能力。
+- 家长 TabBar 顺序已按在线稿更新为“日程 / 成长 / 发现 / 我的孩子”；教练 TabBar 未改变。
+- 在线 Figma 复核节点：家长月历展开 `1008:436`、折叠 `1008:186`、TabBar `358:815`、教练 C1 `93:578`。家长三态和 TabBar 与在线稿一致；教练在线 C1 当前仍是周历历史稿，本批新增的月历行为尚未在 Figma 建立独立展开画板，代码实现按家长在线月历结构复用并标记为待设计补图。
+- 验证：定向 Vitest `30/30`；全仓 `npx --yes pnpm@10.33.0 run check` 使用任务专用 npm 缓存后通过（domain `20/20`、小程序 `429/429`、API `117/117`）；四个目标 WXML/WXSS 均通过 WeChatIDE MCP 编译；教练日历真实模拟器截图严格 `375×812`，月历展开可见，当前会话为真实教练数据空态，不将动态数据空态误报为设计失败。

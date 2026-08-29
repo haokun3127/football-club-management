@@ -25,7 +25,7 @@ globalThis.Page = (definition) => {
 };
 globalThis.wx = { reLaunch: vi.fn(), getStorageSync: vi.fn(), setStorageSync: vi.fn() };
 
-await import("./index.ts");
+const { buildMonthDays } = await import("./index.ts");
 
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
 const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
@@ -174,11 +174,34 @@ describe("coach schedule home", () => {
     expect(page.data.date).toBe("2026-08-13");
   });
 
+  it("builds a Monday-first month grid and returns to the selected day after collapsing", async () => {
+    expect(buildMonthDays("2026-08", "2026-08-13", [])).toHaveLength(42);
+    expect(buildMonthDays("2026-08", "2026-08-13", [home.events[0]]).find((day) => day.key === "2026-08-13")).toMatchObject({
+      isSelected: true,
+      hasTraining: true,
+    });
+
+    mocks.getCoachHome.mockResolvedValue(home);
+    const page = createPageInstance({ date: "2026-08-13", selectedDate: "2026-08-13" });
+    await page.expandMonthPicker();
+    expect(page.data).toMatchObject({ viewMode: "month", monthKey: "2026-08", monthLabel: "2026年8月" });
+    await page.changeMonth({ currentTarget: { dataset: { offset: 1 } } });
+    expect(page.data).toMatchObject({ viewMode: "month", date: "2026-09-01", selectedDate: "2026-09-01", monthKey: "2026-09" });
+    await page.collapseMonthPicker();
+    expect(page.data.viewMode).toBe("day");
+  });
+
   it("keeps C1 week navigation visible and separately tappable", () => {
-    expect(template).toContain('class="c1-dates__arrow c1-dates__arrow--previous" data-offset="-7" bindtap="changeWeek">‹</view>');
-    expect(template).toContain('class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek">›</view>');
+    expect(template).toContain('class="c1-dates__arrow c1-dates__arrow--previous" data-offset="-7" bindtap="changeWeek"');
+    expect(template).toContain('class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek"');
+    expect(template).toContain('<image src="/assets/icons/chevron-left.svg" mode="aspectFit" />');
+    expect(template).toContain('<image src="/assets/icons/chevron-right.svg" mode="aspectFit" />');
+    expect(template).toContain('<block wx:if="{{viewMode === \'month\'}}">');
+    expect(template).toContain('class="c1-month-calendar"');
+    expect(template).toContain('bindtap="expandMonthPicker"');
     expect(stylesheet).toMatch(/\.c1-dates\s*\{[^}]*padding:\s*24rpx\s+0/s);
-    expect(stylesheet).toMatch(/\.c1-dates__arrow\s*\{[^}]*flex:\s*0\s+0\s+44rpx[^}]*color:\s*#667085[^}]*font-size:\s*36rpx/s);
+    expect(stylesheet).toMatch(/\.c1-dates__arrow\s*\{[^}]*flex:\s*0\s+0\s+44rpx/s);
+    expect(stylesheet).toMatch(/\.c1-dates__arrow\s+image\s*\{[^}]*width:\s*28rpx[^}]*height:\s*28rpx/s);
   });
 
   it("renders the live C1 team selector before the hero and removes the legacy summary rail", async () => {

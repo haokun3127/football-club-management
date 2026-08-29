@@ -7,8 +7,21 @@ import type { CoachHome, CoachTask, CoachTaskAction, LoadState, ScheduleEvent } 
 
 const WEEK_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 const COACH_SELECTED_TEAM_KEY = "coach-selected-team";
+const initialDate = currentLocalDate();
 
 type Filter = "all" | "training" | "match" | "pending";
+type ViewMode = "day" | "week" | "month";
+
+export interface CoachMonthDayView {
+  key: string;
+  dayNumber: string;
+  isCurrentMonth: boolean;
+  isToday: boolean;
+  isSelected: boolean;
+  hasTraining: boolean;
+  hasMatch: boolean;
+  hasMultiple: boolean;
+}
 
 type CoachEventView = ScheduleEvent & {
   startTime: string;
@@ -44,9 +57,9 @@ Page({
     state: "loading" as LoadState,
     message: "正在读取教练日程",
     home: null as CoachHome | null,
-    date: currentLocalDate(),
-    selectedDate: currentLocalDate(),
-    viewMode: "day" as "day" | "week",
+    date: initialDate,
+    selectedDate: initialDate,
+    viewMode: "day" as ViewMode,
     activeFilter: "all" as Filter,
     dayStrip: [] as Array<{ date: string; weekLabel: string; dayNum: string }>,
     rangeLabel: "",
@@ -66,6 +79,10 @@ Page({
     hasHeroEvent: false,
     heroDateLabel: "",
     heroPills: [] as HeroPillView[],
+    monthKey: initialDate.slice(0, 7),
+    monthLabel: formatMonthLabel(initialDate.slice(0, 7)),
+    monthWeekdays: ["一", "二", "三", "四", "五", "六", "日"],
+    monthDays: [] as CoachMonthDayView[],
   },
   onLoad() {
     this.load();
@@ -86,7 +103,8 @@ Page({
       const eventViews = home.events.map((event) => toCoachEventView(event, coachName));
       const selectedTeamEvents = selectedTeamName ? eventViews.filter((event) => event.teamName === selectedTeamName) : eventViews;
       const taskCards = home.tasks.map(toCoachTaskView);
-      const heroEvent = selectedTeamEvents.find((event) => event.status === "in_progress") ?? selectedTeamEvents[0] ?? null;
+      const selectedDateEvents = selectedTeamEvents.filter((event) => event.startsAt.slice(0, 10) === this.data.date);
+      const heroEvent = selectedDateEvents.find((event) => event.status === "in_progress") ?? selectedDateEvents[0] ?? null;
       const hasWork = selectedTeamEvents.length > 0 || taskCards.length > 0;
       this.setData({
         state: hasWork ? "ready" : "empty",
@@ -109,6 +127,9 @@ Page({
         heroDateLabel: heroDateLabel(this.data.date),
         taskCards,
         hasTaskCards: taskCards.length > 0,
+        monthKey: this.data.date.slice(0, 7),
+        monthLabel: formatMonthLabel(this.data.date.slice(0, 7)),
+        monthDays: this.data.viewMode === "month" ? buildMonthDays(this.data.date.slice(0, 7), this.data.date, selectedTeamEvents) : [],
       });
       this.applyFilter();
     } catch {
@@ -132,6 +153,24 @@ Page({
     this.setData({ date, viewMode: "day" });
     this.load();
   },
+  expandMonthPicker() {
+    this.setData({ viewMode: "month", monthKey: this.data.date.slice(0, 7), monthLabel: formatMonthLabel(this.data.date.slice(0, 7)) });
+    return this.load();
+  },
+  collapseMonthPicker() {
+    this.setData({ viewMode: "day" });
+    return this.load();
+  },
+  changeMonth(event: { currentTarget: { dataset: { offset?: string | number } } }) {
+    const offset = Number(event.currentTarget.dataset.offset);
+    if (offset !== -1 && offset !== 1) return;
+    const current = new Date(`${this.data.monthKey}-01T00:00:00.000Z`);
+    current.setUTCMonth(current.getUTCMonth() + offset);
+    const monthKey = `${current.getUTCFullYear()}-${String(current.getUTCMonth() + 1).padStart(2, "0")}`;
+    const date = `${monthKey}-01`;
+    this.setData({ date, selectedDate: date, monthKey, monthLabel: formatMonthLabel(monthKey), viewMode: "month" });
+    return this.load();
+  },
   changeWeek(event: { currentTarget: { dataset: { offset?: string | number } } }) {
     const offset = Number(event.currentTarget.dataset.offset);
     if (offset !== -7 && offset !== 7) return;
@@ -144,7 +183,7 @@ Page({
   openTeam() {
     if (this.data.hasTeams) openPage("/pages/coach/team-selector/index");
   },
-  switchView(event: { currentTarget: { dataset: { mode?: "day" | "week" } } }) {
+  switchView(event: { currentTarget: { dataset: { mode?: ViewMode } } }) {
     const viewMode = event.currentTarget.dataset.mode;
     if (!viewMode || viewMode === this.data.viewMode) return;
     this.setData({ viewMode });
@@ -159,6 +198,7 @@ Page({
   applyFilter() {
     const activeFilter = this.data.activeFilter as Filter;
     const visibleEvents = (this.data.eventViews as CoachEventView[]).filter((event) => {
+      if (this.data.viewMode === "month" && event.startsAt.slice(0, 10) !== this.data.date) return false;
       if (activeFilter === "pending") return event.hasNextAction;
       if (activeFilter === "training" || activeFilter === "match") return event.type === activeFilter;
       return true;
@@ -247,8 +287,9 @@ function resolveSelectedTeam(teams: Array<{ name: string }>, stored: string): st
   return teams.find((team) => team.name === stored)?.name ?? teams[0]?.name ?? "";
 }
 
-function resolveRange(date: string, viewMode: "day" | "week") {
+function resolveRange(date: string, viewMode: ViewMode) {
   if (viewMode === "day") return { from: date, to: date };
+  if (viewMode === "month") return monthWindow(date);
   const monday = startOfWeek(date);
   return { from: monday, to: addDays(monday, 6) };
 }
@@ -273,7 +314,54 @@ function addDays(date: string, amount: number): string {
   return value.toISOString().slice(0, 10);
 }
 
-function rangeLabel(range: { from: string; to: string }, viewMode: "day" | "week"): string {
+function rangeLabel(range: { from: string; to: string }, viewMode: ViewMode): string {
   if (viewMode === "day") return formatCalendarDate(range.from);
+  if (viewMode === "month") return formatMonthLabel(range.from.slice(0, 7));
   return `${formatCalendarDate(range.from)} - ${formatCalendarDate(range.to)}`;
+}
+
+function formatMonthLabel(monthKey: string) {
+  const [year, month] = monthKey.split("-");
+  return `${year}年${Number(month)}月`;
+}
+
+function monthWindow(date: string) {
+  const [yearText, monthText] = date.slice(0, 7).split("-");
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const start = new Date(Date.UTC(year, month - 1, 1));
+  const end = new Date(Date.UTC(year, month, 0));
+  return { from: start.toISOString().slice(0, 10), to: end.toISOString().slice(0, 10) };
+}
+
+export function buildMonthDays(monthKey: string, selectedDate: string, events: ScheduleEvent[]): CoachMonthDayView[] {
+  const [yearText, monthText] = monthKey.split("-");
+  const first = new Date(Date.UTC(Number(yearText), Number(monthText) - 1, 1));
+  const leadingDays = (first.getUTCDay() + 6) % 7;
+  const eventByDate = new Map<string, { training: boolean; match: boolean; count: number }>();
+  events.forEach((event) => {
+    const key = event.startsAt.slice(0, 10);
+    const current = eventByDate.get(key) ?? { training: false, match: false, count: 0 };
+    current.training = current.training || event.type === "training";
+    current.match = current.match || event.type === "match";
+    current.count += 1;
+    eventByDate.set(key, current);
+  });
+  const today = currentLocalDate();
+  return Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(first);
+    date.setUTCDate(date.getUTCDate() + index - leadingDays);
+    const key = date.toISOString().slice(0, 10);
+    const markers = eventByDate.get(key);
+    return {
+      key,
+      dayNumber: String(date.getUTCDate()),
+      isCurrentMonth: key.slice(0, 7) === monthKey,
+      isToday: key === today,
+      isSelected: key === selectedDate,
+      hasTraining: markers?.training ?? false,
+      hasMatch: markers?.match ?? false,
+      hasMultiple: (markers?.count ?? 0) > 1,
+    };
+  });
 }

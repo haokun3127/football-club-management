@@ -67,6 +67,11 @@ describe("P1 weekly schedule with expandable month picker", () => {
     expect(template).toContain('data-offset="1" bindtap="changeMonth"');
     expect(template).toContain('bindtap="collapseMonthPicker"');
     expect(template).toContain('bindtap="selectDate"');
+    expect(template).toContain('<image class="week-nav__expand-icon" src="/assets/icons/chevron-right.svg" mode="aspectFit" />');
+    expect(template).toContain('<image class="month-calendar__collapse-icon" src="/assets/icons/chevron-right.svg" mode="aspectFit" />');
+    const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
+    expect(stylesheet).toMatch(/\.week-nav__expand-icon\s*\{[^}]*width:\s*20rpx[^}]*height:\s*20rpx/s);
+    expect(stylesheet).toMatch(/\.month-calendar__collapse-icon\s*\{[^}]*width:\s*20rpx[^}]*height:\s*20rpx/s);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 });

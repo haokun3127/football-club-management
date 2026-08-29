@@ -4,15 +4,41 @@
     <view wx:if="{{hasCoachInitial}}" class="c1-nav__avatar" bindtap="openMe">{{coachInitial}}</view>
   </view>
 
-  <view class="c1-dates">
-    <view class="c1-dates__arrow c1-dates__arrow--previous" data-offset="-7" bindtap="changeWeek">‹</view>
+  <block wx:if="{{viewMode === 'month'}}">
+    <view class="c1-month-calendar">
+      <view class="c1-month-calendar__header">
+        <view class="c1-month-calendar__title">{{monthLabel}}</view>
+        <view class="c1-month-calendar__actions">
+          <view class="c1-month-calendar__arrow" data-offset="-1" bindtap="changeMonth" aria-label="上个月"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+          <view class="c1-month-calendar__arrow" data-offset="1" bindtap="changeMonth" aria-label="下个月"><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
+          <view class="c1-month-calendar__collapse" bindtap="collapseMonthPicker">收起<image class="c1-month-calendar__collapse-icon" src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
+        </view>
+      </view>
+      <view class="c1-month-calendar__weekdays">
+        <view wx:for="{{monthWeekdays}}" wx:key="*this" class="c1-month-calendar__weekday">{{item}}</view>
+      </view>
+      <view class="c1-month-calendar__grid">
+        <view wx:for="{{monthDays}}" wx:key="key" class="c1-month-day {{item.isCurrentMonth ? '' : 'c1-month-day--outside'}} {{item.isToday ? 'c1-month-day--today' : ''}} {{item.isSelected ? 'c1-month-day--selected' : ''}}" data-date="{{item.key}}" bindtap="selectDay">
+          <view class="c1-month-day__number">{{item.dayNumber}}</view>
+          <view class="c1-month-day__markers">
+            <view wx:if="{{item.hasTraining}}" class="c1-month-day__marker c1-month-day__marker--training"></view>
+            <view wx:if="{{item.hasMatch}}" class="c1-month-day__marker c1-month-day__marker--match"></view>
+            <view wx:if="{{item.hasMultiple}}" class="c1-month-day__marker c1-month-day__marker--multiple"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+  <view wx:else class="c1-dates">
+    <view class="c1-dates__arrow c1-dates__arrow--previous" data-offset="-7" bindtap="changeWeek"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
     <view class="c1-dates__days">
       <view wx:for="{{dayStrip}}" wx:key="date" class="c1-day {{selectedDate === item.date ? 'c1-day--selected' : ''}}" data-date="{{item.date}}" bindtap="selectDay">
         <view class="c1-day__week">{{item.weekLabel}}</view>
         <view class="c1-day__num">{{item.dayNum}}</view>
       </view>
     </view>
-    <view class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek">›</view>
+    <view class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek"><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
+    <view class="c1-dates__expand" bindtap="expandMonthPicker" aria-label="展开月历"><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
   </view>
 
   <view wx:if="{{state === 'ready' && hasTeams}}" class="c1-team-selector" bindtap="openTeam">

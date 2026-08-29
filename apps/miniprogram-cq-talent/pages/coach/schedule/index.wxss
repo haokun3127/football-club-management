@@ -13,8 +13,9 @@
 .c1-nav__title { color: #202124; font-size: 36rpx; font-weight: 700; line-height: 44rpx; }
 .c1-nav__avatar { display: flex; align-items: center; justify-content: center; width: 72rpx; height: 72rpx; border-radius: 36rpx; background: #a80f1b; color: #ffffff; font-size: 28rpx; font-weight: 700; }
 
-.c1-dates { display: flex; align-items: center; height: 128rpx; box-sizing: border-box; padding: 24rpx 0; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
-.c1-dates__arrow { display: flex; flex: 0 0 44rpx; align-self: stretch; align-items: center; justify-content: center; color: #667085; font-size: 36rpx; font-weight: 400; line-height: 44rpx; }
+.c1-dates { position: relative; display: flex; align-items: center; height: 128rpx; box-sizing: border-box; padding: 24rpx 0; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
+.c1-dates__arrow { display: flex; flex: 0 0 44rpx; align-self: stretch; align-items: center; justify-content: center; }
+.c1-dates__arrow image { display: block; width: 28rpx; height: 28rpx; }
 .c1-dates__days { display: flex; flex: 1; min-width: 0; }
 .c1-day { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; min-width: 0; border-radius: 16rpx; }
 .c1-day--selected { border-radius: 32rpx; background: #a80f1b; }
@@ -40,3 +41,28 @@
 
 .c1-list { display: flex; flex-direction: column; gap: 24rpx; margin-top: 24rpx; }.acard { display: flex; align-items: center; gap: 24rpx; min-height: 192rpx; padding: 24rpx; box-sizing: border-box; border-radius: 32rpx; background: #ffffff; box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.08); }.acard__accent { width: 8rpx; align-self: stretch; flex: 0 0 8rpx; border-radius: 4rpx; }.acard__time { width: 112rpx; flex: 0 0 112rpx; }.acard__start { color: #a80f1b; font-size: 30rpx; font-weight: 800; line-height: 36rpx; }.acard__dur { color: #667085; font-size: 22rpx; line-height: 26rpx; }.acard__content { display: flex; flex: 1; flex-direction: column; justify-content: center; min-width: 0; gap: 12rpx; }.acard__head { display: flex; align-items: center; gap: 8rpx; min-width: 0; }.acard__title { min-width: 0; overflow: hidden; color: #202124; font-size: 30rpx; font-weight: 600; line-height: 38rpx; text-overflow: ellipsis; white-space: nowrap; }.acard__coach { flex: 0 0 auto; padding: 4rpx 10rpx; border-radius: 8rpx; background: #f3f4f6; color: #667085; font-size: 20rpx; line-height: 26rpx; }.acard__meta { overflow: hidden; color: #667085; font-size: 22rpx; line-height: 30rpx; text-overflow: ellipsis; white-space: nowrap; }.acard__action { align-self: flex-start; padding: 6rpx 12rpx; border-radius: 8rpx; background: #fdf0f1; color: #a80f1b; font-size: 22rpx; line-height: 28rpx; }.acard__right { display: flex; flex: 0 0 auto; align-items: center; gap: 10rpx; }.acard__pill { height: 42rpx; padding: 0 12rpx; border-radius: 8rpx; font-size: 20rpx; line-height: 42rpx; }.pill--info, .pill--success { background: #10b981; color: #ffffff; }.pill--brand { background: #1976d2; color: #ffffff; }.pill--warning, .pill--pending { background: #f59e0b; color: #ffffff; }.pill--error { background: #d14343; color: #ffffff; }
 .c1-empty { padding: 64rpx 32rpx; border-radius: 24rpx; background: #ffffff; color: #8a8f99; font-size: 26rpx; text-align: center; }
+
+.c1-dates__expand { position: absolute; right: 12rpx; bottom: -14rpx; display: flex; align-items: center; justify-content: center; width: 48rpx; height: 28rpx; border-radius: 16rpx; background: #fff1f2; }
+.c1-dates__expand image { display: block; width: 20rpx; height: 20rpx; transform: rotate(90deg); }
+
+.c1-month-calendar { box-sizing: border-box; width: 100%; min-height: 588rpx; padding: 28rpx 24rpx 24rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
+.c1-month-calendar__header { display: flex; align-items: center; justify-content: space-between; min-height: 48rpx; }
+.c1-month-calendar__title { color: #202124; font-size: 34rpx; font-weight: 700; line-height: 42rpx; }
+.c1-month-calendar__actions { display: flex; align-items: center; gap: 8rpx; }
+.c1-month-calendar__arrow { display: flex; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; }
+.c1-month-calendar__arrow image { display: block; width: 28rpx; height: 28rpx; }
+.c1-month-calendar__collapse { display: flex; align-items: center; justify-content: center; gap: 6rpx; box-sizing: border-box; width: 104rpx; height: 48rpx; border-radius: 12rpx; background: #fff1f2; color: #a80f1b; font-size: 22rpx; font-weight: 600; line-height: 28rpx; }
+.c1-month-calendar__collapse-icon { display: block; width: 20rpx; height: 20rpx; transform: rotate(-90deg); }
+.c1-month-calendar__weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-top: 24rpx; }
+.c1-month-calendar__weekday { color: #667085; font-size: 22rpx; line-height: 28rpx; text-align: center; }
+.c1-month-calendar__grid { display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 64rpx; margin-top: 12rpx; }
+.c1-month-day { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 6rpx; color: #202124; }
+.c1-month-day--outside { color: #9ca3af; }
+.c1-month-day__number { display: flex; align-items: center; justify-content: center; width: 52rpx; height: 52rpx; border-radius: 50%; font-size: 26rpx; line-height: 32rpx; }
+.c1-month-day--today .c1-month-day__number { color: #a80f1b; font-weight: 700; }
+.c1-month-day--selected .c1-month-day__number { background: #a80f1b; color: #ffffff; font-weight: 700; }
+.c1-month-day__markers { position: absolute; bottom: 0; display: flex; align-items: center; justify-content: center; gap: 4rpx; height: 10rpx; }
+.c1-month-day__marker { width: 8rpx; height: 8rpx; border-radius: 50%; }
+.c1-month-day__marker--training { background: #10b981; }
+.c1-month-day__marker--match { background: #f59e0b; }
+.c1-month-day__marker--multiple { width: 6rpx; height: 6rpx; background: #667085; }
