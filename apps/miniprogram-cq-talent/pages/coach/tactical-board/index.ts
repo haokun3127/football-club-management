@@ -206,8 +206,8 @@ Page<BoardPageData>({
     const rosterPlayers = currentPlayers
       .map((player: TacticalBoardPlayer, index: number) => ({
         ...toView(player),
-        rosterPx: 34 + (index % 6) * 50,
-        rosterPy: 340 + Math.floor(index / 6) * 54,
+        rosterPx: 34 + (index % 4) * 86,
+        rosterPy: 340 + Math.floor(index / 4) * 92,
       }));
     this.setData({
       rosterPlayers,
