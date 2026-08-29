@@ -47,6 +47,7 @@
 }
 
 .student-strip {
+  height: 64rpx;
   margin-bottom: 32rpx;
   white-space: nowrap;
 }
@@ -54,14 +55,18 @@
 .student-strip__inner {
   display: flex;
   gap: 16rpx;
+  height: 64rpx;
 }
 
 .student-chip {
-  padding: 16rpx 32rpx;
+  box-sizing: border-box;
+  height: 64rpx;
+  padding: 0 32rpx;
   background: var(--color-card);
   border: 1rpx solid var(--color-line);
   border-radius: 40rpx;
   font-size: 26rpx;
+  line-height: 60rpx;
   color: var(--color-text-secondary);
 }
 

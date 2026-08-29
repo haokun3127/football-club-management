@@ -1,0 +1,10 @@
+{
+  "capturedAt": "2026-08-29T11:05:11+08:00",
+  "route": "/pages/coach/student-radar/index",
+  "viewport": { "width": 375, "height": 812, "devicePixelRatio": 3 },
+  "rawPng": { "width": 375, "height": 812, "scaleX": 1, "scaleY": 1 },
+  "captureMethod": "wechatide-mcp simulator_screenshot",
+  "state": "ready",
+  "repair": "student chip fixed to 64rpx outer height with fixed strip height; runtime Hero top returned to the Figma y=152px position",
+  "consoleMatches": 0
+}

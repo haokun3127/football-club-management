@@ -243,6 +243,11 @@ describe("coach student radar", () => {
     expect(controller).not.toContain("app-header");
   });
 
+  it("keeps the student chip at the Figma 32px geometry and preserves the 16px hero gap", () => {
+    expect(stylesheet).toMatch(/\.student-chip\s*\{(?=[^}]*padding:\s*0\s*32rpx)(?=[^}]*height:\s*64rpx)(?=[^}]*box-sizing:\s*border-box)(?=[^}]*line-height:\s*60rpx)/s);
+    expect(stylesheet).toMatch(/\.student-strip\s*\{(?=[^}]*height:\s*64rpx)(?=[^}]*margin-bottom:\s*32rpx)/s);
+  });
+
   it("preserves only the source occurredAt field at the API boundary", () => {
     const normalizer = apiSource.slice(apiSource.indexOf("function normalizeRadarMetric"), apiSource.indexOf("function normalizeStudentHome"));
 

@@ -1,0 +1,8 @@
+{
+  "capturedAt": "2026-08-29T02:38:03+08:00",
+  "route": "/pages/coach/student-radar/index",
+  "viewport": { "width": 375, "height": 812 },
+  "captureMethod": "wechatide-mcp simulator_screenshot",
+  "state": "ready",
+  "note": "Initial C13 runtime capture before the chip geometry repair; retained as pre-repair evidence."
+}
