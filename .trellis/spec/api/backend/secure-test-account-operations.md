@@ -142,6 +142,7 @@ This checks the two guardian students' semantic operational-profile presence whi
 ### 3. Contracts
 
 - A current demo set contains calendar records in each of the current and preceding two calendar weeks, plus upcoming training/match records for continued preview.
+- A current demo set contains five completed training sessions across those three calendar weeks. Each one has all eight team participants and a canonical `lesson_credit_ledger` debit per participant, so C5 history is populated by database-backed records rather than client-side placeholders.
 - Every calendar date is derived from the invocation timestamp, never hard-coded to a historical week.
 - User-facing canonical data (account, parent, coach, team, student, activity, assessment, match, tactical-board, private-lesson, insurance, and communication copy) is Chinese.
 - Storage/API enum values remain their contract values (for example `friendly`, `league`, participant status); the mini-program display boundary maps any visible enum to Chinese rather than changing the API contract.
@@ -166,6 +167,7 @@ This checks the two guardian students' semantic operational-profile presence whi
 ### 6. Tests Required
 
 - Import once with an older `now`, then import with a later `now`; assert the result is `refreshed`, the rolling calendar weeks move, and canonical names/copy contain no English display words.
+- Assert five completed training events cover the current and preceding two calendar weeks, contain eight participants each, and yield forty matching debit ledger rows per secure team.
 - Preserve the existing partial eight-player upgrade and legacy operational-profile idempotency tests.
 - Mini-program API normalization test asserts `friendly`, `league`, `cup`, and `internal` display as Chinese labels.
 

@@ -3,6 +3,14 @@ import type { DatabaseSync } from "node:sqlite";
 const clubId = "club-chongqing-talent";
 const appClientId = "app-client-cq-talent-wechat-main";
 const roleJson = JSON.stringify(["parent", "coach"]);
+const completedTrainingEventKeys = [
+  "history-training",
+  "history-training-2",
+  "history-training-3",
+  "history-training-4",
+  "history-training-5",
+] as const;
+type DemoEventKey = (typeof completedTrainingEventKeys)[number] | "future-training" | "completed-match" | "scheduled-match";
 
 export interface SecureCqTalentTestAccountInput {
   phones: readonly string[];
@@ -153,10 +161,10 @@ export function getSecureCqTalentTestAccountEventIds(
 ): string[] {
   return [
     account.eventId,
-    "event-cq-talent-secure-test-" + account.slot + "-history-training",
-    "event-cq-talent-secure-test-" + account.slot + "-future-training",
-    "event-cq-talent-secure-test-" + account.slot + "-completed-match",
-    "event-cq-talent-secure-test-" + account.slot + "-scheduled-match",
+    ...completedTrainingEventKeys.map((key) => eventIdFor(account, key)),
+    eventIdFor(account, "future-training"),
+    eventIdFor(account, "completed-match"),
+    eventIdFor(account, "scheduled-match"),
   ];
 }
 
@@ -505,6 +513,7 @@ function ensureDemoData(
   const records = demoRecordIds(account);
   const labels = demoLabels(account);
   const events = buildDemoEvents(account, now);
+  const completedTrainingEvents = events.filter((event) => event.type === "training" && event.status === "completed");
   const assessmentCatalog = loadDemoAssessmentCatalog(database);
 
   refreshDemoIdentity(database, account, labels, now);
@@ -548,12 +557,15 @@ function ensureDemoData(
     });
 
     const openingBalance = 12 - index;
+    const ledgerOffset = index * (completedTrainingEvents.length + 1);
     upsertDemoRow(database, "lesson_credit_ledger",
       "id, club_id, student_id, team_id, event_id, occurred_at, entry_type, lesson_delta, balance_after, source, source_id, actor_user_id, note, created_at, updated_at",
-      [records.lessonLedgerIds[index * 2]!, clubId, studentId, account.teamId, null, shiftIso(now, -30, 0), "credit", openingBalance, openingBalance, "secure_demo", "secure-demo-opening-" + account.slot + "-" + (index + 1), account.userId, "开通体验课时", now, now]);
-    upsertDemoRow(database, "lesson_credit_ledger",
-      "id, club_id, student_id, team_id, event_id, occurred_at, entry_type, lesson_delta, balance_after, source, source_id, actor_user_id, note, created_at, updated_at",
-      [records.lessonLedgerIds[index * 2 + 1]!, clubId, studentId, account.teamId, eventIdFor(account, "history-training"), shiftIso(now, -14, 2), "debit", -1, openingBalance - 1, "attendance", eventIdFor(account, "history-training") + "-" + studentId, account.userId, "训练出勤扣课", now, now]);
+      [records.lessonLedgerIds[ledgerOffset]!, clubId, studentId, account.teamId, null, shiftIso(now, -30, 0), "credit", openingBalance, openingBalance, "secure_demo", "secure-demo-opening-" + account.slot + "-" + (index + 1), account.userId, "开通体验课时", now, now]);
+    completedTrainingEvents.forEach((event, trainingIndex) => {
+      upsertDemoRow(database, "lesson_credit_ledger",
+        "id, club_id, student_id, team_id, event_id, occurred_at, entry_type, lesson_delta, balance_after, source, source_id, actor_user_id, note, created_at, updated_at",
+        [records.lessonLedgerIds[ledgerOffset + trainingIndex + 1]!, clubId, studentId, account.teamId, event.id, event.endsAt, "debit", -1, openingBalance - trainingIndex - 1, "attendance", event.id + "-" + studentId, account.userId, event.title + "销课", now, now]);
+    });
 
     const assessmentId = records.assessmentIds[index]!;
     upsertDemoRow(database, "player_assessments",
@@ -725,11 +737,16 @@ function refreshDemoIdentity(
 
 function buildDemoEvents(account: SecureCqTalentTestAccountManifestEntry, now: string): DemoEvent[] {
   const anchor = startOfDemoDay(now);
+  const weekStart = startOfDemoWeek(now);
   return [
     { id: account.eventId, type: "training", title: "本周技术训练", startsAt: shiftIso(anchor, 0, 2), endsAt: shiftIso(anchor, 0, 4), status: "scheduled", notes: "围绕控球、传接和小组配合开展训练。", participantStatuses: ["confirmed", "confirmed", "invited", "confirmed", "confirmed", "invited", "confirmed", "confirmed"] },
-    { id: eventIdFor(account, "history-training"), type: "training", title: "基础技术训练回顾", startsAt: shiftIso(anchor, -14, 0), endsAt: shiftIso(anchor, -14, 2), status: "completed", notes: "已完成带球、传球和射门基础训练。", participantStatuses: ["present", "late", "absent", "leave_requested", "present", "excused", "present", "present"] },
+    { id: eventIdFor(account, "history-training"), type: "training", title: "基础技术训练回顾", startsAt: shiftIso(weekStart, -13, 0), endsAt: shiftIso(weekStart, -13, 2), status: "completed", notes: "已完成带球、传球和射门基础训练。", participantStatuses: ["present", "late", "present", "present", "present", "late", "present", "present"] },
+    { id: eventIdFor(account, "history-training-2"), type: "training", title: "传接配合专项训练", startsAt: shiftIso(weekStart, -11, 0), endsAt: shiftIso(weekStart, -11, 2), status: "completed", notes: "已完成接球转身、短传配合和跑位训练。", participantStatuses: ["present", "present", "late", "present", "present", "present", "late", "present"] },
+    { id: eventIdFor(account, "history-training-3"), type: "training", title: "攻防转换训练", startsAt: shiftIso(weekStart, -6, 0), endsAt: shiftIso(weekStart, -6, 2), status: "completed", notes: "已完成抢断后的快速推进和回防组织训练。", participantStatuses: ["present", "late", "present", "present", "present", "present", "present", "late"] },
+    { id: eventIdFor(account, "history-training-4"), type: "training", title: "射门终结训练", startsAt: shiftIso(weekStart, -4, 0), endsAt: shiftIso(weekStart, -4, 2), status: "completed", notes: "已完成禁区前射门、补射和终结选择训练。", participantStatuses: ["late", "present", "present", "present", "late", "present", "present", "present"] },
+    { id: eventIdFor(account, "history-training-5"), type: "training", title: "小组对抗训练", startsAt: shiftIso(weekStart, 0, 0), endsAt: shiftIso(weekStart, 0, 2), status: "completed", notes: "已完成四对四对抗和小组协同训练。", participantStatuses: ["present", "present", "late", "present", "present", "present", "present", "late"] },
     { id: eventIdFor(account, "future-training"), type: "training", title: "周末进攻训练", startsAt: shiftIso(anchor, 4, 1), endsAt: shiftIso(anchor, 4, 3), status: "scheduled", notes: "安排进攻跑位、边路配合和小范围对抗。", participantStatuses: ["confirmed", "invited", "confirmed", "confirmed", "invited", "confirmed", "confirmed", "confirmed"] },
-    { id: eventIdFor(account, "completed-match"), type: "match", title: "周末友谊赛战报", startsAt: shiftIso(anchor, -9, 0), endsAt: shiftIso(anchor, -9, 2), status: "completed", notes: "友谊赛已完成，已记录关键比赛事件。", participantStatuses: ["present", "present", "present", "late", "present", "present", "present", "present"] },
+    { id: eventIdFor(account, "completed-match"), type: "match", title: "周末友谊赛战报", startsAt: shiftIso(weekStart, -5, 0), endsAt: shiftIso(weekStart, -5, 2), status: "completed", notes: "友谊赛已完成，已记录关键比赛事件。", participantStatuses: ["present", "present", "present", "late", "present", "present", "present", "present"] },
     { id: eventIdFor(account, "scheduled-match"), type: "match", title: "周末联赛排兵", startsAt: shiftIso(anchor, 8, 0), endsAt: shiftIso(anchor, 8, 2), status: "scheduled", notes: "联赛前已完成首发阵容和战术布置。", participantStatuses: ["confirmed", "confirmed", "confirmed", "invited", "confirmed", "confirmed", "confirmed", "confirmed"] },
   ];
 }
@@ -737,6 +754,14 @@ function buildDemoEvents(account: SecureCqTalentTestAccountManifestEntry, now: s
 function startOfDemoDay(now: string): string {
   const date = new Date(now);
   if (!Number.isFinite(date.getTime())) throw new Error("Secure demo data requires a valid ISO timestamp.");
+  date.setUTCHours(8, 0, 0, 0);
+  return date.toISOString();
+}
+
+function startOfDemoWeek(now: string): string {
+  const date = new Date(now);
+  if (!Number.isFinite(date.getTime())) throw new Error("Secure demo data requires a valid ISO timestamp.");
+  date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7));
   date.setUTCHours(8, 0, 0, 0);
   return date.toISOString();
 }
@@ -762,7 +787,7 @@ function demoRecordIds(account: SecureCqTalentTestAccountManifestEntry) {
     participantIds,
     lessonLedgerIds: account.studentIds.flatMap((_, index) => [
       "lesson-ledger-cq-talent-secure-test-" + account.slot + "-" + (index + 1) + "-credit",
-      "lesson-ledger-cq-talent-secure-test-" + account.slot + "-" + (index + 1) + "-debit",
+      ...completedTrainingEventKeys.map((_, trainingIndex) => "lesson-ledger-cq-talent-secure-test-" + account.slot + "-" + (index + 1) + "-debit-" + (trainingIndex + 1)),
     ]),
     assessmentIds: account.studentIds.map((_, index) => "assessment-cq-talent-secure-test-" + account.slot + "-" + (index + 1)),
     assessmentRawResultIds: account.studentIds.flatMap((_, studentIndex) => Array.from({ length: demoMetricCount }, (_, metricIndex) => "assessment-raw-cq-talent-secure-test-" + account.slot + "-" + (studentIndex + 1) + "-" + (metricIndex + 1))),
@@ -794,7 +819,7 @@ function loadDemoAssessmentCatalog(database: DatabaseSync): DemoAssessmentCatalo
   };
 }
 
-function eventIdFor(account: SecureCqTalentTestAccountManifestEntry, key: "history-training" | "future-training" | "completed-match" | "scheduled-match"): string {
+function eventIdFor(account: SecureCqTalentTestAccountManifestEntry, key: DemoEventKey): string {
   return "event-cq-talent-secure-test-" + account.slot + "-" + key;
 }
 

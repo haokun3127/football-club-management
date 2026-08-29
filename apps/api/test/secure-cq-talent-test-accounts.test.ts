@@ -175,8 +175,8 @@ describe("secure Chongqing Talent test-account operation", () => {
       expect(count(persistence.database, "coach_profiles")).toBe(8);
       expect(count(persistence.database, "student_profiles")).toBe(57);
       expect(count(persistence.database, "teams")).toBe(9);
-      expect(countWhere(persistence.database, "calendar_events", "id LIKE 'event-cq-talent-secure-test-%'")).toBe(35);
-      expect(countWhere(persistence.database, "event_participants", "id LIKE 'participant-cq-talent-secure-test-%'")).toBe(280);
+      expect(countWhere(persistence.database, "calendar_events", "id LIKE 'event-cq-talent-secure-test-%'")).toBe(63);
+      expect(countWhere(persistence.database, "event_participants", "id LIKE 'participant-cq-talent-secure-test-%'")).toBe(504);
       expect(countWhere(persistence.database, "student_contacts", "id LIKE 'contact-cq-talent-secure-test-%'")).toBe(14);
 
       const importedAccounts = persistence.database.prepare(`
@@ -241,10 +241,10 @@ describe("secure Chongqing Talent test-account operation", () => {
       });
       const account = imported.manifest.accountIds[0]!;
 
-      expect(countWhere(persistence.database, "calendar_events", "id LIKE 'event-cq-talent-secure-test-1%'")).toBe(5);
-      expect(countWhere(persistence.database, "event_participants", "event_id LIKE 'event-cq-talent-secure-test-1%'")).toBe(40);
+      expect(countWhere(persistence.database, "calendar_events", "id LIKE 'event-cq-talent-secure-test-1%'")).toBe(9);
+      expect(countWhere(persistence.database, "event_participants", "event_id LIKE 'event-cq-talent-secure-test-1%'")).toBe(72);
       expect(countWhere(persistence.database, "event_participants", "event_id LIKE 'event-cq-talent-secure-test-1%' AND status IN ('present', 'late', 'absent', 'leave_requested', 'invited', 'confirmed')")).toBeGreaterThanOrEqual(6);
-      expect(countForIds(persistence.database, "lesson_credit_ledger", "student_id", account.studentIds)).toBe(16);
+      expect(countForIds(persistence.database, "lesson_credit_ledger", "student_id", account.studentIds)).toBe(48);
       expect(countForIds(persistence.database, "player_assessments", "student_id", account.studentIds)).toBe(8);
       expect(countForIds(persistence.database, "assessment_raw_results", "assessment_id", assessmentIdsForStudents(persistence.database, account.studentIds))).toBe(64);
       expect(countForIds(persistence.database, "assessment_scores", "assessment_id", assessmentIdsForStudents(persistence.database, account.studentIds))).toBe(64);
@@ -258,6 +258,47 @@ describe("secure Chongqing Talent test-account operation", () => {
       expect(countForIds(persistence.database, "communication_logs", "student_id", account.studentIds.slice(0, 2))).toBe(4);
       expect(countForIds(persistence.database, "student_operational_profiles", "student_id", account.studentIds.slice(0, 2))).toBe(2);
       expect(countWhere(persistence.database, "calendar_events", "id LIKE 'event-cq-talent-secure-test-1%' AND starts_at > '2026-08-18T08:00:00.000Z'")).toBeGreaterThanOrEqual(2);
+    } finally {
+      persistence.database.close();
+    }
+  }, FILE_DB_TIMEOUT);
+
+  it("creates five completed training sessions with settlement ledgers across the latest three calendar weeks", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+
+    try {
+      const imported = importSecureCqTalentTestAccounts(persistence.database, {
+        phones: runtimePhones,
+        now: "2026-08-29T08:00:00.000Z",
+      });
+      const account = imported.manifest.accountIds[0]!;
+      const completedTrainingRows = persistence.database.prepare(`
+        SELECT id, starts_at
+        FROM calendar_events
+        WHERE club_id = ?
+          AND primary_team_id = ?
+          AND type = 'training'
+          AND status = 'completed'
+        ORDER BY starts_at
+      `).all("club-chongqing-talent", account.teamId) as Array<{ id: string; starts_at: string }>;
+      const completedTrainingIds = completedTrainingRows.map((row) => row.id);
+      const weeks = completedTrainingRows.map((row) => {
+        const date = new Date(row.starts_at);
+        date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7));
+        return date.toISOString().slice(0, 10);
+      });
+      const settledLedgerCount = (persistence.database.prepare(`
+        SELECT COUNT(*) AS count
+        FROM lesson_credit_ledger
+        WHERE student_id IN (${account.studentIds.map(() => "?").join(", ")})
+          AND event_id IN (${completedTrainingIds.map(() => "?").join(", ")})
+          AND entry_type = 'debit'
+      `).get(...account.studentIds, ...completedTrainingIds) as { count: number }).count;
+
+      expect(completedTrainingRows).toHaveLength(5);
+      expect(new Set(weeks)).toEqual(new Set(["2026-08-10", "2026-08-17", "2026-08-24"]));
+      expect(countForIds(persistence.database, "event_participants", "event_id", completedTrainingIds)).toBe(40);
+      expect(settledLedgerCount).toBe(40);
     } finally {
       persistence.database.close();
     }
@@ -478,7 +519,7 @@ describe("secure Chongqing Talent test-account operation", () => {
         headers: { authorization: "Bearer " + parentToken },
       });
       expect(parentCalendar.statusCode).toBe(200);
-      expect((parentCalendar.json() as { events: unknown[] }).events).toHaveLength(5);
+      expect((parentCalendar.json() as { events: unknown[] }).events).toHaveLength(8);
 
       const growth = await app.inject({
         method: "GET",
@@ -517,7 +558,7 @@ describe("secure Chongqing Talent test-account operation", () => {
         headers: { authorization: "Bearer " + coachToken },
       });
       expect(coachHome.statusCode).toBe(200);
-      expect((coachHome.json() as { workbench: { events: unknown[] } }).workbench.events).toHaveLength(5);
+      expect((coachHome.json() as { workbench: { events: unknown[] } }).workbench.events).toHaveLength(8);
 
       const scheduledMatchId = "event-cq-talent-secure-test-" + first.slot + "-scheduled-match";
       const match = await app.inject({
