@@ -128,6 +128,10 @@ export async function seedPlatformData(repositories: PlatformRepositories, data:
     repositories.matches.insertMatchIfAbsent(match);
   }
 
+  for (const matchRoster of data.matchRosters) {
+    repositories.matches.insertRosterIfAbsent(matchRoster);
+  }
+
   for (const matchEvent of data.matchEvents) {
     repositories.matches.insertEventIfAbsent(matchEvent);
   }

@@ -19,7 +19,7 @@ vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/idempotency", () => ({ createIdempotencyKey: mocks.createIdempotencyKey }));
 vi.mock("../../../utils/match-event-draft", () => ({
   clearMatchEventDraft: mocks.clearMatchEventDraft,
-  isMatchEventDraftType: (value) => ["goal", "assist", "save", "tackle", "yellow_card", "red_card", "penalty", "own_goal"].includes(value),
+  isMatchEventDraftType: (value) => ["goal", "assist", "save", "tackle", "foul", "yellow_card", "red_card", "penalty", "own_goal"].includes(value),
   loadMatchEventDraft: mocks.loadMatchEventDraft,
   saveMatchEventDraft: mocks.saveMatchEventDraft,
 }));
@@ -161,6 +161,31 @@ describe("C6.1 match event add", () => {
     await page.saveEvent();
     expect(mocks.createCoachMatchEvent).toHaveBeenCalledTimes(2);
     expect(mocks.createCoachMatchEvent.mock.calls[1][2]).toBe("match-event-stable-key");
+    expect(mocks.clearMatchEventDraft).toHaveBeenCalledWith("event-match-1");
+    expect(globalThis.wx.navigateBack).toHaveBeenCalledWith({ delta: 1 });
+  });
+
+  it("submits a foul event through the same real event contract", async () => {
+    mocks.requireRole.mockReturnValueOnce({
+      role: "coach",
+      capabilities: { match: { eventTypes: ["goal", "foul"] } },
+    });
+    const page = createPageInstance();
+    await page.onLoad({ eventId: "event-match-1" });
+    page.selectType({ currentTarget: { dataset: { value: "foul" } } });
+    page.onMinuteInput({ detail: { value: "31" } });
+    page.onNoteInput({ detail: { value: "防守三区拉人" } });
+    mocks.createCoachMatchEvent.mockResolvedValueOnce({
+      event: { id: "server-foul", studentId: "student-1", type: "foul", minute: 31, note: "防守三区拉人" },
+    });
+
+    await page.saveEvent();
+
+    expect(mocks.createCoachMatchEvent).toHaveBeenCalledWith(
+      "event-match-1",
+      { studentId: "student-1", type: "foul", minute: 31, note: "防守三区拉人" },
+      "match-event-stable-key",
+    );
     expect(mocks.clearMatchEventDraft).toHaveBeenCalledWith("event-match-1");
     expect(globalThis.wx.navigateBack).toHaveBeenCalledWith({ delta: 1 });
   });

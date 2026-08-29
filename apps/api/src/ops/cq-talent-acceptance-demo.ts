@@ -22,6 +22,7 @@ export interface CqTalentAcceptanceDemoRollbackResult {
   deletedParticipants: number;
   deletedMetricRecords: number;
   deletedMatchEvents: number;
+  deletedMatchRosters: number;
   deletedMatches: number;
   deletedTeamMembers: number;
   deletedTeams: number;
@@ -57,6 +58,7 @@ export function rollbackCqTalentAcceptanceDemo(database: DatabaseSync): CqTalent
     const deletedSessions = changeCount(database.prepare("DELETE FROM app_client_sessions WHERE club_id = ? AND app_client_id = ? AND user_id = ?").run(clubId, appClientId, acceptanceUserId).changes);
     const deletedMetricRecords = changeCount(database.prepare("DELETE FROM player_metric_records WHERE club_id = ? AND id LIKE ?").run(clubId, "metric-record-cq-talent-demo-%").changes);
     const deletedMatchEvents = changeCount(database.prepare("DELETE FROM match_events WHERE club_id = ? AND match_id = ?").run(clubId, acceptanceMatchId).changes);
+    const deletedMatchRosters = changeCount(database.prepare("DELETE FROM match_rosters WHERE club_id = ? AND match_id = ?").run(clubId, acceptanceMatchId).changes);
     const deletedMatches = changeCount(database.prepare("DELETE FROM matches WHERE club_id = ? AND id = ?").run(clubId, acceptanceMatchId).changes);
     const deletedTeamMembers = changeCount(database.prepare("DELETE FROM team_members WHERE club_id = ? AND team_id = ?").run(clubId, acceptanceTeamId).changes);
     const deletedEvents = deleteForEvents(database, "calendar_events", "id");
@@ -73,6 +75,7 @@ export function rollbackCqTalentAcceptanceDemo(database: DatabaseSync): CqTalent
       deletedParticipants,
       deletedMetricRecords,
       deletedMatchEvents,
+      deletedMatchRosters,
       deletedMatches,
       deletedTeamMembers,
       deletedTeams,

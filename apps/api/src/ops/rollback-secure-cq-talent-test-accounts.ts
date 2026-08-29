@@ -67,6 +67,7 @@ export function rollbackSecureCqTalentTestAccounts(
     removeByClub("player_assessments", "id", assessmentIds(database, club, students, events, coaches, sideEffects));
     removeByClub("match_events", "id", sideEffects.matchEventIds ?? []);
     removeByClub("match_events", "match_id", matchIds(database, club, events, sideEffects));
+    removeByClub("match_rosters", "match_id", matchIds(database, club, events, sideEffects));
     removeByClub("matches", "id", sideEffects.matchIds ?? []);
     removeByClub("matches", "event_id", events);
     removeByClub("private_lesson_requests", "id", sideEffects.privateLessonRequestIds ?? []);
@@ -141,6 +142,7 @@ function validateSideEffectNamespaces(
     metricRecordIds: "metric-record-cq-talent-secure-test-",
     metricLineageIds: "metric-lineage-cq-talent-secure-test-",
     matchIds: "match-cq-talent-secure-test-",
+    matchRosterIds: "match-roster-cq-talent-secure-test-",
     matchEventIds: "match-event-cq-talent-secure-test-",
   };
   for (const [key, prefix] of Object.entries(prefixes) as Array<[keyof typeof prefixes, string]>) {

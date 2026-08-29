@@ -47,6 +47,7 @@ export interface SecureCqTalentTestAccountSideEffects {
   metricLineageIds?: string[];
   matchIds?: string[];
   matchEventIds?: string[];
+  matchRosterIds?: string[];
 }
 
 export interface SecureCqTalentTestAccountManifest {
@@ -371,6 +372,7 @@ function hasCompleteDemoData(
       && hasRows(database, "metric_lineages", records.metricLineageIds)
       && hasExpectedOwnership(database, account, account.studentIds)
       && hasRows(database, "matches", records.matchIds)
+      && hasRows(database, "match_rosters", records.matchRosterIds)
       && hasRows(database, "match_events", records.matchEventIds)
       && hasRows(database, "tactical_boards", records.tacticalBoardIds)
       && hasOperationalProfilesForGuardianStudents(database, account)
@@ -604,6 +606,17 @@ function ensureDemoData(
   upsertDemoRow(database, "matches",
     "id, club_id, event_id, match_type, opponent_name, home_score, away_score, status, created_at, updated_at",
     [records.matchIds[1]!, clubId, eventIdFor(account, "scheduled-match"), "league", labels.scheduledOpponent, null, null, "scheduled", now, now]);
+  const matchRosterMatches = [
+    { matchId: records.matchIds[0]!, eventId: eventIdFor(account, "completed-match") },
+    { matchId: records.matchIds[1]!, eventId: eventIdFor(account, "scheduled-match") },
+  ];
+  matchRosterMatches.forEach(({ matchId, eventId }, matchIndex) => {
+    account.studentIds.forEach((studentId, index) => {
+      upsertDemoRow(database, "match_rosters",
+        "id, club_id, match_id, student_id, team_id, started, minutes_played, position, created_at, updated_at",
+        [records.matchRosterIds[matchIndex * account.studentIds.length + index]!, clubId, matchId, studentId, account.teamId, 1, matchIndex === 0 ? 60 - index : 0, matchIndex === 0 ? ["GK", "DF", "DF", "DF", "MF", "MF", "FW", "FW"][index]! : null, now, now]);
+    });
+  });
   account.studentIds.forEach((studentId, index) => {
     upsertDemoRow(database, "match_events",
       "id, club_id, match_id, type, student_id, minute, linked_metric_id, note, created_at, updated_at",
@@ -807,6 +820,7 @@ function demoRecordIds(account: SecureCqTalentTestAccountManifestEntry) {
     metricRecordIds: account.studentIds.flatMap((_, studentIndex) => Array.from({ length: demoMetricCount }, (_, metricIndex) => "metric-record-cq-talent-secure-test-" + account.slot + "-" + (studentIndex + 1) + "-" + (metricIndex + 1))),
     metricLineageIds: account.studentIds.flatMap((_, studentIndex) => Array.from({ length: demoMetricCount }, (_, metricIndex) => "metric-lineage-cq-talent-secure-test-" + account.slot + "-" + (studentIndex + 1) + "-" + (metricIndex + 1))),
     matchIds: ["match-cq-talent-secure-test-" + account.slot + "-completed", "match-cq-talent-secure-test-" + account.slot + "-scheduled"],
+    matchRosterIds: ["completed", "scheduled"].flatMap((matchKey) => account.studentIds.map((_, index) => "match-roster-cq-talent-secure-test-" + account.slot + "-" + matchKey + "-" + (index + 1))),
     matchEventIds: account.studentIds.map((_, index) => "match-event-cq-talent-secure-test-" + account.slot + "-" + (index + 1)),
     tacticalBoardIds: ["tactical-board-cq-talent-secure-test-" + account.slot + "-scheduled"],
     operationalProfileIds: account.studentIds.slice(0, 2).map((_, index) => "operational-profile-cq-talent-secure-test-" + account.slot + "-" + (index + 1)),

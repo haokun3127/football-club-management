@@ -2503,6 +2503,9 @@ export class PersistentApiStore extends SeedBackedStore {
     const result = await this.repositories.matches.transaction(async () => {
       const saved = await super.recordMatchSummary(persistedInput);
       this.repositories.matches.saveMatch(saved.match);
+      for (const roster of saved.rosters) {
+        this.repositories.matches.saveRoster(roster);
+      }
       for (const event of saved.events) {
         this.repositories.matches.saveEvent(event);
       }
@@ -3434,6 +3437,7 @@ function mergePersistedMatchData(repositories: PlatformRepositories, data: SeedD
   return {
     ...data,
     matches: mergeById(data.matches, clubIds.flatMap((clubId) => repositories.matches.listMatches(clubId))),
+    matchRosters: mergeById(data.matchRosters, clubIds.flatMap((clubId) => repositories.matches.listRosters(clubId))),
     matchEvents: mergeById(data.matchEvents, clubIds.flatMap((clubId) => repositories.matches.listEvents(clubId))),
     metricRecords: mergeById(data.metricRecords, clubIds.flatMap((clubId) => repositories.matches.listMetricRecords(clubId))),
   };

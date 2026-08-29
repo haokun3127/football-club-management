@@ -1,4 +1,4 @@
-import type { Match, MatchEvent, PlayerMetricRecord } from "@football-club/domain";
+import type { Match, MatchEvent, MatchRoster, PlayerMetricRecord } from "@football-club/domain";
 import type { DatabaseSync, SQLInputValue } from "node:sqlite";
 
 type SqlRow = Record<string, unknown>;
@@ -26,6 +26,11 @@ export class MatchRepository {
   listEvents(clubId: string): MatchEvent[] {
     const rows = this.database.prepare("SELECT * FROM match_events WHERE club_id = ? ORDER BY created_at, id").all(clubId) as SqlRow[];
     return rows.map(mapMatchEvent);
+  }
+
+  listRosters(clubId: string): MatchRoster[] {
+    const rows = this.database.prepare("SELECT * FROM match_rosters WHERE club_id = ? ORDER BY created_at, id").all(clubId) as SqlRow[];
+    return rows.map(mapMatchRoster);
   }
 
   listMetricRecords(clubId: string): PlayerMetricRecord[] {
@@ -68,6 +73,32 @@ export class MatchRepository {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO NOTHING
     `).run(...matchEventValues(event));
+  }
+
+  insertRosterIfAbsent(roster: MatchRoster): void {
+    this.database.prepare(`
+      INSERT INTO match_rosters (
+        id, club_id, match_id, student_id, team_id, started, minutes_played, position, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO NOTHING
+    `).run(...matchRosterValues(roster));
+  }
+
+  saveRoster(roster: MatchRoster): void {
+    this.database.prepare(`
+      INSERT INTO match_rosters (
+        id, club_id, match_id, student_id, team_id, started, minutes_played, position, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        club_id = excluded.club_id,
+        match_id = excluded.match_id,
+        student_id = excluded.student_id,
+        team_id = excluded.team_id,
+        started = excluded.started,
+        minutes_played = excluded.minutes_played,
+        position = excluded.position,
+        updated_at = excluded.updated_at
+    `).run(...matchRosterValues(roster));
   }
 
   saveEvent(event: MatchEvent): void {
@@ -130,6 +161,21 @@ function matchEventValues(event: MatchEvent): Array<string | number | null> {
   ];
 }
 
+function matchRosterValues(roster: MatchRoster): Array<string | number | null> {
+  return [
+    roster.id,
+    roster.clubId,
+    roster.matchId,
+    roster.studentId,
+    roster.teamId ?? null,
+    roster.started ? 1 : 0,
+    roster.minutesPlayed ?? null,
+    roster.position ?? null,
+    roster.createdAt,
+    roster.updatedAt,
+  ];
+}
+
 function playerMetricRecordValues(record: PlayerMetricRecord): SQLInputValue[] {
   return [
     record.id,
@@ -184,6 +230,21 @@ function mapMatchEvent(row: SqlRow): MatchEvent {
   };
 }
 
+function mapMatchRoster(row: SqlRow): MatchRoster {
+  return {
+    id: requiredString(row, "id"),
+    clubId: requiredString(row, "club_id"),
+    matchId: requiredString(row, "match_id"),
+    studentId: requiredString(row, "student_id"),
+    teamId: optionalString(row, "team_id"),
+    started: requiredNumber(row, "started") === 1,
+    minutesPlayed: optionalNumber(row, "minutes_played"),
+    position: optionalString(row, "position"),
+    createdAt: requiredString(row, "created_at"),
+    updatedAt: requiredString(row, "updated_at"),
+  };
+}
+
 function mapPlayerMetricRecord(row: SqlRow): PlayerMetricRecord {
   return {
     id: requiredString(row, "id"),
@@ -211,6 +272,12 @@ function mapPlayerMetricRecord(row: SqlRow): PlayerMetricRecord {
 function requiredString(row: SqlRow, key: string): string {
   const value = row[key];
   if (typeof value !== "string") throw new Error(`Expected ${key} to be a string.`);
+  return value;
+}
+
+function requiredNumber(row: SqlRow, key: string): number {
+  const value = row[key];
+  if (typeof value !== "number") throw new Error(`Expected ${key} to be a number.`);
   return value;
 }
 

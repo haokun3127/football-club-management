@@ -518,6 +518,7 @@ describe("platform persistence", () => {
       "0014_coach_wechat.sql",
       "0015_session_plans.sql",
       "0016_training_sessions.sql",
+      "0017_match_rosters.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);
@@ -560,6 +561,7 @@ describe("platform persistence", () => {
           ,'assessment_tasks'
           ,'session_plans'
           ,'training_sessions'
+          ,'match_rosters'
         )
       ORDER BY name
     `).all() as Array<{ name: string }>;
@@ -583,6 +585,7 @@ describe("platform persistence", () => {
       "external_system_connections",
       "external_table_mappings",
       "http_idempotency_records",
+      "match_rosters",
       "metric_dependencies",
       "metric_graph_versions",
       "metric_view_nodes",
