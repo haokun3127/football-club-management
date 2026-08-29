@@ -1,5 +1,7 @@
 .c5 {
+  box-sizing: border-box;
   min-height: 100vh;
+  padding-bottom: 140rpx;
   background: #f6f7f9;
 }
 
@@ -20,15 +22,26 @@
 }
 
 .c5-hero__title {
+  overflow: hidden;
   color: #ffffff;
   font-size: 36rpx;
   font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .c5-hero__meta {
   color: rgba(255, 255, 255, 0.85);
   font-size: 26rpx;
   line-height: 32rpx;
+}
+
+.c5-hero__meta--primary {
+  opacity: 0.6;
+}
+
+.c5-hero__meta--secondary {
+  opacity: 0.8;
 }
 
 .c5-hero__meta-group {

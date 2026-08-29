@@ -235,6 +235,12 @@ const viewport = await inspectionProgram.systemInfo();
   service and persists the handshake. Do not change page code, API state,
   roles, or authentication while this boundary is failing.
 
+### 8.2 Fixed TabBar bottom-safe-area convention (2026-08-29)
+
+- A page that renders the fixed `role-tabbar` must reserve its `140rpx` height in the page root when its content can exceed one viewport; otherwise a bottom CTA can be hidden behind the TabBar even though the first screenshot looks correct.
+- Verify both the first viewport and a bottom viewport after `wx.pageScrollTo`; the bottom CTA, correction link, and final list row must be fully above the fixed TabBar.
+- Good: `.page { padding-bottom: 140rpx; }` with a bottom screenshot proving the action block is unobscured. Bad: checking only the first viewport or adding an unrelated fixed offset to the action bar.
+
 ### 9. Windows Simulator Capture Fallback (2026-08-05)
 
 - When the Automator route, page-stack, and `systemInfo` calls work but the SDK screenshot call times out, Windows may use `scripts/devtools-simulator-capture.py` through `devtools-screenshot.mjs`.

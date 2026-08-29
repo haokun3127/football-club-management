@@ -179,11 +179,11 @@ describe("coach lesson confirmation", () => {
     expect(globalThis.wx.showToast).toHaveBeenCalledWith({ title: "课时确认已提交", icon: "success" });
   });
 
-  it("uses a page-owned confirmation bar and contains no inline correction or Figma sample data", () => {
+  it("uses the live C5 confirmation hierarchy without copying Figma sample data", () => {
     expect(template).toContain('class="c5-confirm-bar"');
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
-    expect(template).toContain('<app-header theme="soft" title="销课处理" title-align="left" show-back />');
-    expect(styles).not.toContain("bottom: 140rpx");
+    expect(template).toContain('<app-header theme="soft" title="课时确认" title-align="left" show-back />');
+    expect(styles).not.toMatch(/\.c5-confirm-bar\s*\{[^}]*bottom:/s);
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"submit-bar"');
     expect(template).not.toContain("submit-bar");
@@ -198,11 +198,12 @@ describe("coach lesson confirmation", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 
-  it("uses the revised settlement vocabulary for the pending C5 state", () => {
-    expect(template).toContain('<app-header theme="soft" title="销课处理" title-align="left" show-back />');
-    expect(template).toContain('<view class="c5-hero__title">待处理销课</view>');
-    expect(template).toContain("待确认学员");
-    expect(template).toContain("待确认");
+  it("uses the current online Figma labels for the pending C5 state", () => {
+    expect(template).toContain('<app-header theme="soft" title="课时确认" title-align="left" show-back />');
+    expect(template).toContain('<view class="c5-hero__title">{{eventTitle}}</view>');
+    expect(template).toContain("学员课时记录");
+    expect(template).toContain("共 {{rosterCount}} 名学员");
+    expect(template).toContain("{{item.lessonAmountText}}");
     expect(template).toContain("确认全部");
     expect(template).toContain("发起更正");
   });
@@ -211,11 +212,11 @@ describe("coach lesson confirmation", () => {
     expect(styles).toMatch(/\.c5-confirm-bar\s*\{[^}]*position:\s*relative/s);
     expect(styles).not.toMatch(/\.c5-confirm-bar\s*\{[^}]*position:\s*fixed/s);
     expect(styles).toMatch(/\.c5-confirm-bar\s*\{[^}]*padding:\s*0\s+44rpx\s+44rpx/s);
-    expect(styles).not.toContain("bottom: 140rpx");
+    expect(styles).not.toMatch(/\.c5-confirm-bar\s*\{[^}]*bottom:/s);
   });
 
   it("uses the shared compact header instead of a page-owned system-menu layout", () => {
-    expect(template).toContain('<app-header theme="soft" title="销课处理" title-align="left" show-back />');
+    expect(template).toContain('<app-header theme="soft" title="课时确认" title-align="left" show-back />');
     expect(template).not.toContain('class="c5-nav"');
     expect(pageConfig).toContain('"app-header"');
     expect(controller).not.toContain("resolveMenuInset");
@@ -223,7 +224,7 @@ describe("coach lesson confirmation", () => {
   });
 
   it("uses the C5 Figma header and compact confirmation hierarchy without a non-Figma note card", () => {
-    expect(template).toContain('<app-header theme="soft" title="销课处理" title-align="left" show-back />');
+    expect(template).toContain('<app-header theme="soft" title="课时确认" title-align="left" show-back />');
     expect(template).toContain('<status-view wx:if="{{state !== \'ready\' && state !== \'idle\'}}"');
     expect(template).toContain('class="c5-hero__meta-group"');
     expect(template).not.toContain('class="c5-nav"');
@@ -238,6 +239,10 @@ describe("coach lesson confirmation", () => {
     expect(styles).toMatch(/\.c5-confirm-bar\s*\{[^}]*padding:\s*0\s+44rpx\s+44rpx/s);
     expect(styles).toMatch(/\.c5-confirm-bar__button\s*\{[^}]*height:\s*104rpx/s);
     expect(styles).not.toMatch(/\.c5-confirm-bar\s*\{[^}]*box-shadow/s);
-    expect(styles).not.toContain("bottom: 140rpx");
+    expect(styles).not.toMatch(/\.c5-confirm-bar\s*\{[^}]*bottom:/s);
+  });
+
+  it("reserves the fixed coach TabBar safe area for the confirmation action", () => {
+    expect(styles).toMatch(/\.c5\s*\{[^}]*padding-bottom:\s*140rpx/s);
   });
 });

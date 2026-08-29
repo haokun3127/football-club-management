@@ -1,0 +1,14 @@
+{
+  "capturedOn": "2026-08-29",
+  "figmaFileKey": "zZ6wKyOHKcO4UYXDd9jGwv",
+  "nodeId": "93:734",
+  "board": "C5 Lesson Confirm",
+  "png": {
+    "width": 375,
+    "height": 812,
+    "bytes": 34515,
+    "sha256": "CE146DA3E509B9F7B5053AE3505863DD1B6113F48E1F1505E437D91F75FFEC8E"
+  },
+  "captureMethod": "figma-mcp get_screenshot",
+  "designContext": "figma-mcp get_design_context read before comparison"
+}

@@ -1,0 +1,10 @@
+# C5 Lesson Confirm — 2026-08-29 live comparison
+
+- Online design source: Figma file `zZ6wKyOHKcO4UYXDd9jGwv`, node `93:734`, `get_design_context` and `get_screenshot` both read on 2026-08-29. The live board is `375×812`; its key structure is a soft pink 88px top bar, a dark activity card, a white `学员课时记录` card, confirmation action, correction link, and the three-item coach TabBar.
+- Online screenshot: `c5-online.png` with sidecar `c5-online.png.json`.
+- Runtime route: `/pages/coach/lesson/index?id=event-cq-talent-secure-test-1-trn-0818`, opened through WeChatIDE MCP with the real coach session. Initial runtime evidence: `c5-runtime-before.png`.
+- Initial comparison found two implementation defects: the page used the superseded `销课处理`/`待处理销课`/`待确认学员` labels instead of the live board hierarchy, and the fixed TabBar covered the bottom confirmation action when the real roster had eight students.
+- Repair: restored the live-board labels and used the real `eventTitle` in the activity card; added primary/secondary metadata opacity classes; added a `140rpx` root bottom safe-area reserve for the fixed TabBar. The roster, event title, count, and `待确认` chip remain real API state; the backend does not return the Figma sample `1.5课时`, so no sample value was fabricated.
+- Focused TDD: the new/updated C5 assertions failed first (`4` failures for the board hierarchy, then `1` safe-area failure), and passed after repair (`11/11`).
+- Final first viewport: `c5-runtime-final.png` with sidecar `c5-runtime-final.png.json`; final bottom viewport: `c5-runtime-final-bottom.png` with sidecar `c5-runtime-final-bottom.png.json`.
+- Comparison levels: (1) online Figma read — passed; (2) route-verified runtime screenshots — passed, both `375×812`; (3) visual comparison — repaired-and-recaptured. The final bottom viewport confirms the button and `发起更正` link are fully above the fixed TabBar. WXML compilation passed and simulator console filters for `error|exception|fail|undefined|route is not defined|wx:else` had no hits.
