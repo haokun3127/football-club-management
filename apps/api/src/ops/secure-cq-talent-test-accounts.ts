@@ -663,6 +663,16 @@ type DemoAssessmentCatalog = {
 };
 
 const demoMetricCount = 8;
+const demoPlayerNames = [
+  "丁宁",
+  "方圆",
+  "李明",
+  "林一诺",
+  "王旭东",
+  "张晨曦",
+  "白子涵",
+  "陈思远",
+] as const;
 
 type DemoLabels = {
   accountName: string;
@@ -681,7 +691,7 @@ function demoLabels(account: SecureCqTalentTestAccountManifestEntry): DemoLabels
     parentName: "测试家长" + suffix,
     coachName: "测试教练" + suffix,
     teamName: "重庆天才演示球队" + suffix,
-    playerNames: account.studentIds.map((_, index) => "测试球员" + suffix + "-" + (index + 1)),
+    playerNames: account.studentIds.map((_, index) => demoPlayerNames[index]!),
     completedOpponent: "山城少年足球队",
     scheduledOpponent: "两江青训足球队",
   };
