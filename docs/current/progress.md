@@ -1647,3 +1647,10 @@
 - 真实教练路由 `pages/coach/match-event-add/index?eventId=event-cq-talent-secure-test-1-completed-match` 由 WeChatIDE MCP 取得首屏和 `pageScrollTo` 后底部视口截图，均严格 `375×812`；共享顶栏、表单层级、红色提交按钮和教练 TabBar 几何一致。
 - 运行时只显示真实客户端能力返回的 `进球 / 助攻 / 扑救 / 抢断`，未复制在线稿示例的 `黄牌 / 红牌 / 换人 / 其他`；真实球员、空表单和平台状态栏/胶囊同样属于数据或平台差异。单行事件标签导致表单整体上移，是预期差异，不是布局缺陷。
 - 底部视口确认提交按钮未被固定 TabBar 遮挡；控制台错误过滤无命中。本页无业务代码修改、无回归测试新增，结论为 **通过（数据/平台差异豁免）**。证据详见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c6-1-match-event-add-comparison.md`。
+
+## 2026-08-29 C6.2 保存态在线 Figma 修复复验
+
+- 在线唯一 Figma 基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv / 93:858`；在线截图保存为 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c6-2-online.png`，画板严格 `375×812`。
+- 通过真实 C6.1 流程输入第 `54` 分钟并返回比赛页，复现兼容的本机草稿遮罩；没有注入页面 data、API 响应或 storage。修复前对照发现弹层宽度约 `327px`、成功圆容器 `52px`、手写 CSS 勾号和 `#d1fadf` 背景均与在线稿不一致。
+- 最小修复：恢复 Figma `315×270px` 弹层的 border-box 几何和 `#ecfdf5` 成功容器，替换为 Figma 导出的 `c6-2-cloud-check.svg`，并保持本机草稿真实范围文案。修复后真实首屏与底部视口均严格 `375×812`，TabBar 未遮挡，控制台错误过滤无命中。
+- C6 聚焦测试先红后绿 `10/10`；WXML/WXSS 编译成功。结论为 **修复后重新通过（真实数据/本机持久化范围差异豁免）**。证据详见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c6-2-match-save-state-comparison.md`。

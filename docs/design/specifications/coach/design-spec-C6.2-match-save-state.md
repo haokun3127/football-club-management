@@ -87,3 +87,10 @@
 - 通过 C6.1 真实输入分钟 `54` 触发本机草稿保存，再打开真实比赛路由，WeChatIDE MCP 截图保存为 `tmp/goal-c6-2-match-current.png`，严格 `375×812`；`hasLocalDraftOverlay=true`，并显示“本机保存于 2026-08-29 04:09”。
 - 真实运行结构与 Figma 对应：比赛顶栏、比赛摘要卡、事件区、半透明遮罩、白色保存卡片、继续编辑/退出按钮和教练 TabBar 均存在。实现文案明确为“未提交草稿已保存 / 仅保存在当前设备”，因为本轮没有把草稿写入 API；不将本机状态误报为服务器保存。
 - 控制台过滤 `error|exception|fail|undefined|route is not defined` 无命中。该验证只证明设备草稿恢复闭环，不替代生产持久化验证。
+
+## 2026-08-29 在线稿复核与弹层修复
+
+- 重新读取在线节点 `zZ6wKyOHKcO4UYXDd9jGwv / 93:858` 并取得新的 `375×812` Figma 截图；对照发现原实现的弹层宽度、成功图标尺寸/资产和图标容器色值均偏离在线稿。
+- 已将弹层恢复为在线稿 `315×270px` 的 border-box 几何（小程序侧 `630rpx`、`48rpx` 内边距、`40rpx` 垂直间距、遮罩无额外内边距），成功容器恢复为 `64×64px`、`#ecfdf5`，并使用 Figma 导出的 `c6-2-cloud-check.svg`。
+- 真实流程重新创建本机草稿并取得首屏与底部 `375×812` 截图：`.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c6-2-runtime-repaired.png` 与 `c6-2-runtime-repaired-bottom.png`。运行时仍保留本机草稿范围说明，不将 Figma 的示例“已自动保存”误报为服务端持久化。
+- 聚焦 C6 测试先红后绿 `10/10`；WXML/WXSS 编译成功，模拟器错误过滤无命中。详细对照见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-29/c6-2-match-save-state-comparison.md`。

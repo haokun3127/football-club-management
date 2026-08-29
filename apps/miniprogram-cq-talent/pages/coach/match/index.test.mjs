@@ -224,7 +224,15 @@ describe("coach match detail", () => {
     expect(styles).toMatch(/\.match-hero\s*\{[^}]*padding:\s*40rpx/s);
     expect(styles).toMatch(/\.match-card__action\s*\{[^}]*border:\s*1rpx solid #a80f1b[^}]*border-radius:\s*8rpx/s);
     expect(styles).toMatch(/\.match-draft-mask\s*\{[^}]*background:\s*rgba\(0, 0, 0, 0\.5\)/s);
-    expect(styles).toMatch(/\.match-draft-modal\s*\{[^}]*padding:\s*48rpx[^}]*text-align:\s*left/s);
+    expect(template).toContain('<image class="match-draft-modal__cloud-check" src="/assets/icons/c6-2-cloud-check.svg" mode="aspectFit" />');
+    expect(template).not.toContain('class="match-draft-modal__check"');
+    expect(styles).toMatch(/\.match-draft-mask\s*\{[^}]*padding:\s*0/s);
+    expect(styles).toMatch(/\.match-draft-modal\s*\{[^}]*display:\s*flex[^}]*flex-direction:\s*column/s);
+    expect(styles).toMatch(/\.match-draft-modal\s*\{[^}]*box-sizing:\s*border-box/s);
+    expect(styles).toMatch(/\.match-draft-modal\s*\{[^}]*gap:\s*40rpx/s);
+    expect(styles).toMatch(/\.match-draft-modal\s*\{[^}]*width:\s*630rpx[^}]*padding:\s*48rpx[^}]*text-align:\s*left/s);
+    expect(styles).toMatch(/\.match-draft-modal__icon\s*\{[^}]*width:\s*128rpx[^}]*height:\s*128rpx/s);
+    expect(styles).toMatch(/\.match-draft-modal__icon\s*\{[^}]*background:\s*#ecfdf5/s);
     expect(styles).toMatch(/\.match-draft-modal__exit\s*\{[^}]*background:\s*#a80f1b/s);
     expect(template).not.toMatch(/\b(?:0|1|2|3|4|5):(?:0|1|2|3|4|5)\b/);
   });
