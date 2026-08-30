@@ -8,8 +8,10 @@
       - [13] | 比赛记录 | 88x27 @(132,1950) | fill=#202124 | font=Inter/Bold 22px | text="比赛记录"
   - [4] | Content | 375x654 @(80,2008) | layout=V gap=16 pad=16/16
     - [4] | MatchHero | 343x155 @(96,2024) | fill=#07111f | r=16 | layout=V gap=20 pad=20/20 | shadow=0,4,12,#000000@0.10
-      - [13] | 周末联赛补赛 | 96x19 @(116,2044) | fill=#ffffff | font=Inter/Bold 16px | text="周末联赛补赛"
-      - [4] | Teams | 303x29 @(116,2083) | layout=H
+    - [13] | 周末联赛补赛 | 96x19 @(116,2044) | fill=#ffffff | font=Inter/Bold 16px | text="周末联赛补赛"
+    - [4] | MatchEditAction | 82x26 @(337,2040) | stroke=#ffffff@0.72 w1 | r=13 | absolute overlay
+      - [13] | 编辑比赛 | 48x15 | fill=#ffffff | font=Inter/Semi Bold 12px | text="编辑比赛"
+    - [4] | Teams | 303x29 @(116,2083) | layout=H
         - [13] | 凤凰山U10精英队 | 127x19 @(116,2088) | fill=#ffffff | font=Inter/Bold 16px | text="凤凰山U10精英队"
         - [13] | 0:0 | 39x29 @(288,2083) | fill=#ffffff | font=Inter/Semi Bold 24px | text="0:0"
         - [13] | 星辰队 | 48x19 @(371,2088) | fill=#ffffff | font=Inter/Bold 16px | text="星辰队"
