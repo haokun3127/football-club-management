@@ -6,10 +6,10 @@
 
 ## Requirements
 
-- Online Figma file `zZ6wKyOHKcO4UYXDd9jGwv` is the sole visual authority.
+- Online Figma file `zZ6wKyOHKcO4UYXDd9jGwv` is the sole visual authority. The current verified nodes are parent collapsed/expanded `1008:186` / `1008:436` and coach collapsed/expanded `1293:8` / `1293:34`.
 - Do not overwrite or delete the historical `P1 Schedule Home`, `P1 Schedule Home — Empty`, or `P1 Schedule Home — Month V2` frames.
 - Create a new 2026-08-28 client-revision P1 design state in Figma before modifying mini-program code.
-- The collapsed/default state keeps the original seven-day weekly strip, including prior/next-week arrows and a visible affordance to expand the date picker.
+- The parent collapsed/default state keeps the original seven-day weekly strip. The coach collapsed state follows the current online C1 board: Monday through Saturday plus an independent expand affordance, with Sunday available from the expanded month grid. Both keep reachable prior/next-week navigation.
 - The expanded state replaces the compact weekly strip with a month grid. Selecting a date updates the selected-date summary and the event list; the picker can collapse back to the weekly strip.
 - The empty state preserves the date control and a stable event-area height so content below the date control does not jump when the selected day has no events.
 - WXML must not invoke JavaScript array/string methods in templates. Compute every display field in the TypeScript view model.

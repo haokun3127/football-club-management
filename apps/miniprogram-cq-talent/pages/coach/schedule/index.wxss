@@ -17,6 +17,8 @@
 .c1-dates__arrow { position: absolute; top: 32rpx; z-index: 1; display: flex; flex: 0 0 44rpx; align-items: center; justify-content: center; padding: 0; }
 .c1-dates__arrow--previous { top: 40rpx; left: 0; width: 48rpx; height: 48rpx; }
 .c1-dates__arrow--previous image { display: block; width: 48rpx; height: 48rpx; }
+.c1-dates__arrow--next { top: 48rpx; right: 0; width: 32rpx; height: 32rpx; }
+.c1-dates__arrow--next image { display: block; width: 32rpx; height: 32rpx; }
 .c1-dates__days { display: flex; flex: 1; min-width: 0; }
 .c1-day { display: flex; flex: 0 0 88rpx; flex-direction: column; align-items: center; justify-content: center; width: 88rpx; height: 80rpx; border-radius: 16rpx; }
 .c1-day--selected { background: transparent; }
@@ -44,9 +46,9 @@
 .c1-list { display: flex; flex-direction: column; gap: 24rpx; margin-top: 24rpx; }.acard { display: flex; align-items: center; gap: 24rpx; min-height: 192rpx; padding: 24rpx; box-sizing: border-box; border-radius: 32rpx; background: #ffffff; box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.08); }.acard__accent { width: 8rpx; align-self: stretch; flex: 0 0 8rpx; border-radius: 4rpx; }.acard__time { width: 112rpx; flex: 0 0 112rpx; }.acard__start { color: #a80f1b; font-size: 30rpx; font-weight: 800; line-height: 36rpx; }.acard__dur { color: #667085; font-size: 22rpx; line-height: 26rpx; }.acard__content { display: flex; flex: 1; flex-direction: column; justify-content: center; min-width: 0; gap: 12rpx; }.acard__head { display: flex; align-items: center; gap: 8rpx; min-width: 0; }.acard__type { flex: 0 0 auto; padding: 4rpx 10rpx; border-radius: 8rpx; font-size: 20rpx; font-weight: 700; line-height: 26rpx; }.acard__type--training { background: #fceeef; color: #a80f1b; }.acard__type--match { background: #eaf2ff; color: #1976d2; }.acard__type--other { background: #f3f4f6; color: #667085; }.acard__title { min-width: 0; overflow: hidden; color: #202124; font-size: 30rpx; font-weight: 600; line-height: 38rpx; text-overflow: ellipsis; white-space: nowrap; }.acard__coach { flex: 0 0 auto; padding: 4rpx 10rpx; border-radius: 8rpx; background: #f3f4f6; color: #667085; font-size: 20rpx; line-height: 26rpx; }.acard__meta { overflow: hidden; color: #667085; font-size: 22rpx; line-height: 30rpx; text-overflow: ellipsis; white-space: nowrap; }.acard__action { align-self: flex-start; padding: 6rpx 12rpx; border-radius: 8rpx; background: #fdf0f1; color: #a80f1b; font-size: 22rpx; line-height: 28rpx; }.acard__right { display: flex; flex: 0 0 auto; align-items: center; gap: 10rpx; }.acard__pill { height: 42rpx; padding: 0 12rpx; border-radius: 8rpx; font-size: 20rpx; line-height: 42rpx; }.pill--info, .pill--success { background: #10b981; color: #ffffff; }.pill--brand { background: #1976d2; color: #ffffff; }.pill--warning, .pill--pending { background: #f59e0b; color: #ffffff; }.pill--error { background: #d14343; color: #ffffff; }
 .c1-empty { padding: 64rpx 32rpx; border-radius: 24rpx; background: #ffffff; color: #8a8f99; font-size: 26rpx; text-align: center; }
 
-.c1-dates__expand { position: absolute; top: 50%; right: 24rpx; bottom: auto; display: flex; align-items: center; justify-content: center; width: 96rpx; height: 64rpx; border-radius: 32rpx; background: #fff1f2; transform: translateY(-50%); }
-.c1-dates__expand image { display: block; width: 32rpx; height: 32rpx; border: 0; transform: none; }
-.c1-dates__expand-icon { display: block; width: 32rpx; height: 32rpx; transform: none; }
+.c1-dates__expand { position: absolute; top: 50%; right: 24rpx; bottom: auto; display: flex; align-items: center; justify-content: center; width: 60rpx; height: 32rpx; border-radius: 16rpx; background: #fff1f2; transform: translateY(-50%); }
+.c1-dates__expand image { display: block; width: 16rpx; height: 16rpx; border: 0; transform: none; }
+.c1-dates__expand-icon { display: block; width: 16rpx; height: 16rpx; transform: none; }
 
 .c1-month-calendar { box-sizing: border-box; width: 686rpx; min-height: 840rpx; margin: 32rpx 32rpx 0; padding: 28rpx 24rpx 24rpx; border-radius: 32rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.04); }
 .c1-month-calendar__header { display: flex; align-items: center; justify-content: space-between; min-height: 48rpx; }
@@ -54,8 +56,8 @@
 .c1-month-calendar__actions { display: flex; align-items: center; gap: 8rpx; }
 .c1-month-calendar__arrow { display: flex; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; }
 .c1-month-calendar__arrow image { display: block; width: 28rpx; height: 28rpx; }
-.c1-month-calendar__collapse { display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: 64rpx; height: 48rpx; border-radius: 999rpx; background: #fff1f2; }
-.c1-month-calendar__collapse-icon { display: block; width: 28rpx; height: 28rpx; transform: none; }
+.c1-month-calendar__collapse { display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: 60rpx; height: 32rpx; border-radius: 16rpx; background: #fff1f2; }
+.c1-month-calendar__collapse-icon { display: block; width: 16rpx; height: 16rpx; transform: none; line-height: 0; }
 .c1-month-calendar__weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-top: 24rpx; }
 .c1-month-calendar__weekday { color: #667085; font-size: 22rpx; line-height: 28rpx; text-align: center; }
 .c1-month-calendar__grid { display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 104rpx; margin-top: 12rpx; }
@@ -73,8 +75,8 @@
 /* Match Figma C1: the outer date strip owns the border; the seven dates form one inset row. */
 .c1-week-nav { position: absolute; top: 24rpx; right: 0; left: 44rpx; display: flex; gap: 8rpx; min-width: 0; height: 80rpx; box-sizing: border-box; padding: 0; overflow: visible; }
 
-/* Keep both collapsed and expanded controls centered at the live Figma geometry. */
+/* Keep both collapsed and expanded controls centered without overriding their Figma geometry. */
 .c1-dates__expand { line-height: 0; }
 .c1-dates__expand image, .c1-dates__expand-icon { line-height: 0; }
-.c1-month-calendar__collapse { width: 96rpx; height: 64rpx; border-radius: 32rpx; line-height: 0; }
-.c1-month-calendar__collapse-icon { width: 32rpx; height: 32rpx; flex: 0 0 32rpx; line-height: 0; }
+.c1-month-calendar__collapse { line-height: 0; }
+.c1-month-calendar__collapse-icon { flex: 0 0 16rpx; }

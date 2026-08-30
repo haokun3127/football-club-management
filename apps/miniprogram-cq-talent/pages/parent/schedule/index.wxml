@@ -63,7 +63,7 @@
         <view class="month-calendar__actions">
           <view class="month-calendar__arrow" data-offset="-1" bindtap="changeMonth" aria-label="上个月"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
           <view class="month-calendar__arrow" data-offset="1" bindtap="changeMonth" aria-label="下个月"><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
-            <view class="month-calendar__collapse" bindtap="collapseMonthPicker">收起<image class="month-calendar__collapse-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>
+          <view class="month-calendar__collapse" bindtap="collapseMonthPicker" aria-label="收起月历"><image class="month-calendar__collapse-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>
         </view>
       </view>
       <view class="month-calendar__weekdays">

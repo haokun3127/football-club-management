@@ -64,6 +64,7 @@ Page({
     viewMode: "day" as ViewMode,
     activeFilter: "all" as Filter,
     dayStrip: [] as Array<{ date: string; weekLabel: string; dayNum: string }>,
+    collapsedDayStrip: [] as Array<{ date: string; weekLabel: string; dayNum: string }>,
     rangeLabel: "",
     coachName: "",
     coachInitial: "",
@@ -108,12 +109,14 @@ Page({
       const selectedDateEvents = selectedTeamEvents.filter((event) => event.startsAt.slice(0, 10) === this.data.date);
       const heroEvent = selectedDateEvents.find((event) => event.status === "in_progress") ?? selectedDateEvents[0] ?? null;
       const hasWork = selectedTeamEvents.length > 0 || taskCards.length > 0;
+      const dayStrip = buildDayStrip(startOfWeek(this.data.date));
       this.setData({
         state: hasWork ? "ready" : "empty",
         message: hasWork ? "" : "所选日期范围内没有日程或待处理任务",
         home,
         selectedDate: this.data.date,
-        dayStrip: buildDayStrip(startOfWeek(this.data.date)),
+        dayStrip,
+        collapsedDayStrip: dayStrip.slice(0, 6),
         rangeLabel: rangeLabel(range, this.data.viewMode),
         coachName,
         coachInitial: coachName.slice(0, 1),
@@ -305,7 +308,7 @@ function startOfWeek(date: string): string {
 }
 
 function buildDayStrip(monday: string) {
-  return Array.from({ length: 6 }, (_, index) => {
+  return Array.from({ length: 7 }, (_, index) => {
     const date = addDays(monday, index);
     const value = new Date(`${date}T00:00:00.000Z`);
     return { date, weekLabel: WEEK_LABELS[value.getUTCDay()], dayNum: String(value.getUTCDate()) };
