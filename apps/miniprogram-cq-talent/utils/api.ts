@@ -36,6 +36,12 @@ import type {
   TacticalBoardPlayer,
   TacticalBoardState,
 } from "./types";
+
+type MatchDetailReadOptions = {
+  forceRefresh?: boolean;
+};
+
+let matchDetailRefreshSequence = 0;
 export async function resolveClient() {
   return request<AppContext>({
     path: `/app-clients/resolve?clientKey=${APP_CLIENT_KEY}`,
@@ -217,10 +223,11 @@ export async function createCoachAssessmentTask(input: { title: string; template
   return { id: String(task.id ?? "") };
 }
 
-export async function getCoachMatchDetail(eventId: string): Promise<CoachMatchDetail> {
+export async function getCoachMatchDetail(eventId: string, options: MatchDetailReadOptions = {}): Promise<CoachMatchDetail> {
   const context = requireContext();
+  const refreshQuery = options.forceRefresh ? `?refresh=${Date.now()}-${++matchDetailRefreshSequence}` : "";
   const response = await request<Record<string, unknown>>({
-    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/match`,
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/match${refreshQuery}`,
   });
   return normalizeCoachMatchDetail(response);
 }

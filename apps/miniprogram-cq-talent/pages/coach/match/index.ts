@@ -81,9 +81,9 @@ Page<MatchPageData>({
     if (!this.data.eventId || !this.data.hasLoaded) return;
     const session = requireRole("coach");
     if (!session) return;
-    return this.load(this.data.eventId, session.capabilities?.match?.eventTypes);
+    return this.load(this.data.eventId, session.capabilities?.match?.eventTypes, true);
   },
-  async load(eventId: string, capabilityEventTypes?: string[]): Promise<boolean> {
+  async load(eventId: string, capabilityEventTypes?: string[], forceRefresh = false): Promise<boolean> {
     if (!eventId) {
       this.setData({ ...emptyState("缺少活动 ID"), state: "empty" });
       return false;
@@ -98,7 +98,9 @@ Page<MatchPageData>({
     });
 
     try {
-      const detail = await getCoachMatchDetail(eventId);
+      const detail = forceRefresh
+        ? await getCoachMatchDetail(eventId, { forceRefresh: true })
+        : await getCoachMatchDetail(eventId);
       if (requestToken !== loadToken) return false;
       if (!detail.match) {
         this.setData({
@@ -158,7 +160,7 @@ Page<MatchPageData>({
   retry() {
     const session = requireRole("coach");
     if (!session) return;
-    this.load(this.data.eventId, session.capabilities?.match?.eventTypes);
+    this.load(this.data.eventId, session.capabilities?.match?.eventTypes, true);
   },
   goBack() {
     wx.navigateBack();

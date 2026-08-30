@@ -268,6 +268,33 @@ describe("coach match detail request boundary", () => {
       globalThis.wx.request = originalRequest;
     }
   });
+
+  it("uses a distinct read URL when the caller requires a post-write refresh", async () => {
+    const originalRequest = globalThis.wx.request;
+    let received;
+    globalThis.wx.request = ({ url, method, success }) => {
+      received = { url, method };
+      success({
+        statusCode: 200,
+        data: {
+          event: { id: "event-match-refresh", type: "match", title: "赛后刷新", startsAt: "2026-08-13T09:00:00.000Z", status: "completed" },
+          roster: [],
+          match: { id: "match-refresh", homeScore: 1, awayScore: 0, status: "completed" },
+          events: [],
+        },
+      });
+    };
+
+    try {
+      await getCoachMatchDetail("event-match-refresh", { forceRefresh: true });
+      expect(received).toEqual(expect.objectContaining({
+        method: "GET",
+        url: expect.stringMatching(/\/coach\/events\/event-match-refresh\/match\?refresh=\d+-\d+$/),
+      }));
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
 });
 
 describe("coach match-event create request boundary", () => {

@@ -126,7 +126,7 @@ describe("coach match detail", () => {
   it("re-reads its exact event on show instead of accepting a local add-event payload", async () => {
     const page = createPageInstance({ eventId: "event-match-1", hasLoaded: true });
     await page.onShow();
-    expect(mocks.getCoachMatchDetail).toHaveBeenCalledWith("event-match-1");
+    expect(mocks.getCoachMatchDetail).toHaveBeenCalledWith("event-match-1", { forceRefresh: true });
     expect(controller).not.toContain("acceptMatchEvent");
     expect(controller).not.toContain("getOpenerEventChannel");
   });
