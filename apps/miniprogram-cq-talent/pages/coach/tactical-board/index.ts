@@ -32,6 +32,7 @@ interface BoardPageData {
   rosterPlayers: PlayerView[];
   starters: PlayerView[];
   substitutes: PlayerView[];
+  workspaceHeight: number;
   pitchWidth: number;
   pitchHeight: number;
   readOnly: boolean;
@@ -51,6 +52,8 @@ const ROSTER_LEFT = 34;
 const ROSTER_TOP = 339;
 const ROSTER_COLUMN_GAP = 86;
 const ROSTER_ROW_GAP = 92;
+const ROSTER_ITEM_HEIGHT = 80;
+const BASE_WORKSPACE_HEIGHT = 520;
 
 Page<BoardPageData>({
   data: {
@@ -70,6 +73,7 @@ Page<BoardPageData>({
     rosterPlayers: [],
     starters: [],
     substitutes: [],
+    workspaceHeight: 520,
     pitchWidth: 351,
     pitchHeight: 430,
     readOnly: false,
@@ -227,6 +231,10 @@ Page<BoardPageData>({
       rosterPlayers,
       starters: rosterPlayers.filter((player: PlayerView) => player.role === "starter"),
       substitutes: rosterPlayers.filter((player: PlayerView) => player.role !== "starter"),
+      workspaceHeight: Math.max(
+        BASE_WORKSPACE_HEIGHT,
+        ROSTER_TOP + Math.max(0, Math.ceil(rosterPlayers.length / ROSTER_COLUMNS) - 1) * ROSTER_ROW_GAP + ROSTER_ITEM_HEIGHT,
+      ),
     });
   },
   onFormationChange(event: { detail: { value: string | number } }) {

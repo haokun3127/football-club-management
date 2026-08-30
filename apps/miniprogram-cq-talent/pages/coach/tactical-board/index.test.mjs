@@ -181,6 +181,25 @@ describe("C7 coach tactical board MVP", () => {
     ]);
   });
 
+  it("expands the movable workspace so a full nineteen-player roster is not clamped into overlapping rows", () => {
+    const page = createPageInstance({
+      pitchWidth: 320,
+      pitchHeight: 284,
+      players: Array.from({ length: 19 }, (_, index) => ({
+        studentId: `player-${index + 1}`,
+        displayName: `甲${index + 1}`,
+        role: index < 11 ? "substitute" : "starter",
+        x: 0.5,
+        y: 0.8,
+      })),
+    });
+
+    page.refreshViews();
+
+    expect(page.data.workspaceHeight).toBe(787);
+    expect(page.data.rosterPlayers.at(-1)).toMatchObject({ rosterPx: 206, rosterPy: 707 });
+  });
+
   it("derives stable Figma-style jersey numbers and roster state from the real roster", async () => {
     const page = createPageInstance();
     await page.onLoad({ eventId: "event-real" });

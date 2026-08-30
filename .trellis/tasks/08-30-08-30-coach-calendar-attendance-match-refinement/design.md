@@ -1,0 +1,32 @@
+# 双端日历、出勤、比赛与演示数据收口 — 设计
+
+## Boundaries
+
+本轮不重写认证、球队创建、销课或历史业务流程。日历保持现有 P1/C1 页面与日期 view model；工作台保持现有 C2 出勤 API；比赛录入保持 C6/C6.1 的事件契约；战术板保持 C7 的保存/重读契约。仅补齐从真实路由进入、展示、交互与数据可见性。
+
+## Interaction Model
+
+1. P1/C1 默认为紧凑周条。左右箭头移动当前日期所属周；中间下拉胶囊只展开月历；月历头部箭头只切换月份；选日期后刷新该日事件且收起回对应周条。
+2. C2 出勤头像是唯一编辑入口。view model 预先提供 `displayName`、`isPresent` 和颜色类名。一次点击发起单一出勤请求；失败按点击前数据回滚。
+3. 比赛在 C1/C2 预览中有独立蓝色类型色、比赛标签和“记录比赛”路径。C6 在全屏页面写入比分/事件，事件行以中文类型标签、时间、队员和辅助信息显示。
+4. C7 不把 Figma 样例队员写入数据。球员来自战术板 API，拖动改变 normalized 坐标和替补/首发状态；保存后以重读作为成功标准。
+5. 演示数据从 API 生产导入脚本集中生成。每个账号均以同一真实电话绑定的双角色会话可读，但导入和审计输出只显示脱敏键或账户序号。
+
+## Data Contracts and Error Handling
+
+- `getCoachHome(range)` 继续提供 C1 事件和任务；日历 marker 由 `ScheduleEvent[]` 预计算。
+- `getCoachAttendance(eventId)` / 更新出勤接口为 C2 的唯一来源；页面不可本地伪造成功。
+- 比赛事件草稿和提交使用现有 `match-event-draft`、`match-event-add` 与 match-edit API；乌龙仍是合法进球归属选项。
+- C7 `getCoachTacticalBoard(eventId)` / `saveCoachTacticalBoard(...)` 成对使用；保存后以重读作为成功标准。
+- API 或网络失败时保留最近成功页面状态，展示已有错误文案，并避免重复提交。
+
+## Visual Rules
+
+- 先以在线节点的当前截图复验；图中日期、姓名、场地和赛果仅作为布局示例。
+- 图标只用 `/assets/icons/*.svg` 加 `<image mode="aspectFit">`；不以 Emoji 或大段 base64 替代。
+- 下拉箭头容器与图标分离：胶囊负责背景/圆角，`16rpx × 16rpx` 图标保持 `display:block`、无文字行高、以 flex 居中。
+- TabBar 不凭配置猜顺序，运行态读取组件 tabs 并截图确认。
+
+## Rollback
+
+每批提交独立可还原；API 数据导入前在服务器执行带时间戳的备份。任何保存写入异常以重读数据为准，必要时恢复该批备份，不覆盖工作区历史改动。

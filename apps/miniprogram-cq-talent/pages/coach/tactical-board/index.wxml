@@ -39,7 +39,7 @@
       </view>
 
       <view class="c7-board-container">
-        <movable-area id="c7-workspace" class="c7-workspace">
+        <movable-area id="c7-workspace" class="c7-workspace" style="height: {{workspaceHeight}}px;">
            <view id="c7-pitch" class="c7-pitch">
             <view class="c7-pitch__hint">拖拽球员到球场上场</view>
             <view class="c7-pitch__halfway"></view>

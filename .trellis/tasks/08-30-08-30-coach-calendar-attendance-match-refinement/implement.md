@@ -1,0 +1,77 @@
+# 双端日历、出勤、比赛与演示数据收口 Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** 让双端关键演示流程按在线 Figma 可稳定运行，且全部从真实接口和可读演示数据驱动。
+
+**Architecture:** 复用现有页面和 API 契约，以页面 view model 处理视觉字段。按日历、出勤、比赛/战术板、演示数据四批实施，任一批的 API 重读和真实模拟器截图通过后再进入下一批。
+
+**Tech Stack:** TypeScript、WXML、WXSS、Vitest、Node、微信开发者工具 MCP、Docker Compose API。
+
+## Global Constraints
+
+- Online Figma `zZ6wKyOHKcO4UYXDd9jGwv` is authoritative.
+- WXML has no JS method calls; all display fields are precomputed in TypeScript.
+- Stage exact paths only; never use `git add -A`.
+- No secrets, phone numbers, tokens or database paths in output, code, docs or commits.
+- Every production data write is backed up first, then API restart and readback are mandatory.
+
+### Task 1: 双端日历与家长 TabBar 运行态收口
+
+**Files:**
+- Modify if needed: `apps/miniprogram-cq-talent/pages/parent/schedule/index.ts`, `index.wxml`, `index.wxss`
+- Modify if needed: `apps/miniprogram-cq-talent/pages/coach/schedule/index.ts`, `index.wxml`, `index.wxss`
+- Modify if needed: `apps/miniprogram-cq-talent/components/role-tabbar/index.ts`, `index.wxml`, `index.wxss`
+- Test: `apps/miniprogram-cq-talent/pages/parent/schedule/month-v2.test.mjs`, `apps/miniprogram-cq-talent/pages/coach/schedule/index.test.mjs`, `apps/miniprogram-cq-talent/components/role-tabbar/index.test.mjs`
+
+- [ ] Write failing tests asserting the collapsed control uses a centered 16rpx image inside a separate affordance, and parent tabs are `日程/成长/发现/我的孩子`.
+- [ ] Run only those tests and confirm each failure reflects the missing behavior, not test setup.
+- [ ] Make the smallest view-model/WXML/WXSS adjustment; preserve date range APIs and arrow semantics.
+- [ ] Run the focused tests, mini-program TypeScript check, WXML/WXSS compilation, `git diff --check`, then capture P1/C1 at 375×812 and exercise previous/next week, expand, month change, date selection and collapse.
+- [ ] Commit only changed Task 1 paths.
+
+### Task 2: C2 点按出勤与训练/比赛区分
+
+**Files:**
+- Modify if needed: `apps/miniprogram-cq-talent/pages/coach/event/index.ts`, `index.wxml`, `index.wxss`
+- Modify if needed: `apps/miniprogram-cq-talent/pages/coach/schedule/index.ts`, `index.wxml`, `index.wxss`
+- Test: `apps/miniprogram-cq-talent/pages/coach/event/index.test.mjs`, `apps/miniprogram-cq-talent/pages/coach/schedule/index.test.mjs`
+
+- [ ] Write a failing test for `displayName` truncation to four Chinese characters and an optimistic avatar toggle that rolls back when the attendance API rejects.
+- [ ] Run the C2 test and confirm RED.
+- [ ] Implement the smallest view model and handler change; do not reintroduce status workflows,销课, or “查看详情”.
+- [ ] Add or update a focused test that training and match cards have different existing class/tone and match directs to C6.
+- [ ] Run focused tests, mini-program type/compile gate, `git diff --check`, then click a present and absent avatar in real C2 and verify write/readback.
+- [ ] Commit only changed Task 2 paths.
+
+### Task 3: C6 比赛录入与 C7 战术板读写
+
+**Files:**
+- Modify if needed: `apps/miniprogram-cq-talent/pages/coach/match/**`, `pages/coach/match-edit/**`, `pages/coach/match-event-add/**`, `pages/coach/tactical-board/**`
+- Test: `apps/miniprogram-cq-talent/pages/coach/match/index.test.mjs`, `pages/coach/match-edit/index.test.mjs`, `pages/coach/match-event-add/index.test.mjs`, `pages/coach/tactical-board/index.test.mjs`
+
+- [x] Run targeted C6/C7 tests first and record existing results.
+- [ ] If a routing/event-save behavior is missing, add one failing test per behavior: direct entry to full-screen record form, event type/actor/assist or fault persistence, and saved C7 board reload.
+- [ ] Implement only failures discovered from the running page and real API readback.
+- [ ] Build/restart local API when its contract changes; on production use backup → deploy → restart → readback.
+- [x] Capture C6/C7 real 375×812 evidence. C7 runtime verification exposed a 19-player roster overlap: the fixed 520px `movable-area` clipped lower rows when `out-of-bounds=false`. The page now derives `workspaceHeight` from the precomputed roster row count; 19 players use 787px and retain distinct roster coordinates. A regression test covers the final row.
+- [x] Back up production before the C7 write, save one minimal real position change, restart the API, and reopen the same board. The saved normalized position and the 19-player / 11-starter / 8-substitute composition persisted across restart. Evidence screenshots: `tmp/c7-before-save-2026-08-30.png` and `tmp/c7-after-restart-readback-2026-08-30.png` (both 375×812).
+- [ ] Commit only changed Task 3 paths after the final repository gate.
+
+### Task 4: 七账号近三周中文演示数据审计与补齐
+
+**Files:**
+- Modify if needed: controlled scripts under `tmp/prod-verify/` and the API seed source they explicitly use
+- Modify: current task record and `docs/current/progress.md` only when the audit is complete
+
+- [ ] Execute a read-only aggregate audit for the seven pre-authorized accounts without printing raw phone numbers.
+- [ ] Verify each account has three consecutive recent weeks of Chinese training/match/attendance/assessment/tactical data and check data relationships (event roster → attendance → match events → tactical board).
+- [ ] For each detected gap, write a failing audit assertion, back up production data, add the minimal deterministic data, deploy/restart API, and re-run audit/readback.
+- [ ] Record only count/range/account-index evidence in docs; never include sensitive values.
+- [ ] Run `npx --yes pnpm@10.33.0 run check`, `git diff --check`, and commit exact updated source/docs paths.
+
+## Final Integration Check
+
+- [ ] Re-read each acceptance criterion in `prd.md` against current code, API readback and simulator evidence.
+- [ ] Run repository gate `npx --yes pnpm@10.33.0 run check` and `git diff --check`.
+- [x] Update task artifacts and current progress without staging unrelated dirty files.
