@@ -22,6 +22,12 @@
 - 历史核验曾记录容器 `cq-talent-api`、发布目录 `/opt/cq-talent-releases/…`、非 Git 工作树 `/opt/cq-talent-api`、SQLite named volume `cq-talent-api-data`、`127.0.0.1:3000` API 与 Nginx TLS 反代。历史记录不能证明当前服务器仍使用同一版本、目录或运行时配置。
 - 移交后若要部署，先只读核对实际容器、镜像/发布版本、SQLite volume、备份落点、Nginx upstream、HTTPS health 和微信 request 合法域名；完成这些核对前，不得把任何历史部署条目当作当前事实。
 
+### 2026-08-30 已核验发布状态
+
+- API 发布 `904c3bb` 已从已提交的 Git 树构建并运行；容器标签、内部健康检查和 `https://cqtc.pomi.tech/health` 均已核验。
+- 七个受控双角色演示槽位已在受限备份、dry-run、confirmed import 和 API 重启后刷新为 19 人教练名单（11 首发 + 8 候补）；家长端仍仅绑定每槽前两名学员。
+- 本次数据写入完成后已执行只读聚合审计。后续部署不得假设此条永久有效，仍须在实际服务器上重新做版本、备份和健康检查。
+
 ### 敏感信息不入库
 
 - 禁止在仓库、文档、命令记录或日志中写入密码、私钥、`token`、`secret`、带凭据的 `DATABASE_URL`、认证头、`cookie`/session、手机号或完整 env 文件。

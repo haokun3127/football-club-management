@@ -60,11 +60,18 @@ Required private runtime keys: `DATABASE_URL` and `SECURE_CQ_TALENT_TEST_PHONE_1
 
 ## Real-device verification checklist (seven anonymous slots)
 
+## 2026-08-30 production roster expansion
+
+- API release `904c3bb` is the verified production release for the controlled roster expansion. A restricted SQLite snapshot was created before the release and another before the confirmed refresh; only the API container was recreated/restarted.
+- The controlled refresh now gives every coach scope 19 Chinese-named players: 11 saved starters and 8 substitutes on the scheduled-match tactical board. Parent visibility remains exactly two guardian-bound students per slot.
+- A read-only server audit passed for all seven slots: rolling current and previous two weeks, future previews, 19 roster members, 95 participant rows across the five audited events, 19 assessments, 152 radar records, 2 matches, 8 Chinese match events, and a 19-player tactical board. This is production data evidence, not physical-device login or visual acceptance.
+- The initial deploy helper used a zero-delay health loop and can falsely report failure during Node startup. Treat an initial health timeout as a diagnostic trigger only: inspect container state/logs and recheck both internal and HTTPS health before deciding whether rollback is necessary. Do not re-run an import until the database state has been read-only audited.
+
 Run this once for each operator-supplied phone, recording only the slot number and pass/fail outcome in the operator's private acceptance record. Do not put the phone, authorization code, bearer token, screenshot containing personal data, or session payload in this repository.
 
 1. On a physical phone, force-close the mini program, reopen it, and use the real WeChat phone authorization control once. Do not retry automatically after a cancellation or rate-limit message.
 2. Confirm the first authenticated response offers both `parent` and `coach`, then choose `parent`. Verify that the home/schedule and growth pages show exactly two children for this slot, five current demo calendar entries across the supplied date window, and an eight-dimension growth view. Verify no other slot's children are visible.
-3. Use the in-app role-switch entry to choose `coach`. Verify that the schedule/workbench, team, student radar, attendance, training plan, match and tactical-board pages all load. The team must contain exactly eight players; the scheduled match must show a saved 4-3-3 board with eight players.
+3. Use the in-app role-switch entry to choose `coach`. Verify that the schedule/workbench, team, student radar, attendance, training plan, match and tactical-board pages all load. The team must contain exactly 19 players; the scheduled match must show a saved 4-3-3 board with 11 starters and 8 substitutes.
 4. Switch back to `parent`, then exit the current session using the in-app logout entry. Reopen and authorize again; confirm the expected role picker and role isolation still apply.
 5. Mark the slot as accepted only when both roles complete the above path without a fallback identity, fabricated data, or cross-slot visibility. A server-side BFF readback is supporting evidence only; it does not replace this physical-device step.
 
