@@ -3,6 +3,7 @@
     <view class="c1-nav__title">日程</view>
     <view wx:if="{{hasCoachInitial}}" class="c1-nav__avatar" bindtap="openMe">{{coachInitial}}</view>
   </view>
+  <view class="c1-top-spacer" style="height:{{topBarHeight}}px"></view>
 
   <block wx:if="{{viewMode === 'month'}}">
     <view class="c1-month-calendar">

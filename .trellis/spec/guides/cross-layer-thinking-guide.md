@@ -241,6 +241,30 @@ const viewport = await inspectionProgram.systemInfo();
 - Verify both the first viewport and a bottom viewport after `wx.pageScrollTo`; the bottom CTA, correction link, and final list row must be fully above the fixed TabBar.
 - Good: `.page { padding-bottom: 140rpx; }` with a bottom screenshot proving the action block is unobscured. Bad: checking only the first viewport or adding an unrelated fixed offset to the action bar.
 
+### 8.2.1 Fixed custom TopBar flow reservation (2026-08-31)
+
+- A `navigationStyle: custom` top bar that is fixed with `position: fixed`
+  must be followed by an in-flow spacer whose height equals the real status-bar
+  inset plus the Figma content height. Otherwise the page starts underneath the
+  bar and only appears correct on a particular device.
+- The top-bar content height is specified as `88rpx`, so the spacer **must not**
+  use a hard-coded `44px`. Use the shared helper instead:
+
+  ```ts
+  export function resolveTopBarHeight() {
+    const width = wx.getWindowInfo?.().windowWidth ?? 375;
+    return resolveNavInset() + (width * 88) / 750;
+  }
+  ```
+
+- Good: `<view class="p1-top-spacer" style="height:{{topBarHeight}}px" />`
+  immediately follows the fixed navigation; both `topBarHeight` and `navInset`
+  come from shared presentation helpers. Bad: a fixed bar without a spacer, or
+  `resolveNavInset() + 44`, which drifts on non-375px widths.
+- Required checks: a unit test at a non-375px width, WXML/WXSS compilation, and
+  an authenticated `375×812` simulator check that reads the page data and
+  confirms the content starts below the fixed navigation.
+
 ### 8.3 Shared Figma overlay when a route has no independent board (2026-08-29)
 
 - Some routes do not have a one-to-one Figma page board. For those routes, read the

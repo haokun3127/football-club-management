@@ -6,6 +6,7 @@
       <view wx:if="{{hasUnreadReminders}}" class="p1-nav__bell-dot"></view>
     </view>
   </view>
+  <view class="p1-top-spacer" style="height:{{topBarHeight}}px"></view>
 
   <view class="p1-body">
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '加载日程' : state === 'empty' ? '暂无活动' : '日程读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />

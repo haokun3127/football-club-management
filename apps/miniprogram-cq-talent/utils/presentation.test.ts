@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { activityStatus, formatCalendarDate, formatDateTime, formatTimeRange } from "./presentation";
+import { activityStatus, formatCalendarDate, formatDateTime, formatTimeRange, resolveTopBarHeight } from "./presentation";
 
 describe("parent presentation helpers", () => {
   it("maps backend and localized activity states to safe labels", () => {
@@ -20,5 +20,19 @@ describe("parent presentation helpers", () => {
     expect(formatCalendarDate()).toBe("时间待确认");
     expect(formatDateTime("invalid")).toBe("时间待确认");
     expect(formatTimeRange()).toBe("时间待确认");
+  });
+
+  it("derives a custom top bar height from the current device width", () => {
+    const globalWithWx = globalThis as unknown as { wx: typeof wx };
+    const originalWx = globalWithWx.wx;
+    globalWithWx.wx = {
+      getWindowInfo: () => ({ statusBarHeight: 24, windowWidth: 390 }),
+    } as typeof wx;
+
+    try {
+      expect(resolveTopBarHeight()).toBeCloseTo(69.76);
+    } finally {
+      globalWithWx.wx = originalWx;
+    }
   });
 });

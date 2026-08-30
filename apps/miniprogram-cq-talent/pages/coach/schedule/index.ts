@@ -2,7 +2,7 @@ import { getCoachHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { currentLocalDate } from "../../../utils/date";
 import { openPage, openTab } from "../../../utils/navigation";
-import { activityStatus, formatCalendarDate, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import { activityStatus, formatCalendarDate, resolveMenuInset, resolveNavInset, resolveTopBarHeight } from "../../../utils/presentation";
 import type { CoachHome, CoachTask, CoachTaskAction, LoadState, ScheduleEvent } from "../../../utils/types";
 
 const WEEK_LABELS = ["日", "一", "二", "三", "四", "五", "六"];
@@ -56,6 +56,7 @@ type HeroPillView = {
 Page({
   data: {
     navInset: resolveNavInset(),
+    topBarHeight: resolveTopBarHeight(),
     menuInset: resolveMenuInset(),
     state: "loading" as LoadState,
     message: "正在读取教练日程",

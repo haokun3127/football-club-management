@@ -111,6 +111,22 @@ export function resolveNavInset() {
   }
 }
 
+/**
+ * navigationStyle:custom 页面固定顶栏的完整流式占位高度（px）。
+ * 顶栏内容高度是 88rpx，必须按当前窗口宽度换算，不能假定所有设备都是 375px。
+ */
+export function resolveTopBarHeight() {
+  const navInset = resolveNavInset();
+  try {
+    const info = (wx as unknown as { getWindowInfo?: () => { windowWidth?: number } }).getWindowInfo?.();
+    const windowWidth = info?.windowWidth;
+    if (windowWidth && windowWidth > 0) return navInset + (windowWidth * 88) / 750;
+  } catch (_error) {
+    // Fall through to the standard 375px design-width fallback.
+  }
+  return navInset + 44;
+}
+
 // 在队时长：从队伍 startsAt 到今天的年月差（P4 英雄卡标签 / P7 统计行共用）
 export function formatTenure(startsAt?: string, prefix = "在队"): string {
   if (!startsAt) return "";

@@ -150,6 +150,22 @@ describe("parent schedule hero", () => {
     expect(navRules[0]).not.toContain("box-sizing: border-box");
   });
 
+  it("pins the P1 top bar and reserves exactly its safe-area height in document flow", () => {
+    const nav = styles.match(/\.p1-nav\s*\{([^}]*)\}/)?.[1] ?? "";
+
+    expect(template).toContain('class="p1-top-spacer" style="height:{{topBarHeight}}px"');
+    expect(nav).toContain("position: fixed");
+    expect(nav).toContain("top: 0");
+    expect(nav).toContain("z-index: 100");
+  });
+
+  it("derives the P1 spacer from the shared device-width-aware top-bar helper", () => {
+    const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
+
+    expect(controller).toContain("resolveTopBarHeight");
+    expect(controller).not.toContain("resolveNavInset() + 44");
+  });
+
   it("presents a selected week from Monday through Sunday", () => {
     const options = buildDateOptions("2026-08-05", []);
 

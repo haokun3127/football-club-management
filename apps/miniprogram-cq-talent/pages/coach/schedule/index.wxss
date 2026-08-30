@@ -1,6 +1,11 @@
 .c1 { min-height: 100vh; background: #f5f6f8; }
 
 .c1-nav {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 100;
   box-sizing: content-box;
   display: flex;
   align-items: center;
@@ -10,6 +15,7 @@
   background: #ffffff;
   border-bottom: 1rpx solid #e7eaf0;
 }
+.c1-top-spacer { width: 100%; }
 .c1-nav__title { color: #202124; font-size: 36rpx; font-weight: 700; line-height: 44rpx; }
 .c1-nav__avatar { display: flex; align-items: center; justify-content: center; width: 72rpx; height: 72rpx; border-radius: 36rpx; background: #a80f1b; color: #ffffff; font-size: 28rpx; font-weight: 700; }
 

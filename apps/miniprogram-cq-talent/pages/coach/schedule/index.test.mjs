@@ -16,6 +16,7 @@ vi.mock("../../../utils/presentation", () => ({
   formatTimeRange: () => "",
   resolveMenuInset: () => 0,
   resolveNavInset: () => 0,
+  resolveTopBarHeight: () => 44,
 }));
 
 let pageDefinition;
@@ -320,6 +321,18 @@ describe("coach schedule home", () => {
     expect(template).toContain('padding-right:{{menuInset}}px');
     expect(stylesheet).toMatch(/\.c1-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).not.toMatch(/\.c1-nav\s*\{[^}]*height:\s*176rpx/s);
+  });
+
+  it("pins the C1 top bar and reserves exactly its safe-area height in document flow", () => {
+    expect(template).toContain('class="c1-top-spacer" style="height:{{topBarHeight}}px"');
+    expect(stylesheet).toMatch(/\.c1-nav\s*\{(?=[^}]*position:\s*fixed)(?=[^}]*top:\s*0)(?=[^}]*z-index:\s*100)/s);
+  });
+
+  it("derives the C1 spacer from the shared device-width-aware top-bar helper", () => {
+    const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
+
+    expect(controller).toContain("resolveTopBarHeight");
+    expect(controller).not.toContain("resolveNavInset() + 44");
   });
 
   it("uses the live C1 root-page title typography", () => {
