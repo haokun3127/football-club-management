@@ -1,5 +1,5 @@
 .p11 { min-height: 100vh; background: #f6f7f9; }
-.p11-nav { position: relative; display: flex; box-sizing: content-box; align-items: center; justify-content: center; height: 88rpx; padding: 0 32rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03); }
+.p11-nav { position: sticky; top: 0; z-index: 100; display: flex; box-sizing: content-box; align-items: center; justify-content: center; height: 88rpx; padding: 0 32rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03); }
 .p11-nav__title { color: #202124; font-size: 34rpx; font-weight: 700; line-height: 42rpx; }
 .p11-nav__back, .p11-nav__filter { position: absolute; display: flex; align-items: center; justify-content: center; width: 64rpx; height: 64rpx; }
 .p11-nav__back { left: 32rpx; }

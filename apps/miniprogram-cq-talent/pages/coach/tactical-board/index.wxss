@@ -1,6 +1,6 @@
 .c7-page { min-height: 100vh; box-sizing: border-box; padding-bottom: calc(32rpx + env(safe-area-inset-bottom)); background: #ffffff; }
 
-.c7-header-shell { box-sizing: border-box; background: #ffffff; }
+.c7-header-shell { position: sticky; top: 0; z-index: 100; box-sizing: border-box; background: #ffffff; }
 .c7-header { position: relative; display: flex; height: 88rpx; box-sizing: border-box; align-items: center; margin: 0; border-radius: 0; background: #ffffff; }
 .c7-header__back { position: absolute; z-index: 1; left: 24rpx; display: flex; align-items: center; justify-content: center; width: 56rpx; height: 56rpx; }
 .c7-header__back image { display: block; width: 40rpx; height: 40rpx; }

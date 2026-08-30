@@ -6,6 +6,9 @@
 }
 
 .c151-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
   box-sizing: content-box;
   align-items: center;

@@ -2015,3 +2015,9 @@
 - 真实 WeChatIDE MCP 运行态验收：iPhone X `375×812`、状态栏 `44px` 时 P1/C1 的 `topBarHeight` 均读回 `88px`；家长通过真实“双角色切换”入口进入教练 C1，未伪造会话或角色。P1 展开月历后正文可在固定顶栏下滚动；P1 首屏截图仍显示家长 TabBar 的既定四项顺序。
 - 验证：P1/C1/共享 presentation 定向 Vitest `43/43`，小程序全量 Vitest `446/446`，小程序 TypeScript 通过，四份 P1/C1 WXML/WXSS 均由 WeChatIDE MCP 编译成功，限定路径 `git diff --check` 通过。
 - 全仓门禁的 API 部分另有独立失败：`apps/api/test/app-client-match-event-create.test.ts` 的“retains the created event and metric record after reopening SQLite”在默认 `10s` 超时而失败；同文件其余 `4/5` 场景通过。该失败与本批纯前端顶栏改动无关，未在本批掩盖或修改。
+## 2026-08-30 全端页面顶栏固定规则
+
+- 根据最新产品要求，带页面级导航的家长端、教练端和登录页统一采用顶部锁定规则：滚动内容时顶栏保持在窗口顶部，且保留原有安全区与页面流布局。
+- P1/C1 日程继续使用已验收的 `position: fixed` + 顶栏占位；其他页面级顶栏使用 `position: sticky; top: 0; z-index: 100`，共享 `components/app-header` 同步采用该规则。
+- 覆盖范围包括共享 `app-header`、家长端全屏子页、教练端全屏子页、C7 战术板和 C16 我的页；局部卡片标题、月历内部标题、名单标题不纳入页面级顶栏规则。
+- 新增 `apps/miniprogram-cq-talent/utils/topbar-sticky-check.cjs` 作为 Node 原生回归检查；已通过 2/2。小程序现有 Vitest 67 个文件、446 个测试通过，TypeScript 检查通过；相关 WXSS 经微信开发者工具 MCP 编译通过。

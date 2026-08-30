@@ -1,7 +1,7 @@
 .p5 { min-height: 100vh; background: #f6f7f9; }
 
 /* P5 Header */
-.p5-nav { display: flex; align-items: center; gap: 0; box-sizing: content-box; height: 88rpx; padding: 0 200rpx 0 32rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
+.p5-nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 0; box-sizing: content-box; height: 88rpx; padding: 0 200rpx 0 32rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
 .p5-nav__back { display: flex; width: 48rpx; height: 80rpx; align-items: center; justify-content: center; border-radius: 40rpx; background: #ffffff; }
 .p5-nav__back image { width: 40rpx; height: 40rpx; }
 .p5-nav__title { flex: 1; color: #202124; font-size: 36rpx; font-weight: 700; line-height: 44rpx; }

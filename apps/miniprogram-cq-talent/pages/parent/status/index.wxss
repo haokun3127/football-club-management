@@ -1,5 +1,5 @@
 .status-page { min-height: 100vh; background: #f6f7f9; }
-.status-nav { position: relative; display: flex; box-sizing: content-box; align-items: center; height: 88rpx; padding: 0 200rpx 0 32rpx; background: #ffffff; }
+.status-nav { position: sticky; top: 0; z-index: 100; display: flex; box-sizing: content-box; align-items: center; height: 88rpx; padding: 0 200rpx 0 32rpx; background: #ffffff; }
 .status-nav__title { color: #202124; font-size: 36rpx; font-weight: 700; line-height: 44rpx; }
 .status-nav__back { display: flex; align-items: center; justify-content: center; width: 80rpx; height: 80rpx; }.status-nav__back image { width: 48rpx; height: 48rpx; }
 .status-page__body { display: flex; flex-direction: column; gap: 32rpx; padding: 32rpx 32rpx calc(160rpx + env(safe-area-inset-bottom)); }

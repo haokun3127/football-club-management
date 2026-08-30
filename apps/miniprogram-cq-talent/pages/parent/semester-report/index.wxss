@@ -1,5 +1,5 @@
 .semester-report-page { min-height: 100vh; background: #f6f7f9; }
-.page-nav { display: flex; align-items: center; box-sizing: content-box; height: 88rpx; padding: 0 200rpx 0 32rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
+.page-nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; box-sizing: content-box; height: 88rpx; padding: 0 200rpx 0 32rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
 .page-nav__back { display: flex; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; flex: 0 0 auto; }
 .page-nav__back image { width: 40rpx; height: 40rpx; }
 .page-nav__title { flex: 1; margin-left: 24rpx; color: #202124; font-size: 36rpx; font-weight: 700; line-height: 44rpx; }

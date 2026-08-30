@@ -1,5 +1,5 @@
 .p4 { min-height: 100vh; background: #f5f6f8; }
-.p4-nav { display: flex; align-items: center; justify-content: space-between; box-sizing: content-box; height: 88rpx; padding: 0 168rpx 0 32rpx; background: #ffffff; }
+.p4-nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; box-sizing: content-box; height: 88rpx; padding: 0 168rpx 0 32rpx; background: #ffffff; }
 .p4-nav__title { color: #202124; font-size: 44rpx; font-weight: 700; }
 .p4-nav__settings { display: flex; align-items: center; justify-content: center; width: 64rpx; height: 64rpx; border-radius: 32rpx; background: #f3f4f6; color: #667085; }
 .p4-nav__settings-icon { width: 36rpx; height: 36rpx; }

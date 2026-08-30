@@ -4,6 +4,9 @@
 }
 
 .coverage-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   box-sizing: content-box;
   display: flex;
   height: 88rpx;

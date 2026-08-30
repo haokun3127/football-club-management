@@ -1,5 +1,5 @@
 .team-page { min-height: 100vh; padding-bottom: calc(140rpx + env(safe-area-inset-bottom)); background: #f6f7f9; }
-.team-nav { display: flex; align-items: center; height: 88rpx; padding-left: 32rpx; box-sizing: content-box; background: #fceeef; }
+.team-nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; height: 88rpx; padding-left: 32rpx; box-sizing: content-box; background: #fceeef; }
 .team-nav__left { display: flex; align-items: center; gap: 0; min-height: 56rpx; }
 .team-nav__back { width: 48rpx; height: 48rpx; }
 .team-nav__title { color: #202124; font-size: 36rpx; font-weight: 700; line-height: 44rpx; }

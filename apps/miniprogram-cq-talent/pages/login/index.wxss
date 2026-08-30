@@ -1,5 +1,5 @@
 .login-page { min-height: 100vh; box-sizing: border-box; background: var(--color-page); }
-.login-nav { display: flex; box-sizing: border-box; align-items: center; justify-content: center; width: 662rpx; height: 88rpx; margin-right: auto; margin-left: auto; }
+.login-nav { position: sticky; top: 0; z-index: 100; display: flex; box-sizing: border-box; align-items: center; justify-content: center; width: 662rpx; height: 88rpx; margin-right: auto; margin-left: auto; }
 .login-nav__title { color: var(--color-text); font-size: 34rpx; font-weight: 700; line-height: 40rpx; }
 .login-hero-card { display: flex; box-sizing: border-box; flex-direction: column; align-items: center; width: 662rpx; height: 348rpx; margin: 48rpx auto 0; padding: 64rpx; border-radius: 32rpx; background: var(--color-card); box-shadow: 0 2rpx 4rpx rgba(0,0,0,.06); }
 .login-hero-card__badge { display: flex; align-items: center; justify-content: center; width: 96rpx; height: 96rpx; border-radius: 24rpx; background: var(--color-brand); }
