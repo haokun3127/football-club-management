@@ -10,6 +10,9 @@ type PlayerView = TacticalBoardPlayer & {
   rosterPx: number;
   rosterPy: number;
   className: string;
+  jerseyNumber: string;
+  rosterStateLabel: string;
+  rosterToneClass: string;
 };
 
 interface BoardPageData {
@@ -42,11 +45,11 @@ interface BoardPageData {
 
 let latestLoadToken = 0;
 const PITCH_LEFT_IN_WORKSPACE = 16;
-const PLAYER_MARKER_RADIUS = 18;
+const PLAYER_MARKER_RADIUS = 20;
 const ROSTER_COLUMNS = 4;
-const ROSTER_LEFT = 46;
+const ROSTER_LEFT = 34;
 const ROSTER_TOP = 339;
-const ROSTER_COLUMN_GAP = 80;
+const ROSTER_COLUMN_GAP = 86;
 const ROSTER_ROW_GAP = 92;
 
 Page<BoardPageData>({
@@ -207,12 +210,18 @@ Page<BoardPageData>({
       rosterPx: 0,
       rosterPy: 0,
       className: player.studentId === currentSelectedStarterId ? "c7-player c7-player--selected" : "c7-player",
+      jerseyNumber: "",
+      rosterStateLabel: "",
+      rosterToneClass: "",
     });
     const rosterPlayers = currentPlayers
       .map((player: TacticalBoardPlayer, index: number) => ({
         ...toView(player),
         rosterPx: ROSTER_LEFT + (index % ROSTER_COLUMNS) * ROSTER_COLUMN_GAP,
         rosterPy: ROSTER_TOP + Math.floor(index / ROSTER_COLUMNS) * ROSTER_ROW_GAP,
+        jerseyNumber: String(index + 1),
+        rosterStateLabel: player.role === "starter" ? "已上场" : "候补上场",
+        rosterToneClass: player.role === "starter" ? "c7-roster__avatar--on-field" : "c7-roster__avatar--candidate",
       }));
     this.setData({
       rosterPlayers,

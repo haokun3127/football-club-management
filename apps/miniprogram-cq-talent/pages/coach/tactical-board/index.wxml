@@ -40,19 +40,20 @@
 
       <view class="c7-board-container">
         <movable-area id="c7-workspace" class="c7-workspace">
-          <view id="c7-pitch" class="c7-pitch">
-          <view class="c7-pitch__halfway"></view>
-          <view class="c7-pitch__boundary"></view>
-          </view>
+           <view id="c7-pitch" class="c7-pitch">
+            <view class="c7-pitch__hint">拖拽球员到球场上场</view>
+            <view class="c7-pitch__halfway"></view>
+            <view class="c7-pitch__boundary"></view>
+            </view>
 
           <block wx:if="{{!readOnly}}">
             <movable-view wx:for="{{starters}}" wx:key="studentId" class="{{item.className}}" direction="all" x="{{item.px}}" y="{{item.py}}" inertia="{{false}}" out-of-bounds="{{false}}" data-id="{{item.studentId}}" bindchange="onPlayerMove" bindtap="selectStarter">
-              <view class="c7-player__badge"><image class="c7-player__avatar" src="/assets/icons/user-white.svg" mode="aspectFit" /></view>
+              <view class="c7-player__badge"><view class="c7-player__number">{{item.jerseyNumber}}</view></view>
             </movable-view>
           </block>
           <block wx:else>
             <view wx:for="{{starters}}" wx:key="studentId" class="{{item.className}} c7-player--readonly" style="left: {{item.px}}px; top: {{item.py}}px;">
-              <view class="c7-player__badge"><image class="c7-player__avatar" src="/assets/icons/user-white.svg" mode="aspectFit" /></view>
+              <view class="c7-player__badge"><view class="c7-player__number">{{item.jerseyNumber}}</view></view>
             </view>
           </block>
           <view class="c7-roster">
@@ -65,20 +66,23 @@
           <block wx:for="{{rosterPlayers}}" wx:key="studentId">
             <block wx:if="{{item.role === 'starter'}}">
               <view class="c7-roster__player c7-roster__player--listed" style="left: {{item.rosterPx}}px; top: {{item.rosterPy}}px;" data-id="{{item.studentId}}" bindtap="selectStarter">
-                <view class="c7-roster__avatar"><image class="c7-roster__avatar-icon" src="/assets/icons/user.svg" mode="aspectFit" /></view>
+                <view class="c7-roster__avatar {{item.rosterToneClass}}">{{item.jerseyNumber}}</view>
                 <view class="c7-roster__name">{{item.displayName}}</view>
+                <view class="c7-roster__status">{{item.rosterStateLabel}}</view>
               </view>
             </block>
             <block wx:if="{{item.role !== 'starter' && !readOnly}}">
               <movable-view class="c7-roster__player c7-roster__player--movable" direction="all" x="{{item.rosterPx}}" y="{{item.rosterPy}}" inertia="{{false}}" out-of-bounds="{{false}}" data-id="{{item.studentId}}" bindchange="onSubstituteMove" bindtap="swapSubstitute">
-                <view class="c7-roster__avatar"><image class="c7-roster__avatar-icon" src="/assets/icons/user.svg" mode="aspectFit" /></view>
+                <view class="c7-roster__avatar {{item.rosterToneClass}}">{{item.jerseyNumber}}</view>
                 <view class="c7-roster__name">{{item.displayName}}</view>
+                <view class="c7-roster__status">{{item.rosterStateLabel}}</view>
               </movable-view>
             </block>
             <block wx:if="{{item.role !== 'starter' && readOnly}}">
               <view class="c7-roster__player c7-roster__player--listed" style="left: {{item.rosterPx}}px; top: {{item.rosterPy}}px;">
-                <view class="c7-roster__avatar"><image class="c7-roster__avatar-icon" src="/assets/icons/user.svg" mode="aspectFit" /></view>
+                <view class="c7-roster__avatar {{item.rosterToneClass}}">{{item.jerseyNumber}}</view>
                 <view class="c7-roster__name">{{item.displayName}}</view>
+                <view class="c7-roster__status">{{item.rosterStateLabel}}</view>
               </view>
             </block>
           </block>

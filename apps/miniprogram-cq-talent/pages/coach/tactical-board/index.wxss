@@ -48,13 +48,14 @@
 .c7-formation-picker { display: flex; box-sizing: border-box; width: 144rpx; height: 72rpx; align-items: center; justify-content: center; gap: 8rpx; padding: 0 16rpx; border: 1rpx solid #e7eaf0; border-radius: 36rpx; background: #ffffff; }
 .c7-formation-label { overflow: hidden; color: #202124; font-size: 24rpx; font-weight: 700; line-height: 32rpx; text-overflow: ellipsis; white-space: nowrap; }
 .c7-formation-chevron { display: block; flex: 0 0 24rpx; width: 24rpx; height: 24rpx; }
-.c7-board-container { box-sizing: border-box; padding-top: 16rpx; }
-.c7-workspace { position: relative; box-sizing: border-box; width: 100%; height: 1052rpx; }
+.c7-board-container { box-sizing: border-box; padding-top: 28rpx; }
+.c7-workspace { position: relative; box-sizing: border-box; width: 100%; height: 1040rpx; }
 .c7-pitch { position: absolute; top: 0; left: 32rpx; box-sizing: border-box; width: calc(100vw - 64rpx); height: 568rpx; overflow: hidden; border-radius: 32rpx; background: #278a53; }
+.c7-pitch__hint { position: absolute; z-index: 1; top: 24rpx; left: 28rpx; color: #ffffff; font-size: 20rpx; line-height: 28rpx; }
 .c7-pitch__halfway { position: absolute; top: 282rpx; right: 24rpx; left: 24rpx; height: 2rpx; background: rgba(255,255,255,.75); }
 .c7-pitch__boundary { position: absolute; inset: 24rpx; box-sizing: border-box; border: 1rpx solid rgba(255,255,255,.75); border-radius: 0; }
 
-.c7-player { width: 72rpx; height: 72rpx; text-align: center; }
+.c7-player { width: 80rpx; height: 80rpx; text-align: center; }
 .c7-player--readonly { position: absolute; }
 
 .c7-player__badge {
@@ -64,24 +65,27 @@
   box-sizing: border-box;
   width: 100%;
   height: 100%;
+  border: 2rpx solid #ffffff;
   border-radius: 50%;
   background: #a80f1b;
   color: #ffffff;
 }
 
-.c7-player__avatar { display: block; width: 32rpx; height: 32rpx; }
+.c7-player__number { color: #ffffff; font-size: 22rpx; font-weight: 700; line-height: 28rpx; }
 .c7-player--selected .c7-player__badge { box-shadow: 0 0 0 4rpx #ffd666; }
-.c7-roster { position: absolute; z-index: 0; top: 592rpx; right: 32rpx; left: 32rpx; box-sizing: border-box; height: 444rpx; padding: 24rpx 0 0; background: transparent; }
+.c7-roster { position: absolute; z-index: 0; top: 580rpx; right: 32rpx; left: 32rpx; box-sizing: border-box; height: 444rpx; padding: 24rpx 0 0; background: transparent; }
 .c7-roster__heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16rpx; }
 .c7-roster__title { color: #202124; font-size: 30rpx; font-weight: 700; line-height: 36rpx; }
 .c7-roster__hint { flex: 1; color: #667085; font-size: 20rpx; line-height: 28rpx; text-align: right; }
-.c7-roster__grid { position: absolute; top: 592rpx; right: 32rpx; left: 32rpx; height: 444rpx; pointer-events: none; }
-.c7-roster__player { position: absolute; width: 68rpx; height: 128rpx; text-align: center; }
+.c7-roster__grid { position: absolute; top: 580rpx; right: 32rpx; left: 32rpx; height: 444rpx; pointer-events: none; }
+.c7-roster__player { position: absolute; width: 96rpx; height: 160rpx; text-align: center; }
 .c7-roster__player--listed { z-index: 1; }
 .c7-roster__player--movable { z-index: 2; }
-.c7-roster__avatar { display: flex; width: 68rpx; height: 68rpx; align-items: center; justify-content: center; box-sizing: border-box; border: 1rpx solid #d0d5dd; border-radius: 50%; background: #f2f4f7; }
-.c7-roster__avatar-icon { display: block; width: 32rpx; height: 32rpx; }
+.c7-roster__avatar { display: flex; width: 96rpx; height: 96rpx; align-items: center; justify-content: center; box-sizing: border-box; border: 1rpx solid #d0d5dd; border-radius: 50%; color: #344054; font-size: 22rpx; font-weight: 700; line-height: 28rpx; }
+.c7-roster__avatar--candidate { border-color: #a80f1b; background: #fdecef; color: #a80f1b; }
+.c7-roster__avatar--on-field { background: #e7eaf0; color: #344054; }
 .c7-roster__name { overflow: hidden; margin-top: 8rpx; color: #667085; font-size: 20rpx; line-height: 24rpx; text-overflow: ellipsis; white-space: nowrap; }
+.c7-roster__status { overflow: hidden; margin-top: 4rpx; color: #667085; font-size: 20rpx; line-height: 24rpx; text-overflow: ellipsis; white-space: nowrap; }
 .c7-actions { display: flex; gap: 28rpx; height: 96rpx; margin: 84rpx 32rpx 0; }
 .c7-action { display: flex; box-sizing: border-box; align-items: center; justify-content: center; border-radius: 24rpx; font-size: 26rpx; font-weight: 700; line-height: 36rpx; }
 .c7-action--secondary { width: 320rpx; border: 1rpx solid #e7eaf0; background: #ffffff; color: #202124; }

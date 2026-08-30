@@ -130,8 +130,8 @@ describe("C7 coach tactical board MVP", () => {
       expect.objectContaining({ studentId: "student-roster-only", displayName: "真实名单新增成员" }),
     ]));
     expect(page.data.rosterPlayers).toHaveLength(3);
-    expect(page.data.rosterPlayers[0]).toMatchObject({ rosterPx: 46, rosterPy: 339 });
-    expect(page.data.rosterPlayers[1]).toMatchObject({ rosterPx: 126, rosterPy: 339 });
+    expect(page.data.rosterPlayers[0]).toMatchObject({ rosterPx: 34, rosterPy: 339 });
+    expect(page.data.rosterPlayers[1]).toMatchObject({ rosterPx: 120, rosterPy: 339 });
   });
 
   it("lays every roster member into the lower two-row all-player area", () => {
@@ -150,8 +150,20 @@ describe("C7 coach tactical board MVP", () => {
     page.refreshViews();
 
     expect(page.data.rosterPlayers.map((player) => [player.rosterPx, player.rosterPy])).toEqual([
-      [46, 339], [126, 339], [206, 339], [286, 339], [46, 431],
+      [34, 339], [120, 339], [206, 339], [292, 339], [34, 431],
     ]);
+  });
+
+  it("derives stable Figma-style jersey numbers and roster state from the real roster", async () => {
+    const page = createPageInstance();
+    await page.onLoad({ eventId: "event-real" });
+    await flush();
+
+    expect(page.data.rosterPlayers).toEqual(expect.arrayContaining([
+      expect.objectContaining({ studentId: "student-starter", jerseyNumber: "1", rosterStateLabel: "已上场", rosterToneClass: "c7-roster__avatar--on-field" }),
+      expect.objectContaining({ studentId: "student-substitute", jerseyNumber: "2", rosterStateLabel: "候补上场", rosterToneClass: "c7-roster__avatar--candidate" }),
+      expect.objectContaining({ studentId: "student-roster-only", jerseyNumber: "3", rosterStateLabel: "候补上场", rosterToneClass: "c7-roster__avatar--candidate" }),
+    ]));
   });
 
   it("does not let an old success or old failure overwrite the newer board", async () => {
@@ -285,7 +297,8 @@ describe("C7 coach tactical board MVP", () => {
     expect(template).not.toContain('c7-pitch__circle');
     expect(template).toContain('class="c7-pitch__halfway"');
     expect(template).toContain('class="c7-pitch__boundary"');
-    expect(template).toContain('class="c7-player__avatar" src="/assets/icons/user-white.svg"');
+    expect(template).toContain('class="c7-pitch__hint">拖拽球员到球场上场</view>');
+    expect(template).toContain('class="c7-player__number">{{item.jerseyNumber}}</view>');
     expect(template).not.toContain('class="c7-toolbar"');
     expect(template).not.toContain("暂未开放");
     expect(template).not.toContain('<role-tabbar');
@@ -302,9 +315,9 @@ describe("C7 coach tactical board MVP", () => {
     expect(template).toContain('id="c7-workspace"');
     expect(template).toContain('class="c7-roster"');
     expect(template).toContain('class="c7-roster__grid"');
-    expect(template).toContain('class="c7-roster__avatar-icon" src="/assets/icons/user.svg"');
+    expect(template).toContain('class="c7-roster__avatar {{item.rosterToneClass}}">{{item.jerseyNumber}}</view>');
     expect(template).toContain('class="c7-roster__name"');
-    expect(template).not.toContain('class="c7-roster__status"');
+    expect(template).toContain('class="c7-roster__status">{{item.rosterStateLabel}}</view>');
     expect(template).toContain('>全部球员<');
     expect(template).toContain('class="c7-actions"');
     expect(template).toContain('bindtap="swapSubstitute"');
@@ -326,16 +339,18 @@ describe("C7 coach tactical board MVP", () => {
     expect(stylesheet).toMatch(/\.c7-formation-row\s*\{[^}]*margin:\s*8rpx\s+32rpx\s+0/s);
     expect(stylesheet).toMatch(/\.c7-formation-picker\s*\{[^}]*width:\s*144rpx[^}]*height:\s*72rpx/s);
     expect(stylesheet).toMatch(/\.c7-formation-chevron\s*\{[^}]*width:\s*24rpx[^}]*height:\s*24rpx/s);
-    expect(stylesheet).toMatch(/\.c7-player\s*\{[^}]*width:\s*72rpx[^}]*height:\s*72rpx/s);
+    expect(stylesheet).toMatch(/\.c7-player\s*\{[^}]*width:\s*80rpx[^}]*height:\s*80rpx/s);
     expect(stylesheet).toMatch(/\.c7-player__badge\s*\{[^}]*width:\s*100%[^}]*height:\s*100%/s);
-    expect(stylesheet).toMatch(/\.c7-player__avatar\s*\{[^}]*width:\s*32rpx[^}]*height:\s*32rpx/s);
-    expect(stylesheet).toMatch(/\.c7-workspace\s*\{[^}]*height:\s*1052rpx/s);
-    expect(stylesheet).toMatch(/\.c7-roster\s*\{[^}]*top:\s*592rpx[^}]*height:\s*444rpx[^}]*background:\s*transparent/s);
+    expect(stylesheet).toMatch(/\.c7-player__number\s*\{[^}]*font-size:\s*22rpx/s);
+    expect(stylesheet).toMatch(/\.c7-workspace\s*\{[^}]*height:\s*1040rpx/s);
+    expect(stylesheet).toMatch(/\.c7-roster\s*\{[^}]*top:\s*580rpx[^}]*height:\s*444rpx[^}]*background:\s*transparent/s);
     expect(stylesheet).toMatch(/\.c7-roster__grid\s*\{/s);
-    expect(stylesheet).toMatch(/\.c7-roster__player\s*\{[^}]*width:\s*68rpx[^}]*height:\s*128rpx/s);
-    expect(stylesheet).toMatch(/\.c7-roster__avatar\s*\{[^}]*width:\s*68rpx[^}]*height:\s*68rpx/s);
+    expect(stylesheet).toMatch(/\.c7-roster__player\s*\{[^}]*width:\s*96rpx[^}]*height:\s*160rpx/s);
+    expect(stylesheet).toMatch(/\.c7-roster__avatar\s*\{[^}]*width:\s*96rpx[^}]*height:\s*96rpx/s);
+    expect(stylesheet).toContain('.c7-roster__avatar--candidate');
+    expect(stylesheet).toContain('.c7-roster__avatar--on-field');
     expect(stylesheet).toMatch(/\.c7-actions\s*\{[^}]*height:\s*96rpx[^}]*margin:\s*84rpx\s+32rpx\s+0/s);
-    expect(controller).toContain("const PLAYER_MARKER_RADIUS = 18");
+    expect(controller).toContain("const PLAYER_MARKER_RADIUS = 20");
     expect(controller).toContain("PITCH_LEFT_IN_WORKSPACE");
   });
 });
