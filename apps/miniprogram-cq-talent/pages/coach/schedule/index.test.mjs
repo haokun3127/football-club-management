@@ -127,7 +127,7 @@ describe("coach schedule home", () => {
         nextActionLabel: "Record attendance",
       }],
     });
-    expect(page.data.dayStrip.map((day) => day.weekLabel)).toEqual(["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]);
+    expect(page.data.dayStrip.map((day) => day.weekLabel)).toEqual(["MON", "TUE", "WED", "THU", "FRI", "SAT"]);
   });
 
   it("keeps empty and failed coach-home loads honest", async () => {
@@ -195,18 +195,21 @@ describe("coach schedule home", () => {
 
   it("keeps C1 week navigation visible and separately tappable", () => {
     expect(template).toContain('class="c1-dates__arrow c1-dates__arrow--previous" data-offset="-7" bindtap="changeWeek"');
-    expect(template).toContain('class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek"');
+    expect(template).not.toContain('class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek"');
     expect(template).toContain('<image src="/assets/icons/chevron-left.svg" mode="aspectFit" />');
-    expect(template).toContain('<image src="/assets/icons/chevron-right.svg" mode="aspectFit" />');
+    expect(template).toContain('<view class="c1-month-calendar__arrow" data-offset="1" bindtap="changeMonth" aria-label="下个月"><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>');
     expect(template).toContain('<block wx:if="{{viewMode === \'month\'}}">');
     expect(template).toContain('class="c1-month-calendar"');
     expect(template).toMatch(/(?:bindtap|catchtap)="expandMonthPicker"/);
     expect(template).toContain('<image class="c1-dates__expand-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" />');
     expect(template).toContain('<view class="c1-month-calendar__collapse" bindtap="collapseMonthPicker" aria-label="收起月历"><image class="c1-month-calendar__collapse-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>');
     expect(template).toContain('class="c1-week-nav" bindtap="expandMonthPicker"');
-    expect(stylesheet).toMatch(/\.c1-dates\s*\{[^}]*padding:\s*24rpx\s+0/s);
+    expect(stylesheet).toMatch(/\.c1-dates\s*\{[^}]*display:\s*block[^}]*height:\s*128rpx[^}]*padding:\s*0[^}]*border-radius:\s*24rpx/s);
     expect(stylesheet).toMatch(/\.c1-dates__arrow\s*\{[^}]*flex:\s*0\s+0\s+44rpx/s);
-    expect(stylesheet).toMatch(/\.c1-dates__arrow\s+image\s*\{[^}]*width:\s*28rpx[^}]*height:\s*28rpx/s);
+    expect(stylesheet).toMatch(/\.c1-dates__arrow--previous\s*\{[^}]*left:\s*0[^}]*width:\s*48rpx/s);
+    expect(stylesheet).not.toContain('.c1-dates__arrow--next');
+    expect(stylesheet).toMatch(/\.c1-dates__arrow--previous\s+image\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
+    expect(stylesheet).not.toContain('.c1-dates__arrow--next image');
     const expandMatches = [...stylesheet.matchAll(/\.c1-dates__expand\s*\{([^}]*)\}/g)];
     expect(expandMatches).toHaveLength(1);
     const expand = expandMatches[0]?.[1] ?? "";
@@ -215,7 +218,9 @@ describe("coach schedule home", () => {
     expect(expand).toContain("transform: translateY(-50%)");
     expect(expand).not.toContain("bottom: -14rpx");
     expect(stylesheet).toMatch(/\.c1-dates__expand-icon\s*\{[^}]*width:\s*32rpx[^}]*height:\s*32rpx[^}]*transform:\s*none/s);
-    expect(stylesheet).toContain(".c1-week-nav { padding-right: 84rpx; }");
+    expect(stylesheet).toMatch(/\.c1-week-nav\s*\{[^}]*position:\s*absolute[^}]*top:\s*24rpx[^}]*right:\s*0[^}]*left:\s*44rpx[^}]*gap:\s*8rpx[^}]*padding:\s*0[^}]*overflow:\s*visible/s);
+    expect(stylesheet).toMatch(/\.c1-day\s*\{[^}]*flex:\s*0\s+0\s+88rpx[^}]*height:\s*80rpx/s);
+    expect(stylesheet).toMatch(/\.c1-dates__expand\s*\{[^}]*right:\s*24rpx[^}]*width:\s*96rpx[^}]*height:\s*64rpx/s);
     expect(stylesheet).toMatch(/\.c1-month-calendar\s*\{[^}]*min-height:\s*840rpx[^}]*margin:\s*32rpx\s+32rpx\s+0/s);
     expect(stylesheet).toMatch(/\.c1-month-calendar__collapse\s*\{[^}]*width:\s*64rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c1-month-calendar__collapse-icon\s*\{[^}]*width:\s*28rpx[^}]*height:\s*28rpx[^}]*transform:\s*none/s);
@@ -282,7 +287,6 @@ describe("coach schedule home", () => {
     expect(template).not.toContain('data-mode="week"');
     expect(template).not.toContain("c1-task-section");
     expect(template).toContain('data-offset="-7"');
-    expect(template).toContain('data-offset="7"');
     expect(template).toContain('bindtap="changeWeek"');
     expect(template).not.toContain("18/20");
     expect(template).not.toContain("出席");

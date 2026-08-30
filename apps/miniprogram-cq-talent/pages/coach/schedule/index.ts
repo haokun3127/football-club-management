@@ -305,7 +305,7 @@ function startOfWeek(date: string): string {
 }
 
 function buildDayStrip(monday: string) {
-  return Array.from({ length: 7 }, (_, index) => {
+  return Array.from({ length: 6 }, (_, index) => {
     const date = addDays(monday, index);
     const value = new Date(`${date}T00:00:00.000Z`);
     return { date, weekLabel: WEEK_LABELS[value.getUTCDay()], dayNum: String(value.getUTCDate()) };
