@@ -202,7 +202,7 @@ describe("coach schedule home", () => {
     expect(template).toContain('class="c1-month-calendar"');
     expect(template).toMatch(/(?:bindtap|catchtap)="expandMonthPicker"/);
     expect(template).toContain('<image class="c1-dates__expand-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" />');
-    expect(template).toContain('<image class="c1-month-calendar__collapse-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" />');
+    expect(template).toContain('<view class="c1-month-calendar__collapse" bindtap="collapseMonthPicker" aria-label="收起月历"><image class="c1-month-calendar__collapse-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>');
     expect(template).toContain('class="c1-week-nav" bindtap="expandMonthPicker"');
     expect(stylesheet).toMatch(/\.c1-dates\s*\{[^}]*padding:\s*24rpx\s+0/s);
     expect(stylesheet).toMatch(/\.c1-dates__arrow\s*\{[^}]*flex:\s*0\s+0\s+44rpx/s);
@@ -217,8 +217,9 @@ describe("coach schedule home", () => {
     expect(stylesheet).toMatch(/\.c1-dates__expand-icon\s*\{[^}]*width:\s*32rpx[^}]*height:\s*32rpx[^}]*transform:\s*none/s);
     expect(stylesheet).toContain(".c1-week-nav { padding-right: 84rpx; }");
     expect(stylesheet).toMatch(/\.c1-month-calendar\s*\{[^}]*min-height:\s*840rpx[^}]*margin:\s*32rpx\s+32rpx\s+0/s);
-    expect(stylesheet).toMatch(/\.c1-month-calendar__collapse\s*\{[^}]*width:\s*88rpx[^}]*height:\s*64rpx/s);
-    expect(stylesheet).toMatch(/\.c1-month-calendar__collapse-icon\s*\{[^}]*width:\s*32rpx[^}]*height:\s*32rpx/s);
+    expect(stylesheet).toMatch(/\.c1-month-calendar__collapse\s*\{[^}]*width:\s*64rpx[^}]*height:\s*48rpx/s);
+    expect(stylesheet).toMatch(/\.c1-month-calendar__collapse-icon\s*\{[^}]*width:\s*28rpx[^}]*height:\s*28rpx[^}]*transform:\s*none/s);
+    expect(template).not.toContain('>收起<image');
     expect(stylesheet).toMatch(/\.c1-month-day__number\s*\{[^}]*width:\s*80rpx[^}]*height:\s*80rpx/s);
   });
 
