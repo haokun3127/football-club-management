@@ -214,8 +214,12 @@ describe("coach schedule home", () => {
     expect(expand).toContain("bottom: auto");
     expect(expand).toContain("transform: translateY(-50%)");
     expect(expand).not.toContain("bottom: -14rpx");
-    expect(stylesheet).toMatch(/\.c1-dates__expand-icon\s*\{[^}]*width:\s*20rpx[^}]*height:\s*20rpx[^}]*transform:\s*none/s);
-    expect(stylesheet).toContain(".c1-week-nav { padding-right: 68rpx; }");
+    expect(stylesheet).toMatch(/\.c1-dates__expand-icon\s*\{[^}]*width:\s*32rpx[^}]*height:\s*32rpx[^}]*transform:\s*none/s);
+    expect(stylesheet).toContain(".c1-week-nav { padding-right: 84rpx; }");
+    expect(stylesheet).toMatch(/\.c1-month-calendar\s*\{[^}]*min-height:\s*840rpx[^}]*margin:\s*32rpx\s+32rpx\s+0/s);
+    expect(stylesheet).toMatch(/\.c1-month-calendar__collapse\s*\{[^}]*width:\s*88rpx[^}]*height:\s*64rpx/s);
+    expect(stylesheet).toMatch(/\.c1-month-calendar__collapse-icon\s*\{[^}]*width:\s*32rpx[^}]*height:\s*32rpx/s);
+    expect(stylesheet).toMatch(/\.c1-month-day__number\s*\{[^}]*width:\s*80rpx[^}]*height:\s*80rpx/s);
   });
 
   it("renders the live C1 team selector before the hero and removes the legacy summary rail", async () => {

@@ -1828,3 +1828,10 @@
 - 家长 TabBar 按用户最新要求调整为“日程 / 成长 / 发现 / 我的孩子”，仅交换展示顺序，路径和 active key 不变；教练 TabBar 不变。
 - 真实 WeChatIDE MCP 复核截图：`tmp/coach-calendar-fixed-2.png`（折叠态）和 `tmp/coach-month-fixed-2.png`（展开态），均由当前模拟器返回严格 `375×812`；当前为真实教练会话的空态/测试数据态，不把数据缺失误报为业务视觉通过。
 - 验证：家长日历、教练日历、TabBar 定向 Vitest `45/45`，小程序 `tsc --noEmit` 退出 0，两个目标 WXML 编译成功，`git diff --check` 通过。首次测试启动遇到 npm cache `EEXIST`，改用仓库已安装的 pnpm 10.33.0 后完成验证，未清理缓存。
+
+## 2026-08-30 双端月历控件几何与家长 TabBar 顺序复验
+
+- 在线稿复核节点：家长月历折叠 `1008:186`、展开 `1008:436`；教练月历折叠 `1293:8`、展开 `1293:34`。家长折叠月历入口调整为约 `30×16px` 并右侧预留空间；教练折叠箭头调整为 `16×16px`，展开月历卡按约 `343×420px`、日期圆形约 `40×40px` 对齐。
+- 家长 TabBar 顺序已固定为“日程 / 成长 / 发现 / 我的孩子”；路径和 active key 不变。教练端保留“日程 / 训练管理 / 我的”。
+- 目标源码为 `components/role-tabbar/index.ts`、家长/教练 `schedule/index.wxss`；同步更新定向断言，未改 API、会话、数据库或其他业务路径。
+- 验证：定向 Vitest `31/31`；家长/教练目标 WXML 与 WXSS 均经 WeChatIDE MCP 编译成功；教练折叠与展开截图 `tmp/goal-coach-calendar-collapsed-after.png`、`tmp/goal-coach-calendar-expanded-after.png` 均严格 `375×812`。当前真实会话为教练身份，访问家长路由返回 `403 Session active role is not permitted for this operation`，因此家长运行态视觉仍待真实家长会话补验。

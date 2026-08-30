@@ -44,23 +44,23 @@
 .c1-empty { padding: 64rpx 32rpx; border-radius: 24rpx; background: #ffffff; color: #8a8f99; font-size: 26rpx; text-align: center; }
 
 .c1-dates__expand { position: absolute; top: 50%; right: 12rpx; bottom: auto; display: flex; align-items: center; justify-content: center; width: 48rpx; height: 32rpx; border-radius: 16rpx; background: #fff1f2; transform: translateY(-50%); }
-.c1-dates__expand image { display: block; width: 20rpx; height: 20rpx; border: 0; transform: none; }
-.c1-dates__expand-icon { display: block; width: 20rpx; height: 20rpx; transform: none; }
+.c1-dates__expand image { display: block; width: 32rpx; height: 32rpx; border: 0; transform: none; }
+.c1-dates__expand-icon { display: block; width: 32rpx; height: 32rpx; transform: none; }
 
-.c1-month-calendar { box-sizing: border-box; width: 686rpx; min-height: 588rpx; margin: 24rpx 32rpx 0; padding: 28rpx 24rpx 24rpx; border-radius: 32rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.04); }
+.c1-month-calendar { box-sizing: border-box; width: 686rpx; min-height: 840rpx; margin: 32rpx 32rpx 0; padding: 28rpx 24rpx 24rpx; border-radius: 32rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.04); }
 .c1-month-calendar__header { display: flex; align-items: center; justify-content: space-between; min-height: 48rpx; }
 .c1-month-calendar__title { color: #202124; font-size: 34rpx; font-weight: 700; line-height: 42rpx; }
 .c1-month-calendar__actions { display: flex; align-items: center; gap: 8rpx; }
 .c1-month-calendar__arrow { display: flex; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; }
 .c1-month-calendar__arrow image { display: block; width: 28rpx; height: 28rpx; }
-.c1-month-calendar__collapse { display: flex; align-items: center; justify-content: center; gap: 6rpx; box-sizing: border-box; width: 104rpx; height: 48rpx; border-radius: 12rpx; background: #fff1f2; color: #a80f1b; font-size: 22rpx; font-weight: 600; line-height: 28rpx; }
-.c1-month-calendar__collapse-icon { display: block; width: 20rpx; height: 20rpx; transform: rotate(180deg); }
+.c1-month-calendar__collapse { display: flex; align-items: center; justify-content: center; gap: 6rpx; box-sizing: border-box; width: 88rpx; height: 64rpx; border-radius: 12rpx; background: #fff1f2; color: #a80f1b; font-size: 22rpx; font-weight: 600; line-height: 28rpx; }
+.c1-month-calendar__collapse-icon { display: block; width: 32rpx; height: 32rpx; transform: rotate(180deg); }
 .c1-month-calendar__weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-top: 24rpx; }
 .c1-month-calendar__weekday { color: #667085; font-size: 22rpx; line-height: 28rpx; text-align: center; }
-.c1-month-calendar__grid { display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 64rpx; margin-top: 12rpx; }
+.c1-month-calendar__grid { display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 104rpx; margin-top: 12rpx; }
 .c1-month-day { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 6rpx; color: #202124; }
 .c1-month-day--outside { color: #9ca3af; }
-.c1-month-day__number { display: flex; align-items: center; justify-content: center; width: 52rpx; height: 52rpx; border-radius: 50%; font-size: 26rpx; line-height: 32rpx; }
+.c1-month-day__number { display: flex; align-items: center; justify-content: center; width: 80rpx; height: 80rpx; border-radius: 50%; font-size: 26rpx; line-height: 32rpx; }
 .c1-month-day--today .c1-month-day__number { color: #a80f1b; font-weight: 700; }
 .c1-month-day--selected .c1-month-day__number { background: #a80f1b; color: #ffffff; font-weight: 700; }
 .c1-month-day__markers { position: absolute; bottom: 0; display: flex; align-items: center; justify-content: center; gap: 4rpx; height: 10rpx; }
@@ -72,4 +72,4 @@
 /* Match the Figma C1 date strip: arrows stay outside one rounded date container. */
 .c1-week-nav { position: relative; display: flex; flex: 1; min-width: 0; height: 112rpx; box-sizing: border-box; padding: 0 12rpx; border: 1rpx solid #e5e7eb; border-radius: 28rpx; background: #ffffff; }
 
-.c1-week-nav { padding-right: 68rpx; }
+.c1-week-nav { padding-right: 84rpx; }
