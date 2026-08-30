@@ -28,7 +28,7 @@
 - [ ] Run only those tests and confirm each failure reflects the missing behavior, not test setup.
 - [ ] Make the smallest view-model/WXML/WXSS adjustment; preserve date range APIs and arrow semantics.
 - [x] Run the focused tests, mini-program TypeScript check, WXML/WXSS compilation, `git diff --check`, then capture P1/C1 at 375×812 and exercise previous/next week, expand, month change, date selection and collapse.
-- [ ] Commit only changed Task 1 paths.
+- [x] Commit only changed Task 1 paths.
 
 ### Task 2: C2 点按出勤与训练/比赛区分
 
@@ -42,7 +42,7 @@
 - [x] Implement the smallest view-model and transport correction; do not reintroduce status workflows,销课, or “查看详情”.
 - [x] Keep existing focused tests for the training/match visual distinction and C6 route entry.
 - [x] Run focused tests, mini-program type/compile gate, `git diff --check`, then click a present avatar in real C2 and verify write/readback while untouched RSVP rows remain unchanged.
-- [ ] Commit only changed Task 2 paths.
+- [x] Commit only changed Task 2 paths.
 
 ### Task 3: C6 比赛录入与 C7 战术板读写
 
@@ -56,7 +56,7 @@
 - [ ] Build/restart local API when its contract changes; on production use backup → deploy → restart → readback.
 - [x] Capture C6/C7 real 375×812 evidence. C7 runtime verification exposed a 19-player roster overlap: the fixed 520px `movable-area` clipped lower rows when `out-of-bounds=false`. The page now derives `workspaceHeight` from the precomputed roster row count; 19 players use 787px and retain distinct roster coordinates. A regression test covers the final row.
 - [x] Back up production before the C7 write, save one minimal real position change, restart the API, and reopen the same board. The saved normalized position and the 19-player / 11-starter / 8-substitute composition persisted across restart. Evidence screenshots: `tmp/c7-before-save-2026-08-30.png` and `tmp/c7-after-restart-readback-2026-08-30.png` (both 375×812).
-- [ ] Commit only changed Task 3 paths after the final repository gate.
+- [x] Commit only changed Task 3 paths after the final repository gate.
 
 ### Task 4: 七账号近三周中文演示数据审计与补齐
 
@@ -67,7 +67,7 @@
 - [x] Execute a read-only aggregate audit for the seven pre-authorized accounts without printing raw phone numbers.
 - [x] Verify each account has three consecutive recent weeks of Chinese training/match/attendance/assessment/tactical data and check data relationships (event roster → attendance → match events → tactical board).
 - [ ] For each detected gap, write a failing audit assertion, back up production data, add the minimal deterministic data, deploy/restart API, and re-run audit/readback.
-- [ ] Record only count/range/account-index evidence in docs; never include sensitive values.
+- [x] Record only count/range/account-index evidence in docs; never include sensitive values.
 - [x] Run `npx --yes pnpm@10.33.0 run check` and `git diff --check`; stage only exact updated source/docs paths for the pending documentation commit.
 
 #### 2026-08-30 legacy venue compatibility release
@@ -95,3 +95,11 @@
 - Correction: C2 now submits each row's semantic status unchanged except for the tapped row; the adapter preserves `confirmed` and `invited` and accepts them for the complete-roster write contract. The presentation remains intentionally binary: only present/late are green; RSVP rows are grey.
 - Evidence: two new API-adapter tests were first red, then the targeted C2/API suite passed `31/31`; mini-program TypeScript, C2 WXML, C2 WXSS, and the scoped diff check passed. Real WeChatIDE MCP at `375×812` showed the 19-member four-column grid, then a single tap persisted one present member as absent while the eleven untouched confirmed members remained confirmed after reopening.
 - Production demo integrity: the controlled demo activity was restored through a restricted backup, API restart, HTTPS health recovery, and aggregate readback. Final baseline contains 19 participants: 6 present, 2 late, and 11 confirmed. No identity data, sessions, credentials, or database locations are recorded here.
+
+## 2026-08-30 final current-state audit
+
+- Fresh online Figma screenshots were read for P1 `1008:186`, C1 `1293:8`, and C6 `93:796`; their fixed top-navigation, week/month controls, type markers, bottom navigation and full-screen match-entry structures remain the design baseline.
+- Fresh focused mini-program verification passed `99/99`: parent/coach calendar behavior, parent TabBar order, C2 binary attendance write semantics, C1/C2 training-versus-match distinction, C6/C6.1 full-screen record/event flows, and C7 tactical-board behavior.
+- Fresh WeChatIDE MCP runtime check opened C1 on a strict `375×812` simulator: the month picker expanded with separate training/match markers; after collapsing, the next-week action advanced the live page date from `2026-08-31` to `2026-09-07`.
+- Fresh production read-only aggregate audit exited `0`: seven controlled dual-role slots each have a three-week window, Chinese display data and venues, nineteen-player roster, two parent-visible children, nineteen assessments/152 radar records, two matches/eight match events, and an eleven-starter/eight-substitute board. No production write was required.
+- Fresh repository gate completed: domain `21/21`, mini-program `448/448`, API `119/119`; API type-check and mini-program type-check passed. The shared fixed-header implementation was separately compiled through WeChatIDE MCP and visually checked on a strict `375×812` match page.
