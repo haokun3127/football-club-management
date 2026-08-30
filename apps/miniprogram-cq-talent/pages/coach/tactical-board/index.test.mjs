@@ -130,8 +130,28 @@ describe("C7 coach tactical board MVP", () => {
       expect.objectContaining({ studentId: "student-roster-only", displayName: "真实名单新增成员" }),
     ]));
     expect(page.data.rosterPlayers).toHaveLength(3);
-    expect(page.data.rosterPlayers[0]).toMatchObject({ rosterPx: 34, rosterPy: 340 });
-    expect(page.data.rosterPlayers[1]).toMatchObject({ rosterPx: 120, rosterPy: 340 });
+    expect(page.data.rosterPlayers[0]).toMatchObject({ rosterPx: 46, rosterPy: 366 });
+    expect(page.data.rosterPlayers[1]).toMatchObject({ rosterPx: 126, rosterPy: 366 });
+  });
+
+  it("lays every roster member into the lower two-row all-player area", () => {
+    const page = createPageInstance({
+      pitchWidth: 320,
+      pitchHeight: 284,
+      players: [
+        { studentId: "player-1", displayName: "甲一", role: "substitute", x: 0.5, y: 0.8 },
+        { studentId: "player-2", displayName: "甲二", role: "substitute", x: 0.5, y: 0.8 },
+        { studentId: "player-3", displayName: "甲三", role: "substitute", x: 0.5, y: 0.8 },
+        { studentId: "player-4", displayName: "甲四", role: "substitute", x: 0.5, y: 0.8 },
+        { studentId: "player-5", displayName: "甲五", role: "substitute", x: 0.5, y: 0.8 },
+      ],
+    });
+
+    page.refreshViews();
+
+    expect(page.data.rosterPlayers.map((player) => [player.rosterPx, player.rosterPy])).toEqual([
+      [46, 366], [126, 366], [206, 366], [286, 366], [46, 442],
+    ]);
   });
 
   it("does not let an old success or old failure overwrite the newer board", async () => {
@@ -257,6 +277,7 @@ describe("C7 coach tactical board MVP", () => {
     expect(template).toContain('<block wx:if="{{!readOnly}}">');
     expect(template).toContain('<block wx:else>');
     expect(template).toContain('>比赛战术板<');
+    expect(template).toContain('>上半球场 · 下半全部球员<');
     expect(template).not.toContain('阵型与首发位置');
     expect(template).toContain('src="/assets/icons/chevron-left.svg"');
     expect(template).not.toContain('src="/assets/icons/c11-arrow-left.svg"');
@@ -264,18 +285,25 @@ describe("C7 coach tactical board MVP", () => {
     expect(template).not.toContain('c7-pitch__circle');
     expect(template).toContain('class="c7-pitch__halfway"');
     expect(template).toContain('class="c7-pitch__boundary"');
+    expect(template).toContain('class="c7-player__avatar" src="/assets/icons/user-white.svg"');
     expect(template).not.toContain('class="c7-toolbar"');
     expect(template).not.toContain("暂未开放");
     expect(template).not.toContain('<role-tabbar');
     expect(template).toContain('class="c7-context-label"');
     expect(template).toContain('class="c7-match-row"');
-    expect(template).toContain('>本场比赛阵型<');
+    expect(template).toContain('class="c7-match-title">{{eventTitle}}</view>');
+    expect(template).toContain('class="{{saveToneClass}}">{{saveLabel}}</view>');
+    expect(template).not.toContain('>本场比赛阵型<');
     expect(template).toContain('class="c7-formation-card"');
+    expect(template).toContain('>阵型 {{formationLabel}}<');
+    expect(template).toContain('src="/assets/icons/chevron-right.svg"');
+    expect(template).not.toContain('>›<');
     expect(template).toContain('id="c7-workspace"');
     expect(template).toContain('class="c7-roster"');
     expect(template).toContain('class="c7-roster__grid"');
+    expect(template).toContain('class="c7-roster__avatar-icon" src="/assets/icons/user.svg"');
     expect(template).toContain('class="c7-roster__name"');
-    expect(template).toContain('class="c7-roster__status"');
+    expect(template).not.toContain('class="c7-roster__status"');
     expect(template).toContain('>全部球员<');
     expect(template).toContain('class="c7-actions"');
     expect(template).toContain('bindtap="swapSubstitute"');
@@ -290,18 +318,23 @@ describe("C7 coach tactical board MVP", () => {
     expect(pageConfig).not.toContain('"app-header"');
     expect(pageConfig).not.toContain('"submit-bar"');
     expect(pageConfig).toContain('"navigationBarTitleText": "比赛战术板"');
-    expect(stylesheet).toMatch(/\.c7-header\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+    expect(stylesheet).toMatch(/\.c7-header\s*\{(?=[^}]*height:\s*96rpx)(?=[^}]*margin:\s*0\s+24rpx)(?=[^}]*border-radius:\s*28rpx)/s);
     expect(stylesheet).toMatch(/\.c7-header__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
+    expect(stylesheet).toMatch(/\.c7-header__subtitle\s*\{[^}]*font-size:\s*20rpx/s);
     expect(stylesheet).toMatch(/\.c7-pitch\s*\{[^}]*left:\s*32rpx[^}]*width:\s*calc\(100vw - 64rpx\)[^}]*height:\s*568rpx[^}]*background:\s*#278a53/s);
     expect(stylesheet).toMatch(/\.c7-match-row\s*\{/s);
-    expect(stylesheet).toMatch(/\.c7-formation-card\s*\{[^}]*margin:\s*0/s);
-    expect(stylesheet).toMatch(/\.c7-player\s*\{[^}]*width:\s*80rpx[^}]*height:\s*80rpx/s);
-    expect(stylesheet).toMatch(/\.c7-player__badge\s*\{[^}]*width:\s*100%[^}]*height:\s*100%[^}]*font-size:\s*18rpx/s);
-    expect(stylesheet).toMatch(/\.c7-workspace\s*\{[^}]*height:\s*1084rpx/s);
+    expect(stylesheet).toMatch(/\.c7-formation-card\s*\{[^}]*width:\s*calc\(100% - 64rpx\)[^}]*height:\s*88rpx/s);
+    expect(stylesheet).toMatch(/\.c7-formation-chevron\s*\{[^}]*transform:\s*rotate\(90deg\)/s);
+    expect(stylesheet).toMatch(/\.c7-player\s*\{[^}]*width:\s*72rpx[^}]*height:\s*72rpx/s);
+    expect(stylesheet).toMatch(/\.c7-player__badge\s*\{[^}]*width:\s*100%[^}]*height:\s*100%/s);
+    expect(stylesheet).toMatch(/\.c7-player__avatar\s*\{[^}]*width:\s*32rpx[^}]*height:\s*32rpx/s);
+    expect(stylesheet).toMatch(/\.c7-workspace\s*\{[^}]*height:\s*1052rpx/s);
+    expect(stylesheet).toMatch(/\.c7-roster\s*\{[^}]*top:\s*592rpx[^}]*height:\s*444rpx[^}]*border-radius:\s*32rpx[^}]*background:\s*#ffffff/s);
     expect(stylesheet).toMatch(/\.c7-roster__grid\s*\{/s);
-    expect(stylesheet).toMatch(/\.c7-roster__player\s*\{[^}]*width:\s*96rpx[^}]*height:\s*160rpx/s);
-    expect(stylesheet).toMatch(/\.c7-actions\s*\{[^}]*height:\s*96rpx/s);
-    expect(controller).toContain("this.data.pitchWidth, 20");
-    expect(controller).toContain("this.data.pitchHeight, 20");
+    expect(stylesheet).toMatch(/\.c7-roster__player\s*\{[^}]*width:\s*68rpx[^}]*height:\s*128rpx/s);
+    expect(stylesheet).toMatch(/\.c7-roster__avatar\s*\{[^}]*width:\s*68rpx[^}]*height:\s*68rpx/s);
+    expect(stylesheet).toMatch(/\.c7-actions\s*\{[^}]*height:\s*96rpx[^}]*margin:\s*42rpx\s+32rpx\s+0/s);
+    expect(controller).toContain("const PLAYER_MARKER_RADIUS = 18");
+    expect(controller).toContain("PITCH_LEFT_IN_WORKSPACE");
   });
 });

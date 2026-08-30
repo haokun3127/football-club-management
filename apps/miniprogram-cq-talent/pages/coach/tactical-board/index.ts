@@ -5,7 +5,6 @@ import { normalizedToPixel, pixelToNormalized } from "../../../utils/tactical-bo
 import type { FormationTemplate, LoadState, TacticalBoardPlayer, TacticalBoardState } from "../../../utils/types";
 
 type PlayerView = TacticalBoardPlayer & {
-  initials: string;
   px: number;
   py: number;
   rosterPx: number;
@@ -42,6 +41,13 @@ interface BoardPageData {
 }
 
 let latestLoadToken = 0;
+const PITCH_LEFT_IN_WORKSPACE = 16;
+const PLAYER_MARKER_RADIUS = 18;
+const ROSTER_COLUMNS = 4;
+const ROSTER_LEFT = 46;
+const ROSTER_TOP = 366;
+const ROSTER_COLUMN_GAP = 80;
+const ROSTER_ROW_GAP = 76;
 
 Page<BoardPageData>({
   data: {
@@ -196,18 +202,17 @@ Page<BoardPageData>({
     const currentSelectedStarterId = selectedStarterId ?? this.data.selectedStarterId;
     const toView = (player: TacticalBoardPlayer): PlayerView => ({
       ...player,
-      px: normalizedToPixel(player.x, this.data.pitchWidth, 20) + 12,
-      py: normalizedToPixel(player.y, this.data.pitchHeight, 20),
+      px: normalizedToPixel(player.x, this.data.pitchWidth, PLAYER_MARKER_RADIUS) + PITCH_LEFT_IN_WORKSPACE,
+      py: normalizedToPixel(player.y, this.data.pitchHeight, PLAYER_MARKER_RADIUS),
       rosterPx: 0,
       rosterPy: 0,
-      initials: player.displayName.slice(0, 2),
       className: player.studentId === currentSelectedStarterId ? "c7-player c7-player--selected" : "c7-player",
     });
     const rosterPlayers = currentPlayers
       .map((player: TacticalBoardPlayer, index: number) => ({
         ...toView(player),
-        rosterPx: 34 + (index % 4) * 86,
-        rosterPy: 340 + Math.floor(index / 4) * 92,
+        rosterPx: ROSTER_LEFT + (index % ROSTER_COLUMNS) * ROSTER_COLUMN_GAP,
+        rosterPy: ROSTER_TOP + Math.floor(index / ROSTER_COLUMNS) * ROSTER_ROW_GAP,
       }));
     this.setData({
       rosterPlayers,
@@ -283,9 +288,9 @@ Page<BoardPageData>({
     if (this.data.readOnly || event.detail.source !== "touch") return;
     const studentId = event.currentTarget.dataset.id || "";
     if (!this.data.players.some((player: TacticalBoardPlayer) => player.studentId === studentId && player.role === "starter")) return;
-    const movedBelowPitch = event.detail.y >= this.data.pitchHeight - 40;
-    const x = pixelToNormalized(event.detail.x - 12, this.data.pitchWidth, 20);
-    const y = pixelToNormalized(event.detail.y, this.data.pitchHeight, 20);
+    const movedBelowPitch = event.detail.y >= this.data.pitchHeight;
+    const x = pixelToNormalized(event.detail.x - PITCH_LEFT_IN_WORKSPACE, this.data.pitchWidth, PLAYER_MARKER_RADIUS);
+    const y = pixelToNormalized(event.detail.y, this.data.pitchHeight, PLAYER_MARKER_RADIUS);
     const players = this.data.players.map((player: TacticalBoardPlayer) => player.studentId === studentId
       ? movedBelowPitch ? { ...player, role: "substitute" as const, positionLabel: undefined } : { ...player, x, y }
       : player);
@@ -302,10 +307,10 @@ Page<BoardPageData>({
     if (this.data.readOnly || event.detail.source !== "touch") return;
     const studentId = event.currentTarget.dataset.id || "";
     if (!this.data.players.some((player: TacticalBoardPlayer) => player.studentId === studentId && player.role !== "starter")) return;
-    const movedIntoPitch = event.detail.y < this.data.pitchHeight - 40;
+    const movedIntoPitch = event.detail.y <= this.data.pitchHeight - PLAYER_MARKER_RADIUS * 2;
     if (!movedIntoPitch) return;
-    const x = pixelToNormalized(event.detail.x - 12, this.data.pitchWidth, 20);
-    const y = pixelToNormalized(event.detail.y, this.data.pitchHeight, 20);
+    const x = pixelToNormalized(event.detail.x - PITCH_LEFT_IN_WORKSPACE, this.data.pitchWidth, PLAYER_MARKER_RADIUS);
+    const y = pixelToNormalized(event.detail.y, this.data.pitchHeight, PLAYER_MARKER_RADIUS);
     const players = this.data.players.map((player: TacticalBoardPlayer) => player.studentId === studentId
       ? { ...player, role: "starter" as const, x, y }
       : player);
