@@ -18,7 +18,6 @@
         <view wx:if="{{eventView.heroMeta}}" class="shero__meta">{{eventView.heroMeta}}</view>
         <view class="shero__pills">
           <view wx:if="{{attendanceTotal > 0}}" class="shero__pill">出席 {{attendancePresent}}/{{attendanceTotal}} 人</view>
-          <view class="shero__pill">{{eventView.statusLabel}}</view>
         </view>
       </view>
 
@@ -33,34 +32,25 @@
             <image wx:if="{{item.present}}" class="roster-avatar__check" src="/assets/icons/c4-1-check.svg" mode="aspectFit" />
             <view wx:else class="roster-avatar__initial">{{item.initial}}</view>
           </view>
-          <view class="roster-name">{{item.name}}</view>
+          <view class="roster-name">{{item.displayName}}</view>
         </view>
       </view>
       <view wx:if="{{attendanceSaving}}" class="subtitle">正在保存出勤...</view>
       <view wx:if="{{attendanceError}}" class="attendance-error">{{attendanceError}}</view>
     </view>
 
-    <view wx:if="{{hasContentProgress}}" class="workbench-card">
-      <view class="section-title">训练内容进度</view>
-      <view wx:for="{{contentProgressRows}}" wx:key="id" class="progress-row">
-        <image class="progress-row__icon progress-row__icon--{{item.status}}" src="{{item.icon}}" mode="aspectFit" />
-        <view class="progress-row__name">{{item.name}}</view>
-        <view class="progress-row__status progress-row__status--{{item.status}}">{{item.statusLabel}}</view>
+    <view wx:if="{{hasTraining}}" class="workbench-card" data-action="training" bindtap="openAction">
+      <view class="row">
+        <view class="section-title">训练内容</view>
+        <view class="training-card__edit">编辑 ›</view>
       </view>
+      <view class="training-card__summary">{{trainingContentSummary}}</view>
     </view>
 
     <view wx:if="{{hasActionCards}}" class="action-grid">
       <view wx:for="{{actionCards}}" wx:key="id" class="action-tile" data-action="{{item.id}}" bindtap="openAction">
         <image class="action-tile__icon" src="{{item.icon}}" mode="aspectFit" />
         <view class="action-tile__label">{{item.label}}</view>
-      </view>
-    </view>
-
-    <view wx:if="{{hasTraining && !hasContentProgress}}" class="workbench-card">
-      <view class="section-title">训练内容</view>
-      <view wx:for="{{trainingRows}}" wx:key="label" class="field-row">
-        <view class="label">{{item.label}}</view>
-        <view class="field-value">{{item.value}}</view>
       </view>
     </view>
 

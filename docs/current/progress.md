@@ -1877,3 +1877,10 @@
 - 小程序 C7 改用真实 `eventTitle` 与真实保存状态，场上和名单均为圆形头像；所有 roster 成员固定显示在下方 4×2 网格，拖入/拖回仍使用既有真实战术板 API。没有写入 Figma 示例姓名、伪会话或伪 API。
 - 通过压缩工作面垂直几何，让 375×812 首屏同时露出球场、完整名单和完整底部按钮。WXML/WXSS 编译成功，定向 Vitest `9/9`、小程序 TypeScript `exit=0`、`git diff --check` 通过。
 - 真实教练会话严格 375×812 复验截图：`.tmp-c7-runtime-fit-final.png`。开发者工具的“刷新当前页”会回到日程，因此后续 C7 截图固定使用“精确路由 → 等待资源 → 立即截图”，不能以刷新后错误路由的截图判定页面回归。
+
+## 2026-08-30 Goal：C2 训练工作台出勤点按版
+
+- 先写入在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:606`：画板现名为 `C2 训练工作台 · 出勤点按版`。根因修复记录：原画板带垂直自动布局；直接向其中插入绝对坐标图层会在插入时重排位置。处理方式是在清空并重建图层前把画板设为 `layoutMode = NONE`，回读截图确认没有重叠或错位。
+- 小程序 `pages/coach/event` 删除按时钟推导的训练内容进度及“进行中”状态胶囊；保留真实课程/出勤数据与可编辑训练内容摘要。训练卡排在快捷入口前，匹配新版 Figma 层级。
+- 出勤继续通过真实 `saveCoachAttendance` 保存，绿勾/灰首字头像可直接点按；页面展示字段 `displayName` 在 TypeScript 中预计算并限制四字，WXML 不调用数组或字符串方法。
+- 验证：定向 Vitest `14/14`、小程序 TypeScript `exit=0`、限定文件 `git diff --check` 通过；WeChatIDE MCP 精确打开 `pages/coach/event?id=event-cq-talent-secure-test-1-trn-0818` 并取得严格 `375×812` 截图 `C:\Users\ASUS\AppData\Local\Temp\cqtc-c2-runtime-final-20260830.png`。离线参考图 `docs/design/reference/figma/c2-activity-workbench.png` 已按新版在线稿覆盖。

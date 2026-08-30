@@ -148,24 +148,28 @@ describe("coach activity workbench", () => {
     ]);
   });
 
-  it("does not leave a workflow or settlement entry point on the workbench", async () => {
+  it("keeps the workbench focused on direct attendance rather than workflow or settlement", async () => {
     mocks.getCoachWorkbench.mockResolvedValue(trainingWorkbench);
     const page = createPageInstance();
     await page.load("event-training-1");
 
     expect(page.data).toMatchObject({ hasWorkflow: false, workflowRows: [] });
+    expect(page.data).not.toHaveProperty("contentProgressRows");
+    expect(page.data).not.toHaveProperty("hasContentProgress");
     expect(page.data.actionCards.map((item) => item.id)).not.toContain("lesson");
     expect(template).not.toContain("流程状态");
     expect(template).not.toContain("查看详情");
+    expect(template).not.toContain("训练内容进度");
+    expect(template).not.toContain("contentProgressRows");
     expect(template).toContain('bindtap="toggleAttendance"');
-    expect(template).toContain("{{item.name}}");
+    expect(template).toContain("{{item.displayName}}");
   });
 
   it("uses a binary check avatar for attendance and keeps names readable below it", () => {
     expect(template).toContain('<image wx:if="{{item.present}}" class="roster-avatar__check" src="/assets/icons/c4-1-check.svg" mode="aspectFit" />');
     expect(template).toContain('<view wx:else class="roster-avatar__initial">{{item.initial}}</view>');
     expect(template).not.toContain('class="roster-status"');
-    expect(stylesheet).toMatch(/\.roster-avatar__check\s*\{[^}]*width:\s*40rpx[^}]*height:\s*40rpx/s);
+    expect(stylesheet).toMatch(/\.roster-avatar__check\s*\{[^}]*width:\s*44rpx[^}]*height:\s*44rpx/s);
     expect(stylesheet).toMatch(/\.roster-name\s*\{[^}]*white-space:\s*nowrap/s);
   });
 
@@ -186,49 +190,6 @@ describe("coach activity workbench", () => {
     expect(page.data).toMatchObject({ attendancePresent: 1, attendanceTotal: 1 });
     expect(page.data).not.toHaveProperty("inProgress", true);
     expect(page.data).not.toHaveProperty("countdownText");
-  });
-
-  it("derives per-item content progress from planned durations and the clock", async () => {
-    const now = Date.now();
-    mocks.getCoachWorkbench.mockResolvedValue({
-      ...trainingWorkbench,
-      event: {
-        ...trainingWorkbench.event,
-        status: "scheduled",
-        startsAt: new Date(now + 8 * 60 * 60 * 1000 - 25 * 60 * 1000).toISOString(),
-        endsAt: new Date(now + 8 * 60 * 60 * 1000 + 35 * 60 * 1000).toISOString(),
-      },
-      selectedTrainingProjects: [
-        { id: "p1", name: "热身", metricIds: [], tags: [], durationMinutes: 20 },
-        { id: "p2", name: "技术训练", metricIds: [], tags: [], durationMinutes: 20 },
-        { id: "p3", name: "对抗演练", metricIds: [], tags: [], durationMinutes: 20 },
-      ],
-    });
-    const page = createPageInstance();
-    await page.load("event-training-1");
-
-    expect(page.data.hasContentProgress).toBe(true);
-    expect(page.data.contentProgressRows.map((row) => row.statusLabel)).toEqual(["完成", "进行中", "待开始"]);
-  });
-
-  it("shows all content items as done after the session ends", async () => {
-    const now = Date.now();
-    mocks.getCoachWorkbench.mockResolvedValue({
-      ...trainingWorkbench,
-      event: {
-        ...trainingWorkbench.event,
-        status: "completed",
-        startsAt: new Date(now + 8 * 60 * 60 * 1000 - 90 * 60 * 1000).toISOString(),
-        endsAt: new Date(now + 8 * 60 * 60 * 1000 - 30 * 60 * 1000).toISOString(),
-      },
-      selectedTrainingProjects: [
-        { id: "p1", name: "热身", metricIds: [], tags: [], durationMinutes: 20 },
-      ],
-    });
-    const page = createPageInstance();
-    await page.load("event-training-1");
-
-    expect(page.data.contentProgressRows.map((row) => row.statusLabel)).toEqual(["完成"]);
   });
 
   it("keeps missing, forbidden, and empty workbenches honest", async () => {
@@ -284,7 +245,7 @@ describe("coach activity workbench", () => {
     const routes = {
       attendance: "/pages/coach/attendance/index?id=event-1",
       lesson: "/pages/coach/lesson/index?id=event-1",
-      match: "/pages/coach/match-edit/index?eventId=event-1",
+      match: "/pages/coach/match/index?id=event-1",
       tactical: "/pages/coach/tactical-board/index?eventId=event-1",
       training: "/pages/coach/content-select/index?eventId=event-1",
       assessment: "/pages/coach/test-entry/index?eventId=event-1&templateId=template-1",
@@ -333,10 +294,22 @@ describe("coach activity workbench", () => {
     expect(template).toContain('class="shero__pills"');
     expect(template).toContain("{{eventView.heroDateLabel}}");
     expect(template).toContain("{{eventView.heroMeta}}");
-    expect(template).toContain("{{eventView.statusLabel}}");
-    expect(stylesheet).toMatch(/\.shero\s*\{[^}]*min-height:\s*320rpx/s);
-    expect(stylesheet).toMatch(/\.shero__big\s*\{[^}]*font-size:\s*104rpx/s);
+    expect(template).not.toContain("{{eventView.statusLabel}}");
+    expect(stylesheet).toMatch(/\.shero\s*\{[^}]*min-height:\s*368rpx/s);
+    expect(stylesheet).toMatch(/\.shero__big\s*\{[^}]*font-size:\s*96rpx/s);
     expect(stylesheet).toMatch(/\.shero__pill\s*\{[^}]*border-radius:\s*999rpx/s);
+  });
+
+  it("keeps names readable within the four-character attendance-grid budget", async () => {
+    mocks.getCoachWorkbench.mockResolvedValue({
+      ...trainingWorkbench,
+      roster: [{ studentId: "student-1", name: "测试学员名字过长", status: "present" }],
+    });
+    const page = createPageInstance();
+    await page.load("event-training-1");
+
+    expect(page.data.rosterRows[0]).toMatchObject({ displayName: "测试学员" });
+    expect(template).toContain("{{item.displayName}}");
   });
 
   it("uses the coach bottom tabbar (Figma 2026-08-20: tabs moved to page bottom) and neutral icon-led action tiles", () => {
@@ -349,13 +322,18 @@ describe("coach activity workbench", () => {
     expect(stylesheet).not.toContain('.action-tile--match');
   });
 
+  it("places the editable training summary before the secondary action tiles", () => {
+    expect(template.indexOf('class="training-card__summary"')).toBeLessThan(template.indexOf('class="action-grid"'));
+  });
+
   it("matches the live Figma C2 top navigation geometry", () => {
     expect(template).toContain('class="c2-nav__back" src="/assets/icons/chevron-left.svg"');
     expect(template).toContain('style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"');
     expect(stylesheet).toMatch(/\.c2-nav__left\s*\{[^}]*gap:\s*0/s);
     expect(stylesheet).toMatch(/\.c2-nav__back\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c2-nav__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
-    expect(stylesheet).toMatch(/\.c2-nav__finish\s*\{[^}]*font-size:\s*30rpx/s);
+    expect(stylesheet).not.toContain(".c2-nav__finish");
+    expect(stylesheet).not.toContain(".progress-row");
     expect(stylesheet).toMatch(/\.c2-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
   });
 });
