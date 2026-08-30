@@ -70,6 +70,12 @@
 - [ ] Record only count/range/account-index evidence in docs; never include sensitive values.
 - [x] Run `npx --yes pnpm@10.33.0 run check` and `git diff --check`; stage only exact updated source/docs paths for the pending documentation commit.
 
+#### 2026-08-30 legacy venue compatibility release
+
+- [x] Release the legacy `location_id` compatibility repair after a restricted SQLite backup, then run confirmed importer refresh and restart the API.
+- [x] Run the aggregate seven-slot audit after release. The initial false failure was traced to a prefix-only activity query that included another team's old rows; audit scope is now `club_id + primary_team_id + controlled ID namespace`.
+- [x] Re-run read-only audit: all seven slots have known Chinese venues and all required aggregate data.
+
 ## Final Integration Check
 
 - [x] Re-read each acceptance criterion in `prd.md` against current code, API readback and simulator evidence.
