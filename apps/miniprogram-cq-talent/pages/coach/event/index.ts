@@ -186,7 +186,7 @@ Page({
       await saveCoachAttendance(this.data.eventId, nextRows.map((item: RosterRow) => ({
         studentId: item.studentId,
         name: item.name,
-        status: item.present ? "present" : "absent",
+        status: item.status,
         note: item.note,
       })));
       this.setData({ attendanceSaving: false });

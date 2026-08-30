@@ -117,12 +117,12 @@ describe("coach activity workbench", () => {
     expect(page.data).toMatchObject({ attendancePresent: 0, attendanceTotal: 2, joinedNames: "" });
   });
 
-  it("toggles attendance directly on the workbench and persists a simple present/absent state", async () => {
+  it("changes only the tapped attendance status and preserves untouched backend statuses", async () => {
     mocks.getCoachWorkbench.mockResolvedValue({
       ...trainingWorkbench,
       roster: [
         { studentId: "student-1", name: "陈小宇", status: "present" },
-        { studentId: "student-2", name: "林一诺", status: "absent" },
+        { studentId: "student-2", name: "林一诺", status: "confirmed" },
       ],
     });
     const page = createPageInstance();
@@ -135,7 +135,7 @@ describe("coach activity workbench", () => {
     await page.toggleAttendance({ currentTarget: { dataset: { index: "0" } } });
     expect(mocks.saveCoachAttendance).toHaveBeenCalledWith("event-training-1", [
       expect.objectContaining({ studentId: "student-1", status: "absent" }),
-      expect.objectContaining({ studentId: "student-2", status: "absent" }),
+      expect.objectContaining({ studentId: "student-2", status: "confirmed" }),
     ]);
     expect(page.data).toMatchObject({ attendancePresent: 0, attendanceSaving: false });
     expect(page.data.rosterRows[0]).toMatchObject({ present: false, status: "absent" });

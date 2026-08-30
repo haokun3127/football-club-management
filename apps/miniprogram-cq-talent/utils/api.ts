@@ -1095,9 +1095,9 @@ function normalizeCoachWeekStats(raw: Record<string, unknown> | undefined): Coac
   };
 }
 
-function normalizeParticipantStatus(status: string): "present" | "absent" | "late" | "leave_requested" | "excused" | undefined {
+function normalizeParticipantStatus(status: string): "invited" | "confirmed" | "present" | "absent" | "late" | "leave_requested" | "excused" | undefined {
   const value = status.trim();
-  if (value === "present" || value === "absent" || value === "late" || value === "leave_requested" || value === "excused") {
+  if (value === "invited" || value === "confirmed" || value === "present" || value === "absent" || value === "late" || value === "leave_requested" || value === "excused") {
     return value;
   }
   if (value === "已到" || value === "出勤") {
@@ -1111,7 +1111,8 @@ function normalizeParticipantStatus(status: string): "present" | "absent" | "lat
 
 function normalizeWorkbenchAttendanceStatus(status: unknown) {
   const value = String(status ?? "pending").trim();
-  if (value === "confirmed" || value === "invited" || value === "已确认" || value === "已邀请") return "pending";
+  if (value === "已确认") return "confirmed";
+  if (value === "已邀请") return "invited";
   return value || "pending";
 }
 

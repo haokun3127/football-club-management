@@ -2021,3 +2021,9 @@
 - P1/C1 日程继续使用已验收的 `position: fixed` + 顶栏占位；其他页面级顶栏使用 `position: sticky; top: 0; z-index: 100`，共享 `components/app-header` 同步采用该规则。
 - 覆盖范围包括共享 `app-header`、家长端全屏子页、教练端全屏子页、C7 战术板和 C16 我的页；局部卡片标题、月历内部标题、名单标题不纳入页面级顶栏规则。
 - 新增 `apps/miniprogram-cq-talent/utils/topbar-sticky-check.cjs` 作为 Node 原生回归检查；已通过 2/2。小程序现有 Vitest 67 个文件、446 个测试通过，TypeScript 检查通过；相关 WXSS 经微信开发者工具 MCP 编译通过。
+
+## 2026-08-31 C2 出勤完整名单写入防回归
+
+- C2 的头像点按交互使用真实“完整名单”出勤写入契约。发现旧实现会把未点击的灰色成员统一重写为 `absent`；同时小程序 API 适配层把后端合法 RSVP 状态 `confirmed`/`invited` 降为展示用 `pending`，但保存层又拒绝 `pending`，造成完整名单保存不可靠。
+- 已修复为保留后端语义状态：仅被点击成员在 `present/absent` 之间切换；其余成员按原始 `confirmed`、`invited`、`late` 等状态回传。视觉仍符合产品要求：到场/迟到为绿色，其他均为灰色，不恢复流程状态、销课或查看详情入口。
+- 验证：先执行 API 适配层回归测试并确认两个预期失败，再以最小改动转绿；C2 页面与 API 适配层定向 Vitest `31/31`、小程序 TypeScript、C2 WXML/WXSS 微信开发者工具 MCP 编译和限定 `git diff --check` 均通过。真实 `375×812` 教练会话点击一名绿色头像后，读回结果仅多一名未到，11 名未点击 RSVP 成员仍保持确认；演示数据随后通过受控备份、恢复、API 重启和只读回查恢复为 19 人基线（6 到场、2 迟到、11 已确认）。

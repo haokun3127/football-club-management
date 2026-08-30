@@ -87,7 +87,7 @@ describe("coach workbench participant normalization", () => {
     ]);
   });
 
-  it("treats RSVP confirmations as pending until a coach records attendance", async () => {
+  it("preserves RSVP statuses so an attendance save can leave untouched members unchanged", async () => {
     const originalRequest = globalThis.wx.request;
     globalThis.wx.request = ({ success }) => success({
       statusCode: 200,
@@ -119,7 +119,7 @@ describe("coach workbench participant normalization", () => {
 
     try {
       const workbench = await getCoachWorkbench("event-training-pending");
-      expect(workbench.roster.map((student) => student.status)).toEqual(["pending", "pending"]);
+      expect(workbench.roster.map((student) => student.status)).toEqual(["confirmed", "invited"]);
     } finally {
       globalThis.wx.request = originalRequest;
     }
@@ -136,6 +136,30 @@ describe("coach workbench participant normalization", () => {
     try {
       await saveCoachAttendance("event-training-1", [{ studentId: "student-1", name: "Player", status: "present", note: "" }]);
       expect(received).toEqual({ participants: [{ studentId: "student-1", status: "present", note: "" }] });
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
+
+  it("sends untouched RSVP statuses without converting them to attendance decisions", async () => {
+    const originalRequest = globalThis.wx.request;
+    let received;
+    globalThis.wx.request = ({ data, success }) => {
+      received = data;
+      success({ statusCode: 200, data: { participants: [] } });
+    };
+
+    try {
+      await saveCoachAttendance("event-training-1", [
+        { studentId: "student-confirmed", name: "已确认学员", status: "confirmed" },
+        { studentId: "student-invited", name: "受邀学员", status: "invited" },
+      ]);
+      expect(received).toEqual({
+        participants: [
+          { studentId: "student-confirmed", status: "confirmed", note: undefined },
+          { studentId: "student-invited", status: "invited", note: undefined },
+        ],
+      });
     } finally {
       globalThis.wx.request = originalRequest;
     }

@@ -37,11 +37,11 @@
 - Modify if needed: `apps/miniprogram-cq-talent/pages/coach/schedule/index.ts`, `index.wxml`, `index.wxss`
 - Test: `apps/miniprogram-cq-talent/pages/coach/event/index.test.mjs`, `apps/miniprogram-cq-talent/pages/coach/schedule/index.test.mjs`
 
-- [ ] Write a failing test for `displayName` truncation to four Chinese characters and an optimistic avatar toggle that rolls back when the attendance API rejects.
-- [ ] Run the C2 test and confirm RED.
-- [ ] Implement the smallest view model and handler change; do not reintroduce status workflows,销课, or “查看详情”.
-- [ ] Add or update a focused test that training and match cards have different existing class/tone and match directs to C6.
-- [x] Run focused tests, mini-program type/compile gate, `git diff --check`, then click a present and absent avatar in real C2 and verify write/readback.
+- [x] Write failing tests for `displayName` truncation, direct avatar toggle behavior, and preservation of untouched RSVP statuses.
+- [x] Run the C2/API adapter tests and confirm RED: the old page converted untouched rows to `absent`, while the adapter collapsed `confirmed`/`invited` to non-writable `pending`.
+- [x] Implement the smallest view-model and transport correction; do not reintroduce status workflows,销课, or “查看详情”.
+- [x] Keep existing focused tests for the training/match visual distinction and C6 route entry.
+- [x] Run focused tests, mini-program type/compile gate, `git diff --check`, then click a present avatar in real C2 and verify write/readback while untouched RSVP rows remain unchanged.
 - [ ] Commit only changed Task 2 paths.
 
 ### Task 3: C6 比赛录入与 C7 战术板读写
@@ -88,3 +88,10 @@
 - A production 403 observed while opening legacy unit-test fixture IDs was investigated through the simulator network log. The API correctly rejected a current scoped coach session for an unrelated historical event. Runtime checks must use activity IDs supplied by that signed-in coach's current schedule; do not weaken event-access authorization or treat the 403 as a page-rendering failure.
 - Read-only seven-slot audit passed with no identity data in output: all slots have a three-week rolling window, Chinese display copy, nineteen-player coaching scope, two guardian children, assessments/radar, two matches/eight match events, and an eleven-starter/eight-substitute tactical board.
 - [x] Update task artifacts and current progress without staging unrelated dirty files.
+
+## 2026-08-31 C2 attendance persistence hardening
+
+- Root cause: C2 posts the complete roster to the real attendance endpoint. The previous page implementation converted every non-green display row to `absent`, so clicking one avatar could rewrite untouched RSVP rows. The mini-program adapter also turned valid backend `confirmed`/`invited` values into display-only `pending`, which its own save normalizer rejects.
+- Correction: C2 now submits each row's semantic status unchanged except for the tapped row; the adapter preserves `confirmed` and `invited` and accepts them for the complete-roster write contract. The presentation remains intentionally binary: only present/late are green; RSVP rows are grey.
+- Evidence: two new API-adapter tests were first red, then the targeted C2/API suite passed `31/31`; mini-program TypeScript, C2 WXML, C2 WXSS, and the scoped diff check passed. Real WeChatIDE MCP at `375×812` showed the 19-member four-column grid, then a single tap persisted one present member as absent while the eleven untouched confirmed members remained confirmed after reopening.
+- Production demo integrity: the controlled demo activity was restored through a restricted backup, API restart, HTTPS health recovery, and aggregate readback. Final baseline contains 19 participants: 6 present, 2 late, and 11 confirmed. No identity data, sessions, credentials, or database locations are recorded here.
