@@ -206,7 +206,8 @@ describe("coach schedule home", () => {
     expect(stylesheet).toMatch(/\.c1-dates__arrow\s*\{[^}]*flex:\s*0\s+0\s+44rpx/s);
     expect(stylesheet).toMatch(/\.c1-dates__arrow\s+image\s*\{[^}]*width:\s*28rpx[^}]*height:\s*28rpx/s);
     const expandMatches = [...stylesheet.matchAll(/\.c1-dates__expand\s*\{([^}]*)\}/g)];
-    const expand = expandMatches.at(-1)?.[1] ?? "";
+    expect(expandMatches).toHaveLength(1);
+    const expand = expandMatches[0]?.[1] ?? "";
     expect(expand).toContain("top: 50%");
     expect(expand).toContain("bottom: auto");
     expect(expand).toContain("transform: translateY(-50%)");

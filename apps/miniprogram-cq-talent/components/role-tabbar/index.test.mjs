@@ -11,8 +11,8 @@ const expectedItems = {
   parent: [
     ["schedule", "/pages/parent/schedule/index"],
     ["growth", "/pages/parent/growth/index"],
-    ["discover", "/pages/parent/content/index"],
     ["child", "/pages/parent/child/index"],
+    ["discover", "/pages/parent/content/index"],
   ],
   coach: [
     ["schedule", "/pages/coach/schedule/index"],
@@ -32,7 +32,7 @@ describe("role tabbar real-device icon contract", () => {
         expect(controller).toContain(`path: "${path}"`);
       }
     }
-    expect(controller.indexOf('key: "discover"')).toBeLessThan(controller.indexOf('key: "child"'));
+    expect(controller.indexOf('key: "child"')).toBeLessThan(controller.indexOf('key: "discover"'));
   });
 
   it("uses precomputed PNG icon paths for both active states", () => {
