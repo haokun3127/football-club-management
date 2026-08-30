@@ -1,4 +1,5 @@
-.app-header { position: sticky; top: 0; z-index: 100; background: #ffffff; color: #202124; }
+.app-header { position: relative; height: 88px; }
+.app-header__surface { position: fixed; top: 0; right: 0; left: 0; z-index: 100; background: #ffffff; color: #202124; }
 .app-header--brand { background: var(--color-brand); color: #ffffff; }
 .app-header--soft { background: #fdf0f1; }
 .app-header__content { position: relative; display: flex; align-items: center; box-sizing: border-box; padding-left: 32rpx; }

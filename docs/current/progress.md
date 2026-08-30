@@ -2018,9 +2018,9 @@
 ## 2026-08-30 全端页面顶栏固定规则
 
 - 根据最新产品要求，带页面级导航的家长端、教练端和登录页统一采用顶部锁定规则：滚动内容时顶栏保持在窗口顶部，且保留原有安全区与页面流布局。
-- P1/C1 日程继续使用已验收的 `position: fixed` + 顶栏占位；其他页面级顶栏使用 `position: sticky; top: 0; z-index: 100`，共享 `components/app-header` 同步采用该规则。
+- P1/C1 日程继续使用已验收的 `position: fixed` + 顶栏占位；其余自定义页面级顶栏保留 `sticky; top: 0; z-index: 100` 的可见性契约。共享 `components/app-header` 已升级为“外层 88px 正常流占位 + 内层 fixed surface”：比赛、销课、账户等所有复用页面无需逐页加补偿，滚动时也不会失去顶栏或遮住首段内容。
 - 覆盖范围包括共享 `app-header`、家长端全屏子页、教练端全屏子页、C7 战术板和 C16 我的页；局部卡片标题、月历内部标题、名单标题不纳入页面级顶栏规则。
-- 新增 `apps/miniprogram-cq-talent/utils/topbar-sticky-check.cjs` 作为 Node 原生回归检查；已通过 2/2。小程序现有 Vitest 67 个文件、446 个测试通过，TypeScript 检查通过；相关 WXSS 经微信开发者工具 MCP 编译通过。
+- `apps/miniprogram-cq-talent/utils/topbar-sticky-check.cjs` 现额外锁定共享组件的“固定可见层 + 正常流占位”结构；组件定向 Vitest `2/2`、该 Node 回归检查 `2/2`、小程序 TypeScript、共享 WXML/WXSS 微信开发者工具 MCP 编译均通过。真实 `375×812` 比赛页截图：`C:\Users\ASUS\AppData\Local\Temp\cqtc-app-header-fixed-match.png`。
 
 ## 2026-08-31 C2 出勤完整名单写入防回归
 

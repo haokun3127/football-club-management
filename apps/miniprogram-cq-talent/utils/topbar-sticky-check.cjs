@@ -66,9 +66,10 @@ test("page-level top bars stay pinned to the viewport top", () => {
   }
 });
 
-test("the shared app header uses the same sticky contract", () => {
+test("the shared app header keeps its flow reservation and fixes only the visible surface", () => {
+  const template = fs.readFileSync(path.join(root, "components/app-header/index.wxml"), "utf8");
   const css = fs.readFileSync(path.join(root, "components/app-header/index.wxss"), "utf8");
-  assert.match(css, /\.app-header\s*\{[^}]*position\s*:\s*(?:sticky|fixed)/);
-  assert.match(css, /\.app-header\s*\{[^}]*top\s*:\s*0/);
-  assert.match(css, /\.app-header\s*\{[^}]*z-index\s*:\s*100/);
+  assert.match(template, /class="app-header__surface app-header--\{\{theme\}\}"/);
+  assert.match(css, /\.app-header\s*\{[^}]*position\s*:\s*relative[^}]*height\s*:\s*88px/);
+  assert.match(css, /\.app-header__surface\s*\{[^}]*position\s*:\s*fixed[^}]*top\s*:\s*0[^}]*right\s*:\s*0[^}]*left\s*:\s*0[^}]*z-index\s*:\s*100/);
 });

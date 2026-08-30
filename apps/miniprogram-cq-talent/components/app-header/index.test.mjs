@@ -13,4 +13,10 @@ describe("shared app header", () => {
     expect(stylesheet).toMatch(/\.app-header__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
     expect(stylesheet).toMatch(/\.app-header__action\s*\{[^}]*font-size:\s*28rpx/s);
   });
+
+  it("keeps a normal-flow reservation while the visible navigation stays fixed", () => {
+    expect(template).toContain('class="app-header__surface app-header--{{theme}}"');
+    expect(stylesheet).toMatch(/\.app-header\s*\{[^}]*position:\s*relative[^}]*height:\s*88px/s);
+    expect(stylesheet).toMatch(/\.app-header__surface\s*\{[^}]*position:\s*fixed[^}]*top:\s*0[^}]*right:\s*0[^}]*left:\s*0[^}]*z-index:\s*100/s);
+  });
 });
