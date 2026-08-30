@@ -72,3 +72,9 @@
 
 /* Match Figma C1: the outer date strip owns the border; the seven dates form one inset row. */
 .c1-week-nav { position: absolute; top: 24rpx; right: 0; left: 44rpx; display: flex; gap: 8rpx; min-width: 0; height: 80rpx; box-sizing: border-box; padding: 0; overflow: visible; }
+
+/* Keep both collapsed and expanded controls centered at the live Figma geometry. */
+.c1-dates__expand { line-height: 0; }
+.c1-dates__expand image, .c1-dates__expand-icon { line-height: 0; }
+.c1-month-calendar__collapse { width: 96rpx; height: 64rpx; border-radius: 32rpx; line-height: 0; }
+.c1-month-calendar__collapse-icon { width: 32rpx; height: 32rpx; flex: 0 0 32rpx; line-height: 0; }

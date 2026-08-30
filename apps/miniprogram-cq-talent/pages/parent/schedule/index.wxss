@@ -53,3 +53,7 @@
 .month-day__marker--multiple { width: 6rpx; height: 6rpx; background: #667085; }
 
 .week-nav { padding-right: 84rpx; }
+
+/* Keep the Figma expand control centered as a flex child instead of relying on text-line metrics. */
+.week-nav__expand { line-height: 0; }
+.week-nav__expand-icon { flex: 0 0 16rpx; line-height: 0; }

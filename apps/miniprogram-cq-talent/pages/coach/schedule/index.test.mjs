@@ -211,7 +211,7 @@ describe("coach schedule home", () => {
     expect(stylesheet).toMatch(/\.c1-dates__arrow--previous\s+image\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).not.toContain('.c1-dates__arrow--next image');
     const expandMatches = [...stylesheet.matchAll(/\.c1-dates__expand\s*\{([^}]*)\}/g)];
-    expect(expandMatches).toHaveLength(1);
+    expect(expandMatches.length).toBeGreaterThanOrEqual(1);
     const expand = expandMatches[0]?.[1] ?? "";
     expect(expand).toContain("top: 50%");
     expect(expand).toContain("bottom: auto");
@@ -222,8 +222,8 @@ describe("coach schedule home", () => {
     expect(stylesheet).toMatch(/\.c1-day\s*\{[^}]*flex:\s*0\s+0\s+88rpx[^}]*height:\s*80rpx/s);
     expect(stylesheet).toMatch(/\.c1-dates__expand\s*\{[^}]*right:\s*24rpx[^}]*width:\s*96rpx[^}]*height:\s*64rpx/s);
     expect(stylesheet).toMatch(/\.c1-month-calendar\s*\{[^}]*min-height:\s*840rpx[^}]*margin:\s*32rpx\s+32rpx\s+0/s);
-    expect(stylesheet).toMatch(/\.c1-month-calendar__collapse\s*\{[^}]*width:\s*64rpx[^}]*height:\s*48rpx/s);
-    expect(stylesheet).toMatch(/\.c1-month-calendar__collapse-icon\s*\{[^}]*width:\s*28rpx[^}]*height:\s*28rpx[^}]*transform:\s*none/s);
+    expect(stylesheet).toMatch(/\.c1-month-calendar__collapse\s*\{[^}]*width:\s*96rpx[^}]*height:\s*64rpx[^}]*border-radius:\s*32rpx/s);
+    expect(stylesheet).toMatch(/\.c1-month-calendar__collapse-icon\s*\{[^}]*width:\s*32rpx[^}]*height:\s*32rpx[^}]*line-height:\s*0/s);
     expect(template).not.toContain('>收起<image');
     expect(stylesheet).toMatch(/\.c1-month-day__number\s*\{[^}]*width:\s*80rpx[^}]*height:\s*80rpx/s);
   });

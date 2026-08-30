@@ -32,7 +32,7 @@ describe("role tabbar real-device icon contract", () => {
         expect(controller).toContain(`path: "${path}"`);
       }
     }
-    expect(controller.indexOf('key: "child"')).toBeLessThan(controller.indexOf('key: "discover"'));
+    expect(controller.indexOf('key: "discover"')).toBeLessThan(controller.indexOf('key: "child"'));
   });
 
   it("uses precomputed PNG icon paths for both active states", () => {
