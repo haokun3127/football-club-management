@@ -35,6 +35,7 @@ interface MatchPageData {
   hasMatchStatus: boolean;
   hasMatch: boolean;
   canAddEvent: boolean;
+  canEditMatch: boolean;
   periodChips: PeriodChip[];
   timeline: TimelineItem[];
   hasTimeline: boolean;
@@ -63,6 +64,7 @@ Page<MatchPageData>({
     hasMatchStatus: false,
     hasMatch: false,
     canAddEvent: false,
+    canEditMatch: false,
     periodChips: [],
     timeline: [],
     hasTimeline: false,
@@ -130,8 +132,9 @@ Page<MatchPageData>({
         hasScore: score,
         matchStatus,
         hasMatchStatus: Boolean(matchStatus),
-        hasMatch: true,
-        canAddEvent: true,
+         hasMatch: true,
+         canAddEvent: true,
+         canEditMatch: true,
         periodChips: toPeriodChips(),
         timeline,
         hasTimeline: timeline.length > 0,
@@ -164,6 +167,10 @@ Page<MatchPageData>({
     if (!this.data.eventId || !this.data.canAddEvent) return;
     openPage(`/pages/coach/match-event-add/index?eventId=${this.data.eventId}`);
   },
+  openMatchEdit() {
+    if (!this.data.eventId || !this.data.canEditMatch) return;
+    openPage(`/pages/coach/match-edit/index?eventId=${this.data.eventId}`);
+  },
   continueLocalDraft() {
     if (!this.data.eventId || !this.data.hasLocalDraftOverlay || this.data.localDraftNavigationLocked) return;
     this.setData({ localDraftNavigationLocked: true });
@@ -193,6 +200,7 @@ function emptyState(message: string): Omit<MatchPageData, "state"> {
     hasMatchStatus: false,
     hasMatch: false,
     canAddEvent: false,
+    canEditMatch: false,
     periodChips: [],
     timeline: [],
     hasTimeline: false,

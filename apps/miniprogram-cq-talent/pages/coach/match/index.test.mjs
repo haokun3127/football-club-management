@@ -117,6 +117,12 @@ describe("coach match detail", () => {
     expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/match-event-add/index?eventId=event-match-1");
   });
 
+  it("links the explicit edit action to the full-screen match editor", () => {
+    const page = createPageInstance({ eventId: "event-match-1", canEditMatch: true });
+    page.openMatchEdit();
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/match-edit/index?eventId=event-match-1");
+  });
+
   it("re-reads its exact event on show instead of accepting a local add-event payload", async () => {
     const page = createPageInstance({ eventId: "event-match-1", hasLoaded: true });
     await page.onShow();
@@ -191,8 +197,8 @@ describe("coach match detail", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"submit-bar"');
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
-    expect(template).not.toContain("编辑比赛");
-    expect(template).not.toContain("openMatchEdit");
+    expect(template).toContain("编辑比赛");
+    expect(template).toContain("openMatchEdit");
     expect(template).not.toContain("Phoenix");
     expect(template).not.toContain("Star team");
     expect(template).not.toContain("half-time");

@@ -6,7 +6,10 @@
 
     <block wx:if="{{state === 'ready' && hasMatch}}">
       <view class="match-hero">
-        <view class="match-hero__title">{{eventTitle}}</view>
+        <view class="match-hero__heading">
+          <view class="match-hero__title">{{eventTitle}}</view>
+          <view wx:if="{{canEditMatch}}" class="match-hero__edit" bindtap="openMatchEdit">编辑比赛</view>
+        </view>
         <view wx:if="{{hasTeamName || hasOpponentName}}" class="match-hero__teams">
           <view wx:if="{{hasTeamName}}" class="match-hero__team">{{teamName}}</view>
           <view wx:if="{{hasScore}}" class="match-hero__score">{{scoreLabel}}</view>
