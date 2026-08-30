@@ -1884,3 +1884,10 @@
 - 小程序 `pages/coach/event` 删除按时钟推导的训练内容进度及“进行中”状态胶囊；保留真实课程/出勤数据与可编辑训练内容摘要。训练卡排在快捷入口前，匹配新版 Figma 层级。
 - 出勤继续通过真实 `saveCoachAttendance` 保存，绿勾/灰首字头像可直接点按；页面展示字段 `displayName` 在 TypeScript 中预计算并限制四字，WXML 不调用数组或字符串方法。
 - 验证：定向 Vitest `14/14`、小程序 TypeScript `exit=0`、限定文件 `git diff --check` 通过；WeChatIDE MCP 精确打开 `pages/coach/event?id=event-cq-talent-secure-test-1-trn-0818` 并取得严格 `375×812` 截图 `C:\Users\ASUS\AppData\Local\Temp\cqtc-c2-runtime-final-20260830.png`。离线参考图 `docs/design/reference/figma/c2-activity-workbench.png` 已按新版在线稿覆盖。
+
+## 2026-08-30 Goal：比赛录入与事件链路复核
+
+- 在线 Figma C6.1 `93:827` 中的“换人”示例改为“乌龙球”，与当前真实 API 支持的 `own_goal` 对齐；离线参考图 `docs/design/reference/figma/c6-1-add-match-event.png` 已重新导出。
+- 真实教练会话复核了三条全屏路由：C6 比赛记录 `pages/coach/match?id=event-cq-talent-secure-test-1-completed-match`、C6.1 事件录入 `pages/coach/match-event-add?eventId=…`、编辑比赛 `pages/coach/match-edit?eventId=…`。C6 显示中文比赛时间线；C6.1 显示进球、助攻、扑救、抢断、犯规、黄牌、红牌、乌龙球和真实名单选择；编辑页显示对手、类型、状态和双方比分。
+- 本批把本机草稿提醒从遮罩弹窗收口为 C6 页内提示卡，符合“所有子页面全屏、不要弹窗”的产品要求；草稿仍只保留在当前设备，提示文案未把它误报为服务器保存。
+- 验证：C6/C6.1 定向 Vitest `18/18`、小程序 TypeScript `exit=0`、限定 `git diff --check` 通过；C6/C6.1/编辑比赛真实截图均严格 `375×812`，控制台错误筛选无命中。

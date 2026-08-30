@@ -81,3 +81,10 @@
 - 真实会话先暴露出一个缓存根因：启动页刷新了 `/app-clients/resolve`，但复用已有登录会话时没有把最新 `capabilities.match.eventTypes` 写回 session，导致页面错误进入“未配置事件类型”兜底态。已在小程序启动流程补上 session context 合并，并增加回归测试；重新走启动流程后真实页面得到 `进球/助攻/扑救/抢断` 四个后端允许类型。
 - Figma 示例的 `黄牌/红牌/换人/其他` 未由当前客户端能力返回，因此页面不硬编码这些选项；这是能力契约差异，不伪造配置。中文标签和真实名单均在 TypeScript 中预计算。
 - 控制台过滤 `error|exception|fail|undefined|route is not defined` 无命中；真实比赛详情请求返回 `200`，未使用 mock API。
+
+## 2026-08-30 当前权威修订
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:827` 的事件类型示例已将“换人”替换为“乌龙球”，因为乌龙球是当前真实写入契约支持的事件类型，而换人不在该契约中。离线图 `../../reference/figma/c6-1-add-match-event.png` 已同步覆盖。
+- 运行态事件类型继续只读取当前会话的 `capabilities.match.eventTypes`，不硬编码 Figma 芯片；2026-08-30 真实教练会话返回并渲染：进球、助攻、扑救、抢断、犯规、黄牌、红牌、乌龙球。
+- 录入页是独立全屏路由：从 C6 “添加事件”进入，选择球员、可选分钟和备注后调用真实 `createCoachMatchEvent`；C6 “编辑比赛”进入另一独立全屏页录入双方比分。两者均不使用弹窗。
+- 真实 `375×812` 运行证据：`C:\Users\ASUS\AppData\Local\Temp\cqtc-c6-1-runtime-20260830.png`；C6 时间线：`C:\Users\ASUS\AppData\Local\Temp\cqtc-c6-runtime-20260830.png`；编辑比赛：`C:\Users\ASUS\AppData\Local\Temp\cqtc-match-edit-runtime-20260830.png`。

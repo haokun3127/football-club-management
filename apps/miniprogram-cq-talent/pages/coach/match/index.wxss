@@ -212,104 +212,49 @@
   text-align: center;
 }
 
-.match-draft-mask {
-  position: fixed;
-  z-index: 10001;
-  inset: 0;
+.match-draft-notice {
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  padding: 0;
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.match-draft-modal {
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  width: 630rpx;
-  max-width: 100%;
-  gap: 40rpx;
-  padding: 48rpx;
-  border-radius: 40rpx;
-  background: #ffffff;
-  text-align: left;
-}
-
-.match-draft-modal__icon {
-  display: flex;
-  width: 128rpx;
-  height: 128rpx;
-  margin: 0;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: #ecfdf5;
-}
-
-.match-draft-modal__cloud-check {
-  width: 64rpx;
-  height: 64rpx;
-}
-
-.match-draft-modal__text {
-  display: flex;
-  flex-direction: column;
   gap: 16rpx;
-  width: 100%;
-}
-
-.match-draft-modal__title {
-  margin: 0;
-  color: #202124;
-  font-size: 36rpx;
-  font-weight: 700;
-  line-height: 44rpx;
-}
-
-.match-draft-modal__message {
-  margin: 0;
-  color: #667085;
-  font-size: 28rpx;
-  line-height: 34rpx;
-}
-
-.match-draft-modal__updated {
-  margin: 0;
-  color: #667085;
-  font-size: 24rpx;
-  line-height: 30rpx;
-}
-
-.match-draft-modal__actions {
-  display: flex;
-  gap: 24rpx;
-  width: 100%;
-  margin-top: 0;
-}
-
-.match-draft-modal__continue,
-.match-draft-modal__exit {
-  flex: 1;
-  display: flex;
-  height: 96rpx;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
+  padding: 20rpx 24rpx;
   border-radius: 24rpx;
-  font-size: 28rpx;
-  font-weight: 600;
-}
-
-.match-draft-modal__continue {
-  color: #202124;
-  border: 1rpx solid #e7eaf0;
   background: #ffffff;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, .05);
 }
 
-.match-draft-modal__exit {
-  color: #ffffff;
-  border: 0;
-  background: #a80f1b;
+.match-draft-notice__icon {
+  flex: 0 0 auto;
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.match-draft-notice__content {
+  min-width: 0;
+  flex: 1;
+}
+
+.match-draft-notice__title {
+  overflow: hidden;
+  color: #202124;
+  font-size: 25rpx;
+  font-weight: 700;
+  line-height: 32rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.match-draft-notice__meta {
+  margin-top: 4rpx;
+  color: #667085;
+  font-size: 21rpx;
+  line-height: 28rpx;
+}
+
+.match-draft-notice__action {
+  flex: 0 0 auto;
+  padding: 8rpx 0 8rpx 16rpx;
+  color: #a80f1b;
+  font-size: 24rpx;
+  font-weight: 700;
+  line-height: 32rpx;
 }

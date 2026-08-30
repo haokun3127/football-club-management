@@ -24,6 +24,15 @@
         </view>
       </view>
 
+      <view wx:if="{{hasLocalDraftNotice}}" class="match-draft-notice">
+        <image class="match-draft-notice__icon" src="/assets/icons/c6-2-cloud-check.svg" mode="aspectFit" />
+        <view class="match-draft-notice__content">
+          <view class="match-draft-notice__title">有未提交的比赛事件草稿</view>
+          <view class="match-draft-notice__meta">{{localDraftUpdatedAtLabel}}</view>
+        </view>
+        <view class="match-draft-notice__action" bindtap="continueLocalDraft">继续编辑</view>
+      </view>
+
       <view class="match-card">
         <view class="match-card__header">
           <view class="match-card__title">比赛事件</view>
@@ -45,23 +54,6 @@
       </view>
     </block>
   </view>
-
-  <block wx:if="{{hasLocalDraftOverlay}}">
-    <view class="match-draft-mask">
-      <view class="match-draft-modal">
-        <view class="match-draft-modal__icon"><image class="match-draft-modal__cloud-check" src="/assets/icons/c6-2-cloud-check.svg" mode="aspectFit" /></view>
-        <view class="match-draft-modal__text">
-          <view class="match-draft-modal__title">未提交草稿已保存</view>
-          <view class="match-draft-modal__message">这条未提交的比赛事件仅保存在当前设备</view>
-          <view class="match-draft-modal__updated">{{localDraftUpdatedAtLabel}}</view>
-        </view>
-        <view class="match-draft-modal__actions">
-          <view class="match-draft-modal__continue" bindtap="continueLocalDraft">继续编辑</view>
-          <view class="match-draft-modal__exit" bindtap="exitLocalDraft">退出</view>
-        </view>
-      </view>
-    </view>
-  </block>
 
   <role-tabbar role="coach" active="schedule" />
 </view>

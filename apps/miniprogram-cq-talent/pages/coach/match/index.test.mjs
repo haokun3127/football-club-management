@@ -131,7 +131,7 @@ describe("coach match detail", () => {
     expect(controller).not.toContain("getOpenerEventChannel");
   });
 
-  it("shows only a compatible local draft after real detail and capability checks, then bounds continue and exit", async () => {
+  it("shows only a compatible local draft after real detail and capability checks, then offers an in-page continuation", async () => {
     mocks.loadMatchEventDraft.mockReturnValue({
       eventId: "event-match-1",
       studentId: "student-1",
@@ -144,7 +144,7 @@ describe("coach match detail", () => {
 
     expect(page.data).toMatchObject({
       state: "ready",
-      hasLocalDraftOverlay: true,
+      hasLocalDraftNotice: true,
       localDraftUpdatedAtLabel: expect.stringContaining("2026"),
     });
 
@@ -152,12 +152,6 @@ describe("coach match detail", () => {
     page.continueLocalDraft();
     expect(mocks.openPage).toHaveBeenCalledTimes(1);
     expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/match-event-add/index?eventId=event-match-1");
-
-    const exitPage = createPageInstance({ eventId: "event-match-1", hasLocalDraftOverlay: true });
-    exitPage.exitLocalDraft();
-    exitPage.exitLocalDraft();
-    expect(globalThis.wx.navigateBack).toHaveBeenCalledTimes(1);
-    expect(globalThis.wx.navigateBack).toHaveBeenCalledWith({ delta: 1 });
   });
 
   it("hides missing or incompatible drafts and prevents a stale detail completion from replacing newer draft state", async () => {
@@ -169,7 +163,7 @@ describe("coach match detail", () => {
     });
     const incompatible = createPageInstance();
     await incompatible.onLoad({ id: "event-match-1" });
-    expect(incompatible.data.hasLocalDraftOverlay).toBe(false);
+    expect(incompatible.data.hasLocalDraftNotice).toBe(false);
 
     let resolveOlder;
     const olderRequest = new Promise((resolve) => { resolveOlder = resolve; });
@@ -189,7 +183,7 @@ describe("coach match detail", () => {
     resolveOlder({ ...detail, event: { ...detail.event, id: "event-stale", title: "Older match" } });
     await olderLoad;
 
-    expect(page.data).toMatchObject({ eventId: "event-match-1", eventTitle: "Real match title", hasLocalDraftOverlay: true });
+    expect(page.data).toMatchObject({ eventId: "event-match-1", eventTitle: "Real match title", hasLocalDraftNotice: true });
   });
 
   it("uses the local role tab bar and excludes legacy writes, tactical UI, Figma samples, and template helpers", () => {
@@ -204,8 +198,10 @@ describe("coach match detail", () => {
     expect(template).not.toContain("half-time");
     expect(template).not.toContain("submit-bar");
     expect(template).not.toContain("tactical");
-    expect(template).toContain("match-draft-mask");
+    expect(template).toContain("match-draft-notice");
     expect(template).toContain("localDraftUpdatedAtLabel");
+    expect(template).not.toContain("match-draft-mask");
+    expect(template).not.toContain("match-draft-modal");
     expect(template).not.toContain("pause-match");
     expect(template).not.toContain("end-match");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
@@ -225,21 +221,14 @@ describe("coach match detail", () => {
     expect(template).toContain('class="match-card__action match-card__action--outlined"');
     expect(template).toContain('bindtap="openMatchEventAdd"');
     expect(template).toContain('class="timeline__pill timeline__pill--{{item.tone}}"');
-    expect(template).toContain("未提交草稿已保存");
+    expect(template).toContain("有未提交的比赛事件草稿");
     expect(styles).toMatch(/\.match-page\s*\{[^}]*background:\s*#f6f7f9/s);
     expect(styles).toMatch(/\.match-hero\s*\{[^}]*padding:\s*40rpx/s);
     expect(styles).toMatch(/\.match-card__action\s*\{[^}]*border:\s*1rpx solid #a80f1b[^}]*border-radius:\s*8rpx/s);
-    expect(styles).toMatch(/\.match-draft-mask\s*\{[^}]*background:\s*rgba\(0, 0, 0, 0\.5\)/s);
-    expect(template).toContain('<image class="match-draft-modal__cloud-check" src="/assets/icons/c6-2-cloud-check.svg" mode="aspectFit" />');
-    expect(template).not.toContain('class="match-draft-modal__check"');
-    expect(styles).toMatch(/\.match-draft-mask\s*\{[^}]*padding:\s*0/s);
-    expect(styles).toMatch(/\.match-draft-modal\s*\{[^}]*display:\s*flex[^}]*flex-direction:\s*column/s);
-    expect(styles).toMatch(/\.match-draft-modal\s*\{[^}]*box-sizing:\s*border-box/s);
-    expect(styles).toMatch(/\.match-draft-modal\s*\{[^}]*gap:\s*40rpx/s);
-    expect(styles).toMatch(/\.match-draft-modal\s*\{[^}]*width:\s*630rpx[^}]*padding:\s*48rpx[^}]*text-align:\s*left/s);
-    expect(styles).toMatch(/\.match-draft-modal__icon\s*\{[^}]*width:\s*128rpx[^}]*height:\s*128rpx/s);
-    expect(styles).toMatch(/\.match-draft-modal__icon\s*\{[^}]*background:\s*#ecfdf5/s);
-    expect(styles).toMatch(/\.match-draft-modal__exit\s*\{[^}]*background:\s*#a80f1b/s);
+    expect(template).toContain('<image class="match-draft-notice__icon" src="/assets/icons/c6-2-cloud-check.svg" mode="aspectFit" />');
+    expect(styles).toMatch(/\.match-draft-notice\s*\{[^}]*display:\s*flex[^}]*align-items:\s*center/s);
+    expect(styles).toMatch(/\.match-draft-notice\s*\{[^}]*border-radius:\s*24rpx[^}]*background:\s*#ffffff/s);
+    expect(styles).toMatch(/\.match-draft-notice__action\s*\{[^}]*color:\s*#a80f1b/s);
     expect(template).not.toMatch(/\b(?:0|1|2|3|4|5):(?:0|1|2|3|4|5)\b/);
   });
 

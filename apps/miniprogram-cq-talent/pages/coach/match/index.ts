@@ -39,7 +39,7 @@ interface MatchPageData {
   periodChips: PeriodChip[];
   timeline: TimelineItem[];
   hasTimeline: boolean;
-  hasLocalDraftOverlay: boolean;
+  hasLocalDraftNotice: boolean;
   localDraftUpdatedAtLabel: string;
   localDraftNavigationLocked: boolean;
 }
@@ -68,7 +68,7 @@ Page<MatchPageData>({
     periodChips: [],
     timeline: [],
     hasTimeline: false,
-    hasLocalDraftOverlay: false,
+    hasLocalDraftNotice: false,
     localDraftUpdatedAtLabel: "",
     localDraftNavigationLocked: false,
   },
@@ -138,7 +138,7 @@ Page<MatchPageData>({
         periodChips: toPeriodChips(),
         timeline,
         hasTimeline: timeline.length > 0,
-        hasLocalDraftOverlay: Boolean(draft),
+        hasLocalDraftNotice: Boolean(draft),
         localDraftUpdatedAtLabel: draft ? formatLocalDraftUpdatedAt(draft.updatedAt) : "",
         localDraftNavigationLocked: false,
       });
@@ -172,14 +172,9 @@ Page<MatchPageData>({
     openPage(`/pages/coach/match-edit/index?eventId=${this.data.eventId}`);
   },
   continueLocalDraft() {
-    if (!this.data.eventId || !this.data.hasLocalDraftOverlay || this.data.localDraftNavigationLocked) return;
+    if (!this.data.eventId || !this.data.hasLocalDraftNotice || this.data.localDraftNavigationLocked) return;
     this.setData({ localDraftNavigationLocked: true });
     openPage(`/pages/coach/match-event-add/index?eventId=${this.data.eventId}`);
-  },
-  exitLocalDraft() {
-    if (!this.data.hasLocalDraftOverlay || this.data.localDraftNavigationLocked) return;
-    this.setData({ localDraftNavigationLocked: true });
-    wx.navigateBack({ delta: 1 });
   },
 });
 
@@ -204,7 +199,7 @@ function emptyState(message: string): Omit<MatchPageData, "state"> {
     periodChips: [],
     timeline: [],
     hasTimeline: false,
-    hasLocalDraftOverlay: false,
+    hasLocalDraftNotice: false,
     localDraftUpdatedAtLabel: "",
     localDraftNavigationLocked: false,
   };

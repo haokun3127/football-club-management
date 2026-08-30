@@ -1,6 +1,6 @@
 # Figma 设计稿离线参考图（375×812 PNG）
 
-基线导出自权威在线文件 `zZ6wKyOHKcO4UYXDd9jGwv`（2026-08-12，经 Figma MCP `get_screenshot` 原尺寸导出）；有单页更新时会按对应节点增量覆盖，C2 已于 2026-08-30 重新导出。
+基线导出自权威在线文件 `zZ6wKyOHKcO4UYXDd9jGwv`（2026-08-12，经 Figma MCP `get_screenshot` 原尺寸导出）；有单页更新时会按对应节点增量覆盖，C2 与 C6.1 已于 2026-08-30 重新导出。
 用途：无 Figma MCP 的环境（如 Claude Code 未配 Dev Mode MCP）直接读图比对。
 
 画板 id ↔ 路由 ↔ 在线实时查询映射见 `../specifications/figma-online-frame-map-2026-08-12.md`。
