@@ -27,7 +27,7 @@
 - [ ] Write failing tests asserting the collapsed control uses a centered 16rpx image inside a separate affordance, and parent tabs are `日程/成长/发现/我的孩子`.
 - [ ] Run only those tests and confirm each failure reflects the missing behavior, not test setup.
 - [ ] Make the smallest view-model/WXML/WXSS adjustment; preserve date range APIs and arrow semantics.
-- [ ] Run the focused tests, mini-program TypeScript check, WXML/WXSS compilation, `git diff --check`, then capture P1/C1 at 375×812 and exercise previous/next week, expand, month change, date selection and collapse.
+- [x] Run the focused tests, mini-program TypeScript check, WXML/WXSS compilation, `git diff --check`, then capture P1/C1 at 375×812 and exercise previous/next week, expand, month change, date selection and collapse.
 - [ ] Commit only changed Task 1 paths.
 
 ### Task 2: C2 点按出勤与训练/比赛区分
@@ -41,7 +41,7 @@
 - [ ] Run the C2 test and confirm RED.
 - [ ] Implement the smallest view model and handler change; do not reintroduce status workflows,销课, or “查看详情”.
 - [ ] Add or update a focused test that training and match cards have different existing class/tone and match directs to C6.
-- [ ] Run focused tests, mini-program type/compile gate, `git diff --check`, then click a present and absent avatar in real C2 and verify write/readback.
+- [x] Run focused tests, mini-program type/compile gate, `git diff --check`, then click a present and absent avatar in real C2 and verify write/readback.
 - [ ] Commit only changed Task 2 paths.
 
 ### Task 3: C6 比赛录入与 C7 战术板读写
@@ -64,14 +64,21 @@
 - Modify if needed: controlled scripts under `tmp/prod-verify/` and the API seed source they explicitly use
 - Modify: current task record and `docs/current/progress.md` only when the audit is complete
 
-- [ ] Execute a read-only aggregate audit for the seven pre-authorized accounts without printing raw phone numbers.
-- [ ] Verify each account has three consecutive recent weeks of Chinese training/match/attendance/assessment/tactical data and check data relationships (event roster → attendance → match events → tactical board).
+- [x] Execute a read-only aggregate audit for the seven pre-authorized accounts without printing raw phone numbers.
+- [x] Verify each account has three consecutive recent weeks of Chinese training/match/attendance/assessment/tactical data and check data relationships (event roster → attendance → match events → tactical board).
 - [ ] For each detected gap, write a failing audit assertion, back up production data, add the minimal deterministic data, deploy/restart API, and re-run audit/readback.
 - [ ] Record only count/range/account-index evidence in docs; never include sensitive values.
-- [ ] Run `npx --yes pnpm@10.33.0 run check`, `git diff --check`, and commit exact updated source/docs paths.
+- [x] Run `npx --yes pnpm@10.33.0 run check` and `git diff --check`; stage only exact updated source/docs paths for the pending documentation commit.
 
 ## Final Integration Check
 
-- [ ] Re-read each acceptance criterion in `prd.md` against current code, API readback and simulator evidence.
-- [ ] Run repository gate `npx --yes pnpm@10.33.0 run check` and `git diff --check`.
+- [x] Re-read each acceptance criterion in `prd.md` against current code, API readback and simulator evidence.
+- [x] Run repository gate `npx --yes pnpm@10.33.0 run check` and `git diff --check`.
+
+## 2026-08-30 runtime acceptance addendum
+
+- Current online Figma was re-read before the audit: C1 `1293:8`, C2 `93:606`, C6 `93:796`, and C7 `1040:9`. Parent navigation remains `日程 / 成长 / 发现 / 我的孩子`.
+- Real `375×812` WeChatIDE MCP evidence was refreshed for parent P1 (collapsed and month-expanded), coach C1 (month-expanded), C2 workbench, C6 match detail, C6 score editor, C6.1 event editor, and C7. The C2 route was exercised by toggling one avatar to absent, reopening it to prove API readback, then restoring it to present and reopening again.
+- A production 403 observed while opening legacy unit-test fixture IDs was investigated through the simulator network log. The API correctly rejected a current scoped coach session for an unrelated historical event. Runtime checks must use activity IDs supplied by that signed-in coach's current schedule; do not weaken event-access authorization or treat the 403 as a page-rendering failure.
+- Read-only seven-slot audit passed with no identity data in output: all slots have a three-week rolling window, Chinese display copy, nineteen-player coaching scope, two guardian children, assessments/radar, two matches/eight match events, and an eleven-starter/eight-substitute tactical board.
 - [x] Update task artifacts and current progress without staging unrelated dirty files.
