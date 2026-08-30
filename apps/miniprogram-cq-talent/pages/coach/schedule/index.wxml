@@ -77,7 +77,7 @@
           <view class="acard__accent" style="background:{{item.typeColor}}"></view>
           <view class="acard__time"><view class="acard__start">{{item.startTime}}</view><view wx:if="{{item.durationText}}" class="acard__dur">{{item.durationText}}</view></view>
           <view class="acard__content">
-            <view class="acard__head"><view class="acard__title">{{item.title}}</view><view wx:if="{{item.hasCoachName}}" class="acard__coach">{{item.coachName}}</view></view>
+            <view class="acard__head"><view class="acard__type acard__type--{{item.typeTone}}">{{item.typeLabel}}</view><view class="acard__title">{{item.title}}</view><view wx:if="{{item.hasCoachName}}" class="acard__coach">{{item.coachName}}</view></view>
             <view wx:if="{{item.hasLocationDetail}}" class="acard__meta">{{item.locationLabel}}</view>
             <view wx:if="{{item.hasNextAction}}" class="acard__action" data-id="{{item.id}}" data-action="{{item.nextAction}}" catchtap="openTask">{{item.nextActionLabel}}</view>
           </view>

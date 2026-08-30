@@ -117,6 +117,8 @@ describe("coach schedule home", () => {
       visibleEvents: [{
         id: "event-training-1",
         coachName: "Coach Chen",
+        typeLabel: "训练",
+        typeTone: "training",
         hasCoachName: true,
         hasTeamName: true,
         hasVenue: true,
@@ -328,5 +330,26 @@ describe("coach schedule home", () => {
     expect(template).toContain('<image class="acard__chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />');
     expect(template).not.toContain('<view class="acard__chevron">›</view>');
     expect(stylesheet).toMatch(/\.acard__chevron\s*\{[^}]*width:\s*40rpx[^}]*height:\s*40rpx[^}]*flex:\s*0\s+0\s+40rpx/s);
+  });
+
+  it("keeps training and match previews distinguishable with precomputed Chinese type labels", async () => {
+    mocks.getCoachHome.mockResolvedValue({
+      ...home,
+      events: [
+        home.events[0],
+        { ...home.events[0], id: "event-match-1", type: "match", title: "周末联赛" },
+      ],
+    });
+    const page = createPageInstance({ date: "2026-08-13", selectedDate: "2026-08-13", viewMode: "week" });
+
+    await page.load();
+
+    expect(page.data.visibleEvents).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "event-training-1", typeLabel: "训练", typeTone: "training", typeColor: "#a80f1b" }),
+      expect.objectContaining({ id: "event-match-1", typeLabel: "比赛", typeTone: "match", typeColor: "#1976d2" }),
+    ]));
+    expect(template).toContain('class="acard__type acard__type--{{item.typeTone}}"');
+    expect(stylesheet).toContain(".acard__type--training");
+    expect(stylesheet).toContain(".acard__type--match");
   });
 });
