@@ -194,3 +194,65 @@ return refreshCanonicalDemoRows(database, manifest, now);
 ```
 
 The importer distinguishes a complete scope from a current, presentation-ready one.
+
+## Scenario: Legacy secure-demo venue repair
+
+### 1. Scope / Trigger
+
+- Trigger: a legacy calendar activity created for a secure Chongqing Talent demo slot has no `location_id`, causing the BFF to omit `venue` and the mini-program to display the missing-location fallback.
+- This repair is limited to secure-demo activity IDs and the owning slot's exact team and coach. It must not fill missing locations for normal club activities.
+
+### 2. Signatures
+
+- `hasCurrentDemoData(database, manifest, now)`
+- `importSecureCqTalentTestAccounts(database, { phones, now })`
+- `backfillLegacyDemoActivityVenues(database, account, now)`
+
+### 3. Contracts
+
+- A `NULL location_id` makes an otherwise-complete secure slot stale, so the confirmed importer returns `refreshed` rather than `already_present`.
+- Eligible legacy activities match all of: `club_id`, `event-cq-talent-secure-test-<slot>-%` ID namespace, `primary_team_id`, `owner_coach_id`, and `location_id IS NULL`.
+- Training and other eligible activities receive `venue-cq-talent-sport-uni`; matches receive `venue-cq-talent-jiulongpo`. The seeded venue catalogue resolves those IDs to Chinese venue names at the BFF boundary.
+- The repair never creates a venue, modifies a non-null location, or broadens to another team, coach, club, or ID namespace.
+
+### 4. Validation & Error Matrix
+
+| Condition | Required behavior |
+| --- | --- |
+| Canonical activities and eligible legacy activity all have locations | Import returns `already_present`; no rows change. |
+| Eligible legacy activity has `NULL location_id` | Import returns `refreshed` and fills the type-appropriate existing venue ID. |
+| Activity has the secure-looking name but another team or coach | Leave it untouched. |
+| Normal-club activity has `NULL location_id` | Leave it untouched. |
+
+### 5. Good / Base / Bad Cases
+
+- Good: an old secure training record gets the existing indoor training venue and appears with its Chinese venue name in the coach workbench.
+- Base: current canonical activities retain their configured location IDs unchanged.
+- Bad: `UPDATE calendar_events SET location_id = ... WHERE location_id IS NULL`; this would modify real club data outside the secure operation.
+
+### 6. Tests Required
+
+- Regression test inserts one matching legacy secure activity and one unrelated team's missing-location activity, reruns the importer, and asserts only the matching activity changes.
+- Existing BFF test continues to assert that the three controlled venue IDs resolve to Chinese names.
+- Production audit reports only aggregate `allActivitiesHaveVenue` and `venueNamesChinese` booleans; it must not print phones, tokens, or database paths.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+database.prepare("UPDATE calendar_events SET location_id = ? WHERE location_id IS NULL").run(venueId);
+```
+
+#### Correct
+
+```ts
+database.prepare(`
+  UPDATE calendar_events
+  SET location_id = ?
+  WHERE club_id = ? AND id LIKE ? AND primary_team_id = ?
+    AND owner_coach_id = ? AND location_id IS NULL
+`).run(venueId, clubId, namespace, account.teamId, account.coachId);
+```
+
+The exact ownership predicates keep a demo-data repair from modifying ordinary club records.

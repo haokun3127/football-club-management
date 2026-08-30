@@ -411,6 +411,7 @@ function hasCurrentDemoData(
     const labels = demoLabels(account);
     const events = buildDemoEvents(account, now);
     if (hasSupersededSettlementLedgerRows(database, account)) return false;
+    if (hasLegacyDemoActivitiesMissingVenue(database, account)) return false;
     const storedEvents = database.prepare(`
       SELECT id, type, title, starts_at, ends_at, location_id, status, notes
       FROM calendar_events
@@ -585,6 +586,7 @@ function ensureDemoData(
       "id, club_id, type, title, starts_at, ends_at, timezone, location_id, primary_team_id, owner_coach_id, status, notes, created_at, updated_at",
       [event.id, clubId, event.type, event.title, event.startsAt, event.endsAt, "Asia/Shanghai", event.locationId, account.teamId, account.coachId, event.status, event.notes, now, now]);
   });
+  backfillLegacyDemoActivityVenues(database, account, now);
 
   account.studentIds.forEach((studentId, index) => {
     upsertDemoRow(database, "student_profiles",
@@ -697,6 +699,42 @@ function ensureDemoData(
         [records.communicationLogIds[index * 2 + entry]!, clubId, studentId, shiftIso(now, -7 + entry * 3, 0), "wechat", entry === 0 ? "training_feedback" : "follow_up", labels.parentName, account.userId, entry === 0 ? "已发送本周训练反馈。" : "已确认下次训练跟进。", shiftIso(now, 7 + entry, 0), now, now]);
     });
   });
+}
+
+function hasLegacyDemoActivitiesMissingVenue(
+  database: DatabaseSync,
+  account: SecureCqTalentTestAccountManifestEntry,
+): boolean {
+  return Boolean(database.prepare(`
+    SELECT 1
+    FROM calendar_events
+    WHERE club_id = ?
+      AND id LIKE ?
+      AND primary_team_id = ?
+      AND owner_coach_id = ?
+      AND location_id IS NULL
+    LIMIT 1
+  `).get(clubId, `event-cq-talent-secure-test-${account.slot}-%`, account.teamId, account.coachId));
+}
+
+function backfillLegacyDemoActivityVenues(
+  database: DatabaseSync,
+  account: SecureCqTalentTestAccountManifestEntry,
+  now: string,
+): void {
+  database.prepare(`
+    UPDATE calendar_events
+    SET location_id = CASE type
+      WHEN 'match' THEN 'venue-cq-talent-jiulongpo'
+      ELSE 'venue-cq-talent-sport-uni'
+    END,
+      updated_at = ?
+    WHERE club_id = ?
+      AND id LIKE ?
+      AND primary_team_id = ?
+      AND owner_coach_id = ?
+      AND location_id IS NULL
+  `).run(now, clubId, `event-cq-talent-secure-test-${account.slot}-%`, account.teamId, account.coachId);
 }
 
 type DemoEvent = {

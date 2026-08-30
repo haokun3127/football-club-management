@@ -455,6 +455,66 @@ describe("secure Chongqing Talent test-account operation", () => {
     }
   }, FILE_DB_TIMEOUT);
 
+  it("backfills venues for legacy activities owned by a secure demo team without touching another team", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+
+    try {
+      const now = "2026-08-30T08:00:00.000Z";
+      const imported = importSecureCqTalentTestAccounts(persistence.database, { phones: runtimePhones, now });
+      const account = imported.manifest.accountIds[0]!;
+
+      persistence.database.prepare(`
+        INSERT INTO calendar_events (
+          id, club_id, type, title, starts_at, ends_at, timezone, location_id,
+          primary_team_id, owner_coach_id, status, notes, created_at, updated_at
+        ) VALUES (?, ?, 'training', ?, ?, ?, 'Asia/Shanghai', NULL, ?, ?, 'completed', ?, ?, ?)
+      `).run(
+        "event-cq-talent-secure-test-1-legacy-venue-gap",
+        "club-chongqing-talent",
+        "历史专项训练",
+        "2026-08-18T10:00:00.000Z",
+        "2026-08-18T12:00:00.000Z",
+        account.teamId,
+        account.coachId,
+        "早期测试记录",
+        now,
+        now,
+      );
+      persistence.database.prepare(`
+        INSERT INTO teams (id, club_id, name, age_group, level, default_coach_id, status, created_at, updated_at)
+        VALUES (?, ?, ?, 'U10', 'development', NULL, 'active', ?, ?)
+      `).run("team-unrelated-venue-gap", "club-chongqing-talent", "无关队伍", now, now);
+      persistence.database.prepare(`
+        INSERT INTO calendar_events (
+          id, club_id, type, title, starts_at, ends_at, timezone, location_id,
+          primary_team_id, owner_coach_id, status, notes, created_at, updated_at
+        ) VALUES (?, ?, 'training', ?, ?, ?, 'Asia/Shanghai', NULL, ?, NULL, 'completed', ?, ?, ?)
+      `).run(
+        "event-unrelated-venue-gap",
+        "club-chongqing-talent",
+        "无关历史训练",
+        "2026-08-18T10:00:00.000Z",
+        "2026-08-18T12:00:00.000Z",
+        "team-unrelated-venue-gap",
+        "不属于测试账号的数据",
+        now,
+        now,
+      );
+
+      const refreshed = importSecureCqTalentTestAccounts(persistence.database, { phones: runtimePhones, now });
+
+      expect(refreshed.status).toBe("refreshed");
+      expect(persistence.database.prepare("SELECT location_id FROM calendar_events WHERE id = ?").get(
+        "event-cq-talent-secure-test-1-legacy-venue-gap",
+      )).toEqual({ location_id: "venue-cq-talent-sport-uni" });
+      expect(persistence.database.prepare("SELECT location_id FROM calendar_events WHERE id = ?").get(
+        "event-unrelated-venue-gap",
+      )).toEqual({ location_id: null });
+    } finally {
+      persistence.database.close();
+    }
+  }, FILE_DB_TIMEOUT);
+
   it("refreshes stale canonical match-event display copy without waiting for the calendar window to move", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
 
