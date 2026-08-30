@@ -5,7 +5,7 @@ import { openPage, openTab } from "../../../utils/navigation";
 import { activityStatus, formatCalendarDate, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachHome, CoachTask, CoachTaskAction, LoadState, ScheduleEvent } from "../../../utils/types";
 
-const WEEK_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+const WEEK_LABELS = ["日", "一", "二", "三", "四", "五", "六"];
 const COACH_SELECTED_TEAM_KEY = "coach-selected-team";
 const initialDate = currentLocalDate();
 

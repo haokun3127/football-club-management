@@ -127,8 +127,8 @@ describe("coach schedule home", () => {
         nextActionLabel: "Record attendance",
       }],
     });
-    expect(page.data.dayStrip.map((day) => day.weekLabel)).toEqual(["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]);
-    expect(page.data.collapsedDayStrip.map((day) => day.weekLabel)).toEqual(["MON", "TUE", "WED", "THU", "FRI", "SAT"]);
+    expect(page.data.dayStrip.map((day) => day.weekLabel)).toEqual(["一", "二", "三", "四", "五", "六", "日"]);
+    expect(page.data.collapsedDayStrip.map((day) => day.weekLabel)).toEqual(["一", "二", "三", "四", "五", "六"]);
   });
 
   it("keeps empty and failed coach-home loads honest", async () => {
@@ -232,6 +232,11 @@ describe("coach schedule home", () => {
     expect(stylesheet).toMatch(/\.c1-month-calendar__collapse-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx[^}]*line-height:\s*0/s);
     expect(template).not.toContain('>收起<image');
     expect(stylesheet).toMatch(/\.c1-month-day__number\s*\{[^}]*width:\s*80rpx[^}]*height:\s*80rpx/s);
+    expect(template).toContain('class="c1-month-calendar__legend"');
+    expect(template).toContain('绿色=训练');
+    expect(template).toContain('蓝色=比赛');
+    expect(stylesheet).toMatch(/\.c1-month-day__marker--match\s*\{[^}]*background:\s*#1976d2/s);
+    expect(stylesheet).toMatch(/\.c1-month-calendar__grid\s*\{[^}]*grid-auto-rows:\s*88rpx/s);
   });
 
   it("renders the live C1 team selector before the hero and removes the legacy summary rail", async () => {

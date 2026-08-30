@@ -27,6 +27,10 @@
           </view>
         </view>
       </view>
+      <view class="c1-month-calendar__legend">
+        <view class="c1-month-calendar__legend-item"><view class="c1-month-calendar__legend-dot c1-month-calendar__legend-dot--training"></view><text>绿色=训练</text></view>
+        <view class="c1-month-calendar__legend-item"><view class="c1-month-calendar__legend-dot c1-month-calendar__legend-dot--match"></view><text>蓝色=比赛</text></view>
+      </view>
     </view>
   </block>
   <view wx:else class="c1-dates">
