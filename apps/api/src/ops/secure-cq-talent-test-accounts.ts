@@ -711,10 +711,9 @@ function hasLegacyDemoActivitiesMissingVenue(
     WHERE club_id = ?
       AND id LIKE ?
       AND primary_team_id = ?
-      AND owner_coach_id = ?
       AND location_id IS NULL
     LIMIT 1
-  `).get(clubId, `event-cq-talent-secure-test-${account.slot}-%`, account.teamId, account.coachId));
+  `).get(clubId, `event-cq-talent-secure-test-${account.slot}-%`, account.teamId));
 }
 
 function backfillLegacyDemoActivityVenues(
@@ -732,9 +731,8 @@ function backfillLegacyDemoActivityVenues(
     WHERE club_id = ?
       AND id LIKE ?
       AND primary_team_id = ?
-      AND owner_coach_id = ?
       AND location_id IS NULL
-  `).run(now, clubId, `event-cq-talent-secure-test-${account.slot}-%`, account.teamId, account.coachId);
+  `).run(now, clubId, `event-cq-talent-secure-test-${account.slot}-%`, account.teamId);
 }
 
 type DemoEvent = {

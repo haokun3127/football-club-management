@@ -455,7 +455,7 @@ describe("secure Chongqing Talent test-account operation", () => {
     }
   }, FILE_DB_TIMEOUT);
 
-  it("backfills venues for legacy activities owned by a secure demo team without touching another team", async () => {
+  it("backfills venues for legacy activities scoped to a secure demo team without touching another team", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
 
     try {
@@ -467,7 +467,7 @@ describe("secure Chongqing Talent test-account operation", () => {
         INSERT INTO calendar_events (
           id, club_id, type, title, starts_at, ends_at, timezone, location_id,
           primary_team_id, owner_coach_id, status, notes, created_at, updated_at
-        ) VALUES (?, ?, 'training', ?, ?, ?, 'Asia/Shanghai', NULL, ?, ?, 'completed', ?, ?, ?)
+        ) VALUES (?, ?, 'training', ?, ?, ?, 'Asia/Shanghai', NULL, ?, NULL, 'completed', ?, ?, ?)
       `).run(
         "event-cq-talent-secure-test-1-legacy-venue-gap",
         "club-chongqing-talent",
@@ -475,7 +475,6 @@ describe("secure Chongqing Talent test-account operation", () => {
         "2026-08-18T10:00:00.000Z",
         "2026-08-18T12:00:00.000Z",
         account.teamId,
-        account.coachId,
         "早期测试记录",
         now,
         now,
