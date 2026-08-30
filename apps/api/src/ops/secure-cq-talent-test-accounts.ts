@@ -618,9 +618,10 @@ function ensureDemoData(
     });
   });
   account.studentIds.forEach((studentId, index) => {
+    const eventType = ["goal", "assist", "foul", "yellow_card", "own_goal", "save", "tackle", "goal"][index]!;
     upsertDemoRow(database, "match_events",
       "id, club_id, match_id, type, student_id, minute, linked_metric_id, note, created_at, updated_at",
-      [records.matchEventIds[index]!, clubId, records.matchIds[0]!, ["goal", "assist", "interception", "save"][index % 4]!, studentId, 8 + index * 7, assessmentCatalog.radarMetrics[index]!.metricId, "比赛关键事件记录", now, now]);
+      [records.matchEventIds[index]!, clubId, records.matchIds[0]!, eventType, studentId, 8 + index * 7, eventType === "foul" || eventType === "yellow_card" || eventType === "own_goal" ? null : assessmentCatalog.radarMetrics[index]!.metricId, "比赛关键事件记录", now, now]);
   });
 
   const tacticalPositions = [
@@ -687,6 +688,16 @@ const demoPlayerNames = [
   "陈思远",
 ] as const;
 
+const demoIdentityProfiles = [
+  { name: "罗志炫", teamName: "U10精英队", completedOpponent: "山城少年足球队", scheduledOpponent: "两江青训足球队" },
+  { name: "骆啸宇", teamName: "U11精英队", completedOpponent: "渝北青训队", scheduledOpponent: "江北少年足球队" },
+  { name: "郭飞", teamName: "U12精英队", completedOpponent: "南岸青少年队", scheduledOpponent: "九龙坡训练队" },
+  { name: "刘锐", teamName: "U10发展队", completedOpponent: "巴南少年足球队", scheduledOpponent: "沙坪坝青训队" },
+  { name: "吴文静", teamName: "U11发展队", completedOpponent: "大渡口少年队", scheduledOpponent: "渝中校园队" },
+  { name: "唐宇婧", teamName: "U12发展队", completedOpponent: "北碚青训队", scheduledOpponent: "两江新区少年队" },
+  { name: "李佳新", teamName: "U9精英队", completedOpponent: "高新少年足球队", scheduledOpponent: "璧山青训队" },
+] as const;
+
 type DemoLabels = {
   accountName: string;
   parentName: string;
@@ -698,15 +709,15 @@ type DemoLabels = {
 };
 
 function demoLabels(account: SecureCqTalentTestAccountManifestEntry): DemoLabels {
-  const suffix = "第" + account.slot + "组";
+  const profile = demoIdentityProfiles[account.slot - 1] ?? demoIdentityProfiles[0];
   return {
-    accountName: "演示测试账号" + suffix,
-    parentName: "测试家长" + suffix,
-    coachName: "测试教练" + suffix,
-    teamName: "重庆天才演示球队" + suffix,
+    accountName: profile.name,
+    parentName: profile.name,
+    coachName: profile.name,
+    teamName: profile.teamName,
     playerNames: account.studentIds.map((_, index) => demoPlayerNames[index]!),
-    completedOpponent: "山城少年足球队",
-    scheduledOpponent: "两江青训足球队",
+    completedOpponent: profile.completedOpponent,
+    scheduledOpponent: profile.scheduledOpponent,
   };
 }
 

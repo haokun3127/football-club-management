@@ -252,6 +252,12 @@ describe("secure Chongqing Talent test-account operation", () => {
       expect(countWhere(persistence.database, "metric_lineages", "id LIKE 'metric-lineage-cq-talent-secure-test-1-%'")).toBe(64);
       expect(countWhere(persistence.database, "matches", "event_id LIKE 'event-cq-talent-secure-test-1%'")).toBe(2);
       expect(countWhere(persistence.database, "match_events", "id LIKE 'match-event-cq-talent-secure-test-1-%'")).toBe(8);
+      const foulEvent = persistence.database.prepare(`
+        SELECT type, linked_metric_id AS linkedMetricId
+        FROM match_events
+        WHERE id = ?
+      `).get("match-event-cq-talent-secure-test-1-3") as { type: string; linkedMetricId: string | null };
+      expect(foulEvent).toEqual({ type: "foul", linkedMetricId: null });
       expect(countWhere(persistence.database, "tactical_boards", "event_id LIKE 'event-cq-talent-secure-test-1%'")).toBe(1);
       expect(countForIds(persistence.database, "insurance_policies", "student_id", account.studentIds.slice(0, 2))).toBe(2);
       expect(countForIds(persistence.database, "private_lesson_requests", "student_id", account.studentIds.slice(0, 2))).toBe(2);
@@ -417,6 +423,11 @@ describe("secure Chongqing Talent test-account operation", () => {
         "private-lesson-cq-talent-secure-test-1-2",
       ) as Array<{ value: string }>;
       expect(displayValues.map((row) => row.value).join("\n")).not.toMatch(/[A-Za-z]{3,}/);
+      expect(displayValues.map((row) => row.value)).toEqual(expect.arrayContaining([
+        "罗志炫",
+        "U10精英队",
+        "山城少年足球队",
+      ]));
     } finally {
       persistence.database.close();
     }
