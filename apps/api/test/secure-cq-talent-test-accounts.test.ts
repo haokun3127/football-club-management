@@ -394,7 +394,7 @@ describe("secure Chongqing Talent test-account operation", () => {
       expect(refreshed.status).toBe("refreshed");
 
       const events = persistence.database.prepare(`
-        SELECT title, notes, starts_at
+        SELECT title, notes, starts_at, location_id
         FROM calendar_events
         WHERE id IN (?, ?, ?, ?, ?)
         ORDER BY starts_at
@@ -404,7 +404,7 @@ describe("secure Chongqing Talent test-account operation", () => {
         "event-cq-talent-secure-test-1-completed-match",
         "event-cq-talent-secure-test-1-future-training",
         "event-cq-talent-secure-test-1-scheduled-match",
-      ) as Array<{ title: string; notes: string; starts_at: string }>;
+      ) as Array<{ title: string; notes: string; starts_at: string; location_id: string | null }>;
       const weekStarts = events.map((event) => {
         const date = new Date(event.starts_at);
         date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7));
@@ -417,6 +417,12 @@ describe("secure Chongqing Talent test-account operation", () => {
         "2026-08-24",
       ]));
       expect(events.map((event) => event.title + event.notes).join("\n")).not.toMatch(/[A-Za-z]{3,}/);
+      expect(events.map((event) => event.location_id)).toEqual(expect.arrayContaining([
+        "venue-cq-talent-jiulongpo",
+        "venue-cq-talent-sport-uni",
+        "venue-cq-talent-nanan",
+      ]));
+      expect(events.every((event) => Boolean(event.location_id))).toBe(true);
 
       const displayValues = persistence.database.prepare(`
         SELECT display_name AS value FROM user_accounts WHERE id = ?
@@ -666,7 +672,13 @@ describe("secure Chongqing Talent test-account operation", () => {
         headers: { authorization: "Bearer " + coachToken },
       });
       expect(coachHome.statusCode).toBe(200);
-      expect((coachHome.json() as { workbench: { events: unknown[] } }).workbench.events).toHaveLength(8);
+      const coachHomeBody = coachHome.json() as { workbench: { events: Array<{ venue?: string }> } };
+      expect(coachHomeBody.workbench.events).toHaveLength(8);
+      expect(coachHomeBody.workbench.events.map((event) => event.venue)).toEqual(expect.arrayContaining([
+        "九龙坡足球公园",
+        "重庆体育学院训练馆",
+        "南岸足球公园",
+      ]));
 
       const scheduledMatchId = "event-cq-talent-secure-test-" + first.slot + "-scheduled-match";
       const match = await app.inject({

@@ -1125,7 +1125,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         clubId: request.params.clubId,
         client: summarizeClient(client),
         studentId: request.params.studentId,
-        events,
+        events: await withVenueNames(context, request.params.clubId, events),
       };
     },
   );
@@ -1298,7 +1298,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         clubId: request.params.clubId,
         client: summarizeClient(client),
         role: "coach",
-        event,
+        event: (await withVenueNames(context, request.params.clubId, [event]))[0] ?? event,
         rosterContext: {
           participants: event.participants ?? [],
           students: workbenchEvent?.students ?? [],
@@ -1621,7 +1621,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         client: summarizeClient(client),
         role: "parent",
         children: children.map(summarizeStudent),
-        events: sortEvents([...eventsById.values()]),
+        events: await withVenueNames(context, request.params.clubId, sortEvents([...eventsById.values()])),
       };
     },
   );
@@ -1851,7 +1851,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
           coachId,
           coachName: coachProfile?.name ?? null,
           teams: teamNames,
-          events,
+          events: await withVenueNames(context, request.params.clubId, events),
           tasks,
           summary: {
             total: events.length,
@@ -3104,6 +3104,20 @@ function sortEvents(events: unknown[]): AppEventDetail[] {
   return (events as AppEventDetail[])
     .filter((event) => event.timeRange?.startsAt && event.timeRange?.endsAt)
     .sort((left, right) => Date.parse(left.timeRange.startsAt) - Date.parse(right.timeRange.startsAt));
+}
+
+async function withVenueNames(
+  context: RouteContext,
+  clubId: string,
+  events: AppEventDetail[],
+): Promise<Array<AppEventDetail & { venue?: string }>> {
+  const venues = await context.store.listVenues(clubId);
+  const venueNameById = new Map(venues.map((venue) => [venue.id, venue.name]));
+  return events.map((event) => {
+    const locationId = typeof event.locationId === "string" ? event.locationId : "";
+    const venue = venueNameById.get(locationId);
+    return venue ? { ...event, venue } : event;
+  });
 }
 
 type StudentTrainingStats = {

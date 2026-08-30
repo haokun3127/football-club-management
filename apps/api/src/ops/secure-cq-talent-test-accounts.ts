@@ -404,7 +404,7 @@ function hasCurrentDemoData(
     const events = buildDemoEvents(account, now);
     if (hasSupersededSettlementLedgerRows(database, account)) return false;
     const storedEvents = database.prepare(`
-      SELECT id, type, title, starts_at, ends_at, status, notes
+      SELECT id, type, title, starts_at, ends_at, location_id, status, notes
       FROM calendar_events
       WHERE club_id = ? AND id IN (${events.map(() => "?").join(", ")})
     `).all(clubId, ...events.map((event) => event.id)) as Array<{
@@ -413,6 +413,7 @@ function hasCurrentDemoData(
       title: string;
       starts_at: string;
       ends_at: string;
+      location_id: string | null;
       status: string;
       notes: string | null;
     }>;
@@ -424,6 +425,7 @@ function hasCurrentDemoData(
         && stored.title === event.title
         && stored.starts_at === event.startsAt
         && stored.ends_at === event.endsAt
+        && stored.location_id === event.locationId
         && stored.status === event.status
         && stored.notes === event.notes;
     });
@@ -505,13 +507,14 @@ function insertAccount(
     "INSERT INTO teams (id, club_id, name, age_group, level, default_coach_id, status, created_at, updated_at) VALUES (?, ?, ?, 'U10', 'development', ?, 'active', ?, ?)",
   ).run(account.teamId, clubId, labels.teamName, account.coachId, now, now);
   database.prepare(
-    "INSERT INTO calendar_events (id, club_id, type, title, starts_at, ends_at, timezone, primary_team_id, owner_coach_id, status, created_at, updated_at) VALUES (?, ?, 'training', ?, ?, ?, 'Asia/Shanghai', ?, ?, 'scheduled', ?, ?)",
+    "INSERT INTO calendar_events (id, club_id, type, title, starts_at, ends_at, timezone, location_id, primary_team_id, owner_coach_id, status, created_at, updated_at) VALUES (?, ?, 'training', ?, ?, ?, 'Asia/Shanghai', ?, ?, ?, 'scheduled', ?, ?)",
   ).run(
     account.eventId,
     clubId,
     "本周技术训练",
     shiftIso(now, 0, 2),
     shiftIso(now, 0, 4),
+    "venue-cq-talent-jiulongpo",
     account.teamId,
     account.coachId,
     now,
@@ -554,11 +557,12 @@ function ensureDemoData(
   removeSupersededSettlementLedgerRows(database, account);
 
   database.prepare(
-    "UPDATE calendar_events SET title = ?, starts_at = ?, ends_at = ?, status = ?, notes = ?, updated_at = ? WHERE id = ? AND club_id = ? AND primary_team_id = ? AND owner_coach_id = ?",
+    "UPDATE calendar_events SET title = ?, starts_at = ?, ends_at = ?, location_id = ?, status = ?, notes = ?, updated_at = ? WHERE id = ? AND club_id = ? AND primary_team_id = ? AND owner_coach_id = ?",
   ).run(
     events[0]!.title,
     events[0]!.startsAt,
     events[0]!.endsAt,
+    events[0]!.locationId,
     events[0]!.status,
     events[0]!.notes,
     now,
@@ -570,8 +574,8 @@ function ensureDemoData(
 
   events.slice(1).forEach((event) => {
     upsertDemoRow(database, "calendar_events",
-      "id, club_id, type, title, starts_at, ends_at, timezone, primary_team_id, owner_coach_id, status, notes, created_at, updated_at",
-      [event.id, clubId, event.type, event.title, event.startsAt, event.endsAt, "Asia/Shanghai", account.teamId, account.coachId, event.status, event.notes, now, now]);
+      "id, club_id, type, title, starts_at, ends_at, timezone, location_id, primary_team_id, owner_coach_id, status, notes, created_at, updated_at",
+      [event.id, clubId, event.type, event.title, event.startsAt, event.endsAt, "Asia/Shanghai", event.locationId, account.teamId, account.coachId, event.status, event.notes, now, now]);
   });
 
   account.studentIds.forEach((studentId, index) => {
@@ -696,6 +700,7 @@ type DemoEvent = {
   title: string;
   startsAt: string;
   endsAt: string;
+  locationId: string;
   status: "scheduled" | "completed";
   notes: string;
   participantStatuses: string[];
@@ -807,15 +812,15 @@ function buildDemoEvents(account: SecureCqTalentTestAccountManifestEntry, now: s
   const anchor = startOfDemoDay(now);
   const weekStart = startOfDemoWeek(now);
   return [
-    { id: account.eventId, type: "training", title: "本周技术训练", startsAt: shiftIso(anchor, 0, 2), endsAt: shiftIso(anchor, 0, 4), status: "scheduled", notes: "围绕控球、传接和小组配合开展训练。", participantStatuses: ["confirmed", "confirmed", "invited", "confirmed", "confirmed", "invited", "confirmed", "confirmed"] },
-    { id: eventIdFor(account, "history-training"), type: "training", title: "基础技术训练回顾", startsAt: shiftIso(weekStart, -13, 0), endsAt: shiftIso(weekStart, -13, 2), status: "completed", notes: "已完成带球、传球和射门基础训练。", participantStatuses: ["present", "late", "present", "present", "present", "late", "present", "present"] },
-    { id: eventIdFor(account, "history-training-2"), type: "training", title: "传接配合专项训练", startsAt: shiftIso(weekStart, -11, 0), endsAt: shiftIso(weekStart, -11, 2), status: "completed", notes: "已完成接球转身、短传配合和跑位训练。", participantStatuses: ["present", "present", "late", "present", "present", "present", "late", "present"] },
-    { id: eventIdFor(account, "history-training-3"), type: "training", title: "攻防转换训练", startsAt: shiftIso(weekStart, -6, 0), endsAt: shiftIso(weekStart, -6, 2), status: "completed", notes: "已完成抢断后的快速推进和回防组织训练。", participantStatuses: ["present", "late", "present", "present", "present", "present", "present", "late"] },
-    { id: eventIdFor(account, "history-training-4"), type: "training", title: "射门终结训练", startsAt: shiftIso(weekStart, -4, 0), endsAt: shiftIso(weekStart, -4, 2), status: "completed", notes: "已完成禁区前射门、补射和终结选择训练。", participantStatuses: ["late", "present", "present", "present", "late", "present", "present", "present"] },
-    { id: eventIdFor(account, "history-training-5"), type: "training", title: "小组对抗训练", startsAt: shiftIso(weekStart, 0, 0), endsAt: shiftIso(weekStart, 0, 2), status: "completed", notes: "已完成四对四对抗和小组协同训练。", participantStatuses: ["present", "present", "late", "present", "present", "present", "present", "late"] },
-    { id: eventIdFor(account, "future-training"), type: "training", title: "周末进攻训练", startsAt: shiftIso(anchor, 4, 1), endsAt: shiftIso(anchor, 4, 3), status: "scheduled", notes: "安排进攻跑位、边路配合和小范围对抗。", participantStatuses: ["confirmed", "invited", "confirmed", "confirmed", "invited", "confirmed", "confirmed", "confirmed"] },
-    { id: eventIdFor(account, "completed-match"), type: "match", title: "周末友谊赛战报", startsAt: shiftIso(weekStart, -5, 0), endsAt: shiftIso(weekStart, -5, 2), status: "completed", notes: "友谊赛已完成，已记录关键比赛事件。", participantStatuses: ["present", "present", "present", "late", "present", "present", "present", "present"] },
-    { id: eventIdFor(account, "scheduled-match"), type: "match", title: "周末联赛排兵", startsAt: shiftIso(anchor, 8, 0), endsAt: shiftIso(anchor, 8, 2), status: "scheduled", notes: "联赛前已完成首发阵容和战术布置。", participantStatuses: ["confirmed", "confirmed", "confirmed", "invited", "confirmed", "confirmed", "confirmed", "confirmed"] },
+    { id: account.eventId, type: "training", title: "本周技术训练", startsAt: shiftIso(anchor, 0, 2), endsAt: shiftIso(anchor, 0, 4), locationId: "venue-cq-talent-jiulongpo", status: "scheduled", notes: "围绕控球、传接和小组配合开展训练。", participantStatuses: ["confirmed", "confirmed", "invited", "confirmed", "confirmed", "invited", "confirmed", "confirmed"] },
+    { id: eventIdFor(account, "history-training"), type: "training", title: "基础技术训练回顾", startsAt: shiftIso(weekStart, -13, 0), endsAt: shiftIso(weekStart, -13, 2), locationId: "venue-cq-talent-sport-uni", status: "completed", notes: "已完成带球、传球和射门基础训练。", participantStatuses: ["present", "late", "present", "present", "present", "late", "present", "present"] },
+    { id: eventIdFor(account, "history-training-2"), type: "training", title: "传接配合专项训练", startsAt: shiftIso(weekStart, -11, 0), endsAt: shiftIso(weekStart, -11, 2), locationId: "venue-cq-talent-nanan", status: "completed", notes: "已完成接球转身、短传配合和跑位训练。", participantStatuses: ["present", "present", "late", "present", "present", "present", "late", "present"] },
+    { id: eventIdFor(account, "history-training-3"), type: "training", title: "攻防转换训练", startsAt: shiftIso(weekStart, -6, 0), endsAt: shiftIso(weekStart, -6, 2), locationId: "venue-cq-talent-jiulongpo", status: "completed", notes: "已完成抢断后的快速推进和回防组织训练。", participantStatuses: ["present", "late", "present", "present", "present", "present", "present", "late"] },
+    { id: eventIdFor(account, "history-training-4"), type: "training", title: "射门终结训练", startsAt: shiftIso(weekStart, -4, 0), endsAt: shiftIso(weekStart, -4, 2), locationId: "venue-cq-talent-sport-uni", status: "completed", notes: "已完成禁区前射门、补射和终结选择训练。", participantStatuses: ["late", "present", "present", "present", "late", "present", "present", "present"] },
+    { id: eventIdFor(account, "history-training-5"), type: "training", title: "小组对抗训练", startsAt: shiftIso(weekStart, 0, 0), endsAt: shiftIso(weekStart, 0, 2), locationId: "venue-cq-talent-nanan", status: "completed", notes: "已完成四对四对抗和小组协同训练。", participantStatuses: ["present", "present", "late", "present", "present", "present", "present", "late"] },
+    { id: eventIdFor(account, "future-training"), type: "training", title: "周末进攻训练", startsAt: shiftIso(anchor, 4, 1), endsAt: shiftIso(anchor, 4, 3), locationId: "venue-cq-talent-jiulongpo", status: "scheduled", notes: "安排进攻跑位、边路配合和小范围对抗。", participantStatuses: ["confirmed", "invited", "confirmed", "confirmed", "invited", "confirmed", "confirmed", "confirmed"] },
+    { id: eventIdFor(account, "completed-match"), type: "match", title: "周末友谊赛战报", startsAt: shiftIso(weekStart, -5, 0), endsAt: shiftIso(weekStart, -5, 2), locationId: "venue-cq-talent-nanan", status: "completed", notes: "友谊赛已完成，已记录关键比赛事件。", participantStatuses: ["present", "present", "present", "late", "present", "present", "present", "present"] },
+    { id: eventIdFor(account, "scheduled-match"), type: "match", title: "周末联赛排兵", startsAt: shiftIso(anchor, 8, 0), endsAt: shiftIso(anchor, 8, 2), locationId: "venue-cq-talent-jiulongpo", status: "scheduled", notes: "联赛前已完成首发阵容和战术布置。", participantStatuses: ["confirmed", "confirmed", "confirmed", "invited", "confirmed", "confirmed", "confirmed", "confirmed"] },
   ];
 }
 
