@@ -1360,6 +1360,12 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       const students = await context.store.listOperationalStudents(request.params.clubId);
       const nameByStudentId = new Map(students.map((student) => [student.id, student.name]));
       const detail = await context.store.getMatchDetailByEvent(request.params.clubId, request.params.eventId);
+      const primaryTeamName = event.primaryTeamId
+        ? context.store.listTeams(request.params.clubId).find((team) => team.id === event.primaryTeamId)?.name
+        : undefined;
+      const teamName = typeof event.teamName === "string" && event.teamName.trim()
+        ? event.teamName
+        : primaryTeamName;
 
       return {
         event: {
@@ -1368,7 +1374,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
           title: event.title,
           timeRange: event.timeRange,
           status: event.status,
-          teamName: typeof event.teamName === "string" ? event.teamName : undefined,
+          teamName,
         },
         roster: (event.participants ?? []).map((participant) => ({
           studentId: participant.studentId,

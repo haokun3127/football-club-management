@@ -50,7 +50,7 @@ describe("app-client coach match detail", () => {
       expect(response.statusCode).toBe(200);
       const body = response.json();
       expect(body).toEqual(expect.objectContaining({
-        event: expect.objectContaining({ id: "event-match-1", type: "match" }),
+        event: expect.objectContaining({ id: "event-match-1", type: "match", teamName: "U10发展队" }),
         roster: [expect.objectContaining({ studentId: "student-1", status: "present" })],
         match: expect.objectContaining({ id: "match-1", eventId: "event-match-1" }),
         events: expect.arrayContaining([expect.objectContaining({ id: "match-event-goal-1", minute: 18 })]),

@@ -258,6 +258,22 @@ describe("secure Chongqing Talent test-account operation", () => {
         WHERE id = ?
       `).get("match-event-cq-talent-secure-test-1-3") as { type: string; linkedMetricId: string | null };
       expect(foulEvent).toEqual({ type: "foul", linkedMetricId: null });
+      const matchEventNotes = persistence.database.prepare(`
+        SELECT type, note
+        FROM match_events
+        WHERE id LIKE 'match-event-cq-talent-secure-test-1-%'
+        ORDER BY minute, id
+      `).all() as Array<{ type: string; note: string }>;
+      expect(matchEventNotes).toEqual([
+        { type: "goal", note: "禁区前沿接球后低射破门" },
+        { type: "assist", note: "右路突破后倒三角传中助攻" },
+        { type: "foul", note: "中场回追时拉人犯规" },
+        { type: "yellow_card", note: "战术犯规，裁判出示黄牌" },
+        { type: "own_goal", note: "回传解围失误造成乌龙" },
+        { type: "save", note: "近距离封堵对方射门" },
+        { type: "tackle", note: "中场预判成功完成抢断" },
+        { type: "goal", note: "反击中接直塞推射得分" },
+      ]);
       expect(countWhere(persistence.database, "tactical_boards", "event_id LIKE 'event-cq-talent-secure-test-1%'")).toBe(1);
       expect(countForIds(persistence.database, "insurance_policies", "student_id", account.studentIds.slice(0, 2))).toBe(2);
       expect(countForIds(persistence.database, "private_lesson_requests", "student_id", account.studentIds.slice(0, 2))).toBe(2);
@@ -428,6 +444,37 @@ describe("secure Chongqing Talent test-account operation", () => {
         "U10精英队",
         "山城少年足球队",
       ]));
+    } finally {
+      persistence.database.close();
+    }
+  }, FILE_DB_TIMEOUT);
+
+  it("refreshes stale canonical match-event display copy without waiting for the calendar window to move", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+
+    try {
+      importSecureCqTalentTestAccounts(persistence.database, {
+        phones: runtimePhones,
+        now: "2026-08-30T08:00:00.000Z",
+      });
+      persistence.database.prepare(`
+        UPDATE match_events
+        SET note = ?
+        WHERE id = ?
+      `).run("比赛关键事件记录", "match-event-cq-talent-secure-test-1-1");
+
+      const refreshed = importSecureCqTalentTestAccounts(persistence.database, {
+        phones: runtimePhones,
+        now: "2026-08-30T08:00:00.000Z",
+      });
+
+      expect(refreshed.status).toBe("refreshed");
+      const event = persistence.database.prepare(`
+        SELECT type, note
+        FROM match_events
+        WHERE id = ?
+      `).get("match-event-cq-talent-secure-test-1-1") as { type: string; note: string };
+      expect(event).toEqual({ type: "goal", note: "禁区前沿接球后低射破门" });
     } finally {
       persistence.database.close();
     }

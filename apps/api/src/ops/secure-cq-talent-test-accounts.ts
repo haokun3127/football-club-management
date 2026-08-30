@@ -10,6 +10,16 @@ const completedTrainingEventKeys = [
   "history-training-4",
   "history-training-5",
 ] as const;
+const completedMatchEventDetails = [
+  { type: "goal", note: "禁区前沿接球后低射破门" },
+  { type: "assist", note: "右路突破后倒三角传中助攻" },
+  { type: "foul", note: "中场回追时拉人犯规" },
+  { type: "yellow_card", note: "战术犯规，裁判出示黄牌" },
+  { type: "own_goal", note: "回传解围失误造成乌龙" },
+  { type: "save", note: "近距离封堵对方射门" },
+  { type: "tackle", note: "中场预判成功完成抢断" },
+  { type: "goal", note: "反击中接直塞推射得分" },
+] as const;
 type DemoEventKey = (typeof completedTrainingEventKeys)[number] | "future-training" | "completed-match" | "scheduled-match";
 
 export interface SecureCqTalentTestAccountInput {
@@ -419,6 +429,27 @@ function hasCurrentDemoData(
     });
     if (!eventsMatch) return false;
 
+    const records = demoRecordIds(account);
+    const storedMatchEvents = database.prepare(`
+      SELECT id, type, minute, note
+      FROM match_events
+      WHERE club_id = ? AND id IN (${records.matchEventIds.map(() => "?").join(", ")})
+    `).all(clubId, ...records.matchEventIds) as Array<{
+      id: string;
+      type: string;
+      minute: number | null;
+      note: string | null;
+    }>;
+    const matchEventById = new Map(storedMatchEvents.map((event) => [event.id, event]));
+    const matchEventsMatch = completedMatchEventDetails.every((detail, index) => {
+      const stored = matchEventById.get(records.matchEventIds[index]!);
+      return stored
+        && stored.type === detail.type
+        && stored.minute === 8 + index * 7
+        && stored.note === detail.note;
+    });
+    if (!matchEventsMatch) return false;
+
     const identity = database.prepare(`
       SELECT
         (SELECT display_name FROM user_accounts WHERE id = ?) AS account_name,
@@ -618,10 +649,11 @@ function ensureDemoData(
     });
   });
   account.studentIds.forEach((studentId, index) => {
-    const eventType = ["goal", "assist", "foul", "yellow_card", "own_goal", "save", "tackle", "goal"][index]!;
+    const detail = completedMatchEventDetails[index]!;
+    const eventType = detail.type;
     upsertDemoRow(database, "match_events",
       "id, club_id, match_id, type, student_id, minute, linked_metric_id, note, created_at, updated_at",
-      [records.matchEventIds[index]!, clubId, records.matchIds[0]!, eventType, studentId, 8 + index * 7, eventType === "foul" || eventType === "yellow_card" || eventType === "own_goal" ? null : assessmentCatalog.radarMetrics[index]!.metricId, "比赛关键事件记录", now, now]);
+      [records.matchEventIds[index]!, clubId, records.matchIds[0]!, eventType, studentId, 8 + index * 7, eventType === "foul" || eventType === "yellow_card" || eventType === "own_goal" ? null : assessmentCatalog.radarMetrics[index]!.metricId, detail.note, now, now]);
   });
 
   const tacticalPositions = [
