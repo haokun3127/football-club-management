@@ -14,10 +14,10 @@
 .c1-nav__avatar { display: flex; align-items: center; justify-content: center; width: 72rpx; height: 72rpx; border-radius: 36rpx; background: #a80f1b; color: #ffffff; font-size: 28rpx; font-weight: 700; }
 
 .c1-dates { position: relative; display: block; box-sizing: border-box; width: 750rpx; height: 128rpx; padding: 0; border: 1rpx solid #e7eaf0; border-radius: 24rpx; background: #ffffff; }
-.c1-dates__arrow { position: absolute; top: 40rpx; z-index: 1; display: flex; flex: 0 0 48rpx; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; padding: 0; }
-.c1-dates__arrow--previous { top: 40rpx; left: 0; width: 48rpx; height: 48rpx; }
+.c1-dates__arrow { position: absolute; top: 50%; z-index: 1; display: flex; flex: 0 0 48rpx; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; padding: 0; transform: translateY(-50%); }
+.c1-dates__arrow--previous { left: 0; width: 48rpx; height: 48rpx; }
 .c1-dates__arrow--previous image { display: block; width: 48rpx; height: 48rpx; }
-.c1-dates__arrow--next { top: 40rpx; right: 0; width: 48rpx; height: 48rpx; }
+.c1-dates__arrow--next { right: 0; width: 48rpx; height: 48rpx; }
 .c1-dates__arrow--next image { display: block; width: 48rpx; height: 48rpx; }
 .c1-dates__days { display: flex; flex: 1; min-width: 0; }
 .c1-day { display: flex; flex: 0 0 88rpx; flex-direction: column; align-items: center; justify-content: center; width: 88rpx; height: 80rpx; border-radius: 16rpx; }

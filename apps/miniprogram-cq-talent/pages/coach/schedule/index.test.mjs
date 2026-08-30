@@ -210,8 +210,9 @@ describe("coach schedule home", () => {
     expect(template).toContain('data-date="{{item.date}}" catchtap="selectDay"');
     expect(stylesheet).toMatch(/\.c1-dates\s*\{[^}]*display:\s*block[^}]*height:\s*128rpx[^}]*padding:\s*0[^}]*border-radius:\s*24rpx/s);
     expect(stylesheet).toMatch(/\.c1-dates__arrow\s*\{[^}]*flex:\s*0\s+0\s+48rpx[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
-    expect(stylesheet).toMatch(/\.c1-dates__arrow--previous\s*\{[^}]*top:\s*40rpx[^}]*left:\s*0[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
-    expect(stylesheet).toMatch(/\.c1-dates__arrow--next\s*\{[^}]*top:\s*40rpx[^}]*right:\s*0[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
+    expect(stylesheet).toMatch(/\.c1-dates__arrow\s*\{[^}]*top:\s*50%[^}]*transform:\s*translateY\(-50%\)/s);
+    expect(stylesheet).toMatch(/\.c1-dates__arrow--previous\s*\{[^}]*left:\s*0[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
+    expect(stylesheet).toMatch(/\.c1-dates__arrow--next\s*\{[^}]*right:\s*0[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c1-dates__arrow--previous\s+image\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c1-dates__arrow--next\s+image\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     const expandMatches = [...stylesheet.matchAll(/\.c1-dates__expand\s*\{([^}]*)\}/g)];
