@@ -1,6 +1,7 @@
 import type { DatabaseSync } from "node:sqlite";
 import {
   assertCompleteSecureCqTalentTestAccountInstallation,
+  createSecureCqTalentTestAccountManifest,
   getSecureCqTalentTestAccountEventIds,
   type SecureCqTalentTestAccountManifest,
 } from "./secure-cq-talent-test-accounts.js";
@@ -100,20 +101,7 @@ export function rollbackSecureCqTalentTestAccounts(
 }
 
 function validateRollbackManifest(manifest: SecureCqTalentTestAccountManifest): void {
-  const expectedAccountIds = [1, 2, 3, 4, 5, 6, 7].map((slot) => ({
-    slot,
-    userId: "user-cq-talent-secure-test-" + slot,
-    membershipId: "membership-cq-talent-secure-test-" + slot,
-    parentId: "parent-cq-talent-secure-test-" + slot,
-    coachId: "coach-cq-talent-secure-test-" + slot,
-    teamId: "team-cq-talent-secure-test-" + slot,
-    studentIds: [1, 2, 3, 4, 5, 6, 7, 8].map((child) => "student-cq-talent-secure-test-" + slot + "-" + child),
-    guardianBindingIds: [1, 2].map((child) => "guardian-cq-talent-secure-test-" + slot + "-" + child),
-    contactIds: [1, 2].map((child) => "contact-cq-talent-secure-test-" + slot + "-" + child),
-    teamMemberIds: [1, 2, 3, 4, 5, 6, 7, 8].map((child) => "team-member-cq-talent-secure-test-" + slot + "-" + child),
-    eventId: "event-cq-talent-secure-test-" + slot,
-    participantIds: [1, 2, 3, 4, 5, 6, 7, 8].map((child) => "participant-cq-talent-secure-test-" + slot + "-" + child),
-  }));
+  const expectedAccountIds = createSecureCqTalentTestAccountManifest().accountIds;
   if (
     manifest.version !== 2
     || manifest.clubId !== "club-chongqing-talent"

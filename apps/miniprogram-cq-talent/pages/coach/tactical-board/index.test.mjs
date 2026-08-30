@@ -134,6 +134,33 @@ describe("C7 coach tactical board MVP", () => {
     expect(page.data.rosterPlayers[1]).toMatchObject({ rosterPx: 120, rosterPy: 339 });
   });
 
+  it("keeps the saved board's player order when the roster arrives in a different order", async () => {
+    mocks.getCoachTacticalBoard.mockResolvedValue(board({
+      board: {
+        ...board().board,
+        players: [
+          { studentId: "student-starter", displayName: "保存首发", role: "starter", positionLabel: "真实位置", x: 0.5, y: 0.5 },
+          { studentId: "student-substitute", displayName: "保存候补", role: "substitute", x: 0.4, y: 0.7 },
+        ],
+      },
+      roster: [
+        { studentId: "student-substitute", displayName: "真实替补" },
+        { studentId: "student-roster-only", displayName: "真实名单新增成员" },
+        { studentId: "student-starter", displayName: "真实首发" },
+      ],
+    }));
+    const page = createPageInstance();
+
+    await page.onLoad({ eventId: "event-real" });
+    await flush();
+
+    expect(page.data.players.map((player) => player.studentId)).toEqual([
+      "student-starter",
+      "student-substitute",
+      "student-roster-only",
+    ]);
+  });
+
   it("lays every roster member into the lower two-row all-player area", () => {
     const page = createPageInstance({
       pitchWidth: 320,

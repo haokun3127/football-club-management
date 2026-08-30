@@ -3366,7 +3366,11 @@ async function collectCoachScope(context: RouteContext, clubId: string, auth: Co
       teamsById.set(team.id, { id: team.id, name: team.name, season: currentSeason() });
     }
   }
-  return { events, students: [...studentsById.values()], teams: [...teamsById.values()] };
+  return {
+    events,
+    students: [...studentsById.values()].sort((left, right) => left.id.localeCompare(right.id, undefined, { numeric: true })),
+    teams: [...teamsById.values()],
+  };
 }
 
 function currentSeason(): string {

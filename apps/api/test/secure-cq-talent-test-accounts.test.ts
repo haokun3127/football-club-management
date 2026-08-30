@@ -168,15 +168,15 @@ describe("secure Chongqing Talent test-account operation", () => {
 
       expect(imported.status).toBe("imported");
       expect(imported.manifest.accountIds).toHaveLength(7);
-      expect(imported.manifest.accountIds.every((account) => account.studentIds.length === 8)).toBe(true);
+      expect(imported.manifest.accountIds.every((account) => account.studentIds.length === 19)).toBe(true);
       expect(count(persistence.database, "user_accounts")).toBe(10);
       expect(count(persistence.database, "club_user_memberships")).toBe(10);
       expect(count(persistence.database, "parent_profiles")).toBe(8);
       expect(count(persistence.database, "coach_profiles")).toBe(8);
-      expect(count(persistence.database, "student_profiles")).toBe(57);
+      expect(count(persistence.database, "student_profiles")).toBe(134);
       expect(count(persistence.database, "teams")).toBe(9);
       expect(countWhere(persistence.database, "calendar_events", "id LIKE 'event-cq-talent-secure-test-%'")).toBe(63);
-      expect(countWhere(persistence.database, "event_participants", "id LIKE 'participant-cq-talent-secure-test-%'")).toBe(504);
+      expect(countWhere(persistence.database, "event_participants", "id LIKE 'participant-cq-talent-secure-test-%'")).toBe(1197);
       expect(countWhere(persistence.database, "student_contacts", "id LIKE 'contact-cq-talent-secure-test-%'")).toBe(14);
 
       const importedAccounts = persistence.database.prepare(`
@@ -214,7 +214,7 @@ describe("secure Chongqing Talent test-account operation", () => {
       `).all() as Array<{ user_id: string; roster_count: number }>;
       expect(coachScopes).toEqual(Array.from({ length: 7 }, (_, index) => ({
         user_id: "user-cq-talent-secure-test-" + (index + 1),
-        roster_count: 8,
+        roster_count: 19,
       })));
 
       const rerun = importSecureCqTalentTestAccounts(persistence.database, {
@@ -223,7 +223,7 @@ describe("secure Chongqing Talent test-account operation", () => {
       });
       expect(rerun.status).toBe("already_present");
       expect(count(persistence.database, "user_accounts")).toBe(10);
-      expect(count(persistence.database, "student_profiles")).toBe(57);
+      expect(count(persistence.database, "student_profiles")).toBe(134);
       expect(rerun.manifest).toEqual(imported.manifest);
     } finally {
       persistence.database.close();
@@ -242,14 +242,14 @@ describe("secure Chongqing Talent test-account operation", () => {
       const account = imported.manifest.accountIds[0]!;
 
       expect(countWhere(persistence.database, "calendar_events", "id LIKE 'event-cq-talent-secure-test-1%'")).toBe(9);
-      expect(countWhere(persistence.database, "event_participants", "event_id LIKE 'event-cq-talent-secure-test-1%'")).toBe(72);
+      expect(countWhere(persistence.database, "event_participants", "event_id LIKE 'event-cq-talent-secure-test-1%'")).toBe(171);
       expect(countWhere(persistence.database, "event_participants", "event_id LIKE 'event-cq-talent-secure-test-1%' AND status IN ('present', 'late', 'absent', 'leave_requested', 'invited', 'confirmed')")).toBeGreaterThanOrEqual(6);
-      expect(countForIds(persistence.database, "lesson_credit_ledger", "student_id", account.studentIds)).toBe(48);
-      expect(countForIds(persistence.database, "player_assessments", "student_id", account.studentIds)).toBe(8);
-      expect(countForIds(persistence.database, "assessment_raw_results", "assessment_id", assessmentIdsForStudents(persistence.database, account.studentIds))).toBe(64);
-      expect(countForIds(persistence.database, "assessment_scores", "assessment_id", assessmentIdsForStudents(persistence.database, account.studentIds))).toBe(64);
-      expect(countForIds(persistence.database, "player_metric_records", "student_id", account.studentIds)).toBe(64);
-      expect(countWhere(persistence.database, "metric_lineages", "id LIKE 'metric-lineage-cq-talent-secure-test-1-%'")).toBe(64);
+      expect(countForIds(persistence.database, "lesson_credit_ledger", "student_id", account.studentIds)).toBe(114);
+      expect(countForIds(persistence.database, "player_assessments", "student_id", account.studentIds)).toBe(19);
+      expect(countForIds(persistence.database, "assessment_raw_results", "assessment_id", assessmentIdsForStudents(persistence.database, account.studentIds))).toBe(152);
+      expect(countForIds(persistence.database, "assessment_scores", "assessment_id", assessmentIdsForStudents(persistence.database, account.studentIds))).toBe(152);
+      expect(countForIds(persistence.database, "player_metric_records", "student_id", account.studentIds)).toBe(152);
+      expect(countWhere(persistence.database, "metric_lineages", "id LIKE 'metric-lineage-cq-talent-secure-test-1-%'")).toBe(152);
       expect(countWhere(persistence.database, "matches", "event_id LIKE 'event-cq-talent-secure-test-1%'")).toBe(2);
       expect(countWhere(persistence.database, "match_events", "id LIKE 'match-event-cq-talent-secure-test-1-%'")).toBe(8);
       const foulEvent = persistence.database.prepare(`
@@ -319,8 +319,8 @@ describe("secure Chongqing Talent test-account operation", () => {
 
       expect(completedTrainingRows).toHaveLength(5);
       expect(new Set(weeks)).toEqual(new Set(["2026-08-10", "2026-08-17", "2026-08-24"]));
-      expect(countForIds(persistence.database, "event_participants", "event_id", completedTrainingIds)).toBe(40);
-      expect(settledLedgerCount).toBe(40);
+      expect(countForIds(persistence.database, "event_participants", "event_id", completedTrainingIds)).toBe(95);
+      expect(settledLedgerCount).toBe(95);
     } finally {
       persistence.database.close();
     }
@@ -486,7 +486,7 @@ describe("secure Chongqing Talent test-account operation", () => {
     }
   }, FILE_DB_TIMEOUT);
 
-  it("upgrades an existing two-child secure slot into the eight-player coach roster", async () => {
+  it("upgrades an existing two-child secure slot into the nineteen-player coach roster", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
 
     try {
@@ -508,8 +508,8 @@ describe("secure Chongqing Talent test-account operation", () => {
       });
 
       expect(upgraded.status).toBe("imported");
-      expect(countForIds(persistence.database, "student_profiles", "id", first.studentIds)).toBe(8);
-      expect(countForIds(persistence.database, "team_members", "student_id", first.studentIds)).toBe(8);
+      expect(countForIds(persistence.database, "student_profiles", "id", first.studentIds)).toBe(19);
+      expect(countForIds(persistence.database, "team_members", "student_id", first.studentIds)).toBe(19);
       expect(countForIds(persistence.database, "student_guardian_bindings", "student_id", first.studentIds)).toBe(2);
     } finally {
       persistence.database.close();
@@ -696,7 +696,10 @@ describe("secure Chongqing Talent test-account operation", () => {
       });
       expect(tactical.statusCode).toBe(200);
       expect((tactical.json() as { saved: boolean; board: { players: unknown[] } }).saved).toBe(true);
-      expect((tactical.json() as { board: { players: unknown[] } }).board.players).toHaveLength(8);
+      const tacticalBody = tactical.json() as { board: { players: Array<{ role: string }> } };
+      expect(tacticalBody.board.players).toHaveLength(19);
+      expect(tacticalBody.board.players.filter((player) => player.role === "starter")).toHaveLength(11);
+      expect(tacticalBody.board.players.filter((player) => player.role === "substitute")).toHaveLength(8);
     } finally {
       await app?.close();
       persistence.database.close();

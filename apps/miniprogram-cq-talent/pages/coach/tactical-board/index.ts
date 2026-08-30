@@ -369,17 +369,29 @@ Page<BoardPageData>({
 });
 
 function presentBoardPlayers(response: TacticalBoardState) {
-  const boardPlayersByStudentId = new Map(response.board.players.map((player) => [player.studentId, player]));
-  return response.roster.flatMap((member) => {
-    if (!member.studentId || !member.displayName) return [];
-    const boardPlayer = boardPlayersByStudentId.get(member.studentId);
+  const rosterByStudentId = new Map(response.roster.map((member) => [member.studentId, member]));
+  const boardPlayers = response.board.players.flatMap((boardPlayer) => {
+    const member = rosterByStudentId.get(boardPlayer.studentId);
+    if (!member?.studentId || !member.displayName) return [];
     return [{
       studentId: member.studentId,
       displayName: member.displayName,
-      role: boardPlayer?.role ?? "substitute",
-      positionLabel: boardPlayer?.positionLabel,
-      x: boardPlayer?.x ?? 0.5,
-      y: boardPlayer?.y ?? 0.8,
+      role: boardPlayer.role,
+      positionLabel: boardPlayer.positionLabel,
+      x: boardPlayer.x,
+      y: boardPlayer.y,
     }];
   });
+  const boardStudentIds = new Set(boardPlayers.map((player) => player.studentId));
+  const rosterOnlyPlayers = response.roster.flatMap((member) => {
+    if (!member.studentId || !member.displayName || boardStudentIds.has(member.studentId)) return [];
+    return [{
+      studentId: member.studentId,
+      displayName: member.displayName,
+      role: "substitute" as const,
+      x: 0.5,
+      y: 0.8,
+    }];
+  });
+  return [...boardPlayers, ...rosterOnlyPlayers];
 }

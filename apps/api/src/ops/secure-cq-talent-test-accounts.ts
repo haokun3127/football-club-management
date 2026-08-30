@@ -20,6 +20,14 @@ const completedMatchEventDetails = [
   { type: "tackle", note: "中场预判成功完成抢断" },
   { type: "goal", note: "反击中接直塞推射得分" },
 ] as const;
+const demoTeamRosterSize = 19;
+const demoStartingLineupSize = 11;
+const demoMatchPositions = ["GK", "DF", "DF", "DF", "DF", "MF", "MF", "MF", "FW", "FW", "FW"] as const;
+const demoTacticalPositions = [
+  ["守门员", 0.5, 0.1], ["左后卫", 0.18, 0.28], ["左中卫", 0.4, 0.25], ["右中卫", 0.6, 0.25], ["右后卫", 0.82, 0.28],
+  ["左中场", 0.27, 0.52], ["中场", 0.5, 0.48], ["右中场", 0.73, 0.52],
+  ["左边锋", 0.2, 0.76], ["前锋", 0.5, 0.82], ["右边锋", 0.8, 0.76],
+] as const;
 type DemoEventKey = (typeof completedTrainingEventKeys)[number] | "future-training" | "completed-match" | "scheduled-match";
 
 export interface SecureCqTalentTestAccountInput {
@@ -89,7 +97,7 @@ export function importSecureCqTalentTestAccounts(
   input: SecureCqTalentTestAccountInput,
 ): SecureCqTalentTestAccountResult {
   validatePhones(input.phones);
-  const manifest = buildManifest();
+  const manifest = createSecureCqTalentTestAccountManifest();
   const now = input.now ?? new Date().toISOString();
 
   if (input.dryRun) {
@@ -144,7 +152,7 @@ function validatePhones(phones: readonly (string | undefined)[]): void {
   }
 }
 
-function buildManifest(): SecureCqTalentTestAccountManifest {
+export function createSecureCqTalentTestAccountManifest(): SecureCqTalentTestAccountManifest {
   return {
     version: 2,
     clubId,
@@ -156,12 +164,12 @@ function buildManifest(): SecureCqTalentTestAccountManifest {
       parentId: "parent-cq-talent-secure-test-" + slot,
       coachId: "coach-cq-talent-secure-test-" + slot,
       teamId: "team-cq-talent-secure-test-" + slot,
-      studentIds: [1, 2, 3, 4, 5, 6, 7, 8].map((child) => "student-cq-talent-secure-test-" + slot + "-" + child),
+      studentIds: Array.from({ length: demoTeamRosterSize }, (_, index) => "student-cq-talent-secure-test-" + slot + "-" + (index + 1)),
       guardianBindingIds: [1, 2].map((child) => "guardian-cq-talent-secure-test-" + slot + "-" + child),
       contactIds: [1, 2].map((child) => "contact-cq-talent-secure-test-" + slot + "-" + child),
-      teamMemberIds: [1, 2, 3, 4, 5, 6, 7, 8].map((child) => "team-member-cq-talent-secure-test-" + slot + "-" + child),
+      teamMemberIds: Array.from({ length: demoTeamRosterSize }, (_, index) => "team-member-cq-talent-secure-test-" + slot + "-" + (index + 1)),
       eventId: "event-cq-talent-secure-test-" + slot,
-      participantIds: [1, 2, 3, 4, 5, 6, 7, 8].map((child) => "participant-cq-talent-secure-test-" + slot + "-" + child),
+      participantIds: Array.from({ length: demoTeamRosterSize }, (_, index) => "participant-cq-talent-secure-test-" + slot + "-" + (index + 1)),
     })),
     sideEffects: {},
   };
@@ -590,9 +598,10 @@ function ensureDemoData(
       [account.participantIds[index]!, clubId, account.eventId, studentId, "confirmed", "已加入本周训练", now, now]);
 
     events.slice(1).forEach((event) => {
+      const participantStatus = event.participantStatuses[index] ?? "confirmed";
       upsertDemoRow(database, "event_participants",
         "id, club_id, event_id, student_id, status, note, created_at, updated_at",
-        [participantIdForEvent(account, event.id, index), clubId, event.id, studentId, event.participantStatuses[index]!, participantNote(event.participantStatuses[index]!), now, now]);
+        [participantIdForEvent(account, event.id, index), clubId, event.id, studentId, participantStatus, participantNote(participantStatus), now, now]);
     });
 
     const openingBalance = 12 - index;
@@ -649,10 +658,10 @@ function ensureDemoData(
     account.studentIds.forEach((studentId, index) => {
       upsertDemoRow(database, "match_rosters",
         "id, club_id, match_id, student_id, team_id, started, minutes_played, position, created_at, updated_at",
-        [records.matchRosterIds[matchIndex * account.studentIds.length + index]!, clubId, matchId, studentId, account.teamId, 1, matchIndex === 0 ? 60 - index : 0, matchIndex === 0 ? ["GK", "DF", "DF", "DF", "MF", "MF", "FW", "FW"][index]! : null, now, now]);
+        [records.matchRosterIds[matchIndex * account.studentIds.length + index]!, clubId, matchId, studentId, account.teamId, index < demoStartingLineupSize ? 1 : 0, matchIndex === 0 && index < demoStartingLineupSize ? Math.max(20, 60 - index * 4) : 0, matchIndex === 0 && index < demoStartingLineupSize ? demoMatchPositions[index]! : null, now, now]);
     });
   });
-  account.studentIds.forEach((studentId, index) => {
+  account.studentIds.slice(0, completedMatchEventDetails.length).forEach((studentId, index) => {
     const detail = completedMatchEventDetails[index]!;
     const eventType = detail.type;
     upsertDemoRow(database, "match_events",
@@ -660,20 +669,16 @@ function ensureDemoData(
       [records.matchEventIds[index]!, clubId, records.matchIds[0]!, eventType, studentId, 8 + index * 7, eventType === "foul" || eventType === "yellow_card" || eventType === "own_goal" ? null : assessmentCatalog.radarMetrics[index]!.metricId, detail.note, now, now]);
   });
 
-  const tacticalPositions = [
-    ["守门员", 0.5, 0.08], ["左后卫", 0.2, 0.28], ["中后卫", 0.4, 0.24], ["右后卫", 0.72, 0.3],
-    ["中场", 0.32, 0.5], ["中场", 0.54, 0.5], ["左边锋", 0.18, 0.74], ["前锋", 0.56, 0.78],
-  ] as const;
   upsertDemoRow(database, "tactical_boards",
     "id, club_id, event_id, formation_name, pitch_type, players_json, updated_by_coach_id, created_at, updated_at",
     [records.tacticalBoardIds[0]!, clubId, eventIdFor(account, "scheduled-match"), "4-3-3", "full",
       JSON.stringify(account.studentIds.map((studentId, index) => ({
         studentId,
         displayName: labels.playerNames[index]!,
-        role: "starter",
-        positionLabel: tacticalPositions[index]![0],
-        x: tacticalPositions[index]![1],
-        y: tacticalPositions[index]![2],
+        role: index < demoStartingLineupSize ? "starter" : "substitute",
+        positionLabel: index < demoStartingLineupSize ? demoTacticalPositions[index]![0] : undefined,
+        x: index < demoStartingLineupSize ? demoTacticalPositions[index]![1] : 0.5,
+        y: index < demoStartingLineupSize ? demoTacticalPositions[index]![2] : 0.95,
       }))), account.coachId, now, now]);
 
   account.studentIds.slice(0, 2).forEach((studentId, index) => {
@@ -723,6 +728,17 @@ const demoPlayerNames = [
   "张晨曦",
   "白子涵",
   "陈思远",
+  "赵子墨",
+  "孙雨泽",
+  "周奕辰",
+  "吴奕凡",
+  "郑思远",
+  "冯浩然",
+  "曹子轩",
+  "何书言",
+  "陆星河",
+  "杜明远",
+  "沈奕航",
 ] as const;
 
 const demoIdentityProfiles = [
@@ -869,7 +885,7 @@ function demoRecordIds(account: SecureCqTalentTestAccountManifestEntry) {
     metricLineageIds: account.studentIds.flatMap((_, studentIndex) => Array.from({ length: demoMetricCount }, (_, metricIndex) => "metric-lineage-cq-talent-secure-test-" + account.slot + "-" + (studentIndex + 1) + "-" + (metricIndex + 1))),
     matchIds: ["match-cq-talent-secure-test-" + account.slot + "-completed", "match-cq-talent-secure-test-" + account.slot + "-scheduled"],
     matchRosterIds: ["completed", "scheduled"].flatMap((matchKey) => account.studentIds.map((_, index) => "match-roster-cq-talent-secure-test-" + account.slot + "-" + matchKey + "-" + (index + 1))),
-    matchEventIds: account.studentIds.map((_, index) => "match-event-cq-talent-secure-test-" + account.slot + "-" + (index + 1)),
+    matchEventIds: account.studentIds.slice(0, completedMatchEventDetails.length).map((_, index) => "match-event-cq-talent-secure-test-" + account.slot + "-" + (index + 1)),
     tacticalBoardIds: ["tactical-board-cq-talent-secure-test-" + account.slot + "-scheduled"],
     operationalProfileIds: account.studentIds.slice(0, 2).map((_, index) => "operational-profile-cq-talent-secure-test-" + account.slot + "-" + (index + 1)),
     insurancePolicyIds: account.studentIds.slice(0, 2).map((_, index) => "insurance-policy-cq-talent-secure-test-" + account.slot + "-" + (index + 1)),

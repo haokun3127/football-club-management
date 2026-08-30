@@ -36,14 +36,14 @@
 
 ### 5. Good / Base / Bad Cases
 
-- Good: seven runtime phones import to seven separate parent/coach account scopes; every parent session sees only its two guardian-bound students, while the matching coach session sees only its own eight-player team.
+- Good: seven runtime phones import to seven separate parent/coach account scopes; every parent session sees only its two guardian-bound students, while the matching coach session sees its own 19-player team with 11 starters and 8 substitutes for tactical-board demonstration.
 - Base: a complete matching installation that still matches its rolling calendar and controlled display copy re-runs as `already_present` without duplicating records.
 - Bad: a command accepts arbitrary IDs or prints a manifest/phone/token in its result; this expands deletion scope or leaks identity data.
 
 ### 6. Tests Required
 
 - CLI test asserts confirmation for mutation, backup attestation, exact result projection, file-database enforcement, empty-install rollback rejection, and dry-run migration-count stability.
-- Import test asserts seven isolated dual-role scopes, two guardian bindings per parent, eight-player coach teams, relative historical/current/future calendars, attendance, lesson history, eight-dimensional assessments, matches, tactical boards, idempotency, and conflict/partial-install rejection.
+- Import test asserts seven isolated dual-role scopes, two guardian bindings per parent, 19-player coach teams with 11 starters and 8 substitutes, relative historical/current/future calendars, attendance, lesson history, eight-dimensional assessments, matches, tactical boards, idempotency, and conflict/partial-install rejection.
 - BFF test asserts real Bearer role switching, parent and coach scoping, and absence of phone fields in projected payloads.
 - Rollback test asserts canonical-manifest rejection for tampering, namespace checks for direct rollback tests, owned-row cleanup, and unrelated-row preservation.
 
@@ -142,8 +142,8 @@ This checks the two guardian students' semantic operational-profile presence whi
 ### 3. Contracts
 
 - A current demo set contains calendar records in each of the current and preceding two calendar weeks, plus upcoming training/match records for continued preview.
-- A current demo set contains five completed training sessions across those three calendar weeks. Each one has all eight team participants and a canonical `lesson_credit_ledger` debit per participant, so C5 history is populated by database-backed records rather than client-side placeholders.
-- The current ledger shape is one opening credit plus five canonical training debits per roster student: 6 rows per student and 48 rows per slot. A slot therefore has 40 completed-training debit rows; read-only production audits must enumerate the suffixed IDs `-debit-1` through `-debit-5`, not the retired unsuffixed `-debit` IDs.
+- A current demo set contains five completed training sessions across those three calendar weeks. Each one has all 19 team participants and a canonical `lesson_credit_ledger` debit per participant, so C5 history is populated by database-backed records rather than client-side placeholders.
+- The current ledger shape is one opening credit plus five canonical training debits per roster student: 6 rows per student and 114 rows per slot. A slot therefore has 95 completed-training debit rows; read-only production audits must enumerate the suffixed IDs `-debit-1` through `-debit-5`, not the retired unsuffixed `-debit` IDs.
 - Every calendar date is derived from the invocation timestamp, never hard-coded to a historical week.
 - User-facing canonical data (account, parent, coach, team, student, activity, assessment, match, tactical-board, private-lesson, insurance, and communication copy) is Chinese.
 - Storage/API enum values remain their contract values (for example `friendly`, `league`, participant status); the mini-program display boundary maps any visible enum to Chinese rather than changing the API contract.
@@ -171,9 +171,9 @@ This checks the two guardian students' semantic operational-profile presence whi
 ### 6. Tests Required
 
 - Import once with an older `now`, then import with a later `now`; assert the result is `refreshed`, the rolling calendar weeks move, and canonical names/copy contain no English display words.
-- Assert five completed training events cover the current and preceding two calendar weeks, contain eight participants each, and yield forty matching debit ledger rows per secure team.
+- Assert five completed training events cover the current and preceding two calendar weeks, contain nineteen participants each, and yield ninety-five matching debit ledger rows per secure team.
 - Seed the eight retired fixed settlement IDs into an otherwise-current slot; assert rerun returns `refreshed` and removes those IDs without affecting the current canonical ledger rows.
-- Preserve the existing partial eight-player upgrade and legacy operational-profile idempotency tests.
+- Preserve the existing partial nineteen-player upgrade and legacy operational-profile idempotency tests.
 - Mini-program API normalization test asserts `friendly`, `league`, `cup`, and `internal` display as Chinese labels.
 
 ### 7. Wrong vs Correct
