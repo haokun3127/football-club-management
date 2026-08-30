@@ -129,7 +129,7 @@ describe("C7 coach tactical board MVP", () => {
       expect.objectContaining({ studentId: "student-substitute", displayName: "真实替补" }),
       expect.objectContaining({ studentId: "student-roster-only", displayName: "真实名单新增成员" }),
     ]));
-    expect(page.data.rosterPlayers).toHaveLength(3);
+    expect(page.data.rosterPlayers).toHaveLength(2);
     expect(page.data.rosterPlayers[0]).toMatchObject({ rosterPx: 34, rosterPy: 339 });
     expect(page.data.rosterPlayers[1]).toMatchObject({ rosterPx: 120, rosterPy: 339 });
   });
@@ -181,14 +181,14 @@ describe("C7 coach tactical board MVP", () => {
     ]);
   });
 
-  it("expands the movable workspace so a full nineteen-player roster is not clamped into overlapping rows", () => {
+  it("keeps starters on the pitch and fits the eight substitutes into the fixed lower roster", () => {
     const page = createPageInstance({
       pitchWidth: 320,
       pitchHeight: 284,
       players: Array.from({ length: 19 }, (_, index) => ({
         studentId: `player-${index + 1}`,
         displayName: `甲${index + 1}`,
-        role: index < 11 ? "substitute" : "starter",
+        role: index < 11 ? "starter" : "substitute",
         x: 0.5,
         y: 0.8,
       })),
@@ -196,8 +196,10 @@ describe("C7 coach tactical board MVP", () => {
 
     page.refreshViews();
 
-    expect(page.data.workspaceHeight).toBe(787);
-    expect(page.data.rosterPlayers.at(-1)).toMatchObject({ rosterPx: 206, rosterPy: 707 });
+    expect(page.data.starters).toHaveLength(11);
+    expect(page.data.rosterPlayers).toHaveLength(8);
+    expect(page.data.workspaceHeight).toBe(520);
+    expect(page.data.rosterPlayers.at(-1)).toMatchObject({ rosterPx: 292, rosterPy: 431 });
   });
 
   it("derives stable Figma-style jersey numbers and roster state from the real roster", async () => {
@@ -205,8 +207,10 @@ describe("C7 coach tactical board MVP", () => {
     await page.onLoad({ eventId: "event-real" });
     await flush();
 
+    expect(page.data.starters).toEqual(expect.arrayContaining([
+      expect.objectContaining({ studentId: "student-starter", jerseyNumber: "1" }),
+    ]));
     expect(page.data.rosterPlayers).toEqual(expect.arrayContaining([
-      expect.objectContaining({ studentId: "student-starter", jerseyNumber: "1", rosterStateLabel: "已上场", rosterToneClass: "c7-roster__avatar--on-field" }),
       expect.objectContaining({ studentId: "student-substitute", jerseyNumber: "2", rosterStateLabel: "候补上场", rosterToneClass: "c7-roster__avatar--candidate" }),
       expect.objectContaining({ studentId: "student-roster-only", jerseyNumber: "3", rosterStateLabel: "候补上场", rosterToneClass: "c7-roster__avatar--candidate" }),
     ]));

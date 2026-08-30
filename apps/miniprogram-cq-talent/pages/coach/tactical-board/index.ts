@@ -218,22 +218,28 @@ Page<BoardPageData>({
       rosterStateLabel: "",
       rosterToneClass: "",
     });
-    const rosterPlayers = currentPlayers
+    const playerViews = currentPlayers
       .map((player: TacticalBoardPlayer, index: number) => ({
         ...toView(player),
+        jerseyNumber: String(index + 1),
+      }));
+    const starters = playerViews.filter((player: PlayerView) => player.role === "starter");
+    const substitutes = playerViews
+      .filter((player: PlayerView) => player.role !== "starter")
+      .map((player: PlayerView, index: number) => ({
+        ...player,
         rosterPx: ROSTER_LEFT + (index % ROSTER_COLUMNS) * ROSTER_COLUMN_GAP,
         rosterPy: ROSTER_TOP + Math.floor(index / ROSTER_COLUMNS) * ROSTER_ROW_GAP,
-        jerseyNumber: String(index + 1),
-        rosterStateLabel: player.role === "starter" ? "已上场" : "候补上场",
-        rosterToneClass: player.role === "starter" ? "c7-roster__avatar--on-field" : "c7-roster__avatar--candidate",
+        rosterStateLabel: "候补上场",
+        rosterToneClass: "c7-roster__avatar--candidate",
       }));
     this.setData({
-      rosterPlayers,
-      starters: rosterPlayers.filter((player: PlayerView) => player.role === "starter"),
-      substitutes: rosterPlayers.filter((player: PlayerView) => player.role !== "starter"),
+      rosterPlayers: substitutes,
+      starters,
+      substitutes,
       workspaceHeight: Math.max(
         BASE_WORKSPACE_HEIGHT,
-        ROSTER_TOP + Math.max(0, Math.ceil(rosterPlayers.length / ROSTER_COLUMNS) - 1) * ROSTER_ROW_GAP + ROSTER_ITEM_HEIGHT,
+        ROSTER_TOP + Math.max(0, Math.ceil(substitutes.length / ROSTER_COLUMNS) - 1) * ROSTER_ROW_GAP + ROSTER_ITEM_HEIGHT,
       ),
     });
   },

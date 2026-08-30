@@ -64,21 +64,14 @@
           </view>
           <view class="c7-roster__grid" aria-hidden="true"></view>
           <block wx:for="{{rosterPlayers}}" wx:key="studentId">
-            <block wx:if="{{item.role === 'starter'}}">
-              <view class="c7-roster__player c7-roster__player--listed" style="left: {{item.rosterPx}}px; top: {{item.rosterPy}}px;" data-id="{{item.studentId}}" bindtap="selectStarter">
-                <view class="c7-roster__avatar {{item.rosterToneClass}}">{{item.jerseyNumber}}</view>
-                <view class="c7-roster__name">{{item.displayName}}</view>
-                <view class="c7-roster__status">{{item.rosterStateLabel}}</view>
-              </view>
-            </block>
-            <block wx:if="{{item.role !== 'starter' && !readOnly}}">
+            <block wx:if="{{!readOnly}}">
               <movable-view class="c7-roster__player c7-roster__player--movable" direction="all" x="{{item.rosterPx}}" y="{{item.rosterPy}}" inertia="{{false}}" out-of-bounds="{{false}}" data-id="{{item.studentId}}" bindchange="onSubstituteMove" bindtap="swapSubstitute">
                 <view class="c7-roster__avatar {{item.rosterToneClass}}">{{item.jerseyNumber}}</view>
                 <view class="c7-roster__name">{{item.displayName}}</view>
                 <view class="c7-roster__status">{{item.rosterStateLabel}}</view>
               </movable-view>
             </block>
-            <block wx:if="{{item.role !== 'starter' && readOnly}}">
+            <block wx:if="{{readOnly}}">
               <view class="c7-roster__player c7-roster__player--listed" style="left: {{item.rosterPx}}px; top: {{item.rosterPy}}px;">
                 <view class="c7-roster__avatar {{item.rosterToneClass}}">{{item.jerseyNumber}}</view>
                 <view class="c7-roster__name">{{item.displayName}}</view>
