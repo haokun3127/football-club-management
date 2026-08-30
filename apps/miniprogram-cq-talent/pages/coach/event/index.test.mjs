@@ -114,7 +114,7 @@ describe("coach activity workbench", () => {
       hasVenue: true,
       sessionMeta: "U11 Red · 08月13日 09:00-10:00",
     });
-    expect(page.data).toMatchObject({ inProgress: false, countdownText: "", attendancePresent: 0, attendanceTotal: 2, joinedNames: "" });
+    expect(page.data).toMatchObject({ attendancePresent: 0, attendanceTotal: 2, joinedNames: "" });
   });
 
   it("toggles attendance directly on the workbench and persists a simple present/absent state", async () => {
@@ -169,7 +169,7 @@ describe("coach activity workbench", () => {
     expect(stylesheet).toMatch(/\.roster-name\s*\{[^}]*white-space:\s*nowrap/s);
   });
 
-  it("shows finish action and countdown for in-progress events", async () => {
+  it("keeps the workbench free of settlement controls for in-progress events", async () => {
     mocks.getCoachWorkbench.mockResolvedValue({
       ...trainingWorkbench,
       event: {
@@ -183,10 +183,9 @@ describe("coach activity workbench", () => {
     const page = createPageInstance();
     await page.load("event-training-1");
 
-    expect(page.data).toMatchObject({ inProgress: true, attendancePresent: 1, attendanceTotal: 1 });
-    expect(page.data.countdownText).toMatch(/^00:1[0-9]:[0-9]{2}$/);
-    page.onUnload();
-    expect(page.countdownTimer).toBeNull();
+    expect(page.data).toMatchObject({ attendancePresent: 1, attendanceTotal: 1 });
+    expect(page.data).not.toHaveProperty("inProgress", true);
+    expect(page.data).not.toHaveProperty("countdownText");
   });
 
   it("derives per-item content progress from planned durations and the clock", async () => {
@@ -210,7 +209,6 @@ describe("coach activity workbench", () => {
 
     expect(page.data.hasContentProgress).toBe(true);
     expect(page.data.contentProgressRows.map((row) => row.statusLabel)).toEqual(["完成", "进行中", "待开始"]);
-    page.onUnload();
   });
 
   it("shows all content items as done after the session ends", async () => {
@@ -231,7 +229,6 @@ describe("coach activity workbench", () => {
     await page.load("event-training-1");
 
     expect(page.data.contentProgressRows.map((row) => row.statusLabel)).toEqual(["完成"]);
-    page.onUnload();
   });
 
   it("keeps missing, forbidden, and empty workbenches honest", async () => {
@@ -321,10 +318,9 @@ describe("coach activity workbench", () => {
     expect(template).toContain('wx:if="{{hasRoster}}"');
     expect(template).toContain('wx:if="{{hasActionCards}}"');
     expect(template).toContain('bindtap="openAction"');
-    expect(template).toContain('wx:if="{{inProgress}}"');
-    expect(template).toContain('bindtap="finishEvent"');
-    expect(template).toContain("结束训练");
-    expect(template).toContain("{{inProgress ? countdownText : eventView.startTime}}");
+    expect(template).not.toContain('bindtap="finishEvent"');
+    expect(template).not.toContain("结束训练");
+    expect(template).toContain("{{eventView.startTime}}");
     expect(template).not.toContain("18/20");
     expect(template).not.toContain("凤凰山");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);

@@ -4,7 +4,6 @@
       <image class="c2-nav__back" src="/assets/icons/chevron-left.svg" mode="aspectFit" />
       <view class="c2-nav__title">{{eventTypeLabel}}工作台</view>
     </view>
-    <view wx:if="{{inProgress}}" class="c2-nav__finish {{finishing ? 'c2-nav__finish--disabled' : ''}}" bindtap="finishEvent">结束训练</view>
   </view>
   <view class="c2-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载活动' : state === 'empty' ? '暂无工作台数据' : '活动读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
@@ -13,13 +12,13 @@
       <view wx:if="{{eventView}}" class="shero">
         <view class="shero__top"><view>{{eventView.heroDateLabel}}</view><view>重庆天才</view></view>
         <view class="shero__main">
-          <view class="shero__big"><image wx:if="{{inProgress}}" class="shero__big-icon" src="/assets/icons/clock-white.svg" mode="aspectFit" />{{inProgress ? countdownText : eventView.startTime}}</view>
+          <view class="shero__big">{{eventView.startTime}}</view>
           <view class="shero__title">{{eventView.title}}</view>
         </view>
         <view wx:if="{{eventView.heroMeta}}" class="shero__meta">{{eventView.heroMeta}}</view>
         <view class="shero__pills">
           <view wx:if="{{attendanceTotal > 0}}" class="shero__pill">出席 {{attendancePresent}}/{{attendanceTotal}} 人</view>
-          <view class="shero__pill {{inProgress ? 'shero__pill--live' : ''}}">{{eventView.statusLabel}}</view>
+          <view class="shero__pill">{{eventView.statusLabel}}</view>
         </view>
       </view>
 

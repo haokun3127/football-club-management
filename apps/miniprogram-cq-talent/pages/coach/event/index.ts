@@ -1,11 +1,8 @@
-import { finishCoachEvent, getCoachWorkbench, saveCoachAttendance } from "../../../utils/api";
+import { getCoachWorkbench, saveCoachAttendance } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { activityStatus, activityTypeLabel, formatCalendarDate, formatShortDate, formatTimeOnly, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
-
-type TimerHost = { setInterval: (handler: () => void, timeout: number) => number; clearInterval: (id: number) => void };
-const timerHost = globalThis as unknown as TimerHost;
 
 type WorkbenchAction = "attendance" | "lesson" | "match" | "tactical" | "training" | "assessment" | "change";
 
@@ -68,8 +65,6 @@ Page({
     hasPendingRows: false,
     hasActionCards: false,
     hasAssessmentTemplate: false,
-    inProgress: false,
-    countdownText: "",
     contentProgressRows: [] as ContentProgressRow[],
     hasContentProgress: false,
     attendancePresent: 0,
@@ -77,7 +72,6 @@ Page({
     joinedNames: "",
     attendanceSaving: false,
     attendanceError: "",
-    finishing: false,
   },
   onLoad(query?: Record<string, string | undefined>) {
     requireRole("coach");
@@ -104,7 +98,6 @@ Page({
         .filter((item) => item.present)
         .map((item) => item.name)
         .join(" · ");
-      const inProgress = isInProgress(workbench.event.status, workbench.event.startsAt, workbench.event.endsAt);
       const contentProgressRows = buildContentProgress(workbench, Date.now());
       const workflowRows: CoachWorkbench["workflow"] = [];
       const trainingRows = workbench.event.type === "training" ? workbench.training.map((item) => ({ ...item })) : [];
@@ -141,14 +134,12 @@ Page({
         hasPendingRows: pendingRows.length > 0,
         hasActionCards: actionCards.length > 0,
         hasAssessmentTemplate: Boolean(workbench.assessmentTemplateId),
-        inProgress,
         attendancePresent,
         attendanceTotal: rosterRows.length,
         joinedNames,
         attendanceSaving: false,
         attendanceError: "",
       });
-      this.syncCountdown(inProgress, workbench.event.startsAt);
     } catch {
       this.setData({
         state: "error",
@@ -171,15 +162,12 @@ Page({
         hasPendingRows: false,
         hasActionCards: false,
         hasAssessmentTemplate: false,
-        inProgress: false,
-        countdownText: "",
         attendancePresent: 0,
         attendanceTotal: 0,
         joinedNames: "",
         attendanceSaving: false,
         attendanceError: "",
       });
-      this.syncCountdown(false, undefined);
     }
   },
   openAction(event: { currentTarget?: { dataset?: { action?: WorkbenchAction } } }) {
@@ -219,51 +207,13 @@ Page({
   retry() {
     this.load(this.data.eventId);
   },
-  countdownTimer: null as number | null,
-  syncCountdown(inProgress: boolean, startsAt?: string) {
-    if (this.countdownTimer !== null) {
-      timerHost.clearInterval(this.countdownTimer);
-      this.countdownTimer = null;
-    }
-    const startMs = parseEventTime(startsAt);
-    if (!inProgress || !Number.isFinite(startMs)) {
-      if (this.data.countdownText) this.setData({ countdownText: "" });
-      return;
-    }
-    const tick = () => {
-      const elapsed = Math.max(0, Date.now() - startMs);
-      this.setData({ countdownText: formatCountdown(elapsed) });
-    };
-    tick();
-    this.countdownTimer = timerHost.setInterval(tick, 1000);
-  },
-  async finishEvent() {
-    if (this.data.finishing || !this.data.inProgress || !this.data.eventId) return;
-    this.setData({ finishing: true });
-    try {
-      await finishCoachEvent(this.data.eventId);
-      wx.showToast({ title: "训练已结束", icon: "success" });
-      await this.load(this.data.eventId);
-    } catch {
-      wx.showToast({ title: "结束失败，请重试", icon: "none" });
-    } finally {
-      this.setData({ finishing: false });
-    }
-  },
-  onUnload() {
-    if (this.countdownTimer !== null) {
-      timerHost.clearInterval(this.countdownTimer);
-      this.countdownTimer = null;
-    }
-  },
   goBack() {
     wx.navigateBack();
   },
 });
 
 function presentEvent(workbench: CoachWorkbench): EventView {
-  const live = isInProgress(workbench.event.status, workbench.event.startsAt, workbench.event.endsAt);
-  const status = live ? { label: "进行中", tone: "info" } : activityStatus(workbench.event.status);
+  const status = activityStatus(workbench.event.status);
   const hasTime = Boolean(workbench.event.startsAt && workbench.event.endsAt);
   const timeLabel = hasTime ? `${formatShortDate(workbench.event.startsAt)} ${formatTimeRange(workbench.event.startsAt, workbench.event.endsAt)}` : "";
   const sessionTeam = workbench.event.teamName || workbench.event.venue || "";
@@ -374,34 +324,16 @@ function routeForAction(action: WorkbenchAction, eventId: string, templateId: st
   return routes[action];
 }
 
-function isInProgress(status: string, startsAt?: string, endsAt?: string) {
-  if (status !== "scheduled") return false;
-  const start = parseEventTime(startsAt);
-  const end = parseEventTime(endsAt);
-  if (!Number.isFinite(start) || !Number.isFinite(end)) return false;
-  const now = Date.now();
-  return now >= start && now < end;
-}
-
-// 生产活动时间按「北京墙钟存 Z」约定存储（展示端直接截取字符串）。
-// 计时/状态推导须先换算成真实 epoch：真实时刻 = 字面 Z 值 - 8 小时。
-function parseEventTime(value?: string) {
-  const parsed = Date.parse(value ?? "");
-  return Number.isFinite(parsed) ? parsed - 8 * 60 * 60 * 1000 : parsed;
-}
-
 function isPresentStatus(value: string) {
   const status = value.toLowerCase();
   return status === "present" || status === "attended" || status === "late";
 }
 
-function formatCountdown(ms: number) {
-  const total = Math.floor(ms / 1000);
-  const hours = Math.floor(total / 3600);
-  const minutes = Math.floor((total % 3600) / 60);
-  const seconds = total % 60;
-  const pad = (value: number) => String(value).padStart(2, "0");
-  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+// 生产活动时间按「北京墙钟存 Z」约定存储（展示端直接截取字符串）。
+// 训练内容进度推导须先换算成真实 epoch：真实时刻 = 字面 Z 值 - 8 小时。
+function parseEventTime(value?: string) {
+  const parsed = Date.parse(value ?? "");
+  return Number.isFinite(parsed) ? parsed - 8 * 60 * 60 * 1000 : parsed;
 }
 
 function rosterStatusLabel(value: string) {
