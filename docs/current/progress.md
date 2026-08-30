@@ -1835,3 +1835,16 @@
 - 家长 TabBar 顺序已固定为“日程 / 成长 / 发现 / 我的孩子”；路径和 active key 不变。教练端保留“日程 / 训练管理 / 我的”。
 - 目标源码为 `components/role-tabbar/index.ts`、家长/教练 `schedule/index.wxss`；同步更新定向断言，未改 API、会话、数据库或其他业务路径。
 - 验证：定向 Vitest `31/31`；家长/教练目标 WXML 与 WXSS 均经 WeChatIDE MCP 编译成功；教练折叠与展开截图 `tmp/goal-coach-calendar-collapsed-after.png`、`tmp/goal-coach-calendar-expanded-after.png` 均严格 `375×812`。当前真实会话为教练身份，访问家长路由返回 `403 Session active role is not permitted for this operation`，因此家长运行态视觉仍待真实家长会话补验。
+
+## 2026-08-30 当前在线稿 TabBar 顺序纠偏
+
+- 重新读取在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 358:815` 后确认家长 TabBar 的权威顺序是“日程 / 成长 / 我的孩子 / 发现”；此前历史记录中的“发现 / 我的孩子”描述已过时。
+- 已将 `components/role-tabbar/index.ts` 的家长项目顺序改为 `schedule → growth → child → discover`，路径和 active key 不变；定向断言同步改为验证 `child` 位于 `discover` 之前。教练 TabBar 未改动。
+- 验证：`components/role-tabbar/index.test.mjs` 为 `8/8`；当前会话仍是教练角色，家长运行态截图暂待真实家长会话补验。
+
+## 2026-08-30 C6/C6.1 比赛事件真实闭环复验
+
+- 使用真实教练会话读取生产比赛 `event-cq-talent-secure-test-1-completed-match`，向真实 API 写入 1 条 `foul` 事件；同一幂等键重复提交返回同一事件 ID，保存前后及 API 重启后均通过 GET 读回，临时会话已清理。
+- 生产能力策略当前返回进球、助攻、扑救、抢断、犯规、黄牌、红牌、乌龙球；C6 时间线已显示中文事件标签，C6.1 全屏页面已显示可选事件类型和真实名单。
+- WeChatIDE MCP 真实模拟器截图：`tmp/goal-c6-match-live-20260830.png`、`tmp/goal-c6-1-event-add-live-20260830.png`，均严格 `375×812`；网络读写返回 `200`，控制台错误过滤无命中。
+- 首次闭环误报 `401` 的根因是验证脚本读取了过期 `.coach-session.env`，不是业务 API；刷新临时会话后闭环通过。后续运行验证前必须先生成并写入当前临时会话。
