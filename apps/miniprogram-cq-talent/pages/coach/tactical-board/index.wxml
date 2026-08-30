@@ -4,10 +4,7 @@
       <view class="c7-header__back" bindtap="goBack" aria-label="返回">
         <image src="/assets/icons/chevron-left.svg" mode="aspectFit" />
       </view>
-      <view class="c7-header__titles">
-        <view class="c7-header__title">比赛战术板</view>
-        <view class="c7-header__subtitle">上半球场 · 下半全部球员</view>
-      </view>
+      <view class="c7-header__title">比赛战术板</view>
     </view>
   </view>
 
@@ -25,21 +22,20 @@
 
     <block wx:elif="{{state === 'ready'}}">
       <view class="c7-context-label">MATCH TACTICS</view>
-      <view class="c7-match-row">
-        <view class="c7-match-title">{{eventTitle}}</view>
-        <view class="{{saveToneClass}}">{{saveLabel}}</view>
-      </view>
-      <block wx:if="{{!readOnly && hasFormation}}">
-        <picker mode="selector" range="{{formations}}" range-key="label" value="{{formationIndex}}" bindchange="onFormationChange">
-          <view class="c7-formation-card">
-            <view class="c7-formation-label">阵型 {{formationLabel}}</view>
-            <image class="c7-formation-chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
-          </view>
-        </picker>
-      </block>
-      <view wx:else class="c7-formation-card">
-        <view class="c7-formation-label">阵型 {{formationLabel}}</view>
-        <image class="c7-formation-chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
+      <view class="c7-formation-row">
+        <view class="c7-formation-title">本场比赛阵型</view>
+        <block wx:if="{{!readOnly && hasFormation}}">
+          <picker mode="selector" range="{{formations}}" range-key="label" value="{{formationIndex}}" bindchange="onFormationChange">
+            <view class="c7-formation-picker">
+              <view class="c7-formation-label">{{formationLabel}}</view>
+              <image class="c7-formation-chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
+            </view>
+          </picker>
+        </block>
+        <view wx:else class="c7-formation-picker">
+          <view class="c7-formation-label">{{formationLabel}}</view>
+          <image class="c7-formation-chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
+        </view>
       </view>
 
       <view class="c7-board-container">

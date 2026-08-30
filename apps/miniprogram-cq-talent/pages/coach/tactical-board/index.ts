@@ -45,9 +45,9 @@ const PITCH_LEFT_IN_WORKSPACE = 16;
 const PLAYER_MARKER_RADIUS = 18;
 const ROSTER_COLUMNS = 4;
 const ROSTER_LEFT = 46;
-const ROSTER_TOP = 366;
+const ROSTER_TOP = 339;
 const ROSTER_COLUMN_GAP = 80;
-const ROSTER_ROW_GAP = 76;
+const ROSTER_ROW_GAP = 92;
 
 Page<BoardPageData>({
   data: {
