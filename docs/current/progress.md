@@ -1978,6 +1978,7 @@
 
 ## 2026-08-30 C7 十九人名单工作区与保存重读闭环
 
+
 - 家长端 TabBar 的产品基线再次确认且锁定为“日程 / 成长 / 发现 / 我的孩子”；仅家长端采用这四项顺序，教练端导航保持独立配置。较早进度条目中相反的“我的孩子 / 发现”顺序已过时，不得据此回改源码。
 - C7 在真实 19 人名单下暴露了工作区高度固定的布局缺陷：下方第五行成员理论坐标超过 `movable-area` 边界，而 `out-of-bounds=false` 会将其夹在同一边界位置，造成重叠。页面现按 TypeScript 中预计算的名单行数设置 `workspaceHeight`；19 人时为 `787px`，各行坐标保持独立。WXML 不新增数组方法调用。
 - 验证：C7 定向 Vitest `12/12`、小程序 TypeScript `exit=0`、C7 WXML/WXSS 均由 WeChatIDE MCP 编译成功、限定 diff 检查通过。真实模拟器截图 `tmp/c7-before-save-2026-08-30.png` 与 `tmp/c7-after-restart-readback-2026-08-30.png` 均严格 `375×812`。
