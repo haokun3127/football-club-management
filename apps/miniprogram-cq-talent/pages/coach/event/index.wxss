@@ -4,6 +4,7 @@
 .c2-nav__left { display: flex; align-items: center; gap: 0; min-width: 0; }
 .c2-nav__back { flex: 0 0 auto; width: 48rpx; height: 48rpx; }
 .c2-nav__title { overflow: hidden; color: #202124; font-size: 36rpx; font-weight: 700; line-height: 44rpx; text-overflow: ellipsis; white-space: nowrap; }
+.c2-nav__today { flex: 0 0 auto; color: #a80f1b; font-size: 24rpx; font-weight: 700; line-height: 34rpx; }
 
 .c2-body { display: flex; flex-direction: column; gap: 24rpx; padding: 16rpx 44rpx calc(180rpx + env(safe-area-inset-bottom)); }
 .shero { display: flex; flex-direction: column; gap: 8rpx; min-height: 368rpx; padding: 28rpx 32rpx; box-sizing: border-box; border-radius: 32rpx; background: #07111f; color: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0,0,0,.08); }

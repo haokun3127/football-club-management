@@ -4,6 +4,7 @@
       <image class="c2-nav__back" src="/assets/icons/chevron-left.svg" mode="aspectFit" />
       <view class="c2-nav__title">{{eventTypeLabel}}工作台</view>
     </view>
+    <view class="c2-nav__today">今日课程</view>
   </view>
   <view class="c2-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载活动' : state === 'empty' ? '暂无工作台数据' : '活动读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />

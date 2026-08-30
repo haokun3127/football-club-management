@@ -336,4 +336,10 @@ describe("coach activity workbench", () => {
     expect(stylesheet).not.toContain(".progress-row");
     expect(stylesheet).toMatch(/\.c2-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
   });
+
+  it("keeps the live Figma C2 course-context label on the right side of the top navigation", () => {
+    expect(template).toContain('class="c2-nav__today"');
+    expect(template).toContain('>今日课程</view>');
+    expect(stylesheet).toMatch(/\.c2-nav__today\s*\{[^}]*color:\s*#a80f1b[^}]*font-size:\s*24rpx/s);
+  });
 });
