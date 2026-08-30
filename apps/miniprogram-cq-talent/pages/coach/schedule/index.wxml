@@ -73,7 +73,7 @@
       </view>
 
       <view wx:if="{{hasVisibleEvents}}" class="c1-list">
-        <view wx:for="{{visibleEvents}}" wx:key="id" class="acard" data-id="{{item.id}}" bindtap="openEvent">
+        <view wx:for="{{visibleEvents}}" wx:key="id" class="acard acard--{{item.cardTone}}" data-id="{{item.id}}" bindtap="openEvent">
           <view class="acard__accent" style="background:{{item.typeColor}}"></view>
           <view class="acard__time"><view class="acard__start">{{item.startTime}}</view><view wx:if="{{item.durationText}}" class="acard__dur">{{item.durationText}}</view></view>
           <view class="acard__content">

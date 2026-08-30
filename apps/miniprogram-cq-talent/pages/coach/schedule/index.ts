@@ -31,6 +31,7 @@ type CoachEventView = ScheduleEvent & {
   statusTone: string;
   typeLabel: string;
   typeTone: string;
+  cardTone: "training" | "match" | "other";
   typeColor: string;
   coachName: string;
   hasCoachName: boolean;
@@ -245,7 +246,8 @@ function toCoachEventView(event: ScheduleEvent, coachName: string): CoachEventVi
     statusTone: status.tone,
     typeLabel: event.type === "training" ? "训练" : event.type === "match" ? "比赛" : "其他",
     typeTone: event.type === "training" ? "training" : event.type === "match" ? "match" : "other",
-    typeColor: event.type === "training" ? "#a80f1b" : event.type === "match" ? "#1976d2" : "#6b7280",
+    cardTone: event.type === "training" ? "training" : event.type === "match" ? "match" : "other",
+    typeColor: event.type === "training" ? "#a80f1b" : event.type === "match" ? "#69a5ff" : "#6b7280",
     coachName,
     hasCoachName: Boolean(coachName),
     locationLabel,

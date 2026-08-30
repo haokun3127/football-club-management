@@ -358,9 +358,11 @@ describe("coach schedule home", () => {
     await page.load();
 
     expect(page.data.visibleEvents).toEqual(expect.arrayContaining([
-      expect.objectContaining({ id: "event-training-1", typeLabel: "训练", typeTone: "training", typeColor: "#a80f1b" }),
-      expect.objectContaining({ id: "event-match-1", typeLabel: "比赛", typeTone: "match", typeColor: "#1976d2" }),
+      expect.objectContaining({ id: "event-training-1", typeLabel: "训练", typeTone: "training", cardTone: "training", typeColor: "#a80f1b" }),
+      expect.objectContaining({ id: "event-match-1", typeLabel: "比赛", typeTone: "match", cardTone: "match", typeColor: "#69a5ff" }),
     ]));
+    expect(template).toContain('class="acard acard--{{item.cardTone}}"');
+    expect(stylesheet).toContain(".acard--match");
     expect(template).toContain('class="acard__type acard__type--{{item.typeTone}}"');
     expect(stylesheet).toContain(".acard__type--training");
     expect(stylesheet).toContain(".acard__type--match");
