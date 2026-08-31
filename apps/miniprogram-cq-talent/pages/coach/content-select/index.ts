@@ -1,7 +1,15 @@
 import { getCoachTrainingProjectTree, getCoachWorkbench, saveCoachTrainingProjects } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
-import type { CoachWorkbench, LoadState, TrainingProject, TrainingProjectTree } from "../../../utils/types";
+import type {
+  CoachWorkbench,
+  LoadState,
+  TrainingContentMetricNode,
+  TrainingContentTree,
+  TrainingProject,
+  TrainingProjectTree,
+  TrainingTeamOption,
+} from "../../../utils/types";
 
 type CategoryView = {
   id: string;
@@ -21,6 +29,35 @@ type ProjectView = TrainingProject & {
   selectClass: string;
   iconSrc: string;
   searchText: string;
+};
+
+type PrimaryNodeView = {
+  id: string;
+  label: string;
+  className: string;
+};
+
+type SecondaryNodeView = PrimaryNodeView;
+
+type TertiaryGroupView = {
+  id: string;
+  label: string;
+  className: string;
+  actionCount: number;
+};
+
+type ActionCardView = TrainingProject & {
+  metricNames: string[];
+  hasQuantity: boolean;
+  hasDuration: boolean;
+  durationLabel: string;
+  coachingPointsPreview: string;
+  isSelected: boolean;
+  cardClass: string;
+  selectClass: string;
+  iconSrc: string;
+  searchText: string;
+  tertiaryLabel: string;
 };
 
 interface PageData {
@@ -49,6 +86,15 @@ interface PageData {
   submitting: boolean;
   hasSaveError: boolean;
   saveError: string;
+  contentTree?: TrainingContentTree;
+  team: TrainingTeamOption | null;
+  teamOptions: TrainingTeamOption[];
+  primaryNodes: PrimaryNodeView[];
+  secondaryNodes: SecondaryNodeView[];
+  tertiaryGroups: TertiaryGroupView[];
+  actionCards: ActionCardView[];
+  activePrimaryId: string;
+  activeSecondaryId: string;
 }
 
 const TARGET_ICONS = [
@@ -85,6 +131,15 @@ Page<PageData>({
     submitting: false,
     hasSaveError: false,
     saveError: "",
+    contentTree: undefined,
+    team: null,
+    teamOptions: [],
+    primaryNodes: [],
+    secondaryNodes: [],
+    tertiaryGroups: [],
+    actionCards: [],
+    activePrimaryId: "",
+    activeSecondaryId: "",
   },
 
   onLoad(query: { eventId?: string }) {
@@ -128,6 +183,7 @@ Page<PageData>({
       const categories = presentCategories(tree.groups.map((group) => ({ id: group.id, label: group.name })), "all");
       const selectedIds = canonicalizeSelection(workbench.selectedTrainingProjectIds, projects);
       const selection = buildSelectionPatch(projects, categories, selectedIds, "all", "", true, false);
+      const hierarchy = buildContentSelectionPatch(tree.contentTree, selectedIds, "", "", "");
       const hasProjects = projects.length > 0;
 
       this.setData({
@@ -137,6 +193,10 @@ Page<PageData>({
         message: hasProjects ? "" : "当前没有可选择的训练内容。",
         eventId,
         ...selection,
+        ...hierarchy,
+        contentTree: tree.contentTree,
+        team: tree.team ?? null,
+        teamOptions: tree.teamOptions ?? [],
         hasProjects,
         canSave: true,
       });
@@ -163,7 +223,38 @@ Page<PageData>({
       this.data.canSave,
       this.data.submitting,
     );
-    this.setData({ ...selection, hasSaveError: false, saveError: "" });
+    const hierarchy = buildContentSelectionPatch(
+      this.data.contentTree,
+      this.data.selectedIds,
+      this.data.activePrimaryId,
+      this.data.activeSecondaryId,
+      event.detail.value,
+    );
+    this.setData({ ...selection, ...hierarchy, hasSaveError: false, saveError: "" });
+  },
+
+  selectPrimary(event: { currentTarget: { dataset: { id: string } } }) {
+    const activePrimaryId = event.currentTarget.dataset.id;
+    const hierarchy = buildContentSelectionPatch(
+      this.data.contentTree,
+      this.data.selectedIds,
+      activePrimaryId,
+      "",
+      this.data.searchText,
+    );
+    this.setData({ ...hierarchy, hasSaveError: false, saveError: "" });
+  },
+
+  selectSecondary(event: { currentTarget: { dataset: { id: string } } }) {
+    const activeSecondaryId = event.currentTarget.dataset.id;
+    const hierarchy = buildContentSelectionPatch(
+      this.data.contentTree,
+      this.data.selectedIds,
+      this.data.activePrimaryId,
+      activeSecondaryId,
+      this.data.searchText,
+    );
+    this.setData({ ...hierarchy, hasSaveError: false, saveError: "" });
   },
 
   selectCategory(event: { currentTarget: { dataset: { id: string } } }) {
@@ -178,7 +269,14 @@ Page<PageData>({
       this.data.canSave,
       this.data.submitting,
     );
-    this.setData({ ...selection, hasSaveError: false, saveError: "" });
+    const hierarchy = buildContentSelectionPatch(
+      this.data.contentTree,
+      this.data.selectedIds,
+      this.data.activePrimaryId,
+      this.data.activeSecondaryId,
+      this.data.searchText,
+    );
+    this.setData({ ...selection, ...hierarchy, hasSaveError: false, saveError: "" });
   },
 
   toggleProject(event: { currentTarget: { dataset: { id: string } } }) {
@@ -262,6 +360,15 @@ Page<PageData>({
       eventId,
       projects: [],
       visibleProjects: [],
+      contentTree: undefined,
+      team: null,
+      teamOptions: [],
+      primaryNodes: [],
+      secondaryNodes: [],
+      tertiaryGroups: [],
+      actionCards: [],
+      activePrimaryId: "",
+      activeSecondaryId: "",
       hasProjects: false,
       hasVisibleProjects: false,
       selectedIds: [],
@@ -288,9 +395,114 @@ Page<PageData>({
       this.data.canSave,
       false,
     );
-    this.setData({ ...selection, submitting: false, hasSaveError: true, saveError });
+    const hierarchy = buildContentSelectionPatch(
+      this.data.contentTree,
+      selectedIds,
+      this.data.activePrimaryId,
+      this.data.activeSecondaryId,
+      this.data.searchText,
+    );
+    this.setData({ ...selection, ...hierarchy, submitting: false, hasSaveError: true, saveError });
   },
 });
+
+function buildContentSelectionPatch(
+  contentTree: TrainingContentTree | undefined,
+  selectedIds: string[],
+  requestedPrimaryId: string,
+  requestedSecondaryId: string,
+  searchText: string,
+) {
+  const primarySource = contentTree?.nodes ?? [];
+  const activePrimaryId = primarySource.some((node) => node.id === requestedPrimaryId)
+    ? requestedPrimaryId
+    : primarySource[0]?.id ?? "";
+  const activePrimary = primarySource.find((node) => node.id === activePrimaryId);
+  const primaryNodes = primarySource.map((node) => ({
+    id: node.id,
+    label: node.label,
+    className: node.id === activePrimaryId ? "content-primary content-primary--active" : "content-primary",
+  }));
+  const secondarySource = activePrimary?.children ?? [];
+  const activeSecondaryId = secondarySource.some((node) => node.id === requestedSecondaryId)
+    ? requestedSecondaryId
+    : secondarySource[0]?.id ?? "";
+  const activeSecondary = secondarySource.find((node) => node.id === activeSecondaryId);
+  const secondaryNodes = secondarySource.map((node) => ({
+    id: node.id,
+    label: node.label,
+    className: node.id === activeSecondaryId ? "content-secondary content-secondary--active" : "content-secondary",
+  }));
+  const selected = new Set(selectedIds);
+  const normalizedSearch = searchText.trim().toLowerCase();
+  const tertiaryGroups: TertiaryGroupView[] = [];
+  const actionCards: ActionCardView[] = [];
+  const seenDrillIds = new Set<string>();
+
+  for (const tertiary of activeSecondary?.children ?? []) {
+    const drills = tertiary.drills
+      .filter((drill) => matchesTrainingSearch(drill, tertiary.label, normalizedSearch))
+      .map((drill, index) => presentActionCard(drill, tertiary, index, selected.has(drill.id)));
+    if (normalizedSearch && drills.length === 0) continue;
+    tertiaryGroups.push({
+      id: tertiary.id,
+      label: tertiary.label,
+      className: "content-tertiary",
+      actionCount: drills.length,
+    });
+    for (const card of drills) {
+      if (seenDrillIds.has(card.id)) continue;
+      seenDrillIds.add(card.id);
+      actionCards.push(card);
+    }
+  }
+
+  return {
+    primaryNodes,
+    secondaryNodes,
+    tertiaryGroups,
+    actionCards,
+    activePrimaryId,
+    activeSecondaryId,
+  };
+}
+
+function matchesTrainingSearch(
+  drill: TrainingContentMetricNode["drills"][number],
+  tertiaryLabel: string,
+  normalizedSearch: string,
+) {
+  if (!normalizedSearch) return true;
+  const haystack = [drill.name, tertiaryLabel, ...drill.metricNames, ...drill.coachingPoints].join(" ").toLowerCase();
+  return haystack.includes(normalizedSearch);
+}
+
+function presentActionCard(
+  drill: TrainingContentMetricNode["drills"][number],
+  tertiary: TrainingContentMetricNode,
+  index: number,
+  isSelected: boolean,
+): ActionCardView {
+  const hasQuantity = Boolean(drill.quantityLabel);
+  const hasDuration = typeof drill.durationMinutes === "number" && drill.durationMinutes > 0;
+  return {
+    ...drill,
+    metricIds: [...drill.metricIds],
+    metricNames: [...drill.metricNames],
+    tags: [...drill.tags],
+    coachingPoints: [...drill.coachingPoints],
+    hasQuantity,
+    hasDuration,
+    durationLabel: hasDuration ? `${drill.durationMinutes} 分钟` : "",
+    coachingPointsPreview: drill.coachingPoints[0] ?? "动作要点待补充",
+    isSelected,
+    cardClass: isSelected ? "content-action-card content-action-card--selected" : "content-action-card",
+    selectClass: isSelected ? "content-action-card__select content-action-card__select--selected" : "content-action-card__select",
+    iconSrc: drill.imageSrc || TARGET_ICONS[index % TARGET_ICONS.length] || TARGET_ICONS[0] || "",
+    searchText: [drill.name, tertiary.label, ...drill.metricNames, ...drill.coachingPoints].join(" ").toLowerCase(),
+    tertiaryLabel: tertiary.label,
+  };
+}
 
 function mergeProjects(tree: TrainingProjectTree): ProjectView[] {
   const records = new Map<string, { project: TrainingProject; groupIds: string[]; groupNames: string[] }>();

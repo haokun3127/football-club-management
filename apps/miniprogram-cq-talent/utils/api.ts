@@ -31,6 +31,10 @@ import type {
   ScheduleEvent,
   StudentHome,
   StudentSummary,
+  TrainingContentDrill,
+  TrainingContentMetricNode,
+  TrainingContentTree,
+  TrainingTeamOption,
   TrainingProjectTree,
   FormationTemplate,
   TacticalBoardPlayer,
@@ -334,10 +338,11 @@ export async function recordCoachMatch(input: {
   });
 }
 
-export async function getCoachTrainingProjectTree(): Promise<TrainingProjectTree> {
+export async function getCoachTrainingProjectTree(teamId?: string): Promise<TrainingProjectTree> {
   const context = requireContext();
+  const query = teamId ? `?teamId=${encodeURIComponent(teamId)}` : "";
   const response = await request<Record<string, unknown>>({
-    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/training-project-tree`,
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/training-project-tree${query}`,
   });
   return normalizeTrainingProjectTree(response);
 }
@@ -1049,21 +1054,98 @@ function normalizeTrainingProjectTree(raw: Record<string, unknown>): TrainingPro
     groups: groups.length ? groups : [{ id: "all", name: "训练项目", projects: normalizedProjects }],
     projects: normalizedProjects,
     pending: normalizedProjects.length ? [] : [{ title: "暂无训练项目", message: "当前还没有可选项目，请联系俱乐部完善训练内容。" }],
+    contentTree: normalizeTrainingContentTree(raw.contentTree),
+    team: normalizeTrainingTeam(raw.team),
+    teamOptions: normalizeTrainingTeamOptions(raw.teamOptions),
   };
 }
 
 function normalizeTrainingProject(project: Record<string, unknown>) {
   const metricIds = Array.isArray(project.metricIds) ? (project.metricIds as unknown[]).map(String).filter(Boolean) : [];
+  const metricNames = Array.isArray(project.metricNames) ? (project.metricNames as unknown[]).map(String).filter(Boolean) : [];
   const tags = Array.isArray(project.tags) ? (project.tags as unknown[]).map(String).filter(Boolean) : [];
+  const coachingPoints = Array.isArray(project.coachingPoints) ? (project.coachingPoints as unknown[]).map(String).filter(Boolean) : [];
   return {
     id: String(project.id ?? ""),
     name: String(project.name ?? project.title ?? "训练项目"),
     description: stringOrUndefined(project.description ?? project.summary),
     metricIds,
+    metricNames,
     tags,
     durationMinutes: typeof project.durationMinutes === "number" ? project.durationMinutes : undefined,
+    quantityLabel: stringOrUndefined(project.quantityLabel),
     difficulty: stringOrUndefined(project.difficulty),
+    coachingPoints,
+    imageSrc: stringOrUndefined(project.imageSrc),
   };
+}
+
+function normalizeTrainingContentTree(raw: unknown): TrainingContentTree | undefined {
+  const record = asRecord(raw);
+  if (!record) return undefined;
+  const nodes = Array.isArray(record.nodes)
+    ? record.nodes
+      .map((node) => normalizeTrainingContentNode(node))
+      .filter((node): node is TrainingContentMetricNode => Boolean(node))
+    : [];
+  return {
+    viewId: String(record.viewId ?? ""),
+    viewName: String(record.viewName ?? ""),
+    graphVersionId: stringOrUndefined(record.graphVersionId),
+    nodes,
+  };
+}
+
+function normalizeTrainingContentNode(raw: unknown): TrainingContentMetricNode | null {
+  const record = asRecord(raw);
+  if (!record) return null;
+  const level = record.level === 1 || record.level === 2 || record.level === 3 ? record.level : null;
+  const id = String(record.id ?? "");
+  const metricId = String(record.metricId ?? "");
+  if (!id || !metricId || !level) return null;
+  const children = Array.isArray(record.children)
+    ? record.children
+      .map((child) => normalizeTrainingContentNode(child))
+      .filter((child): child is TrainingContentMetricNode => Boolean(child))
+    : [];
+  const drills = Array.isArray(record.drills)
+    ? record.drills
+      .map((drill) => {
+        const normalized = normalizeTrainingProject(asRecord(drill) ?? {});
+        if (!normalized.id) return null;
+        return {
+          ...normalized,
+          metricNames: normalized.metricNames ?? [],
+          coachingPoints: normalized.coachingPoints ?? [],
+        } as TrainingContentDrill;
+      })
+      .filter((drill): drill is TrainingContentDrill => Boolean(drill))
+    : [];
+  return {
+    id,
+    metricId,
+    label: String(record.label ?? "指标"),
+    level,
+    children,
+    drills,
+  };
+}
+
+function normalizeTrainingTeam(raw: unknown): TrainingTeamOption | null {
+  const record = asRecord(raw);
+  if (!record || !record.id) return null;
+  return {
+    id: String(record.id),
+    name: String(record.name ?? "球队"),
+    season: stringOrUndefined(record.season),
+  };
+}
+
+function normalizeTrainingTeamOptions(raw: unknown): TrainingTeamOption[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((item) => normalizeTrainingTeam(item))
+    .filter((item): item is TrainingTeamOption => Boolean(item));
 }
 
 function normalizeCoachTaskAction(value: unknown): "attendance" | "lesson" | "match" | "assessment" | "training" | "view" {

@@ -274,10 +274,14 @@ export interface TrainingProject {
   name: string;
   description?: string;
   metricIds: string[];
+  metricNames?: string[];
   tags: string[];
   selected?: boolean;
   durationMinutes?: number;
+  quantityLabel?: string;
   difficulty?: string;
+  coachingPoints?: string[];
+  imageSrc?: string;
 }
 
 export interface TrainingProjectGroup {
@@ -290,6 +294,36 @@ export interface TrainingProjectTree {
   groups: TrainingProjectGroup[];
   projects: TrainingProject[];
   pending: Array<{ title: string; message: string }>;
+  contentTree?: TrainingContentTree;
+  team?: TrainingTeamOption | null;
+  teamOptions?: TrainingTeamOption[];
+}
+
+export interface TrainingTeamOption {
+  id: string;
+  name: string;
+  season?: string;
+}
+
+export interface TrainingContentDrill extends TrainingProject {
+  metricNames: string[];
+  coachingPoints: string[];
+}
+
+export interface TrainingContentMetricNode {
+  id: string;
+  metricId: string;
+  label: string;
+  level: 1 | 2 | 3;
+  children: TrainingContentMetricNode[];
+  drills: TrainingContentDrill[];
+}
+
+export interface TrainingContentTree {
+  viewId: string;
+  viewName: string;
+  graphVersionId?: string;
+  nodes: TrainingContentMetricNode[];
 }
 
 export interface CoachLessonConfirmation {

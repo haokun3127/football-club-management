@@ -56,6 +56,57 @@ const tree = {
   pending: [],
 };
 
+const hierarchicalTree = {
+  ...tree,
+  contentTree: {
+    viewId: "view-full",
+    viewName: "完整评分图谱",
+    nodes: [
+      {
+        id: "primary-ball",
+        metricId: "metric-ball",
+        label: "运控球",
+        level: 1,
+        children: [
+          {
+            id: "secondary-dribble",
+            metricId: "metric-dribble",
+            label: "带球",
+            level: 2,
+            children: [
+              {
+                id: "tertiary-change",
+                metricId: "metric-change",
+                label: "变向带球",
+                level: 3,
+                children: [],
+                drills: [{
+                  id: "project-1",
+                  name: "绕桩变向",
+                  metricIds: ["metric-change"],
+                  metricNames: ["变向带球"],
+                  tags: [],
+                  durationMinutes: 12,
+                  quantityLabel: "每组 8 次",
+                  difficulty: "standard",
+                  coachingPoints: ["保持抬头观察"],
+                }],
+              },
+            ],
+            drills: [],
+          },
+        ],
+        drills: [],
+      },
+    ],
+  },
+  team: { id: "team-u10-dev", name: "U10发展队", season: "2026-2027赛季" },
+  teamOptions: [
+    { id: "team-u10-dev", name: "U10发展队", season: "2026-2027赛季" },
+    { id: "team-weekend-select", name: "周末精英队", season: "2026-2027赛季" },
+  ],
+};
+
 function workbench(selectedTrainingProjectIds = ["project-1"], event = {}) {
   return {
     event: {
@@ -205,6 +256,26 @@ describe("coach training content select", () => {
     });
     expect(page.data.saveError).not.toContain("raw transport failure");
     expect(mocks.navigateBack).not.toHaveBeenCalled();
+  });
+
+  it("projects the three-level catalog into primary, secondary, tertiary, and dosage-safe drill views", async () => {
+    mocks.getCoachTrainingProjectTree.mockResolvedValueOnce(hierarchicalTree);
+    const page = createPageInstance();
+    await page.load("event-training-1");
+
+    expect(page.data).toMatchObject({
+      state: "ready",
+      activePrimaryId: "primary-ball",
+      activeSecondaryId: "secondary-dribble",
+      primaryNodes: [expect.objectContaining({ id: "primary-ball", label: "运控球" })],
+      secondaryNodes: [expect.objectContaining({ id: "secondary-dribble", label: "带球" })],
+      tertiaryGroups: [expect.objectContaining({ id: "tertiary-change", label: "变向带球" })],
+      actionCards: [expect.objectContaining({
+        id: "project-1",
+        quantityLabel: "每组 8 次",
+        durationLabel: "12 分钟",
+      })],
+    });
   });
 
   it("does not expose a save surface for mismatched, non-training, or cancelled workbenches", async () => {
