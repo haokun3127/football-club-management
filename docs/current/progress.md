@@ -2104,3 +2104,8 @@
 - 通过 WeChatIDE MCP 采集真实教练路由 `/pages/coach/training/index`，截图和 sidecar 均严格 `375×812`，证据位于 `%TEMP%\cq-talent-visual-evidence`。
 - 四项统计卡、训练计划/能力评估/学员管理/测评任务分段导航、训练卡片和教练 TabBar 与在线 Figma `93:896` 结构一致；统计数字、训练名称、日期和人数均来自当前真实接口数据。
 - 训练时间胶囊在长日期数据下按现有防溢出规则显示省略号，未出现横向撑破或遮挡；本轮不改代码。
+
+## 2026-08-31 C11 真实 MCP 运行态复验
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:1002` 已重新读取并与真实教练路由 `/pages/coach/test-tasks/index` 对照；截图和 sidecar 均严格 `375×812`，证据位于 `%TEMP%\cq-talent-visual-evidence`。
+- 顶栏“新增”、全部/未完成/已完成筛选胶囊、任务卡、状态标签、进度条、右箭头、悬浮新增按钮和教练 TabBar 结构一致；任务名称、日期、完成数量和状态来自真实接口数据，未复制 Figma 示例值。
