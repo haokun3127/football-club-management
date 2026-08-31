@@ -28,6 +28,7 @@ await import("./index.ts");
 
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
 const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
+const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 
 function createPageInstance(data = {}) {
   const instance = {
@@ -84,7 +85,7 @@ describe("parent venues", () => {
         monthlyCount: 4,
         canNavigate: true,
         usageLabel: "本月训练 4次",
-        heroImage: "/assets/venues/venue-1.jpg",
+        heroImage: "/assets/venues/venue-1.png",
       }],
     });
     expect(page.data.venues[0]).not.toHaveProperty("gradient");
@@ -142,7 +143,7 @@ describe("parent venues", () => {
     expect(template).toContain('state="{{state}}"');
     expect(template).toContain('bindaction="loadVenues"');
     expect(template).toContain('wx:if="{{item.canNavigate}}"');
-    expect(template).toContain('wx:for="{{item.tags}}"');
+    expect(template).not.toContain('wx:for="{{item.tags}}"');
     expect(template).not.toContain('bindtap="openSearch"');
     expect(template).not.toContain("item.gradient");
     expect(template).not.toContain("http");
@@ -152,5 +153,10 @@ describe("parent venues", () => {
     expect(template).not.toContain("电话");
     expect(controller).not.toContain("openSearch()");
     expect(controller).not.toContain("GRADIENTS");
+  });
+
+  it("starts the title directly after the 24px Figma back slot", () => {
+    expect(styles).not.toContain(".venues-nav__title { flex: 1; margin-left: 24rpx;");
+    expect(styles).toContain(".venues-nav__title { flex: 1; margin-left: 0;");
   });
 });

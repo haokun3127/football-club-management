@@ -34,9 +34,6 @@
             <view class="venue-card__body">
               <view class="venue-card__name">{{item.name}}</view>
               <view class="venue-card__address"><image src="/assets/icons/map-pin.svg" mode="aspectFit" />{{item.address}}</view>
-              <view wx:if="{{item.hasTags}}" class="venue-card__tags">
-                <view wx:for="{{item.tags}}" wx:key="*this" wx:for-item="tag" class="tag-chip">{{tag}}</view>
-              </view>
               <view wx:if="{{item.hasFacilities}}" class="venue-card__facilities">
                 <view wx:for="{{item.facilities}}" wx:key="*this" wx:for-item="facility" class="facility-chip">{{facility}}</view>
               </view>

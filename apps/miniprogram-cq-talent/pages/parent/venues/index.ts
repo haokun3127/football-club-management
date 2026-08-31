@@ -6,7 +6,6 @@ import type { LoadState, VenueInfo } from "../../../utils/types";
 interface VenueView extends VenueInfo {
   canNavigate: boolean;
   hasFacilities: boolean;
-  hasTags: boolean;
   usageLabel: string;
   heroImage: string;
 }
@@ -130,9 +129,8 @@ function presentVenues(venues: VenueInfo[]): VenueView[] {
     monthlyCount,
     canNavigate: hasRealCoordinates(latitude, longitude),
     hasFacilities: facilities.length > 0,
-    hasTags: tags.length > 0,
     usageLabel: `本月训练 ${monthlyCount}次`,
-    heroImage: `/assets/venues/venue-${(index % 3) + 1}.jpg`,
+    heroImage: `/assets/venues/venue-${(index % 3) + 1}.png`,
   }));
 }
 

@@ -2167,3 +2167,8 @@
 - 对照发现推荐大图因多余 `margin-top:48rpx` 整体下移，已先以红灯回归断言锁定，再改为 `margin-top:0`；复拍确认推荐卡、快速入口、最近文章和 TabBar 几何关系恢复。
 - 对照发现训练攻略入口图标不是在线稿的 `book-open`，已以 Figma MCP 导出的原始 SVG 替换并补回归断言；复拍确认图标形态一致。
 - 文章标题、年份、副标题来自真实内容接口，与 Figma 示例不同；微信系统状态栏、原生胶囊和 Home Indicator 属平台外壳差异，按验收规则豁免。详细证据见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/p8-current-comparison.md`。
+# 2026-08-31 P8.1 场地信息真实 MCP 复验
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:416` 已重新读取；真实家长路由 `/pages/parent/venues/index` 已通过微信开发者工具 MCP 捕获严格 `375×812` 截图及 sidecar。
+- 对照发现第一张场地图错误，已替换为在线 Figma MCP 导出的三张场地图资源；对照发现卡片展示了英文 `outdoor / natural` 标签，已移除标签展示并保留筛选字段；对照发现顶栏标题右移，已将标题左间距归零。
+- 修复后复拍确认场地图、中文设施标签、标题位置、卡片层级和家长 TabBar 与在线稿结构一致。真实训练次数、地址和设施来自接口，与 Figma 示例不同；详细证据见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/p8-1-current-comparison.md`。
