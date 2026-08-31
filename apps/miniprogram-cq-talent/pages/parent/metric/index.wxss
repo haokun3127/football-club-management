@@ -4,7 +4,7 @@
 .p6-nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; box-sizing: content-box; height: 88rpx; padding: 0 32rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
 .p6-nav__back { width: 72rpx; height: 72rpx; border-radius: 36rpx; background: #f6f7f9; display: flex; align-items: center; justify-content: center; }
 .p6-nav__back image { width: 36rpx; height: 36rpx; }
-.p6-nav__title { flex: 1; text-align: center; color: #202124; font-size: 34rpx; font-weight: 700; }
+.p6-nav__title { position: absolute; left: 84rpx; max-width: 300rpx; overflow: hidden; color: #202124; font-size: 34rpx; font-weight: 700; line-height: 44rpx; text-overflow: ellipsis; white-space: nowrap; }
 .p6-nav__range { padding: 10rpx 20rpx; border: 1rpx solid #e7eaf0; border-radius: 999rpx; color: #202124; font-size: 24rpx; }
 
 .p6-body { padding: 32rpx 32rpx calc(40rpx + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 24rpx; }
