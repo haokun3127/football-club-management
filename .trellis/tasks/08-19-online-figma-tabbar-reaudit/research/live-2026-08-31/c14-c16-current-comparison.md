@@ -1,0 +1,29 @@
+# C14–C16.4 当前在线 Figma / 真实运行态复核
+
+日期：2026-08-31
+
+## 证据
+
+- 在线文件：`zZ6wKyOHKcO4UYXDd9jGwv`
+- 在线节点：C14 `93:1106`、C15 `93:1132`、C15.1 `93:1163`、C16 `93:1182`、C16.1 `93:1210`、C16.2 `93:1238`、C16.3 `93:1262`、C16.4 `93:1286`
+- 运行截图目录：`C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence`
+- 所有运行截图 sidecar 均确认路由，并确认原始/归一化尺寸为 `375×812`；采集通道为 `wechatide-mcp simulator_screenshot`。
+
+## 结论
+
+| 页面 | 运行路由 | 结论 |
+|---|---|---|
+| C14 团队能力总览 | `/pages/coach/team-ability/index` | 结构、顶栏、雷达卡、统计卡、排名区和 TabBar 通过。线上示例为 6 维/综合 74/2025 春季；真实账号为 8 维/综合 77/评估时间待同步，属于真实数据/API 差异。 |
+| C15 能力评估录入 | `/pages/coach/assessment-entry/index?templateId=assessment-template-technical&title=体能综合测评` | 带真实模板参数后，分组胶囊、学员卡、指标轨道、保存草稿、保存所有和 TabBar 结构通过。无参数空态是契约保护，不作为视觉缺陷。 |
+| C15.1 评估提交 | `/pages/coach/assessment-submit/index?title=体能综合测评&count=5` | 成功图标、顶栏、摘要卡、两个按钮和 TabBar 结构通过；标题、人数、提交状态来自真实路由参数/业务结果，与线上样例不同。 |
+| C16 我的 | `/pages/coach/me/index` | 顶栏、教练信息卡、身份切换、菜单、退出按钮和 TabBar 结构通过；姓名、球队和统计为真实账号数据差异。 |
+| C16.1 权限范围 | `/pages/coach/permissions/index` | 说明卡、权限列表、开关和保存按钮结构通过；开关状态按真实权限返回，和线上示例不同。 |
+| C16.2 私教兴趣 | `/pages/coach/private-interest/index` | 说明卡、开关、可用时段网格和结算说明结构通过；可用时段为真实接口状态。 |
+| C16.3 账号设置 | `/pages/coach/account/index` | 教练身份卡、手机号、微信绑定、设置项和 TabBar 结构通过；姓名、手机号和绑定状态为真实会话数据差异。 |
+| C16.4 帮助中心 | `/pages/coach/help/index` | 搜索、快速上手、常见问题、联系支持和 TabBar 首屏结构通过；帮助分类/问题文案由当前真实数据提供，页面为 924px 长画板，当前仅验收首屏。 |
+
+## 处理边界
+
+- 微信状态栏、原生胶囊和 Home Indicator 属平台壳层差异，按项目约定豁免。
+- 没有修改业务代码、API、生产数据或 Figma；没有为了匹配示例伪造评估、权限、账号或帮助数据。
+- C14–C16.4 本批没有发现需要修复的结构或导航缺陷。

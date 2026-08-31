@@ -2121,3 +2121,9 @@
 - 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:1080` 与真实教练路由 `/pages/coach/student-radar/index?student=student-cq-talent-secure-test-1-1` 已完成对照；运行截图和 sidecar 严格 `375×812`，证据位于 `%TEMP%\cq-talent-visual-evidence`。
 - 顶栏、学员切换胶囊、深色雷达 Hero、维度评分卡、能力评价卡和教练 TabBar 结构一致；运行态的学员、评估日期、8 维指标和得分均来自真实接口，未复制画板示例的 6 维数据。
 - 真实 8 维数据使雷达标签密度和评分卡首屏高度不同，归类为数据范围差异；本轮没有修改 C13 代码或伪造指标来匹配示例。
+
+## 2026-08-31 C14–C16.4 真实 MCP 运行态复验
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv` 的 C14 `93:1106`、C15 `93:1132`、C15.1 `93:1163`、C16 `93:1182`、C16.1 `93:1210`、C16.2 `93:1238`、C16.3 `93:1262`、C16.4 `93:1286` 已重新读取；各页均通过真实微信开发者工具 MCP 取得路由核验的 `375×812` 截图，证据位于 `%TEMP%\cq-talent-visual-evidence`，明细见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/c14-c16-current-comparison.md`。
+- C14、C15、C15.1、C16–C16.4 的顶栏、返回/设置操作、主体结构、关键卡片、按钮和教练 TabBar 与当前在线稿一致；C15 需从真实测评任务带 `templateId` 进入，无参数空态是契约保护。
+- 运行态的评估维度、综合分、教练身份、权限开关、手机号绑定状态、帮助文案等均来自真实接口/会话，与 Figma 示例数据不同，归类为数据差异，不伪造数据匹配画板。本批没有发现需要修改的业务代码或导航结构。
