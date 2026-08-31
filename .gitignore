@@ -55,6 +55,12 @@ tmp/
 temp/
 outputs/
 
+# Local visual evidence and isolated package caches
+/.tmp-*.png
+/tmp-*.png
+/.tmp-npm-cache-*/
+apps/miniprogram-cq-talent/.tmp-npm-cache-*/
+
 # Local agent/runtime helpers
 .agents/
 .hermes/
