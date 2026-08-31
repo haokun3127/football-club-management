@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { readFileSync } from "node:fs";
 
 const mocks = vi.hoisted(() => ({
   getParentCalendar: vi.fn(),
@@ -26,6 +27,8 @@ globalThis.Page = (definition) => {
 };
 
 await import("./index.ts");
+
+const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 
 function createPageInstance() {
   const instance = {
@@ -59,5 +62,9 @@ describe("parent training history active student", () => {
 
     expect(page.data.rows.length).toBeGreaterThan(0);
     expect(page.data.rows.every((row) => row.id === "student-2-training")).toBe(true);
+  });
+
+  it("aligns the title with the Figma 44px title origin", () => {
+    expect(styles).toMatch(/\.page-nav__title\s*\{[^}]*margin-left:\s*8rpx/);
   });
 });

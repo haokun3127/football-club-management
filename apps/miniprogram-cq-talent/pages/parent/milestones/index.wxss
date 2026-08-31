@@ -10,7 +10,7 @@
 .page-nav { position: sticky; top: 0; z-index: 100; height: 88rpx; box-sizing: content-box; display: flex; align-items: center; padding: 0 200rpx 0 32rpx; background: var(--color-card); }
 .page-nav__back { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; }
 .page-nav__back image { width: 48rpx; height: 48rpx; }
-.page-nav__title { flex: 1; margin-left: 24rpx; color: #202124; font-size: 36rpx; font-weight: 700; }
+.page-nav__title { flex: 1; margin-left: 8rpx; color: #202124; font-size: 36rpx; font-weight: 700; }
 .page-nav__spacer { width: 48rpx; height: 48rpx; }
 
 .milestone-card { display: flex; align-items: center; gap: 20rpx; margin-bottom: 24rpx; padding: 28rpx 32rpx; border-radius: 24rpx; background: #ffffff; }
