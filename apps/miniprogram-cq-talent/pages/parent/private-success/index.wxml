@@ -1,6 +1,6 @@
 <view class="private-success-page">
   <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="page-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+    <view class="page-nav__back" bindtap="goBack"><image src="/assets/icons/p9-1-chevron-left.svg" mode="aspectFit" /></view>
     <view class="page-nav__title">预约成功</view>
   </view>
 
@@ -16,7 +16,7 @@
 
     <block wx:if="{{state === 'ready' && request}}">
       <view class="request-marker {{request.hasConfirmation ? 'request-marker--confirmed' : 'request-marker--neutral'}}">
-        <text wx:if="{{request.hasConfirmation}}" class="request-marker__check">✓</text>
+        <image wx:if="{{request.hasConfirmation}}" class="request-marker__check" src="/assets/icons/p9-1-check.svg" mode="aspectFit" />
         <text wx:else class="request-marker__status">{{request.statusLabel}}</text>
       </view>
       <view class="request-title">{{request.headline}}</view>
@@ -27,7 +27,6 @@
         <view class="summary-row"><view class="summary-row__label">日期</view><view class="summary-row__value">{{request.date}}</view></view>
         <view class="summary-row"><view class="summary-row__label">时段</view><view class="summary-row__value">{{request.timeSlot}}</view></view>
         <view wx:if="{{request.hasGoals}}" class="summary-row"><view class="summary-row__label">内容</view><view class="summary-row__value summary-row__value--wrap">{{request.goalsLabel}}</view></view>
-        <view wx:if="{{request.hasNote}}" class="summary-row summary-row--last"><view class="summary-row__label">备注</view><view class="summary-row__value summary-row__value--wrap">{{request.note}}</view></view>
       </view>
 
       <view class="actions">

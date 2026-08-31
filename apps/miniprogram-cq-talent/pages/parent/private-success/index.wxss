@@ -8,7 +8,7 @@
 .private-success-page__body {
   min-height: calc(100vh - 140rpx);
   box-sizing: border-box;
-  padding: 56rpx 44rpx 176rpx;
+  padding: 44rpx 44rpx 176rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -35,8 +35,8 @@
 .page-nav__back image { width: 48rpx; height: 48rpx; }
 
 .page-nav__title {
-  margin-left: 24rpx;
-  font-size: 44rpx;
+  margin-left: 0;
+  font-size: 36rpx;
   font-weight: 700;
   color: var(--color-text);
 }
@@ -58,10 +58,8 @@
 .request-marker--neutral { background: #e7eaf0; }
 
 .request-marker__check {
-  font-size: 96rpx;
-  font-weight: 700;
-  color: #ffffff;
-  line-height: 1;
+  width: 96rpx;
+  height: 96rpx;
 }
 
 .request-marker__status {
@@ -99,7 +97,7 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 32rpx;
-  padding: 24rpx 0;
+  padding: 20rpx 0;
   border-bottom: 1rpx solid var(--color-line);
 }
 

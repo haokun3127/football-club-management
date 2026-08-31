@@ -136,4 +136,17 @@ describe("parent private lesson result", () => {
     expect(controller).not.toContain("query.coach");
     expect(controller).not.toContain("decodeURIComponent");
   });
+
+  it("uses the live P9.1 success icon, compact top-nav title, and four-row summary", () => {
+    const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
+    expect(template).toContain('src="/assets/icons/p9-1-chevron-left.svg"');
+    expect(template).toContain('src="/assets/icons/p9-1-check.svg"');
+    expect(template).not.toContain('class="request-marker__check">✓');
+    expect(template).not.toContain('summary-row__label">备注</view>');
+    expect(styles).toContain("font-size: 36rpx;");
+    expect(styles).toContain("width: 96rpx;");
+    expect(styles).toContain("height: 96rpx;");
+    expect(styles).toContain("padding: 44rpx 44rpx 176rpx;");
+    expect(styles).toContain("padding: 20rpx 0;");
+  });
 });
