@@ -2127,3 +2127,9 @@
 - 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv` 的 C14 `93:1106`、C15 `93:1132`、C15.1 `93:1163`、C16 `93:1182`、C16.1 `93:1210`、C16.2 `93:1238`、C16.3 `93:1262`、C16.4 `93:1286` 已重新读取；各页均通过真实微信开发者工具 MCP 取得路由核验的 `375×812` 截图，证据位于 `%TEMP%\cq-talent-visual-evidence`，明细见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/c14-c16-current-comparison.md`。
 - C14、C15、C15.1、C16–C16.4 的顶栏、返回/设置操作、主体结构、关键卡片、按钮和教练 TabBar 与当前在线稿一致；C15 需从真实测评任务带 `templateId` 进入，无参数空态是契约保护。
 - 运行态的评估维度、综合分、教练身份、权限开关、手机号绑定状态、帮助文案等均来自真实接口/会话，与 Figma 示例数据不同，归类为数据差异，不伪造数据匹配画板。本批没有发现需要修改的业务代码或导航结构。
+
+## 2026-08-31 P1 家长日程真实 MCP 复验
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv` 的 P1 `269:250` 与 P1 Empty `269:479` 已重新读取；家长双角色会话通过真实角色切换入口建立，路由确认 `/pages/parent/schedule/index`，截图和 sidecar 严格 `375×812`，证据位于 `%TEMP%\cq-talent-visual-evidence`。
+- 当前真实账号当天无活动，运行态进入 Empty 分支；顶栏铃铛、深色 Hero、周选择器、状态胶囊、空活动卡和四项家长 TabBar 结构通过。运行态额外的“秋季训练安排提醒”来自真实通知数据，属于动态内容差异。
+- 线上 P1 Empty 当前没有左右周切换箭头，运行态保留了左右箭头；这与此前产品要求两端支持上下周切换存在设计稿/产品契约差异，本轮不删除功能、不修改 Figma，已记录在 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/c14-c16-current-comparison.md`。
