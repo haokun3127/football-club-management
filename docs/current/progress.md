@@ -2061,3 +2061,10 @@
 - 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:606` 的三个快捷入口使用正红色 `✦ / ◎ / ↻`；运行态此前误用了列表、绿色方框和橙色警告 SVG。
 - C2 视图模型现对训练内容、评测录入、变更活动预计算对应 glyph；其他入口保留原有图标回退，不改路由、API 或真实数据契约。
 - 验证：C2 定向 Vitest `16/16`、小程序 TypeScript、目标 WXML/WXSS MCP 编译通过；真实教练会话复拍严格 `375×812`，三个入口与当前在线稿颜色、字形和垂直层级一致。
+
+## 2026-08-31 C4 出勤管理首屏复核
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:665` 与真实教练路由 `pages/coach/attendance/index?id=event-cq-talent-secure-test-1-trn-0818` 已重新读取；运行截图严格 `375×812`，输出到 `%TEMP%\\cq-talent-visual-evidence`。
+- 顶栏、提交动作、深色课程信息卡、出勤/缺勤/待确认统计、全员到场/清空按钮、头像行和绿色确认状态的结构与在线稿一致；运行态真实活动名称、日期、名单和 TabBar 属于数据/设备壳层差异。
+- 在线示例显示“前锋/中场/后卫”等位置副标签，但当前真实 workbench API 的学生资料没有位置字段，只有姓名、基础组别和出勤状态；本轮不伪造位置文本，记录为真实数据能力边界而非视觉代码缺陷。
+- 微信开发者工具 console 仍会报告 `webapi_getwxaasyncsecinfo:fail appid missing`（`err_code=41002`），这是 DevTools SDK 环境日志；C4 API 请求实际返回 `200`，不影响页面编译、加载或截图。
