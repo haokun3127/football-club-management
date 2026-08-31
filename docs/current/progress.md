@@ -7,6 +7,7 @@
 - P2：顶栏、训练摘要、训练内容、关联能力、线下确认、主按钮和家长 TabBar 结构通过。真实活动内容未补充时的提示、标题/时间/场地/教练为 API 数据差异。
 - P2.1：顶栏、邀请好友、比分卡、出席名单、比赛事件和家长 TabBar 结构通过；真实 `4:2`、2 名出席人和 5 条事件与 Figma 示例不同，按真实数据差异保留。
 - 证据详见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/p2-p2.1-current-comparison.md`；本批没有修改业务代码、API、生产数据或 Figma。
+- 同批继续复核 P2.2 `93:198`，真实路由 `/pages/parent/event/index?id=event-cq-talent-family-assessment-day` 截图严格 `375×812`；活动详情结构通过，运行态“俱乐部活动/待开始/地点待确认”等与 Figma 示例不同的内容均为真实 API 数据差异。
 
 ## 2026-08-31 三层训练内容与截图产物隔离收口
 
