@@ -2115,3 +2115,9 @@
 - 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:1030` 与 `93:1061` 已重新读取；C12 画板为高 `894px` 的项目评分录入页，C12.1 为自动保存提示态。
 - 真实活动 `event-cq-talent-secure-test-1` 当前存在设备本机评分草稿，因此 MCP 截图进入 C12.1 自动保存态；遮罩、成功图标、文案层级、继续/退出按钮和教练 TabBar 与 `93:1061` 一致。截图和 sidecar 均严格 `375×812`，证据位于 `%TEMP%\cq-talent-visual-evidence`。
 - 另一个历史活动 `event-cq-talent-demo-training-upcoming` 返回真实“评分项目读取失败”错误态，不能作为普通 C12 成功态证据；本轮不清理本机草稿、不注入评分数据，也不宣称普通 C12 录入态已通过。
+
+## 2026-08-31 C13 真实 MCP 运行态复验
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:1080` 与真实教练路由 `/pages/coach/student-radar/index?student=student-cq-talent-secure-test-1-1` 已完成对照；运行截图和 sidecar 严格 `375×812`，证据位于 `%TEMP%\cq-talent-visual-evidence`。
+- 顶栏、学员切换胶囊、深色雷达 Hero、维度评分卡、能力评价卡和教练 TabBar 结构一致；运行态的学员、评估日期、8 维指标和得分均来自真实接口，未复制画板示例的 6 维数据。
+- 真实 8 维数据使雷达标签密度和评分卡首屏高度不同，归类为数据范围差异；本轮没有修改 C13 代码或伪造指标来匹配示例。
