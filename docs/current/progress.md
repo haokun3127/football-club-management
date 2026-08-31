@@ -2098,3 +2098,9 @@
 - 微信开发者工具恢复后，使用 WeChatIDE MCP 重新打开并采集 C6 `/pages/coach/match/index`、C6.1 `/pages/coach/match-event-add/index`、C7 `/pages/coach/tactical-board/index`，三张截图及 sidecar 均严格 `375×812`，采集方式均为 `wechatide-mcp simulator_screenshot`，证据位于 `%TEMP%\cq-talent-visual-evidence`。
 - C6 真实运行态的比赛标题、球队、比分、事件时间线和半场比分待同步文案均来自当前教练可访问活动；C6.1 显示真实能力类型和球员名单；C7 显示真实战术板号码、候补名单和拖拽工作区，未复制 Figma 示例业务数据。
 - 三页的顶栏、内容卡片、球场/名单结构、操作层级和教练 TabBar 与当前在线稿一致。C7 保存按钮在未产生变更的真实状态下呈禁用色，记录为状态差异，不通过伪造拖拽修改来强行匹配画板示例。
+
+## 2026-08-31 C8 真实 MCP 运行态复验
+
+- 通过 WeChatIDE MCP 采集真实教练路由 `/pages/coach/training/index`，截图和 sidecar 均严格 `375×812`，证据位于 `%TEMP%\cq-talent-visual-evidence`。
+- 四项统计卡、训练计划/能力评估/学员管理/测评任务分段导航、训练卡片和教练 TabBar 与在线 Figma `93:896` 结构一致；统计数字、训练名称、日期和人数均来自当前真实接口数据。
+- 训练时间胶囊在长日期数据下按现有防溢出规则显示省略号，未出现横向撑破或遮挡；本轮不改代码。
