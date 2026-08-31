@@ -25,6 +25,7 @@ export interface TrainingDrill extends AuditFields, CatalogScoped {
   objectiveIds: EntityId[];
   metricIds: EntityId[];
   durationMinutes: number;
+  quantityLabel?: string;
   difficulty: DrillDifficulty;
   recommendedAgeGroups: string[];
   recommendedLevels: string[];

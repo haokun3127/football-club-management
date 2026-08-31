@@ -1219,6 +1219,7 @@ function createRecommendedTrainingDrills(
     objectiveIds: Array.from(drill.objectiveIds),
     metricIds: Array.from(drill.metricIds),
     durationMinutes: 10,
+    quantityLabel: trainingQuantityLabel(index),
     difficulty: "standard",
     recommendedAgeGroups: ["U8", "U10", "U12"],
     recommendedLevels: ["development", "advanced", "elite"],
@@ -1228,6 +1229,11 @@ function createRecommendedTrainingDrills(
     createdAt: now,
     updatedAt: now,
   }));
+}
+
+function trainingQuantityLabel(index: number): string {
+  const labels = ["每组 12 次", "每组 30 秒", "每组 8 次", "每组 10 次"];
+  return labels[index % labels.length] ?? "剂量待设置";
 }
 
 export function splitRecommendedTrainingItems(value: string): string[] {
