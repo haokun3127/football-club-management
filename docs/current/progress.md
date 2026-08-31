@@ -2055,3 +2055,9 @@
 - 截图脚本在省略输出路径时统一写入 `%TEMP%\\cq-talent-visual-evidence`；本轮将 `%TEMP%` 根目录已确认属于旧 MCP 的 20 张 `wechatide-simulator-screenshot-*.png` 可恢复移动到其 `raw` 子目录，没有删除历史资料。
 - 桌面根目录未发现截图文件，仅有原有的 `头.jpg`、`cqai_logo_transparent_cropped.png` 和 `logo.jpg`。项目下 `.trellis/tasks/**/research`、`docs/design/reference/figma` 等图片是历史设计/验收证据，不批量清理或改路径，避免破坏交接文档引用。
 - 截图路径回归 `10/10`；教练 C1 日程在线稿 `1293:8` 与真实 MCP 模拟器截图已重新对照，结构一致，状态栏、TabBar、真实日期和真实数据属于运行时差异，不作为代码缺陷。
+
+## 2026-08-31 C2 快捷入口 glyph 与在线稿同步
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:606` 的三个快捷入口使用正红色 `✦ / ◎ / ↻`；运行态此前误用了列表、绿色方框和橙色警告 SVG。
+- C2 视图模型现对训练内容、评测录入、变更活动预计算对应 glyph；其他入口保留原有图标回退，不改路由、API 或真实数据契约。
+- 验证：C2 定向 Vitest `16/16`、小程序 TypeScript、目标 WXML/WXSS MCP 编译通过；真实教练会话复拍严格 `375×812`，三个入口与当前在线稿颜色、字形和垂直层级一致。

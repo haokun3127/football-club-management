@@ -50,7 +50,8 @@
 
     <view wx:if="{{hasActionCards}}" class="action-grid">
       <view wx:for="{{actionCards}}" wx:key="id" class="action-tile" data-action="{{item.id}}" bindtap="openAction">
-        <image class="action-tile__icon" src="{{item.icon}}" mode="aspectFit" />
+        <view wx:if="{{item.glyph}}" class="action-tile__glyph">{{item.glyph}}</view>
+        <image wx:else class="action-tile__icon" src="{{item.icon}}" mode="aspectFit" />
         <view class="action-tile__label">{{item.label}}</view>
       </view>
     </view>

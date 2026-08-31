@@ -322,6 +322,20 @@ describe("coach activity workbench", () => {
     expect(stylesheet).not.toContain('.action-tile--match');
   });
 
+  it("uses the current Figma glyphs for the three training workbench shortcuts", async () => {
+    mocks.getCoachWorkbench.mockResolvedValue(trainingWorkbench);
+    const page = createPageInstance();
+    await page.load("event-training-1");
+
+    expect(page.data.actionCards).toEqual([
+      { id: "training", label: "训练内容", glyph: "✦" },
+      { id: "assessment", label: "评测录入", glyph: "◎" },
+      { id: "change", label: "变更活动", glyph: "↻" },
+    ]);
+    expect(template).toContain('<view wx:if="{{item.glyph}}" class="action-tile__glyph">{{item.glyph}}</view>');
+    expect(stylesheet).toMatch(/\.action-tile__glyph\s*\{[^}]*color:\s*#a80f1b[^}]*font-size:\s*48rpx/s);
+  });
+
   it("places the editable training summary before the secondary action tiles", () => {
     expect(template.indexOf('class="training-card__summary"')).toBeLessThan(template.indexOf('class="action-grid"'));
   });

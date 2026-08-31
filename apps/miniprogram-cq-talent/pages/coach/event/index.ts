@@ -9,7 +9,8 @@ type WorkbenchAction = "attendance" | "lesson" | "match" | "tactical" | "trainin
 type ActionCard = {
   id: WorkbenchAction;
   label: string;
-  icon: string;
+  icon?: string;
+  glyph?: string;
 };
 
 type RosterRow = CoachWorkbench["roster"][number] & { statusLabel: string; present: boolean; initial: string; displayName: string };
@@ -248,7 +249,14 @@ function actionCard(id: WorkbenchAction, label: string): ActionCard {
     assessment: "/assets/icons/c164-category-assessment.svg",
     change: "/assets/icons/alert.svg",
   };
-  return { id, label, icon: icons[id] };
+  const glyphs: Partial<Record<WorkbenchAction, string>> = {
+    training: "✦",
+    assessment: "◎",
+    change: "↻",
+  };
+  return glyphs[id]
+    ? { id, label, glyph: glyphs[id] }
+    : { id, label, icon: icons[id] };
 }
 
 function attendanceSummary(rosterRows: RosterRow[]) {
