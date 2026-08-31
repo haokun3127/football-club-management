@@ -23,6 +23,8 @@ node scripts/devtools/wechatide-mcp-capture.cjs \
   --output "C:\Users\ASUS\AppData\Local\Temp\cq-coach-schedule.png"
 ```
 
+`--output` 可以省略；此时脚本自动生成不冲突的 PNG 路径到 `%TEMP%\\cq-talent-visual-evidence`。只有需要把证据复制到指定归档位置时才传入明确的绝对路径，禁止把桌面路径作为默认输出。
+
 命令会通过 MCP 编译并打开路由，复核 `currentPage` 与 `systemInfo=375×812`，再以 `optimize=false`、`waitForSelector="view"` 等待新页面完成挂载后获取原始 PNG，用 Pillow 归一化为严格 `375×812`，并生成同名 `.json` sidecar。等待页面根节点是必要的：只确认路由已经切换，仍可能抢在 WXML 渲染完成前得到白屏。sidecar 记录路由、设备倍率、原始像素、归一化像素、SHA-256 和 `captureMethod`；任何 MCP/路由/尺寸/写入失败都不会发布 PNG 或 sidecar。
 
 原始截图的比例允许 DevTools 四舍五入造成的 `0.5%` 以内误差；归一化只裁去边缘的比例误差再缩放，不接受明显错误的画布。
@@ -43,7 +45,7 @@ npx --yes pnpm@10.33.0 --filter @football-club/miniprogram-cq-talent devtools:au
 
 ## 历史 Automator 单页截图（仅紧急回退）
 
-传入明确输出路径时可以保存到指定位置；省略输出路径时，脚本会自动写入系统临时目录 `%TEMP%\\cq-talent-visual-evidence`，不会把截图写入桌面仓库。这个默认行为适用于 `mp-route-shot.cjs`、`mp-route-shot-bottom.cjs`、`mp-snap.cjs` 和 `mp-batch-shot.cjs`。
+传入明确输出路径时可以保存到指定位置；省略输出路径时，脚本会自动写入系统临时目录 `%TEMP%\\cq-talent-visual-evidence`，不会把截图写入桌面仓库。这个默认行为适用于 `wechatide-mcp-capture.cjs`、`mp-route-shot.cjs`、`mp-route-shot-bottom.cjs`、`mp-snap.cjs` 和 `mp-batch-shot.cjs`。
 
 ```bash
 node scripts/devtools/mp-route-shot.cjs \
