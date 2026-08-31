@@ -2193,3 +2193,10 @@
 - 对照发现成功勾选符号、顶栏间距、摘要备注行和内容区纵向间距与在线稿不一致；已用在线稿 SVG 做最小修复，并补充回归断言。
 - 修复后复拍确认成功状态、四行摘要、双按钮、顶栏和家长 TabBar 结构一致；真实请求数据与画板示例差异已记录为数据豁免。
 - 详细证据见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/p9-1-current-comparison.md`。聚焦测试 6/6 通过，小程序 typecheck 通过。
+
+# 2026-08-31 P10 账号绑定真实 MCP 复验与修复
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:550` 已重新读取，并通过真实微信开发者工具 MCP 对 `/pages/parent/binding/index` 取得严格 `375×812` 运行截图。
+- 对照发现顶栏标题、微信绑定图标、家庭成员头像和添加成员按钮仍有旧实现残留；已用在线稿导出的 SVG 做最小修复并补充回归断言。
+- 修复后复拍确认账号绑定三张信息卡、添加成员入口、顶栏和家长 TabBar 结构一致；真实家庭成员数量差异已记录为数据豁免。
+- 详细证据见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/p10-current-comparison.md`。聚焦测试 6/6 通过，小程序 typecheck 通过。

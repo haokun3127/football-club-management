@@ -1,6 +1,6 @@
 <view class="binding-page">
   <view class="binding-nav" style="padding-top:{{navInset}}px">
-    <view class="binding-nav__back" style="top:{{navActionTop}}px" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+    <view class="binding-nav__back" style="top:{{navActionTop}}px" bindtap="goBack"><image src="/assets/icons/p10-chevron-left.svg" mode="aspectFit" /></view>
     <view class="binding-nav__title">账号绑定</view>
   </view>
 
@@ -19,22 +19,22 @@
       </view>
 
       <view class="binding-card binding-card--wechat" bindtap="openAccount">
-        <view class="wechat-head"><image src="/assets/icons/smartphone.svg" mode="aspectFit" /><view class="binding-card__title">微信登录绑定</view></view>
-        <view class="wechat-detail"><image src="/assets/icons/check-circle.svg" mode="aspectFit" /><view>微信: {{wechatLabel}}</view></view>
+        <view class="wechat-head"><image src="/assets/icons/p10-smartphone.svg" mode="aspectFit" /><view class="binding-card__title">微信登录绑定</view></view>
+        <view class="wechat-detail"><image src="/assets/icons/p10-check-circle.svg" mode="aspectFit" /><view>微信: {{wechatLabel}}</view></view>
       </view>
 
       <view class="binding-card binding-card--family">
         <view class="binding-card__title">家庭成员</view>
         <view wx:if="{{familyMembers.length}}">
           <view wx:for="{{familyMembers}}" wx:key="parentId" class="family-row {{index < familyMembers.length - 1 ? 'family-row--border' : ''}}">
-            <view class="family-row__avatar"><image src="/assets/icons/content-users.svg" mode="aspectFit" /></view>
+            <view class="family-row__avatar"><image src="/assets/icons/p10-user.svg" mode="aspectFit" /></view>
             <view class="family-row__info">
               <view class="family-row__name">{{item.relationshipLabel}}<text wx:if="{{item.isSelf}}" class="family-row__self">（我）</text></view>
               <view class="family-row__phone">{{item.phoneMasked}}</view>
             </view>
             <view class="family-row__chip">已加入</view>
           </view>
-          <view class="family-add" bindtap="addFamilyMember">+ 添加家庭成员</view>
+          <view class="family-add" bindtap="addFamilyMember"><image src="/assets/icons/p10-plus.svg" mode="aspectFit" /><text>添加家庭成员</text></view>
         </view>
         <view wx:else class="family-unavailable">家庭成员信息暂不可显示</view>
       </view>
