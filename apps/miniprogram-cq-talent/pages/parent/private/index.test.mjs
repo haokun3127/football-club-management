@@ -194,4 +194,17 @@ describe("parent private lesson form", () => {
     expect(controller).not.toContain("coach=");
     expect(controller).not.toContain("待分配教练");
   });
+
+  it("matches the live P9 form structure and square chip geometry", () => {
+    const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
+    expect(template).toContain('src="/assets/icons/p9-chevron-left.svg"');
+    expect(template).toContain('src="/assets/icons/p9-chevron-right.svg"');
+    expect(template).toContain('src="/assets/icons/p9-calendar.svg"');
+    expect(template).toContain('class="chip-grid chip-grid--slots"');
+    expect(template).toContain('class="chip-grid chip-grid--goals"');
+    expect(template).not.toContain("预约学员");
+    expect(styles).toContain("text-align: left;");
+    expect(styles).toContain("border-radius: 12rpx;");
+    expect(styles).toContain("grid-template-columns: repeat(3, minmax(0, 1fr));");
+  });
 });

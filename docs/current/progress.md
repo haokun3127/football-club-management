@@ -2179,3 +2179,10 @@
 - 对照发现分类图标、更多问题图标、热门问题图标/行高和顶栏标题间距仍有旧实现残留；已用在线稿导出的 SVG 做最小修复，并补充回归断言。
 - 修复后复拍确认帮助分类、热门问题列表、顶栏和家长 TabBar 结构与在线稿一致；热门问题数据继续来自真实 API，平台外壳差异按规则豁免。
 - 详细证据见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/p8-2-current-comparison.md`。聚焦测试 6/6 通过，小程序 typecheck 通过。
+
+# 2026-08-31 P9 私教预约真实 MCP 复验与修复
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:500` 已重新读取，并通过真实微信开发者工具 MCP 对 `/pages/parent/private/index` 取得严格 `375×812` 运行截图。
+- 对照发现旧页面多了预约学员展示、顶栏居中、时段胶囊化、列数不符以及图标资源不一致；已按在线稿做最小修复并补充回归断言。
+- 修复后复拍确认预约表单、时段/目标标签、提交区、顶栏和家长 TabBar 结构一致；真实教练、状态和提交可用性差异已记录为数据/状态豁免。
+- 详细证据见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/p9-current-comparison.md`。聚焦测试 7/7 通过，小程序 typecheck 通过。

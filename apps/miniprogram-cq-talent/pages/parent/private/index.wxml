@@ -1,5 +1,5 @@
 <view class="private-page">
-  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="page-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="page-nav__title">私教预约</view><view class="page-nav__spacer"></view></view>
+  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="page-nav__back" bindtap="goBack"><image src="/assets/icons/p9-chevron-left.svg" mode="aspectFit" /></view><view class="page-nav__title">私教预约</view><view class="page-nav__spacer"></view></view>
   <view class="private-page__body">
     <status-view
       state="{{state}}"
@@ -14,16 +14,11 @@
         <view class="form-card__title">预约信息</view>
 
         <view class="field">
-          <view class="field__label">预约学员</view>
-          <view class="field__picker field__picker--readonly">{{studentName}}</view>
-        </view>
-
-        <view class="field">
           <view class="field__label">选择教练</view>
           <picker wx:if="{{hasCoaches}}" range="{{coachOptions}}" value="{{coachIndex}}" bindchange="selectCoach">
             <view class="field__picker">
               <text>{{coachDisplayName}}</text>
-              <text class="field__chevron">›</text>
+              <image class="field__chevron" src="/assets/icons/p9-chevron-right.svg" mode="aspectFit" />
             </view>
           </picker>
           <view wx:else class="field__picker field__picker--disabled">暂无可用教练</view>
@@ -34,14 +29,14 @@
           <picker mode="date" value="{{date}}" bindchange="selectDate">
             <view class="field__picker">
               <text class="{{date ? '' : 'field__picker--placeholder'}}">{{dateLabel}}</text>
-              <image class="field__icon" src="/assets/icons/tab-calendar.svg" mode="aspectFit" />
+              <image class="field__icon" src="/assets/icons/p9-calendar.svg" mode="aspectFit" />
             </view>
           </picker>
         </view>
 
         <view class="field">
           <view class="field__label">时段选择</view>
-          <view class="chip-grid">
+          <view class="chip-grid chip-grid--slots">
             <view
               wx:for="{{timeSlots}}"
               wx:key="value"
@@ -54,7 +49,7 @@
 
         <view class="field">
           <view class="field__label">训练目标</view>
-          <view class="chip-grid">
+          <view class="chip-grid chip-grid--goals">
             <view
               wx:for="{{goalOptions}}"
               wx:key="value"
