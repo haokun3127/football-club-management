@@ -59,6 +59,16 @@ describe("P1 weekly schedule with expandable month picker", () => {
     });
   });
 
+  it("keeps the date circle and activity markers on separate vertical bands", () => {
+    const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
+    const grid = stylesheet.match(/\.month-calendar__grid\s*\{([^}]*)\}/)?.[1] ?? "";
+    const markers = stylesheet.match(/\.month-day__markers\s*\{([^}]*)\}/)?.[1] ?? "";
+
+    expect(grid).toContain("grid-auto-rows: 72rpx");
+    expect(markers).toContain("bottom: 2rpx");
+    expect(markers).not.toContain("bottom: 0");
+  });
+
   it("keeps the week strip as the default and only renders the month grid while expanded", () => {
     expect(template).toContain('wx:if="{{!isMonthPickerExpanded}}" class="week-switcher"');
     expect(template).toContain('bindtap="expandMonthPicker"');

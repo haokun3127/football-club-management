@@ -237,7 +237,17 @@ describe("coach schedule home", () => {
     expect(template).toContain('绿色=训练');
     expect(template).toContain('蓝色=比赛');
     expect(stylesheet).toMatch(/\.c1-month-day__marker--match\s*\{[^}]*background:\s*#1976d2/s);
-    expect(stylesheet).toMatch(/\.c1-month-calendar__grid\s*\{[^}]*grid-auto-rows:\s*88rpx/s);
+    expect(stylesheet).toMatch(/\.c1-month-calendar__grid\s*\{[^}]*grid-auto-rows:\s*96rpx/s);
+  });
+
+  it("keeps the month date circle separate from markers and keeps the legend close to the grid", () => {
+    const grid = stylesheet.match(/\.c1-month-calendar__grid\s*\{([^}]*)\}/)?.[1] ?? "";
+    const markers = stylesheet.match(/\.c1-month-day__markers\s*\{([^}]*)\}/)?.[1] ?? "";
+    const legend = stylesheet.match(/\.c1-month-calendar__legend\s*\{([^}]*)\}/)?.[1] ?? "";
+
+    expect(grid).toContain("grid-auto-rows: 96rpx");
+    expect(markers).toContain("bottom: 0");
+    expect(legend).toContain("margin-top: 8rpx");
   });
 
   it("renders the live C1 team selector before the hero and removes the legacy summary rail", async () => {
