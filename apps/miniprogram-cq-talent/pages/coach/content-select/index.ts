@@ -44,6 +44,7 @@ type TertiaryGroupView = {
   label: string;
   className: string;
   actionCount: number;
+  cards: ActionCardView[];
 };
 
 type ActionCardView = TrainingProject & {
@@ -89,6 +90,9 @@ interface PageData {
   contentTree?: TrainingContentTree;
   team: TrainingTeamOption | null;
   teamOptions: TrainingTeamOption[];
+  teamLabel: string;
+  hasContentTree: boolean;
+  hasActionCards: boolean;
   primaryNodes: PrimaryNodeView[];
   secondaryNodes: SecondaryNodeView[];
   tertiaryGroups: TertiaryGroupView[];
@@ -134,6 +138,9 @@ Page<PageData>({
     contentTree: undefined,
     team: null,
     teamOptions: [],
+    teamLabel: "",
+    hasContentTree: false,
+    hasActionCards: false,
     primaryNodes: [],
     secondaryNodes: [],
     tertiaryGroups: [],
@@ -197,6 +204,7 @@ Page<PageData>({
         contentTree: tree.contentTree,
         team: tree.team ?? null,
         teamOptions: tree.teamOptions ?? [],
+        teamLabel: tree.team?.name ?? "",
         hasProjects,
         canSave: true,
       });
@@ -363,6 +371,9 @@ Page<PageData>({
       contentTree: undefined,
       team: null,
       teamOptions: [],
+      teamLabel: "",
+      hasContentTree: false,
+      hasActionCards: false,
       primaryNodes: [],
       secondaryNodes: [],
       tertiaryGroups: [],
@@ -449,6 +460,7 @@ function buildContentSelectionPatch(
       label: tertiary.label,
       className: "content-tertiary",
       actionCount: drills.length,
+      cards: drills,
     });
     for (const card of drills) {
       if (seenDrillIds.has(card.id)) continue;
@@ -464,6 +476,8 @@ function buildContentSelectionPatch(
     actionCards,
     activePrimaryId,
     activeSecondaryId,
+    hasContentTree: primarySource.length > 0,
+    hasActionCards: actionCards.length > 0,
   };
 }
 

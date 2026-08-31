@@ -1,7 +1,9 @@
 <view class="select-page">
   <view class="select-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="select-nav__left">
-      <view class="select-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+      <view class="select-nav__back" bindtap="goBack" aria-label="返回">
+        <image src="/assets/icons/chevron-left.svg" mode="aspectFit" />
+      </view>
       <view class="select-nav__title">训练内容选择</view>
     </view>
   </view>
@@ -10,18 +12,68 @@
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{statusTitle}}" message="{{message}}" action-text="{{statusActionText}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready'}}">
-      <view class="search-bar">
-        <image class="search-bar__icon" src="/assets/icons/search.svg" mode="aspectFit" />
-        <input class="search-bar__input" placeholder="搜索训练项目" value="{{searchText}}" bindinput="onSearchInput" />
+      <view class="select-context">
+        <view class="select-context__title">{{teamLabel || '训练内容库'}}</view>
+        <view wx:if="{{contentTree && contentTree.viewName}}" class="select-context__meta">{{contentTree.viewName}}</view>
       </view>
 
-      <scroll-view scroll-x class="category-strip" enhanced show-scrollbar="{{false}}">
-        <view class="category-strip__inner">
-          <view wx:for="{{categories}}" wx:key="id" class="{{item.className}}" data-id="{{item.id}}" bindtap="selectCategory">{{item.label}}</view>
+      <view class="search-bar">
+        <image class="search-bar__icon" src="/assets/icons/search.svg" mode="aspectFit" />
+        <input class="search-bar__input" placeholder="搜索训练动作、动作要点" value="{{searchText}}" bindinput="onSearchInput" />
+      </view>
+
+      <scroll-view wx:if="{{hasContentTree}}" scroll-x class="content-primary-strip" enhanced show-scrollbar="{{false}}">
+        <view class="content-primary-strip__inner">
+          <view wx:for="{{primaryNodes}}" wx:key="id" class="{{item.className}}" data-id="{{item.id}}" bindtap="selectPrimary">
+            <text class="content-primary__label">{{item.label}}</text>
+          </view>
         </view>
       </scroll-view>
 
-      <view wx:if="{{hasVisibleProjects}}" class="project-list">
+      <view wx:if="{{hasContentTree}}" class="content-layout">
+        <scroll-view scroll-y class="content-secondary-rail" enhanced show-scrollbar="{{false}}">
+          <view wx:for="{{secondaryNodes}}" wx:key="id" class="{{item.className}}" data-id="{{item.id}}" bindtap="selectSecondary">
+            <text class="content-secondary__label">{{item.label}}</text>
+          </view>
+          <view wx:if="{{!secondaryNodes.length}}" class="content-secondary__empty">暂无子项</view>
+        </scroll-view>
+
+        <view class="content-results">
+          <block wx:for="{{tertiaryGroups}}" wx:key="id" wx:for-item="group">
+            <view class="content-tertiary-group">
+              <view class="content-tertiary-group__head">
+                <text class="content-tertiary-group__title">{{group.label}}</text>
+                <text class="content-tertiary-group__count">{{group.actionCount}} 项</text>
+              </view>
+
+              <view class="content-action-grid">
+                <view wx:for="{{group.cards}}" wx:key="id" class="{{item.cardClass}}" data-id="{{item.id}}" bindtap="toggleProject">
+                  <view class="content-action-card__visual">
+                    <image src="{{item.iconSrc}}" mode="aspectFit" />
+                    <view wx:if="{{item.hasDifficulty}}" class="content-action-card__difficulty">{{item.difficulty}}</view>
+                  </view>
+                  <view class="content-action-card__body">
+                    <view class="content-action-card__name">{{item.name}}</view>
+                    <view class="content-action-card__meta">
+                      <text wx:if="{{item.hasQuantity}}" class="content-action-card__quantity">{{item.quantityLabel}}</text>
+                      <text wx:if="{{item.hasDuration}}" class="content-action-card__duration">{{item.durationLabel}}</text>
+                    </view>
+                    <view class="content-action-card__point">{{item.coachingPointsPreview}}</view>
+                    <view class="content-action-card__detail">查看动作要点</view>
+                  </view>
+                  <view class="{{item.selectClass}}">
+                    <image wx:if="{{item.isSelected}}" src="/assets/icons/c10-check-circle.svg" mode="aspectFit" />
+                  </view>
+                </view>
+              </view>
+            </view>
+          </block>
+
+          <view wx:if="{{!hasActionCards}}" class="inline-empty">当前筛选暂无训练动作，请更换指标或搜索词。</view>
+        </view>
+      </view>
+
+      <view wx:if="{{!hasContentTree && hasVisibleProjects}}" class="project-list">
         <view wx:for="{{visibleProjects}}" wx:key="id" class="{{item.cardClass}}" data-id="{{item.id}}" bindtap="toggleProject">
           <view class="{{item.iconClass}}"><image src="{{item.iconSrc}}" mode="aspectFit" /></view>
           <view class="project-card__info">
@@ -34,15 +86,20 @@
           <view class="{{item.selectClass}}"><image wx:if="{{item.isSelected}}" src="/assets/icons/c10-check-circle.svg" mode="aspectFit" /></view>
         </view>
       </view>
-      <view wx:else class="inline-empty">当前分类暂无训练内容。</view>
+      <view wx:if="{{!hasContentTree && !hasVisibleProjects}}" class="inline-empty">当前暂无可选择的训练内容。</view>
 
       <view wx:if="{{hasSaveError}}" class="save-error" role="alert">{{saveError}}</view>
     </block>
   </view>
 
   <view wx:if="{{state === 'ready'}}" class="select-bar">
-    <text class="select-bar__summary">{{summaryLabel}}</text>
-    <view class="{{confirmClass}}" bindtap="confirmSelection" aria-disabled="{{isConfirmDisabled}}">{{confirmLabel}}</view>
+    <view class="select-bar__temporary">
+      <view class="select-bar__temporary-title">临时超级组</view>
+      <view class="select-bar__temporary-count">{{summaryLabel}}</view>
+    </view>
+    <view class="{{confirmClass}}" bindtap="confirmSelection" aria-disabled="{{isConfirmDisabled}}">
+      <text>{{confirmLabel}}</text>
+    </view>
   </view>
 
   <role-tabbar role="coach" active="training" />

@@ -321,4 +321,18 @@ describe("coach training content select", () => {
     expect(stylesheet).toMatch(/\.search-bar__input\s*\{[^}]*font-size:\s*26rpx/s);
     expect(stylesheet).toMatch(/\.category-chip\s*\{[^}]*height:\s*64rpx[^}]*padding:\s*0 32rpx[^}]*font-size:\s*26rpx/s);
   });
+
+  it("renders the three-level picker structure with fixed actions and separate dosage fields", () => {
+    expect(template).toContain('class="content-primary-strip"');
+    expect(template).toContain('class="content-secondary-rail"');
+    expect(template).toContain('class="content-tertiary-group"');
+    expect(template).toContain('class="content-action-grid"');
+    expect(template).toContain('{{item.quantityLabel}}');
+    expect(template).toContain('{{item.durationLabel}}');
+    expect(template).toContain('class="select-bar__temporary"');
+    expect(template).toContain('mode="aspectFit"');
+    expect(stylesheet).toMatch(/\.content-action-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,/s);
+    expect(stylesheet).toMatch(/\.select-bar\s*\{[^}]*position:\s*fixed/s);
+    expect(stylesheet).toMatch(/\.select-page__body\s*\{[^}]*padding-bottom:/s);
+  });
 });
