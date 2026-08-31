@@ -109,8 +109,6 @@ describe("coach schedule home", () => {
     expect(page.data).toMatchObject({
       state: "ready",
       coachName: "Coach Chen",
-      selectedTeamName: "U11 Red",
-      teamMetaLabel: "后台同步",
       hasHeroEvent: true,
       heroDateLabel: "2026年8月13日 周四",
       heroEvent: { id: "event-training-1", title: "Ball-control session", startTime: "09:00", hasDuration: true },
@@ -250,23 +248,7 @@ describe("coach schedule home", () => {
     expect(legend).toContain("margin-top: 8rpx");
   });
 
-  it("renders the live C1 team selector before the hero and removes the legacy summary rail", async () => {
-    mocks.getCoachHome.mockResolvedValue({ ...home, teams: ["U10精英队"] });
-    const page = createPageInstance();
-
-    await page.load();
-
-    expect(page.data).toMatchObject({
-      selectedTeamName: "U10精英队",
-      hasTeams: true,
-    });
-    expect(template).toContain('class="c1-team-selector"');
-    expect(template.indexOf("c1-team-selector")).toBeLessThan(template.indexOf("c1-hero"));
-    expect(template).not.toContain('class="c1-summary"');
-    expect(stylesheet).toMatch(/\.c1-team-selector\s*\{[^}]*height:\s*152rpx[^}]*border-radius:\s*24rpx/s);
-  });
-
-  it("restores a real selected team and limits C1 events to that team's API records", async () => {
+  it("keeps all assigned-team events in C1 and removes the obsolete team selector", async () => {
     globalThis.wx.getStorageSync.mockReturnValue("U12 Blue");
     mocks.getCoachHome.mockResolvedValue({
       ...home,
@@ -280,22 +262,27 @@ describe("coach schedule home", () => {
 
     await page.load();
 
-    expect(page.data.selectedTeamName).toBe("U12 Blue");
-    expect(page.data.visibleEvents).toHaveLength(1);
-    expect(page.data.visibleEvents[0]).toMatchObject({ id: "event-training-2", teamName: "U12 Blue" });
+    expect(page.data.eventViews).toHaveLength(2);
+    expect(page.data.visibleEvents).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "event-training-1", teamName: "U11 Red" }),
+      expect.objectContaining({ id: "event-training-2", teamName: "U12 Blue" }),
+    ]));
+    expect(page.data).not.toHaveProperty("selectedTeamName");
+    expect(page.data).not.toHaveProperty("hasTeams");
+    expect(template).not.toContain('class="c1-team-selector"');
+    expect(stylesheet).not.toContain(".c1-team-selector");
+    const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
+    expect(controller).not.toContain("coach-selected-team");
+    expect(controller).not.toContain("resolveSelectedTeam");
+    expect(controller).not.toContain("openTeam()");
   });
 
-  it("opens the dedicated full-screen selector instead of the team-detail page", () => {
-    const page = createPageInstance({ hasTeams: true, selectedTeamName: "U11 Red" });
-
-    page.openTeam();
-
-    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/team-selector/index");
+  it("keeps the all-teams context visible when the selected date has no events", () => {
+    expect(template).toContain('wx:if="{{state !== \'loading\' && state !== \'error\'}}" class="c1-all-teams-context"');
   });
 
   it("matches the C1 online hero and stats-row offsets without moving activity cards off their 22px rail", () => {
     expect(stylesheet).toMatch(/\.c1-nav\s*\{[^}]*padding:\s*0\s+32rpx/s);
-    expect(stylesheet).toMatch(/\.c1-team-selector\s*\{[^}]*height:\s*152rpx[^}]*border-radius:\s*24rpx/s);
     expect(stylesheet).toMatch(/\.c1-body\s*\{[^}]*padding:\s*0\s+44rpx\s+calc\(148rpx\s*\+\s*env\(safe-area-inset-bottom\)\)/s);
     expect(stylesheet).toMatch(/\.c1-hero\s*\{[^}]*margin:\s*0\s+-12rpx/s);
     expect(stylesheet).toMatch(/\.c1-list\s*\{[^}]*margin-top:\s*24rpx/s);

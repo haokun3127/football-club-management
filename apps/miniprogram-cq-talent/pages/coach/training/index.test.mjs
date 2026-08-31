@@ -23,6 +23,7 @@ vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
 vi.mock("../../../utils/presentation", () => ({
   formatCalendarDate: (value) => value.slice(0, 10),
   formatTimeRange: () => "17:30",
+  formatTimeOnly: (value) => value.slice(11, 16),
   resolveMenuInset: () => 88,
   resolveNavInset: () => 0,
 }));
@@ -34,6 +35,10 @@ globalThis.Page = (definition) => {
 };
 
 await import("./index.ts");
+
+globalThis.wx = {
+  getStorageSync: vi.fn(),
+};
 
 const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
@@ -84,6 +89,17 @@ const team = {
   members: [],
 };
 
+const trainingTree = {
+  groups: [],
+  projects: [],
+  pending: [],
+  team: { id: "team-1", name: "Real team", season: "2026-2027赛季" },
+  teamOptions: [
+    { id: "team-1", name: "Real team", season: "2026-2027赛季" },
+    { id: "team-2", name: "Blue team", season: "2026-2027赛季" },
+  ],
+};
+
 function createPageInstance(data = {}) {
   const instance = { ...pageDefinition, data: { ...pageDefinition.data, ...data } };
   instance.setData = (patch) => { instance.data = { ...instance.data, ...patch }; };
@@ -94,46 +110,63 @@ describe("coach training management", () => {
   beforeEach(() => {
     mocks.getCoachHome.mockReset().mockResolvedValue(home);
     mocks.getCoachTeam.mockReset().mockResolvedValue(team);
-    mocks.getCoachTrainingProjectTree.mockReset();
+    mocks.getCoachTrainingProjectTree.mockReset().mockResolvedValue(trainingTree);
     mocks.getCoachWorkbench.mockReset();
     mocks.saveCoachTrainingProjects.mockReset();
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
     mocks.openPage.mockReset();
+    globalThis.wx.getStorageSync.mockReset().mockReturnValue("");
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-08-10T08:00:00.000Z"));
   });
 
-  it("reads the explicit current month and maps only truthful coach metrics and training cards", async () => {
+  it("uses the real assigned-team tree to restore a training context and filter its training cards", async () => {
+    globalThis.wx.getStorageSync.mockReturnValue("team-2");
+    mocks.getCoachHome.mockResolvedValue({
+      ...home,
+      events: [
+        ...home.events,
+        {
+          id: "training-blue",
+          type: "training",
+          title: "Blue team training",
+          startsAt: "2026-08-18T09:00:00.000Z",
+          endsAt: "2026-08-18T10:30:00.000Z",
+          venue: "Blue venue",
+          teamName: "Blue team",
+          status: "scheduled",
+          participantCount: 8,
+        },
+      ],
+    });
     const page = createPageInstance();
     await page.onLoad();
 
     expect(mocks.getCoachHome).toHaveBeenCalledWith({ from: "2026-08-01", to: "2026-08-31" });
-    expect(mocks.getCoachTeam).toHaveBeenCalledTimes(1);
+    expect(mocks.getCoachTrainingProjectTree).toHaveBeenCalledWith();
+    expect(mocks.getCoachTeam).not.toHaveBeenCalled();
     expect(page.data).toMatchObject({
       state: "ready",
+      selectedTeamName: "Blue team",
+      selectedTeamMetaLabel: "2026-2027赛季 · 后台已分配",
+      hasSelectedTeam: true,
       heroMetrics: [
-        { label: "累计课时", value: "46" },
-        { label: "平均出勤", value: "--" },
-        { label: "在队人数", value: "9" },
-        { label: "本月比赛", value: "1" },
+        { label: "本月训练", value: "1" },
+        { label: "本月比赛", value: "0" },
+        { label: "待点名", value: "0" },
+        { label: "已排课程", value: "1" },
       ],
     });
-    expect(page.data.trainingCards.map((item) => item.id)).toEqual(["training-1", "training-2"]);
+    expect(page.data.trainingCards.map((item) => item.id)).toEqual(["training-blue"]);
     expect(page.data.trainingCards[0]).toMatchObject({
-      title: "Real training title",
-      venue: "Real venue",
+      title: "Blue team training",
+      timeLabel: "2026-08-18 · 09:00",
+      venue: "Blue venue",
       hasVenue: true,
       statusLabel: "已排定",
       statusTone: "scheduled",
-      participantLabel: "12 人",
+      participantLabel: "8 人",
       hasParticipantCount: true,
-    });
-    expect(page.data.trainingCards[1]).toMatchObject({
-      venue: "地点待确认",
-      hasParticipantCount: false,
-      statusLabel: "已结束",
-      statusTone: "completed",
-      hasStatus: true,
     });
   });
 
@@ -142,11 +175,11 @@ describe("coach training management", () => {
     const denied = createPageInstance();
     await denied.onLoad();
     expect(mocks.getCoachHome).not.toHaveBeenCalled();
-    expect(mocks.getCoachTeam).not.toHaveBeenCalled();
+    expect(mocks.getCoachTrainingProjectTree).not.toHaveBeenCalled();
 
     const page = createPageInstance();
     await page.onLoad();
-    mocks.getCoachTeam.mockRejectedValueOnce(new Error("raw upstream error"));
+    mocks.getCoachTrainingProjectTree.mockRejectedValueOnce(new Error("raw upstream error"));
     await page.load();
     expect(page.data).toMatchObject({ state: "error", trainingCards: [] });
     expect(page.data.heroMetrics.map((item) => item.value)).toEqual(["--", "--", "--", "--"]);
@@ -156,14 +189,16 @@ describe("coach training management", () => {
   it("navigates only with a real event ID or one of the fixed team pages", () => {
     const page = createPageInstance();
     page.openTrainingEvent({ currentTarget: { dataset: { id: "training-1" } } });
+    page.openTrainingTeamSelector();
     page.openTeamAbility();
     page.openTeam();
     page.openTrainingEvent({ currentTarget: { dataset: {} } });
 
     expect(mocks.openPage).toHaveBeenNthCalledWith(1, "/pages/coach/event/index?id=training-1");
-    expect(mocks.openPage).toHaveBeenNthCalledWith(2, "/pages/coach/team-ability/index");
-    expect(mocks.openPage).toHaveBeenNthCalledWith(3, "/pages/coach/team/index");
-    expect(mocks.openPage).toHaveBeenCalledTimes(3);
+    expect(mocks.openPage).toHaveBeenNthCalledWith(2, "/pages/coach/team-selector/index");
+    expect(mocks.openPage).toHaveBeenNthCalledWith(3, "/pages/coach/team-ability/index");
+    expect(mocks.openPage).toHaveBeenNthCalledWith(4, "/pages/coach/team/index");
+    expect(mocks.openPage).toHaveBeenCalledTimes(4);
   });
 
   it("removes C10 writes and Figma samples while keeping the template declarative", () => {
@@ -172,12 +207,14 @@ describe("coach training management", () => {
     expect(pageConfig).not.toContain('"submit-bar"');
     expect(pageConfig).not.toContain('"radar-canvas"');
     expect(pageConfig).not.toContain('"app-header"');
-    expect(controller).not.toContain("getCoachTrainingProjectTree");
+    expect(controller).toContain("getCoachTrainingProjectTree");
     expect(controller).not.toContain("getCoachWorkbench");
     expect(controller).not.toContain("saveCoachTrainingProjects");
     expect(controller).not.toContain("openTestEntry");
     expect(controller).not.toContain("openContentSelect");
     expect(template).not.toContain("U10精英队");
+    expect(template).toContain('class="c8-team-context"');
+    expect(template).toContain('bindtap="openTrainingTeamSelector"');
     expect(template).not.toContain("凤凰山");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
@@ -188,12 +225,13 @@ describe("coach training management", () => {
     expect(styles).toMatch(/\.c8-nav__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
   });
 
-  it("uses the node 93:896 hero, tabs, and session-card geometry", () => {
-    expect(styles).toContain("height: 360rpx");
-    expect(styles).toContain("padding: 40rpx");
+  it("uses the V3 team context, compact hero, tabs, and session-card geometry", () => {
+    expect(styles).toContain("min-height: 120rpx");
+    expect(styles).toContain("height: 300rpx");
+    expect(styles).toContain("padding: 32rpx 40rpx");
     expect(styles).toContain("border-radius: 32rpx");
-    expect(styles).toContain("gap: 24rpx");
-    expect(styles).toContain("min-height: 128rpx");
+    expect(styles).toContain("gap: 16rpx");
+    expect(styles).toContain("min-height: 110rpx");
     expect(styles).toContain("height: 80rpx");
     expect(styles).toContain("padding: 32rpx 44rpx");
     expect(styles).toContain("min-height: 228rpx");

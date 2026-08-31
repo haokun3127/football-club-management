@@ -1,10 +1,17 @@
 .c8 { min-height: 100vh; padding-bottom: calc(140rpx + env(safe-area-inset-bottom)); background: #f6f7f9; }
 .c8-nav { position: sticky; top: 0; z-index: 100; box-sizing: content-box; display: flex; align-items: center; height: 88rpx; padding: 0 32rpx; background: #ffffff; }
 .c8-nav__title { color: #202124; font-size: 36rpx; font-weight: 700; line-height: 44rpx; }
+.c8-team-context { display: flex; align-items: center; justify-content: space-between; min-height: 120rpx; margin: 16rpx 32rpx; padding: 20rpx 24rpx; box-sizing: border-box; border: 1rpx solid #e7eaf0; border-radius: 24rpx; background: #ffffff; }
+.c8-team-context__copy { min-width: 0; }
+.c8-team-context__label { display: block; color: #667085; font-size: 20rpx; line-height: 26rpx; }
+.c8-team-context__line { display: flex; align-items: baseline; gap: 16rpx; min-width: 0; margin-top: 6rpx; }
+.c8-team-context__name { overflow: hidden; color: #202124; font-size: 32rpx; font-weight: 600; line-height: 40rpx; text-overflow: ellipsis; white-space: nowrap; }
+.c8-team-context__meta { overflow: hidden; color: #667085; font-size: 20rpx; line-height: 26rpx; text-overflow: ellipsis; white-space: nowrap; }
+.c8-team-context__chevron { flex: 0 0 40rpx; width: 40rpx; height: 40rpx; }
 
-.c8-hero { box-sizing: border-box; height: 360rpx; padding: 40rpx; border-radius: 32rpx; background: #07111f; box-shadow: 0 8rpx 12rpx rgba(0, 0, 0, 0.1); }
-.c8-hero__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24rpx; }
-.c8-stat { display: flex; height: 128rpx; min-height: 128rpx; flex-direction: column; align-items: center; justify-content: center; border-radius: 24rpx; background: rgba(255, 255, 255, 0.1); }
+.c8-hero { box-sizing: border-box; height: 300rpx; padding: 32rpx 40rpx; border-radius: 32rpx; background: #07111f; box-shadow: 0 8rpx 12rpx rgba(0, 0, 0, 0.1); }
+.c8-hero__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16rpx; }
+.c8-stat { display: flex; height: 110rpx; min-height: 110rpx; flex-direction: column; align-items: center; justify-content: center; border-radius: 20rpx; background: rgba(255, 255, 255, 0.1); }
 .c8-stat__label { color: rgba(255, 255, 255, 0.5); font-size: 22rpx; line-height: 28rpx; }
 .c8-stat__value { margin-top: 4rpx; color: #ffffff; font-size: 56rpx; font-weight: 700; line-height: 64rpx; }
 
@@ -26,3 +33,4 @@
 .session-card__status--pending { background: #fef3c7; color: #d97706; }
 .session-card__status--completed { background: #f3f4f6; color: #667085; }
 .session-card__count { color: #667085; font-size: 22rpx; line-height: 28rpx; }
+.c8-empty { padding: 64rpx 0; color: #667085; font-size: 26rpx; line-height: 36rpx; text-align: center; }

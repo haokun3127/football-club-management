@@ -2,13 +2,12 @@ import { readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  getCoachHome: vi.fn(),
+  getCoachTrainingProjectTree: vi.fn(),
   requireRole: vi.fn(),
 }));
 
-vi.mock("../../../utils/api", () => ({ getCoachHome: mocks.getCoachHome }));
+vi.mock("../../../utils/api", () => ({ getCoachTrainingProjectTree: mocks.getCoachTrainingProjectTree }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
-vi.mock("../../../utils/date", () => ({ currentLocalDate: () => "2026-08-29" }));
 vi.mock("../../../utils/presentation", () => ({ resolveMenuInset: () => 16, resolveNavInset: () => 20 }));
 
 let pageDefinition;
@@ -35,16 +34,22 @@ function createPageInstance(data = {}) {
 
 describe("coach team selector", () => {
   beforeEach(() => {
-    mocks.getCoachHome.mockReset();
+    mocks.getCoachTrainingProjectTree.mockReset().mockResolvedValue({
+      groups: [], projects: [], pending: [],
+      team: { id: "team-u11", name: "U11 Red", season: "2026-2027赛季" },
+      teamOptions: [
+        { id: "team-u11", name: "U11 Red", season: "2026-2027赛季" },
+        { id: "team-u12", name: "U12 Blue", season: "2026-2027赛季" },
+      ],
+    });
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
     globalThis.wx.getStorageSync.mockReset().mockReturnValue("");
     globalThis.wx.setStorageSync.mockReset();
     globalThis.wx.navigateBack.mockReset();
   });
 
-  it("lists only API-provided teams and restores a stored selection only when it remains assigned", async () => {
-    globalThis.wx.getStorageSync.mockReturnValue("U12 Blue");
-    mocks.getCoachHome.mockResolvedValue({ teams: ["U11 Red", "U12 Blue"] });
+  it("lists only real training-context teams and restores an assigned team id", async () => {
+    globalThis.wx.getStorageSync.mockReturnValue("team-u12");
     const page = createPageInstance();
 
     await page.load();
@@ -52,29 +57,31 @@ describe("coach team selector", () => {
     expect(page.data).toMatchObject({
       state: "ready",
       teams: [
-        { name: "U11 Red", isSelected: false },
-        { name: "U12 Blue", isSelected: true },
+        { id: "team-u11", name: "U11 Red", isSelected: false },
+        { id: "team-u12", name: "U12 Blue", isSelected: true },
       ],
     });
 
-    globalThis.wx.getStorageSync.mockReturnValue("No longer assigned");
+    globalThis.wx.getStorageSync.mockReturnValue("team-no-longer-assigned");
     const fallbackPage = createPageInstance();
     await fallbackPage.load();
     expect(fallbackPage.data.teams[0]).toMatchObject({ name: "U11 Red", isSelected: true });
   });
 
-  it("persists a selected assigned-team name locally and returns to the coach home", () => {
+  it("persists a selected assigned-team id locally and returns to training management", () => {
     const page = createPageInstance();
 
-    page.selectTeam({ currentTarget: { dataset: { name: "U12 Blue" } } });
+    page.selectTeam({ currentTarget: { dataset: { id: "team-u12" } } });
 
-    expect(globalThis.wx.setStorageSync).toHaveBeenCalledWith("coach-selected-team", "U12 Blue");
+    expect(globalThis.wx.setStorageSync).toHaveBeenCalledWith("coach-training-team-id", "team-u12");
     expect(globalThis.wx.navigateBack).toHaveBeenCalledTimes(1);
   });
 
   it("uses a full-screen back flow without team-management actions or font-dependent selected icons", () => {
     expect(template).toContain('bindtap="goBack"');
     expect(template).toContain('bindtap="selectTeam"');
+    expect(template).toContain("选择训练球队");
+    expect(template).toContain("仅显示后台已分配队伍");
     expect(template).toContain('/assets/icons/c4-1-check.svg');
     expect(template).not.toContain('class="team-option__check">✓</view>');
     expect(template).not.toMatch(/新建|编辑|删除/);

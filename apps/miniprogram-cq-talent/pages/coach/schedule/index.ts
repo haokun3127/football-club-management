@@ -6,7 +6,6 @@ import { activityStatus, formatCalendarDate, resolveMenuInset, resolveNavInset, 
 import type { CoachHome, CoachTask, CoachTaskAction, LoadState, ScheduleEvent } from "../../../utils/types";
 
 const WEEK_LABELS = ["日", "一", "二", "三", "四", "五", "六"];
-const COACH_SELECTED_TEAM_KEY = "coach-selected-team";
 const initialDate = currentLocalDate();
 
 type Filter = "all" | "training" | "match" | "pending";
@@ -71,10 +70,6 @@ Page({
     coachName: "",
     coachInitial: "",
     hasCoachInitial: false,
-    teamChips: [] as Array<{ name: string }>,
-    hasTeams: false,
-    selectedTeamName: "",
-    teamMetaLabel: "",
     eventViews: [] as CoachEventView[],
     visibleEvents: [] as CoachEventView[],
     hasVisibleEvents: false,
@@ -103,14 +98,11 @@ Page({
     try {
       const home = await getCoachHome(range);
       const coachName = home.coachName?.trim() || "";
-      const teamChips = home.teams.map((name) => ({ name }));
-      const selectedTeamName = resolveSelectedTeam(teamChips, wx.getStorageSync<string>(COACH_SELECTED_TEAM_KEY));
       const eventViews = home.events.map((event) => toCoachEventView(event, coachName));
-      const selectedTeamEvents = selectedTeamName ? eventViews.filter((event) => event.teamName === selectedTeamName) : eventViews;
       const taskCards = home.tasks.map(toCoachTaskView);
-      const selectedDateEvents = selectedTeamEvents.filter((event) => event.startsAt.slice(0, 10) === this.data.date);
+      const selectedDateEvents = eventViews.filter((event) => event.startsAt.slice(0, 10) === this.data.date);
       const heroEvent = selectedDateEvents.find((event) => event.status === "in_progress") ?? selectedDateEvents[0] ?? null;
-      const hasWork = selectedTeamEvents.length > 0 || taskCards.length > 0;
+      const hasWork = eventViews.length > 0 || taskCards.length > 0;
       const dayStrip = buildDayStrip(startOfWeek(this.data.date));
       this.setData({
         state: hasWork ? "ready" : "empty",
@@ -123,12 +115,8 @@ Page({
         coachName,
         coachInitial: coachName.slice(0, 1),
         hasCoachInitial: Boolean(coachName),
-        teamChips,
-        hasTeams: teamChips.length > 0,
-        selectedTeamName,
-        teamMetaLabel: teamChips.length > 1 ? `共${teamChips.length}支队伍 · 点击切换` : teamChips.length === 1 ? "后台同步" : "",
         heroPills: buildHeroPills(home),
-        eventViews: selectedTeamEvents,
+        eventViews,
         heroEvent,
         hasHeroEvent: Boolean(heroEvent),
         heroDateLabel: heroDateLabel(this.data.date),
@@ -136,7 +124,7 @@ Page({
         hasTaskCards: taskCards.length > 0,
         monthKey: this.data.date.slice(0, 7),
         monthLabel: formatMonthLabel(this.data.date.slice(0, 7)),
-        monthDays: this.data.viewMode === "month" ? buildMonthDays(this.data.date.slice(0, 7), this.data.date, selectedTeamEvents) : [],
+        monthDays: this.data.viewMode === "month" ? buildMonthDays(this.data.date.slice(0, 7), this.data.date, eventViews) : [],
       });
       this.applyFilter();
     } catch {
@@ -186,9 +174,6 @@ Page({
   },
   openMe() {
     openTab("/pages/coach/me/index");
-  },
-  openTeam() {
-    if (this.data.hasTeams) openPage("/pages/coach/team-selector/index");
   },
   switchView(event: { currentTarget: { dataset: { mode?: ViewMode } } }) {
     const viewMode = event.currentTarget.dataset.mode;
@@ -291,10 +276,6 @@ function durationLabel(startsAt?: string, endsAt?: string): string {
   const end = Date.parse(endsAt ?? "");
   if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return "";
   return `${Math.round((end - start) / 60000)}分钟`;
-}
-
-function resolveSelectedTeam(teams: Array<{ name: string }>, stored: string): string {
-  return teams.find((team) => team.name === stored)?.name ?? teams[0]?.name ?? "";
 }
 
 function resolveRange(date: string, viewMode: ViewMode) {

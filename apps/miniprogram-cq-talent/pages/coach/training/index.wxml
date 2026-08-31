@@ -3,6 +3,14 @@
     <view class="c8-nav__title">训练管理</view>
   </view>
 
+  <view wx:if="{{hasSelectedTeam}}" class="c8-team-context" bindtap="openTrainingTeamSelector">
+    <view class="c8-team-context__copy">
+      <text class="c8-team-context__label">我的球队</text>
+      <view class="c8-team-context__line"><text class="c8-team-context__name">{{selectedTeamName}}</text><text class="c8-team-context__meta">{{selectedTeamMetaLabel}}</text></view>
+    </view>
+    <image class="c8-team-context__chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
+  </view>
+
   <view class="c8-hero">
     <view class="c8-hero__grid">
       <view wx:for="{{heroMetrics}}" wx:key="label" class="c8-stat">
@@ -35,6 +43,7 @@
         </view>
       </view>
     </view>
+    <view wx:if="{{state === 'ready' && !hasTrainingCards}}" class="c8-empty">当前球队本月暂无训练</view>
   </view>
 
   <role-tabbar role="coach" active="training" />

@@ -1,15 +1,15 @@
 <view class="team-selector-page">
   <view class="team-selector-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="team-selector-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
-    <view class="team-selector-nav__title">选择球队</view>
+    <view class="team-selector-nav__title">选择训练球队</view>
   </view>
   <view class="team-selector-page__body">
-    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="选择球队" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="选择训练球队" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <block wx:if="{{state === 'ready' && hasTeams}}">
-      <view class="team-selector__title">选择需要查看的球队</view>
-      <view class="team-selector__copy">队伍由俱乐部后台维护并同步到这里</view>
+      <view class="team-selector__title">我的球队</view>
+      <view class="team-selector__copy">仅显示后台已分配队伍</view>
       <view class="team-selector__list">
-        <view wx:for="{{teams}}" wx:key="name" class="team-option {{item.isSelected ? 'team-option--selected' : ''}}" data-name="{{item.name}}" bindtap="selectTeam">
+        <view wx:for="{{teams}}" wx:key="id" class="team-option {{item.isSelected ? 'team-option--selected' : ''}}" data-id="{{item.id}}" bindtap="selectTeam">
           <view class="team-option__text"><view class="team-option__name">{{item.name}}</view><view class="team-option__meta">{{item.metaLabel}}</view></view>
           <view wx:if="{{item.isSelected}}" class="team-option__check"><image class="team-option__check-image" src="/assets/icons/c4-1-check.svg" mode="aspectFit" /></view>
           <image wx:else class="team-option__chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />

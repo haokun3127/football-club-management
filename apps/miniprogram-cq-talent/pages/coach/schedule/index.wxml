@@ -46,13 +46,9 @@
     <view class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek"><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
   </view>
 
-  <view wx:if="{{state === 'ready' && hasTeams}}" class="c1-team-selector" bindtap="openTeam">
-    <text class="c1-team-selector__label">我的球队</text>
-    <view class="c1-team-selector__line">
-      <text class="c1-team-selector__name">{{selectedTeamName}}</text>
-      <text wx:if="{{teamMetaLabel}}" class="c1-team-selector__meta">{{teamMetaLabel}}</text>
-    </view>
-    <image class="c1-team-selector__chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
+  <view wx:if="{{state !== 'loading' && state !== 'error'}}" class="c1-all-teams-context">
+    <text class="c1-all-teams-context__label">全部球队课程</text>
+    <text class="c1-all-teams-context__copy">按时间排列 · 每节课标明所属球队</text>
   </view>
 
   <view class="c1-body">

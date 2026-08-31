@@ -1,8 +1,10 @@
-import { getCoachHome, getCoachTeam } from "../../../utils/api";
+import { getCoachHome, getCoachTrainingProjectTree } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
-import { formatCalendarDate, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
-import type { CoachHome, CoachTeamDetail, LoadState, ScheduleEvent } from "../../../utils/types";
+import { formatCalendarDate, formatTimeOnly, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import type { LoadState, ScheduleEvent, TrainingProjectTree, TrainingTeamOption } from "../../../utils/types";
+
+const COACH_TRAINING_TEAM_KEY = "coach-training-team-id";
 
 type HeroMetric = { label: string; value: string };
 
@@ -27,6 +29,9 @@ Page({
     state: "loading" as LoadState,
     message: "正在读取训练管理",
     retryLabel: "",
+    selectedTeamName: "",
+    selectedTeamMetaLabel: "",
+    hasSelectedTeam: false,
     heroMetrics: emptyHeroMetrics(),
     trainingCards: [] as TrainingCard[],
     hasTrainingCards: false,
@@ -35,26 +40,37 @@ Page({
     if (!requireRole("coach")) return;
     return this.load();
   },
+  onShow() {
+    if (this.data.state !== "loading") return this.load();
+  },
   async load() {
     this.setData({
       state: "loading",
       message: "正在读取训练管理",
       retryLabel: "",
+      selectedTeamName: "",
+      selectedTeamMetaLabel: "",
+      hasSelectedTeam: false,
       heroMetrics: emptyHeroMetrics(),
       trainingCards: [],
       hasTrainingCards: false,
     });
     try {
-      const [home, team] = await Promise.all([
+      const [home, tree] = await Promise.all([
         getCoachHome(currentMonthRange(new Date())),
-        getCoachTeam(),
+        getCoachTrainingProjectTree(),
       ]);
-      const trainingCards = toTrainingCards(home.events);
+      const selectedTeam = resolveTrainingTeam(tree, wx.getStorageSync<string>(COACH_TRAINING_TEAM_KEY));
+      const teamEvents = selectedTeam ? home.events.filter((event) => event.teamName === selectedTeam.name) : [];
+      const trainingCards = toTrainingCards(teamEvents);
       this.setData({
-        state: trainingCards.length ? "ready" : "empty",
-        message: trainingCards.length ? "" : "本月暂无训练活动",
+        state: selectedTeam ? "ready" : "empty",
+        message: selectedTeam ? "" : "暂未分配训练球队，请联系俱乐部后台管理员。",
         retryLabel: "",
-        heroMetrics: toHeroMetrics(home, team),
+        selectedTeamName: selectedTeam?.name ?? "",
+        selectedTeamMetaLabel: selectedTeam ? teamMetaLabel(selectedTeam) : "",
+        hasSelectedTeam: Boolean(selectedTeam),
+        heroMetrics: toHeroMetrics(teamEvents),
         trainingCards,
         hasTrainingCards: trainingCards.length > 0,
       });
@@ -72,6 +88,9 @@ Page({
   openTrainingEvent(event: { currentTarget?: { dataset?: { id?: string } } }) {
     const id = event.currentTarget?.dataset?.id;
     if (id) openPage(`/pages/coach/event/index?id=${encodeURIComponent(id)}`);
+  },
+  openTrainingTeamSelector() {
+    openPage("/pages/coach/team-selector/index");
   },
   openTeamAbility() {
     openPage("/pages/coach/team-ability/index");
@@ -113,13 +132,33 @@ function emptyHeroMetrics(): HeroMetric[] {
   ];
 }
 
-function toHeroMetrics(home: CoachHome, team: CoachTeamDetail): HeroMetric[] {
+function toHeroMetrics(events: ScheduleEvent[]): HeroMetric[] {
+  const trainingCount = events.filter((event) => event.type === "training").length;
+  const matchCount = events.filter((event) => event.type === "match").length;
+  const attendanceCount = events.filter((event) => event.nextAction === "attendance").length;
+  const scheduledCount = events.filter((event) => isScheduled(event.status)).length;
   return [
-    { label: "累计课时", value: String(team.stats.completedTrainingCount) },
-    { label: "平均出勤", value: team.stats.attendanceRate === null ? "--" : `${team.stats.attendanceRate}%` },
-    { label: "在队人数", value: String(team.stats.memberCount) },
-    { label: "本月比赛", value: String(home.summary.matches) },
+    { label: "本月训练", value: String(trainingCount) },
+    { label: "本月比赛", value: String(matchCount) },
+    { label: "待点名", value: String(attendanceCount) },
+    { label: "已排课程", value: String(scheduledCount) },
   ];
+}
+
+function resolveTrainingTeam(tree: TrainingProjectTree, storedTeamId: string): TrainingTeamOption | null {
+  const options = tree.teamOptions ?? [];
+  return options.find((team) => team.id === storedTeamId)
+    ?? options.find((team) => team.id === tree.team?.id)
+    ?? options[0]
+    ?? null;
+}
+
+function teamMetaLabel(team: TrainingTeamOption): string {
+  return team.season ? `${team.season} · 后台已分配` : "后台已分配";
+}
+
+function isScheduled(status: string): boolean {
+  return ["scheduled", "published", "active", "upcoming", "已排定"].includes(status.trim().toLowerCase());
 }
 
 function toTrainingCards(events: ScheduleEvent[]): TrainingCard[] {
@@ -130,7 +169,7 @@ function toTrainingCards(events: ScheduleEvent[]): TrainingCard[] {
       return {
         id: event.id,
         title: event.title,
-        timeLabel: `${formatCalendarDate(event.startsAt)} · ${formatTimeRange(event.startsAt, event.endsAt)}`,
+        timeLabel: `${formatCalendarDate(event.startsAt)} · ${formatTimeOnly(event.startsAt)}`,
         venue: event.venue,
         hasVenue: Boolean(event.venue),
         status: event.status,
