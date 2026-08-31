@@ -9,6 +9,7 @@
 - 证据详见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/p2-p2.1-current-comparison.md`；本批没有修改业务代码、API、生产数据或 Figma。
 - 同批继续复核 P2.2 `93:198`，真实路由 `/pages/parent/event/index?id=event-cq-talent-family-assessment-day` 截图严格 `375×812`；活动详情结构通过，运行态“俱乐部活动/待开始/地点待确认”等与 Figma 示例不同的内容均为真实 API 数据差异。
 - 同批继续复核 P3 `93:222`，真实路由 `/pages/parent/reminders/index` 截图严格 `375×812`；顶栏、全部已读、提醒卡、空态和家长 TabBar 结构通过，真实课时不足提醒与 Figma 静态样例不同，按动态数据差异记录。
+- P4 `93:250` 首次真实截图发现成长 Hero 统计区域缺少在线稿要求的外框与竖向分隔线；已按 TDD 先红后绿补齐样式回归，WeChatIDE MCP 复拍严格 `375×812` 确认修复生效。真实学员与训练统计数据差异按 API 数据态记录。
 
 ## 2026-08-31 三层训练内容与截图产物隔离收口
 

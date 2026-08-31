@@ -36,6 +36,7 @@ globalThis.Page = (definition) => {
 await import("./index.ts");
 
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
+const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 
 function createPageInstance(data = {}) {
   const instance = {
@@ -212,5 +213,10 @@ describe("parent growth training history", () => {
     expect(Math.max(...page.data.trainingBars.map((bar) => bar.height))).toBe(80);
     expect(template).toContain("p4-hero__stats");
     expect(template).toContain("p4-hero__tags");
+  });
+
+  it("keeps the hero stats panel outline and separators from the Figma board", () => {
+    expect(styles).toMatch(/\.p4-hero__stats\s*\{[^}]*border:\s*1rpx\s+solid\s+#334155/);
+    expect(styles).toMatch(/\.p4-hero__stat\s*\+\s*\.p4-hero__stat\s*\{[^}]*border-left:\s*1rpx\s+solid\s+#334155/);
   });
 });
