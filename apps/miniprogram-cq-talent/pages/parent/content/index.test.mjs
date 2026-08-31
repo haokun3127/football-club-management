@@ -26,6 +26,8 @@ await import("./index.ts");
 
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
 const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
+const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
+const bookIcon = readFileSync(new URL("../../../assets/icons/content-book.svg", import.meta.url), "utf8");
 
 function createPageInstance(data = {}) {
   const instance = {
@@ -138,6 +140,16 @@ describe("parent content center", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(template).not.toContain("2023");
     expect(controller).not.toContain("openSearch()");
+  });
+
+  it("keeps the featured card flush with the Figma body spacing", () => {
+    expect(styles).not.toContain(".featured-card {\n  position: relative;\n  height: 360rpx;\n  border-radius: 32rpx;\n  overflow: hidden;\n  margin-top: 48rpx;");
+    expect(styles).toContain(".featured-card {\n  position: relative;\n  height: 360rpx;\n  border-radius: 32rpx;\n  overflow: hidden;\n  margin-top: 0;");
+  });
+
+  it("uses the Figma book-open glyph for the training guide entry", () => {
+    expect(bookIcon).toContain('d="M10 5.83333V17.5M10 5.83333C10 4.94928');
+    expect(bookIcon).toContain('H17.5006C17.7216 2.5 17.9336 2.5878 18.0899 2.74408');
   });
 
   it("navigates to the article detail with the tapped article id", () => {

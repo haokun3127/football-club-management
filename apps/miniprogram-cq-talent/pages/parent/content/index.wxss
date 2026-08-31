@@ -29,7 +29,7 @@
   height: 360rpx;
   border-radius: 32rpx;
   overflow: hidden;
-  margin-top: 48rpx;
+  margin-top: 0;
 }
 
 .featured-card__photo {

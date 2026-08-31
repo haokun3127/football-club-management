@@ -2161,3 +2161,9 @@
 - 训练课时卡、统计胶囊、近期课时记录、运动保障卡、保险详情区域、返回顶栏和家长 TabBar 结构均完成并排视觉复核，未发现确定性的布局、导航或 TabBar 缺陷。
 - 运行态的累计课时、月份/季度统计、训练日期、训练名称和保险字段来自真实 API，与 Figma 静态示例不同；微信系统状态栏、原生胶囊和 Home Indicator 属平台外壳差异，均按验收规则豁免。
 - 详细证据：`.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/p7-1-current-comparison.md`。本批无业务代码修改。
+# 2026-08-31 P8 内容中心真实 MCP 复验
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:388` 已重新读取；真实家长路由 `/pages/parent/content/index` 已通过微信开发者工具 MCP 捕获严格 `375×812` 截图及 sidecar。
+- 对照发现推荐大图因多余 `margin-top:48rpx` 整体下移，已先以红灯回归断言锁定，再改为 `margin-top:0`；复拍确认推荐卡、快速入口、最近文章和 TabBar 几何关系恢复。
+- 对照发现训练攻略入口图标不是在线稿的 `book-open`，已以 Figma MCP 导出的原始 SVG 替换并补回归断言；复拍确认图标形态一致。
+- 文章标题、年份、副标题来自真实内容接口，与 Figma 示例不同；微信系统状态栏、原生胶囊和 Home Indicator 属平台外壳差异，按验收规则豁免。详细证据见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/p8-current-comparison.md`。
