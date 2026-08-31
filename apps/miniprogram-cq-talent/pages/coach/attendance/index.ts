@@ -4,7 +4,7 @@ import { activityStatus, formatCalendarDate, formatTimeRange } from "../../../ut
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
 
 type RosterItem = CoachWorkbench["roster"][number];
-type RosterUiItem = RosterItem & { avatarLetter: string; avatarColor: string; statusLabel: string; statusTone: string; statusIndex: number; statusIsPresent: boolean; hasLessonAction: boolean };
+type RosterUiItem = RosterItem & { avatarLetter: string; avatarColor: string; statusLabel: string; statusTone: string; statusIsPresent: boolean };
 
 const statusOptions = [
   { label: "未点名", value: "pending" },
@@ -27,13 +27,9 @@ interface AttendancePageData {
   roster: RosterUiItem[];
   hasRoster: boolean;
   rosterFooter: string;
-  correctionRosterFooter: string;
-  correctionNote: string;
   saving: boolean;
   canSave: boolean;
-  statusOptions: typeof statusOptions;
   summary: { total: number; present: number; absent: number; pendingCount: number };
-  correctionMode: boolean;
   hasSaveError: boolean;
   saveError: string;
 }
@@ -51,19 +47,14 @@ Page<AttendancePageData>({
     roster: [],
     hasRoster: false,
     rosterFooter: "",
-    correctionRosterFooter: "",
-    correctionNote: "",
     saving: false,
     canSave: false,
-    statusOptions,
     summary: { total: 0, present: 0, absent: 0, pendingCount: 0 },
-    correctionMode: false,
     hasSaveError: false,
     saveError: "",
   },
   onLoad(query?: Record<string, string | undefined>) {
     requireRole("coach");
-    this.setData({ correctionMode: query?.correction === "1" || query?.mode === "correction" });
     this.load(query?.id || "");
   },
   async load(id: string) {
@@ -75,8 +66,6 @@ Page<AttendancePageData>({
         roster: [],
         hasRoster: false,
         rosterFooter: "",
-        correctionRosterFooter: "",
-        correctionNote: "",
         canSave: false,
         summary: emptySummary(),
         hasSaveError: false,
@@ -84,7 +73,7 @@ Page<AttendancePageData>({
       });
       return;
     }
-    this.setData({ state: "loading", message: "正在读取点名名单", eventId: id, hasSaveError: false, saveError: "", correctionNote: "" });
+    this.setData({ state: "loading", message: "正在读取点名名单", eventId: id, hasSaveError: false, saveError: "" });
     try {
       const workbench = await getCoachWorkbench(id);
       const roster = withRosterUi(workbench.roster);
@@ -103,7 +92,6 @@ Page<AttendancePageData>({
         roster,
         hasRoster: roster.length > 0,
         rosterFooter: rosterFooterText(roster.length),
-        correctionRosterFooter: rosterFooterText(roster.length),
         canSave,
         summary: summarizeRoster(roster),
         saving: false,
@@ -117,8 +105,6 @@ Page<AttendancePageData>({
         roster: [],
         hasRoster: false,
         rosterFooter: "",
-        correctionRosterFooter: "",
-        correctionNote: "",
         canSave: false,
         summary: emptySummary(),
         saving: false,
@@ -132,7 +118,7 @@ Page<AttendancePageData>({
   },
   clearAll() {
     if (!this.data.canSave || this.data.saving) return;
-    const roster = withRosterUi(this.data.roster.map((student: RosterUiItem) => ({ ...student, status: "pending", note: "" })));
+    const roster = withRosterUi(this.data.roster.map((student: RosterUiItem) => ({ ...student, status: "absent", note: "" })));
     this.setData({ roster, summary: summarizeRoster(roster), hasSaveError: false, saveError: "" });
   },
   markAllPresent() {
@@ -140,12 +126,13 @@ Page<AttendancePageData>({
     const roster = withRosterUi(this.data.roster.map((student: RosterUiItem) => ({ ...student, status: "present" })));
     this.setData({ roster, summary: summarizeRoster(roster), hasSaveError: false, saveError: "" });
   },
-  onStatusChange(event: { currentTarget: { dataset: { index?: number } }; detail: { value: string | number } }) {
+  toggleAttendance(event: { currentTarget: { dataset: { index?: number } } }) {
     if (!this.data.canSave || this.data.saving) return;
     const index = Number(event.currentTarget.dataset.index);
-    const status = statusOptions[Number(event.detail.value)]?.value;
-    if (!Number.isInteger(index) || !status || !this.data.roster[index]) return;
-    const roster = withRosterUi(this.data.roster.map((student: RosterUiItem, rosterIndex: number) => rosterIndex === index ? { ...student, status } : student));
+    const current = this.data.roster[index];
+    if (!Number.isInteger(index) || !current) return;
+    const nextStatus = current.statusIsPresent ? "absent" : "present";
+    const roster = withRosterUi(this.data.roster.map((student: RosterUiItem, rosterIndex: number) => rosterIndex === index ? { ...student, status: nextStatus } : student));
     this.setData({ roster, summary: summarizeRoster(roster), hasSaveError: false, saveError: "" });
   },
   onNoteInput(event: { currentTarget: { dataset: { index?: number } }; detail: { value: string } }) {
@@ -155,10 +142,6 @@ Page<AttendancePageData>({
     const roster = this.data.roster.map((student: RosterUiItem, rosterIndex: number) => rosterIndex === index ? { ...student, note: event.detail.value } : student);
     this.setData({ roster, hasSaveError: false, saveError: "" });
   },
-  onCorrectionNoteInput(event: { detail: { value: string } }) {
-    if (!this.data.correctionMode || this.data.saving) return;
-    this.setData({ correctionNote: event.detail.value, hasSaveError: false, saveError: "" });
-  },
   async saveAttendance() {
     if (!this.data.canSave || !this.data.eventId || this.data.saving) return;
     if (this.data.roster.some((student: RosterUiItem) => student.status === "pending")) {
@@ -167,7 +150,7 @@ Page<AttendancePageData>({
     }
     this.setData({ saving: true, hasSaveError: false, saveError: "" });
     try {
-      await saveCoachAttendance(this.data.eventId, this.data.roster.map((student: RosterUiItem) => toAttendanceParticipant(student, this.data.correctionNote)));
+      await saveCoachAttendance(this.data.eventId, this.data.roster.map((student: RosterUiItem) => toAttendanceParticipant(student)));
       wx.redirectTo({ url: `/pages/coach/attendance-success/index?eventId=${encodeURIComponent(this.data.eventId)}` });
     } catch (error) {
       this.setData({ saving: false, hasSaveError: true, saveError: attendanceSaveError(error) });
@@ -175,15 +158,12 @@ Page<AttendancePageData>({
   },
 });
 
-function toAttendanceParticipant(student: RosterUiItem, correctionNote = ""): RosterItem {
+function toAttendanceParticipant(student: RosterUiItem): RosterItem {
   return {
     studentId: student.studentId,
     name: student.name,
     status: student.status,
-    note: student.note || correctionNote || undefined,
-    lessonAction: student.lessonAction,
-    shouldConsume: student.shouldConsume,
-    exceptionReason: student.exceptionReason,
+    note: student.note || undefined,
     remainingLessons: student.remainingLessons,
   };
 }
@@ -199,11 +179,13 @@ function withRosterUi(roster: RosterItem[]): RosterUiItem[] {
       avatarColor: avatarColor(student.studentId),
       statusLabel: option.label,
       statusTone: statusTone(option.value),
-      statusIndex: Math.max(0, statusIndex),
-      statusIsPresent: option.value === "present",
-      hasLessonAction: Boolean(student.lessonAction),
+      statusIsPresent: isArrivedStatus(option.value),
     };
   });
+}
+
+function isArrivedStatus(status: string) {
+  return status === "present" || status === "late";
 }
 
 function avatarColor(studentId: string) {

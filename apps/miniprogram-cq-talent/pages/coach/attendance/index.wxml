@@ -1,70 +1,44 @@
-<view class="c4 {{correctionMode ? 'c4--correction' : ''}}">
-  <app-header theme="soft" title="{{correctionMode ? '出勤修改' : '出勤管理'}}" title-align="left" action-text="{{canSave && !saving && !correctionMode ? '提交' : ''}}" bindaction="saveAttendance" show-back />
+<view class="c4">
+  <app-header theme="soft" title="点名" title-align="left" action-text="{{canSave && !saving ? '提交' : ''}}" bindaction="saveAttendance" show-back />
 
   <view class="c4-body">
     <status-view wx:if="{{state !== 'ready' && state !== 'idle'}}" state="{{state}}" title="{{state === 'loading' ? '正在读取名单' : state === 'empty' ? '暂无学员' : '名单读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重新加载' : ''}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready' && hasRoster}}">
-      <view wx:if="{{correctionMode}}" class="correction-alert">
-        <view class="correction-alert__icon">
-          <image src="/assets/icons/c4-2-alert-triangle.svg" mode="aspectFit" />
-        </view>
-        <view class="correction-alert__texts">
-          <view class="correction-alert__title">⚠️ 出勤记录需要修改</view>
-          <view class="correction-alert__text">家长对出勤记录提出异议，请核实后重新提交</view>
-        </view>
-      </view>
-
-      <view wx:if="{{!correctionMode}}" class="c4-hero">
+      <view class="c4-hero">
         <view class="c4-hero__title">{{eventTitle}}</view>
         <view wx:if="{{hasEventMeta}}" class="c4-hero__meta">{{eventMeta}}</view>
         <view class="c4-hero__counts">
           <view class="c4-hero__count"><view class="c4-dot c4-dot--green"></view>出勤 {{summary.present}}</view>
           <view class="c4-hero__count"><view class="c4-dot c4-dot--red"></view>缺勤 {{summary.absent}}</view>
-          <view class="c4-hero__count"><view class="c4-dot c4-dot--gray"></view>待确认 {{summary.pendingCount}}</view>
+          <view class="c4-hero__count"><view class="c4-dot c4-dot--gray"></view>点名即扣课</view>
         </view>
       </view>
 
-      <view wx:if="{{canSave && !correctionMode}}" class="c4-actions">
+      <view wx:if="{{canSave}}" class="c4-actions">
         <view class="c4-action c4-action--green" bindtap="markAllPresent">全员到场</view>
         <view class="c4-action c4-action--outline" bindtap="clearAll">清空</view>
       </view>
 
       <view class="roster-card">
-        <view wx:if="{{correctionMode}}" class="correction-list-header">
-          <view class="correction-list-header__title">学员列表</view>
-          <view class="correction-list-header__count">{{correctionRosterFooter}}</view>
-        </view>
-        <view wx:for="{{roster}}" wx:key="studentId" class="attendance-row">
+        <view wx:for="{{roster}}" wx:key="studentId" class="attendance-row" data-index="{{index}}" bindtap="toggleAttendance">
           <view class="attendance-main">
             <view class="student-info">
               <view class="student-avatar" style="background: {{item.avatarColor}}">{{item.avatarLetter}}</view>
               <view class="student-info__copy">
                 <view class="student-name">{{item.name}}</view>
-                <view wx:if="{{item.hasLessonAction}}" class="lesson-state">{{item.lessonAction}}</view>
               </view>
             </view>
-            <picker mode="selector" range="{{statusOptions}}" range-key="label" value="{{item.statusIndex}}" disabled="{{saving || !canSave}}" data-index="{{index}}" bindchange="onStatusChange">
-              <view wx:if="{{item.statusIsPresent}}" class="attendance-confirmation" aria-label="到课">✓</view>
-              <status-chip wx:else label="{{item.statusLabel}}" tone="{{item.statusTone}}" />
-            </picker>
+            <image wx:if="{{item.statusIsPresent}}" class="attendance-confirmation attendance-confirmation--present" src="/assets/icons/c4-1-check.svg" mode="aspectFit" aria-label="已到" />
+            <view wx:else class="attendance-confirmation attendance-confirmation--absent" aria-label="未到"></view>
           </view>
         </view>
       </view>
 
-      <view wx:if="{{rosterFooter && !correctionMode}}" class="roster-footer">{{rosterFooter}}</view>
-
-      <view wx:if="{{correctionMode}}" class="correction-note">
-        <view class="correction-note__title">修改说明</view>
-        <textarea class="correction-note__input" value="{{correctionNote}}" maxlength="200" placeholder="请填写核实结果..." bindinput="onCorrectionNoteInput" />
-      </view>
+      <view wx:if="{{rosterFooter}}" class="roster-footer">{{rosterFooter}}</view>
 
       <view wx:if="{{hasSaveError}}" class="save-error">{{saveError}}</view>
     </block>
-  </view>
-  <view wx:if="{{state === 'ready' && hasRoster && correctionMode}}" class="c4-correction-submit">
-    <view wx:if="{{saving}}" class="c4-correction-submit__button c4-correction-submit__button--disabled">提交中...</view>
-    <view wx:else class="c4-correction-submit__button" bindtap="saveAttendance">重新提交</view>
   </view>
   <role-tabbar role="coach" active="schedule" />
 </view>

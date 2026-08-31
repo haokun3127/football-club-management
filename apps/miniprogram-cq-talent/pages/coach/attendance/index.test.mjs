@@ -125,7 +125,34 @@ describe("coach attendance", () => {
     });
   });
 
-  it("blocks pending attendance, keeps edits after a failed PUT, and submits at most one PUT", async () => {
+  it("renders a one-tap binary attendance control and treats late as arrived", async () => {
+    mocks.getCoachWorkbench.mockResolvedValue({
+      ...workbench,
+      roster: [
+        { studentId: "student-late", name: "Athlete Late", status: "late" },
+        { studentId: "student-absent", name: "Athlete Absent", status: "absent" },
+      ],
+    });
+    const page = createPageInstance();
+    await page.load("event-1");
+
+    expect(page.data.roster).toEqual(expect.arrayContaining([
+      expect.objectContaining({ studentId: "student-late", statusIsPresent: true }),
+      expect.objectContaining({ studentId: "student-absent", statusIsPresent: false }),
+    ]));
+    expect(template).toContain('class="attendance-row" data-index="{{index}}" bindtap="toggleAttendance"');
+    expect(template).not.toContain('<picker mode="selector"');
+    expect(template).not.toContain("<status-chip");
+    expect(template).toContain('class="attendance-confirmation attendance-confirmation--present"');
+    expect(stylesheet).toMatch(/\.attendance-confirmation--present\s*\{[^}]*border-radius:\s*50%[^}]*background:\s*#188754/s);
+
+    page.toggleAttendance({ currentTarget: { dataset: { index: 0 } } });
+    expect(page.data.roster[0]).toMatchObject({ status: "absent", statusIsPresent: false });
+    page.toggleAttendance({ currentTarget: { dataset: { index: 1 } } });
+    expect(page.data.roster[1]).toMatchObject({ status: "present", statusIsPresent: true });
+  });
+
+  it("blocks pending attendance, keeps binary edits after a failed PUT, and submits at most one PUT", async () => {
     mocks.getCoachWorkbench.mockResolvedValue({
       ...workbench,
       roster: [...workbench.roster, { studentId: "student-pending", name: "Athlete Pending", status: "pending" }],
@@ -141,15 +168,15 @@ describe("coach attendance", () => {
       resolveSave = resolve;
     }));
     const page = await loadReadyPage();
-    const lateIndex = page.data.statusOptions.findIndex((option) => option.value === "late");
-    page.onStatusChange({ currentTarget: { dataset: { index: 0 } }, detail: { value: String(lateIndex) } });
+    page.toggleAttendance({ currentTarget: { dataset: { index: 0 } } });
+    page.toggleAttendance({ currentTarget: { dataset: { index: 0 } } });
     page.onNoteInput({ currentTarget: { dataset: { index: 0 } }, detail: { value: "Updated traffic" } });
 
     const first = page.saveAttendance();
     const second = page.saveAttendance();
     expect(mocks.saveCoachAttendance).toHaveBeenCalledTimes(1);
     expect(mocks.saveCoachAttendance).toHaveBeenCalledWith("event-1", expect.arrayContaining([
-      expect.objectContaining({ studentId: "student-late", status: "late", note: "Updated traffic" }),
+      expect.objectContaining({ studentId: "student-late", status: "present", note: "Updated traffic" }),
       expect.objectContaining({ studentId: "student-leave", status: "leave_requested" }),
       expect.objectContaining({ studentId: "student-excused", status: "excused" }),
     ]));
@@ -166,36 +193,22 @@ describe("coach attendance", () => {
     expect(failedPage.data.roster[0]).toMatchObject({ note: "Keep this edit" });
   });
 
-  it("accepts the canonical correction query and legacy mode alias without inventing a parent dispute", async () => {
+  it("ignores retired correction query aliases and keeps point attendance as the only flow", async () => {
     mocks.getCoachWorkbench.mockResolvedValue(workbench);
-    mocks.saveCoachAttendance.mockRejectedValueOnce(Object.assign(new Error("forbidden"), { status: 403 }));
     const page = createPageInstance();
 
     await page.onLoad({ id: "event-1", correction: "1" });
-    expect(page.data).toMatchObject({
-      correctionMode: true,
-      correctionRosterFooter: "共 3 名学员",
-      roster: [
-        { studentId: "student-late", status: "late" },
-        { studentId: "student-leave", status: "leave_requested" },
-        { studentId: "student-excused", status: "excused" },
-      ],
-    });
-
-    page.onCorrectionNoteInput({ detail: { value: "已核实训练出勤记录" } });
-
-    await page.saveAttendance();
-    expect(mocks.saveCoachAttendance).toHaveBeenCalledWith("event-1", expect.arrayContaining([
-      expect.objectContaining({ studentId: "student-late", status: "late" }),
-      expect.objectContaining({ studentId: "student-leave", status: "leave_requested" }),
-      expect.objectContaining({ studentId: "student-excused", status: "excused", note: "已核实训练出勤记录" }),
-    ]));
-    expect(page.data).toMatchObject({ saving: false, hasSaveError: true });
-    expect(globalThis.wx.redirectTo).not.toHaveBeenCalled();
+    expect(page.data).not.toHaveProperty("correctionMode");
+    expect(page.data).not.toHaveProperty("correctionNote");
 
     const legacyPage = createPageInstance();
     await legacyPage.onLoad({ id: "event-1", mode: "correction" });
-    expect(legacyPage.data.correctionMode).toBe(true);
+    expect(legacyPage.data).not.toHaveProperty("correctionMode");
+    expect(template).not.toContain("出勤记录需要修改");
+    expect(template).not.toContain("重新提交");
+    expect(template).not.toContain("lesson-state");
+    expect(controller).not.toContain("lessonAction");
+    expect(controller).not.toContain("onCorrectionNoteInput");
   });
 
   it("keeps missing IDs, empty rosters, and workbench failures as safe page states", async () => {
@@ -220,46 +233,38 @@ describe("coach attendance", () => {
     expect(template).toContain("hasRoster");
     expect(template).toContain('wx:if="{{hasSaveError}}"');
     expect(template).toContain('<status-view wx:if="{{state !== \'ready\' && state !== \'idle\'}}"');
-    expect(template).toContain('wx:if="{{saving}}"');
-    expect(template).toContain("提交中...");
     expect(template).toContain('class="roster-footer"');
     expect(template).toContain('{{rosterFooter}}');
     expect(template).toContain('wx:if="{{item.statusIsPresent}}"');
-    expect(template).toContain('wx:if="{{!correctionMode}}" class="c4-hero"');
+    expect(template).toContain("点名即扣课");
     expect(template).not.toContain("技术专项训练");
     expect(template).not.toContain("U10精英队");
     expect(template).not.toContain("陈小宇");
     expect(template).not.toContain("林一诺");
     expect(template).not.toContain("共 20 名学员");
-    expect(template).toContain("⚠️ 出勤记录需要修改");
-    expect(template).toContain("请核实后重新提交");
-    expect(template).toContain('<view wx:if="{{correctionMode}}" class="correction-list-header">');
-    expect(template).toContain("{{correctionRosterFooter}}");
-    expect(template).toContain("修改说明");
-    expect(template).toContain("请填写核实结果...");
-    expect(template).not.toContain("异常");
+    expect(template).not.toContain("课时更正");
+    expect(template).not.toContain("待确认");
     expect(template).not.toContain("家长异议");
     expect(controller).not.toContain("disputedCount");
-    expect(controller).toContain("correctionNote");
+    expect(controller).not.toContain("correctionMode");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 
   it("uses the shared 88px Figma header and coach tab bar without an overlapping submit bar", () => {
     expect(template).toContain('<app-header theme="soft"');
     expect(template).not.toContain('title-align="left" large-title');
-    expect(template).toContain('action-text="{{canSave && !saving && !correctionMode ? \'提交\' : \'\'}}"');
+    expect(template).toContain('action-text="{{canSave && !saving ? \'提交\' : \'\'}}"');
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
     expect(template).not.toContain("<submit-bar");
     expect(template).toContain('style="background: {{item.avatarColor}}"');
-    expect(template).toContain('wx:if="{{correctionMode}}"');
+    expect(template).not.toContain("correctionMode");
     expect(controller).toContain("function avatarColor");
-    expect(stylesheet).toMatch(/\.c4-correction-submit\s*\{[^}]*bottom:\s*140rpx[^}]*padding:\s*44rpx/s);
-    expect(stylesheet).toMatch(/\.c4-correction-submit__button\s*\{[^}]*display:\s*flex/s);
+    expect(template).not.toContain("c4-correction-submit");
   });
 
-  it("keeps the parent-dispute explanation required by the live C4.2 board", () => {
-    expect(template).toContain('src="/assets/icons/c4-2-alert-triangle.svg"');
-    expect(template).not.toContain("correction-alert__triangle");
-    expect(template).toContain("家长对出勤记录提出异议，请核实后重新提交");
+  it("does not render the retired parent-dispute or lesson-correction flow", () => {
+    expect(template).not.toContain('src="/assets/icons/c4-2-alert-triangle.svg"');
+    expect(template).not.toContain("家长对出勤记录提出异议，请核实后重新提交");
+    expect(template).not.toContain("重新提交");
   });
 });
