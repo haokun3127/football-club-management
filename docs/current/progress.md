@@ -2155,3 +2155,9 @@
 - 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv` 的 P1 `269:250` 与 P1 Empty `269:479` 已重新读取；家长双角色会话通过真实角色切换入口建立，路由确认 `/pages/parent/schedule/index`，截图和 sidecar 严格 `375×812`，证据位于 `%TEMP%\cq-talent-visual-evidence`。
 - 当前真实账号当天无活动，运行态进入 Empty 分支；顶栏铃铛、深色 Hero、周选择器、状态胶囊、空活动卡和四项家长 TabBar 结构通过。运行态额外的“秋季训练安排提醒”来自真实通知数据，属于动态内容差异。
 - 线上 P1 Empty 当前没有左右周切换箭头，运行态保留了左右箭头；这与此前产品要求两端支持上下周切换存在设计稿/产品契约差异，本轮不删除功能、不修改 Figma，已记录在 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/c14-c16-current-comparison.md`。
+## 2026-08-31 P7.1 课时与保障真实 MCP 复验
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:364` 已重新读取并取得当前 375×812 在线稿截图；真实家长路由 `/pages/parent/status/index` 也已通过微信开发者工具 MCP 捕获严格 `375×812` 截图及 sidecar。
+- 训练课时卡、统计胶囊、近期课时记录、运动保障卡、保险详情区域、返回顶栏和家长 TabBar 结构均完成并排视觉复核，未发现确定性的布局、导航或 TabBar 缺陷。
+- 运行态的累计课时、月份/季度统计、训练日期、训练名称和保险字段来自真实 API，与 Figma 静态示例不同；微信系统状态栏、原生胶囊和 Home Indicator 属平台外壳差异，均按验收规则豁免。
+- 详细证据：`.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/p7-1-current-comparison.md`。本批无业务代码修改。
