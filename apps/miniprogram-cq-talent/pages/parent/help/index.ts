@@ -131,17 +131,17 @@ function presentCategories(questions: FaqQuestion[]): HelpCategory[] {
       icon: CATEGORY_META[category]?.icon ?? "/assets/icons/content-help-circle.svg",
       color: CATEGORY_META[category]?.color ?? "#667085",
     })),
-    { label: "更多问题", value: "all", icon: "/assets/icons/more-horizontal.svg", color: "#7c3aed" },
+    { label: "更多问题", value: "all", icon: "/assets/icons/p82-more-horizontal.svg", color: "#f5f3ff" },
   ];
 }
 
 const CATEGORY_ORDER = ["训练规则", "出勤说明", "成长报告", "账号设置", "联系客服"];
 const CATEGORY_META: Record<string, { icon: string; color: string }> = {
-  训练规则: { icon: "/assets/icons/content-book.svg", color: "#a80f1b" },
-  出勤说明: { icon: "/assets/icons/tab-calendar.svg", color: "#1976d2" },
-  成长报告: { icon: "/assets/icons/tab-growth.svg", color: "#22c55e" },
-  账号设置: { icon: "/assets/icons/settings-gear.svg", color: "#667085" },
-  联系客服: { icon: "/assets/icons/content-help-circle.svg", color: "#ff9800" },
+  训练规则: { icon: "/assets/icons/p82-circle-x.svg", color: "#fee2e2" },
+  出勤说明: { icon: "/assets/icons/p82-calendar.svg", color: "#dbeafe" },
+  成长报告: { icon: "/assets/icons/p82-chart-bar.svg", color: "#d1fae5" },
+  账号设置: { icon: "/assets/icons/p82-settings.svg", color: "#f3f4f6" },
+  联系客服: { icon: "/assets/icons/p82-message-circle.svg", color: "#ffedd5" },
 };
 
 function filterQuestions(questions: FaqQuestion[], category: string, keyword = ""): VisibleFaqQuestion[] {

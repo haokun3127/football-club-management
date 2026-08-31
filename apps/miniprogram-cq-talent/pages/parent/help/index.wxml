@@ -20,7 +20,7 @@
           data-value="{{item.value}}"
           bindtap="selectCategory"
         >
-          <view class="category-card__icon" style="background: {{item.color}}1a"><image src="{{item.icon}}" mode="aspectFit" /></view>
+          <view class="category-card__icon" style="background: {{item.color}}"><image src="{{item.icon}}" mode="aspectFit" /></view>
           <view class="category-card__label">{{item.label}}</view>
         </view>
       </view>
@@ -30,9 +30,9 @@
         <view wx:if="{{hasVisibleQuestions}}">
           <view wx:for="{{visibleQuestions}}" wx:key="id" class="question-row {{item.showDivider ? 'question-row--border' : ''}}">
             <view class="question-row__head" data-id="{{item.id}}" bindtap="toggleQuestion">
-              <view class="question-row__icon"><image src="/assets/icons/help-circle-brand.svg" mode="aspectFit" /></view>
+              <image class="question-row__icon" src="/assets/icons/p82-help-circle.svg" mode="aspectFit" />
               <view class="question-row__q">{{item.q}}</view>
-              <view class="question-row__chevron {{item.open ? 'question-row__chevron--open' : ''}}">›</view>
+              <image class="question-row__chevron {{item.open ? 'question-row__chevron--open' : ''}}" src="/assets/icons/p82-chevron-right.svg" mode="aspectFit" />
             </view>
             <view wx:if="{{item.open}}" class="question-row__a">{{item.a}}</view>
           </view>
