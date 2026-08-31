@@ -241,6 +241,12 @@ const viewport = await inspectionProgram.systemInfo();
 - Verify both the first viewport and a bottom viewport after `wx.pageScrollTo`; the bottom CTA, correction link, and final list row must be fully above the fixed TabBar.
 - Good: `.page { padding-bottom: 140rpx; }` with a bottom screenshot proving the action block is unobscured. Bad: checking only the first viewport or adding an unrelated fixed offset to the action bar.
 
+### 8.2.1 Shared TabBar slot-order convention (2026-09-01)
+
+- The parent TabBar is a shared manifest in `apps/miniprogram-cq-talent/components/role-tabbar/index.ts`; the current product order is exactly `schedule`, `growth`, `discover`, `child` (日程 / 成长 / 发现 / 我的孩子). Preserve the existing route, active key, and active/inactive icon with each slot when reordering.
+- A visual board can change the slot order while the shared manifest and older page records remain stale. Check the current online Figma root plus one authenticated runtime screenshot after changing it; tests alone cannot prove the rendered position.
+- Good: change the parent manifest and assert `discover` appears before `child` in a focused regression test, then refresh and inspect an active parent route. Bad: only swapping labels, only swapping icons, or trusting an older acceptance note that contradicts the current Figma product baseline.
+
 ### 8.2.1 Fixed custom TopBar flow reservation (2026-08-31)
 
 - A `navigationStyle: custom` top bar that is fixed with `position: fixed`
