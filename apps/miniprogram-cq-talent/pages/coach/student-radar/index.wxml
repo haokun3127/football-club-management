@@ -30,7 +30,7 @@
     />
 
     <block wx:if="{{hasRadar}}">
-      <view class="radar-hero">
+      <view class="radar-hero {{radarHeroClass}}">
         <view class="radar-hero__head">
           <view class="radar-hero__title">学员能力雷达</view>
           <view class="radar-hero__period">{{assessmentPeriod}}</view>

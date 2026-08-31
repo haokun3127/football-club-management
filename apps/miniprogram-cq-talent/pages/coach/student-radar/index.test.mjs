@@ -230,6 +230,8 @@ describe("coach student radar", () => {
     expect(template).toContain('feedbackMessage');
     expect(template).not.toContain("教练李");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
+    expect(template).toContain('class="radar-hero {{radarHeroClass}}"');
+    expect(controller).toContain('radarHeroClass');
     expect(stylesheet).toMatch(/\.radar-nav\s*\{[^}]*height:\s*88rpx[^}]*box-sizing:\s*content-box/s);
     expect(stylesheet).toMatch(/\.radar-nav\s*\{[^}]*gap:\s*0/s);
     expect(stylesheet).toMatch(/\.radar-nav__back,\s*\.radar-nav__placeholder\s*\{(?=[^}]*width:\s*48rpx)(?=[^}]*height:\s*64rpx)/s);
@@ -238,6 +240,7 @@ describe("coach student radar", () => {
     expect(stylesheet).toMatch(/\.radar-hero\s*\{[^}]*position:\s*relative[^}]*height:\s*520rpx[^}]*overflow:\s*hidden/s);
     expect(stylesheet).toMatch(/\.radar-hero__plot\s*\{[^}]*justify-content:\s*center/s);
     expect(stylesheet).toMatch(/\.radar-hero__overall\s*\{[^}]*position:\s*absolute[^}]*left:\s*0[^}]*right:\s*0[^}]*bottom:\s*24rpx[^}]*text-align:\s*center[^}]*font-size:\s*96rpx/s);
+    expect(stylesheet).toMatch(/\.radar-hero--dense\s*\{[^}]*height:\s*568rpx/s);
     expect(stylesheet).not.toMatch(/width:\s*200%/);
     expect(stylesheet).not.toMatch(/transform:\s*scale\s*\(/);
     expect(controller).not.toContain("app-header");

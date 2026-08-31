@@ -25,6 +25,7 @@ interface PageData {
   radar: RadarMetricPoint[];
   dimensions: RadarDimension[];
   hasRadar: boolean;
+  radarHeroClass: string;
   overall: string;
   assessmentPeriod: string;
   feedbackMessage: string;
@@ -89,6 +90,7 @@ Page<PageData>({
         radar: hasRadar ? radar.filter(isValidRadarPoint) : [],
         dimensions,
         hasRadar,
+        radarHeroClass: dimensions.length > 6 ? "radar-hero--dense" : "",
         overall: hasRadar ? String(Math.round(average(normalizedValues))) : "-",
         assessmentPeriod: formatAssessmentPeriod(radar),
       });
@@ -129,6 +131,7 @@ function emptyPageData(state: LoadState, message: string): PageData {
     radar: [],
     dimensions: [],
     hasRadar: false,
+    radarHeroClass: "",
     overall: "-",
     assessmentPeriod: "评估时间待同步",
     feedbackMessage: "能力评语暂未同步。",

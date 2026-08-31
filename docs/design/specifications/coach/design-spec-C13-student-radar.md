@@ -126,3 +126,9 @@
 - WeChatIDE MCP 打开真实路由 `pages/coach/student-radar/index?source=goal`，稳定态截图为 `tmp/goal-c13-student-radar-live-ready-20260828.png`，滚动底部截图为 `tmp/goal-c13-student-radar-live-bottom-20260828.png`；两张均为 `375×812`。
 - 页面 data 为 `state=ready`、8 名真实学员、当前学员“测试球员第1组-1”、8 个中文能力维度、综合分 `75`、评估时间 `2026-08-13 评估`；雷达、维度评分、评语空态和教练 TabBar 均在真实运行态渲染。
 - 与在线稿示例的 5 名学员、6 个维度、分数 `76` 和示例评语不同，属于真实 API 数据差异；没有用 Figma 示例替换生产数据。console 过滤 `error|exception|wx:else|route is not defined` 无命中。本轮没有业务代码、API、数据库或 Figma 写回。
+
+## 2026-08-31 八维真实数据布局收口
+
+- 在线 Figma 基准仍为 `zZ6wKyOHKcO4UYXDd9jGwv / 93:1080`。画板示例为 6 个维度，雷达英雄卡维持 `260px` 高。
+- 真实教练数据可返回 8 个维度。仅当维度数大于 6 时，页面使用 `radar-hero--dense` 将卡高增加到 `284px`，为总分留出独立行，避免压住雷达底部标签；不修改雷达值、指标名称或 API 响应。
+- WeChatIDE MCP 复拍：`%TEMP%\\cq-talent-visual-evidence\\wechatide-mcp-1788188580903-29980581769383.png`，严格 `375×812`，总分 `67` 已位于“射门 / 小组配合”标签下方。
