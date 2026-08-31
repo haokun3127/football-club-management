@@ -249,7 +249,7 @@
 .content-action-card {
   position: relative;
   min-width: 0;
-  min-height: 330rpx;
+  min-height: 210rpx;
   box-sizing: border-box;
   overflow: hidden;
   border: 2rpx solid transparent;
@@ -263,39 +263,9 @@
   box-shadow: 0 8rpx 20rpx rgba(168, 15, 27, 0.12);
 }
 
-.content-action-card__visual {
-  position: relative;
-  display: flex;
-  height: 124rpx;
-  align-items: center;
-  justify-content: center;
-  background: #fef2f2;
-}
-
-.content-action-card__visual image {
-  width: 72rpx;
-  height: 72rpx;
-}
-
-.content-action-card__difficulty {
-  position: absolute;
-  top: 12rpx;
-  left: 12rpx;
-  max-width: 96rpx;
-  overflow: hidden;
-  padding: 4rpx 10rpx;
-  border-radius: 999rpx;
-  background: #ffffff;
-  color: #a80f1b;
-  font-size: 18rpx;
-  line-height: 24rpx;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .content-action-card__body {
   min-width: 0;
-  padding: 18rpx 16rpx 20rpx;
+  padding: 20rpx 16rpx;
 }
 
 .content-action-card__name {
@@ -343,13 +313,6 @@
   line-height: 28rpx;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.content-action-card__detail {
-  margin-top: 10rpx;
-  color: #a80f1b;
-  font-size: 20rpx;
-  line-height: 28rpx;
 }
 
 .content-action-card__select {

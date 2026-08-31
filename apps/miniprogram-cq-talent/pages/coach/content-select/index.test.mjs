@@ -329,9 +329,13 @@ describe("coach training content select", () => {
     expect(template).toContain('class="content-action-grid"');
     expect(template).toContain('{{item.quantityLabel}}');
     expect(template).toContain('{{item.durationLabel}}');
+    expect(template).not.toContain('content-action-card__visual');
+    expect(template).not.toContain('content-action-card__detail');
+    expect(template).not.toContain('查看动作要点');
     expect(template).toContain('class="select-bar__temporary"');
-    expect(template).toContain('mode="aspectFit"');
     expect(stylesheet).toMatch(/\.content-action-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,/s);
+    expect(stylesheet).not.toContain('.content-action-card__visual');
+    expect(stylesheet).not.toContain('.content-action-card__detail');
     expect(stylesheet).toMatch(/\.select-bar\s*\{[^}]*position:\s*fixed/s);
     expect(stylesheet).toMatch(/\.select-page__body\s*\{[^}]*padding-bottom:/s);
   });

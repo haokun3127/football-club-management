@@ -48,10 +48,6 @@
 
               <view class="content-action-grid">
                 <view wx:for="{{group.cards}}" wx:key="id" class="{{item.cardClass}}" data-id="{{item.id}}" bindtap="toggleProject">
-                  <view class="content-action-card__visual">
-                    <image src="{{item.iconSrc}}" mode="aspectFit" />
-                    <view wx:if="{{item.hasDifficulty}}" class="content-action-card__difficulty">{{item.difficulty}}</view>
-                  </view>
                   <view class="content-action-card__body">
                     <view class="content-action-card__name">{{item.name}}</view>
                     <view class="content-action-card__meta">
@@ -59,7 +55,6 @@
                       <text wx:if="{{item.hasDuration}}" class="content-action-card__duration">{{item.durationLabel}}</text>
                     </view>
                     <view class="content-action-card__point">{{item.coachingPointsPreview}}</view>
-                    <view class="content-action-card__detail">查看动作要点</view>
                   </view>
                   <view class="{{item.selectClass}}">
                     <image wx:if="{{item.isSelected}}" src="/assets/icons/c10-check-circle.svg" mode="aspectFit" />
