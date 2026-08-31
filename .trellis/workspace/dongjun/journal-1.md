@@ -898,3 +898,72 @@ Added SQLite migration and repository persistence for coach session plans, merge
 ### Next Steps
 
 - None - task complete
+
+
+## Session 25: C1 coach schedule visual acceptance
+
+**Date**: 2026-08-29
+**Task**: C1 coach schedule visual acceptance
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+Re-read online Figma node 93:578, restored a real dual-role coach session through the app switch flow, verified /pages/coach/schedule/index and iPhone X 375x812, captured and compared fresh MCP screenshots, ran WXML/WXSS compilation plus full checks, documented the in-memory session cache gotcha, pushed C1 code and evidence to origin/dev, and archived the C1 Trellis task.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `d479730` | (see git log) |
+| `d6650ab` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 26: Close P1 parent calendar V3 acceptance
+
+**Date**: 2026-09-01
+**Task**: Close P1 parent calendar V3 acceptance
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+Verified the non-destructive P1 V3 weekly, expanded and empty Figma states; captured parent runtime evidence through WeChatIDE MCP; corrected the shared parent TabBar manifest to schedule/growth/discover/child and archived the P1 task.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `b8fa948` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
