@@ -1,8 +1,13 @@
 # 屏幕像素级截图：CopyFromScreen 截取指定窗口区域（绕过 PrintWindow 白屏）
-import ctypes, sys
+import ctypes, sys, tempfile
 from ctypes import wintypes
+from pathlib import Path
 
-out = sys.argv[1] if len(sys.argv) > 1 else r"C:\Users\ASUS\Desktop\football-club-management-codex-windows-2026-08-02\tmp\figma-restore\screen-shot.png"
+if len(sys.argv) > 1:
+    out = sys.argv[1]
+else:
+    out = str(Path(tempfile.gettempdir()) / "cq-talent-visual-evidence" / "screen-shot.png")
+Path(out).parent.mkdir(parents=True, exist_ok=True)
 title_keyword = "开发者工具"
 
 user32 = ctypes.windll.user32
