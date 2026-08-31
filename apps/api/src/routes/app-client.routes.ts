@@ -9,6 +9,7 @@ import { hasBearerAuthorization, parseBearerToken, type AppClientSessionDelivery
 import type { PrivacyRequestCreateInput } from "../data-capability/types.js";
 import type { ClubAppClient, StudentDetail, StudentListItem } from "../data-capability/types.js";
 import { schemas } from "../http/schemas.js";
+import { buildTrainingContentTree } from "../application/training-content-catalog.js";
 import type { RouteContext } from "./context.js";
 
 interface AppEventDetail {
@@ -1631,11 +1632,15 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       clubId: string;
       clientId: string;
     };
+    Querystring: {
+      teamId?: string;
+    };
   }>(
     "/clubs/:clubId/app-clients/:clientId/coach/training-project-tree",
     {
       schema: {
         ...schemas.appClientParams,
+        ...schemas.appClientTrainingProjectTreeQuery,
         ...schemas.appClientTrainingProjectTree,
       },
     },
@@ -1649,17 +1654,44 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return reply;
       }
 
-      const [dimensions, objectives, drills, metrics] = await Promise.all([
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+
+      const teamOptions = collectCoachTeamOptions(context, request.params.clubId, auth);
+      const selectedTeam = request.query.teamId
+        ? teamOptions.find((team) => team.id === request.query.teamId)
+        : teamOptions[0];
+      if (request.query.teamId && !selectedTeam) {
+        return context.sendError(reply, 403, "forbidden", "Team is not accessible for this coach membership");
+      }
+
+      const [dimensions, objectives, drills, metrics, views, viewNodes] = await Promise.all([
         context.store.listDevelopmentDimensions(request.params.clubId),
         context.store.listTrainingObjectives(request.params.clubId),
         context.store.listTrainingDrills(request.params.clubId),
         context.store.listAbilityMetrics(request.params.clubId),
+        context.store.listMetricViews(request.params.clubId),
+        context.store.listMetricViewNodes(request.params.clubId),
       ]);
 
       return {
         clubId: request.params.clubId,
         client: summarizeClient(client),
         role: "coach",
+        team: selectedTeam
+          ? { id: selectedTeam.id, name: selectedTeam.name, season: currentSeason() }
+          : null,
+        teamOptions,
+        contentTree: buildTrainingContentTree({
+          views,
+          viewNodes,
+          metrics,
+          drills,
+        }),
         dimensions: dimensions.map((dimension) => ({
           ...dimension,
           objectives: objectives
@@ -3081,6 +3113,7 @@ function summarizeTrainingDrill(
       .map((metricId: string) => metrics.find((metric) => metric.id === metricId))
       .filter(Boolean),
     durationMinutes: drill.durationMinutes,
+    quantityLabel: drill.quantityLabel,
     difficulty: drill.difficulty,
     recommendedAgeGroups: drill.recommendedAgeGroups,
     recommendedLevels: drill.recommendedLevels,
@@ -3088,6 +3121,29 @@ function summarizeTrainingDrill(
     setup: drill.setup,
     coachingPoints: drill.coachingPoints,
   };
+}
+
+function collectCoachTeamOptions(
+  context: RouteContext,
+  clubId: string,
+  auth: CoachScopeAuth,
+) {
+  const teams = context.store.listTeams(clubId)
+    .filter((team) => team.status === "active")
+    .sort((left, right) => left.id.localeCompare(right.id));
+  const isAdmin = !auth || auth.membership.roles.some((role) => adminRoles.has(role));
+  const visibleTeams = isAdmin
+    ? teams
+    : (() => {
+      const coachId = context.store.listCoaches(clubId).find((coach) => coach.userId === auth.user.id)?.id;
+      return coachId ? teams.filter((team) => team.defaultCoachId === coachId) : [];
+    })();
+
+  return visibleTeams.map((team) => ({
+    id: team.id,
+    name: team.name,
+    season: currentSeason(),
+  }));
 }
 
 function uniqueParticipants(participants: NonNullable<AppEventDetail["participants"]>) {

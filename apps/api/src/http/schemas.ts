@@ -550,6 +550,15 @@ export const schemas = {
       },
     },
   },
+  appClientTrainingProjectTreeQuery: {
+    querystring: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        teamId: { type: "string", minLength: 1 },
+      },
+    },
+  },
   appClientAssessmentFormQuery: {
     querystring: {
       type: "object",

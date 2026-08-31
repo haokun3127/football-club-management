@@ -307,6 +307,7 @@ export function buildOpenApiDocument() {
       "/clubs/{clubId}/app-clients/{clientId}/coach/training-project-tree": {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/training-project-tree", {
           ...schemas.appClientParams,
+          ...schemas.appClientTrainingProjectTreeQuery,
           ...schemas.appClientTrainingProjectTree,
         }),
       },

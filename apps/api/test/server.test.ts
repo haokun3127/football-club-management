@@ -1002,6 +1002,16 @@ describe("api server", () => {
       url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/training-project-tree",
       headers: { "x-user-id": "user-coach-1" },
     });
+    const selectedTeamTrainingProjectTree = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/training-project-tree?teamId=team-weekend-select",
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    const inaccessibleTeamTrainingProjectTree = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/training-project-tree?teamId=team-not-accessible",
+      headers: { "x-user-id": "user-coach-1" },
+    });
     const trainingProjects = await app.inject({
       method: "PUT",
       url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/training-projects",
@@ -1055,7 +1065,16 @@ describe("api server", () => {
     const trainingTreeBody = trainingProjectTree.json() as {
       dimensions: Array<{ objectives: Array<{ projects: Array<{ id: string; name: string; metrics: unknown[] }> }> }>;
       projects: Array<{ id: string; name: string; metricIds: string[] }>;
+      team: { id: string; name: string; season?: string } | null;
+      teamOptions: Array<{ id: string; name: string; season?: string }>;
+      contentTree: {
+        nodes: Array<{
+          level: number;
+          children: Array<{ level: number; children: Array<{ level: number; drills: Array<{ quantityLabel?: string }> }> }>;
+        }>;
+      };
     };
+    const selectedTeamTrainingTreeBody = selectedTeamTrainingProjectTree.json() as { team: { id: string; name: string } | null };
     const trainingProjectsBody = trainingProjects.json() as {
       trainingSession: { eventId: string; sessionPlanId: string; intensity?: string };
       sessionPlan: { id: string; blocks: Array<{ drillId: string }> };
@@ -1099,6 +1118,18 @@ describe("api server", () => {
     expect(workbenchBody.workflow).toEqual(expect.objectContaining({ pendingAttendance: true }));
     expect(workbenchBody.training.session).toEqual(expect.objectContaining({ id: "training-session-1" }));
     expect(trainingProjectTree.statusCode).toBe(200);
+    expect(selectedTeamTrainingProjectTree.statusCode).toBe(200);
+    expect(inaccessibleTeamTrainingProjectTree.statusCode).toBe(403);
+    expect(trainingTreeBody.team).toEqual(expect.objectContaining({ id: "team-u10-dev", name: "U10发展队" }));
+    expect(trainingTreeBody.teamOptions).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "team-u10-dev", name: "U10发展队" }),
+      expect.objectContaining({ id: "team-weekend-select", name: "周末精英队" }),
+    ]));
+    expect(selectedTeamTrainingTreeBody.team).toEqual(expect.objectContaining({ id: "team-weekend-select", name: "周末精英队" }));
+    expect(trainingTreeBody.contentTree.nodes[0]?.level).toBe(1);
+    expect(trainingTreeBody.contentTree.nodes[0]?.children[0]?.level).toBe(2);
+    expect(trainingTreeBody.contentTree.nodes[0]?.children[0]?.children[0]?.level).toBe(3);
+    expect(trainingTreeBody.contentTree.nodes[0]?.children[0]?.children[0]?.drills[0]?.quantityLabel).toMatch(/每组/);
     expect(trainingTreeBody.projects).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "drill-cq-talent-assessment-001" }),
     ]));
