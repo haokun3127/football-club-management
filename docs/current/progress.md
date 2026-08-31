@@ -2092,3 +2092,9 @@
 - 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:896` 已重新读取，返回严格 `375×812`；与 2026-08-29 保存的 C8 在线稿逐像素比较 `same_pixels=True`，当前设计没有实质变化。
 - 当前稿继续要求训练管理标题、四项统计卡、训练计划/能力评估/学员管理/测评任务分段导航、训练卡片和教练底部 TabBar；本轮未因设计未变化而重复修改页面代码。
 - 微信开发者工具当前未运行，本轮没有新增 C8 运行态截图，不宣称新的运行时视觉验收。
+
+## 2026-08-31 C6/C6.1/C7 真实 MCP 运行态复验
+
+- 微信开发者工具恢复后，使用 WeChatIDE MCP 重新打开并采集 C6 `/pages/coach/match/index`、C6.1 `/pages/coach/match-event-add/index`、C7 `/pages/coach/tactical-board/index`，三张截图及 sidecar 均严格 `375×812`，采集方式均为 `wechatide-mcp simulator_screenshot`，证据位于 `%TEMP%\cq-talent-visual-evidence`。
+- C6 真实运行态的比赛标题、球队、比分、事件时间线和半场比分待同步文案均来自当前教练可访问活动；C6.1 显示真实能力类型和球员名单；C7 显示真实战术板号码、候补名单和拖拽工作区，未复制 Figma 示例业务数据。
+- 三页的顶栏、内容卡片、球场/名单结构、操作层级和教练 TabBar 与当前在线稿一致。C7 保存按钮在未产生变更的真实状态下呈禁用色，记录为状态差异，不通过伪造拖拽修改来强行匹配画板示例。
