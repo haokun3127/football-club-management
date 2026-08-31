@@ -2109,3 +2109,9 @@
 
 - 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:1002` 已重新读取并与真实教练路由 `/pages/coach/test-tasks/index` 对照；截图和 sidecar 均严格 `375×812`，证据位于 `%TEMP%\cq-talent-visual-evidence`。
 - 顶栏“新增”、全部/未完成/已完成筛选胶囊、任务卡、状态标签、进度条、右箭头、悬浮新增按钮和教练 TabBar 结构一致；任务名称、日期、完成数量和状态来自真实接口数据，未复制 Figma 示例值。
+
+## 2026-08-31 C12/C12.1 真实 MCP 运行态复核
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:1030` 与 `93:1061` 已重新读取；C12 画板为高 `894px` 的项目评分录入页，C12.1 为自动保存提示态。
+- 真实活动 `event-cq-talent-secure-test-1` 当前存在设备本机评分草稿，因此 MCP 截图进入 C12.1 自动保存态；遮罩、成功图标、文案层级、继续/退出按钮和教练 TabBar 与 `93:1061` 一致。截图和 sidecar 均严格 `375×812`，证据位于 `%TEMP%\cq-talent-visual-evidence`。
+- 另一个历史活动 `event-cq-talent-demo-training-upcoming` 返回真实“评分项目读取失败”错误态，不能作为普通 C12 成功态证据；本轮不清理本机草稿、不注入评分数据，也不宣称普通 C12 录入态已通过。
