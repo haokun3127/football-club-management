@@ -31,5 +31,5 @@
 ## 批次 4：文档与运行态
 
 - [x] 更新 `docs/current/figma-source-of-truth.md` 和 `docs/current/progress.md`，替换已废止的“C1 选队”结论。
-- [x] 在可用的微信开发者工具中依次截图 C1、C8、C8.1；C1 当前为无课程空态，已明确不能冒充多队卡运行态验收。
-- [ ] 对本任务所有修改做最终定向验证并单独提交。
+- [x] 在可用的微信开发者工具中依次截图 C1、C8、C8.1；C1 初次为空态，随后选择 `2026-08-31`，取得含两节真实课程的 375×812 运行态截图：`%TEMP%\\cq-talent-visual-evidence\\c1-all-teams-running-2026-08-31.png`。当前账号只被后端分配到 U10 精英队，因此这张证据验证“全队日程结构 + 队伍/场地标识”，不将单队数据冒充为多队数据。
+- [x] 对本任务所有修改完成定向验证并独立提交：`e6a866e refactor(coach): separate all-team schedule from training context`；定向 Vitest 32/32、Mini TypeScript 检查、根目录 typecheck、domain 21/21、Mini 444/444、API 123/123 均通过。
