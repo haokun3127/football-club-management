@@ -87,6 +87,12 @@
 - Runtime review: the real `assessment-template-technical` currently exposes one writable “技术能力” group and five real students with empty scores; the page therefore renders one group chip and dashes. The Figma sample’s three group chips and sample scores are data/template-state differences, not a client permission to invent fields.
 - WeChatIDE MCP exact runtime screenshot: `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788254598753-fk13ie.jpg` (`375×812`). The full-screen header, dynamic group chip, real student cards, progress tracks and fixed coach TabBar are present. Figma node `1568:7` was screenshot-read after cloning.
 
+### Coach C15.1 Assessment submit (2026-09-01)
+
+- Current V3 node: `1569:7` (`/pages/coach/assessment-submit/index?title=<realTitle>&count=<confirmedCount>`), non-destructively cloned from preserved historical source `93:1163` and named `C15.1 · Assessment Submit · Current V3 · Runtime Reviewed`.
+- Runtime review: the success shell keeps the check mark, dynamic submitted title, summary card, submitted status, real confirmed count/date and the two explicit follow-up actions. It does not make a network request or invent a success result; the upstream assessment loop owns confirmation before navigation.
+- WeChatIDE MCP exact screenshot: `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788254788264-hm55su.jpg` (`375×812`). Figma node `1569:7` was screenshot-read after cloning.
+
 ## Verification
 
 - Figma: 每个新 page 和画板都以 MCP 读取、截图并回读 node id。
