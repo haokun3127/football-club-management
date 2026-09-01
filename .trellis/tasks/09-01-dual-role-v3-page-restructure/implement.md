@@ -63,6 +63,12 @@
 - Runtime review: the task list keeps the full-screen navigation, task-state filters, real task cards/progress and coach TabBar. The shared topbar contract is now `height: 88rpx` with `box-sizing: content-box` and inline safe-area/menu insets; the legacy `176rpx` compensation was removed without changing the rendered first-viewport layout.
 - Verification: C11 targeted Vitest `9/9`, `apps/miniprogram-cq-talent` TypeScript `tsc --noEmit`, and an exact `375×812` WeChatIDE MCP viewport capture `%TEMP%\wechatide-viewport-screenshot-1788248438586-u0siuk.jpg` all passed. Task dates, state labels and participant totals remain the real account data rather than Figma sample values.
 
+### Coach C12 Assessment entry (2026-09-01)
+
+- Current V3 node: `1565:7` (`/pages/coach/assessment-entry/index?eventId=<activityId>`), non-destructively cloned from preserved historical source `93:1030` and named `C12 · Assessment Entry · Current V3 · Pending Runtime Data`.
+- Figma screenshot was read back at `375×894`; the page keeps the full-screen score-entry header, dark assessment summary, compact four-column student metric cards, fixed save bar and coach TabBar. The historical source is preserved.
+- Runtime route was opened with the real secure activity. The API returned the truthful empty state “缺少评测模板参数，请从评测任务列表进入。” rather than a score form, so this page is not claimed as a runtime visual pass until a real assessment-task activity with a template is opened. No fake template, student score or API response was added.
+
 ## Verification
 
 - Figma: 每个新 page 和画板都以 MCP 读取、截图并回读 node id。
