@@ -112,6 +112,13 @@
 - Runtime review: the real account returns more students and dimensions than the Figma sample; the page keeps dynamic coverage bars, pending-sync labels, a fixed confirm bar and coach TabBar without replacing data with sample values.
 - WeChatIDE MCP exact screenshot: `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788255066036-einuxo.jpg` (`375×812`). Figma node `1571:7` was screenshot-read after cloning; no deterministic layout or bottom-bar overlap was found.
 
+### Coach C6.1 Match event add (2026-09-01)
+
+- Current Coach V4 node: `1580:7` (`/pages/coach/match-event-add/index?eventId=<activityId>`), non-destructively cloned from preserved online source `93:827`.
+- Online Figma screenshot was read at native `375×812`; the runtime route was opened with the currently authorized completed match `event-cq-talent-secure-test-1-completed-match`.
+- WeChatIDE MCP screenshot: `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788256647233-r3hq0x.png` (`375×812`). The first attempt with stale activity `event-cq-talent-secure-test-1-mat-0818` correctly returned the real API error state; it was not replaced with mock data. The valid activity rendered the event chips, minute input, player picker, note field, submit CTA and coach TabBar.
+- The only visible difference from Figma is truthful capability-driven event density: the real session exposes `扑救/抢断/犯规/黄牌/红牌/乌龙球` in addition to `进球/助攻`. No code change was needed in this batch.
+
 ## Verification
 
 - Figma: 每个新 page 和画板都以 MCP 读取、截图并回读 node id。
