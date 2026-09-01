@@ -170,6 +170,12 @@
 - 微信开发者工具 MCP 编译：`pages/coach/schedule/index.wxml`、`pages/coach/schedule/index.wxss` 均成功。可信运行截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270390966-tihim6.png`，严格 `375×812`，显示完整七天、两个翻周箭头和“全部球队课程”。
 - 定向 Vitest（`index.test.mjs` + `seven-day-strip.test.mjs`）`23/23`，小程序 `tsc --noEmit` 通过；本批只暂存七天视图数据、移除伪下拉格、七列布局与回归测试，不携带同文件其他未提交改动。
 
+### C2 训练工作台运行复核（2026-09-01）
+
+- V6 在线基准为 `1610:1462`（`/pages/coach/event/index?id=<activityId>`）。其结构为全屏返回顶栏、深色课程摘要、头像点按式出勤、训练内容与三个快捷动作；不放选队或销课流程。
+- 当前教练会话以真实授权活动 `event-cq-talent-secure-test-1-trn-0818` 打开运行态，微信开发者工具 MCP 截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270675679-uzpebj.png` 严格 `375×812`。顶栏、深色课程卡、已到绿色勾／未到灰色头像、中文姓名、训练内容、快捷入口与固定教练 TabBar 均可见。
+- Figma 画板使用 19 人名单示例，当前真实活动返回 8 名授权学员，因此出勤卡高度和下方内容首屏位置不同；此为真实数据密度差异，不通过伪造名单或硬编码高度消除。未发现确定性结构、样式或交互缺陷，本页无业务代码改动。
+
 ### V5 首批复验（2026-09-01）
 
 - 重新通过微信开发者工具 MCP 取得三张严格 `375×812` 运行截图：`%TEMP%\\cq-talent-visual-evidence\\v5-c1-schedule-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-training-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-1-selector-rerun-20260901.png`。
