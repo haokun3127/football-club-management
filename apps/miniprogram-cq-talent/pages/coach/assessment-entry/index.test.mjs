@@ -174,9 +174,9 @@ describe("C15 coach assessment entry", () => {
     });
     const page = createPageInstance();
     await page.load("template-real", "Real task");
-    expect(page.data.students[0].rows[0].value).toBeNull();
+    expect(page.data.cards[0].rawInputValue).toBe("");
 
-    page.onSliderChange({ currentTarget: { dataset: { studentId: "student-1", fieldId: "field-speed" } }, detail: { value: 80 } });
+    page.onRawInput({ currentTarget: { dataset: { fieldId: "field-speed" } }, detail: { value: "80" } });
     const saved = storage.get("coach-assessment-entry:template-real:version-real");
     expect(saved).toEqual(expect.objectContaining({
       signature: expect.any(String),
@@ -188,13 +188,14 @@ describe("C15 coach assessment entry", () => {
     const page = createPageInstance();
     await page.load("template-real", "Real task");
 
-    expect(page.data.students[0]).toMatchObject({
-      teamLabel: "Actual team",
-      rows: [expect.objectContaining({ fieldId: "field-speed", progressPercent: 0 })],
+    expect(page.data).toMatchObject({
+      teamName: "Actual team",
+      activeStudentId: "student-1",
+      cards: expect.arrayContaining([expect.objectContaining({ fieldId: "field-speed", scoreLabel: "待提交", placeholder: "输入" })]),
     });
 
-    page.onSliderChange({ currentTarget: { dataset: { studentId: "student-1", fieldId: "field-speed" } }, detail: { value: 80 } });
-    expect(page.data.students[0].rows[0]).toMatchObject({ valueLabel: "80", progressPercent: 80 });
+    page.onRawInput({ currentTarget: { dataset: { fieldId: "field-speed" } }, detail: { value: "80" } });
+    expect(page.data.cards[0]).toMatchObject({ rawValueLabel: "80", scoreLabel: "80 分", scoreValue: 80 });
   });
 
   it("clears only confirmed students and stays on C15 after a partial or unknown result", async () => {
@@ -203,8 +204,9 @@ describe("C15 coach assessment entry", () => {
       .mockRejectedValueOnce({ code: "network_error" });
     const page = createPageInstance();
     await page.load("template-real", "Real task");
-    page.onSliderChange({ currentTarget: { dataset: { studentId: "student-1", fieldId: "field-speed" } }, detail: { value: 80 } });
-    page.onSliderChange({ currentTarget: { dataset: { studentId: "student-2", fieldId: "field-speed" } }, detail: { value: 70 } });
+    page.onRawInput({ currentTarget: { dataset: { fieldId: "field-speed" } }, detail: { value: "80" } });
+    page.selectStudent({ currentTarget: { dataset: { id: "student-2" } } });
+    page.onRawInput({ currentTarget: { dataset: { fieldId: "field-speed" } }, detail: { value: "70" } });
     await page.submit();
 
     const saved = storage.get("coach-assessment-entry:template-real:version-real");
@@ -224,8 +226,9 @@ describe("C15 coach assessment entry", () => {
     mocks.submitCoachAssessment.mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }));
     const page = createPageInstance();
     await page.load("template-real", "Real task");
-    page.onSliderChange({ currentTarget: { dataset: { studentId: "student-1", fieldId: "field-speed" } }, detail: { value: 80 } });
-    page.onSliderChange({ currentTarget: { dataset: { studentId: "student-2", fieldId: "field-speed" } }, detail: { value: 70 } });
+    page.onRawInput({ currentTarget: { dataset: { fieldId: "field-speed" } }, detail: { value: "80" } });
+    page.selectStudent({ currentTarget: { dataset: { id: "student-2" } } });
+    page.onRawInput({ currentTarget: { dataset: { fieldId: "field-speed" } }, detail: { value: "70" } });
     const pending = page.submit();
     page.submit();
     expect(mocks.submitCoachAssessment).toHaveBeenCalledTimes(1);
@@ -247,20 +250,20 @@ describe("C15 coach assessment entry", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(template).not.toContain("陈小宇");
     expect(template).not.toContain("U10精英队");
-    expect(template).toContain('class="c15-student-card__team"');
-    expect(template).toContain('class="c15-row__progress" style="width: {{row.progressPercent}}%;"');
-    expect(template).toContain('class="c15-row__slider-input"');
+    expect(template).toContain('class="c15-context__team"');
+    expect(template).toContain('class="c15-metric-card__input"');
+    expect(template).toContain('bindinput="onRawInput"');
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).not.toContain('"app-header"');
     expect(template).toContain('<role-tabbar role="coach" active="training" />');
     expect(template).not.toContain('flow="{{true}}"');
     expect(template).toContain('padding-top:{{navInset}}px;padding-right:{{menuInset}}px');
-    expect(stylesheet).toMatch(/\.c15-body\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+180rpx/s);
+    expect(stylesheet).toMatch(/\.c15-body\s*\{[^}]*padding:\s*32rpx\s+32rpx\s+180rpx/s);
     expect(template).toContain('/assets/icons/chevron-left.svg');
     expect(stylesheet).toMatch(/\.c15-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*padding:\s*0\s+32rpx)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).toMatch(/\.c15-nav__left\s*\{[^}]*gap:\s*0/s);
     expect(stylesheet).toMatch(/\.c15-nav__title\s*\{(?=[^}]*font-size:\s*36rpx)(?=[^}]*line-height:\s*44rpx)/s);
     expect(stylesheet).toMatch(/\.c15-submit-wrap\s*\{(?=[^}]*position:\s*static)(?=[^}]*margin-top:\s*32rpx)/s);
-    expect(stylesheet).toMatch(/\.c15-row__track\s*\{(?=[^}]*width:\s*320rpx)(?=[^}]*height:\s*12rpx)/s);
+    expect(stylesheet).toMatch(/\.c15-metric-panel\s*\{(?=[^}]*background:\s*#07111f)/s);
   });
 });

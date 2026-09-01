@@ -17,41 +17,59 @@
     />
 
     <block wx:if="{{state === 'ready'}}">
-      <scroll-view scroll-x class="c15-groups" enhanced show-scrollbar="{{false}}">
-        <view class="c15-groups__row">
-          <view wx:for="{{groups}}" wx:key="id" class="{{item.className}}" data-id="{{item.id}}" bindtap="selectGroup">{{item.label}}</view>
+      <view class="c15-context">
+        <view class="c15-context__label">当前训练球队</view>
+        <view class="c15-context__main">
+          <text class="c15-context__team">{{teamName || '训练球队待同步'}}</text>
+          <text class="c15-context__hint">由训练管理选择</text>
         </view>
-      </scroll-view>
+      </view>
 
-        <view wx:for="{{students}}" wx:for-item="student" wx:key="id" class="c15-student-card">
-          <view class="c15-student-card__head">
-            <view class="c15-student-card__avatar">{{student.initial}}</view>
-            <view class="c15-student-card__identity">
-              <text class="c15-student-card__name">{{student.name}}</text>
-              <text wx:if="{{student.teamLabel}}" class="c15-student-card__team">{{student.teamLabel}}</text>
-            </view>
-            <text class="c15-student-card__average">{{student.averageLabel}}</text>
+      <view class="c15-metric-panel">
+        <view class="c15-metric-panel__head">
+          <text class="c15-metric-panel__title">当前球员指标</text>
+          <text class="c15-metric-panel__hint">最新评测</text>
+        </view>
+        <view class="c15-metric-panel__student">
+          <text class="c15-metric-panel__name">{{activeStudentName}}</text>
+          <text class="c15-metric-panel__hint">录入本次原始值与标准分</text>
+          <text class="c15-metric-panel__score-header">标准分</text>
+        </view>
+
+        <view wx:for="{{cards}}" wx:for-item="card" wx:key="fieldId" class="c15-metric-card">
+          <text class="c15-metric-card__label">{{card.label}}</text>
+          <view class="c15-metric-card__raw">
+            <input
+              class="c15-metric-card__input"
+              type="digit"
+              value="{{card.rawInputValue}}"
+              min="{{card.inputMin}}"
+              max="{{card.inputMax}}"
+              placeholder="{{card.placeholder}}"
+              data-field-id="{{card.fieldId}}"
+              bindinput="onRawInput"
+            />
+            <text class="c15-metric-card__unit">{{card.unitLabel}}</text>
           </view>
-          <view class="c15-rows">
-            <view wx:for="{{student.rows}}" wx:for-item="row" wx:key="fieldId" class="c15-row">
-              <text class="c15-row__label">{{row.label}}</text>
-              <view class="c15-row__track">
-                <view class="c15-row__track-line"><view class="c15-row__progress" style="width: {{row.progressPercent}}%;"></view></view>
-                <slider
-                  class="c15-row__slider-input"
-                  min="{{row.sliderMin}}"
-                  max="{{row.sliderMax}}"
-                  step="{{row.sliderStep}}"
-                  value="{{row.sliderValue}}"
-                  activeColor="#a80f1b"
-                  backgroundColor="#e7eaf0"
-                  block-size="12"
-                  data-student-id="{{student.id}}"
-                  data-field-id="{{row.fieldId}}"
-                  bindchange="onSliderChange"
-                />
-              </view>
-              <text class="c15-row__value">{{row.valueLabel}}</text>
+          <text class="c15-metric-card__score">{{card.scoreLabel}}</text>
+        </view>
+      </view>
+
+      <view class="c15-roster">
+        <view class="c15-roster__head">
+          <text class="c15-roster__title">全部球员</text>
+          <text class="c15-roster__hint">{{students.length}} 名 · 点击头像切换评估</text>
+        </view>
+        <view class="c15-roster__grid">
+          <view
+            wx:for="{{students}}"
+            wx:key="id"
+            class="c15-player {{item.isActive ? 'c15-player--active' : ''}}"
+            data-id="{{item.id}}"
+            bindtap="selectStudent"
+          >
+            <view class="c15-player__avatar">{{item.initial}}</view>
+            <text class="c15-player__name">{{item.name}}</text>
           </view>
         </view>
       </view>

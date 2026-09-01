@@ -7,36 +7,28 @@ type AssessmentField = AssessmentForm["fields"][number];
 type ValuesByStudent = Record<string, Record<string, number>>;
 
 interface EntryField extends AssessmentField {
-  sliderMin: number;
-  sliderMax: number;
-  sliderStep: number;
+  inputMin: number;
+  inputMax: number;
 }
 
-interface GroupOption {
-  id: string;
-  label: string;
-  className: string;
-}
-
-interface StudentRow {
-  fieldId: string;
-  label: string;
-  sliderMin: number;
-  sliderMax: number;
-  sliderStep: number;
-  sliderValue: number;
-  value: number | null;
-  valueLabel: string;
-  progressPercent: number;
-}
-
-interface StudentEntry {
+interface StudentView {
   id: string;
   name: string;
   initial: string;
-  teamLabel: string;
-  averageLabel: string;
-  rows: StudentRow[];
+  isActive: boolean;
+}
+
+interface MetricCard {
+  fieldId: string;
+  label: string;
+  inputMin: number;
+  inputMax: number;
+  rawInputValue: string;
+  rawValueLabel: string;
+  unitLabel: string;
+  scoreLabel: string;
+  scoreValue: number | null;
+  placeholder: string;
 }
 
 interface AssessmentDraft {
@@ -55,12 +47,14 @@ interface PageData {
   templateId: string;
   templateVersionId: string;
   taskTitle: string;
-  groups: GroupOption[];
-  activeGroupId: string;
   fields: EntryField[];
   teamName: string;
   members: CoachTeamDetail["members"];
-  students: StudentEntry[];
+  students: StudentView[];
+  activeStudentId: string;
+  activeStudentName: string;
+  activeStudentInitial: string;
+  cards: MetricCard[];
   valuesByStudent: ValuesByStudent;
   draftSignature: string;
   submitting: boolean;
@@ -80,12 +74,14 @@ Page<PageData>({
     templateId: "",
     templateVersionId: "",
     taskTitle: "能力评估",
-    groups: [],
-    activeGroupId: "",
     fields: [],
     teamName: "",
     members: [],
     students: [],
+    activeStudentId: "",
+    activeStudentName: "",
+    activeStudentInitial: "",
+    cards: [],
     valuesByStudent: {},
     draftSignature: "",
     submitting: false,
@@ -129,13 +125,15 @@ Page<PageData>({
           statusTitle: "无法录入",
           statusActionText: "",
           message: "当前评测表单没有可安全录入的真实项目。",
-          templateVersionId: "",
-          groups: [],
-          activeGroupId: "",
+        templateVersionId: "",
           fields: [],
           teamName: "",
           members: [],
           students: [],
+          activeStudentId: "",
+          activeStudentName: "",
+          activeStudentInitial: "",
+          cards: [],
           valuesByStudent: {},
           draftSignature: "",
         });
@@ -150,34 +148,38 @@ Page<PageData>({
           statusActionText: "",
           message: "当前没有可录入的真实学员。",
           templateVersionId: form.templateVersionId,
-          groups: [],
-          activeGroupId: "",
           fields,
           members: [],
           students: [],
+          activeStudentId: "",
+          activeStudentName: "",
+          activeStudentInitial: "",
+          cards: [],
           valuesByStudent: {},
           draftSignature: "",
         });
         return;
       }
 
-      const groups = buildGroups(fields);
-      const activeGroupId = groups[0]?.id || "";
       const teamName = team.team?.name?.trim() || "";
       const signature = createDraftSignature(fields, members);
       const valuesByStudent = restoreDraft(templateId, form.templateVersionId, signature, fields, members);
+      const students = toStudents(members);
+      const activeStudent = students[0];
       this.setData({
         state: "ready",
         statusTitle: "能力评估录入",
         statusActionText: "",
         message: "",
         templateVersionId: form.templateVersionId,
-        groups,
-        activeGroupId,
         fields,
         teamName,
         members,
-        students: buildStudentEntries(teamName, members, fields, activeGroupId, valuesByStudent),
+        students: markActiveStudent(students, activeStudent?.id || ""),
+        activeStudentId: activeStudent?.id || "",
+        activeStudentName: activeStudent?.name || "",
+        activeStudentInitial: activeStudent?.initial || "",
+        cards: activeStudent ? buildMetricCards(fields, valuesByStudent[activeStudent.id] ?? {}) : [],
         valuesByStudent,
         draftSignature: signature,
         lastSavedLabel: hasValues(valuesByStudent) ? "已恢复本机草稿" : "",
@@ -198,21 +200,31 @@ Page<PageData>({
   goBack() {
     wx.navigateBack({ delta: 1 });
   },
-  selectGroup(event: { currentTarget: { dataset: { id: string } } }) {
-    const activeGroupId = event.currentTarget.dataset.id;
-    if (!this.data.groups.some((group: GroupOption) => group.id === activeGroupId)) return;
+  selectStudent(event: { currentTarget: { dataset: { id: string } } }) {
+    const studentId = event.currentTarget.dataset.id;
+    const student = this.data.members.find((member: CoachTeamDetail["members"][number]) => member.id === studentId);
+    if (!student || student.id === this.data.activeStudentId) return;
     this.setData({
-      activeGroupId,
-      groups: updateGroupClasses(this.data.groups, activeGroupId),
-      students: buildStudentEntries(this.data.teamName, this.data.members, this.data.fields, activeGroupId, this.data.valuesByStudent),
+      students: markActiveStudent(this.data.students, student.id),
+      activeStudentId: student.id,
+      activeStudentName: student.name,
+      activeStudentInitial: student.name.slice(0, 1),
+      cards: buildMetricCards(this.data.fields, this.data.valuesByStudent[student.id] ?? {}),
     });
   },
-  onSliderChange(event: { currentTarget: { dataset: { studentId: string; fieldId: string } }; detail: { value: number } }) {
-    const { studentId, fieldId } = event.currentTarget.dataset;
+  onRawInput(event: { currentTarget: { dataset: { fieldId: string } }; detail: { value: string } }) {
+    const studentId = this.data.activeStudentId;
+    const { fieldId } = event.currentTarget.dataset;
     const field = this.data.fields.find((item: EntryField) => item.id === fieldId);
-    if (!field || !this.data.members.some((member: CoachTeamDetail["members"][number]) => member.id === studentId)) return;
-    const value = Number(event.detail.value);
-    if (!Number.isFinite(value) || value < field.sliderMin || value > field.sliderMax) return;
+    if (!field || !studentId) return;
+    const value = Number(event.detail.value.trim());
+    if (!event.detail.value.trim()) {
+      const valuesByStudent = clearStudentField(this.data.valuesByStudent, studentId, fieldId);
+      this.setData({ valuesByStudent, cards: buildMetricCards(this.data.fields, valuesByStudent[studentId] ?? {}) });
+      this.persistDraft(valuesByStudent);
+      return;
+    }
+    if (!Number.isFinite(value) || value < field.inputMin || value > field.inputMax) return;
 
     const valuesByStudent = {
       ...this.data.valuesByStudent,
@@ -223,7 +235,7 @@ Page<PageData>({
     };
     this.setData({
       valuesByStudent,
-      students: buildStudentEntries(this.data.teamName, this.data.members, this.data.fields, this.data.activeGroupId, valuesByStudent),
+      cards: buildMetricCards(this.data.fields, valuesByStudent[studentId] ?? {}),
     });
     this.persistDraft(valuesByStudent);
   },
@@ -278,7 +290,7 @@ Page<PageData>({
     this.setData({
       submitting: false,
       valuesByStudent,
-      students: buildStudentEntries(this.data.teamName, this.data.members, this.data.fields, this.data.activeGroupId, valuesByStudent),
+      cards: buildMetricCards(this.data.fields, valuesByStudent[this.data.activeStudentId] ?? {}),
     });
 
     if (unconfirmedStudentIds.length) {
@@ -297,9 +309,8 @@ function toEntryFields(form: AssessmentForm): EntryField[] | null {
   if (form.fields.some((field) => !field.testItemId || !field.groupId || !supportsNumericValue(field.valueKind))) return null;
   return form.fields.map((field) => ({
     ...field,
-    sliderMin: field.minValue ?? (field.valueKind === "rating_1_5" ? 1 : 0),
-    sliderMax: field.maxValue ?? (field.valueKind === "rating_1_5" ? 5 : 100),
-    sliderStep: field.precision && field.precision > 0 ? 0.5 : 1,
+    inputMin: field.minValue ?? (field.valueKind === "rating_1_5" ? 1 : 0),
+    inputMax: field.maxValue ?? (field.valueKind === "rating_1_5" ? 5 : 100),
   }));
 }
 
@@ -316,66 +327,62 @@ function supportsNumericValue(kind: string) {
   ].includes(kind);
 }
 
-function buildGroups(fields: EntryField[]) {
-  const seen = new Set<string>();
-  const groups: GroupOption[] = [];
-  for (const field of fields) {
-    if (seen.has(field.groupId)) continue;
-    seen.add(field.groupId);
-    groups.push({
-      id: field.groupId,
-      label: field.groupLabel,
-      className: groups.length === 0 ? "c15-group c15-group--active" : "c15-group",
-    });
-  }
-  return groups;
-}
-
-function updateGroupClasses(groups: GroupOption[], activeGroupId: string) {
-  return groups.map((group) => ({
-    ...group,
-    className: group.id === activeGroupId ? "c15-group c15-group--active" : "c15-group",
+function toStudents(members: CoachTeamDetail["members"]): StudentView[] {
+  return members.map((member) => ({
+    id: member.id,
+    name: member.name.slice(0, 4),
+    initial: member.name.slice(0, 1),
+    isActive: false,
   }));
 }
 
-function buildStudentEntries(
-  teamName: string,
-  members: CoachTeamDetail["members"],
-  fields: EntryField[],
-  activeGroupId: string,
-  valuesByStudent: ValuesByStudent,
-) {
-  const activeFields = fields.filter((field) => field.groupId === activeGroupId);
-  return members.map((member) => {
-    const values = valuesByStudent[member.id] ?? {};
-    const numericValues = Object.values(values).filter((value) => Number.isFinite(value));
+function markActiveStudent(students: StudentView[], activeStudentId: string) {
+  return students.map((student) => ({ ...student, isActive: student.id === activeStudentId }));
+}
+
+function buildMetricCards(fields: EntryField[], values: Record<string, number>): MetricCard[] {
+  return fields.map((field) => {
+    const value = values[field.id];
+    const hasValue = typeof value === "number" && Number.isFinite(value);
+    const isScore = field.valueKind === "score_0_100";
     return {
-      id: member.id,
-      name: member.name,
-      initial: member.name.slice(0, 1),
-      teamLabel: teamName,
-      averageLabel: numericValues.length ? String(Math.round(numericValues.reduce((sum, value) => sum + value, 0) / numericValues.length)) : "--",
-      rows: activeFields.map((field) => {
-        const value = values[field.id];
-        return {
-          fieldId: field.id,
-          label: field.label,
-          sliderMin: field.sliderMin,
-          sliderMax: field.sliderMax,
-          sliderStep: field.sliderStep,
-          sliderValue: value ?? field.sliderMin,
-          value: value ?? null,
-          valueLabel: value === undefined ? "--" : String(value),
-          progressPercent: value === undefined ? 0 : toProgressPercent(value, field.sliderMin, field.sliderMax),
-        };
-      }),
-    } satisfies StudentEntry;
+      fieldId: field.id,
+      label: field.label,
+      inputMin: field.inputMin,
+      inputMax: field.inputMax,
+      rawInputValue: hasValue ? formatValue(value, field.precision) : "",
+      rawValueLabel: hasValue ? formatValue(value, field.precision) : "待录入",
+      unitLabel: displayUnit(field),
+      scoreLabel: hasValue && isScore ? `${formatValue(value, field.precision)} 分` : "待提交",
+      scoreValue: hasValue && isScore ? value : null,
+      placeholder: field.required ? "输入" : "可选",
+    };
   });
 }
 
-function toProgressPercent(value: number, min: number, max: number) {
-  if (!Number.isFinite(value) || !Number.isFinite(min) || !Number.isFinite(max) || max <= min) return 0;
-  return Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
+function displayUnit(field: EntryField) {
+  if (field.unit && field.unit !== "分") return field.unit;
+  const labels: Record<string, string> = {
+    score_0_100: "分",
+    count: "次",
+    percentage: "%",
+    duration_minutes: "分钟",
+    duration_seconds: "秒",
+    distance_meters: "米",
+  };
+  return labels[field.valueKind] ?? "分";
+}
+
+function formatValue(value: number, precision?: number) {
+  if (precision && precision > 0) return value.toFixed(Math.min(precision, 2));
+  return Number.isInteger(value) ? String(value) : String(Number(value.toFixed(2)));
+}
+
+function clearStudentField(valuesByStudent: ValuesByStudent, studentId: string, fieldId: string) {
+  const next = { ...valuesByStudent, [studentId]: { ...(valuesByStudent[studentId] ?? {}) } };
+  delete next[studentId]?.[fieldId];
+  if (!Object.keys(next[studentId] ?? {}).length) delete next[studentId];
+  return next;
 }
 
 function draftKey(templateId: string, templateVersionId: string) {
