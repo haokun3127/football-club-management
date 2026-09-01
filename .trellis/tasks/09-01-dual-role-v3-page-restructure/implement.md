@@ -157,6 +157,19 @@
 - C8 运行截图：`C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-visual-evidence\\v5-c8-training-20260901.png`，sidecar 同名，脚本输出 `375×812`；真实页面显示“我的球队”和切换入口，课程数据按当前训练球队读取。
 - 定向验证：`pages/coach/schedule/index.test.mjs`、`pages/coach/training/index.test.mjs`、`pages/coach/team-selector/index.test.mjs` 共 `32/32`；小程序 `tsc --noEmit` 通过。此批没有业务代码改动。
 
+### V6 当前页面入口（2026-09-01）
+
+15. [x] 对唯一在线文件 `zZ6wKyOHKcO4UYXDd9jGwv` 进行实际写入验证，并新建 Parent V6 页面 `1609:2`、Coach V6 页面 `1609:3`；未覆盖或删除 V3/V4/V5 和历史画板。
+16. [x] 建立并截图回读 Parent V6 总览 `1609:4` 与 Coach V6 总览 `1609:29`，再从已核对的 V5 页面非破坏性克隆当前首批屏幕：Parent P1/P4/P5/P8/P7 与 Coach C1/C2/C4/C6/C7/C8/C8.1。
+17. [x] 固化产品边界：教练 C1 只显示全部授权球队课程；训练球队只能由 C8/C8.1 选择并供训练、点名、测评、统计使用。后续逐页代码和运行态验收只能引用 V6 节点。
+18. [ ] 逐页检查 V6 与运行态，按最小代码批次完成差异修复、定向验证、真实 `375×812` 截图复验和限定路径提交。
+
+### C1 七天周条首批收口（2026-09-01）
+
+- V6 在线基准为 Coach C1 `1610:1323`。运行态将周条由六天加伪月历格改为完整七天；月历继续由整条日期区展开，前后翻周箭头保留。
+- 微信开发者工具 MCP 编译：`pages/coach/schedule/index.wxml`、`pages/coach/schedule/index.wxss` 均成功。可信运行截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270390966-tihim6.png`，严格 `375×812`，显示完整七天、两个翻周箭头和“全部球队课程”。
+- 定向 Vitest（`index.test.mjs` + `seven-day-strip.test.mjs`）`23/23`，小程序 `tsc --noEmit` 通过；本批只暂存七天视图数据、移除伪下拉格、七列布局与回归测试，不携带同文件其他未提交改动。
+
 ### V5 首批复验（2026-09-01）
 
 - 重新通过微信开发者工具 MCP 取得三张严格 `375×812` 运行截图：`%TEMP%\\cq-talent-visual-evidence\\v5-c1-schedule-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-training-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-1-selector-rerun-20260901.png`。

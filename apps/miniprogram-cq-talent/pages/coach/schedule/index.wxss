@@ -80,8 +80,8 @@
 .c1-month-calendar__legend-dot--training { background: #10b981; }
 .c1-month-calendar__legend-dot--match { background: #1976d2; }
 
-/* Match Figma C1: six weekday cells leave a dedicated right-side month control. */
-.c1-week-nav { position: absolute; top: 24rpx; left: 52rpx; display: grid; grid-template-columns: repeat(6, 88rpx) 96rpx; column-gap: 4rpx; width: 648rpx; min-width: 0; height: 80rpx; box-sizing: border-box; padding: 0; overflow: visible; }
+/* Match the current C1 board: seven weekday cells sit between the two week arrows. */
+.c1-week-nav { position: absolute; top: 24rpx; left: 44rpx; display: grid; grid-template-columns: repeat(7, 88rpx); column-gap: 8rpx; width: 664rpx; min-width: 0; height: 80rpx; box-sizing: border-box; padding: 0; overflow: visible; }
 
 /* Keep both collapsed and expanded controls centered without overriding their Figma geometry. */
 .c1-dates__expand { line-height: 0; }

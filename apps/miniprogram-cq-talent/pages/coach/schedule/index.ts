@@ -110,7 +110,7 @@ Page({
         home,
         selectedDate: this.data.date,
         dayStrip,
-        collapsedDayStrip: dayStrip.slice(0, 6),
+        collapsedDayStrip: dayStrip,
         rangeLabel: rangeLabel(range, this.data.viewMode),
         coachName,
         coachInitial: coachName.slice(0, 1),
