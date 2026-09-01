@@ -1,4 +1,4 @@
-import { getCoachTrainingProjectTree } from "../../../utils/api";
+import { getCoachTeam, getCoachTrainingProjectTree } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { LoadState, TrainingTeamOption } from "../../../utils/types";
@@ -35,11 +35,18 @@ Page<PageData>({
       const tree = await getCoachTrainingProjectTree();
       const options = tree.teamOptions ?? [];
       const selected = resolveSelectedTeam(options, wx.getStorageSync<string>(COACH_TRAINING_TEAM_KEY), tree.team?.id);
-      const teams = options.map((team) => ({
-        id: team.id,
-        name: team.name,
-        metaLabel: team.id === selected ? "当前选择 · 后台已分配" : team.season ? `${team.season} · 后台已分配` : "后台已分配",
-        isSelected: team.id === selected,
+      const teams = await Promise.all(options.map(async (team) => {
+        const detail = await getCoachTeam(team.id).catch(() => null);
+        const season = detail?.team?.season ?? team.season;
+        const metaParts = season ? [season] : [];
+        if (typeof detail?.stats.memberCount === "number") metaParts.push(`${detail.stats.memberCount}名学员`);
+        metaParts.push(team.id === selected ? "当前选择" : "后台已分配");
+        return {
+          id: team.id,
+          name: team.name,
+          metaLabel: metaParts.join(" · "),
+          isSelected: team.id === selected,
+        };
       }));
       this.setData({
         state: teams.length ? "ready" : "empty",

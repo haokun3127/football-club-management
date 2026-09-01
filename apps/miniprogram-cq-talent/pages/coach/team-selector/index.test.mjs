@@ -3,10 +3,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   getCoachTrainingProjectTree: vi.fn(),
+  getCoachTeam: vi.fn(),
   requireRole: vi.fn(),
 }));
 
-vi.mock("../../../utils/api", () => ({ getCoachTrainingProjectTree: mocks.getCoachTrainingProjectTree }));
+vi.mock("../../../utils/api", () => ({
+  getCoachTrainingProjectTree: mocks.getCoachTrainingProjectTree,
+  getCoachTeam: mocks.getCoachTeam,
+}));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/presentation", () => ({ resolveMenuInset: () => 16, resolveNavInset: () => 20 }));
 
@@ -42,6 +46,11 @@ describe("coach team selector", () => {
         { id: "team-u12", name: "U12 Blue", season: "2026-2027赛季" },
       ],
     });
+    mocks.getCoachTeam.mockReset().mockImplementation(async (teamId) => ({
+      team: { id: teamId, name: teamId === "team-u12" ? "U12 Blue" : "U11 Red", season: "2026-2027赛季" },
+      stats: { memberCount: teamId === "team-u12" ? 20 : 18, trainingCount: 0, completedTrainingCount: 0, attendanceRate: null },
+      members: [],
+    }));
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
     globalThis.wx.getStorageSync.mockReset().mockReturnValue("");
     globalThis.wx.setStorageSync.mockReset();
@@ -57,8 +66,8 @@ describe("coach team selector", () => {
     expect(page.data).toMatchObject({
       state: "ready",
       teams: [
-        { id: "team-u11", name: "U11 Red", isSelected: false },
-        { id: "team-u12", name: "U12 Blue", isSelected: true },
+        { id: "team-u11", name: "U11 Red", metaLabel: "2026-2027赛季 · 18名学员 · 后台已分配", isSelected: false },
+        { id: "team-u12", name: "U12 Blue", metaLabel: "2026-2027赛季 · 20名学员 · 当前选择", isSelected: true },
       ],
     });
 
@@ -87,5 +96,14 @@ describe("coach team selector", () => {
     expect(template).not.toMatch(/新建|编辑|删除/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(stylesheet).toMatch(/\.team-selector-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+  });
+
+  it("keeps the selector usable when a team detail count is unavailable", async () => {
+    mocks.getCoachTeam.mockRejectedValue(new Error("detail unavailable"));
+    const page = createPageInstance();
+
+    await page.load();
+
+    expect(page.data.teams[0].metaLabel).toBe("2026-2027赛季 · 当前选择");
   });
 });
