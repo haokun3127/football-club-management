@@ -241,4 +241,8 @@ describe("coach training management", () => {
     expect(template).toContain('<view class="c8-tab c8-tab--active">训练计划</view>');
     expect(template).toContain('session-card__status--{{item.statusTone}}');
   });
+
+  it("shows the Figma team switch affordance in the training context", () => {
+    expect(template).toContain('<text class="c8-team-context__switch">切换</text>');
+  });
 });

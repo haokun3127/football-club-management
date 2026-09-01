@@ -8,7 +8,7 @@
       <text class="c8-team-context__label">我的球队</text>
       <view class="c8-team-context__line"><text class="c8-team-context__name">{{selectedTeamName}}</text><text class="c8-team-context__meta">{{selectedTeamMetaLabel}}</text></view>
     </view>
-    <image class="c8-team-context__chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
+    <view class="c8-team-context__action"><text class="c8-team-context__switch">切换</text><text class="c8-team-context__arrow">›</text></view>
   </view>
 
   <view class="c8-hero">
