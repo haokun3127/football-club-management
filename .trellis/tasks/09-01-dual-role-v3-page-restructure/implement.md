@@ -81,6 +81,12 @@
 - Runtime review found a real-data density edge case: the account returned eight dimensions while the historical sample showed six, causing the top canvas label to approach the hero title. The page now applies a dense-radar class with extra hero height and `24rpx` plot headroom; six-dimension layouts remain unchanged.
 - Verification: C13 targeted Vitest `11/11`, mini-program TypeScript passed, and the refreshed WeChatIDE MCP screenshot `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788254323282-8cjn90.jpg` is exact `375×812`. Figma node `1567:7` was screenshot-read after cloning. Student names, dimensions, scores and assessment period remain real API data.
 
+### Coach C15 Assessment entry (2026-09-01)
+
+- Current V3 node: `1568:7` (`/pages/coach/assessment-entry/index?templateId=<realTemplateId>&title=<realTitle>`), non-destructively cloned from preserved historical source `93:1132` and named `C15 · Assessment Entry · Current V3 · Runtime Reviewed`.
+- Runtime review: the real `assessment-template-technical` currently exposes one writable “技术能力” group and five real students with empty scores; the page therefore renders one group chip and dashes. The Figma sample’s three group chips and sample scores are data/template-state differences, not a client permission to invent fields.
+- WeChatIDE MCP exact runtime screenshot: `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788254598753-fk13ie.jpg` (`375×812`). The full-screen header, dynamic group chip, real student cards, progress tracks and fixed coach TabBar are present. Figma node `1568:7` was screenshot-read after cloning.
+
 ## Verification
 
 - Figma: 每个新 page 和画板都以 MCP 读取、截图并回读 node id。
