@@ -51,7 +51,7 @@
 | c8-training-management.png | C8 | pages/coach/training |
 | c9-team-detail.png | C9 | pages/coach/team |
 | c10-training-content-select.png | C10 | pages/coach/content-select |
-| c10-1-coverage-preview.png | C10.1 | pages/coach/coverage |
+| c10-1-coverage-preview.png | C10.1 | pages/coach/coverage/index |
 | c11-test-task-list.png | C11 | pages/coach/test-tasks |
 | c12-project-score-entry.png | C12 | pages/coach/test-entry |
 | c12-1-autosave-state.png | C12.1 | assessment-entry 页内态 |

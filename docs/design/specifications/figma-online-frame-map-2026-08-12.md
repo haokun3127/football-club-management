@@ -68,7 +68,7 @@ CODE 契约版 7 张（222:86-222:92）按 2026-08-07 用户裁定：设计画�
 | 93:896 | C8 Training Management | 812 | pages/coach/training |
 | 93:924 | C9 Team Detail | 871 | pages/coach/team |
 | 93:952 | C10 Training Content Select | 812 | pages/coach/content-select |
-| 93:983 | C10.1 Coverage Preview | 812 | pages/coach/coverage |
+| 93:983 | C10.1 Coverage Preview | 812 | pages/coach/coverage/index |
 | 93:1002 | C11 Test Task List | 812 | pages/coach/test-tasks |
 | 487:2 | C11.1 Assessment Task Create | 812 | pages/coach/test-task-create |
 | 93:1030 | C12 Project Score Entry | 894 | pages/coach/test-entry |
