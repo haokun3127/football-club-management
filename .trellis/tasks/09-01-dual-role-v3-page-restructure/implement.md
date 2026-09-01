@@ -194,6 +194,12 @@
 - 当前教练会话以真实排兵比赛 `event-cq-talent-secure-test-1-scheduled-match` 打开运行态，微信开发者工具 MCP 截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270869987-a26yt3.png` 严格 `375×812`。`4-3-3`、11 名场上球员、8 名候补、球场、拖拽提示、重置／保存操作均可见。
 - Figma 编号为布局示例，真实运行显示当前比赛保存的球员姓名与编号。此轮不拖拽、不重置、不保存，避免覆盖已验证的持久化阵容；未发现当前首屏结构或底部操作区的确定性视觉差异。
 
+### C8/C8.1 训练管理与选训练球队运行复核（2026-09-01）
+
+- V6 在线基准：C8 `1610:1843`（`/pages/coach/training/index`）和 C8.1 `1610:1950`（`/pages/coach/team-selector/index`）。C8 显示当前训练球队、统计、训练计划／能力评估／学员管理／测评任务；C8.1 是唯一可改变训练球队上下文的独立全屏页面。
+- 微信开发者工具 MCP 截图严格 `375×812`：C8 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270926891-bfgw1t.png`，C8.1 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270944226-lssxwk.png`。当前真实会话显示“我的球队 U10精英队”、真实统计和课程；选择页只列出后台分配的 U10精英队并标为当前选择。
+- 在线稿包含多队样例，当前账号实际只有一支已授权队伍，因此 C8.1 只显示一项是权限正确性而非缺陷。未点击队伍以避免切换上下文；C1 日程继续没有选队入口，边界保持正确。无业务代码改动。
+
 ### V5 首批复验（2026-09-01）
 
 - 重新通过微信开发者工具 MCP 取得三张严格 `375×812` 运行截图：`%TEMP%\\cq-talent-visual-evidence\\v5-c1-schedule-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-training-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-1-selector-rerun-20260901.png`。
