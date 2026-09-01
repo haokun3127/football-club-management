@@ -10,7 +10,7 @@
 /* P5 Player Selector */
 .p5-players { width: 100%; white-space: nowrap; background: #f6f7f9; }
 .p5-players__inner { display: inline-flex; gap: 24rpx; padding: 24rpx 32rpx; }
-.p5-chip { padding: 12rpx 24rpx; border-radius: 40rpx; background: #e7eaf0; color: #667085; font-size: 26rpx; font-weight: 500; }
+.p5-chip { padding: 12rpx 24rpx; border-radius: 40rpx; background: #e7eaf0; color: #667085; font-size: 26rpx; font-weight: 500; line-height: 16px; }
 .p5-chip--active { background: #a80f1b; color: #ffffff; font-weight: 600; }
 
 .p5-body { padding: 32rpx 32rpx calc(200rpx + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 32rpx; }
