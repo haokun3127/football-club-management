@@ -112,6 +112,13 @@
 - Runtime review: the real account returns more students and dimensions than the Figma sample; the page keeps dynamic coverage bars, pending-sync labels, a fixed confirm bar and coach TabBar without replacing data with sample values.
 - WeChatIDE MCP exact screenshot: `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788255066036-einuxo.jpg` (`375×812`). Figma node `1571:7` was screenshot-read after cloning; no deterministic layout or bottom-bar overlap was found.
 
+### Coach C8/C8.1 Training management and team selection (2026-09-01)
+
+- Current Coach V4 nodes: `1576:563` (C8 Training Management) and `1576:670` (C8.1 Training Team Selection). C8.1 remains a separate full-screen route and is the only team-selection entry in this flow.
+- Runtime evidence: `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788256951890-3gpdf3.png` for `/pages/coach/training/index` and `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788257002102-jkcmzb.png` for `/pages/coach/team-selector/index`; both are strict `375×812` WeChatIDE MCP screenshots.
+- C8 reads the real training tree and filters training cards by the locally selected assigned-team id; C8.1 lists only backend-assigned teams, persists the selected id, and returns to C8. The runtime account has one assigned team, so one option/card is expected; Figma's additional teams are sample density only.
+- Targeted Vitest for C8/C8.1: `10/10`; miniprogram TypeScript check passed. No business code change was needed in this review.
+
 ### Coach C6.1 Match event add (2026-09-01)
 
 - Current Coach V4 node: `1580:7` (`/pages/coach/match-event-add/index?eventId=<activityId>`), non-destructively cloned from preserved online source `93:827`.
