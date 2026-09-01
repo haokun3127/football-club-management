@@ -102,6 +102,7 @@
 .c15-metric-panel {
   box-sizing: border-box;
   margin-top: 32rpx;
+  min-height: 620rpx;
   padding: 32rpx;
   border-radius: 32rpx;
   background: #07111f;

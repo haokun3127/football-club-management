@@ -265,5 +265,6 @@ describe("C15 coach assessment entry", () => {
     expect(stylesheet).toMatch(/\.c15-nav__title\s*\{(?=[^}]*font-size:\s*36rpx)(?=[^}]*line-height:\s*44rpx)/s);
     expect(stylesheet).toMatch(/\.c15-submit-wrap\s*\{(?=[^}]*position:\s*static)(?=[^}]*margin-top:\s*32rpx)/s);
     expect(stylesheet).toMatch(/\.c15-metric-panel\s*\{(?=[^}]*background:\s*#07111f)/s);
+    expect(stylesheet).toMatch(/\.c15-metric-panel\s*\{(?=[^}]*min-height:\s*620rpx)/s);
   });
 });
