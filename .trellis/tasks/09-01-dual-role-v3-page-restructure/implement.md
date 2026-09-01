@@ -69,6 +69,12 @@
 - Figma screenshot was read back at `375×894`; the page keeps the full-screen score-entry header, dark assessment summary, compact four-column student metric cards, fixed save bar and coach TabBar. The historical source is preserved.
 - Runtime route was opened with the real secure activity. The API returned the truthful empty state “缺少评测模板参数，请从评测任务列表进入。” rather than a score form, so this page is not claimed as a runtime visual pass until a real assessment-task activity with a template is opened. No fake template, student score or API response was added.
 
+### Coach C12.1 Assessment draft resume (2026-09-01)
+
+- Current V3 node: `1566:7` (`/pages/coach/assessment-entry/index` with a valid local draft), non-destructively cloned from preserved historical source `93:1061` and named `C12.1 · Assessment Draft Resume · Current V3 · Runtime Pending`.
+- The V3 state keeps the dimmed assessment shell, centered “评分已自动保存” recovery card, truthful continue/exit actions and coach TabBar. It is a page-local draft state, not a server submission result.
+- The current production activity has no assessment template, so the exact modal state could not be opened through a real task in this session. C12.1 remains a design baseline pending a real task with a valid local draft; no fake draft was created.
+
 ## Verification
 
 - Figma: 每个新 page 和画板都以 MCP 读取、截图并回读 node id。
