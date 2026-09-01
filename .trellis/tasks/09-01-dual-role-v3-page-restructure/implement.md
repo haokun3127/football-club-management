@@ -112,6 +112,12 @@
 - Runtime review: the real account returns more students and dimensions than the Figma sample; the page keeps dynamic coverage bars, pending-sync labels, a fixed confirm bar and coach TabBar without replacing data with sample values.
 - WeChatIDE MCP exact screenshot: `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788255066036-einuxo.jpg` (`375×812`). Figma node `1571:7` was screenshot-read after cloning; no deterministic layout or bottom-bar overlap was found.
 
+### Coach C1 All-team schedule (2026-09-01)
+
+- Current Coach V4 node: `1576:43` (`/pages/coach/schedule/index`), with the all-team context copy and no team selector.
+- WeChatIDE MCP screenshot: `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788257314685-13ld3u.png` (`375×812`). It shows the fixed top bar, previous/next week controls, month affordance, “全部球队课程” context and coach TabBar.
+- The live account had no events in the selected date range, so the empty state is truthful. The C1 test suite separately verifies two different team events remain visible together and that obsolete team-selection state/routes are absent. No code change was needed.
+
 ### Coach C8/C8.1 Training management and team selection (2026-09-01)
 
 - Current Coach V4 nodes: `1576:563` (C8 Training Management) and `1576:670` (C8.1 Training Team Selection). C8.1 remains a separate full-screen route and is the only team-selection entry in this flow.
