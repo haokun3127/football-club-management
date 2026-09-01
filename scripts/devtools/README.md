@@ -25,11 +25,13 @@ node scripts/devtools/wechatide-mcp-capture.cjs \
 
 `--output` 可以省略；此时脚本自动生成不冲突的 PNG 路径到 `%TEMP%\\cq-talent-visual-evidence`。显式输出路径和 `CQ_TALENT_VISUAL_EVIDENCE_DIR` 也会拒绝桌面、当前项目工作区及其子目录；当前证据不得复制回这些位置，历史证据保留原位但不迁移。
 
-命令会通过 MCP 刷新当前项目以触发 TypeScript 编译，再打开并用 `automation_navigate` 精确重导航到目标路由；随后复核 `currentPage` 与 `systemInfo`。iPhone X 在部分新版 DevTools 中会报告 `screen=375×812`、`window=375×724`（窗口尺寸扣除了系统外壳），只要屏幕尺寸正确且最终 PNG 严格为 `375×812` 即合格。命令以 `optimize=false`、`waitForSelector="view"` 等待新页面完成挂载后获取原始 PNG，用 Pillow 归一化为严格 `375×812`，并生成同名 `.json` sidecar。等待页面根节点是必要的：只确认路由已经切换，仍可能抢在 WXML 渲染完成前得到白屏。sidecar 记录路由、设备倍率、原始像素、归一化像素、SHA-256 和 `captureMethod`；任何 MCP/路由/尺寸/写入失败都不会发布 PNG 或 sidecar。
+命令会通过 MCP 刷新当前项目以触发 TypeScript 编译，再打开并用 `automation_navigate` 精确重导航到目标路由；随后复核 `currentPage` 与 `systemInfo`。刷新后的运行时信息可能短暂返回空尺寸，因此脚本会在截图前按条件轮询，直到拿到有效视口或超时，不会把 `NaN×NaN` 当作页面问题。iPhone X 在部分新版 DevTools 中会报告 `screen=375×812`、`window=375×724`（窗口尺寸扣除了系统外壳），只要屏幕尺寸正确且最终 PNG 严格为 `375×812` 即合格。命令以 `optimize=false`、`waitForSelector="view"` 等待新页面完成挂载后获取原始 PNG，用 Pillow 归一化为严格 `375×812`，并生成同名 `.json` sidecar。等待页面根节点是必要的：只确认路由已经切换，仍可能抢在 WXML 渲染完成前得到白屏。sidecar 记录路由、设备倍率、原始像素、归一化像素、SHA-256 和 `captureMethod`；任何 MCP/路由/尺寸/写入失败都不会发布 PNG 或 sidecar。
 
 原始截图的比例允许 DevTools 四舍五入造成的 `0.5%` 以内误差；归一化只裁去边缘的比例误差再缩放，不接受明显错误的画布。
 
 以下 Automator/窗口截图说明全部是历史或人工明确指定的排障资料，不会被 MCP 命令自动调用，且不能作为当前 Figma 视觉验收证据。当前验收只接受 MCP 命令生成、路由已核验且严格 `375×812` 的 PNG 与 sidecar。
+
+`tmp/prod-verify/sweep3.sh` 至 `sweep6.sh` 以及同目录的像素探针也属于历史排障入口；它们现在通过共享路径解析器读取 `CQ_TALENT_VISUAL_EVIDENCE_DIR`，默认仍落到系统临时目录。旧日志或旧文档中的 `C:\Users\ASUS\cq-talent-visual-evidence` 仅代表历史产物位置，不应作为新证据输出位置。
 
 ## 历史 Automator 前提（仅紧急回退）
 

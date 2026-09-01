@@ -47,3 +47,13 @@ def visual_evidence_directory() -> Path:
 def default_visual_evidence_path(prefix: str) -> Path:
     safe_prefix = re.sub(r"[^\w.-]+", "-", str(prefix or "screenshot"), flags=re.UNICODE).strip("-") or "screenshot"
     return assert_visual_evidence_path(visual_evidence_directory() / f"{safe_prefix}-{int(time.time() * 1000)}.png")
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Resolve the isolated visual-evidence directory.")
+    parser.add_argument("--print-dir", action="store_true", help="print the validated evidence directory")
+    args = parser.parse_args()
+    if args.print_dir:
+        print(visual_evidence_directory())
