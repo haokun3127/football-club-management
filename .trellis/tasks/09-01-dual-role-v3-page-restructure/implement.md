@@ -137,3 +137,28 @@
 - Figma: 每个新 page 和画板都以 MCP 读取、截图并回读 node id。
 - Mini-program: 定向 Vitest、`apps/miniprogram-cq-talent` 的 `tsc --noEmit`、限定 `git diff --check`；只有真实 `375×812` MCP 图可作为视觉通过。
 - Git: 仅 `git add -- <明确路径>`，不使用 `git add -A`、reset 或 checkout。
+
+## 2026-09-01 V4 当前交付目录修订
+
+- Parent V4 新增当前总览 `1588:2`，补齐 P1 周态 `1588:27` 与月历展开 `1588:200`；原空态及 P4/P5/P8/P7 画板保留。
+- Coach V4 新增当前总览 `1589:2`，补齐 C1 全队日程 `1589:27`、C2 `1589:166`、C4 `1589:281`、C7 `1589:396` 和 C8.1 训练球队选择 `1589:461`；日程不选队，训练管理才选队。
+- Figma MCP 截图回读：Parent/Coach 总览、P1 周/月、C1、C8.1 均成功；画板均为 `375×812`，总览为 `1280×480`。本次只改在线 Figma 和交接记录，没有改小程序/后端。
+
+## 2026-09-01 V5 当前改版目录
+
+11. [x] 在唯一在线文件中新增 `14 Product Redesign · Parent V5`（`1599:973`）和 `15 Product Redesign · Coach V5`（`1599:2`）；V3/V4/历史稿均保留。
+12. [x] Parent V5 回读总览 `1599:974`，并按阅读顺序加入 P1 周态 `1599:999`、P1 月历 `1599:1172`、P4 `1599:1463`、P5 `1599:1623`、P8 `1599:1769`、P7 `1599:1887`。
+13. [x] Coach V5 回读总览 `1599:3`，并按阅读顺序加入 C1 `1599:28`、C2 `1599:167`、C4 `1599:282`、C6 `1599:397`、C7 `1599:483`、C8 `1599:548`、C8.1 `1599:655`。
+14. [x] 以 V5 画板为新实现入口，逐页检查代码是否仍有日程选队、训练管理缺少选队或选队状态泄漏；每页按最小代码批次、定向测试、真实 375×812 截图、文档和限定路径提交收口。
+
+### V5 首批边界复核（2026-09-01）
+
+- C1 运行截图：`C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-visual-evidence\\v5-c1-schedule-20260901.png`，sidecar 同名，脚本输出 `375×812`；真实页面显示“全部球队课程”，没有球队选择控件。
+- C8 运行截图：`C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-visual-evidence\\v5-c8-training-20260901.png`，sidecar 同名，脚本输出 `375×812`；真实页面显示“我的球队”和切换入口，课程数据按当前训练球队读取。
+- 定向验证：`pages/coach/schedule/index.test.mjs`、`pages/coach/training/index.test.mjs`、`pages/coach/team-selector/index.test.mjs` 共 `32/32`；小程序 `tsc --noEmit` 通过。此批没有业务代码改动。
+
+### V5 首批复验（2026-09-01）
+
+- 重新通过微信开发者工具 MCP 取得三张严格 `375×812` 运行截图：`%TEMP%\\cq-talent-visual-evidence\\v5-c1-schedule-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-training-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-1-selector-rerun-20260901.png`。
+- C1 当前真实日期范围没有课程，保留真实空态；页面仍展示跨球队日程上下文，不读取 `coach-training-team-id`。C8 显示当前训练球队并按球队过滤课程；C8.1 只显示后端分配队伍。样例数量差异不作为代码缺陷。
+- 复验门禁：定向 Vitest `32/32`、小程序 `tsc --noEmit`、C1/C8/C8.1 WXML 与 WXSS 编译均通过；WechatIDE 状态为已登录，CLI 令牌未启用。

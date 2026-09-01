@@ -45,3 +45,18 @@ Coach V4 order:
 4. C11 assessment tasks, C12 entry, C12.1 draft resume, C13 student radar, C14 ability assessment, C15 entry, C15.1 submit, C16 my profile
 
 The Coach index must state the invariant in its first viewport: schedule never selects a team; training management owns the team context. Source screens are cloned non-destructively from the reviewed V3 nodes, positioned in reading order, and renamed with V4 suffixes. No production API or sample-data contract changes are part of this Figma organization pass.
+
+## V5 information architecture revision
+
+The file now contains two further non-destructive delivery pages:
+
+| Current redesign page | Page id | Role |
+| --- | --- | --- |
+| `14 Product Redesign · Parent V5` | `1599:973` | Clean parent delivery directory |
+| `15 Product Redesign · Coach V5` | `1599:2` | Clean coach delivery directory |
+
+Parent V5 contains the navigation index `1599:974`, P1 week `1599:999`, P1 expanded month `1599:1172`, P4 `1599:1463`, P5 `1599:1623`, P8 `1599:1769`, and P7 `1599:1887`.
+
+Coach V5 contains the navigation index `1599:3`, C1 all-team schedule `1599:28`, C2 workbench `1599:167`, C4 attendance `1599:282`, C6 match record `1599:397`, C7 tactical board `1599:483`, C8 training management `1599:548`, and C8.1 training-team selection `1599:655`.
+
+The V5 pages are the new implementation entry points. Their governing rule is explicit: C1 displays all courses within the coach's permission scope and never selects a team; C8/C8.1 owns the training-team context. V3 and V4 remain available for audit and rollback.
