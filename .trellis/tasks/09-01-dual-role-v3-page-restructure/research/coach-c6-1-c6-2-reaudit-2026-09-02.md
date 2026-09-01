@@ -18,3 +18,10 @@
 
 - C6.1/C6.2 路由核验和截图均走 WeChatIDE MCP；截图尺寸严格 `375×812`。
 - 本批没有业务代码修改，事件类型、真实球员名单、比分和草稿时间均未硬编码。
+
+## 2026-09-02 追加复拍
+
+- 使用真实已完成比赛 `event-cq-talent-secure-test-1-completed-match` 重新打开 C6；运行证据为 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788301809274-qa4y6z.png`，严格 `375×812`。
+- 比赛摘要、真实比分 `4:2`、真实事件时间线、未提交事件草稿提示、“继续编辑”、添加事件入口和固定教练 TabBar 均可见；草稿时间是本机真实保存时间。
+- 当前 C6.2 的产品规则是全屏比赛页内提示卡，不使用旧在线稿中的遮罩弹窗；这与“所有子页面不要弹窗”的现行要求一致，因此不按旧弹窗稿回退实现。
+- 当前 MCP console 过滤 `error|exception|fail|route is not defined|wx:else|page not found` 无命中。
