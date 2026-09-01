@@ -93,6 +93,12 @@
 - Runtime review: the success shell keeps the check mark, dynamic submitted title, summary card, submitted status, real confirmed count/date and the two explicit follow-up actions. It does not make a network request or invent a success result; the upstream assessment loop owns confirmation before navigation.
 - WeChatIDE MCP exact screenshot: `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788254788264-hm55su.jpg` (`375×812`). Figma node `1569:7` was screenshot-read after cloning.
 
+### Coach C9 Team detail (2026-09-01)
+
+- Current V3 node: `1570:7` (`/pages/coach/team/index`), non-destructively cloned from preserved historical source `93:924` and named `C9 · Team Detail · Current V3 · Runtime Reviewed`.
+- Runtime review: the real team hero, season, three summary statistics, four-column student roster, coach group and fixed coach TabBar are all present. Team/member/coach counts and names remain API data and are not copied from Figma samples.
+- WeChatIDE MCP exact screenshot: `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788254946742-0k8wr3.jpg` (`375×812`). Figma node `1570:7` was screenshot-read after cloning. No deterministic code defect was found in this pass.
+
 ## Verification
 
 - Figma: 每个新 page 和画板都以 MCP 读取、截图并回读 node id。
