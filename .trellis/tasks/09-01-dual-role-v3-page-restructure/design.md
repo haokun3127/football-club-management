@@ -60,3 +60,16 @@ Parent V5 contains the navigation index `1599:974`, P1 week `1599:999`, P1 expan
 Coach V5 contains the navigation index `1599:3`, C1 all-team schedule `1599:28`, C2 workbench `1599:167`, C4 attendance `1599:282`, C6 match record `1599:397`, C7 tactical board `1599:483`, C8 training management `1599:548`, and C8.1 training-team selection `1599:655`.
 
 The V5 pages are the new implementation entry points. Their governing rule is explicit: C1 displays all courses within the coach's permission scope and never selects a team; C8/C8.1 owns the training-team context. V3 and V4 remain available for audit and rollback.
+
+## C15 assessment-entry V6 reconstruction contract
+
+Historical C15 `93:1132` is a `375×1002` long slider form and is not a valid current implementation reference. The V6 replacement must use a `375×812` viewport and preserve the actual assessment model without making the coach scan or edit a long all-player form.
+
+1. The top bar contains back, title, and an explicit draft-save action.
+2. A compact current training-team context comes from C8/C8.1; it is informational here and does not create a second team selector.
+3. The first viewport exposes the full roster as circular avatars with names, identical in interaction intent to C14/C7: one selected player is visually clear and tapping another player switches the entry target.
+4. The selected-player card contains the assessment template and only the atomic, directly recordable metrics. Each input labels its raw unit (seconds, repetitions, percentage, or coach score) and its 0–100 normalized score. Computed metrics remain read-only outputs.
+5. Saving records the template / graph version, raw test result, normalized metric score, assessor, time and optional note. It must not use arbitrary JavaScript formulas or a fixed Excel tree as the data model.
+6. After submitting, the player radar reads the newly persisted metric records; the parent side remains a simplified view of scores and trend only.
+
+This contract follows `docs/archive/2026-06-discovery/assessment-system-analysis.md`: the three-level display is a view over a versioned metric graph, not the only persistence structure.
