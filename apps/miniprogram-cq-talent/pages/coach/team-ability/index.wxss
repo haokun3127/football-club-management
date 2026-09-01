@@ -1,5 +1,6 @@
 .ability-page {
   min-height: 100vh;
+  padding-bottom: 140rpx;
   background: var(--color-page);
 }
 
@@ -7,24 +8,21 @@
   position: sticky;
   top: 0;
   z-index: 100;
+  display: flex;
   height: 88rpx;
   box-sizing: content-box;
-  display: flex;
   align-items: center;
-  gap: 0;
-  padding: 0 32rpx;
+  padding-left: 32rpx;
   background: #fceeef;
 }
 
 .ability-nav__back {
+  display: flex;
   width: 48rpx;
   height: 64rpx;
-  display: flex;
   align-items: center;
   justify-content: center;
   flex: 0 0 48rpx;
-  border-radius: 32rpx;
-  background: #ffffff;
 }
 
 .ability-nav__back-icon {
@@ -34,215 +32,227 @@
 
 .ability-nav__title {
   min-width: 0;
+  margin-left: 16rpx;
   overflow: hidden;
-  flex: 1;
   font-size: 36rpx;
   font-weight: 700;
-  text-align: left;
+  line-height: 44rpx;
   text-overflow: ellipsis;
   white-space: nowrap;
   color: #202124;
 }
 
-.ability-nav__export {
-  display: flex;
-  width: 104rpx;
-  height: 58rpx;
-  box-sizing: border-box;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-  padding: 0;
-  flex: 0 0 auto;
-  border: 0;
-  border-radius: 24rpx;
-  background: #ffffff;
-  font-size: 28rpx;
-  font-weight: 600;
-  line-height: 1;
-  color: #a80f1b;
-}
-
 .ability-page__body {
-  padding: 32rpx var(--space-page) 180rpx;
+  padding: 32rpx var(--space-page) 0;
 }
 
 .ability-context {
-  margin-bottom: 24rpx;
-  font-size: 26rpx;
+  box-sizing: border-box;
+  min-height: 108rpx;
+  padding: 18rpx 28rpx;
+  border-radius: 28rpx;
+  background: #ffffff;
+}
+
+.ability-context__label,
+.ability-context__hint,
+.ability-hero__period,
+.ability-hero__student-hint,
+.ability-roster__hint {
+  font-size: 22rpx;
+  line-height: 30rpx;
+}
+
+.ability-context__label {
   color: #667085;
 }
 
-.ability-hero {
+.ability-context__main,
+.ability-hero__head,
+.ability-hero__student,
+.ability-roster__head,
+.ability-dimension__head {
   display: flex;
-  height: 1040rpx;
-  box-sizing: border-box;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ability-context__main {
+  margin-top: 2rpx;
+}
+
+.ability-context__team {
+  min-width: 0;
   overflow: hidden;
-  padding: 48rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  line-height: 40rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #202124;
+}
+
+.ability-context__hint {
+  margin-left: 16rpx;
+  flex: 0 0 auto;
+  color: #a80f1b;
+}
+
+.ability-hero {
+  position: relative;
+  height: 620rpx;
+  box-sizing: border-box;
+  margin-top: 32rpx;
+  overflow: hidden;
+  padding: 32rpx;
   border-radius: 32rpx;
   background: #07111f;
 }
 
-.ability-hero__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.ability-hero__title {
+.ability-hero__title,
+.ability-roster__title,
+.ability-dimensions__title {
   font-size: 32rpx;
   font-weight: 700;
+  line-height: 42rpx;
+}
+
+.ability-hero__title,
+.ability-hero__student-name {
   color: #ffffff;
 }
 
-.ability-hero__period {
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.6);
+.ability-hero__period,
+.ability-hero__student-hint {
+  color: rgba(255, 255, 255, 0.68);
 }
 
-.ability-hero__plot {
-  display: flex;
-  height: 720rpx;
-  min-height: 720rpx;
-  margin-top: 40rpx;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
+.ability-hero__student {
+  margin-top: 12rpx;
+}
+
+.ability-hero__student-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  line-height: 40rpx;
 }
 
 .ability-hero__canvas {
   display: block;
-  width: 640rpx;
-  height: 640rpx;
-  flex: 0 0 640rpx;
+  width: 352rpx;
+  height: 352rpx;
+  margin: 4rpx auto 0;
 }
 
 .ability-hero__overall {
-  margin-top: 8rpx;
-  font-size: 96rpx;
+  position: absolute;
+  right: 0;
+  bottom: 26rpx;
+  left: 0;
+  font-size: 30rpx;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 40rpx;
   text-align: center;
   color: #ffffff;
 }
 
-.ability-hero__empty {
+.ability-roster,
+.ability-dimensions {
+  margin-top: 32rpx;
+}
+
+.ability-roster__hint {
+  color: #667085;
+}
+
+.ability-roster__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 16rpx;
+  row-gap: 20rpx;
+  margin-top: 24rpx;
+}
+
+.ability-player {
   display: flex;
-  width: 100%;
-  height: 100%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ability-player__avatar {
+  display: flex;
+  width: 80rpx;
+  height: 80rpx;
+  box-sizing: border-box;
   align-items: center;
   justify-content: center;
-  font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.72);
+  border: 2rpx solid #e7eaf0;
+  border-radius: 50%;
+  background: #ffffff;
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 1;
+  color: #202124;
 }
 
-.trend-chip {
-  display: flex;
-  align-self: flex-start;
-  align-items: center;
-  gap: 8rpx;
-  margin-top: 16rpx;
-  padding: 12rpx 20rpx;
-  border-radius: 24rpx;
+.ability-player__name {
+  width: 100%;
+  margin-top: 8rpx;
+  overflow: hidden;
   font-size: 22rpx;
+  line-height: 30rpx;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #667085;
+}
+
+.ability-player--active .ability-player__avatar {
+  border-color: #a80f1b;
+  background: #a80f1b;
+  color: #ffffff;
+}
+
+.ability-player--active .ability-player__name {
   font-weight: 600;
-}
-
-.trend-chip__icon {
-  width: 24rpx;
-  height: 24rpx;
-}
-
-.trend-chip--up {
-  background: #dcfce7;
-  color: #16a34a;
-}
-
-.trend-chip--down {
-  background: #fee2e2;
   color: #a80f1b;
 }
 
-.dim-table,
-.ranking-empty {
-  margin-top: 32rpx;
+.ability-dimensions {
   padding: 32rpx;
   border-radius: 24rpx;
-  background: var(--color-card);
+  background: #ffffff;
   box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.05);
 }
 
-.dim-table__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24rpx;
+.ability-dimension {
+  margin-top: 24rpx;
 }
 
-.dim-table__title,
-.ranking-empty__title {
-  font-size: 28rpx;
-  font-weight: 700;
-  color: var(--color-text);
-}
-
-.dim-table__hint,
-.ranking-empty__message {
-  font-size: 24rpx;
-  color: var(--color-text-secondary);
-}
-
-.dim-row {
-  display: flex;
-  flex-direction: column;
-  gap: 12rpx;
-}
-
-.dim-row + .dim-row {
-  margin-top: 20rpx;
-}
-
-.dim-row__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.dim-row__label {
+.ability-dimension__label {
   font-size: 26rpx;
-  color: var(--color-text-secondary);
+  line-height: 34rpx;
+  color: #667085;
 }
 
-.dim-row__avg {
+.ability-dimension__value {
   font-size: 26rpx;
   font-weight: 700;
-  text-align: right;
-  color: var(--color-brand);
+  line-height: 34rpx;
+  color: #a80f1b;
 }
 
-.dim-row__track {
-  width: 100%;
+.ability-dimension__track {
   height: 12rpx;
+  margin-top: 12rpx;
   overflow: hidden;
   border-radius: 6rpx;
-  background: var(--color-line);
+  background: #e7eaf0;
 }
 
-.dim-row__fill {
+.ability-dimension__fill {
   height: 100%;
   border-radius: inherit;
   background: #a80f1b;
-}
-
-.dim-row__summary {
-  width: 100%;
-  color: var(--color-text-secondary);
-  font-size: 22rpx;
-  line-height: 28rpx;
-}
-
-.ranking-empty__message {
-  margin-top: 16rpx;
 }

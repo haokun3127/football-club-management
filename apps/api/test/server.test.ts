@@ -783,6 +783,20 @@ describe("api server", () => {
     expect(teamBody.stats.completedTrainingCount).toBe(0);
     expect(teamBody.members.some((member) => member.id === "student-1")).toBe(true);
 
+    const selectedTeam = await app.inject({
+      method: "GET",
+      url: `${base}/team?teamId=team-weekend-select`,
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    const inaccessibleTeam = await app.inject({
+      method: "GET",
+      url: `${base}/team?teamId=team-not-accessible`,
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    expect(selectedTeam.statusCode, selectedTeam.body).toBe(200);
+    expect((selectedTeam.json() as { team: { id: string } | null }).team?.id).toBe("team-weekend-select");
+    expect(inaccessibleTeam.statusCode).toBe(403);
+
     const radar = await app.inject({
       method: "GET",
       url: `${base}/students/student-1/radar`,
@@ -821,6 +835,19 @@ describe("api server", () => {
     };
     expect(overviewBody.studentCount).toBeGreaterThanOrEqual(1);
     expect(Array.isArray(overviewBody.dimensions)).toBe(true);
+
+    const selectedOverview = await app.inject({
+      method: "GET",
+      url: `${base}/team/ability-overview?teamId=team-weekend-select`,
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    const inaccessibleOverview = await app.inject({
+      method: "GET",
+      url: `${base}/team/ability-overview?teamId=team-not-accessible`,
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    expect(selectedOverview.statusCode, selectedOverview.body).toBe(200);
+    expect(inaccessibleOverview.statusCode).toBe(403);
 
     await app.close();
     persistence.database.close();

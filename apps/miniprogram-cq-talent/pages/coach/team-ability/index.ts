@@ -1,37 +1,42 @@
-import { getCoachTeam, getCoachTeamAbilityOverview } from "../../../utils/api";
+import { getCoachStudentRadar, getCoachTeam } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
-import type { CoachTeamAbilityOverview, LoadState, RadarMetricPoint } from "../../../utils/types";
+import type { LoadState, RadarMetricPoint } from "../../../utils/types";
 
-interface DimensionRow {
+const COACH_TRAINING_TEAM_KEY = "coach-training-team-id";
+
+type StudentView = {
+  id: string;
+  name: string;
+  initial: string;
+  isActive: boolean;
+};
+
+type DimensionView = {
   metricId: string;
   label: string;
-  average: string;
-  top: string;
-  bottom: string;
-  progressStyle: string;
-  summaryLabel: string;
-}
+  value: string;
+  width: string;
+};
 
 interface PageData {
   navInset: number;
   menuInset: number;
   state: LoadState;
   message: string;
+  hasTeam: boolean;
   teamContext: string;
-  assessmentPeriod: string;
-  studentCount: number;
-  overall: string;
-  trendLabel: string;
-  trendPositive: boolean;
+  teamHint: string;
+  students: StudentView[];
+  hasStudents: boolean;
+  activeStudentId: string;
+  activeStudentName: string;
   radar: RadarMetricPoint[];
-  dimensions: DimensionRow[];
-  hasOverview: boolean;
+  dimensions: DimensionView[];
   hasRadar: boolean;
   radarMounted: boolean;
-  showOverall: boolean;
-  showTrend: boolean;
-  rankingMessage: string;
+  overall: string;
+  assessmentPeriod: string;
 }
 
 Page<PageData>({
@@ -39,56 +44,115 @@ Page<PageData>({
   onLoad() {
     return this.load();
   },
+  onShow() {
+    if (this.data.state !== "loading") return this.load();
+  },
   async load() {
     if (!requireRole("coach")) {
-      this.setData(emptyPageData("empty", "当前账号暂无可查看的团队能力数据。"));
+      this.setData(emptyPageData("empty", "当前账号暂无可查看的球队能力数据。"));
       return;
     }
 
-    this.setData(emptyPageData("loading", "正在汇总团队能力数据"));
-    const [overviewResult, teamResult] = await Promise.allSettled([
-      getCoachTeamAbilityOverview(),
-      getCoachTeam(),
-    ]);
+    const requestToken = nextRequestToken(this);
+    const teamId = wx.getStorageSync<string>(COACH_TRAINING_TEAM_KEY);
+    this.setData(emptyPageData("loading", "正在读取能力评估"));
+    try {
+      const detail = await getCoachTeam(teamId);
+      if (!isCurrentRequest(this, requestToken)) return;
 
-    if (overviewResult.status !== "fulfilled") {
-      this.setData(emptyPageData("error", "团队能力读取失败，请稍后重试。"));
-      return;
+      if (!detail.team) {
+        this.setData(emptyPageData("empty", "训练管理尚未选择可用球队。"));
+        return;
+      }
+
+      const students = toStudents(detail.members);
+      if (!students.length) {
+        this.setData({
+          ...emptyPageData("empty", "当前训练球队暂无在队学员。"),
+          hasTeam: true,
+          teamContext: detail.team.name,
+          teamHint: "由训练管理选择",
+        });
+        return;
+      }
+
+      const active = students[0];
+      if (!active) return;
+      this.setData({
+        ...emptyPageData("loading", "正在读取学员能力雷达"),
+        hasTeam: true,
+        teamContext: detail.team.name,
+        teamHint: "由训练管理选择",
+        students: markActiveStudent(students, active.id),
+        hasStudents: true,
+        activeStudentId: active.id,
+        activeStudentName: active.name,
+      });
+      await this.loadRadar(active.id, requestToken);
+    } catch {
+      if (!isCurrentRequest(this, requestToken)) return;
+      this.setData(emptyPageData("error", "球队能力读取失败，请稍后重试。"));
     }
+  },
+  async loadRadar(studentId: string, inheritedRequestToken?: number) {
+    const requestToken = inheritedRequestToken ?? nextRequestToken(this);
+    const selected = this.data.students.find((student: StudentView) => student.id === studentId);
+    if (!selected) return;
 
-    const overview = overviewResult.value;
-    const dimensions = toDimensionRows(overview.dimensions);
-    const radar = toRadar(overview.dimensions);
-    const hasOverview = dimensions.length > 0;
-    const hasRadar = radar.length >= 3;
-    const overall = formatOverall(overview.overall);
-    const trendLabel = formatTrend(overview.trendDelta);
     this.setData({
-      state: hasOverview ? "ready" : "empty",
-      message: hasOverview ? "" : "暂无团队评测数据。",
-      teamContext: toTeamContext(teamResult),
-      assessmentPeriod: "评估时间待同步",
-      studentCount: toCount(overview.studentCount),
-      overall,
-      trendLabel,
-      trendPositive: overview.trendDelta === null || overview.trendDelta >= 0,
-      radar: radar.length >= 3 ? radar : [],
-      dimensions,
-      hasOverview,
-      hasRadar,
+      state: "loading",
+      message: `正在读取${selected.name}的能力雷达`,
+      students: markActiveStudent(this.data.students, selected.id),
+      activeStudentId: selected.id,
+      activeStudentName: selected.name,
+      radar: [],
+      dimensions: [],
+      hasRadar: false,
       radarMounted: false,
-      showOverall: hasRadar && overall !== "-",
-      showTrend: hasRadar && Boolean(trendLabel),
-      rankingMessage: "排名暂未同步",
+      overall: "-",
+      assessmentPeriod: "评估时间待同步",
     });
+    try {
+      const radar = await getCoachStudentRadar(selected.id);
+      if (!isCurrentRequest(this, requestToken)) return;
 
-    if (hasRadar) {
-      wx.nextTick(() => {
-        if (this.data.state === "ready" && this.data.hasRadar) {
-          this.setData({ radarMounted: true });
-        }
+      const dimensions = projectDimensions(radar);
+      const hasRadar = dimensions.length >= 3;
+      this.setData({
+        state: hasRadar ? "ready" : "empty",
+        message: hasRadar ? "" : `${selected.name}暂无足够的有效评测数据生成雷达图。`,
+        radar: hasRadar ? radar.filter(isValidRadarPoint) : [],
+        dimensions,
+        hasRadar,
+        radarMounted: false,
+        overall: hasRadar ? formatAverage(dimensions) : "-",
+        assessmentPeriod: formatAssessmentPeriod(radar),
+      });
+      if (hasRadar) {
+        wx.nextTick(() => {
+          if (isCurrentRequest(this, requestToken) && this.data.hasRadar) {
+            this.setData({ radarMounted: true });
+          }
+        });
+      }
+    } catch {
+      if (!isCurrentRequest(this, requestToken)) return;
+      this.setData({
+        state: "error",
+        message: "能力雷达读取失败，请稍后重试。",
+        radar: [],
+        dimensions: [],
+        hasRadar: false,
+        radarMounted: false,
+        overall: "-",
+        assessmentPeriod: "评估时间待同步",
       });
     }
+  },
+  selectStudent(event: { currentTarget?: { dataset?: { id?: string } } }) {
+    const studentId = event.currentTarget?.dataset?.id;
+    if (!studentId || studentId === this.data.activeStudentId) return;
+    return this.loadRadar(studentId);
   },
   retry() {
     return this.load();
@@ -104,80 +168,91 @@ function emptyPageData(state: LoadState, message: string): PageData {
     menuInset: resolveMenuInset(),
     state,
     message,
-    teamContext: "团队信息待同步",
-    assessmentPeriod: "评估时间待同步",
-    studentCount: 0,
-    overall: "-",
-    trendLabel: "",
-    trendPositive: true,
+    hasTeam: false,
+    teamContext: "当前训练球队待同步",
+    teamHint: "由训练管理选择",
+    students: [],
+    hasStudents: false,
+    activeStudentId: "",
+    activeStudentName: "",
     radar: [],
     dimensions: [],
-    hasOverview: false,
     hasRadar: false,
     radarMounted: false,
-    showOverall: false,
-    showTrend: false,
-    rankingMessage: "排名暂未同步",
+    overall: "-",
+    assessmentPeriod: "评估时间待同步",
   };
 }
 
-function toDimensionRows(dimensions: CoachTeamAbilityOverview["dimensions"]): DimensionRow[] {
-  return dimensions
-    .filter((dimension) => Boolean(dimension.metricId) && Boolean(dimension.label))
-    .map((dimension) => {
-      const average = formatScore(dimension.average);
+function toStudents(members: Array<{ id: string; name: string }>): StudentView[] {
+  const ids = new Set<string>();
+  return members
+    .filter((member) => member.id && member.name && !ids.has(member.id) && Boolean(ids.add(member.id)))
+    .map((member) => ({
+      id: member.id,
+      name: member.name.slice(0, 4),
+      initial: member.name.slice(0, 1),
+      isActive: false,
+    }));
+}
+
+function markActiveStudent(students: StudentView[], activeStudentId: string): StudentView[] {
+  return students.map((student) => ({ ...student, isActive: student.id === activeStudentId }));
+}
+
+function projectDimensions(radar: RadarMetricPoint[]): DimensionView[] {
+  return radar
+    .filter(isValidRadarPoint)
+    .map((point) => {
+      const normalized = clamp((point.value / point.maxValue) * 100);
       return {
-        metricId: dimension.metricId,
-        label: dimension.label,
-        average,
-        top: formatScore(dimension.top),
-        bottom: formatScore(dimension.bottom),
-        progressStyle: `${isFiniteNumber(dimension.average) ? clamp(dimension.average) : 0}%`,
-        summaryLabel: `队均 ${average} · TOP ${formatScore(dimension.top)} · 底 ${formatScore(dimension.bottom)}`,
+        metricId: point.metricId,
+        label: point.label,
+        value: formatScore(point.value),
+        width: `${formatScore(normalized)}%`,
       };
     });
 }
 
-function toRadar(dimensions: CoachTeamAbilityOverview["dimensions"]): RadarMetricPoint[] {
-  return dimensions
-    .filter((dimension): dimension is CoachTeamAbilityOverview["dimensions"][number] & { average: number } => isFiniteNumber(dimension.average))
-    .map((dimension) => ({
-      metricId: dimension.metricId,
-      label: dimension.label,
-      value: clamp(dimension.average),
-      maxValue: 100,
-    }));
+function isValidRadarPoint(point: RadarMetricPoint): point is RadarMetricPoint & { value: number } {
+  return typeof point.value === "number"
+    && Number.isFinite(point.value)
+    && Number.isFinite(point.maxValue)
+    && point.maxValue > 0;
 }
 
-function toTeamContext(result: PromiseSettledResult<Awaited<ReturnType<typeof getCoachTeam>>>): string {
-  if (result.status !== "fulfilled") return "团队信息待同步";
-  const team = result.value.team;
-  if (!team?.name || !team.season) return "团队信息待同步";
-  return `${team.season} · ${team.name}`;
+function formatAssessmentPeriod(radar: RadarMetricPoint[]) {
+  const dates = radar
+    .map((point) => point.occurredAt)
+    .filter((occurredAt): occurredAt is string => typeof occurredAt === "string" && Number.isFinite(Date.parse(occurredAt)))
+    .map((occurredAt) => occurredAt.slice(0, 10))
+    .sort();
+  const first = dates[0];
+  const last = dates[dates.length - 1];
+  if (!first || !last) return "评估时间待同步";
+  return first === last ? `${first} 评估` : `${first} 至 ${last} 评估`;
 }
 
-function toCount(value: number) {
-  return isFiniteNumber(value) ? Math.max(0, Math.round(value)) : 0;
+function formatAverage(dimensions: DimensionView[]) {
+  const values = dimensions.map((dimension) => Number.parseFloat(dimension.width));
+  const average = values.reduce((sum, value) => sum + value, 0) / values.length;
+  return String(Math.round(average));
 }
 
-function formatTrend(value: number | null) {
-  if (!isFiniteNumber(value)) return "";
-  return `较上期 ${value >= 0 ? "+" : ""}${formatScore(value)}`;
-}
-
-function formatOverall(value: number | null) {
-  return isFiniteNumber(value) ? String(Math.round(value)) : "-";
-}
-
-function formatScore(value: number | null) {
-  if (!isFiniteNumber(value)) return "-";
+function formatScore(value: number) {
   return Number.isInteger(value) ? String(value) : String(Number(value.toFixed(1)));
-}
-
-function isFiniteNumber(value: unknown): value is number {
-  return typeof value === "number" && Number.isFinite(value);
 }
 
 function clamp(value: number) {
   return Math.max(0, Math.min(value, 100));
+}
+
+function nextRequestToken(page: unknown) {
+  const state = page as { _c14RequestToken?: number };
+  state._c14RequestToken = (state._c14RequestToken ?? 0) + 1;
+  return state._c14RequestToken;
+}
+
+function isCurrentRequest(page: unknown, requestToken: number) {
+  return (page as { _c14RequestToken?: number })._c14RequestToken === requestToken;
 }

@@ -3,59 +3,73 @@
     <view class="ability-nav__back" bindtap="goBack">
       <image class="ability-nav__back-icon" src="/assets/icons/c14-arrow-left.svg" mode="aspectFit" />
     </view>
-    <view class="ability-nav__title">团队能力总览</view>
-    <view class="ability-nav__export">导出</view>
+    <view class="ability-nav__title">能力评估</view>
   </view>
 
   <view class="ability-page__body">
-    <view class="ability-context">{{teamContext}}</view>
     <status-view
       state="{{state}}"
-      title="{{state === 'loading' ? '汇总团队能力' : state === 'empty' ? '暂无评测数据' : '读取失败'}}"
+      title="{{state === 'loading' ? '加载能力评估' : state === 'empty' ? '暂无能力数据' : '读取失败'}}"
       message="{{message}}"
       action-text="{{state === 'error' ? '重试' : ''}}"
       bindaction="retry"
     />
 
-    <block wx:if="{{hasOverview}}">
-      <view class="ability-hero">
-        <view class="ability-hero__head">
-          <view class="ability-hero__title">团队平均能力雷达</view>
-          <view class="ability-hero__period">{{assessmentPeriod}}</view>
-        </view>
-        <view class="ability-hero__plot">
-          <block wx:if="{{hasRadar}}">
-            <radar-canvas wx:if="{{radarMounted}}" host-class="ability-hero__canvas" dark="{{true}}" metrics="{{radar}}" width="640rpx" height="640rpx"></radar-canvas>
-            <view wx:if="{{showOverall}}" class="ability-hero__overall">综合 {{overall}}</view>
-          </block>
-          <view wx:else class="ability-hero__empty">暂无足够维度生成雷达图</view>
-        </view>
-        <view wx:if="{{showTrend}}" class="trend-chip {{trendPositive ? 'trend-chip--up' : 'trend-chip--down'}}">
-          <image wx:if="{{trendPositive}}" class="trend-chip__icon" src="/assets/icons/c14-trending-up.svg" mode="aspectFit" />
-          <text>{{trendLabel}}</text>
+    <block wx:if="{{hasTeam}}">
+      <view class="ability-context">
+        <view class="ability-context__label">当前训练球队</view>
+        <view class="ability-context__main">
+          <view class="ability-context__team">{{teamContext}}</view>
+          <view class="ability-context__hint">{{teamHint}}</view>
         </view>
       </view>
 
-      <view class="dim-table">
-        <view class="dim-table__head">
-          <view class="dim-table__title">维度统计</view>
-          <view class="dim-table__hint">队均 / TOP / 底</view>
-        </view>
-        <view wx:for="{{dimensions}}" wx:key="metricId" class="dim-row">
-          <view class="dim-row__head">
-            <view class="dim-row__label">{{item.label}}</view>
-            <text class="dim-row__avg">{{item.average}}</text>
+      <block wx:if="{{hasRadar}}">
+        <view class="ability-hero">
+          <view class="ability-hero__head">
+            <view class="ability-hero__title">球员能力雷达</view>
+            <view class="ability-hero__period">{{assessmentPeriod}}</view>
           </view>
-          <view class="dim-row__track"><view class="dim-row__fill" style="width: {{item.progressStyle}}"></view></view>
-          <view class="dim-row__summary">{{item.summaryLabel}}</view>
+          <view class="ability-hero__student">
+            <view class="ability-hero__student-name">{{activeStudentName}}</view>
+            <view class="ability-hero__student-hint">点击下方球员切换</view>
+          </view>
+          <radar-canvas wx:if="{{radarMounted}}" class="ability-hero__canvas" dark="{{true}}" metrics="{{radar}}" width="352rpx" height="352rpx"></radar-canvas>
+          <view class="ability-hero__overall">综合 {{overall}}</view>
+        </view>
+      </block>
+
+      <view wx:if="{{hasStudents}}" class="ability-roster">
+        <view class="ability-roster__head">
+          <view class="ability-roster__title">全部球员</view>
+          <view class="ability-roster__hint">点击头像切换评估</view>
+        </view>
+        <view class="ability-roster__grid">
+          <view
+            wx:for="{{students}}"
+            wx:key="id"
+            class="ability-player {{item.isActive ? 'ability-player--active' : ''}}"
+            data-id="{{item.id}}"
+            bindtap="selectStudent"
+          >
+            <view class="ability-player__avatar">{{item.initial}}</view>
+            <view class="ability-player__name">{{item.name}}</view>
+          </view>
         </view>
       </view>
 
-      <view class="ranking-empty">
-        <view class="ranking-empty__title">TOP 3 排名（每维度）</view>
-        <view class="ranking-empty__message">{{rankingMessage}}</view>
+      <view wx:if="{{dimensions.length}}" class="ability-dimensions">
+        <view class="ability-dimensions__title">维度评分</view>
+        <view wx:for="{{dimensions}}" wx:key="metricId" class="ability-dimension">
+          <view class="ability-dimension__head">
+            <view class="ability-dimension__label">{{item.label}}</view>
+            <view class="ability-dimension__value">{{item.value}}</view>
+          </view>
+          <view class="ability-dimension__track"><view class="ability-dimension__fill" style="width: {{item.width}}"></view></view>
+        </view>
       </view>
     </block>
   </view>
+
   <role-tabbar role="coach" active="training" />
 </view>

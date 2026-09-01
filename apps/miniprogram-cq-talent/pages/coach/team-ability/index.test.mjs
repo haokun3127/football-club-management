@@ -2,16 +2,17 @@ import { existsSync, readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  getCoachTeamAbilityOverview: vi.fn(),
   getCoachTeam: vi.fn(),
+  getCoachStudentRadar: vi.fn(),
   requireRole: vi.fn(),
   navigateBack: vi.fn(),
   nextTick: vi.fn(),
+  getStorageSync: vi.fn(),
 }));
 
 vi.mock("../../../utils/api", () => ({
-  getCoachTeamAbilityOverview: mocks.getCoachTeamAbilityOverview,
   getCoachTeam: mocks.getCoachTeam,
+  getCoachStudentRadar: mocks.getCoachStudentRadar,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/presentation", () => ({
@@ -19,7 +20,11 @@ vi.mock("../../../utils/presentation", () => ({
   resolveNavInset: () => 0,
 }));
 
-globalThis.wx = { navigateBack: mocks.navigateBack, nextTick: mocks.nextTick };
+globalThis.wx = {
+  navigateBack: mocks.navigateBack,
+  nextTick: mocks.nextTick,
+  getStorageSync: mocks.getStorageSync,
+};
 
 let pageDefinition;
 globalThis.Page = (definition) => {
@@ -34,28 +39,32 @@ const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
 const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 const pageConfig = readFileSync(new URL("./index.json", import.meta.url), "utf8");
 const backArrow = new URL("../../../assets/icons/c14-arrow-left.svg", import.meta.url);
-const trendIcon = new URL("../../../assets/icons/c14-trending-up.svg", import.meta.url);
-
-const overview = {
-  studentCount: 3,
-  overall: 74.4,
-  trendDelta: 2,
-  dimensions: [
-    { metricId: "passing", label: "Passing", average: 74, top: 80, bottom: 45 },
-    { metricId: "shooting", label: "Shooting", average: 135, top: 135, bottom: 42 },
-    { metricId: "defending", label: "Defending", average: 70, top: 76, bottom: 58 },
-  ],
-};
 
 const team = {
-  team: { id: "team-1", name: "Actual team", season: "2026-2027" },
-  stats: { memberCount: 3, trainingCount: 5, attendanceRate: 90 },
+  team: { id: "team-weekend-select", name: "周末精英队", season: "2026-2027赛季" },
+  stats: { memberCount: 3, trainingCount: 5, completedTrainingCount: 2, attendanceRate: 90 },
   members: [
-    { id: "student-1", name: "Player One" },
-    { id: "student-2", name: "Player Two" },
-    { id: "student-3", name: "Player Three" },
+    { id: "student-1", name: "罗志炫" },
+    { id: "student-2", name: "骆啸宇" },
+    { id: "student-3", name: "四字姓名测试" },
   ],
 };
+
+const validRadar = [
+  { metricId: "passing", label: "传球", value: 82, maxValue: 100, occurredAt: "2026-09-01T09:00:00.000Z" },
+  { metricId: "shooting", label: "射门", value: 74, maxValue: 100, occurredAt: "2026-09-01T09:00:00.000Z" },
+  { metricId: "defending", label: "防守", value: 78, maxValue: 100, occurredAt: "2026-09-01T09:00:00.000Z" },
+];
+
+function deferred() {
+  let resolve;
+  let reject;
+  const promise = new Promise((nextResolve, nextReject) => {
+    resolve = nextResolve;
+    reject = nextReject;
+  });
+  return { promise, resolve, reject };
+}
 
 function createPageInstance(data = {}) {
   const instance = { ...pageDefinition, data: { ...pageDefinition.data, ...data } };
@@ -63,132 +72,122 @@ function createPageInstance(data = {}) {
   return instance;
 }
 
-describe("coach team ability overview", () => {
+describe("coach ability assessment", () => {
   beforeEach(() => {
-    mocks.getCoachTeamAbilityOverview.mockReset().mockResolvedValue(overview);
     mocks.getCoachTeam.mockReset().mockResolvedValue(team);
+    mocks.getCoachStudentRadar.mockReset().mockResolvedValue(validRadar);
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
     mocks.navigateBack.mockReset();
     mocks.nextTick.mockReset().mockImplementation((callback) => callback());
+    mocks.getStorageSync.mockReset().mockReturnValue("team-weekend-select");
   });
 
-  it("reads overview and team once, then renders only real summary data", async () => {
+  it("uses the training-management team context and renders a direct all-player radar selector", async () => {
     const page = createPageInstance();
 
     await page.load();
 
-    expect(mocks.getCoachTeamAbilityOverview).toHaveBeenCalledTimes(1);
-    expect(mocks.getCoachTeam).toHaveBeenCalledTimes(1);
+    expect(mocks.getCoachTeam).toHaveBeenCalledWith("team-weekend-select");
+    expect(mocks.getCoachStudentRadar).toHaveBeenCalledWith("student-1");
     expect(page.data).toMatchObject({
       state: "ready",
-      teamContext: "2026-2027 · Actual team",
-      assessmentPeriod: "评估时间待同步",
-      studentCount: 3,
-      overall: "74",
-      showOverall: true,
-      showTrend: true,
+      teamContext: "周末精英队",
+      activeStudentId: "student-1",
+      activeStudentName: "罗志炫",
       hasRadar: true,
       radarMounted: true,
-      radar: [
-        { metricId: "passing", value: 74, maxValue: 100 },
-        { metricId: "shooting", value: 100, maxValue: 100 },
-        { metricId: "defending", value: 70, maxValue: 100 },
+      students: [
+        expect.objectContaining({ id: "student-1", name: "罗志炫", isActive: true }),
+        expect.objectContaining({ id: "student-2", name: "骆啸宇", isActive: false }),
+        expect.objectContaining({ id: "student-3", name: "四字姓名", isActive: false }),
       ],
     });
-    expect(controller).not.toContain("getCoachStudentRadar");
+
+    await page.selectStudent({ currentTarget: { dataset: { id: "student-2" } } });
+
+    expect(mocks.getCoachStudentRadar).toHaveBeenLastCalledWith("student-2");
+    expect(page.data).toMatchObject({ activeStudentId: "student-2", activeStudentName: "骆啸宇" });
   });
 
-  it("keeps the real overview when team metadata fails", async () => {
-    mocks.getCoachTeam.mockRejectedValueOnce(new Error("raw team upstream details"));
+  it("keeps the newest selected player's radar when an earlier request resolves later", async () => {
+    const first = deferred();
+    const second = deferred();
+    mocks.getCoachStudentRadar
+      .mockImplementationOnce(() => first.promise)
+      .mockImplementationOnce(() => second.promise);
+    const page = createPageInstance();
+
+    const initialLoad = page.load();
+    await Promise.resolve();
+    const latestLoad = page.selectStudent({ currentTarget: { dataset: { id: "student-2" } } });
+    second.resolve(validRadar.map((point) => ({ ...point, value: 88 })));
+    await latestLoad;
+    first.resolve(validRadar.map((point) => ({ ...point, value: 10 })));
+    await initialLoad;
+
+    expect(page.data).toMatchObject({ activeStudentId: "student-2", activeStudentName: "骆啸宇", overall: "88" });
+  });
+
+  it("preserves the selected team roster while reporting invalid radar data honestly", async () => {
+    mocks.getCoachStudentRadar.mockResolvedValueOnce([
+      { metricId: "one", label: "维度一", value: 70, maxValue: 0 },
+      { metricId: "two", label: "维度二", value: Number.NaN, maxValue: 100 },
+    ]);
     const page = createPageInstance();
 
     await page.load();
 
     expect(page.data).toMatchObject({
-      state: "ready",
-      overall: "74",
-      teamContext: "团队信息待同步",
-    });
-    expect(page.data.message).not.toContain("raw team upstream details");
-  });
-
-  it("treats an overview failure as the primary error without exposing details", async () => {
-    mocks.getCoachTeamAbilityOverview.mockRejectedValueOnce(new Error("raw overview upstream details"));
-    const page = createPageInstance();
-
-    await page.load();
-
-    expect(page.data).toMatchObject({
-      state: "error",
-      hasOverview: false,
+      state: "empty",
+      hasTeam: true,
+      hasStudents: true,
+      hasRadar: false,
       radar: [],
       dimensions: [],
-      message: "团队能力读取失败，请稍后重试。",
+      message: "罗志炫暂无足够的有效评测数据生成雷达图。",
     });
-    expect(page.data.message).not.toContain("raw overview upstream details");
-    expect(mocks.getCoachTeam).toHaveBeenCalledTimes(1);
   });
 
-  it("does not read either endpoint for a non-coach and keeps insufficient data out of the radar", async () => {
+  it("does not call a team or radar endpoint for an ineligible coach and handles an empty selected team", async () => {
     mocks.requireRole.mockReturnValueOnce(null);
     const denied = createPageInstance();
     await denied.load();
-    expect(mocks.getCoachTeamAbilityOverview).not.toHaveBeenCalled();
     expect(mocks.getCoachTeam).not.toHaveBeenCalled();
+    expect(mocks.getCoachStudentRadar).not.toHaveBeenCalled();
 
-    mocks.getCoachTeamAbilityOverview.mockResolvedValueOnce({
-      ...overview,
-      dimensions: overview.dimensions.slice(0, 2),
+    mocks.getCoachTeam.mockResolvedValueOnce({
+      team: { id: "team-weekend-select", name: "周末精英队", season: "2026-2027赛季" },
+      stats: { memberCount: 0, trainingCount: 0, completedTrainingCount: 0, attendanceRate: null },
+      members: [],
     });
-    const page = createPageInstance();
-    await page.load();
-    expect(page.data).toMatchObject({ state: "ready", hasOverview: true, hasRadar: false, showOverall: false, showTrend: false, radar: [] });
+    const empty = createPageInstance();
+    await empty.load();
+    expect(mocks.getCoachStudentRadar).not.toHaveBeenCalled();
+    expect(empty.data).toMatchObject({ state: "empty", hasTeam: true, hasStudents: false });
   });
 
-  it("uses fixed Figma geometry and explicit unavailable states without sample data", () => {
+  it("uses the C14 V3 team context, direct avatar grid, and WXML-safe bindings", () => {
     expect(existsSync(backArrow)).toBe(true);
-    expect(existsSync(trendIcon)).toBe(true);
     expect(pageConfig).not.toContain('"app-header"');
     expect(pageConfig).toContain('"role-tabbar"');
-    expect(template).toContain('class="ability-nav"');
-    expect(template).toContain('/assets/icons/c14-arrow-left.svg');
-    expect(template).toContain('host-class="ability-hero__canvas"');
-    expect(template).toContain('wx:if="{{radarMounted}}"');
-    expect(template).not.toContain('class="ability-hero__radar-state"');
-    expect(template).not.toContain('class="ability-hero__canvas-slot"');
-    expect(template).toContain('class="ability-hero__empty"');
-    expect(template).toMatch(/<radar-canvas[^>]*width="640rpx"[^>]*height="640rpx"/);
-    expect(template).toContain("assessmentPeriod");
-    expect(template).toContain("rankingMessage");
-    expect(template).toContain('wx:if="{{showOverall}}"');
-    expect(template).toContain('style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"');
-    const exportControl = template.match(/<view[^>]*class="ability-nav__export"[^>]*>[\s\S]*?<\/view>/)?.[0] ?? "";
-    expect(exportControl).not.toContain("bindtap");
+    expect(pageConfig).toContain('"navigationBarTitleText": "能力评估"');
+    expect(template).toContain('class="ability-context"');
+    expect(template).toContain("当前训练球队");
+    expect(template).toContain('class="ability-roster__grid"');
+    expect(template).toContain('class="ability-player {{item.isActive ? \'ability-player--active\' : \'\'}}"');
+    expect(template).toContain('bindtap="selectStudent"');
+    expect(template).toContain('class="ability-player__name"');
+    expect(template).toContain('width="352rpx" height="352rpx"');
+    expect(template).not.toContain('ability-nav__export');
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(template).not.toMatch(/2025|U10|李明辉|陈小宇|张伟|王浩|赵晨/);
-    expect(controller).toContain("wx.nextTick");
-    expect(stylesheet).toMatch(/\.ability-hero\s*\{[^}]*height:\s*1040rpx[^}]*overflow:\s*hidden/s);
-    expect(stylesheet).toMatch(/\.ability-hero__plot\s*\{[^}]*height:\s*720rpx[^}]*justify-content:\s*center/s);
-    expect(stylesheet).toMatch(/\.ability-hero__plot\s*\{(?=[^}]*flex-direction:\s*column)(?=[^}]*align-items:\s*center)/s);
-    expect(stylesheet).toMatch(/\.ability-hero__canvas\s*\{[^}]*width:\s*640rpx[^}]*height:\s*640rpx[^}]*flex:\s*0\s+0\s+640rpx/s);
-    expect(stylesheet).toMatch(/\.ability-hero__overall\s*\{[^}]*font-size:\s*96rpx[^}]*text-align:\s*center/s);
-    expect(stylesheet).not.toMatch(/\.ability-hero__overall\s*\{[^}]*position:\s*absolute/s);
+    expect(template).not.toMatch(/U10|2025|Player One|李明辉/);
+    expect(controller).toContain('COACH_TRAINING_TEAM_KEY');
+    expect(controller).toContain('getCoachStudentRadar');
+    expect(controller).not.toContain('getCoachTeamAbilityOverview');
     expect(stylesheet).toMatch(/\.ability-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
-    expect(stylesheet).toMatch(/\.ability-nav__title\s*\{[^}]*font-size:\s*36rpx[^}]*text-align:\s*left/s);
-    expect(stylesheet).toMatch(/\.ability-nav__back\s*\{[^}]*width:\s*48rpx[^}]*height:\s*64rpx[^}]*flex:\s*0\s+0\s+48rpx/s);
-    expect(stylesheet).toMatch(/\.ability-nav\s*\{[^}]*gap:\s*0/s);
-    expect(stylesheet).toMatch(/\.ability-nav__export\s*\{[^}]*display:\s*flex[^}]*width:\s*104rpx[^}]*height:\s*58rpx/s);
-  });
-
-  it("uses the stacked progress-bar dimension rows from the live Figma board", () => {
-    expect(template).toContain('class="dim-row__head"');
-    expect(template).toContain('class="dim-row__track"');
-    expect(template).toContain('style="width: {{item.progressStyle}}"');
-    expect(template).toContain('class="dim-row__summary"');
-    expect(template).not.toContain('class="dim-row__stats"');
-    expect(stylesheet).toMatch(/\.dim-row\s*\{[^}]*display:\s*flex[^}]*flex-direction:\s*column[^}]*gap:\s*12rpx/s);
-    expect(stylesheet).toMatch(/\.dim-row__track\s*\{[^}]*height:\s*12rpx[^}]*border-radius:\s*6rpx/s);
-    expect(stylesheet).toMatch(/\.dim-row__fill\s*\{[^}]*background:\s*#a80f1b/s);
-    expect(stylesheet).toMatch(/\.dim-row__summary\s*\{[^}]*font-size:\s*22rpx/s);
+    expect(stylesheet).toMatch(/\.ability-hero\s*\{(?=[^}]*height:\s*620rpx)(?=[^}]*background:\s*#07111f)/s);
+    expect(stylesheet).toMatch(/\.ability-roster__grid\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/s);
+    expect(stylesheet).toMatch(/\.ability-player__avatar\s*\{(?=[^}]*width:\s*80rpx)(?=[^}]*height:\s*80rpx)(?=[^}]*border-radius:\s*50%)/s);
+    expect(stylesheet).toMatch(/\.ability-page\s*\{[^}]*padding-bottom:\s*140rpx/s);
   });
 });

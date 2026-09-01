@@ -1357,10 +1357,11 @@ export async function getPrivateLessonRequests(studentId?: string): Promise<Priv
   return response.requests ?? [];
 }
 
-export async function getCoachTeam(): Promise<CoachTeamDetail> {
+export async function getCoachTeam(teamId?: string): Promise<CoachTeamDetail> {
   const context = requireContext();
+  const query = teamId ? `?teamId=${encodeURIComponent(teamId)}` : "";
   return request<CoachTeamDetail>({
-    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/team`,
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/team${query}`,
   });
 }
 
@@ -1375,10 +1376,11 @@ export async function getCoachStudentRadar(studentId: string): Promise<RadarMetr
     .filter((item) => typeof item.value === "number");
 }
 
-export async function getCoachTeamAbilityOverview(): Promise<CoachTeamAbilityOverview> {
+export async function getCoachTeamAbilityOverview(teamId?: string): Promise<CoachTeamAbilityOverview> {
   const context = requireContext();
+  const query = teamId ? `?teamId=${encodeURIComponent(teamId)}` : "";
   return request<CoachTeamAbilityOverview>({
-    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/team/ability-overview`,
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/team/ability-overview${query}`,
   });
 }
 

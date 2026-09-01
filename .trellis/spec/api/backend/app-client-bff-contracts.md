@@ -704,13 +704,17 @@ const auth = await membershipResolver.resolveByPhone(clubId, identity.phone);
 
 教练端球队详情 / 学员雷达 / 团队能力总览三个读端点（Figma C9/C13/C14）。
 
-### Request
+### 1. Scope / Trigger
 
-- `GET /clubs/:clubId/app-clients/:clientId/coach/team`
+当训练管理（C8）保存了 `coach-training-team-id`，C14 能力评估读取该队真实名单和雷达时使用本场景；教练日程不携带该筛选，仍展示权限内全部球队课程。
+
+### 2. Signatures
+
+- `GET /clubs/:clubId/app-clients/:clientId/coach/team?teamId=<optional assigned-team-id>`
 - `GET /clubs/:clubId/app-clients/:clientId/coach/students/:studentId/radar`
-- `GET /clubs/:clubId/app-clients/:clientId/coach/team/ability-overview`
+- `GET /clubs/:clubId/app-clients/:clientId/coach/team/ability-overview?teamId=<optional assigned-team-id>`
 
-### Response shape
+### 3. Contracts / Response shape
 
 ```ts
 // coach/team
@@ -753,12 +757,48 @@ interface CoachTeamAbilityOverviewResponse {
 }
 ```
 
-### Error matrix
+`teamId` 省略时保持既有默认可见队伍语义；提供时只可定位当前教练被分配的 active team。`members` 从持久化队伍成员读取，但必须以 `id.localeCompare(..., { numeric: true })` 稳定排序，不能把 SQLite 的姓名排序或无序读透传为接口排序。
+
+### 4. Validation & Error Matrix
 
 - client 不存在/未激活/角色不符 → 404 app_client_not_found
 - 非 coach/admin 角色 → 403 forbidden
+- `teamId` 不属于当前成员范围 → 403 forbidden，不能回退到默认队或泄露队伍统计
 - radar：studentId 不在该教练执教学生集合内 → 403 forbidden（不泄露其他学生能力数据）
 - 教练无执教事件 → team 返回空 members（200，不报错）
+
+### 5. Good / Base / Bad Cases
+
+- Good：训练管理选择已分配的 U10 队，C14 读取该队真实 roster 和每名学员的真实雷达；切换球员只改变选中学员的雷达。
+- Base：未带 `teamId` 的旧客户端继续得到默认可见队伍和稳定成员顺序。
+- Bad：客户端把权限外 `teamId` 作为普通空态处理，或把数据库按姓名的返回顺序直接作为 roster 合同。
+
+### 6. Tests Required
+
+- OpenAPI 测试覆盖两个读端点的可选 `teamId` query schema。
+- API 路由测试断言可见队 `200`、不可见队 `403`，并覆盖两条端点。
+- 受控双角色账号回归断言 `/coach/team` 返回成员集合按稳定的自然 ID 顺序，避免持久化存储排序改变页面/测试表现。
+- C14 小程序控制器测试断言读取训练管理保存的队伍 id、真实 roster、直接球员选择以及过期请求不会覆盖最新雷达。
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+const members = await context.store.listOperationalStudents(clubId, { teamId });
+return { members };
+```
+
+#### Correct
+
+```ts
+const members = await context.store.listOperationalStudents(clubId, { teamId });
+return {
+  members: members
+    .map((student) => ({ id: student.id, name: student.name }))
+    .sort((left, right) => left.id.localeCompare(right.id, undefined, { numeric: true })),
+};
+```
 
 ## Scenario: Coach Event Change Request
 

@@ -1910,11 +1910,15 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       clubId: string;
       clientId: string;
     };
+    Querystring: {
+      teamId?: string;
+    };
   }>(
     "/clubs/:clubId/app-clients/:clientId/coach/team",
     {
       schema: {
         ...schemas.appClientParams,
+        ...schemas.appClientCoachTeamQuery,
         ...schemas.appClientCoachTeam,
       },
     },
@@ -1936,8 +1940,15 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       }
 
       const scope = await collectCoachScope(context, request.params.clubId, auth);
-      const completedTrainingCount = await collectCoachCompletedTrainingCount(context, request.params.clubId, auth);
-      const team = scope.teams[0] ?? null;
+      const teamOptions = collectCoachTeamOptions(context, request.params.clubId, auth);
+      const team = resolveCoachTeamOption(teamOptions, request.query.teamId);
+      if (request.query.teamId && !team) {
+        return context.sendError(reply, 403, "forbidden", "Team is not accessible for this coach membership");
+      }
+      const members = team
+        ? await context.store.listOperationalStudents(request.params.clubId, { teamId: team.id })
+        : [];
+      const teamEvents = filterCoachScopeEventsByTeam(scope.events, team?.id);
       const primaryCoach = team
         ? context.store.listTeams(request.params.clubId)
           .find((candidate) => candidate.id === team.id)?.defaultCoachId
@@ -1947,7 +1958,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
           .filter((coach) => coach.id === primaryCoach && coach.status === "active")
           .map((coach) => ({ id: coach.id, name: coach.name, role: "教练" }))
         : [];
-      const decided = scope.events.flatMap((event) => event.participants ?? [])
+      const decided = teamEvents.flatMap((event) => event.participants ?? [])
         .filter((participant) => participant.status === "present" || participant.status === "absent" || participant.status === "excused");
       const present = decided.filter((participant) => participant.status === "present").length;
 
@@ -1956,12 +1967,14 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         role: "coach",
         team,
         stats: {
-          memberCount: scope.students.length,
-          trainingCount: scope.events.filter((event) => event.type === "training").length,
-          completedTrainingCount,
+          memberCount: members.length,
+          trainingCount: teamEvents.filter((event) => event.type === "training").length,
+          completedTrainingCount: teamEvents.filter((event) => event.type === "training" && event.status === "completed").length,
           attendanceRate: decided.length ? Math.round((present / decided.length) * 100) : null,
         },
-        members: scope.students,
+        members: members
+          .map((student) => ({ id: student.id, name: student.name }))
+          .sort((left, right) => left.id.localeCompare(right.id, undefined, { numeric: true })),
         coaches,
       };
     },
@@ -2023,11 +2036,15 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       clubId: string;
       clientId: string;
     };
+    Querystring: {
+      teamId?: string;
+    };
   }>(
     "/clubs/:clubId/app-clients/:clientId/coach/team/ability-overview",
     {
       schema: {
         ...schemas.appClientParams,
+        ...schemas.appClientCoachTeamQuery,
         ...schemas.appClientCoachTeamAbilityOverview,
       },
     },
@@ -2048,9 +2065,16 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return reply;
       }
 
-      const scope = await collectCoachScope(context, request.params.clubId, auth);
+      const teamOptions = collectCoachTeamOptions(context, request.params.clubId, auth);
+      const team = resolveCoachTeamOption(teamOptions, request.query.teamId);
+      if (request.query.teamId && !team) {
+        return context.sendError(reply, 403, "forbidden", "Team is not accessible for this coach membership");
+      }
+      const students = team
+        ? await context.store.listOperationalStudents(request.params.clubId, { teamId: team.id })
+        : [];
       const metricCatalog = await context.store.listAbilityMetrics(request.params.clubId);
-      const perStudent = await Promise.all(scope.students.map(async (student) => ({
+      const perStudent = await Promise.all(students.map(async (student) => ({
         studentId: student.id,
         records: await context.store.getStudentMetrics(request.params.clubId, student.id),
       })));
@@ -2094,7 +2118,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       return {
         clubId: request.params.clubId,
         role: "coach",
-        studentCount: scope.students.length,
+        studentCount: students.length,
         overall: averages.length ? round1(averages.reduce((sum, value) => sum + value, 0) / averages.length) : null,
         trendDelta: deltas.length ? round1(deltas.reduce((sum, value) => sum + value, 0) / deltas.length) : null,
         dimensions,
@@ -3146,6 +3170,20 @@ function collectCoachTeamOptions(
   }));
 }
 
+function resolveCoachTeamOption(
+  options: ReturnType<typeof collectCoachTeamOptions>,
+  requestedTeamId?: string,
+) {
+  return requestedTeamId
+    ? options.find((team) => team.id === requestedTeamId)
+    : options[0];
+}
+
+function filterCoachScopeEventsByTeam(events: CoachScopeEvent[], teamId?: string) {
+  if (!teamId) return [];
+  return events.filter((event) => event.primaryTeamId === teamId || event.teams?.some((team) => team.id === teamId));
+}
+
 function uniqueParticipants(participants: NonNullable<AppEventDetail["participants"]>) {
   const byStudentId = new Map<string, typeof participants[number]>();
 
@@ -3377,6 +3415,7 @@ function buildMetricTrends(metrics: Awaited<ReturnType<RouteContext["store"]["ge
 type CoachScopeAuth = Awaited<ReturnType<RouteContext["resolveClubAuth"]>> | null;
 
 interface CoachScopeEvent extends AppEventDetail {
+  primaryTeamId?: string;
   ownerCoachId?: string;
   students?: Array<{ id: string; name: string }>;
   teams?: Array<{ id: string; name: string }>;

@@ -179,12 +179,14 @@ export function buildOpenApiDocument() {
       "/clubs/{clubId}/app-clients/{clientId}/coach/team": {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/team", {
           ...schemas.appClientParams,
+          ...schemas.appClientCoachTeamQuery,
           ...schemas.appClientCoachTeam,
         }),
       },
       "/clubs/{clubId}/app-clients/{clientId}/coach/team/ability-overview": {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/team/ability-overview", {
           ...schemas.appClientParams,
+          ...schemas.appClientCoachTeamQuery,
           ...schemas.appClientCoachTeamAbilityOverview,
         }),
       },
