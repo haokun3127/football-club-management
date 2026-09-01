@@ -4,13 +4,13 @@
 const path = require("path");
 const automator = require(path.resolve(__dirname, "../../apps/miniprogram-cq-talent/node_modules/miniprogram-automator"));
 const { resolveAutomationPort } = require("./automation-session.cjs");
-const { createDefaultVisualEvidencePath } = require("./visual-evidence-path.cjs");
+const { assertVisualEvidencePath, createDefaultVisualEvidencePath } = require("./visual-evidence-path.cjs");
 const PORT = String(resolveAutomationPort());
 function race(p, ms, label) { return Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error("timeout:" + label)), ms))]); }
 (async () => {
   const mp = await race(automator.connect({ wsEndpoint: "ws://127.0.0.1:" + PORT }), 10000, "connect");
   const route = process.argv[2]; // e.g. pages/parent/schedule/index?id=xxx
-  const out = process.argv[3] || createDefaultVisualEvidencePath("route-shot");
+  const out = assertVisualEvidencePath(process.argv[3] || createDefaultVisualEvidencePath("route-shot"));
   if (!route) { console.error("usage: node scripts/devtools/mp-route-shot.cjs <route> [out.png] [force]"); process.exit(2); }
   let page = await race(mp.currentPage(), 8000, "currentPage-1");
   console.log("route-before:", page && page.path);

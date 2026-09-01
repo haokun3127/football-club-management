@@ -7,10 +7,11 @@ const {
   readFileSync,
   renameSync,
   rmSync,
+  statSync,
   writeFileSync,
 } = require('node:fs');
 const { basename, dirname, resolve, win32 } = require('node:path');
-const { createDefaultVisualEvidencePath } = require('./visual-evidence-path.cjs');
+const { assertVisualEvidenceDirectory, createDefaultVisualEvidencePath } = require('./visual-evidence-path.cjs');
 
 const REPO_ROOT = resolve(__dirname, '..', '..');
 const PROJECT_PATH = resolve(REPO_ROOT, 'apps', 'miniprogram-cq-talent');
@@ -21,6 +22,7 @@ const WECHATIDE_SKILL_VERSION = '0.3.9';
 const REQUIRED_VIEWPORT = Object.freeze({ width: 375, height: 812 });
 const MAX_ASPECT_RATIO_ERROR = 0.005;
 const DEFAULT_TIMEOUT_MS = 30_000;
+const SCREENSHOT_FILE_TIMEOUT_MS = 5_000;
 
 function parseArgs(argv) {
   const args = [...argv];
@@ -53,6 +55,7 @@ function parseArgs(argv) {
   if (!win32.isAbsolute(options.output) || win32.extname(options.output).toLowerCase() !== '.png') {
     throw new Error('--output must be an absolute Windows .png path');
   }
+  assertVisualEvidenceDirectory(dirname(options.output));
   return options;
 }
 
@@ -117,14 +120,21 @@ function viewportOf(payload) {
   return {
     width: Number(source?.windowWidth ?? source?.width),
     height: Number(source?.windowHeight ?? source?.height),
+    screenWidth: Number(source?.screenWidth ?? source?.windowWidth ?? source?.width),
+    screenHeight: Number(source?.screenHeight ?? source?.windowHeight ?? source?.height),
     devicePixelRatio: Number(source?.pixelRatio ?? source?.devicePixelRatio),
   };
 }
 
 function assertLogicalViewport(payload) {
   const viewport = viewportOf(payload);
-  if (viewport.width !== REQUIRED_VIEWPORT.width || viewport.height !== REQUIRED_VIEWPORT.height) {
-    throw new Error(`runtime logical viewport must be 375x812; received ${viewport.width}x${viewport.height}`);
+  const screenMatches = viewport.screenWidth === REQUIRED_VIEWPORT.width && viewport.screenHeight === REQUIRED_VIEWPORT.height;
+  const windowMatches = viewport.width === REQUIRED_VIEWPORT.width && viewport.height === REQUIRED_VIEWPORT.height;
+  if (!screenMatches && !windowMatches) {
+    throw new Error(`runtime screen/window viewport must include 375x812; received screen ${viewport.screenWidth}x${viewport.screenHeight}, window ${viewport.width}x${viewport.height}`);
+  }
+  if (viewport.width !== REQUIRED_VIEWPORT.width || viewport.height < 1 || viewport.height > viewport.screenHeight) {
+    throw new Error(`runtime window viewport is invalid: received ${viewport.width}x${viewport.height} within screen ${viewport.screenWidth}x${viewport.screenHeight}`);
   }
   return viewport;
 }
@@ -141,6 +151,21 @@ async function waitForExactRoute({ client, projectPath, expectedRoute, timeoutMs
     await sleepImpl(Math.min(250, remaining));
   } while (Date.now() < deadline);
   throw new Error(`verified route mismatch: expected ${expectedRoute}, received ${received || '<unknown>'}`);
+}
+
+async function waitForScreenshotFile({ path, timeoutMs = SCREENSHOT_FILE_TIMEOUT_MS, sleepImpl = (milliseconds) => new Promise((resolveSleep) => setTimeout(resolveSleep, milliseconds)) }) {
+  const deadline = Date.now() + timeoutMs;
+  do {
+    try {
+      if (existsSync(path) && statSync(path).size > 0) return;
+    } catch {
+      // The simulator may still be replacing its just-reported PNG path.
+    }
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) break;
+    await sleepImpl(Math.min(100, remaining));
+  } while (Date.now() < deadline);
+  throw new Error(`MCP screenshot path does not exist: ${path}`);
 }
 
 function powershellEncodedInvocation(command) {
@@ -220,7 +245,7 @@ function createMcpClient({
     child.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized', params: {} })}\n`);
     const tools = await request('tools/list', {});
     const names = new Set((tools?.tools || []).map((tool) => tool.name));
-    for (const required of ['check_wechatide_status', 'open_project_window', 'simulator_open_page', 'automation_runtime_info', 'simulator_screenshot']) {
+    for (const required of ['check_wechatide_status', 'open_project_window', 'simulator_open_page', 'simulator_refresh', 'automation_navigate', 'automation_runtime_info', 'simulator_screenshot']) {
       if (!names.has(required)) throw new Error(`MCP tool is unavailable: ${required}`);
     }
   };
@@ -282,6 +307,7 @@ async function runCapture({
   normalizeImage = normalizeWithPython,
   now = () => new Date(),
   routePollTimeoutMs = DEFAULT_TIMEOUT_MS,
+  screenshotFileTimeoutMs = SCREENSHOT_FILE_TIMEOUT_MS,
   sleepImpl,
 } = {}) {
   const options = parseArgs(argv || process.argv.slice(2));
@@ -298,7 +324,15 @@ async function runCapture({
     await client.callTool('open_project_window', { project: projectPath });
     const openPageArgs = { project: projectPath, page: options.route.slice(1) };
     if (options.query) openPageArgs.query = options.query;
+    await client.callTool('simulator_refresh', { project: projectPath });
     await client.callTool('simulator_open_page', openPageArgs);
+    const navigationUrl = options.query ? `${options.route}?${options.query}` : options.route;
+    await client.callTool('automation_navigate', {
+      project: projectPath,
+      action: 'reLaunch',
+      url: navigationUrl,
+      wait: 1,
+    });
     await waitForExactRoute({ client, projectPath, expectedRoute: options.route, timeoutMs: routePollTimeoutMs, sleepImpl });
     const runtime = assertLogicalViewport(payloadOf(await client.callTool('automation_runtime_info', { project: projectPath, action: 'systemInfo' })));
     const screenshot = payloadOf(await client.callTool('simulator_screenshot', {
@@ -308,7 +342,7 @@ async function runCapture({
       waitForSelector: 'view',
     }));
     const sourcePath = screenshot.path || rawPath;
-    if (!existsSync(sourcePath)) throw new Error(`MCP screenshot path does not exist: ${sourcePath}`);
+    await waitForScreenshotFile({ path: sourcePath, timeoutMs: screenshotFileTimeoutMs, sleepImpl });
     const rawBytes = readFileSync(sourcePath);
     const rawPng = readPngDimensions(rawBytes);
     const rawGeometry = assertRawCapture(rawPng);
@@ -348,9 +382,11 @@ if (require.main === module) {
 
 module.exports = {
   assertRawCapture,
+  assertLogicalViewport,
   createMcpClient,
   parseArgs,
   readPngDimensions,
   runCapture,
+  waitForScreenshotFile,
   writeEvidenceAtomically,
 };

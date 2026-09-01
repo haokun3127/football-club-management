@@ -20,16 +20,16 @@ startup_timeout_sec = 120
 ```bash
 node scripts/devtools/wechatide-mcp-capture.cjs \
   --route /pages/coach/schedule/index \
-  --output "C:\Users\ASUS\AppData\Local\Temp\cq-coach-schedule.png"
+  --output "$env:TEMP\\cq-talent-visual-evidence\\cq-coach-schedule.png"
 ```
 
-`--output` 可以省略；此时脚本自动生成不冲突的 PNG 路径到 `%TEMP%\\cq-talent-visual-evidence`。只有需要把证据复制到指定归档位置时才传入明确的绝对路径，禁止把桌面路径作为默认输出。
+`--output` 可以省略；此时脚本自动生成不冲突的 PNG 路径到 `%TEMP%\\cq-talent-visual-evidence`。显式输出路径和 `CQ_TALENT_VISUAL_EVIDENCE_DIR` 也会拒绝桌面、当前项目工作区及其子目录；当前证据不得复制回这些位置，历史证据保留原位但不迁移。
 
-命令会通过 MCP 编译并打开路由，复核 `currentPage` 与 `systemInfo=375×812`，再以 `optimize=false`、`waitForSelector="view"` 等待新页面完成挂载后获取原始 PNG，用 Pillow 归一化为严格 `375×812`，并生成同名 `.json` sidecar。等待页面根节点是必要的：只确认路由已经切换，仍可能抢在 WXML 渲染完成前得到白屏。sidecar 记录路由、设备倍率、原始像素、归一化像素、SHA-256 和 `captureMethod`；任何 MCP/路由/尺寸/写入失败都不会发布 PNG 或 sidecar。
+命令会通过 MCP 刷新当前项目以触发 TypeScript 编译，再打开并用 `automation_navigate` 精确重导航到目标路由；随后复核 `currentPage` 与 `systemInfo`。iPhone X 在部分新版 DevTools 中会报告 `screen=375×812`、`window=375×724`（窗口尺寸扣除了系统外壳），只要屏幕尺寸正确且最终 PNG 严格为 `375×812` 即合格。命令以 `optimize=false`、`waitForSelector="view"` 等待新页面完成挂载后获取原始 PNG，用 Pillow 归一化为严格 `375×812`，并生成同名 `.json` sidecar。等待页面根节点是必要的：只确认路由已经切换，仍可能抢在 WXML 渲染完成前得到白屏。sidecar 记录路由、设备倍率、原始像素、归一化像素、SHA-256 和 `captureMethod`；任何 MCP/路由/尺寸/写入失败都不会发布 PNG 或 sidecar。
 
 原始截图的比例允许 DevTools 四舍五入造成的 `0.5%` 以内误差；归一化只裁去边缘的比例误差再缩放，不接受明显错误的画布。
 
-以下 Automator/窗口截图说明全部是历史或人工明确指定的紧急回退，不会被 MCP 命令自动调用。
+以下 Automator/窗口截图说明全部是历史或人工明确指定的排障资料，不会被 MCP 命令自动调用，且不能作为当前 Figma 视觉验收证据。当前验收只接受 MCP 命令生成、路由已核验且严格 `375×812` 的 PNG 与 sidecar。
 
 ## 历史 Automator 前提（仅紧急回退）
 
@@ -43,14 +43,14 @@ npx --yes pnpm@10.33.0 --filter @football-club/miniprogram-cq-talent devtools:au
 
 该命令读取当前 DevTools 的 IDE HTTP 服务端口（`.ide`），把它作为 `cli auto --port` 传入；再注册**独立的** Automator WebSocket 端口，并在握手成功后写入忽略文件 `tmp/devtools-automation-session.json`。该文件只保存端口、项目路径和时间，**不保存 token、手机号或 session**。
 
-## 历史 Automator 单页截图（仅紧急回退）
+## 历史 Automator 单页截图（仅排障，不可验收）
 
-传入明确输出路径时可以保存到指定位置；省略输出路径时，脚本会自动写入系统临时目录 `%TEMP%\\cq-talent-visual-evidence`，不会把截图写入桌面仓库。这个默认行为适用于 `wechatide-mcp-capture.cjs`、`mp-route-shot.cjs`、`mp-route-shot-bottom.cjs`、`mp-snap.cjs` 和 `mp-batch-shot.cjs`。
+`mp-route-shot.cjs`、`mp-route-shot-bottom.cjs`、`mp-snap.cjs` 和 `mp-batch-shot.cjs` 保留给历史排障；它们不是 MCP 截图通道，不得用其输出宣称 Figma 一致或写入当前验收记录。
 
-```bash
-node scripts/devtools/mp-route-shot.cjs \
-  "pages/parent/event/index?id=event-cq-talent-secure-test-1-trn-0813" \
-  "C:\Users\ASUS\Desktop\football-club-management-codex-windows-2026-08-02\tmp\figma-restore\p2-current.png" \
+```powershell
+node scripts/devtools/mp-route-shot.cjs `
+  "pages/parent/event/index?id=event-cq-talent-secure-test-1-trn-0813" `
+  "$env:TEMP\\cq-talent-visual-evidence\\legacy-p2-current.png" `
   force
 ```
 
@@ -64,8 +64,8 @@ node scripts/devtools/mp-route-shot.cjs \
 ```bash
 python scripts/devtools/sidebyside.py \
   docs/design/reference/figma/p2-training-detail.png \
-  tmp/figma-restore/p2-current.png \
-  tmp/figma-restore/p2-cmp.png
+  "$env:TEMP/cq-talent-visual-evidence/legacy-p2-current.png" \
+  "$env:TEMP/cq-talent-visual-evidence/legacy-p2-cmp.png"
 ```
 
 输出左 DESIGN 右 CURRENT 的拼图，视觉模型一次比对。（PIL 本机已装；没有就 `uv run --with pillow`）
@@ -86,18 +86,21 @@ python scripts/devtools/sidebyside.py \
 
 ```bash
 # 1. 设计稿已在仓库：docs/design/reference/figma/<页面>.png（README.md 有对照表）
-# 2. 用 MCP 截当前实现；输出目录不要复用已有 PNG
+# 2. 用 MCP 截当前实现；输出目录必须是系统临时证据目录，且不要复用已有 PNG
 node scripts/devtools/wechatide-mcp-capture.cjs \
   --route "/<路由>" \
-  --output "<tmp 输出.png>"
+  --output "$env:TEMP/cq-talent-visual-evidence/<页面>-current.png"
 # 3. 合成
-python scripts/devtools/sidebyside.py docs/design/reference/figma/<页面>.png <tmp 输出.png> <tmp 对比.png>
+python scripts/devtools/sidebyside.py \
+  docs/design/reference/figma/<页面>.png \
+  "$env:TEMP/cq-talent-visual-evidence/<页面>-current.png" \
+  "$env:TEMP/cq-talent-visual-evidence/<页面>-cmp.png"
 # 4. 视觉比对 → 修代码 → typecheck + vitest → 重截复验 → 路径限定提交
 ```
 
-## 紧急回退：Windows 模拟器窗口精确捕获（非默认）
+## 历史回退：Windows 模拟器窗口精确捕获（不可用于当前验收）
 
-`page.screenshot` 在某些实例上持续超时（页面渲染正常也一样）。使用动态定位脚本，不依赖显示器分辨率或模拟器摆放位置：
+`page.screenshot` 在某些历史实例上持续超时（页面渲染正常也一样）。以下脚本仅帮助排障，不得替代 MCP 证据或用于当前 Figma 验收：
 
 ```bash
 # 1. 抓当前可见模拟器并自动定位 iPhone X 画布

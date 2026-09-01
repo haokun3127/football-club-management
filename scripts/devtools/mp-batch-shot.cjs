@@ -1,7 +1,7 @@
 const path = require("path");
 const automator = require(path.resolve(__dirname, "../../apps/miniprogram-cq-talent/node_modules/miniprogram-automator"));
 const { resolveAutomationPort } = require("./automation-session.cjs");
-const { createDefaultVisualEvidencePath } = require("./visual-evidence-path.cjs");
+const { assertVisualEvidencePath, createDefaultVisualEvidencePath } = require("./visual-evidence-path.cjs");
 function race(p, ms, label) { return Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error("timeout:" + label)), ms))]); }
 // Batch screenshots in ONE connection: node mp-batch-shot.cjs <manifest.json>
 // manifest: [{ "route": "pages/...?id=x", "out": "abs path.png", "settleMs": 800 }, ...]
@@ -24,7 +24,7 @@ function race(p, ms, label) { return Promise.race([p, new Promise((_, rej) => se
       await new Promise((r) => setTimeout(r, item.settleMs || 900));
       // path-variant screenshot can hang in DevTools; base64 variant is reliable
       const b64 = await race(mp.screenshot(), 30000, "screenshot");
-      const out = item.out || createDefaultVisualEvidencePath("batch-shot");
+      const out = assertVisualEvidencePath(item.out || createDefaultVisualEvidencePath("batch-shot"));
       require("fs").writeFileSync(out, Buffer.from(b64, "base64"));
       console.log("OK", item.route, path.basename(out), (Date.now() - t0) + "ms");
     } catch (e) {

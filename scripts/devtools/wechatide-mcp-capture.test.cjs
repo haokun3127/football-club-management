@@ -9,6 +9,7 @@ const test = require('node:test');
 const {
   parseArgs,
   assertRawCapture,
+  assertLogicalViewport,
   runCapture,
   createMcpClient,
 } = require('./wechatide-mcp-capture.cjs');
@@ -34,7 +35,7 @@ function toolResult(payload) {
   return { structuredContent: payload };
 }
 
-function fakeClient(calls, { route = '/pages/coach/schedule/index', currentRoutes = [route], rawPath } = {}) {
+function fakeClient(calls, { route = '/pages/coach/schedule/index', currentRoutes = [route], rawPath, deferRawFileMs = 0 } = {}) {
   let currentRouteIndex = 0;
   return {
     async callTool(name, args) {
@@ -42,6 +43,8 @@ function fakeClient(calls, { route = '/pages/coach/schedule/index', currentRoute
       if (name === 'check_wechatide_status') return toolResult({ loginExpired: false, tokenRequired: false });
       if (name === 'open_project_window') return toolResult({ windowId: 's0' });
       if (name === 'simulator_open_page') return toolResult({ route });
+      if (name === 'simulator_refresh') return toolResult({ success: true });
+      if (name === 'automation_navigate') return toolResult({ success: true });
       if (name === 'automation_runtime_info') {
         if (args.action === 'currentPage') {
           const currentRoute = currentRoutes[Math.min(currentRouteIndex, currentRoutes.length - 1)];
@@ -50,7 +53,10 @@ function fakeClient(calls, { route = '/pages/coach/schedule/index', currentRoute
         }
         if (args.action === 'systemInfo') return toolResult({ success: true, systemInfo: { result: { windowWidth: 375, windowHeight: 812, pixelRatio: 3 } } });
       }
-      if (name === 'simulator_screenshot') return toolResult({ path: rawPath, imageWidth: 546, imageHeight: 1179 });
+      if (name === 'simulator_screenshot') {
+        if (deferRawFileMs > 0) setTimeout(() => writeFileSync(rawPath, pngHeader(546, 1179)), deferRawFileMs);
+        return toolResult({ path: rawPath, imageWidth: 546, imageHeight: 1179 });
+      }
       throw new Error(`unexpected fake tool: ${name}`);
     },
     async close() {},
@@ -68,6 +74,8 @@ test('requires an absolute PNG output and an exact route', () => {
   });
   assert.throws(() => parseArgs(['--route', 'pages/coach/schedule/index', '--output', 'C:\\temp\\shot.png']), /route/i);
   assert.throws(() => parseArgs(['--route', '/pages/coach/schedule/index', '--output', 'shot.jpg']), /PNG/i);
+  assert.throws(() => parseArgs(['--route', '/pages/coach/schedule/index', '--output', 'C:\\Users\\ASUS\\Desktop\\shot.png']), /desktop/i);
+  assert.throws(() => parseArgs(['--route', '/pages/coach/schedule/index', '--output', 'C:\\Users\\ASUS\\Desktop\\football-club-management-codex-windows-2026-08-02\\tmp\\shot.png']), /repository|worktree/i);
 });
 
 test('defaults screenshot output to the isolated system evidence directory', () => {
@@ -131,6 +139,26 @@ test('accepts the observed WeChatIDE raw raster and rejects a non-viewport raste
   assert.throws(() => assertRawCapture({ width: 546, height: 900 }), /viewport aspect ratio/i);
 });
 
+test('accepts iPhone X screen dimensions when WeChat window excludes system chrome', () => {
+  assert.deepEqual(assertLogicalViewport({
+    systemInfo: {
+      result: {
+        screenWidth: 375,
+        screenHeight: 812,
+        windowWidth: 375,
+        windowHeight: 724,
+        pixelRatio: 3,
+      },
+    },
+  }), {
+    width: 375,
+    height: 724,
+    screenWidth: 375,
+    screenHeight: 812,
+    devicePixelRatio: 3,
+  });
+});
+
 test('publishes a normalized PNG and non-sensitive sidecar only after every check', async () => {
   const { directory, output } = tempOutput();
   const rawPath = join(directory, 'raw.png');
@@ -151,7 +179,9 @@ test('publishes a normalized PNG and non-sensitive sidecar only after every chec
     assert.deepEqual(calls.map(({ name }) => name), [
       'check_wechatide_status',
       'open_project_window',
+      'simulator_refresh',
       'simulator_open_page',
+      'automation_navigate',
       'automation_runtime_info',
       'automation_runtime_info',
       'simulator_screenshot',
@@ -177,6 +207,24 @@ test('publishes a normalized PNG and non-sensitive sidecar only after every chec
       scaleY: 1179 / 812,
     });
     assert.equal(sidecar.projectPath, undefined);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test('waits for a WeChatIDE screenshot file that is reported before it reaches disk', async () => {
+  const { directory, output } = tempOutput();
+  const rawPath = join(directory, 'delayed-raw.png');
+
+  try {
+    await runCapture({
+      argv: ['--route', '/pages/coach/schedule/index', '--output', output],
+      projectPath: 'C:\\workspace\\apps\\miniprogram-cq-talent',
+      createClient: async () => fakeClient([], { rawPath, deferRawFileMs: 25 }),
+      normalizeImage: async ({ output: normalizedOutput }) => writeFileSync(normalizedOutput, pngHeader(375, 812)),
+      screenshotFileTimeoutMs: 500,
+    });
+    assert.equal(existsSync(output), true);
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
@@ -227,7 +275,7 @@ test('waits for simulator_open_page to replace the previous route before capturi
   }
 });
 
-function fakeMcpSpawn({ toolNames = ['check_wechatide_status', 'open_project_window', 'simulator_open_page', 'automation_runtime_info', 'simulator_screenshot'] } = {}) {
+function fakeMcpSpawn({ toolNames = ['check_wechatide_status', 'open_project_window', 'simulator_open_page', 'simulator_refresh', 'automation_navigate', 'automation_runtime_info', 'simulator_screenshot'] } = {}) {
   const calls = [];
   const stdout = new PassThrough();
   const stderr = new PassThrough();

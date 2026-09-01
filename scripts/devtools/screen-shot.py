@@ -3,10 +3,13 @@ import ctypes, sys, tempfile
 from ctypes import wintypes
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from visual_evidence_path import assert_visual_evidence_path, default_visual_evidence_path
+
 if len(sys.argv) > 1:
-    out = sys.argv[1]
+    out = assert_visual_evidence_path(sys.argv[1])
 else:
-    out = str(Path(tempfile.gettempdir()) / "cq-talent-visual-evidence" / "screen-shot.png")
+    out = default_visual_evidence_path("screen-shot")
 Path(out).parent.mkdir(parents=True, exist_ok=True)
 title_keyword = "开发者工具"
 
@@ -45,5 +48,5 @@ print(f"window rect: {x},{y} {w}x{h}")
 # PIL 抓屏
 from PIL import ImageGrab
 img = ImageGrab.grab(bbox=(max(x,0), max(y,0), x + w, y + h), all_screens=True)
-img.save(out)
+img.save(str(out))
 print("saved", out)

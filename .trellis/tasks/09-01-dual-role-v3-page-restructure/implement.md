@@ -258,3 +258,10 @@
 - 重新通过微信开发者工具 MCP 取得三张严格 `375×812` 运行截图：`%TEMP%\\cq-talent-visual-evidence\\v5-c1-schedule-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-training-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-1-selector-rerun-20260901.png`。
 - C1 当前真实日期范围没有课程，保留真实空态；页面仍展示跨球队日程上下文，不读取 `coach-training-team-id`。C8 显示当前训练球队并按球队过滤课程；C8.1 只显示后端分配队伍。样例数量差异不作为代码缺陷。
 - 复验门禁：定向 Vitest `32/32`、小程序 `tsc --noEmit`、C1/C8/C8.1 WXML 与 WXSS 编译均通过；WechatIDE 状态为已登录，CLI 令牌未启用。
+
+### 截图通道隔离与 C15 MCP 复验（2026-09-02）
+
+- 截图工具链已统一增加输出边界：默认写入 `%TEMP%\\cq-talent-visual-evidence`；显式路径和环境变量路径拒绝桌面、当前项目工作区及其子目录。历史 Automator/窗口截图脚本保留为排障用途，不再作为 Figma 视觉验收证据。
+- MCP 捕获流程现在先刷新项目、精确重导航，再核验当前路由和运行时视口；兼容 iPhone X 的 `screen=375×812`、`window=375×724` 外壳差异，并等待 MCP 返回的 PNG 真正落盘后才发布证据与 sidecar。
+- 定向回归 `scripts/devtools/visual-evidence-path.test.cjs` + `scripts/devtools/wechatide-mcp-capture.test.cjs` 为 `14/14`；Python 语法检查使用 Windows `py -3` 通过。完整门禁 `npx --yes pnpm@10.33.0 run check` 通过：domain `21/21`、小程序 `444/444`、API `123/123`。
+- 微信开发者工具 MCP 状态为已登录、`tokenRequired=false`。C15 `/pages/coach/assessment-entry/index?templateId=assessment-template-technical&title=体能综合评估` 首次重导航因标题编码错误出现真实 `URI malformed` 空内容；修正编码后重新导航成功，截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788279060561-c8zjw9.png` 严格为 `375×812`，显示真实评测模板、U10 精英队和 19 名学员。该证据证明截图通道可用，但 C15 仍需与在线 V6 `1623:2` 完成逐模块视觉对照后才能收口。

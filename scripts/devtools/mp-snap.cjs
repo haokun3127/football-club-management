@@ -1,9 +1,9 @@
 // 只截当前页，不导航。用法: node scripts/devtools/mp-snap.cjs "<输出绝对路径>.png"
 const automator = require("miniprogram-automator");
 const { resolveAutomationPort } = require("./automation-session.cjs");
-const { createDefaultVisualEvidencePath } = require("./visual-evidence-path.cjs");
+const { assertVisualEvidencePath, createDefaultVisualEvidencePath } = require("./visual-evidence-path.cjs");
 
-const out = process.argv[2] || createDefaultVisualEvidencePath("current-page");
+const out = assertVisualEvidencePath(process.argv[2] || createDefaultVisualEvidencePath("current-page"));
 const port = String(resolveAutomationPort());
 
 (async () => {

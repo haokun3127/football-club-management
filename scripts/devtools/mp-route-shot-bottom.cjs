@@ -2,10 +2,10 @@
 const path = require('path');
 const automator = require(path.resolve(__dirname, '../../apps/miniprogram-cq-talent/node_modules/miniprogram-automator'));
 const { resolveAutomationPort } = require('./automation-session.cjs');
-const { createDefaultVisualEvidencePath } = require('./visual-evidence-path.cjs');
+const { assertVisualEvidencePath, createDefaultVisualEvidencePath } = require('./visual-evidence-path.cjs');
 
 const [route, requestedOutput] = process.argv.slice(2);
-const out = requestedOutput || createDefaultVisualEvidencePath('route-shot-bottom');
+const out = assertVisualEvidencePath(requestedOutput || createDefaultVisualEvidencePath('route-shot-bottom'));
 if (!route) { console.log('usage: node mp-route-shot-bottom.cjs <route> [out.png]'); process.exit(1); }
 
 async function main() {

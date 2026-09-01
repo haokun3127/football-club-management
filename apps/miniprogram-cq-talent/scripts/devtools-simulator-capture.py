@@ -14,6 +14,9 @@ import sys
 import time
 import zlib
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "scripts" / "devtools"))
+from visual_evidence_path import assert_visual_evidence_path, default_visual_evidence_path
+
 
 PW_RENDERFULLCONTENT = 2
 BI_RGB = 0
@@ -416,7 +419,7 @@ def write_png(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", required=True)
+    parser.add_argument("--output")
     parser.add_argument("--logical-width", type=int, required=True)
     parser.add_argument("--logical-height", type=int, required=True)
     parser.add_argument("--simulator-title", default="")
@@ -425,7 +428,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    output = Path(args.output)
+    output = default_visual_evidence_path("simulator-window") if not args.output else assert_visual_evidence_path(args.output)
     if not output.parent.is_dir():
         raise RuntimeError("Capture output parent directory does not exist")
     hwnd, title = find_simulator_window(args.simulator_title or None)
