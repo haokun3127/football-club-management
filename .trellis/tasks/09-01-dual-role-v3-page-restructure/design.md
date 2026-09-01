@@ -26,3 +26,22 @@ Figma 保持历史页 `05 Parent Generated` / `06 Coach Generated` 原样；新�
 ## Rollback
 
 本轮只追加两个 Figma page 和新画板。若任一新稿方向被否决，删除这两个新增 page 即可恢复，旧画板与小程序不受影响。
+
+## V4 information architecture revision
+
+Create two additional top-level Figma pages: `12 Product Redesign · Parent V4` and `13 Product Redesign · Coach V4`. They are curated delivery indexes, not replacements for V3.
+
+Parent V4 order:
+
+1. Product index
+2. P1 schedule week / month expanded / empty
+3. P4 growth, P5 ability radar, P8 discover, P7 my child
+
+Coach V4 order:
+
+1. Product index
+2. C1 all-team schedule, C2 workbench, C4 attendance, C6 match record, C7 tactical board
+3. C8 training management, C8.1 training-team selection, C9 team detail, C10 training content, C10.1 coverage
+4. C11 assessment tasks, C12 entry, C12.1 draft resume, C13 student radar, C14 ability assessment, C15 entry, C15.1 submit, C16 my profile
+
+The Coach index must state the invariant in its first viewport: schedule never selects a team; training management owns the team context. Source screens are cloned non-destructively from the reviewed V3 nodes, positioned in reading order, and renamed with V4 suffixes. No production API or sample-data contract changes are part of this Figma organization pass.

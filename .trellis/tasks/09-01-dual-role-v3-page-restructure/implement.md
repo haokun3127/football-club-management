@@ -7,6 +7,13 @@
 5. [ ] 每一页按“Figma → 最小代码修改 → 定向测试/TypeScript → WeChatIDE MCP 375×812 截图 → 文档 → 路径限定提交”的循环收口。
 6. [ ] 最后更新 Figma 映射、进度与任务证据，并以路径限定提交页面整理文档；不将其他工作区脏改动一并提交。
 
+## V4 revision execution
+
+7. [x] 在唯一在线文件中新增 `12 Product Redesign · Parent V4` 与 `13 Product Redesign · Coach V4` 两个 Page；旧页面和 V3 不改不删。
+8. [x] 将已审查的 Parent/Coach V3 画板按产品流程克隆到 V4 页面；Coach 明确 C1 全队日程与 C8/C8.1 训练管理选队边界。
+9. [x] 用 Figma MCP 读取新页面总览和首批画板，回读节点 ID，并更新 `figma-source-of-truth.md` 与 `progress.md`。
+10. [ ] 只有 V4 页面结构确认后，才进入对应小程序页面的逐页同步；每批仍执行真实数据、最小测试、限定路径提交和截图证据闭环。
+
 ## Page evidence
 
 ### P4 Growth (2026-09-01)
