@@ -42,6 +42,7 @@
 .month-calendar__weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-top: 24rpx; }
 .month-calendar__weekday { color: #667085; font-size: 22rpx; line-height: 28rpx; text-align: center; }
 .month-calendar__grid { display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 72rpx; margin-top: 12rpx; }
+.month-calendar__hint { margin-top: 10rpx; color: #667085; font-size: 22rpx; line-height: 30rpx; }
 .month-day { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 6rpx; color: #202124; }
 .month-day--outside { color: #9ca3af; }
 .month-day__number { display: flex; align-items: center; justify-content: center; width: 52rpx; height: 52rpx; border-radius: 50%; font-size: 26rpx; line-height: 32rpx; }

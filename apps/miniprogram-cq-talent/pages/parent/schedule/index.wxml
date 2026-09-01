@@ -80,6 +80,7 @@
           </view>
         </view>
       </view>
+      <view class="month-calendar__hint">点击日期更新日程 · 点击收起回到周日历</view>
     </view>
 
     <view class="chips">

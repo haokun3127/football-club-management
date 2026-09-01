@@ -184,6 +184,8 @@ describe("parent schedule hero", () => {
     expect(template).toContain('data-offset="1" bindtap="changeMonth"');
     expect(template).toContain('bindtap="collapseMonthPicker"');
     expect(template).toContain('class="month-calendar__collapse" bindtap="collapseMonthPicker" aria-label="收起月历"');
+    expect(template).toContain('class="month-calendar__hint"');
+    expect(template).toContain('点击日期更新日程 · 点击收起回到周日历');
     expect(template).not.toContain('>收起<image');
     expect(template).toContain("month-day--today");
     expect(template).toContain("month-day--selected");
@@ -195,6 +197,7 @@ describe("parent schedule hero", () => {
     expect(styles).toMatch(/\.month-day--selected \.month-day__number\s*\{[^}]*background: #a80f1b/);
     expect(styles).toMatch(/\.month-calendar__collapse\s*\{[^}]*width:\s*60rpx[^}]*height:\s*32rpx[^}]*border-radius:\s*16rpx/s);
     expect(styles).toMatch(/\.month-calendar__collapse-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx[^}]*transform:\s*none/s);
+    expect(styles).toMatch(/\.month-calendar__hint\s*\{[^}]*font-size:\s*22rpx[^}]*line-height:\s*30rpx/s);
     expect(styles).toMatch(/\.week-nav__expand\s*\{[^}]*width:\s*60rpx[^}]*height:\s*32rpx[^}]*border-radius:\s*16rpx/s);
     expect(styles).toMatch(/\.week-nav__expand-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx/s);
     expect(styles).toMatch(/\.week-nav\s*\{[^}]*padding:\s*0\s+84rpx\s+0\s+12rpx/s);
