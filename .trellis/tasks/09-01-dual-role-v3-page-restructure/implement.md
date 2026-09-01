@@ -57,6 +57,12 @@
 - User-approved simplification: the V3 search hint is `搜索训练动作`; there is no “动作要点” search wording, “查看动作要点” action, circular selection icon, or detail drill-in. The real three-level structure remains: primary ability, secondary ability, tertiary group, then selectable training cards with dosage text.
 - Runtime evidence: exact `375×812` WeChatIDE MCP viewport `%TEMP%\wechatide-viewport-screenshot-1788247959031-j5w294.jpg` shows the data-driven hierarchy, direct card selection, and fixed temporary-group save bar. The visible selected card and count are real event state rather than Figma sample values. No production-code change was required in this migration.
 
+### Coach C11 Assessment task list (2026-09-01)
+
+- Current V3 node: `1564:7` (`/pages/coach/test-tasks/index`), non-destructively cloned from preserved historical source `93:1002` and named `C11 · Assessment Tasks · Current V3 · Runtime Reviewed`.
+- Runtime review: the task list keeps the full-screen navigation, task-state filters, real task cards/progress and coach TabBar. The shared topbar contract is now `height: 88rpx` with `box-sizing: content-box` and inline safe-area/menu insets; the legacy `176rpx` compensation was removed without changing the rendered first-viewport layout.
+- Verification: C11 targeted Vitest `9/9`, `apps/miniprogram-cq-talent` TypeScript `tsc --noEmit`, and an exact `375×812` WeChatIDE MCP viewport capture `%TEMP%\wechatide-viewport-screenshot-1788248438586-u0siuk.jpg` all passed. Task dates, state labels and participant totals remain the real account data rather than Figma sample values.
+
 ## Verification
 
 - Figma: 每个新 page 和画板都以 MCP 读取、截图并回读 node id。

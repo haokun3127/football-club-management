@@ -172,12 +172,13 @@ describe("coach assessment task list", () => {
     expect(page.data.state).toBe("ready");
   });
 
-  it("uses the C11 Figma navigation, unavailable create affordances, and WXML-safe real-data layout", () => {
+  it("uses the standard 88rpx C11 topbar with safe-area padding and WXML-safe real-data layout", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).toContain('"status-view"');
     expect(pageConfig).not.toContain('"app-header"');
     expect(template).toContain('class="tasks-nav"');
-    expect(template).toContain('height:calc(176rpx - {{navInset}}px)');
+    expect(template).toContain('style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"');
+    expect(template).not.toContain('height:calc(176rpx - {{navInset}}px)');
     expect(template).toContain('padding-right:{{menuInset}}px');
     expect(template).toContain('class="tasks-nav__create"');
     expect(template).toContain('class="tasks-fab"');
@@ -190,7 +191,7 @@ describe("coach assessment task list", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("createTask");
     expect(controller).toContain("resolveMenuInset");
-    expect(stylesheet).toMatch(/\.tasks-nav\s*\{[^}]*height:\s*176rpx[^}]*box-sizing:\s*content-box/s);
+    expect(stylesheet).toMatch(/\.tasks-nav\s*\{[^}]*height:\s*88rpx[^}]*box-sizing:\s*content-box/s);
     expect(stylesheet).toMatch(/\.tasks-nav\s*\{[^}]*padding-left:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.tasks-nav__left\s*\{[^}]*gap:\s*0/s);
     expect(stylesheet).toMatch(/\.tasks-nav__title\s*\{(?=[^}]*font-size:\s*36rpx)(?=[^}]*line-height:\s*44rpx)/s);
