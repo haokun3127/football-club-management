@@ -90,9 +90,13 @@
   overflow: hidden;
 }
 
-/* Eight real dimensions need one extra 24px row so the total never covers the canvas labels. */
+/* Eight real dimensions need extra headroom so the top canvas labels never touch the title. */
 .radar-hero--dense {
-  height: 568rpx;
+  height: 616rpx;
+}
+
+.radar-hero--dense .radar-hero__plot {
+  padding-top: 24rpx;
 }
 
 .radar-hero__head {

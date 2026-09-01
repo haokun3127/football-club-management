@@ -75,6 +75,12 @@
 - The V3 state keeps the dimmed assessment shell, centered “评分已自动保存” recovery card, truthful continue/exit actions and coach TabBar. It is a page-local draft state, not a server submission result.
 - The current production activity has no assessment template, so the exact modal state could not be opened through a real task in this session. C12.1 remains a design baseline pending a real task with a valid local draft; no fake draft was created.
 
+### Coach C13 Student radar (2026-09-01)
+
+- Current V3 node: `1567:7` (`/pages/coach/student-radar/index`), non-destructively cloned from preserved historical source `93:1080` and named `C13 · Student Radar · Current V3 · Runtime Reviewed`.
+- Runtime review found a real-data density edge case: the account returned eight dimensions while the historical sample showed six, causing the top canvas label to approach the hero title. The page now applies a dense-radar class with extra hero height and `24rpx` plot headroom; six-dimension layouts remain unchanged.
+- Verification: C13 targeted Vitest `11/11`, mini-program TypeScript passed, and the refreshed WeChatIDE MCP screenshot `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788254323282-8cjn90.jpg` is exact `375×812`. Figma node `1567:7` was screenshot-read after cloning. Student names, dimensions, scores and assessment period remain real API data.
+
 ## Verification
 
 - Figma: 每个新 page 和画板都以 MCP 读取、截图并回读 node id。
