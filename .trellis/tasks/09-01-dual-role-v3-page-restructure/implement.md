@@ -176,6 +176,12 @@
 - 当前教练会话以真实授权活动 `event-cq-talent-secure-test-1-trn-0818` 打开运行态，微信开发者工具 MCP 截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270675679-uzpebj.png` 严格 `375×812`。顶栏、深色课程卡、已到绿色勾／未到灰色头像、中文姓名、训练内容、快捷入口与固定教练 TabBar 均可见。
 - Figma 画板使用 19 人名单示例，当前真实活动返回 8 名授权学员，因此出勤卡高度和下方内容首屏位置不同；此为真实数据密度差异，不通过伪造名单或硬编码高度消除。未发现确定性结构、样式或交互缺陷，本页无业务代码改动。
 
+### C4 点名运行复核（2026-09-01）
+
+- V6 在线基准为 `1610:1577`（`/pages/coach/attendance/index?id=<activityId>`）。该页是独立全屏点名页面：返回、提交、课程摘要和头像点按式名单；绿色勾为已到、灰色头像为未到，姓名必须在头像下方，不显示销课或课时更正流程。
+- 当前教练会话以真实授权活动 `event-cq-talent-secure-test-1-trn-0818` 打开运行态，微信开发者工具 MCP 截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270740951-d0z62o.png` 严格 `375×812`。顶栏、提交、课程卡、8 名真实学员的绿／灰状态与姓名、固定 TabBar 均可见。
+- 本轮只读验收，未点击头像或提交，避免修改生产出勤。在线稿的 19 人只是展示密度样例；当前授权活动的 8 人名单导致卡片较短，不构成布局缺陷。未发现需要修复的确定性差异。
+
 ### V5 首批复验（2026-09-01）
 
 - 重新通过微信开发者工具 MCP 取得三张严格 `375×812` 运行截图：`%TEMP%\\cq-talent-visual-evidence\\v5-c1-schedule-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-training-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-1-selector-rerun-20260901.png`。
