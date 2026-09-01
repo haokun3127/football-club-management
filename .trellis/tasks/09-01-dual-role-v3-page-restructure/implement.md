@@ -182,6 +182,12 @@
 - 当前教练会话以真实授权活动 `event-cq-talent-secure-test-1-trn-0818` 打开运行态，微信开发者工具 MCP 截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270740951-d0z62o.png` 严格 `375×812`。顶栏、提交、课程卡、8 名真实学员的绿／灰状态与姓名、固定 TabBar 均可见。
 - 本轮只读验收，未点击头像或提交，避免修改生产出勤。在线稿的 19 人只是展示密度样例；当前授权活动的 8 人名单导致卡片较短，不构成布局缺陷。未发现需要修复的确定性差异。
 
+### C6 比赛记录运行复核（2026-09-01）
+
+- V6 在线基准为 `1610:1692`（`/pages/coach/match/index?id=<activityId>`）。页面包含比赛摘要、比分、编辑比赛、按分钟排列的事件时间线及“添加事件”入口；事件内容必须来自真实比赛记录，不以 Figma 示例覆盖。
+- 当前教练会话以真实已完成比赛 `event-cq-talent-secure-test-1-completed-match` 打开运行态，微信开发者工具 MCP 截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270802072-j4oamy.png` 严格 `375×812`。赛事标题、真实 `4:2` 比分、编辑／添加事件、中文事件类型和底部 TabBar 均正常可见。
+- Figma 首屏仅用三条事件说明结构，真实比赛返回更多事件（含进球、助攻、犯规、黄牌、乌龙球等）并由页面滚动展示；没有截断、英文伪数据或 TabBar 遮挡。此轮不编辑或写入比赛，无业务代码改动。
+
 ### V5 首批复验（2026-09-01）
 
 - 重新通过微信开发者工具 MCP 取得三张严格 `375×812` 运行截图：`%TEMP%\\cq-talent-visual-evidence\\v5-c1-schedule-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-training-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-1-selector-rerun-20260901.png`。
