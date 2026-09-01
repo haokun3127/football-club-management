@@ -200,6 +200,12 @@
 - 微信开发者工具 MCP 截图严格 `375×812`：C8 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270926891-bfgw1t.png`，C8.1 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270944226-lssxwk.png`。当前真实会话显示“我的球队 U10精英队”、真实统计和课程；选择页只列出后台分配的 U10精英队并标为当前选择。
 - 在线稿包含多队样例，当前账号实际只有一支已授权队伍，因此 C8.1 只显示一项是权限正确性而非缺陷。未点击队伍以避免切换上下文；C1 日程继续没有选队入口，边界保持正确。无业务代码改动。
 
+### P1 家长日程周态／月历展开运行复核（2026-09-01）
+
+- 通过真实双角色入口从 `/pages/coach/me/index` 点击“当前身份 教练端 切换 ›”后，模拟器实际跳转到家长端日程；没有伪造会话或改写接口。页面栈查询发生在异步切换完成之前，最终严格 `375×812` 截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788271024664-vv366q.png` 证明已在家长端。
+- V6 在线基准：周态 `1610:2`，月历展开 `1610:175`，路由 `/pages/parent/schedule/index`。周态保持通知铃铛、无日程 Hero、通知 banner、前后翻周、周条及家长 TabBar；真实截图为 `wechatide-simulator-screenshot-1788271024664-vv366q.png`（`375×812`）。
+- 点击 `.week-nav__expand` 后，运行态 `isMonthPickerExpanded=true`，真实月历截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788271066157-v9mx2k.png` 严格 `375×812`。月历显示真实当月日期与活动标记，选中日期红圈未与训练绿色点重合，月历、顶部和 TabBar 均无截断。无业务代码改动。
+
 ### V5 首批复验（2026-09-01）
 
 - 重新通过微信开发者工具 MCP 取得三张严格 `375×812` 运行截图：`%TEMP%\\cq-talent-visual-evidence\\v5-c1-schedule-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-training-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-1-selector-rerun-20260901.png`。
