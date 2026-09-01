@@ -2,7 +2,7 @@
 
 1. [x] 读取现有 Parent/Coach Figma 树与已验证 V3 画板，建立两个新增 current-product 页面和各自总览（Parent `1462:2` / `1464:2`；Coach `1462:3` / `1464:303`）。
 2. [x] 将 P1 三态迁入 Parent V3，建立 P4/P5/P8/P7 的当前画板位置与路由映射；P1 新节点为 `1465:546`／`1465:719`／`1465:1010`，均已截图回读。P4/P5/P8/P7 当前来源副本为 `1467:185`／`1467:315`／`1467:435`／`1467:527`，均已截图回读并只在新副本修正为“日程 / 成长 / 发现 / 我的孩子”；它们仍待逐页 V3 审查。
-3. [x] 将 C1/C8/C8.1 迁入 Coach V3，建立 C2/C4/C6/C7/C14/C16 的当前画板位置与路由映射；C1/C8/C8.1 新节点为 `1465:7`／`1465:146`／`1465:253`，均已截图回读。C2/C6/C16 当前来源副本为 `1467:726`／`1467:784`／`1467:868`；C4 `1536:7`、C7 `1544:7`、C14 `1546:7` 已各自完成运行态 V3 对照。
+3. [x] 将 C1/C8/C8.1 迁入 Coach V3，建立 C2/C4/C6/C7/C14/C16 的当前画板位置与路由映射；C1/C8/C8.1 新节点为 `1465:7`／`1465:146`／`1465:253`，均已截图回读。C2/C6/C16 当前来源副本为 `1467:726`／`1467:784`／`1467:868`；C4 `1536:7`、C7 `1544:7`、C14 `1546:7`、C16 `1467:868` 已各自完成运行态 V3 对照。
 4. [ ] 为每个尚未改版的画板读取现有在线稿和代码，按主演示链做非破坏性 V3 改版；不跨页面整批修改小程序。
 5. [ ] 每一页按“Figma → 最小代码修改 → 定向测试/TypeScript → WeChatIDE MCP 375×812 截图 → 文档 → 路径限定提交”的循环收口。
 6. [ ] 最后更新 Figma 映射、进度与任务证据，并以路径限定提交页面整理文档；不将其他工作区脏改动一并提交。
@@ -37,6 +37,13 @@
 - Information architecture: C14 inherits the current training-team id from C8 (`coach-training-team-id`) but cannot select a team itself. It renders the selected team in a compact context card, an all-player four-column direct selector, and the selected player's real radar; the schedule stays all-team and has no selector.
 - API contract: `GET /coach/team?teamId=<id>` and `GET /coach/team/ability-overview?teamId=<id>` now reject a team outside the coach's assigned scope with `403`. C14 reads the first endpoint for the selected team's real member roster and `/coach/students/:studentId/radar` for each selected player's real metrics.
 - Verification: C14 targeted Vitest 5/5, API scoped endpoint test passed, both package TypeScript checks passed, and WeChat DevTools MCP compiled WXML/WXSS. The final full workspace gate passed: domain 21/21, mini-program 443/443, API 123/123. Runtime evidence: `%TEMP%\cq-talent-visual-evidence\wechatide-mcp-1788245745779-2245660382334.png`; direct interaction evidence: `%TEMP%\cq-talent-visual-evidence\c14-player-selection-20260901.png` (the active player changed from 丁宁 to 方圆, with the radar and active avatar updated).
+
+### Coach C16 My profile (2026-09-01)
+
+- Current V3 node: `1467:868` (`/pages/coach/me/index`), renamed `C16 · My · Current V3 · Runtime Reviewed`. The online design now uses the truthful labels `教练` and `近30天日程` rather than an unverified seniority title or a season-wide count.
+- Data contract: C16 reads `/coach/home` for the explicit 30-day total and `/coach/team` (no team id) for the coach's default assigned team's member count and attendance rate. It only displays that team; team selection remains exclusive to C8 Training Management.
+- Interaction: when parent entitlement exists, the profile keeps the explicit identity switch. Logout is a direct session clear and full-screen launch-route transition with no popup/modal.
+- Verification: `pages/coach/me/index.test.mjs` 9/9 passed; `apps/miniprogram-cq-talent` `tsc --noEmit` passed; `git diff --check` for the two C16 files passed. The full workspace gate then passed: domain 21/21, mini-program 443/443, API 123/123. Runtime evidence: `%TEMP%\cq-talent-visual-evidence\wechatide-mcp-1788247215884-34748290184239.png` with sidecar, captured by `wechatide-mcp simulator_screenshot` at a true `375×812`. The rendered account showed real values `26 / 19 / 93%`, not Figma sample values.
 
 ## Verification
 

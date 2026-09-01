@@ -3,24 +3,27 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   getCoachHome: vi.fn(),
+  getCoachTeam: vi.fn(),
   switchActiveRole: vi.fn(),
   requireRole: vi.fn(),
   routeHome: vi.fn(),
   openPage: vi.fn(),
   persistAuthenticatedSession: vi.fn(),
   clearSession: vi.fn(),
-  showModal: vi.fn(),
   reLaunch: vi.fn(),
 }));
 
-vi.mock("../../../utils/api", () => ({ getCoachHome: mocks.getCoachHome, switchActiveRole: mocks.switchActiveRole }));
+vi.mock("../../../utils/api", () => ({
+  getCoachHome: mocks.getCoachHome,
+  getCoachTeam: mocks.getCoachTeam,
+  switchActiveRole: mocks.switchActiveRole,
+}));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole, routeHome: mocks.routeHome }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
 vi.mock("../../../utils/store", () => ({ clearSession: mocks.clearSession, persistAuthenticatedSession: mocks.persistAuthenticatedSession }));
 vi.mock("../../../utils/presentation", () => ({ resolveMenuInset: () => 16, resolveNavInset: () => 0 }));
 
 globalThis.wx = {
-  showModal: mocks.showModal,
   reLaunch: mocks.reLaunch,
 };
 
@@ -47,6 +50,12 @@ const home = {
   pendingItems: [],
 };
 
+const team = {
+  team: { id: "team-actual", name: "实际U10精英队", season: "2026-2027赛季" },
+  stats: { memberCount: 18, trainingCount: 8, completedTrainingCount: 6, attendanceRate: 89 },
+  members: [],
+};
+
 function deferred() {
   let resolve;
   let reject;
@@ -66,48 +75,62 @@ function createPageInstance(data = {}) {
 describe("coach profile", () => {
   beforeEach(() => {
     mocks.getCoachHome.mockReset().mockResolvedValue(home);
+    mocks.getCoachTeam.mockReset().mockResolvedValue(team);
     mocks.switchActiveRole.mockReset();
     mocks.requireRole.mockReset().mockReturnValue(session);
     mocks.routeHome.mockReset();
     mocks.openPage.mockReset();
     mocks.clearSession.mockReset();
     mocks.persistAuthenticatedSession.mockReset().mockImplementation((result) => ({ role: result.session.activeRole }));
-    mocks.showModal.mockReset();
     mocks.reLaunch.mockReset();
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 10, 12));
   });
 
-  it("uses the session identity and one explicit frozen 30-day coach-home range", async () => {
+  it("uses the session identity, one explicit 30-day range, and real default-team profile statistics", async () => {
     const page = createPageInstance();
 
     await page.load();
 
     expect(mocks.getCoachHome).toHaveBeenCalledTimes(1);
     expect(mocks.getCoachHome).toHaveBeenCalledWith({ from: "2026-07-12", to: "2026-08-10" });
+    expect(mocks.getCoachTeam).toHaveBeenCalledTimes(1);
     expect(page.data).toMatchObject({
       state: "ready",
       displayName: "Session coach",
       avatarLetter: "S",
-      teamsText: "Actual team",
+      teamsText: "实际U10精英队",
       profileStats: [
-        { label: "近 30 天日程", value: "0" },
-        { label: "训练场次", value: "0" },
-        { label: "比赛场次", value: "0" },
+        { label: "近30天日程", value: "0" },
+        { label: "在队学员", value: "18" },
+        { label: "平均出勤", value: "89%" },
       ],
     });
   });
 
-  it("makes no coach-home request for a non-coach and keeps an empty team state honest", async () => {
+  it("makes no requests for a non-coach and keeps an empty team state honest", async () => {
     mocks.requireRole.mockReturnValueOnce(null);
     const denied = createPageInstance();
     await denied.load();
     expect(mocks.getCoachHome).not.toHaveBeenCalled();
+    expect(mocks.getCoachTeam).not.toHaveBeenCalled();
 
-    mocks.getCoachHome.mockResolvedValueOnce({ ...home, teams: [] });
+    mocks.getCoachTeam.mockResolvedValueOnce({
+      team: null,
+      stats: { memberCount: 0, trainingCount: 0, completedTrainingCount: 0, attendanceRate: null },
+      members: [],
+    });
     const page = createPageInstance();
     await page.load();
-    expect(page.data).toMatchObject({ state: "ready", teamsText: "暂无近30天负责球队" });
+    expect(page.data).toMatchObject({
+      state: "ready",
+      teamsText: "暂无负责球队",
+      profileStats: [
+        { label: "近30天日程", value: "0" },
+        { label: "在队学员", value: "0" },
+        { label: "平均出勤", value: "待同步" },
+      ],
+    });
   });
 
   it("keeps a current coach-home failure safe", async () => {
@@ -134,12 +157,12 @@ describe("coach profile", () => {
     const firstLoad = page.load();
     await Promise.resolve();
     const secondLoad = page.load();
-    second.resolve({ ...home, teams: ["Newest actual team"] });
+    second.resolve(home);
     await secondLoad;
     first.reject(new Error("older failure must not replace current data"));
     await firstLoad;
 
-    expect(page.data).toMatchObject({ state: "ready", teamsText: "Newest actual team" });
+    expect(page.data).toMatchObject({ state: "ready", teamsText: "实际U10精英队" });
     expect(page.data.message).not.toContain("older failure");
 
     const staleSuccess = deferred();
@@ -150,12 +173,12 @@ describe("coach profile", () => {
     const staleLoad = page.load();
     await Promise.resolve();
     const latestLoad = page.load();
-    latestSuccess.resolve({ ...home, teams: ["Latest actual team"] });
+    latestSuccess.resolve(home);
     await latestLoad;
     staleSuccess.resolve({ ...home, teams: ["Old actual team"] });
     await staleLoad;
 
-    expect(page.data).toMatchObject({ state: "ready", teamsText: "Latest actual team" });
+    expect(page.data).toMatchObject({ state: "ready", teamsText: "实际U10精英队" });
   });
 
   it("navigates only through the four existing coach profile routes", () => {
@@ -218,21 +241,10 @@ describe("coach profile", () => {
     expect(mocks.switchActiveRole).not.toHaveBeenCalled();
   });
 
-  it("does not clear a session on cancel and confirms logout only once", () => {
-    const callbacks = [];
-    mocks.showModal.mockImplementation((options) => { callbacks.push(options.success); });
+  it("clears the session and relaunches once without a modal", () => {
     const page = createPageInstance();
 
     page.logout();
-    page.logout();
-    expect(mocks.showModal).toHaveBeenCalledTimes(1);
-    callbacks[0]({ confirm: false });
-    expect(mocks.clearSession).not.toHaveBeenCalled();
-    expect(mocks.reLaunch).not.toHaveBeenCalled();
-
-    page.logout();
-    callbacks[1]({ confirm: true });
-    callbacks[1]({ confirm: true });
     page.logout();
     expect(mocks.clearSession).toHaveBeenCalledTimes(1);
     expect(mocks.reLaunch).toHaveBeenCalledTimes(1);
@@ -252,7 +264,10 @@ describe("coach profile", () => {
     expect(template).toContain('class="c16-profile"');
     expect(template).toContain('<view class="c16-logout" bindtap="logout">退出登录</view>');
     expect(template).not.toContain('<button class="c16-logout"');
-    expect(template).not.toMatch(/主教练|本赛季执教|在队学员|平均出勤/);
+    expect(controller).toContain('label: "近30天日程"');
+    expect(controller).toContain('label: "在队学员"');
+    expect(controller).toContain('label: "平均出勤"');
+    expect(template).not.toMatch(/主教练|本赛季执教/);
     expect(controller).not.toContain("home.coachName");
     expect(controller).not.toContain("readableError");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);

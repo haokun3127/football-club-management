@@ -1,4 +1,4 @@
-import { getCoachHome, switchActiveRole } from "../../../utils/api";
+import { getCoachHome, getCoachTeam, switchActiveRole } from "../../../utils/api";
 import { requireRole, routeHome } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
@@ -38,18 +38,21 @@ Page<PageData>({
     });
 
     try {
-      const home = await getCoachHome(recentThirtyDayRange(new Date()));
+      const [home, teamDetail] = await Promise.all([
+        getCoachHome(recentThirtyDayRange(new Date())),
+        getCoachTeam(),
+      ]);
       if (!isCurrentRequest(this, requestToken)) return;
 
-      const teams = toTeams(home.teams);
+      const currentTeamName = teamDetail.team?.name?.trim() || "暂无负责球队";
       this.setData({
         state: "ready",
         message: "",
         displayName,
         avatarLetter: displayName.slice(0, 1),
-        teamsText: teams.length ? teams.join("、") : "暂无近30天负责球队",
-        hasTeams: teams.length > 0,
-        profileStats: toProfileStats(home.summary),
+        teamsText: currentTeamName,
+        hasTeams: Boolean(teamDetail.team),
+        profileStats: toProfileStats(home.summary, teamDetail.stats),
         canSwitchToParent: session.availableRoles.includes("parent"),
       });
     } catch {
@@ -90,25 +93,14 @@ Page<PageData>({
   },
   logout() {
     const state = this as unknown as LogoutState;
-    if (state._c16LogoutModalOpen || state._c16LogoutFinished) return;
-    state._c16LogoutModalOpen = true;
-
-    wx.showModal({
-      title: "退出登录",
-      content: "退出后需重新选择身份登录",
-      success: (result) => {
-        state._c16LogoutModalOpen = false;
-        if (!result.confirm || state._c16LogoutFinished) return;
-        state._c16LogoutFinished = true;
-        clearSession();
-        wx.reLaunch({ url: "/pages/launch/index" });
-      },
-    });
+    if (state._c16LogoutFinished) return;
+    state._c16LogoutFinished = true;
+    clearSession();
+    wx.reLaunch({ url: "/pages/launch/index" });
   },
 });
 
 interface LogoutState {
-  _c16LogoutModalOpen?: boolean;
   _c16LogoutFinished?: boolean;
 }
 
@@ -120,9 +112,9 @@ function emptyPageData(state: LoadState, message: string): PageData {
     message,
     displayName: "教练",
     avatarLetter: "教",
-    teamsText: "暂无近30天负责球队",
+    teamsText: "暂无负责球队",
     hasTeams: false,
-    profileStats: toProfileStats({ total: 0, training: 0, matches: 0 }),
+    profileStats: toProfileStats({ total: 0 }, { memberCount: 0, attendanceRate: null }),
     canSwitchToParent: false,
   };
 }
@@ -144,15 +136,14 @@ function sessionDisplayName(value: string | undefined) {
   return value?.trim() || "教练";
 }
 
-function toTeams(teams: string[]) {
-  return teams.filter((team, index) => Boolean(team?.trim()) && teams.indexOf(team) === index);
-}
-
-function toProfileStats(summary: { total: number; training: number; matches: number }): ProfileStat[] {
+function toProfileStats(
+  summary: { total: number },
+  teamStats: { memberCount: number; attendanceRate: number | null },
+): ProfileStat[] {
   return [
-    { label: "近 30 天日程", value: String(summary.total) },
-    { label: "训练场次", value: String(summary.training) },
-    { label: "比赛场次", value: String(summary.matches) },
+    { label: "近30天日程", value: String(summary.total) },
+    { label: "在队学员", value: String(teamStats.memberCount) },
+    { label: "平均出勤", value: teamStats.attendanceRate === null ? "待同步" : `${teamStats.attendanceRate}%` },
   ];
 }
 
