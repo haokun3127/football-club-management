@@ -126,8 +126,8 @@ describe("coach schedule home", () => {
         nextActionLabel: "Record attendance",
       }],
     });
-    expect(page.data.dayStrip.map((day) => day.weekLabel)).toEqual(["一", "二", "三", "四", "五", "六", "日"]);
-    expect(page.data.collapsedDayStrip.map((day) => day.weekLabel)).toEqual(["一", "二", "三", "四", "五", "六"]);
+    expect(page.data.dayStrip.map((day) => day.weekLabel)).toEqual(["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]);
+    expect(page.data.collapsedDayStrip.map((day) => day.weekLabel)).toEqual(["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]);
   });
 
   it("keeps empty and failed coach-home loads honest", async () => {
@@ -154,7 +154,6 @@ describe("coach schedule home", () => {
     const page = createPageInstance();
     const routes = {
       attendance: "/pages/coach/attendance/index?id=event-1",
-      lesson: "/pages/coach/lesson/index?id=event-1",
       match: "/pages/coach/match/index?id=event-1",
       assessment: "/pages/coach/test-entry/index?eventId=event-1",
       training: "/pages/coach/content-select/index?eventId=event-1",
@@ -165,6 +164,9 @@ describe("coach schedule home", () => {
       page.openTask({ currentTarget: { dataset: { id: "event-1", action } } });
       expect(mocks.openPage).toHaveBeenLastCalledWith(route);
     });
+    const callCount = mocks.openPage.mock.calls.length;
+    page.openTask({ currentTarget: { dataset: { id: "event-1", action: "lesson" } } });
+    expect(mocks.openPage).toHaveBeenCalledTimes(callCount);
   });
 
   it("moves the coach date strip forward and backward by a full week", () => {
@@ -193,7 +195,7 @@ describe("coach schedule home", () => {
     expect(page.data.viewMode).toBe("day");
   });
 
-  it("keeps C1 week navigation visible and separately tappable", () => {
+  it("stacks weekday over date in the C1 strip and keeps its controls separately tappable", () => {
     expect(template).toContain('class="c1-dates__arrow c1-dates__arrow--previous" data-offset="-7" bindtap="changeWeek"');
     expect(template).toContain('class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek"');
     expect(template).toContain('<image src="/assets/icons/chevron-left.svg" mode="aspectFit" />');
@@ -201,12 +203,14 @@ describe("coach schedule home", () => {
     expect(template).toContain('<block wx:if="{{viewMode === \'month\'}}">');
     expect(template).toContain('class="c1-month-calendar"');
     expect(template).toMatch(/(?:bindtap|catchtap)="expandMonthPicker"/);
-    expect(template).toContain('<image class="c1-dates__expand-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" />');
     expect(template).toContain('<view class="c1-month-calendar__collapse" bindtap="collapseMonthPicker" aria-label="收起月历"><image class="c1-month-calendar__collapse-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>');
     expect(template).toContain('class="c1-week-nav" bindtap="expandMonthPicker"');
     expect(template).toContain('wx:for="{{collapsedDayStrip}}"');
     expect(template).not.toContain('wx:for="{{dayStrip}}"');
     expect(template).toContain('data-date="{{item.date}}" catchtap="selectDay"');
+    expect(template).toContain('<view class="c1-day__week">{{item.weekLabel}}</view>');
+    expect(template).toContain('<view class="c1-day__num">{{item.dayNum}}</view>');
+    expect(template).not.toContain('class="c1-day__label"');
     expect(stylesheet).toMatch(/\.c1-dates\s*\{[^}]*display:\s*block[^}]*height:\s*128rpx[^}]*padding:\s*0[^}]*border-radius:\s*24rpx/s);
     expect(stylesheet).toMatch(/\.c1-dates__arrow\s*\{[^}]*flex:\s*0\s+0\s+48rpx[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c1-dates__arrow\s*\{[^}]*top:\s*50%[^}]*transform:\s*translateY\(-50%\)/s);
@@ -214,18 +218,13 @@ describe("coach schedule home", () => {
     expect(stylesheet).toMatch(/\.c1-dates__arrow--next\s*\{[^}]*right:\s*0[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c1-dates__arrow--previous\s+image\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c1-dates__arrow--next\s+image\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
-    const expandMatches = [...stylesheet.matchAll(/\.c1-dates__expand\s*\{([^}]*)\}/g)];
-    expect(expandMatches.length).toBeGreaterThanOrEqual(1);
-    const expand = expandMatches[0]?.[1] ?? "";
-    expect(expand).toContain("position: static");
-    expect(expand).toContain("grid-column: 7");
-    expect(expand).toContain("align-self: center");
-    expect(expand).toContain("transform: none");
-    expect(expand).not.toContain("bottom:");
-    expect(stylesheet).toMatch(/\.c1-dates__expand-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx[^}]*transform:\s*none/s);
-    expect(stylesheet).toMatch(/\.c1-week-nav\s*\{[^}]*position:\s*absolute[^}]*top:\s*24rpx[^}]*left:\s*52rpx[^}]*display:\s*grid[^}]*grid-template-columns:\s*repeat\(6,\s*88rpx\)\s+96rpx[^}]*column-gap:\s*4rpx[^}]*width:\s*648rpx/s);
-    expect(stylesheet).toMatch(/\.c1-day\s*\{[^}]*flex:\s*0\s+0\s+88rpx[^}]*height:\s*80rpx/s);
-    expect(stylesheet).toMatch(/\.c1-dates__expand\s*\{[^}]*position:\s*static[^}]*width:\s*96rpx[^}]*height:\s*64rpx[^}]*border-radius:\s*16rpx/s);
+    expect(stylesheet).toMatch(/\.c1-week-nav\s*\{[^}]*position:\s*absolute[^}]*top:\s*24rpx[^}]*left:\s*44rpx[^}]*display:\s*grid[^}]*grid-template-columns:\s*repeat\(7,\s*88rpx\)[^}]*column-gap:\s*8rpx[^}]*width:\s*664rpx/s);
+    expect(stylesheet).toMatch(/\.c1-day\s*\{[^}]*flex:\s*0\s+0\s+88rpx[^}]*flex-direction:\s*column[^}]*height:\s*80rpx[^}]*border-radius:\s*32rpx/s);
+    expect(stylesheet).toMatch(/\.c1-day__week\s*\{[^}]*color:\s*#667085[^}]*font-size:\s*20rpx[^}]*line-height:\s*24rpx/s);
+    expect(stylesheet).toMatch(/\.c1-day__num\s*\{[^}]*color:\s*#202124[^}]*font-size:\s*24rpx[^}]*line-height:\s*28rpx/s);
+    expect(stylesheet).toMatch(/\.c1-day--selected\s*\{[^}]*background:\s*#a80f1b/s);
+    expect(stylesheet).toMatch(/\.c1-day--selected\s+\.c1-day__week,\s*\.c1-day--selected\s+\.c1-day__num\s*\{[^}]*color:\s*#ffffff/s);
+    expect(template).not.toContain('class="c1-dates__expand"');
     expect(stylesheet).toMatch(/\.c1-month-calendar\s*\{[^}]*min-height:\s*840rpx[^}]*margin:\s*32rpx\s+32rpx\s+0/s);
     expect(stylesheet).toMatch(/\.c1-month-calendar__collapse\s*\{[^}]*width:\s*60rpx[^}]*height:\s*32rpx[^}]*border-radius:\s*16rpx/s);
     expect(stylesheet).toMatch(/\.c1-month-calendar__collapse-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx[^}]*line-height:\s*0/s);
@@ -279,6 +278,8 @@ describe("coach schedule home", () => {
 
   it("keeps the all-teams context visible when the selected date has no events", () => {
     expect(template).toContain('wx:if="{{state !== \'loading\' && state !== \'error\'}}" class="c1-all-teams-context"');
+    expect(stylesheet).toMatch(/\.c1-all-teams-context\s*\{(?=[^}]*flex-direction:\s*row)(?=[^}]*height:\s*98rpx)/s);
+    expect(stylesheet).toMatch(/\.c1-all-teams-context__copy\s*\{(?=[^}]*margin-left:\s*12rpx)(?=[^}]*margin-top:\s*0)/s);
   });
 
   it("matches the C1 online hero and stats-row offsets without moving activity cards off their 22px rail", () => {

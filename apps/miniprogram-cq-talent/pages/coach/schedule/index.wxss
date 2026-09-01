@@ -26,15 +26,15 @@
 .c1-dates__arrow--next { right: 0; width: 48rpx; height: 48rpx; }
 .c1-dates__arrow--next image { display: block; width: 48rpx; height: 48rpx; }
 .c1-dates__days { display: flex; flex: 1; min-width: 0; }
-.c1-day { display: flex; flex: 0 0 88rpx; flex-direction: column; align-items: center; justify-content: center; width: 88rpx; height: 80rpx; border-radius: 16rpx; }
-.c1-day--selected { background: transparent; }
-.c1-day__week { color: #667085; font-size: 20rpx; line-height: 24rpx; }.c1-day__num { color: #202124; font-size: 28rpx; font-weight: 600; line-height: 34rpx; }
-.c1-day--selected .c1-day__week { color: #ffffff; }
-.c1-day--selected .c1-day__num { display: flex; align-items: center; justify-content: center; width: 80rpx; height: 80rpx; border-radius: 40rpx; background: #a80f1b; color: #ffffff; }
+.c1-day { display: flex; flex: 0 0 88rpx; flex-direction: column; align-items: center; justify-content: center; width: 88rpx; height: 80rpx; border-radius: 32rpx; }
+.c1-day__week { color: #667085; font-size: 20rpx; line-height: 24rpx; }
+.c1-day__num { color: #202124; font-size: 24rpx; font-weight: 600; line-height: 28rpx; }
+.c1-day--selected { background: #a80f1b; }
+.c1-day--selected .c1-day__week, .c1-day--selected .c1-day__num { color: #ffffff; }
 
-.c1-all-teams-context { display: flex; flex-direction: column; justify-content: center; height: 152rpx; padding: 22rpx 42rpx; box-sizing: border-box; border-bottom: 1rpx solid #eef0f4; background: #ffffff; }
+.c1-all-teams-context { display: flex; flex-direction: row; align-items: center; justify-content: flex-start; height: 98rpx; padding: 22rpx 42rpx; box-sizing: border-box; border-bottom: 1rpx solid #eef0f4; background: #ffffff; }
 .c1-all-teams-context__label { color: #202124; font-size: 28rpx; font-weight: 700; line-height: 36rpx; }
-.c1-all-teams-context__copy { margin-top: 8rpx; color: #667085; font-size: 22rpx; line-height: 30rpx; }
+.c1-all-teams-context__copy { margin-top: 0; margin-left: 12rpx; color: #667085; font-size: 22rpx; line-height: 30rpx; white-space: nowrap; }
 
 .c1-body { padding: 0 44rpx calc(148rpx + env(safe-area-inset-bottom)); }
 .c1-hero { display: flex; flex-direction: column; gap: 24rpx; min-height: 360rpx; margin: 0 -12rpx; padding: 32rpx; box-sizing: border-box; border-radius: 32rpx; background: #07111f; color: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0,0,0,.08); }

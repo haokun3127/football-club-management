@@ -5,7 +5,7 @@ import { openPage, openTab } from "../../../utils/navigation";
 import { activityStatus, formatCalendarDate, resolveMenuInset, resolveNavInset, resolveTopBarHeight } from "../../../utils/presentation";
 import type { CoachHome, CoachTask, CoachTaskAction, LoadState, ScheduleEvent } from "../../../utils/types";
 
-const WEEK_LABELS = ["日", "一", "二", "三", "四", "五", "六"];
+const WEEK_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 const initialDate = currentLocalDate();
 
 type Filter = "all" | "training" | "match" | "pending";
@@ -52,6 +52,12 @@ type HeroPillView = {
   tone: "primary" | "neutral";
 };
 
+type CoachDayStripItem = {
+  date: string;
+  weekLabel: string;
+  dayNum: string;
+};
+
 Page({
   data: {
     navInset: resolveNavInset(),
@@ -64,8 +70,8 @@ Page({
     selectedDate: initialDate,
     viewMode: "day" as ViewMode,
     activeFilter: "all" as Filter,
-    dayStrip: [] as Array<{ date: string; weekLabel: string; dayNum: string }>,
-    collapsedDayStrip: [] as Array<{ date: string; weekLabel: string; dayNum: string }>,
+    dayStrip: [] as CoachDayStripItem[],
+    collapsedDayStrip: [] as CoachDayStripItem[],
     rangeLabel: "",
     coachName: "",
     coachInitial: "",
@@ -207,13 +213,13 @@ Page({
     if (!id) return;
     const routes: Record<CoachTaskAction, string> = {
       attendance: `/pages/coach/attendance/index?id=${id}`,
-      lesson: `/pages/coach/lesson/index?id=${id}`,
       match: `/pages/coach/match/index?id=${id}`,
       assessment: `/pages/coach/test-entry/index?eventId=${id}`,
       training: `/pages/coach/content-select/index?eventId=${id}`,
       view: `/pages/coach/event/index?id=${id}`,
     };
-    openPage(routes[action ?? "view"]);
+    const route = routes[action ?? "view"];
+    if (route) openPage(route);
   },
   retry() {
     this.load();
