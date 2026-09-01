@@ -2,7 +2,7 @@
 
 1. [x] 读取现有 Parent/Coach Figma 树与已验证 V3 画板，建立两个新增 current-product 页面和各自总览（Parent `1462:2` / `1464:2`；Coach `1462:3` / `1464:303`）。
 2. [x] 将 P1 三态迁入 Parent V3，建立 P4/P5/P8/P7 的当前画板位置与路由映射；P1 新节点为 `1465:546`／`1465:719`／`1465:1010`，均已截图回读。P4/P5/P8/P7 当前来源副本为 `1467:185`／`1467:315`／`1467:435`／`1467:527`，均已截图回读并只在新副本修正为“日程 / 成长 / 发现 / 我的孩子”；它们仍待逐页 V3 审查。
-3. [x] 将 C1/C8/C8.1 迁入 Coach V3，建立 C2/C3/C4/C6/C7/C14/C16 的当前画板位置与路由映射；C1/C8/C8.1 新节点为 `1465:7`／`1465:146`／`1465:253`，均已截图回读。C2/C6/C16 当前来源副本为 `1467:726`／`1467:784`／`1467:868`；C3 `1561:7`、C4 `1536:7`、C7 `1544:7`、C14 `1546:7`、C16 `1467:868` 已各自完成运行态 V3 对照。
+3. [x] 将 C1/C8/C8.1 迁入 Coach V3，建立 C2/C3/C4/C6/C7/C10/C14/C16 的当前画板位置与路由映射；C1/C8/C8.1 新节点为 `1465:7`／`1465:146`／`1465:253`，均已截图回读。C2/C6/C16 当前来源副本为 `1467:726`／`1467:784`／`1467:868`；C3 `1561:7`、C4 `1536:7`、C7 `1544:7`、C10 `1563:7`、C14 `1546:7`、C16 `1467:868` 已各自完成运行态 V3 对照。
 4. [ ] 为每个尚未改版的画板读取现有在线稿和代码，按主演示链做非破坏性 V3 改版；不跨页面整批修改小程序。
 5. [ ] 每一页按“Figma → 最小代码修改 → 定向测试/TypeScript → WeChatIDE MCP 375×812 截图 → 文档 → 路径限定提交”的循环收口。
 6. [ ] 最后更新 Figma 映射、进度与任务证据，并以路径限定提交页面整理文档；不将其他工作区脏改动一并提交。
@@ -50,6 +50,12 @@
 - Current V3 node: `1561:7` (`/pages/coach/event-change/index?id=<activityId>`), cloned non-destructively from its still-preserved historical source `93:634` and renamed `C3 · Activity Change · Current V3 · Runtime Reviewed`.
 - Runtime review: the current page has the full-screen back/save header, activity summary, change-reason chips, time and venue fields, optional note, parent-notification switch and coach tabbar. The screenshot is WeChatIDE MCP `automation_viewport_action` at exact `375×812`: `%TEMP%\wechatide-viewport-screenshot-1788247717383-m1q6gg.jpg`.
 - Evidence boundary: source Figma is a 375px-wide scrollable 903px canvas, while the capture is the true first 812px device viewport. Event title/status, dates and empty-field state are real API/form-state differences. The canonical capture script successfully navigated and verified the route but the DevTools screenshot file was not created at its generated hidden temporary path; direct MCP viewport capture succeeded, so no production code or DevTools process was changed.
+
+### Coach C10 Training content selection (2026-09-01)
+
+- Current V3 node: `1563:7` (`/pages/coach/content-select/index?eventId=<activityId>`), non-destructively cloned from `93:952` and renamed `C10 · Training Content Select · Current V3 · Runtime Reviewed`.
+- User-approved simplification: the V3 search hint is `搜索训练动作`; there is no “动作要点” search wording, “查看动作要点” action, circular selection icon, or detail drill-in. The real three-level structure remains: primary ability, secondary ability, tertiary group, then selectable training cards with dosage text.
+- Runtime evidence: exact `375×812` WeChatIDE MCP viewport `%TEMP%\wechatide-viewport-screenshot-1788247959031-j5w294.jpg` shows the data-driven hierarchy, direct card selection, and fixed temporary-group save bar. The visible selected card and count are real event state rather than Figma sample values. No production-code change was required in this migration.
 
 ## Verification
 
