@@ -188,6 +188,12 @@
 - 当前教练会话以真实已完成比赛 `event-cq-talent-secure-test-1-completed-match` 打开运行态，微信开发者工具 MCP 截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270802072-j4oamy.png` 严格 `375×812`。赛事标题、真实 `4:2` 比分、编辑／添加事件、中文事件类型和底部 TabBar 均正常可见。
 - Figma 首屏仅用三条事件说明结构，真实比赛返回更多事件（含进球、助攻、犯规、黄牌、乌龙球等）并由页面滚动展示；没有截断、英文伪数据或 TabBar 遮挡。此轮不编辑或写入比赛，无业务代码改动。
 
+### C7 比赛战术板运行复核（2026-09-01）
+
+- V6 在线基准为 `1610:1778`（`/pages/coach/tactical-board/index?eventId=<activityId>`）。全屏工作面必须由上半球场、阵型切换、下半完整球员名单、拖拽上／下场、重置和保存构成，不显示教练 TabBar。
+- 当前教练会话以真实排兵比赛 `event-cq-talent-secure-test-1-scheduled-match` 打开运行态，微信开发者工具 MCP 截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270869987-a26yt3.png` 严格 `375×812`。`4-3-3`、11 名场上球员、8 名候补、球场、拖拽提示、重置／保存操作均可见。
+- Figma 编号为布局示例，真实运行显示当前比赛保存的球员姓名与编号。此轮不拖拽、不重置、不保存，避免覆盖已验证的持久化阵容；未发现当前首屏结构或底部操作区的确定性视觉差异。
+
 ### V5 首批复验（2026-09-01）
 
 - 重新通过微信开发者工具 MCP 取得三张严格 `375×812` 运行截图：`%TEMP%\\cq-talent-visual-evidence\\v5-c1-schedule-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-training-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-1-selector-rerun-20260901.png`。
