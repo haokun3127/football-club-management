@@ -40,3 +40,23 @@
 - 运行截图过期时，必须对同一路由重新调用 MCP，不得从旧路径是否存在推断页面状态。
 - C5/C5.1 仍按“点名即扣课”产品规则重定向到 C4，不作为独立当前页面验收。
 - C6.1 仍保留设计源差异：运行契约有 8 类中文事件，在线稿 `1580:7` 只有 6 类；这需要在线 Figma 改稿或产品范围确认，不能通过删除代码能力解决。
+
+## 后续重拍补充
+
+同一真实教练会话又通过 WeChatIDE MCP 重拍了 C13、C14、C15、C15.1、C16.1、C16.2、C16.3、C16.4；8 张首屏均返回 `375×812`，C16.4 另取得底部滚动段 `375×812`。截图保存于：
+
+`C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence\`
+
+对应文件分别为：
+
+- `c13-student-radar-current-20260901.png`
+- `c14-team-ability-current-20260901.png`
+- `c15-assessment-entry-current-20260901.png`
+- `c15-1-submit-current-20260901.png`
+- `c16-1-permissions-current-20260901.png`
+- `c16-2-interest-current-20260901.png`
+- `c16-3-account-current-20260901.png`
+- `c16-4-help-current-20260901.png`
+- `c16-4-help-current-bottom-20260901.png`
+
+这批导航后读取模拟器控制台错误过滤无命中；未发现 `wx:else`、`route is not defined`、`appid missing`、`not-found` 或页面加载错误。
