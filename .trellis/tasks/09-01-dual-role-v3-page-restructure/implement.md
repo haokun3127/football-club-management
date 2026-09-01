@@ -212,6 +212,18 @@
 - P4 真实运行截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788271133082-uyqoe7.png` 严格 `375×812`，显示真实训练课时、出勤率、成长足迹、比赛记录和训练历程。Figma 的姓名和统计数为样例，不覆盖真实孩子数据。
 - P5 真实运行截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788271161658-ass2je.png` 严格 `375×812`，显示真实六维雷达、综合评分 `77`、维度标签和详情。图形、标签、历史对比、顶部及固定家长 TabBar 均无重叠或截断；本轮无业务代码改动。
 
+### P8 家长发现运行复核（2026-09-01）
+
+- V6 在线基准为 `1610:772`（`/pages/parent/content/index`）。页面由固定顶栏、场馆订阅 Banner、两行快速入口、最近文章和当前顺序的家长 TabBar 构成。
+- 在线 Figma 原始截图临时证据为 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-figma-p8-v6-20260901.png`；真实微信开发者工具 MCP 截图为 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788271333664-qdo7cw.png`，均为 `375×812`。Banner、四个入口的图标与排版、文章卡的强调线/箭头及 TabBar 均与在线稿结构一致。
+- 文章标题与数量由生产账号可见内容决定，和在线稿的示例文章不同；没有用静态示例覆盖真实数据。本轮无确定性视觉或交互差异，无业务代码改动。
+
+### P7 家长我的孩子运行复核（2026-09-01）
+
+- V6 在线基准为 `1610:890`（`/pages/parent/child/index`）。页面包含孩子身份卡、双角色切换入口、三项统计、四个快捷功能、最近动态和当前顺序的家长 TabBar。
+- 在线 Figma 原始截图临时证据为 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-figma-p7-v6-20260901.png`；真实微信开发者工具 MCP 截图为 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788271376464-7mci7o.png`，均为 `375×812`。深色身份卡、角色切换、统计卡、四格快捷入口、动态区和固定 TabBar 均无重叠或截断。
+- 实际账号返回“丁宁”、`27` 课时和 `96%` 出勤率，在线稿的姓名与统计仅为版式示例；真实数据差异不以硬编码替换。本轮无业务代码改动。
+
 ### V5 首批复验（2026-09-01）
 
 - 重新通过微信开发者工具 MCP 取得三张严格 `375×812` 运行截图：`%TEMP%\\cq-talent-visual-evidence\\v5-c1-schedule-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-training-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-1-selector-rerun-20260901.png`。
