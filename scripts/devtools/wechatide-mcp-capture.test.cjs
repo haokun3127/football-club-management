@@ -10,6 +10,7 @@ const {
   parseArgs,
   assertRawCapture,
   assertLogicalViewport,
+  waitForLogicalViewport,
   runCapture,
   createMcpClient,
 } = require('./wechatide-mcp-capture.cjs');
@@ -151,6 +152,27 @@ test('accepts iPhone X screen dimensions when WeChat window excludes system chro
       },
     },
   }), {
+    width: 375,
+    height: 724,
+    screenWidth: 375,
+    screenHeight: 812,
+    devicePixelRatio: 3,
+  });
+});
+
+test('waits for a populated runtime viewport after a refresh', async () => {
+  const payloads = [
+    { success: true, systemInfo: { result: {} } },
+    { success: true, systemInfo: { result: { screenWidth: 375, screenHeight: 812, windowWidth: 375, windowHeight: 724, pixelRatio: 3 } } },
+  ];
+  let calls = 0;
+  const result = await waitForLogicalViewport({
+    readRuntime: async () => payloads[Math.min(calls++, payloads.length - 1)],
+    timeoutMs: 20,
+    sleepImpl: async () => {},
+  });
+  assert.equal(calls, 2);
+  assert.deepEqual(result, {
     width: 375,
     height: 724,
     screenWidth: 375,

@@ -139,6 +139,28 @@ function assertLogicalViewport(payload) {
   return viewport;
 }
 
+async function waitForLogicalViewport({
+  readRuntime,
+  timeoutMs = DEFAULT_TIMEOUT_MS,
+  sleepImpl = (milliseconds) => new Promise((resolveSleep) => setTimeout(resolveSleep, milliseconds)),
+} = {}) {
+  if (typeof readRuntime !== 'function') throw new TypeError('readRuntime must be a function');
+  const deadline = Date.now() + timeoutMs;
+  let lastError;
+  do {
+    const payload = await readRuntime();
+    try {
+      return assertLogicalViewport(payload);
+    } catch (error) {
+      lastError = error;
+    }
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) break;
+    await sleepImpl(Math.min(250, remaining));
+  } while (Date.now() < deadline);
+  throw lastError || new Error('runtime viewport was not available');
+}
+
 async function waitForExactRoute({ client, projectPath, expectedRoute, timeoutMs = DEFAULT_TIMEOUT_MS, sleepImpl = (milliseconds) => new Promise((resolveSleep) => setTimeout(resolveSleep, milliseconds)) }) {
   const deadline = Date.now() + timeoutMs;
   let received = '';
@@ -334,7 +356,11 @@ async function runCapture({
       wait: 1,
     });
     await waitForExactRoute({ client, projectPath, expectedRoute: options.route, timeoutMs: routePollTimeoutMs, sleepImpl });
-    const runtime = assertLogicalViewport(payloadOf(await client.callTool('automation_runtime_info', { project: projectPath, action: 'systemInfo' })));
+    const runtime = await waitForLogicalViewport({
+      readRuntime: async () => payloadOf(await client.callTool('automation_runtime_info', { project: projectPath, action: 'systemInfo' })),
+      timeoutMs: routePollTimeoutMs,
+      sleepImpl,
+    });
     const screenshot = payloadOf(await client.callTool('simulator_screenshot', {
       project: projectPath,
       path: rawPath,
@@ -387,6 +413,7 @@ module.exports = {
   parseArgs,
   readPngDimensions,
   runCapture,
+  waitForLogicalViewport,
   waitForScreenshotFile,
   writeEvidenceAtomically,
 };
