@@ -99,6 +99,12 @@
 - Runtime review: the real team hero, season, three summary statistics, four-column student roster, coach group and fixed coach TabBar are all present. Team/member/coach counts and names remain API data and are not copied from Figma samples.
 - WeChatIDE MCP exact screenshot: `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788254946742-0k8wr3.jpg` (`375×812`). Figma node `1570:7` was screenshot-read after cloning. No deterministic code defect was found in this pass.
 
+### Coach C10.1 Coverage preview (2026-09-01)
+
+- Current V3 node: `1571:7` (`/pages/coach/coverage/index?eventId=<activityId>`), non-destructively cloned from preserved historical source `93:983` and named `C10.1 · Coverage Preview · Current V3 · Runtime Reviewed`.
+- Runtime review: the real account returns more students and dimensions than the Figma sample; the page keeps dynamic coverage bars, pending-sync labels, a fixed confirm bar and coach TabBar without replacing data with sample values.
+- WeChatIDE MCP exact screenshot: `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788255066036-einuxo.jpg` (`375×812`). Figma node `1571:7` was screenshot-read after cloning; no deterministic layout or bottom-bar overlap was found.
+
 ## Verification
 
 - Figma: 每个新 page 和画板都以 MCP 读取、截图并回读 node id。
