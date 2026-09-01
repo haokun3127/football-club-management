@@ -206,6 +206,12 @@
 - V6 在线基准：周态 `1610:2`，月历展开 `1610:175`，路由 `/pages/parent/schedule/index`。周态保持通知铃铛、无日程 Hero、通知 banner、前后翻周、周条及家长 TabBar；真实截图为 `wechatide-simulator-screenshot-1788271024664-vv366q.png`（`375×812`）。
 - 点击 `.week-nav__expand` 后，运行态 `isMonthPickerExpanded=true`，真实月历截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788271066157-v9mx2k.png` 严格 `375×812`。月历显示真实当月日期与活动标记，选中日期红圈未与训练绿色点重合，月历、顶部和 TabBar 均无截断。无业务代码改动。
 
+### P4/P5 家长成长与能力雷达运行复核（2026-09-01）
+
+- V6 在线基准：P4 `1610:466`（`/pages/parent/growth/index`）和 P5 `1610:626`（`/pages/parent/radar/index`）。P4 承载当前孩子成长摘要、足迹、比赛记录、训练历程与雷达入口；P5 是独立全屏能力雷达与维度详情页。
+- P4 真实运行截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788271133082-uyqoe7.png` 严格 `375×812`，显示真实训练课时、出勤率、成长足迹、比赛记录和训练历程。Figma 的姓名和统计数为样例，不覆盖真实孩子数据。
+- P5 真实运行截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788271161658-ass2je.png` 严格 `375×812`，显示真实六维雷达、综合评分 `77`、维度标签和详情。图形、标签、历史对比、顶部及固定家长 TabBar 均无重叠或截断；本轮无业务代码改动。
+
 ### V5 首批复验（2026-09-01）
 
 - 重新通过微信开发者工具 MCP 取得三张严格 `375×812` 运行截图：`%TEMP%\\cq-talent-visual-evidence\\v5-c1-schedule-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-training-rerun-20260901.png`、`%TEMP%\\cq-talent-visual-evidence\\v5-c8-1-selector-rerun-20260901.png`。
