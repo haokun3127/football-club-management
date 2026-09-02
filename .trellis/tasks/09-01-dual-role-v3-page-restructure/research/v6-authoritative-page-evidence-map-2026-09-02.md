@@ -44,9 +44,9 @@
 | C15.1 评估提交 | `1913:2` | `/pages/coach/assessment-submit/index?...` | `wechatide-simulator-screenshot-1788312722631-hxg297.png`（系统临时目录，375×812） | 成功态、提交摘要和后续按钮已通过 |
 | C16 我的 | `1915:2` | `/pages/coach/me/index` | `wechatide-viewport-screenshot-1788309549997-t129qi.jpg` | 教练资料、双角色入口和退出结构已通过 |
 | C16.1 权限范围 | `1917:7` | `/pages/coach/permissions/index?source=goal` | `wechatide-simulator-screenshot-1788312734799-3gvomg.png`（系统临时目录，375×812） | 开关、说明、保存和 TabBar 已通过 |
-| C16.2 私教兴趣 | `1919:7` | `/pages/coach/private-interest/index?source=goal` | `wechatide-simulator-screenshot-1788293008604-k3suvm.png` | 时段网格、预约开关和费用说明已通过 |
-| C16.3 账号设置 | `1921:7` | `/pages/coach/account/index?source=goal` | `wechatide-simulator-screenshot-1788293016035-75kp0y.png` | 账号设置结构已通过；证据文件名沿用当前记录 |
-| C16.4 帮助中心 | `1923:7` | `/pages/coach/help/index?source=goal` | 首屏 `wechatide-viewport-screenshot-1788309885329-6ulfui.jpg` + 滚动段 `wechatide-viewport-screenshot-1788309894474-exe23q.jpg` | 首屏与滚动段均已通过；Figma 原生高度约 924px |
+| C16.2 私教兴趣 | `1919:7` | `/pages/coach/private-interest/index?source=goal` | `wechatide-simulator-screenshot-1788313178902-61e1y9.png`（系统临时目录，375×812） | 时段网格、预约开关和费用说明已通过 |
+| C16.3 账号设置 | `1921:7` | `/pages/coach/account/index?source=goal` | `wechatide-simulator-screenshot-1788313229173-4756ma.png`（系统临时目录，375×812） | 账号设置结构已通过；账号姓名和手机号按真实会话显示 |
+| C16.4 帮助中心 | `1923:7` | `/pages/coach/help/index?source=goal` | 首屏 `wechatide-simulator-screenshot-1788313263375-4d3too.png` + 滚动段 `wechatide-simulator-screenshot-1788313308595-ojorix.png`（系统临时目录，均 375×812） | 首屏与滚动段均已通过；Figma 原生高度约 924px，FAQ 数量按真实 API 展示 |
 
 ## 当前剩余项
 
