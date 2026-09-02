@@ -9,7 +9,7 @@
 
 ## 对照结论
 
-- 顶栏、周切换、`全部球队课程` 说明、内容容器和教练端固定 TabBar 的首屏几何关系一致；运行态没有出现球队选择入口，符合 C1/C8 边界。
+- 顶栏、周切换、`全部球队课程/比赛安排` 标题、内容容器和教练端固定 TabBar 的首屏几何关系一致；运行态没有出现球队选择入口，符合 C1/C8 边界。
 - 运行态使用真实当前日期 **2026年9月2日**，当前权限范围没有可展示课程，因此显示真实空态；Figma 画板是有课程示例状态。课程卡数量、日期、球队和人员属于 API/时间状态差异，不通过硬编码示例数据消除。
 - 微信原生右上角菜单胶囊和运行态头像/身份标识属于运行环境或真实会话，不纳入业务画板差异。
 
@@ -26,8 +26,14 @@
 
 ## 2026-09-02 C1 课程卡信息层级修正
 
-- 在线 Figma `1610:1323` 已先完成非破坏性视觉修正并回读：隐藏“全部球队课程”后面的说明文字，移除课程卡右侧教练姓名胶囊，课程标题与场地改为自然左对齐并允许两行展示；Figma 截图保存为 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence\figma-c1-course-card-fix-1610-1323-20260902.png`，原生 `375×812`。
+- 在线 Figma `1610:1323` 已先完成非破坏性视觉修正并回读：标题更新为“全部球队课程/比赛安排”，隐藏标题后的说明文字，移除课程卡右侧教练姓名胶囊，课程标题与场地改为自然左对齐并允许两行展示；Figma 截图保存为 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence\figma-c1-course-card-fix-1610-1323-20260902.png`，原生 `375×812`。
 - 小程序同步修改 `/pages/coach/schedule/index`：课程卡继续依据真实 API 的 `event.type` 预计算“训练/比赛”标签和卡片主题；移除课程卡 `coachName` 展示字段；标题和地点不再使用单行省略。顶部教练头像姓名仍保留，因为它表达当前会话身份，与课程卡无关。
 - 定向测试 `pages/coach/schedule/index.test.mjs` 为 `23/23`，其中覆盖训练/比赛类型区分、无教练姓名胶囊和标题/地点完整展示；小程序 `tsc --noEmit`、C1 WXML/WXSS 编译和限定路径 `git diff --check` 均通过。
 - 微信开发者工具 MCP 运行态路由为 `/pages/coach/schedule/index`，当前会话为真实教练态。`automation_viewport_action.screenshot` 证据为 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c1-viewport-20260902.png`（`375×812`），另取得下一周真实数据截图 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c1-next-week-20260902.png`。画面确认课程标题“第3天综合训练”、场地“U10精英队 · 九龙坡足球公园”均完整可读，课程卡右侧仅保留真实状态和箭头。
 - `simulator_screenshot` 兼容入口本轮返回白屏 PNG，虽然页面 DOM 和 data 均为 ready；切换到 MCP 的 `automation_viewport_action.screenshot` 后得到有效模拟器像素，因此白屏属于截图采集通道差异，不是页面渲染失败。不得把兼容入口的白屏当作视觉验收截图。
+
+## 2026-09-02 C1 标题同步复验
+
+- 小程序 `/pages/coach/schedule/index` 已将 C1 上下文标题同步为“全部球队课程/比赛安排”，与在线 Figma `1610:1323` 当前文案一致。
+- 微信开发者工具 MCP `automation_viewport_action.screenshot` 取得原始 `564×1220` 模拟器像素，并按仓库规范归一化为严格 `375×812`：`C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence\c1-title-sync-375x812-20260902.png`。截图确认标题、课程标题、球队和场地均完整可读。
+- 本批只涉及 C1 文案、回归断言和文档证据；未修改 API、数据库或其他页面，也未带入工作区其他未提交改动。

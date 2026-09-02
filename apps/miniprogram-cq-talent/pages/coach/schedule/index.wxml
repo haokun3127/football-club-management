@@ -47,7 +47,7 @@
   </view>
 
   <view wx:if="{{state !== 'loading' && state !== 'error'}}" class="c1-all-teams-context">
-    <text class="c1-all-teams-context__label">全部球队课程</text>
+    <text class="c1-all-teams-context__label">全部球队课程/比赛安排</text>
   </view>
 
   <view class="c1-body">

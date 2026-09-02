@@ -282,6 +282,8 @@ describe("coach schedule home", () => {
 
   it("keeps the all-teams context visible when the selected date has no events", () => {
     expect(template).toContain('wx:if="{{state !== \'loading\' && state !== \'error\'}}" class="c1-all-teams-context"');
+    expect(template).toContain("全部球队课程/比赛安排");
+    expect(template).not.toContain(">全部球队课程<");
     expect(template).not.toContain('class="c1-all-teams-context__copy"');
     expect(stylesheet).toMatch(/\.c1-all-teams-context\s*\{(?=[^}]*flex-direction:\s*row)(?=[^}]*height:\s*98rpx)/s);
   });

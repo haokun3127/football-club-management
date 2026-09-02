@@ -289,7 +289,7 @@ https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/
 
 ## 2026-09-02 Coach C1 课程卡信息层级修正
 
-- 当前 C1 唯一在线基准仍为 `zZ6wKyOHKcO4UYXDd9jGwv / 1610:1323`。先在该节点完成并回读：隐藏“全部球队课程”后的说明文字，移除课程卡右侧教练姓名胶囊，课程标题和场地允许自然两行展示；在线回读截图为 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-visual-evidence\\figma-c1-course-card-fix-1610-1323-20260902.png`，原生 `375×812`。
+- 当前 C1 唯一在线基准仍为 `zZ6wKyOHKcO4UYXDd9jGwv / 1610:1323`，标题为“全部球队课程/比赛安排”。该节点已完成并回读：隐藏标题后的说明文字，移除课程卡右侧教练姓名胶囊，课程标题和场地允许自然两行展示；在线回读截图为 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-visual-evidence\\figma-c1-course-card-fix-1610-1323-20260902.png`，原生 `375×812`。
 - 小程序 `/pages/coach/schedule/index` 已同步：活动类型由真实 `event.type` 预计算为“训练/比赛”，课程卡不再显示本人姓名，标题/地点不再使用单行省略。教练身份姓名仍只显示在页面顶栏。
 - 运行态证据为微信开发者工具 MCP `automation_viewport_action.screenshot`：`C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-c1-viewport-20260902.png` 和 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-c1-next-week-20260902.png`，均严格 `375×812`；当前真实日期范围只有训练活动，比赛分支由 C1 定向测试覆盖，不以 Figma 样例补造 API 数据。
 - C1 定向测试 `23/23`、TypeScript、WXML/WXSS 编译和限定路径 `git diff --check` 均通过。`simulator_screenshot` 兼容入口本轮出现白屏，不能作为验收证据；同一 MCP 会话的 viewport 像素截图有效，通道差异已记录在任务研究文件。

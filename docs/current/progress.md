@@ -1,5 +1,11 @@
 # 核心演示闭环 · 进度跟踪
 
+## 2026-09-02 C1 日程标题同步
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 1610:1323` 的 C1 标题已更新为“全部球队课程/比赛安排”，用于明确日程同时覆盖训练和比赛。
+- 小程序 `/pages/coach/schedule/index` 已同步该标题；C1 仍展示教练权限范围内的全部球队活动，不增加球队选择或过滤。
+- 验证：C1 定向 Vitest `23/23`、小程序 TypeScript 和全仓门禁 `domain 21/21`、小程序 `450/450`、API `123/123` 通过；微信开发者工具 MCP 真实截图已归一化为严格 `375×812`：`C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-visual-evidence\\c1-title-sync-375x812-20260902.png`。
+
 ## 2026-09-01 双端 Current Product V3 页面建立
 
 - 在线 Figma 已新增两个独立 Current Product Page：Parent `1462:2 / 10 Current Product · Parent V3` 与 Coach `1462:3 / 11 Current Product · Coach V3`；旧 `05 Parent Generated`、`06 Coach Generated` 没有移动、删除或覆盖。
