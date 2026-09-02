@@ -2656,3 +2656,11 @@
 - 定位到微信上传 `80051` 的直接原因：场地页引用的三张 PNG 原图分别约 `1.6–1.7MB`，合计超过源码包 `2MB` 限制。
 - 保留原场地图视觉内容，新增 `750×328` 压缩 JPG 并切换场地页引用；`project.config.json` 仅在上传包中排除三张 PNG 原图，原文件仍保留在工作区。
 - 排除原图后，小程序源码包估算约 `1938KB`（不含 `node_modules`），低于 `2MB`；场地页与家长日程定向测试 `22/22`、TypeScript 检查通过。
+
+## 2026-09-02 教练 C1 课程卡信息层级修正
+
+- 按在线 Figma Coach V6 C1 `1610:1323` 先改稿后同步代码：删除“全部球队课程”后的说明文字，课程卡移除当前教练姓名，保留真实活动类型标签并区分“训练/比赛”。
+- 课程标题和场地改为可自然换行的展示，不再单行截断；真实 API 返回的球队与场地继续由 TS view model 组合，未把 Figma 示例文案写入代码。
+- C1 定向测试 `23/23`、小程序 TypeScript、WXML/WXSS 编译和限定路径 `git diff --check` 通过。
+- 微信开发者工具 MCP 有效运行态证据：`C:\Users\ASUS\AppData\Local\Temp\cq-talent-c1-viewport-20260902.png` 与 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c1-next-week-20260902.png`，均严格 `375×812`。当前真实数据为训练活动；比赛样式分支由定向测试验证，未伪造比赛数据。
+- 兼容 `simulator_screenshot` 本轮出现白屏，而 MCP `automation_viewport_action.screenshot` 正常；已在 C1 研究记录中记录该采集通道差异。

@@ -115,10 +115,8 @@ describe("coach schedule home", () => {
       hasVisibleEvents: true,
       visibleEvents: [{
         id: "event-training-1",
-        coachName: "Coach Chen",
         typeLabel: "训练",
         typeTone: "training",
-        hasCoachName: true,
         hasTeamName: true,
         hasVenue: true,
         hasNextAction: true,
@@ -126,8 +124,8 @@ describe("coach schedule home", () => {
         nextActionLabel: "Record attendance",
       }],
     });
-    expect(page.data.dayStrip.map((day) => day.weekLabel)).toEqual(["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]);
-    expect(page.data.collapsedDayStrip.map((day) => day.weekLabel)).toEqual(["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]);
+    expect(page.data.dayStrip.map((day) => day.weekLabel)).toEqual(["一", "二", "三", "四", "五", "六", "日"]);
+    expect(page.data.collapsedDayStrip.map((day) => day.weekLabel)).toEqual(["一", "二", "三", "四", "五", "六", "日"]);
   });
 
   it("keeps empty and failed coach-home loads honest", async () => {
@@ -179,7 +177,10 @@ describe("coach schedule home", () => {
   });
 
   it("builds a Monday-first month grid and returns to the selected day after collapsing", async () => {
-    expect(buildMonthDays("2026-08", "2026-08-13", [])).toHaveLength(42);
+    const monthDays = buildMonthDays("2026-08", "2026-08-13", []);
+    expect(monthDays).toHaveLength(42);
+    expect(monthDays.filter((day) => day.isCurrentMonth)).toHaveLength(31);
+    expect(monthDays.filter((day) => !day.isCurrentMonth).every((day) => day.dayNumber === "")).toBe(true);
     expect(buildMonthDays("2026-08", "2026-08-13", [home.events[0]]).find((day) => day.key === "2026-08-13")).toMatchObject({
       isSelected: true,
       hasTraining: true,
@@ -205,6 +206,7 @@ describe("coach schedule home", () => {
     expect(template).toMatch(/(?:bindtap|catchtap)="expandMonthPicker"/);
     expect(template).toContain('<view class="c1-month-calendar__collapse" bindtap="collapseMonthPicker" aria-label="收起月历"><image class="c1-month-calendar__collapse-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>');
     expect(template).toContain('class="c1-week-nav" bindtap="expandMonthPicker"');
+    expect(template).toContain('<view class="c1-week-nav__expand" catchtap="expandMonthPicker" aria-label="展开月历"><image class="c1-week-nav__expand-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>');
     expect(template).toContain('wx:for="{{collapsedDayStrip}}"');
     expect(template).not.toContain('wx:for="{{dayStrip}}"');
     expect(template).toContain('data-date="{{item.date}}" catchtap="selectDay"');
@@ -218,11 +220,13 @@ describe("coach schedule home", () => {
     expect(stylesheet).toMatch(/\.c1-dates__arrow--next\s*\{[^}]*right:\s*0[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c1-dates__arrow--previous\s+image\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c1-dates__arrow--next\s+image\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
-    expect(stylesheet).toMatch(/\.c1-week-nav\s*\{[^}]*position:\s*absolute[^}]*top:\s*24rpx[^}]*left:\s*44rpx[^}]*display:\s*grid[^}]*grid-template-columns:\s*repeat\(7,\s*88rpx\)[^}]*column-gap:\s*8rpx[^}]*width:\s*664rpx/s);
+    expect(stylesheet).toMatch(/\.c1-week-nav\s*\{[^}]*position:\s*absolute[^}]*top:\s*24rpx[^}]*left:\s*44rpx[^}]*display:\s*grid[^}]*grid-template-columns:\s*repeat\(7,\s*minmax\(0,\s*1fr\)\)[^}]*column-gap:\s*8rpx[^}]*width:\s*664rpx[^}]*padding:\s*0\s+84rpx\s+0\s+0/s);
     expect(stylesheet).toMatch(/\.c1-day\s*\{[^}]*flex:\s*0\s+0\s+88rpx[^}]*flex-direction:\s*column[^}]*height:\s*80rpx[^}]*border-radius:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.c1-day__week\s*\{[^}]*color:\s*#667085[^}]*font-size:\s*20rpx[^}]*line-height:\s*24rpx/s);
     expect(stylesheet).toMatch(/\.c1-day__num\s*\{[^}]*color:\s*#202124[^}]*font-size:\s*24rpx[^}]*line-height:\s*28rpx/s);
     expect(stylesheet).toMatch(/\.c1-day--selected\s*\{[^}]*background:\s*#a80f1b/s);
+    expect(stylesheet).toMatch(/\.c1-week-nav__expand\s*\{[^}]*position:\s*absolute[^}]*top:\s*50%[^}]*right:\s*12rpx[^}]*width:\s*60rpx[^}]*height:\s*32rpx[^}]*transform:\s*translateY\(-50%\)/s);
+    expect(stylesheet).toMatch(/\.c1-week-nav__expand-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx/s);
     expect(stylesheet).toMatch(/\.c1-day--selected\s+\.c1-day__week,\s*\.c1-day--selected\s+\.c1-day__num\s*\{[^}]*color:\s*#ffffff/s);
     expect(template).not.toContain('class="c1-dates__expand"');
     expect(stylesheet).toMatch(/\.c1-month-calendar\s*\{[^}]*min-height:\s*840rpx[^}]*margin:\s*32rpx\s+32rpx\s+0/s);
@@ -278,8 +282,8 @@ describe("coach schedule home", () => {
 
   it("keeps the all-teams context visible when the selected date has no events", () => {
     expect(template).toContain('wx:if="{{state !== \'loading\' && state !== \'error\'}}" class="c1-all-teams-context"');
+    expect(template).not.toContain('class="c1-all-teams-context__copy"');
     expect(stylesheet).toMatch(/\.c1-all-teams-context\s*\{(?=[^}]*flex-direction:\s*row)(?=[^}]*height:\s*98rpx)/s);
-    expect(stylesheet).toMatch(/\.c1-all-teams-context__copy\s*\{(?=[^}]*margin-left:\s*12rpx)(?=[^}]*margin-top:\s*0)/s);
   });
 
   it("matches the C1 online hero and stats-row offsets without moving activity cards off their 22px rail", () => {
@@ -304,7 +308,14 @@ describe("coach schedule home", () => {
     expect(template).not.toContain("U10精英队");
     expect(template).not.toContain("凤凰山");
     expect(template).not.toContain("17:30");
+    expect(template).not.toContain("acard__coach");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
+  });
+
+  it("keeps coach schedule course titles and locations fully readable without coach-name chips", () => {
+    expect(stylesheet).toMatch(/\.acard__title\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*overflow:\s*visible)(?=[^}]*text-overflow:\s*clip)[^}]*\}/s);
+    expect(stylesheet).toMatch(/\.acard__meta\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*text-overflow:\s*clip)[^}]*\}/s);
+    expect(stylesheet).not.toContain(".acard__coach");
   });
 
   it("uses the real local date rather than a fixed development date", () => {

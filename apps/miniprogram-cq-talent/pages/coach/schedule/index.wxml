@@ -41,13 +41,13 @@
           <view class="c1-day__week">{{item.weekLabel}}</view>
           <view class="c1-day__num">{{item.dayNum}}</view>
         </view>
+        <view class="c1-week-nav__expand" catchtap="expandMonthPicker" aria-label="展开月历"><image class="c1-week-nav__expand-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>
     </view>
     <view class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek"><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
   </view>
 
   <view wx:if="{{state !== 'loading' && state !== 'error'}}" class="c1-all-teams-context">
     <text class="c1-all-teams-context__label">全部球队课程</text>
-    <text class="c1-all-teams-context__copy">按时间排列 · 每节课标明所属球队</text>
   </view>
 
   <view class="c1-body">
@@ -77,7 +77,7 @@
           <view class="acard__accent" style="background:{{item.typeColor}}"></view>
           <view class="acard__time"><view class="acard__start">{{item.startTime}}</view><view wx:if="{{item.durationText}}" class="acard__dur">{{item.durationText}}</view></view>
           <view class="acard__content">
-            <view class="acard__head"><view class="acard__type acard__type--{{item.typeTone}}">{{item.typeLabel}}</view><view class="acard__title">{{item.title}}</view><view wx:if="{{item.hasCoachName}}" class="acard__coach">{{item.coachName}}</view></view>
+            <view class="acard__head"><view class="acard__type acard__type--{{item.typeTone}}">{{item.typeLabel}}</view><view class="acard__title">{{item.title}}</view></view>
             <view wx:if="{{item.hasLocationDetail}}" class="acard__meta">{{item.locationLabel}}</view>
             <view wx:if="{{item.hasNextAction}}" class="acard__action" data-id="{{item.id}}" data-action="{{item.nextAction}}" catchtap="openTask">{{item.nextActionLabel}}</view>
           </view>

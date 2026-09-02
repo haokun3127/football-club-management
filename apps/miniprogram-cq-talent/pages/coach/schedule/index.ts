@@ -5,7 +5,7 @@ import { openPage, openTab } from "../../../utils/navigation";
 import { activityStatus, formatCalendarDate, resolveMenuInset, resolveNavInset, resolveTopBarHeight } from "../../../utils/presentation";
 import type { CoachHome, CoachTask, CoachTaskAction, LoadState, ScheduleEvent } from "../../../utils/types";
 
-const WEEK_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+const WEEK_LABELS = ["日", "一", "二", "三", "四", "五", "六"];
 const initialDate = currentLocalDate();
 
 type Filter = "all" | "training" | "match" | "pending";
@@ -32,8 +32,6 @@ type CoachEventView = ScheduleEvent & {
   typeTone: string;
   cardTone: "training" | "match" | "other";
   typeColor: string;
-  coachName: string;
-  hasCoachName: boolean;
   locationLabel: string;
   hasLocationDetail: boolean;
   hasTeamName: boolean;
@@ -104,7 +102,7 @@ Page({
     try {
       const home = await getCoachHome(range);
       const coachName = home.coachName?.trim() || "";
-      const eventViews = home.events.map((event) => toCoachEventView(event, coachName));
+      const eventViews = home.events.map((event) => toCoachEventView(event));
       const taskCards = home.tasks.map(toCoachTaskView);
       const selectedDateEvents = eventViews.filter((event) => event.startsAt.slice(0, 10) === this.data.date);
       const heroEvent = selectedDateEvents.find((event) => event.status === "in_progress") ?? selectedDateEvents[0] ?? null;
@@ -226,7 +224,7 @@ Page({
   },
 });
 
-function toCoachEventView(event: ScheduleEvent, coachName: string): CoachEventView {
+function toCoachEventView(event: ScheduleEvent): CoachEventView {
   const status = activityStatus(event.status);
   const locationLabel = [event.teamName, event.venue].filter(Boolean).join(" · ");
   return {
@@ -240,8 +238,6 @@ function toCoachEventView(event: ScheduleEvent, coachName: string): CoachEventVi
     typeTone: event.type === "training" ? "training" : event.type === "match" ? "match" : "other",
     cardTone: event.type === "training" ? "training" : event.type === "match" ? "match" : "other",
     typeColor: event.type === "training" ? "#a80f1b" : event.type === "match" ? "#69a5ff" : "#6b7280",
-    coachName,
-    hasCoachName: Boolean(coachName),
     locationLabel,
     hasLocationDetail: Boolean(locationLabel),
     hasTeamName: Boolean(event.teamName),
@@ -335,6 +331,8 @@ export function buildMonthDays(monthKey: string, selectedDate: string, events: S
   const [yearText, monthText] = monthKey.split("-");
   const first = new Date(Date.UTC(Number(yearText), Number(monthText) - 1, 1));
   const leadingDays = (first.getUTCDay() + 6) % 7;
+  const daysInMonth = new Date(Date.UTC(Number(yearText), Number(monthText), 0)).getUTCDate();
+  const cellCount = Math.ceil((leadingDays + daysInMonth) / 7) * 7;
   const eventByDate = new Map<string, { training: boolean; match: boolean; count: number }>();
   events.forEach((event) => {
     const key = event.startsAt.slice(0, 10);
@@ -345,9 +343,22 @@ export function buildMonthDays(monthKey: string, selectedDate: string, events: S
     eventByDate.set(key, current);
   });
   const today = currentLocalDate();
-  return Array.from({ length: 42 }, (_, index) => {
+  return Array.from({ length: cellCount }, (_, index) => {
+    const dayNumber = index - leadingDays + 1;
+    if (dayNumber < 1 || dayNumber > daysInMonth) {
+      return {
+        key: `${monthKey}-empty-${index}`,
+        dayNumber: "",
+        isCurrentMonth: false,
+        isToday: false,
+        isSelected: false,
+        hasTraining: false,
+        hasMatch: false,
+        hasMultiple: false,
+      };
+    }
     const date = new Date(first);
-    date.setUTCDate(date.getUTCDate() + index - leadingDays);
+    date.setUTCDate(dayNumber);
     const key = date.toISOString().slice(0, 10);
     const markers = eventByDate.get(key);
     return {

@@ -286,3 +286,10 @@ https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/
 - 在线节点 `zZ6wKyOHKcO4UYXDd9jGwv / 1623:2` 当前可由 Figma MCP 正常读取并截图，原生尺寸为 `375×812`；浏览器文件级共享权限仍显示当前账号可编辑。
 - MCP `whoami` 当前显示账号 `haokun3127（1039746386@qq.com）` 的团队席位为 `View`。这只说明 MCP 连接的团队席位状态，不能推翻浏览器文件级可编辑结果；`m=dev` 仅是 Dev Mode 参数。
 - C15 修复后证据 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-visual-evidence\\c15-after-min-height-script-20260901.png` 已与 `1623:2` 完成逐模块对照，面板不收缩、提交条不侵入首屏，真实 API 数据差异按契约保留。
+
+## 2026-09-02 Coach C1 课程卡信息层级修正
+
+- 当前 C1 唯一在线基准仍为 `zZ6wKyOHKcO4UYXDd9jGwv / 1610:1323`。先在该节点完成并回读：隐藏“全部球队课程”后的说明文字，移除课程卡右侧教练姓名胶囊，课程标题和场地允许自然两行展示；在线回读截图为 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-visual-evidence\\figma-c1-course-card-fix-1610-1323-20260902.png`，原生 `375×812`。
+- 小程序 `/pages/coach/schedule/index` 已同步：活动类型由真实 `event.type` 预计算为“训练/比赛”，课程卡不再显示本人姓名，标题/地点不再使用单行省略。教练身份姓名仍只显示在页面顶栏。
+- 运行态证据为微信开发者工具 MCP `automation_viewport_action.screenshot`：`C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-c1-viewport-20260902.png` 和 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-c1-next-week-20260902.png`，均严格 `375×812`；当前真实日期范围只有训练活动，比赛分支由 C1 定向测试覆盖，不以 Figma 样例补造 API 数据。
+- C1 定向测试 `23/23`、TypeScript、WXML/WXSS 编译和限定路径 `git diff --check` 均通过。`simulator_screenshot` 兼容入口本轮出现白屏，不能作为验收证据；同一 MCP 会话的 viewport 像素截图有效，通道差异已记录在任务研究文件。
