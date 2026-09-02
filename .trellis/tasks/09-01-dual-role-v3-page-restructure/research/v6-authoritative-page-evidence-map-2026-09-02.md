@@ -24,11 +24,11 @@
 | --- | --- | --- | --- | --- |
 | C1 全部球队日程 | `1610:1323` | `/pages/coach/schedule/index` | `wechatide-mcp-1788310803824-29900216306735.png` | 结构、全队范围、周切换箭头、空态和 TabBar 已通过；当前日期真实无日程 |
 | C2 训练工作台 | `1610:1462` | `/pages/coach/event/index?id=<trainingActivityId>` | `wechatide-mcp-1788310837113-21820278126036.png` | 工作台、二态点名、训练内容、评测入口和真实学员数据已通过 |
-| C3 变更活动 | `1612:2` | `/pages/coach/event-change/index?id=<activityId>` | `wechatide-simulator-screenshot-1788300685728-ugh4a1.png` | 全屏表单和保存结构已通过 |
-| C4 点名 | `1610:1577` | `/pages/coach/attendance/index?id=<activityId>` | `wechatide-viewport-screenshot-1788309532844-7w3k2k.jpg` | 二态点名、姓名展示、保存链路和 TabBar 已通过 |
+| C3 变更活动 | `1612:2` | `/pages/coach/event-change/index?id=<activityId>` | `wechatide-simulator-screenshot-1788312045264-9vxbyh.png`（系统临时目录，375×812） | 全屏表单和保存结构已通过 |
+| C4 点名 | `1610:1577` | `/pages/coach/attendance/index?id=<activityId>` | `wechatide-simulator-screenshot-1788312056415-bffhus.png`（系统临时目录，375×812） | 二态点名、姓名展示、保存链路和 TabBar 已通过 |
 | C6 比赛记录 | `1610:1692` | `/pages/coach/match/index?id=<matchActivityId>` | `wechatide-mcp-1788310868237-20172608235800.png` | 比分、事件时间线、页内草稿提示和入口已通过 |
-| C6.1 添加比赛事件 | `1894:2` | `/pages/coach/match-event-add/index?eventId=<matchActivityId>` | `wechatide-simulator-screenshot-1788301474505-f0ovb2.png` | Figma V6 已同步 8 类中文事件，结构和真实能力集合已通过 |
-| C6.2 比赛草稿提示 | `1924:12` | C6 比赛页内状态 | `wechatide-simulator-screenshot-1788301809274-qa4y6z.png` | 按全屏页内提示卡验收；不把历史遮罩弹窗当作当前产品规则 |
+| C6.1 添加比赛事件 | `1894:2` | `/pages/coach/match-event-add/index?eventId=<matchActivityId>` | `wechatide-simulator-screenshot-1788312068582-25b9qx.png`（系统临时目录，375×812） | Figma V6 已同步 8 类中文事件，结构和真实能力集合已通过 |
+| C6.2 比赛草稿提示 | `1924:12` | C6 比赛页内状态 | `wechatide-simulator-screenshot-1788312079750-kkgt7o.png`（系统临时目录，375×812） | 按全屏页内提示卡验收；不把历史遮罩弹窗当作当前产品规则 |
 | C7 战术板 | `1610:1778` | `/pages/coach/tactical-board/index?eventId=<matchActivityId>` | `wechatide-mcp-1788310897624-15176572428583.png` | 满屏球场、球员区、阵型和保存区已通过 |
 | C8 训练管理 | `1610:1843` | `/pages/coach/training/index` | `wechatide-mcp-1788310927121-12184812738353.png` | 训练球队上下文、切换入口和课程管理结构已通过 |
 | C8.1 选择训练球队 | `1610:1950` | `/pages/coach/team-selector/index` | `wechatide-mcp-1788310966888-31216239597846.png` | 全屏选队、后台分配范围和选中态已通过 |
