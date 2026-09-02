@@ -47,3 +47,9 @@
 
 - 这些截图只证明在线 V6 设计基准已成功回读并保留原生画板尺寸；C13/C16.4 的长页面仍需用首屏与滚动段运行截图完成视觉验收，不能用一张 `375×812` 截图替代整页。
 - 本轮没有修改小程序代码，也没有覆盖旧 Figma 页面；页面权限通过浏览器文件级编辑控件核实，MCP `whoami` 的团队席位仍单独记录为 `View`。
+
+## 2026-09-02 V6 运行态复拍
+
+- C13 真实路由 `/pages/coach/student-radar/index?source=goal` 通过 WeChatIDE MCP 重新打开，截图 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence\runtime-c13-v6-20260902.png`，严格 `375×812`。顶栏、学员切换、深色雷达卡、维度评分和教练 TabBar 均正常；当前账号返回 8 个维度，在线 V6 示例为 6 个维度，属于真实数据密度差异，未硬编码示例值。
+- C16.4 真实路由 `/pages/coach/help/index?source=goal` 通过 WeChatIDE MCP 重新打开，首屏截图 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence\runtime-c16-4-v6-20260902-top.png`，滚动截图 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence\runtime-c16-4-v6-20260902-bottom.png`，均严格 `375×812`。搜索、六个快速入口、FAQ、联系支持和固定教练 TabBar 均可见；真实 FAQ 返回 5 条而在线示例为 3 条，属于服务数据差异。
+- 当前模拟器日志过滤 `error|exception|fail|undefined|wx:else|route is not defined|appid missing|not-found` 无命中。本轮未发现确定性的顶栏、TabBar、布局或滚动遮挡问题，也没有修改业务代码、API 或生产数据。
