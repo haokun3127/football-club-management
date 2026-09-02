@@ -36,8 +36,8 @@
 | C10 三层训练内容选择 | `1615:2` | `/pages/coach/content-select/index?eventId=<trainingActivityId>` | `wechatide-simulator-screenshot-1788271694548-ln435e.png` | 三层内容、直接选择和固定保存栏已通过 |
 | C10.1 覆盖预览 | `1903:2` | `/pages/coach/coverage/index?eventId=<trainingActivityId>` | `wechatide-simulator-screenshot-1788300725223-f7mxjb.png` | 覆盖卡、维度进度和确认栏已通过 |
 | C11 测评任务 | `1617:2` | `/pages/coach/test-tasks/index` | `wechatide-simulator-screenshot-1788311584128-4hgvai.png`（系统临时目录，375×812） | 任务筛选、进度卡和新增入口已通过；真实测试任务数量与 Figma 示例不同 |
-| C12 测评录入 | `1905:2` | `/pages/coach/test-entry/index?eventId=<activityId>` | `wechatide-simulator-screenshot-1788310600067-2rkifr.png` | 批量项目评分结构、真实学员卡片、指标输入/缺测状态、保存区和 TabBar 已通过；长页首屏之外的内容需按滚动段补证据 |
-| C12.1 草稿恢复 | `1907:2` | C12 本机草稿状态 | `wechatide-simulator-screenshot-1788310475651-krco7j.png` | 本机草稿恢复遮罩、继续/退出按钮和 TabBar 已通过；未写入生产数据 |
+| C12 测评录入 | `1905:2` | `/pages/coach/test-entry/index?eventId=<activityId>` | `wechatide-simulator-screenshot-1788312568988-tqevo1.png`（系统临时目录，375×812） | 退出草稿遮罩后，批量项目评分结构、真实学员卡片、指标输入/缺测状态、保存区和 TabBar 可用 |
+| C12.1 草稿恢复 | `1907:2` | C12 本机草稿状态 | `wechatide-simulator-screenshot-1788312558838-0tsoqy.png`（系统临时目录，375×812） | 本机草稿恢复遮罩、继续/退出按钮和 TabBar 可见；未写入生产数据 |
 | C13 学员雷达 | `1909:2` | `/pages/coach/student-radar/index?source=goal` | 首屏 `wechatide-viewport-screenshot-1788309861983-35g9r0.jpg` + 滚动段 `wechatide-viewport-screenshot-1788309871148-8bezqd.jpg` | 结构和真实 8 维数据已通过；Figma 原生高度约 908px |
 | C14 能力评估 | `1619:2` | `/pages/coach/team-ability/index` | `wechatide-simulator-screenshot-1788292822261-gy0lsq.png` | 训练球队上下文、全员选择和雷达已通过 |
 | C15 指标录入 | `1623:2` | `/pages/coach/assessment-entry/index?templateId=<templateId>` | `wechatide-simulator-screenshot-1788292830287-utsxqr.png` | 固定高度指标面板、当前学员和全员切换已通过 |

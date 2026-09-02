@@ -379,6 +379,7 @@ describe("coach project score entry", () => {
     const savedDraft = JSON.stringify(drafts.get("event-assessment-1:template-current-v2"));
     expect(page.data).toMatchObject({ draftResumeVisible: true, draftResumeUpdatedAtLabel: "本机草稿" });
     page.exitDraft();
+    expect(page.data).toMatchObject({ draftResumeVisible: false, canSubmit: true, navTitle: "项目评分录入" });
     page.exitDraft();
     expect(mocks.navigateBack).toHaveBeenCalledTimes(1);
     expect(JSON.stringify(drafts.get("event-assessment-1:template-current-v2"))).toBe(savedDraft);

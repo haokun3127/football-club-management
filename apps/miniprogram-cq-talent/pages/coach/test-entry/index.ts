@@ -297,6 +297,13 @@ Page<PageData>({
   exitDraft() {
     if (!this.data.draftResumeVisible || this.data.draftExitInProgress) return;
     this.setData({ draftExitInProgress: true });
+    const canSubmit = this.data.state === "ready" && Boolean(this.data.roster.length && this.data.currentField);
+    this.setData({
+      draftResumeVisible: false,
+      navTitle: "项目评分录入",
+      canSubmit,
+      submitClass: canSubmit ? "c12-submit" : "c12-submit c12-submit--disabled",
+    });
     wx.navigateBack({ delta: 1 });
   },
 
