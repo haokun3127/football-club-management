@@ -32,13 +32,13 @@
 | C7 战术板 | `1610:1778` | `/pages/coach/tactical-board/index?eventId=<matchActivityId>` | `wechatide-mcp-1788289617368-19044968056418.png` | 满屏球场、球员区、阵型和保存区已通过 |
 | C8 训练管理 | `1610:1843` | `/pages/coach/training/index` | `wechatide-mcp-1788289672782-31512254753752.png` | 训练球队上下文和“切换”入口已通过 |
 | C8.1 选择训练球队 | `1610:1950` | `/pages/coach/team-selector/index` | `wechatide-mcp-1788289777226-25240257441417.png` | 全屏选队、后台分配范围和选中态已通过 |
-| C9 队伍详情 | `1900:2` | `/pages/coach/team/index` | `wechatide-simulator-screenshot-1788300712072-vye1zx.png` | 长页结构和真实队伍数据已通过；Figma 原生高度约 871px |
+| C9 队伍详情 | `1900:2` | `/pages/coach/team/index` | 首屏 `wechatide-viewport-screenshot-1788309838648-gm8ggx.jpg` + 滚动段 `wechatide-viewport-screenshot-1788309847807-9rkr32.jpg` | 长页结构和真实队伍数据已通过；Figma 原生高度约 871px |
 | C10 三层训练内容选择 | `1615:2` | `/pages/coach/content-select/index?eventId=<trainingActivityId>` | `wechatide-simulator-screenshot-1788271694548-ln435e.png` | 三层内容、直接选择和固定保存栏已通过 |
 | C10.1 覆盖预览 | `1903:2` | `/pages/coach/coverage/index?eventId=<trainingActivityId>` | `wechatide-simulator-screenshot-1788300725223-f7mxjb.png` | 覆盖卡、维度进度和确认栏已通过 |
 | C11 测评任务 | `1617:2` | `/pages/coach/test-tasks/index` | `goal-c11-20260902.png` | 任务筛选、进度卡和新增入口已通过 |
 | C12 测评录入 | `1905:2` | `/pages/coach/test-entry/index?eventId=<activityId>` | `goal-c12-20260902.png` | 真实模板和中文指标已打开；需继续确认 V6 设计与当前 C15 单学员实现的最终统一口径 |
 | C12.1 草稿恢复 | `1907:2` | C12 本机草稿状态 | `goal-c12-20260902.png` | 真实本机草稿恢复已通过；需保留全屏产品规则与 V6 画板的明确映射 |
-| C13 学员雷达 | `1909:2` | `/pages/coach/student-radar/index?source=goal` | `runtime-c13-v6-20260902.png` | 结构和真实 8 维数据已通过；Figma 原生高度约 908px |
+| C13 学员雷达 | `1909:2` | `/pages/coach/student-radar/index?source=goal` | 首屏 `wechatide-viewport-screenshot-1788309861983-35g9r0.jpg` + 滚动段 `wechatide-viewport-screenshot-1788309871148-8bezqd.jpg` | 结构和真实 8 维数据已通过；Figma 原生高度约 908px |
 | C14 能力评估 | `1619:2` | `/pages/coach/team-ability/index` | `wechatide-simulator-screenshot-1788292822261-gy0lsq.png` | 训练球队上下文、全员选择和雷达已通过 |
 | C15 指标录入 | `1623:2` | `/pages/coach/assessment-entry/index?templateId=<templateId>` | `wechatide-simulator-screenshot-1788292830287-utsxqr.png` | 固定高度指标面板、当前学员和全员切换已通过 |
 | C15.1 评估提交 | `1913:2` | `/pages/coach/assessment-submit/index?...` | `wechatide-simulator-screenshot-1788292837998-suycgg.png` | 成功态、提交摘要和后续按钮已通过 |
@@ -46,13 +46,13 @@
 | C16.1 权限范围 | `1917:7` | `/pages/coach/permissions/index?source=goal` | `wechatide-simulator-screenshot-1788293000800-q0zpnq.png` | 开关、说明、保存和 TabBar 已通过 |
 | C16.2 私教兴趣 | `1919:7` | `/pages/coach/private-interest/index?source=goal` | `wechatide-simulator-screenshot-1788293008604-k3suvm.png` | 时段网格、预约开关和费用说明已通过 |
 | C16.3 账号设置 | `1921:7` | `/pages/coach/account/index?source=goal` | `wechatide-simulator-screenshot-1788293016035-75kp0y.png` | 账号设置结构已通过；证据文件名沿用当前记录 |
-| C16.4 帮助中心 | `1923:7` | `/pages/coach/help/index?source=goal` | `runtime-c16-4-v6-20260902-top.png` + `runtime-c16-4-v6-20260902-bottom.png` | 首屏与滚动段均已通过；Figma 原生高度约 924px |
+| C16.4 帮助中心 | `1923:7` | `/pages/coach/help/index?source=goal` | 首屏 `wechatide-viewport-screenshot-1788309885329-6ulfui.jpg` + 滚动段 `wechatide-viewport-screenshot-1788309894474-exe23q.jpg` | 首屏与滚动段均已通过；Figma 原生高度约 924px |
 
 ## 当前剩余项
 
 1. C12/C12.1 的 V6 节点已经建立，但仍要在后续记录中明确：最终以当前 C15 单学员录入结构为实现基准，还是保留旧批量录入状态作为独立状态；在口径明确前不宣称两者像素级完全一致。
-2. 长页面 C9、C13、C16.4 需要持续保留首屏/滚动段证据，不能用一张 `375×812` 图替代整页。
-3. 需要修订旧研究记录中的“当前基准”措辞，尤其是 `figma-v6-live-screenshot-audit-2026-09-02.md`、`c10-1-c11-c12-runtime-reaudit-2026-09-02.md` 和 `c13-c16-visual-reaudit-2026-09-02.md`；本表作为后续读取入口。
+2. 长页面 C9、C13、C16.4 本轮已经补齐首屏/滚动段证据；后续若临时文件被清理，必须按同一路由重新补拍，不能用一张 `375×812` 图替代整页。
+3. 旧研究记录中的“当前基准”措辞已统一到 V6；本表作为后续读取入口。
 4. 当前工作区存在其他任务和用户在途改动，不能用全量 `git add -A`、回滚或清理来制造干净状态；提交必须按路径限定。
 
 ## 验收分层
