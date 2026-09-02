@@ -334,7 +334,7 @@ export function buildDateOptions(selectedDate: string, events: ScheduleEvent[]) 
       isSelected: key === selectedDate,
       day: `${date.getUTCMonth() + 1}/${date.getUTCDate()}`,
       weekday: ["日", "一", "二", "三", "四", "五", "六"][date.getUTCDay()],
-      weekShort: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][date.getUTCDay()] ?? "",
+      weekShort: ["日", "一", "二", "三", "四", "五", "六"][date.getUTCDay()] ?? "",
       dayNumber: String(date.getUTCDate()),
       count: events.filter((event) => event.startsAt.slice(0, 10) === key).length,
     };

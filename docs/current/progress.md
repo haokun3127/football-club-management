@@ -2644,3 +2644,9 @@
 - 共享组件测试 `10/10`、小程序 TypeScript、WXML/WXSS 和限定路径 `git diff --check` 通过。全量小程序测试为 `448/449`，唯一失败是未触碰的 `pages/coach/schedule/seven-day-strip.test.mjs` 旧 CSS 断言，详见任务研究记录。
 - Coach C1 真实 MCP 截图 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence\touch-target-coach-2026-09-02.png` 严格 `375×812`；当前微信会话为教练态，Parent P1 直接导航为空白，家长真实截图需在家长会话下补拍，未误报为双端视觉验收完成。
 - 详细记录：`.trellis/tasks/09-01-dual-role-v3-page-restructure/research/touch-target-size-unification-2026-09-02.md`。
+
+## 2026-09-02 家长端周日历中文星期
+
+- 修复家长端 `/pages/parent/schedule/index` 周日历仍显示 `MON/TUE/...` 的遗漏；周一至周日现在统一显示“一、二、三、四、五、六、日”。
+- 在线 Figma Parent V6 P1 节点 `1610:2` 已同步修改对应 7 个星期标签，并重新截图确认原生尺寸 `375×812`。
+- 家长日程定向 Vitest `21/21`、TypeScript 检查和 `git diff --check` 通过；真实微信运行态需用户重新编译后复核。

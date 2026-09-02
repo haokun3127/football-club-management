@@ -169,7 +169,7 @@ describe("parent schedule hero", () => {
   it("presents a selected week from Monday through Sunday", () => {
     const options = buildDateOptions("2026-08-05", []);
 
-    expect(options.map((option) => option.weekShort)).toEqual(["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]);
+    expect(options.map((option) => option.weekShort)).toEqual(["一", "二", "三", "四", "五", "六", "日"]);
     expect(options[0]?.date).toBe("2026-08-03");
     expect(options[6]?.date).toBe("2026-08-09");
     expect(options[2]).toMatchObject({ date: "2026-08-05", isSelected: true });
