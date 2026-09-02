@@ -1,4 +1,4 @@
 .switcher { width: 100%; white-space: nowrap; }
 .switcher__inner { display: inline-flex; gap: 12rpx; min-width: 100%; padding: 4rpx 0; }
-.switcher__item { flex-shrink: 0; min-height: 64rpx; box-sizing: border-box; padding: 0 24rpx; border: 1rpx solid #e7eaf0; border-radius: 999rpx; background: #ffffff; color: #667085; font-size: 25rpx; line-height: 62rpx; }
+.switcher__item { flex-shrink: 0; min-height: 80rpx; box-sizing: border-box; padding: 0 28rpx; border: 1rpx solid #e7eaf0; border-radius: 999rpx; background: #ffffff; color: #667085; font-size: 28rpx; line-height: 78rpx; }
 .switcher__item--active { border-color: var(--color-brand); background: #fceeef; color: var(--color-brand); font-weight: 650; }

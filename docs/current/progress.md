@@ -1,5 +1,43 @@
 # 核心演示闭环 · 进度跟踪
 
+## 2026-09-01 双端 Current Product V3 页面建立
+
+- 在线 Figma 已新增两个独立 Current Product Page：Parent `1462:2 / 10 Current Product · Parent V3` 与 Coach `1462:3 / 11 Current Product · Coach V3`；旧 `05 Parent Generated`、`06 Coach Generated` 没有移动、删除或覆盖。
+- 两页均有治理总览（Parent `1464:2`、Coach `1464:303`），明确当前画板、路由与状态。它们是设计治理信息，不是可交付的小程序页面。
+- 已按原节点无损克隆并逐张 Figma MCP 截图回读 6 个 `375×812` 当前基准：Parent P1 周／展开／空 `1465:546`／`1465:719`／`1465:1010`；Coach C1/C8/C8.1 `1465:7`／`1465:146`／`1465:253`。截图只位于 `%TEMP%\cq-talent-figma-v3-pages-20260901`。
+- 已补迁入当前来源副本：Parent P4/P5/P8/P7 `1467:185`／`1467:315`／`1467:435`／`1467:527`；Coach C2/C6/C16 `1467:726`／`1467:784`／`1467:868`。每张均已 `375×812` Figma MCP 截图回读，但仍是待逐页 V3 改版，不是运行态视觉通过。
+- 迁入复核还发现旧 Parent P4/P5/P7/P8 的第三、第四项 TabBar 顺序过时；只在新的 V3 副本中从已验证 P1 复制当前顺序“日程 / 成长 / 发现 / 我的孩子”，历史源稿不动。C4/C7/C14 和其余总览卡继续严格标为待审查，不把旧稿或概览卡误报为小程序完成；下一轮从 Parent P4 成长开始逐页改版并与真实运行态对照。
+
+## 2026-09-01 P4 成长 V3 运行态对照
+
+- 新基准为 `1467:185 / P4 · Growth · Current V3 · Runtime Reviewed`。在线稿保留 Hero、成长足迹、训练历程和能力雷达，并补入运行态已经存在、也是产品要求的“比赛记录”卡；卡片在自动布局容器内按“足迹 → 比赛 → 训练 → 雷达”排序，首屏不会挤压顶栏或固定 TabBar。
+- 真实家长会话通过 `node scripts/devtools/wechatide-mcp-capture.cjs --route /pages/parent/growth/index` 取得严格 `375×812` 证据 `wechatide-mcp-1788198699162-3351236472724.png` 与 sidecar，均只位于 `%TEMP%\cq-talent-visual-evidence`。结构对照通过；学生、统计、日期和达成状态保留真实 API 数据差异。
+- 本轮无需修改 P4 小程序业务代码；Figma V3 截图 `p4-growth-v3-match-card-viewport-fixed.png` 位于 `%TEMP%\cq-talent-figma-v3-pages-20260901`，仅作设计对照证据。
+
+## 2026-09-01 Parent V3 一级入口运行态对照
+
+- P5 雷达：Figma `1467:315` 与真实 `/pages/parent/radar/index` 严格 `375×812` 图 `wechatide-mcp-1788226370158-27192973527160.png` 已对照。顶栏、历史对比、学员 chips、六维雷达、综合评分、详情和 TabBar 一致；维度名、人数、评估日和得分为真实数据差异。
+- P8 发现：Figma `1467:435` 与真实 `/pages/parent/content/index` 严格 `375×812` 图 `wechatide-mcp-1788226441390-2020476034700.png` 已对照。内容 Banner、快捷入口、文章列表和 TabBar 一致；文章年份、标题和数量来自内容 API。
+- P7 我的孩子：Figma `1467:527` 与真实 `/pages/parent/child/index` 严格 `375×812` 图 `wechatide-mcp-1788226506714-12780251307313.png` 已对照。身份切换、统计卡、四个功能入口、最近动态和 TabBar 一致；学员信息、数值和最近事件来自真实 API。
+- P5/P8/P7 均无需本批小程序业务代码修改；每张 Figma 截图与截图 sidecar 都只写入系统临时目录，未写入桌面或仓库。
+
+## 2026-09-01 P1 家长日程 V3 画板收口
+
+- 在线 Figma `05 Parent Generated` 的 Parent V3 区域已整理为三个清晰且不覆盖历史稿的状态：`1442:185 / P1 Parent Schedule — Week / V3`、`1444:185 / P1 Parent Schedule — Month Picker Expanded / V3`、`1442:351 / P1 Parent Schedule — Week Empty / V3`。
+- 产品语义重新对齐：家长日程默认显示周日历；点击下拉后展开月历；选日期后返回周日历；空日期保留同一周日历与稳定空内容区。此前 V3 中固定月历单稿已替换为展开态，不再作为默认首页基准；2026-08-28 的历史画板没有改动。
+- Figma MCP 已逐张回读 `375×812`：周日历、展开月历和空态的顶栏、通知铃铛、家长 TabBar、日期控件及内容区均完整可见。截图只保存于 `%TEMP%\cq-talent-figma-v3-review-20260901`。
+- 小程序 P1 已具备上述周/展开月历交互和空态稳定区，且当前工作树没有该页业务代码修改。2026-09-01 已在真实 parent 会话取得严格 `375×812` 周态运行截图 `wechatide-mcp-1788197318472-2190886782456.png`；展开态先通过 MCP 点击下拉并读取 `isMonthPickerExpanded=true`，再对原始 `563×1218` MCP 图用项目标准归一化脚本生成 `p1-month-expanded-runtime-2026-09-01.png`。两张证据都只写在 `%TEMP%\cq-talent-visual-evidence`，不把真实活动数量、日期、微信胶囊等动态/平台差异误报成设计缺陷。
+
+## 2026-08-31 教练全队日程／训练管理球队上下文 V3
+
+- 根据最新产品裁决，在线 Figma 新增且不覆盖旧稿的 V3 基准：P1 周／展开／空态为 `1442:185`／`1444:185`／`1442:351`，C1 `1364:8`、C8 `1364:151`、C8.1 `1364:253`。C1 明确为“全部球队课程”，C8 才保留“我的球队”，C8.1 为全屏“选择训练球队”。
+- 小程序 C1 已移除 `coach-selected-team`、选队入口和按队名过滤；`/coach/home` 返回的全部活动保留在日程中，每张卡继续显示真实队名和场地。
+- 小程序 C8/C8.1 改为使用真实 `/coach/training-project-tree` 的权限内 `teamOptions`。本地只保存稳定队伍 id `coach-training-team-id`；训练列表和四项统计均由当前选中队的真实活动预计算，过期 id 自动回退，不把首队汇总冒充所选队数据。
+- 定向 Vitest `32/32`、小程序 TypeScript `--noEmit` 和限定路径 `git diff --check` 已通过。WeChatIDE MCP 已取得严格 `375×812` 运行截图：C8、C8.1 为结构证据；C1 已在 `2026-08-31` 取得含两节真实训练课程的运行态图，证明全队日程结构及队伍／场地标识。当前账号仅有 U10 精英队权限，因此不把单队真实数据冒充成多队数据。
+- C1 空态仍显示“全部球队课程／按时间排列 · 每节课标明所属球队”，使空日期也不会误导为存在隐性队伍过滤；该行为先以回归用例验证失败，再作最小 WXML 修复。
+- C8 真实窄屏截图发现训练卡右侧完整时间段会溢出；改为“日期 · 开始时间”的预计算短标签（不丢失训练详情中的完整时段），红绿测试后重新取得 `375×812` 截图，标签已完整显示。
+- 当前生产账号只实际可见一支队伍；Figma C8.1 的多队示例表达产品能力，不代表前端可伪造权限外队伍或生产数据。
+
 ## 2026-08-31 P2 / P2.1 当前在线 Figma 真实截图复核
 
 - 在线唯一基准重新读取：`zZ6wKyOHKcO4UYXDd9jGwv` 的 P2 `93:139` 与 P2.1 `93:170`。
@@ -13,8 +51,8 @@
 - P4.1 `499:2` 与 P4.2 `499:18` 已重新读取当前在线 Figma，并通过已启动的 WeChatIDE MCP 分别取得严格 `375×812` 真实截图。两页原先自定义顶栏标题左间距为 `24rpx`，标题起点约 52px；按在线稿返回箭头约 16px、标题约 44px 的几何要求，分别最小修复为 `8rpx`。
 - P4.1/P4.2 定向回归测试先红后绿，最终共 `4/4`；小程序 TypeScript 和限定 `git diff --check` 通过。修复后截图与并排对照图位于 `%TEMP%\cq-talent-visual-evidence`，两页均完成“在线 Figma 已读取 / 真实截图已捕获 / 设计与运行态已视觉对照”三层记录。
 - P4.1/P4.2 的条目数量、训练名称、日期、场地和状态保留真实 API 数据，不复制 Figma 静态示例；系统状态栏、微信胶囊和 Home Indicator 按运行时规则豁免。
-- P5 `93:278` 已重新读取当前在线 Figma 上下文和截图，并通过 WeChatIDE MCP 取得真实家长路由 `/pages/parent/radar/index` 的严格 `375×812` 运行图。发现共享家长 TabBar 顺序与在线稿不一致：运行态为“日程 / 成长 / 发现 / 我的孩子”，在线稿要求“日程 / 成长 / 我的孩子 / 发现”。
-- 已最小修复 `components/role-tabbar/index.ts` 的家长展示顺序，保留原页面路径、active key 和图标；顺序回归与 P5 定向测试共 `16/16`，小程序 TypeScript、`git diff --check` 通过。修复后截图与并排对照图位于 `%TEMP%\cq-talent-visual-evidence`，已完成在线稿读取、真实截图捕获和视觉对照三层证据。
+- P5 `93:278` 的历史验收曾记录过旧稿中的第三、第四项顺序；2026-08-30 后的唯一当前产品基线已明确为“日程 / 成长 / 发现 / 我的孩子”，历史记录不得覆盖该基线。
+- 本轮已最小修复 `components/role-tabbar/index.ts` 的家长展示顺序，保留原页面路径、active key 和图标；定向顺序回归、P1 日期交互测试与小程序 TypeScript 均通过。WeChatIDE MCP 复拍的 P1 家长运行态确认第三格为“发现”、第四格为“我的孩子”。
 - P5 雷达图、学员胶囊、维度条和综合评分结构通过；学员姓名、六维名称、分数、日期和历史数据来自真实接口，与 Figma 示例不同按数据差异记录，不伪造示例数据。
 - P6 `93:308` 已重新读取当前在线 Figma 上下文和截图，并通过 WeChatIDE MCP 取得真实家长指标详情路由的严格 `375×812` 运行图。发现顶栏标题原先因 flex 居中从约 74px 起，在线稿要求约 42px 起；已将 `.p6-nav__title` 最小修复为绝对定位 `left: 84rpx` 并增加单行溢出保护。
 - P6 定向回归测试先红后绿，最终 `6/6`；小程序 TypeScript、`git diff --check` 通过。修复后截图和并排对照图位于 `%TEMP%\cq-talent-visual-evidence`，已完成在线稿读取、真实截图捕获和视觉对照三层记录。
@@ -2200,3 +2238,409 @@
 - 对照发现顶栏标题、微信绑定图标、家庭成员头像和添加成员按钮仍有旧实现残留；已用在线稿导出的 SVG 做最小修复并补充回归断言。
 - 修复后复拍确认账号绑定三张信息卡、添加成员入口、顶栏和家长 TabBar 结构一致；真实家庭成员数量差异已记录为数据豁免。
 - 详细证据见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/p10-current-comparison.md`。聚焦测试 6/6 通过，小程序 typecheck 通过。
+
+# 2026-08-31 C3 变更活动真实 MCP 复验与截图通道修复
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:634` 已重新读取；真实教练会话打开 `/pages/coach/event-change/index?id=event-cq-talent-secure-test-1-trn-0818`，取得首屏与滚动底部严格 `375×812` 截图并完成并排对照。
+- C3 顶栏、活动信息卡、变更原因、新时间、新场地、说明、通知开关和教练 TabBar 均与在线稿结构一致；活动标题、状态、真实时间、场地和家长人数按真实 API 数据差异记录，不覆盖为 Figma 示例。
+- 复现并修复截图通道问题：新版 iPhone X 返回 `screen=375×812`、`window=375×724`；脚本现在以屏幕尺寸和最终 PNG 为准，并在精确导航前刷新项目触发 TypeScript 编译。此前重装 DevTools 后出现的教练端白屏根因是生成的 55 个空 `pages/**/index.js` 桩遮蔽 TypeScript 入口，已移至系统临时可恢复备份目录，未删除、未提交。
+- 证据与详细结论见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/c3-current-comparison.md`；截图脚本定向测试 `10/10` 通过。当前仍未提交本批脚本/文档改动，待全量门禁和限定路径提交。
+
+# 2026-08-31 C4 出勤管理真实 MCP 复验
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:665` 已重新读取；真实教练会话打开 `/pages/coach/attendance/index?id=event-cq-talent-secure-test-1-trn-0818`，取得严格 `375×812` 截图并完成并排对照。
+- 顶栏、提交动作、活动统计卡、全员到场/清空按钮、学员行卡片、绿色出勤勾选和教练 TabBar 结构一致；Figma 示例 20 名学员、运行态真实 API 返回 6 名学员，按数据范围差异记录。
+- 详细证据见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/c4-current-comparison.md`。本页未发现需要修改的确定性视觉缺陷，下一页进入 C4.1。
+
+# 2026-08-31 C4.1 出勤成功真实 MCP 复验
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:696` 已重新读取；真实教练会话打开 `/pages/coach/attendance-success/index?eventId=event-cq-talent-secure-test-1-trn-0818`，取得严格 `375×812` 截图并完成并排对照。
+- 绿色成功图形、成功标题/摘要、四行信息卡、红色详情按钮、返回顶栏和教练 TabBar 结构一致；课程、日期、出勤人数和时间按真实 API 数据差异记录。
+- 详细证据见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/c4-1-current-comparison.md`。本页未发现需要修改的确定性视觉缺陷，下一页进入 C4.2。
+
+# 2026-08-31 C4.2 出勤纠正真实 MCP 复验
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:715` 已重新读取；真实教练会话打开 `/pages/coach/attendance/index?correction=1&id=event-cq-talent-secure-test-1-trn-0818`，取得首屏和滚动底部严格 `375×812` 截图并完成并排对照。
+- 警示卡、异常学员列表、状态标签、修改说明输入、重新提交按钮、返回顶栏和教练 TabBar 结构一致；真实活动 8 名学员与 Figma 示例 2 名学员的差异按数据范围记录。
+- 详细证据见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/c4-2-current-comparison.md`。本页未发现需要修改的确定性视觉缺陷，C4 系列收口。
+
+# 2026-08-31 C5.1 旧课时更正流程真实 MCP 复验
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:765` 与真实教练路由 `/pages/coach/lesson-correction/index?id=event-cq-talent-secure-test-1-trn-0818` 均已重新读取并取得严格 `375×812` 截图。
+- 当前在线稿和实现都仍是独立“课时更正”语义；异常提示、学员纠正值、保存按钮和教练 TabBar 结构一致，真实学员/数值差异按 API 数据记录。
+- 按 2026-08-31 新规则“点名即销课”，C5.1 不能直接视为新流程完成；待产品确认后改造成“出勤纠正”，与点名产生的课时台账统一。
+- 详细证据见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/c5-1-current-comparison.md`。
+
+# 2026-08-31 C5 销课处理真实 MCP 复验
+
+- 历史映射节点 `zZ6wKyOHKcO4UYXDd9jGwv / 93:734` 与当前页面语义不一致；重新读取当前在线稿确认有效基准已演进为 `zZ6wKyOHKcO4UYXDd9jGwv / 537:2`（C5 Session Settlement — Pending）。
+- 真实教练会话打开 `/pages/coach/lesson/index?id=event-cq-talent-secure-test-1-trn-0818`，通过 WeChatIDE MCP 取得严格 `375×812` 截图并完成并排对照。
+- 当前实现与 `537:2` 的“销课处理 / 待处理销课 / 待确认学员 / 确认全部 / 发起更正 / 教练 TabBar”结构一致；活动和学员内容继续按真实 API 数据差异记录，未复制 Figma 示例数据。
+- 系统状态栏和微信原生胶囊属于平台层差异；应用内容区域未发现确定性的结构缺失、遮挡或 TabBar 错位，本页无需业务代码修改。
+- 详细证据见 `.trellis/tasks/08-19-online-figma-tabbar-reaudit/research/live-2026-08-31/c5-current-comparison.md`。
+
+# 2026-08-31 点名即扣课，停用独立销课与课时更正
+
+- 产品规则已最终确认：点名是唯一到课与扣课动作；已到/迟到扣一节，未到不扣。课时更正、独立销课确认、销课历史和销课详情不再作为正常用户流程。
+- Figma 唯一基准已同步：C4 为 `93:665 / C4 点名（点名即扣课）`；C5 `537:2`、C5.1 `93:765`、历史 `537:79`、详情 `537:156` 均为历史归档，不再作为当前实现目标。
+- 后端：`recordEventParticipants()` 按 `attendance/${eventId}-${studentId}` 账本来源原子对齐到课扣课；由到课改为未到时移除同一来源。旧 `lesson-confirmation` GET/POST/PATCH 统一返回 `410 legacy_lesson_flow_retired`，教练待办不再产生 lesson 动作。
+- 小程序：C2 不再生成 lesson 操作；C4 不保留更正模式。`lesson`、`lesson-correction`、`lesson-detail` 有活动 ID 时跳至 C4 点名；`lesson-history` 或无 ID 时回教练日程，且不读取旧 API。旧页面只保留路由登记以避免历史链接白屏。
+- 实测：本地 API 已重新 build 并启动，`http://127.0.0.1:3000/health` 返回 `{"status":"ok","service":"@football-club/api"}`。WeChatIDE MCP 已获取 C2 与 C4 严格 `375×812` PNG（系统临时目录 `cq-talent-visual-evidence`）；实际导航旧 lesson 链接后 runtime route 为 `/pages/coach/attendance/index?id=event-cq-talent-secure-test-1-trn-0818`。
+- 验证：小程序全量 Vitest `442/442`、小程序 typecheck、API `server.test.ts` `55/55`、API typecheck、API build 与 `git diff --check` 均通过；最终全仓 `npx --yes pnpm@10.33.0 run check` 通过（domain `21/21`、小程序 `442/442`、API `123/123`）。未部署生产。
+
+# 2026-08-31 MCP 截图输出路径审计与硬化
+
+- 已审计当前截图脚本：只有 `scripts/devtools/wechatide-mcp-capture.cjs` 可产生本轮 Figma 验收证据；Automator、PrintWindow、窗口和桌面捕获脚本保留为历史排障工具，不得替代 MCP 证据。
+- MCP 截图省略 `--output` 时继续生成到 `%TEMP%\\cq-talent-visual-evidence`；新增共享路径校验，显式 `--output` 与 `CQ_TALENT_VISUAL_EVIDENCE_DIR` 都拒绝桌面和本项目工作区，历史验收图片未移动、未删除。
+- 验证：截图路径与 MCP 捕获定向 Node 测试 `12/12` 通过，`git diff --check` 通过。下一页验收必须先读取在线 Figma，再使用 MCP 生成新的 `375×812` PNG 与 sidecar。
+
+# 2026-08-31 C1 周日期条两行排版复验
+
+- 按产品反馈，教练 C1 折叠周条不再横向拼接“`一 31`”；星期置上、日期置下，选中日保持完整天才体育红色胶囊，星期与日期均为白色，避免只突出数字造成视觉割裂。
+- 在线 Figma 已同步读取折叠月历变体 `zZ6wKyOHKcO4UYXDd9jGwv / 1293:8`；真实微信开发者工具 MCP 重新采集 `/pages/coach/schedule/index`，PNG 与 sidecar 均严格 `375×812`，输出仅在 `%TEMP%\\cq-talent-visual-evidence`。运行图确认选中日显示为“`一`”在上、“`31`”在下。
+- C2 `/pages/coach/event/index` 同批重新采集严格 `375×812`；顶栏、深色课程卡、头像点按出勤、训练内容和教练 TabBar 的结构与在线 Figma `93:606` 一致。当前 19 人队伍相对画板 8 人示例会把出勤卡延长为可滚动内容，按真实数据范围差异记录，不压缩姓名或伪造名单。
+
+# 2026-08-31 C4 二态点名视觉与交互收口
+
+- 重新读取在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 93:665` 并取得真实教练 C4 `/pages/coach/attendance/index` 严格 `375×812` 截图。对照发现旧实现把单一出勤勾选做成了“迟到／请假／免扣”等 picker，违背已确认的“绿色到、灰色未到、点击直接切换”交互。
+- C4 已收口为二态名单：点击整行在已到与未到间切换；`late` 的既有真实数据仍按已到展示和统计，未点名/未到才显示灰色。保存仍通过现有真实 attendance API，未改动账本、角色或接口契约。
+- 视觉复拍发现 Figma 导出的勾选 SVG 仅含白色勾线，直接置于白底不可见；已将其放入绿色圆形底，未到维持灰色圆。复拍确认绿色勾和灰色未到标记均可见。定向 Vitest `9/9`、小程序 TypeScript 和限定 `git diff --check` 通过；证据仅写入 `%TEMP%\\cq-talent-visual-evidence`。
+
+# 2026-08-31 C16.3/C16.4 教练账号与帮助中心 Figma 收口
+
+- 在线 Figma 唯一基准：账号设置 `93:1262`、帮助中心 `93:1286`（file `zZ6wKyOHKcO4UYXDd9jGwv`）。
+- C16.3：修复真实登录已经返回手机号/微信绑定状态、但小程序会话持久化丢弃字段的问题；新的真实登录会显示当前账号的脱敏手机号与绑定状态，旧缓存会话保持“待同步”而不伪造数据。绑定图标改为在线稿导出的 SVG。
+- C16.4：快速上手从动态 FAQ 分类改为在线稿固定六入口；各入口仍只过滤真实 API FAQ，搜索/展开/失败保护不变。支持区恢复信息布局，但不伪造咨询动作或未配置 API。
+- WeChatIDE MCP 运行态证据均严格 `375×812` 且只写入 `%TEMP%\\cq-talent-visual-evidence`；C16.4 额外完成滚动到底部的 MCP 补拍，确认支持卡和 TabBar 不重叠。详细记录见 `.trellis/tasks/08-31-coach-account-help-fidelity/research/c16-3-c16-4-live-comparison-2026-08-31.md`。
+- 定向小程序 Vitest `14/14`、TypeScript `tsc --noEmit` 与 `git diff --check` 通过；全仓串行门禁已复核为 domain `21/21`、小程序 `445/445`、API `123/123`（API 独立复核退出码 `0`）。
+
+# 2026-09-01 C14 能力评估训练球队上下文收口
+
+- 当前 V3 Figma 基准为 `zZ6wKyOHKcO4UYXDd9jGwv / 1546:7 / C14 · Ability Assessment · Current V3 · Runtime Reviewed`。该页只显示训练管理当前保存的球队，顶部压缩为“当前训练球队”上下文卡；所有球员以四列头像/姓名直接选择，选中球员的真实雷达显示在深色主体卡中。日程仍显示教练负责的全部球队课程，不承载选队。
+- API 增加受教练成员范围保护的可选 `teamId` 查询：`GET /coach/team?teamId=` 与 `GET /coach/team/ability-overview?teamId=`。权限外球队明确返回 `403`；C14 读取当前队真实名单，再按所选学员读取真实雷达，不写入 Figma 示例姓名、球队或分数。
+- WeChatIDE MCP 对 `/pages/coach/team-ability/index` 取得严格 `375×812` 首屏证据 `wechatide-mcp-1788245745779-2245660382334.png`，并直接点选真实学员后复拍 `c14-player-selection-20260901.png`；活跃头像、姓名和雷达得分同步变化。两张证据仅保存于 `%TEMP%\\cq-talent-visual-evidence`。
+- 验证：C14 小程序定向 Vitest `5/5`、受控 API 路由测试、API/小程序 TypeScript、WeChatIDE WXML/WXSS 编译均通过。提交前完整门禁通过：domain `21/21`、小程序 `443/443`、API `123/123`；其他工作区在途改动不纳入本项提交。
+
+# 2026-09-01 C16 我的页真实数据与 V3 收口
+
+- 当前 V3 Figma 基准为 `zZ6wKyOHKcO4UYXDd9jGwv / 1467:868 / C16 · My · Current V3 · Runtime Reviewed`。在线稿删除没有后端口径支撑的“主教练 / 本赛季执教”示例，改为真实产品角色“教练”和明确范围“近30天日程”。
+- 小程序同时读取真实 `/coach/home` 的 30 天总日程和无 `teamId` 的 `/coach/team` 默认负责球队摘要，显示“近30天日程 / 在队学员 / 平均出勤”；不将设计样例 `46 / 18 / 89%` 写入客户端。页面只展示默认队，训练球队选择仍只在 C8 训练管理。
+- 退出登录改为直接清会话并全屏返回启动页，不再使用弹窗；双角色账号依旧在资料卡下方保留显式身份切换。
+- WeChatIDE MCP 对 `/pages/coach/me/index` 取得严格 `375×812` 运行证据 `wechatide-mcp-1788247215884-34748290184239.png`（sidecar 同目录）；当时的真实数据为 `26 / 19 / 93%`。C16 定向 Vitest `9/9`、小程序 TypeScript 和限定 `git diff --check` 均通过；完整门禁为 domain `21/21`、小程序 `443/443`、API `123/123`。
+
+# 2026-09-01 C3 变更活动迁入 Current Coach V3
+
+- 当前 V3 Figma 节点为 `zZ6wKyOHKcO4UYXDd9jGwv / 1561:7 / C3 · Activity Change · Current V3 · Runtime Reviewed`。它由保留的历史画板 `93:634` 非破坏性克隆而来；旧稿没有被删除、移动或覆盖。
+- 真实教练会话对 `/pages/coach/event-change/index?id=event-cq-talent-secure-test-1-trn-0818` 取得 WeChatIDE MCP 严格 `375×812` 首屏 `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788247717383-m1q6gg.jpg`。返回/保存、活动摘要、变更原因、时间/场地、说明、通知和教练 TabBar 结构与在线稿一致；真实活动为已完成、表单为未填状态，按 API/表单状态差异保留。
+- 标准截图脚本本次已成功导航并确认精确路由，但开发者工具未在其随机隐藏临时路径写出 PNG；直接 MCP 视口截图成功。该问题只影响该次证据落盘，不改动业务代码或杀掉/重启微信开发者工具。
+
+# 2026-09-01 C10 训练内容选择迁入 Current Coach V3
+
+- 当前 V3 Figma 节点为 `zZ6wKyOHKcO4UYXDd9jGwv / 1563:7 / C10 · Training Content Select · Current V3 · Runtime Reviewed`，由历史 `93:952` 非破坏性克隆而来。在线稿的搜索提示已同步为“搜索训练动作”，不再出现“动作要点”。
+- 真实教练活动路由 `/pages/coach/content-select/index?eventId=event-cq-talent-secure-test-1-trn-0818` 经 WeChatIDE MCP 取得严格 `375×812` 运行图 `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788247959031-j5w294.jpg`。一级/二级/三级指标、两列训练卡、直接点选和固定临时组保存栏均在运行；选中态和数量来自活动真实保存状态。
+- 当前实现已无“查看动作要点”入口、动作要点详情跳转或圈选图标，因此本页本轮无需业务代码改动；设计 V3 只修正旧搜索提示文案。
+
+# 2026-09-01 C11 测评任务顶栏与 Current Coach V3 收口
+
+- 将历史画板 `93:1002` 非破坏性克隆到 Coach V3，当前节点为 `1564:7 / C11 · Assessment Tasks · Current V3 · Runtime Reviewed`；旧稿不删不改。
+- C11 顶栏统一为 `height: 88rpx`、`box-sizing: content-box`、内联 `navInset/menuInset`。该变更去除了过时的 `176rpx` 补偿逻辑，并保持真实运行页的内容起点与安全区稳定。
+- 定向 Vitest `9/9` 与小程序 `tsc --noEmit` 通过；WeChatIDE MCP 真实 `375×812` 截图为 `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788248438586-u0siuk.jpg`。运行的任务名称、日期、参与人数与进度来自 API，不以设计样例覆盖。
+
+# 2026-09-01 C12 项目评分录入 Current Coach V3 基准登记
+
+- 历史画板 `93:1030` 已非破坏性克隆到 Coach V3，当前节点为 `1565:7 / C12 · Assessment Entry · Current V3 · Pending Runtime Data`；旧稿不删不改。
+- 在线稿为 `375×894` 长画板，明确学员卡片优先的指标录入结构，底部保存评分栏固定在教练 TabBar 上方。
+- 真实活动路由 `/pages/coach/assessment-entry/index?eventId=event-cq-talent-secure-test-1-trn-0818` 的 API 响应为缺少评测模板，运行时显示真实空态。因此 C12 暂不做视觉通过结论，待从 C11 进入一个带真实模板的任务后复拍；未注入伪模板或样例成绩。
+
+# 2026-09-01 C12.1 评估草稿恢复 Current Coach V3 基准登记
+
+- 历史画板 `93:1061` 已非破坏性克隆到 Coach V3，当前节点为 `1566:7 / C12.1 · Assessment Draft Resume · Current V3 · Runtime Pending`；旧稿不删不改。
+- 在线稿为 `375×812` 的本机草稿恢复状态：灰色遮罩、自动保存提示、继续录入和退出两个动作，以及固定教练 TabBar。它不是后端提交成功页。
+- 当前真实活动缺少评测模板，无法通过真实任务生成本机草稿并打开此遮罩；因此本轮只完成 Figma 基准登记，未宣称运行态视觉通过，也未创建伪草稿。
+
+# 2026-09-01 C13 学员雷达密集维度布局与 Current Coach V3 收口
+
+- 历史画板 `93:1080` 已非破坏性克隆到 Coach V3，当前节点为 `1567:7 / C13 · Student Radar · Current V3 · Runtime Reviewed`；旧稿不删不改。
+- 真实账号返回 8 个雷达维度，复拍发现最上方维度标签贴近标题区。按测试先行增加密集态 `radar-hero--dense`：卡片高度 `616rpx`、雷达绘图区顶部留白 `24rpx`；六维示例仍走原 `520rpx`。
+- 定向 Vitest `11/11`、小程序 TypeScript 通过；WeChatIDE MCP 刷新后取得严格 `375×812` 证据 `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788254323282-8cjn90.jpg`，确认标题与雷达标签不再重叠。动态名单、维度、分数和日期继续来自真实 API。
+
+# 2026-09-01 C15 能力评估录入 Current Coach V3 复核
+
+- 历史画板 `93:1132` 已非破坏性克隆到 Coach V3，当前节点为 `1568:7 / C15 · Assessment Entry · Current V3 · Runtime Reviewed`；旧稿不删不改。
+- 真实路由使用 `templateId=assessment-template-technical` 打开，后端返回一个可写“技术能力”指标组、5 名真实学员和空成绩；Figma 示例中的三组指标与已填分数按模板/数据差异处理，未在前端补造。
+- WeChatIDE MCP 取得严格 `375×812` 运行证据 `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788254598753-fk13ie.jpg`，全屏顶栏、动态分组、学员评分卡、保存草稿入口和教练 TabBar 结构存在。
+
+# 2026-09-01 C15.1 评估提交结果 Current Coach V3 复核
+
+- 历史画板 `93:1163` 已非破坏性克隆到 Coach V3，当前节点为 `1569:7 / C15.1 · Assessment Submit · Current V3 · Runtime Reviewed`；旧稿不删不改。
+- 真实路由 `/pages/coach/assessment-submit/index?title=体能综合测评&count=5` 返回成功态；标题、学员数 `5 名`、日期和状态来自路由/提交链路，未写入 Figma 样例 `18名`。
+- WeChatIDE MCP 取得严格 `375×812` 运行证据 `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788254788264-hm55su.jpg`；成功图形、总结卡、查看结果/返回列表和固定教练 TabBar 结构与在线稿一致。
+
+# 2026-09-01 C10.1 覆盖预览迁入 Current Coach V3
+
+- 历史画板 `93:983` 已非破坏性克隆到 Coach V3，当前节点为 `1571:7 / C10.1 · Coverage Preview · Current V3 · Runtime Reviewed`；旧稿不删不改。
+- 真实路由 `/pages/coach/coverage/index?eventId=event-cq-talent-secure-test-1-trn-0818` 返回真实学员覆盖、维度轨道和待同步状态；动态数据比画板样例更密集，未压缩或伪造。
+- WeChatIDE MCP 取得严格 `375×812` 运行证据 `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788255066036-einuxo.jpg`，底部确认栏位于教练 TabBar 上方且无遮挡；确认行为仍是本地返回，不写入虚假覆盖结果。
+
+# 2026-09-01 C9 队伍详情迁入 Current Coach V3
+
+- 历史画板 `93:924` 已非破坏性克隆到 Coach V3，当前节点为 `1570:7 / C9 · Team Detail · Current V3 · Runtime Reviewed`；旧稿不删不改。
+- 真实教练会话打开 `/pages/coach/team/index`，返回真实队伍 Hero、赛季、在队人数、累计训练、出勤率、学员四列名单和教练组；没有前台新建球队入口。
+- WeChatIDE MCP 取得严格 `375×812` 运行证据 `C:\Users\ASUS\AppData\Local\Temp\wechatide-viewport-screenshot-1788254946742-0k8wr3.jpg`，与在线稿结构对照通过；数据数量和姓名按 API 差异保留。
+
+## 2026-09-01 Parent/Coach V4 Figma 产品改版目录
+
+- 根据最新产品边界，日程统一定义为当前账号可见范围的课程总览；教练日程展示全部权限内球队，日程不承担选择球队。选择球队只放在训练管理，并作为训练、点名、测评和统计的上下文。
+- 在线 Figma 新增两个独立顶层 Page：Parent `12 Product Redesign · Parent V4`（`1575:28`）和 Coach `13 Product Redesign · Coach V4`（`1576:2`）。两页的产品总览分别为 `1575:29`、`1576:3`，已通过 Figma MCP 截图回读。
+- Parent V4 已整理 P1 周态/月历/空态、P4 成长、P5 雷达、P8 发现、P7 我的孩子；Coach V4 已整理 C1 全队日程、C2/C4/C6/C7 主链、C8/C8.1 训练管理选队、C9/C10/C10.1、C11-C16 测评与我的页面。
+- 本批没有小程序或后端改动，避免把 Figma 示例当成真实数据。后续实现按“一个 V4 画板 → 最小代码批次 → 真实 `375×812` 证据 → 路径限定提交”推进。
+
+## 2026-09-01 Coach V4 C6.1 比赛事件录入复核
+
+- C6.1 在线基准 `93:827` 已重新读取并以 native `375×812` 截图对照；有效运行活动为 `event-cq-talent-secure-test-1-completed-match`。首次使用过期活动得到真实 API 错误态，已改用当前教练可访问活动复验，没有伪造比赛数据。
+- WeChatIDE MCP 截图 `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788256647233-r3hq0x.png` 严格为 `375×812`；事件类型、时间、球员、备注、提交按钮和教练 TabBar 均可见。真实能力类型带来的额外 chip 是数据差异，不是视觉结构缺陷。
+- 已将来源画板非破坏性克隆到 Coach V4：`C6.1 · Match Event Add · V4`，节点 `1580:7`；旧稿与原节点保留。本批未修改小程序或后端代码。
+
+## 2026-09-01 Coach V4 C8/C8.1 训练管理选队边界复核
+
+- 在线稿节点 `1576:563`（C8）和 `1576:670`（C8.1）已回读；C8 顶部承载“我的球队”，C8.1 是独立全屏选队页，日程页不出现选择球队。
+- WeChatIDE MCP 真实截图：`C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788256951890-3gpdf3.png`、`C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788257002102-jkcmzb.png`，均严格 `375×812`。C8 训练卡按真实已选球队过滤；C8.1 只列出后台已分配队伍并支持选择后返回。
+- 当前生产测试账号仅分配一支球队，因此运行态只显示一项；没有用 Figma 示例补造队伍。C8/C8.1 定向 Vitest `10/10` 和小程序 TypeScript 均通过。
+
+## 2026-09-01 Coach V4 C1 全队日程边界复核
+
+- 在线稿节点 `1576:43` 已回读；C1 明确为全部权限内球队课程的日期总览，不提供选择球队。训练管理 C8/C8.1 的队伍上下文不进入日程页面。
+- WeChatIDE MCP 截图 `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788257314685-13ld3u.png` 严格为 `375×812`，确认顶栏、翻周箭头、月历下拉槽位、全部球队提示和空态均可见。当前真实日期范围没有课程，未用 Figma 示例填充。
+- C1 定向测试已覆盖双球队事件同时展示、前后翻周、月历切换和移除选队逻辑；本批没有业务代码改动。
+
+# 2026-09-01 Parent/Coach V4 当前交付目录整理
+
+- 复核发现 V4 页面此前的直接子节点记录与当前在线文件不完全一致，Parent 缺少清晰的当前总览/P1 周月双态，Coach 缺少当前 C1 全队日程入口。为解决查找混乱，在现有 V4 Page 内非破坏性补齐当前交付目录：Parent 总览 `1588:2`、P1 周态 `1588:27`、P1 月历展开 `1588:200`；Coach 总览 `1589:2`、C1 `1589:27`、C2 `1589:166`、C4 `1589:281`、C7 `1589:396`、C8.1 `1589:461`。
+- 设计边界重新确认：教练日程 `/pages/coach/schedule/index` 展示当前账号权限内所有球队课程，卡片标注所属球队；“我的球队/选择球队”只存在于训练管理 `/pages/coach/training/index` 与 `/pages/coach/team-selector/index`，其选择结果供训练、点名、测评和统计使用，不回流到日程筛选。
+- Figma MCP 回读和截图：Parent/Coach 总览、P1 周态、P1 月历、Coach C1、C8.1 均成功；P1/C1/C8.1 原生画板尺寸为 `375×812`。截图仅写入 `%TEMP%\\cq-talent-figma-v4-current`，没有写入桌面或仓库。
+- 家长 P1 运行复核：WeChatIDE MCP 截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788258186586-hj82b8.png`，尺寸 `375×812`；真实请求 `/parent/children`、`/parent/reminders`、`/parent/calendar` 均返回 `200`。本批未修改小程序或后端代码。
+
+## 2026-09-01 Parent/Coach V5 改版入口建立
+
+- 在线 Figma 新增两页清晰交付目录：Parent `14 Product Redesign · Parent V5`（`1599:973`）和 Coach `15 Product Redesign · Coach V5`（`1599:2`）。V3、V4 和历史页面均保留，未做覆盖或删除。
+- Parent V5 总览 `1599:974`，关键页为 P1 周态 `1599:999`、P1 月历展开 `1599:1172`、P4 `1599:1463`、P5 `1599:1623`、P8 `1599:1769`、P7 `1599:1887`。
+- Coach V5 总览 `1599:3`，关键页为 C1 全部球队日程 `1599:28`、C2 `1599:167`、C4 `1599:282`、C6 `1599:397`、C7 `1599:483`、C8 训练管理 `1599:548`、C8.1 选择训练球队 `1599:655`。
+- 这次只新增 Figma 交付入口和治理文档，没有把示例数据写入前端，也没有改变 API。新代码批次必须以 V5 为设计入口：C1 只看所有权限内球队课程，C8/C8.1 才选择训练球队。
+
+## 2026-09-01 V5 C1/C8 边界运行复核
+
+- C1 `/pages/coach/schedule/index` 使用当前教练会话取得真实截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-visual-evidence\\v5-c1-schedule-20260901.png`，原始 `563×1218` 已由 MCP 截图脚本归一化为严格 `375×812`；页面显示“全部球队课程”，未出现球队选择。
+- C8 `/pages/coach/training/index` 使用同一真实教练会话取得 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-visual-evidence\\v5-c8-training-20260901.png`，严格 `375×812`；顶部“我的球队”切换入口和当前球队课程均可见。
+- C1/C8/C8.1 定向测试共 `32/32`，小程序 TypeScript 通过。当前代码已满足“日程全队展示、训练管理选队”的契约，本批无需修改业务代码；后续视觉批次统一以 V5 节点为准。
+
+## 2026-09-01 Parent/Coach V6 Figma 改版入口
+
+- 已更正此前权限判断：Figma MCP 的团队套餐席位文案不代表该文件的最终写入权限。对唯一文件 `zZ6wKyOHKcO4UYXDd9jGwv` 的实际写入验证已成功。
+- 新增而非替换两个在线页面：Parent V6 `1609:2`（总览 `1609:4`）和 Coach V6 `1609:3`（总览 `1609:29`）。旧 V3/V4/V5 页面和历史画板均保留。
+- Parent V6 当前节点：P1 周 `1610:2`、P1 月 `1610:175`、P4 `1610:466`、P5 `1610:626`、P8 `1610:772`、P7 `1610:890`；Coach V6 当前节点：C1 `1610:1323`、C2 `1610:1462`、C4 `1610:1577`、C6 `1610:1692`、C7 `1610:1778`、C8 `1610:1843`、C8.1 `1610:1950`。
+- Figma MCP 已回读并截图 Parent/Coach 总览、P1、C1、C8；屏幕画板为 `375×812`。本轮没有改动小程序代码、API、数据库或生产环境。下一轮视觉/代码工作以 V6 为唯一页面入口：C1 显示全部授权球队课程，C8/C8.1 才选择训练球队。
+
+## 2026-09-01 C15 V6 指标卡录入代码收口
+
+- 在线唯一 Figma 基准为 `zZ6wKyOHKcO4UYXDd9jGwv / 1623:2 / C15 Assessment Entry V6`，原生尺寸 `375×812`。本批按在线稿把 C15 从“全员展开滑杆”改为“当前学员指标卡 + 全员头像切换”结构，保留训练球队上下文、保存草稿和真实逐学员提交链路。
+- 小程序现在只在 TS view model 预计算显示字段：原始值输入、单位、标准分状态和学员姓名；WXML 没有 `.map()`、`.filter()`、`.slice()` 或 `.indexOf()` 方法调用。评分写入仍通过 `submitCoachAssessment` 的真实 `rawResults` 契约，未新增伪 API 或前端换算公式。
+- 当前真实模板 `assessment-template-technical` 返回 1 项可写指标，运行态因此少于 Figma 示例的 3 张指标卡；这是 API 数据差异。真实页面截图 `C:\Users\ASUS\AppData\Local\Temp\c15-runtime-v6-20260901-final.png` 严格为 `375×812`，已复核顶栏、球队上下文、指标卡、学员选择和教练 TabBar，无文字实体泄漏或学员名竖排。
+- 验证：C15 定向 Vitest `9/9`、小程序 `tsc --noEmit`、WeChatIDE MCP WXML 编译、WXSS 编译均通过。npm 缓存曾出现 `EEXIST/EBADF`，未清理缓存，改用仓库本地依赖完成验证。
+
+# 2026-09-02 截图证据通道隔离与 C15 复验
+
+- 截图工具链已收口为系统临时证据目录：默认 `%TEMP%\\cq-talent-visual-evidence`；显式输出拒绝桌面、当前项目工作区及其子目录。Automator/窗口截图仅保留排障用途，不能替代真实 MCP 视觉证据。
+- MCP 捕获流程增加项目刷新、精确重导航、路由核验、iPhone X `screen=375×812` / `window=375×724` 兼容判断，以及 PNG 落盘等待；路径隔离和 MCP 捕获定向回归 `14/14`，Windows `py -3` Python 语法检查通过。
+- 完整门禁通过：domain `21/21`、小程序 `444/444`、API `123/123`。首次 C15 重导航因错误标题编码产生真实 `URI malformed`，没有把空白画面当作验收；修正为完整 URL 编码后，C15 真实截图 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788279060561-c8zjw9.png` 严格 `375×812`，页面内容正常显示。
+- 微信开发者工具 MCP 状态为已登录、`tokenRequired=false`；C15 的编码问题已在复验前修正，未把空白画面作为视觉证据。
+# 2026-09-01 C15 V6 首屏高度复验
+
+- 在线 Figma `1623:2` 回读确认指标面板固定 `310px` 高，首屏只显示指标面板、球员列表和训练管理 TabBar，不露出提交按钮。
+- 修复 C15 指标数量为 1 时面板收缩、导致“保存所有”按钮被 TabBar 截断的问题：`index.wxss` 增加 `min-height: 620rpx`；真实指标仍由 API 返回，不补造 Figma 示例指标。
+- TDD 回归断言先红后绿；C15 定向测试 `9/9`，小程序 `tsc --noEmit` 通过。修复后微信开发者工具 MCP 规范脚本证据为 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-visual-evidence\\c15-after-min-height-script-20260901.png`（严格 `375×812`），红色提交条不再露出，结构与在线稿一致。
+- 权限事实补充：浏览器文件级共享面板显示当前账号可编辑；MCP 团队席位仍返回 `View`；`m=dev` 仅代表 Dev Mode。
+
+## 2026-09-02 C15 V6 在线稿与运行态复核
+
+- 重新读取在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 1623:2`，确认当前 C15 画板原生尺寸为 `375×812`，固定高度指标面板、全员球员选择区和训练管理 TabBar 的首屏结构没有发生变化。
+- 修复后可信证据 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-visual-evidence\\c15-after-min-height-script-20260901.png` 严格为 `375×812`；与在线稿逐模块对照通过。真实模板只有一个可写指标，因此指标卡数量少于 Figma 示例，不补造指标或分数。
+- C15 定向 Vitest `9/9`、小程序 `tsc --noEmit`、截图门禁 `14/14` 和 `git diff --check` 通过。本轮没有改动在线 Figma、生产数据或其他未提交路径。
+
+## 2026-09-02 C4/C6/C7/C8 V6 在线稿复读复核
+
+- 在线 Figma 节点 `1610:1577`、`1610:1692`、`1610:1778`、`1610:1843` 均重新读取并取得原生 `375×812` 截图；点名、比赛记录、战术板、训练管理的顶栏、主体结构、底部导航/操作区与当前 V6 记录一致。
+- 真实运行证据分别为 C4 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270740951-d0z62o.png`、C6 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270802072-j4oamy.png`、C7 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270869987-a26yt3.png`、C8 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788270926891-bfgw1t.png`。真实名单、比赛事件和训练课程数量按 API 返回保留，未用示例数据填充。
+- 未发现新的确定性视觉/交互缺陷；C15 和 C1 的必要代码修复已分别提交 `9523db5`、`3ae5155`。全量门禁通过：domain `21/21`、小程序 `444/444`、API `123/123`。
+
+## 2026-09-01 C12/C12.1 真实模板与草稿恢复复验
+
+- 微信开发者工具 MCP 从真实教练会话进入测评任务列表，点击真实进行中任务 `assessment-task-cq-talent-fitness-july`，API 返回模板 `assessment-template-technical`、版本 `assessment-template-version-technical-1` 和真实学员数据；不再使用伪模板或示例分数。
+- C12 运行态证据为 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788285265105-4r6rz5.png`，严格 `375×812`。输入真实表单值 `4` 后重开页面，C12.1 恢复遮罩证据为 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788286045587-lnx4ya.png`；点击“继续录入”后值仍保留，证据与测试记录见 `.trellis/tasks/09-01-dual-role-v3-page-restructure/research/c12-c12.1-runtime-2026-09-01.md`。
+- C12/C12.1 旧 V3 节点 `1565:7`/`1566:7` 与当前 Coach V6 的 C15 `1623:2` 存在信息架构差异；当前没有独立 C12/C12.1 V6 画板，未将该差异误报为视觉通过。
+- 补充验证：重新打开 C12.1 后点击“退出”，对应版本化本机草稿键被清除并返回上一页；未发生生产 API 写入。
+
+## 2026-09-01 C8.1 训练球队选择运行复核
+
+- 在线 Figma `1610:1950` 与真实路由 `/pages/coach/team-selector/index` 均取得 `375×812` 证据：`C:\\Users\\ASUS\\AppData\\Local\\Temp\\c8-1-figma-1610-1950.png`、`C:\\Users\\ASUS\\AppData\\Local\\Temp\\wechatide-simulator-screenshot-1788286831906-uehf00.png`。
+- 真实 API 仅返回当前教练被分配的 `U10精英队`，运行态保留真实权限范围；在线示例中的其他球队和人数不复制到代码。页面无创建/编辑/删除球队入口，结构和选中交互与当前稿一致。
+
+# 2026-09-01 截图通道时序修复与家长 P4 复核
+
+- 复现了微信开发者工具 MCP 刷新后偶发返回 `screen/window=NaN×NaN` 的问题；根因是截图脚本在刷新、重导航完成后只读取一次尚未填充的 `systemInfo`，不是小程序页面渲染缺陷。
+- `scripts/devtools/wechatide-mcp-capture.cjs` 新增 `waitForLogicalViewport` 条件轮询，并在发布截图前等待有效视口；定向截图工具测试由 `14/14` 增至 `15/15`，故意的“先空尺寸、后有效尺寸”回归用例先红后绿。
+- 实际重新捕获家长 P4 `/pages/parent/growth/index`：`C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence\wechatide-mcp-1788287707028-315847074003.png`，严格 `375×812`。与在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 1610:466` 对照，顶栏、成长摘要、成长足迹、比赛记录、训练历程和 TabBar 结构一致；姓名、统计和状态按真实 API 保留。
+- Figma 权限事实仍分开记录：浏览器文件级共享显示当前账号可编辑；`whoami` 的团队席位显示 `View`。当前 MCP 已可读取文件并进入 `editorType=figma` 上下文，不能仅凭团队席位文案推断文件级权限。
+
+## 2026-09-01 家长 P7/P8 V6 TabBar 激活态复核
+
+- 重新取得在线 Figma V6 `1610:890`（P7 我的孩子）和 `1610:772`（P8 发现）截图，并分别与真实 WeChatIDE MCP `375×812` 截图对照。
+- 发现两个 V6 克隆画板的可见 `TabIconsOverlay` 都错误复用了 P1 的“日程”激活态；已通过 Figma MCP 做最小修正：P7 激活“我的孩子”，P8 激活“发现”，导航顺序仍为“日程 / 成长 / 发现 / 我的孩子”，历史画板未改。
+- Figma 修正后证据保存在 `%TEMP%\\cq-talent-visual-evidence\\figma-p7-1610-890-after.png` 与 `%TEMP%\\cq-talent-visual-evidence\\figma-p8-1610-772-after.png`；运行态证据为 `%TEMP%\\cq-talent-visual-evidence\\wechatide-mcp-1788288628341-33364336154311.png`（P7）及 `%TEMP%\\cq-talent-visual-evidence\\wechatide-mcp-1788288502613-2172885567075.png`（P8），均严格 `375×812`。
+- P7/P8 小程序实现的 active key 已分别是 `child`/`discover`，本轮无需业务代码修改；截图工具当前回归为 `12/12` 与 `3/3`，历史日志中的 `14/14`/`15/15` 属旧版本记录。
+
+## 2026-09-01 双端 V6 当前稿复拍与 TabBar 激活态收口
+
+- 家长 V6 P4 `1610:466`、P5 `1610:626`、P7 `1610:890`、P8 `1610:772` 重新读取后发现克隆画板都错误复用了 P1 的“日程”激活态；已通过 Figma MCP 仅修改可见 `TabIconsOverlay`：P4/P5 激活“成长”，P7 激活“我的孩子”，P8 激活“发现”。导航顺序仍为“日程 / 成长 / 发现 / 我的孩子”，历史源稿未动。
+- 修正后的 Figma 375×812 证据位于 `%TEMP%\\cq-talent-visual-evidence\\figma-p4-1610-466-after.png`、`figma-p5-1610-626-after.png`、`figma-p7-1610-890-after.png`、`figma-p8-1610-772-after.png`。
+- 教练 V6 C1 `1610:1323`、C2 `1610:1462`、C4 `1610:1577`、C6 `1610:1692`、C7 `1610:1778`、C8 `1610:1843`、C8.1 `1610:1950` 均重新读取在线稿并取得真实 MCP `375×812` 运行截图；当前没有确定性结构、顶栏、TabBar 或交互缺陷。日期、球队/学员数量、比赛比分/事件、课程状态等差异均来自真实 API 数据。
+- 本批运行证据：C1 `wechatide-mcp-1788289340223-18528535327476.png`、C2 `wechatide-mcp-1788289412136-596941137715.png`、C4 `wechatide-mcp-1788289498459-12568349279407.png`、C6 `wechatide-mcp-1788289556859-5040518217500.png`、C7 `wechatide-mcp-1788289617368-19044968056418.png`、C8 `wechatide-mcp-1788289672782-31512254753752.png`、C8.1 `wechatide-mcp-1788289777226-25240257441417.png`，均保存在 `%TEMP%\\cq-talent-visual-evidence`。
+## 2026-09-02 P1 家长月历展开提示与 V6 复拍
+
+- 在线 Figma V6 P1 月历节点 `zZ6wKyOHKcO4UYXDd9jGwv / 1610:175` 重新读取并截图，确认月历卡底部有“点击日期更新日程 · 点击收起回到周日历”操作提示。
+- 真实家长会话 MCP 截图 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence\goal-p1-week-20260902.png` 与 `goal-p1-month-hint-20260902.png` 均为 `375×812`。原运行态月历缺少该提示，导致卡片高度与在线稿不一致。
+- 已在 `apps/miniprogram-cq-talent/pages/parent/schedule/index.wxml` 和 `index.wxss` 做最小补齐；复拍确认提示、日期标记、当前日期红圈和家长 TabBar 均保持在安全区内。真实日期、空态和课程数量继续按 API 返回，不复制 Figma 示例数据。
+- 验证：P1 定向 Vitest `17/17`，WXML/WXSS MCP 编译成功；全量门禁 domain `21/21`、小程序 `446` 项、API `123/123`；证据详见 `.trellis/tasks/09-01-dual-role-v3-page-restructure/research/p1-month-hint-2026-09-02.md`。
+## 2026-09-02 Coach C3–C5 运行态复核与历史边界确认
+
+- 重新读取在线 `93:634`（C3）、`93:696`（C4.1）、`93:715`（旧 C4.2）、`93:734`（旧 C5）和 `93:765`（旧 C5.1），并用微信开发者工具 MCP 取得当前真实运行截图。
+- C3 `/pages/coach/event-change/index` 与 C4.1 `/pages/coach/attendance-success/index` 的首屏结构与在线稿一致；真实活动标题、日期、出勤数量和课程状态按 API 保留。
+- C4.2 在线稿仍表达“出勤修改”，但当前业务规则是“点名即扣课”，运行态按现行 C4 二态点名页处理；C5/C5.1 历史入口明确重定向到 C4，不再作为独立页面实现或验收目标。
+- 证据与路由核验详见 `.trellis/tasks/09-01-dual-role-v3-page-restructure/research/coach-c3-c5-reaudit-2026-09-02.md`；本批没有业务代码改动。
+## 2026-09-02 Coach C6.1/C6.2 比赛事件与草稿复核
+
+- 重新读取在线比赛事件录入与草稿状态画板，并用真实教练会话取得 C6.1、C6.2 严格 `375×812` MCP 截图。
+- C6.1 的事件类型、球员名单和空输入状态来自真实 API/页面初始状态；当前能力集合包含进球、助攻、扑救、抢断、犯规、黄牌、红牌、乌龙球，保持中文显示。
+- C6.2 已验证输入分钟/备注后离开比赛事件页，C6 比赛页出现页内未提交草稿提示。在线旧稿的遮罩弹窗不再作为实现目标，当前页内提示卡符合“子页面全屏、不要弹窗”的产品规则。
+- 证据详见 `.trellis/tasks/09-01-dual-role-v3-page-restructure/research/coach-c6-1-c6-2-reaudit-2026-09-02.md`；本批没有业务代码修改。
+
+## 2026-09-02 Coach C6/C7/C8 最新在线稿复核
+
+- 重新读取在线 Figma C6 `1610:1692`、C7 `1610:1778`、C8 `1610:1843`，并用 WeChatIDE MCP 取得严格 `375×812` 运行证据。C6 比赛记录和 C7 战术板的顶栏、主体结构、事件/球员区域、操作区和教练 TabBar 均无新的确定性缺陷；真实比分、事件、球员号码和上场状态不以 Figma 示例覆盖。
+- C8 对照发现在线稿顶部“我的球队”卡明确使用红色“切换 ›”，运行态原来只有灰色箭头；已在 `apps/miniprogram-cq-talent/pages/coach/training/index.wxml` / `index.wxss` 做最小修复，仍由整张卡进入唯一选队页面，没有新增前台建队入口。
+- C8 修复前/后运行证据分别为 `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788302319538-i4oi5m.png` 和 `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788302564006-tfs4bn.png`；Figma 对照证据分别保存在 `%TEMP%\\cq-talent-visual-evidence\\figma-c6-current-1610-1692.png`、`figma-c7-current-1610-1778.png`、`figma-c8-current-1610-1843.png`。
+- C8 定向测试按 TDD 先红后绿，最终 `8/8`；小程序 TypeScript、WXML/WXSS 编译均通过。详细记录见任务 research 下的 `coach-c6-1-c6-2-reaudit-2026-09-02.md`、`coach-c7-current-reaudit-2026-09-02.md`、`coach-c8-current-reaudit-2026-09-02.md`。
+
+## 2026-09-02 P5 与 C6.1 目标模式复拍
+
+- P5 `/pages/parent/radar/index` 通过 WeChatIDE MCP 复拍严格 `375×812`，与在线 Figma `1610:626` 的返回、历史对比、雷达卡、维度详情和 TabBar 结构一致；证据见任务 research 下的 `p5-mcp-permission-and-runtime-rerun-2026-09-02.md`。
+- C6.1 `/pages/coach/match-event-add/index` 使用真实比赛事件路由复拍严格 `375×812`。运行态 8 个中文事件入口、空表单占位和真实球员与 Figma 的 6 个示例入口/预填示例不同，属于设计范围与真实 API 契约待同步；不删能力、不造默认值。证据见 `c6-1-goal-rerun-2026-09-02.md`。
+- 截图门禁 `15/15`；任务专用缓存下完整门禁 domain `21/21`、小程序 `448/448`、API `123/123` 通过。本批没有修改业务代码或在线 Figma。
+
+## 2026-09-02 P5 MCP 权限与运行态复拍
+
+- Figma 文件 `zZ6wKyOHKcO4UYXDd9jGwv` 的浏览器文件级共享仍显示当前账号可编辑；Figma MCP `whoami` 的团队席位仍为 `View`。两者属于不同权限层，当前只确认 MCP 读取稳定，未把 MCP 误报为可写。
+- P5 在线稿 `1610:626` 与 `/pages/parent/radar/index` 重新取得证据，运行态使用 iPhone X `375×812`；返回、标题、历史对比、学员选择、雷达卡、综合评分、维度详情和家长 TabBar 结构一致。真实账号数据差异按 API 保留。
+- 证据与细节见 `.trellis/tasks/09-01-dual-role-v3-page-restructure/research/p5-mcp-permission-and-runtime-rerun-2026-09-02.md`。截图门禁 `node --test ...` 为 `15/15`，`git diff --check` 通过；本批无业务代码修改。
+
+## 2026-09-02 当前工作区门禁复跑记录
+
+- 首次按交接命令执行 `npx --yes pnpm@10.33.0 run check` 时未进入项目检查，npm 缓存复现 `EEXIST/EBADF`（缓存目标已存在、文件句柄重命名失败）；未清理或覆盖缓存。
+- 改用本机已存在的 `pnpm` 入口执行 `pnpm run check`：domain 类型检查与测试通过（`21/21`），小程序类型检查与测试通过（`448/448`）。
+- API 测试为 `122/123` 通过，唯一失败为 `apps/api/test/server.test.ts:1579`：测试 `persists the acceptance dual-role demo through SQLite restart and supports targeted rollback` 期望 `coachTeam.stats.completedTrainingCount` 为 `3`，实际为 `2`。该失败发生在本轮只读 Figma 目录整理之外，涉及工作区已有的 API seed/persistence 在途改动，暂不擅自修改。
+- 当前结论：本轮 Figma 目录与文档证据有效，但全仓门禁不能记为全绿；上述 API 失败必须在后续 API 变更批次中单独定位和验证。
+
+## 2026-09-02 Coach V6 C6.2 设计目录补齐
+
+- 已通过 Edge 浏览器确认 Figma 文件级权限为可编辑：页面处于“设计”模式，选中画板后右侧位置、尺寸、自动布局和填充属性可编辑；MCP `whoami` 的团队席位 `View` 与此权限事实分开记录。
+- 旧 C6.2 `93:858` 已非破坏性复制进 `17 Product Redesign · Coach V6`，新节点 `1924:12`，名称 `C6.2 · Match Draft Notice · V6 · Pending IA Alignment`，位置 `x=870,y=5710`，尺寸 `375×812`。旧稿继续保留，未覆盖或删除。
+- Figma 回读元数据与截图证据：`C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence\figma-c6-2-v6-1924-12-20260902.png`，原生 `375×812`。Coach V6 当前目录已覆盖 C6.1、C6.2、C9、C10.1、C12/C12.1、C13、C15.1、C16 及其子页。
+- 运行态仍按产品硬约束采用全屏比赛页内草稿提示卡，不回退在线旧稿的遮罩弹窗；本批没有业务代码或生产数据改动。
+
+## 2026-09-02 Coach V6 剩余页面在线证据补齐
+
+- 在线 Figma 当前文件 `zZ6wKyOHKcO4UYXDd9jGwv` 的 Coach V6 剩余节点已重新截图并保存到系统临时目录：C13 `1909:2`（`375×908`）、C15.1 `1913:2`、C16 `1915:2`、C16.1 `1917:7`、C16.2 `1919:7`、C16.3 `1921:7` 均为 `375×812`，C16.4 `1923:7` 为 `375×924`。
+- 这批证据对应当前 V6 目录，不再把旧 `93:*` 节点作为页面入口；C13/C16.4 的运行态仍需按长页面首屏和滚动段分别复核，不能因设计截图成功回读就宣称整页验收完成。
+- 本批没有业务代码、API、数据库或生产环境改动；`git diff --check` 已通过。详细截图清单见 `.trellis/tasks/09-01-dual-role-v3-page-restructure/research/c13-c16-visual-reaudit-2026-09-02.md`。
+
+## 2026-09-02 Coach V6 证据总表路径刷新
+
+- 核对系统临时目录后确认 C10、C10.1、C13、C14、C15、C15.1、C16.1 的最新 WeChatIDE MCP 截图仍存在，且均为真实 `375×812` 证据；证据总表已从旧文件名更新到最新截图文件名。
+- 本次只更新证据总表与本日志，没有修改业务代码、Figma、API、数据库或其他未提交路径。Figma MCP 当前账号仍为 `View`，浏览器文件级编辑权限与 MCP 席位继续分开记录。
+
+## 2026-09-02 Coach C16.2–C16.4 最新运行态复核
+
+- C16.2 私教兴趣 `1919:7`、C16.3 账号设置 `1921:7`、C16.4 帮助中心 `1923:7` 均重新读取在线 Figma，并通过正确的小程序目录 `apps/miniprogram-cq-talent` 取得真实 `375×812` WeChatIDE MCP 截图。
+- 最新运行证据：C16.2 `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788313178902-61e1y9.png`；C16.3 `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788313229173-4756ma.png`；C16.4 首屏 `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788313263375-4d3too.png`、滚动段 `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788313308595-ojorix.png`。
+- 对照结论：三页的顶栏、主体卡片、操作区和教练 TabBar 均无确定性结构缺陷；C16.4 滚动后顶栏保持固定，FAQ 数量按真实接口返回（5 条），不以 Figma 的 3 条示例覆盖。
+
+## 2026-09-02 Coach C1/C2/C6/C7/C8/C8.1 证据路径复核
+
+- 发现旧总表中的 6 个 `wechatide-mcp-*` 文件名已不在系统临时目录；没有继续保留失效链接，而是使用当前已登录的 WeChatIDE MCP、正确的小程序目录和精确路由重新取得截图。
+- 最新证据：C1 `wechatide-simulator-screenshot-1788313532147-80prf1.png`、C2 `wechatide-simulator-screenshot-1788313548282-r5fftx.png`、C6 `wechatide-simulator-screenshot-1788313572441-rm48if.png`、C7 `wechatide-simulator-screenshot-1788313584617-6eju3b.png`、C8 `wechatide-simulator-screenshot-1788313603810-5qm7y9.png`、C8.1 `wechatide-simulator-screenshot-1788313615953-8bjr33.png`，均位于 `%TEMP%` 且严格 `375×812`。
+- 人工抽查未发现新的确定性顶栏、TabBar、布局或路由问题；日期、球队/学员数量、比分和事件仍按真实 API 展示。证据总表已同步更新，业务代码未改动。
+
+## 2026-09-02 Coach V6 在线目录清单校正
+
+- 重新读取 `1609:3` 后确认当前在线 Coach V6 顶层画板包含 C1、C2、C4、C6、C6.1、C6.2、C7、C8、C8.1、C3、C10、C11、C14、C15、C9、C10.1、C12、C12.1、C13、C15.1、C16、C16.1–C16.4。
+- `docs/current/figma-source-of-truth.md` 已补齐此前遗漏的 C3、C10、C14、C15，并明确区分浏览器文件级编辑权限与 Figma MCP 当前 `View` 席位；没有改变任何 Figma 节点或业务代码。
+
+## 2026-09-02 Parent V6 在线稿逐页复核
+
+- 重新读取并截图在线 Figma Parent V6 的 P1 周日程 `1610:2`、P1 月历展开 `1610:175`、P4 成长 `1610:466`、P5 能力雷达 `1610:626`、P8 发现 `1610:772`、P7 我的孩子 `1610:890`。
+- 对照系统临时目录中的真实 `375×812` 运行证据，确认顶栏、通知层、周/月历结构、TabBar 顺序及 P4/P5/P8/P7 激活态均一致；运行态的日期、学员、统计和文章内容按 API 展示，不以 Figma 示例数据覆盖。
+- 本轮未发现确定性视觉或交互缺陷，未修改业务代码、Figma、API 或数据库。
+
+## 2026-09-02 Acceptance fixture rolling-window regression closed
+
+- 复现并定位 API 门禁失败：`apps/api/test/server.test.ts:1579` 原本在真实日期 **2026-09-02** 运行时得到 `completedTrainingCount=2`，而验收合同要求演示种子的三节已完成训练均可见。
+- 根因是三节演示训练分别发生在 **2026-08-03、2026-08-06、2026-08-10**；教练团队接口按当前日期回溯 30 天，8 月 3 日在 9 月 2 日时已出窗。SQLite 持久化、球队归属和事件过滤均未丢数据。
+- 测试现在只模拟 `Date` 到 `2026-08-13T12:00:00.000Z`，保留真实异步计时器；没有改变生产接口的动态日期逻辑，也没有降低断言。
+- 定向 acceptance SQLite 重启/回滚测试通过；完整 `pnpm run check` 通过：domain `21/21`、小程序 `448/448`、API `123/123`。详细根因与防复发规则见 `.trellis/tasks/09-01-dual-role-v3-page-restructure/research/acceptance-clock-drift-2026-09-02.md` 和 `.trellis/spec/guides/cross-layer-thinking-guide.md`。
+
+## 2026-09-02 C9/C16 WeChatIDE MCP 规范证据补齐
+
+- C9 `/pages/coach/team/index` 已补拍规范首屏和滚动段：`%TEMP%\\cq-talent-visual-evidence\\goal-c9首屏-rerun-20260902.png`、`goal-c9滚动段-rerun-20260902.png`，均严格 `375×812`；首屏与在线 Figma `1900:2` 的顶栏、球队摘要、学员网格、教练组和固定 TabBar 结构一致，滚动段未发现截断。
+- C16 `/pages/coach/me/index` 已补拍规范首屏：`%TEMP%\\cq-talent-visual-evidence\\goal-c16-my-rerun-20260902.png`，严格 `375×812`；与在线 Figma `1915:2` 对照，身份卡、双角色切换、菜单、退出按钮和 TabBar 结构一致。
+- 本批只更新验收证据文档，没有修改业务代码、API、数据库或其他用户在途改动；运行态姓名、球队、统计数字继续按真实会话/API 展示。
+
+## 2026-09-02 P1/C1 新鲜 MCP 证据补拍
+
+- P1 家长日程：在线 Figma `1610:2` 与真实 `/pages/parent/schedule/index` 均重新取得 `375×812` PNG；证据分别为 `%TEMP%\\cq-talent-visual-evidence\\figma-p1-recheck-1610-2-20260902.png`、`%TEMP%\\cq-talent-visual-evidence\\goal-p1-recheck-20260902.png`。
+- C1 教练全队日程：在线 Figma `1610:1323` 与真实 `/pages/coach/schedule/index` 均重新取得 `375×812` PNG；证据分别为 `%TEMP%\\cq-talent-visual-evidence\\figma-c1-recheck-1610-1323-20260902.png`、`%TEMP%\\cq-talent-visual-evidence\\goal-c1-recheck-20260902.png`。
+- 两页的顶栏、日期切换、状态胶囊/说明、空态容器和固定 TabBar 的几何关系均无确定性缺陷。真实运行态日期是 **2026年9月2日**，课程空态与 Figma 示例课程列表的差异属于 API/日期状态，不用伪造数据填平。
+- C1 取证通过家长端真实双角色切换进入教练端；直接外部写 storage 后重启会被旧运行时模块缓存恢复为家长态，已记录在任务 research，不作为产品登录失败。
+
+## 2026-09-02 P1 家长日程新鲜 MCP 证据复核
+
+- 当前项目窗口由 WeChatIDE MCP 复用成功，当前路由为 `/pages/parent/schedule/index`；正式取证脚本重新导航并生成 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence\goal-p1-recheck-20260902.png`，严格 `375×812`，sidecar 同名生成。
+- 在线 Figma 基准为 `zZ6wKyOHKcO4UYXDd9jGwv / 1610:2`，新鲜截图为 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence\figma-p1-recheck-1610-2-20260902.png`，原生 `375×812`。
+- 对照确认顶栏、通知卡、周切换、状态胶囊、空态/课程列表区域和固定家长 TabBar 的几何关系一致。运行态显示真实当前日期 **2026年9月2日** 且当天无活动，所以显示空态；Figma 使用课程示例，属于数据状态差异，不以硬编码示例覆盖真实 API。
+- 截图定向回归 `visual-evidence-path.test.cjs` + `wechatide-mcp-capture.test.cjs`：`15/15`；本次未修改业务代码、API、数据库或 Figma。
+
+## 2026-09-02 Parent P4/P7/P8 新鲜 MCP 证据补齐
+
+- P4 成长 `1610:466`、P7 我的孩子 `1610:890`、P8 发现 `1610:772` 均重新保留在线 Figma 截图与真实 WeChatIDE MCP 运行截图；运行证据分别为 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence\goal-p4-recheck-20260902.png`、`goal-p7-recheck-20260902.png`、`goal-p8-recheck-20260902.png`，三张均严格 `375×812`。
+- 对照确认 P4 的成长摘要/足迹/比赛记录/训练历程、P7 的孩子身份与切换入口、P8 的 Banner/快捷入口/文章区，以及三页各自的 TabBar 结构和激活态均无确定性缺陷。
+- 当前姓名、球队、统计、动态、文章和数量继续按真实 API 展示；Figma 示例数据不硬编码补齐。详细记录见 `research/p4-fresh-mcp-fidelity-recheck-2026-09-02.md`、`p7-fresh-mcp-fidelity-recheck-2026-09-02.md`、`p8-fresh-mcp-fidelity-recheck-2026-09-02.md`。
+
+## 2026-09-02 Coach C9/C16 失效证据路径修复
+
+- 重新通过真实双角色切换进入教练端，补拍 C9 `/pages/coach/team/index` 首屏与滚动段，以及 C16 `/pages/coach/me/index` 首屏；三张截图均为 WeChatIDE MCP 严格 `375×812`，保存在 `%TEMP%\cq-talent-visual-evidence`：`goal-c9首屏-rerun-20260902.png`、`goal-c9滚动段-rerun-20260902.png`、`goal-c16-my-rerun-20260902.png`。
+- 已将 `research/v6-authoritative-page-evidence-map-2026-09-02.md` 中原先已不存在的 C9/C16 文件名更新为上述新证据；对照在线 Figma `1900:2` / `1915:2`，顶栏、主体结构、滚动边界、双角色入口和固定教练 TabBar 均无确定性缺陷。
+- 详细记录见 `research/c9-c16-fresh-mcp-fidelity-recheck-2026-09-02.md`。运行态姓名、球队、统计、学员和教练数量继续按真实 API 展示。
+
+## 2026-09-02 教练能力雷达视觉修正与双端日历测试数据补齐
+
+- 教练能力评估 `/pages/coach/team-ability/index` 将雷达预览调整为更轻的半透明红色填充、清晰轮廓、低对比度网格和收紧后的标签布局；继续使用固定不透明顶栏和内容占位，避免雷达内容穿透顶栏。
+- 相关定向测试通过：能力评估与安全测试账号定向 Vitest `25/25`，API 类型检查通过；WeChatIDE Automator 端口 `9425` 本轮未连接，因此没有将本批标记为可信运行截图验收通过。
+- 生产数据按受控流程补齐：先创建 SQLite 一致性备份，再向 7 个既有双角色测试账号各写入当前周 **2026-08-31 至 2026-09-06** 和下一周 **2026-09-07 至 2026-09-13** 的每日训练活动，共 14 天；每个日期 19 名学员均有参与记录，已过去日期同步为已完成/点名扣课时，未来日期为待参加。
+- 生产回读通过：7 个账号均为 `14/14` 日期、`14/14` 日期各有 19 条参与记录、每个账号新增 38 条每日活动课时流水；`https://cqtc.pomi.tech/health` 返回 200，既有 7 账号完整审计也通过，场地与展示文案无英文占位。
+- 全仓 `pnpm run check` 本轮仍被既有 `pages/coach/schedule/seven-day-strip.test.mjs` 的旧 CSS 断言阻塞（当前实际选择器为 `.c1-week-nav` 新结构）；该失败未由本批雷达或生产数据逻辑引起，`git diff --check` 通过。
+
+## 2026-09-02 双端可点击性尺寸统一
+
+- 按已确认的统一基准同步在线 Figma Parent V6 `1609:2` 与 Coach V6 `1609:3`：小字号文案小幅放大，返回/铃铛/周月切换和 TabBar 的交互框扩大，P1 `1610:2` 与 C1 `1610:1323` 回读截图均保持 `375×812` 且无画板越界。
+- 小程序共享层同步调整：`app.wxss`、`styles/tokens.wxss`、`components/app-header`、`role-tabbar`、`status-chip`、`submit-bar`、`activity-card`、`student-switcher`。目标是提升命中区，不粗暴放大图标，保持 Figma 页面比例。
+- 共享组件测试 `10/10`、小程序 TypeScript、WXML/WXSS 和限定路径 `git diff --check` 通过。全量小程序测试为 `448/449`，唯一失败是未触碰的 `pages/coach/schedule/seven-day-strip.test.mjs` 旧 CSS 断言，详见任务研究记录。
+- Coach C1 真实 MCP 截图 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence\touch-target-coach-2026-09-02.png` 严格 `375×812`；当前微信会话为教练态，Parent P1 直接导航为空白，家长真实截图需在家长会话下补拍，未误报为双端视觉验收完成。
+- 详细记录：`.trellis/tasks/09-01-dual-role-v3-page-restructure/research/touch-target-size-unification-2026-09-02.md`。

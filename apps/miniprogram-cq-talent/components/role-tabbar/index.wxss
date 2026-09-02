@@ -1,11 +1,11 @@
 .tabbar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 9999; display: flex; box-sizing: border-box; height: 140rpx; padding-bottom: 0; border-top: 1rpx solid #e7eaf0; background: #ffffff; box-shadow: 0 -6rpx 20rpx rgba(16,24,40,.04); }
 .tabbar--flow { position: static; }
-.tabbar-item { position: relative; display: flex; flex: 1; box-sizing: border-box; flex-direction: column; align-items: center; justify-content: flex-start; height: 112rpx; min-width: 0; padding-top: 16rpx; color: #8e97a6; font-family: "Noto Sans SC", sans-serif; font-size: 18rpx; font-weight: 400; }
-.tabbar-icon-wrap { position: static; display: flex; align-items: center; justify-content: center; width: 32rpx; height: 32rpx; border-radius: 18rpx; transition: background-color 180ms ease; }
-.tabbar-icon { width: 32rpx; height: 32rpx; }
-.tabbar-dot { position: absolute; top: 88rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: transparent; }
-.tabbar-label { width: 100%; margin-top: 8rpx; overflow: hidden; max-width: 100%; font-size: 18rpx; line-height: 22rpx; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+.tabbar-item { position: relative; display: flex; flex: 1; box-sizing: border-box; flex-direction: column; align-items: center; justify-content: flex-start; height: 140rpx; min-width: 0; padding-top: 12rpx; color: #8e97a6; font-family: "Noto Sans SC", sans-serif; font-size: 20rpx; font-weight: 400; }
+.tabbar-icon-wrap { position: static; display: flex; align-items: center; justify-content: center; width: 40rpx; height: 40rpx; border-radius: 20rpx; transition: background-color 180ms ease; }
+.tabbar-icon { width: 36rpx; height: 36rpx; }
+.tabbar-dot { position: absolute; top: 96rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: transparent; }
+.tabbar-label { width: 100%; margin-top: 6rpx; overflow: hidden; max-width: 100%; font-size: 20rpx; line-height: 24rpx; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
 .tabbar--parent .tabbar-item.active { color: #a80f1b; }
-.tabbar--parent .tabbar-item.active .tabbar-dot { top: 88rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: #a80f1b; }
+.tabbar--parent .tabbar-item.active .tabbar-dot { top: 96rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: #a80f1b; }
 .tabbar--coach .tabbar-item.active { color: var(--color-brand); }
-.tabbar--coach .tabbar-item.active .tabbar-dot { top: 88rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: var(--color-brand); }
+.tabbar--coach .tabbar-item.active .tabbar-dot { top: 96rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: var(--color-brand); }

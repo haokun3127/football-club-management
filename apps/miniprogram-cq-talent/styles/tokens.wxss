@@ -37,9 +37,9 @@ page {
   /* 字号（rpx） */
   --font-size-display: 36rpx;
   --font-size-section: 30rpx;
-  --font-size-body: 28rpx;
-  --font-size-aux: 24rpx;
-  --font-size-caption: 22rpx;
+  --font-size-body: 30rpx;
+  --font-size-aux: 26rpx;
+  --font-size-caption: 24rpx;
 
   /* 间距（rpx） */
   --spacing-page: 24rpx;

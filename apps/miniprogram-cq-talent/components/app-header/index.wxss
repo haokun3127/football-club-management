@@ -9,16 +9,16 @@
 .app-header__title--large { font-size: 44rpx; line-height: 54rpx; }
 .app-header__subtitle { margin-top: 2rpx; overflow: hidden; max-width: 100%; color: #667085; font-size: 20rpx; text-overflow: ellipsis; white-space: nowrap; }
 .app-header--brand .app-header__subtitle { color: rgba(255,255,255,.76); }
-.app-header__side { display: flex; align-items: center; min-width: 48rpx; }
+.app-header__side { display: flex; align-items: center; min-width: 80rpx; }
 .app-header__side--right { margin-left: auto; justify-content: flex-end; }
-.app-header__back { flex: 0 0 auto; width: 48rpx; height: 48rpx; margin-left: 0; }
-.app-header__action { min-height: 64rpx; padding: 0 12rpx; color: var(--color-brand); font-size: 28rpx; font-weight: 600; line-height: 64rpx; }
+.app-header__back { flex: 0 0 auto; width: 80rpx; height: 80rpx; box-sizing: border-box; padding: 16rpx; margin-left: 0; }
+.app-header__action { min-height: 80rpx; padding: 0 16rpx; color: var(--color-brand); font-size: 30rpx; font-weight: 600; line-height: 80rpx; }
 .app-header--brand .app-header__action { color: #ffffff; }
 
 /* 图标动作（Figma P1: 32x32 铃铛 + 8px 红点 #ff3b30 白描边） */
-.app-header__icon-action { position: relative; display: flex; align-items: center; justify-content: center; width: 64rpx; height: 64rpx; }
+.app-header__icon-action { position: relative; display: flex; align-items: center; justify-content: center; width: 80rpx; height: 80rpx; }
 .app-header__icon-glyph { font-size: 40rpx; line-height: 1; }
 .app-header__icon-dot { position: absolute; top: 6rpx; right: 6rpx; width: 16rpx; height: 16rpx; background: #ff3b30; border: 2rpx solid #ffffff; border-radius: 50%; }
 
 /* 胶囊动作（Figma P3: bg #fceeef, text #a80f1b, r=16px, pad 6/12px） */
-.app-header__action--pill { min-height: 54rpx; margin-right: 8rpx; padding: 0 24rpx; background: var(--color-brand-soft); border-radius: 999rpx; font-size: 24rpx; line-height: 54rpx; }
+.app-header__action--pill { min-height: 64rpx; margin-right: 8rpx; padding: 0 28rpx; background: var(--color-brand-soft); border-radius: 999rpx; font-size: 26rpx; line-height: 64rpx; }

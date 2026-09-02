@@ -11,4 +11,4 @@
 .activity-card__meta { display: flex; flex-wrap: wrap; gap: 8rpx 20rpx; margin-top: 16rpx; }
 .activity-card__meta-item { color: #667085; font-size: 22rpx; }
 .activity-card__footer { display: flex; justify-content: flex-end; margin-top: 20rpx; padding-top: 18rpx; border-top: 1rpx solid #f2f4f7; }
-.activity-card__action { min-width: 180rpx; min-height: 64rpx; margin: 0; padding: 0 24rpx; border-radius: 14rpx; background: var(--color-brand); color: #ffffff; font-size: 25rpx; font-weight: 600; line-height: 64rpx; }
+.activity-card__action { min-width: 192rpx; min-height: 80rpx; margin: 0; padding: 0 28rpx; border-radius: 14rpx; background: var(--color-brand); color: #ffffff; font-size: 28rpx; font-weight: 600; line-height: 80rpx; }
