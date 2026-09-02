@@ -32,3 +32,10 @@
 - 运行态重新截图：`/pages/coach/match/index?id=event-cq-talent-secure-test-1-completed-match`，证据为 `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788302136905-nm7c8x.png`，MCP 返回严格 `375×812`。
 - 确定性结构对照通过：返回顶栏、比赛摘要 Hero、编辑比赛、添加事件入口、事件时间线和教练 TabBar 均存在，位置层级没有发现新的确定性错位。
 - 运行态与 Figma 的可见差异均有状态依据：Figma 为“周末联赛排兵”示例、示例比分/事件；运行态为真实“周末友谊赛战报”`4:2`、8 条真实事件，并显示本机草稿恢复卡。上述差异不判为视觉缺陷，也不写入伪造数据。
+
+## 2026-09-02 Coach V6 目录补齐
+
+- 已确认浏览器文件级权限为可编辑：Edge Figma 页面处于“设计”模式，当前文件 `zZ6wKyOHKcO4UYXDd9jGwv` 的右侧属性面板可编辑位置、尺寸、自动布局和填充；MCP 团队席位仍单独显示为 `View`，不作为浏览器文件权限的判断依据。
+- 将旧 C6.2 `93:858` 非破坏性复制到 `17 Product Redesign · Coach V6`，新节点为 `1924:12`，名称为 `C6.2 · Match Draft Notice · V6 · Pending IA Alignment`，位置 `x=870,y=5710`，尺寸 `375×812`；旧稿未删除、未覆盖。
+- 在线 Figma 回读元数据确认新节点完整保留比赛状态、比分、事件时间线、页内草稿提示卡和教练 TabBar；Figma 截图证据为 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence\figma-c6-2-v6-1924-12-20260902.png`，原生 `375×812`。
+- 当前 V6 C6.2 仅作为设计目录与 IA 对照基准；运行态继续采用比赛页内提示卡，符合现行“所有子页面全屏、不要弹窗”的产品规则，不把旧遮罩弹窗直接当成实现要求。
