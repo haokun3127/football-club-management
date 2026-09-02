@@ -34,7 +34,11 @@
   "condition": {},
   "simulatorPluginLibVersion": {},
   "packOptions": {
-    "ignore": [],
+    "ignore": [
+      { "type": "file", "value": "assets/venues/venue-1.png" },
+      { "type": "file", "value": "assets/venues/venue-2.png" },
+      { "type": "file", "value": "assets/venues/venue-3.png" }
+    ],
     "include": []
   },
   "editorSetting": {}

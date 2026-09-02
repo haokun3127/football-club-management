@@ -130,7 +130,7 @@ function presentVenues(venues: VenueInfo[]): VenueView[] {
     canNavigate: hasRealCoordinates(latitude, longitude),
     hasFacilities: facilities.length > 0,
     usageLabel: `本月训练 ${monthlyCount}次`,
-    heroImage: `/assets/venues/venue-${(index % 3) + 1}.png`,
+    heroImage: `/assets/venues/venue-${(index % 3) + 1}-optimized.jpg`,
   }));
 }
 

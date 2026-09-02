@@ -85,7 +85,7 @@ describe("parent venues", () => {
         monthlyCount: 4,
         canNavigate: true,
         usageLabel: "本月训练 4次",
-        heroImage: "/assets/venues/venue-1.png",
+        heroImage: "/assets/venues/venue-1-optimized.jpg",
       }],
     });
     expect(page.data.venues[0]).not.toHaveProperty("gradient");
