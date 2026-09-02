@@ -33,17 +33,17 @@
 | C8 训练管理 | `1610:1843` | `/pages/coach/training/index` | `wechatide-mcp-1788310927121-12184812738353.png` | 训练球队上下文、切换入口和课程管理结构已通过 |
 | C8.1 选择训练球队 | `1610:1950` | `/pages/coach/team-selector/index` | `wechatide-mcp-1788310966888-31216239597846.png` | 全屏选队、后台分配范围和选中态已通过 |
 | C9 队伍详情 | `1900:2` | `/pages/coach/team/index` | 首屏 `wechatide-viewport-screenshot-1788309838648-gm8ggx.jpg` + 滚动段 `wechatide-viewport-screenshot-1788309847807-9rkr32.jpg` | 长页结构和真实队伍数据已通过；Figma 原生高度约 871px |
-| C10 三层训练内容选择 | `1615:2` | `/pages/coach/content-select/index?eventId=<trainingActivityId>` | `wechatide-simulator-screenshot-1788271694548-ln435e.png` | 三层内容、直接选择和固定保存栏已通过 |
-| C10.1 覆盖预览 | `1903:2` | `/pages/coach/coverage/index?eventId=<trainingActivityId>` | `wechatide-simulator-screenshot-1788300725223-f7mxjb.png` | 覆盖卡、维度进度和确认栏已通过 |
+| C10 三层训练内容选择 | `1615:2` | `/pages/coach/content-select/index?eventId=<trainingActivityId>` | `wechatide-simulator-screenshot-1788312153981-l53fry.png`（系统临时目录，375×812） | 三层内容、直接选择和固定保存栏已通过 |
+| C10.1 覆盖预览 | `1903:2` | `/pages/coach/coverage/index?eventId=<trainingActivityId>` | `wechatide-simulator-screenshot-1788312169124-zyixxr.png`（系统临时目录，375×812） | 覆盖卡、维度进度和确认栏已通过 |
 | C11 测评任务 | `1617:2` | `/pages/coach/test-tasks/index` | `wechatide-simulator-screenshot-1788311584128-4hgvai.png`（系统临时目录，375×812） | 任务筛选、进度卡和新增入口已通过；真实测试任务数量与 Figma 示例不同 |
 | C12 测评录入 | `1905:2` | `/pages/coach/test-entry/index?eventId=<activityId>` | `wechatide-simulator-screenshot-1788312568988-tqevo1.png`（系统临时目录，375×812） | 退出草稿遮罩后，批量项目评分结构、真实学员卡片、指标输入/缺测状态、保存区和 TabBar 可用 |
 | C12.1 草稿恢复 | `1907:2` | C12 本机草稿状态 | `wechatide-simulator-screenshot-1788312558838-0tsoqy.png`（系统临时目录，375×812） | 本机草稿恢复遮罩、继续/退出按钮和 TabBar 可见；未写入生产数据 |
-| C13 学员雷达 | `1909:2` | `/pages/coach/student-radar/index?source=goal` | 首屏 `wechatide-viewport-screenshot-1788309861983-35g9r0.jpg` + 滚动段 `wechatide-viewport-screenshot-1788309871148-8bezqd.jpg` | 结构和真实 8 维数据已通过；Figma 原生高度约 908px |
-| C14 能力评估 | `1619:2` | `/pages/coach/team-ability/index` | `wechatide-simulator-screenshot-1788292822261-gy0lsq.png` | 训练球队上下文、全员选择和雷达已通过 |
-| C15 指标录入 | `1623:2` | `/pages/coach/assessment-entry/index?templateId=<templateId>` | `wechatide-simulator-screenshot-1788292830287-utsxqr.png` | 固定高度指标面板、当前学员和全员切换已通过 |
-| C15.1 评估提交 | `1913:2` | `/pages/coach/assessment-submit/index?...` | `wechatide-simulator-screenshot-1788292837998-suycgg.png` | 成功态、提交摘要和后续按钮已通过 |
+| C13 学员雷达 | `1909:2` | `/pages/coach/student-radar/index?source=goal` | `wechatide-simulator-screenshot-1788312195417-v8kkes.png`（系统临时目录，375×812） | 结构和真实 8 维数据已通过；Figma 原生高度约 908px |
+| C14 能力评估 | `1619:2` | `/pages/coach/team-ability/index` | `wechatide-simulator-screenshot-1788312700314-ls95ig.png`（系统临时目录，375×812） | 训练球队上下文、全员选择和雷达已通过 |
+| C15 指标录入 | `1623:2` | `/pages/coach/assessment-entry/index?templateId=<templateId>` | `wechatide-simulator-screenshot-1788312711472-s5ncq6.png`（系统临时目录，375×812） | 固定高度指标面板、当前学员和全员切换已通过 |
+| C15.1 评估提交 | `1913:2` | `/pages/coach/assessment-submit/index?...` | `wechatide-simulator-screenshot-1788312722631-hxg297.png`（系统临时目录，375×812） | 成功态、提交摘要和后续按钮已通过 |
 | C16 我的 | `1915:2` | `/pages/coach/me/index` | `wechatide-viewport-screenshot-1788309549997-t129qi.jpg` | 教练资料、双角色入口和退出结构已通过 |
-| C16.1 权限范围 | `1917:7` | `/pages/coach/permissions/index?source=goal` | `wechatide-simulator-screenshot-1788293000800-q0zpnq.png` | 开关、说明、保存和 TabBar 已通过 |
+| C16.1 权限范围 | `1917:7` | `/pages/coach/permissions/index?source=goal` | `wechatide-simulator-screenshot-1788312734799-3gvomg.png`（系统临时目录，375×812） | 开关、说明、保存和 TabBar 已通过 |
 | C16.2 私教兴趣 | `1919:7` | `/pages/coach/private-interest/index?source=goal` | `wechatide-simulator-screenshot-1788293008604-k3suvm.png` | 时段网格、预约开关和费用说明已通过 |
 | C16.3 账号设置 | `1921:7` | `/pages/coach/account/index?source=goal` | `wechatide-simulator-screenshot-1788293016035-75kp0y.png` | 账号设置结构已通过；证据文件名沿用当前记录 |
 | C16.4 帮助中心 | `1923:7` | `/pages/coach/help/index?source=goal` | 首屏 `wechatide-viewport-screenshot-1788309885329-6ulfui.jpg` + 滚动段 `wechatide-viewport-screenshot-1788309894474-exe23q.jpg` | 首屏与滚动段均已通过；Figma 原生高度约 924px |
