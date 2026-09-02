@@ -3,7 +3,7 @@
 ## 基准
 
 - 在线 Figma 文件：`zZ6wKyOHKcO4UYXDd9jGwv`
-- 当前 V3 节点：C10.1 `1571:7`、C11 `1564:7`、C12 `1565:7`、C12.1 `1566:7`
+- 当前 V6 节点：C10.1 `1903:2`、C11 `1617:2`、C12 `1905:2`、C12.1 `1907:2`；旧 V3 节点仅作为历史来源保留。
 - 运行设备：微信开发者工具 iPhone X，逻辑视口 `375×812`，`devicePixelRatio=3`
 - 可信采集方式：WeChatIDE MCP `simulator_screenshot`；标准脚本输出到系统临时目录 `%TEMP%\\cq-talent-visual-evidence`
 

@@ -11,14 +11,14 @@
 | 页面 | 在线 Figma 节点 | 运行路由 | Figma 证据 | 运行证据 | 结论 |
 | --- | --- | --- | --- | --- | --- |
 | C3 变更活动 | `1612:2` | `/pages/coach/event-change/index?id=event-cq-talent-secure-test-1-future-training` | `C:\Users\ASUS\AppData\Local\Temp\figma-live-C3-20260902.png` | `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788300685728-ugh4a1.png` | 顶栏保存、活动摘要、变更原因胶囊、新时间、新场地、说明和全屏 TabBar 结构一致；活动标题、日期、场地和输入占位取真实活动状态。 |
-| C6.1 添加比赛事件 | `1580:7` | `/pages/coach/match-event-add/index?eventId=event-cq-talent-secure-test-1-scheduled-match` | `C:\Users\ASUS\AppData\Local\Temp\figma-live-C6-1-20260902.png` | `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788300698913-cly5jd.png` | 全屏顶栏、事件类型、时间、球员、备注、提交按钮和 TabBar 均存在；但在线稿当前示例为 6 个事件胶囊，真实能力契约返回 8 个（额外含“扑救/抢断”），且示例默认值与真实空草稿占位不同。这是 Figma 产品范围与真实能力契约的待同步项，不能直接以伪数据抹平，也暂不把本页标记为完全视觉通过。 |
+| C6.1 添加比赛事件 | `1894:2` | `/pages/coach/match-event-add/index?eventId=event-cq-talent-secure-test-1-scheduled-match` | `C:\Users\ASUS\AppData\Local\Temp\cq-talent-visual-evidence\figma-c6-1-v6-1894-2-after-events-20260902.png` | `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788301474505-f0ovb2.png` | V6 在线稿已补齐真实能力契约的 8 个中文事件；全屏顶栏、事件类型、时间、球员、备注、提交按钮和 TabBar 与真实运行态结构一致。Figma 示例默认值与真实空草稿占位的差异保留为状态差异。 |
 | C9 队伍详情 | `1570:7` | `/pages/coach/team/index` | `C:\Users\ASUS\AppData\Local\Temp\figma-live-C9-20260902.png` | `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788300712072-vye1zx.png` | 队伍摘要、人数/训练/出勤统计、学员名单、教练组和 TabBar 结构一致；真实账号的球队名、赛季、学员数和教练组来自 API，页面继续滚动显示真实长名单。 |
 | C10.1 覆盖预览 | `1571:7` | `/pages/coach/coverage/index?eventId=event-cq-talent-secure-test-1-trn-0818` | `C:\Users\ASUS\AppData\Local\Temp\figma-live-C10-1-20260902.png` | `C:\Users\ASUS\AppData\Local\Temp\wechatide-simulator-screenshot-1788300725223-f7mxjb.png` | 顶栏、学员覆盖卡、维度进度条、底部确认栏和 TabBar 结构一致；学员数量、覆盖比例和真实维度数量由 API 决定。 |
 
-## C6.1 待决项
+## C6.1 处理结论
 
-- Domain `MatchEventType` 与客户端能力真实支持 `goal / assist / save / tackle / foul / yellow_card / red_card / own_goal`；当前 Figma `1580:7` 只展示 6 个示例入口。
-- 后续应在产品范围明确后选择一条：同步 Figma 增加真实支持的“扑救/抢断”，或由 API/页面契约明确过滤这两个事件；在选择前不修改业务代码、不伪造默认球员/分钟/备注。
+- Domain `MatchEventType` 与客户端能力真实支持 `goal / assist / save / tackle / foul / yellow_card / red_card / own_goal`。
+- 已在 Coach V6 `1894:2` 同步“扑救/抢断”，不修改真实 API 能力，也不伪造默认球员/分钟/备注；历史 `1580:7` 仍保留为 V4 来源。
 
 ## 2026-09-02 追加复拍
 
