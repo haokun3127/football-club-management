@@ -1471,6 +1471,11 @@ describe("api server", () => {
   });
 
   it("persists the acceptance dual-role demo through SQLite restart and supports targeted rollback", async () => {
+    // The acceptance events are intentionally dated in the fixture's August 2026
+    // demonstration window. Freeze the test clock so the coach's rolling 30-day
+    // scope remains deterministic as real time advances.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-08-13T12:00:00.000Z"));
     process.env.FCM_CQ_TALENT_ACCEPTANCE_SEED = "1";
     const directory = mkdtempSync(join(tmpdir(), "cq-talent-acceptance-demo-"));
     temporaryAcceptanceDemoDirectories.push(directory);

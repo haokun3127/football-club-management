@@ -515,6 +515,35 @@ actual exit code before launching another.
   reopening SQLite files. This can produce artificial reopen timeouts in
   otherwise passing persistence tests.
 
+---
+
+## Historical Acceptance Fixture Date Windows
+
+Acceptance data often uses a deliberately fixed demonstration window, while
+production endpoints correctly derive rolling ranges from the real current
+date. These two clocks are different cross-layer inputs and must not be
+implicitly coupled.
+
+### Checklist
+
+- [ ] Identify every endpoint or reducer that derives a range from `Date.now()`
+      or `new Date()`.
+- [ ] Compare the fixture event dates with that runtime window before changing
+      a count assertion.
+- [ ] Freeze only `Date` in historical tests; keep real timers available for
+      Fastify, SQLite and cleanup code.
+- [ ] Keep production date logic dynamic; do not move historical fixture dates
+      into production behavior.
+- [ ] Record the exact fixture dates and the frozen test instant in the task
+      evidence.
+
+**Real-world example**: The Chongqing Talent acceptance fixture had completed
+training events on August 3, August 6 and August 10, 2026. When the test ran
+on September 2, the coach's rolling 30-day scope excluded August 3 and the
+correct endpoint result was `2`, although the fixture contract expected all
+three. Freezing only `Date` at August 13 made the test deterministic without
+weakening the production scope or freezing asynchronous timers.
+
 Before classifying a SQLite reopen timeout as a repository regression, inspect
 for active `pnpm run check` / API Vitest process trees launched by the current
 session, let or stop only those known task-owned processes, then retry exactly
