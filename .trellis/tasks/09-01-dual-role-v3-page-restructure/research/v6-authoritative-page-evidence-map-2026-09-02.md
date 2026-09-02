@@ -11,12 +11,12 @@
 
 | 页面 | 当前 Figma 节点 | 运行路由 | 运行证据 | 状态 |
 | --- | --- | --- | --- | --- |
-| P1 周日程 | `1610:2` | `/pages/parent/schedule/index` | `wechatide-simulator-screenshot-1788300532300-fka44t.png` | 结构、顶栏、周切换、课程态和 TabBar 已通过 |
-| P1 月历展开 | `1610:175` | `/pages/parent/schedule/index` | `wechatide-simulator-screenshot-1788300423382-a7sgt1.png` | 月历展开、月份切换、日期标记和收起提示已通过 |
-| P4 成长 | `1610:466` | `/pages/parent/growth/index` | `wechatide-simulator-screenshot-1788300439526-gxmwtz.png` | 结构和真实成长数据已通过 |
-| P5 能力雷达 | `1610:626` | `/pages/parent/radar/index` | `wechatide-simulator-screenshot-1788300452686-zgluet.png` | 结构、雷达、历史对比和 TabBar 已通过 |
-| P8 发现 | `1610:772` | `/pages/parent/content/index` | `wechatide-simulator-screenshot-1788300465861-hwerat.png` | 结构、Banner、入口和 TabBar 已通过 |
-| P7 我的孩子 | `1610:890` | `/pages/parent/child/index` | `wechatide-simulator-screenshot-1788300479038-p15zlg.png` | 结构、双角色入口和 TabBar 已通过 |
+| P1 周日程 | `1610:2` | `/pages/parent/schedule/index` | `wechatide-simulator-screenshot-1788311796978-k4jdj2.png`（系统临时目录，375×812） | 结构、顶栏、周切换、课程态和 TabBar 已通过；当前真实日期无活动，显示空态 |
+| P1 月历展开 | `1610:175` | `/pages/parent/schedule/index` | `wechatide-simulator-screenshot-1788311915855-a4itys.png`（系统临时目录，375×812） | 月历展开、月份切换、日期标记和收起提示已通过；真实日期与 Figma 示例月份不同 |
+| P4 成长 | `1610:466` | `/pages/parent/growth/index` | `wechatide-simulator-screenshot-1788311824164-dnptpu.png`（系统临时目录，375×812） | 结构和真实成长数据已通过 |
+| P5 能力雷达 | `1610:626` | `/pages/parent/radar/index` | `wechatide-simulator-screenshot-1788311836322-tdc3tx.png`（系统临时目录，375×812） | 结构、雷达、历史对比和 TabBar 已通过 |
+| P8 发现 | `1610:772` | `/pages/parent/content/index` | `wechatide-simulator-screenshot-1788311848490-tf6max.png`（系统临时目录，375×812） | 结构、Banner、入口和 TabBar 已通过 |
+| P7 我的孩子 | `1610:890` | `/pages/parent/child/index` | `wechatide-simulator-screenshot-1788311860650-sagzhb.png`（系统临时目录，375×812） | 结构、双角色入口和 TabBar 已通过 |
 
 ## Coach V6
 
