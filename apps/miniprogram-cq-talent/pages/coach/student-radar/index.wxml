@@ -7,19 +7,7 @@
     <view class="radar-nav__placeholder"></view>
   </view>
   <view class="radar-page__body">
-    <!-- 学员选择 chips（Figma C13: 选中=品牌红 r20） -->
-    <scroll-view wx:if="{{students.length}}" scroll-x class="student-strip" enhanced show-scrollbar="{{false}}">
-      <view class="student-strip__inner">
-        <view
-          wx:for="{{students}}"
-          wx:key="id"
-          class="student-chip {{activeStudentId === item.id ? 'student-chip--active' : ''}}"
-          data-id="{{item.id}}"
-          data-name="{{item.name}}"
-          bindtap="selectStudent"
-        >{{item.name}}</view>
-      </view>
-    </scroll-view>
+    <view wx:if="{{students.length}}" class="radar-context">{{radarContext}}</view>
 
     <status-view
       state="{{state}}"
@@ -32,35 +20,26 @@
     <block wx:if="{{hasRadar}}">
       <view class="radar-hero {{radarHeroClass}}">
         <view class="radar-hero__head">
-          <view class="radar-hero__title">学员能力雷达</view>
-          <view class="radar-hero__period">{{assessmentPeriod}}</view>
+          <view class="radar-hero__title">六维能力模型</view>
+          <view class="radar-hero__period">综合 {{overall}}</view>
         </view>
         <view class="radar-hero__plot">
-          <radar-canvas class="radar-hero__canvas" dark="{{true}}" metrics="{{radar}}" width="440rpx" height="360rpx"></radar-canvas>
+          <radar-canvas class="radar-hero__canvas" metrics="{{radar}}" width="528rpx" height="528rpx"></radar-canvas>
         </view>
-        <view class="radar-hero__overall">{{overall}}</view>
       </view>
     </block>
 
-    <view wx:if="{{dimensions.length}}" class="dimensions-card">
-        <view class="dimensions-card__title">维度评分</view>
-        <view class="dimension-list">
-          <view wx:for="{{dimensions}}" wx:key="metricId" class="dimension-row">
-            <view class="dimension-row__head">
-              <view class="dimension-row__label">{{item.label}}</view>
-              <view class="dimension-row__value">{{item.value}}</view>
-            </view>
-            <view class="dimension-row__track">
-              <view class="dimension-row__fill" style="width: {{item.width}}"></view>
-            </view>
-          </view>
+    <view wx:if="{{students.length}}" class="radar-roster">
+      <view class="radar-roster__head">
+        <view class="radar-roster__title">全部学员</view>
+        <view class="radar-roster__hint">点击头像切换查看</view>
+      </view>
+      <view class="radar-roster__grid">
+        <view wx:for="{{students}}" wx:key="id" class="radar-player {{activeStudentId === item.id ? 'radar-player--active' : ''}}" data-id="{{item.id}}" bindtap="selectStudent">
+          <view class="radar-player__avatar">{{item.initial}}</view>
+          <view class="radar-player__name">{{item.name}}</view>
         </view>
-    </view>
-
-    <view wx:if="{{students.length}}" class="feedback-card">
-      <view class="feedback-card__title">能力评语</view>
-      <view class="feedback-card__message">{{feedbackMessage}}</view>
+      </view>
     </view>
   </view>
-  <role-tabbar role="coach" active="training" />
 </view>

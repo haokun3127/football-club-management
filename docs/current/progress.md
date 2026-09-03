@@ -2766,3 +2766,11 @@
 - 草稿按 `coach-assessment-bulk:<taskId>:<projectId>` 隔离，输入后即时保存在本机；保存时逐个调用现有 `submitCoachAssessment`，只清除成功学员，失败学员继续保留草稿，不新增伪 API 或伪数据。
 - 项目选择页已改为进入批量录入页，并在 `app.json` 注册新路由；C12.1 测试覆盖真实名单、草稿隔离、真实提交契约和 WXML 禁止数组方法。
 - 验证：C11/C12/C12.1/C15 联合 Vitest `26/26`、小程序 TypeScript `--noEmit`、`git diff --check` 通过。尚未取得新的微信开发者工具 `375×812` 运行态截图，不能记为视觉验收完成；现有全仓历史阻断仍按前文记录单独处理。
+
+## 2026-09-03 Growth / Assessment V7 代码同步与 Figma 层清理
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv` 的 C14 `1973:181` 已完成一次非破坏性清理：隐藏旧版单人雷达、旧教练 TabBar 和旧操作提示层，保留 V7 球队能力概览与学员卡；写入后重新读取截图，原生尺寸 `375×812`。
+- C12.1 `1973:131` 小程序已同步为 V7 结构：顶栏显示当前测评项目标题且不再显示“保存草稿”，上下文区展示任务／球队／学期，底部操作顺序为“保存本项目”→“下一项目”，并保留任务+项目隔离草稿和真实逐学员提交契约。
+- C13 学员雷达改为 V7 白色雷达卡+全体学员四列头像网格，点击学员通过真实路由进入对应雷达；C14 能力评估改为当前训练球队概览+两列真实学员卡，并移除页面 TabBar，点击学员进入 C13。
+- 验证：C12.1/C13/C14 定向 Vitest `20/20`、小程序 TypeScript `--noEmit` 通过、`git diff --check` 通过；全仓 `pnpm run check` 仍被两个与本批无关的旧阻断拦截：`apps/miniprogram-cq-talent/scripts/devtools-screenshot.test.mjs` 在收集阶段 `SyntaxError: Invalid or unexpected token`，`apps/miniprogram-cq-talent/pages/parent/content/index.test.mjs` 的精确字符串断言受 CRLF/LF 行尾差异影响失败。
+- 微信开发者工具 MCP 当前已登录但工作树窗口没有有效教练会话；对三个教练路由取得的原始图为启动页且 `381×823`，不作为视觉验收证据。需先建立真实 coach 会话、重新编译，再用归一化脚本取得严格 `375×812` 页面截图后才能关闭 C12.1/C13/C14 视觉验收。

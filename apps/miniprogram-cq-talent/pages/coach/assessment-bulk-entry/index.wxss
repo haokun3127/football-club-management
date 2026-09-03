@@ -1,13 +1,12 @@
 .bulk-page { min-height: 100vh; box-sizing: border-box; padding-bottom: 232rpx; background: #f6f7f9; color: #202124; }
-.bulk-nav { position: sticky; top: 0; z-index: 100; display: flex; box-sizing: content-box; height: 88rpx; align-items: center; padding: 0 32rpx; background: #fceeef; }
+.bulk-nav { position: sticky; top: 0; z-index: 100; display: flex; box-sizing: content-box; height: 88rpx; align-items: center; padding: 0 32rpx; background: #ffffff; }
 .bulk-nav__back { display: flex; flex: 0 0 48rpx; width: 48rpx; height: 48rpx; align-items: center; justify-content: center; }
 .bulk-nav__back image { width: 48rpx; height: 48rpx; }
 .bulk-nav__title { min-width: 0; flex: 1; margin-left: 20rpx; overflow: hidden; font-size: 36rpx; font-weight: 700; line-height: 44rpx; text-overflow: ellipsis; white-space: nowrap; }
-.bulk-nav__action { flex: 0 0 auto; margin-left: 16rpx; color: #667085; font-size: 26rpx; line-height: 36rpx; }
-.bulk-body { padding: 32rpx 32rpx 48rpx; }
+.bulk-body { padding: 16rpx 32rpx 48rpx; }
 .bulk-context { padding: 28rpx 32rpx; border-radius: 28rpx; background: #ffffff; }
 .bulk-context__eyebrow, .bulk-context__meta { color: #667085; font-size: 24rpx; line-height: 34rpx; }
-.bulk-context__title { margin-top: 8rpx; font-size: 36rpx; font-weight: 700; line-height: 46rpx; }
+.bulk-context__title { margin-top: 8rpx; font-size: 34rpx; font-weight: 700; line-height: 44rpx; }
 .bulk-context__meta { margin-top: 8rpx; color: #a80f1b; }
 .bulk-hint { margin: 24rpx 4rpx 16rpx; color: #667085; font-size: 24rpx; line-height: 36rpx; }
 .bulk-row { margin-top: 16rpx; padding: 24rpx; border-radius: 28rpx; background: #ffffff; }
@@ -28,4 +27,4 @@
 .bulk-actions__primary, .bulk-actions__secondary { display: flex; height: 88rpx; align-items: center; justify-content: center; box-sizing: border-box; border-radius: 44rpx; font-size: 28rpx; font-weight: 700; }
 .bulk-actions__primary { flex: 1; background: #a80f1b; color: #ffffff; }
 .bulk-actions__primary--disabled { opacity: .58; }
-.bulk-actions__secondary { flex: 0 0 220rpx; border: 1rpx solid #d9dde5; background: #ffffff; color: #667085; }
+.bulk-actions__secondary { flex: 1; background: #fff0f1; color: #a80f1b; }

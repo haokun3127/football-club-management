@@ -69,7 +69,7 @@ describe("C12.1 team batch assessment entry", () => {
     const page = createPageInstance();
     await page.onLoad({ taskId: "task-real", templateId: "template-real", projectId: "fitness", title: "体能综合测评" });
 
-    expect(page.data).toMatchObject({ state: "ready", projectTitle: "速度耐力", teamName: "U10发展队", filledLabel: "已填写 0 人 · 未填写 2 人" });
+    expect(page.data).toMatchObject({ state: "ready", projectTitle: "30米冲刺录入", teamName: "U10发展队", filledLabel: "已填写 0 人 · 未填写 2 人" });
     expect(page.data.rows).toHaveLength(2);
     page.onRawInput({ currentTarget: { dataset: { studentId: "student-1", fieldId: "speed" } }, detail: { value: "4.92" } });
     expect(page.data.rows[0]).toMatchObject({ studentId: "student-1", rawInputValue: "4.92", scoreLabel: "待提交" });
@@ -90,6 +90,12 @@ describe("C12.1 team batch assessment entry", () => {
     expect(template).toContain('bindtap="saveProject"');
     expect(template).toContain('bindtap="nextProject"');
     expect(template).toContain("固定在底部");
+    expect(template).toContain('>{{projectTitle}}</view>');
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
+  });
+
+  it("keeps V7 save before next and removes the extra top-right action", () => {
+    expect(template).not.toContain("保存草稿");
+    expect(template.indexOf('bindtap="saveProject"')).toBeLessThan(template.indexOf('bindtap="nextProject"'));
   });
 });

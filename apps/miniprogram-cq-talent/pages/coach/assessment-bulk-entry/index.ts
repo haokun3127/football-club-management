@@ -148,7 +148,7 @@ Page<PageData>({
         templateId: form.templateId,
         templateVersionId: form.templateVersionId,
         projectId,
-        projectTitle: fields[0]?.groupLabel || "测评项目",
+        projectTitle: fields[0]?.label ? `${fields[0].label}录入` : fields[0]?.groupLabel || "测评项目",
         taskTitle: task.title,
         teamName: team.team?.name?.trim() || "球队待同步",
         termLabel: task.termLabel?.trim() || "学期待同步",

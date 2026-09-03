@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   getCoachStudentRadar: vi.fn(),
   requireRole: vi.fn(),
   navigateBack: vi.fn(),
+  navigateTo: vi.fn(),
   nextTick: vi.fn(),
   getStorageSync: vi.fn(),
 }));
@@ -22,6 +23,7 @@ vi.mock("../../../utils/presentation", () => ({
 
 globalThis.wx = {
   navigateBack: mocks.navigateBack,
+  navigateTo: mocks.navigateTo,
   nextTick: mocks.nextTick,
   getStorageSync: mocks.getStorageSync,
 };
@@ -78,54 +80,41 @@ describe("coach ability assessment", () => {
     mocks.getCoachStudentRadar.mockReset().mockResolvedValue(validRadar);
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
     mocks.navigateBack.mockReset();
+    mocks.navigateTo.mockReset();
     mocks.nextTick.mockReset().mockImplementation((callback) => callback());
     mocks.getStorageSync.mockReset().mockReturnValue("team-weekend-select");
   });
 
-  it("uses the training-management team context and renders a direct all-player radar selector", async () => {
+  it("uses the training-management team context and renders the V7 team overview roster", async () => {
     const page = createPageInstance();
 
     await page.load();
 
     expect(mocks.getCoachTeam).toHaveBeenCalledWith("team-weekend-select");
-    expect(mocks.getCoachStudentRadar).toHaveBeenCalledWith("student-1");
+    expect(mocks.getCoachStudentRadar).toHaveBeenCalledTimes(3);
     expect(page.data).toMatchObject({
       state: "ready",
       teamContext: "周末精英队",
-      activeStudentId: "student-1",
-      activeStudentName: "罗志炫",
-      hasRadar: true,
-      radarMounted: true,
+      summaryOverall: "78",
+      summaryBestDimension: "传球",
+      summaryNeedDimension: "射门",
       students: [
-        expect.objectContaining({ id: "student-1", name: "罗志炫", isActive: true }),
-        expect.objectContaining({ id: "student-2", name: "骆啸宇", isActive: false }),
-        expect.objectContaining({ id: "student-3", name: "四字姓名", isActive: false }),
+        expect.objectContaining({ id: "student-1", name: "罗志炫", scoreLabel: "78" }),
+        expect.objectContaining({ id: "student-2", name: "骆啸宇", scoreLabel: "78" }),
+        expect.objectContaining({ id: "student-3", name: "四字姓名", scoreLabel: "78" }),
       ],
     });
 
     await page.selectStudent({ currentTarget: { dataset: { id: "student-2" } } });
 
-    expect(mocks.getCoachStudentRadar).toHaveBeenLastCalledWith("student-2");
-    expect(page.data).toMatchObject({ activeStudentId: "student-2", activeStudentName: "骆啸宇" });
+    expect(mocks.navigateTo).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining("student=student-2") }));
   });
 
-  it("keeps the newest selected player's radar when an earlier request resolves later", async () => {
-    const first = deferred();
-    const second = deferred();
-    mocks.getCoachStudentRadar
-      .mockImplementationOnce(() => first.promise)
-      .mockImplementationOnce(() => second.promise);
+  it("navigates from the team roster to a selected player's radar", async () => {
     const page = createPageInstance();
-
-    const initialLoad = page.load();
-    await Promise.resolve();
-    const latestLoad = page.selectStudent({ currentTarget: { dataset: { id: "student-2" } } });
-    second.resolve(validRadar.map((point) => ({ ...point, value: 88 })));
-    await latestLoad;
-    first.resolve(validRadar.map((point) => ({ ...point, value: 10 })));
-    await initialLoad;
-
-    expect(page.data).toMatchObject({ activeStudentId: "student-2", activeStudentName: "骆啸宇", overall: "88" });
+    await page.load();
+    await page.selectStudent({ currentTarget: { dataset: { id: "student-2" } } });
+    expect(mocks.navigateTo).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining("student=student-2") }));
   });
 
   it("preserves the selected team roster while reporting invalid radar data honestly", async () => {
@@ -138,13 +127,13 @@ describe("coach ability assessment", () => {
     await page.load();
 
     expect(page.data).toMatchObject({
-      state: "empty",
+      state: "ready",
       hasTeam: true,
       hasStudents: true,
       hasRadar: false,
       radar: [],
       dimensions: [],
-      message: "罗志炫暂无足够的有效评测数据生成雷达图。",
+      message: "",
     });
   });
 
@@ -169,15 +158,16 @@ describe("coach ability assessment", () => {
   it("uses the C14 V3 team context, direct avatar grid, and WXML-safe bindings", () => {
     expect(existsSync(backArrow)).toBe(true);
     expect(pageConfig).not.toContain('"app-header"');
-    expect(pageConfig).toContain('"role-tabbar"');
+    expect(pageConfig).not.toContain('"role-tabbar"');
     expect(pageConfig).toContain('"navigationBarTitleText": "能力评估"');
     expect(template).toContain('class="ability-context"');
     expect(template).toContain("当前训练球队");
     expect(template).toContain('class="ability-roster__grid"');
-    expect(template).toContain('class="ability-player {{item.isActive ? \'ability-player--active\' : \'\'}}"');
+    expect(template).toContain('class="ability-summary"');
+    expect(template).toContain('class="ability-player"');
     expect(template).toContain('bindtap="selectStudent"');
     expect(template).toContain('class="ability-player__name"');
-    expect(template).toContain('width="352rpx" height="352rpx"');
+    expect(template).not.toContain('radar-canvas');
     expect(template).not.toContain('ability-nav__export');
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(template).not.toMatch(/U10|2025|Player One|李明辉/);
@@ -185,9 +175,9 @@ describe("coach ability assessment", () => {
     expect(controller).toContain('getCoachStudentRadar');
     expect(controller).not.toContain('getCoachTeamAbilityOverview');
     expect(stylesheet).toMatch(/\.ability-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
-    expect(stylesheet).toMatch(/\.ability-hero\s*\{(?=[^}]*height:\s*620rpx)(?=[^}]*background:\s*#07111f)/s);
-    expect(stylesheet).toMatch(/\.ability-roster__grid\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/s);
+    expect(stylesheet).toMatch(/\.ability-summary\s*\{(?=[^}]*height:\s*284rpx)(?=[^}]*background:\s*#07111f)/s);
+    expect(stylesheet).toMatch(/\.ability-roster__grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s);
     expect(stylesheet).toMatch(/\.ability-player__avatar\s*\{(?=[^}]*width:\s*80rpx)(?=[^}]*height:\s*80rpx)(?=[^}]*border-radius:\s*50%)/s);
-    expect(stylesheet).toMatch(/\.ability-page\s*\{[^}]*padding-bottom:\s*140rpx/s);
+    expect(stylesheet).toMatch(/\.ability-page\s*\{[^}]*padding-bottom:\s*48rpx/s);
   });
 });
