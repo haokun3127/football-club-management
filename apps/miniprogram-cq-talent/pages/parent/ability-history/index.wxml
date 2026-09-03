@@ -1,0 +1,30 @@
+<view class="ability-history-page">
+  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
+    <view class="page-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+    <view class="page-nav__title">能力模型更新</view>
+    <view class="page-nav__spacer"></view>
+  </view>
+
+  <view class="ability-history-page__body">
+    <view class="ability-history-page__intro">查看每一次能力变化与来源</view>
+    <status-view state="{{state}}" title="{{state === 'loading' ? '加载能力模型更新' : state === 'empty' ? '暂无能力模型更新' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <block wx:if="{{state === 'ready'}}">
+      <view class="history-summary">
+        <view class="history-summary__copy">
+          <view class="history-summary__title">本学期能力模型</view>
+          <view class="history-summary__meta">{{updateCountLabel}} · {{latestUpdateLabel}}</view>
+        </view>
+        <view class="history-summary__score"><view class="history-summary__score-value">{{scoreLabel}}</view><view class="history-summary__score-label">最新分</view></view>
+      </view>
+
+      <view wx:for="{{rows}}" wx:key="id" class="ability-update-card">
+        <view class="ability-update-card__top">
+          <view class="ability-update-card__badge ability-update-card__badge--{{item.sourceTone}}">{{item.sourceLabel}}</view>
+          <view class="ability-update-card__heading"><view class="ability-update-card__title">{{item.title}}</view><view class="ability-update-card__time">{{item.occurredAtLabel}}</view></view>
+          <view wx:if="{{item.hasSourceUrl}}" class="ability-update-card__source" data-url="{{item.sourceUrl}}" bindtap="openSource">查看来源 ›</view>
+        </view>
+        <view class="ability-update-card__bottom"><view class="ability-update-card__metric">{{item.metricLabel}}</view><view class="ability-update-card__delta ability-update-card__delta--{{item.deltaTone}}">{{item.deltaLabel}}</view></view>
+      </view>
+    </block>
+  </view>
+</view>

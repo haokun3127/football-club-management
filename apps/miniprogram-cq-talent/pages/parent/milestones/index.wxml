@@ -11,7 +11,8 @@
       <view wx:for="{{milestones}}" wx:key="id" class="milestone-card milestone-card--{{item.tone}}">
         <view class="milestone-card__icon milestone-card__icon--{{item.tone}}">{{item.icon}}</view>
         <view class="milestone-card__content"><view class="milestone-card__title">{{item.title}}</view><view class="milestone-card__detail">{{item.detail}}</view><view class="milestone-card__meta">{{item.meta}}</view></view>
-        <view class="milestone-card__state milestone-card__state--{{item.tone}}">{{item.state}}</view>
+        <view wx:if="{{item.isAbilityUpdate}}" class="milestone-card__action" bindtap="openAbilityHistory">查看更新 ›</view>
+        <view wx:else class="milestone-card__state milestone-card__state--{{item.tone}}">{{item.state}}</view>
       </view>
     </block>
   </view>

@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 const mocks = vi.hoisted(() => ({
   getParentChildren: vi.fn(),
   getParentGrowth: vi.fn(),
+  openPage: vi.fn(),
   requireRole: vi.fn(),
 }));
 
@@ -12,6 +13,7 @@ vi.mock("../../../utils/api", () => ({
   getParentGrowth: mocks.getParentGrowth,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
+vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
 vi.mock("../../../utils/presentation", () => ({
   resolveMenuInset: () => 0,
   resolveNavInset: () => 0,
@@ -91,5 +93,13 @@ describe("parent milestones active student", () => {
     ]);
     expect(template).toContain("{{item.detail}}");
     expect(readFileSync(new URL("./index.ts", import.meta.url), "utf8")).not.toContain("getParentCalendar");
+  });
+
+  it("opens a dedicated full-screen ability-update history", () => {
+    const page = createPageInstance();
+
+    page.openAbilityHistory();
+
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/parent/ability-history/index");
   });
 });

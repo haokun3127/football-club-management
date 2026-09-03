@@ -1,5 +1,6 @@
 import { getParentChildren, getParentGrowth } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { openPage } from "../../../utils/navigation";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { GrowthTimelineItem, LoadState } from "../../../utils/types";
 
@@ -11,6 +12,7 @@ interface MilestoneRow {
   icon: string;
   detail: string;
   meta: string;
+  isAbilityUpdate: boolean;
 }
 
 Page({
@@ -48,6 +50,9 @@ Page({
   retry() {
     void this.load();
   },
+  openAbilityHistory() {
+    openPage("/pages/parent/ability-history/index");
+  },
 });
 
 function buildMilestoneRows(timeline: GrowthTimelineItem[]): MilestoneRow[] {
@@ -59,6 +64,7 @@ function buildMilestoneRows(timeline: GrowthTimelineItem[]): MilestoneRow[] {
     icon: item.kind === "training" ? "✓" : item.kind === "match" ? "⚽" : "•",
     detail: timelineDetail(item),
     meta: timelineMeta(item),
+    isAbilityUpdate: item.kind === "ability_update",
   }));
 }
 

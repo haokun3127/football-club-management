@@ -26,3 +26,4 @@
 .milestone-card__state--green { color: #10b981; }
 .milestone-card__state--red { color: #a80f1b; }
 .milestone-card__state--blue { color: #1976d2; }
+.milestone-card__action { flex: 0 0 auto; padding: 10rpx 0 10rpx 16rpx; color: #a80f1b; font-size: 24rpx; font-weight: 700; line-height: 32rpx; }
