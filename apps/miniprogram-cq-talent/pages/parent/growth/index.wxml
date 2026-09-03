@@ -21,7 +21,7 @@
 
       <!-- Figma P4 Milestones Card -->
       <view class="p4-card p4-milestones">
-        <view class="p4-card__head"><view class="p4-card__title">成长足迹 🏆</view><view class="p4-card__link" bindtap="openMilestones">更多›</view></view>
+        <view class="p4-card__head"><view class="p4-card__title">成长足迹 🏆</view><view class="p4-card__link" bindtap="openMilestones">查看全部 ›</view></view>
         <view class="p4-milestones__list">
           <view wx:for="{{milestones}}" wx:key="id" class="p4-milestone">
             <view class="p4-milestone__dot p4-milestone__dot--{{item.tone}}">{{item.icon}}</view>

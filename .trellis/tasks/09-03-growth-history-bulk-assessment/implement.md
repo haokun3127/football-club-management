@@ -52,6 +52,12 @@
 - Runtime verification through the WeChat DevTools MCP loaded a real coach student (`student-cq-talent-secure-test-1-1`) after opening `/pages/coach/student-radar/index?student=...`. Screenshot evidence: `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c13-runtime-20260903.png` (`390×844`, so runtime evidence only, not strict `375×812` acceptance). The screenshot shows six complete labels and the fixed top bar.
 - Fresh verification: C13/C14/C12.1/C11/C12/C15 targeted Vitest `57/57`; mini-program TypeScript passed; `git diff --check` passed. Root `pnpm run check` still reports only the two recorded out-of-scope blockers: `scripts/devtools-screenshot.test.mjs` collection-time syntax error and `pages/parent/content/index.test.mjs` LF/CRLF-sensitive exact CSS assertion.
 
+## 2026-09-03 P4 growth-footprint action copy alignment
+
+- Re-read online Figma Parent V7 P4 `1967:2` and confirmed the growth-footprint card action is `查看全部 ›`.
+- Added a regression in `pages/parent/growth/index.test.mjs`, observed it fail against the old `更多›` copy, then changed only the P4 WXML action text to `查看全部 ›`.
+- Verification: parent growth page Vitest `9/9`, mini-program TypeScript passed, and `git diff --check` passed.
+
 ## High-risk files
 
 - `apps/api/src/routes/app-client.routes.ts`: preserve role authorization and existing response compatibility.

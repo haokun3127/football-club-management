@@ -64,6 +64,10 @@ describe("parent growth training history", () => {
     expect(template).toContain('<view class="p4-card__title">训练历程 📊</view><view class="p4-card__link" bindtap="openTrainingHistory">查看›</view>');
   });
 
+  it("uses the Figma P4 copy for the growth-footprint action", () => {
+    expect(template).toContain('<view class="p4-card__title">成长足迹 🏆</view><view class="p4-card__link" bindtap="openMilestones">查看全部 ›</view>');
+  });
+
   it("opens the training-history page", () => {
     const page = createPageInstance({ activeStudentId: "student-1" });
 
