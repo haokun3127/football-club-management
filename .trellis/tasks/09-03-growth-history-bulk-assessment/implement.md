@@ -91,6 +91,13 @@
 - Added the same guidance as a real product instruction below the API-backed task list. Task names, dates, counts, and statuses remain server data; no Figma sample task was added.
 - Red/green verification: C11 Vitest `10/10`, mini-program TypeScript, WXML/WXSS compilation, and a fresh WeChat DevTools runtime screenshot passed; runtime evidence is `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c11-runtime-hint-final.png` (`390×844`).
 
+## 2026-09-03 C12 project selection progress alignment
+
+- Re-read the current online Coach V7 C12 board `1973:91`: task progress belongs in a dedicated progress card with a status pill; project cards show each project's real entry state, description, and chevron.
+- C12 now reads each project's persisted entries through the existing assessment-entries endpoint, derives `已录 X/Y` from real student IDs, and places the task/project progress summary in the progress card. Project descriptions distinguish automatic standard-score conversion from manual scoring.
+- Removed the duplicated student-progress suffix from the context line and the unused metric-count rendering from project cards; no sample task, score, or status was added.
+- Red/green verification: C12 Vitest `4/4`, mini-program TypeScript, WXML/WXSS compilation, and a fresh WeChat DevTools runtime screenshot passed; runtime evidence is `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c12-projects-runtime-final.png` (`390×844`).
+
 ## High-risk files
 
 - `apps/api/src/routes/app-client.routes.ts`: preserve role authorization and existing response compatibility.

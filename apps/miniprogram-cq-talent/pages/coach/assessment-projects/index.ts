@@ -1,4 +1,4 @@
-import { getAssessmentForm, getCoachAssessmentTasks } from "../../../utils/api";
+import { getAssessmentForm, getCoachAssessmentEntries, getCoachAssessmentTasks } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
@@ -11,7 +11,10 @@ type ProjectRow = {
   statusLabel: string;
   statusTone: "pending";
   itemCountLabel: string;
+  completedStudents: number;
 };
+
+const TASK_STATUS_LABELS: Record<string, string> = { in_progress: "进行中", completed: "已完成" };
 
 Page({
   data: {
@@ -24,6 +27,9 @@ Page({
     templateId: "",
     teamContextLabel: "球队与学期待同步",
     progressLabel: "",
+    projectProgressLabel: "",
+    taskStatusLabel: "",
+    taskStatusClass: "",
     projects: [] as ProjectRow[],
   },
   onLoad(query?: { taskId?: string; templateId?: string; title?: string }) {
@@ -45,13 +51,18 @@ Page({
         return;
       }
       const form = await getAssessmentForm(templateId);
-      const projects = buildProjectRows(form);
+      const baseProjects = buildProjectRows(form);
+      const projects = await hydrateProjectProgress(task.id, task.totalStudents, baseProjects);
+      const completedProjects = projects.reduce((count, project) => count + (project.completedStudents >= task.totalStudents && task.totalStudents > 0 ? 1 : 0), 0);
       this.setData({
         state: projects.length ? "ready" : "empty",
         message: projects.length ? "" : "当前测评表单暂无可录入项目。",
         taskTitle: task.title,
         teamContextLabel: `${task.teamName?.trim() || "球队待同步"} · ${task.termLabel?.trim() || "学期待同步"}`,
         progressLabel: `${task.completedStudents}/${task.totalStudents}名学员已完成`,
+        projectProgressLabel: `已完成 ${completedProjects}/${projects.length} 个项目 · ${task.completedStudents}/${task.totalStudents} 名学员`,
+        taskStatusLabel: TASK_STATUS_LABELS[task.status] || "进行中",
+        taskStatusClass: `projects-progress__status--${task.status}`,
         projects,
       });
     } catch {
@@ -82,11 +93,26 @@ function buildProjectRows(form: AssessmentForm): ProjectRow[] {
   return Array.from(groups.entries()).map(([id, group]) => ({
     id,
     title: group.label,
-    description: `原始成绩 · ${unitLabel(group.fields[0])}`,
+    description: projectDescription(group.fields[0]),
     statusLabel: "待录入",
     statusTone: "pending",
     itemCountLabel: `${group.fields.length}个指标`,
+    completedStudents: 0,
   }));
+}
+
+async function hydrateProjectProgress(taskId: string, totalStudents: number, projects: ProjectRow[]): Promise<ProjectRow[]> {
+  const responses = await Promise.all(projects.map((project) => getCoachAssessmentEntries(taskId, project.id).catch(() => ({ savedValuesByStudent: {} }))));
+  return projects.map((project, index) => {
+    const completedStudents = Object.keys(responses[index]?.savedValuesByStudent || {}).length;
+    return { ...project, completedStudents, statusLabel: completedStudents > 0 ? `已录 ${Math.min(completedStudents, totalStudents)}/${totalStudents}` : "待录入" };
+  });
+}
+
+function projectDescription(field?: AssessmentForm["fields"][number]) {
+  const unit = unitLabel(field);
+  const manual = field?.valueKind === "score_0_100" || field?.valueKind === "rating_1_5";
+  return manual ? "无换算规则 · 手动评分" : `原始成绩：${unit} · 自动换算标准分`;
 }
 
 function unitLabel(field?: AssessmentForm["fields"][number]) {

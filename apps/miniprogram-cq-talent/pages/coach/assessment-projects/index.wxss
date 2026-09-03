@@ -7,8 +7,12 @@
 .projects-page__body { padding: 16rpx 32rpx 64rpx; }
 .projects-context { color: #667085; font-size: 26rpx; line-height: 40rpx; }
 .projects-progress { box-sizing: border-box; margin-top: 24rpx; padding: 28rpx 32rpx; border-radius: 32rpx; background: #ffffff; }
+.projects-progress__head { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; }
 .projects-progress__title { color: #202124; font-size: 32rpx; font-weight: 700; line-height: 44rpx; }
 .projects-progress__meta { margin-top: 8rpx; color: #667085; font-size: 24rpx; line-height: 36rpx; }
+.projects-progress__status { flex: 0 0 auto; padding: 6rpx 16rpx; border-radius: 24rpx; font-size: 22rpx; font-weight: 600; line-height: 30rpx; }
+.projects-progress__status--in_progress { background: #ebfaed; color: #2e7d32; }
+.projects-progress__status--completed { background: #ebfaed; color: #2e7d32; }
 .project-card { display: flex; align-items: center; min-height: 152rpx; margin-top: 20rpx; padding: 24rpx 24rpx 24rpx 32rpx; border-radius: 32rpx; background: #ffffff; }
 .project-card__main { min-width: 0; flex: 1; }
 .project-card__title { overflow: hidden; color: #202124; font-size: 30rpx; font-weight: 700; line-height: 42rpx; text-overflow: ellipsis; white-space: nowrap; }

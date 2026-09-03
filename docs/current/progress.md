@@ -2850,3 +2850,10 @@
 - 重新读取在线 Coach V7 C11 `zZ6wKyOHKcO4UYXDd9jGwv / 1973:2`，确认任务列表下方有“进入任务后，先选择测评项目，再为全队连续录入”提示条。
 - 小程序在真实 API 任务列表后补齐同一产品提示；任务名称、日期、人数和状态继续来自服务器，不添加 Figma 示例任务。
 - 红测准确复现缺少提示条，修复后 C11 Vitest `10/10`、小程序 TypeScript、WXML/WXSS 编译通过。运行态截图为 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c11-runtime-hint-final.png`（`390×844`），只记录运行态证据，不冒充严格 `375×812` 像素验收。
+
+## 2026-09-03 C12 项目选择进度卡与项目状态对齐
+
+- 重新读取在线 Coach V7 C12 `zZ6wKyOHKcO4UYXDd9jGwv / 1973:91`，确认任务进度放在独立卡片中，项目卡显示真实录入状态、说明和箭头。
+- C12 使用既有测评 entries 接口逐项目读取已保存学员 ID，预计算“已录 X/Y”；进度卡显示真实项目完成数、学员完成数和任务状态，项目说明区分自动换算标准分与手动评分。
+- 移除上下文行重复的学员进度及项目卡无意义的指标数展示；不添加 Figma 示例任务或分数。
+- 红测准确复现旧结构，修复后 C12 Vitest `4/4`、小程序 TypeScript、WXML/WXSS 编译通过。真实运行截图为 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c12-projects-runtime-final.png`（`390×844`），显示 `已完成 1/1 个项目 · 19/19 名学员` 与 `已录 19/19`；不冒充严格 `375×812` 像素验收。
