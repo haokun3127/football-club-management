@@ -48,7 +48,12 @@ type MatchDetailReadOptions = {
   forceRefresh?: boolean;
 };
 
+type AssessmentTaskReadOptions = {
+  forceRefresh?: boolean;
+};
+
 let matchDetailRefreshSequence = 0;
+let assessmentTaskRefreshSequence = 0;
 export async function resolveClient() {
   return request<AppContext>({
     path: `/app-clients/resolve?clientKey=${APP_CLIENT_KEY}`,
@@ -1534,10 +1539,11 @@ export async function getCoachTrainingCoverage(): Promise<CoachTrainingCoverageS
   return Array.isArray(response.students) ? response.students : [];
 }
 
-export async function getCoachAssessmentTasks(): Promise<CoachAssessmentTask[]> {
+export async function getCoachAssessmentTasks(options: AssessmentTaskReadOptions = {}): Promise<CoachAssessmentTask[]> {
   const context = requireContext();
+  const refreshQuery = options.forceRefresh ? `?refresh=${Date.now()}-${++assessmentTaskRefreshSequence}` : "";
   const response = await request<{ tasks?: CoachAssessmentTask[] }>({
-    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessment-tasks`,
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessment-tasks${refreshQuery}`,
   });
   return Array.isArray(response.tasks) ? response.tasks : [];
 }

@@ -57,6 +57,7 @@ interface PageData {
   projectIndex: number;
   filledLabel: string;
   lastSavedLabel: string;
+  readOnly: boolean;
   submitting: boolean;
 }
 
@@ -86,6 +87,7 @@ Page<PageData>({
     projectIndex: 0,
     filledLabel: "已填写 0 人 · 未填写 0 人",
     lastSavedLabel: "",
+    readOnly: false,
     submitting: false,
   },
 
@@ -116,11 +118,12 @@ Page<PageData>({
       savedValuesByStudent: {},
       valuesByStudent: {},
       savedStudentIds: [],
+      readOnly: false,
       submitting: false,
     });
 
     try {
-      const tasks = await getCoachAssessmentTasks();
+      const tasks = await getCoachAssessmentTasks({ forceRefresh: true });
       if (loadToken !== latestLoadToken) return;
       const task = tasks.find((item) => item.id === taskId);
       if (!isUsableTask(task, templateId)) {
@@ -175,6 +178,7 @@ Page<PageData>({
         projectIndex,
         filledLabel: buildFilledLabel(members, valuesByStudent),
         lastSavedLabel: savedStudentIds.length ? "已恢复已保存成绩" : hasDraftValues(valuesByStudent) ? "已恢复本机草稿" : "",
+        readOnly: task.status === "completed",
         submitting: false,
       });
     } catch {
@@ -184,6 +188,7 @@ Page<PageData>({
   },
 
   onRawInput(event: { currentTarget: { dataset: { studentId?: string; fieldId?: string } }; detail: { value: string | number } }) {
+    if (this.data.readOnly) return;
     const studentId = event.currentTarget.dataset.studentId;
     const fieldId = event.currentTarget.dataset.fieldId;
     if (!studentId || !fieldId || !this.data.fields.some((field: AssessmentField) => field.id === fieldId)) return;
@@ -225,6 +230,10 @@ Page<PageData>({
   },
 
   async saveProject() {
+    if (this.data.readOnly) {
+      wx.showToast({ title: "任务已完成，仅支持查看已保存成绩", icon: "none" });
+      return;
+    }
     if (this.data.submitting) return;
     const pendingValuesByStudent = changedValues(this.data.valuesByStudent, this.data.savedValuesByStudent);
     const members = this.data.rows.filter((row: BulkRow) => hasStudentValues(pendingValuesByStudent[row.studentId]));
@@ -273,6 +282,10 @@ Page<PageData>({
   },
 
   nextProject() {
+    if (this.data.readOnly) {
+      openPage(`/pages/coach/assessment-projects/index?taskId=${encodeURIComponent(this.data.taskId)}&templateId=${encodeURIComponent(this.data.templateId)}&title=${encodeURIComponent(this.data.taskTitle)}`);
+      return;
+    }
     const nextProjectId = this.data.projectIds[this.data.projectIndex + 1];
     if (!nextProjectId) {
       openPage(`/pages/coach/assessment-projects/index?taskId=${encodeURIComponent(this.data.taskId)}&templateId=${encodeURIComponent(this.data.templateId)}&title=${encodeURIComponent(this.data.taskTitle)}`);
@@ -291,7 +304,7 @@ Page<PageData>({
 });
 
 function isUsableTask(task: CoachAssessmentTask | undefined, templateId: string): task is CoachAssessmentTask {
-  return Boolean(task && task.templateId === templateId && task.status === "in_progress");
+  return Boolean(task && task.templateId === templateId && (task.status === "in_progress" || task.status === "completed"));
 }
 
 function buildRows(members: Array<{ id: string; name: string }>, fields: AssessmentField[], valuesByStudent: DraftValues, savedStudentIds: string[] = []): BulkRow[] {

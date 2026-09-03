@@ -30,6 +30,14 @@
 - The prior image was restored immediately and both internal and HTTPS health returned `200`. The corrective repository query now excludes only unscoped legacy tasks from the new scope-bound workflow; it does not infer or write a team for any historic task.
 - A new file-SQLite regression first reproduced the exact startup exception, then passed after the fix. API full suite is `127/127` and API build passes. Production redeployment and WeChat DevTools C12.1 readback remain the next required steps.
 
+## 2026-09-03 C12.1 completed-task readback recovery
+
+- Online Figma was updated before code: a non-destructive C12.1 completed-state board, `1985:2` (`C12.1 · Team Batch Entry · V7 · Completed Read-only`), was added to file `zZ6wKyOHKcO4UYXDd9jGwv` and screenshot-read back.
+- Production API evidence confirmed the final team submission transitions a scoped task to `completed` (the acceptance task has 19 completed students). The previous C11/C12/C12.1 client gate treated this valid state as unavailable, so a coach could not review the results just saved.
+- The task list, project chooser and batch page now accept `in_progress` and `completed`. The completed page hydrates persisted rows, marks the page read-only, prevents input and save writes, and replaces the forward action with `返回项目`.
+- `getCoachAssessmentTasks({ forceRefresh: true })` appends a unique cache-busting query value for post-write reads, avoiding stale DevTools task-list status without altering BFF payloads or creating fake data.
+- Fresh verification: targeted mini-program Vitest `37/37`, mini-program TypeScript `--noEmit`, and `git diff --check` all pass. Runtime DevTools navigation was still routing back to the coach schedule, so no screenshot from that state is claimed as C12.1 visual acceptance.
+
 ## High-risk files
 
 - `apps/api/src/routes/app-client.routes.ts`: preserve role authorization and existing response compatibility.

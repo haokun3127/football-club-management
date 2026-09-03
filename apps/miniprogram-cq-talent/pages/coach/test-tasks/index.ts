@@ -95,7 +95,7 @@ Page<PageData>({
     });
 
     try {
-      const tasks = (await getCoachAssessmentTasks()).map(presentTask);
+      const tasks = (await getCoachAssessmentTasks({ forceRefresh: true })).map(presentTask);
       flags.assessmentTasksLoadedSuccessfully = true;
       const visibleTasks = filterTasks(tasks, this.data.activeFilter);
       this.setData({
@@ -156,10 +156,6 @@ Page<PageData>({
       wx.showToast({ title: "任务尚未开始，暂不能录入。", icon: "none" });
       return;
     }
-    if (task.status === "completed") {
-      wx.showToast({ title: "任务已完成，暂未提供详情。", icon: "none" });
-      return;
-    }
     if (!task.isEntryEnabled || !task.templateId) {
       wx.showToast({ title: "当前任务暂不能录入。", icon: "none" });
       return;
@@ -180,7 +176,7 @@ function presentTask(task: CoachAssessmentTask): TaskCard {
     progressLabel: `${task.completedStudents}/${task.totalStudents}名学员`,
     progressStyle: `width: ${progressPercent}%`,
     progressClass: task.status === "not_started" ? "task-card__bar--muted" : "",
-    isEntryEnabled: task.status === "in_progress" && Boolean(task.templateId),
+    isEntryEnabled: (task.status === "in_progress" || task.status === "completed") && Boolean(task.templateId),
   };
 }
 

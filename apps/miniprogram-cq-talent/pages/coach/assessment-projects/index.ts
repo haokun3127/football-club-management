@@ -38,9 +38,9 @@ Page({
     }
     this.setData({ state: "loading", message: "正在读取测评项目", taskTitle, taskId, templateId });
     try {
-      const tasks = await getCoachAssessmentTasks();
+      const tasks = await getCoachAssessmentTasks({ forceRefresh: true });
       const task = tasks.find((item) => item.id === taskId);
-      if (!task || task.templateId !== templateId || task.status !== "in_progress") {
+      if (!task || task.templateId !== templateId || (task.status !== "in_progress" && task.status !== "completed")) {
         this.setData({ state: "empty", message: "当前测评任务不可录入，请返回任务列表后重试。", projects: [] });
         return;
       }

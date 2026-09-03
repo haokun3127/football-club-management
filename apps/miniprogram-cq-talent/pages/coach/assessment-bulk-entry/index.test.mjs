@@ -106,6 +106,26 @@ describe("C12.1 team batch assessment entry", () => {
     expect(page.data.lastSavedLabel).toBe("已恢复已保存成绩");
   });
 
+  it("keeps a completed task readable while preventing further score edits", async () => {
+    mocks.getCoachAssessmentTasks.mockResolvedValueOnce([{ ...task, status: "completed", completedStudents: 2 }]);
+    mocks.getCoachAssessmentEntries.mockResolvedValueOnce({
+      savedValuesByStudent: {
+        "student-1": { "item-speed": { kind: "duration_seconds", seconds: 4.92 } },
+        "student-2": { "item-speed": { kind: "duration_seconds", seconds: 5.14 } },
+      },
+    });
+    const page = createPageInstance();
+    await page.onLoad({ taskId: "task-real", templateId: "template-real", projectId: "fitness", title: "体能综合测评" });
+
+    expect(page.data).toMatchObject({ state: "ready", readOnly: true, lastSavedLabel: "已恢复已保存成绩" });
+    expect(page.data.rows.map((row) => row.statusLabel)).toEqual(["已保存", "已保存"]);
+    page.onRawInput({ currentTarget: { dataset: { studentId: "student-1", fieldId: "speed" } }, detail: { value: "4.50" } });
+    await page.saveProject();
+    expect(page.data.rows[0]).toMatchObject({ rawInputValue: "4.92", statusLabel: "已保存" });
+    expect(mocks.submitCoachAssessment).not.toHaveBeenCalled();
+    expect(template).toContain('disabled="{{readOnly}}"');
+  });
+
   it("keeps save and next actions in a full-screen WXML page without array methods", () => {
     expect(template).toContain('bindtap="saveProject"');
     expect(template).toContain('bindtap="nextProject"');

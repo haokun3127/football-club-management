@@ -118,7 +118,7 @@ describe("coach assessment task list", () => {
     expect(page.data.visibleTasks.map((task) => task.id)).toEqual(["task-completed"]);
   });
 
-  it("opens the entry form only for an in-progress real task", async () => {
+  it("opens in-progress entry and completed read-only tasks while rejecting a not-started task", async () => {
     const page = createPageInstance();
     await page.load();
 
@@ -127,8 +127,9 @@ describe("coach assessment task list", () => {
 
     page.openTask({ currentTarget: { dataset: { id: "task-not-started" } } });
     page.openTask({ currentTarget: { dataset: { id: "task-completed" } } });
-    expect(mocks.openPage).toHaveBeenCalledTimes(1);
-    expect(mocks.showToast).toHaveBeenCalledTimes(2);
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/assessment-projects/index?taskId=task-completed&templateId=template-completed&title=Completed%20assessment%20task");
+    expect(mocks.openPage).toHaveBeenCalledTimes(2);
+    expect(mocks.showToast).toHaveBeenCalledTimes(1);
   });
 
   it("opens the real create form for the Figma creation affordances", async () => {

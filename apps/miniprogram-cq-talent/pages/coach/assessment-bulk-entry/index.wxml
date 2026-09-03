@@ -10,14 +10,14 @@
       <view class="bulk-context-line">{{taskTitle}} · {{teamName}}</view>
       <view class="bulk-summary">
         <view class="bulk-summary__count">{{filledLabel}}</view>
-        <view class="bulk-summary__rule">保存后同步标准分</view>
+        <view class="bulk-summary__rule">{{readOnly ? '已完成 · 只读' : '保存后同步标准分'}}</view>
       </view>
 
       <view wx:for="{{rows}}" wx:key="studentId" class="bulk-row">
         <view class="bulk-row__identity"><view class="bulk-row__avatar">{{item.initials}}</view><view class="bulk-row__name">{{item.name}}</view></view>
         <view class="bulk-row__metrics">
           <view wx:for="{{item.metrics}}" wx:for-item="metric" wx:key="fieldId" class="bulk-metric">
-            <input class="bulk-metric__input" type="{{metric.inputType}}" value="{{metric.value}}" placeholder="{{metric.placeholder}}" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" bindinput="onRawInput" />
+            <input class="bulk-metric__input" type="{{metric.inputType}}" value="{{metric.value}}" placeholder="{{metric.placeholder}}" disabled="{{readOnly}}" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" bindinput="onRawInput" />
             <text class="bulk-metric__unit">{{metric.unitLabel}}</text>
             <text class="bulk-metric__score">{{metric.scoreLabel}}</text>
           </view>
@@ -27,10 +27,10 @@
   </view>
 
   <view wx:if="{{state === 'ready'}}" class="bulk-actions" style="padding-bottom:calc(24rpx + env(safe-area-inset-bottom))">
-    <view class="bulk-actions__hint">草稿按任务 + 项目保存，切换项目不丢失</view>
+    <view class="bulk-actions__hint">{{readOnly ? '全部成绩已保存，可随时回看' : '草稿按任务 + 项目保存，切换项目不丢失'}}</view>
     <view class="bulk-actions__buttons">
-      <view class="bulk-actions__secondary" bindtap="saveProject">{{submitting ? '正在保存' : '保存本项目'}}</view>
-      <view class="bulk-actions__primary" bindtap="nextProject">下一项目</view>
+      <view class="bulk-actions__secondary {{readOnly ? 'bulk-actions__secondary--disabled' : ''}}" bindtap="saveProject">{{readOnly ? '已完成' : (submitting ? '正在保存' : '保存本项目')}}</view>
+      <view class="bulk-actions__primary" bindtap="nextProject">{{readOnly ? '返回项目' : '下一项目'}}</view>
     </view>
   </view>
 </view>

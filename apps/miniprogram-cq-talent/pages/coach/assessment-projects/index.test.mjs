@@ -64,6 +64,15 @@ describe("C12 assessment project selection", () => {
     expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/assessment-bulk-entry/index?taskId=task-real&templateId=template-real&projectId=fitness&title=%E4%BD%93%E8%83%BD%E7%BB%BC%E5%90%88%E6%B5%8B%E8%AF%84");
   });
 
+  it("keeps a completed task available for saved-score review", async () => {
+    mocks.getCoachAssessmentTasks.mockResolvedValueOnce([{ ...task, status: "completed", completedStudents: 2 }]);
+    const page = createPageInstance();
+    await page.onLoad({ taskId: "task-real", templateId: "template-real", title: "体能综合测评" });
+
+    expect(page.data).toMatchObject({ state: "ready", progressLabel: "2/2名学员已完成" });
+    expect(page.data.projects).toHaveLength(2);
+  });
+
   it("keeps the page WXML free of array method calls", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });

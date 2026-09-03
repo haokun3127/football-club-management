@@ -1211,3 +1211,60 @@ return makeGrowthMilestones(events);
 const growth = await getParentGrowth(studentId);
 return growth.timeline;
 ```
+
+## Scenario: Completed Semester Assessment Readback
+
+### 1. Scope / Trigger
+
+- Trigger: a coach opens a semester assessment task after every scoped team member has submitted a result and the task projection reports `status: "completed"`.
+- The task completion state means its scores are immutable through the mini-program entry flow; it does not mean the saved results become inaccessible.
+
+### 2. Signatures
+
+- `GET /clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks`
+- `GET /clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/projects/{projectId}/entries`
+- Mini-program read helper: `getCoachAssessmentTasks({ forceRefresh?: boolean })`.
+
+### 3. Contracts
+
+- `in_progress` tasks open the normal project and batch-entry workflow.
+- `completed` tasks may open the same project and batch-entry routes, but batch entry is strictly read-only: inputs and save writes are disabled, saved rows remain visible, and the primary action returns to the project list.
+- `not_started` tasks remain non-enterable.
+- After an assessment save, callers may request `{ forceRefresh: true }`; this appends a unique harmless query value so the DevTools HTTP cache cannot serve an obsolete task status. The BFF response shape is unchanged.
+
+### 4. Validation & Error Matrix
+
+- Task absent, template mismatch, or inaccessible -> existing empty/forbidden handling; never display another team's saved values.
+- `not_started` -> client shows the existing "任务尚未开始" message and does not navigate.
+- `completed` + attempted raw input/save -> client performs no write and displays the read-only explanation.
+- Refresh request failure -> retain normal request error handling; do not synthesize task status or score rows.
+
+### 5. Good / Base / Bad Cases
+
+- Good: saving the final student's score turns the task into `completed`; reopening it shows every persisted row marked `已保存` and offers `返回项目`.
+- Base: an in-progress task with partial scores still allows editing and submits only changed rows.
+- Bad: filtering task navigation to `status === "in_progress"`, which prevents a coach from reviewing the scores just saved.
+
+### 6. Tests Required
+
+- Client request test asserts force refresh creates a distinct `/coach/assessment-tasks?refresh=<timestamp>-<sequence>` URL.
+- Task list and project tests assert `completed` task navigation is allowed while `not_started` remains blocked.
+- Batch-entry test asserts a completed task hydrates persisted values, exposes read-only labels, and never calls `submitCoachAssessment` after input/save attempts.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+if (task.status !== "in_progress") {
+  return showUnavailable();
+}
+```
+
+#### Correct
+
+```ts
+const isReadable = task.status === "in_progress" || task.status === "completed";
+const readOnly = task.status === "completed";
+if (!isReadable) return showUnavailable();
+```

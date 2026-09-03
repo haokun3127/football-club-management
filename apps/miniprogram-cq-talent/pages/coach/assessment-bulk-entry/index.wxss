@@ -25,3 +25,4 @@
 .bulk-actions__primary { flex: 1; background: #a80f1b; color: #ffffff; }
 .bulk-actions__primary--disabled { opacity: .58; }
 .bulk-actions__secondary { flex: 1; background: #fff0f1; color: #a80f1b; }
+.bulk-actions__secondary--disabled { background: #e6ebf2; color: #4f5e73; }
