@@ -7,29 +7,27 @@
   <view class="bulk-body">
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{statusTitle}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <block wx:if="{{state === 'ready'}}">
-      <view class="bulk-context">
-        <view class="bulk-context__eyebrow">{{taskTitle}} · {{teamName}}</view>
-        <view class="bulk-context__title">{{projectTitle}}</view>
-        <view class="bulk-context__meta">{{termLabel}} · {{filledLabel}}</view>
+      <view class="bulk-context-line">{{taskTitle}} · {{teamName}}</view>
+      <view class="bulk-summary">
+        <view class="bulk-summary__count">{{filledLabel}}</view>
+        <view class="bulk-summary__rule">保存后同步标准分</view>
       </view>
 
-      <view class="bulk-hint">按学员连续录入本项目原始成绩，保存后可继续下一个项目。</view>
       <view wx:for="{{rows}}" wx:key="studentId" class="bulk-row">
-        <view class="bulk-row__head">
-          <view class="bulk-row__identity"><view class="bulk-row__avatar">{{item.initials}}</view><view class="bulk-row__name">{{item.name}}</view></view>
-          <view class="bulk-row__status">{{item.statusLabel}}</view>
-        </view>
-        <view wx:for="{{item.metrics}}" wx:for-item="metric" wx:key="fieldId" class="bulk-metric">
-          <view class="bulk-metric__label">{{metric.label}}</view>
-          <view class="bulk-metric__input-wrap"><input class="bulk-metric__input" type="{{metric.inputType}}" value="{{metric.value}}" placeholder="{{metric.placeholder}}" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" bindinput="onRawInput" /><text class="bulk-metric__unit">{{metric.unitLabel}}</text></view>
-          <text class="bulk-metric__score">{{metric.scoreLabel}}</text>
+        <view class="bulk-row__identity"><view class="bulk-row__avatar">{{item.initials}}</view><view class="bulk-row__name">{{item.name}}</view></view>
+        <view class="bulk-row__metrics">
+          <view wx:for="{{item.metrics}}" wx:for-item="metric" wx:key="fieldId" class="bulk-metric">
+            <input class="bulk-metric__input" type="{{metric.inputType}}" value="{{metric.value}}" placeholder="{{metric.placeholder}}" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" bindinput="onRawInput" />
+            <text class="bulk-metric__unit">{{metric.unitLabel}}</text>
+            <text class="bulk-metric__score">{{metric.scoreLabel}}</text>
+          </view>
         </view>
       </view>
     </block>
   </view>
 
   <view wx:if="{{state === 'ready'}}" class="bulk-actions" style="padding-bottom:calc(24rpx + env(safe-area-inset-bottom))">
-    <view class="bulk-actions__hint">固定在底部 · {{filledLabel}}</view>
+    <view class="bulk-actions__hint">草稿按任务 + 项目保存，切换项目不丢失</view>
     <view class="bulk-actions__buttons">
       <view class="bulk-actions__secondary" bindtap="saveProject">{{submitting ? '正在保存' : '保存本项目'}}</view>
       <view class="bulk-actions__primary" bindtap="nextProject">下一项目</view>

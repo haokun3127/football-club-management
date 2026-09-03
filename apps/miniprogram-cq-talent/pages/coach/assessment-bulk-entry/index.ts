@@ -1,8 +1,8 @@
-import { getAssessmentForm, getCoachAssessmentTasks, getCoachTeam, submitCoachAssessment } from "../../../utils/api";
+import { getAssessmentForm, getCoachAssessmentEntries, getCoachAssessmentTasks, getCoachTeam, submitCoachAssessment } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
-import type { AssessmentForm, CoachAssessmentTask, CoachTeamDetail, LoadState } from "../../../utils/types";
+import type { AssessmentForm, CoachAssessmentEntries, CoachAssessmentTask, CoachTeamDetail, LoadState } from "../../../utils/types";
 
 type AssessmentField = AssessmentForm["fields"][number];
 type DraftValues = Record<string, Record<string, string>>;
@@ -31,6 +31,7 @@ interface BulkDraft {
   signature: string;
   savedAt: string;
   valuesByStudent: DraftValues;
+  savedStudentIds: string[];
 }
 
 interface PageData {
@@ -49,7 +50,9 @@ interface PageData {
   termLabel: string;
   fields: AssessmentField[];
   rows: BulkRow[];
+  savedValuesByStudent: DraftValues;
   valuesByStudent: DraftValues;
+  savedStudentIds: string[];
   projectIds: string[];
   projectIndex: number;
   filledLabel: string;
@@ -76,7 +79,9 @@ Page<PageData>({
     termLabel: "",
     fields: [],
     rows: [],
+    savedValuesByStudent: {},
     valuesByStudent: {},
+    savedStudentIds: [],
     projectIds: [],
     projectIndex: 0,
     filledLabel: "已填写 0 人 · 未填写 0 人",
@@ -108,7 +113,9 @@ Page<PageData>({
       taskTitle,
       rows: [],
       fields: [],
+      savedValuesByStudent: {},
       valuesByStudent: {},
+      savedStudentIds: [],
       submitting: false,
     });
 
@@ -121,7 +128,11 @@ Page<PageData>({
         return;
       }
 
-      const [form, team] = await Promise.all([getAssessmentForm(templateId), getCoachTeam(task.teamId)]);
+      const [form, team, savedEntries] = await Promise.all([
+        getAssessmentForm(templateId),
+        getCoachTeam(task.teamId),
+        getCoachAssessmentEntries(task.id, projectId),
+      ]);
       if (loadToken !== latestLoadToken) return;
       const fields = form.fields.filter((field) => field.groupId === projectId && Boolean(field.id) && Boolean(field.testItemId));
       const members = team.members.filter((member) => Boolean(member.id) && Boolean(member.name));
@@ -137,7 +148,10 @@ Page<PageData>({
       }
 
       const signature = createSignature(fields, members);
-      const valuesByStudent = restoreDraft(taskId, projectId, signature, fields, members);
+      const savedValuesByStudent = normalizeSavedValues(savedEntries, fields, members);
+      const draftValuesByStudent = restoreDraft(taskId, projectId, signature, fields, members);
+      const valuesByStudent = mergeValues(savedValuesByStudent, draftValuesByStudent);
+      const savedStudentIds = Object.keys(savedValuesByStudent);
       const projectIds = uniqueProjectIds(form.fields);
       const projectIndex = Math.max(0, projectIds.indexOf(projectId));
       this.setData({
@@ -153,12 +167,14 @@ Page<PageData>({
         teamName: team.team?.name?.trim() || "球队待同步",
         termLabel: task.termLabel?.trim() || "学期待同步",
         fields,
-        rows: buildRows(members, fields, valuesByStudent),
+        rows: buildRows(members, fields, valuesByStudent, savedStudentIds),
+        savedValuesByStudent,
         valuesByStudent,
+        savedStudentIds,
         projectIds,
         projectIndex,
         filledLabel: buildFilledLabel(members, valuesByStudent),
-        lastSavedLabel: hasDraftValues(valuesByStudent) ? "已恢复本机草稿" : "",
+        lastSavedLabel: savedStudentIds.length ? "已恢复已保存成绩" : hasDraftValues(valuesByStudent) ? "已恢复本机草稿" : "",
         submitting: false,
       });
     } catch {
@@ -178,19 +194,30 @@ Page<PageData>({
       delete valuesByStudent[studentId][fieldId];
       if (!Object.keys(valuesByStudent[studentId]).length) delete valuesByStudent[studentId];
     }
-    this.setData({ valuesByStudent, rows: buildRows(this.data.rows.map((row: BulkRow) => ({ id: row.studentId, name: row.name })), this.data.fields, valuesByStudent), filledLabel: buildFilledLabel(this.data.rows, valuesByStudent) });
-    this.persistDraft(valuesByStudent);
+    const savedValue = this.data.savedValuesByStudent[studentId]?.[fieldId];
+    if (!rawValue.trim() && savedValue) valuesByStudent[studentId][fieldId] = savedValue;
+    const members = this.data.rows.map((row: BulkRow) => ({ id: row.studentId, name: row.name }));
+    this.setData({ valuesByStudent, rows: buildRows(members, this.data.fields, valuesByStudent, this.data.savedStudentIds), filledLabel: buildFilledLabel(members, valuesByStudent) });
+    const draftValuesByStudent = changedValues(valuesByStudent, this.data.savedValuesByStudent);
+    if (hasDraftValues(draftValuesByStudent)) this.persistDraft(draftValuesByStudent);
+    else wx.removeStorageSync(draftKey(this.data.taskId, this.data.projectId));
   },
 
   persistDraft(valuesByStudent: DraftValues) {
+    if (!this.data.taskId || !this.data.projectId || !this.data.fields.length) return;
+    this.writeDraft(valuesByStudent);
+    this.setData({ lastSavedLabel: "草稿已保存在本机" });
+  },
+
+  writeDraft(valuesByStudent: DraftValues) {
     if (!this.data.taskId || !this.data.projectId || !this.data.fields.length) return;
     const members = this.data.rows.map((row: BulkRow) => ({ id: row.studentId, name: row.name }));
     wx.setStorageSync(draftKey(this.data.taskId, this.data.projectId), {
       signature: createSignature(this.data.fields, members),
       savedAt: new Date().toISOString(),
       valuesByStudent,
+      savedStudentIds: this.data.savedStudentIds,
     } satisfies BulkDraft);
-    this.setData({ lastSavedLabel: "草稿已保存在本机" });
   },
 
   saveDraft() {
@@ -199,7 +226,8 @@ Page<PageData>({
 
   async saveProject() {
     if (this.data.submitting) return;
-    const members = this.data.rows.filter((row: BulkRow) => hasStudentValues(this.data.valuesByStudent[row.studentId]));
+    const pendingValuesByStudent = changedValues(this.data.valuesByStudent, this.data.savedValuesByStudent);
+    const members = this.data.rows.filter((row: BulkRow) => hasStudentValues(pendingValuesByStudent[row.studentId]));
     if (!members.length) {
       wx.showToast({ title: "请先录入至少一名学员", icon: "none" });
       return;
@@ -207,7 +235,7 @@ Page<PageData>({
     this.setData({ submitting: true });
     const succeeded: string[] = [];
     for (const row of members) {
-      const rawResults = buildRawResults(this.data.fields, this.data.valuesByStudent[row.studentId] || {});
+      const rawResults = buildRawResults(this.data.fields, pendingValuesByStudent[row.studentId] || {});
       if (!rawResults.length) continue;
       try {
         await submitCoachAssessment({
@@ -222,10 +250,24 @@ Page<PageData>({
         // Keep this student's draft so the coach can retry only the failed row.
       }
     }
-    const valuesByStudent = withoutStudents(this.data.valuesByStudent, succeeded);
-    if (hasDraftValues(valuesByStudent)) this.persistDraft(valuesByStudent);
+    const draftValuesByStudent = withoutStudents(pendingValuesByStudent, succeeded);
+    if (hasDraftValues(draftValuesByStudent)) this.writeDraft(draftValuesByStudent);
     else wx.removeStorageSync(draftKey(this.data.taskId, this.data.projectId));
-    this.setData({ submitting: false, valuesByStudent, rows: buildRows(this.data.rows.map((row: BulkRow) => ({ id: row.studentId, name: row.name })), this.data.fields, valuesByStudent), filledLabel: buildFilledLabel(this.data.rows, valuesByStudent) });
+    const savedValuesByStudent = { ...this.data.savedValuesByStudent };
+    for (const studentId of succeeded) {
+      savedValuesByStudent[studentId] = { ...(this.data.valuesByStudent[studentId] || {}) };
+    }
+    const valuesByStudent = mergeValues(savedValuesByStudent, draftValuesByStudent);
+    const savedStudentIds = Array.from(new Set([...this.data.savedStudentIds, ...succeeded]));
+    this.setData({
+      submitting: false,
+      savedValuesByStudent,
+      savedStudentIds,
+      valuesByStudent,
+      rows: buildRows(this.data.rows.map((row: BulkRow) => ({ id: row.studentId, name: row.name })), this.data.fields, valuesByStudent, savedStudentIds),
+      filledLabel: buildFilledLabel(this.data.rows.map((row: BulkRow) => ({ id: row.studentId })), valuesByStudent),
+      lastSavedLabel: succeeded.length ? `已保存${succeeded.length}名学员` : this.data.lastSavedLabel,
+    });
     if (succeeded.length < members.length) wx.showToast({ title: "部分学员未保存，已保留草稿", icon: "none" });
     else wx.showToast({ title: `已保存${succeeded.length}名学员`, icon: "success" });
   },
@@ -252,7 +294,7 @@ function isUsableTask(task: CoachAssessmentTask | undefined, templateId: string)
   return Boolean(task && task.templateId === templateId && task.status === "in_progress");
 }
 
-function buildRows(members: Array<{ id: string; name: string }>, fields: AssessmentField[], valuesByStudent: DraftValues): BulkRow[] {
+function buildRows(members: Array<{ id: string; name: string }>, fields: AssessmentField[], valuesByStudent: DraftValues, savedStudentIds: string[] = []): BulkRow[] {
   return members.map((member) => {
     const values = valuesByStudent[member.id] || {};
     const metrics = fields.map((field) => {
@@ -275,10 +317,43 @@ function buildRows(members: Array<{ id: string; name: string }>, fields: Assessm
       initials: member.name.trim().slice(0, 1) || "学",
       rawInputValue: first?.value || "",
       scoreLabel: first?.scoreLabel || "待提交",
-      statusLabel: hasValues ? "已填写" : "待录入",
+      statusLabel: savedStudentIds.includes(member.id) ? "已保存" : hasValues ? "已填写" : "待录入",
       metrics,
     };
   });
+}
+
+function normalizeSavedValues(response: CoachAssessmentEntries, fields: AssessmentField[], members: Array<{ id: string }>): DraftValues {
+  const valuesByStudent: DraftValues = {};
+  const fieldByTestItemId = new Map(fields.map((field) => [field.testItemId, field]));
+  for (const member of members) {
+    const stored = response.savedValuesByStudent?.[member.id];
+    if (!stored) continue;
+    const values: Record<string, string> = {};
+    for (const [testItemId, value] of Object.entries(stored)) {
+      const field = fieldByTestItemId.get(testItemId);
+      const rawValue = formatSavedValue(field, value);
+      if (field && rawValue) values[field.id] = rawValue;
+    }
+    if (hasStudentValues(values)) valuesByStudent[member.id] = values;
+  }
+  return valuesByStudent;
+}
+
+function formatSavedValue(field: AssessmentField | undefined, value: Record<string, unknown>) {
+  if (!field || !value || typeof value !== "object") return "";
+  const numeric = value.score ?? value.count ?? value.percentage ?? value.minutes ?? value.seconds ?? value.meters ?? value.value;
+  if (typeof numeric === "number" && Number.isFinite(numeric)) return String(numeric);
+  if (typeof value.text === "string") return value.text;
+  if (typeof value.tag === "string") return value.tag;
+  return "";
+}
+
+function mergeValues(base: DraftValues, override: DraftValues): DraftValues {
+  const merged: DraftValues = {};
+  for (const [studentId, values] of Object.entries(base)) merged[studentId] = { ...values };
+  for (const [studentId, values] of Object.entries(override)) merged[studentId] = { ...(merged[studentId] || {}), ...values };
+  return merged;
 }
 
 function buildFilledLabel(members: Array<{ id: string }>, valuesByStudent: DraftValues) {
@@ -327,6 +402,19 @@ function withoutStudents(valuesByStudent: DraftValues, studentIds: string[]) {
   const next = { ...valuesByStudent };
   for (const studentId of studentIds) delete next[studentId];
   return next;
+}
+
+function changedValues(valuesByStudent: DraftValues, savedValuesByStudent: DraftValues): DraftValues {
+  const changed: DraftValues = {};
+  for (const [studentId, values] of Object.entries(valuesByStudent)) {
+    const saved = savedValuesByStudent[studentId] || {};
+    const next: Record<string, string> = {};
+    for (const [fieldId, value] of Object.entries(values)) {
+      if (value.trim() && saved[fieldId] !== value) next[fieldId] = value;
+    }
+    if (hasStudentValues(next)) changed[studentId] = next;
+  }
+  return changed;
 }
 
 function displayUnit(field: AssessmentField) {

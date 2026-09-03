@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   getAssessmentForm: vi.fn(),
   getCoachAssessmentTasks: vi.fn(),
   getCoachTeam: vi.fn(),
+  getCoachAssessmentEntries: vi.fn(),
   submitCoachAssessment: vi.fn(),
   requireRole: vi.fn(),
   openPage: vi.fn(),
@@ -16,6 +17,7 @@ vi.mock("../../../utils/api", () => ({
   getAssessmentForm: mocks.getAssessmentForm,
   getCoachAssessmentTasks: mocks.getCoachAssessmentTasks,
   getCoachTeam: mocks.getCoachTeam,
+  getCoachAssessmentEntries: mocks.getCoachAssessmentEntries,
   submitCoachAssessment: mocks.submitCoachAssessment,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
@@ -34,6 +36,7 @@ globalThis.Page = (definition) => { pageDefinition = definition; return definiti
 
 await import("./index.ts");
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
+const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 
 const task = {
   id: "task-real", teamId: "team-real", teamName: "U10发展队", termLabel: "2026秋季学期",
@@ -60,6 +63,7 @@ describe("C12.1 team batch assessment entry", () => {
       team: { id: "team-real", name: "U10发展队", season: "2026" }, stats: { memberCount: 2, trainingCount: 0, completedTrainingCount: 0, attendanceRate: null },
       members: [{ id: "student-1", name: "罗志炫" }, { id: "student-2", name: "骆啸宇" }],
     });
+    mocks.getCoachAssessmentEntries.mockReset().mockResolvedValue({ savedValuesByStudent: {} });
     mocks.submitCoachAssessment.mockReset().mockResolvedValue({ assessment: { id: "saved" } });
     mocks.openPage.mockReset();
     mocks.showToast.mockReset();
@@ -76,7 +80,7 @@ describe("C12.1 team batch assessment entry", () => {
     expect(storage.has("coach-assessment-bulk:task-real:fitness")).toBe(true);
   });
 
-  it("submits each filled student through the real assessment contract", async () => {
+  it("submits each filled student through the real assessment contract and keeps saved values visible", async () => {
     const page = createPageInstance();
     await page.onLoad({ taskId: "task-real", templateId: "template-real", projectId: "fitness", title: "体能综合测评" });
     page.onRawInput({ currentTarget: { dataset: { studentId: "student-1", fieldId: "speed" } }, detail: { value: "4.92" } });
@@ -84,12 +88,28 @@ describe("C12.1 team batch assessment entry", () => {
 
     expect(mocks.submitCoachAssessment).toHaveBeenCalledWith(expect.objectContaining({ studentId: "student-1", assessmentTaskId: "task-real", templateId: "template-real", rawResults: [expect.objectContaining({ testItemId: "item-speed" })] }));
     expect(mocks.submitCoachAssessment).toHaveBeenCalledTimes(1);
+    expect(page.data.rows[0]).toMatchObject({ studentId: "student-1", rawInputValue: "4.92", statusLabel: "已保存" });
+    expect(page.data.filledLabel).toBe("已填写 1 人 · 未填写 1 人");
+    expect(storage.has("coach-assessment-bulk:task-real:fitness")).toBe(false);
+    await page.saveProject();
+    expect(mocks.submitCoachAssessment).toHaveBeenCalledTimes(1);
+  });
+
+  it("hydrates saved server values when the project is opened again", async () => {
+    mocks.getCoachAssessmentEntries.mockResolvedValueOnce({
+      savedValuesByStudent: { "student-1": { "item-speed": { kind: "duration_seconds", seconds: 4.92 } } },
+    });
+    const page = createPageInstance();
+    await page.onLoad({ taskId: "task-real", templateId: "template-real", projectId: "fitness", title: "体能综合测评" });
+
+    expect(page.data.rows[0]).toMatchObject({ studentId: "student-1", rawInputValue: "4.92", statusLabel: "已保存" });
+    expect(page.data.lastSavedLabel).toBe("已恢复已保存成绩");
   });
 
   it("keeps save and next actions in a full-screen WXML page without array methods", () => {
     expect(template).toContain('bindtap="saveProject"');
     expect(template).toContain('bindtap="nextProject"');
-    expect(template).toContain("固定在底部");
+    expect(template).toContain("草稿按任务 + 项目保存，切换项目不丢失");
     expect(template).toContain('>{{projectTitle}}</view>');
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
@@ -97,5 +117,17 @@ describe("C12.1 team batch assessment entry", () => {
   it("keeps V7 save before next and removes the extra top-right action", () => {
     expect(template).not.toContain("保存草稿");
     expect(template.indexOf('bindtap="saveProject"')).toBeLessThan(template.indexOf('bindtap="nextProject"'));
+  });
+
+  it("uses the V7 compact project summary and one-line student entry rows", () => {
+    expect(template).toContain('class="bulk-context-line"');
+    expect(template).toContain('class="bulk-summary"');
+    expect(template).toContain("保存后同步标准分");
+    expect(template).toContain('class="bulk-row__identity"');
+    expect(template).toContain('class="bulk-row__metrics"');
+    expect(template).not.toContain('class="bulk-row__head"');
+    expect(template).not.toContain('class="bulk-hint"');
+    expect(stylesheet).toMatch(/\.bulk-row\s*\{[^}]*display:\s*flex[^}]*align-items:\s*center/s);
+    expect(stylesheet).toMatch(/\.bulk-metric\s*\{[^}]*display:\s*flex[^}]*border-bottom:/s);
   });
 });

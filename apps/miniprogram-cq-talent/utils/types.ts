@@ -425,6 +425,12 @@ export interface AssessmentForm {
   pending: Array<{ title: string; message: string }>;
 }
 
+export interface CoachAssessmentEntries {
+  taskId: string;
+  projectId: string;
+  savedValuesByStudent: Record<string, Record<string, Record<string, unknown>>>;
+}
+
 export type AssessmentDraftStatus = "empty" | "recorded" | "missing";
 
 export interface AssessmentDraftEntry {

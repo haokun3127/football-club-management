@@ -2774,3 +2774,11 @@
 - C13 学员雷达改为 V7 白色雷达卡+全体学员四列头像网格，点击学员通过真实路由进入对应雷达；C14 能力评估改为当前训练球队概览+两列真实学员卡，并移除页面 TabBar，点击学员进入 C13。
 - 验证：C12.1/C13/C14 定向 Vitest `20/20`、小程序 TypeScript `--noEmit` 通过、`git diff --check` 通过；全仓 `pnpm run check` 仍被两个与本批无关的旧阻断拦截：`apps/miniprogram-cq-talent/scripts/devtools-screenshot.test.mjs` 在收集阶段 `SyntaxError: Invalid or unexpected token`，`apps/miniprogram-cq-talent/pages/parent/content/index.test.mjs` 的精确字符串断言受 CRLF/LF 行尾差异影响失败。
 - 微信开发者工具 MCP 当前已登录但工作树窗口没有有效教练会话；对三个教练路由取得的原始图为启动页且 `381×823`，不作为视觉验收证据。需先建立真实 coach 会话、重新编译，再用归一化脚本取得严格 `375×812` 页面截图后才能关闭 C12.1/C13/C14 视觉验收。
+
+## 2026-09-03 C12.1 批量测评回填与保存状态收口
+
+- 修复批量测评回填接口误过滤问题：`/coach/assessment-tasks/:taskId/projects/:projectId/entries` 在任务球队已通过教练权限校验后，直接使用该任务球队的 active team members，不再额外套用近 30 天活动范围；因此没有近期活动的真实队员也能正确回填已保存成绩。
+- 修复前端保存后的状态丢失：已保存成绩继续显示并标记“已保存”；重复点击保存只提交相对服务端已保存值发生变化的待提交字段；成功学员清除本机草稿，失败学员保留可重试草稿。
+- 新增并通过回归：API 回填 `1/1`；C12.1/C13/C14 联合小程序测试 `22/22`；API 全量 `126/126`；API 与小程序 TypeScript 检查通过；`git diff --check` 通过。
+- 根门禁 `corepack pnpm run check` 仍有两项非本批历史阻断：`apps/miniprogram-cq-talent/scripts/devtools-screenshot.test.mjs` 收集阶段语法错误；`apps/miniprogram-cq-talent/pages/parent/content/index.test.mjs` 的精确 CSS 字符串断言受 LF/CRLF 行尾差异影响。两文件未纳入本批修改。
+- 本批尚未取得有效教练会话下的微信开发者工具/真机 `375×812` 截图；上述结果仅代表静态、API 与单测验证，不代表 C12.1/C13/C14 运行态视觉验收完成。

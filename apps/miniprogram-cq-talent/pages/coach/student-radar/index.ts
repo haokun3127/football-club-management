@@ -10,7 +10,7 @@ interface PageData {
   navInset: number; state: LoadState; message: string; radarContext: string;
   students: StudentChip[]; activeStudentId: string; activeStudentName: string;
   radar: RadarMetricPoint[]; dimensions: RadarDimension[]; hasRadar: boolean;
-  radarHeroClass: string; overall: string; assessmentPeriod: string;
+  overall: string; assessmentPeriod: string;
 }
 
 Page<PageData>({
@@ -41,7 +41,7 @@ Page<PageData>({
       const dimensions = projectDimensions(radar);
       const hasRadar = dimensions.length >= 3;
       const normalizedValues = dimensions.map((dimension) => Number.parseFloat(dimension.width));
-      this.setData({ state: hasRadar ? "ready" : "empty", message: hasRadar ? "" : `${student.name} 暂无足够的有效评测数据生成雷达图。`, activeStudentId: student.id, activeStudentName: student.name, radar: hasRadar ? radar.filter(isValidRadarPoint) : [], dimensions, hasRadar, radarHeroClass: dimensions.length > 6 ? "radar-hero--dense" : "", overall: hasRadar ? String(Math.round(average(normalizedValues))) : "-", assessmentPeriod: formatAssessmentPeriod(radar), radarContext: buildRadarContext(this.data.radarContext, radar) });
+      this.setData({ state: hasRadar ? "ready" : "empty", message: hasRadar ? "" : `${student.name} 暂无足够的有效评测数据生成雷达图。`, activeStudentId: student.id, activeStudentName: student.name, radar: hasRadar ? radar.filter(isValidRadarPoint) : [], dimensions, hasRadar, overall: hasRadar ? String(Math.round(average(normalizedValues))) : "-", assessmentPeriod: formatAssessmentPeriod(radar), radarContext: buildRadarContext(this.data.radarContext, radar) });
     } catch {
       if (isCurrentRequest(this, requestToken)) this.setData({ state: "error", message: "能力雷达读取失败，请稍后重试。", radar: [], dimensions: [], hasRadar: false, overall: "-", assessmentPeriod: "评估时间待同步" });
     }
@@ -55,7 +55,7 @@ Page<PageData>({
   goBack() { wx.navigateBack(); },
 });
 
-function emptyPageData(state: LoadState, message: string): PageData { return { navInset: resolveNavInset(), state, message, radarContext: "球队待同步 · 评估时间待同步", students: [], activeStudentId: "", activeStudentName: "", radar: [], dimensions: [], hasRadar: false, radarHeroClass: "", overall: "-", assessmentPeriod: "评估时间待同步" }; }
+function emptyPageData(state: LoadState, message: string): PageData { return { navInset: resolveNavInset(), state, message, radarContext: "球队待同步 · 评估时间待同步", students: [], activeStudentId: "", activeStudentName: "", radar: [], dimensions: [], hasRadar: false, overall: "-", assessmentPeriod: "评估时间待同步" }; }
 function toStudentChips(members: Array<{ id: string; name: string }>): StudentChip[] { const ids = new Set<string>(); const students: StudentChip[] = []; for (const member of members) { const name = member.name.trim(); if (!member.id || !name || ids.has(member.id)) continue; ids.add(member.id); students.push({ id: member.id, name: name.slice(0, 4), initial: name.slice(0, 1) || "学" }); } return students; }
 function projectDimensions(radar: RadarMetricPoint[]): RadarDimension[] { return radar.filter(isValidRadarPoint).map((point) => { const normalized = clamp((point.value / point.maxValue) * 100); return { metricId: point.metricId, label: point.label, value: formatScore(point.value), width: `${formatScore(normalized)}%` }; }); }
 function isValidRadarPoint(point: RadarMetricPoint): point is RadarMetricPoint & { value: number } { return typeof point.value === "number" && Number.isFinite(point.value) && Number.isFinite(point.maxValue) && point.maxValue > 0; }

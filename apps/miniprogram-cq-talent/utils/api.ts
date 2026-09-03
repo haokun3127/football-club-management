@@ -6,6 +6,7 @@ import type {
   ActivityDetail,
   AppContext,
   AssessmentForm,
+  CoachAssessmentEntries,
   CoachLessonConfirmation,
   CoachMatchDetail,
   CoachTrainingContentAssessment,
@@ -658,6 +659,13 @@ function normalizeGrowth(raw: Record<string, unknown>, student?: StudentSummary)
     trainingStats: normalizeTrainingStats(raw.trainingStats),
     timeline: normalizeGrowthTimeline(raw.timeline),
   };
+}
+
+export async function getCoachAssessmentEntries(taskId: string, projectId: string): Promise<CoachAssessmentEntries> {
+  const context = requireContext();
+  return request<CoachAssessmentEntries>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessment-tasks/${encodeURIComponent(taskId)}/projects/${encodeURIComponent(projectId)}/entries`,
+  });
 }
 
 function normalizeGrowthTimeline(raw: unknown): GrowthSummary["timeline"] {

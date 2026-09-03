@@ -803,8 +803,24 @@ describe("api server", () => {
       headers: { "x-user-id": "user-coach-1" },
     });
     expect(radar.statusCode, radar.body).toBe(200);
-    const radarBody = radar.json() as { studentId: string; metrics: unknown[]; latest: unknown[] };
+    const radarBody = radar.json() as {
+      studentId: string;
+      metrics: Array<{ id: string }>;
+      latest: Array<{ metricId: string }>;
+    };
     expect(radarBody.studentId).toBe("student-1");
+    const coreRadarMetricIds = new Set(
+      store.listMetricViewNodes("club-chongqing-talent")
+        .filter((node) => node.viewId === "metric-view-cq-talent-elite-core-radar" && Boolean(node.metricId))
+        .map((node) => node.metricId),
+    );
+    // The baseline server fixture contains a single legacy training observation,
+    // not the atomic assessment inputs required to derive the elite core radar.
+    // The route must still expose the six-dimensional catalog while omitting
+    // unrelated raw metric records.
+    expect(radarBody.metrics).toHaveLength(coreRadarMetricIds.size);
+    expect(radarBody.metrics.every((metric) => coreRadarMetricIds.has(metric.id))).toBe(true);
+    expect(radarBody.latest.every((item) => coreRadarMetricIds.has(item.metricId))).toBe(true);
 
     // Parent role denied on coach endpoints.
     const parentTeam = await app.inject({
@@ -3892,6 +3908,16 @@ describe("api server", () => {
     const boundTask = (progressAfterSubmission.json() as { tasks: Array<{ id: string; completedStudents: number }> }).tasks
       .find((task) => task.id === createdTask.id);
     expect(boundTask?.completedStudents).toBe(1);
+
+    const savedEntries = await app.inject({
+      method: "GET",
+      url: `${base}/${createdTask.id}/projects/dimension-technical/entries`,
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    expect(savedEntries.statusCode).toBe(200);
+    expect((savedEntries.json() as { savedValuesByStudent: Record<string, Record<string, { kind: string; score?: number }>> })
+      .savedValuesByStudent["student-1"]?.["assessment-test-finishing-cq-talent"])
+      .toEqual({ kind: "rating_1_5", score: 4 });
 
     const badTemplate = await app.inject({
       method: "POST",

@@ -7,7 +7,6 @@
 .radar-page__body { padding: 16rpx var(--space-page) 180rpx; }
 .radar-context { margin-bottom: 16rpx; color: #667085; font-size: 26rpx; line-height: 36rpx; }
 .radar-hero { position: relative; height: 688rpx; box-sizing: border-box; overflow: hidden; padding: 32rpx; border-radius: 28rpx; background: #ffffff; }
-.radar-hero--dense { height: 688rpx; }
 .radar-hero__head { display: flex; align-items: center; justify-content: space-between; }
 .radar-hero__title { color: #202124; font-size: 32rpx; font-weight: 700; line-height: 42rpx; }
 .radar-hero__period { color: #a80f1b; font-size: 28rpx; font-weight: 700; line-height: 36rpx; }

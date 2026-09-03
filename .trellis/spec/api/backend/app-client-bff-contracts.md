@@ -847,6 +847,13 @@ v1 存储为进程内集合（同私教申请语义），SQLite 持久化是已�
 - 存储：SQLite `assessment_tasks`；开发验收种子仅以 `ON CONFLICT(id) DO NOTHING` 填充缺失记录，生产不依赖 `FCM_CQ_TALENT_ACCEPTANCE_SEED` 提供任务。
 - **403**：非教练成员。
 
+### `GET /clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/projects/{projectId}/entries`
+
+- **200**：`{ clubId, taskId, projectId, savedValuesByStudent: { [studentId]: { [testItemId]: MetricValue } } }`
+- 语义：读取指定测评任务、项目下已保存的最新成绩，学员范围来自任务所属球队的 active team members；任务已通过教练授权后，不再叠加“近 30 天有活动”过滤。
+- 客户端可把 `MetricValue` 归一化为输入框初始值，但不得把本机草稿当成服务端保存成功的证明。
+- **403**：非教练成员或任务球队超出当前教练范围；**404**：任务、模板或有效模板版本不存在。
+
 ### 复用既有端点
 
 - C10 训练内容选择：`GET /coach/training-project-tree` + `PUT /coach/events/{eventId}/training-projects`（已存在）。

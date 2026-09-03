@@ -200,8 +200,9 @@ describe("coach student radar", () => {
     expect(template).not.toContain('feedbackMessage');
     expect(template).not.toContain('student-strip');
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(template).toContain('class="radar-hero {{radarHeroClass}}"');
-    expect(controller).toContain('radarHeroClass');
+    expect(template).toContain('class="radar-hero"');
+    expect(template).not.toContain('radarHeroClass');
+    expect(controller).not.toContain('radarHeroClass');
     expect(stylesheet).toMatch(/\.radar-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*background:\s*#ffffff)/s);
     expect(stylesheet).toMatch(/\.radar-nav__back,\s*\.radar-nav__placeholder\s*\{(?=[^}]*width:\s*48rpx)(?=[^}]*height:\s*64rpx)/s);
     expect(stylesheet).toMatch(/\.radar-nav__title\s*\{(?=[^}]*text-align:\s*left)(?=[^}]*font-size:\s*36rpx)(?=[^}]*line-height:\s*44rpx)/s);

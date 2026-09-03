@@ -10,11 +10,19 @@
 ## Ordered batches
 
 1. **Figma V7 design first**: complete — non-destructive Parent V7 nodes `1967:2` / `1967:164` / `1967:198` and Coach V7 nodes `1973:2` / `1973:91` / `1973:131` / `1973:181` / `1973:302` were written and screenshot-read back.
-2. **Parent timeline data and navigation**: in progress — API and page tests now cover per-lesson progress; the first unit exposes and renders it. Ability-history and match-detail navigation are complete, with the match route now using the P4.2 V7 full-screen hierarchy.
+2. **Parent timeline data and navigation**: complete for this task — API and page tests cover per-lesson progress; ability-history and match-detail navigation use the P4.2 V7 full-screen hierarchy.
 3. **Parent visual cleanup**: add page-level tests for card classes and view-model fields, remove the Growth card border artifact, align the full-screen history and match detail layouts to V7, then commit.
-4. **Coach visual shell**: in progress — C11 creation wording is synchronized to V7 and verified; C13/C14 code shells now match the V7 white radar/team-overview layouts, and obsolete C14 layers were hidden in Figma. Runtime visual acceptance remains pending a real coach session and strict `375×812` screenshots.
-5. **Coach bulk project entry**: C12.1 code complete for this batch — the task→project chooser now opens a full-screen roster batch page. Each project keeps a task+project-scoped local draft, renders every real team member with precomputed WXML-safe metric rows, and saves filled students through the existing `submitCoachAssessment` contract. The V7 top bar and `保存本项目 → 下一项目` action order are synchronized; remaining work is API-backed existing-score hydration and runtime visual acceptance.
-6. **Integration and documentation**: targeted suites and typecheck are green; full gate has the two unrelated mini-program failures recorded in `docs/current/progress.md`. Inspect diffs, make a limited-path work commit, push to `origin/dev`, then establish a real coach session and complete C12.1/C13/C14 screenshot revalidation before marking the visual units complete.
+4. **Coach visual shell**: code/design batch complete — C11 creation wording is synchronized to V7 and verified; C13/C14 code shells match the V7 white radar/team-overview layouts, and obsolete C14 layers were hidden in Figma. Runtime visual acceptance remains pending a real coach session and strict `375×812` screenshots.
+5. **Coach bulk project entry**: code complete for this batch — the task→project chooser opens a full-screen roster batch page. Each project keeps a task+project-scoped local draft, hydrates existing saved entries from the API, renders every real team member with precomputed WXML-safe metric rows, and saves filled students through the existing `submitCoachAssessment` contract. The V7 top bar and `保存本项目 → 下一项目` action order are synchronized; runtime visual acceptance remains pending.
+6. **Integration and documentation**: targeted suites, API full suite, and typecheck are green. The full gate still has the two unrelated mini-program failures recorded in `docs/current/progress.md`. This batch is ready for a limited-path commit; after commit, establish a real coach session and complete C12.1/C13/C14 screenshot revalidation before marking the visual units complete.
+
+## 2026-09-03 final implementation check
+
+- Fixed API batch-entry hydration: once the assessment task team has passed coach authorization, roster membership is the source of truth; the endpoint no longer incorrectly applies the unrelated recent-30-day activity filter.
+- Fixed post-save UX: saved scores remain visible with `已保存` status, only pending changed values are submitted on a repeat save, successful students lose their local draft, and failed students retain a retryable draft.
+- Verification: API and mini-program TypeScript checks passed; API assessment-task regression `1/1`; C12.1/C13/C14 mini-program tests `22/22`; API full suite `126/126`; `git diff --check` passed.
+- Root `corepack pnpm run check` remains blocked only by the two pre-existing, out-of-scope mini-program failures: `scripts/devtools-screenshot.test.mjs` has a collection-time syntax error, and `pages/parent/content/index.test.mjs` has an LF/CRLF-sensitive exact CSS-string assertion. No code in either file is part of this task.
+- Trusted WeChat DevTools/device `375×812` runtime screenshots for C12.1/C13/C14 are still outstanding; static/type/API evidence must not be labeled visual acceptance.
 
 ## High-risk files
 

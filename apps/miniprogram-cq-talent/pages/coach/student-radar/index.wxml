@@ -18,7 +18,7 @@
     />
 
     <block wx:if="{{hasRadar}}">
-      <view class="radar-hero {{radarHeroClass}}">
+      <view class="radar-hero">
         <view class="radar-hero__head">
           <view class="radar-hero__title">六维能力模型</view>
           <view class="radar-hero__period">综合 {{overall}}</view>
