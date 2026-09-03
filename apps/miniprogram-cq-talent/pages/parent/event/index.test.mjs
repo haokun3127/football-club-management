@@ -126,11 +126,31 @@ describe("parent activity detail", () => {
 
     expect(page.data.detail).toMatchObject({
       matchEvents: [
-        { id: "match-event-1", label: "进球", studentName: "小明", minuteLabel: "18分钟" },
-        { id: "match-event-2", label: "乌龙球", studentName: "小明", minuteLabel: "42分钟" },
+        { id: "match-event-1", label: "进球", studentName: "小明", minuteLabel: "第 18 分钟" },
+        { id: "match-event-2", label: "乌龙球", studentName: "小明", minuteLabel: "第 42 分钟" },
       ],
       hasMatchEvents: true,
     });
+  });
+
+  it("uses the matching event player name and the V7 icon-plus-minute event rows", async () => {
+    mocks.getParentActivityDetail.mockResolvedValueOnce(detail({
+      type: "match",
+      participants: [{ studentId: "student-1", name: "学员", status: "present" }],
+      matchEvents: [{ id: "match-event-1", type: "goal", studentId: "student-1", studentName: "小明", minute: 18 }],
+    }));
+    const page = createPageInstance();
+
+    await page.load("match-event");
+
+    expect(page.data.detail.childName).toBe("小明");
+    expect(page.data.detail.matchEvents[0]).toMatchObject({ icon: "⚽", minuteLabel: "第 18 分钟" });
+    expect(template).toContain("match-events-title");
+    expect(template).toContain("{{item.icon}}");
+    expect(template).toContain("{{item.label}}");
+    expect(template).toContain("{{item.minuteLabel}}");
+    expect(styles).toContain(".match-event-row__icon");
+    expect(styles).not.toMatch(/\.match-event-row__name\s*\{\s*display:\s*none\s*;\s*\}/);
   });
 
   it("keeps the three P2 hierarchies page-owned and method-free in WXML", () => {

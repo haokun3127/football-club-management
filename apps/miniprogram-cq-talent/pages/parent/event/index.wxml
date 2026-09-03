@@ -29,14 +29,14 @@
         <view class="match-summary__scoreline"><view class="match-summary__team match-summary__team--home">{{detail.homeTeam}}</view><view class="match-summary__score">{{detail.scoreText}}</view><view class="match-summary__team match-summary__team--away">{{detail.awayTeam}}</view></view>
         <view class="match-summary__result">{{detail.matchResultLabel}}</view>
       </view>
+      <view class="match-events-title">{{detail.childName}}的比赛数据</view>
       <view class="match-events-card">
-        <view class="match-events-card__head"><view>{{detail.childName}}的比赛数据</view><view wx:if="{{detail.hasMatchEvents}}">{{detail.matchEvents.length}}条</view></view>
         <view wx:if="{{detail.hasMatchEvents}}" class="match-events-list">
           <view wx:for="{{detail.matchEvents}}" wx:key="id" class="match-event-row">
-            <view class="match-event-row__minute">{{item.minuteLabel}}</view>
+            <view class="match-event-row__icon match-event-row__icon--{{item.tone}}">{{item.icon}}</view>
             <view class="match-event-row__main">
-              <view class="match-event-row__line"><view class="match-event-row__pill match-event-row__pill--{{item.tone}}">{{item.label}}</view></view>
-              <view wx:if="{{item.hasNote}}" class="match-event-row__note">{{item.note}}</view>
+              <view class="match-event-row__name">{{item.label}}</view>
+              <view class="match-event-row__minute">{{item.minuteLabel}}</view>
             </view>
           </view>
         </view>

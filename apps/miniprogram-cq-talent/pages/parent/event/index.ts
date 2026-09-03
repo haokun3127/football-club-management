@@ -14,6 +14,7 @@ type RosterItem = {
 
 type MatchEventView = {
   id: string;
+  icon: string;
   label: string;
   tone: "score" | "assist" | "defense" | "discipline" | "neutral";
   studentName: string;
@@ -152,8 +153,8 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
     roster: detail.participants.slice(0, 3).map((participant, index) => rosterItem(participant, index)),
     otherDescription,
     otherNotice,
-    childName: child?.name || "孩子待同步",
-    childInitial: (child?.name || "学").slice(0, 1),
+    childName: resolveChildName(detail, child),
+    childInitial: resolveChildName(detail, child).slice(0, 1),
     childStatusLabel,
     confirmationText: childStatusLabel,
     offlineConfirmText: `本次训练须经教练或家长在现场确认，无需在 APP 进行操作。请${child?.name || "学员"}准时到场。`,
@@ -177,14 +178,37 @@ function matchResultLabel(score: string, status: string) {
 function toMatchEvents(events: ActivityDetail["matchEvents"]): MatchEventView[] {
   return (events ?? []).map((event) => ({
     id: event.id,
+    icon: matchEventIcon(event.type),
     label: matchEventLabel(event.type),
     tone: matchEventTone(event.type),
     studentName: event.studentName || "学员待同步",
-    minuteLabel: typeof event.minute === "number" ? `${event.minute}分钟` : "时间待同步",
+    minuteLabel: typeof event.minute === "number" ? `第 ${event.minute} 分钟` : "时间待同步",
     hasMinute: typeof event.minute === "number",
     note: event.note || "",
     hasNote: Boolean(event.note),
   }));
+}
+
+function resolveChildName(detail: ActivityDetail, child: ActivityDetail["participants"][number] | undefined) {
+  const participantName = child?.name?.trim();
+  if (participantName && participantName !== "学员" && participantName !== "孩子") return participantName;
+  const eventName = detail.matchEvents?.find((event) => event.studentId === child?.studentId)?.studentName?.trim();
+  return eventName || participantName || "孩子待同步";
+}
+
+function matchEventIcon(type: NonNullable<ActivityDetail["matchEvents"]>[number]["type"]) {
+  const icons: Record<typeof type, string> = {
+    goal: "⚽",
+    assist: "↗",
+    save: "✦",
+    tackle: "✦",
+    foul: "!",
+    yellow_card: "▮",
+    red_card: "▮",
+    penalty: "⚽",
+    own_goal: "↩",
+  };
+  return icons[type];
 }
 
 function matchEventLabel(type: NonNullable<ActivityDetail["matchEvents"]>[number]["type"]) {

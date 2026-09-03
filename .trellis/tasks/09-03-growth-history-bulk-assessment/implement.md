@@ -58,6 +58,14 @@
 - Added a regression in `pages/parent/growth/index.test.mjs`, observed it fail against the old `更多›` copy, then changed only the P4 WXML action text to `查看全部 ›`.
 - Verification: parent growth page Vitest `9/9`, mini-program TypeScript passed, and `git diff --check` passed.
 
+## 2026-09-03 P4.2 match-detail event layout recovery
+
+- Re-read online Figma Parent V7 P4.2 `1967:198` before implementation. The match detail uses a standalone child-data heading followed by a white event card; each event row is icon + event label + `第 X 分钟`.
+- Added a red regression for the V7 structure and the real-name fallback. The page now derives a generic participant name such as `学员` from the matching API-backed event player name, while preserving real event data and avoiding hard-coded sample names.
+- Removed the legacy WXSS override that hid `.match-event-row__name`; this was the root cause of the runtime screenshot showing only icons and minutes after the structural update.
+- Fresh verification: parent growth/milestones/ability-history/match-history/event/training-history Vitest `29/29`, mini-program TypeScript passed, and `git diff --check` passed.
+- Runtime evidence after refresh and exact route navigation: `C:\Users\ASUS\AppData\Local\Temp\cq-talent-p42-detail-runtime-final-20260903.png` (`390×844`). It shows the real `丁宁的比赛数据` title and all five API-backed events with labels, icons, and minute text. This is runtime evidence only; strict `375×812` acceptance remains separate.
+
 ## High-risk files
 
 - `apps/api/src/routes/app-client.routes.ts`: preserve role authorization and existing response compatibility.
