@@ -215,4 +215,10 @@ describe("coach assessment task list", () => {
   it("keeps the floating create icon visible on the red Figma FAB", () => {
     expect(plusIcon).toContain('stroke="#FFFFFF"');
   });
+
+  it("uses the V7 creation wording and keeps the action in both entry points", () => {
+    expect(template).toContain('class="tasks-nav__create" bindtap="openCreate"');
+    expect(template).toContain('>新建任务</view>');
+    expect(template).toContain('class="tasks-fab" bindtap="openCreate"');
+  });
 });

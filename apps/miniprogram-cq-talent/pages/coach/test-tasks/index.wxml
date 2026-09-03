@@ -4,7 +4,7 @@
       <view class="tasks-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/c11-arrow-left.svg" mode="aspectFit" /></view>
       <view class="tasks-nav__title">测评任务</view>
     </view>
-    <view class="tasks-nav__create" bindtap="openCreate" aria-label="新增测评任务">新增</view>
+    <view class="tasks-nav__create" bindtap="openCreate" aria-label="新建测评任务">新建任务</view>
   </view>
 
   <view class="tasks-page__body">
