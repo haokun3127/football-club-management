@@ -1412,6 +1412,7 @@ describe("api server", () => {
       url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/assessments",
       headers: { "x-user-id": "user-coach-1" },
       payload: {
+        assessmentTaskId: "assessment-task-server-contract",
         studentId: "student-1",
         templateId: "assessment-template-technical",
         templateVersionId: "assessment-template-version-technical-1",
@@ -3820,8 +3821,13 @@ describe("api server", () => {
 
     const listed = await app.inject({ method: "GET", url: base, headers: { "x-user-id": "user-coach-1" } });
     expect(listed.statusCode).toBe(200);
-    const listedBody = listed.json() as { tasks: unknown[]; templates: Array<{ id: string; name: string }> };
+    const listedBody = listed.json() as {
+      tasks: unknown[];
+      templates: Array<{ id: string; name: string }>;
+      teams: Array<{ id: string; name: string }>;
+    };
     expect(Array.isArray(listedBody.templates)).toBe(true);
+    expect(listedBody.teams).toContainEqual({ id: "team-u10-dev", name: "U10发展队" });
     const templateId = listedBody.templates[0]?.id;
     expect(templateId).toBeTruthy();
 
@@ -3860,8 +3866,8 @@ describe("api server", () => {
     expect(blankTerm.statusCode).toBe(400);
 
     const relisted = await app.inject({ method: "GET", url: base, headers: { "x-user-id": "user-coach-1" } });
-    const relistedTasks = (relisted.json() as { tasks: Array<{ id: string }> }).tasks;
-    expect(relistedTasks.some((task) => task.id === createdTask.id)).toBe(true);
+    const relistedTasks = (relisted.json() as { tasks: Array<{ id: string; teamName?: string }> }).tasks;
+    expect(relistedTasks).toContainEqual(expect.objectContaining({ id: createdTask.id, teamName: "U10发展队" }));
 
     const submitted = await app.inject({
       method: "POST",

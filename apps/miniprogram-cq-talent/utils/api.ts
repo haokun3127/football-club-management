@@ -8,6 +8,8 @@ import type {
   AssessmentForm,
   CoachLessonConfirmation,
   CoachMatchDetail,
+  CoachTrainingContentAssessment,
+  CoachTrainingContentAssessmentScope,
   CoachMatchEventCreateInput,
   CoachMatchEventCreateResult,
   CoachMatchPlayerEvent,
@@ -216,7 +218,14 @@ export async function saveCoachPreferences(preferences: CoachPreferences): Promi
   });
 }
 
-export async function createCoachAssessmentTask(input: { title: string; templateId: string; startsOn: string; dueOn: string }): Promise<{ id: string }> {
+export async function createCoachAssessmentTask(input: {
+  title: string;
+  templateId: string;
+  teamId: string;
+  termLabel: string;
+  startsOn: string;
+  dueOn: string;
+}): Promise<{ id: string }> {
   const context = requireContext();
   const raw = await request<Record<string, unknown>>({
     method: "POST",
@@ -392,6 +401,7 @@ export async function getAssessmentForm(templateId: string): Promise<AssessmentF
 
 export async function submitCoachAssessment(input: {
   studentId: string;
+  assessmentTaskId?: string;
   eventId?: string;
   templateId: string;
   templateVersionId?: string;
@@ -406,6 +416,7 @@ export async function submitCoachAssessment(input: {
 
   return request<Record<string, unknown>, {
     studentId: string;
+    assessmentTaskId?: string;
     templateId: string;
     templateVersionId?: string;
     assessedAt: string;
@@ -422,6 +433,7 @@ export async function submitCoachAssessment(input: {
     method: "POST",
     data: {
       studentId: input.studentId,
+      ...(input.assessmentTaskId ? { assessmentTaskId: input.assessmentTaskId } : {}),
       templateId: input.templateId,
       templateVersionId: input.templateVersionId,
       assessedAt: new Date().toISOString(),
@@ -1450,6 +1462,27 @@ export async function getCoachTeam(teamId?: string): Promise<CoachTeamDetail> {
   });
 }
 
+export async function getCoachTrainingContentAssessments(eventId: string): Promise<CoachTrainingContentAssessmentScope> {
+  const context = requireContext();
+  return request<CoachTrainingContentAssessmentScope>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/training-content-assessments`,
+  });
+}
+
+export async function saveCoachTrainingContentAssessments(
+  eventId: string,
+  assessments: Array<Pick<CoachTrainingContentAssessment, "studentId" | "trainingProjectId" | "score" | "note">>,
+): Promise<{ eventId: string; assessments: CoachTrainingContentAssessment[] }> {
+  const context = requireContext();
+  return request<{ eventId: string; assessments: CoachTrainingContentAssessment[] }>({
+    method: "PUT",
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/training-content-assessments`,
+    data: { assessments },
+    expectedStatus: 200,
+    idempotent: true,
+  });
+}
+
 export async function getCoachStudentRadar(studentId: string): Promise<RadarMetricPoint[]> {
   const context = requireContext();
   const response = await request<{ latest?: Array<Record<string, unknown>> }>({
@@ -1497,14 +1530,23 @@ export async function getCoachAssessmentTasks(): Promise<CoachAssessmentTask[]> 
   return Array.isArray(response.tasks) ? response.tasks : [];
 }
 
-export async function getCoachAssessmentTaskOptions(): Promise<{ tasks: CoachAssessmentTask[]; templates: Array<{ id: string; name: string }> }> {
+export async function getCoachAssessmentTaskOptions(): Promise<{
+  tasks: CoachAssessmentTask[];
+  templates: Array<{ id: string; name: string }>;
+  teams: Array<{ id: string; name: string }>;
+}> {
   const context = requireContext();
-  const response = await request<{ tasks?: CoachAssessmentTask[]; templates?: Array<{ id: string; name: string }> }>({
+  const response = await request<{
+    tasks?: CoachAssessmentTask[];
+    templates?: Array<{ id: string; name: string }>;
+    teams?: Array<{ id: string; name: string }>;
+  }>({
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessment-tasks`,
   });
   return {
     tasks: Array.isArray(response.tasks) ? response.tasks : [],
     templates: Array.isArray(response.templates) ? response.templates : [],
+    teams: Array.isArray(response.teams) ? response.teams : [],
   };
 }
 

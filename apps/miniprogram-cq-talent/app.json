@@ -38,6 +38,7 @@
     "pages/coach/team-ability/index",
     "pages/coach/event-change/index",
     "pages/coach/content-select/index",
+    "pages/coach/training-assessment/index",
     "pages/coach/coverage/index",
     "pages/coach/test-tasks/index",
     "pages/coach/test-task-create/index",

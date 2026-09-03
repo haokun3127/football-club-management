@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const storage = new Map();
 const mocks = vi.hoisted(() => ({
   getAssessmentForm: vi.fn(),
+  getCoachAssessmentTasks: vi.fn(),
   getCoachTeam: vi.fn(),
   submitCoachAssessment: vi.fn(),
   requireRole: vi.fn(),
@@ -14,6 +15,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("../../../utils/api", () => ({
   getAssessmentForm: mocks.getAssessmentForm,
+  getCoachAssessmentTasks: mocks.getCoachAssessmentTasks,
   getCoachTeam: mocks.getCoachTeam,
   submitCoachAssessment: mocks.submitCoachAssessment,
 }));
@@ -89,6 +91,21 @@ const team = (overrides = {}) => ({
   ...overrides,
 });
 
+const assessmentTask = (overrides = {}) => ({
+  id: "task-real",
+  teamId: "team-real",
+  teamName: "Actual team",
+  termLabel: "2026 秋季学期",
+  title: "Real task",
+  templateId: "template-real",
+  startsOn: "2026-08-01",
+  dueOn: "2026-09-30",
+  status: "in_progress",
+  completedStudents: 0,
+  totalStudents: 2,
+  ...overrides,
+});
+
 function createPageInstance(data = {}) {
   const instance = { ...pageDefinition, data: { ...pageDefinition.data, ...data } };
   instance.setData = (patch) => { instance.data = { ...instance.data, ...patch }; };
@@ -99,6 +116,7 @@ describe("C15 coach assessment entry", () => {
   beforeEach(() => {
     storage.clear();
     mocks.getAssessmentForm.mockReset().mockResolvedValue(form());
+    mocks.getCoachAssessmentTasks.mockReset().mockResolvedValue([assessmentTask()]);
     mocks.getCoachTeam.mockReset().mockResolvedValue(team());
     mocks.submitCoachAssessment.mockReset().mockResolvedValue({ assessment: { id: "assessment-confirmed" } });
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
@@ -107,17 +125,30 @@ describe("C15 coach assessment entry", () => {
     mocks.navigateBack.mockReset();
   });
 
-  it("makes no request without an authenticated coach or a real template id", async () => {
+  it("makes no request without an authenticated coach, task id, or real template id", async () => {
     const page = createPageInstance();
     mocks.requireRole.mockReturnValue(null);
-    await page.onLoad({ templateId: "template-real" });
+    await page.onLoad({ taskId: "task-real", templateId: "template-real" });
+    expect(mocks.getCoachAssessmentTasks).not.toHaveBeenCalled();
     expect(mocks.getAssessmentForm).not.toHaveBeenCalled();
     expect(mocks.getCoachTeam).not.toHaveBeenCalled();
 
     mocks.requireRole.mockReturnValue({ role: "coach" });
     await page.onLoad({});
+    expect(mocks.getCoachAssessmentTasks).not.toHaveBeenCalled();
     expect(mocks.getAssessmentForm).not.toHaveBeenCalled();
     expect(mocks.getCoachTeam).not.toHaveBeenCalled();
+  });
+
+  it("loads the task-owned team and sends task id on every real submission", async () => {
+    const page = createPageInstance();
+    await page.onLoad({ taskId: "task-real", templateId: "template-real", title: "Ignored query title" });
+
+    expect(mocks.getCoachTeam).toHaveBeenCalledWith("team-real");
+    expect(page.data).toMatchObject({ assessmentTaskId: "task-real", taskTitle: "Real task", termLabel: "2026 秋季学期" });
+    page.onRawInput({ currentTarget: { dataset: { fieldId: "field-speed" } }, detail: { value: "80" } });
+    await page.submit();
+    expect(mocks.submitCoachAssessment).toHaveBeenCalledWith(expect.objectContaining({ assessmentTaskId: "task-real" }));
   });
 
   it("keeps the newest concurrent load when an older load succeeds or fails late", async () => {
@@ -130,8 +161,11 @@ describe("C15 coach assessment entry", () => {
       .mockImplementationOnce(() => new Promise((resolve) => { resolveOldTeam = resolve; }))
       .mockResolvedValueOnce(team({ members: [{ id: "student-current", name: "Current learner" }] }));
     const page = createPageInstance();
-    const oldLoad = page.load("template-old", "Old task");
-    await page.load("template-current", "Current task");
+    mocks.getCoachAssessmentTasks.mockResolvedValueOnce([assessmentTask({ id: "task-old", templateId: "template-old", title: "Old task" })])
+      .mockResolvedValueOnce([assessmentTask({ id: "task-current", templateId: "template-current", title: "Current task" })]);
+    const oldLoad = page.load("template-old", "Old task", "task-old");
+    await Promise.resolve();
+    await page.load("template-current", "Current task", "task-current");
     resolveOldForm(form({ templateId: "template-old", fields: [{ ...form().fields[0], id: "field-old", testItemId: "item-old" }] }));
     resolveOldTeam(team({ members: [{ id: "student-old", name: "Old learner" }] }));
     await oldLoad;
@@ -150,8 +184,11 @@ describe("C15 coach assessment entry", () => {
       .mockResolvedValueOnce(team())
       .mockResolvedValueOnce(team({ members: [{ id: "student-current", name: "Current learner" }] }));
     const page = createPageInstance();
-    const oldLoad = page.load("template-old", "Old task");
-    await page.load("template-current", "Current task");
+    mocks.getCoachAssessmentTasks.mockResolvedValueOnce([assessmentTask({ id: "task-old", templateId: "template-old", title: "Old task" })])
+      .mockResolvedValueOnce([assessmentTask({ id: "task-current", templateId: "template-current", title: "Current task" })]);
+    const oldLoad = page.load("template-old", "Old task", "task-old");
+    await Promise.resolve();
+    await page.load("template-current", "Current task", "task-current");
     rejectOldForm(new Error("older response failed"));
     await oldLoad;
 
@@ -162,22 +199,22 @@ describe("C15 coach assessment entry", () => {
   it("rejects a form field without its real test item instead of inventing one", async () => {
     mocks.getAssessmentForm.mockResolvedValueOnce(form({ fields: [{ ...form().fields[0], testItemId: undefined }] }));
     const page = createPageInstance();
-    await page.load("template-real", "Real task");
+    await page.load("template-real", "Real task", "task-real");
     expect(page.data.state).toBe("empty");
     expect(page.data.fields).toEqual([]);
   });
 
   it("stores a versioned local draft and restores only the current team/form intersection", async () => {
-    storage.set("coach-assessment-entry:template-real:version-real", {
+    storage.set("coach-assessment-entry:task-real:template-real:version-real", {
       signature: "stale-signature",
       valuesByStudent: { "student-1": { "field-speed": 71 } },
     });
     const page = createPageInstance();
-    await page.load("template-real", "Real task");
+    await page.load("template-real", "Real task", "task-real");
     expect(page.data.cards[0].rawInputValue).toBe("");
 
     page.onRawInput({ currentTarget: { dataset: { fieldId: "field-speed" } }, detail: { value: "80" } });
-    const saved = storage.get("coach-assessment-entry:template-real:version-real");
+    const saved = storage.get("coach-assessment-entry:task-real:template-real:version-real");
     expect(saved).toEqual(expect.objectContaining({
       signature: expect.any(String),
       valuesByStudent: { "student-1": { "field-speed": 80 } },
@@ -186,7 +223,7 @@ describe("C15 coach assessment entry", () => {
 
   it("projects only real team metadata and precomputes compact slider progress for the C15 view", async () => {
     const page = createPageInstance();
-    await page.load("template-real", "Real task");
+    await page.load("template-real", "Real task", "task-real");
 
     expect(page.data).toMatchObject({
       teamName: "Actual team",
@@ -203,16 +240,17 @@ describe("C15 coach assessment entry", () => {
       .mockResolvedValueOnce({ assessment: { id: "assessment-1" } })
       .mockRejectedValueOnce({ code: "network_error" });
     const page = createPageInstance();
-    await page.load("template-real", "Real task");
+    await page.load("template-real", "Real task", "task-real");
     page.onRawInput({ currentTarget: { dataset: { fieldId: "field-speed" } }, detail: { value: "80" } });
     page.selectStudent({ currentTarget: { dataset: { id: "student-2" } } });
     page.onRawInput({ currentTarget: { dataset: { fieldId: "field-speed" } }, detail: { value: "70" } });
     await page.submit();
 
-    const saved = storage.get("coach-assessment-entry:template-real:version-real");
+    const saved = storage.get("coach-assessment-entry:task-real:template-real:version-real");
     expect(mocks.submitCoachAssessment).toHaveBeenCalledTimes(2);
     expect(mocks.submitCoachAssessment).toHaveBeenNthCalledWith(1, expect.objectContaining({
       studentId: "student-1",
+      assessmentTaskId: "task-real",
       rawResults: [expect.objectContaining({ testItemId: "item-speed", metricId: "metric-speed" })],
     }));
     expect(saved.valuesByStudent["student-1"]).toBeUndefined();
@@ -225,7 +263,7 @@ describe("C15 coach assessment entry", () => {
     let resolveFirst;
     mocks.submitCoachAssessment.mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }));
     const page = createPageInstance();
-    await page.load("template-real", "Real task");
+    await page.load("template-real", "Real task", "task-real");
     page.onRawInput({ currentTarget: { dataset: { fieldId: "field-speed" } }, detail: { value: "80" } });
     page.selectStudent({ currentTarget: { dataset: { id: "student-2" } } });
     page.onRawInput({ currentTarget: { dataset: { fieldId: "field-speed" } }, detail: { value: "70" } });
@@ -239,7 +277,7 @@ describe("C15 coach assessment entry", () => {
     expect(mocks.redirectTo).toHaveBeenCalledWith(expect.objectContaining({
       url: expect.stringContaining("count=2"),
     }));
-    expect(storage.has("coach-assessment-entry:template-real:version-real")).toBe(false);
+    expect(storage.has("coach-assessment-entry:task-real:template-real:version-real")).toBe(false);
   });
 
   it("keeps C15 page structure data-driven and free of raw API errors", () => {

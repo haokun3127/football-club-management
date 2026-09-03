@@ -7,12 +7,21 @@ interface TemplateOption {
   name: string;
 }
 
+interface TeamOption {
+  id: string;
+  name: string;
+}
+
 interface PageData {
   navInset: number;
   menuInset: number;
   templates: TemplateOption[];
   templateNames: string[];
   templateIndex: number;
+  teams: TeamOption[];
+  teamNames: string[];
+  teamIndex: number;
+  termLabel: string;
   title: string;
   startsOn: string;
   dueOn: string;
@@ -33,6 +42,10 @@ Page<PageData>({
     templates: [],
     templateNames: [],
     templateIndex: 0,
+    teams: [],
+    teamNames: [],
+    teamIndex: 0,
+    termLabel: "",
     title: "",
     startsOn: todayLocal(),
     dueOn: todayLocal(),
@@ -50,6 +63,8 @@ Page<PageData>({
       this.setData({
         templates: options.templates,
         templateNames: options.templates.map((template) => template.name),
+        teams: options.teams,
+        teamNames: options.teams.map((team) => team.name),
       });
       this.refreshCanSubmit();
     } catch {
@@ -64,6 +79,14 @@ Page<PageData>({
     this.setData({ templateIndex: Number(event.detail.value) || 0 });
     this.refreshCanSubmit();
   },
+  onTeamChange(event: { detail: { value: string } }) {
+    this.setData({ teamIndex: Number(event.detail.value) || 0 });
+    this.refreshCanSubmit();
+  },
+  onTermLabelInput(event: { detail: { value: string } }) {
+    this.setData({ termLabel: event.detail.value });
+    this.refreshCanSubmit();
+  },
   onStartDateChange(event: { detail: { value: string } }) {
     this.setData({ startsOn: event.detail.value });
     this.refreshCanSubmit();
@@ -74,14 +97,16 @@ Page<PageData>({
   },
   refreshCanSubmit() {
     const template = this.data.templates[this.data.templateIndex];
+    const team = this.data.teams[this.data.teamIndex];
     this.setData({
-      canSubmit: Boolean(this.data.title.trim()) && Boolean(template) && this.data.dueOn >= this.data.startsOn,
+      canSubmit: Boolean(this.data.title.trim()) && Boolean(template) && Boolean(team) && Boolean(this.data.termLabel.trim()) && this.data.dueOn >= this.data.startsOn,
     });
   },
   async submit() {
     if (!this.data.canSubmit || this.data.submitting) return;
     const template = this.data.templates[this.data.templateIndex];
-    if (!template) return;
+    const team = this.data.teams[this.data.teamIndex];
+    if (!template || !team) return;
     if (this.data.dueOn < this.data.startsOn) {
       wx.showToast({ title: "截止日期不能早于开始日期", icon: "none" });
       return;
@@ -91,6 +116,8 @@ Page<PageData>({
       await createCoachAssessmentTask({
         title: this.data.title.trim(),
         templateId: template.id,
+        teamId: team.id,
+        termLabel: this.data.termLabel.trim(),
         startsOn: this.data.startsOn,
         dueOn: this.data.dueOn,
       });

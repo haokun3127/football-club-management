@@ -1147,6 +1147,8 @@ const noticeBanner = presentNoticeBanner(articles);
 - A training-content assessment is uniquely `(clubId, eventId, studentId, trainingProjectId)` and an overwrite updates the same record.
 - It is valid only for a training event, a project selected on that event, and a roster student whose current attendance is `present`.
 - A semester task owns exactly one coach-accessible team, a nonblank `termLabel`, one template and one date window. Submissions must use its task id and satisfy its team/template/window scope.
+- The task-list projection returns the accessible `teams: [{ id, name }]` options and each task's safe `teamName`; C11 uses them for task creation and display, rather than deriving a team from a default workbench.
+- Classroom training assessment is a separate full-screen C2 flow. It may use only the GET scope's `selectedProjectIds` and `presentStudentIds`; the old activity-level stage-assessment shortcut must not bypass C11/C15 task ownership.
 - `lessonStats` counts only completed, non-cancelled training events: expected is eligible trainings, attended is `present`; matches never contribute.
 - `timeline.training` resolves the saved session-plan drills for one completed training and attaches only that child's persisted training-content scores/notes.
 - `timeline.match` resolves one completed match's opponent, score, venue and only that child's match events. `timeline.ability_update` is derived from persisted training-content scoring or from an assessment metric record whose `assessmentId` maps to a real task-bound player assessment.

@@ -119,6 +119,12 @@
   white-space: nowrap;
 }
 
+.task-card__context {
+  color: #667085;
+  font-size: 26rpx;
+  line-height: 36rpx;
+}
+
 .task-card__status {
   flex: 0 0 auto;
   padding: 8rpx 16rpx;

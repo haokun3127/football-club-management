@@ -18,10 +18,10 @@
 
     <block wx:if="{{state === 'ready'}}">
       <view class="c15-context">
-        <view class="c15-context__label">当前训练球队</view>
+        <view class="c15-context__label">测评任务</view>
         <view class="c15-context__main">
           <text class="c15-context__team">{{teamName || '训练球队待同步'}}</text>
-          <text class="c15-context__hint">由训练管理选择</text>
+          <text class="c15-context__hint">{{termLabel}} · {{taskTitle}}</text>
         </view>
       </view>
 

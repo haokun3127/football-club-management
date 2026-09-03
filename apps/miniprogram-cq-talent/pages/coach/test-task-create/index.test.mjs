@@ -46,6 +46,7 @@ describe("coach test-task create", () => {
     mocks.getCoachAssessmentTaskOptions.mockReset().mockResolvedValue({
       tasks: [],
       templates: [{ id: "assessment-template-technical", name: "技术测评模板" }],
+      teams: [{ id: "team-u10-dev", name: "U10 发展队" }],
     });
     mocks.createCoachAssessmentTask.mockReset().mockResolvedValue({ id: "task-new" });
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
@@ -53,15 +54,17 @@ describe("coach test-task create", () => {
     mocks.navigateBack.mockReset();
   });
 
-  it("loads templates and enables submit only with title, template and valid period", async () => {
+  it("loads real coach teams and enables submit only with title, team, term, template and valid period", async () => {
     const page = createPageInstance();
     page.onLoad();
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(page.data.templateNames).toEqual(["技术测评模板"]);
+    expect(page.data.teamNames).toEqual(["U10 发展队"]);
     expect(page.data.canSubmit).toBe(false);
 
     page.onTitleInput({ detail: { value: "月度技术测评" } });
+    page.onTermLabelInput({ detail: { value: "2026 秋季学期" } });
     expect(page.data.canSubmit).toBe(true);
 
     page.onDueDateChange({ detail: { value: "2020-01-01" } });
@@ -74,6 +77,7 @@ describe("coach test-task create", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     page.onTitleInput({ detail: { value: "月度技术测评" } });
+    page.onTermLabelInput({ detail: { value: "2026 秋季学期" } });
     page.onStartDateChange({ detail: { value: "2026-08-21" } });
     page.onDueDateChange({ detail: { value: "2026-08-31" } });
     await page.submit();
@@ -81,6 +85,8 @@ describe("coach test-task create", () => {
     expect(mocks.createCoachAssessmentTask).toHaveBeenCalledWith({
       title: "月度技术测评",
       templateId: "assessment-template-technical",
+      teamId: "team-u10-dev",
+      termLabel: "2026 秋季学期",
       startsOn: "2026-08-21",
       dueOn: "2026-08-31",
     });
@@ -94,6 +100,7 @@ describe("coach test-task create", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     page.onTitleInput({ detail: { value: "月度技术测评" } });
+    page.onTermLabelInput({ detail: { value: "2026 秋季学期" } });
     await page.submit();
 
     expect(mocks.navigateBack).not.toHaveBeenCalled();
@@ -104,6 +111,8 @@ describe("coach test-task create", () => {
   it("renders the form affordances without template JS", () => {
     expect(template).toContain('bindinput="onTitleInput"');
     expect(template).toContain('bindchange="onTemplateChange"');
+    expect(template).toContain('bindchange="onTeamChange"');
+    expect(template).toContain('bindinput="onTermLabelInput"');
     expect(template).toContain('mode="date"');
     expect(template).toContain('bindtap="submit"');
     expect(template).not.toMatch(/\{\{item\.(?:map|filter|slice|indexOf)/);

@@ -2686,3 +2686,16 @@
 - P4 成长首页不再自行请求近 30 天日历来拼装足迹，改为展示服务端时间线最新三条；“成长足迹”全屏页也复用同一字段，显示训练评分、比赛比分/事件、能力变更以及队伍/场地上下文。课时继续显示为训练专属的“已到/应到课时”。
 - 同时修复标准 `SeedData` 未初始化 `trainingContentAssessments` 的持久化契约缺口；自定义 seed 下创建 `PersistentApiStore` 不再因该字段缺失崩溃。教练日程的历史 `lesson` 动作现在按“点名即销课”回到点名页，清除无路由分支。
 - 验证：API 成长时间线定向回归 `1/1`、家长成长/足迹与教练日程定向 Vitest `34/34`、API 类型检查和小程序类型检查通过、`git diff --check` 通过。在线 Figma MCP 仍是只读，本批未宣称修改在线稿或完成新的真实截图验收。
+
+## 2026-09-03 教练课堂训练评测与学期测评 UI 收口
+
+- C11 测评任务列表现在显示真实“球队 · 学期”上下文；新建任务页补齐并发送后端必需的球队与学期字段。BFF `GET assessment-tasks` 同时返回当前教练可访问的球队列表和任务 `teamName`，不从前端猜测球队。
+- C15 学期评估录入必须带真实 `taskId + templateId`：客户端先核验任务仍在进行中且模板匹配，再按任务所属球队加载学员；提交携带 `assessmentTaskId`，本机草稿 key 同时含任务 ID，防止同模板不同任务串草稿。
+- 新增全屏 `/pages/coach/training-assessment/index`。从 C2 训练工作台进入后，页面仅展示 API 标记为已到的学员和本堂已选训练内容，可读回已保存的分数/备注并写回真实训练内容评分接口。训练活动上的旧“评测录入”入口已移除，阶段测评仅从 C11 进入，避免与课堂评分混用。
+- Figma 本批读取 C2 `1610:1462`、C11 `1617:2`、C15 `1623:2`；MCP 只读，未记录为在线设计改动。未进行生产部署、生产数据注入或可信真机视觉验收。
+- 复核结果：本批 C2/C11/C15/训练工作台/API client 定向 Vitest `60/60`、API 全量 Vitest `126/126`、domain/API/小程序 TypeScript 和 `git diff --check` 通过。根目录 `corepack pnpm run check` 仍被两处未触碰的既有小程序测试阻断：`apps/miniprogram-cq-talent/scripts/devtools-screenshot.test.mjs` 为语法错误，以及 `pages/parent/content/index.test.mjs` 的 LF 精确字符串断言在当前 CRLF 工作树失败；两文件均不在本批 diff。
+
+## 2026-09-03 训练评测批次提交前最终核验
+
+- `corepack pnpm typecheck` 通过 domain、API 和小程序三层 TypeScript 检查；本批 C2/C11/C15/训练工作台五个页面的定向 Vitest 为 `44/44`，API 全量 Vitest 命令单独通过。
+- 根门禁 `corepack pnpm run check` 已在提交前重新复现：domain `21/21`；小程序为 `66` 个文件通过、两处阻断（共 `452/453` 测试通过）。阻断仍是未纳入本批 diff 的 `scripts/devtools-screenshot.test.mjs` 语法错误与 `pages/parent/content/index.test.mjs` 的 CRLF/LF 精确样式字符串断言，未将其误报为本批回归。

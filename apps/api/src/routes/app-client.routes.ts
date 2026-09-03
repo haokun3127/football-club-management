@@ -2387,6 +2387,8 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
 
       const scope = await collectCoachScope(context, request.params.clubId, auth);
       const tasks = await context.store.listAssessmentTasks(request.params.clubId);
+      const teams = collectCoachTeamOptions(context, request.params.clubId, auth);
+      const teamNameById = new Map(teams.map((team) => [team.id, team.name]));
       const today = new Date().toISOString().slice(0, 10);
       const assessments = await context.store.listPlayerAssessments(request.params.clubId);
       const activeTeamMemberStudentIds = new Map<string, Set<string>>();
@@ -2413,6 +2415,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return {
           id: task.id,
           teamId: task.teamId,
+          teamName: teamNameById.get(task.teamId) ?? "球队待同步",
           termLabel: task.termLabel,
           title: task.title,
           templateId: task.templateId,
@@ -2430,6 +2433,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         tasks: views,
         templates: (await context.store.listAssessmentTemplates(request.params.clubId))
           .map((template) => ({ id: template.id, name: template.name })),
+        teams: teams.map((team) => ({ id: team.id, name: team.name })),
       };
     },
   );

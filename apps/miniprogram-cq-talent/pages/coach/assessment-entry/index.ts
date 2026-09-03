@@ -1,4 +1,4 @@
-import { getAssessmentForm, getCoachTeam, submitCoachAssessment } from "../../../utils/api";
+import { getAssessmentForm, getCoachAssessmentTasks, getCoachTeam, submitCoachAssessment } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { AssessmentForm, CoachTeamDetail, LoadState } from "../../../utils/types";
@@ -46,7 +46,9 @@ interface PageData {
   message: string;
   templateId: string;
   templateVersionId: string;
+  assessmentTaskId: string;
   taskTitle: string;
+  termLabel: string;
   fields: EntryField[];
   teamName: string;
   members: CoachTeamDetail["members"];
@@ -73,7 +75,9 @@ Page<PageData>({
     message: "",
     templateId: "",
     templateVersionId: "",
+    assessmentTaskId: "",
     taskTitle: "能力评估",
+    termLabel: "",
     fields: [],
     teamName: "",
     members: [],
@@ -87,18 +91,18 @@ Page<PageData>({
     submitting: false,
     lastSavedLabel: "",
   },
-  onLoad(query: { templateId?: string; title?: string }) {
-    this.load(query?.templateId || "", query?.title ? decodeURIComponent(query.title) : "能力评估");
+  onLoad(query: { taskId?: string; templateId?: string; title?: string }) {
+    return this.load(query?.templateId || "", query?.title ? decodeURIComponent(query.title) : "能力评估", query?.taskId || "");
   },
-  async load(templateId: string, taskTitle: string) {
+  async load(templateId: string, taskTitle: string, assessmentTaskId: string) {
     const session = requireRole("coach");
     if (!session) return;
-    if (!templateId) {
+    if (!templateId || !assessmentTaskId) {
       this.setData({
         state: "empty",
         statusTitle: "无法录入",
         statusActionText: "",
-        message: "缺少评测模板参数，请从评测任务列表进入。",
+        message: "缺少测评任务参数，请从测评任务列表进入。",
       });
       return;
     }
@@ -110,12 +114,35 @@ Page<PageData>({
       statusActionText: "",
       message: "正在读取评测表单。",
       templateId,
+      assessmentTaskId,
       taskTitle,
       submitting: false,
     });
 
     try {
-      const [form, team] = await Promise.all([getAssessmentForm(templateId), getCoachTeam()]);
+      const tasks = await getCoachAssessmentTasks();
+      if (loadToken !== latestLoadToken) return;
+      const task = tasks.find((item) => item.id === assessmentTaskId);
+      if (!task || task.templateId !== templateId || task.status !== "in_progress") {
+        this.setData({
+          state: "empty",
+          statusTitle: "无法录入",
+          statusActionText: "",
+          message: "当前测评任务不可录入，请返回任务列表后重试。",
+          templateVersionId: "",
+          assessmentTaskId: "",
+          termLabel: "",
+          fields: [],
+          members: [],
+          students: [],
+          cards: [],
+          valuesByStudent: {},
+          draftSignature: "",
+        });
+        return;
+      }
+
+      const [form, team] = await Promise.all([getAssessmentForm(templateId), getCoachTeam(task.teamId)]);
       if (loadToken !== latestLoadToken) return;
 
       const fields = toEntryFields(form);
@@ -163,7 +190,7 @@ Page<PageData>({
 
       const teamName = team.team?.name?.trim() || "";
       const signature = createDraftSignature(fields, members);
-      const valuesByStudent = restoreDraft(templateId, form.templateVersionId, signature, fields, members);
+      const valuesByStudent = restoreDraft(assessmentTaskId, templateId, form.templateVersionId, signature, fields, members);
       const students = toStudents(members);
       const activeStudent = students[0];
       this.setData({
@@ -172,6 +199,9 @@ Page<PageData>({
         statusActionText: "",
         message: "",
         templateVersionId: form.templateVersionId,
+        assessmentTaskId: task.id,
+        taskTitle: task.title,
+        termLabel: task.termLabel,
         fields,
         teamName,
         members,
@@ -195,7 +225,7 @@ Page<PageData>({
     }
   },
   retry() {
-    this.load(this.data.templateId, this.data.taskTitle);
+    this.load(this.data.templateId, this.data.taskTitle, this.data.assessmentTaskId);
   },
   goBack() {
     wx.navigateBack({ delta: 1 });
@@ -243,8 +273,8 @@ Page<PageData>({
     this.persistDraft(this.data.valuesByStudent);
   },
   persistDraft(valuesByStudent: ValuesByStudent) {
-    if (!this.data.templateId || !this.data.templateVersionId || !this.data.draftSignature) return;
-    wx.setStorageSync(draftKey(this.data.templateId, this.data.templateVersionId), {
+    if (!this.data.assessmentTaskId || !this.data.templateId || !this.data.templateVersionId || !this.data.draftSignature) return;
+    wx.setStorageSync(draftKey(this.data.assessmentTaskId, this.data.templateId, this.data.templateVersionId), {
       signature: this.data.draftSignature,
       savedAt: new Date().toISOString(),
       valuesByStudent,
@@ -271,6 +301,7 @@ Page<PageData>({
       try {
         await submitCoachAssessment({
           studentId: student.id,
+          assessmentTaskId: this.data.assessmentTaskId,
           templateId: this.data.templateId,
           templateVersionId: this.data.templateVersionId,
           rawResults,
@@ -285,7 +316,7 @@ Page<PageData>({
     if (hasValues(valuesByStudent)) {
       this.persistDraft(valuesByStudent);
     } else {
-      wx.removeStorageSync(draftKey(this.data.templateId, this.data.templateVersionId));
+      wx.removeStorageSync(draftKey(this.data.assessmentTaskId, this.data.templateId, this.data.templateVersionId));
     }
     this.setData({
       submitting: false,
@@ -385,8 +416,8 @@ function clearStudentField(valuesByStudent: ValuesByStudent, studentId: string, 
   return next;
 }
 
-function draftKey(templateId: string, templateVersionId: string) {
-  return `coach-assessment-entry:${templateId}:${templateVersionId}`;
+function draftKey(assessmentTaskId: string, templateId: string, templateVersionId: string) {
+  return `coach-assessment-entry:${assessmentTaskId}:${templateId}:${templateVersionId}`;
 }
 
 function createDraftSignature(fields: EntryField[], members: CoachTeamDetail["members"]) {
@@ -396,13 +427,14 @@ function createDraftSignature(fields: EntryField[], members: CoachTeamDetail["me
 }
 
 function restoreDraft(
+  assessmentTaskId: string,
   templateId: string,
   templateVersionId: string,
   signature: string,
   fields: EntryField[],
   members: CoachTeamDetail["members"],
 ): ValuesByStudent {
-  const candidate = wx.getStorageSync<AssessmentDraft | "">(draftKey(templateId, templateVersionId));
+  const candidate = wx.getStorageSync<AssessmentDraft | "">(draftKey(assessmentTaskId, templateId, templateVersionId));
   if (!candidate || candidate.signature !== signature || !candidate.valuesByStudent) return {};
 
   const fieldIds = new Set(fields.map((field) => field.id));

@@ -293,3 +293,9 @@ https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/
 - 小程序 `/pages/coach/schedule/index` 已同步：活动类型由真实 `event.type` 预计算为“训练/比赛”，课程卡不再显示本人姓名，标题/地点不再使用单行省略。教练身份姓名仍只显示在页面顶栏。
 - 运行态证据为微信开发者工具 MCP `automation_viewport_action.screenshot`：`C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-c1-viewport-20260902.png` 和 `C:\\Users\\ASUS\\AppData\\Local\\Temp\\cq-talent-c1-next-week-20260902.png`，均严格 `375×812`；当前真实日期范围只有训练活动，比赛分支由 C1 定向测试覆盖，不以 Figma 样例补造 API 数据。
 - C1 定向测试 `23/23`、TypeScript、WXML/WXSS 编译和限定路径 `git diff --check` 均通过。`simulator_screenshot` 兼容入口本轮出现白屏，不能作为验收证据；同一 MCP 会话的 viewport 像素截图有效，通道差异已记录在任务研究文件。
+
+## 2026-09-03 课堂训练评测与学期测评入口
+
+- 本批读取在线 Coach V6 C2 节点 `1610:1462`，以其中的固定顶栏、深色课程信息卡、出勤上下文和全屏页面边界为课堂训练评测入口的结构参考；C11 `1617:2` 与 C15 `1623:2` 仍分别是测评任务和学期评估录入的视觉基准。
+- 当前 Figma MCP 只能读取，未写入或声称写入在线稿。新增小程序页面 `/pages/coach/training-assessment/index` 沿用 C2 的全屏工作台层级，但真实训练项目、已到学员、球队和场地均来自 API，不能以设计示例文案替代。
+- 页面职责已明确：C2 的“课堂评测”只保存本堂训练内容评分；学期评估只能从 C11 的任务卡进入 C15，避免训练/学期两类数据在视觉和路由上混淆。

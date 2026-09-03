@@ -13,6 +13,7 @@ type FilterView = {
 };
 
 interface TaskCard extends CoachAssessmentTask {
+  teamContextLabel: string;
   statusLabel: string;
   statusClass: string;
   dateRange: string;
@@ -164,7 +165,7 @@ Page<PageData>({
       return;
     }
 
-    openPage(`/pages/coach/assessment-entry/index?templateId=${encodeURIComponent(task.templateId)}&title=${encodeURIComponent(task.title)}`);
+    openPage(`/pages/coach/assessment-entry/index?taskId=${encodeURIComponent(task.id)}&templateId=${encodeURIComponent(task.templateId)}&title=${encodeURIComponent(task.title)}`);
   },
 });
 
@@ -172,6 +173,7 @@ function presentTask(task: CoachAssessmentTask): TaskCard {
   const progressPercent = safeProgressPercent(task.completedStudents, task.totalStudents);
   return {
     ...task,
+    teamContextLabel: `${task.teamName?.trim() || "球队待同步"} · ${task.termLabel?.trim() || "学期待同步"}`,
     statusLabel: STATUS_LABELS[task.status],
     statusClass: `task-card__status task-card__status--${task.status}`,
     dateRange: `${task.startsOn} ~ ${task.dueOn}`,

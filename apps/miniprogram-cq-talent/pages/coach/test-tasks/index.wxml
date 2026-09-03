@@ -21,6 +21,7 @@
             <view class="task-card__title">{{item.title}}</view>
             <view class="{{item.statusClass}}">{{item.statusLabel}}</view>
           </view>
+          <view class="task-card__context">{{item.teamContextLabel}}</view>
           <view class="task-card__dates">{{item.dateRange}}</view>
           <view class="task-card__foot">
             <view class="task-card__progress">

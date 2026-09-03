@@ -246,6 +246,20 @@ export interface CoachWorkbench {
   pending: Array<{ title: string; message: string }>;
 }
 
+export interface CoachTrainingContentAssessment {
+  studentId: string;
+  trainingProjectId: string;
+  score: number;
+  note?: string;
+}
+
+export interface CoachTrainingContentAssessmentScope {
+  eventId: string;
+  selectedProjectIds: string[];
+  presentStudentIds: string[];
+  assessments: CoachTrainingContentAssessment[];
+}
+
 export interface CoachMatchDetail {
   event: ScheduleEvent;
   roster: Array<{ studentId: string; name?: string; status?: string }>;
@@ -491,6 +505,9 @@ export interface CoachTrainingCoverageStudent {
 
 export interface CoachAssessmentTask {
   id: string;
+  teamId: string;
+  teamName?: string;
+  termLabel: string;
   title: string;
   templateId: string;
   startsOn: string;

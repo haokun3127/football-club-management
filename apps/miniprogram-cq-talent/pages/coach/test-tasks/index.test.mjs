@@ -34,6 +34,9 @@ const plusIcon = readFileSync(new URL("../../../assets/icons/plus.svg", import.m
 const realTasks = [
   {
     id: "task-in-progress",
+    teamId: "team-real",
+    teamName: "U10 发展队",
+    termLabel: "2026 秋季学期",
     title: "Actual assessment task",
     templateId: "template-real",
     startsOn: "2026-08-01",
@@ -44,6 +47,9 @@ const realTasks = [
   },
   {
     id: "task-not-started",
+    teamId: "team-real",
+    teamName: "U10 发展队",
+    termLabel: "2026 秋季学期",
     title: "Upcoming assessment task",
     templateId: "template-upcoming",
     startsOn: "2026-09-01",
@@ -54,6 +60,9 @@ const realTasks = [
   },
   {
     id: "task-completed",
+    teamId: "team-real",
+    teamName: "U10 发展队",
+    termLabel: "2026 春季学期",
     title: "Completed assessment task",
     templateId: "template-completed",
     startsOn: "2026-07-01",
@@ -96,6 +105,7 @@ describe("coach assessment task list", () => {
     expect(page.data.tasks[0]).toMatchObject({
       statusLabel: "进行中",
       isEntryEnabled: true,
+      teamContextLabel: "U10 发展队 · 2026 秋季学期",
       progressLabel: "4/8名学员",
       progressStyle: "width: 50%",
     });
@@ -113,7 +123,7 @@ describe("coach assessment task list", () => {
     await page.load();
 
     page.openTask({ currentTarget: { dataset: { id: "task-in-progress" } } });
-    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/assessment-entry/index?templateId=template-real&title=Actual%20assessment%20task");
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/assessment-entry/index?taskId=task-in-progress&templateId=template-real&title=Actual%20assessment%20task");
 
     page.openTask({ currentTarget: { dataset: { id: "task-not-started" } } });
     page.openTask({ currentTarget: { dataset: { id: "task-completed" } } });
@@ -186,6 +196,7 @@ describe("coach assessment task list", () => {
     expect(template).toContain('/assets/icons/c11-arrow-left.svg');
     expect(template).toContain('<role-tabbar role="coach" active="training"');
     expect(template).toContain('<image class="task-card__chevron"');
+    expect(template).toContain('class="task-card__context">{{item.teamContextLabel}}</view>');
     expect(template).not.toContain('wx:if="{{item.isEntryEnabled}}" class="task-card__chevron"');
     expect(template).not.toMatch(/体能综合测评|速度耐力体测|控球精度评估|2025-07-01|12\/18名学员/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);

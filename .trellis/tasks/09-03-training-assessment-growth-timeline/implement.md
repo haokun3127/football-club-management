@@ -27,6 +27,8 @@
 
 ## Batch 3 — Coach UI and current Figma screens
 
+**2026-09-03 progress:** complete locally. C11 lists each task with its backend-projected team and term, while task creation now submits the server-required real `teamId` and `termLabel`. C15 accepts only an in-progress task route with matching template, loads that task's team rather than a default team, scopes its draft key by task id, and submits `assessmentTaskId` on every saved player record. C2 was reread from Figma node `1610:1462`; the workbench now links to a separate full-screen classroom assessment page. It reads the server's selected content/present-student scope, restores persisted scores/notes, and saves only valid real student × selected-project entries. The old activity-level “评测录入” shortcut was removed so semester tasks remain the only entry for stage assessment. Figma MCP was read-only, so no online design write is claimed.
+
 1. 读取在线 Figma C2、C11、C15 当前节点和截图，创建/更新当前状态画板后回读节点与 `375×812` 截图。
 2. 先写 failing mini-program tests：C2 从训练活动进入训练内容评测；C11 显示/提交球队与学期；C15 必须携带 `taskId`，不允许从任意模板 URL 进入学期测评。
 3. 新增全屏 `pages/coach/training-assessment/`，以及 C2/C11/C15/API client/types/app route 的最小改动；WXML 所有展示字段在 TS view model 预计算。
@@ -43,7 +45,9 @@
 
 ## Batch 5 — Documentation and controlled demo data
 
+**2026-09-03 documentation progress:** `docs/current/progress.md`, `docs/current/figma-source-of-truth.md`, and the BFF contract note now record this batch. No production import or deployment was performed.
+
 1. 更新 `docs/current/progress.md`、`docs/current/figma-source-of-truth.md`、该任务证据和 API contract notes。
 2. 仅在用户明确授权生产导入后，单独备份生产 SQLite、运行可回滚导入、重启 API、以七个测试账号逐一只读核验两周训练/比赛/测评记录；导入和部署不与业务代码提交混合。
 
-**2026-09-03 quality evidence:** all task-focused tests and all three TypeScript checks pass. The root gate reaches API tests with `125/126` passing; the only remaining failure is outside this batch at `apps/api/test/server.test.ts:1383`, where an in-flight retired lesson-correction payload is still validated before its intended `410` response. It is intentionally left unstaged and is recorded in `docs/current/progress.md` with its exact assertion.
+**2026-09-03 final quality evidence:** all three TypeScript checks pass; the C2/C11/C15/coach-workbench page suite passes `44/44`, and the API full test command passes. The root gate is currently blocked before API tests by two files outside this batch: `apps/miniprogram-cq-talent/scripts/devtools-screenshot.test.mjs` has a syntax error, and `apps/miniprogram-cq-talent/pages/parent/content/index.test.mjs` has a CRLF-sensitive exact-string assertion. Both are intentionally excluded from this task-owned commit and are recorded in `docs/current/progress.md`.
