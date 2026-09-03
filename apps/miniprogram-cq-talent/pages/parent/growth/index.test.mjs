@@ -72,7 +72,7 @@ describe("parent growth training history", () => {
     expect(mocks.openPage).toHaveBeenCalledWith("/pages/parent/training-history/index");
   });
 
-  it("refreshes growth after returning from the child switch and renders real recent activity", async () => {
+  it("refreshes growth after returning from the child switch and renders the server-scoped timeline", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-08-11T12:00:00.000Z"));
     mocks.requireRole.mockReturnValue({ role: "parent", currentStudentId: "student-2" });
@@ -88,11 +88,12 @@ describe("parent growth training history", () => {
       ],
       metricItems: [],
       views: [{ id: "overview", name: "能力概览", metricIds: ["speed", "passing", "control"] }],
+      timeline: [
+        { id: "timeline-training", kind: "training", occurredAt: "2026-08-10T01:00:00.000Z", title: "训练复盘", subtitle: "完成 2 项训练内容" },
+        { id: "timeline-match", kind: "match", occurredAt: "2026-08-09T01:00:00.000Z", title: "友谊赛", subtitle: "对阵渝北青训" },
+        { id: "timeline-ability", kind: "ability_update", occurredAt: "2026-08-08T01:00:00.000Z", title: "训练内容评测已记录", subtitle: "传接球 91 分" },
+      ],
     });
-    mocks.getParentCalendar.mockResolvedValue([
-      { id: "training-1", type: "training", title: "训练复盘", startsAt: "2026-08-10T01:00:00.000Z", status: "completed", venue: "球场", childIds: ["student-2"] },
-      { id: "match-1", type: "match", title: "友谊赛", startsAt: "2026-08-09T01:00:00.000Z", status: "completed", venue: "球场", childIds: ["student-2"] },
-    ]);
     mocks.getParentMetricDetail.mockResolvedValue({ metricId: "speed", label: "速度", records: [], sourceEvents: [] });
     const page = createPageInstance({ activeStudentId: "student-1" });
 
@@ -100,7 +101,7 @@ describe("parent growth training history", () => {
 
     expect(mocks.setCurrentStudentId).toHaveBeenCalledWith("student-2");
     expect(mocks.getParentGrowth).toHaveBeenCalledWith("student-2", expect.objectContaining({ name: "第二位学员" }));
-    expect(mocks.getParentCalendar).toHaveBeenCalledWith("2026-07-13", "2026-08-11");
+    expect(mocks.getParentCalendar).not.toHaveBeenCalled();
     expect(page.data).toMatchObject({
       activeStudentId: "student-2",
       heroName: "第二位学员",
@@ -108,7 +109,11 @@ describe("parent growth training history", () => {
       milestoneMessage: "最新足迹：训练复盘",
       trainingHistoryMessage: "近30天已完成 1 次训练，点击查看完整历程",
     });
-    expect(page.data.milestones).toHaveLength(3);
+    expect(page.data.milestones).toEqual([
+      expect.objectContaining({ id: "timeline-training", title: "训练复盘", state: "完成 2 项训练内容" }),
+      expect.objectContaining({ id: "timeline-match", title: "友谊赛", state: "对阵渝北青训" }),
+      expect.objectContaining({ id: "timeline-ability", title: "训练内容评测已记录", state: "传接球 91 分" }),
+    ]);
     expect(page.data.trainingBars).toHaveLength(8);
   });
 

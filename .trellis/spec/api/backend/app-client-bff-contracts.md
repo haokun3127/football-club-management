@@ -1138,7 +1138,9 @@ const noticeBanner = presentNoticeBanner(articles);
 - `GET|PUT /clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/training-content-assessments`
 - `POST /clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks` with `{ title, templateId, teamId, termLabel, startsOn, dueOn }`
 - Semester assessment submission carries `assessmentTaskId`.
-- Parent growth summary additive field: `trainingStats.lessonStats: { attendedLessons, expectedLessons, attendanceRate }`.
+- Parent growth summary additive fields:
+  - `trainingStats.lessonStats: { attendedLessons, expectedLessons, attendanceRate }`
+  - `timeline: GrowthTimelineItem[]`, where every item is already scoped to the requested child and is one of `training | match | ability_update`.
 
 ### 3. Contracts
 
@@ -1146,6 +1148,9 @@ const noticeBanner = presentNoticeBanner(articles);
 - It is valid only for a training event, a project selected on that event, and a roster student whose current attendance is `present`.
 - A semester task owns exactly one coach-accessible team, a nonblank `termLabel`, one template and one date window. Submissions must use its task id and satisfy its team/template/window scope.
 - `lessonStats` counts only completed, non-cancelled training events: expected is eligible trainings, attended is `present`; matches never contribute.
+- `timeline.training` resolves the saved session-plan drills for one completed training and attaches only that child's persisted training-content scores/notes.
+- `timeline.match` resolves one completed match's opponent, score, venue and only that child's match events. `timeline.ability_update` is derived from persisted training-content scoring or from an assessment metric record whose `assessmentId` maps to a real task-bound player assessment.
+- P4 may render only the latest items, but the full-screen milestones page must reuse this BFF field rather than fetching calendar windows and rebuilding a second, client-side history.
 
 ### 4. Validation & Error Matrix
 
@@ -1166,6 +1171,7 @@ const noticeBanner = presentNoticeBanner(articles);
 - API regression covers present-only, selected-project-only, non-training rejection, and file-SQLite reopen.
 - Task regression covers blank term rejection, team/template/window validation, and distinct-student task progress.
 - Parent growth regression proves completed matches are excluded from `lessonStats`.
+- Parent timeline regression saves a selected drill score, then proves the parent can read training, match and ability-update entries without another child's match events.
 - Mini-program normalizer/view-model regression covers absent additive data and displays `已到/应到课时` from the server response.
 
 ### 7. Wrong vs Correct
@@ -1181,4 +1187,18 @@ const expectedLessons = trainingAndMatchEvents.length;
 ```typescript
 const eligibleTrainings = events.filter((event) => event.type === "training" && event.endsAt <= now && !event.cancelled);
 const expectedLessons = eligibleTrainings.length;
+```
+
+#### Wrong
+
+```ts
+const events = await getParentCalendar(from, to);
+return makeGrowthMilestones(events);
+```
+
+#### Correct
+
+```ts
+const growth = await getParentGrowth(studentId);
+return growth.timeline;
 ```

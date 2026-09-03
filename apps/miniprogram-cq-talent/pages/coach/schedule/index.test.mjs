@@ -162,9 +162,8 @@ describe("coach schedule home", () => {
       page.openTask({ currentTarget: { dataset: { id: "event-1", action } } });
       expect(mocks.openPage).toHaveBeenLastCalledWith(route);
     });
-    const callCount = mocks.openPage.mock.calls.length;
     page.openTask({ currentTarget: { dataset: { id: "event-1", action: "lesson" } } });
-    expect(mocks.openPage).toHaveBeenCalledTimes(callCount);
+    expect(mocks.openPage).toHaveBeenLastCalledWith("/pages/coach/attendance/index?id=event-1");
   });
 
   it("moves the coach date strip forward and backward by a full week", () => {

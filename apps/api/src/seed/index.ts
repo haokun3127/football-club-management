@@ -17,6 +17,7 @@ export function createSeedData(): SeedData {
     ...createAssessmentSeed(),
     ...createDataCapabilitySeed(),
     ...createPrivacySeed(),
+    trainingContentAssessments: [],
   };
 
   if (!shouldIncludeCqTalentAcceptanceSeed()) {

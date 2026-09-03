@@ -187,6 +187,29 @@ export interface GrowthTrainingStats {
   monthly: Array<{ month: number; count: number }>;
 }
 
+export interface GrowthTimelineItem {
+  id: string;
+  kind: "training" | "match" | "ability_update";
+  occurredAt: string;
+  title: string;
+  subtitle: string;
+  teamName?: string;
+  venue?: string;
+  eventId?: string;
+  training?: {
+    items: Array<{ trainingProjectId: string; name: string; score?: number; note?: string }>;
+  };
+  match?: {
+    opponentName?: string;
+    scoreLabel?: string;
+    events: Array<{ id: string; studentId: string; type: string; minute?: number; note?: string }>;
+  };
+  abilityUpdate?: {
+    source: "training_content_assessment" | "semester_assessment";
+    metrics: Array<{ metricId: string; label: string; value: number | null; previousValue: number | null }>;
+  };
+}
+
 export interface GrowthSummary {
   student?: StudentSummary;
   radar: RadarMetricPoint[];
@@ -196,6 +219,7 @@ export interface GrowthSummary {
   views: MetricViewOption[];
   updatedAt?: string;
   trainingStats?: GrowthTrainingStats;
+  timeline: GrowthTimelineItem[];
 }
 
 export interface CoachHome {

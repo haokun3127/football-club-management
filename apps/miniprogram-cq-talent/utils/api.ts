@@ -644,7 +644,82 @@ function normalizeGrowth(raw: Record<string, unknown>, student?: StudentSummary)
     views: views.length ? views : [{ id: "default", name: "能力概览", metricIds: radar.map((point) => point.metricId) }],
     updatedAt: stringOrUndefined(raw.updatedAt ?? raw.generatedAt),
     trainingStats: normalizeTrainingStats(raw.trainingStats),
+    timeline: normalizeGrowthTimeline(raw.timeline),
   };
+}
+
+function normalizeGrowthTimeline(raw: unknown): GrowthSummary["timeline"] {
+  const source = Array.isArray(raw) ? raw : [];
+  const timeline: GrowthSummary["timeline"] = [];
+  for (const value of source) {
+    const item = asRecord(value);
+    if (!item) continue;
+    const kind = item.kind;
+    if (kind !== "training" && kind !== "match" && kind !== "ability_update") continue;
+    const occurredAt = stringOrUndefined(item.occurredAt);
+    const id = stringOrUndefined(item.id);
+    if (!id || !occurredAt) continue;
+    const trainingSource = asRecord(item.training);
+    const matchSource = asRecord(item.match);
+    const updateSource = asRecord(item.abilityUpdate);
+    const trainingItems = Array.isArray(trainingSource?.items) ? trainingSource.items : [];
+    const matchEvents = Array.isArray(matchSource?.events) ? matchSource.events : [];
+    const updateMetrics = Array.isArray(updateSource?.metrics) ? updateSource.metrics : [];
+    timeline.push({
+      id,
+      kind,
+      occurredAt,
+      title: String(item.title ?? "成长记录"),
+      subtitle: String(item.subtitle ?? ""),
+      teamName: stringOrUndefined(item.teamName),
+      venue: stringOrUndefined(item.venue),
+      eventId: stringOrUndefined(item.eventId),
+      ...(kind !== "training" ? {} : {
+        training: {
+          items: trainingItems.map((entry) => {
+            const row = asRecord(entry);
+            return {
+              trainingProjectId: String(row?.trainingProjectId ?? ""),
+              name: String(row?.name ?? "训练内容"),
+              ...(typeof row?.score === "number" ? { score: row.score } : {}),
+              ...(stringOrUndefined(row?.note) ? { note: stringOrUndefined(row?.note) } : {}),
+            };
+          }).filter((entry) => entry.trainingProjectId),
+        },
+      }),
+      ...(kind !== "match" ? {} : {
+        match: {
+          ...(stringOrUndefined(matchSource?.opponentName) ? { opponentName: stringOrUndefined(matchSource?.opponentName) } : {}),
+          ...(stringOrUndefined(matchSource?.scoreLabel) ? { scoreLabel: stringOrUndefined(matchSource?.scoreLabel) } : {}),
+          events: matchEvents.map((entry) => {
+            const row = asRecord(entry);
+            return {
+              id: String(row?.id ?? ""),
+              studentId: String(row?.studentId ?? ""),
+              type: String(row?.type ?? ""),
+              ...(typeof row?.minute === "number" ? { minute: row.minute } : {}),
+              ...(stringOrUndefined(row?.note) ? { note: stringOrUndefined(row?.note) } : {}),
+            };
+          }).filter((entry) => entry.id && entry.studentId && entry.type),
+        },
+      }),
+      ...(kind !== "ability_update" || (updateSource?.source !== "training_content_assessment" && updateSource?.source !== "semester_assessment") ? {} : {
+        abilityUpdate: {
+          source: updateSource.source,
+          metrics: updateMetrics.map((entry) => {
+            const row = asRecord(entry);
+            return {
+              metricId: String(row?.metricId ?? ""),
+              label: String(row?.label ?? "能力指标"),
+              value: typeof row?.value === "number" ? row.value : null,
+              previousValue: typeof row?.previousValue === "number" ? row.previousValue : null,
+            };
+          }).filter((entry) => entry.metricId),
+        },
+      }),
+    });
+  }
+  return timeline;
 }
 
 function normalizeTrainingStats(raw: unknown): GrowthSummary["trainingStats"] {

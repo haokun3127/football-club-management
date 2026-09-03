@@ -1,10 +1,9 @@
-import { getParentCalendar, getParentChildren, getParentGrowth, getParentMetricDetail } from "../../../utils/api";
+import { getParentChildren, getParentGrowth, getParentMetricDetail } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { currentLocalDate, shiftCalendarDate } from "../../../utils/date";
 import { openPage } from "../../../utils/navigation";
 import { formatDateTime, formatTenure, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { setCurrentStudentId } from "../../../utils/store";
-import type { GrowthSummary, LoadState, MetricDetail, RadarMetricPoint, ScheduleEvent, StudentSummary } from "../../../utils/types";
+import type { GrowthSummary, GrowthTimelineItem, LoadState, MetricDetail, RadarMetricPoint, StudentSummary } from "../../../utils/types";
 
 let growthRequestId = 0;
 
@@ -64,16 +63,12 @@ Page({
       const active = children.find((child) => child.id === session.currentStudentId) ?? children[0];
       if (!active) return;
       setCurrentStudentId(active.id);
-      const today = currentLocalDate();
-      const [growth, recentActivities] = await Promise.all([
-        getParentGrowth(active.id, active),
-        getParentCalendar(shiftCalendarDate(today, -29), today),
-      ]);
+      const growth = await getParentGrowth(active.id, active);
       if (requestId !== growthRequestId) return;
       const radar = radarForView(growth, 0);
       const selectedMetric = radar[0] ?? null;
-      const activityMessages = growthActivityMessages(recentActivities, active.id);
-      const activityView = buildActivityView(recentActivities, active.id, radar.length > 0);
+      const activityMessages = growthActivityMessages(growth.timeline ?? []);
+      const activityView = buildActivityView(growth.timeline ?? []);
       this.setData({
         state: radar.length >= 3 ? "ready" : "empty",
         message: radar.length >= 3 ? "" : "有效能力指标不足，完成训练或评测后生成雷达图。",
@@ -200,16 +195,15 @@ function previewVertex(index: number, total: number, radiusPct: number) {
   return `${(50 + Math.cos(angle) * radiusPct).toFixed(1)}% ${(50 + Math.sin(angle) * radiusPct).toFixed(1)}%`;
 }
 
-function growthActivityMessages(events: ScheduleEvent[], studentId: string) {
-  const completed = events
-    .filter((event) => event.status === "completed" && eventBelongsToStudent(event, studentId))
-    .sort((left, right) => new Date(right.startsAt).getTime() - new Date(left.startsAt).getTime());
-  const trainingCount = completed.filter((event) => event.type === "training").length;
-  const matchCount = completed.filter((event) => event.type === "match").length;
-  const latest = completed[0];
+function growthActivityMessages(timeline: GrowthTimelineItem[]) {
+  const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  const recent = timeline.filter((item) => (item.kind === "training" || item.kind === "match") && Date.parse(item.occurredAt) >= thirtyDaysAgo);
+  const trainingCount = recent.filter((item) => item.kind === "training").length;
+  const matchCount = recent.filter((item) => item.kind === "match").length;
+  const latest = timeline[0];
 
   return {
-    heroSummary: completed.length ? `近30天完成 ${trainingCount} 次训练、${matchCount} 场比赛` : "近30天暂无已完成活动",
+    heroSummary: recent.length ? `近30天完成 ${trainingCount} 次训练、${matchCount} 场比赛` : "近30天暂无已完成活动",
     milestone: latest ? `最新足迹：${latest.title}` : "成长足迹正在积累",
     trainingHistory: trainingCount ? `近30天已完成 ${trainingCount} 次训练，点击查看完整历程` : "近30天暂无完成训练",
     matchHistory: matchCount ? `近30天已完成 ${matchCount} 场比赛，点击查看比赛记录` : "近30天暂无完成比赛",
@@ -219,34 +213,28 @@ function growthActivityMessages(events: ScheduleEvent[], studentId: string) {
 type GrowthMilestone = { id: string; title: string; state: string; tone: "green" | "red" | "blue"; icon: string };
 type TrainingBar = { id: string; height: number; label: string };
 
-function buildActivityView(events: ScheduleEvent[], studentId: string, hasMetrics: boolean) {
-  const completed = events
-    .filter((event) => event.status === "completed" && eventBelongsToStudent(event, studentId))
-    .sort((left, right) => new Date(left.startsAt).getTime() - new Date(right.startsAt).getTime());
-  const trainings = completed.filter((event) => event.type === "training");
-  const matches = completed.filter((event) => event.type === "match");
+function buildActivityView(timeline: GrowthTimelineItem[]) {
+  const latest = timeline.slice(0, 3);
+  const trainings = timeline.filter((item) => item.kind === "training");
   const bars = Array.from({ length: 8 }, (_, index) => {
-    const event = trainings[index];
-    const date = event ? new Date(event.startsAt) : null;
+    const item = trainings[index];
+    const date = item ? new Date(item.occurredAt) : null;
     return {
       id: `training-bar-${index + 1}`,
-      height: event ? 32 + ((index % 3) * 16) : 8,
+      height: item ? 32 + ((index % 3) * 16) : 8,
       label: date && !Number.isNaN(date.getTime()) ? `${date.getMonth() + 1}/${date.getDate()}` : "—",
     };
   });
   return {
-    milestones: [
-      { id: "training", title: trainings.length ? `完成 ${trainings.length} 次训练` : "完成首次训练", state: trainings.length ? "已达成" : "待达成", tone: trainings.length ? "green" : "red", icon: trainings.length ? "✓" : "○" },
-      { id: "match", title: matches.length ? `完成 ${matches.length} 场比赛` : "首次参加比赛", state: matches.length ? "已达成" : "待达成", tone: matches.length ? "green" : "red", icon: matches.length ? "✓" : "○" },
-      { id: "assessment", title: "能力模型更新", state: hasMetrics ? "已更新" : "待达成", tone: hasMetrics ? "blue" : "red", icon: hasMetrics ? "•" : "○" },
-    ] as GrowthMilestone[],
+    milestones: latest.map((item) => ({
+      id: item.id,
+      title: item.title,
+      state: item.subtitle || "已记录",
+      tone: item.kind === "training" ? "green" : item.kind === "match" ? "red" : "blue",
+      icon: item.kind === "training" ? "✓" : item.kind === "match" ? "⚽" : "•",
+    })) as GrowthMilestone[],
     trainingBars: bars,
   };
-}
-
-function eventBelongsToStudent(event: ScheduleEvent, studentId: string) {
-  if (event.childIds?.length) return event.childIds.includes(studentId);
-  return event.children?.some((child) => child.id === studentId) ?? false;
 }
 
 // 在队时长标签：从队伍 startsAt 到今天的年月差

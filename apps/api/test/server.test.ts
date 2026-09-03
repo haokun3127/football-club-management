@@ -1241,6 +1241,86 @@ describe("api server", () => {
     persistence.database.close();
   });
 
+  it("returns a child-scoped growth timeline from persisted training, match, and ability facts", async () => {
+    const seed = createSeedData();
+    const training = seed.events.find((event) => event.id === "event-training-1")!;
+    const match = seed.events.find((event) => event.id === "event-match-1")!;
+    training.status = "completed";
+    training.timeRange = { startsAt: "2026-08-10T09:00:00.000Z", endsAt: "2026-08-10T10:00:00.000Z" };
+    match.status = "completed";
+    match.timeRange = { startsAt: "2026-08-11T09:00:00.000Z", endsAt: "2026-08-11T10:00:00.000Z" };
+    seed.participants.find((participant) => participant.eventId === training.id && participant.studentId === "student-1")!.status = "present";
+
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:", seedData: seed });
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories, seed),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+    const base = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1";
+
+    await expect(app.inject({
+      method: "PUT",
+      url: `${base}/training-projects`,
+      headers: { "x-user-id": "user-coach-1", "idempotency-key": "growth-timeline-projects" },
+      payload: { projectIds: ["drill-cq-talent-assessment-001"] },
+    })).resolves.toEqual(expect.objectContaining({ statusCode: 200 }));
+    await expect(app.inject({
+      method: "PUT",
+      url: `${base}/training-content-assessments`,
+      headers: { "x-user-id": "user-coach-1" },
+      payload: {
+        assessments: [{
+          studentId: "student-1",
+          trainingProjectId: "drill-cq-talent-assessment-001",
+          score: 91,
+          note: "传接球处理稳定",
+        }],
+      },
+    })).resolves.toEqual(expect.objectContaining({ statusCode: 200 }));
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/growth-summary",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+
+    expect(response.statusCode).toBe(200);
+    const body = response.json() as {
+      timeline?: Array<{
+        kind: string;
+        eventId?: string;
+        title: string;
+        training?: { items: Array<{ score?: number; note?: string }> };
+        match?: { scoreLabel?: string; events: Array<{ studentId: string }> };
+      }>;
+    };
+    expect(body.timeline).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        kind: "training",
+        eventId: "event-training-1",
+        training: expect.objectContaining({
+          items: [expect.objectContaining({ score: 91, note: "传接球处理稳定" })],
+        }),
+      }),
+      expect.objectContaining({
+        kind: "match",
+        eventId: "event-match-1",
+        match: expect.objectContaining({
+          scoreLabel: "3 : 2",
+          events: expect.arrayContaining([expect.objectContaining({ studentId: "student-1" })]),
+        }),
+      }),
+      expect.objectContaining({ kind: "ability_update" }),
+    ]));
+    expect(body.timeline?.every((item) => item.title !== "student-2")).toBe(true);
+
+    await app.close();
+    persistence.database.close();
+  });
+
   it("serves app-client login, status, metric drilldown, and coach write contracts", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
     const store = new PersistentApiStore(persistence.repositories);

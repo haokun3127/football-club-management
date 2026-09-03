@@ -1152,6 +1152,12 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
 
       // P4 成长首页训练统计：课时总数/出勤率/本月训练/月度分布（真实参与记录推导）
       const trainingStats = await buildStudentTrainingStats(context, request.params.clubId, request.params.studentId);
+      const timeline = await buildStudentGrowthTimeline(
+        context,
+        request.params.clubId,
+        request.params.studentId,
+        metricCatalog,
+      );
 
       return {
         clubId: request.params.clubId,
@@ -1168,6 +1174,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         latest,
         trends: buildMetricTrends(metricRecords),
         trainingStats,
+        timeline,
         generatedAt: new Date().toISOString(),
       };
     },
@@ -3390,6 +3397,202 @@ type StudentTrainingStats = {
 };
 
 const TRAINING_STATS_MONTH_WINDOW = 8;
+
+type GrowthTimelineItem = {
+  id: string;
+  kind: "training" | "match" | "ability_update";
+  occurredAt: string;
+  title: string;
+  subtitle: string;
+  teamName?: string;
+  venue?: string;
+  eventId?: string;
+  training?: {
+    items: Array<{
+      trainingProjectId: string;
+      name: string;
+      score?: number;
+      note?: string;
+    }>;
+  };
+  match?: {
+    opponentName?: string;
+    scoreLabel?: string;
+    events: Array<{
+      id: string;
+      studentId: string;
+      type: string;
+      minute?: number;
+      note?: string;
+    }>;
+  };
+  abilityUpdate?: {
+    source: "training_content_assessment" | "semester_assessment";
+    metrics: Array<{
+      metricId: string;
+      label: string;
+      value: number | null;
+      previousValue: number | null;
+    }>;
+  };
+};
+
+async function buildStudentGrowthTimeline(
+  context: RouteContext,
+  clubId: string,
+  studentId: string,
+  metricCatalog: Awaited<ReturnType<RouteContext["store"]["listAbilityMetrics"]>>,
+): Promise<GrowthTimelineItem[]> {
+  const events = (await withVenueNames(
+    context,
+    clubId,
+    sortEvents(await context.store.getStudentTimeline(clubId, studentId))
+      .filter((event) => event.status === "completed"),
+  ));
+  const [playerAssessments, metricRecords] = await Promise.all([
+    context.store.listPlayerAssessments(clubId),
+    context.store.getStudentMetrics(clubId, studentId),
+  ]);
+  const drillsById = new Map(context.store.listTrainingDrills(clubId).map((drill) => [drill.id, drill]));
+  const metricById = new Map(metricCatalog.map((metric) => [metric.id, metric]));
+  const teamNameById = new Map(context.store.listTeams(clubId).map((team) => [team.id, team.name]));
+  const timeline: GrowthTimelineItem[] = [];
+  const trainingAssessmentItems: GrowthTimelineItem[] = [];
+
+  for (const event of events) {
+    const teamName = typeof event.teamName === "string" && event.teamName.trim()
+      ? event.teamName
+      : typeof event.primaryTeamId === "string" ? teamNameById.get(event.primaryTeamId) : undefined;
+    const venue = typeof event.venue === "string" && event.venue.trim() ? event.venue : undefined;
+
+    if (event.type === "training") {
+      const session = await context.store.getTrainingSessionByEvent(clubId, event.id);
+      const plan = session?.sessionPlanId ? context.store.getSessionPlan(session.sessionPlanId) : null;
+      const assessments = (await context.store.listTrainingContentAssessments(clubId, event.id))
+        .filter((assessment) => assessment.studentId === studentId);
+      const assessmentByProjectId = new Map(assessments.map((assessment) => [assessment.trainingProjectId, assessment]));
+      const items = (plan?.blocks ?? []).map((block) => {
+        const drill = drillsById.get(block.drillId);
+        const assessment = assessmentByProjectId.get(block.drillId);
+        return {
+          trainingProjectId: block.drillId,
+          name: drill?.name ?? "训练内容待同步",
+          ...(assessment ? { score: assessment.score, ...(assessment.note ? { note: assessment.note } : {}) } : {}),
+        };
+      });
+
+      timeline.push({
+        id: `training-${event.id}`,
+        kind: "training",
+        occurredAt: event.timeRange.startsAt,
+        title: event.title,
+        subtitle: items.length ? `完成 ${items.length} 项训练内容` : "完成训练",
+        ...(teamName ? { teamName } : {}),
+        ...(venue ? { venue } : {}),
+        eventId: event.id,
+        training: { items },
+      });
+
+      for (const assessment of assessments) {
+        const drill = drillsById.get(assessment.trainingProjectId);
+        const metricIds = drill?.metricIds ?? [];
+        trainingAssessmentItems.push({
+          id: `training-assessment-${assessment.id}`,
+          kind: "ability_update",
+          occurredAt: assessment.assessedAt,
+          title: "训练内容评测已记录",
+          subtitle: `${drill?.name ?? "训练内容"} ${assessment.score} 分`,
+          ...(teamName ? { teamName } : {}),
+          eventId: event.id,
+          abilityUpdate: {
+            source: "training_content_assessment",
+            metrics: metricIds.map((metricId) => ({
+              metricId,
+              label: metricById.get(metricId)?.name ?? "能力指标待同步",
+              value: assessment.score,
+              previousValue: null,
+            })),
+          },
+        });
+      }
+      continue;
+    }
+
+    if (event.type === "match") {
+      const detail = await context.store.getMatchDetailByEvent(clubId, event.id);
+      const ownEvents = detail?.events
+        .filter((matchEvent) => matchEvent.studentId === studentId)
+        .map((matchEvent) => ({
+          id: matchEvent.id,
+          studentId: matchEvent.studentId,
+          type: matchEvent.type,
+          ...(matchEvent.minute === undefined ? {} : { minute: matchEvent.minute }),
+          ...(matchEvent.note ? { note: matchEvent.note } : {}),
+        })) ?? [];
+      const match = detail?.match;
+      const scoreLabel = typeof match?.homeScore === "number" && typeof match.awayScore === "number"
+        ? `${match.homeScore} : ${match.awayScore}`
+        : undefined;
+      timeline.push({
+        id: `match-${event.id}`,
+        kind: "match",
+        occurredAt: event.timeRange.startsAt,
+        title: event.title,
+        subtitle: match?.opponentName ? `对阵 ${match.opponentName}` : "完成比赛",
+        ...(teamName ? { teamName } : {}),
+        ...(venue ? { venue } : {}),
+        eventId: event.id,
+        match: {
+          ...(match?.opponentName ? { opponentName: match.opponentName } : {}),
+          ...(scoreLabel ? { scoreLabel } : {}),
+          events: ownEvents,
+        },
+      });
+    }
+  }
+
+  const taskByAssessmentId = new Map(
+    playerAssessments
+      .filter((assessment) => assessment.studentId === studentId && assessment.assessmentTaskId)
+      .map((assessment) => [assessment.id, assessment.assessmentTaskId] as const),
+  );
+  const recordsByMetricId = new Map<string, PlayerMetricRecord[]>();
+  for (const record of metricRecords) {
+    const list = recordsByMetricId.get(record.metricId) ?? [];
+    list.push(record);
+    recordsByMetricId.set(record.metricId, list);
+  }
+  for (const records of recordsByMetricId.values()) {
+    records.sort((left, right) => Date.parse(left.occurredAt) - Date.parse(right.occurredAt));
+    for (let index = 0; index < records.length; index += 1) {
+      const record = records[index]!;
+      if (record.source !== "assessment" || !record.assessmentId || !taskByAssessmentId.has(record.assessmentId)) continue;
+      const previous = index > 0 ? metricNumericValue(records[index - 1]!.value) : null;
+      const value = metricNumericValue(record.value);
+      const metric = metricById.get(record.metricId);
+      timeline.push({
+        id: `semester-assessment-${record.id}`,
+        kind: "ability_update",
+        occurredAt: record.occurredAt,
+        title: "学期测评已更新能力模型",
+        subtitle: metric?.name ?? "能力指标更新",
+        abilityUpdate: {
+          source: "semester_assessment",
+          metrics: [{
+            metricId: record.metricId,
+            label: metric?.name ?? "能力指标待同步",
+            value,
+            previousValue: previous,
+          }],
+        },
+      });
+    }
+  }
+
+  return [...timeline, ...trainingAssessmentItems]
+    .sort((left, right) => Date.parse(right.occurredAt) - Date.parse(left.occurredAt) || left.id.localeCompare(right.id))
+    .slice(0, 100);
+}
 
 // P4 成长首页英雄卡统计：从真实参与记录推导课时/出勤/月度分布（月份按北京时间归属）
 async function buildStudentTrainingStats(context: RouteContext, clubId: string, studentId: string): Promise<StudentTrainingStats> {

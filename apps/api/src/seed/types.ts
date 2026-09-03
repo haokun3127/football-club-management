@@ -58,6 +58,7 @@ import type {
   PrivateLessonRequest,
   EventChangeRequest,
   AssessmentTask,
+  TrainingContentAssessment,
   ContentArticle,
   ContentFaq,
   VenueInfo,
@@ -124,6 +125,7 @@ export interface SeedData {
   privateLessonRequests: PrivateLessonRequest[];
   eventChangeRequests: EventChangeRequest[];
   assessmentTasks: AssessmentTask[];
+  trainingContentAssessments: TrainingContentAssessment[];
   contentArticles: ContentArticle[];
   contentFaqs: ContentFaq[];
   venues: VenueInfo[];

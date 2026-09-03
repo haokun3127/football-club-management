@@ -34,7 +34,7 @@
 
 ## Batch 4 — Parent lesson stats and detailed growth timeline
 
-**2026-09-03 progress:** the first API/UI slice is complete locally. `growth-summary.trainingStats.lessonStats` now returns `attendedLessons`, `expectedLessons` and training-only `attendanceRate`; completed matches are excluded from the denominator. P4 normalizes that response and displays `已到/应到课时`. The complete child-scoped mixed timeline and milestones full-screen rendering remain pending. Online nodes P4 `1610:466`, C2 `1610:1462`, C11 `1617:2`, and C15 `1623:2` were reread; MCP is read-only, so no online Figma write is claimed.
+**2026-09-03 progress:** the API/UI slice is complete locally. `growth-summary.trainingStats.lessonStats` returns `attendedLessons`, `expectedLessons` and training-only `attendanceRate`; completed matches are excluded from the denominator. The same BFF now returns a child-scoped mixed `timeline`: completed training with saved drill scores/notes, completed match with the child's own match events, and ability updates from classroom scoring or task-bound semester assessments. P4 normalizes the timeline and shows its latest three facts; `pages/parent/milestones` now renders the full-screen detail from that same server projection, without calendar-window aggregation. Online nodes P4 `1610:466`, C2 `1610:1462`, C11 `1617:2`, and C15 `1623:2` were reread; MCP is read-only, so no online Figma write is claimed.
 
 1. 先写 failing API tests：lesson stats 仅计算训练、正确区分已到/应到、比赛不计入；timeline 只返回当前孩子可访问的训练/比赛/指标更新，并带来源与前后变化。
 2. 扩展 `growth-summary` 的 `lessonStats` 和 `timeline` view model；复用持久化活动、训练内容评分、比赛事件、PlayerMetricRecord，不新增前端伪数据。
