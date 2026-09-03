@@ -23,6 +23,7 @@
 .p4-hero__stat + .p4-hero__stat { border-left: 1rpx solid #334155; }
 .p4-hero__stat-value { color: #ffffff; font-size: 40rpx; font-weight: 700; line-height: 48rpx; }
 .p4-hero__stat-value--accent { color: #4ade80; }
+.p4-hero__stat-value--fraction { font-size: 44rpx; line-height: 52rpx; }
 .p4-hero__stat-label { color: #94a3b8; font-size: 22rpx; line-height: 28rpx; }
 .p4-hero__chips { display: flex; gap: 16rpx; min-height: 40rpx; }
 .p4-hero__chip { overflow: hidden; max-width: 240rpx; padding: 8rpx 16rpx; border-radius: 8rpx; background: #334155; color: #ffffff; font-size: 20rpx; font-weight: 600; line-height: 24rpx; text-overflow: ellipsis; white-space: nowrap; }

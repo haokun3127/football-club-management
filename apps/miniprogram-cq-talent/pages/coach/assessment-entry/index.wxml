@@ -32,7 +32,7 @@
         </view>
         <view class="c15-metric-panel__student">
           <text class="c15-metric-panel__name">{{activeStudentName}}</text>
-          <text class="c15-metric-panel__hint">录入本次原始值与标准分</text>
+          <text class="c15-metric-panel__hint">输入原始值</text>
           <text class="c15-metric-panel__score-header">标准分</text>
         </view>
 

@@ -211,14 +211,16 @@ describe("parent growth training history", () => {
 
     expect(page.data.heroTags).toEqual(["在队1年7个月", "训练46课"]);
     expect(page.data.heroStats).toEqual([
-      { value: "41/46", label: "已到/应到课时", accent: false },
-      { value: "89%", label: "出勤率", accent: true },
-      { value: "12", label: "本月训练", accent: false },
+      { value: "41/46", label: "已到/应到课时", accent: false, valueClass: "p4-hero__stat-value--fraction" },
+      { value: "89%", label: "出勤率", accent: true, valueClass: "" },
+      { value: "12", label: "本月训练", accent: false, valueClass: "" },
     ]);
     expect(page.data.trainingBars.map((bar) => bar.label)).toEqual(["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月"]);
     expect(Math.max(...page.data.trainingBars.map((bar) => bar.height))).toBe(80);
     expect(template).toContain("p4-hero__stats");
     expect(template).toContain("p4-hero__tags");
+    expect(template).toContain("p4-hero__stat-value {{item.valueClass}}");
+    expect(styles).toMatch(/\.p4-hero__stat-value--fraction\s*\{(?=[^}]*font-size:\s*44rpx)(?=[^}]*line-height:\s*52rpx)/s);
   });
 
   it("keeps the hero stats panel outline and separators from the Figma board", () => {

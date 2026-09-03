@@ -131,6 +131,7 @@
 .c15-metric-panel__student .c15-metric-panel__hint {
   margin-left: auto;
   min-width: 0;
+  flex: 1;
   overflow: hidden;
   color: rgba(255, 255, 255, 0.68);
   text-overflow: ellipsis;

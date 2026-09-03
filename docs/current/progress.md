@@ -2716,3 +2716,9 @@
 - 在线稿回读截图为 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c21-figma-assessment-20260903.png`，原生尺寸严格 `375×812`；截图仅作为 Figma 设计回读证据，不冒充小程序运行态截图。
 - 小程序 `/pages/coach/training-assessment/` 已按该层级同步：活动日期/球队、开始时间和场地全部由真实 `CoachWorkbench.event` 预计算；评分行改为“学员与分数同排、可选备注下一行”，避免在窄屏把备注输入压成不可用的第三列。
 - 验证：课堂评测、训练管理、测评任务与学期录入联合 Vitest `27/27`、三层 TypeScript、API 全量 Vitest `126/126` 与 `git diff --check` 通过。根门禁本次为 domain `21/21`、小程序 `453/454`；仍被未触碰的 `scripts/devtools-screenshot.test.mjs` 语法错误和 `pages/parent/content/index.test.mjs` 的 CRLF 精确字符串断言阻断。微信开发者工具 MCP 的单文件 WXML/WXSS 编译请求在 60 秒内未返回，已主动停止，未计为通过或视觉验收。
+
+## 2026-09-03 C15/P4 设计细节同步
+
+- C15 学期能力评估录入页将指标区提示统一为“输入原始值”；姓名、提示与标准分的同排提示区域允许收缩，避免窄屏下挤压评分列。数据范围、任务 ID、草稿键和 API 契约均未改变。
+- P4 成长页将“已到/应到课时”的比例数值作为独立视图状态渲染，使用较小字号保证如 `41/46` 的真实课时值可完整显示；出勤率与本月训练保持原来的视觉层级。
+- 定向回归：C15 与 P4 Vitest `18/18`，小程序 TypeScript `--noEmit` 和 `git diff --check` 通过。全仓门禁新鲜复跑为 domain `21/21`、小程序 `453/454`；未触碰的 `apps/miniprogram-cq-talent/scripts/devtools-screenshot.test.mjs` 仍为语法错误，`pages/parent/content/index.test.mjs` 仍为 CRLF/LF 精确字符串断言失败。本批没有重新取得微信开发者工具或真机截图，不能记为新增运行态视觉验收。

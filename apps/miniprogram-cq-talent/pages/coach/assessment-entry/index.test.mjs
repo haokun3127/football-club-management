@@ -304,5 +304,8 @@ describe("C15 coach assessment entry", () => {
     expect(stylesheet).toMatch(/\.c15-submit-wrap\s*\{(?=[^}]*position:\s*static)(?=[^}]*margin-top:\s*32rpx)/s);
     expect(stylesheet).toMatch(/\.c15-metric-panel\s*\{(?=[^}]*background:\s*#07111f)/s);
     expect(stylesheet).toMatch(/\.c15-metric-panel\s*\{(?=[^}]*min-height:\s*620rpx)/s);
+    expect(template).toContain("输入原始值");
+    expect(template).not.toContain("录入本次原始值与标准分");
+    expect(stylesheet).toMatch(/\.c15-metric-panel__student\s+\.c15-metric-panel__hint\s*\{(?=[^}]*flex:\s*1)/s);
   });
 });
