@@ -2864,3 +2864,9 @@
 - 小程序同步增加摘要文字的 flex、单行和溢出保护，并将胶囊间距对齐到 Figma；没有改变 API、真实数据、任务状态或草稿契约。
 - 红测准确复现旧 CSS 缺少单行保护；绿测：C12.1 Vitest `8/8`、小程序 TypeScript、WXML/WXSS 编译和 `git diff --check` 通过。
 - 运行态复拍：`C:\Users\ASUS\AppData\Local\Temp\cq-talent-c121-runtime-after-summary-fix.png`，`390×844`；控制台错误过滤无命中。该图是运行态证据，不冒充严格 `375×812` 像素验收。
+
+## 2026-09-03 P4.1 能力模型历史摘要文案对齐
+
+- 重新读取在线 Parent V7 能力模型更新页 `zZ6wKyOHKcO4UYXDd9jGwv / 1967:164`，确认摘要分数下方文案为“综合分”。
+- 小程序将固定文案从“最新分”改为“综合分”，真实能力时间线、分数计算、来源跳转和 API 契约保持不变。
+- 红测准确复现旧 WXML 文案，绿测：P4.1 Vitest `2/2`、小程序 TypeScript、WXML/WXSS 编译通过。当前 DevTools 是教练会话，进入家长历史页会回到教练日程，因此本批没有声称家长运行态视觉验收。

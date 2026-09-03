@@ -14,7 +14,7 @@
           <view class="history-summary__title">本学期能力模型</view>
           <view class="history-summary__meta">{{updateCountLabel}} · {{latestUpdateLabel}}</view>
         </view>
-        <view class="history-summary__score"><view class="history-summary__score-value">{{scoreLabel}}</view><view class="history-summary__score-label">最新分</view></view>
+        <view class="history-summary__score"><view class="history-summary__score-value">{{scoreLabel}}</view><view class="history-summary__score-label">综合分</view></view>
       </view>
 
       <view wx:for="{{rows}}" wx:key="id" class="ability-update-card">

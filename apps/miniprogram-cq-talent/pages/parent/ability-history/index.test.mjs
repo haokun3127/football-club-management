@@ -64,4 +64,9 @@ describe("parent ability model history", () => {
     })]);
     expect(template).toContain("bindtap=\"openSource\"");
   });
+
+  it("uses the Figma summary label for the latest overall score", () => {
+    expect(template).toContain(">综合分</view>");
+    expect(template).not.toContain(">最新分</view>");
+  });
 });

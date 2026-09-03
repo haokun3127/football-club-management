@@ -105,6 +105,12 @@
 - Red phase was observed with the existing stylesheet; green verification passed C12.1 Vitest `8/8`, mini-program TypeScript, WXML/WXSS compilation, and `git diff --check`.
 - Runtime evidence after refresh and exact route navigation: `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c121-runtime-after-summary-fix.png` (`390×844`), with no console matches for `error|exception|fail|route is not defined`. This is runtime evidence only, not strict `375×812` acceptance.
 
+## 2026-09-03 P4.1 ability-history summary label alignment
+
+- Re-read the online Parent V7 ability-history board `zZ6wKyOHKcO4UYXDd9jGwv / 1967:164`; its summary score label is `综合分`, not `最新分`.
+- Added a focused regression, observed it fail against the previous WXML, then changed only the fixed summary label to `综合分`. Real timeline data, score derivation, source navigation, and API contracts are unchanged.
+- Green verification: P4.1 Vitest `2/2`, mini-program TypeScript, and WXML/WXSS compilation passed. The active DevTools session is coach-scoped and redirects the parent route to coach schedule, so no parent runtime screenshot is claimed for this batch.
+
 ## High-risk files
 
 - `apps/api/src/routes/app-client.routes.ts`: preserve role authorization and existing response compatibility.
