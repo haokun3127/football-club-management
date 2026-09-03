@@ -7,8 +7,10 @@
     <status-view state="{{state}}" title="{{statusTitle}}" message="{{message}}" action-text="{{statusActionText}}" bindaction="retry" />
     <block wx:if="{{state === 'ready'}}">
       <view class="assessment-hero">
+        <view class="assessment-hero__top"><text>{{eventDateTeam}}</text><text>{{presentCountLabel}}</text></view>
+        <text class="assessment-hero__time">{{eventTime}}</text>
         <text class="assessment-hero__title">{{eventTitle}}</text>
-        <text class="assessment-hero__meta">{{eventMeta}}</text>
+        <text class="assessment-hero__meta">{{eventVenue}}</text>
         <text class="assessment-hero__count">{{presentCountLabel}}</text>
       </view>
       <view class="assessment-projects">

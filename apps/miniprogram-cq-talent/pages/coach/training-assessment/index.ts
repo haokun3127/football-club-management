@@ -1,6 +1,6 @@
 import { getCoachTrainingContentAssessments, getCoachWorkbench, saveCoachTrainingContentAssessments } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import { formatCalendarDate, formatTimeOnly, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachTrainingContentAssessmentScope, CoachWorkbench, LoadState, TrainingProject } from "../../../utils/types";
 
 type AssessmentValue = { scoreInput: string; noteInput: string };
@@ -29,7 +29,9 @@ interface PageData {
   message: string;
   eventId: string;
   eventTitle: string;
-  eventMeta: string;
+  eventDateTeam: string;
+  eventTime: string;
+  eventVenue: string;
   presentCountLabel: string;
   projects: ProjectView[];
   activeProjectId: string;
@@ -48,7 +50,9 @@ Page<PageData>({
     message: "",
     eventId: "",
     eventTitle: "",
-    eventMeta: "",
+    eventDateTeam: "",
+    eventTime: "",
+    eventVenue: "",
     presentCountLabel: "",
     projects: [],
     activeProjectId: "",
@@ -93,7 +97,9 @@ Page<PageData>({
         message: "",
         eventId,
         eventTitle: workbench.event.title,
-        eventMeta: [workbench.event.teamName, workbench.event.venue].filter(Boolean).join(" · "),
+        eventDateTeam: [formatCalendarDate(workbench.event.startsAt), workbench.event.teamName].filter(Boolean).join(" · "),
+        eventTime: formatTimeOnly(workbench.event.startsAt),
+        eventVenue: workbench.event.venue || "场地待确认",
         presentCountLabel: `${presentRows.length} 名已到学员`,
         projects: presentProjects(projects, activeProjectId),
         activeProjectId,

@@ -16,7 +16,12 @@ vi.mock("../../../utils/api", () => ({
   saveCoachTrainingContentAssessments: mocks.saveCoachTrainingContentAssessments,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
-vi.mock("../../../utils/presentation", () => ({ resolveMenuInset: () => 16, resolveNavInset: () => 0 }));
+vi.mock("../../../utils/presentation", () => ({
+  formatCalendarDate: () => "9月4日 周五",
+  formatTimeOnly: () => "09:00",
+  resolveMenuInset: () => 16,
+  resolveNavInset: () => 0,
+}));
 
 globalThis.wx = { showToast: mocks.showToast, navigateBack: mocks.navigateBack };
 let pageDefinition;
@@ -29,7 +34,16 @@ const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
 const pageConfig = readFileSync(new URL("./index.json", import.meta.url), "utf8");
 
 const workbench = {
-  event: { id: "event-training", type: "training", title: "进攻训练", teamName: "U10发展队", venue: "九龙坡足球公园", status: "completed" },
+  event: {
+    id: "event-training",
+    type: "training",
+    title: "进攻训练",
+    teamName: "U10发展队",
+    venue: "九龙坡足球公园",
+    startsAt: "2026-09-04T09:00:00.000Z",
+    endsAt: "2026-09-04T10:30:00.000Z",
+    status: "completed",
+  },
   selectedTrainingProjects: [{ id: "project-passing", name: "传接球" }, { id: "project-finishing", name: "射门" }],
   roster: [
     { studentId: "student-1", name: "罗志炫", status: "present" },
@@ -74,6 +88,21 @@ describe("coach training content assessment", () => {
       expect.objectContaining({ studentId: "student-3" }),
     ]));
     expect(page.data.rows.find((item) => item.studentId === "student-2")).toBeUndefined();
+  });
+
+  it("projects the real activity time into the classroom assessment course context", async () => {
+    const page = createPageInstance();
+    await page.load("event-training");
+
+    expect(page.data).toMatchObject({
+      eventDateTeam: "9月4日 周五 · U10发展队",
+      eventTime: "09:00",
+      eventVenue: "九龙坡足球公园",
+      presentCountLabel: "2 名已到学员",
+    });
+    expect(template).toContain("{{eventTime}}");
+    expect(template).toContain("{{eventDateTeam}}");
+    expect(template).toContain("{{eventVenue}}");
   });
 
   it("keeps assessment values per selected content and saves only valid real student-project pairs", async () => {
