@@ -216,9 +216,9 @@ describe("parent growth training history", () => {
     expect(template).toContain("p4-hero__tags");
   });
 
-  it("keeps only the hero stats top divider and its internal separators from the Figma board", () => {
-    expect(styles).not.toMatch(/\.p4-hero__stats\s*\{[^}]*border:\s*1rpx\s+solid\s+#334155/);
-    expect(styles).toMatch(/\.p4-hero__stats\s*\{[^}]*border-top:\s*1rpx\s+solid\s+#334155/);
-    expect(styles).toMatch(/\.p4-hero__stat\s*\+\s*\.p4-hero__stat\s*\{[^}]*border-left:\s*1rpx\s+solid\s+#334155/);
+  it("keeps the stats row completely borderless like the updated Figma board", () => {
+    expect(styles).not.toMatch(/\.p4-hero__stats\s*\{[^}]*border(?:-(?:top|right|bottom|left))?\s*:/);
+    expect(styles).not.toContain(".p4-hero__stat + .p4-hero__stat");
+    expect(styles).not.toContain(".p4-stat + .p4-stat");
   });
 });

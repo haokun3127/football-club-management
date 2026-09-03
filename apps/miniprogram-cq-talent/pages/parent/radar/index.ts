@@ -113,13 +113,6 @@ Page({
       openPage(`/pages/parent/metric/index?metricId=${metricId}&studentId=${this.data.activeStudentId}`);
     }
   },
-  openMetricHistory() {
-    if (this.data.selectedMetricId) {
-      openPage(`/pages/parent/metric/index?metricId=${this.data.selectedMetricId}&studentId=${this.data.activeStudentId}`);
-      return;
-    }
-    wx.showToast({ title: "暂无可查看的指标记录", icon: "none" });
-  },
   goBack() {
     wx.navigateBack();
   },

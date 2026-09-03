@@ -140,7 +140,9 @@ describe("parent ability radar", () => {
 
   it("derives composite score from real dimension percents and keeps peer baselines contract-gated", () => {
     expect(template).toContain("{{radarDimensionLabel}}");
-    expect(template).toContain('bindtap="openMetricHistory"');
+    expect(template).not.toContain('bindtap="openMetricHistory"');
+    expect(template).not.toContain("p5-nav__compare");
+    expect(template).not.toContain("历史对比");
     expect(template).toContain("{{compositeScore}}");
     expect(template).toContain('src="/assets/icons/chevron-left.svg"');
     expect(template).toContain('width="100%" height="560rpx"');
@@ -148,6 +150,7 @@ describe("parent ability radar", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("peerPercent");
     expect(controller).not.toContain("openCompare");
+    expect(controller).not.toContain("openMetricHistory");
   });
 
   it("keeps the refreshed P5 geometry tokens aligned with the 375px Figma frame", () => {
@@ -178,11 +181,12 @@ describe("parent ability radar", () => {
     expect(stylesheet).toMatch(/\.p5-chip\s*\{[^}]*line-height:\s*16px/s);
   });
 
-  it("keeps the history action at the Figma right edge instead of applying an oversized runtime menu inset", () => {
+  it("keeps the top bar focused on the radar title after removing history comparison", () => {
     const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
     expect(template).toContain('style="padding-top:{{navInset}}px"');
     expect(template).not.toContain("padding-right:{{menuInset}}px");
     expect(controller).not.toContain("resolveMenuInset");
+    expect(stylesheet).not.toContain(".p5-nav__compare");
     expect(stylesheet).toMatch(/\.p5-nav\s*\{[^}]*padding:\s*0\s+200rpx\s+0\s+32rpx/s);
   });
 });

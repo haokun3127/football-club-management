@@ -5,8 +5,6 @@
 .p5-nav__back { display: flex; width: 48rpx; height: 80rpx; align-items: center; justify-content: center; border-radius: 40rpx; background: #ffffff; }
 .p5-nav__back image { width: 40rpx; height: 40rpx; }
 .p5-nav__title { flex: 1; color: #202124; font-size: 36rpx; font-weight: 700; line-height: 44rpx; }
-.p5-nav__compare { padding: 16rpx 32rpx; border-radius: 40rpx; background: #a80f1b; color: #ffffff; font-size: 28rpx; font-weight: 600; }
-
 /* P5 Player Selector */
 .p5-players { width: 100%; white-space: nowrap; background: #f6f7f9; }
 .p5-players__inner { display: inline-flex; gap: 24rpx; padding: 24rpx 32rpx; }
