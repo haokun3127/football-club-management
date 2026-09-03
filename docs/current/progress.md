@@ -2857,3 +2857,10 @@
 - C12 使用既有测评 entries 接口逐项目读取已保存学员 ID，预计算“已录 X/Y”；进度卡显示真实项目完成数、学员完成数和任务状态，项目说明区分自动换算标准分与手动评分。
 - 移除上下文行重复的学员进度及项目卡无意义的指标数展示；不添加 Figma 示例任务或分数。
 - 红测准确复现旧结构，修复后 C12 Vitest `4/4`、小程序 TypeScript、WXML/WXSS 编译通过。真实运行截图为 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c12-projects-runtime-final.png`（`390×844`），显示 `已完成 1/1 个项目 · 19/19 名学员` 与 `已录 19/19`；不冒充严格 `375×812` 像素验收。
+
+## 2026-09-03 C12.1 完成态摘要单行对齐
+
+- 在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 1985:2` 先行修正完成态摘要：`全队 19 人已完成 · 成绩已保存` 在原生 `375×812` 下完整单行显示，右侧“已完成 · 只读”胶囊调整到稳定间距。
+- 小程序同步增加摘要文字的 flex、单行和溢出保护，并将胶囊间距对齐到 Figma；没有改变 API、真实数据、任务状态或草稿契约。
+- 红测准确复现旧 CSS 缺少单行保护；绿测：C12.1 Vitest `8/8`、小程序 TypeScript、WXML/WXSS 编译和 `git diff --check` 通过。
+- 运行态复拍：`C:\Users\ASUS\AppData\Local\Temp\cq-talent-c121-runtime-after-summary-fix.png`，`390×844`；控制台错误过滤无命中。该图是运行态证据，不冒充严格 `375×812` 像素验收。

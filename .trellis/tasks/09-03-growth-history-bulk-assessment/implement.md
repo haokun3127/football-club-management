@@ -98,6 +98,13 @@
 - Removed the duplicated student-progress suffix from the context line and the unused metric-count rendering from project cards; no sample task, score, or status was added.
 - Red/green verification: C12 Vitest `4/4`, mini-program TypeScript, WXML/WXSS compilation, and a fresh WeChat DevTools runtime screenshot passed; runtime evidence is `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c12-projects-runtime-final.png` (`390×844`).
 
+## 2026-09-03 C12.1 completed-summary single-line alignment
+
+- Re-read the online Figma completed-state board `zZ6wKyOHKcO4UYXDd9jGwv / 1985:2` before editing. The summary now renders `全队 19 人已完成 · 成绩已保存` as one complete line at native `375×812`; the read-only pill was moved to `x=251` to leave a stable gap.
+- Added a focused mini-program regression requiring the summary count to be a flexible, non-wrapping line and the rule pill to keep the matching `22rpx` separation. No API, data, task state, or draft contract changed.
+- Red phase was observed with the existing stylesheet; green verification passed C12.1 Vitest `8/8`, mini-program TypeScript, WXML/WXSS compilation, and `git diff --check`.
+- Runtime evidence after refresh and exact route navigation: `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c121-runtime-after-summary-fix.png` (`390×844`), with no console matches for `error|exception|fail|route is not defined`. This is runtime evidence only, not strict `375×812` acceptance.
+
 ## High-risk files
 
 - `apps/api/src/routes/app-client.routes.ts`: preserve role authorization and existing response compatibility.

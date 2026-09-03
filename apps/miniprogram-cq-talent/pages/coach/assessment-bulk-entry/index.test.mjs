@@ -155,4 +155,9 @@ describe("C12.1 team batch assessment entry", () => {
     expect(stylesheet).toMatch(/\.bulk-metric\s*\{[^}]*display:\s*flex[^}]*border-bottom:/s);
     expect(stylesheet).toMatch(/\.bulk-metric--readonly\s*\{[^}]*border-bottom:\s*0/s);
   });
+
+  it("keeps the completed project summary on one line at the native 375px layout", () => {
+    expect(stylesheet).toMatch(/\.bulk-summary__count\s*\{[^}]*min-width:\s*0[^}]*flex:\s*1[^}]*white-space:\s*nowrap/s);
+    expect(stylesheet).toMatch(/\.bulk-summary__rule\s*\{[^}]*margin-left:\s*22rpx/s);
+  });
 });
