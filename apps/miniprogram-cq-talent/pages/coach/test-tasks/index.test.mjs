@@ -123,7 +123,7 @@ describe("coach assessment task list", () => {
     await page.load();
 
     page.openTask({ currentTarget: { dataset: { id: "task-in-progress" } } });
-    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/assessment-entry/index?taskId=task-in-progress&templateId=template-real&title=Actual%20assessment%20task");
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/assessment-projects/index?taskId=task-in-progress&templateId=template-real&title=Actual%20assessment%20task");
 
     page.openTask({ currentTarget: { dataset: { id: "task-not-started" } } });
     page.openTask({ currentTarget: { dataset: { id: "task-completed" } } });

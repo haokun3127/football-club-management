@@ -165,7 +165,7 @@ Page<PageData>({
       return;
     }
 
-    openPage(`/pages/coach/assessment-entry/index?taskId=${encodeURIComponent(task.id)}&templateId=${encodeURIComponent(task.templateId)}&title=${encodeURIComponent(task.title)}`);
+    openPage(`/pages/coach/assessment-projects/index?taskId=${encodeURIComponent(task.id)}&templateId=${encodeURIComponent(task.templateId)}&title=${encodeURIComponent(task.title)}`);
   },
 });
 

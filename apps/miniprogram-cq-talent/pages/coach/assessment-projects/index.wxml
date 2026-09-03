@@ -1,0 +1,11 @@
+<view class="projects-page">
+  <view class="projects-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="projects-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="projects-nav__title">{{taskTitle}}</view><view class="projects-nav__spacer"></view></view>
+  <view class="projects-page__body">
+    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '加载测评项目' : state === 'empty' ? '暂无测评项目' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <block wx:if="{{state === 'ready'}}">
+      <view class="projects-context">{{teamContextLabel}}<text wx:if="{{progressLabel}}"> · {{progressLabel}}</text></view>
+      <view class="projects-progress"><view class="projects-progress__title">先选择测评项目</view><view class="projects-progress__meta">进入项目后，为全队连续录入原始成绩</view></view>
+      <view wx:for="{{projects}}" wx:key="id" class="project-card" data-id="{{item.id}}" bindtap="openProject"><view class="project-card__main"><view class="project-card__title">{{item.title}}</view><view class="project-card__description">{{item.description}}</view></view><view class="project-card__side"><view class="project-card__status">{{item.statusLabel}}</view><view class="project-card__count">{{item.itemCountLabel}}</view></view><image class="project-card__chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
+    </block>
+  </view>
+</view>

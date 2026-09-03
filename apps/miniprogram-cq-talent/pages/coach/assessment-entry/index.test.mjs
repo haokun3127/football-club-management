@@ -151,6 +151,14 @@ describe("C15 coach assessment entry", () => {
     expect(mocks.submitCoachAssessment).toHaveBeenCalledWith(expect.objectContaining({ assessmentTaskId: "task-real" }));
   });
 
+  it("loads only the fields belonging to the selected assessment project", async () => {
+    const page = createPageInstance();
+    await page.onLoad({ taskId: "task-real", templateId: "template-real", projectId: "fitness", title: "Real task" });
+
+    expect(page.data.projectId).toBe("fitness");
+    expect(page.data.fields.map((field) => field.id)).toEqual(["field-speed"]);
+  });
+
   it("keeps the newest concurrent load when an older load succeeds or fails late", async () => {
     let resolveOldForm;
     let resolveOldTeam;

@@ -1,0 +1,19 @@
+.projects-page { min-height: 100vh; background: #f6f7f9; }
+.projects-nav { position: sticky; top: 0; z-index: 100; display: flex; box-sizing: content-box; align-items: center; height: 88rpx; padding-left: 32rpx; background: #ffffff; }
+.projects-nav__back { display: flex; flex: 0 0 auto; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; }
+.projects-nav__back image { width: 48rpx; height: 48rpx; }
+.projects-nav__title { min-width: 0; flex: 1; margin-left: 24rpx; overflow: hidden; color: #202124; font-size: 36rpx; font-weight: 700; line-height: 44rpx; text-overflow: ellipsis; white-space: nowrap; }
+.projects-nav__spacer { flex: 0 0 auto; width: 48rpx; height: 48rpx; }
+.projects-page__body { padding: 16rpx 32rpx 64rpx; }
+.projects-context { color: #667085; font-size: 26rpx; line-height: 40rpx; }
+.projects-progress { box-sizing: border-box; margin-top: 24rpx; padding: 28rpx 32rpx; border-radius: 32rpx; background: #ffffff; }
+.projects-progress__title { color: #202124; font-size: 32rpx; font-weight: 700; line-height: 44rpx; }
+.projects-progress__meta { margin-top: 8rpx; color: #667085; font-size: 24rpx; line-height: 36rpx; }
+.project-card { display: flex; align-items: center; min-height: 152rpx; margin-top: 20rpx; padding: 24rpx 24rpx 24rpx 32rpx; border-radius: 32rpx; background: #ffffff; }
+.project-card__main { min-width: 0; flex: 1; }
+.project-card__title { overflow: hidden; color: #202124; font-size: 30rpx; font-weight: 700; line-height: 42rpx; text-overflow: ellipsis; white-space: nowrap; }
+.project-card__description { margin-top: 8rpx; overflow: hidden; color: #667085; font-size: 24rpx; line-height: 36rpx; text-overflow: ellipsis; white-space: nowrap; }
+.project-card__side { flex: 0 0 auto; margin-left: 16rpx; text-align: right; }
+.project-card__status { color: #667085; font-size: 24rpx; line-height: 34rpx; }
+.project-card__count { margin-top: 4rpx; color: #98a2b3; font-size: 22rpx; line-height: 30rpx; }
+.project-card__chevron { flex: 0 0 auto; width: 32rpx; height: 32rpx; margin-left: 12rpx; }

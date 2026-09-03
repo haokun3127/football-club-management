@@ -47,6 +47,7 @@ interface PageData {
   templateId: string;
   templateVersionId: string;
   assessmentTaskId: string;
+  projectId: string;
   taskTitle: string;
   termLabel: string;
   fields: EntryField[];
@@ -76,6 +77,7 @@ Page<PageData>({
     templateId: "",
     templateVersionId: "",
     assessmentTaskId: "",
+    projectId: "",
     taskTitle: "能力评估",
     termLabel: "",
     fields: [],
@@ -91,10 +93,10 @@ Page<PageData>({
     submitting: false,
     lastSavedLabel: "",
   },
-  onLoad(query: { taskId?: string; templateId?: string; title?: string }) {
-    return this.load(query?.templateId || "", query?.title ? decodeURIComponent(query.title) : "能力评估", query?.taskId || "");
+  onLoad(query: { taskId?: string; templateId?: string; projectId?: string; title?: string }) {
+    return this.load(query?.templateId || "", query?.title ? decodeURIComponent(query.title) : "能力评估", query?.taskId || "", query?.projectId || "");
   },
-  async load(templateId: string, taskTitle: string, assessmentTaskId: string) {
+  async load(templateId: string, taskTitle: string, assessmentTaskId: string, projectId = "") {
     const session = requireRole("coach");
     if (!session) return;
     if (!templateId || !assessmentTaskId) {
@@ -115,6 +117,7 @@ Page<PageData>({
       message: "正在读取评测表单。",
       templateId,
       assessmentTaskId,
+      projectId,
       taskTitle,
       submitting: false,
     });
@@ -145,7 +148,7 @@ Page<PageData>({
       const [form, team] = await Promise.all([getAssessmentForm(templateId), getCoachTeam(task.teamId)]);
       if (loadToken !== latestLoadToken) return;
 
-      const fields = toEntryFields(form);
+      const fields = toEntryFields(form, projectId);
       if (!fields || !form.templateVersionId) {
         this.setData({
           state: "empty",
@@ -200,6 +203,7 @@ Page<PageData>({
         message: "",
         templateVersionId: form.templateVersionId,
         assessmentTaskId: task.id,
+        projectId,
         taskTitle: task.title,
         termLabel: task.termLabel,
         fields,
@@ -225,7 +229,7 @@ Page<PageData>({
     }
   },
   retry() {
-    this.load(this.data.templateId, this.data.taskTitle, this.data.assessmentTaskId);
+    this.load(this.data.templateId, this.data.taskTitle, this.data.assessmentTaskId, this.data.projectId);
   },
   goBack() {
     wx.navigateBack({ delta: 1 });
@@ -335,10 +339,10 @@ Page<PageData>({
   },
 });
 
-function toEntryFields(form: AssessmentForm): EntryField[] | null {
+function toEntryFields(form: AssessmentForm, projectId = ""): EntryField[] | null {
   if (!form.fields.length) return [];
   if (form.fields.some((field) => !field.testItemId || !field.groupId || !supportsNumericValue(field.valueKind))) return null;
-  return form.fields.map((field) => ({
+  return form.fields.filter((field) => !projectId || field.groupId === projectId).map((field) => ({
     ...field,
     inputMin: field.minValue ?? (field.valueKind === "rating_1_5" ? 1 : 0),
     inputMax: field.maxValue ?? (field.valueKind === "rating_1_5" ? 5 : 100),
