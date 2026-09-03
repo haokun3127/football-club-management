@@ -50,6 +50,7 @@ export interface PlayerAssessment extends AuditFields, ClubScoped {
   assessedByCoachId: EntityId;
   assessedAt: string;
   eventId?: EntityId;
+  assessmentTaskId?: EntityId;
   summary?: string;
 }
 

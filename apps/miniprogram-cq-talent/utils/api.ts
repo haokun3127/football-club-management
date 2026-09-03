@@ -651,9 +651,19 @@ function normalizeTrainingStats(raw: unknown): GrowthSummary["trainingStats"] {
   const record = asRecord(raw);
   if (!record) return undefined;
   const monthlySource = Array.isArray(record.monthly) ? record.monthly : [];
+  const lessonStats = asRecord(record.lessonStats);
+  const attendedLessons = Number(lessonStats?.attendedLessons ?? 0);
+  const expectedLessons = Number(lessonStats?.expectedLessons ?? record.totalTrainings ?? 0);
   return {
     totalTrainings: Number(record.totalTrainings ?? 0),
     attendanceRate: typeof record.attendanceRate === "number" ? record.attendanceRate : null,
+    lessonStats: {
+      attendedLessons,
+      expectedLessons,
+      attendanceRate: typeof lessonStats?.attendanceRate === "number"
+        ? lessonStats.attendanceRate
+        : typeof record.attendanceRate === "number" ? record.attendanceRate : null,
+    },
     monthTrainings: Number(record.monthTrainings ?? 0),
     monthly: monthlySource
       .map((item) => {

@@ -21,6 +21,7 @@ import { migrate, openSqliteDatabase } from "./sqlite.js";
 import { TacticalBoardRepository } from "./tactical-board-repository.js";
 import { SessionPlanRepository } from "./session-plan-repository.js";
 import { TrainingSessionRepository } from "./training-session-repository.js";
+import { TrainingContentAssessmentRepository } from "./training-content-assessment-repository.js";
 
 export interface PlatformRepositories {
   appClientSessions: AppClientSessionRepository;
@@ -41,6 +42,7 @@ export interface PlatformRepositories {
   tacticalBoards: TacticalBoardRepository;
   sessionPlans: SessionPlanRepository;
   trainingSessions: TrainingSessionRepository;
+  trainingContentAssessments: TrainingContentAssessmentRepository;
 }
 
 export interface PlatformPersistence {
@@ -68,6 +70,7 @@ export function createPlatformRepositories(database: DatabaseSync): PlatformRepo
     tacticalBoards: new TacticalBoardRepository(database),
     sessionPlans: new SessionPlanRepository(database),
     trainingSessions: new TrainingSessionRepository(database),
+    trainingContentAssessments: new TrainingContentAssessmentRepository(database),
   };
 }
 

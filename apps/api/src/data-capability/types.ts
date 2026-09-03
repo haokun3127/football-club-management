@@ -628,10 +628,26 @@ export interface EventChangeRequest {
 export interface AssessmentTask {
   id: string;
   clubId: string;
+  teamId: string;
+  termLabel: string;
   title: string;
   templateId: string;
   startsOn: string;
   dueOn: string;
+}
+
+export interface TrainingContentAssessment {
+  id: EntityId;
+  clubId: EntityId;
+  eventId: EntityId;
+  studentId: EntityId;
+  trainingProjectId: EntityId;
+  score: number;
+  note?: string;
+  assessedByCoachId: EntityId;
+  assessedAt: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ContentArticle {

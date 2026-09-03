@@ -9,7 +9,7 @@ export class AssessmentTaskRepository {
 
   listByClub(clubId: EntityId): AssessmentTask[] {
     const rows = this.database.prepare(`
-      SELECT id, club_id, title, template_id, starts_on, due_on
+      SELECT id, club_id, team_id, term_label, title, template_id, starts_on, due_on
       FROM assessment_tasks
       WHERE club_id = ?
       ORDER BY starts_on, due_on, id
@@ -22,10 +22,12 @@ export class AssessmentTaskRepository {
     const now = new Date().toISOString();
     this.database.prepare(`
       INSERT INTO assessment_tasks (
-        id, club_id, title, template_id, starts_on, due_on, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        id, club_id, team_id, term_label, title, template_id, starts_on, due_on, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         club_id = excluded.club_id,
+        team_id = excluded.team_id,
+        term_label = excluded.term_label,
         title = excluded.title,
         template_id = excluded.template_id,
         starts_on = excluded.starts_on,
@@ -34,6 +36,8 @@ export class AssessmentTaskRepository {
     `).run(
       task.id,
       task.clubId,
+      task.teamId,
+      task.termLabel,
       task.title,
       task.templateId,
       task.startsOn,
@@ -47,12 +51,14 @@ export class AssessmentTaskRepository {
     const now = new Date().toISOString();
     this.database.prepare(`
       INSERT INTO assessment_tasks (
-        id, club_id, title, template_id, starts_on, due_on, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        id, club_id, team_id, term_label, title, template_id, starts_on, due_on, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO NOTHING
     `).run(
       task.id,
       task.clubId,
+      task.teamId,
+      task.termLabel,
       task.title,
       task.templateId,
       task.startsOn,
@@ -73,6 +79,8 @@ function mapAssessmentTask(row: SqlRow): AssessmentTask {
   return {
     id: required("id"),
     clubId: required("club_id"),
+    teamId: required("team_id"),
+    termLabel: required("term_label"),
     title: required("title"),
     templateId: required("template_id"),
     startsOn: required("starts_on"),

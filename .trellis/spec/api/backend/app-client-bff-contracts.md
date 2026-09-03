@@ -1125,3 +1125,60 @@ const summary = article.body?.slice(0, 52) || "俱乐部最新通知";
 const noticeBanner = presentNoticeBanner(articles);
 // WXML 只使用 noticeBanner.summary / noticeBanner.metaLabel
 ```
+
+## Scenario: Training Content Scores and Semester Assessment Scope
+
+### 1. Scope / Trigger
+
+- Trigger: a coach records per-student classroom training scores, or creates/submits a semester assessment task through the mini-program BFF.
+- This crosses `training_content_assessments`, `assessment_tasks`, `player_assessments`, the coach BFF, and parent growth summary projections.
+
+### 2. Signatures
+
+- `GET|PUT /clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/training-content-assessments`
+- `POST /clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks` with `{ title, templateId, teamId, termLabel, startsOn, dueOn }`
+- Semester assessment submission carries `assessmentTaskId`.
+- Parent growth summary additive field: `trainingStats.lessonStats: { attendedLessons, expectedLessons, attendanceRate }`.
+
+### 3. Contracts
+
+- A training-content assessment is uniquely `(clubId, eventId, studentId, trainingProjectId)` and an overwrite updates the same record.
+- It is valid only for a training event, a project selected on that event, and a roster student whose current attendance is `present`.
+- A semester task owns exactly one coach-accessible team, a nonblank `termLabel`, one template and one date window. Submissions must use its task id and satisfy its team/template/window scope.
+- `lessonStats` counts only completed, non-cancelled training events: expected is eligible trainings, attended is `present`; matches never contribute.
+
+### 4. Validation & Error Matrix
+
+- Non-training event -> `400 invalid_training_event`.
+- Project not selected for the event -> `400 invalid_training_project`.
+- Student absent/not on roster -> `400 invalid_training_assessment_student`.
+- Blank term label -> `400 invalid_term_label`.
+- Inaccessible team, task-template mismatch, task-window mismatch, or student outside the task team -> `403 forbidden` or the route's explicit `400` scope error; no assessment row is written.
+
+### 5. Good / Base / Bad Cases
+
+- Good: coach marks a present student 91 for a selected drill, restarts file SQLite, and reads one persisted assessment back.
+- Base: a task has no completed submissions and reports `0 / team roster size` rather than inferring progress from unrelated records.
+- Bad: client sends a student id, template id, or `taskId` and the server trusts it without resolving the event/team scope.
+
+### 6. Tests Required
+
+- API regression covers present-only, selected-project-only, non-training rejection, and file-SQLite reopen.
+- Task regression covers blank term rejection, team/template/window validation, and distinct-student task progress.
+- Parent growth regression proves completed matches are excluded from `lessonStats`.
+- Mini-program normalizer/view-model regression covers absent additive data and displays `已到/应到课时` from the server response.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```typescript
+const expectedLessons = trainingAndMatchEvents.length;
+```
+
+#### Correct
+
+```typescript
+const eligibleTrainings = events.filter((event) => event.type === "training" && event.endsAt <= now && !event.cancelled);
+const expectedLessons = eligibleTrainings.length;
+```

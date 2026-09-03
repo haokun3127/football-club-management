@@ -191,6 +191,7 @@ describe("parent growth training history", () => {
       trainingStats: {
         totalTrainings: 46,
         attendanceRate: 89,
+        lessonStats: { attendedLessons: 41, expectedLessons: 46, attendanceRate: 89 },
         monthTrainings: 12,
         monthly: [
           { month: 1, count: 4 }, { month: 2, count: 6 }, { month: 3, count: 5 }, { month: 4, count: 8 },
@@ -205,7 +206,7 @@ describe("parent growth training history", () => {
 
     expect(page.data.heroTags).toEqual(["在队1年7个月", "训练46课"]);
     expect(page.data.heroStats).toEqual([
-      { value: "46", label: "训练课时", accent: false },
+      { value: "41/46", label: "已到/应到课时", accent: false },
       { value: "89%", label: "出勤率", accent: true },
       { value: "12", label: "本月训练", accent: false },
     ]);

@@ -2670,3 +2670,12 @@
 - C1 定向测试 `23/23`、小程序 TypeScript、WXML/WXSS 编译和限定路径 `git diff --check` 通过。
 - 微信开发者工具 MCP 有效运行态证据：`C:\Users\ASUS\AppData\Local\Temp\cq-talent-c1-viewport-20260902.png` 与 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c1-next-week-20260902.png`，均严格 `375×812`。当前真实数据为训练活动；比赛样式分支由定向测试验证，未伪造比赛数据。
 - 兼容 `simulator_screenshot` 本轮出现白屏，而 MCP `automation_viewport_action.screenshot` 正常；已在 C1 研究记录中记录该采集通道差异。
+
+## 2026-09-03 训练评测、学期测评与成长课时口径
+
+- 新增课堂训练内容评分持久化：评分唯一绑定“训练活动 × 已到学员 × 已选训练内容”，分数范围为 0–100；接口拒绝非训练活动、未选训练内容和缺席学员写入，文件 SQLite 重启后可读回。
+- 学期测评任务已扩展为“球队 + 学期 + 测评模板”范围，提交必须携带任务 ID；完成进度只按该任务的真实学员提交去重计算。额外修复了纯空白学期名称可被创建的问题，现返回 `400 invalid_term_label`。
+- 家长成长摘要新增真实 `lessonStats`：仅计算已结束、未取消的训练活动；比赛不计课时。成长首页首项展示改为“已到/应到课时”，并复用服务端出勤率，不再把比赛状态混入课时分母。
+- 本批 Figma 读取基准为 Coach C2 `1610:1462`、C11 `1617:2`、C15 `1623:2` 与 Parent P4 `1610:466`；当前 Figma MCP 连接为只读，未把读取误记为在线稿已修改。后续页面入口与成长足迹时间线仍在当前任务中，尚未完成或部署。
+- 验证：训练评分/测评任务 API 定向回归 `3/3`，SQLite 重启回归 `1/1`，成长课时 API 回归 `1/1`，成长页与 API 归一化定向 Vitest `23/23`，API/domain/小程序 TypeScript 与本批 `git diff --check` 通过。
+- 全仓 `corepack pnpm run check`：domain `21/21`、小程序 `450/450`、API `125/126`。唯一失败为**未纳入本批**的 `apps/api/test/server.test.ts:1383`：课时更正旧路由期望 `410 legacy_lesson_flow_retired`，实际先因旧 payload 返回 `400`。本批的持久化测评测试已改为创建有效任务并携带 `assessmentTaskId`，对应重跑为 `1/1`。

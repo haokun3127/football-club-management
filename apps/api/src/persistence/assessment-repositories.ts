@@ -76,8 +76,8 @@ export class AssessmentRepository {
     this.database.prepare(`
       INSERT INTO player_assessments (
         id, club_id, student_id, template_id, template_version_id, assessed_by_coach_id,
-        assessed_at, event_id, summary, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        assessed_at, event_id, assessment_task_id, summary, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(...playerAssessmentValues(entity));
   }
 
@@ -85,8 +85,8 @@ export class AssessmentRepository {
     this.database.prepare(`
       INSERT INTO player_assessments (
         id, club_id, student_id, template_id, template_version_id, assessed_by_coach_id,
-        assessed_at, event_id, summary, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        assessed_at, event_id, assessment_task_id, summary, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO NOTHING
     `).run(...playerAssessmentValues(entity));
   }
@@ -212,6 +212,7 @@ function playerAssessmentValues(entity: PlayerAssessment): SQLInputValue[] {
     entity.assessedByCoachId,
     entity.assessedAt,
     entity.eventId ?? null,
+    entity.assessmentTaskId ?? null,
     entity.summary ?? null,
     entity.createdAt,
     entity.updatedAt,
@@ -296,6 +297,7 @@ function mapPlayerAssessment(row: SqlRow): PlayerAssessment {
     assessedByCoachId: requiredString(row, "assessed_by_coach_id"),
     assessedAt: requiredString(row, "assessed_at"),
     eventId: optionalString(row, "event_id"),
+    assessmentTaskId: optionalString(row, "assessment_task_id"),
     summary: optionalString(row, "summary"),
     createdAt: requiredString(row, "created_at"),
     updatedAt: requiredString(row, "updated_at"),

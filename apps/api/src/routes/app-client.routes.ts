@@ -258,6 +258,95 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
   );
 
   app.get<{
+    Params: { clubId: string; clientId: string; eventId: string };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/training-content-assessments",
+    {
+      schema: {
+        ...schemas.appClientEventParams,
+        ...schemas.appClientTrainingContentAssessments,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) return reply;
+      if (!await requireCoachEventAccess(context, request, reply, request.params.clubId, request.params.eventId)) return reply;
+      const scope = await resolveTrainingContentAssessmentScope(context, reply, request.params.clubId, request.params.eventId);
+      if (!scope) return reply;
+
+      return {
+        clubId: request.params.clubId,
+        client: summarizeClient(client),
+        eventId: request.params.eventId,
+        selectedProjectIds: [...scope.selectedProjectIds],
+        presentStudentIds: [...scope.presentStudentIds],
+        assessments: await context.store.listTrainingContentAssessments(request.params.clubId, request.params.eventId),
+      };
+    },
+  );
+
+  app.put<{
+    Params: { clubId: string; clientId: string; eventId: string };
+    Body: {
+      assessments: Array<{ studentId: string; trainingProjectId: string; score: number; note?: string }>;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/training-content-assessments",
+    {
+      schema: {
+        ...schemas.appClientEventParams,
+        ...schemas.appClientTrainingContentAssessmentsUpdate,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) return reply;
+      if (!await requireCoachEventAccess(context, request, reply, request.params.clubId, request.params.eventId)) return reply;
+      const scope = await resolveTrainingContentAssessmentScope(context, reply, request.params.clubId, request.params.eventId);
+      if (!scope) return reply;
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) return reply;
+      const assessedByCoachId = context.store.listCoaches(request.params.clubId)
+        .find((coach) => coach.userId === auth?.user.id)?.id
+        ?? "coach-1";
+      const now = new Date().toISOString();
+      const assessments = [];
+
+      for (const input of request.body.assessments) {
+        if (!scope.selectedProjectIds.has(input.trainingProjectId)) {
+          return context.sendError(reply, 400, "invalid_training_project", "Training content is not selected for this event");
+        }
+        if (!scope.presentStudentIds.has(input.studentId)) {
+          return context.sendError(reply, 400, "student_not_present", "Only present students can receive a training-content assessment");
+        }
+        assessments.push(await context.store.saveTrainingContentAssessment({
+          id: `training-content-assessment-${crypto.randomUUID()}`,
+          clubId: request.params.clubId,
+          eventId: request.params.eventId,
+          studentId: input.studentId,
+          trainingProjectId: input.trainingProjectId,
+          score: input.score,
+          note: input.note?.trim() || undefined,
+          assessedByCoachId,
+          assessedAt: now,
+          createdAt: now,
+          updatedAt: now,
+        }));
+      }
+
+      return {
+        clubId: request.params.clubId,
+        client: summarizeClient(client),
+        eventId: request.params.eventId,
+        assessments,
+      };
+    },
+  );
+
+  app.get<{
     Params: {
       clubId: string;
       clientId: string;
@@ -2292,16 +2381,23 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       const scope = await collectCoachScope(context, request.params.clubId, auth);
       const tasks = await context.store.listAssessmentTasks(request.params.clubId);
       const today = new Date().toISOString().slice(0, 10);
-      const recordsByStudent = new Map<string, Awaited<ReturnType<RouteContext["store"]["getStudentMetrics"]>>>();
-      await Promise.all(scope.students.map(async (student) => {
-        recordsByStudent.set(student.id, await context.store.getStudentMetrics(request.params.clubId, student.id));
-      }));
+      const assessments = await context.store.listPlayerAssessments(request.params.clubId);
+      const activeTeamMemberStudentIds = new Map<string, Set<string>>();
+      for (const member of context.store.listTeamMembers(request.params.clubId)) {
+        if (member.status !== "active") continue;
+        const students = activeTeamMemberStudentIds.get(member.teamId) ?? new Set<string>();
+        students.add(member.studentId);
+        activeTeamMemberStudentIds.set(member.teamId, students);
+      }
 
       const views = tasks.map((task) => {
-        const totalStudents = scope.students.length;
-        const completedStudents = scope.students.filter((student) =>
-          (recordsByStudent.get(student.id) ?? []).some((record) => record.occurredAt.slice(0, 10) >= task.startsOn && record.occurredAt.slice(0, 10) <= task.dueOn)
-        ).length;
+        const taskStudentIds = activeTeamMemberStudentIds.get(task.teamId) ?? new Set<string>();
+        const visibleStudentIds = new Set(scope.students.map((student) => student.id));
+        const totalStudents = [...taskStudentIds].filter((studentId) => visibleStudentIds.has(studentId)).length;
+        const completedStudentIds = new Set(assessments
+          .filter((assessment) => assessment.assessmentTaskId === task.id && taskStudentIds.has(assessment.studentId))
+          .map((assessment) => assessment.studentId));
+        const completedStudents = completedStudentIds.size;
         const status = task.startsOn > today
           ? "not_started"
           : totalStudents > 0 && completedStudents >= totalStudents
@@ -2309,6 +2405,8 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
             : "in_progress";
         return {
           id: task.id,
+          teamId: task.teamId,
+          termLabel: task.termLabel,
           title: task.title,
           templateId: task.templateId,
           startsOn: task.startsOn,
@@ -2331,7 +2429,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
 
   app.post<{
     Params: { clubId: string; clientId: string };
-    Body: { title: string; templateId: string; startsOn: string; dueOn: string };
+    Body: { title: string; templateId: string; teamId: string; termLabel: string; startsOn: string; dueOn: string };
   }>(
     "/clubs/:clubId/app-clients/:clientId/coach/assessment-tasks",
     {
@@ -2355,6 +2453,10 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return reply;
       }
 
+      const termLabel = request.body.termLabel.trim();
+      if (!termLabel) {
+        return context.sendError(reply, 400, "invalid_term_label", "学期不能为空");
+      }
       const templates = await context.store.listAssessmentTemplates(request.params.clubId);
       const template = templates.find((item) => item.id === request.body.templateId);
       if (!template) {
@@ -2363,10 +2465,17 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       if (request.body.dueOn < request.body.startsOn) {
         return context.sendError(reply, 400, "invalid_period", "截止日期不能早于开始日期");
       }
+      const allowedTeam = collectCoachTeamOptions(context, request.params.clubId, auth)
+        .find((team) => team.id === request.body.teamId);
+      if (!allowedTeam) {
+        return context.sendError(reply, 403, "forbidden", "Team is not accessible for this coach membership");
+      }
 
       const task = await context.store.saveAssessmentTask({
         id: `assessment-task-app-client-${crypto.randomUUID()}`,
         clubId: request.params.clubId,
+        teamId: allowedTeam.id,
+        termLabel,
         title: request.body.title.trim(),
         templateId: template.id,
         startsOn: request.body.startsOn,
@@ -2806,6 +2915,27 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         ? context.store.listCoaches(request.params.clubId).find((coach) => coach.userId === auth.user.id)
         : null;
 
+      const task = request.body.assessmentTaskId
+        ? (await context.store.listAssessmentTasks(request.params.clubId)).find((item) => item.id === request.body.assessmentTaskId)
+        : null;
+      if (!task) {
+        return context.sendError(reply, 400, "assessment_task_required", "Assessment submissions must be linked to an assessment task");
+      }
+      if (task.templateId !== request.body.templateId) {
+        return context.sendError(reply, 400, "assessment_task_template_mismatch", "Assessment template does not match the task");
+      }
+      const today = new Date().toISOString().slice(0, 10);
+      if (today < task.startsOn || today > task.dueOn) {
+        return context.sendError(reply, 400, "assessment_task_not_active", "Assessment task is outside its active period");
+      }
+      const teamIsAccessible = collectCoachTeamOptions(context, request.params.clubId, auth)
+        .some((team) => team.id === task.teamId);
+      const studentIsInTaskTeam = context.store.listTeamMembers(request.params.clubId)
+        .some((member) => member.teamId === task.teamId && member.studentId === request.body.studentId && member.status === "active");
+      if (!teamIsAccessible || !studentIsInTaskTeam) {
+        return context.sendError(reply, 403, "forbidden", "Student is outside the assessment task team scope");
+      }
+
       try {
         const result = await context.store.recordAssessment({
           ...request.body,
@@ -2952,6 +3082,39 @@ async function requireCoachEventAccess(
   }
 
   return true;
+}
+
+async function resolveTrainingContentAssessmentScope(
+  context: RouteContext,
+  reply: FastifyReply,
+  clubId: string,
+  eventId: string,
+): Promise<{ selectedProjectIds: Set<string>; presentStudentIds: Set<string> } | null> {
+  const event = (await context.store.listCalendarEvents(clubId) as AppEventDetail[])
+    .find((item) => item.id === eventId);
+  if (!event) {
+    context.sendError(reply, 404, "not_found", "Event not found");
+    return null;
+  }
+  if (event.type !== "training") {
+    context.sendError(reply, 400, "invalid_training_event", "Training content assessments can only be recorded for training events");
+    return null;
+  }
+
+  const session = await context.store.getTrainingSessionByEvent(clubId, eventId);
+  const plan = session?.sessionPlanId ? context.store.getSessionPlan(session.sessionPlanId) : null;
+  const selectedProjectIds = new Set(plan?.blocks.map((block) => block.drillId) ?? []);
+  if (!selectedProjectIds.size) {
+    context.sendError(reply, 400, "training_content_required", "Select training content before recording assessments");
+    return null;
+  }
+
+  const presentStudentIds = new Set(
+    context.store.listEventParticipants(clubId)
+      .filter((participant) => participant.eventId === eventId && participant.status === "present")
+      .map((participant) => participant.studentId),
+  );
+  return { selectedProjectIds, presentStudentIds };
 }
 
 function summarizeClient(client: ClubAppClient) {
@@ -3217,6 +3380,11 @@ async function withVenueNames(
 type StudentTrainingStats = {
   totalTrainings: number;
   attendanceRate: number | null;
+  lessonStats: {
+    attendedLessons: number;
+    expectedLessons: number;
+    attendanceRate: number | null;
+  };
   monthTrainings: number;
   monthly: Array<{ month: number; count: number }>;
 };
@@ -3233,20 +3401,18 @@ async function buildStudentTrainingStats(context: RouteContext, clubId: string, 
   );
   const now = Date.now();
   const past = events.filter((event) => {
-    const startsAt = Date.parse(event.timeRange?.startsAt ?? "");
-    return Number.isFinite(startsAt) && startsAt <= now && event.status !== "cancelled";
+    const endsAt = Date.parse(event.timeRange?.endsAt ?? event.timeRange?.startsAt ?? "");
+    return Number.isFinite(endsAt) && endsAt <= now && event.status !== "cancelled";
   });
   const pastTrainings = past.filter((event) => event.type === "training");
 
-  let attended = 0;
-  let recorded = 0;
-  for (const event of past) {
+  let attendedLessons = 0;
+  for (const event of pastTrainings) {
     const status = statusByEvent.get(event.id);
-    if (status === "present" || status === "absent" || status === "excused") {
-      recorded += 1;
-      if (status === "present") attended += 1;
-    }
+    if (status === "present") attendedLessons += 1;
   }
+  const expectedLessons = pastTrainings.length;
+  const attendanceRate = expectedLessons ? Math.round((attendedLessons / expectedLessons) * 100) : null;
 
   const cnMonthKey = (iso: string) => {
     const shifted = new Date(Date.parse(iso) + 8 * 60 * 60 * 1000);
@@ -3268,7 +3434,12 @@ async function buildStudentTrainingStats(context: RouteContext, clubId: string, 
 
   return {
     totalTrainings: pastTrainings.length,
-    attendanceRate: recorded ? Math.round((attended / recorded) * 100) : null,
+    attendanceRate,
+    lessonStats: {
+      attendedLessons,
+      expectedLessons,
+      attendanceRate,
+    },
     monthTrainings,
     monthly,
   };

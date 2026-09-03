@@ -636,6 +636,8 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
       {
         id: "assessment-task-cq-talent-fitness-july",
         clubId,
+        teamId: "team-u10-dev",
+        termLabel: "2026 夏季学期",
         title: "体能综合测评",
         templateId: "assessment-template-technical",
         startsOn: "2026-07-01",
@@ -644,6 +646,8 @@ export function createCqTalentAcceptanceSeed(): Partial<SeedData> {
       {
         id: "assessment-task-cq-talent-speed-august",
         clubId,
+        teamId: "team-u10-dev",
+        termLabel: "2026 夏季学期",
         title: "速度耐力体测",
         templateId: "assessment-template-technical",
         startsOn: "2026-08-01",

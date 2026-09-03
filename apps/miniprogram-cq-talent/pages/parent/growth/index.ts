@@ -265,7 +265,7 @@ function buildHeroStats(growth: GrowthSummary) {
   const stats = growth.trainingStats;
   if (!stats) return [];
   return [
-    { value: `${stats.totalTrainings}`, label: "训练课时", accent: false },
+    { value: `${stats.lessonStats.attendedLessons}/${stats.lessonStats.expectedLessons}`, label: "已到/应到课时", accent: false },
     { value: stats.attendanceRate === null ? "—" : `${stats.attendanceRate}%`, label: "出勤率", accent: stats.attendanceRate !== null },
     { value: `${stats.monthTrainings}`, label: "本月训练", accent: false },
   ];

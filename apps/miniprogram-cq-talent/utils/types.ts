@@ -178,6 +178,11 @@ export interface MetricDetail {
 export interface GrowthTrainingStats {
   totalTrainings: number;
   attendanceRate: number | null;
+  lessonStats: {
+    attendedLessons: number;
+    expectedLessons: number;
+    attendanceRate: number | null;
+  };
   monthTrainings: number;
   monthly: Array<{ month: number; count: number }>;
 }

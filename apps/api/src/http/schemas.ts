@@ -736,10 +736,12 @@ export const schemas = {
     body: {
       type: "object",
       additionalProperties: false,
-      required: ["title", "templateId", "startsOn", "dueOn"],
+      required: ["title", "templateId", "teamId", "termLabel", "startsOn", "dueOn"],
       properties: {
         title: { type: "string", minLength: 1, maxLength: 60 },
         templateId: { type: "string", minLength: 1 },
+        teamId: { type: "string", minLength: 1 },
+        termLabel: { type: "string", minLength: 1, maxLength: 40 },
         startsOn: { type: "string", pattern: "^\\d{4}-\\d{2}-\\d{2}$" },
         dueOn: { type: "string", pattern: "^\\d{4}-\\d{2}-\\d{2}$" },
       },
@@ -957,6 +959,45 @@ export const schemas = {
     },
     response: {
       200: flexibleObject,
+      400: errorResponse,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientTrainingContentAssessments: {
+    response: {
+      200: { type: "object", additionalProperties: true },
+      400: errorResponse,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
+  appClientTrainingContentAssessmentsUpdate: {
+    body: {
+      type: "object",
+      additionalProperties: false,
+      required: ["assessments"],
+      properties: {
+        assessments: {
+          type: "array",
+          minItems: 1,
+          maxItems: 200,
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["studentId", "trainingProjectId", "score"],
+            properties: {
+              studentId: { type: "string", minLength: 1 },
+              trainingProjectId: { type: "string", minLength: 1 },
+              score: { type: "integer", minimum: 0, maximum: 100 },
+              note: { type: "string", maxLength: 500 },
+            },
+          },
+        },
+      },
+    },
+    response: {
+      200: { type: "object", additionalProperties: true },
       400: errorResponse,
       403: errorResponse,
       404: errorResponse,

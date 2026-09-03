@@ -46,6 +46,7 @@ export interface RecordAssessmentInput {
   assessedByCoachId: EntityId;
   assessedAt?: string;
   eventId?: EntityId;
+  assessmentTaskId?: EntityId;
   summary?: string;
   scores?: AssessmentScoreInput[];
   rawResults?: AssessmentRawResultInput[];
@@ -161,6 +162,7 @@ export function createAssessmentService(dependencies: AssessmentServiceDependenc
         assessedByCoachId: input.assessedByCoachId,
         assessedAt,
         eventId: input.eventId,
+        assessmentTaskId: input.assessmentTaskId,
         summary: input.summary,
         createdAt: now,
         updatedAt: now,

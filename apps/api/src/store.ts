@@ -86,6 +86,7 @@ import type {
   EventChangeRequest,
   EventChangeRequestInput,
   AssessmentTask,
+  TrainingContentAssessment,
   ContentArticle,
   ContentFaq,
   VenueInfo,
@@ -176,6 +177,9 @@ export interface ApiStore {
   createEventChangeRequest(clubId: EntityId, eventId: EntityId, input: EventChangeRequestInput): EventChangeRequest | Promise<EventChangeRequest>;
   listAssessmentTasks(clubId: EntityId): AssessmentTask[] | Promise<AssessmentTask[]>;
   saveAssessmentTask(task: AssessmentTask): AssessmentTask | Promise<AssessmentTask>;
+  listPlayerAssessments(clubId: EntityId): PlayerAssessment[] | Promise<PlayerAssessment[]>;
+  listTrainingContentAssessments(clubId: EntityId, eventId: EntityId): TrainingContentAssessment[] | Promise<TrainingContentAssessment[]>;
+  saveTrainingContentAssessment(assessment: TrainingContentAssessment): TrainingContentAssessment | Promise<TrainingContentAssessment>;
   listContentArticles(clubId: EntityId): ContentArticle[] | Promise<ContentArticle[]>;
   listContentFaqs(clubId: EntityId): ContentFaq[] | Promise<ContentFaq[]>;
   listVenues(clubId: EntityId): VenueInfo[] | Promise<VenueInfo[]>;
@@ -1843,6 +1847,20 @@ export abstract class SeedBackedStore implements ApiStore {
     return upsertById(this.data.assessmentTasks, task);
   }
 
+  listPlayerAssessments(clubId: EntityId): PlayerAssessment[] | Promise<PlayerAssessment[]> {
+    return this.data.playerAssessments.filter((item) => item.clubId === clubId);
+  }
+
+  listTrainingContentAssessments(clubId: EntityId, eventId: EntityId): TrainingContentAssessment[] | Promise<TrainingContentAssessment[]> {
+    return this.data.trainingContentAssessments
+      .filter((item) => item.clubId === clubId && item.eventId === eventId)
+      .sort((left, right) => left.studentId.localeCompare(right.studentId) || left.trainingProjectId.localeCompare(right.trainingProjectId));
+  }
+
+  saveTrainingContentAssessment(assessment: TrainingContentAssessment): TrainingContentAssessment | Promise<TrainingContentAssessment> {
+    return upsertByTrainingContentAssessmentKey(this.data.trainingContentAssessments, assessment);
+  }
+
   listContentArticles(clubId: EntityId): ContentArticle[] {
     return this.data.contentArticles.filter((item) => item.clubId === clubId);
   }
@@ -2492,6 +2510,20 @@ export class PersistentApiStore extends SeedBackedStore {
   override async saveAssessmentTask(task: AssessmentTask): Promise<AssessmentTask> {
     const saved = await super.saveAssessmentTask(task);
     await this.repositories.assessmentTasks.save(saved);
+    return saved;
+  }
+
+  override async listPlayerAssessments(clubId: EntityId): Promise<PlayerAssessment[]> {
+    return this.repositories.assessments.listAssessments(clubId);
+  }
+
+  override async listTrainingContentAssessments(clubId: EntityId, eventId: EntityId): Promise<TrainingContentAssessment[]> {
+    return this.repositories.trainingContentAssessments.listByEvent(clubId, eventId);
+  }
+
+  override async saveTrainingContentAssessment(assessment: TrainingContentAssessment): Promise<TrainingContentAssessment> {
+    const saved = this.repositories.trainingContentAssessments.save(assessment);
+    upsertByTrainingContentAssessmentKey(this.data.trainingContentAssessments, saved);
     return saved;
   }
 
@@ -3407,6 +3439,10 @@ function mergePersistedAssessmentData(repositories: PlatformRepositories, data: 
       data.assessmentTasks,
       clubIds.flatMap((clubId) => repositories.assessmentTasks.listByClub(clubId)),
     ),
+    trainingContentAssessments: mergeById(
+      data.trainingContentAssessments,
+      clubIds.flatMap((clubId) => repositories.trainingContentAssessments.listByClub(clubId)),
+    ),
   };
 }
 
@@ -3495,6 +3531,24 @@ function upsertByTrainingEvent(items: TrainingSession[], session: TrainingSessio
     items[index] = session;
   }
   return session;
+}
+
+function upsertByTrainingContentAssessmentKey(
+  items: TrainingContentAssessment[],
+  assessment: TrainingContentAssessment,
+): TrainingContentAssessment {
+  const index = items.findIndex((item) =>
+    item.clubId === assessment.clubId
+    && item.eventId === assessment.eventId
+    && item.studentId === assessment.studentId
+    && item.trainingProjectId === assessment.trainingProjectId,
+  );
+  if (index < 0) {
+    items.push(assessment);
+  } else {
+    items[index] = assessment;
+  }
+  return assessment;
 }
 
 function participantKey(participant: EventParticipant): string {

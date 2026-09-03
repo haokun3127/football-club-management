@@ -10,6 +10,88 @@ import { buildServer } from "../src/server.js";
 import { PersistentApiStore } from "../src/store.js";
 
 describe("platform persistence", () => {
+  it("keeps training-content assessments after a file database reopen", { timeout: 30_000 }, async () => {
+    const directory = mkdtempSync(join(tmpdir(), "football-training-content-assessment-"));
+    const databasePath = join(directory, "club.sqlite");
+    const data = createSeedData();
+    let first: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
+    let firstApp: ReturnType<typeof buildServer> | undefined;
+    let reopened: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
+    let reopenedApp: ReturnType<typeof buildServer> | undefined;
+    const base = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1";
+
+    try {
+      first = await createPlatformPersistence({ databasePath, seedData: data });
+      firstApp = buildServer(
+        new PersistentApiStore(first.repositories, data),
+        {
+          logger: false,
+          membershipResolver: new HeaderMembershipResolver(first.repositories.users, first.repositories.memberships),
+        },
+      );
+      const headers = { "x-user-id": "user-coach-1" };
+
+      await expect(firstApp.inject({
+        method: "PUT",
+        url: `${base}/training-projects`,
+        headers: { ...headers, "idempotency-key": "training-content-restart-projects" },
+        payload: { projectIds: ["drill-cq-talent-assessment-001"] },
+      })).resolves.toEqual(expect.objectContaining({ statusCode: 200 }));
+      await expect(firstApp.inject({
+        method: "PUT",
+        url: `${base}/attendance`,
+        headers: { ...headers, "idempotency-key": "training-content-restart-attendance" },
+        payload: { participants: [{ studentId: "student-1", status: "present" }] },
+      })).resolves.toEqual(expect.objectContaining({ statusCode: 200 }));
+      const saved = await firstApp.inject({
+        method: "PUT",
+        url: `${base}/training-content-assessments`,
+        headers,
+        payload: {
+          assessments: [{
+            studentId: "student-1",
+            trainingProjectId: "drill-cq-talent-assessment-001",
+            score: 91,
+            note: "重启验证",
+          }],
+        },
+      });
+      expect(saved.statusCode).toBe(200);
+
+      await firstApp.close();
+      firstApp = undefined;
+      first.database.close();
+      first = undefined;
+
+      const reopenedData = createSeedData();
+      reopened = await createPlatformPersistence({ databasePath, seed: true, seedData: reopenedData });
+      reopenedApp = buildServer(
+        new PersistentApiStore(reopened.repositories, reopenedData),
+        {
+          logger: false,
+          membershipResolver: new HeaderMembershipResolver(reopened.repositories.users, reopened.repositories.memberships),
+        },
+      );
+      const reread = await reopenedApp.inject({ method: "GET", url: `${base}/training-content-assessments`, headers: { "x-user-id": "user-coach-1" } });
+      expect(reread.statusCode).toBe(200);
+      expect((reread.json() as { assessments: Array<{ score: number; note?: string }> }).assessments).toEqual([
+        expect.objectContaining({ score: 91, note: "重启验证" }),
+      ]);
+      const count = reopened.database.prepare(`
+        SELECT COUNT(*) AS count
+        FROM training_content_assessments
+        WHERE club_id = ? AND event_id = ? AND student_id = ? AND training_project_id = ?
+      `).get("club-chongqing-talent", "event-training-1", "student-1", "drill-cq-talent-assessment-001") as { count: number };
+      expect(count.count).toBe(1);
+    } finally {
+      await reopenedApp?.close();
+      await firstApp?.close();
+      reopened?.database.close();
+      first?.database.close();
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   it("keeps the saved training session association after a file database reopen", { timeout: 45_000 }, async () => {
     const directory = mkdtempSync(join(tmpdir(), "football-training-session-"));
     const databasePath = join(directory, "club.sqlite");
@@ -161,6 +243,8 @@ describe("platform persistence", () => {
     const task = {
       id: "assessment-task-persistence-regression",
       clubId: "club-chongqing-talent",
+      teamId: "team-u10-dev",
+      termLabel: "2026 秋季学期",
       title: "Persistence regression assessment",
       templateId: "assessment-template-technical",
       startsOn: "2026-08-01",
@@ -318,6 +402,18 @@ describe("platform persistence", () => {
 
     try {
       const firstData = createSeedData();
+      const today = new Date().toISOString().slice(0, 10);
+      const assessmentTaskId = "assessment-task-persistence-reopen";
+      firstData.assessmentTasks.push({
+        id: assessmentTaskId,
+        clubId: "club-chongqing-talent",
+        teamId: "team-u10-dev",
+        termLabel: "持久化验证学期",
+        title: "重启后学期测评",
+        templateId: "assessment-template-technical",
+        startsOn: today,
+        dueOn: today,
+      });
       first = await createPlatformPersistence({ databasePath, seedData: firstData });
       firstApp = buildServer(
         new PersistentApiStore(first.repositories, firstData),
@@ -328,6 +424,7 @@ describe("platform persistence", () => {
       );
 
       const assessmentPayload = {
+        assessmentTaskId,
         studentId: "student-1",
         templateId: "assessment-template-technical",
         templateVersionId: "assessment-template-version-technical-1",
@@ -519,6 +616,8 @@ describe("platform persistence", () => {
       "0015_session_plans.sql",
       "0016_training_sessions.sql",
       "0017_match_rosters.sql",
+      "0018_training_content_assessments.sql",
+      "0019_assessment_task_scope.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);
@@ -562,6 +661,8 @@ describe("platform persistence", () => {
           ,'session_plans'
           ,'training_sessions'
           ,'match_rosters'
+          ,'training_content_assessments'
+          ,'assessment_tasks'
         )
       ORDER BY name
     `).all() as Array<{ name: string }>;
@@ -601,6 +702,7 @@ describe("platform persistence", () => {
       "student_guardian_bindings",
       "student_operational_profiles",
       "tactical_boards",
+      "training_content_assessments",
       "training_sessions",
     ]);
 

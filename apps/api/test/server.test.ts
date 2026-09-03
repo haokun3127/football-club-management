@@ -1202,10 +1202,60 @@ describe("api server", () => {
     persistence.database.close();
   });
 
+  it("counts only completed training attendance as parent lesson stats", async () => {
+    const seed = createSeedData();
+    const training = seed.events.find((event) => event.id === "event-training-1")!;
+    const match = seed.events.find((event) => event.id === "event-match-1")!;
+    training.status = "completed";
+    training.timeRange = { startsAt: "2026-08-10T09:00:00.000Z", endsAt: "2026-08-10T10:00:00.000Z" };
+    match.status = "completed";
+    match.timeRange = { startsAt: "2026-08-11T09:00:00.000Z", endsAt: "2026-08-11T10:00:00.000Z" };
+    seed.participants.find((participant) => participant.eventId === training.id && participant.studentId === "student-1")!.status = "present";
+    seed.participants.find((participant) => participant.eventId === match.id && participant.studentId === "student-1")!.status = "absent";
+
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:", seedData: seed });
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories, seed),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/growth-summary",
+      headers: { "x-user-id": "user-parent-1" },
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect((response.json() as {
+      trainingStats: { lessonStats: { attendedLessons: number; expectedLessons: number; attendanceRate: number | null } };
+    }).trainingStats.lessonStats).toEqual({
+      attendedLessons: 1,
+      expectedLessons: 1,
+      attendanceRate: 100,
+    });
+
+    await app.close();
+    persistence.database.close();
+  });
+
   it("serves app-client login, status, metric drilldown, and coach write contracts", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const store = new PersistentApiStore(persistence.repositories);
+    await store.saveAssessmentTask({
+      id: "assessment-task-server-contract",
+      clubId: "club-chongqing-talent",
+      teamId: "team-u10-dev",
+      termLabel: "2026 秋季学期",
+      title: "服务契约测评",
+      templateId: "assessment-template-technical",
+      startsOn: "2026-09-01",
+      dueOn: "2026-09-30",
+    });
     const app = buildServer(
-      new PersistentApiStore(persistence.repositories),
+      store,
       {
         logger: false,
         membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
@@ -3215,14 +3265,26 @@ describe("api server", () => {
 
   it("preserves assessment app-client routes and role-scoped parent reads", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const store = new PersistentApiStore(persistence.repositories);
+    await store.saveAssessmentTask({
+      id: "assessment-task-route-contract",
+      clubId: "club-chongqing-talent",
+      teamId: "team-u10-dev",
+      termLabel: "2026 秋季学期",
+      title: "路由契约测评",
+      templateId: "assessment-template-technical",
+      startsOn: "2026-09-01",
+      dueOn: "2026-09-30",
+    });
     const app = buildServer(
-      new PersistentApiStore(persistence.repositories),
+      store,
       {
         logger: false,
         membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
       },
     );
     const payload = {
+      assessmentTaskId: "assessment-task-route-contract",
       studentId: "student-1",
       templateId: "assessment-template-technical",
       templateVersionId: "assessment-template-version-technical-1",
@@ -3233,6 +3295,8 @@ describe("api server", () => {
       }],
     };
     const appClientRoute = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/assessments";
+    const genericPayload = { ...payload };
+    delete genericPayload.assessmentTaskId;
 
     const [coachWrite, genericWrite, parentWrite, noScopeCoachWrite] = await Promise.all([
       app.inject({ method: "POST", url: appClientRoute, headers: { "x-user-id": "user-coach-1" }, payload }),
@@ -3240,7 +3304,7 @@ describe("api server", () => {
         method: "POST",
         url: "/clubs/club-chongqing-talent/assessments",
         headers: { "x-user-id": "user-coach-1" },
-        payload,
+        payload: genericPayload,
       }),
       app.inject({ method: "POST", url: appClientRoute, headers: { "x-user-id": "user-parent-1" }, payload }),
       app.inject({ method: "POST", url: appClientRoute, headers: { "x-user-id": "user-coach-no-club-scope" }, payload }),
@@ -3685,21 +3749,68 @@ describe("api server", () => {
       method: "POST",
       url: base,
       headers: { "x-user-id": "user-coach-1" },
-      payload: { title: "月度技术测评", templateId, startsOn: "2026-08-21", dueOn: "2026-08-31" },
+      payload: {
+        title: "月度技术测评",
+        templateId,
+        teamId: "team-u10-dev",
+        termLabel: "2026 秋季学期",
+        startsOn: "2026-09-01",
+        dueOn: "2026-09-30",
+      },
     });
     expect(created.statusCode).toBe(201);
-    const createdTask = (created.json() as { task: { id: string; title: string } }).task;
+    const createdTask = (created.json() as { task: { id: string; title: string; teamId: string; termLabel: string } }).task;
     expect(createdTask.title).toBe("月度技术测评");
+    expect(createdTask.teamId).toBe("team-u10-dev");
+    expect(createdTask.termLabel).toBe("2026 秋季学期");
+
+    const blankTerm = await app.inject({
+      method: "POST",
+      url: base,
+      headers: { "x-user-id": "user-coach-1" },
+      payload: {
+        title: "学期不能为空",
+        templateId,
+        teamId: "team-u10-dev",
+        termLabel: "   ",
+        startsOn: "2026-09-01",
+        dueOn: "2026-09-30",
+      },
+    });
+    expect(blankTerm.statusCode).toBe(400);
 
     const relisted = await app.inject({ method: "GET", url: base, headers: { "x-user-id": "user-coach-1" } });
     const relistedTasks = (relisted.json() as { tasks: Array<{ id: string }> }).tasks;
     expect(relistedTasks.some((task) => task.id === createdTask.id)).toBe(true);
 
+    const submitted = await app.inject({
+      method: "POST",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/assessments",
+      headers: { "x-user-id": "user-coach-1" },
+      payload: {
+        assessmentTaskId: createdTask.id,
+        studentId: "student-1",
+        templateId,
+        templateVersionId: "assessment-template-version-technical-1",
+        rawResults: [{
+          testItemId: "assessment-test-finishing-cq-talent",
+          value: { kind: "rating_1_5", score: 4 },
+        }],
+      },
+    });
+    expect(submitted.statusCode).toBe(201);
+    expect((submitted.json() as { assessment: { assessmentTaskId?: string } }).assessment.assessmentTaskId).toBe(createdTask.id);
+
+    const progressAfterSubmission = await app.inject({ method: "GET", url: base, headers: { "x-user-id": "user-coach-1" } });
+    const boundTask = (progressAfterSubmission.json() as { tasks: Array<{ id: string; completedStudents: number }> }).tasks
+      .find((task) => task.id === createdTask.id);
+    expect(boundTask?.completedStudents).toBe(1);
+
     const badTemplate = await app.inject({
       method: "POST",
       url: base,
       headers: { "x-user-id": "user-coach-1" },
-      payload: { title: "无效模板", templateId: "nope", startsOn: "2026-08-21", dueOn: "2026-08-31" },
+      payload: { title: "无效模板", templateId: "nope", teamId: "team-u10-dev", termLabel: "2026 秋季学期", startsOn: "2026-09-01", dueOn: "2026-09-30" },
     });
     expect(badTemplate.statusCode).toBe(400);
 
@@ -3707,9 +3818,94 @@ describe("api server", () => {
       method: "POST",
       url: base,
       headers: { "x-user-id": "user-coach-1" },
-      payload: { title: "日期倒挂", templateId, startsOn: "2026-08-31", dueOn: "2026-08-21" },
+      payload: { title: "日期倒挂", templateId, teamId: "team-u10-dev", termLabel: "2026 秋季学期", startsOn: "2026-09-30", dueOn: "2026-09-01" },
     });
     expect(badPeriod.statusCode).toBe(400);
+  });
+
+  it("persists training-content assessments only for present students and selected training content", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const app = buildServer(
+      new PersistentApiStore(persistence.repositories),
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+    const base = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1";
+    const headers = { "x-user-id": "user-coach-1" };
+
+    const selected = await app.inject({
+      method: "PUT",
+      url: `${base}/training-projects`,
+      headers: { ...headers, "idempotency-key": "training-content-assessment-projects" },
+      payload: { projectIds: ["drill-cq-talent-assessment-001"] },
+    });
+    expect(selected.statusCode).toBe(200);
+
+    const attendance = await app.inject({
+      method: "PUT",
+      url: `${base}/attendance`,
+      headers: { ...headers, "idempotency-key": "training-content-assessment-attendance" },
+      payload: { participants: [{ studentId: "student-1", status: "present" }] },
+    });
+    expect(attendance.statusCode).toBe(200);
+
+    const saved = await app.inject({
+      method: "PUT",
+      url: `${base}/training-content-assessments`,
+      headers,
+      payload: {
+        assessments: [{
+          studentId: "student-1",
+          trainingProjectId: "drill-cq-talent-assessment-001",
+          score: 88,
+          note: "传接球处理稳定",
+        }],
+      },
+    });
+    expect(saved.statusCode).toBe(200);
+    expect((saved.json() as { assessments: Array<{ studentId: string; trainingProjectId: string; score: number; note?: string }> }).assessments).toEqual([
+      expect.objectContaining({
+        studentId: "student-1",
+        trainingProjectId: "drill-cq-talent-assessment-001",
+        score: 88,
+        note: "传接球处理稳定",
+      }),
+    ]);
+
+    const reread = await app.inject({ method: "GET", url: `${base}/training-content-assessments`, headers });
+    expect(reread.statusCode).toBe(200);
+    expect((reread.json() as { assessments: Array<{ score: number }> }).assessments).toEqual([
+      expect.objectContaining({ score: 88 }),
+    ]);
+
+    const missingProject = await app.inject({
+      method: "PUT",
+      url: `${base}/training-content-assessments`,
+      headers,
+      payload: { assessments: [{ studentId: "student-1", trainingProjectId: "drill-cq-talent-assessment-002", score: 80 }] },
+    });
+    expect(missingProject.statusCode).toBe(400);
+
+    const absentStudent = await app.inject({
+      method: "PUT",
+      url: `${base}/training-content-assessments`,
+      headers,
+      payload: { assessments: [{ studentId: "student-2", trainingProjectId: "drill-cq-talent-assessment-001", score: 80 }] },
+    });
+    expect(absentStudent.statusCode).toBe(400);
+
+    const matchAttempt = await app.inject({
+      method: "PUT",
+      url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-match-1/training-content-assessments",
+      headers,
+      payload: { assessments: [{ studentId: "student-1", trainingProjectId: "drill-cq-talent-assessment-001", score: 80 }] },
+    });
+    expect(matchAttempt.statusCode).toBe(400);
+
+    await app.close();
+    persistence.database.close();
   });
 
   it("roundtrips coach preferences and rejects parents", async () => {

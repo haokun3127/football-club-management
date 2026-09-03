@@ -319,6 +319,16 @@ export function buildOpenApiDocument() {
           ...schemas.appClientTrainingProjectsUpdate,
         }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/training-content-assessments": {
+        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/training-content-assessments", {
+          ...schemas.appClientEventParams,
+          ...schemas.appClientTrainingContentAssessments,
+        }),
+        put: operation("PUT", "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/training-content-assessments", {
+          ...schemas.appClientEventParams,
+          ...schemas.appClientTrainingContentAssessmentsUpdate,
+        }),
+      },
       "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/attendance": {
         put: operation("PUT", "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/attendance", {
           ...schemas.appClientEventParams,
