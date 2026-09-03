@@ -2870,3 +2870,10 @@
 - 重新读取在线 Parent V7 能力模型更新页 `zZ6wKyOHKcO4UYXDd9jGwv / 1967:164`，确认摘要分数下方文案为“综合分”。
 - 小程序将固定文案从“最新分”改为“综合分”，真实能力时间线、分数计算、来源跳转和 API 契约保持不变。
 - 红测准确复现旧 WXML 文案，绿测：P4.1 Vitest `2/2`、小程序 TypeScript、WXML/WXSS 编译通过。通过真实双角色入口切换到家长端后，使用项目页面通道打开并复拍：`C:\Users\ASUS\AppData\Local\Temp\cq-talent-parent-p41-runtime-current.png`（`390×844`），页面显示“综合分”和当前真实的一条能力更新记录，控制台错误过滤无命中；该图是运行态证据，不冒充严格 `375×812` 像素验收。
+
+## 2026-09-03 P4 课时情况外框清理
+
+- 用户反馈成长页深色球员卡中的课时统计行仍有白色/浅色方框边线。根因已定位为重复 `.p4-hero__stats` 规则：一条设置完整边框，后一条只覆盖顶部边框，导致左右和底部不会自动清除。
+- 设计先行：在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 1967:21 / Stats Row` 已改为仅顶部描边（top `1`，right/bottom/left `0`）；内部竖向分隔线 `1967:25`、`1967:29` 保留。
+- 小程序同步合并为单一 `.p4-hero__stats` 规则，仅保留 `border-top: 1rpx solid #334155`；新增回归断言，禁止恢复完整 `border`，同时锁定两条内部竖分隔线。
+- 验证：成长页 Vitest `9/9`、小程序 TypeScript `--noEmit`、微信开发者工具 MCP WXML/WXSS 编译及 `git diff --check` 均通过。

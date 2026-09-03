@@ -227,8 +227,9 @@ describe("parent growth training history", () => {
     expect(styles).toMatch(/\.p4-hero__stat-value--fraction\s*\{(?=[^}]*font-size:\s*44rpx)(?=[^}]*line-height:\s*52rpx)/s);
   });
 
-  it("keeps the hero stats panel outline and separators from the Figma board", () => {
-    expect(styles).toMatch(/\.p4-hero__stats\s*\{[^}]*border:\s*1rpx\s+solid\s+#334155/);
+  it("keeps only the hero stats top divider and its internal separators from the Figma board", () => {
+    expect(styles).not.toMatch(/\.p4-hero__stats\s*\{[^}]*border:\s*1rpx\s+solid\s+#334155/);
+    expect(styles).toMatch(/\.p4-hero__stats\s*\{[^}]*border-top:\s*1rpx\s+solid\s+#334155/);
     expect(styles).toMatch(/\.p4-hero__stat\s*\+\s*\.p4-hero__stat\s*\{[^}]*border-left:\s*1rpx\s+solid\s+#334155/);
   });
 });
