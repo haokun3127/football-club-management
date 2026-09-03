@@ -8,6 +8,7 @@ The API currently uses SQLite persistence with ordered SQL migrations and reposi
 - Migration names are part of expected test output; update `apps/api/test/persistence.test.ts` when adding a migration.
 - Migrations must be idempotently tracked by the migration runner: first run applies files, second run skips the same files.
 - Keep database column names snake_case and translate to TypeScript shapes in repository code.
+- When a later migration adds nullable scope columns to a historical table, do not map those legacy nullable values directly through a required domain-field decoder. Either normalize a value with an explicit, valid migration policy or exclude rows that are not eligible for the new scoped workflow. Never invent a team, owner, or tenant scope during a repository read.
 
 ## Repository Rules
 
@@ -83,6 +84,12 @@ upsertById(this.data.sessionPlans, saved);
 - SQLite helper: `apps/api/src/persistence/sqlite.ts`
 - Repository assembly: `apps/api/src/persistence/platform-persistence.ts`
 - Natural-key reseed regression: `apps/api/test/persistence.test.ts`
+
+## Assessment Task Scope Compatibility
+
+- Migration `0019_assessment_task_scope.sql` adds nullable `team_id` and `term_label` to the historical `assessment_tasks` table. Existing rows can therefore legitimately have neither value.
+- `AssessmentTaskRepository.listByClub` returns only rows with a nonblank team and term scope. Scoped coach assessment routes may safely use those returned tasks for roster authorization and progress; an unscoped legacy row stays intact in SQLite but cannot be presented as a scoped task or receive a fabricated team assignment.
+- Regression coverage must create a persisted legacy row with `team_id = NULL` and `term_label = NULL`, then prove `PersistentApiStore` opens and the repository excludes that row without modifying it.
 
 ## Training Session Association Persistence
 

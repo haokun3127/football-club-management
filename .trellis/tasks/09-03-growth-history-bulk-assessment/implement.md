@@ -24,6 +24,12 @@
 - Root `corepack pnpm run check` remains blocked only by the two pre-existing, out-of-scope mini-program failures: `scripts/devtools-screenshot.test.mjs` has a collection-time syntax error, and `pages/parent/content/index.test.mjs` has an LF/CRLF-sensitive exact CSS-string assertion. No code in either file is part of this task.
 - Trusted WeChat DevTools/device `375×812` runtime screenshots for C12.1/C13/C14 are still outstanding; static/type/API evidence must not be labeled visual acceptance.
 
+## 2026-09-03 production compatibility recovery
+
+- A first production deployment of `a4d9542` exposed a legacy-data compatibility issue: `0019_assessment_task_scope.sql` had added nullable `team_id`/`term_label`, while the repository decoder treated both as required and the API restart looped on an older unscoped task row. No production data was written; a file-consistent SQLite backup was taken before the release attempt.
+- The prior image was restored immediately and both internal and HTTPS health returned `200`. The corrective repository query now excludes only unscoped legacy tasks from the new scope-bound workflow; it does not infer or write a team for any historic task.
+- A new file-SQLite regression first reproduced the exact startup exception, then passed after the fix. API full suite is `127/127` and API build passes. Production redeployment and WeChat DevTools C12.1 readback remain the next required steps.
+
 ## High-risk files
 
 - `apps/api/src/routes/app-client.routes.ts`: preserve role authorization and existing response compatibility.

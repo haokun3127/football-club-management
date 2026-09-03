@@ -2782,3 +2782,10 @@
 - 新增并通过回归：API 回填 `1/1`；C12.1/C13/C14 联合小程序测试 `22/22`；API 全量 `126/126`；API 与小程序 TypeScript 检查通过；`git diff --check` 通过。
 - 根门禁 `corepack pnpm run check` 仍有两项非本批历史阻断：`apps/miniprogram-cq-talent/scripts/devtools-screenshot.test.mjs` 收集阶段语法错误；`apps/miniprogram-cq-talent/pages/parent/content/index.test.mjs` 的精确 CSS 字符串断言受 LF/CRLF 行尾差异影响。两文件未纳入本批修改。
 - 本批尚未取得有效教练会话下的微信开发者工具/真机 `375×812` 截图；上述结果仅代表静态、API 与单测验证，不代表 C12.1/C13/C14 运行态视觉验收完成。
+
+## 2026-09-03 生产测评任务兼容性回滚与修复
+
+- C12.1 真实教练会话首次进入正文空白后，网络证据确认小程序已经请求新回填端点，但生产 OpenAPI 尚未发布该路由；线上容器仍为旧发布 `1a9a27c`，因此先按受限流程准备发布 `a4d9542`。
+- 发布前已在 Docker named volume 内通过 API 运行身份完成 SQLite 一致性备份；归档校验、私有 `.env.runtime` 保留和 API 源码同步均完成，未导入、清空或手改生产业务数据。
+- 首次重建后发现生产库存在 `team_id/term_label` 为空的历史 `assessment_tasks` 行；迁移 `0019` 允许这些字段为空，但新仓库读取器错误地按必填解析，导致 API 重启循环。已立即使用保留的回滚镜像恢复，内部与 `https://cqtc.pomi.tech/health` 均恢复 `200`。
+- 本地已先以文件 SQLite 写出同形态旧记录并复现异常，再修复为仅将“同时具备非空球队和学期范围”的任务交给新 scoped 测评流程；旧记录保留在数据库中，不猜测或写入球队。回归 `1/1`、任务列表 API `1/1`、API 全量 `127/127` 与 API build 通过。待本修复提交并再次发布后，必须用同一真实教练会话复验 C12.1 页面和新端点。

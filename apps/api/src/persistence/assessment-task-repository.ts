@@ -12,6 +12,8 @@ export class AssessmentTaskRepository {
       SELECT id, club_id, team_id, term_label, title, template_id, starts_on, due_on
       FROM assessment_tasks
       WHERE club_id = ?
+        AND NULLIF(TRIM(team_id), '') IS NOT NULL
+        AND NULLIF(TRIM(term_label), '') IS NOT NULL
       ORDER BY starts_on, due_on, id
     `).all(clubId) as SqlRow[];
 
