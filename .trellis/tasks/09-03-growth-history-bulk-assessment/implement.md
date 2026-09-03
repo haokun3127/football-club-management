@@ -38,6 +38,13 @@
 - `getCoachAssessmentTasks({ forceRefresh: true })` appends a unique cache-busting query value for post-write reads, avoiding stale DevTools task-list status without altering BFF payloads or creating fake data.
 - Fresh verification: targeted mini-program Vitest `37/37`, mini-program TypeScript `--noEmit`, and `git diff --check` all pass. Runtime DevTools navigation was still routing back to the coach schedule, so no screenshot from that state is claimed as C12.1 visual acceptance.
 
+## 2026-09-03 C12.1 saved-state label correction
+
+- Figma board `1985:2` was updated first so completed roster rows show the explicit `已保存` state beside each real raw result; the board was re-read at native `375×812`.
+- A real DevTools run with the correct project id `dimension-technical` loaded 19 persisted scores. It exposed a presentation mismatch: the page data had `row.statusLabel = 已保存`, but WXML rendered the metric helper `待提交` instead.
+- WXML now renders the precomputed row status. Fresh runtime evidence is `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c121-completed-saved-status-reroute-390x844.png`; it shows all visible persisted rows as `已保存`. The simulator was `390×844`, so this is runtime evidence, not strict `375×812` acceptance.
+- The earlier blank direct route was also explained: `fitness` was a debug-only invalid project id; the real form dimension id is `dimension-technical`, and the API correctly returns no bindings for an unknown project id.
+
 ## High-risk files
 
 - `apps/api/src/routes/app-client.routes.ts`: preserve role authorization and existing response compatibility.

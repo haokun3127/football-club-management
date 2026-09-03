@@ -119,6 +119,8 @@ describe("C12.1 team batch assessment entry", () => {
 
     expect(page.data).toMatchObject({ state: "ready", readOnly: true, lastSavedLabel: "已恢复已保存成绩" });
     expect(page.data.rows.map((row) => row.statusLabel)).toEqual(["已保存", "已保存"]);
+    expect(template).toContain('{{item.statusLabel}}');
+    expect(template).not.toContain('{{metric.scoreLabel}}');
     page.onRawInput({ currentTarget: { dataset: { studentId: "student-1", fieldId: "speed" } }, detail: { value: "4.50" } });
     await page.saveProject();
     expect(page.data.rows[0]).toMatchObject({ rawInputValue: "4.92", statusLabel: "已保存" });
