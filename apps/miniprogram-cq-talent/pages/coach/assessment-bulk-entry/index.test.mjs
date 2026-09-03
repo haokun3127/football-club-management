@@ -73,7 +73,7 @@ describe("C12.1 team batch assessment entry", () => {
     const page = createPageInstance();
     await page.onLoad({ taskId: "task-real", templateId: "template-real", projectId: "fitness", title: "体能综合测评" });
 
-    expect(page.data).toMatchObject({ state: "ready", projectTitle: "30米冲刺录入", teamName: "U10发展队", filledLabel: "已填写 0 人 · 未填写 2 人" });
+    expect(page.data).toMatchObject({ state: "ready", projectTitle: "30米冲刺", teamName: "U10发展队", filledLabel: "已填写 0 人 · 未填写 2 人" });
     expect(page.data.rows).toHaveLength(2);
     page.onRawInput({ currentTarget: { dataset: { studentId: "student-1", fieldId: "speed" } }, detail: { value: "4.92" } });
     expect(page.data.rows[0]).toMatchObject({ studentId: "student-1", rawInputValue: "4.92", scoreLabel: "待提交" });
@@ -117,15 +117,17 @@ describe("C12.1 team batch assessment entry", () => {
     const page = createPageInstance();
     await page.onLoad({ taskId: "task-real", templateId: "template-real", projectId: "fitness", title: "体能综合测评" });
 
-    expect(page.data).toMatchObject({ state: "ready", readOnly: true, lastSavedLabel: "已恢复已保存成绩" });
+    expect(page.data).toMatchObject({ state: "ready", readOnly: true, projectTitle: "30米冲刺", filledLabel: "全队 2 人已完成 · 成绩已保存", lastSavedLabel: "已恢复已保存成绩" });
     expect(page.data.rows.map((row) => row.statusLabel)).toEqual(["已保存", "已保存"]);
-    expect(template).toContain('{{item.statusLabel}}');
+    expect(template).toContain("{{readOnly ? '已保存' : item.statusLabel}}");
+    expect(template).toContain('class="bulk-metric__readonly"');
+    expect(template).toContain("class=\"bulk-metric {{readOnly ? 'bulk-metric--readonly' : ''}}\"");
     expect(template).not.toContain('{{metric.scoreLabel}}');
     page.onRawInput({ currentTarget: { dataset: { studentId: "student-1", fieldId: "speed" } }, detail: { value: "4.50" } });
     await page.saveProject();
     expect(page.data.rows[0]).toMatchObject({ rawInputValue: "4.92", statusLabel: "已保存" });
     expect(mocks.submitCoachAssessment).not.toHaveBeenCalled();
-    expect(template).toContain('disabled="{{readOnly}}"');
+    expect(template).toContain('wx:else class="bulk-metric__input"');
   });
 
   it("keeps save and next actions in a full-screen WXML page without array methods", () => {
@@ -151,5 +153,6 @@ describe("C12.1 team batch assessment entry", () => {
     expect(template).not.toContain('class="bulk-hint"');
     expect(stylesheet).toMatch(/\.bulk-row\s*\{[^}]*display:\s*flex[^}]*align-items:\s*center/s);
     expect(stylesheet).toMatch(/\.bulk-metric\s*\{[^}]*display:\s*flex[^}]*border-bottom:/s);
+    expect(stylesheet).toMatch(/\.bulk-metric--readonly\s*\{[^}]*border-bottom:\s*0/s);
   });
 });

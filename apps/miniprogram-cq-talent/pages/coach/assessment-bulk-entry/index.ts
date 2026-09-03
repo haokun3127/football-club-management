@@ -157,6 +157,7 @@ Page<PageData>({
       const savedStudentIds = Object.keys(savedValuesByStudent);
       const projectIds = uniqueProjectIds(form.fields);
       const projectIndex = Math.max(0, projectIds.indexOf(projectId));
+      const readOnly = task.status === "completed";
       this.setData({
         state: "ready",
         statusTitle: "全队录入",
@@ -165,7 +166,7 @@ Page<PageData>({
         templateId: form.templateId,
         templateVersionId: form.templateVersionId,
         projectId,
-        projectTitle: fields[0]?.label ? `${fields[0].label}录入` : fields[0]?.groupLabel || "测评项目",
+        projectTitle: fields[0]?.label || fields[0]?.groupLabel || "测评项目",
         taskTitle: task.title,
         teamName: team.team?.name?.trim() || "球队待同步",
         termLabel: task.termLabel?.trim() || "学期待同步",
@@ -176,9 +177,9 @@ Page<PageData>({
         savedStudentIds,
         projectIds,
         projectIndex,
-        filledLabel: buildFilledLabel(members, valuesByStudent),
+        filledLabel: readOnly ? buildCompletedLabel(members, valuesByStudent) : buildFilledLabel(members, valuesByStudent),
         lastSavedLabel: savedStudentIds.length ? "已恢复已保存成绩" : hasDraftValues(valuesByStudent) ? "已恢复本机草稿" : "",
-        readOnly: task.status === "completed",
+        readOnly,
         submitting: false,
       });
     } catch {
@@ -372,6 +373,11 @@ function mergeValues(base: DraftValues, override: DraftValues): DraftValues {
 function buildFilledLabel(members: Array<{ id: string }>, valuesByStudent: DraftValues) {
   const filled = members.reduce((count, member) => count + (hasStudentValues(valuesByStudent[member.id]) ? 1 : 0), 0);
   return `已填写 ${filled} 人 · 未填写 ${Math.max(0, members.length - filled)} 人`;
+}
+
+function buildCompletedLabel(members: Array<{ id: string }>, valuesByStudent: DraftValues) {
+  const completed = members.reduce((count, member) => count + (hasStudentValues(valuesByStudent[member.id]) ? 1 : 0), 0);
+  return `全队 ${completed} 人已完成 · 成绩已保存`;
 }
 
 function createSignature(fields: AssessmentField[], members: Array<{ id: string }>) {

@@ -14,8 +14,10 @@
 .bulk-row__name { margin-left: 16rpx; overflow: hidden; font-size: 30rpx; font-weight: 700; line-height: 40rpx; text-overflow: ellipsis; white-space: nowrap; }
 .bulk-row__metrics { display: flex; min-width: 0; flex: 1; flex-direction: column; align-items: stretch; margin-left: 20rpx; }
 .bulk-metric { display: flex; min-height: 64rpx; align-items: center; border-bottom: 2rpx solid #dbe1eb; }
+.bulk-metric--readonly { border-bottom: 0; }
 .bulk-metric:last-child { border-bottom: 0; }
 .bulk-metric__input { min-width: 0; flex: 1; color: #202124; font-size: 28rpx; font-weight: 700; line-height: 36rpx; text-align: right; }
+.bulk-metric__readonly { min-width: 0; flex: 1; color: #202124; font-size: 28rpx; font-weight: 700; line-height: 36rpx; }
 .bulk-metric__unit { flex: 0 0 auto; margin-left: 8rpx; color: #667085; font-size: 23rpx; }
 .bulk-metric__score { flex: 0 0 76rpx; margin-left: 16rpx; overflow: hidden; color: #667085; font-size: 22rpx; line-height: 34rpx; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
 .bulk-actions { position: fixed; right: 0; bottom: 0; left: 0; z-index: 110; box-sizing: border-box; padding: 12rpx 32rpx 24rpx; background: rgba(255, 255, 255, .98); box-shadow: 0 -8rpx 24rpx rgba(32, 33, 36, .08); }

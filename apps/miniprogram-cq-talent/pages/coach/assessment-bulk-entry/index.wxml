@@ -16,10 +16,11 @@
       <view wx:for="{{rows}}" wx:key="studentId" class="bulk-row">
         <view class="bulk-row__identity"><view class="bulk-row__avatar">{{item.initials}}</view><view class="bulk-row__name">{{item.name}}</view></view>
         <view class="bulk-row__metrics">
-          <view wx:for="{{item.metrics}}" wx:for-item="metric" wx:key="fieldId" class="bulk-metric">
-            <input class="bulk-metric__input" type="{{metric.inputType}}" value="{{metric.value}}" placeholder="{{metric.placeholder}}" disabled="{{readOnly}}" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" bindinput="onRawInput" />
-            <text class="bulk-metric__unit">{{metric.unitLabel}}</text>
-            <text class="bulk-metric__score">{{item.statusLabel}}</text>
+          <view wx:for="{{item.metrics}}" wx:for-item="metric" wx:key="fieldId" class="bulk-metric {{readOnly ? 'bulk-metric--readonly' : ''}}">
+            <view wx:if="{{readOnly}}" class="bulk-metric__readonly"><text>{{metric.value}}</text><text wx:if="{{metric.unitLabel}}"> {{metric.unitLabel}}</text></view>
+            <input wx:else class="bulk-metric__input" type="{{metric.inputType}}" value="{{metric.value}}" placeholder="{{metric.placeholder}}" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" bindinput="onRawInput" />
+            <text wx:if="{{!readOnly}}" class="bulk-metric__unit">{{metric.unitLabel}}</text>
+            <text class="bulk-metric__score">{{readOnly ? '已保存' : item.statusLabel}}</text>
           </view>
         </view>
       </view>

@@ -66,6 +66,19 @@
 - Fresh verification: parent growth/milestones/ability-history/match-history/event/training-history Vitest `29/29`, mini-program TypeScript passed, and `git diff --check` passed.
 - Runtime evidence after refresh and exact route navigation: `C:\Users\ASUS\AppData\Local\Temp\cq-talent-p42-detail-runtime-final-20260903.png` (`390×844`). It shows the real `丁宁的比赛数据` title and all five API-backed events with labels, icons, and minute text. This is runtime evidence only; strict `375×812` acceptance remains separate.
 
+## 2026-09-03 C12.1 completed-state presentation alignment
+
+- Re-read the online completed-state board `1985:2` before changing code. It uses the project name without the “录入” suffix, a completed-team summary (`全队 N 人已完成 · 成绩已保存`), and read-only roster rows that show the raw value plus unit instead of disabled input controls.
+- C12.1 now keeps editable projects as inputs, but renders completed projects as precomputed read-only values and a fixed `已保存` state. The real unit and raw value still come from the assessment form and saved-entry API; no sample value is introduced.
+- Completed summary is derived from the real team roster and hydrated saved values. Draft/save behavior for `in_progress` tasks is unchanged.
+- Verification: C12.1 targeted Vitest `7/7`, mini-program TypeScript passed, and `git diff --check` passed. Runtime revalidation is the next step after the project window receives the refreshed bundle.
+
+## 2026-09-03 C12.1 completed read-only cleanup
+
+- Figma was updated first at `zZ6wKyOHKcO4UYXDd9jGwv / 1985:2`: removed the five leftover `Input Underline` layers from completed read-only roster rows, then re-read the native `375×812` screenshot.
+- The mini-program now adds `bulk-metric--readonly` only for completed tasks and removes the metric bottom border in that state. Editable projects retain the existing input underline and draft behavior.
+- Added a regression that requires the read-only class and zero border. Red phase reproduced both missing template/style contracts; green phase passed C12.1 Vitest `7/7`, mini-program TypeScript, and `git diff --check`.
+
 ## High-risk files
 
 - `apps/api/src/routes/app-client.routes.ts`: preserve role authorization and existing response compatibility.
