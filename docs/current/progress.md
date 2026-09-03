@@ -2804,3 +2804,10 @@
 - 真实 DevTools 通过正确项目 ID `dimension-technical` 读取到 19 名队员的持久化“射门终结评分”。此前用 `fitness` 直达会得到空绑定，这是错误调试参数，不是生产数据丢失。
 - 发现并修复前端显示矛盾：行数据中的 `statusLabel` 已是“已保存”，但 WXML 错误渲染了指标辅助字段 `metric.scoreLabel` 的“待提交”。现在改为渲染真实预计算行状态。
 - 复拍证据：`C:\Users\ASUS\AppData\Local\Temp\cq-talent-c121-completed-saved-status-reroute-390x844.png`，真实模拟器显示分数、19 人完成态、每行“已保存”和底部“返回项目”。本次设备为 `390×844`，因此只记运行态证据，不冒充严格 `375×812` 视觉验收。
+
+## 2026-09-03 C13 六轴雷达投影与运行态复核
+
+- 先重新读取在线 Figma Coach V7 C13 `1973:302`，原生尺寸 `375×812`；当前稿明确展示六个轴：协作、速度、射门、体能、防守、传球。
+- 教练学员雷达页保留真实 API 返回的指标值、上限、指标 ID 和评估时间，仅将已存在的六个真实指标投影到 Figma 的六轴展示名称；“整体战术”和“精神”不再挤入 V7 雷达，也没有补造数值。
+- 通过微信开发者工具 MCP 打开真实教练学员 `student-cq-talent-secure-test-1-1` 并重新编译截图：`C:\Users\ASUS\AppData\Local\Temp\cq-talent-c13-runtime-20260903.png`，截图尺寸 `390×844`。截图确认六轴标签完整、顶部返回键和标题未被遮挡；由于模拟器不是 `375×812`，本条只记录运行态证据，不宣称严格视觉验收完成。
+- 新鲜验证：C13/C14/C12.1/C11/C12/C15 定向 Vitest `57/57`；小程序 TypeScript 通过；`git diff --check` 通过。根门禁 `pnpm run check` 仍准确复现两项历史阻断：`apps/miniprogram-cq-talent/scripts/devtools-screenshot.test.mjs` 收集阶段语法错误；`pages/parent/content/index.test.mjs` 精确 CSS 断言受 LF/CRLF 行尾差异影响失败。

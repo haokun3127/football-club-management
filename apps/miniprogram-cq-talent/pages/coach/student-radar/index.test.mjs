@@ -94,6 +94,26 @@ describe("coach student radar", () => {
     });
   });
 
+  it("projects the real eight-metric response into the six Figma display axes without inventing values", async () => {
+    mocks.getCoachStudentRadar.mockResolvedValueOnce([
+      { metricId: "metric-cq-talent-core-03", label: "运控球", value: 66, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
+      { metricId: "metric-cq-talent-core-10", label: "1v1", value: 70, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
+      { metricId: "metric-cq-talent-core-18", label: "传接球", value: 74, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
+      { metricId: "metric-cq-talent-core-27", label: "射门", value: 78, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
+      { metricId: "metric-cq-talent-core-32", label: "小组配合", value: 82, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
+      { metricId: "metric-cq-talent-core-48", label: "体能", value: 90, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
+      { metricId: "metric-cq-talent-core-38", label: "整体战术", value: 86, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
+      { metricId: "metric-cq-talent-core-56", label: "精神", value: 63, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
+    ]);
+    const page = createPageInstance();
+
+    await page.load("student-1");
+
+    expect(page.data.radar).toHaveLength(6);
+    expect(page.data.dimensions.map((dimension) => dimension.label)).toEqual(["协作", "速度", "射门", "体能", "防守", "传球"]);
+    expect(page.data.radar.map((metric) => metric.value)).toEqual([82, 66, 78, 90, 70, 74]);
+  });
+
   it("does not request a radar when the scoped team has no members", async () => {
     mocks.getCoachTeam.mockResolvedValueOnce({
       team: null,

@@ -38,10 +38,11 @@ Page<PageData>({
     try {
       const radar = await getCoachStudentRadar(student.id);
       if (!isCurrentRequest(this, requestToken)) return;
-      const dimensions = projectDimensions(radar);
+      const displayRadar = projectRadar(radar);
+      const dimensions = projectDimensions(displayRadar);
       const hasRadar = dimensions.length >= 3;
       const normalizedValues = dimensions.map((dimension) => Number.parseFloat(dimension.width));
-      this.setData({ state: hasRadar ? "ready" : "empty", message: hasRadar ? "" : `${student.name} 暂无足够的有效评测数据生成雷达图。`, activeStudentId: student.id, activeStudentName: student.name, radar: hasRadar ? radar.filter(isValidRadarPoint) : [], dimensions, hasRadar, overall: hasRadar ? String(Math.round(average(normalizedValues))) : "-", assessmentPeriod: formatAssessmentPeriod(radar), radarContext: buildRadarContext(this.data.radarContext, radar) });
+      this.setData({ state: hasRadar ? "ready" : "empty", message: hasRadar ? "" : `${student.name} 暂无足够的有效评测数据生成雷达图。`, activeStudentId: student.id, activeStudentName: student.name, radar: hasRadar ? displayRadar : [], dimensions, hasRadar, overall: hasRadar ? String(Math.round(average(normalizedValues))) : "-", assessmentPeriod: formatAssessmentPeriod(displayRadar), radarContext: buildRadarContext(this.data.radarContext, displayRadar) });
     } catch {
       if (isCurrentRequest(this, requestToken)) this.setData({ state: "error", message: "能力雷达读取失败，请稍后重试。", radar: [], dimensions: [], hasRadar: false, overall: "-", assessmentPeriod: "评估时间待同步" });
     }
@@ -57,6 +58,25 @@ Page<PageData>({
 
 function emptyPageData(state: LoadState, message: string): PageData { return { navInset: resolveNavInset(), state, message, radarContext: "球队待同步 · 评估时间待同步", students: [], activeStudentId: "", activeStudentName: "", radar: [], dimensions: [], hasRadar: false, overall: "-", assessmentPeriod: "评估时间待同步" }; }
 function toStudentChips(members: Array<{ id: string; name: string }>): StudentChip[] { const ids = new Set<string>(); const students: StudentChip[] = []; for (const member of members) { const name = member.name.trim(); if (!member.id || !name || ids.has(member.id)) continue; ids.add(member.id); students.push({ id: member.id, name: name.slice(0, 4), initial: name.slice(0, 1) || "学" }); } return students; }
+const FIGMA_RADAR_AXES: Array<{ label: string; metricId: string }> = [
+  { label: "协作", metricId: "metric-cq-talent-core-32" },
+  { label: "速度", metricId: "metric-cq-talent-core-03" },
+  { label: "射门", metricId: "metric-cq-talent-core-27" },
+  { label: "体能", metricId: "metric-cq-talent-core-48" },
+  { label: "防守", metricId: "metric-cq-talent-core-10" },
+  { label: "传球", metricId: "metric-cq-talent-core-18" },
+];
+function projectRadar(radar: RadarMetricPoint[]): RadarMetricPoint[] {
+  const valid = radar.filter(isValidRadarPoint);
+  const byId = new Map(valid.map((point) => [point.metricId, point]));
+  const projected: RadarMetricPoint[] = [];
+  for (const axis of FIGMA_RADAR_AXES) {
+    const point = byId.get(axis.metricId);
+    if (point) projected.push({ ...point, label: axis.label });
+  }
+  if (projected.length >= 3) return projected.slice(0, 6);
+  return valid.slice(0, 6);
+}
 function projectDimensions(radar: RadarMetricPoint[]): RadarDimension[] { return radar.filter(isValidRadarPoint).map((point) => { const normalized = clamp((point.value / point.maxValue) * 100); return { metricId: point.metricId, label: point.label, value: formatScore(point.value), width: `${formatScore(normalized)}%` }; }); }
 function isValidRadarPoint(point: RadarMetricPoint): point is RadarMetricPoint & { value: number } { return typeof point.value === "number" && Number.isFinite(point.value) && Number.isFinite(point.maxValue) && point.maxValue > 0; }
 function formatAssessmentPeriod(radar: RadarMetricPoint[]): string { const dates = radar.map((point) => point.occurredAt).filter((value): value is string => typeof value === "string" && Number.isFinite(Date.parse(value))).map((value) => value.slice(0, 10)).sort(); const first = dates[0]; const last = dates[dates.length - 1]; if (!first || !last) return "评估时间待同步"; return first === last ? `${first} 评估` : `${first} 至 ${last} 评估`; }

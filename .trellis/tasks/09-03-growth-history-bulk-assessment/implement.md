@@ -45,6 +45,13 @@
 - WXML now renders the precomputed row status. Fresh runtime evidence is `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c121-completed-saved-status-reroute-390x844.png`; it shows all visible persisted rows as `已保存`. The simulator was `390×844`, so this is runtime evidence, not strict `375×812` acceptance.
 - The earlier blank direct route was also explained: `fitness` was a debug-only invalid project id; the real form dimension id is `dimension-technical`, and the API correctly returns no bindings for an unknown project id.
 
+## 2026-09-03 C13 six-axis radar projection and runtime readback
+
+- Online Figma Coach V7 C13 `1973:302` was re-read before code verification at native `375×812`; it defines six visible axes: 协作、速度、射门、体能、防守、传球.
+- The coach student radar view now projects the existing real metric response onto those six configured metric IDs for display, preserving each metric's real value, max value, metric ID, and timestamp. The extra “整体战术” and “精神” metrics are not shown in the V7 radar when all six configured axes are available; no score is invented or recalculated.
+- Runtime verification through the WeChat DevTools MCP loaded a real coach student (`student-cq-talent-secure-test-1-1`) after opening `/pages/coach/student-radar/index?student=...`. Screenshot evidence: `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c13-runtime-20260903.png` (`390×844`, so runtime evidence only, not strict `375×812` acceptance). The screenshot shows six complete labels and the fixed top bar.
+- Fresh verification: C13/C14/C12.1/C11/C12/C15 targeted Vitest `57/57`; mini-program TypeScript passed; `git diff --check` passed. Root `pnpm run check` still reports only the two recorded out-of-scope blockers: `scripts/devtools-screenshot.test.mjs` collection-time syntax error and `pages/parent/content/index.test.mjs` LF/CRLF-sensitive exact CSS assertion.
+
 ## High-risk files
 
 - `apps/api/src/routes/app-client.routes.ts`: preserve role authorization and existing response compatibility.
