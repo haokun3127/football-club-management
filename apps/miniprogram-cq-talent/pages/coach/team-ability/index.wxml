@@ -20,7 +20,7 @@
         <view class="ability-context__label">当前训练球队</view>
         <view class="ability-context__main">
           <view class="ability-context__team">{{teamContext}}</view>
-          <view class="ability-context__hint">{{teamHint}}</view>
+          <view class="ability-context__hint">{{teamHint}} ›</view>
         </view>
       </view>
 

@@ -79,6 +79,12 @@
 - The mini-program now adds `bulk-metric--readonly` only for completed tasks and removes the metric bottom border in that state. Editable projects retain the existing input underline and draft behavior.
 - Added a regression that requires the read-only class and zero border. Red phase reproduced both missing template/style contracts; green phase passed C12.1 Vitest `7/7`, mini-program TypeScript, and `git diff --check`.
 
+## 2026-09-03 C14 team ability context arrow alignment
+
+- Re-read the current online Coach V7 C14 board `1973:181`; the team context action is `由训练管理选择 ›`.
+- The C14 WXML now renders the arrow with the real `teamHint` value. No API, team-selection behavior, or score calculation changed.
+- Red/green verification: C14 Vitest `5/5`, mini-program TypeScript, WXML compilation, and a fresh WeChat DevTools runtime screenshot passed; runtime evidence is `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c14-runtime-arrow-final.png` (`390×844`).
+
 ## High-risk files
 
 - `apps/api/src/routes/app-client.routes.ts`: preserve role authorization and existing response compatibility.

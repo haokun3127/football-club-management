@@ -2838,3 +2838,9 @@
 - 先更新在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 1985:2`：删除完成态五个队员行遗留的 `Input Underline` 图层，并重新读取原生 `375×812` 截图。
 - 小程序完成态指标行新增 `bulk-metric--readonly`，只读时关闭底部输入边框；进行中项目仍保留输入下划线、草稿和保存逻辑。
 - 先写回归并准确复现模板/样式契约缺失，再完成最小修复。C12.1 Vitest `7/7`、小程序 TypeScript、`git diff --check` 通过。
+
+## 2026-09-03 C14 球队上下文箭头对齐
+
+- 重新读取在线 Coach V7 C14 `zZ6wKyOHKcO4UYXDd9jGwv / 1973:181`，确认球队上下文操作文案为“由训练管理选择 ›”。
+- C14 WXML 将真实 `teamHint` 与右箭头一起展示；未改 API、球队选择逻辑或能力分数计算。
+- 红测准确复现缺少箭头，修复后 C14 Vitest `5/5`、小程序 TypeScript、WXML 编译通过。微信开发者工具重新导航后的运行态截图为 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c14-runtime-arrow-final.png`（`390×844`），控制台无错误；因设备不是 `375×812`，记录为运行态证据，不冒充严格像素验收。

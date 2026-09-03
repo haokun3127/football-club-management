@@ -162,6 +162,7 @@ describe("coach ability assessment", () => {
     expect(pageConfig).toContain('"navigationBarTitleText": "能力评估"');
     expect(template).toContain('class="ability-context"');
     expect(template).toContain("当前训练球队");
+    expect(template).toContain("{{teamHint}} ›");
     expect(template).toContain('class="ability-roster__grid"');
     expect(template).toContain('class="ability-summary"');
     expect(template).toContain('class="ability-player"');
