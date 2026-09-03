@@ -51,6 +51,9 @@ type ActivityDetailView = Omit<ActivityDetail, "matchEvents"> & {
   attendanceConfirmed: boolean;
   matchEvents: MatchEventView[];
   hasMatchEvents: boolean;
+  matchResultLabel: string;
+  matchNote: string;
+  hasMatchNote: boolean;
 };
 
 const NAV_TITLES = { training: "训练详情", match: "比赛详情", other: "活动详情" } as const;
@@ -157,7 +160,18 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
     attendanceConfirmed: childStatusLabel === "已到场",
     matchEvents: toMatchEvents(detail.matchEvents),
     hasMatchEvents: toMatchEvents(detail.matchEvents).length > 0,
+    matchResultLabel: matchResultLabel(rawScore, status.label),
+    matchNote: fieldValue(detail, ["教练点评", "点评", "评语"]) || sectionValue(detail, ["比赛过程"], ["教练点评", "评语", "表现"]),
+    hasMatchNote: Boolean(fieldValue(detail, ["教练点评", "点评", "评语"]) || sectionValue(detail, ["比赛过程"], ["教练点评", "评语", "表现"])),
   };
+}
+
+function matchResultLabel(score: string, status: string) {
+  const match = score.match(/(\d+)\s*[:：]\s*(\d+)/);
+  if (!match) return status === "已结束" ? "比赛已结束" : status;
+  const home = Number(match[1]);
+  const away = Number(match[2]);
+  return home > away ? "胜利" : home < away ? "失利" : "平局";
 }
 
 function toMatchEvents(events: ActivityDetail["matchEvents"]): MatchEventView[] {

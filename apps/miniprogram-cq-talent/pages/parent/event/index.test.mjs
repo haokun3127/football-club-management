@@ -154,4 +154,15 @@ describe("parent activity detail", () => {
     expect(styles).toContain(".p2-nav__back image { width: 48rpx; height: 48rpx; }");
     expect(styles).toContain("button.p2-nav__action { width: auto; min-width: 0; margin: 0; padding: 0; border: none; background: transparent; line-height: 34rpx; }");
   });
+
+  it("uses the V7 full-screen match detail hierarchy", () => {
+    expect(template).toContain("match-summary");
+    expect(template).toContain("match-summary__venue");
+    expect(template).toContain("{{detail.matchResultLabel}}");
+    expect(template).toContain("{{detail.childName}}的比赛数据");
+    expect(template).toContain("match-note");
+    expect(template).toContain('wx:if="{{!detail || detail.type !== \'match\'}}"');
+    expect(styles).toContain(".match-summary");
+    expect(styles).toContain(".match-note");
+  });
 });
