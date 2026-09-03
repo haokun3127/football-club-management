@@ -45,6 +45,7 @@
     "pages/coach/test-task-create/index",
     "pages/coach/assessment-entry/index",
     "pages/coach/assessment-projects/index",
+    "pages/coach/assessment-bulk-entry/index",
     "pages/coach/assessment-submit/index",
     "pages/coach/attendance-success/index",
     "pages/coach/lesson-correction/index",

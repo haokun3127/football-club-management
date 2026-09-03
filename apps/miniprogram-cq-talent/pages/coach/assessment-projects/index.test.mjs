@@ -61,7 +61,7 @@ describe("C12 assessment project selection", () => {
     ]);
 
     page.openProject({ currentTarget: { dataset: { id: "fitness" } } });
-    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/assessment-entry/index?taskId=task-real&templateId=template-real&projectId=fitness&title=%E4%BD%93%E8%83%BD%E7%BB%BC%E5%90%88%E6%B5%8B%E8%AF%84");
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/assessment-bulk-entry/index?taskId=task-real&templateId=template-real&projectId=fitness&title=%E4%BD%93%E8%83%BD%E7%BB%BC%E5%90%88%E6%B5%8B%E8%AF%84");
   });
 
   it("keeps the page WXML free of array method calls", () => {

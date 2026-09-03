@@ -61,7 +61,7 @@ Page({
   openProject(event: { currentTarget?: { dataset?: { id?: string } } }) {
     const projectId = event.currentTarget?.dataset?.id;
     if (!projectId) return;
-    openPage(`/pages/coach/assessment-entry/index?taskId=${encodeURIComponent(this.data.taskId)}&templateId=${encodeURIComponent(this.data.templateId)}&projectId=${encodeURIComponent(projectId)}&title=${encodeURIComponent(this.data.taskTitle)}`);
+    openPage(`/pages/coach/assessment-bulk-entry/index?taskId=${encodeURIComponent(this.data.taskId)}&templateId=${encodeURIComponent(this.data.templateId)}&projectId=${encodeURIComponent(projectId)}&title=${encodeURIComponent(this.data.taskTitle)}`);
   },
   goBack() {
     wx.navigateBack({ delta: 1 });
