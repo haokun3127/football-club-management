@@ -109,7 +109,7 @@
 
 - Re-read the online Parent V7 ability-history board `zZ6wKyOHKcO4UYXDd9jGwv / 1967:164`; its summary score label is `综合分`, not `最新分`.
 - Added a focused regression, observed it fail against the previous WXML, then changed only the fixed summary label to `综合分`. Real timeline data, score derivation, source navigation, and API contracts are unchanged.
-- Green verification: P4.1 Vitest `2/2`, mini-program TypeScript, and WXML/WXSS compilation passed. The active DevTools session is coach-scoped and redirects the parent route to coach schedule, so no parent runtime screenshot is claimed for this batch.
+- Green verification: P4.1 Vitest `2/2`, mini-program TypeScript, and WXML/WXSS compilation passed. After switching the real dual-role session to parent and opening the page through the project page channel, runtime evidence is `C:\Users\ASUS\AppData\Local\Temp\cq-talent-parent-p41-runtime-current.png` (`390×844`); the page shows the real `综合分` label and the current one-record timeline, with no console matches for `error|exception|fail|route is not defined`. This is runtime evidence only, not strict `375×812` acceptance.
 
 ## High-risk files
 

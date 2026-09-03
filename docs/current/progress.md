@@ -2869,4 +2869,4 @@
 
 - 重新读取在线 Parent V7 能力模型更新页 `zZ6wKyOHKcO4UYXDd9jGwv / 1967:164`，确认摘要分数下方文案为“综合分”。
 - 小程序将固定文案从“最新分”改为“综合分”，真实能力时间线、分数计算、来源跳转和 API 契约保持不变。
-- 红测准确复现旧 WXML 文案，绿测：P4.1 Vitest `2/2`、小程序 TypeScript、WXML/WXSS 编译通过。当前 DevTools 是教练会话，进入家长历史页会回到教练日程，因此本批没有声称家长运行态视觉验收。
+- 红测准确复现旧 WXML 文案，绿测：P4.1 Vitest `2/2`、小程序 TypeScript、WXML/WXSS 编译通过。通过真实双角色入口切换到家长端后，使用项目页面通道打开并复拍：`C:\Users\ASUS\AppData\Local\Temp\cq-talent-parent-p41-runtime-current.png`（`390×844`），页面显示“综合分”和当前真实的一条能力更新记录，控制台错误过滤无命中；该图是运行态证据，不冒充严格 `375×812` 像素验收。
