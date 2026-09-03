@@ -3418,6 +3418,7 @@ type GrowthTimelineItem = {
       score?: number;
       note?: string;
     }>;
+    lessonProgress: { attendedLessons: number; expectedLessons: number };
   };
   match?: {
     opponentName?: string;
@@ -3460,8 +3461,15 @@ async function buildStudentGrowthTimeline(
   const drillsById = new Map(context.store.listTrainingDrills(clubId).map((drill) => [drill.id, drill]));
   const metricById = new Map(metricCatalog.map((metric) => [metric.id, metric]));
   const teamNameById = new Map(context.store.listTeams(clubId).map((team) => [team.id, team.name]));
+  const attendanceByEventId = new Map(
+    context.store.listEventParticipants(clubId)
+      .filter((participant) => participant.studentId === studentId)
+      .map((participant) => [participant.eventId, participant.status] as const),
+  );
   const timeline: GrowthTimelineItem[] = [];
   const trainingAssessmentItems: GrowthTimelineItem[] = [];
+  let attendedLessons = 0;
+  let expectedLessons = 0;
 
   for (const event of events) {
     const teamName = typeof event.teamName === "string" && event.teamName.trim()
@@ -3470,6 +3478,8 @@ async function buildStudentGrowthTimeline(
     const venue = typeof event.venue === "string" && event.venue.trim() ? event.venue : undefined;
 
     if (event.type === "training") {
+      expectedLessons += 1;
+      if (attendanceByEventId.get(event.id) === "present") attendedLessons += 1;
       const session = await context.store.getTrainingSessionByEvent(clubId, event.id);
       const plan = session?.sessionPlanId ? context.store.getSessionPlan(session.sessionPlanId) : null;
       const assessments = (await context.store.listTrainingContentAssessments(clubId, event.id))
@@ -3494,7 +3504,7 @@ async function buildStudentGrowthTimeline(
         ...(teamName ? { teamName } : {}),
         ...(venue ? { venue } : {}),
         eventId: event.id,
-        training: { items },
+        training: { items, lessonProgress: { attendedLessons, expectedLessons } },
       });
 
       for (const assessment of assessments) {

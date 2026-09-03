@@ -19,6 +19,7 @@
 .history-card__main { flex: 1; min-width: 0; }
 .history-card__title { overflow: hidden; font-size: 30rpx; font-weight: 600; color: #202124; text-overflow: ellipsis; white-space: nowrap; }
 .history-card__meta { margin-top: 8rpx; font-size: 24rpx; color: #667085; }
+.history-card__progress { margin-top: 6rpx; color: #a80f1b; font-size: 24rpx; font-weight: 600; line-height: 32rpx; }
 .history-card__place { overflow: hidden; margin-top: 4rpx; font-size: 24rpx; color: #98a2b3; text-overflow: ellipsis; white-space: nowrap; }
 .history-card__status { flex: 0 0 auto; font-size: 24rpx; color: #98a2b3; }
 .history-card__status--done { color: #10b981; font-weight: 600; }

@@ -672,6 +672,7 @@ function normalizeGrowthTimeline(raw: unknown): GrowthSummary["timeline"] {
     const id = stringOrUndefined(item.id);
     if (!id || !occurredAt) continue;
     const trainingSource = asRecord(item.training);
+    const lessonProgress = asRecord(trainingSource?.lessonProgress);
     const matchSource = asRecord(item.match);
     const updateSource = asRecord(item.abilityUpdate);
     const trainingItems = Array.isArray(trainingSource?.items) ? trainingSource.items : [];
@@ -697,6 +698,9 @@ function normalizeGrowthTimeline(raw: unknown): GrowthSummary["timeline"] {
               ...(stringOrUndefined(row?.note) ? { note: stringOrUndefined(row?.note) } : {}),
             };
           }).filter((entry) => entry.trainingProjectId),
+          ...(typeof lessonProgress?.attendedLessons === "number" && typeof lessonProgress?.expectedLessons === "number"
+            ? { lessonProgress: { attendedLessons: lessonProgress.attendedLessons, expectedLessons: lessonProgress.expectedLessons } }
+            : {}),
         },
       }),
       ...(kind !== "match" ? {} : {

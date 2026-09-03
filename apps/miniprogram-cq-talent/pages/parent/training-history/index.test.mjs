@@ -4,12 +4,14 @@ import { readFileSync } from "node:fs";
 const mocks = vi.hoisted(() => ({
   getParentCalendar: vi.fn(),
   getParentChildren: vi.fn(),
+  getParentGrowth: vi.fn(),
   requireRole: vi.fn(),
 }));
 
 vi.mock("../../../utils/api", () => ({
   getParentCalendar: mocks.getParentCalendar,
   getParentChildren: mocks.getParentChildren,
+  getParentGrowth: mocks.getParentGrowth,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/date", () => ({ resolveParentPageDate: () => "2026-08-28" }));
@@ -49,13 +51,21 @@ describe("parent training history active student", () => {
       { id: "student-2", name: "第二位学员", teams: [] },
     ]);
     mocks.getParentCalendar.mockReset().mockResolvedValue([]);
+    mocks.getParentGrowth.mockReset().mockResolvedValue({ timeline: [] });
   });
 
   it("loads and filters training history for the selected child", async () => {
-    mocks.getParentCalendar.mockResolvedValue([
-      { id: "student-2-training", type: "training", title: "第二位训练", startsAt: "2026-08-20T10:00:00.000Z", endsAt: "2026-08-20T11:30:00.000Z", status: "completed", childIds: ["student-2"] },
-      { id: "student-1-training", type: "training", title: "第一位训练", startsAt: "2026-08-19T10:00:00.000Z", endsAt: "2026-08-19T11:30:00.000Z", status: "completed", childIds: ["student-1"] },
-    ]);
+    mocks.getParentGrowth.mockResolvedValue({
+      timeline: [{
+        id: "training-student-2-training",
+        eventId: "student-2-training",
+        kind: "training",
+        occurredAt: "2026-08-20T10:00:00.000Z",
+        title: "第二位训练",
+        subtitle: "完成训练",
+        training: { items: [], lessonProgress: { attendedLessons: 5, expectedLessons: 6 } },
+      }],
+    });
     const page = createPageInstance();
 
     await page.load();
@@ -66,5 +76,26 @@ describe("parent training history active student", () => {
 
   it("aligns the title with the Figma 44px title origin", () => {
     expect(styles).toMatch(/\.page-nav__title\s*\{[^}]*margin-left:\s*8rpx/);
+  });
+
+  it("renders the server-projected attendance progress for every completed training", async () => {
+    mocks.getParentGrowth.mockResolvedValue({
+      timeline: [{
+        id: "training-2",
+        kind: "training",
+        occurredAt: "2026-08-20T10:00:00.000Z",
+        title: "第二位训练",
+        subtitle: "完成 2 项训练内容",
+        teamName: "U10精英队",
+        venue: "凤凰山足球公园",
+        eventId: "student-2-training",
+        training: { items: [], lessonProgress: { attendedLessons: 18, expectedLessons: 22 } },
+      }],
+    });
+    const page = createPageInstance();
+
+    await page.load();
+
+    expect(page.data.rows).toEqual([expect.objectContaining({ id: "student-2-training", lessonProgressLabel: "18/22课时" })]);
   });
 });

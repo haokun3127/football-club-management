@@ -198,6 +198,7 @@ export interface GrowthTimelineItem {
   eventId?: string;
   training?: {
     items: Array<{ trainingProjectId: string; name: string; score?: number; note?: string }>;
+    lessonProgress?: { attendedLessons: number; expectedLessons: number };
   };
   match?: {
     opponentName?: string;

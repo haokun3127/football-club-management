@@ -1,8 +1,7 @@
-import { getParentCalendar, getParentChildren } from "../../../utils/api";
+import { getParentChildren, getParentGrowth } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { resolveParentPageDate } from "../../../utils/date";
-import { formatShortDate, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
-import type { LoadState, ScheduleEvent } from "../../../utils/types";
+import { formatShortDate, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import type { GrowthTimelineItem, LoadState } from "../../../utils/types";
 
 interface HistoryRow {
   id: string;
@@ -10,6 +9,7 @@ interface HistoryRow {
   dateLabel: string;
   timeLabel: string;
   placeLabel: string;
+  lessonProgressLabel: string;
   statusLabel: string;
   done: boolean;
 }
@@ -36,11 +36,10 @@ Page({
         this.setData({ state: "empty", message: "暂无绑定学员", rows: [] });
         return;
       }
-      const today = resolveParentPageDate();
-      const events = await fetchCalendarRange(today, 180);
-      const trainings = events
-        .filter((event) => event.type === "training" && eventBelongsToStudent(event, active.id))
-        .sort((left, right) => right.startsAt.localeCompare(left.startsAt));
+      const growth = await getParentGrowth(active.id, active);
+      const trainings = (growth.timeline ?? [])
+        .filter((item) => item.kind === "training")
+        .sort((left, right) => right.occurredAt.localeCompare(left.occurredAt));
       const rows = trainings.map(presentRow);
       this.setData({ state: rows.length ? "ready" : "empty", message: rows.length ? "" : "暂无训练历程", rows });
     } catch {
@@ -55,37 +54,22 @@ Page({
   },
 });
 
-function presentRow(event: ScheduleEvent): HistoryRow {
-  const done = event.status === "completed";
+function presentRow(event: GrowthTimelineItem): HistoryRow {
+  const progress = event.training?.lessonProgress;
   return {
-    id: event.id,
+    id: event.eventId || event.id,
     title: event.title,
-    dateLabel: formatShortDate(event.startsAt),
-    timeLabel: formatTimeRange(event.startsAt, event.endsAt),
+    dateLabel: formatShortDate(event.occurredAt),
+    timeLabel: timeLabel(event.occurredAt),
     placeLabel: [event.teamName, event.venue].filter(Boolean).join(" · "),
-    statusLabel: done ? "已完成" : "未完成",
-    done,
+    lessonProgressLabel: progress ? `${progress.attendedLessons}/${progress.expectedLessons}课时` : "课时待同步",
+    statusLabel: "已完成",
+    done: true,
   };
 }
 
-function shiftDate(date: string, days: number): string {
-  const d = new Date(`${date}T00:00:00`);
-  d.setDate(d.getDate() + days);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
-// 服务端单次日程查询上限 31 天，分块并行拉取
-async function fetchCalendarRange(today: string, days: number) {
-  const chunks: Array<Promise<Awaited<ReturnType<typeof getParentCalendar>>>> = [];
-  for (let offset = days; offset > 0; offset -= 31) {
-    const from = shiftDate(today, -offset);
-    const to = offset - 31 <= 0 ? today : shiftDate(today, -offset + 30);
-    chunks.push(getParentCalendar(from, to));
-  }
-  const results = await Promise.all(chunks);
-  return results.flat();
-}
-
-function eventBelongsToStudent(event: ScheduleEvent, studentId: string) {
-  return event.childIds?.includes(studentId) ?? false;
+function timeLabel(occurredAt: string) {
+  const date = new Date(occurredAt);
+  if (Number.isNaN(date.getTime())) return "时间待同步";
+  return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
 }

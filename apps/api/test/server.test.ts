@@ -1293,7 +1293,7 @@ describe("api server", () => {
         kind: string;
         eventId?: string;
         title: string;
-        training?: { items: Array<{ score?: number; note?: string }> };
+        training?: { items: Array<{ score?: number; note?: string }>; lessonProgress?: { attendedLessons: number; expectedLessons: number } };
         match?: { scoreLabel?: string; events: Array<{ studentId: string }> };
       }>;
     };
@@ -1303,6 +1303,7 @@ describe("api server", () => {
         eventId: "event-training-1",
         training: expect.objectContaining({
           items: [expect.objectContaining({ score: 91, note: "传接球处理稳定" })],
+          lessonProgress: { attendedLessons: 1, expectedLessons: 1 },
         }),
       }),
       expect.objectContaining({
