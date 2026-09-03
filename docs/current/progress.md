@@ -2699,3 +2699,8 @@
 
 - `corepack pnpm typecheck` 通过 domain、API 和小程序三层 TypeScript 检查；本批 C2/C11/C15/训练工作台五个页面的定向 Vitest 为 `44/44`，API 全量 Vitest 命令单独通过。
 - 根门禁 `corepack pnpm run check` 已在提交前重新复现：domain `21/21`；小程序为 `66` 个文件通过、两处阻断（共 `452/453` 测试通过）。阻断仍是未纳入本批 diff 的 `scripts/devtools-screenshot.test.mjs` 语法错误与 `pages/parent/content/index.test.mjs` 的 CRLF/LF 精确样式字符串断言，未将其误报为本批回归。
+
+## 2026-09-03 Figma 写入权限复核
+
+- Figma MCP `whoami` 显示当前身份 `haokun3127` 为团队 `View` 席位。本批只能读取 C2 `1610:1462`、C11 `1617:2`、C15 `1623:2` 与 P4 `1610:466`，不具备可审计的在线写入权限。
+- 已推送的训练评测、学期测评绑定和成长足迹代码不依赖伪造设计状态；但课堂训练评测的新全屏状态与 C11/C15/P4 的新数据状态尚未通过在线 Figma 写回验证。待使用浏览器编辑会话或具编辑权的 MCP 连接补画板并回读截图后，才能关闭该视觉设计项。

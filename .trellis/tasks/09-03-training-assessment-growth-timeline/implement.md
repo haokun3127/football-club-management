@@ -51,3 +51,5 @@
 2. 仅在用户明确授权生产导入后，单独备份生产 SQLite、运行可回滚导入、重启 API、以七个测试账号逐一只读核验两周训练/比赛/测评记录；导入和部署不与业务代码提交混合。
 
 **2026-09-03 final quality evidence:** all three TypeScript checks pass; the C2/C11/C15/coach-workbench page suite passes `44/44`, and the API full test command passes. The root gate is currently blocked before API tests by two files outside this batch: `apps/miniprogram-cq-talent/scripts/devtools-screenshot.test.mjs` has a syntax error, and `apps/miniprogram-cq-talent/pages/parent/content/index.test.mjs` has a CRLF-sensitive exact-string assertion. Both are intentionally excluded from this task-owned commit and are recorded in `docs/current/progress.md`.
+
+**2026-09-03 Figma completion boundary:** the authenticated Figma MCP identity was rechecked and has a `View` team seat. Code and contract completion are pushed to `dev`, but online design writes for the new C2 classroom-assessment state and revised C11/C15/P4 task states are not proven through this MCP connection. Do not close the visual-design acceptance item until a browser editor session or an editable MCP seat updates and rereads the relevant V6 frames.
