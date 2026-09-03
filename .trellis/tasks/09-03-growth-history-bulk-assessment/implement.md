@@ -85,6 +85,12 @@
 - The C14 WXML now renders the arrow with the real `teamHint` value. No API, team-selection behavior, or score calculation changed.
 - Red/green verification: C14 Vitest `5/5`, mini-program TypeScript, WXML compilation, and a fresh WeChat DevTools runtime screenshot passed; runtime evidence is `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c14-runtime-arrow-final.png` (`390×844`).
 
+## 2026-09-03 C11 project-entry guidance alignment
+
+- Re-read the current online Coach V7 C11 board `1973:2`; it includes the guidance strip `进入任务后，先选择测评项目，再为全队连续录入` below the task list.
+- Added the same guidance as a real product instruction below the API-backed task list. Task names, dates, counts, and statuses remain server data; no Figma sample task was added.
+- Red/green verification: C11 Vitest `10/10`, mini-program TypeScript, WXML/WXSS compilation, and a fresh WeChat DevTools runtime screenshot passed; runtime evidence is `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c11-runtime-hint-final.png` (`390×844`).
+
 ## High-risk files
 
 - `apps/api/src/routes/app-client.routes.ts`: preserve role authorization and existing response compatibility.

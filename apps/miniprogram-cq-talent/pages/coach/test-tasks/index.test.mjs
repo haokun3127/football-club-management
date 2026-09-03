@@ -198,6 +198,7 @@ describe("coach assessment task list", () => {
     expect(template).toContain('<role-tabbar role="coach" active="training"');
     expect(template).toContain('<image class="task-card__chevron"');
     expect(template).toContain('class="task-card__context">{{item.teamContextLabel}}</view>');
+    expect(template).toContain('class="tasks-first-hint">进入任务后，先选择测评项目，再为全队连续录入</view>');
     expect(template).not.toContain('wx:if="{{item.isEntryEnabled}}" class="task-card__chevron"');
     expect(template).not.toMatch(/体能综合测评|速度耐力体测|控球精度评估|2025-07-01|12\/18名学员/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);

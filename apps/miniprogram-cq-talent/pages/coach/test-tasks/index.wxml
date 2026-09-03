@@ -33,6 +33,7 @@
         </view>
       </view>
       <view wx:else class="filter-empty">当前筛选暂无测评任务。</view>
+      <view class="tasks-first-hint">进入任务后，先选择测评项目，再为全队连续录入</view>
     </block>
   </view>
 

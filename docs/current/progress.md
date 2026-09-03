@@ -2844,3 +2844,9 @@
 - 重新读取在线 Coach V7 C14 `zZ6wKyOHKcO4UYXDd9jGwv / 1973:181`，确认球队上下文操作文案为“由训练管理选择 ›”。
 - C14 WXML 将真实 `teamHint` 与右箭头一起展示；未改 API、球队选择逻辑或能力分数计算。
 - 红测准确复现缺少箭头，修复后 C14 Vitest `5/5`、小程序 TypeScript、WXML 编译通过。微信开发者工具重新导航后的运行态截图为 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c14-runtime-arrow-final.png`（`390×844`），控制台无错误；因设备不是 `375×812`，记录为运行态证据，不冒充严格像素验收。
+
+## 2026-09-03 C11 任务列表操作提示对齐
+
+- 重新读取在线 Coach V7 C11 `zZ6wKyOHKcO4UYXDd9jGwv / 1973:2`，确认任务列表下方有“进入任务后，先选择测评项目，再为全队连续录入”提示条。
+- 小程序在真实 API 任务列表后补齐同一产品提示；任务名称、日期、人数和状态继续来自服务器，不添加 Figma 示例任务。
+- 红测准确复现缺少提示条，修复后 C11 Vitest `10/10`、小程序 TypeScript、WXML/WXSS 编译通过。运行态截图为 `C:\Users\ASUS\AppData\Local\Temp\cq-talent-c11-runtime-hint-final.png`（`390×844`），只记录运行态证据，不冒充严格 `375×812` 像素验收。
