@@ -848,9 +848,14 @@ describe("api server", () => {
       studentCount: number;
       overall: number | null;
       dimensions: Array<{ metricId: string; label: string; average: number | null }>;
+      students: Array<{ studentId: string; overall: number | null }>;
     };
     expect(overviewBody.studentCount).toBeGreaterThanOrEqual(1);
     expect(Array.isArray(overviewBody.dimensions)).toBe(true);
+    expect(overviewBody.students).toEqual(expect.arrayContaining([
+      expect.objectContaining({ studentId: "student-1" }),
+    ]));
+    expect(overviewBody.students.every((student) => typeof student.overall === "number" || student.overall === null)).toBe(true);
 
     const selectedOverview = await app.inject({
       method: "GET",

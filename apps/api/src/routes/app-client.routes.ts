@@ -2286,12 +2286,35 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         ? await context.store.listOperationalStudents(request.params.clubId, { teamId: team.id })
         : [];
       const metricCatalog = await context.store.listAbilityMetrics(request.params.clubId);
+      const metricViewNodes = await context.store.listMetricViewNodes(request.params.clubId);
+      const radarMetricIds = new Set(
+        metricViewNodes
+          .filter((node) => node.viewId === "metric-view-cq-talent-elite-core-radar" && Boolean(node.metricId))
+          .map((node) => node.metricId),
+      );
+      const radarMetricCatalog = metricCatalog.filter((metric) => radarMetricIds.has(metric.id));
       const perStudent = await Promise.all(students.map(async (student) => ({
         studentId: student.id,
         records: await context.store.getStudentMetrics(request.params.clubId, student.id),
       })));
 
-      const dimensions = metricCatalog.map((metric) => {
+      const studentScores = perStudent.map((student) => {
+        const scores = buildLatestMetricRecords(
+          student.records.filter((record) => radarMetricIds.has(record.metricId)),
+          radarMetricCatalog,
+        )
+          .map(({ record }) => metricNumericValue(record.value))
+          .filter((value): value is number => value !== null);
+        return {
+          studentId: student.studentId,
+          overall: scores.length ? round1(scores.reduce((sum, value) => sum + value, 0) / scores.length) : null,
+        };
+      });
+
+      // Keep the overview aligned with the same core radar dimensions used by
+      // the individual player page, so the aggregate response is a drop-in
+      // replacement for the former per-player fan-out.
+      const dimensions = radarMetricCatalog.map((metric) => {
         const latestValues: number[] = [];
         for (const student of perStudent) {
           const record = student.records.find((item) => item.metricId === metric.id);
@@ -2326,14 +2349,15 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         }
       }
 
-      const averages = dimensions.map((dimension) => dimension.average).filter((value): value is number => value !== null);
+      const overallScores = studentScores.map((student) => student.overall).filter((value): value is number => value !== null);
       return {
         clubId: request.params.clubId,
         role: "coach",
         studentCount: students.length,
-        overall: averages.length ? round1(averages.reduce((sum, value) => sum + value, 0) / averages.length) : null,
+        overall: overallScores.length ? round1(overallScores.reduce((sum, value) => sum + value, 0) / overallScores.length) : null,
         trendDelta: deltas.length ? round1(deltas.reduce((sum, value) => sum + value, 0) / deltas.length) : null,
         dimensions,
+        students: studentScores,
       };
     },
   );

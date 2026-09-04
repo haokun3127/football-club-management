@@ -1268,3 +1268,53 @@ const isReadable = task.status === "in_progress" || task.status === "completed";
 const readOnly = task.status === "completed";
 if (!isReadable) return showUnavailable();
 ```
+
+## Scenario: Coach Team Ability Overview Aggregation
+
+### 1. Scope / Trigger
+
+- Trigger: C14 needs a team roster's score badges and summary. On WeChat clients, a per-student radar request fan-out can be serialized by the runtime and creates visible multi-second loading.
+
+### 2. Signatures
+
+- `GET /clubs/{clubId}/app-clients/{clientId}/coach/team/ability-overview?teamId={optional}`.
+- Additive response field: `students: [{ studentId, overall: number | null }]`.
+
+### 3. Contracts
+
+- The route resolves the requested team through the active coach membership scope before reading students or metric records.
+- `students` contains only the scoped team's operational students. `overall` is the latest-score average across the same core radar metric ids used by `GET .../coach/students/{studentId}/radar`; no client-side per-player follow-up reads are required for roster badges.
+- `dimensions` uses that same core radar metric catalog. A mini-program client may render the roster before this additive overview resolves and must leave score labels as `"-"` if the aggregate request fails.
+
+### 4. Validation & Error Matrix
+
+- Missing/inactive/non-coach client -> existing `404 not_found`.
+- Parent or out-of-scope coach -> `403 forbidden` before any roster or score is returned.
+- Unknown or inaccessible `teamId` -> `403 forbidden`.
+- A student with no core radar record -> `{ overall: null }`, not an invented score.
+
+### 5. Good / Base / Bad Cases
+
+- Good: a 19-player C14 list loads one team request plus one ability-overview request, then fills all 19 badges.
+- Base: the overview request fails temporarily; names and detail navigation remain usable and badges remain `"-"`.
+- Bad: `Promise.all(students.map(getCoachStudentRadar))` in the list page; it appears parallel in TypeScript but can serialize into N network round trips in the WeChat runtime.
+
+### 6. Tests Required
+
+- API contract test asserts the scoped overview returns a `students` entry with only a numeric or null `overall`.
+- C14 controller test asserts one `getCoachTeamAbilityOverview` call, zero roster-time `getCoachStudentRadar` calls, and the graceful aggregate-failure fallback.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+const radars = await Promise.all(students.map((student) => getCoachStudentRadar(student.id)));
+```
+
+#### Correct
+
+```ts
+const overview = await getCoachTeamAbilityOverview(teamId);
+const scoreByStudentId = new Map(overview.students.map((student) => [student.studentId, student.overall]));
+```

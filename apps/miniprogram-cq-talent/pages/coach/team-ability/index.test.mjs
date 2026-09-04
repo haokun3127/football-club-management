@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   getCoachTeam: vi.fn(),
   getCoachStudentRadar: vi.fn(),
+  getCoachTeamAbilityOverview: vi.fn(),
   requireRole: vi.fn(),
   navigateBack: vi.fn(),
   navigateTo: vi.fn(),
@@ -14,6 +15,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("../../../utils/api", () => ({
   getCoachTeam: mocks.getCoachTeam,
   getCoachStudentRadar: mocks.getCoachStudentRadar,
+  getCoachTeamAbilityOverview: mocks.getCoachTeamAbilityOverview,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/presentation", () => ({
@@ -78,6 +80,20 @@ describe("coach ability assessment", () => {
   beforeEach(() => {
     mocks.getCoachTeam.mockReset().mockResolvedValue(team);
     mocks.getCoachStudentRadar.mockReset().mockResolvedValue(validRadar);
+    mocks.getCoachTeamAbilityOverview.mockReset().mockResolvedValue({
+      studentCount: 3,
+      overall: 78,
+      trendDelta: 0,
+      dimensions: [
+        { metricId: "passing", label: "传球", average: 82, top: 82, bottom: 82 },
+        { metricId: "shooting", label: "射门", average: 74, top: 74, bottom: 74 },
+      ],
+      students: [
+        { studentId: "student-1", overall: 78 },
+        { studentId: "student-2", overall: 78 },
+        { studentId: "student-3", overall: 78 },
+      ],
+    });
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
     mocks.navigateBack.mockReset();
     mocks.navigateTo.mockReset();
@@ -91,7 +107,8 @@ describe("coach ability assessment", () => {
     await page.load();
 
     expect(mocks.getCoachTeam).toHaveBeenCalledWith("team-weekend-select");
-    expect(mocks.getCoachStudentRadar).toHaveBeenCalledTimes(3);
+    expect(mocks.getCoachTeamAbilityOverview).toHaveBeenCalledWith("team-weekend-select");
+    expect(mocks.getCoachStudentRadar).not.toHaveBeenCalled();
     expect(page.data).toMatchObject({
       state: "ready",
       teamContext: "周末精英队",
@@ -117,11 +134,8 @@ describe("coach ability assessment", () => {
     expect(mocks.navigateTo).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining("student=student-2") }));
   });
 
-  it("preserves the selected team roster while reporting invalid radar data honestly", async () => {
-    mocks.getCoachStudentRadar.mockResolvedValueOnce([
-      { metricId: "one", label: "维度一", value: 70, maxValue: 0 },
-      { metricId: "two", label: "维度二", value: Number.NaN, maxValue: 100 },
-    ]);
+  it("keeps the roster usable when the aggregate score request fails", async () => {
+    mocks.getCoachTeamAbilityOverview.mockRejectedValueOnce(new Error("temporary network failure"));
     const page = createPageInstance();
 
     await page.load();
@@ -134,7 +148,12 @@ describe("coach ability assessment", () => {
       radar: [],
       dimensions: [],
       message: "",
+      summaryOverall: "-",
+      students: expect.arrayContaining([
+        expect.objectContaining({ id: "student-1", scoreLabel: "-" }),
+      ]),
     });
+    expect(mocks.getCoachStudentRadar).not.toHaveBeenCalled();
   });
 
   it("does not call a team or radar endpoint for an ineligible coach and handles an empty selected team", async () => {
@@ -173,8 +192,8 @@ describe("coach ability assessment", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(template).not.toMatch(/U10|2025|Player One|李明辉/);
     expect(controller).toContain('COACH_TRAINING_TEAM_KEY');
-    expect(controller).toContain('getCoachStudentRadar');
-    expect(controller).not.toContain('getCoachTeamAbilityOverview');
+    expect(controller).toContain('getCoachTeamAbilityOverview');
+    expect(controller).not.toContain('getCoachStudentRadar');
     expect(stylesheet).toMatch(/\.ability-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).toMatch(/\.ability-summary\s*\{(?=[^}]*height:\s*284rpx)(?=[^}]*background:\s*#07111f)/s);
     expect(stylesheet).toMatch(/\.ability-roster__grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s);

@@ -488,6 +488,7 @@ export interface CoachTeamAbilityOverview {
   studentCount: number;
   overall: number | null;
   trendDelta: number | null;
+  students?: Array<{ studentId: string; overall: number | null }>;
   dimensions: Array<{
     metricId: string;
     label: string;
