@@ -145,6 +145,8 @@ This checks the two guardian students' semantic operational-profile presence whi
 - A current demo set contains five completed training sessions across those three calendar weeks. Each one has all 19 team participants and a canonical `lesson_credit_ledger` debit per participant, so C5 history is populated by database-backed records rather than client-side placeholders.
 - The current ledger shape is one opening credit plus five canonical training debits per roster student: 6 rows per student and 114 rows per slot. A slot therefore has 95 completed-training debit rows; read-only production audits must enumerate the suffixed IDs `-debit-1` through `-debit-5`, not the retired unsuffixed `-debit` IDs.
 - Every calendar date is derived from the invocation timestamp, never hard-coded to a historical week.
+- A canonical upcoming activity must start after the invocation timestamp. A refresh run later in a day must move the next scheduled training forward instead of producing an immediately stale `scheduled` activity.
+- Eligible legacy secure-demo activities must be state-reconciled only inside the exact `club_id + cq-talent-secure-test slot ID prefix + primary_team_id` scope: ended activities become `completed`, future activities remain `scheduled`, pending historical participation becomes a final attendance state, and any linked match follows its activity state. Ordinary club data and another secure slot's team remain untouched.
 - User-facing canonical data (account, parent, coach, team, student, activity, assessment, match, tactical-board, private-lesson, insurance, and communication copy) is Chinese.
 - Storage/API enum values remain their contract values (for example `friendly`, `league`, participant status); the mini-program display boundary maps any visible enum to Chinese rather than changing the API contract.
 - Refresh may upsert only the operation's canonical IDs. If a guardian student has a legacy operational profile under the table's `(club_id, student_id)` uniqueness boundary, retain it.
@@ -159,6 +161,7 @@ This checks the two guardian students' semantic operational-profile presence whi
 | `--dry-run` finds stale data | Return `dry_run`; do not mutate or migrate. |
 | A legacy operational profile occupies its unique student slot | Preserve it; do not replace it to force canonical copy. |
 | A complete slot retains retired `lesson-ledger-cq-talent-secure-test-<slot>-<student>-debit` rows | Return `refreshed`, remove only those exact retired IDs, and preserve the current five-session ledger rows. |
+| An ended secure-demo activity is still `scheduled`, or its participant is still invited/confirmed/pending leave | Return `refreshed`, reconcile only the exact secure slot/team activity namespace to final activity and attendance states. |
 | A visible API enum would otherwise appear raw in the mini-program | Translate at the client presentation boundary; do not store a localized enum. |
 
 ### 5. Good / Base / Bad Cases

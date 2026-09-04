@@ -455,6 +455,102 @@ describe("secure Chongqing Talent test-account operation", () => {
     }
   }, FILE_DB_TIMEOUT);
 
+  it("keeps the canonical upcoming training in the future when the refresh runs later in the day", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+
+    try {
+      const now = "2026-09-04T15:00:00.000Z";
+      const imported = importSecureCqTalentTestAccounts(persistence.database, { phones: runtimePhones, now });
+      const account = imported.manifest.accountIds[0]!;
+      const event = persistence.database.prepare(`
+        SELECT starts_at, ends_at, status
+        FROM calendar_events
+        WHERE id = ?
+      `).get(account.eventId) as { starts_at: string; ends_at: string; status: string };
+
+      expect(event.status).toBe("scheduled");
+      expect(new Date(event.starts_at).getTime()).toBeGreaterThan(new Date(now).getTime());
+      expect(new Date(event.ends_at).getTime()).toBeGreaterThan(new Date(event.starts_at).getTime());
+    } finally {
+      persistence.database.close();
+    }
+  }, FILE_DB_TIMEOUT);
+
+  it("reconciles stale legacy secure activities and pending attendance without touching another team", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+
+    try {
+      const now = "2026-09-04T15:00:00.000Z";
+      const imported = importSecureCqTalentTestAccounts(persistence.database, { phones: runtimePhones, now });
+      const account = imported.manifest.accountIds[0]!;
+      const staleEventId = "event-cq-talent-secure-test-1-legacy-pending-state";
+
+      persistence.database.prepare(`
+        INSERT INTO calendar_events (
+          id, club_id, type, title, starts_at, ends_at, timezone, location_id,
+          primary_team_id, owner_coach_id, status, notes, created_at, updated_at
+        ) VALUES (?, ?, 'training', ?, ?, ?, 'Asia/Shanghai', ?, ?, NULL, 'scheduled', ?, ?, ?)
+      `).run(
+        staleEventId,
+        "club-chongqing-talent",
+        "历史待收口训练",
+        "2026-08-26T10:00:00.000Z",
+        "2026-08-26T12:00:00.000Z",
+        "venue-cq-talent-sport-uni",
+        account.teamId,
+        "早期测试活动",
+        now,
+        now,
+      );
+      persistence.database.prepare(`
+        INSERT INTO event_participants (id, club_id, event_id, student_id, status, note, created_at, updated_at)
+        VALUES (?, ?, ?, ?, 'confirmed', '已确认参加', ?, ?)
+      `).run(
+        "participant-cq-talent-secure-test-1-legacy-pending-state-1",
+        "club-chongqing-talent",
+        staleEventId,
+        account.studentIds[0],
+        now,
+        now,
+      );
+      persistence.database.prepare(`
+        INSERT INTO teams (id, club_id, name, age_group, level, default_coach_id, status, created_at, updated_at)
+        VALUES (?, ?, ?, 'U10', 'development', NULL, 'active', ?, ?)
+      `).run("team-unrelated-pending-state", "club-chongqing-talent", "无关队伍", now, now);
+      persistence.database.prepare(`
+        INSERT INTO calendar_events (
+          id, club_id, type, title, starts_at, ends_at, timezone, location_id,
+          primary_team_id, owner_coach_id, status, notes, created_at, updated_at
+        ) VALUES (?, ?, 'training', ?, ?, ?, 'Asia/Shanghai', ?, ?, NULL, 'scheduled', ?, ?, ?)
+      `).run(
+        "event-unrelated-pending-state",
+        "club-chongqing-talent",
+        "无关历史训练",
+        "2026-08-26T10:00:00.000Z",
+        "2026-08-26T12:00:00.000Z",
+        "venue-cq-talent-sport-uni",
+        "team-unrelated-pending-state",
+        "不属于测试账号的数据",
+        now,
+        now,
+      );
+
+      const refreshed = importSecureCqTalentTestAccounts(persistence.database, { phones: runtimePhones, now });
+
+      expect(refreshed.status).toBe("refreshed");
+      expect(persistence.database.prepare("SELECT status FROM calendar_events WHERE id = ?").get(staleEventId)).toEqual({ status: "completed" });
+      expect(persistence.database.prepare("SELECT status, note FROM event_participants WHERE event_id = ?").get(staleEventId)).toEqual({
+        status: "present",
+        note: "已到场",
+      });
+      expect(persistence.database.prepare("SELECT status FROM calendar_events WHERE id = ?").get(
+        "event-unrelated-pending-state",
+      )).toEqual({ status: "scheduled" });
+    } finally {
+      persistence.database.close();
+    }
+  }, FILE_DB_TIMEOUT);
+
   it("backfills venues for legacy activities scoped to a secure demo team without touching another team", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
 
