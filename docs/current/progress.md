@@ -2916,5 +2916,9 @@
 
 **2026-09-04 天才精英队评分表正式接入测评项目与成绩回显：** 用户提供的 `D:\UU\GameViewer\Download\天才精英队评分表.xlsx` 作为唯一真实项目来源，确认包含 8 个一级能力域、28 个二级子项和 62 个三级测试项目。后端新增并激活 `assessment-template-version-technical-table-20260904`，沿用版本化能力图谱，不删除旧模板、旧测评或历史成绩；C12 项目选择页现在从后端真实表单字段按“一级能力域 → 二级指标 → 三级测试项目”展示，每个三级项目独立成卡，未在训练内容树匹配的项目按真实测评维度归类，不在前端硬编码 Excel 内容。
 
+**2026-09-04 测评项目生产同步完成：** 根因是线上数据库仍运行旧 API 版本，且已有进行中的任务使用旧的 `assessment-template-version-technical-1`，该版本只有 1 个输入绑定；修改本地 seed 不会自动改变线上既有数据库。已从提交 `0bc5907` 打包并仅部署 `cq-talent-api`，部署前创建受限 SQLite 备份，API 容器标签已切换为 `0bc5907`。容器重建后的第一次健康探测因 Node 冷启动短暂出现 `502`，只读诊断确认容器正常运行，随后内部健康和 `https://cqtc.pomi.tech/health` 均为 `200`。应用启动 seed 已将 `assessment-template-version-technical-table-20260904` 写入线上库，保持旧模板、旧成绩和数据库卷不变。
+
+**2026-09-04 线上验证：** 新版本测评表默认读取和显式指定读取均返回 `assessment-template-version-technical-table-20260904`，`fields.length=62`。七账号受控刷新先 dry-run 返回 `{"operation":"import","status":"dry_run","accountCount":7}`，完成备份后导入返回 `refreshed`，仅重启 API。服务器审计七个账号全部通过：每个账号 19 名教练球员、2 名家长孩子、最近三周滚动日程、中文场地和展示文案、19 条测评、152 条雷达记录、2 场比赛、8 条比赛事件，以及 19 人战术板（11 首发、8 替补）；角色隔离 BFF 回读也全部通过。该证据证明服务端数据已就绪；微信真机授权和视觉验收仍需在开发者工具/真机单独完成。
+
 - 修复教练端测评项目成绩回显接口：`/coach/assessment-tasks/:taskId/projects/:projectId/entries` 现在优先支持真实 `testItemId`，同时兼容 `metricId` 和旧的 `dimensionId`；读取 `assessment-test-cq-talent-03` 不会再返回空，也不会混入同一能力域下其他项目。
 - 回归证据：提交 62 个真实项目后，单项目读取只返回请求项目的成绩；API 相关测试 `29/29`，小程序 C12/C12.1/训练评测/任务列表测试 `29/29`，API 与小程序 TypeScript 均通过，`git diff --check` 通过。尚未进行新的 Figma 在线写入或微信开发者工具运行态视觉验收。
