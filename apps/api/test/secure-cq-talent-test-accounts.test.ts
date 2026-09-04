@@ -489,7 +489,7 @@ describe("secure Chongqing Talent test-account operation", () => {
         INSERT INTO calendar_events (
           id, club_id, type, title, starts_at, ends_at, timezone, location_id,
           primary_team_id, owner_coach_id, status, notes, created_at, updated_at
-        ) VALUES (?, ?, 'training', ?, ?, ?, 'Asia/Shanghai', ?, ?, NULL, 'scheduled', ?, ?, ?)
+        ) VALUES (?, ?, 'training', ?, ?, ?, 'Asia/Shanghai', ?, ?, ?, 'scheduled', ?, ?, ?)
       `).run(
         staleEventId,
         "club-chongqing-talent",
@@ -497,7 +497,8 @@ describe("secure Chongqing Talent test-account operation", () => {
         "2026-08-26T10:00:00.000Z",
         "2026-08-26T12:00:00.000Z",
         "venue-cq-talent-sport-uni",
-        account.teamId,
+        "team-u10-dev",
+        account.coachId,
         "早期测试活动",
         now,
         now,

@@ -713,10 +713,10 @@ function hasLegacyDemoActivitiesMissingVenue(
     FROM calendar_events
     WHERE club_id = ?
       AND id LIKE ?
-      AND primary_team_id = ?
+      AND (primary_team_id = ? OR owner_coach_id = ?)
       AND location_id IS NULL
     LIMIT 1
-  `).get(clubId, `event-cq-talent-secure-test-${account.slot}-%`, account.teamId));
+  `).get(clubId, `event-cq-talent-secure-test-${account.slot}-%`, account.teamId, account.coachId));
 }
 
 function backfillLegacyDemoActivityVenues(
@@ -733,9 +733,9 @@ function backfillLegacyDemoActivityVenues(
       updated_at = ?
     WHERE club_id = ?
       AND id LIKE ?
-      AND primary_team_id = ?
+      AND (primary_team_id = ? OR owner_coach_id = ?)
       AND location_id IS NULL
-  `).run(now, clubId, `event-cq-talent-secure-test-${account.slot}-%`, account.teamId);
+  `).run(now, clubId, `event-cq-talent-secure-test-${account.slot}-%`, account.teamId, account.coachId);
 }
 
 function hasLegacyDemoActivityStateDrift(
@@ -749,7 +749,7 @@ function hasLegacyDemoActivityStateDrift(
     FROM calendar_events AS event
     WHERE event.club_id = ?
       AND event.id LIKE ?
-      AND event.primary_team_id = ?
+      AND (event.primary_team_id = ? OR event.owner_coach_id = ?)
       AND (
         (event.ends_at < ? AND event.status <> 'completed')
         OR (event.starts_at > ? AND event.status <> 'scheduled')
@@ -773,7 +773,7 @@ function hasLegacyDemoActivityStateDrift(
         )
       )
     LIMIT 1
-  `).get(clubId, prefix, account.teamId, now, now, now, now, now));
+  `).get(clubId, prefix, account.teamId, account.coachId, now, now, now, now, now));
 }
 
 function reconcileLegacyDemoActivityStates(
@@ -782,7 +782,7 @@ function reconcileLegacyDemoActivityStates(
   now: string,
 ): void {
   const prefix = `event-cq-talent-secure-test-${account.slot}-%`;
-  const eventScope = "club_id = ? AND id LIKE ? AND primary_team_id = ?";
+  const eventScope = "club_id = ? AND id LIKE ? AND (primary_team_id = ? OR owner_coach_id = ?)";
 
   database.prepare(`
     UPDATE calendar_events
@@ -790,14 +790,14 @@ function reconcileLegacyDemoActivityStates(
     WHERE ${eventScope}
       AND ends_at < ?
       AND status <> 'completed'
-  `).run(now, clubId, prefix, account.teamId, now);
+  `).run(now, clubId, prefix, account.teamId, account.coachId, now);
   database.prepare(`
     UPDATE calendar_events
     SET status = 'scheduled', updated_at = ?
     WHERE ${eventScope}
       AND starts_at > ?
       AND status <> 'scheduled'
-  `).run(now, clubId, prefix, account.teamId, now);
+  `).run(now, clubId, prefix, account.teamId, account.coachId, now);
   database.prepare(`
     UPDATE event_participants
     SET status = CASE
@@ -817,7 +817,7 @@ function reconcileLegacyDemoActivityStates(
         WHERE ${eventScope}
           AND ends_at < ?
       )
-  `).run(now, clubId, clubId, prefix, account.teamId, now);
+  `).run(now, clubId, clubId, prefix, account.teamId, account.coachId, now);
   database.prepare(`
     UPDATE matches
     SET status = 'completed', updated_at = ?
@@ -829,7 +829,7 @@ function reconcileLegacyDemoActivityStates(
         WHERE ${eventScope}
           AND ends_at < ?
       )
-  `).run(now, clubId, clubId, prefix, account.teamId, now);
+  `).run(now, clubId, clubId, prefix, account.teamId, account.coachId, now);
   database.prepare(`
     UPDATE matches
     SET status = 'scheduled', updated_at = ?
@@ -841,7 +841,7 @@ function reconcileLegacyDemoActivityStates(
         WHERE ${eventScope}
           AND starts_at > ?
       )
-  `).run(now, clubId, clubId, prefix, account.teamId, now);
+  `).run(now, clubId, clubId, prefix, account.teamId, account.coachId, now);
 }
 
 type DemoEvent = {
