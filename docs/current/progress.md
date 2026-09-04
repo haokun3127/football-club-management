@@ -2922,3 +2922,12 @@
 
 - 修复教练端测评项目成绩回显接口：`/coach/assessment-tasks/:taskId/projects/:projectId/entries` 现在优先支持真实 `testItemId`，同时兼容 `metricId` 和旧的 `dimensionId`；读取 `assessment-test-cq-talent-03` 不会再返回空，也不会混入同一能力域下其他项目。
 - 回归证据：提交 62 个真实项目后，单项目读取只返回请求项目的成绩；API 相关测试 `29/29`，小程序 C12/C12.1/训练评测/任务列表测试 `29/29`，API 与小程序 TypeScript 均通过，`git diff --check` 通过。尚未进行新的 Figma 在线写入或微信开发者工具运行态视觉验收。
+
+## 2026-09-04 C12 测评项目选择页单列布局优化
+
+补充：微信开发者工具 MCP 已重新连接到主工作区项目。第一次截图未出现 project-list 的直接原因是测试导航携带了错误模板参数，页面没有进入 ready 状态；改用真实任务 assessment-task-app-client-4aeb45d0-5dba-4d1d-8e33-1381a6ff8e2b 与模板 assessment-template-technical 后，截图恢复。复拍发现选择圆圈未贴右侧，已增加 margin-left:auto；复拍文件为 C:\Users\ASUS\AppData\Local\Temp\cq-talent-assessment-projects-single-column-right-aligned.png，尺寸 390×844，控制台错误过滤无命中。当前未宣称严格 375×812 视觉验收。
+
+- 重新对照在线 Figma C12 `zZ6wKyOHKcO4UYXDd9jGwv / 1973:91`：当前设计是顶栏、球队/学期上下文、任务进度卡、单列全宽测评项目卡和固定底部选择栏；旧小程序仍显示三级能力导航、二级侧栏和双列小卡，导致项目名称、说明与状态拥挤。
+- 小程序已移除 C12 旧的三级导航渲染，直接使用真实 `projects` view model 输出单列项目列表；卡片支持长标题两行、评分说明、真实“已录 X/Y/待录入”状态和 40rpx 选择控件，保留真实多选与底部确认跳转。
+- 删除对应废弃嵌套布局样式，保留 sticky 顶栏、底部安全区预留、品牌正红色和 API 数据契约；本批无需修改在线 Figma，因为 `1973:91` 已是目标设计。
+- 验证：C12 与相关教练页 Vitest `20/20`、小程序 TypeScript、WXSS 编译和 `git diff --check` 通过。WXML 编译与模拟器截图经微信开发者工具 MCP 尝试但在工具边界超时，未宣称运行态视觉通过。
