@@ -4,7 +4,7 @@ import { openPage } from "../../../utils/navigation";
 import { activityTypeLabel, formatCalendarDate, formatShortDate, formatTimeOnly, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
 
-type WorkbenchAction = "attendance" | "lesson" | "match" | "tactical" | "training" | "assessment" | "change";
+type WorkbenchAction = "attendance" | "lesson" | "match" | "tactical" | "training" | "training-assessment" | "change";
 
 type ActionCard = {
   id: WorkbenchAction;
@@ -229,12 +229,14 @@ function buildActionCards(workbench: CoachWorkbench, canWrite: boolean): ActionC
   if (!canWrite) return [];
 
   const cards: ActionCard[] = [];
-  if (workbench.event.type === "training") cards.push(actionCard("training", "训练内容"));
+  if (workbench.event.type === "training") {
+    cards.push(actionCard("training", "训练内容"));
+    cards.push(actionCard("training-assessment", "课堂评测"));
+  }
   if (workbench.event.type === "match") {
     cards.push(actionCard("match", "比赛录入"));
     cards.push(actionCard("tactical", "比赛战术板"));
   }
-  if (workbench.assessmentTemplateId) cards.push(actionCard("assessment", "评测录入"));
   cards.push(actionCard("change", "变更活动"));
   return cards;
 }
@@ -246,12 +248,12 @@ function actionCard(id: WorkbenchAction, label: string): ActionCard {
     match: "/assets/icons/c10-target-rose.svg",
     tactical: "/assets/icons/c10-target-violet.svg",
     training: "/assets/icons/tab-training.svg",
-    assessment: "/assets/icons/c164-category-assessment.svg",
+    "training-assessment": "/assets/icons/c164-category-assessment.svg",
     change: "/assets/icons/alert.svg",
   };
   const glyphs: Partial<Record<WorkbenchAction, string>> = {
     training: "✦",
-    assessment: "◎",
+    "training-assessment": "◎",
     change: "↻",
   };
   return glyphs[id]
@@ -268,16 +270,16 @@ function attendanceSummary(rosterRows: RosterRow[]) {
   };
 }
 
-function routeForAction(action: WorkbenchAction, eventId: string, templateId: string) {
-  const routes: Record<Exclude<WorkbenchAction, "assessment">, string> = {
+function routeForAction(action: WorkbenchAction, eventId: string, _templateId: string) {
+  const routes: Record<WorkbenchAction, string> = {
     attendance: `/pages/coach/attendance/index?id=${eventId}`,
     lesson: `/pages/coach/lesson/index?id=${eventId}`,
     match: `/pages/coach/match/index?id=${eventId}`,
     tactical: `/pages/coach/tactical-board/index?eventId=${eventId}`,
     training: `/pages/coach/content-select/index?eventId=${eventId}`,
+    "training-assessment": `/pages/coach/training-assessment/index?eventId=${eventId}`,
     change: `/pages/coach/event-change/index?id=${eventId}`,
   };
-  if (action === "assessment") return templateId ? `/pages/coach/test-entry/index?eventId=${eventId}&templateId=${templateId}` : "";
   return routes[action];
 }
 

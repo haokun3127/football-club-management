@@ -14,6 +14,7 @@ type RosterItem = {
 
 type MatchEventView = {
   id: string;
+  icon: string;
   label: string;
   tone: "score" | "assist" | "defense" | "discipline" | "neutral";
   studentName: string;
@@ -51,6 +52,9 @@ type ActivityDetailView = Omit<ActivityDetail, "matchEvents"> & {
   attendanceConfirmed: boolean;
   matchEvents: MatchEventView[];
   hasMatchEvents: boolean;
+  matchResultLabel: string;
+  matchNote: string;
+  hasMatchNote: boolean;
 };
 
 const NAV_TITLES = { training: "训练详情", match: "比赛详情", other: "活动详情" } as const;
@@ -149,28 +153,62 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
     roster: detail.participants.slice(0, 3).map((participant, index) => rosterItem(participant, index)),
     otherDescription,
     otherNotice,
-    childName: child?.name || "孩子待同步",
-    childInitial: (child?.name || "学").slice(0, 1),
+    childName: resolveChildName(detail, child),
+    childInitial: resolveChildName(detail, child).slice(0, 1),
     childStatusLabel,
     confirmationText: childStatusLabel,
     offlineConfirmText: `本次训练须经教练或家长在现场确认，无需在 APP 进行操作。请${child?.name || "学员"}准时到场。`,
     attendanceConfirmed: childStatusLabel === "已到场",
     matchEvents: toMatchEvents(detail.matchEvents),
     hasMatchEvents: toMatchEvents(detail.matchEvents).length > 0,
+    matchResultLabel: matchResultLabel(rawScore, status.label),
+    matchNote: fieldValue(detail, ["教练点评", "点评", "评语"]) || sectionValue(detail, ["比赛过程"], ["教练点评", "评语", "表现"]),
+    hasMatchNote: Boolean(fieldValue(detail, ["教练点评", "点评", "评语"]) || sectionValue(detail, ["比赛过程"], ["教练点评", "评语", "表现"])),
   };
+}
+
+function matchResultLabel(score: string, status: string) {
+  const match = score.match(/(\d+)\s*[:：]\s*(\d+)/);
+  if (!match) return status === "已结束" ? "比赛已结束" : status;
+  const home = Number(match[1]);
+  const away = Number(match[2]);
+  return home > away ? "胜利" : home < away ? "失利" : "平局";
 }
 
 function toMatchEvents(events: ActivityDetail["matchEvents"]): MatchEventView[] {
   return (events ?? []).map((event) => ({
     id: event.id,
+    icon: matchEventIcon(event.type),
     label: matchEventLabel(event.type),
     tone: matchEventTone(event.type),
     studentName: event.studentName || "学员待同步",
-    minuteLabel: typeof event.minute === "number" ? `${event.minute}分钟` : "时间待同步",
+    minuteLabel: typeof event.minute === "number" ? `第 ${event.minute} 分钟` : "时间待同步",
     hasMinute: typeof event.minute === "number",
     note: event.note || "",
     hasNote: Boolean(event.note),
   }));
+}
+
+function resolveChildName(detail: ActivityDetail, child: ActivityDetail["participants"][number] | undefined) {
+  const participantName = child?.name?.trim();
+  if (participantName && participantName !== "学员" && participantName !== "孩子") return participantName;
+  const eventName = detail.matchEvents?.find((event) => event.studentId === child?.studentId)?.studentName?.trim();
+  return eventName || participantName || "孩子待同步";
+}
+
+function matchEventIcon(type: NonNullable<ActivityDetail["matchEvents"]>[number]["type"]) {
+  const icons: Record<typeof type, string> = {
+    goal: "⚽",
+    assist: "↗",
+    save: "✦",
+    tackle: "✦",
+    foul: "!",
+    yellow_card: "▮",
+    red_card: "▮",
+    penalty: "⚽",
+    own_goal: "↩",
+  };
+  return icons[type];
 }
 
 function matchEventLabel(type: NonNullable<ActivityDetail["matchEvents"]>[number]["type"]) {

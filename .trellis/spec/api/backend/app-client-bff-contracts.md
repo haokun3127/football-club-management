@@ -847,6 +847,13 @@ v1 存储为进程内集合（同私教申请语义），SQLite 持久化是已�
 - 存储：SQLite `assessment_tasks`；开发验收种子仅以 `ON CONFLICT(id) DO NOTHING` 填充缺失记录，生产不依赖 `FCM_CQ_TALENT_ACCEPTANCE_SEED` 提供任务。
 - **403**：非教练成员。
 
+### `GET /clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/projects/{projectId}/entries`
+
+- **200**：`{ clubId, taskId, projectId, savedValuesByStudent: { [studentId]: { [testItemId]: MetricValue } } }`
+- 语义：读取指定测评任务、项目下已保存的最新成绩，学员范围来自任务所属球队的 active team members；任务已通过教练授权后，不再叠加“近 30 天有活动”过滤。
+- 客户端可把 `MetricValue` 归一化为输入框初始值，但不得把本机草稿当成服务端保存成功的证明。
+- **403**：非教练成员或任务球队超出当前教练范围；**404**：任务、模板或有效模板版本不存在。
+
 ### 复用既有端点
 
 - C10 训练内容选择：`GET /coach/training-project-tree` + `PUT /coach/events/{eventId}/training-projects`（已存在）。
@@ -1138,14 +1145,21 @@ const noticeBanner = presentNoticeBanner(articles);
 - `GET|PUT /clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/training-content-assessments`
 - `POST /clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks` with `{ title, templateId, teamId, termLabel, startsOn, dueOn }`
 - Semester assessment submission carries `assessmentTaskId`.
-- Parent growth summary additive field: `trainingStats.lessonStats: { attendedLessons, expectedLessons, attendanceRate }`.
+- Parent growth summary additive fields:
+  - `trainingStats.lessonStats: { attendedLessons, expectedLessons, attendanceRate }`
+  - `timeline: GrowthTimelineItem[]`, where every item is already scoped to the requested child and is one of `training | match | ability_update`.
 
 ### 3. Contracts
 
 - A training-content assessment is uniquely `(clubId, eventId, studentId, trainingProjectId)` and an overwrite updates the same record.
 - It is valid only for a training event, a project selected on that event, and a roster student whose current attendance is `present`.
 - A semester task owns exactly one coach-accessible team, a nonblank `termLabel`, one template and one date window. Submissions must use its task id and satisfy its team/template/window scope.
+- The task-list projection returns the accessible `teams: [{ id, name }]` options and each task's safe `teamName`; C11 uses them for task creation and display, rather than deriving a team from a default workbench.
+- Classroom training assessment is a separate full-screen C2 flow. It may use only the GET scope's `selectedProjectIds` and `presentStudentIds`; the old activity-level stage-assessment shortcut must not bypass C11/C15 task ownership.
 - `lessonStats` counts only completed, non-cancelled training events: expected is eligible trainings, attended is `present`; matches never contribute.
+- `timeline.training` resolves the saved session-plan drills for one completed training and attaches only that child's persisted training-content scores/notes.
+- `timeline.match` resolves one completed match's opponent, score, venue and only that child's match events. `timeline.ability_update` is derived from persisted training-content scoring or from an assessment metric record whose `assessmentId` maps to a real task-bound player assessment.
+- P4 may render only the latest items, but the full-screen milestones page must reuse this BFF field rather than fetching calendar windows and rebuilding a second, client-side history.
 
 ### 4. Validation & Error Matrix
 
@@ -1166,6 +1180,7 @@ const noticeBanner = presentNoticeBanner(articles);
 - API regression covers present-only, selected-project-only, non-training rejection, and file-SQLite reopen.
 - Task regression covers blank term rejection, team/template/window validation, and distinct-student task progress.
 - Parent growth regression proves completed matches are excluded from `lessonStats`.
+- Parent timeline regression saves a selected drill score, then proves the parent can read training, match and ability-update entries without another child's match events.
 - Mini-program normalizer/view-model regression covers absent additive data and displays `已到/应到课时` from the server response.
 
 ### 7. Wrong vs Correct
@@ -1181,4 +1196,75 @@ const expectedLessons = trainingAndMatchEvents.length;
 ```typescript
 const eligibleTrainings = events.filter((event) => event.type === "training" && event.endsAt <= now && !event.cancelled);
 const expectedLessons = eligibleTrainings.length;
+```
+
+#### Wrong
+
+```ts
+const events = await getParentCalendar(from, to);
+return makeGrowthMilestones(events);
+```
+
+#### Correct
+
+```ts
+const growth = await getParentGrowth(studentId);
+return growth.timeline;
+```
+
+## Scenario: Completed Semester Assessment Readback
+
+### 1. Scope / Trigger
+
+- Trigger: a coach opens a semester assessment task after every scoped team member has submitted a result and the task projection reports `status: "completed"`.
+- The task completion state means its scores are immutable through the mini-program entry flow; it does not mean the saved results become inaccessible.
+
+### 2. Signatures
+
+- `GET /clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks`
+- `GET /clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/projects/{projectId}/entries`
+- Mini-program read helper: `getCoachAssessmentTasks({ forceRefresh?: boolean })`.
+
+### 3. Contracts
+
+- `in_progress` tasks open the normal project and batch-entry workflow.
+- `completed` tasks may open the same project and batch-entry routes, but batch entry is strictly read-only: inputs and save writes are disabled, saved rows remain visible, and the primary action returns to the project list.
+- `not_started` tasks remain non-enterable.
+- After an assessment save, callers may request `{ forceRefresh: true }`; this appends a unique harmless query value so the DevTools HTTP cache cannot serve an obsolete task status. The BFF response shape is unchanged.
+
+### 4. Validation & Error Matrix
+
+- Task absent, template mismatch, or inaccessible -> existing empty/forbidden handling; never display another team's saved values.
+- `not_started` -> client shows the existing "任务尚未开始" message and does not navigate.
+- `completed` + attempted raw input/save -> client performs no write and displays the read-only explanation.
+- Refresh request failure -> retain normal request error handling; do not synthesize task status or score rows.
+
+### 5. Good / Base / Bad Cases
+
+- Good: saving the final student's score turns the task into `completed`; reopening it shows every persisted row marked `已保存` and offers `返回项目`.
+- Base: an in-progress task with partial scores still allows editing and submits only changed rows.
+- Bad: filtering task navigation to `status === "in_progress"`, which prevents a coach from reviewing the scores just saved.
+
+### 6. Tests Required
+
+- Client request test asserts force refresh creates a distinct `/coach/assessment-tasks?refresh=<timestamp>-<sequence>` URL.
+- Task list and project tests assert `completed` task navigation is allowed while `not_started` remains blocked.
+- Batch-entry test asserts a completed task hydrates persisted values, exposes read-only labels, and never calls `submitCoachAssessment` after input/save attempts.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+if (task.status !== "in_progress") {
+  return showUnavailable();
+}
+```
+
+#### Correct
+
+```ts
+const isReadable = task.status === "in_progress" || task.status === "completed";
+const readOnly = task.status === "completed";
+if (!isReadable) return showUnavailable();
 ```

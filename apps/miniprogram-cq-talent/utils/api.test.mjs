@@ -36,7 +36,7 @@ globalThis.wx = {
   }),
 };
 
-const { correctCoachLesson, createCoachMatchEvent, getCoachMatchDetail, getCoachWorkbench, getParentActivityDetail, getParentStudentHome, saveCoachAttendance, submitCoachAssessment, switchActiveRole, wechatLogin } = await import("./api.ts");
+const { correctCoachLesson, createCoachMatchEvent, getCoachAssessmentTasks, getCoachMatchDetail, getCoachWorkbench, getParentActivityDetail, getParentStudentHome, saveCoachAttendance, submitCoachAssessment, switchActiveRole, wechatLogin } = await import("./api.ts");
 
 describe("active-role session transport", () => {
   it("advertises the role-switch capability when starting WeChat login", async () => {
@@ -314,6 +314,27 @@ describe("coach match detail request boundary", () => {
       expect(received).toEqual(expect.objectContaining({
         method: "GET",
         url: expect.stringMatching(/\/coach\/events\/event-match-refresh\/match\?refresh=\d+-\d+$/),
+      }));
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
+});
+
+describe("coach assessment task request boundary", () => {
+  it("uses a distinct read URL when the caller requires a post-write refresh", async () => {
+    const originalRequest = globalThis.wx.request;
+    let received;
+    globalThis.wx.request = ({ url, method, success }) => {
+      received = { url, method };
+      success({ statusCode: 200, data: { tasks: [] } });
+    };
+
+    try {
+      await getCoachAssessmentTasks({ forceRefresh: true });
+      expect(received).toEqual(expect.objectContaining({
+        method: "GET",
+        url: expect.stringMatching(/\/coach\/assessment-tasks\?refresh=\d+-\d+$/),
       }));
     } finally {
       globalThis.wx.request = originalRequest;

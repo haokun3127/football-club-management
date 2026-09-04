@@ -2877,9 +2877,3 @@
 - 设计先行：在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 1967:21 / Stats Row` 已改为仅顶部描边（top `1`，right/bottom/left `0`）；内部竖向分隔线 `1967:25`、`1967:29` 保留。
 - 小程序同步合并为单一 `.p4-hero__stats` 规则，仅保留 `border-top: 1rpx solid #334155`；新增回归断言，禁止恢复完整 `border`，同时锁定两条内部竖分隔线。
 - 验证：成长页 Vitest `9/9`、小程序 TypeScript `--noEmit`、微信开发者工具 MCP WXML/WXSS 编译及 `git diff --check` 均通过。
-
-## 2026-09-03 P4 统计行与 P5 历史对比最终删减
-
-- 用户确认统计行“什么线都不要”。在线 Figma `zZ6wKyOHKcO4UYXDd9jGwv / 1967:21` 已回读为无外框、无内部竖线；此前保留顶部线的旧记录已由本条覆盖。
-- P5 在线 Figma `1610:633` 已回读为隐藏节点；小程序删除能力雷达顶栏“历史对比”入口、处理函数和无用样式，维度详情入口仍保留。
-- 先改测试再改实现：P4/P5 定向 Vitest `17/17` 通过；TypeScript、P4/P5 WXML/WXSS 编译及 `git diff --check` 通过。未把这些静态/编译结果冒充运行态视觉验收。

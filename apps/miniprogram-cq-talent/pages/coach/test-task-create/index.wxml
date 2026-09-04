@@ -18,6 +18,16 @@
         </picker>
       </view>
       <view class="form-field">
+        <view class="form-field__label">测评球队</view>
+        <picker class="form-field__picker" mode="selector" range="{{teamNames}}" value="{{teamIndex}}" bindchange="onTeamChange">
+          <view class="form-field__picker-box">{{teamNames.length ? teamNames[teamIndex] : '球队加载中'}}<text class="form-field__picker-arrow">›</text></view>
+        </picker>
+      </view>
+      <view class="form-field">
+        <view class="form-field__label">所属学期</view>
+        <input class="form-field__input" value="{{termLabel}}" placeholder="例如：2026 秋季学期" maxlength="30" bindinput="onTermLabelInput" />
+      </view>
+      <view class="form-field">
         <view class="form-field__label">开始日期</view>
         <picker class="form-field__picker" mode="date" value="{{startsOn}}" bindchange="onStartDateChange">
           <view class="form-field__picker-box">{{startsOn}}<text class="form-field__picker-arrow">›</text></view>

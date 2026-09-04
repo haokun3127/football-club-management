@@ -20,24 +20,19 @@
         <view class="ability-context__label">当前训练球队</view>
         <view class="ability-context__main">
           <view class="ability-context__team">{{teamContext}}</view>
-          <view class="ability-context__hint">{{teamHint}}</view>
+          <view class="ability-context__hint">{{teamHint}} ›</view>
         </view>
       </view>
 
-      <block wx:if="{{hasRadar}}">
-        <view class="ability-hero">
-          <view class="ability-hero__head">
-            <view class="ability-hero__title">球员能力雷达</view>
-            <view class="ability-hero__period">{{assessmentPeriod}}</view>
-          </view>
-          <view class="ability-hero__student">
-            <view class="ability-hero__student-name">{{activeStudentName}}</view>
-            <view class="ability-hero__student-hint">点击下方球员切换</view>
-          </view>
-          <radar-canvas wx:if="{{radarMounted}}" class="ability-hero__canvas" dark="{{true}}" metrics="{{radar}}" width="352rpx" height="352rpx"></radar-canvas>
-          <view class="ability-hero__overall">综合 {{overall}}</view>
+      <view class="ability-summary">
+        <view class="ability-summary__title">球队能力概览</view>
+        <view class="ability-summary__meta">最近学期测评 · {{students.length}}名学员</view>
+        <view class="ability-summary__stats">
+          <view class="ability-summary__stat"><view class="ability-summary__value">{{summaryOverall}}</view><view class="ability-summary__label">平均综合分</view></view>
+          <view class="ability-summary__stat"><view class="ability-summary__value ability-summary__value--green">{{summaryBestDimension}}</view><view class="ability-summary__label">优势维度</view></view>
+          <view class="ability-summary__stat"><view class="ability-summary__value ability-summary__value--yellow">{{summaryNeedDimension}}</view><view class="ability-summary__label">待提升维度</view></view>
         </view>
-      </block>
+      </view>
 
       <view wx:if="{{hasStudents}}" class="ability-roster">
         <view class="ability-roster__head">
@@ -48,28 +43,18 @@
           <view
             wx:for="{{students}}"
             wx:key="id"
-            class="ability-player {{item.isActive ? 'ability-player--active' : ''}}"
+            class="ability-player"
             data-id="{{item.id}}"
             bindtap="selectStudent"
           >
             <view class="ability-player__avatar">{{item.initial}}</view>
-            <view class="ability-player__name">{{item.name}}</view>
+            <view class="ability-player__copy"><view class="ability-player__name">{{item.name}}</view><view class="ability-player__score">综合 {{item.scoreLabel}}</view></view>
+            <view class="ability-player__arrow">›</view>
           </view>
         </view>
       </view>
 
-      <view wx:if="{{dimensions.length}}" class="ability-dimensions">
-        <view class="ability-dimensions__title">维度评分</view>
-        <view wx:for="{{dimensions}}" wx:key="metricId" class="ability-dimension">
-          <view class="ability-dimension__head">
-            <view class="ability-dimension__label">{{item.label}}</view>
-            <view class="ability-dimension__value">{{item.value}}</view>
-          </view>
-          <view class="ability-dimension__track"><view class="ability-dimension__fill" style="width: {{item.width}}"></view></view>
-        </view>
-      </view>
     </block>
   </view>
 
-  <role-tabbar role="coach" active="training" />
 </view>

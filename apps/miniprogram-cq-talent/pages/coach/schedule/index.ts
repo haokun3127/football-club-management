@@ -211,6 +211,7 @@ Page({
     if (!id) return;
     const routes: Record<CoachTaskAction, string> = {
       attendance: `/pages/coach/attendance/index?id=${id}`,
+      lesson: `/pages/coach/attendance/index?id=${id}`,
       match: `/pages/coach/match/index?id=${id}`,
       assessment: `/pages/coach/test-entry/index?eventId=${id}`,
       training: `/pages/coach/content-select/index?eventId=${id}`,

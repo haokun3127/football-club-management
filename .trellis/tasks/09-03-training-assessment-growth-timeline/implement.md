@@ -27,6 +27,8 @@
 
 ## Batch 3 — Coach UI and current Figma screens
 
+**2026-09-03 progress:** complete locally. C11 lists each task with its backend-projected team and term, while task creation now submits the server-required real `teamId` and `termLabel`. C15 accepts only an in-progress task route with matching template, loads that task's team rather than a default team, scopes its draft key by task id, and submits `assessmentTaskId` on every saved player record. C2 was reread from Figma node `1610:1462`; the workbench now links to a separate full-screen classroom assessment page. It reads the server's selected content/present-student scope, restores persisted scores/notes, and saves only valid real student × selected-project entries. The old activity-level “评测录入” shortcut was removed so semester tasks remain the only entry for stage assessment. Figma MCP was read-only, so no online design write is claimed.
+
 1. 读取在线 Figma C2、C11、C15 当前节点和截图，创建/更新当前状态画板后回读节点与 `375×812` 截图。
 2. 先写 failing mini-program tests：C2 从训练活动进入训练内容评测；C11 显示/提交球队与学期；C15 必须携带 `taskId`，不允许从任意模板 URL 进入学期测评。
 3. 新增全屏 `pages/coach/training-assessment/`，以及 C2/C11/C15/API client/types/app route 的最小改动；WXML 所有展示字段在 TS view model 预计算。
@@ -34,7 +36,7 @@
 
 ## Batch 4 — Parent lesson stats and detailed growth timeline
 
-**2026-09-03 progress:** the first API/UI slice is complete locally. `growth-summary.trainingStats.lessonStats` now returns `attendedLessons`, `expectedLessons` and training-only `attendanceRate`; completed matches are excluded from the denominator. P4 normalizes that response and displays `已到/应到课时`. The complete child-scoped mixed timeline and milestones full-screen rendering remain pending. Online nodes P4 `1610:466`, C2 `1610:1462`, C11 `1617:2`, and C15 `1623:2` were reread; MCP is read-only, so no online Figma write is claimed.
+**2026-09-03 progress:** the API/UI slice is complete locally. `growth-summary.trainingStats.lessonStats` returns `attendedLessons`, `expectedLessons` and training-only `attendanceRate`; completed matches are excluded from the denominator. The same BFF now returns a child-scoped mixed `timeline`: completed training with saved drill scores/notes, completed match with the child's own match events, and ability updates from classroom scoring or task-bound semester assessments. P4 normalizes the timeline and shows its latest three facts; `pages/parent/milestones` now renders the full-screen detail from that same server projection, without calendar-window aggregation. Online nodes P4 `1610:466`, C2 `1610:1462`, C11 `1617:2`, and C15 `1623:2` were reread; MCP is read-only, so no online Figma write is claimed.
 
 1. 先写 failing API tests：lesson stats 仅计算训练、正确区分已到/应到、比赛不计入；timeline 只返回当前孩子可访问的训练/比赛/指标更新，并带来源与前后变化。
 2. 扩展 `growth-summary` 的 `lessonStats` 和 `timeline` view model；复用持久化活动、训练内容评分、比赛事件、PlayerMetricRecord，不新增前端伪数据。
@@ -43,10 +45,11 @@
 
 ## Batch 5 — Documentation and controlled demo data
 
+**2026-09-03 documentation progress:** `docs/current/progress.md`, `docs/current/figma-source-of-truth.md`, and the BFF contract note now record this batch. No production import or deployment was performed.
+
 1. 更新 `docs/current/progress.md`、`docs/current/figma-source-of-truth.md`、该任务证据和 API contract notes。
 2. 仅在用户明确授权生产导入后，单独备份生产 SQLite、运行可回滚导入、重启 API、以七个测试账号逐一只读核验两周训练/比赛/测评记录；导入和部署不与业务代码提交混合。
 
-**2026-09-03 quality evidence:** all task-focused tests and all three TypeScript checks pass. The root gate reaches API tests with `125/126` passing; the only remaining failure is outside this batch at `apps/api/test/server.test.ts:1383`, where an in-flight retired lesson-correction payload is still validated before its intended `410` response. It is intentionally left unstaged and is recorded in `docs/current/progress.md` with its exact assertion.
 **2026-09-03 final quality evidence:** all three TypeScript checks pass; the C2/C11/C15/coach-workbench page suite passes `44/44`, and the API full test command passes. The root gate is currently blocked before API tests by two files outside this batch: `apps/miniprogram-cq-talent/scripts/devtools-screenshot.test.mjs` has a syntax error, and `apps/miniprogram-cq-talent/pages/parent/content/index.test.mjs` has a CRLF-sensitive exact-string assertion. Both are intentionally excluded from this task-owned commit and are recorded in `docs/current/progress.md`.
 
 **2026-09-03 Figma completion boundary:** the authenticated Figma MCP identity was rechecked and has a `View` team seat. Code and contract completion are pushed to `dev`, but online design writes for the new C2 classroom-assessment state and revised C11/C15/P4 task states are not proven through this MCP connection. Do not close the visual-design acceptance item until a browser editor session or an editable MCP seat updates and rereads the relevant V6 frames.
@@ -59,6 +62,4 @@
 
 **2026-09-03 completion audit:** this task's code and contract acceptance is now verified against current `dev`. Server regressions cover the training-content assessment write scope, assessment task ownership/listing, training-only lesson stats, and child-scoped mixed growth timeline (`4/4`). File-SQLite reopens cover saved classroom assessments, assessment tasks, and task-bound app-client assessment/parent metric records (`3/3`). The relevant mini-program C2/C11/C15/P4/milestones entry and rendering suites pass (`63/63`), with mini-program TypeScript and `git diff --check` clean. The full root gate remains independently blocked by the already-recorded DevTools screenshot syntax error and CRLF-sensitive parent-content assertion; neither path belongs to this task. The browser-backed Figma readback is design evidence, not a new runtime screenshot claim.
 
-**2026-09-03 P4 stats-row outline correction:** user reported a pale boxed outline around the “已到/应到课时 / 出勤率 / 本月训练” row. Root cause was two duplicate `.p4-hero__stats` rules: the earlier rule set full `border: 1rpx solid #334155`, while the later rule only added `border-top`, leaving the other three sides in effect. The online authoritative Figma node `1967:21` was then changed to no strokes at all; inner dividers `1967:25` and `1967:29` are hidden. The mini-program now has one corresponding borderless rule, and a red-green regression forbids restoring any stats-row border. Focused P4 Vitest `9/9`, mini-program TypeScript, WXML/WXSS compiler checks, and `git diff --check` pass.
-
-**2026-09-03 P5 history comparison removal:** user confirmed the ability-radar “历史对比” action has no value. Online node `1610:633` is hidden and reread; the mini-program removes the top-bar action, handler, and style while retaining per-dimension detail navigation. P4/P5 focused Vitest `17/17`, TypeScript, WXML/WXSS compilation, and `git diff --check` pass. No runtime screenshot claim is made here.
+**2026-09-03 P4 stats-row outline correction:** user reported a pale boxed outline around the “已到/应到课时 / 出勤率 / 本月训练” row. Root cause was two duplicate `.p4-hero__stats` rules: the earlier rule set full `border: 1rpx solid #334155`, while the later rule only added `border-top`, leaving the other three sides in effect. The online authoritative Figma node `1967:21` was first changed to individual strokes top=1, right/bottom/left=0; inner dividers `1967:25` and `1967:29` remain. The mini-program now has one corresponding rule with only `border-top`, and a red-green regression forbids restoring the full border. Focused P4 Vitest `9/9`, mini-program TypeScript, WXML/WXSS compiler checks, and `git diff --check` pass.

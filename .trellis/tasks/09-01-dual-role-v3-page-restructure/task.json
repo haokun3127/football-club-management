@@ -18,7 +18,9 @@
   "commit": null,
   "pr_url": null,
   "subtasks": [],
-  "children": [],
+  "children": [
+    "09-03-growth-history-bulk-assessment"
+  ],
   "parent": null,
   "relatedFiles": [],
   "notes": "",

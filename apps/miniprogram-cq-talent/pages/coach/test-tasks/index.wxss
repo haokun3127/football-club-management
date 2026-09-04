@@ -119,6 +119,12 @@
   white-space: nowrap;
 }
 
+.task-card__context {
+  color: #667085;
+  font-size: 26rpx;
+  line-height: 36rpx;
+}
+
 .task-card__status {
   flex: 0 0 auto;
   padding: 8rpx 16rpx;
@@ -211,5 +217,17 @@
   color: #667085;
   font-size: 26rpx;
   line-height: 38rpx;
+  text-align: center;
+}
+
+.tasks-first-hint {
+  margin-top: 20rpx;
+  padding: 16rpx 28rpx;
+  border-radius: 24rpx;
+  background: #fff5f5;
+  color: #a80f1b;
+  font-size: 24rpx;
+  font-weight: 600;
+  line-height: 30rpx;
   text-align: center;
 }

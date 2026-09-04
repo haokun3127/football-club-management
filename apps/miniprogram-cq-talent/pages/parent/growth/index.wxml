@@ -15,13 +15,13 @@
           <view class="p4-hero__identity"><view class="p4-hero__name">{{heroName}}</view><view class="p4-hero__team">{{heroTeam}}</view></view>
         </view>
         <view wx:if="{{heroTags.length}}" class="p4-hero__tags"><view wx:for="{{heroTags}}" wx:key="*this" class="p4-hero__tag {{index === 1 ? 'p4-hero__tag--accent' : ''}}">{{item}}</view></view>
-        <view wx:if="{{heroStats.length}}" class="p4-hero__stats"><view wx:for="{{heroStats}}" wx:key="label" class="p4-hero__stat"><view class="p4-hero__stat-value {{item.accent ? 'p4-hero__stat-value--accent' : ''}}">{{item.value}}</view><view class="p4-hero__stat-label">{{item.label}}</view></view></view>
+        <view wx:if="{{heroStats.length}}" class="p4-hero__stats"><view wx:for="{{heroStats}}" wx:key="label" class="p4-hero__stat"><view class="p4-hero__stat-value {{item.valueClass}} {{item.accent ? 'p4-hero__stat-value--accent' : ''}}">{{item.value}}</view><view class="p4-hero__stat-label">{{item.label}}</view></view></view>
         <view wx:if="{{!heroStats.length}}" class="p4-hero__pending">{{heroSummaryMessage}}</view>
       </view>
 
       <!-- Figma P4 Milestones Card -->
       <view class="p4-card p4-milestones">
-        <view class="p4-card__head"><view class="p4-card__title">成长足迹 🏆</view><view class="p4-card__link" bindtap="openMilestones">更多›</view></view>
+        <view class="p4-card__head"><view class="p4-card__title">成长足迹 🏆</view><view class="p4-card__link" bindtap="openMilestones">查看全部 ›</view></view>
         <view class="p4-milestones__list">
           <view wx:for="{{milestones}}" wx:key="id" class="p4-milestone">
             <view class="p4-milestone__dot p4-milestone__dot--{{item.tone}}">{{item.icon}}</view>

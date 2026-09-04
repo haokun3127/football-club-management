@@ -187,6 +187,30 @@ export interface GrowthTrainingStats {
   monthly: Array<{ month: number; count: number }>;
 }
 
+export interface GrowthTimelineItem {
+  id: string;
+  kind: "training" | "match" | "ability_update";
+  occurredAt: string;
+  title: string;
+  subtitle: string;
+  teamName?: string;
+  venue?: string;
+  eventId?: string;
+  training?: {
+    items: Array<{ trainingProjectId: string; name: string; score?: number; note?: string }>;
+    lessonProgress?: { attendedLessons: number; expectedLessons: number };
+  };
+  match?: {
+    opponentName?: string;
+    scoreLabel?: string;
+    events: Array<{ id: string; studentId: string; type: string; minute?: number; note?: string }>;
+  };
+  abilityUpdate?: {
+    source: "training_content_assessment" | "semester_assessment";
+    metrics: Array<{ metricId: string; label: string; value: number | null; previousValue: number | null }>;
+  };
+}
+
 export interface GrowthSummary {
   student?: StudentSummary;
   radar: RadarMetricPoint[];
@@ -196,6 +220,7 @@ export interface GrowthSummary {
   views: MetricViewOption[];
   updatedAt?: string;
   trainingStats?: GrowthTrainingStats;
+  timeline: GrowthTimelineItem[];
 }
 
 export interface CoachHome {
@@ -220,6 +245,20 @@ export interface CoachWorkbench {
   match: Array<{ label: string; value: string }>;
   assessmentTemplateId?: string;
   pending: Array<{ title: string; message: string }>;
+}
+
+export interface CoachTrainingContentAssessment {
+  studentId: string;
+  trainingProjectId: string;
+  score: number;
+  note?: string;
+}
+
+export interface CoachTrainingContentAssessmentScope {
+  eventId: string;
+  selectedProjectIds: string[];
+  presentStudentIds: string[];
+  assessments: CoachTrainingContentAssessment[];
 }
 
 export interface CoachMatchDetail {
@@ -386,6 +425,12 @@ export interface AssessmentForm {
   pending: Array<{ title: string; message: string }>;
 }
 
+export interface CoachAssessmentEntries {
+  taskId: string;
+  projectId: string;
+  savedValuesByStudent: Record<string, Record<string, Record<string, unknown>>>;
+}
+
 export type AssessmentDraftStatus = "empty" | "recorded" | "missing";
 
 export interface AssessmentDraftEntry {
@@ -467,6 +512,9 @@ export interface CoachTrainingCoverageStudent {
 
 export interface CoachAssessmentTask {
   id: string;
+  teamId: string;
+  teamName?: string;
+  termLabel: string;
   title: string;
   templateId: string;
   startsOn: string;

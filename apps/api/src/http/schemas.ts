@@ -577,6 +577,24 @@ export const schemas = {
       },
     },
   },
+  appClientCoachAssessmentEntries: {
+    params: {
+      type: "object",
+      additionalProperties: false,
+      required: ["clubId", "clientId", "taskId", "projectId"],
+      properties: {
+        clubId: { type: "string", minLength: 1 },
+        clientId: { type: "string", minLength: 1 },
+        taskId: { type: "string", minLength: 1 },
+        projectId: { type: "string", minLength: 1 },
+      },
+    },
+    response: {
+      200: flexibleObject,
+      403: errorResponse,
+      404: errorResponse,
+    },
+  },
   appClientWechatLogin: {
     headers: {
       type: "object",

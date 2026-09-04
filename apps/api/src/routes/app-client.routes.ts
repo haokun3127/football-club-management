@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { formationTemplates, validateTacticalBoardPlayers, type ClubUserRole, type MatchEventType, type TacticalBoardPlayer } from "@football-club/domain";
-import type { RecordAssessmentInput, RecordMatchInput } from "@football-club/domain";
+import type { RecordAssessmentInput, RecordMatchInput, MetricValue } from "@football-club/domain";
 import type { PlayerMetricRecord } from "@football-club/domain";
 import { resolveAvailableAppRoles, resolveCompatibleAppRole, type AppRole } from "../auth/app-roles.js";
 import type { AuthContext } from "../auth/context.js";
@@ -253,6 +253,109 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         clubId: request.params.clubId,
         studentId: request.params.studentId,
         members,
+      };
+    },
+  );
+
+  app.get<{
+    Params: {
+      clubId: string;
+      clientId: string;
+      taskId: string;
+      projectId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/coach/assessment-tasks/:taskId/projects/:projectId/entries",
+    {
+      schema: {
+        ...schemas.appClientCoachAssessmentEntries,
+      },
+    },
+    async (request, reply) => {
+      const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
+      if (!client) {
+        return reply;
+      }
+
+      if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
+        return reply;
+      }
+
+      const auth = context.membershipResolver
+        ? await context.resolveClubAuth(request, reply, request.params.clubId)
+        : null;
+      if (context.membershipResolver && !auth) {
+        return reply;
+      }
+
+      const task = (await context.store.listAssessmentTasks(request.params.clubId))
+        .find((item) => item.id === request.params.taskId);
+      if (!task) {
+        return context.sendError(reply, 404, "not_found", "Assessment task not found");
+      }
+
+      const accessibleTeam = collectCoachTeamOptions(context, request.params.clubId, auth)
+        .some((team) => team.id === task.teamId);
+      if (!accessibleTeam) {
+        return context.sendError(reply, 403, "forbidden", "Assessment task team is outside this coach scope");
+      }
+
+      const [templates, metricCatalog, config] = await Promise.all([
+        context.store.listAssessmentTemplates(request.params.clubId),
+        context.store.listAbilityMetrics(request.params.clubId),
+        context.store.getDataCapabilityConfig(request.params.clubId),
+      ]);
+      const template = templates.find((item) => item.id === task.templateId && item.status === "active");
+      if (!template) {
+        return context.sendError(reply, 404, "not_found", "Assessment template not found");
+      }
+      const templateVersion = config.assessmentTemplateVersions
+        .filter((item) => item.templateId === template.id && item.status === "active")
+        .sort((left, right) => right.version.localeCompare(left.version))[0];
+      if (!templateVersion) {
+        return context.sendError(reply, 404, "not_found", "Assessment template version not found");
+      }
+
+      const bindings = config.assessmentMetricBindings
+        .filter((binding) => binding.templateVersionId === templateVersion.id && binding.role === "input")
+        .map((binding) => ({
+          binding,
+          metric: metricCatalog.find((metric) => metric.id === binding.metricId),
+        }))
+        .filter((item) => item.metric?.dimensionId === request.params.projectId && Boolean(item.binding.testItemId));
+      const fieldByMetricId = new Map(bindings.map((item) => [item.binding.metricId, item]));
+      if (!bindings.length) {
+        return { clubId: request.params.clubId, taskId: task.id, projectId: request.params.projectId, savedValuesByStudent: {} };
+      }
+
+      const taskStudentIds = new Set(
+        context.store.listTeamMembers(request.params.clubId)
+          .filter((member) => member.teamId === task.teamId && member.status === "active")
+          .map((member) => member.studentId),
+      );
+      const assessments = (await context.store.listPlayerAssessments(request.params.clubId))
+        .filter((assessment) => assessment.assessmentTaskId === task.id && taskStudentIds.has(assessment.studentId))
+        .sort((left, right) => Date.parse(right.assessedAt) - Date.parse(left.assessedAt) || right.id.localeCompare(left.id));
+      const latestAssessmentByStudent = new Map<string, (typeof assessments)[number]>();
+      for (const assessment of assessments) {
+        if (!latestAssessmentByStudent.has(assessment.studentId)) latestAssessmentByStudent.set(assessment.studentId, assessment);
+      }
+      const assessmentIds = new Set([...latestAssessmentByStudent.values()].map((assessment) => assessment.id));
+      const savedValuesByStudent: Record<string, Record<string, MetricValue>> = {};
+      for (const record of context.store.listMetricRecords(request.params.clubId)) {
+        if (record.source !== "assessment" || !record.assessmentId || !assessmentIds.has(record.assessmentId)) continue;
+        const field = fieldByMetricId.get(record.metricId);
+        if (!field?.binding.testItemId) continue;
+        const values = savedValuesByStudent[record.studentId] ?? {};
+        values[field.binding.testItemId] = record.value;
+        savedValuesByStudent[record.studentId] = values;
+      }
+
+      return {
+        clubId: request.params.clubId,
+        taskId: task.id,
+        projectId: request.params.projectId,
+        savedValuesByStudent,
       };
     },
   );
@@ -1152,6 +1255,12 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
 
       // P4 成长首页训练统计：课时总数/出勤率/本月训练/月度分布（真实参与记录推导）
       const trainingStats = await buildStudentTrainingStats(context, request.params.clubId, request.params.studentId);
+      const timeline = await buildStudentGrowthTimeline(
+        context,
+        request.params.clubId,
+        request.params.studentId,
+        metricCatalog,
+      );
 
       return {
         clubId: request.params.clubId,
@@ -1168,6 +1277,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         latest,
         trends: buildMetricTrends(metricRecords),
         trainingStats,
+        timeline,
         generatedAt: new Date().toISOString(),
       };
     },
@@ -2105,17 +2215,25 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return context.sendError(reply, 403, "forbidden", "Student is not accessible for this coach membership");
       }
 
-      const [metricCatalog, metricRecords] = await Promise.all([
+      const [metricCatalog, metricRecords, metricViewNodes] = await Promise.all([
         context.store.listAbilityMetrics(request.params.clubId),
         context.store.getStudentMetrics(request.params.clubId, request.params.studentId),
+        context.store.listMetricViewNodes(request.params.clubId),
       ]);
+      const radarMetricIds = new Set(
+        metricViewNodes
+          .filter((node) => node.viewId === "metric-view-cq-talent-elite-core-radar" && Boolean(node.metricId))
+          .map((node) => node.metricId),
+      );
+      const radarMetricCatalog = metricCatalog.filter((metric) => radarMetricIds.has(metric.id));
+      const radarMetricRecords = metricRecords.filter((record) => radarMetricIds.has(record.metricId));
 
       return {
         clubId: request.params.clubId,
         role: "coach",
         studentId: request.params.studentId,
-        metrics: metricCatalog,
-        latest: buildLatestMetricRecords(metricRecords, metricCatalog),
+        metrics: radarMetricCatalog,
+        latest: buildLatestMetricRecords(radarMetricRecords, radarMetricCatalog),
       };
     },
   );
@@ -2380,6 +2498,8 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
 
       const scope = await collectCoachScope(context, request.params.clubId, auth);
       const tasks = await context.store.listAssessmentTasks(request.params.clubId);
+      const teams = collectCoachTeamOptions(context, request.params.clubId, auth);
+      const teamNameById = new Map(teams.map((team) => [team.id, team.name]));
       const today = new Date().toISOString().slice(0, 10);
       const assessments = await context.store.listPlayerAssessments(request.params.clubId);
       const activeTeamMemberStudentIds = new Map<string, Set<string>>();
@@ -2406,6 +2526,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return {
           id: task.id,
           teamId: task.teamId,
+          teamName: teamNameById.get(task.teamId) ?? "球队待同步",
           termLabel: task.termLabel,
           title: task.title,
           templateId: task.templateId,
@@ -2423,6 +2544,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         tasks: views,
         templates: (await context.store.listAssessmentTemplates(request.params.clubId))
           .map((template) => ({ id: template.id, name: template.name })),
+        teams: teams.map((team) => ({ id: team.id, name: team.name })),
       };
     },
   );
@@ -3390,6 +3512,212 @@ type StudentTrainingStats = {
 };
 
 const TRAINING_STATS_MONTH_WINDOW = 8;
+
+type GrowthTimelineItem = {
+  id: string;
+  kind: "training" | "match" | "ability_update";
+  occurredAt: string;
+  title: string;
+  subtitle: string;
+  teamName?: string;
+  venue?: string;
+  eventId?: string;
+  training?: {
+    items: Array<{
+      trainingProjectId: string;
+      name: string;
+      score?: number;
+      note?: string;
+    }>;
+    lessonProgress: { attendedLessons: number; expectedLessons: number };
+  };
+  match?: {
+    opponentName?: string;
+    scoreLabel?: string;
+    events: Array<{
+      id: string;
+      studentId: string;
+      type: string;
+      minute?: number;
+      note?: string;
+    }>;
+  };
+  abilityUpdate?: {
+    source: "training_content_assessment" | "semester_assessment";
+    metrics: Array<{
+      metricId: string;
+      label: string;
+      value: number | null;
+      previousValue: number | null;
+    }>;
+  };
+};
+
+async function buildStudentGrowthTimeline(
+  context: RouteContext,
+  clubId: string,
+  studentId: string,
+  metricCatalog: Awaited<ReturnType<RouteContext["store"]["listAbilityMetrics"]>>,
+): Promise<GrowthTimelineItem[]> {
+  const events = (await withVenueNames(
+    context,
+    clubId,
+    sortEvents(await context.store.getStudentTimeline(clubId, studentId))
+      .filter((event) => event.status === "completed"),
+  ));
+  const [playerAssessments, metricRecords] = await Promise.all([
+    context.store.listPlayerAssessments(clubId),
+    context.store.getStudentMetrics(clubId, studentId),
+  ]);
+  const drillsById = new Map(context.store.listTrainingDrills(clubId).map((drill) => [drill.id, drill]));
+  const metricById = new Map(metricCatalog.map((metric) => [metric.id, metric]));
+  const teamNameById = new Map(context.store.listTeams(clubId).map((team) => [team.id, team.name]));
+  const attendanceByEventId = new Map(
+    context.store.listEventParticipants(clubId)
+      .filter((participant) => participant.studentId === studentId)
+      .map((participant) => [participant.eventId, participant.status] as const),
+  );
+  const timeline: GrowthTimelineItem[] = [];
+  const trainingAssessmentItems: GrowthTimelineItem[] = [];
+  let attendedLessons = 0;
+  let expectedLessons = 0;
+
+  for (const event of events) {
+    const teamName = typeof event.teamName === "string" && event.teamName.trim()
+      ? event.teamName
+      : typeof event.primaryTeamId === "string" ? teamNameById.get(event.primaryTeamId) : undefined;
+    const venue = typeof event.venue === "string" && event.venue.trim() ? event.venue : undefined;
+
+    if (event.type === "training") {
+      expectedLessons += 1;
+      if (attendanceByEventId.get(event.id) === "present") attendedLessons += 1;
+      const session = await context.store.getTrainingSessionByEvent(clubId, event.id);
+      const plan = session?.sessionPlanId ? context.store.getSessionPlan(session.sessionPlanId) : null;
+      const assessments = (await context.store.listTrainingContentAssessments(clubId, event.id))
+        .filter((assessment) => assessment.studentId === studentId);
+      const assessmentByProjectId = new Map(assessments.map((assessment) => [assessment.trainingProjectId, assessment]));
+      const items = (plan?.blocks ?? []).map((block) => {
+        const drill = drillsById.get(block.drillId);
+        const assessment = assessmentByProjectId.get(block.drillId);
+        return {
+          trainingProjectId: block.drillId,
+          name: drill?.name ?? "训练内容待同步",
+          ...(assessment ? { score: assessment.score, ...(assessment.note ? { note: assessment.note } : {}) } : {}),
+        };
+      });
+
+      timeline.push({
+        id: `training-${event.id}`,
+        kind: "training",
+        occurredAt: event.timeRange.startsAt,
+        title: event.title,
+        subtitle: items.length ? `完成 ${items.length} 项训练内容` : "完成训练",
+        ...(teamName ? { teamName } : {}),
+        ...(venue ? { venue } : {}),
+        eventId: event.id,
+        training: { items, lessonProgress: { attendedLessons, expectedLessons } },
+      });
+
+      for (const assessment of assessments) {
+        const drill = drillsById.get(assessment.trainingProjectId);
+        const metricIds = drill?.metricIds ?? [];
+        trainingAssessmentItems.push({
+          id: `training-assessment-${assessment.id}`,
+          kind: "ability_update",
+          occurredAt: assessment.assessedAt,
+          title: "训练内容评测已记录",
+          subtitle: `${drill?.name ?? "训练内容"} ${assessment.score} 分`,
+          ...(teamName ? { teamName } : {}),
+          eventId: event.id,
+          abilityUpdate: {
+            source: "training_content_assessment",
+            metrics: metricIds.map((metricId) => ({
+              metricId,
+              label: metricById.get(metricId)?.name ?? "能力指标待同步",
+              value: assessment.score,
+              previousValue: null,
+            })),
+          },
+        });
+      }
+      continue;
+    }
+
+    if (event.type === "match") {
+      const detail = await context.store.getMatchDetailByEvent(clubId, event.id);
+      const ownEvents = detail?.events
+        .filter((matchEvent) => matchEvent.studentId === studentId)
+        .map((matchEvent) => ({
+          id: matchEvent.id,
+          studentId: matchEvent.studentId,
+          type: matchEvent.type,
+          ...(matchEvent.minute === undefined ? {} : { minute: matchEvent.minute }),
+          ...(matchEvent.note ? { note: matchEvent.note } : {}),
+        })) ?? [];
+      const match = detail?.match;
+      const scoreLabel = typeof match?.homeScore === "number" && typeof match.awayScore === "number"
+        ? `${match.homeScore} : ${match.awayScore}`
+        : undefined;
+      timeline.push({
+        id: `match-${event.id}`,
+        kind: "match",
+        occurredAt: event.timeRange.startsAt,
+        title: event.title,
+        subtitle: match?.opponentName ? `对阵 ${match.opponentName}` : "完成比赛",
+        ...(teamName ? { teamName } : {}),
+        ...(venue ? { venue } : {}),
+        eventId: event.id,
+        match: {
+          ...(match?.opponentName ? { opponentName: match.opponentName } : {}),
+          ...(scoreLabel ? { scoreLabel } : {}),
+          events: ownEvents,
+        },
+      });
+    }
+  }
+
+  const taskByAssessmentId = new Map(
+    playerAssessments
+      .filter((assessment) => assessment.studentId === studentId && assessment.assessmentTaskId)
+      .map((assessment) => [assessment.id, assessment.assessmentTaskId] as const),
+  );
+  const recordsByMetricId = new Map<string, PlayerMetricRecord[]>();
+  for (const record of metricRecords) {
+    const list = recordsByMetricId.get(record.metricId) ?? [];
+    list.push(record);
+    recordsByMetricId.set(record.metricId, list);
+  }
+  for (const records of recordsByMetricId.values()) {
+    records.sort((left, right) => Date.parse(left.occurredAt) - Date.parse(right.occurredAt));
+    for (let index = 0; index < records.length; index += 1) {
+      const record = records[index]!;
+      if (record.source !== "assessment" || !record.assessmentId || !taskByAssessmentId.has(record.assessmentId)) continue;
+      const previous = index > 0 ? metricNumericValue(records[index - 1]!.value) : null;
+      const value = metricNumericValue(record.value);
+      const metric = metricById.get(record.metricId);
+      timeline.push({
+        id: `semester-assessment-${record.id}`,
+        kind: "ability_update",
+        occurredAt: record.occurredAt,
+        title: "学期测评已更新能力模型",
+        subtitle: metric?.name ?? "能力指标更新",
+        abilityUpdate: {
+          source: "semester_assessment",
+          metrics: [{
+            metricId: record.metricId,
+            label: metric?.name ?? "能力指标待同步",
+            value,
+            previousValue: previous,
+          }],
+        },
+      });
+    }
+  }
+
+  return [...timeline, ...trainingAssessmentItems]
+    .sort((left, right) => Date.parse(right.occurredAt) - Date.parse(left.occurredAt) || left.id.localeCompare(right.id))
+    .slice(0, 100);
+}
 
 // P4 成长首页英雄卡统计：从真实参与记录推导课时/出勤/月度分布（月份按北京时间归属）
 async function buildStudentTrainingStats(context: RouteContext, clubId: string, studentId: string): Promise<StudentTrainingStats> {

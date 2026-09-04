@@ -1,0 +1,30 @@
+<view class="training-assessment-page">
+  <view class="assessment-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
+    <view class="assessment-nav__left" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /><text>课堂训练评测</text></view>
+    <text class="assessment-nav__save" bindtap="save">{{saving ? '保存中' : '保存'}}</text>
+  </view>
+  <view class="assessment-body">
+    <status-view state="{{state}}" title="{{statusTitle}}" message="{{message}}" action-text="{{statusActionText}}" bindaction="retry" />
+    <block wx:if="{{state === 'ready'}}">
+      <view class="assessment-hero">
+        <view class="assessment-hero__top"><text>{{eventDateTeam}}</text><text>{{presentCountLabel}}</text></view>
+        <text class="assessment-hero__time">{{eventTime}}</text>
+        <text class="assessment-hero__title">{{eventTitle}}</text>
+        <text class="assessment-hero__meta">{{eventVenue}}</text>
+        <text class="assessment-hero__count">{{presentCountLabel}}</text>
+      </view>
+      <view class="assessment-projects">
+        <view wx:for="{{projects}}" wx:key="id" class="{{item.className}}" data-id="{{item.id}}" bindtap="selectProject">{{item.label}}</view>
+      </view>
+      <view class="assessment-panel">
+        <view class="assessment-panel__head"><text>已到学员</text><text>分数（0-100）</text></view>
+        <view wx:for="{{rows}}" wx:key="studentId" class="assessment-row">
+          <view class="assessment-row__student"><view class="assessment-row__avatar">{{item.initial}}</view><text>{{item.name}}</text></view>
+          <input class="assessment-row__score" type="number" value="{{item.scoreInput}}" placeholder="分数" data-student-id="{{item.studentId}}" bindinput="onScoreInput" />
+          <input class="assessment-row__note" value="{{item.noteInput}}" placeholder="可选备注" maxlength="80" data-student-id="{{item.studentId}}" bindinput="onNoteInput" />
+        </view>
+      </view>
+      <view class="assessment-save {{saving ? 'assessment-save--disabled' : ''}}" bindtap="save">{{saving ? '正在保存' : '保存本堂课堂评测'}}</view>
+    </block>
+  </view>
+</view>

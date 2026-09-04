@@ -4,7 +4,7 @@
       <view class="tasks-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/c11-arrow-left.svg" mode="aspectFit" /></view>
       <view class="tasks-nav__title">测评任务</view>
     </view>
-    <view class="tasks-nav__create" bindtap="openCreate" aria-label="新增测评任务">新增</view>
+    <view class="tasks-nav__create" bindtap="openCreate" aria-label="新建测评任务">新建任务</view>
   </view>
 
   <view class="tasks-page__body">
@@ -21,6 +21,7 @@
             <view class="task-card__title">{{item.title}}</view>
             <view class="{{item.statusClass}}">{{item.statusLabel}}</view>
           </view>
+          <view class="task-card__context">{{item.teamContextLabel}}</view>
           <view class="task-card__dates">{{item.dateRange}}</view>
           <view class="task-card__foot">
             <view class="task-card__progress">
@@ -32,6 +33,7 @@
         </view>
       </view>
       <view wx:else class="filter-empty">当前筛选暂无测评任务。</view>
+      <view class="tasks-first-hint">进入任务后，先选择测评项目，再为全队连续录入</view>
     </block>
   </view>
 

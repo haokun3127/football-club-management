@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   getCoachStudentRadar: vi.fn(),
   requireRole: vi.fn(),
   navigateBack: vi.fn(),
+  openPage: vi.fn(),
 }));
 
 vi.mock("../../../utils/api", () => ({
@@ -13,6 +14,7 @@ vi.mock("../../../utils/api", () => ({
   getCoachStudentRadar: mocks.getCoachStudentRadar,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
+vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
 vi.mock("../../../utils/presentation", () => ({ resolveNavInset: () => 0 }));
 
 globalThis.wx = { navigateBack: mocks.navigateBack };
@@ -70,6 +72,7 @@ describe("coach student radar", () => {
     mocks.getCoachStudentRadar.mockReset().mockResolvedValue(validRadar);
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
     mocks.navigateBack.mockReset();
+    mocks.openPage.mockReset();
   });
 
   it("uses only a real team member, projects real dimensions, and preserves the assessment period", async () => {
@@ -81,7 +84,7 @@ describe("coach student radar", () => {
     expect(page.data).toMatchObject({
       state: "ready",
       activeStudentId: "student-1",
-      activeStudentName: "Player One",
+      activeStudentName: "Play",
       assessmentPeriod: "2026-08-01 至 2026-08-05 评估",
       dimensions: [
         { metricId: "passing", value: "74", width: "74%" },
@@ -89,6 +92,26 @@ describe("coach student radar", () => {
         { metricId: "speed", value: "78", width: "78%" },
       ],
     });
+  });
+
+  it("projects the real eight-metric response into the six Figma display axes without inventing values", async () => {
+    mocks.getCoachStudentRadar.mockResolvedValueOnce([
+      { metricId: "metric-cq-talent-core-03", label: "运控球", value: 66, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
+      { metricId: "metric-cq-talent-core-10", label: "1v1", value: 70, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
+      { metricId: "metric-cq-talent-core-18", label: "传接球", value: 74, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
+      { metricId: "metric-cq-talent-core-27", label: "射门", value: 78, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
+      { metricId: "metric-cq-talent-core-32", label: "小组配合", value: 82, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
+      { metricId: "metric-cq-talent-core-48", label: "体能", value: 90, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
+      { metricId: "metric-cq-talent-core-38", label: "整体战术", value: 86, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
+      { metricId: "metric-cq-talent-core-56", label: "精神", value: 63, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
+    ]);
+    const page = createPageInstance();
+
+    await page.load("student-1");
+
+    expect(page.data.radar).toHaveLength(6);
+    expect(page.data.dimensions.map((dimension) => dimension.label)).toEqual(["协作", "速度", "射门", "体能", "防守", "传球"]);
+    expect(page.data.radar.map((metric) => metric.value)).toEqual([82, 66, 78, 90, 70, 74]);
   });
 
   it("does not request a radar when the scoped team has no members", async () => {
@@ -105,53 +128,18 @@ describe("coach student radar", () => {
     expect(page.data).toMatchObject({ state: "empty", students: [], radar: [] });
   });
 
-  it("keeps the newest student data when an older request succeeds or fails later", async () => {
-    const first = deferred();
-    const second = deferred();
-    mocks.getCoachStudentRadar
-      .mockImplementationOnce(() => first.promise)
-      .mockImplementationOnce(() => second.promise);
+  it("navigates to another real team member's radar", async () => {
     const page = createPageInstance();
-
-    const initialLoad = page.load("student-1");
-    await Promise.resolve();
-    const latestLoad = page.selectStudent({ currentTarget: { dataset: { id: "student-2", name: "Player Two" } } });
-    second.resolve(validRadar.map((point) => ({ ...point, value: 80 })));
-    await latestLoad;
-    first.reject(new Error("older request failed"));
-    await initialLoad;
-
-    expect(page.data).toMatchObject({
-      state: "ready",
-      activeStudentId: "student-2",
-      activeStudentName: "Player Two",
-      overall: "80",
-    });
-    expect(page.data.message).not.toContain("older request failed");
+    await page.load("student-1");
+    page.selectStudent({ currentTarget: { dataset: { id: "student-2" } } });
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/student-radar/index?student=student-2");
   });
 
-  it("ignores an older successful response after another student becomes active", async () => {
-    const first = deferred();
-    const second = deferred();
-    mocks.getCoachStudentRadar
-      .mockImplementationOnce(() => first.promise)
-      .mockImplementationOnce(() => second.promise);
+  it("does not navigate when the active student is selected again", async () => {
     const page = createPageInstance();
-
-    const initialLoad = page.load("student-1");
-    await Promise.resolve();
-    const latestLoad = page.selectStudent({ currentTarget: { dataset: { id: "student-2", name: "Player Two" } } });
-    second.resolve(validRadar.map((point) => ({ ...point, value: 80 })));
-    await latestLoad;
-    first.resolve(validRadar.map((point) => ({ ...point, value: 12 })));
-    await initialLoad;
-
-    expect(page.data).toMatchObject({
-      state: "ready",
-      activeStudentId: "student-2",
-      activeStudentName: "Player Two",
-      overall: "80",
-    });
+    await page.load("student-1");
+    page.selectStudent({ currentTarget: { dataset: { id: "student-1" } } });
+    expect(mocks.openPage).not.toHaveBeenCalled();
   });
 
   it("shows an honest empty state instead of drawing invalid radar dimensions", async () => {
@@ -220,36 +208,37 @@ describe("coach student radar", () => {
     expect(page.data.message).not.toContain("raw radar upstream details");
   });
 
-  it("uses a local Figma header, safe feedback state, and a template without method calls", () => {
+  it("uses the V7 full-screen white header, large radar card, roster grid, and a template without method calls", () => {
     expect(existsSync(backArrow)).toBe(true);
     expect(pageConfig).not.toContain('"app-header"');
-    expect(pageConfig).toContain('"role-tabbar"');
+    expect(pageConfig).not.toContain('"role-tabbar"');
     expect(template).toContain('class="radar-nav"');
     expect(template).toContain('padding-top:{{navInset}}px');
     expect(template).toContain('/assets/icons/c13-arrow-left.svg');
-    expect(template).toContain('feedbackMessage');
-    expect(template).not.toContain("教练李");
+    expect(template).toContain('class="radar-context"');
+    expect(template).toContain('class="radar-roster__grid"');
+    expect(template).not.toContain('feedbackMessage');
+    expect(template).not.toContain('student-strip');
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(template).toContain('class="radar-hero {{radarHeroClass}}"');
-    expect(controller).toContain('radarHeroClass');
-    expect(stylesheet).toMatch(/\.radar-nav\s*\{[^}]*height:\s*88rpx[^}]*box-sizing:\s*content-box/s);
-    expect(stylesheet).toMatch(/\.radar-nav\s*\{[^}]*gap:\s*0/s);
+    expect(template).toContain('class="radar-hero"');
+    expect(template).not.toContain('radarHeroClass');
+    expect(controller).not.toContain('radarHeroClass');
+    expect(stylesheet).toMatch(/\.radar-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*background:\s*#ffffff)/s);
     expect(stylesheet).toMatch(/\.radar-nav__back,\s*\.radar-nav__placeholder\s*\{(?=[^}]*width:\s*48rpx)(?=[^}]*height:\s*64rpx)/s);
     expect(stylesheet).toMatch(/\.radar-nav__title\s*\{(?=[^}]*text-align:\s*left)(?=[^}]*font-size:\s*36rpx)(?=[^}]*line-height:\s*44rpx)/s);
-    expect(template).toMatch(/<radar-canvas[^>]*width="440rpx"[^>]*height="360rpx"/);
-    expect(stylesheet).toMatch(/\.radar-hero\s*\{[^}]*position:\s*relative[^}]*height:\s*520rpx[^}]*overflow:\s*hidden/s);
+    expect(template).toMatch(/<radar-canvas[^>]*width="528rpx"[^>]*height="528rpx"/);
+    expect(stylesheet).toMatch(/\.radar-hero\s*\{[^}]*position:\s*relative[^}]*height:\s*688rpx[^}]*overflow:\s*hidden/s);
     expect(stylesheet).toMatch(/\.radar-hero__plot\s*\{[^}]*justify-content:\s*center/s);
-    expect(stylesheet).toMatch(/\.radar-hero__overall\s*\{[^}]*position:\s*absolute[^}]*left:\s*0[^}]*right:\s*0[^}]*bottom:\s*24rpx[^}]*text-align:\s*center[^}]*font-size:\s*96rpx/s);
-    expect(stylesheet).toMatch(/\.radar-hero--dense\s+\.radar-hero__plot\s*\{[^}]*padding-top:\s*24rpx/s);
-    expect(stylesheet).toMatch(/\.radar-hero--dense\s*\{[^}]*height:\s*616rpx/s);
+    expect(stylesheet).toMatch(/\.radar-hero__period\s*\{[^}]*color:\s*#a80f1b/s);
+    expect(stylesheet).toMatch(/\.radar-roster__grid\s*\{[^}]*grid-template-columns:\s*repeat\(4,/s);
     expect(stylesheet).not.toMatch(/width:\s*200%/);
     expect(stylesheet).not.toMatch(/transform:\s*scale\s*\(/);
     expect(controller).not.toContain("app-header");
   });
 
-  it("keeps the student chip at the Figma 32px geometry and preserves the 16px hero gap", () => {
-    expect(stylesheet).toMatch(/\.student-chip\s*\{(?=[^}]*padding:\s*0\s*32rpx)(?=[^}]*height:\s*64rpx)(?=[^}]*box-sizing:\s*border-box)(?=[^}]*line-height:\s*60rpx)/s);
-    expect(stylesheet).toMatch(/\.student-strip\s*\{(?=[^}]*height:\s*64rpx)(?=[^}]*margin-bottom:\s*32rpx)/s);
+  it("keeps the Figma context line above the radar card", () => {
+    expect(stylesheet).toMatch(/\.radar-context\s*\{[^}]*margin-bottom:\s*16rpx/s);
+    expect(stylesheet).toMatch(/\.radar-page__body\s*\{[^}]*padding:[^}]*180rpx/s);
   });
 
   it("preserves only the source occurredAt field at the API boundary", () => {

@@ -2,8 +2,7 @@
   <view class="p2-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="p2-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
     <view class="p2-nav__title">{{detail ? detail.navTitle : '活动详情'}}</view>
-    <button wx:if="{{detail && detail.type === 'match'}}" class="p2-nav__action" open-type="share">邀请好友</button>
-    <view wx:elif="{{detail}}" class="p2-nav__status p2-nav__status--{{detail.statusTone}}">{{detail.statusLabel}}</view>
+    <view wx:if="{{detail && detail.type !== 'match'}}" class="p2-nav__status p2-nav__status--{{detail.statusTone}}">{{detail.statusLabel}}</view>
     <view wx:else class="p2-nav__spacer"></view>
   </view>
 
@@ -23,24 +22,27 @@
     </block>
 
     <block wx:elif="{{detail && detail.type === 'match'}}">
-      <view class="match-hero">
-        <view class="match-hero__meta"><view><view class="match-hero__type">比赛</view><view class="match-hero__title">{{detail.title}}</view></view><view class="match-hero__date"><view>{{detail.dateText}}</view><view>{{detail.venueText}}</view></view></view>
-        <view class="match-score"><view class="match-team"><view class="match-team__avatar">A</view><view>{{detail.homeTeam}}</view></view><view class="match-score__center"><view>{{detail.scoreText}}</view><view class="match-score__status">{{detail.statusLabel}}</view></view><view class="match-team"><view class="match-team__avatar">B</view><view>{{detail.awayTeam}}</view></view></view>
+      <view class="match-detail__date">{{detail.dateText}}</view>
+      <view class="match-summary">
+        <view class="match-summary__venue-label">比赛场地</view>
+        <view class="match-summary__venue">{{detail.venueText}}</view>
+        <view class="match-summary__scoreline"><view class="match-summary__team match-summary__team--home">{{detail.homeTeam}}</view><view class="match-summary__score">{{detail.scoreText}}</view><view class="match-summary__team match-summary__team--away">{{detail.awayTeam}}</view></view>
+        <view class="match-summary__result">{{detail.matchResultLabel}}</view>
       </view>
-      <view class="roster-card"><view class="roster-card__head"><view>出席名单</view><view>{{detail.roster.length}}人</view></view><view wx:for="{{detail.roster}}" wx:key="id" class="roster-row"><view class="roster-row__avatar roster-row__avatar--{{item.tone}}">{{item.initial}}</view><view class="roster-row__name">{{item.name}}</view><view class="roster-row__state roster-row__state--{{item.statusTone}}">{{item.statusLabel}}</view></view><view wx:if="{{!detail.roster.length}}" class="roster-empty">出席名单待同步</view></view>
+      <view class="match-events-title">{{detail.childName}}的比赛数据</view>
       <view class="match-events-card">
-        <view class="match-events-card__head"><view>比赛事件</view><view wx:if="{{detail.hasMatchEvents}}">{{detail.matchEvents.length}}条</view></view>
         <view wx:if="{{detail.hasMatchEvents}}" class="match-events-list">
           <view wx:for="{{detail.matchEvents}}" wx:key="id" class="match-event-row">
-            <view class="match-event-row__minute">{{item.minuteLabel}}</view>
+            <view class="match-event-row__icon match-event-row__icon--{{item.tone}}">{{item.icon}}</view>
             <view class="match-event-row__main">
-              <view class="match-event-row__line"><view class="match-event-row__pill match-event-row__pill--{{item.tone}}">{{item.label}}</view><view class="match-event-row__name">{{item.studentName}}</view></view>
-              <view wx:if="{{item.hasNote}}" class="match-event-row__note">{{item.note}}</view>
+              <view class="match-event-row__name">{{item.label}}</view>
+              <view class="match-event-row__minute">{{item.minuteLabel}}</view>
             </view>
           </view>
         </view>
         <view wx:else class="match-events-empty">暂无已记录的比赛事件</view>
       </view>
+      <view wx:if="{{detail.hasMatchNote}}" class="match-note"><view class="match-note__title">教练点评</view><view class="match-note__copy">{{detail.matchNote}}</view></view>
     </block>
 
     <block wx:elif="{{detail}}">
@@ -51,5 +53,5 @@
       <view class="other-footer"><image src="/assets/icons/info.svg" mode="aspectFit" />{{detail.otherNotice}}</view>
     </block>
   </view>
-  <role-tabbar role="parent" active="schedule" />
+  <role-tabbar wx:if="{{!detail || detail.type !== 'match'}}" role="parent" active="schedule" />
 </view>

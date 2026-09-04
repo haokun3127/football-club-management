@@ -64,6 +64,10 @@ describe("parent growth training history", () => {
     expect(template).toContain('<view class="p4-card__title">训练历程 📊</view><view class="p4-card__link" bindtap="openTrainingHistory">查看›</view>');
   });
 
+  it("uses the Figma P4 copy for the growth-footprint action", () => {
+    expect(template).toContain('<view class="p4-card__title">成长足迹 🏆</view><view class="p4-card__link" bindtap="openMilestones">查看全部 ›</view>');
+  });
+
   it("opens the training-history page", () => {
     const page = createPageInstance({ activeStudentId: "student-1" });
 
@@ -72,7 +76,7 @@ describe("parent growth training history", () => {
     expect(mocks.openPage).toHaveBeenCalledWith("/pages/parent/training-history/index");
   });
 
-  it("refreshes growth after returning from the child switch and renders real recent activity", async () => {
+  it("refreshes growth after returning from the child switch and renders the server-scoped timeline", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-08-11T12:00:00.000Z"));
     mocks.requireRole.mockReturnValue({ role: "parent", currentStudentId: "student-2" });
@@ -88,11 +92,12 @@ describe("parent growth training history", () => {
       ],
       metricItems: [],
       views: [{ id: "overview", name: "能力概览", metricIds: ["speed", "passing", "control"] }],
+      timeline: [
+        { id: "timeline-training", kind: "training", occurredAt: "2026-08-10T01:00:00.000Z", title: "训练复盘", subtitle: "完成 2 项训练内容" },
+        { id: "timeline-match", kind: "match", occurredAt: "2026-08-09T01:00:00.000Z", title: "友谊赛", subtitle: "对阵渝北青训" },
+        { id: "timeline-ability", kind: "ability_update", occurredAt: "2026-08-08T01:00:00.000Z", title: "训练内容评测已记录", subtitle: "传接球 91 分" },
+      ],
     });
-    mocks.getParentCalendar.mockResolvedValue([
-      { id: "training-1", type: "training", title: "训练复盘", startsAt: "2026-08-10T01:00:00.000Z", status: "completed", venue: "球场", childIds: ["student-2"] },
-      { id: "match-1", type: "match", title: "友谊赛", startsAt: "2026-08-09T01:00:00.000Z", status: "completed", venue: "球场", childIds: ["student-2"] },
-    ]);
     mocks.getParentMetricDetail.mockResolvedValue({ metricId: "speed", label: "速度", records: [], sourceEvents: [] });
     const page = createPageInstance({ activeStudentId: "student-1" });
 
@@ -100,7 +105,7 @@ describe("parent growth training history", () => {
 
     expect(mocks.setCurrentStudentId).toHaveBeenCalledWith("student-2");
     expect(mocks.getParentGrowth).toHaveBeenCalledWith("student-2", expect.objectContaining({ name: "第二位学员" }));
-    expect(mocks.getParentCalendar).toHaveBeenCalledWith("2026-07-13", "2026-08-11");
+    expect(mocks.getParentCalendar).not.toHaveBeenCalled();
     expect(page.data).toMatchObject({
       activeStudentId: "student-2",
       heroName: "第二位学员",
@@ -108,7 +113,11 @@ describe("parent growth training history", () => {
       milestoneMessage: "最新足迹：训练复盘",
       trainingHistoryMessage: "近30天已完成 1 次训练，点击查看完整历程",
     });
-    expect(page.data.milestones).toHaveLength(3);
+    expect(page.data.milestones).toEqual([
+      expect.objectContaining({ id: "timeline-training", title: "训练复盘", state: "完成 2 项训练内容" }),
+      expect.objectContaining({ id: "timeline-match", title: "友谊赛", state: "对阵渝北青训" }),
+      expect.objectContaining({ id: "timeline-ability", title: "训练内容评测已记录", state: "传接球 91 分" }),
+    ]);
     expect(page.data.trainingBars).toHaveLength(8);
   });
 
@@ -206,19 +215,21 @@ describe("parent growth training history", () => {
 
     expect(page.data.heroTags).toEqual(["在队1年7个月", "训练46课"]);
     expect(page.data.heroStats).toEqual([
-      { value: "41/46", label: "已到/应到课时", accent: false },
-      { value: "89%", label: "出勤率", accent: true },
-      { value: "12", label: "本月训练", accent: false },
+      { value: "41/46", label: "已到/应到课时", accent: false, valueClass: "p4-hero__stat-value--fraction" },
+      { value: "89%", label: "出勤率", accent: true, valueClass: "" },
+      { value: "12", label: "本月训练", accent: false, valueClass: "" },
     ]);
     expect(page.data.trainingBars.map((bar) => bar.label)).toEqual(["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月"]);
     expect(Math.max(...page.data.trainingBars.map((bar) => bar.height))).toBe(80);
     expect(template).toContain("p4-hero__stats");
     expect(template).toContain("p4-hero__tags");
+    expect(template).toContain("p4-hero__stat-value {{item.valueClass}}");
+    expect(styles).toMatch(/\.p4-hero__stat-value--fraction\s*\{(?=[^}]*font-size:\s*44rpx)(?=[^}]*line-height:\s*52rpx)/s);
   });
 
-  it("keeps the stats row completely borderless like the updated Figma board", () => {
-    expect(styles).not.toMatch(/\.p4-hero__stats\s*\{[^}]*border(?:-(?:top|right|bottom|left))?\s*:/);
-    expect(styles).not.toContain(".p4-hero__stat + .p4-hero__stat");
-    expect(styles).not.toContain(".p4-stat + .p4-stat");
+  it("keeps only the hero stats top divider and its internal separators from the Figma board", () => {
+    expect(styles).not.toMatch(/\.p4-hero__stats\s*\{[^}]*border:\s*1rpx\s+solid\s+#334155/);
+    expect(styles).toMatch(/\.p4-hero__stats\s*\{[^}]*border-top:\s*1rpx\s+solid\s+#334155/);
+    expect(styles).toMatch(/\.p4-hero__stat\s*\+\s*\.p4-hero__stat\s*\{[^}]*border-left:\s*1rpx\s+solid\s+#334155/);
   });
 });

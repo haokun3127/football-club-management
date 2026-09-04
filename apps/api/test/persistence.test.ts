@@ -273,6 +273,37 @@ describe("platform persistence", () => {
     }
   });
 
+  it("skips legacy assessment tasks without a team scope when opening a persisted database", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "football-legacy-assessment-task-"));
+    const databasePath = join(directory, "club.sqlite");
+    let persistence: Awaited<ReturnType<typeof createPlatformPersistence>> | undefined;
+
+    try {
+      persistence = await createPlatformPersistence({ databasePath, seed: true });
+      persistence.database.prepare(`
+        INSERT INTO assessment_tasks (
+          id, club_id, team_id, term_label, title, template_id, starts_on, due_on, created_at, updated_at
+        ) VALUES (?, ?, NULL, NULL, ?, ?, ?, ?, ?, ?)
+      `).run(
+        "assessment-task-legacy-unscoped",
+        "club-chongqing-talent",
+        "旧版测评任务",
+        "assessment-template-technical",
+        "2026-06-01",
+        "2026-06-30",
+        "2026-06-01T00:00:00.000Z",
+        "2026-06-01T00:00:00.000Z",
+      );
+
+      expect(() => new PersistentApiStore(persistence!.repositories, createSeedData())).not.toThrow();
+      expect(persistence.repositories.assessmentTasks.listByClub("club-chongqing-talent"))
+        .not.toContainEqual(expect.objectContaining({ id: "assessment-task-legacy-unscoped" }));
+    } finally {
+      persistence?.database.close();
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   // 该用例需完整跑两遍文件库 seed（开库→改→关→带 seed 重开），单跑约 30s，并行负载下更久，显式放宽超时
   it("preserves existing acceptance parent phones across a seeded file database reopen", { timeout: 90_000 }, async () => {
     const directory = mkdtempSync(join(tmpdir(), "football-parent-phone-"));

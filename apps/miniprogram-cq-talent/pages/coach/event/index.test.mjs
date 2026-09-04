@@ -86,7 +86,7 @@ describe("coach activity workbench", () => {
     globalThis.wx.reLaunch.mockReset();
   });
 
-  it("presents real workbench data and exposes entries only for the event type, workflow, and assessment template", async () => {
+  it("presents real workbench data and exposes only training-content and classroom-assessment entries for a training activity", async () => {
     mocks.getCoachWorkbench.mockResolvedValue(trainingWorkbench);
     const page = createPageInstance();
 
@@ -106,7 +106,7 @@ describe("coach activity workbench", () => {
       hasMatch: false,
       hasAssessmentTemplate: true,
     });
-    expect(page.data.actionCards.map((item) => item.id)).toEqual(["training", "assessment", "change"]);
+    expect(page.data.actionCards.map((item) => item.id)).toEqual(["training", "training-assessment", "change"]);
     expect(page.data.eventView).toMatchObject({
       title: "Ball-control session",
       typeLabel: "Training",
@@ -240,7 +240,7 @@ describe("coach activity workbench", () => {
       eventId: "event-1",
       canWrite: true,
       assessmentTemplateId: "template-1",
-      actionCards: ["attendance", "lesson", "match", "tactical", "training", "assessment", "change"].map((id) => ({ id })),
+      actionCards: ["attendance", "lesson", "match", "tactical", "training", "training-assessment", "change"].map((id) => ({ id })),
     });
     const routes = {
       attendance: "/pages/coach/attendance/index?id=event-1",
@@ -248,7 +248,7 @@ describe("coach activity workbench", () => {
       match: "/pages/coach/match/index?id=event-1",
       tactical: "/pages/coach/tactical-board/index?eventId=event-1",
       training: "/pages/coach/content-select/index?eventId=event-1",
-      assessment: "/pages/coach/test-entry/index?eventId=event-1&templateId=template-1",
+      "training-assessment": "/pages/coach/training-assessment/index?eventId=event-1",
       change: "/pages/coach/event-change/index?id=event-1",
     };
     Object.entries(routes).forEach(([action, route]) => {
@@ -257,7 +257,7 @@ describe("coach activity workbench", () => {
     });
   });
 
-  it("does not expose training, assessment, or completed-workflow entries for a match without an assessment template", async () => {
+  it("does not expose training or completed-workflow entries for a match without an assessment template", async () => {
     mocks.getCoachWorkbench.mockResolvedValue({
       ...trainingWorkbench,
       event: { ...trainingWorkbench.event, type: "match" },
@@ -322,14 +322,14 @@ describe("coach activity workbench", () => {
     expect(stylesheet).not.toContain('.action-tile--match');
   });
 
-  it("uses the current Figma glyphs for the three training workbench shortcuts", async () => {
+  it("uses the current Figma glyphs for the training workbench shortcuts", async () => {
     mocks.getCoachWorkbench.mockResolvedValue(trainingWorkbench);
     const page = createPageInstance();
     await page.load("event-training-1");
 
     expect(page.data.actionCards).toEqual([
       { id: "training", label: "训练内容", glyph: "✦" },
-      { id: "assessment", label: "评测录入", glyph: "◎" },
+      { id: "training-assessment", label: "课堂评测", glyph: "◎" },
       { id: "change", label: "变更活动", glyph: "↻" },
     ]);
     expect(template).toContain('<view wx:if="{{item.glyph}}" class="action-tile__glyph">{{item.glyph}}</view>');
