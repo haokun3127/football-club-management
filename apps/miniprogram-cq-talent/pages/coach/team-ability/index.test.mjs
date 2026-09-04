@@ -179,6 +179,9 @@ describe("coach ability assessment", () => {
     expect(stylesheet).toMatch(/\.ability-summary\s*\{(?=[^}]*height:\s*284rpx)(?=[^}]*background:\s*#07111f)/s);
     expect(stylesheet).toMatch(/\.ability-roster__grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s);
     expect(stylesheet).toMatch(/\.ability-player__avatar\s*\{(?=[^}]*width:\s*80rpx)(?=[^}]*height:\s*80rpx)(?=[^}]*border-radius:\s*50%)/s);
+    expect(stylesheet).toMatch(/\.ability-player__avatar\s*\{(?=[^}]*background:\s*#a80f1b)/s);
+    expect(stylesheet).not.toContain(".ability-player:first-child .ability-player__avatar");
+    expect(stylesheet).not.toContain("#3971ba");
     expect(stylesheet).toMatch(/\.ability-page\s*\{[^}]*padding-bottom:\s*48rpx/s);
   });
 });

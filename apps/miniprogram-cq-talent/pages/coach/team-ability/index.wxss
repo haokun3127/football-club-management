@@ -24,8 +24,7 @@
 .ability-roster__hint { color: #667085; font-size: 24rpx; line-height: 34rpx; }
 .ability-roster__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16rpx; margin-top: 24rpx; }
 .ability-player { display: flex; min-width: 0; height: 148rpx; box-sizing: border-box; align-items: center; padding: 24rpx; border-radius: 24rpx; background: #ffffff; }
-.ability-player__avatar { display: flex; flex: 0 0 80rpx; width: 80rpx; height: 80rpx; align-items: center; justify-content: center; border-radius: 50%; background: #3971ba; color: #ffffff; font-size: 28rpx; font-weight: 700; }
-.ability-player:first-child .ability-player__avatar { background: #a80f1b; }
+.ability-player__avatar { display: flex; flex: 0 0 80rpx; width: 80rpx; height: 80rpx; align-items: center; justify-content: center; border-radius: 50%; background: #a80f1b; color: #ffffff; font-size: 28rpx; font-weight: 700; }
 .ability-player__copy { min-width: 0; margin-left: 16rpx; }
 .ability-player__name { overflow: hidden; color: #202124; font-size: 30rpx; font-weight: 700; line-height: 40rpx; text-overflow: ellipsis; white-space: nowrap; }
 .ability-player__score { margin-top: 4rpx; color: #667085; font-size: 22rpx; line-height: 30rpx; }
