@@ -89,7 +89,7 @@ Page({
         taskTitle: task.title,
         teamContextLabel: `${task.teamName?.trim() || "球队待同步"} · ${task.termLabel?.trim() || "学期待同步"}`,
         progressLabel: `${task.completedStudents}/${task.totalStudents}名学员已完成`,
-        projectProgressLabel: `已完成 ${completedProjects}/${projects.length} 个项目 · ${task.completedStudents}/${task.totalStudents} 名学员`,
+        projectProgressLabel: `可选 ${projects.length} 个项目 · 已录入 ${completedProjects} 个项目 · ${task.completedStudents}/${task.totalStudents} 名学员`,
         taskStatusLabel: TASK_STATUS_LABELS[task.status] || "进行中",
         taskStatusClass: `projects-progress__status--${task.status}`,
         projects,

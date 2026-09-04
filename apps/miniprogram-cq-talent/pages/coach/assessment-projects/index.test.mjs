@@ -74,7 +74,7 @@ describe("C12 assessment project selection", () => {
       state: "ready",
       taskTitle: "体能综合测评",
       teamContextLabel: "U10发展队 · 2026秋季学期",
-      projectProgressLabel: "已完成 0/3 个项目 · 0/2 名学员",
+      projectProgressLabel: "可选 3 个项目 · 已录入 0 个项目 · 0/2 名学员",
       taskStatusLabel: "进行中",
     });
     expect(page.data.primaryNodes.map((node) => node.label)).toEqual(["身体素质", "技术能力"]);
@@ -156,7 +156,7 @@ describe("C12 assessment project selection", () => {
     expect(template).toContain("{{projectProgressLabel}}");
     expect(template).not.toContain('class="projects-context">{{teamContextLabel}}<text wx:if="{{progressLabel}}"');
     expect(template).not.toContain('class="project-card__count"');
-    expect(template).toContain("请选择下方测评项目开始录入");
+    expect(template).toContain("请选择本次需要测评的项目");
     expect(template).toContain('bindtap="toggleProject"');
     expect(template).toContain('bindtap="confirmSelection"');
     expect(template).toContain("{{confirmLabel}}");

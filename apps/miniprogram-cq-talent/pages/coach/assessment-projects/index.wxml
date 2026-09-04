@@ -4,7 +4,7 @@
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '加载测评项目' : state === 'empty' ? '暂无测评项目' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <block wx:if="{{state === 'ready'}}">
       <view class="projects-context">{{teamContextLabel}}</view>
-      <view class="projects-progress"><view class="projects-progress__head"><view class="projects-progress__title">请选择测评项目</view><view class="projects-progress__status {{taskStatusClass}}">{{taskStatusLabel}}</view></view><view class="projects-progress__meta">{{projectProgressLabel}}</view><view class="projects-progress__instruction">请选择下方测评项目开始录入</view></view>
+      <view class="projects-progress"><view class="projects-progress__head"><view class="projects-progress__title">请选择测评项目</view><view class="projects-progress__status {{taskStatusClass}}">{{taskStatusLabel}}</view></view><view class="projects-progress__meta">{{projectProgressLabel}}</view><view class="projects-progress__instruction">请选择本次需要测评的项目</view></view>
       <scroll-view wx:if="{{hasContentTree}}" scroll-x class="content-primary-strip" enhanced show-scrollbar="{{false}}">
         <view class="content-primary-strip__inner">
           <view wx:for="{{primaryNodes}}" wx:key="id" class="{{item.className}}" data-id="{{item.id}}" bindtap="selectPrimary">

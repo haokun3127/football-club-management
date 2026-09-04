@@ -106,6 +106,24 @@ describe("C12.1 team batch assessment entry", () => {
     expect(page.data.lastSavedLabel).toBe("已恢复已保存成绩");
   });
 
+  it("scores only the projects selected for this assessment session", async () => {
+    mocks.getAssessmentForm.mockResolvedValueOnce({
+      templateId: "template-real", templateName: "体能综合测评", versionName: "v1", templateVersionId: "version-real", pending: [],
+      fields: [
+        { id: "speed", testItemId: "item-speed", metricId: "metric-speed", groupId: "fitness", groupLabel: "速度耐力", label: "30米冲刺", valueKind: "duration_seconds", inputType: "number", required: true, unit: "秒" },
+        { id: "passing", testItemId: "item-passing", metricId: "metric-passing", groupId: "technical", groupLabel: "传接球", label: "短传准确率", valueKind: "score", inputType: "number", required: true, unit: "分" },
+        { id: "shooting", testItemId: "item-shooting", metricId: "metric-shooting", groupId: "technical", groupLabel: "射门", label: "射门力量", valueKind: "score", inputType: "number", required: true, unit: "分" },
+      ],
+    });
+    const page = createPageInstance();
+    await page.onLoad({ taskId: "task-real", templateId: "template-real", projectId: "item-speed", projectIds: "item-speed,item-passing", title: "体能综合测评" });
+
+    expect(page.data.projectIds).toEqual(["item-speed", "item-passing"]);
+    page.nextProject();
+    expect(mocks.openPage).toHaveBeenCalledWith(expect.stringContaining("projectId=item-passing"));
+    expect(mocks.openPage).not.toHaveBeenCalledWith(expect.stringContaining("projectId=item-shooting"));
+  });
+
   it("keeps a completed task readable while preventing further score edits", async () => {
     mocks.getCoachAssessmentTasks.mockResolvedValueOnce([{ ...task, status: "completed", completedStudents: 2 }]);
     mocks.getCoachAssessmentEntries.mockResolvedValueOnce({
