@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   getCoachTrainingContentAssessments: vi.fn(),
   saveCoachTrainingContentAssessments: vi.fn(),
   requireRole: vi.fn(),
+  openPage: vi.fn(),
   showToast: vi.fn(),
   navigateBack: vi.fn(),
 }));
@@ -16,6 +17,7 @@ vi.mock("../../../utils/api", () => ({
   saveCoachTrainingContentAssessments: mocks.saveCoachTrainingContentAssessments,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
+vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
 vi.mock("../../../utils/presentation", () => ({
   formatCalendarDate: () => "9月4日 周五",
   formatTimeOnly: () => "09:00",
@@ -71,6 +73,7 @@ describe("coach training content assessment", () => {
     mocks.getCoachTrainingContentAssessments.mockReset().mockResolvedValue(assessmentScope);
     mocks.saveCoachTrainingContentAssessments.mockReset().mockResolvedValue({ assessments: [] });
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
+    mocks.openPage.mockReset();
     mocks.showToast.mockReset();
     mocks.navigateBack.mockReset();
   });
@@ -129,12 +132,28 @@ describe("coach training content assessment", () => {
     expect(mocks.saveCoachTrainingContentAssessments).not.toHaveBeenCalled();
   });
 
+  it("offers a direct link to select training content when the API reports it is missing", async () => {
+    mocks.getCoachTrainingContentAssessments.mockRejectedValueOnce({ code: "training_content_required" });
+    const page = createPageInstance();
+
+    await page.load("event-training");
+
+    expect(page.data).toMatchObject({
+      state: "empty",
+      statusTitle: "暂无训练内容",
+      statusActionText: "去选择训练内容",
+    });
+    page.handleStatusAction();
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/content-select/index?eventId=event-training");
+  });
+
   it("keeps the full-screen view WXML-safe and linked from C2 training workbench", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(template).toContain('bindtap="selectProject"');
     expect(template).toContain('bindinput="onScoreInput"');
     expect(template).toContain('bindinput="onNoteInput"');
     expect(template).toContain('bindtap="save"');
+    expect(template).toContain('bindaction="handleStatusAction"');
     expect(pageConfig).toContain('"navigationStyle": "custom"');
     expect(pageConfig).not.toContain('"role-tabbar"');
     expect(controller).not.toContain("eventId: \"event-");

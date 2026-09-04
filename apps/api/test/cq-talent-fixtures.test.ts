@@ -343,4 +343,29 @@ describe("Chongqing Talent elite assessment model", () => {
     expect(finalRecord?.value).toEqual({ kind: "measurement", value: 72, unit: "score" });
     expect(result.lineages.find((lineage) => lineage.outputRecordId === finalRecord?.id)).toBeDefined();
   });
+
+  it("uses the supplied score table as the active technical assessment template", () => {
+    const seed = createSeedData();
+    const tableVersionId = "assessment-template-version-technical-table-20260904";
+    const tableInputs = seed.assessmentMetricBindings.filter((binding) =>
+      binding.templateVersionId === tableVersionId && binding.role === "input",
+    );
+    const tableItems = new Map(seed.assessmentTestItems.map((item) => [item.id, item]));
+    const itemNames = tableInputs.map((binding) => tableItems.get(binding.testItemId ?? "")?.name).filter(Boolean);
+
+    expect(seed.assessmentTemplateVersions).toContainEqual(expect.objectContaining({
+      id: tableVersionId,
+      templateId: "assessment-template-technical",
+      graphVersionId: "metric-graph-version-cq-talent-elite-20260326",
+      status: "active",
+    }));
+    expect(tableInputs).toHaveLength(62);
+    expect(new Set(tableInputs.map((binding) => binding.metricId)).size).toBe(62);
+    expect(itemNames).toEqual(expect.arrayContaining([
+      "1 分钟颠球次数",
+      "边路正面 1v1 突破",
+      "30 米冲刺计时",
+      "平板支撑时间",
+    ]));
+  });
 });

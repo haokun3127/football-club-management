@@ -1202,13 +1202,13 @@ describe("api server", () => {
     }));
     expect(assessmentForm.statusCode).toBe(200);
     expect(formBody.template.id).toBe("assessment-template-technical");
-    expect(formBody.templateVersion.id).toBe("assessment-template-version-technical-1");
+    expect(formBody.templateVersion.id).toBe("assessment-template-version-technical-table-20260904");
+    expect(formBody.fields).toHaveLength(62);
     expect(formBody.fields).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        binding: expect.objectContaining({ metricId: "metric-finishing" }),
-        metric: expect.objectContaining({ id: "metric-finishing" }),
-        dimension: expect.objectContaining({ id: "dimension-technical", name: "技术能力" }),
-        testItem: expect.objectContaining({ id: "assessment-test-finishing-cq-talent" }),
+        binding: expect.objectContaining({ metricId: "metric-cq-talent-atomic-03" }),
+        metric: expect.objectContaining({ id: "metric-cq-talent-atomic-03" }),
+        testItem: expect.objectContaining({ id: "assessment-test-cq-talent-03" }),
       }),
     ]));
     expect(parentAssessmentForm.statusCode).toBe(403);
@@ -3894,11 +3894,13 @@ describe("api server", () => {
         assessmentTaskId: createdTask.id,
         studentId: "student-1",
         templateId,
-        templateVersionId: "assessment-template-version-technical-1",
-        rawResults: [{
-          testItemId: "assessment-test-finishing-cq-talent",
-          value: { kind: "rating_1_5", score: 4 },
-        }],
+        templateVersionId: "assessment-template-version-technical-table-20260904",
+        rawResults: createSeedData().assessmentTestItems
+          .filter((item) => item.id.startsWith("assessment-test-cq-talent-"))
+          .map((item) => ({
+            testItemId: item.id,
+            value: { kind: "score_0_100" as const, score: item.id === "assessment-test-cq-talent-03" ? 73 : 60 },
+          })),
       },
     });
     expect(submitted.statusCode).toBe(201);
@@ -3911,13 +3913,13 @@ describe("api server", () => {
 
     const savedEntries = await app.inject({
       method: "GET",
-      url: `${base}/${createdTask.id}/projects/dimension-technical/entries`,
+      url: `${base}/${createdTask.id}/projects/assessment-test-cq-talent-03/entries`,
       headers: { "x-user-id": "user-coach-1" },
     });
     expect(savedEntries.statusCode).toBe(200);
     expect((savedEntries.json() as { savedValuesByStudent: Record<string, Record<string, { kind: string; score?: number }>> })
-      .savedValuesByStudent["student-1"]?.["assessment-test-finishing-cq-talent"])
-      .toEqual({ kind: "rating_1_5", score: 4 });
+      .savedValuesByStudent["student-1"]?.["assessment-test-cq-talent-03"])
+      .toEqual({ kind: "score_0_100", score: 73 });
 
     const badTemplate = await app.inject({
       method: "POST",
@@ -3934,6 +3936,71 @@ describe("api server", () => {
       payload: { title: "日期倒挂", templateId, teamId: "team-u10-dev", termLabel: "2026 秋季学期", startsOn: "2026-09-30", dueOn: "2026-09-01" },
     });
     expect(badPeriod.statusCode).toBe(400);
+  });
+
+  it("reads saved assessment values by real table test-item project id", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+    const store = new PersistentApiStore(persistence.repositories);
+    const app = buildServer(
+      store,
+      {
+        logger: false,
+        membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships),
+      },
+    );
+    const base = "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main";
+    const taskId = "assessment-task-table-project-readback";
+    const tableVersionId = "assessment-template-version-technical-table-20260904";
+    const firstProjectId = "assessment-test-cq-talent-03";
+    const secondProjectId = "assessment-test-cq-talent-04";
+    const tableTestItems = createSeedData().assessmentTestItems.filter((item) => item.id.startsWith("assessment-test-cq-talent-"));
+
+    await store.saveAssessmentTask({
+      id: taskId,
+      clubId: "club-chongqing-talent",
+      teamId: "team-u10-dev",
+      termLabel: "2026 秋季学期",
+      title: "表格项目回显测试",
+      templateId: "assessment-template-technical",
+      startsOn: "2026-09-01",
+      dueOn: "2026-09-30",
+    });
+
+    const submitted = await app.inject({
+      method: "POST",
+      url: `${base}/coach/assessments`,
+      headers: { "x-user-id": "user-coach-1" },
+      payload: {
+        assessmentTaskId: taskId,
+        studentId: "student-1",
+        templateId: "assessment-template-technical",
+        templateVersionId: tableVersionId,
+        rawResults: tableTestItems.map((item) => ({
+          testItemId: item.id,
+          value: {
+            kind: "score_0_100" as const,
+            score: item.id === firstProjectId ? 73 : item.id === secondProjectId ? 81 : 60,
+          },
+        })),
+      },
+    });
+    expect(submitted.statusCode, submitted.body).toBe(201);
+
+    const firstRead = await app.inject({
+      method: "GET",
+      url: `${base}/coach/assessment-tasks/${taskId}/projects/${firstProjectId}/entries`,
+      headers: { "x-user-id": "user-coach-1" },
+    });
+    expect(firstRead.statusCode, firstRead.body).toBe(200);
+    const firstValues = (firstRead.json() as {
+      savedValuesByStudent: Record<string, Record<string, { kind: string; score?: number }>>;
+    }).savedValuesByStudent["student-1"];
+    expect(firstValues).toEqual({
+      [firstProjectId]: { kind: "score_0_100", score: 73 },
+    });
+
+    await app.close();
+    persistence.database.close();
   });
 
   it("persists training-content assessments only for present students and selected training content", async () => {

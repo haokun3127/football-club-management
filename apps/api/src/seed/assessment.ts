@@ -20,6 +20,14 @@ export function createAssessmentSeed(): Pick<
   | "derivedMetricDefinitions"
 > {
   const talentElite = createTalentEliteAssessmentCatalog();
+  const tableTemplateVersionId = "assessment-template-version-technical-table-20260904";
+  const tableInputBindings = talentElite.assessmentMetricBindings
+    .filter((binding) => binding.role === "input")
+    .map((binding, index) => ({
+      ...binding,
+      id: `assessment-binding-technical-table-${String(index + 1).padStart(2, "0")}`,
+      templateVersionId: tableTemplateVersionId,
+    }));
 
   return {
     metricGraphVersions: [
@@ -110,9 +118,20 @@ export function createAssessmentSeed(): Pick<
         createdAt: now,
         updatedAt: now,
       },
+      {
+        id: tableTemplateVersionId,
+        clubId,
+        templateId: "assessment-template-technical",
+        graphVersionId: "metric-graph-version-cq-talent-elite-20260326",
+        version: "20260904",
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+      },
     ],
     assessmentMetricBindings: [
       ...talentElite.assessmentMetricBindings,
+      ...tableInputBindings,
       {
         id: "assessment-binding-finishing",
         clubId,

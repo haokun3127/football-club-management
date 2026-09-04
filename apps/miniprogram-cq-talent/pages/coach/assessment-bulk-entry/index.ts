@@ -91,12 +91,13 @@ Page<PageData>({
     submitting: false,
   },
 
-  onLoad(query?: { taskId?: string; templateId?: string; projectId?: string; title?: string }) {
+  onLoad(query?: { taskId?: string; templateId?: string; projectId?: string; projectIds?: string; title?: string }) {
     const title = query?.title ? decodeURIComponent(query.title) : "能力评估";
-    return this.load(query?.taskId || "", query?.templateId || "", query?.projectId || "", title);
+    const selectedProjectIds = query?.projectIds ? decodeURIComponent(query.projectIds).split(",").filter(Boolean) : [];
+    return this.load(query?.taskId || "", query?.templateId || "", query?.projectId || "", title, selectedProjectIds);
   },
 
-  async load(taskId: string, templateId: string, projectId: string, taskTitle: string) {
+  async load(taskId: string, templateId: string, projectId: string, taskTitle: string, selectedProjectIds: string[] = []) {
     const session = requireRole("coach");
     if (!session) return;
     if (!taskId || !templateId || !projectId) {
@@ -137,7 +138,11 @@ Page<PageData>({
         getCoachAssessmentEntries(task.id, projectId),
       ]);
       if (loadToken !== latestLoadToken) return;
-      const fields = form.fields.filter((field) => field.groupId === projectId && Boolean(field.id) && Boolean(field.testItemId));
+      const fields = form.fields.filter((field) =>
+        (field.id === projectId || field.testItemId === projectId || field.groupId === projectId)
+        && Boolean(field.id)
+        && Boolean(field.testItemId),
+      );
       const members = team.members.filter((member) => Boolean(member.id) && Boolean(member.name));
       if (!form.templateVersionId || !fields.length || !members.length) {
         this.setData({
@@ -155,7 +160,10 @@ Page<PageData>({
       const draftValuesByStudent = restoreDraft(taskId, projectId, signature, fields, members);
       const valuesByStudent = mergeValues(savedValuesByStudent, draftValuesByStudent);
       const savedStudentIds = Object.keys(savedValuesByStudent);
-      const projectIds = uniqueProjectIds(form.fields);
+      const availableProjectIds = uniqueProjectIds(form.fields);
+      const projectIds = selectedProjectIds.length
+        ? availableProjectIds.filter((id) => selectedProjectIds.includes(id))
+        : availableProjectIds;
       const projectIndex = Math.max(0, projectIds.indexOf(projectId));
       const readOnly = task.status === "completed";
       this.setData({
@@ -292,7 +300,7 @@ Page<PageData>({
       openPage(`/pages/coach/assessment-projects/index?taskId=${encodeURIComponent(this.data.taskId)}&templateId=${encodeURIComponent(this.data.templateId)}&title=${encodeURIComponent(this.data.taskTitle)}`);
       return;
     }
-    openPage(`/pages/coach/assessment-bulk-entry/index?taskId=${encodeURIComponent(this.data.taskId)}&templateId=${encodeURIComponent(this.data.templateId)}&projectId=${encodeURIComponent(nextProjectId)}&title=${encodeURIComponent(this.data.taskTitle)}`);
+    openPage(`/pages/coach/assessment-bulk-entry/index?taskId=${encodeURIComponent(this.data.taskId)}&templateId=${encodeURIComponent(this.data.templateId)}&projectId=${encodeURIComponent(nextProjectId)}&projectIds=${encodeURIComponent(this.data.projectIds.join(","))}&title=${encodeURIComponent(this.data.taskTitle)}`);
   },
 
   goBack() {
@@ -401,7 +409,10 @@ function restoreDraft(taskId: string, projectId: string, signature: string, fiel
 
 function uniqueProjectIds(fields: AssessmentField[]) {
   const ids: string[] = [];
-  for (const field of fields) if (field.groupId && !ids.includes(field.groupId)) ids.push(field.groupId);
+  for (const field of fields) {
+    const id = field.testItemId || field.id || field.groupId;
+    if (id && !ids.includes(id)) ids.push(id);
+  }
   return ids;
 }
 

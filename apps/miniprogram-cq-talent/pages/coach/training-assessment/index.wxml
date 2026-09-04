@@ -4,7 +4,7 @@
     <text class="assessment-nav__save" bindtap="save">{{saving ? '保存中' : '保存'}}</text>
   </view>
   <view class="assessment-body">
-    <status-view state="{{state}}" title="{{statusTitle}}" message="{{message}}" action-text="{{statusActionText}}" bindaction="retry" />
+    <status-view state="{{state}}" title="{{statusTitle}}" message="{{message}}" action-text="{{statusActionText}}" bindaction="handleStatusAction" />
     <block wx:if="{{state === 'ready'}}">
       <view class="assessment-hero">
         <view class="assessment-hero__top"><text>{{eventDateTeam}}</text><text>{{presentCountLabel}}</text></view>

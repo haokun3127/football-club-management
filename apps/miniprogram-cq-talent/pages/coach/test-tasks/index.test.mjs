@@ -211,7 +211,7 @@ describe("coach assessment task list", () => {
     expect(stylesheet).toMatch(/\.tasks-page__body\s*\{[^}]*padding:\s*64rpx\s+76rpx\s+220rpx/s);
     expect(stylesheet).toMatch(/\.filter-row\s*\{[^}]*margin-bottom:\s*28rpx/s);
     expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*width:\s*112rpx[^}]*height:\s*112rpx/s);
-    expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*z-index:\s*10000/s);
+    expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*z-index:\s*9998/s);
   });
 
   it("keeps the floating create icon visible on the red Figma FAB", () => {

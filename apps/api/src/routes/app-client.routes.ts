@@ -316,13 +316,18 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return context.sendError(reply, 404, "not_found", "Assessment template version not found");
       }
 
-      const bindings = config.assessmentMetricBindings
+      const inputBindings = config.assessmentMetricBindings
         .filter((binding) => binding.templateVersionId === templateVersion.id && binding.role === "input")
         .map((binding) => ({
           binding,
           metric: metricCatalog.find((metric) => metric.id === binding.metricId),
         }))
-        .filter((item) => item.metric?.dimensionId === request.params.projectId && Boolean(item.binding.testItemId));
+        .filter((item) => Boolean(item.binding.testItemId));
+      const bindings = inputBindings.filter((item) =>
+        item.binding.testItemId === request.params.projectId
+        || item.binding.metricId === request.params.projectId
+        || item.metric?.dimensionId === request.params.projectId,
+      );
       const fieldByMetricId = new Map(bindings.map((item) => [item.binding.metricId, item]));
       if (!bindings.length) {
         return { clubId: request.params.clubId, taskId: task.id, projectId: request.params.projectId, savedValuesByStudent: {} };

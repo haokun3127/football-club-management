@@ -1,5 +1,6 @@
 import { getCoachTrainingContentAssessments, getCoachWorkbench, saveCoachTrainingContentAssessments } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { openPage } from "../../../utils/navigation";
 import { formatCalendarDate, formatTimeOnly, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachTrainingContentAssessmentScope, CoachWorkbench, LoadState, TrainingProject } from "../../../utils/types";
 
@@ -26,6 +27,7 @@ interface PageData {
   state: LoadState;
   statusTitle: string;
   statusActionText: string;
+  statusAction: "retry" | "select-training-content" | "";
   message: string;
   eventId: string;
   eventTitle: string;
@@ -47,6 +49,7 @@ Page<PageData>({
     state: "idle",
     statusTitle: "课堂训练评测",
     statusActionText: "",
+    statusAction: "",
     message: "",
     eventId: "",
     eventTitle: "",
@@ -68,24 +71,24 @@ Page<PageData>({
   async load(eventId: string) {
     if (!requireRole("coach")) return;
     if (!eventId) {
-      this.setData({ state: "empty", statusTitle: "无法评测", statusActionText: "", message: "缺少训练活动参数，请从训练工作台进入。" });
+      this.setData({ state: "empty", statusTitle: "无法评测", statusActionText: "", statusAction: "", message: "缺少训练活动参数，请从训练工作台进入。" });
       return;
     }
-    this.setData({ state: "loading", statusTitle: "正在读取课堂评测", statusActionText: "", message: "", eventId, saving: false });
+    this.setData({ state: "loading", statusTitle: "正在读取课堂评测", statusActionText: "", statusAction: "", message: "", eventId, saving: false });
     try {
       const [workbench, scope] = await Promise.all([getCoachWorkbench(eventId), getCoachTrainingContentAssessments(eventId)]);
       if (!isTrainingAssessmentScope(workbench, scope, eventId)) {
-        this.setData({ state: "empty", statusTitle: "当前活动不可评测", statusActionText: "", message: "仅已配置训练内容的训练活动可以进行课堂评测。", projects: [], rows: [], valuesByProject: {} });
+        this.setData({ state: "empty", statusTitle: "当前活动不可评测", statusActionText: "", statusAction: "", message: "仅已配置训练内容的训练活动可以进行课堂评测。", projects: [], rows: [], valuesByProject: {} });
         return;
       }
       const projects = selectedProjects(workbench, scope);
       const presentRows = presentStudents(workbench, scope);
       if (!projects.length) {
-        this.setData({ state: "empty", statusTitle: "暂无训练内容", statusActionText: "", message: "请先在训练内容页选择本堂课的训练内容。", projects: [], rows: [], valuesByProject: {} });
+        this.setData({ state: "empty", statusTitle: "暂无训练内容", statusActionText: "去选择训练内容", statusAction: "select-training-content", message: "请先在训练内容页选择本堂课的训练内容。", projects: [], rows: [], valuesByProject: {} });
         return;
       }
       if (!presentRows.length) {
-        this.setData({ state: "empty", statusTitle: "暂无可评测学员", statusActionText: "", message: "请先完成点名，课堂评测只对已到学员开放。", projects: [], rows: [], valuesByProject: {} });
+        this.setData({ state: "empty", statusTitle: "暂无可评测学员", statusActionText: "", statusAction: "", message: "请先完成点名，课堂评测只对已到学员开放。", projects: [], rows: [], valuesByProject: {} });
         return;
       }
       const valuesByProject = toAssessmentValues(scope, projects, presentRows);
@@ -94,6 +97,7 @@ Page<PageData>({
         state: "ready",
         statusTitle: "课堂训练评测",
         statusActionText: "",
+        statusAction: "",
         message: "",
         eventId,
         eventTitle: workbench.event.title,
@@ -107,13 +111,25 @@ Page<PageData>({
         valuesByProject,
         saving: false,
       });
-    } catch {
-      this.setData({ state: "error", statusTitle: "读取失败", statusActionText: "重试", message: "课堂评测读取失败，请稍后重试。", projects: [], rows: [], valuesByProject: {}, saving: false });
+    } catch (error) {
+      if (errorCode(error) === "training_content_required") {
+        this.setData({ state: "empty", statusTitle: "暂无训练内容", statusActionText: "去选择训练内容", statusAction: "select-training-content", message: "请先在训练内容页选择本堂课的训练内容。", projects: [], rows: [], valuesByProject: {}, saving: false });
+        return;
+      }
+      this.setData({ state: "error", statusTitle: "读取失败", statusActionText: "重试", statusAction: "retry", message: "课堂评测读取失败，请稍后重试。", projects: [], rows: [], valuesByProject: {}, saving: false });
     }
   },
 
   retry() {
     return this.load(this.data.eventId);
+  },
+
+  handleStatusAction() {
+    if (this.data.statusAction === "select-training-content" && this.data.eventId) {
+      openPage(`/pages/coach/content-select/index?eventId=${encodeURIComponent(this.data.eventId)}`);
+      return;
+    }
+    return this.retry();
   },
 
   goBack() {
@@ -175,6 +191,11 @@ Page<PageData>({
 
 function isTrainingAssessmentScope(workbench: CoachWorkbench, scope: CoachTrainingContentAssessmentScope, eventId: string) {
   return workbench.event.id === eventId && workbench.event.type === "training" && scope.eventId === eventId;
+}
+
+function errorCode(error: unknown) {
+  if (!error || typeof error !== "object" || !("code" in error)) return "";
+  return String((error as { code?: unknown }).code ?? "");
 }
 
 function selectedProjects(workbench: CoachWorkbench, scope: CoachTrainingContentAssessmentScope): TrainingProject[] {
