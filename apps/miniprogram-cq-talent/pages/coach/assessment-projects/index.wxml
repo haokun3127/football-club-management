@@ -5,7 +5,51 @@
     <block wx:if="{{state === 'ready'}}">
       <view class="projects-context">{{teamContextLabel}}</view>
       <view class="projects-progress"><view class="projects-progress__head"><view class="projects-progress__title">请选择测评项目</view><view class="projects-progress__status {{taskStatusClass}}">{{taskStatusLabel}}</view></view><view class="projects-progress__meta">{{projectProgressLabel}}</view><view class="projects-progress__instruction">请选择下方测评项目开始录入</view></view>
-      <view class="project-list">
+      <scroll-view wx:if="{{hasContentTree}}" scroll-x class="content-primary-strip" enhanced show-scrollbar="{{false}}">
+        <view class="content-primary-strip__inner">
+          <view wx:for="{{primaryNodes}}" wx:key="id" class="{{item.className}}" data-id="{{item.id}}" bindtap="selectPrimary">
+            <text class="content-primary__label">{{item.label}}</text>
+          </view>
+        </view>
+      </scroll-view>
+
+      <view wx:if="{{hasContentTree}}" class="content-layout">
+        <scroll-view scroll-y class="content-secondary-rail" enhanced show-scrollbar="{{false}}">
+          <view wx:for="{{secondaryNodes}}" wx:key="id" class="{{item.className}}" data-id="{{item.id}}" bindtap="selectSecondary">
+            <text class="content-secondary__label">{{item.label}}</text>
+          </view>
+          <view wx:if="{{!secondaryNodes.length}}" class="content-secondary__empty">暂无子项</view>
+        </scroll-view>
+
+        <view class="content-results">
+          <block wx:for="{{tertiaryGroups}}" wx:key="id" wx:for-item="group">
+            <view class="content-tertiary-group">
+              <view class="content-tertiary-group__head">
+                <text class="content-tertiary-group__title">{{group.label}}</text>
+                <text class="content-tertiary-group__count">{{group.actionCount}} 项</text>
+              </view>
+              <view class="content-action-grid">
+                <view wx:for="{{group.cards}}" wx:key="id" class="{{item.cardClass}}" data-id="{{item.id}}" bindtap="toggleProject">
+                  <view class="content-action-card__body">
+                    <view class="content-action-card__name">{{item.title}}</view>
+                    <view class="content-action-card__meta">
+                      <text class="content-action-card__quantity">{{item.itemCountLabel}}</text>
+                      <text class="content-action-card__duration">{{item.statusLabel}}</text>
+                    </view>
+                    <view class="content-action-card__point">{{item.description}}</view>
+                  </view>
+                  <view class="{{item.selectClass}}" aria-label="{{item.isSelected ? '已选择' : '未选择'}}">
+                    <image wx:if="{{item.isSelected}}" src="/assets/icons/c10-check-circle.svg" mode="aspectFit" />
+                  </view>
+                </view>
+              </view>
+            </view>
+          </block>
+          <view wx:if="{{!hasActionCards}}" class="inline-empty">当前分类暂无测评项目。</view>
+        </view>
+      </view>
+
+      <view wx:if="{{!hasContentTree}}" class="project-list">
         <view wx:for="{{projects}}" wx:key="id" class="{{item.cardClass}}" data-id="{{item.id}}" bindtap="toggleProject">
           <view class="project-card__content">
             <view class="project-card__name">{{item.title}}</view>

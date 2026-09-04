@@ -164,15 +164,17 @@ describe("C12 assessment project selection", () => {
     expect(template).toContain("{{item.itemCountLabel}}");
   });
 
-  it("uses a readable single-column project list instead of a nested selector layout", () => {
-    expect(template).toContain('class="project-list"');
-    expect(template).not.toContain('class="content-layout"');
-    expect(template).not.toContain('class="content-action-grid"');
-    expect(template).not.toContain('class="content-secondary-rail"');
+  it("uses the same three-level selection hierarchy as training content", () => {
+    expect(template).toContain('class="content-primary-strip"');
+    expect(template).toContain('class="content-secondary-rail"');
+    expect(template).toContain('class="content-action-grid"');
+    expect(template).toContain('bindtap="selectPrimary"');
+    expect(template).toContain('bindtap="selectSecondary"');
   });
 
-  it("keeps the project selection control at the far right of each card", () => {
+  it("keeps the tertiary project selection control at the right edge of each card", () => {
     const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
-    expect(stylesheet).toContain("margin-left: auto;");
+    expect(stylesheet).toContain(".content-action-card__select");
+    expect(stylesheet).toContain("right: 24rpx;");
   });
 });
