@@ -36,6 +36,7 @@ test-results/
 # Editor files
 .idea/
 .vscode/
+/.claude/
 *.swp
 *.swo
 

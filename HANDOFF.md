@@ -201,10 +201,8 @@ API 侧：
 - 提交前跑 `typecheck` + `vitest run`。
 - 以下文件**不要带进提交**（用户文件或他人在途工作）：
   - `apps/miniprogram-cq-talent/project.config.json`（仅 EOL 差异）
-  - `apps/api/tmp-phone-repro.mjs`
   - `docs/superpowers/`
   - 根目录的 WPS `.xlsx`
-  - `assets/icons/settings.svg`、`assets/icons/login-wechat.svg`
 - 不要删除分支、archive 文件、数据库或 worktree，除非用户明确授权。
 - master 目前落后 dev，是否同步由用户决定。
 
