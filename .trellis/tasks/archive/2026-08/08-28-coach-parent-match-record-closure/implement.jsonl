@@ -1,0 +1,6 @@
+{"file":".trellis/spec/api/backend/index.md","reason":"API route, store, schema, and persistence boundaries for the existing app-client match contracts."}
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Role scoping, real-data-only BFF behavior, and parent participant projection rules."}
+{"file":".trellis/spec/api/backend/error-handling.md","reason":"Expected API validation and authorization error handling."}
+{"file":".trellis/spec/api/backend/quality-guidelines.md","reason":"Required API and cross-package verification commands."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Match summary data crosses API, store, normalization, and two mini-program roles."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Reuse existing match API, page components, and view-model normalization patterns."}

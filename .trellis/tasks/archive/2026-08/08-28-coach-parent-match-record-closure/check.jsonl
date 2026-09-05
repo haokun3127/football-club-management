@@ -1,0 +1,4 @@
+{"file":".trellis/spec/api/backend/index.md","reason":"Final API quality and route-contract review."}
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Final role-scope and parent redaction review."}
+{"file":".trellis/spec/api/backend/quality-guidelines.md","reason":"Final required checks and forbidden-pattern review."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Final cross-layer data-flow review."}

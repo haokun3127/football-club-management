@@ -1,0 +1,2 @@
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Check data/API/display boundaries and ensure the review does not mistake sample design values for real product data."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Check that C14 uses established page and component patterns without unrelated refactoring."}

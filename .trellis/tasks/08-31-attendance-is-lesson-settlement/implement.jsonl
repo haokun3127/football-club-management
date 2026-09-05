@@ -1,0 +1,4 @@
+{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python3 .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Attendance crosses mini-program, BFF, store and ledger persistence."}
+{"file":".trellis/spec/api/backend/app-client-bff-contracts.md","reason":"Defines app-client role, response and error-contract boundaries."}
+{"file":".trellis/tasks/08-31-attendance-is-lesson-settlement/research/baseline-2026-08-31.md","reason":"Records Figma nodes, old write paths and reconciliation risk."}
