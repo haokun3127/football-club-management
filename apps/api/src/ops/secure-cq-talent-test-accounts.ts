@@ -411,6 +411,7 @@ function hasCurrentDemoData(
     const labels = demoLabels(account);
     const events = buildDemoEvents(account, now);
     if (hasSupersededSettlementLedgerRows(database, account)) return false;
+    if (hasLegacyDailyDemoActivities(database, account)) return false;
     if (hasLegacyDemoActivitiesMissingVenue(database, account)) return false;
     if (hasLegacyDemoActivityStateDrift(database, account, now)) return false;
     const storedEvents = database.prepare(`
@@ -565,6 +566,7 @@ function ensureDemoData(
 
   refreshDemoIdentity(database, account, labels, now);
   removeSupersededSettlementLedgerRows(database, account);
+  removeLegacyDailyDemoActivities(database, account);
 
   database.prepare(
     "UPDATE calendar_events SET title = ?, starts_at = ?, ends_at = ?, location_id = ?, status = ?, notes = ?, updated_at = ? WHERE id = ? AND club_id = ? AND primary_team_id = ? AND owner_coach_id = ?",
@@ -702,6 +704,61 @@ function ensureDemoData(
         [records.communicationLogIds[index * 2 + entry]!, clubId, studentId, shiftIso(now, -7 + entry * 3, 0), "wechat", entry === 0 ? "training_feedback" : "follow_up", labels.parentName, account.userId, entry === 0 ? "已发送本周训练反馈。" : "已确认下次训练跟进。", shiftIso(now, 7 + entry, 0), now, now]);
     });
   });
+}
+
+function hasLegacyDailyDemoActivities(
+  database: DatabaseSync,
+  account: SecureCqTalentTestAccountManifestEntry,
+): boolean {
+  return legacyDailyDemoEventIds(database, account).length > 0;
+}
+
+function removeLegacyDailyDemoActivities(
+  database: DatabaseSync,
+  account: SecureCqTalentTestAccountManifestEntry,
+): void {
+  const eventIds = legacyDailyDemoEventIds(database, account);
+  if (!eventIds.length) return;
+
+  const placeholders = eventIds.map(() => "?").join(", ");
+  const eventParams = [clubId, ...eventIds];
+  const matchIds = database.prepare(
+    "SELECT id FROM matches WHERE club_id = ? AND event_id IN (" + placeholders + ")",
+  ).all(...eventParams) as Array<{ id: string }>;
+  if (matchIds.length) {
+    const matchPlaceholders = matchIds.map(() => "?").join(", ");
+    const matchParams = [clubId, ...matchIds.map((match) => match.id)];
+    database.prepare("DELETE FROM match_events WHERE club_id = ? AND match_id IN (" + matchPlaceholders + ")").run(...matchParams);
+    database.prepare("DELETE FROM match_rosters WHERE club_id = ? AND match_id IN (" + matchPlaceholders + ")").run(...matchParams);
+    database.prepare("DELETE FROM matches WHERE club_id = ? AND id IN (" + matchPlaceholders + ")").run(...matchParams);
+  }
+
+  database.prepare("DELETE FROM tactical_boards WHERE club_id = ? AND event_id IN (" + placeholders + ")").run(...eventParams);
+  database.prepare("DELETE FROM event_change_requests WHERE club_id = ? AND event_id IN (" + placeholders + ")").run(...eventParams);
+  database.prepare("DELETE FROM player_metric_records WHERE club_id = ? AND event_id IN (" + placeholders + ")").run(...eventParams);
+  database.prepare("DELETE FROM player_assessments WHERE club_id = ? AND event_id IN (" + placeholders + ")").run(...eventParams);
+  database.prepare("DELETE FROM lesson_credit_ledger WHERE club_id = ? AND event_id IN (" + placeholders + ")").run(...eventParams);
+  database.prepare("DELETE FROM event_participants WHERE club_id = ? AND event_id IN (" + placeholders + ")").run(...eventParams);
+  database.prepare("DELETE FROM calendar_events WHERE club_id = ? AND id IN (" + placeholders + ")").run(...eventParams);
+}
+
+function legacyDailyDemoEventIds(
+  database: DatabaseSync,
+  account: SecureCqTalentTestAccountManifestEntry,
+): string[] {
+  return (database.prepare(`
+    SELECT id
+    FROM calendar_events
+    WHERE club_id = ?
+      AND id LIKE ?
+      AND (primary_team_id = ? OR owner_coach_id = ?)
+    ORDER BY id
+  `).all(
+    clubId,
+    `event-cq-talent-secure-test-${account.slot}-daily-%`,
+    account.teamId,
+    account.coachId,
+  ) as Array<{ id: string }>).map((row) => row.id);
 }
 
 function hasLegacyDemoActivitiesMissingVenue(

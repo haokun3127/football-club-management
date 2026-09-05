@@ -149,7 +149,7 @@ This checks the two guardian students' semantic operational-profile presence whi
 - Eligible legacy secure-demo activities must be state-reconciled only inside the exact `club_id + cq-talent-secure-test slot ID prefix + (primary_team_id OR owner_coach_id)` scope for the same slot. This accommodates early secure records that retained an old team association while still belonging to the exact test coach. Ended activities become `completed`, future activities remain `scheduled`, pending historical participation becomes a final attendance state, and any linked match follows its activity state. Ordinary club data and another secure slot's team or coach remain untouched.
 - User-facing canonical data (account, parent, coach, team, student, activity, assessment, match, tactical-board, private-lesson, insurance, and communication copy) is Chinese.
 - Storage/API enum values remain their contract values (for example `friendly`, `league`, participant status); the mini-program display boundary maps any visible enum to Chinese rather than changing the API contract.
-- Refresh may upsert only the operation's canonical IDs. If a guardian student has a legacy operational profile under the table's `(club_id, student_id)` uniqueness boundary, retain it.
+- Refresh may upsert only the operation's canonical IDs. The sole cleanup exception is a legacy duplicate training activity whose ID exactly matches `event-cq-talent-secure-test-<slot>-daily-%` and whose club plus team-or-coach ownership matches that same secure slot; refresh deletes that activity and its event-linked demo artifacts. If a guardian student has a legacy operational profile under the table's `(club_id, student_id)` uniqueness boundary, retain it.
 - When the rolling settlement schema supersedes canonical ledger IDs, refresh must remove only the exact retired fixed IDs for the same secure slot before writing the new IDs. It must never delete by broad `student_id`, event, source, or name predicates because those can include coach-created records.
 
 ### 4. Validation & Error Matrix
@@ -161,6 +161,7 @@ This checks the two guardian students' semantic operational-profile presence whi
 | `--dry-run` finds stale data | Return `dry_run`; do not mutate or migrate. |
 | A legacy operational profile occupies its unique student slot | Preserve it; do not replace it to force canonical copy. |
 | A complete slot retains retired `lesson-ledger-cq-talent-secure-test-<slot>-<student>-debit` rows | Return `refreshed`, remove only those exact retired IDs, and preserve the current five-session ledger rows. |
+| A complete slot retains a scoped `daily-*` legacy training activity | Return `refreshed`, remove only that activity's event-linked demo artifacts, and preserve another team's or another slot's similarly named activity. |
 | An ended secure-demo activity is still `scheduled`, or its participant is still invited/confirmed/pending leave | Return `refreshed`, reconcile only the exact secure slot/team activity namespace to final activity and attendance states. |
 | A visible API enum would otherwise appear raw in the mini-program | Translate at the client presentation boundary; do not store a localized enum. |
 
@@ -176,6 +177,7 @@ This checks the two guardian students' semantic operational-profile presence whi
 - Import once with an older `now`, then import with a later `now`; assert the result is `refreshed`, the rolling calendar weeks move, and canonical names/copy contain no English display words.
 - Assert five completed training events cover the current and preceding two calendar weeks, contain nineteen participants each, and yield ninety-five matching debit ledger rows per secure team.
 - Seed the eight retired fixed settlement IDs into an otherwise-current slot; assert rerun returns `refreshed` and removes those IDs without affecting the current canonical ledger rows.
+- Seed a same-slot `daily-*` duplicate with a participant plus a same-prefix activity for another team; assert rerun removes only the scoped duplicate and its participant.
 - Preserve the existing partial nineteen-player upgrade and legacy operational-profile idempotency tests.
 - Mini-program API normalization test asserts `friendly`, `league`, `cup`, and `internal` display as Chinese labels.
 

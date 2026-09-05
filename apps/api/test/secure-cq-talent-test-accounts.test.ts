@@ -476,6 +476,82 @@ describe("secure Chongqing Talent test-account operation", () => {
     }
   }, FILE_DB_TIMEOUT);
 
+  it("removes scoped legacy daily training duplicates while preserving another team's records", async () => {
+    const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
+
+    try {
+      const now = "2026-09-04T15:00:00.000Z";
+      const imported = importSecureCqTalentTestAccounts(persistence.database, { phones: runtimePhones, now });
+      const account = imported.manifest.accountIds[0]!;
+      const duplicateEventId = "event-cq-talent-secure-test-1-daily-overlap";
+      const unrelatedEventId = "event-cq-talent-secure-test-1-daily-unrelated";
+      const canonical = persistence.database.prepare(
+        "SELECT starts_at, ends_at FROM calendar_events WHERE id = ?",
+      ).get(account.eventId) as { starts_at: string; ends_at: string };
+
+      persistence.database.prepare(`
+        INSERT INTO calendar_events (
+          id, club_id, type, title, starts_at, ends_at, timezone, location_id,
+          primary_team_id, owner_coach_id, status, notes, created_at, updated_at
+        ) VALUES (?, ?, 'training', ?, ?, ?, 'Asia/Shanghai', ?, ?, ?, 'scheduled', ?, ?, ?)
+      `).run(
+        duplicateEventId,
+        "club-chongqing-talent",
+        "历史重复训练",
+        canonical.starts_at,
+        canonical.ends_at,
+        "venue-cq-talent-sport-uni",
+        account.teamId,
+        account.coachId,
+        "仅用于验证历史重复训练清理",
+        now,
+        now,
+      );
+      persistence.database.prepare(`
+        INSERT INTO event_participants (id, club_id, event_id, student_id, status, note, created_at, updated_at)
+        VALUES (?, ?, ?, ?, 'confirmed', '历史重复参与记录', ?, ?)
+      `).run(
+        "participant-cq-talent-secure-test-1-daily-overlap-1",
+        "club-chongqing-talent",
+        duplicateEventId,
+        account.studentIds[0],
+        now,
+        now,
+      );
+      persistence.database.prepare(`
+        INSERT INTO teams (id, club_id, name, age_group, level, default_coach_id, status, created_at, updated_at)
+        VALUES (?, ?, ?, 'U10', 'development', NULL, 'active', ?, ?)
+      `).run("team-unrelated-daily-duplicate", "club-chongqing-talent", "无关队伍", now, now);
+      persistence.database.prepare(`
+        INSERT INTO calendar_events (
+          id, club_id, type, title, starts_at, ends_at, timezone, location_id,
+          primary_team_id, owner_coach_id, status, notes, created_at, updated_at
+        ) VALUES (?, ?, 'training', ?, ?, ?, 'Asia/Shanghai', ?, ?, NULL, 'scheduled', ?, ?, ?)
+      `).run(
+        unrelatedEventId,
+        "club-chongqing-talent",
+        "无关队伍训练",
+        canonical.starts_at,
+        canonical.ends_at,
+        "venue-cq-talent-sport-uni",
+        "team-unrelated-daily-duplicate",
+        "不属于受控测试账号的数据",
+        now,
+        now,
+      );
+
+      const refreshed = importSecureCqTalentTestAccounts(persistence.database, { phones: runtimePhones, now });
+
+      expect(refreshed.status).toBe("refreshed");
+      expect(persistence.database.prepare("SELECT id FROM calendar_events WHERE id = ?").get(duplicateEventId)).toBeUndefined();
+      expect(persistence.database.prepare("SELECT id FROM event_participants WHERE event_id = ?").get(duplicateEventId)).toBeUndefined();
+      expect(persistence.database.prepare("SELECT id FROM calendar_events WHERE id = ?").get(unrelatedEventId)).toEqual({ id: unrelatedEventId });
+      expect(persistence.database.prepare("SELECT id FROM calendar_events WHERE id = ?").get(account.eventId)).toEqual({ id: account.eventId });
+    } finally {
+      persistence.database.close();
+    }
+  }, FILE_DB_TIMEOUT);
+
   it("reconciles stale legacy secure activities and pending attendance without touching another team", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
 
