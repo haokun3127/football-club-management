@@ -71,12 +71,15 @@ describe("P1 weekly schedule with expandable month picker", () => {
 
   it("keeps the week strip as the default and only renders the month grid while expanded", () => {
     expect(template).toContain('wx:if="{{!isMonthPickerExpanded}}" class="week-switcher"');
-    expect(template).toContain('bindtap="expandMonthPicker"');
+    expect(template).toContain('catchtap="expandMonthPicker"');
     expect(template).toContain('wx:if="{{isMonthPickerExpanded}}" class="month-calendar"');
     expect(template).toContain('data-offset="-1" bindtap="changeMonth"');
     expect(template).toContain('data-offset="1" bindtap="changeMonth"');
     expect(template).toContain('bindtap="collapseMonthPicker"');
     expect(template).toContain('bindtap="selectDate"');
+    expect(template).toContain('class="week-nav"');
+    expect(template).not.toContain('class="week-nav" bindtap="expandMonthPicker"');
+    expect(template).toContain('class="week-nav__expand" catchtap="expandMonthPicker"');
     expect(template).toContain('<image class="week-nav__expand-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" />');
     expect(template).toContain('<image class="month-calendar__collapse-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" />');
     const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");

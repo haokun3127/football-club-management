@@ -178,7 +178,7 @@ describe("parent schedule hero", () => {
 
   it("renders a collapsed week strip and an expandable two-way month picker", () => {
     expect(template).toContain('wx:if="{{!isMonthPickerExpanded}}" class="week-switcher"');
-    expect(template).toContain('bindtap="expandMonthPicker"');
+    expect(template).toContain('catchtap="expandMonthPicker"');
     expect(template).toContain('wx:if="{{isMonthPickerExpanded}}" class="month-calendar"');
     expect(template).toContain('data-offset="-1" bindtap="changeMonth"');
     expect(template).toContain('data-offset="1" bindtap="changeMonth"');

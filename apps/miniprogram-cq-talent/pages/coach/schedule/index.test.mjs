@@ -195,7 +195,7 @@ describe("coach schedule home", () => {
     expect(page.data.viewMode).toBe("day");
   });
 
-  it("stacks weekday over date in the C1 strip and keeps its controls separately tappable", () => {
+  it("stacks weekday over date in the C1 strip and reserves month expansion for its chevron", () => {
     expect(template).toContain('class="c1-dates__arrow c1-dates__arrow--previous" data-offset="-7" bindtap="changeWeek"');
     expect(template).toContain('class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek"');
     expect(template).toContain('<image src="/assets/icons/chevron-left.svg" mode="aspectFit" />');
@@ -204,7 +204,8 @@ describe("coach schedule home", () => {
     expect(template).toContain('class="c1-month-calendar"');
     expect(template).toMatch(/(?:bindtap|catchtap)="expandMonthPicker"/);
     expect(template).toContain('<view class="c1-month-calendar__collapse" bindtap="collapseMonthPicker" aria-label="收起月历"><image class="c1-month-calendar__collapse-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>');
-    expect(template).toContain('class="c1-week-nav" bindtap="expandMonthPicker"');
+    expect(template).toContain('class="c1-week-nav"');
+    expect(template).not.toContain('class="c1-week-nav" bindtap="expandMonthPicker"');
     expect(template).toContain('<view class="c1-week-nav__expand" catchtap="expandMonthPicker" aria-label="展开月历"><image class="c1-week-nav__expand-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>');
     expect(template).toContain('wx:for="{{collapsedDayStrip}}"');
     expect(template).not.toContain('wx:for="{{dayStrip}}"');

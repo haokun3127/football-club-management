@@ -36,7 +36,7 @@
   </block>
   <view wx:else class="c1-dates">
     <view class="c1-dates__arrow c1-dates__arrow--previous" data-offset="-7" bindtap="changeWeek"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
-      <view class="c1-week-nav" bindtap="expandMonthPicker">
+      <view class="c1-week-nav">
         <view wx:for="{{collapsedDayStrip}}" wx:key="date" class="c1-day {{selectedDate === item.date ? 'c1-day--selected' : ''}}" data-date="{{item.date}}" catchtap="selectDay">
           <view class="c1-day__week">{{item.weekLabel}}</view>
           <view class="c1-day__num">{{item.dayNum}}</view>

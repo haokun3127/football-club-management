@@ -48,7 +48,7 @@
 
     <view wx:if="{{!isMonthPickerExpanded}}" class="week-switcher">
       <view class="week-switcher__arrow" data-offset="-7" bindtap="changeWeek" aria-label="上一周"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
-      <view class="week-nav" bindtap="expandMonthPicker">
+      <view class="week-nav">
         <view wx:for="{{dateOptions}}" wx:key="date" class="week-day {{item.isSelected ? 'week-day--selected' : ''}} {{item.isToday ? 'week-day--today' : ''}}" data-date="{{item.date}}" catchtap="selectDate">
           <view class="week-day__name">{{item.weekShort}}</view>
           <view class="week-day__number">{{item.dayNumber}}</view>
