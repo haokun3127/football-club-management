@@ -14,7 +14,7 @@
         <view class="c163-profile__info">
           <view class="c163-profile__name">{{displayName}}</view>
           <view class="c163-profile__team">{{teamText}}</view>
-          <view class="c163-profile__badge c163-profile__badge--pending">{{bindingText}}</view>
+          <view class="c163-profile__badge {{isWechatBound ? 'c163-profile__badge--bound' : 'c163-profile__badge--pending'}}">{{accountStatusText}}</view>
         </view>
       </view>
 
@@ -25,11 +25,11 @@
         </view>
         <view class="c163-row c163-row--line">
           <view class="c163-row__label-with-icon">
-            <view class="c163-row__binding-icon" aria-hidden="true">×</view>
+            <image class="c163-row__binding-icon" src="/assets/icons/c163-circle-x.svg" mode="aspectFit" aria-hidden="true" />
             <text class="c163-row__label">微信绑定</text>
           </view>
           <view class="c163-row__binding-actions">
-            <text class="c163-row__value c163-row__value--pending">{{bindingText}}</text>
+            <text class="c163-row__value {{isWechatBound ? 'c163-row__value--bound' : 'c163-row__value--pending'}}">{{bindingText}}</text>
             <text class="c163-row__action" bindtap="reauthorizeWechat">重新授权</text>
           </view>
         </view>

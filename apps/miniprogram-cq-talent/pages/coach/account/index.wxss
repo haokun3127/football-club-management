@@ -122,6 +122,11 @@
   color: #667085;
 }
 
+.c163-profile__badge--bound {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
 .c163-list {
   overflow: hidden;
 }
@@ -174,22 +179,18 @@
 }
 
 .c163-row__binding-icon {
-  display: flex;
   width: 36rpx;
   height: 36rpx;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  border: 4rpx solid #34c759;
-  border-radius: 50%;
-  color: #34c759;
-  font-size: 28rpx;
-  font-weight: 700;
-  line-height: 28rpx;
+  flex: 0 0 36rpx;
 }
 
 .c163-row__value--pending {
   color: #667085;
+}
+
+.c163-row__value--bound {
+  color: #34c759;
+  font-weight: 600;
 }
 
 .c163-row__arrow {

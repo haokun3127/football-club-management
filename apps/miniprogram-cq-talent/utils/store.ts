@@ -131,8 +131,8 @@ export function getDevRole(): AppRole {
 
 export function toggleDevRole(): AppRole {
   const next = getDevRole() === "parent" ? "coach" : "parent";
-  wx.setStorageSync(STORAGE_KEYS.devRole, next);
   clearSession();
+  wx.setStorageSync(STORAGE_KEYS.devRole, next);
   return next;
 }
 

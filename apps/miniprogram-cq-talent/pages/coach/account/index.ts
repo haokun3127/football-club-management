@@ -14,6 +14,8 @@ interface PageData {
   teamText: string;
   phoneText: string;
   bindingText: string;
+  isWechatBound: boolean;
+  accountStatusText: string;
 }
 
 Page<PageData>({
@@ -88,6 +90,8 @@ function accountPageData(
     teamText,
     phoneText: maskPhone(phone),
     bindingText: phoneBinding === "accepted" ? "已绑定" : "状态待同步",
+    isWechatBound: phoneBinding === "accepted",
+    accountStatusText: phoneBinding === "accepted" ? "已认证" : "状态待同步",
   };
 }
 

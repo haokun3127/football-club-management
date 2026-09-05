@@ -10,7 +10,7 @@ globalThis.wx = {
 };
 
 const store = await import("./store.ts");
-const { clearSession, getSession, persistAuthenticatedSession, mergeSessionContext } = store;
+const { clearSession, getDevRole, getSession, persistAuthenticatedSession, mergeSessionContext, toggleDevRole } = store;
 
 describe("session storage compatibility", () => {
   beforeEach(() => {
@@ -125,5 +125,13 @@ describe("session storage compatibility", () => {
     expect(storage.has("coach-assessment-bulk:task-1:project-1")).toBe(false);
     expect(storage.has("match-event-draft:v1:event-1")).toBe(false);
     expect(storage.has("cq-parent-reminder-read-ids")).toBe(false);
+  });
+
+  it("keeps the selected development role after resetting an old session", () => {
+    storage.set("cqTalentSession", { token: "stale-session" });
+
+    expect(toggleDevRole()).toBe("coach");
+    expect(storage.has("cqTalentSession")).toBe(false);
+    expect(getDevRole()).toBe("coach");
   });
 });

@@ -94,6 +94,8 @@ describe("coach account", () => {
       teamState: "ready",
       phoneText: "199****1921",
       bindingText: "已绑定",
+      isWechatBound: true,
+      accountStatusText: "已认证",
     });
   });
 
@@ -177,6 +179,11 @@ describe("coach account", () => {
     expect(template).toContain("重新授权");
     expect(template).toContain('bindtap="clearCache"');
     expect(template).toContain('bindtap="reauthorizeWechat"');
+    expect(template).toContain("isWechatBound");
+    expect(template).toContain("accountStatusText");
+    expect(template).toContain("c163-row__value--bound");
+    expect(template).toContain("/assets/icons/c163-circle-x.svg");
+    expect(existsSync(new URL("../../../assets/icons/c163-circle-x.svg", import.meta.url))).toBe(true);
     expect(existsSync(new URL("../../../assets/icons/c16-chevron-right.svg", import.meta.url))).toBe(true);
     expect(template).toContain("/assets/icons/c16-chevron-right.svg");
     expect(template).not.toContain("/assets/icons/c163-chevron-right.svg");
@@ -193,6 +200,7 @@ describe("coach account", () => {
     expect(stylesheet).toMatch(/\.c163-card\s*\{[^}]*border-radius:\s*24rpx/s);
     expect(stylesheet).toMatch(/\.c163-profile\s*\{(?=[^}]*min-height:\s*184rpx)(?=[^}]*padding:\s*32rpx)/s);
     expect(stylesheet).toMatch(/\.c163-row\s*\{[^}]*min-height:\s*90rpx/s);
+    expect(stylesheet).toMatch(/\.c163-row__value--bound\s*\{[^}]*color:\s*#34c759/s);
   });
 
   it("clears disposable cache without clearing the active session", () => {
