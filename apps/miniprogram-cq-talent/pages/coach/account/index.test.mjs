@@ -5,14 +5,26 @@ const mocks = vi.hoisted(() => ({
   getCoachHome: vi.fn(),
   requireRole: vi.fn(),
   navigateBack: vi.fn(),
+  clearDisposableLocalCache: vi.fn(),
+  clearSession: vi.fn(),
+  showModal: vi.fn(),
+  showToast: vi.fn(),
+  reLaunch: vi.fn(),
 }));
 
 vi.mock("../../../utils/api", () => ({ getCoachHome: mocks.getCoachHome }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
+vi.mock("../../../utils/store", () => ({
+  clearDisposableLocalCache: mocks.clearDisposableLocalCache,
+  clearSession: mocks.clearSession,
+}));
 vi.mock("../../../utils/presentation", () => ({ resolveNavInset: () => 0 }));
 
 globalThis.wx = {
   navigateBack: mocks.navigateBack,
+  showModal: mocks.showModal,
+  showToast: mocks.showToast,
+  reLaunch: mocks.reLaunch,
 };
 
 let pageDefinition;
@@ -28,7 +40,7 @@ const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
 const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 const pageConfig = readFileSync(new URL("./index.json", import.meta.url), "utf8");
 
-const session = { role: "coach", displayName: "会话教练" };
+const session = { role: "coach", displayName: "会话教练", phone: "19922961921", phoneBinding: "accepted" };
 const home = {
   coachName: "不得使用的种子教练姓名",
   teams: ["真实 U10 队", "真实 U10 队", ""],
@@ -59,6 +71,11 @@ describe("coach account", () => {
     mocks.getCoachHome.mockReset().mockResolvedValue(home);
     mocks.requireRole.mockReset().mockReturnValue(session);
     mocks.navigateBack.mockReset();
+    mocks.clearDisposableLocalCache.mockReset().mockReturnValue(3);
+    mocks.clearSession.mockReset();
+    mocks.showModal.mockReset();
+    mocks.showToast.mockReset();
+    mocks.reLaunch.mockReset();
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 10, 12));
   });
@@ -75,8 +92,8 @@ describe("coach account", () => {
       avatarLetter: "会",
       teamText: "真实 U10 队",
       teamState: "ready",
-      phoneText: "当前会话未提供",
-      bindingText: "状态待同步",
+      phoneText: "199****1921",
+      bindingText: "已绑定",
     });
   });
 
@@ -141,7 +158,7 @@ describe("coach account", () => {
     expect(page.data).toMatchObject({ teamState: "pending", teamText: "团队信息待同步" });
   });
 
-  it("keeps account rows read-only and uses only the local back action", () => {
+  it("removes obsolete password and device rows, while keeping only real account actions", () => {
     const page = createPageInstance();
     page.goBack();
 
@@ -152,18 +169,21 @@ describe("coach account", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(template).toContain('class="c163-nav"');
     expect(template).toContain("/assets/icons/c163-chevron-left.svg");
-    expect([...template.matchAll(/\bbind(?:tap|longpress|change|input|submit|action)\s*=/g)]).toHaveLength(1);
+    expect([...template.matchAll(/\bbind(?:tap|longpress|change|input|submit|action)\s*=/g)]).toHaveLength(3);
     expect(template).toMatch(/class="c163-nav__back"[^>]*bindtap="goBack"/);
-    expect(template).toContain("修改密码");
-    expect(template).toContain("设备管理");
+    expect(template).not.toContain("修改密码");
+    expect(template).not.toContain("设备管理");
     expect(template).toContain("清除缓存");
+    expect(template).toContain("重新授权");
+    expect(template).toContain('bindtap="clearCache"');
+    expect(template).toContain('bindtap="reauthorizeWechat"');
     expect(existsSync(new URL("../../../assets/icons/c16-chevron-right.svg", import.meta.url))).toBe(true);
     expect(template).toContain("/assets/icons/c16-chevron-right.svg");
     expect(template).not.toContain("/assets/icons/c163-chevron-right.svg");
-    expect(template).not.toMatch(/138\*|已绑定|已认证|退出登录/);
+    expect(template).not.toMatch(/138\*|已认证|退出登录/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("home.coachName");
-    expect(controller).not.toMatch(/clearSession|getStorage|setStorage|showToast|showModal|reLaunch/);
+    expect(controller).toMatch(/clearDisposableLocalCache|clearSession|showToast|showModal|reLaunch/);
     expect(template).toContain('class="c163-nav__placeholder"');
     expect(stylesheet).toMatch(/\.c163-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*padding-right:\s*200rpx)(?=[^}]*padding-left:\s*32rpx)(?=[^}]*background:\s*#fceeef)/s);
     expect(stylesheet).toMatch(/\.c163-nav__title\s*\{(?=[^}]*flex:\s*1)(?=[^}]*font-size:\s*36rpx)(?=[^}]*text-align:\s*left)/s);
@@ -173,5 +193,30 @@ describe("coach account", () => {
     expect(stylesheet).toMatch(/\.c163-card\s*\{[^}]*border-radius:\s*24rpx/s);
     expect(stylesheet).toMatch(/\.c163-profile\s*\{(?=[^}]*min-height:\s*184rpx)(?=[^}]*padding:\s*32rpx)/s);
     expect(stylesheet).toMatch(/\.c163-row\s*\{[^}]*min-height:\s*90rpx/s);
+  });
+
+  it("clears disposable cache without clearing the active session", () => {
+    const page = createPageInstance();
+    page.clearCache();
+
+    expect(mocks.showModal).toHaveBeenCalledWith(expect.objectContaining({ title: "清除本地缓存" }));
+    const options = mocks.showModal.mock.calls[0][0];
+    options.success({ confirm: true });
+
+    expect(mocks.clearDisposableLocalCache).toHaveBeenCalledTimes(1);
+    expect(mocks.clearSession).not.toHaveBeenCalled();
+    expect(mocks.showToast).toHaveBeenCalledWith(expect.objectContaining({ title: "已清除 3 项本地缓存" }));
+  });
+
+  it("requires explicit confirmation before returning to the official WeChat authorization flow", () => {
+    const page = createPageInstance();
+    page.reauthorizeWechat();
+
+    expect(mocks.showModal).toHaveBeenCalledWith(expect.objectContaining({ title: "重新授权微信手机号" }));
+    const options = mocks.showModal.mock.calls[0][0];
+    options.success({ confirm: true });
+
+    expect(mocks.clearSession).toHaveBeenCalledTimes(1);
+    expect(mocks.reLaunch).toHaveBeenCalledWith({ url: "/pages/login/index?reauthorize=1" });
   });
 });

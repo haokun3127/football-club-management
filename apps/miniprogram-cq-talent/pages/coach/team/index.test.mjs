@@ -187,6 +187,8 @@ describe("coach team detail", () => {
     expect(stylesheet).toContain(".hero-stat__value--positive { color: #10b981; }");
     expect(stylesheet).toContain("gap: 24rpx;");
     expect(stylesheet).toContain(".coach-card { width: 280rpx;");
+    expect(stylesheet).toMatch(/\.coach-card\s*\{(?=[^}]*height:\s*240rpx)(?=[^}]*overflow:\s*hidden)/s);
+    expect(stylesheet).toMatch(/\.coach-card__role\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*text-overflow:\s*ellipsis)(?=[^}]*white-space:\s*nowrap)/s);
     expect(controller).not.toContain("app-header");
   });
 });

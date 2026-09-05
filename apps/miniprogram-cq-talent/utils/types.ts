@@ -1,5 +1,6 @@
 export type AppRole = "parent" | "coach";
 export type LoadState = "idle" | "loading" | "ready" | "empty" | "error" | "pending";
+export type PhoneBinding = "required" | "received" | "accepted" | "not_provided";
 
 export interface Capabilities {
   client?: {
@@ -38,6 +39,8 @@ export interface SessionState extends AppContext {
   token: string;
   userId?: string;
   displayName?: string;
+  phone?: string;
+  phoneBinding?: PhoneBinding;
   currentStudentId?: string;
   expiresAt: string;
 }
@@ -46,7 +49,7 @@ export interface LoginResult {
   clubId: string;
   client: { id: string };
   status: "authenticated" | "binding_required";
-  phoneBinding: "required" | "received" | "accepted" | "not_provided";
+  phoneBinding: PhoneBinding;
   session: { token: string; expiresInSeconds: number; expiresAt: string; activeRole: AppRole | null } | null;
   role: AppRole | null;
   availableRoles: AppRole[];

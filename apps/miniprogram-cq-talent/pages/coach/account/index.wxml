@@ -12,10 +12,7 @@
       <view class="c163-card c163-profile">
         <view class="c163-profile__avatar">{{avatarLetter}}</view>
         <view class="c163-profile__info">
-          <view class="c163-profile__name-row">
-            <view class="c163-profile__name">{{displayName}}</view>
-            <view class="c163-profile__edit" aria-hidden="true">编辑</view>
-          </view>
+          <view class="c163-profile__name">{{displayName}}</view>
           <view class="c163-profile__team">{{teamText}}</view>
           <view class="c163-profile__badge c163-profile__badge--pending">{{bindingText}}</view>
         </view>
@@ -24,33 +21,22 @@
       <view class="c163-card c163-list">
         <view class="c163-row">
           <text class="c163-row__label">手机号</text>
-          <view class="c163-row__right">
-            <text class="c163-row__value">{{phoneText}}</text>
-            <text class="c163-row__action">修改</text>
-          </view>
+          <text class="c163-row__value">{{phoneText}}</text>
         </view>
         <view class="c163-row c163-row--line">
           <view class="c163-row__label-with-icon">
             <view class="c163-row__binding-icon" aria-hidden="true">×</view>
             <text class="c163-row__label">微信绑定</text>
           </view>
-          <text class="c163-row__value c163-row__value--pending">{{bindingText}}</text>
+          <view class="c163-row__binding-actions">
+            <text class="c163-row__value c163-row__value--pending">{{bindingText}}</text>
+            <text class="c163-row__action" bindtap="reauthorizeWechat">重新授权</text>
+          </view>
         </view>
       </view>
 
       <view class="c163-card c163-list">
-        <view class="c163-row">
-          <text class="c163-row__label">修改密码</text>
-          <image class="c163-row__arrow" src="/assets/icons/c16-chevron-right.svg" mode="aspectFit" />
-        </view>
-        <view class="c163-row c163-row--line">
-          <text class="c163-row__label">设备管理</text>
-          <image class="c163-row__arrow" src="/assets/icons/c16-chevron-right.svg" mode="aspectFit" />
-        </view>
-      </view>
-
-      <view class="c163-card c163-list">
-        <view class="c163-row">
+        <view class="c163-row" bindtap="clearCache">
           <text class="c163-row__label">清除缓存</text>
           <image class="c163-row__arrow" src="/assets/icons/c16-chevron-right.svg" mode="aspectFit" />
         </view>

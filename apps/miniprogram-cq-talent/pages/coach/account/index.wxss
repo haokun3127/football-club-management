@@ -92,28 +92,11 @@
   flex: 1;
 }
 
-.c163-profile__name-row {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-}
-
 .c163-profile__name {
   color: #202124;
   font-size: 32rpx;
   font-weight: 700;
   line-height: 38rpx;
-}
-
-.c163-profile__edit {
-  box-sizing: border-box;
-  padding: 4rpx 12rpx;
-  border-radius: 8rpx;
-  background: #fceeef;
-  color: #a80f1b;
-  font-size: 22rpx;
-  font-weight: 600;
-  line-height: 26rpx;
 }
 
 .c163-profile__team {
@@ -169,10 +152,10 @@
   text-align: right;
 }
 
-.c163-row__right {
+.c163-row__binding-actions {
   display: flex;
   align-items: center;
-  gap: 32rpx;
+  gap: 24rpx;
   min-width: 0;
 }
 

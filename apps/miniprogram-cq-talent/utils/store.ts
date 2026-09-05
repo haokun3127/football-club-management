@@ -71,6 +71,8 @@ export function persistAuthenticatedSession(result: LoginResult) {
     token: result.session.token,
     userId: result.profile.userId,
     displayName: result.profile.displayName,
+    phone: result.profile.phone,
+    phoneBinding: result.phoneBinding,
     currentStudentId: result.children[0]?.id,
     expiresAt: result.session.expiresAt,
   };
@@ -84,6 +86,36 @@ export function clearSession() {
   wx.removeStorageSync(STORAGE_KEYS.session);
   wx.removeStorageSync(STORAGE_KEYS.context);
   wx.removeStorageSync(STORAGE_KEYS.devRole);
+}
+
+const DISPOSABLE_STORAGE_PREFIXES = [
+  `${STORAGE_KEYS.assessmentDraftPrefix}:`,
+  "coach-assessment-entry:",
+  "coach-assessment-bulk:",
+  "match-event-draft:v1:",
+];
+const DISPOSABLE_STORAGE_KEYS = new Set(["cq-parent-reminder-read-ids"]);
+
+/** Removes only regenerable drafts and local read-state, never authentication or role context. */
+export function clearDisposableLocalCache() {
+  let keys: string[];
+  try {
+    keys = wx.getStorageInfoSync?.().keys ?? [];
+  } catch {
+    return 0;
+  }
+
+  let cleared = 0;
+  keys.forEach((key) => {
+    if (!DISPOSABLE_STORAGE_KEYS.has(key) && !DISPOSABLE_STORAGE_PREFIXES.some((prefix) => key.startsWith(prefix))) return;
+    try {
+      wx.removeStorageSync(key);
+      cleared += 1;
+    } catch {
+      // A single inaccessible entry must not block the other disposable entries.
+    }
+  });
+  return cleared;
 }
 
 export function setCurrentStudentId(studentId: string) {

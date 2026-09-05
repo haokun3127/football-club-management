@@ -44,6 +44,7 @@ declare const wx: {
   getStorageSync: <T = unknown>(key: string) => T;
   setStorageSync: (key: string, value: unknown) => void;
   removeStorageSync: (key: string) => void;
+  getStorageInfoSync?: () => { keys: string[] };
   switchTab: (options: { url: string }) => void;
   navigateTo: (options: { url: string; success?: WechatCallback<unknown>; fail?: WechatCallback<{ errMsg: string }> }) => void;
   redirectTo: (options: { url: string }) => void;
