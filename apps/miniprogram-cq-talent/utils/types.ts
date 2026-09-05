@@ -501,19 +501,6 @@ export interface CoachTeamAbilityOverview {
   }>;
 }
 
-export interface CoachTrainingCoverageStudent {
-  studentId: string;
-  name: string;
-  coveredCount: number;
-  totalCount: number;
-  dimensions: Array<{
-    dimensionId: string;
-    label: string;
-    covered: boolean;
-    scorePercent: number | null;
-  }>;
-}
-
 export interface CoachAssessmentTask {
   id: string;
   teamId: string;

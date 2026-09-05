@@ -1,8 +1,0 @@
-{
-  "navigationBarTitleText": "覆盖预览",
-  "usingComponents": {
-    "role-tabbar": "/components/role-tabbar/index",
-    "status-view": "/components/status-view/index"
-  },
-  "navigationStyle": "custom"
-}

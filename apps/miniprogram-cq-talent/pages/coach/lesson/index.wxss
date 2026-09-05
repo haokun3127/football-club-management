@@ -159,16 +159,6 @@
   opacity: 0.72;
 }
 
-.c5-confirm-bar__correction {
-  margin-top: 24rpx;
-  color: #a80f1b;
-  font-size: 28rpx;
-  font-weight: 500;
-  line-height: 34rpx;
-  text-align: center;
-  text-decoration: underline;
-}
-
 .c5-history-link {
   margin-top: 24rpx;
   color: var(--color-text-secondary);

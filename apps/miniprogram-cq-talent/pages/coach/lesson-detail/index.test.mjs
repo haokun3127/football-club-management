@@ -105,12 +105,9 @@ describe("coach lesson detail", () => {
     expect(page.data.rows.map((row) => row.studentId)).not.toContain("student-confirmation-only");
   });
 
-  it("navigates to correction and preserves safe error behavior", async () => {
+  it("navigates to training content without exposing a correction flow", async () => {
     const page = createPageInstance();
     await page.onLoad({ id: "event-1" });
-    page.openCorrection();
-    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/lesson-correction/index?id=event-1");
-
     page.openTrainingContent();
     expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/content-select/index?eventId=event-1");
 
@@ -129,7 +126,8 @@ describe("coach lesson detail", () => {
     expect(template).toContain('<view class="detail-card__count">{{rosterStatusLabel}}</view>');
     expect(template).toContain('<view class="detail-row__lesson-chip">{{item.lessonLabel}}</view>');
     expect(template).toContain('<view class="detail-actions__primary" bindtap="openTrainingContent">查看训练内容</view>');
-    expect(template).toContain('<view class="detail-actions__correction" bindtap="openCorrection">更正本次销课</view>');
+    expect(template).not.toContain("openCorrection");
+    expect(template).not.toContain("更正本次销课");
     expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
     expect(template).not.toContain("陈小宇");
     expect(template).not.toContain("周亦辰");

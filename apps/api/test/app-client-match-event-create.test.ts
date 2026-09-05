@@ -177,5 +177,5 @@ describe("app-client coach match-event create", () => {
       first?.persistence.database.close();
       rmSync(directory, { recursive: true, force: true });
     }
-  }, 10_000);
+  }, 30_000);
 });

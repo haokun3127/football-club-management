@@ -7,10 +7,8 @@ const root = __dirname.replace(/\\utils$/, "");
 
 const pageTopBars = [
   ["pages/coach/account/index.wxss", ".c163-nav"],
-  ["pages/coach/assessment-entry/index.wxss", ".c15-nav"],
   ["pages/coach/assessment-submit/index.wxss", ".c151-nav"],
   ["pages/coach/content-select/index.wxss", ".select-nav"],
-  ["pages/coach/coverage/index.wxss", ".coverage-nav"],
   ["pages/coach/event/index.wxss", ".c2-nav"],
   ["pages/coach/help/index.wxss", ".c164-nav"],
   ["pages/coach/permissions/index.wxss", ".c161-nav"],

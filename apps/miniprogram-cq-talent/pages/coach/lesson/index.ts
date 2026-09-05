@@ -189,10 +189,6 @@ Page<LessonPageData>({
   retry() {
     this.load(this.data.eventId);
   },
-  openCorrection() {
-    if (!this.data.eventId) return;
-    openPage(`/pages/coach/lesson-correction/index?id=${this.data.eventId}`);
-  },
   openHistory() {
     openPage("/pages/coach/lesson-history/index");
   },

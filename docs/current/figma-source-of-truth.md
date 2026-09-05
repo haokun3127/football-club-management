@@ -229,6 +229,13 @@ https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/
 3. 未获得可信 DevTools 或真机 `375x812` 截图前，不得宣称小程序实现与 Figma 完全一致。
 4. 需要将在线设计同步回交接包时，先导出本地 `.fig`，再更新此文档中的导出时间、文件大小与 SHA-256。
 
+## 2026-09-06 当前可达流程 superseding 记录
+
+- 历史 C5.1（课时更正）、C10.1（Coverage Preview）与 C15（旧 Assessment Entry）画板、截图和规格继续作为历史设计证据保留，但不再对应可达的小程序路由；不要依照这些历史页重新增加入口。
+- 当前教练测评唯一用户流程为 C11 `pages/coach/test-tasks` → C12 `pages/coach/assessment-projects`（仅选择本次需要的、按训练内容三级分级的项目）→ C12.1 `pages/coach/assessment-bulk-entry`。评分库含 62 个可选项目，不意味着每次都需录入全部项目。
+- 点名确认即销课。小程序不再提供课时更正页；后端既有流水和历史审计能力没有删除。
+- 本记录只更新当前功能映射；在线 Figma 历史画板未删除、未改写，且本批未进行新的运行态视觉验收。
+
 # 2026-09-01 Parent/Coach V4 产品改版页面
 
 - 在线 Figma 唯一文件仍为 `zZ6wKyOHKcO4UYXDd9jGwv`。为解决历史稿、组件稿和多轮改版集中导致的查找混乱，新增两个独立的顶层 Page；原 `05 Parent Generated`、`06 Coach Generated` 和 V3 页面均保留，不覆盖、不删除。

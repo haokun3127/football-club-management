@@ -75,8 +75,8 @@ Page<PageData>({
         allEvents: presented,
         events: applyTypeFilter(presented, this.data.activeType),
       });
-    } catch (error) {
-      this.setData({ state: "error", message: error instanceof Error ? error.message : "活动读取失败，请稍后重试。" });
+    } catch {
+      this.setData({ state: "error", message: "活动读取失败，请稍后重试。" });
     }
   },
   retry() {

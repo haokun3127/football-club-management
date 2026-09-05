@@ -147,10 +147,6 @@ Page<PageData>({
     return this.load(this.data.eventId);
   },
 
-  openCorrection() {
-    if (this.data.eventId) openPage(`/pages/coach/lesson-correction/index?id=${encodeURIComponent(this.data.eventId)}`);
-  },
-
   openTrainingContent() {
     if (this.data.eventId) openPage(`/pages/coach/content-select/index?eventId=${encodeURIComponent(this.data.eventId)}`);
   },

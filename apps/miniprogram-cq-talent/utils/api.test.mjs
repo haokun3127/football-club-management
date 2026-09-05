@@ -36,7 +36,7 @@ globalThis.wx = {
   }),
 };
 
-const { correctCoachLesson, createCoachMatchEvent, getCoachAssessmentTasks, getCoachMatchDetail, getCoachWorkbench, getParentActivityDetail, getParentStudentHome, saveCoachAttendance, submitCoachAssessment, switchActiveRole, wechatLogin } = await import("./api.ts");
+const { createCoachMatchEvent, getCoachAssessmentTasks, getCoachMatchDetail, getCoachWorkbench, getParentActivityDetail, getParentStudentHome, saveCoachAttendance, submitCoachAssessment, switchActiveRole, wechatLogin } = await import("./api.ts");
 
 describe("active-role session transport", () => {
   it("advertises the role-switch capability when starting WeChat login", async () => {
@@ -160,32 +160,6 @@ describe("coach workbench participant normalization", () => {
           { studentId: "student-invited", status: "invited", note: undefined },
         ],
       });
-    } finally {
-      globalThis.wx.request = originalRequest;
-    }
-  });
-});
-
-describe("coach lesson correction request boundary", () => {
-  it("sends only the correction payload with the page-owned stable idempotency key", async () => {
-    const originalRequest = globalThis.wx.request;
-    let received;
-    globalThis.wx.request = ({ data, header, success }) => {
-      received = { data, header };
-      success({ statusCode: 200, data: { ledger: {} } });
-    };
-
-    try {
-      await correctCoachLesson("event-training-1", "student-1", 0.5, "Attendance follow-up", "lesson-correction-key");
-      expect(received).toEqual(expect.objectContaining({
-        data: {
-          studentId: "student-1",
-          lessonDelta: 0.5,
-          reason: "Attendance follow-up",
-        },
-        header: expect.objectContaining({ "Idempotency-Key": "lesson-correction-key" }),
-      }));
-      expect(received.data).not.toHaveProperty("actorUserId");
     } finally {
       globalThis.wx.request = originalRequest;
     }

@@ -34,7 +34,6 @@
 
       <view class="detail-actions">
         <view class="detail-actions__primary" bindtap="openTrainingContent">查看训练内容</view>
-        <view class="detail-actions__correction" bindtap="openCorrection">更正本次销课</view>
       </view>
     </block>
 

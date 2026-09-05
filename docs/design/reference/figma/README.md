@@ -43,7 +43,7 @@
 | c4-1-attendance-success.png | C4.1 | pages/coach/attendance-success |
 | c4-2-attendance-correction.png | C4.2 | attendance ?correction=1 |
 | c5-lesson-confirm.png | C5 | pages/coach/lesson |
-| c5-1-lesson-correction.png | C5.1 | pages/coach/lesson-correction |
+| c5-1-lesson-correction.png | C5.1（历史） | 已退役，无小程序路由 |
 | c6-match-entry.png | C6 | pages/coach/match |
 | c6-1-add-match-event.png | C6.1 | pages/coach/match-event-add |
 | c6-2-save-state.png | C6.2 | match 页内 savedFlash 态 |
@@ -51,13 +51,13 @@
 | c8-training-management.png | C8 | pages/coach/training |
 | c9-team-detail.png | C9 | pages/coach/team |
 | c10-training-content-select.png | C10 | pages/coach/content-select |
-| c10-1-coverage-preview.png | C10.1 | pages/coach/coverage/index |
+| c10-1-coverage-preview.png | C10.1（历史） | 已退役，无小程序路由 |
 | c11-test-task-list.png | C11 | pages/coach/test-tasks |
-| c12-project-score-entry.png | C12 | pages/coach/test-entry |
-| c12-1-autosave-state.png | C12.1 | assessment-entry 页内态 |
+| c12-project-score-entry.png | C12 | pages/coach/assessment-projects |
+| c12-1-autosave-state.png | C12.1 | pages/coach/assessment-bulk-entry |
 | c13-student-radar.png | C13 | pages/coach/student-radar |
 | c14-team-ability-overview.png | C14 | pages/coach/team-ability |
-| c15-assessment-entry.png | C15 | pages/coach/assessment-entry |
+| c15-assessment-entry.png | C15（历史） | 已退役，无小程序路由 |
 | c15-1-assessment-submit.png | C15.1 | pages/coach/assessment-submit |
 | c16-coach-me.png | C16 | pages/coach/me |
 | c16-1-permission-scope.png | C16.1 | pages/coach/permissions |

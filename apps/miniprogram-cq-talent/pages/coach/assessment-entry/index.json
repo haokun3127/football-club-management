@@ -1,7 +1,0 @@
-{
-  "navigationStyle": "custom",
-  "usingComponents": {
-    "role-tabbar": "/components/role-tabbar/index",
-    "status-view": "/components/status-view/index"
-  }
-}

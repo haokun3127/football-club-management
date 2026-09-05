@@ -130,14 +130,6 @@
   font-weight: 600;
 }
 
-.detail-actions__correction {
-  color: var(--color-brand);
-  font-size: 28rpx;
-  line-height: 36rpx;
-  text-align: center;
-  text-decoration: underline;
-}
-
 .detail-empty {
   display: flex;
   flex-direction: column;

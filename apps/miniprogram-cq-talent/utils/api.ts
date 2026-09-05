@@ -18,7 +18,6 @@ import type {
   CoachWeekStats,
   CoachTeamDetail,
   CoachTeamAbilityOverview,
-  CoachTrainingCoverageStudent,
   CoachAssessmentTask,
   ClubCoachTeam,
   ContentArticle,
@@ -305,31 +304,6 @@ export async function confirmCoachLesson(eventId: string, studentIds: string[], 
       note: note || "重庆天才小程序教练端确认销课",
     },
     idempotent: true,
-  });
-}
-
-export async function correctCoachLesson(
-  eventId: string,
-  studentId: string,
-  lessonDelta: -0.5 | 0.5,
-  reason: string | undefined,
-  idempotencyKey: string,
-) {
-  const context = requireContext();
-
-  return request<Record<string, unknown>, {
-    studentId: string;
-    lessonDelta: -0.5 | 0.5;
-    reason?: string;
-  }>({
-    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/lesson-confirmation`,
-    method: "PATCH",
-    data: {
-      studentId,
-      lessonDelta,
-      reason,
-    },
-    idempotencyKey,
   });
 }
 
@@ -1529,14 +1503,6 @@ export async function createCoachEventChangeRequest(
     method: "POST",
     data: input,
   });
-}
-
-export async function getCoachTrainingCoverage(): Promise<CoachTrainingCoverageStudent[]> {
-  const context = requireContext();
-  const response = await request<{ students?: CoachTrainingCoverageStudent[] }>({
-    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/training-coverage`,
-  });
-  return Array.isArray(response.students) ? response.students : [];
 }
 
 export async function getCoachAssessmentTasks(options: AssessmentTaskReadOptions = {}): Promise<CoachAssessmentTask[]> {

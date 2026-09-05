@@ -35,7 +35,6 @@
   <view wx:if="{{state === 'ready' && hasRoster}}" class="c5-confirm-bar">
     <view wx:if="{{saving}}" class="c5-confirm-bar__button c5-confirm-bar__button--disabled">确认中...</view>
     <view wx:else class="c5-confirm-bar__button" bindtap="confirmLesson">确认全部</view>
-    <view class="c5-confirm-bar__correction" bindtap="openCorrection">发起更正</view>
   </view>
 
   <role-tabbar role="coach" active="schedule" />

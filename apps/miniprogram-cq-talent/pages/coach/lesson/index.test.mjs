@@ -188,6 +188,8 @@ describe("coach lesson confirmation", () => {
     expect(pageConfig).not.toContain('"submit-bar"');
     expect(template).not.toContain("submit-bar");
     expect(template).not.toContain("lesson-correction");
+    expect(template).not.toContain("openCorrection");
+    expect(template).not.toContain("发起更正");
     expect(template).not.toContain("返还");
     expect(template).not.toContain("补扣");
     expect(template).not.toContain("1.5");
@@ -195,6 +197,7 @@ describe("coach lesson confirmation", () => {
     expect(template).not.toContain("U10精英队");
     expect(controller).not.toContain("correctCoachLesson");
     expect(controller).not.toContain("correctLesson");
+    expect(controller).not.toContain("openCorrection");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 
@@ -205,7 +208,7 @@ describe("coach lesson confirmation", () => {
     expect(template).toContain("{{rosterCount}} 人待处理");
     expect(template).toContain("{{item.lessonAmountText}}");
     expect(template).toContain("确认全部");
-    expect(template).toContain("发起更正");
+    expect(template).not.toContain("发起更正");
   });
 
   it("keeps the pending action block in normal page flow like the refreshed C5 board", () => {
