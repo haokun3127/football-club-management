@@ -342,28 +342,23 @@ export function buildDateOptions(selectedDate: string, events: ScheduleEvent[]) 
 }
 
 export function presentNoticeBanner(articles: ContentArticle[]): NoticeBannerView | null {
-  const article = articles.find((item) => item.category === "notice" && !isExpired(item.expiresAt));
+  const now = Date.now();
+  const article = articles.find((item) => {
+    const publishedAt = item.publishedAt ? Date.parse(item.publishedAt) : null;
+    const expiresAt = item.expiresAt ? Date.parse(item.expiresAt) : null;
+    return item.category === "notice"
+      && (publishedAt === null || (Number.isFinite(publishedAt) && publishedAt <= now))
+      && (expiresAt === null || (Number.isFinite(expiresAt) && expiresAt > now));
+  });
   if (!article) return null;
-  const source = (article.body || article.subtitle || article.title).replace(/\s+/g, " ").trim();
+  const source = (article.subtitle?.trim() || article.body || article.title).replace(/\s+/g, " ").trim();
   return {
     id: article.id,
     title: article.title,
     summary: source.length > 52 ? `${source.slice(0, 52)}…` : source,
-    metaLabel: article.expiresAt ? `有效期至${formatNoticeDate(article.expiresAt)}` : article.publishedAt ? `发布于${formatNoticeDate(article.publishedAt)}` : "俱乐部通知",
+    metaLabel: "俱乐部公告",
     hasDetail: Boolean(article.body || article.subtitle),
   };
-}
-
-function isExpired(value?: string) {
-  if (!value) return false;
-  const timestamp = Date.parse(value);
-  return Number.isFinite(timestamp) && timestamp < Date.now();
-}
-
-function formatNoticeDate(value: string) {
-  const date = new Date(value);
-  if (!Number.isFinite(date.getTime())) return "日期待同步";
-  return `${date.getMonth() + 1}月${date.getDate()}日`;
 }
 
 export function buildMonthDays(monthKey: string, selectedDate: string, events: ScheduleEvent[]): MonthDayView[] {

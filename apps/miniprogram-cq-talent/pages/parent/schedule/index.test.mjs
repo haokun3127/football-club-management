@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 globalThis.wx = {
   getAccountInfoSync: () => ({ miniProgram: { envVersion: "develop" } }),
@@ -271,8 +271,8 @@ describe("parent schedule hero", () => {
     ])).toEqual({
       id: "notice-1",
       title: "本周训练安排提醒",
-      summary: "本周六训练提前至上午九点，请家长及时查看日程安排。",
-      metaLabel: "俱乐部通知",
+      summary: "请关注本周课程调整",
+      metaLabel: "俱乐部公告",
       hasDetail: true,
     });
   });
@@ -281,5 +281,24 @@ describe("parent schedule hero", () => {
     expect(presentNoticeBanner([])).toBeNull();
     expect(presentNoticeBanner([{ id: "guide", title: "训练指南", subtitle: "帮助", accent: "#a80f1b", category: "guide" }])).toBeNull();
     expect(presentNoticeBanner([{ id: "expired", title: "过期通知", subtitle: "不应展示", accent: "#a80f1b", category: "notice", expiresAt: "2020-01-01T00:00:00.000Z" }])).toBeNull();
+  });
+
+  it("uses publication dates only to control display and leaves source articles available for history", () => {
+    const clock = vi.spyOn(Date, "now").mockReturnValue(Date.parse("2026-09-06T08:00:00Z"));
+    try {
+      const notice = { id: "n", title: "俱乐部活动", subtitle: "活动摘要", accent: "#a80f1b", category: "notice" };
+      const future = { ...notice, id: "future", publishedAt: "2026-09-07T00:00:00Z" };
+      const expired = { ...notice, id: "expired", expiresAt: "2026-09-06T08:00:00Z" };
+      const active = { ...notice, id: "active", publishedAt: "2026-09-06T08:00:00Z", expiresAt: "2026-10-01T00:00:00Z" };
+      const articles = [future, expired, active];
+      expect(presentNoticeBanner(articles)).toMatchObject({ id: "active", metaLabel: "俱乐部公告" });
+      expect(articles).toEqual([future, expired, active]);
+      expect(presentNoticeBanner([future, expired])).toBeNull();
+      expect(presentNoticeBanner([{ ...notice, publishedAt: "invalid" }])).toBeNull();
+      expect(presentNoticeBanner([{ ...notice, expiresAt: "invalid" }])).toBeNull();
+      expect(presentNoticeBanner([{ ...notice, subtitle: "   ", body: "完整正文" }])).toMatchObject({ summary: "完整正文" });
+    } finally {
+      clock.mockRestore();
+    }
   });
 });
