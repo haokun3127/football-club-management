@@ -11,10 +11,10 @@ Prepare seven dual-role accounts for customer testing without resetting authenti
 
 ## Acceptance Criteria
 
-- [ ] Positive credits; attendance agrees with ledger and operational profile.
-- [ ] Every date in current and next China-local calendar week has usable activities.
-- [ ] Scheduled matches have no results; finished matches have consistent event records.
-- [ ] Database integrity, focused tests and post-restart role-scoped reads pass.
+- [x] Positive credits; attendance agrees with ledger and operational profile.
+- [x] Every date in current and next China-local calendar week has usable activities.
+- [x] Scheduled matches have no results; finished matches have consistent event records.
+- [x] Database integrity, focused tests and post-restart role-scoped reads pass.
 
 ## Notes
 

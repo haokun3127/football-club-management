@@ -28,10 +28,29 @@ are stored in this document. Ordinary club rows are not reset.
 - Consistent SQLite backups were created before any live write. September 7 backup:
   `/var/lib/cq-talent/customer-pre-repair-20260907.sqlite` inside the API data volume,
   mode 0600; `integrity_check=ok`, no foreign-key violations.
-- September 6 rehearsals passed on a copy of production. Latest date-window rehearsal
-  and production application are pending at this commit.
+- Deployed API commit `c893adb`; applied the backed-up repair on September 7 at
+  09:05 CST, restarted API and confirmed HTTPS health. Production is no longer pending.
+- All seven scopes (133 students) have daily activities from September 7–27.
+  Negative credits/balances, absent-student scores, ledger/profile mismatches and
+  premature match results are zero; SQLite integrity is `ok`, foreign-key errors zero.
+- Each team has 38 historical assessments (two rounds for 19 players) and three
+  tasks, including one unscored project-selection task. Radar values use the domain
+  model; the current task does not require testing every catalog project.
+- Post-restart read-only BFF checks: 84/84 HTTP 200, two bound children per account,
+  eight radar dimensions, three own-team tasks, 21 calendar dates, and training plus
+  ability-update growth history for both children. No cross-team task leakage.
+- Account slot 1 (罗志炫): 丁宁 balance 24 / attended 24; 方圆 balance 35 / attended 25.
+  This replaces the inconsistent negative-balance test history, not merely its display.
+- API suite: 138 tests; TypeScript build and diff checks passed during implementation.
 - In-process read-only BFF checks use persisted memberships, not fabricated phone
   authorization or production sessions. They are **not** real-device login acceptance.
+
+## Limits
+
+These are synthetic customer-test records, not actual sporting results. Completed
+demo matches share a 2–1 scenario and training plans reuse eight catalog blocks.
+The checks above establish selected data invariants and BFF readability, not every
+screen's appearance, real-device authorization, or all historical age-group metadata.
 
 ## Recovery and safety
 

@@ -6,4 +6,7 @@
 4. Execute authorized repair, restart API, check health and seven-role data reads.
 5. Record evidence and limitations; stage only task-owned paths.
 
-Never equate row existence with realistic data. No production changes yet.
+Completed: backed up production, rehearsed, deployed c893adb, applied September 7
+09:05 CST, restarted API and verified database consistency plus 84 read-only BFF
+requests. See docs/current/customer-test-data-repair-2026-09-07.md for evidence and
+limitations. Never equate row existence with realistic data or device acceptance.
