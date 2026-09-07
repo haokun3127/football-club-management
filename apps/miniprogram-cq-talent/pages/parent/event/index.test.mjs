@@ -59,6 +59,37 @@ function detail(overrides = {}) {
 }
 
 describe("parent activity detail", () => {
+  it.each(["scheduled", "in_progress", "cancelled"])("hides post-match comments for %s matches", async (status) => {
+    mocks.getParentActivityDetail.mockResolvedValueOnce(detail({
+      type: "match", status,
+      fields: [{ label: "教练点评", value: "积极拼抢" }],
+      sections: [{ title: "比赛过程", items: [{ label: "孩子表现", value: "已点评" }] }],
+    }));
+    const page = createPageInstance();
+    await page.load("match-event");
+    expect(page.data.detail).toMatchObject({ hasMatchNote: false, matchNote: "" });
+  });
+
+  it("does not use attendance as a completed match comment", async () => {
+    mocks.getParentActivityDetail.mockResolvedValueOnce(detail({
+      type: "match", status: "completed",
+      sections: [{ title: "比赛过程", items: [{ label: "孩子表现", value: "已到场" }] }],
+    }));
+    const page = createPageInstance();
+    await page.load("match-event");
+    expect(page.data.detail.matchNote).toBe("教练尚未点评");
+  });
+
+  it("preserves an explicit completed match comment", async () => {
+    mocks.getParentActivityDetail.mockResolvedValueOnce(detail({
+      type: "match", status: "completed",
+      fields: [{ label: "教练点评", value: "  积极拼抢，传球及时。  " }],
+    }));
+    const page = createPageInstance();
+    await page.load("match-event");
+    expect(page.data.detail).toMatchObject({ hasMatchNote: true, matchNote: "积极拼抢，传球及时。" });
+  });
+
   beforeEach(() => {
     mocks.getParentActivityDetail.mockReset();
     mocks.requireRole.mockReset().mockReturnValue({ role: "parent" });

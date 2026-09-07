@@ -124,6 +124,15 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
   const rawDateTime = fieldValue(detail, ["时间", "日期"]);
   const dateTime = parseDateTimeParts(rawDateTime);
   const rawScore = sectionValue(detail, ["比赛信息"], ["比分"]).trim();
+  // Attendance/participation is not a coach review. Only explicit comment fields
+  // may supply review text, and post-match content is hidden until completion.
+  const commentLabels = ["教练点评", "点评", "评语"];
+  const commentFields = [
+    ...detail.fields,
+    ...detail.sections.filter((section) => section.title === "比赛过程").flatMap((section) => section.items),
+  ];
+  const explicitComment = commentFields.find((field) => commentLabels.includes(field.label) && field.value.trim())?.value.trim() ?? "";
+  const showMatchComment = detail.type === "match" && detail.status === "completed";
   const childStatusLabel = child ? participantStatusLabel(child.status) : "出勤状态待同步";
   const trainingPill = detail.type === "training"
     ? childStatusLabel === "已到场"
@@ -162,8 +171,8 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
     matchEvents: toMatchEvents(detail.matchEvents),
     hasMatchEvents: toMatchEvents(detail.matchEvents).length > 0,
     matchResultLabel: matchResultLabel(rawScore, status.label),
-    matchNote: fieldValue(detail, ["教练点评", "点评", "评语"]) || sectionValue(detail, ["比赛过程"], ["教练点评", "评语", "表现"]),
-    hasMatchNote: Boolean(fieldValue(detail, ["教练点评", "点评", "评语"]) || sectionValue(detail, ["比赛过程"], ["教练点评", "评语", "表现"])),
+    matchNote: showMatchComment ? explicitComment || "教练尚未点评" : "",
+    hasMatchNote: showMatchComment,
   };
 }
 
