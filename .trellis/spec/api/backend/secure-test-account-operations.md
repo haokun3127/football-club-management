@@ -1,5 +1,23 @@
 # Secure Test-Account Operations
 
+## Explicit customer-test repair exception (2026-09-07)
+
+`repairSecureDemoData` is separate from normal import and rollback. Only with
+explicit user authorization and a verified SQLite backup may it reset the seven
+fixed scopes' test financial and assessment histories. It preserves login bindings
+and unrelated club records. Never schedule it or call it from startup.
+
+Validate semantics, not record counts: positive opening credits; exactly one debit
+per present/late completed training; no absent/future debit; profile/ledger equality;
+date coverage; match-event/score consistency; real score-table graph lineage.
+Once customer credit IDs exist, legacy rolling import must refuse execution.
+Maintenance-only indexes may be created and dropped inside the reset transaction
+to avoid quadratic foreign-key cascade scans; no persistent schema change is needed.
+
+Coach assessment task lists must filter by accessible team IDs before projecting
+counts and status. Returning another team's task with zero visible students is
+neither correct scoping nor a valid completion-state calculation.
+
 ## Scenario: Chongqing Talent isolated dual-role account operation
 
 ### 1. Scope / Trigger

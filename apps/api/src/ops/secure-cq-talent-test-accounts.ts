@@ -100,6 +100,10 @@ export function importSecureCqTalentTestAccounts(
   const manifest = createSecureCqTalentTestAccountManifest();
   const now = input.now ?? new Date().toISOString();
 
+  if (database.prepare("SELECT id FROM lesson_credit_ledger WHERE club_id=? AND id=?").get(clubId, "customer-credit-student-cq-talent-secure-test-1-1")) {
+    throw new Error("Customer-test baseline is installed; use the separately backed-up repair operation, not rolling legacy import.");
+  }
+
   if (input.dryRun) {
     validateTarget(database, input.phones, manifest);
     const existing = readExistingManifest(database, input.phones, manifest);
@@ -611,7 +615,7 @@ function ensureDemoData(
         [participantIdForEvent(account, event.id, index), clubId, event.id, studentId, participantStatus, participantNote(participantStatus), now, now]);
     });
 
-    const openingBalance = 12 - index;
+    const openingBalance = 36 + (index % 3) * 12;
     const ledgerOffset = index * (completedTrainingEvents.length + 1);
     upsertDemoRow(database, "lesson_credit_ledger",
       "id, club_id, student_id, team_id, event_id, occurred_at, entry_type, lesson_delta, balance_after, source, source_id, actor_user_id, note, created_at, updated_at",
@@ -1029,13 +1033,15 @@ function refreshDemoIdentity(
 function buildDemoEvents(account: SecureCqTalentTestAccountManifestEntry, now: string): DemoEvent[] {
   const nextTrainingStart = nextDemoTrainingStart(now);
   const weekStart = startOfDemoWeek(now);
+  const latestCompletedStart = Date.parse(shiftIso(weekStart, 0, 2)) <= Date.parse(now)
+    ? weekStart : shiftIso(weekStart, -1, 0);
   return [
     { id: account.eventId, type: "training", title: "本周技术训练", startsAt: nextTrainingStart, endsAt: shiftIso(nextTrainingStart, 0, 2), locationId: "venue-cq-talent-jiulongpo", status: "scheduled", notes: "围绕控球、传接和小组配合开展训练。", participantStatuses: ["confirmed", "confirmed", "invited", "confirmed", "confirmed", "invited", "confirmed", "confirmed"] },
     { id: eventIdFor(account, "history-training"), type: "training", title: "基础技术训练回顾", startsAt: shiftIso(weekStart, -13, 0), endsAt: shiftIso(weekStart, -13, 2), locationId: "venue-cq-talent-sport-uni", status: "completed", notes: "已完成带球、传球和射门基础训练。", participantStatuses: ["present", "late", "present", "present", "present", "late", "present", "present"] },
     { id: eventIdFor(account, "history-training-2"), type: "training", title: "传接配合专项训练", startsAt: shiftIso(weekStart, -11, 0), endsAt: shiftIso(weekStart, -11, 2), locationId: "venue-cq-talent-nanan", status: "completed", notes: "已完成接球转身、短传配合和跑位训练。", participantStatuses: ["present", "present", "late", "present", "present", "present", "late", "present"] },
     { id: eventIdFor(account, "history-training-3"), type: "training", title: "攻防转换训练", startsAt: shiftIso(weekStart, -6, 0), endsAt: shiftIso(weekStart, -6, 2), locationId: "venue-cq-talent-jiulongpo", status: "completed", notes: "已完成抢断后的快速推进和回防组织训练。", participantStatuses: ["present", "late", "present", "present", "present", "present", "present", "late"] },
     { id: eventIdFor(account, "history-training-4"), type: "training", title: "射门终结训练", startsAt: shiftIso(weekStart, -4, 0), endsAt: shiftIso(weekStart, -4, 2), locationId: "venue-cq-talent-sport-uni", status: "completed", notes: "已完成禁区前射门、补射和终结选择训练。", participantStatuses: ["late", "present", "present", "present", "late", "present", "present", "present"] },
-    { id: eventIdFor(account, "history-training-5"), type: "training", title: "小组对抗训练", startsAt: shiftIso(weekStart, 0, 0), endsAt: shiftIso(weekStart, 0, 2), locationId: "venue-cq-talent-nanan", status: "completed", notes: "已完成四对四对抗和小组协同训练。", participantStatuses: ["present", "present", "late", "present", "present", "present", "present", "late"] },
+    { id: eventIdFor(account, "history-training-5"), type: "training", title: "小组对抗训练", startsAt: latestCompletedStart, endsAt: shiftIso(latestCompletedStart, 0, 2), locationId: "venue-cq-talent-nanan", status: "completed", notes: "已完成四对四对抗和小组协同训练。", participantStatuses: ["present", "present", "late", "present", "present", "present", "present", "late"] },
     { id: eventIdFor(account, "future-training"), type: "training", title: "周末进攻训练", startsAt: shiftIso(nextTrainingStart, 4, 0), endsAt: shiftIso(nextTrainingStart, 4, 2), locationId: "venue-cq-talent-jiulongpo", status: "scheduled", notes: "安排进攻跑位、边路配合和小范围对抗。", participantStatuses: ["confirmed", "invited", "confirmed", "confirmed", "invited", "confirmed", "confirmed", "confirmed"] },
     { id: eventIdFor(account, "completed-match"), type: "match", title: "周末友谊赛战报", startsAt: shiftIso(weekStart, -5, 0), endsAt: shiftIso(weekStart, -5, 2), locationId: "venue-cq-talent-nanan", status: "completed", notes: "友谊赛已完成，已记录关键比赛事件。", participantStatuses: ["present", "present", "present", "late", "present", "present", "present", "present"] },
     { id: eventIdFor(account, "scheduled-match"), type: "match", title: "周末联赛排兵", startsAt: shiftIso(nextTrainingStart, 8, 0), endsAt: shiftIso(nextTrainingStart, 8, 2), locationId: "venue-cq-talent-jiulongpo", status: "scheduled", notes: "联赛前已完成首发阵容和战术布置。", participantStatuses: ["confirmed", "confirmed", "confirmed", "invited", "confirmed", "confirmed", "confirmed", "confirmed"] },

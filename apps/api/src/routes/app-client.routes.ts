@@ -2539,7 +2539,8 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         activeTeamMemberStudentIds.set(member.teamId, students);
       }
 
-      const views = tasks.map((task) => {
+      const accessibleTeamIds = new Set(teams.map((team) => team.id));
+      const views = tasks.filter((task) => accessibleTeamIds.has(task.teamId)).map((task) => {
         const taskStudentIds = activeTeamMemberStudentIds.get(task.teamId) ?? new Set<string>();
         const visibleStudentIds = new Set(scope.students.map((student) => student.id));
         const totalStudents = [...taskStudentIds].filter((studentId) => visibleStudentIds.has(studentId)).length;
