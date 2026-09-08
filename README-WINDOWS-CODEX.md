@@ -12,6 +12,8 @@ npx --yes pnpm@10.33.0 --filter @football-club/miniprogram-cq-talent test
 
 完整命令、当前项目状态、在线 Figma 和验收流程见 [docs/README.md](docs/README.md)。
 
+从 GitHub 接手请先阅读 [HANDOFF-GITHUB-2026-09-08.md](HANDOFF-GITHUB-2026-09-08.md)，其中记录当前 `dev` 提交、验证基线、生产边界及用户文件隔离规则。
+
 ## Codex 配置
 
 项目已保留 `.codex/`、`.trellis/` 和 `AGENTS.md`：它们为 Codex 提供项目规范、历史任务和可选 hooks，不依赖 Hermes。

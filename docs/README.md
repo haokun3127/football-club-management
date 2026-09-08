@@ -4,7 +4,8 @@
 
 ## 从这里开始
 
-- [Kimi 当前交接 HANDOFF-KIMI-2026-08-19.md](../HANDOFF-KIMI-2026-08-19.md)：**当前接手第一篇**（2026-08-19）。工作区状态、在线 Figma 权威、真实截图 SOP、生产边界、未完成事项和未提交改动白名单。
+- [GitHub 当前交接 HANDOFF-GITHUB-2026-09-08.md](../HANDOFF-GITHUB-2026-09-08.md)：**当前接手第一篇**。从克隆、门禁、Figma、生产边界到测试数据的最新事实。
+- [Kimi 交接（2026-08-19，历史）](../HANDOFF-KIMI-2026-08-19.md)：保留当时的工作区与截图 SOP；不能单独作为当前提交、生产版本或未完成项的依据。
 - [历史总交接 HANDOFF.md](../HANDOFF.md)：2026-08-13 历史全量背景；若与当前交接冲突，以当前交接、`docs/current/` 和最新进度记录为准。
 - [当前项目进度](current/progress.md)：正在推进的工作、已知阻塞和真实验证状态。
 - [当前架构](current/architecture.md)：服务、数据和模块边界。
@@ -13,7 +14,7 @@
 - [小程序验收](current/miniprogram-manual-acceptance-cq-talent.md)：DevTools/真机验收流程。
 - [发布准备度](current/miniprogram-release-readiness-cq-talent.md)：上线前缺口与判断。
 - [部署要求](current/deployment-requirements.md)：部署环境与运维要求。
-- [Claude 总交接文档（2026-08-12，最新）](current/agent-handover-2026-08-12.md)：主工作区、当前提交/未提交边界、Figma 基准、安全登录边界、部署前置条件和下一步路线。
+- [Claude 总交接文档（2026-08-12，历史）](current/agent-handover-2026-08-12.md)：主工作区、Figma 基准、安全登录边界与当时的部署前置条件。
 - [安全测试账号专项交接（2026-08-12）](current/agent-handover-2026-08-12-secure-test-accounts.md)：受控导入/回滚 CLI、私有运行时变量和未执行的生产操作。
 - [Agent 交接文档（2026-08-09，历史快照）](current/agent-handover-2026-08-09.md)：17 页巡检收口、雷达预览真实数据化、截图基础设施与当时的白名单。
 - [Agent 交接文档（2026-08-07）](current/agent-handover-2026-08-07.md)：工作区、hotfix worktree、生产状态、未完成任务和交接规则。

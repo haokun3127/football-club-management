@@ -3053,3 +3053,9 @@
 - 当前 Figma P4 `1967:21 / Stats Row` 要求课时统计行及内部三列无任何描边；代码残留了一条顶部横线和两条竖分隔线，造成深色球员卡内部出现不应有的浅色框线。
 - `.p4-hero__stats` 现仅保留布局和间距，移除顶部与内部统计项边线；未改动课时数据、文字、卡片尺寸或能力雷达。
 - 回归测试明确禁止这两个选择器重新出现 `border` / `border-top` / `border-left`；定向与全量小程序测试、TypeScript 和 `git diff --check` 已通过。
+
+## 2026-09-08 GitHub 接手文档收口
+
+- 新增根目录 `HANDOFF-GITHUB-2026-09-08.md` 作为唯一当前 GitHub 接手入口；文档导航、根 README 与 Windows 交付说明均已指向它。旧 Kimi/Next 交接改为明确的历史快照，避免误把 8 月分支、部署和待办当作今天状态。
+- 当前远端 `origin/dev` 与本地均为 `b6a3de3d5bd8415874613176a51a72e681637194`。9 月 8 日完整门禁通过：domain `21/21`、miniprogram `494/494`、API `138/138`，三包 TypeScript 检查通过；`https://cqtc.pomi.tech/health` 返回正常。
+- Windows 全局 npm 缓存出现 `EEXIST`/`EBADF` 时，交接命令使用忽略的 `.tmp-npm-cache-handoff` 临时缓存运行固定 `pnpm@10.33.0`，不清理共享 npm 缓存。用户的 DevTools `project.config.json` 和根 WPS 表格保持未提交且未纳入交接提交。

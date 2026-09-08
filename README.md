@@ -5,6 +5,7 @@
 ## 快速入口
 
 - [项目文档导航](docs/README.md)
+- [GitHub 当前交接](HANDOFF-GITHUB-2026-09-08.md)
 - [当前项目进度](docs/current/progress.md)
 - [当前架构](docs/current/architecture.md)
 - [Figma 权威来源](docs/current/figma-source-of-truth.md)
