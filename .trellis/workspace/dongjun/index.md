@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 26
-- **Last Active**: 2026-09-01
+- **Total Sessions**: 27
+- **Last Active**: 2026-09-09
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~969 | Active |
+| `journal-1.md` | ~1003 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 27 | 2026-09-09 | 整理文档导航与历史归档 | `a0eadfe` | `dev` |
 | 26 | 2026-09-01 | Close P1 parent calendar V3 acceptance | `b8fa948` | `dev` |
 | 25 | 2026-08-29 | C1 coach schedule visual acceptance | `d479730`, `d6650ab` | `dev` |
 | 24 | 2026-08-24 | Persist coach session plans | `f0ce036` | `dev` |

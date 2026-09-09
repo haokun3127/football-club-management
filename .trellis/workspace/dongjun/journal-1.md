@@ -967,3 +967,37 @@ Verified the non-destructive P1 V3 weekly, expanded and empty Figma states; capt
 ### Next Steps
 
 - None - task complete
+
+
+## Session 27: 整理文档导航与历史归档
+
+**Date**: 2026-09-09
+**Task**: 整理文档导航与历史归档
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+归档旧交接、已完成计划和历史运行快照；重建当前文档导航并验证本地 Markdown 链接。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `a0eadfe` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
