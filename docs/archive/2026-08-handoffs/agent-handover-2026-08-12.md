@@ -20,7 +20,7 @@ C:\Users\ASUS\Desktop\football-club-management-codex-windows-2026-08-02
 2. 本文
 3. `docs/current/progress.md`（逐日记录；最新结论在开头与末尾）
 4. `docs/current/figma-source-of-truth.md`
-5. `docs/current/agent-handover-2026-08-12-secure-test-accounts.md`（安全账号专项）
+5. `agent-handover-2026-08-12-secure-test-accounts.md`（安全账号专项）
 6. 若处理部署：`docs/current/deployment-requirements.md`
 7. 只读体检：`git status --short`、`git log --oneline -12`、`python ./.trellis/scripts/get_context.py`
 

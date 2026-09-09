@@ -3059,3 +3059,9 @@
 - 新增根目录 `HANDOFF-GITHUB-2026-09-08.md` 作为唯一当前 GitHub 接手入口；文档导航、根 README 与 Windows 交付说明均已指向它。旧 Kimi/Next 交接改为明确的历史快照，避免误把 8 月分支、部署和待办当作今天状态。
 - 当前远端 `origin/dev` 与本地均为 `b6a3de3d5bd8415874613176a51a72e681637194`。9 月 8 日完整门禁通过：domain `21/21`、miniprogram `494/494`、API `138/138`，三包 TypeScript 检查通过；`https://cqtc.pomi.tech/health` 返回正常。
 - Windows 全局 npm 缓存出现 `EEXIST`/`EBADF` 时，交接命令使用忽略的 `.tmp-npm-cache-handoff` 临时缓存运行固定 `pnpm@10.33.0`，不清理共享 npm 缓存。用户的 DevTools `project.config.json` 和根 WPS 表格保持未提交且未纳入交接提交。
+
+## 2026-09-09 文档导航与历史归档整理
+
+- 根目录现在仅保留 `HANDOFF-GITHUB-2026-09-08.md` 作为当前交接入口；四份 8 月旧交接和四份旧 agent 交接移至 `docs/archive/2026-08-handoffs/`，并附带阅读限制与当前入口说明。
+- 已完成的 2026-06/08 阶段计划、8 月与 9 月执行计划，以及角色切换、登录绑定、C1、生产演示等历史运行记录分别移入 `docs/archive/2026-06-plans/`、`2026-08-plans/`、`2026-08-execution-plans/`、`2026-09-execution-plans/`、`2026-08-operations/`。历史资料未删除、未改写历史结论。
+- `docs/README.md` 重写为当前事实、设计资料、工具链和历史档案四层入口；现行部署、发布与验收文档的历史安全账号链接已同步到归档路径。`DELIVERY-MANIFEST.txt` 不再列出已不存在的 `docs/plans/active/` 路径。

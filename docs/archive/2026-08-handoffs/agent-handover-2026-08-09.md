@@ -4,7 +4,7 @@
 >
 > 用途：把主工作区当前状态、今日完成的全部工作、验证基础设施和未完成事项交给下一位 agent（Codex）。
 > 本文只记录可复核事实；密码、token、session、手机号和微信 AppSecret 不写入仓库。
-> 上一份交接：`docs/current/agent-handover-2026-08-07.md`（其中 worktree/分支关系仍然有效，本文不重复）。
+> 上一份交接：`agent-handover-2026-08-07.md`（其中 worktree/分支关系仍然有效，本文不重复）。
 
 ## 0. 下一位 agent 先读什么
 

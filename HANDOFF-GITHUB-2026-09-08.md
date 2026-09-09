@@ -106,4 +106,4 @@ After a clean clone and green gate, choose one small, independently verifiable t
 - Design authority: `docs/current/figma-source-of-truth.md`.
 - Production/data safeguards: `docs/current/deployment-requirements.md` and `docs/current/customer-test-data-repair-2026-09-07.md`.
 - Architecture/API contract: `docs/current/architecture.md`, `docs/current/api-contract.md`.
-- Historical handoffs: root `HANDOFF.md`, `HANDOFF-2026-08-14.md`, `HANDOFF-KIMI-2026-08-19.md`, `HANDOFF-NEXT.md`.
+- Historical handoffs: [`docs/archive/2026-08-handoffs/`](docs/archive/2026-08-handoffs/), including the former root `HANDOFF.md`, `HANDOFF-2026-08-14.md`, `HANDOFF-KIMI-2026-08-19.md`, and `HANDOFF-NEXT.md`.

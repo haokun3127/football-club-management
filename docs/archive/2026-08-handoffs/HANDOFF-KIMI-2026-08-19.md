@@ -1,6 +1,6 @@
 # 历史交接（2026-08-19）
 
-> 本文是 2026-08-19 的 Kimi 交接快照。当前 GitHub 接手入口为 [HANDOFF-GITHUB-2026-09-08.md](HANDOFF-GITHUB-2026-09-08.md)；其中的分支状态、未提交清单、生产版本和待办不再代表当前事实。
+> 本文是 2026-08-19 的 Kimi 交接快照。当前 GitHub 接手入口为 [HANDOFF-GITHUB-2026-09-08.md](../../../HANDOFF-GITHUB-2026-09-08.md)；其中的分支状态、未提交清单、生产版本和待办不再代表当前事实。
 
 # 交接给 Kimi — 重庆天才足球俱乐部管理系统
 
@@ -165,7 +165,7 @@ node scripts/devtools/wechatide-mcp-capture.cjs `
 ~~~powershell
 Set-Location 'C:\Users\ASUS\Desktop\football-club-management-codex-windows-2026-08-02'
 Get-Content -Raw AGENTS.md
-Get-Content -Raw HANDOFF-KIMI-2026-08-19.md
+Get-Content -Raw docs/archive/2026-08-handoffs/HANDOFF-KIMI-2026-08-19.md
 git status --short
 git branch -vv
 git log --oneline -12

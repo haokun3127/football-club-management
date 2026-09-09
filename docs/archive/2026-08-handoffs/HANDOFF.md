@@ -1,6 +1,6 @@
 # 历史交接（2026-08-13）
 
-> 本文保留 2026-08-13 的项目背景与当时验收状态。当前 GitHub 接手入口为 [HANDOFF-GITHUB-2026-09-08.md](HANDOFF-GITHUB-2026-09-08.md)；不要将本文的提交号、生产版本、测试数量或待办作为当前事实。
+> 本文保留 2026-08-13 的项目背景与当时验收状态。当前 GitHub 接手入口为 [HANDOFF-GITHUB-2026-09-08.md](../../../HANDOFF-GITHUB-2026-09-08.md)；不要将本文的提交号、生产版本、测试数量或待办作为当前事实。
 
 # 交接文档 — 重庆天才足球俱乐部管理系统（→ Kimi）
 
@@ -150,7 +150,7 @@ API 侧：
 - 生产 API **不接受 `x-user-id` 头鉴权**（`createProductionMembershipResolver` 硬关），只能用真实微信登录会话。
 - 生产**不要重跑全量 seed**，会覆盖用户绑定手机号（`fb1e268` 修过这个缺陷）。补数只能受控 INSERT。
 
-**任何生产操作都需要用户明确授权后另立任务**，顺序是：只读确认目标 → 受限备份 → dry-run → 向用户确认 → 执行 → 有界只读回查 → 仅重启 API → 真机后验。详细流程见 `docs/current/agent-handover-2026-08-12.md` 第 6 节。
+**任何生产操作都需要用户明确授权后另立任务**，顺序是：只读确认目标 → 受限备份 → dry-run → 向用户确认 → 执行 → 有界只读回查 → 仅重启 API → 真机后验。详细流程见 `agent-handover-2026-08-12.md` 第 6 节。
 
 ---
 
@@ -222,7 +222,7 @@ API 侧：
 | `docs/design/specifications/figma-online-frame-map-2026-08-12.md` | Figma 画板↔路由映射（施工图纸） |
 | `docs/design/reference/figma/` | 49 张设计稿离线 PNG + 对照表 |
 | `scripts/devtools/README.md` | 截图工具链用法与全部已知坑 |
-| `docs/current/agent-handover-2026-08-12.md` | 上一轮交接，生产操作强制顺序在第 6 节 |
+| `agent-handover-2026-08-12.md` | 上一轮交接，生产操作强制顺序在第 6 节 |
 | `docs/current/deployment-requirements.md` | 部署与运维要求 |
 | `AGENTS.md` | Trellis 工作流（强制规则） |
 

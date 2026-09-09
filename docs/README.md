@@ -1,25 +1,20 @@
 # 项目文档导航
 
-> 本目录按“当前事实、设计规格、历史档案”组织。历史文档保留以便追溯，但不代表当前实现或当前计划。
+> 本目录按“当前事实、设计规格、历史档案”组织。历史文档保留以便追溯，但不代表当前实现、计划或生产状态。
 
 ## 从这里开始
 
-- [GitHub 当前交接 HANDOFF-GITHUB-2026-09-08.md](../HANDOFF-GITHUB-2026-09-08.md)：**当前接手第一篇**。从克隆、门禁、Figma、生产边界到测试数据的最新事实。
-- [Kimi 交接（2026-08-19，历史）](../HANDOFF-KIMI-2026-08-19.md)：保留当时的工作区与截图 SOP；不能单独作为当前提交、生产版本或未完成项的依据。
-- [历史总交接 HANDOFF.md](../HANDOFF.md)：2026-08-13 历史全量背景；若与当前交接冲突，以当前交接、`docs/current/` 和最新进度记录为准。
-- [当前项目进度](current/progress.md)：正在推进的工作、已知阻塞和真实验证状态。
+- [GitHub 当前交接 HANDOFF-GITHUB-2026-09-08.md](../HANDOFF-GITHUB-2026-09-08.md)：**唯一当前接手入口**。从克隆、门禁、Figma、生产边界到测试数据的最新事实。
+- [当前项目进度](current/progress.md)：逐日事实、已知阻塞和真实验证状态；最新记录在文件末尾。
 - [当前架构](current/architecture.md)：服务、数据和模块边界。
 - [API 契约](current/api-contract.md)：对外/客户端接口约定。
 - [Figma 权威来源](current/figma-source-of-truth.md)：唯一在线设计基准与修改规则。
 - [小程序验收](current/miniprogram-manual-acceptance-cq-talent.md)：DevTools/真机验收流程。
 - [发布准备度](current/miniprogram-release-readiness-cq-talent.md)：上线前缺口与判断。
 - [部署要求](current/deployment-requirements.md)：部署环境与运维要求。
-- [Claude 总交接文档（2026-08-12，历史）](current/agent-handover-2026-08-12.md)：主工作区、Figma 基准、安全登录边界与当时的部署前置条件。
-- [安全测试账号专项交接（2026-08-12）](current/agent-handover-2026-08-12-secure-test-accounts.md)：受控导入/回滚 CLI、私有运行时变量和未执行的生产操作。
-- [Agent 交接文档（2026-08-09，历史快照）](current/agent-handover-2026-08-09.md)：17 页巡检收口、雷达预览真实数据化、截图基础设施与当时的白名单。
-- [Agent 交接文档（2026-08-07）](current/agent-handover-2026-08-07.md)：工作区、hotfix worktree、生产状态、未完成任务和交接规则。
 - [数据能力规划](current/data-capability-plan.md)：数据接入与字段扩展的当前规划。
 - [后台产品设计](current/backoffice-product-design.md)：运营后台的当前产品资料。
+- [客户测试数据修复记录（2026-09-07）](current/customer-test-data-repair-2026-09-07.md)：受控生产数据重建的已验证事实与限制。
 
 ## 设计资料
 
@@ -34,10 +29,15 @@
 
 - [DevTools 截图工具链](../scripts/devtools/README.md)：路由跳转 + 375×812 截图 + 设计稿合成对比，含全部已知坑。视觉验收全靠它。
 
-## 计划与历史
+## 历史档案
 
-- [当前计划](plans/active/)：仍待决策或外部依赖未解决的工作。
-- [历史档案](archive/)：早期评估、调研、已过期计划和阶段性决策。阅读前先确认日期，并以 `current/` 文档为准。
+- [2026-08 交接快照](archive/2026-08-handoffs/)：旧 Kimi/Claude/截图 SOP 交接和安全测试账号操作记录；仅用于追溯。
+- [2026-08 运行记录](archive/2026-08-operations/)：旧角色切换、登录绑定、C1 与生产演示记录；不代表当前生产状态。
+- [2026-06 与 2026-08 计划](archive/2026-06-plans/) 和 [2026-08 计划](archive/2026-08-plans/)：已被后续实现或产品决策替代的阶段计划。
+- [2026-08 执行计划](archive/2026-08-execution-plans/) 和 [2026-09 执行计划](archive/2026-09-execution-plans/)：已完成批次的 agent 施工计划和验证上下文。
+- [早期调研与 WPS 资料](archive/)：早期评估、调研和阶段性决策。阅读前先确认日期，并以 `current/` 文档为准。
+
+当前没有独立维护的 `docs/plans/active/` 计划目录。新工作须通过 `.trellis/tasks/` 建立任务，并在完成后将阶段性计划归档。
 
 ## 维护规则
 

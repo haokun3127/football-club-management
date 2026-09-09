@@ -690,9 +690,9 @@
 ./docs/design/specifications/parent/design-spec-P9-private-lesson.md
 ./docs/design/specifications/parent/design-spec-venues.md
 ./docs/design/specifications/shared/design-spec-G2-login-verification-v2.md
-./docs/plans/active/development-plan.md
-./docs/plans/active/miniprogram-next-work-plan.md
-./docs/plans/active/next-step-wps-automation-acceptance-plan.md
+./docs/archive/2026-06-plans/development-plan.md
+./docs/archive/2026-06-plans/next-step-wps-automation-acceptance-plan.md
+./docs/archive/2026-08-plans/miniprogram-next-work-plan.md
 ./docs/README.md
 ./package.json
 ./packages/domain/dist/activities.d.ts
