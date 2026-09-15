@@ -1042,3 +1042,38 @@ Implemented and committed the approved 62-score project-draft/publication workfl
 ### Next Steps
 
 - None - task complete
+
+
+## Session 29: Fix macOS DevTools test foundations
+
+**Date**: 2026-09-16
+**Task**: Fix macOS DevTools test foundations
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+Fixed native screenshot paths, isolated Windows CLI fixtures and bounded page probes. Root check passes: domain 23, mini 505 plus one Windows-only skip, API 147. Verified official arm64 DevTools 2.02.2608070 separately; QR login pending user phone confirmation, then Codex handshake/runtime acceptance. Existing installation and production unchanged. Keep assessment task active until runtime acceptance.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `23382d9` | (see git log) |
+| `f0e6025` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

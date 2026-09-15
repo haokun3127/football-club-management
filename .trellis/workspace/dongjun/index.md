@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 28
-- **Last Active**: 2026-09-15
+- **Total Sessions**: 29
+- **Last Active**: 2026-09-16
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~1044 | Active |
+| `journal-1.md` | ~1079 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 29 | 2026-09-16 | Fix macOS DevTools test foundations | `23382d9`, `f0e6025` | `dev` |
 | 28 | 2026-09-15 | Assessment drafts and explicit publication stability | `49ce87d`, `77857fc`, `8625b8f`, `67691dc`, `956d57e`, `ba55b21`, `de30091`, `47d3624` | `dev` |
 | 27 | 2026-09-09 | 整理文档导航与历史归档 | `a0eadfe` | `dev` |
 | 26 | 2026-09-01 | Close P1 parent calendar V3 acceptance | `b8fa948` | `dev` |
