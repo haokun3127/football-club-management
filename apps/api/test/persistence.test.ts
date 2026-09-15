@@ -649,6 +649,7 @@ describe("platform persistence", () => {
       "0017_match_rosters.sql",
       "0018_training_content_assessments.sql",
       "0019_assessment_task_scope.sql",
+      "0020_assessment_workflow.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);

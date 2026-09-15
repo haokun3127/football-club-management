@@ -9,13 +9,16 @@ import type {
 } from "@football-club/domain";
 import type { DatabaseSync } from "node:sqlite";
 import type { SQLInputValue } from "node:sqlite";
+import { SerialOperation } from "../application/serial-operation.js";
 
 type SqlRow = Record<string, unknown>;
 
 export class AssessmentRepository {
+  private readonly operations = new SerialOperation();
   constructor(private readonly database: DatabaseSync) {}
 
   async transaction<T>(operation: () => Promise<T>): Promise<T> {
+    return this.operations.run(async () => {
     this.database.exec("BEGIN;");
     try {
       const result = await operation();
@@ -25,6 +28,7 @@ export class AssessmentRepository {
       this.database.exec("ROLLBACK;");
       throw error;
     }
+    });
   }
 
   listAssessments(clubId: EntityId): PlayerAssessment[] {

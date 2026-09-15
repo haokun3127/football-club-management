@@ -1,4 +1,5 @@
 import type { DatabaseSync } from "node:sqlite";
+import { SqliteAssessmentWorkflowRepository } from "./assessment-workflow-repository.js";
 import { createSeedData, type SeedData } from "../seed.js";
 import { AppClientSessionRepository } from "./app-client-session-repository.js";
 import { AssessmentRepository } from "./assessment-repositories.js";
@@ -24,6 +25,7 @@ import { TrainingSessionRepository } from "./training-session-repository.js";
 import { TrainingContentAssessmentRepository } from "./training-content-assessment-repository.js";
 
 export interface PlatformRepositories {
+  assessmentWorkflow: SqliteAssessmentWorkflowRepository;
   appClientSessions: AppClientSessionRepository;
   assessments: AssessmentRepository;
   assessmentTasks: AssessmentTaskRepository;
@@ -52,6 +54,7 @@ export interface PlatformPersistence {
 
 export function createPlatformRepositories(database: DatabaseSync): PlatformRepositories {
   return {
+    assessmentWorkflow: new SqliteAssessmentWorkflowRepository(database),
     appClientSessions: new AppClientSessionRepository(database),
     assessments: new AssessmentRepository(database),
     assessmentTasks: new AssessmentTaskRepository(database),
