@@ -27,3 +27,7 @@ Domain changes must be pure, deterministic, and covered by focused Vitest tests.
 - `packages/domain/test/metric-services.test.ts`
 - `packages/domain/test/metric-graph-services.test.ts`
 - `packages/domain/test/match-services.test.ts`
+
+## Score Display Contract
+
+Use `withScoreMaxima` with formula/dependency weights and `scorePercent`/`overallScore` for assessment display. Standard scores already use their standard scale; computed score measurements require an explicit maximum. Round overall only after combining dimensions. Keep raw results and normalized graph inputs distinct; normalization is not confidence.

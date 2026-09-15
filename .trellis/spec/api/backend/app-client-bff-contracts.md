@@ -1,3 +1,5 @@
+> Managed assessment tasks follow [assessment-publication.md](./assessment-publication.md). Its revision/editability and weighted percentage contracts supersede the legacy assessment rules below.
+
 # App Client BFF Contracts
 
 ## Scenario: Mini-Program P0 BFF

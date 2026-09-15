@@ -40,3 +40,5 @@ The goal is to help AI assistants and new team members understand how YOUR proje
 ---
 
 **Language**: All documentation should be written in **English**.
+
+- [Assessment publication](./assessment-publication.md): project drafts, revision checks, explicit publication, score scales and restart contracts.

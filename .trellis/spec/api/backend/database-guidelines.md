@@ -143,3 +143,7 @@ this.data.trainingSessions = nextSessions;
 const saved = this.repositories.trainingSessions.save(session);
 upsertById(this.data.trainingSessions, saved);
 ```
+
+## Shared Async Transactions
+
+Assessment and match repositories use `persistence/transaction.ts`: one queue per `DatabaseSync` connection. Do not open overlapping async BEGIN/COMMIT blocks on that connection. Assessment publication facts and its workflow publication pointer must commit together; test rollback and database reopen.
