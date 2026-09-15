@@ -1,4 +1,4 @@
-import { getAssessmentForm, getCoachAssessmentEntries, getCoachAssessmentTasks, getCoachTeam, submitCoachAssessment } from "../../../utils/api";
+import { getAssessmentForm, getCoachAssessmentEntries, getCoachAssessmentTasks, getCoachTeam, submitCoachAssessment, saveCoachAssessmentEntries, getCoachAssessmentHistory } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
@@ -29,6 +29,7 @@ type BulkRow = {
 
 interface BulkDraft {
   signature: string;
+  studentStates?: CoachAssessmentEntries["studentStates"];
   savedAt: string;
   valuesByStudent: DraftValues;
   savedStudentIds: string[];
@@ -59,6 +60,14 @@ interface PageData {
   lastSavedLabel: string;
   readOnly: boolean;
   submitting: boolean;
+  managed: boolean;
+  draftTaskKey: string;
+  studentStates: NonNullable<CoachAssessmentEntries["studentStates"]>;
+  correctionReason: string;
+  saveError: string;
+  historyTitle: string;
+  historyLines: string[];
+  historyVisible: boolean;
 }
 
 let latestLoadToken = 0;
@@ -89,6 +98,14 @@ Page<PageData>({
     lastSavedLabel: "",
     readOnly: false,
     submitting: false,
+    managed: false,
+    draftTaskKey: "",
+    studentStates: {},
+    correctionReason: "",
+    saveError: "",
+    historyTitle: "",
+    historyLines: [],
+    historyVisible: false,
   },
 
   onLoad(query?: { taskId?: string; templateId?: string; projectId?: string; projectIds?: string; title?: string }) {
@@ -133,7 +150,7 @@ Page<PageData>({
       }
 
       const [form, team, savedEntries] = await Promise.all([
-        getAssessmentForm(templateId),
+        task.workflow ? getAssessmentForm(templateId, task.workflow.templateVersionId) : getAssessmentForm(templateId),
         getCoachTeam(task.teamId),
         getCoachAssessmentEntries(task.id, projectId),
       ]);
@@ -155,9 +172,12 @@ Page<PageData>({
         return;
       }
 
+      const draftTaskKey = task.workflow
+        ? [session.clubId, session.userId || "coach", taskId, form.templateVersionId].map(encodeURIComponent).join(":")
+        : taskId;
       const signature = createSignature(fields, members);
       const savedValuesByStudent = normalizeSavedValues(savedEntries, fields, members);
-      const draftValuesByStudent = restoreDraft(taskId, projectId, signature, fields, members);
+      const draftValuesByStudent = (task.workflow ? !task.workflow.canEdit : task.status === "completed") ? {} : restoreDraft(draftTaskKey, projectId, signature, fields, members);
       const valuesByStudent = mergeValues(savedValuesByStudent, draftValuesByStudent);
       const savedStudentIds = Object.keys(savedValuesByStudent);
       const availableProjectIds = uniqueProjectIds(form.fields);
@@ -165,7 +185,13 @@ Page<PageData>({
         ? availableProjectIds.filter((id) => selectedProjectIds.includes(id))
         : availableProjectIds;
       const projectIndex = Math.max(0, projectIds.indexOf(projectId));
-      const readOnly = task.status === "completed";
+      const readOnly = task.workflow ? !task.workflow.canEdit : task.status === "completed";
+      const studentStates = { ...savedEntries.studentStates };
+      const localDraft = wx.getStorageSync<BulkDraft | "">(draftKey(draftTaskKey, projectId));
+      // Preserve the revision against which each restored edit was made.
+      for (const studentId of Object.keys(draftValuesByStudent)) {
+        if (localDraft && localDraft.studentStates?.[studentId]) studentStates[studentId] = localDraft.studentStates[studentId]!;
+      }
       this.setData({
         state: "ready",
         statusTitle: "全队录入",
@@ -188,6 +214,11 @@ Page<PageData>({
         filledLabel: readOnly ? buildCompletedLabel(members, valuesByStudent) : buildFilledLabel(members, valuesByStudent),
         lastSavedLabel: savedStudentIds.length ? "已恢复已保存成绩" : hasDraftValues(valuesByStudent) ? "已恢复本机草稿" : "",
         readOnly,
+        managed: Boolean(task.workflow),
+        draftTaskKey,
+        studentStates,
+        correctionReason: "",
+        saveError: "",
         submitting: false,
       });
     } catch {
@@ -197,7 +228,7 @@ Page<PageData>({
   },
 
   onRawInput(event: { currentTarget: { dataset: { studentId?: string; fieldId?: string } }; detail: { value: string | number } }) {
-    if (this.data.readOnly) return;
+    if (this.data.readOnly || this.data.submitting) return;
     const studentId = event.currentTarget.dataset.studentId;
     const fieldId = event.currentTarget.dataset.fieldId;
     if (!studentId || !fieldId || !this.data.fields.some((field: AssessmentField) => field.id === fieldId)) return;
@@ -214,7 +245,7 @@ Page<PageData>({
     this.setData({ valuesByStudent, rows: buildRows(members, this.data.fields, valuesByStudent, this.data.savedStudentIds), filledLabel: buildFilledLabel(members, valuesByStudent) });
     const draftValuesByStudent = changedValues(valuesByStudent, this.data.savedValuesByStudent);
     if (hasDraftValues(draftValuesByStudent)) this.persistDraft(draftValuesByStudent);
-    else wx.removeStorageSync(draftKey(this.data.taskId, this.data.projectId));
+    else wx.removeStorageSync(draftKey(this.data.draftTaskKey || this.data.taskId, this.data.projectId));
   },
 
   persistDraft(valuesByStudent: DraftValues) {
@@ -226,11 +257,12 @@ Page<PageData>({
   writeDraft(valuesByStudent: DraftValues) {
     if (!this.data.taskId || !this.data.projectId || !this.data.fields.length) return;
     const members = this.data.rows.map((row: BulkRow) => ({ id: row.studentId, name: row.name }));
-    wx.setStorageSync(draftKey(this.data.taskId, this.data.projectId), {
+    wx.setStorageSync(draftKey(this.data.draftTaskKey || this.data.taskId, this.data.projectId), {
       signature: createSignature(this.data.fields, members),
       savedAt: new Date().toISOString(),
       valuesByStudent,
       savedStudentIds: this.data.savedStudentIds,
+      studentStates: this.data.studentStates,
     } satisfies BulkDraft);
   },
 
@@ -240,7 +272,7 @@ Page<PageData>({
 
   async saveProject() {
     if (this.data.readOnly) {
-      wx.showToast({ title: "任务已完成，仅支持查看已保存成绩", icon: "none" });
+      wx.showToast({ title: this.data.managed ? "当前任务仅支持查看" : "任务已完成，仅支持查看已保存成绩", icon: "none" });
       return;
     }
     if (this.data.submitting) return;
@@ -250,13 +282,30 @@ Page<PageData>({
       wx.showToast({ title: "请先录入至少一名学员", icon: "none" });
       return;
     }
-    this.setData({ submitting: true });
+    if (this.data.managed && members.some((row: BulkRow) => (this.data.studentStates[row.studentId]?.publishedRevision ?? null) !== null) && !this.data.correctionReason.trim()) {
+      this.setData({ saveError: "更正已发布成绩，请先填写更正原因。" });
+      return;
+    }
+    this.setData({ submitting: true, saveError: "" });
     const succeeded: string[] = [];
     for (const row of members) {
+      if (this.data.managed && !validStandardInputs(this.data.fields, pendingValuesByStudent[row.studentId] || {})) {
+        this.setData({ saveError: `${row.name}：请填写范围内的标准分（0–100），评级须为1–5整数。` });
+        continue;
+      }
       const rawResults = buildRawResults(this.data.fields, pendingValuesByStudent[row.studentId] || {});
       if (!rawResults.length) continue;
       try {
-        await submitCoachAssessment({
+        if (this.data.managed) {
+          const revision = this.data.studentStates[row.studentId]?.revision;
+          if (revision === undefined) throw new Error("缺少成绩版本，请重新读取服务器成绩");
+          const saved = await saveCoachAssessmentEntries(this.data.taskId, row.studentId, {
+            expectedRevision: revision, entries: rawResults, reason: this.data.correctionReason.trim() || undefined,
+          });
+          this.setData({ studentStates: { ...this.data.studentStates, [row.studentId]: {
+            revision: saved.revision, publishedRevision: saved.publications.at(-1)?.revision ?? null,
+          } } });
+        } else await submitCoachAssessment({
           studentId: row.studentId,
           assessmentTaskId: this.data.taskId,
           templateId: this.data.templateId,
@@ -264,13 +313,14 @@ Page<PageData>({
           rawResults,
         });
         succeeded.push(row.studentId);
-      } catch {
+      } catch (error) {
+        this.setData({ saveError: error && typeof error === "object" && "message" in error ? String(error.message) : "保存失败，请稍后重试；本机草稿已保留。" });
         // Keep this student's draft so the coach can retry only the failed row.
       }
     }
     const draftValuesByStudent = withoutStudents(pendingValuesByStudent, succeeded);
     if (hasDraftValues(draftValuesByStudent)) this.writeDraft(draftValuesByStudent);
-    else wx.removeStorageSync(draftKey(this.data.taskId, this.data.projectId));
+    else wx.removeStorageSync(draftKey(this.data.draftTaskKey || this.data.taskId, this.data.projectId));
     const savedValuesByStudent = { ...this.data.savedValuesByStudent };
     for (const studentId of succeeded) {
       savedValuesByStudent[studentId] = { ...(this.data.valuesByStudent[studentId] || {}) };
@@ -291,6 +341,7 @@ Page<PageData>({
   },
 
   nextProject() {
+    if (this.data.submitting) return;
     if (this.data.readOnly) {
       openPage(`/pages/coach/assessment-projects/index?taskId=${encodeURIComponent(this.data.taskId)}&templateId=${encodeURIComponent(this.data.templateId)}&title=${encodeURIComponent(this.data.taskTitle)}`);
       return;
@@ -304,8 +355,39 @@ Page<PageData>({
   },
 
   goBack() {
+    if (this.data.submitting) return;
     wx.navigateBack({ delta: 1 });
   },
+
+  onReasonInput(event: { detail: { value: string } }) {
+    if (!this.data.submitting) this.setData({ correctionReason: event.detail.value });
+  },
+
+  async reloadServer() {
+    if (this.data.submitting) return;
+    const answer = await new Promise<{ confirm: boolean }>((resolve) => wx.showModal({ success: resolve, title: "重新读取服务器成绩", content: "将放弃当前项目的本机未保存修改，读取服务器最新成绩。是否继续？" }));
+    if (!answer.confirm) return;
+    wx.removeStorageSync(draftKey(this.data.draftTaskKey, this.data.projectId));
+    await this.load(this.data.taskId, this.data.templateId, this.data.projectId, this.data.taskTitle, this.data.projectIds);
+  },
+
+  async showHistory(event: { currentTarget: { dataset: { studentId?: string } } }) {
+    const studentId = event.currentTarget.dataset.studentId;
+    if (!studentId || !this.data.managed) return;
+    this.setData({ historyVisible: true, historyTitle: "录入与发布记录", historyLines: ["正在读取记录…"] });
+    try {
+      const history = await getCoachAssessmentHistory(this.data.taskId, studentId);
+      const labels = new Map(this.data.fields.map((field: AssessmentField) => [field.testItemId, field.label]));
+      const changes = history.changes.flatMap((change) => change.entries.filter((entry) => labels.has(entry.testItemId)).map((entry) =>
+        `修订 ${change.revision} · ${change.changedAt.replace("T", " ").slice(0, 19)} UTC · ${change.coachId}\n${labels.get(entry.testItemId)}：${historyValue(entry.before)} → ${historyValue(entry.after)}${change.reason ? `\n原因：${change.reason}` : ""}`));
+      const publications = history.publications.map((publication) => `发布修订 ${publication.revision} · ${publication.publishedAt.replace("T", " ").slice(0, 19)} UTC · ${publication.coachId}`);
+      this.setData({ historyLines: [...publications.reverse(), ...changes.reverse()].length ? [...publications, ...changes] : ["当前项目暂无记录"] });
+    } catch {
+      this.setData({ historyLines: ["记录读取失败，请关闭后重试。"] });
+    }
+  },
+
+  closeHistory() { this.setData({ historyVisible: false }); },
 
   retry() {
     void this.load(this.data.taskId, this.data.templateId, this.data.projectId, this.data.taskTitle);
@@ -478,4 +560,17 @@ function buildMetricValue(kind: string, rawValue: string, unit?: string): Record
   if (kind === "duration_seconds") return { kind, seconds: numeric };
   if (kind === "distance_meters") return { kind, meters: numeric };
   return { kind: "measurement", value: numeric, unit: unit || "value" };
+}
+
+function validStandardInputs(fields: AssessmentField[], values: Record<string, string>): boolean {
+  return fields.every((field) => {
+    const text = values[field.id];
+    if (!text?.trim()) return true;
+    const score = Number(text);
+    return Number.isFinite(score) && (field.valueKind === "score_0_100" ? score >= 0 && score <= 100 : field.valueKind === "rating_1_5" && Number.isInteger(score) && score >= 1 && score <= 5);
+  });
+}
+
+function historyValue(value: Record<string, unknown> | null): string {
+  return value === null ? "未录入" : String(value.score ?? value.value ?? "—");
 }

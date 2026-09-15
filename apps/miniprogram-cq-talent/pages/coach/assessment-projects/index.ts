@@ -1,4 +1,4 @@
-import { getAssessmentForm, getCoachAssessmentEntries, getCoachAssessmentTasks, getCoachTrainingProjectTree } from "../../../utils/api";
+import { getAssessmentForm, getCoachAssessmentEntries, getCoachAssessmentTasks, getCoachTrainingProjectTree, getCoachAssessmentWorkflow, publishCoachAssessments } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
@@ -59,6 +59,11 @@ Page({
     confirmLabel: "选择 (0)",
     confirmClass: "projects-select-bar__confirm projects-select-bar__confirm--disabled",
     isConfirmDisabled: true,
+    managed: false,
+    canPublish: false,
+    publishing: false,
+    publicationLabel: "",
+    publicationMessage: "",
   },
   onLoad(query?: { taskId?: string; templateId?: string; title?: string }) {
     return this.load(query?.taskId || "", query?.templateId || "", query?.title ? decodeURIComponent(query.title) : "能力评估");
@@ -78,7 +83,8 @@ Page({
         this.setData({ state: "empty", message: "当前测评任务不可录入，请返回任务列表后重试。", projects: [] });
         return;
       }
-      const [form, trainingTree] = await Promise.all([getAssessmentForm(templateId), getCoachTrainingProjectTree()]);
+      if (task.workflow?.error) throw new Error(task.workflow.error);
+      const [form, trainingTree] = await Promise.all([task.workflow ? getAssessmentForm(templateId, task.workflow.templateVersionId) : getAssessmentForm(templateId), getCoachTrainingProjectTree()]);
       const baseProjects = buildProjectRows(form);
       const projects = presentProjects(await hydrateProjectProgress(task.id, task.totalStudents, baseProjects), []);
       const hierarchy = buildHierarchyPatch(trainingTree.contentTree, projects, [], "", "");
@@ -92,6 +98,9 @@ Page({
         projectProgressLabel: `可选 ${projects.length} 个项目 · 已录入 ${completedProjects} 个项目 · ${task.completedStudents}/${task.totalStudents} 名学员`,
         taskStatusLabel: TASK_STATUS_LABELS[task.status] || "进行中",
         taskStatusClass: `projects-progress__status--${task.status}`,
+        managed: Boolean(task.workflow),
+        canPublish: Boolean(task.workflow?.canEdit && task.workflow.readyStudents > 0),
+        publicationLabel: task.workflow ? `已发布 ${task.workflow.publishedStudents}/${task.totalStudents} 人 · 待发布 ${task.workflow.readyStudents} 人` : "",
         projects,
         contentTree: trainingTree.contentTree,
         ...hierarchy,
@@ -103,6 +112,32 @@ Page({
       });
     } catch {
       this.setData({ state: "error", message: "测评项目读取失败，请稍后重试。", projects: [] });
+    }
+  },
+  onShow() {
+    if (this.data.taskId && this.data.state === "ready" && !this.data.publishing) void this.load(this.data.taskId, this.data.templateId, this.data.taskTitle);
+  },
+  async publishReady() {
+    if (this.data.publishing || !this.data.canPublish) return;
+    this.setData({ publishing: true, publicationMessage: "" });
+    try {
+      const workflow = await getCoachAssessmentWorkflow(this.data.taskId);
+      const ready = workflow.students.filter((student) => student.canPublish);
+      if (!workflow.canEdit || !ready.length) {
+        this.setData({ publicationMessage: "当前没有可发布的学员，请先录齐并保存所有项目。", canPublish: false });
+        return;
+      }
+      const answer = await new Promise<{ confirm: boolean }>((resolve) => wx.showModal({ success: resolve, title: `确认发布 ${ready.length} 名学员`, content: `${ready.map((student) => student.name).join("、")}\n发布后，家长和能力雷达将展示本次成绩。` }));
+      if (!answer.confirm) return;
+      const result = await publishCoachAssessments(this.data.taskId, ready.map((student) => ({ studentId: student.studentId, expectedRevision: student.revision })));
+      const successes = result.results.filter((student) => student.success).length;
+      const failures = result.results.filter((student) => !student.success);
+      this.setData({ publicationMessage: `已发布 ${successes} 人${failures.length ? `；${failures.length} 人未发布：${failures.map((student) => student.error?.message || "请重试").join("；")}` : "，家长端与雷达已更新。"}` });
+      await this.load(this.data.taskId, this.data.templateId, this.data.taskTitle);
+    } catch (error) {
+      this.setData({ publicationMessage: error && typeof error === "object" && "message" in error ? String(error.message) : "发布结果暂未确认，请重试；重复发布不会生成重复成绩。" });
+    } finally {
+      this.setData({ publishing: false });
     }
   },
   toggleProject(event: { currentTarget?: { dataset?: { id?: string } } }) {
@@ -139,12 +174,14 @@ Page({
     });
   },
   confirmSelection() {
+    if (this.data.publishing) return;
     const projectId = this.data.selectedIds[0];
     if (!projectId || this.data.isConfirmDisabled) return;
     const projectIds = this.data.selectedIds.join(",");
     openPage(`/pages/coach/assessment-bulk-entry/index?taskId=${encodeURIComponent(this.data.taskId)}&templateId=${encodeURIComponent(this.data.templateId)}&projectId=${encodeURIComponent(projectId)}&projectIds=${encodeURIComponent(projectIds)}&title=${encodeURIComponent(this.data.taskTitle)}`);
   },
   goBack() {
+    if (this.data.publishing) return;
     wx.navigateBack({ delta: 1 });
   },
   retry() {

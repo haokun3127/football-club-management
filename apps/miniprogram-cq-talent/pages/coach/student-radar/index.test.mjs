@@ -94,7 +94,7 @@ describe("coach student radar", () => {
     });
   });
 
-  it("projects the real eight-metric response into the six Figma display axes without inventing values", async () => {
+  it("projects the real eight-metric response into the six Figma display axes with actual metric labels", async () => {
     mocks.getCoachStudentRadar.mockResolvedValueOnce([
       { metricId: "metric-cq-talent-core-03", label: "运控球", value: 66, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
       { metricId: "metric-cq-talent-core-10", label: "1v1", value: 70, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
@@ -110,7 +110,7 @@ describe("coach student radar", () => {
     await page.load("student-1");
 
     expect(page.data.radar).toHaveLength(6);
-    expect(page.data.dimensions.map((dimension) => dimension.label)).toEqual(["协作", "速度", "射门", "体能", "防守", "传球"]);
+    expect(page.data.dimensions.map((dimension) => dimension.label)).toEqual(["小组配合", "运控球", "射门", "体能", "1v1", "传接球"]);
     expect(page.data.radar.map((metric) => metric.value)).toEqual([82, 66, 78, 90, 70, 74]);
   });
 

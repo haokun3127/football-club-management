@@ -144,6 +144,7 @@ export interface ActivityDetail {
 }
 
 export interface RadarMetricPoint {
+  overallScore?: number | null;
   metricId: string;
   label: string;
   value?: number;
@@ -215,6 +216,7 @@ export interface GrowthTimelineItem {
 }
 
 export interface GrowthSummary {
+  overall?: number | null;
   student?: StudentSummary;
   radar: RadarMetricPoint[];
   milestones: Array<{ title: string; description: string; date?: string }>;
@@ -429,6 +431,7 @@ export interface AssessmentForm {
 }
 
 export interface CoachAssessmentEntries {
+  studentStates?: Record<string, { revision: number; publishedRevision: number | null }>;
   taskId: string;
   projectId: string;
   savedValuesByStudent: Record<string, Record<string, Record<string, unknown>>>;
@@ -501,7 +504,26 @@ export interface CoachTeamAbilityOverview {
   }>;
 }
 
+export interface AssessmentWorkflowSummary {
+  enabled: boolean;
+  canEdit: boolean;
+  templateVersionId: string;
+  totalStudents: number;
+  completedStudents: number;
+  publishedStudents: number;
+  readyStudents: number;
+  students: Array<{ studentId: string; name: string; revision: number; completedFields: number; totalFields: number; publishedRevision: number | null; canPublish: boolean }>;
+  error?: string;
+}
+
+export interface AssessmentWorkingHistory {
+  revision: number;
+  changes: Array<{ revision: number; coachId: string; changedAt: string; reason?: string; entries: Array<{ testItemId: string; before: Record<string, unknown> | null; after: Record<string, unknown> }> }>;
+  publications: Array<{ revision: number; assessmentId: string; coachId: string; publishedAt: string }>;
+}
+
 export interface CoachAssessmentTask {
+  workflow?: AssessmentWorkflowSummary;
   id: string;
   teamId: string;
   teamName?: string;

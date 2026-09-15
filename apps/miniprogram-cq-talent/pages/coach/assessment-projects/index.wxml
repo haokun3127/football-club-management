@@ -5,6 +5,11 @@
     <block wx:if="{{state === 'ready'}}">
       <view class="projects-context">{{teamContextLabel}}</view>
       <view class="projects-progress"><view class="projects-progress__head"><view class="projects-progress__title">请选择测评项目</view><view class="projects-progress__status {{taskStatusClass}}">{{taskStatusLabel}}</view></view><view class="projects-progress__meta">{{projectProgressLabel}}</view><view class="projects-progress__instruction">请选择本次需要测评的项目</view></view>
+      <view wx:if="{{managed}}" class="projects-publication">
+        <view>{{publicationLabel}}</view>
+        <button disabled="{{!canPublish || publishing}}" loading="{{publishing}}" bindtap="publishReady">{{publishing ? '正在发布' : '发布已录齐的学员'}}</button>
+        <view wx:if="{{publicationMessage}}">{{publicationMessage}}</view>
+      </view>
       <scroll-view wx:if="{{hasContentTree}}" scroll-x class="content-primary-strip" enhanced show-scrollbar="{{false}}">
         <view class="content-primary-strip__inner">
           <view wx:for="{{primaryNodes}}" wx:key="id" class="{{item.className}}" data-id="{{item.id}}" bindtap="selectPrimary">

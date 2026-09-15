@@ -41,8 +41,9 @@ Page<PageData>({
       const displayRadar = projectRadar(radar);
       const dimensions = projectDimensions(displayRadar);
       const hasRadar = dimensions.length >= 3;
+      const serverOverall = radar.find((point) => point.overallScore !== undefined)?.overallScore;
       const normalizedValues = dimensions.map((dimension) => Number.parseFloat(dimension.width));
-      this.setData({ state: hasRadar ? "ready" : "empty", message: hasRadar ? "" : `${student.name} 暂无足够的有效评测数据生成雷达图。`, activeStudentId: student.id, activeStudentName: student.name, radar: hasRadar ? displayRadar : [], dimensions, hasRadar, overall: hasRadar ? String(Math.round(average(normalizedValues))) : "-", assessmentPeriod: formatAssessmentPeriod(displayRadar), radarContext: buildRadarContext(this.data.radarContext, displayRadar) });
+      this.setData({ state: hasRadar ? "ready" : "empty", message: hasRadar ? "" : `${student.name} 暂无足够的有效评测数据生成雷达图。`, activeStudentId: student.id, activeStudentName: student.name, radar: hasRadar ? displayRadar : [], dimensions, hasRadar, overall: hasRadar ? (serverOverall === null ? "-" : String(serverOverall ?? Math.round(average(normalizedValues)))) : "-", assessmentPeriod: formatAssessmentPeriod(displayRadar), radarContext: buildRadarContext(this.data.radarContext, displayRadar) });
     } catch {
       if (isCurrentRequest(this, requestToken)) this.setData({ state: "error", message: "能力雷达读取失败，请稍后重试。", radar: [], dimensions: [], hasRadar: false, overall: "-", assessmentPeriod: "评估时间待同步" });
     }
@@ -72,7 +73,7 @@ function projectRadar(radar: RadarMetricPoint[]): RadarMetricPoint[] {
   const projected: RadarMetricPoint[] = [];
   for (const axis of FIGMA_RADAR_AXES) {
     const point = byId.get(axis.metricId);
-    if (point) projected.push({ ...point, label: axis.label });
+    if (point) projected.push(point);
   }
   if (projected.length >= 3) return projected.slice(0, 6);
   return valid.slice(0, 6);

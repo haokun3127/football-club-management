@@ -8,6 +8,8 @@ const mocks = vi.hoisted(() => ({
   getCoachTeam: vi.fn(),
   getCoachAssessmentEntries: vi.fn(),
   submitCoachAssessment: vi.fn(),
+  saveCoachAssessmentEntries: vi.fn(),
+  getCoachAssessmentHistory: vi.fn(),
   requireRole: vi.fn(),
   openPage: vi.fn(),
   showToast: vi.fn(),
@@ -19,6 +21,8 @@ vi.mock("../../../utils/api", () => ({
   getCoachTeam: mocks.getCoachTeam,
   getCoachAssessmentEntries: mocks.getCoachAssessmentEntries,
   submitCoachAssessment: mocks.submitCoachAssessment,
+  saveCoachAssessmentEntries: mocks.saveCoachAssessmentEntries,
+  getCoachAssessmentHistory: mocks.getCoachAssessmentHistory,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
@@ -177,5 +181,73 @@ describe("C12.1 team batch assessment entry", () => {
   it("keeps the completed project summary on one line at the native 375px layout", () => {
     expect(stylesheet).toMatch(/\.bulk-summary__count\s*\{[^}]*min-width:\s*0[^}]*flex:\s*1[^}]*white-space:\s*nowrap/s);
     expect(stylesheet).toMatch(/\.bulk-summary__rule\s*\{[^}]*margin-left:\s*22rpx/s);
+  });
+});
+
+
+describe("revisioned project drafts", () => {
+  beforeEach(() => {
+    storage.clear();
+    mocks.requireRole.mockReturnValue({ role: "coach", clubId: "club-1", userId: "coach-1" });
+    mocks.getCoachAssessmentTasks.mockResolvedValue([{ ...task, workflow: { templateVersionId: "version-pinned", canEdit: true } }]);
+    mocks.getAssessmentForm.mockResolvedValue({ templateId: "template-real", templateVersionId: "version-pinned", fields: [
+      { id: "score", testItemId: "item-score", metricId: "metric-score", groupId: "technical", label: "运控球", valueKind: "score_0_100", inputType: "number", required: true },
+    ] });
+    mocks.getCoachTeam.mockResolvedValue({ team: { name: "U10" }, members: [{ id: "student-1", name: "球员甲" }] });
+    mocks.getCoachAssessmentEntries.mockResolvedValue({ savedValuesByStudent: {}, studentStates: { "student-1": { revision: 0, publishedRevision: null } } });
+    mocks.saveCoachAssessmentEntries.mockReset().mockResolvedValue({ revision: 1, publications: [] });
+    mocks.submitCoachAssessment.mockClear();
+  });
+  async function load() {
+    const page = createPageInstance();
+    await page.onLoad({ taskId: task.id, templateId: task.templateId, projectId: "item-score" });
+    return page;
+  }
+  function input(page, value) { page.onRawInput({ currentTarget: { dataset: { studentId: "student-1", fieldId: "score" } }, detail: { value } }); }
+
+  it("saves zero as a revisioned draft and pins the form without invoking legacy publication", async () => {
+    const page = await load();
+    input(page, "0");
+    await page.saveProject();
+    expect(mocks.getAssessmentForm).toHaveBeenCalledWith("template-real", "version-pinned");
+    expect(mocks.saveCoachAssessmentEntries).toHaveBeenCalledWith(task.id, "student-1", expect.objectContaining({ expectedRevision: 0, entries: [expect.objectContaining({ value: { kind: "score_0_100", score: 0 } })] }));
+    expect(mocks.submitCoachAssessment).not.toHaveBeenCalled();
+    expect(page.data.studentStates["student-1"].revision).toBe(1);
+    expect(page.data.savedValuesByStudent["student-1"].score).toBe("0");
+  });
+  it("rejects out-of-range scores instead of silently clamping them", async () => {
+    const page = await load(); input(page, "101"); await page.saveProject();
+    expect(mocks.saveCoachAssessmentEntries).not.toHaveBeenCalled();
+    expect(page.data.valuesByStudent["student-1"].score).toBe("101");
+    expect(page.data.saveError).toContain("0–100");
+  });
+  it("retains the original revision of a failed local edit when reopening", async () => {
+    const page = await load(); input(page, "70");
+    mocks.saveCoachAssessmentEntries.mockRejectedValue(new Error("成绩已被更新"));
+    await page.saveProject();
+    mocks.getCoachAssessmentEntries.mockResolvedValue({ savedValuesByStudent: { "student-1": { "item-score": { score: 80 } } }, studentStates: { "student-1": { revision: 2, publishedRevision: null } } });
+    const reopened = await load();
+    expect(reopened.data.valuesByStudent["student-1"].score).toBe("70");
+    expect(reopened.data.studentStates["student-1"].revision).toBe(0);
+    expect(page.data.saveError).toContain("已被更新");
+  });
+  it("requires a correction reason and prevents edits while saving", async () => {
+    mocks.getCoachAssessmentEntries.mockResolvedValue({ savedValuesByStudent: {}, studentStates: { "student-1": { revision: 3, publishedRevision: 3 } } });
+    const page = await load(); input(page, "75"); await page.saveProject();
+    expect(mocks.saveCoachAssessmentEntries).not.toHaveBeenCalled();
+    expect(page.data.saveError).toContain("更正原因");
+    page.onReasonInput({ detail: { value: "核对更正" } });
+    let resolve;
+    mocks.saveCoachAssessmentEntries.mockImplementation(() => new Promise((done) => { resolve = done; }));
+    const saving = page.saveProject(); input(page, "90");
+    expect(page.data.valuesByStudent["student-1"].score).toBe("75");
+    resolve({ revision: 4, publications: [{ revision: 3 }] }); await saving;
+    expect(mocks.saveCoachAssessmentEntries).toHaveBeenCalledWith(task.id, "student-1", expect.objectContaining({ expectedRevision: 3, reason: "核对更正" }));
+  });
+  it("keeps a disabled managed task read-only even when its legacy status is in progress", async () => {
+    mocks.getCoachAssessmentTasks.mockResolvedValue([{ ...task, workflow: { templateVersionId: "version-pinned", canEdit: false } }]);
+    const page = await load(); input(page, "75"); await page.saveProject();
+    expect(page.data.readOnly).toBe(true);
+    expect(mocks.saveCoachAssessmentEntries).not.toHaveBeenCalled();
   });
 });

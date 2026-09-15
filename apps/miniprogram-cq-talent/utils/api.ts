@@ -1,3 +1,4 @@
+import type { AssessmentWorkflowSummary, AssessmentWorkingHistory } from "./types";
 import { APP_CLIENT_KEY, DEV_TEST_DATE } from "./config";
 import { activityStatus, formatDateTime, formatTimeRange } from "./presentation";
 import { request } from "./request";
@@ -371,10 +372,10 @@ export async function saveCoachTrainingProjects(eventId: string, projectIds: str
   });
 }
 
-export async function getAssessmentForm(templateId: string): Promise<AssessmentForm> {
+export async function getAssessmentForm(templateId: string, templateVersionId?: string): Promise<AssessmentForm> {
   const context = requireContext();
   const response = await request<Record<string, unknown>>({
-    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessments/templates/${templateId}/form`,
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessments/templates/${templateId}/form${templateVersionId ? `?templateVersionId=${encodeURIComponent(templateVersionId)}` : ""}`,
   });
   return normalizeAssessmentForm(response);
 }
@@ -625,6 +626,7 @@ function normalizeGrowth(raw: Record<string, unknown>, student?: StudentSummary)
   return {
     student,
     radar,
+    overall: raw.overall === null ? null : numberOrUndefined(raw.overall),
     milestones: [
       { title: "成长足迹", description: "成长记录正在积累，当前先展示最新评测能力数据。" },
     ],
@@ -834,7 +836,7 @@ function normalizeRadarMetric(item: Record<string, unknown>): RadarMetricPoint {
     ?? value?.seconds
     ?? value?.meters,
   );
-  const maxValue = numberOrUndefined(metric?.maxScore) ?? inferMaxValue(value);
+  const maxValue = value?.kind === "measurement" ? (numberOrUndefined(metric?.maxScore) ?? 0) : inferMaxValue(value);
   return {
     metricId: String(metric?.id ?? item.metricId ?? "metric"),
     label: String(metric?.name ?? item.label ?? "指标"),
@@ -1476,12 +1478,12 @@ export async function saveCoachTrainingContentAssessments(
 
 export async function getCoachStudentRadar(studentId: string): Promise<RadarMetricPoint[]> {
   const context = requireContext();
-  const response = await request<{ latest?: Array<Record<string, unknown>> }>({
+  const response = await request<{ latest?: Array<Record<string, unknown>>; overall?: number | null }>({
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/students/${studentId}/radar`,
   });
   const latest = Array.isArray(response.latest) ? response.latest : [];
   return latest
-    .map((item) => normalizeRadarMetric(item))
+    .map((item) => ({ ...normalizeRadarMetric(item), overallScore: response.overall }))
     .filter((item) => typeof item.value === "number");
 }
 
@@ -1564,4 +1566,29 @@ export async function getClubCoachTeam(): Promise<ClubCoachTeam | null> {
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach-team`,
   });
   return response.teamName ? response : null;
+}
+
+function assessmentWorkflowPath(taskId: string) {
+  const context = requireContext();
+  return `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessment-tasks/${encodeURIComponent(taskId)}`;
+}
+
+export function getCoachAssessmentWorkflow(taskId: string): Promise<AssessmentWorkflowSummary> {
+  return request({ path: `${assessmentWorkflowPath(taskId)}/workflow` });
+}
+
+export function getCoachAssessmentHistory(taskId: string, studentId: string): Promise<AssessmentWorkingHistory> {
+  return request({ path: `${assessmentWorkflowPath(taskId)}/students/${encodeURIComponent(studentId)}/history` });
+}
+
+export function saveCoachAssessmentEntries(taskId: string, studentId: string, input: {
+  expectedRevision: number; reason?: string; entries: Array<{ testItemId: string; metricId?: string; value: Record<string, unknown> }>;
+}): Promise<AssessmentWorkingHistory> {
+  return request({ path: `${assessmentWorkflowPath(taskId)}/students/${encodeURIComponent(studentId)}/entries`, method: "PUT", data: input });
+}
+
+export function publishCoachAssessments(taskId: string, students: Array<{ studentId: string; expectedRevision: number }>): Promise<{
+  results: Array<{ studentId: string; success: boolean; revision?: number; error?: { message: string } }>;
+}> {
+  return request({ path: `${assessmentWorkflowPath(taskId)}/publications`, method: "POST", data: { students } });
 }

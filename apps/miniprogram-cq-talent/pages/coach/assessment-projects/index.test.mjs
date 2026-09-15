@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   getAssessmentForm: vi.fn(),
+  getCoachAssessmentWorkflow: vi.fn(),
+  publishCoachAssessments: vi.fn(),
   getCoachTrainingProjectTree: vi.fn(),
   getCoachAssessmentTasks: vi.fn(),
   getCoachAssessmentEntries: vi.fn(),
@@ -12,6 +14,8 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("../../../utils/api", () => ({
   getAssessmentForm: mocks.getAssessmentForm,
+  getCoachAssessmentWorkflow: mocks.getCoachAssessmentWorkflow,
+  publishCoachAssessments: mocks.publishCoachAssessments,
   getCoachTrainingProjectTree: mocks.getCoachTrainingProjectTree,
   getCoachAssessmentTasks: mocks.getCoachAssessmentTasks,
   getCoachAssessmentEntries: mocks.getCoachAssessmentEntries,
@@ -176,5 +180,33 @@ describe("C12 assessment project selection", () => {
     const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
     expect(stylesheet).toContain(".content-action-card__select");
     expect(stylesheet).toContain("right: 24rpx;");
+  });
+});
+
+
+describe("explicit publication", () => {
+  it("confirms only ready revisions and reports partial failures", async () => {
+    globalThis.wx.showModal = ({ success }) => success({ confirm: true });
+    mocks.getCoachAssessmentWorkflow.mockResolvedValue({ canEdit: true, students: [
+      { studentId: "a", name: "甲", revision: 2, canPublish: true },
+      { studentId: "b", name: "乙", revision: 4, canPublish: true },
+      { studentId: "c", name: "丙", revision: 1, canPublish: false },
+    ] });
+    mocks.publishCoachAssessments.mockResolvedValue({ results: [{ studentId: "a", success: true }, { studentId: "b", success: false, error: { message: "成绩已更新" } }] });
+    const page = createPageInstance();
+    page.setData({ taskId: task.id, templateId: task.templateId, canPublish: true });
+    page.load = vi.fn();
+    await page.publishReady();
+    expect(mocks.publishCoachAssessments).toHaveBeenCalledWith(task.id, [{ studentId: "a", expectedRevision: 2 }, { studentId: "b", expectedRevision: 4 }]);
+    expect(page.data.publicationMessage).toContain("已发布 1 人；1 人未发布");
+    expect(page.data.publishing).toBe(false);
+  });
+  it("does not publish when the coach cancels confirmation", async () => {
+    globalThis.wx.showModal = ({ success }) => success({ confirm: false });
+    mocks.getCoachAssessmentWorkflow.mockResolvedValue({ canEdit: true, students: [{ studentId: "a", name: "甲", revision: 2, canPublish: true }] });
+    mocks.publishCoachAssessments.mockClear();
+    const page = createPageInstance(); page.setData({ taskId: task.id, canPublish: true });
+    await page.publishReady();
+    expect(mocks.publishCoachAssessments).not.toHaveBeenCalled();
   });
 });

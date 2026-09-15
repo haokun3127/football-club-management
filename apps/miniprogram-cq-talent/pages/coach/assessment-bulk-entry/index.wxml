@@ -10,15 +10,20 @@
       <view class="bulk-context-line">{{taskTitle}} · {{teamName}}</view>
       <view class="bulk-summary">
         <view class="bulk-summary__count">{{filledLabel}}</view>
-        <view class="bulk-summary__rule">{{readOnly ? '已完成 · 只读' : '保存后同步标准分'}}</view>
+        <view class="bulk-summary__rule">{{readOnly ? '只读' : (managed ? '草稿保存后需确认发布' : '保存后同步标准分')}}</view>
       </view>
 
+      <view wx:if="{{managed && !readOnly}}" class="bulk-workflow">
+        <input value="{{correctionReason}}" maxlength="500" disabled="{{submitting}}" placeholder="更正已发布成绩时，请填写原因" bindinput="onReasonInput" />
+        <text bindtap="reloadServer">重新读取服务器成绩</text>
+      </view>
+      <view wx:if="{{saveError}}" class="bulk-workflow__error">{{saveError}}</view>
       <view wx:for="{{rows}}" wx:key="studentId" class="bulk-row">
-        <view class="bulk-row__identity"><view class="bulk-row__avatar">{{item.initials}}</view><view class="bulk-row__name">{{item.name}}</view></view>
+        <view class="bulk-row__identity"><view class="bulk-row__avatar">{{item.initials}}</view><view class="bulk-row__name">{{item.name}}</view><text wx:if="{{managed}}" class="bulk-history-link" data-student-id="{{item.studentId}}" bindtap="showHistory">记录</text></view>
         <view class="bulk-row__metrics">
           <view wx:for="{{item.metrics}}" wx:for-item="metric" wx:key="fieldId" class="bulk-metric {{readOnly ? 'bulk-metric--readonly' : ''}}">
             <view wx:if="{{readOnly}}" class="bulk-metric__readonly"><text>{{metric.value}}</text><text wx:if="{{metric.unitLabel}}"> {{metric.unitLabel}}</text></view>
-            <input wx:else class="bulk-metric__input" type="{{metric.inputType}}" value="{{metric.value}}" placeholder="{{metric.placeholder}}" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" bindinput="onRawInput" />
+            <input wx:else class="bulk-metric__input" disabled="{{submitting}}" type="{{metric.inputType}}" value="{{metric.value}}" placeholder="{{metric.placeholder}}" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" bindinput="onRawInput" />
             <text wx:if="{{!readOnly}}" class="bulk-metric__unit">{{metric.unitLabel}}</text>
             <text class="bulk-metric__score">{{readOnly ? '已保存' : item.statusLabel}}</text>
           </view>
@@ -28,10 +33,17 @@
   </view>
 
   <view wx:if="{{state === 'ready'}}" class="bulk-actions" style="padding-bottom:calc(24rpx + env(safe-area-inset-bottom))">
-    <view class="bulk-actions__hint">{{readOnly ? '全部成绩已保存，可随时回看' : '草稿按任务 + 项目保存，切换项目不丢失'}}</view>
+    <view class="bulk-actions__hint">{{readOnly ? '可查看已保存成绩与记录' : (managed ? '保存后请返回项目页确认发布' : '草稿按任务 + 项目保存，切换项目不丢失')}}</view>
     <view class="bulk-actions__buttons">
-      <view class="bulk-actions__secondary {{readOnly ? 'bulk-actions__secondary--disabled' : ''}}" bindtap="saveProject">{{readOnly ? '已完成' : (submitting ? '正在保存' : '保存本项目')}}</view>
+      <view class="bulk-actions__secondary {{readOnly ? 'bulk-actions__secondary--disabled' : ''}}" bindtap="saveProject">{{readOnly ? '只读' : (submitting ? '正在保存' : '保存本项目')}}</view>
       <view class="bulk-actions__primary" bindtap="nextProject">{{readOnly ? '返回项目' : '下一项目'}}</view>
     </view>
+  </view>
+</view>
+
+<view wx:if="{{historyVisible}}" class="bulk-history-mask">
+  <view class="bulk-history-panel">
+    <view class="bulk-history-head"><text>{{historyTitle}}</text><button size="mini" bindtap="closeHistory">关闭</button></view>
+    <scroll-view scroll-y class="bulk-history-scroll"><view wx:for="{{historyLines}}" wx:key="index" class="bulk-history-item">{{item}}</view></scroll-view>
   </view>
 </view>

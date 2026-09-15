@@ -81,7 +81,7 @@ Page({
         radarDimensionLabel: radar.length === 6 ? "六维能力模型" : radar.length >= 3 ? `${radar.length}维能力模型` : "",
         radarGeometry: "default",
         updatedAtLabel: growth.updatedAt ? `本周评估 · ${formatShortDate(growth.updatedAt)}` : "评估时间待同步",
-        compositeScore: compositeScoreOf(radar),
+        compositeScore: growth.overall === null ? "" : growth.overall ?? compositeScoreOf(radar),
       });
       // 首帧门控：让 webview 内容（导航/hero/维度行）先上屏，下一帧再挂载原生 canvas，避免 canvas 合成层抢跑
       if (radar.length >= 3) {
