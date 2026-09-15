@@ -223,7 +223,6 @@ export function createAssessmentService(dependencies: AssessmentServiceDependenc
           templateVersionId: templateVersion.id,
           rawResultId,
           recordedByCoachId: input.assessedByCoachId,
-          confidence: scoreInput.normalizedScore ?? getNumericMetricValue(scoreInput.value) ?? undefined,
           createdAt: now,
           updatedAt: now,
           note: scoreInput.comment ?? input.summary ?? `assessment:${template.id}`,
@@ -245,7 +244,12 @@ export function createAssessmentService(dependencies: AssessmentServiceDependenc
           metrics: await dependencies.catalog.listAbilityMetrics(input.clubId),
           dependencies: await dependencies.catalog.listMetricGraphDependencies(input.clubId, graphVersion.id),
           formulas: await dependencies.catalog.listDerivedMetricDefinitions(input.clubId),
-          inputRecords: metricRecords,
+          // Calculation uses the standardized score; lineage still refers to the
+          // original persisted fact, whose raw value must never be overwritten.
+          inputRecords: metricRecords.map((record, index) => {
+            const normalized = scores[index]?.normalizedScore;
+            return normalized === undefined ? record : { ...record, value: { kind: "measurement" as const, value: normalized, unit: "score" } };
+          }),
           ids: dependencies.ids,
           now,
           assessmentId: assessment.id,

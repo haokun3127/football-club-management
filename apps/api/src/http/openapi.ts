@@ -105,6 +105,7 @@ export function buildOpenApiDocument() {
       },
     },
     paths: {
+      "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/publications": { post: operation("POST", "assessment-publications", workflowSchemas.publish) },
       "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/workflow": { get: operation("GET", "assessment-workflow", workflowSchemas.summary) },
       "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/students/{studentId}/entries": { put: operation("PUT", "assessment-entries", workflowSchemas.save) },
       "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/students/{studentId}/history": { get: operation("GET", "assessment-history", workflowSchemas.history) },

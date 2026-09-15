@@ -117,4 +117,27 @@ export class AssessmentWorkflow {
       return state;
     });
   }
+  publish(task: AssessmentTask, studentId: string, coachId: string, expectedRevision: number) {
+    return this.operations.run(async () => {
+      this.assertWritable(task, studentId);
+      const { version, bindings } = await this.definition(task);
+      const state = await this.state(task, studentId);
+      const existing = state.publications.find((p) => p.revision === expectedRevision);
+      if (existing) return { studentId, ...existing, replayed: true };
+      if (expectedRevision !== state.revision) throw new AssessmentWorkflowError("assessment_revision_conflict", "成绩已变化，请重新加载后确认发布", 409);
+      const entries = bindings.map((b) => state.entries[b.testItemId!]);
+      if (entries.some((e) => !e)) throw new AssessmentWorkflowError("assessment_incomplete", "该学员尚未录齐所有项目，不能发布", 409);
+      const complete = entries as AssessmentEntry[];
+      await this.validateEntries(task, complete, bindings);
+      this.store.assessmentWorkflow.pin(task.clubId, task.id, version.id);
+      const publishedAt = new Date().toISOString();
+      await this.store.recordAssessment({ clubId: task.clubId, studentId, templateId: task.templateId, templateVersionId: version.id,
+        assessmentTaskId: task.id, assessedByCoachId: coachId, assessedAt: publishedAt, rawResults: complete,
+        summary: `教练确认发布 · 修订 ${state.revision}` }, (assessment) => {
+        state.publications.push({ revision: state.revision, assessmentId: assessment.id, coachId, publishedAt });
+        this.store.assessmentWorkflow.save(task.clubId, task.id, studentId, state);
+      });
+      return { studentId, ...state.publications.at(-1)!, replayed: false };
+    });
+  }
 }

@@ -273,7 +273,7 @@ export interface ApiStore {
     notes: MatchPlayerNote[];
     metricRecords: PlayerMetricRecord[];
   } | null>;
-  recordAssessment(input: RecordAssessmentInput): Promise<{
+  recordAssessment(input: RecordAssessmentInput, onRecorded?: (assessment: PlayerAssessment) => void): Promise<{
     assessment: PlayerAssessment;
     rawResults: AssessmentRawResult[];
     scores: AssessmentScore[];
@@ -2397,7 +2397,7 @@ export abstract class SeedBackedStore implements ApiStore {
     };
   }
 
-  recordAssessment(input: RecordAssessmentInput) {
+  recordAssessment(input: RecordAssessmentInput, onRecorded?: (assessment: PlayerAssessment) => void) {
     this.ensureStudentInClub(input.clubId, input.studentId);
     this.ensureCoachInClub(input.clubId, input.assessedByCoachId);
     if (input.eventId) {
@@ -2439,7 +2439,7 @@ export abstract class SeedBackedStore implements ApiStore {
       },
     });
 
-    return service.recordPlayerAssessment(input);
+    return service.recordPlayerAssessment(input).then((result) => { onRecorded?.(result.assessment); return result; });
   }
 
   computeAttackingContribution(clubId: EntityId, studentId: EntityId) {
@@ -2609,7 +2609,7 @@ export class PersistentApiStore extends SeedBackedStore {
     return this.repositories.assessments.listMetricRecords(clubId);
   }
 
-  override async recordAssessment(input: RecordAssessmentInput) {
+  override async recordAssessment(input: RecordAssessmentInput, onRecorded?: (assessment: PlayerAssessment) => void) {
     this.ensureStudentInClub(input.clubId, input.studentId);
     this.ensureCoachInClub(input.clubId, input.assessedByCoachId);
     if (input.eventId) {
@@ -2664,7 +2664,11 @@ export class PersistentApiStore extends SeedBackedStore {
       },
     });
 
-    return this.repositories.assessments.transaction(() => service.recordPlayerAssessment(input));
+    return this.repositories.assessments.transaction(async () => {
+      const result = await service.recordPlayerAssessment(input);
+      onRecorded?.(result.assessment);
+      return result;
+    });
   }
 
   override async recordCoachMatchEvent(input: MatchEventAppendInput): Promise<MatchEventAppendResult | MatchEventAppendConflict> {

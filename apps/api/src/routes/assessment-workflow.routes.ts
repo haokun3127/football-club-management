@@ -42,4 +42,18 @@ export async function registerAssessmentWorkflowRoutes(app: FastifyInstance, con
     if (!access.coachId) return context.sendError(reply, 403, "coach_profile_required", "当前账号没有可记录的教练档案");
     try { return await workflow.save(access.task, request.params.studentId, access.coachId, request.body); } catch (error) { return fail(reply, error); }
   });
+  app.post<{ Params: Params; Body: { students: Array<{ studentId: string; expectedRevision: number }> } }>(`${base}/publications`, { schema: workflowSchemas.publish }, async (request, reply) => {
+    const access = await scope(request, reply); if (!access) return reply;
+    if (!access.coachId) return context.sendError(reply, 403, "coach_profile_required", "当前账号没有可记录的教练档案");
+    const results = [];
+    for (const student of request.body.students) {
+      try {
+        results.push({ success: true, ...await workflow.publish(access.task, student.studentId, access.coachId, student.expectedRevision) });
+      } catch (error) {
+        const known = error instanceof AssessmentWorkflowError;
+        results.push({ studentId: student.studentId, success: false, error: { code: known ? error.code : "assessment_publication_failed", message: known ? error.message : "发布失败，成绩已保留，请重试" } });
+      }
+    }
+    return { results };
+  });
 }
