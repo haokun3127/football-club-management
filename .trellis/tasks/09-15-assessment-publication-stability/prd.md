@@ -26,3 +26,7 @@ New age normalization tables, classroom/match score fusion, arbitrary spreadshee
 
 ## Authorization
 User approved the plan and small commits on 2026-09-15; no further commit confirmation is needed.
+
+## Subsequent deployment authorization
+
+User authorized deployment if ready. The 2026-09-15 readiness check found public health normal, but documented SSH access failed with public-key authentication rejection. No production mutation was performed; see validation.md.

@@ -51,3 +51,13 @@ Regression coverage includes single-project readback, zero and bad inputs, stale
 - `956d57e` score scale and publication timeline
 - `ba55b21` mini-program integration
 - `de30091` pinned-version, transaction and restart hardening
+
+## Conditional deployment check — 2026-09-15
+
+The user subsequently authorized deployment if prerequisites are met. This supersedes the earlier no-deployment authorization boundary, but does not waive release checks.
+
+- Public `https://cqtc.pomi.tech/health` responded successfully with `status: ok`.
+- Read-only SSH attempt using the documented `ubuntu@43.136.114.225` endpoint and existing authentication failed with `Permission denied (publickey)`. No current release, image, persistent volume, backup or rollout environment could be verified on the server.
+- `pnpm build` passed for domain and API.
+- The known root-check screenshot-helper failures and the new mini-program runtime acceptance gap remain unresolved.
+- No deployment, service restart, production migration, rollout flag change or push was performed. Deployment is blocked until a working authorized SSH/deployment entrypoint is available and the applicable release checks pass.
