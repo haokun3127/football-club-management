@@ -1001,3 +1001,44 @@ Verified the non-destructive P1 V3 weekly, expanded and empty Figma states; capt
 ### Next Steps
 
 - None - task complete
+
+
+## Session 28: Assessment drafts and explicit publication stability
+
+**Date**: 2026-09-15
+**Task**: Assessment drafts and explicit publication stability
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+Implemented and committed the approved 62-score project-draft/publication workflow. Domain 23, API 144, mini excluding baseline screenshot helper 485 tests pass; typecheck passes. Root check retains 4 existing Windows-path screenshot failures on macOS. Isolated WeChat runtime connected but page/system reads timed out; temporary processes cleaned up. Feature flag remains off, no deployment/push, task kept active for runtime acceptance.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `49ce87d` | (see git log) |
+| `77857fc` | (see git log) |
+| `8625b8f` | (see git log) |
+| `67691dc` | (see git log) |
+| `956d57e` | (see git log) |
+| `ba55b21` | (see git log) |
+| `de30091` | (see git log) |
+| `47d3624` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
