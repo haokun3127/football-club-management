@@ -11,6 +11,7 @@ import type { ClubAppClient, StudentDetail, StudentListItem } from "../data-capa
 import { schemas } from "../http/schemas.js";
 import { buildTrainingContentTree } from "../application/training-content-catalog.js";
 import type { RouteContext } from "./context.js";
+import { assessmentWorkflow, publicationEnabled, AssessmentWorkflowError } from "../application/assessment-workflow.js";
 
 interface AppEventDetail {
   id: string;
@@ -298,6 +299,31 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         .some((team) => team.id === task.teamId);
       if (!accessibleTeam) {
         return context.sendError(reply, 403, "forbidden", "Assessment task team is outside this coach scope");
+      }
+
+      const workflow = assessmentWorkflow(context.store);
+      if (workflow.available(task)) {
+        try {
+          const { bindings } = await workflow.definition(task);
+          const metrics = context.store.listAbilityMetrics(request.params.clubId);
+          const selected = bindings.filter((b) => b.testItemId === request.params.projectId || b.metricId === request.params.projectId || metrics.find((m) => m.id === b.metricId)?.dimensionId === request.params.projectId);
+          const savedValuesByStudent: Record<string, Record<string, MetricValue>> = {};
+          const studentStates: Record<string, { revision: number; publishedRevision: number | null }> = {};
+          for (const studentId of workflow.roster(task)) {
+            const state = await workflow.state(task, studentId);
+            const values: Record<string, MetricValue> = {};
+            for (const binding of selected) {
+              const entry = state.entries[binding.testItemId!];
+              if (entry) values[binding.testItemId!] = entry.value;
+            }
+            if (Object.keys(values).length) savedValuesByStudent[studentId] = values;
+            studentStates[studentId] = { revision: state.revision, publishedRevision: state.publications.at(-1)?.revision ?? null };
+          }
+          return { clubId: request.params.clubId, taskId: task.id, projectId: request.params.projectId, savedValuesByStudent, studentStates };
+        } catch (error) {
+          if (error instanceof AssessmentWorkflowError) return context.sendError(reply, error.status, error.code, error.message);
+          throw error;
+        }
       }
 
       const [templates, metricCatalog, config] = await Promise.all([
@@ -2540,10 +2566,9 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       }
 
       const accessibleTeamIds = new Set(teams.map((team) => team.id));
-      const views = tasks.filter((task) => accessibleTeamIds.has(task.teamId)).map((task) => {
+      const views = await Promise.all(tasks.filter((task) => accessibleTeamIds.has(task.teamId)).map(async (task) => {
         const taskStudentIds = activeTeamMemberStudentIds.get(task.teamId) ?? new Set<string>();
-        const visibleStudentIds = new Set(scope.students.map((student) => student.id));
-        const totalStudents = [...taskStudentIds].filter((studentId) => visibleStudentIds.has(studentId)).length;
+        const totalStudents = taskStudentIds.size;
         const completedStudentIds = new Set(assessments
           .filter((assessment) => assessment.assessmentTaskId === task.id && taskStudentIds.has(assessment.studentId))
           .map((assessment) => assessment.studentId));
@@ -2553,6 +2578,15 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
           : totalStudents > 0 && completedStudents >= totalStudents
             ? "completed"
             : "in_progress";
+        let workflowData;
+        const workflow = assessmentWorkflow(context.store);
+        if (workflow.available(task)) {
+          try { workflowData = await workflow.summary(task); }
+          catch (error) {
+            if (!(error instanceof AssessmentWorkflowError)) throw error;
+            workflowData = { enabled: publicationEnabled(task.clubId), canEdit: false, error: error.message };
+          }
+        }
         return {
           id: task.id,
           teamId: task.teamId,
@@ -2565,8 +2599,10 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
           status,
           completedStudents,
           totalStudents,
+          ...(workflowData ? { workflow: workflowData, completedStudents: "completedStudents" in workflowData ? workflowData.completedStudents : 0,
+            status: task.startsOn > today ? "not_started" : "in_progress" } : {}),
         };
-      });
+      }));
 
       return {
         clubId: request.params.clubId,
@@ -2633,6 +2669,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         startsOn: request.body.startsOn,
         dueOn: request.body.dueOn,
       });
+      if (publicationEnabled(task.clubId)) await assessmentWorkflow(context.store).adopt(task);
       reply.code(201);
       return { clubId: request.params.clubId, task };
     },
@@ -3075,6 +3112,9 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       }
       if (task.templateId !== request.body.templateId) {
         return context.sendError(reply, 400, "assessment_task_template_mismatch", "Assessment template does not match the task");
+      }
+      if (publicationEnabled(request.params.clubId) || assessmentWorkflow(context.store).managed(task)) {
+        return context.sendError(reply, 409, "assessment_publication_required", "此任务须保存草稿并确认发布，请使用新版测评页面");
       }
       const today = new Date().toISOString().slice(0, 10);
       if (today < task.startsOn || today > task.dueOn) {

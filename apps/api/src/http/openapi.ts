@@ -1,4 +1,5 @@
 import { errorResponse, schemas } from "./schemas.js";
+import { workflowSchemas } from "./assessment-workflow-schemas.js";
 
 interface RouteSchema {
   params?: unknown;
@@ -104,6 +105,9 @@ export function buildOpenApiDocument() {
       },
     },
     paths: {
+      "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/workflow": { get: operation("GET", "assessment-workflow", workflowSchemas.summary) },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/students/{studentId}/entries": { put: operation("PUT", "assessment-entries", workflowSchemas.save) },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/students/{studentId}/history": { get: operation("GET", "assessment-history", workflowSchemas.history) },
       "/health": { get: operation("GET", "/health", schemas.health) },
       "/clubs": { get: operation("GET", "/clubs", schemas.clubsResponse) },
       "/app-clients/resolve": {

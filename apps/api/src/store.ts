@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { MemoryAssessmentWorkflowRepository, type AssessmentWorkflowRepository } from "./application/assessment-workflow-types.js";
 import {
   createAssessmentService,
   createMatchService,
@@ -126,6 +127,8 @@ import type { PlatformRepositories } from "./persistence/platform-persistence.js
 import { createSeedData, type SeedData } from "./seed.js";
 
 export interface ApiStore {
+  readonly assessmentWorkflow: AssessmentWorkflowRepository;
+  listStudents(clubId: EntityId): StudentProfile[];
   getHealth(): { status: "ok"; service: "@football-club/api" };
   getTacticalBoard(clubId: EntityId, eventId: EntityId): TacticalBoard | null | Promise<TacticalBoard | null>;
   saveTacticalBoard(board: TacticalBoard): TacticalBoard | Promise<TacticalBoard>;
@@ -645,6 +648,7 @@ function validateLessonAdjustment(input: LessonAdjustmentInput): void {
 }
 
 export abstract class SeedBackedStore implements ApiStore {
+  readonly assessmentWorkflow: AssessmentWorkflowRepository = new MemoryAssessmentWorkflowRepository();
   protected readonly data: SeedData;
   private readonly counters = new Map<string, number>();
   private readonly httpIdempotencyRecords = new Map<string, HttpIdempotencyRecord>();
@@ -2466,11 +2470,13 @@ export abstract class SeedBackedStore implements ApiStore {
 export class InMemoryStore extends SeedBackedStore {}
 
 export class PersistentApiStore extends SeedBackedStore {
+  override readonly assessmentWorkflow: AssessmentWorkflowRepository;
   constructor(
     readonly repositories: PlatformRepositories,
     data: SeedData = createSeedData(),
   ) {
     super(mergePersistedTrainingSessionData(repositories, mergePersistedSessionPlanData(repositories, mergePersistedPlatformData(repositories, mergePersistedMatchData(repositories, mergePersistedAssessmentData(repositories, data))))));
+    this.assessmentWorkflow = repositories.assessmentWorkflow;
   }
 
   override listCalendarEvents(clubId: EntityId) {

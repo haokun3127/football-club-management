@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import { registerAssessmentWorkflowRoutes } from "./routes/assessment-workflow.routes.js";
 import type { FastifyError } from "fastify";
 import type { MembershipResolver } from "./auth/context.js";
 import { SessionRegistry } from "./auth/session-registry.js";
@@ -68,6 +69,7 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
   void app.register(registerTrainingRoutes, context);
   void app.register(registerMatchRoutes, context);
   void app.register(registerAssessmentRoutes, context);
+  void app.register(registerAssessmentWorkflowRoutes, context);
   void app.register(registerMetricsRoutes, context);
 
   return app;
