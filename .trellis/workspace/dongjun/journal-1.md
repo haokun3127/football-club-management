@@ -1046,6 +1046,8 @@ Implemented and committed the approved 62-score project-draft/publication workfl
 
 ## Session 29: Fix macOS DevTools test foundations
 
+Follow-up outcome (2026-09-16): user completed login and Codex authorization. Installed verified official Stable 2.02.2608070 alongside the old app at `/Applications/wechatwebdevtools-stable.app`; `~/.local/bin/wechatide` resolves to it. Final fixed-path login/version check, offline current-page read and simulator PNG inspection passed. Screenshot: `/tmp/fcm-devtools-installed-verified.png`. Foundation blocker resolved; assessment-flow runtime acceptance remains pending.
+
 **Date**: 2026-09-16
 **Task**: Fix macOS DevTools test foundations
 **Package**: api

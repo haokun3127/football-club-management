@@ -103,3 +103,16 @@ Runtime foundation is a separate check:
 - The user then explicitly allowed opening the login entry. A fresh screenshot showed the new tool's test-project window with an open QR panel labeled `未登录`. Requested the user's own WeChat scan/phone confirmation. The concrete next prerequisite is completing this login, followed by verifying the Codex handshake; do not infer either from the old tool's login state.
 
 Deployment remains pending real-runtime acceptance. The four unit-test failures and SSH access are no longer blockers.
+
+## Runtime foundation verified — 2026-09-16
+
+The login/authorization blocker above is now resolved. The user completed WeChat login and Codex authorization. In the temporary verified app, `check_wechatide_status` returned `loginExpired: false`, `versionRelation: equal`, `tokenRequired: false`; current-page and system-info calls succeeded, and a simulator screenshot visibly showed the offline test text.
+
+Installed the same verified official app alongside the old app at `/Applications/wechatwebdevtools-stable.app`; added `~/.local/bin/wechatide` pointing to its official CLI. The copied app passed signature verification. The new installation location did not retain the temporary location's login/authorization state; the user completed those prompts again. Final checks at the fixed location passed:
+
+- Login current; skill version 0.3.9 matches; Codex authorized.
+- Opened `/tmp/fcm-devtools-foundation` via `open_project_window`.
+- `automation_runtime_info --action currentPage` returned `pages/probe/index`, title `本地工具验证`.
+- `simulator_screenshot --optimize false --wait-for-selector view` generated `/tmp/fcm-devtools-installed-verified.png` (624×1352); visual inspection confirms `本地自动化正常`.
+
+This is an offline toolchain smoke check, not production authentication or assessment-flow/Figma acceptance. The original `/Applications/wechatwebdevtools.app`, existing project configuration and production service remain unchanged. Use the fixed new entrypoint for subsequent runtime acceptance; old Automator probes are not the default. Two automatic shell-review deadlines were retried successfully; neither is an unresolved tool failure.

@@ -39,6 +39,10 @@ Windows CLI 单元测试同时注入进程启动和文件存在检查，不要�
 
 本机旧版 2.01.2510290 出现最小离线页面可见、Automator 页面读取超时的现象。此时先核实工具运行时，不能通过修改业务页面或延长无界等待来掩盖问题。上述路径/超时修复不改变 MCP 作为视觉验收默认通道的约定。
 
+2026-09-16 本机已并行安装并验证官方 arm64 Stable 2.02.2608070：`/Applications/wechatwebdevtools-stable.app`。`~/.local/bin/wechatide` 指向该应用的 `Contents/MacOS/wechatide`，旧版仍保留。CLI 官方 skill 说明位于该应用的 `Contents/Resources/app.asar.unpacked/wechatide-skill/SKILL.md`。首次使用先检查 `wechatide -c Codex check_wechatide_status --skill-version 0.3.9`；只有版本匹配、登录有效且连接授权完成后才进入业务操作。安装位置变化可能需要重新登录/授权，不能假定临时副本的状态自动迁移。
+
+该固定入口已通过离线最小页面的 currentPage、模拟器原始 PNG 检查；这不等于业务流程验收。`wechatide` 提供的 `automation_runtime_info` / `simulator_screenshot` 可供运行时排障；现有 Windows MCP 截图脚本尚未因此变成跨平台脚本，不能把截图成功冒充严格 375×812 Figma 证据。
+
 `tmp/prod-verify/sweep3.sh` 至 `sweep6.sh` 以及同目录的像素探针也属于历史排障入口；它们现在通过共享路径解析器读取 `CQ_TALENT_VISUAL_EVIDENCE_DIR`，默认仍落到系统临时目录。旧日志或旧文档中的 `C:\Users\ASUS\cq-talent-visual-evidence` 仅代表历史产物位置，不应作为新证据输出位置。
 
 ## 历史 Automator 前提（仅紧急回退）
