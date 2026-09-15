@@ -61,3 +61,22 @@ The user subsequently authorized deployment if prerequisites are met. This super
 - `pnpm build` passed for domain and API.
 - The known root-check screenshot-helper failures and the new mini-program runtime acceptance gap remain unresolved.
 - No deployment, service restart, production migration, rollout flag change or push was performed. Deployment is blocked until a working authorized SSH/deployment entrypoint is available and the applicable release checks pass.
+
+## SSH verification correction — 2026-09-15
+
+The previous SSH conclusion was incomplete: the default identity failed, but this machine already has the project's dedicated identity at `~/.ssh/football_club_codex`. It is not selected by the default SSH config.
+
+Verified command (contains no credential material):
+
+```sh
+ssh -i ~/.ssh/football_club_codex -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes ubuntu@43.136.114.225
+```
+
+- Explicit identity authentication succeeded as `ubuntu`.
+- `cq-talent-api` runs `cq-talent-api:latest`; observed uptime was 8 days.
+- Compose working directory is `/opt/cq-talent-api`.
+- Persistent mount is `cq-talent-api-data:/var/lib/cq-talent`.
+- Running image ID is `sha256:2af072566363a245f40bbbaaf62456fef72d0b0f44604db70b028d2a3cdee556`; the queried OCI revision label is absent, so no Git revision is inferred from the mutable `latest` tag.
+- Internal `/health` returned `status: ok`.
+- The SSH access blocker is resolved. These were read-only checks; no backup, deployment, migration, restart or flag change was performed. Existing test/runtime acceptance gaps remain as recorded above.
+- One automatic approval request failed because its review connection disconnected; the same read-only check succeeded after local identity/permission validation and a new approval request.

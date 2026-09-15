@@ -21,6 +21,6 @@
   "children": [],
   "parent": null,
   "relatedFiles": [],
-  "notes": "Code and regression checks complete; rollout flag remains off. Root check retains 4 baseline macOS screenshot-helper failures. WeChat automation connected but page/system reads timed out; real-runtime acceptance pending. See validation.md. No production writes or push.",
+  "notes": "Code checks and commits recorded. Conditional deployment authorized. Dedicated SSH identity ~/.ssh/football_club_codex successfully verified; default-key failure was not a real access blocker. Production health and persistent volume confirmed read-only. Root check retains 4 baseline screenshot failures and WeChat runtime acceptance remains pending; no deployment performed. See validation.md.",
   "meta": {}
 }
