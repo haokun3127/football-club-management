@@ -34,3 +34,7 @@ User authorized deployment if ready. The 2026-09-15 readiness check found public
 ## Test environment remediation
 
 User explicitly requested correction of local prerequisites behind the four previously failing tests. Scope includes host-native screenshot paths, deterministic Windows CLI fixtures, bounded runtime probes and verification of the installed WeChat toolchain. No test bypass or business behavior changes are authorized by this remediation alone.
+
+## Formal release authorization — 2026-09-16
+
+The user explicitly requested formal project delivery: complete verification, push the code to GitHub, and advance the online release once checks are normal. This supersedes the initial no-push/no-deployment boundary. Preserve small commits and existing mini-program stability. Release only the verified committed tree; keep unrelated local work separate. Record the exact release revision, backup/rollback evidence, backend and mini-program release statuses independently. Platform login, review or account-owner actions that cannot be completed must be identified precisely, never represented as a completed release.

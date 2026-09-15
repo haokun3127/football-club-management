@@ -7,6 +7,7 @@ API changes must preserve route contracts, OpenAPI coverage, persistence behavio
 - Run `pnpm --filter @football-club/api typecheck` for API-only changes.
 - Run `pnpm --filter @football-club/api test` when changing routes, store, persistence, integrations, schemas, or seed data.
 - Run root `pnpm check` before broad cross-package changes.
+- `.github/workflows/ci.yml` runs the same root check and build on `dev`/`master` pushes and pull requests, using Node 24 and the package manager pinned in `package.json`. Keep this gate read-only; deployment credentials and production writes do not belong in this workflow.
 
 ## Implementation Rules
 
