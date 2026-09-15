@@ -2,8 +2,8 @@
 
 import { createHash, randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
-import { existsSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
-import { basename, dirname, resolve, win32 } from "node:path";
+import { existsSync, realpathSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
+import { basename, dirname, resolve, join, isAbsolute, normalize, relative, sep, extname, parse } from "node:path";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
@@ -28,7 +28,7 @@ const DEFAULT_CLI_PATH = process.platform === "win32"
   : "/Applications/wechatwebdevtools.app/Contents/MacOS/cli";
 const DEFAULT_PROJECT_PATH = resolve(import.meta.dirname, "..");
 const WINDOWS_SIMULATOR_CAPTURE_HELPER = resolve(import.meta.dirname, "devtools-simulator-capture.py");
-const USAGE = "Usage: devtools:screenshot -- --output C:\\temp\\shot.png --expect-route-prefix /pages/parent/ [--port <automator-port>]";
+const USAGE = "Usage: devtools:screenshot -- --output <absolute-path.png> --expect-route-prefix /pages/parent/ [--port <automator-port>]";
 
 export function parseArgs(argv) {
   const args = [...argv];
@@ -72,17 +72,19 @@ function parsePort(value) {
 }
 
 export function validateOutputPath(output, repoRoot = REPO_ROOT) {
-  if (!win32.isAbsolute(output)) throw new Error("--output must be an absolute Windows path");
-  if (output.startsWith("\\\\")) throw new Error("UNC output paths are not supported");
-  const normalized = win32.normalize(output);
-  if (win32.parse(normalized).base.includes(":")) throw new Error("ADS output paths are not supported");
-  if (win32.extname(normalized).toLowerCase() !== ".png") throw new Error("--output must end in .png");
-
-  const repo = win32.resolve(repoRoot).toLowerCase();
-  const target = normalized.toLowerCase();
-  if (target === repo || target.startsWith(`${repo}\\`)) throw new Error("--output must be outside the repository");
+  if (!isAbsolute(output)) throw new Error("--output must be an absolute path on this operating system");
+  if (process.platform === "win32" && output.startsWith("\\\\")) throw new Error("UNC output paths are not supported");
+  const normalized = normalize(output);
+  if (process.platform === "win32" && parse(normalized).base.includes(":")) throw new Error("ADS output paths are not supported");
+  if (extname(normalized).toLowerCase() !== ".png") throw new Error("--output must end in .png");
   const parent = dirname(normalized);
   if (!existsSync(parent)) throw new Error("--output parent directory does not exist");
+  const repo = realpathSync(repoRoot);
+  const target = join(realpathSync(parent), basename(normalized));
+  const fromRepo = relative(repo, target);
+  if (!fromRepo || (!isAbsolute(fromRepo) && fromRepo !== ".." && !fromRepo.startsWith(`..${sep}`))) {
+    throw new Error("--output must be outside the repository");
+  }
   const sidecar = `${normalized}.json`;
   if (existsSync(normalized) || existsSync(sidecar)) throw new Error("PNG output or sidecar already exists");
   return { output: normalized, sidecar, parent };
@@ -129,8 +131,8 @@ function assertExpectedDimensions(bytes, viewport) {
 
 function writeCaptureAtomically({ targets, bytes, sidecar }) {
   const token = `${process.pid}-${randomUUID()}`;
-  const pngTemp = win32.join(targets.parent, `.${basename(targets.output)}.${token}.tmp`);
-  const sidecarTemp = win32.join(targets.parent, `.${basename(targets.sidecar)}.${token}.tmp`);
+  const pngTemp = join(targets.parent, `.${basename(targets.output)}.${token}.tmp`);
+  const sidecarTemp = join(targets.parent, `.${basename(targets.sidecar)}.${token}.tmp`);
   let pngRenamed = false;
   try {
     writeFileSync(pngTemp, bytes, { flag: "wx" });
@@ -290,6 +292,7 @@ export async function openAutomation({
   isWindows = process.platform === "win32",
   commandShell = process.env.ComSpec ?? "cmd.exe",
   spawnImpl = spawn,
+  existsSyncImpl = existsSync,
   discoverAutomationPortImpl = discoverAutomationPort,
   probeAutomationPortImpl = probeAutomationPort,
   findFreeAutomationPortImpl = findFreeAutomationPort,
@@ -327,7 +330,7 @@ export async function openAutomation({
     }
     automationPort = await findFreeAutomationPortImpl();
   }
-  if (!existsSync(cliPath)) throw new Error(`WeChat DevTools CLI not found: ${cliPath}`);
+  if (!existsSyncImpl(cliPath)) throw new Error(`WeChat DevTools CLI not found: ${cliPath}`);
   const activeIdeHttpPort = ideHttpPort ?? (detectIdeHttpPort ? readIdeHttpPort() : undefined);
   const endpoint = `ws://127.0.0.1:${automationPort}`;
   const cliArgs = buildCliArgs({ projectPath, automationPort, ideHttpPort: activeIdeHttpPort });
@@ -346,7 +349,7 @@ export async function openAutomation({
   child?.unref?.();
   const miniProgram = await connectAfterLaunch({ automatorImpl, endpoint, timeoutMs, retryDelayMs, sleepImpl, connectAttemptTimeoutMs });
   try {
-    const route = routeOf(await miniProgram.currentPage());
+    const route = routeOf(await withOperationTimeout(miniProgram.currentPage(), "Automator currentPage", timeoutMs));
     const sessionFile = persistSession
       ? writeAutomationSession({ automationPort, projectPath, ideHttpPort: activeIdeHttpPort, cliPath }, statePath)
       : undefined;
@@ -370,17 +373,17 @@ export async function runCli({
   const targets = validateOutputPath(options.output, repoRoot);
   const automationPort = resolveAutomationPort({ explicitPort: options.port });
   const endpoint = `ws://127.0.0.1:${automationPort}`;
-  const captureTemp = win32.join(targets.parent, `.${basename(targets.output)}.${process.pid}-${randomUUID()}.capture`);
+  const captureTemp = join(targets.parent, `.${basename(targets.output)}.${process.pid}-${randomUUID()}.capture`);
 
   try {
-    const captureProgram = await automatorImpl.connect({ wsEndpoint: endpoint });
+    const captureProgram = await withOperationTimeout(automatorImpl.connect({ wsEndpoint: endpoint }), "Automator connect", operationTimeoutMs);
     let route;
     let pageStackRoutes;
     let bytes;
     let simulatorWindow;
     try {
-      route = routeOf(await captureProgram.currentPage());
-      pageStackRoutes = routesOf(await captureProgram.pageStack());
+      route = routeOf(await withOperationTimeout(captureProgram.currentPage(), "Automator currentPage", operationTimeoutMs));
+      pageStackRoutes = routesOf(await withOperationTimeout(captureProgram.pageStack(), "Automator pageStack", operationTimeoutMs));
       if (!route.startsWith(options.expectRoutePrefix)) throw new Error(`current page does not match route prefix: ${route || "(none)"}`);
       if (platform !== "win32") {
         await withOperationTimeout(captureProgram.screenshot({ path: captureTemp }), "screenshot", operationTimeoutMs);
@@ -395,10 +398,10 @@ export async function runCli({
       bytes = readFileSync(captureTemp);
     }
 
-    const inspectionProgram = await automatorImpl.connect({ wsEndpoint: endpoint });
+    const inspectionProgram = await withOperationTimeout(automatorImpl.connect({ wsEndpoint: endpoint }), "Automator connect", operationTimeoutMs);
     let viewport;
     try {
-      const inspectionRoute = routeOf(await inspectionProgram.currentPage());
+      const inspectionRoute = routeOf(await withOperationTimeout(inspectionProgram.currentPage(), "Automator inspection currentPage", operationTimeoutMs));
       if (inspectionRoute !== route) throw new Error(`current page changed during capture: ${route || "(none)"} -> ${inspectionRoute || "(none)"}`);
       viewport = assertExpectedViewport(await withOperationTimeout(inspectionProgram.systemInfo(), "systemInfo", operationTimeoutMs));
     } finally {

@@ -5,7 +5,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "no
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
-import { openAutomation, parseArgs, runCli } from "./devtools-screenshot.mjs";
+import { openAutomation, parseArgs, runCli, validateOutputPath } from "./devtools-screenshot.mjs";
 
 const tempDirectories = [];
 process.env.MP_AUTO_PORT = "9421";
@@ -85,6 +85,8 @@ describe("DevTools Automator screenshot CLI", () => {
     ]);
     expect(fake.calls.screenshotPaths).toHaveLength(1);
     expect(fake.calls.screenshotPaths[0]).not.toBe(output);
+    expect(fake.calls.screenshotPaths[0]).toContain(directory);
+    expect(existsSync(output)).toBe(true);
     expect(fake.calls.sequence).toEqual(["screenshot", "systemInfo"]);
     expect(fake.calls.systemInfo).toBe(1);
     expect(fake.calls.disconnects).toBe(2);
@@ -275,6 +277,7 @@ describe("DevTools Automator screenshot CLI", () => {
       ideHttpPort: 14535,
       timeoutMs: 12_000,
       isWindows: true,
+      existsSyncImpl: (path) => path === "D:\\微信web开发者工具\\cli.bat",
       commandShell: "cmd.exe",
       spawnImpl(command, args, options) {
         spawnCalls.push({ command, args, options });
@@ -305,6 +308,7 @@ describe("DevTools Automator screenshot CLI", () => {
       port: 9431,
       ideHttpPort: 14535,
       isWindows: true,
+      existsSyncImpl: (path) => path === "D:\\微信web开发者工具\\cli.bat",
       spawnImpl() { return { unref() {} }; },
       retryDelayMs: 1,
       sleepImpl: async () => { sleepCalls += 1; },
@@ -378,5 +382,41 @@ describe("DevTools Automator screenshot CLI", () => {
   it("bounds each Automator connection attempt so a half-open WebSocket cannot block recovery", () => {
     const source = readFileSync(new URL("./devtools-screenshot.mjs", import.meta.url), "utf8");
     expect(source).toMatch(/async function connectAfterLaunch[\s\S]{0,800}withOperationTimeout\(\s*\n?\s*automatorImpl\.connect/);
+  });
+});
+
+
+describe("host filesystem boundaries and unresponsive runtimes", () => {
+  it("rejects relative paths, repository paths, missing parents and overwrite", () => {
+    const directory = createOutputDirectory();
+    expect(() => validateOutputPath("relative.png")).toThrow(/absolute path/);
+    expect(() => validateOutputPath(join(directory, "inside.png"), directory)).toThrow(/outside the repository/);
+    expect(() => validateOutputPath(join(directory, "missing", "shot.png"))).toThrow(/parent directory/);
+    const output = join(directory, "shot.png");
+    writeFileSync(`${output}.json`, "{}");
+    expect(() => validateOutputPath(output)).toThrow(/already exists/);
+  });
+  it("still rejects an absent CLI before spawning a process", async () => {
+    await expect(openAutomation({ port: 9431, cliPath: "missing-cli", existsSyncImpl: () => false,
+      spawnImpl() { throw new Error("must not spawn"); },
+    })).rejects.toThrow(/CLI not found/);
+  });
+  it("times out currentPage after connecting and disconnects without publishing evidence", async () => {
+    const directory = createOutputDirectory();
+    let disconnected = 0;
+    await expect(runCli({ argv: ["--output", join(directory, "timeout.png"), "--expect-route-prefix", "/pages/parent/"],
+      operationTimeoutMs: 5,
+      automatorImpl: { async connect() { return { currentPage: () => new Promise(() => {}), disconnect() { disconnected++; } }; } },
+    })).rejects.toThrow(/currentPage timed out/);
+    expect(disconnected).toBe(1);
+    expect(existsSync(join(directory, "timeout.png"))).toBe(false);
+  });
+  it("bounds the post-launch page probe rather than hanging after successful websocket connection", async () => {
+    let disconnected = 0;
+    await expect(openAutomation({ port: 9431, timeoutMs: 5, cliPath: "test-cli", existsSyncImpl: () => true,
+      spawnImpl: () => ({ unref() {} }),
+      automatorImpl: { async connect() { return { currentPage: () => new Promise(() => {}), disconnect() { disconnected++; } }; } },
+    })).rejects.toThrow(/currentPage timed out/);
+    expect(disconnected).toBe(1);
   });
 });
