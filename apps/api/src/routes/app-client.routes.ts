@@ -11,7 +11,7 @@ import type { ClubAppClient, StudentDetail, StudentListItem } from "../data-capa
 import { schemas } from "../http/schemas.js";
 import { buildTrainingContentTree } from "../application/training-content-catalog.js";
 import type { RouteContext } from "./context.js";
-import { assessmentWorkflow, publicationEnabled, AssessmentWorkflowError } from "../application/assessment-workflow.js";
+import { assessmentWorkflow, publicationEnabled, AssessmentWorkflowError, taskDate } from "../application/assessment-workflow.js";
 import { scorePercent, overallScore } from "@football-club/domain";
 
 interface AppEventDetail {
@@ -1661,7 +1661,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       }
 
       const versions = config.assessmentTemplateVersions
-        .filter((item) => item.templateId === template.id && item.status === "active")
+        .filter((item) => item.templateId === template.id && (item.status === "active" || (item.status === "archived" && item.id === request.query.templateVersionId)))
         .sort((left, right) => right.version.localeCompare(left.version));
       const templateVersion = request.query.templateVersionId
         ? versions.find((item) => item.id === request.query.templateVersionId)
@@ -2546,11 +2546,10 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return reply;
       }
 
-      const scope = await collectCoachScope(context, request.params.clubId, auth);
       const tasks = await context.store.listAssessmentTasks(request.params.clubId);
       const teams = collectCoachTeamOptions(context, request.params.clubId, auth);
       const teamNameById = new Map(teams.map((team) => [team.id, team.name]));
-      const today = new Date().toISOString().slice(0, 10);
+      const today = taskDate();
       const assessments = await context.store.listPlayerAssessments(request.params.clubId);
       const activeTeamMemberStudentIds = new Map<string, Set<string>>();
       for (const member of context.store.listTeamMembers(request.params.clubId)) {
@@ -2654,7 +2653,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return context.sendError(reply, 403, "forbidden", "Team is not accessible for this coach membership");
       }
 
-      const task = await context.store.saveAssessmentTask({
+      const task = {
         id: `assessment-task-app-client-${crypto.randomUUID()}`,
         clubId: request.params.clubId,
         teamId: allowedTeam.id,
@@ -2663,8 +2662,17 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         templateId: template.id,
         startsOn: request.body.startsOn,
         dueOn: request.body.dueOn,
-      });
-      if (publicationEnabled(task.clubId)) await assessmentWorkflow(context.store).adopt(task);
+      };
+      let versionId: string | undefined;
+      if (publicationEnabled(task.clubId)) {
+        try { versionId = (await assessmentWorkflow(context.store).definition(task)).version.id; }
+        catch (error) {
+          if (error instanceof AssessmentWorkflowError) return context.sendError(reply, error.status, error.code, error.message);
+          throw error;
+        }
+      }
+      await context.store.saveAssessmentTask(task);
+      if (versionId) context.store.assessmentWorkflow.pin(task.clubId, task.id, versionId);
       reply.code(201);
       return { clubId: request.params.clubId, task };
     },

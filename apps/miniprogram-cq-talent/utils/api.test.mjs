@@ -429,3 +429,19 @@ describe("parent student-home request boundary", () => {
     }
   });
 });
+
+describe("published score display transport", () => {
+  it("preserves standard scores while scaling score measurements by their actual maximum", async () => {
+    const { getCoachStudentRadar } = await import("./api.ts");
+    const original = wx.request;
+    wx.request = ({ success }) => success({ statusCode: 200, data: { overall: 76.5, latest: [
+      { metric: { id: "computed", name: "运控球", maxScore: 20 }, record: { value: { kind: "measurement", value: 15, unit: "score" } } },
+      { metric: { id: "legacy", name: "传接球", maxScore: 10 }, record: { value: { kind: "score_0_100", score: 75 } } },
+      { metric: { id: "unknown", name: "未配置" }, record: { value: { kind: "measurement", value: 5, unit: "score" } } },
+    ] } });
+    try {
+      const points = await getCoachStudentRadar("student-1");
+      expect(points.map((point) => [point.value, point.maxValue, point.overallScore])).toEqual([[15, 20, 76.5], [75, 100, 76.5], [5, 0, 76.5]]);
+    } finally { wx.request = original; }
+  });
+});

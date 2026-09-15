@@ -56,12 +56,29 @@ describe("project-first assessment workflow", () => {
     expect(store.getStudentMetrics(clubId, "student-1")).toEqual(published);
     const corrected = await app.inject({ method: "POST", url: `${base}/publications`, headers, payload: { students: [{ studentId: "student-1", expectedRevision: 3 }] } });
     expect(corrected.json().results[0].success).toBe(true);
+    const correctedRecords = store.getStudentMetrics(clubId, "student-1").filter((record) => record.assessmentId === corrected.json().results[0].assessmentId);
+    const final = correctedRecords.find((record) => record.metricId === "metric-cq-talent-final-score")!;
+    expect(final.value.kind).toBe("measurement");
+    if (final.value.kind === "measurement") {
+      const correctedRadar = await app.inject({ method: "GET", url: `${coachBase}/students/student-1/radar`, headers });
+      expect(correctedRadar.json().overall).toBe(Math.round(final.value.value / 90 * 1000) / 10);
+    }
     const history = await app.inject({ method: "GET", url: `${base}/students/student-1/history`, headers });
     expect(history.json().publications).toHaveLength(2);
     expect(history.json().changes[2]).toMatchObject({ reason: "录入核对更正", entries: [{ before: { score: 100 }, after: { score: 60 } }] });
     const full = await store.recordAssessment({ clubId, studentId: "student-1", assessedByCoachId: "coach-1", templateId: task.templateId, templateVersionId: "assessment-template-version-technical-table-20260904", rawResults: inputs });
     const incremental = published.filter((r) => r.assessmentId === response.json().results[0].assessmentId);
     expect(incremental.map((r) => [r.metricId, r.value]).sort()).toEqual(full.metricRecords.map((r) => [r.metricId, r.value]).sort());
+  });
+  it("keeps a pinned archived template readable and publishable", async () => {
+    const inputs = store.listAssessmentTestItems(clubId).filter((i) => i.id.startsWith("assessment-test-cq-talent-")).map((i) => ({ testItemId: i.id, value: { kind: "score_0_100" as const, score: 80 } }));
+    await save(inputs, 0);
+    const versionId = store.assessmentWorkflow.version(clubId, task.id)!;
+    const config = await store.getDataCapabilityConfig(clubId);
+    config.assessmentTemplateVersions.find((v) => v.id === versionId)!.status = "archived";
+    const form = await app.inject({ method: "GET", url: `/clubs/${clubId}/app-clients/app-client-cq-talent-wechat-main/coach/assessments/templates/${task.templateId}/form?templateVersionId=${versionId}`, headers });
+    expect(form.statusCode, form.body).toBe(200);
+    expect((await assessmentWorkflow(store).publish(task, "student-1", "coach-1", 1)).replayed).toBe(false);
   });
   it("rolls back published facts when the publication pointer cannot be persisted", async () => {
     const entries = store.listAssessmentTestItems(clubId).filter((i) => i.id.startsWith("assessment-test-cq-talent-")).map((i) => ({ testItemId: i.id, value: { kind: "score_0_100" as const, score: 80 } }));

@@ -1,3 +1,4 @@
+import { transaction } from "./transaction.js";
 import type {
   AssessmentRawResult,
   AssessmentScore,
@@ -9,26 +10,14 @@ import type {
 } from "@football-club/domain";
 import type { DatabaseSync } from "node:sqlite";
 import type { SQLInputValue } from "node:sqlite";
-import { SerialOperation } from "../application/serial-operation.js";
 
 type SqlRow = Record<string, unknown>;
 
 export class AssessmentRepository {
-  private readonly operations = new SerialOperation();
   constructor(private readonly database: DatabaseSync) {}
 
-  async transaction<T>(operation: () => Promise<T>): Promise<T> {
-    return this.operations.run(async () => {
-    this.database.exec("BEGIN;");
-    try {
-      const result = await operation();
-      this.database.exec("COMMIT;");
-      return result;
-    } catch (error) {
-      this.database.exec("ROLLBACK;");
-      throw error;
-    }
-    });
+  transaction<T>(operation: () => Promise<T>): Promise<T> {
+    return transaction(this.database, operation);
   }
 
   listAssessments(clubId: EntityId): PlayerAssessment[] {

@@ -123,8 +123,9 @@ Page({
     try {
       const workflow = await getCoachAssessmentWorkflow(this.data.taskId);
       const ready = workflow.students.filter((student) => student.canPublish);
+      this.setData({ publicationLabel: `已发布 ${workflow.publishedStudents}/${workflow.totalStudents} 人 · 待发布 ${ready.length} 人` });
       if (!workflow.canEdit || !ready.length) {
-        this.setData({ publicationMessage: "当前没有可发布的学员，请先录齐并保存所有项目。", canPublish: false });
+        this.setData({ publicationMessage: "当前成绩已发布或尚未录齐，请核对项目进度。", canPublish: false });
         return;
       }
       const answer = await new Promise<{ confirm: boolean }>((resolve) => wx.showModal({ success: resolve, title: `确认发布 ${ready.length} 名学员`, content: `${ready.map((student) => student.name).join("、")}\n发布后，家长和能力雷达将展示本次成绩。` }));

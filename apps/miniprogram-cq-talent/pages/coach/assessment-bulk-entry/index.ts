@@ -149,6 +149,10 @@ Page<PageData>({
         return;
       }
 
+      if (task.workflow?.error) {
+        this.setData({ state: "error", statusTitle: "当前任务暂不可录入", message: task.workflow.error });
+        return;
+      }
       const [form, team, savedEntries] = await Promise.all([
         task.workflow ? getAssessmentForm(templateId, task.workflow.templateVersionId) : getAssessmentForm(templateId),
         getCoachTeam(task.teamId),
@@ -303,7 +307,7 @@ Page<PageData>({
             expectedRevision: revision, entries: rawResults, reason: this.data.correctionReason.trim() || undefined,
           });
           this.setData({ studentStates: { ...this.data.studentStates, [row.studentId]: {
-            revision: saved.revision, publishedRevision: saved.publications.at(-1)?.revision ?? null,
+            revision: saved.revision, publishedRevision: saved.publications[saved.publications.length - 1]?.revision ?? null,
           } } });
         } else await submitCoachAssessment({
           studentId: row.studentId,

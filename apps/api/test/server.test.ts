@@ -156,6 +156,10 @@ describe("api server", () => {
     expect(response.statusCode).toBe(200);
     expect(body.openapi).toBe("3.1.0");
     expect(body.paths["/app-clients/resolve"]).toBeDefined();
+    const workflowBase = "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}";
+    for (const suffix of ["/workflow", "/students/{studentId}/entries", "/students/{studentId}/history", "/publications"]) {
+      expect(body.paths[`${workflowBase}${suffix}`]).toBeDefined();
+    }
     expect(body.paths["/clubs/{clubId}/capabilities"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/admin/app-clients"]).toBeDefined();
     expect(body.paths["/clubs/{clubId}/app-clients/{clientId}/parent/children"]).toBeDefined();

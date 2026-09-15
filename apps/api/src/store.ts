@@ -1008,7 +1008,7 @@ export abstract class SeedBackedStore implements ApiStore {
   }
 
   listAbilityMetrics(clubId: EntityId): AbilityMetric[] {
-    return withScoreMaxima(this.data.metrics.filter((item) => isCatalogVisibleToClub(item, clubId)), this.listDerivedMetricDefinitions(clubId));
+    return withScoreMaxima(this.data.metrics.filter((item) => isCatalogVisibleToClub(item, clubId)), this.listDerivedMetricDefinitions(clubId), this.listMetricDependencies(clubId));
   }
 
   listMetricGraphVersions(clubId: EntityId): MetricGraphVersion[] {
@@ -2246,7 +2246,7 @@ export abstract class SeedBackedStore implements ApiStore {
     this.data.assessmentTemplateVersions.find((version) =>
       version.clubId === clubId
       && version.templateId === templateId
-      && version.status === "active"
+      && (version.status === "active" || (version.status === "archived" && Boolean(templateVersionId)))
       && (!templateVersionId || version.id === templateVersionId),
     ) ?? null;
 
@@ -2263,7 +2263,7 @@ export abstract class SeedBackedStore implements ApiStore {
     const versions = this.data.assessmentTemplateVersions.filter((version) =>
       version.clubId === clubId
       && version.templateId === templateId
-      && version.status === "active"
+      && (version.status === "active" || (version.status === "archived" && Boolean(templateVersionId)))
       && (!templateVersionId || version.id === templateVersionId),
     );
     const versionIds = new Set(versions.map((version) => version.id));
@@ -2630,7 +2630,7 @@ export class PersistentApiStore extends SeedBackedStore {
         findTemplateVersion: (clubId, templateId, templateVersionId) => this.data.assessmentTemplateVersions.find((version) =>
           version.clubId === clubId
           && version.templateId === templateId
-          && version.status === "active"
+          && (version.status === "active" || (version.status === "archived" && Boolean(templateVersionId)))
           && (!templateVersionId || version.id === templateVersionId),
         ) ?? null,
         findMetricGraphVersion: (clubId, graphVersionId) => this.data.metricGraphVersions.find((version) =>
@@ -2641,7 +2641,7 @@ export class PersistentApiStore extends SeedBackedStore {
             .filter((version) =>
               version.clubId === clubId
               && version.templateId === templateId
-              && version.status === "active"
+              && (version.status === "active" || (version.status === "archived" && Boolean(templateVersionId)))
               && (!templateVersionId || version.id === templateVersionId),
             )
             .map((version) => version.id));

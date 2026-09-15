@@ -1,16 +1,18 @@
-import { getNumericMetricValue, type AbilityMetric, type DerivedMetricDefinition, type MetricValue, type PlayerMetricRecord } from "./metrics.js";
+import { getNumericMetricValue, type AbilityMetric, type DerivedMetricDefinition, type MetricValue, type MetricDependency, type PlayerMetricRecord } from "./metrics.js";
 
 /** Derive attainable maxima from the same formulas as the score graph. No database writes. */
-export function withScoreMaxima(metrics: AbilityMetric[], formulas: DerivedMetricDefinition[]): AbilityMetric[] {
+export function withScoreMaxima(metrics: AbilityMetric[], formulas: DerivedMetricDefinition[], dependencies: MetricDependency[] = []): AbilityMetric[] {
   const maxima = new Map(metrics.filter((m) => m.metricKind === "atomic" && Number.isFinite(m.maxScore)).map((m) => [m.id, m.maxScore!]));
   const pending = [...formulas];
   while (pending.length) {
     let changed = false;
     for (let index = pending.length - 1; index >= 0; index -= 1) {
       const formula = pending[index]!;
-      const values = formula.inputMetricIds.map((id) => maxima.get(id));
+      const incoming = dependencies.filter((edge) => edge.outputMetricId === formula.outputMetricId && (!edge.formulaId || edge.formulaId === formula.id));
+      const inputIds = incoming.length ? incoming.map((edge) => edge.inputMetricId) : formula.inputMetricIds;
+      const values = inputIds.map((id) => maxima.get(id));
       if (!values.length || values.some((v) => v === undefined)) continue;
-      const weights = formula.inputMetricIds.map((id) => formula.weights?.[id] ?? 1);
+      const weights = inputIds.map((id) => incoming.find((edge) => edge.inputMetricId === id)?.weight ?? formula.weights?.[id] ?? 1);
       const weighted = values.reduce<number>((total, value, i) => total + value! * weights[i]!, 0);
       let maximum: number | undefined;
       if (formula.method === "sum") maximum = values.reduce<number>((total, value) => total + value!, 0);
@@ -25,12 +27,17 @@ export function withScoreMaxima(metrics: AbilityMetric[], formulas: DerivedMetri
   return metrics.map((metric) => maxima.has(metric.id) ? { ...metric, maxScore: maxima.get(metric.id)! } : metric);
 }
 
-export function scorePercent(value: MetricValue, metric?: Pick<AbilityMetric, "maxScore" | "unit">): number | null {
+function exactScorePercent(value: MetricValue, metric?: Pick<AbilityMetric, "maxScore" | "unit">): number | null {
   const number = getNumericMetricValue(value);
   if (number === null || !Number.isFinite(number)) return null;
   const max = value.kind === "rating_1_5" ? 5 : value.kind === "score_0_100" || value.kind === "percentage" ? 100
     : value.kind === "measurement" && value.unit === "score" ? metric?.maxScore : undefined;
-  return max && Number.isFinite(max) && max > 0 ? Math.round(Math.max(0, Math.min(100, number / max * 100)) * 10) / 10 : null;
+  return max && Number.isFinite(max) && max > 0 ? Math.max(0, Math.min(100, number / max * 100)) : null;
+}
+
+export function scorePercent(value: MetricValue, metric?: Pick<AbilityMetric, "maxScore" | "unit">): number | null {
+  const percent = exactScorePercent(value, metric);
+  return percent === null ? null : Math.round(percent * 10) / 10;
 }
 
 export function overallScore(records: PlayerMetricRecord[], metrics: AbilityMetric[]): number | null {
@@ -39,7 +46,7 @@ export function overallScore(records: PlayerMetricRecord[], metrics: AbilityMetr
   for (const metric of metrics) {
     const record = records.filter((r) => r.metricId === metric.id).sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt))[0];
     if (!record) return null;
-    const percent = scorePercent(record.value, metric);
+    const percent = exactScorePercent(record.value, metric);
     if (percent === null) return null;
     const weight = metric.maxScore ?? 100;
     total += percent * weight; maximum += weight;

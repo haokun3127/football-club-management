@@ -1,3 +1,4 @@
+import { transaction } from "./transaction.js";
 import type { Match, MatchEvent, MatchRoster, PlayerMetricRecord } from "@football-club/domain";
 import type { DatabaseSync, SQLInputValue } from "node:sqlite";
 
@@ -6,16 +7,8 @@ type SqlRow = Record<string, unknown>;
 export class MatchRepository {
   constructor(private readonly database: DatabaseSync) {}
 
-  async transaction<T>(operation: () => Promise<T>): Promise<T> {
-    this.database.exec("BEGIN;");
-    try {
-      const result = await operation();
-      this.database.exec("COMMIT;");
-      return result;
-    } catch (error) {
-      this.database.exec("ROLLBACK;");
-      throw error;
-    }
+  transaction<T>(operation: () => Promise<T>): Promise<T> {
+    return transaction(this.database, operation);
   }
 
   listMatches(clubId: string): Match[] {
