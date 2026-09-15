@@ -31,6 +31,14 @@ node scripts/devtools/wechatide-mcp-capture.cjs \
 
 以下 Automator/窗口截图说明全部是历史或人工明确指定的排障资料，不会被 MCP 命令自动调用，且不能作为当前 Figma 视觉验收证据。当前验收只接受 MCP 命令生成、路由已核验且严格 `375×812` 的 PNG 与 sidecar。
 
+### macOS 测试基础修正（2026-09-15）
+
+`apps/miniprogram-cq-talent/scripts/devtools-screenshot.mjs` 的排障输出使用宿主原生路径；macOS 可传 `/tmp/...png`，Windows 继续使用本机绝对路径。输出父目录必须存在，解析符号链接后也必须位于仓库外，不能覆盖已有 PNG 或 sidecar。临时截图与原子写入路径遵循同一平台规则。
+
+Windows CLI 单元测试同时注入进程启动和文件存在检查，不要求 macOS 安装 `D:\微信web开发者工具\cli.bat`；真实运行仍检查 CLI 文件是否存在。连接成功不代表页面可操作，连接后的页面读取同样有超时边界。macOS 上跳过的原生 Windows 窗口枚举测试不代表 Windows 实机验收通过。
+
+本机旧版 2.01.2510290 出现最小离线页面可见、Automator 页面读取超时的现象。此时先核实工具运行时，不能通过修改业务页面或延长无界等待来掩盖问题。上述路径/超时修复不改变 MCP 作为视觉验收默认通道的约定。
+
 `tmp/prod-verify/sweep3.sh` 至 `sweep6.sh` 以及同目录的像素探针也属于历史排障入口；它们现在通过共享路径解析器读取 `CQ_TALENT_VISUAL_EVIDENCE_DIR`，默认仍落到系统临时目录。旧日志或旧文档中的 `C:\Users\ASUS\cq-talent-visual-evidence` 仅代表历史产物位置，不应作为新证据输出位置。
 
 ## 历史 Automator 前提（仅紧急回退）

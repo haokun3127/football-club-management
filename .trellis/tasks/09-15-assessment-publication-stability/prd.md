@@ -30,3 +30,7 @@ User approved the plan and small commits on 2026-09-15; no further commit confir
 ## Subsequent deployment authorization
 
 User authorized deployment if ready. The 2026-09-15 readiness check found public health normal, but documented SSH access failed with public-key authentication rejection. No production mutation was performed; see validation.md.
+
+## Test environment remediation
+
+User explicitly requested correction of local prerequisites behind the four previously failing tests. Scope includes host-native screenshot paths, deterministic Windows CLI fixtures, bounded runtime probes and verification of the installed WeChat toolchain. No test bypass or business behavior changes are authorized by this remediation alone.
