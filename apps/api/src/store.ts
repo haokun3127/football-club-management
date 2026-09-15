@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { MemoryAssessmentWorkflowRepository, type AssessmentWorkflowRepository } from "./application/assessment-workflow-types.js";
 import {
   createAssessmentService,
+  withScoreMaxima,
   createMatchService,
   createMetricService,
   isCatalogVisibleToClub,
@@ -1007,7 +1008,7 @@ export abstract class SeedBackedStore implements ApiStore {
   }
 
   listAbilityMetrics(clubId: EntityId): AbilityMetric[] {
-    return this.data.metrics.filter((item) => isCatalogVisibleToClub(item, clubId));
+    return withScoreMaxima(this.data.metrics.filter((item) => isCatalogVisibleToClub(item, clubId)), this.listDerivedMetricDefinitions(clubId));
   }
 
   listMetricGraphVersions(clubId: EntityId): MetricGraphVersion[] {

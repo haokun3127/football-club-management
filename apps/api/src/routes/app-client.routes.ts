@@ -12,6 +12,7 @@ import { schemas } from "../http/schemas.js";
 import { buildTrainingContentTree } from "../application/training-content-catalog.js";
 import type { RouteContext } from "./context.js";
 import { assessmentWorkflow, publicationEnabled, AssessmentWorkflowError } from "../application/assessment-workflow.js";
+import { scorePercent, overallScore } from "@football-club/domain";
 
 interface AppEventDetail {
   id: string;
@@ -1277,11 +1278,11 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       ]);
 
       // 同龄均值：全俱乐部每个学生的每指标最新记录按 0-100 归一求均值，再折算回本学生记录的量纲
-      const peerAverageByMetric = buildPeerAverages(context.store.listMetricRecords(request.params.clubId));
+      const peerAverageByMetric = buildPeerAverages(context.store.listMetricRecords(request.params.clubId), metricCatalog);
       const latest = buildLatestMetricRecords(metricRecords, metricCatalog)
         .map((entry) => {
           const normalized = peerAverageByMetric.get(entry.metricId);
-          return { ...entry, peerAverage: normalized === undefined ? null : rescaleToRecordKind(normalized, entry.record?.value) };
+          return { ...entry, peerAverage: normalized === undefined ? null : rescaleToRecordKind(normalized, entry.record?.value, entry.metric?.maxScore) };
         });
 
       // P4 成长首页训练统计：课时总数/出勤率/本月训练/月度分布（真实参与记录推导）
@@ -1306,6 +1307,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         },
         metrics: metricCatalog,
         latest,
+        overall: overallScore(metricRecords, metricCatalog.filter((m) => m.metricKind === "composite")),
         trends: buildMetricTrends(metricRecords),
         trainingStats,
         timeline,
@@ -2241,8 +2243,10 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return reply;
       }
 
-      const scope = await collectCoachScope(context, request.params.clubId, auth);
-      if (context.membershipResolver && !scope.students.some((student) => student.id === request.params.studentId)) {
+      const teamIds = new Set(collectCoachTeamOptions(context, request.params.clubId, auth).map((team) => team.id));
+      const accessible = context.store.listTeamMembers(request.params.clubId).some((member) =>
+        member.studentId === request.params.studentId && member.status === "active" && teamIds.has(member.teamId));
+      if (context.membershipResolver && !accessible) {
         return context.sendError(reply, 403, "forbidden", "Student is not accessible for this coach membership");
       }
 
@@ -2264,6 +2268,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         role: "coach",
         studentId: request.params.studentId,
         metrics: radarMetricCatalog,
+        overall: overallScore(radarMetricRecords, radarMetricCatalog),
         latest: buildLatestMetricRecords(radarMetricRecords, radarMetricCatalog),
       };
     },
@@ -2324,18 +2329,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         records: await context.store.getStudentMetrics(request.params.clubId, student.id),
       })));
 
-      const studentScores = perStudent.map((student) => {
-        const scores = buildLatestMetricRecords(
-          student.records.filter((record) => radarMetricIds.has(record.metricId)),
-          radarMetricCatalog,
-        )
-          .map(({ record }) => metricNumericValue(record.value))
-          .filter((value): value is number => value !== null);
-        return {
-          studentId: student.studentId,
-          overall: scores.length ? round1(scores.reduce((sum, value) => sum + value, 0) / scores.length) : null,
-        };
-      });
+      const studentScores = perStudent.map((student) => ({ studentId: student.studentId, overall: overallScore(student.records, radarMetricCatalog) }));
 
       // Keep the overview aligned with the same core radar dimensions used by
       // the individual player page, so the aggregate response is a drop-in
@@ -2344,7 +2338,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         const latestValues: number[] = [];
         for (const student of perStudent) {
           const record = student.records.find((item) => item.metricId === metric.id);
-          const value = record ? metricNumericValue(record.value) : null;
+          const value = record ? scorePercent(record.value, metric) : null;
           if (value !== null) {
             latestValues.push(value);
           }
@@ -2367,8 +2361,9 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
           byMetric.set(record.metricId, list);
         }
         for (const records of byMetric.values()) {
-          const current = records[0] ? metricNumericValue(records[0].value) : null;
-          const previous = records[1] ? metricNumericValue(records[1].value) : null;
+          const metric = metricCatalog.find((m) => m.id === records[0]?.metricId);
+          const current = records[0] ? scorePercent(records[0].value, metric) : null;
+          const previous = records[1] ? scorePercent(records[1].value, metric) : null;
           if (current !== null && previous !== null) {
             deltas.push(current - previous);
           }
@@ -3752,6 +3747,9 @@ async function buildStudentGrowthTimeline(
       .map((assessment) => [assessment.id, assessment.assessmentTaskId] as const),
   );
   const recordsByMetricId = new Map<string, PlayerMetricRecord[]>();
+  const publications = (await context.store.listAssessmentTasks(clubId)).flatMap((task) =>
+    context.store.assessmentWorkflow.get(clubId, task.id, studentId)?.publications ?? []);
+  const publishedIds = new Set(publications.map((p) => p.assessmentId));
   for (const record of metricRecords) {
     const list = recordsByMetricId.get(record.metricId) ?? [];
     list.push(record);
@@ -3761,6 +3759,7 @@ async function buildStudentGrowthTimeline(
     records.sort((left, right) => Date.parse(left.occurredAt) - Date.parse(right.occurredAt));
     for (let index = 0; index < records.length; index += 1) {
       const record = records[index]!;
+      if (record.assessmentId && publishedIds.has(record.assessmentId)) continue;
       if (record.source !== "assessment" || !record.assessmentId || !taskByAssessmentId.has(record.assessmentId)) continue;
       const previous = index > 0 ? metricNumericValue(records[index - 1]!.value) : null;
       const value = metricNumericValue(record.value);
@@ -3782,6 +3781,19 @@ async function buildStudentGrowthTimeline(
         },
       });
     }
+  }
+
+  for (const publication of publications) {
+    const published = metricRecords.filter((r) => r.assessmentId === publication.assessmentId && metricById.get(r.metricId)?.metricKind === "composite");
+    if (!published.length) continue;
+    timeline.push({ id: `assessment-publication-${publication.assessmentId}`, kind: "ability_update", occurredAt: publication.publishedAt,
+      title: "教练已发布评测结果", subtitle: `能力评测 · 修订 ${publication.revision}`,
+      abilityUpdate: { source: "semester_assessment", metrics: published.map((r) => {
+        const metric = metricById.get(r.metricId)!;
+        const previous = (recordsByMetricId.get(r.metricId) ?? []).filter((p) => p.assessmentId !== r.assessmentId && Date.parse(p.occurredAt) < Date.parse(r.occurredAt)).at(-1);
+        return { metricId: r.metricId, label: metric.name, value: scorePercent(r.value, metric), previousValue: previous ? scorePercent(previous.value, metric) : null };
+      }) },
+    });
   }
 
   return [...timeline, ...trainingAssessmentItems]
@@ -3918,11 +3930,11 @@ function splitHomeSchedule(events: AppEventDetail[]) {
   };
 }
 
-function buildPeerAverages(records: PlayerMetricRecord[]): Map<string, number> {
+function buildPeerAverages(records: PlayerMetricRecord[], metrics: ReturnType<RouteContext["store"]["listAbilityMetrics"]>): Map<string, number> {
   // 每（指标, 学生）取最新一条并按 0-100 归一（metricNumericValue），再跨学生求均值
   const latestByStudentMetric = new Map<string, { occurredAt: string; score: number }>();
   for (const record of records) {
-    const score = metricNumericValue(record.value);
+    const score = scorePercent(record.value, metrics.find((m) => m.id === record.metricId));
     if (score === null) continue;
     const key = `${record.metricId}::${record.studentId}`;
     const existing = latestByStudentMetric.get(key);
@@ -3943,10 +3955,11 @@ function buildPeerAverages(records: PlayerMetricRecord[]): Map<string, number> {
 }
 
 // 把 0-100 归一均值折算回目标记录的量纲（rating_1_5 → ÷20，rating_1_10 → ÷10，其余保持百分制）
-function rescaleToRecordKind(normalized: number, value: unknown): number {
+function rescaleToRecordKind(normalized: number, value: unknown, maxScore?: number): number {
   const kind = (value as { kind?: string } | null)?.kind;
   if (kind === "rating_1_5") return Number((normalized / 20).toFixed(1));
   if (kind === "rating_1_10") return Number((normalized / 10).toFixed(1));
+  if (kind === "measurement" && maxScore) return Number((normalized * maxScore / 100).toFixed(1));
   return normalized;
 }
 
