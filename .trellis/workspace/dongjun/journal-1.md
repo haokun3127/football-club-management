@@ -1079,3 +1079,38 @@ Fixed native screenshot paths, isolated Windows CLI fixtures and bounded page pr
 ### Next Steps
 
 - None - task complete
+
+
+## Session 30: Prepare formal assessment release and restore rehearsal
+
+**Date**: 2026-09-16
+**Task**: Prepare formal assessment release and restore rehearsal
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+Added read-only pinned GitHub CI; frozen install/check/build pass (675 tests, one native Windows skip). Native project save/reopen and unpublished isolation verified; real publish confirmation pending Mac unlock. Built immutable b050391 image, took restricted consistent production backup, booted its copy with no network, and verified all existing values in 12 critical tables unchanged. Production remains on c893adb. GitHub push denied: clint-cpu lacks write permission; requested access. Detailed resume/cutover gates in release.md. Task remains active.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `b050391` | (see git log) |
+| `fb40f18` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
