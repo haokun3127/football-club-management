@@ -116,3 +116,11 @@ Installed the same verified official app alongside the old app at `/Applications
 - `simulator_screenshot --optimize false --wait-for-selector view` generated `/tmp/fcm-devtools-installed-verified.png` (624×1352); visual inspection confirms `本地自动化正常`.
 
 This is an offline toolchain smoke check, not production authentication or assessment-flow/Figma acceptance. The original `/Applications/wechatwebdevtools.app`, existing project configuration and production service remain unchanged. Use the fixed new entrypoint for subsequent runtime acceptance; old Automator probes are not the default. Two automatic shell-review deadlines were retried successfully; neither is an unresolved tool failure.
+
+## Native acceptance and authorized online cutover — 2026-09-16
+
+Supersedes the earlier runtime/deployment blockers above. Actual native controls passed save/reopen, real publish confirmation, reason-required zero correction, cancellation, republish and history. Coach and parent published scores agreed at 100, stayed 100 during correction draft/cancel, and became 94.4 after republish. Parent radar and history were visually verified. No business-code change was needed; the existing full check/build results apply to the same immutable source.
+
+Uploaded a separate clean committed production-config mini-program as `0.1.0-20260916`; official CLI returned success. Deployed API source `b0503919871efe842f531b5f5acd109d7f46ca2e` after fresh restricted backup and restored-copy rehearsal. Internal/public health, expected unauthenticated 403, SQLite integrity and all existing values across 12 critical tables passed. Default Compose is pinned to the release; rollback image/config retained.
+
+Public WeChat release is unconfirmed: browser tool site-safety policy blocks the platform administration site and prohibits workarounds; requested manual platform completion. GitHub push remains denied (account lacks write permission). Workflow allowlist remains empty, pending matching public-client and authenticated production acceptance. Detailed receipts, immutable IDs, backup paths, evidence and remaining gates are in `release.md`. Task is not archived.

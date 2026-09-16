@@ -13,14 +13,16 @@
 - Mini-program TypeScript and business controller tests; report existing screenshot helper failures separately.
 - New tests: DB reopen, stale revision, duplicate/no-op, bad input, date/role/team scopes, disabled/adopted tasks, incremental/full equivalence, partial publication batch, correction visibility.
 - Full pnpm check and git diff --check. Do not silently waive baseline defects.
-- Temporary DBs/screenshots outside repo; no production writes.
+- Temporary DBs/screenshots outside repo; production changes only under explicit release authorization below.
 
 ## Formal release work — authorized 2026-09-16
 
-- [ ] Verify the committed mini-program in the working native runtime with an isolated local API: project save/reopen, publication, shared scores and correction/history.
-- [ ] Fix observed defects in small commits; run relevant tests and final frozen-lockfile/check/build/migration smoke against the release tree.
+- [x] Verify the committed mini-program in the working native runtime with an isolated local API: project save/reopen, publication, shared scores and correction/history.
+- [x] Fix observed defects in small commits; run relevant tests and final frozen-lockfile/check/build/migration smoke against the release tree.
 - [ ] Verify GitHub repository/default branch/remote divergence and push reviewed commits through the repository's release process.
-- [ ] Inspect live compose/image/storage/proxy and rollout flags without exposing credentials; prepare restricted consistent DB backup and verify restore/migrations before cutover.
-- [ ] Deploy an immutable revision-tagged API image, verify health and compatibility, retain rollback artifacts. Keep workflow allowlist off until matching mini-program is accepted.
+- [x] Inspect live compose/image/storage/proxy and rollout flags without exposing credentials; prepare restricted consistent DB backup and verify restore/migrations before cutover.
+- [x] Deploy an immutable revision-tagged API image, verify health and compatibility, retain rollback artifacts. Keep workflow allowlist off until matching mini-program is accepted.
 - [ ] Compile/preview/upload the matching mini-program; verify platform release/review requirements and advance as authorization/account capabilities permit.
 - [ ] Record exact versions, checks, release URLs, rollback steps and any platform dependency. Archive only after applicable acceptance is complete.
+
+2026-09-16: Native workflow passed, clean mini-program `0.1.0-20260916` uploaded, API `b050391` deployed and checked. Default Compose pinned; restricted backup and image rollback retained. Upload is complete; platform public release and GitHub write access remain pending. See `release.md` for evidence and precise remaining gates.
