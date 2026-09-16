@@ -1,6 +1,6 @@
 # Formal release status — 2026-09-16
 
-Status: native workflow acceptance passed; matching mini-program uploaded; production API switched successfully. GitHub delivery and WeChat platform review/public release remain pending. The user explicitly authorized upload and online cutover. Keep this task active until the remaining delivery and rollout acceptance is complete.
+Status: native workflow acceptance passed; matching mini-program uploaded as `9.7.4` following the user-confirmed `9.7.3` trial version; production API switched successfully. GitHub delivery and WeChat platform review/public release remain pending. The user explicitly authorized upload and online cutover. Keep this task active until the remaining delivery and rollout acceptance is complete.
 
 ## Candidate and checks
 
@@ -27,10 +27,12 @@ These are native simulator/local-fixture checks, not a claim of authenticated pr
 
 ## Matching mini-program — uploaded, public release unconfirmed
 
-- App ID: `wx4c588cd106e520e0`; uploaded version: `0.1.0-20260916`.
+- App ID: `wx4c588cd106e520e0`; latest uploaded version: `9.7.4`. The earlier `0.1.0-20260916` upload was superseded for this delivery by the user-requested continuation of the `9.7.3` version sequence.
 - Clean upload directory: `/tmp/fcm-release-validation/upload-b050391`, 408 committed files. Each included file matches the source commit; manifest: `upload-manifest.json` in the validation directory.
 - All three client environments use `https://cqtc.pomi.tech`; `DEV_AUTO_SESSION` is false; no local session bootstrap or localhost endpoint was included.
-- Official stable DevTools CLI returned upload success, package size 1,243,081 bytes. Receipt: `/tmp/fcm-release-validation/tool-1789523074567330000.json`.
+- Official stable DevTools CLI returned upload success for `9.7.4`, package size 1,243,081 bytes. Receipt: `/tmp/fcm-release-validation/tool-1789528111145775000.json`. Earlier `0.1.0-20260916` receipt: `tool-1789523074567330000.json` in the same directory.
+- User confirmed the September 7 `9.7.3` trial belongs to this App ID. The registered old Documents project path resolves to the current repository. Git confirms the last September 7 mini-program commit `b6a3de3` is an ancestor of the candidate; no exact Git-to-`9.7.3` upload mapping is recorded. Rechecked all 408 upload files against `b050391`: no differences. No business-code or API deployment change accompanied this version-number correction.
+- Selecting `9.7.4` as the active trial version is still a separate platform action and is not verified complete. The user should select the new upload in the platform before relying on the existing trial QR code.
 - Browser access to `https://mp.weixin.qq.com/` was rejected by the tool's site-safety policy, explicitly forbidding alternate browser/indirect workarounds. This was not an account login failure or an automatic-approval rejection. Asked the user to complete/check review and public release in the platform.
 - Upload does not establish that Tencent review or public release has completed. No public-release confirmation is available yet.
 
@@ -69,7 +71,7 @@ After rollback, verify image, health and authentication and align the default ov
 
 ## Remaining delivery and rollout gates
 
-- GitHub `haokun3127/football-club-management`: `git push origin dev` failed 403 for `clint-cpu`; authenticated permissions still report `push: false`. Existing GitHub SSH authentication also failed. User action is needed to grant write access or sign in with an authorized account. No force push, credential extraction or alternate repository was attempted. Once restored, fetch/recheck divergence, push `dev` normally, and inspect CI. Do not merge the unrelated, substantially older `master` into this release.
+- GitHub `haokun3127/football-club-management`: `git push origin dev` failed 403 for `clint-cpu`; authenticated permissions still report `push: false`. Existing GitHub SSH authentication also failed. After the user reported permission was granted, a fresh fetch showed 0 remote-only and 20 local-only commits; one actual push retry still returned HTTP 403 for `clint-cpu`, and API permissions remained `push: false`. User action is needed to grant write access or sign in with an authorized account. No force push, credential extraction or alternate repository was attempted. Once restored, fetch/recheck divergence, push `dev` normally, and inspect CI. Do not merge the unrelated, substantially older `master` into this release.
 - WeChat platform review/public release requires user completion due to the site-safety restriction above. Record the actual released version and status before rollout.
 - `FCM_ASSESSMENT_PUBLICATION_CLUBS` remains empty. API deployment and mini-program upload do not enable the new managed workflow for existing online clients.
 - After the matching public client is available, verify real authenticated coach/parent requests and old-task compatibility, then enable only the intended club and confirm the full workflow. No production synthetic session or test record was created in this release.
