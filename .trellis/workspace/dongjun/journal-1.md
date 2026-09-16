@@ -1114,3 +1114,41 @@ Added read-only pinned GitHub CI; frozen install/check/build pass (675 tests, on
 ### Next Steps
 
 - None - task complete
+
+
+## Session 31: Accept assessment workflow and deploy production API
+
+**Date**: 2026-09-16
+**Task**: Accept assessment workflow and deploy production API
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+Native save/publication/correction/history acceptance passed; clean mini-program 0.1.0-20260916 uploaded and API b050391 deployed. Health, auth guard, integrity and 12-table old-value comparison pass. Pinned default Compose and retained restricted backup/rollback. GitHub write access and WeChat public release remain pending; workflow allowlist stays off and task remains active.
+
+### Main Changes
+
+- Actual native confirmation and cancellation passed; published coach/parent scores stayed 100 during the zero-score correction draft and became 94.4 after republish. Parent radar and history verified.
+- Fresh pre-cutover backup and old image retained; no existing values changed in 12 critical tables. Default Compose pinned to the deployed release; rehearsal DB moved out of the build source.
+- WeChat upload succeeded; platform browser blocked by site-safety policy, so public release requires user completion. GitHub account lacks write access. No completed remote CI/public-client/production-authentication acceptance is claimed.
+- Full release evidence and remaining gates: .trellis/tasks/09-15-assessment-publication-stability/release.md.
+
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `1d9a473` | (see git log) |
+
+### Testing
+
+- [OK] Native workflow and upload; internal/public health; expected unauthenticated 403; SQLite integrity and 12-table data preservation. Source passed 675 tests with one native Windows skip, type checks and build.
+
+### Status
+
+**Release partially delivered; task remains active.**
+
+### Next Steps
+
+- Restore GitHub write access and verify CI; complete WeChat public release; verify authenticated production flows before club rollout.
