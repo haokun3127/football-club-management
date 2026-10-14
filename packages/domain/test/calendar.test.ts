@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { expandRecurringCalendarEvent, expandRecurringTimeRanges, findScheduleConflicts } from "../src/index.js";
 
 describe("findScheduleConflicts", () => {
@@ -131,3 +131,15 @@ describe("findScheduleConflicts", () => {
     ]);
   });
 });
+
+for (const hostTimezone of ["UTC", "Asia/Hong_Kong", "America/Los_Angeles"]) {
+  it(`keeps business wall times and absolute UNTIL independent of host ${hostTimezone}`, () => {
+    vi.stubEnv("TZ", hostTimezone);
+    try {
+      const event = { id: "dst-series", clubId: "club", type: "training" as const, title: "Weekly", status: "scheduled" as const, createdAt: "2026-02-01T00:00:00Z", updatedAt: "2026-02-01T00:00:00Z", timeRange: { startsAt: "2026-03-01T14:00:00Z", endsAt: "2026-03-01T15:30:00Z" } };
+      const rows = expandRecurringCalendarEvent({ event, recurrence: { startsAt: event.timeRange.startsAt, timezone: "America/New_York", rrule: "FREQ=WEEKLY;UNTIL=20260315T130000Z" }, range: { startsAt: "2026-03-01T00:00:00Z", endsAt: "2026-03-22T23:59:59Z" } });
+      expect(rows.map(row => row.timeRange.startsAt)).toEqual(["2026-03-01T14:00:00Z", "2026-03-08T13:00:00Z", "2026-03-15T13:00:00Z"]);
+      expect(rows.map(row => Date.parse(row.timeRange.endsAt) - Date.parse(row.timeRange.startsAt))).toEqual([5_400_000,5_400_000,5_400_000]);
+    } finally { vi.unstubAllEnvs(); }
+  });
+}

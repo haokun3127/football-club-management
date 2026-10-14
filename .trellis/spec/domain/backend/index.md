@@ -36,3 +36,5 @@ The goal is to help AI assistants and new team members understand how YOUR proje
 ---
 
 **Language**: All documentation should be written in **English**.
+
+- [Recurring Calendar Timezones](./calendar-timezones.md): explicit wall-time recurrence, host-independent instants, UTC/DST regression.

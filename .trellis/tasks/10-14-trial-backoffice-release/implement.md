@@ -30,3 +30,8 @@ Native官方真实渲染尚未通过：首页page data只有__webviewId__，cons
 原生补验：官方刷新本身未解决helper缺失；去掉首页解构后单一会话通过，/tmp/fcm-native-release-actions-20261014.log退出0。两截图已查看，成绩三层/版本/历史正常；截图还发现首页四按钮默认宽度导致横向溢出，已最小改flex等分并进行复拍。用户已扫码平台登录，账号名重庆天才足球俱乐部/AppID匹配。平台当前显示未备案，不扩展为正式上架操作。
 
 最终截图复核：四入口改flex后全在视口，编辑面板/取消/保存无溢出；/tmp/fcm-native-layout-final-20261014.log退出0，夹具和会话已恢复。最终门禁发现退休用语筛选参数隐式any，已仅补类型注解，mini typecheck退出0；最终完整门禁/tmp/fcm-delivery-release-ready-20261014.log运行中。具体提交清单commit-plan.md约384源码配置+102文档规格，排除534项无关/原有本地工作；未包含.env、数据库、credentials、private config、node_modules/dist。
+
+## CI根因修复
+批准两批已提交并推送：806c40770526源码、e4e04373ff66文档；GitHub同SHA CI38528557783暴露rrule TZID按主机时区转换，UTC返回01Z而本地香港返回09Z。不是权限或CI配置问题。已用既有Temporal显式业务墙钟→UTC浮动规则→业务时区真实瞬时修复，并增加UTC/香港/洛杉矶主机、纽约夏令时、绝对UNTIL及90分钟时长回归，定向7/7通过；TZ=UTC全交付运行中。新镜像必须随修复后SHA重新构建，旧e4e镜像未部署。原e4e Linux构建/非联网只读node用户模块加载成功；生产仍未操作。
+
+TZ=UTC pnpm check:delivery /tmp/fcm-delivery-utc-20261014.log退出0：domain38/API230/mini566+1skip/backoffice2；类型/构建/9工具及3运行入口通过。原香港定向calendar7/7与UTC三主机/DST/UNTIL回归通过。例外修复按已批准收尾发布范围提交，不修改CI期望或全局TZ以掩盖原因。

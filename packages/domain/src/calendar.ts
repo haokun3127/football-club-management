@@ -103,16 +103,35 @@ export function expandRecurringCalendarEvent(input: {
     throw new Error(`Calendar event ${input.event.id} must end after it starts.`);
   }
 
-  const rule = rrulestr(input.recurrence.rrule, {
-    dtstart: new Date(input.recurrence.startsAt),
-    tzid: input.recurrence.timezone,
+  const timezone = input.recurrence.timezone;
+  // RRule's TZID conversion depends on the host timezone. Expand floating wall
+  // times in UTC instead, then use Temporal for the explicit business timezone.
+  const floatingDate = (value: string) => new Date(
+    Temporal.Instant.from(value).toZonedDateTimeISO(timezone)
+      .toPlainDateTime().toZonedDateTime("UTC").epochMilliseconds,
+  );
+  const recurrence = input.recurrence.rrule.replace(
+    /(^|;)UNTIL=(\d{8}T\d{6})Z(?=;|$)/g,
+    (_match, prefix: string, value: string) => {
+      const instant = `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}T${value.slice(9, 11)}:${value.slice(11, 13)}:${value.slice(13, 15)}Z`;
+      return `${prefix}UNTIL=${floatingDate(instant).toISOString().replace(/[-:]/g, "").replace(".000Z", "Z")}`;
+    },
+  );
+  const rule = rrulestr(recurrence, {
+    dtstart: floatingDate(input.recurrence.startsAt),
+    tzid: "UTC",
   });
+  const rangeStart = Temporal.Instant.from(input.range.startsAt);
+  const rangeEnd = Temporal.Instant.from(input.range.endsAt);
   const occurrenceStarts = rule
-    .between(new Date(input.range.startsAt), new Date(input.range.endsAt), true)
+    .between(floatingDate(input.range.startsAt), floatingDate(input.range.endsAt), true)
+    .map(date => Temporal.Instant.from(date.toISOString()).toZonedDateTimeISO("UTC")
+      .toPlainDateTime().toZonedDateTime(timezone).toInstant())
+    .filter(instant => Temporal.Instant.compare(instant, rangeStart) >= 0 && Temporal.Instant.compare(instant, rangeEnd) <= 0)
     .slice(0, input.maxOccurrences ?? 100);
 
   return occurrenceStarts.map((occurrenceStart, index) => {
-    const occurrenceStartInstant = Temporal.Instant.from(occurrenceStart.toISOString());
+    const occurrenceStartInstant = occurrenceStart;
     const occurrenceEndInstant = occurrenceStartInstant.add({ milliseconds: durationMilliseconds });
 
     return {
