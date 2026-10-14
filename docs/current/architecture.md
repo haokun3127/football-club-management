@@ -1,3 +1,5 @@
+> **Historical architecture snapshot (compatibility).** Read [docs/spec/architecture.md](../spec/architecture.md) for the canonical module-boundary entry; below is preserved for provenance and must be verified against the target commit.
+
 # 架构骨架
 
 ## 设计目标

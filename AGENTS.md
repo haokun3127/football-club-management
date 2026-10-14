@@ -30,3 +30,9 @@ For non-trivial engineering work in this repository, use the Trellis project lay
 4. After code changes, run the relevant package checks and use Trellis finish/update-spec flow to record durable lessons.
 
 Keep this overlay additive. Do not remove existing Codex, Hermes, Impeccable, Seedance, or other local skills.
+
+## Canonical Project Specs (2026-10-14)
+
+**Project normative source:** `docs/spec/README.md`. Read it before planning or editing. Product, API/security, Figma implementation, QA, and project workflow overlays are maintained only under `docs/spec/`; do not establish new parallel spec files in task logs or historical handoffs. `PRODUCT.md` and the active `.trellis/spec/api/backend/*.md` files are compatibility pointers; follow their links. Trellis-managed `.trellis/workflow.md` remains the lifecycle engine, not a second owner of project requirements.
+
+For handoff use `docs/status/current.md` (verified dated snapshot), not the oversized append-only `docs/current/progress.md`. `docs/design/specifications/` and offline Figma PNGs are references, not substitutes for current online Figma. Treat tests and runtime visual evidence as separate gates. Do not begin a new UI development cycle merely because documentation changed.

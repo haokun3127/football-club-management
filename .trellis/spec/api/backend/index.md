@@ -1,42 +1,11 @@
-# Backend Development Guidelines
+# API Backend Entry (Trellis compatibility)
 
-> Best practices for backend development in this project.
+> Status: **Active pointer**. Project-level canonical requirements are in [docs/spec/api/](../../../../docs/spec/api/README.md). This path is preserved for Trellis routing; do not maintain a second version of contract prose here.
 
----
+## Must read before changes
 
-## Overview
+- [API/Identity/Persistence contracts](../../../../docs/spec/api/README.md)
+- [Project quality gates](../../../../docs/spec/quality-gates.md)
+- [Trellis workflow](../../../workflow.md) and [project overlay](../../../../docs/spec/workflow.md)
 
-This directory contains guidelines for backend development. Fill in each file with your project's specific conventions.
-
----
-
-## Guidelines Index
-
-| Guide | Description | Status |
-|-------|-------------|--------|
-| [Directory Structure](./directory-structure.md) | Module organization and file layout | To fill |
-| [Database Guidelines](./database-guidelines.md) | ORM patterns, queries, migrations | To fill |
-| [Error Handling](./error-handling.md) | Error types, handling strategies | To fill |
-| [Quality Guidelines](./quality-guidelines.md) | Code standards, forbidden patterns | To fill |
-| [Logging Guidelines](./logging-guidelines.md) | Structured logging, log levels | To fill |
-| [App Client BFF Contracts](./app-client-bff-contracts.md) | Mini-program app-client API boundary and role contracts | Active |
-| [Active Role Sessions](./active-role-sessions.md) | Durable dual-role session and switching contract | Active |
-| [Secure Test-Account Operations](./secure-test-account-operations.md) | Controlled file-SQLite import and rollback contract | Active |
-| [Restart-Safe Phone Binding Seed](./phone-binding-seed.md) | Seed behavior for preserving real WeChat phone bindings across API restarts | Active |
-
----
-
-## How to Fill These Guidelines
-
-For each guideline file:
-
-1. Document your project's **actual conventions** (not ideals)
-2. Include **code examples** from your codebase
-3. List **forbidden patterns** and why
-4. Add **common mistakes** your team has made
-
-The goal is to help AI assistants and new team members understand how YOUR project works.
-
----
-
-**Language**: All documentation should be written in **English**.
+The following generic directory structure, error-handling and logging scaffolds in this Trellis folder are **unfilled templates**, not evidence of project conventions. The frontend layer of `apps/api` is inactive. Derive real implementation behavior from source/tests and update the canonical spec only after review.

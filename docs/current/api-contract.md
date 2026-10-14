@@ -1,3 +1,5 @@
+> **Historical API overview (compatibility).** Current normative contract entry: [docs/spec/api/README.md](../spec/api/README.md). This document is a dated explanatory overview and must not override validated OpenAPI, source code, security and persistent-data contracts.
+
 # API 契约基线
 
 ## Club scope

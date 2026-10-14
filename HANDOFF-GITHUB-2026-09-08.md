@@ -1,3 +1,5 @@
+> **Historical handoff snapshot (2026-09-08)**. This file describes the repository and environment as observed on that date. For new work, use [current dated status](docs/status/current.md), [canonical specs](docs/spec/README.md), and validate the actual branch head. Its SHA and production observations below are not current claims.
+
 # GitHub 接手交接 — 2026-09-08
 
 本文件是仓库的当前接手入口，面向从 GitHub 克隆项目的开发者。
