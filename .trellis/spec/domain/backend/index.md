@@ -1,38 +1,5 @@
-# Backend Development Guidelines
+# Trellis domain/backend index (compatibility)
 
-> Best practices for backend development in this project.
+> Status: **Inactive template directory** | 2026-10-14. The generic files in this directory are incomplete templates, not project-level normative specs.
 
----
-
-## Overview
-
-This directory contains guidelines for backend development. Fill in each file with your project's specific conventions.
-
----
-
-## Guidelines Index
-
-| Guide | Description | Status |
-|-------|-------------|--------|
-| [Directory Structure](./directory-structure.md) | Module organization and file layout | To fill |
-| [Database Guidelines](./database-guidelines.md) | ORM patterns, queries, migrations | To fill |
-| [Error Handling](./error-handling.md) | Error types, handling strategies | To fill |
-| [Quality Guidelines](./quality-guidelines.md) | Code standards, forbidden patterns | To fill |
-| [Logging Guidelines](./logging-guidelines.md) | Structured logging, log levels | To fill |
-
----
-
-## How to Fill These Guidelines
-
-For each guideline file:
-
-1. Document your project's **actual conventions** (not ideals)
-2. Include **code examples** from your codebase
-3. List **forbidden patterns** and why
-4. Add **common mistakes** your team has made
-
-The goal is to help AI assistants and new team members understand how YOUR project works.
-
----
-
-**Language**: All documentation should be written in **English**.
+Project requirements are maintained in [docs/spec/](../../../../docs/spec/README.md). Follow [API](../../../../docs/spec/api/README.md), [Architecture](../../../../docs/spec/architecture.md) and [Quality](../../../../docs/spec/quality-gates.md). The managed Trellis [workflow](../../../workflow.md) still applies. Do not fill or cite dormant template files as currently approved conventions without opening a reviewed spec change.

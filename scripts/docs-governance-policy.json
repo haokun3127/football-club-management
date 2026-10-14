@@ -1,0 +1,47 @@
+{
+  "strictPrefixes": [
+    "docs/spec/",
+    "docs/decisions/",
+    "docs/status/"
+  ],
+  "strictFiles": [
+    "README.md",
+    "AGENTS.md",
+    "PRODUCT.md",
+    "docs/README.md",
+    ".trellis/spec/api/backend/index.md"
+  ],
+  "compatibility": {
+    "PRODUCT.md": "docs/spec/product.md",
+    "docs/current/progress.md": "docs/status/current.md",
+    "docs/current/figma-source-of-truth.md": "docs/spec/figma-current-registry.md",
+    "docs/current/deployment-requirements.md": "docs/spec/operations/deployment.md",
+    "docs/current/miniprogram-manual-acceptance-cq-talent.md": "docs/spec/visual-capture-runbook.md",
+    ".trellis/spec/api/backend/index.md": "docs/spec/api/README.md",
+    ".trellis/spec/api/backend/app-client-bff-contracts.md": "docs/spec/api/app-client-bff-contracts.md",
+    ".trellis/spec/api/backend/active-role-sessions.md": "docs/spec/api/active-role-sessions.md",
+    ".trellis/spec/api/backend/phone-binding-seed.md": "docs/spec/api/phone-binding-seed.md",
+    ".trellis/spec/api/backend/quality-guidelines.md": "docs/spec/api/quality-guidelines.md",
+    ".trellis/spec/api/backend/secure-test-account-operations.md": "docs/spec/api/secure-test-account-operations.md"
+  },
+  "legacyDirectories": {
+    "docs/current/": [
+      "api-contract.md",
+      "architecture.md",
+      "backoffice-product-design.md",
+      "coach-account-team-detail-2026-09-05.md",
+      "customer-test-data-repair-2026-09-07.md",
+      "data-capability-plan.md",
+      "deployment-requirements.md",
+      "figma-source-of-truth.md",
+      "miniprogram-manual-acceptance-cq-talent.md",
+      "miniprogram-release-readiness-cq-talent.md",
+      "progress.md"
+    ],
+    "docs/design/figma/": [
+      "figma-extracted-tokens.md",
+      "figma-full-implementation-decision.md",
+      "figma-v2-visual-audit.md"
+    ]
+  }
+}
