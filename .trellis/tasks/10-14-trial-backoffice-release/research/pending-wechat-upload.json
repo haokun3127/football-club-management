@@ -1,0 +1,10 @@
+{
+  "nextScene": "previewer",
+  "project": "/private/tmp/fcm-release-939676f325b9/apps/miniprogram-cq-talent",
+  "taskId": "confirmation_upload_30bd73b1-02e4-4083-8ef7-0bcb77e53b88",
+  "tool": "upload",
+  "version": "9.7.5",
+  "sourceSHA": "939676f325b9046383c907e0f3f3eac0a2e9628e",
+  "status": "pending",
+  "blocker": "等待用户在腾讯开发者工具确认；继续前查询旧taskId，不重发上传"
+}

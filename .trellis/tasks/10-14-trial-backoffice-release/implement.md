@@ -4,12 +4,12 @@
 - [x] 获用户创建任务同意；读取Trellis和当前上下文、验收及发布记录。
 - [x] 记录混合工作树基线、线上镜像；10项只读环境检查通过；GitHub push=true。
 - [x] 用户明确确认按方案实施与发布；task.py start已激活，已读相关spec正文。
-- [ ] 核清需求覆盖，补公共内容/四快捷入口等已确认缺口并验证。
-- [ ] 刷新46篇官方正文/manifest，审阅变化；策略报告及官方包体/编译。
-- [ ] check:delivery、后台lint、定向测试、Native/浏览器实际交互，diff审阅。
-- [ ] 形成完整依赖与提交清单，一次确认后提交/push并验证CI。
-- [ ] 干净SHA镜像实际构建及权限/模块启动、独立备份和副本迁移/恢复。
-- [ ] develop配置与真实登录/写入回读/权限，晋级同镜像trial。
+- [x] 核清需求覆盖，补公共内容/四快捷入口等已确认缺口并验证。
+- [x] 刷新46篇官方正文/manifest，审阅变化；策略报告及官方包体/编译。
+- [x] check:delivery、后台lint、定向测试、Native/浏览器实际交互，diff审阅。
+- [x] 形成完整依赖与提交清单，一次确认后提交/push并验证CI。
+- [x] 干净SHA镜像实际构建及权限/模块启动、独立备份和副本迁移/恢复。
+- [x] develop配置与真实登录/写入回读/权限，晋级同镜像trial。
 - [ ] 官方上传并设体验版、回读版本/二维码及三角色验收；部署报告。
 - [ ] spec durable lessons及finish流程；只归档实际完成且已提交任务。
 
@@ -35,3 +35,11 @@ Native官方真实渲染尚未通过：首页page data只有__webviewId__，cons
 批准两批已提交并推送：806c40770526源码、e4e04373ff66文档；GitHub同SHA CI38528557783暴露rrule TZID按主机时区转换，UTC返回01Z而本地香港返回09Z。不是权限或CI配置问题。已用既有Temporal显式业务墙钟→UTC浮动规则→业务时区真实瞬时修复，并增加UTC/香港/洛杉矶主机、纽约夏令时、绝对UNTIL及90分钟时长回归，定向7/7通过；TZ=UTC全交付运行中。新镜像必须随修复后SHA重新构建，旧e4e镜像未部署。原e4e Linux构建/非联网只读node用户模块加载成功；生产仍未操作。
 
 TZ=UTC pnpm check:delivery /tmp/fcm-delivery-utc-20261014.log退出0：domain38/API230/mini566+1skip/backoffice2；类型/构建/9工具及3运行入口通过。原香港定向calendar7/7与UTC三主机/DST/UNTIL回归通过。例外修复按已批准收尾发布范围提交，不修改CI期望或全局TZ以掩盖原因。
+
+## 2026-10-14 部署检查点
+时区修复939676f325b9已推送；同SHA GitHub CI38530211783 success。干净git archive构建linux/amd64 cq-talent-api:trial-939676f325b9，镜像sha256:aed831fd6fa1b103ffb30534a5f72fe79f2569ed6ca405ba52b3dc248a56981a，本地只读非联网node用户加载模块成功。服务器验证相同RootFS及source label。两库各自在线备份在/opt/cq-talent-nonproduction/backups/trial-release-939676f325b9-20261014；每份副本迁移integrity/FK及全部旧列旧行多重集合保持通过，未恢复覆盖活库。
+develop先部署并配置原既有管理员初始后台凭据、独立keyring/后台URL/非生产publication allowlist；HTTPS安全Cookie、401、敏感未授权403、inactive验收场地写入/回读、重启后会话/持久化、退出撤销通过。真实浏览器登录/刷新及工作台截图已查。随后同一镜像晋级trial，同样HTTPS/重启/注销通过。首次路由探测撞trial重启窗口502，待稳定后重新执行，不隐藏首次失败。真实浏览器trial登录通过，进一步页面检查进行中。正式容器ID/imageID前后严格保持。
+官方干净SHA上传9.7.5调用已返回confirmation_upload_30bd73b1-02e4-4083-8ef7-0bcb77e53b88 pending；已异步请用户在开发者工具确认，遵循官方SKILL其他pending不得主动轮询。pending task写入research/pending-wechat-upload.json。用户继续后必须查询此旧ID，不重新upload；尚未宣称上传或设体验版成功。
+后台新私有凭据在服务器0700private目录0600access文件及本地/tmp/fcm-backoffice-access-939676f325b9.json，未入Git、日志或argv。当前两环境为独立干净业务库，不复制生产事实、不播种未核定标准；真实手机登录及三角色业务验收待用户授权手机操作。
+
+最终后台补验：trial浏览器编辑唯一inactive验收场地，添加验收设施/地址标记，保存提示成功、重载值保持、退出返回登录；实际截图已查看，无明显溢出。10项发布后路由探测稳定重跑全通过。只读最后核对双环境同imageID/独立keyring及正式容器不变；发布记录见docs/current/trial-backoffice-release-2026-10-14.md。上传pending仍等待用户，任务不归档。
