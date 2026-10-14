@@ -5,6 +5,7 @@
   "tool": "upload",
   "version": "9.7.5",
   "sourceSHA": "939676f325b9046383c907e0f3f3eac0a2e9628e",
-  "status": "pending",
-  "blocker": "等待用户在腾讯开发者工具确认；继续前查询旧taskId，不重发上传"
+  "status": "success",
+  "officialPackageBytes": 1531864,
+  "platformTrialVersion": "9.7.5"
 }

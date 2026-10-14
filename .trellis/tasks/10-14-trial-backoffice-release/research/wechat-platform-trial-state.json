@@ -1,0 +1,29 @@
+{
+  "observedAt": "2026-10-14 Asia/Hong_Kong",
+  "appId": "wx4c588cd106e520e0",
+  "accountName": "重庆天才足球俱乐部",
+  "trialVersion": "9.7.5",
+  "platformSubmissionTime": "2026-10-14 16:28:14",
+  "sourceSHA": "939676f325b9046383c907e0f3f3eac0a2e9628e",
+  "remarkMatchesSource": true,
+  "platformAlreadyMarksTrial": true,
+  "noAdditionalSetTrialMutationNeeded": true,
+  "entryPage": "pages/launch/index",
+  "qrValidBefore": "2026-10-21",
+  "officialDownloadedQr": true,
+  "requestDomain": "https://cqtc.pomi.tech",
+  "phoneQuickVerification": {
+    "used": 73,
+    "total": 1000,
+    "availablePercent": 92.7
+  },
+  "phoneRealtimeVerification": {
+    "used": 0,
+    "total": 1000,
+    "availablePercent": 100
+  },
+  "truePhoneLoginVerified": false,
+  "threeRolesOnPhoneVerified": false,
+  "reviewSubmitted": false,
+  "formalVersionPublished": false
+}
