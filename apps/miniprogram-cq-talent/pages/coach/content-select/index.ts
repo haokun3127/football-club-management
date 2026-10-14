@@ -69,6 +69,7 @@ interface PageData {
   statusActionText: string;
   message: string;
   eventId: string;
+  revision: string;
   searchText: string;
   categories: CategoryView[];
   activeCategoryId: string;
@@ -117,6 +118,7 @@ Page<PageData>({
     statusActionText: "",
     message: "",
     eventId: "",
+    revision: "",
     searchText: "",
     categories: presentCategories([], "all"),
     activeCategoryId: "all",
@@ -131,7 +133,7 @@ Page<PageData>({
     canSave: false,
     isConfirmDisabled: true,
     confirmClass: "select-bar__confirm select-bar__confirm--disabled",
-    confirmLabel: "选择 (0)",
+    confirmLabel: "保存 0 项",
     submitting: false,
     hasSaveError: false,
     saveError: "",
@@ -153,7 +155,10 @@ Page<PageData>({
     return this.load(query?.eventId || "");
   },
 
+  onUnload() { nextRequest(this); },
+
   async load(eventId: string) {
+    const ticket = nextRequest(this);
     if (!requireRole("coach")) {
       this.showLoadError(eventId, "当前账号无法读取训练内容。");
       return;
@@ -180,6 +185,7 @@ Page<PageData>({
       const treeRequest = getCoachTrainingProjectTree();
       const workbenchRequest = getCoachWorkbench(eventId);
       const [tree, workbench] = await Promise.all([treeRequest, workbenchRequest]);
+      if (!currentRequest(this, ticket)) return;
 
       if (!isWritableTrainingWorkbench(workbench, eventId)) {
         this.showLoadError(eventId, "当前活动不可编辑训练内容。");
@@ -199,6 +205,7 @@ Page<PageData>({
         statusActionText: "",
         message: hasProjects ? "" : "当前没有可选择的训练内容。",
         eventId,
+        revision: workbench.trainingContentRevision!,
         ...selection,
         ...hierarchy,
         contentTree: tree.contentTree,
@@ -209,6 +216,7 @@ Page<PageData>({
         canSave: true,
       });
     } catch {
+      if (!currentRequest(this, ticket)) return;
       this.showLoadError(eventId, "训练内容读取失败，请点击重试。");
     }
   },
@@ -222,6 +230,7 @@ Page<PageData>({
   },
 
   onSearchInput(event: { detail: { value: string } }) {
+    if (!this.data.canSave || this.data.submitting) return;
     const selection = buildSelectionPatch(
       this.data.projects,
       this.data.categories,
@@ -242,6 +251,7 @@ Page<PageData>({
   },
 
   selectPrimary(event: { currentTarget: { dataset: { id: string } } }) {
+    if (!this.data.canSave || this.data.submitting) return;
     const activePrimaryId = event.currentTarget.dataset.id;
     const hierarchy = buildContentSelectionPatch(
       this.data.contentTree,
@@ -254,6 +264,7 @@ Page<PageData>({
   },
 
   selectSecondary(event: { currentTarget: { dataset: { id: string } } }) {
+    if (!this.data.canSave || this.data.submitting) return;
     const activeSecondaryId = event.currentTarget.dataset.id;
     const hierarchy = buildContentSelectionPatch(
       this.data.contentTree,
@@ -266,6 +277,7 @@ Page<PageData>({
   },
 
   selectCategory(event: { currentTarget: { dataset: { id: string } } }) {
+    if (!this.data.canSave || this.data.submitting) return;
     const activeCategoryId = event.currentTarget.dataset.id;
     if (!this.data.categories.some((category: CategoryView) => category.id === activeCategoryId)) return;
     const selection = buildSelectionPatch(
@@ -305,7 +317,8 @@ Page<PageData>({
       this.data.canSave,
       false,
     );
-    this.setData({ ...selection, hasSaveError: false, saveError: "" });
+    const hierarchy = buildContentSelectionPatch(this.data.contentTree, selection.selectedIds, this.data.activePrimaryId, this.data.activeSecondaryId, this.data.searchText);
+    this.setData({ ...selection, ...hierarchy, hasSaveError: false, saveError: "" });
   },
 
   async confirmSelection() {
@@ -327,6 +340,8 @@ Page<PageData>({
       return;
     }
 
+    const ticket = nextRequest(this);
+    const eventId = this.data.eventId;
     this.setData({
       submitting: true,
       isConfirmDisabled: true,
@@ -337,11 +352,13 @@ Page<PageData>({
     });
 
     try {
-      await saveCoachTrainingProjects(this.data.eventId, selectedIds);
-      const readback = await getCoachWorkbench(this.data.eventId);
+      await saveCoachTrainingProjects(eventId, selectedIds, this.data.revision);
+      if (!currentRequest(this, ticket)) return;
+      const readback = await getCoachWorkbench(eventId);
+      if (!currentRequest(this, ticket)) return;
       const savedIds = canonicalizeSelection(readback.selectedTrainingProjectIds, this.data.projects);
       if (!isWritableTrainingWorkbench(readback, this.data.eventId) || !sameSelection(selectedIds, savedIds)) {
-        this.showSaveError("训练内容尚未确认，请重试。", selectedIds);
+        this.showSaveError("保存结果与当前记录不一致，请重新读取并核对。", selectedIds);
         return;
       }
 
@@ -349,13 +366,14 @@ Page<PageData>({
         submitting: false,
         isConfirmDisabled: false,
         confirmClass: "select-bar__confirm",
-        confirmLabel: `选择 (${selectedIds.length})`,
+        confirmLabel: `保存 ${selectedIds.length} 项`,
         hasSaveError: false,
         saveError: "",
       });
       wx.navigateBack({ delta: 1 });
     } catch {
-      this.showSaveError("训练内容保存失败，请重试。", selectedIds);
+      if (!currentRequest(this, ticket)) return;
+      this.showSaveError("保存结果未确认，请重新读取并核对。", selectedIds);
     }
   },
 
@@ -389,7 +407,7 @@ Page<PageData>({
       canSave: false,
       isConfirmDisabled: true,
       confirmClass: "select-bar__confirm select-bar__confirm--disabled",
-      confirmLabel: "选择 (0)",
+      confirmLabel: "保存 0 项",
       submitting: false,
       hasSaveError: false,
       saveError: "",
@@ -397,6 +415,7 @@ Page<PageData>({
   },
 
   showSaveError(saveError: string, selectedIds: string[]) {
+    this.setData({ canSave: false });
     const selection = buildSelectionPatch(
       this.data.projects,
       this.data.categories,
@@ -592,7 +611,7 @@ function buildSelectionPatch(
     summaryLabel: selectedSummaryLabel(selectedIds.length, durationText),
     isConfirmDisabled,
     confirmClass: isConfirmDisabled ? "select-bar__confirm select-bar__confirm--disabled" : "select-bar__confirm",
-    confirmLabel: submitting ? "保存中" : `选择 (${selectedIds.length})`,
+    confirmLabel: submitting ? "保存中" : `保存 ${selectedIds.length} 项`,
   };
 }
 
@@ -643,5 +662,8 @@ function selectedSummaryLabel(selectedCount: number, durationText: string) {
 }
 
 function isWritableTrainingWorkbench(workbench: CoachWorkbench, eventId: string) {
-  return workbench.event.id === eventId && workbench.event.type === "training" && workbench.event.status !== "cancelled";
+  return workbench.canEditTraining === true && /^[a-f0-9]{64}$/.test(workbench.trainingContentRevision || "") && workbench.event.id === eventId && workbench.event.type === "training" && workbench.event.status !== "cancelled";
 }
+
+function nextRequest(page: unknown) { const p = page as { _request?: number }; return p._request = (p._request ?? 0) + 1; }
+function currentRequest(page: unknown, ticket: number) { return (page as { _request?: number })._request === ticket; }

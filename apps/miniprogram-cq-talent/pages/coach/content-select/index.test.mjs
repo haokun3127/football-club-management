@@ -118,6 +118,8 @@ function workbench(selectedTrainingProjectIds = ["project-1"], event = {}) {
       venue: "Actual venue",
       ...event,
     },
+    canEditTraining: true,
+    trainingContentRevision: "a".repeat(64),
     roster: [],
     workflow: [],
     training: [],
@@ -214,7 +216,7 @@ describe("coach training content select", () => {
     const saving = page.confirmSelection();
     page.confirmSelection();
 
-    expect(mocks.saveCoachTrainingProjects).toHaveBeenCalledWith("event-training-1", ["project-1", "project-2"]);
+    expect(mocks.saveCoachTrainingProjects).toHaveBeenCalledWith("event-training-1", ["project-1", "project-2"], "a".repeat(64));
     expect(mocks.saveCoachTrainingProjects).toHaveBeenCalledTimes(1);
     resolveSave({});
     await saving;
@@ -254,6 +256,8 @@ describe("coach training content select", () => {
       submitting: false,
       hasSaveError: true,
     });
+    expect(page.data.canSave).toBe(false);
+    await page.confirmSelection(); expect(mocks.saveCoachTrainingProjects).toHaveBeenCalledTimes(1);
     expect(page.data.saveError).not.toContain("raw transport failure");
     expect(mocks.navigateBack).not.toHaveBeenCalled();
   });
@@ -278,6 +282,24 @@ describe("coach training content select", () => {
     });
   });
 
+  it("updates hierarchical checks immediately and retains them while searching", async () => {
+    mocks.getCoachTrainingProjectTree.mockResolvedValueOnce(hierarchicalTree);
+    const page = createPageInstance(); await page.load("event-training-1");
+    expect(page.data.actionCards[0].isSelected).toBe(true);
+    page.toggleProject({ currentTarget: { dataset: { id: "project-1" } } });
+    expect(page.data.actionCards[0].isSelected).toBe(false); expect(page.data.tertiaryGroups[0].cards[0].isSelected).toBe(false);
+    page.toggleProject({ currentTarget: { dataset: { id: "project-1" } } });
+    page.onSearchInput({ detail: { value: "no match" } }); expect(page.data.selectedIds).toEqual(["project-1"]);
+    page.onSearchInput({ detail: { value: "" } }); expect(page.data.actionCards[0].isSelected).toBe(true);
+  });
+  it("fails closed without explicit planning permission and ignores callbacks after leaving", async () => {
+    mocks.getCoachWorkbench.mockResolvedValueOnce({ ...workbench(), canEditTraining: undefined });
+    const page = createPageInstance(); await page.load("event-training-1"); expect(page.data.canSave).toBe(false);
+    let resolve; mocks.getCoachWorkbench.mockImplementationOnce(() => new Promise(r => { resolve = r; }));
+    const loading = page.load("event-training-1"); page.onUnload(); resolve(workbench()); await loading; expect(page.data.state).toBe("loading");
+    await page.load("event-training-1"); let saved; mocks.saveCoachTrainingProjects.mockImplementationOnce(() => new Promise(r => { saved = r; }));
+    const saving = page.confirmSelection(); page.onUnload(); saved({}); await saving; expect(mocks.navigateBack).not.toHaveBeenCalled();
+  });
   it("does not expose a save surface for mismatched, non-training, or cancelled workbenches", async () => {
     const page = createPageInstance();
     mocks.getCoachWorkbench.mockResolvedValueOnce(workbench([], { id: "other-event" }));
@@ -294,7 +316,7 @@ describe("coach training content select", () => {
   });
 
   it("uses the compact C10 Figma hierarchy without app headers, sample facts, or WXML helpers", () => {
-    expect(pageConfig).toContain('"role-tabbar"');
+    expect(pageConfig).not.toContain('"role-tabbar"');
     expect(pageConfig).toContain('"status-view"');
     expect(pageConfig).not.toContain('"app-header"');
     expect(template).toContain('class="select-nav"');

@@ -26,7 +26,5 @@ jobs:
         run: corepack enable
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
-      - name: Typecheck and test
-        run: pnpm check
-      - name: Build release packages
-        run: pnpm build
+      - name: Verify delivery configuration, tests, build and isolated startup
+        run: pnpm check:delivery

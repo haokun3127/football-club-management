@@ -1,41 +1,29 @@
-<view class="c5">
-  <app-header theme="soft" title="销课处理" title-align="left" show-back />
-
-  <view class="c5-body">
-    <status-view wx:if="{{state !== 'ready' && state !== 'idle'}}" state="{{state}}" title="销课处理" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
-
-    <block wx:if="{{state === 'ready' && hasRoster}}">
-      <view class="c5-hero">
-        <view class="c5-hero__title">待处理销课</view>
-        <view class="c5-hero__meta-group">
-          <view class="c5-hero__meta c5-hero__meta--primary" wx:if="{{hasEventTeam}}">{{eventTeam}} · {{eventDate}}</view>
-          <view class="c5-hero__meta c5-hero__meta--primary" wx:else>{{eventDate}}</view>
-          <view class="c5-hero__meta c5-hero__meta--secondary" wx:if="{{hasVenue}}">{{eventTime}} · {{eventVenue}}</view>
-          <view class="c5-hero__meta c5-hero__meta--secondary" wx:else>{{eventTime}}</view>
-        </view>
+<view class="history-page">
+  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="page-nav__back" bindtap="goBack" aria-label="返回">‹</view><view class="page-nav__title">{{editing ? '修正记录与历史' : '训练记录名单'}}</view></view>
+  <view class="history-page__body">
+    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '加载训练记录' : state === 'empty' ? '暂无训练记录' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <block wx:if="{{state === 'ready' && !editing}}">
+      <view class="record-summary">{{eventTitle}} · {{rows.length}}名学员 · {{total}}人已计课次</view>
+      <view class="record-filters"><button class="{{filter === 'all' ? 'selected' : ''}}" data-filter="all" bindtap="changeFilter">全部</button><button class="{{filter === 'counted' ? 'selected' : ''}}" data-filter="counted" bindtap="changeFilter">已计课次</button><button class="{{filter === 'uncounted' ? 'selected' : ''}}" data-filter="uncounted" bindtap="changeFilter">未计课次</button></view>
+      <view wx:for="{{visibleRows}}" wx:key="studentId" class="record">
+        <view class="record-title">{{item.name}}</view><view class="record-state">{{item.statusLabel}} · {{item.sourceLabel}}</view>
+        <view class="record-actions"><button wx:if="{{canEdit}}" data-id="{{item.studentId}}" bindtap="edit">修正</button><button data-id="{{item.studentId}}" bindtap="toggleHistory">{{expandedId === item.studentId ? '收起历史' : '修改历史'}}</button></view>
+        <view wx:if="{{expandedId === item.studentId}}" class="record-history"><view wx:for="{{item.historyLabels}}" wx:for-item="entry" wx:key="index">{{entry}}</view><view wx:if="{{!item.historyLabels.length}}">尚无修改历史</view></view>
       </view>
-
-      <view class="c5-list">
-        <view class="c5-list__head">
-          <view class="c5-list__title">待确认学员</view>
-          <view class="c5-list__count">{{rosterCount}} 人待处理</view>
-        </view>
-        <view wx:for="{{roster}}" wx:key="studentId" class="c5-row">
-          <view class="c5-row__avatar">{{item.avatarLetter}}</view>
-          <view class="c5-row__name">{{item.name}}</view>
-          <view class="c5-chip">{{item.lessonAmountText}}</view>
-        </view>
-      </view>
-
-      <view wx:if="{{hasSubmitError}}" class="submit-error">{{submitError}}</view>
-      <view class="c5-history-link" bindtap="openHistory">查看历史销课</view>
+      <view wx:if="{{!visibleRows.length}}" class="record-summary">当前筛选下暂无学员</view>
+      <view class="record-summary">课程结束后自动记录，无需整班点名或逐条确认。</view>
+    </block>
+    <block wx:if="{{editing}}">
+      <view class="record-field"><view>学员</view><view class="record-input">{{editing.name}}</view></view>
+      <view class="record-field"><view>训练</view><view class="record-input">{{editing.dateLabel}} {{eventTitle}}</view></view>
+      <view class="record-field"><view>当前结果</view><view class="record-input">{{editing.statusLabel}} · {{editing.sourceLabel}}</view></view>
+      <view class="record-field"><view>修改为</view><view class="record-input record-toggle"><text>{{draftCounted ? '已计课次' : '不计课次'}}</text><switch checked="{{draftCounted}}" color="#A80F1B" disabled="{{saving}}" bindchange="changeCounted" /></view></view>
+      <view class="record-field"><view>说明</view><textarea class="record-input record-reason" value="{{reason}}" maxlength="500" placeholder="填写更正原因" disabled="{{saving}}" bindinput="changeReason" /></view>
+      <view class="record-info">保存直接生效，自动任务不覆盖人工修改。</view>
+      <view wx:if="{{saveError}}" class="editor-error">{{saveError}}</view>
+      <button wx:if="{{conflict}}" disabled="{{saving}}" bindtap="refreshConflict">核对最新记录</button>
+      <view class="record-history"><view wx:for="{{editing.historyLabels}}" wx:key="index">{{item}}</view></view>
     </block>
   </view>
-
-  <view wx:if="{{state === 'ready' && hasRoster}}" class="c5-confirm-bar">
-    <view wx:if="{{saving}}" class="c5-confirm-bar__button c5-confirm-bar__button--disabled">确认中...</view>
-    <view wx:else class="c5-confirm-bar__button" bindtap="confirmLesson">确认全部</view>
-  </view>
-
-  <role-tabbar role="coach" active="schedule" />
+  <view class="record-footer"><button wx:if="{{editing}}" class="record-primary" loading="{{saving}}" disabled="{{saving || conflict}}" bindtap="save">保存修改</button><button wx:else class="record-primary" bindtap="goBack">返回</button></view>
 </view>

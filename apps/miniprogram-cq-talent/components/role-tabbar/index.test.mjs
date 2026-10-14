@@ -9,9 +9,9 @@ const iconsDir = new URL("../../assets/icons/", componentDir);
 
 const expectedItems = {
   parent: [
+    ["home", "/pages/parent/home/index"],
     ["schedule", "/pages/parent/schedule/index"],
     ["growth", "/pages/parent/growth/index"],
-    ["discover", "/pages/parent/content/index"],
     ["child", "/pages/parent/child/index"],
   ],
   coach: [

@@ -32,10 +32,11 @@ services:
       - .env.runtime
     environment:
       NODE_ENV: production
+      FCM_RUNTIME_ENV: release
       HOST: 0.0.0.0
       PORT: 3000
       DATABASE_URL: /var/lib/cq-talent/api.sqlite
-      FCM_CQ_TALENT_ACCEPTANCE_SEED: "1"
+      FCM_CQ_TALENT_ACCEPTANCE_SEED: "0"
     ports:
       - "127.0.0.1:3000:3000"
     volumes:

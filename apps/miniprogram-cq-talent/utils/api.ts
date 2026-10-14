@@ -1,3 +1,4 @@
+import type { CoachStudentProfile } from "./types";
 import type { AssessmentWorkflowSummary, AssessmentWorkingHistory } from "./types";
 import { APP_CLIENT_KEY, DEV_TEST_DATE } from "./config";
 import { activityStatus, formatDateTime, formatTimeRange } from "./presentation";
@@ -166,11 +167,11 @@ export async function getParentStudentHome(student: StudentSummary): Promise<Stu
   return normalizeStudentHome(response, student);
 }
 
-export async function getCoachHome(range: string | { from: string; to: string } = DEV_TEST_DATE): Promise<CoachHome> {
+export async function getCoachHome(range: string | { from: string; to: string; teamIds?: string[] } = DEV_TEST_DATE): Promise<CoachHome> {
   const context = requireContext();
   const query = typeof range === "string"
     ? `date=${encodeURIComponent(range)}`
-    : `from=${encodeURIComponent(range.from)}&to=${encodeURIComponent(range.to)}`;
+    : `from=${encodeURIComponent(range.from)}&to=${encodeURIComponent(range.to)}${range.teamIds?.length ? `&teamIds=${encodeURIComponent(range.teamIds.join(","))}` : ""}`;
   const response = await request<Record<string, unknown>>({
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/home?${query}`,
   });
@@ -225,21 +226,27 @@ export async function saveCoachPreferences(preferences: CoachPreferences): Promi
 }
 
 export async function createCoachAssessmentTask(input: {
+  studentIds?: string[];
+  testItemIds?: string[];
+  sourceEventId?: string;
   title: string;
   templateId: string;
   teamId: string;
   termLabel: string;
   startsOn: string;
   dueOn: string;
-}): Promise<{ id: string }> {
+}, idempotencyKey?:string): Promise<{ id: string }> {
   const context = requireContext();
   const raw = await request<Record<string, unknown>>({
     method: "POST",
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessment-tasks`,
     data: input,
+    idempotencyKey,
+    expectedStatus:201,
   });
   const task = (raw.task ?? {}) as Record<string, unknown>;
-  return { id: String(task.id ?? "") };
+  if(typeof task.id!=="string" || !task.id)throw new Error("创建响应缺少任务标识，请重试确认");
+  return { id: task.id };
 }
 
 export async function getCoachMatchDetail(eventId: string, options: MatchDetailReadOptions = {}): Promise<CoachMatchDetail> {
@@ -314,6 +321,7 @@ export async function recordCoachMatch(input: {
   matchType: string;
   status: string;
   opponentName?: string;
+  ageGroup?: string; competitionFormat?: string; handbookUrl?: string;
   homeScore?: number;
   awayScore?: number;
   events?: CoachMatchPlayerEvent[];
@@ -362,12 +370,12 @@ export async function saveCoachTacticalBoard(eventId: string, formationName: str
   });
 }
 
-export async function saveCoachTrainingProjects(eventId: string, projectIds: string[], note?: string) {
+export async function saveCoachTrainingProjects(eventId: string, projectIds: string[], expectedRevision: string, note?: string) {
   const context = requireContext();
-  return request<Record<string, unknown>, { projectIds: string[]; note?: string }>({
+  return request<Record<string, unknown>, { projectIds: string[]; expectedRevision: string; note?: string }>({
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/training-projects`,
     method: "PUT",
-    data: { projectIds, note },
+    data: { projectIds, expectedRevision, note },
     idempotent: true,
   });
 }
@@ -627,9 +635,12 @@ function normalizeGrowth(raw: Record<string, unknown>, student?: StudentSummary)
     student,
     radar,
     overall: raw.overall === null ? null : numberOrUndefined(raw.overall),
-    milestones: [
-      { title: "成长足迹", description: "成长记录正在积累，当前先展示最新评测能力数据。" },
-    ],
+    milestonesAvailable: Array.isArray(raw.milestones),
+    milestones: Array.isArray(raw.milestones) ? raw.milestones.flatMap((value) => {
+      const item = asRecord(value);
+      return item && typeof item.title === "string" && typeof item.description === "string"
+        ? [{ title: item.title, description: item.description, date: stringOrUndefined(item.date) }] : [];
+    }) : [],
     trainingHistory: [
       { label: "训练历程", value: "训练统计正在同步" },
       { label: "更新时间", value: String(raw.updatedAt ?? raw.generatedAt ?? "尚未同步") },
@@ -637,6 +648,7 @@ function normalizeGrowth(raw: Record<string, unknown>, student?: StudentSummary)
     metricItems: metrics,
     views: views.length ? views : [{ id: "default", name: "能力概览", metricIds: radar.map((point) => point.metricId) }],
     updatedAt: stringOrUndefined(raw.updatedAt ?? raw.generatedAt),
+    evaluations: Array.isArray(raw.evaluations) ? raw.evaluations as GrowthSummary["evaluations"] : undefined,
     trainingStats: normalizeTrainingStats(raw.trainingStats),
     timeline: normalizeGrowthTimeline(raw.timeline),
   };
@@ -656,7 +668,7 @@ function normalizeGrowthTimeline(raw: unknown): GrowthSummary["timeline"] {
     const item = asRecord(value);
     if (!item) continue;
     const kind = item.kind;
-    if (kind !== "training" && kind !== "match" && kind !== "ability_update") continue;
+    if (kind !== "training" && kind !== "match" && kind !== "ability_update" && kind !== "evaluation") continue;
     const occurredAt = stringOrUndefined(item.occurredAt);
     const id = stringOrUndefined(item.id);
     if (!id || !occurredAt) continue;
@@ -673,6 +685,8 @@ function normalizeGrowthTimeline(raw: unknown): GrowthSummary["timeline"] {
       occurredAt,
       title: String(item.title ?? "成长记录"),
       subtitle: String(item.subtitle ?? ""),
+      teamId: stringOrUndefined(item.teamId),
+      evaluationRevision: typeof item.evaluationRevision === "number" ? item.evaluationRevision : undefined,
       teamName: stringOrUndefined(item.teamName),
       venue: stringOrUndefined(item.venue),
       eventId: stringOrUndefined(item.eventId),
@@ -913,6 +927,11 @@ function normalizeCoachHome(raw: Record<string, unknown>, from: string, to: stri
   const tasksSource = Array.isArray(workbench.tasks) ? workbench.tasks as Array<Record<string, unknown>> : [];
   const tasks = tasksSource.map((task) => ({
     eventId: String(task.eventId ?? ""),
+    templateId: stringOrUndefined(task.templateId), taskId: stringOrUndefined(task.taskId), title: stringOrUndefined(task.title),
+    teamId: stringOrUndefined(task.teamId), teamName: stringOrUndefined(task.teamName), periodLabel: stringOrUndefined(task.periodLabel),
+    completedStudents: typeof task.completedStudents === "number" ? task.completedStudents : undefined,
+    totalStudents: typeof task.totalStudents === "number" ? task.totalStudents : undefined,
+    readyStudents: typeof task.readyStudents === "number" ? task.readyStudents : undefined,
     eventType: normalizeEventType(task.eventType),
     action: normalizeCoachTaskAction(task.action),
     label: String(task.label ?? "查看活动"),
@@ -931,6 +950,9 @@ function normalizeCoachHome(raw: Record<string, unknown>, from: string, to: stri
   return {
     date: from,
     dateRange: { from, to },
+    clubName: stringOrUndefined(workbench.clubName),
+    teamOptions: Array.isArray(workbench.teamOptions) ? workbench.teamOptions as Array<{ id: string; name: string }> : [],
+    selectedTeamIds: Array.isArray(workbench.selectedTeamIds) ? workbench.selectedTeamIds.map(String) : [],
     coachName: stringOrUndefined(workbench.coachName ?? raw.coachName),
     teams,
     events,
@@ -977,6 +999,14 @@ function normalizeCoachWorkbench(raw: Record<string, unknown>, eventId: string):
     : selectedTrainingProjects.map((project) => project.id);
   return {
     event,
+    trainingContentRevision: typeof raw.trainingContentRevision === "string" ? raw.trainingContentRevision : undefined,
+    trainingRecords: Array.isArray(raw.trainingRecords) ? raw.trainingRecords as import("./training-records").TrainingRecord[] : undefined,
+    canEditTraining: asRecord(raw.permissions)?.canEditTraining === true,
+    canManageRoster: asRecord(raw.permissions)?.canManageRoster === true,
+    contentSummary: (training?.contentSummary as import("./types").TrainingContentSummary | undefined) ?? {
+      count:selectedTrainingProjects.length,configuredMinutes:null,
+      groups:selectedTrainingProjects.length?[{id:"unclassified",label:"未配置分类",items:selectedTrainingProjects.map(project=>({id:project.id,name:project.name,configuredMinutes:null}))}]:[],
+    },
     roster,
     workflow: [
       { label: "点名", value: boolStatus(workflow?.pendingAttendance, "待完成", "已完成"), status: workflow?.pendingAttendance ? "pending" : "ready" },
@@ -1023,6 +1053,7 @@ function normalizeCoachMatchDetail(raw: Record<string, unknown>): CoachMatchDeta
     eventId: stringOrUndefined(matchSource?.eventId),
     matchType: stringOrUndefined(matchSource?.matchType),
     opponentName: stringOrUndefined(matchSource?.opponentName),
+    ageGroup: stringOrUndefined(matchSource?.ageGroup), competitionFormat: stringOrUndefined(matchSource?.competitionFormat), handbookUrl: stringOrUndefined(matchSource?.handbookUrl),
     homeScore: numberOrUndefined(matchSource?.homeScore),
     awayScore: numberOrUndefined(matchSource?.awayScore),
     status: stringOrUndefined(matchSource?.status),
@@ -1045,6 +1076,7 @@ function normalizeCoachMatchDetail(raw: Record<string, unknown>): CoachMatchDeta
   });
 
   return {
+    canManageRoster: raw.canManageRoster === true,
     event: {
       id: eventId,
       type: "match",
@@ -1487,6 +1519,15 @@ export async function getCoachStudentRadar(studentId: string): Promise<RadarMetr
     .filter((item) => typeof item.value === "number");
 }
 
+export async function getCoachStudentProfile(studentId: string): Promise<{ profile: CoachStudentProfile; radar: RadarMetricPoint[]; overall: number | null; modelName: string; confirmedResults?: import("./types").ConfirmedStudentResult[] }> {
+  const context = requireContext();
+  const response = await request<{ profile: CoachStudentProfile; confirmedResults?: import("./types").ConfirmedStudentResult[]; latest?: Array<Record<string, unknown>>; overall?: number | null; modelName?: string }>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/students/${encodeURIComponent(studentId)}/radar`,
+  });
+  if (!response.profile) throw new Error("学员档案服务尚未就绪");
+  return { profile: response.profile, confirmedResults: response.confirmedResults, radar: (response.latest ?? []).map(normalizeRadarMetric), overall: response.overall ?? null, modelName: response.modelName ?? "能力模型" };
+}
+
 export async function getCoachTeamAbilityOverview(teamId?: string): Promise<CoachTeamAbilityOverview> {
   const context = requireContext();
   const query = teamId ? `?teamId=${encodeURIComponent(teamId)}` : "";
@@ -1516,24 +1557,20 @@ export async function getCoachAssessmentTasks(options: AssessmentTaskReadOptions
   return Array.isArray(response.tasks) ? response.tasks : [];
 }
 
-export async function getCoachAssessmentTaskOptions(): Promise<{
+export interface AssessmentTaskOptions {
   tasks: CoachAssessmentTask[];
-  templates: Array<{ id: string; name: string }>;
-  teams: Array<{ id: string; name: string }>;
-}> {
+  publicationEnabled?: boolean;
+  templates: Array<{id:string; name:string; testItems?:Array<{id:string;name:string}>}>;
+  teams: Array<{id:string; name:string; students?:Array<{id:string;name:string}>}>;
+  sourceCourse?: {temporaryStudents?:Array<{id:string;name:string}>;id:string;title:string;teamId:string;date:string;studentIds:string[];startsAt?:string;endsAt?:string;attendance?:Array<{studentId:string;status:string}>};
+  courseOptions?:Array<{id:string;title:string;teamId:string;date:string;startsAt?:string;endsAt?:string}>;
+}
+export async function getCoachAssessmentTaskOptions(sourceEventId?:string): Promise<AssessmentTaskOptions> {
   const context = requireContext();
-  const response = await request<{
-    tasks?: CoachAssessmentTask[];
-    templates?: Array<{ id: string; name: string }>;
-    teams?: Array<{ id: string; name: string }>;
-  }>({
-    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessment-tasks`,
+  const response = await request<AssessmentTaskOptions>({
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessment-tasks${sourceEventId ? `?sourceEventId=${encodeURIComponent(sourceEventId)}` : ""}`,
   });
-  return {
-    tasks: Array.isArray(response.tasks) ? response.tasks : [],
-    templates: Array.isArray(response.templates) ? response.templates : [],
-    teams: Array.isArray(response.teams) ? response.teams : [],
-  };
+  return {...response, tasks: response.tasks || [], templates: response.templates || [], teams: response.teams || []};
 }
 
 export async function getContentArticles(): Promise<ContentArticle[]> {
@@ -1577,12 +1614,16 @@ export function getCoachAssessmentWorkflow(taskId: string): Promise<AssessmentWo
   return request({ path: `${assessmentWorkflowPath(taskId)}/workflow` });
 }
 
+export function getCoachAssessmentCourses(taskId: string): Promise<{courses: import("./types").AssessmentCourse[]}> {
+  return request({path:`${assessmentWorkflowPath(taskId)}/courses`});
+}
+
 export function getCoachAssessmentHistory(taskId: string, studentId: string): Promise<AssessmentWorkingHistory> {
   return request({ path: `${assessmentWorkflowPath(taskId)}/students/${encodeURIComponent(studentId)}/history` });
 }
 
 export function saveCoachAssessmentEntries(taskId: string, studentId: string, input: {
-  expectedRevision: number; reason?: string; entries: Array<{ testItemId: string; metricId?: string; value: Record<string, unknown> }>;
+  expectedRevision: number; reason?: string; entries: Array<{ testItemId: string; metricId?: string; value: Record<string, unknown>; eventId?:string }>;
 }): Promise<AssessmentWorkingHistory> {
   return request({ path: `${assessmentWorkflowPath(taskId)}/students/${encodeURIComponent(studentId)}/entries`, method: "PUT", data: input });
 }
@@ -1591,4 +1632,22 @@ export function publishCoachAssessments(taskId: string, students: Array<{ studen
   results: Array<{ studentId: string; success: boolean; revision?: number; error?: { message: string } }>;
 }> {
   return request({ path: `${assessmentWorkflowPath(taskId)}/publications`, method: "POST", data: { students } });
+}
+
+export async function getTrainingTemplates(): Promise<import("./types").TrainingTemplateSummary[]> {
+  const c = requireContext(); const result = await request<{ templates: import("./types").TrainingTemplateSummary[] }>({ path: `/clubs/${c.clubId}/app-clients/${c.clientId}/coach/training-content/templates` }); return result.templates;
+}
+export async function saveTrainingTemplate(sourceEventId: string, title: string) {
+  const c = requireContext(); return request<{ template: { id: string; title: string }; excluded: string[] }>({ method: "POST", path: `/clubs/${c.clubId}/app-clients/${c.clientId}/coach/training-content/templates`, data: { sourceEventId, title, visibility: "private" }, expectedStatus: 201 });
+}
+export async function previewTrainingTransfer(source: import("./types").TrainingTransferSource): Promise<import("./types").TrainingTransferPreview> {
+  const c = requireContext(); return request({ method: "POST", path: `/clubs/${c.clubId}/app-clients/${c.clientId}/coach/training-content/preview`, data: source });
+}
+export async function applyTrainingTransfer(input: import("./types").TrainingTransferSource & { sourceRevision: string; targets: Array<{ eventId: string; expectedRevision: string; action: "merge" | "replace" | "skip" }> }): Promise<{ results: Array<{ eventId: string; status: string }>; excluded: string[] }> {
+  const c = requireContext(); return request({ method: "POST", path: `/clubs/${c.clubId}/app-clients/${c.clientId}/coach/training-content/apply`, data: input });
+}
+
+export async function getParentConfirmedResults(studentId: string) {
+  const context = requireContext();
+  return request<{ student: { id: string; name: string; teams: Array<{ name: string }> }; confirmedResults: import("./types").ConfirmedStudentResult[] }>({ path: `/clubs/${encodeURIComponent(context.clubId)}/app-clients/${encodeURIComponent(context.clientId)}/parent/students/${encodeURIComponent(studentId)}/confirmed-results` });
 }

@@ -1,4 +1,4 @@
-import { assertRuntimeApiConfigured, DEV_MODE, DEV_USER_IDS } from "./config";
+import { assertRuntimeApiConfigured, DEV_MODE, DEV_USER_IDS, RUNTIME_ENV } from "./config";
 import { createIdempotencyKey, createRequestId } from "./idempotency";
 import { clearSession, getAppContext, getSession } from "./store";
 
@@ -28,6 +28,12 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
     "X-Request-Id": requestId,
     ...options.headers,
   };
+
+  // Caller headers cannot override or duplicate the runtime routing declaration.
+  for (const name of Object.keys(headers)) {
+    if (name.toLowerCase() === "x-miniprogram-env") delete headers[name];
+  }
+  if (RUNTIME_ENV) headers["X-MiniProgram-Env"] = RUNTIME_ENV;
 
   if (context) {
     headers["X-Club-Id"] = context.clubId;

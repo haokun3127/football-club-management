@@ -12,7 +12,7 @@
         </view>
         <view wx:if="{{hasTeamName || hasOpponentName}}" class="match-hero__teams">
           <view wx:if="{{hasTeamName}}" class="match-hero__team">{{teamName}}</view>
-          <view wx:if="{{hasScore}}" class="match-hero__score">{{scoreLabel}}</view>
+          <view class="match-hero__score">{{scoreLabel}}</view>
           <view wx:if="{{hasOpponentName}}" class="match-hero__team">{{opponentName}}</view>
         </view>
         <view wx:else class="match-hero__score match-hero__score--pending">{{scoreLabel}}</view>
@@ -24,6 +24,9 @@
         </view>
       </view>
 
+      <view class="match-card"><view wx:for="{{metadata}}" wx:key="label" class="match-meta"><view>{{item.label}}</view><text selectable>{{item.value}}</text></view></view>
+
+      <view class="match-card"><view class="match-card__header"><view class="match-card__title">本场名单</view><view wx:if="{{canManageRoster}}" class="match-card__action" bindtap="openTemporaryPlayers">＋临时球员</view></view><view class="match-card__empty">{{rosterNames || '暂无名单成员'}}</view></view>
       <view wx:if="{{hasLocalDraftNotice}}" class="match-draft-notice">
         <image class="match-draft-notice__icon" src="/assets/icons/c6-2-cloud-check.svg" mode="aspectFit" />
         <view class="match-draft-notice__content">

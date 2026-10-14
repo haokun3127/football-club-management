@@ -1,3 +1,4 @@
+import { environmentStorageKey } from "../../../utils/config";
 import { getFamilyMembers, getParentChildren, type FamilyMember } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
@@ -47,7 +48,7 @@ Page<PageData>({
         avatarLetter: child.name.slice(0, 1),
         teamLabel: child.teams[0] || "所属球队信息待同步",
       }));
-      const stored = wx.getStorageSync("activeStudentId") as string | "";
+      const stored = wx.getStorageSync(environmentStorageKey("activeStudentId")) as string | "";
       const activeChildId = stored && children.some((child) => child.id === stored)
         ? stored
         : children[0]?.id || "";

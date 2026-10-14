@@ -1,0 +1,59 @@
+{
+  "retrievedOn": "2026-09-18",
+  "note": "微信开放文档（腾讯官方）正文抓取清单。slug 决定输出文件名，topic 用于生成索引。URL 一律 https，公开只读。",
+  "sources": [
+    { "slug": "framework-overview",        "topic": "框架总览",             "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/" },
+    { "slug": "quickstart-code",           "topic": "代码构成(JSON/WXML/WXSS/JS)", "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/quickstart/code.html" },
+    { "slug": "config-app-json",           "topic": "全局配置 app.json / 页面配置 page.json", "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/config.html" },
+    { "slug": "ref-app-config",            "topic": "app.json 配置参考(全字段)",  "url": "https://developers.weixin.qq.com/miniprogram/dev/reference/configuration/app.html" },
+    { "slug": "ref-page-config",           "topic": "page.json 配置参考(全字段)", "url": "https://developers.weixin.qq.com/miniprogram/dev/reference/configuration/page.html" },
+    { "slug": "ref-project-config",        "topic": "project.config.json 参考",   "url": "https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html" },
+    { "slug": "operating-mechanism",       "topic": "运行机制",             "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/runtime/operating-mechanism.html" },
+    { "slug": "update-mechanism",          "topic": "更新机制(版本与热更新)",  "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/runtime/update-mechanism.html" },
+    { "slug": "release-latest-v3",         "topic": "基础库更新日志 v3.x(最新)", "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/release/" },
+    { "slug": "client-lib-version",        "topic": "基础库版本分布",         "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/client-lib/version.html" },
+
+    { "slug": "subpackages-overview",      "topic": "分包加载总览(体积限制)",   "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/subpackages.html" },
+    { "slug": "subpackages-basic",         "topic": "使用分包",             "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/subpackages/basic.html" },
+    { "slug": "subpackages-independent",   "topic": "独立分包",             "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/subpackages/independent.html" },
+    { "slug": "subpackages-preload",       "topic": "分包预下载",            "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/subpackages/preload.html" },
+    { "slug": "subpackages-async",         "topic": "分包异步化",            "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/subpackages/async.html" },
+
+    { "slug": "ability-storage",           "topic": "数据缓存(容量与限制)",    "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/ability/storage.html" },
+    { "slug": "ability-network",           "topic": "网络能力(超时/并发)",     "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/ability/network.html" },
+    { "slug": "ability-domain",            "topic": "服务器域名配置(HTTPS/备案)", "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/ability/domain.html" },
+    { "slug": "ability-lazyload",          "topic": "代码懒注入/按需注入",      "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/ability/lazyload.html" },
+
+    { "slug": "privacy-overview",          "topic": "用户隐私保护指引填写说明",  "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/user-privacy/" },
+    { "slug": "privacy-intro",             "topic": "小程序用户隐私保护指引内容介绍", "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/user-privacy/miniprogram-intro.html" },
+    { "slug": "privacy-authorize",         "topic": "隐私协议开发指南(授权接口)", "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/user-privacy/PrivacyAuthorize.html" },
+
+    { "slug": "open-login",                "topic": "小程序登录 wx.login",    "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/login.html" },
+    { "slug": "open-getphonenumber",       "topic": "手机号快速验证/实时验证",  "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/getPhoneNumber.html" },
+    { "slug": "api-getSystemInfoSync",     "topic": "wx.getSystemInfoSync（已停止维护，替代方案）", "url": "https://developers.weixin.qq.com/miniprogram/dev/api/base/system/wx.getSystemInfoSync.html" },
+    { "slug": "api-getWindowInfo",         "topic": "wx.getWindowInfo（窗口/安全区）", "url": "https://developers.weixin.qq.com/miniprogram/dev/api/base/system/wx.getWindowInfo.html" },
+    { "slug": "api-getDeviceInfo",         "topic": "wx.getDeviceInfo（设备信息）", "url": "https://developers.weixin.qq.com/miniprogram/dev/api/base/system/wx.getDeviceInfo.html" },
+    { "slug": "api-getAppBaseInfo",        "topic": "wx.getAppBaseInfo（字体/适老化）", "url": "https://developers.weixin.qq.com/miniprogram/dev/api/base/system/wx.getAppBaseInfo.html" },
+    { "slug": "subscribe-message",         "topic": "订阅消息",             "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/subscribe-message.html" },
+    { "slug": "server-code2session",       "topic": "服务端 code2Session 登录凭证校验", "url": "https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-login/code2Session.html" },
+
+    { "slug": "perf-tips",                 "topic": "性能与体验优化总览",      "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/performance/tips.html" },
+    { "slug": "perf-start",                "topic": "启动性能优化",          "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/performance/tips/start.html" },
+    { "slug": "perf-setdata",              "topic": "setData 使用建议",      "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/performance/tips/runtime_setData.html" },
+    { "slug": "audits-overview",           "topic": "体验评分(评分项与标准)",   "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/audits/audits.html" },
+    { "slug": "audits-best-practice",      "topic": "体验评分最佳实践",       "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/audits/best-practice.html" },
+
+    { "slug": "custom-component",          "topic": "自定义组件(组件框架)",     "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/custom-component/" },
+    { "slug": "skyline-introduction",      "topic": "Skyline 渲染引擎介绍",    "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/runtime/skyline/introduction.html" },
+    { "slug": "quickstart-release",        "topic": "发布上线流程(上传/审核/发布)", "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/quickstart/release.html" },
+
+    { "slug": "product-ops-spec",          "topic": "小程序运营规范(平台红线)",  "url": "https://developers.weixin.qq.com/miniprogram/product/" },
+    { "slug": "product-reject",            "topic": "常见拒绝情形(审核)",      "url": "https://developers.weixin.qq.com/miniprogram/product/reject.html" },
+    { "slug": "product-record-guidelines", "topic": "微信小程序备案指引",       "url": "https://developers.weixin.qq.com/miniprogram/product/record/guidelines" },
+    { "slug": "security-basic",            "topic": "安全指引",             "url": "https://developers.weixin.qq.com/miniprogram/security/basic/" },
+    { "slug": "design-guide",              "topic": "小程序设计指南",         "url": "https://developers.weixin.qq.com/miniprogram/design/" },
+    { "slug": "design-accessibility",      "topic": "无障碍设计",            "url": "https://developers.weixin.qq.com/miniprogram/design/accessibility.html" },
+    { "slug": "design-elderly",            "topic": "适老化设计",            "url": "https://developers.weixin.qq.com/miniprogram/design/elderly.html" },
+    { "slug": "design-adapt",              "topic": "大屏适配",              "url": "https://developers.weixin.qq.com/miniprogram/design/adapt.html" }
+  ]
+}

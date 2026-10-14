@@ -1,0 +1,17 @@
+<view class="results-page">
+  <view class="results-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view bindtap="goBack" class="results-back">‹</view><view>{{pageTitle}}</view></view>
+  <view class="results-body">
+    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '加载成绩' : state === 'empty' ? '暂无已确认成绩' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <block wx:if="{{state === 'ready' && selected}}">
+      <view class="results-card"><view class="results-heading">{{selected.name}} · 已确认</view><view class="results-value">{{selected.valueLabel}}</view><view wx:if="{{selected.mapping}}" class="results-text">分值 {{selected.mapping.integerScore}} · 等级 {{selected.mapping.grade}}</view><view wx:else class="results-caption">该确认结果暂无完整分值/等级映射</view><view wx:if="{{selected.mapping}}" class="results-caption">分值规则 {{selected.mapping.rawScoreVersionId}} · 等级规则 {{selected.mapping.gradeVersionId}}</view><view class="results-caption">{{studentName}} · {{teamName}} · {{selected.dateLabel}}</view></view>
+      <view class="results-card"><view class="results-history-title">{{scaleLabel}}</view>
+        <view wx:if="{{bars.length}}" class="results-chart"><view wx:for="{{bars}}" wx:key="id" class="results-column"><view class="results-bar {{item.latest ? 'results-bar--latest' : ''}}" style="height:{{item.height}}"></view><view>{{item.valueLabel}}</view><view class="results-caption">{{item.dateLabel}}</view></view></view>
+        <view wx:if="{{bars.length}}" class="results-caption">图表显示最近三次，完整记录如下</view>
+        <view wx:for="{{history}}" wx:key="id" class="results-history-row"><text>{{item.historyDate}}</text><text>{{item.valueLabel}}<text wx:if="{{item.mapping}}"> · {{item.mapping.integerScore}} / {{item.mapping.grade}}</text></text></view>
+        <view class="results-caption">仅比较同一项目、版本及单位；修订保留为同一次测评。</view>
+      </view>
+      <view wx:for="{{alternatives}}" wx:key="id" class="results-card results-alternative" data-id="{{item.id}}" bindtap="select"><view class="results-title">{{item.name}}</view><view class="results-text">原始成绩 {{item.valueLabel}} · {{item.dateLabel}}</view><view class="results-link">查看已确认成绩与个人历史 ›</view></view>
+    </block>
+  </view>
+  <view wx:if="{{teamId}}" class="results-footer"><button class="results-primary" loading="{{switching}}" disabled="{{switching}}" bindtap="switchStudent">切换同队学员</button></view>
+</view>

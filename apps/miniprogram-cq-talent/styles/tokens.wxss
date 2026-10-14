@@ -17,6 +17,15 @@ page {
   --color-page: #f6f7f9;
   --color-card: #ffffff;
   --color-line: #e7eaf0;
+  /* Approved bright club V2; opt in per verified screen during rollout. */
+  --club-page: #faf8f4;
+  --club-nav: #fffdf9;
+  --club-line: #e9e1dc;
+  --club-text: #211c1b;
+  --club-muted: #746b68;
+  --club-warning-line: #ebcf91;
+  --club-warning-soft: #fff7e5;
+  --club-shadow: 0 6rpx 24rpx rgba(46, 20, 15, 0.06);
 
   /* 文本 */
   --color-text: #202124;

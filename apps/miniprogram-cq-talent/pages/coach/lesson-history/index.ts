@@ -1,9 +1,9 @@
-import { getCoachHome, getCoachLessonConfirmation } from "../../../utils/api";
+import { getCoachHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { currentLocalDate, shiftCalendarDate } from "../../../utils/date";
 import { openPage } from "../../../utils/navigation";
 import { formatShortDate, formatTimeRange } from "../../../utils/presentation";
-import type { CoachLessonConfirmation, LoadState, ScheduleEvent } from "../../../utils/types";
+import type { LoadState, ScheduleEvent } from "../../../utils/types";
 
 type HistoryRow = {
   id: string;
@@ -56,10 +56,10 @@ Page<PageData>({
   async load(showAll = false): Promise<boolean> {
     const to = currentLocalDate();
     const from = shiftCalendarDate(to, -29);
-    const recordWindowLabel = showAll ? "全部记录" : "近 30 天";
+    const recordWindowLabel = showAll ? "近 30 天全部记录" : "近 30 天";
     this.setData({
       state: "loading",
-      message: "正在读取销课历史",
+      message: "正在读取训练历史",
       retryLabel: "",
       from,
       to,
@@ -73,18 +73,13 @@ Page<PageData>({
 
     try {
       const home = await getCoachHome({ from, to });
-      const candidates = home.events.filter((event) => event.type === "training" && isCompleted(event.status) && Boolean(event.id));
-      const allRows: HistoryRow[] = [];
-      for (const event of candidates) {
-        const confirmation = await getCoachLessonConfirmation(event.id);
-        if (!hasRealSettlement(event, confirmation)) continue;
-        allRows.push(toHistoryRow(event, confirmation));
-      }
+      const candidates = home.events.filter((event) => event.type === "training" && Date.parse(event.endsAt || event.startsAt) < Date.now() && Boolean(event.id));
+      const allRows = candidates.sort((a, b) => b.startsAt.localeCompare(a.startsAt)).map(toHistoryRow);
       const rows = showAll ? allRows : allRows.slice(0, 5);
       const latest = allRows[0];
       this.setData({
         state: allRows.length ? "ready" : "empty",
-        message: allRows.length ? "" : "最近 30 天暂无已销课记录。",
+        message: allRows.length ? "" : "最近 30 天暂无历史训练。",
         retryLabel: "",
         from,
         to,
@@ -99,7 +94,7 @@ Page<PageData>({
     } catch {
       this.setData({
         state: "error",
-        message: "销课历史读取失败，请稍后重试。",
+        message: "训练历史读取失败，请稍后重试。",
         retryLabel: "重新读取",
         from,
         to,
@@ -115,7 +110,7 @@ Page<PageData>({
   },
 
   retry() {
-    return this.load(this.data.recordWindowLabel === "全部记录");
+    return this.load(this.data.recordWindowLabel === "近 30 天全部记录");
   },
 
   showAll() {
@@ -128,26 +123,7 @@ Page<PageData>({
   },
 });
 
-function isCompleted(status: string) {
-  const value = status.trim().toLowerCase();
-  return ["completed", "finished", "done", "已完成", "已结束"].includes(value);
-}
-
-function hasRealSettlement(event: ScheduleEvent, confirmation: CoachLessonConfirmation) {
-  const participantIds = new Set(confirmation.participants.map((participant) => participant.studentId).filter(Boolean));
-  if (!participantIds.size) return false;
-  return [...participantIds].every((studentId) => confirmation.ledgers.some((ledger) => ledger.studentId === studentId
-    && (ledger.sourceIds ?? []).some((sourceId) => isSettlementSourceForEvent(sourceId, event.id, studentId))));
-}
-
-function isSettlementSourceForEvent(sourceId: string, eventId: string, studentId: string) {
-  return sourceId === `app-client-lesson-${eventId}-${studentId}`
-    || sourceId === eventId
-    || sourceId.startsWith(`${eventId}-`);
-}
-
-function toHistoryRow(event: ScheduleEvent, confirmation: CoachLessonConfirmation): HistoryRow {
-  const participantCount = confirmation.participants.filter((participant) => Boolean(participant.studentId)).length;
+function toHistoryRow(event: ScheduleEvent): HistoryRow {
   return {
     id: event.id,
     title: event.title && event.title !== "活动" ? event.title : "训练活动",
@@ -158,8 +134,8 @@ function toHistoryRow(event: ScheduleEvent, confirmation: CoachLessonConfirmatio
     venueLabel: event.venue || "场地待同步",
     hasTeam: Boolean(event.teamName),
     hasVenue: Boolean(event.venue),
-    studentCountLabel: `${participantCount} 人已销课`,
-    statusLabel: "已完成",
+    studentCountLabel: "查看学员训练记录",
+    statusLabel: "查看记录",
   };
 }
 

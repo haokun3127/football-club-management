@@ -1,251 +1,59 @@
-import { existsSync, readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
-const mocks = vi.hoisted(() => ({
-  getCoachTeam: vi.fn(),
-  getCoachStudentRadar: vi.fn(),
-  requireRole: vi.fn(),
-  navigateBack: vi.fn(),
-  openPage: vi.fn(),
-}));
-
-vi.mock("../../../utils/api", () => ({
-  getCoachTeam: mocks.getCoachTeam,
-  getCoachStudentRadar: mocks.getCoachStudentRadar,
-}));
+const mocks = vi.hoisted(() => ({ getCoachTeam: vi.fn(), getCoachStudentProfile: vi.fn(), requireRole: vi.fn(), openPage: vi.fn() }));
+vi.mock("../../../utils/api", () => mocks);
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
-vi.mock("../../../utils/presentation", () => ({ resolveNavInset: () => 0 }));
-
-globalThis.wx = { navigateBack: mocks.navigateBack };
-
-let pageDefinition;
-globalThis.Page = (definition) => {
-  pageDefinition = definition;
-  return definition;
-};
-
+vi.mock("../../../utils/presentation", () => ({ resolveNavInset: () => 0, resolveMenuInset: () => 0 }));
+globalThis.wx = { navigateBack: vi.fn() };
+let definition; globalThis.Page = value => { definition = value; };
 await import("./index.ts");
-
-const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
-const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
-const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
-const pageConfig = readFileSync(new URL("./index.json", import.meta.url), "utf8");
-const apiSource = readFileSync(new URL("../../../utils/api.ts", import.meta.url), "utf8");
-const typesSource = readFileSync(new URL("../../../utils/types.ts", import.meta.url), "utf8");
-const backArrow = new URL("../../../assets/icons/c13-arrow-left.svg", import.meta.url);
-
-const team = {
-  team: { id: "team-1", name: "Actual team", season: "2026-2027" },
-  stats: { memberCount: 2, trainingCount: 5, attendanceRate: 90 },
-  members: [
-    { id: "student-1", name: "Player One" },
-    { id: "student-2", name: "Player Two" },
-  ],
+const profile = {
+ student: { id: "s1", name: "超过四个字的姓名", age: 10, school: null, dominantFoot: "left", level: null, teams: [{ id: "t2", name: "第二队", joinedAt: "2026-01-01" }] },
+ attendance: { expected: 3, present: 2, absent: 1, leave: 0, late: 1, unrecorded: 0, effectiveLessons: 1, earlyLeave: null },
+ records: [{ eventId: "e1", title: "训练", occurredAt: "2026-09-20T18:00:00Z", status: "present", counted: false, source: "correction", revision: 2, history: [{ revision: 2, counted: false, source: "correction", reason: "重复排课", changedAt: "2026-09-23T00:00:00Z" }] }],
+ training: { modules: [{ label: "后台分类", courses: 1, configuredMinutes: 20 }], participation: 2, formalMatches: 0, friendlyMatches: null, completionTargets: null },
 };
-
-const validRadar = [
-  { metricId: "passing", label: "Passing", value: 74, maxValue: 100, occurredAt: "2026-08-01T09:00:00.000Z" },
-  { metricId: "shooting", label: "Shooting", value: 65, maxValue: 100, occurredAt: "2026-08-03T09:00:00.000Z" },
-  { metricId: "speed", label: "Speed", value: 78, maxValue: 100, occurredAt: "2026-08-05T09:00:00.000Z" },
-];
-
-function deferred() {
-  let resolve;
-  let reject;
-  const promise = new Promise((nextResolve, nextReject) => {
-    resolve = nextResolve;
-    reject = nextReject;
-  });
-  return { promise, resolve, reject };
-}
-
-function createPageInstance(data = {}) {
-  const instance = { ...pageDefinition, data: { ...pageDefinition.data, ...data } };
-  instance.setData = (patch) => { instance.data = { ...instance.data, ...patch }; };
-  return instance;
-}
-
-describe("coach student radar", () => {
-  beforeEach(() => {
-    mocks.getCoachTeam.mockReset().mockResolvedValue(team);
-    mocks.getCoachStudentRadar.mockReset().mockResolvedValue(validRadar);
-    mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
-    mocks.navigateBack.mockReset();
-    mocks.openPage.mockReset();
-  });
-
-  it("uses only a real team member, projects real dimensions, and preserves the assessment period", async () => {
-    const page = createPageInstance();
-
-    await page.load("student-not-in-team");
-
-    expect(mocks.getCoachStudentRadar).toHaveBeenCalledWith("student-1");
-    expect(page.data).toMatchObject({
-      state: "ready",
-      activeStudentId: "student-1",
-      activeStudentName: "Play",
-      assessmentPeriod: "2026-08-01 至 2026-08-05 评估",
-      dimensions: [
-        { metricId: "passing", value: "74", width: "74%" },
-        { metricId: "shooting", value: "65", width: "65%" },
-        { metricId: "speed", value: "78", width: "78%" },
-      ],
-    });
-  });
-
-  it("projects the real eight-metric response into the six Figma display axes with actual metric labels", async () => {
-    mocks.getCoachStudentRadar.mockResolvedValueOnce([
-      { metricId: "metric-cq-talent-core-03", label: "运控球", value: 66, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
-      { metricId: "metric-cq-talent-core-10", label: "1v1", value: 70, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
-      { metricId: "metric-cq-talent-core-18", label: "传接球", value: 74, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
-      { metricId: "metric-cq-talent-core-27", label: "射门", value: 78, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
-      { metricId: "metric-cq-talent-core-32", label: "小组配合", value: 82, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
-      { metricId: "metric-cq-talent-core-48", label: "体能", value: 90, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
-      { metricId: "metric-cq-talent-core-38", label: "整体战术", value: 86, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
-      { metricId: "metric-cq-talent-core-56", label: "精神", value: 63, maxValue: 100, occurredAt: "2026-08-25T13:39:34.423Z" },
-    ]);
-    const page = createPageInstance();
-
-    await page.load("student-1");
-
-    expect(page.data.radar).toHaveLength(6);
-    expect(page.data.dimensions.map((dimension) => dimension.label)).toEqual(["小组配合", "运控球", "射门", "体能", "1v1", "传接球"]);
-    expect(page.data.radar.map((metric) => metric.value)).toEqual([82, 66, 78, 90, 70, 74]);
-  });
-
-  it("does not request a radar when the scoped team has no members", async () => {
-    mocks.getCoachTeam.mockResolvedValueOnce({
-      team: null,
-      stats: { memberCount: 0, trainingCount: 0, attendanceRate: null },
-      members: [],
-    });
-    const page = createPageInstance();
-
-    await page.load("");
-
-    expect(mocks.getCoachStudentRadar).not.toHaveBeenCalled();
-    expect(page.data).toMatchObject({ state: "empty", students: [], radar: [] });
-  });
-
-  it("navigates to another real team member's radar", async () => {
-    const page = createPageInstance();
-    await page.load("student-1");
-    page.selectStudent({ currentTarget: { dataset: { id: "student-2" } } });
-    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/student-radar/index?student=student-2");
-  });
-
-  it("does not navigate when the active student is selected again", async () => {
-    const page = createPageInstance();
-    await page.load("student-1");
-    page.selectStudent({ currentTarget: { dataset: { id: "student-1" } } });
-    expect(mocks.openPage).not.toHaveBeenCalled();
-  });
-
-  it("shows an honest empty state instead of drawing invalid radar dimensions", async () => {
-    mocks.getCoachStudentRadar.mockResolvedValueOnce([
-      { metricId: "one", label: "One", value: 70, maxValue: 0 },
-      { metricId: "two", label: "Two", value: Number.NaN, maxValue: 100 },
-      { metricId: "three", label: "Three", value: Number.POSITIVE_INFINITY, maxValue: 100 },
-    ]);
-    const page = createPageInstance();
-
-    await page.load("student-1");
-
-    expect(page.data).toMatchObject({
-      state: "empty",
-      hasRadar: false,
-      radar: [],
-      dimensions: [],
-      assessmentPeriod: "评估时间待同步",
-    });
-  });
-
-  it("keeps one or two real dimensions visible without drawing a radar geometry", async () => {
-    mocks.getCoachStudentRadar.mockResolvedValueOnce(validRadar.slice(0, 2));
-    const page = createPageInstance();
-
-    await page.load("student-1");
-
-    expect(page.data).toMatchObject({
-      state: "empty",
-      hasRadar: false,
-      radar: [],
-      assessmentPeriod: "2026-08-01 至 2026-08-03 评估",
-      dimensions: [
-        { metricId: "passing", value: "74", width: "74%" },
-        { metricId: "shooting", value: "65", width: "65%" },
-      ],
-    });
-  });
-
-  it("shows the pending assessment-time label when valid radar data has no occurredAt", async () => {
-    mocks.getCoachStudentRadar.mockResolvedValueOnce(validRadar.map(({ occurredAt, ...point }) => point));
-    const page = createPageInstance();
-
-    await page.load("student-1");
-
-    expect(page.data).toMatchObject({
-      state: "ready",
-      hasRadar: true,
-      assessmentPeriod: "评估时间待同步",
-    });
-  });
-
-  it("keeps a current radar failure safe and does not expose the upstream message", async () => {
-    mocks.getCoachStudentRadar.mockRejectedValueOnce(new Error("raw radar upstream details"));
-    const page = createPageInstance();
-
-    await page.load("student-1");
-
-    expect(page.data).toMatchObject({
-      state: "error",
-      hasRadar: false,
-      radar: [],
-      dimensions: [],
-      message: "能力雷达读取失败，请稍后重试。",
-    });
-    expect(page.data.message).not.toContain("raw radar upstream details");
-  });
-
-  it("uses the V7 full-screen white header, large radar card, roster grid, and a template without method calls", () => {
-    expect(existsSync(backArrow)).toBe(true);
-    expect(pageConfig).not.toContain('"app-header"');
-    expect(pageConfig).not.toContain('"role-tabbar"');
-    expect(template).toContain('class="radar-nav"');
-    expect(template).toContain('padding-top:{{navInset}}px');
-    expect(template).toContain('/assets/icons/c13-arrow-left.svg');
-    expect(template).toContain('class="radar-context"');
-    expect(template).toContain('class="radar-roster__grid"');
-    expect(template).not.toContain('feedbackMessage');
-    expect(template).not.toContain('student-strip');
-    expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(template).toContain('class="radar-hero"');
-    expect(template).not.toContain('radarHeroClass');
-    expect(controller).not.toContain('radarHeroClass');
-    expect(stylesheet).toMatch(/\.radar-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*background:\s*#ffffff)/s);
-    expect(stylesheet).toMatch(/\.radar-nav__back,\s*\.radar-nav__placeholder\s*\{(?=[^}]*width:\s*48rpx)(?=[^}]*height:\s*64rpx)/s);
-    expect(stylesheet).toMatch(/\.radar-nav__title\s*\{(?=[^}]*text-align:\s*left)(?=[^}]*font-size:\s*36rpx)(?=[^}]*line-height:\s*44rpx)/s);
-    expect(template).toMatch(/<radar-canvas[^>]*width="528rpx"[^>]*height="528rpx"/);
-    expect(stylesheet).toMatch(/\.radar-hero\s*\{[^}]*position:\s*relative[^}]*height:\s*688rpx[^}]*overflow:\s*hidden/s);
-    expect(stylesheet).toMatch(/\.radar-hero__plot\s*\{[^}]*justify-content:\s*center/s);
-    expect(stylesheet).toMatch(/\.radar-hero__period\s*\{[^}]*color:\s*#a80f1b/s);
-    expect(stylesheet).toMatch(/\.radar-roster__grid\s*\{[^}]*grid-template-columns:\s*repeat\(4,/s);
-    expect(stylesheet).not.toMatch(/width:\s*200%/);
-    expect(stylesheet).not.toMatch(/transform:\s*scale\s*\(/);
-    expect(controller).not.toContain("app-header");
-  });
-
-  it("keeps the Figma context line above the radar card", () => {
-    expect(stylesheet).toMatch(/\.radar-context\s*\{[^}]*margin-bottom:\s*16rpx/s);
-    expect(stylesheet).toMatch(/\.radar-page__body\s*\{[^}]*padding:[^}]*180rpx/s);
-  });
-
-  it("preserves only the source occurredAt field at the API boundary", () => {
-    const normalizer = apiSource.slice(apiSource.indexOf("function normalizeRadarMetric"), apiSource.indexOf("function normalizeStudentHome"));
-
-    expect(typesSource).toMatch(/interface RadarMetricPoint\s*\{[\s\S]*occurredAt\?: string;/);
-    expect(normalizer).toMatch(/occurredAt:\s*stringOrUndefined\(record\?\.occurredAt\)/);
-    expect(normalizer).not.toContain("updatedAt");
-  });
+const result = { profile, radar: [{ metricId: "one", label: "后台能力一", value: 0, maxValue: 100, occurredAt: "2026-09-20T18:00:00Z" }, { metricId: "two", label: "后台能力二", maxValue: 100 }], overall: null, modelName: "后台配置模型" };
+function page() { return { ...definition, data: structuredClone(definition.data), setData(value) { Object.assign(this.data, value); } }; }
+beforeEach(() => { vi.clearAllMocks(); mocks.requireRole.mockReturnValue(true); mocks.getCoachStudentProfile.mockResolvedValue(result); mocks.getCoachTeam.mockResolvedValue({ team: { id: "t2" }, members: [{ id: "s1", name: "长姓名" }, { id: "s2", name: "第二学员" }] }); });
+describe("three-region student teaching profile", () => {
+ it("uses the requested child directly, keeps full names, zero and missing dimensions, and never invents an overall score", async () => {
+  const p = page(); await p.onLoad({ student: "s1" });
+  expect(mocks.getCoachTeam).not.toHaveBeenCalled(); expect(mocks.getCoachStudentProfile).toHaveBeenCalledWith("s1");
+  expect(p.data.activeStudentName).toBe("超过四个字的姓名"); expect(p.data.state).toBe("ready"); expect(p.data.hasRadar).toBe(false);
+  expect(p.data.dimensions.map(x => x.value)).toEqual(["0", "未测评"]); expect(p.data.overall).toBe("未形成完整结果");
+  expect(p.data.records[0]).toMatchObject({ date: "2026-09-21", countLabel: "不计次", revised: true });
+  expect(p.data.attendance.find(x => x.label === "早退").value).toBe("未记录");
+  p.showHistory({ currentTarget: { dataset: { id: "e1" } } }); expect(p.data.history[0].reason).toBe("重复排课");
+ });
+ it("opens summary drilldowns with the exact student and team and safely defaults unknown sections", async () => {
+  const p = page(); await p.onLoad({ student: "s1", team: "t2", section: "unsafe" });
+  expect(p.data.section).toBe("summary");
+  p.openSection({ currentTarget: { dataset: { section: "training" } } });
+  expect(mocks.openPage).toHaveBeenLastCalledWith("/pages/coach/student-radar/index?student=s1&team=t2&section=training");
+  const detail = page(); await detail.onLoad({ student: "s1", team: "t2", section: "training" });
+  expect(detail.data.section).toBe("training"); expect(detail.data.pageTitle).toBe("学员训练记录");
+  expect(detail.data.records[0].countLabel).toBe("不计次");
+ });
+ it("counts confirmed tasks rather than individual raw items and keeps unavailable distinct from empty", async () => {
+  const p = page(); await p.load("s1"); expect(p.data.confirmedSummary).toBe("已确认成绩暂不可用");
+  mocks.getCoachStudentProfile.mockResolvedValueOnce({ ...result, confirmedResults: [{ taskId: "t1" }, { taskId: "t1" }, { taskId: "t2" }] });
+  await p.load("s1"); expect(p.data.confirmedSummary).toBe("已确认测评 2次");
+ });
+ it("preserves every configured dimension rather than six fixed axes", async () => {
+  mocks.getCoachStudentProfile.mockResolvedValueOnce({ ...result, radar: Array.from({ length: 8 }, (_, i) => ({ metricId: String(i), label: `能力${i}`, value: i, maxValue: 100 })) });
+  const p = page(); await p.load("s1"); expect(p.data.radar).toHaveLength(8); expect(p.data.hasRadar).toBe(true);
+ });
+ it("uses explicit team context and loads another child without growing the navigation stack", async () => {
+  const p = page(); await p.onLoad({ student: "s1", team: "t2" }); expect(mocks.getCoachTeam).toHaveBeenCalledWith("t2");
+  await p.selectStudent({ currentTarget: { dataset: { id: "s2" } } }); expect(mocks.getCoachStudentProfile).toHaveBeenLastCalledWith("s2"); expect(mocks.openPage).not.toHaveBeenCalled();
+ });
+ it("ignores an old request after a newer selection and after unload", async () => {
+  let resolve; mocks.getCoachStudentProfile.mockImplementationOnce(() => new Promise(r => { resolve = r; }));
+  const p = page(); const old = p.load("s1"); await p.load("s2"); const current = structuredClone(p.data); resolve({ ...result, profile: { ...profile, student: { ...profile.student, name: "旧数据" } } }); await old; expect(p.data).toEqual(current);
+  let next; mocks.getCoachStudentProfile.mockImplementationOnce(() => new Promise(r => { next = r; })); const pending = p.load("s1"); p.onUnload(); const unloaded = structuredClone(p.data); next(result); await pending; expect(p.data).toEqual(unloaded);
+ });
+ it("does not silently replace a forbidden child with a default child", async () => {
+  mocks.getCoachStudentProfile.mockRejectedValueOnce(new Error("forbidden private details")); const p = page(); await p.load("forbidden"); expect(p.data.state).toBe("error"); expect(mocks.getCoachTeam).not.toHaveBeenCalled(); expect(p.data.message).not.toContain("private");
+ });
 });

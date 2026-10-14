@@ -70,3 +70,6 @@ apps/miniprogram-cq-talent/.tmp-npm-cache-*/
 apps/api/data/
 apps/api/apps/
 local-backups/
+
+# Official WeChat docs local raw snapshots (regenerate with scripts/wechat-docs/fetch-official-docs.py)
+docs/reference/wechat-miniprogram/_raw-html/

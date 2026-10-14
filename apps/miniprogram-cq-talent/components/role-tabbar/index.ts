@@ -10,10 +10,10 @@ type TabItem = {
 
 const LABELS: Record<AppRole, TabItem[]> = {
   parent: [
+    { key: "home", label: "首页", path: "/pages/parent/home/index", activeIcon: "/assets/icons/tab-discover-active.png", inactiveIcon: "/assets/icons/tab-discover-inactive.png" },
     { key: "schedule", label: "日程", path: "/pages/parent/schedule/index", activeIcon: "/assets/icons/tab-calendar-active.png", inactiveIcon: "/assets/icons/tab-calendar-inactive.png" },
     { key: "growth", label: "成长", path: "/pages/parent/growth/index", activeIcon: "/assets/icons/tab-growth-active.png", inactiveIcon: "/assets/icons/tab-growth-inactive.png" },
-    { key: "discover", label: "发现", path: "/pages/parent/content/index", activeIcon: "/assets/icons/tab-discover-active.png", inactiveIcon: "/assets/icons/tab-discover-inactive.png" },
-    { key: "child", label: "我的孩子", path: "/pages/parent/child/index", activeIcon: "/assets/icons/tab-child-active.png", inactiveIcon: "/assets/icons/tab-child-inactive.png" },
+    { key: "child", label: "我的", path: "/pages/parent/child/index", activeIcon: "/assets/icons/tab-user-active.png", inactiveIcon: "/assets/icons/tab-user-inactive.png" },
   ],
   coach: [
     { key: "schedule", label: "日程", path: "/pages/coach/schedule/index", activeIcon: "/assets/icons/tab-calendar-active.png", inactiveIcon: "/assets/icons/tab-calendar-inactive.png" },

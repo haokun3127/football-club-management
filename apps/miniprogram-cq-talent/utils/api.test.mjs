@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 const storage = new Map([
-  ["cqTalentAppContext", {
+  ["cqTalent:develop:cqTalentAppContext", {
     clubId: "club-chongqing-talent",
     clientId: "app-client-cq-talent-wechat-main",
     capabilities: { client: { roleEntrypoints: { coach: ["attendance"] } } },
@@ -37,6 +37,24 @@ globalThis.wx = {
 };
 
 const { createCoachMatchEvent, getCoachAssessmentTasks, getCoachMatchDetail, getCoachWorkbench, getParentActivityDetail, getParentStudentHome, saveCoachAttendance, submitCoachAssessment, switchActiveRole, wechatLogin } = await import("./api.ts");
+
+describe("assessment task creation transport", () => {
+  it("sends the stable retry key and requires a created task identity", async () => {
+    const {createCoachAssessmentTask}=await import("./api.ts");
+    const originalRequest=globalThis.wx.request;
+    let received;let response={statusCode:201,data:{task:{id:"new-task"}}};
+    globalThis.wx.request=({header,success})=>{received=header;success(response);};
+    const payload={title:"随堂测评",templateId:"template",teamId:"team",termLabel:"秋季",startsOn:"2026-09-19",dueOn:"2026-09-19"};
+    try {
+      await expect(createCoachAssessmentTask(payload,"assessment-task-retry")).resolves.toEqual({id:"new-task"});
+      expect(received["Idempotency-Key"]).toBe("assessment-task-retry");
+      response={statusCode:201,data:{task:{}}};
+      await expect(createCoachAssessmentTask(payload,"assessment-task-retry")).rejects.toThrow("任务标识");
+      response={statusCode:200,data:{task:{id:"unexpected"}}};
+      await expect(createCoachAssessmentTask(payload,"assessment-task-retry")).rejects.toMatchObject({code:"unexpected_status"});
+    } finally {globalThis.wx.request=originalRequest;}
+  });
+});
 
 describe("active-role session transport", () => {
   it("advertises the role-switch capability when starting WeChat login", async () => {

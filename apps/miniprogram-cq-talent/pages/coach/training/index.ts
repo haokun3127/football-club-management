@@ -1,10 +1,11 @@
+import { environmentStorageKey } from "../../../utils/config";
 import { getCoachHome, getCoachTrainingProjectTree } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { formatCalendarDate, formatTimeOnly, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { LoadState, ScheduleEvent, TrainingProjectTree, TrainingTeamOption } from "../../../utils/types";
 
-const COACH_TRAINING_TEAM_KEY = "coach-training-team-id";
+const COACH_TRAINING_TEAM_KEY = environmentStorageKey("coach-training-team-id");
 
 type HeroMetric = { label: string; value: string };
 

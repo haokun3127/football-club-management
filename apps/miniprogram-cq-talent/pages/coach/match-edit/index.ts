@@ -19,6 +19,7 @@ interface MatchEditPageData {
   statusIndex: number;
   statuses: Option[];
   opponentName: string;
+  ageGroup: string; competitionFormat: string; handbookUrl: string;
   homeScore: string;
   awayScore: string;
   submitting: boolean;
@@ -27,10 +28,8 @@ interface MatchEditPageData {
 }
 
 const MATCH_TYPES: Option[] = [
-  { value: "friendly", label: "友谊赛" },
   { value: "league", label: "联赛" },
   { value: "cup", label: "杯赛" },
-  { value: "internal", label: "队内赛" },
 ];
 
 const STATUSES: Option[] = [
@@ -48,13 +47,13 @@ Page<MatchEditPageData>({
     matchId: "",
     eventTitle: "",
     teamName: "",
-    matchType: "friendly",
+    matchType: "league",
     matchTypeIndex: 0,
     matchTypes: MATCH_TYPES,
     status: "scheduled",
     statusIndex: 0,
     statuses: STATUSES,
-    opponentName: "",
+    opponentName: "", ageGroup: "", competitionFormat: "", handbookUrl: "",
     homeScore: "",
     awayScore: "",
     submitting: false,
@@ -86,7 +85,8 @@ Page<MatchEditPageData>({
       const detail = await getCoachMatchDetail(eventId);
       if (detail.event.id !== eventId) throw new Error("Match event mismatch");
       const match = detail.match;
-      const matchType = optionValue(MATCH_TYPES, match?.matchType, "friendly");
+      if (match && ["friendly", "internal"].includes(match.matchType || "")) throw new Error("Use training content for friendly games");
+      const matchType = optionValue(MATCH_TYPES, match?.matchType, "league");
       const status = optionValue(STATUSES, match?.status || detail.event.status, "scheduled");
       this.setData({
         state: "ready",
@@ -101,6 +101,7 @@ Page<MatchEditPageData>({
         status,
         statusIndex: optionIndex(STATUSES, status),
         opponentName: match?.opponentName || "",
+        ageGroup: match?.ageGroup || "", competitionFormat: match?.competitionFormat || "", handbookUrl: match?.handbookUrl || "",
         homeScore: numberInput(match?.homeScore),
         awayScore: numberInput(match?.awayScore),
         submitting: false,
@@ -122,6 +123,10 @@ Page<MatchEditPageData>({
     wx.navigateBack({ delta: 1 });
   },
 
+  onMetadataInput(event: { currentTarget: { dataset: { field: string } }; detail: { value: string } }) {
+    const field = event.currentTarget.dataset.field;
+    if (["ageGroup", "competitionFormat", "handbookUrl"].includes(field)) this.setData({ [field]: event.detail.value, hasSaveError: false });
+  },
   onOpponentInput(event: { detail: { value: string } }) {
     this.setData({ opponentName: event.detail.value, hasSaveError: false, saveError: "" });
   },
@@ -174,9 +179,10 @@ function buildInput(data: MatchEditPageData): { ok: true; value: Parameters<type
   const away = parseScore(data.awayScore);
   if (home === null || away === null) return { ok: false, message: "比分必须是 0 到 99 的整数。" };
   if ((home === undefined) !== (away === undefined)) return { ok: false, message: "请同时填写主队和对手比分。" };
-  if (data.status === "completed" && (home === undefined || away === undefined)) return { ok: false, message: "已完成比赛必须填写完整比分。" };
   if (data.status === "cancelled" && (home !== undefined || away !== undefined)) return { ok: false, message: "已取消比赛不能填写比分。" };
   const opponentName = data.opponentName.trim();
+  if (!opponentName) return { ok: false, message: "正式赛事请填写对手名称。" };
+  if (data.handbookUrl.trim() && !/^https:\/\//.test(data.handbookUrl.trim())) return { ok: false, message: "秩序册请填写 HTTPS 链接。" };
   return {
     ok: true,
     value: {
@@ -184,6 +190,9 @@ function buildInput(data: MatchEditPageData): { ok: true; value: Parameters<type
       ...(data.matchId ? { matchId: data.matchId } : {}),
       matchType: data.matchType,
       status: data.status,
+      ...(data.ageGroup.trim() ? { ageGroup: data.ageGroup.trim() } : {}),
+      ...(data.competitionFormat.trim() ? { competitionFormat: data.competitionFormat.trim() } : {}),
+      ...(data.handbookUrl.trim() ? { handbookUrl: data.handbookUrl.trim() } : {}),
       ...(opponentName ? { opponentName } : {}),
       ...(home === undefined ? {} : { homeScore: home, awayScore: away }),
     },
@@ -196,6 +205,9 @@ function matchesInput(detail: CoachMatchDetail, input: Parameters<typeof recordC
   return match.matchType === input.matchType
     && match.status === input.status
     && (match.opponentName || "") === (input.opponentName || "")
+    && (match.ageGroup || "") === (input.ageGroup || "")
+    && (match.competitionFormat || "") === (input.competitionFormat || "")
+    && (match.handbookUrl || "") === (input.handbookUrl || "")
     && match.homeScore === input.homeScore
     && match.awayScore === input.awayScore;
 }
@@ -236,7 +248,7 @@ function errorState(message: string, eventId: string): Partial<MatchEditPageData
     matchId: "",
     eventTitle: "",
     teamName: "",
-    opponentName: "",
+    opponentName: "", ageGroup: "", competitionFormat: "", handbookUrl: "",
     homeScore: "",
     awayScore: "",
     submitting: false,

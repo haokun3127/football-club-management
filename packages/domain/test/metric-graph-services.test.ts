@@ -190,3 +190,10 @@ describe("metric graph services", () => {
     })).toThrow("missing input metric metric-agility");
   });
 });
+
+ it("scoped inputs skip incomplete computations while strict mode still rejects them", () => {
+   const input = {clubId:"club-chongqing-talent",studentId:"student-1",graphVersion,metrics,dependencies,formulas:[formula],inputRecords:inputRecords.slice(0,1),ids:{next:(prefix="id")=>prefix},now};
+   expect(() => computeMetricGraph(input)).toThrow("Missing numeric input");
+   expect(computeMetricGraph({...input,allowPartialInputs:true})).toMatchObject({records:[],lineages:[]});
+   expect(computeMetricGraph({...input,inputRecords,allowPartialInputs:true}).records[0]?.value).toEqual({kind:"measurement",value:70,unit:"score"});
+ });

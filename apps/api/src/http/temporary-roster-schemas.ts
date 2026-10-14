@@ -1,0 +1,8 @@
+const id = { type: "string", minLength: 1 };
+const history = { type:"object",additionalProperties:false,required:["revision","action","actorName","changedAt","note"],properties:{revision:{type:"integer"},action:{enum:["add","remove"]},actorName:id,changedAt:id,participated:{type:"boolean"},note:{type:"string"}} };
+const roster = { type:"object",additionalProperties:false,required:["eventId","revision","temporary","participantIds"],properties:{eventId:id,revision:{type:"string",pattern:"^[0-9a-f]{64}$"},participantIds:{type:"array",items:id},temporary:{type:"array",items:{type:"object",additionalProperties:false,required:["studentId","active","revision","history"],properties:{studentId:id,active:{type:"boolean"},revision:{type:"integer"},history:{type:"array",items:history}}}}} };
+export const temporaryRosterSchemas = {
+  params: { type:"object",additionalProperties:false,required:["clubId","clientId","eventId"],properties:{clubId:id,clientId:id,eventId:id} },
+  body: { type:"object",additionalProperties:false,required:["expectedRevision","action","players"],properties:{expectedRevision:{type:"string",pattern:"^[0-9a-f]{64}$"},action:{enum:["add","remove"]},players:{type:"array",minItems:1,maxItems:20,items:{type:"object",additionalProperties:false,required:["studentId"],properties:{studentId:id,participated:{type:"boolean"}}}},note:{type:"string",maxLength:500}} },
+  response: { type:"object",additionalProperties:false,required:["event","roster"],properties:{event:{type:"object",additionalProperties:false,required:["id","title","type","endsAt","ended","cancelled"],properties:{id,title:id,type:{enum:["training","match","other"]},endsAt:id,ended:{type:"boolean"},cancelled:{type:"boolean"}}},roster} },
+};

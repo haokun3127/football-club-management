@@ -1,0 +1,25 @@
+{
+  "capturedAt": "2026-09-09T08:49:25.926Z",
+  "automationEndpoint": "ws://127.0.0.1:9421",
+  "route": "/pages/parent/schedule/index",
+  "pageStackRoutes": [
+    "/pages/parent/schedule/index"
+  ],
+  "png": {
+    "path": "\\var\\folders\\80\\xb71yvlx4kq6y47jl9rlt0440000gn\\T\\cq-talent-automator-ZlIltv\\parent-high-density.png",
+    "bytes": 33,
+    "width": 563,
+    "height": 1218,
+    "sha256": "89cb30296627c825587168cc69d3f84375b21853e6398999c02d9fddc03b5cfe"
+  },
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 3,
+    "rasterScale": {
+      "width": 1.5013333333333334,
+      "height": 1.5
+    }
+  },
+  "captureMethod": "miniprogram-automator MiniProgram.screenshot"
+}

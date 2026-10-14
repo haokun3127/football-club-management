@@ -14,6 +14,7 @@ const {
   findFreeAutomationPort,
   isTcpPortOpen,
   readIdeHttpPort,
+  resolveDevtoolsCli,
   resolveAutomationPort,
   writeAutomationSession,
 } = require(resolve(import.meta.dirname, "../../../scripts/devtools/automation-session.cjs"));
@@ -23,9 +24,7 @@ const DEFAULT_TIMEOUT_MS = 30_000;
 const DEFAULT_RETRY_DELAY_MS = 500;
 const DEFAULT_CONNECT_ATTEMPT_TIMEOUT_MS = 2_000;
 const REQUIRED_VIEWPORT = Object.freeze({ width: 375, height: 812 });
-const DEFAULT_CLI_PATH = process.platform === "win32"
-  ? "D:\\微信web开发者工具\\cli.bat"
-  : "/Applications/wechatwebdevtools.app/Contents/MacOS/cli";
+const DEFAULT_CLI_PATH = resolveDevtoolsCli();
 const DEFAULT_PROJECT_PATH = resolve(import.meta.dirname, "..");
 const WINDOWS_SIMULATOR_CAPTURE_HELPER = resolve(import.meta.dirname, "devtools-simulator-capture.py");
 const USAGE = "Usage: devtools:screenshot -- --output <absolute-path.png> --expect-route-prefix /pages/parent/ [--port <automator-port>]";

@@ -2,7 +2,7 @@ import { getSession } from "./store";
 import type { AppRole } from "./types";
 
 const HOME_BY_ROLE: Record<AppRole, string> = {
-  parent: "/pages/parent/schedule/index",
+  parent: "/pages/parent/home/index",
   coach: "/pages/coach/schedule/index",
 };
 

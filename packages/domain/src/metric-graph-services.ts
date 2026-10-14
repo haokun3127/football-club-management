@@ -18,6 +18,7 @@ export interface MetricGraphComputationInput {
   dependencies: MetricDependency[];
   formulas: DerivedMetricDefinition[];
   inputRecords: PlayerMetricRecord[];
+  allowPartialInputs?: boolean;
   ids: IdGenerator;
   now: ISODateTimeString;
   assessmentId?: EntityId;
@@ -99,6 +100,8 @@ export function computeMetricGraph(input: MetricGraphComputationInput): MetricGr
     }
 
     const formula = resolveFormula(metricId, incoming, formulaById, formulasByOutput);
+    // A scoped assessment produces only branches whose required facts exist.
+    if (input.allowPartialInputs && incoming.some((dependency) => !recordsByMetric.has(dependency.inputMetricId))) continue;
     const numericInputs = incoming.map((dependency) => {
       const record = recordsByMetric.get(dependency.inputMetricId);
       const value = record ? getNumericMetricValue(record.value) : null;

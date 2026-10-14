@@ -28,12 +28,21 @@ export interface AssessmentMetricBinding extends AuditFields, ClubScoped {
   role: AssessmentBindingRole;
   formulaId?: EntityId;
   testItemId?: EntityId;
+  scoreMappingVersionId?: EntityId;
+  gradeMappingVersionId?: EntityId;
   maxScore?: number;
   weight?: number;
   sortOrder: number;
 }
 
 export interface AssessmentTestItem extends AuditFields, ClubScoped {
+  status?: "active" | "inactive";
+  tags?: string[];
+  applicability?: string;
+  precision?: number;
+  minimumValue?: number;
+  maximumValue?: number;
+  direction?: "higher" | "lower" | "neutral";
   id: EntityId;
   metricId: EntityId;
   name: string;
@@ -54,13 +63,24 @@ export interface PlayerAssessment extends AuditFields, ClubScoped {
   summary?: string;
 }
 
+export interface AssessmentMappedResult {
+  rawScoreVersionId: EntityId;
+  gradeVersionId: EntityId;
+  integerScore: number;
+  grade: string;
+  mappedAt: string;
+}
 export interface AssessmentRawResult extends AuditFields, ClubScoped {
+  mapping?: AssessmentMappedResult;
   id: EntityId;
   assessmentId: EntityId;
   testItemId: EntityId;
   metricId: EntityId;
   value: MetricValue;
   recordedByCoachId?: EntityId;
+  eventId?: EntityId;
+  occurredAt?: string;
+  recordedAt?: string;
   note?: string;
 }
 

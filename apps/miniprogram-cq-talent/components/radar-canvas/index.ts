@@ -119,7 +119,7 @@ Component({
       query.select("#radarCanvas").fields({ node: true, size: true }, (res) => {
         const canvas = res.node;
         const ctx = canvas.getContext("2d");
-        const pixelRatio = wx.getWindowInfo?.().pixelRatio ?? wx.getSystemInfoSync().pixelRatio ?? 1;
+        const pixelRatio = wx.getWindowInfo?.().pixelRatio ?? 1;
         canvas.width = res.width * pixelRatio;
         canvas.height = res.height * pixelRatio;
         ctx.scale(pixelRatio, pixelRatio);

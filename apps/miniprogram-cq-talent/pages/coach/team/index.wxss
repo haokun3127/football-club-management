@@ -30,3 +30,11 @@
 .coach-card__name { overflow: hidden; color: #202124; font-size: 26rpx; font-weight: 700; line-height: 32rpx; text-overflow: ellipsis; white-space: nowrap; }
 .coach-card__role { align-self: flex-start; max-width: 100%; overflow: hidden; padding: 4rpx 16rpx; border-radius: 999rpx; background: #f3f4f6; color: #667085; font-size: 20rpx; font-weight: 700; line-height: 24rpx; text-overflow: ellipsis; white-space: nowrap; }
 .coaches-empty { padding: 28rpx; border-radius: 16rpx; background: #ffffff; color: #667085; font-size: 26rpx; line-height: 36rpx; }
+
+.team-selector { white-space: nowrap; margin-bottom: 20rpx; }
+.team-selector__item { display: inline-block; padding: 16rpx 24rpx; border-radius: 30rpx; background: #fff; margin-right: 12rpx; font-size: 26rpx; }
+.team-selector__item.is-active { color: #fff; background: #a80f1b; }
+.team-match { margin-top: 16rpx; padding: 24rpx; background: #fff; border-radius: 20rpx; border-left: 6rpx solid #a80f1b; }
+.team-match__title { font-weight: 600; font-size: 30rpx; }
+.team-match__subtitle { color: #667085; font-size: 24rpx; line-height: 1.6; margin-top: 8rpx; }
+.team-match__score { color: #a80f1b; font-weight: 700; margin-top: 12rpx; font-size: 28rpx; }

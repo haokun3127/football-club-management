@@ -49,7 +49,7 @@ function createPageInstance(data = {}) {
 const workbench = {
   event: {
     id: "event-1",
-    type: "training",
+    type: "match",
     title: "Ball-control session",
     startsAt: "2026-08-13T09:00:00.000Z",
     endsAt: "2026-08-13T10:00:00.000Z",
@@ -85,6 +85,13 @@ describe("coach attendance", () => {
     globalThis.wx.navigateBack.mockReset();
     globalThis.wx.redirectTo.mockReset();
     globalThis.wx.showToast.mockReset();
+  });
+
+  it("routes training to the shared record list without submitting legacy attendance", async () => {
+    mocks.getCoachWorkbench.mockResolvedValue({ ...workbench, event: { ...workbench.event, type: "training" } });
+    const page = createPageInstance(); await page.load("event/1");
+    expect(wx.redirectTo).toHaveBeenCalledWith({ url: "/pages/coach/lesson/index?id=event%2F1" });
+    expect(mocks.saveCoachAttendance).not.toHaveBeenCalled();
   });
 
   it("maps backend roster statuses without losing late, leave_requested, or excused", async () => {

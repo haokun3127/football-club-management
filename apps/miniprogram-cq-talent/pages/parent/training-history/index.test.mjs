@@ -1,101 +1,46 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { readFileSync } from "node:fs";
-
-const mocks = vi.hoisted(() => ({
-  getParentCalendar: vi.fn(),
-  getParentChildren: vi.fn(),
-  getParentGrowth: vi.fn(),
-  requireRole: vi.fn(),
-}));
-
-vi.mock("../../../utils/api", () => ({
-  getParentCalendar: mocks.getParentCalendar,
-  getParentChildren: mocks.getParentChildren,
-  getParentGrowth: mocks.getParentGrowth,
-}));
-vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
-vi.mock("../../../utils/date", () => ({ resolveParentPageDate: () => "2026-08-28" }));
-vi.mock("../../../utils/presentation", () => ({
-  formatShortDate: () => "8月20日",
-  formatTimeRange: () => "18:00–19:30",
-  resolveMenuInset: () => 0,
-  resolveNavInset: () => 0,
-}));
-
-let pageDefinition;
-globalThis.Page = (definition) => {
-  pageDefinition = definition;
-  return definition;
-};
-
+const mocks = vi.hoisted(() => ({ children: vi.fn(), records: vi.fn(), correct: vi.fn(), session: vi.fn() }));
+vi.mock("../../../utils/api", () => ({ getParentChildren: mocks.children }));
+vi.mock("../../../utils/training-records", () => ({ getTrainingRecords: mocks.records, correctTrainingRecord: mocks.correct }));
+vi.mock("../../../utils/auth", () => ({ requireRole: mocks.session }));
+vi.mock("../../../utils/presentation", () => ({ formatShortDate: () => "9月21日", formatDateTime: (s) => s, resolveMenuInset: () => 0, resolveNavInset: () => 0 }));
+let definition;
+globalThis.Page = (value) => { definition = value; };
+globalThis.wx = { showToast: vi.fn(), navigateBack: vi.fn() };
 await import("./index.ts");
-
-const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
-
-function createPageInstance() {
-  const instance = {
-    ...pageDefinition,
-    data: { ...pageDefinition.data },
-    setData(patch) {
-      this.data = { ...this.data, ...patch };
-    },
-  };
-  return instance;
-}
-
-describe("parent training history active student", () => {
-  beforeEach(() => {
-    mocks.requireRole.mockReset().mockReturnValue({ role: "parent", currentStudentId: "student-2" });
-    mocks.getParentChildren.mockReset().mockResolvedValue([
-      { id: "student-1", name: "第一位学员", teams: [] },
-      { id: "student-2", name: "第二位学员", teams: [] },
-    ]);
-    mocks.getParentCalendar.mockReset().mockResolvedValue([]);
-    mocks.getParentGrowth.mockReset().mockResolvedValue({ timeline: [] });
+const record = { eventId: "event-2", studentId: "student-2", title: "技术训练", counted: true, revision: 1, occurredAt: "2026-09-21T08:00:00Z", source: "automatic", history: [] };
+function page() { return { ...definition, data: structuredClone(definition.data), setData(patch) { Object.assign(this.data, patch); } }; }
+beforeEach(() => {
+  vi.clearAllMocks();
+  mocks.session.mockReturnValue({ role: "parent", currentStudentId: "student-2" });
+  mocks.children.mockResolvedValue([{ id: "student-1", name: "甲" }, { id: "student-2", name: "乙" }]);
+  mocks.records.mockResolvedValue({ total: 1, records: [record] });
+});
+describe("parent training facts and corrections", () => {
+  it("uses the selected child and the actual server count", async () => {
+    const p = page(); await p.load();
+    expect(mocks.records).toHaveBeenCalledWith("student-2");
+    expect(p.data.total).toBe(1);
+    expect(p.data.rows[0].statusLabel).toBe("已计次");
   });
-
-  it("loads and filters training history for the selected child", async () => {
-    mocks.getParentGrowth.mockResolvedValue({
-      timeline: [{
-        id: "training-student-2-training",
-        eventId: "student-2-training",
-        kind: "training",
-        occurredAt: "2026-08-20T10:00:00.000Z",
-        title: "第二位训练",
-        subtitle: "完成训练",
-        training: { items: [], lessonProgress: { attendedLessons: 5, expectedLessons: 6 } },
-      }],
-    });
-    const page = createPageInstance();
-
-    await page.load();
-
-    expect(page.data.rows.length).toBeGreaterThan(0);
-    expect(page.data.rows.every((row) => row.id === "student-2-training")).toBe(true);
+  it("retains edits after a conflict, blocks a blind retry, then uses the explicitly refreshed version", async () => {
+    const p = page(); await p.load(); p.edit({ currentTarget: { dataset: { id: "event-2" } } });
+    p.changeCounted({ detail: { value: false } }); p.changeReason({ detail: { value: "当天请假" } });
+    mocks.correct.mockRejectedValueOnce({ code: "training_record_conflict" });
+    await p.save();
+    expect(p.data.reason).toBe("当天请假"); expect(p.data.draftCounted).toBe(false); expect(p.data.conflict).toBe(true);
+    await p.save(); expect(mocks.correct).toHaveBeenCalledTimes(1);
+    mocks.records.mockResolvedValueOnce({ total: 1, records: [{ ...record, revision: 2 }] });
+    await p.refreshConflict(); expect(p.data.reason).toBe("当天请假");
+    mocks.correct.mockResolvedValueOnce({ record: { ...record, counted: false, revision: 3 } });
+    await p.save();
+    expect(mocks.correct).toHaveBeenLastCalledWith("student-2", "event-2", { expectedRevision: 2, counted: false, reason: "当天请假" });
+    expect(p.data.total).toBe(0); expect(p.data.editing).toBeNull();
   });
-
-  it("aligns the title with the Figma 44px title origin", () => {
-    expect(styles).toMatch(/\.page-nav__title\s*\{[^}]*margin-left:\s*8rpx/);
-  });
-
-  it("renders the server-projected attendance progress for every completed training", async () => {
-    mocks.getParentGrowth.mockResolvedValue({
-      timeline: [{
-        id: "training-2",
-        kind: "training",
-        occurredAt: "2026-08-20T10:00:00.000Z",
-        title: "第二位训练",
-        subtitle: "完成 2 项训练内容",
-        teamName: "U10精英队",
-        venue: "凤凰山足球公园",
-        eventId: "student-2-training",
-        training: { items: [], lessonProgress: { attendedLessons: 18, expectedLessons: 22 } },
-      }],
-    });
-    const page = createPageInstance();
-
-    await page.load();
-
-    expect(page.data.rows).toEqual([expect.objectContaining({ id: "student-2-training", lessonProgressLabel: "18/22课时" })]);
+  it("does not submit without a reason or close the editor after a network failure", async () => {
+    const p = page(); await p.load(); p.edit({ currentTarget: { dataset: { id: "event-2" } } });
+    await p.save(); expect(mocks.correct).not.toHaveBeenCalled();
+    p.changeReason({ detail: { value: "未参加" } }); mocks.correct.mockRejectedValueOnce({ message: "网络中断" });
+    await p.save(); expect(p.data.editing.eventId).toBe("event-2"); expect(p.data.reason).toBe("未参加"); expect(p.data.saving).toBe(false);
   });
 });

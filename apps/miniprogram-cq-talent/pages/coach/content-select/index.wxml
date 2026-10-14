@@ -4,7 +4,7 @@
       <view class="select-nav__back" bindtap="goBack" aria-label="返回">
         <image src="/assets/icons/chevron-left.svg" mode="aspectFit" />
       </view>
-      <view class="select-nav__title">训练内容选择</view>
+      <view class="select-nav__title">选择训练内容</view>
     </view>
   </view>
 
@@ -83,13 +83,13 @@
       </view>
       <view wx:if="{{!hasContentTree && !hasVisibleProjects}}" class="inline-empty">当前暂无可选择的训练内容。</view>
 
-      <view wx:if="{{hasSaveError}}" class="save-error" role="alert">{{saveError}}</view>
+      <view wx:if="{{hasSaveError}}" class="save-error" role="alert">{{saveError}}<button bindtap="retry">重新读取并核对</button></view>
     </block>
   </view>
 
   <view wx:if="{{state === 'ready'}}" class="select-bar">
     <view class="select-bar__temporary">
-      <view class="select-bar__temporary-title">临时超级组</view>
+      <view class="select-bar__temporary-title">当前选择</view>
       <view class="select-bar__temporary-count">{{summaryLabel}}</view>
     </view>
     <view class="{{confirmClass}}" bindtap="confirmSelection" aria-disabled="{{isConfirmDisabled}}">
@@ -97,5 +97,5 @@
     </view>
   </view>
 
-  <role-tabbar role="coach" active="training" />
+
 </view>

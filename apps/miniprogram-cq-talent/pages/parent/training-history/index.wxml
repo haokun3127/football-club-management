@@ -1,23 +1,25 @@
 <view class="history-page">
-  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="page-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
-    <view class="page-nav__title">训练历程</view>
-    <view class="page-nav__spacer"></view>
-  </view>
-
+  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="page-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="page-nav__title">训练记录</view></view>
   <view class="history-page__body">
-    <status-view state="{{state}}" title="{{state === 'loading' ? '加载训练历程' : state === 'empty' ? '暂无训练历程' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '加载训练记录' : state === 'empty' ? '期待下一次训练' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <block wx:if="{{state === 'ready'}}">
-      <view wx:for="{{rows}}" wx:key="id" class="history-card">
-        <view class="history-card__bar {{item.done ? '' : 'history-card__bar--pending'}}"></view>
-        <view class="history-card__main">
-          <view class="history-card__title">{{item.title}}</view>
-          <view class="history-card__meta">{{item.dateLabel}} · {{item.timeLabel}}</view>
-          <view class="history-card__progress">课时进度 {{item.lessonProgressLabel}}</view>
-          <view wx:if="{{item.placeLabel}}" class="history-card__place">{{item.placeLabel}}</view>
-        </view>
-        <view class="history-card__status {{item.done ? 'history-card__status--done' : ''}}">{{item.statusLabel}}</view>
+      <view class="record-summary"><view class="record-summary__name">{{studentName}}的训练累计</view><view class="record-summary__number">{{total}}<text>次</text></view><view class="record-summary__note">课程结束后自动计次 · 有变化可直接更正</view></view>
+      <view wx:for="{{rows}}" wx:key="eventId" class="record">
+        <view class="record-heading"><view><view class="record-date">{{item.dateLabel}}</view><view class="record-title">{{item.title}}</view></view><view class="record-state {{item.counted ? 'record-state--counted' : ''}}">{{item.statusLabel}}</view></view>
+        <view class="record-actions"><button data-id="{{item.eventId}}" bindtap="toggleHistory">{{expandedId === item.eventId ? '收起历史' : '更正历史'}}</button><button class="record-edit" data-id="{{item.eventId}}" bindtap="edit">更正记录</button></view>
+        <view wx:if="{{expandedId === item.eventId}}" class="record-history"><view wx:for="{{item.historyLabels}}" wx:for-item="entry" wx:key="index">{{entry}}</view></view>
       </view>
     </block>
+  </view>
+  <view wx:if="{{editing}}" class="editor-backdrop">
+    <view class="record-editor">
+      <view class="record-title">更正训练记录</view><view class="editor-subtitle">{{editing.title}} · {{editing.dateLabel}}</view>
+      <view class="editor-current">当前状态：{{editing.statusLabel}} · 版本 {{editing.revision}}</view>
+      <view class="editor-toggle"><text>本次训练计入累计</text><switch checked="{{draftCounted}}" color="#A80F1B" disabled="{{saving}}" bindchange="changeCounted" /></view>
+      <textarea class="editor-reason" value="{{reason}}" maxlength="500" placeholder="填写更正原因，方便家长和教练核对" disabled="{{saving}}" bindinput="changeReason" />
+      <view wx:if="{{saveError}}" class="editor-error">{{saveError}}</view>
+      <button wx:if="{{conflict}}" class="ghost-button" disabled="{{saving}}" bindtap="refreshConflict">核对最新记录</button>
+      <view class="actions"><button class="ghost-button mini-button" disabled="{{saving}}" bindtap="closeEditor">取消</button><button class="primary-button mini-button" loading="{{saving}}" disabled="{{saving || conflict}}" bindtap="save">保存更正</button></view>
+    </view>
   </view>
 </view>

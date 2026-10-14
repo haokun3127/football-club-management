@@ -1,8 +1,11 @@
-import { migrate, openSqliteDatabase } from "./persistence/sqlite.js";
+import { readRuntimeConfig } from "./runtime/environment.js";
+import { openRuntimeDatabase } from "./persistence/runtime-database.js";
+import { migrate } from "./persistence/sqlite.js";
 
-const databasePath = process.env.DATABASE_URL ?? "apps/api/data/dev.sqlite";
-const database = openSqliteDatabase(databasePath);
-const result = migrate(database);
-
-console.log(JSON.stringify({ databasePath, ...result }, null, 2));
-database.close();
+const config = readRuntimeConfig();
+const database = openRuntimeDatabase(config);
+try {
+  console.log(JSON.stringify({ environment: config.environment, ...migrate(database) }, null, 2));
+} finally {
+  database.close();
+}

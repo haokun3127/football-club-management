@@ -7,6 +7,8 @@
   <view class="p4-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载成长数据' : state === 'empty' ? '成长数据不足' : '成长数据读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
+
+
     <view wx:if="{{growth && state === 'ready'}}" class="p4-content">
       <!-- Figma P4 Player Hero: 335 x 212 -->
       <view class="p4-hero">
@@ -62,6 +64,10 @@
         </view>
         <view wx:else class="p4-radar__empty">指标正在积累</view>
       </view>
+    </view>
+    <view wx:if="{{activeStudentId && (state === 'ready' || state === 'empty')}}" class="p4-evaluations"><view class="p4-evaluation-card" bindtap="openConfirmedResults"><view class="p4-evaluation-title">已确认测评结果</view><view class="p4-evaluation-author">查看原始成绩、分值、等级与历史 ›</view></view>
+      <view wx:for="{{evaluationCards}}" wx:key="teamId" class="p4-evaluation-card" data-team="{{item.teamId}}" bindtap="openEvaluation"><view class="p4-evaluation-title">当前教练评价 · {{item.teamName}}</view><view class="p4-evaluation-text">{{item.text}}</view><view class="p4-evaluation-author">{{item.author}} · 查看变化 ›</view></view>
+      <view wx:if="{{evaluationMessage}}" class="p4-evaluation-card" bindtap="openEvaluation"><view class="p4-evaluation-title">当前教练评价</view><view class="p4-evaluation-text">{{evaluationMessage}}</view><view class="p4-evaluation-author">查看当前评价与变化 ›</view></view>
     </view>
   </view>
   <role-tabbar role="parent" active="growth" />

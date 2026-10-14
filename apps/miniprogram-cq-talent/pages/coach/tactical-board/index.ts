@@ -1,411 +1,212 @@
-import { getCoachTacticalBoard, getTacticalBoardFormations, saveCoachTacticalBoard } from "../../../utils/api";
+import { getCoachTacticalBoard, saveCoachTacticalBoard } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { environmentStorageKey } from "../../../utils/config";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
-import { normalizedToPixel, pixelToNormalized } from "../../../utils/tactical-board";
-import type { FormationTemplate, LoadState, TacticalBoardPlayer, TacticalBoardState } from "../../../utils/types";
+import type { LoadState, TacticalBoardPlayer, TacticalBoardState } from "../../../utils/types";
 
-type PlayerView = TacticalBoardPlayer & {
-  px: number;
-  py: number;
-  rosterPx: number;
-  rosterPy: number;
-  className: string;
-  jerseyNumber: string;
-  rosterStateLabel: string;
-  rosterToneClass: string;
+const timers = globalThis as unknown as {
+  setTimeout(callback: () => void, milliseconds: number): number;
+  clearTimeout(timer?: number): void;
 };
+const setTimeout = (callback: () => void, milliseconds: number) => timers.setTimeout(callback, milliseconds);
+const clearTimeout = (timer?: number) => timers.clearTimeout(timer);
 
-interface BoardPageData {
-  navInset: number;
-  menuInset: number;
-  state: LoadState;
-  stateTitle: string;
-  message: string;
-  eventId: string;
-  eventTitle: string;
-  formations: FormationTemplate[];
-  formationIndex: number;
-  formationLabel: string;
-  hasFormation: boolean;
-  players: TacticalBoardPlayer[];
-  roster: TacticalBoardState["roster"];
-  rosterPlayers: PlayerView[];
-  starters: PlayerView[];
-  substitutes: PlayerView[];
-  workspaceHeight: number;
-  pitchWidth: number;
-  pitchHeight: number;
-  readOnly: boolean;
-  dirty: boolean;
-  saving: boolean;
-  saveLabel: string;
-  saveToneClass: string;
-  saveError: string;
-  selectedStarterId: string;
+type Rect = { left: number; top: number; width: number; height: number };
+type Touch = { clientX: number; clientY: number };
+type Gesture = { currentTarget: { dataset: { id?: string } }; touches?: Touch[]; changedTouches?: Touch[] };
+type PlayerView = TacticalBoardPlayer & { left: number; top: number };
+interface BoardData {
+  navInset: number; menuInset: number; state: LoadState; stateTitle: string; message: string;
+  eventId: string; eventTitle: string; players: TacticalBoardPlayer[]; starters: PlayerView[];
+  rosterPlayers: PlayerView[]; readOnly: boolean; dirty: boolean; saving: boolean;
+  saveLabel: string; saveError: string; canUndo: boolean; dragId: string; dragName: string;
+  dragAvatar: string; dragX: number; dragY: number; rosterTarget: boolean;
 }
+interface Runtime {
+  epoch: number; revision: number; alive: boolean; hidden: boolean; saving?: boolean; pitch?: Rect; roster?: Rect;
+  saveTimer?: ReturnType<typeof setTimeout>; undo?: TacticalBoardPlayer[];
+  draftKey?: string;
+  drag?: { id: string; x: number; y: number; renderedAt: number };
+}
+const runtimes = new WeakMap<object, Runtime>();
+function runtime(page: object) {
+  let value = runtimes.get(page);
+  if (!value) { value = { epoch: 0, revision: 0, alive: true, hidden: false }; runtimes.set(page, value); }
+  return value;
+}
+const copy = (players: TacticalBoardPlayer[]) => players.map((player) => ({ ...player }));
+const inside = (rect: Rect | undefined, x: number, y: number) => Boolean(rect && x >= rect.left && x <= rect.left + rect.width && y >= rect.top && y <= rect.top + rect.height);
 
-let latestLoadToken = 0;
-const PITCH_LEFT_IN_WORKSPACE = 16;
-const PLAYER_MARKER_RADIUS = 20;
-const ROSTER_COLUMNS = 4;
-const ROSTER_LEFT = 34;
-const ROSTER_TOP = 339;
-const ROSTER_COLUMN_GAP = 86;
-const ROSTER_ROW_GAP = 92;
-const ROSTER_ITEM_HEIGHT = 80;
-const BASE_WORKSPACE_HEIGHT = 520;
-
-Page<BoardPageData>({
+Page<BoardData>({
   data: {
-    navInset: 20,
-    menuInset: 16,
-    state: "idle",
-    stateTitle: "比赛战术板",
-    message: "",
-    eventId: "",
-    eventTitle: "",
-    formations: [],
-    formationIndex: -1,
-    formationLabel: "",
-    hasFormation: false,
-    players: [],
-    roster: [],
-    rosterPlayers: [],
-    starters: [],
-    substitutes: [],
-    workspaceHeight: 520,
-    pitchWidth: 351,
-    pitchHeight: 430,
-    readOnly: false,
-    dirty: false,
-    saving: false,
-    saveLabel: "",
-    saveToneClass: "",
-    saveError: "",
-    selectedStarterId: "",
+    navInset: 20, menuInset: 16, state: "idle", stateTitle: "比赛战术板", message: "", eventId: "", eventTitle: "",
+    players: [], starters: [], rosterPlayers: [], readOnly: false, dirty: false, saving: false,
+    saveLabel: "已保存", saveError: "", canUndo: false, dragId: "", dragName: "", dragAvatar: "", dragX: 0, dragY: 0, rosterTarget: false,
   },
   onLoad(query?: Record<string, string | undefined>) {
-    if (!requireRole("coach")) return;
+    const session = requireRole("coach");
+    if (!session) return;
     this.setData({ navInset: resolveNavInset(), menuInset: resolveMenuInset() });
     const eventId = (query?.eventId || "").trim();
-    if (!eventId) {
-      this.setData({
-        state: "empty",
-        stateTitle: "未选择比赛",
-        message: "请从比赛活动进入战术板。",
-        eventId: "",
-      });
-      return;
-    }
+    if (!eventId) { this.setData({ state: "empty", stateTitle: "未选择比赛", message: "请从比赛活动进入战术板。" }); return; }
+    if (session.userId && session.clubId) runtime(this).draftKey = environmentStorageKey(`tactical-draft:${session.clubId}:${session.userId}:${eventId}`);
     return this.load(eventId);
   },
-  goBack() {
-    wx.navigateBack({ delta: 1 });
+  onShow() { runtime(this).hidden = false; },
+  onReady() { this.measureRegions(); },
+  onResize() { this.cancelDrag(); this.measureRegions(); },
+  onHide() { const state = runtime(this); state.hidden = true; clearTimeout(state.saveTimer); this.cancelDrag(); void this.saveBoard(); },
+  onUnload() {
+    const state = runtime(this); clearTimeout(state.saveTimer);
+    void this.saveBoard(); state.alive = false;
   },
+  goBack() { void this.saveBoard(); wx.navigateBack({ delta: 1 }); },
   async load(eventId?: string) {
-    const currentEventId = eventId ?? this.data.eventId;
-    if (!currentEventId) {
-      this.setData({ state: "empty", stateTitle: "未选择比赛", message: "请从比赛活动进入战术板。" });
-      return;
-    }
-
-    const loadToken = ++latestLoadToken;
-    this.setData({
-      state: "loading",
-      stateTitle: "正在载入战术板",
-      message: "正在读取本场比赛的真实阵型与名单。",
-      eventId: currentEventId,
-      saveError: "",
-      saving: false,
-      selectedStarterId: "",
-    });
+    const id = eventId || this.data.eventId;
+    if (!id) return;
+    const state = runtime(this); const epoch = ++state.epoch;
+    this.setData({ state: "loading", stateTitle: "正在载入战术板", message: "", eventId: id });
     try {
-      const [formations, response] = await Promise.all([
-        getTacticalBoardFormations(),
-        getCoachTacticalBoard(currentEventId),
-      ]);
-      if (loadToken !== latestLoadToken) return;
-      if (response.event.id !== currentEventId) {
-        this.setData({ state: "error", stateTitle: "读取失败", message: "当前比赛的战术板信息暂不可用。" });
-        return;
-      }
-
-      const formationIndex = formations.findIndex((formation) => formation.name === response.board.formationName);
-      const formation = formationIndex >= 0 ? formations[formationIndex] : undefined;
-      const players = presentBoardPlayers(response);
-      if (!players.length) {
-        this.setData({
-          state: "empty",
-          stateTitle: "暂无战术安排",
-          message: "当前比赛尚无可展示的真实名单与位置。",
-          formations,
-          formationIndex,
-          formationLabel: formation?.label || "阵型待同步",
-          hasFormation: Boolean(formation),
-          players: [],
-          roster: response.roster,
-          starters: [],
-          substitutes: [],
-          eventTitle: response.event.title,
-          readOnly: response.readOnly,
-          dirty: false,
-          saveLabel: "已保存",
-          saveToneClass: "c7-status c7-status--loaded",
-        });
-        return;
-      }
-
-      this.setData({
-        state: "ready",
-        stateTitle: "比赛战术板",
-        message: "",
-        formations,
-        formationIndex,
-        formationLabel: formation?.label || "阵型待同步",
-        hasFormation: Boolean(formation),
-        players,
-        roster: response.roster,
-        eventTitle: response.event.title,
-        readOnly: response.readOnly,
-        dirty: false,
-        saveLabel: "已保存",
-        saveToneClass: "c7-status c7-status--loaded",
-        saveError: "",
-        selectedStarterId: "",
-        rosterPlayers: [],
-        starters: [],
-        substitutes: [],
-      });
-      this.refreshViews(players, "");
-      void Promise.resolve().then(() => this.measurePitch(loadToken));
+      const response = await getCoachTacticalBoard(id);
+      if (!state.alive || epoch !== state.epoch) return;
+      if (response.event.id !== id) throw new Error("Mismatched event");
+      state.undo = undefined; state.revision = 0;
+      let players = presentPlayers(response);
+      const draft = !response.readOnly && state.draftKey ? readDraft(state.draftKey) : null;
+      if (draft) players = players.map((player) => ({ ...player, ...draft.find((item) => item.studentId === player.studentId) }));
+      this.setData({ state: "ready", eventTitle: response.event.title, players, readOnly: response.readOnly, dirty: Boolean(draft), saving: false, canUndo: false,
+        saveError: draft ? "已恢复上次未保存的布置，请核对后重试保存。" : "", saveLabel: response.readOnly ? "只读" : draft ? "未保存" : "已保存" });
+      this.refreshViews(); wx.nextTick(() => this.measureRegions());
     } catch {
-      if (loadToken !== latestLoadToken) return;
-      this.setData({
-        state: "error",
-        stateTitle: "读取失败",
-        message: "当前比赛的战术板信息暂不可用，请稍后重试。",
-        rosterPlayers: [],
-        starters: [],
-        substitutes: [],
-      });
+      if (state.alive && epoch === state.epoch) this.setData({ state: "error", stateTitle: "读取失败", message: "战术板暂不可用，请稍后重试。" });
     }
   },
-  measurePitch(loadToken: number) {
-    const selectorQuery = wx as unknown as {
-      createSelectorQuery: () => {
-        select: (selector: string) => {
-          boundingClientRect: (callback: (rect?: { width: number; height: number }) => void) => { exec: () => void };
-        };
-      };
-    };
-    selectorQuery.createSelectorQuery().select("#c7-pitch").boundingClientRect((rect) => {
-      if (loadToken !== latestLoadToken || !rect) return;
-      this.setData({ pitchWidth: rect.width, pitchHeight: rect.height });
-      this.refreshViews();
-    }).exec();
-  },
-  refreshViews(players?: TacticalBoardPlayer[], selectedStarterId?: string) {
-    const currentPlayers = players ?? this.data.players;
-    const currentSelectedStarterId = selectedStarterId ?? this.data.selectedStarterId;
-    const toView = (player: TacticalBoardPlayer): PlayerView => ({
-      ...player,
-      px: normalizedToPixel(player.x, this.data.pitchWidth, PLAYER_MARKER_RADIUS) + PITCH_LEFT_IN_WORKSPACE,
-      py: normalizedToPixel(player.y, this.data.pitchHeight, PLAYER_MARKER_RADIUS),
-      rosterPx: 0,
-      rosterPy: 0,
-      className: player.studentId === currentSelectedStarterId ? "c7-player c7-player--selected" : "c7-player",
-      jerseyNumber: "",
-      rosterStateLabel: "",
-      rosterToneClass: "",
-    });
-    const playerViews = currentPlayers
-      .map((player: TacticalBoardPlayer, index: number) => ({
-        ...toView(player),
-        jerseyNumber: String(index + 1),
-      }));
-    const starters = playerViews.filter((player: PlayerView) => player.role === "starter");
-    const substitutes = playerViews
-      .filter((player: PlayerView) => player.role !== "starter")
-      .map((player: PlayerView, index: number) => ({
-        ...player,
-        rosterPx: ROSTER_LEFT + (index % ROSTER_COLUMNS) * ROSTER_COLUMN_GAP,
-        rosterPy: ROSTER_TOP + Math.floor(index / ROSTER_COLUMNS) * ROSTER_ROW_GAP,
-        rosterStateLabel: "候补上场",
-        rosterToneClass: "c7-roster__avatar--candidate",
-      }));
-    this.setData({
-      rosterPlayers: substitutes,
-      starters,
-      substitutes,
-      workspaceHeight: Math.max(
-        BASE_WORKSPACE_HEIGHT,
-        ROSTER_TOP + Math.max(0, Math.ceil(substitutes.length / ROSTER_COLUMNS) - 1) * ROSTER_ROW_GAP + ROSTER_ITEM_HEIGHT,
-      ),
-    });
-  },
-  onFormationChange(event: { detail: { value: string | number } }) {
-    if (this.data.readOnly) return;
-    this.applyFormation(Number(event.detail.value));
-  },
-  applyFormation(formationIndex: number) {
-    const formation = this.data.formations[formationIndex];
-    if (this.data.readOnly || !formation || !formation.positions.length) return;
-
-    let starterIndex = 0;
-    const players = this.data.players.map((player: TacticalBoardPlayer) => {
-      if (player.role !== "starter") return player;
-      const position = formation.positions[starterIndex++];
-      return position
-        ? { ...player, positionLabel: position.positionLabel, x: position.x, y: position.y }
-        : player;
-    });
-    this.setData({
-      formationIndex,
-      formationLabel: formation.label,
-      hasFormation: true,
-      players,
-      dirty: true,
-      saveLabel: "未保存",
-      saveToneClass: "c7-status c7-status--dirty",
-      saveError: "",
-      selectedStarterId: "",
-    });
-    this.refreshViews(players, "");
-  },
-  selectStarter(event: { currentTarget: { dataset: { id?: string } } }) {
-    if (this.data.readOnly) return;
-    const studentId = event.currentTarget.dataset.id || "";
-    if (!this.data.players.some((player: TacticalBoardPlayer) => player.studentId === studentId && player.role === "starter")) return;
-    const selectedStarterId = studentId === this.data.selectedStarterId ? "" : studentId;
-    this.setData({ selectedStarterId });
-    this.refreshViews(this.data.players, selectedStarterId);
-  },
-  swapSubstitute(event: { currentTarget: { dataset: { id?: string } } }) {
-    if (this.data.readOnly) return;
-    const substituteId = event.currentTarget.dataset.id || "";
-    const starterId = this.data.selectedStarterId;
-    const starter = this.data.players.find((player: TacticalBoardPlayer) => player.studentId === starterId && player.role === "starter");
-    const substitute = this.data.players.find((player: TacticalBoardPlayer) => player.studentId === substituteId && player.role !== "starter");
-    if (!starter || !substitute) {
-      wx.showToast({ title: "请先选择场上球员再换位", icon: "none" });
-      return;
+  measureRegions() {
+    const state = runtime(this);
+    if (!state.alive || this.data.state !== "ready") return;
+    const selector = wx as unknown as { createSelectorQuery(): { select(selector: string): { boundingClientRect(callback: (rect?: Rect) => void): { exec(): void } } } };
+    for (const [id, key] of [["#c7-pitch", "pitch"], ["#c7-roster", "roster"]] as const) {
+      selector.createSelectorQuery().select(id).boundingClientRect((rect) => { if (state.alive && rect) state[key] = rect; }).exec();
     }
-    const players = this.data.players.map((player: TacticalBoardPlayer) => {
-      if (player.studentId === starter.studentId) return { ...player, role: "substitute" as const, positionLabel: undefined };
-      if (player.studentId === substitute.studentId) {
-        return { ...player, role: "starter" as const, positionLabel: starter.positionLabel, x: starter.x, y: starter.y };
-      }
-      return player;
-    });
-    this.setData({
-      players,
-      dirty: true,
-      saveLabel: "未保存",
-      saveToneClass: "c7-status c7-status--dirty",
-      saveError: "",
-      selectedStarterId: "",
-    });
-    this.refreshViews(players, "");
   },
-  onPlayerMove(event: { currentTarget: { dataset: { id?: string } }; detail: { x: number; y: number; source?: string } }) {
-    if (this.data.readOnly || event.detail.source !== "touch") return;
-    const studentId = event.currentTarget.dataset.id || "";
-    if (!this.data.players.some((player: TacticalBoardPlayer) => player.studentId === studentId && player.role === "starter")) return;
-    const movedBelowPitch = event.detail.y >= this.data.pitchHeight;
-    const x = pixelToNormalized(event.detail.x - PITCH_LEFT_IN_WORKSPACE, this.data.pitchWidth, PLAYER_MARKER_RADIUS);
-    const y = pixelToNormalized(event.detail.y, this.data.pitchHeight, PLAYER_MARKER_RADIUS);
-    const players = this.data.players.map((player: TacticalBoardPlayer) => player.studentId === studentId
-      ? movedBelowPitch ? { ...player, role: "substitute" as const, positionLabel: undefined } : { ...player, x, y }
-      : player);
-    this.setData({
-      players,
-      dirty: true,
-      saveLabel: "未保存",
-      saveToneClass: "c7-status c7-status--dirty",
-      saveError: "",
-    });
-    this.refreshViews(players);
+  refreshViews() {
+    const views = this.data.players.map((player: TacticalBoardPlayer) => ({ ...player, left: player.x * 100, top: player.y * 100 }));
+    this.setData({ starters: views.filter((p: PlayerView) => p.role === "starter"), rosterPlayers: views.filter((p: PlayerView) => p.role !== "starter") });
   },
-  onSubstituteMove(event: { currentTarget: { dataset: { id?: string } }; detail: { x: number; y: number; source?: string } }) {
-    if (this.data.readOnly || event.detail.source !== "touch") return;
-    const studentId = event.currentTarget.dataset.id || "";
-    if (!this.data.players.some((player: TacticalBoardPlayer) => player.studentId === studentId && player.role !== "starter")) return;
-    const movedIntoPitch = event.detail.y <= this.data.pitchHeight - PLAYER_MARKER_RADIUS * 2;
-    if (!movedIntoPitch) return;
-    const x = pixelToNormalized(event.detail.x - PITCH_LEFT_IN_WORKSPACE, this.data.pitchWidth, PLAYER_MARKER_RADIUS);
-    const y = pixelToNormalized(event.detail.y, this.data.pitchHeight, PLAYER_MARKER_RADIUS);
-    const players = this.data.players.map((player: TacticalBoardPlayer) => player.studentId === studentId
-      ? { ...player, role: "starter" as const, x, y }
-      : player);
-    this.setData({
-      players,
-      dirty: true,
-      saveLabel: "未保存",
-      saveToneClass: "c7-status c7-status--dirty",
-      saveError: "",
-      selectedStarterId: "",
-    });
-    this.refreshViews(players, "");
+  startPlayerDrag(event: Gesture) { this.startDrag(event); },
+  startRosterDrag(event: Gesture) { this.startDrag(event); },
+  startDrag(event: Gesture) {
+    if (this.data.readOnly || this.data.state !== "ready") return;
+    const player = this.data.players.find((p: TacticalBoardPlayer) => p.studentId === event.currentTarget.dataset.id);
+    const touch = event.touches?.[0] || event.changedTouches?.[0];
+    if (!player || !touch) return;
+    runtime(this).drag = { id: player.studentId, x: touch.clientX, y: touch.clientY, renderedAt: 0 };
+    this.setData({ dragId: player.studentId, dragName: player.displayName, dragAvatar: player.avatarUrl || "", dragX: touch.clientX, dragY: touch.clientY, rosterTarget: false });
   },
-  resetBoard() {
+  movePlayer(event: Gesture) {
+    const state = runtime(this); const drag = state.drag; const touch = event.touches?.[0];
+    if (!drag || !touch || this.data.readOnly) return;
+    drag.x = touch.clientX; drag.y = touch.clientY;
+    const now = Date.now();
+    if (now - drag.renderedAt < 32) return;
+    drag.renderedAt = now;
+    this.setData({ dragX: drag.x, dragY: drag.y, rosterTarget: inside(state.roster, drag.x, drag.y) });
+  },
+  finishDrag(event: Gesture) {
+    const state = runtime(this); const drag = state.drag;
+    if (!drag || this.data.readOnly) return;
+    const point = event.changedTouches?.[0]; const x = point?.clientX ?? drag.x; const y = point?.clientY ?? drag.y;
+    const pitch = state.pitch;
+    const onPitch = inside(pitch, x, y); const onRoster = inside(state.roster, x, y);
+    if (onPitch && pitch) {
+      const paddingX = Math.min(0.2, 26 / pitch.width); const paddingY = Math.min(0.2, 30 / pitch.height);
+      this.commitPlayers(this.data.players.map((p: TacticalBoardPlayer) => p.studentId === drag.id ? { ...p, role: "starter", positionLabel: undefined, x: Math.max(paddingX, Math.min(1 - paddingX, (x - pitch.left) / pitch.width)), y: Math.max(paddingY, Math.min(1 - paddingY, (y - pitch.top) / pitch.height)) } : p));
+    } else if (onRoster) {
+      this.commitPlayers(this.data.players.map((p: TacticalBoardPlayer) => p.studentId === drag.id ? { ...p, role: "substitute", positionLabel: undefined } : p));
+    }
+    this.cancelDrag();
+  },
+  cancelDrag() { runtime(this).drag = undefined; if (runtime(this).alive) this.setData({ dragId: "", rosterTarget: false }); },
+  commitPlayers(players: TacticalBoardPlayer[], remember = true) {
+    if (this.data.readOnly || JSON.stringify(players) === JSON.stringify(this.data.players)) return;
+    const state = runtime(this);
+    if (remember) state.undo = copy(this.data.players);
+    state.revision += 1;
+    this.setData({ players, dirty: true, canUndo: Boolean(state.undo), saveError: "", saveLabel: "等待保存" });
+    // Persist only positions and roster identifiers, scoped to environment, club, coach and match.
+    if (state.draftKey) { try { wx.setStorageSync(state.draftKey, draftPositions(players)); } catch { /* Remote save remains available when storage is full. */ } }
+    this.refreshViews(); this.scheduleSave();
+  },
+  undoMove() {
+    const state = runtime(this); const undo = state.undo;
+    if (!undo || this.data.readOnly) return;
+    state.undo = undefined; this.commitPlayers(copy(undo), false);
+  },
+  clearBoard() {
     if (this.data.readOnly) return;
-    this.applyFormation(this.data.formationIndex);
+    // Clearing is distinct from the reviewed single-drag undo action.
+    runtime(this).undo = undefined;
+    this.setData({ canUndo: false });
+    this.commitPlayers(this.data.players.map((p: TacticalBoardPlayer) => ({ ...p, role: "substitute", positionLabel: undefined })), false);
+  },
+  scheduleSave() {
+    const state = runtime(this); clearTimeout(state.saveTimer);
+    if (!state.hidden && state.alive) state.saveTimer = setTimeout(() => { state.saveTimer = undefined; void this.saveBoard(); }, 400);
   },
   async saveBoard() {
-    if (this.data.readOnly || this.data.saving || !this.data.dirty || !this.data.eventId) return;
-    const formation = this.data.formations[this.data.formationIndex];
-    if (!formation) return;
-
-    this.setData({ saving: true, saveError: "" });
+    const state = runtime(this); clearTimeout(state.saveTimer);
+    if (this.data.readOnly || state.saving || !this.data.dirty || !this.data.eventId) return;
+    const revision = state.revision; const epoch = state.epoch; const eventId = this.data.eventId;
+    const players = copy(this.data.players);
+    state.saving = true;
+    if (state.alive) this.setData({ saving: true, saveLabel: "保存中", saveError: "" });
     try {
-      const response = await saveCoachTacticalBoard(this.data.eventId, formation.name, this.data.players);
-      if (response.event.id !== this.data.eventId) throw new Error("mismatched event");
-      const players = presentBoardPlayers(response);
-      this.setData({
-        players,
-        roster: response.roster,
-        dirty: false,
-        saving: false,
-        saveLabel: "已保存",
-        saveToneClass: "c7-status c7-status--saved",
-        saveError: "",
-        selectedStarterId: "",
-      });
-      this.refreshViews(players, "");
+      const response = await saveCoachTacticalBoard(eventId, "free", players);
+      state.saving = false;
+      if (epoch !== state.epoch) return;
+      if (response.event.id !== eventId) throw new Error("Mismatched event");
+      const pending = revision !== state.revision;
+      if (!pending && state.draftKey) {
+        try {
+          if (JSON.stringify(readDraft(state.draftKey)) === JSON.stringify(draftPositions(players))) wx.removeStorageSync(state.draftKey);
+        } catch { /* A retained draft is safer than losing an unsaved newer edit. */ }
+      }
+      if (state.alive) this.setData({ saving: false, dirty: pending, saveLabel: pending ? "等待保存" : "已保存" });
+      if (pending) { if (state.hidden || !state.alive) return this.saveBoard(); else this.scheduleSave(); }
     } catch {
-      this.setData({ saving: false, saveError: "保存失败，未保存的调整已保留" });
-      wx.showToast({ title: "保存失败，未保存的调整已保留", icon: "none" });
+      state.saving = false;
+      if (state.alive && epoch === state.epoch) this.setData({ saving: false, dirty: true, saveLabel: "未保存", saveError: "保存失败，当前布置已保留。点击重试。" });
     }
   },
-  retry() {
-    this.load(this.data.eventId);
-  },
+  retry() { return this.load(this.data.eventId); },
 });
 
-function presentBoardPlayers(response: TacticalBoardState) {
-  const rosterByStudentId = new Map(response.roster.map((member) => [member.studentId, member]));
-  const boardPlayers = response.board.players.flatMap((boardPlayer) => {
-    const member = rosterByStudentId.get(boardPlayer.studentId);
-    if (!member?.studentId || !member.displayName) return [];
-    return [{
-      studentId: member.studentId,
-      displayName: member.displayName,
-      role: boardPlayer.role,
-      positionLabel: boardPlayer.positionLabel,
-      x: boardPlayer.x,
-      y: boardPlayer.y,
-    }];
-  });
-  const boardStudentIds = new Set(boardPlayers.map((player) => player.studentId));
-  const rosterOnlyPlayers = response.roster.flatMap((member) => {
-    if (!member.studentId || !member.displayName || boardStudentIds.has(member.studentId)) return [];
-    return [{
-      studentId: member.studentId,
-      displayName: member.displayName,
-      role: "substitute" as const,
-      x: 0.5,
-      y: 0.8,
-    }];
-  });
-  return [...boardPlayers, ...rosterOnlyPlayers];
+function draftPositions(players: TacticalBoardPlayer[]) {
+  return players.map(({ studentId, role, x, y }) => ({ studentId, role, x, y }));
+}
+
+function readDraft(key: string): ReturnType<typeof draftPositions> | null {
+  try {
+    const value: unknown = wx.getStorageSync(key);
+    if (!Array.isArray(value) || !value.every((item) => item && typeof item.studentId === "string"
+      && (item.role === "starter" || item.role === "substitute") && Number.isFinite(item.x) && item.x >= 0 && item.x <= 1
+      && Number.isFinite(item.y) && item.y >= 0 && item.y <= 1)) return null;
+    return value.map(({ studentId, role, x, y }) => ({ studentId, role, x, y }));
+  } catch { return null; }
+}
+
+function presentPlayers(response: TacticalBoardState): TacticalBoardPlayer[] {
+  const roster = new Map(response.roster.map((p) => [p.studentId, p]));
+  const seen = new Set<string>();
+  const players: TacticalBoardPlayer[] = [];
+  for (const player of response.board.players) {
+    const member = roster.get(player.studentId);
+    if (!member || seen.has(player.studentId)) continue;
+    seen.add(player.studentId); players.push({ ...player, displayName: member.displayName });
+  }
+  for (const member of response.roster) {
+    if (seen.has(member.studentId)) continue;
+    seen.add(member.studentId); players.push({ ...member, role: "substitute", x: 0.5, y: 0.5 });
+  }
+  return players;
 }

@@ -2,6 +2,8 @@
   "pages": [
     "pages/launch/index",
     "pages/login/index",
+    "pages/parent/home/index",
+    "pages/parent/confirmed-results/index",
     "pages/parent/schedule/index",
     "pages/parent/event/index",
     "pages/parent/growth/index",
@@ -35,10 +37,12 @@
     "pages/coach/match-edit/index",
     "pages/coach/tactical-board/index",
     "pages/coach/team/index",
+    "pages/coach/scout/index",
     "pages/coach/student-radar/index",
     "pages/coach/team-ability/index",
     "pages/coach/event-change/index",
     "pages/coach/content-select/index",
+    "pages/coach/content-copy/index",
     "pages/coach/training-assessment/index",
     "pages/coach/test-tasks/index",
     "pages/coach/test-task-create/index",
@@ -55,7 +59,9 @@
     "pages/coach/help/index",
     "pages/coach/training/index",
     "pages/coach/test-entry/index",
-    "pages/coach/me/index"
+    "pages/coach/me/index",
+    "pages/coach/student-results/index",
+    "pages/shared/student-evaluation/index"
   ],
   "window": {
     "navigationBarTitleText": "重庆天才足球",

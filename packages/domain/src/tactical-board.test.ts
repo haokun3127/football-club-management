@@ -2,6 +2,11 @@ import { describe, expect, it } from "vitest";
 import { formationTemplates, validateTacticalBoardPlayers } from "./tactical-board.js";
 
 describe("tactical board", () => {
+  it("allows an empty pitch and more than eleven roster members without fixed formation limits", () => {
+    const players = Array.from({ length: 19 }, (_, index) => ({ studentId: `s${index}`, displayName: `Player ${index}`, role: "starter" as const, x: 0.5, y: 0.5 }));
+    expect(validateTacticalBoardPlayers(players, players.map((player) => player.studentId))).toEqual([]);
+    expect(validateTacticalBoardPlayers([], [])).toEqual([]);
+  });
   it("provides three normalized eleven-player formations", () => {
     expect(formationTemplates.map((item) => item.name)).toEqual(["4-3-3", "4-4-2", "3-5-2"]);
     expect(formationTemplates.every((item) => item.positions.length === 11 && item.positions.every((position) => position.x >= 0 && position.x <= 1 && position.y >= 0 && position.y <= 1))).toBe(true);

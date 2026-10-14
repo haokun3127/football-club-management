@@ -1,10 +1,11 @@
+import { environmentStorageKey } from "../../../utils/config";
 import { getCoachTeam, getCoachTeamAbilityOverview } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachTeamAbilityOverview, LoadState, RadarMetricPoint } from "../../../utils/types";
 
-const COACH_TRAINING_TEAM_KEY = "coach-training-team-id";
+const COACH_TRAINING_TEAM_KEY = environmentStorageKey("coach-training-team-id");
 
 type StudentView = { id: string; name: string; initial: string; scoreLabel: string; };
 interface PageData {

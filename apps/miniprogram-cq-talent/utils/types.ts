@@ -94,6 +94,7 @@ export interface ScheduleEvent {
   nextActionLabel?: string;
   match?: {
     opponentName?: string;
+    ageGroup?: string; competitionFormat?: string; handbookUrl?: string;
     homeScore?: number;
     awayScore?: number;
     status?: string;
@@ -103,6 +104,15 @@ export interface ScheduleEvent {
 export type CoachTaskAction = "attendance" | "lesson" | "match" | "assessment" | "training" | "view";
 
 export interface CoachTask {
+  templateId?: string;
+  taskId?: string;
+  title?: string;
+  teamId?: string;
+  teamName?: string;
+  periodLabel?: string;
+  completedStudents?: number;
+  totalStudents?: number;
+  readyStudents?: number;
   eventId: string;
   eventType: ScheduleEvent["type"];
   action: CoachTaskAction;
@@ -193,7 +203,9 @@ export interface GrowthTrainingStats {
 
 export interface GrowthTimelineItem {
   id: string;
-  kind: "training" | "match" | "ability_update";
+  kind: "training" | "match" | "ability_update" | "evaluation";
+  teamId?: string;
+  evaluationRevision?: number;
   occurredAt: string;
   title: string;
   subtitle: string;
@@ -216,10 +228,12 @@ export interface GrowthTimelineItem {
 }
 
 export interface GrowthSummary {
+  evaluations?: Array<import("./student-evaluations").StudentEvaluation & { teamName: string }>;
   overall?: number | null;
   student?: StudentSummary;
   radar: RadarMetricPoint[];
   milestones: Array<{ title: string; description: string; date?: string }>;
+  milestonesAvailable?: boolean;
   trainingHistory: Array<{ label: string; value: string }>;
   metricItems: Array<{ metricId: string; label: string; value: string; peerAverage?: string }>;
   views: MetricViewOption[];
@@ -229,6 +243,9 @@ export interface GrowthSummary {
 }
 
 export interface CoachHome {
+  clubName?: string;
+  teamOptions?: Array<{ id: string; name: string }>;
+  selectedTeamIds?: string[];
   date: string;
   dateRange: { from: string; to: string };
   coachName?: string;
@@ -240,7 +257,14 @@ export interface CoachHome {
   pendingItems: Array<{ label: string; value: string }>;
 }
 
+export interface TrainingContentSummary {count:number;configuredMinutes:number|null;groups:Array<{id:string;label:string;items:Array<{id:string;name:string;configuredMinutes:number|null}>}>}
+
 export interface CoachWorkbench {
+  trainingContentRevision?: string;
+  trainingRecords?: import("./training-records").TrainingRecord[];
+  contentSummary?:TrainingContentSummary;
+  canEditTraining?: boolean;
+  canManageRoster?: boolean;
   event: ScheduleEvent;
   roster: Array<{ studentId: string; name: string; status: string; note?: string; lessonAction?: string; shouldConsume?: boolean; exceptionReason?: string; remainingLessons?: number }>;
   workflow: Array<{ label: string; value: string; status?: string }>;
@@ -267,6 +291,7 @@ export interface CoachTrainingContentAssessmentScope {
 }
 
 export interface CoachMatchDetail {
+  canManageRoster?: boolean;
   event: ScheduleEvent;
   roster: Array<{ studentId: string; name?: string; status?: string }>;
   match: {
@@ -274,6 +299,7 @@ export interface CoachMatchDetail {
     eventId?: string;
     matchType?: string;
     opponentName?: string;
+    ageGroup?: string; competitionFormat?: string; handbookUrl?: string;
     homeScore?: number;
     awayScore?: number;
     status?: string;
@@ -431,6 +457,7 @@ export interface AssessmentForm {
 }
 
 export interface CoachAssessmentEntries {
+  entrySourcesByStudent?: Record<string, Record<string, {eventId?:string;occurredAt?:string;recordedAt?:string}>>;
   studentStates?: Record<string, { revision: number; publishedRevision: number | null }>;
   taskId: string;
   projectId: string;
@@ -484,6 +511,8 @@ export interface PrivateLessonRequest {
 }
 
 export interface CoachTeamDetail {
+  teamOptions?: Array<{ id: string; name: string }>;
+  formalMatches?: Array<{ eventId: string; title: string; startsAt: string; venue: string | null; match: NonNullable<CoachMatchDetail["match"]> }>;
   team: { id: string; name: string; season: string } | null;
   stats: { memberCount: number; trainingCount: number; completedTrainingCount: number; attendanceRate: number | null };
   members: Array<{ id: string; name: string }>;
@@ -504,7 +533,11 @@ export interface CoachTeamAbilityOverview {
   }>;
 }
 
+export interface AssessmentCourse { id:string; title:string; occurredAt:string; studentIds:string[]; }
+
 export interface AssessmentWorkflowSummary {
+  testItemIds?: string[];
+  courseSelectionRequired?: boolean;
   enabled: boolean;
   canEdit: boolean;
   templateVersionId: string;
@@ -517,12 +550,16 @@ export interface AssessmentWorkflowSummary {
 }
 
 export interface AssessmentWorkingHistory {
+  entries?:Record<string,{testItemId:string;metricId?:string;value:Record<string,unknown>;eventId?:string;occurredAt?:string;recordedAt?:string}>;
   revision: number;
   changes: Array<{ revision: number; coachId: string; changedAt: string; reason?: string; entries: Array<{ testItemId: string; before: Record<string, unknown> | null; after: Record<string, unknown> }> }>;
   publications: Array<{ revision: number; assessmentId: string; coachId: string; publishedAt: string }>;
 }
 
 export interface CoachAssessmentTask {
+  studentIds?: string[];
+  testItemIds?: string[];
+  sourceEventId?: string;
   workflow?: AssessmentWorkflowSummary;
   id: string;
   teamId: string;
@@ -567,6 +604,13 @@ export interface VenueInfo {
   monthlyCount: number;
 }
 
+export interface CoachStudentProfile {
+  student: { id: string; name: string; age: number | null; school: string | null; dominantFoot: string | null; level: string | null; teams: Array<{ id: string; name: string; joinedAt: string }> };
+  attendance: { expected: number; present: number; absent: number; leave: number; late: number; unrecorded: number; effectiveLessons: number; earlyLeave: number | null };
+  records: Array<{ eventId: string; title: string; occurredAt: string; status: string; counted: boolean; source: string; revision: number; history: Array<{ revision: number; counted: boolean; source: string; reason: string; changedAt: string }> }>;
+  training: { modules: Array<{ label: string; courses: number; configuredMinutes: number | null }>; participation: number; formalMatches: number; friendlyMatches: number | null; completionTargets: null };
+}
+
 export interface ClubCoachTeam {
   teamName: string;
   teamChips: string[];
@@ -578,4 +622,19 @@ export interface ClubCoachTeam {
     bio: string;
     wechatId?: string | null;
   }>;
+}
+
+export interface TrainingTemplateSummary { id: string; title: string; visibility: "private" | "club"; items: Array<{ id: string; name: string; configuredMinutes: number }>; configuredMinutes: number; }
+export interface TrainingTransferSource { sourceEventId?: string; sourceTemplateId?: string; }
+export interface TrainingTransferOutcome { items: TrainingTemplateSummary["items"]; count: number; configuredMinutes: number; }
+export interface TrainingTransferPreview {
+  source: { title: string; revision: string; items: TrainingTemplateSummary["items"]; excluded: string[]; count: number; configuredMinutes: number };
+  targets: Array<{ eventId: string; title: string; startsAt: string; revision: string; existing: TrainingTemplateSummary["items"]; outcomes?: { merge: TrainingTransferOutcome; replace: TrainingTransferOutcome } }>;
+}
+
+export interface ConfirmedStudentResult {
+  mapping?: { integerScore: number; grade: string; rawScoreVersionId: string; gradeVersionId: string; mappedAt: string } | null;
+  id: string; assessmentId: string; taskId: string | null; testItemId: string; metricId: string;
+  name: string; value: Record<string, unknown>; unit: string | null; templateVersionId: string | null;
+  eventId: string | null; occurredAt: string; recordedAt: string;
 }

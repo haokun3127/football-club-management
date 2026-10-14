@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   getAssessmentForm: vi.fn(),
   getCoachAssessmentWorkflow: vi.fn(),
+  getCoachAssessmentHistory: vi.fn(),
   publishCoachAssessments: vi.fn(),
   getCoachTrainingProjectTree: vi.fn(),
   getCoachAssessmentTasks: vi.fn(),
@@ -15,6 +16,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("../../../utils/api", () => ({
   getAssessmentForm: mocks.getAssessmentForm,
   getCoachAssessmentWorkflow: mocks.getCoachAssessmentWorkflow,
+  getCoachAssessmentHistory: mocks.getCoachAssessmentHistory,
   publishCoachAssessments: mocks.publishCoachAssessments,
   getCoachTrainingProjectTree: mocks.getCoachTrainingProjectTree,
   getCoachAssessmentTasks: mocks.getCoachAssessmentTasks,
@@ -113,6 +115,12 @@ describe("C12 assessment project selection", () => {
     expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/assessment-bulk-entry/index?taskId=task-real&templateId=template-real&projectId=item-speed&projectIds=item-speed%2Citem-passing&title=%E4%BD%93%E8%83%BD%E7%BB%BC%E5%90%88%E6%B5%8B%E8%AF%84");
   });
 
+  it("only exposes the task's selected project even when the template has more fields", async () => {
+    mocks.getCoachAssessmentTasks.mockResolvedValue([{...task,testItemIds:["item-speed"]}]);
+    const page=createPageInstance();await page.onLoad({taskId:"task-real",templateId:"template-real"});
+    expect(page.data.projects.map((p)=>p.id)).toEqual(["item-speed"]);
+  });
+
   it("keeps a completed task available for saved-score review", async () => {
     mocks.getCoachAssessmentTasks.mockResolvedValueOnce([{ ...task, status: "completed", completedStudents: 2 }]);
     const page = createPageInstance();
@@ -184,29 +192,25 @@ describe("C12 assessment project selection", () => {
 });
 
 
-describe("explicit publication", () => {
-  it("confirms only ready revisions and reports partial failures", async () => {
-    globalThis.wx.showModal = ({ success }) => success({ confirm: true });
-    mocks.getCoachAssessmentWorkflow.mockResolvedValue({ canEdit: true, students: [
-      { studentId: "a", name: "甲", revision: 2, canPublish: true },
-      { studentId: "b", name: "乙", revision: 4, canPublish: true },
-      { studentId: "c", name: "丙", revision: 1, canPublish: false },
-    ] });
-    mocks.publishCoachAssessments.mockResolvedValue({ results: [{ studentId: "a", success: true }, { studentId: "b", success: false, error: { message: "成绩已更新" } }] });
-    const page = createPageInstance();
-    page.setData({ taskId: task.id, templateId: task.templateId, canPublish: true });
-    page.load = vi.fn();
-    await page.publishReady();
-    expect(mocks.publishCoachAssessments).toHaveBeenCalledWith(task.id, [{ studentId: "a", expectedRevision: 2 }, { studentId: "b", expectedRevision: 4 }]);
-    expect(page.data.publicationMessage).toContain("已发布 1 人；1 人未发布");
-    expect(page.data.publishing).toBe(false);
+describe("reviewed per-student publication", () => {
+  beforeEach(()=>{
+    globalThis.wx.showModal=({success})=>success({confirm:true});
+    mocks.publishCoachAssessments.mockReset().mockResolvedValue({results:[{studentId:"a",success:true}]});
+    mocks.getCoachAssessmentWorkflow.mockResolvedValue({templateVersionId:"v1",canEdit:true,readyStudents:1,publishedStudents:0,totalStudents:2,students:[{studentId:"a",name:"甲",revision:2,canPublish:true,completedFields:2,totalFields:2},{studentId:"b",name:"乙",revision:0,canPublish:false,completedFields:0,totalFields:2}]});
+    mocks.getCoachAssessmentHistory.mockResolvedValue({revision:2,entries:{first:{testItemId:"first",value:{kind:"score_0_100",score:0},occurredAt:"2026-07-01T09:00:00Z",recordedAt:"2026-09-28T06:00:00Z"},second:{testItemId:"second",value:{kind:"score_0_100",score:80},occurredAt:"2026-07-02T09:00:00Z"}}});
+    mocks.getAssessmentForm.mockResolvedValue({fields:[{id:"first",testItemId:"first",label:"第一项"},{id:"second",testItemId:"second",label:"第二项"},{id:"missing",label:"未测项目"}]});
   });
-  it("does not publish when the coach cancels confirmation", async () => {
-    globalThis.wx.showModal = ({ success }) => success({ confirm: false });
-    mocks.getCoachAssessmentWorkflow.mockResolvedValue({ canEdit: true, students: [{ studentId: "a", name: "甲", revision: 2, canPublish: true }] });
-    mocks.publishCoachAssessments.mockClear();
-    const page = createPageInstance(); page.setData({ taskId: task.id, canPublish: true });
-    await page.publishReady();
-    expect(mocks.publishCoachAssessments).not.toHaveBeenCalled();
+  it("shows each course date, separates zero from missing and publishes only the displayed revision",async()=>{
+    const page=createPageInstance();page.setData({taskId:task.id,templateId:task.templateId});await page.openReviewList();
+    expect(page.data.reviewRows[0]).toMatchObject({value:"0 分",course:"课程：2026-07-01 17:00",recorded:"录入：2026-09-28 14:00"});
+    expect(page.data.reviewRows[1].course).toContain("2026-07-02");expect(page.data.reviewRows[2].value).toBe("未测");
+    expect(mocks.publishCoachAssessments).not.toHaveBeenCalled();await page.confirmReviewedStudent();
+    expect(mocks.publishCoachAssessments).toHaveBeenCalledWith(task.id,[{studentId:"a",expectedRevision:2}]);expect(page.data.reviewCanPublish).toBe(false);
+  });
+  it("keeps reviewed values on a server conflict and does not publish on cancellation",async()=>{
+    const page=createPageInstance();page.setData({taskId:task.id,templateId:task.templateId});await page.openReviewList();
+    globalThis.wx.showModal=({success})=>success({confirm:false});await page.confirmReviewedStudent();expect(mocks.publishCoachAssessments).not.toHaveBeenCalled();
+    globalThis.wx.showModal=({success})=>success({confirm:true});mocks.publishCoachAssessments.mockResolvedValue({results:[{studentId:"a",success:false,error:{message:"成绩已更新"}}]});
+    await page.confirmReviewedStudent();expect(page.data.reviewMessage).toBe("成绩已更新");expect(page.data.reviewRows[0].value).toBe("0 分");expect(page.data.publishing).toBe(false);
   });
 });

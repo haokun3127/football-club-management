@@ -126,7 +126,7 @@ const appClientAuthenticatedSessionResponse = {
   },
 } as const;
 
-const metricValue = {
+export const metricValue = {
   oneOf: [
     {
       type: "object",
@@ -544,6 +544,7 @@ export const schemas = {
       type: "object",
       additionalProperties: false,
       properties: {
+        teamIds: { type: "string", minLength: 1, maxLength: 4000 },
         date: { type: "string", minLength: 10 },
         from: { type: "string", minLength: 10 },
         to: { type: "string", minLength: 10 },
@@ -756,6 +757,9 @@ export const schemas = {
       additionalProperties: false,
       required: ["title", "templateId", "teamId", "termLabel", "startsOn", "dueOn"],
       properties: {
+        studentIds: { type: "array", minItems: 1, maxItems: 500, uniqueItems: true, items: {type: "string", minLength: 1} },
+        testItemIds: { type: "array", minItems: 1, maxItems: 500, uniqueItems: true, items: {type: "string", minLength: 1} },
+        sourceEventId: { type: "string", minLength: 1 },
         title: { type: "string", minLength: 1, maxLength: 60 },
         templateId: { type: "string", minLength: 1 },
         teamId: { type: "string", minLength: 1 },
@@ -966,9 +970,11 @@ export const schemas = {
       additionalProperties: false,
       required: ["projectIds"],
       properties: {
+        expectedRevision: { type: "string", pattern: "^[a-f0-9]{64}$" },
         projectIds: {
           type: "array",
           minItems: 1,
+          uniqueItems: true,
           items: { type: "string", minLength: 1 },
         },
         intensity: { type: "string", enum: ["low", "medium", "high"] },
@@ -980,6 +986,9 @@ export const schemas = {
       400: errorResponse,
       403: errorResponse,
       404: errorResponse,
+      409: errorResponse,
+      428: errorResponse,
+      500: errorResponse,
     },
   },
   appClientTrainingContentAssessments: {
@@ -1150,7 +1159,8 @@ export const schemas = {
         matchId: { type: "string", minLength: 1 },
         matchType: { type: "string", enum: ["friendly", "league", "cup", "internal"] },
         status: { type: "string", enum: ["scheduled", "completed", "cancelled"] },
-        opponentName: { type: "string" },
+        opponentName: { type: "string", maxLength: 100 },
+        ageGroup: { type: "string", maxLength: 60 }, competitionFormat: { type: "string", maxLength: 100 }, handbookUrl: { type: "string", maxLength: 1000, pattern: "^https://" },
         homeScore: { type: "number" },
         awayScore: { type: "number" },
         rosters: {
@@ -1903,7 +1913,8 @@ export const schemas = {
           required: ["matchType"],
           properties: {
             matchType: { type: "string", minLength: 1 },
-            opponentName: { type: "string" },
+            opponentName: { type: "string", maxLength: 100 },
+        ageGroup: { type: "string", maxLength: 60 }, competitionFormat: { type: "string", maxLength: 100 }, handbookUrl: { type: "string", maxLength: 1000, pattern: "^https://" },
             homeScore: { type: "number", minimum: 0 },
             awayScore: { type: "number", minimum: 0 },
             status: { type: "string" },
@@ -2052,7 +2063,8 @@ export const schemas = {
         eventId: { type: "string", minLength: 1 },
         matchType: { type: "string", minLength: 1 },
         status: { type: "string", minLength: 1 },
-        opponentName: { type: "string" },
+        opponentName: { type: "string", maxLength: 100 },
+        ageGroup: { type: "string", maxLength: 60 }, competitionFormat: { type: "string", maxLength: 100 }, handbookUrl: { type: "string", maxLength: 1000, pattern: "^https://" },
         homeScore: { type: "number" },
         awayScore: { type: "number" },
         rosters: {

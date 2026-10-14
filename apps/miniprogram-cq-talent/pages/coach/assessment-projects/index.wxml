@@ -7,7 +7,7 @@
       <view class="projects-progress"><view class="projects-progress__head"><view class="projects-progress__title">请选择测评项目</view><view class="projects-progress__status {{taskStatusClass}}">{{taskStatusLabel}}</view></view><view class="projects-progress__meta">{{projectProgressLabel}}</view><view class="projects-progress__instruction">请选择本次需要测评的项目</view></view>
       <view wx:if="{{managed}}" class="projects-publication">
         <view>{{publicationLabel}}</view>
-        <button disabled="{{!canPublish || publishing}}" loading="{{publishing}}" bindtap="publishReady">{{publishing ? '正在发布' : '发布已录齐的学员'}}</button>
+        <button disabled="{{publishing}}" loading="{{publishing}}" bindtap="openReviewList">核对学员成绩并同步</button>
         <view wx:if="{{publicationMessage}}">{{publicationMessage}}</view>
       </view>
       <scroll-view wx:if="{{hasContentTree}}" scroll-x class="content-primary-strip" enhanced show-scrollbar="{{false}}">
@@ -75,5 +75,16 @@
   <view wx:if="{{state === 'ready'}}" class="projects-select-bar">
     <view class="projects-select-bar__summary"><view class="projects-select-bar__title">测评项目</view><view class="projects-select-bar__count">{{selectedCount ? '已选 ' + selectedCount + ' 项' : '请选择测评项目'}}</view></view>
     <view class="{{confirmClass}}" bindtap="confirmSelection" aria-disabled="{{isConfirmDisabled}}"><text>{{confirmLabel}}</text></view>
+  </view>
+</view>
+
+<view wx:if="{{reviewVisible}}" class="review-mask">
+  <view class="review-panel">
+    <view class="review-head"><text>逐人核对</text><button size="mini" disabled="{{publishing || reviewLoading}}" bindtap="closeReview">关闭</button></view>
+    <scroll-view scroll-x class="review-students"><view class="review-students__row"><button wx:for="{{reviewStudents}}" wx:key="studentId" size="mini" class="{{reviewStudentId === item.studentId ? 'review-selected' : ''}}" data-id="{{item.studentId}}" bindtap="chooseReviewStudent">{{item.name}} · {{item.completedFields}}/{{item.totalFields}}</button></view></scroll-view>
+    <view class="review-name">{{reviewLoading ? '正在读取…' : reviewName}}</view>
+    <scroll-view scroll-y class="review-results"><view wx:for="{{reviewRows}}" wx:key="id" class="review-result"><view>{{item.label}} <text>{{item.value}}</text></view><view class="review-result__source">{{item.course}}</view><view class="review-result__source">{{item.recorded}}</view></view></scroll-view>
+    <view wx:if="{{reviewMessage}}" class="review-message">{{reviewMessage}}</view>
+    <button class="review-confirm" disabled="{{!reviewCanPublish || publishing || reviewLoading}}" loading="{{publishing}}" bindtap="confirmReviewedStudent">确认并同步该学员</button>
   </view>
 </view>

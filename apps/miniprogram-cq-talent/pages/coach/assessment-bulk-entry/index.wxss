@@ -40,3 +40,6 @@
 .bulk-history-head button { margin: 0; }
 .bulk-history-scroll { height: 60vh; }
 .bulk-history-item { white-space: pre-wrap; font-size: 24rpx; line-height: 1.7; padding: 20rpx 0; border-bottom: 1rpx solid #eee; overflow-wrap: anywhere; }
+
+.bulk-course-bar { margin:20rpx 0; padding:20rpx; background:#fff; border-radius:16rpx; color:#a80f1b; font-size:26rpx; }
+.bulk-metric__course { padding:12rpx 0; color:#a80f1b; font-size:22rpx; line-height:30rpx; white-space:normal; }

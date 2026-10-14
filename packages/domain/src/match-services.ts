@@ -47,6 +47,9 @@ export interface RecordMatchInput {
   matchType: MatchType;
   status: MatchStatus;
   opponentName?: string;
+  ageGroup?: string;
+  competitionFormat?: string;
+  handbookUrl?: string;
   homeScore?: number;
   awayScore?: number;
   rosters?: MatchRosterInput[];
@@ -189,6 +192,10 @@ export function createMatchService(dependencies: MatchServiceDependencies) {
     },
 
     async recordMatchSummary(input: RecordMatchInput): Promise<MatchSummaryResult> {
+      if (["league", "cup"].includes(input.matchType) && !input.opponentName?.trim()) throw new Error("Formal matches require an opponent");
+      if ((input.homeScore === undefined) !== (input.awayScore === undefined)) throw new Error("Both scores must be provided together");
+      for (const score of [input.homeScore, input.awayScore]) if (score !== undefined && (!Number.isInteger(score) || score < 0 || score > 99)) throw new Error("Invalid match score");
+      if (input.status === "cancelled" && input.homeScore !== undefined) throw new Error("Cancelled matches cannot have a score");
       const now = dependencies.clock.now();
       const match: Match = {
         id: input.matchId ?? dependencies.ids.next("match"),
@@ -196,6 +203,7 @@ export function createMatchService(dependencies: MatchServiceDependencies) {
         eventId: input.eventId,
         matchType: input.matchType,
         opponentName: input.opponentName,
+        ageGroup: input.ageGroup, competitionFormat: input.competitionFormat, handbookUrl: input.handbookUrl,
         homeScore: input.homeScore,
         awayScore: input.awayScore,
         status: input.status,

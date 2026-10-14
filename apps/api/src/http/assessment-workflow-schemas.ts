@@ -1,4 +1,4 @@
-import { errorResponse } from "./schemas.js";
+import { errorResponse, metricValue } from "./schemas.js";
 const id = { type: "string", minLength: 1 };
 const revision = { type: "integer", minimum: 0 };
 const params = (student = false) => ({ type: "object", additionalProperties: false, required: ["clubId", "clientId", "taskId", ...(student ? ["studentId"] : [])], properties: { clubId: id, clientId: id, taskId: id, ...(student ? { studentId: id } : {}) } });
@@ -6,8 +6,8 @@ const response = { 200: { type: "object", additionalProperties: true }, 400: err
 const entry = {
   type: "object", additionalProperties: false, required: ["testItemId", "value"],
   properties: {
-    testItemId: id, metricId: id,
-    value: { type: "object", additionalProperties: false, required: ["kind", "score"], properties: { kind: { type: "string", enum: ["score_0_100", "rating_1_5"] }, score: { type: "number", minimum: 0, maximum: 100 } } },
+    testItemId: id, metricId: id, eventId: id,
+    value: metricValue,
   },
 };
 export const workflowSchemas = {

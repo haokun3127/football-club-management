@@ -34,15 +34,20 @@ Page({
     heroSummaryMessage: "",
     heroTags: [] as string[],
     heroStats: [] as Array<{ value: string; label: string; accent: boolean; valueClass: string }>,
+    evaluationCards: [] as Array<{ teamId: string; teamName: string; text: string; author: string }>,
+    evaluationMessage: "",
     milestoneMessage: "",
     trainingHistoryMessage: "",
     matchHistoryMessage: "",
     milestones: [] as GrowthMilestone[],
     trainingBars: [] as TrainingBar[],
   },
+  openConfirmedResults() { if (this.data.activeStudentId) openPage(`/pages/parent/confirmed-results/index?student=${encodeURIComponent(this.data.activeStudentId)}`); },
+  openEvaluation(event?: { currentTarget?: { dataset?: { team?: string } } }) { if (this.data.activeStudentId) openPage(`/pages/shared/student-evaluation/index?student=${encodeURIComponent(this.data.activeStudentId)}&team=${encodeURIComponent(event?.currentTarget?.dataset?.team || "")}`); },
   onLoad() {
     this.load();
   },
+  onUnload() { growthRequestId += 1; },
   onShow() {
     const session = requireRole("parent");
     if (!session || !this.data.activeStudentId || session.currentStudentId === this.data.activeStudentId) return;
@@ -52,7 +57,7 @@ Page({
     const session = requireRole("parent");
     if (!session) return;
     const requestId = ++growthRequestId;
-    this.setData({ state: "loading", message: "正在读取成长数据" });
+    this.setData({ state: "loading", message: "正在读取成长数据", evaluationCards: [], evaluationMessage: "" });
     try {
       const children = await getParentChildren();
       if (requestId !== growthRequestId) return;
@@ -92,6 +97,8 @@ Page({
         heroSummaryMessage: activityMessages.heroSummary,
         heroTags: buildHeroTags(active, growth),
         heroStats: buildHeroStats(growth),
+        evaluationMessage: growth.evaluations === undefined ? "评价暂不可用，请进入详情重新读取" : growth.evaluations.length ? "" : "教练尚未维护评价",
+        evaluationCards: (growth.evaluations || []).flatMap(record => { const entry = record.history[record.history.length - 1]; return entry ? [{ teamId: record.teamId, teamName: record.teamName, text: [...entry.phrases.map(p => p.text), entry.note].filter(Boolean).join(" · ") || "当前评价已清空，历史仍保留", author: `${entry.actorDisplayName} · ${formatDateTime(entry.changedAt)}` }] : []; }),
         milestoneMessage: activityMessages.milestone,
         trainingHistoryMessage: activityMessages.trainingHistory,
         matchHistoryMessage: activityMessages.matchHistory,
@@ -100,7 +107,7 @@ Page({
       });
       if (selectedMetric) await this.loadMetricDetail(selectedMetric.metricId);
     } catch (error) {
-      this.setData({ state: "error", message: readableError(error) });
+      if (requestId === growthRequestId) this.setData({ state: "error", message: readableError(error) });
     }
   },
   switchChild(event: { detail: { studentId: string } }) {

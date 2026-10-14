@@ -1,4 +1,4 @@
-import { DEV_IDENTITY_ROLE, STORAGE_KEYS } from "./config";
+import { DEV_IDENTITY_ROLE, STORAGE_KEYS, environmentStorageKey } from "./config";
 import type { AppContext, AppRole, LoginResult, SessionState } from "./types";
 
 let appContext: AppContext | null = null;
@@ -90,11 +90,11 @@ export function clearSession() {
 
 const DISPOSABLE_STORAGE_PREFIXES = [
   `${STORAGE_KEYS.assessmentDraftPrefix}:`,
-  "coach-assessment-entry:",
-  "coach-assessment-bulk:",
-  "match-event-draft:v1:",
+  `${environmentStorageKey("coach-assessment-entry")}:`,
+  `${environmentStorageKey("coach-assessment-bulk")}:`,
+  `${environmentStorageKey("match-event-draft:v1")}:`,
 ];
-const DISPOSABLE_STORAGE_KEYS = new Set(["cq-parent-reminder-read-ids"]);
+const DISPOSABLE_STORAGE_KEYS = new Set([environmentStorageKey("cq-parent-reminder-read-ids")]);
 
 /** Removes only regenerable drafts and local read-state, never authentication or role context. */
 export function clearDisposableLocalCache() {

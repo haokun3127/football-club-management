@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "比赛战术板",
   "usingComponents": {},
-  "navigationStyle": "custom"
+  "navigationStyle": "custom",
+  "disableScroll": true
 }

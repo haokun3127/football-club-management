@@ -1,25 +1,27 @@
-.history-page {
-  min-height: 100vh;
-  background: var(--color-bg);
-}
-
-.history-page__body {
-  padding: 32rpx 32rpx 64rpx;
-}
-
+.history-page { min-height: 100vh; background: var(--color-page); }
+.history-page__body { padding: 32rpx 32rpx 64rpx; }
 .page-nav { position: sticky; top: 0; z-index: 100; height: 88rpx; box-sizing: content-box; display: flex; align-items: center; padding: 0 200rpx 0 32rpx; background: var(--color-card); }
-.page-nav__back { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; }
+.page-nav__back { display: flex; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; }
 .page-nav__back image { width: 48rpx; height: 48rpx; }
-.page-nav__title { flex: 1; margin-left: 8rpx; color: #202124; font-size: 36rpx; font-weight: 700; }
-.page-nav__spacer { width: 48rpx; height: 48rpx; }
-
-.history-card { display: flex; align-items: center; gap: 24rpx; margin-bottom: 20rpx; padding: 28rpx 32rpx; border-radius: 24rpx; background: #ffffff; }
-.history-card__bar { flex: 0 0 auto; width: 8rpx; height: 72rpx; border-radius: 4rpx; background: #a80f1b; }
-.history-card__bar--pending { background: #d0d5dd; }
-.history-card__main { flex: 1; min-width: 0; }
-.history-card__title { overflow: hidden; font-size: 30rpx; font-weight: 600; color: #202124; text-overflow: ellipsis; white-space: nowrap; }
-.history-card__meta { margin-top: 8rpx; font-size: 24rpx; color: #667085; }
-.history-card__progress { margin-top: 6rpx; color: #a80f1b; font-size: 24rpx; font-weight: 600; line-height: 32rpx; }
-.history-card__place { overflow: hidden; margin-top: 4rpx; font-size: 24rpx; color: #98a2b3; text-overflow: ellipsis; white-space: nowrap; }
-.history-card__status { flex: 0 0 auto; font-size: 24rpx; color: #98a2b3; }
-.history-card__status--done { color: #10b981; font-weight: 600; }
+.page-nav__title { flex: 1; margin-left: 8rpx; color: var(--color-text); font-size: 36rpx; font-weight: 700; }
+.record-summary { margin-bottom: 32rpx; padding: 36rpx; border-radius: 24rpx; background: var(--color-brand); color: var(--color-card); }
+.record-summary__name { font-size: 26rpx; line-height: 40rpx; }
+.record-summary__number { margin-top: 12rpx; font-size: 92rpx; font-weight: 700; line-height: 112rpx; }
+.record-summary__number text { margin-left: 12rpx; font-size: 26rpx; font-weight: 400; }
+.record-summary__note { margin-top: 20rpx; font-size: 22rpx; line-height: 36rpx; opacity: .8; }
+.record { margin-bottom: 20rpx; padding: 28rpx 32rpx 12rpx; border: 1rpx solid var(--color-line); border-radius: 20rpx; background: var(--color-card); }
+.record-heading { display: flex; justify-content: space-between; align-items: center; gap: 20rpx; }
+.record-date { color: var(--color-text-secondary); font-size: 22rpx; line-height: 36rpx; }
+.record-title { color: var(--color-text); font-size: 32rpx; font-weight: 600; line-height: 48rpx; }
+.record-state { flex-shrink: 0; color: var(--color-text-secondary); font-size: 24rpx; }
+.record-state--counted { color: var(--color-brand); }
+.record-actions { display: flex; justify-content: flex-end; gap: 28rpx; margin-top: 20rpx; border-top: 1rpx solid var(--color-line); }
+.record-actions button { padding: 12rpx 0; margin: 0; min-height: 80rpx; line-height: 56rpx; background: transparent; font-size: 24rpx; color: var(--color-text-secondary); }
+.record-actions .record-edit { color: var(--color-brand); }
+.record-history { border-top: 1rpx solid var(--color-line); padding: 12rpx 0; color: var(--color-text-secondary); font-size: 22rpx; line-height: 40rpx; }
+.editor-backdrop { position: fixed; inset: 0; z-index: 200; display: flex; align-items: flex-end; background: rgba(0,0,0,.4); }
+.record-editor { box-sizing: border-box; width: 100%; max-height: 88vh; overflow-y: auto; padding: 36rpx 32rpx calc(32rpx + env(safe-area-inset-bottom)); border-radius: 28rpx 28rpx 0 0; background: var(--color-card); }
+.editor-subtitle,.editor-current { margin-top: 12rpx; color: var(--color-text-secondary); font-size: 24rpx; line-height: 36rpx; }
+.editor-toggle { display: flex; align-items: center; justify-content: space-between; margin: 32rpx 0; font-size: 28rpx; }
+.editor-reason { width: 100%; height: 160rpx; padding: 20rpx; box-sizing: border-box; border: 1rpx solid var(--color-line); border-radius: 12rpx; font-size: 28rpx; }
+.editor-error { margin: 20rpx 0; font-size: 24rpx; line-height: 36rpx; color: var(--color-error); }

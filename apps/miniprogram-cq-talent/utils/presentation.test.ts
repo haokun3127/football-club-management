@@ -12,8 +12,8 @@ describe("parent presentation helpers", () => {
 
   it("formats API dates without exposing ISO timestamps", () => {
     expect(formatCalendarDate("2026-06-28T11:00:00.000Z")).toBe("6月28日 周日");
-    expect(formatDateTime("2026-06-28T11:00:00.000Z")).toBe("6月28日 11:00");
-    expect(formatTimeRange("2026-06-28T11:00:00.000Z", "2026-06-28T12:30:00.000Z")).toBe("11:00–12:30");
+    expect(formatDateTime("2026-06-28T11:00:00.000Z")).toBe("6月28日 19:00");
+    expect(formatTimeRange("2026-06-28T11:00:00.000Z", "2026-06-28T12:30:00.000Z")).toBe("19:00–20:30");
   });
 
   it("uses business-friendly fallbacks for incomplete dates", () => {

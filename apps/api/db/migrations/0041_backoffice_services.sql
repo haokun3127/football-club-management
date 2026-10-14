@@ -1,0 +1,11 @@
+CREATE TABLE service_catalog (id TEXT NOT NULL, club_id TEXT NOT NULL REFERENCES clubs(id), data_json TEXT NOT NULL CHECK(json_valid(data_json)), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY(club_id,id));
+CREATE TABLE service_cases (id TEXT NOT NULL, club_id TEXT NOT NULL REFERENCES clubs(id), data_json TEXT NOT NULL CHECK(json_valid(data_json)), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY(club_id,id));
+CREATE TABLE scout_work_records (id TEXT NOT NULL, club_id TEXT NOT NULL REFERENCES clubs(id), data_json TEXT NOT NULL CHECK(json_valid(data_json)), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY(club_id,id));
+ALTER TABLE private_lesson_requests ADD COLUMN service_id TEXT;
+ALTER TABLE private_lesson_requests ADD COLUMN responsible_coach_id TEXT;
+ALTER TABLE private_lesson_requests ADD COLUMN candidate_coach_ids_json TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE private_lesson_requests ADD COLUMN communication TEXT;
+ALTER TABLE private_lesson_requests ADD COLUMN acceptance_evidence TEXT;
+ALTER TABLE private_lesson_requests ADD COLUMN next_follow_up TEXT;
+ALTER TABLE private_lesson_requests ADD COLUMN internal_notes TEXT;
+ALTER TABLE private_lesson_requests ADD COLUMN event_id TEXT;

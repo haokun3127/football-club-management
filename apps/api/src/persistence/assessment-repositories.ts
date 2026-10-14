@@ -88,8 +88,8 @@ export class AssessmentRepository {
     this.database.prepare(`
       INSERT INTO assessment_raw_results (
         id, club_id, assessment_id, test_item_id, metric_id, value_json,
-        recorded_by_coach_id, note, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        recorded_by_coach_id, note, created_at, updated_at, event_id, occurred_at, recorded_at, mapping_json
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(...assessmentRawResultValues(entity));
   }
 
@@ -97,8 +97,8 @@ export class AssessmentRepository {
     this.database.prepare(`
       INSERT INTO assessment_raw_results (
         id, club_id, assessment_id, test_item_id, metric_id, value_json,
-        recorded_by_coach_id, note, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        recorded_by_coach_id, note, created_at, updated_at, event_id, occurred_at, recorded_at, mapping_json
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO NOTHING
     `).run(...assessmentRawResultValues(entity));
   }
@@ -224,6 +224,10 @@ function assessmentRawResultValues(entity: AssessmentRawResult): SQLInputValue[]
     entity.note ?? null,
     entity.createdAt,
     entity.updatedAt,
+    entity.eventId ?? null,
+    entity.occurredAt ?? null,
+    entity.recordedAt ?? null,
+    entity.mapping ? JSON.stringify(entity.mapping) : null,
   ];
 }
 
@@ -307,6 +311,10 @@ function mapAssessmentRawResult(row: SqlRow): AssessmentRawResult {
     value: parseMetricValue(row, "value_json"),
     recordedByCoachId: optionalString(row, "recorded_by_coach_id"),
     note: optionalString(row, "note"),
+    eventId: optionalString(row, "event_id"),
+    occurredAt: optionalString(row, "occurred_at"),
+    recordedAt: optionalString(row, "recorded_at"),
+    ...(row.mapping_json ? {mapping:JSON.parse(String(row.mapping_json)) as AssessmentRawResult["mapping"]} : {}),
     createdAt: requiredString(row, "created_at"),
     updatedAt: requiredString(row, "updated_at"),
   } as AssessmentRawResult;

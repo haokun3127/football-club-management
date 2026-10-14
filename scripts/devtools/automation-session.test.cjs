@@ -82,3 +82,23 @@ test('all tracked Automator helpers use the shared session resolver instead of a
     assert.match(source, /resolveAutomationPort/, relativePath);
   }
 });
+
+test('uses the verified stable macOS installation unless explicitly overridden', () => {
+  const { resolveDevtoolsCli } = require('./automation-session.cjs');
+  assert.match(resolveDevtoolsCli({env:{},platform:'darwin',exists:()=>true}), /wechatwebdevtools-stable\.app/);
+  assert.match(resolveDevtoolsCli({env:{},platform:'darwin',exists:()=>false}), /wechatwebdevtools\.app/);
+  assert.equal(resolveDevtoolsCli({env:{WECHAT_DEVTOOLS_CLI:'/custom/cli'},platform:'darwin'}), '/custom/cli');
+});
+
+test('detects the newest macOS IDE marker and honors explicit port selection', () => {
+  const { mkdirSync, utimesSync } = require('node:fs');
+  const root=mkdtempSync(join(tmpdir(),'cq-ide-profiles-'));
+  try {
+    for (const [name,port,time] of [['old','14022',100],['stable','56031',200]]) {
+      const dir=join(root,name,'Default');mkdirSync(dir,{recursive:true});
+      const path=join(dir,'.ide');writeFileSync(path,port);utimesSync(path,time,time);
+    }
+    assert.equal(readIdeHttpPort({env:{MP_DEVTOOLS_IDE_USER_DATA:root},platform:'darwin'}),56031);
+    assert.equal(readIdeHttpPort({env:{MP_DEVTOOLS_IDE_USER_DATA:root,MP_IDE_HTTP_PORT:'56032'},platform:'darwin'}),56032);
+  } finally {rmSync(root,{recursive:true,force:true});}
+});

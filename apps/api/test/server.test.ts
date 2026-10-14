@@ -454,9 +454,7 @@ describe("api server", () => {
     expect(coachWeek.statusCode).toBe(200);
     expect(coachWeekBody.workbench.dateRange).toEqual({ from: "2026-07-01", to: "2026-07-07" });
     expect(coachWeekBody.workbench.summary.total).toBeGreaterThan(0);
-    expect(coachWeekBody.workbench.tasks).toEqual(expect.arrayContaining([
-      expect.objectContaining({ eventId: "event-training-1", action: "attendance" }),
-    ]));
+    expect(coachWeekBody.workbench.tasks).toEqual([]); // No task is fabricated from normal attendance.
     expect(parentCoachHome.statusCode).toBe(403);
     expect(coachEventFinishForbidden.statusCode).toBe(403);
     expect(coachEventFinish.statusCode).toBe(200);
@@ -466,6 +464,29 @@ describe("api server", () => {
 
     await app.close();
     persistence.database.close();
+  });
+
+  it("scopes multi-team schedules and retains cross-day assessment tasks independently of calendar dates", async () => {
+    const persistence = await createPlatformPersistence({databasePath: ":memory:"});
+    const seed = createSeedData();
+    const clubId = "club-chongqing-talent";
+    const team = seed.teams.find(item => item.id === "team-u10-dev")!;
+    seed.assessmentTasks = [{id:"cross-day",clubId,teamId:team.id,title:"跨月测评",templateId:"assessment-template-technical",termLabel:"学期",startsOn:"2026-07-01",dueOn:"2026-08-31"}];
+    seed.teams.push({...team,id:"team-other",name:"第二队"},{...team,id:"team-forbidden",defaultCoachId:"different-coach"});
+    seed.assessmentTasks.push({...seed.assessmentTasks[0]!,id:"hidden-task",teamId:"team-forbidden"});
+    const event=seed.events.find(item=>item.id==="event-training-1")!;
+    seed.events.push({...event,id:"second-event",primaryTeamId:"team-other"});
+    const store=new PersistentApiStore(persistence.repositories, seed);
+    const app=buildServer(store,{logger:false,membershipResolver:new HeaderMembershipResolver(persistence.repositories.users,persistence.repositories.memberships)});
+    try {
+      const base=`/clubs/${clubId}/app-clients/app-client-cq-talent-wechat-main/coach/home`;
+      const get=async(query:string)=>(await app.inject({method:"GET",url:`${base}?${query}`,headers:{"x-user-id":"user-coach-1"}})).json().workbench;
+      const first=await get("date=2026-07-01");const later=await get("date=2026-10-01");
+      expect(first.tasks).toHaveLength(1);expect(later.tasks).toEqual(first.tasks);expect(first.tasks[0]).toMatchObject({taskId:"cross-day",action:"assessment"});expect(first.tasks[0]).not.toHaveProperty("dueAt");
+      expect(first.teamOptions.map((item:{id:string})=>item.id)).not.toContain("team-forbidden");
+      const selected=await get("date=2026-07-01&teamIds=team-other");expect(selected.selectedTeamIds).toEqual(["team-other"]);expect(selected.tasks).toEqual([]);expect(selected.events.map((item:{id:string})=>item.id)).toEqual(["second-event"]);
+      const corrected=await get("date=2026-07-01&teamIds=team-forbidden");expect(corrected.selectedTeamIds).toEqual(first.selectedTeamIds);expect(corrected.tasks).toEqual(first.tasks);
+    } finally {await app.close();persistence.database.close();}
   });
 
   it("interprets parent calendar date-only ranges as whole UTC days and rejects invalid ranges", async () => {
@@ -592,7 +613,8 @@ describe("api server", () => {
     expect(formations.json().formations.every((item: { positions: unknown[] }) => item.positions.length === 11)).toBe(true);
     expect(initial.statusCode).toBe(200);
     expect(initialBody.roster).toHaveLength(1);
-    expect(initialBody.board.players.filter((player) => player.role === "starter")).toHaveLength(1);
+    expect(initialBody.board.players.filter((player) => player.role === "starter")).toHaveLength(0);
+    expect(initialBody.board.formationName).toBe("free");
     expect(saved.statusCode).toBe(200);
     expect(restored.json().saved).toBe(true);
     expect(restored.json().board.players[0].x).toBe(0.42);
@@ -1068,7 +1090,7 @@ describe("api server", () => {
       method: "PUT",
       url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/training-projects",
       headers: { "x-user-id": "user-coach-1", "idempotency-key": "training-projects-submit-1" },
-      payload: {
+      payload: { expectedRevision: (await app.inject({method:"GET", url:"/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/workbench", headers:{"x-user-id":"user-coach-1"}})).json().trainingContentRevision,
         projectIds: ["drill-cq-talent-assessment-001", "drill-cq-talent-assessment-002"],
         intensity: "medium",
         note: "小程序训练管理保存",
@@ -1290,7 +1312,7 @@ describe("api server", () => {
       method: "PUT",
       url: `${base}/training-projects`,
       headers: { "x-user-id": "user-coach-1", "idempotency-key": "growth-timeline-projects" },
-      payload: { projectIds: ["drill-cq-talent-assessment-001"] },
+      payload: { expectedRevision: (await app.inject({method:"GET", url:"/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/workbench", headers:{"x-user-id":"user-coach-1"}})).json().trainingContentRevision, projectIds: ["drill-cq-talent-assessment-001"] },
     })).resolves.toEqual(expect.objectContaining({ statusCode: 200 }));
     await expect(app.inject({
       method: "PUT",
@@ -1348,6 +1370,8 @@ describe("api server", () => {
   });
 
   it("serves app-client login, status, metric drilldown, and coach write contracts", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-18T12:00:00.000Z"));
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
     const store = new PersistentApiStore(persistence.repositories);
     await store.saveAssessmentTask({
@@ -1482,9 +1506,9 @@ describe("api server", () => {
     expect(metricBody.records.length).toBeGreaterThan(0);
     expect(metricBody.privacy.minorProfile).toBe("redacted_contact_fields");
     expect(attendance.statusCode).toBe(200);
-    expect(lessonRead.statusCode).toBe(200);
-    expect(lessonConfirm.statusCode).toBe(201);
-    expect(lessonCorrection.statusCode).toBe(200);
+    expect(lessonRead.statusCode).toBe(410);
+    expect(lessonConfirm.statusCode).toBe(410);
+    expect(lessonCorrection.statusCode).toBe(410);
     expect(match.statusCode).toBe(201);
     expect(assessment.statusCode).toBe(201);
     expect(parentWrite.statusCode).toBe(403);
@@ -1561,10 +1585,7 @@ describe("api server", () => {
     expect(late.statusCode).toBe(200);
     expect(parent.statusCode).toBe(403);
     expect(outOfScopeCoach.statusCode).toBe(403);
-    expect(ledger?.entries.filter((entry) => entry.sourceId === "event-training-1-student-1")).toHaveLength(1);
-    expect(ledger?.entries).toEqual(expect.arrayContaining([
-      expect.objectContaining({ source: "attendance", sourceId: "event-training-1-student-1", lessonDelta: -1 }),
-    ]));
+    expect(ledger?.entries.filter((entry) => entry.sourceId === "event-training-1-student-1")).toHaveLength(0);
 
     await app.close();
     persistence.database.close();
@@ -1780,8 +1801,8 @@ describe("api server", () => {
       expect(tactical.statusCode, tactical.body).toBe(200);
       const tacticalBody = tactical.json() as { roster: Array<{ studentId: string }>; board: { players: Array<Record<string, unknown>> } };
       expect(tacticalBody.roster.map((student) => student.studentId)).toEqual(coachDemoRosterStudentIds);
-      expect(tacticalBody.board.players.filter((player) => player.role === "starter")).toHaveLength(11);
-      expect(tacticalBody.board.players.filter((player) => player.role === "substitute")).toHaveLength(5);
+      expect(tacticalBody.board.players.filter((player) => player.role === "starter")).toHaveLength(0);
+      expect(tacticalBody.board.players.filter((player) => player.role === "substitute")).toHaveLength(16);
       const partialTactical = await firstApp.inject({
         method: "PUT",
         url: `${base}/coach/events/event-cq-talent-demo-match-tactical/tactical-board`,
@@ -1801,18 +1822,19 @@ describe("api server", () => {
       const hydratedTacticalBody = hydratedTactical.json() as { saved: boolean; board: { players: Array<Record<string, unknown>> } };
       expect(hydratedTacticalBody.saved).toBe(true);
       expect(hydratedTacticalBody.board.players).toHaveLength(16);
-      expect(hydratedTacticalBody.board.players.filter((player) => player.role === "starter")).toHaveLength(11);
-      expect(hydratedTacticalBody.board.players.filter((player) => player.role === "substitute")).toHaveLength(5);
+      expect(hydratedTacticalBody.board.players.filter((player) => player.role === "starter")).toHaveLength(0);
+      expect(hydratedTacticalBody.board.players.filter((player) => player.role === "substitute")).toHaveLength(16);
       const saveTactical = await firstApp.inject({
         method: "PUT",
         url: `${base}/coach/events/event-cq-talent-demo-match-tactical/tactical-board`,
         headers: { authorization: `Bearer ${coachToken}`, "idempotency-key": "acceptance-demo-tactical-board" },
         payload: {
           formationName: "4-3-3",
-          players: hydratedTacticalBody.board.players.map((player, index) => index === 0 ? { ...player, x: 0.42 } : player),
+          players: hydratedTacticalBody.board.players.map((player, index) => ({ ...player, role: "starter", ...(index === 0 ? {x: 0.42} : {}) })),
         },
       });
       expect(saveTactical.statusCode, saveTactical.body).toBe(200);
+      expect(saveTactical.json().board.players.filter((player: {role: string}) => player.role === "starter")).toHaveLength(16);
 
       await firstApp.close();
       firstApp = undefined;
@@ -1938,6 +1960,7 @@ describe("api server", () => {
       const rollback = rollbackCqTalentAcceptanceDemo(restartedPersistence.database);
       expect(rollback.deletedEventIds).toEqual(demoEventIds);
       expect(rollback.deletedSessions).toBeGreaterThan(0);
+      expect(rollback.deletedTrainingRecords).toBeGreaterThan(0);
       await restartedApp.close();
       restartedApp = undefined;
       restartedPersistence.database.close();
@@ -2665,7 +2688,7 @@ describe("api server", () => {
     });
   });
 
-  it("records lesson credit, attendance debit, and manual adjustment with balance", async () => {
+  it("records explicit lesson credits and adjustments without an attendance debit", async () => {
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
     const app = buildServer(
       new PersistentApiStore(persistence.repositories),
@@ -2732,16 +2755,15 @@ describe("api server", () => {
     expect(attendanceResponse.statusCode).toBe(200);
     expect(adjustmentResponse.statusCode).toBe(201);
     expect(ledgerResponse.statusCode).toBe(200);
-    expect(ledger.balance).toBe(13);
+    expect(ledger.balance).toBe(14);
     expect(ledger.entries).toEqual(expect.arrayContaining([
       expect.objectContaining({ entryType: "credit", lessonDelta: 12, source: "offline_recharge", sourceId: "offline-payment-1" }),
-      expect.objectContaining({ entryType: "debit", lessonDelta: -1, source: "attendance", sourceId: "event-training-1-student-1" }),
       expect.objectContaining({ entryType: "adjustment", lessonDelta: 2, source: "manual_adjustment", sourceId: "manual-adjustment-1" }),
     ]));
     expect(ledger.entries.find((entry) => entry.entryType === "credit")?.paymentEventId).toBeTruthy();
     expect(summaryResponse.statusCode).toBe(200);
     expect(summary.lesson).toEqual(expect.objectContaining({
-      balance: 13,
+      balance: 14,
       status: "confirmed",
       source: "manual_adjustment",
     }));
@@ -3371,6 +3393,8 @@ describe("api server", () => {
   });
 
   it("preserves assessment app-client routes and role-scoped parent reads", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-18T12:00:00.000Z"));
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
     const store = new PersistentApiStore(persistence.repositories);
     await store.saveAssessmentTask({
@@ -3835,6 +3859,8 @@ describe("api server", () => {
   });
 
   it("creates assessment tasks and lists them with templates", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-18T12:00:00.000Z"));
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
     const app = buildServer(
       new PersistentApiStore(persistence.repositories),
@@ -3853,7 +3879,7 @@ describe("api server", () => {
       teams: Array<{ id: string; name: string }>;
     };
     expect(Array.isArray(listedBody.templates)).toBe(true);
-    expect(listedBody.teams).toContainEqual({ id: "team-u10-dev", name: "U10发展队" });
+    expect(listedBody.teams).toContainEqual(expect.objectContaining({ id: "team-u10-dev", name: "U10发展队" }));
     const templateId = listedBody.templates[0]?.id;
     expect(templateId).toBeTruthy();
 
@@ -3948,6 +3974,8 @@ describe("api server", () => {
   });
 
   it("reads saved assessment values by real table test-item project id", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-18T12:00:00.000Z"));
     const persistence = await createPlatformPersistence({ databasePath: ":memory:" });
     const store = new PersistentApiStore(persistence.repositories);
     const app = buildServer(
@@ -4028,7 +4056,7 @@ describe("api server", () => {
       method: "PUT",
       url: `${base}/training-projects`,
       headers: { ...headers, "idempotency-key": "training-content-assessment-projects" },
-      payload: { projectIds: ["drill-cq-talent-assessment-001"] },
+      payload: { expectedRevision: (await app.inject({method:"GET", url:"/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/workbench", headers:{"x-user-id":"user-coach-1"}})).json().trainingContentRevision, projectIds: ["drill-cq-talent-assessment-001"] },
     });
     expect(selected.statusCode).toBe(200);
 

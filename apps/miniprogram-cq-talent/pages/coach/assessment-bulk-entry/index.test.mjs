@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => ({
   submitCoachAssessment: vi.fn(),
   saveCoachAssessmentEntries: vi.fn(),
   getCoachAssessmentHistory: vi.fn(),
+  getCoachAssessmentCourses: vi.fn(),
   requireRole: vi.fn(),
   openPage: vi.fn(),
   showToast: vi.fn(),
@@ -23,12 +24,14 @@ vi.mock("../../../utils/api", () => ({
   submitCoachAssessment: mocks.submitCoachAssessment,
   saveCoachAssessmentEntries: mocks.saveCoachAssessmentEntries,
   getCoachAssessmentHistory: mocks.getCoachAssessmentHistory,
+  getCoachAssessmentCourses: mocks.getCoachAssessmentCourses,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
 vi.mock("../../../utils/presentation", () => ({ resolveMenuInset: () => 0, resolveNavInset: () => 0 }));
 
 globalThis.wx = {
+  getAccountInfoSync: () => ({ miniProgram: { envVersion: "develop" } }),
   navigateBack: vi.fn(),
   getStorageSync: (key) => storage.get(key) ?? "",
   setStorageSync: (key, value) => storage.set(key, value),
@@ -73,6 +76,17 @@ describe("C12.1 team batch assessment entry", () => {
     mocks.showToast.mockReset();
   });
 
+  it("uses the frozen roster and project scope after a student has left the live team", async () => {
+    mocks.getCoachAssessmentTasks.mockResolvedValue([{...task,studentIds:["student-1"],testItemIds:["item-speed"],sourceEventId:"course-a",workflow:{canEdit:true,templateVersionId:"version-real",courseSelectionRequired:true,students:[{studentId:"student-1",name:"任务原学员"}]}}]);
+    mocks.getCoachTeam.mockResolvedValue({team:{id:"team-real",name:"U10发展队"},members:[{id:"student-new",name:"新入队学员"}]});
+    const form=await mocks.getAssessmentForm();mocks.getAssessmentForm.mockResolvedValue({...form,fields:[...form.fields,{...form.fields[0],id:"other",testItemId:"item-other"}]});
+    mocks.getCoachAssessmentCourses.mockResolvedValue({courses:[{id:"course-a",title:"任务来源课",occurredAt:"2026-09-22T08:00:00Z",studentIds:["student-1"]}]});
+    const page=createPageInstance();await page.onLoad({taskId:"task-real",templateId:"template-real",projectId:"fitness"});
+    expect(page.data.rows.map((r)=>r.studentId)).toEqual(["student-1"]);
+    expect(page.data.fields.map((f)=>f.testItemId)).toEqual(["item-speed"]);
+    expect(page.data.courseIds).toEqual({"student-1":{speed:"course-a"}});
+  });
+
   it("loads every real team member and keeps the draft scoped to task plus project", async () => {
     const page = createPageInstance();
     await page.onLoad({ taskId: "task-real", templateId: "template-real", projectId: "fitness", title: "体能综合测评" });
@@ -81,7 +95,7 @@ describe("C12.1 team batch assessment entry", () => {
     expect(page.data.rows).toHaveLength(2);
     page.onRawInput({ currentTarget: { dataset: { studentId: "student-1", fieldId: "speed" } }, detail: { value: "4.92" } });
     expect(page.data.rows[0]).toMatchObject({ studentId: "student-1", rawInputValue: "4.92", scoreLabel: "待提交" });
-    expect(storage.has("coach-assessment-bulk:task-real:fitness")).toBe(true);
+    expect(storage.has("cqTalent:develop:coach-assessment-bulk:task-real:fitness")).toBe(true);
   });
 
   it("submits each filled student through the real assessment contract and keeps saved values visible", async () => {
@@ -94,7 +108,7 @@ describe("C12.1 team batch assessment entry", () => {
     expect(mocks.submitCoachAssessment).toHaveBeenCalledTimes(1);
     expect(page.data.rows[0]).toMatchObject({ studentId: "student-1", rawInputValue: "4.92", statusLabel: "已保存" });
     expect(page.data.filledLabel).toBe("已填写 1 人 · 未填写 1 人");
-    expect(storage.has("coach-assessment-bulk:task-real:fitness")).toBe(false);
+    expect(storage.has("cqTalent:develop:coach-assessment-bulk:task-real:fitness")).toBe(false);
     await page.saveProject();
     expect(mocks.submitCoachAssessment).toHaveBeenCalledTimes(1);
   });
@@ -204,6 +218,18 @@ describe("revisioned project drafts", () => {
     return page;
   }
   function input(page, value) { page.onRawInput({ currentTarget: { dataset: { studentId: "student-1", fieldId: "score" } }, detail: { value } }); }
+
+  it("requires a valid course, keeps a course-only correction in the draft and saves it with the same score", async () => {
+    mocks.getCoachAssessmentTasks.mockResolvedValue([{...task,workflow:{templateVersionId:"version-pinned",canEdit:true,courseSelectionRequired:true}}]);
+    mocks.getCoachAssessmentCourses.mockResolvedValue({courses:[{id:"course-a",title:"第一课",occurredAt:"2026-07-01T09:00:00Z",studentIds:["student-1"]},{id:"course-b",title:"第二课",occurredAt:"2026-07-02T09:00:00Z",studentIds:["student-1"]}]});
+    const page=await load();input(page,"75");await page.saveProject();expect(mocks.saveCoachAssessmentEntries).not.toHaveBeenCalled();expect(page.data.saveError).toContain("所属训练课");
+    page.selectCourse({currentTarget:{dataset:{}},detail:{value:"0"}});await page.saveProject();
+    expect(mocks.saveCoachAssessmentEntries).toHaveBeenLastCalledWith(task.id,"student-1",expect.objectContaining({entries:[expect.objectContaining({eventId:"course-a",value:{kind:"score_0_100",score:75}})]}));
+    page.selectCourse({currentTarget:{dataset:{studentId:"student-1",fieldId:"score"}},detail:{value:"1"}});
+    expect([...storage.values()][0].courseIds["student-1"].score).toBe("course-b");await page.saveProject();
+    expect(mocks.saveCoachAssessmentEntries).toHaveBeenLastCalledWith(task.id,"student-1",expect.objectContaining({entries:[expect.objectContaining({eventId:"course-b",value:{kind:"score_0_100",score:75}})]}));
+    expect(page.data.rows[0].metrics[0].courseLabel).toContain("2026-07-02 17:00");
+  });
 
   it("saves zero as a revisioned draft and pins the form without invoking legacy publication", async () => {
     const page = await load();

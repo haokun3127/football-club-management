@@ -1,5 +1,22 @@
+import {workbenchSchema} from './backoffice-workbench-schemas.js';
+import {clubPresentationSchema} from './club-presentation-schemas.js';
+import {biSchemas} from "./backoffice-bi-schemas.js";
+import {importSchemas,exportSchema} from "./backoffice-import-schemas.js";
+import {backofficeTaskSchemas} from "./backoffice-task-schemas.js";
+import {backofficeStandardSchemas} from "./backoffice-standard-schemas.js";
+import {backofficeModelSchemas} from "./backoffice-model-schemas.js";
+import {backofficeMappingSchemas} from "./backoffice-mapping-schemas.js";
+import {backofficePlanSchemas} from "./backoffice-plan-schemas.js";
+import { backofficeResources } from "../application/backoffice-resources.js";
+import { managementSchemas, optionSchema, resourceIndexSchema, grantsSchema, saveGrantsSchema, scoutManagementSchemas, backofficeTrainingSchemas } from "./backoffice-management-schemas.js";
+import { scoutSchemas } from "./scout-player-schemas.js";
+import { backofficeSchemas, backofficeCatalogSchema } from "./backoffice-schemas.js";
+import { temporaryRosterSchemas } from "./temporary-roster-schemas.js";
+import { parentResultSchema } from "./parent-result-schemas.js";
+import { evaluationSchemas } from "./student-evaluation-schemas.js";
 import { errorResponse, schemas } from "./schemas.js";
 import { workflowSchemas } from "./assessment-workflow-schemas.js";
+import { trainingRecordSchemas } from "./training-record-schemas.js";
 
 interface RouteSchema {
   params?: unknown;
@@ -105,6 +122,75 @@ export function buildOpenApiDocument() {
       },
     },
     paths: {
+      "/backoffice/api/bi-catalog":{get:operation("GET","backoffice-bi-catalog",biSchemas.catalog)},
+      "/backoffice/api/bi-snapshots":{post:operation("POST","backoffice-bi-create",biSchemas.create)},
+      "/backoffice/api/bi-snapshots/{id}":{get:operation("GET","backoffice-bi-detail",biSchemas.detail)},
+      "/backoffice/api/bi-snapshots/{id}/export":{post:operation("POST","backoffice-bi-export",biSchemas.export)},
+
+      "/backoffice/api/workbench":{get:operation("GET","backoffice-workbench",workbenchSchema)},
+      "/backoffice/api/import-templates":{get:operation("GET","backoffice-import-templates",importSchemas.templates)},
+      "/backoffice/api/import-templates/{key}":{get:operation("GET","backoffice-import-template",importSchemas.template)},
+      "/backoffice/api/imports":{get:operation("GET","backoffice-imports",importSchemas.list)},
+      "/backoffice/api/imports/{id}":{get:operation("GET","backoffice-import-detail",importSchemas.detail)},
+      "/backoffice/api/imports/preview":{post:operation("POST","backoffice-import-preview",importSchemas.preview)},
+      "/backoffice/api/imports/{id}/failures-export":{post:operation("POST","backoffice-import-failures",importSchemas.failures)},
+      "/backoffice/api/imports/{id}/confirm":{post:operation("POST","backoffice-import-confirm",importSchemas.confirm)},
+      "/backoffice/api/exports/{key}":{post:operation("POST","backoffice-export",exportSchema)},
+
+      "/backoffice/api/task-catalog":{get:operation("GET","backoffice-task-catalog",backofficeTaskSchemas.catalog)},
+      "/backoffice/api/assessment-tasks":{get:operation("GET","backoffice-tasks",backofficeTaskSchemas.list),post:operation("POST","backoffice-task-create",backofficeTaskSchemas.create)},
+      "/backoffice/api/assessment-tasks/{id}":{get:operation("GET","backoffice-task-detail",backofficeTaskSchemas.detail)},
+      "/backoffice/api/assessment-tasks/{id}/students/{studentId}/entries":{put:operation("PUT","backoffice-task-save",backofficeTaskSchemas.save)},
+      "/backoffice/api/assessment-tasks/{id}/students/{studentId}/handling":{put:operation("PUT","backoffice-task-handling",backofficeTaskSchemas.handling)},
+      "/backoffice/api/assessment-tasks/{id}/publications":{post:operation("POST","backoffice-task-publication",backofficeTaskSchemas.publish)},
+      "/backoffice/api/standards":{get:operation("GET","backoffice-standards",backofficeStandardSchemas.list),post:operation("POST","backoffice-standard-create",backofficeStandardSchemas.create)},
+      "/backoffice/api/standards/{id}":{get:operation("GET","backoffice-standard-detail",backofficeStandardSchemas.detail),put:operation("PUT","backoffice-standard-update",backofficeStandardSchemas.update)},
+      "/backoffice/api/standards/{id}/compare":{post:operation("POST","backoffice-standard-compare",backofficeStandardSchemas.compare)},
+      "/backoffice/api/standards/{id}/transitions":{post:operation("POST","backoffice-standard-transition",backofficeStandardSchemas.transition)},
+      "/backoffice/api/model-catalog":{get:operation("GET","backoffice-model-catalog",backofficeModelSchemas.catalog)},
+      "/backoffice/api/models":{get:operation("GET","backoffice-models",backofficeModelSchemas.list),post:operation("POST","backoffice-model-create",backofficeModelSchemas.create)},
+      "/backoffice/api/models/{id}":{get:operation("GET","backoffice-model-detail",backofficeModelSchemas.detail),put:operation("PUT","backoffice-model-update",backofficeModelSchemas.update)},
+      "/backoffice/api/models/{id}/trial":{post:operation("POST","backoffice-model-trial",backofficeModelSchemas.trial)},
+      "/backoffice/api/models/{id}/display":{put:operation("PUT","backoffice-model-display",backofficeModelSchemas.display)},
+      "/backoffice/api/models/{id}/transitions":{post:operation("POST","backoffice-model-transition",backofficeModelSchemas.transition)},
+      "/backoffice/api/mapping-items":{get:operation("GET","backoffice-mapping-items",backofficeMappingSchemas.items)},
+      "/backoffice/api/mappings":{get:operation("GET","backoffice-mappings",backofficeMappingSchemas.list),post:operation("POST","backoffice-mapping-create",backofficeMappingSchemas.create)},
+      "/backoffice/api/mappings/{id}":{get:operation("GET","backoffice-mapping-detail",backofficeMappingSchemas.detail),put:operation("PUT","backoffice-mapping-update",backofficeMappingSchemas.update)},
+      "/backoffice/api/mappings/{id}/trial":{post:operation("POST","backoffice-mapping-trial",backofficeMappingSchemas.trial)},
+      "/backoffice/api/mappings/{id}/transitions":{post:operation("POST","backoffice-mapping-transition",backofficeMappingSchemas.transition)},
+      "/backoffice/api/plans":{get:operation("GET","backoffice-plans",backofficePlanSchemas.list),post:operation("POST","backoffice-plan-create",backofficePlanSchemas.create)},
+      "/backoffice/api/plans/{id}":{get:operation("GET","backoffice-plan-detail",backofficePlanSchemas.detail),put:operation("PUT","backoffice-plan-save",backofficePlanSchemas.update)},
+      "/backoffice/api/training-records": {get:operation("GET","backoffice-training-records",backofficeTrainingSchemas.list),put:operation("PUT","backoffice-training-correction",backofficeTrainingSchemas.save)},
+      "/backoffice/api/scouts": {get:operation("GET","backoffice-scouts",scoutManagementSchemas.list),post:operation("POST","backoffice-scout-create",scoutManagementSchemas.create)},
+      "/backoffice/api/scouts/{id}/enroll": {post:operation("POST","backoffice-scout-enroll",scoutManagementSchemas.enroll)},
+      ...Object.fromEntries(backofficeResources.flatMap(resource => { const schemas=managementSchemas(resource); const path=`/backoffice/api/resources/${resource.key}`; return [[path,{get:operation("GET",path,schemas.list),post:operation("POST",path,schemas.create)}],[`${path}/{id}`,{get:operation("GET",`${path}-detail`,schemas.detail),put:operation("PUT",`${path}-save`,schemas.update)}]]; })),
+      "/backoffice/api/resources": {get:operation("GET","backoffice-resources",resourceIndexSchema)},
+      "/backoffice/api/options/{key}": {get:operation("GET","backoffice-options",optionSchema)},
+      "/backoffice/api/grants": {get:operation("GET","backoffice-grants",grantsSchema),put:operation("PUT","backoffice-grants-save",saveGrantsSchema)},
+      "/backoffice/api/catalog/{table}": { get: operation("GET", "backoffice-catalog", backofficeCatalogSchema) },
+      "/backoffice/api/login": { post: operation("POST", "backoffice-login", backofficeSchemas.login) },
+      "/backoffice/api/session": { get: operation("GET", "backoffice-session", backofficeSchemas.session) },
+      "/backoffice/api/logout": { post: operation("POST", "backoffice-logout", backofficeSchemas.logout) },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/scout-players": {
+        get: operation("GET", "scout-players", { params: scoutSchemas.params, querystring: scoutSchemas.query, response: { 200: scoutSchemas.list } }),
+        post: operation("POST", "scout-player-create", { params: scoutSchemas.params, body: scoutSchemas.create, response: { 200: scoutSchemas.created, 201: scoutSchemas.created } }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/temporary-roster": {
+        get: operation("GET", "temporary-roster", { params: temporaryRosterSchemas.params, response: { 200: temporaryRosterSchemas.response } }),
+        post: operation("POST", "temporary-roster-change", { params: temporaryRosterSchemas.params, body: temporaryRosterSchemas.body, response: { 200: temporaryRosterSchemas.response } }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/scout-players/{studentId}": {
+        get: operation("GET", "scout-player-detail", { params: scoutSchemas.detailParams, response: { 200: scoutSchemas.detail } }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/confirmed-results": { get: operation("GET", "parent-confirmed-results", { ...schemas.appClientStudentParams, ...parentResultSchema }) },
+      "/clubs/{clubId}/app-clients/{clientId}/students/{studentId}/evaluations": { get: operation("GET", "student-evaluations", { params: evaluationSchemas.params, response: { 200: evaluationSchemas.list } }) },
+      "/clubs/{clubId}/app-clients/{clientId}/students/{studentId}/evaluations/{teamId}": { put: operation("PUT", "student-evaluation-save", { params: evaluationSchemas.saveParams, body: evaluationSchemas.body, response: { 200: evaluationSchemas.saved } }) },
+      "/clubs/{clubId}/app-clients/{clientId}/students/{studentId}/training-records": {
+        get: operation("GET", "training-records", { params: trainingRecordSchemas.params, response: { 200: trainingRecordSchemas.listResponse } }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/students/{studentId}/training-records/{eventId}": {
+        patch: operation("PATCH", "training-record-correction", { params: trainingRecordSchemas.correctionParams, body: trainingRecordSchemas.correction, response: { 200: trainingRecordSchemas.correctionResponse } }),
+      },
       "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/publications": { post: operation("POST", "assessment-publications", workflowSchemas.publish) },
       "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/workflow": { get: operation("GET", "assessment-workflow", workflowSchemas.summary) },
       "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/students/{studentId}/entries": { put: operation("PUT", "assessment-entries", workflowSchemas.save) },
@@ -219,6 +305,7 @@ export function buildOpenApiDocument() {
           ...schemas.appClientCoachAssessmentTasks,
         }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/content/presentation": {get:operation("GET","club-presentation",{...schemas.appClientParams,...clubPresentationSchema})},
       "/clubs/{clubId}/app-clients/{clientId}/content/articles": {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/content/articles", {
           ...schemas.appClientParams,
@@ -341,18 +428,9 @@ export function buildOpenApiDocument() {
         }),
       },
       "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/lesson-confirmation": {
-        get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/lesson-confirmation", {
-          ...schemas.appClientEventParams,
-          ...schemas.appClientLessonConfirmation,
-        }),
-        post: operation("POST", "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/lesson-confirmation", {
-          ...schemas.appClientEventParams,
-          ...schemas.appClientLessonConfirmationCreate,
-        }),
-        patch: operation("PATCH", "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/lesson-confirmation", {
-          ...schemas.appClientEventParams,
-          ...schemas.appClientLessonConfirmationPatch,
-        }),
+        get: { ...operation("GET", "retired-lesson-read", { ...schemas.appClientEventParams, response: { 410: errorResponse } }), deprecated: true },
+        post: { ...operation("POST", "retired-lesson-confirm", { ...schemas.appClientEventParams, response: { 410: errorResponse } }), deprecated: true },
+        patch: { ...operation("PATCH", "retired-lesson-correct", { ...schemas.appClientEventParams, response: { 410: errorResponse } }), deprecated: true },
       },
       "/clubs/{clubId}/app-clients/{clientId}/coach/matches": {
         post: operation("POST", "/clubs/{clubId}/app-clients/{clientId}/coach/matches", {

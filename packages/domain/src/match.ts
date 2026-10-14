@@ -10,6 +10,9 @@ export interface Match extends AuditFields, ClubScoped {
   eventId: EntityId;
   matchType: MatchType;
   opponentName?: string;
+  ageGroup?: string;
+  competitionFormat?: string;
+  handbookUrl?: string;
   homeScore?: number;
   awayScore?: number;
   status: MatchStatus;

@@ -2,16 +2,20 @@ import { readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  getCoachWorkbench: vi.fn(),
+  getTrainingTemplates: vi.fn(), saveTrainingTemplate: vi.fn(), previewTrainingTransfer: vi.fn(), applyTrainingTransfer: vi.fn(),
+  getCoachWorkbench: vi.fn(), getCoachAssessmentTasks: vi.fn().mockResolvedValue([]),
   saveCoachAttendance: vi.fn(),
+  correctTrainingRecord: vi.fn(),
   openPage: vi.fn(),
   requireRole: vi.fn(),
 }));
 
 vi.mock("../../../utils/api", () => ({
-  getCoachWorkbench: mocks.getCoachWorkbench,
+  getTrainingTemplates: mocks.getTrainingTemplates, saveTrainingTemplate: mocks.saveTrainingTemplate, previewTrainingTransfer: mocks.previewTrainingTransfer, applyTrainingTransfer: mocks.applyTrainingTransfer,
+  getCoachWorkbench: mocks.getCoachWorkbench, getCoachAssessmentTasks: mocks.getCoachAssessmentTasks,
   saveCoachAttendance: mocks.saveCoachAttendance,
 }));
+vi.mock("../../../utils/training-records", () => ({ correctTrainingRecord: mocks.correctTrainingRecord }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
 vi.mock("../../../utils/presentation", () => ({
@@ -50,6 +54,8 @@ function createPageInstance(data = {}) {
 }
 
 const trainingWorkbench = {
+  canEditTraining: true,
+  trainingRecords: [],
   event: {
     id: "event-training-1",
     type: "training",
@@ -76,6 +82,40 @@ const trainingWorkbench = {
   assessmentTemplateId: "assessment-template-1",
   pending: [],
 };
+
+describe("reviewed course-copy controls", () => {
+  beforeEach(() => { vi.clearAllMocks(); mocks.requireRole.mockReturnValue({ role: "coach" }); mocks.getTrainingTemplates.mockResolvedValue([]); mocks.getCoachWorkbench.mockResolvedValue(trainingWorkbench); });
+  it("opens the dedicated C06 route only with planning permission and preserves source identity", async () => {
+    const page = createPageInstance({ canEditTraining: true, eventId: "course/a" });
+    await page.openTransfer({ currentTarget: { dataset: { mode: "copy" } } });
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/content-copy/index?eventId=course%2Fa");
+    expect(page.data.transferVisible).toBe(false);
+    mocks.openPage.mockClear(); page.data.canEditTraining = false;
+    await page.openTransfer({ currentTarget: { dataset: { mode: "copy" } } });
+    expect(mocks.openPage).not.toHaveBeenCalled();
+  });
+  const preview = { source: { title: "原课程", revision: "source-v1", count: 1, configuredMinutes: 7, items: [{ id: "drill", name: "已选内容", configuredMinutes: 7 }], excluded: ["友谊赛"] }, targets: [{ eventId: "target", title: "未来课程", startsAt: "2099-10-01T00:00:00Z", revision: "target-v1", existing: [{ id: "old", name: "目标原内容", configuredMinutes: 10 }] }] };
+  it("defaults to skipping existing content, then submits only explicitly chosen targets and the reviewed revisions", async () => {
+    mocks.previewTrainingTransfer.mockResolvedValueOnce(preview); mocks.applyTrainingTransfer.mockResolvedValueOnce({ results: [{ eventId: "target", status: "applied" }], excluded: ["友谊赛"] });
+    const page = createPageInstance({ canEditTraining: true, eventId: "target" });
+    await page.openTransfer({ currentTarget: { dataset: { mode: "templates" } } }); await page.selectTemplate({ currentTarget: { dataset: { id: "template" } } });
+    expect(page.data.transferTargets[0]).toMatchObject({ action: "skip", existingLabel: "目标原内容" });
+    await page.confirmTransfer(); expect(mocks.applyTrainingTransfer).not.toHaveBeenCalled();
+    page.toggleTransferTarget({ currentTarget: { dataset: { id: "target" } } }); await page.confirmTransfer();
+    expect(mocks.applyTrainingTransfer).toHaveBeenCalledWith({ sourceTemplateId: "template", sourceRevision: "source-v1", targets: [{ eventId: "target", expectedRevision: "target-v1", action: "replace" }] });
+    expect(page.data.transferResults[0].label).toBe("已保存"); expect(page.data.transferPreview).toBeNull();
+  });
+  it("shows a version conflict without retrying an overwrite and does not open tools without planning permission", async () => {
+    const denied = createPageInstance({ canEditTraining: false }); await denied.openTransfer({ currentTarget: { dataset: { mode: "copy" } } }); expect(denied.data.transferVisible).toBe(false);
+    mocks.previewTrainingTransfer.mockResolvedValueOnce(preview); mocks.applyTrainingTransfer.mockRejectedValueOnce(new Error("conflict"));
+    const page = createPageInstance({ canEditTraining: true, eventId: "target" }); await page.openTransfer({ currentTarget: { dataset: { mode: "templates" } } }); await page.selectTemplate({ currentTarget: { dataset: { id: "template" } } }); page.toggleTransferTarget({ currentTarget: { dataset: { id: "target" } } }); await page.confirmTransfer();
+    expect(page.data.transferMessage).toContain("重新预览"); expect(page.data.transferPreview).toBeNull(); expect(page.data.transferBusy).toBe(false);
+  });
+  it("saves a personal template through its own button and keeps the input on failure", async () => {
+    const page = createPageInstance({ canEditTraining: true, eventId: "source", templateTitle: "我的模板" }); mocks.saveTrainingTemplate.mockRejectedValueOnce(new Error("offline"));
+    await page.saveTemplate(); expect(page.data.templateTitle).toBe("我的模板"); expect(mocks.saveTrainingTemplate).toHaveBeenCalledWith("source", "我的模板");
+  });
+});
 
 describe("coach activity workbench", () => {
   beforeEach(() => {
@@ -106,7 +146,7 @@ describe("coach activity workbench", () => {
       hasMatch: false,
       hasAssessmentTemplate: true,
     });
-    expect(page.data.actionCards.map((item) => item.id)).toEqual(["training", "training-assessment", "change"]);
+    expect(page.data.actionCards.map((item) => item.id)).toEqual(["training", "training-assessment", "records", "change"]);
     expect(page.data.eventView).toMatchObject({
       title: "Ball-control session",
       typeLabel: "Training",
@@ -117,35 +157,49 @@ describe("coach activity workbench", () => {
     expect(page.data).toMatchObject({ attendancePresent: 0, attendanceTotal: 2, joinedNames: "" });
   });
 
-  it("changes only the tapped attendance status and preserves untouched backend statuses", async () => {
-    mocks.getCoachWorkbench.mockResolvedValue({
-      ...trainingWorkbench,
-      roster: [
-        { studentId: "student-1", name: "陈小宇", status: "present" },
-        { studentId: "student-2", name: "林一诺", status: "confirmed" },
-      ],
-    });
-    const page = createPageInstance();
-    await page.load("event-training-1");
-
-    expect(page.data.rosterRows).toMatchObject([
-      { studentId: "student-1", name: "陈小宇", present: true },
-      { studentId: "student-2", name: "林一诺", present: false },
-    ]);
+  it("uses the shared fact instead of participant status, only mutates the tapped student, and waits for success", async () => {
+    const record = { studentId: "student-1", eventId: "event-training-1", revision: 2, counted: false };
+    mocks.getCoachWorkbench.mockResolvedValue({ ...trainingWorkbench, trainingRecords: [record], roster: [{ studentId: "student-1", name: "甲", status: "present" }, { studentId: "student-2", name: "乙", status: "confirmed" }] });
+    const page = createPageInstance(); await page.load("event-training-1");
+    expect(page.data.rosterRows[0].present).toBe(false);
+    let resolve; mocks.correctTrainingRecord.mockImplementationOnce(() => new Promise(r => { resolve = r; }));
+    const saving = page.toggleAttendance({ currentTarget: { dataset: { index: "0" } } });
+    expect(page.data.rosterRows[0].present).toBe(false);
+    resolve({ record: { ...record, revision: 3, counted: true } }); await saving;
+    expect(mocks.correctTrainingRecord).toHaveBeenLastCalledWith("student-1", "event-training-1", { expectedRevision: 2, counted: true, reason: "教练快捷更正为已出勤" });
+    expect(mocks.saveCoachAttendance).not.toHaveBeenCalled();
+    expect(page.data.rosterRows.map(row => row.present)).toEqual([true, false]);
+  });
+  it("keeps a pending course-task read alive while saving one training fact", async () => {
+    let resolveTasks;
+    mocks.getCoachAssessmentTasks.mockImplementationOnce(() => new Promise(resolve => { resolveTasks = resolve; }));
+    mocks.getCoachWorkbench.mockResolvedValue(trainingWorkbench);
+    const page = createPageInstance(); await page.load("event-training-1");
+    mocks.correctTrainingRecord.mockResolvedValueOnce({ record: { studentId: page.data.rosterRows[0].studentId, eventId: "event-training-1", revision: 1, counted: true } });
     await page.toggleAttendance({ currentTarget: { dataset: { index: "0" } } });
-    expect(mocks.saveCoachAttendance).toHaveBeenCalledWith("event-training-1", [
-      expect.objectContaining({ studentId: "student-1", status: "absent" }),
-      expect.objectContaining({ studentId: "student-2", status: "confirmed" }),
-    ]);
-    expect(page.data).toMatchObject({ attendancePresent: 0, attendanceSaving: false });
-    expect(page.data.rosterRows[0]).toMatchObject({ present: false, status: "absent" });
-
-    await page.toggleAttendance({ currentTarget: { dataset: { index: "1" } } });
-    expect(page.data).toMatchObject({ attendancePresent: 1, rosterRows: [{ present: false }, { present: true }] });
-    expect(mocks.saveCoachAttendance).toHaveBeenLastCalledWith("event-training-1", [
-      expect.objectContaining({ studentId: "student-1", status: "absent" }),
-      expect.objectContaining({ studentId: "student-2", status: "present" }),
-    ]);
+    resolveTasks([{ id: "t1", sourceEventId: "event-training-1", title: "本课测评", templateId: "tpl", completedStudents: 0, totalStudents: 2 }]);
+    await Promise.resolve();
+    expect(page.data.courseTasks.map(task => task.id)).toEqual(["t1"]);
+    expect(page.data.courseTaskMessage).toBe("");
+  });
+  it("blocks blind retries after a conflict or unknown result and refreshes the server fact", async () => {
+    mocks.getCoachWorkbench.mockResolvedValue(trainingWorkbench);
+    const page = createPageInstance(); await page.load("event-training-1");
+    mocks.correctTrainingRecord.mockReset().mockRejectedValueOnce({ code: "training_record_conflict" });
+    await page.toggleAttendance({ currentTarget: { dataset: { index: "0" } } });
+    expect(page.data.attendanceNeedsRefresh).toBe(true);
+    expect(page.data.attendancePresent).toBe(0);
+    await page.toggleAttendance({ currentTarget: { dataset: { index: "0" } } });
+    expect(mocks.correctTrainingRecord).toHaveBeenCalledTimes(1);
+    await page.load("event-training-1"); expect(page.data.attendanceNeedsRefresh).toBe(false);
+  });
+  it("does not enable training writes against an older BFF without shared records", async () => {
+    mocks.getCoachWorkbench.mockResolvedValue({ ...trainingWorkbench, trainingRecords: undefined, canEditTraining: undefined });
+    mocks.correctTrainingRecord.mockReset();
+    const page = createPageInstance(); await page.load("event-training-1");
+    await page.toggleAttendance({ currentTarget: { dataset: { index: "0" } } });
+    expect(mocks.correctTrainingRecord).not.toHaveBeenCalled();
+    expect(page.data.actionCards.map(item => item.id)).not.toContain("training");
   });
 
   it("keeps the workbench focused on direct attendance rather than workflow or settlement", async () => {
@@ -166,11 +220,11 @@ describe("coach activity workbench", () => {
   });
 
   it("uses a binary check avatar for attendance and keeps names readable below it", () => {
-    expect(template).toContain('<image wx:if="{{item.present}}" class="roster-avatar__check" src="/assets/icons/c4-1-check.svg" mode="aspectFit" />');
+    expect(template).toContain('<text wx:if="{{item.present}}" class="roster-avatar__check">✓</text>');
     expect(template).toContain('<view wx:else class="roster-avatar__initial">{{item.initial}}</view>');
     expect(template).not.toContain('class="roster-status"');
     expect(stylesheet).toMatch(/\.roster-avatar__check\s*\{[^}]*width:\s*44rpx[^}]*height:\s*44rpx/s);
-    expect(stylesheet).toMatch(/\.roster-name\s*\{[^}]*white-space:\s*nowrap/s);
+    expect(stylesheet).toMatch(/\.roster-name\s*\{[^}]*white-space:\s*normal/s);
   });
 
   it("keeps the workbench free of settlement controls for in-progress events", async () => {
@@ -187,7 +241,7 @@ describe("coach activity workbench", () => {
     const page = createPageInstance();
     await page.load("event-training-1");
 
-    expect(page.data).toMatchObject({ attendancePresent: 1, attendanceTotal: 1 });
+    expect(page.data).toMatchObject({ attendancePresent: 0, attendanceTotal: 1 });
     expect(page.data).not.toHaveProperty("inProgress", true);
     expect(page.data).not.toHaveProperty("countdownText");
   });
@@ -232,19 +286,21 @@ describe("coach activity workbench", () => {
     });
     const cancelledPage = createPageInstance();
     await cancelledPage.load("event-cancelled");
-    expect(cancelledPage.data).toMatchObject({ canWrite: false, actionCards: [] });
+    expect(cancelledPage.data).toMatchObject({ canWrite: false, actionCards: [{ id: "records", label: "训练记录" }] });
     cancelledPage.openAction({ currentTarget: { dataset: { action: "attendance" } } });
     expect(mocks.openPage).not.toHaveBeenCalled();
+    cancelledPage.openAction({ currentTarget: { dataset: { action: "records" } } });
+    expect(mocks.openPage).toHaveBeenLastCalledWith("/pages/coach/lesson/index?id=event-cancelled");
 
     const page = createPageInstance({
       eventId: "event-1",
       canWrite: true,
       assessmentTemplateId: "template-1",
-      actionCards: ["attendance", "lesson", "match", "tactical", "training", "training-assessment", "change"].map((id) => ({ id })),
+      actionCards: ["attendance", "records", "match", "tactical", "training", "training-assessment", "change"].map((id) => ({ id })),
     });
     const routes = {
       attendance: "/pages/coach/attendance/index?id=event-1",
-      lesson: "/pages/coach/lesson/index?id=event-1",
+      records: "/pages/coach/lesson/index?id=event-1",
       match: "/pages/coach/match/index?id=event-1",
       tactical: "/pages/coach/tactical-board/index?eventId=event-1",
       training: "/pages/coach/content-select/index?eventId=event-1",
@@ -277,30 +333,26 @@ describe("coach activity workbench", () => {
 
   it("uses precomputed template fields and C2 in-progress affordances without unsafe WXML expressions", () => {
     expect(template).toContain('wx:if="{{hasRoster}}"');
-    expect(template).toContain('wx:if="{{hasActionCards}}"');
+    expect(template).toContain('wx:if="{{hasActionCards && !isTraining}}"');
     expect(template).toContain('bindtap="openAction"');
     expect(template).not.toContain('bindtap="finishEvent"');
     expect(template).not.toContain("结束训练");
-    expect(template).toContain("{{eventView.startTime}}");
+    expect(template).toContain("{{eventView.timeLabel}}");
     expect(template).not.toContain("18/20");
     expect(template).not.toContain("凤凰山");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 
-  it("uses the C1-style hero hierarchy with API-backed fields only", () => {
-    expect(template).toContain('class="shero__top"');
-    expect(template).toContain('class="shero__big"');
-    expect(template).toContain('class="shero__title"');
-    expect(template).toContain('class="shero__pills"');
-    expect(template).toContain("{{eventView.heroDateLabel}}");
-    expect(template).toContain("{{eventView.heroMeta}}");
-    expect(template).not.toContain("{{eventView.statusLabel}}");
-    expect(stylesheet).toMatch(/\.shero\s*\{[^}]*min-height:\s*368rpx/s);
-    expect(stylesheet).toMatch(/\.shero__big\s*\{[^}]*font-size:\s*96rpx/s);
-    expect(stylesheet).toMatch(/\.shero__pill\s*\{[^}]*border-radius:\s*999rpx/s);
+  it("uses approved C03 compact course information and a fixed change action", () => {
+    expect(template).toContain('class="course-info workbench-card"');
+    expect(template).toContain("{{eventView.title}}");
+    expect(template).toContain("{{eventView.timeLabel}}");
+    expect(template).toContain("变更本次训练");
+    expect(template).toContain('bindtap="openCourseTask"');
+    expect(stylesheet).toContain('background:var(--club-page)');
   });
 
-  it("keeps names readable within the four-character attendance-grid budget", async () => {
+  it("keeps names readable within the attendance grid without truncating identity", async () => {
     mocks.getCoachWorkbench.mockResolvedValue({
       ...trainingWorkbench,
       roster: [{ studentId: "student-1", name: "测试学员名字过长", status: "present" }],
@@ -308,13 +360,13 @@ describe("coach activity workbench", () => {
     const page = createPageInstance();
     await page.load("event-training-1");
 
-    expect(page.data.rosterRows[0]).toMatchObject({ displayName: "测试学员" });
+    expect(page.data.rosterRows[0]).toMatchObject({ displayName: "测试学员名字过长" });
     expect(template).toContain("{{item.displayName}}");
   });
 
   it("uses the coach bottom tabbar (Figma 2026-08-20: tabs moved to page bottom) and neutral icon-led action tiles", () => {
     expect(template).not.toContain('class="c2-route-tabs"');
-    expect(template).toContain('<role-tabbar role="coach" active="schedule" />');
+    expect(template).toContain('<role-tabbar wx:if="{{!isTraining && !transferVisible}}" role="coach" active="schedule" />');
     expect(pageConfig).toContain('"role-tabbar"');
     expect(template).toContain('src="{{item.icon}}"');
     expect(stylesheet).toMatch(/\.action-tile\s*\{[^}]*min-height:\s*200rpx/s);
@@ -330,6 +382,7 @@ describe("coach activity workbench", () => {
     expect(page.data.actionCards).toEqual([
       { id: "training", label: "训练内容", glyph: "✦" },
       { id: "training-assessment", label: "课堂评测", glyph: "◎" },
+      { id: "records", label: "训练记录", icon: "/assets/icons/tab-calendar.svg" },
       { id: "change", label: "变更活动", glyph: "↻" },
     ]);
     expect(template).toContain('<view wx:if="{{item.glyph}}" class="action-tile__glyph">{{item.glyph}}</view>');
@@ -353,7 +406,7 @@ describe("coach activity workbench", () => {
 
   it("keeps the live Figma C2 course-context label on the right side of the top navigation", () => {
     expect(template).toContain('class="c2-nav__today"');
-    expect(template).toContain('>今日课程</view>');
+    expect(template).toContain('>本次课程</view>');
     expect(stylesheet).toMatch(/\.c2-nav__today\s*\{[^}]*color:\s*#a80f1b[^}]*font-size:\s*24rpx/s);
   });
 });

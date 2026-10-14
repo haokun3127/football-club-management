@@ -1,0 +1,4 @@
+src/.umi/
+src/.umi-production/
+src/.umi-test/
+dist/

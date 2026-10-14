@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 const storage = new Map([
-  ["cqTalentAppContext", {
+  ["cqTalent:develop:cqTalentAppContext", {
     clubId: "club-chongqing-talent",
     clientId: "app-client-cq-talent-wechat-main",
     capabilities: { client: { roleEntrypoints: { coach: ["lesson"] } } },
@@ -50,12 +50,12 @@ describe("request authentication failures", () => {
   it("clears the stored session when a temporary role-selection bearer is rejected", async () => {
     clearSession();
     storage.clear();
-    storage.set("cqTalentAppContext", {
+    storage.set("cqTalent:develop:cqTalentAppContext", {
       clubId: "club-chongqing-talent",
       clientId: "app-client-cq-talent-wechat-main",
       capabilities: {},
     });
-    storage.set("cqTalentSession", {
+    storage.set("cqTalent:develop:cqTalentSession", {
       clubId: "club-chongqing-talent",
       clientId: "app-client-cq-talent-wechat-main",
       capabilities: {},

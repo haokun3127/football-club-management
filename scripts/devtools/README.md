@@ -132,3 +132,9 @@ python scripts/devtools/sidebyside.py \
 - 输出 JSON 的 `source` 为 `print_window` 或 `screen`；两者都必须生成真实的 `375×812` 画布，不能接受纯白、固定坐标、桌面/Codex 内容或左偏截图。若 `print_window` 曾返回纯白帧，先运行当前脚本的前台桥接版本，不要为此重启 DevTools 或改页面代码。
 - 整窗 `screen-shot.py` 和坐标裁剪 `crop-phone.py` 仅保留给历史排障，不作为视觉验收通道。
 - 页面内容超出首屏时用 automator `mp.callWxMethod('pageScrollTo',{scrollTop:N,duration:0})` 滚动后再截第二段。
+
+## 2026-09-28 双安装与本地覆盖修正
+
+默认 CLI 由 `automation-session.cjs.resolveDevtoolsCli()` 统一选择：显式 `WECHAT_DEVTOOLS_CLI` 优先，macOS 优先已验证的 stable 安装，再回退旧安装。macOS 的 `.ide` 标记位于 `~/Library/Application Support/微信开发者工具/<profile>/Default/.ide`。多安装时请显式传 `MP_IDE_HTTP_PORT`，不要把旧安装的“服务端口关闭”错误解释成当前 IDE 未开启。
+
+`pnpm check:delivery` 使用 Node 24，并拒绝私有配置将 `urlCheck` 关闭、基础库/AppID 覆盖为不同于团队的值。完整流程见 `docs/current/development-delivery-channel.md`。工具诊断通过不等于微信登录凭据、测试身份及 Figma 视觉验收已通过。

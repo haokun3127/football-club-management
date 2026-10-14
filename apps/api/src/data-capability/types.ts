@@ -333,6 +333,7 @@ export interface StudentListFilters {
 }
 
 export interface StudentListItem {
+  dominantFoot?: string;
   id: EntityId;
   clubId: EntityId;
   name: string;
@@ -626,6 +627,9 @@ export interface EventChangeRequest {
 }
 
 export interface AssessmentTask {
+  studentIds?: string[];
+  testItemIds?: string[];
+  sourceEventId?: string;
   id: string;
   clubId: string;
   teamId: string;
@@ -678,8 +682,9 @@ export interface VenueInfo {
   address: string;
   tags: string[];
   facilities: string[];
-  latitude: number;
-  longitude: number;
+  latitude?: number;
+  longitude?: number;
+  status?: "active" | "inactive";
 }
 
 export interface EventChangeRequestInput {

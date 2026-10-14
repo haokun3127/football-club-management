@@ -17,6 +17,10 @@
         <input value="{{correctionReason}}" maxlength="500" disabled="{{submitting}}" placeholder="更正已发布成绩时，请填写原因" bindinput="onReasonInput" />
         <text bindtap="reloadServer">重新读取服务器成绩</text>
       </view>
+      <view wx:if="{{courseSelectionRequired}}" class="bulk-course-bar">
+        <picker wx:if="{{!readOnly && courses.length}}" range="{{courses}}" range-key="label" bindchange="selectCourse" disabled="{{submitting}}"><view>批量选择所属训练课</view></picker>
+        <text wx:if="{{!courses.length}}">周期内暂无可关联的有效训练课</text>
+      </view>
       <view wx:if="{{saveError}}" class="bulk-workflow__error">{{saveError}}</view>
       <view wx:for="{{rows}}" wx:key="studentId" class="bulk-row">
         <view class="bulk-row__identity"><view class="bulk-row__avatar">{{item.initials}}</view><view class="bulk-row__name">{{item.name}}</view><text wx:if="{{managed}}" class="bulk-history-link" data-student-id="{{item.studentId}}" bindtap="showHistory">记录</text></view>
@@ -25,6 +29,8 @@
             <view wx:if="{{readOnly}}" class="bulk-metric__readonly"><text>{{metric.value}}</text><text wx:if="{{metric.unitLabel}}"> {{metric.unitLabel}}</text></view>
             <input wx:else class="bulk-metric__input" disabled="{{submitting}}" type="{{metric.inputType}}" value="{{metric.value}}" placeholder="{{metric.placeholder}}" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" bindinput="onRawInput" />
             <text wx:if="{{!readOnly}}" class="bulk-metric__unit">{{metric.unitLabel}}</text>
+            <picker wx:if="{{courseSelectionRequired && !readOnly}}" range="{{item.courses}}" range-key="label" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" disabled="{{submitting || !item.courses.length}}" bindchange="selectCourse"><view class="bulk-metric__course">{{metric.courseLabel}}</view></picker>
+            <text wx:if="{{courseSelectionRequired && readOnly}}" class="bulk-metric__course">{{metric.courseLabel}}</text>
             <text class="bulk-metric__score">{{readOnly ? '已保存' : item.statusLabel}}</text>
           </view>
         </view>

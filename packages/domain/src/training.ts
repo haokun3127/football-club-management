@@ -20,6 +20,8 @@ export interface TrainingObjective extends AuditFields, CatalogScoped {
 }
 
 export interface TrainingDrill extends AuditFields, CatalogScoped {
+  status?: "active" | "inactive";
+  recordingCapability?: "friendly_match";
   id: EntityId;
   name: string;
   objectiveIds: EntityId[];
@@ -43,6 +45,7 @@ export interface SessionPlanBlock {
 }
 
 export interface SessionPlan extends AuditFields, CatalogScoped {
+  status?: "active" | "inactive";
   id: EntityId;
   name: string;
   objectiveIds: EntityId[];

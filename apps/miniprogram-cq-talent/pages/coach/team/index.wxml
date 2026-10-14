@@ -7,9 +7,11 @@
   </view>
 
   <view class="team-page__body">
+    <view class="members-title" bindtap="openScouts">球探人员库 ›</view>
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="队伍详情" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready' && hasTeam}}">
+      <scroll-view wx:if="{{hasTeamOptions}}" class="team-selector" scroll-x><view wx:for="{{teamOptions}}" wx:key="id" class="team-selector__item {{teamId === item.id ? 'is-active' : ''}}" data-id="{{item.id}}" bindtap="selectTeam">{{item.name}}</view></scroll-view>
       <view class="hero">
         <view class="hero__name">{{teamName}}</view>
         <view wx:if="{{season}}" class="hero__season">{{season}}</view>
@@ -21,6 +23,7 @@
         </view>
       </view>
 
+      <view class="matches-section"><view class="members-title">正式赛事</view><view class="members-empty">与日历共用赛事记录，友谊赛在训练内容中查看。</view><view wx:for="{{matches}}" wx:key="eventId" class="team-match" data-id="{{item.eventId}}" bindtap="openMatch"><view class="team-match__title">{{item.title}} ›</view><view class="team-match__subtitle">{{item.subtitle}}</view><view class="team-match__score">{{item.score}}</view></view><view wx:if="{{!hasMatches}}" class="members-empty">本队暂无正式赛事</view></view>
       <view class="members-title">学员名单</view>
       <view wx:if="{{hasMembers}}" class="members-grid">
         <view wx:for="{{members}}" wx:key="id" class="member" data-id="{{item.id}}" bindtap="openRadar">

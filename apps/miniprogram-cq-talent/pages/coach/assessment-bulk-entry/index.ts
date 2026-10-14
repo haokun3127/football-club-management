@@ -1,8 +1,9 @@
-import { getAssessmentForm, getCoachAssessmentEntries, getCoachAssessmentTasks, getCoachTeam, submitCoachAssessment, saveCoachAssessmentEntries, getCoachAssessmentHistory } from "../../../utils/api";
+import { environmentStorageKey } from "../../../utils/config";
+import { getAssessmentForm, getCoachAssessmentEntries, getCoachAssessmentTasks, getCoachTeam, submitCoachAssessment, saveCoachAssessmentEntries, getCoachAssessmentHistory, getCoachAssessmentCourses } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
-import type { AssessmentForm, CoachAssessmentEntries, CoachAssessmentTask, CoachTeamDetail, LoadState } from "../../../utils/types";
+import type { AssessmentCourse, AssessmentForm, CoachAssessmentEntries, CoachAssessmentTask, CoachTeamDetail, LoadState } from "../../../utils/types";
 
 type AssessmentField = AssessmentForm["fields"][number];
 type DraftValues = Record<string, Record<string, string>>;
@@ -15,6 +16,7 @@ type MetricView = {
   unitLabel: string;
   placeholder: string;
   scoreLabel: string;
+  courseLabel: string;
 };
 
 type BulkRow = {
@@ -25,10 +27,12 @@ type BulkRow = {
   scoreLabel: string;
   statusLabel: string;
   metrics: MetricView[];
+  courses: Array<AssessmentCourse & {label:string}>;
 };
 
 interface BulkDraft {
   signature: string;
+  courseIds?: DraftValues;
   studentStates?: CoachAssessmentEntries["studentStates"];
   savedAt: string;
   valuesByStudent: DraftValues;
@@ -68,6 +72,10 @@ interface PageData {
   historyTitle: string;
   historyLines: string[];
   historyVisible: boolean;
+  courseSelectionRequired: boolean;
+  courses: Array<AssessmentCourse & {label:string}>;
+  courseIds: DraftValues;
+  savedCourseIds: DraftValues;
 }
 
 let latestLoadToken = 0;
@@ -106,6 +114,7 @@ Page<PageData>({
     historyTitle: "",
     historyLines: [],
     historyVisible: false,
+    courseSelectionRequired:false, courses:[],courseIds:{},savedCourseIds:{},
   },
 
   onLoad(query?: { taskId?: string; templateId?: string; projectId?: string; projectIds?: string; title?: string }) {
@@ -153,18 +162,20 @@ Page<PageData>({
         this.setData({ state: "error", statusTitle: "当前任务暂不可录入", message: task.workflow.error });
         return;
       }
-      const [form, team, savedEntries] = await Promise.all([
+      const [form, team, savedEntries, courseResponse] = await Promise.all([
         task.workflow ? getAssessmentForm(templateId, task.workflow.templateVersionId) : getAssessmentForm(templateId),
         getCoachTeam(task.teamId),
         getCoachAssessmentEntries(task.id, projectId),
+        task.workflow?.courseSelectionRequired ? getCoachAssessmentCourses(task.id) : Promise.resolve({courses:[]}),
       ]);
       if (loadToken !== latestLoadToken) return;
       const fields = form.fields.filter((field) =>
         (field.id === projectId || field.testItemId === projectId || field.groupId === projectId)
         && Boolean(field.id)
-        && Boolean(field.testItemId),
+        && Boolean(field.testItemId)
+        && (!task.testItemIds || task.testItemIds.includes(field.testItemId!)),
       );
-      const members = team.members.filter((member) => Boolean(member.id) && Boolean(member.name));
+      const members = (task.workflow?.students ? task.workflow.students.map((s) => ({id:s.studentId,name:s.name})) : team.members).filter((member) => Boolean(member.id) && Boolean(member.name) && (!task.studentIds || task.studentIds.includes(member.id)));
       if (!form.templateVersionId || !fields.length || !members.length) {
         this.setData({
           state: "empty",
@@ -184,7 +195,7 @@ Page<PageData>({
       const draftValuesByStudent = (task.workflow ? !task.workflow.canEdit : task.status === "completed") ? {} : restoreDraft(draftTaskKey, projectId, signature, fields, members);
       const valuesByStudent = mergeValues(savedValuesByStudent, draftValuesByStudent);
       const savedStudentIds = Object.keys(savedValuesByStudent);
-      const availableProjectIds = uniqueProjectIds(form.fields);
+      const availableProjectIds = uniqueProjectIds(form.fields.filter((f) => !task.testItemIds || task.testItemIds.includes(f.testItemId || f.id)));
       const projectIds = selectedProjectIds.length
         ? availableProjectIds.filter((id) => selectedProjectIds.includes(id))
         : availableProjectIds;
@@ -196,7 +207,19 @@ Page<PageData>({
       for (const studentId of Object.keys(draftValuesByStudent)) {
         if (localDraft && localDraft.studentStates?.[studentId]) studentStates[studentId] = localDraft.studentStates[studentId]!;
       }
+      const courses = courseResponse.courses.map((course)=>({...course,label:`${courseDate(course.occurredAt)} · ${course.title}`}));
+      const savedCourseIds: DraftValues = {};
+      for (const member of members) for (const field of fields) {
+        const id = savedEntries.entrySourcesByStudent?.[member.id]?.[field.testItemId || ""]?.eventId;
+        if (id) (savedCourseIds[member.id] ??= {})[field.id] = id;
+      }
+      const courseIds = mergeValues(savedCourseIds, !readOnly && localDraft && localDraft.signature === signature ? localDraft.courseIds || {} : {});
+      const sourceCourse = courses.find((c) => c.id === task.sourceEventId);
+      if (!readOnly && sourceCourse) for (const member of members) if (sourceCourse.studentIds.includes(member.id)) for (const field of fields) {
+        if (!courseIds[member.id]?.[field.id]) (courseIds[member.id] ??= {})[field.id] = sourceCourse.id;
+      }
       this.setData({
+        courseSelectionRequired:Boolean(task.workflow?.courseSelectionRequired),courses,courseIds,savedCourseIds,
         state: "ready",
         statusTitle: "全队录入",
         message: "",
@@ -209,7 +232,7 @@ Page<PageData>({
         teamName: team.team?.name?.trim() || "球队待同步",
         termLabel: task.termLabel?.trim() || "学期待同步",
         fields,
-        rows: buildRows(members, fields, valuesByStudent, savedStudentIds),
+        rows: buildRows(members, fields, valuesByStudent, savedStudentIds, courses, courseIds),
         savedValuesByStudent,
         valuesByStudent,
         savedStudentIds,
@@ -246,8 +269,8 @@ Page<PageData>({
     const savedValue = this.data.savedValuesByStudent[studentId]?.[fieldId];
     if (!rawValue.trim() && savedValue) valuesByStudent[studentId][fieldId] = savedValue;
     const members = this.data.rows.map((row: BulkRow) => ({ id: row.studentId, name: row.name }));
-    this.setData({ valuesByStudent, rows: buildRows(members, this.data.fields, valuesByStudent, this.data.savedStudentIds), filledLabel: buildFilledLabel(members, valuesByStudent) });
-    const draftValuesByStudent = changedValues(valuesByStudent, this.data.savedValuesByStudent);
+    this.setData({ valuesByStudent, rows: buildRows(members, this.data.fields, valuesByStudent, this.data.savedStudentIds, this.data.courses, this.data.courseIds), filledLabel: buildFilledLabel(members, valuesByStudent) });
+    const draftValuesByStudent = pendingChanges(valuesByStudent, this.data.savedValuesByStudent, this.data.courseIds, this.data.savedCourseIds);
     if (hasDraftValues(draftValuesByStudent)) this.persistDraft(draftValuesByStudent);
     else wx.removeStorageSync(draftKey(this.data.draftTaskKey || this.data.taskId, this.data.projectId));
   },
@@ -267,9 +290,26 @@ Page<PageData>({
       valuesByStudent,
       savedStudentIds: this.data.savedStudentIds,
       studentStates: this.data.studentStates,
+      courseIds:this.data.courseIds,
     } satisfies BulkDraft);
   },
 
+  selectCourse(event: {currentTarget:{dataset:{studentId?:string;fieldId?:string}};detail:{value:string}}) {
+    if (this.data.readOnly || this.data.submitting) return;
+    const {studentId,fieldId}=event.currentTarget.dataset;
+    const options=studentId ? this.data.courses.filter((course:AssessmentCourse)=>course.studentIds.includes(studentId)) : this.data.courses;
+    const course=options[Number(event.detail.value)];if(!course)return;
+    const courseIds=mergeValues(this.data.courseIds,{});
+    for(const row of this.data.rows as BulkRow[]) {
+      if ((studentId && row.studentId!==studentId) || !course.studentIds.includes(row.studentId)) continue;
+      for(const field of this.data.fields as AssessmentField[]) {
+        if(fieldId && field.id!==fieldId)continue;
+        (courseIds[row.studentId] ??= {})[field.id]=course.id;
+      }
+    }
+    this.setData({courseIds,rows:buildRows(this.data.rows.map((row:BulkRow)=>({id:row.studentId,name:row.name})),this.data.fields,this.data.valuesByStudent,this.data.savedStudentIds,this.data.courses,courseIds)});
+    this.persistDraft(pendingChanges(this.data.valuesByStudent,this.data.savedValuesByStudent,courseIds,this.data.savedCourseIds));
+  },
   saveDraft() {
     this.persistDraft(this.data.valuesByStudent);
   },
@@ -280,7 +320,7 @@ Page<PageData>({
       return;
     }
     if (this.data.submitting) return;
-    const pendingValuesByStudent = changedValues(this.data.valuesByStudent, this.data.savedValuesByStudent);
+    const pendingValuesByStudent = pendingChanges(this.data.valuesByStudent, this.data.savedValuesByStudent, this.data.courseIds, this.data.savedCourseIds);
     const members = this.data.rows.filter((row: BulkRow) => hasStudentValues(pendingValuesByStudent[row.studentId]));
     if (!members.length) {
       wx.showToast({ title: "请先录入至少一名学员", icon: "none" });
@@ -297,7 +337,12 @@ Page<PageData>({
         this.setData({ saveError: `${row.name}：请填写范围内的标准分（0–100），评级须为1–5整数。` });
         continue;
       }
-      const rawResults = buildRawResults(this.data.fields, pendingValuesByStudent[row.studentId] || {});
+      const rawResults = buildRawResults(this.data.fields, pendingValuesByStudent[row.studentId] || {}).map((entry)=>{
+        const field = this.data.fields.find((item:AssessmentField)=>item.testItemId===entry.testItemId);
+        const eventId = field && this.data.courseIds[row.studentId]?.[field.id];
+        return {...entry,...(eventId ? {eventId} : {})};
+      });
+      if (this.data.courseSelectionRequired && rawResults.some((entry)=>!entry.eventId)) {this.setData({saveError:`${row.name}：请选择各项成绩所属训练课。`});continue;}
       if (!rawResults.length) continue;
       try {
         if (this.data.managed) {
@@ -322,6 +367,9 @@ Page<PageData>({
         // Keep this student's draft so the coach can retry only the failed row.
       }
     }
+    const savedCourseIds=mergeValues(this.data.savedCourseIds,{});
+    for(const studentId of succeeded) savedCourseIds[studentId]={...(this.data.courseIds[studentId] || {})};
+    this.setData({savedCourseIds});
     const draftValuesByStudent = withoutStudents(pendingValuesByStudent, succeeded);
     if (hasDraftValues(draftValuesByStudent)) this.writeDraft(draftValuesByStudent);
     else wx.removeStorageSync(draftKey(this.data.draftTaskKey || this.data.taskId, this.data.projectId));
@@ -336,7 +384,7 @@ Page<PageData>({
       savedValuesByStudent,
       savedStudentIds,
       valuesByStudent,
-      rows: buildRows(this.data.rows.map((row: BulkRow) => ({ id: row.studentId, name: row.name })), this.data.fields, valuesByStudent, savedStudentIds),
+      rows: buildRows(this.data.rows.map((row: BulkRow) => ({ id: row.studentId, name: row.name })), this.data.fields, valuesByStudent, savedStudentIds, this.data.courses, this.data.courseIds),
       filledLabel: buildFilledLabel(this.data.rows.map((row: BulkRow) => ({ id: row.studentId })), valuesByStudent),
       lastSavedLabel: succeeded.length ? `已保存${succeeded.length}名学员` : this.data.lastSavedLabel,
     });
@@ -399,10 +447,10 @@ Page<PageData>({
 });
 
 function isUsableTask(task: CoachAssessmentTask | undefined, templateId: string): task is CoachAssessmentTask {
-  return Boolean(task && task.templateId === templateId && (task.status === "in_progress" || task.status === "completed"));
+  return Boolean(task && task.templateId === templateId && (task.status === "in_progress" || task.status === "completed" || (task.status === "not_started" && task.workflow)));
 }
 
-function buildRows(members: Array<{ id: string; name: string }>, fields: AssessmentField[], valuesByStudent: DraftValues, savedStudentIds: string[] = []): BulkRow[] {
+function buildRows(members: Array<{ id: string; name: string }>, fields: AssessmentField[], valuesByStudent: DraftValues, savedStudentIds: string[] = [], courses: Array<AssessmentCourse & {label:string}> = [], courseIds:DraftValues = {}): BulkRow[] {
   return members.map((member) => {
     const values = valuesByStudent[member.id] || {};
     const metrics = fields.map((field) => {
@@ -414,6 +462,7 @@ function buildRows(members: Array<{ id: string; name: string }>, fields: Assessm
         value,
         unitLabel: displayUnit(field),
         placeholder: field.required ? "录入" : "选填",
+        courseLabel: courses.find((course)=>course.id===courseIds[member.id]?.[field.id])?.label || (courseIds[member.id]?.[field.id] ? "原关联课程当前不可用，请核对" : "选择所属训练课"),
         scoreLabel: value && field.valueKind === "score_0_100" ? `${value}分` : "待提交",
       };
     });
@@ -421,11 +470,12 @@ function buildRows(members: Array<{ id: string; name: string }>, fields: Assessm
     const hasValues = Object.keys(values).length > 0;
     return {
       studentId: member.id,
-      name: member.name.trim().slice(0, 4),
+      name: member.name.trim(),
       initials: member.name.trim().slice(0, 1) || "学",
       rawInputValue: first?.value || "",
       scoreLabel: first?.scoreLabel || "待提交",
       statusLabel: savedStudentIds.includes(member.id) ? "已保存" : hasValues ? "已填写" : "待录入",
+      courses:courses.filter((course)=>course.studentIds.includes(member.id)),
       metrics,
     };
   });
@@ -503,7 +553,7 @@ function uniqueProjectIds(fields: AssessmentField[]) {
 }
 
 function draftKey(taskId: string, projectId: string) {
-  return `coach-assessment-bulk:${taskId}:${projectId}`;
+  return `${environmentStorageKey("coach-assessment-bulk")}:${taskId}:${projectId}`;
 }
 
 function hasStudentValues(values: Record<string, string> | undefined) {
@@ -577,4 +627,16 @@ function validStandardInputs(fields: AssessmentField[], values: Record<string, s
 
 function historyValue(value: Record<string, unknown> | null): string {
   return value === null ? "未录入" : String(value.score ?? value.value ?? "—");
+}
+
+function courseDate(value:string) {
+  const date=new Date(Date.parse(value)+8*3600000);
+  return Number.isFinite(date.getTime()) ? date.toISOString().slice(0,16).replace("T"," ") : "日期未知";
+}
+function pendingChanges(values:DraftValues,saved:DraftValues,courses:DraftValues,savedCourses:DraftValues):DraftValues {
+  const result=changedValues(values,saved);
+  for(const [studentId,fields] of Object.entries(values)) for(const [fieldId,value] of Object.entries(fields)) {
+    if (value.trim() && courses[studentId]?.[fieldId] !== savedCourses[studentId]?.[fieldId]) (result[studentId] ??= {})[fieldId]=value;
+  }
+  return result;
 }

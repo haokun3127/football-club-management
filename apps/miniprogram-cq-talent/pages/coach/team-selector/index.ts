@@ -1,9 +1,10 @@
+import { environmentStorageKey } from "../../../utils/config";
 import { getCoachTeam, getCoachTrainingProjectTree } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { LoadState, TrainingTeamOption } from "../../../utils/types";
 
-const COACH_TRAINING_TEAM_KEY = "coach-training-team-id";
+const COACH_TRAINING_TEAM_KEY = environmentStorageKey("coach-training-team-id");
 
 type TeamOption = { id: string; name: string; metaLabel: string; isSelected: boolean };
 

@@ -1,0 +1,19 @@
+.results-page { min-height:100vh;background:var(--club-page);color:var(--club-text); }
+.results-nav { position:sticky;top:0;z-index:100;height:88rpx;display:flex;align-items:center;padding-left:32rpx;background:var(--club-nav);font-size:32rpx; }
+.results-back { width:40rpx;font-size:40rpx; }
+.results-body { display:flex;flex-direction:column;gap:32rpx;padding:32rpx 32rpx calc(166rpx + env(safe-area-inset-bottom)); }
+.results-card { display:flex;flex-direction:column;gap:24rpx;padding:32rpx;border:1rpx solid var(--club-line);border-radius:28rpx;background:#fff;box-shadow:var(--club-shadow); }
+.results-heading { font-size:36rpx;font-weight:700;line-height:56rpx; }
+.results-value { font-size:64rpx;font-weight:700;line-height:88rpx;color:var(--color-brand);overflow-wrap:anywhere; }
+.results-caption { font-size:24rpx;line-height:36rpx;color:var(--color-text-secondary); }
+.results-history-title { font-size:30rpx;font-weight:500;line-height:48rpx;color:var(--club-muted); }
+.results-chart { display:flex;gap:24rpx;align-items:flex-end;min-height:300rpx; }
+.results-column { flex:0 1 calc((100% - 48rpx) / 3);min-width:0;display:flex;flex-direction:column;gap:16rpx;font-size:26rpx;line-height:40rpx;color:var(--club-muted); }
+.results-bar { width:100%;background:var(--color-brand-soft);border-radius:12rpx; }
+.results-bar--latest { background:var(--color-brand); }
+.results-history-row { display:flex;justify-content:space-between;gap:20rpx;font-size:28rpx;line-height:44rpx; }
+.results-title { font-size:32rpx;font-weight:500;line-height:48rpx; }
+.results-text { font-size:30rpx;color:var(--color-text-secondary);line-height:48rpx; }
+.results-link { font-size:26rpx;color:var(--color-brand);line-height:40rpx; }
+.results-footer { position:fixed;bottom:0;left:0;right:0;padding:16rpx 32rpx calc(32rpx + env(safe-area-inset-bottom));background:var(--club-nav); }
+.results-footer .results-primary { width:100%;height:96rpx;padding:0;background:var(--color-brand);color:#fff;border-radius:16rpx;font-size:32rpx;line-height:96rpx; }

@@ -1,45 +1,47 @@
 <view class="radar-page">
-  <view class="radar-nav" style="padding-top:{{navInset}}px">
-    <view class="radar-nav__back" bindtap="goBack">
-      <image class="radar-nav__back-icon" src="/assets/icons/c13-arrow-left.svg" mode="aspectFit" />
-    </view>
-    <view class="radar-nav__title">学员雷达</view>
-    <view class="radar-nav__placeholder"></view>
+  <view class="radar-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
+    <view class="radar-nav__back" bindtap="goBack"><image class="radar-nav__back-icon" src="/assets/icons/c13-arrow-left.svg" mode="aspectFit" /></view>
+    <view class="radar-nav__title">{{pageTitle}}</view><view class="radar-nav__placeholder"></view>
   </view>
   <view class="radar-page__body">
-    <view wx:if="{{students.length}}" class="radar-context">{{radarContext}}</view>
-
-    <status-view
-      state="{{state}}"
-      title="{{state === 'loading' ? '加载能力雷达' : state === 'empty' ? '暂无雷达数据' : '读取失败'}}"
-      message="{{message}}"
-      action-text="{{state === 'error' ? '重试' : ''}}"
-      bindaction="retry"
-    />
-
-    <block wx:if="{{hasRadar}}">
-      <view class="radar-hero">
-        <view class="radar-hero__head">
-          <view class="radar-hero__title">六维能力模型</view>
-          <view class="radar-hero__period">综合 {{overall}}</view>
+    <status-view state="{{state}}" title="{{state === 'loading' ? '加载学员档案' : state === 'empty' ? '暂无学员' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <block wx:if="{{state === 'ready'}}">
+      <block wx:if="{{section === 'summary'}}">
+        <view class="profile-identity"><view class="profile-identity__caption">学员档案</view><view class="profile-name">{{activeStudentName}}<text wx:if="{{radarContext}}"> · {{radarContext}}</text></view></view>
+        <view class="profile-card profile-summary" data-section="personal" bindtap="openSection"><view class="profile-heading">个人资料与评价</view><view class="profile-summary__text">{{personalSummary}}</view><view class="profile-summary__link">查看个人资料 ›</view></view>
+        <view class="profile-card profile-summary" data-section="training" bindtap="openSection"><view class="profile-heading">训练参与与出勤</view><view class="profile-summary__text">有效训练 {{profile.attendance.effectiveLessons}} 次 · 已请假 {{profile.attendance.leave}} 次</view><view class="profile-summary__text">按当前有效记录统计</view><view class="profile-summary__link">查看训练记录与更正历史 ›</view></view>
+        <view class="profile-card profile-summary" data-section="ability" bindtap="openSection"><view class="profile-heading">训练内容与已确认能力</view><view class="profile-summary__text">{{moduleSummary}}</view><view class="profile-summary__text">{{confirmedSummary}}</view><view class="profile-summary__link">查看分类明细与已确认成绩 ›</view></view>
+      </block>
+      <view wx:if="{{section === 'personal'}}" class="profile-card"><view class="profile-heading">基础信息</view><view class="profile-grid"><view wx:for="{{basic}}" wx:key="label"><view class="profile-label">{{item.label}}</view><view class="profile-value">{{item.value}}</view></view></view></view>
+      <view wx:if="{{section === 'personal'}}" class="profile-card"><view class="profile-heading">本队教练评价</view><view class="profile-hint">按需更新，保留每次变化。</view><button class="profile-link" bindtap="openEvaluation">查看当前评价与历史 ›</button></view>
+      <block wx:if="{{section === 'training'}}">
+        <view class="profile-hint">{{activeStudentName}} · 累计有效训练 {{profile.attendance.effectiveLessons}} 次</view>
+        <view wx:for="{{records}}" wx:key="eventId" class="profile-card profile-course">
+          <view class="profile-heading" data-id="{{item.eventId}}" bindtap="openCourse">{{item.date}} · {{item.title}}</view>
+          <view class="profile-summary__text">{{item.statusLabel}} · {{item.countLabel}}</view>
+          <button class="profile-link" data-id="{{item.eventId}}" bindtap="showHistory">{{item.revised ? '查看更正历史' : '查看计次来源'}} ›</button>
+          <view wx:if="{{historyEventId === item.eventId}}" class="profile-history"><view wx:for="{{history}}" wx:for-item="entry" wx:key="revision">版本 {{entry.revision}} · {{entry.label}} · {{entry.date}}<view class="profile-hint">{{entry.reason}}</view></view></view>
         </view>
-        <view class="radar-hero__plot">
-          <radar-canvas class="radar-hero__canvas" metrics="{{radar}}" width="528rpx" height="528rpx"></radar-canvas>
-        </view>
+        <view wx:if="{{!hasRecords}}" class="profile-hint">暂无已形成的培训记录</view>
+        <button wx:if="{{hasMoreRecords}}" class="profile-link" bindtap="moreRecords">显示更多记录</button>
+        <view class="profile-hint">有效训练按当前课程记录累计，更正保留历史。</view>
+        <view class="profile-card"><view class="profile-heading">出勤统计</view><view class="profile-grid"><view wx:for="{{attendance}}" wx:key="label"><view class="profile-label">{{item.label}}</view><view class="profile-value">{{item.value}}</view></view></view></view>
+      </block>
+      <view wx:if="{{section === 'ability'}}" class="profile-card">
+        <view class="profile-heading">训练与能力分析</view><view class="profile-grid"><view wx:for="{{participation}}" wx:key="label"><view class="profile-label">{{item.label}}</view><view class="profile-value">{{item.value}}</view></view></view>
+        <view class="profile-subheading">参与课程的训练模块</view><view class="profile-hint">按后台分类汇总课程编排，不代表逐项完成或实练时长；友谊赛属于训练内明细。</view>
+        <view wx:for="{{modules}}" wx:key="label" class="profile-record"><view>{{item.label}}</view><view class="profile-hint">{{item.value}}</view></view>
+        <view wx:if="{{!hasModules}}" class="profile-hint">暂无可归类的训练内容</view>
+        <view class="profile-subheading">训练目标进展</view><view class="profile-hint">未配置学员训练目标，暂不生成已完成／未完成清单。</view>
       </view>
+      <view wx:if="{{section === 'ability'}}" class="profile-card">
+        <button class="profile-link" bindtap="openConfirmedResults">查看已确认原始成绩与个人历史 ›</button>
+        <view class="radar-hero__head"><view class="profile-heading">{{modelName}}</view><view class="radar-hero__period">{{overall}}</view></view><view class="profile-hint">最近发生日期：{{assessmentPeriod}}</view>
+        <view wx:if="{{hasRadar}}" class="radar-hero__plot"><radar-canvas class="radar-hero__canvas" metrics="{{radar}}" width="528rpx" height="528rpx"></radar-canvas></view>
+        <view wx:else class="profile-hint">至少三个有效维度才能绘制雷达图，已有结果仍列示如下。</view>
+        <view wx:for="{{dimensions}}" wx:key="metricId" class="profile-record"><view>{{item.label}} · {{item.value}}</view><view class="profile-hint">{{item.date}}</view></view>
+      </view>
+      <view wx:if="{{hasStudents && section === 'summary'}}" class="radar-roster"><view class="radar-roster__title">同队学员</view><view class="radar-roster__grid"><view wx:for="{{students}}" wx:key="id" class="radar-player {{activeStudentId === item.id ? 'radar-player--active' : ''}}" data-id="{{item.id}}" bindtap="selectStudent"><view class="radar-player__avatar">{{item.initial}}</view><view class="radar-player__name">{{item.name}}</view></view></view></view>
     </block>
-
-    <view wx:if="{{students.length}}" class="radar-roster">
-      <view class="radar-roster__head">
-        <view class="radar-roster__title">全部学员</view>
-        <view class="radar-roster__hint">点击头像切换查看</view>
-      </view>
-      <view class="radar-roster__grid">
-        <view wx:for="{{students}}" wx:key="id" class="radar-player {{activeStudentId === item.id ? 'radar-player--active' : ''}}" data-id="{{item.id}}" bindtap="selectStudent">
-          <view class="radar-player__avatar">{{item.initial}}</view>
-          <view class="radar-player__name">{{item.name}}</view>
-        </view>
-      </view>
-    </view>
   </view>
 </view>

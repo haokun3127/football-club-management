@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 const storage = new Map();
 
 globalThis.wx = {
+  getAccountInfoSync: () => ({ miniProgram: { envVersion: "develop" } }),
   getStorageSync: (key) => storage.get(key) ?? "",
   setStorageSync: (key, value) => storage.set(key, value),
   removeStorageSync: (key) => storage.delete(key),
@@ -19,7 +20,7 @@ describe("session storage compatibility", () => {
   });
 
   it("treats a stored session without availableRoles as its active role only", () => {
-    storage.set("cqTalentSession", {
+    storage.set("cqTalent:develop:cqTalentSession", {
       clubId: "club-1",
       clientId: "client-1",
       capabilities: {},
@@ -104,34 +105,34 @@ describe("session storage compatibility", () => {
   });
 
   it("clears only disposable local drafts and preserves the authenticated session", () => {
-    storage.set("cqTalentSession", { token: "keep-session" });
-    storage.set("cqTalentAppContext", { clubId: "club-1" });
-    storage.set("cqTalentAssessmentDraft:event-1:current", { score: 80 });
-    storage.set("coach-assessment-entry:task-1:template:version", { score: 80 });
-    storage.set("coach-assessment-bulk:task-1:project-1", { score: 80 });
-    storage.set("match-event-draft:v1:event-1", { minute: 12 });
-    storage.set("cq-parent-reminder-read-ids", ["notice-1"]);
-    storage.set("coach-training-team-id", "team-1");
+    storage.set("cqTalent:develop:cqTalentSession", { token: "keep-session" });
+    storage.set("cqTalent:develop:cqTalentAppContext", { clubId: "club-1" });
+    storage.set("cqTalent:develop:cqTalentAssessmentDraft:event-1:current", { score: 80 });
+    storage.set("cqTalent:develop:coach-assessment-entry:task-1:template:version", { score: 80 });
+    storage.set("cqTalent:develop:coach-assessment-bulk:task-1:project-1", { score: 80 });
+    storage.set("cqTalent:develop:match-event-draft:v1:event-1", { minute: 12 });
+    storage.set("cqTalent:develop:cq-parent-reminder-read-ids", ["notice-1"]);
+    storage.set("cqTalent:develop:coach-training-team-id", "team-1");
 
     expect(store.clearDisposableLocalCache).toBeTypeOf("function");
     const cleared = store.clearDisposableLocalCache?.();
 
     expect(cleared).toBe(5);
-    expect(storage.has("cqTalentSession")).toBe(true);
-    expect(storage.has("cqTalentAppContext")).toBe(true);
-    expect(storage.has("coach-training-team-id")).toBe(true);
-    expect(storage.has("cqTalentAssessmentDraft:event-1:current")).toBe(false);
-    expect(storage.has("coach-assessment-entry:task-1:template:version")).toBe(false);
-    expect(storage.has("coach-assessment-bulk:task-1:project-1")).toBe(false);
-    expect(storage.has("match-event-draft:v1:event-1")).toBe(false);
-    expect(storage.has("cq-parent-reminder-read-ids")).toBe(false);
+    expect(storage.has("cqTalent:develop:cqTalentSession")).toBe(true);
+    expect(storage.has("cqTalent:develop:cqTalentAppContext")).toBe(true);
+    expect(storage.has("cqTalent:develop:coach-training-team-id")).toBe(true);
+    expect(storage.has("cqTalent:develop:cqTalentAssessmentDraft:event-1:current")).toBe(false);
+    expect(storage.has("cqTalent:develop:coach-assessment-entry:task-1:template:version")).toBe(false);
+    expect(storage.has("cqTalent:develop:coach-assessment-bulk:task-1:project-1")).toBe(false);
+    expect(storage.has("cqTalent:develop:match-event-draft:v1:event-1")).toBe(false);
+    expect(storage.has("cqTalent:develop:cq-parent-reminder-read-ids")).toBe(false);
   });
 
   it("keeps the selected development role after resetting an old session", () => {
-    storage.set("cqTalentSession", { token: "stale-session" });
+    storage.set("cqTalent:develop:cqTalentSession", { token: "stale-session" });
 
     expect(toggleDevRole()).toBe("coach");
-    expect(storage.has("cqTalentSession")).toBe(false);
+    expect(storage.has("cqTalent:develop:cqTalentSession")).toBe(false);
     expect(getDevRole()).toBe("coach");
   });
 });

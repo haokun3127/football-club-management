@@ -7,34 +7,44 @@ export class SessionPlanRepository {
   constructor(private readonly database: DatabaseSync) {}
 
   listByClub(clubId: string): SessionPlan[] {
-    const rows = this.database.prepare(`
+    const rows = this.database
+      .prepare(
+        `
       SELECT *
       FROM session_plans
       WHERE catalog_scope = 'system' OR catalog_club_id = ?
       ORDER BY updated_at, id
-    `).all(clubId) as SqlRow[];
+    `,
+      )
+      .all(clubId) as SqlRow[];
 
     return rows.map(mapSessionPlan);
   }
 
   getById(clubId: string, id: string): SessionPlan | null {
-    const row = this.database.prepare(`
+    const row = this.database
+      .prepare(
+        `
       SELECT *
       FROM session_plans
       WHERE id = ?
         AND (catalog_scope = 'system' OR catalog_club_id = ?)
-    `).get(id, clubId) as SqlRow | undefined;
+    `,
+      )
+      .get(id, clubId) as SqlRow | undefined;
 
     return row ? mapSessionPlan(row) : null;
   }
 
   save(plan: SessionPlan): SessionPlan {
-    this.database.prepare(`
+    this.database
+      .prepare(
+        `
       INSERT INTO session_plans (
         id, catalog_scope, catalog_club_id, base_item_id, name,
         objective_ids_json, metric_ids_json, blocks_json, estimated_minutes,
-        created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        created_at, updated_at, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         catalog_scope = excluded.catalog_scope,
         catalog_club_id = excluded.catalog_club_id,
@@ -44,49 +54,64 @@ export class SessionPlanRepository {
         metric_ids_json = excluded.metric_ids_json,
         blocks_json = excluded.blocks_json,
         estimated_minutes = excluded.estimated_minutes,
-        updated_at = excluded.updated_at
-    `).run(
-      plan.id,
-      plan.catalogScope.scope,
-      plan.catalogScope.scope === "club" ? plan.catalogScope.clubId : null,
-      plan.catalogScope.scope === "club" ? plan.catalogScope.baseItemId ?? null : null,
-      plan.name,
-      JSON.stringify(plan.objectiveIds),
-      JSON.stringify(plan.metricIds),
-      JSON.stringify(plan.blocks),
-      plan.estimatedMinutes,
-      plan.createdAt,
-      plan.updatedAt,
-    );
+        updated_at = excluded.updated_at,
+        status = excluded.status
+    `,
+      )
+      .run(
+        plan.id,
+        plan.catalogScope.scope,
+        plan.catalogScope.scope === "club" ? plan.catalogScope.clubId : null,
+        plan.catalogScope.scope === "club"
+          ? (plan.catalogScope.baseItemId ?? null)
+          : null,
+        plan.name,
+        JSON.stringify(plan.objectiveIds),
+        JSON.stringify(plan.metricIds),
+        JSON.stringify(plan.blocks),
+        plan.estimatedMinutes,
+        plan.createdAt,
+        plan.updatedAt,
+        plan.status ?? "active",
+      );
 
     return this.getByIdForPlan(plan)!;
   }
 
   insertIfAbsent(plan: SessionPlan): void {
-    this.database.prepare(`
+    this.database
+      .prepare(
+        `
       INSERT INTO session_plans (
         id, catalog_scope, catalog_club_id, base_item_id, name,
         objective_ids_json, metric_ids_json, blocks_json, estimated_minutes,
-        created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        created_at, updated_at, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO NOTHING
-    `).run(
-      plan.id,
-      plan.catalogScope.scope,
-      plan.catalogScope.scope === "club" ? plan.catalogScope.clubId : null,
-      plan.catalogScope.scope === "club" ? plan.catalogScope.baseItemId ?? null : null,
-      plan.name,
-      JSON.stringify(plan.objectiveIds),
-      JSON.stringify(plan.metricIds),
-      JSON.stringify(plan.blocks),
-      plan.estimatedMinutes,
-      plan.createdAt,
-      plan.updatedAt,
-    );
+    `,
+      )
+      .run(
+        plan.id,
+        plan.catalogScope.scope,
+        plan.catalogScope.scope === "club" ? plan.catalogScope.clubId : null,
+        plan.catalogScope.scope === "club"
+          ? (plan.catalogScope.baseItemId ?? null)
+          : null,
+        plan.name,
+        JSON.stringify(plan.objectiveIds),
+        JSON.stringify(plan.metricIds),
+        JSON.stringify(plan.blocks),
+        plan.estimatedMinutes,
+        plan.createdAt,
+        plan.updatedAt,
+        plan.status ?? "active",
+      );
   }
 
   private getByIdForPlan(plan: SessionPlan): SessionPlan | null {
-    const row = this.database.prepare("SELECT * FROM session_plans WHERE id = ?").get(plan.id) as SqlRow | undefined;
+    const row = this.database
+      .prepare("SELECT * FROM session_plans WHERE id = ?")
+      .get(plan.id) as SqlRow | undefined;
     return row ? mapSessionPlan(row) : null;
   }
 }
@@ -94,27 +119,31 @@ export class SessionPlanRepository {
 function mapSessionPlan(row: SqlRow): SessionPlan {
   const requiredString = (key: string): string => {
     const value = row[key];
-    if (typeof value !== "string") throw new Error(`Expected ${key} to be a string.`);
+    if (typeof value !== "string")
+      throw new Error(`Expected ${key} to be a string.`);
     return value;
   };
   const requiredJsonArray = <T>(key: string): T[] => {
     const value: unknown = JSON.parse(requiredString(key));
-    if (!Array.isArray(value)) throw new Error(`Expected ${key} to contain a JSON array.`);
+    if (!Array.isArray(value))
+      throw new Error(`Expected ${key} to contain a JSON array.`);
     return value as T[];
   };
   const scope = requiredString("catalog_scope");
-  const catalogScope = scope === "system"
-    ? { scope: "system" as const }
-    : {
-        scope: "club" as const,
-        clubId: requiredString("catalog_club_id"),
-        ...(row.base_item_id ? { baseItemId: String(row.base_item_id) } : {}),
-      };
+  const catalogScope =
+    scope === "system"
+      ? { scope: "system" as const }
+      : {
+          scope: "club" as const,
+          clubId: requiredString("catalog_club_id"),
+          ...(row.base_item_id ? { baseItemId: String(row.base_item_id) } : {}),
+        };
 
   return {
     id: requiredString("id"),
     catalogScope,
     name: requiredString("name"),
+    ...(requiredString("status") === "inactive" ? { status: "inactive" as const } : {}),
     objectiveIds: requiredJsonArray<string>("objective_ids_json"),
     metricIds: requiredJsonArray<string>("metric_ids_json"),
     blocks: requiredJsonArray<SessionPlan["blocks"][number]>("blocks_json"),

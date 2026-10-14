@@ -1,0 +1,25 @@
+{
+  "capturedAt": "2026-08-04T01:00:00.000Z",
+  "automationEndpoint": "ws://127.0.0.1:9421",
+  "route": "/pages/parent/schedule/index",
+  "pageStackRoutes": [
+    "/pages/parent/schedule/index"
+  ],
+  "png": {
+    "path": "\\var\\folders\\80\\xb71yvlx4kq6y47jl9rlt0440000gn\\T\\cq-talent-automator-o9IFO0\\parent.png",
+    "bytes": 33,
+    "width": 375,
+    "height": 812,
+    "sha256": "f3bb92deb9d984dfb65c74e0bb42aa25e8152ae2a6d0dbee98302033a6f6ea28"
+  },
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 1,
+    "rasterScale": {
+      "width": 1,
+      "height": 1
+    }
+  },
+  "captureMethod": "miniprogram-automator MiniProgram.screenshot"
+}

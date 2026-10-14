@@ -1,0 +1,32 @@
+diff --git a/es/Dom/dynamicCSS.js b/es/Dom/dynamicCSS.js
+index 8ddec00f7cbb971b1f8267c965cef95f886991a2..5ccd139c53e7b4863937e0a4adfad5331f54e242 100644
+--- a/es/Dom/dynamicCSS.js
++++ b/es/Dom/dynamicCSS.js
+@@ -46,6 +46,11 @@ export function injectCSS(css) {
+     priority = _option$priority === void 0 ? 0 : _option$priority;
+   var mergedOrder = getOrder(prepend);
+   var isPrependQueue = mergedOrder === 'prependQueue';
++  // FCM's CSP nonce also covers rc portal/scrollbar callers without explicit csp options.
++  if (!csp || !csp.nonce) {
++    var nonceMeta = document.querySelector('meta[name="fcm-csp-nonce"]');
++    if (nonceMeta && nonceMeta.content) csp = { nonce: nonceMeta.content };
++  }
+   var styleNode = document.createElement('style');
+   styleNode.setAttribute(APPEND_ORDER, mergedOrder);
+   if (isPrependQueue && priority) {
+diff --git a/lib/Dom/dynamicCSS.js b/lib/Dom/dynamicCSS.js
+index 95a5191f16583aefc5d3e094e7b6560f89b43afa..b39286f8d27550523b03049b22c8802d4318cbd1 100644
+--- a/lib/Dom/dynamicCSS.js
++++ b/lib/Dom/dynamicCSS.js
+@@ -56,6 +56,11 @@ function injectCSS(css) {
+     priority = _option$priority === void 0 ? 0 : _option$priority;
+   var mergedOrder = getOrder(prepend);
+   var isPrependQueue = mergedOrder === 'prependQueue';
++  // FCM's CSP nonce also covers rc portal/scrollbar callers without explicit csp options.
++  if (!csp || !csp.nonce) {
++    var nonceMeta = document.querySelector('meta[name="fcm-csp-nonce"]');
++    if (nonceMeta && nonceMeta.content) csp = { nonce: nonceMeta.content };
++  }
+   var styleNode = document.createElement('style');
+   styleNode.setAttribute(APPEND_ORDER, mergedOrder);
+   if (isPrependQueue && priority) {

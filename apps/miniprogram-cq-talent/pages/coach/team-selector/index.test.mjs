@@ -20,6 +20,7 @@ globalThis.Page = (definition) => {
   return definition;
 };
 globalThis.wx = {
+  getAccountInfoSync: () => ({ miniProgram: { envVersion: "develop" } }),
   getStorageSync: vi.fn(),
   setStorageSync: vi.fn(),
   navigateBack: vi.fn(),
@@ -82,7 +83,7 @@ describe("coach team selector", () => {
 
     page.selectTeam({ currentTarget: { dataset: { id: "team-u12" } } });
 
-    expect(globalThis.wx.setStorageSync).toHaveBeenCalledWith("coach-training-team-id", "team-u12");
+    expect(globalThis.wx.setStorageSync).toHaveBeenCalledWith("cqTalent:develop:coach-training-team-id", "team-u12");
     expect(globalThis.wx.navigateBack).toHaveBeenCalledTimes(1);
   });
 

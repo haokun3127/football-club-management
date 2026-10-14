@@ -9,7 +9,7 @@ export class AssessmentTaskRepository {
 
   listByClub(clubId: EntityId): AssessmentTask[] {
     const rows = this.database.prepare(`
-      SELECT id, club_id, team_id, term_label, title, template_id, starts_on, due_on
+      SELECT id, club_id, team_id, term_label, title, template_id, starts_on, due_on, student_ids_json, test_item_ids_json, source_event_id
       FROM assessment_tasks
       WHERE club_id = ?
         AND NULLIF(TRIM(team_id), '') IS NOT NULL
@@ -24,8 +24,8 @@ export class AssessmentTaskRepository {
     const now = new Date().toISOString();
     this.database.prepare(`
       INSERT INTO assessment_tasks (
-        id, club_id, team_id, term_label, title, template_id, starts_on, due_on, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        id, club_id, team_id, term_label, title, template_id, starts_on, due_on, created_at, updated_at, student_ids_json, test_item_ids_json, source_event_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         club_id = excluded.club_id,
         team_id = excluded.team_id,
@@ -34,7 +34,10 @@ export class AssessmentTaskRepository {
         template_id = excluded.template_id,
         starts_on = excluded.starts_on,
         due_on = excluded.due_on,
-        updated_at = excluded.updated_at
+        updated_at = excluded.updated_at,
+        student_ids_json = excluded.student_ids_json,
+        test_item_ids_json = excluded.test_item_ids_json,
+        source_event_id = excluded.source_event_id
     `).run(
       task.id,
       task.clubId,
@@ -46,6 +49,9 @@ export class AssessmentTaskRepository {
       task.dueOn,
       now,
       now,
+      task.studentIds ? JSON.stringify(task.studentIds) : null,
+      task.testItemIds ? JSON.stringify(task.testItemIds) : null,
+      task.sourceEventId ?? null,
     );
   }
 
@@ -53,8 +59,8 @@ export class AssessmentTaskRepository {
     const now = new Date().toISOString();
     this.database.prepare(`
       INSERT INTO assessment_tasks (
-        id, club_id, team_id, term_label, title, template_id, starts_on, due_on, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        id, club_id, team_id, term_label, title, template_id, starts_on, due_on, created_at, updated_at, student_ids_json, test_item_ids_json, source_event_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO NOTHING
     `).run(
       task.id,
@@ -67,6 +73,9 @@ export class AssessmentTaskRepository {
       task.dueOn,
       now,
       now,
+      task.studentIds ? JSON.stringify(task.studentIds) : null,
+      task.testItemIds ? JSON.stringify(task.testItemIds) : null,
+      task.sourceEventId ?? null,
     );
   }
 }
@@ -87,5 +96,8 @@ function mapAssessmentTask(row: SqlRow): AssessmentTask {
     templateId: required("template_id"),
     startsOn: required("starts_on"),
     dueOn: required("due_on"),
+    ...(typeof row.student_ids_json === "string" ? {studentIds: JSON.parse(row.student_ids_json) as string[]} : {}),
+    ...(typeof row.test_item_ids_json === "string" ? {testItemIds: JSON.parse(row.test_item_ids_json) as string[]} : {}),
+    ...(typeof row.source_event_id === "string" ? {sourceEventId: row.source_event_id} : {}),
   };
 }

@@ -49,7 +49,7 @@ it("restores actual published facts and unpublished corrections after restarting
     await store.saveAssessmentTask(task);
     const entries = store.listAssessmentTestItems(clubId).filter((item) => item.id.startsWith("assessment-test-cq-talent-")).map((item) => ({ testItemId: item.id, value: { kind: "score_0_100" as const, score: 80 } }));
     const workflow = assessmentWorkflow(store);
-    await workflow.save(task, "student-1", "coach-1", { expectedRevision: 0, entries });
+    await workflow.save(task, "student-1", "coach-1", { expectedRevision: 0, entries: entries.map(e=>({...e,eventId:"event-training-1"})) });
     const publication = await workflow.publish(task, "student-1", "coach-1", 1);
     await workflow.save(task, "student-1", "coach-1", { expectedRevision: 1, reason: "核对更正", entries: [{ ...entries[0]!, value: { kind: "score_0_100", score: 60 } }] });
     const facts = store.getStudentMetrics(clubId, "student-1");
@@ -66,3 +66,19 @@ it("restores actual published facts and unpublished corrections after restarting
     expect((await reopened.publish(task, "student-1", "coach-1", 2)).replayed).toBe(false);
   } finally { persistence.database.close(); vi.unstubAllEnvs(); rmSync(directory, { recursive: true, force: true }); }
 });
+
+ it("retains task selections and source course on SQLite reopen without inventing legacy selections", async () => {
+   const directory=mkdtempSync(join(tmpdir(),"assessment-scope-restart-"));
+   const databasePath=join(directory,"test.sqlite");
+   let persistence=await createPlatformPersistence({databasePath});
+   try {
+     const legacy={id:"scope-legacy",clubId:"club-chongqing-talent",teamId:"team-u10-dev",templateId:"assessment-template-technical",title:"Scope",termLabel:"2026",startsOn:"2026-01-01",dueOn:"2026-12-31"};
+     const selected={...legacy,id:"scope-fixed",studentIds:["student-1"],testItemIds:["assessment-test-cq-talent-03"],sourceEventId:"event-training-1"};
+     persistence.repositories.assessmentTasks.save(legacy);
+     persistence.repositories.assessmentTasks.save(selected);
+     persistence.database.close();persistence=await createPlatformPersistence({databasePath});
+     const tasks=persistence.repositories.assessmentTasks.listByClub(legacy.clubId);
+     expect(tasks.find((t)=>t.id===selected.id)).toEqual(selected);
+     expect(tasks.find((t)=>t.id===legacy.id)).toEqual(legacy);
+   }finally{persistence.database.close();rmSync(directory,{recursive:true,force:true});}
+ });

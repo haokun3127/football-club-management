@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import type { ApiStore } from "../store.js";
 import { apiError } from "./errors.js";
+import { isBackofficePath } from "../runtime/backoffice.js";
 
 const idempotencyTtlMs = 1000 * 60 * 30;
 
@@ -9,7 +10,7 @@ export function registerHttpRequestContracts(app: FastifyInstance, store: ApiSto
   app.addHook("preHandler", async (request, reply) => {
     applyPrivateCacheHeaders(request, reply);
 
-    if (!isMutatingMethod(request.method)) {
+    if (isBackofficePath(request.url) || !isMutatingMethod(request.method) || request.routeOptions.config.disableHttpIdempotency) {
       return;
     }
 
@@ -48,7 +49,7 @@ export function registerHttpRequestContracts(app: FastifyInstance, store: ApiSto
   });
 
   app.addHook("onSend", async (request, reply, payload) => {
-    if (request.method === "GET" && typeof payload === "string" && reply.statusCode === 200) {
+    if (!isBackofficePath(request.url) && request.method === "GET" && typeof payload === "string" && reply.statusCode === 200) {
       const etag = `"${hash(payload)}"`;
       reply.header("ETag", etag);
 
@@ -83,6 +84,11 @@ export function registerHttpRequestContracts(app: FastifyInstance, store: ApiSto
 }
 
 function applyPrivateCacheHeaders(request: FastifyRequest, reply: FastifyReply) {
+  if (isBackofficePath(request.url)) {
+    reply.header("Cache-Control", "no-store");
+    reply.header("Vary", "Cookie, X-FCM-Environment");
+    return;
+  }
   if (request.method !== "GET") {
     reply.header("Cache-Control", "no-store");
     return;
@@ -145,6 +151,7 @@ function headerValue(value: string | string[] | undefined): string | undefined {
 }
 
 declare module "fastify" {
+  interface FastifyContextConfig { disableHttpIdempotency?: boolean; }
   interface FastifyRequest {
     idempotency?: {
       cacheKey: string;

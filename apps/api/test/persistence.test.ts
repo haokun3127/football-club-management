@@ -35,7 +35,7 @@ describe("platform persistence", () => {
         method: "PUT",
         url: `${base}/training-projects`,
         headers: { ...headers, "idempotency-key": "training-content-restart-projects" },
-        payload: { projectIds: ["drill-cq-talent-assessment-001"] },
+        payload: { expectedRevision: (await firstApp.inject({method:"GET", url:"/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/workbench", headers:{"x-user-id":"user-coach-1"}})).json().trainingContentRevision, projectIds: ["drill-cq-talent-assessment-001"] },
       })).resolves.toEqual(expect.objectContaining({ statusCode: 200 }));
       await expect(firstApp.inject({
         method: "PUT",
@@ -115,7 +115,7 @@ describe("platform persistence", () => {
         method: "PUT",
         url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/training-projects",
         headers: { "x-user-id": "user-coach-1", "idempotency-key": "training-session-restart-1" },
-        payload: {
+        payload: { expectedRevision: (await firstApp.inject({method:"GET", url:"/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-training-1/workbench", headers:{"x-user-id":"user-coach-1"}})).json().trainingContentRevision,
           projectIds: ["drill-finishing-1"],
           intensity: "high",
           note: "重启后仍保留",
@@ -650,6 +650,29 @@ describe("platform persistence", () => {
       "0018_training_content_assessments.sql",
       "0019_assessment_task_scope.sql",
       "0020_assessment_workflow.sql",
+      "0021_training_records.sql",
+      "0022_assessment_course_provenance.sql",
+      "0023_coach_assignments.sql",
+      "0024_match_metadata.sql",
+      "0025_training_templates.sql",
+      "0026_assessment_task_selection.sql",
+      "0027_student_evaluations.sql",
+      "0028_scout_identities.sql",
+      "0029_temporary_rosters.sql",
+      "0030_backoffice_sessions.sql",
+      "0031_backoffice_management.sql",
+      "0032_training_catalog_status.sql",
+      "0033_assessment_mapping_versions.sql",
+      "0034_assessment_project_metadata.sql",
+      "0035_assessment_mapping_lineage.sql",
+      "0036_backoffice_model_definitions.sql",
+      "0037_backoffice_standards.sql",
+      "0038_backoffice_teaching_authorization.sql",
+      "0039_backoffice_import_batches.sql",
+      "0040_backoffice_bi_snapshots.sql",
+      "0041_backoffice_services.sql",
+      "0042_backoffice_content.sql",
+      "0043_backoffice_import_secrets.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);

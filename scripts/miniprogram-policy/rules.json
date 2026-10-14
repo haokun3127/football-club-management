@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "projectPath": "apps/miniprogram-cq-talent",
+  "snapshot": {
+    "capturedAt": "2026-09-18",
+    "latestBaseLibrary": "3.17.3"
+  },
+  "rules": [
+    {
+      "id": "MP-CONF-001",
+      "title": "团队配置结构完整",
+      "level": "gate",
+      "checker": "json-required",
+      "params": {
+        "files": [
+          {
+            "path": "project.config.json",
+            "required": [
+              { "path": "appid", "type": "string" },
+              { "path": "projectname", "type": "string" },
+              { "path": "compileType", "type": "string", "equals": "miniprogram" },
+              { "path": "libVersion", "type": "string" },
+              { "path": "miniprogramRoot", "type": "string" },
+              { "path": "setting", "type": "object" },
+              { "path": "packOptions", "type": "object" }
+            ]
+          },
+          {
+            "path": "app.json",
+            "required": [
+              { "path": "pages", "type": "array", "nonEmpty": true },
+              { "path": "window", "type": "object" },
+              { "path": "sitemapLocation", "type": "string" }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "MP-CONF-002",
+      "title": "启用安全域名校验",
+      "level": "gate",
+      "checker": "json-value",
+      "params": {
+        "file": "project.config.json",
+        "path": "setting.urlCheck",
+        "equals": true
+      }
+    },
+    {
+      "id": "MP-CONF-003",
+      "title": "基础库不低于批准版本",
+      "level": "gate",
+      "checker": "minimum-version",
+      "params": {
+        "file": "project.config.json",
+        "path": "libVersion",
+        "minimum": "3.17.3"
+      }
+    },
+    {
+      "id": "MP-CONF-004",
+      "title": "页面文件与静态路由一致",
+      "level": "gate",
+      "checker": "routes",
+      "params": {
+        "appConfig": "app.json",
+        "logicExtensions": [".ts", ".js"],
+        "requiredExtensions": [".wxml", ".wxss", ".json"]
+      }
+    },
+    {
+      "id": "MP-PKG-001",
+      "title": "非产品文件不进入上传包",
+      "level": "gate",
+      "checker": "pack-ignore",
+      "params": {
+        "projectConfig": "project.config.json",
+        "forbiddenPathPatterns": [
+          "(^|/)[^/]+\\.(test|spec)\\.(mjs|cjs|js|ts)$",
+          "^scripts/",
+          "(^|/)README\\.md$",
+          "\\.py$",
+          "\\.cjs$"
+        ]
+      }
+    },
+    {
+      "id": "MP-PKG-002",
+      "title": "原始文件预算预警",
+      "level": "advisory",
+      "checker": "raw-size-budget",
+      "params": {
+        "projectConfig": "project.config.json",
+        "warningBytes": 1572864
+      }
+    },
+    {
+      "id": "MP-PKG-003",
+      "title": "运行时网络地址使用 HTTPS/WSS",
+      "level": "gate",
+      "checker": "forbidden-patterns",
+      "params": {
+        "patterns": [
+          { "name": "HTTP URL", "regex": "http://[^\\s'\\\"`<>)]+" }
+        ]
+      }
+    },
+    { "id": "MP-PKG-004", "title": "官方构建满足 2M/30M", "level": "gate", "checker": null },
+    { "id": "MP-PKG-005", "title": "按访问路径规划分包", "level": "advisory", "checker": null },
+    {
+      "id": "MP-PRIV-001",
+      "title": "隐私能力在批准清单内",
+      "level": "gate",
+      "checker": "privacy-capabilities",
+      "params": {
+        "capabilities": [
+          { "name": "phone-number", "approved": true, "regex": "open-type\\s*=\\s*['\\\"]get(?:Realtime)?PhoneNumber['\\\"]" },
+          { "name": "clipboard", "approved": true, "regex": "wx\\.(?:set|get)ClipboardData\\s*\\(" },
+          { "name": "media-picker", "approved": false, "regex": "wx\\.(?:chooseImage|chooseMedia|chooseVideo)\\s*\\(" },
+          { "name": "message-file", "approved": false, "regex": "wx\\.chooseMessageFile\\s*\\(" },
+          { "name": "location", "approved": false, "regex": "wx\\.(?:getLocation|startLocationUpdate|startLocationUpdateBackground|chooseLocation|choosePoi|getFuzzyLocation)\\s*\\(" },
+          { "name": "location-authorize", "approved": false, "regex": "scope\\.(?:userLocation|userLocationBackground|userFuzzyLocation)" },
+          { "name": "map-location", "approved": false, "regex": "MapContext\\.moveToLocation\\s*\\(" },
+          { "name": "address-invoice", "approved": false, "regex": "wx\\.(?:chooseAddress|chooseInvoiceTitle|chooseInvoice)\\s*\\(" },
+          { "name": "werun", "approved": false, "regex": "(?:scope\\.werun|wx\\.getWeRunData\\s*\\()" },
+          { "name": "license-plate", "approved": false, "regex": "wx\\.chooseLicensePlate\\s*\\(" },
+          { "name": "album-write", "approved": false, "regex": "wx\\.(?:saveImageToPhotosAlbum|saveVideoToPhotosAlbum)\\s*\\(" },
+          { "name": "album-authorize", "approved": false, "regex": "scope\\.writePhotosAlbum" },
+          { "name": "contacts", "approved": false, "regex": "(?:scope\\.addPhoneContact|wx\\.addPhoneContact\\s*\\()" },
+          { "name": "calendar", "approved": false, "regex": "(?:scope\\.addPhoneCalendar|wx\\.(?:addPhoneRepeatCalendar|addPhoneCalendar)\\s*\\()" },
+          { "name": "microphone", "approved": false, "regex": "(?:scope\\.record|wx\\.startRecord\\s*\\(|RecorderManager\\.start\\s*\\(|<(?:live-pusher)[\\s>]|wx\\.joinVoIPChat\\s*\\()" },
+          { "name": "camera", "approved": false, "regex": "(?:scope\\.camera|wx\\.createVKSession\\s*\\(|<(?:camera|voip-room)[\\s>])" },
+          { "name": "bluetooth", "approved": false, "regex": "(?:scope\\.bluetooth|wx\\.(?:openBluetoothAdapter|createBLEPeripheralServer)\\s*\\()" },
+          { "name": "sensors", "approved": false, "regex": "wx\\.(?:startAccelerometer|startCompass|startDeviceMotionListening|startGyroscope)\\s*\\(" },
+          { "name": "profile", "approved": false, "regex": "(?:wx\\.(?:getUserInfo|getUserProfile)\\s*\\(|open-type\\s*=\\s*['\\\"]chooseAvatar['\\\"]|type\\s*=\\s*['\\\"]nickname['\\\"])" }
+        ]
+      }
+    },
+    { "id": "MP-PRIV-002", "title": "后台声明与用户同步同意", "level": "gate", "checker": null },
+    { "id": "MP-PRIV-003", "title": "账号注销与数据删除", "level": "gate", "checker": null },
+    {
+      "id": "MP-CAP-001",
+      "title": "微信服务端密钥与接口不进入客户端",
+      "level": "gate",
+      "checker": "forbidden-patterns",
+      "params": {
+        "patterns": [
+          { "name": "微信服务端域名", "regex": "api\\.weixin\\.qq\\.com" },
+          { "name": "code2Session 服务端接口", "regex": "(?:jscode2session|code2Session)" },
+          { "name": "AppSecret 标识", "regex": "(?:app_?secret|AppSecret)\\s*[:=]" },
+          { "name": "session_key 下发标识", "regex": "session_key\\s*[:=]" }
+        ]
+      }
+    },
+    { "id": "MP-CAP-002", "title": "付费能力先批准并提供降级", "level": "gate", "checker": null },
+    { "id": "MP-CAP-003", "title": "发版前核对额度与告警", "level": "advisory", "checker": null },
+    {
+      "id": "MP-PERF-001",
+      "title": "不使用废弃 API",
+      "level": "gate",
+      "checker": "forbidden-patterns",
+      "params": {
+        "patterns": [
+          { "name": "已停止维护 API wx.getSystemInfoSync", "regex": "wx\\.getSystemInfoSync\\s*\\(" }
+        ]
+      }
+    },
+    { "id": "MP-PERF-002", "title": "主路径无 JS/网络异常", "level": "gate", "checker": null },
+    { "id": "MP-PERF-003", "title": "控制 setData 范围与频率", "level": "advisory", "checker": null },
+    { "id": "MP-PERF-004", "title": "及时回收定时器与监听", "level": "advisory", "checker": null },
+    { "id": "MP-COMP-001", "title": "能力检测与最低基础库兼容", "level": "gate", "checker": null },
+    { "id": "MP-PERF-005", "title": "记录冷启动与 Audits", "level": "advisory", "checker": null },
+    { "id": "MP-REL-001", "title": "发版前刷新官方留档", "level": "gate", "checker": null },
+    { "id": "MP-REL-002", "title": "后台与审核材料完整", "level": "gate", "checker": null },
+    { "id": "MP-REL-003", "title": "审核体验路径合规", "level": "gate", "checker": null },
+    { "id": "MP-REL-004", "title": "官方构建包体留证", "level": "gate", "checker": null },
+    { "id": "MP-REL-005", "title": "发布候选完整验证", "level": "gate", "checker": null },
+    { "id": "MP-REL-006", "title": "发布后观察覆盖窗口", "level": "advisory", "checker": null }
+  ]
+}

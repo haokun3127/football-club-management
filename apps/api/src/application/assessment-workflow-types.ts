@@ -4,22 +4,27 @@ export interface AssessmentEntry {
   testItemId: string;
   metricId?: string;
   value: MetricValue;
+  eventId?: string;
+  occurredAt?: string;
+  recordedAt?: string;
 }
 
 export interface AssessmentWorkingState {
   revision: number;
+  notAssessed?: {reason:string;coachId:string;recordedAt:string};
   entries: Record<string, AssessmentEntry>;
   changes: Array<{
     revision: number;
     coachId: string;
     changedAt: string;
     reason?: string;
-    entries: Array<{ testItemId: string; before: MetricValue | null; after: MetricValue }>;
+    entries: Array<{ testItemId: string; before: MetricValue | null; after: MetricValue; beforeEventId?: string; afterEventId?: string; beforeOccurredAt?: string; afterOccurredAt?: string }>;
   }>;
   publications: Array<{ revision: number; assessmentId: string; coachId: string; publishedAt: string }>;
 }
 
 export interface AssessmentWorkflowRepository {
+  transaction?<T>(operation: () => Promise<T>): Promise<T>;
   version(clubId: string, taskId: string): string | null;
   pin(clubId: string, taskId: string, versionId: string): void;
   get(clubId: string, taskId: string, studentId: string): AssessmentWorkingState | null;

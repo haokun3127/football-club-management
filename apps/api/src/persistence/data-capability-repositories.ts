@@ -1,6 +1,7 @@
 import type {
   AbilityMetric,
   AssessmentMetricBinding,
+  DerivedMetricDefinition,
   AssessmentTemplate,
   AssessmentTemplateVersion,
   AssessmentTestItem,
@@ -691,6 +692,7 @@ export class DataCapabilityRepository {
       clubId: requireString(student, "club_id"),
       name: requireString(student, "name"),
       birthDate: requireString(student, "birth_date"),
+      dominantFoot: optionalString(student, "dominant_foot"),
       gender: optionalString(student, "gender"),
       currentLevel: optionalString(student, "current_level"),
       operationalProfile: op,
@@ -1453,6 +1455,12 @@ export class DataCapabilityRepository {
     );
   }
 
+  listAbilityMetrics(clubId:EntityId):AbilityMetric[] {
+    return (this.database.prepare("SELECT * FROM ability_metrics WHERE catalog_scope='system' OR scope_club_id=? ORDER BY id").all(clubId) as SqlRow[]).map(row=>({id:requireString(row,"id"),catalogScope:catalogScope(row),code:requireString(row,"code"),name:requireString(row,"name"),dimensionId:requireString(row,"dimension_id"),valueKind:requireString(row,"value_kind") as AbilityMetric["valueKind"],metricKind:requireString(row,"metric_kind") as AbilityMetric["metricKind"],unit:optionalString(row,"unit"),maxScore:optionalNumber(row,"max_score"),sourceKinds:row.source_kinds_json?JSON.parse(String(row.source_kinds_json)):undefined,version:optionalString(row,"version"),status:optionalString(row,"status") as AbilityMetric["status"],description:optionalString(row,"description"),createdAt:requireString(row,"created_at"),updatedAt:requireString(row,"updated_at")}));
+  }
+  listDerivedMetricDefinitions(clubId:EntityId):DerivedMetricDefinition[] {
+    return (this.database.prepare("SELECT * FROM derived_metric_definitions WHERE catalog_scope='system' OR scope_club_id=? ORDER BY id").all(clubId) as SqlRow[]).map(row=>({id:requireString(row,"id"),catalogScope:catalogScope(row),code:requireString(row,"code"),name:requireString(row,"name"),outputMetricId:requireString(row,"output_metric_id"),method:requireString(row,"method") as DerivedMetricDefinition["method"],inputMetricIds:JSON.parse(requireString(row,"input_metric_ids_json")),version:requireString(row,"version"),weights:row.weights_json?JSON.parse(String(row.weights_json)):undefined,inputScale:optionalNumber(row,"input_scale"),maxScore:optionalNumber(row,"max_score"),rounding:optionalString(row,"rounding") as DerivedMetricDefinition["rounding"],inputWindowDays:optionalNumber(row,"input_window_days"),outputUnit:optionalString(row,"output_unit"),createdAt:requireString(row,"created_at"),updatedAt:requireString(row,"updated_at")}));
+  }
   saveAbilityMetric(entity: AbilityMetric): void {
     const [catalogScope, scopeClubId, baseItemId] = catalogScopeValues(entity.catalogScope);
 
@@ -1669,9 +1677,9 @@ export class DataCapabilityRepository {
     this.database.prepare(`
       INSERT INTO assessment_metric_bindings (
         id, club_id, template_version_id, metric_id, role, formula_id, test_item_id,
-        max_score, weight, sort_order, created_at, updated_at
+        max_score, weight, sort_order, created_at, updated_at, score_mapping_version_id, grade_mapping_version_id
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         template_version_id = excluded.template_version_id,
         metric_id = excluded.metric_id,
@@ -1681,7 +1689,7 @@ export class DataCapabilityRepository {
         max_score = excluded.max_score,
         weight = excluded.weight,
         sort_order = excluded.sort_order,
-        updated_at = excluded.updated_at
+        updated_at = excluded.updated_at,score_mapping_version_id=excluded.score_mapping_version_id,grade_mapping_version_id=excluded.grade_mapping_version_id
     `).run(
       entity.id,
       entity.clubId,
@@ -1695,22 +1703,24 @@ export class DataCapabilityRepository {
       entity.sortOrder,
       entity.createdAt,
       entity.updatedAt,
+      entity.scoreMappingVersionId ?? null,entity.gradeMappingVersionId ?? null,
     );
   }
 
   saveAssessmentTestItem(entity: AssessmentTestItem): void {
     this.database.prepare(`
       INSERT INTO assessment_test_items (
-        id, club_id, metric_id, name, value_kind, unit, protocol, created_at, updated_at
+        id, club_id, metric_id, name, value_kind, unit, protocol, created_at, updated_at, status, tags_json, applicability, precision, minimum_value, maximum_value, direction
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         metric_id = excluded.metric_id,
         name = excluded.name,
         value_kind = excluded.value_kind,
         unit = excluded.unit,
         protocol = excluded.protocol,
-        updated_at = excluded.updated_at
+        updated_at = excluded.updated_at,
+        status=excluded.status,tags_json=excluded.tags_json,applicability=excluded.applicability,precision=excluded.precision,minimum_value=excluded.minimum_value,maximum_value=excluded.maximum_value,direction=excluded.direction
     `).run(
       entity.id,
       entity.clubId,
@@ -1721,6 +1731,7 @@ export class DataCapabilityRepository {
       entity.protocol ?? null,
       entity.createdAt,
       entity.updatedAt,
+      entity.status ?? "active",entity.tags ? JSON.stringify(entity.tags) : null, entity.applicability ?? null, entity.precision ?? null, entity.minimumValue ?? null, entity.maximumValue ?? null, entity.direction ?? null,
     );
   }
 
@@ -2770,6 +2781,8 @@ function mapAssessmentMetricBinding(row: SqlRow): AssessmentMetricBinding {
     formulaId: optionalString(row, "formula_id"),
     testItemId: optionalString(row, "test_item_id"),
     maxScore: optionalNumber(row, "max_score"),
+    ...(row.score_mapping_version_id ? {scoreMappingVersionId:String(row.score_mapping_version_id)} : {}),
+    ...(row.grade_mapping_version_id ? {gradeMappingVersionId:String(row.grade_mapping_version_id)} : {}),
     weight: optionalNumber(row, "weight"),
     sortOrder: numberFromSql(row, "sort_order"),
     createdAt: requireString(row, "created_at"),
@@ -2786,6 +2799,13 @@ function mapAssessmentTestItem(row: SqlRow): AssessmentTestItem {
     valueKind: requireString(row, "value_kind") as AssessmentTestItem["valueKind"],
     unit: optionalString(row, "unit"),
     protocol: optionalString(row, "protocol"),
+    ...(row.status === "inactive" ? {status:"inactive" as const} : {}),
+    ...(row.tags_json ? {tags:JSON.parse(String(row.tags_json)) as string[]} : {}),
+    ...(row.applicability ? {applicability:String(row.applicability)} : {}),
+    ...(row.precision == null ? {} : {precision:Number(row.precision)}),
+    ...(row.minimum_value == null ? {} : {minimumValue:Number(row.minimum_value)}),
+    ...(row.maximum_value == null ? {} : {maximumValue:Number(row.maximum_value)}),
+    ...(row.direction ? {direction:row.direction as AssessmentTestItem["direction"]} : {}),
     createdAt: requireString(row, "created_at"),
     updatedAt: requireString(row, "updated_at"),
   };

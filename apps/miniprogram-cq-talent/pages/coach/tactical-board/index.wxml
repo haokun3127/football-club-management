@@ -1,92 +1,37 @@
-<view class="c7-page">
-  <view class="c7-header-shell" style="padding-top:{{navInset}}px">
-    <view class="c7-header">
-      <view class="c7-header__back" bindtap="goBack" aria-label="返回">
-        <image src="/assets/icons/chevron-left.svg" mode="aspectFit" />
-      </view>
-      <view class="c7-header__title">比赛战术板</view>
-    </view>
+<view class="c7-page" style="padding-top:{{navInset}}px">
+  <view class="c7-header" style="padding-right:{{menuInset}}px">
+    <button class="c7-back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></button>
+    <text class="c7-title">比赛战术板</text>
   </view>
-
-  <view class="c7-content">
-    <view wx:if="{{state === 'loading'}}" class="c7-feedback">
-      <view class="c7-feedback__title">{{stateTitle}}</view>
-      <view class="c7-feedback__message">{{message}}</view>
-    </view>
-
-    <view wx:elif="{{state === 'empty' || state === 'error'}}" class="c7-feedback">
-      <view class="c7-feedback__title">{{stateTitle}}</view>
-      <view class="c7-feedback__message">{{message}}</view>
-      <view wx:if="{{state === 'error'}}" class="c7-feedback__retry" bindtap="retry">重试</view>
-    </view>
-
-    <block wx:elif="{{state === 'ready'}}">
-      <view class="c7-context-label">MATCH TACTICS</view>
-      <view class="c7-formation-row">
-        <view class="c7-formation-title">本场比赛阵型</view>
-        <block wx:if="{{!readOnly && hasFormation}}">
-          <picker mode="selector" range="{{formations}}" range-key="label" value="{{formationIndex}}" bindchange="onFormationChange">
-            <view class="c7-formation-picker">
-              <view class="c7-formation-label">{{formationLabel}}</view>
-              <image class="c7-formation-chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
-            </view>
-          </picker>
-        </block>
-        <view wx:else class="c7-formation-picker">
-          <view class="c7-formation-label">{{formationLabel}}</view>
-          <image class="c7-formation-chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />
-        </view>
+  <view wx:if="{{state !== 'ready'}}" class="c7-feedback">
+    <text>{{stateTitle}}</text><text class="c7-muted">{{message}}</text>
+    <button wx:if="{{state === 'error'}}" bindtap="retry">重新加载</button>
+  </view>
+  <block wx:else>
+    <view class="c7-toolbar"><text class="c7-event">{{eventTitle}}</text><text class="c7-status {{saveError ? 'c7-status--error' : ''}}">{{saveLabel}}</text></view>
+    <view id="c7-pitch" class="c7-pitch">
+      <view class="c7-boundary"></view><view class="c7-halfway"></view><view class="c7-center"></view>
+      <view class="c7-box c7-box--top"></view><view class="c7-box c7-box--bottom"></view>
+      <text wx:if="{{!starters.length}}" class="c7-hint">{{readOnly ? '暂无场上布置' : '长按下方球员，拖入球场'}}</text>
+      <view wx:for="{{starters}}" wx:key="studentId" class="c7-player {{dragId === item.studentId ? 'c7-player--dragging' : ''}}" style="left:{{item.left}}%;top:{{item.top}}%" data-id="{{item.studentId}}" bindtouchstart="startPlayerDrag" catchtouchmove="movePlayer" bindtouchend="finishDrag" bindtouchcancel="cancelDrag">
+        <image src="{{item.avatarUrl || '/assets/icons/user-white.svg'}}" mode="aspectFill" /><text>{{item.displayName}}</text>
       </view>
-
-      <view class="c7-board-container">
-        <movable-area id="c7-workspace" class="c7-workspace" style="height: {{workspaceHeight}}px;">
-           <view id="c7-pitch" class="c7-pitch">
-            <view class="c7-pitch__hint">拖拽球员到球场上场</view>
-            <view class="c7-pitch__halfway"></view>
-            <view class="c7-pitch__boundary"></view>
-            </view>
-
-          <block wx:if="{{!readOnly}}">
-            <movable-view wx:for="{{starters}}" wx:key="studentId" class="{{item.className}}" direction="all" x="{{item.px}}" y="{{item.py}}" inertia="{{false}}" out-of-bounds="{{false}}" data-id="{{item.studentId}}" bindchange="onPlayerMove" bindtap="selectStarter">
-              <view class="c7-player__badge"><view class="c7-player__number">{{item.jerseyNumber}}</view></view>
-            </movable-view>
-          </block>
-          <block wx:else>
-            <view wx:for="{{starters}}" wx:key="studentId" class="{{item.className}} c7-player--readonly" style="left: {{item.px}}px; top: {{item.py}}px;">
-              <view class="c7-player__badge"><view class="c7-player__number">{{item.jerseyNumber}}</view></view>
-            </view>
-          </block>
-          <view class="c7-roster">
-            <view class="c7-roster__heading">
-              <view class="c7-roster__title">全部球员</view>
-              <view class="c7-roster__hint">拖入球场上场 · 拖回这里下场</view>
-            </view>
+    </view>
+    <view id="c7-roster" class="c7-roster {{rosterTarget ? 'c7-roster--target' : ''}}">
+      <view class="c7-roster-heading"><text>可用球员 · {{rosterPlayers.length}}</text><text class="c7-muted">{{readOnly ? '比赛已结束，仅供查看' : '长按拖入 · 拖回下场'}}</text></view>
+      <scroll-view class="c7-roster-scroll" scroll-y="{{!dragId}}">
+        <view class="c7-roster-grid">
+          <view wx:for="{{rosterPlayers}}" wx:key="studentId" class="c7-roster-player {{dragId === item.studentId ? 'c7-player--dragging' : ''}}" data-id="{{item.studentId}}" bindlongpress="startRosterDrag" bindtouchmove="movePlayer" bindtouchend="finishDrag" bindtouchcancel="cancelDrag">
+            <image src="{{item.avatarUrl || '/assets/icons/user.svg'}}" mode="aspectFill" /><text>{{item.displayName}}</text>
           </view>
-          <view class="c7-roster__grid" aria-hidden="true"></view>
-          <block wx:for="{{rosterPlayers}}" wx:key="studentId">
-            <block wx:if="{{!readOnly}}">
-              <movable-view class="c7-roster__player c7-roster__player--movable" direction="all" x="{{item.rosterPx}}" y="{{item.rosterPy}}" inertia="{{false}}" out-of-bounds="{{false}}" data-id="{{item.studentId}}" bindchange="onSubstituteMove" bindtap="swapSubstitute">
-                <view class="c7-roster__avatar {{item.rosterToneClass}}">{{item.jerseyNumber}}</view>
-                <view class="c7-roster__name">{{item.displayName}}</view>
-                <view class="c7-roster__status">{{item.rosterStateLabel}}</view>
-              </movable-view>
-            </block>
-            <block wx:if="{{readOnly}}">
-              <view class="c7-roster__player c7-roster__player--listed" style="left: {{item.rosterPx}}px; top: {{item.rosterPy}}px;">
-                <view class="c7-roster__avatar {{item.rosterToneClass}}">{{item.jerseyNumber}}</view>
-                <view class="c7-roster__name">{{item.displayName}}</view>
-                <view class="c7-roster__status">{{item.rosterStateLabel}}</view>
-              </view>
-            </block>
-          </block>
-        </movable-area>
-      </view>
-      <view wx:if="{{saveError}}" class="c7-save-error">{{saveError}}</view>
-
-      <view class="c7-actions">
-        <view class="c7-action c7-action--secondary {{readOnly ? 'c7-action--disabled' : ''}}" bindtap="resetBoard">重置阵型</view>
-        <view class="c7-action c7-action--primary {{(!dirty || saving || readOnly) ? 'c7-action--disabled' : ''}}" bindtap="saveBoard">{{saving ? '保存中…' : '保存战术板'}}</view>
-      </view>
-    </block>
-  </view>
+        </view>
+      </scroll-view>
+    </view>
+    <view class="c7-actions">
+      <button disabled="{{readOnly || !canUndo}}" bindtap="undoMove">撤销上一步</button>
+      <button disabled="{{readOnly || !starters.length}}" bindtap="clearBoard">清空球场</button>
+    </view>
+    <button wx:if="{{saveError}}" class="c7-error" bindtap="saveBoard">{{saveError}}</button>
+    <view wx:if="{{dragId}}" class="c7-ghost" style="left:{{dragX}}px;top:{{dragY}}px"><image src="{{dragAvatar || '/assets/icons/user-white.svg'}}" mode="aspectFill" /><text>{{dragName}}</text></view>
+  </block>
 </view>

@@ -1,4 +1,4 @@
-import { getAssessmentForm, getCoachAssessmentEntries, getCoachAssessmentTasks, getCoachTrainingProjectTree, getCoachAssessmentWorkflow, publishCoachAssessments } from "../../../utils/api";
+import { getAssessmentForm, getCoachAssessmentEntries, getCoachAssessmentTasks, getCoachTrainingProjectTree, getCoachAssessmentWorkflow, publishCoachAssessments, getCoachAssessmentHistory } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
@@ -64,6 +64,9 @@ Page({
     publishing: false,
     publicationLabel: "",
     publicationMessage: "",
+    reviewVisible:false,reviewLoading:false,reviewStudentId:"",reviewName:"",reviewRevision:0,reviewCanPublish:false,reviewMessage:"",
+    reviewStudents:[] as Array<{studentId:string;name:string;revision:number;canPublish:boolean;completedFields:number;totalFields:number}>,
+    reviewRows:[] as Array<{id:string;label:string;value:string;course:string;recorded:string}>,
   },
   onLoad(query?: { taskId?: string; templateId?: string; title?: string }) {
     return this.load(query?.taskId || "", query?.templateId || "", query?.title ? decodeURIComponent(query.title) : "能力评估");
@@ -79,13 +82,13 @@ Page({
     try {
       const tasks = await getCoachAssessmentTasks({ forceRefresh: true });
       const task = tasks.find((item) => item.id === taskId);
-      if (!task || task.templateId !== templateId || (task.status !== "in_progress" && task.status !== "completed")) {
+      if (!task || task.templateId !== templateId || (task.status !== "in_progress" && task.status !== "completed" && !(task.status === "not_started" && task.workflow))) {
         this.setData({ state: "empty", message: "当前测评任务不可录入，请返回任务列表后重试。", projects: [] });
         return;
       }
       if (task.workflow?.error) throw new Error(task.workflow.error);
       const [form, trainingTree] = await Promise.all([task.workflow ? getAssessmentForm(templateId, task.workflow.templateVersionId) : getAssessmentForm(templateId), getCoachTrainingProjectTree()]);
-      const baseProjects = buildProjectRows(form);
+      const baseProjects = buildProjectRows({...form,fields:form.fields.filter((f) => !task.testItemIds || task.testItemIds.includes(f.testItemId || f.id))});
       const projects = presentProjects(await hydrateProjectProgress(task.id, task.totalStudents, baseProjects), []);
       const hierarchy = buildHierarchyPatch(trainingTree.contentTree, projects, [], "", "");
       const completedProjects = projects.reduce((count, project) => count + (project.completedStudents >= task.totalStudents && task.totalStudents > 0 ? 1 : 0), 0);
@@ -117,29 +120,53 @@ Page({
   onShow() {
     if (this.data.taskId && this.data.state === "ready" && !this.data.publishing) void this.load(this.data.taskId, this.data.templateId, this.data.taskTitle);
   },
-  async publishReady() {
-    if (this.data.publishing || !this.data.canPublish) return;
-    this.setData({ publishing: true, publicationMessage: "" });
+  async openReviewList() {
+    if(this.data.publishing)return;
+    this.setData({reviewVisible:true,reviewLoading:true,reviewMessage:"",reviewCanPublish:false,reviewRows:[]});
     try {
-      const workflow = await getCoachAssessmentWorkflow(this.data.taskId);
-      const ready = workflow.students.filter((student) => student.canPublish);
-      this.setData({ publicationLabel: `已发布 ${workflow.publishedStudents}/${workflow.totalStudents} 人 · 待发布 ${ready.length} 人` });
-      if (!workflow.canEdit || !ready.length) {
-        this.setData({ publicationMessage: "当前成绩已发布或尚未录齐，请核对项目进度。", canPublish: false });
-        return;
-      }
-      const answer = await new Promise<{ confirm: boolean }>((resolve) => wx.showModal({ success: resolve, title: `确认发布 ${ready.length} 名学员`, content: `${ready.map((student) => student.name).join("、")}\n发布后，家长和能力雷达将展示本次成绩。` }));
-      if (!answer.confirm) return;
-      const result = await publishCoachAssessments(this.data.taskId, ready.map((student) => ({ studentId: student.studentId, expectedRevision: student.revision })));
-      const successes = result.results.filter((student) => student.success).length;
-      const failures = result.results.filter((student) => !student.success);
-      this.setData({ publicationMessage: `已发布 ${successes} 人${failures.length ? `；${failures.length} 人未发布：${failures.map((student) => student.error?.message || "请重试").join("；")}` : "，家长端与雷达已更新。"}` });
-      await this.load(this.data.taskId, this.data.templateId, this.data.taskTitle);
-    } catch (error) {
-      this.setData({ publicationMessage: error && typeof error === "object" && "message" in error ? String(error.message) : "发布结果暂未确认，请重试；重复发布不会生成重复成绩。" });
-    } finally {
-      this.setData({ publishing: false });
-    }
+      const workflow=await getCoachAssessmentWorkflow(this.data.taskId);
+      this.setData({reviewStudents:workflow.students});
+      const first=workflow.students.find(item=>item.canPublish)||workflow.students[0];
+      if(first)await this.loadStudentReview(first.studentId,workflow.templateVersionId);
+      else this.setData({reviewMessage:"暂无可核对学员"});
+    }catch{this.setData({reviewMessage:"核对信息读取失败，请关闭后重试"});}
+    finally{this.setData({reviewLoading:false});}
+  },
+  async chooseReviewStudent(event:{currentTarget:{dataset:{id?:string}}}) {
+    if(this.data.publishing || this.data.reviewLoading || !event.currentTarget.dataset.id)return;
+    await this.loadStudentReview(event.currentTarget.dataset.id);
+  },
+  async loadStudentReview(studentId:string,versionId?:string) {
+    this.setData({reviewLoading:true,reviewCanPublish:false,reviewMessage:"",reviewRows:[],reviewStudentId:studentId});
+    try {
+      const workflow=await getCoachAssessmentWorkflow(this.data.taskId);
+      const student=workflow.students.find(item=>item.studentId===studentId);
+      if(!student)throw new Error("学员不可用");
+      const [history,form]=await Promise.all([getCoachAssessmentHistory(this.data.taskId,studentId),getAssessmentForm(this.data.templateId,versionId||workflow.templateVersionId)]);
+      const rows=form.fields.filter((f) => !workflow.testItemIds || workflow.testItemIds.includes(f.testItemId || f.id)).map(field=>{
+        const entry=history.entries?.[field.testItemId||field.id];
+        return {id:field.id,label:field.label,value:reviewValue(entry?.value,field.unit),course:entry?.occurredAt ? `课程：${reviewDate(entry.occurredAt)}` : "课程：未关联",recorded:entry?.recordedAt ? `录入：${reviewDate(entry.recordedAt)}` : "录入时间未记录"};
+      });
+      this.setData({reviewStudents:workflow.students,reviewName:student.name,reviewRows:rows,reviewRevision:history.revision,reviewCanPublish:Boolean(workflow.canEdit&&student.canPublish&&history.revision===student.revision),reviewMessage:history.revision!==student.revision?"成绩刚刚发生变化，请重新选择学员核对。":""});
+    }catch{this.setData({reviewMessage:"该学员成绩读取失败，请重新选择后重试"});}
+    finally{this.setData({reviewLoading:false});}
+  },
+  closeReview() {if(!this.data.publishing&&!this.data.reviewLoading)this.setData({reviewVisible:false});},
+  async confirmReviewedStudent() {
+    if(!this.data.reviewCanPublish||this.data.publishing||this.data.reviewLoading)return;
+    const studentId=this.data.reviewStudentId;const expectedRevision=this.data.reviewRevision;
+    this.setData({publishing:true,reviewMessage:""});
+    try {
+      const answer=await new Promise<{confirm:boolean}>(resolve=>wx.showModal({title:`确认同步 ${this.data.reviewName}`,content:"已核对本页项目成绩与各自课程日期，确认后家长可见。",success:resolve}));
+      if(!answer.confirm)return;
+      const response=await publishCoachAssessments(this.data.taskId,[{studentId,expectedRevision}]);
+      const result=response.results.find(item=>item.studentId===studentId);
+      if(!result?.success){this.setData({reviewMessage:result?.error?.message||"同步失败，当前核对内容已保留。"});return;}
+      this.setData({reviewCanPublish:false,reviewMessage:"已同步该学员，可继续核对下一名。"});
+      const workflow=await getCoachAssessmentWorkflow(this.data.taskId);
+      this.setData({reviewStudents:workflow.students,canPublish:workflow.readyStudents>0,publicationLabel:`已发布 ${workflow.publishedStudents}/${workflow.totalStudents} 人 · 待发布 ${workflow.readyStudents} 人`});
+    }catch{this.setData({reviewMessage:"同步失败，当前核对内容已保留，请重试。"});}
+    finally{this.setData({publishing:false});}
   },
   toggleProject(event: { currentTarget?: { dataset?: { id?: string } } }) {
     const projectId = event.currentTarget?.dataset?.id;
@@ -427,4 +454,11 @@ function presentProjects(projects: ProjectRow[], selectedIds: string[]): Project
       selectClass: isSelected ? "project-card__select project-card__select--selected" : "project-card__select",
     };
   });
+}
+
+function reviewDate(value:string){const date=new Date(Date.parse(value)+8*3600000);return Number.isFinite(date.getTime())?date.toISOString().slice(0,16).replace("T"," "):"时间未知";}
+function reviewValue(value:Record<string,unknown>|undefined,unit?:string){
+  if(!value)return "未测";
+  const score=value.score??value.value??value.text;
+  return score===undefined?"未测":`${String(score)}${value.kind==="score_0_100"?" 分":unit||String(value.unit||"")}`;
 }

@@ -24,6 +24,9 @@ type CoachView = {
 };
 
 interface PageData {
+  hasTeamOptions: boolean; hasMatches: boolean;
+  teamId: string; teamOptions: Array<{ id: string; name: string }>;
+  matches: Array<{ eventId: string; title: string; subtitle: string; score: string }>;
   navInset: number;
   menuInset: number;
   state: LoadState;
@@ -50,14 +53,18 @@ const AVATAR_THEMES = [
 
 Page<PageData>({
   data: emptyPageData("loading", "正在读取队伍信息"),
-  onLoad() {
-    return this.load();
+  onLoad(query: { teamId?: string } = {}) {
+    return this.load(query.teamId);
   },
-  async load() {
+  openScouts() { if (requireRole("coach")) openPage("/pages/coach/scout/index"); },
+  async load(teamId?: string) {
     if (!requireRole("coach")) return;
+    const token = nextTeamRequest(this);
+    teamId = teamId || this.data.teamId;
     this.setData(emptyPageData("loading", "正在读取队伍信息"));
     try {
-      const detail = await getCoachTeam();
+      const detail = await getCoachTeam(teamId || this.data.teamId || undefined);
+      if (!currentTeamRequest(this, token)) return;
       const hasTeam = detail.team !== null;
       const members = hasTeam ? toMembers(detail) : [];
       const coaches = hasTeam ? toCoaches(detail) : [];
@@ -66,6 +73,11 @@ Page<PageData>({
         message: hasTeam ? "" : "近30天暂无可展示的球队",
         retryLabel: "",
         hasTeam,
+        hasTeamOptions: (detail.teamOptions || []).length > 1, hasMatches: (detail.formalMatches || []).length > 0,
+        teamId: detail.team?.id || "", teamOptions: detail.teamOptions || [],
+        matches: (detail.formalMatches || []).map(item => ({ eventId: item.eventId, title: item.title,
+          subtitle: `${new Date(Date.parse(item.startsAt) + 8 * 3600000).toISOString().slice(0, 16).replace("T", " ")} · ${item.match.opponentName || "对手未配置"} · ${item.venue || "地点未配置"}`,
+          score: typeof item.match.homeScore === "number" && typeof item.match.awayScore === "number" ? `${item.match.homeScore} : ${item.match.awayScore}` : "未记录比分" })),
         hasMembers: members.length > 0,
         teamName: detail.team?.name ?? "",
         season: detail.team?.season ?? "",
@@ -77,23 +89,30 @@ Page<PageData>({
         coachEmptyMessage: hasTeam && !coaches.length ? "暂未配置队伍教练" : "",
       });
     } catch {
+      if (!currentTeamRequest(this, token)) return;
       this.setData(emptyPageData("error", "队伍信息读取失败，请稍后重试。", "重新读取"));
     }
   },
+  onUnload() { nextTeamRequest(this); },
   retry() {
     this.load();
   },
   goBack() {
     wx.navigateBack();
   },
+  selectTeam(event: { currentTarget: { dataset: { id: string } } }) { return this.load(event.currentTarget.dataset.id); },
+  openMatch(event: { currentTarget: { dataset: { id: string } } }) {
+    if (this.data.matches.some((match: PageData["matches"][number]) => match.eventId === event.currentTarget.dataset.id)) openPage(`/pages/coach/match/index?id=${encodeURIComponent(event.currentTarget.dataset.id)}`);
+  },
   openRadar(event: { currentTarget?: { dataset?: { id?: string } } }) {
     const id = event.currentTarget?.dataset?.id;
-    if (id) openPage(`/pages/coach/student-radar/index?student=${encodeURIComponent(id)}`);
+    if (id) openPage(`/pages/coach/student-radar/index?student=${encodeURIComponent(id)}&team=${encodeURIComponent(this.data.teamId)}`);
   },
 });
 
 function emptyPageData(state: LoadState, message: string, retryLabel = ""): PageData {
   return {
+    hasTeamOptions: false, hasMatches: false, teamId: "", teamOptions: [], matches: [],
     navInset: resolveNavInset(),
     menuInset: resolveMenuInset(),
     state,
@@ -158,3 +177,6 @@ function toCoaches(detail: CoachTeamDetail): CoachView[] {
     };
   });
 }
+
+function nextTeamRequest(page: unknown) { const p=page as {_request?:number}; return p._request=(p._request||0)+1; }
+function currentTeamRequest(page: unknown, token: number) { return (page as {_request?:number})._request===token; }

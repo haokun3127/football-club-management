@@ -76,6 +76,10 @@ Page<AttendancePageData>({
     this.setData({ state: "loading", message: "正在读取点名名单", eventId: id, hasSaveError: false, saveError: "" });
     try {
       const workbench = await getCoachWorkbench(id);
+      if (workbench.event.type === "training") {
+        wx.redirectTo({ url: `/pages/coach/lesson/index?id=${encodeURIComponent(id)}` });
+        return;
+      }
       const roster = withRosterUi(workbench.roster);
       const eventStatus = activityStatus(workbench.event.status);
       const eventMeta = eventMetadata(workbench.event.teamName, workbench.event.startsAt, workbench.event.endsAt);

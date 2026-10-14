@@ -13,6 +13,7 @@ interface MilestoneRow {
   detail: string;
   meta: string;
   isAbilityUpdate: boolean;
+  isEvaluation: boolean; teamId?: string;
 }
 
 Page({
@@ -21,6 +22,7 @@ Page({
     menuInset: resolveMenuInset(),
     state: "loading" as LoadState,
     message: "正在读取成长足迹",
+    activeStudentId: "",
     milestones: [] as MilestoneRow[],
   },
   onLoad() {
@@ -39,7 +41,7 @@ Page({
       }
       const growth = await getParentGrowth(active.id, active);
       const milestones = buildMilestoneRows(growth.timeline ?? []);
-      this.setData({ state: milestones.length ? "ready" : "empty", message: milestones.length ? "" : "暂无成长足迹", milestones });
+      this.setData({ activeStudentId: active.id, state: milestones.length ? "ready" : "empty", message: milestones.length ? "" : "暂无成长足迹", milestones });
     } catch {
       this.setData({ state: "error", message: "成长足迹读取失败，请点击重试" });
     }
@@ -50,6 +52,7 @@ Page({
   retry() {
     void this.load();
   },
+  openEvaluation(event: { currentTarget: { dataset: { team: string } } }) { openPage(`/pages/shared/student-evaluation/index?student=${encodeURIComponent(this.data.activeStudentId)}&team=${encodeURIComponent(event.currentTarget.dataset.team)}&mode=history`); },
   openAbilityHistory() {
     openPage("/pages/parent/ability-history/index");
   },
@@ -59,12 +62,13 @@ function buildMilestoneRows(timeline: GrowthTimelineItem[]): MilestoneRow[] {
   return timeline.map((item) => ({
     id: item.id,
     title: item.title,
-    state: item.kind === "training" ? "训练" : item.kind === "match" ? "比赛" : "能力更新",
+    state: item.kind === "training" ? "训练" : item.kind === "match" ? "比赛" : item.kind === "evaluation" ? "评价变化" : "能力更新",
     tone: item.kind === "training" ? "green" : item.kind === "match" ? "red" : "blue",
     icon: item.kind === "training" ? "✓" : item.kind === "match" ? "⚽" : "•",
     detail: timelineDetail(item),
     meta: timelineMeta(item),
     isAbilityUpdate: item.kind === "ability_update",
+    isEvaluation: item.kind === "evaluation", teamId: item.teamId,
   }));
 }
 
@@ -83,6 +87,7 @@ function timelineDetail(item: GrowthTimelineItem) {
     const label = firstEvent.type === "goal" ? "进球" : firstEvent.type === "assist" ? "助攻" : firstEvent.type === "foul" ? "犯规" : "比赛事件";
     return `${score} · ${label}${typeof firstEvent.minute === "number" ? ` ${firstEvent.minute}'` : ""}`;
   }
+  if (item.kind === "evaluation") return item.subtitle;
   const first = item.abilityUpdate?.metrics[0];
   if (!first) return item.subtitle || "能力模型已更新";
   const current = typeof first.value === "number" ? ` ${first.value}` : "";

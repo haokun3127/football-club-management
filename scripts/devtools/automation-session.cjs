@@ -73,12 +73,21 @@ function writeAutomationSession(state, statePath) {
   return file;
 }
 
-function readIdeHttpPort({ env = process.env } = {}) {
+function resolveDevtoolsCli({ env = process.env, platform = process.platform, exists = existsSync } = {}) {
+  if (env.WECHAT_DEVTOOLS_CLI) return env.WECHAT_DEVTOOLS_CLI;
+  if (platform === "win32") return "D:\\微信web开发者工具\\cli.bat";
+  const stable = "/Applications/wechatwebdevtools-stable.app/Contents/MacOS/cli";
+  return exists(stable) ? stable : "/Applications/wechatwebdevtools.app/Contents/MacOS/cli";
+}
+
+function readIdeHttpPort({ env = process.env, platform = process.platform } = {}) {
   const explicit = env.MP_IDE_HTTP_PORT || env.WECHAT_DEVTOOLS_HTTP_PORT;
   if (explicit) return parsePort(explicit, "IDE HTTP port");
 
-  if (process.platform !== "win32") return undefined;
-  const userData = env.MP_DEVTOOLS_IDE_USER_DATA || join(env.LOCALAPPDATA || join(homedir(), "AppData", "Local"), "微信开发者工具", "User Data");
+  if (platform !== "win32" && platform !== "darwin") return undefined;
+  const userData = env.MP_DEVTOOLS_IDE_USER_DATA || (platform === "darwin"
+    ? join(homedir(), "Library", "Application Support", "微信开发者工具")
+    : join(env.LOCALAPPDATA || join(homedir(), "AppData", "Local"), "微信开发者工具", "User Data"));
   if (!existsSync(userData)) return undefined;
 
   const candidates = [];
@@ -139,6 +148,7 @@ module.exports = {
   parsePort,
   readAutomationSession,
   readIdeHttpPort,
+  resolveDevtoolsCli,
   resolveAutomationPort,
   sessionPath,
   writeAutomationSession,

@@ -24,7 +24,7 @@ globalThis.Page = (definition) => {
   pageDefinition = definition;
   return definition;
 };
-globalThis.wx = { reLaunch: vi.fn(), getStorageSync: vi.fn(), setStorageSync: vi.fn() };
+globalThis.wx = { reLaunch: vi.fn(), getStorageSync: vi.fn(), setStorageSync: vi.fn(), showToast: vi.fn(), pageScrollTo: vi.fn() };
 
 const { buildMonthDays } = await import("./index.ts");
 
@@ -82,6 +82,45 @@ describe("coach schedule home", () => {
     globalThis.wx.getStorageSync.mockReset().mockReturnValue("");
   });
 
+  it("keeps team selection within this account and club and accepts server permission corrections", async () => {
+    mocks.requireRole.mockReturnValue({role:"coach", userId:"coach-a", clubId:"club-a"});
+    globalThis.wx.getStorageSync.mockReturnValue(["revoked", "team-a"]);
+    mocks.getCoachHome.mockResolvedValue({...home, teamOptions:[{id:"team-a",name:"甲队"},{id:"team-b",name:"乙队"}], selectedTeamIds:["team-a"]});
+    const page=createPageInstance({date:"2026-08-13"}); await page.load();
+    expect(mocks.getCoachHome).toHaveBeenLastCalledWith({from:"2026-08-13",to:"2026-08-13",teamIds:["revoked","team-a"]});
+    expect(globalThis.wx.setStorageSync).toHaveBeenLastCalledWith(expect.stringContaining("coach-team-selection:club-a:coach-a"),["team-a"]);
+    mocks.getCoachHome.mockClear(); globalThis.wx.showToast.mockClear();
+    await page.selectTeam({currentTarget:{dataset:{id:"team-a"}}});
+    expect(mocks.getCoachHome).not.toHaveBeenCalled(); expect(globalThis.wx.showToast).toHaveBeenCalled();
+    await page.selectTeam({currentTarget:{dataset:{id:"team-b"}}});
+    expect(mocks.getCoachHome).toHaveBeenLastCalledWith(expect.objectContaining({teamIds:["team-a","team-b"]}));
+    mocks.requireRole.mockReturnValue({role:"coach",userId:"coach-b",clubId:"club-b"}); globalThis.wx.getStorageSync.mockReturnValue([]);
+    await page.load(); expect(mocks.getCoachHome).toHaveBeenLastCalledWith({from:"2026-08-13",to:"2026-08-13"});
+  });
+
+  it("keeps a cross-day assessment reachable without creating a fake deadline", async () => {
+    const task={eventId:"assessment-a",taskId:"assessment-a",templateId:"template-a",title:"月度测评",action:"assessment",periodLabel:"8月",eventType:"training",label:"继续录入"};
+    mocks.getCoachHome.mockResolvedValue({...home,events:[],tasks:[task]});
+    const page=createPageInstance({date:"2026-09-01"}); await page.load();
+    expect(page.data.hasTaskCards).toBe(true);expect(page.data.taskCards[0].hasDueAt).toBe(false);
+    page.openAssessmentTask({currentTarget:{dataset:{id:"assessment-a"}}});
+    expect(mocks.openPage).toHaveBeenCalledWith(expect.stringContaining("taskId=assessment-a&templateId=template-a"));
+    page.setData({date:"2026-10-01"}); await page.load(); expect(page.data.taskCards[0].taskId).toBe("assessment-a");
+  });
+
+  it("ignores stale schedule responses and ignores the blank cells in the month grid", async () => {
+    let resolve; mocks.getCoachHome.mockImplementationOnce(()=>new Promise(r=>{resolve=r;})).mockResolvedValue({...home,clubName:"新俱乐部"});
+    const page=createPageInstance(); const first=page.load();await page.load();resolve({...home,clubName:"旧俱乐部"});await first;
+    expect(page.data.clubName).toBe("新俱乐部");mocks.getCoachHome.mockClear();page.selectDay({currentTarget:{dataset:{date:"2026-08-empty-0"}}});expect(mocks.getCoachHome).not.toHaveBeenCalled();
+  });
+
+  it("shows named calendar blocks with stable deduplication, other type and overflow", () => {
+    const events=[home.events[0],home.events[0],{...home.events[0],id:"other",type:"other",title:"活动"},{...home.events[0],id:"third"}];
+    const day=buildMonthDays("2026-08","2026-08-13",events).find(item=>item.key==="2026-08-13");
+    expect(day.events).toHaveLength(2);expect(day.overflow).toBe(1);expect(day.events[0]).toMatchObject({title:"Ball-control session",typeLabel:"训练"});expect(day.events[1].typeLabel).toBe("其他");
+    expect(template).toContain("另有 {{item.overflow}} 项");expect(template).toContain("{{activity.title}}");
+  });
+
   it("shows the attendance capsule and weekly hero pills when the API provides them", async () => {
     mocks.getCoachHome.mockResolvedValue({
       ...home,
@@ -94,8 +133,8 @@ describe("coach schedule home", () => {
 
     expect(page.data.heroPills).toEqual([
       { value: "90%", label: "出席率", tone: "primary" },
-      { value: "4.5h", label: "本周训练", tone: "neutral" },
-      { value: "3节", label: "本周课次", tone: "neutral" },
+      { value: "4.5h", label: "本周安排时长", tone: "neutral" },
+      { value: "3节", label: "本周安排", tone: "neutral" },
     ]);
   });
 
@@ -233,12 +272,12 @@ describe("coach schedule home", () => {
     expect(stylesheet).toMatch(/\.c1-month-calendar__collapse\s*\{[^}]*width:\s*60rpx[^}]*height:\s*32rpx[^}]*border-radius:\s*16rpx/s);
     expect(stylesheet).toMatch(/\.c1-month-calendar__collapse-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx[^}]*line-height:\s*0/s);
     expect(template).not.toContain('>收起<image');
-    expect(stylesheet).toMatch(/\.c1-month-day__number\s*\{[^}]*width:\s*80rpx[^}]*height:\s*80rpx/s);
+    expect(stylesheet).toMatch(/\.c1-month-day__number\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(template).toContain('class="c1-month-calendar__legend"');
-    expect(template).toContain('绿色=训练');
-    expect(template).toContain('蓝色=比赛');
+    expect(template).toContain('蓝色=训练');
+    expect(template).toContain('红色=比赛');
     expect(stylesheet).toMatch(/\.c1-month-day__marker--match\s*\{[^}]*background:\s*#1976d2/s);
-    expect(stylesheet).toMatch(/\.c1-month-calendar__grid\s*\{[^}]*grid-auto-rows:\s*96rpx/s);
+    expect(stylesheet).toMatch(/\.c1-month-calendar__grid\s*\{[^}]*grid-auto-rows:\s*minmax\(154rpx, auto\)/s);
   });
 
   it("keeps the month date circle separate from markers and keeps the legend close to the grid", () => {
@@ -246,7 +285,7 @@ describe("coach schedule home", () => {
     const markers = stylesheet.match(/\.c1-month-day__markers\s*\{([^}]*)\}/)?.[1] ?? "";
     const legend = stylesheet.match(/\.c1-month-calendar__legend\s*\{([^}]*)\}/)?.[1] ?? "";
 
-    expect(grid).toContain("grid-auto-rows: 96rpx");
+    expect(grid).toContain("grid-auto-rows: minmax(154rpx, auto)");
     expect(markers).toContain("bottom: 0");
     expect(legend).toContain("margin-top: 8rpx");
   });
@@ -282,7 +321,7 @@ describe("coach schedule home", () => {
 
   it("keeps the all-teams context visible when the selected date has no events", () => {
     expect(template).toContain('wx:if="{{state !== \'loading\' && state !== \'error\'}}" class="c1-all-teams-context"');
-    expect(template).toContain("全部球队课程/比赛安排");
+    expect(template).toContain("所选队伍 · 日程安排");
     expect(template).not.toContain(">全部球队课程<");
     expect(template).not.toContain('class="c1-all-teams-context__copy"');
     expect(stylesheet).toMatch(/\.c1-all-teams-context\s*\{(?=[^}]*flex-direction:\s*row)(?=[^}]*height:\s*98rpx)/s);
@@ -290,7 +329,7 @@ describe("coach schedule home", () => {
 
   it("matches the C1 online hero and stats-row offsets without moving activity cards off their 22px rail", () => {
     expect(stylesheet).toMatch(/\.c1-nav\s*\{[^}]*padding:\s*0\s+32rpx/s);
-    expect(stylesheet).toMatch(/\.c1-body\s*\{[^}]*padding:\s*0\s+44rpx\s+calc\(148rpx\s*\+\s*env\(safe-area-inset-bottom\)\)/s);
+    expect(stylesheet).toMatch(/\.c1-body\s*\{[^}]*padding:\s*0\s+44rpx\s+24rpx/s);
     expect(stylesheet).toMatch(/\.c1-hero\s*\{[^}]*margin:\s*0\s+-12rpx/s);
     expect(stylesheet).toMatch(/\.c1-list\s*\{[^}]*margin-top:\s*24rpx/s);
   });
@@ -389,8 +428,8 @@ describe("coach schedule home", () => {
     await page.load();
 
     expect(page.data.visibleEvents).toEqual(expect.arrayContaining([
-      expect.objectContaining({ id: "event-training-1", typeLabel: "训练", typeTone: "training", cardTone: "training", typeColor: "#a80f1b" }),
-      expect.objectContaining({ id: "event-match-1", typeLabel: "比赛", typeTone: "match", cardTone: "match", typeColor: "#69a5ff" }),
+      expect.objectContaining({ id: "event-training-1", typeLabel: "训练", typeTone: "training", cardTone: "training", typeColor: "#397ac7" }),
+      expect.objectContaining({ id: "event-match-1", typeLabel: "比赛", typeTone: "match", cardTone: "match", typeColor: "#a80f1b" }),
     ]));
     expect(template).toContain('class="acard acard--{{item.cardTone}}"');
     expect(stylesheet).toContain(".acard--match");

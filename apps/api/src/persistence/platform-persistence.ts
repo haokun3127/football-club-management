@@ -1,3 +1,14 @@
+import { BackofficeManagementRepository } from "./backoffice-management-repository.js";
+import { SqliteScoutPlayerRepository } from "./scout-player-repository.js";
+import { BackofficeAuthRepository } from "./backoffice-auth-repository.js";
+import { SqliteTemporaryRosterRepository } from "./temporary-roster-repository.js";
+import type { IdentityKeyring } from "../application/scout-identity.js";
+import { SqliteStudentEvaluationRepository } from "./student-evaluation-repository.js";
+import { TrainingTemplateRepository } from "./training-template-repository.js";
+import { CoachAssignmentRepository } from "./coach-assignment-repository.js";
+import { openRuntimeDatabase } from "./runtime-database.js";
+import { SqliteTrainingRecordRepository } from "./training-record-repository.js";
+import type { RuntimeConfig } from "../runtime/environment.js";
 import type { DatabaseSync } from "node:sqlite";
 import { SqliteAssessmentWorkflowRepository } from "./assessment-workflow-repository.js";
 import { createSeedData, type SeedData } from "../seed.js";
@@ -25,6 +36,14 @@ import { TrainingSessionRepository } from "./training-session-repository.js";
 import { TrainingContentAssessmentRepository } from "./training-content-assessment-repository.js";
 
 export interface PlatformRepositories {
+  backofficeAuth: BackofficeAuthRepository;
+  backofficeManagement: BackofficeManagementRepository;
+  trainingTemplates: TrainingTemplateRepository;
+  coachAssignments: CoachAssignmentRepository;
+  scoutPlayers: SqliteScoutPlayerRepository;
+  temporaryRosters: SqliteTemporaryRosterRepository;
+  studentEvaluations: SqliteStudentEvaluationRepository;
+  trainingRecords: SqliteTrainingRecordRepository;
   assessmentWorkflow: SqliteAssessmentWorkflowRepository;
   appClientSessions: AppClientSessionRepository;
   assessments: AssessmentRepository;
@@ -52,8 +71,16 @@ export interface PlatformPersistence {
   repositories: PlatformRepositories;
 }
 
-export function createPlatformRepositories(database: DatabaseSync): PlatformRepositories {
+export function createPlatformRepositories(database: DatabaseSync, identityKeyring?: IdentityKeyring): PlatformRepositories {
   return {
+    backofficeAuth: new BackofficeAuthRepository(database),
+    backofficeManagement: new BackofficeManagementRepository(database),
+    trainingTemplates: new TrainingTemplateRepository(database),
+    coachAssignments:new CoachAssignmentRepository(database),
+    scoutPlayers: new SqliteScoutPlayerRepository(database, identityKeyring),
+    temporaryRosters: new SqliteTemporaryRosterRepository(database),
+    studentEvaluations: new SqliteStudentEvaluationRepository(database),
+    trainingRecords: new SqliteTrainingRecordRepository(database),
     assessmentWorkflow: new SqliteAssessmentWorkflowRepository(database),
     appClientSessions: new AppClientSessionRepository(database),
     assessments: new AssessmentRepository(database),
@@ -283,21 +310,30 @@ export async function seedPlatformData(repositories: PlatformRepositories, data:
 }
 
 export async function createPlatformPersistence(options: {
+  identityKeyring?: IdentityKeyring;
+  runtimeConfig?: RuntimeConfig;
   databasePath?: string;
   seed?: boolean;
   seedData?: SeedData;
 } = {}): Promise<PlatformPersistence> {
-  const database = openSqliteDatabase(options.databasePath);
-  migrate(database);
+  const database = options.runtimeConfig
+    ? openRuntimeDatabase(options.runtimeConfig)
+    : openSqliteDatabase(options.databasePath);
+  try {
+    migrate(database);
 
-  const repositories = createPlatformRepositories(database);
+    const repositories = createPlatformRepositories(database, options.identityKeyring);
 
-  if (options.seed ?? true) {
-    await seedPlatformData(repositories, options.seedData);
+    if (options.seed ?? !options.runtimeConfig) {
+      await seedPlatformData(repositories, options.seedData);
+    }
+
+    return {
+      database,
+      repositories,
+    };
+  } catch (error) {
+    database.close();
+    throw error;
   }
-
-  return {
-    database,
-    repositories,
-  };
 }

@@ -2,13 +2,13 @@
   "appid": "wx4c588cd106e520e0",
   "projectname": "miniprogram-cq-talent",
   "compileType": "miniprogram",
-  "libVersion": "3.17.0",
+  "libVersion": "3.17.3",
   "miniprogramRoot": "./",
   "setting": {
     "useCompilerPlugins": [
       "typescript"
     ],
-    "urlCheck": false,
+    "urlCheck": true,
     "es6": true,
     "enhance": true,
     "postcss": true,
@@ -35,9 +35,74 @@
   "simulatorPluginLibVersion": {},
   "packOptions": {
     "ignore": [
-      { "type": "file", "value": "assets/venues/venue-1.png" },
-      { "type": "file", "value": "assets/venues/venue-2.png" },
-      { "type": "file", "value": "assets/venues/venue-3.png" }
+      {
+        "type": "file",
+        "value": "utils/environment-isolation.test.mjs"
+      },
+      {
+        "type": "file",
+        "value": "assets/venues/venue-1.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/venues/venue-2.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/venues/venue-3.png"
+      },
+      {
+        "type": "folder",
+        "value": "scripts"
+      },
+      {
+        "type": "folder",
+        "value": "node_modules"
+      },
+      {
+        "type": "prefix",
+        "value": "\\var\\folders\\"
+      },
+      {
+        "type": "suffix",
+        "value": ".test.ts"
+      },
+      {
+        "type": "suffix",
+        "value": ".test.mjs"
+      },
+      {
+        "type": "suffix",
+        "value": ".mjs"
+      },
+      {
+        "type": "suffix",
+        "value": ".cjs"
+      },
+      {
+        "type": "suffix",
+        "value": ".py"
+      },
+      {
+        "type": "suffix",
+        "value": ".md"
+      },
+      {
+        "type": "suffix",
+        "value": ".tsbuildinfo"
+      },
+      {
+        "type": "file",
+        "value": "package.json"
+      },
+      {
+        "type": "file",
+        "value": "tsconfig.json"
+      },
+      {
+        "type": "file",
+        "value": "vitest.config.ts"
+      }
     ],
     "include": []
   },

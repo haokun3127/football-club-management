@@ -258,3 +258,6 @@
   font-weight: 700;
   line-height: 32rpx;
 }
+
+.match-meta { display: grid; grid-template-columns: 110rpx minmax(0,1fr); gap: 16rpx; font-size: 26rpx; line-height: 1.6; padding: 12rpx 0; color: #667085; }
+.match-meta text { color: #202124; word-break: break-all; }

@@ -67,13 +67,23 @@ export function childNames(event: ScheduleEvent) {
 }
 
 function dateParts(value?: string) {
-  const matched = String(value ?? "").match(/^(\d{4})-(\d{2})-(\d{2})/);
+  const matched = clubWallClock(value).match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (!matched) return null;
   return { year: Number(matched[1]), month: Number(matched[2]), day: Number(matched[3]) };
 }
 
 function timePart(value?: string) {
-  return String(value ?? "").match(/T(\d{2}):(\d{2})/)?.slice(1).join(":") ?? "";
+  return clubWallClock(value).match(/T(\d{2}):(\d{2})/)?.slice(1).join(":") ?? "";
+}
+
+/** Explicit instants use the club's UTC+8 timezone; date-only/local calendar values retain their meaning. */
+function clubWallClock(value?: string) {
+  if (!value) return "";
+  if (/T.*(?:Z|[+-]\d{2}:?\d{2})$/i.test(value)) {
+    const time = Date.parse(value);
+    return Number.isFinite(time) ? new Date(time + 8 * 3_600_000).toISOString() : "";
+  }
+  return value;
 }
 
 function weekday(year: number, month: number, day: number) {

@@ -57,6 +57,7 @@ export class CalendarRepository {
     const rows = this.database.prepare(`
       SELECT * FROM event_participants
       WHERE club_id = ?
+      AND NOT EXISTS (SELECT 1 FROM temporary_event_participants t WHERE t.club_id=event_participants.club_id AND t.event_id=event_participants.event_id AND t.student_id=event_participants.student_id AND t.active=0)
       ORDER BY event_id, student_id
     `).all(clubId) as SqlRow[];
 
@@ -72,6 +73,7 @@ export class CalendarRepository {
     const rows = this.database.prepare(`
       SELECT * FROM event_participants
       WHERE club_id = ? AND event_id = ?
+      AND NOT EXISTS (SELECT 1 FROM temporary_event_participants t WHERE t.club_id=event_participants.club_id AND t.event_id=event_participants.event_id AND t.student_id=event_participants.student_id AND t.active=0)
       ORDER BY student_id
     `).all(clubId, eventId) as SqlRow[];
 
@@ -82,6 +84,7 @@ export class CalendarRepository {
     const rows = this.database.prepare(`
       SELECT * FROM event_participants
       WHERE club_id = ? AND student_id = ?
+      AND NOT EXISTS (SELECT 1 FROM temporary_event_participants t WHERE t.club_id=event_participants.club_id AND t.event_id=event_participants.event_id AND t.student_id=event_participants.student_id AND t.active=0)
       ORDER BY event_id
     `).all(clubId, studentId) as SqlRow[];
 
@@ -99,8 +102,7 @@ export class CalendarRepository {
         updated_at = excluded.updated_at
     `).run(...eventParticipantValues(participant));
 
-    return this.listParticipantsForEvent(participant.clubId, participant.eventId)
-      .find((item) => item.studentId === participant.studentId)!;
+    return mapEventParticipant(this.database.prepare("SELECT * FROM event_participants WHERE club_id=? AND event_id=? AND student_id=?").get(participant.clubId,participant.eventId,participant.studentId)!);
   }
 
   insertParticipantIfAbsent(participant: EventParticipant): void {

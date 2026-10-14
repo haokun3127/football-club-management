@@ -2,9 +2,10 @@
 
 微信原生小程序 + TypeScript。当前覆盖家长与教练主流程、评测草稿、雷达下钻和微信登录绑定结构。
 
-## 当前运行基线（2026-08-03）
+## 当前运行基线（2026-09-22，仓库实现未部署）
 
-- 三种运行环境 `develop`、`trial`、`release` 当前统一请求 `https://cqtc.pomi.tech`；开发者工具中的小程序不再把 localhost 当作默认后端。
+- `develop` 请求 `https://cqtc.pomi.tech/__env/develop`，`trial` 请求 `https://cqtc.pomi.tech/__env/trial`，`release` 保留 `https://cqtc.pomi.tech`。未知环境直接失败，非生产入口不可用时不会回退生产。部署候选与后续验收见 [环境隔离](../../docs/current/miniprogram-environment-isolation.md)。
+- 上下文、会话、草稿按环境隔离，不导入旧的无环境缓存；首次使用新版本需重新登录。
 - `DEV_AUTO_SESSION = false`。角色不由 UI、`DEV_IDENTITY_ROLE` 或长按手势选择；微信手机号授权成功后，必须按 `wechat-login` 返回的真实 `role` 分流到家长或教练端。
 - `X-User-Id` 与 `DEV_USER_IDS` 仅保留给本地 API smoke/开发诊断。它们不能作为真实小程序登录、测试账号切换或视觉验收的凭据。
 - Windows 的 DevTools CLI 路径是 `D:\微信web开发者工具\cli.bat`；下方 macOS CLI 示例只适用于 macOS。
@@ -81,7 +82,7 @@ pnpm --filter @football-club/miniprogram-cq-talent typecheck
 pnpm --filter @football-club/miniprogram-cq-talent devtools:preview
 ```
 
-本地 API 启动后，可复跑 app-client BFF smoke：
+本地 `pnpm dev:api` 启动后，可复跑 app-client BFF 写入 smoke（仅 localhost develop；先校验 health 环境，禁止远程地址和重定向）：
 
 ```bash
 pnpm --filter @football-club/miniprogram-cq-talent smoke:app-client

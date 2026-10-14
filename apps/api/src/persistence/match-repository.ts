@@ -38,8 +38,8 @@ export class MatchRepository {
   insertMatchIfAbsent(match: Match): void {
     this.database.prepare(`
       INSERT INTO matches (
-        id, club_id, event_id, match_type, opponent_name, home_score, away_score, status, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        id, club_id, event_id, match_type, opponent_name, home_score, away_score, status, created_at, updated_at, age_group, competition_format, handbook_url
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO NOTHING
     `).run(...matchValues(match));
   }
@@ -47,10 +47,11 @@ export class MatchRepository {
   saveMatch(match: Match): void {
     this.database.prepare(`
       INSERT INTO matches (
-        id, club_id, event_id, match_type, opponent_name, home_score, away_score, status, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        id, club_id, event_id, match_type, opponent_name, home_score, away_score, status, created_at, updated_at, age_group, competition_format, handbook_url
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         match_type = excluded.match_type,
+        age_group = excluded.age_group, competition_format = excluded.competition_format, handbook_url = excluded.handbook_url,
         opponent_name = excluded.opponent_name,
         home_score = excluded.home_score,
         away_score = excluded.away_score,
@@ -136,6 +137,7 @@ function matchValues(match: Match): Array<string | number | null> {
     match.status,
     match.createdAt,
     match.updatedAt,
+    match.ageGroup ?? null, match.competitionFormat ?? null, match.handbookUrl ?? null,
   ];
 }
 
@@ -200,6 +202,7 @@ function mapMatch(row: SqlRow): Match {
     eventId: requiredString(row, "event_id"),
     matchType: requiredString(row, "match_type") as Match["matchType"],
     opponentName: optionalString(row, "opponent_name"),
+    ageGroup: optionalString(row, "age_group"), competitionFormat: optionalString(row, "competition_format"), handbookUrl: optionalString(row, "handbook_url"),
     homeScore: optionalNumber(row, "home_score"),
     awayScore: optionalNumber(row, "away_score"),
     status: requiredString(row, "status") as Match["status"],

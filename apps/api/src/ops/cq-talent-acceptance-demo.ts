@@ -20,6 +20,7 @@ export interface CqTalentAcceptanceDemoRollbackResult {
   deletedSessions: number;
   deletedTacticalBoards: number;
   deletedParticipants: number;
+  deletedTrainingRecords: number;
   deletedMetricRecords: number;
   deletedMatchEvents: number;
   deletedMatchRosters: number;
@@ -54,6 +55,7 @@ export function rollbackCqTalentAcceptanceDemo(database: DatabaseSync): CqTalent
   database.exec("BEGIN IMMEDIATE;");
   try {
     const deletedTacticalBoards = deleteForEvents(database, "tactical_boards", "event_id");
+    const deletedTrainingRecords = deleteForEvents(database, "training_records", "event_id");
     const deletedParticipants = deleteForEvents(database, "event_participants", "event_id");
     const deletedSessions = changeCount(database.prepare("DELETE FROM app_client_sessions WHERE club_id = ? AND app_client_id = ? AND user_id = ?").run(clubId, appClientId, acceptanceUserId).changes);
     const deletedMetricRecords = changeCount(database.prepare("DELETE FROM player_metric_records WHERE club_id = ? AND id LIKE ?").run(clubId, "metric-record-cq-talent-demo-%").changes);
@@ -73,6 +75,7 @@ export function rollbackCqTalentAcceptanceDemo(database: DatabaseSync): CqTalent
       deletedSessions,
       deletedTacticalBoards,
       deletedParticipants,
+      deletedTrainingRecords,
       deletedMetricRecords,
       deletedMatchEvents,
       deletedMatchRosters,
@@ -87,7 +90,7 @@ export function rollbackCqTalentAcceptanceDemo(database: DatabaseSync): CqTalent
   }
 }
 
-function deleteForEvents(database: DatabaseSync, table: "tactical_boards" | "event_participants" | "calendar_events", column: "event_id" | "id"): number {
+function deleteForEvents(database: DatabaseSync, table: "training_records" | "tactical_boards" | "event_participants" | "calendar_events", column: "event_id" | "id"): number {
   return changeCount(database.prepare(`DELETE FROM ${table} WHERE club_id = ? AND ${column} IN (?, ?, ?, ?, ?, ?)`).run(clubId, ...acceptanceDemoEventIds).changes);
 }
 

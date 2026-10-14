@@ -47,12 +47,12 @@ declare const wx: {
   getStorageInfoSync?: () => { keys: string[] };
   switchTab: (options: { url: string }) => void;
   navigateTo: (options: { url: string; success?: WechatCallback<unknown>; fail?: WechatCallback<{ errMsg: string }> }) => void;
-  redirectTo: (options: { url: string }) => void;
+  redirectTo: (options: { url: string; success?: WechatCallback<unknown>; fail?: WechatCallback<{ errMsg: string }> }) => void;
   navigateBack: (options?: { delta?: number }) => void;
   reLaunch: (options: { url: string; success?: WechatCallback<unknown>; fail?: WechatCallback<{ errMsg: string }> }) => void;
   showToast: (options: { title: string; icon?: "success" | "error" | "loading" | "none"; duration?: number }) => void;
   showModal: (options: { title: string; content: string; showCancel?: boolean; success?: WechatCallback<{ confirm: boolean }> }) => void;
-  showActionSheet: (options: { itemList: string[]; success?: WechatCallback<{ tapIndex: number }> }) => void;
+  showActionSheet: (options: { itemList: string[]; success?: WechatCallback<{ tapIndex: number }>; fail?: WechatCallback<{ errMsg: string }> }) => void;
   nextTick: (callback: () => void) => void;
   pageScrollTo: (options: { selector?: string; scrollTop?: number; duration?: number }) => void;
   setClipboardData: (options: { data: string; success?: WechatCallback<unknown>; fail?: WechatCallback<unknown> }) => void;

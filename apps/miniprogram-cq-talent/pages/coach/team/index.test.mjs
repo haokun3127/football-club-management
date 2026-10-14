@@ -49,6 +49,16 @@ describe("coach team detail", () => {
     mocks.navigateBack.mockReset();
   });
 
+  it("links the same formal event and preserves unrecorded versus zero scores", async () => {
+    mocks.getCoachTeam.mockResolvedValueOnce({ ...teamDetail, formalMatches: [
+      { eventId: "formal-1", title: "正式赛", startsAt: "2026-09-20T00:00:00Z", venue: "测试场", match: { opponentName: "测试队" } },
+      { eventId: "formal-2", title: "第二场", startsAt: "2026-09-21T00:00:00Z", venue: "测试场", match: { homeScore: 0, awayScore: 0 } },
+    ] });
+    const page = createPageInstance(); await page.load("team-1"); expect(mocks.getCoachTeam).toHaveBeenCalledWith("team-1");
+    expect(page.data.matches.map(item => item.score)).toEqual(["未记录比分", "0 : 0"]);
+    page.openMatch({ currentTarget: { dataset: { id: "formal-1" } } }); expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/match/index?id=formal-1");
+  });
+
   it("does not invent a team when the coach scope has no team", async () => {
     mocks.getCoachTeam.mockResolvedValueOnce({
       team: null,
@@ -108,7 +118,7 @@ describe("coach team detail", () => {
       { label: "累计训练", value: "3", valueClass: "" },
       { label: "出勤率", value: "95%", valueClass: "hero-stat__value--positive" },
     ]);
-    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/student-radar/index?student=student-1");
+    expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/student-radar/index?student=student-1&team=team-1");
     expect(mocks.openPage).toHaveBeenCalledTimes(1);
     expect(mocks.navigateBack).toHaveBeenCalledTimes(1);
   });

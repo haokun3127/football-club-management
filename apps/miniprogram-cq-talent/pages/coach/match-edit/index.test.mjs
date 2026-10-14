@@ -37,7 +37,7 @@ function createPageInstance(data = {}) {
 const detail = {
   event: { id: "event-match-1", type: "match", title: "周末友谊赛", status: "scheduled", teamName: "U11 精英队" },
   roster: [{ studentId: "student-1", name: "罗小明", status: "confirmed" }],
-  match: { id: "match-1", matchType: "friendly", status: "scheduled", opponentName: "山城青训", homeScore: 0, awayScore: 0 },
+  match: { id: "match-1", matchType: "league", status: "scheduled", opponentName: "山城青训", homeScore: 0, awayScore: 0 },
   events: [],
 };
 
@@ -62,7 +62,7 @@ describe("coach match editor", () => {
       opponentName: "山城青训",
       homeScore: "0",
       awayScore: "0",
-      matchType: "friendly",
+      matchType: "league",
       status: "scheduled",
     });
   });
@@ -83,7 +83,7 @@ describe("coach match editor", () => {
 
     expect(mocks.recordCoachMatch).toHaveBeenCalledWith(expect.objectContaining({
       eventId: "event-match-1",
-      matchType: "friendly",
+      matchType: "league",
       status: "completed",
       opponentName: "渝北青训",
       homeScore: 2,
@@ -91,6 +91,14 @@ describe("coach match editor", () => {
     }));
     expect(mocks.getCoachMatchDetail).toHaveBeenCalledTimes(2);
     expect(globalThis.wx.navigateBack).toHaveBeenCalledWith({ delta: 1 });
+  });
+
+  it("allows a completed formal match with both scores unrecorded", async () => {
+    const page = createPageInstance(); await page.onLoad({ eventId: "event-match-1" });
+    page.onStatusChange({ detail: { value: "completed" } }); page.onHomeScoreInput({ detail: { value: "" } }); page.onAwayScoreInput({ detail: { value: "" } });
+    mocks.getCoachMatchDetail.mockResolvedValueOnce({ ...detail, match: { ...detail.match, status: "completed", homeScore: undefined, awayScore: undefined } });
+    await page.save(); expect(mocks.recordCoachMatch).toHaveBeenCalledWith(expect.objectContaining({ status: "completed" }));
+    expect(mocks.recordCoachMatch.mock.calls[0][0]).not.toHaveProperty("homeScore"); expect(page.data.hasSaveError).toBe(false);
   });
 
   it("rejects incomplete completed scores without writing", async () => {

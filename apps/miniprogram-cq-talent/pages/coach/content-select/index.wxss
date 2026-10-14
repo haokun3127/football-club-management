@@ -519,3 +519,15 @@
   .select-bar { gap: 12rpx; padding-right: 24rpx; padding-left: 24rpx; }
   .select-bar__confirm { min-width: 150rpx; }
 }
+
+/* Retain the reviewed online catalog hierarchy; apply the approved C04 light palette. */
+.select-page { background:var(--club-page);color:var(--club-text); }
+.select-nav { background:var(--club-nav);padding-left:32rpx; }
+.select-nav__title { font-size:32rpx;line-height:48rpx;color:var(--club-text); }
+.select-page__body { padding-bottom:calc(180rpx + env(safe-area-inset-bottom)); }
+.search-bar { border-radius:20rpx;border:1rpx solid var(--club-line);background:#fff; }
+.select-bar { bottom:0;background:var(--club-nav);padding-bottom:calc(24rpx + env(safe-area-inset-bottom)); }
+.select-bar__confirm { background:var(--color-brand);border-radius:16rpx; }
+.select-bar__confirm--disabled { background:#e8d3d5;color:#715558; }
+.content-action-card, .project-card { border-color:var(--club-line);background:#fff; }
+.content-action-card--selected, .project-card--selected { border-color:var(--color-brand);background:var(--color-brand-soft); }

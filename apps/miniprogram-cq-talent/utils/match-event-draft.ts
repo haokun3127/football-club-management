@@ -1,4 +1,5 @@
-const MATCH_EVENT_DRAFT_PREFIX = "match-event-draft:v1";
+import { environmentStorageKey } from "./config";
+const MATCH_EVENT_DRAFT_PREFIX = environmentStorageKey("match-event-draft:v1");
 
 const MATCH_EVENT_TYPES = [
   "goal",

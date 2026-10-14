@@ -1,0 +1,49 @@
+<view class="home">
+  <app-header title="{{clubTitle}}" title-align="left" />
+  <view class="home-body">
+    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'empty' ? '等待开启成长旅程' : state === 'error' ? '暂时无法读取' : '读取球员档案'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <block wx:if="{{state === 'ready'}}">
+      <student-switcher wx:if="{{showChildren}}" students="{{children}}" selected-id="{{student.id}}" show-all="{{false}}" bindchange="switchChild" />
+      <swiper class="player-slides" indicator-dots indicator-color="rgba(168,15,27,0.18)" indicator-active-color="#A80F1B" autoplay="{{false}}">
+        <swiper-item>
+          <view class="player-card">
+            <view class="eyebrow">球员档案 / PLAYER PROFILE</view>
+            <view class="player-heading"><text class="player-name">{{student.name}}</text><button class="child-button" bindtap="toggleChildren">切换孩子</button></view>
+            <view class="player-team">{{teamLabel}}</view>
+            <view class="player-metrics">
+              <view><view class="metric-label">训练累计</view><view class="metric-value">{{trainingTotal}}<text class="metric-unit">次</text></view></view>
+              <view><view class="metric-label">成长里程碑</view><view class="metric-value">{{milestoneCount}}</view></view>
+            </view>
+            <view class="player-latest" bindtap="openGrowth"><text class="metric-label">最新成长</text><view>{{milestoneTitle}}</view></view>
+          </view>
+        </swiper-item>
+        <swiper-item>
+          <view class="player-card milestone-card" bindtap="openGrowth">
+            <view class="eyebrow">每一步，都算数 / YOUR JOURNEY</view>
+            <view class="milestone-title">{{milestoneTitle}}</view>
+            <view class="milestone-description">{{milestoneDescription}}</view>
+            <view class="milestone-link">查看成长记录</view>
+          </view>
+        </swiper-item>
+      </swiper>
+      <view class="club-banner" bindtap="openNews" role="button" aria-label="查看俱乐部动态">
+        <image class="club-banner-image" src="{{banner ? banner.imageUrl : '/assets/content/football-editorial.jpg'}}" mode="aspectFill" />
+        <view class="club-banner-copy"><view class="eyebrow">俱乐部动态</view><view class="club-banner-title"><view>把热爱</view><view>留在球场</view></view><view class="club-banner-subtitle">{{banner ? banner.name : news ? news.title : '了解我们的俱乐部'}}</view></view>
+      </view>
+      <view class="shortcut-heading"><text>常用功能</text><button class="text-button" bindtap="editShortcuts" disabled="{{!!contentMessage}}">调整入口</button></view>
+      <view wx:if="{{contentMessage}}" class="configuration-message">{{contentMessage}}</view>
+      <view class="shortcuts"><button wx:for="{{shortcuts}}" wx:key="key" class="shortcut" data-key="{{item.key}}" bindtap="openShortcut"><view class="shortcut-icon"><image src="/assets/icons/{{item.icon}}" mode="aspectFit" /></view><text>{{item.label}}</text></button></view>
+      <view wx:if="{{editingShortcuts}}" class="shortcut-editor">
+        <view class="editor-title">选择并排列四个入口</view>
+        <picker range="{{shortcutSlots}}" range-key="label" value="{{activeShortcutSlot}}" bindchange="selectShortcutSlot"><view class="slot-picker">调整第 {{activeShortcutSlot + 1}} 个：{{shortcutSlots[activeShortcutSlot].label}} · 点击切换位置</view></picker>
+        <view class="shortcut-choices"><button wx:for="{{shortcutOptions}}" wx:key="key" data-key="{{item.key}}" bindtap="chooseShortcut">{{item.label}}</button></view>
+        <view wx:if="{{shortcutMessage}}" class="configuration-message">{{shortcutMessage}}</view>
+        <view class="editor-actions"><button bindtap="cancelShortcuts">取消</button><button class="editor-save" bindtap="saveShortcuts">保存入口</button></view>
+      </view>
+      <view class="section-heading"><view>下一次训练</view><button class="text-button" bindtap="openSchedule">全部日程</button></view>
+      <view wx:if="{{nextEvent}}" class="next-event" bindtap="openNextEvent"><view class="next-event-title">{{nextEvent.title}}</view><view class="next-event-time">{{nextEventTime}}</view><view class="next-event-meta">{{nextEvent.teamName}} · {{nextEvent.venue || '场地待同步'}}</view></view>
+      <view wx:else class="next-event"><view class="next-event-title">下一次训练，敬请期待</view><view class="next-event-meta">有新安排时，可在日程中查看。</view></view>
+    </block>
+  </view>
+  <role-tabbar role="parent" active="home" />
+</view>

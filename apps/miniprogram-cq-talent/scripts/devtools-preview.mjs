@@ -3,13 +3,13 @@
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
+import { createRequire } from "node:module";
 
-const defaultCliPath = process.platform === "win32"
-  ? "D:\\微信web开发者工具\\cli.bat"
-  : "/Applications/wechatwebdevtools.app/Contents/MacOS/cli";
-const cliPath = process.env.WECHAT_DEVTOOLS_CLI ?? defaultCliPath;
+const require = createRequire(import.meta.url);
+const { resolveDevtoolsCli, readIdeHttpPort } = require("../../../scripts/devtools/automation-session.cjs");
+const cliPath = resolveDevtoolsCli();
 const projectPath = process.env.PROJECT_PATH ?? resolve(import.meta.dirname, "..");
-const port = process.env.DEVTOOLS_PORT;
+const port = process.env.DEVTOOLS_PORT ?? readIdeHttpPort();
 
 function main() {
   if (!existsSync(cliPath)) {
@@ -17,7 +17,7 @@ function main() {
   }
 
   const login = run(withPort(["islogin"]), "check DevTools login");
-  if (/"login"\s*:\s*false/.test(login)) {
+  if (!/"login"\s*:\s*true/.test(login)) {
     throw new Error("WeChat DevTools is not logged in. Log in to the IDE, then rerun this command.");
   }
   run(withPort(["open", "--project", projectPath]), "open mini-program project");

@@ -1,6 +1,7 @@
+import { environmentStorageKey } from "./config";
 import type { ReminderItem } from "./types";
 
-const READ_STORAGE_KEY = "cq-parent-reminder-read-ids";
+const READ_STORAGE_KEY = environmentStorageKey("cq-parent-reminder-read-ids");
 
 export function getReminderReadIds(): string[] {
   const raw = wx.getStorageSync(READ_STORAGE_KEY);

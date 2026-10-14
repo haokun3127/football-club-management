@@ -1,3 +1,4 @@
+import { coachTeamRole } from "../application/coach-scope.js";
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { assessmentWorkflow, AssessmentWorkflowError } from "../application/assessment-workflow.js";
 import type { AssessmentEntry } from "../application/assessment-workflow-types.js";
@@ -21,7 +22,7 @@ export async function registerAssessmentWorkflowRoutes(app: FastifyInstance, con
     const coach = context.store.listCoaches(clubId).find((c) => c.userId === (auth?.user.id ?? "user-coach-1"));
     const team = context.store.listTeams(clubId).find((t) => t.id === task.teamId && t.status === "active");
     const admin = !auth || auth.membership.roles.some((r) => ["owner", "admin"].includes(r));
-    if (!team || (!admin && (!coach || team.defaultCoachId !== coach.id)) || (studentId && !workflow.roster(task).includes(studentId))) { context.sendError(reply, 403, "forbidden", "任务或学员不在教练管理范围内"); return null; }
+    if (!team || (!admin && (!coach || !coachTeamRole(context.store,clubId,coach.id,team.id))) || (studentId && !workflow.roster(task).includes(studentId))) { context.sendError(reply, 403, "forbidden", "任务或学员不在教练管理范围内"); return null; }
     if (!workflow.available(task)) { context.sendError(reply, 409, "assessment_workflow_disabled", "评测发布流程暂未开放"); return null; }
     return { task, coachId: coach?.id };
   }
@@ -29,6 +30,10 @@ export async function registerAssessmentWorkflowRoutes(app: FastifyInstance, con
     if (error instanceof AssessmentWorkflowError) return context.sendError(reply, error.status, error.code, error.message);
     throw error;
   }
+  app.get<{ Params: Params }>(`${base}/courses`, {schema:workflowSchemas.summary}, async(request,reply)=>{
+    const access=await scope(request,reply);if(!access)return reply;
+    return {courses: access.coachId ? await workflow.courses(access.task,access.coachId) : []};
+  });
   app.get<{ Params: Params }>(`${base}/workflow`, { schema: workflowSchemas.summary }, async (request, reply) => {
     const access = await scope(request, reply); if (!access) return reply;
     try { return await workflow.summary(access.task); } catch (error) { return fail(reply, error); }

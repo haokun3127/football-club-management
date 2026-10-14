@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "学员雷达",
+  "navigationBarTitleText": "学员档案",
   "usingComponents": {
     "status-view": "/components/status-view/index",
     "radar-canvas": "/components/radar-canvas/index"

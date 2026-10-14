@@ -1,0 +1,5 @@
+CREATE TABLE club_branding (id TEXT NOT NULL, club_id TEXT NOT NULL REFERENCES clubs(id), data_json TEXT NOT NULL CHECK(json_valid(data_json)), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY(club_id,id));
+CREATE TABLE news_banners (id TEXT NOT NULL, club_id TEXT NOT NULL REFERENCES clubs(id), data_json TEXT NOT NULL CHECK(json_valid(data_json)), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY(club_id,id));
+CREATE TABLE share_templates (id TEXT NOT NULL, club_id TEXT NOT NULL REFERENCES clubs(id), data_json TEXT NOT NULL CHECK(json_valid(data_json)), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY(club_id,id));
+CREATE TABLE evaluation_phrases (id TEXT NOT NULL, club_id TEXT NOT NULL REFERENCES clubs(id), data_json TEXT NOT NULL CHECK(json_valid(data_json)), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY(club_id,id));
+CREATE TABLE optional_feature_catalog (id TEXT NOT NULL, club_id TEXT NOT NULL REFERENCES clubs(id), data_json TEXT NOT NULL CHECK(json_valid(data_json)), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY(club_id,id));

@@ -28,8 +28,11 @@
             <view class="match-edit-picker">{{statuses[statusIndex].label}}<text>›</text></view>
           </picker>
         </view>
+        <view class="match-edit-field"><view class="match-edit-field__label">组别（选填）</view><input class="match-edit-field__input" value="{{ageGroup}}" data-field="ageGroup" maxlength="60" bindinput="onMetadataInput" placeholder="例如 U10" /></view>
+        <view class="match-edit-field"><view class="match-edit-field__label">赛制（选填）</view><input class="match-edit-field__input" value="{{competitionFormat}}" data-field="competitionFormat" maxlength="100" bindinput="onMetadataInput" placeholder="填写本场实际赛制" /></view>
+        <view class="match-edit-field"><view class="match-edit-field__label">秩序册链接（选填）</view><input class="match-edit-field__input" value="{{handbookUrl}}" data-field="handbookUrl" maxlength="1000" bindinput="onMetadataInput" placeholder="HTTPS 链接" /></view>
         <view class="match-edit-field match-edit-field--score">
-          <view class="match-edit-field__label">比分</view>
+          <view class="match-edit-field__label">比分（选填，两侧同时填写）</view>
           <view class="match-edit-score">
             <input class="match-edit-score__input" type="number" value="{{homeScore}}" placeholder="主队" bindinput="onHomeScoreInput" />
             <view class="match-edit-score__colon">:</view>

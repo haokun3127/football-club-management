@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 
 const baseUrl = process.env.API_BASE_URL ?? "http://127.0.0.1:3000";
+const smokeTarget = new URL(baseUrl);
+if (smokeTarget.protocol !== "http:" || !["127.0.0.1", "localhost"].includes(smokeTarget.hostname)
+  || smokeTarget.username || smokeTarget.password || smokeTarget.pathname !== "/" || smokeTarget.search || smokeTarget.hash) {
+  throw new Error("Write smoke only supports an explicit localhost develop API");
+}
 const clubId = process.env.CLUB_ID ?? "club-chongqing-talent";
 const clientKey = process.env.CLIENT_KEY ?? "cq-talent-wechat-main";
 const expectedClientId = process.env.CLIENT_ID ?? "app-client-cq-talent-wechat-main";
@@ -262,6 +267,7 @@ async function expectAssessmentSubmit(clientId, eventId, studentId) {
 async function request(path, options = {}) {
   const headers = {
     "content-type": "application/json",
+    "x-miniprogram-env": "develop",
     "x-user-id": options.userId ?? parentUserId,
     "x-request-id": makeKey("req"),
   };
@@ -270,10 +276,14 @@ async function request(path, options = {}) {
   }
 
   const response = await fetch(`${baseUrl}${path}`, {
+    redirect: "error",
     method: options.method ?? "GET",
     headers,
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
+  if (response.headers.get("x-fcm-environment") !== "develop") {
+    throw new Error("Write smoke requires a verified develop API; refusing further requests");
+  }
   const text = await response.text();
   const data = parseBody(text);
   if (!response.ok) {

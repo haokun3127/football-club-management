@@ -1,3 +1,4 @@
+import {mapAssessmentValue,type AssessmentMappingVersion} from "./score-mapping.js";
 import type {
   AssessmentMetricBinding,
   AssessmentRawResult,
@@ -30,6 +31,9 @@ export interface AssessmentScoreInput {
 }
 
 export interface AssessmentRawResultInput {
+  eventId?: EntityId;
+  occurredAt?: string;
+  recordedAt?: string;
   testItemId: EntityId;
   metricId?: EntityId;
   value: MetricValue;
@@ -39,6 +43,7 @@ export interface AssessmentRawResultInput {
 }
 
 export interface RecordAssessmentInput {
+  allowPartialGraph?: boolean;
   clubId: EntityId;
   studentId: EntityId;
   templateId: EntityId;
@@ -61,6 +66,7 @@ export interface AssessmentStore {
 }
 
 export interface AssessmentCatalogLookup {
+  findScoreMapping?(clubId:EntityId,id:EntityId): AssessmentMappingVersion | null | Promise<AssessmentMappingVersion | null>;
   findTemplateById(clubId: EntityId, templateId: EntityId): Promise<AssessmentTemplate | null> | AssessmentTemplate | null;
   findTemplateVersion(
     clubId: EntityId,
@@ -127,20 +133,35 @@ export function createAssessmentService(dependencies: AssessmentServiceDependenc
       }
 
       const testItems = await dependencies.catalog.listAssessmentTestItems(input.clubId);
-      const rawScoreInputs = (input.rawResults ?? []).map((rawResult) => {
+      const rawScoreInputs = await Promise.all((input.rawResults ?? []).map(async (rawResult) => {
         const testItem = testItems.find((item) => item.id === rawResult.testItemId);
         if (!testItem) {
           throw new Error(`Assessment test item ${rawResult.testItemId} not found.`);
         }
 
+        const metricId = rawResult.metricId ?? testItem.metricId;
+        if (metricId !== testItem.metricId) throw new Error("Raw result metric does not match its project");
+        const binding=bindings.find(binding=>binding.role === "input" && binding.testItemId===testItem.id && binding.metricId===metricId);
+        let mapped:ReturnType<typeof mapAssessmentValue> | undefined;
+        if(binding?.scoreMappingVersionId || binding?.gradeMappingVersionId) {
+          const raw=binding.scoreMappingVersionId ? await dependencies.catalog.findScoreMapping?.(input.clubId,binding.scoreMappingVersionId) : null;
+          const grade=binding.gradeMappingVersionId ? await dependencies.catalog.findScoreMapping?.(input.clubId,binding.gradeMappingVersionId) : null;
+          if(!raw||!grade)throw new Error("Bound mapping version not found");
+          mapped=mapAssessmentValue(testItem,rawResult.value,raw,grade);
+          const metric=(await dependencies.catalog.listAbilityMetrics(input.clubId)).find(metric=>metric.id===binding.metricId);
+          const maximum=metric?.maxScore??(metric?.valueKind==="score_0_100"?100:metric?.valueKind==="rating_1_5"?5:undefined);
+          if(!metric||metric.metricKind!=="atomic"||!maximum||!Number.isFinite(maximum)||(metric.valueKind!=="score_0_100"&&metric.valueKind!=="rating_1_5"&&!(metric.valueKind==="measurement"&&metric.unit==="score"))||mapped.integerScore>maximum||(binding.maxScore!==undefined&&(!Number.isFinite(binding.maxScore)||binding.maxScore<=0||binding.maxScore>maximum||mapped.integerScore>binding.maxScore)))throw new Error("Mapped score requires a compatible declared score scale");
+        }
         return {
-          metricId: rawResult.metricId ?? testItem.metricId,
+          metricId,
           value: rawResult.value,
-          normalizedScore: rawResult.normalizedScore ?? getNumericMetricValue(rawResult.value) ?? undefined,
+          normalizedScore: mapped?.integerScore ?? rawResult.normalizedScore ?? getNumericMetricValue(rawResult.value) ?? undefined,
+          mapped,
           rawResult,
           comment: rawResult.comment ?? rawResult.note,
         };
-      });
+      }));
+      for (const score of input.scores ?? []) if(bindings.some(binding=>binding.metricId===score.metricId && (binding.scoreMappingVersionId || binding.gradeMappingVersionId)))throw new Error("Mapped projects require original raw measurements");
       const scoreInputs = [
         ...(input.scores ?? []).map((score) => ({ ...score, rawResult: undefined })),
         ...rawScoreInputs,
@@ -186,7 +207,11 @@ export function createAssessmentService(dependencies: AssessmentServiceDependenc
             metricId: scoreInput.metricId,
             value: scoreInput.value,
             recordedByCoachId: input.assessedByCoachId,
+            ...("mapped" in scoreInput && scoreInput.mapped ? {mapping:{...scoreInput.mapped,mappedAt:now}} : {}),
             note: scoreInput.rawResult.note,
+            eventId: scoreInput.rawResult.eventId,
+            occurredAt: scoreInput.rawResult.occurredAt,
+            recordedAt: scoreInput.rawResult.recordedAt,
             createdAt: now,
             updatedAt: now,
           };
@@ -200,7 +225,7 @@ export function createAssessmentService(dependencies: AssessmentServiceDependenc
           clubId: input.clubId,
           assessmentId: assessment.id,
           metricId: scoreInput.metricId,
-          value: scoreInput.value,
+          value: "mapped" in scoreInput && scoreInput.mapped ? {kind:"measurement",value:scoreInput.mapped.integerScore,unit:"score"} : scoreInput.value,
           normalizedScore: scoreInput.normalizedScore,
           rawResultId,
           comment: scoreInput.comment,
@@ -215,10 +240,10 @@ export function createAssessmentService(dependencies: AssessmentServiceDependenc
           clubId: input.clubId,
           studentId: input.studentId,
           metricId: scoreInput.metricId,
-          value: scoreInput.value,
+          value: score.value,
           source: "assessment",
-          occurredAt: assessedAt,
-          eventId: input.eventId,
+          occurredAt: scoreInput.rawResult?.occurredAt ?? assessedAt,
+          eventId: scoreInput.rawResult?.eventId ?? input.eventId,
           assessmentId: assessment.id,
           templateVersionId: templateVersion.id,
           rawResultId,
@@ -238,6 +263,7 @@ export function createAssessmentService(dependencies: AssessmentServiceDependenc
         }
 
         const computed = computeMetricGraph({
+          allowPartialInputs: input.allowPartialGraph,
           clubId: input.clubId,
           studentId: input.studentId,
           graphVersion,

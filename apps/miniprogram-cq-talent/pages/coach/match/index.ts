@@ -19,6 +19,9 @@ type TimelineItem = {
 type PeriodChip = { id: "first-half" | "second-half"; periodLabel: string; scoreLabel: string };
 
 interface MatchPageData {
+  canManageRoster: boolean;
+  rosterNames: string;
+  metadata: Array<{ label: string; value: string }>;
   state: LoadState;
   message: string;
   retryLabel: string;
@@ -52,6 +55,8 @@ Page<MatchPageData>({
     message: "正在读取比赛记录",
     retryLabel: "",
     eventId: "",
+    metadata: [],
+    canManageRoster: false, rosterNames: "",
     hasLoaded: false,
     eventTitle: "",
     teamName: "",
@@ -94,7 +99,9 @@ Page<MatchPageData>({
       ...emptyState("正在读取比赛记录"),
       state: "loading",
       eventId,
-      hasLoaded: false,
+      metadata: [],
+    canManageRoster: false, rosterNames: "",
+    hasLoaded: false,
     });
 
     try {
@@ -108,6 +115,7 @@ Page<MatchPageData>({
           state: "empty",
           eventId,
           eventTitle: detail.event.title,
+        canManageRoster: detail.canManageRoster === true, rosterNames: detail.roster.map(p => p.name || "学员").join("、"),
           hasLoaded: true,
         });
         return false;
@@ -126,6 +134,9 @@ Page<MatchPageData>({
         eventId,
         hasLoaded: true,
         eventTitle: detail.event.title,
+        metadata: [{ label: "时间", value: detail.event.startsAt ? new Date(Date.parse(detail.event.startsAt) + 8 * 3600000).toISOString().slice(0, 16).replace("T", " ") : "未配置" },
+          { label: "地点", value: detail.event.venue || "未配置" }, { label: "组别", value: detail.match.ageGroup || "未填写" },
+          { label: "赛制", value: detail.match.competitionFormat || "未填写" }, { label: "秩序册", value: detail.match.handbookUrl || "未提供" }],
         teamName,
         hasTeamName: Boolean(teamName),
         opponentName,
@@ -136,7 +147,7 @@ Page<MatchPageData>({
         hasMatchStatus: Boolean(matchStatus),
          hasMatch: true,
          canAddEvent: true,
-         canEditMatch: true,
+         canEditMatch: ["league", "cup"].includes(detail.match.matchType || ""),
         periodChips: toPeriodChips(),
         timeline,
         hasTimeline: timeline.length > 0,
@@ -169,6 +180,7 @@ Page<MatchPageData>({
     if (!this.data.eventId || !this.data.canAddEvent) return;
     openPage(`/pages/coach/match-event-add/index?eventId=${this.data.eventId}`);
   },
+  openTemporaryPlayers() { if(this.data.canManageRoster) openPage(`/pages/coach/scout/index?eventId=${encodeURIComponent(this.data.eventId)}`); },
   openMatchEdit() {
     if (!this.data.eventId || !this.data.canEditMatch) return;
     openPage(`/pages/coach/match-edit/index?eventId=${this.data.eventId}`);
@@ -185,6 +197,8 @@ function emptyState(message: string): Omit<MatchPageData, "state"> {
     message,
     retryLabel: "",
     eventId: "",
+    metadata: [],
+    canManageRoster: false, rosterNames: "",
     hasLoaded: false,
     eventTitle: "",
     teamName: "",

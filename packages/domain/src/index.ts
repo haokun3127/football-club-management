@@ -17,3 +17,5 @@ export * from "./teams.js";
 export * from "./training.js";
 export * from "./tactical-board.js";
 export { withScoreMaxima, scorePercent, overallScore } from "./score-display.js";
+
+export * from "./score-mapping.js";

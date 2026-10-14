@@ -49,7 +49,6 @@ export function validateTacticalBoardPlayers(players: TacticalBoardPlayer[], ros
     }
     if (!["starter", "substitute", "reserve"].includes(player.role)) errors.push(`invalid_role:${player.studentId}`);
   }
-  if (players.filter((player) => player.role === "starter").length > 11) errors.push("too_many_starters");
   return errors;
 }
 

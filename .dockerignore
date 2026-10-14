@@ -9,3 +9,6 @@ node_modules
 *.sqlite-*
 .env
 .env.*
+
+.playwright-cli
+output/playwright

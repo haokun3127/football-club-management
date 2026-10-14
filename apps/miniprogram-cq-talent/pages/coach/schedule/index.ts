@@ -1,3 +1,4 @@
+import { environmentStorageKey } from "../../../utils/config";
 import { getCoachHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { currentLocalDate } from "../../../utils/date";
@@ -7,6 +8,9 @@ import type { CoachHome, CoachTask, CoachTaskAction, LoadState, ScheduleEvent } 
 
 const WEEK_LABELS = ["日", "一", "二", "三", "四", "五", "六"];
 const initialDate = currentLocalDate();
+const loadVersions = new WeakMap<object, number>();
+const selectionOwners = new WeakMap<object, string>();
+const calendarTouches = new WeakMap<object, {x: number; y: number}>();
 
 type Filter = "all" | "training" | "match" | "pending";
 type ViewMode = "day" | "week" | "month";
@@ -20,6 +24,8 @@ export interface CoachMonthDayView {
   hasTraining: boolean;
   hasMatch: boolean;
   hasMultiple: boolean;
+  events: Array<{id: string; title: string; typeLabel: string; tone: string}>;
+  overflow: number;
 }
 
 type CoachEventView = ScheduleEvent & {
@@ -64,6 +70,12 @@ Page({
     state: "loading" as LoadState,
     message: "正在读取教练日程",
     home: null as CoachHome | null,
+    clubName: "俱乐部",
+    teamOptions: [] as Array<{id: string; name: string; selected: boolean}>,
+    selectedTeamIds: [] as string[],
+    allTeamsSelected: true,
+    hasTeamOptions:false,
+    taskCount:0,
     date: initialDate,
     selectedDate: initialDate,
     viewMode: "day" as ViewMode,
@@ -97,10 +109,21 @@ Page({
   async load() {
     const session = requireRole("coach");
     if (!session) return;
+    const version = (loadVersions.get(this) ?? 0) + 1; loadVersions.set(this, version);
     const range = resolveRange(this.data.date, this.data.viewMode);
+    const selectionKey = session.userId ? environmentStorageKey(`coach-team-selection:${session.clubId}:${session.userId}`) : null;
+    if (selectionKey && selectionOwners.get(this) !== selectionKey) {
+      selectionOwners.set(this, selectionKey); this.setData({selectedTeamIds: []});
+    }
+    let stored: unknown = [];
+    try { stored = selectionKey ? wx.getStorageSync<string[]>(selectionKey) : []; } catch { /* Selection remains usable without local storage. */ }
+    const selectedIds = this.data.selectedTeamIds.length ? this.data.selectedTeamIds : Array.isArray(stored) ? stored.filter((id) => typeof id === "string") : [];
     this.setData({ state: "loading", message: "正在读取教练日程" });
     try {
-      const home = await getCoachHome(range);
+      const home = await getCoachHome(selectedIds.length ? { ...range, teamIds: selectedIds } : range);
+      if (loadVersions.get(this) !== version) return;
+      const selectedTeamIds = home.selectedTeamIds ?? [];
+      if (selectionKey) { try { wx.setStorageSync(selectionKey, selectedTeamIds); } catch { /* Do not turn a cache failure into a schedule failure. */ } }
       const coachName = home.coachName?.trim() || "";
       const eventViews = home.events.map((event) => toCoachEventView(event));
       const taskCards = home.tasks.map(toCoachTaskView);
@@ -112,6 +135,11 @@ Page({
         state: hasWork ? "ready" : "empty",
         message: hasWork ? "" : "所选日期范围内没有日程或待处理任务",
         home,
+        clubName: home.clubName || "俱乐部",
+        selectedTeamIds,
+        hasTeamOptions:Boolean(home.teamOptions?.length),taskCount:taskCards.length,
+        teamOptions: (home.teamOptions ?? []).map((team) => ({ ...team, selected: selectedTeamIds.includes(team.id) })),
+        allTeamsSelected: selectedTeamIds.length === (home.teamOptions ?? []).length,
         selectedDate: this.data.date,
         dayStrip,
         collapsedDayStrip: dayStrip,
@@ -132,15 +160,33 @@ Page({
       });
       this.applyFilter();
     } catch {
+      if (loadVersions.get(this) !== version) return;
       this.setData({
         state: "error",
         message: "日程读取失败，请稍后重试",
         visibleEvents: [],
         hasVisibleEvents: false,
         taskCards: [],
-        hasTaskCards: false,
+        hasTaskCards: false,taskCount:0,
       });
     }
+  },
+  onUnload() { loadVersions.set(this, (loadVersions.get(this) ?? 0) + 1); },
+  selectTeam(event: {currentTarget: {dataset: {id?: string}}}) {
+    const id = event.currentTarget.dataset.id;
+    const options = this.data.teamOptions as Array<{id: string}>;
+    if (id === "all") { this.setData({selectedTeamIds: options.map((team) => team.id)}); return this.load(); }
+    if (!id || !options.some((team) => team.id === id)) return;
+    const selected = new Set<string>(this.data.selectedTeamIds);
+    if (selected.has(id)) { if (selected.size === 1) { wx.showToast({title:"至少选择一个队伍",icon:"none"}); return; } selected.delete(id); }
+    else selected.add(id);
+    this.setData({selectedTeamIds: [...selected]}); return this.load();
+  },
+  goToday() { this.setData({date: currentLocalDate(), viewMode:"day"}); return this.load(); },
+  showTasks() { wx.pageScrollTo({selector:"#coach-tasks",duration:200}); },
+  openAssessmentTask(event: {currentTarget: {dataset: {id?: string}}}) {
+    const task = (this.data.taskCards as CoachTask[]).find((item) => item.taskId === event.currentTarget.dataset.id);
+    if (task?.taskId && task.templateId) openPage(`/pages/coach/assessment-projects/index?taskId=${encodeURIComponent(task.taskId)}&templateId=${encodeURIComponent(task.templateId)}&title=${encodeURIComponent(task.title || "测评任务")}`);
   },
   onDateChange(event: { detail: { value: string } }) {
     this.setData({ date: event.detail.value });
@@ -148,9 +194,19 @@ Page({
   },
   selectDay(event: { currentTarget: { dataset: { date?: string } } }) {
     const date = event.currentTarget.dataset.date;
-    if (!date) return;
-    this.setData({ date, viewMode: "day" });
+    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+    this.setData({ date });
     this.load();
+  },
+  calendarTouchStart(event: {touches: Array<{clientX: number; clientY: number}>}) {
+    const touch = event.touches[0];
+    if (touch) calendarTouches.set(this, {x: touch.clientX, y: touch.clientY});
+  },
+  calendarTouchEnd(event: {changedTouches: Array<{clientX: number; clientY: number}>}) {
+    const start = calendarTouches.get(this); const end = event.changedTouches[0]; calendarTouches.delete(this);
+    if (!start || !end || Math.abs(end.clientX - start.x) > 40) return;
+    if (end.clientY - start.y > 60 && this.data.viewMode !== "month") return this.expandMonthPicker();
+    if (start.y - end.clientY > 60 && this.data.viewMode === "month") return this.collapseMonthPicker();
   },
   expandMonthPicker() {
     this.setData({ viewMode: "month", monthKey: this.data.date.slice(0, 7), monthLabel: formatMonthLabel(this.data.date.slice(0, 7)) });
@@ -238,7 +294,7 @@ function toCoachEventView(event: ScheduleEvent): CoachEventView {
     typeLabel: event.type === "training" ? "训练" : event.type === "match" ? "比赛" : "其他",
     typeTone: event.type === "training" ? "training" : event.type === "match" ? "match" : "other",
     cardTone: event.type === "training" ? "training" : event.type === "match" ? "match" : "other",
-    typeColor: event.type === "training" ? "#a80f1b" : event.type === "match" ? "#69a5ff" : "#6b7280",
+    typeColor: event.type === "training" ? "#397ac7" : event.type === "match" ? "#a80f1b" : "#328660",
     locationLabel,
     hasLocationDetail: Boolean(locationLabel),
     hasTeamName: Boolean(event.teamName),
@@ -269,8 +325,8 @@ function buildHeroPills(home: CoachHome): HeroPillView[] {
   if (stats.attendanceRate !== null && stats.attendanceRate !== undefined) {
     pills.push({ value: `${stats.attendanceRate}%`, label: "出席率", tone: "primary" });
   }
-  pills.push({ value: `${stats.hours}h`, label: "本周训练", tone: "neutral" });
-  pills.push({ value: `${stats.sessions}节`, label: "本周课次", tone: "neutral" });
+  pills.push({ value: `${stats.hours}h`, label: "本周安排时长", tone: "neutral" });
+  pills.push({ value: `${stats.sessions}节`, label: "本周安排", tone: "neutral" });
   return pills;
 }
 
@@ -334,13 +390,11 @@ export function buildMonthDays(monthKey: string, selectedDate: string, events: S
   const leadingDays = (first.getUTCDay() + 6) % 7;
   const daysInMonth = new Date(Date.UTC(Number(yearText), Number(monthText), 0)).getUTCDate();
   const cellCount = Math.ceil((leadingDays + daysInMonth) / 7) * 7;
-  const eventByDate = new Map<string, { training: boolean; match: boolean; count: number }>();
+  const eventByDate = new Map<string, ScheduleEvent[]>();
   events.forEach((event) => {
     const key = event.startsAt.slice(0, 10);
-    const current = eventByDate.get(key) ?? { training: false, match: false, count: 0 };
-    current.training = current.training || event.type === "training";
-    current.match = current.match || event.type === "match";
-    current.count += 1;
+    const current = eventByDate.get(key) ?? [];
+    if (!current.some((item) => item.id === event.id)) current.push(event);
     eventByDate.set(key, current);
   });
   const today = currentLocalDate();
@@ -356,21 +410,24 @@ export function buildMonthDays(monthKey: string, selectedDate: string, events: S
         hasTraining: false,
         hasMatch: false,
         hasMultiple: false,
+        events: [], overflow: 0,
       };
     }
     const date = new Date(first);
     date.setUTCDate(dayNumber);
     const key = date.toISOString().slice(0, 10);
-    const markers = eventByDate.get(key);
+    const markers = (eventByDate.get(key) ?? []).sort((a, b) => a.startsAt.localeCompare(b.startsAt) || a.id.localeCompare(b.id));
     return {
       key,
       dayNumber: String(date.getUTCDate()),
       isCurrentMonth: key.slice(0, 7) === monthKey,
       isToday: key === today,
       isSelected: key === selectedDate,
-      hasTraining: markers?.training ?? false,
-      hasMatch: markers?.match ?? false,
-      hasMultiple: (markers?.count ?? 0) > 1,
+      hasTraining: markers.some((event) => event.type === "training"),
+      hasMatch: markers.some((event) => event.type === "match"),
+      hasMultiple: markers.length > 1,
+      events: markers.slice(0, 2).map((event) => ({id: event.id, title: event.title, tone: event.type === "training" ? "training" : event.type === "match" ? "match" : "other", typeLabel: event.type === "training" ? "训练" : event.type === "match" ? "比赛" : "其他"})),
+      overflow: Math.max(0, markers.length - 2),
     };
   });
 }

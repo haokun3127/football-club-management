@@ -1,4 +1,14 @@
-import { randomUUID } from "node:crypto";
+import {clubPresentation} from './application/backoffice-content.js';
+import {AssessmentMappingRepository} from "./persistence/assessment-mapping-repository.js";
+import type {AssessmentMappingVersion} from "@football-club/domain";
+import { venueProjection, articleProjection, drillProjection } from "./application/backoffice-document-projections.js";
+import { resourceByKey } from "./application/backoffice-resources.js";
+import type { ScoutCreateInput, ScoutPlayerRepository } from "./application/scout-players.js";
+import { MemoryStudentEvaluationRepository, evaluationPhrases, type StudentEvaluationRepository } from "./application/student-evaluations.js";
+import { MemoryTrainingTemplateStore, trainingContentRevision, type ApplyTrainingContent, type TrainingTemplateStore } from "./application/training-templates.js";
+import { coachTeamRole } from "./application/coach-scope.js";
+import type { CoachAssignment } from "@football-club/domain";
+import { createHash, randomUUID } from "node:crypto";
 import { MemoryAssessmentWorkflowRepository, type AssessmentWorkflowRepository } from "./application/assessment-workflow-types.js";
 import {
   createAssessmentService,
@@ -126,8 +136,17 @@ import {
 } from "./integration/wps-webhook-security.js";
 import type { PlatformRepositories } from "./persistence/platform-persistence.js";
 import { createSeedData, type SeedData } from "./seed.js";
+import { MemoryTrainingRecordRepository, type TrainingRecordRepository } from "./application/training-records.js";
 
 export interface ApiStore {
+  readonly trainingTemplates: TrainingTemplateStore;
+  getTrainingSessionByEvent(clubId: string, eventId: string): TrainingSession | null;
+  applyTrainingContent(input: ApplyTrainingContent): Promise<boolean>;
+  readonly trainingRecords: TrainingRecordRepository;
+  readonly studentEvaluations: StudentEvaluationRepository;
+  readonly scoutPlayers: ScoutPlayerRepository | null;
+  readonly temporaryRosters: TemporaryRosterRepository | null;
+  createScoutPlayer(input: ScoutCreateInput): ReturnType<ScoutPlayerRepository["create"]>;
   readonly assessmentWorkflow: AssessmentWorkflowRepository;
   listStudents(clubId: EntityId): StudentProfile[];
   getHealth(): { status: "ok"; service: "@football-club/api" };
@@ -167,6 +186,9 @@ export interface ApiStore {
   getExternalSyncRunDetail(clubId: EntityId, syncRunId: EntityId): SyncRunDetail | null | Promise<SyncRunDetail | null>;
   listOperationalStudents(clubId: EntityId, filters?: StudentListFilters): StudentListItem[] | Promise<StudentListItem[]>;
   listCoaches(clubId: EntityId): CoachProfile[];
+  listCoachAssignments(clubId:string):CoachAssignment[];
+  saveCoachAssignment(value:CoachAssignment):CoachAssignment;
+  removeCoachAssignment(clubId:string,teamId:string,coachId:string):void;
   listTeams(clubId: EntityId): Team[];
   listTeamMembers(clubId: EntityId): TeamMember[];
   getOperationalStudentDetail(clubId: EntityId, studentId: EntityId): StudentDetail | null | Promise<StudentDetail | null>;
@@ -182,8 +204,10 @@ export interface ApiStore {
   listAssessmentTasks(clubId: EntityId): AssessmentTask[] | Promise<AssessmentTask[]>;
   saveAssessmentTask(task: AssessmentTask): AssessmentTask | Promise<AssessmentTask>;
   listPlayerAssessments(clubId: EntityId): PlayerAssessment[] | Promise<PlayerAssessment[]>;
+  listAssessmentRawResults(clubId: EntityId): AssessmentRawResult[];
   listTrainingContentAssessments(clubId: EntityId, eventId: EntityId): TrainingContentAssessment[] | Promise<TrainingContentAssessment[]>;
   saveTrainingContentAssessment(assessment: TrainingContentAssessment): TrainingContentAssessment | Promise<TrainingContentAssessment>;
+  listEvaluationPhrases(clubId: EntityId): Array<{ id: string; text: string }>;
   listContentArticles(clubId: EntityId): ContentArticle[] | Promise<ContentArticle[]>;
   listContentFaqs(clubId: EntityId): ContentFaq[] | Promise<ContentFaq[]>;
   listVenues(clubId: EntityId): VenueInfo[] | Promise<VenueInfo[]>;
@@ -209,10 +233,12 @@ export interface ApiStore {
   listMetricViewNodes(clubId: EntityId): MetricViewNode[];
   listAssessmentTemplates(clubId: EntityId): AssessmentTemplate[] | Promise<AssessmentTemplate[]>;
   listAssessmentTestItems(clubId: EntityId): AssessmentTestItem[] | Promise<AssessmentTestItem[]>;
+  findAssessmentMappingVersion?(clubId:EntityId,id:EntityId):AssessmentMappingVersion|null;
   listDevelopmentDimensions(clubId: EntityId): DevelopmentDimension[];
   listTrainingObjectives(clubId: EntityId): TrainingObjective[];
   listTrainingDrills(clubId: EntityId): TrainingDrill[];
   listSessionPlans(clubId: EntityId): SessionPlan[];
+  getTrainingSession(trainingSessionId: EntityId): TrainingSession | null;
   getSessionPlan(sessionPlanId: EntityId): SessionPlan | null;
   saveSessionPlan(sessionPlan: SessionPlan): SessionPlan;
   getStudentMetrics(clubId: EntityId, studentId: EntityId, source?: MetricSourceKind | MetricSourceKind[]): PlayerMetricRecord[];
@@ -312,8 +338,8 @@ function safeIdPart(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "external";
 }
 
-function buildStagedRawRecordId(tableKey: string, rowHash: string): EntityId {
-  return `external-raw-${safeIdPart(tableKey)}-${rowHash.slice(0, 16)}`;
+function buildStagedRawRecordId(clubId: string, connectionId: string, externalRecordId: string, rowHash: string): EntityId {
+  return `external-raw-${createHash("sha256").update(JSON.stringify([clubId,connectionId,externalRecordId,rowHash])).digest("hex")}`;
 }
 
 function normalizeExternalRawRecord(
@@ -649,8 +675,29 @@ function validateLessonAdjustment(input: LessonAdjustmentInput): void {
 }
 
 export abstract class SeedBackedStore implements ApiStore {
+  readonly trainingTemplates: TrainingTemplateStore = new MemoryTrainingTemplateStore();
+  async applyTrainingContent(input: ApplyTrainingContent): Promise<boolean> {
+    const event = this.getCalendarEvent(input.eventId);
+    const session = this.getTrainingSessionByEvent(input.clubId, input.eventId);
+    const plan = session?.sessionPlanId ? this.getSessionPlan(session.sessionPlanId) : null;
+    if (!event || event.clubId !== input.clubId || event.type !== "training" || event.status === "cancelled" || (input.operation !== "edit" && (event.status !== "scheduled" || Date.parse(event.timeRange.startsAt) <= Date.now())) || trainingContentRevision(event, session, plan) !== input.expectedRevision) return false;
+    this.saveSessionPlan({ ...input.plan, createdAt: plan?.id === input.plan.id ? plan.createdAt : input.plan.createdAt });
+    this.ensureTrainingSessionForEvent(input.clubId, input.eventId, { sessionPlanId: input.plan.id, kind: session?.kind || "team", intensity: input.intensity ?? session?.intensity });
+    return true;
+  }
+  readonly scoutPlayers: ScoutPlayerRepository | null = null;
+  readonly temporaryRosters: TemporaryRosterRepository | null = null;
+  async createScoutPlayer(input: ScoutCreateInput) {
+    if (!this.scoutPlayers) throw new Error("Scout persistence unavailable");
+    const result = await this.scoutPlayers.create(input);
+    upsertById(this.data.students, result.student);
+    return result;
+  }
+  readonly studentEvaluations: StudentEvaluationRepository = new MemoryStudentEvaluationRepository();
+  readonly trainingRecords: TrainingRecordRepository = new MemoryTrainingRecordRepository();
   readonly assessmentWorkflow: AssessmentWorkflowRepository = new MemoryAssessmentWorkflowRepository();
   protected readonly data: SeedData;
+  private coachAssignments: CoachAssignment[]=[];
   private readonly counters = new Map<string, number>();
   private readonly httpIdempotencyRecords = new Map<string, HttpIdempotencyRecord>();
   private readonly privacyAuditLogs: PrivacyAuditLog[] = [];
@@ -1008,7 +1055,7 @@ export abstract class SeedBackedStore implements ApiStore {
   }
 
   listAbilityMetrics(clubId: EntityId): AbilityMetric[] {
-    return withScoreMaxima(this.data.metrics.filter((item) => isCatalogVisibleToClub(item, clubId)), this.listDerivedMetricDefinitions(clubId), this.listMetricDependencies(clubId));
+    return withScoreMaxima(this.data.metrics.filter((item) => isCatalogVisibleToClub(item, clubId)), this.listDerivedMetricDefinitions(clubId), this.listMetricDependencies(clubId).filter(edge=>!edge.id.startsWith("reference-edge-")));
   }
 
   listMetricGraphVersions(clubId: EntityId): MetricGraphVersion[] {
@@ -1036,8 +1083,19 @@ export abstract class SeedBackedStore implements ApiStore {
   }
 
   listDerivedMetricDefinitions(clubId: EntityId): DerivedMetricDefinition[] {
-    return this.data.derivedMetricDefinitions.filter((item) => isCatalogVisibleToClub(item, clubId));
+    const draftGraphs=new Set(this.data.metricGraphVersions.filter(graph=>graph.status==="draft").map(graph=>graph.id));
+    const publishedFormulas=new Set(this.data.metricDependencies.filter(edge=>!draftGraphs.has(edge.graphVersionId)).map(edge=>edge.formulaId));
+    return this.data.derivedMetricDefinitions.filter((item) => isCatalogVisibleToClub(item, clubId) && (!item.id.startsWith("formula-model-version-") || publishedFormulas.has(item.id)));
   }
+
+  listCoachAssignments(clubId:string) { return this.coachAssignments.filter(item=>item.clubId===clubId).map(item=>({...item})); }
+  saveCoachAssignment(value:CoachAssignment) {
+    if(!value.teamId || value.eventId || !this.listTeams(value.clubId).some(t=>t.id===value.teamId) || !this.listCoaches(value.clubId).some(c=>c.id===value.coachId)) throw new Error("Invalid coach assignment scope");
+    const existing=this.coachAssignments.find(item=>item.clubId===value.clubId&&item.teamId===value.teamId&&item.coachId===value.coachId);
+    if(existing){existing.role=value.role;existing.updatedAt=value.updatedAt;return {...existing};}
+    this.coachAssignments.push({...value});return {...value};
+  }
+  removeCoachAssignment(clubId:string,teamId:string,coachId:string) {this.coachAssignments=this.coachAssignments.filter(item=>!(item.clubId===clubId&&item.teamId===teamId&&item.coachId===coachId));}
 
   listCoaches(clubId: EntityId): CoachProfile[] {
     return this.data.coaches.filter((item) => item.clubId === clubId);
@@ -1464,8 +1522,9 @@ export abstract class SeedBackedStore implements ApiStore {
     );
     const records = input.records.map((record) => {
       const { normalizedPreview, validationErrors } = normalizeExternalRawRecord(record.raw, fieldMappings);
-      const id = buildStagedRawRecordId(tableMapping.externalTableKey, record.rowHash);
-      const existing = this.data.externalRawRecords.find((item) => item.id === id);
+      const externalRecordId = record.externalRecordId ?? `${input.sourceName ?? tableMapping.externalTableKey}:row-${record.rowNumber}`;
+      const existing = this.data.externalRawRecords.find((item) => item.clubId === clubId && item.connectionId === input.connectionId && item.externalRecordId === externalRecordId && item.payloadHash === record.rowHash);
+      const id = existing?.id ?? buildStagedRawRecordId(clubId, input.connectionId, externalRecordId, record.rowHash);
 
       return upsertById<ExternalRawRecord>(this.data.externalRawRecords, {
         id,
@@ -1473,7 +1532,7 @@ export abstract class SeedBackedStore implements ApiStore {
         connectionId: input.connectionId,
         tableMappingId: input.tableMappingId,
         syncRunId,
-        externalRecordId: record.externalRecordId ?? `${input.sourceName ?? tableMapping.externalTableKey}:row-${record.rowNumber}`,
+        externalRecordId,
         payload: record.raw,
         payloadHash: record.rowHash,
         reviewStatus: existing?.reviewStatus ?? "pending",
@@ -1592,6 +1651,7 @@ export abstract class SeedBackedStore implements ApiStore {
       clubId: student.clubId,
       name: student.name,
       birthDate: student.birthDate,
+      dominantFoot: student.dominantFoot,
       gender: student.gender,
       currentLevel: student.currentLevel,
       operationalProfile: undefined,
@@ -1852,6 +1912,10 @@ export abstract class SeedBackedStore implements ApiStore {
     return upsertById(this.data.assessmentTasks, task);
   }
 
+  listAssessmentRawResults(clubId: EntityId): AssessmentRawResult[] {
+    return this.data.assessmentRawResults.filter(item => item.clubId === clubId);
+  }
+
   listPlayerAssessments(clubId: EntityId): PlayerAssessment[] | Promise<PlayerAssessment[]> {
     return this.data.playerAssessments.filter((item) => item.clubId === clubId);
   }
@@ -1865,6 +1929,8 @@ export abstract class SeedBackedStore implements ApiStore {
   saveTrainingContentAssessment(assessment: TrainingContentAssessment): TrainingContentAssessment | Promise<TrainingContentAssessment> {
     return upsertByTrainingContentAssessmentKey(this.data.trainingContentAssessments, assessment);
   }
+
+  listEvaluationPhrases(_clubId: EntityId) { return evaluationPhrases.map(phrase => ({ ...phrase })); }
 
   listContentArticles(clubId: EntityId): ContentArticle[] {
     return this.data.contentArticles.filter((item) => item.clubId === clubId);
@@ -2059,7 +2125,7 @@ export abstract class SeedBackedStore implements ApiStore {
     const coach = this.listCoaches(clubId).find((item) => item.userId === input.userId);
     const events = this.listCalendarEvents(clubId)
       .filter((event) => event.timeRange.startsAt.slice(0, 10) === input.date)
-      .filter((event) => isAdmin || (coach ? event.ownerCoachId === coach.id : false));
+      .filter((event) => isAdmin || (coach ? event.ownerCoachId === coach.id || Boolean(event.primaryTeamId && coachTeamRole(this,clubId,coach.id,event.primaryTeamId)) : false));
 
     return {
       clubId,
@@ -2122,24 +2188,9 @@ export abstract class SeedBackedStore implements ApiStore {
     eventId: EntityId,
     participants: Parameters<ReturnType<typeof createApiServices>["recordEventParticipants"]>[2],
   ) {
-    const result = this.activityServices.recordEventParticipants(clubId, eventId, participants);
-    for (const participant of result) {
-      if (participant.status !== "present" && participant.status !== "late") {
-        continue;
-      }
-
-      this.recordLessonAdjustment(clubId, participant.studentId, {
-        entryType: "debit",
-        lessonDelta: -1,
-        source: "attendance",
-        sourceId: `${eventId}-${participant.studentId}`,
-        eventId,
-        occurredAt: participant.updatedAt,
-        note: `Attendance ${participant.status}`,
-      });
-    }
-
-    return result;
+    // Attendance describes participation; financial lesson adjustments are an
+    // explicitly authorized backoffice operation, never an attendance side effect.
+    return this.activityServices.recordEventParticipants(clubId, eventId, participants);
   }
 
   checkScheduleConflicts(
@@ -2471,6 +2522,29 @@ export abstract class SeedBackedStore implements ApiStore {
 export class InMemoryStore extends SeedBackedStore {}
 
 export class PersistentApiStore extends SeedBackedStore {
+  override readonly trainingTemplates: TrainingTemplateStore;
+  override async applyTrainingContent(input: ApplyTrainingContent): Promise<boolean> {
+    const result = await this.repositories.matches.transaction(async () => {
+      const event = this.repositories.calendar.getEventById(input.eventId);
+      const session = this.repositories.trainingSessions.getByEvent(input.clubId, input.eventId);
+      const plan = session?.sessionPlanId ? this.repositories.sessionPlans.getById(input.clubId, session.sessionPlanId) : null;
+      if (!event || event.clubId !== input.clubId || event.type !== "training" || event.status === "cancelled" || (input.operation !== "edit" && (event.status !== "scheduled" || Date.parse(event.timeRange.startsAt) <= Date.now())) || trainingContentRevision(event, session, plan) !== input.expectedRevision) return null;
+      const savedPlan = this.repositories.sessionPlans.save({ ...input.plan, createdAt: plan?.id === input.plan.id ? plan.createdAt : input.plan.createdAt });
+      const savedSession = this.repositories.trainingSessions.save({ id: session?.id || `training-session-copy-${event.id}`, clubId: input.clubId, eventId: event.id, kind: session?.kind || "team", intensity: input.intensity ?? session?.intensity, sessionPlanId: savedPlan.id, createdAt: session?.createdAt || input.plan.createdAt, updatedAt: input.plan.updatedAt });
+      return { savedPlan, savedSession };
+    });
+    if (!result) return false;
+    upsertById(this.data.sessionPlans, result.savedPlan); upsertByTrainingEvent(this.data.trainingSessions, result.savedSession);
+    return true;
+  }
+
+  override listCoachAssignments(clubId:string) {return this.repositories.coachAssignments.list(clubId);}
+  override saveCoachAssignment(value:CoachAssignment) {return this.repositories.coachAssignments.save(value);}
+  override removeCoachAssignment(clubId:string,teamId:string,coachId:string) {this.repositories.coachAssignments.remove(clubId,teamId,coachId); }
+  override readonly scoutPlayers: ScoutPlayerRepository;
+  override readonly temporaryRosters: TemporaryRosterRepository;
+  override readonly studentEvaluations: StudentEvaluationRepository;
+  override readonly trainingRecords: TrainingRecordRepository;
   override readonly assessmentWorkflow: AssessmentWorkflowRepository;
   constructor(
     readonly repositories: PlatformRepositories,
@@ -2478,6 +2552,60 @@ export class PersistentApiStore extends SeedBackedStore {
   ) {
     super(mergePersistedTrainingSessionData(repositories, mergePersistedSessionPlanData(repositories, mergePersistedPlatformData(repositories, mergePersistedMatchData(repositories, mergePersistedAssessmentData(repositories, data))))));
     this.assessmentWorkflow = repositories.assessmentWorkflow;
+    for (const clubId of repositories.backofficeManagement.clubIds()) this.refreshBackofficeAssessmentCatalog(clubId);
+    this.trainingRecords = repositories.trainingRecords;
+    this.studentEvaluations = repositories.studentEvaluations;
+    this.scoutPlayers = repositories.scoutPlayers;
+    this.temporaryRosters = repositories.temporaryRosters;
+    this.trainingTemplates = repositories.trainingTemplates;
+  }
+
+  /** Publish database-backed projections only after the management transaction commits. */
+  refreshBackofficeAssessmentTasks(clubId:string):void {
+    this.data.assessmentTasks=[...this.data.assessmentTasks.filter(task=>task.clubId!==clubId),...this.repositories.assessmentTasks.listByClub(clubId)];
+  }
+  refreshBackofficeAssessmentCatalog(clubId:string):void {
+    const repository=this.repositories.dataCapability;
+    this.data.metrics=[...this.data.metrics.filter(item=>!isCatalogVisibleToClub(item,clubId)),...repository.listAbilityMetrics(clubId)];
+    this.data.derivedMetricDefinitions=[...this.data.derivedMetricDefinitions.filter(item=>!isCatalogVisibleToClub(item,clubId)),...repository.listDerivedMetricDefinitions(clubId)];
+    this.data.metricGraphVersions=[...this.data.metricGraphVersions.filter(item=>!isCatalogVisibleToClub(item,clubId)),...repository.listMetricGraphVersions(clubId)];
+    this.data.metricDependencies=[...this.data.metricDependencies.filter(item=>!isCatalogVisibleToClub(item,clubId)),...repository.listMetricDependencies(clubId)];
+    this.data.metricViews=[...this.data.metricViews.filter(item=>!isCatalogVisibleToClub(item,clubId)),...repository.listMetricViews(clubId)];
+    this.data.metricViewNodes=[...this.data.metricViewNodes.filter(item=>!isCatalogVisibleToClub(item,clubId)),...repository.listMetricViewNodes(clubId)];
+    this.data.assessmentTemplates=[...this.data.assessmentTemplates.filter(item=>!isCatalogVisibleToClub(item,clubId)),...repository.listAssessmentTemplates(clubId)];
+    this.data.assessmentTemplateVersions=[...this.data.assessmentTemplateVersions.filter(item=>item.clubId!==clubId),...repository.listAssessmentTemplateVersions(clubId)];
+    this.data.assessmentMetricBindings=[...this.data.assessmentMetricBindings.filter(item=>item.clubId!==clubId),...repository.listAssessmentMetricBindings(clubId)];
+    this.data.assessmentTestItems=[...this.data.assessmentTestItems.filter(item=>item.clubId!==clubId),...repository.listAssessmentTestItems(clubId)];
+  }
+  refreshBackofficeFacts(clubId: string): void {
+    this.refreshBackofficeAssessmentCatalog(clubId);
+    Object.assign(this.data, mergePersistedSessionPlanData(this.repositories, mergePersistedTrainingSessionData(this.repositories, mergePersistedMatchData(this.repositories, mergePersistedPlatformData(this.repositories, this.data,[clubId]),[clubId]),[clubId]),[clubId]));
+  }
+
+  override listVenues(clubId: EntityId): VenueInfo[] {
+    const rows = this.repositories.backofficeManagement.list(resourceByKey("venues")!, clubId);
+    const overridden = new Set(rows.map(row => row.id));
+    return [...super.listVenues(clubId).filter(item => !overridden.has(item.id)), ...rows.map(row => venueProjection(clubId,row))];
+  }
+
+  override listEvaluationPhrases(clubId: EntityId) {
+    const configured = this.repositories.backofficeManagement.list(resourceByKey("evaluation-phrases")!, clubId)
+      .filter(row => row.values.status === "active")
+      .map(row => ({ id: `configured:${row.id}`, text: String(row.values.text) }));
+    return [...super.listEvaluationPhrases(clubId), ...configured];
+  }
+
+  override listContentArticles(clubId: EntityId): ContentArticle[] {
+    const rows = this.repositories.backofficeManagement.list(resourceByKey("articles")!, clubId);
+    const overridden = new Set(rows.map(row => row.id));
+    const now = new Date().toISOString();
+    return [...super.listContentArticles(clubId).filter(item => !overridden.has(item.id)), ...rows.filter(row => row.values.status === "published" && Date.parse(String(row.values.publishedAt)) <= Date.parse(now) && (!row.values.expiresAt || Date.parse(String(row.values.expiresAt)) > Date.parse(now))).map(row => articleProjection(clubId,row))];
+  }
+
+  override listTrainingDrills(clubId: EntityId) {
+    const rows = this.repositories.backofficeManagement.list(resourceByKey("drills")!, clubId);
+    const overridden = new Set(rows.map(row => row.id));
+    return [...super.listTrainingDrills(clubId).filter(item => !overridden.has(item.id)), ...rows.map(row => drillProjection(clubId,row,super.listTrainingDrills(clubId).find(item=>item.id===row.id)))];
   }
 
   override listCalendarEvents(clubId: EntityId) {
@@ -2518,6 +2646,10 @@ export class PersistentApiStore extends SeedBackedStore {
     const saved = await super.saveAssessmentTask(task);
     await this.repositories.assessmentTasks.save(saved);
     return saved;
+  }
+
+  override listAssessmentRawResults(clubId: EntityId): AssessmentRawResult[] {
+    return this.repositories.assessments.listRawResults(clubId);
   }
 
   override async listPlayerAssessments(clubId: EntityId): Promise<PlayerAssessment[]> {
@@ -2569,6 +2701,7 @@ export class PersistentApiStore extends SeedBackedStore {
   }
 
   override listEventParticipants(clubId: EntityId) {
+    const inactive = new Set(this.temporaryRosters.inactiveIds(clubId));
     const persisted = this.repositories.calendar.listParticipants(clubId);
     const byKey = new Map(persisted.map((participant) => [participantKey(participant), participant]));
     for (const participant of this.data.participants.filter((item) => item.clubId === clubId)) {
@@ -2576,13 +2709,23 @@ export class PersistentApiStore extends SeedBackedStore {
         byKey.set(participantKey(participant), participant);
       }
     }
-    return [...byKey.values()];
+    return [...byKey.values()].filter(p => !inactive.has(p.id));
   }
 
   override getEventParticipant(eventParticipantId: EntityId) {
-    return this.repositories.calendar.getParticipantById(eventParticipantId)
+    const participant = this.repositories.calendar.getParticipantById(eventParticipantId)
       ?? this.data.participants.find((participant) => participant.id === eventParticipantId)
       ?? null;
+    return participant && !this.temporaryRosters.inactiveIds(participant.clubId).includes(participant.id) ? participant : null;
+  }
+
+  override getMatchDetailByEvent(clubId: EntityId, eventId: EntityId) {
+    const detail = super.getMatchDetailByEvent(clubId,eventId);
+    if (!detail) return null;
+    const removed = new Set(this.temporaryRosters.get(clubId,eventId).temporary.filter(p=>!p.active).map(p=>p.studentId));
+    const rosters = new Map(detail.rosters.map(r=>[r.id,r]));
+    for (const roster of this.repositories.matches.listRosters(clubId).filter(r=>r.matchId===detail.match.id)) rosters.set(roster.id,roster);
+    return { ...detail, rosters: [...rosters.values()].filter(r=>!removed.has(r.studentId)) };
   }
 
   override saveEventParticipant(eventParticipant: EventParticipant) {
@@ -2624,6 +2767,7 @@ export class PersistentApiStore extends SeedBackedStore {
       clock: { now: () => new Date().toISOString() },
       ids: { next: (prefix?: string) => this.nextId(prefix) },
       catalog: {
+        findScoreMapping:(clubId,id)=>this.findAssessmentMappingVersion(clubId,id),
         findTemplateById: (clubId, templateId) => this.data.assessmentTemplates.find((template) =>
           template.id === templateId && isCatalogVisibleToClub(template, clubId),
         ) ?? null,
@@ -2751,8 +2895,10 @@ export class PersistentApiStore extends SeedBackedStore {
   }
 
   override createPrivateLessonRequest(clubId: EntityId, studentId: EntityId, input: PrivateLessonRequestInput) {
-    const request = super.createPrivateLessonRequest(clubId, studentId, input);
+    if(!this.data.students.some(student=>student.clubId===clubId&&student.id===studentId))throw new Error("Student not found for club.");
+    const now=new Date().toISOString(),request:PrivateLessonRequest={id:`private-lesson-request-${randomUUID()}`,clubId,studentId,coachName:input.coachName,date:input.date,timeSlot:input.timeSlot,goals:[...input.goals],note:input.note,status:"pending",requestedByUserId:input.requestedByUserId,createdAt:now,updatedAt:now};
     this.repositories.dataCapability.savePrivateLessonRequest(request);
+    this.data.privateLessonRequests.push(request);
     return request;
   }
 
@@ -2791,12 +2937,15 @@ export class PersistentApiStore extends SeedBackedStore {
       return null;
     }
 
-    return buildClubCapabilities(
+    const capabilities = buildClubCapabilities(
       club,
       this.getDataCapabilityConfig(clubId),
       this.listExternalSyncRuns(clubId),
       client,
     );
+    const branding = clubPresentation(this,clubId).branding;
+    if(capabilities.client && branding) capabilities.client.theme={...capabilities.client.theme,...(branding.logoUrl?{logoUrl:branding.logoUrl}:{}),...(branding.primaryColor?{primaryColor:branding.primaryColor}:{})};
+    return capabilities;
   }
 
   override getDataCapabilityConfig(clubId: EntityId) {
@@ -2981,6 +3130,7 @@ export class PersistentApiStore extends SeedBackedStore {
     return this.repositories.dataCapability.listAssessmentTemplates(clubId);
   }
 
+  findAssessmentMappingVersion(clubId:EntityId,id:EntityId) { return new AssessmentMappingRepository(this.repositories.backofficeManagement.database).get(clubId,id); }
   override listAssessmentTestItems(clubId: EntityId) {
     return this.repositories.dataCapability.listAssessmentTestItems(clubId);
   }
@@ -3296,8 +3446,9 @@ export class PersistentApiStore extends SeedBackedStore {
     }).records;
     const fieldMappings = config.fieldMappings.filter((item) => item.tableMappingId === input.tableMappingId);
     const records = input.records.map((record) => {
-      const id = buildStagedRawRecordId(tableMapping.externalTableKey, record.rowHash);
-      const existing = existingRecords.find((item) => item.id === id);
+      const externalRecordId = record.externalRecordId ?? `${input.sourceName ?? tableMapping.externalTableKey}:row-${record.rowNumber}`;
+      const existing = existingRecords.find((item) => item.connectionId === input.connectionId && item.externalRecordId === externalRecordId && item.payloadHash === record.rowHash);
+      const id = existing?.id ?? buildStagedRawRecordId(clubId, input.connectionId, externalRecordId, record.rowHash);
       const { normalizedPreview, validationErrors } = normalizeExternalRawRecord(record.raw, fieldMappings);
 
       return {
@@ -3306,7 +3457,7 @@ export class PersistentApiStore extends SeedBackedStore {
         connectionId: input.connectionId,
         tableMappingId: input.tableMappingId,
         syncRunId: syncRun.id,
-        externalRecordId: record.externalRecordId ?? `${input.sourceName ?? tableMapping.externalTableKey}:row-${record.rowNumber}`,
+        externalRecordId,
         payload: record.raw,
         payloadHash: record.rowHash,
         reviewStatus: existing?.reviewStatus ?? "pending",
@@ -3422,8 +3573,8 @@ export class PersistentApiStore extends SeedBackedStore {
   }
 }
 
-function mergePersistedAssessmentData(repositories: PlatformRepositories, data: SeedData): SeedData {
-  const clubIds = data.clubs.map((club) => club.id);
+function mergePersistedAssessmentData(repositories: PlatformRepositories, data: SeedData, scopedClubIds?: string[]): SeedData {
+  const clubIds = scopedClubIds ?? [...new Set([...data.clubs.map((club) => club.id),...repositories.backofficeManagement.clubIds()])];
   return {
     ...data,
     playerAssessments: mergeById(
@@ -3457,8 +3608,8 @@ function mergePersistedAssessmentData(repositories: PlatformRepositories, data: 
   };
 }
 
-function mergePersistedSessionPlanData(repositories: PlatformRepositories, data: SeedData): SeedData {
-  const clubIds = data.clubs.map((club) => club.id);
+function mergePersistedSessionPlanData(repositories: PlatformRepositories, data: SeedData, scopedClubIds?: string[]): SeedData {
+  const clubIds = scopedClubIds ?? [...new Set([...data.clubs.map((club) => club.id),...repositories.backofficeManagement.clubIds()])];
   return {
     ...data,
     sessionPlans: mergeById(
@@ -3468,8 +3619,8 @@ function mergePersistedSessionPlanData(repositories: PlatformRepositories, data:
   };
 }
 
-function mergePersistedTrainingSessionData(repositories: PlatformRepositories, data: SeedData): SeedData {
-  const clubIds = data.clubs.map((club) => club.id);
+function mergePersistedTrainingSessionData(repositories: PlatformRepositories, data: SeedData, scopedClubIds?: string[]): SeedData {
+  const clubIds = scopedClubIds ?? [...new Set([...data.clubs.map((club) => club.id),...repositories.backofficeManagement.clubIds()])];
   return {
     ...data,
     trainingSessions: mergeByTrainingEvent(
@@ -3479,8 +3630,8 @@ function mergePersistedTrainingSessionData(repositories: PlatformRepositories, d
   };
 }
 
-function mergePersistedMatchData(repositories: PlatformRepositories, data: SeedData): SeedData {
-  const clubIds = data.clubs.map((club) => club.id);
+function mergePersistedMatchData(repositories: PlatformRepositories, data: SeedData, scopedClubIds?: string[]): SeedData {
+  const clubIds = scopedClubIds ?? [...new Set([...data.clubs.map((club) => club.id),...repositories.backofficeManagement.clubIds()])];
   return {
     ...data,
     matches: mergeById(data.matches, clubIds.flatMap((clubId) => repositories.matches.listMatches(clubId))),
@@ -3490,8 +3641,8 @@ function mergePersistedMatchData(repositories: PlatformRepositories, data: SeedD
   };
 }
 
-function mergePersistedPlatformData(repositories: PlatformRepositories, data: SeedData): SeedData {
-  const clubIds = data.clubs.map((club) => club.id);
+function mergePersistedPlatformData(repositories: PlatformRepositories, data: SeedData, scopedClubIds?: string[]): SeedData {
+  const clubIds = scopedClubIds ?? [...new Set([...data.clubs.map((club) => club.id),...repositories.backofficeManagement.clubIds()])];
   return {
     ...data,
     parents: mergeById(data.parents, clubIds.flatMap((clubId) => repositories.parents.listByClubSync(clubId))),
@@ -3797,3 +3948,4 @@ function nextDailyRunAt(schedule: Extract<ExternalSyncSchedule, { kind: "daily_t
 
   return candidate.toISOString();
 }
+import type { TemporaryRosterRepository } from "./application/temporary-rosters.js";

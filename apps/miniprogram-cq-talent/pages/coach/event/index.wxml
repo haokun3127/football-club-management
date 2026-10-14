@@ -1,54 +1,63 @@
-<view class="c2">
+<view class="c2 {{isTraining ? 'club-workbench' : ''}}">
   <view class="c2-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="c2-nav__left" bindtap="goBack">
       <image class="c2-nav__back" src="/assets/icons/chevron-left.svg" mode="aspectFit" />
       <view class="c2-nav__title">{{eventTypeLabel}}工作台</view>
     </view>
-    <view class="c2-nav__today">今日课程</view>
+    <view class="c2-nav__today">本次课程</view>
   </view>
   <view class="c2-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载活动' : state === 'empty' ? '暂无工作台数据' : '活动读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready'}}">
-      <view wx:if="{{eventView}}" class="shero">
-        <view class="shero__top"><view>{{eventView.heroDateLabel}}</view><view>重庆天才</view></view>
-        <view class="shero__main">
-          <view class="shero__big">{{eventView.startTime}}</view>
-          <view class="shero__title">{{eventView.title}}</view>
-        </view>
-        <view wx:if="{{eventView.heroMeta}}" class="shero__meta">{{eventView.heroMeta}}</view>
-        <view class="shero__pills">
-          <view wx:if="{{attendanceTotal > 0}}" class="shero__pill">出席 {{attendancePresent}}/{{attendanceTotal}} 人</view>
-        </view>
+      <view wx:if="{{eventView}}" class="course-info workbench-card">
+        <view class="section-title">{{eventView.title}}</view>
+        <view class="subtitle">{{eventView.timeLabel}} · {{eventView.venue}}</view>
+        <view wx:if="{{!canWrite}}" class="subtitle">课程已取消，不计训练记录</view>
+        <view class="training-card__edit">{{eventView.teamName}}</view>
       </view>
 
     <view wx:if="{{hasRoster}}" class="workbench-card">
       <view class="row">
-        <view class="section-title">出勤情况 {{attendancePresent}}/{{attendanceTotal}}</view>
-        <view class="subtitle">点击头像切换</view>
+        <view class="section-title">本课出勤 · {{attendancePresent}}/{{attendanceTotal}}</view>
+        <view wx:if="{{canManageRoster}}" class="training-card__edit" bindtap="openTemporaryPlayers">＋临时球员</view>
       </view>
       <view class="roster-grid">
         <view wx:for="{{rosterRows}}" wx:key="studentId" class="roster-person" data-index="{{index}}" bindtap="toggleAttendance">
           <view class="roster-avatar {{item.present ? 'roster-avatar--present' : 'roster-avatar--absent'}}">
-            <image wx:if="{{item.present}}" class="roster-avatar__check" src="/assets/icons/c4-1-check.svg" mode="aspectFit" />
+            <text wx:if="{{item.present}}" class="roster-avatar__check">✓</text>
             <view wx:else class="roster-avatar__initial">{{item.initial}}</view>
           </view>
           <view class="roster-name">{{item.displayName}}</view>
         </view>
       </view>
+      <view wx:if="{{isTraining}}" class="subtitle">课结束自动记录 · 请假例外 · 无需点名提交
+出勤记录与财务扣费分别处理</view>
+      <view class="attendance-links"><text bindtap="openAttendance">完整名单</text><text data-action="records" bindtap="openAction">修改历史</text></view>
       <view wx:if="{{attendanceSaving}}" class="subtitle">正在保存出勤...</view>
-      <view wx:if="{{attendanceError}}" class="attendance-error">{{attendanceError}}</view>
+      <view wx:if="{{attendanceError}}" class="attendance-error">{{attendanceError}}</view><button wx:if="{{attendanceNeedsRefresh}}" size="mini" bindtap="retry">刷新核对</button>
     </view>
 
-    <view wx:if="{{hasTraining}}" class="workbench-card" data-action="training" bindtap="openAction">
+    <view wx:if="{{hasTraining}}" class="workbench-card">
       <view class="row">
-        <view class="section-title">训练内容</view>
-        <view class="training-card__edit">编辑 ›</view>
+        <view class="section-title">本次训练内容 · {{contentCount}} 项</view>
+        <view wx:if="{{canEditTraining}}" class="training-card__edit" data-action="training" bindtap="openAction">编辑 ›</view>
       </view>
-      <view class="training-card__summary">{{trainingContentSummary}}</view>
+      <view wx:if="{{!hasConfiguredContent}}" class="training-card__summary">本堂课尚未添加训练内容</view>
+      <view wx:for="{{contentGroups}}" wx:key="id" class="training-content-group"><view class="training-content-group__title">{{item.label}}</view><view wx:for="{{item.items}}" wx:for-item="content" wx:key="id" class="training-content-item"><text>{{content.name}}</text><text class="training-content-item__minutes">{{content.minutesLabel}}</text></view></view>
+      <view wx:if="{{canEditTraining}}" class="training-tools"><button data-mode="templates" bindtap="openTransfer">套用模板</button><button data-mode="copy" bindtap="openTransfer">复制到其他课</button><button data-mode="save" bindtap="openTransfer">保存为模板</button></view>
+      <view wx:if="{{canWrite && hasConfiguredContent}}" class="training-card__edit" data-action="training-assessment" bindtap="openAction">课堂记录 →</view>
+      <view wx:if="{{contentMinutesLabel}}" class="training-content-total">{{contentMinutesLabel}}</view>
+      <button wx:if="{{hiddenContentCount}}" size="mini" class="training-content-expand" bindtap="toggleContent">{{contentExpanded ? '收起' : '展开全部'}}{{contentExpanded ? '' : ' · 另有 ' + hiddenContentCount + ' 项'}}</button>
     </view>
 
-    <view wx:if="{{hasActionCards}}" class="action-grid">
+    <view wx:if="{{isTraining}}" class="workbench-card course-assessment">
+      <view class="section-title">本课测评</view><view wx:if="{{courseTaskMessage}}" class="subtitle">{{courseTaskMessage}}</view>
+      <view wx:for="{{courseTasks}}" wx:key="id" class="course-task" data-id="{{item.id}}" bindtap="openCourseTask"><view>{{item.title}} · {{item.summary}}</view><view class="training-card__edit">继续录入 / 核对同步 →</view></view>
+      <view wx:if="{{canWrite}}" class="training-card__edit" bindtap="createAssessmentTask">＋发起随堂测评</view>
+    </view>
+    <view wx:if="{{hasActionCards && !isTraining}}" class="action-grid">
+      <view wx:if="{{canWrite && hasTraining}}" class="action-tile" bindtap="createAssessmentTask"><view class="action-tile__label">创建测评任务</view></view>
       <view wx:for="{{actionCards}}" wx:key="id" class="action-tile" data-action="{{item.id}}" bindtap="openAction">
         <view wx:if="{{item.glyph}}" class="action-tile__glyph">{{item.glyph}}</view>
         <image wx:else class="action-tile__icon" src="{{item.icon}}" mode="aspectFit" />
@@ -70,5 +79,17 @@
     </view>
     </block>
   </view>
-  <role-tabbar role="coach" active="schedule" />
+  <view wx:if="{{isTraining && !transferVisible && canEditTraining}}" class="course-footer"><button class="course-primary" data-action="change" bindtap="openAction">变更本次训练</button></view>
+  <role-tabbar wx:if="{{!isTraining && !transferVisible}}" role="coach" active="schedule" />
+  <view wx:if="{{transferVisible}}" class="transfer-mask"><view class="transfer-sheet"><view class="transfer-head"><text>{{transferMode === 'save' ? '保存个人模板' : transferMode === 'templates' ? '套用模板' : '复制课程内容'}}</text><button disabled="{{transferBusy}}" bindtap="closeTransfer">关闭</button></view>
+    <scroll-view scroll-y class="transfer-scroll">
+      <view class="transfer-hint">模板和复制均排除友谊赛内容及其记录。</view>
+      <view wx:if="{{transferMode === 'save'}}"><input class="transfer-input" value="{{templateTitle}}" bindinput="onTemplateTitle" placeholder="模板名称" maxlength="80" /><button class="transfer-primary" disabled="{{transferBusy}}" bindtap="saveTemplate">保存个人模板</button></view>
+      <block wx:if="{{transferMode === 'templates' && !transferPreview}}"><view wx:for="{{templates}}" wx:key="id" class="transfer-item" data-id="{{item.id}}" bindtap="selectTemplate"><view>{{item.title}} · {{item.visibility === 'club' ? '俱乐部' : '个人'}}</view><view class="transfer-hint">{{item.summary}}</view></view><view wx:if="{{!hasTemplates}}" class="transfer-hint">暂无可用模板</view></block>
+      <view wx:if="{{transferPreview}}"><view class="transfer-title">{{transferPreview.title}}</view><view class="transfer-hint">{{transferPreview.count}}项 · {{transferPreview.configuredMinutes}}分钟</view><view wx:for="{{transferPreview.items}}" wx:key="id" class="transfer-item">{{item.name}} · {{item.configuredMinutes}}分钟</view><view wx:for="{{transferPreview.excluded}}" wx:key="*this" class="transfer-hint">已排除：{{item}}</view>
+        <view wx:for="{{transferTargets}}" wx:key="eventId" class="transfer-target"><view class="transfer-title">{{item.title}}</view><view class="transfer-hint">{{item.dateLabel}}</view><view class="transfer-hint">已有内容：{{item.existingLabel}}</view><button disabled="{{transferBusy}}" class="{{item.action === 'replace' ? 'transfer-selected' : ''}}" data-id="{{item.eventId}}" bindtap="toggleTransferTarget">{{item.action === 'replace' ? '已选：替换此课内容' : '跳过此课 · 点击选择替换'}}</button></view>
+      </view>
+      <view class="transfer-message">{{transferMessage}}</view><view wx:for="{{transferResults}}" wx:key="eventId" class="transfer-item">{{item.title}} · {{item.label}}</view>
+      <button wx:if="{{transferPreview && hasTransferTargets}}" class="transfer-primary" disabled="{{transferBusy}}" bindtap="confirmTransfer">{{transferBusy ? '处理中…' : '确认保存所选课程'}}</button>
+    </scroll-view></view></view>
 </view>
