@@ -1,0 +1,33 @@
+name: Documentation governance
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - ".trellis/spec/**"
+      - "AGENTS.md"
+      - "PRODUCT.md"
+      - "README.md"
+      - "scripts/docs-governance*"
+      - ".github/workflows/docs-governance.yml"
+  push:
+    branches: [dev]
+    paths:
+      - "docs/**"
+      - ".trellis/spec/**"
+      - "AGENTS.md"
+      - "PRODUCT.md"
+      - "README.md"
+      - "scripts/docs-governance*"
+      - ".github/workflows/docs-governance.yml"
+permissions:
+  contents: read
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: node scripts/docs-governance.mjs --strict
+      - run: node --test scripts/docs-governance.test.mjs
