@@ -1,21 +1,12 @@
-# 当前交接与进度快照
+# Current handoff (verified snapshot, not production assertion)
 
-> Status: **Verified GitHub branch snapshot; production not live-verified** | Owner: **Maintainers** | Reviewed: 2026-10-14
+> Status: **Verified GitHub snapshot; runtime unverified** | 2026-10-14.
 
-## 已核验仓库状态（只读 GitHub）
+- Repository `haokun3127/football-club-management`；日常分支 `dev`，本轮治理基线 `1453e54af475f8ffb5ca55ccc441cc20ed02ce77`（2026-09-09）。
+- `master` 仍属旧代码基线；`docs/spec-consolidation-20261014` 是文档专用 Draft PR 分支，不代表合并、生产更新或 LocalHarness 同步。
+- [现行规范中心](../spec/README.md) 与 [Figma 在线画板登记](../spec/figma-current-registry.md) 是新任务入口。先现场核对当前节点。
+- [历史进度日志](../archive/2026-09-current-snapshots/progress-log.md)、[2026-09-08 交接](../../HANDOFF-GITHUB-2026-09-08.md)、[2026-09-07 测试数据修复](../archive/2026-09-current-snapshots/customer-test-data-repair-2026-09-07.md) 均为历史快照。
+- **当前请求**：梳理规范、修复引用和加入自动化检查。新一轮 UI/业务开发暂停，须另行授权。
+- **仍待现场验证**：LocalHarness SHA、微信 DevTools bundle 与真实登录截图、生产 API release 与 SQLite、最新 Figma 在线节点、CI 执行结果。
 
-- Repository: `haokun3127/football-club-management`；日常协作分支 `dev`；审计时 head `1453e54af475f8ffb5ca55ccc441cc20ed02ce77`，committer 时间 2026-09-09。
-- `master` 仍落在 2026-08-12 的旧基线，不可用于判断 9 月当前 UI/规范。
-- 2026-09-08 [交接快照](../../HANDOFF-GITHUB-2026-09-08.md) 的环境/测试数据状态属于当时事实，不能无验证外推至 2026-10-14。
-- 进度逐项原始记录保留在 [历史事件日志](../current/progress.md)，不再作为新会话的必读大文件。
-- 当前需求：先统一收敛文档规范；UI 开发和下一轮功能工作保持暂停，等待单独指令。
-
-## 未核验、必须重新检查
-
-- 本地 LocalHarness 工作树是否已同步至以上 head、微信开发者工具实际 bundle、生产 API 所在 SHA 和 SQLite 状态。
-- 现行在线 Figma 节点是否晚于 2026-09-03 台账；不能依据 8 月 93:* 旧节点直接断言视觉正确。
-- 文档治理 PR 的自动化检查/旧路径覆盖情况；此处不写“质量门禁已通过”。
-
-## 下一次更新格式
-
-仅追加最新**已验证**的分支 SHA、线上 deploy 版本、视觉通过页面及真实阻塞（含时间/证据）；详细执行记录留 Trellis task，旧快照转历史，不在此累积数十万字符过程日志。
+更新本文件只增加最新已核实事实的日期、SHA、验证方式和结论；执行过程留任务证据，禁止将数十万字符工作日志再追加到此文件。
