@@ -1,0 +1,277 @@
+{
+  "retrievedOn": "2026-10-14",
+  "entries": 46,
+  "failureCount": 0,
+  "changes": [
+    {
+      "slug": "framework-overview",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "quickstart-code",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "config-app-json",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "ref-app-config",
+      "htmlChanged": true,
+      "bodyChanged": true,
+      "error": null
+    },
+    {
+      "slug": "ref-page-config",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "ref-project-config",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "operating-mechanism",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "update-mechanism",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "release-latest-v3",
+      "htmlChanged": true,
+      "bodyChanged": true,
+      "error": null
+    },
+    {
+      "slug": "client-lib-version",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "subpackages-overview",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "subpackages-basic",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "subpackages-independent",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "subpackages-preload",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "subpackages-async",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "ability-storage",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "ability-network",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "ability-domain",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "ability-lazyload",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "privacy-overview",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "privacy-intro",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "privacy-authorize",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "open-login",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "open-getphonenumber",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "api-getSystemInfoSync",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "api-getWindowInfo",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "api-getDeviceInfo",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "api-getAppBaseInfo",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "subscribe-message",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "server-code2session",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "perf-tips",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "perf-start",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "perf-setdata",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "audits-overview",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "audits-best-practice",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "skyline-introduction",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "quickstart-release",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "product-ops-spec",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "product-reject",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "product-record-guidelines",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "security-basic",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "design-guide",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "design-accessibility",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "design-elderly",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    },
+    {
+      "slug": "design-adapt",
+      "htmlChanged": true,
+      "bodyChanged": false,
+      "error": null
+    }
+  ]
+}

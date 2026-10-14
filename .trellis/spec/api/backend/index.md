@@ -42,3 +42,19 @@ The goal is to help AI assistants and new team members understand how YOUR proje
 **Language**: All documentation should be written in **English**.
 
 - [Assessment publication](./assessment-publication.md): project drafts, revision checks, explicit publication, score scales and restart contracts.
+
+- [Runtime Environment Isolation](./environment-isolation.md): explicit startup environment, database ownership, Referer/declaration routing guard, separate deployment volumes and safe local smoke.
+- [Training Records and Corrections](./training-records.md): shared parent/coach training facts, optimistic corrections, history and financial separation.
+
+- [Coach Team Scope](./coach-team-scope.md): explicit collaboration and head-coach planning boundaries across BFF and legacy routes.
+- [Training Templates](./training-templates.md): authorized reusable snapshots, reviewed copy, capability-based exclusion and atomic target updates.
+- [Team Student Evaluations](./student-evaluations.md): per-team current communication, revision history, guardian reads and BFF/client integration.
+- [Scout Identities](./scout-identities.md): encrypted identity registration, natural retries, club isolation and coach library.
+- [Temporary Event Rosters](./temporary-rosters.md): direct authorized changes, atomic late participation, immutable facts and explicit measurement selection.
+- [Backoffice Authentication](./backoffice-authentication.md): browser origin/environment boundary, password sessions, private provisioning and scoped read catalogs.
+
+- [Backoffice Management](./backoffice-management.md): framework resource contracts, write revisions, grants, audit, shared facts and protected histories.
+
+- [Backoffice Integration](./backoffice-integration.md): versioned configuration, typed encrypted imports, snapshot BI, services/content and workbench.
+
+- [Public Presentation and Confirmed Child Results](./public-presentation-results.md): native configuration, scoped preferences and guardian-only raw/mapped confirmation readback.

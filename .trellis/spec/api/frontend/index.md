@@ -1,39 +1,14 @@
-# Frontend Development Guidelines
+# Backoffice Frontend Guidelines
 
-> Best practices for frontend development in this project.
+The browser management application lives in `apps/backoffice`, using React, Umi Max, Ant Design and ProComponents. Fastify serves its build under an environment-specific prefix. The original `apps/api/backoffice` client remains a compatibility fallback.
 
----
+- [Directory Structure](./directory-structure.md)
+- [Component Guidelines](./component-guidelines.md)
+- [State Management](./state-management.md)
+- [Quality Guidelines](./quality-guidelines.md)
+- [Type Safety](./type-safety.md)
+- [Backoffice Authentication](../backend/backoffice-authentication.md)
+- [Management Contracts](../backend/backoffice-management.md)
+- [Integration Contracts](../backend/backoffice-integration.md)
 
-## Overview
-
-This package currently has no browser frontend source. Treat this layer as inactive unless frontend code is added under `apps/api`.
-
----
-
-## Guidelines Index
-
-| Guide | Description | Status |
-|-------|-------------|--------|
-| [Directory Structure](./directory-structure.md) | Module organization and file layout | Inactive |
-| [Component Guidelines](./component-guidelines.md) | Component patterns, props, composition | Inactive |
-| [Hook Guidelines](./hook-guidelines.md) | Custom hooks, data fetching patterns | Inactive |
-| [State Management](./state-management.md) | Local state, global state, server state | Inactive |
-| [Quality Guidelines](./quality-guidelines.md) | Code standards, forbidden patterns | Inactive |
-| [Type Safety](./type-safety.md) | Type patterns, validation | Inactive |
-
----
-
-## How to Fill These Guidelines
-
-For each guideline file:
-
-1. Document your project's **actual conventions** (not ideals)
-2. Include **code examples** from your codebase
-3. List **forbidden patterns** and why
-4. Add **common mistakes** your team has made
-
-The goal is to help AI assistants and new team members understand how YOUR project works.
-
----
-
-**Language**: All documentation should be written in **English**.
+Read each relevant guide before changing the browser application. Quality gate: backoffice typecheck/test/build, affected API tests, rendered browser verification, and root `check:delivery` for changes crossing application boundaries.

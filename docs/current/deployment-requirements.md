@@ -2,7 +2,11 @@
 
 本文档用于第一个小程序前端进场前的后端部署准入。目标是确保 API 可启动、可迁移、可健康检查，并能支撑约 500 日常用户的早期内测。
 
-## 当前域名与认证安全基线（2026-08-12）
+## 环境隔离仓库基线（2026-09-22，未部署）
+
+`develop` / `trial` 使用独立路径、API 和数据卷；`release` 保留既有基址。启动及迁移必须显式指定环境并验证数据库归属；旧体验/审核来源将被正式服务拒绝。详见 [环境隔离实现与部署候选](miniprogram-environment-isolation.md)。本次没有改变线上数据或发布状态，下述同域根路径描述仅为历史事实。
+
+## 历史域名与认证安全基线（2026-08-12）
 
 - 小程序 API 基址为 `https://cqtc.pomi.tech`，不再使用裸 IP；`develop`、`trial`、`release` 三个运行环境均使用该 HTTPS 域名。
 - 域名配置写入客户端不等于部署验收完成。发布前仍须分别确认 DNS 解析、TLS 证书及续期、反向代理到 API、健康检查、微信公众平台 request 合法域名和真机实际请求。
@@ -60,7 +64,8 @@ pnpm install --frozen-lockfile
 
 | 变量 | 必填 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| `DATABASE_URL` | 是 | `apps/api/data/dev.sqlite` | SQLite 数据库文件路径。生产/内测应使用明确的持久化路径。 |
+| `FCM_RUNTIME_ENV` | 是 | 无 | develop / trial / release；不得缺省或用 NODE_ENV 替代。 |
+| `DATABASE_URL` | 是 | 无 | 绝对 SQLite 路径；非生产必须为专用 cq-talent-<env>/api.sqlite，且已有库归属匹配。 |
 | `PORT` | 否 | `3000` | API 监听端口。 |
 | `HOST` | 否 | `127.0.0.1` | API 监听地址；容器或反向代理环境按部署拓扑设置。 |
 | `WECHAT_MINIPROGRAM_APP_ID` / `WECHAT_MINIPROGRAM_APP_SECRET` | 正式微信登录需要 | — | 仅保存在服务器私有运行时环境。 |
@@ -83,8 +88,9 @@ SQLite 文件所在目录必须满足：
 pnpm install --frozen-lockfile
 pnpm check
 pnpm build
-DATABASE_URL=/path/to/app.sqlite pnpm --filter @football-club/api db:migrate
-DATABASE_URL=/path/to/app.sqlite PORT=3000 HOST=127.0.0.1 pnpm --filter @football-club/api start
+# 仅在获部署授权且配置 FCM_RUNTIME_ENV、DATABASE_URL、WECHAT_MINIPROGRAM_APP_ID 后执行：
+pnpm --filter @football-club/api db:migrate
+pnpm --filter @football-club/api start
 curl -fsS http://127.0.0.1:3000/health
 ```
 

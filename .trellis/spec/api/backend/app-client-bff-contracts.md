@@ -1320,3 +1320,37 @@ const radars = await Promise.all(students.map((student) => getCoachStudentRadar(
 const overview = await getCoachTeamAbilityOverview(teamId);
 const scoreByStudentId = new Map(overview.students.map((student) => [student.studentId, student.overall]));
 ```
+
+## Teaching profile and formal team matches
+
+- The coach student radar response additionally contains a teaching-only `profile`: basic whitelisted fields, authorized-team participation, effective training records and redacted source history. Never spread `StudentDetail`, contacts, operational notes or the lesson ledger into this projection.
+- Attendance (`present` plus `late`) and effective training records are independent counts. Module course counts and configured minutes describe attended courses' plans, not drill completion or actual practice time. Missing friendly-game or target data is null, not an invented zero/list.
+- The client preserves configured ability dimensions, explicit missing values and server overall scores. Do not truncate to six example axes or calculate a fallback overall average.
+- Team formal matches are the same calendar/match entities, filtered to league/cup. Friendly/internal games are excluded. Both scores may be missing even after completion; a recorded 0:0 remains a real result. Require a paired score if supplied, an opponent and configured event venue for formal match updates.
+- Match metadata (`ageGroup`, `competitionFormat`, `handbookUrl`) persists through migration 0024. App-client and legacy match writes must enforce event scope and cannot redirect a supplied match ID to another event.
+
+
+## Confirmed raw student results (C31, 2026-10-05)
+
+### 1. Scope / trigger
+Coach teaching profile now exposes confirmed raw values independently from computed radar scores.
+
+### 2. Signatures
+`GET /clubs/:clubId/app-clients/:clientId/coach/students/:studentId/radar` adds `confirmedResults: [{id,assessmentId,taskId,testItemId,metricId,name,value,unit,templateVersionId,eventId,occurredAt,recordedAt}]`. Nullable scope/version fields remain null. `ApiStore.listAssessmentRawResults(clubId)` reads existing facts; no new migration or write on this projection.
+
+### 3. Contracts
+Current active authorized team membership gates the profile. Result visibility additionally requires a task team, or a legacy event primary team, in the same authorized set. Unscoped historical rows are retained in storage but not given invented team associations. Working-state publication pointers select the current confirmation; otherwise use the latest persisted assessment per task. Superseded publications are revisions, not additional attempts. Draft work never replaces the previous confirmation. Whitelist the output; raw notes and recorder identity are not exposed. Names/metadata currently use the referenced test-item catalog; this is not a historical catalog snapshot guarantee.
+
+Mini-program retains raw precision and zero. Compare only matching test item, version, value kind and unit; missing version/non-numeric rows use a list. The chart shows three recent points, with complete dated history below; fixed sample scales/direction claims are forbidden. Summary counts unique task IDs, falling back to assessment IDs for legacy non-task rows. Missing response field means unsupported service, not a zero-count result.
+
+### 4. Validation / error matrix
+Existing session/role/student scope errors remain 401/403; absent profile is404. Authorized empty facts return[]; unsupported older BFF produces a client error. Cross-team raw facts produce no projected rows. Stale/unloaded page requests do not update UI or navigate.
+
+### 5. Good / base / bad
+Good: retain old published raw values during a revision draft, then replace that attempt after confirmation. Base: zero seconds/count remains a real raw value. Bad: treat every historical publication as another test, assign an old unscoped row a team, or use converted radar scores as raw seconds.
+
+### 6. Tests required
+`assessment-workflow.test.ts` asserts current publication IDs/counts, draft retention, republish replacement, unrelated-team exclusion and no raw recorder fields. `student-results/index.test.mjs` covers precision, zero, missing versions, all historical rows, stale callbacks, unsupported/empty and all teammate picker pages. `student-radar/index.test.mjs` covers exact student/team drilldown and counts. Native `verify-c31-design.cjs` and `verify-c11-design.cjs` validate synthetic rendering/navigation only.
+
+### 7. Wrong / correct
+Wrong: `publishedAssessments.length` as attempt count or `latestRadar.value` as20m time. Correct: project the current confirmed assessment's raw results, count unique task/legacy assessment IDs, and preserve units/provenance without inventing comparisons.
