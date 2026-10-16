@@ -1,14 +1,16 @@
 # Figma 权威来源
 
-> 最后更新：2026-09-03
+> 最后更新：2026-10-17
 
-## 唯一设计基准
+## 唯一设计基准（2026-10-17 收敛）
 
 后续查看、审计、修改和验收重庆天才小程序设计时，唯一权威来源是以下在线 Figma 文件：
 
-https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/
+文件 Key：`EyQtDtILGDZDf6neLBL6vs`（画板目录见 `.trellis/tasks/09-23-three-role-prototype-ui-review/screen-catalog.md`：家长 P01–P31、教练 C01–C33）。
 
-文件 Key：`zZ6wKyOHKcO4UYXDd9jGwv`
+自 2026-10-17 起，旧文件 `zZ6wKyOHKcO4UYXDd9jGwv`（含 `ATlfBRO0ruOCDDY5ICagFD`）降级为历史参考：其中的 V3–V7 节点记录仅用于历史审计与决策溯源，不再作为新实现、视觉验收或 Figma 操作的依据。来自不同设计文件的节点 ID 不得互相继承。
+
+以下历史章节为旧文件时代的决策与证据留档，其"唯一权威"表述已被本节取代。
 
 ## 2026-09-01 Current Product V3 页面（后续实施入口）
 
