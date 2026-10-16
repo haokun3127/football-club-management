@@ -1,4 +1,4 @@
-<cover-view class="tabbar tabbar--{{role}} {{flow ? 'tabbar--flow' : ''}}">
+<cover-view class="tabbar tabbar--{{role}} {{flow ? 'tabbar--flow' : ''}} {{theme === 'dark' ? 'tabbar--dark' : ''}}">
   <cover-view
     wx:for="{{items}}"
     wx:key="key"

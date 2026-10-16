@@ -47,13 +47,13 @@ describe("role tabbar real-device icon contract", () => {
     expect(controller).not.toContain("tab-training.svg");
     expect(controller).not.toContain("tab-user.svg");
     expect(template).not.toMatch(/\.(map|filter|slice|indexOf)\s*\(/);
-    expect(template).toContain('class="tabbar tabbar--{{role}} {{flow ? \'tabbar--flow\' : \'\'}}"');
+    expect(template).toContain('class="tabbar tabbar--{{role}} {{flow ? \'tabbar--flow\' : \'\'}} {{theme === \'dark\' ? \'tabbar--dark\' : \'\'}}"');
     expect(template).toContain("<cover-image class=\"tabbar-icon\" src=\"{{item.icon}}\" />");
     expect(styles).not.toContain("opacity: .48");
   });
 
   it("keeps parent activity affordances separate from coach tab states", () => {
-    expect(template).toContain('class="tabbar tabbar--{{role}} {{flow ? \'tabbar--flow\' : \'\'}}"');
+    expect(template).toContain('class="tabbar tabbar--{{role}} {{flow ? \'tabbar--flow\' : \'\'}} {{theme === \'dark\' ? \'tabbar--dark\' : \'\'}}"');
     expect(styles).toContain(".tabbar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 9999; display: flex; box-sizing: border-box; height: 140rpx;");
     expect(styles).toContain(".tabbar-icon-wrap { position: static; display: flex; align-items: center; justify-content: center; width: 40rpx; height: 40rpx;");
     expect(styles).toContain(".tabbar-icon { width: 36rpx; height: 36rpx; }");
@@ -86,6 +86,12 @@ describe("role tabbar real-device icon contract", () => {
   it("supports an opt-in flowing layout without changing the default fixed tab bar", () => {
     expect(controller).toMatch(/flow:\s*\{\s*type:\s*Boolean,\s*value:\s*false/s);
     expect(styles).toContain(".tabbar--flow { position: static; }");
+  });
+
+  it("supports an opt-in dark chrome for the P01 parent home", () => {
+    expect(controller).toMatch(/theme:\s*\{\s*type:\s*String,\s*value:\s*"light"/s);
+    expect(styles).toContain(".tabbar--dark { border-top-color: rgba(255,255,255,.08); background: var(--club-text); box-shadow: none; }");
+    expect(styles).toContain(".tabbar--dark .tabbar-item.active { color: #ffffff; }");
   });
 
   it("ships all active and inactive icons as valid PNG files", () => {

@@ -1,6 +1,9 @@
 .home { min-height: 100vh; background: var(--color-page); }
 .home-body { padding: 32rpx 32rpx calc(180rpx + env(safe-area-inset-bottom)); }
-.player-slides { height: 596rpx; margin-bottom: 12rpx; }
+.player-slides { height: 548rpx; margin-bottom: 0; }
+.player-dots { display: flex; justify-content: center; gap: 12rpx; padding: 16rpx 0; }
+.player-dot { width: 12rpx; height: 12rpx; border-radius: 999rpx; background: rgba(var(--color-brand-rgb), 0.18); }
+.player-dot.active { background: var(--color-brand); }
 .player-card { height: 548rpx; box-sizing: border-box; padding: 40rpx; border-radius: 28rpx; background: var(--color-brand); color: var(--color-card); }
 .eyebrow { font-size: 20rpx; letter-spacing: 2rpx; line-height: 30rpx; }
 .player-heading { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; margin-top: 20rpx; }

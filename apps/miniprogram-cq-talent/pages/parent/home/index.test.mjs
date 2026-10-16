@@ -30,6 +30,18 @@ describe("player homepage", () => {
     p.openShortcut({ currentTarget: { dataset: { key: "records" } } });
     expect(mocks.open).toHaveBeenCalledWith("/pages/parent/training-history/index");
   });
+  it("shows the latest milestone date like the P01 design", async () => {
+    mocks.growth.mockResolvedValue({ milestones: [{ title: "阶段测评已确认", description: "教练已确认", date: "2026-09-12" }], milestonesAvailable: true });
+    const p = page(); await p.load();
+    expect(p.data.milestoneCount).toBe("1");
+    expect(p.data.milestoneDate).toBe("9月12日");
+    p.onSlideChange({ detail: { current: 1 } });
+    expect(p.data.playerSlide).toBe(1);
+  });
+  it("keeps the latest growth line clean when no milestone date exists", async () => {
+    const p = page(); await p.load();
+    expect(p.data.milestoneDate).toBe("");
+  });
   it("never fabricates a count when the facts request fails", async () => {
     mocks.records.mockRejectedValueOnce({ message: "无法读取训练记录" });
     const p = page(); await p.load(); expect(p.data.state).toBe("error"); expect(p.data.message).toBe("无法读取训练记录");

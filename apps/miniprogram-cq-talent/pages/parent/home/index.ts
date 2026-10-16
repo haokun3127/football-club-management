@@ -9,10 +9,18 @@ import { getTrainingRecords } from "../../../utils/training-records";
 import type { ContentArticle, LoadState, ScheduleEvent, StudentSummary } from "../../../utils/types";
 
 let generation = 0;
+
+function formatMilestoneDate(value: string): string {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "";
+  return `${parsed.getMonth() + 1}月${parsed.getDate()}日`;
+}
+
 Page({
   data: {
     state: "loading" as LoadState, message: "正在读取球员档案", children: [] as StudentSummary[],
     student: null as StudentSummary | null, showChildren: false, trainingTotal: 0,
+    playerSlide: 0, milestoneDate: "",
     teamLabel: "", milestoneTitle: "成长正在发生", milestoneDescription: "完成训练和测评后，成长记录会在这里更新。",
     milestoneCount: "—", news: null as ContentArticle | null, nextEvent: null as ScheduleEvent | null, nextEventTime: "",
     clubTitle: "天才足球俱乐部", banner: null as ClubPresentation["banners"][number] | null,
@@ -55,6 +63,7 @@ Page({
         shortcuts: restoreParentShortcuts(options), shortcutOptions: options, contentMessage: content.error, teamLabel: student.teams.filter(Boolean).join(" · ") || "队伍待同步",
         trainingTotal: training.total, milestoneCount: growth.milestonesAvailable ? String(growth.milestones.length) : "—",
         milestoneTitle: milestone?.title || "成长正在发生", milestoneDescription: milestone?.description || "完成训练和测评后，成长记录会在这里更新。",
+        milestoneDate: milestone?.date ? formatMilestoneDate(milestone.date) : "",
         news: articles.find((article) => article.category === "notice") ?? articles[0] ?? null,
         nextEvent, nextEventTime: nextEvent ? formatTimeRange(nextEvent.startsAt, nextEvent.endsAt) : "",
       });
@@ -64,6 +73,7 @@ Page({
     }
   },
   retry() { void this.load(); },
+  onSlideChange(event: { detail: { current: number } }) { this.setData({ playerSlide: event.detail.current }); },
   toggleChildren() { this.setData({ showChildren: !this.data.showChildren }); },
   switchChild(event: { detail: { studentId: string } }) {
     if (!this.data.children.some((child: StudentSummary) => child.id === event.detail.studentId)) return;

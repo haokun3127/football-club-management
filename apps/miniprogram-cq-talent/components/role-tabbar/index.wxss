@@ -9,3 +9,8 @@
 .tabbar--parent .tabbar-item.active .tabbar-dot { top: 96rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: #a80f1b; }
 .tabbar--coach .tabbar-item.active { color: var(--color-brand); }
 .tabbar--coach .tabbar-item.active .tabbar-dot { top: 96rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: var(--color-brand); }
+/* P01 深色底栏：opt-in，仅显式声明 theme="dark" 的页面生效 */
+.tabbar--dark { border-top-color: rgba(255,255,255,.08); background: var(--club-text); box-shadow: none; }
+.tabbar--dark .tabbar-item { color: rgba(255,255,255,.72); }
+.tabbar--dark .tabbar-item.active { color: #ffffff; }
+.tabbar--dark .tabbar-item.active .tabbar-dot { background: #ffffff; }

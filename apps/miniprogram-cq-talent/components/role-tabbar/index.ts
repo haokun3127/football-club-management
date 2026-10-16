@@ -43,6 +43,10 @@ Component({
       type: Boolean,
       value: false,
     },
+    theme: {
+      type: String,
+      value: "light",
+    },
   },
   data: {
     items: buildItems("parent", "schedule"),
