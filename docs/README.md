@@ -4,7 +4,9 @@
 
 ## 从这里开始
 
-- [GitHub 当前交接 HANDOFF-GITHUB-2026-09-08.md](../HANDOFF-GITHUB-2026-09-08.md)：**唯一当前接手入口**。从克隆、门禁、Figma、生产边界到测试数据的最新事实。
+- [唯一主开发入口](current/development-workspace.md)：各工具统一仓库与微信项目路径，辨认别名和历史副本。
+- [当前交付状态与待办](current/development-delivery-channel.md)：当前源码、体验版、服务端版本、证据日期与优先级。
+- [GitHub 当前交接 HANDOFF-GITHUB-2026-09-08.md](../HANDOFF-GITHUB-2026-09-08.md)：2026-09-08交接快照；路径和当前交付状态优先以上述入口为准。
 - [当前项目进度](current/progress.md)：逐日事实、已知阻塞和真实验证状态；最新记录在文件末尾。
 - [当前架构](current/architecture.md)：服务、数据和模块边界。
 - [API 契约](current/api-contract.md)：对外/客户端接口约定。
@@ -19,7 +21,7 @@
 ## 设计资料
 
 - [在线画板 ID 映射](design/specifications/figma-online-frame-map-2026-08-12.md)：Figma 画板 ↔ 小程序路由对照，复原任务的施工图纸。
-- [49 张设计稿离线 PNG](design/reference/figma/)：家长 21 + 教练 28，375 宽原尺寸，含画板↔文件对照表。日常比对优先用这里，不必每次调 Figma MCP。
+- [49 张设计稿离线 PNG](design/reference/figma/)：家长 21 + 教练 28，375 宽原尺寸，含画板↔文件对照表。仅作历史辅助；新实现与验收必须核对当前在线Figma权威来源。
 - [Figma 审计与 Token](design/figma/)：设计变量、全量实施决策和视觉审计。
 - [页面规格](design/specifications/)：按家长端、教练端、批次和通用页面分类的实现规格。
 

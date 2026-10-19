@@ -1,9 +1,11 @@
 # 足球俱乐部管理系统
 
-足球俱乐部多端管理系统，包含 API、领域包与重庆天才足球俱乐部微信小程序。
+足球俱乐部多端管理系统，包含 API、领域包、网页管理后台与重庆天才足球俱乐部微信小程序。
 
 ## 快速入口
 
+- [唯一主开发入口](docs/current/development-workspace.md)
+- [当前交付状态与待办](docs/current/development-delivery-channel.md)
 - [项目文档导航](docs/README.md)
 - [GitHub 当前交接](HANDOFF-GITHUB-2026-09-08.md)
 - [当前项目进度](docs/current/progress.md)
@@ -16,6 +18,7 @@
 ```text
 apps/
   api/                         Fastify API 与 SQLite 持久化
+  backoffice/                  网页管理后台
   miniprogram-cq-talent/       重庆天才微信小程序
 packages/
   domain/                      领域模型与共享逻辑

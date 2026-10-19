@@ -12,12 +12,12 @@
 
 ### MP-PRIV-002 [硬门禁]
 
-- **规则正文**：调用隐私接口前，后台《小程序用户隐私保护指引》必须声明对应信息，且每位用户已同步明确同意；拒绝必须有真实可用的降级或退出路径。
-- **依据**：`docs/reference/wechat-miniprogram/pages/privacy-authorize.md:33-51`、`docs/reference/wechat-miniprogram/pages/product-reject.md:142-156`。本地留档抓取于 2026-09-18，对应基础库 3.17.3。
-- **判定方式**：人工核对后台指引；用全新用户真机分别验证拒绝、查看官方协议、同意与新增隐私能力再次同步路径。
+- **规则正文**：后台《小程序用户隐私保护指引》必须声明实际处理的信息；隐私调用按平台要求取得用户明确同意后才可继续，拒绝须有可用降级或退出路径。官方默认弹窗可完成同意流程；不得仅凭未自写同步 API 或缺少 `__usePrivacyCheck__` 判定违规或登录不可用。
+- **依据**：`docs/reference/wechat-miniprogram/pages/privacy-authorize.md:17-27`、`docs/reference/wechat-miniprogram/pages/privacy-authorize.md:237-251`、`docs/reference/wechat-miniprogram/pages/product-reject.md:142-156`。本地留档抓取于 2026-09-18，对应基础库 3.17.3。这是初始快照；正文于2026-10-14刷新，本规则于2026-10-18复核，纳入默认官方弹窗机制。
+- **判定方式**：人工核对后台指引；全新用户真机验证官方默认或自定义授权、查看协议、同意、拒绝后退出/显式重试与新增能力。记录平台错误码；源码 API 检索不替代运行验证。
 - **违反时处理**：阻止提审；补后台声明、官方协议入口、同步同意状态、拒绝路径及真机证据。
 - **Owner**：TBD
-- **最后复核日期**：2026-09-18
+- **最后复核日期**：2026-10-18
 - **自动化检查 ID**：manual
 
 ### MP-PRIV-003 [硬门禁]

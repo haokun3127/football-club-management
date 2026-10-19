@@ -137,7 +137,7 @@
         ]
       }
     },
-    { "id": "MP-PRIV-002", "title": "后台声明与用户同步同意", "level": "gate", "checker": null },
+    { "id": "MP-PRIV-002", "title": "后台声明、默认弹窗与用户同意", "reviewedAt": "2026-10-18", "level": "gate", "checker": null },
     { "id": "MP-PRIV-003", "title": "账号注销与数据删除", "level": "gate", "checker": null },
     {
       "id": "MP-CAP-001",

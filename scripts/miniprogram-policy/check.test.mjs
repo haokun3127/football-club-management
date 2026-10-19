@@ -78,7 +78,7 @@ test("合成违规可检出并报告 file:line", (t) => {
 });
 
 test("rules.json 与 spec 规则编号及自动化 ID 一致", () => {
-  const rules = JSON.parse(fs.readFileSync(rulesPath, "utf8")).rules;
+  const { rules, snapshot } = JSON.parse(fs.readFileSync(rulesPath, "utf8"));
   const ruleIds = rules.map((rule) => rule.id);
   assert.equal(new Set(ruleIds).size, ruleIds.length, "rules.json 不得有重复 id");
 
@@ -98,7 +98,9 @@ test("rules.json 与 spec 规则编号及自动化 ID 一致", () => {
         assert.match(section, new RegExp(`^- \\*\\*${label}\\*\\*：`, "m"), `${id} 缺少 ${label}`);
       }
       assert.match(section, /^- \*\*Owner\*\*：TBD$/m, `${id} 的 Owner 应保持 TBD`);
-      assert.match(section, /^- \*\*最后复核日期\*\*：2026-09-18$/m, `${id} 的复核日期不一致`);
+      const reviewedAt = rules.find((rule) => rule.id === id)?.reviewedAt ?? snapshot.capturedAt;
+      assert.match(reviewedAt, /^\d{4}-\d{2}-\d{2}$/, `${id} 的复核日期格式不正确`);
+      assert.ok(section.split("\n").includes(`- **最后复核日期**：${reviewedAt}`), `${id} 的复核日期不一致`);
       assert.match(section, /本地留档抓取于 2026-09-18，对应基础库 3\.17\.3。/, `${id} 缺少快照说明`);
       const citations = [...section.matchAll(/`(docs\/reference\/wechat-miniprogram\/pages\/([^`:]+\.md)):(\d+)(?:-(\d+))?`/g)];
       assert.ok(citations.length > 0, `${id} 至少需要一处 pages/ 行号依据`);

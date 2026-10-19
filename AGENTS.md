@@ -30,3 +30,10 @@ For non-trivial engineering work in this repository, use the Trellis project lay
 4. After code changes, run the relevant package checks and use Trellis finish/update-spec flow to record durable lessons.
 
 Keep this overlay additive. Do not remove existing Codex, Hermes, Impeccable, Seedance, or other local skills.
+
+## 主开发工作区与当前状态
+
+- 日常开发统一使用 `/Users/dongjun/projects/football-club-management`；微信开发者工具只导入该目录下 `apps/miniprogram-cq-talent`，显示名为“重庆天才-主开发”。
+- `Documents`下同名符号链接不再作为第二个导入入口；不要在WorkBuddy报告目录、临时验收副本或旧worktree中另起日常开发。
+- 路径/副本用途见 [唯一主开发入口](docs/current/development-workspace.md)；版本、待办及验证边界见 [当前交付状态](docs/current/development-delivery-channel.md)。开工时读回Git分支、HEAD和脏工作区，不根据旧交接快照切分支或覆盖改动。
+- 保留旧worktree和发布证据；项目列表“移除记录”与删除源码是不同操作，不清理其他工具的未提交工作或登录缓存。
