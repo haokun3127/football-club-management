@@ -1,0 +1,63 @@
+{
+  "restoredFromVersion": "2404917248958920351",
+  "versionLabel": "Sep 30, 3:15 PM",
+  "scope": "238 historical frames plus preexisting cloud-only 231:3468; compares all text ID/content and reaction ID/payload hashes",
+  "results": [
+    {
+      "page": "213:347",
+      "count": 53,
+      "reactions": 220,
+      "changed": [],
+      "missing": []
+    },
+    {
+      "page": "214:28",
+      "count": 40,
+      "reactions": 252,
+      "changed": [],
+      "missing": []
+    },
+    {
+      "page": "214:4557",
+      "count": 17,
+      "reactions": 121,
+      "changed": [],
+      "missing": []
+    },
+    {
+      "page": "214:5393",
+      "count": 9,
+      "reactions": 62,
+      "changed": [],
+      "missing": []
+    },
+    {
+      "page": "214:6123",
+      "count": 12,
+      "reactions": 88,
+      "changed": [],
+      "missing": []
+    },
+    {
+      "page": "214:5862",
+      "count": 5,
+      "reactions": 33,
+      "changed": [],
+      "missing": []
+    },
+    {
+      "page": "214:6654",
+      "count": 20,
+      "reactions": 22,
+      "changed": [],
+      "missing": []
+    },
+    {
+      "page": "214:2143",
+      "count": 83,
+      "reactions": 268,
+      "changed": [],
+      "missing": []
+    }
+  ]
+}

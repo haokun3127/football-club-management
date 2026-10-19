@@ -1,0 +1,22 @@
+[
+  {
+    "environment": "develop",
+    "httpStatus": 200,
+    "environmentMarker": "develop",
+    "status": "binding_required",
+    "errorCode": null,
+    "loginCodeExchangePassed": true,
+    "phoneAuthorizationAttempted": false,
+    "realUserLoginVerified": false
+  },
+  {
+    "environment": "trial",
+    "httpStatus": 200,
+    "environmentMarker": "trial",
+    "status": "binding_required",
+    "errorCode": null,
+    "loginCodeExchangePassed": true,
+    "phoneAuthorizationAttempted": false,
+    "realUserLoginVerified": false
+  }
+]

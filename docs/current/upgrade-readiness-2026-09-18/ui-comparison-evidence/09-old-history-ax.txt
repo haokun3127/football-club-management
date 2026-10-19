@@ -1,0 +1,258 @@
+Window: "重庆天才小程序 UIUX Design System", App: Figma.
+0 standard window 重庆天才小程序 UIUX Design System, Secondary Actions: Raise
+	1 container 重庆天才小程序 UIUX Design System
+		2 container
+			3 HTML content Figma, URL: file:///Applications/Figma.app/Contents/Resources/app.asar/shell.html
+				4 container
+					5 tab group Tab bar
+						6 container
+							7 tab (settable, integer) Description: Home, Value: 0
+							8 tab (settable, integer) Description: AI应用转化Hub 官网 UI 优化 Round5, Value: 0
+							9 tab (selected) Description: 重庆天才小程序 UIUX Design System, Value: 1
+								10 button Close tab
+							11 tab (settable, integer) Description: 天才足球 · 产品升级全量设计 · 2026.09, Value: 0
+							12 button New file
+						13 pop up button Open and recently closed tabs
+			14 HTML content 重庆天才小程序 UIUX Design System – Figma, URL: figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/%E9%87%8D%E5%BA%86%E5%A4%A9%E6%89%8D%E5%B0%8F%E7%A8%8B%E5%BA%8F-UIUX-Design-System?node-id=1967-164&m=dev
+				15 container
+					16 container
+						17 container
+						18 container Figma Design, 1 item selected
+						19 text Screenreader support for the board is currently disabled. To enable it via Accessibility settings, press ⌘K, type Accessibility Settings, and press Enter. To see available keyboard shortcuts, enter ⌃⇧Question mark .
+						20 container Comments on canvas
+							21 button Create new comment
+						22 container Left sidebar
+							23 toolbar Navigation Bar
+								24 pop up button Main menu
+									25 image
+								26 button File
+									27 image
+									28 text File
+								29 button Variables
+									30 image
+									31 text Variables
+							32 container
+								33 button 重庆天才小程序 UIUX Design System, file name
+								34 text File name
+								35 pop up button Edit file menu
+								36 button Minimize UI
+								37 link Description: Team project, Value: figma.com/files/team/1473219625644975094/project/340128772
+								38 container
+									39 heading Pages Find, Value: 2
+										40 button Pages
+										41 button Find
+									42 container
+										43 container
+											44 table
+												45 row 00 Method & Contract
+													46 cell
+														47 button 00 Method & Contract
+												48 row 01 Design Language
+													49 cell
+														50 button 01 Design Language
+												51 row 02 Tokens
+													52 cell
+														53 button 02 Tokens
+												54 row 03 Components
+													55 cell
+														56 button 03 Components
+												57 row 04 Templates
+													58 cell
+														59 button 04 Templates
+												60 row 05 Parent Generated
+													61 cell
+														62 button 05 Parent Generated
+												63 row 06 Coach Generated
+													64 cell
+														65 button 06 Coach Generated
+												66 row 07 Prototype & Routes
+													67 cell
+														68 button 07 Prototype & Routes
+												69 row 08 Coverage & Diff
+													70 cell
+														71 button 08 Coverage & Diff
+												72 row 09 Mock Data Layer
+													73 cell
+														74 button 09 Mock Data Layer
+												75 row 10 Current Product · Parent V3
+													76 cell
+														77 button 10 Current Product · Parent V3
+												78 row 11 Current Product · Coach V3
+													79 cell
+														80 button 11 Current Product · Coach V3
+												81 row 12 Product Redesign · Parent V4
+													82 cell
+														83 button 12 Product Redesign · Parent V4
+												84 row 13 Product Redesign · Coach V4
+													85 cell
+														86 button 13 Product Redesign · Coach V4
+												87 row 15 Product Redesign · Coach V5
+													88 cell
+														89 button 15 Product Redesign · Coach V5
+												90 row 14 Product Redesign · Parent V5
+													91 cell
+														92 button 14 Product Redesign · Parent V5
+												93 row 16 Product Redesign · Parent V6
+													94 cell
+														95 button 16 Product Redesign · Parent V6
+												96 row 17 Product Redesign · Coach V6
+													97 cell
+														98 button 17 Product Redesign · Coach V6
+										99 slider Description: Resize handle, Value: 100, Details: 151 pixels, Secondary Actions: Increment, Decrement
+								100 button Ready for development
+								101 container
+									102 button Mark as ready for dev
+								103 container
+									104 button Layers
+										105 image
+										106 text Layers
+									107 button Frame INDEX · Parent V6 · Current Product Navigation
+										108 image Frame
+										109 text INDEX · Parent V6 · Current Product Navigation
+									110 button Auto layout P1 · Schedule · Week · V6
+										111 image Auto layout
+										112 text P1 · Schedule · Week · V6
+									113 button Auto layout P1 · Schedule · Month Expanded · V6
+										114 image Auto layout
+										115 text P1 · Schedule · Month Expanded · V6
+									116 button Auto layout P4 · Growth · V6
+										117 image Auto layout
+										118 text P4 · Growth · V6
+									119 button Auto layout P5 · Ability Radar · V6
+										120 image Auto layout
+										121 text P5 · Ability Radar · V6
+									122 button Auto layout P8 · Discover · V6
+										123 image Auto layout
+										124 text P8 · Discover · V6
+									125 button Auto layout P7 · My Child · V6
+										126 image Auto layout
+										127 text P7 · My Child · V6
+									128 button Frame P4.1 · Ability Model History · V7
+										129 image Frame
+										130 text P4.1 · Ability Model History · V7
+									131 button Frame P4.2 · Match Detail · V7
+										132 image Frame
+										133 text P4.2 · Match Detail · V7
+								134 slider Description: Resize handle, Value: 280, Details: 280 pixels, Secondary Actions: Increment, Decrement
+						135 container Properties and plugins
+							136 container
+								137 container
+									138 container Prototype view
+										139 button Present
+										140 pop up button Prototype view
+									141 button Share
+									142 tab group
+										143 tab (selected) Inspect, Value: 1
+										144 tab (settable, integer) Plugins, Value: 0
+									145 pop up button 80%, zoom and view options
+										146 text 80%
+										147 image
+									148 container Inspect
+										149 container
+											150 container
+												151 button Click to copy layer name: P4.1 · Ability Model History · V7
+												152 button Copy URL for selected layer
+												153 checkbox Toggle ready for dev status, Value: 0
+												154 text Toggle ready for dev status
+												155 pop up button More actions
+												156 image Frame
+												157 text Frame
+											158 container
+												159 button MCP
+													160 heading MCP, Value: 3
+														161 text MCP
+												162 pop up button Open help
+												163 pop up button Open set up modal
+												164 button Set up third-party agents for Figma MCP
+												165 text Selection details Session activity Not sent Estimated tokens 2.1k
+												166 button Implement this design from Figma. @https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/%E9%87%8D%E5%BA%86%E5%A4%A9%E6%89%8D%E5%B0%8F%E7%A8%8B%E5%BA%8F-UIUX-Design-System?node-id=1967-164&m=dev
+													167 text Implement this design from Figma.
+													168 text @https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/%E9%87%8D%E5%BA%86%E5%A4%A9%E6%89%8D%E5%B0%8F%E7%A8%8B%E5%BA%8F-UIUX-Design-System?node-id=1967-164&m=dev
+												169 button Copy example prompt
+											170 container
+												171 button Layer properties
+													172 heading Layer properties, Value: 3
+														173 text Layer properties
+												174 image Visual representation of element layout properties including padding, border box, and spacing
+												175 View
+													176 text View
+													177 container
+														178 radio button List, Value: 0
+														179 text List
+													180 container
+														181 radio button Code, Value: 1
+														182 text Code
+												183 text Language: HTML
+												184 pop up button Language: HTML
+													185 image Figma to Code (HTML, Tailwind, Flutter, SwiftUI) icon
+													186 text HTML
+												187 text Loading
+												188 heading Colors, Value: 3
+													189 text Colors
+												190 text Color format
+												191 combo box (settable) Color format, Value: Hex
+													192 text Hex
+													193 image
+												194 container
+													195 heading Background colors, Value: 3
+														196 text Background colors
+													197 button Copy #F5F6F8
+														198 text #F5F6F8
+												199 container
+													200 heading Selection colors, Value: 3
+														201 text Selection colors
+													202 button Copy #202124
+														203 text #202124
+													204 button Copy #667085
+														205 text #667085
+													206 button Copy #2E7D32
+														207 text #2E7D32
+													208 button Copy #FFFFFF
+														209 text #FFFFFF
+													210 button 4 more
+											211 container
+												212 button Export
+												213 button Add export settings
+								214 slider Description: Resize handle, Value: 100, Details: 321 pixels, Secondary Actions: Increment, Decrement
+					215 container
+						216 toolbar Editor
+							217 toggle button Description: Move, Value: 1
+								218 image
+							219 toggle button Description: Copy colors, Value: 0
+								220 image
+							221 toggle button Description: Measurement, Value: 0
+								222 image
+							223 toggle button Description: Annotation, Value: 0
+								224 image
+							225 toggle button Description: Comment, Value: 0
+								226 image
+							227 Toolbelt Mode
+								228 text Toolbelt Mode
+								229 radio button Draw, Value: 0
+								230 radio button Design, Value: 0
+								231 radio button Motion, Value: 0
+								232 radio button Dev Mode, Value: 1
+						233 toolbar Inspect
+							234 button Previous frame
+								235 image
+							236 text 5 / 9
+							237 button Next frame
+								238 image
+					239 container Help/zoom toolbar
+						240 toolbar Help/zoom toolbar
+							241 pop up button Help
+								242 image
+	243 close button
+	244 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	245 minimize button
+246 menu bar
+	247 Figma
+	248 File
+	249 Edit
+	250 View
+	251 Plugins
+	252 Widgets
+	253 Window
+	254 Help
+
+The focused UI element is 128 button Frame P4.1 · Ability Model History · V7

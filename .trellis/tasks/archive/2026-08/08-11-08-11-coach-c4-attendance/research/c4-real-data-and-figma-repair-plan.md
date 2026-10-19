@@ -14,7 +14,7 @@
 2. 修正 C4 对 RSVP 状态和出勤状态的边界：`invited/confirmed` 在 C4 必须显示为“未点名”，不能作为已完成点名直接提交；显式空备注必须能清除后端备注。
 3. 保留当前已经出现的 C4/C4.1 局部视觉修复，只补在线 Figma 尚未满足的层级和尺寸；C4.2 不得伪造“家长异议”、异常数量或全局更正原因。
 
-输入任务 `.trellis/tasks/08-11-08-11-coach-acceptance-demo-data/prd.md:11-12` 仍写“8 人名单”，但当前 seed 与测试已经是 16 人：`apps/api/src/seed/cq-talent-acceptance.ts:85-88` 选择 2 名 acceptance 家庭学员加 14 名同俱乐部学员，`apps/api/test/cq-talent-fixtures.test.ts:183-188` 和 `apps/api/test/server.test.ts:1349-1352` 均以 16 人为当前契约。C4 修复不应回退到 8 人，也不应复制 Figma 的 20 人示例计数。
+输入任务 `.trellis/tasks/archive/2026-10/08-11-08-11-coach-acceptance-demo-data/prd.md:11-12` 仍写“8 人名单”，但当前 seed 与测试已经是 16 人：`apps/api/src/seed/cq-talent-acceptance.ts:85-88` 选择 2 名 acceptance 家庭学员加 14 名同俱乐部学员，`apps/api/test/cq-talent-fixtures.test.ts:183-188` 和 `apps/api/test/server.test.ts:1349-1352` 均以 16 人为当前契约。C4 修复不应回退到 8 人，也不应复制 Figma 的 20 人示例计数。
 
 ### 现有真实数据覆盖矩阵
 
@@ -134,7 +134,7 @@ npx.cmd --yes pnpm@10.33.0 --filter @football-club/miniprogram-cq-talent devtool
 - `.trellis/workflow.md` — 当前 planning/research 工作流与质量门禁。
 - `.trellis/tasks/08-11-08-11-coach-c4-attendance/prd.md:9-22` — 在线节点、真实 API、seed 状态覆盖与截图 AC。
 - `.trellis/tasks/08-11-08-11-coach-c4-attendance/design.md:12-23` — seed -> persistence -> workbench -> PUT -> reload 数据流及扣课风险。
-- `.trellis/tasks/08-11-08-11-coach-acceptance-demo-data/prd.md:9-23` — opt-in、guardian projection、固定事件与重启目标；人数描述已落后于当前代码。
+- `.trellis/tasks/archive/2026-10/08-11-08-11-coach-acceptance-demo-data/prd.md:9-23` — opt-in、guardian projection、固定事件与重启目标；人数描述已落后于当前代码。
 - `.trellis/spec/api/backend/app-client-bff-contracts.md:264-266,305-327` — workbench RSVP/attendance 语义、C4 PUT、幂等、note、seed 与截图契约。
 - `.trellis/spec/api/backend/database-guidelines.md` — 自然键、club scope、file-backed reopen 规则。
 - `.trellis/spec/api/backend/active-role-sessions.md` — active coach role 必须由后端 session 决定。

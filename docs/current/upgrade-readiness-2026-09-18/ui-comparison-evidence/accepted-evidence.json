@@ -1,0 +1,87 @@
+{
+  "date": "2026-09-18",
+  "capture": "Current-run native Figma screenshot; 03 is current Figma export",
+  "accepted": [
+    {
+      "file": "03-old-schedule.png",
+      "sha256": "e7b6873242222f2e8b876666d20400a5e8b81171b642e7f65e3fa5998eabc5c2"
+    },
+    {
+      "file": "05-new-schedule.png",
+      "sha256": "06a04d3dd9752b8500c5013e98a45e04674cac447a97dc44aa35c4586f57e42a"
+    },
+    {
+      "file": "06-new-growth-full.png",
+      "sha256": "04ab84530d81e49df351f86379da708e8ffc68e7b9e41425b63d1498ad1a6303"
+    },
+    {
+      "file": "07-new-history.png",
+      "sha256": "614634dcf21349abdee460b0690909baa709a6e0a83cc54d1a30e22689f2c4bf"
+    },
+    {
+      "file": "08-old-growth-full.png",
+      "sha256": "aa7c4f9f21ed1fcb46fd5990b70eae1199e43db103fbe6ef443efdaf875686c0"
+    },
+    {
+      "file": "09-old-history.png",
+      "sha256": "d6a157085821caf0cd8e0a330d68cc632448803646084f458648874830f3b0bd"
+    },
+    {
+      "file": "10-old-match-detail.png",
+      "sha256": "43b82d3b8a2c4a7f564130bc5391ea41f41b9656751325464940450c65af5dee"
+    },
+    {
+      "file": "11-old-workbench.png",
+      "sha256": "8fb7973225d7ac071f1a3b262069e607ec3317ef380543488990aef2164c4b49"
+    },
+    {
+      "file": "12-old-content.png",
+      "sha256": "b1f2c5f5cb08296e1edcce37384f5c7a891f368c224b6dec8243083cf651643f"
+    },
+    {
+      "file": "13-old-tactics.png",
+      "sha256": "34acc67964b893b04f503ecdbabbed57c961496f67478916c7b2d35e9f9a4882"
+    },
+    {
+      "file": "14-old-batch.png",
+      "sha256": "7c31c7c888eda669b6c3625173f585b6f379cbb24a9ddc212d2bc1cd94aa1eb9"
+    },
+    {
+      "file": "15-old-student.png",
+      "sha256": "e0f8f55ac0b77474358ba0341473eebdc5d485161db3209cc5b7525f3c2500e4"
+    },
+    {
+      "file": "16-new-workbench.png",
+      "sha256": "69d9263b03bb5c9eb53d32808691641ad0c5fd71c8d7e321bacc42807b1f3dbe"
+    },
+    {
+      "file": "17-new-content.png",
+      "sha256": "eed1ebf48a67edf787df9cb53b0dd073392eeaf2a997d928414b5cb3caebaaef"
+    },
+    {
+      "file": "18-new-batch.png",
+      "sha256": "44b699560011c1f4a2f29d3e95b7285ab3e0c23130a9e32809c7aac3250f73b3"
+    },
+    {
+      "file": "19-new-task.png",
+      "sha256": "216c9528c2183c12dbee22d19e54bd8593f88f47771fb5993d37a9fe83320bc6"
+    },
+    {
+      "file": "20-new-student.png",
+      "sha256": "15a77ca833a8ec91a3d09c8f22847519d70d4dc151928ff43dd50d11014ed038"
+    },
+    {
+      "file": "21-new-tactics.png",
+      "sha256": "9cdc01aaff35786a94f623696f49f2a7b227b458573de35bbf58df986c021ded"
+    },
+    {
+      "file": "22-new-match.png",
+      "sha256": "5bc7f2e630d334046aad632670aa50e1019c1f863e08290e64aadec0d8907a10"
+    }
+  ],
+  "rejected": [
+    "02-old-growth.png (menu/partial)",
+    "04-old-growth-view.png (overview scale)"
+  ],
+  "status": "Nine targeted old/new pairs complete plus home sequence; static prototype properties read. Runtime untested. Old team overview V7 not located."
+}

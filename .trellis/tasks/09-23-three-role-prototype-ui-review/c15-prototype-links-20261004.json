@@ -1,0 +1,12 @@
+{
+  "source": "Figma MCP mechanical navigation after native Agents explicitly reported prototype capability unavailable",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"mutatedNodeIds\":[\"495:360\",\"495:370\",\"495:403\",\"495:405\"],\"readback\":[{\"id\":\"495:360\",\"reactions\":[{\"action\":{\"type\":\"NODE\",\"destinationId\":\"495:366\",\"navigation\":\"NAVIGATE\",\"transition\":null,\"resetVideoPosition\":false,\"resetScrollPosition\":true},\"actions\":[{\"type\":\"NODE\",\"destinationId\":\"495:366\",\"navigation\":\"NAVIGATE\",\"transition\":null,\"resetVideoPosition\":false,\"resetScrollPosition\":true}],\"trigger\":{\"type\":\"ON_CLICK\"}}]},{\"id\":\"495:370\",\"reactions\":[{\"action\":{\"type\":\"NODE\",\"destinationId\":\"214:2497\",\"navigation\":\"NAVIGATE\",\"transition\":null,\"resetVideoPosition\":false,\"resetScrollPosition\":true},\"actions\":[{\"type\":\"NODE\",\"destinationId\":\"214:2497\",\"navigation\":\"NAVIGATE\",\"transition\":null,\"resetVideoPosition\":false,\"resetScrollPosition\":true}],\"trigger\":{\"type\":\"ON_CLICK\"}}]},{\"id\":\"495:403\",\"reactions\":[{\"action\":{\"type\":\"NODE\",\"destinationId\":\"214:2497\",\"navigation\":\"NAVIGATE\",\"transition\":null,\"resetVideoPosition\":false,\"resetScrollPosition\":true},\"actions\":[{\"type\":\"NODE\",\"destinationId\":\"214:2497\",\"navigation\":\"NAVIGATE\",\"transition\":null,\"resetVideoPosition\":false,\"resetScrollPosition\":true}],\"trigger\":{\"type\":\"ON_CLICK\"}}]},{\"id\":\"495:405\",\"reactions\":[{\"action\":{\"type\":\"NODE\",\"destinationId\":\"214:2497\",\"navigation\":\"NAVIGATE\",\"transition\":null,\"resetVideoPosition\":false,\"resetScrollPosition\":true},\"actions\":[{\"type\":\"NODE\",\"destinationId\":\"214:2497\",\"navigation\":\"NAVIGATE\",\"transition\":null,\"resetVideoPosition\":false,\"resetScrollPosition\":true}],\"trigger\":{\"type\":\"ON_CLICK\"}}]}]}"
+      }
+    ],
+    "isError": false
+  }
+}

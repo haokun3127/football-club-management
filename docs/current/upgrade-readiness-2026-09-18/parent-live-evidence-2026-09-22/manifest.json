@@ -1,0 +1,335 @@
+{
+  "fileKey": "EyQtDtILGDZDf6neLBL6vs",
+  "pageNodeId": "6:9",
+  "source": "Figma Desktop MCP localhost:3845",
+  "screenshots": [
+    {
+      "id": "P01",
+      "nodeId": "15:2",
+      "title": "首页",
+      "capturedAt": "2026-09-22T02:46:56.380346+00:00",
+      "file": "P01.png",
+      "sha256": "f594a690452e42daae0b464d1de5954ddf5cc43e3b24892c5293126c31634757"
+    },
+    {
+      "id": "P02",
+      "nodeId": "15:6",
+      "title": "日程",
+      "capturedAt": "2026-09-22T02:46:56.799912+00:00",
+      "file": "P02.png",
+      "sha256": "1d1cd26414966ba35be5c26eb42d0f2e933b18beba2497c98aa27b57f4b9e741"
+    },
+    {
+      "id": "P03",
+      "nodeId": "15:10",
+      "title": "训练详情",
+      "capturedAt": "2026-09-22T02:46:57.225730+00:00",
+      "file": "P03.png",
+      "sha256": "3eacc3649b9a7f012a72df4ce4942ab4acec1b1536a97dadfa7e704d80c46d27"
+    },
+    {
+      "id": "P04",
+      "nodeId": "15:14",
+      "title": "提交请假",
+      "capturedAt": "2026-09-22T02:46:57.616361+00:00",
+      "file": "P04.png",
+      "sha256": "c372159fb5410fe95a862a2aa0290c746a442eb5715b5d6af74cb453e9fc8556"
+    },
+    {
+      "id": "P05",
+      "nodeId": "15:18",
+      "title": "请假已生效",
+      "capturedAt": "2026-09-22T02:46:58.049933+00:00",
+      "file": "P05.png",
+      "sha256": "c125d9064fd81d67950d8036dad5ab8d11aca06cc6ad921040b36cb067e17c6a"
+    },
+    {
+      "id": "P06",
+      "nodeId": "15:22",
+      "title": "修正训练记录",
+      "capturedAt": "2026-09-22T02:46:58.450476+00:00",
+      "file": "P06.png",
+      "sha256": "d3daebc3125f89ff2fd1d040f549efa84d4125d61791e6b66bb8fa38cb365184"
+    },
+    {
+      "id": "P07",
+      "nodeId": "15:26",
+      "title": "记录与修改历史",
+      "capturedAt": "2026-09-22T02:46:58.895068+00:00",
+      "file": "P07.png",
+      "sha256": "bb56d004f80d6ad835c817543288a9ce4cdb4a6bad2740d3e5320d9a2e4b5c34"
+    },
+    {
+      "id": "P08",
+      "nodeId": "15:30",
+      "title": "成长",
+      "capturedAt": "2026-09-22T02:46:59.326857+00:00",
+      "file": "P08.png",
+      "sha256": "d6e7afd236e1324eb6dfc86519a09e6210a6a30b7a4f66c2354b601c8f94d8e9"
+    },
+    {
+      "id": "P09",
+      "nodeId": "15:34",
+      "title": "测评项目详情",
+      "capturedAt": "2026-09-22T02:46:59.718725+00:00",
+      "file": "P09.png",
+      "sha256": "72eec45827268444a4b0aa7cd3d3e7771bb4e3b7aef0a27f2ee19d16c59ed3fe"
+    },
+    {
+      "id": "P10",
+      "nodeId": "15:38",
+      "title": "测评历史",
+      "capturedAt": "2026-09-22T02:47:00.107238+00:00",
+      "file": "P10.png",
+      "sha256": "c2e087cc617159c8e4d527b2b589f4a9cd67b6303d44b02336e4cfc1f1881083"
+    },
+    {
+      "id": "P11",
+      "nodeId": "15:42",
+      "title": "学期成长报告",
+      "capturedAt": "2026-09-22T02:47:00.543641+00:00",
+      "file": "P11.png",
+      "sha256": "aec54e8559afa118fd7398a129055106a203c592fbeccc417f591001c106cfe7"
+    },
+    {
+      "id": "P12",
+      "nodeId": "15:46",
+      "title": "训练记录",
+      "capturedAt": "2026-09-22T02:47:00.975047+00:00",
+      "file": "P12.png",
+      "sha256": "86fa3cb215f9cb07555fc6aee46d3fcd435cac63567aa61423b98ff2a44a9927"
+    },
+    {
+      "id": "P13",
+      "nodeId": "15:50",
+      "title": "比赛记录",
+      "capturedAt": "2026-09-22T02:47:01.375515+00:00",
+      "file": "P13.png",
+      "sha256": "bac88bd9e89ed15c6ed33d06207bb7056749e14f000a41716ab5e4fd40dbc198"
+    },
+    {
+      "id": "P14",
+      "nodeId": "15:54",
+      "title": "成长里程碑",
+      "capturedAt": "2026-09-22T02:47:01.785207+00:00",
+      "file": "P14.png",
+      "sha256": "9c2151cb7a5d0c516e0a78abe6dfacb1b9233ec2c9fcb83203535e82549468b0"
+    },
+    {
+      "id": "P15",
+      "nodeId": "15:58",
+      "title": "成长分享卡",
+      "capturedAt": "2026-09-22T02:47:02.204670+00:00",
+      "file": "P15.png",
+      "sha256": "3aabeadd335abf4832be41dd139b5f36867437858d83ff898effc8dc710c753b"
+    },
+    {
+      "id": "P16",
+      "nodeId": "15:62",
+      "title": "俱乐部动态",
+      "capturedAt": "2026-09-22T02:47:02.655789+00:00",
+      "file": "P16.png",
+      "sha256": "51f23315348614c4d37112cfc949f12903c5ec96e410c867d1f4e87e55f44a65"
+    },
+    {
+      "id": "P17",
+      "nodeId": "15:66",
+      "title": "动态详情",
+      "capturedAt": "2026-09-22T02:47:03.056278+00:00",
+      "file": "P17.png",
+      "sha256": "7439304e5a5fa2bc2144669d2d12994e492667835bede0c868379628ed8cc0e0"
+    },
+    {
+      "id": "P18",
+      "nodeId": "15:70",
+      "title": "专业服务",
+      "capturedAt": "2026-09-22T02:47:03.431907+00:00",
+      "file": "P18.png",
+      "sha256": "ff4373f64a67ba0abce0e03b026e1eb3daee416a7766a8c20bf6160976227d51"
+    },
+    {
+      "id": "P19",
+      "nodeId": "15:74",
+      "title": "私教咨询",
+      "capturedAt": "2026-09-22T02:47:03.939228+00:00",
+      "file": "P19.png",
+      "sha256": "fe0412fd0da22eff918b23d539583dc271af8cc010f80a7a1fddce1147fe6166"
+    },
+    {
+      "id": "P20",
+      "nodeId": "15:78",
+      "title": "咨询已提交",
+      "capturedAt": "2026-09-22T02:47:04.342996+00:00",
+      "file": "P20.png",
+      "sha256": "46ca9ef9f63f5752b8c153046d57f6f8aca67feb3e2f8ac49054b5cb92799836"
+    },
+    {
+      "id": "P21",
+      "nodeId": "15:82",
+      "title": "孩子档案",
+      "capturedAt": "2026-09-22T02:47:04.746158+00:00",
+      "file": "P21.png",
+      "sha256": "8760da2eaf20869c1f83a47bc37617ea85cd6639d2dd7c2f10a9f03b925a428c"
+    },
+    {
+      "id": "P22",
+      "nodeId": "15:86",
+      "title": "我的",
+      "capturedAt": "2026-09-22T02:47:05.242637+00:00",
+      "file": "P22.png",
+      "sha256": "282cae7978a91c0f0660fa1d24d5a50a377b182e4899363c99384c45654fcc67"
+    },
+    {
+      "id": "P23",
+      "nodeId": "15:90",
+      "title": "自定义快捷入口",
+      "capturedAt": "2026-09-22T02:47:05.805434+00:00",
+      "file": "P23.png",
+      "sha256": "ef4bd1c6fd8ebec1c8aacc6f98027ad247be10b655d00d75693395d9f03b35cb"
+    },
+    {
+      "id": "P24",
+      "nodeId": "15:94",
+      "title": "消息中心",
+      "capturedAt": "2026-09-22T02:47:06.296827+00:00",
+      "file": "P24.png",
+      "sha256": "4dd016013513ae5c2cb8c361ac79a1e179133832ac649061e45c2abe841fc88a"
+    },
+    {
+      "id": "P25",
+      "nodeId": "15:98",
+      "title": "教练与场地",
+      "capturedAt": "2026-09-22T02:47:06.736293+00:00",
+      "file": "P25.png",
+      "sha256": "27d0c16050bfd419f97b844abf12de86085c8ca595b4b9c27553d5b9d3183de1"
+    },
+    {
+      "id": "P26",
+      "nodeId": "15:102",
+      "title": "帮助与反馈",
+      "capturedAt": "2026-09-22T02:47:07.147030+00:00",
+      "file": "P26.png",
+      "sha256": "43f16d41b0ab5443affeea0155f5c3412aee006c53a2d7f61f844c01130cd719"
+    },
+    {
+      "id": "P27",
+      "nodeId": "25:236",
+      "title": "我的咨询",
+      "capturedAt": "2026-09-22T02:47:07.545390+00:00",
+      "file": "P27.png",
+      "sha256": "cb37211ddefe6b484922b998c24319616d667757a68322372ee21bd04c5b4380"
+    },
+    {
+      "id": "P28",
+      "nodeId": "25:240",
+      "title": "咨询跟进",
+      "capturedAt": "2026-09-22T02:47:07.938262+00:00",
+      "file": "P28.png",
+      "sha256": "aaf4fadaff3ab99994b852d58e3059a4e0a1e41b985948a719404738a975e57a"
+    },
+    {
+      "id": "P29",
+      "nodeId": "112:254",
+      "title": "训练场地",
+      "capturedAt": "2026-09-22T02:47:08.330623+00:00",
+      "file": "P29.png",
+      "sha256": "cb37211ddefe6b484922b998c24319616d667757a68322372ee21bd04c5b4380"
+    },
+    {
+      "id": "P30",
+      "nodeId": "112:281",
+      "title": "场地详情",
+      "capturedAt": "2026-09-22T02:47:08.796481+00:00",
+      "file": "P30.png",
+      "sha256": "aaf4fadaff3ab99994b852d58e3059a4e0a1e41b985948a719404738a975e57a"
+    },
+    {
+      "id": "P30-NO",
+      "nodeId": "112:308",
+      "title": "场地暂无定位",
+      "capturedAt": "2026-09-22T02:47:09.211599+00:00",
+      "file": "P30-NO.png",
+      "sha256": "f5d29cc97d4e79e4cf66806aa15d18707c0f51b46908566a9cb881e763c6fbcf"
+    },
+    {
+      "id": "P29-A",
+      "nodeId": "113:287",
+      "title": "室内场地检索",
+      "capturedAt": "2026-09-22T02:47:09.617068+00:00",
+      "file": "P29-A.png",
+      "sha256": "3a9691cbaadb2dca7641fbbab3ad3b8854f88d76bc667b79846f66fcfad53f36"
+    },
+    {
+      "id": "P30-IN",
+      "nodeId": "114:288",
+      "title": "室内馆详情",
+      "capturedAt": "2026-09-22T02:47:10.044066+00:00",
+      "file": "P30-IN.png",
+      "sha256": "bc342b673effa2cba3eaa2dc81847a978eed0caec9ab6ed523c67c44ab918792"
+    },
+    {
+      "id": "P30-MAP",
+      "nodeId": "114:315",
+      "title": "地图导航",
+      "capturedAt": "2026-09-22T02:47:10.449755+00:00",
+      "file": "P30-MAP.png",
+      "sha256": "1a606484711e7c273c847e325526c7146c7a7d65af75adb3105d4bbaad74b534"
+    },
+    {
+      "id": "P29-E",
+      "nodeId": "114:342",
+      "title": "未找到匹配场地",
+      "capturedAt": "2026-09-22T02:47:10.874290+00:00",
+      "file": "P29-E.png",
+      "sha256": "47fe24101ca19ee5ce5396ae80840253652102391eee7ddad225a3377cdb7142"
+    },
+    {
+      "id": "P31",
+      "nodeId": "115:309",
+      "title": "比赛详情",
+      "capturedAt": "2026-09-22T02:47:11.292155+00:00",
+      "file": "P31.png",
+      "sha256": "d258724402d1219659ef120ec6573390cdbc72f1d737be25e4bea5597b67094a"
+    },
+    {
+      "id": "P31-END",
+      "nodeId": "115:336",
+      "title": "比赛已结束",
+      "capturedAt": "2026-09-22T02:47:11.692640+00:00",
+      "file": "P31-END.png",
+      "sha256": "c015e8d3ec9e23982f295a8a77039ecb7db3f07d6f5cee37f893014845c7b1c9"
+    },
+    {
+      "id": "P31-CANCEL",
+      "nodeId": "115:363",
+      "title": "比赛已取消",
+      "capturedAt": "2026-09-22T02:47:12.083593+00:00",
+      "file": "P31-CANCEL.png",
+      "sha256": "eca0066315afdcdfb198058ecb9ae6a7aed2208d7038168eb641e8e7950a0d2c"
+    },
+    {
+      "id": "P29-OUT",
+      "nodeId": "125:329",
+      "title": "室外场地",
+      "capturedAt": "2026-09-22T02:47:12.516046+00:00",
+      "file": "P29-OUT.png",
+      "sha256": "998d5cdea9f7cb3af306748480025440632771c3f21905e6d0344d8fec04c6de"
+    },
+    {
+      "id": "P29-ART",
+      "nodeId": "125:370",
+      "title": "人工草场地",
+      "capturedAt": "2026-09-22T02:47:12.936202+00:00",
+      "file": "P29-ART.png",
+      "sha256": "174130d6b1c760d47db222a7ece4f5cdc67bf2db70fd4e5a4227d2f4d5749b48"
+    },
+    {
+      "id": "P29-NAT",
+      "nodeId": "125:411",
+      "title": "天然草场地",
+      "capturedAt": "2026-09-22T02:47:13.441638+00:00",
+      "file": "P29-NAT.png",
+      "sha256": "787431643267080eb9c6ef85ef2fec1710f6dbb6ca4369115b90f9001655678c"
+    }
+  ]
+}

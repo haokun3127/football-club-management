@@ -1,0 +1,1429 @@
+<canvas id="6:9" name="10 · 家长端" x="0" y="0" width="0" height="0">
+  <frame id="15:2" name="P01 · 首页" x="80" y="80" width="375" height="812">
+    <frame id="15:3" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="16:2" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="16:3" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="16:4" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="16:5" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="16:6" name="首页" x="16" y="8" width="240" height="24" />
+        <frame id="16:7" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="16:8" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:4" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <frame id="16:28" name="学员成长轮播 · 第1张" x="16" y="16" width="343" height="214">
+        <text id="16:29" name="天才足球  /  TALENT FOOTBALL" x="20" y="16" width="303" height="18" />
+        <text id="16:30" name="林予安" x="20" y="42" width="303" height="38" />
+        <text id="16:31" name="U10 精英队  ·  切换孩子 ›" x="20" y="88" width="303" height="20" />
+        <frame id="16:32" name="本学期概览" x="20" y="116" width="303" height="56">
+          <frame id="16:33" name="训练记录" x="0" y="0" width="143" height="56">
+            <text id="16:34" name="24" x="0" y="0" width="143" height="34" />
+            <text id="16:35" name="训练记录" x="0" y="38" width="143" height="18" />
+          </frame>
+          <frame id="16:36" name="确认测评" x="159" y="0" width="143" height="56">
+            <text id="16:37" name="6" x="0" y="0" width="143" height="34" />
+            <text id="16:38" name="确认测评" x="0" y="38" width="143" height="18" />
+          </frame>
+        </frame>
+        <text id="16:39" name="●  ○  ○        每一步，都值得记住" x="20" y="180" width="303" height="18" />
+      </frame>
+      <frame id="16:57" name="俱乐部动态 Banner" x="16" y="242" width="343" height="98">
+        <text id="16:58" name="CLUB NEWS" x="16" y="12" width="311" height="18" />
+        <text id="16:59" name="把热爱留在球场" x="16" y="34" width="311" height="28" />
+        <text id="16:60" name="秋季训练营开放日  ·  了解详情 →" x="16" y="66" width="311" height="20" />
+      </frame>
+      <frame id="16:40" name="四个快捷入口" x="16" y="352" width="343" height="86">
+        <frame id="16:41" name="请假" x="0" y="0" width="79.75" height="86">
+          <frame id="16:42" name="图标" x="8" y="8" width="63.75" height="44">
+            <text id="16:43" name="↗" x="8" y="8" width="47.75" height="28" />
+          </frame>
+          <text id="16:44" name="请假" x="8" y="60" width="63.75" height="18" />
+        </frame>
+        <frame id="16:45" name="训练记录" x="87.75" y="0" width="79.75" height="86">
+          <frame id="16:46" name="图标" x="8" y="8" width="63.75" height="44">
+            <text id="16:47" name="≡" x="8" y="8" width="47.75" height="28" />
+          </frame>
+          <text id="16:48" name="训练记录" x="8" y="60" width="63.75" height="18" />
+        </frame>
+        <frame id="16:49" name="测评结果" x="175.5" y="0" width="79.75" height="86">
+          <frame id="16:50" name="图标" x="8" y="8" width="63.75" height="44">
+            <text id="16:51" name="▥" x="8" y="8" width="47.75" height="28" />
+          </frame>
+          <text id="16:52" name="测评结果" x="8" y="60" width="63.75" height="18" />
+        </frame>
+        <frame id="16:53" name="私教咨询" x="263.25" y="0" width="79.75" height="86">
+          <frame id="16:54" name="图标" x="8" y="8" width="63.75" height="44">
+            <text id="16:55" name="＋" x="8" y="8" width="47.75" height="28" />
+          </frame>
+          <text id="16:56" name="私教咨询" x="8" y="60" width="63.75" height="18" />
+        </frame>
+      </frame>
+      <text id="16:61" name="下一次训练" x="16" y="450" width="343" height="28" />
+      <instance id="16:62" name="TC / Business Card" x="16" y="490" width="343" height="138" />
+    </frame>
+    <frame id="15:5" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="16:9" name="TC / Mini TabBar" x="0" y="0" width="375" height="83" />
+    </frame>
+  </frame>
+  <frame id="15:6" name="P02 · 日程" x="535" y="80" width="375" height="812">
+    <frame id="15:7" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="16:66" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="16:67" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="16:68" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="16:69" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="16:70" name="日程" x="16" y="8" width="240" height="24" />
+        <frame id="16:71" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="16:72" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:8" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <text id="16:92" name="2026年9月" x="16" y="16" width="343" height="34" />
+      <frame id="16:93" name="日期选择" x="16" y="66" width="343" height="88">
+        <frame id="16:94" name="一周日期" x="17" y="17" width="311" height="54">
+          <frame id="16:95" name="一
+14" x="0" y="0" width="40" height="54">
+            <text id="16:96" name="一
+14" x="7" y="7" width="26" height="40" />
+          </frame>
+          <frame id="16:97" name="二
+15" x="45" y="0" width="40" height="54">
+            <text id="16:98" name="二
+15" x="7" y="7" width="26" height="40" />
+          </frame>
+          <frame id="16:99" name="三
+16" x="90" y="0" width="40" height="54">
+            <text id="16:100" name="三
+16" x="7" y="7" width="26" height="40" />
+          </frame>
+          <frame id="16:101" name="四
+17" x="135" y="0" width="40" height="54">
+            <text id="16:102" name="四
+17" x="7" y="7" width="26" height="40" />
+          </frame>
+          <frame id="16:103" name="五
+18" x="180" y="0" width="40" height="54">
+            <text id="16:104" name="五
+18" x="7" y="7" width="26" height="40" />
+          </frame>
+          <frame id="16:105" name="六
+19" x="225" y="0" width="40" height="54">
+            <text id="16:106" name="六
+19" x="7" y="7" width="26" height="40" />
+          </frame>
+          <frame id="16:107" name="日
+20" x="270" y="0" width="40" height="54">
+            <text id="16:108" name="日
+20" x="7" y="7" width="26" height="40" />
+          </frame>
+        </frame>
+      </frame>
+      <text id="16:109" name="9月19日 · 周六" x="16" y="170" width="343" height="24" />
+      <instance id="16:110" name="TC / Business Card" x="16" y="210" width="343" height="142" />
+      <text id="83:245" name="9月19日 · 周六" x="16" y="368" width="343" height="24" />
+      <instance id="16:114" name="TC / Business Card" x="16" y="408" width="343" height="118" />
+    </frame>
+    <frame id="15:9" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="16:73" name="TC / Mini TabBar" x="0" y="0" width="375" height="83" />
+    </frame>
+  </frame>
+  <frame id="15:10" name="P03 · 训练详情" x="990" y="80" width="375" height="812">
+    <frame id="15:11" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="16:118" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="16:119" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="16:120" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="16:121" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="16:122" name="‹  训练详情" x="16" y="8" width="240" height="24" />
+        <frame id="16:123" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="16:124" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:12" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <frame id="16:127" name="概览" x="16" y="16" width="343" height="176">
+        <text id="16:128" name="U10 技术训练" x="17" y="17" width="311" height="34" />
+        <text id="16:129" name="9月19日 周六 16:30–18:00" x="17" y="63" width="311" height="24" />
+        <text id="16:130" name="天才足球训练场 · 2号场" x="17" y="99" width="311" height="24" />
+        <text id="16:131" name="陈教练 · 主教练" x="17" y="135" width="311" height="24" />
+      </frame>
+      <frame id="16:132" name="热身与协调 15分钟" x="16" y="208" width="343" height="166">
+        <text id="16:133" name="热身与协调 15分钟" x="17" y="17" width="311" height="24" />
+        <text id="16:134" name="控球与传接 30分钟" x="17" y="53" width="311" height="24" />
+        <text id="16:135" name="小组对抗 30分钟" x="17" y="89" width="311" height="24" />
+        <text id="16:136" name="放松 15分钟" x="17" y="125" width="311" height="24" />
+      </frame>
+    </frame>
+    <frame id="15:13" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="16:125" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:14" name="P04 · 提交请假" x="1445" y="80" width="375" height="812">
+    <frame id="15:15" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="16:137" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="16:138" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="16:139" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="16:140" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="16:141" name="‹  提交请假" x="16" y="8" width="240" height="24" />
+        <frame id="16:142" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="16:143" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:16" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="16:146" name="TC / Field" x="16" y="16" width="343" height="102" />
+      <instance id="16:151" name="TC / Field" x="16" y="134" width="343" height="102" />
+      <instance id="16:156" name="TC / Field" x="16" y="252" width="343" height="102" />
+      <frame id="16:161" name="操作说明" x="16" y="370" width="343" height="42">
+        <text id="16:162" name="提交后立即生效，本堂训练不计课次" x="12" y="12" width="319" height="18" />
+      </frame>
+    </frame>
+    <frame id="15:17" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="16:144" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:18" name="P05 · 请假已生效" x="1900" y="80" width="375" height="812">
+    <frame id="15:19" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="16:163" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="16:164" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="16:165" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="16:166" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="16:167" name="‹  请假已生效" x="16" y="8" width="240" height="24" />
+        <frame id="16:168" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="16:169" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:20" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <frame id="16:172" name="成功反馈" x="16" y="16" width="343" height="258">
+        <text id="16:173" name="✓" x="24" y="48" width="295" height="44" />
+        <text id="16:174" name="已记录本次请假" x="24" y="112" width="295" height="34" />
+        <text id="16:175" name="林予安 · 9月19日训练" x="24" y="166" width="295" height="24" />
+        <text id="16:176" name="本堂训练不计课次，教练无需审批。" x="24" y="210" width="295" height="24" />
+      </frame>
+    </frame>
+    <frame id="15:21" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="16:170" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:22" name="P06 · 修正训练记录" x="80" y="1000" width="375" height="812">
+    <frame id="15:23" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="16:177" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="16:178" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="16:179" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="16:180" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="16:181" name="‹  修正训练记录" x="16" y="8" width="240" height="24" />
+        <frame id="16:182" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="16:183" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:24" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="16:186" name="TC / Field" x="16" y="16" width="343" height="102" />
+      <instance id="16:191" name="TC / Field" x="16" y="134" width="343" height="102" />
+      <instance id="16:196" name="TC / Field" x="16" y="252" width="343" height="102" />
+      <instance id="16:201" name="TC / Field" x="16" y="370" width="343" height="102" />
+      <frame id="16:206" name="操作说明" x="16" y="488" width="343" height="42">
+        <text id="16:207" name="保存后直接生效，每次修改保留历史" x="12" y="12" width="319" height="18" />
+      </frame>
+    </frame>
+    <frame id="15:25" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="16:184" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:26" name="P07 · 记录与修改历史" x="535" y="1000" width="375" height="812">
+    <frame id="15:27" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:79" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:80" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:81" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:82" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:83" name="‹  记录与修改历史" x="16" y="8" width="240" height="24" />
+        <frame id="17:84" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:85" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:28" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <text id="17:88" name="当前：不计课次" x="16" y="16" width="343" height="28" />
+      <frame id="17:89" name="历史记录" x="16" y="60" width="343" height="132">
+        <frame id="17:90" name="9月18日 09:20" x="17" y="17" width="163" height="26">
+          <text id="17:91" name="9月18日 09:20" x="8" y="4" width="147" height="18" />
+        </frame>
+        <text id="17:92" name="家长修正" x="17" y="55" width="311" height="24" />
+        <text id="17:93" name="已计课次 → 不计课次" x="17" y="91" width="311" height="24" />
+      </frame>
+      <frame id="17:94" name="历史记录" x="16" y="208" width="343" height="132">
+        <frame id="17:95" name="9月13日 00:10" x="17" y="17" width="163" height="26">
+          <text id="17:96" name="9月13日 00:10" x="8" y="4" width="147" height="18" />
+        </frame>
+        <text id="17:97" name="系统默认" x="17" y="55" width="311" height="24" />
+        <text id="17:98" name="生成训练记录" x="17" y="91" width="311" height="24" />
+      </frame>
+      <text id="17:99" name="按培训记录统计，不代表逐项动作的实测完成。" x="16" y="356" width="343" height="18" />
+    </frame>
+    <frame id="15:29" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:86" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:30" name="P08 · 成长" x="990" y="1000" width="375" height="812">
+    <frame id="15:31" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:100" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:101" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:102" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:103" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:104" name="成长" x="16" y="8" width="240" height="24" />
+        <frame id="17:105" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:106" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:32" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <frame id="17:126" name="个人成长概览" x="16" y="16" width="343" height="166">
+        <text id="17:127" name="林予安的成长" x="17" y="15" width="311" height="34" />
+        <text id="17:128" name="与过去的自己比较" x="17" y="57" width="311" height="20" />
+        <frame id="17:129" name="统计" x="17" y="85" width="311" height="66">
+          <frame id="17:130" name="训练记录" x="0" y="0" width="147" height="66">
+            <text id="17:131" name="24" x="0" y="0" width="147" height="44" />
+            <text id="17:132" name="训练记录" x="0" y="48" width="147" height="18" />
+          </frame>
+          <frame id="17:133" name="已确认测评" x="163" y="0" width="147" height="66">
+            <text id="17:134" name="6" x="0" y="0" width="147" height="44" />
+            <text id="17:135" name="已确认测评" x="0" y="48" width="147" height="18" />
+          </frame>
+        </frame>
+      </frame>
+      <frame id="17:136" name="个人能力变化 · 示例" x="16" y="194" width="343" height="205">
+        <text id="17:137" name="本次与上次" x="17" y="13" width="311" height="24" />
+        <frame id="17:138" name="控球稳定性" x="17" y="45" width="311" height="35">
+          <frame id="17:139" name="控球稳定性" x="0" y="0" width="311" height="20">
+            <text id="17:140" name="控球稳定性" x="0" y="0" width="247" height="20" />
+            <text id="17:141" name="75" x="255" y="0" width="56" height="20" />
+          </frame>
+          <rounded-rectangle id="17:142" name="刻度底" x="0" y="28" width="311" height="7" />
+          <rounded-rectangle id="17:143" name="数据条" x="0" y="28" width="233.25" height="7" />
+        </frame>
+        <frame id="17:144" name="传接球表现" x="17" y="88" width="311" height="35">
+          <frame id="17:145" name="传接球表现" x="0" y="0" width="311" height="20">
+            <text id="17:146" name="传接球表现" x="0" y="0" width="247" height="20" />
+            <text id="17:147" name="82" x="255" y="0" width="56" height="20" />
+          </frame>
+          <rounded-rectangle id="17:148" name="刻度底" x="0" y="28" width="311" height="7" />
+          <rounded-rectangle id="17:149" name="数据条" x="0" y="28" width="255.02000427246094" height="7" />
+        </frame>
+        <frame id="17:150" name="协调能力" x="17" y="131" width="311" height="35">
+          <frame id="17:151" name="协调能力" x="0" y="0" width="311" height="20">
+            <text id="17:152" name="协调能力" x="0" y="0" width="247" height="20" />
+            <text id="17:153" name="78" x="255" y="0" width="56" height="20" />
+          </frame>
+          <rounded-rectangle id="17:154" name="刻度底" x="0" y="28" width="311" height="7" />
+          <rounded-rectangle id="17:155" name="数据条" x="0" y="28" width="242.5800018310547" height="7" />
+        </frame>
+        <text id="17:156" name="示例模型输出 · 无同伴排名" x="17" y="174" width="311" height="18" />
+      </frame>
+      <instance id="17:157" name="TC / Business Card" x="16" y="411" width="343" height="114" />
+      <instance id="17:161" name="TC / Business Card" x="16" y="537" width="343" height="114" />
+    </frame>
+    <frame id="15:33" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:107" name="TC / Mini TabBar" x="0" y="0" width="375" height="83" />
+    </frame>
+  </frame>
+  <frame id="15:34" name="P09 · 测评项目详情" x="1445" y="1000" width="375" height="812">
+    <frame id="15:35" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:165" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:166" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:167" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:168" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:169" name="‹  测评项目详情" x="16" y="8" width="240" height="24" />
+        <frame id="17:170" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:171" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:36" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <frame id="17:174" name="原始成绩" x="16" y="16" width="343" height="148">
+        <text id="17:175" name="20米跑" x="17" y="17" width="311" height="28" />
+        <text id="17:176" name="4.28 秒" x="17" y="57" width="311" height="44" />
+        <text id="17:177" name="实际测评：9月12日 · U10训练" x="17" y="113" width="311" height="18" />
+      </frame>
+      <frame id="17:178" name="历史变化" x="16" y="180" width="343" height="254">
+        <text id="17:179" name="每一次真实进步" x="17" y="17" width="311" height="24" />
+        <frame id="17:180" name="历史数值" x="17" y="53" width="311" height="154">
+          <frame id="17:181" name="4.62" x="0" y="0" width="95" height="154">
+            <rounded-rectangle id="17:182" name="历史高度" x="0" y="7.599998474121094" width="95" height="92.4000015258789" />
+            <text id="17:183" name="4.62 秒" x="0" y="108" width="95" height="20" />
+            <text id="17:184" name="7月18日" x="0" y="136" width="95" height="18" />
+          </frame>
+          <frame id="17:185" name="4.46" x="107" y="0" width="95" height="154">
+            <rounded-rectangle id="17:186" name="历史高度" x="0" y="10.800003051757812" width="95" height="89.19999694824219" />
+            <text id="17:187" name="4.46 秒" x="0" y="108" width="95" height="20" />
+            <text id="17:188" name="8月16日" x="0" y="136" width="95" height="18" />
+          </frame>
+          <frame id="17:189" name="4.28" x="214" y="0" width="95" height="154">
+            <rounded-rectangle id="17:190" name="历史高度" x="0" y="14.400001525878906" width="95" height="85.5999984741211" />
+            <text id="17:191" name="4.28 秒" x="0" y="108" width="95" height="20" />
+            <text id="17:192" name="9月12日" x="0" y="136" width="95" height="18" />
+          </frame>
+        </frame>
+        <text id="17:193" name="本项目越低越好" x="17" y="219" width="311" height="18" />
+      </frame>
+      <instance id="17:194" name="TC / Business Card" x="16" y="450" width="343" height="118" />
+    </frame>
+    <frame id="15:37" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:172" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:38" name="P10 · 测评历史" x="1900" y="1000" width="375" height="812">
+    <frame id="15:39" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:198" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:199" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:200" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:201" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:202" name="‹  测评历史" x="16" y="8" width="240" height="24" />
+        <frame id="17:203" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:204" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:40" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="17:207" name="TC / Business Card" x="16" y="16" width="343" height="142" />
+      <instance id="17:211" name="TC / Business Card" x="16" y="174" width="343" height="142" />
+      <instance id="17:215" name="TC / Business Card" x="16" y="332" width="343" height="142" />
+      <text id="17:219" name="按实际测评日期排序；修订版本保留" x="16" y="490" width="343" height="20" />
+    </frame>
+    <frame id="15:41" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:205" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:42" name="P11 · 学期成长报告" x="80" y="1920" width="375" height="812">
+    <frame id="15:43" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:220" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:221" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:222" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:223" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:224" name="‹  学期成长报告" x="16" y="8" width="240" height="24" />
+        <frame id="17:225" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:226" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:44" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <frame id="17:229" name="个人成长概览" x="16" y="16" width="343" height="178">
+        <text id="17:230" name="2026 秋季成长报告" x="17" y="17" width="311" height="34" />
+        <text id="17:231" name="与过去的自己比较" x="17" y="63" width="311" height="20" />
+        <frame id="17:232" name="统计" x="17" y="95" width="311" height="66">
+          <frame id="17:233" name="训练记录" x="0" y="0" width="147" height="66">
+            <text id="17:234" name="24" x="0" y="0" width="147" height="44" />
+            <text id="17:235" name="训练记录" x="0" y="48" width="147" height="18" />
+          </frame>
+          <frame id="17:236" name="已确认测评" x="163" y="0" width="147" height="66">
+            <text id="17:237" name="6" x="0" y="0" width="147" height="44" />
+            <text id="17:238" name="已确认测评" x="0" y="48" width="147" height="18" />
+          </frame>
+        </frame>
+      </frame>
+      <frame id="17:239" name="个人能力变化 · 示例" x="16" y="210" width="343" height="229">
+        <text id="17:240" name="本次与上次" x="17" y="17" width="311" height="24" />
+        <frame id="17:241" name="控球稳定性" x="17" y="53" width="311" height="35">
+          <frame id="17:242" name="控球稳定性" x="0" y="0" width="311" height="20">
+            <text id="17:243" name="控球稳定性" x="0" y="0" width="247" height="20" />
+            <text id="17:244" name="75" x="255" y="0" width="56" height="20" />
+          </frame>
+          <rounded-rectangle id="17:245" name="刻度底" x="0" y="28" width="311" height="7" />
+          <rounded-rectangle id="17:246" name="数据条" x="0" y="28" width="233.25" height="7" />
+        </frame>
+        <frame id="17:247" name="传接球表现" x="17" y="100" width="311" height="35">
+          <frame id="17:248" name="传接球表现" x="0" y="0" width="311" height="20">
+            <text id="17:249" name="传接球表现" x="0" y="0" width="247" height="20" />
+            <text id="17:250" name="82" x="255" y="0" width="56" height="20" />
+          </frame>
+          <rounded-rectangle id="17:251" name="刻度底" x="0" y="28" width="311" height="7" />
+          <rounded-rectangle id="17:252" name="数据条" x="0" y="28" width="255.02000427246094" height="7" />
+        </frame>
+        <frame id="17:253" name="协调能力" x="17" y="147" width="311" height="35">
+          <frame id="17:254" name="协调能力" x="0" y="0" width="311" height="20">
+            <text id="17:255" name="协调能力" x="0" y="0" width="247" height="20" />
+            <text id="17:256" name="78" x="255" y="0" width="56" height="20" />
+          </frame>
+          <rounded-rectangle id="17:257" name="刻度底" x="0" y="28" width="311" height="7" />
+          <rounded-rectangle id="17:258" name="数据条" x="0" y="28" width="242.5800018310547" height="7" />
+        </frame>
+        <text id="17:259" name="示例模型输出 · 无同伴排名" x="17" y="194" width="311" height="18" />
+      </frame>
+      <instance id="17:260" name="TC / Business Card" x="16" y="455" width="343" height="160" />
+      <instance id="17:264" name="TC / Business Card" x="16" y="631" width="343" height="160" />
+    </frame>
+    <frame id="15:45" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:227" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:46" name="P12 · 训练记录" x="535" y="1920" width="375" height="812">
+    <frame id="15:47" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:268" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:269" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:270" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:271" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:272" name="‹  训练记录" x="16" y="8" width="240" height="24" />
+        <frame id="17:273" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:274" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:48" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="17:277" name="TC / Business Card" x="16" y="16" width="343" height="160" />
+      <instance id="17:281" name="TC / Business Card" x="16" y="192" width="343" height="160" />
+      <instance id="17:285" name="TC / Business Card" x="16" y="368" width="343" height="160" />
+      <text id="17:289" name="按当前有效培训记录汇总" x="16" y="544" width="343" height="20" />
+    </frame>
+    <frame id="15:49" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:275" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:50" name="P13 · 比赛记录" x="990" y="1920" width="375" height="812">
+    <frame id="15:51" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:290" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:291" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:292" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:293" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:294" name="‹  比赛记录" x="16" y="8" width="240" height="24" />
+        <frame id="17:295" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:296" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:52" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="17:299" name="TC / Business Card" x="16" y="16" width="343" height="114" />
+      <instance id="17:303" name="TC / Business Card" x="16" y="146" width="343" height="114" />
+      <text id="17:307" name="训练内友谊赛归入训练记录" x="16" y="276" width="343" height="20" />
+    </frame>
+    <frame id="15:53" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:297" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:54" name="P14 · 成长里程碑" x="1445" y="1920" width="375" height="812">
+    <frame id="15:55" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:308" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:309" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:310" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:311" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:312" name="‹  成长里程碑" x="16" y="8" width="240" height="24" />
+        <frame id="17:313" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:314" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:56" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <text id="17:317" name="每一步，都值得记住" x="16" y="16" width="343" height="28" />
+      <frame id="17:318" name="历史记录" x="16" y="60" width="343" height="132">
+        <frame id="17:319" name="9月12日" x="17" y="17" width="85" height="26">
+          <text id="17:320" name="9月12日" x="8" y="4" width="69" height="18" />
+        </frame>
+        <text id="17:321" name="完成阶段测评" x="17" y="55" width="311" height="24" />
+        <text id="17:322" name="记录新一次努力" x="17" y="91" width="311" height="24" />
+      </frame>
+      <frame id="17:323" name="历史记录" x="16" y="208" width="343" height="132">
+        <frame id="17:324" name="9月05日" x="17" y="17" width="85" height="26">
+          <text id="17:325" name="9月05日" x="8" y="4" width="69" height="18" />
+        </frame>
+        <text id="17:326" name="第24次训练记录" x="17" y="55" width="311" height="24" />
+        <text id="17:327" name="坚持正在发生" x="17" y="91" width="311" height="24" />
+      </frame>
+      <frame id="17:328" name="历史记录" x="16" y="356" width="343" height="132">
+        <frame id="17:329" name="8月20日" x="17" y="17" width="85" height="26">
+          <text id="17:330" name="8月20日" x="8" y="4" width="69" height="18" />
+        </frame>
+        <text id="17:331" name="评价更新" x="17" y="55" width="311" height="24" />
+        <text id="17:332" name="学会主动观察队友" x="17" y="91" width="311" height="24" />
+      </frame>
+      <text id="17:333" name="制作成长卡" x="16" y="504" width="343" height="18" />
+    </frame>
+    <frame id="15:57" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:315" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:58" name="P15 · 成长分享卡" x="1900" y="1920" width="375" height="812">
+    <frame id="15:59" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:334" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:335" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:336" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:337" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:338" name="‹  成长分享卡" x="16" y="8" width="240" height="24" />
+        <frame id="17:339" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:340" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:60" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <frame id="17:343" name="预制分享模板 · 成长记忆" x="16" y="16" width="343" height="494">
+        <text id="17:344" name="TALENT FOOTBALL" x="24" y="24" width="295" height="18" />
+        <text id="17:345" name="让努力
+成为自己的光" x="24" y="58" width="295" height="88" />
+        <frame id="17:346" name="原创球场图形" x="24" y="162" width="295" height="180">
+          <frame id="17:347" name="Frame" x="0" y="0" width="295" height="180">
+            <frame id="17:348" name="Group" x="18.9710636138916" y="23.601287841796875" width="257.057861328125" height="132.79742431640625">
+              <vector id="17:349" name="Vector" x="18.971064299345016" y="23.601287364959717" width="257.057861328125" height="132.79742431640625" />
+              <vector id="17:350" name="Vector" x="18.971064299345016" y="23.601287364959717" width="257.057861328125" height="132.79742431640625" />
+              <vector id="17:351" name="Vector" x="113.82636451721191" y="56.80064392089844" width="66.39871215820312" height="66.39871215820312" />
+              <vector id="17:352" name="Vector" x="145.12861824035645" y="88.10289001464844" width="3.7942121028900146" height="3.7942121028900146" />
+            </frame>
+            <vector id="17:353" name="Vector" x="0.000004500150680541992" y="4.630227565765381" width="279.8231506347656" height="170.7395477294922" />
+          </frame>
+        </frame>
+        <text id="17:354" name="林予安  /  U10" x="24" y="358" width="295" height="34" />
+        <text id="17:355" name="24 次训练记录" x="24" y="408" width="295" height="28" />
+        <text id="17:356" name="天才足球 · 成长纪念" x="24" y="452" width="295" height="18" />
+      </frame>
+      <text id="17:357" name="选择模板   ● 成长记忆   ○ 赛场时刻" x="16" y="526" width="343" height="20" />
+      <text id="17:358" name="照片使用普通原图；公开字段和照片须已获授权。" x="16" y="562" width="343" height="18" />
+    </frame>
+    <frame id="15:61" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:341" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:62" name="P16 · 俱乐部动态" x="80" y="2840" width="375" height="812">
+    <frame id="15:63" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:359" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:360" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:361" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:362" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:363" name="‹  俱乐部动态" x="16" y="8" width="240" height="24" />
+        <frame id="17:364" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:365" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:64" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="17:368" name="TC / Business Card" x="16" y="16" width="343" height="160" />
+      <instance id="17:372" name="TC / Business Card" x="16" y="192" width="343" height="160" />
+      <instance id="17:376" name="TC / Business Card" x="16" y="368" width="343" height="160" />
+    </frame>
+    <frame id="15:65" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:366" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:66" name="P17 · 动态详情" x="535" y="2840" width="375" height="812">
+    <frame id="15:67" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:380" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:381" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:382" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:383" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:384" name="‹  动态详情" x="16" y="8" width="240" height="24" />
+        <frame id="17:385" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:386" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:68" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <text id="17:389" name="秋季训练营开放日" x="16" y="16" width="343" height="34" />
+      <text id="17:390" name="天才足球 · 2026年9月18日" x="16" y="66" width="343" height="18" />
+      <frame id="17:391" name="原创球场图形" x="16" y="100" width="343" height="180">
+        <frame id="17:392" name="Frame" x="0" y="0" width="343" height="180">
+          <frame id="17:393" name="Group" x="36" y="20" width="271" height="140">
+            <vector id="17:394" name="Vector" x="36" y="20" width="271" height="140" />
+            <vector id="17:395" name="Vector" x="36" y="20" width="271" height="140" />
+            <vector id="17:396" name="Vector" x="136" y="55" width="70" height="70" />
+            <vector id="17:397" name="Vector" x="169" y="88" width="4" height="4" />
+          </frame>
+          <vector id="17:398" name="Vector" x="16" y="0" width="295" height="180" />
+        </frame>
+      </frame>
+      <text id="17:399" name="把成长交给时间，把热爱留在球场。" x="16" y="296" width="343" height="24" />
+      <text id="17:400" name="本周开放日欢迎家长了解训练内容与孩子的阶段进步。" x="16" y="336" width="343" height="48" />
+      <text id="17:401" name="活动时间
+9月26日 10:00–12:00" x="16" y="400" width="343" height="48" />
+      <text id="17:402" name="活动地点
+天才足球训练场" x="16" y="464" width="343" height="48" />
+    </frame>
+    <frame id="15:69" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:387" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:70" name="P18 · 专业服务" x="990" y="2840" width="375" height="812">
+    <frame id="15:71" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:403" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:404" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:405" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:406" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:407" name="‹  专业服务" x="16" y="8" width="240" height="24" />
+        <frame id="17:408" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:409" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:72" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="17:412" name="TC / Business Card" x="16" y="16" width="343" height="160" />
+      <instance id="17:416" name="TC / Business Card" x="16" y="192" width="343" height="160" />
+      <instance id="17:420" name="TC / Business Card" x="16" y="368" width="343" height="160" />
+      <text id="17:424" name="咨询不形成订单或付款" x="16" y="544" width="343" height="20" />
+    </frame>
+    <frame id="15:73" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:410" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:74" name="P19 · 私教咨询" x="1445" y="2840" width="375" height="812">
+    <frame id="15:75" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:425" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:426" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:427" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:428" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:429" name="‹  私教咨询" x="16" y="8" width="240" height="24" />
+        <frame id="17:430" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:431" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:76" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="17:434" name="TC / Field" x="16" y="16" width="343" height="102" />
+      <instance id="17:439" name="TC / Field" x="16" y="134" width="343" height="102" />
+      <instance id="17:444" name="TC / Field" x="16" y="252" width="343" height="102" />
+      <instance id="17:449" name="TC / Field" x="16" y="370" width="343" height="102" />
+      <frame id="17:454" name="操作说明" x="16" y="488" width="343" height="42">
+        <text id="17:455" name="提交后由俱乐部联系沟通，不自动购买" x="12" y="12" width="319" height="18" />
+      </frame>
+    </frame>
+    <frame id="15:77" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:432" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:78" name="P20 · 咨询已提交" x="1900" y="2840" width="375" height="812">
+    <frame id="15:79" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:456" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:457" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:458" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:459" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:460" name="‹  咨询已提交" x="16" y="8" width="240" height="24" />
+        <frame id="17:461" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:462" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:80" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <frame id="17:465" name="成功反馈" x="16" y="16" width="343" height="258">
+        <text id="17:466" name="✓" x="24" y="48" width="295" height="44" />
+        <text id="17:467" name="俱乐部已收到你的咨询" x="24" y="112" width="295" height="34" />
+        <text id="17:468" name="服务方向：控球与传接" x="24" y="166" width="295" height="24" />
+        <text id="17:469" name="可在我的咨询中查看后续跟进。" x="24" y="210" width="295" height="24" />
+      </frame>
+    </frame>
+    <frame id="15:81" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:463" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:82" name="P21 · 孩子档案" x="80" y="3760" width="375" height="812">
+    <frame id="15:83" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:470" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:471" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:472" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:473" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:474" name="‹  孩子档案" x="16" y="8" width="240" height="24" />
+        <frame id="17:475" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:476" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:84" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <frame id="17:479" name="身份与资料" x="16" y="16" width="343" height="104">
+        <text id="17:480" name="TALENT FAMILY" x="20" y="20" width="303" height="18" />
+        <text id="17:481" name="林予安 · U10 精英队" x="20" y="50" width="303" height="34" />
+      </frame>
+      <frame id="17:482" name="资料与服务" x="16" y="136" width="343" height="229">
+        <frame id="17:483" name="位置" x="17" y="17" width="311" height="24">
+          <text id="17:484" name="位置" x="0" y="0" width="90" height="20" />
+          <text id="17:485" name="中场" x="102" y="0" width="209" height="24" />
+        </frame>
+        <rounded-rectangle id="17:486" name="分隔线" x="17" y="53" width="311" height="1" />
+        <frame id="17:487" name="惯用脚" x="17" y="66" width="311" height="24">
+          <text id="17:488" name="惯用脚" x="0" y="0" width="90" height="20" />
+          <text id="17:489" name="右脚" x="102" y="0" width="209" height="24" />
+        </frame>
+        <rounded-rectangle id="17:490" name="分隔线" x="17" y="102" width="311" height="1" />
+        <frame id="17:491" name="负责教练" x="17" y="115" width="311" height="24">
+          <text id="17:492" name="负责教练" x="0" y="0" width="90" height="20" />
+          <text id="17:493" name="陈教练" x="102" y="0" width="209" height="24" />
+        </frame>
+        <rounded-rectangle id="17:494" name="分隔线" x="17" y="151" width="311" height="1" />
+        <text id="17:495" name="资料由俱乐部维护；如需更正请联系俱乐部" x="17" y="164" width="311" height="18" />
+        <text id="17:496" name="查看训练记录" x="17" y="194" width="311" height="18" />
+      </frame>
+    </frame>
+    <frame id="15:85" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:477" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:86" name="P22 · 我的" x="535" y="3760" width="375" height="812">
+    <frame id="15:87" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:497" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:498" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:499" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:500" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:501" name="我的" x="16" y="8" width="240" height="24" />
+        <frame id="17:502" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:503" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:88" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <frame id="17:523" name="身份与资料" x="16" y="16" width="343" height="104">
+        <text id="17:524" name="TALENT FAMILY" x="20" y="20" width="303" height="18" />
+        <text id="17:525" name="林予安家长" x="20" y="50" width="303" height="34" />
+      </frame>
+      <frame id="17:526" name="资料与服务" x="16" y="136" width="343" height="376">
+        <frame id="17:527" name="孩子档案" x="17" y="17" width="311" height="24">
+          <text id="17:528" name="孩子档案" x="0" y="0" width="90" height="20" />
+          <text id="17:529" name="林予安 / 林予宁" x="102" y="0" width="209" height="24" />
+        </frame>
+        <rounded-rectangle id="17:530" name="分隔线" x="17" y="53" width="311" height="1" />
+        <frame id="17:531" name="我的咨询" x="17" y="66" width="311" height="24">
+          <text id="17:532" name="我的咨询" x="0" y="0" width="90" height="20" />
+          <text id="17:533" name="1条跟进中" x="102" y="0" width="209" height="24" />
+        </frame>
+        <rounded-rectangle id="17:534" name="分隔线" x="17" y="102" width="311" height="1" />
+        <frame id="17:535" name="消息中心" x="17" y="115" width="311" height="24">
+          <text id="17:536" name="消息中心" x="0" y="0" width="90" height="20" />
+          <text id="17:537" name="2条新消息" x="102" y="0" width="209" height="24" />
+        </frame>
+        <rounded-rectangle id="17:538" name="分隔线" x="17" y="151" width="311" height="1" />
+        <frame id="17:539" name="教练团队" x="17" y="164" width="311" height="24">
+          <text id="17:540" name="教练团队" x="0" y="0" width="90" height="20" />
+          <text id="17:541" name="了解教学团队" x="102" y="0" width="209" height="24" />
+        </frame>
+        <rounded-rectangle id="17:542" name="分隔线" x="17" y="200" width="311" height="1" />
+        <frame id="17:543" name="训练场地" x="17" y="213" width="311" height="24">
+          <text id="17:544" name="训练场地" x="0" y="0" width="90" height="20" />
+          <text id="17:545" name="地址与到场指引" x="102" y="0" width="209" height="24" />
+        </frame>
+        <rounded-rectangle id="17:546" name="分隔线" x="17" y="249" width="311" height="1" />
+        <frame id="17:547" name="帮助与反馈" x="17" y="262" width="311" height="24">
+          <text id="17:548" name="帮助与反馈" x="0" y="0" width="90" height="20" />
+          <text id="17:549" name="常见问题" x="102" y="0" width="209" height="24" />
+        </frame>
+        <rounded-rectangle id="17:550" name="分隔线" x="17" y="298" width="311" height="1" />
+        <text id="17:551" name="当前身份：家长" x="17" y="311" width="311" height="48" />
+      </frame>
+    </frame>
+    <frame id="15:89" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:504" name="TC / Mini TabBar" x="0" y="0" width="375" height="83" />
+    </frame>
+  </frame>
+  <frame id="15:90" name="P23 · 自定义快捷入口" x="990" y="3760" width="375" height="812">
+    <frame id="15:91" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:552" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:553" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:554" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:555" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:556" name="‹  自定义快捷入口" x="16" y="8" width="240" height="24" />
+        <frame id="17:557" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:558" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:92" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <text id="17:561" name="已选 4 / 4" x="16" y="16" width="343" height="24" />
+      <frame id="17:562" name="请假" x="16" y="56" width="343" height="92">
+        <frame id="17:563" name="选项" x="17" y="17" width="311" height="28">
+          <text id="17:564" name="☑" x="0" y="0" width="24" height="28" />
+          <text id="17:565" name="请假" x="32" y="0" width="279" height="24" />
+        </frame>
+        <text id="17:566" name="已选" x="17" y="57" width="311" height="18" />
+      </frame>
+      <frame id="17:567" name="训练记录" x="16" y="164" width="343" height="92">
+        <frame id="17:568" name="选项" x="17" y="17" width="311" height="28">
+          <text id="17:569" name="☑" x="0" y="0" width="24" height="28" />
+          <text id="17:570" name="训练记录" x="32" y="0" width="279" height="24" />
+        </frame>
+        <text id="17:571" name="已选" x="17" y="57" width="311" height="18" />
+      </frame>
+      <frame id="17:572" name="测评结果" x="16" y="272" width="343" height="92">
+        <frame id="17:573" name="选项" x="17" y="17" width="311" height="28">
+          <text id="17:574" name="☑" x="0" y="0" width="24" height="28" />
+          <text id="17:575" name="测评结果" x="32" y="0" width="279" height="24" />
+        </frame>
+        <text id="17:576" name="已选" x="17" y="57" width="311" height="18" />
+      </frame>
+      <frame id="17:577" name="私教咨询" x="16" y="380" width="343" height="92">
+        <frame id="17:578" name="选项" x="17" y="17" width="311" height="28">
+          <text id="17:579" name="☑" x="0" y="0" width="24" height="28" />
+          <text id="17:580" name="私教咨询" x="32" y="0" width="279" height="24" />
+        </frame>
+        <text id="17:581" name="已选" x="17" y="57" width="311" height="18" />
+      </frame>
+      <frame id="17:582" name="成长里程碑" x="16" y="488" width="343" height="92">
+        <frame id="17:583" name="选项" x="17" y="17" width="311" height="28">
+          <text id="17:584" name="○" x="0" y="0" width="24" height="28" />
+          <text id="17:585" name="成长里程碑" x="32" y="0" width="279" height="24" />
+        </frame>
+        <text id="17:586" name="可选" x="17" y="57" width="311" height="18" />
+      </frame>
+      <text id="17:587" name="拖动调整顺序" x="16" y="596" width="343" height="18" />
+    </frame>
+    <frame id="15:93" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:559" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:94" name="P24 · 消息中心" x="1445" y="3760" width="375" height="812">
+    <frame id="15:95" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:588" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:589" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:590" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:591" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:592" name="‹  消息中心" x="16" y="8" width="240" height="24" />
+        <frame id="17:593" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:594" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:96" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="17:597" name="TC / Business Card" x="16" y="16" width="343" height="160" />
+      <instance id="17:601" name="TC / Business Card" x="16" y="192" width="343" height="160" />
+      <text id="17:605" name="阅读状态与通知渠道以实际能力为准" x="16" y="368" width="343" height="20" />
+    </frame>
+    <frame id="15:97" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:595" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:98" name="P25 · 教练与场地" x="1900" y="3760" width="375" height="812">
+    <frame id="15:99" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:606" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:607" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:608" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:609" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:610" name="‹  教练与场地" x="16" y="8" width="240" height="24" />
+        <frame id="17:611" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:612" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:100" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="17:615" name="TC / Business Card" x="16" y="16" width="343" height="114" />
+      <instance id="17:619" name="TC / Business Card" x="16" y="146" width="343" height="114" />
+      <instance id="17:623" name="TC / Business Card" x="16" y="276" width="343" height="114" />
+      <instance id="17:627" name="TC / Business Card" x="16" y="406" width="343" height="114" />
+    </frame>
+    <frame id="15:101" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:613" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="15:102" name="P26 · 帮助与反馈" x="80" y="4680" width="375" height="812">
+    <frame id="15:103" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="17:631" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="17:632" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="17:633" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="17:634" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="17:635" name="‹  帮助与反馈" x="16" y="8" width="240" height="24" />
+        <frame id="17:636" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="17:637" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="15:104" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="17:640" name="TC / Business Card" x="16" y="16" width="343" height="160" />
+      <instance id="17:644" name="TC / Business Card" x="16" y="192" width="343" height="160" />
+      <instance id="17:648" name="TC / Business Card" x="16" y="368" width="343" height="160" />
+      <instance id="17:652" name="TC / Business Card" x="16" y="544" width="343" height="160" />
+    </frame>
+    <frame id="15:105" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="17:638" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="25:236" name="P27 · 我的咨询" x="80" y="5600" width="375" height="812">
+    <frame id="25:237" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="25:244" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="25:245" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="25:246" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="25:247" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="25:248" name="‹  我的咨询" x="16" y="8" width="240" height="24" />
+        <frame id="25:249" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="25:250" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="25:238" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="25:253" name="TC / Business Card" x="16" y="16" width="343" height="160" />
+      <instance id="25:257" name="TC / Business Card" x="16" y="192" width="343" height="160" />
+      <text id="25:261" name="咨询不等同已购买服务" x="16" y="368" width="343" height="20" />
+    </frame>
+    <frame id="25:239" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="25:251" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="25:240" name="P28 · 咨询跟进" x="535" y="5600" width="375" height="812">
+    <frame id="25:241" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="25:262" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="25:263" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="25:264" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="25:265" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="25:266" name="‹  咨询跟进" x="16" y="8" width="240" height="24" />
+        <frame id="25:267" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="25:268" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="25:242" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <text id="25:271" name="控球专项私教 · 林予安" x="16" y="16" width="343" height="28" />
+      <frame id="25:272" name="历史记录" x="16" y="60" width="343" height="132">
+        <frame id="25:273" name="9月18日 10:00" x="17" y="17" width="163" height="26">
+          <text id="25:274" name="9月18日 10:00" x="8" y="4" width="147" height="18" />
+        </frame>
+        <text id="25:275" name="咨询已提交" x="17" y="55" width="311" height="24" />
+        <text id="25:276" name="方向：控球与传接" x="17" y="91" width="311" height="24" />
+      </frame>
+      <frame id="25:277" name="历史记录" x="16" y="208" width="343" height="132">
+        <frame id="25:278" name="9月18日 15:00" x="17" y="17" width="163" height="26">
+          <text id="25:279" name="9月18日 15:00" x="8" y="4" width="147" height="18" />
+        </frame>
+        <text id="25:280" name="俱乐部已联系" x="17" y="55" width="311" height="24" />
+        <text id="25:281" name="沟通后确定安排" x="17" y="91" width="311" height="24" />
+      </frame>
+      <text id="25:282" name="后续方案和费用由双方沟通确认" x="16" y="356" width="343" height="18" />
+    </frame>
+    <frame id="25:243" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="25:269" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="112:254" name="P29 · 训练场地" x="80" y="5600" width="375" height="812">
+    <frame id="112:255" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="112:256" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="112:257" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="112:258" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="112:259" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="112:260" name="‹  服务跟进" x="16" y="8" width="240" height="24" />
+        <frame id="112:261" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="112:262" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="112:263" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <frame id="113:274" name="场地搜索" x="16" y="16" width="343" height="44">
+        <text id="113:275" name="15分钟 · 已选" x="16" y="13" width="327" height="18" />
+      </frame>
+      <frame id="113:276" name="场地类型筛选" x="16" y="72" width="343" height="44">
+        <frame id="113:277" name="分类 / 全部" x="0" y="0" width="62" height="44">
+          <text id="113:278" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="113:279" name="分类 / 热身" x="70" y="0" width="62" height="44">
+          <text id="113:280" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="113:281" name="分类 / 技术" x="140" y="0" width="62" height="44">
+          <text id="113:282" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="113:283" name="分类 / 战术" x="210" y="0" width="62" height="44">
+          <text id="113:284" name="热身 / 技术 / 战术 / 对抗" x="11.5" y="10" width="39" height="24" />
+        </frame>
+        <frame id="113:285" name="分类 / 对抗" x="280" y="0" width="62" height="44">
+          <text id="113:286" name="热身 / 技术 / 战术 / 对抗" x="11.5" y="10" width="39" height="24" />
+        </frame>
+      </frame>
+      <instance id="112:264" name="TC / Business Card" x="16" y="128" width="343" height="138" />
+      <instance id="112:265" name="TC / Business Card" x="16" y="278" width="343" height="138" />
+      <instance id="112:266" name="TC / Business Card" x="16" y="428" width="343" height="138" />
+      <text id="112:267" name="服务承接不等同咨询已付款" x="16" y="578" width="343" height="20" />
+    </frame>
+    <frame id="112:268" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="112:269" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="112:281" name="P30 · 场地详情" x="535" y="5600" width="375" height="812">
+    <frame id="112:282" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="112:283" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="112:284" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="112:285" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="112:286" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="112:287" name="‹  服务跟进" x="16" y="8" width="240" height="24" />
+        <frame id="112:288" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="112:289" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="112:290" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="112:291" name="TC / Business Card" x="16" y="16" width="343" height="114" />
+      <instance id="112:292" name="TC / Business Card" x="16" y="142" width="343" height="114" />
+      <instance id="112:293" name="TC / Business Card" x="16" y="268" width="343" height="114" />
+      <text id="112:294" name="服务承接不等同咨询已付款" x="16" y="394" width="343" height="20" />
+    </frame>
+    <frame id="112:295" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="112:296" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="112:308" name="P30-NO · 场地暂无定位" x="990" y="5600" width="375" height="812">
+    <frame id="112:309" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="112:310" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="112:311" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="112:312" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="112:313" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="112:314" name="‹  服务跟进" x="16" y="8" width="240" height="24" />
+        <frame id="112:315" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="112:316" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="112:317" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="112:318" name="TC / Business Card" x="16" y="16" width="343" height="114" />
+      <instance id="112:319" name="TC / Business Card" x="16" y="142" width="343" height="114" />
+      <instance id="112:320" name="TC / Business Card" x="16" y="268" width="343" height="114" />
+      <text id="112:321" name="服务承接不等同咨询已付款" x="16" y="394" width="343" height="20" />
+    </frame>
+    <frame id="112:322" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="112:323" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="113:287" name="P29-A · 室内场地检索" x="1445" y="5600" width="375" height="812">
+    <frame id="113:288" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="113:289" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="113:290" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="113:291" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="113:292" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="113:293" name="‹  服务跟进" x="16" y="8" width="240" height="24" />
+        <frame id="113:294" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="113:295" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="113:296" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <frame id="113:297" name="场地搜索" x="16" y="16" width="343" height="44">
+        <text id="113:298" name="15分钟 · 已选" x="16" y="13" width="327" height="18" />
+      </frame>
+      <frame id="113:299" name="场地类型筛选" x="16" y="72" width="343" height="44">
+        <frame id="113:300" name="分类 / 全部" x="0" y="0" width="62" height="44">
+          <text id="113:301" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="113:302" name="分类 / 热身" x="70" y="0" width="62" height="44">
+          <text id="113:303" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="113:304" name="分类 / 技术" x="140" y="0" width="62" height="44">
+          <text id="113:305" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="113:306" name="分类 / 战术" x="210" y="0" width="62" height="44">
+          <text id="113:307" name="热身 / 技术 / 战术 / 对抗" x="11.5" y="10" width="39" height="24" />
+        </frame>
+        <frame id="113:308" name="分类 / 对抗" x="280" y="0" width="62" height="44">
+          <text id="113:309" name="热身 / 技术 / 战术 / 对抗" x="11.5" y="10" width="39" height="24" />
+        </frame>
+      </frame>
+      <instance id="113:310" name="TC / Business Card" x="16" y="128" width="343" height="138" hidden="true" />
+      <instance id="113:311" name="TC / Business Card" x="16" y="128" width="343" height="138" hidden="true" />
+      <instance id="113:312" name="TC / Business Card" x="16" y="128" width="343" height="138" />
+      <text id="113:313" name="服务承接不等同咨询已付款" x="16" y="278" width="343" height="20" />
+    </frame>
+    <frame id="113:314" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="113:315" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="114:288" name="P30-IN · 室内馆详情" x="1900" y="5600" width="375" height="812">
+    <frame id="114:289" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="114:290" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="114:291" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="114:292" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="114:293" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="114:294" name="‹  服务跟进" x="16" y="8" width="240" height="24" />
+        <frame id="114:295" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="114:296" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="114:297" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="114:298" name="TC / Business Card" x="16" y="16" width="343" height="114" />
+      <instance id="114:299" name="TC / Business Card" x="16" y="142" width="343" height="114" />
+      <instance id="114:300" name="TC / Business Card" x="16" y="268" width="343" height="114" />
+      <text id="114:301" name="服务承接不等同咨询已付款" x="16" y="394" width="343" height="20" />
+    </frame>
+    <frame id="114:302" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="114:303" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="114:315" name="P30-MAP · 地图导航" x="80" y="6520" width="375" height="812">
+    <frame id="114:316" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="114:317" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="114:318" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="114:319" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="114:320" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="114:321" name="‹  服务跟进" x="16" y="8" width="240" height="24" />
+        <frame id="114:322" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="114:323" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="114:324" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="114:325" name="TC / Business Card" x="16" y="16" width="343" height="114" />
+      <instance id="114:326" name="TC / Business Card" x="16" y="142" width="343" height="114" />
+      <instance id="114:327" name="TC / Business Card" x="16" y="268" width="343" height="114" />
+      <text id="114:328" name="服务承接不等同咨询已付款" x="16" y="394" width="343" height="20" />
+    </frame>
+    <frame id="114:329" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="114:330" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="114:342" name="P29-E · 未找到匹配场地" x="535" y="6520" width="375" height="812">
+    <frame id="114:343" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="114:344" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="114:345" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="114:346" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="114:347" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="114:348" name="‹  服务跟进" x="16" y="8" width="240" height="24" />
+        <frame id="114:349" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="114:350" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="114:351" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <frame id="114:352" name="场地搜索" x="16" y="16" width="343" height="44">
+        <text id="114:353" name="15分钟 · 已选" x="16" y="13" width="327" height="18" />
+      </frame>
+      <frame id="114:354" name="场地类型筛选" x="16" y="72" width="343" height="44">
+        <frame id="114:355" name="分类 / 全部" x="0" y="0" width="62" height="44">
+          <text id="114:356" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="114:357" name="分类 / 热身" x="70" y="0" width="62" height="44">
+          <text id="114:358" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="114:359" name="分类 / 技术" x="140" y="0" width="62" height="44">
+          <text id="114:360" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="114:361" name="分类 / 战术" x="210" y="0" width="62" height="44">
+          <text id="114:362" name="热身 / 技术 / 战术 / 对抗" x="11.5" y="10" width="39" height="24" />
+        </frame>
+        <frame id="114:363" name="分类 / 对抗" x="280" y="0" width="62" height="44">
+          <text id="114:364" name="热身 / 技术 / 战术 / 对抗" x="11.5" y="10" width="39" height="24" />
+        </frame>
+      </frame>
+      <instance id="114:365" name="TC / Business Card" x="16" y="128" width="343" height="138" hidden="true" />
+      <instance id="114:366" name="TC / Business Card" x="16" y="128" width="343" height="138" hidden="true" />
+      <instance id="114:367" name="TC / Business Card" x="16" y="128" width="343" height="138" hidden="true" />
+      <text id="114:368" name="服务承接不等同咨询已付款" x="16" y="128" width="343" height="56" />
+    </frame>
+    <frame id="114:369" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="114:370" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="115:309" name="P31 · 比赛详情" x="990" y="6520" width="375" height="812">
+    <frame id="115:310" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="115:311" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="115:312" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="115:313" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="115:314" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="115:315" name="‹  服务跟进" x="16" y="8" width="240" height="24" />
+        <frame id="115:316" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="115:317" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="115:318" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="115:319" name="TC / Business Card" x="16" y="16" width="343" height="138" />
+      <instance id="115:320" name="TC / Business Card" x="16" y="166" width="343" height="114" />
+      <instance id="115:321" name="TC / Business Card" x="16" y="292" width="343" height="138" />
+      <text id="115:322" name="服务承接不等同咨询已付款" x="16" y="442" width="343" height="20" />
+    </frame>
+    <frame id="115:323" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="115:324" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="115:336" name="P31-END · 比赛已结束" x="1445" y="6520" width="375" height="812">
+    <frame id="115:337" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="115:338" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="115:339" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="115:340" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="115:341" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="115:342" name="‹  服务跟进" x="16" y="8" width="240" height="24" />
+        <frame id="115:343" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="115:344" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="115:345" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="115:346" name="TC / Business Card" x="16" y="16" width="343" height="158" />
+      <instance id="115:347" name="TC / Business Card" x="16" y="186" width="343" height="138" />
+      <instance id="115:348" name="TC / Business Card" x="16" y="336" width="343" height="138" />
+      <text id="115:349" name="服务承接不等同咨询已付款" x="16" y="486" width="343" height="20" />
+    </frame>
+    <frame id="115:350" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="115:351" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="115:363" name="P31-CANCEL · 比赛已取消" x="1900" y="6520" width="375" height="812">
+    <frame id="115:364" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="115:365" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="115:366" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="115:367" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="115:368" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="115:369" name="‹  服务跟进" x="16" y="8" width="240" height="24" />
+        <frame id="115:370" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="115:371" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="115:372" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <instance id="115:373" name="TC / Business Card" x="16" y="16" width="343" height="138" />
+      <instance id="115:374" name="TC / Business Card" x="16" y="166" width="343" height="114" />
+      <instance id="115:375" name="TC / Business Card" x="16" y="292" width="343" height="114" />
+      <text id="115:376" name="服务承接不等同咨询已付款" x="16" y="418" width="343" height="20" />
+    </frame>
+    <frame id="115:377" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="115:378" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="125:329" name="P29-OUT · 室外场地" x="80" y="7440" width="375" height="812">
+    <frame id="125:330" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="125:331" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="125:332" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="125:333" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="125:334" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="125:335" name="‹  服务跟进" x="16" y="8" width="240" height="24" />
+        <frame id="125:336" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="125:337" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="125:338" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <frame id="125:339" name="场地搜索" x="16" y="16" width="343" height="44">
+        <text id="125:340" name="15分钟 · 已选" x="16" y="13" width="327" height="18" />
+      </frame>
+      <frame id="125:341" name="场地类型筛选" x="16" y="72" width="343" height="44">
+        <frame id="125:342" name="分类 / 全部" x="0" y="0" width="62" height="44">
+          <text id="125:343" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="125:344" name="分类 / 热身" x="70" y="0" width="62" height="44">
+          <text id="125:345" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="125:346" name="分类 / 技术" x="140" y="0" width="62" height="44">
+          <text id="125:347" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="125:348" name="分类 / 战术" x="210" y="0" width="62" height="44">
+          <text id="125:349" name="热身 / 技术 / 战术 / 对抗" x="11.5" y="10" width="39" height="24" />
+        </frame>
+        <frame id="125:350" name="分类 / 对抗" x="280" y="0" width="62" height="44">
+          <text id="125:351" name="热身 / 技术 / 战术 / 对抗" x="11.5" y="10" width="39" height="24" />
+        </frame>
+      </frame>
+      <instance id="125:352" name="TC / Business Card" x="16" y="128" width="343" height="138" />
+      <instance id="125:353" name="TC / Business Card" x="16" y="278" width="343" height="138" />
+      <instance id="125:354" name="TC / Business Card" x="16" y="428" width="343" height="138" hidden="true" />
+      <text id="125:355" name="服务承接不等同咨询已付款" x="16" y="428" width="343" height="20" />
+    </frame>
+    <frame id="125:356" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="125:357" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="125:370" name="P29-ART · 人工草场地" x="535" y="7440" width="375" height="812">
+    <frame id="125:371" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="125:372" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="125:373" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="125:374" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="125:375" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="125:376" name="‹  服务跟进" x="16" y="8" width="240" height="24" />
+        <frame id="125:377" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="125:378" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="125:379" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <frame id="125:380" name="场地搜索" x="16" y="16" width="343" height="44">
+        <text id="125:381" name="15分钟 · 已选" x="16" y="13" width="327" height="18" />
+      </frame>
+      <frame id="125:382" name="场地类型筛选" x="16" y="72" width="343" height="44">
+        <frame id="125:383" name="分类 / 全部" x="0" y="0" width="62" height="44">
+          <text id="125:384" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="125:385" name="分类 / 热身" x="70" y="0" width="62" height="44">
+          <text id="125:386" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="125:387" name="分类 / 技术" x="140" y="0" width="62" height="44">
+          <text id="125:388" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="125:389" name="分类 / 战术" x="210" y="0" width="62" height="44">
+          <text id="125:390" name="热身 / 技术 / 战术 / 对抗" x="11.5" y="10" width="39" height="24" />
+        </frame>
+        <frame id="125:391" name="分类 / 对抗" x="280" y="0" width="62" height="44">
+          <text id="125:392" name="热身 / 技术 / 战术 / 对抗" x="11.5" y="10" width="39" height="24" />
+        </frame>
+      </frame>
+      <instance id="125:393" name="TC / Business Card" x="16" y="128" width="343" height="138" />
+      <instance id="125:394" name="TC / Business Card" x="16" y="278" width="343" height="138" hidden="true" />
+      <instance id="125:395" name="TC / Business Card" x="16" y="278" width="343" height="138" />
+      <text id="125:396" name="服务承接不等同咨询已付款" x="16" y="428" width="343" height="20" />
+    </frame>
+    <frame id="125:397" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="125:398" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+  <frame id="125:411" name="P29-NAT · 天然草场地" x="990" y="7440" width="375" height="812">
+    <frame id="125:412" name="顶部导航" x="0" y="0" width="375" height="88">
+      <frame id="125:413" name="系统状态栏" x="0" y="0" width="375" height="44">
+        <text id="125:414" name="9:41" x="16" y="10" width="263" height="20" />
+        <text id="125:415" name="••• ▰" x="279" y="10" width="80" height="20" />
+      </frame>
+      <frame id="125:416" name="导航栏与胶囊占位" x="0" y="44" width="375" height="44">
+        <text id="125:417" name="‹  服务跟进" x="16" y="8" width="240" height="24" />
+        <frame id="125:418" name="微信系统胶囊区域" x="264" y="8" width="87" height="28">
+          <text id="125:419" name="•••    ◉" x="9.5" y="1" width="68" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="125:420" name="内容 · 可纵向滚动" x="0" y="88" width="375" height="641">
+      <frame id="125:421" name="场地搜索" x="16" y="16" width="343" height="44">
+        <text id="125:422" name="15分钟 · 已选" x="16" y="13" width="327" height="18" />
+      </frame>
+      <frame id="125:423" name="场地类型筛选" x="16" y="72" width="343" height="44">
+        <frame id="125:424" name="分类 / 全部" x="0" y="0" width="62" height="44">
+          <text id="125:425" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="125:426" name="分类 / 热身" x="70" y="0" width="62" height="44">
+          <text id="125:427" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="125:428" name="分类 / 技术" x="140" y="0" width="62" height="44">
+          <text id="125:429" name="热身 / 技术 / 战术 / 对抗" x="18" y="10" width="26" height="24" />
+        </frame>
+        <frame id="125:430" name="分类 / 战术" x="210" y="0" width="62" height="44">
+          <text id="125:431" name="热身 / 技术 / 战术 / 对抗" x="11.5" y="10" width="39" height="24" />
+        </frame>
+        <frame id="125:432" name="分类 / 对抗" x="280" y="0" width="62" height="44">
+          <text id="125:433" name="热身 / 技术 / 战术 / 对抗" x="11.5" y="10" width="39" height="24" />
+        </frame>
+      </frame>
+      <instance id="125:434" name="TC / Business Card" x="16" y="128" width="343" height="138" hidden="true" />
+      <instance id="125:435" name="TC / Business Card" x="16" y="128" width="343" height="138" />
+      <instance id="125:436" name="TC / Business Card" x="16" y="278" width="343" height="138" hidden="true" />
+      <text id="125:437" name="服务承接不等同咨询已付款" x="16" y="278" width="343" height="20" />
+    </frame>
+    <frame id="125:438" name="固定操作与安全区" x="0" y="729" width="375" height="83">
+      <instance id="125:439" name="TC / Button" x="16" y="8" width="343" height="48" />
+    </frame>
+  </frame>
+</canvas>

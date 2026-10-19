@@ -1,0 +1,441 @@
+Window: "天才足球 · 产品升级全量设计 · 2026.09", App: Figma.
+0 standard window 天才足球 · 产品升级全量设计 · 2026.09, Secondary Actions: Raise
+	1 container 天才足球 · 产品升级全量设计 · 2026.09
+		2 container
+			3 HTML content Figma, URL: file:///Applications/Figma.app/Contents/Resources/app.asar/shell.html
+				4 container
+					5 tab group Tab bar
+						6 container
+							7 tab (settable, integer) Description: Home, Value: 0
+							8 tab (settable, integer) Description: AI应用转化Hub 官网 UI 优化 Round5, Value: 0
+							9 tab (settable, integer) Description: 重庆天才小程序 UIUX Design System, Value: 0
+							10 tab (selected) Description: 天才足球 · 产品升级全量设计 · 2026.09, Value: 1
+								11 button Close tab
+							12 button New file
+						13 pop up button Open and recently closed tabs
+			14 HTML content 天才足球 · 产品升级全量设计 · 2026.09 – Figma, URL: figma.com/design/EyQtDtILGDZDf6neLBL6vs/%E5%A4%A9%E6%89%8D%E8%B6%B3%E7%90%83-%C2%B7-%E4%BA%A7%E5%93%81%E5%8D%87%E7%BA%A7%E5%85%A8%E9%87%8F%E8%AE%BE%E8%AE%A1-%C2%B7-2026.09?node-id=17-756&m=dev
+				15 container
+					16 container
+						17 container
+						18 container Figma Design, 1 item selected
+						19 text Screenreader support for the board is currently disabled. To enable it via Accessibility settings, press ⌘K, type Accessibility Settings, and press Enter. To see available keyboard shortcuts, enter ⌃⇧Question mark .
+						20 container Comments on canvas
+							21 button Create new comment
+						22 container Left sidebar
+							23 toolbar Navigation Bar
+								24 pop up button Main menu
+									25 image
+								26 button File
+									27 image
+									28 text File
+								29 button Variables
+									30 image
+									31 text Variables
+							32 container
+								33 button 天才足球 · 产品升级全量设计 · 2026.09, file name
+								34 text File name
+								35 pop up button Edit file menu
+								36 button Minimize UI
+								37 link Description: Drafts, Value: figma.com/files/team/1473219625644975094/project/340128768
+								38 container
+									39 heading Pages Find, Value: 2
+										40 button Pages
+										41 button Find
+									42 container
+										43 container
+											44 table
+												45 row 00 · 封面
+													46 cell
+														47 button 00 · 封面
+												48 row 01 · 使用与交互说明
+													49 cell
+														50 button 01 · 使用与交互说明
+												51 row 02 · 品牌基础
+													52 cell
+														53 button 02 · 品牌基础
+												54 row 03 · Button
+													55 cell
+														56 button 03 · Button
+												57 row 04 · Field
+													58 cell
+														59 button 04 · Field
+												60 row 05 · Badge
+													61 cell
+														62 button 05 · Badge
+												63 row 06 · Navigation
+													64 cell
+														65 button 06 · Navigation
+												66 row 07 · Business Card
+													67 cell
+														68 button 07 · Business Card
+												69 row 10 · 家长端
+													70 cell
+														71 button 10 · 家长端
+												72 row 20 · 教练端
+													73 cell
+														74 button 20 · 教练端
+												75 row 30 · 后台·数据管理
+													76 cell
+														77 button 30 · 后台·数据管理
+												78 row 31 · 后台·评测与模型
+													79 cell
+														80 button 31 · 后台·评测与模型
+												81 row 32 · 后台·BI
+													82 cell
+														83 button 32 · 后台·BI
+												84 row 33 · 后台·专业服务
+													85 cell
+														86 button 33 · 后台·专业服务
+												87 row 34 · 后台·设置
+													88 cell
+														89 button 34 · 后台·设置
+												90 row 40 · 状态与适配
+													91 cell
+														92 button 40 · 状态与适配
+										93 slider Description: Resize handle, Value: 100, Details: 151 pixels, Secondary Actions: Increment, Decrement
+								94 button Ready for development
+								95 container
+									96 button Mark as ready for dev
+								97 container
+									98 button Auto layout C05 · 课程模板
+										99 image Auto layout
+										100 text C05 · 课程模板
+									101 button Auto layout C06 · 复制课程内容
+										102 image Auto layout
+										103 text C06 · 复制课程内容
+									104 button Auto layout C07 · 训练记录名单
+										105 image Auto layout
+										106 text C07 · 训练记录名单
+									107 button Auto layout C08 · 修正记录与历史
+										108 image Auto layout
+										109 text C08 · 修正记录与历史
+									110 button Auto layout C09 · 单堂训练变更
+										111 image Auto layout
+										112 text C09 · 单堂训练变更
+									113 button Auto layout C10 · 我的队伍
+										114 image Auto layout
+										115 text C10 · 我的队伍
+									116 button Auto layout C11 · 学员详情
+										117 image Auto layout
+										118 text C11 · 学员详情
+									119 button Auto layout C12 · 更新学员评价
+										120 image Auto layout
+										121 text C12 · 更新学员评价
+									122 button Auto layout C13 · 评价变化
+										123 image Auto layout
+										124 text C13 · 评价变化
+									125 button Auto layout C14 · 测评任务
+										126 image Auto layout
+										127 text C14 · 测评任务
+									128 button Auto layout C15 · 创建本队测评
+										129 image Auto layout
+										130 text C15 · 创建本队测评
+									131 button Auto layout C16 · 任务详情
+										132 image Auto layout
+										133 text C16 · 任务详情
+									134 button Auto layout C17 · 项目清单
+										135 image Auto layout
+										136 text C17 · 项目清单
+									137 button Auto layout C18 · 批量录入
+										138 image Auto layout
+										139 text C18 · 批量录入
+									140 button Auto layout C19 · 选择关联训练课
+										141 image Auto layout
+										142 text C19 · 选择关联训练课
+									143 button Auto layout C20 · 核对并同步
+										144 image Auto layout
+										145 text C20 · 核对并同步
+									146 button Auto layout C21 · 同步完成
+										147 image Auto layout
+										148 text C21 · 同步完成
+									149 button Auto layout C22 · 更正已确认成绩
+										150 image Auto layout
+										151 text C22 · 更正已确认成绩
+									152 button Auto layout C23 · 标记不测评
+										153 image Auto layout
+										154 text C23 · 标记不测评
+									155 button Auto layout C24 · 比赛详情
+										156 image Auto layout
+										157 text C24 · 比赛详情
+									158 button Auto layout C25 · 比赛记录
+										159 image Auto layout
+										160 text C25 · 比赛记录
+									161 button Auto layout C26 · 战术板
+										162 image Auto layout
+										163 text C26 · 战术板
+									164 button Auto layout C27 · 我的教学记录
+										165 image Auto layout
+										166 text C27 · 我的教学记录
+									167 button Auto layout C28 · 我的与权限
+										168 image Auto layout
+										169 text C28 · 我的与权限
+									170 button Auto layout C29 · 服务跟进
+										171 image Auto layout
+										172 text C29 · 服务跟进
+									173 button Auto layout C30 · 保存课程模板
+										174 image Auto layout
+										175 text C30 · 保存课程模板
+								176 slider Description: Resize handle, Value: 280, Details: 280 pixels, Secondary Actions: Increment, Decrement
+						177 container Properties and plugins
+							178 container
+								179 container
+									180 container
+										181 button Follow CLINT CLYNX
+									182 pop up button Multiplayer tools
+										183 image
+									184 container Prototype view
+										185 button Present
+										186 pop up button Prototype view
+									187 button Share
+									188 tab group
+										189 tab (selected) Inspect, Value: 1
+										190 tab (settable, integer) Plugins, Value: 0
+									191 pop up button 80%, zoom and view options
+										192 text 80%
+										193 image
+									194 container Inspect
+										195 container
+											196 container
+												197 button Click to copy layer name: C26 · 战术板
+												198 button Copy URL for selected layer
+												199 checkbox Toggle ready for dev status, Value: 0
+												200 text Toggle ready for dev status
+												201 pop up button More actions
+												202 image Auto layout
+												203 text Frame with auto layout
+											204 container
+												205 button MCP
+													206 heading MCP, Value: 3
+														207 text MCP
+												208 pop up button Open help
+												209 pop up button Open set up modal
+												210 button Set up third-party agents for Figma MCP
+												211 text Selection details Session activity Sent  14 hours ago Estimated tokens 2.8k
+												212 button Implement this design from Figma. @https://www.figma.com/design/EyQtDtILGDZDf6neLBL6vs/%E5%A4%A9%E6%89%8D%E8%B6%B3%E7%90%83-%C2%B7-%E4%BA%A7%E5%93%81%E5%8D%87%E7%BA%A7%E5%85%A8%E9%87%8F%E8%AE%BE%E8%AE%A1-%C2%B7-2026.09?node-id=17-756&m=dev
+													213 text Implement this design from Figma.
+													214 text @https://www.figma.com/design/EyQtDtILGDZDf6neLBL6vs/%E5%A4%A9%E6%89%8D%E8%B6%B3%E7%90%83-%C2%B7-%E4%BA%A7%E5%93%81%E5%8D%87%E7%BA%A7%E5%85%A8%E9%87%8F%E8%AE%BE%E8%AE%A1-%C2%B7-2026.09?node-id=17-756&m=dev
+												215 button Copy example prompt
+											216 container
+												217 button Layer properties
+													218 heading Layer properties, Value: 3
+														219 text Layer properties
+												220 image Visual representation of element layout properties including padding, border box, and spacing
+												221 View
+													222 text View
+													223 container
+														224 radio button List, Value: 0
+														225 text List
+													226 container
+														227 radio button Code, Value: 1
+														228 text Code
+												229 text Language: HTML
+												230 pop up button Language: HTML
+													231 image Figma to Code (HTML, Tailwind, Flutter, SwiftUI) icon
+													232 text HTML
+												233 container
+													234 heading Code, Value: 3
+														235 text Code
+													236 button Copy Code, press shift to copy all code
+													237 container
+														238 container
+															239 container
+																240 text < div style = " width : 100 % ; height : 100 % ; background : var ( --color-page , #F6F7F9 ) ; overflow :  hidden ; flex-direction :  column ; justify-content :  flex-start ; align-items :  flex-start ; display :  inline-flex " >
+															241 container
+																242 text < div style = " width : 375 px ; height : 88 px ; background : var ( --color-card , white ) ; overflow :  hidden ; flex-direction :  column ; justify-content :  flex-start ; align-items :  flex-start ; display :  flex " >
+															243 container
+																244 text < div style = " width : 375 px ; height : 44 px ; padding-top : 10 px ; padding-bottom : 8 px ; padding-left : 16 px ; padding-right : 16 px ; background : var ( --color-card , white ) ; overflow :  hidden ; justify-content :  flex-start ; align-items :  flex-start ; display :  inline-flex " >
+															245 container
+																246 text < div style = " width : 263 px ; color : var ( --color-text , #202124 ) ; font-size : 13 px ; font-family :  Noto Sans SC ; font-weight : 500 ; line-height : 20 px ; word-wrap :  break-word " > 9:41 </ div >
+															247 container
+																248 text < div style = " width : 80 px ; color : var ( --color-text , #202124 ) ; font-size : 13 px ; font-family :  Noto Sans SC ; font-weight : 500 ; line-height : 20 px ; word-wrap :  break-word " > ••• ▰ </ div >
+															249 container
+																250 text </ div >
+															251 container
+																252 text < div style = " width : 375 px ; height : 44 px ; padding-left : 16 px ; padding-right : 16 px ; padding-top : 8 px ; padding-bottom : 8 px ; background : var ( --color-card , white ) ; overflow :  hidden ; justify-content :  flex-start ; align-items :  flex-start ; gap : 8 px ; display :  inline-flex " >
+															253 container
+																254 text < div style = " width : 240 px ; color : var ( --color-text , #202124 ) ; font-size : 16 px ; font-family :  Noto Sans SC ; font-weight : 500 ; line-height : 24 px ; word-wrap :  break-word " > ‹ 战术板 </ div >
+															255 container
+																256 text < div style = " width : 87 px ; height : 28 px ; overflow :  hidden ; border-radius : 14 px ; outline : 1 px var ( --color-line , #E7EAF0 )  solid ; outline-offset : -1 px ; justify-content :  center ; align-items :  flex-start ; display :  flex " >
+															257 container
+																258 text < div style = " width : 68 px ; color : var ( --color-text , #202124 ) ; font-size : 13 px ; font-family :  Noto Sans SC ; font-weight : 500 ; line-height : 20 px ; word-wrap :  break-word " > ••• ◉ </ div >
+															259 container
+																260 text </ div >
+															261 container
+																262 text </ div >
+															263 container
+																264 text </ div >
+															265 container
+																266 text < div style = " width : 375 px ; height : 641 px ; padding : 16 px ; background : var ( --color-page , #F6F7F9 ) ; overflow :  hidden ; flex-direction :  column ; justify-content :  flex-start ; align-items :  flex-start ; gap : 16 px ; display :  flex " >
+															267 container
+																268 text < div style = " width : 137 px ; padding-left : 8 px ; padding-right : 8 px ; padding-top : 4 px ; padding-bottom : 4 px ; background : var ( --color-soft , #FCEEEF ) ; overflow :  hidden ; border-radius : 8 px ; justify-content :  flex-start ; align-items :  flex-start ; display :  inline-flex " >
+													269 button Show 47 more lines of code
+												270 container
+													271 heading Text Styles, Value: 3
+														272 text Text Styles
+													273 button Copy Text Styles, press shift to copy all code
+													274 container
+														275 text // 9:41
+														276 container
+															277 text color: var(--color-text,  #202124 );
+														278 text font-size: 13px;
+														279 text font-family: Noto Sans SC;
+														280 text font-weight: 500;
+														281 text line-height: 20px;
+														282 text word-wrap: break-word
+														283 text ---
+														284 text // ••• ▰
+														285 container
+															286 text color: var(--color-text,  #202124 );
+														287 text font-size: 13px;
+														288 text font-family: Noto Sans SC;
+														289 text font-weight: 500;
+														290 text line-height: 20px;
+														291 text word-wrap: break-word
+													292 button Show 152 more lines of code
+												293 heading Modes, Value: 3
+													294 text Modes
+												295 button Copy TC / Dimensions: Auto (Mode 1)
+													296 container TC / Dimensions
+														297 text TC / Dimensions
+													298 container Auto (Mode 1)
+														299 text Auto (Mode 1)
+												300 button Copy TC / Primitives: Auto (Mode 1)
+													301 container TC / Primitives
+														302 text TC / Primitives
+													303 container Auto (Mode 1)
+														304 text Auto (Mode 1)
+												305 button Copy TC / Semantic: Auto (Mode 1)
+													306 container TC / Semantic
+														307 text TC / Semantic
+													308 container Auto (Mode 1)
+														309 text Auto (Mode 1)
+												310 heading Colors, Value: 3
+													311 text Colors
+												312 text Color format
+												313 combo box (settable) Color format, Value: Hex
+													314 text Hex
+													315 image
+												316 container
+													317 heading Background colors, Value: 3
+														318 text Background colors
+													319 button Copy color/page
+														320 container color/page
+															321 text color/page
+													322 toggle button Description: Variable details: color/page, Value: 0
+														323 image
+												324 container
+													325 heading Selection colors, Value: 3
+														326 text Selection colors
+													327 button Copy color/card
+														328 container color/card
+															329 text color/card
+													330 toggle button Description: Variable details: color/card, Value: 0
+														331 image
+													332 button Copy color/text
+														333 container color/text
+															334 text color/text
+													335 toggle button Description: Variable details: color/text, Value: 0
+														336 image
+													337 button Copy color/brand
+														338 container color/brand
+															339 text color/brand
+													340 toggle button Description: Variable details: color/brand, Value: 0
+														341 image
+													342 button Copy color/page
+														343 container color/page
+															344 text color/page
+													345 toggle button Description: Variable details: color/page, Value: 0
+														346 image
+													347 button 6 more
+											348 container
+												349 button Motion
+													350 heading Motion, Value: 3
+														351 text Motion
+												352 Motion display preference
+													353 text Motion display preference
+													354 container
+														355 radio button List, Value: 1
+														356 text List
+													357 container
+														358 radio button (disabled) Code, Value: 0
+														359 text Code
+												360 container
+													361 text Explore more on the timeline Use the timeline view to interact with animations and see a breakdown of transitions.
+												362 button Dismiss
+												363 heading Transitions (no code), Value: 3
+													364 text Transitions (no code)
+												365 image
+												366 button TC / Button > Click > C24 · 比赛详情
+													367 image Instance
+													368 text TC / Button
+													369 text Click
+													370 image Auto layout
+													371 text C24 · 比赛详情
+												372 button ‹ 战术板 > Click > Back
+													373 image Text
+													374 text ‹ 战术板
+													375 text Click
+													376 text Back
+											377 container
+												378 button Assets
+													379 heading Assets, Value: 3
+														380 text Assets
+												381 heading Icons, Value: 3
+													382 text Icons
+												383 pop up button Download icons
+												384 button
+													385 Unlabeled image /4efe553c-0e26-4072-8335-7afd114a6ad3
+												386 text Vector
+												387 container
+													388 text 4.41  x  4.41
+												389 button
+													390 Unlabeled image /2d8df9d9-8f27-47c3-8f0a-0fa9b087ef58
+												391 text Vector
+												392 container
+													393 text 77.2  x  77.2
+											394 container
+												395 button Export
+												396 button Add export settings
+								397 slider Description: Resize handle, Value: 100, Details: 321 pixels, Secondary Actions: Increment, Decrement
+					398 container
+						399 toolbar Editor
+							400 toggle button Description: Move, Value: 1
+								401 image
+							402 toggle button Description: Copy colors, Value: 0
+								403 image
+							404 toggle button Description: Measurement, Value: 0
+								405 image
+							406 toggle button Description: Annotation, Value: 0
+								407 image
+							408 toggle button Description: Comment, Value: 0
+								409 image
+							410 Toolbelt Mode
+								411 text Toolbelt Mode
+								412 radio button Draw, Value: 0
+								413 radio button Design, Value: 0
+								414 radio button Motion, Value: 0
+								415 radio button Dev Mode, Value: 1
+						416 toolbar Inspect
+							417 button Previous frame
+								418 image
+							419 text 26 / 30
+							420 button Next frame
+								421 image
+					422 container Help/zoom toolbar
+						423 toolbar Help/zoom toolbar
+							424 pop up button Help
+								425 image
+	426 close button
+	427 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	428 minimize button
+429 menu bar
+	430 Figma
+	431 File
+	432 Edit
+	433 View
+	434 Plugins
+	435 Widgets
+	436 Window
+	437 Help
+
+The focused UI element is 161 button Auto layout C26 · 战术板

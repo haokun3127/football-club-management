@@ -1152,3 +1152,108 @@ Native save/publication/correction/history acceptance passed; clean mini-program
 ### Next Steps
 
 - Restore GitHub write access and verify CI; complete WeChat public release; verify authenticated production flows before club rollout.
+
+
+## Session 32: 完成9.7.5体验版与独立后台发布
+
+**Date**: 2026-10-14
+**Task**: 完成9.7.5体验版与独立后台发布
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+按获准清单收尾公共内容、四入口、评价用语及家长三层成绩；CI时区修复及UTC全交付通过，备份恢复演练后同镜像先develop后trial，HTTPS后台实测通过，官方上传9.7.5成功且平台标记体验版，包体1531864字节，官方QR已下载；真实手机隐私/手机号/三角色仍为提审前人工验证缺口，正式服务不变。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `806c4077` | (see git log) |
+| `e4e04373` | (see git log) |
+| `939676f3` | (see git log) |
+| `89aba740` | (see git log) |
+| `3fcaa774` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 33: 体验版与 Figma 设计差距只读排查
+
+**Date**: 2026-10-14
+**Task**: 体验版与 Figma 设计差距只读排查
+**Package**: api
+**Branch**: `dev`
+
+### Summary
+
+核对9.7.5来源939676f325b9、当前在线P01/C01/P08设计及七份实际上传文件，确认新旧视觉混用、日程结构差异、权威来源文档分叉与发布全页视觉门禁缺口；保存三张实时Figma PNG和既有原生局部证据。只读排查完成并归档10-14-trial-figma-gap-audit；未改业务代码、上传、部署或真实数据，用户手机全页验收未冒称完成。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+(No commits - planning session)
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 34: 合规收尾与干净基线整理
+
+**Date**: 2026-10-19
+**Task**: 合规收尾与干净基线整理
+**Package**: api
+**Branch**: `feature/ui-batch-1-p01`
+
+### Summary
+
+纠正合规解释并统一主入口；官方重复记录移除成功。完整Node24交付门禁通过；归档16个已完成任务并提交既有10-14归档，保留进行中设计任务。逐类纳入正式文档/资产/任务证据，临时产物和本机备份仅忽略；源码与旧worktree保留，不push、不部署或启动新批次。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `f015ab2d` | (see git log) |
+| `fd1695d1` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

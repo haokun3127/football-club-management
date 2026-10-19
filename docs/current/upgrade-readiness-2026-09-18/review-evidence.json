@@ -1,0 +1,2321 @@
+{
+  "checkedOn": "2026-09-18",
+  "baseCommit": "cccd8d57e16c985c8cb1063c1d94e84849b7781f",
+  "method": "Current-turn read-only source, document, Figma node/reaction inspection and screenshots; no product acceptance tests executed",
+  "figmaFileKey": "EyQtDtILGDZDf6neLBL6vs",
+  "screenshotsInspected": [
+    "17:724",
+    "17:732",
+    "20:52"
+  ],
+  "observations": [
+    {
+      "id": "17:716",
+      "name": "C16 · 任务详情",
+      "texts": [
+        {
+          "id": "17:1262",
+          "text": "9:41"
+        },
+        {
+          "id": "17:1263",
+          "text": "••• ▰"
+        },
+        {
+          "id": "17:1265",
+          "text": "‹  任务详情"
+        },
+        {
+          "id": "17:1267",
+          "text": "•••    ◉"
+        },
+        {
+          "id": "17:1271",
+          "text": "9月阶段测评"
+        },
+        {
+          "id": "17:1272",
+          "text": "9月01日—9月30日 · U10精英队"
+        },
+        {
+          "id": "17:1273",
+          "text": "16/19 · 已处理学员"
+        },
+        {
+          "id": "17:1274",
+          "text": "15 · 实际已测"
+        },
+        {
+          "id": "17:1276",
+          "text": "1"
+        },
+        {
+          "id": "17:1277",
+          "text": "不测评"
+        },
+        {
+          "id": "17:1279",
+          "text": "2"
+        },
+        {
+          "id": "17:1280",
+          "text": "待同步"
+        },
+        {
+          "id": "17:1282",
+          "text": "按学员录入"
+        },
+        {
+          "id": "17:1283",
+          "text": "按项目录入"
+        },
+        {
+          "id": "I17:1268;8:3",
+          "text": "继续录入"
+        }
+      ],
+      "links": [
+        {
+          "id": "17:1265",
+          "name": "‹  任务详情",
+          "reactions": [
+            {
+              "action": {
+                "type": "BACK"
+              },
+              "actions": [
+                {
+                  "type": "BACK"
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "17:1268",
+          "name": "TC / Button",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "17:720",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false,
+                "resetScrollPosition": true
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "17:720",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false,
+                  "resetScrollPosition": true
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "17:724",
+      "name": "C18 · 批量录入",
+      "texts": [
+        {
+          "id": "17:1308",
+          "text": "9:41"
+        },
+        {
+          "id": "17:1309",
+          "text": "••• ▰"
+        },
+        {
+          "id": "17:1311",
+          "text": "‹  批量录入"
+        },
+        {
+          "id": "17:1313",
+          "text": "•••    ◉"
+        },
+        {
+          "id": "17:1316",
+          "text": "20米跑 · 单位：秒"
+        },
+        {
+          "id": "17:1318",
+          "text": "草稿已自动保存"
+        },
+        {
+          "id": "17:1320",
+          "text": "关联训练：9月12日 U10技术训练"
+        },
+        {
+          "id": "17:1323",
+          "text": "林予安"
+        },
+        {
+          "id": "17:1324",
+          "text": "已保存"
+        },
+        {
+          "id": "17:1326",
+          "text": "4.28"
+        },
+        {
+          "id": "17:1327",
+          "text": "秒"
+        },
+        {
+          "id": "17:1330",
+          "text": "周子衡"
+        },
+        {
+          "id": "17:1331",
+          "text": "已保存"
+        },
+        {
+          "id": "17:1333",
+          "text": "4.46"
+        },
+        {
+          "id": "17:1334",
+          "text": "秒"
+        },
+        {
+          "id": "17:1337",
+          "text": "许明澈"
+        },
+        {
+          "id": "17:1338",
+          "text": "未测"
+        },
+        {
+          "id": "17:1340",
+          "text": "待输入"
+        },
+        {
+          "id": "17:1341",
+          "text": "秒"
+        },
+        {
+          "id": "17:1342",
+          "text": "支持分批保存；缺测不填0"
+        },
+        {
+          "id": "I17:1314;8:3",
+          "text": "核对个人结果"
+        }
+      ],
+      "links": [
+        {
+          "id": "17:1311",
+          "name": "‹  批量录入",
+          "reactions": [
+            {
+              "action": {
+                "type": "BACK"
+              },
+              "actions": [
+                {
+                  "type": "BACK"
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "17:1319",
+          "name": "关联训练课",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "17:728",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "17:728",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "17:1314",
+          "name": "TC / Button",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "17:732",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false,
+                "resetScrollPosition": true
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "17:732",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false,
+                  "resetScrollPosition": true
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "17:728",
+      "name": "C19 · 选择关联训练课",
+      "texts": [
+        {
+          "id": "17:1344",
+          "text": "9:41"
+        },
+        {
+          "id": "17:1345",
+          "text": "••• ▰"
+        },
+        {
+          "id": "17:1347",
+          "text": "‹  选择关联训练课"
+        },
+        {
+          "id": "17:1349",
+          "text": "•••    ◉"
+        },
+        {
+          "id": "17:1352",
+          "text": "测评周期：9月01日—9月30日"
+        },
+        {
+          "id": "17:1355",
+          "text": "☑"
+        },
+        {
+          "id": "17:1356",
+          "text": "9月12日 技术训练"
+        },
+        {
+          "id": "17:1357",
+          "text": "已选 · 16:30–18:00"
+        },
+        {
+          "id": "17:1360",
+          "text": "○"
+        },
+        {
+          "id": "17:1361",
+          "text": "9月10日 技术训练"
+        },
+        {
+          "id": "17:1362",
+          "text": "可选 · 16:30–18:00"
+        },
+        {
+          "id": "17:1365",
+          "text": "○"
+        },
+        {
+          "id": "17:1366",
+          "text": "9月05日 友谊赛训练"
+        },
+        {
+          "id": "17:1367",
+          "text": "可选 · 10:00–11:30"
+        },
+        {
+          "id": "17:1368",
+          "text": "仅选择周期内真实开展的训练课"
+        },
+        {
+          "id": "I17:1350;8:3",
+          "text": "应用到所选记录"
+        }
+      ],
+      "links": [
+        {
+          "id": "17:1347",
+          "name": "‹  选择关联训练课",
+          "reactions": [
+            {
+              "action": {
+                "type": "BACK"
+              },
+              "actions": [
+                {
+                  "type": "BACK"
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "17:1350",
+          "name": "TC / Button",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "17:724",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false,
+                "resetScrollPosition": true
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "17:724",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false,
+                  "resetScrollPosition": true
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "17:732",
+      "name": "C20 · 核对并同步",
+      "texts": [
+        {
+          "id": "17:1370",
+          "text": "9:41"
+        },
+        {
+          "id": "17:1371",
+          "text": "••• ▰"
+        },
+        {
+          "id": "17:1373",
+          "text": "‹  核对并同步"
+        },
+        {
+          "id": "17:1375",
+          "text": "•••    ◉"
+        },
+        {
+          "id": "17:1379",
+          "text": "林予安 · 9月阶段测评"
+        },
+        {
+          "id": "17:1380",
+          "text": "原始成绩 · 20米跑 4.28秒 / 传接球 18次"
+        },
+        {
+          "id": "17:1381",
+          "text": "关联课程 · 9月12日 U10 技术训练"
+        },
+        {
+          "id": "17:1382",
+          "text": "适用模型 · 示例版本，仅说明布局"
+        },
+        {
+          "id": "17:1384",
+          "text": "确认后家长可见，无需等待全队完成"
+        },
+        {
+          "id": "I17:1376;8:3",
+          "text": "确认同步"
+        }
+      ],
+      "links": [
+        {
+          "id": "17:1373",
+          "name": "‹  核对并同步",
+          "reactions": [
+            {
+              "action": {
+                "type": "BACK"
+              },
+              "actions": [
+                {
+                  "type": "BACK"
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "17:1376",
+          "name": "TC / Button",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "17:736",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false,
+                "resetScrollPosition": true
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "17:736",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false,
+                  "resetScrollPosition": true
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "17:740",
+      "name": "C22 · 更正已确认成绩",
+      "texts": [
+        {
+          "id": "17:1400",
+          "text": "9:41"
+        },
+        {
+          "id": "17:1401",
+          "text": "••• ▰"
+        },
+        {
+          "id": "17:1403",
+          "text": "‹  更正已确认成绩"
+        },
+        {
+          "id": "17:1405",
+          "text": "•••    ◉"
+        },
+        {
+          "id": "I17:1408;10:3",
+          "text": "学员"
+        },
+        {
+          "id": "I17:1408;10:5",
+          "text": "林予安"
+        },
+        {
+          "id": "I17:1408;10:6",
+          "text": ""
+        },
+        {
+          "id": "I17:1413;10:3",
+          "text": "项目"
+        },
+        {
+          "id": "I17:1413;10:5",
+          "text": "20米跑"
+        },
+        {
+          "id": "I17:1413;10:6",
+          "text": ""
+        },
+        {
+          "id": "I17:1418;10:3",
+          "text": "原值"
+        },
+        {
+          "id": "I17:1418;10:5",
+          "text": "4.28秒 · 已确认"
+        },
+        {
+          "id": "I17:1418;10:6",
+          "text": ""
+        },
+        {
+          "id": "I17:1423;10:3",
+          "text": "修订值"
+        },
+        {
+          "id": "I17:1423;10:5",
+          "text": "4.26秒"
+        },
+        {
+          "id": "I17:1423;10:6",
+          "text": ""
+        },
+        {
+          "id": "I17:1428;10:3",
+          "text": "原因"
+        },
+        {
+          "id": "I17:1428;10:5",
+          "text": "核对计时记录"
+        },
+        {
+          "id": "I17:1428;10:6",
+          "text": ""
+        },
+        {
+          "id": "17:1434",
+          "text": "保存修订草稿，确认后更新家长展示"
+        },
+        {
+          "id": "I17:1406;8:3",
+          "text": "保存修订"
+        }
+      ],
+      "links": [
+        {
+          "id": "17:1403",
+          "name": "‹  更正已确认成绩",
+          "reactions": [
+            {
+              "action": {
+                "type": "BACK"
+              },
+              "actions": [
+                {
+                  "type": "BACK"
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "17:1406",
+          "name": "TC / Button",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "17:732",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false,
+                "resetScrollPosition": true
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "17:732",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false,
+                  "resetScrollPosition": true
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "18:47",
+      "name": "D10 · 队伍详情",
+      "texts": [
+        {
+          "id": "19:63",
+          "text": "天才足球"
+        },
+        {
+          "id": "19:64",
+          "text": "TALENT FOOTBALL"
+        },
+        {
+          "id": "19:65",
+          "text": "俱乐部管理工作台"
+        },
+        {
+          "id": "19:67",
+          "text": "工作台"
+        },
+        {
+          "id": "19:69",
+          "text": "数据管理"
+        },
+        {
+          "id": "19:71",
+          "text": "评测与模型"
+        },
+        {
+          "id": "19:73",
+          "text": "BI 分析"
+        },
+        {
+          "id": "19:75",
+          "text": "专业服务"
+        },
+        {
+          "id": "19:77",
+          "text": "管理设置"
+        },
+        {
+          "id": "19:78",
+          "text": "2026 秋季学期"
+        },
+        {
+          "id": "19:79",
+          "text": "天才足球 / 数据管理"
+        },
+        {
+          "id": "19:80",
+          "text": "演示俱乐部    ·    管理员"
+        },
+        {
+          "id": "19:83",
+          "text": "队伍详情"
+        },
+        {
+          "id": "19:84",
+          "text": "U10 精英队 · 2026 秋季"
+        },
+        {
+          "id": "I19:85;8:3",
+          "text": "维护成员"
+        },
+        {
+          "id": "19:88",
+          "text": "U10 精英队 · 2026 秋季"
+        },
+        {
+          "id": "19:90",
+          "text": "基本资料"
+        },
+        {
+          "id": "19:91",
+          "text": "训练记录"
+        },
+        {
+          "id": "19:92",
+          "text": "测评与成长"
+        },
+        {
+          "id": "19:93",
+          "text": "服务记录"
+        },
+        {
+          "id": "19:94",
+          "text": "操作历史"
+        },
+        {
+          "id": "19:97",
+          "text": "学员"
+        },
+        {
+          "id": "19:98",
+          "text": "关系"
+        },
+        {
+          "id": "19:99",
+          "text": "加入时间"
+        },
+        {
+          "id": "19:100",
+          "text": "状态"
+        },
+        {
+          "id": "19:102",
+          "text": "林予安"
+        },
+        {
+          "id": "19:103",
+          "text": "正式队员"
+        },
+        {
+          "id": "19:104",
+          "text": "2026-03-01"
+        },
+        {
+          "id": "19:105",
+          "text": "在训"
+        },
+        {
+          "id": "19:108",
+          "text": "周子衡"
+        },
+        {
+          "id": "19:109",
+          "text": "正式队员"
+        },
+        {
+          "id": "19:110",
+          "text": "2026-03-01"
+        },
+        {
+          "id": "19:111",
+          "text": "在训"
+        },
+        {
+          "id": "19:114",
+          "text": "顾思远"
+        },
+        {
+          "id": "19:115",
+          "text": "临时参训"
+        },
+        {
+          "id": "19:116",
+          "text": "2026-09-12"
+        },
+        {
+          "id": "19:117",
+          "text": "保留历史"
+        },
+        {
+          "id": "19:120",
+          "text": "共 3 条演示记录"
+        },
+        {
+          "id": "19:121",
+          "text": "‹      1      ›     20 条/页"
+        },
+        {
+          "id": "19:123",
+          "text": "使用同一业务记录"
+        },
+        {
+          "id": "19:124",
+          "text": "课程、测评和服务从这里直接打开；当前状态和历史沿用对应业务对象。"
+        },
+        {
+          "id": "19:125",
+          "text": "天才足球 · 演示数据 / 界面方案 · D10"
+        }
+      ],
+      "links": [
+        {
+          "id": "19:66",
+          "name": "工作台",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "18:2",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "18:2",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "19:68",
+          "name": "数据管理",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "18:7",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "18:7",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "19:70",
+          "name": "评测与模型",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-2&starting-point-node-id=20-2",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-2&starting-point-node-id=20-2",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "19:72",
+          "name": "BI 分析",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-616&starting-point-node-id=20-616",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-616&starting-point-node-id=20-616",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "19:74",
+          "name": "专业服务",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-641&starting-point-node-id=20-641",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-641&starting-point-node-id=20-641",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "19:76",
+          "name": "管理设置",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-681&starting-point-node-id=20-681",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-681&starting-point-node-id=20-681",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "19:85",
+          "name": "TC / Button",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "18:17",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "18:17",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "18:62",
+      "name": "D13 · 学期排课与变更",
+      "texts": [
+        {
+          "id": "19:261",
+          "text": "天才足球"
+        },
+        {
+          "id": "19:262",
+          "text": "TALENT FOOTBALL"
+        },
+        {
+          "id": "19:263",
+          "text": "俱乐部管理工作台"
+        },
+        {
+          "id": "19:265",
+          "text": "工作台"
+        },
+        {
+          "id": "19:267",
+          "text": "数据管理"
+        },
+        {
+          "id": "19:269",
+          "text": "评测与模型"
+        },
+        {
+          "id": "19:271",
+          "text": "BI 分析"
+        },
+        {
+          "id": "19:273",
+          "text": "专业服务"
+        },
+        {
+          "id": "19:275",
+          "text": "管理设置"
+        },
+        {
+          "id": "19:276",
+          "text": "2026 秋季学期"
+        },
+        {
+          "id": "19:277",
+          "text": "天才足球 / 数据管理"
+        },
+        {
+          "id": "19:278",
+          "text": "演示俱乐部    ·    管理员"
+        },
+        {
+          "id": "19:281",
+          "text": "学期排课与变更"
+        },
+        {
+          "id": "19:282",
+          "text": "基础安排由俱乐部维护；单次变更保留来源"
+        },
+        {
+          "id": "I19:283;8:3",
+          "text": "预览安排"
+        },
+        {
+          "id": "19:287",
+          "text": "基本信息"
+        },
+        {
+          "id": "19:289",
+          "text": "学期"
+        },
+        {
+          "id": "19:291",
+          "text": "2026秋季"
+        },
+        {
+          "id": "19:293",
+          "text": "队伍"
+        },
+        {
+          "id": "19:295",
+          "text": "U10精英队"
+        },
+        {
+          "id": "19:297",
+          "text": "重复安排"
+        },
+        {
+          "id": "19:299",
+          "text": "每周二、周六 16:30–18:00"
+        },
+        {
+          "id": "19:301",
+          "text": "主教练 / 场地"
+        },
+        {
+          "id": "19:303",
+          "text": "陈教练 / 2号场"
+        },
+        {
+          "id": "19:305",
+          "text": "例外与变更"
+        },
+        {
+          "id": "19:307",
+          "text": "O-01 生效规则待定；提供影响预览"
+        },
+        {
+          "id": "19:309",
+          "text": "保存前核对"
+        },
+        {
+          "id": "19:310",
+          "text": "所属俱乐部：天才足球"
+        },
+        {
+          "id": "19:311",
+          "text": "请确认对象、数据来源和适用范围。"
+        },
+        {
+          "id": "19:312",
+          "text": "必填项只覆盖建档与使用所需信息。扩展资料可以后续补齐。"
+        },
+        {
+          "id": "19:313",
+          "text": "示例内容 · 不含真实个人资料"
+        },
+        {
+          "id": "19:314",
+          "text": "天才足球 · 演示数据 / 界面方案 · D13"
+        }
+      ],
+      "links": [
+        {
+          "id": "19:264",
+          "name": "工作台",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "18:2",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "18:2",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "19:266",
+          "name": "数据管理",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "18:7",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "18:7",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "19:268",
+          "name": "评测与模型",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-2&starting-point-node-id=20-2",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-2&starting-point-node-id=20-2",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "19:270",
+          "name": "BI 分析",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-616&starting-point-node-id=20-616",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-616&starting-point-node-id=20-616",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "19:272",
+          "name": "专业服务",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-641&starting-point-node-id=20-641",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-641&starting-point-node-id=20-641",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "19:274",
+          "name": "管理设置",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-681&starting-point-node-id=20-681",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-681&starting-point-node-id=20-681",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "18:97",
+      "name": "D20 · 导入：影响预览",
+      "texts": [
+        {
+          "id": "19:1192",
+          "text": "天才足球"
+        },
+        {
+          "id": "19:1193",
+          "text": "TALENT FOOTBALL"
+        },
+        {
+          "id": "19:1194",
+          "text": "俱乐部管理工作台"
+        },
+        {
+          "id": "19:1196",
+          "text": "工作台"
+        },
+        {
+          "id": "19:1198",
+          "text": "数据管理"
+        },
+        {
+          "id": "19:1200",
+          "text": "评测与模型"
+        },
+        {
+          "id": "19:1202",
+          "text": "BI 分析"
+        },
+        {
+          "id": "19:1204",
+          "text": "专业服务"
+        },
+        {
+          "id": "19:1206",
+          "text": "管理设置"
+        },
+        {
+          "id": "19:1207",
+          "text": "2026 秋季学期"
+        },
+        {
+          "id": "19:1208",
+          "text": "天才足球 / 数据管理"
+        },
+        {
+          "id": "19:1209",
+          "text": "演示俱乐部    ·    管理员"
+        },
+        {
+          "id": "19:1212",
+          "text": "导入：影响预览"
+        },
+        {
+          "id": "19:1213",
+          "text": "预览尚未入库 · 客户模板及来源责任待 O-05"
+        },
+        {
+          "id": "I19:1214;8:3",
+          "text": "确认导入合格行"
+        },
+        {
+          "id": "19:1217",
+          "text": "01 选择类型   →   02 映射校验   →   03 影响预览   →   04 查看结果"
+        },
+        {
+          "id": "19:1220",
+          "text": "分类"
+        },
+        {
+          "id": "19:1221",
+          "text": "数量"
+        },
+        {
+          "id": "19:1222",
+          "text": "处理"
+        },
+        {
+          "id": "19:1223",
+          "text": "操作"
+        },
+        {
+          "id": "19:1225",
+          "text": "新增"
+        },
+        {
+          "id": "19:1226",
+          "text": "16"
+        },
+        {
+          "id": "19:1227",
+          "text": "可导入"
+        },
+        {
+          "id": "19:1228",
+          "text": "查看行"
+        },
+        {
+          "id": "19:1231",
+          "text": "更新"
+        },
+        {
+          "id": "19:1232",
+          "text": "8"
+        },
+        {
+          "id": "19:1233",
+          "text": "按映射更新获准字段"
+        },
+        {
+          "id": "19:1234",
+          "text": "查看前后值"
+        },
+        {
+          "id": "19:1237",
+          "text": "疑似重复"
+        },
+        {
+          "id": "19:1238",
+          "text": "2"
+        },
+        {
+          "id": "19:1239",
+          "text": "人工核对"
+        },
+        {
+          "id": "19:1240",
+          "text": "处理冲突"
+        },
+        {
+          "id": "19:1243",
+          "text": "错误"
+        },
+        {
+          "id": "19:1244",
+          "text": "3"
+        },
+        {
+          "id": "19:1245",
+          "text": "当前模板拒绝入库"
+        },
+        {
+          "id": "19:1246",
+          "text": "下载错误"
+        },
+        {
+          "id": "19:1249",
+          "text": "共 4 条演示记录"
+        },
+        {
+          "id": "19:1250",
+          "text": "‹      1      ›     20 条/页"
+        },
+        {
+          "id": "19:1252",
+          "text": "请核对本次影响"
+        },
+        {
+          "id": "19:1253",
+          "text": "来源、外部标识、模板和映射版本随批次保留。失败行提供原因，重试不得重复生成事实。"
+        },
+        {
+          "id": "19:1254",
+          "text": "天才足球 · 演示数据 / 界面方案 · D20"
+        }
+      ],
+      "links": [
+        {
+          "id": "19:1195",
+          "name": "工作台",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "18:2",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "18:2",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "19:1197",
+          "name": "数据管理",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "18:7",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "18:7",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "19:1199",
+          "name": "评测与模型",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-2&starting-point-node-id=20-2",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-2&starting-point-node-id=20-2",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "19:1201",
+          "name": "BI 分析",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-616&starting-point-node-id=20-616",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-616&starting-point-node-id=20-616",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "19:1203",
+          "name": "专业服务",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-641&starting-point-node-id=20-641",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-641&starting-point-node-id=20-641",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "19:1205",
+          "name": "管理设置",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-681&starting-point-node-id=20-681",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-681&starting-point-node-id=20-681",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "19:1214",
+          "name": "TC / Button",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "18:102",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "18:102",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "20:42",
+      "name": "M09 · 创建与下发任务",
+      "texts": [
+        {
+          "id": "21:1037",
+          "text": "天才足球"
+        },
+        {
+          "id": "21:1038",
+          "text": "TALENT FOOTBALL"
+        },
+        {
+          "id": "21:1039",
+          "text": "俱乐部管理工作台"
+        },
+        {
+          "id": "21:1041",
+          "text": "工作台"
+        },
+        {
+          "id": "21:1043",
+          "text": "数据管理"
+        },
+        {
+          "id": "21:1045",
+          "text": "评测与模型"
+        },
+        {
+          "id": "21:1047",
+          "text": "BI 分析"
+        },
+        {
+          "id": "21:1049",
+          "text": "专业服务"
+        },
+        {
+          "id": "21:1051",
+          "text": "管理设置"
+        },
+        {
+          "id": "21:1052",
+          "text": "2026 秋季学期"
+        },
+        {
+          "id": "21:1053",
+          "text": "天才足球 / 评测与模型"
+        },
+        {
+          "id": "21:1054",
+          "text": "演示俱乐部    ·    管理员"
+        },
+        {
+          "id": "21:1057",
+          "text": "创建与下发任务"
+        },
+        {
+          "id": "21:1058",
+          "text": "从已配置项目选择，可按周、月或学期设置周期"
+        },
+        {
+          "id": "I21:1059;8:3",
+          "text": "预览下发"
+        },
+        {
+          "id": "21:1063",
+          "text": "基本信息"
+        },
+        {
+          "id": "21:1065",
+          "text": "名称"
+        },
+        {
+          "id": "21:1067",
+          "text": "秋季基线测评"
+        },
+        {
+          "id": "21:1069",
+          "text": "队伍"
+        },
+        {
+          "id": "21:1071",
+          "text": "U10精英队 / U12普通队"
+        },
+        {
+          "id": "21:1073",
+          "text": "测评周期"
+        },
+        {
+          "id": "21:1075",
+          "text": "9月01日—9月30日"
+        },
+        {
+          "id": "21:1077",
+          "text": "项目及必测项"
+        },
+        {
+          "id": "21:1079",
+          "text": "20米跑 / 控球 / 传接"
+        },
+        {
+          "id": "21:1081",
+          "text": "名单确认"
+        },
+        {
+          "id": "21:1083",
+          "text": "正式与临时参训分别说明范围"
+        },
+        {
+          "id": "21:1085",
+          "text": "保存前核对"
+        },
+        {
+          "id": "21:1086",
+          "text": "所属俱乐部：天才足球"
+        },
+        {
+          "id": "21:1087",
+          "text": "请确认对象、数据来源和适用范围。"
+        },
+        {
+          "id": "21:1088",
+          "text": "必填项只覆盖建档与使用所需信息。扩展资料可以后续补齐。"
+        },
+        {
+          "id": "21:1089",
+          "text": "示例内容 · 不含真实个人资料"
+        },
+        {
+          "id": "21:1090",
+          "text": "天才足球 · 演示数据 / 界面方案 · M09"
+        }
+      ],
+      "links": [
+        {
+          "id": "21:1040",
+          "name": "工作台",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=18-2&starting-point-node-id=18-2",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=18-2&starting-point-node-id=18-2",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "21:1042",
+          "name": "数据管理",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=18-7&starting-point-node-id=18-7",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=18-7&starting-point-node-id=18-7",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "21:1044",
+          "name": "评测与模型",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "20:2",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "20:2",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "21:1046",
+          "name": "BI 分析",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-616&starting-point-node-id=20-616",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-616&starting-point-node-id=20-616",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "21:1048",
+          "name": "专业服务",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-641&starting-point-node-id=20-641",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-641&starting-point-node-id=20-641",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "21:1050",
+          "name": "管理设置",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-681&starting-point-node-id=20-681",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-681&starting-point-node-id=20-681",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "21:1059",
+          "name": "TC / Button",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "20:47",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "20:47",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "20:52",
+      "name": "M11 · 个人结果与修订",
+      "texts": [
+        {
+          "id": "21:1151",
+          "text": "天才足球"
+        },
+        {
+          "id": "21:1152",
+          "text": "TALENT FOOTBALL"
+        },
+        {
+          "id": "21:1153",
+          "text": "俱乐部管理工作台"
+        },
+        {
+          "id": "21:1155",
+          "text": "工作台"
+        },
+        {
+          "id": "21:1157",
+          "text": "数据管理"
+        },
+        {
+          "id": "21:1159",
+          "text": "评测与模型"
+        },
+        {
+          "id": "21:1161",
+          "text": "BI 分析"
+        },
+        {
+          "id": "21:1163",
+          "text": "专业服务"
+        },
+        {
+          "id": "21:1165",
+          "text": "管理设置"
+        },
+        {
+          "id": "21:1166",
+          "text": "2026 秋季学期"
+        },
+        {
+          "id": "21:1167",
+          "text": "天才足球 / 评测与模型"
+        },
+        {
+          "id": "21:1168",
+          "text": "演示俱乐部    ·    管理员"
+        },
+        {
+          "id": "21:1171",
+          "text": "个人结果与修订"
+        },
+        {
+          "id": "21:1172",
+          "text": "修订草稿不替换家长已确认的旧版本"
+        },
+        {
+          "id": "I21:1173;8:3",
+          "text": "核对修订"
+        },
+        {
+          "id": "21:1176",
+          "text": "修订草稿不替换家长已确认的旧版本"
+        },
+        {
+          "id": "21:1178",
+          "text": "基本资料"
+        },
+        {
+          "id": "21:1179",
+          "text": "训练记录"
+        },
+        {
+          "id": "21:1180",
+          "text": "测评与成长"
+        },
+        {
+          "id": "21:1181",
+          "text": "服务记录"
+        },
+        {
+          "id": "21:1182",
+          "text": "操作历史"
+        },
+        {
+          "id": "21:1185",
+          "text": "项目"
+        },
+        {
+          "id": "21:1186",
+          "text": "原始值"
+        },
+        {
+          "id": "21:1187",
+          "text": "实际课"
+        },
+        {
+          "id": "21:1188",
+          "text": "发布状态"
+        },
+        {
+          "id": "21:1190",
+          "text": "20米跑"
+        },
+        {
+          "id": "21:1191",
+          "text": "4.28秒"
+        },
+        {
+          "id": "21:1192",
+          "text": "9月12日"
+        },
+        {
+          "id": "21:1193",
+          "text": "已发布 r1"
+        },
+        {
+          "id": "21:1196",
+          "text": "20米跑修订"
+        },
+        {
+          "id": "21:1197",
+          "text": "4.26秒"
+        },
+        {
+          "id": "21:1198",
+          "text": "9月12日"
+        },
+        {
+          "id": "21:1199",
+          "text": "草稿 r2"
+        },
+        {
+          "id": "21:1202",
+          "text": "传接球"
+        },
+        {
+          "id": "21:1203",
+          "text": "18次"
+        },
+        {
+          "id": "21:1204",
+          "text": "9月10日"
+        },
+        {
+          "id": "21:1205",
+          "text": "已发布 r1"
+        },
+        {
+          "id": "21:1208",
+          "text": "共 3 条演示记录"
+        },
+        {
+          "id": "21:1209",
+          "text": "‹      1      ›     20 条/页"
+        },
+        {
+          "id": "21:1211",
+          "text": "使用同一业务记录"
+        },
+        {
+          "id": "21:1212",
+          "text": "课程、测评和服务从这里直接打开；当前状态和历史沿用对应业务对象。"
+        },
+        {
+          "id": "21:1213",
+          "text": "天才足球 · 演示数据 / 界面方案 · M11"
+        }
+      ],
+      "links": [
+        {
+          "id": "21:1154",
+          "name": "工作台",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=18-2&starting-point-node-id=18-2",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=18-2&starting-point-node-id=18-2",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "21:1156",
+          "name": "数据管理",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=18-7&starting-point-node-id=18-7",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=18-7&starting-point-node-id=18-7",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "21:1158",
+          "name": "评测与模型",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "20:2",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "20:2",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "21:1160",
+          "name": "BI 分析",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-616&starting-point-node-id=20-616",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-616&starting-point-node-id=20-616",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "21:1162",
+          "name": "专业服务",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-641&starting-point-node-id=20-641",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-641&starting-point-node-id=20-641",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "21:1164",
+          "name": "管理设置",
+          "reactions": [
+            {
+              "action": {
+                "type": "URL",
+                "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-681&starting-point-node-id=20-681",
+                "openInNewTab": false
+              },
+              "actions": [
+                {
+                  "type": "URL",
+                  "url": "https://www.figma.com/proto/EyQtDtILGDZDf6neLBL6vs?node-id=20-681&starting-point-node-id=20-681",
+                  "openInNewTab": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        },
+        {
+          "id": "21:1173",
+          "name": "TC / Button",
+          "reactions": [
+            {
+              "action": {
+                "type": "NODE",
+                "destinationId": "20:27",
+                "navigation": "NAVIGATE",
+                "transition": null,
+                "resetVideoPosition": false
+              },
+              "actions": [
+                {
+                  "type": "NODE",
+                  "destinationId": "20:27",
+                  "navigation": "NAVIGATE",
+                  "transition": null,
+                  "resetVideoPosition": false
+                }
+              ],
+              "trigger": {
+                "type": "ON_CLICK"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "additionalCheck": {
+    "nodeId": "17:744",
+    "name": "C23 · 标记不测评",
+    "scope": "Direct destinationId reactions on coach page 6:10",
+    "incoming": []
+  },
+  "findings": [
+    {
+      "id": "R1",
+      "priority": "P1",
+      "status": "open"
+    },
+    {
+      "id": "R2",
+      "priority": "P1",
+      "status": "open"
+    },
+    {
+      "id": "R3",
+      "priority": "P1",
+      "status": "open"
+    },
+    {
+      "id": "R4",
+      "priority": "P1",
+      "status": "open"
+    },
+    {
+      "id": "R5",
+      "priority": "P1",
+      "status": "open"
+    },
+    {
+      "id": "R6",
+      "priority": "P2",
+      "status": "open"
+    },
+    {
+      "id": "R7",
+      "priority": "P2",
+      "status": "open"
+    }
+  ]
+}

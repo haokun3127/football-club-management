@@ -1,5 +1,9 @@
 # 核心演示闭环 · 进度跟踪
 
+## 2026-09-20 需求与开发规格 v1.2
+
+已同步所选课程归属、原始成绩→整数分值→等级两段映射、双方课次修正与协同权限、后台扣课保留且前台隐藏、简单并发、自由拖放战术及后台工程补齐。需求52项、验收69项、决策31条。详见 [需求入口](product-requirements/README.md) 和 [16号规格](upgrade-readiness-2026-09-18/16-confirmed-rules-and-engineering-spec.md)。用户明确本轮不新建任务；未改代码、Figma或生产，软件验收未执行。
+
 ## 2026-09-05 C16.3 账号设置真实会话收口
 
 - 在线 Figma 唯一基准 `zZ6wKyOHKcO4UYXDd9jGwv / 1921:7` 已同步移除没有后端能力的资料“编辑”控件；保留绿色“已认证”、微信绑定的绿色“已绑定”、重新授权和清除缓存。
@@ -3065,3 +3069,31 @@
 - 根目录现在仅保留 `HANDOFF-GITHUB-2026-09-08.md` 作为当前交接入口；四份 8 月旧交接和四份旧 agent 交接移至 `docs/archive/2026-08-handoffs/`，并附带阅读限制与当前入口说明。
 - 已完成的 2026-06/08 阶段计划、8 月与 9 月执行计划，以及角色切换、登录绑定、C1、生产演示等历史运行记录分别移入 `docs/archive/2026-06-plans/`、`2026-08-plans/`、`2026-08-execution-plans/`、`2026-09-execution-plans/`、`2026-08-operations/`。历史资料未删除、未改写历史结论。
 - `docs/README.md` 重写为当前事实、设计资料、工具链和历史档案四层入口；现行部署、发布与验收文档的历史安全账号链接已同步到归档路径。`DELIVERY-MANIFEST.txt` 不再列出已不存在的 `docs/plans/active/` 路径。
+
+## 2026-09-18 微信官方规范留档与平台合规核对
+
+- 抓取腾讯《微信开放文档》46 篇官方正文（框架/配置/分包/能力限制/隐私/开放能力/性能/审核运营/设计）留档到 `docs/reference/wechat-miniprogram/`，含 `manifest.json`（URL、HTTP、字节数、SHA-256）与可复现脚本 `scripts/wechat-docs/fetch-official-docs.py`（清单 `scripts/wechat-docs/sources.json`）。抓取时点基础库最新为 v3.17.3（2026-08-20）。
+- 面向本项目写了 8 份提炼（`notes/`），并逐项核对现状：主包打包估算 1.96 MB（2M 上限，未分包）；miniprogramRoot 下混有 73 个测试 `.mjs`（约 556 KB）与 `scripts/`；登录页手机号授权与复制教练微信号的 `wx.setClipboardData` 属隐私项，而全仓无隐私授权同步代码；`wx.getSystemInfoSync` 仍作为降级分支（基础库 2.20.1 起停止维护）；`setting.urlCheck: false` 长期开启；`libVersion` 3.17.0 落后 3 个补丁版。
+- 差距清单与推进顺序见 `docs/reference/wechat-miniprogram/notes/08-本项目平台合规差距-2026-09-18.md`。后台配置、真机表现、备案状态无法从代码验证，未做断言。本次只新增文档、抓取脚本与 `.gitignore` 条目，未改小程序业务代码。
+
+## 2026-09-18 微信小程序开发规则（第 1 批）
+
+- 新增 `.trellis/spec/miniprogram/frontend/` 规范层，把 2026-09-18 官方留档（基础库 3.17.3）转成带编号、判定、处理、Owner、复核日期与自动化 ID 的配置/分包、隐私/开放能力、性能/兼容和发布/审核规则；未指定 Owner 统一保留 `TBD`。
+- 新增纯 Node 策略检查器、规则数据源与 `node:test` 回归；检查器作为独立报告工具按需运行，列出全部发现和分组汇总，恒定 exit 0，不接入根 `pnpm check`。原始文件求和仅作 1.5 MiB 预算预警，不作为微信官方 2M 包体结论。
+- 同日按决定做减法：删除冻结清单与机器阻断层，由人/Codex 按规则和评审上下文决定修与不修；未修改 `apps/miniprogram-cq-talent/**` 业务代码，隐私授权链路、`packOptions.ignore`、分包、废弃 API、`urlCheck` 与 `libVersion` 修复留待后续批次。
+
+## 2026-09-18 项目全景文档（内容与 Codex 交叉核验）
+
+- 新增 `docs/current/project-overview-cq-talent.md`：产品面（56 页全在主包、双角色 2/24/30 分布）、设计权威（现行 `zZ6wKyOHKcO4UYXDd9jGwv` 与升级 `EyQtDtILGDZDf6neLBL6vs`）、技术面（Fastify 5 + `node:sqlite`、20 迁移/65 表、107 个路由注册点其中 50 个小程序 BFF、鉴权与幂等）、部署与最近一次有证据的发布（2026-09-16 `b050391`）、交付与发布状态、平台规范留档、9 条风险、开工前仍缺的事实、文档地图；每条事实标注 `[实测]`/`[记录]`/`[未验证]` 三级证据等级，并明确本文只做了公开面复核（`/health`、Git 远端只读查询、本机测试与静态检查）。
+- 内容经 Codex（`gpt-5.6-sol`，只读沙箱）逐条核验后修订，采纳的更正包括：销课不是「已退役的更正界面」，而是三条都还能写课时账的路径——点名扣课（`app-client.routes.ts:2801-2843` → `store.ts:2131` → `data-capability-repositories.ts:781`）、`/lesson-confirmation` 的 GET/POST/PATCH（`:2847`/`:2890`/`:2948`，扣课调用在 `:2925`、`:3013`）、后台 `POST /clubs/:clubId/admin/students/:studentId/lesson-adjustments`（`data-capability.routes.ts:548-570`），`attendance_debit_confirmation` 是响应模式值而非接口名；`token_hash` 列保存的是原始令牌的 SHA-256（不是 token 的哈希名）；幂等键由 `preHandler`、ETag 由 `onSend` 处理，且比赛事件另有 24 小时幂等（`app-client.routes.ts:811`）；领域包生产源码 20 文件 2301 行（21 文件含 `tactical-board.test.ts`）；「44 变量 / 7 文字样式」出自该任务 `implement.md`，不在 `figma-state.json` 结构化字段内；迁移实体为 `apps/api/db/migrations/0001..0020_*.sql`（65 张表，无 down 脚本）；基础 compose 在 production 仍配置 `FCM_CQ_TALENT_ACCEPTANCE_SEED=1`（`docker-compose.yml:34-38`）、靠 `apps/api/src/seed/index.ts:52-53` 的 `NODE_ENV !== production` 闸门拦住，列为独立风险项。
+- 不采纳 Codex 的 3 条「无法验证」结论，因为那是只读沙箱限制而非仓库事实：测试跑不起来（沙箱临时目录 EPERM）、`gh` token 无效（沙箱读不到钥匙串）、`/health` DNS 失败。本机复核结果：`pnpm -w run check` exit 0（domain 9 文件/23 项、miniprogram 71 文件/505 通过 + 1 跳过、API 17 文件/147 项，2026-09-18 14:38）、`gh auth status` 已登录 `clint-cpu` 且 `gh api` 返回 `push=true`、`curl https://cqtc.pomi.tech/health` HTTP 200。同时保留「本轮未尝试实际推送」「线上版本未复验」的表述，不把只读证据写成既成事实。
+- 同步修正 `docs/README.md` 的设计稿计数：`docs/design/reference/figma/` 实际 52 张 PNG，README 与目录对照表仍按 49 张登记（家长 21 + 教练 28），少登记 3 张（`c11-1-assessment-task-create.png`、`p4-1-milestones.png`、`p4-2-training-history.png`）；并修正本项目测试文件口径为 72 个（69 `.test.mjs` + 2 `.test.ts` + 1 `.test.py`，约 527 KiB），此前 2026-09-18 上一条记录里的「73 个 `.mjs` / 556 KB」为旧口径。
+- 未修改小程序与 API 业务代码，未提交 git；本次只新增/更新文档。
+
+## 2026-10-19 合规收尾与干净基线整理
+
+- 合规解释/主开发入口提交`f015ab2d`；官方project_remove及列表回读确认Documents重复入口已移除，只有一条重庆天才真实主路径；其他应用与旧worktree保留。列表缓存旧名与配置/窗口显示名的差异在主入口文档如实记录。
+- 完成任务归档提交`fd1695d1`：本次新归档16项，并提交此前已归档的10-14发布/差距审计两项。未完成的视觉、产品评审等任务继续保留，不为清空列表虚称完成。
+- 对未跟踪文件逐类审阅：正式任务/设计评审/配套图像证据纳入版本控制，浏览器会话、output截图、本机备份指针/私有配置备份和审阅patch只忽略不删除；一处旧task.json补缺失逗号。未改业务逻辑、线上体验版或Figma，不启动下一批次。
+- 当前Node24完整`pnpm check:delivery`退出0：API230、domain38、mini569通过+1跳过、backoffice2；类型/构建/工具和环境启动检查通过。全部任务元数据和新增JSON可解析。
+- 当前工作区、GitHub分支、已上传体验版和Figma分别留证；本轮提交仅本地，尚未push。最新状态见[交付现状](development-delivery-channel.md)，旧09-18清单只按历史快照解读。

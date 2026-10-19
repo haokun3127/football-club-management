@@ -1,0 +1,74 @@
+[
+  {
+    "page": "213:347",
+    "name": "2026-09-23 评审 · 家长",
+    "expected": 53,
+    "present": 53,
+    "missing": [],
+    "extra": [
+      "401:1010"
+    ]
+  },
+  {
+    "page": "214:2143",
+    "name": "2026-09-23 评审 · 教练",
+    "expected": 83,
+    "present": 83,
+    "missing": [],
+    "extra": [
+      "401:1106",
+      "401:1164",
+      "401:1212"
+    ]
+  },
+  {
+    "page": "214:28",
+    "name": "2026-09-23 评审 · 后台·数据管理",
+    "expected": 40,
+    "present": 40,
+    "missing": [],
+    "extra": [
+      "401:1262"
+    ]
+  },
+  {
+    "page": "214:4557",
+    "name": "2026-09-23 评审 · 后台·评测与模型",
+    "expected": 16,
+    "present": 16,
+    "missing": [],
+    "extra": []
+  },
+  {
+    "page": "214:5393",
+    "name": "2026-09-23 评审 · 后台·BI",
+    "expected": 9,
+    "present": 9,
+    "missing": [],
+    "extra": []
+  },
+  {
+    "page": "214:6123",
+    "name": "2026-09-23 评审 · 后台·专业服务",
+    "expected": 12,
+    "present": 12,
+    "missing": [],
+    "extra": []
+  },
+  {
+    "page": "214:5862",
+    "name": "2026-09-23 评审 · 后台·设置",
+    "expected": 5,
+    "present": 5,
+    "missing": [],
+    "extra": []
+  },
+  {
+    "page": "214:6654",
+    "name": "2026-09-23 评审 · 状态与适配",
+    "expected": 20,
+    "present": 20,
+    "missing": [],
+    "extra": []
+  }
+]

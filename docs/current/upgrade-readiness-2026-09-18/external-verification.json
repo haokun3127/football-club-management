@@ -1,0 +1,135 @@
+{
+  "checkedOn": "2026-09-18",
+  "method": "Approved read-only HTTP retrieval and default-trust TLS hostname verification",
+  "officialSources": [
+    {
+      "key": "design",
+      "url": "https://developers.weixin.qq.com/miniprogram/design/",
+      "final": "https://developers.weixin.qq.com/miniprogram/design/",
+      "http": 200,
+      "bytes": 49009,
+      "sha256": "f4a56c388c27e885c1cd30cd4a8902e4fbf38dffd50c0e126c85e374cf447410",
+      "title": [
+        "微信小程序设计指南 | 微信开放文档"
+      ]
+    },
+    {
+      "key": "window",
+      "url": "https://developers.weixin.qq.com/miniprogram/dev/api/base/system/wx.getWindowInfo.html",
+      "final": "https://developers.weixin.qq.com/miniprogram/dev/api/base/system/wx.getWindowInfo.html",
+      "http": 200,
+      "bytes": 451882,
+      "sha256": "934b2af3818d142beb23bd7ab79032cd6f7b25422a3a95283d2d815e03b15fe2",
+      "title": [
+        "Object wx.getWindowInfo() | 微信开放文档"
+      ]
+    },
+    {
+      "key": "capsule",
+      "url": "https://developers.weixin.qq.com/miniprogram/dev/api/ui/menu/wx.getMenuButtonBoundingClientRect.html",
+      "final": "https://developers.weixin.qq.com/miniprogram/dev/api/ui/menu/wx.getMenuButtonBoundingClientRect.html",
+      "http": 200,
+      "bytes": 449743,
+      "sha256": "92c451a56738a77f30f40faa28ea07896f9ab9cabf61ee732b0f86ca5b6f85eb",
+      "title": [
+        "Object wx.getMenuButtonBoundingClientRect() | 微信开放文档"
+      ]
+    },
+    {
+      "key": "wxss",
+      "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/view/wxss.html",
+      "final": "https://developers.weixin.qq.com/miniprogram/dev/framework/view/wxss.html",
+      "http": 200,
+      "bytes": 148488,
+      "sha256": "ed9c54002e4029ac15c110ea124f08ce54c0adac7f8dce32bbefc0d1c44e34ad",
+      "title": [
+        "WXSS | 微信开放文档"
+      ]
+    },
+    {
+      "key": "privacy",
+      "url": "https://developers.weixin.qq.com/miniprogram/dev/framework/user-privacy/PrivacyAuthorize.html",
+      "http": 200,
+      "bytes": 170440,
+      "sha256": "5ca166dccf8ece6296b92eb83807b7c5354b26ece1007edc16f0ee235a80c137"
+    },
+    {
+      "key": "appbase",
+      "url": "https://developers.weixin.qq.com/miniprogram/dev/api/base/system/wx.getAppBaseInfo.html",
+      "http": 200,
+      "bytes": 451615,
+      "sha256": "9f55e4837e548814fb6e17f45b7c03f40248fb43ecd430649d565ec4616c7c55"
+    },
+    {
+      "key": "elderly",
+      "url": "https://developers.weixin.qq.com/miniprogram/design/elderly.html",
+      "http": 200,
+      "bytes": 41568,
+      "sha256": "490c5d522e126c6841683d7ee5f7e8491e3453f1fa6a6c117dcf724d42245bb3"
+    },
+    {
+      "key": "adapt",
+      "url": "https://developers.weixin.qq.com/miniprogram/design/adapt.html",
+      "http": 200,
+      "bytes": 37505,
+      "sha256": "ede47d510e5a204dad67da14e907ac0a165302d3ab56804576db2c46f4ce5a05"
+    },
+    {
+      "key": "accessibility",
+      "url": "https://developers.weixin.qq.com/miniprogram/design/accessibility.html",
+      "http": 200,
+      "bytes": 27739,
+      "sha256": "89b3172496a6790e4496f061ef71e4e7cfc9edfe868565181c59f8dea9b1538f"
+    }
+  ],
+  "health": {
+    "url": "https://cqtc.pomi.tech/health",
+    "http": 200,
+    "body": {
+      "status": "ok",
+      "service": "@football-club/api"
+    },
+    "curlTlsVerifyResult": 0
+  },
+  "tls": {
+    "host": "cqtc.pomi.tech",
+    "tls": "TLSv1.3",
+    "notBefore": "Aug  2 08:33:49 2026 GMT",
+    "notAfter": "Oct 31 08:33:48 2026 GMT",
+    "subjectAltName": [
+      [
+        "DNS",
+        "cqtc.pomi.tech"
+      ]
+    ],
+    "issuer": [
+      [
+        [
+          "countryName",
+          "US"
+        ]
+      ],
+      [
+        [
+          "organizationName",
+          "Let's Encrypt"
+        ]
+      ],
+      [
+        [
+          "commonName",
+          "YE2"
+        ]
+      ]
+    ]
+  },
+  "notVerified": [
+    "release commit and image digest",
+    "containers and SQLite volume/schema",
+    "Nginx configuration and certificate renewal",
+    "backup and restore",
+    "WeChat management console configuration",
+    "real-device implementation acceptance"
+  ],
+  "matchingProductionSshConnections": 0
+}

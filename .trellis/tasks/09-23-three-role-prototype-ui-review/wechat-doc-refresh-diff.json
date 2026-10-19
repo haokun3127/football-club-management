@@ -1,0 +1,437 @@
+{
+  "beforeRetrievedOn": "2026-09-18",
+  "afterRetrievedOn": "2026-09-24",
+  "pages": 46,
+  "failures": [],
+  "changes": [
+    {
+      "slug": "framework-overview",
+      "diff": {
+        "sha256": {
+          "before": "9d337742d798bde06a6ce4a92614ba0337bb52eb73374e52b66d58fd9400881e",
+          "after": "af5d3002be5978dbac55fc2f5fd8b1b3f698bb21069a418d29a2afa81d6871b9"
+        }
+      }
+    },
+    {
+      "slug": "quickstart-code",
+      "diff": {
+        "sha256": {
+          "before": "b3c1d55433ecfde0228f992b4b41e4b5a19aca9e4f55ebf54274e3afc6977879",
+          "after": "969a09299b19ef08e2792c46168048c72661cceff7b19273870c1752715b2e9c"
+        }
+      }
+    },
+    {
+      "slug": "config-app-json",
+      "diff": {
+        "sha256": {
+          "before": "30851f456098e78f560070a71ddc1f3e13d719e1785d0be4ec744ca41cb48b7a",
+          "after": "262e0d62998570c2d982c5eaea65b976072e23b7b304b25668222364e65268d0"
+        }
+      }
+    },
+    {
+      "slug": "ref-app-config",
+      "diff": {
+        "sha256": {
+          "before": "90d979e10e92223d8f3d7cc875646a000706d6cb00b188d0a71e93a8ead85461",
+          "after": "cae7cf45441f50987bb1e0ce3b8f31b9d721000e1fa76f3655a2322c4786368a"
+        }
+      }
+    },
+    {
+      "slug": "ref-page-config",
+      "diff": {
+        "sha256": {
+          "before": "6abb3e407602602a91622999a49a208bfd51e3ec8bda90603f29cfa15ae0e5a7",
+          "after": "0232c2541e14f5616ac73a1d2603dccbf5b7911d2ab6ce4611e8b59466521871"
+        }
+      }
+    },
+    {
+      "slug": "ref-project-config",
+      "diff": {
+        "sha256": {
+          "before": "d8f56aed9360d6c7009b8de56da3ce9ac831eeb0df8a3e9dcecbe578a1f37d51",
+          "after": "b510de8f0dbe86d450b9fee789f828ab04fc6692616b9d4b50536644a943736f"
+        }
+      }
+    },
+    {
+      "slug": "operating-mechanism",
+      "diff": {
+        "sha256": {
+          "before": "4e794dacf42ed5c2853dc8affe269a9a2ca8fd450dd7fb489bf1a18fc939779d",
+          "after": "bfe9d9a7751b7a46078dfa9c3d197371fcec94afcf0462f29b52415dc2eaef68"
+        }
+      }
+    },
+    {
+      "slug": "update-mechanism",
+      "diff": {
+        "sha256": {
+          "before": "c92416745f1ac0be0e4b0a3d9ca747e827aaeabf9572feabd79e961e62b4e055",
+          "after": "db5098789b467549c66b62a863209e6dc5f2b420c621d85cfc3796be8f045245"
+        }
+      }
+    },
+    {
+      "slug": "release-latest-v3",
+      "diff": {
+        "sha256": {
+          "before": "c9ba153837e2d5f4332d51127767c63a50c639063fc54b68e5c677d2a1994ac0",
+          "after": "bb7b2db8b3dece904335f53e202bec1945ef7afb8fb0f18b05611b3a7eeb793f"
+        },
+        "mdBytes": {
+          "before": 303192,
+          "after": 303186
+        },
+        "mdSha256": {
+          "before": "a3789a41e95dd0354822b8c416b0204969c551f84622cda4f8cde4a6b260e014",
+          "after": "6259dcff466df33e232101f246b08470e4eea0e84b95083d7b06688bac72896d"
+        }
+      }
+    },
+    {
+      "slug": "client-lib-version",
+      "diff": {
+        "sha256": {
+          "before": "5e4b2ece6dc634da086494ab203ca00d03fb0897a65786e7f7505d8a17ee9204",
+          "after": "1b9e317c23d358a8258933a1a2423b3b7d644e1bc225804629a341046009fa02"
+        }
+      }
+    },
+    {
+      "slug": "subpackages-overview",
+      "diff": {
+        "sha256": {
+          "before": "c6912e501807fc5b3661c70cc05eb715b52965b4d824769774629621cd7b2344",
+          "after": "74fb168a9ec7f10eb086a64f2ee073cc74b917441f598632a19e547d7a692b08"
+        }
+      }
+    },
+    {
+      "slug": "subpackages-basic",
+      "diff": {
+        "sha256": {
+          "before": "a883577d87ea12d11aa6d47502ff42d6924e03f21c5796917fbad27dbafdc8bc",
+          "after": "db23245c333e4087af49ced07414de341ffdd77c2ea867c2b570ed6ccdddc128"
+        }
+      }
+    },
+    {
+      "slug": "subpackages-independent",
+      "diff": {
+        "sha256": {
+          "before": "175c26cd8ae829e57f32f3e7d80b09648543b3a61c9448934bb0be60db876fe6",
+          "after": "b69bbd9030899071e4a90b47e0949281cda5f86a91f519b89828aca7db473bcf"
+        }
+      }
+    },
+    {
+      "slug": "subpackages-preload",
+      "diff": {
+        "sha256": {
+          "before": "e5844f50bbef14b1f195dbae29af0ea74ca1e70748723ffd974cd5b4bc72a490",
+          "after": "7ed4d195da98a5249d7cc87ed78ace4fecd33aa67ea0958b190229d9a8dff02f"
+        }
+      }
+    },
+    {
+      "slug": "subpackages-async",
+      "diff": {
+        "sha256": {
+          "before": "569a1f7e944a2956f4c479db7f687c3c6e0dbd173d14da7c57fddd797640a5a3",
+          "after": "9d7411a9a0f5460520566a65a08f22247b5ac8ce7506c198447775b38b7f8e9b"
+        }
+      }
+    },
+    {
+      "slug": "ability-storage",
+      "diff": {
+        "sha256": {
+          "before": "9ec9f22915daf3c8df27bc817a13e59e469c224dc0d96c873a02f74bc23767be",
+          "after": "8e7b088e8ab6fa3f768ed179b4a73fa0b664be8d4d406b850bd2a128b2921732"
+        }
+      }
+    },
+    {
+      "slug": "ability-network",
+      "diff": {
+        "sha256": {
+          "before": "07861b42114547ae3524d6ef4524acaf11f8115c55c8641121a32b633f41ef72",
+          "after": "5d187980d551c805d992a6ec300b444667733a8b61899ac2661b5b6a43e886f0"
+        }
+      }
+    },
+    {
+      "slug": "ability-domain",
+      "diff": {
+        "sha256": {
+          "before": "d907e5264d01371d5c3b56111dc1c5fdd5ac5393554c9f48f967fc3b34963222",
+          "after": "db986db2cf9e89137add4b5fa817a9cdafc733d409c3f569b0a7f8256ef0e4f9"
+        }
+      }
+    },
+    {
+      "slug": "ability-lazyload",
+      "diff": {
+        "sha256": {
+          "before": "ae58ba8cc77c1bf2d0643206e9605fd6314c9b8d489630c4cf5eeb44af36cd46",
+          "after": "214a601fd096c885cf0bdb399394d68059bd256955f5995bca1484b35f028ff7"
+        }
+      }
+    },
+    {
+      "slug": "privacy-overview",
+      "diff": {
+        "sha256": {
+          "before": "a70c5e92bd2a827b4b37650a11526fdfe3bf39c3cc5c15049ab1e45300080b98",
+          "after": "6c297ff6dd50e7f1ec2b6dfabd2c0dcbdfd5efe5becd469d25b1869b43ec5298"
+        }
+      }
+    },
+    {
+      "slug": "privacy-intro",
+      "diff": {
+        "sha256": {
+          "before": "38a2915778ab3fae760fe41b781196c7912a86c987b779465a1e492a74ea8bad",
+          "after": "ec822e24b31018470240d058d689b6d2c989bb4c0d1395347f86af321aa3f4ce"
+        }
+      }
+    },
+    {
+      "slug": "privacy-authorize",
+      "diff": {
+        "sha256": {
+          "before": "ad8718e898edd0c2b6a71aad994d90c7f16836de3291cb43a6e2f096c557c0c8",
+          "after": "bc0310da2401098ecc120ce61da9ffc05e0033786986bb198491221715f574d8"
+        }
+      }
+    },
+    {
+      "slug": "open-login",
+      "diff": {
+        "sha256": {
+          "before": "a98768205a8525719588ac45d0850c637aceff2dfae439f7733c1901b9181bd1",
+          "after": "fda77d37eae1b6f2c983d278e8402d37ccf43ab6c4b29f6cb6a77504d63454df"
+        }
+      }
+    },
+    {
+      "slug": "open-getphonenumber",
+      "diff": {
+        "sha256": {
+          "before": "c3ba624a82544117a67dcb38cf7a8ff300e26e455544b065284bed2a077782f7",
+          "after": "d93a71badddb0459fd55e698f31583c5b0926d138aed5ed923153ee82e259164"
+        }
+      }
+    },
+    {
+      "slug": "api-getSystemInfoSync",
+      "diff": {
+        "bytes": {
+          "before": 463074,
+          "after": 463494
+        },
+        "sha256": {
+          "before": "aa7b84c27eebbb0ed176aab36dd5c422ec2e42d91b2b36514a110900f08b8420",
+          "after": "275f3e53238f9d2ee8a651162b85db3e9909e12c16f2fc5ae58a412af5dc0fdd"
+        }
+      }
+    },
+    {
+      "slug": "api-getWindowInfo",
+      "diff": {
+        "bytes": {
+          "before": 451882,
+          "after": 452302
+        },
+        "sha256": {
+          "before": "4702e8c35ff761add510dfa67bc5904ede30c536d8f9c5eb8bed930e55b45582",
+          "after": "0ea91935c36df6e833375ce161a8ac80802304f41bd22b7db82f2167b35d6931"
+        }
+      }
+    },
+    {
+      "slug": "api-getDeviceInfo",
+      "diff": {
+        "bytes": {
+          "before": 451797,
+          "after": 452217
+        },
+        "sha256": {
+          "before": "3778cfd14e73b7278540a1f146737dde3dd7f06eba433ae81bfc5c2e77059e88",
+          "after": "9986cc8fb6f2fdeb638b10267b51375bb2679ab43218ac82dfbd3157874988bf"
+        }
+      }
+    },
+    {
+      "slug": "api-getAppBaseInfo",
+      "diff": {
+        "bytes": {
+          "before": 451615,
+          "after": 452035
+        },
+        "sha256": {
+          "before": "b3325f20d0237e87524e4451b12b610f9e36c0472c34150e472d5013a015e7cc",
+          "after": "6382b579a01b2928f31e24de77f3bf64dfb84f0a6fd3235513a420fc495efad2"
+        }
+      }
+    },
+    {
+      "slug": "subscribe-message",
+      "diff": {
+        "sha256": {
+          "before": "40451edee421b1b2ff324a28b659854f33770ffa4d7d749d90a6262ea0996fcf",
+          "after": "0ace809e620f747d66f9cb6d5073a365b9a7607bfdaf8d89380ce6cd65238fe3"
+        }
+      }
+    },
+    {
+      "slug": "server-code2session",
+      "diff": {
+        "sha256": {
+          "before": "5d71b9d7bf6b32b267e0906875a4f509f9df50954654b25da7afa029aca593f7",
+          "after": "c962f56708229b46b4522f7798784f53c0b0689fb32aca56c4898ef7a9dee497"
+        }
+      }
+    },
+    {
+      "slug": "perf-tips",
+      "diff": {
+        "sha256": {
+          "before": "bd54879f9a2d0e9139ac6b650431fa5b22abdae1e179de1ab26d528eecc62b1c",
+          "after": "d2d5448c04ea1f9e5955cb6ca7cdcf4fc211bd9ee6653e6788f47a444029d0fb"
+        }
+      }
+    },
+    {
+      "slug": "perf-start",
+      "diff": {
+        "sha256": {
+          "before": "80eb8d46863d23565dd7d4d67b16038e47e46580fa664d4e97a209bc89f77e4a",
+          "after": "480cdd0d823caccd3490053d6e8fecd9ad013135960a9b0d5ba767d8cb393763"
+        }
+      }
+    },
+    {
+      "slug": "perf-setdata",
+      "diff": {
+        "sha256": {
+          "before": "dc5263ca47af2624b0e703532466775d858a764a64a17edb05ee456b5193d9be",
+          "after": "41cf27217e480b95080df4d633d8b63adc0740d4b3e9cd2b696b5e984e44ce5f"
+        }
+      }
+    },
+    {
+      "slug": "audits-overview",
+      "diff": {
+        "sha256": {
+          "before": "16f88add661b201e1c17029e52d57a78220c8a1b908e9e3bb2a5b33cf46824a8",
+          "after": "7e1ca9c4e5182636df941f2325c67278fc7c8911dfe8cf9706cf0a1a78f79ec5"
+        }
+      }
+    },
+    {
+      "slug": "audits-best-practice",
+      "diff": {
+        "sha256": {
+          "before": "74498cd8feff98dbe5773ff3680f0fc2888ce644c99a5e7ee67f497fc1434a51",
+          "after": "44a3e1d9508e0d973bc1c1eb4d74c5c6d027452d35ee608aebae264d73106d78"
+        }
+      }
+    },
+    {
+      "slug": "skyline-introduction",
+      "diff": {
+        "sha256": {
+          "before": "d1bde8ef82baaddf1eb15512fe6dd9c16a52910aba4c5a6df23c732f681a3af6",
+          "after": "c1fec3c5b79b8a58b786c163997506e6b8e9a520369320b15dba423b53c03a49"
+        }
+      }
+    },
+    {
+      "slug": "quickstart-release",
+      "diff": {
+        "sha256": {
+          "before": "5dbb2e447287dd185ad6469b0e3b94dd5cd66a2c3c393f348c4c75075a6d71a8",
+          "after": "f01fee4174a92f5e4518d11184ce6e6485c9cc85e36ed45e6deaa5cb93fe7209"
+        }
+      }
+    },
+    {
+      "slug": "product-ops-spec",
+      "diff": {
+        "sha256": {
+          "before": "0a82c0d2cae96bb81df00909a0b18f535b96cf508bb4d103b2cb62fdea2121a5",
+          "after": "107c9057effd9f331db7f671f01d9da4999c70033a1e551bf6513e38480f36cc"
+        }
+      }
+    },
+    {
+      "slug": "product-reject",
+      "diff": {
+        "sha256": {
+          "before": "d211e70b8a79e6408bbe0cd925279a7cb89161806e507adf9c28d15c062870e6",
+          "after": "fe689df193a90e0a9df9129c6adb7056bedc58dd47000526884d18bb5a2e5101"
+        }
+      }
+    },
+    {
+      "slug": "product-record-guidelines",
+      "diff": {
+        "sha256": {
+          "before": "84d2bb83ce8eb4027ca0036d03056193e35eacac625d0fda5a159ab5dafc237f",
+          "after": "f11e4dd8ffe6bee736177b6cc1fa709d7cf34f3ce944de420510f286cfe8f702"
+        }
+      }
+    },
+    {
+      "slug": "security-basic",
+      "diff": {
+        "sha256": {
+          "before": "ffee3b96a85578d79a181bd1451598cc955f55e49f30607f6f790e25f6d1699a",
+          "after": "f6bdd21a248bd6def17041e25375df2866a4661084d944f2b4cc50d03a877140"
+        }
+      }
+    },
+    {
+      "slug": "design-guide",
+      "diff": {
+        "sha256": {
+          "before": "3d605fe2e1f7a0cf932f89158bd7d3820152a3f99651f29c55ac839794e97ea6",
+          "after": "74fe5900a128b63d019f180b2c8c39af73cb92a6e82209a25e474eb651cc8aea"
+        }
+      }
+    },
+    {
+      "slug": "design-accessibility",
+      "diff": {
+        "sha256": {
+          "before": "fed21417baa3f3b8ef7e4a434645e671e28851252455c6011cc795875cc1416c",
+          "after": "f589a86c472240d613abf21bf0cb224362c8b4d629dde3150f19fd910e6e4116"
+        }
+      }
+    },
+    {
+      "slug": "design-elderly",
+      "diff": {
+        "sha256": {
+          "before": "f38504648845a6fa02d3a18ff5492b97c8bc7503f65ea89437db638e907b052c",
+          "after": "2f59ce643d2b90c8e10d07b477d1b69b3d0a6647849694f6a773b347a4bf9a94"
+        }
+      }
+    },
+    {
+      "slug": "design-adapt",
+      "diff": {
+        "sha256": {
+          "before": "689c7dc58715f91d04b8302c33247b331ccd1e58648fcbed6611f308b887341f",
+          "after": "200c55ca9166013a995027ad4c3d1f2722aefb52f904a50c68f05ecf077e082c"
+        }
+      }
+    }
+  ]
+}

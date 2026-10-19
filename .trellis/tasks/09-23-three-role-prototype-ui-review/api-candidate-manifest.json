@@ -1,0 +1,548 @@
+{
+  "files": [
+    {
+      "path": ".dockerignore",
+      "sha256": "137e36eb3f1f894660fff5e529d0f4228076d63a06d94402809677beccd2265d"
+    },
+    {
+      "path": "Dockerfile",
+      "sha256": "7f475bc1504922292302256dbc9e6927f2c421f3344c2ad74bf7176c5865e61b"
+    },
+    {
+      "path": "apps/api/db/migrations/0001_platform_foundation.sql",
+      "sha256": "3d81164878a316a7a8dbcf19c964436024b62b4610cae4d3004c97fa68e9deb2"
+    },
+    {
+      "path": "apps/api/db/migrations/0002_data_capability_foundation.sql",
+      "sha256": "b54e38b712830d35137a624186bf1993c25908e90d554a0ac3460e5a5402520a"
+    },
+    {
+      "path": "apps/api/db/migrations/0003_status_flow_audit_fields.sql",
+      "sha256": "2f5d2f55875f00c8fff3ba54b171e062bc3bc3d1bec74c9d6d78871e480fd0a0"
+    },
+    {
+      "path": "apps/api/db/migrations/0004_http_idempotency_records.sql",
+      "sha256": "2925fa6d431956c8ab54fc0ca017cf791943c35185e69a189f2d5c575ff42f2f"
+    },
+    {
+      "path": "apps/api/db/migrations/0005_privacy_foundation.sql",
+      "sha256": "988e6f4100461297ffea7fb6bfc85b111a020bc03edacf8a257ef565117de084"
+    },
+    {
+      "path": "apps/api/db/migrations/0006_tactical_boards.sql",
+      "sha256": "fda3b27862c3c0306d4f7037ddac3b66c6f11e2798e753b34b5a3efa9d9f6dd9"
+    },
+    {
+      "path": "apps/api/db/migrations/0007_request_collections.sql",
+      "sha256": "76d9926753cfc1993d140f7cd0cd6b409c204f32fb4925a66a8d9b70da406562"
+    },
+    {
+      "path": "apps/api/db/migrations/0008_match_event_bundles.sql",
+      "sha256": "df2f8260fcc17c6acf0312b815f255e8d8bef7470491b43523bb5df32e0bdc8c"
+    },
+    {
+      "path": "apps/api/db/migrations/0009_app_client_sessions.sql",
+      "sha256": "a80f2b79c6746d7e299d966a7b775b588e204365bd2626de03e8ba8612f278e5"
+    },
+    {
+      "path": "apps/api/db/migrations/0010_student_guardian_bindings.sql",
+      "sha256": "b1ca0945eef022bc7fad84704b0d377d6a2882947e2d1b329c0a8d9e2ca27edf"
+    },
+    {
+      "path": "apps/api/db/migrations/0011_event_change_notify.sql",
+      "sha256": "ed9ece28a78901fc1e826397e00409b3ef2bdc073f56603e98b27f99deaca2a7"
+    },
+    {
+      "path": "apps/api/db/migrations/0012_assessment_tasks.sql",
+      "sha256": "c6d1b3873d7b22e790d1633c93c70d5bab80a76480bd626adf3afc8e5940532c"
+    },
+    {
+      "path": "apps/api/db/migrations/0013_coach_preferences.sql",
+      "sha256": "4564bfe041f10fba3310c40445165e54f62b15eab767b1dc0d5f536d3c49d597"
+    },
+    {
+      "path": "apps/api/db/migrations/0014_coach_wechat.sql",
+      "sha256": "92128400adfaf3e122bab2839aa658883157f13213f80665e74a8a786e11d32f"
+    },
+    {
+      "path": "apps/api/db/migrations/0015_session_plans.sql",
+      "sha256": "62f4389c3b069c25ed4521bd80c2a44044c85537471d8e9d0959adffdc6d4f94"
+    },
+    {
+      "path": "apps/api/db/migrations/0016_training_sessions.sql",
+      "sha256": "5a869b3e0ba051a71550f092e3071b898ed565bf09c1219bb955111d100d9bd4"
+    },
+    {
+      "path": "apps/api/db/migrations/0017_match_rosters.sql",
+      "sha256": "e4a460b521ccb07efbd368e90e683d84dce889f95471b33adb4edaac0420b5a4"
+    },
+    {
+      "path": "apps/api/db/migrations/0018_training_content_assessments.sql",
+      "sha256": "7f09ef8ddb090b6ed3b8c3d3c17bca283452b834995bef3780f21d02660f8482"
+    },
+    {
+      "path": "apps/api/db/migrations/0019_assessment_task_scope.sql",
+      "sha256": "09ec23987b5496b28b050cb016ca7652a83d5b80c6984dde794c3ae56c9baa2e"
+    },
+    {
+      "path": "apps/api/db/migrations/0020_assessment_workflow.sql",
+      "sha256": "c2fa68d0ae2e5dfdc928165f07e772a4a8d13ccc6594e25a96368eefee4a26fe"
+    },
+    {
+      "path": "apps/api/db/migrations/0021_training_records.sql",
+      "sha256": "ce50c80a32c7bfca03d3fe15c599e7a6127ceb35410f4c8a27c8e58004de1e62"
+    },
+    {
+      "path": "apps/api/package.json",
+      "sha256": "86d7e98305f819ac8bede365c5c53d0efe8d2151c8eef2c690774d91ed6bc75a"
+    },
+    {
+      "path": "apps/api/src/application/assessment-workflow-types.ts",
+      "sha256": "c7ca8187557bf8ba0834a136d624ab6bdf41ee79f9898cf23a99fa94ce0bebb2"
+    },
+    {
+      "path": "apps/api/src/application/assessment-workflow.ts",
+      "sha256": "c24a998b71846be8e9eac57456ee38c75a4734c21c0314db8061db08ebf7d3c0"
+    },
+    {
+      "path": "apps/api/src/application/contracts.ts",
+      "sha256": "ea3c7b3b3ca52dfd1d595dba59e7de7ba9d9379ee7deaa882d76a6e7511e696f"
+    },
+    {
+      "path": "apps/api/src/application/serial-operation.ts",
+      "sha256": "091b1cc8be1f26c239f591cdd284bb601845fdeac612da7a65ea2e1e3c1e63dd"
+    },
+    {
+      "path": "apps/api/src/application/services.ts",
+      "sha256": "cad59d82cb5f30b4c265ea51bb4b54b6cef2f516952622a414b3bff0d331a241"
+    },
+    {
+      "path": "apps/api/src/application/training-content-catalog.test.ts",
+      "sha256": "589eb1ba8415b9017d247ed7b80a1157d675142879f70e6a2e558b2992ba06e8"
+    },
+    {
+      "path": "apps/api/src/application/training-content-catalog.ts",
+      "sha256": "444b79e057a3f0dd079ac1bc84b18c3bbe9d5876df81af06e9f2d587a22c1844"
+    },
+    {
+      "path": "apps/api/src/application/training-records.ts",
+      "sha256": "6e64eec31c946c15b56b1c494989f2bbb2fcb93c8be54078c745a8aa5058426d"
+    },
+    {
+      "path": "apps/api/src/auth/app-roles.ts",
+      "sha256": "6943a16fe80dcceab402c08026db1d9eb164bc171526d97eddd9af33f615f7b0"
+    },
+    {
+      "path": "apps/api/src/auth/context.ts",
+      "sha256": "65df07190e816ba19b23a7247ef7c4db6272143dea0f79648fa677d2ed8a84b1"
+    },
+    {
+      "path": "apps/api/src/auth/session-registry.ts",
+      "sha256": "7c193c43baa990a633a52325eb958e3c5ca2b867a03fee55863d73006adeed22"
+    },
+    {
+      "path": "apps/api/src/data-capability/types.ts",
+      "sha256": "97773a0b2b2f26791f909cc902dfca29a73c6588279d3c3a624d8d4847a2b23b"
+    },
+    {
+      "path": "apps/api/src/dev.ts",
+      "sha256": "c288e1faf3145178eed47c5f53a2b9c1734a69ebbbd6531a6434245ed10c05aa"
+    },
+    {
+      "path": "apps/api/src/http/assessment-workflow-schemas.ts",
+      "sha256": "dba284ce542028149e1a4180e7c332dfd8abcdc99faeb54b6d28894fb26f4fb1"
+    },
+    {
+      "path": "apps/api/src/http/environment-guard.ts",
+      "sha256": "b2a5ab49002b127088ff7333a5696cf1fd870be307a7cdad2b7d9f62da423834"
+    },
+    {
+      "path": "apps/api/src/http/errors.ts",
+      "sha256": "29949b8328f2b1de0e24dff96bf7f2687d6200a60930b944d7fb450753209a1b"
+    },
+    {
+      "path": "apps/api/src/http/openapi.ts",
+      "sha256": "44725198d8d11f223347f8f9a1ee9d570984fb2a5b63dc5e55aa94836300e39c"
+    },
+    {
+      "path": "apps/api/src/http/request-contracts.ts",
+      "sha256": "81b51a53c16f33181784ec685c6f2a34443e892755c053f15d02542d1b032cb6"
+    },
+    {
+      "path": "apps/api/src/http/schemas.ts",
+      "sha256": "6752f6bfde72ce91957cd60fbe44ff7fe73ae472257f6b813ec57d20c69fee12"
+    },
+    {
+      "path": "apps/api/src/http/training-record-schemas.ts",
+      "sha256": "dec26349e8e44d6c7de027cc23a8b13278e257673c86e76ca3d6ec9a7a8d94ed"
+    },
+    {
+      "path": "apps/api/src/index.ts",
+      "sha256": "f054504862ac56932a6ec80f8c41e6699fbb698eaff1a780d2c92fbd608290da"
+    },
+    {
+      "path": "apps/api/src/integration/excel-import.ts",
+      "sha256": "187bcbeaa8b2adbee95aae9977a2aa4b74330975a1c01284f3dc9513a447e1a0"
+    },
+    {
+      "path": "apps/api/src/integration/wps-connector.ts",
+      "sha256": "ebd916eea7e481d5142e5be750bdab027ba57dbc0353ccaefc526928e4fa695a"
+    },
+    {
+      "path": "apps/api/src/integration/wps-webhook-security.ts",
+      "sha256": "9c78211ebcd9097f174b11caee590ce6e48e8e676a10ed6efe1500d0aa6892ff"
+    },
+    {
+      "path": "apps/api/src/integrations/wechat-identity-connector.ts",
+      "sha256": "3f7ff117f578286ef6453ea2ceb1d717745dfb406b17914c2582c198812805f8"
+    },
+    {
+      "path": "apps/api/src/migrate.ts",
+      "sha256": "de8a9ba0c6d9fd445f9291d95ff7314812ed94638ac00b3c2a391cb199e6d4db"
+    },
+    {
+      "path": "apps/api/src/ops/cq-talent-acceptance-demo.ts",
+      "sha256": "3bda578d6c7a410ec6100845a52d50cc0c23399b2dace8670b153703963e821b"
+    },
+    {
+      "path": "apps/api/src/ops/initialize-nonproduction.ts",
+      "sha256": "5f80a48f934b67698e7da2c0129991c12d36990114b654c82098418fefe68995"
+    },
+    {
+      "path": "apps/api/src/ops/repair-demo-assessments.ts",
+      "sha256": "ab705353c20ceb216112c96fbc0f59fcc905bca65b24bfab2d239a680b699595"
+    },
+    {
+      "path": "apps/api/src/ops/repair-secure-demo-data.ts",
+      "sha256": "f51b4f5fb47e6022e7c77b08b15391067ce532b0c8c86b128b40e95cb946110f"
+    },
+    {
+      "path": "apps/api/src/ops/rollback-cq-talent-acceptance-demo.ts",
+      "sha256": "941f07d462dc4e4212029d4c838bc638cf43d8de11ae42d503e21405d647e713"
+    },
+    {
+      "path": "apps/api/src/ops/rollback-secure-cq-talent-test-accounts.ts",
+      "sha256": "66455f1f47cc87e95faa2712a9613f5ef966e6442d93003cc6081d1afaaa4b70"
+    },
+    {
+      "path": "apps/api/src/ops/secure-cq-talent-test-accounts-cli.ts",
+      "sha256": "ba46c0628a98d0260f4bf142d0c65b8d962683c7339fda05b9eb7184b8906248"
+    },
+    {
+      "path": "apps/api/src/ops/secure-cq-talent-test-accounts-command.ts",
+      "sha256": "221387bf72995856f10df73508d1806224046a6b6eb7d29916cdaa379cec90df"
+    },
+    {
+      "path": "apps/api/src/ops/secure-cq-talent-test-accounts.ts",
+      "sha256": "0246a01a3c8414e52007e926a3153d2553d369e1c1f864113f8461f5826e53f5"
+    },
+    {
+      "path": "apps/api/src/persistence/app-client-session-repository.ts",
+      "sha256": "d025cbf246a0f2dfced6e298278ac9901b1bd3adda2e19e9c1f12a03c1504e41"
+    },
+    {
+      "path": "apps/api/src/persistence/assessment-repositories.ts",
+      "sha256": "689fb756e7b975ad48ebbe41a1cb5fd531100b027fb56e14b901f9832f3872a2"
+    },
+    {
+      "path": "apps/api/src/persistence/assessment-task-repository.ts",
+      "sha256": "36233945a2301e62823c7bbcf9fcbe6a0aa7726c5233a616dfc8c58e4a32d0a4"
+    },
+    {
+      "path": "apps/api/src/persistence/assessment-workflow-repository.ts",
+      "sha256": "5749733dc60562249a25aa9fdeb56ef048e011d071a01af3ee5392cfe3f46251"
+    },
+    {
+      "path": "apps/api/src/persistence/calendar-repositories.ts",
+      "sha256": "1b6f2cf1401644a49b045413c58f3e230da7fb3ccbddfdb5727f4b7ca88bae44"
+    },
+    {
+      "path": "apps/api/src/persistence/data-capability-repositories.ts",
+      "sha256": "659d63edd3cb6dd955e851867e10583aec67662695de6b6703251cd8ab420a44"
+    },
+    {
+      "path": "apps/api/src/persistence/match-repository.ts",
+      "sha256": "5df31d84b37e45140a9540e4e331bc21a9fae275f017bd679810db555b89a57b"
+    },
+    {
+      "path": "apps/api/src/persistence/platform-persistence.ts",
+      "sha256": "3188892aaa8185291799b588f9e7bdba0e8e29d9d44f663fd278528521f0a85a"
+    },
+    {
+      "path": "apps/api/src/persistence/platform-repositories.ts",
+      "sha256": "58b6e1366b45ca00800532377943452848e28d29ea0d6706277c25b4d9a46afa"
+    },
+    {
+      "path": "apps/api/src/persistence/runtime-database.ts",
+      "sha256": "28861511f665c042d4e7ffb63de0c1f2c79ff72fe1bd960e25fa01a5e93f8fc1"
+    },
+    {
+      "path": "apps/api/src/persistence/session-plan-repository.ts",
+      "sha256": "80fb2de47fc9e0fea109f41fce131fbb277240ec1b4cfa6cc417a81388dc1b9d"
+    },
+    {
+      "path": "apps/api/src/persistence/sqlite.ts",
+      "sha256": "f85f2b740167eaeb88208d4a7a5551c1567d8e8079ab1e79ce5bee7595ed40f8"
+    },
+    {
+      "path": "apps/api/src/persistence/tactical-board-repository.ts",
+      "sha256": "be6e1da6e0d3d0d0ec6680064d1d0c60406efb4df207c31d2289d3e6a9c7c73a"
+    },
+    {
+      "path": "apps/api/src/persistence/training-content-assessment-repository.ts",
+      "sha256": "7d4baf98eb0d40ca18a7d6d0fb5054523aa7f392921d59f40342870f511f6d9b"
+    },
+    {
+      "path": "apps/api/src/persistence/training-record-repository.ts",
+      "sha256": "3d0380f8a9c2a5213ecb004ad98bc69c2b917ad8f81597465f0465b0df5a6128"
+    },
+    {
+      "path": "apps/api/src/persistence/training-session-repository.ts",
+      "sha256": "b1a360f4998e4440a1365990754574df70262f152f8bc2a851457c09472679e4"
+    },
+    {
+      "path": "apps/api/src/persistence/transaction.ts",
+      "sha256": "6e5329dde89e38d66c3799f5b77b790119a7fc13fcb15777f8c398fa93be96e6"
+    },
+    {
+      "path": "apps/api/src/routes/app-client.routes.ts",
+      "sha256": "b9aee77b75a122d257bbea0c5c63b145fcdfdc7abf4a387717c2d98e57bacb07"
+    },
+    {
+      "path": "apps/api/src/routes/assessment-workflow.routes.ts",
+      "sha256": "591492e0f9e097a6868cb1b942c89264092c38fbb1bc2b4f878a097243059921"
+    },
+    {
+      "path": "apps/api/src/routes/assessment.routes.ts",
+      "sha256": "2b845711c3d3af680568776bce1006871db1cf9f566265ab195e9dc90bc9ad09"
+    },
+    {
+      "path": "apps/api/src/routes/calendar.routes.ts",
+      "sha256": "88343578e3918045ca66329bed1cca0a2e8355702a4f4c9d6ebfb8067a3b5cea"
+    },
+    {
+      "path": "apps/api/src/routes/context.ts",
+      "sha256": "4ceeeb20b9ef3c1eac95438aa2322542f5505d956c9d451d7efcac191cf21ffd"
+    },
+    {
+      "path": "apps/api/src/routes/data-capability.routes.ts",
+      "sha256": "f4d77f4ade43de29d697d766ea720ac70cf423931fa41faae04ec0adeddb7c3a"
+    },
+    {
+      "path": "apps/api/src/routes/match.routes.ts",
+      "sha256": "d5c9c6335a87ea3070b7cab767f3f48df5b85697f10599216abb9b07e46118de"
+    },
+    {
+      "path": "apps/api/src/routes/metrics.routes.ts",
+      "sha256": "391c94bdbea45d7d340034d1deb42539e16e2e08c98c64184f103c4141802a3b"
+    },
+    {
+      "path": "apps/api/src/routes/platform.routes.ts",
+      "sha256": "dd719316383b294f226c9087f483ddd50f54bdbcaa34160158f68d01ef4b11b6"
+    },
+    {
+      "path": "apps/api/src/routes/training-record.routes.ts",
+      "sha256": "5fe21098a9e9e2efbf31d74200ea182920e2d82b37a5ca0c64e7213810f1839b"
+    },
+    {
+      "path": "apps/api/src/routes/training.routes.ts",
+      "sha256": "815c3f4af5635e92873e6d8501beb808b82bf638d8990f64dfe4ba4cf533f969"
+    },
+    {
+      "path": "apps/api/src/runtime/environment.ts",
+      "sha256": "6432fb7b62d1ecff6803f4c9cd7c3f284eef455b99dc69854f8a2942b705d684"
+    },
+    {
+      "path": "apps/api/src/seed/assessment.ts",
+      "sha256": "37337e60c239159841ae2f2cfcc56cece441afb5d1d143830baff71a962adda3"
+    },
+    {
+      "path": "apps/api/src/seed/cq-talent-acceptance.ts",
+      "sha256": "00c0f7e7cea39aa77749bc250d9df57434f20dac3cfe25d4e6d4df6b532e3619"
+    },
+    {
+      "path": "apps/api/src/seed/cq-talent-assessment-model.ts",
+      "sha256": "a0f4ee271135764c9f39220c55d294472b2b935ec3f5d8fac87a63e26a662919"
+    },
+    {
+      "path": "apps/api/src/seed/cq-talent-test-data.ts",
+      "sha256": "cdc5738b9b06a544b9a6b459d90562983deba4c53755d8c7ff48e7eca69e88f3"
+    },
+    {
+      "path": "apps/api/src/seed/data-capability.ts",
+      "sha256": "7f2a7f6a553bf8d8cdba7b5ff99da3a6cb3a8abfde433923219f7e3ab5bad163"
+    },
+    {
+      "path": "apps/api/src/seed/index.ts",
+      "sha256": "f9e0ec8eda799d61828b4782de742c720c1d4b0ecfee018b47631080d6c1f2b1"
+    },
+    {
+      "path": "apps/api/src/seed/match.ts",
+      "sha256": "337503f25a28030cc4f67e2d619c777be080dc02d6fab2ccd606526f5efbe55c"
+    },
+    {
+      "path": "apps/api/src/seed/platform.ts",
+      "sha256": "c349cdf3f7453184a057fcad0cf5f57e48b267febe0e9af936427856d38d5db7"
+    },
+    {
+      "path": "apps/api/src/seed/privacy.ts",
+      "sha256": "349be36b2911606e6c9313587fe6745bf59174adeba705ecbbc905eacc95287a"
+    },
+    {
+      "path": "apps/api/src/seed/training.ts",
+      "sha256": "68660a39a2337e8e229f16c3be90ba478f9da4f7b1926c9a652fec5cb752bd30"
+    },
+    {
+      "path": "apps/api/src/seed/types.ts",
+      "sha256": "045447bf92af94facf69e7e8b3595d4f2af44b918a37fa48c59b011a0dabee63"
+    },
+    {
+      "path": "apps/api/src/seed.ts",
+      "sha256": "72f489660013536687dcd4428c2097da5fbb83531e0d67878730c3351cba677d"
+    },
+    {
+      "path": "apps/api/src/server.ts",
+      "sha256": "272fd2e59e473a9ea1e3ed7cf2c866f65c08b5aee3558c5d2a7f38253b69451f"
+    },
+    {
+      "path": "apps/api/src/store.ts",
+      "sha256": "6a0f6c31a59354d3b7554209531c6ffa5129b4601c3952502af5df7f7ecaf0e8"
+    },
+    {
+      "path": "apps/api/tsconfig.json",
+      "sha256": "9f231abf5b60e783c69bcca933bd0d0a9dbf3142916d6b76fd408995969f17e2"
+    },
+    {
+      "path": "deploy/environment-isolation/compose.nonproduction.yml",
+      "sha256": "0c25ec4fa296decd99a7309d3fefce04a06c4902589f9d6a3dbb88ee54fce77e"
+    },
+    {
+      "path": "deploy/environment-isolation/nginx-locations.conf",
+      "sha256": "86af7e580ae74282b6db5db4b0240c93edd1d0848c1853c50a27eabbe0b72e20"
+    },
+    {
+      "path": "deploy/environment-isolation/nginx-release-guard.conf",
+      "sha256": "2dbeec6d3c5b869961e6ebc0abc7822a4fb38b5edb715f205094b0d5af173718"
+    },
+    {
+      "path": "deploy/environment-isolation/nginx-release-location.conf",
+      "sha256": "e3a3b742e8c89bbf2929bf805f945fca1ab952bf70de62b052d6ba63199cc6c5"
+    },
+    {
+      "path": "package.json",
+      "sha256": "fd7ef9e65400bb4db38b11d7868811eb16d3c86755d020b99a9afe72c5ff9ef4"
+    },
+    {
+      "path": "packages/domain/package.json",
+      "sha256": "25d8be1fb52ea275346cc53c3f213d3fe53c2d023496e34fa403b54a12cce4a3"
+    },
+    {
+      "path": "packages/domain/src/activities.ts",
+      "sha256": "fa3b06d4c24d3690b8b5509610b837ded1a01105478b4d418fd7cf97fce3f4df"
+    },
+    {
+      "path": "packages/domain/src/actors.ts",
+      "sha256": "f7e46cc17bdf2616304b556731b39d6b188a662f545027f20256e4c4dac61759"
+    },
+    {
+      "path": "packages/domain/src/assessment-services.ts",
+      "sha256": "ac594d324a573e544af6382fac39789a84aa825b566fd5186b9742daeafdbb30"
+    },
+    {
+      "path": "packages/domain/src/assessment.ts",
+      "sha256": "b97305c4f8574d1383936e4ab40213504366567f85aa717eb76d061000300bac"
+    },
+    {
+      "path": "packages/domain/src/calendar.ts",
+      "sha256": "4cab00587f12a827ac1d6b6bd2134a5e780ddeab2052eddadb17d1bfb962f480"
+    },
+    {
+      "path": "packages/domain/src/clubs.ts",
+      "sha256": "dec53d5a70889455db975d3093831187dc62a6188def418c974eed3d8cf6bc1f"
+    },
+    {
+      "path": "packages/domain/src/events.ts",
+      "sha256": "4eef7ed8f66403d2aab7aeb284e33542a71de77329164c8537085988d5a9f111"
+    },
+    {
+      "path": "packages/domain/src/index.ts",
+      "sha256": "8b783d8860284f2a3906362488ada998059f8d64aa258c1da4779b935457f0c6"
+    },
+    {
+      "path": "packages/domain/src/match-services.ts",
+      "sha256": "3db64cab63c0ba07a2b8ca45b8f5e445a3e733819d24e931d2d15cd9b9017bce"
+    },
+    {
+      "path": "packages/domain/src/match.ts",
+      "sha256": "79b07d3b7fb5e68492f1dba95760d769e74ddc268c02e519f9fdc2fdd2544084"
+    },
+    {
+      "path": "packages/domain/src/metric-graph-services.ts",
+      "sha256": "bb241c2db8fa1b6f3b185c094dcd9d0ef244862fde4981e7a74e03fd8ea89b71"
+    },
+    {
+      "path": "packages/domain/src/metric-services.ts",
+      "sha256": "3acd2624215f36c0098159c490befb3ebfbf1b3fe77e0ba02af22a00410b757e"
+    },
+    {
+      "path": "packages/domain/src/metrics.ts",
+      "sha256": "71aa5a6a6d95b336e8e01392aad7f7e41ff8740009e16b8093570347b68ab4e4"
+    },
+    {
+      "path": "packages/domain/src/ports.ts",
+      "sha256": "7f0e2727ce8fb9eaca15b6d40bd0d9d003649c888cc02319eb126085bf99bb05"
+    },
+    {
+      "path": "packages/domain/src/primitives.ts",
+      "sha256": "791de96d95b5a24ad4e30a4b834ce8a5ba06e5d2f0b0bb9454057ef6072cff36"
+    },
+    {
+      "path": "packages/domain/src/privacy.ts",
+      "sha256": "d599faa73117e41487dc6bc39d12c392175cdaf17c5f5ea976fd282db3a68d34"
+    },
+    {
+      "path": "packages/domain/src/score-display.ts",
+      "sha256": "5448c6a2de0cc83ed2c92aba2a01efd85552278d3ccb5d675ef6bbf291012184"
+    },
+    {
+      "path": "packages/domain/src/tactical-board.test.ts",
+      "sha256": "0ca239f11d3e5d890724fc9e37193612c3cc7b979b9273baaa4249ae823af775"
+    },
+    {
+      "path": "packages/domain/src/tactical-board.ts",
+      "sha256": "70e5839e0c5bf3d6dd4b8e847af2fca2b352754725b4f14cf9c0245ceb7c78a3"
+    },
+    {
+      "path": "packages/domain/src/teams.ts",
+      "sha256": "87b140e4b7370b6e877861c67a90b22509af82a77f1f20c3fc3fd9a56ec24d8a"
+    },
+    {
+      "path": "packages/domain/src/training.ts",
+      "sha256": "0e1c03edd513e04f7a03286fe7a8f0ca7146cf7aa7560b50bc9552604433304d"
+    },
+    {
+      "path": "packages/domain/tsconfig.json",
+      "sha256": "f63bdbf3b7f226b6d58c5c4c2aa007d958ac93c7658eeb5e73f2a5137964aca0"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "a7d050e34b74ec2d49b5a470c9cf3c735313af44770ce3c1a7c39b77bcf0eeb8"
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "sha256": "21417825f8ee4ea58653e65ffb9149afd6c2c1d3cf197eb09e9a275c20200250"
+    },
+    {
+      "path": "scripts/clean.mjs",
+      "sha256": "cdfca54e5b641bbd4fc4323ca960014fd1517c9b6566ce9e9bf82c936dd26ee7"
+    },
+    {
+      "path": "tsconfig.base.json",
+      "sha256": "91f368727d26d4cdb976cada76a83860536fbe830c427ab266a600409ad89337"
+    }
+  ],
+  "productionDataIncluded": false,
+  "sourceHead": "cccd8d57",
+  "workspaceSnapshot": true,
+  "snapshotId": "1224e07bf5f4"
+}

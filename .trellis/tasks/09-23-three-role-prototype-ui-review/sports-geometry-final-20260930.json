@@ -1,0 +1,60 @@
+{
+  "method": "Match exposed nodes by hierarchical type/name/occurrence; compare frame-relative accumulated x/y, size and hidden state. Instance internals, actual text content and reactions are not exposed by metadata.",
+  "screens": [
+    {
+      "screen": "P01",
+      "source": "213:348",
+      "candidate": "401:1010",
+      "sourceNodes": 52,
+      "candidateNodes": 58,
+      "matched": 52,
+      "missing": [],
+      "geometryOrVisibilityChanges": [],
+      "addedCount": 6
+    },
+    {
+      "screen": "C01",
+      "source": "214:2144",
+      "candidate": "401:1106",
+      "sourceNodes": 57,
+      "candidateNodes": 60,
+      "matched": 57,
+      "missing": [],
+      "geometryOrVisibilityChanges": [],
+      "addedCount": 3
+    },
+    {
+      "screen": "C03",
+      "source": "214:2203",
+      "candidate": "401:1164",
+      "sourceNodes": 47,
+      "candidateNodes": 51,
+      "matched": 47,
+      "missing": [],
+      "geometryOrVisibilityChanges": [],
+      "addedCount": 4
+    },
+    {
+      "screen": "C11",
+      "source": "214:2381",
+      "candidate": "401:1212",
+      "sourceNodes": 40,
+      "candidateNodes": 43,
+      "matched": 40,
+      "missing": [],
+      "geometryOrVisibilityChanges": [],
+      "addedCount": 3
+    },
+    {
+      "screen": "D01",
+      "source": "214:29",
+      "candidate": "401:1262",
+      "sourceNodes": 78,
+      "candidateNodes": 80,
+      "matched": 78,
+      "missing": [],
+      "geometryOrVisibilityChanges": [],
+      "addedCount": 2
+    }
+  ]
+}

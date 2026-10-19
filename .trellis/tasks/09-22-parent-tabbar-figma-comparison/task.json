@@ -1,0 +1,30 @@
+{
+  "id": "parent-tabbar-figma-comparison",
+  "name": "parent-tabbar-figma-comparison",
+  "title": "家长端线上与当前 Figma 底部导航对比",
+  "description": "",
+  "status": "planning",
+  "dev_type": null,
+  "scope": null,
+  "package": "api",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-09-22",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "dev",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "apps/miniprogram-cq-talent/components/role-tabbar/index.ts",
+    "apps/miniprogram-cq-talent/components/role-tabbar/index.wxss",
+    "docs/current/product-requirements/05-decisions-and-sources.md"
+  ],
+  "notes": "只读对比已完成，见 research/comparison.md。已验证两份在线 Figma；未取得当天微信正式客户端截图。O-07 导航仍待决，本任务未进入实现。",
+  "meta": {}
+}

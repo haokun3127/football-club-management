@@ -31,6 +31,6 @@
     "tmp/goal-c7-coach-current.png",
     "tmp/goal-c7-coach-bottom-current.png"
   ],
-  "notes": "Online Figma node 233:2 was re-read on 2026-08-28 and remains 375x812. WeChatIDE MCP reopened the real coach route with eventId event-cq-talent-secure-test-1-scheduled-match; screenshot returned 563x1218, equivalent to 375x812 logical viewport. WXML/WXSS compile succeeded and filtered simulator console returned no error, wx:else, or route-is-not-defined lines. Generated WeChatIDE index.js files are build artifacts and must remain excluded from commits."
+  "notes": "Online Figma node 233:2 was re-read on 2026-08-28 and remains 375x812. WeChatIDE MCP reopened the real coach route with eventId event-cq-talent-secure-test-1-scheduled-match; screenshot returned 563x1218, equivalent to 375x812 logical viewport. WXML/WXSS compile succeeded and filtered simulator console returned no error, wx:else, or route-is-not-defined lines. Generated WeChatIDE index.js files are build artifacts and must remain excluded from commits.",
   "meta": {}
 }

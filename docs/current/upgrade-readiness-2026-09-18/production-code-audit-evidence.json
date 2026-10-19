@@ -1,0 +1,108 @@
+{
+  "checkedAt": "2026-09-19",
+  "host": "43.136.114.225",
+  "user": "ubuntu",
+  "container": "cq-talent-api",
+  "image": "cq-talent-api:b050391",
+  "imageId": "sha256:cff8ce30dc02b427a91a813b0a900a3c5ba25b6d0101d60ef59e9e03184ed459",
+  "releaseDirectory": "/opt/cq-talent-releases/b050391",
+  "sourceHashes": {
+    "apps/api/src/routes/app-client.routes.ts": "9aa16e25a5d7761049074579e346ec479b1ee272e7bce71e2a91d4f53dffb9cf",
+    "apps/api/src/routes/assessment-workflow.routes.ts": "591492e0f9e097a6868cb1b942c89264092c38fbb1bc2b4f878a097243059921",
+    "apps/api/src/application/assessment-workflow.ts": "c24a998b71846be8e9eac57456ee38c75a4734c21c0314db8061db08ebf7d3c0",
+    "apps/miniprogram-cq-talent/pages/parent/status/index.ts": "16ac64a95706e0c7f3b623d13f123baf3b9d02c00cba91e365a951b073a71e2e",
+    "apps/miniprogram-cq-talent/pages/parent/account/index.ts": "06666d3b3a7072106bb0b71aa2a1dcc955fb08de3dacdf08bf14b94537848b2f",
+    "apps/miniprogram-cq-talent/pages/parent/reminders/index.ts": "c8547691546ccc6140979dee062c2d975153962c270649d505e53448ec76919b",
+    "apps/miniprogram-cq-talent/pages/parent/venues/index.ts": "0cf19f0652677ec4690b218e7d6a94383d2486d3db17e0e498069efb15c511e0",
+    "apps/miniprogram-cq-talent/pages/parent/event/index.ts": "9b78cdf2722c03845e83c8a5009dc0a177cd4764b33ea2d2822c9ba102e3e4f6",
+    "apps/miniprogram-cq-talent/pages/parent/growth/index.ts": "de1168e60d475219e4e28ebc6f88c20fef39f34622a63d466e21d8700d09dd45",
+    "apps/miniprogram-cq-talent/pages/parent/metric/index.ts": "6ed3a81fa9ed1c3eac7d7f37bbf29f7fc3706d5c5426023e32f1d437a14ef71a",
+    "apps/miniprogram-cq-talent/pages/coach/private-interest/index.ts": "ee810779def63288d7252ecbaa7cb633583cb48ffccb5dde8c4c4ad20b631f9d",
+    "apps/miniprogram-cq-talent/pages/coach/team-ability/index.ts": "e9e8b5e8ab8a50c703726123d081a918031e23588083a383581dfcee47439f03",
+    "apps/miniprogram-cq-talent/pages/coach/training-assessment/index.ts": "8224eb86bf5f00d61f6b1609e96a801376efee1e55dd1136f66284a913ee4978",
+    "apps/miniprogram-cq-talent/pages/coach/content-select/index.ts": "2bccf3bf46c5b0c6926696c06e5165825458462f96ed73a5809b1887bf767d8d",
+    "apps/miniprogram-cq-talent/pages/coach/schedule/index.ts": "cb9e35ab1b1cdc5292d96de24ce584e5647d20e6322b5f5af53ac845e8cdcc6e",
+    "apps/miniprogram-cq-talent/pages/coach/assessment-bulk-entry/index.ts": "aa765f30b2e78a7927f8872aab8d6b429bca26bf267eb7fe431e5ae459f2e5ff",
+    "apps/miniprogram-cq-talent/pages/coach/tactical-board/index.ts": "6a6910ee3dfe612a31d36b170c5db9620d7ca2489501008ac5d6fc171a50c853",
+    "apps/miniprogram-cq-talent/utils/api.ts": "58dd7fb9e99581266f08d5170551baa1e7a061acdd732a387aa879151f6c18b2",
+    "apps/miniprogram-cq-talent/utils/auth.ts": "3fa21a50e415dfdd672f85f326bd835b72cadb99e338d9e0cb76bb8c7d855e26"
+  },
+  "localComparison": [
+    {
+      "path": "apps/api/src/routes/app-client.routes.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/api/src/routes/assessment-workflow.routes.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/api/src/application/assessment-workflow.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/miniprogram-cq-talent/pages/parent/status/index.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/miniprogram-cq-talent/pages/parent/account/index.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/miniprogram-cq-talent/pages/parent/reminders/index.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/miniprogram-cq-talent/pages/parent/venues/index.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/miniprogram-cq-talent/pages/parent/event/index.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/miniprogram-cq-talent/pages/parent/growth/index.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/miniprogram-cq-talent/pages/parent/metric/index.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/miniprogram-cq-talent/pages/coach/private-interest/index.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/miniprogram-cq-talent/pages/coach/team-ability/index.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/miniprogram-cq-talent/pages/coach/training-assessment/index.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/miniprogram-cq-talent/pages/coach/content-select/index.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/miniprogram-cq-talent/pages/coach/schedule/index.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/miniprogram-cq-talent/pages/coach/assessment-bulk-entry/index.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/miniprogram-cq-talent/pages/coach/tactical-board/index.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/miniprogram-cq-talent/utils/api.ts",
+      "localMatchesServer": true
+    },
+    {
+      "path": "apps/miniprogram-cq-talent/utils/auth.ts",
+      "localMatchesServer": true
+    }
+  ]
+}

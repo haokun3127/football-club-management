@@ -1,0 +1,11 @@
+295:    app.get("/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/training-content-assessments", {
+318:    app.put("/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/training-content-assessments", {
+435:                    id: `insurance_expiring:${child.id}`,
+436:                    type: "insurance_expiring",
+450:                    id: `lesson_credit_low:${child.id}`,
+451:                    type: "lesson_credit_low",
+1030:    app.get("/clubs/:clubId/app-clients/:clientId/coach/preferences", { schema: { ...schemas.appClientParams, ...schemas.appClientCoachPreferences } }, async (request, reply) => {
+1051:    app.put("/clubs/:clubId/app-clients/:clientId/coach/preferences", { schema: { ...schemas.appClientParams, ...schemas.appClientCoachPreferencesUpdate } }, async (request, reply) => {
+1691:    app.get("/clubs/:clubId/app-clients/:clientId/coach/team/ability-overview", {
+35:            context.sendError(reply, 409, "assessment_workflow_disabled", "评测发布流程暂未开放");
+9aa16e25a5d7761049074579e346ec479b1ee272e7bce71e2a91d4f53dffb9cf  /opt/cq-talent-releases/b050391/apps/api/src/routes/app-client.routes.ts

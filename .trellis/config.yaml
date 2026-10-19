@@ -115,4 +115,6 @@ packages:
     path: apps/api
   domain:
     path: packages/domain
+  miniprogram:
+    path: apps/miniprogram-cq-talent
 default_package: api

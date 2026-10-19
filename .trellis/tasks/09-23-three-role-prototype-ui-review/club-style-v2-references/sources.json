@@ -1,0 +1,29 @@
+[
+  {
+    "file": "milan-reference.jpg",
+    "title": "AC Milan official App 2026 promotional image",
+    "source": "https://www.acmilan.com/en/fans/official-app",
+    "sha256": "cf692b531bb063d54e53cfe45246152f07f0ecfe48a3768b8d0be84c0890e87e",
+    "use": "Design reference only, not a product asset",
+    "visuallyInspected": true,
+    "uploadedToFigma": true,
+    "figmaFileKey": "EyQtDtILGDZDf6neLBL6vs",
+    "figmaPageId": "414:358",
+    "figmaNodeId": "416:2",
+    "figmaScreenshotVerified": true
+  },
+  {
+    "file": "liverpool-reference.webp",
+    "title": "Liverpool official Apps player-profile showcase",
+    "source": "https://www.liverpoolfc.com/info/lfc-apps",
+    "sha256": "89e30080b4bf42d3da81c11e69d693e4da8c51af10d818183de2415dc4089f67",
+    "use": "Design reference only, not a product asset",
+    "visuallyInspected": true,
+    "uploadedToFigma": true,
+    "figmaFileKey": "EyQtDtILGDZDf6neLBL6vs",
+    "figmaPageId": "414:358",
+    "figmaNodeId": "416:2361",
+    "figmaScreenshotVerified": true,
+    "uploadNote": "WebP upload rendered black; converted original to PNG with sips and replaced fill on the same node. PNG screenshot verified."
+  }
+]

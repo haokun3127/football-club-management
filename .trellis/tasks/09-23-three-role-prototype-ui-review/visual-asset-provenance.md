@@ -1,0 +1,6 @@
+# 原创视觉资产
+
+工具：内置 ImageGen。项目文件：apps/miniprogram-cq-talent/assets/content/football-editorial.jpg（1100px，121337 bytes）。这是品牌示意图，不是实际俱乐部场地照片。图像生成后使用 sips 压缩；已检查球、草地、暗色文字留白和品牌红色。已上传到本项目 Figma，imageHash dc497e92842df9341ba9c66107f7311290b90d7b。
+
+生成提示词：
+Create a premium editorial sports photograph for a Chinese youth football academy mobile app banner. This is an original illustrative brand image, not a real venue photo. Wide horizontal crop around 2.3:1. Close-up of a realistically textured unbranded off-white football on dark natural football turf, with a deep crimson red training bib and a red training cone subtly in the right background. Ball and details positioned in rightmost 40 percent. Left 55 percent remains very dark charcoal with subtle turf texture, intentionally quiet negative space for readable UI headline to be added later. Low angle, sharp natural photographic detail, hard stadium sidelight, restrained deep crimson #A80F1B and charcoal palette, sophisticated contemporary football academy editorial campaign, realistic lighting and materials. No people, no faces, no logos, no text, no watermarks, no UI elements. Landscape banner, avoid neon or orange or dominant green. The image should feel energetic and refined without busy effects.

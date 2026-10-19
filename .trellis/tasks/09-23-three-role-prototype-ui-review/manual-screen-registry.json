@@ -1,0 +1,31 @@
+{
+  "fileKey": "EyQtDtILGDZDf6neLBL6vs",
+  "status": "in_progress_not_ready_for_approval",
+  "screens": {
+    "SC01-NEW": "247:304",
+    "SC01-PICK": "248:305",
+    "SC01-PROFILE": "249:306",
+    "SC01-ADDED": "250:307",
+    "SC01-LIB": "258:308",
+    "SC01-NEW-LIB": "259:309",
+    "SC01-PROFILE-LIB": "260:310",
+    "X16-LOADING": "266:22",
+    "X16-ERROR": "267:18",
+    "X16-DISABLED": "267:59",
+    "X16-NOACCESS": "268:20",
+    "B-EMPTY": "270:10",
+    "B-LOADING": "271:14",
+    "B-ERROR": "271:141",
+    "B-PARTIAL": "272:22",
+    "P-CHILD": "275:448",
+    "P01-CHILD2": "276:449",
+    "P08-CHILD2": "277:470",
+    "P-CHILD-GROWTH": "278:488"
+  },
+  "notes": [
+    "原生AI做了首轮增量，独立截图发现问题后通过MCP修正。",
+    "Figma桌面被Mac锁屏阻断后继续使用云端MCP；新节点的桌面截图可能暂时找不到，云端截图成功。",
+    "已改写既有评审稿内可识别的旧版跨页链接；新增流程仍需完整覆盖和独立验证。",
+    "不触碰生产数据、部署和发布状态。"
+  ]
+}

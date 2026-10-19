@@ -1,0 +1,88 @@
+{
+  "checkedAt": "2026-09-28T01:24:55.919Z",
+  "passed": true,
+  "scope": "routing-and-client-registration-only",
+  "realWechatLoginVerified": false,
+  "checks": [
+    {
+      "environment": "develop",
+      "path": "/health",
+      "status": 200,
+      "expected": 200,
+      "marker": "develop",
+      "passed": true
+    },
+    {
+      "environment": "develop",
+      "path": "/app-clients/resolve?clientKey=cq-talent-wechat-main",
+      "status": 200,
+      "expected": 200,
+      "marker": "develop",
+      "passed": true
+    },
+    {
+      "environment": "develop",
+      "path": "/app-clients/resolve?clientKey=cq-talent-wechat-main",
+      "status": 403,
+      "expected": 403,
+      "marker": "develop",
+      "passed": true
+    },
+    {
+      "environment": "develop",
+      "path": "/clubs/probe/capabilities",
+      "status": 401,
+      "expected": 401,
+      "marker": "develop",
+      "passed": true
+    },
+    {
+      "environment": "trial",
+      "path": "/health",
+      "status": 200,
+      "expected": 200,
+      "marker": "trial",
+      "passed": true
+    },
+    {
+      "environment": "trial",
+      "path": "/app-clients/resolve?clientKey=cq-talent-wechat-main",
+      "status": 200,
+      "expected": 200,
+      "marker": "trial",
+      "passed": true
+    },
+    {
+      "environment": "trial",
+      "path": "/app-clients/resolve?clientKey=cq-talent-wechat-main",
+      "status": 403,
+      "expected": 403,
+      "marker": "trial",
+      "passed": true
+    },
+    {
+      "environment": "trial",
+      "path": "/clubs/probe/capabilities",
+      "status": 401,
+      "expected": 401,
+      "marker": "trial",
+      "passed": true
+    },
+    {
+      "environment": "release",
+      "path": "/health",
+      "status": 200,
+      "expected": 200,
+      "marker": null,
+      "passed": true
+    },
+    {
+      "environment": "release",
+      "path": "/health",
+      "status": 403,
+      "expected": 403,
+      "marker": null,
+      "passed": true
+    }
+  ]
+}

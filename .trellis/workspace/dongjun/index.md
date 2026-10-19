@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 31
-- **Last Active**: 2026-09-16
+- **Total Sessions**: 34
+- **Last Active**: 2026-10-19
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~1154 | Active |
+| `journal-1.md` | ~1259 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,9 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 34 | 2026-10-19 | 合规收尾与干净基线整理 | `f015ab2d`, `fd1695d1` | `feature/ui-batch-1-p01` |
+| 33 | 2026-10-14 | 体验版与 Figma 设计差距只读排查 | - | `dev` |
+| 32 | 2026-10-14 | 完成9.7.5体验版与独立后台发布 | `806c4077`, `e4e04373`, `939676f3`, `89aba740`, `3fcaa774` | `dev` |
 | 31 | 2026-09-16 | Accept assessment workflow and deploy production API | `1d9a473` | `dev` |
 | 30 | 2026-09-16 | Prepare formal assessment release and restore rehearsal | `b050391`, `fb40f18` | `dev` |
 | 29 | 2026-09-16 | Fix macOS DevTools test foundations | `23382d9`, `f0e6025` | `dev` |

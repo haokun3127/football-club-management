@@ -1,0 +1,140 @@
+The following is a diff from the previous accessibility tree for Window: "重庆天才小程序 UIUX Design System" with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 484-485, 556-558, 605-647, 650-666
+~			467 HTML content 重庆天才小程序 UIUX Design System – Figma, URL: figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/%E9%87%8D%E5%BA%86%E5%A4%A9%E6%89%8D%E5%B0%8F%E7%A8%8B%E5%BA%8F-UIUX-Design-System?node-id=1610-466&m=dev
+~						471 container Figma Design, 1 item selected
++						672 text Screenreader support for the board is currently disabled. To enable it via Accessibility settings, press ⌘K, type Accessibility Settings, and press Enter. To see available keyboard shortcuts, enter ⌃⇧Question mark .
++									673 button Mark as ready for dev
+~									601 pop up button 100%, zoom and view options
+~										602 text 100%
++										674 container
++											675 container
++												676 button Click to copy layer name: P4 · Growth · V6
++												677 button Copy URL for selected layer
++												678 checkbox Toggle ready for dev status, Value: 0
++												679 text Toggle ready for dev status
++												680 pop up button More actions
++												681 image Auto layout
++												682 text Frame with auto layout
++												683 image
++												684 text Edited 15 days ago
++												685 button Compare with previous versions
++											686 container
++												687 button MCP
++													688 heading MCP, Value: 3
++														689 text MCP
++												690 pop up button Open help
++												691 pop up button Open set up modal
++												692 button Set up third-party agents for Figma MCP
++												693 text Selection details Session activity Not sent Estimated tokens 10k
++												694 button Implement this design from Figma. @https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/%E9%87%8D%E5%BA%86%E5%A4%A9%E6%89%8D%E5%B0%8F%E7%A8%8B%E5%BA%8F-UIUX-Design-System?node-id=1610-466&m=dev
++													695 text Implement this design from Figma.
++													696 text @https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/%E9%87%8D%E5%BA%86%E5%A4%A9%E6%89%8D%E5%B0%8F%E7%A8%8B%E5%BA%8F-UIUX-Design-System?node-id=1610-466&m=dev
++												697 button Copy example prompt
++											698 container
++												699 button Layer properties
++													700 heading Layer properties, Value: 3
++														701 text Layer properties
++												702 image Visual representation of element layout properties including padding, border box, and spacing
++												703 View
++													704 text View
++													705 container
++														706 radio button List, Value: 0
++														707 text List
++													708 container
++														709 radio button Code, Value: 1
++														710 text Code
++												711 text Language: HTML
++												712 pop up button Language: HTML
++													713 image Figma to Code (HTML, Tailwind, Flutter, SwiftUI) icon
++													714 text HTML
++												715 text Loading
++												716 heading Modes, Value: 3
++													717 text Modes
++												718 button Copy CQ Talent Contract Tokens: Auto (Mode 1)
++													719 container CQ Talent Contract Tokens
++														720 text CQ Talent Contract Tokens
++													721 container Auto (Mode 1)
++														722 text Auto (Mode 1)
++												723 heading Colors, Value: 3
++													724 text Colors
++												725 text Color format
++												726 combo box (settable) Color format, Value: Hex
++													727 text Hex
++													728 image
++												729 container
++													730 heading Background colors, Value: 3
++														731 text Background colors
++													732 button Copy #F5F6F8
++														733 text #F5F6F8
++												734 container
++													735 heading Selection colors, Value: 3
++														736 text Selection colors
++													737 button Copy color/brand/primary
++														738 container color/brand/primary
++															739 text color/brand/primary
++													740 toggle button Description: Variable details: color/brand/primary, Value: 0
++														741 image
++													742 button Copy color/text/secondary
++														743 container color/text/secondary
++															744 text color/text/secondary
++													745 toggle button Description: Variable details: color/text/secondary, Value: 0
++														746 image
++													747 button Copy color/text/primary
++														748 container color/text/primary
++															749 text color/text/primary
++													750 toggle button Description: Variable details: color/text/primary, Value: 0
++														751 image
++													752 button Copy #FFFFFF
++														753 text #FFFFFF
++													754 button 17 more
++											755 container
++												756 button Assets
++													757 heading Assets, Value: 3
++														758 text Assets
++												759 heading Icons, Value: 3
++													760 text Icons
++												761 pop up button Download icons
++												762 button
++													763 Unlabeled image To get missing image descriptions, open the context menu.
++												764 text Frame
++												765 container
++													766 text 16  x  16
++												767 button
++													768 Unlabeled image /28135629-3c2b-419b-8297-e78f527cb3dd
++												769 text Frame
++												770 container
++													771 text 16  x  16
++												772 button
++													773 Unlabeled image /9ced18d6-1e79-452f-b516-045ffc5f0b60
++												774 text Ellipse
++												775 container
++													776 text 4  x  4
++												777 button 10 more
++											778 container
++												779 button Export
++												780 button Add export settings
++						781 container
++							782 toolbar Editor
++								783 toggle button Description: Move, Value: 1
++									784 image
++								785 toggle button Description: Copy colors, Value: 0
++									786 image
++								787 toggle button Description: Measurement, Value: 0
++									788 image
++								789 toggle button Description: Annotation, Value: 0
++									790 image
++								791 toggle button Description: Comment, Value: 0
++									792 image
++								793 Toolbelt Mode
++									794 text Toolbelt Mode
++									795 radio button Draw, Value: 0
++									796 radio button Design, Value: 0
++									797 radio button Motion, Value: 0
++									798 radio button Dev Mode, Value: 1
++							799 toolbar Inspect
++								800 button Previous frame
++									801 image
++								802 text 4 / 9
++								803 button Next frame
++									804 image
+The focused UI element is 572 button Auto layout P4 · Growth · V6

@@ -58,7 +58,7 @@
 ## Task 3: Local verification and bounded commit
 
 **Files:**
-- Modify: `.trellis/tasks/08-18-production-three-phone-demo-data/*`
+- Modify: `.trellis/tasks/archive/2026-10/08-18-production-three-phone-demo-data/*`
 - Modify: `docs/current/progress.md`
 - Modify: `docs/current/agent-handover-2026-08-12-secure-test-accounts.md`
 

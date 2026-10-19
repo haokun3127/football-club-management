@@ -1,0 +1,995 @@
+{
+  "date": "2026-09-18",
+  "fileKey": "EyQtDtILGDZDf6neLBL6vs",
+  "pages": [
+    {
+      "page": "10 · 家长端",
+      "pageId": "6:9",
+      "roots": [
+        {
+          "id": "P01",
+          "nodeId": "15:2",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P02",
+          "nodeId": "15:6",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P03",
+          "nodeId": "15:10",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P04",
+          "nodeId": "15:14",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P05",
+          "nodeId": "15:18",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P06",
+          "nodeId": "15:22",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P07",
+          "nodeId": "15:26",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P08",
+          "nodeId": "15:30",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P09",
+          "nodeId": "15:34",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P10",
+          "nodeId": "15:38",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P11",
+          "nodeId": "15:42",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P12",
+          "nodeId": "15:46",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P13",
+          "nodeId": "15:50",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P14",
+          "nodeId": "15:54",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P15",
+          "nodeId": "15:58",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P16",
+          "nodeId": "15:62",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P17",
+          "nodeId": "15:66",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P18",
+          "nodeId": "15:70",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P19",
+          "nodeId": "15:74",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P20",
+          "nodeId": "15:78",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P21",
+          "nodeId": "15:82",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P22",
+          "nodeId": "15:86",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P23",
+          "nodeId": "15:90",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P24",
+          "nodeId": "15:94",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P25",
+          "nodeId": "15:98",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P26",
+          "nodeId": "15:102",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P27",
+          "nodeId": "25:236",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "P28",
+          "nodeId": "25:240",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        }
+      ],
+      "textCount": 462,
+      "reactionCount": 80,
+      "issues": []
+    },
+    {
+      "page": "20 · 教练端",
+      "pageId": "6:10",
+      "roots": [
+        {
+          "id": "C01",
+          "nodeId": "17:656",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C02",
+          "nodeId": "17:660",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C03",
+          "nodeId": "17:664",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C04",
+          "nodeId": "17:668",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C05",
+          "nodeId": "17:672",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C06",
+          "nodeId": "17:676",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C07",
+          "nodeId": "17:680",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C08",
+          "nodeId": "17:684",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C09",
+          "nodeId": "17:688",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C10",
+          "nodeId": "17:692",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C11",
+          "nodeId": "17:696",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C12",
+          "nodeId": "17:700",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C13",
+          "nodeId": "17:704",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C14",
+          "nodeId": "17:708",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C15",
+          "nodeId": "17:712",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C16",
+          "nodeId": "17:716",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C17",
+          "nodeId": "17:720",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C18",
+          "nodeId": "17:724",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C19",
+          "nodeId": "17:728",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C20",
+          "nodeId": "17:732",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C21",
+          "nodeId": "17:736",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C22",
+          "nodeId": "17:740",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C23",
+          "nodeId": "17:744",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C24",
+          "nodeId": "17:748",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C25",
+          "nodeId": "17:752",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C26",
+          "nodeId": "17:756",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C27",
+          "nodeId": "17:760",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C28",
+          "nodeId": "17:764",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C29",
+          "nodeId": "17:768",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "C30",
+          "nodeId": "25:583",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        }
+      ],
+      "textCount": 516,
+      "reactionCount": 80,
+      "issues": []
+    },
+    {
+      "page": "30 · 后台·数据管理",
+      "pageId": "6:11",
+      "roots": [
+        {
+          "id": "D01",
+          "nodeId": "18:2",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D02",
+          "nodeId": "18:7",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D03",
+          "nodeId": "18:12",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D04",
+          "nodeId": "18:17",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D05",
+          "nodeId": "18:22",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D06",
+          "nodeId": "18:27",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D07",
+          "nodeId": "18:32",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D08",
+          "nodeId": "18:37",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D09",
+          "nodeId": "18:42",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D10",
+          "nodeId": "18:47",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D11",
+          "nodeId": "18:52",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D12",
+          "nodeId": "18:57",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D13",
+          "nodeId": "18:62",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D14",
+          "nodeId": "18:67",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D15",
+          "nodeId": "18:72",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D16",
+          "nodeId": "18:77",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D17",
+          "nodeId": "18:82",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D18",
+          "nodeId": "18:87",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D19",
+          "nodeId": "18:92",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D20",
+          "nodeId": "18:97",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D21",
+          "nodeId": "18:102",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D22",
+          "nodeId": "18:107",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D23",
+          "nodeId": "18:112",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D24",
+          "nodeId": "18:117",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D25",
+          "nodeId": "18:122",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "D26",
+          "nodeId": "25:638",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        }
+      ],
+      "textCount": 992,
+      "reactionCount": 179,
+      "issues": []
+    },
+    {
+      "page": "31 · 后台·评测与模型",
+      "pageId": "6:12",
+      "roots": [
+        {
+          "id": "M01",
+          "nodeId": "20:2",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "M02",
+          "nodeId": "20:7",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "M03",
+          "nodeId": "20:12",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "M04",
+          "nodeId": "20:17",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "M05",
+          "nodeId": "20:22",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "M06",
+          "nodeId": "20:27",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "M07",
+          "nodeId": "20:32",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "M08",
+          "nodeId": "20:37",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "M09",
+          "nodeId": "20:42",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "M10",
+          "nodeId": "20:47",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "M11",
+          "nodeId": "20:52",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "M12",
+          "nodeId": "25:740",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "M13",
+          "nodeId": "25:745",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        }
+      ],
+      "textCount": 494,
+      "reactionCount": 94,
+      "issues": []
+    },
+    {
+      "page": "32 · 后台·BI",
+      "pageId": "6:13",
+      "roots": [
+        {
+          "id": "B01",
+          "nodeId": "20:616",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "B02",
+          "nodeId": "20:621",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "B03",
+          "nodeId": "20:626",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "B04",
+          "nodeId": "20:631",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "B05",
+          "nodeId": "20:636",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        }
+      ],
+      "textCount": 265,
+      "reactionCount": 34,
+      "issues": []
+    },
+    {
+      "page": "33 · 后台·专业服务",
+      "pageId": "6:14",
+      "roots": [
+        {
+          "id": "S01",
+          "nodeId": "20:641",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "S02",
+          "nodeId": "20:646",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "S03",
+          "nodeId": "20:651",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "S04",
+          "nodeId": "20:656",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "S05",
+          "nodeId": "20:661",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "S06",
+          "nodeId": "20:666",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "S07",
+          "nodeId": "20:671",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "S08",
+          "nodeId": "20:676",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        }
+      ],
+      "textCount": 307,
+      "reactionCount": 58,
+      "issues": []
+    },
+    {
+      "page": "34 · 后台·设置",
+      "pageId": "6:15",
+      "roots": [
+        {
+          "id": "A01",
+          "nodeId": "20:681",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "A02",
+          "nodeId": "20:686",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "A03",
+          "nodeId": "20:691",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        },
+        {
+          "id": "A04",
+          "nodeId": "20:696",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        }
+      ],
+      "textCount": 148,
+      "reactionCount": 27,
+      "issues": []
+    },
+    {
+      "page": "40 · 状态与适配",
+      "pageId": "6:16",
+      "roots": [
+        {
+          "id": "X01",
+          "nodeId": "22:2",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "X02",
+          "nodeId": "22:15",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "X03",
+          "nodeId": "22:30",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "X04",
+          "nodeId": "22:44",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "X05",
+          "nodeId": "22:62",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "X06",
+          "nodeId": "22:73",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "X07",
+          "nodeId": "22:84",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "X08",
+          "nodeId": "22:95",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "X09",
+          "nodeId": "22:106",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "X10",
+          "nodeId": "22:121",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "X11",
+          "nodeId": "22:132",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "X12",
+          "nodeId": "22:143",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "X13",
+          "nodeId": "22:154",
+          "width": 320,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "X14",
+          "nodeId": "22:170",
+          "width": 430,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "X15",
+          "nodeId": "22:186",
+          "width": 375,
+          "height": 812,
+          "children": 3
+        },
+        {
+          "id": "X16",
+          "nodeId": "22:202",
+          "width": 1440,
+          "height": 1024,
+          "children": 2
+        }
+      ],
+      "textCount": 105,
+      "reactionCount": 16,
+      "issues": []
+    }
+  ],
+  "summary": {
+    "frames": 130,
+    "texts": 3289,
+    "actions": 568,
+    "issues": 0
+  },
+  "revisionNote": "Official-source review updated X01/X12/X15 and guide; state page rechecked 2026-09-18."
+}

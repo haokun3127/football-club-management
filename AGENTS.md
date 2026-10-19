@@ -37,3 +37,13 @@ Keep this overlay additive. Do not remove existing Codex, Hermes, Impeccable, Se
 - `Documents`下同名符号链接不再作为第二个导入入口；不要在WorkBuddy报告目录、临时验收副本或旧worktree中另起日常开发。
 - 路径/副本用途见 [唯一主开发入口](docs/current/development-workspace.md)；版本、待办及验证边界见 [当前交付状态](docs/current/development-delivery-channel.md)。开工时读回Git分支、HEAD和脏工作区，不根据旧交接快照切分支或覆盖改动。
 - 保留旧worktree和发布证据；项目列表“移除记录”与删除源码是不同操作，不清理其他工具的未提交工作或登录缓存。
+
+## 微信小程序平台规范（动小程序代码前必读）
+
+`apps/miniprogram-cq-talent` 是原生微信小程序，受腾讯平台规范约束。动手前读 `docs/reference/wechat-miniprogram/`：
+
+可执行开发规则与质量门禁从 `.trellis/spec/miniprogram/frontend/index.md` 进入；官方事实仍回到下述本地留档核对。
+
+1. 先读该目录 `notes/` 里对应主题（配置/分包/隐私/开放能力/性能/审核），细则回 `pages/` 官方正文；不要凭记忆或旧交接文档下结论。
+2. 留档时间以 `manifest.json` 和 `pages/` 文件头为准。超过约 1 个月、或发版前，重跑 `python3 scripts/wechat-docs/fetch-official-docs.py` 并用 `manifest.json` 的 SHA-256 比对变化。
+3. 已核对的差距清单与推进顺序见 `docs/reference/wechat-miniprogram/notes/08-本项目平台合规差距-2026-09-18.md`；新增隐私接口、新增页面、包体积变化都要回到该清单更新。

@@ -1,0 +1,641 @@
+{
+  "method": "Match exposed nodes by hierarchical type/name/occurrence; compare frame-relative accumulated x/y, size and hidden state. Instance internals, actual text content and reactions are not exposed by metadata.",
+  "screens": [
+    {
+      "screen": "P01",
+      "source": "213:348",
+      "candidate": "401:1010",
+      "sourceNodes": 52,
+      "candidateNodes": 58,
+      "matched": 52,
+      "missing": [],
+      "geometryOrVisibilityChanges": [],
+      "addedCount": 6
+    },
+    {
+      "screen": "C01",
+      "source": "214:2144",
+      "candidate": "401:1106",
+      "sourceNodes": 57,
+      "candidateNodes": 60,
+      "matched": 57,
+      "missing": [],
+      "geometryOrVisibilityChanges": [],
+      "addedCount": 3
+    },
+    {
+      "screen": "C03",
+      "source": "214:2203",
+      "candidate": "401:1164",
+      "sourceNodes": 47,
+      "candidateNodes": 51,
+      "matched": 47,
+      "missing": [],
+      "geometryOrVisibilityChanges": [],
+      "addedCount": 4
+    },
+    {
+      "screen": "C11",
+      "source": "214:2381",
+      "candidate": "401:1212",
+      "sourceNodes": 40,
+      "candidateNodes": 43,
+      "matched": 40,
+      "missing": [],
+      "geometryOrVisibilityChanges": [],
+      "addedCount": 3
+    },
+    {
+      "screen": "D01",
+      "source": "214:29",
+      "candidate": "401:1262",
+      "sourceNodes": 78,
+      "candidateNodes": 80,
+      "matched": 78,
+      "missing": [],
+      "geometryOrVisibilityChanges": [
+        {
+          "sourceId": "214:62",
+          "candidateId": "401:1295",
+          "name": "今日训练",
+          "diff": {
+            "height": [
+              150.0,
+              148.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:63",
+          "candidateId": "401:1296",
+          "name": "今日训练",
+          "diff": {
+            "x": [
+              569.0,
+              568.0
+            ],
+            "y": [
+              223.0,
+              222.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:64",
+          "candidateId": "401:1297",
+          "name": "2",
+          "diff": {
+            "x": [
+              569.0,
+              568.0
+            ],
+            "y": [
+              251.0,
+              250.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:65",
+          "candidateId": "401:1298",
+          "name": "查看共同日程",
+          "diff": {
+            "x": [
+              569.0,
+              568.0
+            ],
+            "y": [
+              313.0,
+              312.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:66",
+          "candidateId": "401:1299",
+          "name": "测评待同步",
+          "diff": {
+            "height": [
+              150.0,
+              148.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:67",
+          "candidateId": "401:1300",
+          "name": "测评待同步",
+          "diff": {
+            "x": [
+              861.0,
+              860.0
+            ],
+            "y": [
+              223.0,
+              222.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:68",
+          "candidateId": "401:1301",
+          "name": "2",
+          "diff": {
+            "x": [
+              861.0,
+              860.0
+            ],
+            "y": [
+              251.0,
+              250.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:69",
+          "candidateId": "401:1302",
+          "name": "按学员独立确认",
+          "diff": {
+            "x": [
+              861.0,
+              860.0
+            ],
+            "y": [
+              313.0,
+              312.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:70",
+          "candidateId": "401:1303",
+          "name": "待跟进咨询",
+          "diff": {
+            "height": [
+              150.0,
+              148.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:71",
+          "candidateId": "401:1304",
+          "name": "待跟进咨询",
+          "diff": {
+            "x": [
+              1153.0,
+              1152.0
+            ],
+            "y": [
+              223.0,
+              222.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:72",
+          "candidateId": "401:1305",
+          "name": "3",
+          "diff": {
+            "x": [
+              1153.0,
+              1152.0
+            ],
+            "y": [
+              251.0,
+              250.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:73",
+          "candidateId": "401:1306",
+          "name": "尚未承接",
+          "diff": {
+            "x": [
+              1153.0,
+              1152.0
+            ],
+            "y": [
+              313.0,
+              312.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:81",
+          "candidateId": "401:1314",
+          "name": "数据明细",
+          "diff": {
+            "height": [
+              319.0,
+              317.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:82",
+          "candidateId": "401:1315",
+          "name": "列标题",
+          "diff": {
+            "x": [
+              257.0,
+              256.0
+            ],
+            "y": [
+              557.0,
+              556.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:83",
+          "candidateId": "401:1316",
+          "name": "工作事项",
+          "diff": {
+            "x": [
+              277.0,
+              276.0
+            ],
+            "y": [
+              573.0,
+              572.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:84",
+          "candidateId": "401:1317",
+          "name": "关联对象",
+          "diff": {
+            "x": [
+              555.0,
+              554.0
+            ],
+            "y": [
+              573.0,
+              572.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:85",
+          "candidateId": "401:1318",
+          "name": "状态",
+          "diff": {
+            "x": [
+              833.0,
+              832.0
+            ],
+            "y": [
+              573.0,
+              572.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:86",
+          "candidateId": "401:1319",
+          "name": "下一步",
+          "diff": {
+            "x": [
+              1111.0,
+              1110.0
+            ],
+            "y": [
+              573.0,
+              572.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:87",
+          "candidateId": "401:1320",
+          "name": "记录 1",
+          "diff": {
+            "x": [
+              257.0,
+              256.0
+            ],
+            "y": [
+              609.0,
+              608.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:88",
+          "candidateId": "401:1321",
+          "name": "阶段测评待同步",
+          "diff": {
+            "x": [
+              277.0,
+              276.0
+            ],
+            "y": [
+              631.0,
+              630.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:89",
+          "candidateId": "401:1322",
+          "name": "U10精英队 · 2人",
+          "diff": {
+            "x": [
+              555.0,
+              554.0
+            ],
+            "y": [
+              631.0,
+              630.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:90",
+          "candidateId": "401:1323",
+          "name": "待处理",
+          "diff": {
+            "x": [
+              833.0,
+              832.0
+            ],
+            "y": [
+              631.0,
+              630.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:91",
+          "candidateId": "401:1324",
+          "name": "打开任务",
+          "diff": {
+            "x": [
+              1111.0,
+              1110.0
+            ],
+            "y": [
+              631.0,
+              630.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:92",
+          "candidateId": "401:1325",
+          "name": "分隔",
+          "diff": {
+            "x": [
+              257.0,
+              256.0
+            ],
+            "y": [
+              677.0,
+              676.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:93",
+          "candidateId": "401:1326",
+          "name": "记录 2",
+          "diff": {
+            "x": [
+              257.0,
+              256.0
+            ],
+            "y": [
+              678.0,
+              677.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:94",
+          "candidateId": "401:1327",
+          "name": "导入映射冲突",
+          "diff": {
+            "x": [
+              277.0,
+              276.0
+            ],
+            "y": [
+              700.0,
+              699.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:95",
+          "candidateId": "401:1328",
+          "name": "学员资料批次 #026",
+          "diff": {
+            "x": [
+              555.0,
+              554.0
+            ],
+            "y": [
+              700.0,
+              699.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:96",
+          "candidateId": "401:1329",
+          "name": "需核对",
+          "diff": {
+            "x": [
+              833.0,
+              832.0
+            ],
+            "y": [
+              700.0,
+              699.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:97",
+          "candidateId": "401:1330",
+          "name": "查看详情",
+          "diff": {
+            "x": [
+              1111.0,
+              1110.0
+            ],
+            "y": [
+              700.0,
+              699.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:98",
+          "candidateId": "401:1331",
+          "name": "分隔",
+          "diff": {
+            "x": [
+              257.0,
+              256.0
+            ],
+            "y": [
+              746.0,
+              745.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:99",
+          "candidateId": "401:1332",
+          "name": "记录 3",
+          "diff": {
+            "x": [
+              257.0,
+              256.0
+            ],
+            "y": [
+              747.0,
+              746.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:100",
+          "candidateId": "401:1333",
+          "name": "私教咨询待跟进",
+          "diff": {
+            "x": [
+              277.0,
+              276.0
+            ],
+            "y": [
+              769.0,
+              768.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:101",
+          "candidateId": "401:1334",
+          "name": "林予安 · 控球训练",
+          "diff": {
+            "x": [
+              555.0,
+              554.0
+            ],
+            "y": [
+              769.0,
+              768.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:102",
+          "candidateId": "401:1335",
+          "name": "待分派",
+          "diff": {
+            "x": [
+              833.0,
+              832.0
+            ],
+            "y": [
+              769.0,
+              768.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:103",
+          "candidateId": "401:1336",
+          "name": "查看需求",
+          "diff": {
+            "x": [
+              1111.0,
+              1110.0
+            ],
+            "y": [
+              769.0,
+              768.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:104",
+          "candidateId": "401:1337",
+          "name": "分隔",
+          "diff": {
+            "x": [
+              257.0,
+              256.0
+            ],
+            "y": [
+              815.0,
+              814.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:105",
+          "candidateId": "401:1338",
+          "name": "分页",
+          "diff": {
+            "x": [
+              257.0,
+              256.0
+            ],
+            "y": [
+              816.0,
+              815.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:106",
+          "candidateId": "401:1339",
+          "name": "共 3 条演示记录",
+          "diff": {
+            "x": [
+              277.0,
+              276.0
+            ],
+            "y": [
+              836.0,
+              835.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:107",
+          "candidateId": "401:1340",
+          "name": "‹ 1 › 20 条/页",
+          "diff": {
+            "x": [
+              1175.0,
+              1174.0
+            ],
+            "y": [
+              836.0,
+              835.0
+            ]
+          }
+        },
+        {
+          "sourceId": "214:108",
+          "candidateId": "401:1341",
+          "name": "天才足球 · 演示数据 / 界面方案 · D01",
+          "diff": {
+            "y": [
+              899.0,
+              897.0
+            ]
+          }
+        }
+      ],
+      "addedCount": 2
+    }
+  ]
+}

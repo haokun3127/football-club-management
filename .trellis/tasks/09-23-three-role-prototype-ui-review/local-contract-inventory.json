@@ -1,0 +1,1795 @@
+{
+  "scope": "local working tree only; regex inventory, not full semantic linkage or runtime validation",
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/tactical-board/formations",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 84
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/tactical-board",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 95
+    },
+    {
+      "method": "PUT",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/tactical-board",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 120
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/parent/children",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 172
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/parent/students/:studentId/family",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 217
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/assessment-tasks/:taskId/projects/:projectId/entries",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 270
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/training-content-assessments",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 398
+    },
+    {
+      "method": "PUT",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/training-content-assessments",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 429
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/parent/reminders",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 490
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/parent/private-lessons",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 636
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/app-clients/:clientId/session/role",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 687
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/match/events",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 737
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/app-clients/:clientId/parent/private-lessons",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 839
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/app-clients/:clientId/wechat-login",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 893
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/parent/students/:studentId/home",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 977
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/parent/students/:studentId/privacy",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 1032
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/app-clients/:clientId/parent/students/:studentId/privacy/requests",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 1061
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/parent/students/:studentId/activity-summaries",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 1106
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/parent/students/:studentId/status-summary",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 1163
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/parent/students/:studentId/ability-metrics/:metricId",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 1202
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/parent/students/:studentId/growth-summary",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 1257
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/parent/students/:studentId/schedule",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 1330
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/finish",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 1373
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/preferences",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 1416
+    },
+    {
+      "method": "PUT",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/preferences",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 1445
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/workbench",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 1481
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/match",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 1567
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/assessments/templates/:templateId/form",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 1633
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/events/:eventId",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 1702
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/parent/calendar",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 1791
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/training-project-tree",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 1871
+    },
+    {
+      "method": "PUT",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/training-projects",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 1956
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/home",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 2039
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/team",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 2149
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/students/:studentId/radar",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 2222
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/team/ability-overview",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 2286
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/change-requests",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 2400
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/training-coverage",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 2459
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/assessment-tasks",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 2525
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/assessment-tasks",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 2616
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/content/articles",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 2686
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/content/faqs",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 2706
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/venues",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 2726
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach-team",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 2769
+    },
+    {
+      "method": "PUT",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/attendance",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 2811
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/lesson-confirmation",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 2854
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/lesson-confirmation",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 2902
+    },
+    {
+      "method": "PATCH",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/lesson-confirmation",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 2960
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/matches",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 3042
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/app-clients/:clientId/coach/assessments",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 3085
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/${params.clubId}/app-clients/${params.clientId}/",
+      "file": "apps/api/src/routes/app-client.routes.ts",
+      "line": 3391
+    },
+    {
+      "method": "GET",
+      "path": "${base}/workflow",
+      "file": "apps/api/src/routes/assessment-workflow.routes.ts",
+      "line": 32,
+      "note": "base resolved in source"
+    },
+    {
+      "method": "GET",
+      "path": "${base}/students/:studentId/history",
+      "file": "apps/api/src/routes/assessment-workflow.routes.ts",
+      "line": 36,
+      "note": "base resolved in source"
+    },
+    {
+      "method": "PUT",
+      "path": "${base}/students/:studentId/entries",
+      "file": "apps/api/src/routes/assessment-workflow.routes.ts",
+      "line": 40,
+      "note": "base resolved in source"
+    },
+    {
+      "method": "POST",
+      "path": "${base}/publications",
+      "file": "apps/api/src/routes/assessment-workflow.routes.ts",
+      "line": 45,
+      "note": "base resolved in source"
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/assessments",
+      "file": "apps/api/src/routes/assessment.routes.ts",
+      "line": 14
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/coach/today",
+      "file": "apps/api/src/routes/calendar.routes.ts",
+      "line": 14
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/calendar/events",
+      "file": "apps/api/src/routes/calendar.routes.ts",
+      "line": 46
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/students/:studentId/timeline",
+      "file": "apps/api/src/routes/calendar.routes.ts",
+      "line": 68
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/admin/calendar/events",
+      "file": "apps/api/src/routes/calendar.routes.ts",
+      "line": 90
+    },
+    {
+      "method": "PUT",
+      "path": "/clubs/:clubId/admin/calendar/events/:eventId/participants",
+      "file": "apps/api/src/routes/calendar.routes.ts",
+      "line": 115
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/admin/calendar/conflicts",
+      "file": "apps/api/src/routes/calendar.routes.ts",
+      "line": 141
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/admin/integrations/connections",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 23
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/admin/integrations/sync-policies",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 44
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/admin/integrations/sync-policies/run-due",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 68
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/admin/integrations/sync-policies",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 99
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/admin/integrations/sync-policies/due",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 129
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/admin/integrations/wps/webhook",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 159
+    },
+    {
+      "method": "PATCH",
+      "path": "/clubs/:clubId/admin/integrations/sync-policies/:policyId",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 191
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/admin/integrations/sync-policies/:policyId/run",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 223
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/admin/students",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 255
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/admin/students/:studentId",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 278
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/admin/privacy",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 313
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/admin/privacy/audit-logs",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 334
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/admin/privacy/retention/dry-run",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 355
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/admin/privacy/export-preview",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 377
+    },
+    {
+      "method": "PUT",
+      "path": "/clubs/:clubId/admin/privacy/consents",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 411
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/admin/privacy/requests",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 440
+    },
+    {
+      "method": "PATCH",
+      "path": "/clubs/:clubId/admin/privacy/requests/:requestId",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 463
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/students/:studentId/status-summary",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 495
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/admin/students/:studentId/lesson-ledger",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 523
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/admin/students/:studentId/lesson-adjustments",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 552
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/admin/students/:studentId/insurance-policies",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 582
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/admin/students/:studentId/insurance-policies",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 611
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/admin/data/config",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 640
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/admin/imports/excel/preview",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 662
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/admin/import-preview",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 696
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/admin/sync-runs",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 726
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/admin/sync-runs/:syncRunId",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 748
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/admin/external-records/:rawRecordId/confirm",
+      "file": "apps/api/src/routes/data-capability.routes.ts",
+      "line": 785
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/matches",
+      "file": "apps/api/src/routes/match.routes.ts",
+      "line": 15
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/matches",
+      "file": "apps/api/src/routes/match.routes.ts",
+      "line": 65
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/catalog/ability-metrics",
+      "file": "apps/api/src/routes/metrics.routes.ts",
+      "line": 12
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/students/:studentId/metrics",
+      "file": "apps/api/src/routes/metrics.routes.ts",
+      "line": 37
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/students/:studentId/derived-metrics/attacking-contribution",
+      "file": "apps/api/src/routes/metrics.routes.ts",
+      "line": 59
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "file": "apps/api/src/routes/platform.routes.ts",
+      "line": 6
+    },
+    {
+      "method": "GET",
+      "path": "/clubs",
+      "file": "apps/api/src/routes/platform.routes.ts",
+      "line": 8
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/capabilities",
+      "file": "apps/api/src/routes/platform.routes.ts",
+      "line": 41
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/admin/app-clients",
+      "file": "apps/api/src/routes/platform.routes.ts",
+      "line": 69
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/config",
+      "file": "apps/api/src/routes/platform.routes.ts",
+      "line": 90
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/teams",
+      "file": "apps/api/src/routes/platform.routes.ts",
+      "line": 118
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/teams/:teamId/members",
+      "file": "apps/api/src/routes/platform.routes.ts",
+      "line": 144
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:clubId/training/sessions",
+      "file": "apps/api/src/routes/training.routes.ts",
+      "line": 14
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/training/sessions",
+      "file": "apps/api/src/routes/training.routes.ts",
+      "line": 42
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/training/sessions/ensure",
+      "file": "apps/api/src/routes/training.routes.ts",
+      "line": 64
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:clubId/training/sessions/:trainingSessionId/observations",
+      "file": "apps/api/src/routes/training.routes.ts",
+      "line": 97
+    }
+  ],
+  "pages": [
+    {
+      "page": "pages/coach/account/index.wxml",
+      "handlers": [
+        {
+          "handler": "clearCache",
+          "definitionLine": 54
+        },
+        {
+          "handler": "goBack",
+          "definitionLine": 51
+        },
+        {
+          "handler": "reauthorizeWechat",
+          "definitionLine": 65
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/assessment-bulk-entry/index.wxml",
+      "handlers": [
+        {
+          "handler": "closeHistory",
+          "definitionLine": 395
+        },
+        {
+          "handler": "goBack",
+          "definitionLine": 362
+        },
+        {
+          "handler": "nextProject",
+          "definitionLine": 348
+        },
+        {
+          "handler": "onRawInput",
+          "definitionLine": 235
+        },
+        {
+          "handler": "onReasonInput",
+          "definitionLine": 367
+        },
+        {
+          "handler": "reloadServer",
+          "definitionLine": 371
+        },
+        {
+          "handler": "saveProject",
+          "definitionLine": 278
+        },
+        {
+          "handler": "showHistory",
+          "definitionLine": 379
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/assessment-projects/index.wxml",
+      "handlers": [
+        {
+          "handler": "confirmSelection",
+          "definitionLine": 177
+        },
+        {
+          "handler": "goBack",
+          "definitionLine": 184
+        },
+        {
+          "handler": "publishReady",
+          "definitionLine": 120
+        },
+        {
+          "handler": "selectPrimary",
+          "definitionLine": 163
+        },
+        {
+          "handler": "selectSecondary",
+          "definitionLine": 170
+        },
+        {
+          "handler": "toggleProject",
+          "definitionLine": 144
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/assessment-submit/index.wxml",
+      "handlers": [
+        {
+          "handler": "backToList",
+          "definitionLine": 60
+        },
+        {
+          "handler": "viewResults",
+          "definitionLine": 56
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/attendance/index.wxml",
+      "handlers": [
+        {
+          "handler": "clearAll",
+          "definitionLine": 119
+        },
+        {
+          "handler": "markAllPresent",
+          "definitionLine": 124
+        },
+        {
+          "handler": "toggleAttendance",
+          "definitionLine": 129
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/attendance-success/index.wxml",
+      "handlers": [
+        {
+          "handler": "openSchedule",
+          "definitionLine": 96
+        },
+        {
+          "handler": "openWorkbench",
+          "definitionLine": 93
+        },
+        {
+          "handler": "retry",
+          "definitionLine": 90
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/content-select/index.wxml",
+      "handlers": [
+        {
+          "handler": "confirmSelection",
+          "definitionLine": 311
+        },
+        {
+          "handler": "goBack",
+          "definitionLine": 220
+        },
+        {
+          "handler": "onSearchInput",
+          "definitionLine": 224
+        },
+        {
+          "handler": "selectPrimary",
+          "definitionLine": 244
+        },
+        {
+          "handler": "selectSecondary",
+          "definitionLine": 256
+        },
+        {
+          "handler": "toggleProject",
+          "definitionLine": 290
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/event/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 201
+        },
+        {
+          "handler": "openAction",
+          "definitionLine": 164
+        },
+        {
+          "handler": "toggleAttendance",
+          "definitionLine": 175
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/event-change/index.wxml",
+      "handlers": [
+        {
+          "handler": "inputNote",
+          "definitionLine": 226
+        },
+        {
+          "handler": "inputVenue",
+          "definitionLine": 215
+        },
+        {
+          "handler": "selectDate",
+          "definitionLine": 170
+        },
+        {
+          "handler": "selectReason",
+          "definitionLine": 156
+        },
+        {
+          "handler": "selectTime",
+          "definitionLine": 184
+        },
+        {
+          "handler": "selectVenue",
+          "definitionLine": 198
+        },
+        {
+          "handler": "toggleNotify",
+          "definitionLine": 211
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/help/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 98
+        },
+        {
+          "handler": "onSearchInput",
+          "definitionLine": 69
+        },
+        {
+          "handler": "selectCategory",
+          "definitionLine": 76
+        },
+        {
+          "handler": "toggleQuestion",
+          "definitionLine": 86
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/lesson/index.wxml",
+      "handlers": [
+        {
+          "handler": "confirmLesson",
+          "definitionLine": 195
+        },
+        {
+          "handler": "openHistory",
+          "definitionLine": 192
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/lesson-detail/index.wxml",
+      "handlers": [
+        {
+          "handler": "openTrainingContent",
+          "definitionLine": 150
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/lesson-history/index.wxml",
+      "handlers": [
+        {
+          "handler": "openDetail",
+          "definitionLine": 125
+        },
+        {
+          "handler": "showAll",
+          "definitionLine": 121
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/match/index.wxml",
+      "handlers": [
+        {
+          "handler": "continueLocalDraft",
+          "definitionLine": 176
+        },
+        {
+          "handler": "openMatchEdit",
+          "definitionLine": 172
+        },
+        {
+          "handler": "openMatchEventAdd",
+          "definitionLine": 168
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/match-edit/index.wxml",
+      "handlers": [
+        {
+          "handler": "onAwayScoreInput",
+          "definitionLine": 133
+        },
+        {
+          "handler": "onHomeScoreInput",
+          "definitionLine": 129
+        },
+        {
+          "handler": "onMatchTypeChange",
+          "definitionLine": 137
+        },
+        {
+          "handler": "onOpponentInput",
+          "definitionLine": 125
+        },
+        {
+          "handler": "onStatusChange",
+          "definitionLine": 144
+        },
+        {
+          "handler": "save",
+          "definitionLine": 151
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/match-event-add/index.wxml",
+      "handlers": [
+        {
+          "handler": "onMinuteInput",
+          "definitionLine": 135
+        },
+        {
+          "handler": "onNoteInput",
+          "definitionLine": 139
+        },
+        {
+          "handler": "onPlayerChange",
+          "definitionLine": 128
+        },
+        {
+          "handler": "saveEvent",
+          "definitionLine": 176
+        },
+        {
+          "handler": "selectType",
+          "definitionLine": 122
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/me/index.wxml",
+      "handlers": [
+        {
+          "handler": "logout",
+          "definitionLine": 94
+        },
+        {
+          "handler": "openAccount",
+          "definitionLine": 70
+        },
+        {
+          "handler": "openHelp",
+          "definitionLine": 79
+        },
+        {
+          "handler": "openPermissions",
+          "definitionLine": 73
+        },
+        {
+          "handler": "openPrivateInterest",
+          "definitionLine": 76
+        },
+        {
+          "handler": "switchToParent",
+          "definitionLine": 82
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/permissions/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 47
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/private-interest/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 104
+        },
+        {
+          "handler": "toggleAccepting",
+          "definitionLine": 74
+        },
+        {
+          "handler": "toggleSlot",
+          "definitionLine": 87
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/schedule/index.wxml",
+      "handlers": [
+        {
+          "handler": "changeMonth",
+          "definitionLine": 163
+        },
+        {
+          "handler": "changeWeek",
+          "definitionLine": 173
+        },
+        {
+          "handler": "collapseMonthPicker",
+          "definitionLine": 159
+        },
+        {
+          "handler": "expandMonthPicker",
+          "definitionLine": 155
+        },
+        {
+          "handler": "openEvent",
+          "definitionLine": 204
+        },
+        {
+          "handler": "openMe",
+          "definitionLine": 179
+        },
+        {
+          "handler": "openTask",
+          "definitionLine": 208
+        },
+        {
+          "handler": "selectDay",
+          "definitionLine": 149
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/student-radar/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 57
+        },
+        {
+          "handler": "selectStudent",
+          "definitionLine": 51
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/tactical-board/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 102
+        },
+        {
+          "handler": "onFormationChange",
+          "definitionLine": 246
+        },
+        {
+          "handler": "onPlayerMove",
+          "definitionLine": 310
+        },
+        {
+          "handler": "onSubstituteMove",
+          "definitionLine": 329
+        },
+        {
+          "handler": "resetBoard",
+          "definitionLine": 350
+        },
+        {
+          "handler": "retry",
+          "definitionLine": 380
+        },
+        {
+          "handler": "saveBoard",
+          "definitionLine": 354
+        },
+        {
+          "handler": "selectStarter",
+          "definitionLine": 275
+        },
+        {
+          "handler": "swapSubstitute",
+          "definitionLine": 283
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/team/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 86
+        },
+        {
+          "handler": "openRadar",
+          "definitionLine": 89
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/team-ability/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 55
+        },
+        {
+          "handler": "selectStudent",
+          "definitionLine": 49
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/team-selector/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 68
+        },
+        {
+          "handler": "selectTeam",
+          "definitionLine": 62
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/test-entry/index.wxml",
+      "handlers": [
+        {
+          "handler": "continueDraft",
+          "definitionLine": 286
+        },
+        {
+          "handler": "exitDraft",
+          "definitionLine": 297
+        },
+        {
+          "handler": "goBack",
+          "definitionLine": 281
+        },
+        {
+          "handler": "nextField",
+          "definitionLine": 338
+        },
+        {
+          "handler": "onFieldChange",
+          "definitionLine": 328
+        },
+        {
+          "handler": "onMissingReasonInput",
+          "definitionLine": 385
+        },
+        {
+          "handler": "onValueInput",
+          "definitionLine": 351
+        },
+        {
+          "handler": "previousField",
+          "definitionLine": 333
+        },
+        {
+          "handler": "submitAssessment",
+          "definitionLine": 432
+        },
+        {
+          "handler": "switchGroup",
+          "definitionLine": 310
+        },
+        {
+          "handler": "toggleMissing",
+          "definitionLine": 367
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/test-task-create/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 131
+        },
+        {
+          "handler": "onDueDateChange",
+          "definitionLine": 94
+        },
+        {
+          "handler": "onStartDateChange",
+          "definitionLine": 90
+        },
+        {
+          "handler": "onTeamChange",
+          "definitionLine": 82
+        },
+        {
+          "handler": "onTemplateChange",
+          "definitionLine": 78
+        },
+        {
+          "handler": "onTermLabelInput",
+          "definitionLine": 86
+        },
+        {
+          "handler": "onTitleInput",
+          "definitionLine": 74
+        },
+        {
+          "handler": "submit",
+          "definitionLine": 105
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/test-tasks/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 130
+        },
+        {
+          "handler": "openCreate",
+          "definitionLine": 134
+        },
+        {
+          "handler": "openTask",
+          "definitionLine": 150
+        },
+        {
+          "handler": "selectFilter",
+          "definitionLine": 138
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/training/index.wxml",
+      "handlers": [
+        {
+          "handler": "openTeam",
+          "definitionLine": 99
+        },
+        {
+          "handler": "openTeamAbility",
+          "definitionLine": 96
+        },
+        {
+          "handler": "openTestTasks",
+          "definitionLine": 102
+        },
+        {
+          "handler": "openTrainingEvent",
+          "definitionLine": 89
+        },
+        {
+          "handler": "openTrainingTeamSelector",
+          "definitionLine": 93
+        }
+      ]
+    },
+    {
+      "page": "pages/coach/training-assessment/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 135
+        },
+        {
+          "handler": "onNoteInput",
+          "definitionLine": 153
+        },
+        {
+          "handler": "onScoreInput",
+          "definitionLine": 149
+        },
+        {
+          "handler": "save",
+          "definitionLine": 173
+        },
+        {
+          "handler": "selectProject",
+          "definitionLine": 139
+        }
+      ]
+    },
+    {
+      "page": "pages/launch/index.wxml",
+      "handlers": [
+        {
+          "handler": "retry",
+          "definitionLine": 69
+        }
+      ]
+    },
+    {
+      "page": "pages/login/index.wxml",
+      "handlers": [
+        {
+          "handler": "backToLaunch",
+          "definitionLine": 182
+        },
+        {
+          "handler": "chooseCoachRole",
+          "definitionLine": 144
+        },
+        {
+          "handler": "chooseParentRole",
+          "definitionLine": 141
+        },
+        {
+          "handler": "onPhoneAuthorizationTap",
+          "definitionLine": 50
+        },
+        {
+          "handler": "retry",
+          "definitionLine": 122
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/ability-history/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 64
+        },
+        {
+          "handler": "openSource",
+          "definitionLine": 60
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/account/index.wxml",
+      "handlers": [
+        {
+          "handler": "editPhone",
+          "definitionLine": 50
+        },
+        {
+          "handler": "logout",
+          "definitionLine": 68
+        },
+        {
+          "handler": "switchToCoach",
+          "definitionLine": 53
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/article/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 34
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/binding/index.wxml",
+      "handlers": [
+        {
+          "handler": "addFamilyMember",
+          "definitionLine": 121
+        },
+        {
+          "handler": "chooseChild",
+          "definitionLine": 93
+        },
+        {
+          "handler": "goBack",
+          "definitionLine": 85
+        },
+        {
+          "handler": "openAccount",
+          "definitionLine": 118
+        },
+        {
+          "handler": "switchChild",
+          "definitionLine": 86
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/child/index.wxml",
+      "handlers": [
+        {
+          "handler": "openBinding",
+          "definitionLine": 86
+        },
+        {
+          "handler": "openCoach",
+          "definitionLine": 98
+        },
+        {
+          "handler": "openGrowth",
+          "definitionLine": 92
+        },
+        {
+          "handler": "openRadar",
+          "definitionLine": 95
+        },
+        {
+          "handler": "openSchedule",
+          "definitionLine": 89
+        },
+        {
+          "handler": "openStatus",
+          "definitionLine": 77
+        },
+        {
+          "handler": "switchToCoach",
+          "definitionLine": 101
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/coaches/index.wxml",
+      "handlers": [
+        {
+          "handler": "copyCoachWechat",
+          "definitionLine": 50
+        },
+        {
+          "handler": "goBack",
+          "definitionLine": 47
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/content/index.wxml",
+      "handlers": [
+        {
+          "handler": "onSearchInput",
+          "definitionLine": 64
+        },
+        {
+          "handler": "openArticle",
+          "definitionLine": 107
+        },
+        {
+          "handler": "openQuickLink",
+          "definitionLine": 112
+        },
+        {
+          "handler": "toggleSearch",
+          "definitionLine": 58
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/day/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 107
+        },
+        {
+          "handler": "openEvent",
+          "definitionLine": 110
+        },
+        {
+          "handler": "openFilter",
+          "definitionLine": 85
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/event/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 90
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/growth/index.wxml",
+      "handlers": [
+        {
+          "handler": "openMatchHistory",
+          "definitionLine": 118
+        },
+        {
+          "handler": "openMilestones",
+          "definitionLine": 121
+        },
+        {
+          "handler": "openRadar",
+          "definitionLine": 124
+        },
+        {
+          "handler": "openSettings",
+          "definitionLine": 112
+        },
+        {
+          "handler": "openTrainingHistory",
+          "definitionLine": 115
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/guide/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 34
+        },
+        {
+          "handler": "openGuide",
+          "definitionLine": 52
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/help/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 112
+        },
+        {
+          "handler": "onSearchInput",
+          "definitionLine": 91
+        },
+        {
+          "handler": "selectCategory",
+          "definitionLine": 79
+        },
+        {
+          "handler": "toggleQuestion",
+          "definitionLine": 101
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/match-history/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 58
+        },
+        {
+          "handler": "openMatch",
+          "definitionLine": 54
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/metric/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 134
+        },
+        {
+          "handler": "openSourceEvent",
+          "definitionLine": 130
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/milestones/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 47
+        },
+        {
+          "handler": "openAbilityHistory",
+          "definitionLine": 53
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/private/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 135
+        },
+        {
+          "handler": "inputNote",
+          "definitionLine": 164
+        },
+        {
+          "handler": "selectCoach",
+          "definitionLine": 136
+        },
+        {
+          "handler": "selectDate",
+          "definitionLine": 147
+        },
+        {
+          "handler": "selectSlot",
+          "definitionLine": 150
+        },
+        {
+          "handler": "submit",
+          "definitionLine": 177
+        },
+        {
+          "handler": "toggleGoal",
+          "definitionLine": 156
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/private-success/index.wxml",
+      "handlers": [
+        {
+          "handler": "backToHome",
+          "definitionLine": 85
+        },
+        {
+          "handler": "backToSchedule",
+          "definitionLine": 82
+        },
+        {
+          "handler": "goBack",
+          "definitionLine": 88
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/radar/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 116
+        },
+        {
+          "handler": "openMetric",
+          "definitionLine": 110
+        },
+        {
+          "handler": "switchChild",
+          "definitionLine": 99
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/reminders/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 66
+        },
+        {
+          "handler": "markAllRead",
+          "definitionLine": 69
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/schedule/index.wxml",
+      "handlers": [
+        {
+          "handler": "changeMonth",
+          "definitionLine": 259
+        },
+        {
+          "handler": "changeWeek",
+          "definitionLine": 275
+        },
+        {
+          "handler": "collapseMonthPicker",
+          "definitionLine": 272
+        },
+        {
+          "handler": "expandMonthPicker",
+          "definitionLine": 269
+        },
+        {
+          "handler": "openDay",
+          "definitionLine": 307
+        },
+        {
+          "handler": "openEvent",
+          "definitionLine": 296
+        },
+        {
+          "handler": "openNotice",
+          "definitionLine": 303
+        },
+        {
+          "handler": "openReminders",
+          "definitionLine": 300
+        },
+        {
+          "handler": "selectDate",
+          "definitionLine": 229
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/semester-report/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 122
+        },
+        {
+          "handler": "openStudentPicker",
+          "definitionLine": 112
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/status/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 90
+        },
+        {
+          "handler": "openCoach",
+          "definitionLine": 131
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/training-history/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 49
+        }
+      ]
+    },
+    {
+      "page": "pages/parent/venues/index.wxml",
+      "handlers": [
+        {
+          "handler": "goBack",
+          "definitionLine": 49
+        },
+        {
+          "handler": "navigate",
+          "definitionLine": 107
+        },
+        {
+          "handler": "onSearchInput",
+          "definitionLine": 58
+        },
+        {
+          "handler": "selectFilter",
+          "definitionLine": 101
+        },
+        {
+          "handler": "toggleSearch",
+          "definitionLine": 52
+        }
+      ]
+    }
+  ]
+}

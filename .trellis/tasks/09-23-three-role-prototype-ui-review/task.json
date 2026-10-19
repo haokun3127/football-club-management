@@ -1,0 +1,229 @@
+{
+  "id": "three-role-prototype-ui-review",
+  "name": "three-role-prototype-ui-review",
+  "title": "三端视觉升级、产品闭环与隔离体验部署",
+  "description": "保留深红品牌主题，升级 Figma 与实际三端 UI，补齐定稿需求/BFF 并部署独立 develop、trial；禁止生产业务数据和正式发布变更。",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": null,
+  "package": "api",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-09-23",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "dev",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    ".trellis/tasks/09-23-three-role-prototype-ui-review/review.md",
+    ".trellis/tasks/09-23-three-role-prototype-ui-review/requirements-design-map.md",
+    ".trellis/tasks/09-23-three-role-prototype-ui-review/delivery-inventory.json",
+    ".trellis/tasks/09-23-three-role-prototype-ui-review/bff-data-flow-review.md",
+    ".trellis/tasks/09-23-three-role-prototype-ui-review/channel-checkpoint-20260928.md",
+    "docs/current/development-delivery-channel.md",
+    ".trellis/tasks/09-23-three-role-prototype-ui-review/engineering-baseline-20260928.md",
+    ".trellis/tasks/09-23-three-role-prototype-ui-review/design-baseline-20260928.json"
+  ],
+  "notes": "2026-09-28 交付通道修复：Node 24 本地交付门禁通过，稳定版微信 IDE/56031 正常且进入身份验证页；develop/trial 仅补齐 club/app-client，线上 10 项只读探测通过。非生产仍缺 AppSecret 与三角色测试身份，真实登录、远端 CI、后台前端及完整业务/视觉验收和体验上传未完成。生产业务数据和正式发布状态未改变。 用户后续已确认继续使用现有小程序 AppID；再次只读检查 develop/trial 私有配置与运行态，AppID 匹配、文件权限 0600，但 AppSecret 和测试身份仍缺失。 用户确认本人一个账号兼任家长/教练/管理员，仅用于 develop/trial；登录手机号尚未提供，未创建身份或修改生产账号。 已根据用户提供的运行时手机号在 develop/trial 各配置一个三角色测试身份，已备份并重启非生产服务；手机号未写入仓库。只读配置检查仅剩 AppSecret 缺口，完整交付检查通过；生产未变。 用户明确授权后，已在服务器内仅提取匹配 AppID 的微信凭据并写入两份非生产私有配置，重建原镜像服务，配置检查全通过。两个环境真实 wx.login 登录码兑换通过；尚未获取手机号/建立真实用户会话或上传新体验包。生产容器元数据未变。",
+  "meta": {
+    "designReview": {
+      "status": "revision_in_progress",
+      "screenCount": 238,
+      "productionTouched": false,
+      "imageUploadApproval": "pending",
+      "runtimeValidated": false,
+      "sportsVisual": {
+        "date": "2026-09-30",
+        "generator": "Figma native AI Agents",
+        "status": "rejected_by_user",
+        "brand": "#A80F1B",
+        "sourceLayoutFrozen": true,
+        "sourceCount": 5,
+        "candidateIds": [
+          "401:1010",
+          "401:1106",
+          "401:1164",
+          "401:1212",
+          "401:1262"
+        ],
+        "specNodeId": "401:2662",
+        "specPageId": "401:1009",
+        "geometryMatchedNodes": 274,
+        "geometryDifferences": 0,
+        "prototypeReactionMatchesReportedByFigmaAI": 42,
+        "userApproved": false,
+        "record": "sports-visual-review-20260930.md",
+        "specSize": [
+          1200,
+          2083
+        ]
+      },
+      "clubStyleV2": {
+        "status": "all_screen_visual_complete_with_c15_c06_handoff_additions",
+        "direction": "modern football club editorial",
+        "references": [
+          "https://www.acmilan.com/en/fans/official-app",
+          "https://www.liverpoolfc.com/info/lfc-apps"
+        ],
+        "record": "club-style-v2-20260930.md",
+        "userApproved": true,
+        "figmaGenerationPaused": false,
+        "figmaPageId": "414:358",
+        "referenceNodeIds": [
+          "416:2",
+          "416:2361"
+        ],
+        "referencesVisuallyVerified": true,
+        "frames": {
+          "direction": "421:2367",
+          "P01": "421:2454",
+          "C03": "421:2540",
+          "D01": "421:2735"
+        },
+        "screenshotsVerified": true,
+        "prototypeWired": false,
+        "backgroundDirection": "bright_light",
+        "evidenceDirectory": "club-style-light-evidence",
+        "approvedAt": "2026-10-03",
+        "recoveryRecord": "all-screen-ai-recovery-20261003.json",
+        "restorationEvidence": "all-screen-restoration-20261003.json",
+        "parentEvidence": "native-ai-parent-final-audit-20261004.json",
+        "coachEvidence": "native-ai-coach-final-audit-20261004.json",
+        "dataEvidence": "native-ai-data-final-audit-20261004.json",
+        "finalAudit": "native-ai-all-screen-final-audit-20261004.json",
+        "c15SettingsNodeId": "495:366",
+        "c15PrototypeBlocker": null,
+        "c15PrototypeEvidence": "c15-prototype-links-20261004.json",
+        "c06TargetStates": [
+          "504:359",
+          "504:394"
+        ],
+        "c03C06Audit": "c03-c06-audit-20261004.json"
+      }
+    },
+    "implementation": {
+      "status": "in_progress",
+      "apiEnvironmentsDeployed": [
+        "develop",
+        "trial"
+      ],
+      "apiImage": "cq-talent-api:trial-1224e07bf5f4",
+      "trialDeployed": false,
+      "productionBusinessDataTouched": false,
+      "formalReleaseChanged": false,
+      "verification": "deployment-verification.json",
+      "blockers": [
+        "remote CI, isolated trial package upload and real phone-authorized login/acceptance remain unverified"
+      ],
+      "remaining": [
+        "remaining confirmed product capabilities and BFF",
+        "all-screen UI polish and runtime inspection",
+        "backoffice frontend and auth",
+        "official package validation and trial upload/selection"
+      ],
+      "channelVerification": "channel-checkpoint-20260928.md",
+      "wechatCredentialDecision": {
+        "appId": "wx4c588cd106e520e0",
+        "strategy": "existing-miniprogram",
+        "confirmedByUser": true,
+        "privateConfigurationPresent": true,
+        "productionSecretCopyAuthorized": true,
+        "authorizedScope": "Read only the existing matching WeChat AppID/AppSecret inside the server and configure develop/trial private files; no production configuration or data mutation",
+        "runtimeVerifiedEnvironments": [
+          "develop",
+          "trial"
+        ],
+        "loginCodeExchangeVerified": true,
+        "realUserLoginVerified": false
+      },
+      "testIdentityDecision": {
+        "strategy": "single-user-three-roles",
+        "roles": [
+          "parent",
+          "coach",
+          "admin"
+        ],
+        "environments": [
+          "develop",
+          "trial"
+        ],
+        "confirmedByUser": true,
+        "phoneProvided": true,
+        "configuredEnvironments": [
+          "develop",
+          "trial"
+        ],
+        "realWechatLoginVerified": false
+      },
+      "engineeringStage": "B0_C15_C06_C03_C31_C12_C13_local_verified_B1_B5_in_progress",
+      "engineeringBaseline": "engineering-baseline-20260928.md",
+      "localExperienceReady": false,
+      "latestPriority": "O-08 closed and team evaluations locally integrated; SC01 confirmed normal flow, backoffice frontend/auth, remaining B1–B5 and remote real-user acceptance remain",
+      "latestVerification": {
+        "date": "2026-10-05",
+        "deliveryCheck": "passed",
+        "domainTests": 26,
+        "miniTests": 553,
+        "miniSkipped": 1,
+        "apiTests": 188,
+        "c15Runtime": "synthetic_devtools_four_states_pass",
+        "productionTouched": false,
+        "c06Runtime": "synthetic_devtools_selection_merge_replace_result_empty_pass",
+        "deliveryLog": "/tmp/cq-delivery-evaluation-final-20261005.log",
+        "afterDesignSyncChecks": "Final full delivery check plus focused SQL failure HTTP regression passed",
+        "c03Runtime": "synthetic_devtools_quick_toggle_list_filter_correction_history_pass",
+        "miniLog": "/tmp/cq-mini-final-20261005.log",
+        "c31Runtime": "synthetic_raw_precision_history_project_switch_pass",
+        "c11Runtime": "synthetic_summary_training_history_back_ability_results_pass",
+        "c04Runtime": "synthetic_versioned_hierarchy_search_selection_save_readback_return_pass",
+        "evaluationRuntime": "synthetic edit/save/history/parent readonly/growth empty-radar entry/timeline entry passed",
+        "evaluationIntegration": "actual native page + request + localhost HTTP + environment guard + authenticated BFF + SQLite + parent page passed",
+        "evaluationPolicyLog": "/tmp/cq-evaluation-policy-20261005.log"
+      },
+      "evaluationOwnershipDecision": {
+        "scope": "club_team_student",
+        "confirmedByUser": true,
+        "date": "2026-10-05",
+        "historyRequired": true
+      }
+    },
+    "scoutLibrary20261005": {
+      "status": "locally_verified",
+      "figmaNodes": [
+        "258:308",
+        "259:309",
+        "260:310"
+      ],
+      "migration": "0028_scout_identities.sql",
+      "deliveryLog": "/tmp/cq-delivery-scout-20261005.log",
+      "clientBffSqliteIntegration": "passed_loopback_only",
+      "nativeScreenshots": 3,
+      "remoteDeployed": false,
+      "productionTouched": false,
+      "remaining": [
+        "temporary roster and history",
+        "match/tactical integration",
+        "temporary assessment scope",
+        "enrollment/backoffice",
+        "real-user deployment acceptance"
+      ],
+      "pendingProductQuestion": null,
+      "rosterRuleDecision": {
+        "date": "2026-10-05",
+        "authority": "user_delegated_simple_operation_record_only_fewer_approvals",
+        "editors": "event_authorized_coaches",
+        "approvalRequired": false,
+        "afterEnd": "explicit_participated_or_not_no_default",
+        "assessment": "explicit_selection_preserve_existing_task_scope",
+        "audit": "actor_time_before_after_optional_note",
+        "implementation": "pending"
+      }
+    }
+  }
+}

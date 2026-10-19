@@ -73,3 +73,15 @@ local-backups/
 
 # Official WeChat docs local raw snapshots (regenerate with scripts/wechat-docs/fetch-official-docs.py)
 docs/reference/wechat-miniprogram/_raw-html/
+
+# Local browser sessions and ad-hoc screenshots (keep source/evidence under docs)
+/.playwright-cli/
+/output/
+
+# Machine-local task recovery pointers and generated review patches
+/.trellis/tasks/**/research/local-baseline.json
+/.trellis/tasks/**/research/cleanup-local-backup.json
+/.trellis/tasks/**/research/implementation.patch
+/.trellis/tasks/**/research/pending-ide-cleanup.json
+/.trellis/tasks/**/research/ide-projects-before.json
+/.trellis/tasks/**/research/prep/project.private.config.bak-*.json

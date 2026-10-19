@@ -1,0 +1,381 @@
+{
+  "status": "recovery_required",
+  "generator": "Figma native Agents",
+  "reason": "Rebuilt child nodes lose existing reactions; P01 does not match approved V2. Stopped after 18m27s. Two native Undo actions attempted; latest read still parent 77 / coach 172 reaction nodes. Native UI then blocked by macOS lock. Restore only this generation before continuing smaller batches.",
+  "pages": [
+    {
+      "page": "213:347",
+      "baselineReactions": 220,
+      "observedReactions": 77,
+      "changed": [
+        {
+          "id": "213:348",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:395",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:428",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:450",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:467",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:484",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:502",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:526",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:571",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:604",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:620",
+          "remainingReactionNodes": 2
+        },
+        {
+          "id": "213:665",
+          "remainingReactionNodes": 2
+        },
+        {
+          "id": "213:681",
+          "remainingReactionNodes": 2
+        },
+        {
+          "id": "213:753",
+          "remainingReactionNodes": 2
+        },
+        {
+          "id": "213:794",
+          "remainingReactionNodes": 2
+        },
+        {
+          "id": "213:845",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:875",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:916",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:955",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:970",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:986",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:1002",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:1017",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:1041",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:1070",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "213:1086",
+          "remainingReactionNodes": 2
+        },
+        {
+          "id": "213:1102",
+          "remainingReactionNodes": 8
+        },
+        {
+          "id": "213:1131",
+          "remainingReactionNodes": 2
+        },
+        {
+          "id": "213:1147",
+          "remainingReactionNodes": 2
+        },
+        {
+          "id": "213:1163",
+          "remainingReactionNodes": 3
+        },
+        {
+          "id": "213:1192",
+          "remainingReactionNodes": 3
+        },
+        {
+          "id": "213:1208",
+          "remainingReactionNodes": 3
+        },
+        {
+          "id": "213:1224",
+          "remainingReactionNodes": 3
+        },
+        {
+          "id": "213:1240",
+          "remainingReactionNodes": 10
+        },
+        {
+          "id": "213:1269",
+          "remainingReactionNodes": 10
+        },
+        {
+          "id": "213:1298",
+          "remainingReactionNodes": 10
+        },
+        {
+          "id": "218:1960",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "218:2111",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "218:2262",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "218:2326",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "218:2390",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "218:2408",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "218:2426",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "275:448",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "276:449",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "277:470",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "278:488",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "308:489",
+          "remainingReactionNodes": 0
+        }
+      ]
+    },
+    {
+      "page": "214:28",
+      "baselineReactions": 252,
+      "observedReactions": 252,
+      "changed": []
+    },
+    {
+      "page": "214:4557",
+      "baselineReactions": 121,
+      "observedReactions": 121,
+      "changed": []
+    },
+    {
+      "page": "214:5393",
+      "baselineReactions": 62,
+      "observedReactions": 62,
+      "changed": []
+    },
+    {
+      "page": "214:6123",
+      "baselineReactions": 88,
+      "observedReactions": 88,
+      "changed": []
+    },
+    {
+      "page": "214:5862",
+      "baselineReactions": 33,
+      "observedReactions": 33,
+      "changed": []
+    },
+    {
+      "page": "214:6654",
+      "baselineReactions": 22,
+      "observedReactions": 22,
+      "changed": []
+    },
+    {
+      "page": "214:2143",
+      "baselineReactions": 268,
+      "observedReactions": 172,
+      "changed": [
+        {
+          "id": "214:2144",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "214:2180",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "214:2203",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "214:2226",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "214:2273",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "214:2290",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "214:2308",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "214:2325",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "214:2344",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "214:2363",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "214:2381",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "214:2418",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "214:2452",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "214:2481",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "214:2497",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "214:2514",
+          "remainingReactionNodes": 1
+        },
+        {
+          "id": "214:2544",
+          "remainingReactionNodes": 1
+        },
+        {
+          "id": "214:2561",
+          "remainingReactionNodes": 1
+        },
+        {
+          "id": "214:2600",
+          "remainingReactionNodes": 1
+        },
+        {
+          "id": "214:2629",
+          "remainingReactionNodes": 1
+        },
+        {
+          "id": "214:2648",
+          "remainingReactionNodes": 1
+        },
+        {
+          "id": "214:2665",
+          "remainingReactionNodes": 1
+        },
+        {
+          "id": "214:2684",
+          "remainingReactionNodes": 1
+        },
+        {
+          "id": "214:2702",
+          "remainingReactionNodes": 2
+        },
+        {
+          "id": "214:2721",
+          "remainingReactionNodes": 1
+        },
+        {
+          "id": "214:2739",
+          "remainingReactionNodes": 1
+        },
+        {
+          "id": "214:2798",
+          "remainingReactionNodes": 3
+        },
+        {
+          "id": "214:2814",
+          "remainingReactionNodes": 0
+        },
+        {
+          "id": "214:2854",
+          "remainingReactionNodes": 4
+        },
+        {
+          "id": "214:2870",
+          "remainingReactionNodes": 1
+        },
+        {
+          "id": "214:2887",
+          "remainingReactionNodes": 1
+        },
+        {
+          "id": "214:2920",
+          "remainingReactionNodes": 1
+        },
+        {
+          "id": "214:3084",
+          "remainingReactionNodes": 2
+        }
+      ]
+    }
+  ]
+}

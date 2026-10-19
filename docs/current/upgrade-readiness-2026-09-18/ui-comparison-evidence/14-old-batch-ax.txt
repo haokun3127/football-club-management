@@ -1,0 +1,369 @@
+Window: "重庆天才小程序 UIUX Design System", App: Figma.
+0 standard window 重庆天才小程序 UIUX Design System, Secondary Actions: Raise
+	1 container 重庆天才小程序 UIUX Design System
+		2 container
+			3 HTML content Figma, URL: file:///Applications/Figma.app/Contents/Resources/app.asar/shell.html
+				4 container
+					5 tab group Tab bar
+						6 container
+							7 tab (settable, integer) Description: Home, Value: 0
+							8 tab (settable, integer) Description: AI应用转化Hub 官网 UI 优化 Round5, Value: 0
+							9 tab (selected) Description: 重庆天才小程序 UIUX Design System, Value: 1
+								10 button Close tab
+							11 tab (settable, integer) Description: 天才足球 · 产品升级全量设计 · 2026.09, Value: 0
+							12 button New file
+						13 pop up button Open and recently closed tabs
+			14 HTML content 重庆天才小程序 UIUX Design System – Figma, URL: figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/%E9%87%8D%E5%BA%86%E5%A4%A9%E6%89%8D%E5%B0%8F%E7%A8%8B%E5%BA%8F-UIUX-Design-System?node-id=1973-131&m=dev
+				15 container
+					16 container
+						17 container
+						18 container Figma Design, 1 item selected
+						19 text Screenreader support for the board is currently disabled. To enable it via Accessibility settings, press ⌘K, type Accessibility Settings, and press Enter. To see available keyboard shortcuts, enter ⌃⇧Question mark .
+						20 container Comments on canvas
+							21 button Create new comment
+						22 container Left sidebar
+							23 toolbar Navigation Bar
+								24 pop up button Main menu
+									25 image
+								26 button File
+									27 image
+									28 text File
+								29 button Variables
+									30 image
+									31 text Variables
+							32 container
+								33 button 重庆天才小程序 UIUX Design System, file name
+								34 text File name
+								35 pop up button Edit file menu
+								36 button Minimize UI
+								37 link Description: Team project, Value: figma.com/files/team/1473219625644975094/project/340128772
+								38 container
+									39 heading Pages Find, Value: 2
+										40 button Pages
+										41 button Find
+									42 container
+										43 container
+											44 table
+												45 row 00 Method & Contract
+													46 cell
+														47 button 00 Method & Contract
+												48 row 01 Design Language
+													49 cell
+														50 button 01 Design Language
+												51 row 02 Tokens
+													52 cell
+														53 button 02 Tokens
+												54 row 03 Components
+													55 cell
+														56 button 03 Components
+												57 row 04 Templates
+													58 cell
+														59 button 04 Templates
+												60 row 05 Parent Generated
+													61 cell
+														62 button 05 Parent Generated
+												63 row 06 Coach Generated
+													64 cell
+														65 button 06 Coach Generated
+												66 row 07 Prototype & Routes
+													67 cell
+														68 button 07 Prototype & Routes
+												69 row 08 Coverage & Diff
+													70 cell
+														71 button 08 Coverage & Diff
+												72 row 09 Mock Data Layer
+													73 cell
+														74 button 09 Mock Data Layer
+												75 row 10 Current Product · Parent V3
+													76 cell
+														77 button 10 Current Product · Parent V3
+												78 row 11 Current Product · Coach V3
+													79 cell
+														80 button 11 Current Product · Coach V3
+												81 row 12 Product Redesign · Parent V4
+													82 cell
+														83 button 12 Product Redesign · Parent V4
+												84 row 13 Product Redesign · Coach V4
+													85 cell
+														86 button 13 Product Redesign · Coach V4
+												87 row 15 Product Redesign · Coach V5
+													88 cell
+														89 button 15 Product Redesign · Coach V5
+												90 row 14 Product Redesign · Parent V5
+													91 cell
+														92 button 14 Product Redesign · Parent V5
+												93 row 16 Product Redesign · Parent V6
+													94 cell
+														95 button 16 Product Redesign · Parent V6
+												96 row 17 Product Redesign · Coach V6
+													97 cell
+														98 button 17 Product Redesign · Coach V6
+										99 slider Description: Resize handle, Value: 100, Details: 151 pixels, Secondary Actions: Increment, Decrement
+								100 button Ready for development
+								101 container
+									102 button Mark as ready for dev
+								103 container
+									104 button Auto layout C6 · Match Record · V6
+										105 image Auto layout
+										106 text C6 · Match Record · V6
+									107 button Frame C7 · Tactical Board · V6
+										108 image Frame
+										109 text C7 · Tactical Board · V6
+									110 button Auto layout C8 · Training Management · V6
+										111 image Auto layout
+										112 text C8 · Training Management · V6
+									113 button Frame C8.1 · Select Training Team · V6
+										114 image Frame
+										115 text C8.1 · Select Training Team · V6
+									116 button Auto layout C3 · Activity Change · V6
+										117 image Auto layout
+										118 text C3 · Activity Change · V6
+									119 button Frame C10 · Three-Level Training Content Picker · V6
+										120 image Frame
+										121 text C10 · Three-Level Training Content Picker · V6
+									122 button Frame C11 · Assessment Tasks · V6
+										123 image Frame
+										124 text C11 · Assessment Tasks · V6
+									125 button Frame C14 · Player Ability Radar · V6
+										126 image Frame
+										127 text C14 · Player Ability Radar · V6
+									128 button Frame C15 · Assessment Entry · V6 · Pending Code Verification
+										129 image Frame
+										130 text C15 · Assessment Entry · V6 · Pending Code Verification
+									131 button Auto layout C6.1 · Match Event Add · V6
+										132 image Auto layout
+										133 text C6.1 · Match Event Add · V6
+									134 button Auto layout C9 · Team Detail · V6
+										135 image Auto layout
+										136 text C9 · Team Detail · V6
+									137 button Auto layout C10.1 · Coverage Preview · V6
+										138 image Auto layout
+										139 text C10.1 · Coverage Preview · V6
+									140 button Frame C12 · Assessment Entry · V6 · Pending Runtime Alignment
+										141 image Frame
+										142 text C12 · Assessment Entry · V6 · Pending Runtime Alignment
+									143 button Frame C12.1 · Assessment Draft Resume · V6 · Pending Runtime Alignment
+										144 image Frame
+										145 text C12.1 · Assessment Draft Resume · V6 · Pending Runtime Alignment
+									146 button Auto layout C13 · Student Radar · V6
+										147 image Auto layout
+										148 text C13 · Student Radar · V6
+									149 button Auto layout C15.1 · Assessment Submit · V6
+										150 image Auto layout
+										151 text C15.1 · Assessment Submit · V6
+									152 button Auto layout C16 · My · V6
+										153 image Auto layout
+										154 text C16 · My · V6
+									155 button Auto layout C16.1 · Permissions · V6
+										156 image Auto layout
+										157 text C16.1 · Permissions · V6
+									158 button Auto layout C16.2 · Private Interest · V6
+										159 image Auto layout
+										160 text C16.2 · Private Interest · V6
+									161 button Auto layout C16.3 · Account Settings · V6
+										162 image Auto layout
+										163 text C16.3 · Account Settings · V6
+									164 button Auto layout C16.4 · Help Center · V6
+										165 image Auto layout
+										166 text C16.4 · Help Center · V6
+									167 button Auto layout C6.2 · Match Draft Notice · V6 · Pending IA Alignment
+										168 image Auto layout
+										169 text C6.2 · Match Draft Notice · V6 · Pending IA Alignment
+									170 button Text “C2.1 · Classroom Assessment · V6”
+										171 image Text
+										172 text “
+										173 text C2.1 · Classroom Assessment · V6
+										174 text ”
+									175 button Frame C12 · Assessment Project Select · V7
+										176 image Frame
+										177 text C12 · Assessment Project Select · V7
+									178 button Frame C12.1 · Team Batch Entry · V7
+										179 image Frame
+										180 text C12.1 · Team Batch Entry · V7
+									181 button Frame C13 · Student Radar · V7
+										182 image Frame
+										183 text C13 · Student Radar · V7
+								184 slider Description: Resize handle, Value: 280, Details: 280 pixels, Secondary Actions: Increment, Decrement
+						185 container Properties and plugins
+							186 container
+								187 container
+									188 pop up button Multiplayer tools
+										189 image
+									190 container Prototype view
+										191 button Present
+										192 pop up button Prototype view
+									193 button Share
+									194 tab group
+										195 tab (selected) Inspect, Value: 1
+										196 tab (settable, integer) Plugins, Value: 0
+									197 pop up button 80%, zoom and view options
+										198 text 80%
+										199 image
+									200 container Inspect
+										201 container
+											202 container
+												203 button Click to copy layer name: C12.1 · Team Batch Entry · V7
+												204 button Copy URL for selected layer
+												205 checkbox Toggle ready for dev status, Value: 0
+												206 text Toggle ready for dev status
+												207 pop up button More actions
+												208 image Frame
+												209 text Frame
+											210 container
+												211 button MCP
+													212 heading MCP, Value: 3
+														213 text MCP
+												214 pop up button Open help
+												215 pop up button Open set up modal
+												216 button Set up third-party agents for Figma MCP
+												217 text Selection details Session activity Not sent Estimated tokens 3.1k
+												218 button Implement this design from Figma. @https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/%E9%87%8D%E5%BA%86%E5%A4%A9%E6%89%8D%E5%B0%8F%E7%A8%8B%E5%BA%8F-UIUX-Design-System?node-id=1973-131&m=dev
+													219 text Implement this design from Figma.
+													220 text @https://www.figma.com/design/zZ6wKyOHKcO4UYXDd9jGwv/%E9%87%8D%E5%BA%86%E5%A4%A9%E6%89%8D%E5%B0%8F%E7%A8%8B%E5%BA%8F-UIUX-Design-System?node-id=1973-131&m=dev
+												221 button Copy example prompt
+											222 container
+												223 button Layer properties
+													224 heading Layer properties, Value: 3
+														225 text Layer properties
+												226 image Visual representation of element layout properties including padding, border box, and spacing
+												227 View
+													228 text View
+													229 container
+														230 radio button List, Value: 0
+														231 text List
+													232 container
+														233 radio button Code, Value: 1
+														234 text Code
+												235 text Language: HTML
+												236 pop up button Language: HTML
+													237 image Figma to Code (HTML, Tailwind, Flutter, SwiftUI) icon
+													238 text HTML
+												239 container
+													240 heading Code, Value: 3
+														241 text Code
+													242 button Copy Code, press shift to copy all code
+													243 container
+														244 container
+															245 container
+																246 text < div style = " width : 100 % ; height : 100 % ; position :  relative ; background : #F6F7F9 ; overflow :  hidden " >
+															247 container
+																248 text < div style = " width : 375 px ; height : 88 px ; left : 0 px ; top : 0 px ; position :  absolute ; background : white " > </ div >
+															249 container
+																250 text < div style = " width : 24 px ; height : 48 px ; left : 16 px ; top : 26 px ; position :  absolute ; color : #202124 ; font-size : 32 px ; font-family :  Inter ; font-weight : 400 ; word-wrap :  break-word " > ‹ </ div >
+															251 container
+																252 text < div style = " width : 215 px ; height : 27 px ; left : 52 px ; top : 32 px ; position :  absolute ; color : #202124 ; font-size : 18 px ; font-family :  Inter ; font-weight : 700 ; word-wrap :  break-word " > 30米冲刺录入 </ div >
+															253 container
+																254 text < div style = " width : 230 px ; height : 20 px ; left : 16 px ; top : 96 px ; position :  absolute ; color : #667085 ; font-size : 13 px ; font-family :  Inter ; font-weight : 400 ; word-wrap :  break-word " > 体能综合测评 · U10精英队 </ div >
+															255 container
+																256 text < div style = " width : 343 px ; height : 72 px ; left : 16 px ; top : 124 px ; position :  absolute ; background : white ; border-radius : 16 px " > </ div >
+															257 container
+																258 text < div style = " width : 210 px ; height : 24 px ; left : 32 px ; top : 140 px ; position :  absolute ; color : #202124 ; font-size : 16 px ; font-family :  Inter ; font-weight : 700 ; word-wrap :  break-word " > 已填写 12 人 · 未填写 6 人 </ div >
+															259 container
+																260 text < div style = " width : 96 px ; height : 24 px ; left : 239 px ; top : 142 px ; position :  absolute ; background : #EBF2FF ; border-radius : 12 px " > </ div >
+															261 container
+																262 text < div style = " width : 78 px ; height : 17 px ; left : 249 px ; top : 147 px ; position :  absolute ; color : #2159BD ; font-size : 11 px ; font-family :  Inter ; font-weight : 600 ; word-wrap :  break-word " > 自动换算标准分 </ div >
+															263 container
+																264 text < div style = " width : 343 px ; height : 62 px ; left : 16 px ; top : 214 px ; position :  absolute ; background : white ; border-radius : 16 px " > </ div >
+															265 container
+																266 text < div style = " width : 36 px ; height : 36 px ; left : 32 px ; top : 227 px ; position :  absolute ; background : #A80F1B ; border-radius : 18 px " > </ div >
+															267 container
+																268 text < div style = " width : 16 px ; height : 21 px ; left : 44 px ; top : 235 px ; position :  absolute ; color : white ; font-size : 14 px ; font-family :  Inter ; font-weight : 700 ; word-wrap :  break-word " > 罗 </ div >
+															269 container
+																270 text < div style = " width : 72 px ; height : 23 px ; left : 80 px ; top : 228 px ; position :  absolute ; color : #202124 ; font-size : 15 px ; font-family :  Inter ; font-weight : 700 ; word-wrap :  break-word " > 罗志炫 </ div >
+															271 container
+																272 text < div style = " width : 98 px ; height : 20 px ; left : 164 px ; top : 226 px ; position :  absolute ; color : #202124 ; font-size : 13 px ; font-family :  Inter ; font-weight : 600 ; word-wrap :  break-word " > 4.92 秒 </ div >
+															273 container
+																274 text < div style = " width : 98 px ; height : 1 px ; left : 164 px ; top : 252 px ; position :  absolute ; background : #E3E8F0 " > </ div >
+													275 button Show 36 more lines of code
+												276 container
+													277 heading Text Styles, Value: 3
+														278 text Text Styles
+													279 button Copy Text Styles, press shift to copy all code
+													280 container
+														281 text // ‹
+														282 container
+															283 text color:  #202124 ;
+														284 text font-size: 32px;
+														285 text font-family: Inter;
+														286 text font-weight: 400;
+														287 text word-wrap: break-word
+														288 text ---
+														289 text // 30米冲刺录入
+														290 container
+															291 text color:  #202124 ;
+														292 text font-size: 18px;
+														293 text font-family: Inter;
+														294 text font-weight: 700;
+														295 text word-wrap: break-word
+														296 text ---
+														297 text // 体能综合测评 · U10精英队
+													298 button Show 180 more lines of code
+												299 heading Colors, Value: 3
+													300 text Colors
+												301 text Color format
+												302 combo box (settable) Color format, Value: Hex
+													303 text Hex
+													304 image
+												305 container
+													306 heading Background colors, Value: 3
+														307 text Background colors
+													308 button Copy #F6F7F9
+														309 text #F6F7F9
+												310 container
+													311 heading Selection colors, Value: 3
+														312 text Selection colors
+													313 button Copy #FFFFFF
+														314 text #FFFFFF
+													315 button Copy #202124
+														316 text #202124
+													317 button Copy #667085
+														318 text #667085
+													319 button Copy #E3E8F0
+														320 text #E3E8F0
+													321 button 6 more
+											322 container
+												323 button Export
+												324 button Add export settings
+								325 slider Description: Resize handle, Value: 100, Details: 321 pixels, Secondary Actions: Increment, Decrement
+					326 container
+						327 toolbar Editor
+							328 toggle button Description: Move, Value: 1
+								329 image
+							330 toggle button Description: Copy colors, Value: 0
+								331 image
+							332 toggle button Description: Measurement, Value: 0
+								333 image
+							334 toggle button Description: Annotation, Value: 0
+								335 image
+							336 toggle button Description: Comment, Value: 0
+								337 image
+							338 Toolbelt Mode
+								339 text Toolbelt Mode
+								340 radio button Draw, Value: 0
+								341 radio button Design, Value: 0
+								342 radio button Motion, Value: 0
+								343 radio button Dev Mode, Value: 1
+						344 toolbar Inspect
+							345 button Previous frame
+								346 image
+							347 text 15 / 30
+							348 button Next frame
+								349 image
+					350 container Help/zoom toolbar
+						351 toolbar Help/zoom toolbar
+							352 pop up button Help
+								353 image
+	354 close button
+	355 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	356 minimize button
+357 menu bar
+	358 Figma
+	359 File
+	360 Edit
+	361 View
+	362 Plugins
+	363 Widgets
+	364 Window
+	365 Help
+
+The focused UI element is 178 button Frame C12.1 · Team Batch Entry · V7
