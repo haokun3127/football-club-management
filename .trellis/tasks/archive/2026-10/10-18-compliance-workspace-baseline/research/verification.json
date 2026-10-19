@@ -54,5 +54,18 @@
     "backofficeTests": 2,
     "buildsAndRuntimeChecks": "passed",
     "localLog": "/private/tmp/fcm-clean-baseline-delivery-20261019.log"
+  },
+  "cleanBaseline": {
+    "date": "2026-10-19",
+    "verifiedRevision": "828526c7",
+    "porcelainEmpty": true,
+    "untrackedFiles": 0,
+    "completedTasksLeftActive": 0,
+    "oldWorktreesPreserved": 6,
+    "newlyArchivedTasks": 16,
+    "previouslyArchivedTasksCommitted": 2,
+    "pushed": false,
+    "nextBatchStarted": false,
+    "backup": "OS temp restricted archive retained; no source/worktree deletion"
   }
 }
