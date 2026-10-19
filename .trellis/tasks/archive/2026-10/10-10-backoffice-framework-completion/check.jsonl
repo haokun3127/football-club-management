@@ -1,0 +1,3 @@
+{"file":".trellis/spec/api/backend/backoffice-management.md","reason":"固定资源、授权、共享事实和事务历史"}
+{"file":".trellis/spec/api/backend/backoffice-integration.md","reason":"版本配置、导入、BI、服务和最终质量门禁"}
+{"file":".trellis/spec/api/frontend/quality-guidelines.md","reason":"实际浏览器、当前构建和全包检查"}

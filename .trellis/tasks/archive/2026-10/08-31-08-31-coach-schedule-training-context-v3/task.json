@@ -1,0 +1,28 @@
+{
+  "id": "08-31-coach-schedule-training-context-v3",
+  "name": "08-31-coach-schedule-training-context-v3",
+  "title": "Coach schedule all-teams and training-context V3",
+  "description": "",
+  "status": "completed",
+  "dev_type": null,
+  "scope": null,
+  "package": "api",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-08-31",
+  "completedAt": "2026-10-19",
+  "branch": null,
+  "base_branch": "dev",
+  "worktree_path": null,
+  "commit": "e6a866e",
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "08-30-08-30-coach-calendar-attendance-match-refinement",
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {
+    "archivedAt": "2026-10-19"
+  }
+}

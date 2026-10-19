@@ -1,0 +1,39 @@
+{
+  "id": "miniprogram-environment-isolation",
+  "name": "miniprogram-environment-isolation",
+  "title": "隔离重庆天才小程序 develop、trial、release 环境",
+  "description": "三环境固定入口、独立缓存/API/SQLite、请求与启动防误写、部署候选及本地可重复验证；未部署。",
+  "status": "completed",
+  "dev_type": null,
+  "scope": "environment-isolation",
+  "package": "api",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-09-22",
+  "completedAt": "2026-10-19",
+  "branch": null,
+  "base_branch": "dev",
+  "worktree_path": null,
+  "commit": "806c4077",
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "apps/api/src/runtime/environment.ts",
+    "apps/api/src/http/environment-guard.ts",
+    "apps/api/src/persistence/runtime-database.ts",
+    "apps/api/test/environment-isolation.test.ts",
+    "apps/miniprogram-cq-talent/utils/config.ts",
+    "apps/miniprogram-cq-talent/utils/environment-isolation.test.mjs",
+    "deploy/environment-isolation/compose.nonproduction.yml",
+    "deploy/environment-isolation/nginx-locations.conf",
+    "scripts/verify-environment-startup.mjs",
+    "docs/current/miniprogram-environment-isolation.md"
+  ],
+  "notes": "Implementation and local verification complete. Awaiting scoped commit approval; production and release status untouched. See verification.md and commit-plan.md. 2026-10-19收尾复核：用户已批准本轮提交/归档；实现已包含在记录的提交，当前check:delivery全通过。本地实现/文档任务归档，不宣称微信真机、正式发布或全部Figma视觉验收完成。",
+  "meta": {
+    "archivedAt": "2026-10-19"
+  }
+}

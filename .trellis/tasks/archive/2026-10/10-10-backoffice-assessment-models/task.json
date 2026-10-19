@@ -1,0 +1,28 @@
+{
+  "id": "backoffice-assessment-models",
+  "name": "backoffice-assessment-models",
+  "title": "后台评测与模型配置闭环",
+  "description": "测评项目、三层定义、模型/标准、任务/结果管理及两段区间草稿、试算、校验、版本发布与停用，复用共同任务与发布事务。",
+  "status": "completed",
+  "dev_type": "fullstack",
+  "scope": "backoffice",
+  "package": "api",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-10-10",
+  "completedAt": "2026-10-19",
+  "branch": null,
+  "base_branch": "dev",
+  "worktree_path": null,
+  "commit": "806c4077",
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "10-10-backoffice-framework-completion",
+  "relatedFiles": [],
+  "notes": "网页后台本地实现与验收通过；证据见 docs/current/backoffice-delivery-2026-10-10.md。等待 Phase 3.4 本任务增量提交确认；未提交、未归档、未生产部署。 2026-10-19收尾复核：用户已批准本轮提交/归档；实现已包含在记录的提交，当前check:delivery全通过。本地实现/文档任务归档，不宣称微信真机、正式发布或全部Figma视觉验收完成。",
+  "meta": {
+    "archivedAt": "2026-10-19"
+  }
+}

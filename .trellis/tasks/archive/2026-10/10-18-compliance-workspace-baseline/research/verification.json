@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-18",
+  "node": "v24.21.0",
+  "deliveryConfig": "passed",
+  "policyTests": {
+    "passed": 3,
+    "failed": 0
+  },
+  "policyReport": {
+    "files": 432,
+    "rawMiB": 1.67,
+    "findings": [
+      "MP-PKG-002"
+    ],
+    "note": "raw budget warning; not official upload size"
+  },
+  "newOrChangedLocalLinks": 19,
+  "unrelatedTrackedChangesPreserved": true,
+  "worktreeInventoryUnchanged": true,
+  "projectname": "重庆天才-主开发",
+  "onlyProjectnameChangedInTeamAndPrivateConfig": true,
+  "ideOpen": {
+    "date": "2026-10-18",
+    "cli": "/Applications/wechatwebdevtools.app/Contents/MacOS/cli",
+    "exitCode": 0,
+    "result": "open",
+    "server": "127.0.0.1:23910",
+    "projectpath": "/Users/dongjun/projects/football-club-management/apps/miniprogram-cq-talent",
+    "projectname": "重庆天才-主开发",
+    "appid": "wx4c588cd106e520e0",
+    "evidence": "official CLI output + selective project metadata readback; no visible window screenshot",
+    "servicePortEnabledBy": "user"
+  },
+  "historicalRecordsRemoved": true,
+  "committed": "f015ab2d",
+  "projectListCleanup": {
+    "verifiedAt": "2026-10-19",
+    "totalProjects": 4,
+    "cqTalentProjects": 1,
+    "canonicalPathPreserved": true,
+    "otherApplicationProjectsPreserved": 3,
+    "listNameCache": "miniprogram-cq-talent",
+    "configDisplayName": "重庆天才-主开发",
+    "sourceAndWorktreesDeleted": false
+  },
+  "closeoutDelivery": {
+    "date": "2026-10-19",
+    "command": "Node24 pnpm check:delivery",
+    "exitCode": 0,
+    "apiTests": 230,
+    "domainTests": 38,
+    "miniPassed": 569,
+    "miniSkipped": 1,
+    "backofficeTests": 2,
+    "buildsAndRuntimeChecks": "passed",
+    "localLog": "/private/tmp/fcm-clean-baseline-delivery-20261019.log"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "seven-account-data-consistency",
+  "name": "seven-account-data-consistency",
+  "title": "Seven-account demo data consistency repair",
+  "description": "",
+  "status": "completed",
+  "dev_type": null,
+  "scope": null,
+  "package": "api",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-09-06",
+  "completedAt": "2026-10-19",
+  "branch": null,
+  "base_branch": "dev",
+  "worktree_path": null,
+  "commit": "c893adb",
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {
+    "archivedAt": "2026-10-19"
+  }
+}

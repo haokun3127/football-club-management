@@ -1,0 +1,28 @@
+{
+  "id": "backoffice-data-management",
+  "name": "backoffice-data-management",
+  "title": "后台基础资料和活动维护闭环",
+  "description": "基础人员和联系人、任职/成员/绑定、球队、学期、场地、保险、课包、训练目录、三类活动及内容配置具备获准维护闭环。权限设置与各动作一起实现。",
+  "status": "completed",
+  "dev_type": "fullstack",
+  "scope": "backoffice",
+  "package": "api",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-10-10",
+  "completedAt": "2026-10-19",
+  "branch": null,
+  "base_branch": "dev",
+  "worktree_path": null,
+  "commit": "806c4077",
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "10-10-backoffice-framework-completion",
+  "relatedFiles": [],
+  "notes": "网页后台本地实现与验收通过；证据见 docs/current/backoffice-delivery-2026-10-10.md。等待 Phase 3.4 本任务增量提交确认；未提交、未归档、未生产部署。 2026-10-19收尾复核：用户已批准本轮提交/归档；实现已包含在记录的提交，当前check:delivery全通过。本地实现/文档任务归档，不宣称微信真机、正式发布或全部Figma视觉验收完成。",
+  "meta": {
+    "archivedAt": "2026-10-19"
+  }
+}

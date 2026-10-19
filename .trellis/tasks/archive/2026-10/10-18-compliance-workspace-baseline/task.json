@@ -1,0 +1,47 @@
+{
+  "id": "compliance-workspace-baseline",
+  "name": "compliance-workspace-baseline",
+  "title": "纠正合规基线并统一小程序开发入口",
+  "description": "纠正隐私与平台现状误判，整理可追溯的现状/优先级并统一主开发小程序入口；不删除已有副本、不部署。",
+  "status": "completed",
+  "dev_type": "docs",
+  "scope": "compliance-workspace",
+  "package": "miniprogram",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-10-18",
+  "completedAt": "2026-10-19",
+  "branch": "feature/ui-batch-1-p01",
+  "base_branch": "feature/ui-batch-1-p01",
+  "worktree_path": null,
+  "commit": "f015ab2d",
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "docs/reference/wechat-miniprogram/notes/04-隐私与个人信息合规.md",
+    "docs/reference/wechat-miniprogram/notes/05-登录-手机号-订阅消息.md",
+    "docs/reference/wechat-miniprogram/notes/08-本项目平台合规差距-2026-09-18.md",
+    ".trellis/spec/miniprogram/frontend/privacy-and-capabilities.md",
+    "apps/miniprogram-cq-talent/project.config.json",
+    "docs/current/development-delivery-channel.md",
+    "docs/README.md",
+    "README.md",
+    "AGENTS.md",
+    "docs/current/development-workspace.md",
+    "scripts/miniprogram-policy/rules.json",
+    "scripts/miniprogram-policy/check.test.mjs"
+  ],
+  "notes": "2026-10-19收尾：官方移除任务success，project_list确认仅一条CQ Talent主路径，其他三个应用保留。配置与窗口名称已统一，项目列表缓存旧名为已知工具显示限制，不影响唯一入口。文档/规则验证通过；用户已明确授权提交、归档及剩余未跟踪文件分类，保留源码和旧worktree，不部署、不push。 2026-10-19收尾复核：用户已批准本轮提交/归档；实现已包含在记录的提交，当前check:delivery全通过。本地实现/文档任务归档，不宣称微信真机、正式发布或全部Figma视觉验收完成。",
+  "meta": {
+    "closeout": {
+      "date": "2026-10-19",
+      "commitAuthorized": true,
+      "sourceTreePreserved": true,
+      "remainingNonBlocking": "IDE project list label cache; canonical path unique"
+    },
+    "archivedAt": "2026-10-19"
+  }
+}

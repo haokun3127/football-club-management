@@ -1,0 +1,111 @@
+{
+  "checked_at_client_date": "2026-10-14",
+  "source_sha": "939676f325b9046383c907e0f3f3eac0a2e9628e",
+  "miniprogram_diff_from_release_sha": [],
+  "registered_pages": 62,
+  "page_css_files": 62,
+  "page_css_directly_using_club_tokens": [
+    "pages/parent/growth/index.wxss",
+    "pages/coach/content-copy/index.wxss",
+    "pages/coach/student-radar/index.wxss",
+    "pages/coach/scout/index.wxss",
+    "pages/coach/content-select/index.wxss",
+    "pages/coach/test-task-create/index.wxss",
+    "pages/coach/lesson/index.wxss",
+    "pages/coach/event/index.wxss",
+    "pages/coach/student-results/index.wxss",
+    "pages/shared/student-evaluation/index.wxss"
+  ],
+  "page_css_not_directly_using_club_tokens": [
+    "pages/launch/index.wxss",
+    "pages/login/index.wxss",
+    "pages/parent/training-history/index.wxss",
+    "pages/parent/guide/index.wxss",
+    "pages/parent/home/index.wxss",
+    "pages/parent/schedule/index.wxss",
+    "pages/parent/private-success/index.wxss",
+    "pages/parent/match-history/index.wxss",
+    "pages/parent/semester-report/index.wxss",
+    "pages/parent/coaches/index.wxss",
+    "pages/parent/content/index.wxss",
+    "pages/parent/status/index.wxss",
+    "pages/parent/binding/index.wxss",
+    "pages/parent/ability-history/index.wxss",
+    "pages/parent/venues/index.wxss",
+    "pages/parent/private/index.wxss",
+    "pages/parent/milestones/index.wxss",
+    "pages/parent/article/index.wxss",
+    "pages/parent/account/index.wxss",
+    "pages/parent/radar/index.wxss",
+    "pages/parent/day/index.wxss",
+    "pages/parent/metric/index.wxss",
+    "pages/parent/event/index.wxss",
+    "pages/parent/reminders/index.wxss",
+    "pages/parent/child/index.wxss",
+    "pages/parent/help/index.wxss",
+    "pages/parent/confirmed-results/index.wxss",
+    "pages/coach/attendance/index.wxss",
+    "pages/coach/schedule/index.wxss",
+    "pages/coach/training-assessment/index.wxss",
+    "pages/coach/assessment-bulk-entry/index.wxss",
+    "pages/coach/test-entry/index.wxss",
+    "pages/coach/team-selector/index.wxss",
+    "pages/coach/lesson-history/index.wxss",
+    "pages/coach/team-ability/index.wxss",
+    "pages/coach/match/index.wxss",
+    "pages/coach/training/index.wxss",
+    "pages/coach/match-edit/index.wxss",
+    "pages/coach/test-tasks/index.wxss",
+    "pages/coach/assessment-submit/index.wxss",
+    "pages/coach/tactical-board/index.wxss",
+    "pages/coach/permissions/index.wxss",
+    "pages/coach/lesson-detail/index.wxss",
+    "pages/coach/team/index.wxss",
+    "pages/coach/me/index.wxss",
+    "pages/coach/match-event-add/index.wxss",
+    "pages/coach/event-change/index.wxss",
+    "pages/coach/assessment-projects/index.wxss",
+    "pages/coach/attendance-success/index.wxss",
+    "pages/coach/account/index.wxss",
+    "pages/coach/help/index.wxss",
+    "pages/coach/private-interest/index.wxss"
+  ],
+  "note": "Direct token-reference count is only a migration indicator, not a count of compliant or noncompliant screens.",
+  "upload_directory_checks": [
+    {
+      "path": "styles/tokens.wxss",
+      "matches_uploaded_directory": true,
+      "sha256": "db39ba2ef7efc9fc91b94430787f0f895a417bd0c02c9a9c10258330a330fe6f"
+    },
+    {
+      "path": "pages/parent/home/index.wxml",
+      "matches_uploaded_directory": true,
+      "sha256": "712a4c127d54df41f5239c282abaec65e4309904219a5d18bc4e8df7cac5eee9"
+    },
+    {
+      "path": "pages/parent/home/index.wxss",
+      "matches_uploaded_directory": true,
+      "sha256": "d7d0d9ec67f7d7079148eeef7e0dd16c3b6d569d73eb0aad99374c0c89b34769"
+    },
+    {
+      "path": "pages/parent/growth/index.wxss",
+      "matches_uploaded_directory": true,
+      "sha256": "fdea1c4e5322b6a0e95fc7cfdc98a398511aba2a0e00935da4072703aefd8c65"
+    },
+    {
+      "path": "pages/coach/schedule/index.wxml",
+      "matches_uploaded_directory": true,
+      "sha256": "b62725b09b4e4ecba8a8cc4b6f5a011ec4ad21b9e9c391613ff738370916d0f2"
+    },
+    {
+      "path": "pages/coach/schedule/index.wxss",
+      "matches_uploaded_directory": true,
+      "sha256": "ae3b99f85af9afcc6a522dca19e7f318c3610230c4f836ac8f51cbe7d771e369"
+    },
+    {
+      "path": "components/role-tabbar/index.ts",
+      "matches_uploaded_directory": true,
+      "sha256": "f6460f87c3a2e963969b969e71498293eddd27ec0780dc46db4c9f5063f2c333"
+    }
+  ]
+}

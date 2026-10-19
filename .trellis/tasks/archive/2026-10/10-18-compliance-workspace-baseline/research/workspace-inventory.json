@@ -1,0 +1,200 @@
+{
+  "date": "2026-10-18",
+  "scope": "metadata only; not a live IDE window enumeration",
+  "devtoolsRecords": [
+    {
+      "path": "/Users/dongjun/projects/football-club-management/apps/miniprogram-cq-talent",
+      "profile": "d1e8765721a6c23d43b14c95b1843e6b",
+      "record": "ls_a4f9aaa22258bdb97cedb4f405a7f805.json",
+      "exists": true,
+      "realpath": "/Users/dongjun/projects/football-club-management/apps/miniprogram-cq-talent"
+    },
+    {
+      "projectid": "/Users/dongjun/projects/football-club-management/apps/miniprogram-cq-talent",
+      "profile": "d1e8765721a6c23d43b14c95b1843e6b",
+      "record": "localstorage_04ae2c5abd947dac11469f3c23a393b5.json"
+    },
+    {
+      "path": "/Users/dongjun/projects/football-club-management/apps/miniprogram-cq-talent",
+      "profile": "d1e8765721a6c23d43b14c95b1843e6b",
+      "record": "localstorage_a96b4f6adcbf14bf13c794bd3da45da6.json",
+      "exists": true,
+      "realpath": "/Users/dongjun/projects/football-club-management/apps/miniprogram-cq-talent"
+    },
+    {
+      "path": "/tmp/fcm-devtools-foundation",
+      "profile": "7178a451c59aa82eaff5246be0f86d12",
+      "record": "ls_a4f9aaa22258bdb97cedb4f405a7f805.json",
+      "exists": false,
+      "realpath": "/private/tmp/fcm-devtools-foundation"
+    },
+    {
+      "projectid": "/tmp/fcm-devtools-foundation",
+      "profile": "7178a451c59aa82eaff5246be0f86d12",
+      "record": "localstorage_04ae2c5abd947dac11469f3c23a393b5.json"
+    },
+    {
+      "path": "/tmp/fcm-devtools-foundation",
+      "profile": "7178a451c59aa82eaff5246be0f86d12",
+      "record": "localstorage_a96b4f6adcbf14bf13c794bd3da45da6.json",
+      "exists": false,
+      "realpath": "/private/tmp/fcm-devtools-foundation"
+    },
+    {
+      "path": "/Users/dongjun/Documents/football-club-management/apps/miniprogram-cq-talent",
+      "profile": "7178a451c59aa82eaff5246be0f86d12",
+      "record": "localstorage_a96b4f6adcbf14bf13c794bd3da45da6.json",
+      "exists": true,
+      "realpath": "/Users/dongjun/projects/football-club-management/apps/miniprogram-cq-talent"
+    },
+    {
+      "path": "/Users/dongjun/projects/football-club-management/apps/miniprogram-cq-talent",
+      "profile": "6b7da420be86ec51f52a2cf40e0ed23d",
+      "record": "ls_a4f9aaa22258bdb97cedb4f405a7f805.json",
+      "exists": true,
+      "realpath": "/Users/dongjun/projects/football-club-management/apps/miniprogram-cq-talent"
+    },
+    {
+      "path": "/Users/dongjun/Documents/football-club-management/apps/miniprogram-cq-talent",
+      "profile": "6b7da420be86ec51f52a2cf40e0ed23d",
+      "record": "ls_a4f9aaa22258bdb97cedb4f405a7f805.json",
+      "exists": true,
+      "realpath": "/Users/dongjun/projects/football-club-management/apps/miniprogram-cq-talent"
+    },
+    {
+      "path": "/tmp/fcm-devtools-foundation",
+      "profile": "6b7da420be86ec51f52a2cf40e0ed23d",
+      "record": "ls_a4f9aaa22258bdb97cedb4f405a7f805.json",
+      "exists": false,
+      "realpath": "/private/tmp/fcm-devtools-foundation"
+    },
+    {
+      "projectid": "/Users/dongjun/projects/football-club-management/apps/miniprogram-cq-talent",
+      "profile": "6b7da420be86ec51f52a2cf40e0ed23d",
+      "record": "localstorage_04ae2c5abd947dac11469f3c23a393b5.json"
+    },
+    {
+      "projectid": "/Users/dongjun/Documents/football-club-management/apps/miniprogram-cq-talent",
+      "profile": "6b7da420be86ec51f52a2cf40e0ed23d",
+      "record": "localstorage_04ae2c5abd947dac11469f3c23a393b5.json"
+    },
+    {
+      "path": "/tmp/fcm-devtools-foundation",
+      "profile": "6b7da420be86ec51f52a2cf40e0ed23d",
+      "record": "localstorage_a96b4f6adcbf14bf13c794bd3da45da6.json",
+      "exists": false,
+      "realpath": "/private/tmp/fcm-devtools-foundation"
+    },
+    {
+      "path": "/Users/dongjun/Documents/football-club-management/apps/miniprogram-cq-talent",
+      "profile": "6b7da420be86ec51f52a2cf40e0ed23d",
+      "record": "localstorage_a96b4f6adcbf14bf13c794bd3da45da6.json",
+      "exists": true,
+      "realpath": "/Users/dongjun/projects/football-club-management/apps/miniprogram-cq-talent"
+    },
+    {
+      "path": "/Users/dongjun/projects/football-club-management/apps/miniprogram-cq-talent",
+      "profile": "6b7da420be86ec51f52a2cf40e0ed23d",
+      "record": "localstorage_a96b4f6adcbf14bf13c794bd3da45da6.json",
+      "exists": true,
+      "realpath": "/Users/dongjun/projects/football-club-management/apps/miniprogram-cq-talent"
+    },
+    {
+      "projectid": "/Users/dongjun/Documents/football-club-management/apps/miniprogram-cq-talent",
+      "profile": "50a7d9210159a32f006158795f893857",
+      "record": "localstorage_04ae2c5abd947dac11469f3c23a393b5.json"
+    },
+    {
+      "projectid": "/tmp/fcm-devtools-foundation",
+      "profile": "50a7d9210159a32f006158795f893857",
+      "record": "localstorage_04ae2c5abd947dac11469f3c23a393b5.json"
+    },
+    {
+      "path": "/Users/dongjun/Documents/football-club-management/apps/miniprogram-cq-talent",
+      "profile": "50a7d9210159a32f006158795f893857",
+      "record": "localstorage_a96b4f6adcbf14bf13c794bd3da45da6.json",
+      "exists": true,
+      "realpath": "/Users/dongjun/projects/football-club-management/apps/miniprogram-cq-talent"
+    },
+    {
+      "path": "/tmp/fcm-devtools-foundation",
+      "profile": "50a7d9210159a32f006158795f893857",
+      "record": "localstorage_a96b4f6adcbf14bf13c794bd3da45da6.json",
+      "exists": false,
+      "realpath": "/private/tmp/fcm-devtools-foundation"
+    }
+  ],
+  "worktrees": [
+    {
+      "path": "/Users/dongjun/projects/football-club-management",
+      "head": "2e8a6d9650a577d62ce87662eca5dab35b3aff52",
+      "branch": "refs/heads/feature/ui-batch-1-p01",
+      "trackedChanges": 22,
+      "miniExists": true
+    },
+    {
+      "path": "/Users/dongjun/.codex/worktrees/580c/football-club-management",
+      "head": "af5bcfa6d872327be8c302f1764f6775a0effb64",
+      "branch": "refs/heads/codex/f-sync-rules-webhook-contract",
+      "trackedChanges": 6,
+      "miniExists": false
+    },
+    {
+      "path": "/Users/dongjun/.codex/worktrees/7742/football-club-management",
+      "head": "459970a01dd70a1ef7a0cd198afe3fb6b27cbfb4",
+      "branch": "detached",
+      "trackedChanges": 0,
+      "miniExists": false
+    },
+    {
+      "path": "/Users/dongjun/.codex/worktrees/a05a/football-club-management",
+      "head": "8fd6bc88b332fc7cbd0f15f9e636cf92a287e927",
+      "branch": "detached",
+      "trackedChanges": 0,
+      "miniExists": false
+    },
+    {
+      "path": "/Users/dongjun/.codex/worktrees/b71d/football-club-management",
+      "head": "bd0f696588a880d77604f1012a5b7e86d2c5c046",
+      "branch": "detached",
+      "trackedChanges": 0,
+      "miniExists": false
+    },
+    {
+      "path": "/Users/dongjun/.codex/worktrees/df69/football-club-management",
+      "head": "5853dcb918cf4705def5c1356b950d43f8d15af4",
+      "branch": "refs/heads/codex/integrate-backend-service-foundations",
+      "trackedChanges": 0,
+      "miniExists": false
+    },
+    {
+      "path": "/Users/dongjun/.codex/worktrees/f1b1/football-club-management",
+      "head": "6a71669fa54b0fe2db6de290d6dd9209cdae4c1d",
+      "branch": "detached",
+      "trackedChanges": 0,
+      "miniExists": false
+    }
+  ],
+  "historicalPathKeys": [
+    {
+      "path": "/Users/dongjun/Documents/football-club-management/apps/miniprogram-cq-talent",
+      "exists": true,
+      "profileCount": 4
+    },
+    {
+      "path": "/Users/dongjun/projects/football-club-management/apps/miniprogram-cq-talent",
+      "exists": true,
+      "profileCount": 1
+    },
+    {
+      "path": "/tmp/fcm-assessment-runtime/mini",
+      "exists": false,
+      "profileCount": 2
+    },
+    {
+      "path": "/tmp/fcm-devtools-foundation",
+      "exists": false,
+      "profileCount": 2
+    }
+  ]
+}

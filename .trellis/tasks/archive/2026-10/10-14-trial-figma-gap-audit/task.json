@@ -1,0 +1,30 @@
+{
+  "id": "trial-figma-gap-audit",
+  "name": "trial-figma-gap-audit",
+  "title": "体验版小程序与 Figma 设计差距排查",
+  "description": "只读核对当前设计来源、9.7.5体验版源码、发布和视觉验收证据，记录差异原因与后续修复边界。",
+  "status": "completed",
+  "dev_type": null,
+  "scope": null,
+  "package": "miniprogram",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-10-14",
+  "completedAt": "2026-10-14",
+  "branch": null,
+  "base_branch": "dev",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "research/findings.md",
+    "research/source-check.json",
+    "research/screenshot-evidence.json"
+  ],
+  "notes": "只读排查完成：发布源码包含明确的新旧视觉混用、C01结构差异、设计权威文档分叉及全页视觉验收缺口。当前在线三页截图、七文件上传目录比对和原生历史证据已记录。业务修复、重新上传和用户手机全页验收不属于本轮完成声明。",
+  "meta": {}
+}
