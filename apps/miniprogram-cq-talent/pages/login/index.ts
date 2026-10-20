@@ -22,6 +22,7 @@ Page({
     canChooseCoach: false,
     isBlocked: false,
     navTop: 88,
+    privacyAgreed: false,
   },
   phoneAuthorizationReserved: false,
   phoneAuthorizationCallbackConsumed: false,
@@ -64,6 +65,12 @@ Page({
       this.setData({ submitting: false, authorizationLocked: true, state: "error", errorType: "authorization_timeout", message: "微信授权未返回，请点击重试。" });
     }, AUTHORIZATION_CALLBACK_TIMEOUT_MS);
   },
+  // 隐私门禁（官方推荐交互）：取号按钮使用耦合 open-type="getPhoneNumber|agreePrivacyAuthorization"，
+  // 同一次点击先完成《小程序用户隐私保护指引》同意、再进入手机号授权；微信保证隐私未同意前
+  // 实际取号不会执行，因此无需禁用态门禁。此回调在用户同意后触发，仅更新展示状态。
+  onPrivacyAgreed() {
+    this.setData({ privacyAgreed: true });
+  },
   async onGetPhoneNumber(event: { detail: { code?: string; errMsg?: string } }) {
     if (!this.phoneAuthorizationReserved || this.phoneAuthorizationCallbackConsumed) return;
     this.phoneAuthorizationCallbackConsumed = true;
@@ -72,13 +79,19 @@ Page({
       this.phoneAuthorizationTimeoutId = undefined;
     }
     if (!event.detail.code) {
-      const tooFrequent = event.detail.errMsg?.toLowerCase().includes("too frequently");
+      const errMsg = (event.detail.errMsg ?? "").toLowerCase();
+      const privacyRefused = errMsg.includes("privacy");
+      const tooFrequent = errMsg.includes("too frequently");
       this.setData({
         submitting: false,
         authorizationLocked: true,
         state: "error",
-        errorType: tooFrequent ? "authorization_too_frequent" : "authorization_cancelled",
-        message: tooFrequent ? "微信授权操作过于频繁，请稍后重试。" : "需要授权手机号才能匹配俱乐部身份。请点击重试。",
+        errorType: privacyRefused ? "privacy_refused" : tooFrequent ? "authorization_too_frequent" : "authorization_cancelled",
+        message: privacyRefused
+          ? "需先同意《隐私政策》后才能授权手机号，请点击重试。"
+          : tooFrequent
+            ? "微信授权操作过于频繁，请稍后重试。"
+            : "需要授权手机号才能匹配俱乐部身份。请点击重试。",
       });
       return;
     }

@@ -344,7 +344,7 @@ describe("login page", () => {
   });
 
   it("uses a single real WeChat phone authorization action", () => {
-    expect(template.match(/open-type="getPhoneNumber"/g)).toHaveLength(1);
+    expect(template.match(/open-type="getPhoneNumber\|agreePrivacyAuthorization"/g)).toHaveLength(1);
     expect(template).not.toContain("验证码");
     expect(template).not.toContain("获取验证码");
     expect(template).not.toContain("绑定孩子");
@@ -354,6 +354,33 @@ describe("login page", () => {
     expect(template).not.toContain("login-field--wechat");
     expect(template).toContain('disabled="{{submitting || state === \'loading\' || authorizationLocked}}"');
     expect(template).toContain('bindtap="onPhoneAuthorizationTap"');
+  });
+
+  it("gates the phone number action behind privacy consent via the coupled official open-type", () => {
+    // 官方推荐交互：耦合按钮同一次点击先同意隐私协议再取号，微信保证隐私未同意前不实际取号。
+    expect(template).toContain('open-type="getPhoneNumber|agreePrivacyAuthorization"');
+    expect(template).toContain('bindagreeprivacyauthorization="onPrivacyAgreed"');
+    expect(controller).toContain("onPrivacyAgreed()");
+    expect(template).not.toMatch(/open-type="getPhoneNumber"(?!\|)/);
+  });
+
+  it("marks the privacy footer as agreed once the user consents through the coupled button", () => {
+    const page = createPageInstance({ wxLoginCode: "wx-code" });
+    expect(page.data.privacyAgreed).toBe(false);
+
+    page.onPrivacyAgreed();
+
+    expect(page.data.privacyAgreed).toBe(true);
+    expect(template).toContain("{{privacyAgreed ? '已同意《用户协议》和《隐私政策》' : '授权手机号时将一并征得《隐私政策》同意'}}");
+  });
+
+  it("explains privacy refusal separately from cancellation and frequency errors", async () => {
+    const page = createPageInstance({ wxLoginCode: "wx-code" });
+    page.onPhoneAuthorizationTap();
+    await page.onGetPhoneNumber({ detail: { errMsg: "getPhoneNumber:fail privacy permission is not authorized" } });
+    expect(page.data.errorType).toBe("privacy_refused");
+    expect(page.data.message).toBe("需先同意《隐私政策》后才能授权手机号，请点击重试。");
+    expect(mocks.wechatLogin).not.toHaveBeenCalled();
   });
 
   it("renders explicit role choices without JavaScript array calls in WXML", () => {
@@ -391,7 +418,7 @@ describe("login page", () => {
     expect(styles).toContain(".login-field__status { overflow: hidden; flex: 1;");
     expect(styles).toContain("text-align: left;");
     expect(styles).not.toContain("justify-content: space-between");
-    expect(template.match(/open-type="getPhoneNumber"/g)).toHaveLength(1);
+    expect(template.match(/open-type="getPhoneNumber\|agreePrivacyAuthorization"/g)).toHaveLength(1);
     expect(template).not.toMatch(/\.(map|filter|slice|indexOf)\s*\(/);
   });
 
