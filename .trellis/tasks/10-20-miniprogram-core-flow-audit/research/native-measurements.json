@@ -1,0 +1,595 @@
+{
+  "checkedAt": "2026-10-20/21",
+  "environment": "WeChat IDE / develop, existing authorized two-role session; no dev-token or known mock markers found in final readback",
+  "method": "AppService Date.now before wx.reLaunch to first settled page.data state, sampled every80ms. wx.request callbacks capture path/status/client elapsed only; no bodies/headers/tokens. Includes navigation, code preparation and debugger/runtime overhead; not onReady, first paint, package cold start, real-phone latency, backend-only time, or trial performance.",
+  "captureNotes": "Initial request wrapper equality check returned false, but callbacks demonstrably logged requests. Only samples with recorded callbacks are used; no assumption based on equality alone. Same-role repeat navigation is distinguished from first role-switch navigation.",
+  "measurements": [
+    {
+      "route": "pages/coach/schedule/index",
+      "state": "empty",
+      "dataReadyMs": 4548,
+      "elapsedMs": 4793,
+      "requestCount": 1,
+      "requests": [
+        {
+          "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/home?from=2026-10-20&to=2026-10-20&teamIds=team-u10-dev%2Cteam-weekend-select",
+          "startOffsetMs": 585,
+          "durationMs": 3917,
+          "status": 200
+        }
+      ],
+      "summary": {
+        "route": "pages/coach/schedule/index",
+        "state": "empty",
+        "message": "所选日期范围内没有日程或待处理任务",
+        "events": [],
+        "tasks": [],
+        "counts": {
+          "children": 0,
+          "rows": 0,
+          "roster": 0
+        }
+      },
+      "screenshot": {
+        "success": true,
+        "path": "/private/tmp/cq-core-flow-audit-20261020/02-coach-schedule.png",
+        "imageWidth": 624,
+        "imageHeight": 1352
+      },
+      "step": "02-coach-schedule"
+    },
+    {
+      "route": "pages/coach/training/index",
+      "state": "ready",
+      "dataReadyMs": 5188,
+      "elapsedMs": 5432,
+      "requestCount": 2,
+      "requests": [
+        {
+          "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/home?from=2026-10-01&to=2026-10-31",
+          "startOffsetMs": 589,
+          "durationMs": 2260,
+          "status": 200
+        },
+        {
+          "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/training-project-tree",
+          "startOffsetMs": 590,
+          "durationMs": 4531,
+          "status": 200
+        }
+      ],
+      "summary": {
+        "route": "pages/coach/training/index",
+        "state": "ready",
+        "message": "",
+        "events": [],
+        "tasks": [],
+        "counts": {
+          "children": 0,
+          "rows": 0,
+          "roster": 0
+        }
+      },
+      "screenshot": {
+        "success": true,
+        "path": "/private/tmp/cq-core-flow-audit-20261020/03-coach-training.png",
+        "imageWidth": 624,
+        "imageHeight": 1352
+      },
+      "step": "03-coach-training"
+    },
+    {
+      "route": "pages/coach/test-tasks/index",
+      "state": "empty",
+      "dataReadyMs": 1016,
+      "elapsedMs": 1261,
+      "requestCount": 1,
+      "requests": [
+        {
+          "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/assessment-tasks?refresh=1792511816992-1",
+          "startOffsetMs": 583,
+          "durationMs": 186,
+          "status": 200
+        }
+      ],
+      "summary": {
+        "route": "pages/coach/test-tasks/index",
+        "state": "empty",
+        "message": "当前暂无测评任务。",
+        "events": [],
+        "tasks": [],
+        "counts": {
+          "children": 0,
+          "rows": 0,
+          "roster": 0
+        }
+      },
+      "screenshot": {
+        "success": true,
+        "path": "/private/tmp/cq-core-flow-audit-20261020/04-coach-tasks.png",
+        "imageWidth": 624,
+        "imageHeight": 1352
+      },
+      "step": "04-coach-tasks"
+    },
+    {
+      "route": "pages/coach/team/index",
+      "state": "ready",
+      "dataReadyMs": 1020,
+      "elapsedMs": 1264,
+      "requestCount": 1,
+      "requests": [
+        {
+          "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/team",
+          "startOffsetMs": 582,
+          "durationMs": 158,
+          "status": 200
+        }
+      ],
+      "summary": {
+        "route": "pages/coach/team/index",
+        "state": "ready",
+        "message": "",
+        "events": [],
+        "tasks": [],
+        "counts": {
+          "children": 0,
+          "rows": 0,
+          "roster": 0
+        }
+      },
+      "screenshot": {
+        "success": true,
+        "path": "/private/tmp/cq-core-flow-audit-20261020/05-coach-team.png",
+        "imageWidth": 624,
+        "imageHeight": 1352
+      },
+      "step": "05-coach-team"
+    },
+    {
+      "route": "pages/coach/me/index",
+      "state": "ready",
+      "dataReadyMs": 982,
+      "elapsedMs": 1225,
+      "requestCount": 2,
+      "requests": [
+        {
+          "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/home?from=2026-09-21&to=2026-10-20",
+          "startOffsetMs": 547,
+          "durationMs": 167,
+          "status": 200
+        },
+        {
+          "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/team",
+          "startOffsetMs": 548,
+          "durationMs": 3,
+          "status": 200
+        }
+      ],
+      "summary": {
+        "route": "pages/coach/me/index",
+        "state": "ready",
+        "message": "",
+        "canSwitchToParent": true,
+        "events": [],
+        "tasks": [],
+        "counts": {
+          "children": 0,
+          "rows": 0,
+          "roster": 0
+        }
+      },
+      "screenshot": {
+        "success": true,
+        "path": "/private/tmp/cq-core-flow-audit-20261020/06-coach-me.png",
+        "imageWidth": 624,
+        "imageHeight": 1352
+      },
+      "step": "06-coach-me"
+    },
+    {
+      "route": "pages/coach/private-interest/index",
+      "state": "enabled",
+      "dataReadyMs": 980,
+      "elapsedMs": 1223,
+      "requestCount": 1,
+      "requests": [
+        {
+          "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/preferences",
+          "startOffsetMs": 539,
+          "durationMs": 169,
+          "status": 200
+        }
+      ],
+      "summary": {
+        "route": "pages/coach/private-interest/index",
+        "state": "enabled",
+        "message": "开启私教兴趣后，家长可向您发起私教预约",
+        "events": [],
+        "tasks": [],
+        "counts": {
+          "children": 0,
+          "rows": 0,
+          "roster": 0
+        }
+      },
+      "screenshot": {
+        "success": true,
+        "path": "/private/tmp/cq-core-flow-audit-20261020/07-coach-private.png",
+        "imageWidth": 624,
+        "imageHeight": 1352
+      },
+      "step": "07-coach-private"
+    },
+    {
+      "route": "pages/parent/home/index",
+      "state": "empty",
+      "dataReadyMs": 9663,
+      "elapsedMs": 9908,
+      "requestCount": 1,
+      "requests": [
+        {
+          "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/children",
+          "startOffsetMs": 9575,
+          "durationMs": 9,
+          "status": 200
+        }
+      ],
+      "summary": {
+        "route": "pages/parent/home/index",
+        "state": "empty",
+        "message": "当前账号尚未绑定孩子，请联系俱乐部。",
+        "events": [],
+        "tasks": [],
+        "counts": {
+          "children": 0,
+          "rows": 0,
+          "roster": 0
+        }
+      },
+      "screenshot": {
+        "success": true,
+        "path": "/private/tmp/cq-core-flow-audit-20261020/13-parent-home.png",
+        "imageWidth": 624,
+        "imageHeight": 1352
+      },
+      "step": "13-parent-home"
+    },
+    {
+      "route": "pages/parent/schedule/index",
+      "state": "empty",
+      "dataReadyMs": 1026,
+      "elapsedMs": 1270,
+      "requestCount": 2,
+      "requests": [
+        {
+          "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/children",
+          "startOffsetMs": 580,
+          "durationMs": 4,
+          "status": 200
+        },
+        {
+          "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/reminders",
+          "startOffsetMs": 581,
+          "durationMs": 140,
+          "status": 200
+        }
+      ],
+      "summary": {
+        "route": "pages/parent/schedule/index",
+        "state": "empty",
+        "message": "当前微信手机号尚未绑定孩子档案，请联系俱乐部确认登记信息。",
+        "events": [],
+        "tasks": [],
+        "counts": {
+          "children": 0,
+          "rows": 0,
+          "roster": 0
+        }
+      },
+      "screenshot": {
+        "success": true,
+        "path": "/private/tmp/cq-core-flow-audit-20261020/14-parent-schedule.png",
+        "imageWidth": 624,
+        "imageHeight": 1352
+      },
+      "step": "14-parent-schedule"
+    },
+    {
+      "route": "pages/parent/growth/index",
+      "state": "empty",
+      "dataReadyMs": 1044,
+      "elapsedMs": 1288,
+      "requestCount": 1,
+      "requests": [
+        {
+          "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/children",
+          "startOffsetMs": 596,
+          "durationMs": 3,
+          "status": 200
+        }
+      ],
+      "summary": {
+        "route": "pages/parent/growth/index",
+        "state": "empty",
+        "message": "当前账号没有绑定孩子，无法查看成长数据。",
+        "events": [],
+        "tasks": [],
+        "counts": {
+          "children": 0,
+          "rows": 0,
+          "roster": 0
+        }
+      },
+      "screenshot": {
+        "success": true,
+        "path": "/private/tmp/cq-core-flow-audit-20261020/15-parent-growth.png",
+        "imageWidth": 624,
+        "imageHeight": 1352
+      },
+      "step": "15-parent-growth"
+    },
+    {
+      "route": "pages/parent/training-history/index",
+      "state": "empty",
+      "dataReadyMs": 966,
+      "elapsedMs": 1212,
+      "requestCount": 1,
+      "requests": [
+        {
+          "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/children",
+          "startOffsetMs": 552,
+          "durationMs": 3,
+          "status": 200
+        }
+      ],
+      "summary": {
+        "route": "pages/parent/training-history/index",
+        "state": "empty",
+        "message": "暂无绑定学员",
+        "events": [],
+        "tasks": [],
+        "counts": {
+          "children": 0,
+          "rows": 0,
+          "roster": 0
+        }
+      },
+      "screenshot": {
+        "success": true,
+        "path": "/private/tmp/cq-core-flow-audit-20261020/16-parent-records.png",
+        "imageWidth": 624,
+        "imageHeight": 1352
+      },
+      "step": "16-parent-records"
+    },
+    {
+      "route": "pages/parent/confirmed-results/index",
+      "state": "error",
+      "dataReadyMs": 970,
+      "elapsedMs": 1215,
+      "requestCount": 0,
+      "requests": [],
+      "summary": {
+        "route": "pages/parent/confirmed-results/index",
+        "state": "error",
+        "message": "请从学员档案进入成绩记录",
+        "events": [],
+        "tasks": [],
+        "counts": {
+          "children": 0,
+          "rows": 0,
+          "roster": 0
+        }
+      },
+      "screenshot": {
+        "success": true,
+        "path": "/private/tmp/cq-core-flow-audit-20261020/17-parent-results.png",
+        "imageWidth": 624,
+        "imageHeight": 1352
+      },
+      "step": "17-parent-results"
+    },
+    {
+      "route": "pages/parent/private/index",
+      "state": "empty",
+      "dataReadyMs": 998,
+      "elapsedMs": 1243,
+      "requestCount": 1,
+      "requests": [
+        {
+          "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/children",
+          "startOffsetMs": 563,
+          "durationMs": 3,
+          "status": 200
+        }
+      ],
+      "summary": {
+        "route": "pages/parent/private/index",
+        "state": "empty",
+        "message": "当前账号没有绑定孩子",
+        "events": [],
+        "tasks": [],
+        "counts": {
+          "children": 0,
+          "rows": 0,
+          "roster": 0
+        }
+      },
+      "screenshot": {
+        "success": true,
+        "path": "/private/tmp/cq-core-flow-audit-20261020/18-parent-private.png",
+        "imageWidth": 624,
+        "imageHeight": 1352
+      },
+      "step": "18-parent-private"
+    },
+    {
+      "route": "pages/parent/child/index",
+      "state": "empty",
+      "dataReadyMs": 993,
+      "elapsedMs": 1238,
+      "requestCount": 1,
+      "requests": [
+        {
+          "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/children",
+          "startOffsetMs": 557,
+          "durationMs": 3,
+          "status": 200
+        }
+      ],
+      "summary": {
+        "route": "pages/parent/child/index",
+        "state": "empty",
+        "message": "当前账号没有绑定孩子，请联系俱乐部确认手机号。",
+        "canSwitchToCoach": true,
+        "events": [],
+        "tasks": [],
+        "counts": {
+          "children": 0,
+          "rows": 0,
+          "roster": 0
+        }
+      },
+      "screenshot": {
+        "success": true,
+        "path": "/private/tmp/cq-core-flow-audit-20261020/19-parent-child.png",
+        "imageWidth": 624,
+        "imageHeight": 1352
+      },
+      "step": "19-parent-child"
+    }
+  ],
+  "warm": {
+    "parent-home": {
+      "samples": [
+        {
+          "route": "pages/parent/home/index",
+          "state": "empty",
+          "dataReadyMs": 995,
+          "elapsedMs": 1241,
+          "requestCount": 1,
+          "requests": [
+            {
+              "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/children",
+              "startOffsetMs": 551,
+              "durationMs": 4,
+              "status": 200
+            }
+          ]
+        },
+        {
+          "route": "pages/parent/home/index",
+          "state": "empty",
+          "dataReadyMs": 1006,
+          "elapsedMs": 1251,
+          "requestCount": 1,
+          "requests": [
+            {
+              "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/children",
+              "startOffsetMs": 565,
+              "durationMs": 3,
+              "status": 200
+            }
+          ]
+        },
+        {
+          "route": "pages/parent/home/index",
+          "state": "empty",
+          "dataReadyMs": 972,
+          "elapsedMs": 1217,
+          "requestCount": 1,
+          "requests": [
+            {
+              "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/parent/children",
+              "startOffsetMs": 535,
+              "durationMs": 3,
+              "status": 200
+            }
+          ]
+        }
+      ],
+      "medianDataReadyMs": 995,
+      "minMs": 972,
+      "maxMs": 1006
+    },
+    "coach-training": {
+      "samples": [
+        {
+          "route": "pages/coach/training/index",
+          "state": "ready",
+          "dataReadyMs": 1012,
+          "elapsedMs": 1257,
+          "requestCount": 2,
+          "requests": [
+            {
+              "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/home?from=2026-10-01&to=2026-10-31",
+              "startOffsetMs": 570,
+              "durationMs": 59,
+              "status": 200
+            },
+            {
+              "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/training-project-tree",
+              "startOffsetMs": 571,
+              "durationMs": 115,
+              "status": 200
+            }
+          ]
+        },
+        {
+          "route": "pages/coach/training/index",
+          "state": "ready",
+          "dataReadyMs": 989,
+          "elapsedMs": 1233,
+          "requestCount": 2,
+          "requests": [
+            {
+              "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/home?from=2026-10-01&to=2026-10-31",
+              "startOffsetMs": 550,
+              "durationMs": 4,
+              "status": 200
+            },
+            {
+              "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/training-project-tree",
+              "startOffsetMs": 551,
+              "durationMs": 4,
+              "status": 200
+            }
+          ]
+        },
+        {
+          "route": "pages/coach/training/index",
+          "state": "ready",
+          "dataReadyMs": 983,
+          "elapsedMs": 1228,
+          "requestCount": 2,
+          "requests": [
+            {
+              "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/home?from=2026-10-01&to=2026-10-31",
+              "startOffsetMs": 543,
+              "durationMs": 4,
+              "status": 200
+            },
+            {
+              "path": "/__env/develop/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/training-project-tree",
+              "startOffsetMs": 544,
+              "durationMs": 4,
+              "status": 200
+            }
+          ]
+        }
+      ],
+      "medianDataReadyMs": 989,
+      "minMs": 983,
+      "maxMs": 1012
+    }
+  },
+  "cleanup": {
+    "temporaryRequestObserverRemoved": true,
+    "syntheticViewDataDiscardedByReload": true,
+    "finalRole": "coach",
+    "finalRoute": "pages/coach/schedule/index",
+    "businessWrites": 0,
+    "roleSwitchUsesNormalAuthEndpoint": true
+  }
+}

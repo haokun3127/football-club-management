@@ -1,0 +1,44 @@
+{
+  "fab": {
+    "fab": {
+      "id": "",
+      "dataset": {},
+      "left": 303,
+      "right": 361,
+      "top": 728,
+      "bottom": 786,
+      "width": 58,
+      "height": 58
+    },
+    "windowHeight": 844,
+    "safeBottom": 810,
+    "tabbarTopFromSourceCss": 771.2,
+    "overlapFromSourceCssPx": 14.799999999999955,
+    "scope": "Fab rectangle measured natively; tabbar height140rpx/z-index9999 from unchanged CSS, not native component geometry. Component-query attempt returned null; no claim of directly measured tabbar rectangle."
+  },
+  "name": {
+    "scope": "native view-only synthetic three-character name",
+    "rectangles": {
+      "name": {
+        "id": "",
+        "dataset": {},
+        "left": 36,
+        "right": 141,
+        "top": 149,
+        "bottom": 196,
+        "width": 105,
+        "height": 47
+      },
+      "button": {
+        "id": "",
+        "dataset": {},
+        "left": 159.5,
+        "right": 343.5,
+        "top": 154,
+        "bottom": 191,
+        "width": 184,
+        "height": 37
+      }
+    }
+  }
+}

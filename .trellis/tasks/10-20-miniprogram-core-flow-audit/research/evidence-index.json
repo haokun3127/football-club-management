@@ -1,0 +1,286 @@
+{
+  "checkedAt": "2026-10-20 to 2026-10-21 Asia/Hong_Kong",
+  "sourceHead": "97419b47",
+  "figmaFile": "EyQtDtILGDZDf6neLBL6vs",
+  "captureRoot": "/private/tmp/cq-core-flow-audit-20261020",
+  "device": {
+    "logicalWidth": 390,
+    "logicalHeight": 844,
+    "rawWidth": 624,
+    "rawHeight": 1352,
+    "sdk": "3.17.3"
+  },
+  "limit": "Design frames 375x812; native device 390x844. Side-by-side images scale to comparable width; no pixel-error percentage or exact viewport equivalence claimed. Native originals remain outside repo under existing capture policy. Synthetic means page.setData only, no auth or backend writes.",
+  "files": [
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/01-current.png",
+      "sha256": "e9e996b4e638872f8da9d8e5b114272f26aae4233c3e839ed335e75222637ae6",
+      "kind": "native-or-contact",
+      "sizeBytes": 81528
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/02-coach-schedule.png",
+      "sha256": "212d05ba2def74eab2df69ee12ab1e6eefaeba4359d2dda597a882d20cfaf25c",
+      "kind": "native-or-contact",
+      "sizeBytes": 81584
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/03-coach-training.png",
+      "sha256": "82c7f54e19f57fa00ab8caecbcf68d8e351becb17a33a1d4da92c95fd3601d23",
+      "kind": "native-or-contact",
+      "sizeBytes": 70241
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/04-coach-tasks.png",
+      "sha256": "1c5c8697d360c94928520636b13b324672b0ee6eb77bdfa87fe6e8707f116e87",
+      "kind": "native-or-contact",
+      "sizeBytes": 46351
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/05-coach-team.png",
+      "sha256": "7c8e32df38490818fbb7f93875fbfa65d54065f06e2e54989f32d4f8f1142844",
+      "kind": "native-or-contact",
+      "sizeBytes": 90631
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/06-coach-me.png",
+      "sha256": "f6470d1752b00687ba91150fca158b809a301e4b422d495bed2581adf0bf4180",
+      "kind": "native-or-contact",
+      "sizeBytes": 79704
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/07-coach-private.png",
+      "sha256": "f587eee37f80da2d40fb14881f58544e8be372fd62b0a6eb0ab5131617f3e622",
+      "kind": "native-or-contact",
+      "sizeBytes": 89288
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/08-coach-month.png",
+      "sha256": "912a8645b4a288920d4e095fec23bace4c73c8fb7bfa329e19296396035a906a",
+      "kind": "native-or-contact",
+      "sizeBytes": 81602
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/09-coach-september.png",
+      "sha256": "6388ad7c7ffb0bec0e9194db9ca71feb1fc8122d3e78af463baa23045bf71766",
+      "kind": "native-or-contact",
+      "sizeBytes": 77244
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/12-coach-role.png",
+      "sha256": "c58c20f29ea205a44ceee76c2e5e3ae1b44083fc6fc618333678b38ba915df68",
+      "kind": "native-or-contact",
+      "sizeBytes": 79653
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/13-parent-home.png",
+      "sha256": "f954fd062f589e99930c34ebf0a551688a35e3c6eec557edfdd022a2fab89d2d",
+      "kind": "native-or-contact",
+      "sizeBytes": 48413
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/14-parent-schedule.png",
+      "sha256": "6930fa4ad462a5c4fe5ff0cf04138d81d085f8fdfb0b10e7af424506e829ba9d",
+      "kind": "native-or-contact",
+      "sizeBytes": 54981
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/15-parent-growth.png",
+      "sha256": "42d716da679edb4e8afdc4f7e74891fe43454475eacf4d869c79dda3e7503f4a",
+      "kind": "native-or-contact",
+      "sizeBytes": 44905
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/16-parent-records.png",
+      "sha256": "101393e6f22c0e7a568d04ac8312c2622232d41d11911c3bd7e65fa88856fa3d",
+      "kind": "native-or-contact",
+      "sizeBytes": 30022
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/17-parent-results.png",
+      "sha256": "6ee3055bbf7e9d38ff47336140a7f44623534ec95629efb679f2fca3b76e3a26",
+      "kind": "native-or-contact",
+      "sizeBytes": 37976
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/18-parent-private.png",
+      "sha256": "9877b1914eb06e0d9b5fe4fb0614a4c3e3e7ccaf1e23bdf28dee9c59a1a24890",
+      "kind": "native-or-contact",
+      "sizeBytes": 40171
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/19-parent-child.png",
+      "sha256": "e2ef5d9f38a7f4b3a0f4e1b9df0fe01a07c34ca4649309f7c3bdffd46eea7ef9",
+      "kind": "native-or-contact",
+      "sizeBytes": 53914
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/20-synthetic-parent-home.png",
+      "sha256": "6041393e91f5c604bce5f978d16c2d956e6ab38fb76c7658b52d85d1f020f1fb",
+      "kind": "native-synthetic-view",
+      "sizeBytes": 300990
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/21-synthetic-parent-growth.png",
+      "sha256": "6d65ad66ec5cc2eb5fb511b440a51dee101508ec33b9a4023b0e455e294f0232",
+      "kind": "native-synthetic-view",
+      "sizeBytes": 82072
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/22-synthetic-short-name.png",
+      "sha256": "2f735a7400f765f465f219012cb465413067f482579d94f28e256f071e2af1eb",
+      "kind": "native-synthetic-view",
+      "sizeBytes": 286938
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/coach-contact.png",
+      "sha256": "9e07fd800fc2e64779ad76a02e6df4680cbfcc2b703ecfcecdf2895f07d1c86a",
+      "kind": "native-or-contact",
+      "sizeBytes": 310249
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/comparison-C01.png",
+      "sha256": "d6432f6ed72cf4c584fbe1b4212dadb3e8b258449f8e4b2eceb3ac5e6cba6d97",
+      "kind": "comparison",
+      "sizeBytes": 172816
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/comparison-C34.png",
+      "sha256": "24e261b8930c52916838ca201da8db6d68a263b938f56845e8ef0878a867e01b",
+      "kind": "comparison",
+      "sizeBytes": 166226
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/comparison-P01.png",
+      "sha256": "5a95effce364adc1ce7aff3fcb343a80ace1cda41fca15febc9c0fbad5ffa2e5",
+      "kind": "comparison",
+      "sizeBytes": 335871
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/comparison-P08.png",
+      "sha256": "4fa45ce69b5b7ad47773baf970fa448c153194c1f9b5eaca4c9e7f448b904a46",
+      "kind": "comparison",
+      "sizeBytes": 151423
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-C01.png",
+      "sha256": "6403d4e2a6d733c937176fa88b5881333e1384860a73af4919eb0cdad891d10d",
+      "kind": "figma-current",
+      "sizeBytes": 68743
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-C03.png",
+      "sha256": "fd1c44b028c7cedb5897fae306d5ef05c6f9de5d58db2f03b9962588f8c147d3",
+      "kind": "figma-current",
+      "sizeBytes": 70198
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-C04.png",
+      "sha256": "34aa88991c3b65f610c65087fb3f3713bf352060c446e5b107150f0eb84cd2e2",
+      "kind": "figma-current",
+      "sizeBytes": 40448
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-C07.png",
+      "sha256": "359731262225cdb51bdedb9d36d6b518ddba3f9d08a15b314a86ea158390d32d",
+      "kind": "figma-current",
+      "sizeBytes": 46250
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-C14.png",
+      "sha256": "287d72d6be5ec98954e7a03a8c0a4c9b4dce73dbcca1339d3a2468be15c205db",
+      "kind": "figma-current",
+      "sizeBytes": 52007
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-C18.png",
+      "sha256": "e149d2b1da79eebd78c53f9fdd97e05cf96158f5a4b94d4692eafc284008d76d",
+      "kind": "figma-current",
+      "sizeBytes": 39935
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-C20.png",
+      "sha256": "9097c984a3438abe4de4f4a54a7964e463c0de182bca5a7f0b530ec92e57b795",
+      "kind": "figma-current",
+      "sizeBytes": 53514
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-C26.png",
+      "sha256": "927b8b4475714f81743190396d6d9acd7613097c626dd84df21cfa329dfc30d2",
+      "kind": "figma-current",
+      "sizeBytes": 43545
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-C28.png",
+      "sha256": "994fe811a5d40b54176a6fcc1051d8c3a3bc2fb6769cde6f25b5f2a291ca606a",
+      "kind": "figma-current",
+      "sizeBytes": 56446
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-C34.png",
+      "sha256": "59300b6dabede87e3d4b52368589ea33d65d26d4a39c645705d7f64f77148389",
+      "kind": "figma-current",
+      "sizeBytes": 57559
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-P01.png",
+      "sha256": "88feb2b07d1dbcd50f5a509fa7a1ac4cf8964a2f54bdb724f1b8ffab6c374817",
+      "kind": "figma-current",
+      "sizeBytes": 151038
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-P02.png",
+      "sha256": "209b2bcf66b4a285c4c6040fd0af937ec8921b69c561fb055733669b7931fcfa",
+      "kind": "figma-current",
+      "sizeBytes": 71142
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-P03.png",
+      "sha256": "f8f8a31bac0fc97f5ca87ea7782c1f7aee1caaccd071047d3bc7cf7081b09d52",
+      "kind": "figma-current",
+      "sizeBytes": 50057
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-P04.png",
+      "sha256": "f58a462d9175c945d9f79ff16233a8fb7d7d2a762c72ff363a558672f147fe7b",
+      "kind": "figma-current",
+      "sizeBytes": 25284
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-P06.png",
+      "sha256": "e5c68c0047de932fedf9b4cf79449bf09041cf8f58fcef42c515c1705cb2a231",
+      "kind": "figma-current",
+      "sizeBytes": 32048
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-P08.png",
+      "sha256": "37da994231903f8d309bf58adc0ae7984d54b94f062607bc8cf07954b77fc2c4",
+      "kind": "figma-current",
+      "sizeBytes": 58385
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-P19.png",
+      "sha256": "b6fc5e0435b13009a242932cd404a13c091d8a89e3656a6284746b6b99d92805",
+      "kind": "figma-current",
+      "sizeBytes": 29447
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-P22.png",
+      "sha256": "6fc034bcb3cb98ee8adef3d512b15252d5ed6a7fb38860016ba3528847d77cf0",
+      "kind": "figma-current",
+      "sizeBytes": 41824
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/figma-contact.png",
+      "sha256": "bd2a5bb3b4c44bcec09cd6937b3f52a599ad589ee97497dd00e23cfa2d43946e",
+      "kind": "figma-current",
+      "sizeBytes": 716505
+    },
+    {
+      "file": "/private/tmp/cq-core-flow-audit-20261020/parent-contact.png",
+      "sha256": "16d94e4f6ad8f351701cafc185d1622abdd98f7ac6406f10ff8556ba0a876d82",
+      "kind": "native-contact",
+      "sizeBytes": 180480
+    }
+  ]
+}

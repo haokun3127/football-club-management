@@ -1,0 +1,29 @@
+{
+  "id": "miniprogram-technology-review",
+  "name": "miniprogram-technology-review",
+  "title": "小程序技术选型与组件适配评审",
+  "description": "评估原生微信小程序现有选型和组件替代方案；本轮仅评审与文档。",
+  "status": "completed",
+  "dev_type": "research",
+  "scope": "miniprogram",
+  "package": "miniprogram",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-10-20",
+  "completedAt": "2026-10-20",
+  "branch": null,
+  "base_branch": "feature/ui-batch-1-p01",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "apps/miniprogram-cq-talent",
+    "apps/api/src/http/openapi.ts"
+  ],
+  "notes": "2026-10-20评审完成；建议不等于迁移批准；未实施业务修改、未安装依赖、未部署。",
+  "meta": {}
+}

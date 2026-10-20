@@ -1,0 +1,40 @@
+{
+  "id": "miniprogram-core-flow-audit",
+  "name": "miniprogram-core-flow-audit",
+  "title": "家长与教练核心流程：功能、Figma 视觉与加载性能审计",
+  "description": "以现有产品需求和最新在线 Figma 审计家长、教练核心流程，交付证据矩阵、问题清单和修复优先级；不改业务代码、不发布。",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": null,
+  "package": "miniprogram",
+  "priority": "P1",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-10-20",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "feature/ui-batch-1-p01",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "docs/current/miniprogram-core-flow-audit-2026-10-21.md",
+    "docs/current/development-delivery-channel.md",
+    "docs/README.md"
+  ],
+  "notes": "",
+  "meta": {
+    "auditReport": "docs/current/miniprogram-core-flow-audit-2026-10-21.md",
+    "auditReportDeliveredAt": "2026-10-21",
+    "sourceHead": "97419b47",
+    "issueCounts": {
+      "P1": 15,
+      "P2": 7
+    },
+    "flowSteps": 24,
+    "validationGap": "Existing real develop account lacks bound children/courses/tasks; native data-bearing writes and real-phone checks not signed off. Report and prioritization delivered; no product fixes or release."
+  }
+}

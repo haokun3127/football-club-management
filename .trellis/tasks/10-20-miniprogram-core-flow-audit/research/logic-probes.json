@@ -1,0 +1,60 @@
+{
+  "checkedAt": "2026-10-21",
+  "sourceHead": "97419b47",
+  "scope": "Unchanged TypeScript page controllers with synthetic dependencies; no renderer/network/server/phone coverage",
+  "probes": [
+    {
+      "id": "HOME-AUX-FAIL",
+      "confirmed": true,
+      "observed": "News failure hides otherwise successful child, training, calendar and growth content."
+    },
+    {
+      "id": "HOME-GATE",
+      "confirmed": true,
+      "controlledWaitMs": 120,
+      "observed": "No child content is rendered until the slow growth promise resolves; controlled dependency, not phone performance."
+    },
+    {
+      "id": "PRIVATE-CHILD",
+      "confirmed": true,
+      "selectedChild": "b",
+      "actualChild": "a",
+      "observed": "Default shortcut omits student query, and private form chooses children[0] instead of currentStudentId."
+    },
+    {
+      "id": "PRIVATE-ROLLBACK",
+      "confirmed": true,
+      "changedAfterFailedSave": true,
+      "toasts": [
+        {
+          "toast": "保存失败，请重试"
+        }
+      ]
+    },
+    {
+      "id": "PRIVATE-EMPTY",
+      "confirmed": true,
+      "storedSlots": 0,
+      "displayedSelectedSlots": 20
+    },
+    {
+      "id": "PRIVATE-READ-FAIL",
+      "confirmed": true,
+      "interactive": true,
+      "observed": "After a failed preferences read, default values remain editable and may overwrite saved server preferences."
+    },
+    {
+      "id": "GROWTH-RETURN",
+      "evidence": "source",
+      "observed": "onShow returns without refresh when the selected child is unchanged, including return from training-record correction."
+    },
+    {
+      "id": "RADAR-SIX",
+      "confirmed": true,
+      "inputDimensions": 8,
+      "renderedDimensions": 6,
+      "serverOverall": "absent",
+      "frontendOverall": 80
+    }
+  ]
+}

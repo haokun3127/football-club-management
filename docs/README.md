@@ -6,6 +6,7 @@
 
 - [唯一主开发入口](current/development-workspace.md)：各工具统一仓库与微信项目路径，辨认别名和历史副本。
 - [当前交付状态与待办](current/development-delivery-channel.md)：当前源码、体验版、服务端版本、证据日期与优先级。
+- [核心流程审计（2026-10-21）](current/miniprogram-core-flow-audit-2026-10-21.md)：家长/教练24步覆盖、当前Figma对照、加载采样、问题及修复顺序，逐项标注真实数据与真机验证边界。
 - [GitHub 当前交接 HANDOFF-GITHUB-2026-09-08.md](../HANDOFF-GITHUB-2026-09-08.md)：2026-09-08交接快照；路径和当前交付状态优先以上述入口为准。
 - [当前项目进度](current/progress.md)：逐日事实、已知阻塞和真实验证状态；最新记录在文件末尾。
 - [项目全景（2026-09-18）](current/project-overview-cq-talent.md)：一页看懂产品面、设计权威、技术面、部署与交付状态、风险与开工前缺口；每条事实标注 `[实测]`/`[记录]`/`[未验证]` 证据等级。
