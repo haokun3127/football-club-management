@@ -32,6 +32,19 @@ interface PageData {
   navActionTop: number;
 }
 
+/**
+ * 试点：迁移到官方 Page 泛型（miniprogram-api-typings）。
+ * TCustom 声明页面自定义方法，官方 Options 据此约束 this 与事件回调；
+ * 生命周期（onLoad 等）由官方 WechatMiniprogram.Page.ILifetime 约束。
+ */
+interface DayPageMethods {
+  load(date: string): Promise<void>;
+  retry(): void;
+  openFilter(): void;
+  goBack(): void;
+  openEvent(event: WechatMiniprogram.TouchEvent): void;
+}
+
 const TYPE_COLORS: Record<ScheduleEvent["type"], string> = {
   training: "#a80f1b",
   match: "#1976d2",
@@ -40,7 +53,7 @@ const TYPE_COLORS: Record<ScheduleEvent["type"], string> = {
 
 const WEEKDAYS = ["日", "一", "二", "三", "四", "五", "六"];
 
-Page<PageData>({
+Page<PageData, DayPageMethods>({
   data: {
     state: "idle",
     message: "",
@@ -53,8 +66,10 @@ Page<PageData>({
     menuInset: resolveMenuInset(),
     navActionTop: resolveMenuActionTop(),
   },
-  onLoad(query: { date?: string }) {
-    this.load(query?.date || parentPageToday());
+  // onLoad 形参类型由官方 WechatMiniprogram.Page.ILifetime 提供（query 为
+  // Record<string, string | undefined>），不再手写窄化结构。
+  onLoad(query: Record<string, string | undefined>) {
+    this.load(query.date || parentPageToday());
   },
   async load(date: string) {
     const session = requireRole("parent");
@@ -107,7 +122,9 @@ Page<PageData>({
   goBack() {
     wx.navigateBack();
   },
-  openEvent(event: { currentTarget: { dataset: { id: string } } }) {
+  // 事件类型采用官方 WechatMiniprogram.TouchEvent（dataset 取值为 any，
+  // 由 utils/api 的显式业务类型负责后续约束）。
+  openEvent(event: WechatMiniprogram.TouchEvent) {
     openPage(`/pages/parent/event/index?id=${event.currentTarget.dataset.id}`);
   },
 });
