@@ -18,6 +18,8 @@ interface Coach {
 }
 
 interface PageData {
+  navInset: number;
+  menuInset: number;
   state: LoadState;
   message: string;
   teamName: string;
