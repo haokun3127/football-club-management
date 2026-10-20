@@ -93,13 +93,16 @@ Page<PageData>({
         this.setData({ state: "empty", message: "当前账号没有绑定孩子" });
         return;
       }
+      // F-02：默认入口沿用当前已选孩子，而不是 children[0]；显式携带的孩子参数仍需归属校验
       const active = requestedStudentId
         ? children.find((child: StudentSummary) => child.id === requestedStudentId)
-        : children[0];
+        : children.find((child: StudentSummary) => child.id === session.currentStudentId) ?? children[0];
       if (!active) {
         this.setData({ state: "empty", message: "未找到可预约的孩子" });
         return;
       }
+      // 解析结果固化到 requestedStudentId，重试/返回期间保持同一孩子
+      const resolvedStudentId = requestedStudentId || active.id;
       const coachOptions = active.coachNames.filter((name) => Boolean(name));
       const selectedCoachName = coachOptions[0] ?? "";
       const formState = buildFormState({
@@ -114,6 +117,7 @@ Page<PageData>({
       this.setData({
         state: "ready",
         message: "",
+        requestedStudentId: resolvedStudentId,
         studentId: active.id,
         studentName: active.name,
         coachOptions,

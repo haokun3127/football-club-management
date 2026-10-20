@@ -207,4 +207,61 @@ describe("parent private lesson form", () => {
     expect(styles).toContain("border-radius: 12rpx;");
     expect(styles).toContain("grid-template-columns: repeat(3, minmax(0, 1fr));");
   });
+
+  it("defaults to the currently selected child instead of children[0] (F-02)", async () => {
+    mocks.requireRole.mockReturnValue({ role: "parent", currentStudentId: "student-2" });
+    mocks.getParentChildren.mockResolvedValue([
+      child,
+      { id: "student-2", name: "二宝", teams: [], coachNames: ["真实教练"] },
+    ]);
+    const page = createPageInstance();
+
+    await page.load("");
+
+    expect(page.data).toMatchObject({ state: "ready", studentId: "student-2", studentName: "二宝", requestedStudentId: "student-2" });
+  });
+
+  it("keeps the same child across retries even after the default entry resolved it (F-02)", async () => {
+    mocks.requireRole.mockReturnValue({ role: "parent", currentStudentId: "student-2" });
+    const children = [child, { id: "student-2", name: "二宝", teams: [], coachNames: ["真实教练"] }];
+    mocks.getParentChildren.mockResolvedValue(children);
+    const page = createPageInstance();
+    await page.load("");
+
+    // 重试期间当前孩子被切回老大，默认入口解析出的孩子仍保持不变
+    mocks.requireRole.mockReturnValue({ role: "parent", currentStudentId: "student-1" });
+    await page.retry();
+
+    expect(page.data).toMatchObject({ studentId: "student-2", studentName: "二宝" });
+  });
+
+  it("submits the consultation for the resolved child in a two-child family (F-02)", async () => {
+    mocks.requireRole.mockReturnValue({ role: "parent", currentStudentId: "student-2" });
+    mocks.getParentChildren.mockResolvedValue([
+      child,
+      { id: "student-2", name: "二宝", teams: [], coachNames: ["真实教练"] },
+    ]);
+    mocks.createPrivateLessonRequest.mockResolvedValue({ id: "request-2", studentId: "student-2" });
+    const page = createPageInstance();
+    await page.load("");
+    completeForm(page);
+
+    await page.submit();
+
+    expect(mocks.createPrivateLessonRequest).toHaveBeenCalledWith(expect.objectContaining({ studentId: "student-2" }));
+    expect(globalThis.wx.redirectTo).toHaveBeenCalledWith({
+      url: "/pages/parent/private-success/index?request=request-2&student=student-2",
+    });
+  });
+
+  it("rejects an explicitly requested child outside the guardian binding instead of substituting another", async () => {
+    mocks.requireRole.mockReturnValue({ role: "parent", currentStudentId: "student-2" });
+    mocks.getParentChildren.mockResolvedValue([child]);
+    const page = createPageInstance();
+
+    await page.load("student-foreign");
+
+    expect(page.data).toMatchObject({ state: "empty", message: "未找到可预约的孩子" });
+    expect(page.data.studentId).toBe("");
+  });
 });
