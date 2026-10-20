@@ -1,6 +1,8 @@
 import { getParentActivityDetail } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { activityStatus, activityTypeLabel, resolveMenuActionTop, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import { markGrowthStale } from "../../../utils/growth-invalidation";
+import { activityStatus, activityTypeLabel, formatDateTime, resolveMenuActionTop, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import { getTrainingRecords, requestTrainingLeave, revokeTrainingLeave, type TrainingRecord } from "../../../utils/training-records";
 import type { ActivityDetail, LoadState } from "../../../utils/types";
 
 type RosterItem = {
@@ -47,14 +49,27 @@ type ActivityDetailView = Omit<ActivityDetail, "matchEvents"> & {
   childName: string;
   childInitial: string;
   childStatusLabel: string;
-  confirmationText: string;
-  offlineConfirmText: string;
-  attendanceConfirmed: boolean;
   matchEvents: MatchEventView[];
   hasMatchEvents: boolean;
   matchResultLabel: string;
   matchNote: string;
   hasMatchNote: boolean;
+};
+
+// 请假与课时视图（F-01 / REQ-ATT-001）：请假直接生效、可撤回、双方可见历史
+type LeaveView = {
+  visible: boolean;
+  eventId: string;
+  studentId: string;
+  studentName: string;
+  onLeave: boolean;
+  cancelled: boolean;
+  statusLabel: string;
+  resultLabel: string;
+  historyLabels: string[];
+  revision: number;
+  submitting: boolean;
+  message: string;
 };
 
 const NAV_TITLES = { training: "训练详情", match: "比赛详情", other: "活动详情" } as const;
@@ -68,6 +83,7 @@ Page({
     message: "正在读取活动详情",
     eventId: "",
     detail: null as ActivityDetailView | null,
+    leave: null as LeaveView | null,
   },
   onLoad(query?: Record<string, string | undefined>) {
     requireRole("parent");
@@ -80,11 +96,65 @@ Page({
       this.setData({ state: "error", message: "这条活动信息暂时无法打开，请从日程重新进入。" });
       return;
     }
+    const session = requireRole("parent");
+    if (!session) return;
     try {
       const detail = await getParentActivityDetail(id);
-      this.setData({ state: "ready", detail: presentDetail(detail), message: "" });
+      const leave = detail.type === "training" ? await this.loadLeave(detail, id, session.currentStudentId) : null;
+      this.setData({ state: "ready", detail: presentDetail(detail), leave, message: "" });
     } catch (error) {
       this.setData({ state: "error", message: readableError(error) });
+    }
+  },
+  // 读取请假参与状态与课时记录；课时读取失败不阻塞详情展示
+  async loadLeave(detail: ActivityDetail, eventId: string, currentStudentId?: string) {
+    const child = detail.participants.find((participant) => participant.studentId === currentStudentId) ?? detail.participants[0];
+    if (!child) return null;
+    let record: TrainingRecord | undefined;
+    try {
+      const result = await getTrainingRecords(child.studentId);
+      record = result.records.find((item) => item.eventId === eventId);
+    } catch { record = undefined; }
+    return presentLeave(detail, eventId, child.studentId, child.name, child.status, record);
+  },
+  async submitLeave() {
+    await this.writeLeave("request");
+  },
+  async revokeLeave() {
+    await this.writeLeave("revoke");
+  },
+  async writeLeave(action: "request" | "revoke") {
+    const leave = this.data.leave;
+    if (!leave?.visible || leave.submitting || leave.cancelled) return;
+    if (action === "request" && leave.onLeave) return;
+    if (action === "revoke" && !leave.onLeave) return;
+    this.setData({ leave: { ...leave, submitting: true, message: "" } });
+    try {
+      const input = { expectedRevision: leave.revision };
+      if (action === "request") await requestTrainingLeave(leave.studentId, leave.eventId, input);
+      else await revokeTrainingLeave(leave.studentId, leave.eventId, input);
+      // 请假/撤回改变了销课事实，返回成长页时定向重拉（F-06 同款失效标记）
+      markGrowthStale();
+      wx.showToast({ title: action === "request" ? "请假已生效" : "已改回销课", icon: "success" });
+      await this.load(leave.eventId);
+    } catch (error) {
+      const failure = error as { message?: string; code?: string; errorType?: string; userMessage?: string };
+      const conflict = failure.errorType === "conflict" || failure.code === "training_record_conflict";
+      if (conflict) {
+        // 冲突时先刷新到最新事实，再在最新视图上提示核对，避免提示被刷新覆盖
+        await this.load(leave.eventId);
+        if (this.data.leave) {
+          this.setData({ leave: { ...this.data.leave, submitting: false, message: "这条记录刚被更新，请核对最新状态后重试。" } });
+        }
+        return;
+      }
+      this.setData({
+        leave: {
+          ...leave,
+          submitting: false,
+          message: failure.userMessage || failure.message || "提交失败，请稍后重试。",
+        },
+      });
     }
   },
   goBack() {
@@ -137,9 +207,11 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
   const trainingPill = detail.type === "training"
     ? childStatusLabel === "已到场"
       ? { label: "已到场", tone: "success" as const }
-      : childStatusLabel === "未到场"
-        ? { label: "未到场", tone: "muted" as const }
-        : { label: "待确认", tone: "warning" as const }
+      : childStatusLabel === "已请假"
+        ? { label: "已请假", tone: "muted" as const }
+        : childStatusLabel === "未到场"
+          ? { label: "未到场", tone: "muted" as const }
+          : { label: "待确认", tone: "warning" as const }
     : { label: status.label, tone: statusTone as "warning" | "success" | "muted" };
   return {
     ...detail,
@@ -165,9 +237,6 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
     childName: resolveChildName(detail, child),
     childInitial: resolveChildName(detail, child).slice(0, 1),
     childStatusLabel,
-    confirmationText: childStatusLabel,
-    offlineConfirmText: `本次训练须经教练或家长在现场确认，无需在 APP 进行操作。请${child?.name || "学员"}准时到场。`,
-    attendanceConfirmed: childStatusLabel === "已到场",
     matchEvents: toMatchEvents(detail.matchEvents),
     hasMatchEvents: toMatchEvents(detail.matchEvents).length > 0,
     matchResultLabel: matchResultLabel(rawScore, status.label),
@@ -263,8 +332,35 @@ function rosterItem(participant: ActivityDetail["participants"][number], index: 
 function participantStatusLabel(status?: string) {
   const value = String(status ?? "").toLowerCase();
   if (["present", "confirmed", "completed", "accepted"].includes(value)) return "已到场";
+  if (["leave_requested", "excused"].includes(value)) return "已请假";
   if (["absent", "cancelled"].includes(value)) return "未到场";
+  if (value === "late") return "迟到";
   return value ? "状态待确认" : "状态待同步";
+}
+
+// 请假视图：statusLabel 表达参与事实，resultLabel 表达销课结果
+function presentLeave(detail: ActivityDetail, eventId: string, studentId: string, studentName: string, participantStatus: string, record?: TrainingRecord): LeaveView {
+  const cancelled = detail.status === "cancelled";
+  const onLeave = ["leave_requested", "excused"].includes(String(participantStatus ?? "").toLowerCase());
+  return {
+    visible: true,
+    eventId,
+    studentId,
+    studentName: studentName || "孩子",
+    onLeave,
+    cancelled,
+    statusLabel: cancelled ? "课程已取消" : participantStatusLabel(participantStatus),
+    resultLabel: cancelled
+      ? "取消课不销课"
+      : record
+        ? record.counted ? "已销课" : "本课不销课（请假）"
+        : "课程结束后自动记录",
+    historyLabels: (record?.history ?? []).map((item) =>
+      `${formatDateTime(item.changedAt)} · ${item.counted ? "销课" : "不销课"} · ${item.reason}`),
+    revision: record?.revision ?? 0,
+    submitting: false,
+    message: "",
+  };
 }
 
 function collectAbilityChips(detail: ActivityDetail) {

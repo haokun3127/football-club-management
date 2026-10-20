@@ -17,8 +17,23 @@
       </view>
       <view class="detail-card detail-card--training"><view class="detail-card__head"><view class="detail-card__title">训练内容</view><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view><view class="detail-card__copy">{{detail.trainingSummary}}</view></view>
       <view class="detail-card detail-card--ability"><view class="detail-card__title">关联能力</view><view class="ability-tags"><view wx:for="{{detail.abilityChips}}" wx:key="*this" class="ability-tag">{{item}}</view></view></view>
-      <view class="detail-card detail-card--confirm"><view class="detail-card__head"><image src="/assets/icons/alert.svg" mode="aspectFit" /><view class="detail-card__title">线下确认</view></view><view class="detail-card__copy">{{detail.offlineConfirmText}}</view></view>
-      <view class="attendance-button {{detail.attendanceConfirmed ? 'attendance-button--confirmed' : ''}}">{{detail.attendanceConfirmed ? '已确认出席' : '待现场确认'}}</view>
+      <view wx:if="{{leave && leave.visible}}" class="leave-card">
+        <view class="leave-card__head"><view class="leave-card__title">请假与课时</view><view class="leave-card__status">{{leave.statusLabel}}</view></view>
+        <view class="leave-card__rows">
+          <view class="leave-card__row"><view class="leave-card__label">孩子</view><view class="leave-card__value">{{leave.studentName}}</view></view>
+          <view class="leave-card__row"><view class="leave-card__label">课时结果</view><view class="leave-card__value">{{leave.resultLabel}}</view></view>
+        </view>
+        <view wx:if="{{leave.historyLabels.length}}" class="leave-card__history">
+          <view class="leave-card__history-title">变更历史</view>
+          <view wx:for="{{leave.historyLabels}}" wx:key="*this" class="leave-card__history-item">{{item}}</view>
+        </view>
+        <view wx:if="{{leave.cancelled}}" class="leave-card__hint">课程已取消，本课不销课，无需请假。</view>
+        <view wx:elif="{{leave.onLeave}}" class="leave-card__hint">请假已生效，本课不销课；如孩子实际参加，可撤销改回销课。</view>
+        <view wx:else class="leave-card__hint">提交请假后立即生效、无需审批，本课不销课。</view>
+        <view wx:if="{{!leave.cancelled && !leave.onLeave}}" class="leave-card__action {{leave.submitting ? 'leave-card__action--disabled' : ''}}" bindtap="submitLeave">{{leave.submitting ? '提交中…' : '提交请假'}}</view>
+        <view wx:if="{{!leave.cancelled && leave.onLeave}}" class="leave-card__action leave-card__action--revoke {{leave.submitting ? 'leave-card__action--disabled' : ''}}" bindtap="revokeLeave">{{leave.submitting ? '提交中…' : '撤销请假，改回销课'}}</view>
+        <view wx:if="{{leave.message}}" class="leave-card__message">{{leave.message}}</view>
+      </view>
     </block>
 
     <block wx:elif="{{detail && detail.type === 'match'}}">

@@ -23,3 +23,18 @@ export function getTrainingRecords(studentId: string) {
 export function correctTrainingRecord(studentId: string, eventId: string, input: { expectedRevision: number; counted: boolean; reason: string }) {
   return request<{ record: TrainingRecord }>({ path: `${path(studentId)}/${encodeURIComponent(eventId)}`, method: "PATCH", data: input, idempotent: true });
 }
+
+export interface TrainingLeaveResult {
+  record?: TrainingRecord;
+  participant: { studentId: string; status: string };
+}
+
+// 家长请假（REQ-ATT-001）：提交后直接生效、无需审批，本课不销课
+export function requestTrainingLeave(studentId: string, eventId: string, input: { expectedRevision: number; reason?: string }) {
+  return request<TrainingLeaveResult>({ path: `${path(studentId)}/${encodeURIComponent(eventId)}/leave`, method: "POST", data: { action: "request", ...input }, idempotent: true });
+}
+
+// 撤回请假：已请假但实际参加时改回销课
+export function revokeTrainingLeave(studentId: string, eventId: string, input: { expectedRevision: number; reason?: string }) {
+  return request<TrainingLeaveResult>({ path: `${path(studentId)}/${encodeURIComponent(eventId)}/leave`, method: "POST", data: { action: "revoke", ...input }, idempotent: true });
+}

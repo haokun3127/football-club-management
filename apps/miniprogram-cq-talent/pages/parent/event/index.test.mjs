@@ -3,14 +3,25 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   getParentActivityDetail: vi.fn(),
+  getTrainingRecords: vi.fn(),
+  requestTrainingLeave: vi.fn(),
+  revokeTrainingLeave: vi.fn(),
+  markGrowthStale: vi.fn(),
   requireRole: vi.fn(),
 }));
 
 vi.mock("../../../utils/api", () => ({ getParentActivityDetail: mocks.getParentActivityDetail }));
+vi.mock("../../../utils/training-records", () => ({
+  getTrainingRecords: mocks.getTrainingRecords,
+  requestTrainingLeave: mocks.requestTrainingLeave,
+  revokeTrainingLeave: mocks.revokeTrainingLeave,
+}));
+vi.mock("../../../utils/growth-invalidation", () => ({ markGrowthStale: mocks.markGrowthStale }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/presentation", () => ({
   activityStatus: (status) => ({ label: status === "scheduled" ? "待开始" : status, tone: "brand" }),
   activityTypeLabel: (type) => type === "training" ? "训练" : type === "match" ? "比赛" : "活动",
+  formatDateTime: (value) => String(value),
   resolveMenuActionTop: () => 24,
   resolveMenuInset: () => 16,
   resolveNavInset: () => 20,
@@ -58,6 +69,16 @@ function detail(overrides = {}) {
   };
 }
 
+beforeEach(() => {
+  mocks.getParentActivityDetail.mockReset();
+  mocks.getTrainingRecords.mockReset().mockResolvedValue({ total: 0, records: [] });
+  mocks.requestTrainingLeave.mockReset();
+  mocks.revokeTrainingLeave.mockReset();
+  mocks.markGrowthStale.mockReset();
+  mocks.requireRole.mockReset().mockReturnValue({ role: "parent" });
+  globalThis.wx.showToast.mockReset();
+});
+
 describe("parent activity detail", () => {
   it.each(["scheduled", "in_progress", "cancelled"])("hides post-match comments for %s matches", async (status) => {
     mocks.getParentActivityDetail.mockResolvedValueOnce(detail({
@@ -88,11 +109,6 @@ describe("parent activity detail", () => {
     const page = createPageInstance();
     await page.load("match-event");
     expect(page.data.detail).toMatchObject({ hasMatchNote: true, matchNote: "积极拼抢，传球及时。" });
-  });
-
-  beforeEach(() => {
-    mocks.getParentActivityDetail.mockReset();
-    mocks.requireRole.mockReset().mockReturnValue({ role: "parent" });
   });
 
   it("keeps a rejected detail request in the route error state", async () => {
@@ -215,5 +231,120 @@ describe("parent activity detail", () => {
     expect(template).toContain('wx:if="{{!detail || detail.type !== \'match\'}}"');
     expect(styles).toContain(".match-summary");
     expect(styles).toContain(".match-note");
+  });
+});
+
+describe("parent training leave flow (F-01)", () => {
+  const trainingDetail = (overrides = {}) => detail({
+    type: "training",
+    participants: [{ studentId: "student-1", name: "小天", status: "invited" }],
+    ...overrides,
+  });
+  const leaveRecord = {
+    eventId: "event-1", studentId: "student-1", revision: 1, counted: false,
+    source: "correction", occurredAt: "2026-10-01T08:00:00Z", updatedAt: "2026-10-01T02:00:00Z",
+    history: [{ revision: 1, counted: false, previousCounted: null, source: "correction", reason: "家长请假", actorUserId: "user-parent-1", changedAt: "2026-10-01T02:00:00Z" }],
+  };
+
+  it("shows leave state, history and a pending result before any leave", async () => {
+    mocks.getParentActivityDetail.mockResolvedValue(trainingDetail());
+    mocks.getTrainingRecords.mockResolvedValue({ total: 0, records: [] });
+    const page = createPageInstance();
+
+    await page.load("event-1");
+
+    expect(mocks.getTrainingRecords).toHaveBeenCalledWith("student-1");
+    expect(page.data.leave).toMatchObject({ visible: true, onLeave: false, cancelled: false, statusLabel: "状态待确认", resultLabel: "课程结束后自动记录", revision: 0 });
+    expect(template).toContain("leave-card");
+    expect(template).toContain("提交请假");
+    expect(template).not.toContain("线下确认");
+  });
+
+  it("submits leave with the loaded revision, marks growth stale, and reflects the effective leave immediately", async () => {
+    mocks.getParentActivityDetail
+      .mockResolvedValueOnce(trainingDetail())
+      .mockResolvedValueOnce(trainingDetail({ participants: [{ studentId: "student-1", name: "小天", status: "leave_requested" }] }));
+    mocks.getTrainingRecords
+      .mockResolvedValueOnce({ total: 0, records: [] })
+      .mockResolvedValueOnce({ total: 0, records: [leaveRecord] });
+    mocks.requestTrainingLeave.mockResolvedValueOnce({ record: leaveRecord, participant: { studentId: "student-1", status: "leave_requested" } });
+    const page = createPageInstance();
+
+    await page.load("event-1");
+    await page.submitLeave();
+
+    expect(mocks.requestTrainingLeave).toHaveBeenCalledWith("student-1", "event-1", { expectedRevision: 0 });
+    expect(mocks.markGrowthStale).toHaveBeenCalledTimes(1);
+    expect(globalThis.wx.showToast).toHaveBeenCalledWith({ title: "请假已生效", icon: "success" });
+    expect(page.data.leave).toMatchObject({ onLeave: true, statusLabel: "已请假", resultLabel: "本课不销课（请假）", revision: 1 });
+    expect(page.data.leave.historyLabels[0]).toContain("家长请假");
+    // 已请假时重复点击提交不再发起请求
+    await page.submitLeave();
+    expect(mocks.requestTrainingLeave).toHaveBeenCalledTimes(1);
+  });
+
+  it("revokes an active leave back to a counted lesson and refreshes the growth cache", async () => {
+    mocks.getParentActivityDetail
+      .mockResolvedValueOnce(trainingDetail({ participants: [{ studentId: "student-1", name: "小天", status: "leave_requested" }] }))
+      .mockResolvedValueOnce(trainingDetail({ participants: [{ studentId: "student-1", name: "小天", status: "confirmed" }] }));
+    mocks.getTrainingRecords
+      .mockResolvedValueOnce({ total: 0, records: [leaveRecord] })
+      .mockResolvedValueOnce({ total: 1, records: [{ ...leaveRecord, revision: 2, counted: true }] });
+    mocks.revokeTrainingLeave.mockResolvedValueOnce({ record: { ...leaveRecord, revision: 2, counted: true }, participant: { studentId: "student-1", status: "confirmed" } });
+    const page = createPageInstance();
+
+    await page.load("event-1");
+    await page.revokeLeave();
+
+    expect(mocks.revokeTrainingLeave).toHaveBeenCalledWith("student-1", "event-1", { expectedRevision: 1 });
+    expect(mocks.markGrowthStale).toHaveBeenCalledTimes(1);
+    expect(page.data.leave).toMatchObject({ onLeave: false, statusLabel: "已到场", resultLabel: "已销课", revision: 2 });
+  });
+
+  it("keeps the form usable after a conflict and surfaces the structured network error copy", async () => {
+    mocks.getParentActivityDetail.mockResolvedValue(trainingDetail());
+    mocks.getTrainingRecords.mockResolvedValue({ total: 0, records: [] });
+    const page = createPageInstance();
+    await page.load("event-1");
+
+    mocks.requestTrainingLeave.mockRejectedValueOnce({ code: "training_record_conflict", errorType: "conflict" });
+    await page.submitLeave();
+    expect(page.data.leave.submitting).toBe(false);
+    expect(page.data.leave.message).toContain("请核对最新状态");
+    expect(mocks.getParentActivityDetail).toHaveBeenCalledTimes(2);
+
+    mocks.requestTrainingLeave.mockRejectedValueOnce({ code: "network_error", errorType: "network", userMessage: "网络连接不可用，请检查网络后重试" });
+    await page.submitLeave();
+    expect(page.data.leave.message).toBe("网络连接不可用，请检查网络后重试");
+    expect(mocks.getParentActivityDetail).toHaveBeenCalledTimes(2);
+  });
+  it("uses the currently selected child when the training involves multiple children", async () => {
+    mocks.requireRole.mockReturnValue({ role: "parent", currentStudentId: "student-2" });
+    mocks.getParentActivityDetail.mockResolvedValue(trainingDetail({
+      participants: [
+        { studentId: "student-1", name: "大宝", status: "invited" },
+        { studentId: "student-2", name: "小宝", status: "leave_requested" },
+      ],
+    }));
+    mocks.getTrainingRecords.mockResolvedValue({ total: 0, records: [] });
+    const page = createPageInstance();
+
+    await page.load("event-1");
+
+    expect(mocks.getTrainingRecords).toHaveBeenCalledWith("student-2");
+    expect(page.data.leave).toMatchObject({ studentId: "student-2", studentName: "小宝", onLeave: true, statusLabel: "已请假" });
+  });
+
+  it("does not offer leave actions for a cancelled training", async () => {
+    mocks.getParentActivityDetail.mockResolvedValue(trainingDetail({ status: "cancelled" }));
+    mocks.getTrainingRecords.mockResolvedValue({ total: 0, records: [] });
+    const page = createPageInstance();
+
+    await page.load("event-1");
+    await page.submitLeave();
+
+    expect(page.data.leave).toMatchObject({ cancelled: true, statusLabel: "课程已取消", resultLabel: "取消课不销课" });
+    expect(mocks.requestTrainingLeave).not.toHaveBeenCalled();
+    expect(template).toContain("课程已取消，本课不销课，无需请假");
   });
 });
