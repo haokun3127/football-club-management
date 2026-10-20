@@ -10,11 +10,15 @@ const mocks = vi.hoisted(() => ({
   requireRole: vi.fn(),
 }));
 
-vi.mock("../../../utils/api", () => ({
-  getTrainingTemplates: mocks.getTrainingTemplates, saveTrainingTemplate: mocks.saveTrainingTemplate, previewTrainingTransfer: mocks.previewTrainingTransfer, applyTrainingTransfer: mocks.applyTrainingTransfer,
-  getCoachWorkbench: mocks.getCoachWorkbench, getCoachAssessmentTasks: mocks.getCoachAssessmentTasks,
-  saveCoachAttendance: mocks.saveCoachAttendance,
-}));
+vi.mock("../../../utils/api", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    getTrainingTemplates: mocks.getTrainingTemplates, saveTrainingTemplate: mocks.saveTrainingTemplate, previewTrainingTransfer: mocks.previewTrainingTransfer, applyTrainingTransfer: mocks.applyTrainingTransfer,
+    getCoachWorkbench: mocks.getCoachWorkbench, getCoachAssessmentTasks: mocks.getCoachAssessmentTasks,
+    saveCoachAttendance: mocks.saveCoachAttendance,
+  };
+});
 vi.mock("../../../utils/training-records", () => ({ correctTrainingRecord: mocks.correctTrainingRecord }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
@@ -408,5 +412,50 @@ describe("coach activity workbench", () => {
     expect(template).toContain('class="c2-nav__today"');
     expect(template).toContain('>本次课程</view>');
     expect(stylesheet).toMatch(/\.c2-nav__today\s*\{[^}]*color:\s*#a80f1b[^}]*font-size:\s*24rpx/s);
+  });
+
+  it("sends the loaded status snapshot as previousStatus on inline attendance saves for non-training events", async () => {
+    mocks.getCoachWorkbench.mockResolvedValue({
+      ...trainingWorkbench,
+      event: { ...trainingWorkbench.event, type: "match" },
+      roster: [
+        { studentId: "student-1", name: "甲", status: "confirmed" },
+        { studentId: "student-2", name: "乙", status: "leave_requested" },
+      ],
+    });
+    const page = createPageInstance();
+    await page.load("event-match-1");
+
+    await page.toggleAttendance({ currentTarget: { dataset: { index: "0" } } });
+    expect(mocks.saveCoachAttendance).toHaveBeenCalledWith("event-match-1", [
+      expect.objectContaining({ studentId: "student-1", status: "present", previousStatus: "confirmed" }),
+      expect.objectContaining({ studentId: "student-2", status: "leave_requested", previousStatus: "leave_requested" }),
+    ]);
+  });
+
+  it("refreshes the inline roster and names conflicting students after a leave 409 without auto-retrying", async () => {
+    const matchWorkbench = { ...trainingWorkbench, event: { ...trainingWorkbench.event, type: "match" } };
+    mocks.getCoachWorkbench
+      .mockResolvedValueOnce({ ...matchWorkbench, roster: [{ studentId: "student-1", name: "甲", status: "confirmed" }] })
+      .mockResolvedValueOnce({ ...matchWorkbench, roster: [{ studentId: "student-1", name: "甲", status: "leave_requested" }] });
+    mocks.saveCoachAttendance.mockRejectedValueOnce({ code: "attendance_leave_conflict", errorType: "conflict", statusCode: 409 });
+    const page = createPageInstance();
+    await page.load("event-match-1");
+
+    await page.toggleAttendance({ currentTarget: { dataset: { index: "0" } } });
+
+    expect(mocks.saveCoachAttendance).toHaveBeenCalledTimes(1);
+    expect(mocks.getCoachWorkbench).toHaveBeenCalledTimes(2);
+    expect(page.data.rosterRows[0]).toMatchObject({ studentId: "student-1", status: "leave_requested", present: false, initialStatus: "leave_requested" });
+    expect(page.data.attendanceError).toContain("甲");
+    expect(page.data.attendanceError).toContain("请假");
+    expect(page.data).toMatchObject({ attendanceSaving: false, attendanceNeedsRefresh: false });
+
+    // 核对后确认实际到场：基于刷新后的快照显式改回 present（REQ-ATT-001）
+    await page.toggleAttendance({ currentTarget: { dataset: { index: "0" } } });
+    expect(mocks.saveCoachAttendance).toHaveBeenLastCalledWith("event-match-1", [
+      expect.objectContaining({ studentId: "student-1", status: "present", previousStatus: "leave_requested" }),
+    ]);
+    expect(page.data.attendanceSaving).toBe(false);
   });
 });

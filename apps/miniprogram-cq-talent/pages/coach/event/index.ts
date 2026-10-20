@@ -1,5 +1,5 @@
 import { correctTrainingRecord, type TrainingRecord } from "../../../utils/training-records";
-import { getCoachAssessmentTasks, getTrainingTemplates, saveTrainingTemplate, previewTrainingTransfer, applyTrainingTransfer, getCoachWorkbench, saveCoachAttendance } from "../../../utils/api";
+import { attendanceLeaveConflictMessage, getCoachAssessmentTasks, getTrainingTemplates, saveTrainingTemplate, previewTrainingTransfer, applyTrainingTransfer, getCoachWorkbench, isAttendanceLeaveConflictError, resolveAttendanceLeaveConflicts, saveCoachAttendance } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { activityTypeLabel, formatCalendarDate, formatShortDate, formatTimeOnly, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
@@ -16,7 +16,7 @@ type ActionCard = {
   glyph?: string;
 };
 
-type RosterRow = CoachWorkbench["roster"][number] & { statusLabel: string; present: boolean; initial: string; displayName: string; record?: TrainingRecord };
+type RosterRow = CoachWorkbench["roster"][number] & { statusLabel: string; present: boolean; initial: string; initialStatus: string; displayName: string; record?: TrainingRecord };
 
 type EventView = {
   title: string;
@@ -151,14 +151,7 @@ Page({
       const canWrite = workbench.event.status !== "cancelled";
       const isTraining = workbench.event.type === "training";
       const records = new Map((workbench.trainingRecords ?? []).map(record => [record.studentId, record]));
-      const rosterRows = workbench.roster.map((item) => ({
-        ...item,
-        record: records.get(item.studentId),
-        statusLabel: (isTraining ? records.get(item.studentId)?.counted : isPresentStatus(item.status)) ? "已到" : "未到",
-        present: isTraining ? records.get(item.studentId)?.counted === true : isPresentStatus(item.status),
-        initial: (item.name || "学").slice(0, 1),
-        displayName: item.name || "学员",
-      }));
+      const rosterRows = buildRosterRows(workbench, isTraining, records);
       const attendancePresent = rosterRows.filter((item) => item.present).length;
       const joinedNames = rosterRows
         .filter((item) => item.present)
@@ -305,10 +298,35 @@ Page({
         name: item.name,
         status: item.status,
         note: item.note,
+        previousStatus: item.initialStatus,
       })));
       this.setData({ attendanceSaving: false });
-    } catch {
+    } catch (error) {
+      // 家长请假冲突与点名页同一套处理：重拉名单、展示冲突学员、核对后重新提交（REQ-ATT-002）。
+      if (isAttendanceLeaveConflictError(error)) {
+        await this.refreshAttendanceAfterLeaveConflict(nextRows);
+        return;
+      }
       this.setData({ ...attendanceSummary(previousRows), rosterRows: previousRows, attendanceSaving: false, attendanceError: "出勤保存失败，请重试" });
+    }
+  },
+  async refreshAttendanceAfterLeaveConflict(attempted: Array<{ studentId: string; status: string; previousStatus?: string }>) {
+    try {
+      const workbench = await getCoachWorkbench(this.data.eventId);
+      const conflicts = resolveAttendanceLeaveConflicts(workbench.roster, attempted);
+      const records = new Map((workbench.trainingRecords ?? []).map(record => [record.studentId, record]));
+      const rosterRows = buildRosterRows(workbench, this.data.isTraining, records);
+      this.setData({
+        rosterRows,
+        rosterCount: rosterRows.length,
+        hasRoster: rosterRows.length > 0,
+        ...attendanceSummary(rosterRows),
+        attendanceSaving: false,
+        attendanceNeedsRefresh: false,
+        attendanceError: attendanceLeaveConflictMessage(conflicts),
+      });
+    } catch {
+      this.setData({ attendanceSaving: false, attendanceNeedsRefresh: true, attendanceError: "名单已变化且刷新失败，请刷新核对后重试。" });
     }
   },
   retry() {
@@ -398,6 +416,18 @@ function routeForAction(action: WorkbenchAction, eventId: string, _templateId: s
     change: `/pages/coach/event-change/index?id=${eventId}`,
   };
   return routes[action];
+}
+
+function buildRosterRows(workbench: CoachWorkbench, isTraining: boolean, records: Map<string, TrainingRecord>): RosterRow[] {
+  return workbench.roster.map((item) => ({
+    ...item,
+    record: records.get(item.studentId),
+    statusLabel: (isTraining ? records.get(item.studentId)?.counted : isPresentStatus(item.status)) ? "已到" : "未到",
+    present: isTraining ? records.get(item.studentId)?.counted === true : isPresentStatus(item.status),
+    initial: (item.name || "学").slice(0, 1),
+    initialStatus: item.status,
+    displayName: item.name || "学员",
+  }));
 }
 
 function isPresentStatus(value: string) {
