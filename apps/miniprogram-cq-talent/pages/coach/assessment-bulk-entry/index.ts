@@ -7,6 +7,8 @@ import type { AssessmentCourse, AssessmentForm, CoachAssessmentEntries, CoachAss
 
 type AssessmentField = AssessmentForm["fields"][number];
 type DraftValues = Record<string, Record<string, string>>;
+// assessedAt 提交快照：同一学员同一笔提交（含失败重试）复用同一测评发生时间（REQ-ASM-002）
+type AssessedAtSnapshot = { assessedAt: string; signature: string };
 
 type MetricView = {
   fieldId: string;
@@ -116,6 +118,9 @@ Page<PageData>({
     historyVisible: false,
     courseSelectionRequired:false, courses:[],courseIds:{},savedCourseIds:{},
   },
+
+  // 非渲染实例状态：学员 → 待提交 assessedAt 快照（见 resolveAssessedAtSnapshot）
+  assessmentAssessedAt: undefined as Record<string, AssessedAtSnapshot> | undefined,
 
   onLoad(query?: { taskId?: string; templateId?: string; projectId?: string; projectIds?: string; title?: string }) {
     const title = query?.title ? decodeURIComponent(query.title) : "能力评估";
@@ -354,15 +359,24 @@ Page<PageData>({
           this.setData({ studentStates: { ...this.data.studentStates, [row.studentId]: {
             revision: saved.revision, publishedRevision: saved.publications[saved.publications.length - 1]?.revision ?? null,
           } } });
-        } else await submitCoachAssessment({
-          studentId: row.studentId,
-          assessmentTaskId: this.data.taskId,
-          templateId: this.data.templateId,
-          templateVersionId: this.data.templateVersionId,
-          rawResults,
-        });
+        } else {
+          const assessedAtStore = (this.assessmentAssessedAt ??= {});
+          const snapshotKey = `${this.data.taskId}:${row.studentId}`;
+          const assessedAt = resolveAssessedAtSnapshot(assessedAtStore, snapshotKey, rawResults);
+          await submitCoachAssessment({
+            studentId: row.studentId,
+            assessmentTaskId: this.data.taskId,
+            templateId: this.data.templateId,
+            templateVersionId: this.data.templateVersionId,
+            assessedAt,
+            rawResults,
+          });
+          // 提交成功后清掉快照：后续对同一学员的重新提交属于新的业务事实
+          delete assessedAtStore[snapshotKey];
+        }
         succeeded.push(row.studentId);
       } catch (error) {
+        // 失败保留快照，重试复用同一 assessedAt，让确定性幂等键保持不变
         this.setData({ saveError: error && typeof error === "object" && "message" in error ? String(error.message) : "保存失败，请稍后重试；本机草稿已保留。" });
         // Keep this student's draft so the coach can retry only the failed row.
       }
@@ -445,6 +459,18 @@ Page<PageData>({
     void this.load(this.data.taskId, this.data.templateId, this.data.projectId, this.data.taskTitle);
   },
 });
+
+// assessedAt 幂等快照（REQ-ASM-002 / A 线移交项）：
+// 同一学员同一内容的提交（含失败重试）复用同一 assessedAt，保证请求体稳定、
+// 请求层的确定性幂等键不变；仅内容变化后的重新提交才生成新的测评发生时间。
+function resolveAssessedAtSnapshot(store: Record<string, AssessedAtSnapshot>, key: string, rawResults: unknown[]) {
+  const signature = JSON.stringify(rawResults);
+  const snapshot = store[key];
+  if (snapshot && snapshot.signature === signature) return snapshot.assessedAt;
+  const assessedAt = new Date().toISOString();
+  store[key] = { assessedAt, signature };
+  return assessedAt;
+}
 
 function isUsableTask(task: CoachAssessmentTask | undefined, templateId: string): task is CoachAssessmentTask {
   return Boolean(task && task.templateId === templateId && (task.status === "in_progress" || task.status === "completed" || (task.status === "not_started" && task.workflow)));

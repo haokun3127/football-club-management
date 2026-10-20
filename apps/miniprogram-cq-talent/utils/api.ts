@@ -424,6 +424,10 @@ export async function submitCoachAssessment(input: {
   eventId?: string;
   templateId: string;
   templateVersionId?: string;
+  // REQ-ASM-002：assessedAt 是「测评发生时间」的业务事实。由调用方在用户发起本次提交时生成一次，
+  // 失败重试同一笔提交必须复用同一值——这里不再自造时间戳，否则请求体变化会让
+  // 请求层的确定性幂等键（method+path+body 派生）在重试时失效；修改内容重新提交时才重新生成。
+  assessedAt: string;
   rawResults: Array<{
     testItemId: string;
     metricId?: string;
@@ -455,7 +459,7 @@ export async function submitCoachAssessment(input: {
       ...(input.assessmentTaskId ? { assessmentTaskId: input.assessmentTaskId } : {}),
       templateId: input.templateId,
       templateVersionId: input.templateVersionId,
-      assessedAt: new Date().toISOString(),
+      assessedAt: input.assessedAt,
       ...(input.eventId ? { eventId: input.eventId } : {}),
       summary: "重庆天才小程序教练端评测录入",
       rawResults: input.rawResults,

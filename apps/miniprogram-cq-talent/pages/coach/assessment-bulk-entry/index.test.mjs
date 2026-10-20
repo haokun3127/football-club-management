@@ -113,6 +113,36 @@ describe("C12.1 team batch assessment entry", () => {
     expect(mocks.submitCoachAssessment).toHaveBeenCalledTimes(1);
   });
 
+  it("reuses one assessedAt per failed save retry and regenerates it after edits", async () => {
+    mocks.submitCoachAssessment
+      .mockRejectedValueOnce(new Error("network outcome unknown"))
+      .mockRejectedValueOnce(new Error("network outcome unknown"))
+      .mockResolvedValue({ assessment: { id: "saved" } });
+    const page = createPageInstance();
+    await page.onLoad({ taskId: "task-real", templateId: "template-real", projectId: "fitness", title: "体能综合测评" });
+    page.onRawInput({ currentTarget: { dataset: { studentId: "student-1", fieldId: "speed" } }, detail: { value: "4.92" } });
+
+    let tick = 0;
+    const stamps = vi.spyOn(Date.prototype, "toISOString").mockImplementation(() => `2026-10-21T08:${String(tick++).padStart(2, "0")}:00.000Z`);
+    try {
+      // 同一笔提交失败重试两次后成功：assessedAt（以及请求体、幂等键）必须保持不变
+      await page.saveProject();
+      await page.saveProject();
+      await page.saveProject();
+      let assessedAt = mocks.submitCoachAssessment.mock.calls.map((call) => call[0].assessedAt);
+      expect(assessedAt).toEqual(["2026-10-21T08:00:00.000Z", "2026-10-21T08:00:00.000Z", "2026-10-21T08:00:00.000Z"]);
+
+      // 修改成绩后重新提交：属于新的业务事实，assessedAt 重新生成
+      page.onRawInput({ currentTarget: { dataset: { studentId: "student-1", fieldId: "speed" } }, detail: { value: "4.95" } });
+      await page.saveProject();
+      assessedAt = mocks.submitCoachAssessment.mock.calls.map((call) => call[0].assessedAt);
+      expect(assessedAt).toHaveLength(4);
+      expect(assessedAt[3]).not.toBe(assessedAt[0]);
+    } finally {
+      stamps.mockRestore();
+    }
+  });
+
   it("hydrates saved server values when the project is opened again", async () => {
     mocks.getCoachAssessmentEntries.mockResolvedValueOnce({
       savedValuesByStudent: { "student-1": { "item-speed": { kind: "duration_seconds", seconds: 4.92 } } },

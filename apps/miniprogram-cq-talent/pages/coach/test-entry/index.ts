@@ -6,6 +6,8 @@ import type { AssessmentForm, CoachWorkbench, LoadState } from "../../../utils/t
 
 type AssessmentField = AssessmentForm["fields"][number];
 type RosterStudent = CoachWorkbench["roster"][number];
+// assessedAt 提交快照：同一学员同一笔提交（含失败重试）复用同一测评发生时间（REQ-ASM-002）
+type AssessedAtSnapshot = { assessedAt: string; signature: string };
 type GroupView = { id: string; label: string; className: string };
 type MetricCell = {
   testItemId: string;
@@ -122,6 +124,9 @@ Page<PageData>({
     draftExitInProgress: false,
     loadToken: 0,
   },
+
+  // 非渲染实例状态：学员 → 待提交 assessedAt 快照（见 resolveAssessedAtSnapshot）
+  assessmentAssessedAt: undefined as Record<string, AssessedAtSnapshot> | undefined,
 
   onLoad(query?: Record<string, string | undefined>) {
     return this.load(query?.eventId || "");
@@ -451,6 +456,7 @@ Page<PageData>({
     }
 
     this.setData({ saving: true, submitClass: "c12-submit c12-submit--disabled", submitLabel: "正在提交", submitMessage: "正在确认提交结果" });
+    const assessedAtStore = (this.assessmentAssessedAt ??= {});
     const succeeded: string[] = [];
     const unconfirmed: string[] = [];
     for (const student of recordedStudents) {
@@ -460,16 +466,22 @@ Page<PageData>({
         const value = entry.status === "recorded" ? buildMetricValue(field.valueKind, entry.rawValue, field.unit) : null;
         return value ? [{ testItemId: field.testItemId, metricId: field.metricId, value }] : [];
       });
+      const snapshotKey = `${this.data.eventId}:${student.studentId}`;
+      const assessedAt = resolveAssessedAtSnapshot(assessedAtStore, snapshotKey, rawResults);
       try {
         await submitCoachAssessment({
           studentId: student.studentId,
           eventId: this.data.eventId,
           templateId: form.templateId,
           templateVersionId: form.templateVersionId,
+          assessedAt,
           rawResults,
         });
         succeeded.push(student.studentId);
+        // 提交成功后清掉快照：后续对同一学员的重新提交属于新的业务事实
+        delete assessedAtStore[snapshotKey];
       } catch {
+        // 失败保留快照，重试复用同一 assessedAt，让确定性幂等键保持不变
         unconfirmed.push(student.studentId);
       }
     }
@@ -488,6 +500,18 @@ Page<PageData>({
     this.refreshDraftView();
   },
 });
+
+// assessedAt 幂等快照（REQ-ASM-002 / A 线移交项）：
+// 同一学员同一内容的提交（含失败重试）复用同一 assessedAt，保证请求体稳定、
+// 请求层的确定性幂等键不变；仅内容变化后的重新提交才生成新的测评发生时间。
+function resolveAssessedAtSnapshot(store: Record<string, AssessedAtSnapshot>, key: string, rawResults: unknown[]) {
+  const signature = JSON.stringify(rawResults);
+  const snapshot = store[key];
+  if (snapshot && snapshot.signature === signature) return snapshot.assessedAt;
+  const assessedAt = new Date().toISOString();
+  store[key] = { assessedAt, signature };
+  return assessedAt;
+}
 
 function validDraftEntries(draft: AssessmentDraftMap, roster: CoachWorkbench["roster"], fields: AssessmentField[]) {
   const studentIds = new Set(roster.map((student) => student.studentId));

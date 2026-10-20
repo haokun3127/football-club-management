@@ -290,7 +290,7 @@ describe("coach lesson confirmation ledger normalization", () => {
 });
 
 describe("coach assessment submission boundary", () => {
-  it("sends the BFF-owned actor-free assessment body and treats 200 as unconfirmed", async () => {
+  it("sends the caller-owned assessedAt and BFF-owned actor-free body, treating 200 as unconfirmed", async () => {
     const originalRequest = globalThis.wx.request;
     let received;
     globalThis.wx.request = ({ data, success }) => {
@@ -303,12 +303,14 @@ describe("coach assessment submission boundary", () => {
         studentId: "student-1",
         templateId: "template-real",
         templateVersionId: "version-real",
+        assessedAt: "2026-10-21T08:00:00.000Z",
         rawResults: [{ testItemId: "item-real", metricId: "metric-real", value: { kind: "score_0_100", score: 80 } }],
       })).rejects.toMatchObject({ code: "unexpected_status", statusCode: 200 });
       expect(received).toEqual(expect.objectContaining({
         studentId: "student-1",
         templateId: "template-real",
         templateVersionId: "version-real",
+        assessedAt: "2026-10-21T08:00:00.000Z",
         rawResults: [{ testItemId: "item-real", metricId: "metric-real", value: { kind: "score_0_100", score: 80 } }],
       }));
       expect(received).not.toHaveProperty("assessedByCoachId");
@@ -316,6 +318,45 @@ describe("coach assessment submission boundary", () => {
     } finally {
       globalThis.wx.request = originalRequest;
     }
+  });
+
+  it("reuses the caller-supplied assessedAt verbatim so a failed retry keeps an identical body", async () => {
+    const originalRequest = globalThis.wx.request;
+    const bodies = [];
+    globalThis.wx.request = ({ data, success }) => {
+      bodies.push(data);
+      success({ statusCode: 200, data: {} });
+    };
+
+    try {
+      const input = {
+        studentId: "student-1",
+        templateId: "template-real",
+        templateVersionId: "version-real",
+        assessedAt: "2026-10-21T08:00:00.000Z",
+        rawResults: [{ testItemId: "item-real", metricId: "metric-real", value: { kind: "score_0_100", score: 80 } }],
+      };
+      // 200 被视为未确认（expectedStatus 201），两次调用等价于失败后重试同一笔提交
+      await expect(submitCoachAssessment(input)).rejects.toMatchObject({ code: "unexpected_status" });
+      await expect(submitCoachAssessment(input)).rejects.toMatchObject({ code: "unexpected_status" });
+      expect(bodies).toHaveLength(2);
+      expect(bodies[0]).toEqual(bodies[1]);
+      expect(bodies[0].assessedAt).toBe("2026-10-21T08:00:00.000Z");
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
+
+  it("keeps the api layer free of an internally generated assessment timestamp", async () => {
+    const { readFileSync } = await import("node:fs");
+    const controller = readFileSync(new URL("./api.ts", import.meta.url), "utf8");
+    const fnStart = controller.indexOf("export async function submitCoachAssessment");
+    const fnEnd = controller.indexOf("function requireContext");
+    const fnBody = controller.slice(fnStart, fnEnd);
+    expect(fnStart).toBeGreaterThan(-1);
+    expect(fnEnd).toBeGreaterThan(fnStart);
+    // assessedAt 只能来自调用方；api 层自造时间戳会让 body 每次变化、幂等键失效
+    expect(fnBody).not.toContain("new Date().toISOString()");
   });
 });
 

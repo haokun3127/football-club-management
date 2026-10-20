@@ -186,6 +186,36 @@ describe("coach project score entry", () => {
     expect(page.data.submitMessage).not.toContain("已提交 2");
   });
 
+  it("reuses one assessedAt across failed retries and regenerates it only after content changes", async () => {
+    mocks.submitCoachAssessment
+      .mockRejectedValueOnce(new Error("network outcome unknown"))
+      .mockRejectedValueOnce(new Error("network outcome unknown"))
+      .mockResolvedValue({ assessment: { id: "assessment-student-1" } });
+    const page = createPageInstance();
+    await page.load("event-assessment-1");
+    page.onValueInput({ currentTarget: { dataset: { studentId: "student-1" } }, detail: { value: "80" } });
+
+    let tick = 0;
+    const stamps = vi.spyOn(Date.prototype, "toISOString").mockImplementation(() => `2026-10-21T08:${String(tick++).padStart(2, "0")}:00.000Z`);
+    try {
+      // 同一笔提交失败重试两次后成功：assessedAt（以及请求体、幂等键）必须保持不变
+      await page.submitAssessment();
+      await page.submitAssessment();
+      await page.submitAssessment();
+      let assessedAt = mocks.submitCoachAssessment.mock.calls.map((call) => call[0].assessedAt);
+      expect(assessedAt).toEqual(["2026-10-21T08:00:00.000Z", "2026-10-21T08:00:00.000Z", "2026-10-21T08:00:00.000Z"]);
+
+      // 修改内容后重新提交：属于新的业务事实，assessedAt 重新生成
+      page.onValueInput({ currentTarget: { dataset: { studentId: "student-1" } }, detail: { value: "82" } });
+      await page.submitAssessment();
+      assessedAt = mocks.submitCoachAssessment.mock.calls.map((call) => call[0].assessedAt);
+      expect(assessedAt).toHaveLength(4);
+      expect(assessedAt[3]).not.toBe(assessedAt[0]);
+    } finally {
+      stamps.mockRestore();
+    }
+  });
+
   it("counts missing entries as real draft progress without submitting them", async () => {
     const page = createPageInstance();
     await page.load("event-assessment-1");
