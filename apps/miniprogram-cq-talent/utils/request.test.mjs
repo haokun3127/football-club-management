@@ -395,4 +395,50 @@ describe("request 401 session race", () => {
       clearSession();
     }
   });
+
+  it("carries the current page as an encoded redirect parameter when navigating to login", async () => {
+    clearSession();
+    installSession("token-a");
+    globalThis.getCurrentPages = () => [
+      { route: "pages/coach/event", options: { eventId: "event-1" } },
+    ];
+    const relaunches = [];
+    globalThis.wx.request = ({ success }) => success({
+      statusCode: 401,
+      data: { error: { code: "authentication_required", message: "Session expired" } },
+    });
+    globalThis.wx.reLaunch = (options) => { relaunches.push(options.url); };
+
+    try {
+      await expect(request({ path: "/coach/events" })).rejects.toMatchObject({ code: "authentication_required" });
+      expect(relaunches).toEqual([
+        `/pages/login/index?redirect=${encodeURIComponent("/pages/coach/event?eventId=event-1")}`,
+      ]);
+    } finally {
+      delete globalThis.getCurrentPages;
+      globalThis.wx.request = originalRequest;
+      clearSession();
+    }
+  });
+
+  it("omits the redirect parameter when the current page is the login page itself", async () => {
+    clearSession();
+    installSession("token-a");
+    globalThis.getCurrentPages = () => [{ route: "pages/login/index" }];
+    const relaunches = [];
+    globalThis.wx.request = ({ success }) => success({
+      statusCode: 401,
+      data: { error: { code: "authentication_required", message: "Session expired" } },
+    });
+    globalThis.wx.reLaunch = (options) => { relaunches.push(options.url); };
+
+    try {
+      await expect(request({ path: "/coach/events" })).rejects.toMatchObject({ code: "authentication_required" });
+      expect(relaunches).toEqual(["/pages/login/index"]);
+    } finally {
+      delete globalThis.getCurrentPages;
+      globalThis.wx.request = originalRequest;
+      clearSession();
+    }
+  });
 });

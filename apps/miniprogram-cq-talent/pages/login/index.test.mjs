@@ -52,6 +52,7 @@ describe("login page", () => {
     ));
     mocks.switchActiveRole.mockReset();
     mocks.routeHome.mockReset();
+    globalThis.wx.reLaunch.mockReset();
     globalThis.wx.login.mockReset().mockImplementation(({ success }) => success({ code: "wx-code" }));
   });
 
@@ -81,6 +82,25 @@ describe("login page", () => {
       availableRoles: ["parent"],
       profile: { userId: "user-parent", displayName: "Parent" },
       children,
+      capabilities: {},
+    };
+  }
+
+  function authenticatedCoach() {
+    return {
+      clubId: "club-chongqing-talent",
+      client: { id: "client-cq-talent" },
+      status: "authenticated",
+      session: {
+        token: "session-token",
+        expiresInSeconds: 3600,
+        expiresAt: "2099-01-01T00:00:00.000Z",
+        activeRole: "coach",
+      },
+      role: "coach",
+      availableRoles: ["coach"],
+      profile: { userId: "user-coach", displayName: "Coach" },
+      children: [],
       capabilities: {},
     };
   }
@@ -144,6 +164,36 @@ describe("login page", () => {
     expect(mocks.persistAuthenticatedSession).toHaveBeenCalledTimes(1);
     expect(mocks.routeHome).toHaveBeenCalledTimes(1);
     expect(globalThis.wx.login).not.toHaveBeenCalled();
+  });
+
+  it("returns to the redirected page after re-login when the role is compatible", async () => {
+    mocks.wechatLogin.mockResolvedValue(authenticatedCoach());
+    const page = createPageInstance();
+    page.onLoad({ redirect: encodeURIComponent("/pages/coach/schedule/index?teamId=team-1") });
+
+    page.onPhoneAuthorizationTap();
+    await page.onGetPhoneNumber({ detail: { code: "phone-code" } });
+
+    expect(globalThis.wx.reLaunch).toHaveBeenCalledWith({ url: "/pages/coach/schedule/index?teamId=team-1" });
+    expect(mocks.routeHome).not.toHaveBeenCalled();
+  });
+
+  it("falls back to the role home when the redirect target belongs to another role", async () => {
+    mocks.wechatLogin.mockResolvedValue(authenticatedParent());
+    const page = createPageInstance();
+    page.onLoad({ redirect: encodeURIComponent("/pages/coach/schedule/index") });
+
+    page.onPhoneAuthorizationTap();
+    await page.onGetPhoneNumber({ detail: { code: "phone-code" } });
+
+    expect(globalThis.wx.reLaunch).not.toHaveBeenCalled();
+    expect(mocks.routeHome).toHaveBeenCalledWith("parent");
+  });
+
+  it("ignores redirect targets that are not inner pages", () => {
+    const page = createPageInstance();
+    page.onLoad({ redirect: encodeURIComponent("https://example.example/not-a-page") });
+    expect(page.redirectTarget).toBe("");
   });
 
   it("waits for a dual-role choice before persisting or routing, then uses the pending token once", async () => {

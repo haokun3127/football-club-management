@@ -28,8 +28,11 @@ Page({
   phoneAuthorizationTimeoutId: undefined as number | undefined,
   pendingRoleLogin: null as LoginResult | null,
   roleSelectionInProgress: false,
+  redirectTarget: "" as string,
   onLoad(query?: Record<string, string | undefined>) {
     const code = query?.code ? decodeURIComponent(query.code) : "";
+    const redirect = query?.redirect ? decodeURIComponent(query.redirect) : "";
+    this.redirectTarget = isRedirectTarget(redirect) ? redirect : "";
     // Keep the G2 top navigation envelope at 88px.
     this.setData({ wxLoginCode: code, navTop: 88 });
     if (!code) this.refreshWechatCode();
@@ -177,9 +180,25 @@ Page({
       this.setData({ state: "error", errorType: "login_rejected", message: "身份匹配失败，请稍后重试。" });
       return;
     }
+    if (this.redirectTarget && canRedirectToRole(this.redirectTarget, session.role)) {
+      // A forced re-login keeps the user's place: return to the page that
+      // triggered the 401 instead of dropping them onto the role home.
+      wx.reLaunch({ url: this.redirectTarget });
+      return;
+    }
     routeHome(session.role);
   },
   backToLaunch() {
     wx.reLaunch({ url: "/pages/launch/index" });
   },
 });
+
+function isRedirectTarget(value: string): boolean {
+  return value.startsWith("/pages/") && !value.startsWith("/pages/login/") && !value.startsWith("/pages/launch/");
+}
+
+function canRedirectToRole(target: string, role: AppRole): boolean {
+  if (target.startsWith("/pages/coach/")) return role === "coach";
+  if (target.startsWith("/pages/parent/")) return role === "parent";
+  return true; // Shared pages accept either role.
+}

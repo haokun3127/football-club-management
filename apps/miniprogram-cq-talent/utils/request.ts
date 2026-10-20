@@ -207,7 +207,32 @@ function handleAuthFailure(sessionAtRequest: SessionState | null, tokenSent: str
   if (tokenSent !== undefined) lastAuthFailureHandledFor = tokenSent;
 
   clearSession();
-  wx.reLaunch({ url: "/pages/login/index" });
+  wx.reLaunch({ url: buildLoginUrl() });
+}
+
+// Keeps the user's place across a forced re-login: the login page receives
+// the current page (route + query) as an encoded redirect parameter and sends
+// the user back once a compatible session is re-established.
+function buildLoginUrl(): string {
+  const currentPath = currentPagePath();
+  if (!currentPath) return "/pages/login/index";
+  return `/pages/login/index?redirect=${encodeURIComponent(currentPath)}`;
+}
+
+function currentPagePath(): string | null {
+  try {
+    if (typeof getCurrentPages !== "function") return null;
+    const pages = getCurrentPages() as Array<{ route?: string; options?: Record<string, string | undefined> }>;
+    const page = pages[pages.length - 1];
+    const route = page?.route;
+    if (!route || route === "pages/login/index" || route === "pages/launch/index") return null;
+    const query = Object.entries(page?.options ?? {})
+      .map(([key, value]) => `${key}=${value ?? ""}`)
+      .join("&");
+    return `/${route}${query ? `?${query}` : ""}`;
+  } catch {
+    return null;
+  }
 }
 
 function isSameSession(left: SessionState | null, right: SessionState | null): boolean {
