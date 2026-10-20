@@ -71,6 +71,12 @@ describe("parent growth training history", () => {
     expect(template).toContain('<view class="p4-card__title">成长足迹 🏆</view><view class="p4-card__link" bindtap="openMilestones">查看全部 ›</view>');
   });
 
+  it("labels the peer-average preview outline as a statistical reference, not a standard (REQ-PAR-004)", () => {
+    expect(template).toContain('wx:if="{{radarPreview.peerPath}}"');
+    expect(template).toContain("灰色轮廓为同队测评统计均值，仅供参考");
+    expect(template).not.toContain("同龄标准");
+  });
+
   it("opens the exact team evaluation for the displayed child", () => {
     const page = createPageInstance({ activeStudentId: "student-1" }); page.openEvaluation({ currentTarget: { dataset: { team: "team-1" } } });
     expect(mocks.openPage).toHaveBeenCalledWith("/pages/shared/student-evaluation/index?student=student-1&team=team-1");

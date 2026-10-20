@@ -36,7 +36,7 @@
           <view class="p4-radar-preview__dot"></view>
         </view>
         <view wx:else class="p4-card__empty">指标正在积累</view>
-        <view class="p4-ability__foot">点击能力查看明细 · 更新于 {{updatedAtLabel}}</view>
+        <view class="p4-ability__foot">点击能力查看明细 · 更新于 {{updatedAtLabel}}<block wx:if="{{radarPreview.peerPath}}"> · 灰色轮廓为同队测评统计均值，仅供参考</block></view>
       </view>
     </view>
 
