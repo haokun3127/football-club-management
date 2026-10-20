@@ -191,6 +191,9 @@ export function buildOpenApiDocument() {
       "/clubs/{clubId}/app-clients/{clientId}/students/{studentId}/training-records/{eventId}": {
         patch: operation("PATCH", "training-record-correction", { params: trainingRecordSchemas.correctionParams, body: trainingRecordSchemas.correction, response: { 200: trainingRecordSchemas.correctionResponse } }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/students/{studentId}/training-records/{eventId}/leave": {
+        post: operation("POST", "training-record-leave", { params: trainingRecordSchemas.correctionParams, body: trainingRecordSchemas.leave, response: { 200: trainingRecordSchemas.leaveResponse } }),
+      },
       "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/publications": { post: operation("POST", "assessment-publications", workflowSchemas.publish) },
       "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/workflow": { get: operation("GET", "assessment-workflow", workflowSchemas.summary) },
       "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/students/{studentId}/entries": { put: operation("PUT", "assessment-entries", workflowSchemas.save) },

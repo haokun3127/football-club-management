@@ -1,6 +1,6 @@
 import type { CalendarEvent, EventParticipant } from "@football-club/domain";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { correctTrainingRecord, reconcileTrainingRecord, TrainingRecordConflict } from "../application/training-records.js";
+import { correctTrainingRecord, reconcileTrainingRecord, requestTrainingLeave, revokeTrainingLeave, TrainingRecordConflict, type TrainingRecord } from "../application/training-records.js";
 import { trainingRecordSchemas } from "../http/training-record-schemas.js";
 import type { RouteContext } from "./context.js";
 
@@ -64,6 +64,51 @@ export async function registerTrainingRecordRoutes(app: FastifyInstance, context
     if (!current && !canInitialize) return context.sendError(reply, 409, "training_record_not_ready", "Training has not ended");
     try {
       return { record: correctTrainingRecord(context.store.trainingRecords, { clubId: request.params.clubId, eventId: event.id, studentId: participant.studentId }, { ...request.body, actorUserId: scope.auth.user.id, actorDisplayName: scope.auth.user.displayName, ...(!current && canInitialize ? { initialOccurredAt: event.timeRange.startsAt } : {}) }) };
+    } catch (error) {
+      if (error instanceof TrainingRecordConflict) return reply.code(409).send({ error: { code: "training_record_conflict", message: error.message }, current: error.current });
+      throw error;
+    }
+  });
+
+  // 家长请假链路（REQ-ATT-001 / REQ-PAR-002）：请假直接生效、无需审批。
+  // 记录写入复用 correction 的修订/留痕/409 机制（见 application/training-records.ts），
+  // 不新增第三条销课写入路径；参与状态同步为 leave_requested，供教练名单与自动销课识别。
+  app.post<{ Params: Params; Body: { action: "request" | "revoke"; expectedRevision: number; reason?: string } }>(`${base}/:eventId/leave`, {
+    schema: { params: trainingRecordSchemas.correctionParams, body: trainingRecordSchemas.leave, response: { 200: trainingRecordSchemas.leaveResponse } },
+  }, async (request, reply) => {
+    const scope = await scopedEvents(context, request, reply);
+    if (!scope) return reply;
+    if (scope.auth.appClientSession?.activeRole !== "parent") {
+      return context.sendError(reply, 403, "forbidden", "Leave is submitted by the guardian of the student");
+    }
+    const event = scope.events.find((item) => item.id === request.params.eventId);
+    if (!event) return context.sendError(reply, 403, "forbidden", "Training event is not accessible");
+    if (event.status === "cancelled") return context.sendError(reply, 409, "cancelled_training", "Cancelled training does not count lessons; leave is not needed");
+    const participant = event.participants.find((item) => item.studentId === request.params.studentId)!;
+    const onLeave = ["leave_requested", "excused"].includes(participant.status ?? "");
+    const scopeKeys = { clubId: request.params.clubId, eventId: event.id, studentId: participant.studentId };
+    const actor = { actorUserId: scope.auth.user.id, actorDisplayName: scope.auth.user.displayName };
+    try {
+      if (request.body.action === "request") {
+        const current = context.store.trainingRecords.get(scopeKeys.clubId, scopeKeys.eventId, scopeKeys.studentId);
+        // 重复提交：请假已生效且记录已是不销课，直接返回当前事实，不追加修订
+        if (onLeave && current && !current.counted) {
+          return { record: current, participant: { studentId: scopeKeys.studentId, status: participant.status ?? "leave_requested" } };
+        }
+        const record = requestTrainingLeave(context.store.trainingRecords, scopeKeys, {
+          expectedRevision: request.body.expectedRevision, reason: request.body.reason, ...actor, initialOccurredAt: event.timeRange.startsAt,
+        });
+        context.store.recordEventParticipants(scopeKeys.clubId, scopeKeys.eventId, [{ studentId: scopeKeys.studentId, status: "leave_requested" }]);
+        return { record, participant: { studentId: scopeKeys.studentId, status: "leave_requested" } };
+      }
+      if (!onLeave) return context.sendError(reply, 409, "leave_not_active", "No active leave to withdraw");
+      const current = context.store.trainingRecords.get(scopeKeys.clubId, scopeKeys.eventId, scopeKeys.studentId);
+      let record: TrainingRecord | null = null;
+      // 记录已是销课（或尚无记录）时无需改动事实，仅恢复参与状态
+      if (!current || current.counted) record = current;
+      else record = revokeTrainingLeave(context.store.trainingRecords, scopeKeys, event, { expectedRevision: request.body.expectedRevision, reason: request.body.reason, ...actor });
+      context.store.recordEventParticipants(scopeKeys.clubId, scopeKeys.eventId, [{ studentId: scopeKeys.studentId, status: "confirmed" }]);
+      return { ...(record ? { record } : {}), participant: { studentId: scopeKeys.studentId, status: "confirmed" } };
     } catch (error) {
       if (error instanceof TrainingRecordConflict) return reply.code(409).send({ error: { code: "training_record_conflict", message: error.message }, current: error.current });
       throw error;

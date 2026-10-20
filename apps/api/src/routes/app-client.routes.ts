@@ -2936,7 +2936,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       eventId: string;
     };
     Body: {
-      participants: Parameters<RouteContext["store"]["recordEventParticipants"]>[2];
+      participants: Array<Parameters<RouteContext["store"]["recordEventParticipants"]>[2][number] & { previousStatus?: string }>;
     };
   }>(
     "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/attendance",
@@ -2956,11 +2956,32 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return reply;
       }
 
+      // 覆盖保护：家长提交的请假（leave_requested/excused）不得被整名单点名静默覆盖
+      //（10-18 审计 §3.2 / REQ-UX-001）。点名如需覆盖，必须携带 previousStatus 核对原状态。
+      const storedParticipants = context.store.listEventParticipants(request.params.clubId)
+        .filter((participant) => participant.eventId === request.params.eventId);
+      const leaveConflicts = request.body.participants
+        .flatMap((incoming) => {
+          const stored = storedParticipants.find((participant) => participant.studentId === incoming.studentId);
+          if (!stored
+            || !incoming.status
+            || !["leave_requested", "excused"].includes(String(stored.status))
+            || ["leave_requested", "excused"].includes(incoming.status)
+            || incoming.previousStatus === stored.status) return [];
+          return [{ studentId: incoming.studentId, status: String(stored.status) }];
+        });
+      if (leaveConflicts.length) {
+        return reply.code(409).send({
+          error: { code: "attendance_leave_conflict", message: "部分学员有家长提交的请假，请核对最新名单后重试" },
+          conflicts: leaveConflicts,
+        });
+      }
+
       try {
         const participants = await context.store.recordEventParticipants(
           request.params.clubId,
           request.params.eventId,
-          request.body.participants,
+          request.body.participants.map(({ previousStatus: _previousStatus, ...participant }) => participant),
         );
         return {
           clubId: request.params.clubId,

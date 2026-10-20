@@ -20,4 +20,13 @@ export const trainingRecordSchemas = {
   correction: { type: "object", additionalProperties: false, required: ["expectedRevision", "counted", "reason"], properties: {
     expectedRevision: { type: "integer", minimum: 0 }, counted: { type: "boolean" }, reason: { type: "string", minLength: 1, maxLength: 500 },
   } },
+  leave: { type: "object", additionalProperties: false, required: ["action", "expectedRevision"], properties: {
+    action: { enum: ["request", "revoke"] },
+    expectedRevision: { type: "integer", minimum: 0 },
+    reason: { type: "string", maxLength: 500 },
+  } },
+  leaveResponse: { type: "object", additionalProperties: false, required: ["participant"], properties: {
+    record,
+    participant: { type: "object", additionalProperties: false, required: ["studentId", "status"], properties: { studentId: id, status: { type: "string" } } },
+  } },
 };

@@ -1068,6 +1068,7 @@ export const schemas = {
               studentId: { type: "string", minLength: 1 },
               status: { type: "string", enum: ["invited", "confirmed", "present", "absent", "late", "leave_requested", "excused"] },
               note: { type: "string" },
+              previousStatus: { type: "string", enum: ["invited", "confirmed", "present", "absent", "late", "leave_requested", "excused"] },
             },
           },
         },
