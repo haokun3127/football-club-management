@@ -95,7 +95,7 @@ describe("parent metric detail", () => {
     expect(page.data.chartPoints).toEqual([]);
   });
 
-  it("shows peer comparison and coach comment only from real data", async () => {
+  it("shows the team average as a statistical reference without any standard badge", async () => {
     mocks.getParentGrowth.mockResolvedValue({
       radar: [{ metricId: "speed", label: "Speed", value: 80, maxValue: 100, peerAverage: 70 }],
     });
@@ -116,16 +116,17 @@ describe("parent metric detail", () => {
     await page.load();
 
     expect(page.data).toMatchObject({
-      peerBadgeLabel: "高于同龄均值 10",
-      peerBadgeTone: "success",
       peerMinePercent: 80,
       peerAveragePercent: 70,
       peerAverageLabel: "70分",
       coachCommentText: "传球视野开阔，继续保持。",
     });
+    // REQ-PAR-004：不得基于统计均值生成高/低/达标徽标
+    expect(page.data.peerBadgeLabel).toBeUndefined();
+    expect(page.data.peerBadgeTone).toBeUndefined();
   });
 
-  it("hides peer comparison and coach comment when no real data backs them", async () => {
+  it("hides the statistical reference and coach comment when no real data backs them", async () => {
     mocks.getParentMetricDetail.mockResolvedValue({
       metricId: "speed",
       label: "Speed",
@@ -138,7 +139,6 @@ describe("parent metric detail", () => {
 
     await page.load();
 
-    expect(page.data.peerBadgeLabel).toBe("");
     expect(page.data.peerAverageLabel).toBe("");
     expect(page.data.coachCommentText).toBe("");
   });
@@ -149,6 +149,25 @@ describe("parent metric detail", () => {
     expect(template).toContain("p6-nav__range");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("switchRange");
+  });
+
+  it("never presents the statistical average as an age standard (F-05 / REQ-PAR-004)", () => {
+    // 不得出现「同龄标准/应达标准」类措辞与基于均值的高/低徽标
+    expect(template).not.toContain("同龄");
+    expect(controller).not.toContain("同龄");
+    expect(template).not.toContain("应达");
+    expect(controller).not.toContain("应达");
+    expect(controller).not.toContain("peerBadge");
+    expect(controller).not.toContain("buildPeerView");
+    expect(stylesheet).not.toMatch(/\.mhero__badge--(success|warning|info)/);
+    // 均值必须以统计参考口径呈现
+    expect(template).toContain("同队参考值");
+    expect(template).toContain("统计均值");
+    expect(template).toContain("同队统计均值");
+    // 无经核定标准时个人历史为主体：趋势/变化记录排在统计参考之前
+    expect(template.indexOf("变化记录")).toBeGreaterThan(-1);
+    expect(template.indexOf("变化记录")).toBeLessThan(template.indexOf("同队参考值"));
+    expect(template.indexOf("能力趋势")).toBeLessThan(template.indexOf("同队参考值"));
   });
 
   it("anchors the title at the live Figma left origin", () => {

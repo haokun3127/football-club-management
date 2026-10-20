@@ -66,8 +66,6 @@ Page({
     chartSegments: [] as ChartSegment[],
     chartAreaPath: "",
     yTicks: [] as string[],
-    peerBadgeLabel: "",
-    peerBadgeTone: "info",
     peerMinePercent: 0,
     peerAveragePercent: 0,
     peerAverageLabel: "",
@@ -89,7 +87,8 @@ Page({
     this.setData({ state: "loading", message: "正在读取指标详情" });
     try {
       const detailPromise = getParentMetricDetail(this.data.studentId, this.data.metricId);
-      // 同龄均值来自成长汇总（雷达点带 peerAverage），取不到时降级隐藏对比模块
+      // 同队统计均值来自成长汇总（雷达点带 peerAverage），取不到时降级隐藏参考模块。
+      // REQ-PAR-004：该值是俱乐部指标记录的统计均值，不是经核定的年龄/队伍标准，不作达标判断。
       const growthPromise = getParentGrowth(this.data.studentId).catch(() => undefined);
       const detail = await detailPromise;
       const growth = await growthPromise;
@@ -118,7 +117,7 @@ Page({
         heroMaxLabel: latestValue === undefined ? "" : `/ ${maxValue}`,
         trendDelta: records[0]?.changeTone === "success" ? `+${records[0].changeLabel.replace(/[^0-9.]/g, "")}` : "",
         ...buildChart(detail, maxValue),
-        ...buildPeerView(latestValue, peerAverage, maxValue, detail.unit),
+        ...buildPeerReferenceView(latestValue, peerAverage, maxValue, detail.unit),
         coachCommentText: coachRecord?.note ?? "",
         coachCommentDate: coachRecord?.dateLabel ?? "",
       });
@@ -202,13 +201,12 @@ function trimTick(value: number) {
   return Number.isInteger(value) ? String(value) : value.toFixed(1);
 }
 
-function buildPeerView(latestValue: number | undefined, peerAverage: number | undefined, maxValue: number, unit?: string) {
-  const empty = { peerBadgeLabel: "", peerBadgeTone: "info", peerMinePercent: 0, peerAveragePercent: 0, peerAverageLabel: "" };
+// REQ-PAR-004 / DEC-19：统计均值只能作为统计参考口径呈现，不作培养标准解读，也不产生高/低徽标；
+// 页面当前没有经核定的年龄/队伍培养标准，个人历史才是详情主体。
+function buildPeerReferenceView(latestValue: number | undefined, peerAverage: number | undefined, maxValue: number, unit?: string) {
+  const empty = { peerMinePercent: 0, peerAveragePercent: 0, peerAverageLabel: "" };
   if (latestValue === undefined || peerAverage === undefined) return empty;
-  const delta = Number((latestValue - peerAverage).toFixed(1));
   return {
-    peerBadgeLabel: delta > 0 ? `高于同龄均值 ${delta}` : delta < 0 ? `低于同龄均值 ${Math.abs(delta)}` : "与同龄均值持平",
-    peerBadgeTone: delta > 0 ? "success" : delta < 0 ? "warning" : "info",
     peerMinePercent: Math.min(100, Math.round((latestValue / maxValue) * 100)),
     peerAveragePercent: Math.min(100, Math.round((peerAverage / maxValue) * 100)),
     peerAverageLabel: `${peerAverage}${unit || ""}`,

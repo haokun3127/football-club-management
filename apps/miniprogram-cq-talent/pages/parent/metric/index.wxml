@@ -21,8 +21,7 @@
       </view>
       <view class="mhero__divider"></view>
       <view class="mhero__foot">
-        <view wx:if="{{peerBadgeLabel}}" class="mhero__badge mhero__badge--{{peerBadgeTone}}">{{peerBadgeLabel}}</view>
-        <view wx:else class="mhero__badge">{{records.length}} 项记录</view>
+        <view class="mhero__badge">{{records.length}} 项记录</view>
         <view class="mhero__foot-text">{{latestDateLabel}} · 持续追踪中</view>
       </view>
     </view>
@@ -61,19 +60,20 @@
       </view>
     </view>
 
-    <!-- P6 PeerCompare（同龄均值有真实数据时展示） -->
-    <view wx:if="{{detail && peerAverageLabel}}" class="metric-card">
-      <view class="section-title">同队对比</view>
-      <view class="peer-row">
-        <view class="peer-row__label">我的孩子</view>
-        <view class="peer-row__bar"><view class="peer-row__fill peer-row__fill--mine" style="width:{{peerMinePercent}}%"></view></view>
-        <view class="peer-row__value">{{heroValue}}</view>
+    <!-- P6 个人历史（无经核定标准时以个人历史为主体，REQ-PAR-004） -->
+    <view wx:if="{{detail}}" class="metric-card">
+      <view class="section-heading"><view><view class="section-title">变化记录</view><view class="subtitle">按时间查看每次记录与变化</view></view><view class="record-count">{{records.length}} 次</view></view>
+      <view wx:if="{{records.length}}" class="trend-list">
+        <view wx:for="{{records}}" wx:key="id" class="trend-row">
+          <view class="trend-row__axis"><view class="trend-row__dot"></view><view class="trend-row__line"></view></view>
+          <view class="trend-row__content">
+            <view class="row"><view class="trend-row__value">{{item.valueLabel}}</view><status-chip label="{{item.changeLabel}}" tone="{{item.changeTone}}" compact="{{true}}" /></view>
+            <view class="trend-row__meta">{{item.dateLabel}} · {{item.source}}</view>
+            <view wx:if="{{item.note}}" class="trend-row__note">{{item.note}}</view>
+          </view>
+        </view>
       </view>
-      <view class="peer-row">
-        <view class="peer-row__label">同龄均值</view>
-        <view class="peer-row__bar"><view class="peer-row__fill peer-row__fill--peer" style="width:{{peerAveragePercent}}%"></view></view>
-        <view class="peer-row__value">{{peerAverageLabel}}</view>
-      </view>
+      <view wx:else class="subtitle">暂无可展示的趋势记录。</view>
     </view>
 
     <!-- P6 CoachComment（最新记录带评语时展示） -->
@@ -88,20 +88,20 @@
       </view>
     </view>
 
-    <!-- 变化记录 / source trace remain below designed primary cards -->
-    <view wx:if="{{detail}}" class="metric-card">
-      <view class="section-heading"><view><view class="section-title">变化记录</view><view class="subtitle">按时间查看每次记录与变化</view></view><view class="record-count">{{records.length}} 次</view></view>
-      <view wx:if="{{records.length}}" class="trend-list">
-        <view wx:for="{{records}}" wx:key="id" class="trend-row">
-          <view class="trend-row__axis"><view class="trend-row__dot"></view><view class="trend-row__line"></view></view>
-          <view class="trend-row__content">
-            <view class="row"><view class="trend-row__value">{{item.valueLabel}}</view><status-chip label="{{item.changeLabel}}" tone="{{item.changeTone}}" compact="{{true}}" /></view>
-            <view class="trend-row__meta">{{item.dateLabel}} · {{item.source}}</view>
-            <view wx:if="{{item.note}}" class="trend-row__note">{{item.note}}</view>
-          </view>
-        </view>
+    <!-- P6 同队参考（统计均值有真实数据时展示；仅为统计参考口径，REQ-PAR-004） -->
+    <view wx:if="{{detail && peerAverageLabel}}" class="metric-card">
+      <view class="section-title">同队参考值</view>
+      <view class="subtitle">同队测评记录的统计均值，仅供参考</view>
+      <view class="peer-row">
+        <view class="peer-row__label">我的孩子</view>
+        <view class="peer-row__bar"><view class="peer-row__fill peer-row__fill--mine" style="width:{{peerMinePercent}}%"></view></view>
+        <view class="peer-row__value">{{heroValue}}</view>
       </view>
-      <view wx:else class="subtitle">暂无可展示的趋势记录。</view>
+      <view class="peer-row">
+        <view class="peer-row__label">同队统计均值</view>
+        <view class="peer-row__bar"><view class="peer-row__fill peer-row__fill--peer" style="width:{{peerAveragePercent}}%"></view></view>
+        <view class="peer-row__value">{{peerAverageLabel}}</view>
+      </view>
     </view>
 
     <!-- 数据来源 -->

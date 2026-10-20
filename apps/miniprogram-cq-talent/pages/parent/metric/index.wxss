@@ -20,9 +20,6 @@
 .mhero__divider { height: 1rpx; background: rgba(255, 255, 255, 0.1); }
 .mhero__foot { display: flex; align-items: center; gap: 16rpx; }
 .mhero__badge { padding: 6rpx 16rpx; border-radius: 8rpx; background: #a80f1b; color: #ffffff; font-size: 22rpx; font-weight: 700; }
-.mhero__badge--success { background: #16a34a; }
-.mhero__badge--warning { background: #d97706; }
-.mhero__badge--info { background: #475569; }
 .mhero__foot-text { color: rgba(255, 255, 255, 0.6); font-size: 26rpx; }
 
 /* P6 TrendChart */
