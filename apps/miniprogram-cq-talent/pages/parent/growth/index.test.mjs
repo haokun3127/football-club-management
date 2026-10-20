@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
   getParentMetricDetail: vi.fn(),
   requireRole: vi.fn(),
   setCurrentStudentId: vi.fn(),
+  consumeGrowthStale: vi.fn(),
 }));
 
 vi.mock("../../../utils/api", () => ({
@@ -18,6 +19,7 @@ vi.mock("../../../utils/api", () => ({
   getParentMetricDetail: mocks.getParentMetricDetail,
 }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
+vi.mock("../../../utils/growth-invalidation", () => ({ consumeGrowthStale: mocks.consumeGrowthStale }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
 vi.mock("../../../utils/presentation", () => ({
   formatDateTime: () => "2026-08-10 10:00",
@@ -58,6 +60,7 @@ describe("parent growth training history", () => {
     mocks.getParentMetricDetail.mockReset();
     mocks.requireRole.mockReset().mockReturnValue({ role: "parent", currentStudentId: "student-1" });
     mocks.setCurrentStudentId.mockReset();
+    mocks.consumeGrowthStale.mockReset().mockReturnValue(false);
   });
 
   it("binds the training-history view action to its handler", () => {
@@ -123,6 +126,57 @@ describe("parent growth training history", () => {
       expect.objectContaining({ id: "timeline-ability", title: "训练内容评测已记录", state: "传接球 91 分" }),
     ]);
     expect(page.data.trainingBars).toHaveLength(8);
+  });
+
+  it("refreshes growth on return after a training-record correction marked the facts stale", async () => {
+    mocks.getParentChildren.mockResolvedValue([
+      { id: "student-1", name: "真实球员", teams: [], coachNames: [] },
+    ]);
+    mocks.getParentGrowth.mockResolvedValue({
+      radar: [
+        { metricId: "speed", label: "速度", value: 8, maxValue: 10 },
+        { metricId: "passing", label: "传球", value: 7, maxValue: 10 },
+        { metricId: "control", label: "控球", value: 9, maxValue: 10 },
+      ],
+      metricItems: [],
+      views: [{ id: "overview", name: "能力概览", metricIds: ["speed", "passing", "control"] }],
+    });
+    mocks.getParentMetricDetail.mockResolvedValue({ metricId: "speed", label: "速度", records: [], sourceEvents: [] });
+    const page = createPageInstance();
+
+    await page.load();
+    expect(mocks.getParentGrowth).toHaveBeenCalledTimes(1);
+
+    // 同一孩子、训练记录更正写入成功后打脏（F-06）
+    mocks.consumeGrowthStale.mockReturnValue(true);
+    await page.onShow();
+
+    expect(mocks.consumeGrowthStale).toHaveBeenCalledTimes(1);
+    expect(mocks.getParentGrowth).toHaveBeenCalledTimes(2);
+    expect(mocks.getParentGrowth).toHaveBeenLastCalledWith("student-1", expect.objectContaining({ name: "真实球员" }));
+  });
+
+  it("does not issue a duplicate growth request when returning without any fact change", async () => {
+    mocks.getParentChildren.mockResolvedValue([
+      { id: "student-1", name: "真实球员", teams: [], coachNames: [] },
+    ]);
+    mocks.getParentGrowth.mockResolvedValue({
+      radar: [
+        { metricId: "speed", label: "速度", value: 8, maxValue: 10 },
+        { metricId: "passing", label: "传球", value: 7, maxValue: 10 },
+        { metricId: "control", label: "控球", value: 9, maxValue: 10 },
+      ],
+      metricItems: [],
+      views: [{ id: "overview", name: "能力概览", metricIds: ["speed", "passing", "control"] }],
+    });
+    mocks.getParentMetricDetail.mockResolvedValue({ metricId: "speed", label: "速度", records: [], sourceEvents: [] });
+    const page = createPageInstance();
+
+    await page.load();
+    await page.onShow();
+
+    expect(mocks.consumeGrowthStale).toHaveBeenCalledTimes(1);
+    expect(mocks.getParentGrowth).toHaveBeenCalledTimes(1);
   });
 
   it("opens the milestones page from the footprint card", () => {

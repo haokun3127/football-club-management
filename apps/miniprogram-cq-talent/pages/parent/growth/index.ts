@@ -1,5 +1,6 @@
 import { getParentChildren, getParentGrowth, getParentMetricDetail } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { consumeGrowthStale } from "../../../utils/growth-invalidation";
 import { openPage } from "../../../utils/navigation";
 import { formatDateTime, formatTenure, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { setCurrentStudentId } from "../../../utils/store";
@@ -50,8 +51,10 @@ Page({
   onUnload() { growthRequestId += 1; },
   onShow() {
     const session = requireRole("parent");
-    if (!session || !this.data.activeStudentId || session.currentStudentId === this.data.activeStudentId) return;
-    return this.load();
+    if (!session || !this.data.activeStudentId) return;
+    // 孩子未变时仅对相关事实变更（如训练记录更正打脏）做失效刷新，不做无差别全量加载（F-06）
+    if (session.currentStudentId !== this.data.activeStudentId) return this.load();
+    if (consumeGrowthStale()) return this.load();
   },
   async load() {
     const session = requireRole("parent");

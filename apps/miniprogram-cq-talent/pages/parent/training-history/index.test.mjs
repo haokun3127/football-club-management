@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-const mocks = vi.hoisted(() => ({ children: vi.fn(), records: vi.fn(), correct: vi.fn(), session: vi.fn() }));
+const mocks = vi.hoisted(() => ({ children: vi.fn(), records: vi.fn(), correct: vi.fn(), session: vi.fn(), markGrowthStale: vi.fn() }));
 vi.mock("../../../utils/api", () => ({ getParentChildren: mocks.children }));
 vi.mock("../../../utils/training-records", () => ({ getTrainingRecords: mocks.records, correctTrainingRecord: mocks.correct }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.session }));
+vi.mock("../../../utils/growth-invalidation", () => ({ markGrowthStale: mocks.markGrowthStale }));
 vi.mock("../../../utils/presentation", () => ({ formatShortDate: () => "9月21日", formatDateTime: (s) => s, resolveMenuInset: () => 0, resolveNavInset: () => 0 }));
 let definition;
 globalThis.Page = (value) => { definition = value; };
@@ -42,5 +43,16 @@ describe("parent training facts and corrections", () => {
     await p.save(); expect(mocks.correct).not.toHaveBeenCalled();
     p.changeReason({ detail: { value: "未参加" } }); mocks.correct.mockRejectedValueOnce({ message: "网络中断" });
     await p.save(); expect(p.data.editing.eventId).toBe("event-2"); expect(p.data.reason).toBe("未参加"); expect(p.data.saving).toBe(false);
+  });
+  it("marks growth stale only after a correction is actually saved", async () => {
+    const p = page(); await p.load(); p.edit({ currentTarget: { dataset: { id: "event-2" } } });
+    p.changeReason({ detail: { value: "当天请假" } });
+    mocks.correct.mockRejectedValueOnce({ message: "网络中断" });
+    await p.save();
+    expect(mocks.markGrowthStale).not.toHaveBeenCalled();
+
+    mocks.correct.mockResolvedValueOnce({ record: { ...record, counted: false, revision: 2 } });
+    await p.save();
+    expect(mocks.markGrowthStale).toHaveBeenCalledTimes(1);
   });
 });

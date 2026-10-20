@@ -1,5 +1,6 @@
 import { getParentChildren } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { markGrowthStale } from "../../../utils/growth-invalidation";
 import { formatDateTime, formatShortDate, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { correctTrainingRecord, getTrainingRecords, type TrainingRecord } from "../../../utils/training-records";
 import type { LoadState } from "../../../utils/types";
@@ -59,6 +60,8 @@ Page({
     this.setData({ saving: true, saveError: "" });
     try {
       const response = await correctTrainingRecord(this.data.studentId, editing.eventId, { expectedRevision: editing.revision, counted: this.data.draftCounted, reason: this.data.reason.trim() });
+      // 更正写入成功后打脏成长数据，返回成长页时定向重拉（F-06）
+      markGrowthStale();
       const rows = this.data.rows.map((row: Row) => row.eventId === editing.eventId ? presentRow({ ...row, ...response.record }) : row);
       this.setData({ rows, total: rows.filter((row: Row) => row.counted).length, editing: null });
       wx.showToast({ title: "更正已保存", icon: "success" });
