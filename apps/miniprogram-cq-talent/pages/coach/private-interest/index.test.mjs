@@ -169,6 +169,37 @@ describe("coach private interest", () => {
     expect(reenteredCount).toBe(0);
   });
 
+  it("blocks editing and submitting while the initial read fails", async () => {
+    mocks.getCoachPreferences.mockRejectedValueOnce(new Error("network"));
+    const page = createPageInstance();
+    page.onLoad();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(page.data.interactive).toBe(false);
+    expect(page.data.loadFailed).toBe(true);
+    await page.toggleAccepting();
+    await page.toggleSlot({ currentTarget: { dataset: { key: "0-0" } } });
+    expect(mocks.saveCoachPreferences).not.toHaveBeenCalled();
+    expect(mocks.showToast).toHaveBeenCalled();
+  });
+
+  it("recovers to an editable state after retrying the read", async () => {
+    mocks.getCoachPreferences.mockRejectedValueOnce(new Error("network"));
+    const page = createPageInstance();
+    page.onLoad();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(page.data.loadFailed).toBe(true);
+
+    page.retryLoad();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(page.data.loadFailed).toBe(false);
+    expect(page.data.interactive).toBe(true);
+    await page.toggleSlot({ currentTarget: { dataset: { key: "5-0" } } });
+    expect(mocks.saveCoachPreferences).toHaveBeenCalledTimes(1);
+    expect(page.data.availabilityColumns[5].slots[0].selected).toBe(true);
+  });
+
   it("keeps disabled and pending feature states non-interactive", async () => {
     mocks.requireRole.mockReturnValueOnce(coachSession({ private_lessons: false }));
     const disabled = createPageInstance();

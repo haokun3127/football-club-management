@@ -26,6 +26,7 @@ interface PageData {
   feeMessage: string;
   saving: boolean;
   saveFailed: boolean;
+  loadFailed: boolean;
 }
 
 const WEEK_DAYS = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
@@ -70,8 +71,14 @@ Page<PageData>({
     feeMessage: "费用由俱乐部统一结算",
     saving: false,
     saveFailed: false,
+    loadFailed: false,
   },
   onLoad() {
+    const session = requireRole("coach");
+    if (!session) return;
+    void this.load(session.capabilities?.features?.private_lessons);
+  },
+  retryLoad() {
     const session = requireRole("coach");
     if (!session) return;
     void this.load(session.capabilities?.features?.private_lessons);
@@ -81,7 +88,8 @@ Page<PageData>({
       this.setData(featureOnly(feature));
       return;
     }
-    this.setData({ ...featureOnly(true), interactive: true });
+    // 读取成功前禁用编辑与提交，避免把未知默认值覆盖到已有设置（F-09）。
+    this.setData({ ...featureOnly(true), loadFailed: false });
     try {
       const preferences = await getCoachPreferences();
       // 首次未配置（本地无保存标记）时给设计稿默认；已明确保存为空则尊重空配置。
@@ -92,8 +100,11 @@ Page<PageData>({
       this.setData({
         accepting: preferences.acceptsPrivateLessons,
         availabilityColumns: buildColumns(selected),
+        interactive: true,
+        loadFailed: false,
       });
     } catch {
+      this.setData({ interactive: false, loadFailed: true });
       wx.showToast({ title: "私教偏好读取失败", icon: "none" });
     }
   },

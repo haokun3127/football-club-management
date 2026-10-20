@@ -14,6 +14,12 @@
         <view class="c162-info-card__text">{{featureMessage}}</view>
       </view>
 
+      <view wx:if="{{loadFailed}}" class="c162-load-error">
+        <view class="c162-load-error__text">私教偏好读取失败，为避免覆盖已有设置，暂不可编辑。</view>
+        <view class="c162-load-error__retry" bindtap="retryLoad" aria-label="重试读取">重试</view>
+      </view>
+
+      <block wx:if="{{!loadFailed}}">
       <view class="c162-toggle-row">
         <view class="c162-toggle-row__label">接受私教预约</view>
         <view class="c162-toggle {{accepting ? 'c162-toggle--on' : 'c162-toggle--off'}} {{interactive ? '' : 'c162-toggle--disabled'}}" bindtap="toggleAccepting" aria-label="接受私教预约">
@@ -39,6 +45,7 @@
         </view>
         <view class="c162-schedule-card__fee">{{feeMessage}}</view>
       </view>
+      </block>
     </view>
   </view>
 
