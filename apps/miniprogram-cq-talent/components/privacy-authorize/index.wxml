@@ -1,0 +1,12 @@
+<view wx:if="{{visible}}" class="privacy-overlay">
+  <view class="privacy-overlay__mask" bindtap="handleDisagree"></view>
+  <view class="privacy-overlay__panel">
+    <view class="privacy-overlay__title">隐私保护提示</view>
+    <view class="privacy-overlay__desc">复制微信号等能力需要先阅读并同意{{contractName}}。</view>
+    <view class="privacy-overlay__link" bindtap="openContract">查看{{contractName}}</view>
+    <view class="privacy-overlay__actions">
+      <button class="privacy-overlay__button privacy-overlay__button--secondary" bindtap="handleDisagree">暂不</button>
+      <button id="privacy-agree-btn" class="privacy-overlay__button privacy-overlay__button--primary" open-type="agreePrivacyAuthorization" bindagreeprivacyauthorization="handleAgree">同意并继续</button>
+    </view>
+  </view>
+</view>

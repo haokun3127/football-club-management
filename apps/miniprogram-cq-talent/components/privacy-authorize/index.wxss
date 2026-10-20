@@ -1,0 +1,84 @@
+.privacy-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.privacy-overlay__mask {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(33, 28, 27, 0.45);
+}
+
+.privacy-overlay__panel {
+  position: relative;
+  width: 560rpx;
+  box-sizing: border-box;
+  padding: 48rpx 40rpx 32rpx;
+  border-radius: var(--radius-card);
+  background: var(--club-nav);
+  box-shadow: var(--club-shadow);
+}
+
+.privacy-overlay__title {
+  font-size: var(--font-size-section);
+  font-weight: 600;
+  color: var(--club-text);
+  text-align: center;
+}
+
+.privacy-overlay__desc {
+  margin-top: 20rpx;
+  font-size: var(--font-size-aux);
+  line-height: 40rpx;
+  color: var(--club-muted);
+  text-align: center;
+}
+
+.privacy-overlay__link {
+  margin-top: 16rpx;
+  font-size: var(--font-size-caption);
+  color: var(--color-brand);
+  text-align: center;
+}
+
+.privacy-overlay__actions {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 40rpx;
+}
+
+.privacy-overlay__button {
+  flex: 1;
+  height: 80rpx;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-button);
+  font-size: var(--font-size-body);
+  line-height: 80rpx;
+  text-align: center;
+}
+
+.privacy-overlay__button--secondary {
+  background: var(--club-page);
+  color: var(--club-muted);
+}
+
+.privacy-overlay__button--primary {
+  background: var(--color-brand);
+  color: #ffffff;
+}
+
+.privacy-overlay__button--primary::after {
+  border: none;
+}
