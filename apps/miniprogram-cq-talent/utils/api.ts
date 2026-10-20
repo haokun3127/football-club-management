@@ -299,22 +299,6 @@ export async function saveCoachAttendance(eventId: string, roster: CoachWorkbenc
   });
 }
 
-export async function confirmCoachLesson(eventId: string, studentIds: string[], note?: string) {
-  const context = requireContext();
-  const session = getSession();
-
-  return request<Record<string, unknown>, { studentIds: string[]; actorUserId?: string; note: string }>({
-    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/lesson-confirmation`,
-    method: "POST",
-    data: {
-      studentIds,
-      actorUserId: session?.userId,
-      note: note || "重庆天才小程序教练端确认销课",
-    },
-    idempotent: true,
-  });
-}
-
 export async function recordCoachMatch(input: {
   eventId: string;
   matchId?: string;
