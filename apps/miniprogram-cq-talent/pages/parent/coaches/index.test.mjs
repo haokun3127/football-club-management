@@ -5,10 +5,13 @@ const mocks = vi.hoisted(() => ({
   getClubCoachTeam: vi.fn(),
   requireRole: vi.fn(),
   setClipboardData: vi.fn(),
+  showToast: vi.fn(),
+  ensurePrivacyAuthorized: vi.fn(),
 }));
 
 vi.mock("../../../utils/api", () => ({ getClubCoachTeam: mocks.getClubCoachTeam }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
+vi.mock("../../../utils/privacy", () => ({ ensurePrivacyAuthorized: mocks.ensurePrivacyAuthorized }));
 vi.mock("../../../utils/presentation", () => ({
   resolveMenuInset: () => 0,
   resolveNavInset: () => 0,
@@ -21,7 +24,7 @@ globalThis.Page = (definition) => {
 };
 globalThis.wx = {
   navigateBack: vi.fn(),
-  showToast: vi.fn(),
+  showToast: mocks.showToast,
   setClipboardData: mocks.setClipboardData,
 };
 
@@ -29,6 +32,7 @@ await import("./index.ts");
 
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
 const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
+const pageConfig = JSON.parse(readFileSync(new URL("./index.json", import.meta.url), "utf8"));
 
 function createPageInstance(data = {}) {
   const instance = {
@@ -52,8 +56,10 @@ describe("parent coach team", () => {
   beforeEach(() => {
     mocks.getClubCoachTeam.mockReset();
     mocks.requireRole.mockReset().mockReturnValue({ role: "parent" });
+    mocks.ensurePrivacyAuthorized.mockReset().mockResolvedValue(true);
+    mocks.setClipboardData.mockReset();
     globalThis.wx.navigateBack.mockReset();
-    globalThis.wx.showToast.mockReset();
+    mocks.showToast.mockReset();
   });
 
   it("maps team, counts, goal, coach role and bio fields from the payload", async () => {
@@ -144,11 +150,32 @@ describe("parent coach team", () => {
     expect(controller).not.toContain("重庆天才足球俱乐部");
   });
 
-  it("copies the coach wechat id to the clipboard", () => {
+  it("copies the coach wechat id only after privacy authorization allows it", async () => {
     const page = createPageInstance();
     page.copyCoachWechat({ currentTarget: { dataset: { wechat: "cq-coach-chen" } } });
+    expect(mocks.ensurePrivacyAuthorized).toHaveBeenCalledTimes(1);
+    await Promise.resolve();
     expect(mocks.setClipboardData).toHaveBeenCalledWith({ data: "cq-coach-chen" });
     page.copyCoachWechat({ currentTarget: { dataset: { wechat: "" } } });
+    await Promise.resolve();
     expect(mocks.setClipboardData).toHaveBeenCalledTimes(1);
+    expect(mocks.ensurePrivacyAuthorized).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the clipboard untouched and explains why when privacy consent is refused", async () => {
+    mocks.ensurePrivacyAuthorized.mockResolvedValue(false);
+    const page = createPageInstance();
+    page.copyCoachWechat({ currentTarget: { dataset: { wechat: "cq-coach-chen" } } });
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(mocks.setClipboardData).not.toHaveBeenCalled();
+    expect(mocks.showToast).toHaveBeenCalledWith({ title: "需同意隐私协议后才能复制微信号", icon: "none" });
+  });
+
+  it("mounts the shared privacy authorization popup on the page", () => {
+    expect(template).toContain("<privacy-authorize />");
+    expect(pageConfig.usingComponents["privacy-authorize"]).toBe("/components/privacy-authorize/index");
+    expect(controller).toContain("ensurePrivacyAuthorized().then((authorized) => {");
+    expect(controller.indexOf("ensurePrivacyAuthorized()")).toBeLessThan(controller.indexOf("wx.setClipboardData({"));
   });
 });

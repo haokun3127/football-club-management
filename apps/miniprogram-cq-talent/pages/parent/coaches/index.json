@@ -2,7 +2,8 @@
   "navigationBarTitleText": "教练团队",
   "usingComponents": {
     "role-tabbar": "/components/role-tabbar/index",
-    "status-view": "/components/status-view/index"
+    "status-view": "/components/status-view/index",
+    "privacy-authorize": "/components/privacy-authorize/index"
   },
   "navigationStyle": "custom"
 }

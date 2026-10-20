@@ -1,5 +1,6 @@
 import { getClubCoachTeam } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { ensurePrivacyAuthorized } from "../../../utils/privacy";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { ClubCoachTeam, LoadState } from "../../../utils/types";
 
@@ -47,10 +48,18 @@ Page<PageData>({
   goBack() {
     wx.navigateBack();
   },
+  // 复制微信号前先走隐私授权（wx.setClipboardData 为隐私接口，用户未同意前不得实际调用）。
+  // 已同意过的用户由 ensurePrivacyAuthorized 直接放行，不重复打扰。
   copyCoachWechat(event: { currentTarget: { dataset: { wechat: string } } }) {
     const wechatId = event.currentTarget.dataset.wechat;
     if (!wechatId) return;
-    wx.setClipboardData({ data: wechatId });
+    ensurePrivacyAuthorized().then((authorized) => {
+      if (!authorized) {
+        wx.showToast({ title: "需同意隐私协议后才能复制微信号", icon: "none" });
+        return;
+      }
+      wx.setClipboardData({ data: wechatId });
+    });
   },
   onLoad() {
     requireRole("parent");

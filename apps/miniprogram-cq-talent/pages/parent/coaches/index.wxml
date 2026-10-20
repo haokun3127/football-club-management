@@ -42,4 +42,5 @@
     </block>
   </view>
   <role-tabbar role="parent" active="discover" />
+  <privacy-authorize />
 </view>
