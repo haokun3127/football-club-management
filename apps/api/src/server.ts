@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { registerBackofficeManagementRoutes } from "./routes/backoffice-management.routes.js";
 import { registerScoutPlayerRoutes } from "./routes/scout-player.routes.js";
 import { BackofficeAuth } from "./auth/backoffice.js";
@@ -9,6 +10,8 @@ import { registerCoachAssignmentRoutes } from "./routes/coach-assignment.routes.
 import { registerEnvironmentGuard } from "./http/environment-guard.js";
 import type { RuntimeConfig } from "./runtime/environment.js";
 import Fastify from "fastify";
+import rateLimit from "@fastify/rate-limit";
+import helmet from "@fastify/helmet";
 import { registerAssessmentWorkflowRoutes } from "./routes/assessment-workflow.routes.js";
 import type { FastifyError } from "fastify";
 import type { MembershipResolver } from "./auth/context.js";
@@ -29,12 +32,29 @@ import { registerPlatformRoutes } from "./routes/platform.routes.js";
 import { registerTrainingRoutes } from "./routes/training.routes.js";
 import { registerTrainingRecordRoutes } from "./routes/training-record.routes.js";
 
+export interface RateLimitOptions {
+  max: number;
+  timeWindow: string;
+  loginMax?: number;
+}
+
+// 全局默认阈值按「小程序多用户共享出口 IP + 生产 Nginx 未传 X-Forwarded-For（request.ip 恒为 127.0.0.1）」设计：
+// key 按 Authorization 哈希分桶（每个会话独立计数），匿名桶覆盖登录/健康检查等未鉴权流量，
+// 阈值需容纳活动场景集中登录与共享 WiFi 出口的并发峰值。
+const DEFAULT_RATE_LIMIT: RateLimitOptions = {
+  max: 300,
+  timeWindow: "1 minute",
+  loginMax: 90,
+};
+
 export interface ServerOptions {
   runtimeConfig?: RuntimeConfig;
   logger?: boolean;
   membershipResolver?: MembershipResolver;
   wechatIdentityConnector?: WechatIdentityConnector;
   sessionRegistry?: SessionRegistry;
+  /** false 显式关闭；传对象则用自定义阈值；缺省时仅在有 runtimeConfig 的运行时（生产/develop 容器）启用。 */
+  rateLimit?: false | RateLimitOptions;
 }
 
 export function buildServer(store: ApiStore = new InMemoryStore(), options: ServerOptions = {}) {
@@ -47,11 +67,46 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
     },
   });
   if (options.runtimeConfig) registerEnvironmentGuard(app, options.runtimeConfig);
+
+  // 默认安全响应头：CSP 关闭——backoffice 页面已由 backoffice-web 路由下发专属的 nonce CSP，
+  // 全局 CSP 与之叠加会按交集收紧并破坏内联样式；JSON API 响应亦无 CSP 语义。
+  void app.register(helmet, { contentSecurityPolicy: false });
+
+  const rateLimitOptions = options.rateLimit === undefined
+    ? (options.runtimeConfig ? DEFAULT_RATE_LIMIT : false)
+    : options.rateLimit;
+  let loginRateLimit: { max: number; timeWindow: string } | undefined;
+  if (rateLimitOptions) {
+    void app.register(rateLimit, {
+      max: rateLimitOptions.max,
+      timeWindow: rateLimitOptions.timeWindow,
+      // 生产链路 Nginx 未透传 X-Forwarded-For，request.ip 无法区分真实来源；
+      // 携带 Authorization 的请求按 token 哈希分桶，匿名请求退回共享 IP 桶。
+      keyGenerator: (request) => {
+        const authorization = request.headers.authorization;
+        if (authorization) {
+          return `auth:${createHash("sha256").update(authorization).digest("hex")}`;
+        }
+        return `ip:${request.ip}`;
+      },
+      errorResponseBuilder: (_request, context) => ({
+        statusCode: context.statusCode,
+        error: {
+          code: "rate_limited",
+          message: `Rate limit exceeded, retry in ${context.after}`,
+        },
+      }),
+    });
+    loginRateLimit = rateLimitOptions.loginMax === undefined
+      ? undefined
+      : { max: rateLimitOptions.loginMax, timeWindow: rateLimitOptions.timeWindow };
+  }
+
   const sessionRegistry = options.sessionRegistry
     ?? (store instanceof PersistentApiStore
       ? new SessionRegistry(store.repositories.appClientSessions)
       : new SessionRegistry());
-  const context = createRouteContext(store, options.membershipResolver, sessionRegistry, options.wechatIdentityConnector);
+  const context = createRouteContext(store, options.membershipResolver, sessionRegistry, options.wechatIdentityConnector, loginRateLimit);
   const backofficeAuth = options.runtimeConfig?.backoffice && options.membershipResolver && store instanceof PersistentApiStore
     ? new BackofficeAuth(options.runtimeConfig.backoffice, store.repositories.backofficeAuth, options.membershipResolver) : undefined;
   registerHttpRequestContracts(app, store);
@@ -63,6 +118,17 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
         "Request validation failed",
         error.validation as unknown[],
       ));
+    }
+
+    // 限流插件通过 throw errorResponseBuilder(...) 触发 429，按项目 apiError 形状透传。
+    const rateLimitPayload = (error as FastifyError & { error?: { code?: unknown; message?: unknown } }).error;
+    if (
+      error.statusCode === 429
+      && typeof rateLimitPayload === "object" && rateLimitPayload !== null
+      && typeof rateLimitPayload.code === "string"
+      && typeof rateLimitPayload.message === "string"
+    ) {
+      return reply.code(429).send(apiError(rateLimitPayload.code, rateLimitPayload.message));
     }
 
     // 未显式标记 statusCode 的异常视为服务器内部错误，绝不回显 error.message；

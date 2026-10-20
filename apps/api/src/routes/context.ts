@@ -16,6 +16,8 @@ export interface RouteContext {
   membershipResolver?: MembershipResolver;
   sessionRegistry: SessionRegistry;
   wechatIdentityConnector?: WechatIdentityConnector;
+  /** wechat-login 路由的独立限流阈值；仅在启用全局限流时生效。 */
+  loginRateLimit?: { max: number; timeWindow: string };
   resolveClubAuth(request: FastifyRequest, reply: FastifyReply, clubId: string): Promise<AuthContext | null>;
   requireClubMembership(request: FastifyRequest, reply: FastifyReply, clubId: string): Promise<boolean>;
   sendError: typeof sendError;
@@ -34,7 +36,7 @@ export interface RouteContext {
   ): Promise<boolean>;
 }
 
-export function createRouteContext(store: ApiStore, membershipResolver: MembershipResolver | undefined, sessionRegistry: SessionRegistry, wechatIdentityConnector?: WechatIdentityConnector): RouteContext {
+export function createRouteContext(store: ApiStore, membershipResolver: MembershipResolver | undefined, sessionRegistry: SessionRegistry, wechatIdentityConnector?: WechatIdentityConnector, loginRateLimit?: { max: number; timeWindow: string }): RouteContext {
   const resolveAuth = async (request: FastifyRequest, reply: FastifyReply, clubId: string): Promise<AuthContext | null> => {
     if (!membershipResolver) {
       return null;
@@ -83,6 +85,7 @@ export function createRouteContext(store: ApiStore, membershipResolver: Membersh
     membershipResolver,
     sessionRegistry,
     wechatIdentityConnector,
+    loginRateLimit,
     sendError,
     resolveClubAuth: resolveAuth,
     async requireClubMembership(request, reply, clubId) {

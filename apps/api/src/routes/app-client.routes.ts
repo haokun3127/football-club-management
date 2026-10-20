@@ -942,6 +942,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         ...schemas.appClientParams,
         ...schemas.appClientWechatLogin,
       },
+      ...(context.loginRateLimit ? { config: { rateLimit: context.loginRateLimit } } : {}),
     },
     async (request, reply) => {
       const client = await requireActiveAppClientAny(context, reply, request.params.clubId, request.params.clientId);
