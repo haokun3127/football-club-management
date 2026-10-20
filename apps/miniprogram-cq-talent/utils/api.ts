@@ -281,22 +281,68 @@ export async function getCoachLessonConfirmation(eventId: string): Promise<Coach
   return normalizeLessonConfirmation(response);
 }
 
-export async function saveCoachAttendance(eventId: string, roster: CoachWorkbench["roster"]) {
+// 点名保存的学员条目：previousStatus 是点名页加载名单时的状态快照。
+// 服务端放行规则（apps/api app-client.routes.ts attendance PUT）：
+// 家长已提交请假（leave_requested/excused）的学员，整名单点名要么原样保留请假状态，
+// 要么携带与当前值一致的 previousStatus（核对后的显式覆盖），否则 409 attendance_leave_conflict。
+export type CoachAttendanceRosterEntry = CoachWorkbench["roster"][number] & { previousStatus?: string };
+
+export async function saveCoachAttendance(eventId: string, roster: CoachAttendanceRosterEntry[]) {
   const context = requireContext();
   const participants = roster
     .filter((student) => student.studentId)
     .map((student) => {
       const status = normalizeParticipantStatus(student.status);
       if (!status) throw new Error(`请先完成${student.name}的点名`);
-      return { studentId: student.studentId, status, note: student.note };
+      const previousStatus = normalizeParticipantStatus(student.previousStatus ?? "");
+      return { studentId: student.studentId, status, note: student.note, previousStatus };
     });
 
-  return request<Record<string, unknown>, { participants: Array<{ studentId: string; status: string; note?: string }> }>({
+  return request<Record<string, unknown>, { participants: Array<{ studentId: string; status: string; note?: string; previousStatus?: string }> }>({
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/attendance`,
     method: "PUT",
     data: { participants },
     idempotent: true,
   });
+}
+
+export interface AttendanceLeaveConflict {
+  studentId: string;
+  name: string;
+  status: string;
+}
+
+function isLeaveAttendanceStatus(status: unknown) {
+  return status === "leave_requested" || status === "excused";
+}
+
+// request 层对 409 的结构化分类是 errorType "conflict"；code 为服务端错误码。
+// 依据结构化字段判断，不做 message 字符串匹配。
+export function isAttendanceLeaveConflictError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const candidate = error as { code?: unknown; errorType?: unknown };
+  return candidate.code === "attendance_leave_conflict" && candidate.errorType === "conflict";
+}
+
+// 409 后重拉名单，用刷新结果与本次提交内容重建冲突学员名单（与服务端判定规则一致）：
+// 当前状态为请假、本次提交为非请假状态、且提交时携带的 previousStatus 与当前值不一致。
+export function resolveAttendanceLeaveConflicts(
+  refreshedRoster: CoachWorkbench["roster"],
+  attempted: Array<{ studentId: string; status: string; previousStatus?: string }>,
+): AttendanceLeaveConflict[] {
+  const attemptedById = new Map(attempted.filter((item) => item.studentId).map((item) => [item.studentId, item]));
+  return refreshedRoster.flatMap((student) => {
+    const sent = attemptedById.get(student.studentId);
+    if (!sent || !isLeaveAttendanceStatus(student.status) || isLeaveAttendanceStatus(sent.status) || sent.previousStatus === student.status) return [];
+    return [{ studentId: student.studentId, name: student.name, status: String(student.status) }];
+  });
+}
+
+export function attendanceLeaveConflictMessage(conflicts: AttendanceLeaveConflict[]): string {
+  const names = conflicts.map((item) => item.name || item.studentId).join("、");
+  return names
+    ? `${names}的家长已提交请假，名单已刷新，请核对后再提交点名。`
+    : "部分学员的家长已提交请假，名单已刷新，请核对后再提交点名。";
 }
 
 export async function recordCoachMatch(input: {

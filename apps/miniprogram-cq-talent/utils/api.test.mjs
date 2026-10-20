@@ -36,7 +36,7 @@ globalThis.wx = {
   }),
 };
 
-const { createCoachMatchEvent, getCoachAssessmentTasks, getCoachMatchDetail, getCoachWorkbench, getParentActivityDetail, getParentStudentHome, saveCoachAttendance, submitCoachAssessment, switchActiveRole, wechatLogin } = await import("./api.ts");
+const { attendanceLeaveConflictMessage, createCoachMatchEvent, getCoachAssessmentTasks, getCoachMatchDetail, getCoachWorkbench, getParentActivityDetail, getParentStudentHome, isAttendanceLeaveConflictError, resolveAttendanceLeaveConflicts, saveCoachAttendance, submitCoachAssessment, switchActiveRole, wechatLogin } = await import("./api.ts");
 
 describe("assessment task creation transport", () => {
   it("sends the stable retry key and requires a created task identity", async () => {
@@ -181,6 +181,75 @@ describe("coach workbench participant normalization", () => {
     } finally {
       globalThis.wx.request = originalRequest;
     }
+  });
+});
+
+describe("attendance leave conflict protection (REQ-ATT-002)", () => {
+  it("carries the roster snapshot previousStatus per participant and omits it when absent", async () => {
+    const originalRequest = globalThis.wx.request;
+    let received;
+    globalThis.wx.request = ({ data, success }) => {
+      received = data;
+      success({ statusCode: 200, data: { participants: [] } });
+    };
+
+    try {
+      await saveCoachAttendance("event-training-1", [
+        { studentId: "student-1", name: "到场学员", status: "present", previousStatus: "confirmed" },
+        { studentId: "student-2", name: "请假学员", status: "present", previousStatus: "leave_requested" },
+        { studentId: "student-3", name: "无快照学员", status: "absent" },
+      ]);
+      expect(received).toEqual({
+        participants: [
+          { studentId: "student-1", status: "present", note: undefined, previousStatus: "confirmed" },
+          { studentId: "student-2", status: "present", note: undefined, previousStatus: "leave_requested" },
+          { studentId: "student-3", status: "absent", note: undefined, previousStatus: undefined },
+        ],
+      });
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
+
+  it("detects the conflict through structured errorType and code instead of message matching", () => {
+    expect(isAttendanceLeaveConflictError({ code: "attendance_leave_conflict", errorType: "conflict", statusCode: 409 })).toBe(true);
+    expect(isAttendanceLeaveConflictError({ code: "attendance_leave_conflict", errorType: "http_error", statusCode: 400 })).toBe(false);
+    expect(isAttendanceLeaveConflictError({ code: "training_record_conflict", errorType: "conflict" })).toBe(false);
+    expect(isAttendanceLeaveConflictError({ message: "attendance_leave_conflict" })).toBe(false);
+    expect(isAttendanceLeaveConflictError(new Error("部分学员有家长提交的请假"))).toBe(false);
+    expect(isAttendanceLeaveConflictError(null)).toBe(false);
+    expect(isAttendanceLeaveConflictError(undefined)).toBe(false);
+  });
+
+  it("rebuilds the conflict list from the refreshed roster using the server pass rule", () => {
+    const refreshed = [
+      { studentId: "student-1", name: "甲", status: "leave_requested" },
+      { studentId: "student-2", name: "乙", status: "leave_requested" },
+      { studentId: "student-3", name: "丙", status: "excused" },
+      { studentId: "student-4", name: "丁", status: "present" },
+    ];
+    const attempted = [
+      { studentId: "student-1", status: "present", previousStatus: "confirmed" },
+      { studentId: "student-2", status: "leave_requested", previousStatus: "confirmed" },
+      { studentId: "student-3", status: "present", previousStatus: "excused" },
+      { studentId: "student-4", status: "absent", previousStatus: "present" },
+    ];
+    // 甲：家长在快照后新请假 → 冲突；乙：点名原样传回请假 → 放行；
+    // 丙：携带一致的 previousStatus 显式覆盖 → 放行；丁：非请假状态 → 不适用。
+    expect(resolveAttendanceLeaveConflicts(refreshed, attempted)).toEqual([
+      { studentId: "student-1", name: "甲", status: "leave_requested" },
+    ]);
+    // 学员不在本次提交中（如新加入名单）不构成冲突
+    expect(resolveAttendanceLeaveConflicts([{ studentId: "student-new", name: "新", status: "leave_requested" }], attempted)).toEqual([]);
+  });
+
+  it("formats the conflict message with the affected student names", () => {
+    expect(attendanceLeaveConflictMessage([{ studentId: "student-1", name: "甲", status: "leave_requested" }]))
+      .toBe("甲的家长已提交请假，名单已刷新，请核对后再提交点名。");
+    expect(attendanceLeaveConflictMessage([{ studentId: "student-x", name: "", status: "excused" }]))
+      .toBe("student-x的家长已提交请假，名单已刷新，请核对后再提交点名。");
+    expect(attendanceLeaveConflictMessage([]))
+      .toBe("部分学员的家长已提交请假，名单已刷新，请核对后再提交点名。");
   });
 });
 
