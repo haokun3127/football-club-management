@@ -21,6 +21,8 @@
         </view>
       </view>
 
+      <view wx:if="{{saveFailed}}" class="c162-save-alert">上次保存未成功，当前展示的是已保存内容，请重试。</view>
+
       <view class="c162-schedule-card">
         <view class="c162-schedule-card__title">可用时段</view>
         <view class="c162-schedule-grid">

@@ -78,7 +78,7 @@ describe("coach private interest", () => {
     expect(mocks.saveCoachPreferences).toHaveBeenCalledWith(expect.objectContaining({ acceptsPrivateLessons: false }));
   });
 
-  it("reverts acceptance and toasts when the save fails", async () => {
+  it("reverts acceptance and marks unsaved when the save fails", async () => {
     mocks.saveCoachPreferences.mockRejectedValueOnce(new Error("network"));
     const page = createPageInstance();
     page.onLoad();
@@ -86,6 +86,7 @@ describe("coach private interest", () => {
 
     await page.toggleAccepting();
     expect(page.data.accepting).toBe(true);
+    expect(page.data.saveFailed).toBe(true);
     expect(mocks.showToast).toHaveBeenCalled();
   });
 
@@ -98,6 +99,36 @@ describe("coach private interest", () => {
     const saturday = page.data.availabilityColumns[5];
     expect(saturday.slots[0].selected).toBe(true);
     expect(mocks.saveCoachPreferences).toHaveBeenCalledWith(expect.objectContaining({ availabilitySlots: expect.arrayContaining(["5-0"]) }));
+    expect(page.data.saveFailed).toBe(false);
+  });
+
+  it("restores the previous columns and marks unsaved when the slot save fails", async () => {
+    mocks.saveCoachPreferences.mockRejectedValueOnce(new Error("network"));
+    const page = createPageInstance();
+    page.onLoad();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const before = page.data.availabilityColumns.map((column) => column.slots.map((slot) => slot.selected));
+    await page.toggleSlot({ currentTarget: { dataset: { key: "0-0" } } });
+    expect(page.data.availabilityColumns[0].slots[0].selected).toBe(before[0][0]);
+    const after = page.data.availabilityColumns.map((column) => column.slots.map((slot) => slot.selected));
+    expect(after).toEqual(before);
+    expect(page.data.saveFailed).toBe(true);
+    expect(mocks.showToast).toHaveBeenCalled();
+  });
+
+  it("keeps the new value and clears the unsaved flag after a successful retry", async () => {
+    mocks.saveCoachPreferences.mockRejectedValueOnce(new Error("network"));
+    const page = createPageInstance();
+    page.onLoad();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await page.toggleSlot({ currentTarget: { dataset: { key: "5-0" } } });
+    expect(page.data.availabilityColumns[5].slots[0].selected).toBe(false);
+    expect(page.data.saveFailed).toBe(true);
+    await page.toggleSlot({ currentTarget: { dataset: { key: "5-0" } } });
+    expect(page.data.availabilityColumns[5].slots[0].selected).toBe(true);
+    expect(page.data.saveFailed).toBe(false);
   });
 
   it("keeps disabled and pending feature states non-interactive", async () => {

@@ -123,6 +123,15 @@
   background: #ffffff;
 }
 
+.c162-save-alert {
+  padding: 16rpx 24rpx;
+  border-radius: 8rpx;
+  background: #fff1f1;
+  color: #b42318;
+  font-size: 24rpx;
+  line-height: 32rpx;
+}
+
 .c162-schedule-card {
   display: flex;
   flex-direction: column;

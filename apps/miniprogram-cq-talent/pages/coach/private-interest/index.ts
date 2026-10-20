@@ -25,6 +25,7 @@ interface PageData {
   availabilityColumns: AvailabilityColumn[];
   feeMessage: string;
   saving: boolean;
+  saveFailed: boolean;
 }
 
 const WEEK_DAYS = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
@@ -48,6 +49,7 @@ Page<PageData>({
     availabilityColumns: buildColumns(new Set(DEFAULT_SLOTS)),
     feeMessage: "费用由俱乐部统一结算",
     saving: false,
+    saveFailed: false,
   },
   onLoad() {
     const session = requireRole("coach");
@@ -73,12 +75,14 @@ Page<PageData>({
   },
   async toggleAccepting() {
     if (!this.data.interactive || this.data.saving) return;
-    const next = !this.data.accepting;
+    const previousAccepting = this.data.accepting;
+    const next = !previousAccepting;
     this.setData({ accepting: next, saving: true });
     try {
       await saveCoachPreferences({ acceptsPrivateLessons: next, availabilitySlots: collectSelected(this.data.availabilityColumns) });
+      this.setData({ saveFailed: false });
     } catch {
-      this.setData({ accepting: !next });
+      this.setData({ accepting: previousAccepting, saveFailed: true });
       wx.showToast({ title: "保存失败，请重试", icon: "none" });
     } finally {
       this.setData({ saving: false });
@@ -87,15 +91,17 @@ Page<PageData>({
   async toggleSlot(event: { currentTarget: { dataset: { key: string } } }) {
     if (!this.data.interactive || this.data.saving) return;
     const key = event.currentTarget.dataset.key;
-    const columns = this.data.availabilityColumns.map((column: AvailabilityColumn) => ({
+    const previousColumns = this.data.availabilityColumns;
+    const columns = previousColumns.map((column: AvailabilityColumn) => ({
       ...column,
       slots: column.slots.map((slot: AvailabilitySlot) => (slot.key === key ? { ...slot, selected: !slot.selected } : slot)),
     }));
     this.setData({ availabilityColumns: columns, saving: true });
     try {
       await saveCoachPreferences({ acceptsPrivateLessons: this.data.accepting, availabilitySlots: collectSelected(columns) });
+      this.setData({ saveFailed: false });
     } catch {
-      this.setData({ availabilityColumns: this.data.availabilityColumns });
+      this.setData({ availabilityColumns: previousColumns, saveFailed: true });
       wx.showToast({ title: "保存失败，请重试", icon: "none" });
     } finally {
       this.setData({ saving: false });
