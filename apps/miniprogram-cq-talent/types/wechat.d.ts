@@ -5,6 +5,7 @@ interface WechatRequestOptions<TData = unknown> {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   data?: TData;
   header?: Record<string, string>;
+  timeout?: number;
   success?: WechatCallback<{ statusCode: number; data: unknown; header?: Record<string, string> }>;
   fail?: WechatCallback<{ errMsg: string }>;
   complete?: WechatCallback;

@@ -19,6 +19,16 @@ export interface RequestOptions<TBody = unknown> {
   expectedStatus?: number;
   headers?: Record<string, string>;
   bearerToken?: string;
+  timeout?: number;
+}
+
+// WeChat's default wx.request timeout is 60s; the mini-program opts into
+// shorter budgets so weak networks fail fast instead of leaving pages stuck.
+const READ_TIMEOUT_MS = 10_000;
+const WRITE_TIMEOUT_MS = 15_000;
+
+function defaultTimeoutFor(method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | undefined): number {
+  return method && method !== "GET" ? WRITE_TIMEOUT_MS : READ_TIMEOUT_MS;
 }
 
 export function request<TResponse = unknown, TBody = unknown>(options: RequestOptions<TBody>): Promise<TResponse> {
@@ -74,6 +84,7 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
       method: options.method ?? "GET",
       data: options.data,
       header: headers,
+      timeout: options.timeout ?? defaultTimeoutFor(options.method),
       success: (response) => {
         const isExpectedStatus = options.expectedStatus === undefined
           ? response.statusCode >= 200 && response.statusCode < 300

@@ -103,6 +103,31 @@ describe("request authentication failures", () => {
   });
 });
 
+describe("request timeouts", () => {
+  it("applies a 10s budget to reads and a 15s budget to writes", async () => {
+    const originalRequest = globalThis.wx.request;
+    const captured = [];
+    globalThis.wx.request = (options) => {
+      captured.push({ method: options.method, timeout: options.timeout });
+      options.success({ statusCode: 200, data: { ok: true } });
+    };
+
+    try {
+      await request({ path: "/reads-default" });
+      await request({ path: "/reads-post", method: "POST" });
+      await request({ path: "/reads-override", method: "POST", timeout: 3_000 });
+
+      expect(captured).toEqual([
+        { method: "GET", timeout: 10_000 },
+        { method: "POST", timeout: 15_000 },
+        { method: "POST", timeout: 3_000 },
+      ]);
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
+});
+
 describe("request 401 session race", () => {
   const originalRequest = globalThis.wx.request;
 
