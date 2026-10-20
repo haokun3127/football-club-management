@@ -126,8 +126,11 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
     }
     wx.request({
       url: `${baseUrl}${options.path}`,
-      method: options.method ?? "GET",
-      data: options.data,
+      // 官方 miniprogram-api-typings 的 method 枚举暂缺 "PATCH"（wx.request 实际
+      // 支持，为上游 typings 已知缺口）；TBody 泛型未声明传输形状。二者均在
+      // 调用边界窄化，不改变任何请求逻辑。
+      method: (options.method ?? "GET") as WechatMiniprogram.RequestOption["method"],
+      data: options.data as WechatMiniprogram.RequestOption["data"],
       header: headers,
       timeout: options.timeout ?? defaultTimeoutFor(options.method),
       success: (response) => {

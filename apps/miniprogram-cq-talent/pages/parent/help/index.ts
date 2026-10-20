@@ -19,6 +19,8 @@ interface VisibleFaqQuestion extends FaqQuestion {
 }
 
 interface PageData {
+  navInset: number;
+  menuInset: number;
   state: LoadState;
   message: string;
   categories: HelpCategory[];

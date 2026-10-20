@@ -4,6 +4,8 @@ import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { LoadState } from "../../../utils/types";
 
 interface PageData {
+  navInset: number;
+  menuInset: number;
   state: LoadState;
   message: string;
   articleId: string;

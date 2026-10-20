@@ -1,72 +1,51 @@
-type WechatCallback<T = unknown> = (result: T) => void;
+/**
+ * 微信小程序全局类型的「收缩策略」适配层。
+ *
+ * 全局声明主体已切换到官方 `miniprogram-api-typings`（经 tsconfig `types` 字段
+ * 引入）：`wx` 全量 API、`App`、`getApp`、`getCurrentPages`、`Component`、
+ * `Behavior`、`console`、`require`/`module` 与 `WechatMiniprogram` 命名空间
+ * （含 CustomEvent / TouchEvent / RequestTask 等事件与任务类型）均来自官方包。
+ *
+ * 本文件仅保留两类无法随包整体启用而直接删除的过渡内容：
+ *
+ * 1. `Page` 双重载适配层
+ *    官方 `Page.Constructor` 泛型无默认值，直接启用会迫使全部 43 个显式传参页面
+ *    一次性迁移（TS2558 + `this`/excess property 级联错误，实测 >150 行业务改动）。
+ *    - 宽松重载（先匹配）：存量页面继续用 `Page<PageData>(options)` 或
+ *      `Page(options)` 调用。`data` 负例（`Page<{count:number}>({data:{count:"x"}})`）
+ *      自本重载起可检出；`this` 与其余 options 字段保持旧 shim 的宽松语义，
+ *      未迁移页面无需任何改动。
+ *    - 严格重载（显式双参时匹配）：`Page<TData, TCustom>(options)` 与官方
+ *      `WechatMiniprogram.Page.Options<TData, TCustom>` 完全一致，生命周期、
+ *      自定义方法、`this`、`setData`、事件全部受官方类型约束。试点页面
+ *      （pages/parent/day）已迁移；后续批次逐页迁移完成后，应删除本适配层、
+ *      直接采用官方全局 `Page` 声明。
+ *
+ * 2. `WechatPageOptions` 过渡别名
+ *    仅剩 utils/student-results-page.ts 引用；该文件迁移到官方泛型后删除。
+ *
+ * 注意：官方包同样声明了全局 `Page`（lib.wx.page.d.ts 尾部 `declare let Page`）。
+ * 本文件的 `Page` 声明与之重复，因 `skipLibCheck` 不报冲突，且本文件声明优先生效
+ * （由 tests/types-negative-guard.test.mjs 在 CI 中断言该行为：宽松重载的 data
+ * 约束必须持续可检出）。若未来升级官方包后声明优先级翻转，负例守卫与全量
+ * typecheck 会立即失败，不会静默回退。
+ */
 
-interface WechatRequestOptions<TData = unknown> {
-  url: string;
-  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+type WechatPageOptions<TData extends Record<string, any> = Record<string, any>> = {
+  /**
+   * data 字面量必须满足 TData（与官方一致）。启用即暴露 9 处存量声明漂移
+   * （data 实际字段与本地 PageData 接口不一致），已逐文件补齐接口；见
+   * 迁移报告「逐文件小修清单」。
+   */
   data?: TData;
-  header?: Record<string, string>;
-  timeout?: number;
-  success?: WechatCallback<{ statusCode: number; data: unknown; header?: Record<string, string> }>;
-  fail?: WechatCallback<{ errMsg: string }>;
-  complete?: WechatCallback;
-}
-
-interface WechatAppOptions {
-  onLaunch?: () => void;
-  globalData?: Record<string, unknown>;
-}
-
-interface WechatPageOptions<TData extends Record<string, any> = Record<string, any>> {
-  data?: TData;
-  onLoad?: (query?: Record<string, string | undefined>) => void;
-  onShow?: () => void;
-  onReady?: () => void;
-  onUnload?: () => void;
-  setData?: (data: Partial<TData> | Record<string, unknown>) => void;
   [key: string]: any;
-}
-
-interface WechatComponentOptions {
-  properties?: Record<string, unknown>;
-  data?: Record<string, any>;
-  lifetimes?: Record<string, any>;
-  observers?: Record<string, any>;
-  methods?: Record<string, any>;
-  [key: string]: any;
-}
-
-declare const wx: {
-  request: <TData = unknown>(options: WechatRequestOptions<TData>) => void;
-  login: (options: { success?: WechatCallback<{ code: string }>; fail?: WechatCallback<{ errMsg: string }> }) => void;
-  getSystemInfoSync: () => { platform?: string; windowWidth: number; pixelRatio?: number; statusBarHeight?: number };
-  getWindowInfo?: () => { windowWidth: number; screenWidth?: number; statusBarHeight?: number; pixelRatio?: number };
-  getMenuButtonBoundingClientRect?: () => { top: number; bottom: number; left: number; right: number; width: number; height: number };
-  getAccountInfoSync?: () => { miniProgram?: { appId?: string; envVersion?: "develop" | "trial" | "release" } };
-  getStorageSync: <T = unknown>(key: string) => T;
-  setStorageSync: (key: string, value: unknown) => void;
-  removeStorageSync: (key: string) => void;
-  getStorageInfoSync?: () => { keys: string[] };
-  switchTab: (options: { url: string }) => void;
-  navigateTo: (options: { url: string; success?: WechatCallback<unknown>; fail?: WechatCallback<{ errMsg: string }> }) => void;
-  redirectTo: (options: { url: string; success?: WechatCallback<unknown>; fail?: WechatCallback<{ errMsg: string }> }) => void;
-  navigateBack: (options?: { delta?: number }) => void;
-  reLaunch: (options: { url: string; success?: WechatCallback<unknown>; fail?: WechatCallback<{ errMsg: string }> }) => void;
-  showToast: (options: { title: string; icon?: "success" | "error" | "loading" | "none"; duration?: number }) => void;
-  showModal: (options: { title: string; content: string; showCancel?: boolean; success?: WechatCallback<{ confirm: boolean }> }) => void;
-  showActionSheet: (options: { itemList: string[]; success?: WechatCallback<{ tapIndex: number }>; fail?: WechatCallback<{ errMsg: string }> }) => void;
-  nextTick: (callback: () => void) => void;
-  pageScrollTo: (options: { selector?: string; scrollTop?: number; duration?: number }) => void;
-  setClipboardData: (options: { data: string; success?: WechatCallback<unknown>; fail?: WechatCallback<unknown> }) => void;
 };
 
-declare function App(options: WechatAppOptions): void;
-declare function Page<TData extends Record<string, any> = Record<string, any>>(options: any): void;
-declare function Component(options: any): void;
-declare function getApp<T extends { globalData?: Record<string, unknown> } = { globalData?: Record<string, unknown> }>(): T;
-declare function getCurrentPages(): unknown[];
-declare const console: {
-  log: (...args: unknown[]) => void;
-  info: (...args: unknown[]) => void;
-  warn: (...args: unknown[]) => void;
-  error: (...args: unknown[]) => void;
-};
+declare function Page<TData extends Record<string, any> = Record<string, any>>(
+  options: WechatPageOptions<TData> & ThisType<any>
+): void;
+
+declare function Page<
+  TData extends WechatMiniprogram.Page.DataOption,
+  TCustom extends WechatMiniprogram.Page.CustomOption
+>(options: WechatMiniprogram.Page.Options<TData, TCustom>): void;

@@ -21,6 +21,8 @@ interface ArticleView {
 }
 
 interface PageData {
+  navInset: number;
+  menuInset: number;
   state: LoadState;
   message: string;
 

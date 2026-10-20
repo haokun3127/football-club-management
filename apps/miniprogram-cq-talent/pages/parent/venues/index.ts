@@ -11,6 +11,8 @@ interface VenueView extends VenueInfo {
 }
 
 interface PageData {
+  navInset: number;
+  menuInset: number;
   state: LoadState;
   message: string;
   filters: Array<{ label: string; value: string }>;

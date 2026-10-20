@@ -12,6 +12,7 @@
     "devtools:screenshot": "node scripts/devtools-screenshot.mjs"
   },
   "devDependencies": {
+    "miniprogram-api-typings": "^5.2.3",
     "miniprogram-automator": "0.12.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"

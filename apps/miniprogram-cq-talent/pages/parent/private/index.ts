@@ -10,6 +10,8 @@ interface ChipOption {
 }
 
 interface PageData {
+  navInset: number;
+  menuInset: number;
   state: LoadState;
   message: string;
   requestedStudentId: string;

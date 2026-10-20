@@ -32,7 +32,7 @@ interface PageData {
   insuranceSubtitle: string;
   history: HistoryRow[];
   navInset: number;
-  navActionTop: number;
+  menuInset: number;
 }
 
 Page<PageData>({
