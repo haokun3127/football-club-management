@@ -128,6 +128,93 @@ describe("request timeouts", () => {
   });
 });
 
+describe("request error mapping", () => {
+  const originalRequest = globalThis.wx.request;
+
+  it("maps transport failures to a structured network error with unified copy", async () => {
+    globalThis.wx.request = ({ fail }) => fail({ errMsg: "request:fail " });
+
+    try {
+      await expect(request({ path: "/flaky" })).rejects.toMatchObject({
+        code: "network_error",
+        message: "request:fail ",
+        errorType: "network",
+        userMessage: "网络连接不可用，请检查网络后重试",
+      });
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
+
+  it("distinguishes timeouts from generic network failures", async () => {
+    globalThis.wx.request = ({ fail }) => fail({ errMsg: "request:fail timeout" });
+
+    try {
+      await expect(request({ path: "/slow" })).rejects.toMatchObject({
+        code: "timeout",
+        errorType: "timeout",
+        userMessage: "请求超时，请检查网络后重试",
+      });
+    } finally {
+      globalThis.wx.request = originalRequest;
+    }
+  });
+
+  it("keeps the server error payload while classifying http status codes", async () => {
+    const scenarios = [
+      { statusCode: 403, data: { error: { code: "capability_missing", message: "denied" } }, errorType: "forbidden" },
+      { statusCode: 409, data: { error: { code: "idempotency_conflict", message: "reused key" } }, errorType: "conflict" },
+      { statusCode: 500, data: {}, errorType: "server_error" },
+      { statusCode: 422, data: { error: { code: "validation_failed", message: "bad input" } }, errorType: "http_error" },
+    ];
+
+    for (const scenario of scenarios) {
+      globalThis.wx.request = ({ success }) => success({ statusCode: scenario.statusCode, data: scenario.data });
+      const expectation = await request({ path: "/errors" }).then(
+        () => Promise.reject(new Error("expected rejection")),
+        (error) => error,
+      );
+      expect(expectation.errorType).toBe(scenario.errorType);
+      expect(expectation.statusCode).toBe(scenario.statusCode);
+      expect(typeof expectation.userMessage).toBe("string");
+      expect(expectation.userMessage.length).toBeGreaterThan(0);
+      if (scenario.data.error) {
+        expect(expectation.code).toBe(scenario.data.error.code);
+        expect(expectation.message).toBe(scenario.data.error.message);
+      } else {
+        expect(expectation.code).toBe("http_error");
+      }
+    }
+
+    globalThis.wx.request = originalRequest;
+  });
+
+  it("classifies genuine 401 responses as unauthorized errors", async () => {
+    clearSession();
+    installSession("token-a");
+    const relaunches = [];
+    globalThis.wx.request = ({ success }) => success({
+      statusCode: 401,
+      data: { error: { code: "authentication_required", message: "Session expired" } },
+    });
+    globalThis.wx.reLaunch = (options) => { relaunches.push(options.url); };
+
+    try {
+      await expect(request({ path: "/coach/events" })).rejects.toMatchObject({
+        code: "authentication_required",
+        statusCode: 401,
+        errorType: "unauthorized",
+        userMessage: "登录已过期，请重新登录",
+      });
+      expect(relaunches).toEqual(["/pages/login/index"]);
+      expect(getSession()).toBeNull();
+    } finally {
+      globalThis.wx.request = originalRequest;
+      clearSession();
+    }
+  });
+});
+
 describe("request 401 session race", () => {
   const originalRequest = globalThis.wx.request;
 
@@ -192,6 +279,28 @@ describe("request 401 session race", () => {
       await Promise.allSettled(pending);
       expect(relaunches).toEqual(["/pages/login/index"]);
       expect(getSession()).toBeNull();
+    } finally {
+      globalThis.wx.request = originalRequest;
+      clearSession();
+    }
+  });
+
+  it("converges concurrent explicit-bearer 401s without a surrounding session to one navigation", async () => {
+    clearSession();
+    const responders = [];
+    const relaunches = [];
+    globalThis.wx.request = ({ success }) => { responders.push(success); };
+    globalThis.wx.reLaunch = (options) => { relaunches.push(options.url); };
+
+    try {
+      const pending = [0, 1].map(() => request({ path: "/session/role", method: "POST", bearerToken: "pending-role-token" }));
+      responders.forEach((respond) => respond({
+        statusCode: 401,
+        data: { error: { code: "authentication_required", message: "Role token expired" } },
+      }));
+
+      await Promise.allSettled(pending);
+      expect(relaunches).toEqual(["/pages/login/index"]);
     } finally {
       globalThis.wx.request = originalRequest;
       clearSession();

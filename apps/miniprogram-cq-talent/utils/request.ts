@@ -3,11 +3,46 @@ import { createIdempotencyKey, createRequestId } from "./idempotency";
 import { clearSession, getAppContext, getSession } from "./store";
 import type { SessionState } from "./types";
 
+export type ApiErrorType =
+  | "network"
+  | "timeout"
+  | "unauthorized"
+  | "forbidden"
+  | "conflict"
+  | "server_error"
+  | "http_error"
+  | "unexpected_status"
+  | "runtime_not_configured";
+
 export interface ApiError {
   code: string;
   message: string;
   details?: unknown[];
   statusCode?: number;
+  /** Stable machine-readable category pages can branch on. */
+  errorType?: ApiErrorType;
+  /** Unified user-facing copy for the error category. */
+  userMessage?: string;
+}
+
+const USER_MESSAGES: Record<ApiErrorType, string> = {
+  network: "网络连接不可用，请检查网络后重试",
+  timeout: "请求超时，请检查网络后重试",
+  unauthorized: "登录已过期，请重新登录",
+  forbidden: "没有权限执行此操作",
+  conflict: "操作冲突，请刷新后重试",
+  server_error: "服务暂时不可用，请稍后重试",
+  http_error: "请求失败，请重试",
+  unexpected_status: "服务返回了意外的响应，请重试",
+  runtime_not_configured: "当前环境尚未配置服务地址，请重新打开小程序",
+};
+
+function httpErrorType(statusCode: number): ApiErrorType {
+  if (statusCode === 401) return "unauthorized";
+  if (statusCode === 403) return "forbidden";
+  if (statusCode === 409) return "conflict";
+  if (statusCode >= 500) return "server_error";
+  return "http_error";
 }
 
 export interface RequestOptions<TBody = unknown> {
@@ -76,7 +111,12 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
     try {
       baseUrl = assertRuntimeApiConfigured();
     } catch (error) {
-      reject({ code: "runtime_not_configured", message: error instanceof Error ? error.message : "当前环境尚未配置服务地址" });
+      reject({
+        code: "runtime_not_configured",
+        message: error instanceof Error ? error.message : "当前环境尚未配置服务地址",
+        errorType: "runtime_not_configured",
+        userMessage: USER_MESSAGES.runtime_not_configured,
+      });
       return;
     }
     wx.request({
@@ -105,17 +145,34 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
           handleAuthFailure(sessionAtRequest, bearerToken, options.bearerToken !== undefined);
         }
         const payload = response.data as { error?: ApiError };
-        reject(payload.error ?? { code: "http_error", message: `HTTP ${response.statusCode}` });
+        const errorType = httpErrorType(response.statusCode);
+        reject({
+          ...(payload.error ?? { code: "http_error", message: `HTTP ${response.statusCode}` }),
+          statusCode: response.statusCode,
+          errorType,
+          userMessage: USER_MESSAGES[errorType],
+        });
       },
       fail: (error) => {
-        reject({ code: "network_error", message: error.errMsg });
+        // WeChat reports timeouts as "request:fail timeout"; they need distinct
+        // user-facing copy from generic network failures.
+        const isTimeout = /timeout/i.test(error.errMsg ?? "");
+        const errorType: ApiErrorType = isTimeout ? "timeout" : "network";
+        reject({
+          code: isTimeout ? "timeout" : "network_error",
+          message: error.errMsg,
+          errorType,
+          userMessage: USER_MESSAGES[errorType],
+        });
       },
     });
   });
 }
 
 // Remembers which token already triggered the login redirect so a burst of
-// concurrent 401 responses converges to a single navigation.
+// concurrent 401 responses without any surrounding session converges to a
+// single navigation. Genuine failures of a live session reset it implicitly:
+// after the first 401 clears the session, later ones are classified as stale.
 let lastAuthFailureHandledFor: string | null = null;
 
 function handleAuthFailure(sessionAtRequest: SessionState | null, tokenSent: string | undefined, usedExplicitBearer: boolean): void {
@@ -132,7 +189,12 @@ function handleAuthFailure(sessionAtRequest: SessionState | null, tokenSent: str
     : !(currentSession && tokenSent !== undefined && currentSession.token === tokenSent);
   if (isStaleAuthFailure) return;
 
-  if (tokenSent !== undefined && lastAuthFailureHandledFor === tokenSent) return;
+  if (
+    !currentSession
+    && !sessionAtRequest
+    && tokenSent !== undefined
+    && lastAuthFailureHandledFor === tokenSent
+  ) return;
   if (tokenSent !== undefined) lastAuthFailureHandledFor = tokenSent;
 
   clearSession();
