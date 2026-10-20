@@ -17,7 +17,9 @@ function runGuardTsc() {
 }
 
 describe("微信类型负例守卫（miniprogram-api-typings）", () => {
-  it("Page/Component 的错误示例必须被 tsc 拒绝", () => {
+  // tsc 子进程在与其它 vitest worker 并发时可能明显慢于单独执行，
+  // 用例曾实测并发下触发默认 5s 超时；放宽到 60s 保证 CI 可复跑。
+  it("Page/Component 的错误示例必须被 tsc 拒绝", { timeout: 60_000 }, () => {
     const { status, output } = runGuardTsc();
     // fixture 全部为故意错误示例：编译必须失败
     expect(status).not.toBe(0);
