@@ -1,52 +1,66 @@
-<view class="c162-page">
-  <view class="c162-nav" style="padding-top:{{navInset}}px">
-    <view class="c162-nav__back" bindtap="goBack" aria-label="返回">
-      <image class="c162-nav__back-icon" src="/assets/icons/c162-chevron-left.svg" mode="aspectFit" />
+<view class="c34-page">
+  <view class="c34-nav" style="padding-top:{{navInset}}px">
+    <view class="c34-nav__back" bindtap="goBack" aria-label="返回">
+      <image class="c34-nav__back-icon" src="/assets/icons/c162-chevron-left.svg" mode="aspectFit" />
     </view>
-    <view class="c162-nav__title">私教兴趣</view>
-    <view class="c162-nav__placeholder" aria-hidden="true"></view>
+    <view class="c34-nav__title">私教接课</view>
+    <view class="c34-nav__placeholder" aria-hidden="true"></view>
   </view>
 
-  <view class="c162-page__body">
-    <view class="c162-content">
-      <view class="c162-info-card">
-        <view class="c162-info-card__title">私教兴趣</view>
-        <view class="c162-info-card__text">{{featureMessage}}</view>
+  <view class="c34-body">
+    <!-- 接课状态 -->
+    <view class="c34-card">
+      <view class="c34-card__title">接课状态</view>
+      <view wx:if="{{loadFailed}}" class="c34-retry">
+        <view class="c34-retry__text">私教偏好读取失败，为避免覆盖已有设置，暂不可编辑。</view>
+        <view class="c34-retry__button" bindtap="retryLoad" aria-label="重试读取">重试</view>
       </view>
-
-      <view wx:if="{{loadFailed}}" class="c162-load-error">
-        <view class="c162-load-error__text">私教偏好读取失败，为避免覆盖已有设置，暂不可编辑。</view>
-        <view class="c162-load-error__retry" bindtap="retryLoad" aria-label="重试读取">重试</view>
-      </view>
-
-      <block wx:if="{{!loadFailed}}">
-      <view class="c162-toggle-row">
-        <view class="c162-toggle-row__label">接受私教预约</view>
-        <view class="c162-toggle {{accepting ? 'c162-toggle--on' : 'c162-toggle--off'}} {{interactive ? '' : 'c162-toggle--disabled'}}" bindtap="toggleAccepting" aria-label="接受私教预约">
-          <view class="c162-toggle__thumb"></view>
-        </view>
-      </view>
-
-      <view wx:if="{{saveFailed}}" class="c162-save-alert">上次保存未成功，当前展示的是已保存内容，请重试。</view>
-
-      <view class="c162-schedule-card">
-        <view class="c162-schedule-card__title">可用时段</view>
-        <view class="c162-schedule-grid">
-          <view class="c162-schedule-grid__headers">
-            <view wx:for="{{availabilityColumns}}" wx:key="day" class="c162-schedule-grid__header">{{item.day}}</view>
+      <block wx:else>
+        <view class="c34-status">
+          <view class="c34-status__info">
+            <view class="c34-status__label {{accepting ? 'c34-status__label--on' : ''}}">{{acceptingStatusLabel}}</view>
+            <view class="c34-status__hint">{{featureMessage}}</view>
           </view>
-          <view class="c162-schedule-grid__columns">
-            <view wx:for="{{availabilityColumns}}" wx:key="day" class="c162-schedule-grid__column">
-              <view wx:for="{{item.slots}}" wx:key="key" class="c162-slot {{item.selected ? 'c162-slot--selected' : 'c162-slot--unavailable'}}" data-key="{{item.key}}" bindtap="toggleSlot">
-                <view class="c162-slot__text {{item.selected ? 'c162-slot__text--selected' : 'c162-slot__text--unavailable'}}">{{item.label}}</view>
+          <view class="c34-toggle {{accepting ? 'c34-toggle--on' : 'c34-toggle--off'}} {{interactive ? '' : 'c34-toggle--disabled'}}" bindtap="toggleAccepting" aria-label="接受私教预约">
+            <view class="c34-toggle__thumb"></view>
+          </view>
+        </view>
+      </block>
+      <view wx:if="{{saveFailed}}" class="c34-alert">上次保存未成功，当前展示的是已保存内容，请重试。</view>
+    </view>
+
+    <!-- 时段摘要 -->
+    <block wx:if="{{featureState === 'enabled' && !loadFailed}}">
+      <view class="c34-card">
+        <view class="c34-card__title">可用时段</view>
+        <view class="c34-summary">{{availabilitySummary}}</view>
+        <view class="c34-grid">
+          <view class="c34-grid__headers">
+            <view wx:for="{{availabilityColumns}}" wx:key="day" class="c34-grid__header">{{item.day}}</view>
+          </view>
+          <view class="c34-grid__columns">
+            <view wx:for="{{availabilityColumns}}" wx:key="day" class="c34-grid__column">
+              <view wx:for="{{item.slots}}" wx:key="key" class="c34-slot {{item.selected ? 'c34-slot--selected' : 'c34-slot--unavailable'}}" data-key="{{item.key}}" bindtap="toggleSlot">
+                <view class="c34-slot__text {{item.selected ? 'c34-slot__text--selected' : 'c34-slot__text--unavailable'}}">{{item.label}}</view>
               </view>
             </view>
           </view>
         </view>
-        <view class="c162-schedule-card__fee">{{feeMessage}}</view>
       </view>
-      </block>
-    </view>
+
+      <!-- 已分派咨询 -->
+      <view class="c34-card">
+        <view class="c34-card__title">已分派咨询</view>
+        <view class="c34-card__empty">家长发起的私教预约，经俱乐部确认分派后将在此展示。</view>
+      </view>
+
+      <!-- 服务跟进 -->
+      <view class="c34-card">
+        <view class="c34-card__title">服务跟进</view>
+        <view class="c34-card__note">{{feeMessage}}</view>
+        <view class="c34-card__note">家长发起预约后由俱乐部统一跟进，教练确认可用时段后安排开课。</view>
+      </view>
+    </block>
   </view>
 
   <role-tabbar role="coach" active="me" />

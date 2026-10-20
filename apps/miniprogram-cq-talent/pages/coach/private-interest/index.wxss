@@ -1,9 +1,11 @@
-.c162-page {
+/* C34 接课配置页：接课状态 / 时段摘要 / 已分派咨询 / 服务跟进 四块信息层次。
+   配色一律使用 club tokens，禁止硬编码色值。 */
+.c34-page {
   min-height: 100vh;
-  background: #f6f7f9;
+  background: var(--club-page);
 }
 
-.c162-nav {
+.c34-nav {
   position: sticky;
   top: 0;
   z-index: 100;
@@ -13,96 +15,116 @@
   align-items: center;
   padding-right: 200rpx;
   padding-left: 32rpx;
-  background: #fceeef;
+  background: var(--club-nav);
+  border-bottom: 1rpx solid var(--club-line);
 }
 
-.c162-nav__back {
+.c34-nav__back {
+  display: flex;
   width: 48rpx;
   height: 48rpx;
   flex: 0 0 48rpx;
-}
-
-.c162-nav__back {
-  display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.c162-nav__back-icon {
+.c34-nav__back-icon {
   width: 40rpx;
   height: 40rpx;
 }
 
-.c162-nav__title {
+.c34-nav__title {
   flex: 1;
-  color: #202124;
-  font-size: 36rpx;
+  color: var(--club-text);
+  font-size: var(--font-size-display);
   font-weight: 700;
   text-align: left;
 }
 
-.c162-nav__placeholder {
+.c34-nav__placeholder {
   width: 48rpx;
   height: 48rpx;
   flex: 0 0 48rpx;
 }
 
-.c162-page__body {
-  padding: 32rpx 44rpx 80rpx;
-}
-
-.c162-content {
+.c34-body {
   display: flex;
   flex-direction: column;
-  gap: 32rpx;
+  gap: var(--spacing-card-gap);
+  padding: var(--spacing-page) var(--space-page) 220rpx;
 }
 
-.c162-info-card,
-.c162-toggle-row,
-.c162-schedule-card {
+.c34-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-stack);
   box-sizing: border-box;
-  padding: 32rpx;
-  background: #ffffff;
-  border-radius: 24rpx;
-  box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.05);
+  padding: var(--spacing-card);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  box-shadow: var(--club-shadow);
 }
 
-.c162-info-card {
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
-}
-
-.c162-info-card__title,
-.c162-schedule-card__title {
-  color: #202124;
-  font-size: 28rpx;
+.c34-card__title {
+  color: var(--club-text);
+  font-size: var(--font-size-section);
   font-weight: 700;
+  line-height: 42rpx;
 }
 
-.c162-info-card__text,
-.c162-schedule-card__fee {
-  color: #667085;
-  font-size: 24rpx;
-  line-height: 32rpx;
+.c34-card__note {
+  color: var(--club-muted);
+  font-size: var(--font-size-caption);
+  line-height: 36rpx;
 }
 
-.c162-toggle-row {
+.c34-card__empty {
+  padding: var(--spacing-stack) 0;
+  border-radius: var(--radius-button);
+  background: var(--club-page);
+  color: var(--club-muted);
+  font-size: var(--font-size-caption);
+  line-height: 36rpx;
+  text-align: center;
+}
+
+/* 接课状态 */
+.c34-status {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 112rpx;
+  gap: var(--spacing-stack);
+  min-height: 96rpx;
 }
 
-.c162-toggle-row__label {
-  color: #202124;
-  font-size: 28rpx;
-  font-weight: 600;
+.c34-status__info {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  min-width: 0;
 }
 
-.c162-toggle {
+.c34-status__label {
+  color: var(--club-muted);
+  font-size: var(--font-size-body);
+  font-weight: 700;
+  line-height: 40rpx;
+}
+
+.c34-status__label--on {
+  color: var(--color-success);
+}
+
+.c34-status__hint {
+  color: var(--club-muted);
+  font-size: var(--font-size-caption);
+  line-height: 32rpx;
+}
+
+.c34-toggle {
   display: flex;
   align-items: center;
+  flex: 0 0 auto;
   width: 88rpx;
   height: 48rpx;
   box-sizing: border-box;
@@ -110,94 +132,103 @@
   border-radius: 24rpx;
 }
 
-.c162-toggle--pending,
-.c162-toggle--off {
+.c34-toggle--off {
   justify-content: flex-start;
-  background: #e7eaf0;
+  background: var(--club-line);
 }
 
-.c162-toggle__thumb {
+.c34-toggle--on {
+  justify-content: flex-end;
+  background: var(--color-brand);
+}
+
+.c34-toggle--disabled {
+  opacity: 0.5;
+}
+
+.c34-toggle__thumb {
   width: 40rpx;
   height: 40rpx;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--color-card);
 }
 
-.c162-save-alert {
+.c34-alert {
   padding: 16rpx 24rpx;
-  border-radius: 8rpx;
-  background: #fff1f1;
-  color: #b42318;
-  font-size: 24rpx;
+  border-radius: var(--radius-button);
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+  font-size: var(--font-size-caption);
   line-height: 32rpx;
 }
 
-.c162-load-error {
+/* 读取失败重试 */
+.c34-retry {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
-  padding: 32rpx;
-  border-radius: 24rpx;
-  background: #ffffff;
-  box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.05);
+  gap: var(--spacing-stack);
 }
 
-.c162-load-error__text {
-  color: #667085;
-  font-size: 26rpx;
+.c34-retry__text {
+  color: var(--club-muted);
+  font-size: var(--font-size-aux);
   line-height: 36rpx;
 }
 
-.c162-load-error__retry {
+.c34-retry__button {
   align-self: flex-start;
   padding: 12rpx 40rpx;
   border-radius: 32rpx;
-  background: #a80f1b;
-  color: #ffffff;
-  font-size: 26rpx;
+  background: var(--color-brand);
+  color: var(--color-card);
+  font-size: var(--font-size-aux);
   font-weight: 600;
   line-height: 34rpx;
 }
 
-.c162-schedule-card {
-  display: flex;
-  flex-direction: column;
-  gap: 32rpx;
+/* 时段摘要 */
+.c34-summary {
+  padding: 16rpx 24rpx;
+  border-radius: var(--radius-button);
+  background: var(--club-page);
+  color: var(--club-muted);
+  font-size: var(--font-size-caption);
+  line-height: 32rpx;
 }
 
-.c162-schedule-grid {
+.c34-grid {
   display: flex;
   flex-direction: column;
   gap: 24rpx;
 }
 
-.c162-schedule-grid__headers,
-.c162-schedule-grid__columns {
+.c34-grid__headers,
+.c34-grid__columns {
   display: flex;
   gap: 8rpx;
 }
 
-.c162-schedule-grid__header,
-.c162-schedule-grid__column {
+.c34-grid__header,
+.c34-grid__column {
   flex: 1;
   min-width: 0;
 }
 
-.c162-schedule-grid__header {
-  color: #667085;
+.c34-grid__header {
+  color: var(--club-muted);
   font-size: 22rpx;
   font-weight: 600;
   line-height: 26rpx;
   text-align: center;
 }
 
-.c162-schedule-grid__column {
+.c34-grid__column {
   display: flex;
   flex-direction: column;
   gap: 8rpx;
 }
 
-.c162-slot {
+.c34-slot {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -205,38 +236,25 @@
   border-radius: 8rpx;
 }
 
-.c162-slot--unavailable {
-  background: #e7eaf0;
+.c34-slot--unavailable {
+  background: var(--club-line);
 }
 
-.c162-slot__text {
+.c34-slot--selected {
+  background: var(--color-brand);
+}
+
+.c34-slot__text {
   font-size: 20rpx;
   line-height: 24rpx;
   white-space: nowrap;
 }
 
-.c162-slot__text--unavailable {
-  color: #667085;
+.c34-slot__text--unavailable {
+  color: var(--club-muted);
 }
 
-.c162-schedule-card__fee {
-  text-align: center;
-}
-
-.c162-toggle--on {
-  justify-content: flex-end;
-  background: #34c759;
-}
-
-.c162-toggle--disabled {
-  opacity: 0.5;
-}
-
-.c162-slot--selected {
-  background: #34c759;
-}
-
-.c162-slot__text--selected {
-  color: #ffffff;
+.c34-slot__text--selected {
+  color: var(--color-card);
   font-weight: 600;
 }

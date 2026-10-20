@@ -226,17 +226,46 @@ describe("coach private interest", () => {
     expect(mocks.saveCoachPreferences).not.toHaveBeenCalled();
   });
 
-  it("uses the C16.2 Figma structure with interactive toggle and selectable slots", () => {
+  it("organizes the C34 information hierarchy: status, availability summary, consultations, follow-up", async () => {
+    const page = createPageInstance();
+    page.onLoad();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(page.data.acceptingStatusLabel).toBe("接课中");
+    expect(page.data.availabilitySummary).toBe("每周周一、周二、周三、周四、周五，共 20 个时段");
+  });
+
+  it("summarizes an explicitly empty availability without default wording", async () => {
+    mocks.getStorageSync.mockReturnValue(true);
+    const page = createPageInstance();
+    page.onLoad();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(page.data.availabilitySummary).toBe("暂无可用时段");
+    await page.toggleAccepting();
+    expect(page.data.acceptingStatusLabel).toBe("已暂停接课");
+  });
+
+  it("uses the C34 four-section structure with club tokens and no hardcoded colors", () => {
     expect(existsSync(new URL("../../../assets/icons/c162-chevron-left.svg", import.meta.url))).toBe(true);
     expect(pageConfig).toContain('"role-tabbar"');
-    expect(template).toContain('class="c162-nav"');
+    expect(template).toContain('class="c34-nav"');
+    expect(template).toContain('<view class="c34-card__title">接课状态</view>');
+    expect(template).toContain('<view class="c34-card__title">可用时段</view>');
+    expect(template).toContain('<view class="c34-card__title">已分派咨询</view>');
+    expect(template).toContain('<view class="c34-card__title">服务跟进</view>');
+    expect(template).toContain('{{availabilitySummary}}');
+    expect(template).toContain('bindtap="retryLoad"');
     expect(template).toContain('bindtap="toggleAccepting"');
     expect(template).toContain('bindtap="toggleSlot"');
-    expect(template).toContain("c162-toggle--on");
-    expect(template).toContain("c162-slot--selected");
+    expect(template).toContain("c34-toggle--on");
+    expect(template).toContain("c34-slot--selected");
     expect(template).not.toMatch(/\{\{item\.(?:map|filter|slice|indexOf)/);
-    expect(stylesheet).toMatch(/\.c162-toggle--on\s*\{[^}]*background:\s*#34c759/s);
-    expect(stylesheet).toMatch(/\.c162-slot--selected\s*\{[^}]*background:\s*#34c759/s);
-    expect(stylesheet).toMatch(/\.c162-nav\s*\{(?=[^}]*background:\s*#fceeef)/s);
+    expect(stylesheet).toMatch(/\.c34-page\s*\{[^}]*background:\s*var\(--club-page\)/s);
+    expect(stylesheet).toMatch(/\.c34-nav\s*\{[^}]*background:\s*var\(--club-nav\)/s);
+    expect(stylesheet).toMatch(/\.c34-toggle--on\s*\{[^}]*background:\s*var\(--color-brand\)/s);
+    expect(stylesheet).toMatch(/\.c34-slot--selected\s*\{[^}]*background:\s*var\(--color-brand\)/s);
+    expect(stylesheet).toMatch(/\.c34-status__label--on\s*\{[^}]*color:\s*var\(--color-success\)/s);
+    expect(stylesheet).not.toMatch(/#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})\b/);
   });
 });

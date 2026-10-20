@@ -21,8 +21,10 @@ interface PageData {
   featureTitle: string;
   featureMessage: string;
   accepting: boolean;
+  acceptingStatusLabel: string;
   interactive: boolean;
   availabilityColumns: AvailabilityColumn[];
+  availabilitySummary: string;
   feeMessage: string;
   saving: boolean;
   saveFailed: boolean;
@@ -66,8 +68,10 @@ Page<PageData>({
     featureTitle: "私教服务状态待同步",
     featureMessage: "暂无法确认俱乐部是否已开通私教服务",
     accepting: false,
+    acceptingStatusLabel: "已暂停接课",
     interactive: false,
     availabilityColumns: buildColumns(new Set(DEFAULT_SLOTS)),
+    availabilitySummary: "",
     feeMessage: "费用由俱乐部统一结算",
     saving: false,
     saveFailed: false,
@@ -97,9 +101,12 @@ Page<PageData>({
         ? preferences.availabilitySlots
         : DEFAULT_SLOTS;
       const selected = new Set(slots);
+      const columns = buildColumns(selected);
       this.setData({
         accepting: preferences.acceptsPrivateLessons,
-        availabilityColumns: buildColumns(selected),
+        acceptingStatusLabel: acceptingStatusLabel(preferences.acceptsPrivateLessons),
+        availabilityColumns: columns,
+        availabilitySummary: summarizeAvailability(columns),
         interactive: true,
         loadFailed: false,
       });
@@ -112,13 +119,13 @@ Page<PageData>({
     if (!this.data.interactive || this.data.saving) return;
     const previousAccepting = this.data.accepting;
     const next = !previousAccepting;
-    this.setData({ accepting: next, saving: true });
+    this.setData({ accepting: next, acceptingStatusLabel: acceptingStatusLabel(next), saving: true });
     try {
       await saveCoachPreferences({ acceptsPrivateLessons: next, availabilitySlots: collectSelected(this.data.availabilityColumns) });
       markPreferencesSaved();
       this.setData({ saveFailed: false });
     } catch {
-      this.setData({ accepting: previousAccepting, saveFailed: true });
+      this.setData({ accepting: previousAccepting, acceptingStatusLabel: acceptingStatusLabel(previousAccepting), saveFailed: true });
       wx.showToast({ title: "保存失败，请重试", icon: "none" });
     } finally {
       this.setData({ saving: false });
@@ -132,13 +139,13 @@ Page<PageData>({
       ...column,
       slots: column.slots.map((slot: AvailabilitySlot) => (slot.key === key ? { ...slot, selected: !slot.selected } : slot)),
     }));
-    this.setData({ availabilityColumns: columns, saving: true });
+    this.setData({ availabilityColumns: columns, availabilitySummary: summarizeAvailability(columns), saving: true });
     try {
       await saveCoachPreferences({ acceptsPrivateLessons: this.data.accepting, availabilitySlots: collectSelected(columns) });
       markPreferencesSaved();
       this.setData({ saveFailed: false });
     } catch {
-      this.setData({ availabilityColumns: previousColumns, saveFailed: true });
+      this.setData({ availabilityColumns: previousColumns, availabilitySummary: summarizeAvailability(previousColumns), saveFailed: true });
       wx.showToast({ title: "保存失败，请重试", icon: "none" });
     } finally {
       this.setData({ saving: false });
@@ -187,4 +194,17 @@ function buildColumns(selected: Set<string>): AvailabilityColumn[] {
 
 function collectSelected(columns: AvailabilityColumn[]): string[] {
   return columns.flatMap((column: AvailabilityColumn) => column.slots.filter((slot: AvailabilitySlot) => slot.selected).map((slot: AvailabilitySlot) => slot.key));
+}
+
+function acceptingStatusLabel(accepting: boolean): string {
+  return accepting ? "接课中" : "已暂停接课";
+}
+
+function summarizeAvailability(columns: AvailabilityColumn[]): string {
+  const activeDays = columns.filter((column: AvailabilityColumn) => column.slots.some((slot: AvailabilitySlot) => slot.selected)).map((column: AvailabilityColumn) => column.day);
+  const total = columns.reduce((sum: number, column: AvailabilityColumn) => sum + column.slots.filter((slot: AvailabilitySlot) => slot.selected).length, 0);
+  if (total === 0) {
+    return "暂无可用时段";
+  }
+  return `每周${activeDays.join("、")}，共 ${total} 个时段`;
 }
