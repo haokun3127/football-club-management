@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { correctTrainingRecord, MemoryTrainingRecordRepository, reconcileTrainingRecord, TrainingRecordConflict } from "../src/application/training-records.js";
+import { correctTrainingRecord, MemoryTrainingRecordRepository, reconcileTrainingRecord, requestTrainingLeave, revokeTrainingLeave, TrainingRecordConflict } from "../src/application/training-records.js";
 import { createPlatformPersistence } from "../src/persistence/platform-persistence.js";
 import { createSeedData } from "../src/seed.js";
 
@@ -37,6 +37,35 @@ describe("independent training facts", () => {
     const repository = new MemoryTrainingRecordRepository();
     expect(reconcileTrainingRecord(repository, pastEvent, { ...participant, status }, nextDay)?.counted).toBe(false);
     expect(reconcileTrainingRecord(repository, { ...pastEvent, status: "cancelled" }, participant, nextDay)?.counted).toBe(false);
+  });
+
+  it("writes pre-class leave as an audited non-counted fact and removes it on pre-class withdrawal", () => {
+    const repository = new MemoryTrainingRecordRepository();
+    const scope = { clubId: event.clubId, eventId: event.id, studentId: participant.studentId };
+    const beforeClass = "2026-09-21T07:00:00Z";
+    const leave = requestTrainingLeave(repository, scope, { expectedRevision: 0, actorUserId: "parent-1", initialOccurredAt: pastEvent.timeRange.startsAt }, beforeClass);
+    expect(leave).toMatchObject({ counted: false, source: "correction", revision: 1 });
+    expect(leave.history[0]).toMatchObject({ reason: "家长请假", actorUserId: "parent-1", previousCounted: null });
+    // 课前请假不会被自动任务覆盖
+    expect(reconcileTrainingRecord(repository, pastEvent, { ...participant, status: "leave_requested" }, nextDay)).toEqual(leave);
+    // 课前撤回：删除记录，恢复默认自动流程；过期版本撤回触发冲突
+    expect(revokeTrainingLeave(repository, scope, pastEvent, { expectedRevision: 1, actorUserId: "parent-1" }, beforeClass)).toBeNull();
+    expect(repository.get(scope.clubId, scope.eventId, scope.studentId)).toBeNull();
+    const reLeave = requestTrainingLeave(repository, scope, { expectedRevision: 0, actorUserId: "parent-1", initialOccurredAt: pastEvent.timeRange.startsAt }, beforeClass);
+    expect(() => revokeTrainingLeave(repository, scope, pastEvent, { expectedRevision: 0, actorUserId: "parent-1" }, beforeClass)).toThrow(TrainingRecordConflict);
+    expect(repository.get(scope.clubId, scope.eventId, scope.studentId)).toEqual(reLeave);
+    expect(repository.remove(scope.clubId, scope.eventId, scope.studentId, 99)).toBe(false);
+  });
+
+  it("withdraws a post-class leave as a counted correction with history", () => {
+    const repository = new MemoryTrainingRecordRepository();
+    const scope = { clubId: event.clubId, eventId: event.id, studentId: participant.studentId };
+    const leave = requestTrainingLeave(repository, scope, { expectedRevision: 0, actorUserId: "parent-1", initialOccurredAt: pastEvent.timeRange.startsAt }, nextDay);
+    const revoked = revokeTrainingLeave(repository, scope, pastEvent, { expectedRevision: leave.revision, actorUserId: "parent-1" }, nextDay)!;
+    expect(revoked).toMatchObject({ counted: true, revision: 2 });
+    expect(revoked.history.at(-1)).toMatchObject({ reason: "撤回请假，改为销课", previousCounted: false, actorUserId: "parent-1" });
+    // 没有记录时撤回直接成功且不产生事实
+    expect(revokeTrainingLeave(repository, { ...scope, studentId: "student-none" }, pastEvent, { expectedRevision: 0, actorUserId: "parent-1" }, nextDay)).toBeNull();
   });
 
   it("replays automatic work without duplicates and preserves a manual correction and its history", () => {

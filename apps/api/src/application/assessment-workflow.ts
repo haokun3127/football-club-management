@@ -44,7 +44,7 @@ export class AssessmentWorkflow {
       courses.push({id:event.id,title:event.title,occurredAt:event.timeRange.startsAt,
         studentIds: this.store.listEventParticipants(task.clubId).filter(participant => {
           if (participant.eventId !== event.id) return false;
-          const repository=readOnly?{get:()=>this.store.trainingRecords.get(task.clubId,event.id,participant.studentId),compareAndSave:()=>true}:this.store.trainingRecords;
+          const repository=readOnly?{get:()=>this.store.trainingRecords.get(task.clubId,event.id,participant.studentId),compareAndSave:()=>true,remove:()=>true}:this.store.trainingRecords;
           const fact = reconcileTrainingRecord(repository, event, participant);
           return fact ? fact.counted : !["absent", "leave_requested", "excused"].includes(participant.status);
         }).map(participant => participant.studentId)});

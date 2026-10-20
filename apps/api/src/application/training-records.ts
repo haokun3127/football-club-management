@@ -25,6 +25,8 @@ export interface TrainingRecordRepository {
   get(clubId: string, eventId: string, studentId: string): TrainingRecord | null;
   /** Atomically replaces the fact AND its history; revision 0 means insert only. */
   compareAndSave(record: TrainingRecord, expectedRevision: number): boolean;
+  /** Removes the fact only while it is still at expectedRevision (pre-class leave withdrawal). */
+  remove(clubId: string, eventId: string, studentId: string, expectedRevision: number): boolean;
 }
 
 export class MemoryTrainingRecordRepository implements TrainingRecordRepository {
@@ -38,6 +40,12 @@ export class MemoryTrainingRecordRepository implements TrainingRecordRepository 
     if ((this.records.get(key)?.revision ?? 0) !== expectedRevision) return false;
     if (record.revision !== expectedRevision + 1) throw new Error("Invalid training record revision");
     this.records.set(key, structuredClone(record));
+    return true;
+  }
+  remove(clubId: string, eventId: string, studentId: string, expectedRevision: number) {
+    const key = JSON.stringify([clubId, eventId, studentId]);
+    if ((this.records.get(key)?.revision ?? 0) !== expectedRevision) return false;
+    this.records.delete(key);
     return true;
   }
 }
@@ -92,4 +100,56 @@ export function correctTrainingRecord(
   };
   if (!repository.compareAndSave(record, current?.revision ?? 0)) throw new TrainingRecordConflict(repository.get(scope.clubId, scope.eventId, scope.studentId));
   return record;
+}
+
+/**
+ * 家长请假（REQ-ATT-001）：本质是一次参与状态修正——写入不销课的训练记录并留痕，
+ * 与课后更正共用 correctTrainingRecord 的修订/冲突/留痕机制，不另起第三条销课写入路径。
+ */
+export function requestTrainingLeave(
+  repository: TrainingRecordRepository,
+  scope: { clubId: string; eventId: string; studentId: string },
+  input: { expectedRevision: number; reason?: string; actorUserId: string; actorDisplayName?: string; initialOccurredAt: string },
+  now = new Date().toISOString(),
+): TrainingRecord {
+  return correctTrainingRecord(repository, scope, {
+    expectedRevision: input.expectedRevision,
+    counted: false,
+    reason: input.reason?.trim() || "家长请假",
+    actorUserId: input.actorUserId,
+    actorDisplayName: input.actorDisplayName,
+    initialOccurredAt: input.initialOccurredAt,
+  }, now);
+}
+
+/**
+ * 撤回请假（已请假但实际参加 → 改回销课）。课前撤回删除请假产生的记录，恢复
+ * “课程结束后自动记录”的默认流程；课后撤回是对既有记录的一次更正（计次、留痕）。
+ */
+export function revokeTrainingLeave(
+  repository: TrainingRecordRepository,
+  scope: { clubId: string; eventId: string; studentId: string },
+  event: Pick<CalendarEvent, "timeRange">,
+  input: { expectedRevision: number; reason?: string; actorUserId: string; actorDisplayName?: string },
+  now = new Date().toISOString(),
+): TrainingRecord | null {
+  const current = repository.get(scope.clubId, scope.eventId, scope.studentId);
+  if (!current) return null;
+  const endsAt = Date.parse(event.timeRange.endsAt);
+  const nowAt = Date.parse(now);
+  if (!Number.isFinite(endsAt) || !Number.isFinite(nowAt)) throw new Error("Invalid training timestamp");
+  if (nowAt < endsAt) {
+    if (current.revision !== input.expectedRevision
+      || !repository.remove(scope.clubId, scope.eventId, scope.studentId, current.revision)) {
+      throw new TrainingRecordConflict(repository.get(scope.clubId, scope.eventId, scope.studentId));
+    }
+    return null;
+  }
+  return correctTrainingRecord(repository, scope, {
+    expectedRevision: input.expectedRevision,
+    counted: true,
+    reason: input.reason?.trim() || "撤回请假，改为销课",
+    actorUserId: input.actorUserId,
+    actorDisplayName: input.actorDisplayName,
+  }, now);
 }
