@@ -30,6 +30,7 @@
               </view>
             </view>
             <image wx:if="{{item.statusIsPresent}}" class="attendance-confirmation attendance-confirmation--present" src="/assets/icons/c4-1-check.svg" mode="aspectFit" aria-label="已到" />
+            <view wx:elif="{{item.statusLeave}}" class="attendance-leave-badge">已请假</view>
             <view wx:else class="attendance-confirmation attendance-confirmation--absent" aria-label="未到"></view>
           </view>
         </view>

@@ -1,10 +1,10 @@
-import { getCoachWorkbench, saveCoachAttendance } from "../../../utils/api";
+import { attendanceLeaveConflictMessage, getCoachWorkbench, isAttendanceLeaveConflictError, resolveAttendanceLeaveConflicts, saveCoachAttendance } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { activityStatus, formatCalendarDate, formatTimeRange } from "../../../utils/presentation";
 import type { CoachWorkbench, LoadState } from "../../../utils/types";
 
 type RosterItem = CoachWorkbench["roster"][number];
-type RosterUiItem = RosterItem & { avatarLetter: string; avatarColor: string; statusLabel: string; statusTone: string; statusIsPresent: boolean };
+type RosterUiItem = RosterItem & { initialStatus: string; avatarLetter: string; avatarColor: string; statusLabel: string; statusTone: string; statusIsPresent: boolean; statusLeave: boolean };
 
 const statusOptions = [
   { label: "未点名", value: "pending" },
@@ -157,33 +157,74 @@ Page<AttendancePageData>({
       await saveCoachAttendance(this.data.eventId, this.data.roster.map((student: RosterUiItem) => toAttendanceParticipant(student)));
       wx.redirectTo({ url: `/pages/coach/attendance-success/index?eventId=${encodeURIComponent(this.data.eventId)}` });
     } catch (error) {
+      if (isAttendanceLeaveConflictError(error)) {
+        await this.refreshAfterLeaveConflict();
+        return;
+      }
       this.setData({ saving: false, hasSaveError: true, saveError: attendanceSaveError(error) });
+    }
+  },
+  // 家长请假冲突（409 attendance_leave_conflict）：重拉名单、展示冲突学员，
+  // 要求教练核对后重新提交；不静默覆盖、不自动重试（REQ-ATT-002 并发保护）。
+  async refreshAfterLeaveConflict() {
+    const attempted = this.data.roster.map((student: RosterUiItem) => ({
+      studentId: student.studentId, status: student.status, previousStatus: student.initialStatus,
+    }));
+    try {
+      const workbench = await getCoachWorkbench(this.data.eventId);
+      const roster = withRosterUi(workbench.roster);
+      const conflicts = resolveAttendanceLeaveConflicts(workbench.roster, attempted);
+      this.setData({
+        roster,
+        summary: summarizeRoster(roster),
+        rosterFooter: rosterFooterText(roster.length),
+        canSave: workbench.event.status !== "cancelled" && roster.length > 0,
+        saving: false,
+        hasSaveError: true,
+        saveError: attendanceLeaveConflictMessage(conflicts),
+      });
+    } catch {
+      this.setData({
+        state: "error",
+        message: "名单已变化且刷新失败，请重新加载核对最新名单。",
+        roster: [],
+        hasRoster: false,
+        rosterFooter: "",
+        canSave: false,
+        summary: emptySummary(),
+        saving: false,
+        hasSaveError: false,
+        saveError: "",
+      });
     }
   },
 });
 
-function toAttendanceParticipant(student: RosterUiItem): RosterItem {
+function toAttendanceParticipant(student: RosterUiItem): RosterItem & { previousStatus: string } {
   return {
     studentId: student.studentId,
     name: student.name,
     status: student.status,
     note: student.note || undefined,
     remainingLessons: student.remainingLessons,
+    previousStatus: student.initialStatus,
   };
 }
 
-function withRosterUi(roster: RosterItem[]): RosterUiItem[] {
+function withRosterUi(roster: Array<RosterItem & { initialStatus?: string }>): RosterUiItem[] {
   return roster.map((student) => {
     const statusIndex = statusOptions.findIndex((option) => option.value === student.status);
     const option = statusOptions[statusIndex] ?? statusOptions[0]!;
     return {
       ...student,
       status: option.value,
+      initialStatus: student.initialStatus ?? student.status,
       avatarLetter: student.name.slice(0, 1),
       avatarColor: avatarColor(student.studentId),
       statusLabel: option.label,
       statusTone: statusTone(option.value),
       statusIsPresent: isArrivedStatus(option.value),
+      statusLeave: option.value === "leave_requested" || option.value === "excused",
     };
   });
 }

@@ -7,10 +7,14 @@ const mocks = vi.hoisted(() => ({
   requireRole: vi.fn(),
 }));
 
-vi.mock("../../../utils/api", () => ({
-  getCoachWorkbench: mocks.getCoachWorkbench,
-  saveCoachAttendance: mocks.saveCoachAttendance,
-}));
+vi.mock("../../../utils/api", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    getCoachWorkbench: mocks.getCoachWorkbench,
+    saveCoachAttendance: mocks.saveCoachAttendance,
+  };
+});
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/presentation", () => ({
   activityStatus: (status) => ({ label: status, tone: "info" }),
@@ -273,5 +277,92 @@ describe("coach attendance", () => {
     expect(template).not.toContain('src="/assets/icons/c4-2-alert-triangle.svg"');
     expect(template).not.toContain("家长对出勤记录提出异议，请核实后重新提交");
     expect(template).not.toContain("重新提交");
+  });
+
+  it("marks parent-submitted leave statuses with a 已请假 badge instead of a plain absent circle", async () => {
+    const page = await loadReadyPage();
+
+    expect(page.data.roster).toEqual(expect.arrayContaining([
+      expect.objectContaining({ studentId: "student-leave", statusLeave: true, initialStatus: "leave_requested" }),
+      expect.objectContaining({ studentId: "student-excused", statusLeave: true, initialStatus: "excused" }),
+      expect.objectContaining({ studentId: "student-late", statusLeave: false, initialStatus: "late" }),
+    ]));
+    expect(template).toContain('wx:elif="{{item.statusLeave}}"');
+    expect(template).toContain("已请假");
+    expect(stylesheet).toMatch(/\.attendance-leave-badge\s*\{[^}]*background:\s*#f2f4f7[^}]*color:\s*#475569/s);
+  });
+
+  it("submits the loaded status snapshot as previousStatus for every participant", async () => {
+    const page = await loadReadyPage();
+
+    await page.saveAttendance();
+    expect(mocks.saveCoachAttendance).toHaveBeenCalledWith("event-1", expect.arrayContaining([
+      expect.objectContaining({ studentId: "student-late", status: "late", previousStatus: "late" }),
+      expect.objectContaining({ studentId: "student-leave", status: "leave_requested", previousStatus: "leave_requested" }),
+      expect.objectContaining({ studentId: "student-excused", status: "excused", previousStatus: "excused" }),
+    ]));
+  });
+
+  it("refreshes the roster and names conflicting students after a leave 409 without auto-retrying", async () => {
+    mocks.getCoachWorkbench
+      .mockResolvedValueOnce({
+        ...workbench,
+        roster: [
+          { studentId: "student-1", name: "小明", status: "confirmed" },
+          { studentId: "student-2", name: "小红", status: "confirmed" },
+        ],
+      })
+      .mockResolvedValueOnce({
+        ...workbench,
+        roster: [
+          { studentId: "student-1", name: "小明", status: "leave_requested" },
+          { studentId: "student-2", name: "小红", status: "confirmed" },
+        ],
+      });
+    mocks.saveCoachAttendance.mockRejectedValueOnce({
+      code: "attendance_leave_conflict",
+      errorType: "conflict",
+      statusCode: 409,
+      message: "部分学员有家长提交的请假，请核对最新名单后重试",
+    });
+    const page = createPageInstance();
+    await page.load("event-1");
+    page.markAllPresent();
+
+    await page.saveAttendance();
+
+    expect(mocks.saveCoachAttendance).toHaveBeenCalledTimes(1);
+    expect(mocks.getCoachWorkbench).toHaveBeenCalledTimes(2);
+    expect(globalThis.wx.redirectTo).not.toHaveBeenCalled();
+    expect(page.data).toMatchObject({ saving: false, hasSaveError: true });
+    expect(page.data.saveError).toContain("小明");
+    expect(page.data.saveError).toContain("请假");
+    expect(page.data.roster[0]).toMatchObject({ studentId: "student-1", status: "leave_requested", statusLeave: true, initialStatus: "leave_requested" });
+    expect(page.data.roster[1]).toMatchObject({ status: "pending", initialStatus: "confirmed" });
+  });
+
+  it("allows an explicit override back to present once the refreshed snapshot is submitted", async () => {
+    mocks.getCoachWorkbench
+      .mockResolvedValueOnce({
+        ...workbench,
+        roster: [{ studentId: "student-1", name: "小明", status: "confirmed" }],
+      })
+      .mockResolvedValueOnce({
+        ...workbench,
+        roster: [{ studentId: "student-1", name: "小明", status: "leave_requested" }],
+      });
+    const page = createPageInstance();
+    await page.load("event-1");
+    page.markAllPresent();
+    mocks.saveCoachAttendance.mockRejectedValueOnce({ code: "attendance_leave_conflict", errorType: "conflict", statusCode: 409 });
+    await page.saveAttendance();
+
+    // 核对后确认孩子实际到场：基于刷新后的快照显式改回 present（REQ-ATT-001）
+    page.markAllPresent();
+    await page.saveAttendance();
+    expect(mocks.saveCoachAttendance).toHaveBeenLastCalledWith("event-1", [
+      expect.objectContaining({ studentId: "student-1", status: "present", previousStatus: "leave_requested" }),
+    ]);
+    expect(globalThis.wx.redirectTo).toHaveBeenCalledWith({ url: "/pages/coach/attendance-success/index?eventId=event-1" });
   });
 });
