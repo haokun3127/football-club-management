@@ -21,7 +21,25 @@ globalThis.wx = {
 };
 
 const { request } = await import("./request.ts");
-const { clearSession, getSession } = await import("./store.ts");
+const { clearSession, getSession, setSession } = await import("./store.ts");
+
+const SESSION_CONTEXT = {
+  clubId: "club-chongqing-talent",
+  clientId: "app-client-cq-talent-wechat-main",
+  capabilities: {},
+};
+
+function installSession(token) {
+  setSession({
+    ...SESSION_CONTEXT,
+    role: "coach",
+    availableRoles: ["parent", "coach"],
+    token,
+    userId: `user-${token}`,
+    displayName: "测试教练",
+    expiresAt: "4100-01-01T00:00:00.000Z",
+  });
+}
 
 describe("request idempotency keys", () => {
   it("preserves a caller supplied key instead of creating a new one", async () => {
@@ -81,6 +99,77 @@ describe("request authentication failures", () => {
     } finally {
       globalThis.wx.request = originalRequest;
       globalThis.wx.reLaunch = originalRelaunch;
+    }
+  });
+});
+
+describe("request 401 session race", () => {
+  const originalRequest = globalThis.wx.request;
+
+  it("ignores a stale 401 issued by a session that has since been replaced", async () => {
+    clearSession();
+    installSession("token-a");
+    let respond;
+    const relaunches = [];
+    globalThis.wx.request = ({ success }) => { respond = success; };
+    globalThis.wx.reLaunch = (options) => { relaunches.push(options.url); };
+
+    try {
+      const pending = request({ path: "/coach/events", method: "GET" });
+      installSession("token-b");
+      respond({ statusCode: 401, data: { error: { code: "authentication_required", message: "Session expired" } } });
+
+      await expect(pending).rejects.toMatchObject({ code: "authentication_required" });
+      expect(getSession()?.token).toBe("token-b");
+      expect(relaunches).toEqual([]);
+    } finally {
+      globalThis.wx.request = originalRequest;
+      clearSession();
+    }
+  });
+
+  it("ignores a stale 401 carrying an explicit bearer after a new session was established", async () => {
+    clearSession();
+    let respond;
+    const relaunches = [];
+    globalThis.wx.request = ({ success }) => { respond = success; };
+    globalThis.wx.reLaunch = (options) => { relaunches.push(options.url); };
+
+    try {
+      const pending = request({ path: "/session/role", method: "POST", bearerToken: "pending-role-token" });
+      installSession("token-b");
+      respond({ statusCode: 401, data: { error: { code: "authentication_required", message: "Role token expired" } } });
+
+      await expect(pending).rejects.toMatchObject({ code: "authentication_required" });
+      expect(getSession()?.token).toBe("token-b");
+      expect(relaunches).toEqual([]);
+    } finally {
+      globalThis.wx.request = originalRequest;
+      clearSession();
+    }
+  });
+
+  it("converges concurrent 401 responses from the same session to a single login navigation", async () => {
+    clearSession();
+    installSession("token-a");
+    const responders = [];
+    const relaunches = [];
+    globalThis.wx.request = ({ success }) => { responders.push(success); };
+    globalThis.wx.reLaunch = (options) => { relaunches.push(options.url); };
+
+    try {
+      const pending = ["/a", "/b", "/c"].map((path) => request({ path, method: "GET" }));
+      responders.forEach((respond) => respond({
+        statusCode: 401,
+        data: { error: { code: "authentication_required", message: "Session expired" } },
+      }));
+
+      await Promise.allSettled(pending);
+      expect(relaunches).toEqual(["/pages/login/index"]);
+      expect(getSession()).toBeNull();
+    } finally {
+      globalThis.wx.request = originalRequest;
+      clearSession();
     }
   });
 });
