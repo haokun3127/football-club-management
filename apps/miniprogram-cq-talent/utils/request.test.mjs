@@ -21,6 +21,7 @@ globalThis.wx = {
 };
 
 const { request } = await import("./request.ts");
+const { resetIdempotencyKeyStateForTesting } = await import("./idempotency.ts");
 const { clearSession, getSession, setSession } = await import("./store.ts");
 
 const SESSION_CONTEXT = {
@@ -42,6 +43,8 @@ function installSession(token) {
 }
 
 describe("request idempotency keys", () => {
+  const originalRequest = globalThis.wx.request;
+
   it("preserves a caller supplied key instead of creating a new one", async () => {
     await request({
       path: "/correction",
@@ -51,6 +54,92 @@ describe("request idempotency keys", () => {
     });
 
     expect(capturedHeaders["Idempotency-Key"]).toBe("lesson-correction-stable-key");
+  });
+
+  it("derives a stable key from method, path and the normalized body", async () => {
+    resetIdempotencyKeyStateForTesting();
+    const keys = [];
+    globalThis.wx.request = ({ header, success }) => {
+      keys.push(header["Idempotency-Key"]);
+      success({ statusCode: 200, data: { ok: true } });
+    };
+
+    try {
+      await request({ path: "/attendance", method: "PUT", data: { b: 2, a: 1 }, idempotent: true });
+      await request({ path: "/attendance", method: "PUT", data: { a: 1, b: 2 }, idempotent: true });
+      await request({ path: "/attendance", method: "PUT", data: { a: 1, b: 3 }, idempotent: true });
+
+      expect(keys[0]).toMatch(/^mp-.+-a1$/);
+      // Key-order differences in an equivalent body derive the same key, but a
+      // successful attempt rotates the attempt counter for the next submission.
+      expect(keys[1]).toMatch(/^mp-.+-a2$/);
+      expect(keys[1]).not.toBe(keys[0]);
+      expect(keys[2]).not.toBe(keys[1]);
+    } finally {
+      globalThis.wx.request = originalRequest;
+      resetIdempotencyKeyStateForTesting();
+    }
+  });
+
+  it("reuses the derived key across failures and rotates it only after success", async () => {
+    resetIdempotencyKeyStateForTesting();
+    const keys = [];
+    let transportFailure = false;
+    globalThis.wx.request = ({ header, success, fail }) => {
+      keys.push(header["Idempotency-Key"]);
+      if (transportFailure) {
+        fail({ errMsg: "request:fail " });
+        return;
+      }
+      success({ statusCode: 200, data: { ok: true } });
+    };
+
+    const options = { path: "/attendance", method: "PUT", data: { participants: [{ studentId: "student-1", status: "present" }] }, idempotent: true };
+
+    try {
+      // First attempt fails in transport: the retry must reuse the same key so
+      // the server can replay a stored outcome or re-execute safely.
+      transportFailure = true;
+      await expect(request(options)).rejects.toMatchObject({ code: "network_error" });
+      await expect(request(options)).rejects.toMatchObject({ code: "network_error" });
+      expect(keys[0]).toBe(keys[1]);
+
+      // The third attempt succeeds and consumes the key.
+      transportFailure = false;
+      await request(options);
+      expect(keys[2]).toBe(keys[0]);
+
+      // A brand-new submission with the same content rotates to a fresh key so
+      // the 30-minute server replay window cannot swallow it.
+      await request(options);
+      expect(keys[3]).not.toBe(keys[2]);
+      expect(keys[3]).toMatch(/^mp-.+-a2$/);
+    } finally {
+      globalThis.wx.request = originalRequest;
+      resetIdempotencyKeyStateForTesting();
+    }
+  });
+
+  it("reuses the derived key for a duplicate submission while the first is in flight", async () => {
+    resetIdempotencyKeyStateForTesting();
+    const keys = [];
+    const responders = [];
+    globalThis.wx.request = ({ header, success }) => {
+      keys.push(header["Idempotency-Key"]);
+      responders.push(success);
+    };
+
+    try {
+      const first = request({ path: "/events", method: "POST", data: { type: "goal" }, idempotent: true });
+      const second = request({ path: "/events", method: "POST", data: { type: "goal" }, idempotent: true });
+      responders.forEach((respond) => respond({ statusCode: 201, data: { event: { id: "event-1" } } }));
+      await Promise.all([first, second]);
+
+      expect(keys[0]).toBe(keys[1]);
+    } finally {
+      globalThis.wx.request = originalRequest;
+      resetIdempotencyKeyStateForTesting();
+    }
   });
 });
 

@@ -1,5 +1,5 @@
 import { assertRuntimeApiConfigured, DEV_MODE, DEV_USER_IDS, RUNTIME_ENV } from "./config";
-import { createIdempotencyKey, createRequestId } from "./idempotency";
+import { markIdempotencyOutcome, resolveIdempotencyKey, createRequestId } from "./idempotency";
 import { clearSession, getAppContext, getSession } from "./store";
 import type { SessionState } from "./types";
 
@@ -100,10 +100,15 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
     headers["X-User-Id"] = sessionAtRequest.userId || DEV_USER_IDS[sessionAtRequest.role];
   }
 
+  // Derived keys are tracked so retries of the same business action reuse the
+  // key while fresh submissions after a success rotate to a new one; see
+  // utils/idempotency.ts for the server contract this implements.
+  let derivedIdempotencyKey: string | null = null;
   if (options.idempotencyKey) {
     headers["Idempotency-Key"] = options.idempotencyKey;
   } else if (options.idempotent && options.method && options.method !== "GET") {
-    headers["Idempotency-Key"] = createIdempotencyKey(options.method.toLowerCase());
+    derivedIdempotencyKey = resolveIdempotencyKey(options.method, options.path, options.data);
+    headers["Idempotency-Key"] = derivedIdempotencyKey;
   }
 
   return new Promise((resolve, reject) => {
@@ -130,10 +135,12 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
           ? response.statusCode >= 200 && response.statusCode < 300
           : response.statusCode === options.expectedStatus;
         if (isExpectedStatus) {
+          if (derivedIdempotencyKey) markIdempotencyOutcome(derivedIdempotencyKey, true);
           resolve(response.data as TResponse);
           return;
         }
         if (options.expectedStatus !== undefined && response.statusCode >= 200 && response.statusCode < 300) {
+          if (derivedIdempotencyKey) markIdempotencyOutcome(derivedIdempotencyKey, false);
           reject({
             code: "unexpected_status",
             message: "Unexpected response status",
@@ -144,6 +151,7 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
         if (response.statusCode === 401) {
           handleAuthFailure(sessionAtRequest, bearerToken, options.bearerToken !== undefined);
         }
+        if (derivedIdempotencyKey) markIdempotencyOutcome(derivedIdempotencyKey, false);
         const payload = response.data as { error?: ApiError };
         const errorType = httpErrorType(response.statusCode);
         reject({
@@ -154,6 +162,7 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
         });
       },
       fail: (error) => {
+        if (derivedIdempotencyKey) markIdempotencyOutcome(derivedIdempotencyKey, false);
         // WeChat reports timeouts as "request:fail timeout"; they need distinct
         // user-facing copy from generic network failures.
         const isTimeout = /timeout/i.test(error.errMsg ?? "");
