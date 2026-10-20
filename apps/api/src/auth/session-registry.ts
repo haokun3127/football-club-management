@@ -56,6 +56,21 @@ export class SessionRegistry {
     return session;
   }
 
+  async revoke(token: string | undefined): Promise<boolean> {
+    if (!token) return false;
+    const tokenHash = hashToken(token);
+    const now = new Date().toISOString();
+    if (this.repository) {
+      return this.repository.revoke(tokenHash, now);
+    }
+    const existing = this.sessions.get(tokenHash);
+    if (!existing || existing.revokedAt || Date.parse(existing.expiresAt) <= Date.parse(now)) {
+      return false;
+    }
+    this.sessions.set(tokenHash, { ...existing, revokedAt: now, updatedAt: now });
+    return true;
+  }
+
   async rotate(token: string | undefined, input: AppClientSessionInput, expiresInSeconds = SessionRegistry.DEFAULT_TTL_SECONDS): Promise<AppClientSessionDelivery | null> {
     if (!token) return null;
     const now = new Date().toISOString();

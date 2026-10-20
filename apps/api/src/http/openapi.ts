@@ -231,6 +231,12 @@ export function buildOpenApiDocument() {
           ...schemas.appClientSessionRole,
         }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/session/logout": {
+        post: operation("POST", "/clubs/{clubId}/app-clients/{clientId}/session/logout", {
+          ...schemas.appClientParams,
+          ...schemas.appClientSessionLogout,
+        }),
+      },
       "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/home": {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/home", {
           ...schemas.appClientStudentParams,

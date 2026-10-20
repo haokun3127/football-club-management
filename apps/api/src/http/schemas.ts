@@ -636,6 +636,20 @@ export const schemas = {
       404: errorResponse,
     },
   },
+  appClientSessionLogout: {
+    response: {
+      200: {
+        type: "object",
+        additionalProperties: false,
+        required: ["clubId", "status"],
+        properties: {
+          clubId: { type: "string", minLength: 1 },
+          status: { type: "string", enum: ["logged_out", "already_logged_out"] },
+        },
+      },
+      401: errorResponse,
+    },
+  },
   appClientParentChildren: {
     response: {
       200: flexibleObject,

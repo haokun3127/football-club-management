@@ -74,7 +74,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
   app.addHook("preHandler", async (request, reply) => {
     const bffPath = appClientBffPath(request);
     const requiredRole = requiredSessionRole(request);
-    if (!bffPath || bffPath === "wechat-login" || bffPath === "session/role" || !hasBearerAuthorization(request.headers.authorization)) {
+    if (!bffPath || bffPath === "wechat-login" || bffPath === "session/role" || bffPath === "session/logout" || !hasBearerAuthorization(request.headers.authorization)) {
       return;
     }
     const params = request.params as { clubId?: unknown };
@@ -731,6 +731,39 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return context.sendError(reply, 401, "authentication_required", "Session is missing or expired");
       }
       return authenticatedSessionResponse(context, request.params.clubId, client, auth, availableRoles, request.body.role, session, "accepted");
+    },
+  );
+
+  app.post<{
+    Params: {
+      clubId: string;
+      clientId: string;
+    };
+  }>(
+    "/clubs/:clubId/app-clients/:clientId/session/logout",
+    {
+      schema: {
+        ...schemas.appClientParams,
+        ...schemas.appClientSessionLogout,
+      },
+    },
+    async (request, reply) => {
+      const bearer = parseBearerToken(request.headers.authorization);
+      const session = bearer
+        ? await context.sessionRegistry.resolve(bearer)
+        : null;
+      if (
+        !bearer || !session
+        || session.clubId !== request.params.clubId
+        || session.appClientId !== request.params.clientId
+      ) {
+        return context.sendError(reply, 401, "authentication_required", "Session is missing or expired");
+      }
+      const revoked = await context.sessionRegistry.revoke(bearer);
+      return {
+        clubId: request.params.clubId,
+        status: revoked ? "logged_out" : "already_logged_out",
+      };
     },
   );
 

@@ -30,6 +30,15 @@ export class AppClientSessionRepository {
     this.insert(session);
   }
 
+  revoke(tokenHash: string, revokedAt: string): boolean {
+    const result = this.database.prepare(`
+      UPDATE app_client_sessions
+      SET revoked_at = ?, updated_at = ?
+      WHERE token_hash = ? AND revoked_at IS NULL
+    `).run(revokedAt, revokedAt, tokenHash);
+    return result.changes === 1;
+  }
+
   rotate(tokenHash: string, replacement: AppClientSessionRecord, revokedAt: string): boolean {
     this.database.exec("BEGIN IMMEDIATE;");
     try {
