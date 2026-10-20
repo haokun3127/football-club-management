@@ -92,9 +92,26 @@ describe("parent private lesson result", () => {
         hasNote: true,
         status: "pending",
         statusLabel: "待处理",
-        confirmHint: "Coach Chen将在 24 小时内确认",
+        navTitle: "咨询已提交",
+        headline: "咨询已提交",
+        confirmHint: "咨询已提交，教练会尽快与你确认训练安排，请留意通知",
+        hasConfirmation: false,
       },
     });
+  });
+
+  it.each([
+    ["confirmed", "已承接", "咨询已承接", "教练已承接本次咨询"],
+    ["declined", "未承接", "咨询未承接", "本次咨询未承接"],
+    ["cancelled", "已取消", "咨询已取消", "本次咨询已取消"],
+  ])("presents the real consultation state for %s without promising a booking (F-11)", async (status, label, navTitle, headline) => {
+    mocks.getPrivateLessonRequests.mockResolvedValue([{ ...persistedRequest, status }]);
+    const page = createPageInstance();
+
+    await page.onLoad({ request: "request-1", student: "student-1" });
+
+    expect(page.data.request).toMatchObject({ statusLabel: label, navTitle, headline });
+    expect(page.data.request.hasConfirmation).toBe(status === "confirmed");
   });
 
   it("does not render a result when the request is absent, cross-student, or unreadable", async () => {
@@ -135,6 +152,12 @@ describe("parent private lesson result", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("query.coach");
     expect(controller).not.toContain("decodeURIComponent");
+  });
+
+  it("aligns the nav title with the real consultation state instead of a fixed success claim (F-11)", () => {
+    expect(template).toContain("{{request ? request.navTitle : '咨询详情'}}");
+    expect(template).not.toContain("预约成功");
+    expect(template).not.toContain("24 小时内确认");
   });
 
   it("uses the live P9.1 success icon, compact top-nav title, and four-row summary", () => {

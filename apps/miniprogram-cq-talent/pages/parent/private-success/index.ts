@@ -15,6 +15,7 @@ interface PrivateLessonView {
   hasNote: boolean;
   status: PrivateLessonRequest["status"];
   statusLabel: string;
+  navTitle: string;
   headline: string;
   confirmHint: string;
   hasConfirmation: boolean;
@@ -49,7 +50,7 @@ Page<PageData>({
     if (!requestId || !studentId) {
       this.setData({
         state: "error",
-        message: "缺少预约凭据，无法读取申请结果",
+        message: "缺少咨询记录信息，无法读取提交结果",
         requestId,
         studentId,
         request: null,
@@ -59,7 +60,7 @@ Page<PageData>({
 
     this.setData({
       state: "loading",
-      message: "正在读取预约申请",
+      message: "正在读取咨询详情",
       requestId,
       studentId,
       request: null,
@@ -68,12 +69,12 @@ Page<PageData>({
       const requests = await getPrivateLessonRequests(studentId);
       const request = requests.find((item) => item.id === requestId && item.studentId === studentId);
       if (!request) {
-        this.setData({ state: "error", message: "未找到对应的预约申请", request: null });
+        this.setData({ state: "error", message: "未找到对应的咨询记录", request: null });
         return;
       }
       this.setData({ state: "ready", message: "", request: presentRequest(request) });
     } catch {
-      this.setData({ state: "error", message: "无法读取预约申请，请稍后重试", request: null });
+      this.setData({ state: "error", message: "无法读取咨询记录，请稍后重试", request: null });
     }
   },
   retry() {
@@ -91,7 +92,8 @@ Page<PageData>({
 });
 
 function presentRequest(request: PrivateLessonRequest): PrivateLessonView {
-  const hasConfirmation = request.status === "pending" || request.status === "confirmed";
+  // F-11：只呈现真实咨询状态（待处理/已承接/取消），不自动承诺预约或购买
+  const hasConfirmation = request.status === "confirmed";
   return {
     id: request.id,
     studentId: request.studentId,
@@ -104,8 +106,11 @@ function presentRequest(request: PrivateLessonRequest): PrivateLessonView {
     hasNote: Boolean(request.note),
     status: request.status,
     statusLabel: statusLabel(request.status),
+    navTitle: statusNavTitle(request.status),
     headline: statusHeadline(request.status),
-    confirmHint: request.status === "pending" ? `${request.coachName}将在 24 小时内确认` : `当前状态：${statusLabel(request.status)}`,
+    confirmHint: request.status === "pending"
+      ? "咨询已提交，教练会尽快与你确认训练安排，请留意通知"
+      : `当前状态：${statusLabel(request.status)}`,
     hasConfirmation,
   };
 }
@@ -113,16 +118,23 @@ function presentRequest(request: PrivateLessonRequest): PrivateLessonView {
 function statusLabel(status: PrivateLessonRequest["status"]): string {
   const labels: Record<PrivateLessonRequest["status"], string> = {
     pending: "待处理",
-    confirmed: "已确认",
-    declined: "未确认",
+    confirmed: "已承接",
+    declined: "未承接",
     cancelled: "已取消",
   };
   return labels[status];
 }
 
+function statusNavTitle(status: PrivateLessonRequest["status"]): string {
+  if (status === "confirmed") return "咨询已承接";
+  if (status === "declined") return "咨询未承接";
+  if (status === "cancelled") return "咨询已取消";
+  return "咨询已提交";
+}
+
 function statusHeadline(status: PrivateLessonRequest["status"]): string {
-  if (status === "confirmed") return "预约已确认";
-  if (status === "declined") return "预约未获确认";
-  if (status === "cancelled") return "预约已取消";
-  return "预约申请已提交";
+  if (status === "confirmed") return "教练已承接本次咨询";
+  if (status === "declined") return "本次咨询未承接";
+  if (status === "cancelled") return "本次咨询已取消";
+  return "咨询已提交";
 }

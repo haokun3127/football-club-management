@@ -1,14 +1,14 @@
 <view class="private-success-page">
   <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="page-nav__back" bindtap="goBack"><image src="/assets/icons/p9-1-chevron-left.svg" mode="aspectFit" /></view>
-    <view class="page-nav__title">预约成功</view>
+    <view class="page-nav__title">{{request ? request.navTitle : '咨询详情'}}</view>
   </view>
 
   <view class="private-success-page__body">
     <status-view
       wx:if="{{state !== 'ready'}}"
       state="{{state}}"
-      title="{{state === 'loading' ? '正在读取预约申请' : '暂时无法显示预约详情'}}"
+      title="{{state === 'loading' ? '正在读取咨询详情' : '暂时无法读取咨询详情'}}"
       message="{{message}}"
       action-text="{{state === 'error' ? '重试' : ''}}"
       bindaction="retry"
