@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({ children: vi.fn(), growth: vi.fn(), news: vi.fn(), calendar: vi.fn(), records: vi.fn(), session: vi.fn(), select: vi.fn(), open: vi.fn() }));
 vi.mock("../../../utils/api", () => ({ getParentChildren: mocks.children, getParentGrowth: mocks.growth, getContentArticles: mocks.news, getParentCalendar: mocks.calendar }));
@@ -53,5 +54,38 @@ describe("player homepage", () => {
     mocks.session.mockReturnValue({ role: "parent", currentStudentId: "a" }); mocks.records.mockResolvedValueOnce({ total: 3, records: [] });
     await p.load(); finishOld({ total: 12, records: [] }); await old;
     expect(p.data.student.id).toBe("a"); expect(p.data.trainingTotal).toBe(3);
+  });
+});
+
+describe("P01 visual alignment (V-01/V-05)", () => {
+  const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
+  const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
+
+  it("renders the warm page surface, white player card, and red stats from club tokens only", () => {
+    expect(stylesheet).toMatch(/\.home\s*\{[^}]*background:\s*var\(--club-page\)/s);
+    expect(stylesheet).toMatch(/\.player-card\s*\{[^}]*background:\s*var\(--color-card\)/s);
+    expect(stylesheet).toMatch(/\.metric-value\s*\{[^}]*color:\s*var\(--color-brand\)/s);
+    expect(stylesheet).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+  });
+
+  it("keeps the whole shortcut group on white cards without dropping the editor", () => {
+    expect(template).toContain('class="shortcuts"');
+    expect(template).toContain('bindtap="editShortcuts"');
+    expect(template).toContain('class="shortcut-editor"');
+    expect(stylesheet).toMatch(/\.shortcut\s*\{[^}]*background:\s*var\(--color-card\)/s);
+  });
+
+  it("constrains the child-switch button and lets long names ellipsis with a full-name path", () => {
+    expect(template).toContain('<button class="child-button" bindtap="toggleChildren">切换孩子</button>');
+    expect(template).toContain('<student-switcher wx:if="{{showChildren}}"');
+    expect(stylesheet).toMatch(/\.child-button\s*\{[^}]*min-width:\s*0[^}]*max-width:\s*220rpx[^}]*overflow:\s*hidden[^}]*text-overflow:\s*ellipsis/s);
+    expect(stylesheet).toMatch(/\.player-name\s*\{[^}]*flex:\s*1\s+1\s+auto[^}]*min-width:\s*0[^}]*text-overflow:\s*ellipsis/s);
+  });
+
+  it("keeps the light top nav and the club photo banner structure", () => {
+    expect(template).toContain('<app-header title="{{clubTitle}}" title-align="left" />');
+    expect(template).not.toContain('theme="dark" />\n  <view class="home-body"');
+    expect(template).toContain('class="club-banner-scrim"');
+    expect(stylesheet).toMatch(/\.club-banner-scrim\s*\{[^}]*linear-gradient\(90deg,\s*var\(--color-card\)/s);
   });
 });

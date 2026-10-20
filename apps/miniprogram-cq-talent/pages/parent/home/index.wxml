@@ -1,5 +1,5 @@
 <view class="home">
-  <app-header title="{{clubTitle}}" title-align="left" theme="dark" />
+  <app-header title="{{clubTitle}}" title-align="left" />
   <view class="home-body">
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'empty' ? '等待开启成长旅程' : state === 'error' ? '暂时无法读取' : '读取球员档案'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <block wx:if="{{state === 'ready'}}">
@@ -14,7 +14,7 @@
               <view><view class="metric-label">训练累计</view><view class="metric-value">{{trainingTotal}}<text class="metric-unit">次</text></view></view>
               <view><view class="metric-label">成长里程碑</view><view class="metric-value">{{milestoneCount}}</view></view>
             </view>
-            <view class="player-latest" bindtap="openGrowth"><text class="metric-label">最新成长</text><view>{{milestoneTitle}}{{milestoneDate ? ' · ' + milestoneDate : ''}}</view></view>
+            <view class="player-latest" bindtap="openGrowth"><text class="metric-label">最新成长</text><view class="player-latest-text">{{milestoneTitle}}{{milestoneDate ? ' · ' + milestoneDate : ''}}</view></view>
           </view>
         </swiper-item>
         <swiper-item>
@@ -29,11 +29,12 @@
       <view class="player-dots" aria-hidden="true"><view class="player-dot {{playerSlide === 0 ? 'active' : ''}}"></view><view class="player-dot {{playerSlide === 1 ? 'active' : ''}}"></view></view>
       <view class="club-banner" bindtap="openNews" role="button" aria-label="查看俱乐部动态">
         <image class="club-banner-image" src="{{banner ? banner.imageUrl : '/assets/content/football-editorial.jpg'}}" mode="aspectFill" />
+        <view class="club-banner-scrim" aria-hidden="true"></view>
         <view class="club-banner-copy"><view class="eyebrow">俱乐部动态</view><view class="club-banner-title"><view>把热爱</view><view>留在球场</view></view><view class="club-banner-subtitle">{{banner ? banner.name : news ? news.title : '了解我们的俱乐部'}}</view></view>
       </view>
       <view class="shortcut-heading"><text>常用功能</text><button class="text-button" bindtap="editShortcuts" disabled="{{!!contentMessage}}">调整入口</button></view>
       <view wx:if="{{contentMessage}}" class="configuration-message">{{contentMessage}}</view>
-      <view class="shortcuts"><button wx:for="{{shortcuts}}" wx:key="key" class="shortcut" data-key="{{item.key}}" bindtap="openShortcut"><view class="shortcut-icon"><image src="/assets/icons/{{item.icon}}" mode="aspectFit" /></view><text>{{item.label}}</text></button></view>
+      <view class="shortcuts"><button wx:for="{{shortcuts}}" wx:key="key" class="shortcut" data-key="{{item.key}}" bindtap="openShortcut"><view class="shortcut-icon"><image src="/assets/icons/{{item.icon}}" mode="aspectFit" /></view><text class="shortcut-label">{{item.label}}</text></button></view>
       <view wx:if="{{editingShortcuts}}" class="shortcut-editor">
         <view class="editor-title">选择并排列四个入口</view>
         <picker range="{{shortcutSlots}}" range-key="label" value="{{activeShortcutSlot}}" bindchange="selectShortcutSlot"><view class="slot-picker">调整第 {{activeShortcutSlot + 1}} 个：{{shortcutSlots[activeShortcutSlot].label}} · 点击切换位置</view></picker>
