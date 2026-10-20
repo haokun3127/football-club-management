@@ -1,67 +1,56 @@
-.p4 { min-height: 100vh; background: #f5f6f8; }
-.p4-nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; box-sizing: content-box; height: 88rpx; padding: 0 168rpx 0 32rpx; background: #ffffff; }
-.p4-nav__title { color: #202124; font-size: 44rpx; font-weight: 700; }
-.p4-nav__settings { display: flex; align-items: center; justify-content: center; width: 64rpx; height: 64rpx; border-radius: 32rpx; background: #f3f4f6; color: #667085; }
+/* P08 213:526：白底概览（训练累计）→ 能力组合区 → 当前评价；旧深色身份卡/深色雷达结构已移除 */
+.p4 { min-height: 100vh; background: var(--club-page); }
+.p4-nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; box-sizing: content-box; height: 88rpx; padding: 0 168rpx 0 32rpx; background: var(--club-nav); }
+.p4-nav__title { color: var(--club-text); font-size: 44rpx; font-weight: 700; }
+.p4-nav__settings { display: flex; align-items: center; justify-content: center; width: 64rpx; height: 64rpx; border-radius: 32rpx; background: var(--color-brand-soft); }
 .p4-nav__settings-icon { width: 36rpx; height: 36rpx; }
 
 .p4-body { padding: 32rpx 40rpx calc(180rpx + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 32rpx; }
 .p4-content { display: flex; flex-direction: column; gap: 32rpx; }
 
-/* Figma P4: Player Hero, 16px radius, 20px pad */
-.p4-hero { display: flex; flex-direction: column; gap: 32rpx; padding: 40rpx; border-radius: 32rpx; background: #07111f; }
-.p4-hero__header { display: flex; align-items: center; gap: 24rpx; }
-.p4-hero__avatar { display: flex; flex: 0 0 96rpx; align-items: center; justify-content: center; width: 96rpx; height: 96rpx; border-radius: 48rpx; background: #a80f1b; color: #ffffff; font-size: 36rpx; font-weight: 700; }
-.p4-hero__identity { display: flex; flex-direction: column; gap: 8rpx; min-width: 0; }
-.p4-hero__name { color: #ffffff; font-size: 36rpx; font-weight: 700; }
-.p4-hero__team { overflow: hidden; max-width: 400rpx; color: #ffffff; font-size: 26rpx; text-overflow: ellipsis; white-space: nowrap; }
-.p4-hero__pending { padding-top: 12rpx; border-top: 1rpx solid #334155; color: #d0d5dd; font-size: 24rpx; line-height: 34rpx; }
-.p4-hero__tags { display: flex; gap: 16rpx; }
-.p4-hero__tag { padding: 8rpx 20rpx; border-radius: 24rpx; background: rgba(255, 255, 255, 0.12); color: #d0d5dd; font-size: 22rpx; line-height: 30rpx; }
-.p4-hero__tag--accent { background: rgba(168, 15, 27, 0.35); color: #ffb3ba; }
-.p4-hero__stats { display: flex; box-sizing: border-box; padding-top: 32rpx; }
-.p4-hero__stat { display: flex; flex: 1; flex-direction: column; align-items: center; gap: 6rpx; }
-.p4-hero__stat-value { color: #ffffff; font-size: 40rpx; font-weight: 700; line-height: 48rpx; }
-.p4-hero__stat-value--accent { color: #4ade80; }
-.p4-hero__stat-value--fraction { font-size: 44rpx; line-height: 52rpx; }
-.p4-hero__stat-label { color: #94a3b8; font-size: 22rpx; line-height: 28rpx; }
-.p4-hero__chips { display: flex; gap: 16rpx; min-height: 40rpx; }
-.p4-hero__chip { overflow: hidden; max-width: 240rpx; padding: 8rpx 16rpx; border-radius: 8rpx; background: #334155; color: #ffffff; font-size: 20rpx; font-weight: 600; line-height: 24rpx; text-overflow: ellipsis; white-space: nowrap; }
-.p4-hero__chip--brand { background: #a80f1b; }
-.p4-stat { display: flex; flex: 1; flex-direction: column; align-items: center; min-width: 0; gap: 8rpx; }
-.p4-stat + .p4-stat { border-left: 1rpx solid #334155; }
-.p4-stat__value { overflow: hidden; max-width: 100%; min-height: 64rpx; color: #ffffff; font-size: 64rpx; font-weight: 800; line-height: 64rpx; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
-.p4-stat__value--green { color: #22c55e; }
-.p4-stat__label { overflow: hidden; max-width: 100%; color: #ffffff; font-size: 22rpx; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+/* 白底成长概览：姓名 + 姓氏徽章 + 红色队伍行 + 红色大数字统计 */
+.p4-overview { display: flex; flex-direction: column; gap: 20rpx; padding: 40rpx; border-radius: 32rpx; background: var(--color-card); box-shadow: var(--club-shadow); }
+.p4-overview__head { display: flex; align-items: center; justify-content: space-between; gap: 24rpx; }
+.p4-overview__name { min-width: 0; overflow: hidden; color: var(--club-text); font-size: 36rpx; font-weight: 700; line-height: 48rpx; text-overflow: ellipsis; white-space: nowrap; }
+.p4-overview__avatar { display: flex; flex: 0 0 72rpx; align-items: center; justify-content: center; width: 72rpx; height: 72rpx; border-radius: 36rpx; background: var(--color-brand); color: var(--color-card); font-size: 30rpx; font-weight: 700; }
+.p4-overview__team { color: var(--color-brand); font-size: 26rpx; line-height: 38rpx; }
+.p4-overview__stats { display: flex; box-sizing: border-box; padding-top: 8rpx; }
+.p4-overview__stat { display: flex; flex: 1; flex-direction: column; gap: 6rpx; }
+.p4-overview__stat-value { color: var(--color-brand); font-size: 64rpx; font-weight: 700; line-height: 76rpx; font-variant-numeric: tabular-nums; }
+.p4-overview__stat-label { color: var(--club-muted); font-size: 22rpx; line-height: 30rpx; }
+.p4-overview__summary { padding-top: 16rpx; border-top: 1rpx solid var(--club-line); color: var(--club-muted); font-size: 24rpx; line-height: 34rpx; }
 
-.p4-card { display: flex; flex-direction: column; gap: 24rpx; padding: 32rpx; border-radius: 32rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05); }
+.p4-card { display: flex; flex-direction: column; gap: 24rpx; padding: 32rpx; border-radius: 32rpx; background: var(--color-card); box-shadow: var(--club-shadow); }
 .p4-card__head { display: flex; align-items: center; justify-content: space-between; }
-.p4-card__title { color: #202124; font-size: 28rpx; font-weight: 700; }
-.p4-card__link { color: #a80f1b; font-size: 26rpx; font-weight: 600; }
-.p4-match-history .p4-card__summary { color: #667085; font-size: 24rpx; line-height: 34rpx; }
-.p4-card__empty { display: flex; align-items: center; justify-content: center; min-height: 96rpx; color: #667085; font-size: 24rpx; line-height: 34rpx; text-align: center; }
-.p4-milestones { gap: 24rpx; }.p4-milestones__list { display: flex; flex-direction: column; gap: 24rpx; width: 100%; }
-.p4-milestone { display: flex; align-items: center; gap: 24rpx; min-height: 48rpx; }
-.p4-milestone__dot { display: flex; flex: 0 0 48rpx; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; border-radius: 24rpx; background: #ecfdf5; color: #10b981; font-size: 24rpx; font-weight: 700; }
-.p4-milestone__dot--red { background: #fee2e2; color: #a80f1b; }.p4-milestone__dot--blue { background: #dbeafe; color: #3b82f6; }
-.p4-milestone__title { flex: 1; min-width: 0; color: #202124; font-size: 26rpx; }
-.p4-milestone__state { padding: 4rpx 12rpx; border-radius: 8rpx; background: #fee2e2; color: #a80f1b; font-size: 20rpx; font-weight: 600; }.p4-milestone__state--green { background: #ecfdf5; color: #10b981; }.p4-milestone__state--blue { background: #dbeafe; color: #3b82f6; }
-.p4-chart-card { gap: 28rpx; }.p4-bars { display: flex; align-items: flex-end; width: 100%; height: 160rpx; gap: 8rpx; }.p4-bar { flex: 1; min-height: 8rpx; border-radius: 4rpx 4rpx 0 0; background: linear-gradient(160deg, #a80f1b 25%, #c53030 75%); }.p4-months { display: flex; justify-content: space-between; width: 100%; color: #667085; font-size: 20rpx; }
+.p4-card__title { color: var(--club-text); font-size: 28rpx; font-weight: 700; }
+.p4-card__link { color: var(--color-brand); font-size: 26rpx; font-weight: 600; }
+.p4-card__empty { display: flex; align-items: center; justify-content: center; min-height: 96rpx; color: var(--club-muted); font-size: 24rpx; line-height: 34rpx; text-align: center; }
+.p4-match-history .p4-card__summary { color: var(--club-muted); font-size: 24rpx; line-height: 34rpx; }
 
-/* Figma P4: dark radar card */
-.p4-radar { display: flex; flex-direction: column; gap: 24rpx; padding: 32rpx; border-radius: 32rpx; background: #07111f; box-shadow: 0 4rpx 16rpx rgba(0,0,0,.05); }
-.p4-radar__title { color: #ffffff; font-size: 28rpx; font-weight: 700; }.p4-radar__sub { margin-top: 4rpx; color: #ffffff; font-size: 22rpx; }.p4-radar__action { padding: 10rpx 20rpx; border: 1rpx solid #a80f1b; border-radius: 40rpx; color: #a80f1b; font-size: 24rpx; font-weight: 600; }.p4-radar__empty { padding: 80rpx 0; color: #ffffff; font-size: 26rpx; text-align: center; }
+/* 能力组合概览：浅色雷达预览 */
+.p4-ability__foot { color: var(--club-muted); font-size: 22rpx; line-height: 32rpx; }
 .p4-radar-preview { position: relative; align-self: center; width: 560rpx; height: 560rpx; }
 .p4-radar-preview__grid { position: absolute; top: 50%; left: 50%; box-sizing: border-box; transform: translate(-50%,-50%); }
-.p4-radar-preview__grid--line { background: rgba(255,255,255,.42); }
-.p4-radar-preview__grid--cover { background: #07111f; }
-.p4-radar-preview__spoke { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 2rpx; background: rgba(255,255,255,.36); transform-origin: center; }
-.p4-radar-preview__shapeline { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 336rpx; background: #a80f1b; transform: translate(-50%,-50%); }
-.p4-radar-preview__shapefill { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 336rpx; background: rgba(168,15,27,.34); transform: translate(-50%,-50%); }
-.p4-radar-preview__peerline { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 336rpx; background: rgba(255,255,255,.5); transform: translate(-50%,-50%); }
-.p4-radar-preview__peerfill { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 336rpx; background: rgba(255,255,255,.08); transform: translate(-50%,-50%); }
-.p4-radar-preview__label { position: absolute; color: #ffffff; font-size: 18rpx; line-height: 24rpx; white-space: nowrap; transform: translate(-50%,-50%); }
-.p4-radar-preview__dot { position: absolute; top: 50%; left: 50%; width: 12rpx; height: 12rpx; border-radius: 50%; background: #ffffff; box-shadow: 0 0 0 4rpx #b70f20; transform: translate(-50%,-50%); }
-.metric-scroll { width: 100%; white-space: nowrap; }.metric-chips { display: inline-flex; gap: 12rpx; }.metric-chip { display: inline-flex; align-items: center; gap: 10rpx; padding: 12rpx 20rpx; border: 1rpx solid #e7eaf0; border-radius: 999rpx; background: #ffffff; color: #60646f; font-size: 24rpx; }.metric-chip.active { border-color: #a80f1b; background: #fceeef; color: #a80f1b; font-weight: 700; }.metric-chip__dot { width: 10rpx; height: 10rpx; border-radius: 50%; background: currentColor; }.metric-summary { display: flex; flex-direction: column; gap: 16rpx; padding: 32rpx; border-radius: 32rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0,0,0,.05); }.metric-value { color: #a80f1b; font-size: 56rpx; font-weight: 800; }
+.p4-radar-preview__grid--line { background: var(--club-line); }
+.p4-radar-preview__grid--cover { background: var(--color-card); }
+.p4-radar-preview__spoke { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 2rpx; background: var(--club-line); transform-origin: center; }
+.p4-radar-preview__shapeline { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 336rpx; background: var(--color-brand); transform: translate(-50%,-50%); }
+.p4-radar-preview__shapefill { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 336rpx; background: rgba(var(--color-brand-rgb), .32); transform: translate(-50%,-50%); }
+.p4-radar-preview__peerline { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 336rpx; background: var(--club-muted); transform: translate(-50%,-50%); }
+.p4-radar-preview__peerfill { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 336rpx; background: rgba(var(--color-brand-rgb), .08); transform: translate(-50%,-50%); }
+.p4-radar-preview__label { position: absolute; color: var(--club-text); font-size: 18rpx; line-height: 24rpx; white-space: nowrap; transform: translate(-50%,-50%); }
+.p4-radar-preview__dot { position: absolute; top: 50%; left: 50%; width: 12rpx; height: 12rpx; border-radius: 50%; background: var(--color-card); box-shadow: 0 0 0 4rpx var(--color-brand); transform: translate(-50%,-50%); }
 
-/* Figma P08 227:2126: per-team current evaluation; no fabricated coach copy. */
-.p4-evaluations{display:flex;flex-direction:column;gap:24rpx}.p4-evaluation-card{padding:32rpx;border:1rpx solid var(--club-line);border-radius:28rpx;background:#fff;box-shadow:var(--club-shadow);display:flex;flex-direction:column;gap:12rpx}.p4-evaluation-title{font-size:32rpx;line-height:48rpx;color:var(--club-text)}.p4-evaluation-text{font-size:30rpx;line-height:48rpx;color:var(--club-muted);white-space:pre-wrap}.p4-evaluation-author{font-size:26rpx;line-height:40rpx;color:var(--color-brand)}
+/* 成长足迹 */
+.p4-milestones { gap: 24rpx; }.p4-milestones__list { display: flex; flex-direction: column; gap: 24rpx; width: 100%; }
+.p4-milestone { display: flex; align-items: center; gap: 24rpx; min-height: 48rpx; }
+.p4-milestone__dot { display: flex; flex: 0 0 48rpx; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; border-radius: 24rpx; background: var(--color-success-soft); color: var(--color-success); font-size: 24rpx; font-weight: 700; }
+.p4-milestone__dot--red { background: var(--color-error-soft); color: var(--color-brand); }.p4-milestone__dot--blue { background: var(--color-info-soft); color: var(--color-info); }
+.p4-milestone__title { flex: 1; min-width: 0; color: var(--club-text); font-size: 26rpx; }
+.p4-milestone__state { padding: 4rpx 12rpx; border-radius: 8rpx; background: var(--color-error-soft); color: var(--color-brand); font-size: 20rpx; font-weight: 600; }.p4-milestone__state--green { background: var(--color-success-soft); color: var(--color-success); }.p4-milestone__state--blue { background: var(--color-info-soft); color: var(--color-info); }
+
+/* 训练历程 */
+.p4-chart-card { gap: 28rpx; }.p4-bars { display: flex; align-items: flex-end; width: 100%; height: 160rpx; gap: 8rpx; }.p4-bar { flex: 1; min-height: 8rpx; border-radius: 4rpx 4rpx 0 0; background: var(--color-brand); }.p4-months { display: flex; justify-content: space-between; width: 100%; color: var(--club-muted); font-size: 20rpx; }
+
+/* 当前评价（P08 227:2126：per-team current evaluation; no fabricated coach copy） */
+.p4-evaluations{display:flex;flex-direction:column;gap:24rpx}.p4-evaluation-card{padding:32rpx;border:1rpx solid var(--club-line);border-radius:28rpx;background:var(--color-card);box-shadow:var(--club-shadow);display:flex;flex-direction:column;gap:12rpx}.p4-evaluation-title{font-size:32rpx;line-height:48rpx;color:var(--club-text)}.p4-evaluation-text{font-size:30rpx;line-height:48rpx;color:var(--club-muted);white-space:pre-wrap}.p4-evaluation-author{font-size:26rpx;line-height:40rpx;color:var(--color-brand)}

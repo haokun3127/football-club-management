@@ -2,7 +2,7 @@ import { getParentChildren, getParentGrowth, getParentMetricDetail } from "../..
 import { requireRole } from "../../../utils/auth";
 import { consumeGrowthStale } from "../../../utils/growth-invalidation";
 import { openPage } from "../../../utils/navigation";
-import { formatDateTime, formatTenure, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import { formatDateTime, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { setCurrentStudentId } from "../../../utils/store";
 import type { GrowthSummary, GrowthTimelineItem, LoadState, MetricDetail, RadarMetricPoint, StudentSummary } from "../../../utils/types";
 
@@ -33,8 +33,7 @@ Page({
     heroName: "",
     heroTeam: "",
     heroSummaryMessage: "",
-    heroTags: [] as string[],
-    heroStats: [] as Array<{ value: string; label: string; accent: boolean; valueClass: string }>,
+    heroStats: [] as Array<{ value: string; label: string }>,
     evaluationCards: [] as Array<{ teamId: string; teamName: string; text: string; author: string }>,
     evaluationMessage: "",
     milestoneMessage: "",
@@ -98,7 +97,6 @@ Page({
         heroName: active.name,
         heroTeam: active.teams.find(Boolean) || "球队待同步",
         heroSummaryMessage: activityMessages.heroSummary,
-        heroTags: buildHeroTags(active, growth),
         heroStats: buildHeroStats(growth),
         evaluationMessage: growth.evaluations === undefined ? "评价暂不可用，请进入详情重新读取" : growth.evaluations.length ? "" : "教练尚未维护评价",
         evaluationCards: (growth.evaluations || []).flatMap(record => { const entry = record.history[record.history.length - 1]; return entry ? [{ teamId: record.teamId, teamName: record.teamName, text: [...entry.phrases.map(p => p.text), entry.note].filter(Boolean).join(" · ") || "当前评价已清空，历史仍保留", author: `${entry.actorDisplayName} · ${formatDateTime(entry.changedAt)}` }] : []; }),
@@ -247,25 +245,13 @@ function buildActivityView(timeline: GrowthTimelineItem[]) {
   };
 }
 
-// 在队时长标签：从队伍 startsAt 到今天的年月差
-const tenureLabel = formatTenure;
-
-function buildHeroTags(student: StudentSummary, growth: GrowthSummary) {
-  const tags: string[] = [];
-  const tenure = tenureLabel(student.teamStartsAt);
-  if (tenure) tags.push(tenure);
-  const total = growth.trainingStats?.totalTrainings ?? 0;
-  if (total > 0) tags.push(`训练${total}课`);
-  return tags;
-}
-
+// 概览统计（P08）：训练累计 + 已确认测评数量，仅展示可追溯事实，缺失留空
 function buildHeroStats(growth: GrowthSummary) {
-  const stats = growth.trainingStats;
-  if (!stats) return [];
+  const total = growth.trainingStats?.totalTrainings;
+  const confirmed = Array.isArray(growth.evaluations) ? growth.evaluations.length : null;
   return [
-    { value: `${stats.lessonStats.attendedLessons}/${stats.lessonStats.expectedLessons}`, label: "已到/应到课时", accent: false, valueClass: "p4-hero__stat-value--fraction" },
-    { value: stats.attendanceRate === null ? "—" : `${stats.attendanceRate}%`, label: "出勤率", accent: stats.attendanceRate !== null, valueClass: "" },
-    { value: `${stats.monthTrainings}`, label: "本月训练", accent: false, valueClass: "" },
+    { value: typeof total === "number" ? String(total) : "—", label: "训练记录" },
+    { value: confirmed === null ? "—" : String(confirmed), label: "已确认测评" },
   ];
 }
 

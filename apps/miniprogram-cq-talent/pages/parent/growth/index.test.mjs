@@ -243,7 +243,7 @@ describe("parent growth training history", () => {
     expect(readFileSync(new URL("./index.ts", import.meta.url), "utf8")).not.toContain("重庆天才");
   });
 
-  it("renders hero tags, stats panel, and monthly bars from server trainingStats", async () => {
+  it("renders the P08 overview stats and monthly bars from server trainingStats", async () => {
     mocks.getParentChildren.mockResolvedValue([
       { id: "student-1", name: "真实球员", teams: ["U10 精英队"], coachNames: [], teamStartsAt: "2025-01-05" },
     ]);
@@ -255,6 +255,10 @@ describe("parent growth training history", () => {
       ],
       metricItems: [],
       views: [{ id: "overview", name: "能力概览", metricIds: ["speed", "passing", "control"] }],
+      evaluations: [
+        { teamId: "team-1", teamName: "U10 精英队", history: [{ phrases: [], note: "敢于持球", actorDisplayName: "陈教练", changedAt: "2026-09-12T00:00:00.000Z" }] },
+        { teamId: "team-2", teamName: "U12 梯队", history: [{ phrases: [], note: "跑位积极", actorDisplayName: "陈教练", changedAt: "2026-09-12T00:00:00.000Z" }] },
+      ],
       trainingStats: {
         totalTrainings: 46,
         attendanceRate: 89,
@@ -271,22 +275,24 @@ describe("parent growth training history", () => {
 
     await page.load();
 
-    expect(page.data.heroTags).toEqual(["在队1年7个月", "训练46课"]);
     expect(page.data.heroStats).toEqual([
-      { value: "41/46", label: "已到/应到课时", accent: false, valueClass: "p4-hero__stat-value--fraction" },
-      { value: "89%", label: "出勤率", accent: true, valueClass: "" },
-      { value: "12", label: "本月训练", accent: false, valueClass: "" },
+      { value: "46", label: "训练记录" },
+      { value: "2", label: "已确认测评" },
     ]);
     expect(page.data.trainingBars.map((bar) => bar.label)).toEqual(["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月"]);
     expect(Math.max(...page.data.trainingBars.map((bar) => bar.height))).toBe(80);
-    expect(template).toContain("p4-hero__stats");
-    expect(template).toContain("p4-hero__tags");
-    expect(template).toContain("p4-hero__stat-value {{item.valueClass}}");
-    expect(styles).toMatch(/\.p4-hero__stat-value--fraction\s*\{(?=[^}]*font-size:\s*44rpx)(?=[^}]*line-height:\s*52rpx)/s);
+    expect(template).toContain("p4-overview__stats");
+    expect(template).toContain("p4-overview__stat-value");
+    expect(template).not.toContain("p4-hero__tags");
   });
 
-  it("keeps the P4 lesson statistics row free of outer and internal borders", () => {
-    expect(styles).not.toMatch(/\.p4-hero__stats\s*\{[^}]*border(?:-top)?:/);
-    expect(styles).not.toMatch(/\.p4-hero__stat\s*\+\s*\.p4-hero__stat\s*\{[^}]*border-left:/);
+  it("keeps the P08 overview stats row free of borders, dark surfaces, and hardcoded colors", () => {
+    expect(styles).not.toMatch(/\.p4-overview__stats\s*\{[^}]*border(?:-top)?:/);
+    expect(styles).not.toMatch(/\.p4-overview__stat\s*\+\s*\.p4-overview__stat\s*\{[^}]*border-left:/);
+    expect(styles).not.toMatch(/background:\s*#(0[0-9a-f]|1[0-9a-f]|07111f)/i);
+    expect(styles).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+    expect(template).toContain("p4-overview__summary");
+    expect(template).toContain("能力组合概览");
+    expect(template).toContain('wx:if="{{activeStudentId && (state === \'ready\' || state === \'empty\')}}" class="p4-evaluations"');
   });
 });
