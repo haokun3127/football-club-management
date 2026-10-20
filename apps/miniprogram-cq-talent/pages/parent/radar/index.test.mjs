@@ -87,7 +87,7 @@ describe("parent ability radar", () => {
     expect(page.data.radar.map((point) => point.metricId)).toEqual(["speed", "control", "defence"]);
   });
 
-  it("projects a complete real metric view into the refreshed six-dimension P5 model", async () => {
+  it("keeps every dimension of an eight-metric model instead of truncating to six", async () => {
     mocks.getParentGrowth.mockResolvedValue({
       radar: [
         { metricId: "teamwork", label: "Teamwork", value: 65, maxValue: 100 },
@@ -110,14 +110,42 @@ describe("parent ability radar", () => {
 
     expect(page.data).toMatchObject({
       state: "ready",
-      radarDimensionLabel: "六维能力模型",
-      compositeScore: 75,
+      radarDimensionLabel: "8维能力模型",
+      compositeScore: 77,
       radarGeometry: "default",
     });
     expect(page.data.radar.map((point) => point.metricId)).toEqual([
-      "teamwork", "speed", "fitness", "passing", "defence", "shooting",
+      "teamwork", "speed", "fitness", "passing", "defence", "shooting", "control", "balance",
     ]);
     expect(template).toContain('geometry="{{radarGeometry}}"');
+  });
+
+  it("renders the full dimension set for three, six, eight and twelve dimension models", async () => {
+    for (const total of [3, 6, 8, 12]) {
+      mocks.getParentGrowth.mockResolvedValue({
+        radar: Array.from({ length: total }, (_, index) => ({
+          metricId: `metric-${index + 1}`,
+          label: `维度${index + 1}`,
+          value: 60 + index,
+          maxValue: 100,
+        })),
+        metricItems: [],
+        views: [{ id: "overview", name: "Overview", metricIds: Array.from({ length: total }, (_, index) => `metric-${index + 1}`) }],
+      });
+      const page = createPageInstance();
+
+      const loading = page.load();
+      await vi.runAllTimersAsync();
+      await loading;
+
+      expect(page.data.state).toBe("ready");
+      expect(page.data.canDrawRadar).toBe(true);
+      expect(page.data.radarDimensionLabel).toBe(`${total}维能力模型`);
+      expect(page.data.radar).toHaveLength(total);
+      expect(page.data.radar.map((point) => point.metricId)).toEqual(
+        Array.from({ length: total }, (_, index) => `metric-${index + 1}`),
+      );
+    }
   });
 
   it("keeps the radar empty when fewer than three real values are available", async () => {
@@ -151,6 +179,8 @@ describe("parent ability radar", () => {
     expect(controller).not.toContain("peerPercent");
     expect(controller).not.toContain("openCompare");
     expect(controller).not.toContain("openMetricHistory");
+    // F-03 回归守卫：控制器不得按固定维度数截断输入
+    expect(controller).not.toMatch(/\.slice\(/);
   });
 
   it("keeps the refreshed P5 geometry tokens aligned with the 375px Figma frame", () => {

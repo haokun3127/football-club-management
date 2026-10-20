@@ -69,7 +69,7 @@ Page({
         growth = await getParentGrowth(active.id, active);
         if (gen !== loadGeneration) return;
       }
-      const radar = presentP5Radar(radarForView(growth));
+      const radar = presentRadar(radarForView(growth));
       this.setData({
         state: radar.length >= 3 ? "ready" : "empty",
         message: radar.length >= 3 ? "" : "有效能力指标不足，完成训练或评测后生成雷达图。",
@@ -78,7 +78,7 @@ Page({
         radar,
         selectedMetricId: radar[0]?.metricId ?? "",
         canDrawRadar: false,
-        radarDimensionLabel: radar.length === 6 ? "六维能力模型" : radar.length >= 3 ? `${radar.length}维能力模型` : "",
+        radarDimensionLabel: radar.length >= 3 ? `${radar.length}维能力模型` : "",
         radarGeometry: "default",
         updatedAtLabel: growth.updatedAt ? `本周评估 · ${formatShortDate(growth.updatedAt)}` : "评估时间待同步",
         compositeScore: growth.overall === null ? "" : growth.overall ?? compositeScoreOf(radar),
@@ -127,15 +127,12 @@ function radarForView(growth: GrowthSummary) {
   return filtered.length >= 3 ? filtered : growth.radar;
 }
 
+// 按测评模型实际维度组织展示：不限定六维、不截断输入维度（REQ-PAR-003）
 function presentRadar(points: RadarMetricPoint[]): RadarPointView[] {
   return points.filter((point) => typeof point.value === "number" && Number.isFinite(point.value)).map((point) => ({
     ...point,
     percent: !point.maxValue ? 0 : Math.min(100, Math.round(((point.value ?? 0) / point.maxValue) * 100)),
   }));
-}
-
-function presentP5Radar(points: RadarMetricPoint[]): RadarPointView[] {
-  return presentRadar(points).slice(0, 6);
 }
 
 // 综合评分：各维度得分率（value/maxValue）的均值折算百分制
