@@ -50,3 +50,10 @@
 .editor-actions { display: flex; gap: 16rpx; margin-top: 24rpx; }
 .editor-actions .editor-save { background: var(--color-brand); color: var(--color-card); }
 .configuration-message { margin: 16rpx 0; color: var(--color-brand); font-size: 24rpx; line-height: 36rpx; }
+
+/* L-02：辅助模块局部加载/失败态与重试，失败只影响本模块卡片 */
+.milestone-fallback { display: flex; flex: 1; flex-direction: column; }
+.milestone-fallback .milestone-description { margin-top: 20rpx; }
+.module-retry { display: inline-block; box-sizing: border-box; margin: 24rpx 0 0; padding: 0 40rpx; min-height: 64rpx; line-height: 64rpx; border-radius: 32rpx; background: var(--color-brand-soft); color: var(--color-brand); font-size: 24rpx; text-align: center; }
+.milestone-fallback .module-retry { align-self: flex-start; }
+.inline-retry { display: inline-block; box-sizing: border-box; margin: 0 0 0 16rpx; padding: 0 24rpx; min-height: 48rpx; line-height: 48rpx; border-radius: 24rpx; background: var(--color-brand-soft); color: var(--color-brand); font-size: 24rpx; text-align: center; vertical-align: middle; }

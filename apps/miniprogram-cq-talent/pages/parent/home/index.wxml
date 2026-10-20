@@ -12,17 +12,28 @@
             <view class="player-team">{{teamLabel}}</view>
             <view class="player-metrics">
               <view><view class="metric-label">训练累计</view><view class="metric-value">{{trainingTotal}}<text class="metric-unit">次</text></view></view>
-              <view><view class="metric-label">成长里程碑</view><view class="metric-value">{{milestoneCount}}</view></view>
+              <view><view class="metric-label">成长里程碑</view><view class="metric-value">{{growthState === 'ready' ? milestoneCount : '—'}}</view></view>
             </view>
-            <view class="player-latest" bindtap="openGrowth"><text class="metric-label">最新成长</text><view class="player-latest-text">{{milestoneTitle}}{{milestoneDate ? ' · ' + milestoneDate : ''}}</view></view>
+            <view class="player-latest" bindtap="openGrowth"><text class="metric-label">最新成长</text><view class="player-latest-text">{{growthState === 'ready' ? latestGrowthText : growthState === 'error' ? '成长统计暂时无法读取' : '正在读取成长记录…'}}</view></view>
           </view>
         </swiper-item>
         <swiper-item>
           <view class="player-card milestone-card" bindtap="openGrowth">
-            <view class="eyebrow">每一步，都算数 / YOUR JOURNEY</view>
-            <view class="milestone-title">{{milestoneTitle}}</view>
-            <view class="milestone-description">{{milestoneDescription}}</view>
-            <view class="milestone-link">查看成长记录</view>
+            <block wx:if="{{growthState === 'ready'}}">
+              <view class="eyebrow">每一步，都算数 / YOUR JOURNEY</view>
+              <view class="milestone-title">{{milestoneTitle}}</view>
+              <view class="milestone-description">{{milestoneDescription}}</view>
+              <view class="milestone-link">查看成长记录</view>
+            </block>
+            <view wx:elif="{{growthState === 'error'}}" class="milestone-fallback">
+              <view class="eyebrow">成长统计暂时无法读取</view>
+              <view class="milestone-description">{{growthMessage}}</view>
+              <button class="module-retry" catchtap="retryGrowth">重试</button>
+            </view>
+            <view wx:else class="milestone-fallback">
+              <view class="eyebrow">每一步，都算数 / YOUR JOURNEY</view>
+              <view class="milestone-description">正在读取成长记录…</view>
+            </view>
           </view>
         </swiper-item>
       </swiper>
@@ -30,10 +41,16 @@
       <view class="club-banner" bindtap="openNews" role="button" aria-label="查看俱乐部动态">
         <image class="club-banner-image" src="{{banner ? banner.imageUrl : '/assets/content/football-editorial.jpg'}}" mode="aspectFill" />
         <view class="club-banner-scrim" aria-hidden="true"></view>
-        <view class="club-banner-copy"><view class="eyebrow">俱乐部动态</view><view class="club-banner-title"><view>把热爱</view><view>留在球场</view></view><view class="club-banner-subtitle">{{banner ? banner.name : news ? news.title : '了解我们的俱乐部'}}</view></view>
+        <view class="club-banner-copy"><view class="eyebrow">俱乐部动态</view><view class="club-banner-title"><view>把热爱</view><view>留在球场</view></view>
+          <block wx:if="{{newsState === 'error' && !banner}}">
+            <view class="club-banner-subtitle">{{newsMessage}}</view>
+            <button class="module-retry" catchtap="retryNews">重试</button>
+          </block>
+          <view wx:else class="club-banner-subtitle">{{banner ? banner.name : newsState === 'loading' ? '正在获取俱乐部动态…' : news ? news.title : '了解我们的俱乐部'}}</view>
+        </view>
       </view>
-      <view class="shortcut-heading"><text>常用功能</text><button class="text-button" bindtap="editShortcuts" disabled="{{!!contentMessage}}">调整入口</button></view>
-      <view wx:if="{{contentMessage}}" class="configuration-message">{{contentMessage}}</view>
+      <view class="shortcut-heading"><text>常用功能</text><button class="text-button" bindtap="editShortcuts" disabled="{{presentationState !== 'ready'}}">调整入口</button></view>
+      <view wx:if="{{contentMessage}}" class="configuration-message"><text>{{contentMessage}}</text><button class="inline-retry" catchtap="retryContent">重试</button></view>
       <view class="shortcuts"><button wx:for="{{shortcuts}}" wx:key="key" class="shortcut" data-key="{{item.key}}" bindtap="openShortcut"><view class="shortcut-icon"><image src="/assets/icons/{{item.icon}}" mode="aspectFit" /></view><text class="shortcut-label">{{item.label}}</text></button></view>
       <view wx:if="{{editingShortcuts}}" class="shortcut-editor">
         <view class="editor-title">选择并排列四个入口</view>
