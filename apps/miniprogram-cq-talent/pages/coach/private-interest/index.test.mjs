@@ -7,6 +7,8 @@ const mocks = vi.hoisted(() => ({
   showToast: vi.fn(),
   getCoachPreferences: vi.fn(),
   saveCoachPreferences: vi.fn(),
+  getStorageSync: vi.fn(),
+  setStorageSync: vi.fn(),
 }));
 
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
@@ -19,6 +21,8 @@ vi.mock("../../../utils/api", () => ({
 globalThis.wx = {
   navigateBack: mocks.navigateBack,
   showToast: mocks.showToast,
+  getStorageSync: mocks.getStorageSync,
+  setStorageSync: mocks.setStorageSync,
 };
 
 let pageDefinition;
@@ -51,6 +55,8 @@ describe("coach private interest", () => {
     mocks.showToast.mockReset();
     mocks.getCoachPreferences.mockReset().mockResolvedValue({ acceptsPrivateLessons: true, availabilitySlots: [] });
     mocks.saveCoachPreferences.mockReset().mockResolvedValue(undefined);
+    mocks.getStorageSync.mockReset().mockReturnValue("");
+    mocks.setStorageSync.mockReset();
   });
 
   it("loads persisted preferences and defaults availability to weekday slots", async () => {
@@ -129,6 +135,38 @@ describe("coach private interest", () => {
     await page.toggleSlot({ currentTarget: { dataset: { key: "5-0" } } });
     expect(page.data.availabilityColumns[5].slots[0].selected).toBe(true);
     expect(page.data.saveFailed).toBe(false);
+  });
+
+  it("keeps an explicitly saved empty availability instead of reviving defaults", async () => {
+    mocks.getStorageSync.mockReturnValue(true);
+    const page = createPageInstance();
+    page.onLoad();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const selectedCount = page.data.availabilityColumns.flatMap((column) => column.slots).filter((slot) => slot.selected).length;
+    expect(selectedCount).toBe(0);
+  });
+
+  it("does not revive default slots after clearing all, saving, and re-entering", async () => {
+    const page = createPageInstance();
+    page.onLoad();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const keys = page.data.availabilityColumns.flatMap((column) => column.slots.filter((slot) => slot.selected).map((slot) => slot.key));
+    expect(keys.length).toBe(20);
+    for (const key of keys) {
+      await page.toggleSlot({ currentTarget: { dataset: { key } } });
+    }
+    const clearedCount = page.data.availabilityColumns.flatMap((column) => column.slots).filter((slot) => slot.selected).length;
+    expect(clearedCount).toBe(0);
+    expect(mocks.setStorageSync).toHaveBeenCalledWith("coach-private-interest-preferences-saved-v1", true);
+
+    mocks.getStorageSync.mockReturnValue(true);
+    const reentered = createPageInstance();
+    reentered.onLoad();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const reenteredCount = reentered.data.availabilityColumns.flatMap((column) => column.slots).filter((slot) => slot.selected).length;
+    expect(reenteredCount).toBe(0);
   });
 
   it("keeps disabled and pending feature states non-interactive", async () => {

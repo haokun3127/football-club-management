@@ -38,6 +38,26 @@ function slotKey(dayIndex: number, slotIndex: number) {
   return `${dayIndex}-${slotIndex}`;
 }
 
+// 服务端对「从未配置」与「明确保存为空」都返回空数组，无法区分。
+// 用本地标记记录「教练已成功保存过偏好」，以尊重明确保存的空配置（F-08）。
+const PREFERENCES_SAVED_KEY = "coach-private-interest-preferences-saved-v1";
+
+function hasSavedPreferences(): boolean {
+  try {
+    return wx.getStorageSync(PREFERENCES_SAVED_KEY) === true;
+  } catch {
+    return false;
+  }
+}
+
+function markPreferencesSaved() {
+  try {
+    wx.setStorageSync(PREFERENCES_SAVED_KEY, true);
+  } catch {
+    // 本地标记仅用于区分默认值与空配置，写入失败不阻断保存流程。
+  }
+}
+
 Page<PageData>({
   data: {
     navInset: resolveNavInset(),
@@ -64,7 +84,11 @@ Page<PageData>({
     this.setData({ ...featureOnly(true), interactive: true });
     try {
       const preferences = await getCoachPreferences();
-      const selected = new Set(preferences.availabilitySlots.length > 0 ? preferences.availabilitySlots : DEFAULT_SLOTS);
+      // 首次未配置（本地无保存标记）时给设计稿默认；已明确保存为空则尊重空配置。
+      const slots = preferences.availabilitySlots.length > 0 || hasSavedPreferences()
+        ? preferences.availabilitySlots
+        : DEFAULT_SLOTS;
+      const selected = new Set(slots);
       this.setData({
         accepting: preferences.acceptsPrivateLessons,
         availabilityColumns: buildColumns(selected),
@@ -80,6 +104,7 @@ Page<PageData>({
     this.setData({ accepting: next, saving: true });
     try {
       await saveCoachPreferences({ acceptsPrivateLessons: next, availabilitySlots: collectSelected(this.data.availabilityColumns) });
+      markPreferencesSaved();
       this.setData({ saveFailed: false });
     } catch {
       this.setData({ accepting: previousAccepting, saveFailed: true });
@@ -99,6 +124,7 @@ Page<PageData>({
     this.setData({ availabilityColumns: columns, saving: true });
     try {
       await saveCoachPreferences({ acceptsPrivateLessons: this.data.accepting, availabilitySlots: collectSelected(columns) });
+      markPreferencesSaved();
       this.setData({ saveFailed: false });
     } catch {
       this.setData({ availabilityColumns: previousColumns, saveFailed: true });
