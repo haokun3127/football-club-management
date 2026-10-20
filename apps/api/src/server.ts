@@ -56,7 +56,7 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
     ? new BackofficeAuth(options.runtimeConfig.backoffice, store.repositories.backofficeAuth, options.membershipResolver) : undefined;
   registerHttpRequestContracts(app, store);
 
-  app.setErrorHandler((error: FastifyError, _request, reply) => {
+  app.setErrorHandler((error: FastifyError, request, reply) => {
     if (error.validation) {
       return reply.code(400).send(apiError(
         "bad_request",
@@ -65,13 +65,16 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
       ));
     }
 
+    // 未显式标记 statusCode 的异常视为服务器内部错误，绝不回显 error.message；
+    // Fastify 在错误进入本处理器前已按 error 级别记录完整日志。
     const statusCode = error.statusCode && error.statusCode >= 400 && error.statusCode < 600
       ? error.statusCode
-      : 400;
+      : 500;
+    const isServerError = statusCode >= 500;
 
     return reply.code(statusCode).send(apiError(
-      statusCode < 500 ? "bad_request" : "internal_error",
-      statusCode < 500 ? error.message : "Internal server error",
+      isServerError ? "internal_error" : "bad_request",
+      isServerError ? "Internal server error" : error.message,
     ));
   });
 
