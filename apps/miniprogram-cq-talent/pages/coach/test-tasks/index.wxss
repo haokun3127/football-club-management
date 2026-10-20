@@ -56,8 +56,9 @@
 }
 
 .tasks-page__body {
-  /* Figma's 331px content frame keeps 16px inner gutters and a 16px filter inset. */
-  padding: 64rpx 76rpx 220rpx;
+  /* Figma's 331px content frame keeps 16px inner gutters and a 16px filter inset.
+     底部预留：底栏 140rpx + FAB 底 172rpx + 高 112rpx 内的悬浮区域，避免末卡被 FAB 压住。 */
+  padding: 64rpx 76rpx 316rpx;
 }
 
 .filter-row {
@@ -191,9 +192,10 @@
 }
 
 .tasks-fab {
+  /* 底栏高 140rpx（role-tabbar，z-index 9999）：FAB 抬到 140rpx + 32rpx 间距之上，保证完整可见可点。 */
   position: fixed;
   right: 56rpx;
-  bottom: 112rpx;
+  bottom: 172rpx;
   z-index: 9998;
   display: flex;
   width: 112rpx;
@@ -201,8 +203,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 56rpx;
-  background: #a80f1b;
-  box-shadow: 0 8rpx 12rpx rgba(168, 15, 27, 0.25);
+  background: var(--color-brand);
+  box-shadow: 0 8rpx 12rpx rgba(var(--color-brand-rgb), 0.25);
 }
 
 .tasks-fab image {

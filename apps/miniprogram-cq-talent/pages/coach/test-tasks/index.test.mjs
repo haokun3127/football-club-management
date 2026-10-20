@@ -208,10 +208,18 @@ describe("coach assessment task list", () => {
     expect(stylesheet).toMatch(/\.tasks-nav\s*\{[^}]*padding-left:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.tasks-nav__left\s*\{[^}]*gap:\s*0/s);
     expect(stylesheet).toMatch(/\.tasks-nav__title\s*\{(?=[^}]*font-size:\s*36rpx)(?=[^}]*line-height:\s*44rpx)/s);
-    expect(stylesheet).toMatch(/\.tasks-page__body\s*\{[^}]*padding:\s*64rpx\s+76rpx\s+220rpx/s);
+    expect(stylesheet).toMatch(/\.tasks-page__body\s*\{[^}]*padding:\s*64rpx\s+76rpx\s+316rpx/s);
     expect(stylesheet).toMatch(/\.filter-row\s*\{[^}]*margin-bottom:\s*28rpx/s);
     expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*width:\s*112rpx[^}]*height:\s*112rpx/s);
     expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*z-index:\s*9998/s);
+  });
+
+  it("keeps the FAB fully above the 140rpx role-tabbar without overlap (V-06)", () => {
+    // 底栏高 140rpx、z-index 9999：FAB bottom 必须 ≥ 140rpx + 间距，且保持低于底栏层级。
+    expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*bottom:\s*172rpx/s);
+    expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*background:\s*var\(--color-brand\)/s);
+    expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*box-shadow:\s*0 8rpx 12rpx rgba\(var\(--color-brand-rgb\),\s*0\.25\)/s);
+    expect(stylesheet).not.toMatch(/\.tasks-fab\s*\{[^}]*bottom:\s*(?:[0-9]|1[0-3][0-9])rpx/s);
   });
 
   it("keeps the floating create icon visible on the red Figma FAB", () => {
