@@ -81,7 +81,8 @@ Page({
         radarDimensionLabel: radar.length >= 3 ? `${radar.length}维能力模型` : "",
         radarGeometry: "default",
         updatedAtLabel: growth.updatedAt ? `本周评估 · ${formatShortDate(growth.updatedAt)}` : "评估时间待同步",
-        compositeScore: growth.overall === null ? "" : growth.overall ?? compositeScoreOf(radar),
+        // 综合分仅使用模型定义的 overall：缺失或 null 一律留空，不得用维度均值自造总分（F-04）
+        compositeScore: typeof growth.overall === "number" ? growth.overall : "",
       });
       // 首帧门控：让 webview 内容（导航/hero/维度行）先上屏，下一帧再挂载原生 canvas，避免 canvas 合成层抢跑
       if (radar.length >= 3) {
@@ -133,11 +134,4 @@ function presentRadar(points: RadarMetricPoint[]): RadarPointView[] {
     ...point,
     percent: !point.maxValue ? 0 : Math.min(100, Math.round(((point.value ?? 0) / point.maxValue) * 100)),
   }));
-}
-
-// 综合评分：各维度得分率（value/maxValue）的均值折算百分制
-function compositeScoreOf(radar: RadarPointView[]): number | "" {
-  const percents = radar.map((point) => point.percent).filter((percent) => Number.isFinite(percent));
-  if (!percents.length) return "";
-  return Math.round(percents.reduce((sum, percent) => sum + percent, 0) / percents.length);
 }

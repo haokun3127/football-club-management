@@ -82,9 +82,29 @@ describe("parent ability radar", () => {
       state: "ready",
       canDrawRadar: true,
       radarDimensionLabel: "3维能力模型",
-      compositeScore: 70,
+      compositeScore: "",
     });
     expect(page.data.radar.map((point) => point.metricId)).toEqual(["speed", "control", "defence"]);
+  });
+
+  it("shows the model-defined overall score only when the server returns a real number", async () => {
+    const dimensions = [
+      { metricId: "speed", label: "Speed", value: 8, maxValue: 10 },
+      { metricId: "control", label: "Control", value: 7, maxValue: 10 },
+      { metricId: "defence", label: "Defence", value: 6, maxValue: 10 },
+    ];
+    const views = [{ id: "overview", name: "Overview", metricIds: ["speed", "control", "defence"] }];
+
+    for (const [overall, expected] of [[86, 86], [null, ""], [undefined, ""]]) {
+      mocks.getParentGrowth.mockResolvedValueOnce({ radar: dimensions, metricItems: [], views, overall });
+      const page = createPageInstance();
+
+      const loading = page.load();
+      await vi.runAllTimersAsync();
+      await loading;
+
+      expect(page.data.compositeScore).toBe(expected);
+    }
   });
 
   it("keeps every dimension of an eight-metric model instead of truncating to six", async () => {
@@ -111,7 +131,7 @@ describe("parent ability radar", () => {
     expect(page.data).toMatchObject({
       state: "ready",
       radarDimensionLabel: "8维能力模型",
-      compositeScore: 77,
+      compositeScore: "",
       radarGeometry: "default",
     });
     expect(page.data.radar.map((point) => point.metricId)).toEqual([
@@ -166,7 +186,7 @@ describe("parent ability radar", () => {
     expect(page.data.radar).toHaveLength(2);
   });
 
-  it("derives composite score from real dimension percents and keeps peer baselines contract-gated", () => {
+  it("keeps the composite score limited to the model-defined overall and peer baselines contract-gated", () => {
     expect(template).toContain("{{radarDimensionLabel}}");
     expect(template).not.toContain('bindtap="openMetricHistory"');
     expect(template).not.toContain("p5-nav__compare");
@@ -181,6 +201,8 @@ describe("parent ability radar", () => {
     expect(controller).not.toContain("openMetricHistory");
     // F-03 回归守卫：控制器不得按固定维度数截断输入
     expect(controller).not.toMatch(/\.slice\(/);
+    // F-04 回归守卫：不得用维度百分比均值自造综合分
+    expect(controller).not.toContain("compositeScoreOf");
   });
 
   it("keeps the refreshed P5 geometry tokens aligned with the 375px Figma frame", () => {
