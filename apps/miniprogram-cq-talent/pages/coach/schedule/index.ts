@@ -75,6 +75,7 @@ Page({
     selectedTeamIds: [] as string[],
     allTeamsSelected: true,
     hasTeamOptions:false,
+    showTeamPicker:false,
     taskCount:0,
     date: initialDate,
     selectedDate: initialDate,
@@ -94,6 +95,7 @@ Page({
     heroEvent: null as CoachEventView | null,
     hasHeroEvent: false,
     heroDateLabel: "",
+    heroKindLabel: "",
     heroPills: [] as HeroPillView[],
     monthKey: initialDate.slice(0, 7),
     monthLabel: formatMonthLabel(initialDate.slice(0, 7)),
@@ -152,6 +154,7 @@ Page({
         heroEvent,
         hasHeroEvent: Boolean(heroEvent),
         heroDateLabel: heroDateLabel(this.data.date),
+        heroKindLabel: heroEvent ? heroKindLabel(heroEvent.type) : "",
         taskCards,
         hasTaskCards: taskCards.length > 0,
         monthKey: this.data.date.slice(0, 7),
@@ -172,6 +175,8 @@ Page({
     }
   },
   onUnload() { loadVersions.set(this, (loadVersions.get(this) ?? 0) + 1); },
+  toggleTeamPicker() { this.setData({ showTeamPicker: !this.data.showTeamPicker }); },
+  openSelectedTeam() { openPage("/pages/coach/team/index"); },
   selectTeam(event: {currentTarget: {dataset: {id?: string}}}) {
     const id = event.currentTarget.dataset.id;
     const options = this.data.teamOptions as Array<{id: string}>;
@@ -316,6 +321,12 @@ function heroDateLabel(date: string): string {
   if (!Number.isFinite(value.getTime())) return formatCalendarDate(date);
   const weekLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
   return `${value.getUTCFullYear()}年${value.getUTCMonth() + 1}月${value.getUTCDate()}日 ${weekLabels[value.getUTCDay()]}`;
+}
+
+function heroKindLabel(type: ScheduleEvent["type"]): string {
+  if (type === "match") return "比赛安排";
+  if (type === "training") return "训练安排";
+  return "活动安排";
 }
 
 function buildHeroPills(home: CoachHome): HeroPillView[] {

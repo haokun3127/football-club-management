@@ -10,6 +10,6 @@ describe("coach schedule seven-day strip", () => {
     expect(controller).toContain("collapsedDayStrip: dayStrip,");
     expect(controller).not.toContain("collapsedDayStrip: dayStrip.slice(0, 6)");
     expect(template).toContain('class="c1-week-nav__expand"');
-    expect(stylesheet).toMatch(/\.c1-week-nav\s*\{[^}]*left:\s*44rpx[^}]*grid-template-columns:\s*repeat\(7,\s*minmax\(0,\s*1fr\)\)[^}]*column-gap:\s*8rpx[^}]*width:\s*664rpx[^}]*padding:\s*0\s+84rpx\s+0\s+0/s);
+    expect(stylesheet).toMatch(/\.c1-week-nav\s*\{[^}]*left:\s*44rpx[^}]*grid-template-columns:\s*repeat\(7,\s*minmax\(0,\s*1fr\)\)[^}]*column-gap:\s*8rpx[^}]*width:\s*566rpx/s);
   });
 });

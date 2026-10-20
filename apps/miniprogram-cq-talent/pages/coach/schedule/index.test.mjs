@@ -245,7 +245,7 @@ describe("coach schedule home", () => {
     expect(template).toContain('<view class="c1-month-calendar__collapse" bindtap="collapseMonthPicker" aria-label="收起月历"><image class="c1-month-calendar__collapse-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>');
     expect(template).toContain('class="c1-week-nav"');
     expect(template).not.toContain('class="c1-week-nav" bindtap="expandMonthPicker"');
-    expect(template).toContain('<view class="c1-week-nav__expand" catchtap="expandMonthPicker" aria-label="展开月历"><image class="c1-week-nav__expand-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>');
+    expect(template).toContain('<view wx:else class="c1-week-nav__expand" catchtap="expandMonthPicker" aria-label="展开月历"><image class="c1-week-nav__expand-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>');
     expect(template).toContain('wx:for="{{collapsedDayStrip}}"');
     expect(template).not.toContain('wx:for="{{dayStrip}}"');
     expect(template).toContain('data-date="{{item.date}}" catchtap="selectDay"');
@@ -259,16 +259,16 @@ describe("coach schedule home", () => {
     expect(stylesheet).toMatch(/\.c1-dates__arrow--next\s*\{[^}]*right:\s*0[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c1-dates__arrow--previous\s+image\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c1-dates__arrow--next\s+image\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
-    expect(stylesheet).toMatch(/\.c1-week-nav\s*\{[^}]*position:\s*absolute[^}]*top:\s*24rpx[^}]*left:\s*44rpx[^}]*display:\s*grid[^}]*grid-template-columns:\s*repeat\(7,\s*minmax\(0,\s*1fr\)\)[^}]*column-gap:\s*8rpx[^}]*width:\s*664rpx[^}]*padding:\s*0\s+84rpx\s+0\s+0/s);
+    expect(stylesheet).toMatch(/\.c1-week-nav\s*\{[^}]*position:\s*absolute[^}]*top:\s*24rpx[^}]*left:\s*44rpx[^}]*display:\s*grid[^}]*grid-template-columns:\s*repeat\(7,\s*minmax\(0,\s*1fr\)\)[^}]*column-gap:\s*8rpx[^}]*width:\s*566rpx/s);
     expect(stylesheet).toMatch(/\.c1-day\s*\{[^}]*flex:\s*0\s+0\s+88rpx[^}]*flex-direction:\s*column[^}]*height:\s*80rpx[^}]*border-radius:\s*32rpx/s);
-    expect(stylesheet).toMatch(/\.c1-day__week\s*\{[^}]*color:\s*#667085[^}]*font-size:\s*20rpx[^}]*line-height:\s*24rpx/s);
-    expect(stylesheet).toMatch(/\.c1-day__num\s*\{[^}]*color:\s*#202124[^}]*font-size:\s*24rpx[^}]*line-height:\s*28rpx/s);
-    expect(stylesheet).toMatch(/\.c1-day--selected\s*\{[^}]*background:\s*#a80f1b/s);
-    expect(stylesheet).toMatch(/\.c1-week-nav__expand\s*\{[^}]*position:\s*absolute[^}]*top:\s*50%[^}]*right:\s*12rpx[^}]*width:\s*60rpx[^}]*height:\s*32rpx[^}]*transform:\s*translateY\(-50%\)/s);
+    expect(stylesheet).toMatch(/\.c1-day__week\s*\{[^}]*color:\s*var\(--color-text-secondary\)[^}]*font-size:\s*20rpx[^}]*line-height:\s*24rpx/s);
+    expect(stylesheet).toMatch(/\.c1-day__num\s*\{[^}]*color:\s*var\(--club-text\)[^}]*font-size:\s*24rpx[^}]*line-height:\s*28rpx/s);
+    expect(stylesheet).toMatch(/\.c1-day--selected\s*\{[^}]*background:\s*var\(--color-brand\)/s);
+    expect(stylesheet).toMatch(/\.c1-week-nav__expand\s*\{[^}]*display:\s*flex[^}]*align-items:\s*center[^}]*width:\s*60rpx[^}]*height:\s*32rpx[^}]*border-radius:\s*16rpx[^}]*background:\s*var\(--color-brand-soft\)/s);
     expect(stylesheet).toMatch(/\.c1-week-nav__expand-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx/s);
-    expect(stylesheet).toMatch(/\.c1-day--selected\s+\.c1-day__week,\s*\.c1-day--selected\s+\.c1-day__num\s*\{[^}]*color:\s*#ffffff/s);
+    expect(stylesheet).toMatch(/\.c1-day--selected\s+\.c1-day__week,\s*\.c1-day--selected\s+\.c1-day__num\s*\{[^}]*color:\s*var\(--color-card\)/s);
     expect(template).not.toContain('class="c1-dates__expand"');
-    expect(stylesheet).toMatch(/\.c1-month-calendar\s*\{[^}]*min-height:\s*840rpx[^}]*margin:\s*32rpx\s+32rpx\s+0/s);
+    expect(stylesheet).toMatch(/\.c1-month-calendar\s*\{[^}]*min-height:\s*840rpx[^}]*margin-top:\s*8rpx/s);
     expect(stylesheet).toMatch(/\.c1-month-calendar__collapse\s*\{[^}]*width:\s*60rpx[^}]*height:\s*32rpx[^}]*border-radius:\s*16rpx/s);
     expect(stylesheet).toMatch(/\.c1-month-calendar__collapse-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx[^}]*line-height:\s*0/s);
     expect(template).not.toContain('>收起<image');
@@ -276,7 +276,7 @@ describe("coach schedule home", () => {
     expect(template).toContain('class="c1-month-calendar__legend"');
     expect(template).toContain('蓝色=训练');
     expect(template).toContain('红色=比赛');
-    expect(stylesheet).toMatch(/\.c1-month-day__marker--match\s*\{[^}]*background:\s*#1976d2/s);
+    expect(stylesheet).toMatch(/\.c1-month-day__marker--match\s*\{[^}]*background:\s*var\(--color-brand\)/s);
     expect(stylesheet).toMatch(/\.c1-month-calendar__grid\s*\{[^}]*grid-auto-rows:\s*minmax\(154rpx, auto\)/s);
   });
 
@@ -319,18 +319,24 @@ describe("coach schedule home", () => {
     expect(controller).not.toContain("openTeam()");
   });
 
-  it("keeps the all-teams context visible when the selected date has no events", () => {
-    expect(template).toContain('wx:if="{{state !== \'loading\' && state !== \'error\'}}" class="c1-all-teams-context"');
-    expect(template).toContain("所选队伍 · 日程安排");
+  it("keeps the authorized-team card, margined calendar card, and selected-team entry visible", () => {
+    expect(template).toContain('class="c1-team-card"');
+    expect(template).toContain("全部授权队伍");
+    expect(template).toContain("已记住上次选择");
+    expect(template).toContain('catchtap="toggleTeamPicker"');
+    expect(template).toContain('class="c1-team-entry"');
+    expect(template).toContain("查看所选队伍");
     expect(template).not.toContain(">全部球队课程<");
-    expect(template).not.toContain('class="c1-all-teams-context__copy"');
-    expect(stylesheet).toMatch(/\.c1-all-teams-context\s*\{(?=[^}]*flex-direction:\s*row)(?=[^}]*height:\s*98rpx)/s);
+    expect(stylesheet).toMatch(/\.c1-team-card\s*\{[^}]*background:\s*var\(--color-brand\)/s);
+    expect(stylesheet).toMatch(/\.c1-calendar-card\s*\{[^}]*margin:\s*24rpx\s+24rpx\s+0[^}]*border-radius:\s*28rpx[^}]*background:\s*var\(--color-card\)/s);
+    expect(stylesheet).toMatch(/\.c1-team-entry\s*\{[^}]*background:\s*var\(--color-brand\)[^}]*color:\s*var\(--color-card\)/s);
+    expect(stylesheet).toMatch(/\.c1-team-strip\s*\{[^}]*margin:\s*16rpx\s+24rpx\s+0/s);
   });
 
-  it("matches the C1 online hero and stats-row offsets without moving activity cards off their 22px rail", () => {
+  it("matches the C01 card layout: nav rail, margined calendar, and 24rpx body rail", () => {
     expect(stylesheet).toMatch(/\.c1-nav\s*\{[^}]*padding:\s*0\s+32rpx/s);
-    expect(stylesheet).toMatch(/\.c1-body\s*\{[^}]*padding:\s*0\s+44rpx\s+24rpx/s);
-    expect(stylesheet).toMatch(/\.c1-hero\s*\{[^}]*margin:\s*0\s+-12rpx/s);
+    expect(stylesheet).toMatch(/\.c1-body\s*\{[^}]*padding:\s*0\s+24rpx\s+24rpx/s);
+    expect(stylesheet).toMatch(/\.c1-calendar-card\s*\{[^}]*margin:\s*24rpx\s+24rpx\s+0/s);
     expect(stylesheet).toMatch(/\.c1-list\s*\{[^}]*margin-top:\s*24rpx/s);
   });
 
@@ -391,7 +397,7 @@ describe("coach schedule home", () => {
 
   it("keeps the live hero title and cards inside the C1 Figma width budget", () => {
     expect(stylesheet).toMatch(/\.c1-hero__title\s*\{[^}]*flex:\s*1[^}]*min-width:\s*0/s);
-    expect(stylesheet).toMatch(/\.c1-hero\s*\{[^}]*min-height:\s*360rpx[^}]*padding:\s*32rpx/s);
+    expect(stylesheet).toMatch(/\.c1-hero\s*\{[^}]*padding:\s*32rpx[^}]*border-radius:\s*28rpx[^}]*background:\s*var\(--color-card\)/s);
     expect(stylesheet).toMatch(/\.acard\s*\{[^}]*min-height:\s*192rpx[^}]*padding:\s*24rpx/s);
   });
 
@@ -400,13 +406,14 @@ describe("coach schedule home", () => {
     expect(stylesheet).toMatch(/\.c1-hero__title\s*\{[^}]*flex:\s*1[^}]*min-width:\s*0/s);
   });
 
-  it("matches the live C1 stat-pill and hero scale", () => {
-    expect(stylesheet).toMatch(/\.c1-hero\s*\{[^}]*gap:\s*24rpx[^}]*min-height:\s*360rpx/s);
-    expect(stylesheet).toMatch(/\.c1-hero__time\s*\{[^}]*font-size:\s*108rpx[^}]*line-height:\s*108rpx/s);
+  it("matches the C01 white course card scale with token stat-pills", () => {
+    expect(stylesheet).toMatch(/\.c1-hero\s*\{[^}]*gap:\s*20rpx[^}]*margin-top:\s*24rpx/s);
+    expect(stylesheet).toMatch(/\.c1-hero__time\s*\{[^}]*color:\s*var\(--color-brand\)[^}]*font-size:\s*34rpx[^}]*line-height:\s*44rpx/s);
     expect(stylesheet).toMatch(/\.c1-hero__pill\s*\{[^}]*padding:\s*16rpx\s+20rpx/s);
-    expect(stylesheet).toMatch(/\.c1-hero__pill--primary\s*\{[^}]*background:\s*rgba\(168,15,27,\.1\)/s);
-    expect(stylesheet).toMatch(/\.c1-hero__pill--primary\s*\{[^}]*border-color:\s*rgba\(168,15,27,\.2\)/s);
+    expect(stylesheet).toMatch(/\.c1-hero__pill--primary\s*\{[^}]*background:\s*rgba\(var\(--color-brand-rgb\),\s*\.1\)/s);
+    expect(stylesheet).toMatch(/\.c1-hero__pill--primary\s*\{[^}]*border-color:\s*rgba\(var\(--color-brand-rgb\),\s*\.2\)/s);
     expect(template).toContain('class="c1-hero__pill c1-hero__pill--{{item.tone}}"');
+    expect(template).toContain("{{heroDateLabel}} · {{heroKindLabel}}");
   });
 
   it("uses the project chevron asset for every activity card", () => {

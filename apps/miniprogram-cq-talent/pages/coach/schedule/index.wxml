@@ -5,76 +5,86 @@
   </view>
   <view class="c1-top-spacer" style="height:{{topBarHeight}}px"></view>
 
-  <scroll-view wx:if="{{hasTeamOptions}}" scroll-x class="c1-team-strip">
+  <!-- V-03 C01 214:2144：授权队伍卡（更改展开选队，保留授权范围与选队状态） -->
+  <view wx:if="{{hasTeamOptions}}" class="c1-team-card">
+    <view class="c1-team-card__info">
+      <view class="c1-team-card__title">全部授权队伍 · {{teamOptions.length}}队</view>
+      <view class="c1-team-card__sub">已记住上次选择</view>
+    </view>
+    <view class="c1-team-card__toggle" role="button" aria-label="更改授权队伍" catchtap="toggleTeamPicker">更改 ›</view>
+  </view>
+  <scroll-view wx:if="{{hasTeamOptions && showTeamPicker}}" scroll-x class="c1-team-strip">
     <view class="c1-team-row"><button class="c1-team {{allTeamsSelected ? 'c1-team--selected' : ''}}" data-id="all" bindtap="selectTeam">全部</button>
     <button wx:for="{{teamOptions}}" wx:key="id" class="c1-team {{item.selected ? 'c1-team--selected' : ''}}" data-id="{{item.id}}" bindtap="selectTeam"><image src="/assets/icons/content-users.svg" mode="aspectFit" />{{item.name}}</button></view>
   </scroll-view>
-  <view class="c1-shortcuts"><button bindtap="goToday">回到今天</button><button bindtap="showTasks">未完成任务 · {{taskCount}}</button></view>
-  <block wx:if="{{viewMode === 'month'}}">
-    <view class="c1-month-calendar" bindtouchstart="calendarTouchStart" bindtouchend="calendarTouchEnd">
-      <view class="c1-month-calendar__header">
-        <view class="c1-month-calendar__title">{{monthLabel}}</view>
-        <view class="c1-month-calendar__actions">
+
+  <!-- 带边距日历卡：月标签 + 回今天/月历切换 + 周条或月格 + 图例 -->
+  <view class="c1-calendar-card" bindtouchstart="calendarTouchStart" bindtouchend="calendarTouchEnd">
+    <view class="c1-calendar-card__header">
+      <view class="c1-calendar-card__title">{{monthLabel}}</view>
+      <view class="c1-calendar-card__actions">
+        <button class="c1-calendar-card__today" bindtap="goToday">回今天</button>
+        <block wx:if="{{viewMode === 'month'}}">
           <view class="c1-month-calendar__arrow" data-offset="-1" bindtap="changeMonth" aria-label="上个月"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
           <view class="c1-month-calendar__arrow" data-offset="1" bindtap="changeMonth" aria-label="下个月"><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
           <view class="c1-month-calendar__collapse" bindtap="collapseMonthPicker" aria-label="收起月历"><image class="c1-month-calendar__collapse-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>
+        </block>
+        <view wx:else class="c1-week-nav__expand" catchtap="expandMonthPicker" aria-label="展开月历"><image class="c1-week-nav__expand-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>
+      </view>
+    </view>
+    <block wx:if="{{viewMode === 'month'}}">
+      <view class="c1-month-calendar">
+        <view class="c1-month-calendar__weekdays">
+          <view wx:for="{{monthWeekdays}}" wx:key="*this" class="c1-month-calendar__weekday">{{item}}</view>
         </view>
-      </view>
-      <view class="c1-month-calendar__weekdays">
-        <view wx:for="{{monthWeekdays}}" wx:key="*this" class="c1-month-calendar__weekday">{{item}}</view>
-      </view>
-      <view class="c1-month-calendar__grid">
-        <view wx:for="{{monthDays}}" wx:key="key" class="c1-month-day {{item.isCurrentMonth ? '' : 'c1-month-day--outside'}} {{item.isToday ? 'c1-month-day--today' : ''}} {{item.isSelected ? 'c1-month-day--selected' : ''}}" data-date="{{item.key}}" bindtap="selectDay">
-          <view class="c1-month-day__number">{{item.dayNumber}}</view>
-          <view class="c1-month-day__events">
-            <view wx:for="{{item.events}}" wx:for-item="activity" wx:key="id" class="c1-month-event c1-month-event--{{activity.tone}}">{{activity.typeLabel}} · {{activity.title}}</view>
-            <view wx:if="{{item.overflow}}" class="c1-month-overflow">另有 {{item.overflow}} 项</view>
+        <view class="c1-month-calendar__grid">
+          <view wx:for="{{monthDays}}" wx:key="key" class="c1-month-day {{item.isCurrentMonth ? '' : 'c1-month-day--outside'}} {{item.isToday ? 'c1-month-day--today' : ''}} {{item.isSelected ? 'c1-month-day--selected' : ''}}" data-date="{{item.key}}" bindtap="selectDay">
+            <view class="c1-month-day__number">{{item.dayNumber}}</view>
+            <view class="c1-month-day__events">
+              <view wx:for="{{item.events}}" wx:for-item="activity" wx:key="id" class="c1-month-event c1-month-event--{{activity.tone}}">{{activity.typeLabel}} · {{activity.title}}</view>
+              <view wx:if="{{item.overflow}}" class="c1-month-overflow">另有 {{item.overflow}} 项</view>
+            </view>
           </view>
         </view>
       </view>
-      <view class="c1-month-calendar__legend">
-        <view class="c1-month-calendar__legend-item"><view class="c1-month-calendar__legend-dot c1-month-calendar__legend-dot--training"></view><text>蓝色=训练</text></view>
-        <view class="c1-month-calendar__legend-item"><view class="c1-month-calendar__legend-dot c1-month-calendar__legend-dot--match"></view><text>红色=比赛</text></view>
-        <view class="c1-month-calendar__legend-item"><view class="c1-month-calendar__legend-dot c1-month-calendar__legend-dot--other"></view><text>绿色=其他</text></view>
-      </view>
-    </view>
-  </block>
-  <view wx:else class="c1-dates" bindtouchstart="calendarTouchStart" bindtouchend="calendarTouchEnd">
-    <view class="c1-dates__arrow c1-dates__arrow--previous" data-offset="-7" bindtap="changeWeek"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
+    </block>
+    <view wx:else class="c1-dates">
+      <view class="c1-dates__arrow c1-dates__arrow--previous" data-offset="-7" bindtap="changeWeek"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
       <view class="c1-week-nav">
         <view wx:for="{{collapsedDayStrip}}" wx:key="date" class="c1-day {{selectedDate === item.date ? 'c1-day--selected' : ''}}" data-date="{{item.date}}" catchtap="selectDay">
           <view class="c1-day__week">{{item.weekLabel}}</view>
           <view class="c1-day__num">{{item.dayNum}}</view>
         </view>
-        <view class="c1-week-nav__expand" catchtap="expandMonthPicker" aria-label="展开月历"><image class="c1-week-nav__expand-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>
+      </view>
+      <view class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek"><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
     </view>
-    <view class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek"><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
-  </view>
-
-  <view wx:if="{{state !== 'loading' && state !== 'error'}}" class="c1-all-teams-context">
-    <text class="c1-all-teams-context__label">所选队伍 · 日程安排</text>
+    <view class="c1-month-calendar__legend">
+      <view class="c1-month-calendar__legend-item"><view class="c1-month-calendar__legend-dot c1-month-calendar__legend-dot--training"></view><text>蓝色=训练</text></view>
+      <view class="c1-month-calendar__legend-item"><view class="c1-month-calendar__legend-dot c1-month-calendar__legend-dot--match"></view><text>红色=比赛</text></view>
+      <view class="c1-month-calendar__legend-item"><view class="c1-month-calendar__legend-dot c1-month-calendar__legend-dot--other"></view><text>绿色=其他</text></view>
+    </view>
   </view>
 
   <view class="c1-body">
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '加载日程' : state === 'empty' ? '暂无日程或任务' : '日程读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready'}}">
+      <!-- 课程卡 -->
       <view wx:if="{{hasHeroEvent}}" class="c1-hero" data-id="{{heroEvent.id}}" bindtap="openEvent">
-        <view class="c1-hero__top"><view>{{heroDateLabel}}</view><view>{{clubName}}</view></view>
+        <view class="c1-hero__head"><view class="c1-hero__date">{{heroDateLabel}} · {{heroKindLabel}}</view></view>
         <view class="c1-hero__main"><view class="c1-hero__time">{{heroEvent.startTime}}</view><view class="c1-hero__title">{{heroEvent.title}}</view></view>
         <view class="c1-hero__meta">{{heroEvent.locationLabel}}</view>
-        <view class="c1-hero__pills">
-          <block wx:if="{{heroPills.length}}">
-            <view wx:for="{{heroPills}}" wx:key="label" class="c1-hero__pill c1-hero__pill--{{item.tone}}">
-              <text class="c1-hero__pill-value">{{item.value}}</text>
-              <text class="c1-hero__pill-label">{{item.label}}</text>
-            </view>
-          </block>
-          <block wx:else>
-            <view class="c1-hero__pill">{{heroEvent.statusLabel}}</view>
-            <view wx:if="{{heroEvent.hasDuration}}" class="c1-hero__pill">{{heroEvent.durationText}}</view>
-          </block>
+        <view class="c1-hero__pills" wx:if="{{heroPills.length}}">
+          <view wx:for="{{heroPills}}" wx:key="label" class="c1-hero__pill c1-hero__pill--{{item.tone}}">
+            <text class="c1-hero__pill-value">{{item.value}}</text>
+            <text class="c1-hero__pill-label">{{item.label}}</text>
+          </view>
         </view>
+        <view class="c1-hero__pills" wx:else>
+          <view class="c1-hero__pill">{{heroEvent.statusLabel}}</view>
+          <view wx:if="{{heroEvent.hasDuration}}" class="c1-hero__pill">{{heroEvent.durationText}}</view>
+        </view>
+        <view class="c1-hero__link">查看详情 →</view>
       </view>
 
       <view wx:if="{{hasVisibleEvents}}" class="c1-list">
@@ -93,8 +103,9 @@
     </block>
   </view>
 
+  <!-- 任务卡 -->
   <view id="coach-tasks" class="c1-tasks" wx:if="{{state !== 'loading' && state !== 'error'}}">
-    <view class="c1-tasks__heading">所选队伍 · 未完成任务</view>
+    <view class="c1-tasks__head"><view class="c1-tasks__heading">待完成任务</view><button class="c1-tasks__more" bindtap="showTasks">未完成任务 · {{taskCount}}</button></view>
     <view wx:if="{{!taskCards.length}}" class="c1-empty">暂无未完成任务</view>
     <view wx:for="{{taskCards}}" wx:key="eventId" class="c1-task" data-id="{{item.taskId}}" bindtap="openAssessmentTask">
       <view class="c1-task__title">{{item.title || item.label}}</view><view class="c1-task__meta">{{item.teamName}} · {{item.periodLabel}}</view>
@@ -102,5 +113,8 @@
       <view class="c1-task__action">{{item.label}} <image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
     </view>
   </view>
+
+  <!-- 所选队伍入口 -->
+  <button class="c1-team-entry" wx:if="{{state !== 'loading' && state !== 'error'}}" bindtap="openSelectedTeam">查看所选队伍</button>
   <role-tabbar role="coach" active="schedule" />
 </view>
