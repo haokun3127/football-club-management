@@ -53,13 +53,22 @@ describe("coach private interest", () => {
     mocks.requireRole.mockReset().mockReturnValue(coachSession({ private_lessons: true }));
     mocks.navigateBack.mockReset();
     mocks.showToast.mockReset();
-    mocks.getCoachPreferences.mockReset().mockResolvedValue({ acceptsPrivateLessons: true, availabilitySlots: [] });
+    mocks.getCoachPreferences.mockReset().mockResolvedValue({ acceptsPrivateLessons: true, availabilitySlots: Array.from({ length: 20 }, (_, i) => `${Math.floor(i / 4)}-${i % 4}`) });
     mocks.saveCoachPreferences.mockReset().mockResolvedValue(undefined);
     mocks.getStorageSync.mockReset().mockReturnValue("");
     mocks.setStorageSync.mockReset();
   });
 
-  it("loads persisted preferences and defaults availability to weekday slots", async () => {
+  it("preserves server empty availability on a fresh device and on acceptance changes", async () => {
+    mocks.getCoachPreferences.mockResolvedValue({ acceptsPrivateLessons: true, availabilitySlots: [] });
+    const page = createPageInstance();
+    await page.load(true);
+    expect(page.data.availabilityColumns.flatMap(c => c.slots).filter(s => s.selected)).toHaveLength(0);
+    await page.toggleAccepting();
+    expect(mocks.saveCoachPreferences).toHaveBeenCalledWith({ acceptsPrivateLessons: false, availabilitySlots: [] });
+  });
+
+  it("loads actual persisted weekday slots", async () => {
     const page = createPageInstance();
     page.onLoad();
     await page.data && Promise.resolve();
@@ -138,7 +147,7 @@ describe("coach private interest", () => {
   });
 
   it("keeps an explicitly saved empty availability instead of reviving defaults", async () => {
-    mocks.getStorageSync.mockReturnValue(true);
+    mocks.getCoachPreferences.mockResolvedValue({ acceptsPrivateLessons: true, availabilitySlots: [] });
     const page = createPageInstance();
     page.onLoad();
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -159,9 +168,9 @@ describe("coach private interest", () => {
     }
     const clearedCount = page.data.availabilityColumns.flatMap((column) => column.slots).filter((slot) => slot.selected).length;
     expect(clearedCount).toBe(0);
-    expect(mocks.setStorageSync).toHaveBeenCalledWith("coach-private-interest-preferences-saved-v1", true);
+    expect(mocks.saveCoachPreferences).toHaveBeenLastCalledWith({ acceptsPrivateLessons: true, availabilitySlots: [] });
 
-    mocks.getStorageSync.mockReturnValue(true);
+    mocks.getCoachPreferences.mockResolvedValue({ acceptsPrivateLessons: true, availabilitySlots: [] });
     const reentered = createPageInstance();
     reentered.onLoad();
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -236,7 +245,7 @@ describe("coach private interest", () => {
   });
 
   it("summarizes an explicitly empty availability without default wording", async () => {
-    mocks.getStorageSync.mockReturnValue(true);
+    mocks.getCoachPreferences.mockResolvedValue({ acceptsPrivateLessons: true, availabilitySlots: [] });
     const page = createPageInstance();
     page.onLoad();
     await new Promise((resolve) => setTimeout(resolve, 0));
