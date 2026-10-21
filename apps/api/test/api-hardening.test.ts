@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { SessionRegistry } from "../src/auth/session-registry.js";
 import { buildServer } from "../src/server.js";
 
 const clubId = "club-chongqing-talent";
@@ -6,6 +7,15 @@ const clientId = "app-client-cq-talent-wechat-main";
 const loginPath = `/clubs/${clubId}/app-clients/${clientId}/wechat-login`;
 
 describe("global rate limit", () => {
+  it("does not accept attacker-selected Authorization values as new anonymous buckets", async () => {
+    const app = buildServer(undefined, { logger: false, rateLimit: { max: 2, timeWindow: "1 minute", loginMax: 2 } });
+    try {
+      const codes = [];
+      for (let i=0; i<3; i++) codes.push((await app.inject({ method: "GET", url: "/health",
+        headers: { authorization: `Bearer invented-${i}` } })).statusCode);
+      expect(codes[2]).toBe(429);
+    } finally { await app.close(); }
+  });
   it("returns 429 with the project error shape once the anonymous bucket is exhausted", async () => {
     const app = buildServer(undefined, {
       logger: false,
@@ -28,13 +38,17 @@ describe("global rate limit", () => {
   });
 
   it("buckets requests by the authorization token so distinct sessions are not throttled together", async () => {
+    const sessions = new SessionRegistry();
+    const sessionInput = { clubId, appClientId: clientId, userId: "coach", membershipId: "member", activeRole: "coach" as const };
+    const firstSession = await sessions.create(sessionInput);
+    const secondSession = await sessions.create(sessionInput);
     const app = buildServer(undefined, {
-      logger: false,
+      logger: false, sessionRegistry: sessions,
       rateLimit: { max: 2, timeWindow: "1 minute" },
     });
     try {
-      const headersA = { authorization: "Bearer token-session-a" };
-      const headersB = { authorization: "Bearer token-session-b" };
+      const headersA = { authorization: `Bearer ${firstSession.token}` };
+      const headersB = { authorization: `Bearer ${secondSession.token}` };
       for (let index = 0; index < 2; index += 1) {
         expect((await app.inject({ method: "GET", url: "/health", headers: headersA })).statusCode).toBe(200);
       }

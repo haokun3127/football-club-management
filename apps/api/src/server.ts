@@ -39,7 +39,7 @@ export interface RateLimitOptions {
 }
 
 // 全局默认阈值按「小程序多用户共享出口 IP + 生产 Nginx 未传 X-Forwarded-For（request.ip 恒为 127.0.0.1）」设计：
-// key 按 Authorization 哈希分桶（每个会话独立计数），匿名桶覆盖登录/健康检查等未鉴权流量，
+// key 按已验证会话哈希分桶（每个会话独立计数），匿名桶覆盖登录/健康检查等未鉴权流量，
 // 阈值需容纳活动场景集中登录与共享 WiFi 出口的并发峰值。
 const DEFAULT_RATE_LIMIT: RateLimitOptions = {
   max: 300,
@@ -72,6 +72,11 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
   // 全局 CSP 与之叠加会按交集收紧并破坏内联样式；JSON API 响应亦无 CSP 语义。
   void app.register(helmet, { contentSecurityPolicy: false });
 
+  const sessionRegistry = options.sessionRegistry
+    ?? (store instanceof PersistentApiStore
+      ? new SessionRegistry(store.repositories.appClientSessions)
+      : new SessionRegistry());
+
   const rateLimitOptions = options.rateLimit === undefined
     ? (options.runtimeConfig ? DEFAULT_RATE_LIMIT : false)
     : options.rateLimit;
@@ -81,11 +86,14 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
       max: rateLimitOptions.max,
       timeWindow: rateLimitOptions.timeWindow,
       // 生产链路 Nginx 未透传 X-Forwarded-For，request.ip 无法区分真实来源；
-      // 携带 Authorization 的请求按 token 哈希分桶，匿名请求退回共享 IP 桶。
-      keyGenerator: (request) => {
+      // 有效会话按 token 哈希分桶，伪造/匿名请求和登录退回共享 IP 桶。
+      keyGenerator: async (request) => {
         const authorization = request.headers.authorization;
-        if (authorization) {
-          return `auth:${createHash("sha256").update(authorization).digest("hex")}`;
+        const token = authorization?.match(/^Bearer ([^ ]+)$/i)?.[1];
+        // Untrusted header values must not create unlimited anonymous buckets.
+        const session = token ? await sessionRegistry.resolve(token) : null;
+        if (session && !request.url.split("?")[0]?.endsWith("/wechat-login")) {
+          return `auth:${createHash("sha256").update(token!).digest("hex")}`;
         }
         return `ip:${request.ip}`;
       },
@@ -102,10 +110,6 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
       : { max: rateLimitOptions.loginMax, timeWindow: rateLimitOptions.timeWindow };
   }
 
-  const sessionRegistry = options.sessionRegistry
-    ?? (store instanceof PersistentApiStore
-      ? new SessionRegistry(store.repositories.appClientSessions)
-      : new SessionRegistry());
   const context = createRouteContext(store, options.membershipResolver, sessionRegistry, options.wechatIdentityConnector, loginRateLimit);
   const backofficeAuth = options.runtimeConfig?.backoffice && options.membershipResolver && store instanceof PersistentApiStore
     ? new BackofficeAuth(options.runtimeConfig.backoffice, store.repositories.backofficeAuth, options.membershipResolver) : undefined;
