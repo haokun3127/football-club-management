@@ -1,0 +1,140 @@
+{
+  "date": "2026-10-21",
+  "codeRevision": "68921a8d759501a0a26456f25373c543b5d74b2e",
+  "miniprogramTree": "ed5614228f5e1f70d7ca050d9e0b1f37197d2753",
+  "baseline": "c98c7c37",
+  "commands": {
+    "baseline-delivery": {
+      "exitCode": 0,
+      "passed": 952,
+      "skipped": 1
+    },
+    "final-code-delivery": {
+      "exitCode": 0,
+      "passed": 964,
+      "skipped": 1,
+      "additionalNodeTests": 9,
+      "runtimeStartupChecks": 3
+    },
+    "radar-regression": {
+      "exitCode": 0,
+      "passed": 674,
+      "skipped": 1
+    },
+    "frozen-install": {
+      "exitCode": 0
+    },
+    "dependency-audit-after": {
+      "exitCode": 1,
+      "high": 0,
+      "critical": 0,
+      "moderate": 1
+    },
+    "native-code-commit": {
+      "exitCode": 0,
+      "result": "official cli auto success"
+    }
+  },
+  "logs": [
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/baseline-delivery.log",
+      "sha256": "fc5d10f41cbf61ed609fead9a801a58517309253c8008c7ac72f1bf179dabfbb",
+      "bytes": 6424
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/dependency-audit-after.json",
+      "sha256": "0114b1f65260e23e93ca4ef4c449c78e065bd007160c5894480d50cb34d00377",
+      "bytes": 4201
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/dependency-audit.json",
+      "sha256": "7a2f45bc867ff1317c4bb90b2c66fa7eb30f7197b18f43fe6352bdc9022147ca",
+      "bytes": 122579
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/dependency-install.log",
+      "sha256": "be9eb0419b5fbbb5f3a62d796b417e6c009ab168c2db649a27bbceeef8390682",
+      "bytes": 3503
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/dependency-update.log",
+      "sha256": "45c9ca68f7510bf81bcf8b9a254b1175695edd839096d62283e06db6343180c4",
+      "bytes": 4068
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/final-code-delivery.log",
+      "sha256": "8acb5175c7bf5aa349b464eccba2af57fee768a4cc207c4767256321c541c918",
+      "bytes": 6412
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/fix-api.log",
+      "sha256": "3ad6d7c77aa063ec8aaddf27ce979d59baf797bf82d75152e45fd8499b0818f6",
+      "bytes": 3766
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/fixed-delivery.log",
+      "sha256": "5a0d81eec68decc1fbf68385e7b80406e8be72fda783c4faa28ab5d13fbd0375",
+      "bytes": 6448
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/frozen-install.log",
+      "sha256": "c05e54674d5f887c73299c0bac19b96981f9dafeb0f0d6eb5f4cd771c1229197",
+      "bytes": 1111
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/growth-synthetic.png",
+      "sha256": "5bc3ac3127f0b551bb555d05a8cd350c5dbf361315e16ccb11eb4768a1596e46",
+      "bytes": 80631
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/native-auto.log",
+      "sha256": "4390b1c1470b1a71d372952872107f4376410daa2f5617b7126894c28f3db3cb",
+      "bytes": 369
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/native-code-commit.log",
+      "sha256": "e4b1dac8e493e6e2ecc4c94b209349aba618f3a9ef9f124ac20f4776c760ec4c",
+      "bytes": 369
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/native-visual.json",
+      "sha256": "f7a391b0e9948ee77cb92ba7e260e34219669c611f01f3c307adbe48412be98f",
+      "bytes": 2279
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/platform-policy.log",
+      "sha256": "27e2d4feac91ec66bfd4a88e2569cf3d0ac404a7ca89c2442ec84c10da9684c5",
+      "bytes": 1194
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/private-empty-synthetic.png",
+      "sha256": "87ce0015086938f99c9f6f76bccc22e1459c97310e77d35befb7f1957a50540a",
+      "bytes": 120668
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/radar-regression.log",
+      "sha256": "517e0c16e9877398cacb9a1e58c4071219eea5ba4a0d3a50177097f4c534b301",
+      "bytes": 455
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/reproduction-api.log",
+      "sha256": "1eedb2c8e9f38444b948572085bfd2c8e2392a1a6d4386fc1a96d8df483d8d4d",
+      "bytes": 2174
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/reproduction-client.log",
+      "sha256": "075a72fa9d92fda1395e244de722708b73d86bdc0e722b5139d92396ba1d6183",
+      "bytes": 4801
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/router-update.log",
+      "sha256": "83d377f4d7951468aceed917b2d6fe64eb19b4928de58e02334b4f7c956d6e4d",
+      "bytes": 3539
+    },
+    {
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/transitive-update.log",
+      "sha256": "3dc05d8f2cc87da6c3d4c5dd46ec9327046fb147296e4576ee755aa6f3c0b06b",
+      "bytes": 4163
+    }
+  ]
+}

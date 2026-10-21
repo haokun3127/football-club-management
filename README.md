@@ -6,9 +6,10 @@
 
 - [唯一主开发入口](docs/current/development-workspace.md)
 - [当前交付状态与待办](docs/current/development-delivery-channel.md)
+- [优化后独立审计](docs/current/post-optimization-audit-2026-10-21/README.md)
 - [项目文档导航](docs/README.md)
-- [GitHub 当前交接](HANDOFF-GITHUB-2026-09-08.md)
-- [当前项目进度](docs/current/progress.md)
+- [GitHub 09-08历史交接](HANDOFF-GITHUB-2026-09-08.md)
+- [历史进度日志](docs/current/progress.md)
 - [当前架构](docs/current/architecture.md)
 - [Figma 权威来源](docs/current/figma-source-of-truth.md)
 - [小程序手工验收](docs/current/miniprogram-manual-acceptance-cq-talent.md)
@@ -30,13 +31,13 @@ docs/                          当前事实、设计规格、计划与历史档�
 ## 常用命令
 
 ```bash
-npx --yes pnpm@10.33.0 install
-npx --yes pnpm@10.33.0 run check
-npx --yes pnpm@10.33.0 run test
+npx --yes pnpm@10.33.0 install --frozen-lockfile
+npx --yes pnpm@10.33.0 run check:delivery
+python3 scripts/check-current-docs.py
 npx --yes pnpm@10.33.0 --filter @football-club/miniprogram-cq-talent typecheck
 ```
 
-Windows 环境中，项目应使用 pinned `pnpm` 版本执行；详情见 [项目文档导航](docs/README.md)。
+Node.js 使用24；本轮验证为24.21.0。Windows 环境中，项目应使用 pinned `pnpm` 版本执行；详情见 [项目文档导航](docs/README.md)。
 
 ## 文档规则
 

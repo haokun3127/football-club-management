@@ -14,9 +14,11 @@
 
 | 角色 | 访问边界 |
 | --- | --- |
-| admin/operator | 俱乐部管理写入，包括球队、队员、活动、训练、比赛、评测和指标计算。`owner`、`admin`、`operator` 都按 admin baseline 处理。 |
-| coach | 可读取俱乐部训练数据，可写入活动、训练、比赛、评测和指标计算；不能管理球队基础档案和队员关系。 |
-| parent | 可读取俱乐部公开目录和日历；学生个人时间线、指标只限 guardian binding 绑定的学生；不能写入训练、比赛、评测或派生指标。 |
+| admin/operator | 按后台授权范围维护资料、队伍和业务；字段和导出权限独立核对。 |
+| coach | 仅获授权队伍/活动；主教练编排课程，其他授权教练协同测评、评价和课次更正，不获得主档编辑权限。 |
+| parent | 绑定孩子获准资料和已确认结果；可直接请假及更正已有训练事实，不可修改日程、测评或队伍主档。 |
+
+权限产品基准见 [矩阵](product-requirements/03-data-and-permissions.md)，可执行约束见 [active-role 规范](../../.trellis/spec/api/backend/active-role-sessions.md)。
 
 ## 微信手机号登录契约（当前客户端）
 
@@ -26,7 +28,7 @@ POST /clubs/:clubId/app-clients/:clientId/wechat-login
 
 - `wxLoginCode` 必填，`phoneCode` 可选；`roleHint` 不是可信身份来源，不能决定访问权限或前端分流。
 - 返回 `binding_required` 时，`role`、`session`、`profile` 都为 `null`；只能提示核对登记手机号，不能伪造角色、手机号或 session。
-- 只有返回 `authenticated`、真实 `role`、`session` 和 `profile` 后，客户端才可按 parent/coach 分流。
+- `authenticated` 后仍须核对 `session.activeRole`：双角色客户端声明 `active-role-switch-v1` 时，初始 activeRole 可为 null，先通过 `POST .../session/role` 选择可用角色；不能直接按旧 roleHint 分流。
 - 正式微信 connector 依赖服务器 `WECHAT_MINIPROGRAM_APP_ID` 与 `WECHAT_MINIPROGRAM_APP_SECRET`。本地 `x-user-id` smoke 只验证 API 边界，不能代替真实微信登录。
 
 ## Auth headers
@@ -57,7 +59,7 @@ POST /clubs/:clubId/app-clients/:clientId/wechat-login
 }
 ```
 
-`details` 只在校验失败等需要结构化调试信息时返回。前端展示时优先使用 `error.message`，分支处理时使用 `error.code`。
+`details` 只在校验失败等需要结构化调试信息时返回。前端通过 `utils/request.ts` 将网络/HTTP错误映射为可恢复提示，分支使用 `error.code`；服务器内部异常统一隐藏细节，不能直接向用户显示堆栈或 SQL。
 
 ## Schedule contract
 
@@ -96,3 +98,10 @@ GET /openapi.json
 ```
 
 当前输出来自 route schema registry，覆盖现有 route、request body、常用 response 和统一错误格式。
+
+## 2026-10-21 复核：写入身份与训练留痕
+
+- `POST .../session/logout` 撤销当前服务端会话，重复注销可安全处理；当前小程序退出入口尚未全部调用它，见审计剩余项，不能宣称端到端注销闭合。
+- 幂等写使用 `Idempotency-Key` 与请求指纹；客户端未决重试复用操作键，明确 HTTP 结果后下次新操作换键。缓存寿命/并发限制见[请求规范](../../.trellis/spec/miniprogram/frontend/performance-and-compatibility.md)。
+- 请假 POST `{ action: "request" | "revoke", expectedRevision, reason? }` 与课次 PATCH 共用事实仓储。撤回不删除记录，历史可含 `action` 标识；过期 revision 返回409。具体路径、角色、schema和测试见[训练记录规范](../../.trellis/spec/api/backend/training-records.md)。
+- 本文为入口摘要；路由 schema、OpenAPI和回归测试是可执行接口证据，不用旧文档推导额外权限。

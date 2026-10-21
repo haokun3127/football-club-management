@@ -1,0 +1,224 @@
+path,category,sha256,review_scope
+docs/README.md,README.md,291e8b669464c516acde845c876d09bb931b1716305a670445faec455ff10f32,authority/targeted semantic review
+docs/archive/2026-06-discovery/architecture-quality-assessment.md,archive,2d75df65b7e4bec5d4ce6eb34a88d895bae98dd42588d617056431c3ab3d3357,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-discovery/assessment-system-analysis.md,archive,14a646d2969aa1c8da9cb71371015bc6b88712e4b06dc8d9abd6daa5603a7642,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-discovery/backend-integration-evaluation.md,archive,d0c30bbd14ef247a930bfa0e96090ee4a0c40a87324e6b2ffff295e959f5a1c8,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-discovery/development-window-evaluation.md,archive,27bc32eb970cf762888c2816c12d512ce0a17ee90e0d9ed6bfaa9ada307e62b4,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-discovery/miniprogram-bff-gap-cq-talent.md,archive,53a18f989090e2f5c9c70da04f9d15bc02c985844980255668e4fde4b98016ea,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-discovery/miniprogram-development-workflow.md,archive,0cdb1712bb2ff76049083c63ba6e3449cee226d7f3e87bb35a6fc5107479ae1a,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-discovery/miniprogram-devtools-debug-cq-talent.md,archive,6b92b1af4da442e43059b329b3bd21963d54f89e20d0165757945858edfa1c4d,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-discovery/miniprogram-implementation-audit-cq-talent.md,archive,62dd4514555ce025ed1809ce2e4142a801463311d368e31407e048a52528753a,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-discovery/miniprogram-page-blueprints-cq-talent.md,archive,d7fba38b2d9df366291ff37fafe9f3ae5fd08508905435e586897981e4e5ca4c,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-discovery/miniprogram-page-spec-cq-talent.md,archive,8320549a349f4ab9a269e3de5e9162b290c5a6ae5c2b38d664c32cc1415e94e9,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-discovery/miniprogram-product-design-cq-talent.md,archive,0859b90787fcabc6ec900ce4b48398b667c56d402dae17909d191df168b0646f,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-discovery/miniprogram-technical-deployment-evaluation.md,archive,a22fd8c2c57ac9c2f71e019cb41c4637ab8be2b71be390f208a88203eeabfb98,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-discovery/multi-app-client-capability.md,archive,a18aa8e023550266172ffaf9b4ad0047edd4c9e2336c027cc00013490f710075,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-discovery/multi-club-decoupling.md,archive,863ab6296f6c46bf3166489530b9ba3f1fd60b28c5ee0f0b187b736c5cdc8f8c,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-discovery/mvp-scope.md,archive,a17add6c5b303529ea07893df364ef6d51127071b8c70e9170765ac0951d1af3,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-discovery/persistence.md,archive,9dfca45414a5d2ff0844b05e44a60874ba8091e8b0bcc24a79ba0d4f0e83bed6,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-plans/README.md,archive,efa686e70795d1678449f0da9892cd23e4af6d56a5cb2d28095923e930d1c32c,authority/targeted semantic review
+docs/archive/2026-06-plans/development-plan.md,archive,eb6fb97b147ba8bc52d395ba44c3c8a26ddeabaa326192208e88c7f436d263bf,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-plans/next-step-wps-automation-acceptance-plan.md,archive,2a1960cb0a12b5c35999366a720c411e03bf3cbbbedbbcf302401560d4a6ceda,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-wps/wps-integration-analysis.md,archive,38c9a28673c23e62b4f571abf05c66ccc745956b5d0440a44205853979e68e94,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-wps/wps-production-readiness.md,archive,97267acd61d339b34818243c66f35a48ecbfbf211de394417fad61a9e3b17922,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-06-wps/wps-realtime-sync-and-status-flow-plan.md,archive,6e72278629f12dca859b53aeea06c1126d35cee96f271367a8182e44d14d281f,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-execution-plans/2026-08-02-p1-responsive-chip-states-plan.md,archive,ef4babbec5367cdbd06507cb5d327526152db565107e01f1eb8ceb1b495f68a4,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-execution-plans/2026-08-03-p1-schedule-layout-fix.md,archive,85d9d0d0b521a2859a276fc8bfb030d8ffb085f8e8fe924439405fe0165c13d5,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-execution-plans/2026-08-04-devtools-automator-screenshot-plan.md,archive,48df7820dffade1889a77c449b54214b75cac83307851e51ce7c143467d78dcc,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-execution-plans/2026-08-05-test-metric-persistence.md,archive,8aaae3c0212764585367cff31f78b21b920dbffacd0006fce77f201434cbf34a,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-execution-plans/2026-08-18-seven-phone-demo-data.md,archive,798d00193ee98dfe0ab03b0279896cd08ed1c66872e13e3203c528ce1237684a,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-execution-plans/2026-08-28-parent-growth-active-student-consistency.md,archive,d94f3cf68c8a15745a6e05ffdeea5c293a5576d35326b002353c1d15498e3158,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-execution-plans/2026-08-28-parent-match-history.md,archive,8f528d70dbf09312e8ca28d995b9746f4cbf3fa36143df439d4e2ca5b2b2211e,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-execution-plans/README.md,archive,056c057f414d5ccb6b5ef692b2952914be62e8ef34afbfc08f894c3776abee37,authority/targeted semantic review
+docs/archive/2026-08-handoffs/HANDOFF-2026-08-14.md,archive,a4257b3edf039b77a37498ccd970e33ba69bc94e34cda2717da11b94faadb031,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-handoffs/HANDOFF-KIMI-2026-08-19.md,archive,4baa3984c06f3a912f62ca0dddb88c89a9b349b12172375f66b076ad7829946d,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-handoffs/HANDOFF-NEXT.md,archive,2c53ee57f5781a3b8c41f8637969167f9998e5b259ee946b81929cec8794bdb4,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-handoffs/HANDOFF.md,archive,8c8626ea228dff22c392d78fbcd7593c24e882cc7d6220029c816cc13b416c73,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-handoffs/README.md,archive,e3f2676226f98b1f090659b757df912cd9bea66f8818ed2c6bf99f3f05262602,authority/targeted semantic review
+docs/archive/2026-08-handoffs/agent-handover-2026-08-07.md,archive,3059060b95983dfa4293de7bf20d370eabe5018277a9ff315d40f4bef3affc73,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-handoffs/agent-handover-2026-08-09.md,archive,262b2558b540ec4b6cfaf58c5b6a1e581e906b788586b97dcba301e27e053e8e,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-handoffs/agent-handover-2026-08-12-secure-test-accounts.md,archive,173b52f29092c19e04c6b0c8f830b09f1d65970ef558314a1cd2cd05da1a7f6e,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-handoffs/agent-handover-2026-08-12.md,archive,c743a7b63ee4553956ec660ed606ccd17d5b92b9a362bf07c0b5a3197119f8d7,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-operations/README.md,archive,42e66f2f62c7d02afb5ee4cf5854884707eb29b0092bb43955e40bc84d831945,authority/targeted semantic review
+docs/archive/2026-08-operations/active-role-switch-backend-2026-08-11.md,archive,9d4c5e5aca1d6df323dc49a5d90a9e0b98a54f1234633ee5050c5c8f9deb6714,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-operations/coach-c1-schedule-home-2026-08-11.md,archive,2234b8c32fb9f8ba9622051ec19fdfd5fbb8ee632f25e53eb0fa618e91033987,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-operations/production-dual-role-demo-2026-08-11.md,archive,1d6a93deabbd1c8f05d58e1a3ec20a5b3c5f709885f14edfa57439246c256a38,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-operations/production-phone-binding-2026-08-06.md,archive,d075ff6eeb4f7720c68a1b85f7ef267e2f3ffd48112c10753d35be2d566fbaa7,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-08-plans/README.md,archive,dbc6fdda95edebd617d47fd9393ba43c55ff266b231827da526c6573e982d78d,authority/targeted semantic review
+docs/archive/2026-08-plans/miniprogram-next-work-plan.md,archive,28e07a0225330cbfce8efca051f46b065efe4d942a98a08435f03acf05856d21,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-09-execution-plans/2026-09-03-training-assessment-growth-timeline.md,archive,24a188fe5099770326324a1aa3d2e9284411e2a8c56902c816d56e242a79c131,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/2026-09-execution-plans/README.md,archive,977c32103c681587d065c2d32f421eb3128c3f8cecae692b6c33aa06699dc389,authority/targeted semantic review
+docs/archive/README.md,archive,6e75ea009d9bcd5b071334ee22b35872c6932e4dbbf3c26d2aa4e8fa2ccbbaab,authority/targeted semantic review
+docs/archive/architecture-before-2026-10-21.md,archive,c9fbdcdb18ccb79f35410500e7e73cb315ab9882aaa258c1a63e050a4dc02477,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/figma-authority-history-through-2026-10-17.md,archive,5977c82be78daa865675b88ab8b42d859859ff82fc18b90a635e3e21957f4f4e,inventory/reference review; not sentence-by-sentence recertification
+docs/archive/github-handoff-2026-09-08.md,archive,14cc5a42f479b67bb4af88e9ceb62e9244a4e6dbd94bbf8395e698b0a530ec24,inventory/reference review; not sentence-by-sentence recertification
+docs/current/api-contract.md,current,c7371c9e9a4085a2361fa877fd347e1cbb86b1305c62bc08e08f2f2658b46329,authority/targeted semantic review
+docs/current/architecture.md,current,903fd1effe2be9d54ccd558de715c605344fdc4fc47f1e5c3f7d9f578ad7be86,authority/targeted semantic review
+docs/current/backoffice-delivery-2026-10-10.md,current,6f1c79b999cb1b28e6515bbae8979e48725fbe6b0f66e135eb58da0935c8a5be,inventory/reference review; not sentence-by-sentence recertification
+docs/current/backoffice-product-benchmark-review-2026-09-18.md,current,e4f9137f5b6a624ff72da19582ea30bbb5c96eab2fef11eff93a62199e21256b,inventory/reference review; not sentence-by-sentence recertification
+docs/current/backoffice-product-design.md,current,07e4e6db0c3a82570923f65c31090915dcb4aaa53dadad4dc0c3eb563bd951ea,inventory/reference review; not sentence-by-sentence recertification
+docs/current/backoffice-product-direction-review-2026-09-17.md,current,3528a29472f86e20cf27df622be9f3f09d977149655430a164d113ed7255ea14,inventory/reference review; not sentence-by-sentence recertification
+docs/current/coach-account-team-detail-2026-09-05.md,current,e82eade4d61a09bb2bd91c6220c8ce180887f7d62d135527ba1a1799501e3e36,inventory/reference review; not sentence-by-sentence recertification
+docs/current/customer-test-data-repair-2026-09-07.md,current,3d737e4df158c202303ab99ccdd216876ea243d478f42437a5e3a0904e7b209b,inventory/reference review; not sentence-by-sentence recertification
+docs/current/data-capability-plan.md,current,e0af182fa8c8089c7ca756502c6cfb161b5208fae343cd29a26269f41d5fc6eb,inventory/reference review; not sentence-by-sentence recertification
+docs/current/deployment-requirements.md,current,b214c9e77690501781d5421cd5f48bcb7eecd27f7a3d6224aab095c77eeaa0c4,inventory/reference review; not sentence-by-sentence recertification
+docs/current/development-delivery-channel.md,current,f310b0eb88f79628e5bca6e383e2c80bffd10712bc863dcb970acf961addebe2,authority/targeted semantic review
+docs/current/development-workspace.md,current,325018bef6e834657e1eea2a993667f3b83f6d8d9254be92d1a93a78c043524f,inventory/reference review; not sentence-by-sentence recertification
+docs/current/figma-source-of-truth.md,current,d9983bd01fcf1d58ebe7f2a881be5ed40d50a951462c82759854eb73c60e71e7,authority/targeted semantic review
+docs/current/miniprogram-core-flow-audit-2026-10-21.md,current,755cd8bb87b74fa95748f721a97c50f62c0a396f6d9d8882198e0c11059b524c,inventory/reference review; not sentence-by-sentence recertification
+docs/current/miniprogram-environment-isolation.md,current,0e70d47d5441388c6f87b719b4914b2112c2195475c96528743e91e003f2fbde,inventory/reference review; not sentence-by-sentence recertification
+docs/current/miniprogram-manual-acceptance-cq-talent.md,current,737b7ccaea3ee41486365ac0d6301b48d088da0737b3eb7fb734c92cbda9c846,inventory/reference review; not sentence-by-sentence recertification
+docs/current/miniprogram-release-readiness-cq-talent.md,current,62d8d2a98ff53bbc83a9187be993d828decf9d5ceb38eece8af3553392603bdb,inventory/reference review; not sentence-by-sentence recertification
+docs/current/miniprogram-requirements-review-2026-09-17.md,current,74b55f6e0d270693731ceadd2280ae0166489641a2b14a5f889fc6251b77aa61,inventory/reference review; not sentence-by-sentence recertification
+docs/current/post-optimization-audit-2026-10-21/README.md,current,b45fb36cbeb14cb28b6d98999457cf80ad6e9f9db3f64766a15d7975c89d96cc,authority/targeted semantic review
+docs/current/post-optimization-audit-2026-10-21/audit-report.md,current,f10078b642aa596b9ea42b07744f07b6044ed33125ef952212c6ed8a0aa21d71,inventory/reference review; not sentence-by-sentence recertification
+docs/current/post-optimization-audit-2026-10-21/commit-history.md,current,4aaad852c5e56c57f2802926a36223969b8b268fc31fdf0c50ab3fac9e683372,inventory/reference review; not sentence-by-sentence recertification
+docs/current/post-optimization-audit-2026-10-21/documentation-governance.md,current,7d83d88ad8c17b19847269976c2ce21f645340e832cb20d1f482f75fb46481bd,inventory/reference review; not sentence-by-sentence recertification
+docs/current/post-optimization-audit-2026-10-21/next-cycle.md,current,e7d184cfd4d5033f42e0db3e75a376f11c4829b48f5887524eb9b8fb567bf3ad,inventory/reference review; not sentence-by-sentence recertification
+docs/current/post-optimization-audit-2026-10-21/product-gap-matrix.md,current,9cf38c1e00738962cdd1bf78624c28a11e9e69f2eea5df27dddb7126eda8836a,inventory/reference review; not sentence-by-sentence recertification
+docs/current/post-optimization-audit-2026-10-21/version-consistency.md,current,afeb349746dd4bc2861ef15620fd244f13d317651097d77cce40dc909a8cc154,inventory/reference review; not sentence-by-sentence recertification
+docs/current/product-requirements/01-product-and-miniprogram.md,current,af5ae53bd58759cf113b3c395219ad427facc122163ee6b5abf986dedb8e03f4,authority/targeted semantic review
+docs/current/product-requirements/02-backoffice.md,current,59ac1bec8a04fe58a9cbbcfcebb9686a6d0769b7242b7f8b51476e616ca82bb0,authority/targeted semantic review
+docs/current/product-requirements/03-data-and-permissions.md,current,47359e61a9b20e410e2804549ed1b1689f725db2e1385f17c862b7946e232f03,authority/targeted semantic review
+docs/current/product-requirements/04-acceptance.md,current,ebdc7aca9fa798c62c46ddeb79f7bf6f928397e88b8c40f939c130cbf97402e2,authority/targeted semantic review
+docs/current/product-requirements/05-decisions-and-sources.md,current,ad1e415f6099e46bd9a9a13e99ff936194e86a4f2588c1f49157da78221e3f20,authority/targeted semantic review
+docs/current/product-requirements/README.md,current,95182764b18b4579c2299c51e63292d004bb4383bcf653d85d79615719821761,authority/targeted semantic review
+docs/current/progress.md,current,3c664e89a63e8074e9a92cb20bdffa3fa7288372c20d3553da482b2c5d7c3907,inventory/reference review; not sentence-by-sentence recertification
+docs/current/project-overview-cq-talent.md,current,91276442496451141df51d1d6abd944042d3d9097de4cf6a9ea1cf964849d415,inventory/reference review; not sentence-by-sentence recertification
+docs/current/trial-backoffice-release-2026-10-14.md,current,e321ca6575962b788849222b9dc334c0850a918ed5db71e11ff2717857c38fd6,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/01-existing-system-and-gaps.md,current,ab8709e37c2587657599243a7351c66355c2fe3b70a7bcc0e67c899e643e9b46,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/02-data-api-permissions.md,current,6dee9bbae1359b68182f39cf1e362f616707f0e57430d0193ea91091653db30c,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/03-migration-and-deployment.md,current,a9aadc2d664755a224a2232e508c8d4c2ea500de93b8790435c42e0f40673879,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/04-design-and-wechat.md,current,d972cc5f047692a2a5c32b4fd6edb25ec5abf561e0968b8c66c02156a0d7de8c,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/05-page-catalog.md,current,4470df2e0d81761218a18ac960de187fdf74e120b25d37e7f61c91561f84e0f0,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/06-decisions-and-delivery-plan.md,current,81483e4af3a7e4ffeebb9cdb6c67036a4bd68bea820dcacc2638a7f8b9696965,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/07-validation.md,current,285d4c360ae3b9840517e7777fa8265c50997a85399f7c26299edb2eeb70b0b3,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/08-external-verification.md,current,62bacb38ca5f32d1db6df2ad94a56ca3c7eebadcedb10f8d16478cbafd1130fc,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/09-data-business-review.md,current,dc50c64b03553283a5ba7b2552d9397e2cba39d8727c381d3752aadcecae3328,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/10-ui-inheritance-review.md,current,c411ad7af591a063e156daa3738257bfbec2044dc28a69a752131afeab871bb6,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/11-figma-read-recovery.md,current,9f22750ca07ae022bbde3e9aef794d4ecb90f0c447948b525568a0bf7d181d15,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/12-ui-visual-comparison.md,current,609f7e5ea1b04342bbeb04603793cd1516b6e988c3a1ea06c5aab88530406346,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/13-production-code-gap-review.md,current,1c2bd148f8083e10d38489ff6ecb880802ed33adf09a8345a7b38a1961f52003,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/14-miniprogram-ui-optimization.md,current,b016aa53edd8d07baa64bdaaf1687fc8414db18da6a858b4dd575ecbd9dcce15,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/15-miniprogram-capability-completion.md,current,3411c215837e932e38908f51c90edde3174bf2d21ef38e84d1e6a8f586719655,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/16-confirmed-rules-and-engineering-spec.md,current,e488098c645adb657eedf2ba085f5521193b5494425708ca5ed40f2ada97b253,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/17-user-confirmed-design-change-plan.md,current,fb13c71926414bc9d7886eeb69e5b21347f5929d053ec23fba0d34f58ce04e39,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/18-parent-pages-adaptation-proposal.md,current,da383d48ca90f9c8fb7935366d0b6a7ab2ba3dad4c0bc0d71035771109ad8405,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/19-backoffice-confirmed-design-change-plan.md,current,9a438bd08882f78ccc7ad35fd7e68c873e8007d94eabb74eed31761b1619cb34,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/20-backoffice-page-by-page-audit-2026-09-22.md,current,6e513c2413062046266fdea49079da730f5fd4af7e6f0c1b05ef814a710befd6,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/20-parent-live-audit-and-plan.md,current,750fa428bb87fa152ec720b0f182818f924c749af231e740d8d9faf2d125bad3,inventory/reference review; not sentence-by-sentence recertification
+docs/current/upgrade-readiness-2026-09-18/README.md,current,c572e2736deb6b4e5830d94c9c9869189ed7db6f65d9f904086996fd588cb6c6,authority/targeted semantic review
+docs/design/figma/figma-extracted-tokens.md,design,983174a454d2a9e879b10fceef4f696ce3e3ec9c31ebc4c780398ea0a10edb9e,inventory/reference review; not sentence-by-sentence recertification
+docs/design/figma/figma-full-implementation-decision.md,design,909f5d3cbdb1766f1f1ea00a245f82317b50e036a007d399ff2c2bc62efa85de,inventory/reference review; not sentence-by-sentence recertification
+docs/design/figma/figma-v2-visual-audit.md,design,817eced84e12f9a19f032659883b146a877decaff7ecb037578853ec6886e929,inventory/reference review; not sentence-by-sentence recertification
+docs/design/reference/figma/README.md,design,36275c4edcfc371c136712fd35b616a3c3d2810ae6983f627d65d1a73cdcea39,authority/targeted semantic review
+docs/design/specifications/batches/design-spec-batch13-p1-schedule-home.md,design,3835386ad6f38e5825da2ae8f876a28e9b35b2fe500e807f390702a8b23310d6,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/batches/design-spec-batch13-p2-training-detail.md,design,82a784cd0c2cd56ac3055a5b612d8c8a512774948fe0902e85327902043e9f76,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/batches/design-spec-batch13-p2.1-match-detail.md,design,ff7caad502de7d4de15d19477bf75b275dab6e4b3e87441f062f0729e7b5856f,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/batches/design-spec-batch13-p2.2-other-activity-detail.md,design,f90482bb0057066ec53a65af69a990383198d82c2e5913f4c672a26c12e8f6c8,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/batches/design-spec-batch13-p4-growth-home.md,design,dd4ca05e72cfaf1f8f45292f4c71c59e5c9b2d75a0d970fe092f4a9579d9c7cf,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/batches/design-spec-batch13-p5-ability-radar.md,design,e03fc4881d6a49e3bd1f17311746a916f21556167041c85a35a6e9b46b87b42c,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/batches/design-spec-batch13-p6-metric-detail.md,design,bd5784ccfbc87700e0f5092a40ece2fea03577f60a6557e7828348bfeddc0e4d,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/batches/design-spec-batch13-p7-parent-profile-hub.md,design,9a2138d88c8b02b1b6e189953b0c2a44ceb0a37b5a9c6fd621d7a7f8bbd28851,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/batches/design-spec-batch14-c1-coach-schedule-home.md,design,0ea1f48bb839d26b0e90e7cafebc48e025b24cf344ff44387486c50b8e1deb2a,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/batches/design-spec-batch14-c12-project-score-entry.md,design,1bb4820dd47906a3294a1c89bac5815b2f149fa8f0a7fab76fdb7adb031d6012,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/batches/design-spec-batch14-c12-score-entry.md,design,67dc6b05f1e8ba7144099e9118ba16b2c004d2ba72c32c9e3c78daab436d0e76,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/batches/design-spec-batch14-c16-coach-me.md,design,c6b3742b4b6855b4be6f0184ae66719053d30f39ed20beb0388e11550ba0c4ec,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/batches/design-spec-batch14-c2-activity-workbench.md,design,ded382b357931135c9c9c15762ccb9e38ca231d3b7ff15e3ebeeb0e77c818c2f,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/batches/design-spec-batch14-c4-attendance.md,design,5066989fe2be8985fffddedaf811419d04aaa10586505dbd21f396b2e01cf38b,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/batches/design-spec-batch14-c5-lesson-confirm.md,design,fa2e62e98992dad05a52422f8690a0865a22634e10b9ec1e914e9dca62b15845,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/batches/design-spec-batch14-c6-match-entry.md,design,7815ee8a3982c82e858a9725ff32040134989515023ed20a4f7c97eb1898468b,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/batches/design-spec-batch14-c7-tactical-board-poc.md,design,4562cbf098d004d1c68207c0e35e1c7876e9d11adb41b44d0435b752b2975261,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/batches/design-spec-batch14-c8-training-management.md,design,51f0e0a6a5a05fff493e76fb12b1b21ae4dc01a3fb272b2bf7f23dd56c41a9ab,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C10-content-select.md,design,3a553003c6d04f809006b08fa3ab02a22ffca79db2b743e2f507705de4c53c2b,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C10.1-coverage.md,design,b96dfdc080666e521f59377ffb13ec9e089d78661f480a11151ae3839c43ab73,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C11-test-tasks.md,design,51bc8986100e52716343fbc32c3979c23550f4f36f623d6c27ab6590e87fae4f,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C12-project-score-entry.md,design,76f9052e3091e8457f5bf62ff24764409a1ad7010a1b6e766383869752ebe476,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C12.1-autosave.md,design,1e034a46dae510562b0b08392f73f7bd16890edacc50f65c6fa994b5c9efff6f,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C13-student-radar.md,design,b6b45edde7c44ada7cc783053744c8f23a0f1957cdda8d2e83636b61ed37752a,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C14-team-ability.md,design,34b9e7f8604980b22cfaf9957a7be4fe97494550ae453d567d504493ee75f047,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C15-assessment-entry.md,design,660402e499c8303572ee8c2c064f7fad6effc71372bfb90ea0a4a995a3b33f46,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C15.1-assessment-submit.md,design,1c597de9b05a1109bcacdec542a0b3978eafd3ece625ab29bc372964e17b2e73,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C16.1-permissions.md,design,84cfc5df8fdaef852f3b4f917c68b596badcda1b69a339768363a5ce0345aacd,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C16.2-private-interest.md,design,8ad98834eed1852b637b47c2140562a4528f2641b62c72627626bb2faac1e6b4,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C16.3-coach-account.md,design,ca0927fd45088ab1e6711b395549dff5d9170e99417e2637eb70f7fb347f2a8f,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C16.4-coach-help.md,design,301d0a7999222481b0eb4bd2ec3b5e1a95d40b49a51ecba60ff38022c7bb17c7,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C3-activity-change.md,design,24a5f86cb856141056b787c1993520d80ea09cd5442e1f2be50f095dfc2ba50b,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C4.1-attendance-success.md,design,8e46ed6707b99df4f9ef86c9d48e72127371e65ba255474b1653ff5201a416cc,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C4.2-attendance-correction.md,design,cfaa3f9567b56ce265b9f33a1e5578f6a378f0cd19145c0d7d08c80d8d026f63,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C5.1-lesson-correction.md,design,6dc5641501852a79c3685f9b3a6e7d062f6b7237b5c22600f16a5cb141cc1956,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C6.1-match-event-add.md,design,960190fffadf14332d6de241aeaeefccb23cc20e386b4570a15bb31aaa3a5e2b,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C6.2-match-save-state.md,design,4355f8c0252dd2c985d83cf3315eae5c06ad16ba92370987dacaf56908c79efd,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-C9-team-detail.md,design,a56b9e9280dee46f3ccbc5525d672ba83b76850b88950dfa3ddead86deda61a0,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/coach/design-spec-coach-team.md,design,b723559fcfa716628ae7078b97f949a59b4e6754c6871e19bf0934dd8a613a9f,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/figma-online-frame-map-2026-08-12.md,design,3d68a21d51227467ae5abc21de1dbed95b978cd0b0f7f1c8ec4f3d96a5d5c098,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/parent/design-spec-P1.1-day-activity-list.md,design,36d8c6628b07e56064c2d4662e1ecf896de2c2413bb54028d6dfc9410ecea882,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/parent/design-spec-P10-account-binding.md,design,a30a7f3bf894ba51eb428833f7448644d7182fed48b665fc94ec9e85756836a8,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/parent/design-spec-P3-reminder-center.md,design,1f2cf16bb0e0e1fb31bc6ad39e8b0b59a61e16f956545895a3c7ab09019141d6,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/parent/design-spec-P7.1-lessons-insurance.md,design,6e59b3cda76121a2074480ce52712bee0f177989f711bd01ba778127a44fa26b,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/parent/design-spec-P8-content-center.md,design,96f94b49880a6e2ed5c0c21db624a159837e96b46a98803df45e834ed8e96398,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/parent/design-spec-P8.2-help-center.md,design,d53f084e2addc657ddefe96104c942a4b228b00d421307833f59f7bde8ec62fb,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/parent/design-spec-P9-private-lesson.md,design,e4599176ec9ec16492ef4cc83e8634bc70214a65d78fe0c237e6eb65fd1aeb10,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/parent/design-spec-P9.1-private-success.md,design,8e0ec0d96128ccfed1a7e2bef5821546daa356d49306b30f6fb696e7c6280a13,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/parent/design-spec-venues.md,design,9509c5e455583a8391a5d42d11cd49db12445d3d159b6734a7e165d3cf3dfc14,inventory/reference review; not sentence-by-sentence recertification
+docs/design/specifications/shared/design-spec-G2-login-verification-v2.md,design,6d615d79c4cc1667ed4a811860939a75b2a77a46041ef11d7b9b8a81d5e23154,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/README.md,reference,84e745f48e2cc7cf9624f33a53fd8b09178a866ddcaa60d1fe1d9053839b329c,authority/targeted semantic review
+docs/reference/wechat-miniprogram/notes/01-平台基线与版本.md,reference,0dc180b82f8b9cac023563f14531743b39a1dd7f98b7d64e6539fbf1c104f1be,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/notes/02-配置与代码规范.md,reference,ae258de34a709a3c23474c378e624db6a4b0dab88e22d7ed8c38fcb488770697,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/notes/03-分包与体积.md,reference,73270537ec72688b5365ec3271d823ff67c752cb54184069dd53e48eddec0b88,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/notes/04-隐私与个人信息合规.md,reference,49f47ad3677a514d7dad382a859decbbd8500340c154468cd7a4ecd0bb592e2b,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/notes/05-登录-手机号-订阅消息.md,reference,9182d5e9c038daefdd806164d94f5dda73fc858facca4e2d3ffb67fa09862c59,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/notes/06-性能与体验评分.md,reference,4803ae5f50ddd0f2f1e2112e12f05cf68445420cf9b8326463f93f40d482ace6,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/notes/07-发布审核与运营红线.md,reference,59ce450ff2e110ede8af2f2a9400e87b786e21f3da66655c45c5d1317d50c671,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/notes/08-本项目平台合规差距-2026-09-18.md,reference,9654e6325f6bb8950e9331800db639c6e0d81d8c1449175315b3e747472c84e1,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/ability-domain.md,reference,f24fa4a858b7cedfa14c5c3e2b4b0f413ccc1e239ac0e52033b6039715f9d494,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/ability-lazyload.md,reference,50dda08b508f75a8e10a23e45d3a8dea51e5a7df8f7f9e5cd9049b97b60534d2,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/ability-network.md,reference,0a3e827952cae1ae5a6b19575574c6510b1acebf7e04a73ee67c6133c7e29279,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/ability-storage.md,reference,b7bc94f1c95c4a0b152216f98eef6eb4cc45b8694b7330764346c0150714afd0,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/api-getAppBaseInfo.md,reference,3fe97dccb0dba9ae8f2456ddf969e7140a9d05e448b582677bedade62a91acc0,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/api-getDeviceInfo.md,reference,4051839c00fb022c6272b3d418773ef28b731832ecd9e560a7df5b66dff1bee9,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/api-getSystemInfoSync.md,reference,26fd146dd8e61ee3c522fadfb2309ece2f4a950296f96ff2c47e5a77df0b8f6e,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/api-getWindowInfo.md,reference,6c7012b7ea50a641ed57a63151699f767027c0a30106e595720e1768f5f0ed65,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/audits-best-practice.md,reference,62ba0f838be3eafdab69554d0877ee99fc1bb7ec2f32b868b636816c44cb88b9,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/audits-overview.md,reference,6a0943162d1b48bc3087cf8af5a7d0a35ba2bd7357e94398e1f2123d8f83a74c,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/client-lib-version.md,reference,54b1c9d42c8a22a608f357a3fdfa575a39098690bdf5d5b416d37685c1acee68,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/config-app-json.md,reference,bd55815ac75f4310d5c707b4d24e53afaa607e650e8861ca0f6fdeb314147d15,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/custom-component.md,reference,3c042eaa42bebe514040cfde59bac905bca5dca00a8c9689598edf17d597d6e0,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/design-accessibility.md,reference,96cd16fb67b5dd9887f6270ba99bac8f7c31d417d4056e8b7a536d83b351120e,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/design-adapt.md,reference,7cf7a6bbb0777d96c6441e115269f6df2ef027b04bd1bbf4cb4bb0147f6fa887,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/design-elderly.md,reference,2804b2d22aede422f1f82b016e9055a771880e4c8939820c18185c618daee2bc,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/design-guide.md,reference,2a7e8707cc1a931d5fc8a650dbd95f66a9950866eb568bc0d525b0a07087b45f,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/framework-overview.md,reference,729e69af07cd0d9ffc7f5fa2df949afa4336742ce1e4a3b83e6a4dc557862106,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/open-getphonenumber.md,reference,fc62a06e139e50de1dc35d5953486485c6aeab7eb0f5426366d847e3ab5c7282,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/open-login.md,reference,000773462b6f3aa16dffcb556d9e427598fab3a6f58c0cc2de5a4690f131b2af,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/operating-mechanism.md,reference,1207ac144a8f3d4062e640f738a5c5a9e0eb97089be814cbd73be8f6f15c494f,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/perf-setdata.md,reference,063f3ca8ddb2cfad9e4d4754f0bd42a83d5e16a5c7c4dfa17dd2451a27042ac3,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/perf-start.md,reference,afe0a70fd5372fc7cf1bcfb23bcf769ab23d785bbc873b0f23fd4264b9ff84be,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/perf-tips.md,reference,be0023c17e04d4ab5e3b7b8f10437a49bc37cff3e10acfb1f30dc38de64d0b91,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/privacy-authorize.md,reference,cb83606999a72cf2a97d3861f9d9abcdeefff1d965f78e044bea42a5a8c62027,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/privacy-intro.md,reference,131b585b6286cf536ff7e0aab55dabc61e562ac8c5b025bbd2b73f3c6da139d4,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/privacy-overview.md,reference,6f1ed110cc30f5cf3fec0fba70abf16ccf1ee17bdcee92733bf01d8c33990465,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/product-ops-spec.md,reference,3e35571d1c140d1481d759327cceee6b96adcded63294c162a92883936cc7896,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/product-record-guidelines.md,reference,753a68dddc749a2dbf9b060e8a151fb19a84b9cd5c8d39a7fddffa6c6c92d63b,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/product-reject.md,reference,322cbff833aefea2cf0b4e74960b8a2d74b35b5174c7b344bdc4d99498bb530c,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/quickstart-code.md,reference,6c1054d42db3f5181fecccd10f4f5e70d846f7903a044cab0dc2aa3703170d2c,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/quickstart-release.md,reference,ab0cb372d75c8e72c7cc4feae49c4513fcc9fd43e1fd603bad6ca33d334df937,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/ref-app-config.md,reference,e19a520ca89c659aad8d7bd6c4faa17b956e85ed6236e7376ea6b0d8bc253e3d,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/ref-page-config.md,reference,9e9b8de6455f52d928cc3d959b872ef14cb61f61bf2744f66c2c734422f665e7,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/ref-project-config.md,reference,f822263a8434b12c7f409dd3e9afe0d75473388435cb569e2b5fb93ebcbe0564,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/release-latest-v3.md,reference,60d91cfd7da4b868ec19ae00c3c97fbcb7905687dd224db16ca718c87606eb86,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/security-basic.md,reference,10955187cd268e83b36d05c87b58ce97317c86c0b8594701045053de830f9cf2,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/server-code2session.md,reference,9716f4240cdeff6129af313283ead4a2c618e94acb9ceb583269b5188877a4c0,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/skyline-introduction.md,reference,8dd8794d613c5529785c4ca38afd4b3fdbcfae05617b898e09c988b996ecfc40,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/subpackages-async.md,reference,8b66da8a7db773b9e3c0ebd3754b583a9e91422e35544ef2b289fbdd982e531e,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/subpackages-basic.md,reference,dd38fc6de2a522d50911a061ed485107bfbdf46ca4611f2a6301b3229c4a5e45,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/subpackages-independent.md,reference,72d866a1fa01ee564369895c69badd22afc93db26b04546ea944d2edb3eea78d,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/subpackages-overview.md,reference,026eeae7e7fa12c8dfa062296d445ffa329583f9da52bacdaba40a24498e7ba2,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/subpackages-preload.md,reference,71f9f19b5bc4e7e7710f62b04ecfb06a998830f3cad84b6fd7ca856601f178a7,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/subscribe-message.md,reference,5478875d8fcb119cc6c76db6b89893dd85c6304622c7c5401584249c35497852,inventory/reference review; not sentence-by-sentence recertification
+docs/reference/wechat-miniprogram/pages/update-mechanism.md,reference,e17cb73897479e199a268d16f07713ba764e617666c01efb43543a745b7e7bad,inventory/reference review; not sentence-by-sentence recertification
+AGENTS.md,root,dce4127dffe57ced423d86ea9df47db4a6b8a44cb8dff13da49c978c71d87671,authority/targeted semantic review
+HANDOFF-GITHUB-2026-09-08.md,root,bb104f44d6f53bc99a852d4a161bb7953369eb7fbb34ec15762abbaf62d9792f,authority/targeted semantic review
+PRODUCT.md,root,16dafd6b95735316b665fa2b0a2b3aff2c19685045ae287a37a7518d53febbb2,inventory/reference review; not sentence-by-sentence recertification
+README-WINDOWS-CODEX.md,root,2e9604822a6d09f961cb05b6115917322d40f7e5c33b6899af0d7d7de6830291,inventory/reference review; not sentence-by-sentence recertification
+README.md,root,35e0580c459476acfec89393234b9978a09306364b7e77d9e4ea04c8d810bd03,authority/targeted semantic review

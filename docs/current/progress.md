@@ -1,5 +1,7 @@
 # 核心演示闭环 · 进度跟踪
 
+> 本文是按各时点记录的历史日志，不是当前版本权威。当前状态见[交付入口](development-delivery-channel.md)，本轮证据见[优化后审计](post-optimization-audit-2026-10-21/README.md)。
+
 ## 2026-09-20 需求与开发规格 v1.2
 
 已同步所选课程归属、原始成绩→整数分值→等级两段映射、双方课次修正与协同权限、后台扣课保留且前台隐藏、简单并发、自由拖放战术及后台工程补齐。需求52项、验收69项、决策31条。详见 [需求入口](product-requirements/README.md) 和 [16号规格](upgrade-readiness-2026-09-18/16-confirmed-rules-and-engineering-spec.md)。用户明确本轮不新建任务；未改代码、Figma或生产，软件验收未执行。

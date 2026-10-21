@@ -4,13 +4,14 @@
 
 ## 从这里开始
 
+- [优化后独立审计与差距矩阵](current/post-optimization-audit-2026-10-21/README.md)：40提交范围、修复证据、版本一致性、文档治理及下一周期边界。
 - [唯一主开发入口](current/development-workspace.md)：各工具统一仓库与微信项目路径，辨认别名和历史副本。
 - [当前交付状态与待办](current/development-delivery-channel.md)：当前源码、体验版、服务端版本、证据日期与优先级。
 - [核心流程审计（2026-10-21）](current/miniprogram-core-flow-audit-2026-10-21.md)：家长/教练24步覆盖、当前Figma对照、加载采样、问题及修复顺序，逐项标注真实数据与真机验证边界。
 - [GitHub 当前交接 HANDOFF-GITHUB-2026-09-08.md](../HANDOFF-GITHUB-2026-09-08.md)：2026-09-08交接快照；路径和当前交付状态优先以上述入口为准。
-- [当前项目进度](current/progress.md)：逐日事实、已知阻塞和真实验证状态；最新记录在文件末尾。
+- [当前项目进度](current/progress.md)：历史时点日志；当前状态以交付入口和本轮审计为准。
 - [项目全景（2026-09-18）](current/project-overview-cq-talent.md)：一页看懂产品面、设计权威、技术面、部署与交付状态、风险与开工前缺口；每条事实标注 `[实测]`/`[记录]`/`[未验证]` 证据等级。
-- [产品需求文档 v1.1（2026-09-18）](current/product-requirements/README.md)：本轮小程序与后台的统一需求入口，含确认状态、数据权限、验收场景和待决项；描述目标行为，不替代当前实现和发布事实。
+- [产品需求文档 v1.2（含后续明确决定）](current/product-requirements/README.md)：本轮小程序与后台的统一需求入口，含确认状态、数据权限、验收场景和待决项；描述目标行为，不替代当前实现和发布事实。
 - [当前架构](current/architecture.md)：服务、数据和模块边界。
 - [API 契约](current/api-contract.md)：对外/客户端接口约定。
 - [Figma 权威来源](current/figma-source-of-truth.md)：唯一在线设计基准与修改规则。
@@ -23,7 +24,7 @@
 
 ## 设计资料
 
-- [在线画板 ID 映射](design/specifications/figma-online-frame-map-2026-08-12.md)：Figma 画板 ↔ 小程序路由对照，复原任务的施工图纸。
+- [在线画板 ID 映射](design/specifications/figma-online-frame-map-2026-08-12.md)：历史文件的画板与路由对照；当前节点必须从 Figma 权威入口进入。
 - [52 张设计稿离线 PNG](design/reference/figma/)：目录内实际 52 张（该目录 README 的对照表仍只登记 49 张：家长 21 + 教练 28，少登记 `c11-1-assessment-task-create.png`、`p4-1-milestones.png`、`p4-2-training-history.png`），375 宽原尺寸。仅作历史辅助；新实现与验收必须核对当前在线Figma权威来源。
 - [Figma 审计与 Token](design/figma/)：设计变量、全量实施决策和视觉审计。
 - [页面规格](design/specifications/)：按家长端、教练端、批次和通用页面分类的实现规格。
@@ -32,7 +33,7 @@
 
 ## 工具链
 
-- [DevTools 截图工具链](../scripts/devtools/README.md)：路由跳转 + 375×812 截图 + 设计稿合成对比，含全部已知坑。视觉验收全靠它。
+- [DevTools 截图工具链](../scripts/devtools/README.md)：路由跳转 + 375×812 截图 + 设计稿合成对比，含全部已知坑。截图工具不替代业务断言与真机验收。
 
 ## 平台规范参考（微信官方留档）
 

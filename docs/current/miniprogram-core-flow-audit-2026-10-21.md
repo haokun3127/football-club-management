@@ -1,5 +1,7 @@
 # 重庆天才小程序核心流程审计
 
+> 历史审计快照：本文结论只针对 `97419b47`；其后40提交优化及本轮修复的状态见[优化后独立审计](post-optimization-audit-2026-10-21/audit-report.md)。本文不作为当前未修问题清单，原结论保留供追溯。
+
 审计：2026-10-20 至 10-21（香港时间）。源码 `feature/ui-batch-1-p01 / 97419b47`。任务：[核心流程审计](../../.trellis/tasks/10-20-miniprogram-core-flow-audit/prd.md)。
 
 ## 结论与版本边界

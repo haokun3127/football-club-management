@@ -1,0 +1,115 @@
+[
+  {
+    "ok": true,
+    "tool": "automation_evaluate",
+    "clientName": "Codex",
+    "result": {
+      "success": true,
+      "result": {
+        "result": {
+          "installed": true,
+          "persistentSessionChanged": false
+        }
+      }
+    }
+  },
+  {
+    "ok": true,
+    "tool": "automation_navigate",
+    "clientName": "Codex",
+    "result": {
+      "success": true
+    }
+  },
+  {
+    "ok": true,
+    "tool": "simulator_screenshot",
+    "clientName": "Codex",
+    "result": {
+      "success": true,
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/growth-synthetic.png",
+      "imageWidth": 624,
+      "imageHeight": 1352
+    }
+  },
+  {
+    "ok": true,
+    "tool": "automation_evaluate",
+    "clientName": "Codex",
+    "result": {
+      "success": true,
+      "result": {
+        "result": {
+          "route": "pages/parent/growth/index",
+          "state": "ready",
+          "heroStats": [
+            {
+              "value": "24",
+              "label": "训练记录"
+            },
+            {
+              "value": "—",
+              "label": "已确认测评"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "ok": true,
+    "tool": "automation_navigate",
+    "clientName": "Codex",
+    "result": {
+      "success": true
+    }
+  },
+  {
+    "ok": true,
+    "tool": "simulator_screenshot",
+    "clientName": "Codex",
+    "result": {
+      "success": true,
+      "path": "/private/tmp/fcm-post-optimization-audit-20261021/private-empty-synthetic.png",
+      "imageWidth": 624,
+      "imageHeight": 1352
+    }
+  },
+  {
+    "ok": true,
+    "tool": "automation_evaluate",
+    "clientName": "Codex",
+    "result": {
+      "success": true,
+      "result": {
+        "result": {
+          "route": "pages/coach/private-interest/index",
+          "availabilitySummary": "暂无可用时段",
+          "interactive": true
+        }
+      }
+    }
+  },
+  {
+    "ok": true,
+    "tool": "automation_evaluate",
+    "clientName": "Codex",
+    "result": {
+      "success": true,
+      "result": {
+        "result": {
+          "restored": true,
+          "hasSession": false
+        }
+      }
+    }
+  },
+  {
+    "ok": true,
+    "tool": "automation_navigate",
+    "clientName": "Codex",
+    "result": {
+      "success": true
+    }
+  }
+]
