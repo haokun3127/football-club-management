@@ -1,0 +1,23 @@
+.calendar { padding:8px 0; border:1px solid var(--color-line); border-radius:var(--radius-card); background:var(--color-card); color:var(--color-text); }
+.calendar__header { display:flex; height:44px; align-items:center; justify-content:space-between; }
+.calendar__arrow { flex:0 0 44px; width:44px; }
+.calendar__title { flex:1; min-width:0; white-space:nowrap; text-align:center; font-size:16px; font-weight:600; }
+.calendar__weekdays,.calendar__grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); }
+.calendar__weekdays { height:22px; align-items:center; font-size:14px; text-align:center; color:var(--color-text-secondary); }
+.calendar__scroll { width:100%; }
+.calendar__day { box-sizing:border-box; height:48px; min-width:0; padding:3px; border-radius:8px; }
+.calendar__number-row { display:flex; height:22px; align-items:center; justify-content:center; gap:1px; }
+.calendar__number { font-size:16px; line-height:22px; }
+.calendar__number--today { text-decoration:underline; text-underline-offset:3px; font-weight:700; }
+.calendar__day--selected { background:var(--color-brand-soft); color:var(--color-brand); outline:1px solid var(--color-brand); outline-offset:-1px; }
+.calendar__day--outside { color:var(--color-text-secondary); }
+.calendar__day--pressed { background:var(--color-brand-soft); }
+.calendar__footer { display:flex; height:44px; justify-content:space-between; align-items:center; }
+.calendar__legend { display:flex; height:24px; gap:20px; align-items:center; justify-content:center; font-size:14px; color:var(--color-text-secondary); }
+.calendar__legend text::before { content:""; display:inline-block; margin-right:5px; width:6px; height:6px; border-radius:50%; }
+.training::before { background:var(--color-info); }.match::before { background:var(--color-brand); }.other::before { background:var(--color-success); }
+.calendar__markers { display:flex; height:14px; align-items:center; justify-content:center; gap:2px; }
+.calendar__marker { width:8px; height:4px; border-radius:2px; flex:0 0 8px; }
+.calendar__marker--training { background:var(--color-info); }
+.calendar__marker--match { background:var(--color-brand); }
+.calendar__marker--other { background:var(--color-success); }

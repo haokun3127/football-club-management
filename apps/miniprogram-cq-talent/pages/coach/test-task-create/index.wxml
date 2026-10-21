@@ -70,8 +70,8 @@
         <view class="form-field"><view class="form-field__label">模板</view><picker range="{{templateNames}}" value="{{templateIndex}}" bindchange="onTemplateChange"><view class="form-field__picker-box">{{templateNames[templateIndex] || '暂无可用模板'}}<text>›</text></view></picker></view>
         <view class="form-field"><view class="form-field__label">所属学期</view><t-input class="form-field__input" value="{{termLabel}}" placeholder="填写真实学期" maxlength="30" bindchange="onTermLabelInput"  borderless t-class="form-field__input" /><view class="brand-link caption--small">填写本次测评所属学期</view></view>
         <view class="date-fields">
-          <view class="form-field"><view class="form-field__label">开始日期</view><picker mode="date" value="{{startsOn}}" bindchange="onStartDateChange"><view class="form-field__picker-box">{{startsOn}}</view></picker></view>
-          <view class="form-field"><view class="form-field__label">截止日期</view><picker mode="date" value="{{dueOn}}" bindchange="onDueDateChange"><view class="form-field__picker-box">{{dueOn}}</view></picker></view>
+          <view class="form-field"><view class="form-field__label">开始日期</view><date-picker mode="date" value="{{startsOn}}" bindchange="onStartDateChange"><view class="form-field__picker-box">{{startsOn}}</view></date-picker></view>
+          <view class="form-field"><view class="form-field__label">截止日期</view><date-picker mode="date" value="{{dueOn}}" bindchange="onDueDateChange"><view class="form-field__picker-box">{{dueOn}}</view></date-picker></view>
         </view>
         <view class="caption caption--small">周期须包含所选课程日期</view>
       </view>

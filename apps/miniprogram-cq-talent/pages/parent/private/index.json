@@ -3,7 +3,8 @@
   "usingComponents": {
     "role-tabbar": "/components/role-tabbar/index",
     "status-view": "/components/status-view/index",
-    "t-textarea": "tdesign-miniprogram/textarea/textarea"
+    "t-textarea": "tdesign-miniprogram/textarea/textarea",
+    "date-picker": "/components/date-picker/index"
   },
   "navigationStyle": "custom"
 }

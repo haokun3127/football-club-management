@@ -1,32 +1,17 @@
 import { environmentStorageKey } from "../../../utils/config";
 import { getCoachHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
-import { currentLocalDate } from "../../../utils/date";
+import { calendarDateKey, currentLocalDate } from "../../../utils/date";
 import { openPage, openTab } from "../../../utils/navigation";
-import { activityStatus, formatCalendarDate, resolveMenuInset, resolveNavInset, resolveTopBarHeight } from "../../../utils/presentation";
+import { activityStatus, formatCalendarDate, formatTimeOnly, resolveMenuInset, resolveNavInset, resolveTopBarHeight } from "../../../utils/presentation";
 import type { CoachHome, CoachTask, CoachTaskAction, LoadState, ScheduleEvent } from "../../../utils/types";
 
-const WEEK_LABELS = ["日", "一", "二", "三", "四", "五", "六"];
 const initialDate = currentLocalDate();
 const loadVersions = new WeakMap<object, number>();
 const selectionOwners = new WeakMap<object, string>();
-const calendarTouches = new WeakMap<object, {x: number; y: number}>();
 
 type Filter = "all" | "training" | "match" | "pending";
-type ViewMode = "day" | "week" | "month";
-
-export interface CoachMonthDayView {
-  key: string;
-  dayNumber: string;
-  isCurrentMonth: boolean;
-  isToday: boolean;
-  isSelected: boolean;
-  hasTraining: boolean;
-  hasMatch: boolean;
-  hasMultiple: boolean;
-  events: Array<{id: string; title: string; typeLabel: string; tone: string}>;
-  overflow: number;
-}
+type ViewMode = "day" | "month";
 
 type CoachEventView = ScheduleEvent & {
   startTime: string;
@@ -56,12 +41,6 @@ type HeroPillView = {
   tone: "primary" | "neutral";
 };
 
-type CoachDayStripItem = {
-  date: string;
-  weekLabel: string;
-  dayNum: string;
-};
-
 Page({
   data: {
     navInset: resolveNavInset(),
@@ -78,12 +57,8 @@ Page({
     showTeamPicker:false,
     taskCount:0,
     date: initialDate,
-    selectedDate: initialDate,
     viewMode: "day" as ViewMode,
     activeFilter: "all" as Filter,
-    dayStrip: [] as CoachDayStripItem[],
-    collapsedDayStrip: [] as CoachDayStripItem[],
-    rangeLabel: "",
     coachName: "",
     coachInitial: "",
     hasCoachInitial: false,
@@ -97,10 +72,6 @@ Page({
     heroDateLabel: "",
     heroKindLabel: "",
     heroPills: [] as HeroPillView[],
-    monthKey: initialDate.slice(0, 7),
-    monthLabel: formatMonthLabel(initialDate.slice(0, 7)),
-    monthWeekdays: ["一", "二", "三", "四", "五", "六", "日"],
-    monthDays: [] as CoachMonthDayView[],
   },
   onLoad() {
     this.load();
@@ -112,7 +83,7 @@ Page({
     const session = requireRole("coach");
     if (!session) return;
     const version = (loadVersions.get(this) ?? 0) + 1; loadVersions.set(this, version);
-    const range = resolveRange(this.data.date, this.data.viewMode);
+    const range = monthWindow(this.data.date);
     const selectionKey = session.userId ? environmentStorageKey(`coach-team-selection:${session.clubId}:${session.userId}`) : null;
     if (selectionKey && selectionOwners.get(this) !== selectionKey) {
       selectionOwners.set(this, selectionKey); this.setData({selectedTeamIds: []});
@@ -122,17 +93,23 @@ Page({
     const selectedIds = this.data.selectedTeamIds.length ? this.data.selectedTeamIds : Array.isArray(stored) ? stored.filter((id) => typeof id === "string") : [];
     this.setData({ state: "loading", message: "正在读取教练日程" });
     try {
-      const home = await getCoachHome(selectedIds.length ? { ...range, teamIds: selectedIds } : range);
+      const teamScope = selectedIds.length ? {teamIds:selectedIds} : {};
+      // The month query supplies markers; the selected-day query retains the API's
+      // selected-week statistics instead of treating the first week as this week.
+      const [dayHome, calendarHome] = await Promise.all([
+        getCoachHome({from:this.data.date,to:this.data.date,...teamScope}),
+        getCoachHome({...range,...teamScope}),
+      ]);
+      const home = {...dayHome,events:calendarHome.events};
       if (loadVersions.get(this) !== version) return;
       const selectedTeamIds = home.selectedTeamIds ?? [];
       if (selectionKey) { try { wx.setStorageSync(selectionKey, selectedTeamIds); } catch { /* Do not turn a cache failure into a schedule failure. */ } }
       const coachName = home.coachName?.trim() || "";
       const eventViews = home.events.map((event) => toCoachEventView(event));
       const taskCards = home.tasks.map(toCoachTaskView);
-      const selectedDateEvents = eventViews.filter((event) => event.startsAt.slice(0, 10) === this.data.date);
+      const selectedDateEvents = eventViews.filter((event) => calendarDateKey(event.startsAt) === this.data.date);
       const heroEvent = selectedDateEvents.find((event) => event.status === "in_progress") ?? selectedDateEvents[0] ?? null;
       const hasWork = eventViews.length > 0 || taskCards.length > 0;
-      const dayStrip = buildDayStrip(startOfWeek(this.data.date));
       this.setData({
         state: hasWork ? "ready" : "empty",
         message: hasWork ? "" : "所选日期范围内没有日程或待处理任务",
@@ -142,10 +119,6 @@ Page({
         hasTeamOptions:Boolean(home.teamOptions?.length),taskCount:taskCards.length,
         teamOptions: (home.teamOptions ?? []).map((team) => ({ ...team, selected: selectedTeamIds.includes(team.id) })),
         allTeamsSelected: selectedTeamIds.length === (home.teamOptions ?? []).length,
-        selectedDate: this.data.date,
-        dayStrip,
-        collapsedDayStrip: dayStrip,
-        rangeLabel: rangeLabel(range, this.data.viewMode),
         coachName,
         coachInitial: coachName.slice(0, 1),
         hasCoachInitial: Boolean(coachName),
@@ -157,9 +130,6 @@ Page({
         heroKindLabel: heroEvent ? heroKindLabel(heroEvent.type) : "",
         taskCards,
         hasTaskCards: taskCards.length > 0,
-        monthKey: this.data.date.slice(0, 7),
-        monthLabel: formatMonthLabel(this.data.date.slice(0, 7)),
-        monthDays: this.data.viewMode === "month" ? buildMonthDays(this.data.date.slice(0, 7), this.data.date, eventViews) : [],
       });
       this.applyFilter();
     } catch {
@@ -187,64 +157,23 @@ Page({
     else selected.add(id);
     this.setData({selectedTeamIds: [...selected]}); return this.load();
   },
-  goToday() { this.setData({date: currentLocalDate(), viewMode:"day"}); return this.load(); },
+  goToday() { this.setData({date: currentLocalDate()}); return this.load(); },
   showTasks() { wx.pageScrollTo({selector:"#coach-tasks",duration:200}); },
   openAssessmentTask(event: {currentTarget: {dataset: {id?: string}}}) {
     const task = (this.data.taskCards as CoachTask[]).find((item) => item.taskId === event.currentTarget.dataset.id);
     if (task?.taskId && task.templateId) openPage(`/pages/coach/assessment-projects/index?taskId=${encodeURIComponent(task.taskId)}&templateId=${encodeURIComponent(task.templateId)}&title=${encodeURIComponent(task.title || "测评任务")}`);
   },
+  onCalendarChange(event: {detail:{date:string}}) {
+    if (event.detail.date === this.data.date) return;
+    return this.onDateChange({detail:{value:event.detail.date}});
+  },
+  onCalendarViewChange(event: {detail:{expanded:boolean}}) { this.setData({viewMode:event.detail.expanded ? "month" : "day"}); },
   onDateChange(event: { detail: { value: string } }) {
     this.setData({ date: event.detail.value });
     this.load();
   },
-  selectDay(event: { currentTarget: { dataset: { date?: string } } }) {
-    const date = event.currentTarget.dataset.date;
-    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
-    this.setData({ date });
-    this.load();
-  },
-  calendarTouchStart(event: {touches: Array<{clientX: number; clientY: number}>}) {
-    const touch = event.touches[0];
-    if (touch) calendarTouches.set(this, {x: touch.clientX, y: touch.clientY});
-  },
-  calendarTouchEnd(event: {changedTouches: Array<{clientX: number; clientY: number}>}) {
-    const start = calendarTouches.get(this); const end = event.changedTouches[0]; calendarTouches.delete(this);
-    if (!start || !end || Math.abs(end.clientX - start.x) > 40) return;
-    if (end.clientY - start.y > 60 && this.data.viewMode !== "month") return this.expandMonthPicker();
-    if (start.y - end.clientY > 60 && this.data.viewMode === "month") return this.collapseMonthPicker();
-  },
-  expandMonthPicker() {
-    this.setData({ viewMode: "month", monthKey: this.data.date.slice(0, 7), monthLabel: formatMonthLabel(this.data.date.slice(0, 7)) });
-    return this.load();
-  },
-  collapseMonthPicker() {
-    this.setData({ viewMode: "day" });
-    return this.load();
-  },
-  changeMonth(event: { currentTarget: { dataset: { offset?: string | number } } }) {
-    const offset = Number(event.currentTarget.dataset.offset);
-    if (offset !== -1 && offset !== 1) return;
-    const current = new Date(`${this.data.monthKey}-01T00:00:00.000Z`);
-    current.setUTCMonth(current.getUTCMonth() + offset);
-    const monthKey = `${current.getUTCFullYear()}-${String(current.getUTCMonth() + 1).padStart(2, "0")}`;
-    const date = `${monthKey}-01`;
-    this.setData({ date, selectedDate: date, monthKey, monthLabel: formatMonthLabel(monthKey), viewMode: "month" });
-    return this.load();
-  },
-  changeWeek(event: { currentTarget: { dataset: { offset?: string | number } } }) {
-    const offset = Number(event.currentTarget.dataset.offset);
-    if (offset !== -7 && offset !== 7) return;
-    this.setData({ date: addDays(this.data.date, offset), viewMode: "day" });
-    this.load();
-  },
   openMe() {
     openTab("/pages/coach/me/index");
-  },
-  switchView(event: { currentTarget: { dataset: { mode?: ViewMode } } }) {
-    const viewMode = event.currentTarget.dataset.mode;
-    if (!viewMode || viewMode === this.data.viewMode) return;
-    this.setData({ viewMode });
-    this.load();
   },
   switchFilter(event: { currentTarget: { dataset: { filter?: Filter } } }) {
     const activeFilter = event.currentTarget.dataset.filter;
@@ -255,7 +184,7 @@ Page({
   applyFilter() {
     const activeFilter = this.data.activeFilter as Filter;
     const visibleEvents = (this.data.eventViews as CoachEventView[]).filter((event) => {
-      if (this.data.viewMode === "month" && event.startsAt.slice(0, 10) !== this.data.date) return false;
+      if (calendarDateKey(event.startsAt) !== this.data.date) return false;
       if (activeFilter === "pending") return event.hasNextAction;
       if (activeFilter === "training" || activeFilter === "match") return event.type === activeFilter;
       return true;
@@ -291,7 +220,7 @@ function toCoachEventView(event: ScheduleEvent): CoachEventView {
   const locationLabel = [event.teamName, event.venue].filter(Boolean).join(" · ");
   return {
     ...event,
-    startTime: event.startsAt?.slice(11, 16) || "",
+    startTime: formatTimeOnly(event.startsAt),
     durationText: durationLabel(event.startsAt, event.endsAt),
     hasDuration: Boolean(durationLabel(event.startsAt, event.endsAt)),
     statusLabel: status.label,
@@ -348,97 +277,9 @@ function durationLabel(startsAt?: string, endsAt?: string): string {
   return `${Math.round((end - start) / 60000)}分钟`;
 }
 
-function resolveRange(date: string, viewMode: ViewMode) {
-  if (viewMode === "day") return { from: date, to: date };
-  if (viewMode === "month") return monthWindow(date);
-  const monday = startOfWeek(date);
-  return { from: monday, to: addDays(monday, 6) };
-}
-
-function startOfWeek(date: string): string {
-  const value = new Date(`${date}T00:00:00.000Z`);
-  value.setUTCDate(value.getUTCDate() - ((value.getUTCDay() + 6) % 7));
-  return value.toISOString().slice(0, 10);
-}
-
-function buildDayStrip(monday: string) {
-  return Array.from({ length: 7 }, (_, index) => {
-    const date = addDays(monday, index);
-    const value = new Date(`${date}T00:00:00.000Z`);
-    return { date, weekLabel: WEEK_LABELS[value.getUTCDay()], dayNum: String(value.getUTCDate()) };
-  });
-}
-
-function addDays(date: string, amount: number): string {
-  const value = new Date(`${date}T00:00:00.000Z`);
-  value.setUTCDate(value.getUTCDate() + amount);
-  return value.toISOString().slice(0, 10);
-}
-
-function rangeLabel(range: { from: string; to: string }, viewMode: ViewMode): string {
-  if (viewMode === "day") return formatCalendarDate(range.from);
-  if (viewMode === "month") return formatMonthLabel(range.from.slice(0, 7));
-  return `${formatCalendarDate(range.from)} - ${formatCalendarDate(range.to)}`;
-}
-
-function formatMonthLabel(monthKey: string) {
-  const [year, month] = monthKey.split("-");
-  return `${year}年${Number(month)}月`;
-}
 
 function monthWindow(date: string) {
-  const [yearText, monthText] = date.slice(0, 7).split("-");
-  const year = Number(yearText);
-  const month = Number(monthText);
-  const start = new Date(Date.UTC(year, month - 1, 1));
-  const end = new Date(Date.UTC(year, month, 0));
-  return { from: start.toISOString().slice(0, 10), to: end.toISOString().slice(0, 10) };
-}
-
-export function buildMonthDays(monthKey: string, selectedDate: string, events: ScheduleEvent[]): CoachMonthDayView[] {
-  const [yearText, monthText] = monthKey.split("-");
-  const first = new Date(Date.UTC(Number(yearText), Number(monthText) - 1, 1));
-  const leadingDays = (first.getUTCDay() + 6) % 7;
-  const daysInMonth = new Date(Date.UTC(Number(yearText), Number(monthText), 0)).getUTCDate();
-  const cellCount = Math.ceil((leadingDays + daysInMonth) / 7) * 7;
-  const eventByDate = new Map<string, ScheduleEvent[]>();
-  events.forEach((event) => {
-    const key = event.startsAt.slice(0, 10);
-    const current = eventByDate.get(key) ?? [];
-    if (!current.some((item) => item.id === event.id)) current.push(event);
-    eventByDate.set(key, current);
-  });
-  const today = currentLocalDate();
-  return Array.from({ length: cellCount }, (_, index) => {
-    const dayNumber = index - leadingDays + 1;
-    if (dayNumber < 1 || dayNumber > daysInMonth) {
-      return {
-        key: `${monthKey}-empty-${index}`,
-        dayNumber: "",
-        isCurrentMonth: false,
-        isToday: false,
-        isSelected: false,
-        hasTraining: false,
-        hasMatch: false,
-        hasMultiple: false,
-        events: [], overflow: 0,
-      };
-    }
-    const date = new Date(first);
-    date.setUTCDate(dayNumber);
-    const key = date.toISOString().slice(0, 10);
-    const markers = (eventByDate.get(key) ?? []).sort((a, b) => a.startsAt.localeCompare(b.startsAt) || a.id.localeCompare(b.id));
-    return {
-      key,
-      dayNumber: String(date.getUTCDate()),
-      isCurrentMonth: key.slice(0, 7) === monthKey,
-      isToday: key === today,
-      isSelected: key === selectedDate,
-      hasTraining: markers.some((event) => event.type === "training"),
-      hasMatch: markers.some((event) => event.type === "match"),
-      hasMultiple: markers.length > 1,
-      events: markers.slice(0, 2).map((event) => ({id: event.id, title: event.title, tone: event.type === "training" ? "training" : event.type === "match" ? "match" : "other", typeLabel: event.type === "training" ? "训练" : event.type === "match" ? "比赛" : "其他"})),
-      overflow: Math.max(0, markers.length - 2),
-    };
-  });
+  const year = Number(date.slice(0,4));
+  const month = Number(date.slice(5,7));
+  return { from: `${date.slice(0,7)}-01`, to: new Date(Date.UTC(year, month, 0)).toISOString().slice(0,10) };
 }

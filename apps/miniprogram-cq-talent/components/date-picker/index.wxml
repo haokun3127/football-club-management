@@ -1,0 +1,2 @@
+<view class="date-field" bindtap="open" aria-role="button" aria-label="{{mode === 'time' ? '选择时间' : '选择日期'}}" aria-disabled="{{disabled}}"><slot /></view>
+<t-date-time-picker visible="{{visible}}" value="{{pickerValue}}" mode="{{pickerMode}}" format="{{format}}" start="{{boundaryStart}}" end="{{boundaryEnd}}" title="{{mode === 'time' ? '选择时间' : '选择日期'}}" confirm-btn="确定" cancel-btn="取消" bindconfirm="confirm" bindcancel="close" bindclose="close" />

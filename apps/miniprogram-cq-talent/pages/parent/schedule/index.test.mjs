@@ -13,7 +13,7 @@ globalThis.wx = {
 };
 globalThis.Page = () => {};
 
-const { buildDateOptions, buildScheduleDigest, presentNoticeBanner } = await import("./index.ts");
+const { buildScheduleDigest, presentNoticeBanner } = await import("./index.ts");
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
 const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 
@@ -41,7 +41,7 @@ describe("parent schedule hero", () => {
       mode: "upcoming",
       id: input.id,
       title: input.title,
-      timeText: "09:30",
+      timeText: "17:30",
       teamName: input.teamName,
       venue: input.venue,
     });
@@ -166,41 +166,10 @@ describe("parent schedule hero", () => {
     expect(controller).not.toContain("resolveNavInset() + 44");
   });
 
-  it("presents a selected week from Monday through Sunday", () => {
-    const options = buildDateOptions("2026-08-05", []);
-
-    expect(options.map((option) => option.weekShort)).toEqual(["一", "二", "三", "四", "五", "六", "日"]);
-    expect(options[0]?.date).toBe("2026-08-03");
-    expect(options[6]?.date).toBe("2026-08-09");
-    expect(options[2]).toMatchObject({ date: "2026-08-05", isSelected: true });
-    expect(options[1]).toMatchObject({ date: "2026-08-04", isSelected: false });
-  });
-
-  it("renders a collapsed week strip and an expandable two-way month picker", () => {
-    expect(template).toContain('wx:if="{{!isMonthPickerExpanded}}" class="week-switcher"');
-    expect(template).toContain('catchtap="expandMonthPicker"');
-    expect(template).toContain('wx:if="{{isMonthPickerExpanded}}" class="month-calendar"');
-    expect(template).toContain('data-offset="-1" bindtap="changeMonth"');
-    expect(template).toContain('data-offset="1" bindtap="changeMonth"');
-    expect(template).toContain('bindtap="collapseMonthPicker"');
-    expect(template).toContain('class="month-calendar__collapse" bindtap="collapseMonthPicker" aria-label="收起月历"');
-    expect(template).toContain('class="month-calendar__hint"');
-    expect(template).toContain('点击日期更新日程 · 点击收起回到周日历');
-    expect(template).not.toContain('>收起<image');
-    expect(template).toContain("month-day--today");
-    expect(template).toContain("month-day--selected");
-    expect(template).toContain("month-day__marker--training");
-    expect(template).toContain("month-day__marker--match");
-    expect(styles).toMatch(/\.month-calendar\s*\{[^}]*width:\s*686rpx/s);
-    expect(styles).toMatch(/\.week-switcher\s*\{[^}]*width:\s*686rpx/s);
-    expect(styles).toMatch(/\.month-calendar__grid\s*\{[^}]*grid-template-columns:\s*repeat\(7,\s*1fr\)/s);
-    expect(styles).toMatch(/\.month-day--selected \.month-day__number\s*\{[^}]*background: #a80f1b/);
-    expect(styles).toMatch(/\.month-calendar__collapse\s*\{[^}]*width:\s*60rpx[^}]*height:\s*32rpx[^}]*border-radius:\s*16rpx/s);
-    expect(styles).toMatch(/\.month-calendar__collapse-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx[^}]*transform:\s*none/s);
-    expect(styles).toMatch(/\.month-calendar__hint\s*\{[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)[^}]*line-height:\s*1\.5/s);
-    expect(styles).toMatch(/\.week-nav__expand\s*\{[^}]*width:\s*60rpx[^}]*height:\s*32rpx[^}]*border-radius:\s*16rpx/s);
-    expect(styles).toMatch(/\.week-nav__expand-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx/s);
-    expect(styles).toMatch(/\.week-nav\s*\{[^}]*padding:\s*0\s+84rpx\s+0\s+12rpx/s);
+  it("connects the same controlled calendar without a second grid", () => {
+    expect(template).toContain('<schedule-calendar date="{{selectedDate}}" events="{{calendarEvents}}"');
+    expect(template).toContain('bindchange="onCalendarChange" bindviewchange="onCalendarViewChange"');
+    expect(template).not.toContain('class="month-calendar__grid"');
   });
 
   it("uses the Figma bell asset with explicit outer and leaf sizing", () => {
@@ -212,8 +181,6 @@ describe("parent schedule hero", () => {
 
     expect(template).toContain('/assets/icons/bell.svg');
     expect(template).not.toContain('/assets/icons/clock.svg');
-    expect(template).toContain('/assets/icons/chevron-left.svg');
-    expect(template).toContain('/assets/icons/chevron-right.svg');
     expect(template).toContain('style="margin-right:{{menuInset}}px"');
     expect(template).toContain('bindtap="openReminders"');
     expect(template).not.toContain('p1-nav__bell-shape');

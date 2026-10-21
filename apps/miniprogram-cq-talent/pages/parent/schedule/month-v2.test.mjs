@@ -1,100 +1,28 @@
-import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-
-globalThis.wx = {
-  getAccountInfoSync: () => ({ miniProgram: { envVersion: "develop" } }),
-  getWindowInfo: () => ({ statusBarHeight: 20, windowWidth: 375 }),
-  getMenuButtonBoundingClientRect: () => ({ top: 24, left: 300, width: 64, height: 32 }),
-  getStorageSync: () => "",
-  setStorageSync: () => {},
-  removeStorageSync: () => {},
-  navigateTo: () => {},
-  reLaunch: () => {},
-};
-globalThis.Page = () => {};
-
-const { buildMonthDays } = await import("./index.ts");
-const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
-
-function event(overrides = {}) {
-  return {
-    id: "training-1",
-    type: "training",
-    title: "技术专项训练",
-    startsAt: "2026-08-13T09:30:00.000Z",
-    endsAt: "2026-08-13T11:00:00.000Z",
-    venue: "凤凰山球场",
-    status: "scheduled",
-    childIds: ["student-1"],
-    ...overrides,
-  };
-}
-
-describe("P1 weekly schedule with expandable month picker", () => {
-  it("builds a Monday-first August 2026 grid with leading and trailing days", () => {
-    const days = buildMonthDays("2026-08", "2026-08-13", []);
-
-    expect(days[0]).toMatchObject({ key: "2026-07-27", dayNumber: "27", isCurrentMonth: false });
-    expect(days.at(-1)).toMatchObject({ key: "2026-09-06", dayNumber: "6", isCurrentMonth: false });
-    expect(days).toHaveLength(42);
-    expect(days.filter((day) => day.isCurrentMonth)).toHaveLength(31);
+import {describe,expect,it} from "vitest";
+import {calendarDays,calendarGridHeight} from "../../../utils/schedule-calendar";
+import {calendarDateKey,shiftCalendarMonth} from "../../../utils/date";
+const event=(id,startsAt,type="training")=>({id,startsAt,type,title:id,endsAt:startsAt,childIds:[],status:"scheduled"});
+describe("shared club calendar model",()=>{
+  it("lays out seven days or a six-row Monday-first month",()=>{
+    expect(calendarDays("2026-08-13",false,[]).map(x=>x.date)).toEqual(["2026-08-10","2026-08-11","2026-08-12","2026-08-13","2026-08-14","2026-08-15","2026-08-16"]);
+    const days=calendarDays("2026-08-13",true,[],"2026-08-13");
+    expect(days).toHaveLength(42);expect(days[0].date).toBe("2026-07-27");expect(days.at(-1).date).toBe("2026-09-06");
+    expect(days.find(x=>x.date==="2026-08-13")).toMatchObject({selected:true,today:true});
   });
-
-  it("precomputes selected state and separate training/match markers from real events", () => {
-    const days = buildMonthDays("2026-08", "2026-08-13", [
-      event(),
-      event({ id: "match-1", type: "match", startsAt: "2026-08-14T09:30:00.000Z" }),
-    ]);
-
-    expect(days.find((day) => day.key === "2026-08-13")).toMatchObject({
-      isSelected: true,
-      hasTraining: true,
-      hasMatch: false,
-      hasMultiple: false,
-    });
-    expect(days.find((day) => day.key === "2026-08-14")).toMatchObject({
-      hasTraining: false,
-      hasMatch: true,
-      hasMultiple: false,
-    });
+  it("uses club timezone, sorts facts and counts duplicate events once",()=>{
+    expect(calendarDateKey("2026-08-12T16:30:00Z")).toBe("2026-08-13");
+    const input=[event("later","2026-08-13T12:00:00+08:00","match"),event("first","2026-08-13T09:00:00+08:00"),event("first","2026-08-13T09:00:00+08:00")];
+    const day=calendarDays("2026-08-13",true,input).find(x=>x.date==="2026-08-13");
+    expect(day).toMatchObject({title:"first",type:"training",overflow:1,markers:["training","match"]});expect(day.label).toContain("另有1项");
   });
-
-  it("keeps the date circle and activity markers on separate vertical bands", () => {
-    const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
-    const grid = stylesheet.match(/\.month-calendar__grid\s*\{([^}]*)\}/)?.[1] ?? "";
-    const markers = stylesheet.match(/\.month-day__markers\s*\{([^}]*)\}/)?.[1] ?? "";
-
-    expect(grid).toContain("grid-auto-rows: 72rpx");
-    expect(markers).toContain("bottom: 2rpx");
-    expect(markers).not.toContain("bottom: 0");
+  it("clamps month end and crosses leap years without losing the intended day",()=>{
+    expect(shiftCalendarMonth("2026-01-31",1)).toBe("2026-02-28");
+    expect(shiftCalendarMonth("2028-01-31",1)).toBe("2028-02-29");
+    expect(shiftCalendarMonth("2026-12-13",1)).toBe("2027-01-13");
   });
-
-  it("keeps the week strip as the default and only renders the month grid while expanded", () => {
-    expect(template).toContain('wx:if="{{!isMonthPickerExpanded}}" class="week-switcher"');
-    expect(template).toContain('catchtap="expandMonthPicker"');
-    expect(template).toContain('wx:if="{{isMonthPickerExpanded}}" class="month-calendar"');
-    expect(template).toContain('data-offset="-1" bindtap="changeMonth"');
-    expect(template).toContain('data-offset="1" bindtap="changeMonth"');
-    expect(template).toContain('bindtap="collapseMonthPicker"');
-    expect(template).toContain('bindtap="selectDate"');
-    expect(template).toContain('class="week-nav"');
-    expect(template).not.toContain('class="week-nav" bindtap="expandMonthPicker"');
-    expect(template).toContain('class="week-nav__expand" catchtap="expandMonthPicker"');
-    expect(template).toContain('<image class="week-nav__expand-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" />');
-    expect(template).toContain('<image class="month-calendar__collapse-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" />');
-    const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
-    expect(stylesheet).toMatch(/\.week-nav__expand-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx/s);
-    expect(stylesheet).toMatch(/\.month-calendar__collapse-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx/s);
-    const expandMatches = [...stylesheet.matchAll(/\.week-nav__expand\s*\{([^}]*)\}/g)];
-    expect(expandMatches.length).toBeGreaterThanOrEqual(1);
-    const expand = expandMatches[0]?.[1] ?? "";
-    expect(expand).toContain("top: 50%");
-    expect(expand).toContain("right: 24rpx");
-    expect(expand).toContain("width: 60rpx");
-    expect(expand).toContain("bottom: auto");
-    expect(expand).toContain("transform: translateY(-50%)");
-    expect(expand).not.toContain("bottom: -14rpx");
-    expect(stylesheet).toMatch(/\.week-nav\s*\{[^}]*padding:\s*0\s+84rpx\s+0\s+12rpx/s);
-    expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
+  it("keeps six rows scrollable within the same explicit height budget",()=>{
+    expect(calendarGridHeight(42,400)).toBe(108);
+    expect(calendarGridHeight(42,900)).toBe(288);
+    expect(calendarGridHeight(42,400)+152).toBeLessThanOrEqual(400*.65);
   });
 });

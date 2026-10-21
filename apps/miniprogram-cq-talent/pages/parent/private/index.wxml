@@ -26,12 +26,12 @@
 
         <view class="field">
           <view class="field__label">预约日期</view>
-          <picker mode="date" value="{{date}}" bindchange="selectDate">
+          <date-picker mode="date" value="{{date}}" bindchange="selectDate">
             <view class="field__picker">
               <text class="{{date ? '' : 'field__picker--placeholder'}}">{{dateLabel}}</text>
               <image class="field__icon" src="/assets/icons/p9-calendar.svg" mode="aspectFit" />
             </view>
-          </picker>
+          </date-picker>
         </view>
 
         <view class="field">

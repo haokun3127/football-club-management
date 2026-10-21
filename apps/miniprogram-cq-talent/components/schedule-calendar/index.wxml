@@ -1,0 +1,21 @@
+<view class="calendar" bindtouchstart="touchStart" bindtouchend="touchEnd">
+  <view class="calendar__header">
+    <t-button class="calendar__arrow" variant="text" theme="primary" icon="chevron-left" aria-label="{{expanded ? '上个月' : '上一周'}}" data-offset="-1" bindtap="shift" custom-style="min-width:44px;min-height:44px;" />
+    <view class="calendar__title">{{monthLabel}}</view>
+    <t-button class="calendar__arrow" variant="text" theme="primary" icon="chevron-right" aria-label="{{expanded ? '下个月' : '下一周'}}" data-offset="1" bindtap="shift" custom-style="min-width:44px;min-height:44px;" />
+  </view>
+  <view class="calendar__weekdays"><view wx:for="{{weekdays}}" wx:key="*this">{{item}}</view></view>
+  <scroll-view class="calendar__scroll" scroll-y="{{expanded}}" style="height:{{gridHeight}}px" show-scrollbar="{{false}}">
+    <view class="calendar__grid">
+      <view wx:for="{{days}}" wx:key="date" class="calendar__day {{item.selected ? 'calendar__day--selected' : ''}} {{item.outside ? 'calendar__day--outside' : ''}}" data-date="{{item.date}}" bindtap="choose" hover-class="calendar__day--pressed" aria-role="button" aria-label="{{item.label}}" aria-selected="{{item.selected}}">
+        <view class="calendar__number-row"><text class="calendar__number {{item.today ? 'calendar__number--today' : ''}}">{{item.number}}</text></view>
+        <view class="calendar__markers" aria-hidden="true"><view wx:for="{{item.markers}}" wx:for-item="marker" wx:key="*this" class="calendar__marker calendar__marker--{{marker}}" /></view>
+      </view>
+    </view>
+  </scroll-view>
+  <view class="calendar__footer">
+    <t-button variant="text" theme="primary" bindtap="today" custom-style="min-height:44px;font-size:14px;">回今天</t-button>
+    <t-button variant="text" theme="primary" icon="{{expanded ? 'chevron-up' : 'chevron-down'}}" bindtap="toggle" custom-style="min-height:44px;font-size:14px;">{{expanded ? '收起月历' : '展开月历'}}</t-button>
+  </view>
+  <view class="calendar__legend"><text class="training">训练</text><text class="match">比赛</text><text class="other">其他</text></view>
+</view>

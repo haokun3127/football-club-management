@@ -1,9 +1,9 @@
 import { getContentArticles, getParentCalendar, getParentChildren, getParentReminders } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { DEV_PARENT_PAGE_DATE_OVERRIDE } from "../../../utils/config";
-import { currentLocalDate, resolveParentPageDate, shiftCalendarDate } from "../../../utils/date";
+import { calendarDateKey, currentLocalDate, resolveParentPageDate } from "../../../utils/date";
 import { openPage } from "../../../utils/navigation";
-import { activityStatus, childNames, formatCalendarDate, formatShortDate, formatTimeRange, resolveMenuInset, resolveNavInset, resolveTopBarHeight } from "../../../utils/presentation";
+import { activityStatus, childNames, formatCalendarDate, formatShortDate, formatTimeOnly, formatTimeRange, resolveMenuInset, resolveNavInset, resolveTopBarHeight } from "../../../utils/presentation";
 import { countUnreadReminders } from "../../../utils/reminders";
 import { setCurrentStudentId } from "../../../utils/store";
 import type { ContentArticle, LoadState, ScheduleEvent, StudentSummary } from "../../../utils/types";
@@ -40,9 +40,9 @@ type HeroView = {
 );
 
 const TYPE_COLORS: Record<string, string> = {
-  training: "#a80f1b",
-  match: "#1a3a6b",
-  other: "#6b7280",
+  training: "#2268d8",
+  match: "#a80f1b",
+  other: "#188754",
 };
 
 export interface NoticeBannerView {
@@ -62,17 +62,13 @@ interface PageData {
   activeStudentId: string;
   activeStudentName: string;
   events: ScheduleEvent[];
+  calendarEvents: ScheduleEvent[];
   visibleEvents: ScheduleEventView[];
   selectedDate: string;
   selectedDateLabel: string;
   selectedType: "all" | ScheduleEvent["type"];
   typeTabs: Array<{ label: string; value: "all" | ScheduleEvent["type"] }>;
-  dateOptions: Array<{ date: string; isToday: boolean; isSelected: boolean; day: string; weekday: string; weekShort: string; dayNumber: string; count: number }>;
   isMonthPickerExpanded: boolean;
-  monthKey: string;
-  monthLabel: string;
-  monthWeekdays: string[];
-  monthDays: MonthDayView[];
   hasUnreadReminders: boolean;
   unreadCount: number;
   todayLabel: string;
@@ -95,17 +91,6 @@ const typeTabs: PageData["typeTabs"] = [
 const initialDate = resolveParentPageDate(new Date(), DEV_PARENT_PAGE_DATE_OVERRIDE);
 let scheduleLoadToken = 0;
 
-export interface MonthDayView {
-  key: string;
-  dayNumber: string;
-  isCurrentMonth: boolean;
-  isToday: boolean;
-  isSelected: boolean;
-  hasTraining: boolean;
-  hasMatch: boolean;
-  hasMultiple: boolean;
-}
-
 Page<PageData>({
   data: {
     navInset: resolveNavInset(),
@@ -117,17 +102,13 @@ Page<PageData>({
     activeStudentId: "",
     activeStudentName: "",
     events: [],
+    calendarEvents: [],
     visibleEvents: [],
     selectedDate: initialDate,
     selectedDateLabel: formatCalendarDate(initialDate),
-    monthKey: initialDate.slice(0, 7),
-    monthLabel: formatMonthLabel(initialDate.slice(0, 7)),
-    monthWeekdays: ["一", "二", "三", "四", "五", "六", "日"],
-    monthDays: [],
     isMonthPickerExpanded: false,
     selectedType: "all",
     typeTabs,
-    dateOptions: [],
     hasUnreadReminders: false,
     unreadCount: 0,
     todayLabel: "",
@@ -167,7 +148,7 @@ Page<PageData>({
         return;
       }
       const [events, articles] = await Promise.all([
-        getParentCalendar(dateWindowStart(selectedDate), dateWindowEnd(selectedDate)),
+        getParentCalendar(`${selectedDate.slice(0,7)}-01`, new Date(Date.UTC(Number(selectedDate.slice(0,4)), Number(selectedDate.slice(5,7)), 0)).toISOString().slice(0,10)),
         getContentArticles(),
       ]);
       if (loadToken !== scheduleLoadToken) return;
@@ -177,7 +158,6 @@ Page<PageData>({
       const visibleEvents = presentEvents(filterEvents(events, active?.id ?? "", selectedDate, this.data.selectedType));
       const digest = buildScheduleDigest(childEvents, selectedDate);
       const noticeBanner = presentNoticeBanner(articles);
-      const monthKey = selectedDate.slice(0, 7);
       this.setData({
         state: "ready",
         message: "",
@@ -185,12 +165,9 @@ Page<PageData>({
         activeStudentId: active?.id ?? "",
         activeStudentName: active?.name ?? "全部孩子",
         events,
+        calendarEvents: childEvents,
         visibleEvents,
         selectedDateLabel: formatCalendarDate(selectedDate),
-        dateOptions: buildDateOptions(selectedDate, childEvents),
-        monthKey,
-        monthLabel: formatMonthLabel(monthKey),
-        monthDays: buildMonthDays(monthKey, selectedDate, childEvents),
         todayLabel: digest.todayLabel,
         selectedCountLabel: selectedCountLabel(this.data.selectedDate, digest.todayCount),
         todayCount: digest.todayCount,
@@ -217,8 +194,7 @@ Page<PageData>({
       weekCount: digest.weekCount,
       weekHours: digest.weekHours,
       hero: digest.hero,
-      dateOptions: buildDateOptions(this.data.selectedDate, childEvents),
-      monthDays: buildMonthDays(this.data.monthKey, this.data.selectedDate, childEvents),
+      calendarEvents: childEvents,
     });
     this.applyFilters();
   },
@@ -226,59 +202,11 @@ Page<PageData>({
     this.setData({ selectedDate: event.detail.value, selectedDateLabel: formatCalendarDate(event.detail.value) });
     this.load();
   },
-  selectDate(event: { currentTarget: { dataset: { date?: string } } }) {
-    const date = event.currentTarget.dataset.date;
-    if (!date) return;
-    if (date === this.data.selectedDate) {
-      this.setData({ isMonthPickerExpanded: false });
-      return;
-    }
-    const monthKey = date.slice(0, 7);
-    if (monthKey !== this.data.monthKey) {
-      this.setData({ selectedDate: date, selectedDateLabel: formatCalendarDate(date), monthKey, monthLabel: formatMonthLabel(monthKey), isMonthPickerExpanded: false });
-      this.load();
-      return;
-    }
-    const childEvents = filterEvents(this.data.events, this.data.activeStudentId, "", "all");
-    const digest = buildScheduleDigest(childEvents, date);
-    this.setData({
-      selectedDate: date,
-      selectedDateLabel: formatCalendarDate(date),
-      dateOptions: buildDateOptions(date, childEvents),
-      monthDays: buildMonthDays(monthKey, date, childEvents),
-      isMonthPickerExpanded: false,
-      todayLabel: digest.todayLabel,
-      selectedCountLabel: selectedCountLabel(date, digest.todayCount),
-      todayCount: digest.todayCount,
-      weekCount: digest.weekCount,
-      weekHours: digest.weekHours,
-      hero: digest.hero,
-    });
-    this.applyFilters();
+  onCalendarChange(event: {detail:{date:string}}) {
+    if (event.detail.date === this.data.selectedDate) return;
+    return this.onDateChange({detail:{value:event.detail.date}});
   },
-  changeMonth(event: { currentTarget: { dataset: { offset?: string | number } } }) {
-    const offset = Number(event.currentTarget.dataset.offset);
-    if (offset !== -1 && offset !== 1) return;
-    const current = new Date(`${this.data.monthKey}-01T00:00:00.000Z`);
-    current.setUTCMonth(current.getUTCMonth() + offset);
-    const monthKey = `${current.getUTCFullYear()}-${String(current.getUTCMonth() + 1).padStart(2, "0")}`;
-    const selectedDate = `${monthKey}-01`;
-    this.setData({ selectedDate, selectedDateLabel: formatCalendarDate(selectedDate), monthKey, monthLabel: formatMonthLabel(monthKey) });
-    this.load();
-  },
-  expandMonthPicker() {
-    this.setData({ isMonthPickerExpanded: true });
-  },
-  collapseMonthPicker() {
-    this.setData({ isMonthPickerExpanded: false });
-  },
-  changeWeek(event: { currentTarget: { dataset: { offset?: string | number } } }) {
-    const offset = Number(event.currentTarget.dataset.offset);
-    if (offset !== -7 && offset !== 7) return;
-    const selectedDate = shiftCalendarDate(this.data.selectedDate, offset);
-    this.setData({ selectedDate, selectedDateLabel: formatCalendarDate(selectedDate) });
-    this.load();
-  },
+  onCalendarViewChange(event: {detail:{expanded:boolean}}) { this.setData({isMonthPickerExpanded:event.detail.expanded}); },
   switchType(event: { currentTarget: { dataset: { type?: PageData["selectedType"] } } }) {
     const selectedType = event.currentTarget.dataset.type;
     if (!selectedType || selectedType === this.data.selectedType) return;
@@ -316,28 +244,8 @@ function filterEvents(events: ScheduleEvent[], studentId: string, selectedDate: 
   return events.filter((event) => {
     const childMatched = !studentId || !event.childIds?.length || event.childIds.includes(studentId);
     const typeMatched = selectedType === "all" || event.type === selectedType;
-    const dateMatched = !selectedDate || event.startsAt.slice(0, 10) === selectedDate;
+    const dateMatched = !selectedDate || calendarDateKey(event.startsAt) === selectedDate;
     return childMatched && typeMatched && dateMatched;
-  });
-}
-
-export function buildDateOptions(selectedDate: string, events: ScheduleEvent[]) {
-  const base = weekWindowStart(selectedDate);
-  const todayKey = currentLocalDate();
-  return Array.from({ length: 7 }, (_, index) => {
-    const date = new Date(base);
-    date.setUTCDate(date.getUTCDate() + index);
-    const key = date.toISOString().slice(0, 10);
-    return {
-      date: key,
-      isToday: key === todayKey,
-      isSelected: key === selectedDate,
-      day: `${date.getUTCMonth() + 1}/${date.getUTCDate()}`,
-      weekday: ["日", "一", "二", "三", "四", "五", "六"][date.getUTCDay()],
-      weekShort: ["日", "一", "二", "三", "四", "五", "六"][date.getUTCDay()] ?? "",
-      dayNumber: String(date.getUTCDate()),
-      count: events.filter((event) => event.startsAt.slice(0, 10) === key).length,
-    };
   });
 }
 
@@ -358,65 +266,6 @@ export function presentNoticeBanner(articles: ContentArticle[]): NoticeBannerVie
     summary: source.length > 52 ? `${source.slice(0, 52)}…` : source,
     metaLabel: "俱乐部公告",
     hasDetail: Boolean(article.body || article.subtitle),
-  };
-}
-
-export function buildMonthDays(monthKey: string, selectedDate: string, events: ScheduleEvent[]): MonthDayView[] {
-  const [yearText, monthText] = monthKey.split("-");
-  const year = Number(yearText);
-  const month = Number(monthText);
-  const first = new Date(Date.UTC(year, month - 1, 1));
-  const leadingDays = (first.getUTCDay() + 6) % 7;
-  const eventByDate = new Map<string, { training: boolean; match: boolean; count: number }>();
-  events.forEach((event) => {
-    const date = event.startsAt.slice(0, 10);
-    const current = eventByDate.get(date) ?? { training: false, match: false, count: 0 };
-    current.training = current.training || event.type === "training";
-    current.match = current.match || event.type === "match";
-    current.count += 1;
-    eventByDate.set(date, current);
-  });
-  const today = currentLocalDate();
-  return Array.from({ length: 42 }, (_, index) => {
-    const date = new Date(first);
-    date.setUTCDate(date.getUTCDate() + index - leadingDays);
-    const key = date.toISOString().slice(0, 10);
-    const markers = eventByDate.get(key);
-    return {
-      key,
-      dayNumber: String(date.getUTCDate()),
-      isCurrentMonth: key.slice(0, 7) === monthKey,
-      isToday: key === today,
-      isSelected: key === selectedDate,
-      hasTraining: markers?.training ?? false,
-      hasMatch: markers?.match ?? false,
-      hasMultiple: (markers?.count ?? 0) > 1,
-    };
-  });
-}
-
-function formatMonthLabel(monthKey: string) {
-  const [year, month] = monthKey.split("-");
-  return `${year}年${Number(month)}月`;
-}
-
-function dateWindowStart(date: string) {
-  const month = monthWindow(date);
-  return month.start.toISOString().slice(0, 10);
-}
-
-function dateWindowEnd(date: string) {
-  const month = monthWindow(date);
-  return month.end.toISOString().slice(0, 10);
-}
-
-function monthWindow(date: string) {
-  const [yearText, monthText] = (date || initialDate).slice(0, 7).split("-");
-  const year = Number(yearText);
-  const month = Number(monthText);
-  return {
-    start: new Date(Date.UTC(year, month - 1, 1)),
-    end: new Date(Date.UTC(year, month, 0)),
   };
 }
 
@@ -473,7 +322,7 @@ export function buildScheduleDigest(events: ScheduleEvent[], selectedDate: strin
     return total + (Number.isFinite(span) && span > 0 ? span : 0);
   }, 0) / 60000;
   const upcoming = events
-    .filter((event) => event.startsAt.slice(0, 10) === selectedKey && event.status !== "cancelled")
+    .filter((event) => calendarDateKey(event.startsAt) === selectedKey && event.status !== "cancelled")
     .sort((left, right) => Date.parse(left.startsAt) - Date.parse(right.startsAt))[0];
   const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
   const todayLabel = `${selected.getUTCFullYear()}年${selected.getUTCMonth() + 1}月${selected.getUTCDate()}日 周${weekdays[selected.getUTCDay()]}`;
@@ -481,7 +330,7 @@ export function buildScheduleDigest(events: ScheduleEvent[], selectedDate: strin
   const weekHours = (Math.round(weekMinutes / 6) / 10).toString();
   return {
     todayLabel,
-    todayCount: events.filter((event) => event.startsAt.slice(0, 10) === selectedKey).length,
+    todayCount: events.filter((event) => calendarDateKey(event.startsAt) === selectedKey).length,
     weekCount,
     weekHours,
     hero: upcoming
@@ -492,7 +341,7 @@ export function buildScheduleDigest(events: ScheduleEvent[], selectedDate: strin
           weekHours,
           id: upcoming.id,
           title: upcoming.title,
-          timeText: upcoming.startsAt.slice(11, 16) || "待定",
+          timeText: formatTimeOnly(upcoming.startsAt),
           teamName: upcoming.teamName ?? "",
           venue: upcoming.venue ?? "",
         }

@@ -14,6 +14,7 @@ vi.mock("../../../utils/presentation", () => ({
   activityStatus: (status) => ({ label: status, tone: "info" }),
   formatCalendarDate: (value) => String(value).slice(0, 10),
   formatTimeRange: () => "",
+  formatTimeOnly: (value) => new Date(Date.parse(value)+8*3600000).toISOString().slice(11,16),
   resolveMenuInset: () => 0,
   resolveNavInset: () => 0,
   resolveTopBarHeight: () => 44,
@@ -26,7 +27,7 @@ globalThis.Page = (definition) => {
 };
 globalThis.wx = { reLaunch: vi.fn(), getStorageSync: vi.fn(), setStorageSync: vi.fn(), showToast: vi.fn(), pageScrollTo: vi.fn() };
 
-const { buildMonthDays } = await import("./index.ts");
+await import("./index.ts");
 
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
 const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
@@ -44,7 +45,7 @@ function createPageInstance(data = {}) {
 
 const home = {
   date: "2026-08-13",
-  dateRange: { from: "2026-08-10", to: "2026-08-16" },
+  dateRange: { from: "2026-08-01", to: "2026-08-31" },
   coachName: "Coach Chen",
   teams: ["U11 Red"],
   events: [
@@ -87,7 +88,7 @@ describe("coach schedule home", () => {
     globalThis.wx.getStorageSync.mockReturnValue(["revoked", "team-a"]);
     mocks.getCoachHome.mockResolvedValue({...home, teamOptions:[{id:"team-a",name:"甲队"},{id:"team-b",name:"乙队"}], selectedTeamIds:["team-a"]});
     const page=createPageInstance({date:"2026-08-13"}); await page.load();
-    expect(mocks.getCoachHome).toHaveBeenLastCalledWith({from:"2026-08-13",to:"2026-08-13",teamIds:["revoked","team-a"]});
+    expect(mocks.getCoachHome).toHaveBeenLastCalledWith({from:"2026-08-01",to:"2026-08-31",teamIds:["revoked","team-a"]});
     expect(globalThis.wx.setStorageSync).toHaveBeenLastCalledWith(expect.stringContaining("coach-team-selection:club-a:coach-a"),["team-a"]);
     mocks.getCoachHome.mockClear(); globalThis.wx.showToast.mockClear();
     await page.selectTeam({currentTarget:{dataset:{id:"team-a"}}});
@@ -95,7 +96,7 @@ describe("coach schedule home", () => {
     await page.selectTeam({currentTarget:{dataset:{id:"team-b"}}});
     expect(mocks.getCoachHome).toHaveBeenLastCalledWith(expect.objectContaining({teamIds:["team-a","team-b"]}));
     mocks.requireRole.mockReturnValue({role:"coach",userId:"coach-b",clubId:"club-b"}); globalThis.wx.getStorageSync.mockReturnValue([]);
-    await page.load(); expect(mocks.getCoachHome).toHaveBeenLastCalledWith({from:"2026-08-13",to:"2026-08-13"});
+    await page.load(); expect(mocks.getCoachHome).toHaveBeenLastCalledWith({from:"2026-08-01",to:"2026-08-31"});
   });
 
   it("keeps a cross-day assessment reachable without creating a fake deadline", async () => {
@@ -108,17 +109,21 @@ describe("coach schedule home", () => {
     page.setData({date:"2026-10-01"}); await page.load(); expect(page.data.taskCards[0].taskId).toBe("assessment-a");
   });
 
-  it("ignores stale schedule responses and ignores the blank cells in the month grid", async () => {
+  it("ignores stale schedule responses", async () => {
     let resolve; mocks.getCoachHome.mockImplementationOnce(()=>new Promise(r=>{resolve=r;})).mockResolvedValue({...home,clubName:"新俱乐部"});
     const page=createPageInstance(); const first=page.load();await page.load();resolve({...home,clubName:"旧俱乐部"});await first;
-    expect(page.data.clubName).toBe("新俱乐部");mocks.getCoachHome.mockClear();page.selectDay({currentTarget:{dataset:{date:"2026-08-empty-0"}}});expect(mocks.getCoachHome).not.toHaveBeenCalled();
+    expect(page.data.clubName).toBe("新俱乐部");
   });
 
-  it("shows named calendar blocks with stable deduplication, other type and overflow", () => {
-    const events=[home.events[0],home.events[0],{...home.events[0],id:"other",type:"other",title:"活动"},{...home.events[0],id:"third"}];
-    const day=buildMonthDays("2026-08","2026-08-13",events).find(item=>item.key==="2026-08-13");
-    expect(day.events).toHaveLength(2);expect(day.overflow).toBe(1);expect(day.events[0]).toMatchObject({title:"Ball-control session",typeLabel:"训练"});expect(day.events[1].typeLabel).toBe("其他");
-    expect(template).toContain("另有 {{item.overflow}} 项");expect(template).toContain("{{activity.title}}");
+  it("uses selected-day weekly facts while keeping the full month for markers", async () => {
+    mocks.getCoachHome.mockImplementation(async range => ({...home,
+      events: range.from === range.to ? [home.events[0]] : [home.events[0],{...home.events[0],id:"later",startsAt:"2026-08-20T01:00:00Z"}],
+      weekStats:range.from === range.to ? {sessions:3,hours:4.5} : {sessions:0,hours:0},
+    }));
+    const page=createPageInstance({date:"2026-08-13"}); await page.load();
+    expect(page.data.eventViews).toHaveLength(2);
+    expect(page.data.visibleEvents).toHaveLength(1);
+    expect(page.data.heroPills).toEqual([{value:"4.5h",label:"本周安排时长",tone:"neutral"},{value:"3节",label:"本周安排",tone:"neutral"}]);
   });
 
   it("shows the attendance capsule and weekly hero pills when the API provides them", async () => {
@@ -138,19 +143,19 @@ describe("coach schedule home", () => {
     ]);
   });
 
-  it("loads a Monday-to-Sunday range and presents only API-backed C1 summary, hero, and events", async () => {
+  it("loads the marker month and presents the selected day from API facts", async () => {
     mocks.getCoachHome.mockResolvedValue(home);
-    const page = createPageInstance({ date: "2026-08-13", selectedDate: "2026-08-13", viewMode: "week" });
+    const page = createPageInstance({ date: "2026-08-13", selectedDate: "2026-08-13", viewMode: "day" });
 
     await page.load();
 
-    expect(mocks.getCoachHome).toHaveBeenCalledWith({ from: "2026-08-10", to: "2026-08-16" });
+    expect(mocks.getCoachHome).toHaveBeenCalledWith({ from: "2026-08-01", to: "2026-08-31" });
     expect(page.data).toMatchObject({
       state: "ready",
       coachName: "Coach Chen",
       hasHeroEvent: true,
       heroDateLabel: "2026年8月13日 周四",
-      heroEvent: { id: "event-training-1", title: "Ball-control session", startTime: "09:00", hasDuration: true },
+      heroEvent: { id: "event-training-1", title: "Ball-control session", startTime: "17:00", hasDuration: true },
       hasVisibleEvents: true,
       visibleEvents: [{
         id: "event-training-1",
@@ -163,8 +168,6 @@ describe("coach schedule home", () => {
         nextActionLabel: "Record attendance",
       }],
     });
-    expect(page.data.dayStrip.map((day) => day.weekLabel)).toEqual(["一", "二", "三", "四", "五", "六", "日"]);
-    expect(page.data.collapsedDayStrip.map((day) => day.weekLabel)).toEqual(["一", "二", "三", "四", "五", "六", "日"]);
   });
 
   it("keeps empty and failed coach-home loads honest", async () => {
@@ -205,91 +208,6 @@ describe("coach schedule home", () => {
     expect(mocks.openPage).toHaveBeenLastCalledWith("/pages/coach/attendance/index?id=event-1");
   });
 
-  it("moves the coach date strip forward and backward by a full week", () => {
-    const page = createPageInstance({ date: "2026-08-13" });
-
-    page.changeWeek({ currentTarget: { dataset: { offset: 7 } } });
-    expect(page.data.date).toBe("2026-08-20");
-    page.changeWeek({ currentTarget: { dataset: { offset: -7 } } });
-    expect(page.data.date).toBe("2026-08-13");
-  });
-
-  it("builds a Monday-first month grid and returns to the selected day after collapsing", async () => {
-    const monthDays = buildMonthDays("2026-08", "2026-08-13", []);
-    expect(monthDays).toHaveLength(42);
-    expect(monthDays.filter((day) => day.isCurrentMonth)).toHaveLength(31);
-    expect(monthDays.filter((day) => !day.isCurrentMonth).every((day) => day.dayNumber === "")).toBe(true);
-    expect(buildMonthDays("2026-08", "2026-08-13", [home.events[0]]).find((day) => day.key === "2026-08-13")).toMatchObject({
-      isSelected: true,
-      hasTraining: true,
-    });
-
-    mocks.getCoachHome.mockResolvedValue(home);
-    const page = createPageInstance({ date: "2026-08-13", selectedDate: "2026-08-13" });
-    await page.expandMonthPicker();
-    expect(page.data).toMatchObject({ viewMode: "month", monthKey: "2026-08", monthLabel: "2026年8月" });
-    await page.changeMonth({ currentTarget: { dataset: { offset: 1 } } });
-    expect(page.data).toMatchObject({ viewMode: "month", date: "2026-09-01", selectedDate: "2026-09-01", monthKey: "2026-09" });
-    await page.collapseMonthPicker();
-    expect(page.data.viewMode).toBe("day");
-  });
-
-  it("stacks weekday over date in the C1 strip and reserves month expansion for its chevron", () => {
-    expect(template).toContain('class="c1-dates__arrow c1-dates__arrow--previous" data-offset="-7" bindtap="changeWeek"');
-    expect(template).toContain('class="c1-dates__arrow c1-dates__arrow--next" data-offset="7" bindtap="changeWeek"');
-    expect(template).toContain('<image src="/assets/icons/chevron-left.svg" mode="aspectFit" />');
-    expect(template).toContain('<view class="c1-month-calendar__arrow" data-offset="1" bindtap="changeMonth" aria-label="下个月"><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>');
-    expect(template).toContain('<block wx:if="{{viewMode === \'month\'}}">');
-    expect(template).toContain('class="c1-month-calendar"');
-    expect(template).toMatch(/(?:bindtap|catchtap)="expandMonthPicker"/);
-    expect(template).toContain('<view class="c1-month-calendar__collapse" bindtap="collapseMonthPicker" aria-label="收起月历"><image class="c1-month-calendar__collapse-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>');
-    expect(template).toContain('class="c1-week-nav"');
-    expect(template).not.toContain('class="c1-week-nav" bindtap="expandMonthPicker"');
-    expect(template).toContain('<view wx:else class="c1-week-nav__expand" catchtap="expandMonthPicker" aria-label="展开月历"><image class="c1-week-nav__expand-icon" src="/assets/icons/chevron-down-brand.svg" mode="aspectFit" /></view>');
-    expect(template).toContain('wx:for="{{collapsedDayStrip}}"');
-    expect(template).not.toContain('wx:for="{{dayStrip}}"');
-    expect(template).toContain('data-date="{{item.date}}" catchtap="selectDay"');
-    expect(template).toContain('<view class="c1-day__week">{{item.weekLabel}}</view>');
-    expect(template).toContain('<view class="c1-day__num">{{item.dayNum}}</view>');
-    expect(template).not.toContain('class="c1-day__label"');
-    expect(stylesheet).toMatch(/\.c1-dates\s*\{[^}]*display:\s*block[^}]*height:\s*128rpx[^}]*padding:\s*0[^}]*border-radius:\s*24rpx/s);
-    expect(stylesheet).toMatch(/\.c1-dates__arrow\s*\{[^}]*flex:\s*0\s+0\s+48rpx[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
-    expect(stylesheet).toMatch(/\.c1-dates__arrow\s*\{[^}]*top:\s*50%[^}]*transform:\s*translateY\(-50%\)/s);
-    expect(stylesheet).toMatch(/\.c1-dates__arrow--previous\s*\{[^}]*left:\s*0[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
-    expect(stylesheet).toMatch(/\.c1-dates__arrow--next\s*\{[^}]*right:\s*0[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
-    expect(stylesheet).toMatch(/\.c1-dates__arrow--previous\s+image\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
-    expect(stylesheet).toMatch(/\.c1-dates__arrow--next\s+image\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
-    expect(stylesheet).toMatch(/\.c1-week-nav\s*\{[^}]*position:\s*absolute[^}]*top:\s*24rpx[^}]*left:\s*44rpx[^}]*display:\s*grid[^}]*grid-template-columns:\s*repeat\(7,\s*minmax\(0,\s*1fr\)\)[^}]*column-gap:\s*8rpx[^}]*width:\s*566rpx/s);
-    expect(stylesheet).toMatch(/\.c1-day\s*\{[^}]*flex:\s*0\s+0\s+88rpx[^}]*flex-direction:\s*column[^}]*height:\s*80rpx[^}]*border-radius:\s*32rpx/s);
-    expect(stylesheet).toMatch(/\.c1-day__week\s*\{[^}]*color:\s*var\(--color-text-secondary\)[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)[^}]*line-height:\s*1\.5/s);
-    expect(stylesheet).toMatch(/\.c1-day__num\s*\{[^}]*color:\s*var\(--club-text\)[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)[^}]*line-height:\s*1\.5/s);
-    expect(stylesheet).toMatch(/\.c1-day--selected\s*\{[^}]*background:\s*var\(--color-brand\)/s);
-    expect(stylesheet).toMatch(/\.c1-week-nav__expand\s*\{[^}]*display:\s*flex[^}]*align-items:\s*center[^}]*width:\s*60rpx[^}]*height:\s*32rpx[^}]*border-radius:\s*16rpx[^}]*background:\s*var\(--color-brand-soft\)/s);
-    expect(stylesheet).toMatch(/\.c1-week-nav__expand-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx/s);
-    expect(stylesheet).toMatch(/\.c1-day--selected\s+\.c1-day__week,\s*\.c1-day--selected\s+\.c1-day__num\s*\{[^}]*color:\s*var\(--color-card\)/s);
-    expect(template).not.toContain('class="c1-dates__expand"');
-    expect(stylesheet).toMatch(/\.c1-month-calendar\s*\{[^}]*min-height:\s*840rpx[^}]*margin-top:\s*8rpx/s);
-    expect(stylesheet).toMatch(/\.c1-month-calendar__collapse\s*\{[^}]*width:\s*60rpx[^}]*height:\s*32rpx[^}]*border-radius:\s*16rpx/s);
-    expect(stylesheet).toMatch(/\.c1-month-calendar__collapse-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx[^}]*line-height:\s*0/s);
-    expect(template).not.toContain('>收起<image');
-    expect(stylesheet).toMatch(/\.c1-month-day__number\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
-    expect(template).toContain('class="c1-month-calendar__legend"');
-    expect(template).toContain('蓝色=训练');
-    expect(template).toContain('红色=比赛');
-    expect(stylesheet).toMatch(/\.c1-month-day__marker--match\s*\{[^}]*background:\s*var\(--color-brand\)/s);
-    expect(stylesheet).toMatch(/\.c1-month-calendar__grid\s*\{[^}]*grid-auto-rows:\s*minmax\(154rpx, auto\)/s);
-  });
-
-  it("keeps the month date circle separate from markers and keeps the legend close to the grid", () => {
-    const grid = stylesheet.match(/\.c1-month-calendar__grid\s*\{([^}]*)\}/)?.[1] ?? "";
-    const markers = stylesheet.match(/\.c1-month-day__markers\s*\{([^}]*)\}/)?.[1] ?? "";
-    const legend = stylesheet.match(/\.c1-month-calendar__legend\s*\{([^}]*)\}/)?.[1] ?? "";
-
-    expect(grid).toContain("grid-auto-rows: minmax(154rpx, auto)");
-    expect(markers).toContain("bottom: 0");
-    expect(legend).toContain("margin-top: 8rpx");
-  });
-
   it("keeps all assigned-team events in C1 and removes the obsolete team selector", async () => {
     globalThis.wx.getStorageSync.mockReturnValue("U12 Blue");
     mocks.getCoachHome.mockResolvedValue({
@@ -300,7 +218,7 @@ describe("coach schedule home", () => {
         { ...home.events[0], id: "event-training-2", teamName: "U12 Blue", title: "U12 session" },
       ],
     });
-    const page = createPageInstance();
+    const page = createPageInstance({date:"2026-08-13"});
 
     await page.load();
 
@@ -328,7 +246,6 @@ describe("coach schedule home", () => {
     expect(template).toContain("查看所选队伍");
     expect(template).not.toContain(">全部球队课程<");
     expect(stylesheet).toMatch(/\.c1-team-card\s*\{[^}]*background:\s*var\(--color-brand\)/s);
-    expect(stylesheet).toMatch(/\.c1-calendar-card\s*\{[^}]*margin:\s*24rpx\s+24rpx\s+0[^}]*border-radius:\s*28rpx[^}]*background:\s*var\(--color-card\)/s);
     expect(stylesheet).toMatch(/\.c1-team-entry\s*\{[^}]*background:\s*var\(--color-brand\)[^}]*color:\s*var\(--color-card\)/s);
     expect(stylesheet).toMatch(/\.c1-team-strip\s*\{[^}]*margin:\s*16rpx\s+24rpx\s+0/s);
   });
@@ -336,7 +253,6 @@ describe("coach schedule home", () => {
   it("matches the C01 card layout: nav rail, margined calendar, and 24rpx body rail", () => {
     expect(stylesheet).toMatch(/\.c1-nav\s*\{[^}]*padding:\s*0\s+32rpx/s);
     expect(stylesheet).toMatch(/\.c1-body\s*\{[^}]*padding:\s*0\s+24rpx\s+24rpx/s);
-    expect(stylesheet).toMatch(/\.c1-calendar-card\s*\{[^}]*margin:\s*24rpx\s+24rpx\s+0/s);
     expect(stylesheet).toMatch(/\.c1-list\s*\{[^}]*margin-top:\s*24rpx/s);
   });
 
@@ -347,8 +263,6 @@ describe("coach schedule home", () => {
     expect(template).not.toContain('<picker mode="date"');
     expect(template).not.toContain('data-mode="week"');
     expect(template).not.toContain("c1-task-section");
-    expect(template).toContain('data-offset="-7"');
-    expect(template).toContain('bindtap="changeWeek"');
     expect(template).not.toContain("18/20");
     expect(template).not.toContain("出席");
     expect(template).not.toContain("林教练");
@@ -430,7 +344,7 @@ describe("coach schedule home", () => {
         { ...home.events[0], id: "event-match-1", type: "match", title: "周末联赛" },
       ],
     });
-    const page = createPageInstance({ date: "2026-08-13", selectedDate: "2026-08-13", viewMode: "week" });
+    const page = createPageInstance({ date: "2026-08-13", selectedDate: "2026-08-13", viewMode: "day" });
 
     await page.load();
 

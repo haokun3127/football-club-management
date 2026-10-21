@@ -6,7 +6,8 @@
     "status-view": "/components/status-view/index",
     "t-textarea": "tdesign-miniprogram/textarea/textarea",
     "t-input": "tdesign-miniprogram/input/input",
-    "t-switch": "tdesign-miniprogram/switch/switch"
+    "t-switch": "tdesign-miniprogram/switch/switch",
+    "date-picker": "/components/date-picker/index"
   },
   "navigationStyle": "custom"
 }
