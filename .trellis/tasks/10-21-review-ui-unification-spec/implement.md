@@ -100,7 +100,7 @@ B6在最终源码上选择**一次**：
 - 有效边界：当前develop服务仍旧版本，**新登录和雷达接口需配套部署**。本轮没有SSH、测试业务数据写入、部署、微信上传或Figma编辑；原生验收通过既有API切换审查账号角色，产生正常会话轮换。CUA因Documents符号链接根路径拒绝启动；430宽原生证据可用，实际320/375、iOS/Android及手机隐私链未验证，不以mock窗口冒充。
 - 下一步：完成本地提交后，另行取得develop配套部署授权再进行新接口联调；指定image2.5素材、真实手机/窄屏、正式包体与B队完整原生链路保留待验，未齐不归档本任务。
 
-### 本地交付收口
+### 本地交付收口（2026-10-21，部署前快照）
 
 - 最终后台类型/lint/构建通过；最新隔离Chromium确认app-role页签没有通用保存按钮，默认身份POST/PUT200、实际重读、并发编辑409后显式刷新均通过。API options严格枚举已补端点级回归25例，API最终typecheck/build通过。
 - 最终样式76文件PostCSS解析通过、git diff --check通过。TDesign禁用主按钮已用官方变量改中性灰和可读文字，原生诊断画面已查看。旧灰白空截图是热重载空帧，已剔除有效证据。
@@ -108,3 +108,19 @@ B6在最终源码上选择**一次**：
 - B2/B3/B4/B5源码后续批次和全页移动端收口已形成候选；测试/构建通过不等于新API已在develop可用。运行环境仍需配套部署，当前不上传微信。
 
 - 本地提交`b29d84e3`已形成；官方冻结后工作区画面再次读回为ready并直接查看，证据research/b5/workspace-final-official.png。已向用户申请一次develop配套部署授权，等待答复；未执行服务器部署。
+
+
+### 2026-10-22 develop 部署（用户已明确授权）
+
+- 范围：已提交b29d84e35b66的API、后台及0044增量迁移，仅develop；不上传微信、不更新trial/release、不重置审查业务样本。
+- 现场基线：develop旧容器8b94ea6f0dbd、镜像trial-939676f325b9、卷cq-talent-develop-data；trial容器b2e517305a9f、release容器e9fde0292b28。所有镜像/容器以本次现场读回为准。
+- 已完成在线一致性备份：服务器受限目录/opt/cq-talent-nonproduction/backups/ui-b29d84e35b66-20261022/develop.sqlite，SHA256 27ed84287c7db3668c0fc9d97b64af695024c876af672e22b878a35a0cb4e4d9；101表、integrity ok、FK0。私有env与账号资料均未输出/复制到本地。
+- 已从批准提交的git archive构建固定镜像`cq-talent-api:develop-b29d84e35b66`，镜像ID `sha256:816baab45eea20365680f019932cff95b1f5ae7aec22bffcc710c8c139797537`，revision标签为完整b29d84e35b66 SHA。源码归档SHA256 `96a3bcf0115f5c0f7ffbadedab640ef835da72958a5ca987eb2d7ea6d166f0a6`。
+- 迁移演练：新镜像使用`--network none`在备份副本运行`node apps/api/dist/migrate.js`，仅应用0044；原101张表按原列逐行多重集精确一致（schema_migrations只增加0044），新偏好表为空，integrity ok/FK0。
+- 已执行develop单服务切换：旧compose固定旧基础镜像，新增develop专属override；`docker compose --env-file <new-release>/compose.develop.env -f <old-release>/compose.nonproduction.yml -f <new-release>/develop.override.yml up -d --no-deps develop`。两份环境变量合成结果与旧容器一致；未运行data-init/全服务up。当前develop容器`9a1bc1f436e4`，启动迁移43→44。旧镜像、原始一致性备份与部署配置保留在服务器。
+- 服务验证：公网develop health200、OpenAPI两个radar-comparison路径；后台`/backoffice/`及四个引用资源200。裸localhost后台403符合浏览器路径边界，不能当后台故障。错误环境声明403；trial/release容器ID和镜像ID与部署前完全一致。
+- 原生真实联调：当前开发者工具连接develop，家长2个孩子、教练19人；双端新雷达GET及本人历史选择成功，教练不可访问teamId返回403。既有Bearer会话恢复使用auto-active-role-v1，自动回到coach，家长/教练均可正常切换。未清理登录缓存、未触发手机号授权；不能据此宣称首次微信手机登录通过。
+- 实际数据边界：100个配置轴/3个视图、4个历史选项、0个适用批准标准；所选学生98项指标的当前原始成绩无批准映射，当前映射分值0项，默认视图仅2轴，组件按规则显示数值/缺测原因，绘制系列0。没有为展示效果补造映射或标准；彩色线条的既有合成诊断不能冒充本次服务器业务联调。审查账号兼有admin/coach，学生访问探针不能证明纯家长隔离；按既有membership访问模型解释，不虚标该探针通过。
+- 页面验证：家长雷达、教练能力组件、球队工作区均ready；历史选择经真实API回读成功，对比面板展开时canvas隐藏。正式截图已直接查看`research/deployment/workspace-develop-official.png`；真实雷达数值/未映射画面为`radar-develop-diagnostic.png`。安全结果集中在`develop-verification.json`，不存令牌、手机号、私有env或业务库。
+- 联调后再次逐表核对：仅schema_migrations与正常会话表变化，偏好表新增1行default=null/last=coach；全部原业务数据保持一致，integrity ok/FK0，trial/release仍未变。最终停在教练球队页，保留有效登录。
+- 本次只部署已过门禁的同一应用源码，无业务源码改动，复用b29已有API/小程序/后台测试与本次Linux镜像构建；不为部署重跑无关全量套件。image2.5素材、真实手机号/窄屏/真机、官方包体与B队完整原生链仍待验，任务保持in_progress。后续优先补齐获批映射/标准的审查样本以审查真实雷达线；不能把部署成功等同于整个v1.1验收完成。

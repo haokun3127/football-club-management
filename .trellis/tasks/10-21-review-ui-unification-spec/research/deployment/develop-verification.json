@@ -1,0 +1,177 @@
+{
+  "date": "2026-10-22",
+  "scope": "develop only",
+  "sourceCommit": "b29d84e35b66ba48c8dfd9b532ad602d7e9b0623",
+  "deployment": {
+    "revision": "b29d84e35b66ba48c8dfd9b532ad602d7e9b0623",
+    "developContainerId": "9a1bc1f436e46834066cb569793cf93efa8a005f703134334e372cf1efe01c8c",
+    "imageId": "sha256:816baab45eea20365680f019932cff95b1f5ae7aec22bffcc710c8c139797537",
+    "trialAndReleaseUnchanged": true,
+    "originalBusinessTablesUnchanged": true,
+    "expectedMigrationChange": [
+      {
+        "table": "schema_migrations",
+        "beforeRows": 43,
+        "afterRows": 44
+      }
+    ],
+    "integrity": "ok",
+    "foreignKeyErrors": 0,
+    "http": [
+      {
+        "path": "/health",
+        "status": 200,
+        "bytes": 46
+      },
+      {
+        "path": "/backoffice",
+        "status": 403
+      },
+      {
+        "path": "/openapi.json",
+        "status": 200,
+        "bytes": 1037632
+      }
+    ]
+  },
+  "https": [
+    {
+      "path": "/health",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "path": "/backoffice/",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "assets": [
+        {
+          "status": 200,
+          "bytes": 234
+        },
+        {
+          "status": 200,
+          "bytes": 1529
+        },
+        {
+          "status": 200,
+          "bytes": 1097
+        },
+        {
+          "status": 200,
+          "bytes": 680631
+        }
+      ]
+    },
+    {
+      "path": "/openapi.json",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "radarRoutes": [
+        "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/radar-comparison",
+        "/clubs/{clubId}/app-clients/{clientId}/coach/students/{studentId}/radar-comparison"
+      ]
+    },
+    {
+      "path": "/app-clients/resolve?clientKey=cq-talent-wechat-main",
+      "status": 403,
+      "contentType": "application/json; charset=utf-8"
+    }
+  ],
+  "nativeApi": {
+    "session": true,
+    "environment": "develop",
+    "baseUrl": "https://cqtc.pomi.tech/__env/develop",
+    "originalRole": "coach",
+    "roles": [
+      {
+        "role": "parent",
+        "axes": 100,
+        "views": 3,
+        "historyOptions": 4,
+        "standardOptions": 0,
+        "currentMeasured": 0,
+        "currentUnmapped": 98,
+        "selectedHistory": 1,
+        "foreignStudentDenied": false,
+        "membershipAccessExplanation": "审查账号同时具有admin/coach，requireStudentAccess按membership允许访问；该探针不能证明纯家长越权拒绝，未修改现有权限合同。"
+      },
+      {
+        "role": "coach",
+        "axes": 100,
+        "views": 3,
+        "historyOptions": 4,
+        "standardOptions": 0,
+        "currentMeasured": 0,
+        "currentUnmapped": 98,
+        "selectedHistory": 1,
+        "foreignTeamStatus": 403,
+        "foreignTeamDenied": true
+      }
+    ],
+    "children": 2,
+    "roster": 19
+  },
+  "nativePages": {
+    "login": {
+      "status": "authenticated",
+      "activeRole": "coach",
+      "automaticRoleMatchesLast": true,
+      "roles": [
+        "parent",
+        "coach"
+      ],
+      "phoneAuthorizationTriggered": false,
+      "mode": "existing-bearer-session-resume"
+    },
+    "parent": {
+      "page": "ready",
+      "widget": "ready",
+      "selectedAxes": 2,
+      "plots": 0,
+      "historyOptions": 5,
+      "panelVisible": true,
+      "canvasHiddenByPanel": true,
+      "selectedHistory": 1
+    },
+    "coach": {
+      "page": "ready",
+      "widget": "ready",
+      "plots": 0
+    },
+    "workspace": {
+      "state": "ready"
+    }
+  },
+  "postSmoke": {
+    "trialAndReleaseUnchanged": true,
+    "integrity": "ok",
+    "foreignKeyErrors": 0,
+    "existingTableChanges": [
+      {
+        "table": "app_client_sessions",
+        "beforeRows": 22,
+        "afterRows": 29
+      },
+      {
+        "table": "schema_migrations",
+        "beforeRows": 43,
+        "afterRows": 44
+      }
+    ],
+    "businessTablesUnchangedAfterSmoke": true,
+    "rolePreferences": [
+      {
+        "defaultRole": null,
+        "lastActiveRole": "coach",
+        "rows": 1
+      }
+    ]
+  },
+  "limitations": [
+    "真实手机号授权未触发；登录验证仅覆盖既有Bearer会话恢复与自动身份选择。",
+    "当前样本有原始历史，无适用批准标准；本次读取的已确认事实没有批准映射，未绘出雷达线。",
+    "管理员兼教练账号不能用于证明纯家长学生越权拒绝；源码相关权限测试复用原提交门禁。",
+    "截图为原生430宽模拟器，不代表窄屏/真机或Figma验收。"
+  ]
+}
