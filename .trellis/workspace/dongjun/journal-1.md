@@ -1297,3 +1297,37 @@ Audited 40 commits; seven isolated fix commits; 964 tests plus 9 script tests an
 ### Next Steps
 
 - None - task complete
+
+
+## Session 36: 恢复 develop 审查账号业务样本
+
+**Date**: 2026-10-21
+**Task**: 恢复 develop 审查账号业务样本
+**Package**: api
+**Branch**: `feature/ui-batch-1-p01`
+
+### Summary
+
+用户明确授权服务器develop恢复；一致性备份后增量恢复唯一既有账号、19人队伍、2名孩子、26活动和6测评任务。副本语义/FK检查、重复拒绝、真实家长教练会话与原生首页ready验证通过，已切回家长。页面源码未改；TDesign及登录/日历原始意见保留，等待用户审查结束后再整理优化spec。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `f90d79e6` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
