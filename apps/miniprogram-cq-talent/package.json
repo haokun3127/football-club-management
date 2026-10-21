@@ -16,5 +16,8 @@
     "miniprogram-automator": "0.12.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"
+  },
+  "dependencies": {
+    "tdesign-miniprogram": "1.17.0"
   }
 }

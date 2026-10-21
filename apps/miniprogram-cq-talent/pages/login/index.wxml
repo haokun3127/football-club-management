@@ -6,15 +6,15 @@
     <view class="blocked-card__title">账号暂时受限</view>
     <view class="blocked-card__desc">如有疑问，请联系俱乐部管理员</view>
     <view class="blocked-card__status"><view class="blocked-card__chip">受限</view><view class="blocked-card__status-text">当前账号无法进入小程序</view></view>
-    <button class="blocked-card__button" bindtap="backToLaunch">返回首页</button>
+    <t-button class="blocked-card__button" bindtap="backToLaunch" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="blocked-card__button" theme="primary" variant="base">返回首页</t-button>
   </view>
 
   <block wx:else>
     <view wx:if="{{roleChooserVisible}}" class="role-chooser">
       <view class="role-chooser__title">选择身份</view>
       <view class="role-chooser__desc">{{message}}</view>
-      <button wx:if="{{canChooseParent}}" class="role-chooser__button" disabled="{{submitting}}" bindtap="chooseParentRole">以家长身份进入</button>
-      <button wx:if="{{canChooseCoach}}" class="role-chooser__button" disabled="{{submitting}}" bindtap="chooseCoachRole">以教练身份进入</button>
+      <t-button wx:if="{{canChooseParent}}" class="role-chooser__button" disabled="{{submitting}}" bindtap="chooseParentRole" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="role-chooser__button" theme="primary" variant="base">以家长身份进入</t-button>
+      <t-button wx:if="{{canChooseCoach}}" class="role-chooser__button" disabled="{{submitting}}" bindtap="chooseCoachRole" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="role-chooser__button" theme="primary" variant="base">以教练身份进入</t-button>
     </view>
 
     <block wx:else>

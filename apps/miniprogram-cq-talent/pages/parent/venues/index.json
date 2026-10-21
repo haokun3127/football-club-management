@@ -2,7 +2,8 @@
   "navigationBarTitleText": "场地信息",
   "usingComponents": {
     "role-tabbar": "/components/role-tabbar/index",
-    "status-view": "/components/status-view/index"
+    "status-view": "/components/status-view/index",
+    "t-input": "tdesign-miniprogram/input/input"
   },
   "navigationStyle": "custom"
 }

@@ -216,9 +216,9 @@
 
 .c34-grid__header {
   color: var(--club-muted);
-  font-size: 22rpx;
+  font-size: var(--font-size-aux);
   font-weight: 600;
-  line-height: 26rpx;
+  line-height: 1.5;
   text-align: center;
 }
 
@@ -245,8 +245,8 @@
 }
 
 .c34-slot__text {
-  font-size: 20rpx;
-  line-height: 24rpx;
+  font-size: var(--font-size-aux);
+  line-height: 1.5;
   white-space: nowrap;
 }
 

@@ -18,11 +18,11 @@ page {
   --color-card: #ffffff;
   --color-line: #e7eaf0;
   /* Approved bright club V2; opt in per verified screen during rollout. */
-  --club-page: #faf8f4;
-  --club-nav: #fffdf9;
-  --club-line: #e9e1dc;
-  --club-text: #211c1b;
-  --club-muted: #746b68;
+  --club-page: var(--color-page);
+  --club-nav: var(--color-card);
+  --club-line: var(--color-line);
+  --club-text: var(--color-text);
+  --club-muted: var(--color-text-secondary);
   --club-warning-line: #ebcf91;
   --club-warning-soft: #fff7e5;
   --club-shadow: 0 6rpx 24rpx rgba(46, 20, 15, 0.06);
@@ -44,15 +44,15 @@ page {
   --color-pending-soft: #f4f3ff;
 
   /* 字号（rpx） */
-  --font-size-display: 36rpx;
-  --font-size-section: 30rpx;
-  --font-size-body: 30rpx;
-  --font-size-aux: 26rpx;
-  --font-size-caption: 24rpx;
+  --font-size-display: 20px;
+  --font-size-section: 18px;
+  --font-size-body: 16px;
+  --font-size-aux: 14px;
+  --font-size-caption: 12px;
 
   /* 间距（rpx） */
   --spacing-page: 24rpx;
-  --space-page: 32rpx; /* 新版画板 Body p-16px；venues/coaches/content-select 等页引用 */
+  --space-page: 24rpx; /* 新版画板 Body p-16px；venues/coaches/content-select 等页引用 */
   --spacing-card: 24rpx;
   --spacing-card-gap: 20rpx;
   --spacing-stack: 16rpx;
@@ -61,6 +61,37 @@ page {
   --radius-card: 24rpx;
   --radius-button: 16rpx;
   --radius-hero: 28rpx;
+
+  /* v1.1 通用交互与腾讯组件主题；逻辑px保持窄屏可读。 */
+  --control-height: 44px;
+  --control-padding: 10px 16px;
+  --td-textarea-padding: 12px;
+  --control-height-primary: 48px;
+  --motion-fast: 180ms;
+  --td-brand-color: var(--color-brand);
+  --td-brand-color-active: var(--color-brand-pressed);
+  --td-brand-color-light: var(--color-brand-soft);
+  --td-text-color-primary: var(--color-text);
+  --td-text-color-secondary: var(--color-text-secondary);
+  --td-text-color-placeholder: #667085;
+  --td-bg-color-page: var(--color-page);
+  --td-bg-color-container: var(--color-card);
+  --td-font-size-base: 16px;
+  --td-font-size-m: 16px;
+  --td-font-body-large: 400 16px / 1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --td-font-body-medium: 400 16px / 1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --td-font-body-small: 400 14px / 1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --td-button-border-radius: var(--radius-button);
+  --td-button-font-size: 16px;
+  --td-button-medium-height: 44px;
+  --td-button-large-height: 48px;
+  --td-input-placeholder-text-color: #667085;
+  --td-input-vertical-padding: 10px;
+  --td-textarea-placeholder-color: #667085;
+  --td-tab-bar-height: 56px;
+  --td-tab-bar-active-color: var(--color-brand);
+  --td-tab-bar-color: var(--color-text-secondary);
+  --td-tab-bar-bg-color: var(--color-card);
 
   /* 阴影 */
   --shadow-card: 0 8rpx 24rpx rgba(16, 24, 40, 0.04);

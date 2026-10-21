@@ -5,7 +5,7 @@
 .venues-nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; box-sizing: content-box; height: 88rpx; padding: 0 200rpx 0 32rpx; background: #ffffff; box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.04); }
 .venues-nav__back { width: 48rpx; height: 48rpx; display: flex; align-items: center; justify-content: center; }
 .venues-nav__back image { width: 48rpx; height: 48rpx; }
-.venues-nav__title { flex: 1; margin-left: 0; color: #202124; font-size: 36rpx; font-weight: 700; }
+.venues-nav__title { flex: 1; margin-left: 0; color: #202124; font-size: var(--font-size-display); font-weight: 700; }
 .venues-nav__action { width: 48rpx; height: 48rpx; display: flex; align-items: center; justify-content: center; }
 .venues-nav__action--disabled { opacity: 0.45; }
 .venues-nav__action image { width: 48rpx; height: 48rpx; }
@@ -29,7 +29,7 @@
   background: var(--color-card);
   border: 1rpx solid var(--color-line);
   border-radius: 40rpx;
-  font-size: 26rpx;
+  font-size: var(--font-size-aux);
   font-weight: 600;
   color: var(--color-text-secondary);
 }
@@ -79,7 +79,7 @@
   background: #3b82f6;
   padding: 8rpx 16rpx;
   border-radius: 12rpx;
-  font-size: 22rpx;
+  font-size: var(--font-size-aux);
   font-weight: 600;
   color: #ffffff;
 }
@@ -89,7 +89,7 @@
 }
 
 .venue-card__name {
-  font-size: 34rpx;
+  font-size: var(--font-size-body);
   font-weight: 700;
   color: var(--color-text);
 }
@@ -99,7 +99,7 @@
   align-items: center;
   gap: 12rpx;
   margin-top: 24rpx;
-  font-size: 26rpx;
+  font-size: var(--font-size-aux);
   color: var(--color-text-secondary);
 }
 
@@ -128,7 +128,7 @@
   padding: 8rpx 16rpx;
   background: var(--color-page);
   border-radius: 12rpx;
-  font-size: 22rpx;
+  font-size: var(--font-size-aux);
   color: var(--color-text-secondary);
 }
 
@@ -143,7 +143,7 @@
   border: 1rpx solid var(--color-brand);
   border-radius: 40rpx;
   padding: 12rpx 24rpx;
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
   font-weight: 600;
   color: var(--color-brand);
 }
@@ -152,7 +152,7 @@
   background: var(--color-brand);
   border-radius: 40rpx;
   padding: 12rpx 24rpx;
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
   font-weight: 600;
   color: #ffffff;
 }
@@ -165,9 +165,9 @@
 .venue-empty {
   padding: 48rpx 0;
   text-align: center;
-  font-size: 26rpx;
+  font-size: var(--font-size-aux);
   color: var(--color-text-secondary);
 }
 
 .search-bar { margin-bottom: 24rpx; }
-.search-bar__input { box-sizing: border-box; width: 100%; height: 72rpx; padding: 0 28rpx; border-radius: 16rpx; background: #f3f4f6; font-size: 26rpx; }
+.search-bar__input { box-sizing: border-box; width: 100%; height: 72rpx; padding: 0 28rpx; border-radius: 16rpx; background: #f3f4f6; font-size: var(--font-size-aux); }

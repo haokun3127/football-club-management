@@ -133,7 +133,7 @@ describe("parent account binding", () => {
     expect(template).toContain('src="/assets/icons/p10-plus.svg"');
     expect(template).not.toContain("content-users.svg");
     expect(styles).toContain("margin-left: 48rpx;");
-    expect(styles).toContain("font-size: 36rpx;");
+    expect(styles).toContain("font-size: var(--font-size-display);");
     expect(styles).toContain("width: 48rpx; height: 48rpx; flex-shrink: 0;");
   });
 });

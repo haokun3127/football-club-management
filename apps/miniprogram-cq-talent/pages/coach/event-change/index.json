@@ -3,7 +3,10 @@
   "usingComponents": {
     "app-header": "/components/app-header/index",
     "role-tabbar": "/components/role-tabbar/index",
-    "status-view": "/components/status-view/index"
+    "status-view": "/components/status-view/index",
+    "t-textarea": "tdesign-miniprogram/textarea/textarea",
+    "t-input": "tdesign-miniprogram/input/input",
+    "t-switch": "tdesign-miniprogram/switch/switch"
   },
   "navigationStyle": "custom"
 }

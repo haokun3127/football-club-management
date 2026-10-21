@@ -1,7 +1,9 @@
 {
   "navigationBarTitleText": "选择训练内容",
   "usingComponents": {
-    "status-view": "/components/status-view/index"
+    "status-view": "/components/status-view/index",
+    "t-button": "tdesign-miniprogram/button/button",
+    "t-input": "tdesign-miniprogram/input/input"
   },
   "navigationStyle": "custom"
 }

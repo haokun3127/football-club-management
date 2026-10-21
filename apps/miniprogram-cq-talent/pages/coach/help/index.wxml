@@ -11,7 +11,7 @@
     <view class="c164-content">
       <view class="c164-search">
         <image class="c164-search__icon" src="/assets/icons/c164-search.svg" mode="aspectFit" />
-        <input class="c164-search__input" placeholder="搜索使用指南" value="{{searchText}}" bindinput="onSearchInput" />
+        <t-input class="c164-search__input" placeholder="搜索使用指南" value="{{searchText}}" bindchange="onSearchInput"  borderless t-class="c164-search__input" />
       </view>
 
       <view wx:if="{{state === 'loading'}}" class="c164-state">{{message}}</view>

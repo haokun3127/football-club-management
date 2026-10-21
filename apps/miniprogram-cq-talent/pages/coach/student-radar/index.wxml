@@ -13,17 +13,17 @@
         <view class="profile-card profile-summary" data-section="ability" bindtap="openSection"><view class="profile-heading">训练内容与已确认能力</view><view class="profile-summary__text">{{moduleSummary}}</view><view class="profile-summary__text">{{confirmedSummary}}</view><view class="profile-summary__link">查看分类明细与已确认成绩 ›</view></view>
       </block>
       <view wx:if="{{section === 'personal'}}" class="profile-card"><view class="profile-heading">基础信息</view><view class="profile-grid"><view wx:for="{{basic}}" wx:key="label"><view class="profile-label">{{item.label}}</view><view class="profile-value">{{item.value}}</view></view></view></view>
-      <view wx:if="{{section === 'personal'}}" class="profile-card"><view class="profile-heading">本队教练评价</view><view class="profile-hint">按需更新，保留每次变化。</view><button class="profile-link" bindtap="openEvaluation">查看当前评价与历史 ›</button></view>
+      <view wx:if="{{section === 'personal'}}" class="profile-card"><view class="profile-heading">本队教练评价</view><view class="profile-hint">按需更新，保留每次变化。</view><t-button class="profile-link" bindtap="openEvaluation" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="profile-link" theme="primary" variant="text">查看当前评价与历史 ›</t-button></view>
       <block wx:if="{{section === 'training'}}">
         <view class="profile-hint">{{activeStudentName}} · 累计有效训练 {{profile.attendance.effectiveLessons}} 次</view>
         <view wx:for="{{records}}" wx:key="eventId" class="profile-card profile-course">
           <view class="profile-heading" data-id="{{item.eventId}}" bindtap="openCourse">{{item.date}} · {{item.title}}</view>
           <view class="profile-summary__text">{{item.statusLabel}} · {{item.countLabel}}</view>
-          <button class="profile-link" data-id="{{item.eventId}}" bindtap="showHistory">{{item.revised ? '查看更正历史' : '查看计次来源'}} ›</button>
+          <t-button class="profile-link" data-id="{{item.eventId}}" bindtap="showHistory" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="profile-link" theme="primary" variant="text">{{item.revised ? '查看更正历史' : '查看计次来源'}} ›</t-button>
           <view wx:if="{{historyEventId === item.eventId}}" class="profile-history"><view wx:for="{{history}}" wx:for-item="entry" wx:key="revision">版本 {{entry.revision}} · {{entry.label}} · {{entry.date}}<view class="profile-hint">{{entry.reason}}</view></view></view>
         </view>
         <view wx:if="{{!hasRecords}}" class="profile-hint">暂无已形成的培训记录</view>
-        <button wx:if="{{hasMoreRecords}}" class="profile-link" bindtap="moreRecords">显示更多记录</button>
+        <t-button wx:if="{{hasMoreRecords}}" class="profile-link" bindtap="moreRecords" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="profile-link" theme="primary" variant="text">显示更多记录</t-button>
         <view class="profile-hint">有效训练按当前课程记录累计，更正保留历史。</view>
         <view class="profile-card"><view class="profile-heading">出勤统计</view><view class="profile-grid"><view wx:for="{{attendance}}" wx:key="label"><view class="profile-label">{{item.label}}</view><view class="profile-value">{{item.value}}</view></view></view></view>
       </block>
@@ -35,7 +35,7 @@
         <view class="profile-subheading">训练目标进展</view><view class="profile-hint">未配置学员训练目标，暂不生成已完成／未完成清单。</view>
       </view>
       <view wx:if="{{section === 'ability'}}" class="profile-card">
-        <button class="profile-link" bindtap="openConfirmedResults">查看已确认原始成绩与个人历史 ›</button>
+        <t-button class="profile-link" bindtap="openConfirmedResults" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="profile-link" theme="primary" variant="text">查看已确认原始成绩与个人历史 ›</t-button>
         <view class="radar-hero__head"><view class="profile-heading">{{modelName}}</view><view class="radar-hero__period">{{overall}}</view></view><view class="profile-hint">最近发生日期：{{assessmentPeriod}}</view>
         <view wx:if="{{hasRadar}}" class="radar-hero__plot"><radar-canvas class="radar-hero__canvas" metrics="{{radar}}" width="528rpx" height="528rpx"></radar-canvas></view>
         <view wx:else class="profile-hint">至少三个有效维度才能绘制雷达图，已有结果仍列示如下。</view>

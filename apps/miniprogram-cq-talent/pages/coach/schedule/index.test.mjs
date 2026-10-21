@@ -261,8 +261,8 @@ describe("coach schedule home", () => {
     expect(stylesheet).toMatch(/\.c1-dates__arrow--next\s+image\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c1-week-nav\s*\{[^}]*position:\s*absolute[^}]*top:\s*24rpx[^}]*left:\s*44rpx[^}]*display:\s*grid[^}]*grid-template-columns:\s*repeat\(7,\s*minmax\(0,\s*1fr\)\)[^}]*column-gap:\s*8rpx[^}]*width:\s*566rpx/s);
     expect(stylesheet).toMatch(/\.c1-day\s*\{[^}]*flex:\s*0\s+0\s+88rpx[^}]*flex-direction:\s*column[^}]*height:\s*80rpx[^}]*border-radius:\s*32rpx/s);
-    expect(stylesheet).toMatch(/\.c1-day__week\s*\{[^}]*color:\s*var\(--color-text-secondary\)[^}]*font-size:\s*20rpx[^}]*line-height:\s*24rpx/s);
-    expect(stylesheet).toMatch(/\.c1-day__num\s*\{[^}]*color:\s*var\(--club-text\)[^}]*font-size:\s*24rpx[^}]*line-height:\s*28rpx/s);
+    expect(stylesheet).toMatch(/\.c1-day__week\s*\{[^}]*color:\s*var\(--color-text-secondary\)[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)[^}]*line-height:\s*1\.5/s);
+    expect(stylesheet).toMatch(/\.c1-day__num\s*\{[^}]*color:\s*var\(--club-text\)[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)[^}]*line-height:\s*1\.5/s);
     expect(stylesheet).toMatch(/\.c1-day--selected\s*\{[^}]*background:\s*var\(--color-brand\)/s);
     expect(stylesheet).toMatch(/\.c1-week-nav__expand\s*\{[^}]*display:\s*flex[^}]*align-items:\s*center[^}]*width:\s*60rpx[^}]*height:\s*32rpx[^}]*border-radius:\s*16rpx[^}]*background:\s*var\(--color-brand-soft\)/s);
     expect(stylesheet).toMatch(/\.c1-week-nav__expand-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx/s);
@@ -392,7 +392,7 @@ describe("coach schedule home", () => {
   });
 
   it("uses the live C1 root-page title typography", () => {
-    expect(stylesheet).toMatch(/\.c1-nav__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
+    expect(stylesheet).toMatch(/\.c1-nav__title\s*\{[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)[^}]*line-height:\s*1\.5/s);
   });
 
   it("keeps the live hero title and cards inside the C1 Figma width budget", () => {
@@ -408,7 +408,7 @@ describe("coach schedule home", () => {
 
   it("matches the C01 white course card scale with token stat-pills", () => {
     expect(stylesheet).toMatch(/\.c1-hero\s*\{[^}]*gap:\s*20rpx[^}]*margin-top:\s*24rpx/s);
-    expect(stylesheet).toMatch(/\.c1-hero__time\s*\{[^}]*color:\s*var\(--color-brand\)[^}]*font-size:\s*34rpx[^}]*line-height:\s*44rpx/s);
+    expect(stylesheet).toMatch(/\.c1-hero__time\s*\{[^}]*color:\s*var\(--color-brand\)[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)[^}]*line-height:\s*1\.5/s);
     expect(stylesheet).toMatch(/\.c1-hero__pill\s*\{[^}]*padding:\s*16rpx\s+20rpx/s);
     expect(stylesheet).toMatch(/\.c1-hero__pill--primary\s*\{[^}]*background:\s*rgba\(var\(--color-brand-rgb\),\s*\.1\)/s);
     expect(stylesheet).toMatch(/\.c1-hero__pill--primary\s*\{[^}]*border-color:\s*rgba\(var\(--color-brand-rgb\),\s*\.2\)/s);

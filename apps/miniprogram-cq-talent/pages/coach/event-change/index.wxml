@@ -53,12 +53,12 @@
             <text class="picker-box__arrow">›</text>
           </view>
         </picker>
-        <input wx:else class="input-box" placeholder="填写不同于原场地的新场地" value="{{newVenue}}" disabled="{{submitting}}" bindinput="inputVenue" />
+        <t-input wx:else class="input-box" placeholder="填写不同于原场地的新场地" value="{{newVenue}}" disabled="{{submitting}}" bindchange="inputVenue"  borderless t-class="input-box" />
       </view>
 
       <view class="form-card">
         <view class="form-card__title">说明</view>
-        <textarea class="textarea-box" placeholder="请说明变更原因（选填）" maxlength="500" value="{{note}}" disabled="{{submitting}}" bindinput="inputNote" />
+        <t-textarea class="textarea-box" placeholder="请说明变更原因（选填）" maxlength="500" value="{{note}}" disabled="{{submitting}}" bindchange="inputNote"  t-class="textarea-box" />
       </view>
 
       <view class="form-card notify-row">
@@ -66,7 +66,7 @@
           <view class="form-card__title">通知学员家长</view>
           <view class="notify-row__hint">本次变更将通知 {{affectedCount}} 位家长</view>
         </view>
-        <switch checked="{{notifyParents}}" disabled="{{submitting}}" color="#a80f1b" bindchange="toggleNotify" />
+        <t-switch value="{{notifyParents}}" disabled="{{submitting}}" bindchange="toggleNotify" />
       </view>
 
       <view wx:if="{{hasSubmitError}}" class="form-error">{{submitError}}</view>

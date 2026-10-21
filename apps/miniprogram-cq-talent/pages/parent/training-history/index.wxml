@@ -6,7 +6,7 @@
       <view class="record-summary"><view class="record-summary__name">{{studentName}}的训练累计</view><view class="record-summary__number">{{total}}<text>次</text></view><view class="record-summary__note">课程结束后自动计次 · 有变化可直接更正</view></view>
       <view wx:for="{{rows}}" wx:key="eventId" class="record">
         <view class="record-heading"><view><view class="record-date">{{item.dateLabel}}</view><view class="record-title">{{item.title}}</view></view><view class="record-state {{item.counted ? 'record-state--counted' : ''}}">{{item.statusLabel}}</view></view>
-        <view class="record-actions"><button data-id="{{item.eventId}}" bindtap="toggleHistory">{{expandedId === item.eventId ? '收起历史' : '更正历史'}}</button><button class="record-edit" data-id="{{item.eventId}}" bindtap="edit">更正记录</button></view>
+        <view class="record-actions"><t-button data-id="{{item.eventId}}" bindtap="toggleHistory" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">{{expandedId === item.eventId ? '收起历史' : '更正历史'}}</t-button><t-button class="record-edit" data-id="{{item.eventId}}" bindtap="edit" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="record-edit" theme="primary" variant="text">更正记录</t-button></view>
         <view wx:if="{{expandedId === item.eventId}}" class="record-history"><view wx:for="{{item.historyLabels}}" wx:for-item="entry" wx:key="index">{{entry}}</view></view>
       </view>
     </block>
@@ -15,11 +15,11 @@
     <view class="record-editor">
       <view class="record-title">更正训练记录</view><view class="editor-subtitle">{{editing.title}} · {{editing.dateLabel}}</view>
       <view class="editor-current">当前状态：{{editing.statusLabel}} · 版本 {{editing.revision}}</view>
-      <view class="editor-toggle"><text>本次训练计入累计</text><switch checked="{{draftCounted}}" color="#A80F1B" disabled="{{saving}}" bindchange="changeCounted" /></view>
-      <textarea class="editor-reason" value="{{reason}}" maxlength="500" placeholder="填写更正原因，方便家长和教练核对" disabled="{{saving}}" bindinput="changeReason" />
+      <view class="editor-toggle"><text>本次训练计入累计</text><t-switch value="{{draftCounted}}" disabled="{{saving}}" bindchange="changeCounted" /></view>
+      <t-textarea class="editor-reason" value="{{reason}}" maxlength="500" placeholder="填写更正原因，方便家长和教练核对" disabled="{{saving}}" bindchange="changeReason"  t-class="editor-reason" />
       <view wx:if="{{saveError}}" class="editor-error">{{saveError}}</view>
-      <button wx:if="{{conflict}}" class="ghost-button" disabled="{{saving}}" bindtap="refreshConflict">核对最新记录</button>
-      <view class="actions"><button class="ghost-button mini-button" disabled="{{saving}}" bindtap="closeEditor">取消</button><button class="primary-button mini-button" loading="{{saving}}" disabled="{{saving || conflict}}" bindtap="save">保存更正</button></view>
+      <t-button wx:if="{{conflict}}" class="ghost-button" disabled="{{saving}}" bindtap="refreshConflict" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="ghost-button" theme="default" variant="outline">核对最新记录</t-button>
+      <view class="actions"><t-button class="ghost-button mini-button" disabled="{{saving}}" bindtap="closeEditor" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="ghost-button mini-button" theme="default" variant="outline">取消</t-button><t-button class="primary-button mini-button" loading="{{saving}}" disabled="{{saving || conflict}}" bindtap="save" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="primary-button mini-button" theme="primary" variant="base">保存更正</t-button></view>
     </view>
   </view>
 </view>

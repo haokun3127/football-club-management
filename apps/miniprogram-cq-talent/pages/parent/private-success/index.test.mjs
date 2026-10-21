@@ -166,7 +166,7 @@ describe("parent private lesson result", () => {
     expect(template).toContain('src="/assets/icons/p9-1-check.svg"');
     expect(template).not.toContain('class="request-marker__check">✓');
     expect(template).not.toContain('summary-row__label">备注</view>');
-    expect(styles).toContain("font-size: 36rpx;");
+    expect(styles).toContain("font-size: var(--font-size-display);");
     expect(styles).toContain("width: 96rpx;");
     expect(styles).toContain("height: 96rpx;");
     expect(styles).toContain("padding: 44rpx 44rpx 176rpx;");

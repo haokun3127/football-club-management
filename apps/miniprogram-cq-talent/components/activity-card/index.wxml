@@ -12,7 +12,7 @@
       <view wx:for="{{meta}}" wx:key="label" class="activity-card__meta-item">{{item.label}} {{item.value}}</view>
     </view>
     <view wx:if="{{actionLabel}}" class="activity-card__footer">
-      <button class="activity-card__action" catchtap="handleAction">{{actionLabel}}</button>
+      <t-button class="activity-card__action" catchtap="handleAction" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="activity-card__action" theme="primary" variant="text">{{actionLabel}}</t-button>
     </view>
   </view>
 </view>

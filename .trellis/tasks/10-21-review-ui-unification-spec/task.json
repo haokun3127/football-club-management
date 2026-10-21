@@ -1,0 +1,29 @@
+{
+  "id": "review-ui-unification-spec",
+  "name": "review-ui-unification-spec",
+  "title": "本轮审查：双端统一UI与球队管理优化spec",
+  "description": "六类UI优化spec的审计修订：单一实施基线、最小数据合同、独立批次与必要验证；仅文档。",
+  "status": "in_progress",
+  "dev_type": "fullstack",
+  "scope": "ui-review",
+  "package": "miniprogram",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-10-21",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "feature/ui-batch-1-p01",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "docs/current/development-delivery-channel.md",
+    ".trellis/tasks/archive/2026-10/10-21-review-account-test-data/review-notes.md"
+  ],
+  "notes": "2026-10-21用户已批准按审计v1.1开发，包含P实施基线。B1开始，主会话inline；部署/上传未授权。",
+  "meta": {}
+}

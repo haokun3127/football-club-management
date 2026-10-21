@@ -4,10 +4,10 @@
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '加载训练记录' : state === 'empty' ? '暂无训练记录' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <block wx:if="{{state === 'ready' && !editing}}">
       <view class="record-summary">{{eventTitle}} · {{rows.length}}名学员 · {{total}}人已计课次</view>
-      <view class="record-filters"><button class="{{filter === 'all' ? 'selected' : ''}}" data-filter="all" bindtap="changeFilter">全部</button><button class="{{filter === 'counted' ? 'selected' : ''}}" data-filter="counted" bindtap="changeFilter">已计课次</button><button class="{{filter === 'uncounted' ? 'selected' : ''}}" data-filter="uncounted" bindtap="changeFilter">未计课次</button></view>
+      <view class="record-filters"><t-button class="{{filter === 'all' ? 'selected' : ''}}" data-filter="all" bindtap="changeFilter" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="{{filter === 'all' ? 'selected' : ''}}" theme="primary" variant="text">全部</t-button><t-button class="{{filter === 'counted' ? 'selected' : ''}}" data-filter="counted" bindtap="changeFilter" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="{{filter === 'counted' ? 'selected' : ''}}" theme="primary" variant="text">已计课次</t-button><t-button class="{{filter === 'uncounted' ? 'selected' : ''}}" data-filter="uncounted" bindtap="changeFilter" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="{{filter === 'uncounted' ? 'selected' : ''}}" theme="primary" variant="text">未计课次</t-button></view>
       <view wx:for="{{visibleRows}}" wx:key="studentId" class="record">
         <view class="record-title">{{item.name}}</view><view class="record-state">{{item.statusLabel}} · {{item.sourceLabel}}</view>
-        <view class="record-actions"><button wx:if="{{canEdit}}" data-id="{{item.studentId}}" bindtap="edit">修正</button><button data-id="{{item.studentId}}" bindtap="toggleHistory">{{expandedId === item.studentId ? '收起历史' : '修改历史'}}</button></view>
+        <view class="record-actions"><t-button wx:if="{{canEdit}}" data-id="{{item.studentId}}" bindtap="edit" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">修正</t-button><t-button data-id="{{item.studentId}}" bindtap="toggleHistory" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">{{expandedId === item.studentId ? '收起历史' : '修改历史'}}</t-button></view>
         <view wx:if="{{expandedId === item.studentId}}" class="record-history"><view wx:for="{{item.historyLabels}}" wx:for-item="entry" wx:key="index">{{entry}}</view><view wx:if="{{!item.historyLabels.length}}">尚无修改历史</view></view>
       </view>
       <view wx:if="{{!visibleRows.length}}" class="record-summary">当前筛选下暂无学员</view>
@@ -17,13 +17,13 @@
       <view class="record-field"><view>学员</view><view class="record-input">{{editing.name}}</view></view>
       <view class="record-field"><view>训练</view><view class="record-input">{{editing.dateLabel}} {{eventTitle}}</view></view>
       <view class="record-field"><view>当前结果</view><view class="record-input">{{editing.statusLabel}} · {{editing.sourceLabel}}</view></view>
-      <view class="record-field"><view>修改为</view><view class="record-input record-toggle"><text>{{draftCounted ? '已计课次' : '不计课次'}}</text><switch checked="{{draftCounted}}" color="#A80F1B" disabled="{{saving}}" bindchange="changeCounted" /></view></view>
-      <view class="record-field"><view>说明</view><textarea class="record-input record-reason" value="{{reason}}" maxlength="500" placeholder="填写更正原因" disabled="{{saving}}" bindinput="changeReason" /></view>
+      <view class="record-field"><view>修改为</view><view class="record-input record-toggle"><text>{{draftCounted ? '已计课次' : '不计课次'}}</text><t-switch value="{{draftCounted}}" disabled="{{saving}}" bindchange="changeCounted" /></view></view>
+      <view class="record-field"><view>说明</view><t-textarea class="record-input record-reason" value="{{reason}}" maxlength="500" placeholder="填写更正原因" disabled="{{saving}}" bindchange="changeReason"  t-class="record-input record-reason" /></view>
       <view class="record-info">保存直接生效，自动任务不覆盖人工修改。</view>
       <view wx:if="{{saveError}}" class="editor-error">{{saveError}}</view>
-      <button wx:if="{{conflict}}" disabled="{{saving}}" bindtap="refreshConflict">核对最新记录</button>
+      <t-button wx:if="{{conflict}}" disabled="{{saving}}" bindtap="refreshConflict" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">核对最新记录</t-button>
       <view class="record-history"><view wx:for="{{editing.historyLabels}}" wx:key="index">{{item}}</view></view>
     </block>
   </view>
-  <view class="record-footer"><button wx:if="{{editing}}" class="record-primary" loading="{{saving}}" disabled="{{saving || conflict}}" bindtap="save">保存修改</button><button wx:else class="record-primary" bindtap="goBack">返回</button></view>
+  <view class="record-footer"><t-button wx:if="{{editing}}" class="record-primary" loading="{{saving}}" disabled="{{saving || conflict}}" bindtap="save" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="record-primary" theme="primary" variant="base">保存修改</t-button><t-button wx:else class="record-primary" bindtap="goBack" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="record-primary" theme="primary" variant="base">返回</t-button></view>
 </view>

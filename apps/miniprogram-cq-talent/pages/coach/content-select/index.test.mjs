@@ -340,8 +340,8 @@ describe("coach training content select", () => {
     expect(stylesheet).toMatch(/\.select-nav__left\s*\{[^}]*gap:\s*24rpx/s);
     expect(stylesheet).toMatch(/\.select-nav__title\s*\{[^}]*font-size:\s*44rpx[^}]*line-height:\s*54rpx/s);
     expect(stylesheet).toMatch(/\.search-bar__icon\s*\{[^}]*width:\s*40rpx[^}]*height:\s*40rpx[^}]*flex:\s*0 0 40rpx/s);
-    expect(stylesheet).toMatch(/\.search-bar__input\s*\{[^}]*font-size:\s*26rpx/s);
-    expect(stylesheet).toMatch(/\.category-chip\s*\{[^}]*height:\s*64rpx[^}]*padding:\s*0 32rpx[^}]*font-size:\s*26rpx/s);
+    expect(stylesheet).toMatch(/\.search-bar__input\s*\{[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)/s);
+    expect(stylesheet).toMatch(/\.category-chip\s*\{[^}]*height:\s*64rpx[^}]*padding:\s*0 32rpx[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)/s);
   });
 
   it("renders the three-level picker structure with fixed actions and separate dosage fields", () => {

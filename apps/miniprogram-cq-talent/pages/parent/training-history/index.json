@@ -1,7 +1,10 @@
 {
   "navigationBarTitleText": "训练历程",
   "usingComponents": {
-    "status-view": "/components/status-view/index"
+    "status-view": "/components/status-view/index",
+    "t-button": "tdesign-miniprogram/button/button",
+    "t-textarea": "tdesign-miniprogram/textarea/textarea",
+    "t-switch": "tdesign-miniprogram/switch/switch"
   },
   "navigationStyle": "custom"
 }

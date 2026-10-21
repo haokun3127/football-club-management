@@ -1,1 +1,1 @@
-<view class="chip chip--{{tone}} {{compact ? 'chip--compact' : ''}}">{{label}}</view>
+<t-tag theme="{{tone === 'error' ? 'danger' : tone === 'success' ? 'success' : tone === 'warning' ? 'warning' : tone === 'brand' || tone === 'info' || tone === 'pending' ? 'primary' : 'default'}}" variant="light" shape="round" size="{{compact ? 'small' : 'medium'}}" custom-style="font-size:var(--font-size-aux);line-height:1.5;">{{label}}</t-tag>

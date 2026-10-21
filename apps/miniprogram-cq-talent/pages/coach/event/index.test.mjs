@@ -402,7 +402,7 @@ describe("coach activity workbench", () => {
     expect(template).toContain('style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"');
     expect(stylesheet).toMatch(/\.c2-nav__left\s*\{[^}]*gap:\s*0/s);
     expect(stylesheet).toMatch(/\.c2-nav__back\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
-    expect(stylesheet).toMatch(/\.c2-nav__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
+    expect(stylesheet).toMatch(/\.c2-nav__title\s*\{[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)[^}]*line-height:\s*1\.5/s);
     expect(stylesheet).not.toContain(".c2-nav__finish");
     expect(stylesheet).not.toContain(".progress-row");
     expect(stylesheet).toMatch(/\.c2-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
@@ -411,7 +411,7 @@ describe("coach activity workbench", () => {
   it("keeps the live Figma C2 course-context label on the right side of the top navigation", () => {
     expect(template).toContain('class="c2-nav__today"');
     expect(template).toContain('>本次课程</view>');
-    expect(stylesheet).toMatch(/\.c2-nav__today\s*\{[^}]*color:\s*#a80f1b[^}]*font-size:\s*24rpx/s);
+    expect(stylesheet).toMatch(/\.c2-nav__today\s*\{[^}]*color:\s*#a80f1b[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)/s);
   });
 
   it("sends the loaded status snapshot as previousStatus on inline attendance saves for non-training events", async () => {

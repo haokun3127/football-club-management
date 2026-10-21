@@ -13,5 +13,5 @@
       <view wx:for="{{alternatives}}" wx:key="id" class="results-card results-alternative" data-id="{{item.id}}" bindtap="select"><view class="results-title">{{item.name}}</view><view class="results-text">原始成绩 {{item.valueLabel}} · {{item.dateLabel}}</view><view class="results-link">查看已确认成绩与个人历史 ›</view></view>
     </block>
   </view>
-  <view wx:if="{{teamId}}" class="results-footer"><button class="results-primary" loading="{{switching}}" disabled="{{switching}}" bindtap="switchStudent">切换同队学员</button></view>
+  <view wx:if="{{teamId}}" class="results-footer"><t-button class="results-primary" loading="{{switching}}" disabled="{{switching}}" bindtap="switchStudent" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="results-primary" theme="primary" variant="base">切换同队学员</t-button></view>
 </view>

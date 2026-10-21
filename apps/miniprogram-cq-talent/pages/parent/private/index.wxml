@@ -62,13 +62,13 @@
 
         <view class="field field--last">
           <view class="field__label">备注</view>
-          <textarea
+          <t-textarea
             class="field__textarea"
             placeholder="请输入特殊要求或说明"
             maxlength="500"
             value="{{note}}"
-            bindinput="inputNote"
-          />
+            bindchange="inputNote"
+           t-class="field__textarea" />
         </view>
       </view>
       <view wx:if="{{hasFormMessage}}" class="form-message">{{formMessage}}</view>

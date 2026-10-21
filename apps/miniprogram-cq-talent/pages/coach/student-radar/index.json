@@ -2,7 +2,8 @@
   "navigationBarTitleText": "学员档案",
   "usingComponents": {
     "status-view": "/components/status-view/index",
-    "radar-canvas": "/components/radar-canvas/index"
+    "radar-canvas": "/components/radar-canvas/index",
+    "t-button": "tdesign-miniprogram/button/button"
   },
   "navigationStyle": "custom"
 }

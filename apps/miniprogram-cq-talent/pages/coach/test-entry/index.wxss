@@ -34,14 +34,14 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 36rpx;
+  font-size: var(--font-size-display);
   font-weight: 700;
-  line-height: 44rpx;
+  line-height: 1.5;
 }
 
 .c12-nav__action {
   color: #a80f1b;
-  font-size: 30rpx;
+  font-size: var(--font-size-body);
   font-weight: 600;
 }
 
@@ -65,7 +65,7 @@
 
 .c12-task-header__title {
   overflow: hidden;
-  font-size: 36rpx;
+  font-size: var(--font-size-display);
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -74,7 +74,7 @@
 .c12-task-header__meta {
   overflow: hidden;
   color: rgba(255, 255, 255, 0.64);
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -88,7 +88,7 @@
 .c12-task-header__chip {
   padding: 8rpx 14rpx;
   border-radius: 4rpx;
-  font-size: 22rpx;
+  font-size: var(--font-size-aux);
   font-weight: 600;
 }
 
@@ -133,7 +133,7 @@
   border-radius: 999rpx;
   background: #ffffff;
   color: #667085;
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
 }
 
 .c12-group--active {
@@ -160,14 +160,14 @@
 
 .c12-field-card__label,
 .c12-roster__title {
-  font-size: 28rpx;
+  font-size: var(--font-size-section);
   font-weight: 700;
 }
 
 .c12-field-card__position,
 .c12-row__status {
   color: #667085;
-  font-size: 22rpx;
+  font-size: var(--font-size-aux);
 }
 
 .c12-field-card__picker {
@@ -181,14 +181,14 @@
 }
 
 .c12-field-card__name {
-  font-size: 28rpx;
+  font-size: var(--font-size-body);
   font-weight: 600;
 }
 
 .c12-field-card__unit,
 .c12-field-card__protocol {
   color: #667085;
-  font-size: 22rpx;
+  font-size: var(--font-size-aux);
   line-height: 1.5;
 }
 
@@ -210,7 +210,7 @@
   border-radius: 8rpx;
   background: #ffffff;
   color: #202124;
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
 }
 
 .c12-row {
@@ -223,7 +223,7 @@
 }
 
 .c12-row__name {
-  font-size: 28rpx;
+  font-size: var(--font-size-body);
   font-weight: 600;
 }
 
@@ -251,7 +251,7 @@
   padding: 14rpx 18rpx;
   border-radius: 8rpx;
   background: #f6f7f9;
-  font-size: 26rpx;
+  font-size: var(--font-size-aux);
 }
 
 .c12-row__input {
@@ -265,7 +265,7 @@
   border-radius: 8rpx;
   background: #ffffff;
   color: #667085;
-  font-size: 22rpx;
+  font-size: var(--font-size-aux);
 }
 
 .c12-row__reason {
@@ -277,7 +277,7 @@
   display: block;
   margin-top: 12rpx;
   color: #a80f1b;
-  font-size: 22rpx;
+  font-size: var(--font-size-aux);
 }
 
 .c12-submit-wrap {
@@ -298,7 +298,7 @@
   min-height: 28rpx;
   margin-bottom: 8rpx;
   color: #667085;
-  font-size: 20rpx;
+  font-size: var(--font-size-aux);
 }
 
 .c12-submit__message {
@@ -306,7 +306,7 @@
   overflow: hidden;
   margin-top: 2rpx;
   color: #667085;
-  font-size: 20rpx;
+  font-size: var(--font-size-aux);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -316,7 +316,7 @@
   border-radius: 10rpx;
   background: #a80f1b;
   color: #ffffff;
-  font-size: 30rpx;
+  font-size: var(--font-size-body);
   font-weight: 700;
   text-align: center;
 }
@@ -373,18 +373,18 @@
 
 .c121-modal__title {
   color: #202124;
-  font-size: 36rpx;
+  font-size: var(--font-size-section);
   font-weight: 700;
 }
 
 .c121-modal__message {
   color: #667085;
-  font-size: 28rpx;
+  font-size: var(--font-size-body);
 }
 
 .c121-modal__updated-at {
   color: #667085;
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
 }
 
 .c121-modal__actions {
@@ -400,7 +400,7 @@
   justify-content: center;
   height: 96rpx;
   border-radius: 24rpx;
-  font-size: 30rpx;
+  font-size: var(--font-size-body);
   font-weight: 600;
 }
 
@@ -444,7 +444,7 @@
 .c12-field-window__label {
   overflow: hidden;
   color: #202124;
-  font-size: 26rpx;
+  font-size: var(--font-size-aux);
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -454,7 +454,7 @@
 .c12-field-window__position,
 .c12-field-window__step {
   color: #667085;
-  font-size: 20rpx;
+  font-size: var(--font-size-aux);
 }
 
 .c12-field-window__steps {
@@ -480,7 +480,7 @@
 .c12-students__title {
   padding: 0 2rpx;
   color: #202124;
-  font-size: 28rpx;
+  font-size: var(--font-size-section);
   font-weight: 600;
 }
 
@@ -516,7 +516,7 @@
   border-radius: 32rpx;
   background: #f3f4f6;
   color: #667085;
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
   font-weight: 600;
 }
 
@@ -526,7 +526,7 @@
   flex: 1;
   margin-left: 0;
   color: #202124;
-  font-size: 28rpx;
+  font-size: var(--font-size-body);
   font-weight: 600;
   line-height: 1.25;
   text-overflow: ellipsis;
@@ -552,7 +552,7 @@
 .c12-metric-cell__label {
   overflow: hidden;
   color: #667085;
-  font-size: 20rpx;
+  font-size: var(--font-size-aux);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -566,7 +566,7 @@
   border: 1rpx solid #e7eaf0;
   border-radius: 12rpx;
   color: #202124;
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
   text-align: center;
 }
 
@@ -580,7 +580,7 @@
   border-radius: 12rpx;
   background: #fff7e6;
   color: #ad6800;
-  font-size: 20rpx;
+  font-size: var(--font-size-aux);
 }
 
 .c12-metric-cell__status--recorded {
@@ -599,7 +599,7 @@
 
 .c12-student-card__missing,
 .c12-student-card__invalid {
-  font-size: 20rpx;
+  font-size: var(--font-size-aux);
 }
 
 .c12-student-card__missing {
@@ -620,5 +620,5 @@
   border-radius: 12rpx;
   background: #f6f7f9;
   color: #202124;
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
 }

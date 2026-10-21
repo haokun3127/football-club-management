@@ -136,8 +136,8 @@ describe("parent schedule hero", () => {
     expect(title).not.toContain("position: absolute");
     expect(title).toContain("display: flex");
     expect(title).toContain("align-items: center");
-    expect(title).toContain("font-size: 36rpx");
-    expect(title).toContain("line-height: 44rpx");
+    expect(title).toContain("font-size: var(--font-size-display)");
+    expect(title).toContain("line-height: 1.5");
   });
 
   it("keeps one 88rpx content-box custom navigation rule", () => {
@@ -197,7 +197,7 @@ describe("parent schedule hero", () => {
     expect(styles).toMatch(/\.month-day--selected \.month-day__number\s*\{[^}]*background: #a80f1b/);
     expect(styles).toMatch(/\.month-calendar__collapse\s*\{[^}]*width:\s*60rpx[^}]*height:\s*32rpx[^}]*border-radius:\s*16rpx/s);
     expect(styles).toMatch(/\.month-calendar__collapse-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx[^}]*transform:\s*none/s);
-    expect(styles).toMatch(/\.month-calendar__hint\s*\{[^}]*font-size:\s*22rpx[^}]*line-height:\s*30rpx/s);
+    expect(styles).toMatch(/\.month-calendar__hint\s*\{[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)[^}]*line-height:\s*1\.5/s);
     expect(styles).toMatch(/\.week-nav__expand\s*\{[^}]*width:\s*60rpx[^}]*height:\s*32rpx[^}]*border-radius:\s*16rpx/s);
     expect(styles).toMatch(/\.week-nav__expand-icon\s*\{[^}]*width:\s*16rpx[^}]*height:\s*16rpx/s);
     expect(styles).toMatch(/\.week-nav\s*\{[^}]*padding:\s*0\s+84rpx\s+0\s+12rpx/s);
@@ -228,7 +228,7 @@ describe("parent schedule hero", () => {
     expect(clock).toContain("height: 20rpx");
     expect(clock).toContain("border: 3rpx solid #6b7280");
     expect(chevron).toContain("color: #c0c8d2");
-    expect(chevron).toContain("font-size: 32rpx");
+    expect(chevron).toContain("font-size: var(--font-size-body)");
     expect(bellDot).toContain("box-sizing: border-box");
     expect(bellDot).toContain("width: 16rpx");
     expect(bellDot).toContain("height: 16rpx");

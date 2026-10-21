@@ -10,8 +10,8 @@ describe("shared app header", () => {
     expect(template).toContain('src="/assets/icons/chevron-left.svg"');
     expect(stylesheet).toMatch(/\.app-header__content\s*\{[^}]*padding-left:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.app-header__back\s*\{[^}]*width:\s*80rpx[^}]*height:\s*80rpx[^}]*padding:\s*16rpx[^}]*margin-left:\s*0/s);
-    expect(stylesheet).toMatch(/\.app-header__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
-    expect(stylesheet).toMatch(/\.app-header__action\s*\{[^}]*min-height:\s*80rpx[^}]*font-size:\s*30rpx/s);
+    expect(stylesheet).toMatch(/\.app-header__title\s*\{[^}]*font-size:\s*var\(--font-size-display\)[^}]*line-height:\s*44rpx/s);
+    expect(stylesheet).toMatch(/\.app-header__action\s*\{[^}]*min-height:\s*80rpx[^}]*font-size:\s*var\(--font-size-body\)/s);
   });
 
   it("keeps a normal-flow reservation while the visible navigation stays fixed", () => {

@@ -35,7 +35,7 @@
 出勤记录与财务扣费分别处理</view>
       <view class="attendance-links"><text bindtap="openAttendance">完整名单</text><text data-action="records" bindtap="openAction">修改历史</text></view>
       <view wx:if="{{attendanceSaving}}" class="subtitle">正在保存出勤...</view>
-      <view wx:if="{{attendanceError}}" class="attendance-error">{{attendanceError}}</view><button wx:if="{{attendanceNeedsRefresh}}" size="mini" bindtap="retry">刷新核对</button>
+      <view wx:if="{{attendanceError}}" class="attendance-error">{{attendanceError}}</view><t-button wx:if="{{attendanceNeedsRefresh}}" size="small" bindtap="retry" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">刷新核对</t-button>
     </view>
 
     <view wx:if="{{hasTraining}}" class="workbench-card">
@@ -45,10 +45,10 @@
       </view>
       <view wx:if="{{!hasConfiguredContent}}" class="training-card__summary">本堂课尚未添加训练内容</view>
       <view wx:for="{{contentGroups}}" wx:key="id" class="training-content-group"><view class="training-content-group__title">{{item.label}}</view><view wx:for="{{item.items}}" wx:for-item="content" wx:key="id" class="training-content-item"><text>{{content.name}}</text><text class="training-content-item__minutes">{{content.minutesLabel}}</text></view></view>
-      <view wx:if="{{canEditTraining}}" class="training-tools"><button data-mode="templates" bindtap="openTransfer">套用模板</button><button data-mode="copy" bindtap="openTransfer">复制到其他课</button><button data-mode="save" bindtap="openTransfer">保存为模板</button></view>
+      <view wx:if="{{canEditTraining}}" class="training-tools"><t-button data-mode="templates" bindtap="openTransfer" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">套用模板</t-button><t-button data-mode="copy" bindtap="openTransfer" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">复制到其他课</t-button><t-button data-mode="save" bindtap="openTransfer" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">保存为模板</t-button></view>
       <view wx:if="{{canWrite && hasConfiguredContent}}" class="training-card__edit" data-action="training-assessment" bindtap="openAction">课堂记录 →</view>
       <view wx:if="{{contentMinutesLabel}}" class="training-content-total">{{contentMinutesLabel}}</view>
-      <button wx:if="{{hiddenContentCount}}" size="mini" class="training-content-expand" bindtap="toggleContent">{{contentExpanded ? '收起' : '展开全部'}}{{contentExpanded ? '' : ' · 另有 ' + hiddenContentCount + ' 项'}}</button>
+      <t-button wx:if="{{hiddenContentCount}}" size="small" class="training-content-expand" bindtap="toggleContent" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="training-content-expand" theme="primary" variant="text">{{contentExpanded ? '收起' : '展开全部'}}{{contentExpanded ? '' : ' · 另有 ' + hiddenContentCount + ' 项'}}</t-button>
     </view>
 
     <view wx:if="{{isTraining}}" class="workbench-card course-assessment">
@@ -79,17 +79,17 @@
     </view>
     </block>
   </view>
-  <view wx:if="{{isTraining && !transferVisible && canEditTraining}}" class="course-footer"><button class="course-primary" data-action="change" bindtap="openAction">变更本次训练</button></view>
+  <view wx:if="{{isTraining && !transferVisible && canEditTraining}}" class="course-footer"><t-button class="course-primary" data-action="change" bindtap="openAction" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="course-primary" theme="primary" variant="base">变更本次训练</t-button></view>
   <role-tabbar wx:if="{{!isTraining && !transferVisible}}" role="coach" active="schedule" />
-  <view wx:if="{{transferVisible}}" class="transfer-mask"><view class="transfer-sheet"><view class="transfer-head"><text>{{transferMode === 'save' ? '保存个人模板' : transferMode === 'templates' ? '套用模板' : '复制课程内容'}}</text><button disabled="{{transferBusy}}" bindtap="closeTransfer">关闭</button></view>
+  <view wx:if="{{transferVisible}}" class="transfer-mask"><view class="transfer-sheet"><view class="transfer-head"><text>{{transferMode === 'save' ? '保存个人模板' : transferMode === 'templates' ? '套用模板' : '复制课程内容'}}</text><t-button disabled="{{transferBusy}}" bindtap="closeTransfer" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">关闭</t-button></view>
     <scroll-view scroll-y class="transfer-scroll">
       <view class="transfer-hint">模板和复制均排除友谊赛内容及其记录。</view>
-      <view wx:if="{{transferMode === 'save'}}"><input class="transfer-input" value="{{templateTitle}}" bindinput="onTemplateTitle" placeholder="模板名称" maxlength="80" /><button class="transfer-primary" disabled="{{transferBusy}}" bindtap="saveTemplate">保存个人模板</button></view>
+      <view wx:if="{{transferMode === 'save'}}"><t-input class="transfer-input" value="{{templateTitle}}" bindchange="onTemplateTitle" placeholder="模板名称" maxlength="80"  borderless t-class="transfer-input" /><t-button class="transfer-primary" disabled="{{transferBusy}}" bindtap="saveTemplate" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="transfer-primary" theme="primary" variant="base">保存个人模板</t-button></view>
       <block wx:if="{{transferMode === 'templates' && !transferPreview}}"><view wx:for="{{templates}}" wx:key="id" class="transfer-item" data-id="{{item.id}}" bindtap="selectTemplate"><view>{{item.title}} · {{item.visibility === 'club' ? '俱乐部' : '个人'}}</view><view class="transfer-hint">{{item.summary}}</view></view><view wx:if="{{!hasTemplates}}" class="transfer-hint">暂无可用模板</view></block>
       <view wx:if="{{transferPreview}}"><view class="transfer-title">{{transferPreview.title}}</view><view class="transfer-hint">{{transferPreview.count}}项 · {{transferPreview.configuredMinutes}}分钟</view><view wx:for="{{transferPreview.items}}" wx:key="id" class="transfer-item">{{item.name}} · {{item.configuredMinutes}}分钟</view><view wx:for="{{transferPreview.excluded}}" wx:key="*this" class="transfer-hint">已排除：{{item}}</view>
-        <view wx:for="{{transferTargets}}" wx:key="eventId" class="transfer-target"><view class="transfer-title">{{item.title}}</view><view class="transfer-hint">{{item.dateLabel}}</view><view class="transfer-hint">已有内容：{{item.existingLabel}}</view><button disabled="{{transferBusy}}" class="{{item.action === 'replace' ? 'transfer-selected' : ''}}" data-id="{{item.eventId}}" bindtap="toggleTransferTarget">{{item.action === 'replace' ? '已选：替换此课内容' : '跳过此课 · 点击选择替换'}}</button></view>
+        <view wx:for="{{transferTargets}}" wx:key="eventId" class="transfer-target"><view class="transfer-title">{{item.title}}</view><view class="transfer-hint">{{item.dateLabel}}</view><view class="transfer-hint">已有内容：{{item.existingLabel}}</view><t-button disabled="{{transferBusy}}" class="{{item.action === 'replace' ? 'transfer-selected' : ''}}" data-id="{{item.eventId}}" bindtap="toggleTransferTarget" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="{{item.action === 'replace' ? 'transfer-selected' : ''}}" theme="primary" variant="text">{{item.action === 'replace' ? '已选：替换此课内容' : '跳过此课 · 点击选择替换'}}</t-button></view>
       </view>
       <view class="transfer-message">{{transferMessage}}</view><view wx:for="{{transferResults}}" wx:key="eventId" class="transfer-item">{{item.title}} · {{item.label}}</view>
-      <button wx:if="{{transferPreview && hasTransferTargets}}" class="transfer-primary" disabled="{{transferBusy}}" bindtap="confirmTransfer">{{transferBusy ? '处理中…' : '确认保存所选课程'}}</button>
+      <t-button wx:if="{{transferPreview && hasTransferTargets}}" class="transfer-primary" disabled="{{transferBusy}}" bindtap="confirmTransfer" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="transfer-primary" theme="primary" variant="base">{{transferBusy ? '处理中…' : '确认保存所选课程'}}</t-button>
     </scroll-view></view></view>
 </view>

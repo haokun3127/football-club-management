@@ -143,9 +143,9 @@ describe("coach test-task create", () => {
   });
 
   it("renders the form affordances without template JS", () => {
-    expect(template).toContain('bindinput="onTitleInput"');
+    expect(template).toContain('bindchange="onTitleInput"');
     expect(template).toContain('bindchange="onTemplateChange"');
-    expect(template).toContain('bindinput="onTermLabelInput"');
+    expect(template).toContain('bindchange="onTermLabelInput"');
     expect(template).toContain('mode="date"');
     expect(template).toContain('bindtap="primaryAction"');
     expect(template).not.toMatch(/\{\{item\.(?:map|filter|slice|indexOf)/);

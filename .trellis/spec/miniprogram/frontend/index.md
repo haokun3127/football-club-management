@@ -26,6 +26,7 @@
 
 | 文件 | 职责 | 状态 |
 | --- | --- | --- |
+| [原生通用组件](./ui-components.md) | TDesign接入、事件与主题、原生验证 | Active |
 | [配置与分包](./configuration-and-packaging.md) | 项目配置、基础库、路由、HTTPS、上传文件与包体 | Active |
 | [隐私与开放能力](./privacy-and-capabilities.md) | 隐私清单、同步同意、注销、登录密钥与付费能力 | Active |
 | [性能与兼容性](./performance-and-compatibility.md) | 废弃 API、异常、`setData`、定时器、能力检测与 Audits | Active |

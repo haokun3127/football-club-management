@@ -1,4 +1,7 @@
 {
   "navigationBarTitleText": "复制课程内容",
-  "navigationStyle": "custom"
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "t-button": "tdesign-miniprogram/button/button"
+  }
 }

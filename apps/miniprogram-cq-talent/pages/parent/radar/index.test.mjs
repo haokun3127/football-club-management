@@ -209,7 +209,7 @@ describe("parent ability radar", () => {
   it("keeps the refreshed P5 geometry tokens aligned with the 375px Figma frame", () => {
     const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
     expect(stylesheet).toMatch(/\.p5-nav__back\s*\{[^}]*width:\s*48rpx[^}]*height:\s*80rpx/s);
-    expect(stylesheet).toContain("font-size: 36rpx");
+    expect(stylesheet).toContain("font-size: var(--font-size-display)");
     expect(stylesheet).toContain(".p5-players { width: 100%; white-space: nowrap; background: #f6f7f9; }");
     expect(stylesheet).toMatch(/\.p5-body\s*\{[^}]*padding:\s*32rpx\s+32rpx\s+calc\(200rpx/s);
     expect(stylesheet).toContain(".rhero { display: flex; flex-direction: column; gap: 40rpx;");

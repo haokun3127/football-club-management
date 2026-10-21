@@ -11,24 +11,24 @@
 /* 白底成长概览：姓名 + 姓氏徽章 + 红色队伍行 + 红色大数字统计 */
 .p4-overview { display: flex; flex-direction: column; gap: 20rpx; padding: 40rpx; border-radius: 32rpx; background: var(--color-card); box-shadow: var(--club-shadow); }
 .p4-overview__head { display: flex; align-items: center; justify-content: space-between; gap: 24rpx; }
-.p4-overview__name { min-width: 0; overflow: hidden; color: var(--club-text); font-size: 36rpx; font-weight: 700; line-height: 48rpx; text-overflow: ellipsis; white-space: nowrap; }
-.p4-overview__avatar { display: flex; flex: 0 0 72rpx; align-items: center; justify-content: center; width: 72rpx; height: 72rpx; border-radius: 36rpx; background: var(--color-brand); color: var(--color-card); font-size: 30rpx; font-weight: 700; }
-.p4-overview__team { color: var(--color-brand); font-size: 26rpx; line-height: 38rpx; }
+.p4-overview__name { min-width: 0; overflow: hidden; color: var(--club-text); font-size: var(--font-size-body); font-weight: 700; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
+.p4-overview__avatar { display: flex; flex: 0 0 72rpx; align-items: center; justify-content: center; width: 72rpx; height: 72rpx; border-radius: 36rpx; background: var(--color-brand); color: var(--color-card); font-size: var(--font-size-body); font-weight: 700; }
+.p4-overview__team { color: var(--color-brand); font-size: var(--font-size-aux); line-height: 1.5; }
 .p4-overview__stats { display: flex; box-sizing: border-box; padding-top: 8rpx; }
 .p4-overview__stat { display: flex; flex: 1; flex-direction: column; gap: 6rpx; }
 .p4-overview__stat-value { color: var(--color-brand); font-size: 64rpx; font-weight: 700; line-height: 76rpx; font-variant-numeric: tabular-nums; }
-.p4-overview__stat-label { color: var(--club-muted); font-size: 22rpx; line-height: 30rpx; }
-.p4-overview__summary { padding-top: 16rpx; border-top: 1rpx solid var(--club-line); color: var(--club-muted); font-size: 24rpx; line-height: 34rpx; }
+.p4-overview__stat-label { color: var(--club-muted); font-size: var(--font-size-aux); line-height: 1.5; }
+.p4-overview__summary { padding-top: 16rpx; border-top: 1rpx solid var(--club-line); color: var(--club-muted); font-size: var(--font-size-aux); line-height: 1.5; }
 
 .p4-card { display: flex; flex-direction: column; gap: 24rpx; padding: 32rpx; border-radius: 32rpx; background: var(--color-card); box-shadow: var(--club-shadow); }
 .p4-card__head { display: flex; align-items: center; justify-content: space-between; }
-.p4-card__title { color: var(--club-text); font-size: 28rpx; font-weight: 700; }
-.p4-card__link { color: var(--color-brand); font-size: 26rpx; font-weight: 600; }
-.p4-card__empty { display: flex; align-items: center; justify-content: center; min-height: 96rpx; color: var(--club-muted); font-size: 24rpx; line-height: 34rpx; text-align: center; }
-.p4-match-history .p4-card__summary { color: var(--club-muted); font-size: 24rpx; line-height: 34rpx; }
+.p4-card__title { color: var(--club-text); font-size: var(--font-size-section); font-weight: 700; }
+.p4-card__link { color: var(--color-brand); font-size: var(--font-size-aux); font-weight: 600; }
+.p4-card__empty { display: flex; align-items: center; justify-content: center; min-height: 96rpx; color: var(--club-muted); font-size: var(--font-size-aux); line-height: 1.5; text-align: center; }
+.p4-match-history .p4-card__summary { color: var(--club-muted); font-size: var(--font-size-aux); line-height: 1.5; }
 
 /* 能力组合概览：浅色雷达预览 */
-.p4-ability__foot { color: var(--club-muted); font-size: 22rpx; line-height: 32rpx; }
+.p4-ability__foot { color: var(--club-muted); font-size: var(--font-size-aux); line-height: 1.5; }
 .p4-radar-preview { position: relative; align-self: center; width: 560rpx; height: 560rpx; }
 .p4-radar-preview__grid { position: absolute; top: 50%; left: 50%; box-sizing: border-box; transform: translate(-50%,-50%); }
 .p4-radar-preview__grid--line { background: var(--club-line); }
@@ -38,19 +38,19 @@
 .p4-radar-preview__shapefill { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 336rpx; background: rgba(var(--color-brand-rgb), .32); transform: translate(-50%,-50%); }
 
 
-.p4-radar-preview__label { position: absolute; color: var(--club-text); font-size: 18rpx; line-height: 24rpx; white-space: nowrap; transform: translate(-50%,-50%); }
+.p4-radar-preview__label { position: absolute; color: var(--club-text); font-size: var(--font-size-aux); line-height: 1.5; white-space: nowrap; transform: translate(-50%,-50%); }
 .p4-radar-preview__dot { position: absolute; top: 50%; left: 50%; width: 12rpx; height: 12rpx; border-radius: 50%; background: var(--color-card); box-shadow: 0 0 0 4rpx var(--color-brand); transform: translate(-50%,-50%); }
 
 /* 成长足迹 */
 .p4-milestones { gap: 24rpx; }.p4-milestones__list { display: flex; flex-direction: column; gap: 24rpx; width: 100%; }
 .p4-milestone { display: flex; align-items: center; gap: 24rpx; min-height: 48rpx; }
-.p4-milestone__dot { display: flex; flex: 0 0 48rpx; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; border-radius: 24rpx; background: var(--color-success-soft); color: var(--color-success); font-size: 24rpx; font-weight: 700; }
+.p4-milestone__dot { display: flex; flex: 0 0 48rpx; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; border-radius: 24rpx; background: var(--color-success-soft); color: var(--color-success); font-size: var(--font-size-aux); font-weight: 700; }
 .p4-milestone__dot--red { background: var(--color-error-soft); color: var(--color-brand); }.p4-milestone__dot--blue { background: var(--color-info-soft); color: var(--color-info); }
-.p4-milestone__title { flex: 1; min-width: 0; color: var(--club-text); font-size: 26rpx; }
-.p4-milestone__state { padding: 4rpx 12rpx; border-radius: 8rpx; background: var(--color-error-soft); color: var(--color-brand); font-size: 20rpx; font-weight: 600; }.p4-milestone__state--green { background: var(--color-success-soft); color: var(--color-success); }.p4-milestone__state--blue { background: var(--color-info-soft); color: var(--color-info); }
+.p4-milestone__title { flex: 1; min-width: 0; color: var(--club-text); font-size: var(--font-size-section); }
+.p4-milestone__state { padding: 4rpx 12rpx; border-radius: 8rpx; background: var(--color-error-soft); color: var(--color-brand); font-size: var(--font-size-aux); font-weight: 600; }.p4-milestone__state--green { background: var(--color-success-soft); color: var(--color-success); }.p4-milestone__state--blue { background: var(--color-info-soft); color: var(--color-info); }
 
 /* 训练历程 */
-.p4-chart-card { gap: 28rpx; }.p4-bars { display: flex; align-items: flex-end; width: 100%; height: 160rpx; gap: 8rpx; }.p4-bar { flex: 1; min-height: 8rpx; border-radius: 4rpx 4rpx 0 0; background: var(--color-brand); }.p4-months { display: flex; justify-content: space-between; width: 100%; color: var(--club-muted); font-size: 20rpx; }
+.p4-chart-card { gap: 28rpx; }.p4-bars { display: flex; align-items: flex-end; width: 100%; height: 160rpx; gap: 8rpx; }.p4-bar { flex: 1; min-height: 8rpx; border-radius: 4rpx 4rpx 0 0; background: var(--color-brand); }.p4-months { display: flex; justify-content: space-between; width: 100%; color: var(--club-muted); font-size: var(--font-size-aux); }
 
 /* 当前评价（P08 227:2126：per-team current evaluation; no fabricated coach copy） */
-.p4-evaluations{display:flex;flex-direction:column;gap:24rpx}.p4-evaluation-card{padding:32rpx;border:1rpx solid var(--club-line);border-radius:28rpx;background:var(--color-card);box-shadow:var(--club-shadow);display:flex;flex-direction:column;gap:12rpx}.p4-evaluation-title{font-size:32rpx;line-height:48rpx;color:var(--club-text)}.p4-evaluation-text{font-size:30rpx;line-height:48rpx;color:var(--club-muted);white-space:pre-wrap}.p4-evaluation-author{font-size:26rpx;line-height:40rpx;color:var(--color-brand)}
+.p4-evaluations{display:flex;flex-direction:column;gap:24rpx}.p4-evaluation-card{padding:32rpx;border:1rpx solid var(--club-line);border-radius:28rpx;background:var(--color-card);box-shadow:var(--club-shadow);display:flex;flex-direction:column;gap:12rpx}.p4-evaluation-title{font-size: var(--font-size-section);line-height: 1.5;color:var(--club-text)}.p4-evaluation-text{font-size: var(--font-size-body);line-height: 1.5;color:var(--club-muted);white-space:pre-wrap}.p4-evaluation-author{font-size: var(--font-size-aux);line-height: 1.5;color:var(--color-brand)}

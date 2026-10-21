@@ -10,7 +10,7 @@
 .page-nav { position: sticky; top: 0; z-index: 100; height: 88rpx; box-sizing: content-box; display: flex; align-items: center; padding: 0 200rpx 0 32rpx; background: var(--color-card); }
 .page-nav__back { width: 48rpx; height: 48rpx; display: flex; align-items: center; justify-content: center; }
 .page-nav__back image { width: 48rpx; height: 48rpx; }
-.page-nav__title { margin-left: 0; flex: 1; font-size: 36rpx; font-weight: 700; color: var(--color-text); text-align: left; }
+.page-nav__title { margin-left: 0; flex: 1; font-size: var(--font-size-display); font-weight: 700; color: var(--color-text); text-align: left; }
 .page-nav__spacer { width: 48rpx; height: 48rpx; }
 
 /* 表单卡 */
@@ -22,7 +22,7 @@
 }
 
 .form-card__title {
-  font-size: 28rpx;
+  font-size: var(--font-size-section);
   font-weight: 700;
   color: var(--color-text);
   margin-bottom: 32rpx;
@@ -33,7 +33,7 @@
 }
 
 .field__label {
-  font-size: 26rpx;
+  font-size: var(--font-size-aux);
   font-weight: 600;
   color: var(--color-text);
   margin-bottom: 16rpx;
@@ -48,7 +48,7 @@
   height: 96rpx;
   box-sizing: border-box;
   padding: 0 24rpx;
-  font-size: 28rpx;
+  font-size: var(--font-size-body);
   color: var(--color-text);
 }
 
@@ -78,7 +78,7 @@
   border-radius: 16rpx;
   padding: 24rpx;
   min-height: 160rpx;
-  font-size: 26rpx;
+  font-size: var(--font-size-aux);
   color: var(--color-text);
 }
 
@@ -108,7 +108,7 @@
   border-radius: 12rpx;
   background: var(--color-card);
   color: var(--color-text);
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
   line-height: 1.35;
   white-space: nowrap;
 }
@@ -138,7 +138,7 @@
 
 .form-message {
   margin-top: 32rpx;
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
   color: var(--color-brand);
 }
 
@@ -158,7 +158,7 @@
   border-radius: 52rpx;
   padding: 26rpx 0;
   text-align: center;
-  font-size: 32rpx;
+  font-size: var(--font-size-body);
   font-weight: 600;
   color: #ffffff;
 }
@@ -170,6 +170,6 @@
 .submit-hint {
   margin-top: 16rpx;
   text-align: center;
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
   color: var(--color-text-secondary);
 }

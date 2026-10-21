@@ -1,7 +1,7 @@
 <view wx:if="{{state !== 'ready' && state !== 'idle'}}" class="status status--{{state}} {{compact ? 'status--compact' : ''}}">
-  <view wx:if="{{state === 'loading'}}" class="status__spinner"></view>
-  <view wx:elif="{{symbol}}" class="status__symbol">{{symbol}}</view>
+  <t-loading wx:if="{{state === 'loading'}}" theme="circular" size="24px" aria-label="正在加载" />
+  <t-icon wx:elif="{{state === 'error' || state === 'success' || state === 'pending'}}" name="{{state === 'error' ? 'error-circle' : state === 'success' ? 'check-circle' : 'time'}}" size="28px" color="{{state === 'error' ? 'var(--color-error)' : 'var(--color-brand)'}}" />
   <view wx:if="{{title}}" class="status__title">{{title}}</view>
   <view wx:if="{{message}}" class="status__message">{{message}}</view>
-  <button wx:if="{{actionText}}" class="status__action" bindtap="handleAction">{{actionText}}</button>
+  <t-button wx:if="{{actionText}}" class="status__action" bindtap="handleAction" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="status__action" theme="primary" variant="text">{{actionText}}</t-button>
 </view>

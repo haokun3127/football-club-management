@@ -161,7 +161,7 @@ describe("P01 visual alignment (V-01/V-05)", () => {
   });
 
   it("constrains the child-switch button and lets long names ellipsis with a full-name path", () => {
-    expect(template).toContain('<button class="child-button" bindtap="toggleChildren">切换孩子</button>');
+    expect(template).toMatch(/<t-button class="child-button"[^>]*bindtap="toggleChildren"[^>]*>切换孩子<\/t-button>/);
     expect(template).toContain('<student-switcher wx:if="{{showChildren}}"');
     expect(stylesheet).toMatch(/\.child-button\s*\{[^}]*min-width:\s*0[^}]*max-width:\s*220rpx[^}]*overflow:\s*hidden[^}]*text-overflow:\s*ellipsis/s);
     expect(stylesheet).toMatch(/\.player-name\s*\{[^}]*flex:\s*1\s+1\s+auto[^}]*min-width:\s*0[^}]*text-overflow:\s*ellipsis/s);

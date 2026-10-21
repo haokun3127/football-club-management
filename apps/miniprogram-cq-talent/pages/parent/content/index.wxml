@@ -41,7 +41,7 @@
       <view class="section-title">最近文章</view>
       <view class="article-list">
         <view wx:if="{{searchOpen}}" class="search-bar">
-          <input class="search-bar__input" value="{{searchQuery}}" placeholder="搜索文章标题或内容" bindinput="onSearchInput" focus="{{true}}" />
+          <t-input class="search-bar__input" value="{{searchQuery}}" placeholder="搜索文章标题或内容" bindchange="onSearchInput" focus="{{true}}"  borderless t-class="search-bar__input" />
         </view>
         <view wx:if="{{hasVisibleArticles}}">
           <view wx:for="{{visibleArticles}}" wx:key="id" class="article-card" data-id="{{item.id}}" bindtap="openArticle">

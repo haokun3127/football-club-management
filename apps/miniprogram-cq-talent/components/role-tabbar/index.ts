@@ -66,6 +66,10 @@ Component({
     },
   },
   methods: {
+    handleChange(event: { detail: { value?: string } }) {
+      const item = (this.data.items as Array<TabItem>).find((entry) => entry.key === event.detail.value);
+      if (item && item.key !== this.data.active) wx.reLaunch({ url: item.path });
+    },
     handleTap(this: any, event: { currentTarget: { dataset: { key?: string; path?: string } } }) {
       const { key, path } = event.currentTarget.dataset;
       if (!path || key === this.data.active) return;

@@ -5,7 +5,7 @@
     <view class="privacy-overlay__desc">复制微信号等能力需要先阅读并同意{{contractName}}。</view>
     <view class="privacy-overlay__link" bindtap="openContract">查看{{contractName}}</view>
     <view class="privacy-overlay__actions">
-      <button class="privacy-overlay__button privacy-overlay__button--secondary" bindtap="handleDisagree">暂不</button>
+      <t-button class="privacy-overlay__button privacy-overlay__button--secondary" bindtap="handleDisagree" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="privacy-overlay__button privacy-overlay__button--secondary" theme="default" variant="outline">暂不</t-button>
       <button id="privacy-agree-btn" class="privacy-overlay__button privacy-overlay__button--primary" open-type="agreePrivacyAuthorization" bindagreeprivacyauthorization="handleAgree">同意并继续</button>
     </view>
   </view>

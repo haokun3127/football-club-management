@@ -16,7 +16,7 @@
         <view class="match-event-form__field">
           <view class="section-title">时间</view>
           <view class="minute-control">
-            <input class="minute-control__input" type="number" placeholder="请输入分钟（可选）" value="{{minute}}" bindinput="onMinuteInput" />
+            <t-input class="minute-control__input" type="number" placeholder="请输入分钟（可选）" value="{{minute}}" bindchange="onMinuteInput"  borderless t-class="minute-control__input" />
             <view class="minute-control__arrows">
               <view class="minute-control__arrow minute-control__arrow--up"></view>
               <view class="minute-control__arrow minute-control__arrow--down"></view>
@@ -36,7 +36,7 @@
 
         <view class="match-event-form__field">
           <view class="section-title">备注</view>
-          <textarea class="note-input" maxlength="500" placeholder="补充说明（选填）" value="{{note}}" bindinput="onNoteInput" />
+          <t-textarea class="note-input" maxlength="500" placeholder="补充说明（选填）" value="{{note}}" bindchange="onNoteInput"  t-class="note-input" />
         </view>
       </view>
       <view wx:if="{{hasSubmitError}}" class="submit-error">{{submitError}}</view>

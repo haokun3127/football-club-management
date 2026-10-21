@@ -161,12 +161,12 @@ describe("coach help", () => {
     expect(template).toContain("支持方式待配置");
     expect([...template.matchAll(/\bbind(?:tap|input|longpress|change|submit|action)\s*=/g)]).toHaveLength(4);
     expect(template).toMatch(/class="c164-nav__back"[^>]*bindtap="goBack"/);
-    expect(template).toMatch(/class="c164-search__input"[^>]*bindinput="onSearchInput"/);
+    expect(template).toMatch(/class="c164-search__input"[^>]*bindchange="onSearchInput"/);
     expect(template).not.toMatch(/出勤操作|活动管理|评分评估|私教流程|账号权限|客服电话|公众号|在线咨询|工作日\s*9:00|文字图标/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toMatch(/TOPICS|showToast|showModal|getStorage|setStorage|contactWechat|openSupport/);
     expect(stylesheet).toMatch(/\.c164-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*background:\s*#fceeef)/s);
-    expect(stylesheet).toMatch(/\.c164-nav__title\s*\{[^}]*flex:\s*1[^}]*font-size:\s*36rpx[^}]*text-align:\s*left/s);
+    expect(stylesheet).toMatch(/\.c164-nav__title\s*\{[^}]*flex:\s*1[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)[^}]*text-align:\s*left/s);
     expect(stylesheet).toMatch(/\.c164-nav__spacer\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
     expect(stylesheet).toMatch(/\.c164-page__body\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+180rpx/s);
     expect(stylesheet).toMatch(/\.c164-content\s*\{[^}]*gap:\s*40rpx/s);

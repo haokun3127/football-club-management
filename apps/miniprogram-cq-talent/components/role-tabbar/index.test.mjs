@@ -35,63 +35,30 @@ describe("role tabbar real-device icon contract", () => {
     expect(controller.indexOf('key: "discover"')).toBeLessThan(controller.indexOf('key: "child"'));
   });
 
-  it("uses precomputed PNG icon paths for both active states", () => {
-    expect(controller).toContain("activeIcon");
-    expect(controller).toContain("inactiveIcon");
-    expect(controller).toMatch(/icon:\s*item\.key === active/);
-    expect(controller).toMatch(/activeIcon:\s*"\/assets\/icons\/tab-[^"]+-active\.png"/);
-    expect(controller).toMatch(/inactiveIcon:\s*"\/assets\/icons\/tab-[^"]+-inactive\.png"/);
-    expect(controller).not.toContain("tab-calendar.svg");
-    expect(controller).not.toContain("tab-growth.svg");
-    expect(controller).not.toContain("tab-child.svg");
-    expect(controller).not.toContain("tab-training.svg");
-    expect(controller).not.toContain("tab-user.svg");
-    expect(template).not.toMatch(/\.(map|filter|slice|indexOf)\s*\(/);
-    expect(template).toContain('class="tabbar tabbar--{{role}} {{flow ? \'tabbar--flow\' : \'\'}} {{theme === \'dark\' ? \'tabbar--dark\' : \'\'}}"');
-    expect(template).toContain("<cover-image class=\"tabbar-icon\" src=\"{{item.icon}}\" />");
-    expect(styles).not.toContain("opacity: .48");
+  it("uses the official safe-area tabbar with stable icon slots", () => {
+    expect(template).toContain('<t-tab-bar value="{{active}}" fixed="{{!flow}}" safe-area-inset-bottom');
+    expect(template).toContain('bindchange="handleChange"');
+    expect(template).toContain('slot="icon"');
+    expect(template).toContain('src="{{item.icon}}"');
+    expect(styles).not.toContain("9999");
   });
 
-  it("keeps parent activity affordances separate from coach tab states", () => {
-    expect(template).toContain('class="tabbar tabbar--{{role}} {{flow ? \'tabbar--flow\' : \'\'}} {{theme === \'dark\' ? \'tabbar--dark\' : \'\'}}"');
-    expect(styles).toContain(".tabbar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 9999; display: flex; box-sizing: border-box; height: 140rpx;");
-    expect(styles).toContain(".tabbar-icon-wrap { position: static; display: flex; align-items: center; justify-content: center; width: 40rpx; height: 40rpx;");
-    expect(styles).toContain(".tabbar-icon { width: 36rpx; height: 36rpx; }");
-    expect(styles).toContain(".tabbar--parent .tabbar-item.active { color: #a80f1b;");
-    expect(styles).toContain(".tabbar--parent .tabbar-item.active .tabbar-dot { top: 96rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: #a80f1b; }");
-    expect(styles).toContain(".tabbar--coach .tabbar-item.active .tabbar-dot { top: 96rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx; border-radius: 999rpx; background: var(--color-brand); }");
-    expect(styles).not.toContain(".tabbar-item.active .tabbar-icon-wrap { background: #fceeef; }");
-    expect(styles).not.toContain(".tabbar-item.active .tabbar-dot { background: var(--color-brand); }");
+  it("resolves official change values to registered paths and ignores current/unknown keys", async () => {
+    const ts = await import("typescript");
+    const vm = await import("node:vm");
+    let definition;
+    const navigated = [];
+    const js = ts.transpileModule(controller, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
+    vm.runInNewContext(js, { exports: {}, Component: (value) => { definition = value; }, wx: { reLaunch: ({url}) => navigated.push(url) } });
+    const page = { data: { items: [{key: "schedule", path: "/pages/coach/schedule/index"}, {key: "training", path: "/pages/coach/training/index"}], active: "schedule" } };
+    for (const value of ["schedule", "unknown", "training"]) definition.methods.handleChange.call(page, {detail:{value}});
+    expect(navigated).toEqual(["/pages/coach/training/index"]);
   });
 
-  it("places fixed tab content inside the Figma 70px overlay", () => {
-    expect(styles).toContain("height: 140rpx;");
-    expect(styles).toContain("padding-bottom: 0;");
-    expect(styles).not.toContain("padding-bottom: env(safe-area-inset-bottom);");
-    expect(styles).toContain(".tabbar-item { position: relative; display: flex; flex: 1; box-sizing: border-box; flex-direction: column; align-items: center; justify-content: flex-start; height: 140rpx; min-width: 0; padding-top: 12rpx;");
-    expect(styles).toContain("width: 40rpx; height: 40rpx;");
-    expect(styles).toContain(".tabbar-label { width: 100%; margin-top: 6rpx;");
-    expect(styles).toContain("line-height: 24rpx;");
-    expect(styles).toContain("text-align: center;");
-    expect(styles).toContain("top: 96rpx; left: 50%; width: 8rpx; height: 8rpx; margin-left: -4rpx;");
-  });
-
-  it("uses the live Figma tab typography and inactive color", () => {
-    expect(styles).toContain("color: #8e97a6;");
-    expect(styles).toContain("font-family: \"Noto Sans SC\", sans-serif;");
-    expect(styles).toContain("font-weight: 400;");
-    expect(styles).not.toContain("font-weight: 650;");
-  });
-
-  it("supports an opt-in flowing layout without changing the default fixed tab bar", () => {
+  it("keeps flow mode and dark chrome as optional shared themes", () => {
     expect(controller).toMatch(/flow:\s*\{\s*type:\s*Boolean,\s*value:\s*false/s);
-    expect(styles).toContain(".tabbar--flow { position: static; }");
-  });
-
-  it("supports an opt-in dark chrome for the P01 parent home", () => {
-    expect(controller).toMatch(/theme:\s*\{\s*type:\s*String,\s*value:\s*"light"/s);
-    expect(styles).toContain(".tabbar--dark { border-top-color: rgba(255,255,255,.08); background: var(--club-text); box-shadow: none; }");
-    expect(styles).toContain(".tabbar--dark .tabbar-item.active { color: #ffffff; }");
+    expect(styles).toContain(".role-tabs--dark");
+    expect(styles).toContain("--td-tab-bar-active-color");
   });
 
   it("ships all active and inactive icons as valid PNG files", () => {

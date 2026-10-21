@@ -9,7 +9,7 @@
 
 .page-nav { position: sticky; top: 0; z-index: 100; height: 88rpx; box-sizing: content-box; display: flex; align-items: center; padding: 0 200rpx 0 32rpx; background: var(--color-card); }
 .page-nav--plain { justify-content: space-between; }
-.page-nav__title { font-size: 40rpx; font-weight: 700; color: var(--color-text); }
+.page-nav__title { font-size: var(--font-size-display); font-weight: 700; color: var(--color-text); }
 .page-nav__action { width: 72rpx; height: 72rpx; display: flex; align-items: center; justify-content: center; border-radius: 36rpx; background: #f6f7f9; }
 .page-nav__action--disabled { opacity: 0.45; }
 .page-nav__action-icon { width: 36rpx; height: 36rpx; }
@@ -17,7 +17,7 @@
 .icon-search::after { content: ""; position: absolute; width: 12rpx; height: 4rpx; background: var(--color-text); right: -9rpx; bottom: -4rpx; transform: rotate(45deg); border-radius: 4rpx; }
 
 .section-title {
-  font-size: 32rpx;
+  font-size: var(--font-size-section);
   font-weight: 700;
   color: var(--color-text);
   margin: 48rpx 0 24rpx;
@@ -62,19 +62,19 @@
   background: rgba(255, 255, 255, 0.2);
   border: 1rpx solid rgba(255, 255, 255, 0.4);
   border-radius: 12rpx;
-  font-size: 22rpx;
+  font-size: var(--font-size-aux);
   font-weight: 700;
   color: #ffffff;
 }
 
 .featured-card__title {
-  font-size: 36rpx;
+  font-size: var(--font-size-section);
   font-weight: 700;
   color: #ffffff;
 }
 
 .featured-card__subtitle {
-  font-size: 26rpx;
+  font-size: var(--font-size-aux);
   color: rgba(255, 255, 255, 0.8);
 }
 
@@ -112,7 +112,7 @@
 }
 
 .quick-card__label {
-  font-size: 26rpx;
+  font-size: var(--font-size-aux);
   font-weight: 700;
   color: var(--color-text);
 }
@@ -154,7 +154,7 @@
 }
 
 .article-card__title {
-  font-size: 28rpx;
+  font-size: var(--font-size-section);
   font-weight: 700;
   color: var(--color-text);
   overflow: hidden;
@@ -164,7 +164,7 @@
 
 .article-card__subtitle {
   margin-top: 8rpx;
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
   color: var(--color-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -174,9 +174,9 @@
 .article-empty {
   padding: 48rpx 0;
   text-align: center;
-  font-size: 26rpx;
+  font-size: var(--font-size-aux);
   color: var(--color-text-secondary);
 }
 
 .search-bar { margin-bottom: 24rpx; }
-.search-bar__input { box-sizing: border-box; width: 100%; height: 72rpx; padding: 0 28rpx; border-radius: 16rpx; background: #f3f4f6; font-size: 26rpx; }
+.search-bar__input { box-sizing: border-box; width: 100%; height: 72rpx; padding: 0 28rpx; border-radius: 16rpx; background: #f3f4f6; font-size: var(--font-size-aux); }

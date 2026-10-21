@@ -1,16 +1,8 @@
-<cover-view class="tabbar tabbar--{{role}} {{flow ? 'tabbar--flow' : ''}} {{theme === 'dark' ? 'tabbar--dark' : ''}}">
-  <cover-view
-    wx:for="{{items}}"
-    wx:key="key"
-    class="tabbar-item {{active === item.key ? 'active' : ''}}"
-    data-key="{{item.key}}"
-    data-path="{{item.path}}"
-    bindtap="handleTap"
-  >
-    <cover-view class="tabbar-icon-wrap">
-      <cover-image class="tabbar-icon" src="{{item.icon}}" />
-      <cover-view class="tabbar-dot"></cover-view>
-    </cover-view>
-    <cover-view class="tabbar-label">{{item.label}}</cover-view>
-  </cover-view>
-</cover-view>
+<view class="role-tabs {{theme === 'dark' ? 'role-tabs--dark' : ''}}">
+  <t-tab-bar value="{{active}}" fixed="{{!flow}}" safe-area-inset-bottom split="{{false}}" z-index="30" bindchange="handleChange">
+    <t-tab-bar-item wx:for="{{items}}" wx:key="key" value="{{item.key}}" aria-label="{{item.label}}">
+      <image slot="icon" class="tabbar-icon" src="{{item.icon}}" mode="aspectFit" />
+      {{item.label}}
+    </t-tab-bar-item>
+  </t-tab-bar>
+</view>

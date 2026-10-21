@@ -2,39 +2,39 @@
 .team-nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; height: 88rpx; padding-left: 32rpx; box-sizing: content-box; background: #fceeef; }
 .team-nav__left { display: flex; align-items: center; gap: 0; min-height: 56rpx; }
 .team-nav__back { width: 48rpx; height: 48rpx; }
-.team-nav__title { color: #202124; font-size: 36rpx; font-weight: 700; line-height: 44rpx; }
+.team-nav__title { color: #202124; font-size: var(--font-size-display); font-weight: 700; line-height: 1.5; }
 
 .team-page__body { padding: 32rpx; }
 .hero { display: flex; flex-direction: column; gap: 16rpx; padding: 32rpx; border-radius: 32rpx; background: #07111f; }
-.hero__name { color: #ffffff; font-size: 34rpx; font-weight: 700; line-height: 42rpx; }
-.hero__season { align-self: flex-start; padding: 8rpx 20rpx; border-radius: 999rpx; background: rgba(255, 255, 255, 0.08); color: #ffffff; font-size: 24rpx; font-weight: 600; line-height: 32rpx; }
+.hero__name { color: #ffffff; font-size: var(--font-size-body); font-weight: 700; line-height: 1.5; }
+.hero__season { align-self: flex-start; padding: 8rpx 20rpx; border-radius: 999rpx; background: rgba(255, 255, 255, 0.08); color: #ffffff; font-size: var(--font-size-aux); font-weight: 600; line-height: 1.5; }
 .hero__stats { display: flex; gap: 24rpx; margin-top: 8rpx; }
 .hero-stat { flex: 1; min-width: 0; }
-.hero-stat__label { color: #94a3b8; font-size: 22rpx; line-height: 30rpx; white-space: nowrap; }
-.hero-stat__value { margin-top: 8rpx; color: #ffffff; font-size: 28rpx; font-weight: 700; line-height: 36rpx; }
+.hero-stat__label { color: #94a3b8; font-size: var(--font-size-aux); line-height: 1.5; white-space: nowrap; }
+.hero-stat__value { margin-top: 8rpx; color: #ffffff; font-size: var(--font-size-body); font-weight: 700; line-height: 1.5; }
 .hero-stat__value--positive { color: #10b981; }
 
-.members-title { margin: 32rpx 0 24rpx; color: #202124; font-size: 28rpx; font-weight: 700; line-height: 36rpx; }
+.members-title { margin: 32rpx 0 24rpx; color: #202124; font-size: var(--font-size-section); font-weight: 700; line-height: 1.5; }
 .members-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24rpx; }
 .member { display: flex; flex-direction: column; align-items: center; gap: 16rpx; min-width: 0; }
-.member__avatar { display: flex; width: 88rpx; height: 88rpx; align-items: center; justify-content: center; border-radius: 44rpx; font-size: 28rpx; font-weight: 700; }
-.member__name { max-width: 100%; overflow: hidden; color: #202124; font-size: 24rpx; font-weight: 600; line-height: 32rpx; text-overflow: ellipsis; white-space: nowrap; }
-.members-empty { padding: 28rpx; border-radius: 16rpx; background: #ffffff; color: #667085; font-size: 26rpx; line-height: 36rpx; }
+.member__avatar { display: flex; width: 88rpx; height: 88rpx; align-items: center; justify-content: center; border-radius: 44rpx; font-size: var(--font-size-body); font-weight: 700; }
+.member__name { max-width: 100%; overflow: hidden; color: #202124; font-size: var(--font-size-aux); font-weight: 600; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
+.members-empty { padding: 28rpx; border-radius: 16rpx; background: #ffffff; color: #667085; font-size: var(--font-size-aux); line-height: 1.5; }
 
 .coaches-section { margin-top: 32rpx; }
-.coaches-title { margin-bottom: 24rpx; color: #202124; font-size: 28rpx; font-weight: 700; line-height: 36rpx; }
+.coaches-title { margin-bottom: 24rpx; color: #202124; font-size: var(--font-size-section); font-weight: 700; line-height: 1.5; }
 .coaches-scroll { width: 100%; white-space: nowrap; }
 .coaches-scroll__content { display: flex; gap: 24rpx; width: max-content; padding-bottom: 4rpx; }
 .coach-card { width: 280rpx; height: 240rpx; overflow: hidden; box-sizing: border-box; display: flex; flex-direction: column; gap: 20rpx; padding: 24rpx; border: 2rpx solid #e7eaf0; border-radius: 24rpx; background: #ffffff; }
-.coach-card__avatar { display: flex; width: 88rpx; height: 88rpx; align-items: center; justify-content: center; border-radius: 44rpx; font-size: 28rpx; font-weight: 700; line-height: 34rpx; }
-.coach-card__name { overflow: hidden; color: #202124; font-size: 26rpx; font-weight: 700; line-height: 32rpx; text-overflow: ellipsis; white-space: nowrap; }
-.coach-card__role { align-self: flex-start; max-width: 100%; overflow: hidden; padding: 4rpx 16rpx; border-radius: 999rpx; background: #f3f4f6; color: #667085; font-size: 20rpx; font-weight: 700; line-height: 24rpx; text-overflow: ellipsis; white-space: nowrap; }
-.coaches-empty { padding: 28rpx; border-radius: 16rpx; background: #ffffff; color: #667085; font-size: 26rpx; line-height: 36rpx; }
+.coach-card__avatar { display: flex; width: 88rpx; height: 88rpx; align-items: center; justify-content: center; border-radius: 44rpx; font-size: var(--font-size-body); font-weight: 700; line-height: 1.5; }
+.coach-card__name { overflow: hidden; color: #202124; font-size: var(--font-size-aux); font-weight: 700; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
+.coach-card__role { align-self: flex-start; max-width: 100%; overflow: hidden; padding: 4rpx 16rpx; border-radius: 999rpx; background: #f3f4f6; color: #667085; font-size: var(--font-size-aux); font-weight: 700; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
+.coaches-empty { padding: 28rpx; border-radius: 16rpx; background: #ffffff; color: #667085; font-size: var(--font-size-aux); line-height: 1.5; }
 
 .team-selector { white-space: nowrap; margin-bottom: 20rpx; }
-.team-selector__item { display: inline-block; padding: 16rpx 24rpx; border-radius: 30rpx; background: #fff; margin-right: 12rpx; font-size: 26rpx; }
+.team-selector__item { display: inline-block; padding: 16rpx 24rpx; border-radius: 30rpx; background: #fff; margin-right: 12rpx; font-size: var(--font-size-aux); }
 .team-selector__item.is-active { color: #fff; background: #a80f1b; }
 .team-match { margin-top: 16rpx; padding: 24rpx; background: #fff; border-radius: 20rpx; border-left: 6rpx solid #a80f1b; }
-.team-match__title { font-weight: 600; font-size: 30rpx; }
-.team-match__subtitle { color: #667085; font-size: 24rpx; line-height: 1.6; margin-top: 8rpx; }
-.team-match__score { color: #a80f1b; font-weight: 700; margin-top: 12rpx; font-size: 28rpx; }
+.team-match__title { font-weight: 600; font-size: var(--font-size-section); }
+.team-match__subtitle { color: #667085; font-size: var(--font-size-aux); line-height: 1.6; margin-top: 8rpx; }
+.team-match__score { color: #a80f1b; font-weight: 700; margin-top: 12rpx; font-size: var(--font-size-body); }

@@ -14,7 +14,7 @@
       </view>
 
       <view wx:if="{{managed && !readOnly}}" class="bulk-workflow">
-        <input value="{{correctionReason}}" maxlength="500" disabled="{{submitting}}" placeholder="更正已发布成绩时，请填写原因" bindinput="onReasonInput" />
+        <t-input value="{{correctionReason}}" maxlength="500" disabled="{{submitting}}" placeholder="更正已发布成绩时，请填写原因" bindchange="onReasonInput"  borderless />
         <text bindtap="reloadServer">重新读取服务器成绩</text>
       </view>
       <view wx:if="{{courseSelectionRequired}}" class="bulk-course-bar">
@@ -27,7 +27,7 @@
         <view class="bulk-row__metrics">
           <view wx:for="{{item.metrics}}" wx:for-item="metric" wx:key="fieldId" class="bulk-metric {{readOnly ? 'bulk-metric--readonly' : ''}}">
             <view wx:if="{{readOnly}}" class="bulk-metric__readonly"><text>{{metric.value}}</text><text wx:if="{{metric.unitLabel}}"> {{metric.unitLabel}}</text></view>
-            <input wx:else class="bulk-metric__input" disabled="{{submitting}}" type="{{metric.inputType}}" value="{{metric.value}}" placeholder="{{metric.placeholder}}" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" bindinput="onRawInput" />
+            <t-input wx:else class="bulk-metric__input" disabled="{{submitting}}" type="{{metric.inputType}}" value="{{metric.value}}" placeholder="{{metric.placeholder}}" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" bindchange="onRawInput"  borderless t-class="bulk-metric__input" />
             <text wx:if="{{!readOnly}}" class="bulk-metric__unit">{{metric.unitLabel}}</text>
             <picker wx:if="{{courseSelectionRequired && !readOnly}}" range="{{item.courses}}" range-key="label" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" disabled="{{submitting || !item.courses.length}}" bindchange="selectCourse"><view class="bulk-metric__course">{{metric.courseLabel}}</view></picker>
             <text wx:if="{{courseSelectionRequired && readOnly}}" class="bulk-metric__course">{{metric.courseLabel}}</text>
@@ -49,7 +49,7 @@
 
 <view wx:if="{{historyVisible}}" class="bulk-history-mask">
   <view class="bulk-history-panel">
-    <view class="bulk-history-head"><text>{{historyTitle}}</text><button size="mini" bindtap="closeHistory">关闭</button></view>
+    <view class="bulk-history-head"><text>{{historyTitle}}</text><t-button size="small" bindtap="closeHistory" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">关闭</t-button></view>
     <scroll-view scroll-y class="bulk-history-scroll"><view wx:for="{{historyLines}}" wx:key="index" class="bulk-history-item">{{item}}</view></scroll-view>
   </view>
 </view>

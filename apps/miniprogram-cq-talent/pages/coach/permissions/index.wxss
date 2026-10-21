@@ -36,7 +36,7 @@
 .c161-nav__title {
   flex: 1;
   color: #1f2937;
-  font-size: 36rpx;
+  font-size: var(--font-size-display);
   font-weight: 700;
   text-align: left;
 }
@@ -78,8 +78,8 @@
 
 .c161-explain__text {
   color: #677487;
-  font-size: 26rpx;
-  line-height: 40rpx;
+  font-size: var(--font-size-aux);
+  line-height: 1.5;
 }
 
 .c161-permission-list {
@@ -103,7 +103,7 @@
 
 .c161-permission-row__label {
   color: #1f2937;
-  font-size: 28rpx;
+  font-size: var(--font-size-body);
   font-weight: 600;
 }
 
@@ -121,7 +121,7 @@
   color: #ffffff;
   background: #a80f1b;
   border-radius: 52rpx;
-  font-size: 32rpx;
+  font-size: var(--font-size-body);
   font-weight: 600;
   line-height: 1;
   text-align: center;
@@ -139,15 +139,15 @@
 
 .c161-empty__title {
   color: #1f2937;
-  font-size: 32rpx;
+  font-size: var(--font-size-section);
   font-weight: 700;
 }
 
 .c161-empty__message {
   margin-top: 16rpx;
   color: #768396;
-  font-size: 26rpx;
-  line-height: 40rpx;
+  font-size: var(--font-size-aux);
+  line-height: 1.5;
 }
 
 .c161-empty .c161-admin-cta {

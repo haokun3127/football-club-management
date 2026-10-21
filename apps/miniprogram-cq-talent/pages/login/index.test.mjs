@@ -428,6 +428,6 @@ describe("login page", () => {
     expect(ctaRule).toContain("justify-content: center;");
     expect(ctaRule).toContain("padding: 0;");
     expect(ctaRule).not.toContain("line-height: 100rpx;");
-    expect(ctaRule).toContain("line-height: 38rpx;");
+    expect(ctaRule).toContain("line-height: 1.5;");
   });
 });

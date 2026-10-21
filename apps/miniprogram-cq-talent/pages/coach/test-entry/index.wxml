@@ -36,7 +36,7 @@
           <view class="c12-student-card__metrics">
             <view wx:for="{{item.metricCells}}" wx:for-item="cell" wx:key="testItemId" class="c12-metric-cell">
               <text class="c12-metric-cell__label">{{cell.displayLabel}}</text>
-              <input wx:if="{{cell.showInput}}" class="c12-metric-cell__input" type="{{cell.inputType}}" placeholder="{{cell.placeholder}}" value="{{cell.rawValue}}" data-student-id="{{item.studentId}}" data-test-item-id="{{cell.testItemId}}" bindinput="onValueInput" />
+              <t-input wx:if="{{cell.showInput}}" class="c12-metric-cell__input" type="{{cell.inputType}}" placeholder="{{cell.placeholder}}" value="{{cell.rawValue}}" data-student-id="{{item.studentId}}" data-test-item-id="{{cell.testItemId}}" bindchange="onValueInput"  borderless t-class="c12-metric-cell__input" />
               <text wx:else class="{{cell.statusClass}}">{{cell.statusLabel}}</text>
             </view>
           </view>
@@ -44,7 +44,7 @@
             <text wx:if="{{item.invalid}}" class="c12-student-card__invalid">{{item.invalidHint}}</text>
             <text class="c12-student-card__missing" data-student-id="{{item.studentId}}" data-test-item-id="{{currentField.testItemId}}" bindtap="toggleMissing">{{item.missingActionLabel}}</text>
           </view>
-          <input wx:if="{{item.showMissingReason}}" class="c12-student-card__reason" placeholder="缺测原因（选填）" value="{{item.missingReason}}" data-student-id="{{item.studentId}}" data-test-item-id="{{currentField.testItemId}}" bindinput="onMissingReasonInput" />
+          <t-input wx:if="{{item.showMissingReason}}" class="c12-student-card__reason" placeholder="缺测原因（选填）" value="{{item.missingReason}}" data-student-id="{{item.studentId}}" data-test-item-id="{{currentField.testItemId}}" bindchange="onMissingReasonInput"  borderless t-class="c12-student-card__reason" />
         </view>
       </view>
 

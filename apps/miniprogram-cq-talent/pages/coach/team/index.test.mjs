@@ -192,7 +192,7 @@ describe("coach team detail", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(stylesheet).toMatch(/\.team-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*padding-left:\s*32rpx)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).toContain(".team-nav__left { display: flex; align-items: center; gap: 0;");
-    expect(stylesheet).toContain(".team-nav__title { color: #202124; font-size: 36rpx; font-weight: 700; line-height: 44rpx; }");
+    expect(stylesheet).toContain(".team-nav__title { color: #202124; font-size: var(--font-size-display); font-weight: 700; line-height: 1.5; }");
     expect(stylesheet).toContain(".hero { display: flex; flex-direction: column; gap: 16rpx; padding: 32rpx; border-radius: 32rpx;");
     expect(stylesheet).toContain(".hero-stat__value--positive { color: #10b981; }");
     expect(stylesheet).toContain("gap: 24rpx;");

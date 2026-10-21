@@ -85,3 +85,6 @@ docs/reference/wechat-miniprogram/_raw-html/
 /.trellis/tasks/**/research/pending-ide-cleanup.json
 /.trellis/tasks/**/research/ide-projects-before.json
 /.trellis/tasks/**/research/prep/project.private.config.bak-*.json
+
+# WeChat official npm build output (regenerate via build_npm)
+apps/miniprogram-cq-talent/miniprogram_npm/

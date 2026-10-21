@@ -222,7 +222,7 @@ describe("coach training management", () => {
   it("keeps the training title clear of the system capsule", () => {
     expect(template).toContain('padding-right:{{menuInset}}px');
     expect(styles).toMatch(/\.c8-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
-    expect(styles).toMatch(/\.c8-nav__title\s*\{[^}]*font-size:\s*36rpx[^}]*line-height:\s*44rpx/s);
+    expect(styles).toMatch(/\.c8-nav__title\s*\{[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)[^}]*line-height:\s*1\.5/s);
   });
 
   it("uses the V3 team context, compact hero, tabs, and session-card geometry", () => {

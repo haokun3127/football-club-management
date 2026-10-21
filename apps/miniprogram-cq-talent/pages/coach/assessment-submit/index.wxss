@@ -37,9 +37,9 @@
   flex: 1;
   margin-left: 0;
   color: var(--color-text);
-  font-size: 36rpx;
+  font-size: var(--font-size-display);
   font-weight: 700;
-  line-height: 44rpx;
+  line-height: 1.5;
 }
 
 .c151-page__body {
@@ -75,16 +75,16 @@
 .c151-success__title {
   margin-top: 32rpx;
   color: var(--color-text);
-  font-size: 40rpx;
+  font-size: var(--font-size-section);
   font-weight: 700;
-  line-height: 48rpx;
+  line-height: 1.5;
 }
 
 .c151-success__subtitle {
   margin-top: 16rpx;
   color: var(--color-text-secondary);
-  font-size: 28rpx;
-  line-height: 34rpx;
+  font-size: var(--font-size-aux);
+  line-height: 1.5;
 }
 
 .c151-summary {
@@ -113,9 +113,9 @@
 .c151-summary__title,
 .c151-summary__value {
   color: var(--color-text);
-  font-size: 28rpx;
+  font-size: var(--font-size-section);
   font-weight: 600;
-  line-height: 34rpx;
+  line-height: 1.5;
 }
 
 .c151-summary__chip {
@@ -123,15 +123,15 @@
   border-radius: 8rpx;
   background: #fce7e7;
   color: var(--color-brand);
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
   font-weight: 600;
-  line-height: 32rpx;
+  line-height: 1.5;
 }
 
 .c151-summary__label {
   color: var(--color-text-secondary);
-  font-size: 28rpx;
-  line-height: 34rpx;
+  font-size: var(--font-size-body);
+  line-height: 1.5;
 }
 
 .c151-actions {
@@ -155,8 +155,8 @@
   border-radius: 52rpx;
   background: var(--color-brand);
   color: #ffffff;
-  font-size: 32rpx;
-  line-height: 40rpx;
+  font-size: var(--font-size-body);
+  line-height: 1.5;
 }
 
 .c151-actions__secondary {
@@ -165,6 +165,6 @@
   border-radius: 48rpx;
   background: #ffffff;
   color: var(--color-text-secondary);
-  font-size: 28rpx;
-  line-height: 36rpx;
+  font-size: var(--font-size-body);
+  line-height: 1.5;
 }

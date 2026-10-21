@@ -5,7 +5,7 @@
 .coaches-nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; box-sizing: content-box; height: 88rpx; padding: 0 200rpx 0 32rpx; background: #ffffff; box-shadow: 0 8rpx 12rpx rgba(0, 0, 0, 0.05); }
 .coaches-nav__back { width: 48rpx; height: 48rpx; display: flex; align-items: center; justify-content: center; }
 .coaches-nav__back image { width: 48rpx; height: 48rpx; }
-.coaches-nav__title { flex: 1; margin-left: 24rpx; color: #202124; font-size: 36rpx; font-weight: 700; }
+.coaches-nav__title { flex: 1; margin-left: 24rpx; color: #202124; font-size: var(--font-size-display); font-weight: 700; }
 .coaches-nav__spacer { width: 48rpx; height: 48rpx; }
 
 .coaches-page__body {
@@ -22,7 +22,7 @@
 }
 
 .team-card__name {
-  font-size: 32rpx;
+  font-size: var(--font-size-body);
   font-weight: 700;
   color: #ffffff;
 }
@@ -38,7 +38,7 @@
   padding: 8rpx 20rpx;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 12rpx;
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
   font-weight: 600;
   color: #ffffff;
 }
@@ -50,7 +50,7 @@
 }
 
 .team-card__goal {
-  font-size: 26rpx;
+  font-size: var(--font-size-aux);
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.7);
 }
@@ -81,7 +81,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36rpx;
+  font-size: var(--font-size-body);
   font-weight: 700;
   color: var(--color-brand);
   flex-shrink: 0;
@@ -99,7 +99,7 @@
 }
 
 .coach-card__name {
-  font-size: 32rpx;
+  font-size: var(--font-size-body);
   font-weight: 700;
   color: var(--color-text);
 }
@@ -107,14 +107,14 @@
 .coach-card__role {
   padding: 8rpx 16rpx;
   border-radius: 8rpx;
-  font-size: 22rpx;
+  font-size: var(--font-size-aux);
   font-weight: 700;
   color: #ffffff;
 }
 
 .coach-card__bio {
   margin-top: 12rpx;
-  font-size: 26rpx;
+  font-size: var(--font-size-aux);
   line-height: 1.5;
   color: var(--color-text-secondary);
 }
@@ -124,17 +124,17 @@
   border: 1rpx solid var(--color-line);
   border-radius: 40rpx;
   padding: 12rpx 24rpx;
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
   color: var(--color-text-secondary);
 }
 
 .coach-empty {
   padding: 48rpx 0;
   text-align: center;
-  font-size: 26rpx;
+  font-size: var(--font-size-aux);
   color: var(--color-text-secondary);
 }
 
 .coach-card__wechat { flex: 0 0 auto; display: flex; align-items: center; gap: 8rpx; align-self: center; padding: 12rpx 20rpx; border: 1rpx solid #e7eaf0; border-radius: 999rpx; background: #f6f7f9; }
 .coach-card__wechat-icon { width: 28rpx; height: 28rpx; }
-.coach-card__wechat-text { font-size: 24rpx; color: #202124; }
+.coach-card__wechat-text { font-size: var(--font-size-aux); color: #202124; }

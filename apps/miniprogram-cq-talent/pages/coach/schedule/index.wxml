@@ -14,8 +14,8 @@
     <view class="c1-team-card__toggle" role="button" aria-label="更改授权队伍" catchtap="toggleTeamPicker">更改 ›</view>
   </view>
   <scroll-view wx:if="{{hasTeamOptions && showTeamPicker}}" scroll-x class="c1-team-strip">
-    <view class="c1-team-row"><button class="c1-team {{allTeamsSelected ? 'c1-team--selected' : ''}}" data-id="all" bindtap="selectTeam">全部</button>
-    <button wx:for="{{teamOptions}}" wx:key="id" class="c1-team {{item.selected ? 'c1-team--selected' : ''}}" data-id="{{item.id}}" bindtap="selectTeam"><image src="/assets/icons/content-users.svg" mode="aspectFit" />{{item.name}}</button></view>
+    <view class="c1-team-row"><t-button class="c1-team {{allTeamsSelected ? 'c1-team--selected' : ''}}" data-id="all" bindtap="selectTeam" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="c1-team {{allTeamsSelected ? 'c1-team--selected' : ''}}" theme="primary" variant="text">全部</t-button>
+    <t-button wx:for="{{teamOptions}}" wx:key="id" class="c1-team {{item.selected ? 'c1-team--selected' : ''}}" data-id="{{item.id}}" bindtap="selectTeam" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="c1-team {{item.selected ? 'c1-team--selected' : ''}}" theme="primary" variant="text"><image src="/assets/icons/content-users.svg" mode="aspectFit" />{{item.name}}</t-button></view>
   </scroll-view>
 
   <!-- 带边距日历卡：月标签 + 回今天/月历切换 + 周条或月格 + 图例 -->
@@ -23,7 +23,7 @@
     <view class="c1-calendar-card__header">
       <view class="c1-calendar-card__title">{{monthLabel}}</view>
       <view class="c1-calendar-card__actions">
-        <button class="c1-calendar-card__today" bindtap="goToday">回今天</button>
+        <t-button class="c1-calendar-card__today" bindtap="goToday" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="c1-calendar-card__today" theme="primary" variant="text">回今天</t-button>
         <block wx:if="{{viewMode === 'month'}}">
           <view class="c1-month-calendar__arrow" data-offset="-1" bindtap="changeMonth" aria-label="上个月"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
           <view class="c1-month-calendar__arrow" data-offset="1" bindtap="changeMonth" aria-label="下个月"><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view>
@@ -105,7 +105,7 @@
 
   <!-- 任务卡 -->
   <view id="coach-tasks" class="c1-tasks" wx:if="{{state !== 'loading' && state !== 'error'}}">
-    <view class="c1-tasks__head"><view class="c1-tasks__heading">待完成任务</view><button class="c1-tasks__more" bindtap="showTasks">未完成任务 · {{taskCount}}</button></view>
+    <view class="c1-tasks__head"><view class="c1-tasks__heading">待完成任务</view><t-button class="c1-tasks__more" bindtap="showTasks" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="c1-tasks__more" theme="primary" variant="text">未完成任务 · {{taskCount}}</t-button></view>
     <view wx:if="{{!taskCards.length}}" class="c1-empty">暂无未完成任务</view>
     <view wx:for="{{taskCards}}" wx:key="eventId" class="c1-task" data-id="{{item.taskId}}" bindtap="openAssessmentTask">
       <view class="c1-task__title">{{item.title || item.label}}</view><view class="c1-task__meta">{{item.teamName}} · {{item.periodLabel}}</view>
@@ -115,6 +115,6 @@
   </view>
 
   <!-- 所选队伍入口 -->
-  <button class="c1-team-entry" wx:if="{{state !== 'loading' && state !== 'error'}}" bindtap="openSelectedTeam">查看所选队伍</button>
+  <t-button class="c1-team-entry" wx:if="{{state !== 'loading' && state !== 'error'}}" bindtap="openSelectedTeam" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="c1-team-entry" theme="primary" variant="text">查看所选队伍</t-button>
   <role-tabbar role="coach" active="schedule" />
 </view>

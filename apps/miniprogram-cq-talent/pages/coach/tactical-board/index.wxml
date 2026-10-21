@@ -1,11 +1,11 @@
 <view class="c7-page" style="padding-top:{{navInset}}px">
   <view class="c7-header" style="padding-right:{{menuInset}}px">
-    <button class="c7-back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></button>
+    <t-button class="c7-back" bindtap="goBack" aria-label="返回" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="c7-back" theme="primary" variant="text"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></t-button>
     <text class="c7-title">比赛战术板</text>
   </view>
   <view wx:if="{{state !== 'ready'}}" class="c7-feedback">
     <text>{{stateTitle}}</text><text class="c7-muted">{{message}}</text>
-    <button wx:if="{{state === 'error'}}" bindtap="retry">重新加载</button>
+    <t-button wx:if="{{state === 'error'}}" bindtap="retry" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">重新加载</t-button>
   </view>
   <block wx:else>
     <view class="c7-toolbar"><text class="c7-event">{{eventTitle}}</text><text class="c7-status {{saveError ? 'c7-status--error' : ''}}">{{saveLabel}}</text></view>
@@ -28,10 +28,10 @@
       </scroll-view>
     </view>
     <view class="c7-actions">
-      <button disabled="{{readOnly || !canUndo}}" bindtap="undoMove">撤销上一步</button>
-      <button disabled="{{readOnly || !starters.length}}" bindtap="clearBoard">清空球场</button>
+      <t-button disabled="{{readOnly || !canUndo}}" bindtap="undoMove" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">撤销上一步</t-button>
+      <t-button disabled="{{readOnly || !starters.length}}" bindtap="clearBoard" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">清空球场</t-button>
     </view>
-    <button wx:if="{{saveError}}" class="c7-error" bindtap="saveBoard">{{saveError}}</button>
+    <t-button wx:if="{{saveError}}" class="c7-error" bindtap="saveBoard" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="c7-error" theme="primary" variant="text">{{saveError}}</t-button>
     <view wx:if="{{dragId}}" class="c7-ghost" style="left:{{dragX}}px;top:{{dragY}}px"><image src="{{dragAvatar || '/assets/icons/user-white.svg'}}" mode="aspectFill" /><text>{{dragName}}</text></view>
   </block>
 </view>

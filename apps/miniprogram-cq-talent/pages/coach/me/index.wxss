@@ -19,9 +19,9 @@
 
 .c16-bar__title {
   color: #202124;
-  font-size: 36rpx;
+  font-size: var(--font-size-section);
   font-weight: 700;
-  line-height: 44rpx;
+  line-height: 1.5;
 }
 
 .c16-bar__settings {
@@ -72,7 +72,7 @@
   border-radius: 60rpx;
   background: #a80f1b;
   color: #ffffff;
-  font-size: 40rpx;
+  font-size: var(--font-size-body);
   font-weight: 700;
 }
 
@@ -83,7 +83,7 @@
 .c16-profile__name {
   overflow: hidden;
   color: #ffffff;
-  font-size: 40rpx;
+  font-size: var(--font-size-body);
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -96,7 +96,7 @@
   border-radius: 8rpx;
   background: #a80f1b;
   color: #ffffff;
-  font-size: 22rpx;
+  font-size: var(--font-size-aux);
   font-weight: 700;
 }
 
@@ -104,7 +104,7 @@
   overflow: hidden;
   margin-top: 8rpx;
   color: rgba(255, 255, 255, 0.6);
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -121,16 +121,16 @@
 
 .c16-profile__stat-label {
   color: rgba(255, 255, 255, 0.6);
-  font-size: 22rpx;
-  line-height: 30rpx;
+  font-size: var(--font-size-aux);
+  line-height: 1.5;
 }
 
 .c16-profile__stat-value {
   margin-top: 4rpx;
   color: #ffffff;
-  font-size: 32rpx;
+  font-size: var(--font-size-body);
   font-weight: 700;
-  line-height: 40rpx;
+  line-height: 1.5;
 }
 
 .c16-role-switch {
@@ -153,15 +153,15 @@
 
 .c16-role-switch__label {
   color: #667085;
-  font-size: 24rpx;
-  line-height: 36rpx;
+  font-size: var(--font-size-aux);
+  line-height: 1.5;
 }
 
 .c16-role-switch__role {
   color: #202124;
-  font-size: 32rpx;
+  font-size: var(--font-size-body);
   font-weight: 600;
-  line-height: 48rpx;
+  line-height: 1.5;
 }
 
 .c16-role-switch__action {
@@ -169,8 +169,8 @@
   border-radius: 24rpx;
   background: #fceeef;
   color: #a80f1b;
-  font-size: 28rpx;
-  line-height: 44rpx;
+  font-size: var(--font-size-body);
+  line-height: 1.5;
 }
 
 .c16-menu {
@@ -198,7 +198,7 @@
 .c16-menu__label {
   flex: 1;
   color: #202124;
-  font-size: 30rpx;
+  font-size: var(--font-size-body);
   font-weight: 600;
 }
 
@@ -221,7 +221,7 @@
   border-radius: 48rpx;
   background: #ffffff;
   color: #a80f1b;
-  font-size: 28rpx;
+  font-size: var(--font-size-body);
   font-weight: 600;
   line-height: 1.2;
 }

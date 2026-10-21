@@ -9,7 +9,7 @@
       bindaction="loadFaqs"
     />
     <block wx:if="{{state === 'ready'}}">
-      <view class="help-search"><image class="help-search__icon" src="/assets/icons/search.svg" mode="aspectFit" /><input class="help-search__input" placeholder="搜索常见问题" value="{{searchKeyword}}" bindinput="onSearchInput" /></view>
+      <view class="help-search"><image class="help-search__icon" src="/assets/icons/search.svg" mode="aspectFit" /><t-input class="help-search__input" placeholder="搜索常见问题" value="{{searchKeyword}}" bindchange="onSearchInput"  borderless t-class="help-search__input" /></view>
 
       <view class="section-title">帮助分类</view>
       <view class="category-grid">

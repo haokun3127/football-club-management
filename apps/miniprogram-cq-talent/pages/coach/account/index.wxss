@@ -36,9 +36,9 @@
 .c163-nav__title {
   flex: 1;
   color: #202124;
-  font-size: 36rpx;
+  font-size: var(--font-size-display);
   font-weight: 700;
-  line-height: 44rpx;
+  line-height: 1.5;
   text-align: left;
 }
 
@@ -83,7 +83,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32rpx;
+  font-size: var(--font-size-body);
   font-weight: 700;
 }
 
@@ -94,16 +94,16 @@
 
 .c163-profile__name {
   color: #202124;
-  font-size: 32rpx;
+  font-size: var(--font-size-body);
   font-weight: 700;
-  line-height: 38rpx;
+  line-height: 1.5;
 }
 
 .c163-profile__team {
   margin-top: 8rpx;
   color: #667085;
-  font-size: 24rpx;
-  line-height: 32rpx;
+  font-size: var(--font-size-aux);
+  line-height: 1.5;
 }
 
 .c163-profile__badge {
@@ -112,9 +112,9 @@
   margin-top: 4rpx;
   padding: 4rpx 12rpx;
   border-radius: 8rpx;
-  font-size: 22rpx;
+  font-size: var(--font-size-aux);
   font-weight: 600;
-  line-height: 26rpx;
+  line-height: 1.5;
 }
 
 .c163-profile__badge--pending {
@@ -146,14 +146,14 @@
 
 .c163-row__label {
   color: #202124;
-  font-size: 28rpx;
+  font-size: var(--font-size-body);
   font-weight: 500;
 }
 
 .c163-row__value {
   flex: 1;
   color: #667085;
-  font-size: 24rpx;
+  font-size: var(--font-size-aux);
   text-align: right;
 }
 
@@ -167,9 +167,9 @@
 .c163-row__action {
   flex: 0 0 auto;
   color: #a80f1b;
-  font-size: 28rpx;
+  font-size: var(--font-size-body);
   font-weight: 600;
-  line-height: 34rpx;
+  line-height: 1.5;
 }
 
 .c163-row__label-with-icon {

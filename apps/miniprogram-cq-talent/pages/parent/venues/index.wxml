@@ -10,7 +10,7 @@
     />
     <block wx:if="{{state === 'ready'}}">
       <view wx:if="{{searchOpen}}" class="search-bar">
-        <input class="search-bar__input" value="{{searchQuery}}" placeholder="搜索场地名称或地址" bindinput="onSearchInput" focus="{{true}}" />
+        <t-input class="search-bar__input" value="{{searchQuery}}" placeholder="搜索场地名称或地址" bindchange="onSearchInput" focus="{{true}}"  borderless t-class="search-bar__input" />
       </view>
       <scroll-view scroll-x class="filters" enhanced show-scrollbar="{{false}}">
         <view class="filters__inner">

@@ -150,8 +150,8 @@ describe("coach training content assessment", () => {
   it("keeps the full-screen view WXML-safe and linked from C2 training workbench", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(template).toContain('bindtap="selectProject"');
-    expect(template).toContain('bindinput="onScoreInput"');
-    expect(template).toContain('bindinput="onNoteInput"');
+    expect(template).toContain('bindchange="onScoreInput"');
+    expect(template).toContain('bindchange="onNoteInput"');
     expect(template).toContain('bindtap="save"');
     expect(template).toContain('bindaction="handleStatusAction"');
     expect(pageConfig).toContain('"navigationStyle": "custom"');
