@@ -1365,3 +1365,37 @@ Audited 40 commits; seven isolated fix commits; 964 tests plus 9 script tests an
 ### Next Steps
 
 - None - task complete
+
+
+## Session 38: Deploy approved UI API candidate to develop
+
+**Date**: 2026-10-22
+**Task**: Deploy approved UI API candidate to develop
+**Package**: miniprogram
+**Branch**: `feature/ui-batch-1-p01`
+
+### Summary
+
+按用户明确授权从b29d84e3构建并仅部署develop。101表一致性备份、副本0044迁移演练、线上数据一致性、HTTPS后台资源/新路由/环境拒绝及真实模拟器双角色历史读取通过。仅正常会话与last=coach偏好变化；trial/release未变。真实手机号、雷达映射样本、image2.5及真机等仍待验，当前UI任务保持in_progress，不归档。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `0528df93` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
