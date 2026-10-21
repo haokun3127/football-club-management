@@ -75,3 +75,14 @@ The legacy production process can be protected by `nginx-release-guard.conf` plu
 5. **Cases:** good = unique runtime phone resolves after reopen; base = repeat is `already_present`; bad = reuse the seven-account demo importer or modify a production account for single-user testing.
 6. **Tests:** `bootstrap-identity.test.mjs` covers both environments, rejected calls leave DB bytes unchanged, repeat, conflict, no unrelated seed, phone membership lookup and parent/coach switching with a synthetic identity connector. It does not prove real WeChat login. Restart the affected nonproduction services after the separate write so their parent/coach in-memory projections reload.
 7. **Wrong vs correct:** three membership roles do not imply three mini-program entrances. Existing app sessions expose parent/coach; admin belongs to the separately implemented backoffice. Record admin permission configuration separately from backoffice acceptance.
+
+
+## Authorized reviewer business samples
+
+- **Scope:** separately authorized develop business-data preparation for the existing reviewer; the identity-only bootstrap remains unchanged.
+- **Operation:** use a verified file backup and a disposable staging database; preserve the reviewer user/membership/profiles, WeChat binding, sessions and registered client. The dated task recovery script is evidence of a one-time operation, not a general CLI.
+- **Contract:** generate only synthetic data from repository fixtures, retain one authorized scope, map references to the existing identity before deleting temporary identities, then incrementally insert in a deferred-FK transaction. Restart only the affected test service to refresh projections. Never copy production records or enable startup seeding.
+- **Errors:** unknown/release environment, mismatched identity, pre-existing business data, foreign-key/semantic errors or row conflicts must stop before commit. Repeated restore must reject rather than overwrite review edits.
+- **Cases:** good = two guardian children and an editable synthetic team under real role sessions; base = identity/session remains unchanged after restart; bad = delete temporary profiles first and trust FK integrity alone, because cascades can remove valid child bindings/assessments without an FK violation.
+- **Checks:** assert guardian/roster/publication counts, real course provenance, attendance-to-ledger equality and positive balances, not just integrity_check. Exercise the real parent/coach session and read rendered pages.
+- **Wrong vs correct:** client role/token injection is not provisioning; persist authorized memberships and scoped business associations, and validate through the normal role-switch endpoint.
