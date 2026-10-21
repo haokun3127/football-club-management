@@ -171,7 +171,7 @@ describe("api server", () => {
       name: "x-app-client-capabilities",
       in: "header",
       required: false,
-      schema: { type: "string", enum: ["active-role-switch-v1"] },
+      schema: { type: "string", enum: ["active-role-switch-v1","auto-active-role-v1"] },
     });
     for (const operation of [loginOperation, roleOperation]) {
       const responseSchema = operation.responses?.["200"]?.content?.["application/json"]?.schema as {

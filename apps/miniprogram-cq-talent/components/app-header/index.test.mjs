@@ -1,22 +1,13 @@
-import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
-
-const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
-const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
-
-describe("shared app header", () => {
-  it("uses the live Figma navigation geometry for back, title, and action", () => {
-    expect(template).toContain('class="app-header__back"');
-    expect(template).toContain('src="/assets/icons/chevron-left.svg"');
-    expect(stylesheet).toMatch(/\.app-header__content\s*\{[^}]*padding-left:\s*32rpx/s);
-    expect(stylesheet).toMatch(/\.app-header__back\s*\{[^}]*width:\s*80rpx[^}]*height:\s*80rpx[^}]*padding:\s*16rpx[^}]*margin-left:\s*0/s);
-    expect(stylesheet).toMatch(/\.app-header__title\s*\{[^}]*font-size:\s*var\(--font-size-display\)[^}]*line-height:\s*44rpx/s);
-    expect(stylesheet).toMatch(/\.app-header__action\s*\{[^}]*min-height:\s*80rpx[^}]*font-size:\s*var\(--font-size-body\)/s);
-  });
-
-  it("keeps a normal-flow reservation while the visible navigation stays fixed", () => {
-    expect(template).toContain('class="app-header__surface app-header--{{theme}}"');
-    expect(stylesheet).toMatch(/\.app-header\s*\{[^}]*position:\s*relative[^}]*height:\s*88px/s);
-    expect(stylesheet).toMatch(/\.app-header__surface\s*\{[^}]*position:\s*fixed[^}]*top:\s*0[^}]*right:\s*0[^}]*left:\s*0[^}]*z-index:\s*100/s);
-  });
+import {describe,expect,it,vi} from "vitest";
+let definition;globalThis.Component=value=>{definition=value;};await import("./index.ts");
+describe("shared native app header",()=>{
+ it.each([320,375,430])("reserves the status bar plus 44 logical pixels at width %s",width=>{
+  globalThis.wx={getWindowInfo:()=>({statusBarHeight:24,windowWidth:width}),getMenuButtonBoundingClientRect:()=>({left:width-84})};
+  const header={data:{...definition.data},setData(patch){Object.assign(this.data,patch);}};definition.lifetimes.attached.call(header);
+  expect(header.data).toMatchObject({statusBarHeight:24,contentHeight:44,actionInset:92});
+ });
+ it("returns to launch when a deep link has no previous page",()=>{
+  globalThis.wx={navigateBack:vi.fn(({fail})=>fail()),reLaunch:vi.fn()};const header={triggerEvent:vi.fn()};definition.methods.handleBack.call(header);
+  expect(wx.navigateBack).toHaveBeenCalledWith(expect.objectContaining({delta:1}));expect(wx.reLaunch).toHaveBeenCalledWith({url:"/pages/launch/index"});
+ });
 });

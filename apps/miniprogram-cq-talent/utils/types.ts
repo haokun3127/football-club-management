@@ -48,7 +48,7 @@ export interface SessionState extends AppContext {
 export interface LoginResult {
   clubId: string;
   client: { id: string };
-  status: "authenticated" | "binding_required";
+  status: "authenticated" | "binding_required" | "role_configuration_required";
   phoneBinding: PhoneBinding;
   session: { token: string; expiresInSeconds: number; expiresAt: string; activeRole: AppRole | null } | null;
   role: AppRole | null;
@@ -77,6 +77,7 @@ export interface StudentHome {
 }
 
 export interface ScheduleEvent {
+  teamIds?: string[];
   id: string;
   type: "training" | "match" | "other";
   title: string;

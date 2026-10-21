@@ -23,7 +23,7 @@ button::after { border: 0; }
   border: 1rpx solid var(--color-line);
   border-radius: 24rpx;
   background: var(--color-card);
-  box-shadow: 0 8rpx 24rpx rgba(16, 24, 40, 0.04);
+  box-shadow: none;
 }
 
 .hero-card {
@@ -34,7 +34,7 @@ button::after { border: 0; }
 
 .title { font-size: var(--font-size-display); font-weight: 700; line-height: 1.3; }
 .subtitle { color: var(--color-text-secondary); font-size: var(--font-size-aux); line-height: 1.55; }
-.section-title { margin-bottom: 16rpx; font-size: 32rpx; font-weight: 700; }
+.section-title { margin-bottom: 16rpx; font-size: var(--font-size-section); font-weight: 600; }
 .label { color: var(--color-text-secondary); font-size: var(--font-size-aux); }
 .row { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; }
 .stack { display: flex; flex-direction: column; gap: 16rpx; }
@@ -46,10 +46,10 @@ button::after { border: 0; }
   justify-content: center;
   min-height: 48rpx;
   padding: 0 16rpx;
-  border-radius: 999rpx;
-  background: var(--color-brand-soft);
-  color: var(--color-brand);
-  font-size: 24rpx;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-aux);
 }
 .tag.muted { background: #f2f4f7; color: var(--color-text-secondary); }
 .tag.warning { background: var(--color-warning-soft); color: var(--color-warning); }

@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 88rpx;
+  height:44px;
   padding: 0 32rpx;
   background: var(--club-nav);
 }
@@ -20,10 +20,10 @@
 .c1-nav__avatar { display: flex; align-items: center; justify-content: center; width: 72rpx; height: 72rpx; border-radius: 36rpx; background: var(--color-brand); color: var(--color-card); font-size: var(--font-size-body); font-weight: 700; }
 
 /* 授权队伍卡 */
-.c1-team-card { display: flex; align-items: center; justify-content: space-between; gap: 24rpx; margin: 24rpx 24rpx 0; padding: 28rpx 32rpx; border-radius: 28rpx; background: var(--color-brand); color: var(--color-card); box-shadow: var(--shadow-hero); }
+.c1-team-card { display: flex; align-items: center; justify-content: space-between; gap: 24rpx; margin: 24rpx 24rpx 0; padding: 28rpx 32rpx; border-radius: 28rpx; background:var(--color-card); color:var(--color-text); box-shadow:none; }
 .c1-team-card__title { font-size: var(--font-size-section); font-weight: 700; line-height: 1.5; }
-.c1-team-card__sub { margin-top: 6rpx; color: rgba(255,255,255,.76); font-size: var(--font-size-aux); line-height: 1.5; }
-.c1-team-card__toggle { flex: 0 0 auto; padding: 8rpx 0 8rpx 20rpx; color: rgba(255,255,255,.92); font-size: var(--font-size-aux); font-weight: 600; }
+.c1-team-card__sub { margin-top: 6rpx; color:var(--color-text-secondary); font-size: var(--font-size-aux); line-height: 1.5; }
+.c1-team-card__toggle { flex: 0 0 auto; padding: 8rpx 0 8rpx 20rpx; color:var(--color-text-secondary); font-size: var(--font-size-aux); font-weight: 600; }
 
 /* 选队列表（更改展开） */
 .c1-team-strip { margin: 16rpx 24rpx 0; border-radius: 20rpx; background: var(--color-card); }
@@ -34,28 +34,13 @@
 
 .c1-body { padding: 0 24rpx 24rpx; }
 
-/* 课程卡 */
-.c1-hero { display: flex; flex-direction: column; gap: 20rpx; margin-top: 24rpx; padding: 32rpx; box-sizing: border-box; border-radius: 28rpx; background: var(--color-card); box-shadow: var(--club-shadow); }
-.c1-hero__date { color: var(--club-text); font-size: var(--font-size-body); font-weight: 700; line-height: 1.5; }
-.c1-hero__main { display: flex; flex-direction: row; align-items: baseline; gap: 16rpx; min-width: 0; }
-.c1-hero__time { flex: 0 0 auto; color: var(--color-brand); font-size: var(--font-size-body); font-weight: 700; line-height: 1.5; }
-.c1-hero__title { flex: 1; min-width: 0; overflow: hidden; color: var(--club-text); font-size: var(--font-size-section); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-.c1-hero__meta { overflow: hidden; color: var(--club-muted); font-size: var(--font-size-aux); text-overflow: ellipsis; white-space: nowrap; }
-.c1-hero__pills { display: flex; flex-wrap: wrap; gap: 16rpx; }
-.c1-hero__pill { display: flex; align-items: center; gap: 12rpx; padding: 16rpx 20rpx; border: 1rpx solid var(--club-line); border-radius: 999rpx; background: var(--club-page); white-space: nowrap; }
-.c1-hero__pill--primary { border-color: rgba(var(--color-brand-rgb), .2); background: rgba(var(--color-brand-rgb), .1); }
-.c1-hero__pill-value { color: var(--club-text); font-size: var(--font-size-aux); font-weight: 800; line-height: 1.5; }
-.c1-hero__pill-label { color: var(--color-text-secondary); font-size: var(--font-size-aux); font-weight: 600; line-height: 1.5; }
-.c1-hero__pill--primary .c1-hero__pill-value { color: var(--color-brand); }
-.c1-hero__link { color: var(--color-brand); font-size: var(--font-size-aux); font-weight: 600; }
-
 .c1-empty { padding: 64rpx 32rpx; border-radius: 24rpx; background: var(--color-card); color: var(--color-text-secondary); font-size: var(--font-size-aux); text-align: center; }
 
 /* Legacy activity-card rail (unchanged content structure). */
-.c1-list { display: flex; flex-direction: column; gap: 24rpx; margin-top: 24rpx; }.acard { display: flex; align-items: center; gap: 24rpx; min-height: 192rpx; padding: 24rpx; box-sizing: border-box; border-radius: 32rpx; background: #ffffff; box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.08); }.acard--match { border: 1rpx solid #24476e; background: #0b1b33; box-shadow: 0 8rpx 32rpx rgba(11, 27, 51, 0.22); }.acard--match .acard__start { color: #9fc6ff; }.acard--match .acard__dur, .acard--match .acard__meta { color: #c9dcf5; }.acard--match .acard__title { color: #ffffff; }.acard--match .acard__type--match { background: #cfe3ff; color: #12365f; }.acard--match .acard__chevron { opacity: 0.88; filter: brightness(0) invert(1); }.acard__accent { width: 8rpx; align-self: stretch; flex: 0 0 8rpx; border-radius: 4rpx; }.acard__time { width: 112rpx; flex: 0 0 112rpx; }.acard__start { color: #a80f1b; font-size: var(--font-size-body); font-weight: 800; line-height: 1.5; }.acard__dur { color: #667085; font-size: var(--font-size-aux); line-height: 1.5; }.acard__content { display: flex; flex: 1; flex-direction: column; justify-content: center; min-width: 0; gap: 12rpx; }.acard__head { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 8rpx; min-width: 0; }.acard__type { flex: 0 0 auto; padding: 4rpx 10rpx; border-radius: 8rpx; font-size: var(--font-size-aux); font-weight: 700; line-height: 1.5; }.acard__type--training { background: #fceeef; color: #a80f1b; }.acard__type--match { background: #eaf2ff; color: #1976d2; }.acard__type--other { background: #f3f4f6; color: #667085; }.acard__title { flex: 1 1 0; min-width: 0; overflow: visible; color: #202124; font-size: var(--font-size-section); font-weight: 600; line-height: 1.5; text-overflow: clip; white-space: normal; word-break: break-all; }.acard__meta { overflow: visible; color: #667085; font-size: var(--font-size-aux); line-height: 1.5; text-overflow: clip; white-space: normal; word-break: break-all; }.acard__action { align-self: flex-start; padding: 6rpx 12rpx; border-radius: 8rpx; background: #fdf0f1; color: #a80f1b; font-size: var(--font-size-aux); line-height: 1.5; }.acard__right { display: flex; flex: 0 0 auto; align-items: center; gap: 10rpx; }.acard__pill { height: 42rpx; padding: 0 12rpx; border-radius: 8rpx; font-size: var(--font-size-aux); line-height: 1.5; }.pill--info, .pill--success { background: #10b981; color: #ffffff; }.pill--brand { background: #1976d2; color: #ffffff; }.pill--warning, .pill--pending { background: #f59e0b; color: #ffffff; }.pill--error { background: #d14343; color: #ffffff; }.acard__chevron { display: block; width: 40rpx; height: 40rpx; flex: 0 0 40rpx; }
+.c1-list { display: flex; flex-direction: column; gap: 24rpx; margin-top: 24rpx; }.acard { display: flex; align-items: center; gap: 24rpx; min-height: 192rpx; padding: 24rpx; box-sizing: border-box; border-radius: 32rpx; background: #ffffff; box-shadow:none; }.acard--match { border: 1rpx solid #24476e; background: #0b1b33; box-shadow:none; }.acard--match .acard__start { color: #9fc6ff; }.acard--match .acard__dur, .acard--match .acard__meta { color: #c9dcf5; }.acard--match .acard__title { color: #ffffff; }.acard--match .acard__type--match { background: #cfe3ff; color: #12365f; }.acard--match .acard__chevron { opacity: 0.88; filter: brightness(0) invert(1); }.acard__accent { width: 8rpx; align-self: stretch; flex: 0 0 8rpx; border-radius: 4rpx; }.acard__time { width: 112rpx; flex: 0 0 112rpx; }.acard__start { color: #a80f1b; font-size: var(--font-size-body); font-weight: 800; line-height: 1.5; }.acard__dur { color: #667085; font-size: var(--font-size-aux); line-height: 1.5; }.acard__content { display: flex; flex: 1; flex-direction: column; justify-content: center; min-width: 0; gap: 12rpx; }.acard__head { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 8rpx; min-width: 0; }.acard__type { flex: 0 0 auto; padding: 4rpx 10rpx; border-radius: 8rpx; font-size: var(--font-size-aux); font-weight: 700; line-height: 1.5; }.acard__type--training { background: #fceeef; color: #a80f1b; }.acard__type--match { background: #eaf2ff; color: #1976d2; }.acard__type--other { background: #f3f4f6; color: #667085; }.acard__title { flex: 1 1 0; min-width: 0; overflow: visible; color: #202124; font-size: var(--font-size-section); font-weight: 600; line-height: 1.5; text-overflow: clip; white-space: normal; word-break: break-all; }.acard__meta { overflow: visible; color: #667085; font-size: var(--font-size-aux); line-height: 1.5; text-overflow: clip; white-space: normal; word-break: break-all; }.acard__action { align-self: flex-start; padding: 6rpx 12rpx; border-radius: 8rpx; background: #fdf0f1; color: #a80f1b; font-size: var(--font-size-aux); line-height: 1.5; }.acard__right { display: flex; flex: 0 0 auto; align-items: center; gap: 10rpx; }.acard__pill {    font-size: var(--font-size-aux); line-height: 1.5;       background:transparent;border-radius:0;padding:0;height:auto;min-height:0;color:var(--color-text-secondary);}.pill--info, .pill--success {   background:transparent;border-radius:0;padding:0;height:auto;min-height:0;color:var(--color-text-secondary);}.pill--brand {   background:transparent;border-radius:0;padding:0;height:auto;min-height:0;color:var(--color-text-secondary);}.pill--warning, .pill--pending {   background:transparent;border-radius:0;padding:0;height:auto;min-height:0;color:var(--color-text-secondary);}.pill--error {   background:transparent;border-radius:0;padding:0;height:auto;min-height:0;color:var(--color-text-secondary);}.acard__chevron { display: block; width: 40rpx; height: 40rpx; flex: 0 0 40rpx; }
 
 /* 任务卡 */
-.c1-tasks { margin: 0 24rpx; padding: 28rpx; border-radius: 28rpx; background: var(--color-card); box-shadow: var(--club-shadow); }
+.c1-tasks { margin: 0 24rpx; padding: 28rpx; border-radius: 28rpx; background: var(--color-card); box-shadow:none; }
 .c1-tasks__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20rpx; }
 .c1-tasks__heading { color: var(--club-text); font-size: var(--font-size-section); font-weight: 700; }
 .c1-tasks__more { width: auto; margin: 0; padding: 0 0 0 16rpx; background: transparent; color: var(--color-brand); font-size: var(--font-size-aux); line-height: 1.5; }
@@ -68,3 +53,12 @@
 .c1-team-entry { width: auto; height: 88rpx; margin: 24rpx 24rpx calc(180rpx + env(safe-area-inset-bottom)); padding: 0 32rpx; border-radius: 24rpx; background: var(--color-brand); color: var(--color-card); font-size: var(--font-size-body); font-weight: 600; line-height: 1.5; }
 
 .schedule-calendar-wrap { margin:12px; }
+
+.agenda-heading { font-size:18px; font-weight:600; line-height:1.5; margin:8px 0; }
+.agenda-summary { font-size:14px; line-height:1.6; color:var(--color-text-secondary); margin-bottom:16px; }
+.c1-team-card { min-height:64px; padding:12px 16px; }
+.c1-team-card__toggle { display:flex; align-items:center; min-height:44px; min-width:44px; color:var(--color-brand); }
+.acard { height:auto; min-height:96px; }
+.acard__title { white-space:normal; overflow-wrap:break-word; }
+
+.c1-nav__avatar {min-height:44px;min-width:44px;border-radius:50%;}

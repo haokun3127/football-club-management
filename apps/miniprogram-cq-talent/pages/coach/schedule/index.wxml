@@ -8,8 +8,8 @@
   <!-- V-03 C01 214:2144：授权队伍卡（更改展开选队，保留授权范围与选队状态） -->
   <view wx:if="{{hasTeamOptions}}" class="c1-team-card">
     <view class="c1-team-card__info">
-      <view class="c1-team-card__title">全部授权队伍 · {{teamOptions.length}}队</view>
-      <view class="c1-team-card__sub">已记住上次选择</view>
+      <view class="c1-team-card__title">日程范围 · {{selectedTeamIds.length}}队</view>
+      <view class="c1-team-card__sub">仅显示所选球队的活动和待办</view>
     </view>
     <view class="c1-team-card__toggle" role="button" aria-label="更改授权队伍" catchtap="toggleTeamPicker">更改 ›</view>
   </view>
@@ -18,30 +18,14 @@
     <t-button wx:for="{{teamOptions}}" wx:key="id" class="c1-team {{item.selected ? 'c1-team--selected' : ''}}" data-id="{{item.id}}" bindtap="selectTeam" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="c1-team {{item.selected ? 'c1-team--selected' : ''}}" theme="primary" variant="text"><image src="/assets/icons/content-users.svg" mode="aspectFit" />{{item.name}}</t-button></view>
   </scroll-view>
 
-  <view class="schedule-calendar-wrap"><schedule-calendar date="{{date}}" events="{{eventViews}}" expanded="{{viewMode === 'month'}}" top-inset="{{topBarHeight}}" bindchange="onCalendarChange" bindviewchange="onCalendarViewChange" /></view>
+  <view class="schedule-calendar-wrap"><schedule-calendar class="schedule-calendar-widget" date="{{date}}" events="{{eventViews}}" expanded="{{viewMode === 'month'}}" top-inset="{{topBarHeight}}" bindchange="onCalendarChange" bindviewchange="onCalendarViewChange" /></view>
 
   <view class="c1-body">
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '加载日程' : state === 'empty' ? '暂无日程或任务' : '日程读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready'}}">
-      <!-- 课程卡 -->
-      <view wx:if="{{hasHeroEvent}}" class="c1-hero" data-id="{{heroEvent.id}}" bindtap="openEvent">
-        <view class="c1-hero__head"><view class="c1-hero__date">{{heroDateLabel}} · {{heroKindLabel}}</view></view>
-        <view class="c1-hero__main"><view class="c1-hero__time">{{heroEvent.startTime}}</view><view class="c1-hero__title">{{heroEvent.title}}</view></view>
-        <view class="c1-hero__meta">{{heroEvent.locationLabel}}</view>
-        <view class="c1-hero__pills" wx:if="{{heroPills.length}}">
-          <view wx:for="{{heroPills}}" wx:key="label" class="c1-hero__pill c1-hero__pill--{{item.tone}}">
-            <text class="c1-hero__pill-value">{{item.value}}</text>
-            <text class="c1-hero__pill-label">{{item.label}}</text>
-          </view>
-        </view>
-        <view class="c1-hero__pills" wx:else>
-          <view class="c1-hero__pill">{{heroEvent.statusLabel}}</view>
-          <view wx:if="{{heroEvent.hasDuration}}" class="c1-hero__pill">{{heroEvent.durationText}}</view>
-        </view>
-        <view class="c1-hero__link">查看详情 →</view>
-      </view>
-
+      <view class="agenda-heading">{{heroDateLabel}}</view>
+      <view class="agenda-summary"><text wx:for="{{heroPills}}" wx:key="label">{{item.label}} {{item.value}}　</text></view>
       <view wx:if="{{hasVisibleEvents}}" class="c1-list">
         <view wx:for="{{visibleEvents}}" wx:key="id" class="acard acard--{{item.cardTone}}" data-id="{{item.id}}" bindtap="openEvent">
           <view class="acard__accent" style="background:{{item.typeColor}}"></view>

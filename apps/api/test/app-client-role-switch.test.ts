@@ -334,4 +334,32 @@ describe("app-client active role sessions", () => {
        if (second) second.database.close();
      }
   }, 15_000);
+  it("automatically chooses a valid backend default, persists the last switch across restart, and ignores revoked roles",async()=>{
+    const path=createRoleSwitchDatabasePath(),data=createSeedData();
+    const membership=data.clubMemberships.find(m=>m.clubId===clubId && m.userId==="user-parent-1")!;
+    membership.roles=["parent","coach"];
+    data.coaches.push({...data.coaches.find(c=>c.clubId===clubId)!,id:"ui-dual-coach",clubId,userId:"user-parent-1",status:"active"});
+    let p=await createPlatformPersistence({databasePath:path,seedData:data}),app=createApp(data,p);
+    const scope={clubId,appClientId:clientId,userId:"user-parent-1"};
+    try{
+      let response=await login(app,scope.userId,"auto-active-role-v1");
+      expect(response.statusCode,response.body).toBe(200);expect(response.json()).toMatchObject({status:"role_configuration_required",session:null});
+      p.repositories.appClientSessions.saveRolePreference(scope,"default_role","parent");
+      response=await login(app,scope.userId,"auto-active-role-v1");expect(response.json().session.activeRole).toBe("parent");
+      const switched=await app.inject({method:"POST",url:rolePath,headers:{authorization:`Bearer ${response.json().session.token}`},payload:{role:"coach"}});expect(switched.statusCode,switched.body).toBe(200);
+      await app.close();p.database.close();
+      p=await createPlatformPersistence({databasePath:path,seed:false});app=createApp(data,p);
+      response=await login(app,scope.userId,"auto-active-role-v1");expect(response.json().session.activeRole).toBe("coach");
+      await p.repositories.memberships.save({...membership,roles:["parent"]});
+      response=await login(app,scope.userId,"auto-active-role-v1");expect(response.json().session.activeRole).toBe("parent");
+    }finally{await app.close();p.database.close();}
+  },15_000);
+  it("does not let an unbound parent identity block a valid coach or create a pending role session",async()=>{
+    const data=createSeedData();addUserWithMembership(data,"ui-unbound",["parent","coach"]);
+    data.parents.push({...data.parents.find(parent=>parent.clubId===clubId)!,id:"ui-unbound-parent",userId:"ui-unbound",clubId});
+    data.coaches.push({...data.coaches.find(coach=>coach.clubId===clubId)!,id:"ui-unbound-coach",userId:"ui-unbound",clubId,status:"active"});
+    const p=await createPlatformPersistence({databasePath:":memory:",seedData:data}),app=createApp(data,p);
+    try{p.repositories.appClientSessions.saveRolePreference({clubId,appClientId:clientId,userId:"ui-unbound"},"default_role","parent");const response=await login(app,"ui-unbound","auto-active-role-v1");expect(response.statusCode,response.body).toBe(200);expect(response.json()).toMatchObject({role:"coach",availableRoles:["coach"],session:{activeRole:"coach"}});const denied=await app.inject({method:"POST",url:rolePath,headers:{authorization:`Bearer ${response.json().session.token}`,"x-app-client-capabilities":"auto-active-role-v1"},payload:{role:"parent"}});expect(denied.statusCode).toBe(403);}finally{await app.close();p.database.close();}
+  });
+
 });

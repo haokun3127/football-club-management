@@ -1,1 +1,6 @@
 @import "../../coach/student-results/index.wxss";
+
+/* 移动端触控下限，业务内容与原事件保持一致。 */
+.results-alternative,
+.results-back,
+.results-card { min-height:44px; min-width:44px; box-sizing:border-box; }

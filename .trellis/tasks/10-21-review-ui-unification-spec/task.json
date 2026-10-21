@@ -2,7 +2,7 @@
   "id": "review-ui-unification-spec",
   "name": "review-ui-unification-spec",
   "title": "本轮审查：双端统一UI与球队管理优化spec",
-  "description": "按已批准v1.1分批实现双端统一UI、自动角色登录、日历、雷达与球队工作区；当前B1基础已落地、B2验证中。",
+  "description": "v1.1后续批次本地实现及全页移动端收口；当前在最终差异审查，配套部署/真机/正式包体/指定图片素材保留验收边界。",
   "status": "in_progress",
   "dev_type": "fullstack",
   "scope": "ui-review",
@@ -24,6 +24,6 @@
     "docs/current/development-delivery-channel.md",
     ".trellis/tasks/archive/2026-10/10-21-review-account-test-data/review-notes.md"
   ],
-  "notes": "2026-10-21已批准开发。B1本地提交110f048d；B2最新日格仅日期+类型色块，验证详情以implement.md为准。部署/上传未授权。",
+  "notes": "B1/B2已提交110f048d、7269d556；B3/B4/B5与全局收口见implement.md唯一进度。整仓门禁已通过，最后真实浏览器发现options合同已修并补回归。未部署/上传/改Figma，未齐外部验收不归档。",
   "meta": {}
 }

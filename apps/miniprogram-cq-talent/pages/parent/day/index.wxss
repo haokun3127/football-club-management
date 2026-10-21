@@ -1,5 +1,5 @@
 .p11 { min-height: 100vh; background: #f6f7f9; }
-.p11-nav { position: sticky; top: 0; z-index: 100; display: flex; box-sizing: content-box; align-items: center; justify-content: center; height: 88rpx; padding: 0 32rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03); }
+.p11-nav { position: sticky; top: 0; z-index: 100; display: flex; box-sizing: content-box; align-items: center; justify-content: center; height:44px; padding: 0 32rpx; background: #ffffff; box-shadow:none; }
 .p11-nav__title { color: #202124; font-size: var(--font-size-display); font-weight: 700; line-height: 1.5; }
 .p11-nav__back, .p11-nav__filter { position: absolute; display: flex; align-items: center; justify-content: center; width: 64rpx; height: 64rpx; }
 .p11-nav__back { left: 32rpx; }
@@ -7,13 +7,18 @@
 .p11-nav__filter image { width: 40rpx; height: 40rpx; }
 .p11-body { padding: 32rpx 32rpx calc(160rpx + env(safe-area-inset-bottom)); }
 .p11-list { display: flex; flex-direction: column; gap: 24rpx; }
-.p11-card { display: flex; box-sizing: border-box; width: 686rpx; height: 236rpx; padding: 32rpx; border-radius: 32rpx; background: #ffffff; box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06); }
+.p11-card { display: flex; box-sizing: border-box; width: 686rpx; height: 236rpx; padding: 32rpx; border-radius: 32rpx; background: #ffffff; box-shadow:none; }
 .p11-card__bar { flex: 0 0 8rpx; width: 8rpx; height: 172rpx; margin-right: 32rpx; border-radius: 40rpx; }
 .p11-card__main { display: flex; flex: 1; flex-direction: column; min-width: 0; }
 .p11-card__head { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; height: 42rpx; }
 .p11-card__title { overflow: hidden; flex: 1; color: #202124; font-size: var(--font-size-section); font-weight: 700; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
-.p11-card__status { flex: 0 0 auto; box-sizing: border-box; height: 42rpx; padding: 8rpx 20rpx; border-radius: 999rpx; font-size: var(--font-size-aux); font-weight: 600; line-height: 1.5; }
+.p11-card__status { flex: 0 0 auto; box-sizing: border-box;    font-size: var(--font-size-aux); font-weight: 600; line-height: 1.5;       background:transparent;border-radius:0;padding:0;height:auto;min-height:0;color:var(--color-text-secondary);}
 .p11-card__meta { margin-top: 16rpx; color: #667085; font-size: var(--font-size-body); line-height: 1.5; }
 .p11-card__place { display: flex; align-items: center; gap: 12rpx; overflow: hidden; margin-top: 8rpx; color: #667085; font-size: var(--font-size-body); line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
 .p11-card__place image { flex: 0 0 auto; width: 28rpx; height: 28rpx; }
 .p11-card__coach { margin-top: 8rpx; color: #667085; font-size: var(--font-size-aux); line-height: 1.5; }
+
+/* 移动端触控下限，业务内容与原事件保持一致。 */
+.p11-card,
+.p11-nav__back,
+.p11-nav__filter { min-height:44px; min-width:44px; box-sizing:border-box; }

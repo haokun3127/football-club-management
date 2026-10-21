@@ -14,10 +14,10 @@
 .calendar__day--pressed { background:var(--color-brand-soft); }
 .calendar__footer { display:flex; height:44px; justify-content:space-between; align-items:center; }
 .calendar__legend { display:flex; height:24px; gap:20px; align-items:center; justify-content:center; font-size:14px; color:var(--color-text-secondary); }
-.calendar__legend text::before { content:""; display:inline-block; margin-right:5px; width:6px; height:6px; border-radius:50%; }
+.calendar__legend text::before { content:""; display:inline-block; margin-right:5px; width:10px; height:8px; border-radius:2px; }
 .training::before { background:var(--color-info); }.match::before { background:var(--color-brand); }.other::before { background:var(--color-success); }
-.calendar__markers { display:flex; height:14px; align-items:center; justify-content:center; gap:2px; }
-.calendar__marker { width:8px; height:4px; border-radius:2px; flex:0 0 8px; }
+.calendar__markers { display:flex; width:calc(100% - 4px); max-width:56px; height:16px; margin:0 auto; align-items:center; justify-content:center; gap:3px; }
+.calendar__marker { height:8px; min-width:0; max-width:22px; border-radius:2px; flex:1 1 0; }
 .calendar__marker--training { background:var(--color-info); }
 .calendar__marker--match { background:var(--color-brand); }
 .calendar__marker--other { background:var(--color-success); }

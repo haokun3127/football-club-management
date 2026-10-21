@@ -2,13 +2,13 @@
   <view class="team-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="team-nav__left" bindtap="goBack">
       <image class="team-nav__back" src="/assets/icons/chevron-left.svg" mode="aspectFit" />
-      <view class="team-nav__title">队伍详情</view>
+      <view class="team-nav__title">{{pageTitle}}</view>
     </view>
   </view>
 
   <view class="team-page__body">
-    <view class="members-title" bindtap="openScouts">球探人员库 ›</view>
-    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="队伍详情" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
+    <t-button wx:if="{{state === 'empty'}}" theme="primary" bindtap="chooseTeam">选择球队</t-button>
+    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{pageTitle}}" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready' && hasTeam}}">
       <scroll-view wx:if="{{hasTeamOptions}}" class="team-selector" scroll-x><view wx:for="{{teamOptions}}" wx:key="id" class="team-selector__item {{teamId === item.id ? 'is-active' : ''}}" data-id="{{item.id}}" bindtap="selectTeam">{{item.name}}</view></scroll-view>
@@ -23,8 +23,8 @@
         </view>
       </view>
 
-      <view class="matches-section"><view class="members-title">正式赛事</view><view class="members-empty">与日历共用赛事记录，友谊赛在训练内容中查看。</view><view wx:for="{{matches}}" wx:key="eventId" class="team-match" data-id="{{item.eventId}}" bindtap="openMatch"><view class="team-match__title">{{item.title}} ›</view><view class="team-match__subtitle">{{item.subtitle}}</view><view class="team-match__score">{{item.score}}</view></view><view wx:if="{{!hasMatches}}" class="members-empty">本队暂无正式赛事</view></view>
-      <view class="members-title">学员名单</view>
+      <view class="matches-section" wx:if="{{section === 'all' || section === 'matches'}}"><view class="members-title">正式赛事</view><view class="members-empty">与日历共用赛事记录，友谊赛在训练内容中查看。</view><view wx:for="{{matches}}" wx:key="eventId" class="team-match" data-id="{{item.eventId}}" bindtap="openMatch"><view class="team-match__title">{{item.title}} ›</view><view class="team-match__subtitle">{{item.subtitle}}</view><view class="team-match__score">{{item.score}}</view></view><view wx:if="{{!hasMatches}}" class="members-empty">本队暂无正式赛事</view></view>
+      <block wx:if="{{section === 'all' || section === 'roster'}}"><view class="members-title">队员名单 · 点击查看详情</view>
       <view wx:if="{{hasMembers}}" class="members-grid">
         <view wx:for="{{members}}" wx:key="id" class="member" data-id="{{item.id}}" bindtap="openRadar">
           <view class="member__avatar" style="background: {{item.avatarBg}}; color: {{item.avatarColor}}">{{item.initial}}</view>
@@ -33,7 +33,7 @@
       </view>
       <view wx:else class="members-empty">{{memberEmptyMessage}}</view>
 
-      <view class="coaches-section">
+      </block><view class="coaches-section" wx:if="{{section === 'all' || section === 'coaches'}}">
         <view class="coaches-title">教练组</view>
         <scroll-view wx:if="{{hasCoaches}}" class="coaches-scroll" scroll-x enable-flex show-scrollbar="{{false}}">
           <view class="coaches-scroll__content">

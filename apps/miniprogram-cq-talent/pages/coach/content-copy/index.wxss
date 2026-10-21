@@ -1,8 +1,8 @@
 .copy-page { min-height:100vh; background:var(--club-page); color:var(--club-muted); }
-.copy-nav { position:sticky; top:0; z-index:10; display:flex; align-items:center; height:88rpx; background:var(--club-nav); color:var(--club-text); font-size: var(--font-size-body); gap:8rpx; padding-left:20rpx; }
+.copy-nav { position:sticky; top:0; z-index:10; display:flex; align-items:center; height:44px; background:var(--club-nav); color:var(--club-text); font-size: var(--font-size-body); gap:8rpx; padding-left:20rpx; }
 .copy-page .back { padding:0; margin:0; min-width:56rpx; width:56rpx; height:72rpx; line-height:68rpx; color:var(--club-text); background:transparent; font-size:48rpx; }
 .copy-body { padding:32rpx 32rpx calc(190rpx + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:16rpx; }
-.copy-card { padding:22rpx; display:flex; flex-direction:column; gap:10rpx; border:1rpx solid var(--club-line); border-radius:28rpx; background:#fff; box-shadow:var(--club-shadow); font-size: var(--font-size-aux); line-height:1.5; overflow-wrap:anywhere; }
+.copy-card { padding:22rpx; display:flex; flex-direction:column; gap:10rpx; border:1rpx solid var(--club-line); border-radius:28rpx; background:#fff; box-shadow:none; font-size: var(--font-size-aux); line-height:1.5; overflow-wrap:anywhere; }
 .card-title { font-size: var(--font-size-section); font-weight:700; color:var(--club-muted); }
 .brand { color:var(--color-brand); }
 .success { color:#188754; }
@@ -31,7 +31,7 @@
 .target-title { font-size: var(--font-size-section); font-weight:700; color:var(--club-text); }
 .target-date { margin-top:12rpx; color:#4f4947; }
 .target-metrics { margin-top:12rpx; font-size: var(--font-size-aux); }
-.target-status { margin-top:12rpx; text-align:right; font-size: var(--font-size-aux); }
+.target-status { margin-top:12rpx; text-align:right; font-size: var(--font-size-aux);       background:transparent;border-radius:0;padding:0;height:auto;min-height:0;color:var(--color-text-secondary);}
 .selection-warning { padding:20rpx 24rpx; border:1rpx solid var(--club-warning-line); border-radius:20rpx; background:var(--club-warning-soft); font-size: var(--font-size-aux); line-height:1.6; color:#4f4947; }
 .selection-warning .brand { margin-top:8rpx; font-size: var(--font-size-aux); }
 .selection-actions { display:flex; gap:16rpx; }

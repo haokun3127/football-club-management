@@ -9,13 +9,16 @@
     "smoke:app-client": "node scripts/smoke-app-client.mjs",
     "devtools:preview": "node scripts/devtools-preview.mjs",
     "devtools:automator:open": "node scripts/devtools-automator-open.mjs",
-    "devtools:screenshot": "node scripts/devtools-screenshot.mjs"
+    "devtools:screenshot": "node scripts/devtools-screenshot.mjs",
+    "build:radar": "node scripts/build-radar.mjs"
   },
   "devDependencies": {
+    "esbuild": "0.28.2",
     "miniprogram-api-typings": "^5.2.3",
     "miniprogram-automator": "0.12.1",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.9",
+    "echarts": "6.1.0"
   },
   "dependencies": {
     "tdesign-miniprogram": "1.17.0"

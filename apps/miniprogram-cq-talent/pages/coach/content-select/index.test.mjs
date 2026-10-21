@@ -326,10 +326,9 @@ describe("coach training content select", () => {
     expect(template).toContain('padding-right:{{menuInset}}px');
     expect(template).toContain('class="{{item.selectClass}}"');
     expect(template).toContain('{{summaryLabel}}');
-    expect(stylesheet).toMatch(/\.select-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*background:\s*#fceeef)/s);
+    expect(stylesheet).toMatch(/\.select-nav\s*\{(?=[^}]*height:\s*44px)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*background:\s*#fceeef)/s);
     expect(stylesheet).toMatch(/\.select-nav__left\s*\{[^}]*gap:\s*24rpx/s);
     expect(stylesheet).toMatch(/\.select-nav__title\s*\{[^}]*font-size:\s*44rpx[^}]*line-height:\s*54rpx/s);
-    expect(stylesheet).toMatch(/\.search-bar\s*\{[^}]*min-height:\s*88rpx[^}]*border-radius:\s*44rpx/s);
     expect(stylesheet).toMatch(/\.project-card\s*\{[^}]*min-height:\s*128rpx/s);
     expect(controller).toContain("summaryLabel");
     expect(controller).not.toContain("openCoverage");

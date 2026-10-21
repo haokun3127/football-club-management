@@ -1275,3 +1275,16 @@ describe("browser backoffice management", () => {
     }
   });
 });
+
+it("validates, audits and version-checks the account's default mini-program role",async()=>{
+ const f=await fixture(),base="resources/app-role-preferences",values={userId:"user-parent-1",appClientId:"app-client-cq-talent-wechat-main",defaultRole:"parent"};
+ try{
+ const clientOptions=await f.request("GET","options/app-clients");expect(clientOptions.statusCode).toBe(200);expect(clientOptions.json()).toEqual(expect.arrayContaining([expect.objectContaining({value:values.appClientId})]));
+  const invalid=await f.request("POST",base,saveBody({...values,defaultRole:"coach"}));expect(invalid.statusCode,invalid.body).toBe(400);
+  const saved=await f.request("POST",base,saveBody(values));expect(saved.statusCode,saved.body).toBe(200);const record=saved.json();
+  const detail=await f.request("GET",`${base}/${record.id}`);expect(detail.json().history).toHaveLength(1);
+  expect(f.p.repositories.appClientSessions.rolePreference({clubId,appClientId:values.appClientId,userId:values.userId}).defaultRole).toBe("parent");
+  const stale=await f.request("PUT",`${base}/${record.id}`,saveBody({...values,defaultRole:null},"stale"));expect(stale.statusCode).toBe(409);
+  const updated=await f.request("PUT",`${base}/${record.id}`,saveBody({...values,defaultRole:null},record.revision));expect(updated.statusCode,updated.body).toBe(200);
+ }finally{await f.close();}
+});

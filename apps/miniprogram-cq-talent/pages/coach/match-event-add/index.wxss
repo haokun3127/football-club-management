@@ -24,7 +24,7 @@
   padding: 32rpx;
   border-radius: 24rpx;
   background: var(--color-card);
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, .05);
+  box-shadow:none;
 }
 
 .section-title {
@@ -161,3 +161,7 @@
   font-size: var(--font-size-aux);
   line-height: 1.5;
 }
+
+/* 移动端触控下限，业务内容与原事件保持一致。 */
+.save-button,
+.type-chip { min-height:44px; min-width:44px; box-sizing:border-box; }

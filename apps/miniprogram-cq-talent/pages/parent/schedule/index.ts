@@ -1,9 +1,10 @@
+import {calendarDataRanges} from "../../../utils/schedule-calendar";
 import { getContentArticles, getParentCalendar, getParentChildren, getParentReminders } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { DEV_PARENT_PAGE_DATE_OVERRIDE } from "../../../utils/config";
 import { calendarDateKey, currentLocalDate, resolveParentPageDate } from "../../../utils/date";
 import { openPage } from "../../../utils/navigation";
-import { activityStatus, childNames, formatCalendarDate, formatShortDate, formatTimeOnly, formatTimeRange, resolveMenuInset, resolveNavInset, resolveTopBarHeight } from "../../../utils/presentation";
+import { activityStatus, childNames, formatCalendarDate, formatShortDate, formatTimeRange, resolveMenuInset, resolveNavInset, resolveTopBarHeight } from "../../../utils/presentation";
 import { countUnreadReminders } from "../../../utils/reminders";
 import { setCurrentStudentId } from "../../../utils/store";
 import type { ContentArticle, LoadState, ScheduleEvent, StudentSummary } from "../../../utils/types";
@@ -18,26 +19,6 @@ type ScheduleEventView = ScheduleEvent & {
   durationText: string;
   childNames: string;
 };
-
-type HeroView = {
-  todayLabel: string;
-  weekCount: number;
-  weekHours: string;
-} & (
-  | {
-      mode: "upcoming";
-      id: string;
-      title: string;
-      timeText: string;
-      teamName: string;
-      venue: string;
-    }
-  | {
-      mode: "empty";
-      title: "该日期暂无日程";
-      description: "暂未安排训练、比赛或其他活动";
-    }
-);
 
 const TYPE_COLORS: Record<string, string> = {
   training: "#2268d8",
@@ -77,7 +58,6 @@ interface PageData {
   todayCount: number;
   weekCount: number;
   weekHours: string;
-  hero: HeroView | null;
   noticeBanner: NoticeBannerView | null;
 }
 
@@ -89,7 +69,8 @@ const typeTabs: PageData["typeTabs"] = [
 ];
 
 const initialDate = resolveParentPageDate(new Date(), DEV_PARENT_PAGE_DATE_OVERRIDE);
-let scheduleLoadToken = 0;
+const scheduleLoadTokens=new WeakMap<object,number>();
+const familySelections=new WeakSet<object>();
 
 Page<PageData>({
   data: {
@@ -116,7 +97,6 @@ Page<PageData>({
     todayCount: 0,
     weekCount: 0,
     weekHours: "0",
-    hero: null,
     noticeBanner: null,
   },
   onLoad() {
@@ -137,22 +117,24 @@ Page<PageData>({
   async load() {
     const session = requireRole("parent");
     if (!session) return;
-    const loadToken = ++scheduleLoadToken;
+    const loadToken=(scheduleLoadTokens.get(this)??0)+1;scheduleLoadTokens.set(this,loadToken);
     const selectedDate = this.data.selectedDate;
     this.setData({ state: "loading", message: "正在读取家庭日程" });
     try {
       const children = await getParentChildren();
-      if (loadToken !== scheduleLoadToken) return;
+      if (loadToken !== scheduleLoadTokens.get(this)) return;
       if (!children.length) {
         this.setData({ state: "empty", message: "当前微信手机号尚未绑定孩子档案，请联系俱乐部确认登记信息。" });
         return;
       }
-      const [events, articles] = await Promise.all([
-        getParentCalendar(`${selectedDate.slice(0,7)}-01`, new Date(Date.UTC(Number(selectedDate.slice(0,4)), Number(selectedDate.slice(5,7)), 0)).toISOString().slice(0,10)),
-        getContentArticles(),
+      const ranges=calendarDataRanges(selectedDate,this.data.isMonthPickerExpanded);
+      const [batches,articles]=await Promise.all([
+        Promise.all(ranges.map(range=>getParentCalendar(`${range.from}T00:00:00+08:00`,`${range.to}T23:59:59.999+08:00`))),getContentArticles(),
       ]);
-      if (loadToken !== scheduleLoadToken) return;
-      const active = children.find((child) => child.id === session.currentStudentId) ?? children[0];
+      const events=[...new Map(batches.flat().map(event=>[event.id,event])).values()];
+      if (loadToken !== scheduleLoadTokens.get(this)) return;
+      const preferred=familySelections.has(this) ? this.data.activeStudentId : session.currentStudentId;
+      const active=familySelections.has(this) && !preferred ? null : children.find(child=>child.id===preferred) ?? children[0];
       if (active && active.id !== session.currentStudentId) setCurrentStudentId(active.id);
       const childEvents = filterEvents(events, active?.id ?? "", "", "all");
       const visibleEvents = presentEvents(filterEvents(events, active?.id ?? "", selectedDate, this.data.selectedType));
@@ -173,16 +155,18 @@ Page<PageData>({
         todayCount: digest.todayCount,
         weekCount: digest.weekCount,
         weekHours: digest.weekHours,
-        hero: digest.hero,
         noticeBanner,
       });
     } catch (error) {
-      if (loadToken !== scheduleLoadToken) return;
+      if (loadToken !== scheduleLoadTokens.get(this)) return;
       this.setData({ state: "error", message: readableError(error) });
     }
   },
+  onUnload(){scheduleLoadTokens.set(this,(scheduleLoadTokens.get(this)??0)+1);familySelections.delete(this);},
   onChildChange(event: { detail: { studentId: string } }) {
+    familySelections.add(this);
     const id = event.detail.studentId === "all" ? "" : event.detail.studentId;
+    if(id && !this.data.children.some((child:StudentSummary)=>child.id===id))return;
     const child = this.data.children.find((item: StudentSummary) => item.id === id);
     if (id) setCurrentStudentId(id);
     const digest = buildScheduleDigest(filterEvents(this.data.events, id, "", "all"), this.data.selectedDate);
@@ -193,7 +177,6 @@ Page<PageData>({
       todayCount: digest.todayCount,
       weekCount: digest.weekCount,
       weekHours: digest.weekHours,
-      hero: digest.hero,
       calendarEvents: childEvents,
     });
     this.applyFilters();
@@ -206,7 +189,7 @@ Page<PageData>({
     if (event.detail.date === this.data.selectedDate) return;
     return this.onDateChange({detail:{value:event.detail.date}});
   },
-  onCalendarViewChange(event: {detail:{expanded:boolean}}) { this.setData({isMonthPickerExpanded:event.detail.expanded}); },
+  onCalendarViewChange(event: {detail:{expanded:boolean}}) {this.setData({isMonthPickerExpanded:event.detail.expanded});if(event.detail.expanded)return this.load();},
   switchType(event: { currentTarget: { dataset: { type?: PageData["selectedType"] } } }) {
     const selectedType = event.currentTarget.dataset.type;
     if (!selectedType || selectedType === this.data.selectedType) return;
@@ -311,19 +294,16 @@ export function buildScheduleDigest(events: ScheduleEvent[], selectedDate: strin
   const selected = new Date(`${selectedDate || initialDate}T00:00:00.000Z`);
   const selectedKey = selected.toISOString().slice(0, 10);
   const weekStart = weekWindowStart(selectedDate);
-  const weekEnd = new Date(weekStart);
-  weekEnd.setUTCDate(weekEnd.getUTCDate() + 7);
+  const startTime=Date.parse(`${weekStart.toISOString().slice(0,10)}T00:00:00+08:00`);
+  const endTime=startTime+7*86400000;
   const weekEvents = events.filter((event) => {
     const startsAt = Date.parse(event.startsAt);
-    return Number.isFinite(startsAt) && startsAt >= weekStart.getTime() && startsAt < weekEnd.getTime();
+    return Number.isFinite(startsAt) && startsAt >= startTime && startsAt < endTime;
   });
   const weekMinutes = weekEvents.reduce((total, event) => {
     const span = Date.parse(event.endsAt ?? "") - Date.parse(event.startsAt ?? "");
     return total + (Number.isFinite(span) && span > 0 ? span : 0);
   }, 0) / 60000;
-  const upcoming = events
-    .filter((event) => calendarDateKey(event.startsAt) === selectedKey && event.status !== "cancelled")
-    .sort((left, right) => Date.parse(left.startsAt) - Date.parse(right.startsAt))[0];
   const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
   const todayLabel = `${selected.getUTCFullYear()}年${selected.getUTCMonth() + 1}月${selected.getUTCDate()}日 周${weekdays[selected.getUTCDay()]}`;
   const weekCount = weekEvents.length;
@@ -333,26 +313,7 @@ export function buildScheduleDigest(events: ScheduleEvent[], selectedDate: strin
     todayCount: events.filter((event) => calendarDateKey(event.startsAt) === selectedKey).length,
     weekCount,
     weekHours,
-    hero: upcoming
-      ? {
-          mode: "upcoming",
-          todayLabel,
-          weekCount,
-          weekHours,
-          id: upcoming.id,
-          title: upcoming.title,
-          timeText: formatTimeOnly(upcoming.startsAt),
-          teamName: upcoming.teamName ?? "",
-          venue: upcoming.venue ?? "",
-        }
-      : {
-          mode: "empty",
-          todayLabel,
-          weekCount,
-          weekHours,
-          title: "该日期暂无日程",
-          description: "暂未安排训练、比赛或其他活动",
-        },
+
   };
 }
 

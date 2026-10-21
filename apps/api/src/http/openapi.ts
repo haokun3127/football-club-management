@@ -1,3 +1,4 @@
+import {radarComparisonSchema} from "./radar-comparison-schemas.js";
 import {workbenchSchema} from './backoffice-workbench-schemas.js';
 import {clubPresentationSchema} from './club-presentation-schemas.js';
 import {biSchemas} from "./backoffice-bi-schemas.js";
@@ -346,6 +347,8 @@ export function buildOpenApiDocument() {
           ...schemas.appClientActivitySummaries,
         }),
       },
+      "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/radar-comparison":{get:operation("GET","/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/radar-comparison",{...schemas.appClientStudentParams,...radarComparisonSchema})},
+      "/clubs/{clubId}/app-clients/{clientId}/coach/students/{studentId}/radar-comparison":{get:operation("GET","/clubs/{clubId}/app-clients/{clientId}/coach/students/{studentId}/radar-comparison",{...schemas.appClientStudentParams,...radarComparisonSchema})},
       "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/growth-summary": {
         get: operation("GET", "/clubs/{clubId}/app-clients/{clientId}/parent/students/{studentId}/growth-summary", {
           ...schemas.appClientStudentParams,

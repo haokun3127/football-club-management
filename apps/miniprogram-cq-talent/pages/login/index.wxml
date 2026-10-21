@@ -1,39 +1,22 @@
 <view class="login-page">
-  <view class="login-nav" style="margin-top: {{navTop}}px"><view class="login-nav__title">{{isBlocked ? '访问受限' : '身份验证'}}</view></view>
-
-  <view wx:if="{{isBlocked}}" class="blocked-card">
-    <view class="blocked-card__icon"><image class="blocked-card__icon-image" src="/assets/icons/login-alert.svg" mode="aspectFit" /></view>
-    <view class="blocked-card__title">账号暂时受限</view>
-    <view class="blocked-card__desc">如有疑问，请联系俱乐部管理员</view>
-    <view class="blocked-card__status"><view class="blocked-card__chip">受限</view><view class="blocked-card__status-text">当前账号无法进入小程序</view></view>
-    <t-button class="blocked-card__button" bindtap="backToLaunch" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="blocked-card__button" theme="primary" variant="base">返回首页</t-button>
+  <app-header title="重庆天才" show-back="{{false}}" />
+  <view wx:if="{{isBlocked}}" class="login-body blocked-card">
+    <view class="login-title">暂时无法进入</view><view class="login-description">{{message}}</view>
+    <t-button theme="primary" variant="outline" bindtap="backToLaunch" block custom-style="min-height:48px;">返回首页</t-button>
   </view>
-
   <block wx:else>
-    <view wx:if="{{roleChooserVisible}}" class="role-chooser">
-      <view class="role-chooser__title">选择身份</view>
-      <view class="role-chooser__desc">{{message}}</view>
-      <t-button wx:if="{{canChooseParent}}" class="role-chooser__button" disabled="{{submitting}}" bindtap="chooseParentRole" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="role-chooser__button" theme="primary" variant="base">以家长身份进入</t-button>
-      <t-button wx:if="{{canChooseCoach}}" class="role-chooser__button" disabled="{{submitting}}" bindtap="chooseCoachRole" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="role-chooser__button" theme="primary" variant="base">以教练身份进入</t-button>
+    <view class="login-hero"><image class="login-hero__photo" src="/assets/content/football-editorial.jpg" mode="aspectFill" /><view class="login-hero__scrim" /><view class="login-hero__copy"><view class="login-hero__title"><view>重庆天才</view><view>足球俱乐部</view></view><view class="login-hero__caption">把热爱，留在球场</view></view></view>
+    <view class="login-body">
+      <view class="login-title">欢迎回到球队</view>
+      <view class="login-description">使用微信手机号匹配俱乐部档案，进入你的专属服务。</view>
+      <view class="agreement-row"><t-checkbox class="agreement-check" checked="{{agreementAccepted}}" disabled="{{submitting}}" content="" aria-label="同意用户协议和隐私政策" bindchange="onAgreementChange" /><view class="agreement-copy"><text bindtap="toggleAgreement">我已阅读并同意</text><text class="agreement-link" catchtap="openAgreement">《用户协议》</text><text>和</text><text class="agreement-link" catchtap="openPrivacy">《隐私政策》</text></view></view>
+      <button class="login-cta {{!agreementAccepted || submitting || state === 'loading' || authorizationLocked ? 'login-cta--disabled' : ''}}" open-type="getPhoneNumber|agreePrivacyAuthorization" loading="{{submitting}}" disabled="{{!agreementAccepted || submitting || state === 'loading' || authorizationLocked}}" bindtap="onPhoneAuthorizationTap" bindgetphonenumber="onGetPhoneNumber" bindagreeprivacyauthorization="onPrivacyAgreed">微信手机号登录</button>
+      <view wx:if="{{state === 'loading'}}" class="login-feedback" aria-live="polite">{{message}}</view>
+      <view wx:elif="{{state === 'error' || state === 'pending'}}" class="login-feedback login-feedback--error" aria-live="polite">{{message}}<t-button theme="primary" variant="text" bindtap="retry" custom-style="min-height:44px;">重新尝试</t-button></view>
+      <view class="login-caption">身份由俱乐部配置；拥有多个身份时，可在“我的”中切换。</view>
     </view>
-
-    <block wx:else>
-      <view class="login-hero-card">
-        <view class="login-hero-card__badge"><image class="login-hero-card__icon" src="/assets/icons/login-link.svg" mode="aspectFit" /></view>
-        <view class="login-hero-card__title">连接重庆天才服务</view>
-        <view class="login-hero-card__desc">验证微信手机号，自动匹配俱乐部身份</view>
-      </view>
-
-      <view class="login-form-card">
-        <view class="login-field"><view class="login-field__label">微信手机号</view><view class="login-field__line"></view><view class="login-field__placeholder">授权后自动读取</view></view>
-        <view class="login-field login-field--status"><view class="login-field__label">身份匹配</view><view class="login-field__line"></view><view class="login-field__status">自动匹配俱乐部档案</view></view>
-      </view>
-
-      <view wx:if="{{state === 'loading'}}" class="login-feedback login-feedback--loading">{{message}}</view>
-      <view wx:elif="{{state === 'error'}}" class="login-feedback login-feedback--error" bindtap="retry">{{message}}<text class="login-feedback__action">重新连接</text></view>
-
-      <view class="login-cta-wrap"><button class="login-cta {{submitting || state === 'loading' || authorizationLocked ? 'login-cta--disabled' : ''}}" open-type="getPhoneNumber|agreePrivacyAuthorization" loading="{{submitting}}" disabled="{{submitting || state === 'loading' || authorizationLocked}}" bindtap="onPhoneAuthorizationTap" bindgetphonenumber="onGetPhoneNumber" bindagreeprivacyauthorization="onPrivacyAgreed">微信手机号授权并继续</button></view>
-      <view class="login-privacy">{{privacyAgreed ? '已同意《用户协议》和《隐私政策》' : '授权手机号时将一并征得《隐私政策》同意'}}</view>
-    </block>
   </block>
+  <t-popup visible="{{agreementVisible}}" placement="bottom" bindclose="closeAgreement" safe-area-inset-bottom>
+    <view class="agreement-panel"><view class="login-title">用户协议</view><scroll-view scroll-y class="agreement-document"><view>本小程序提供重庆天才足球俱乐部的日程、训练、测评和球队服务。</view><view>请使用与俱乐部登记资料一致的微信手机号登录。可访问的身份、球队和孩子由俱乐部授权配置；资料不一致时请联系俱乐部管理员更正。</view><view>家长可查看自己监护授权内的孩子信息；教练可在授权球队范围内使用相关服务。测评结果以俱乐部确认后的记录为准。</view><view>请妥善保管微信账号，仅在授权范围内查看和使用相关信息。如需更正资料或申请注销，请通过“我的”中的账号设置联系俱乐部处理。</view><view>个人信息处理范围及方式，以微信展示的《小程序用户隐私保护指引》为准。点击隐私政策可打开原文；勾选本页协议不会代替微信平台的隐私授权。</view></scroll-view><t-button theme="primary" variant="outline" block bindtap="closeAgreement" custom-style="min-height:48px;">关闭</t-button></view>
+  </t-popup>
 </view>

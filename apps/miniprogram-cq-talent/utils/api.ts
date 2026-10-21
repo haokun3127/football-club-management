@@ -1,3 +1,4 @@
+import type {ComparisonData} from "./radar-comparison";
 import type { CoachStudentProfile } from "./types";
 import type { AssessmentWorkflowSummary, AssessmentWorkingHistory } from "./types";
 import { APP_CLIENT_KEY, DEV_TEST_DATE } from "./config";
@@ -50,6 +51,7 @@ type MatchDetailReadOptions = {
 };
 
 type AssessmentTaskReadOptions = {
+  teamId?: string;
   forceRefresh?: boolean;
 };
 
@@ -67,7 +69,7 @@ export async function wechatLogin(wxLoginCode: string, phoneCode?: string): Prom
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/wechat-login`,
     method: "POST",
     data: { wxLoginCode, phoneCode },
-    headers: { "X-App-Client-Capabilities": "active-role-switch-v1" },
+    headers: { "X-App-Client-Capabilities": "auto-active-role-v1" },
   });
 }
 
@@ -78,6 +80,7 @@ export async function switchActiveRole(role: "parent" | "coach", bearerToken?: s
     method: "POST",
     data: { role },
     bearerToken,
+    headers: { "X-App-Client-Capabilities": "auto-active-role-v1" },
   });
 }
 
@@ -541,6 +544,7 @@ function normalizeEvent(raw: Record<string, unknown>): ScheduleEvent {
       name: String(child.name ?? child.studentName ?? "学员"),
     })).filter((child) => child.id),
     teamName: stringOrUndefined(event.teamName ?? raw.teamName ?? firstTeamName),
+    teamIds: Array.from(new Set([event.primaryTeamId,raw.primaryTeamId,...rawTeams.map(team=>typeof team === "object" && team !== null ? (team as Record<string,unknown>).id : undefined)].filter((id):id is string=>typeof id === "string" && !!id))),
     status: String(event.status ?? raw.status ?? "待确认"),
     summary: stringOrUndefined(event.summary ?? raw.summary),
     participantCount: participants.length || undefined,
@@ -1584,7 +1588,8 @@ export async function createCoachEventChangeRequest(
 
 export async function getCoachAssessmentTasks(options: AssessmentTaskReadOptions = {}): Promise<CoachAssessmentTask[]> {
   const context = requireContext();
-  const refreshQuery = options.forceRefresh ? `?refresh=${Date.now()}-${++assessmentTaskRefreshSequence}` : "";
+  const query=[options.forceRefresh ? `refresh=${Date.now()}-${++assessmentTaskRefreshSequence}` : "",options.teamId ? `teamId=${encodeURIComponent(options.teamId)}` : ""].filter(Boolean).join("&");
+  const refreshQuery=query ? `?${query}` : "";
   const response = await request<{ tasks?: CoachAssessmentTask[] }>({
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessment-tasks${refreshQuery}`,
   });
@@ -1599,10 +1604,11 @@ export interface AssessmentTaskOptions {
   sourceCourse?: {temporaryStudents?:Array<{id:string;name:string}>;id:string;title:string;teamId:string;date:string;studentIds:string[];startsAt?:string;endsAt?:string;attendance?:Array<{studentId:string;status:string}>};
   courseOptions?:Array<{id:string;title:string;teamId:string;date:string;startsAt?:string;endsAt?:string}>;
 }
-export async function getCoachAssessmentTaskOptions(sourceEventId?:string): Promise<AssessmentTaskOptions> {
+export async function getCoachAssessmentTaskOptions(sourceEventId?:string,teamId?:string): Promise<AssessmentTaskOptions> {
   const context = requireContext();
+  const query=[sourceEventId ? `sourceEventId=${encodeURIComponent(sourceEventId)}` : "",teamId ? `teamId=${encodeURIComponent(teamId)}` : ""].filter(Boolean).join("&");
   const response = await request<AssessmentTaskOptions>({
-    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessment-tasks${sourceEventId ? `?sourceEventId=${encodeURIComponent(sourceEventId)}` : ""}`,
+    path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/assessment-tasks${query ? `?${query}` : ""}`,
   });
   return {...response, tasks: response.tasks || [], templates: response.templates || [], teams: response.teams || []};
 }
@@ -1684,4 +1690,9 @@ export async function applyTrainingTransfer(input: import("./types").TrainingTra
 export async function getParentConfirmedResults(studentId: string) {
   const context = requireContext();
   return request<{ student: { id: string; name: string; teams: Array<{ name: string }> }; confirmedResults: import("./types").ConfirmedStudentResult[] }>({ path: `/clubs/${encodeURIComponent(context.clubId)}/app-clients/${encodeURIComponent(context.clientId)}/parent/students/${encodeURIComponent(studentId)}/confirmed-results` });
+}
+
+export async function getRadarComparison(studentId:string,role:"parent"|"coach",teamId?:string,selection:{historyResultId?:string;standardId?:string}={}):Promise<ComparisonData>{
+ const context=requireContext();const query=[role==="coach" && teamId ? `teamId=${encodeURIComponent(teamId)}` : "",selection.historyResultId ? `historyResultId=${encodeURIComponent(selection.historyResultId)}` : "",selection.standardId ? `standardId=${encodeURIComponent(selection.standardId)}` : ""].filter(Boolean).join("&");
+ return request<ComparisonData>({path:`/clubs/${context.clubId}/app-clients/${context.clientId}/${role}/students/${encodeURIComponent(studentId)}/radar-comparison${query ? `?${query}` : ""}`});
 }

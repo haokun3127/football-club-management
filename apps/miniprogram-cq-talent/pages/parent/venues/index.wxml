@@ -29,9 +29,9 @@
           <view wx:for="{{visibleVenues}}" wx:key="id" class="venue-card">
             <view class="venue-card__hero">
               <image class="venue-card__photo" src="{{item.heroImage}}" mode="aspectFill" />
-              <view class="venue-card__type">{{item.type}}</view>
             </view>
             <view class="venue-card__body">
+              <view class="venue-card__type">{{item.type}}</view>
               <view class="venue-card__name">{{item.name}}</view>
               <view class="venue-card__address"><image src="/assets/icons/map-pin.svg" mode="aspectFit" />{{item.address}}</view>
               <view wx:if="{{item.hasFacilities}}" class="venue-card__facilities">

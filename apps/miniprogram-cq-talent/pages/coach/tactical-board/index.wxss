@@ -7,8 +7,8 @@ page { height:100%; overflow:hidden; background:#f7f7f5; }
 .c7-title { font-size:18px; font-weight:700; }
 .c7-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 16px; font-size:12px; }
 .c7-event { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
-.c7-status { flex-shrink:0; color:#53645b; }
-.c7-status--error { color:#a80f1b; }
+.c7-status { flex-shrink:0;        background:transparent;border-radius:0;padding:0;height:auto;min-height:0;color:var(--color-text-secondary);}
+.c7-status--error {        background:transparent;border-radius:0;padding:0;height:auto;min-height:0;color:var(--color-text-secondary);}
 .c7-pitch { position:relative; flex:1; min-height:160px; margin:0 12px; overflow:visible; border-radius:8px; background:repeating-linear-gradient(0deg,#176044 0,#176044 12.5%,#1b694b 12.5%,#1b694b 25%); }
 .c7-boundary { position:absolute; inset:12px; border:1px solid #a0c4ad; }
 .c7-halfway { position:absolute; left:12px; right:12px; top:50%; border-top:1px solid #a0c4ad; }
@@ -17,7 +17,7 @@ page { height:100%; overflow:hidden; background:#f7f7f5; }
 .c7-box--top { top:12px; border-top:0; }.c7-box--bottom { bottom:12px; border-bottom:0; }
 .c7-hint { position:absolute; top:38%; width:100%; text-align:center; color:#e3eee7; font-size:13px; }
 .c7-player,.c7-ghost { position:absolute; display:flex; flex-direction:column; align-items:center; width:64px; transform:translate(-50%,-50%); z-index:2; }
-.c7-player image,.c7-ghost image { width:34px; height:34px; border:2px solid white; border-radius:50%; background:#a80f1b; box-shadow:0 2px 5px #0003; }
+.c7-player image,.c7-ghost image { width:34px; height:34px; border:2px solid white; border-radius:50%; background:#a80f1b; box-shadow:none; }
 .c7-player text,.c7-ghost text { max-width:90px; white-space:nowrap; background:#152e24; color:white; padding:2px 5px; border-radius:3px; font-size:12px; font-weight:600; }
 .c7-player--dragging { opacity:.3; }
 .c7-roster { margin:8px 12px 0; border:2px solid transparent; border-radius:8px; background:white; }

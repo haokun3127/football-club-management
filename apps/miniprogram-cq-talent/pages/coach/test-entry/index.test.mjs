@@ -236,7 +236,7 @@ describe("coach project score entry", () => {
     expect(mocks.showToast).toHaveBeenCalledTimes(1);
   });
 
-  it("projects at most four real fields into each student card and keeps later fields reachable", async () => {
+  it("shows one full-size metric per student and keeps later fields reachable", async () => {
     mocks.getAssessmentForm.mockResolvedValueOnce(form({
       fields: [
         { id: "field-speed", testItemId: "item-speed", metricId: "metric-speed", groupId: "fitness", groupLabel: "Fitness", label: "Actual speed", valueKind: "score_0_100", inputType: "number", minValue: 0, maxValue: 100, unit: "score" },
@@ -250,13 +250,13 @@ describe("coach project score entry", () => {
     await page.load("event-assessment-1");
 
     expect(page.data.draftRows[0].metricCells.map((cell) => cell.testItemId)).toEqual([
-      "item-speed", "item-endurance", "item-strength", "item-agility",
+      "item-speed",
     ]);
     expect(page.data.draftRows[0].metricCells.every((cell) => cell.rawValue === "")).toBe(true);
 
     page.nextField();
     expect(page.data.draftRows[0].metricCells.map((cell) => cell.testItemId)).toEqual([
-      "item-endurance", "item-strength", "item-agility", "item-balance",
+      "item-endurance",
     ]);
   });
 
@@ -315,15 +315,15 @@ describe("coach project score entry", () => {
     expect(stylesheet).not.toMatch(/\.c12-student-card__name\s*\{[^}]*word-break:\s*break-all/s);
   });
 
-  it("keeps the Figma C12 first viewport focused on learner cards before field navigation", () => {
+  it("keeps the active metric control before learner entry and shows its full label", () => {
     const studentsIndex = template.indexOf('class="c12-students"');
     const navigationIndex = template.indexOf('class="c12-field-navigation"');
     const progressIndex = template.indexOf('class="c12-progress"');
 
-    expect(template).toContain("{{cell.displayLabel}}");
+    expect(template).toContain("{{cell.label}}");
     expect(studentsIndex).toBeGreaterThan(-1);
-    expect(navigationIndex).toBeGreaterThan(studentsIndex);
-    expect(progressIndex).toBeGreaterThan(studentsIndex);
+    expect(navigationIndex).toBeLessThan(studentsIndex);
+    expect(progressIndex).toBeLessThan(studentsIndex);
   });
 
   it("serializes duplicate submits and keeps a safe page-local C12 shell", async () => {
@@ -348,7 +348,7 @@ describe("coach project score entry", () => {
     expect(template).toContain('/assets/icons/c12-arrow-left.svg');
     expect(stylesheet).toMatch(/\.c12-submit-wrap\s*\{[^}]*bottom:\s*140rpx/s);
     expect(template).toContain("{{navTitle}}");
-    expect(stylesheet).toMatch(/\.c12-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+    expect(stylesheet).toMatch(/\.c12-nav\s*\{(?=[^}]*height:\s*44px)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).toMatch(/\.c12-nav\s*\{[^}]*padding-left:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.c12-nav__left\s*\{[^}]*gap:\s*0/s);
     expect(stylesheet).toMatch(/\.c12-nav__title\s*\{(?=[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\))(?=[^}]*line-height:\s*1\.5)/s);

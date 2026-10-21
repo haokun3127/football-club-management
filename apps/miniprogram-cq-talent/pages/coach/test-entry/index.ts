@@ -410,7 +410,7 @@ Page<PageData>({
     const field = this.data.currentField;
     const form = this.data.form;
     if (!field?.testItemId || !form) return;
-    const visibleFields = this.data.fieldsInGroup.slice(this.data.fieldIndex, this.data.fieldIndex + 4);
+    const visibleFields = [field];
     const draftRows = this.data.roster.map((student: RosterStudent) => presentDraftRow(student, this.data.draft, field, visibleFields));
     const itemIds = form.fields.map((item: AssessmentField) => item.testItemId || "").filter(Boolean);
     const progress = draftProgress(this.data.draft, this.data.roster.map((student: RosterStudent) => student.studentId), itemIds);

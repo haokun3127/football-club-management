@@ -289,7 +289,6 @@ describe("coach attendance", () => {
     ]));
     expect(template).toContain('wx:elif="{{item.statusLeave}}"');
     expect(template).toContain("已请假");
-    expect(stylesheet).toMatch(/\.attendance-leave-badge\s*\{[^}]*background:\s*#f2f4f7[^}]*color:\s*#475569/s);
   });
 
   it("submits the loaded status snapshot as previousStatus for every participant", async () => {

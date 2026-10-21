@@ -1,3 +1,4 @@
+import {calendarDataRanges} from "../../../utils/schedule-calendar";
 import { environmentStorageKey } from "../../../utils/config";
 import { getCoachHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
@@ -83,7 +84,7 @@ Page({
     const session = requireRole("coach");
     if (!session) return;
     const version = (loadVersions.get(this) ?? 0) + 1; loadVersions.set(this, version);
-    const range = monthWindow(this.data.date);
+    const ranges=calendarDataRanges(this.data.date,this.data.viewMode==="month",true);
     const selectionKey = session.userId ? environmentStorageKey(`coach-team-selection:${session.clubId}:${session.userId}`) : null;
     if (selectionKey && selectionOwners.get(this) !== selectionKey) {
       selectionOwners.set(this, selectionKey); this.setData({selectedTeamIds: []});
@@ -96,11 +97,11 @@ Page({
       const teamScope = selectedIds.length ? {teamIds:selectedIds} : {};
       // The month query supplies markers; the selected-day query retains the API's
       // selected-week statistics instead of treating the first week as this week.
-      const [dayHome, calendarHome] = await Promise.all([
+      const [dayHome, calendarHomes] = await Promise.all([
         getCoachHome({from:this.data.date,to:this.data.date,...teamScope}),
-        getCoachHome({...range,...teamScope}),
+        Promise.all(ranges.map(range=>getCoachHome({...range,...teamScope}))),
       ]);
-      const home = {...dayHome,events:calendarHome.events};
+      const home={...dayHome,events:[...new Map(calendarHomes.flatMap(item=>item.events).map(event=>[event.id,event])).values()]};
       if (loadVersions.get(this) !== version) return;
       const selectedTeamIds = home.selectedTeamIds ?? [];
       if (selectionKey) { try { wx.setStorageSync(selectionKey, selectedTeamIds); } catch { /* Do not turn a cache failure into a schedule failure. */ } }
@@ -146,7 +147,10 @@ Page({
   },
   onUnload() { loadVersions.set(this, (loadVersions.get(this) ?? 0) + 1); },
   toggleTeamPicker() { this.setData({ showTeamPicker: !this.data.showTeamPicker }); },
-  openSelectedTeam() { openPage("/pages/coach/team/index"); },
+  openSelectedTeam() {
+    const ids=this.data.selectedTeamIds;
+    openPage(ids.length===1 ? `/pages/coach/training/index?teamId=${encodeURIComponent(ids[0]!)}` : "/pages/coach/team-selector/index?destination=workspace");
+  },
   selectTeam(event: {currentTarget: {dataset: {id?: string}}}) {
     const id = event.currentTarget.dataset.id;
     const options = this.data.teamOptions as Array<{id: string}>;
@@ -167,7 +171,7 @@ Page({
     if (event.detail.date === this.data.date) return;
     return this.onDateChange({detail:{value:event.detail.date}});
   },
-  onCalendarViewChange(event: {detail:{expanded:boolean}}) { this.setData({viewMode:event.detail.expanded ? "month" : "day"}); },
+  onCalendarViewChange(event: {detail:{expanded:boolean}}) {this.setData({viewMode:event.detail.expanded ? "month" : "day"});if(event.detail.expanded)return this.load();},
   onDateChange(event: { detail: { value: string } }) {
     this.setData({ date: event.detail.value });
     this.load();
@@ -275,11 +279,4 @@ function durationLabel(startsAt?: string, endsAt?: string): string {
   const end = Date.parse(endsAt ?? "");
   if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return "";
   return `${Math.round((end - start) / 60000)}分钟`;
-}
-
-
-function monthWindow(date: string) {
-  const year = Number(date.slice(0,4));
-  const month = Number(date.slice(5,7));
-  return { from: `${date.slice(0,7)}-01`, to: new Date(Date.UTC(year, month, 0)).toISOString().slice(0,10) };
 }

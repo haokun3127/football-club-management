@@ -30,6 +30,7 @@ export function parseBearerToken(authorization: string | undefined): string | un
 export class SessionRegistry {
   // 会话默认 30 天：俱乐部内部应用，家长/教练授权一次长期使用（原 7200s 导致每 2 小时强制重新授权）
   static readonly DEFAULT_TTL_SECONDS = 30 * 24 * 60 * 60;
+  private readonly preferences = new Map<string,{defaultRole:AppRole|null;lastActiveRole:AppRole|null}>();
   private readonly sessions = new Map<string, AppClientSessionRecord>();
 
   constructor(private readonly repository?: AppClientSessionRepository) {}
@@ -41,6 +42,7 @@ export class SessionRegistry {
     } else {
       this.sessions.set(created.record.tokenHash, created.record);
     }
+    if(input.activeRole)this.rememberRole(input,input.activeRole);
     return created.delivery;
   }
 
@@ -78,7 +80,9 @@ export class SessionRegistry {
     const tokenHash = hashToken(token);
 
     if (this.repository) {
-      return this.repository.rotate(tokenHash, replacement.record, now) ? replacement.delivery : null;
+      if(!this.repository.rotate(tokenHash,replacement.record,now))return null;
+      if(input.activeRole)this.rememberRole(input,input.activeRole);
+      return replacement.delivery;
     }
 
     const existing = this.sessions.get(tokenHash);
@@ -87,7 +91,20 @@ export class SessionRegistry {
     }
     this.sessions.set(tokenHash, { ...existing, revokedAt: now, updatedAt: now });
     this.sessions.set(replacement.record.tokenHash, replacement.record);
+    if(input.activeRole)this.rememberRole(input,input.activeRole);
     return replacement.delivery;
+  }
+
+  rolePreference(scope:Pick<AppClientSessionInput,"clubId"|"appClientId"|"userId">) {
+    return this.repository?.rolePreference(scope) ?? this.preferences.get(JSON.stringify([scope.clubId,scope.appClientId,scope.userId])) ?? {defaultRole:null,lastActiveRole:null};
+  }
+  setDefaultRole(scope:Pick<AppClientSessionInput,"clubId"|"appClientId"|"userId">,role:AppRole|null) {
+    if(this.repository)this.repository.saveRolePreference(scope,"default_role",role);
+    else this.preferences.set(JSON.stringify([scope.clubId,scope.appClientId,scope.userId]),{...this.rolePreference(scope),defaultRole:role});
+  }
+  private rememberRole(scope:Pick<AppClientSessionInput,"clubId"|"appClientId"|"userId">,role:AppRole) {
+    if(this.repository)this.repository.saveRolePreference(scope,"last_active_role",role);
+    else this.preferences.set(JSON.stringify([scope.clubId,scope.appClientId,scope.userId]),{...this.rolePreference(scope),lastActiveRole:role});
   }
 
   private createRecord(input: AppClientSessionInput, expiresInSeconds: number, now = new Date().toISOString()) {

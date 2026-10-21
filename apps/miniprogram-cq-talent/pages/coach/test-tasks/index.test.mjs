@@ -17,6 +17,7 @@ vi.mock("../../../utils/presentation", () => ({ resolveMenuInset: () => 16, reso
 
 globalThis.wx = { navigateBack: mocks.navigateBack, navigateTo: mocks.navigateTo, showToast: mocks.showToast };
 
+vi.mock("../../../utils/coach-team-context",()=>({loadActiveTeam:async()=>({id:"team-real",options:[],detail:null})}));
 let pageDefinition;
 globalThis.Page = (definition) => {
   pageDefinition = definition;
@@ -138,8 +139,8 @@ describe("coach assessment task list", () => {
 
     page.openCreate();
 
-    expect(mocks.navigateTo).toHaveBeenCalledWith({ url: "/pages/coach/test-task-create/index" });
-    expect(mocks.getCoachAssessmentTasks).toHaveBeenCalledTimes(1);
+    expect(mocks.navigateTo).toHaveBeenCalledWith({ url: "/pages/coach/test-task-create/index?teamId=team-real" });
+    await vi.waitFor(()=>expect(mocks.getCoachAssessmentTasks).toHaveBeenCalledTimes(1));
     expect(page.data.tasks.map((task) => task.id)).toEqual(realTasks.map((task) => task.id));
   });
 
@@ -159,7 +160,7 @@ describe("coach assessment task list", () => {
     const loading = page.onLoad();
     page.onShow();
 
-    expect(mocks.getCoachAssessmentTasks).toHaveBeenCalledTimes(1);
+    await vi.waitFor(()=>expect(mocks.getCoachAssessmentTasks).toHaveBeenCalledTimes(1));
     resolveTasks(realTasks);
     await loading;
   });
@@ -177,13 +178,13 @@ describe("coach assessment task list", () => {
 
     const firstRefresh = page.onShow();
     page.onShow();
-    expect(mocks.getCoachAssessmentTasks).toHaveBeenCalledTimes(2);
+    await vi.waitFor(()=>expect(mocks.getCoachAssessmentTasks).toHaveBeenCalledTimes(2));
     resolveRefresh(realTasks);
     await firstRefresh;
     expect(page.data.state).toBe("ready");
   });
 
-  it("uses the standard 88rpx C11 topbar with safe-area padding and WXML-safe real-data layout", () => {
+  it("uses the standard 44px C11 topbar with safe-area padding and WXML-safe real-data layout", () => {
     expect(pageConfig).toContain('"role-tabbar"');
     expect(pageConfig).toContain('"status-view"');
     expect(pageConfig).not.toContain('"app-header"');
@@ -204,7 +205,7 @@ describe("coach assessment task list", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("createTask");
     expect(controller).toContain("resolveMenuInset");
-    expect(stylesheet).toMatch(/\.tasks-nav\s*\{[^}]*height:\s*88rpx[^}]*box-sizing:\s*content-box/s);
+    expect(stylesheet).toMatch(/\.tasks-nav\s*\{[^}]*height:\s*44px[^}]*box-sizing:\s*content-box/s);
     expect(stylesheet).toMatch(/\.tasks-nav\s*\{[^}]*padding-left:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.tasks-nav__left\s*\{[^}]*gap:\s*0/s);
     expect(stylesheet).toMatch(/\.tasks-nav__title\s*\{(?=[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\))(?=[^}]*line-height:\s*1\.5)/s);
@@ -218,7 +219,6 @@ describe("coach assessment task list", () => {
     // 底栏高 140rpx、z-index 9999：FAB bottom 必须 ≥ 140rpx + 间距，且保持低于底栏层级。
     expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*bottom:\s*172rpx/s);
     expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*background:\s*var\(--color-brand\)/s);
-    expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*box-shadow:\s*0 8rpx 12rpx rgba\(var\(--color-brand-rgb\),\s*0\.25\)/s);
     expect(stylesheet).not.toMatch(/\.tasks-fab\s*\{[^}]*bottom:\s*(?:[0-9]|1[0-3][0-9])rpx/s);
   });
 

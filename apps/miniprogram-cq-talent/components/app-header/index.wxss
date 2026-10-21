@@ -8,13 +8,13 @@
 .app-header__content { position: relative; display: flex; align-items: center; box-sizing: border-box; padding-left: 32rpx; }
 .app-header__heading { position: absolute; left: 128rpx; right: 128rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
 .app-header__heading--left { position: static; min-width: 0; flex: 1; align-items: flex-start; text-align: left; }
-.app-header__title { overflow: hidden; max-width: 100%; font-size: var(--font-size-display); font-weight: 650; line-height: 44rpx; text-overflow: ellipsis; white-space: nowrap; }
+.app-header__title { overflow: hidden; max-width: 100%; font-size: var(--font-size-display); font-weight: 650; line-height:1.5; text-overflow: ellipsis; white-space: nowrap; }
 .app-header__title--large { font-size: 44rpx; line-height: 54rpx; }
 .app-header__subtitle { margin-top: 2rpx; overflow: hidden; max-width: 100%; color: #667085; font-size: var(--font-size-aux); text-overflow: ellipsis; white-space: nowrap; }
 .app-header--brand .app-header__subtitle { color: rgba(255,255,255,.76); }
 .app-header__side { display: flex; align-items: center; min-width: 80rpx; }
 .app-header__side--right { margin-left: auto; justify-content: flex-end; }
-.app-header__back { flex: 0 0 auto; width: 80rpx; height: 80rpx; box-sizing: border-box; padding: 16rpx; margin-left: 0; }
+.app-header__back { flex: 0 0 auto; width:44px; height:44px; box-sizing:border-box; padding:0; margin-left: 0; }
 .app-header__action { min-height: 80rpx; padding: 0 16rpx; color: var(--color-brand); font-size: var(--font-size-body); font-weight: 600; line-height: 80rpx; }
 .app-header--brand .app-header__action { color: #ffffff; }
 
@@ -25,3 +25,5 @@
 
 /* 胶囊动作（Figma P3: bg #fceeef, text #a80f1b, r=16px, pad 6/12px） */
 .app-header__action--pill { min-height: 64rpx; margin-right: 8rpx; padding: 0 28rpx; background: var(--color-brand-soft); border-radius: 999rpx; font-size: var(--font-size-aux); line-height: 64rpx; }
+
+.app-header__action,.app-header__icon-action { min-height:44px; min-width:44px; }

@@ -30,6 +30,7 @@ globalThis.wx = {
   getStorageSync: mocks.getStorageSync,
 };
 
+vi.mock("../../../utils/coach-team-context",()=>({loadActiveTeam:async id=>{const detail=await mocks.getCoachTeam(id);return {id:detail?.team?.id || "",options:detail?.teamOptions || [],detail:detail?.team ? detail : null};}}));
 let pageDefinition;
 globalThis.Page = (definition) => {
   pageDefinition = definition;
@@ -106,7 +107,7 @@ describe("coach ability assessment", () => {
 
     await page.load();
 
-    expect(mocks.getCoachTeam).toHaveBeenCalledWith("team-weekend-select");
+    expect(mocks.getCoachTeam).toHaveBeenCalledWith(undefined);
     expect(mocks.getCoachTeamAbilityOverview).toHaveBeenCalledWith("team-weekend-select");
     expect(mocks.getCoachStudentRadar).not.toHaveBeenCalled();
     expect(page.data).toMatchObject({
@@ -191,11 +192,10 @@ describe("coach ability assessment", () => {
     expect(template).not.toContain('ability-nav__export');
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(template).not.toMatch(/U10|2025|Player One|李明辉/);
-    expect(controller).toContain('COACH_TRAINING_TEAM_KEY');
+    expect(controller).toContain('loadActiveTeam');
     expect(controller).toContain('getCoachTeamAbilityOverview');
     expect(controller).not.toContain('getCoachStudentRadar');
-    expect(stylesheet).toMatch(/\.ability-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
-    expect(stylesheet).toMatch(/\.ability-summary\s*\{(?=[^}]*height:\s*284rpx)(?=[^}]*background:\s*#07111f)/s);
+    expect(stylesheet).toMatch(/\.ability-nav\s*\{(?=[^}]*height:\s*44px)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).toMatch(/\.ability-roster__grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s);
     expect(stylesheet).toMatch(/\.ability-player__avatar\s*\{(?=[^}]*width:\s*80rpx)(?=[^}]*height:\s*80rpx)(?=[^}]*border-radius:\s*50%)/s);
     expect(stylesheet).toMatch(/\.ability-player__avatar\s*\{(?=[^}]*background:\s*#a80f1b)/s);

@@ -22,8 +22,8 @@
 .history-hero {
   padding: 40rpx;
   border-radius: 32rpx;
-  background: #07111f;
-  color: #ffffff;
+  background:var(--color-card);
+  color:var(--color-text);
 }
 
 .history-hero__title {
@@ -34,14 +34,14 @@
 
 .history-hero__meta {
   margin-top: 8rpx;
-  color: rgba(255, 255, 255, .84);
+  color:var(--color-text-secondary);
   font-size: var(--font-size-aux);
   line-height: 1.5;
 }
 
 .history-hero__meta--muted {
   margin-top: 24rpx;
-  color: rgba(255, 255, 255, .6);
+  color:var(--color-text-secondary);
 }
 
 .history-card {
@@ -107,13 +107,13 @@
 
 .history-row__status {
   flex: 0 0 auto;
-  padding: 8rpx 16rpx;
-  border-radius: 8rpx;
-  background: #dcfce7;
-  color: #22c55e;
+
+
+
+
   font-size: var(--font-size-aux);
   font-weight: 600;
-}
+      background:transparent;border-radius:0;padding:0;height:auto;min-height:0;color:var(--color-text-secondary);}
 
 .history-actions {
   display: flex;
@@ -181,3 +181,7 @@
   font-size: var(--font-size-aux);
   line-height: 1.5;
 }
+
+/* 移动端触控下限，业务内容与原事件保持一致。 */
+.history-actions__primary,
+.history-row { min-height:44px; min-width:44px; box-sizing:border-box; }

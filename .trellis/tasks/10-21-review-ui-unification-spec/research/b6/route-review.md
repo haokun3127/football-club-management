@@ -1,0 +1,65 @@
+# 原生路由首轮走查
+
+430宽原生模拟器，59个双端路由；这是布局盘点，不是全业务/状态/设备验收。首轮缺参数页随后按正确参数补查；提交回执/咨询成功页不为视觉验收伪造业务写入。最新修复画面见mobile-refinements.jpg；其余边界见任务implement.md。
+
+| 路由 | 首轮实际页面 | 状态 |
+|---|---|---|
+| pages/coach/schedule/index | pages/coach/schedule/index | ready |
+| pages/coach/team-selector/index | pages/coach/team-selector/index | ready |
+| pages/coach/event/index | pages/coach/event/index | ready |
+| pages/coach/attendance/index | pages/coach/lesson/index | ready |
+| pages/coach/lesson/index | pages/coach/lesson/index | ready |
+| pages/coach/match/index | pages/coach/match/index | ready |
+| pages/coach/match-edit/index | pages/coach/match-edit/index | error |
+| pages/coach/tactical-board/index | pages/coach/tactical-board/index | empty |
+| pages/coach/team/index | pages/coach/team/index | ready |
+| pages/coach/scout/index | pages/coach/scout/index | ready |
+| pages/coach/student-radar/index | pages/coach/student-radar/index | ready |
+| pages/coach/team-ability/index | pages/coach/team-ability/index | ready |
+| pages/coach/event-change/index | pages/coach/event-change/index | ready |
+| pages/coach/content-select/index | pages/coach/content-select/index | ready |
+| pages/coach/content-copy/index | pages/coach/content-copy/index | 独立loading字段 |
+| pages/coach/training-assessment/index | pages/coach/training-assessment/index | ready |
+| pages/coach/test-tasks/index | pages/coach/test-tasks/index | ready |
+| pages/coach/test-task-create/index | pages/coach/test-task-create/index | 独立loading字段 |
+| pages/coach/assessment-projects/index | pages/coach/assessment-projects/index | ready |
+| pages/coach/assessment-bulk-entry/index | pages/coach/assessment-bulk-entry/index | empty |
+| pages/coach/assessment-submit/index | pages/coach/assessment-submit/index | empty |
+| pages/coach/attendance-success/index | pages/coach/attendance-success/index | empty |
+| pages/coach/lesson-history/index | pages/coach/lesson-history/index | ready |
+| pages/coach/lesson-detail/index | pages/coach/lesson/index | ready |
+| pages/coach/match-event-add/index | pages/coach/match-event-add/index | loading |
+| pages/coach/permissions/index | pages/coach/permissions/index | ready |
+| pages/coach/private-interest/index | pages/coach/private-interest/index | 独立loading字段 |
+| pages/coach/account/index | pages/coach/account/index | 独立loading字段 |
+| pages/coach/help/index | pages/coach/help/index | ready |
+| pages/coach/training/index | pages/coach/training/index | ready |
+| pages/coach/test-entry/index | pages/coach/test-entry/index | ready |
+| pages/coach/me/index | pages/coach/me/index | ready |
+| pages/coach/student-results/index | pages/coach/student-results/index | error |
+| pages/parent/home/index | pages/parent/home/index | ready |
+| pages/parent/confirmed-results/index | pages/parent/confirmed-results/index | ready |
+| pages/parent/schedule/index | pages/parent/schedule/index | ready |
+| pages/parent/event/index | pages/parent/event/index | ready |
+| pages/parent/growth/index | pages/parent/growth/index | ready |
+| pages/parent/radar/index | pages/parent/radar/index | ready |
+| pages/parent/metric/index | pages/parent/metric/index | error |
+| pages/parent/child/index | pages/parent/child/index | ready |
+| pages/parent/semester-report/index | pages/parent/semester-report/index | ready |
+| pages/parent/account/index | pages/parent/account/index | ready |
+| pages/parent/reminders/index | pages/parent/reminders/index | ready |
+| pages/parent/status/index | pages/parent/status/index | ready |
+| pages/parent/content/index | pages/parent/content/index | ready |
+| pages/parent/article/index | pages/parent/article/index | empty |
+| pages/parent/guide/index | pages/parent/guide/index | ready |
+| pages/parent/milestones/index | pages/parent/milestones/index | ready |
+| pages/parent/ability-history/index | pages/parent/ability-history/index | ready |
+| pages/parent/training-history/index | pages/parent/training-history/index | ready |
+| pages/parent/match-history/index | pages/parent/match-history/index | ready |
+| pages/parent/help/index | pages/parent/help/index | ready |
+| pages/parent/coaches/index | pages/parent/coaches/index | ready |
+| pages/parent/venues/index | pages/parent/venues/index | ready |
+| pages/parent/private/index | pages/parent/private/index | ready |
+| pages/parent/private-success/index | pages/parent/private-success/index | error |
+| pages/parent/day/index | pages/parent/day/index | ready |
+| pages/parent/binding/index | pages/parent/binding/index | ready |

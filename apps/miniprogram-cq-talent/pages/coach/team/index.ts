@@ -1,4 +1,4 @@
-import { getCoachTeam } from "../../../utils/api";
+import { loadActiveTeam } from "../../../utils/coach-team-context";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
@@ -24,6 +24,7 @@ type CoachView = {
 };
 
 interface PageData {
+  section:string; pageTitle:string;
   hasTeamOptions: boolean; hasMatches: boolean;
   teamId: string; teamOptions: Array<{ id: string; name: string }>;
   matches: Array<{ eventId: string; title: string; subtitle: string; score: string }>;
@@ -53,24 +54,32 @@ const AVATAR_THEMES = [
 
 Page<PageData>({
   data: emptyPageData("loading", "正在读取队伍信息"),
-  onLoad(query: { teamId?: string } = {}) {
+  requestedTeamId:"",
+  onLoad(query: {teamId?:string;section?:string}={}) {
+    this.requestedTeamId=query.teamId || "";
+    const section=["roster","matches","coaches"].includes(query.section || "") ? query.section! : "all";
+    this.setData({section,pageTitle:({roster:"队员名单",matches:"比赛记录",coaches:"教练组"} as Record<string,string>)[section] || "球队详情"});
     return this.load(query.teamId);
   },
+  chooseTeam(){openPage("/pages/coach/team-selector/index");},
   openScouts() { if (requireRole("coach")) openPage("/pages/coach/scout/index"); },
   async load(teamId?: string) {
     if (!requireRole("coach")) return;
     const token = nextTeamRequest(this);
     teamId = teamId || this.data.teamId;
-    this.setData(emptyPageData("loading", "正在读取队伍信息"));
+    this.setData({...emptyPageData("loading", "正在读取队伍信息"),section:this.data.section,pageTitle:this.data.pageTitle});
     try {
-      const detail = await getCoachTeam(teamId || this.data.teamId || undefined);
+      const context = await loadActiveTeam(teamId || this.requestedTeamId || undefined);
+      const detail=context.detail;
+      if(!currentTeamRequest(this,token))return;
+      if(!detail){this.setData({state:"empty",message:context.options.length ? "请选择球队后查看" : "暂无授权球队",hasTeam:false});return;}
       if (!currentTeamRequest(this, token)) return;
       const hasTeam = detail.team !== null;
       const members = hasTeam ? toMembers(detail) : [];
       const coaches = hasTeam ? toCoaches(detail) : [];
       this.setData({
         state: hasTeam ? "ready" : "empty",
-        message: hasTeam ? "" : "近30天暂无可展示的球队",
+        message: hasTeam ? "" : "暂无授权球队",
         retryLabel: "",
         hasTeam,
         hasTeamOptions: (detail.teamOptions || []).length > 1, hasMatches: (detail.formalMatches || []).length > 0,
@@ -83,7 +92,7 @@ Page<PageData>({
         season: detail.team?.season ?? "",
         heroStats: hasTeam ? toHeroStats(detail) : emptyHeroStats(),
         members,
-        memberEmptyMessage: hasTeam && !members.length ? "近30天暂无执教学员" : "",
+        memberEmptyMessage: hasTeam && !members.length ? "本队暂无在队学员" : "",
         hasCoaches: coaches.length > 0,
         coaches,
         coachEmptyMessage: hasTeam && !coaches.length ? "暂未配置队伍教练" : "",
@@ -112,7 +121,7 @@ Page<PageData>({
 
 function emptyPageData(state: LoadState, message: string, retryLabel = ""): PageData {
   return {
-    hasTeamOptions: false, hasMatches: false, teamId: "", teamOptions: [], matches: [],
+    section:"all",pageTitle:"球队详情",hasTeamOptions: false, hasMatches: false, teamId: "", teamOptions: [], matches: [],
     navInset: resolveNavInset(),
     menuInset: resolveMenuInset(),
     state,

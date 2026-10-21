@@ -1,0 +1,10 @@
+{
+  "component": true,
+  "usingComponents": {
+    "radar-canvas": "/components/radar-canvas/index",
+    "t-button": "tdesign-miniprogram/button/button",
+    "t-popup": "tdesign-miniprogram/popup/popup",
+    "t-radio-group": "tdesign-miniprogram/radio-group/radio-group",
+    "t-checkbox-group": "tdesign-miniprogram/checkbox-group/checkbox-group"
+  }
+}

@@ -71,6 +71,10 @@ page {
   --td-brand-color: var(--color-brand);
   --td-brand-color-active: var(--color-brand-pressed);
   --td-brand-color-light: var(--color-brand-soft);
+  --td-brand-color-disabled: #e4e7ec;
+  --td-button-primary-disabled-bg: #e4e7ec;
+  --td-button-primary-disabled-border-color: #e4e7ec;
+  --td-button-primary-disabled-color: var(--color-text-secondary);
   --td-text-color-primary: var(--color-text);
   --td-text-color-secondary: var(--color-text-secondary);
   --td-text-color-placeholder: #667085;

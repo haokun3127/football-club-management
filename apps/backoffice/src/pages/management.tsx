@@ -1,3 +1,4 @@
+import MembershipAppRoles from "./membership-app-roles";
 import { useLocation, history } from "@umijs/max";
 import ResourceExport from "./resource-export";
 import { useEffect, useRef, useState } from "react";
@@ -91,6 +92,7 @@ export default function Management({ resource }: { resource: string }) {
   const [data, setData] = useState<ResourceList>();
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
+  const [activeTab,setActiveTab] = useState("edit");
   const [detail, setDetail] = useState<Detail>();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -115,6 +117,7 @@ export default function Management({ resource }: { resource: string }) {
   }, [resource]);
   async function edit(row?: Pick<RecordRow, "id">, copy = false) {
     const generation = ++editorGeneration.current;
+    setActiveTab("edit");
     setOpen(true);
     setLoading(true);
     setDetail(undefined);
@@ -354,7 +357,7 @@ export default function Management({ resource }: { resource: string }) {
             <Button disabled={saving} onClick={closeEditor}>
               关闭
             </Button>
-            {data?.canWrite && !detail?.record.readOnly && (
+            {data?.canWrite && activeTab !== "app-role" && !detail?.record.readOnly && (
               <Button
                 type="primary"
                 disabled={loading || !!latest}
@@ -436,6 +439,8 @@ export default function Management({ resource }: { resource: string }) {
           <Spin />
         ) : (
           <Tabs
+            activeKey={activeTab}
+            onChange={setActiveTab}
             items={[
               {
                 key: "edit",
@@ -517,6 +522,7 @@ export default function Management({ resource }: { resource: string }) {
                   </Form>
                 ),
               },
+              ...(resource === "memberships" && detail ? [{key:"app-role",label:"小程序默认身份",children:<MembershipAppRoles key={detail.record.id} userId={String(detail.record.values.userId)} roles={Array.isArray(detail.record.values.roles) ? detail.record.values.roles as string[] : []} canWrite={!!data?.canWrite && !saving}/>}]:[]),
               {
                 key: "history",
                 label: "操作历史",

@@ -42,3 +42,7 @@ Migration 0032 adds active/inactive session-plan state; drill document status is
 After writes, refresh only the current club, including newly registered clubs absent from the original seed. Startup must read all persisted club IDs. Assessment catalogs also refresh after committed project/metric edits. System metrics and drills remain read-only. Null and empty optional arrays compare equally when checking protected definitions; unrelated deactivation must not be rejected because a form normalizes an empty array.
 
 Read [Backoffice Integration](./backoffice-integration.md) for configuration, import, BI, service/content and workbench contracts.
+
+## Default mini-program role (2026-10-21)
+
+The existing memberships drawer owns the app-role tab; the generic record Save is hidden there so only Save default role writes this setting. app-role-preferences is admin-only, unique club/client/user, immutable scope on update; defaultRole is nullable and must belong to authorized client/profile roles. lastActiveRole is not an admin-editable field. Reuse audit/revision/requestId receipts. The options service AND strict HTTP optionSchema must both register app-clients. Frontend saves read the direct RecordRow mutation response and detail.record on reread.409 preserves the desired input and requires explicit reread; unchanged uncertain retry retains its requestId. A real two-editor browser check supplements service tests.

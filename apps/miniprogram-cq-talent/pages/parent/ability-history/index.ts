@@ -108,8 +108,10 @@ function metricLabel(label: string | undefined, previousValue: number | null | u
 }
 
 function deltaLabel(delta: number | undefined) {
-  if (delta === undefined || delta === 0) return "持平";
-  return delta > 0 ? `+${delta}` : String(delta);
+  if (delta === undefined || !Number.isFinite(delta)) return "持平";
+  const rounded = Number(delta.toFixed(1));
+  if (rounded === 0) return "持平";
+  return rounded > 0 ? `+${rounded}` : String(rounded);
 }
 
 function shortDate(value: string) {

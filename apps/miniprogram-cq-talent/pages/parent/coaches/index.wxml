@@ -27,7 +27,7 @@
             <view class="coach-card__info">
               <view class="coach-card__name-row">
                 <view class="coach-card__name">{{item.name}}</view>
-                <view wx:if="{{item.hasRole}}" class="coach-card__role" style="background:{{item.ringColor}}">{{item.role}}</view>
+                <view wx:if="{{item.hasRole}}" class="coach-card__role">{{item.role}}</view>
               </view>
               <view wx:if="{{item.hasBio}}" class="coach-card__bio">{{item.bio}}</view>
             </view>

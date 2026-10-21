@@ -89,7 +89,7 @@ const appClientSessionResponse = {
         visibility: { type: "string" },
       },
     },
-    status: { type: "string", enum: ["authenticated", "binding_required"] },
+    status: { type: "string", enum: ["authenticated", "binding_required","role_configuration_required"] },
     phoneBinding: { type: "string", enum: ["accepted", "not_provided", "received", "required"] },
     session: {
       anyOf: [appClientSession, { type: "null" }],
@@ -600,7 +600,7 @@ export const schemas = {
     headers: {
       type: "object",
       properties: {
-        "x-app-client-capabilities": { type: "string", enum: ["active-role-switch-v1"] },
+        "x-app-client-capabilities": { type: "string", enum: ["active-role-switch-v1","auto-active-role-v1"] },
       },
     },
     body: {
@@ -821,6 +821,7 @@ export const schemas = {
     },
   },
   appClientCoachAssessmentTasks: {
+    querystring:{type:"object",additionalProperties:false,properties:{teamId:{type:"string",minLength:1},sourceEventId:{type:"string",minLength:1},refresh:{type:"string",maxLength:100}}},
     response: {
       200: {
         type: "object",

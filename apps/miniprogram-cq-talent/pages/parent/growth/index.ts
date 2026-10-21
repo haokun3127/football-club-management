@@ -19,7 +19,6 @@ Page({
     growth: null as GrowthSummary | null,
     viewIndex: 0,
     radar: [] as RadarMetricPoint[],
-    radarPreview: null as RadarPreview | null,
     selectedMetricId: "",
     selectedMetric: null as RadarMetricPoint | null,
     selectedDetail: null as MetricDetail | null,
@@ -77,14 +76,13 @@ Page({
       const activityMessages = growthActivityMessages(growth.timeline ?? []);
       const activityView = buildActivityView(growth.timeline ?? []);
       this.setData({
-        state: radar.length >= 3 ? "ready" : "empty",
-        message: radar.length >= 3 ? "" : "有效能力指标不足，完成训练或评测后生成雷达图。",
+        state: "ready",
+        message: "",
         children,
         activeStudentId: active.id,
         growth,
         viewIndex: 0,
         radar,
-        radarPreview: buildRadarPreview(radar),
         selectedMetricId: selectedMetric?.metricId ?? "",
         selectedMetric,
         selectedDetail: null,
@@ -138,7 +136,7 @@ Page({
     if (!this.data.growth) return;
     const radar = radarForView(this.data.growth, viewIndex);
     const selectedMetric = radar[0] ?? null;
-    this.setData({ viewIndex, radar, radarPreview: buildRadarPreview(radar), selectedMetricId: selectedMetric?.metricId ?? "", selectedMetric, selectedDetail: null, canDrawRadar: radar.length >= 3, latestLabel: "", trendLabel: "等待更多记录" });
+    this.setData({ viewIndex, radar, selectedMetricId: selectedMetric?.metricId ?? "", selectedMetric, selectedDetail: null, canDrawRadar: radar.length >= 3, latestLabel: "", trendLabel: "等待更多记录" });
     if (selectedMetric) this.loadMetricDetail(selectedMetric.metricId);
   },
   selectMetric(event: { detail?: { metricId?: string }; currentTarget?: { dataset?: { id?: string } } }) {
@@ -185,21 +183,6 @@ Page({
     this.load();
   },
 });
-
-type RadarPreview = {
-  count: number;
-  spokes: number[];
-  gridLayers: Array<{ size: number; kind: "line" | "cover" }>;
-  ringPath: string;
-  valuePath: string;
-  valuePathInner: string;
-  labels: Array<{ text: string; x: number; y: number }>;
-};
-
-function previewVertex(index: number, total: number, radiusPct: number) {
-  const angle = -Math.PI / 2 + (Math.PI * 2 * index) / total;
-  return `${(50 + Math.cos(angle) * radiusPct).toFixed(1)}% ${(50 + Math.sin(angle) * radiusPct).toFixed(1)}%`;
-}
 
 function growthActivityMessages(timeline: GrowthTimelineItem[]) {
   const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
@@ -266,54 +249,10 @@ function buildMonthlyBars(growth: GrowthSummary): TrainingBar[] | null {
   }));
 }
 
-function previewPolygon(points: RadarMetricPoint[], key: "value", inset: number) {
-  const total = points.length;
-  return `polygon(${points
-    .map((point, index) => {
-      const raw = point[key];
-      const ratio = typeof raw === "number" && point.maxValue ? raw / point.maxValue : 0;
-      return previewVertex(index, total, Math.max(0.08, Math.min(ratio, 1)) * 50 * inset);
-    })
-    .join(",")})`;
-}
-
-function buildRadarPreview(points: RadarMetricPoint[]): RadarPreview | null {
-  if (points.length < 3) return null;
-  const total = points.length;
-  const ringPath = `polygon(${points.map((_, index) => previewVertex(index, total, 50)).join(",")})`;
-  // 描边在 clip-path 下不绘制：所有轮廓线用「外多边形实心 + 内缩多边形盖面」双层叠加模拟
-  const gridLayers: RadarPreview["gridLayers"] = [];
-  [336, 252, 168, 84].forEach((size) => {
-    gridLayers.push({ size, kind: "line" });
-    gridLayers.push({ size: size - 4, kind: "cover" });
-  });
-  // 偶数轴时每条直线贯穿两条对轴，奇数轴时每轴一条半径线
-  const spokeCount = total % 2 === 0 ? total / 2 : total;
-  const spokes = Array.from({ length: spokeCount }, (_, index) => (180 / spokeCount) * index);
-  // 标签布在图表外圈（图表外圈 336rpx 占容器 60%，标签半径取容器 42%）
-  const labels = points.map((point, index) => {
-    const angle = -Math.PI / 2 + (Math.PI * 2 * index) / total;
-    return {
-      text: point.label,
-      x: 50 + Math.cos(angle) * 42,
-      y: 50 + Math.sin(angle) * 42,
-    };
-  });
-  return {
-    count: total,
-    spokes,
-    gridLayers,
-    ringPath,
-    valuePath: previewPolygon(points, "value", 1),
-    valuePathInner: previewPolygon(points, "value", 0.976),
-    labels,
-  };
-}
-
 function radarForView(growth: GrowthSummary, viewIndex: number) {
   const metricIds = new Set(growth.views[viewIndex]?.metricIds ?? growth.radar.map((point) => point.metricId));
   const filtered = growth.radar.filter((point) => metricIds.has(point.metricId));
-  return filtered.length >= 3 ? filtered : growth.radar;
+  return filtered;
 }
 
 function readableError(error: unknown) {

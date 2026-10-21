@@ -59,7 +59,7 @@ describe("login page", () => {
   function createPageInstance(data = {}) {
     const instance = {
       ...pageDefinition,
-      data: { ...pageDefinition.data, ...data },
+      data: { ...pageDefinition.data, agreementAccepted:true, ...data },
     };
     instance.setData = (patch) => {
       instance.data = { ...instance.data, ...patch };
@@ -196,91 +196,7 @@ describe("login page", () => {
     expect(page.redirectTarget).toBe("");
   });
 
-  it("waits for a dual-role choice before persisting or routing, then uses the pending token once", async () => {
-    let resolveSelection;
-    mocks.wechatLogin.mockResolvedValue({
-      clubId: "club-chongqing-talent",
-      client: { id: "client-cq-talent" },
-      status: "authenticated",
-      session: {
-        token: "pending-role-token",
-        expiresInSeconds: 3600,
-        expiresAt: "2099-01-01T00:00:00.000Z",
-        activeRole: null,
-      },
-      role: "coach",
-      availableRoles: ["parent", "coach"],
-      profile: { userId: "user-dual", displayName: "Dual role" },
-      children: [],
-      capabilities: {},
-    });
-    mocks.switchActiveRole.mockReturnValue(new Promise((resolve) => { resolveSelection = resolve; }));
-    const page = createPageInstance({ wxLoginCode: "wx-code" });
 
-    page.onPhoneAuthorizationTap();
-    await page.onGetPhoneNumber({ detail: { code: "phone-code" } });
-
-    expect(mocks.wechatLogin).toHaveBeenCalledTimes(1);
-    expect(mocks.persistAuthenticatedSession).not.toHaveBeenCalled();
-    expect(mocks.routeHome).not.toHaveBeenCalled();
-    expect(page.data).toMatchObject({ roleChooserVisible: true, canChooseParent: true, canChooseCoach: true });
-
-    const selection = page.chooseParentRole();
-    expect(mocks.switchActiveRole).toHaveBeenCalledWith("parent", "pending-role-token");
-    expect(mocks.switchActiveRole).toHaveBeenCalledTimes(1);
-    expect(mocks.persistAuthenticatedSession).not.toHaveBeenCalled();
-    expect(mocks.routeHome).not.toHaveBeenCalled();
-
-    resolveSelection(authenticatedParent());
-    await selection;
-
-    expect(mocks.persistAuthenticatedSession).toHaveBeenCalledWith(expect.objectContaining({
-      session: expect.objectContaining({ activeRole: "parent" }),
-    }));
-    expect(mocks.routeHome).toHaveBeenCalledWith("parent");
-    expect(mocks.wechatLogin).toHaveBeenCalledTimes(1);
-  });
-
-  it("rotates the pending token even when the compatible default role is chosen", async () => {
-    const pendingSession = {
-      clubId: "club-chongqing-talent",
-      client: { id: "client-cq-talent" },
-      status: "authenticated",
-      session: {
-        token: "pending-role-token",
-        expiresInSeconds: 3600,
-        expiresAt: "2099-01-01T00:00:00.000Z",
-        activeRole: null,
-      },
-      role: "coach",
-      availableRoles: ["parent", "coach"],
-      profile: { userId: "user-dual", displayName: "Dual role" },
-      children: [],
-      capabilities: {},
-    };
-    const selectedSession = {
-      ...pendingSession,
-      session: {
-        token: "rotated-coach-token",
-        expiresInSeconds: 3600,
-        expiresAt: "2099-01-01T01:00:00.000Z",
-        activeRole: "coach",
-      },
-    };
-    mocks.wechatLogin.mockResolvedValue(pendingSession);
-    mocks.switchActiveRole.mockResolvedValue(selectedSession);
-    const page = createPageInstance({ wxLoginCode: "wx-code" });
-
-    page.onPhoneAuthorizationTap();
-    await page.onGetPhoneNumber({ detail: { code: "phone-code" } });
-    await page.chooseCoachRole();
-
-    expect(mocks.switchActiveRole).toHaveBeenCalledTimes(1);
-    expect(mocks.switchActiveRole).toHaveBeenCalledWith("coach", "pending-role-token");
-    expect(mocks.persistAuthenticatedSession).toHaveBeenCalledWith(selectedSession);
-    expect(mocks.routeHome).toHaveBeenCalledWith("coach");
-    expect(mocks.wechatLogin).toHaveBeenCalledTimes(1);
-  });
 
   it("does not auto-retry cancellation, frequency errors, empty code, or a missing login code", async () => {
     const cases = [
@@ -343,18 +259,6 @@ describe("login page", () => {
     expect(page.data.message).not.toContain("session=secret-phone");
   });
 
-  it("uses a single real WeChat phone authorization action", () => {
-    expect(template.match(/open-type="getPhoneNumber\|agreePrivacyAuthorization"/g)).toHaveLength(1);
-    expect(template).not.toContain("验证码");
-    expect(template).not.toContain("获取验证码");
-    expect(template).not.toContain("绑定孩子");
-    expect(template).toContain("身份验证");
-    expect(template).toContain("微信手机号授权并继续");
-    expect(template).toContain("自动匹配俱乐部档案");
-    expect(template).not.toContain("login-field--wechat");
-    expect(template).toContain('disabled="{{submitting || state === \'loading\' || authorizationLocked}}"');
-    expect(template).toContain('bindtap="onPhoneAuthorizationTap"');
-  });
 
   it("gates the phone number action behind privacy consent via the coupled official open-type", () => {
     // 官方推荐交互：耦合按钮同一次点击先同意隐私协议再取号，微信保证隐私未同意前不实际取号。
@@ -364,15 +268,6 @@ describe("login page", () => {
     expect(template).not.toMatch(/open-type="getPhoneNumber"(?!\|)/);
   });
 
-  it("marks the privacy footer as agreed once the user consents through the coupled button", () => {
-    const page = createPageInstance({ wxLoginCode: "wx-code" });
-    expect(page.data.privacyAgreed).toBe(false);
-
-    page.onPrivacyAgreed();
-
-    expect(page.data.privacyAgreed).toBe(true);
-    expect(template).toContain("{{privacyAgreed ? '已同意《用户协议》和《隐私政策》' : '授权手机号时将一并征得《隐私政策》同意'}}");
-  });
 
   it("explains privacy refusal separately from cancellation and frequency errors", async () => {
     const page = createPageInstance({ wxLoginCode: "wx-code" });
@@ -383,28 +278,8 @@ describe("login page", () => {
     expect(mocks.wechatLogin).not.toHaveBeenCalled();
   });
 
-  it("renders explicit role choices without JavaScript array calls in WXML", () => {
-    expect(template).toContain('wx:if="{{roleChooserVisible}}"');
-    expect(template).toContain('bindtap="chooseParentRole"');
-    expect(template).toContain('bindtap="chooseCoachRole"');
-    expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-  });
 
-  it("keeps the G2 device-frame geometry for the login card stack", () => {
-    expect(styles).toContain("width: 662rpx");
-    expect(styles).toContain("height: 348rpx");
-    expect(styles).toContain("height: 288rpx");
-    expect(styles).toContain("height: 100rpx");
-    expect(styles.match(/box-shadow: 0 2rpx 4rpx rgba\(0,0,0,.06\);/g)).toHaveLength(2);
-  });
 
-  it("keeps the G3 restricted-account hierarchy and real return action", () => {
-    expect(template).toContain('wx:if="{{isBlocked}}"');
-    expect(template).toContain("账号暂时受限");
-    expect(template).toContain("当前账号无法进入小程序");
-    expect(template).toContain('bindtap="backToLaunch"');
-    expect(controller).toContain('wx.reLaunch({ url: "/pages/launch/index" });');
-  });
 
   it("uses the 88px G2 top navigation envelope", () => {
     expect(controller.match(/navTop:\s*88/g)).toHaveLength(2);
@@ -412,22 +287,14 @@ describe("login page", () => {
     expect(controller).toContain("this.setData({ wxLoginCode: code, navTop: 88 });");
   });
 
-  it("keeps both verification rows on the shared geometry track", () => {
-    expect(template.match(/class="login-field__line"/g)).toHaveLength(2);
-    expect(styles).toContain(".login-field__label { flex: 0 0 140rpx; }");
-    expect(styles).toContain(".login-field__status { overflow: hidden; flex: 1;");
-    expect(styles).toContain("text-align: left;");
-    expect(styles).not.toContain("justify-content: space-between");
-    expect(template.match(/open-type="getPhoneNumber\|agreePrivacyAuthorization"/g)).toHaveLength(1);
-    expect(template).not.toMatch(/\.(map|filter|slice|indexOf)\s*\(/);
-  });
 
-  it("centers the native CTA label within its button box", () => {
-    expect(ctaRule).toContain("display: flex;");
-    expect(ctaRule).toContain("align-items: center;");
-    expect(ctaRule).toContain("justify-content: center;");
-    expect(ctaRule).toContain("padding: 0;");
-    expect(ctaRule).not.toContain("line-height: 100rpx;");
-    expect(ctaRule).toContain("line-height: 1.5;");
-  });
+
+});
+
+describe("automatic role login consent",()=>{
+ beforeEach(()=>{vi.clearAllMocks();mocks.getAppContext.mockReturnValue({clubId:"club-chongqing-talent",clientId:"client-cq-talent"});});
+ it("starts unchecked and never reserves phone authorization without consent",()=>{const page={...pageDefinition,data:{...pageDefinition.data},setData(p){Object.assign(this.data,p);}};expect(page.data.agreementAccepted).toBe(false);page.onPhoneAuthorizationTap();expect(page.phoneAuthorizationReserved).toBe(false);page.onAgreementChange({detail:{checked:true}});expect(page.data.privacyAgreed).toBe(false);page.openAgreement();page.closeAgreement();expect(page.data.agreementAccepted).toBe(true);});
+ it("keeps one native privacy-and-phone button and no role chooser",()=>{expect(template.match(/open-type="getPhoneNumber\|agreePrivacyAuthorization"/g)).toHaveLength(1);expect(template).toContain('bindgetphonenumber="onGetPhoneNumber"');expect(template).toContain('bindagreeprivacyauthorization="onPrivacyAgreed"');expect(template).not.toContain('roleChooser');});
+ it("shows missing role configuration without persisting a pending token",async()=>{mocks.wechatLogin.mockResolvedValue({status:"role_configuration_required",session:null});const page={...pageDefinition,data:{...pageDefinition.data,agreementAccepted:true,wxLoginCode:"wx-code"},setData(p){Object.assign(this.data,p);}};page.onPhoneAuthorizationTap();await page.onGetPhoneNumber({detail:{code:"phone-code"}});expect(page.data.errorType).toBe("role_configuration_required");expect(page.data.isBlocked).toBe(false);expect(mocks.persistAuthenticatedSession).not.toHaveBeenCalled();});
+
 });

@@ -15,7 +15,7 @@
 }
 
 .page-nav {
-  height: 88rpx;
+  height:44px;
   box-sizing: content-box;
   display: flex;
   align-items: center;
@@ -52,7 +52,7 @@
 
 .request-marker--confirmed {
   background: #22c55e;
-  box-shadow: 0 24rpx 48rpx rgba(34, 197, 94, 0.25);
+  box-shadow:none;
 }
 
 .request-marker--neutral { background: #e7eaf0; }
@@ -65,8 +65,8 @@
 .request-marker__status {
   font-size: var(--font-size-body);
   font-weight: 600;
-  color: var(--color-text-secondary);
-}
+
+      background:transparent;border-radius:0;padding:0;height:auto;min-height:0;color:var(--color-text-secondary);}
 
 .request-title {
   margin-top: 64rpx;
@@ -89,7 +89,7 @@
   border: 1rpx solid var(--color-line);
   border-radius: 32rpx;
   padding: 40rpx;
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.05);
+  box-shadow:none;
 }
 
 .summary-row {
@@ -144,3 +144,8 @@
   border: 1rpx solid var(--color-brand);
   color: var(--color-brand);
 }
+
+/* 移动端触控下限，业务内容与原事件保持一致。 */
+.actions__outline,
+.actions__primary,
+.page-nav__back { min-height:44px; min-width:44px; box-sizing:border-box; }

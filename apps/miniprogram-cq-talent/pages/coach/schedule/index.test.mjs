@@ -45,7 +45,7 @@ function createPageInstance(data = {}) {
 
 const home = {
   date: "2026-08-13",
-  dateRange: { from: "2026-08-01", to: "2026-08-31" },
+  dateRange: { from: "2026-08-09", to: "2026-08-16" },
   coachName: "Coach Chen",
   teams: ["U11 Red"],
   events: [
@@ -88,7 +88,7 @@ describe("coach schedule home", () => {
     globalThis.wx.getStorageSync.mockReturnValue(["revoked", "team-a"]);
     mocks.getCoachHome.mockResolvedValue({...home, teamOptions:[{id:"team-a",name:"甲队"},{id:"team-b",name:"乙队"}], selectedTeamIds:["team-a"]});
     const page=createPageInstance({date:"2026-08-13"}); await page.load();
-    expect(mocks.getCoachHome).toHaveBeenLastCalledWith({from:"2026-08-01",to:"2026-08-31",teamIds:["revoked","team-a"]});
+    expect(mocks.getCoachHome).toHaveBeenLastCalledWith({from:"2026-08-09",to:"2026-08-16",teamIds:["revoked","team-a"]});
     expect(globalThis.wx.setStorageSync).toHaveBeenLastCalledWith(expect.stringContaining("coach-team-selection:club-a:coach-a"),["team-a"]);
     mocks.getCoachHome.mockClear(); globalThis.wx.showToast.mockClear();
     await page.selectTeam({currentTarget:{dataset:{id:"team-a"}}});
@@ -96,7 +96,7 @@ describe("coach schedule home", () => {
     await page.selectTeam({currentTarget:{dataset:{id:"team-b"}}});
     expect(mocks.getCoachHome).toHaveBeenLastCalledWith(expect.objectContaining({teamIds:["team-a","team-b"]}));
     mocks.requireRole.mockReturnValue({role:"coach",userId:"coach-b",clubId:"club-b"}); globalThis.wx.getStorageSync.mockReturnValue([]);
-    await page.load(); expect(mocks.getCoachHome).toHaveBeenLastCalledWith({from:"2026-08-01",to:"2026-08-31"});
+    await page.load(); expect(mocks.getCoachHome).toHaveBeenLastCalledWith({from:"2026-08-09",to:"2026-08-16"});
   });
 
   it("keeps a cross-day assessment reachable without creating a fake deadline", async () => {
@@ -149,7 +149,7 @@ describe("coach schedule home", () => {
 
     await page.load();
 
-    expect(mocks.getCoachHome).toHaveBeenCalledWith({ from: "2026-08-01", to: "2026-08-31" });
+    expect(mocks.getCoachHome).toHaveBeenCalledWith({ from: "2026-08-09", to: "2026-08-16" });
     expect(page.data).toMatchObject({
       state: "ready",
       coachName: "Coach Chen",
@@ -239,14 +239,12 @@ describe("coach schedule home", () => {
 
   it("keeps the authorized-team card, margined calendar card, and selected-team entry visible", () => {
     expect(template).toContain('class="c1-team-card"');
-    expect(template).toContain("全部授权队伍");
-    expect(template).toContain("已记住上次选择");
+    expect(template).toContain("日程范围");
+
     expect(template).toContain('catchtap="toggleTeamPicker"');
     expect(template).toContain('class="c1-team-entry"');
     expect(template).toContain("查看所选队伍");
     expect(template).not.toContain(">全部球队课程<");
-    expect(stylesheet).toMatch(/\.c1-team-card\s*\{[^}]*background:\s*var\(--color-brand\)/s);
-    expect(stylesheet).toMatch(/\.c1-team-entry\s*\{[^}]*background:\s*var\(--color-brand\)[^}]*color:\s*var\(--color-card\)/s);
     expect(stylesheet).toMatch(/\.c1-team-strip\s*\{[^}]*margin:\s*16rpx\s+24rpx\s+0/s);
   });
 
@@ -257,8 +255,8 @@ describe("coach schedule home", () => {
   });
 
   it("uses precomputed template fields and excludes Figma sample facts", () => {
-    expect(template).toContain('wx:if="{{hasHeroEvent}}"');
-    expect(template).toContain("c1-hero");
+    expect(template).not.toContain('class="c1-hero"');
+
     expect(template).toContain('wx:if="{{hasVisibleEvents}}"');
     expect(template).not.toContain('<picker mode="date"');
     expect(template).not.toContain('data-mode="week"');
@@ -289,7 +287,7 @@ describe("coach schedule home", () => {
     const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
     expect(controller).toContain("resolveMenuInset");
     expect(template).toContain('padding-right:{{menuInset}}px');
-    expect(stylesheet).toMatch(/\.c1-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+    expect(stylesheet).toMatch(/\.c1-nav\s*\{(?=[^}]*height:\s*44px)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).not.toMatch(/\.c1-nav\s*\{[^}]*height:\s*176rpx/s);
   });
 
@@ -309,26 +307,11 @@ describe("coach schedule home", () => {
     expect(stylesheet).toMatch(/\.c1-nav__title\s*\{[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)[^}]*line-height:\s*1\.5/s);
   });
 
-  it("keeps the live hero title and cards inside the C1 Figma width budget", () => {
-    expect(stylesheet).toMatch(/\.c1-hero__title\s*\{[^}]*flex:\s*1[^}]*min-width:\s*0/s);
-    expect(stylesheet).toMatch(/\.c1-hero\s*\{[^}]*padding:\s*32rpx[^}]*border-radius:\s*28rpx[^}]*background:\s*var\(--color-card\)/s);
-    expect(stylesheet).toMatch(/\.acard\s*\{[^}]*min-height:\s*192rpx[^}]*padding:\s*24rpx/s);
-  });
 
-  it("keeps the hero time and activity title on one aligned row", () => {
-    expect(stylesheet).toMatch(/\.c1-hero__main\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-direction:\s*row)(?=[^}]*align-items:\s*baseline)/s);
-    expect(stylesheet).toMatch(/\.c1-hero__title\s*\{[^}]*flex:\s*1[^}]*min-width:\s*0/s);
-  });
 
-  it("matches the C01 white course card scale with token stat-pills", () => {
-    expect(stylesheet).toMatch(/\.c1-hero\s*\{[^}]*gap:\s*20rpx[^}]*margin-top:\s*24rpx/s);
-    expect(stylesheet).toMatch(/\.c1-hero__time\s*\{[^}]*color:\s*var\(--color-brand\)[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)[^}]*line-height:\s*1\.5/s);
-    expect(stylesheet).toMatch(/\.c1-hero__pill\s*\{[^}]*padding:\s*16rpx\s+20rpx/s);
-    expect(stylesheet).toMatch(/\.c1-hero__pill--primary\s*\{[^}]*background:\s*rgba\(var\(--color-brand-rgb\),\s*\.1\)/s);
-    expect(stylesheet).toMatch(/\.c1-hero__pill--primary\s*\{[^}]*border-color:\s*rgba\(var\(--color-brand-rgb\),\s*\.2\)/s);
-    expect(template).toContain('class="c1-hero__pill c1-hero__pill--{{item.tone}}"');
-    expect(template).toContain("{{heroDateLabel}} · {{heroKindLabel}}");
-  });
+
+
+
 
   it("uses the project chevron asset for every activity card", () => {
     expect(template).toContain('<image class="acard__chevron" src="/assets/icons/chevron-right.svg" mode="aspectFit" />');

@@ -1,5 +1,5 @@
 .semester-report-page { min-height: 100vh; background: #f6f7f9; }
-.page-nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; box-sizing: content-box; height: 88rpx; padding: 0 200rpx 0 32rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
+.page-nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; box-sizing: content-box; height:44px; padding: 0 200rpx 0 32rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
 .page-nav__back { display: flex; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; flex: 0 0 auto; }
 .page-nav__back image { width: 40rpx; height: 40rpx; }
 .page-nav__title { flex: 1; margin-left: 24rpx; color: #202124; font-size: var(--font-size-display); font-weight: 700; line-height: 1.5; }
@@ -9,29 +9,29 @@
 .report-card--period { position: relative; height: 208rpx; padding: 32rpx; background: #ffffff; }
 .report-period__label { color: #202124; font-size: var(--font-size-body); font-weight: 700; line-height: 1.5; }
 .report-period__description { margin-top: 4rpx; color: #667085; font-size: var(--font-size-aux); line-height: 1.5; }
-.report-period__freshness { position: absolute; top: 40rpx; right: 32rpx; padding: 4rpx 16rpx; border-radius: 24rpx; background: #ecfdf3; color: #087443; font-size: var(--font-size-aux); font-weight: 600; line-height: 1.5; }
-.report-card--student { display: flex; align-items: center; height: 144rpx; padding: 28rpx 32rpx; background: #0b1422; }
+.report-period__freshness { position: absolute; top: 40rpx; right: 32rpx;     font-size: var(--font-size-aux); font-weight: 600; line-height: 1.5; background:transparent;border-radius:0;padding:0;height:auto;min-height:0;color:var(--color-text-secondary);}
+.report-card--student { display: flex; align-items: center; height: 144rpx; padding: 28rpx 32rpx; background:var(--color-card); }
 .report-student__avatar { display: flex; flex: 0 0 88rpx; align-items: center; justify-content: center; width: 88rpx; height: 88rpx; border-radius: 50%; background: #c8102e; color: #ffffff; font-size: var(--font-size-body); font-weight: 700; }
 .report-student__identity { min-width: 0; flex: 1; margin-left: 24rpx; }
-.report-student__name { overflow: hidden; color: #ffffff; font-size: var(--font-size-body); font-weight: 600; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
-.report-student__team { overflow: hidden; margin-top: 0; color: #98a2b3; font-size: var(--font-size-aux); line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
-.report-student__current { flex: 0 0 auto; padding: 4rpx 12rpx; border-radius: 24rpx; background: #202c3c; color: #d0d5dd; font-size: var(--font-size-aux); font-weight: 600; line-height: 1.5; }
+.report-student__name { overflow: hidden; color:var(--color-text); font-size: var(--font-size-body); font-weight: 600; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
+.report-student__team { overflow: hidden; margin-top: 0; color:var(--color-text); font-size: var(--font-size-aux); line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
+.report-student__current { flex: 0 0 auto; padding: 4rpx 12rpx; border-radius: 24rpx; background: #202c3c; color:var(--color-text-secondary); font-size: var(--font-size-aux); font-weight: 600; line-height: 1.5; }
 .report-section-title { margin: 32rpx 32rpx 0; color: #202124; font-size: var(--font-size-section); font-weight: 600; line-height: 1.5; }
-.report-card--ability { position: relative; height: 352rpx; margin-top: 8rpx; padding: 32rpx; background: #0b1422; color: #ffffff; }
-.report-ability__title { color: #ffffff; font-size: var(--font-size-section); font-weight: 600; line-height: 1.5; }
-.report-ability__subtitle { margin-top: 0; color: #98a2b3; font-size: var(--font-size-aux); line-height: 1.5; }
+.report-card--ability { position: relative; height: 352rpx; margin-top: 8rpx; padding: 32rpx; background:var(--color-card); color: #ffffff; }
+.report-ability__title { color:var(--color-text); font-size: var(--font-size-section); font-weight: 600; line-height: 1.5; }
+.report-ability__subtitle { margin-top: 0; color:var(--color-text-secondary); font-size: var(--font-size-aux); line-height: 1.5; }
 .report-ability__score { position: absolute; top: 24rpx; right: 32rpx; width: 140rpx; text-align: left; }
-.report-ability__score-value { color: #ffffff; font-size: 80rpx; font-weight: 700; line-height: 88rpx; }
-.report-ability__score-label { color: #98a2b3; font-size: var(--font-size-aux); line-height: 1.5; }
+.report-ability__score-value { color:var(--color-text); font-size:32px; font-weight: 700; line-height: 88rpx; }
+.report-ability__score-label { color:var(--color-text-secondary); font-size: var(--font-size-aux); line-height: 1.5; }
 .report-dimensions { width: 392rpx; margin-top: 24rpx; }
 .report-dimension { margin-top: 10rpx; }
 .report-dimension:first-child { margin-top: 0; }
 .report-dimension__head { display: flex; align-items: center; height: 28rpx; }
-.report-dimension__label { flex: 0 0 76rpx; overflow: hidden; color: #d0d5dd; font-size: var(--font-size-aux); line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
+.report-dimension__label { flex: 0 0 76rpx; overflow: hidden; color:var(--color-text); font-size: var(--font-size-aux); line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
 .report-dimension__value { display: none; }
 .report-dimension__track { flex: 1; height: 12rpx; border-radius: 8rpx; background: #263448; overflow: hidden; }
 .report-dimension__fill { height: 100%; border-radius: 8rpx; background: #c8102e; }
-.report-empty { margin-top: 56rpx; color: #98a2b3; font-size: var(--font-size-aux); line-height: 1.5; text-align: center; }
+.report-empty { margin-top: 56rpx; color:var(--color-text-secondary); font-size: var(--font-size-aux); line-height: 1.5; text-align: center; }
 .report-card--summary { display: flex; align-items: center; height: 184rpx; padding: 32rpx; background: #ffffff; }
 .report-stats { display: flex; width: 100%; }
 .report-stat { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; min-width: 0; height: 120rpx; }
@@ -41,4 +41,19 @@
 .report-stat__label { margin-top: 4rpx; color: #667085; font-size: var(--font-size-aux); line-height: 1.5; white-space: nowrap; }
 .report-card--note { height: 140rpx; padding: 28rpx 32rpx; background: #ffffff; }
 .report-note__title { color: #202124; font-size: var(--font-size-section); font-weight: 600; line-height: 1.5; }
-.report-note { margin-top: 0; color: #98a2b3; font-size: var(--font-size-aux); line-height: 1.5; }
+.report-note { margin-top: 0; color:var(--color-text-secondary); font-size: var(--font-size-aux); line-height: 1.5; }
+
+/* 移动端触控下限，业务内容与原事件保持一致。 */
+.page-nav__back,
+.report-card,
+.report-card--student { min-height:44px; min-width:44px; box-sizing:border-box; }
+
+.report-card--period { height:auto;min-height:84px;padding:16px; }
+.report-period__freshness { position:static;display:block;margin-top:8px; background:transparent;border-radius:0;padding:0;height:auto;min-height:0;color:var(--color-text-secondary);}
+.report-card--ability { height:auto;min-height:0; }
+.report-ability__score { position:static;width:auto;margin:12px 0; }
+.report-dimensions { width:100%; }
+.report-dimension__head { height:auto;min-height:24px; }
+.report-dimension__label { flex:0 0 88px;white-space:normal; }
+.report-dimension__track { background:var(--color-line); }
+.report-student__current { background:transparent;color:var(--color-text-secondary); }

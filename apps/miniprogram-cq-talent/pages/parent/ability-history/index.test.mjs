@@ -70,3 +70,8 @@ describe("parent ability model history", () => {
     expect(template).not.toContain(">最新分</view>");
   });
 });
+
+it("formats floating point score changes to one decimal without exposing binary precision",async()=>{
+ mocks.getParentGrowth.mockResolvedValueOnce({timeline:[{id:"precision",kind:"ability_update",occurredAt:"2026-10-21T01:00:00Z",abilityUpdate:{source:"semester_assessment",metrics:[{metricId:"m",label:"精神",value:67.8,previousValue:75.9}]}}]});
+ const page=createPageInstance();await page.load();expect(page.data.rows[0].deltaLabel).toBe("-8.1");
+});

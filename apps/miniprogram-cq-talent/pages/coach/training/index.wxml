@@ -1,50 +1,21 @@
-<view class="c8">
-  <view class="c8-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="c8-nav__title">训练管理</view>
+<view class="team-workspace">
+  <app-header title="{{section === 'training' ? '训练安排' : '球队'}}" show-back="{{section === 'training'}}" />
+  <view class="workspace-body">
+    <view class="team-context" wx:if="{{teamId}}"><view><view class="team-context__name">{{teamName}}</view><view class="team-context__season">{{season}}</view></view><t-button theme="primary" variant="text" bindtap="chooseTeam" custom-style="min-height:44px;font-size:14px;">切换球队</t-button></view>
+    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'empty' ? '选择球队' : '球队'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <t-button wx:if="{{state === 'empty'}}" theme="primary" bindtap="chooseTeam" block custom-style="min-height:48px;">选择球队</t-button>
+    <block wx:if="{{state === 'ready'}}">
+      <block wx:if="{{section === 'workspace'}}">
+        <t-cell-group theme="card"><t-cell wx:for="{{entries}}" wx:key="id" title="{{item.name}}" note="{{item.note}}" arrow data-id="{{item.id}}" bindtap="openEntry" hover /></t-cell-group>
+        <view class="secondary-title">球队支持</view>
+        <t-cell-group theme="card"><t-cell title="教练组" arrow data-id="coaches" bindtap="openEntry" hover /><t-cell title="俱乐部球探库" arrow bindtap="openScouts" hover /></t-cell-group>
+      </block>
+      <block wx:else>
+        <view class="section-caption">本月已排课程 · {{trainingCards.length}}节</view>
+        <t-cell-group theme="card" wx:if="{{trainingCards.length}}"><t-cell wx:for="{{trainingCards}}" wx:key="id" title="{{item.title}}" description="{{item.timeLabel}}" note="{{item.venue}}" arrow data-id="{{item.id}}" bindtap="openTrainingEvent" hover /></t-cell-group>
+        <view wx:else class="workspace-empty">本队本月暂无训练安排</view>
+      </block>
+    </block>
   </view>
-
-  <view wx:if="{{hasSelectedTeam}}" class="c8-team-context" bindtap="openTrainingTeamSelector">
-    <view class="c8-team-context__copy">
-      <text class="c8-team-context__label">我的球队</text>
-      <view class="c8-team-context__line"><text class="c8-team-context__name">{{selectedTeamName}}</text><text class="c8-team-context__meta">{{selectedTeamMetaLabel}}</text></view>
-    </view>
-    <view class="c8-team-context__action"><text class="c8-team-context__switch">切换</text><text class="c8-team-context__arrow">›</text></view>
-  </view>
-
-  <view class="c8-hero">
-    <view class="c8-hero__grid">
-      <view wx:for="{{heroMetrics}}" wx:key="label" class="c8-stat">
-        <view class="c8-stat__label">{{item.label}}</view>
-        <view class="c8-stat__value">{{item.value}}</view>
-      </view>
-    </view>
-  </view>
-
-  <view class="c8-tabs">
-    <view class="c8-tab c8-tab--active">训练计划</view>
-    <view class="c8-tab" bindtap="openTeamAbility">能力评估</view>
-    <view class="c8-tab" bindtap="openTeam">学员管理</view>
-    <view class="c8-tab" bindtap="openTestTasks">测评任务</view>
-  </view>
-
-  <view class="c8-body">
-    <status-view state="{{state}}" title="训练管理" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
-
-    <view wx:if="{{hasTrainingCards}}" class="c8-list">
-      <view wx:for="{{trainingCards}}" wx:key="id" class="session-card" data-id="{{item.id}}" bindtap="openTrainingEvent">
-        <view class="session-card__head">
-          <view class="session-card__title">{{item.title}}</view>
-          <view class="session-card__time">{{item.timeLabel}}</view>
-        </view>
-        <view wx:if="{{item.hasVenue}}" class="session-card__venue">{{item.venue}}</view>
-        <view class="session-card__foot">
-          <view wx:if="{{item.hasStatus}}" class="session-card__status session-card__status--{{item.statusTone}}">{{item.statusLabel}}</view>
-          <view wx:if="{{item.hasParticipantCount}}" class="session-card__count">{{item.participantLabel}}</view>
-        </view>
-      </view>
-    </view>
-    <view wx:if="{{state === 'ready' && !hasTrainingCards}}" class="c8-empty">当前球队本月暂无训练</view>
-  </view>
-
-  <role-tabbar role="coach" active="training" />
+  <role-tabbar wx:if="{{section === 'workspace'}}" role="coach" active="training" />
 </view>

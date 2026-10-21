@@ -1,10 +1,10 @@
-import { environmentStorageKey } from "../../../utils/config";
-import { getCoachTeam, getCoachTrainingProjectTree } from "../../../utils/api";
+import { rememberActiveTeam, resolveActiveTeam } from "../../../utils/coach-team-context";
+import { getCoachTrainingProjectTree } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
-import type { LoadState, TrainingTeamOption } from "../../../utils/types";
+import type { LoadState } from "../../../utils/types";
 
-const COACH_TRAINING_TEAM_KEY = environmentStorageKey("coach-training-team-id");
+
 
 type TeamOption = { id: string; name: string; metaLabel: string; isSelected: boolean };
 
@@ -26,29 +26,16 @@ Page<PageData>({
     teams: [],
     hasTeams: false,
   },
-  onLoad() {
-    this.load();
-  },
+  openWorkspace:false,
+  onLoad(query?:{destination?:string}) { this.openWorkspace=query?.destination==="workspace";return this.load(); },
   async load() {
     if (!requireRole("coach")) return;
     this.setData({ state: "loading", message: "正在读取可选训练球队" });
     try {
       const tree = await getCoachTrainingProjectTree();
       const options = tree.teamOptions ?? [];
-      const selected = resolveSelectedTeam(options, wx.getStorageSync<string>(COACH_TRAINING_TEAM_KEY), tree.team?.id);
-      const teams = await Promise.all(options.map(async (team) => {
-        const detail = await getCoachTeam(team.id).catch(() => null);
-        const season = detail?.team?.season ?? team.season;
-        const metaParts = season ? [season] : [];
-        if (typeof detail?.stats.memberCount === "number") metaParts.push(`${detail.stats.memberCount}名学员`);
-        metaParts.push(team.id === selected ? "当前选择" : "后台已分配");
-        return {
-          id: team.id,
-          name: team.name,
-          metaLabel: metaParts.join(" · "),
-          isSelected: team.id === selected,
-        };
-      }));
+      const selected = resolveActiveTeam(options);
+      const teams = options.map(team=>({id:team.id,name:team.name,metaLabel:team.season || "后台已分配",isSelected:team.id===selected}));
       this.setData({
         state: teams.length ? "ready" : "empty",
         message: teams.length ? "" : "暂未分配训练球队，请联系俱乐部后台管理员。",
@@ -61,9 +48,11 @@ Page<PageData>({
   },
   selectTeam(event: { currentTarget: { dataset: { id?: string } } }) {
     const id = event.currentTarget.dataset.id;
-    if (!id) return;
-    wx.setStorageSync(COACH_TRAINING_TEAM_KEY, id);
-    wx.navigateBack();
+    if (!id || !this.data.teams.some((team:TeamOption)=>team.id===id)) return;
+    rememberActiveTeam(id);
+    const url=`/pages/coach/training/index?teamId=${encodeURIComponent(id)}`;
+    if(this.openWorkspace)wx.redirectTo({url});
+    else wx.navigateBack({fail:()=>wx.reLaunch({url})});
   },
   goBack() {
     wx.navigateBack();
@@ -72,10 +61,3 @@ Page<PageData>({
     this.load();
   },
 });
-
-function resolveSelectedTeam(options: TrainingTeamOption[], storedId: string, fallbackId?: string): string {
-  return options.find((team) => team.id === storedId)?.id
-    ?? options.find((team) => team.id === fallbackId)?.id
-    ?? options[0]?.id
-    ?? "";
-}

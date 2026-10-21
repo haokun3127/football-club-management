@@ -22,7 +22,7 @@ describe("parent presentation helpers", () => {
     expect(formatTimeRange()).toBe("时间待确认");
   });
 
-  it("derives a custom top bar height from the current device width", () => {
+  it("keeps 44 logical pixels of navigation content below the status bar", () => {
     const globalWithWx = globalThis as unknown as { wx: typeof wx };
     const originalWx = globalWithWx.wx;
     globalWithWx.wx = {
@@ -30,7 +30,7 @@ describe("parent presentation helpers", () => {
     } as typeof wx;
 
     try {
-      expect(resolveTopBarHeight()).toBeCloseTo(69.76);
+      expect(resolveTopBarHeight()).toBe(68);
     } finally {
       globalWithWx.wx = originalWx;
     }

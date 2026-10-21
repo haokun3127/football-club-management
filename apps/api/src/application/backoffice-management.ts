@@ -1,3 +1,4 @@
+import {resolveAvailableAppRoles} from "../auth/app-roles.js";
 import { validateBackofficeValues } from "./backoffice-value-validation.js";
 import { AssessmentMappingRepository } from "../persistence/assessment-mapping-repository.js";
 import type { AuthContext } from "../auth/context.js";
@@ -169,6 +170,7 @@ export class BackofficeManagement {
         .listByClub(auth.clubId)
         .filter((row) => row.status !== "inactive")
         .map((row) => ({ value: row.id, label: row.name }));
+    if(key === "app-clients")return (await this.store.listClubAppClients(auth.clubId)).filter(client=>client.status==="active" && client.channel==="wechat_miniprogram").map(client=>({value:client.id,label:client.name}));
     if (key === "accounts")
       return this.repository
         .accounts(auth.clubId)
@@ -565,6 +567,15 @@ export class BackofficeManagement {
           .some((record) => record.metricId === previous.id))
     )
       throw new BackofficeFault(409, "metric_in_use_copy_required");
+    if(resource.key === "app-role-preferences") {
+      const userId=String(values.userId),clientId=String(values.appClientId);
+      const membership=await this.store.repositories.memberships.findActiveByClubAndUser(auth.clubId,userId);
+      const client=(await this.store.listClubAppClients(auth.clubId)).find(item=>item.id===clientId && item.status==="active");
+      if(!membership || !client)throw new BackofficeFault(400,"invalid_reference");
+      const role=values.defaultRole;
+      if(role && (!resolveAvailableAppRoles(membership.roles,client).includes(role as "parent"|"coach") || (role==="parent" ? !this.store.listParents(auth.clubId).some(parent=>parent.userId===userId) : !this.store.listCoaches(auth.clubId).some(coach=>coach.userId===userId && coach.status==="active"))))throw new BackofficeFault(400,"invalid_role_default");
+      if(previous && (previous.values.userId!==userId || previous.values.appClientId!==clientId))throw new BackofficeFault(400,"immutable_role_scope");
+    }
     if (resource.key === "memberships") {
       if (
         previous?.values.userId === auth.user.id &&

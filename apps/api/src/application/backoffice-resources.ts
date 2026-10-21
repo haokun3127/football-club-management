@@ -58,6 +58,7 @@ const ref = (
 ): BackofficeField =>
   field(key, label, "reference", { reference, required: must });
 export const backofficeResources: BackofficeResource[] = [
+  {key:"app-role-preferences",title:"默认小程序身份",table:"app_client_role_preferences",adminOnly:true,fields:[ref("userId","账号","accounts",true),ref("appClientId","小程序","app-clients",true),field("defaultRole","默认身份","select",{options:options(["parent","coach"],["家长","教练"])})]},
   ...serviceResources,
   ...contentResources,
   {

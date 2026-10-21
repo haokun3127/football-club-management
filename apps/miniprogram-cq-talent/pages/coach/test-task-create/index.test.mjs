@@ -116,7 +116,7 @@ describe("coach test-task create", () => {
     const options=await mocks.getCoachAssessmentTaskOptions();
     mocks.getCoachAssessmentTaskOptions.mockResolvedValue({...options,sourceCourse:{id:"course-a",title:"周二训练",teamId:"team-u10-dev",date:"2026-09-22",studentIds:["student-1"]}});
     const page=createPageInstance();page.onLoad({eventId:"course-a"});await new Promise((r)=>setTimeout(r,0));
-    expect(mocks.getCoachAssessmentTaskOptions).toHaveBeenLastCalledWith("course-a");
+    expect(mocks.getCoachAssessmentTaskOptions).toHaveBeenLastCalledWith("course-a",undefined);
     expect(page.data.students.map((s)=>s.id)).toEqual(["student-1"]);
     expect(page.data).toMatchObject({startsOn:"2026-09-22",dueOn:"2026-09-22"});
     page.onTermLabelInput({detail:{value:"秋季"}});

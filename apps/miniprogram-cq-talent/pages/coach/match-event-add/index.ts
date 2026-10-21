@@ -54,7 +54,7 @@ Page<MatchEventAddPageData>({
   },
   async load(eventId: string, capabilityTypes?: string[]) {
     if (!eventId) {
-      this.setData(emptyState("缺少活动 ID"));
+      this.setData({ ...emptyState("缺少活动 ID"), state: "empty" });
       return;
     }
 

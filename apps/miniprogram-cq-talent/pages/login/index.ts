@@ -1,4 +1,5 @@
-import { switchActiveRole, wechatLogin } from "../../utils/api";
+import { openPrivacyContract } from "../../utils/privacy";
+import { wechatLogin } from "../../utils/api";
 import { routeHome } from "../../utils/auth";
 import { getAppContext, persistAuthenticatedSession } from "../../utils/store";
 import type { AppRole, LoadState, LoginResult } from "../../utils/types";
@@ -17,9 +18,8 @@ Page({
     wxLoginCode: "",
     submitting: false,
     authorizationLocked: false,
-    roleChooserVisible: false,
-    canChooseParent: false,
-    canChooseCoach: false,
+    agreementAccepted:false,
+    agreementVisible:false,
     isBlocked: false,
     navTop: 88,
     privacyAgreed: false,
@@ -27,8 +27,6 @@ Page({
   phoneAuthorizationReserved: false,
   phoneAuthorizationCallbackConsumed: false,
   phoneAuthorizationTimeoutId: undefined as number | undefined,
-  pendingRoleLogin: null as LoginResult | null,
-  roleSelectionInProgress: false,
   redirectTarget: "" as string,
   onLoad(query?: Record<string, string | undefined>) {
     const code = query?.code ? decodeURIComponent(query.code) : "";
@@ -52,11 +50,11 @@ Page({
     });
   },
   onPhoneAuthorizationTap() {
-    if (this.phoneAuthorizationReserved) return;
+    if (!this.data.agreementAccepted || this.phoneAuthorizationReserved) return;
     this.phoneAuthorizationReserved = true;
     this.phoneAuthorizationCallbackConsumed = false;
     runtimeTimers.setTimeout(() => {
-      if (!this.phoneAuthorizationReserved || this.phoneAuthorizationCallbackConsumed) return;
+      if (!this.data.agreementAccepted || !this.phoneAuthorizationReserved || this.phoneAuthorizationCallbackConsumed) return;
       this.setData({ submitting: true, authorizationLocked: true, state: "loading", errorType: "", message: "正在匹配俱乐部档案" });
     }, 0);
     this.phoneAuthorizationTimeoutId = runtimeTimers.setTimeout(() => {
@@ -108,6 +106,7 @@ Page({
     this.setData({ submitting: true, authorizationLocked: true, state: "loading", errorType: "", message: "正在匹配俱乐部档案" });
     try {
       const result = await wechatLogin(this.data.wxLoginCode, event.detail.code);
+      if(result.status === "role_configuration_required") {this.setData({state:"pending",errorType:"role_configuration_required",message:"身份配置尚未完成，请联系俱乐部管理员设置默认身份。"});return;}
       if (result.status !== "authenticated" || !result.session || !result.role || !result.profile) {
         this.setData({ state: "pending", errorType: result.status === "binding_required" ? "binding_required" : "login_rejected", isBlocked: true, message: "当前手机号尚未匹配到有效的家长或教练档案，请联系俱乐部管理员。" });
         return;
@@ -116,17 +115,7 @@ Page({
         this.setData({ state: "pending", errorType: "parent_without_children", isBlocked: true, message: "家长档案尚未绑定孩子，请联系俱乐部补充资料。" });
         return;
       }
-      if (!result.session.activeRole && result.availableRoles.length > 1) {
-        this.pendingRoleLogin = result;
-        this.setData({
-          state: "ready",
-          message: "请选择进入小程序的身份。",
-          roleChooserVisible: true,
-          canChooseParent: result.availableRoles.includes("parent"),
-          canChooseCoach: result.availableRoles.includes("coach"),
-        });
-        return;
-      }
+      if(!result.session.activeRole){this.setData({state:"pending",errorType:"role_configuration_required",message:"身份配置尚未完成，请联系俱乐部管理员设置默认身份。"});return;}
       this.finishAuthenticatedSession(result);
     } catch (error) {
       const record = error as { code?: string; message?: string };
@@ -142,46 +131,22 @@ Page({
     }
     this.phoneAuthorizationReserved = false;
     this.phoneAuthorizationCallbackConsumed = false;
-    this.pendingRoleLogin = null;
-    this.roleSelectionInProgress = false;
     this.setData({
       submitting: false,
       authorizationLocked: false,
       errorType: "",
-      roleChooserVisible: false,
-      canChooseParent: false,
-      canChooseCoach: false,
     });
     this.refreshWechatCode();
   },
-  chooseParentRole() {
-    return this.chooseRole("parent");
-  },
-  chooseCoachRole() {
-    return this.chooseRole("coach");
-  },
-  async chooseRole(role: AppRole) {
-    const pending = this.pendingRoleLogin;
-    if (
-      this.roleSelectionInProgress
-      || !pending?.session
-      || pending.session.activeRole !== null
-      || !pending.availableRoles.includes(role)
-    ) return;
-
-    this.roleSelectionInProgress = true;
-    this.setData({ submitting: true, errorType: "", message: "正在切换身份。" });
-    try {
-      const result = await switchActiveRole(role, pending.session.token);
-      this.pendingRoleLogin = null;
-      this.setData({ roleChooserVisible: false, canChooseParent: false, canChooseCoach: false });
-      this.finishAuthenticatedSession(result);
-    } catch {
-      this.setData({ state: "ready", errorType: "role_selection_failed", message: "身份切换失败，请重新选择。" });
-    } finally {
-      this.roleSelectionInProgress = false;
-      this.setData({ submitting: false });
-    }
+  onAgreementChange(event:{detail:{checked:boolean}}) {if(!this.data.submitting)this.setData({agreementAccepted:event.detail.checked});},
+  toggleAgreement(){if(!this.data.submitting)this.setData({agreementAccepted:!this.data.agreementAccepted});},
+  openAgreement(){this.setData({agreementVisible:true});},
+  closeAgreement(){this.setData({agreementVisible:false});},
+  openPrivacy(){openPrivacyContract();},
+  onUnload(){
+    if(this.phoneAuthorizationTimeoutId!==undefined)runtimeTimers.clearTimeout(this.phoneAuthorizationTimeoutId);
+    this.phoneAuthorizationReserved=false;
+    this.phoneAuthorizationCallbackConsumed=true;
   },
   finishAuthenticatedSession(result: LoginResult) {
     if (result.session?.activeRole === "parent" && !result.children.length) {

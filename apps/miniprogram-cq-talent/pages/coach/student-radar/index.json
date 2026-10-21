@@ -3,7 +3,8 @@
   "usingComponents": {
     "status-view": "/components/status-view/index",
     "radar-canvas": "/components/radar-canvas/index",
-    "t-button": "tdesign-miniprogram/button/button"
+    "t-button": "tdesign-miniprogram/button/button",
+    "radar-comparison": "/components/radar-comparison/index"
   },
   "navigationStyle": "custom"
 }

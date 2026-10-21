@@ -4,40 +4,28 @@
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'empty' ? '等待开启成长旅程' : state === 'error' ? '暂时无法读取' : '读取球员档案'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <block wx:if="{{state === 'ready'}}">
       <student-switcher wx:if="{{showChildren}}" students="{{children}}" selected-id="{{student.id}}" show-all="{{false}}" bindchange="switchChild" />
-      <swiper class="player-slides" current="{{playerSlide}}" bindchange="onSlideChange" autoplay="{{false}}">
-        <swiper-item>
           <view class="player-card">
-            <view class="eyebrow">球员档案 / PLAYER PROFILE</view>
             <view class="player-heading"><text class="player-name">{{student.name}}</text><t-button class="child-button" bindtap="toggleChildren" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="child-button" theme="primary" variant="text">切换孩子</t-button></view>
             <view class="player-team">{{teamLabel}}</view>
             <view class="player-metrics">
               <view><view class="metric-label">训练累计</view><view class="metric-value">{{trainingTotal}}<text class="metric-unit">次</text></view></view>
               <view><view class="metric-label">成长里程碑</view><view class="metric-value">{{growthState === 'ready' ? milestoneCount : '—'}}</view></view>
             </view>
-            <view class="player-latest" bindtap="openGrowth"><text class="metric-label">最新成长</text><view class="player-latest-text">{{growthState === 'ready' ? latestGrowthText : growthState === 'error' ? '成长统计暂时无法读取' : '正在读取成长记录…'}}</view></view>
           </view>
-        </swiper-item>
-        <swiper-item>
-          <view class="player-card milestone-card" bindtap="openGrowth">
-            <block wx:if="{{growthState === 'ready'}}">
-              <view class="eyebrow">每一步，都算数 / YOUR JOURNEY</view>
-              <view class="milestone-title">{{milestoneTitle}}</view>
-              <view class="milestone-description">{{milestoneDescription}}</view>
-              <view class="milestone-link">查看成长记录</view>
-            </block>
-            <view wx:elif="{{growthState === 'error'}}" class="milestone-fallback">
-              <view class="eyebrow">成长统计暂时无法读取</view>
-              <view class="milestone-description">{{growthMessage}}</view>
-              <t-button class="module-retry" catchtap="retryGrowth" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="module-retry" theme="primary" variant="text">重试</t-button>
-            </view>
-            <view wx:else class="milestone-fallback">
-              <view class="eyebrow">每一步，都算数 / YOUR JOURNEY</view>
-              <view class="milestone-description">正在读取成长记录…</view>
-            </view>
-          </view>
-        </swiper-item>
-      </swiper>
-      <view class="player-dots" aria-hidden="true"><view class="player-dot {{playerSlide === 0 ? 'active' : ''}}"></view><view class="player-dot {{playerSlide === 1 ? 'active' : ''}}"></view></view>
+      <view class="section-heading"><view>下一次训练</view><t-button class="text-button" bindtap="openSchedule" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="text-button" theme="primary" variant="text">全部日程</t-button></view>
+      <view wx:if="{{nextEvent}}" class="next-event" bindtap="openNextEvent"><view class="next-event-title">{{nextEvent.title}}</view><view class="next-event-time">{{nextEventTime}}</view><view class="next-event-meta">{{nextEvent.teamName}} · {{nextEvent.venue || '场地待同步'}}</view></view>
+      <view wx:else class="next-event"><view class="next-event-title">下一次训练，敬请期待</view><view class="next-event-meta">有新安排时，可在日程中查看。</view></view>
+      <view class="shortcut-heading"><text>常用功能</text><t-button class="text-button" bindtap="editShortcuts" disabled="{{presentationState !== 'ready'}}" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="text-button" theme="primary" variant="text">调整入口</t-button></view>
+      <view wx:if="{{contentMessage}}" class="configuration-message"><text>{{contentMessage}}</text><t-button class="inline-retry" catchtap="retryContent" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="inline-retry" theme="primary" variant="text">重试</t-button></view>
+      <view class="shortcuts"><t-button wx:for="{{shortcuts}}" wx:key="key" class="shortcut" data-key="{{item.key}}" bindtap="openShortcut" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="shortcut" theme="default" variant="text"><view class="shortcut-icon"><image src="/assets/icons/{{item.icon}}" mode="aspectFit" /></view><text class="shortcut-label">{{item.label}}</text></t-button></view>
+      <view wx:if="{{editingShortcuts}}" class="shortcut-editor">
+        <view class="editor-title">选择并排列四个入口</view>
+        <picker range="{{shortcutSlots}}" range-key="label" value="{{activeShortcutSlot}}" bindchange="selectShortcutSlot"><view class="slot-picker">调整第 {{activeShortcutSlot + 1}} 个：{{shortcutSlots[activeShortcutSlot].label}} · 点击切换位置</view></picker>
+        <view class="shortcut-choices"><t-button wx:for="{{shortcutOptions}}" wx:key="key" data-key="{{item.key}}" bindtap="chooseShortcut" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">{{item.label}}</t-button></view>
+        <view wx:if="{{shortcutMessage}}" class="configuration-message">{{shortcutMessage}}</view>
+        <view class="editor-actions"><t-button bindtap="cancelShortcuts" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">取消</t-button><t-button class="editor-save" bindtap="saveShortcuts" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="editor-save" theme="primary" variant="base">保存入口</t-button></view>
+      </view>
+
       <view class="club-banner" bindtap="openNews" role="button" aria-label="查看俱乐部动态">
         <image class="club-banner-image" src="{{banner ? banner.imageUrl : '/assets/content/football-editorial.jpg'}}" mode="aspectFill" />
         <view class="club-banner-scrim" aria-hidden="true"></view>
@@ -49,19 +37,7 @@
           <view wx:else class="club-banner-subtitle">{{banner ? banner.name : newsState === 'loading' ? '正在获取俱乐部动态…' : news ? news.title : '了解我们的俱乐部'}}</view>
         </view>
       </view>
-      <view class="shortcut-heading"><text>常用功能</text><t-button class="text-button" bindtap="editShortcuts" disabled="{{presentationState !== 'ready'}}" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="text-button" theme="primary" variant="text">调整入口</t-button></view>
-      <view wx:if="{{contentMessage}}" class="configuration-message"><text>{{contentMessage}}</text><t-button class="inline-retry" catchtap="retryContent" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="inline-retry" theme="primary" variant="text">重试</t-button></view>
-      <view class="shortcuts"><t-button wx:for="{{shortcuts}}" wx:key="key" class="shortcut" data-key="{{item.key}}" bindtap="openShortcut" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="shortcut" theme="default" variant="text"><view class="shortcut-icon"><image src="/assets/icons/{{item.icon}}" mode="aspectFit" /></view><text class="shortcut-label">{{item.label}}</text></t-button></view>
-      <view wx:if="{{editingShortcuts}}" class="shortcut-editor">
-        <view class="editor-title">选择并排列四个入口</view>
-        <picker range="{{shortcutSlots}}" range-key="label" value="{{activeShortcutSlot}}" bindchange="selectShortcutSlot"><view class="slot-picker">调整第 {{activeShortcutSlot + 1}} 个：{{shortcutSlots[activeShortcutSlot].label}} · 点击切换位置</view></picker>
-        <view class="shortcut-choices"><t-button wx:for="{{shortcutOptions}}" wx:key="key" data-key="{{item.key}}" bindtap="chooseShortcut" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">{{item.label}}</t-button></view>
-        <view wx:if="{{shortcutMessage}}" class="configuration-message">{{shortcutMessage}}</view>
-        <view class="editor-actions"><t-button bindtap="cancelShortcuts" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">取消</t-button><t-button class="editor-save" bindtap="saveShortcuts" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="editor-save" theme="primary" variant="base">保存入口</t-button></view>
-      </view>
-      <view class="section-heading"><view>下一次训练</view><t-button class="text-button" bindtap="openSchedule" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="text-button" theme="primary" variant="text">全部日程</t-button></view>
-      <view wx:if="{{nextEvent}}" class="next-event" bindtap="openNextEvent"><view class="next-event-title">{{nextEvent.title}}</view><view class="next-event-time">{{nextEventTime}}</view><view class="next-event-meta">{{nextEvent.teamName}} · {{nextEvent.venue || '场地待同步'}}</view></view>
-      <view wx:else class="next-event"><view class="next-event-title">下一次训练，敬请期待</view><view class="next-event-meta">有新安排时，可在日程中查看。</view></view>
+
     </block>
   </view>
   <role-tabbar role="parent" active="home" />

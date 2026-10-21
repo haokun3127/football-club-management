@@ -1,10 +1,10 @@
 <view class="team-selector-page">
   <view class="team-selector-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
     <view class="team-selector-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
-    <view class="team-selector-nav__title">选择训练球队</view>
+    <view class="team-selector-nav__title">选择球队</view>
   </view>
   <view class="team-selector-page__body">
-    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="选择训练球队" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="选择球队" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <block wx:if="{{state === 'ready' && hasTeams}}">
       <view class="team-selector__title">我的球队</view>
       <view class="team-selector__copy">仅显示后台已分配队伍</view>

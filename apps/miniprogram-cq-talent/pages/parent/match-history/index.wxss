@@ -1,6 +1,6 @@
 .match-history-page { min-height: 100vh; background: var(--color-bg); }
 .match-history-page__body { padding: 32rpx 32rpx 64rpx; }
-.page-nav { position: sticky; top: 0; z-index: 100; height: 88rpx; box-sizing: content-box; display: flex; align-items: center; padding: 0 200rpx 0 32rpx; background: var(--color-card); }
+.page-nav { position: sticky; top: 0; z-index: 100; height:44px; box-sizing: content-box; display: flex; align-items: center; padding: 0 200rpx 0 32rpx; background: var(--color-card); }
 .page-nav__back { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; }
 .page-nav__back image { width: 48rpx; height: 48rpx; }
 .page-nav__title { flex: 1; margin-left: 24rpx; color: #202124; font-size: var(--font-size-display); font-weight: 700; }
@@ -11,8 +11,12 @@
 .match-history-card__main { min-width: 0; flex: 1; }
 .match-history-card__title { overflow: hidden; color: #202124; font-size: var(--font-size-section); font-weight: 700; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
 .match-history-card__meta { margin-top: 6rpx; color: #667085; font-size: var(--font-size-aux); line-height: 1.5; }
-.match-history-card__context { overflow: hidden; margin-top: 4rpx; color: #98a2b3; font-size: var(--font-size-aux); line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
+.match-history-card__context { overflow: hidden; margin-top: 4rpx; color:var(--color-text-secondary); font-size: var(--font-size-aux); line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
 .match-history-card__result { flex: 0 0 156rpx; align-self: stretch; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; }
 .match-history-card__score { color: #202124; font-size: var(--font-size-aux); font-weight: 700; line-height: 1.5; white-space: nowrap; }
-.match-history-card__status { margin-top: 6rpx; color: #98a2b3; font-size: var(--font-size-aux); line-height: 1.5; }
-.match-history-card__status--done { color: #10b981; font-weight: 600; }
+.match-history-card__status { margin-top: 6rpx;  font-size: var(--font-size-aux); line-height: 1.5;       background:transparent;border-radius:0;padding:0;height:auto;min-height:0;color:var(--color-text-secondary);}
+.match-history-card__status--done {  font-weight: 600;       background:transparent;border-radius:0;padding:0;height:auto;min-height:0;color:var(--color-text-secondary);}
+
+/* 移动端触控下限，业务内容与原事件保持一致。 */
+.match-history-card,
+.page-nav__back { min-height:44px; min-width:44px; box-sizing:border-box; }

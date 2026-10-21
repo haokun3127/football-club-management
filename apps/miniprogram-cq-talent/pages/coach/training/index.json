@@ -2,6 +2,10 @@
   "navigationStyle": "custom",
   "usingComponents": {
     "role-tabbar": "/components/role-tabbar/index",
-    "status-view": "/components/status-view/index"
+    "status-view": "/components/status-view/index",
+    "app-header": "/components/app-header/index",
+    "t-cell": "tdesign-miniprogram/cell/cell",
+    "t-cell-group": "tdesign-miniprogram/cell-group/cell-group",
+    "t-button": "tdesign-miniprogram/button/button"
   }
 }

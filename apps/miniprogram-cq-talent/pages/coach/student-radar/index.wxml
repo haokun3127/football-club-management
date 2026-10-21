@@ -37,9 +37,7 @@
       <view wx:if="{{section === 'ability'}}" class="profile-card">
         <t-button class="profile-link" bindtap="openConfirmedResults" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="profile-link" theme="primary" variant="text">查看已确认原始成绩与个人历史 ›</t-button>
         <view class="radar-hero__head"><view class="profile-heading">{{modelName}}</view><view class="radar-hero__period">{{overall}}</view></view><view class="profile-hint">最近发生日期：{{assessmentPeriod}}</view>
-        <view wx:if="{{hasRadar}}" class="radar-hero__plot"><radar-canvas class="radar-hero__canvas" metrics="{{radar}}" width="528rpx" height="528rpx"></radar-canvas></view>
-        <view wx:else class="profile-hint">至少三个有效维度才能绘制雷达图，已有结果仍列示如下。</view>
-        <view wx:for="{{dimensions}}" wx:key="metricId" class="profile-record"><view>{{item.label}} · {{item.value}}</view><view class="profile-hint">{{item.date}}</view></view>
+        <view class="radar-hero__plot"><radar-comparison class="radar-comparison-widget" role="coach" student-id="{{activeStudentId}}" team-id="{{teamId}}" fallback-metrics="{{radar}}" /></view>
       </view>
       <view wx:if="{{hasStudents && section === 'summary'}}" class="radar-roster"><view class="radar-roster__title">同队学员</view><view class="radar-roster__grid"><view wx:for="{{students}}" wx:key="id" class="radar-player {{activeStudentId === item.id ? 'radar-player--active' : ''}}" data-id="{{item.id}}" bindtap="selectStudent"><view class="radar-player__avatar">{{item.initial}}</view><view class="radar-player__name">{{item.name}}</view></view></view></view>
     </block>

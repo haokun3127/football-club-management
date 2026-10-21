@@ -17,7 +17,7 @@ const LABELS: Record<AppRole, TabItem[]> = {
   ],
   coach: [
     { key: "schedule", label: "日程", path: "/pages/coach/schedule/index", activeIcon: "/assets/icons/tab-calendar-active.png", inactiveIcon: "/assets/icons/tab-calendar-inactive.png" },
-    { key: "training", label: "训练管理", path: "/pages/coach/training/index", activeIcon: "/assets/icons/tab-training-active.png", inactiveIcon: "/assets/icons/tab-training-inactive.png" },
+    { key: "training", label: "球队", path: "/pages/coach/training/index", activeIcon: "/assets/icons/tab-training-active.png", inactiveIcon: "/assets/icons/tab-training-inactive.png" },
     { key: "me", label: "我的", path: "/pages/coach/me/index", activeIcon: "/assets/icons/tab-user-active.png", inactiveIcon: "/assets/icons/tab-user-inactive.png" },
   ],
 };

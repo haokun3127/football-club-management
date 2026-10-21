@@ -1,3 +1,6 @@
+import {radarComparison,RadarSourceError} from "../application/radar-comparison.js";
+import {radarComparisonSchema} from "../http/radar-comparison-schemas.js";
+import {automaticRoleScope,chooseAutomaticRole} from "../auth/auto-active-role.js";
 import { parentResultSchema } from "../http/parent-result-schemas.js";
 import {clubPresentation} from '../application/backoffice-content.js';
 import {clubPresentationSchema} from '../http/club-presentation-schemas.js';
@@ -94,6 +97,21 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
   });
 
   await registerTrainingTemplateRoutes(app, context);
+
+  for(const role of ["parent","coach"] as const) {
+    app.get<{Params:{clubId:string;clientId:string;studentId:string};Querystring:{teamId?:string;historyResultId?:string;standardId?:string}}>(
+      `/clubs/:clubId/app-clients/:clientId/${role}/students/:studentId/radar-comparison`,
+      {schema:{...schemas.appClientStudentParams,...radarComparisonSchema}},async(request,reply)=>{
+        const {clubId,clientId,studentId}=request.params;
+        const client=await requireActiveAppClient(context,reply,clubId,clientId,role);if(!client)return reply;
+        if(!await context.requireStudentAccess(request,reply,clubId,studentId))return reply;
+        const auth=await context.resolveClubAuth(request,reply,clubId);if(!auth)return reply;
+        const options=role==="coach" ? collectCoachTeamOptions(context,clubId,auth) : [];
+        if(role==="coach" && request.query.teamId && !options.some(team=>team.id===request.query.teamId))return context.sendError(reply,403,"forbidden","Team is not accessible for this coach membership");
+        const teamIds=role==="coach" ? new Set(options.filter(team=>!request.query.teamId || team.id===request.query.teamId).map(team=>team.id)) : new Set(context.store.listTeamMembers(clubId).filter(member=>member.studentId===studentId).map(member=>member.teamId));
+        try{return await radarComparison(context.store,clubId,studentId,teamIds,request.query);}catch(error){if(error instanceof RadarSourceError)return context.sendError(reply,404,"comparison_source_unavailable",error.message);throw error;}
+      });
+  }
 
   app.get<{ Params: { clubId: string; clientId: string } }>(
     "/clubs/:clubId/app-clients/:clientId/coach/tactical-board/formations",
@@ -713,7 +731,9 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       if (!client) {
         return reply;
       }
-      const availableRoles = resolveAvailableAppRoles(auth.membership.roles, client);
+      const availableRoles = firstHeaderValue(request.headers["x-app-client-capabilities"]) === "auto-active-role-v1"
+        ? (await automaticRoleScope(context.store,request.params.clubId,auth,client)).enterable
+        : resolveAvailableAppRoles(auth.membership.roles, client);
       if (!availableRoles.includes(request.body.role)) {
         return context.sendError(reply, 403, "forbidden", "Requested role is not available for this app client");
       }
@@ -985,14 +1005,17 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         };
       }
 
-      const availableRoles = resolveAvailableAppRoles(auth.membership.roles, client);
-      const role = resolveCompatibleAppRole(availableRoles);
-      if (!role) {
-        return context.sendError(reply, 403, "forbidden", "App client does not expose an available membership role");
+      const automatic=firstHeaderValue(request.headers["x-app-client-capabilities"]) === "auto-active-role-v1";
+      const scope=automatic ? await automaticRoleScope(context.store,request.params.clubId,auth,client) : null;
+      const availableRoles=scope?.enterable ?? resolveAvailableAppRoles(auth.membership.roles,client);
+      const roleScope={clubId:request.params.clubId,appClientId:client.id,userId:auth.user.id};
+      const role=automatic ? chooseAutomaticRole(availableRoles,context.sessionRegistry.rolePreference(roleScope)) : resolveCompatibleAppRole(availableRoles);
+      if(!role && automatic) {
+        const status=availableRoles.length>1 ? "role_configuration_required" : "binding_required";
+        return {clubId:request.params.clubId,client:summarizeClient(client),status,phoneBinding:request.body.phoneCode ? "received" : "required",session:null,role:null,availableRoles,profile:null,children:[],capabilities:await context.store.getClubCapabilities(request.params.clubId,{clientId:client.id})};
       }
-      const activeRole = availableRoles.length > 1 && firstHeaderValue(request.headers["x-app-client-capabilities"]) === "active-role-switch-v1"
-        ? null
-        : role;
+      if(!role)return context.sendError(reply,403,"forbidden","App client does not expose an available membership role");
+      const activeRole=!automatic && availableRoles.length>1 && firstHeaderValue(request.headers["x-app-client-capabilities"]) === "active-role-switch-v1" ? null : role;
       const session = await context.sessionRegistry.create({
         clubId: request.params.clubId,
         appClientId: client.id,
@@ -2623,7 +2646,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
   );
 
   app.get<{
-    Querystring: {sourceEventId?: string};
+    Querystring: {sourceEventId?: string;teamId?:string};
     Params: {
       clubId: string;
       clientId: string;
@@ -2653,7 +2676,10 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return reply;
       }
 
-      const { views, teams } = await coachAssessmentViews(context, request.params.clubId, auth);
+      const scope = await coachAssessmentViews(context, request.params.clubId, auth);
+      if(request.query.teamId && !scope.teams.some(team=>team.id===request.query.teamId))return context.sendError(reply,403,"forbidden","Team is not accessible for this coach membership");
+      const teams=request.query.teamId ? scope.teams.filter(team=>team.id===request.query.teamId) : scope.teams;
+      const views=request.query.teamId ? scope.views.filter(task=>task.teamId===request.query.teamId) : scope.views;
 
       const config = await context.store.getDataCapabilityConfig(request.params.clubId);
       const items = await context.store.listAssessmentTestItems(request.params.clubId);

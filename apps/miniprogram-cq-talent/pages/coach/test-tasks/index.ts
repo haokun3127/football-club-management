@@ -1,3 +1,4 @@
+import { loadActiveTeam } from "../../../utils/coach-team-context";
 import { getCoachAssessmentTasks } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
@@ -24,6 +25,7 @@ interface TaskCard extends CoachAssessmentTask {
 }
 
 interface PageData {
+  teamId:string;
   navInset: number;
   menuInset: number;
   state: LoadState;
@@ -51,7 +53,7 @@ const STATUS_LABELS: Record<CoachAssessmentTask["status"], string> = {
 
 Page<PageData>({
   data: {
-    navInset: resolveNavInset(),
+    teamId:"",navInset: resolveNavInset(),
     menuInset: resolveMenuInset(),
     state: "idle",
     statusTitle: "测评任务",
@@ -64,7 +66,9 @@ Page<PageData>({
     hasVisibleTasks: false,
   },
 
-  onLoad() {
+  requestedTeamId:"",
+  onLoad(query?:{teamId?:string}) {
+    this.requestedTeamId=query?.teamId || "";
     const flags = this as typeof this & RefreshFlags;
     flags.skipInitialAssessmentTasksShow = true;
     return this.load();
@@ -95,7 +99,10 @@ Page<PageData>({
     });
 
     try {
-      const tasks = (await getCoachAssessmentTasks({ forceRefresh: true })).map(presentTask);
+      const context=await loadActiveTeam(this.requestedTeamId || undefined);
+      if(!context.id){this.setData({state:"empty",statusTitle:"选择球队",message:"请从球队工作区选择球队后查看测评任务",tasks:[],visibleTasks:[],hasVisibleTasks:false});return;}
+      this.setData({teamId:context.id});
+      const tasks = (await getCoachAssessmentTasks({ forceRefresh: true,teamId:context.id })).filter(task=>task.teamId===context.id).map(presentTask);
       flags.assessmentTasksLoadedSuccessfully = true;
       const visibleTasks = filterTasks(tasks, this.data.activeFilter);
       this.setData({
@@ -132,7 +139,7 @@ Page<PageData>({
   },
 
   openCreate() {
-    wx.navigateTo({ url: "/pages/coach/test-task-create/index" });
+    wx.navigateTo({ url: `/pages/coach/test-task-create/index${this.data.teamId ? `?teamId=${encodeURIComponent(this.data.teamId)}` : ""}` });
   },
 
   selectFilter(event: { currentTarget: { dataset: { id: FilterId } } }) {

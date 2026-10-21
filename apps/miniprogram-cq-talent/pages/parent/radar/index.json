@@ -3,7 +3,9 @@
   "navigationBarTitleText": "能力雷达",
   "usingComponents": {
     "status-view": "/components/status-view/index",
-    "radar-canvas": "/components/radar-canvas/index",
-    "role-tabbar": "/components/role-tabbar/index"
+    "role-tabbar": "/components/role-tabbar/index",
+    "radar-comparison": "/components/radar-comparison/index",
+    "app-header": "/components/app-header/index",
+    "student-switcher": "/components/student-switcher/index"
   }
 }

@@ -68,7 +68,7 @@ describe("active-role session transport", () => {
     try {
       await wechatLogin("wx-code", "phone-code");
       expect(received).toMatchObject({
-        "X-App-Client-Capabilities": "active-role-switch-v1",
+        "X-App-Client-Capabilities": "auto-active-role-v1",
       });
     } finally {
       globalThis.wx.request = originalRequest;

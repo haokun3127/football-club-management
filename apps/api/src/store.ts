@@ -186,6 +186,7 @@ export interface ApiStore {
   getExternalSyncRunDetail(clubId: EntityId, syncRunId: EntityId): SyncRunDetail | null | Promise<SyncRunDetail | null>;
   listOperationalStudents(clubId: EntityId, filters?: StudentListFilters): StudentListItem[] | Promise<StudentListItem[]>;
   listCoaches(clubId: EntityId): CoachProfile[];
+  listParents(clubId: EntityId): ParentProfile[];
   listCoachAssignments(clubId:string):CoachAssignment[];
   saveCoachAssignment(value:CoachAssignment):CoachAssignment;
   removeCoachAssignment(clubId:string,teamId:string,coachId:string):void;
@@ -1096,6 +1097,8 @@ export abstract class SeedBackedStore implements ApiStore {
     this.coachAssignments.push({...value});return {...value};
   }
   removeCoachAssignment(clubId:string,teamId:string,coachId:string) {this.coachAssignments=this.coachAssignments.filter(item=>!(item.clubId===clubId&&item.teamId===teamId&&item.coachId===coachId));}
+
+  listParents(clubId: EntityId): ParentProfile[] { return this.data.parents.filter(parent=>parent.clubId===clubId); }
 
   listCoaches(clubId: EntityId): CoachProfile[] {
     return this.data.coaches.filter((item) => item.clubId === clubId);

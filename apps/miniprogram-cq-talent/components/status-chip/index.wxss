@@ -1,8 +1,1 @@
-.chip { display: inline-flex; align-items: center; justify-content: center; min-height: 52rpx; box-sizing: border-box; padding: 0 18rpx; border-radius: 999rpx; background: #f2f4f7; color: #667085; font-size: 24rpx; line-height: 1; }
-.chip--compact { min-height: 48rpx; padding: 0 14rpx; font-size: 22rpx; }
-.chip--brand { background: #fceeef; color: var(--color-brand); }
-.chip--success { background: #f0fff4; color: var(--color-success); }
-.chip--warning { background: #fff7e6; color: #ad6800; }
-.chip--error { background: #fff1f0; color: #b42318; }
-.chip--info { background: #eff8ff; color: #175cd3; }
-.chip--pending { background: #f4f3ff; color: #6941c6; }
+:host { display:inline-flex; align-items:center; }

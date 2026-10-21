@@ -113,3 +113,5 @@ body {
 .content-panel .ant-form {
   max-width: 560px;
 }
+
+.role-default-select { min-width:160px; }

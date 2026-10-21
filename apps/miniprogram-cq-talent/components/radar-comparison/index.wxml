@@ -1,0 +1,22 @@
+<view class="comparison">
+ <view class="comparison-heading">能力雷达</view><view class="comparison-caption">最新各项 · 每项成绩日期见下方明细</view>
+ <view wx:if="{{state === 'loading'}}" class="comparison-message">正在读取已确认能力…</view>
+ <view wx:if="{{state === 'error'}}" class="comparison-message">{{message}}<t-button variant="text" theme="primary" bindtap="retry" custom-style="min-height:44px;">重试</t-button><t-button wx:if="{{historyResultId || standardId}}" variant="text" theme="primary" bindtap="clearComparisons" custom-style="min-height:44px;">清除对比并重试</t-button></view>
+ <view wx:if="{{state === 'error' && fallbackMetrics.length >= 3 && fallbackMetrics.length <= 8 && panel === ''}}" class="comparison-caption">以下仅为已读取的当前成绩，尚未加载对比来源。</view>
+ <radar-canvas class="comparison-chart" wx:if="{{state === 'error' && fallbackMetrics.length >= 3 && fallbackMetrics.length <= 8 && panel === ''}}" metrics="{{fallbackMetrics}}" dark height="300px" />
+ <block wx:if="{{data}}">
+  <view class="comparison-tools"><t-button variant="outline" theme="default" bindtap="openMetrics" custom-style="min-height:44px;font-size:14px;">指标</t-button><t-button variant="outline" theme="default" bindtap="openComparisons" custom-style="min-height:44px;font-size:14px;">对比</t-button><text>{{selectionLabel}}</text></view>
+  <view class="comparison-caption">{{viewName}}</view>
+  <radar-canvas class="comparison-chart" wx:if="{{metrics.length >= 3 && !allHidden && panel === ''}}" metrics="{{metrics}}" series="{{plots}}" configured dark height="300px" />
+  <view wx:if="{{allHidden}}" class="comparison-message">已隐藏全部系列<t-button variant="text" theme="primary" bindtap="restoreSeries" custom-style="min-height:44px;">恢复显示</t-button></view>
+  <view class="comparison-legends"><t-button wx:for="{{legends}}" wx:key="id" data-id="{{item.id}}" bindtap="toggleSeries" variant="text" theme="default" custom-style="min-height:44px;font-size:14px;height:auto;line-height:1.5;white-space:normal;text-align:left;max-width:100%;padding:8px;opacity:{{item.visible ? 1 : .5}};"><view class="legend-line" style="background:{{item.color}}" />{{item.name}}</t-button></view>
+  <view wx:for="{{issues}}" wx:key="id" class="comparison-caption">{{item.text}}</view>
+  <view class="comparison-values"><view wx:for="{{rows}}" wx:key="id" class="metric-row"><view class="metric-row__heading"><view class="metric-row__title">{{item.name}}</view><t-button wx:if="{{role === 'parent'}}" data-id="{{item.id}}" bindtap="openMetric" variant="text" theme="primary" custom-style="min-height:44px;font-size:14px;">详情</t-button></view><view wx:for="{{item.values}}" wx:for-item="value" wx:key="id" class="metric-row__value"><view>{{value.text}}</view><view class="metric-row__date">{{value.date}}{{value.reason ? ' · ' + value.reason : ''}}</view></view></view></view>
+ </block>
+ <t-popup visible="{{panel !== ''}}" placement="bottom" bindclose="closePanel" safe-area-inset-bottom>
+  <view class="comparison-panel"><view class="comparison-heading">{{panel === 'metrics' ? '选择指标' : '选择对比来源'}}</view><scroll-view scroll-y class="comparison-panel__scroll">
+   <block wx:if="{{panel === 'metrics'}}"><view class="comparison-caption">指标组</view><t-radio-group value="{{viewId}}" options="{{viewOptions}}" bindchange="changeView" /><view class="comparison-caption">{{selectionLabel}} · 最多8项；少于3项显示数值</view><t-checkbox-group max="{{8}}" value="{{selectedIds}}" options="{{axisOptions}}" bindchange="changeAxes" /></block>
+   <block wx:else><view class="comparison-caption">本人已确认历史</view><t-radio-group value="{{historyResultId}}" options="{{historyOptions}}" bindchange="changeHistory" /><view class="comparison-caption">{{historyReason}}</view><view class="comparison-caption">适用批准标准</view><t-radio-group value="{{standardId}}" options="{{standardOptions}}" bindchange="changeStandard" /><view class="comparison-caption">{{standardReason}}</view></block>
+  </scroll-view><t-button theme="primary" block bindtap="closePanel" custom-style="min-height:48px;width:100%;">完成</t-button></view>
+ </t-popup>
+</view>

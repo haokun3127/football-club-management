@@ -1354,3 +1354,9 @@ Good: retain old published raw values during a revision draft, then replace that
 
 ### 7. Wrong / correct
 Wrong: `publishedAssessments.length` as attempt count or `latestRadar.value` as20m time. Correct: project the current confirmed assessment's raw results, count unique task/legacy assessment IDs, and preserve units/provenance without inventing comparisons.
+
+## Published radar comparison (2026-10-21)
+
+`GET parent/students/:studentId/radar-comparison` and `GET coach/students/:studentId/radar-comparison?teamId=...` share one assembler and retain distinct guardian/coach authorization. Optional historyResultId is a published immutable assessment ID; optional standardId identifies an applicable approved standard group. Invalid/withdrawn sources return404 without fallback; foreign child/team403. Both schemas are in OpenAPI.
+
+DTO axes/views retain configured missing metrics. Current is latest confirmed fact per metric, with actual fact/date/metric and mapping versions; comparison points carry measured/missing/unmapped/incompatible plus reason/rawLabel. ConfirmedStudentResults supplies publication/supersession scope. Only approved mappings/models proving a common0–100 domain produce a score; no raw unit normalization or averaged standards. Approved official standards require active/effective/model applicability; unsupported teamLevel applicability is excluded, never guessed. Historical/standard points align per axis to the current metric and mapping versions; mismatch nulls the comparable score while retaining raw facts. Persistent three-axis tests cover true0, complete history, approved boundaries, distinct per-axis mappings, guardian/coach scope and withdrawn standards.

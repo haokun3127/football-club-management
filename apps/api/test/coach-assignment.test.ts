@@ -34,4 +34,25 @@ describe("explicit team coaching scope",()=>{
    expect(store.listCoachAssignments("another-club")).toEqual([]);
   } finally {await app.close();persistence.database.close();vi.unstubAllEnvs();}
  });
+ it("filters persisted same-name teams by ID and refuses an explicit foreign team",async()=>{
+  const clubId="club-chongqing-talent",seed=createSeedData();
+  const a=seed.teams.find(team=>team.clubId===clubId)!;
+  seed.teams.push({...a,id:"team-ui-b",name:a.name});
+  const persistence=await createPlatformPersistence({databasePath:":memory:",seedData:seed});
+  const store=new PersistentApiStore(persistence.repositories,seed);
+  const app=buildServer(store,{logger:false,membershipResolver:new HeaderMembershipResolver(persistence.repositories.users,persistence.repositories.memberships)});
+  const base=`/clubs/${clubId}/app-clients/app-client-cq-talent-wechat-main/coach/assessment-tasks`;
+  try{
+   for(const [id,teamId] of [["ui-a",a.id],["ui-b","team-ui-b"]])await store.saveAssessmentTask({id:id!,clubId,teamId:teamId!,templateId:"assessment-template-technical",title:"同名队测评",termLabel:"2026",startsOn:"2026-01-01",dueOn:"2026-12-31"});
+   const response=await app.inject({method:"GET",url:`${base}?teamId=team-ui-b`,headers:{"x-user-id":"user-admin-1"}});
+   expect(response.statusCode,response.body).toBe(200);
+   expect(response.json().teams.map((team:{id:string})=>team.id)).toEqual(["team-ui-b"]);
+   expect(response.json().tasks.map((task:{id:string})=>task.id)).toEqual(["ui-b"]);
+   const denied=await app.inject({method:"GET",url:`${base}?teamId=foreign`,headers:{"x-user-id":"user-admin-1"}});
+   expect(denied.statusCode).toBe(403);
+   const legacy=await app.inject({method:"GET",url:base,headers:{"x-user-id":"user-admin-1"}});
+   expect(legacy.json().tasks.map((task:{id:string})=>task.id)).toEqual(expect.arrayContaining(["ui-a","ui-b"]));
+  }finally{await app.close();persistence.database.close();}
+ });
+
 });

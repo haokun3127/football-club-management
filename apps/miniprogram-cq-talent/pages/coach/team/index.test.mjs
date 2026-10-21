@@ -15,6 +15,7 @@ vi.mock("../../../utils/presentation", () => ({ resolveMenuInset: () => 88, reso
 
 globalThis.wx = { navigateBack: mocks.navigateBack };
 
+vi.mock("../../../utils/coach-team-context",()=>({loadActiveTeam:async id=>{const detail=await mocks.getCoachTeam(id);return {id:detail?.team?.id || "",options:detail?.teamOptions || [],detail:detail?.team ? detail : null};}}));
 let pageDefinition;
 globalThis.Page = (definition) => {
   pageDefinition = definition;
@@ -97,7 +98,7 @@ describe("coach team detail", () => {
       hasMembers: false,
       teamName: "Actual team",
       season: "2026-2027",
-      memberEmptyMessage: "近30天暂无执教学员",
+      memberEmptyMessage: "本队暂无在队学员",
       heroStats: [
         { label: "在队人数", value: "0", valueClass: "" },
         { label: "累计训练", value: "3", valueClass: "" },
@@ -190,7 +191,7 @@ describe("coach team detail", () => {
     expect(template).toContain('/assets/icons/chevron-left.svg');
     expect(template).not.toMatch(/凤凰山|U10精英队|林教练|主教练|王助教|李体能/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(stylesheet).toMatch(/\.team-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*padding-left:\s*32rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+    expect(stylesheet).toMatch(/\.team-nav\s*\{(?=[^}]*height:\s*44px)(?=[^}]*padding-left:\s*32rpx)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).toContain(".team-nav__left { display: flex; align-items: center; gap: 0;");
     expect(stylesheet).toContain(".team-nav__title { color: #202124; font-size: var(--font-size-display); font-weight: 700; line-height: 1.5; }");
     expect(stylesheet).toContain(".hero { display: flex; flex-direction: column; gap: 16rpx; padding: 32rpx; border-radius: 32rpx;");

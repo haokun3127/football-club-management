@@ -239,7 +239,7 @@ describe("parent growth training history", () => {
 
     await page.load();
 
-    expect(page.data.state).toBe("empty");
+    expect(page.data.state).toBe("ready");
     expect(page.data.canDrawRadar).toBe(false);
     expect(template).toContain('wx:if="{{growth && state === \'ready\'}}"');
     expect(template).toContain("p4-milestone");

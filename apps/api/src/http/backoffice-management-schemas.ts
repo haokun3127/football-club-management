@@ -187,6 +187,7 @@ export const optionSchema = {
         enum: [
           ...backofficeResources.map((r) => r.key),
           "accounts",
+          "app-clients",
           "objectives",
           "dimensions",
           "plans",

@@ -405,7 +405,7 @@ describe("coach activity workbench", () => {
     expect(stylesheet).toMatch(/\.c2-nav__title\s*\{[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)[^}]*line-height:\s*1\.5/s);
     expect(stylesheet).not.toContain(".c2-nav__finish");
     expect(stylesheet).not.toContain(".progress-row");
-    expect(stylesheet).toMatch(/\.c2-nav\s*\{(?=[^}]*height:\s*88rpx)(?=[^}]*box-sizing:\s*content-box)/s);
+    expect(stylesheet).toMatch(/\.c2-nav\s*\{(?=[^}]*height:\s*44px)(?=[^}]*box-sizing:\s*content-box)/s);
   });
 
   it("keeps the live Figma C2 course-context label on the right side of the top navigation", () => {

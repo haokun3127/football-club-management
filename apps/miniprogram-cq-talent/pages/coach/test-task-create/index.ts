@@ -68,7 +68,9 @@ Page<PageData>({
     submitting: false,
     canSubmit: false,
   },
-  onLoad(query?:{eventId?:string}) {
+  requestedTeamId:"",
+  onLoad(query?:{eventId?:string;teamId?:string}) {
+    this.requestedTeamId=query?.teamId || "";
     if (!requireRole("coach")) return;
     this.setData({sourceEventId:query?.eventId || ""});
     void this.load();
@@ -78,10 +80,11 @@ Page<PageData>({
     const sequence = this._loadSequence = (this._loadSequence || 0) + 1;
     this.setData({loading:true,canSubmit:false});
     try {
-      const options = await getCoachAssessmentTaskOptions(eventId || undefined);
+      const options = await getCoachAssessmentTaskOptions(eventId || undefined,this.requestedTeamId || undefined);
       if(sequence !== this._loadSequence)return;
       if (eventId && options.sourceCourse?.id !== eventId) throw new Error("来源课程不可用");
       const source = options.sourceCourse;
+      if(this.requestedTeamId && !options.teams.some(team=>team.id===this.requestedTeamId))throw new Error("球队不可用");
       this.setData({
         courseOptions:(options.courseOptions || []).map((c)=>({...c,label:`${formatShortDate(c.date)} ${c.title}`,timeLabel:c.startsAt ? formatTimeRange(c.startsAt,c.endsAt) : ""})),
         courseIndex:Math.max(0,(options.courseOptions || []).findIndex((c)=>c.id===source?.id)),existingTasks:options.tasks,
@@ -91,6 +94,7 @@ Page<PageData>({
         attendance:source?.attendance || [],loading:false,
         templateIndex:Math.max(0,options.templates.findIndex((t)=>t.id===this.data.templates[this.data.templateIndex]?.id)),
         sourceTitle:source?.title || "", sourceDate:source?.date || "", sourceStudentIds:source?.studentIds || [], loadError:"",
+        ...(!source && this.requestedTeamId ? {teamIndex:options.teams.findIndex(team=>team.id===this.requestedTeamId)} : {}),
         ...(source ? {teamIndex: Math.max(0,options.teams.findIndex((t) => t.id === source.teamId)), startsOn:source.date, dueOn:source.date, title:`${source.title}测评`.slice(0,60)} : {}),
         templates: options.templates,
         templateNames: options.templates.map((template) => template.name),
@@ -241,7 +245,7 @@ Page<PageData>({
       taskMode:sameMatches ? this.data.taskMode : matchingTasks.length ? "continue" : "create",
       settingsReady,
       selectedStudentCount:selectedStudents.length,selectedProjectCount:selectedProjects.length,
-      projectSummary:this.data.projects.filter((p:Selection)=>p.selected).map((p:Selection)=>p.name).join(" / ") || "请选择项目",
+      projectSummary:this.data.projects.some((p:Selection)=>p.selected) ? `已选 ${this.data.projects.filter((p:Selection)=>p.selected).length} 个项目 · 点击调整` : "请选择项目",
       visibleStudents:this.data.students.filter((s:Selection)=>s.name.includes(this.data.studentSearch.trim())),
       attendanceNotes:this.data.students.filter((s:Selection)=>s.attendanceWarning).map((s:Selection)=>`${s.name} · ${s.attendanceLabel}`),
       scopeLabel:`已选 ${this.data.students.filter((s:Selection)=>s.selected).length} 名学员 · ${this.data.projects.filter((p:Selection)=>p.selected).length} 个项目`,

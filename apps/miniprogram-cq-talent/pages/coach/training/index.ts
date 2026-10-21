@@ -1,192 +1,44 @@
-import { environmentStorageKey } from "../../../utils/config";
-import { getCoachHome, getCoachTrainingProjectTree } from "../../../utils/api";
+import { getCoachHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
+import { loadActiveTeam } from "../../../utils/coach-team-context";
+import { currentLocalDate } from "../../../utils/date";
 import { openPage } from "../../../utils/navigation";
-import { formatCalendarDate, formatTimeOnly, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
-import type { LoadState, ScheduleEvent, TrainingProjectTree, TrainingTeamOption } from "../../../utils/types";
-
-const COACH_TRAINING_TEAM_KEY = environmentStorageKey("coach-training-team-id");
-
-type HeroMetric = { label: string; value: string };
-
-type TrainingCard = {
-  id: string;
-  title: string;
-  timeLabel: string;
-  venue: string;
-  hasVenue: boolean;
-  status: string;
-  statusLabel: string;
-  statusTone: string;
-  hasStatus: boolean;
-  participantLabel: string;
-  hasParticipantCount: boolean;
-};
-
+import { formatCalendarDate,formatTimeOnly,resolveNavInset,resolveMenuInset } from "../../../utils/presentation";
+import type { LoadState, ScheduleEvent } from "../../../utils/types";
+const generations=new WeakMap<object,number>();
+const routes:Record<string,string>={roster:"/pages/coach/team/index?section=roster",training:"/pages/coach/training/index?section=training",tasks:"/pages/coach/test-tasks/index?",ability:"/pages/coach/team-ability/index?",matches:"/pages/coach/team/index?section=matches",coaches:"/pages/coach/team/index?section=coaches"};
 Page({
-  data: {
-    navInset: resolveNavInset(),
-    menuInset: resolveMenuInset(),
-    state: "loading" as LoadState,
-    message: "正在读取训练管理",
-    retryLabel: "",
-    selectedTeamName: "",
-    selectedTeamMetaLabel: "",
-    hasSelectedTeam: false,
-    heroMetrics: emptyHeroMetrics(),
-    trainingCards: [] as TrainingCard[],
-    hasTrainingCards: false,
+  data:{navInset:resolveNavInset(),menuInset:resolveMenuInset(),state:"loading" as LoadState,message:"正在读取球队",teamId:"",teamName:"",season:"",section:"workspace",trainingCards:[] as Array<ScheduleEvent & {timeLabel:string}>,
+    entries:[{id:"roster",name:"队员名单",note:"在队学员"},{id:"training",name:"训练安排",note:"课程与内容"},{id:"tasks",name:"测评任务",note:"录入与确认"},{id:"ability",name:"能力分析",note:"已确认结果"},{id:"matches",name:"比赛记录",note:"正式赛事"}]},
+  requestedTeamId:"",
+  onLoad(query?:{teamId?:string;section?:string}) {this.requestedTeamId=query?.teamId || "";this.setData({section:query?.section==="training" ? "training" : "workspace"});return this.load();},
+  onShow(){if(this.data.state!=="loading")return this.load();},
+  onUnload(){generations.set(this,(generations.get(this)??0)+1);},
+  async load(){
+    if(!requireRole("coach"))return;
+    const version=(generations.get(this)??0)+1;generations.set(this,version);
+    this.setData({state:"loading",message:"正在读取球队"});
+    try{
+      const context=await loadActiveTeam(this.requestedTeamId || undefined);
+      if(generations.get(this)!==version)return;
+      if(!context.id){this.setData({state:"empty",teamId:"",teamName:"",trainingCards:[],message:context.options.length ? "请先选择要管理的球队" : "暂无授权球队，请联系俱乐部管理员"});return;}
+      this.requestedTeamId="";
+      this.setData({teamId:context.id,teamName:context.detail!.team!.name,season:context.detail!.team!.season || "当前学期",state:"ready",message:"",trainingCards:[]});
+      if(this.data.section!=="training")return;
+      const date=currentLocalDate(),year=Number(date.slice(0,4)),month=Number(date.slice(5,7));
+      const home=await getCoachHome({from:`${date.slice(0,7)}-01`,to:new Date(Date.UTC(year,month,0)).toISOString().slice(0,10),teamIds:[context.id]});
+      if(generations.get(this)!==version)return;
+      this.setData({trainingCards:home.events.filter(event=>event.type==="training" && event.teamIds?.includes(context.id)).map(event=>({...event,timeLabel:`${formatCalendarDate(event.startsAt)} · ${formatTimeOnly(event.startsAt)}`}))});
+    }catch(error){if(generations.get(this)===version)this.setData({state:"error",teamId:"",teamName:"",trainingCards:[],message:error instanceof Error ? error.message : "球队读取失败，请重试"});}
   },
-  onLoad() {
-    if (!requireRole("coach")) return;
-    return this.load();
+  chooseTeam(){openPage("/pages/coach/team-selector/index");},
+  openEntry(event:{currentTarget:{dataset:{id?:string}}}){
+    const route=routes[event.currentTarget.dataset.id || ""];
+    if(!route)return;
+    if(!this.data.teamId)return this.chooseTeam();
+    openPage(`${route}${route.endsWith("?") ? "" : "&"}teamId=${encodeURIComponent(this.data.teamId)}`);
   },
-  onShow() {
-    if (this.data.state !== "loading") return this.load();
-  },
-  async load() {
-    this.setData({
-      state: "loading",
-      message: "正在读取训练管理",
-      retryLabel: "",
-      selectedTeamName: "",
-      selectedTeamMetaLabel: "",
-      hasSelectedTeam: false,
-      heroMetrics: emptyHeroMetrics(),
-      trainingCards: [],
-      hasTrainingCards: false,
-    });
-    try {
-      const [home, tree] = await Promise.all([
-        getCoachHome(currentMonthRange(new Date())),
-        getCoachTrainingProjectTree(),
-      ]);
-      const selectedTeam = resolveTrainingTeam(tree, wx.getStorageSync<string>(COACH_TRAINING_TEAM_KEY));
-      const teamEvents = selectedTeam ? home.events.filter((event) => event.teamName === selectedTeam.name) : [];
-      const trainingCards = toTrainingCards(teamEvents);
-      this.setData({
-        state: selectedTeam ? "ready" : "empty",
-        message: selectedTeam ? "" : "暂未分配训练球队，请联系俱乐部后台管理员。",
-        retryLabel: "",
-        selectedTeamName: selectedTeam?.name ?? "",
-        selectedTeamMetaLabel: selectedTeam ? teamMetaLabel(selectedTeam) : "",
-        hasSelectedTeam: Boolean(selectedTeam),
-        heroMetrics: toHeroMetrics(teamEvents),
-        trainingCards,
-        hasTrainingCards: trainingCards.length > 0,
-      });
-    } catch {
-      this.setData({
-        state: "error",
-        message: "训练管理读取失败，请稍后重试。",
-        retryLabel: "重新读取",
-        heroMetrics: emptyHeroMetrics(),
-        trainingCards: [],
-        hasTrainingCards: false,
-      });
-    }
-  },
-  openTrainingEvent(event: { currentTarget?: { dataset?: { id?: string } } }) {
-    const id = event.currentTarget?.dataset?.id;
-    if (id) openPage(`/pages/coach/event/index?id=${encodeURIComponent(id)}`);
-  },
-  openTrainingTeamSelector() {
-    openPage("/pages/coach/team-selector/index");
-  },
-  openTeamAbility() {
-    openPage("/pages/coach/team-ability/index");
-  },
-  openTeam() {
-    openPage("/pages/coach/team/index");
-  },
-  openTestTasks() {
-    openPage("/pages/coach/test-tasks/index");
-  },
-  retry() {
-    this.load();
-  },
+  openTrainingEvent(event:{currentTarget:{dataset:{id?:string}}}){const id=event.currentTarget.dataset.id;if(this.data.trainingCards.some((item:ScheduleEvent)=>item.id===id))openPage(`/pages/coach/event/index?id=${encodeURIComponent(id!)}&teamId=${encodeURIComponent(this.data.teamId)}`);},
+  openScouts(){openPage("/pages/coach/scout/index");},
+  retry(){return this.load();},
 });
-
-function currentMonthRange(now: Date): { from: string; to: string } {
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  return {
-    from: localDate(year, month, 1),
-    to: localDate(year, month + 1, 0),
-  };
-}
-
-function localDate(year: number, month: number, day: number): string {
-  const value = new Date(year, month, day);
-  const localYear = value.getFullYear();
-  const localMonth = String(value.getMonth() + 1).padStart(2, "0");
-  const localDay = String(value.getDate()).padStart(2, "0");
-  return `${localYear}-${localMonth}-${localDay}`;
-}
-
-function emptyHeroMetrics(): HeroMetric[] {
-  return [
-    { label: "累计课时", value: "--" },
-    { label: "平均出勤", value: "--" },
-    { label: "在队人数", value: "--" },
-    { label: "本月比赛", value: "--" },
-  ];
-}
-
-function toHeroMetrics(events: ScheduleEvent[]): HeroMetric[] {
-  const trainingCount = events.filter((event) => event.type === "training").length;
-  const matchCount = events.filter((event) => event.type === "match").length;
-  const attendanceCount = events.filter((event) => event.nextAction === "attendance").length;
-  const scheduledCount = events.filter((event) => isScheduled(event.status)).length;
-  return [
-    { label: "本月训练", value: String(trainingCount) },
-    { label: "本月比赛", value: String(matchCount) },
-    { label: "待点名", value: String(attendanceCount) },
-    { label: "已排课程", value: String(scheduledCount) },
-  ];
-}
-
-function resolveTrainingTeam(tree: TrainingProjectTree, storedTeamId: string): TrainingTeamOption | null {
-  const options = tree.teamOptions ?? [];
-  return options.find((team) => team.id === storedTeamId)
-    ?? options.find((team) => team.id === tree.team?.id)
-    ?? options[0]
-    ?? null;
-}
-
-function teamMetaLabel(team: TrainingTeamOption): string {
-  return team.season ? `${team.season} · 后台已分配` : "后台已分配";
-}
-
-function isScheduled(status: string): boolean {
-  return ["scheduled", "published", "active", "upcoming", "已排定"].includes(status.trim().toLowerCase());
-}
-
-function toTrainingCards(events: ScheduleEvent[]): TrainingCard[] {
-  return events
-    .filter((event) => event.type === "training")
-    .map((event) => {
-      const status = trainingStatus(event.status);
-      return {
-        id: event.id,
-        title: event.title,
-        timeLabel: `${formatCalendarDate(event.startsAt)} · ${formatTimeOnly(event.startsAt)}`,
-        venue: event.venue,
-        hasVenue: Boolean(event.venue),
-        status: event.status,
-        statusLabel: status.label,
-        statusTone: status.tone,
-        hasStatus: Boolean(status.label),
-        participantLabel: typeof event.participantCount === "number" ? `${event.participantCount} 人` : "",
-        hasParticipantCount: typeof event.participantCount === "number",
-      };
-    });
-}
-
-function trainingStatus(value: string): { label: string; tone: string } {
-  const normalized = value.trim().toLowerCase();
-  if (["scheduled", "published", "active", "upcoming", "已排定"].includes(normalized)) return { label: "已排定", tone: "scheduled" };
-  if (["pending", "draft", "unconfirmed", "待确认"].includes(normalized)) return { label: "待确认", tone: "pending" };
-  if (["completed", "finished", "done", "已结束", "已完成"].includes(normalized)) return { label: "已结束", tone: "completed" };
-  return value ? { label: value, tone: "neutral" } : { label: "", tone: "" };
-}

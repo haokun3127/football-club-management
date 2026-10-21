@@ -1,3 +1,4 @@
+import {randomUUID} from "node:crypto";
 import type { EntityId } from "@football-club/domain";
 import type { DatabaseSync } from "node:sqlite";
 import type { AppRole } from "../auth/app-roles.js";
@@ -59,6 +60,15 @@ export class AppClientSessionRepository {
       this.database.exec("ROLLBACK;");
       throw error;
     }
+  }
+
+  rolePreference(scope:{clubId:string;appClientId:string;userId:string}) {
+    const row=this.database.prepare("SELECT default_role,last_active_role FROM app_client_role_preferences WHERE club_id=? AND app_client_id=? AND user_id=?").get(scope.clubId,scope.appClientId,scope.userId);
+    return {defaultRole:(row?.default_role ?? null) as AppRole|null,lastActiveRole:(row?.last_active_role ?? null) as AppRole|null};
+  }
+  saveRolePreference(scope:{clubId:string;appClientId:string;userId:string},key:"default_role"|"last_active_role",role:AppRole|null) {
+    const now=new Date().toISOString();
+    this.database.prepare(`INSERT INTO app_client_role_preferences(id,club_id,app_client_id,user_id,${key},created_at,updated_at) VALUES(?,?,?,?,?,?,?) ON CONFLICT(club_id,app_client_id,user_id) DO UPDATE SET ${key}=excluded.${key},updated_at=excluded.updated_at`).run(randomUUID(),scope.clubId,scope.appClientId,scope.userId,role,now,now);
   }
 
   private insert(session: AppClientSessionRecord): void {
