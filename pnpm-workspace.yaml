@@ -5,3 +5,6 @@ allowBuilds:
   esbuild: true
 patchedDependencies:
   rc-util@5.44.4: patches/rc-util@5.44.4.patch
+# pro-layout pins 8.2.0; 8.4.0 fixes GHSA-j3q9-mxjg-w52f / GHSA-27v5-c462-wpq7.
+overrides:
+  '@ant-design/pro-layout>path-to-regexp': 8.4.0
