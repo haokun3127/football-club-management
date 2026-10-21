@@ -71,12 +71,13 @@ describe("parent training leave (REQ-ATT-001)", () => {
         payload: { participants: [{ studentId: "student-1", status: "leave_requested" }] } });
       expect(passthrough.statusCode).toBe(200);
 
-      // 课前撤回：删除请假记录、恢复参与状态，课程结束后回到自动销课默认流程
+      // 课前撤回：保留请假与撤回历史、恢复参与状态，课后回到自动记录流程
       const revoke = await app.inject({ method: "POST", url: `${base}/event-training-1/leave`, headers: parent,
         payload: { action: "revoke", expectedRevision: 2 } });
       expect(revoke.statusCode).toBe(200);
       expect(revoke.json()).toMatchObject({ participant: { studentId: "student-1", status: "confirmed" } });
-      expect(revoke.json().record).toBeUndefined();
+      expect(revoke.json().record).toMatchObject({ revision: 3, counted: false, source: "automatic" });
+      expect(revoke.json().record.history).toHaveLength(3);
       vi.setSystemTime(new Date(POST_CLASS));
       expect((await reconcileTrainingRecords(store, POST_CLASS)).processed).toBeGreaterThan(0);
       const afterRevoke = (await app.inject({ url: base, headers: parent })).json();

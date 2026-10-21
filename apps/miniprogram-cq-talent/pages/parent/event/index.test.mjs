@@ -301,6 +301,15 @@ describe("parent training leave flow (F-01)", () => {
     expect(page.data.leave).toMatchObject({ onLeave: false, statusLabel: "已到场", resultLabel: "已销课", revision: 2 });
   });
 
+  it("shows a retained pre-class withdrawal as pending, not an active leave", async () => {
+    mocks.getParentActivityDetail.mockResolvedValue(trainingDetail({ participants: [{ studentId: "student-1", name: "小天", status: "confirmed" }] }));
+    mocks.getTrainingRecords.mockResolvedValue({ total: 0, records: [{ ...leaveRecord, revision: 2, source: "automatic" }] });
+    const page = createPageInstance();
+    await page.load("event-1");
+    expect(page.data.leave).toMatchObject({ onLeave: false, resultLabel: "课程结束后自动记录", revision: 2 });
+    expect(page.data.leave.historyLabels).toHaveLength(1);
+  });
+
   it("keeps the form usable after a conflict and surfaces the structured network error copy", async () => {
     mocks.getParentActivityDetail.mockResolvedValue(trainingDetail());
     mocks.getTrainingRecords.mockResolvedValue({ total: 0, records: [] });

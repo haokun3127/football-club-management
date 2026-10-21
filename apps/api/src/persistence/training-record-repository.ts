@@ -24,10 +24,4 @@ export class SqliteTrainingRecordRepository implements TrainingRecordRepository 
         .run(record.revision, state, record.clubId, record.eventId, record.studentId, expectedRevision);
     return Number(result.changes) === 1;
   }
-  remove(clubId: string, eventId: string, studentId: string, expectedRevision: number): boolean {
-    const result = this.database.prepare(`DELETE FROM training_records
-        WHERE club_id = ? AND event_id = ? AND student_id = ? AND revision = ?`)
-      .run(clubId, eventId, studentId, expectedRevision);
-    return Number(result.changes) === 1;
-  }
 }

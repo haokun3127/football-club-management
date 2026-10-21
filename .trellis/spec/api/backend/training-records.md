@@ -6,6 +6,7 @@ Training participation facts shown by parent and coach clients. They are indepen
 ## 2. Signatures
 - `GET /clubs/:clubId/app-clients/:clientId/students/:studentId/training-records` returns `{ studentId, total, records }`.
 - `PATCH .../training-records/:eventId` requires `{ expectedRevision, counted, reason }`; returns `{ record }`. Authorized coaches/admins may initialize an explicit correction before course end with revision 0; parents can only correct an existing fact.
+- `POST .../training-records/:eventId/leave` accepts `{ action: "request" | "revoke", expectedRevision, reason? }`.
 - Migration `0021_training_records.sql`: composite club/event/student identity, positive revision, JSON history, participant foreign key.
 - Repository `get` / `compareAndSave` implement atomic revision comparison in memory and SQLite.
 
@@ -43,3 +44,12 @@ Cancellation supersedes a previous counted correction: reconcile a cancelled cou
 
 ## Parent growth consistency (2026-10-05)
 Parent growth total/monthly training counts use the same reconciled `trainingRecords` as the correction screen and coach profile. Expected/attended/rate denominator remains ended non-cancelled courses; counted future manual facts appear in total/monthly history with their actual event date. Timeline includes formed training facts even if the event status has not been manually marked completed. Its subtitle distinguishes counted/not-counted and planned content; planned drills are not proof of completed drills. Regression: `training-record-routes.test.ts` corrects a fact, compares parent growth total to record count and checks the same event's non-counted timeline wording.
+
+## Leave withdrawal audit contract (2026-10-21)
+1. **Scope:** request/withdrawal must preserve REQ-ATT-002 history, including before the course ends.
+2. **Signatures:** existing leave POST; optional history `action: "leave" | "leave_revoke"`; no database schema migration (history JSON).
+3. **Contracts:** withdrawal appends a revision, never deletes the fact. Before end restore the state preceding consecutive marked leave entries, or automatic/not-counted pending reconciliation. After end append a counted correction. Participant and record views refresh together; UI says “请假已撤回”, not an unconditional counted success.
+4. **Errors:** stale expectedRevision → 409 including when current record already counts; forbidden object → existing 403; cancelled training → existing conflict. Previous unmarked legacy histories lack an unambiguous action: do not rewrite historical records by guessing from custom reason text; review them explicitly before rollout.
+5. **Cases:** base leave→withdraw→course end produces revisions 1→2→3; good prior manual correction survives leave/withdraw; bad delete→revision0 allows stale editors and loses the audit trail.
+6. **Tests:** `training-leave-history.test.ts`, `training-records.test.ts` SQLite reopen/stale revision/ledger isolation, route leave tests and parent event pending label.
+7. **Wrong / correct:** `repository.remove(scope)` is wrong; compare-and-save the restored fact with the previous history plus one withdrawal entry is correct.

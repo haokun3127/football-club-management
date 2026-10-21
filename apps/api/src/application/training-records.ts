@@ -11,6 +11,7 @@ export interface TrainingRecord {
   updatedAt: string;
   history: Array<{
     revision: number;
+    action?: "leave" | "leave_revoke";
     counted: boolean;
     previousCounted?: boolean | null;
     source: "automatic" | "correction";
@@ -25,8 +26,6 @@ export interface TrainingRecordRepository {
   get(clubId: string, eventId: string, studentId: string): TrainingRecord | null;
   /** Atomically replaces the fact AND its history; revision 0 means insert only. */
   compareAndSave(record: TrainingRecord, expectedRevision: number): boolean;
-  /** Removes the fact only while it is still at expectedRevision (pre-class leave withdrawal). */
-  remove(clubId: string, eventId: string, studentId: string, expectedRevision: number): boolean;
 }
 
 export class MemoryTrainingRecordRepository implements TrainingRecordRepository {
@@ -42,12 +41,7 @@ export class MemoryTrainingRecordRepository implements TrainingRecordRepository 
     this.records.set(key, structuredClone(record));
     return true;
   }
-  remove(clubId: string, eventId: string, studentId: string, expectedRevision: number) {
-    const key = JSON.stringify([clubId, eventId, studentId]);
-    if ((this.records.get(key)?.revision ?? 0) !== expectedRevision) return false;
-    this.records.delete(key);
-    return true;
-  }
+
 }
 
 export class TrainingRecordConflict extends Error {
@@ -87,7 +81,7 @@ export function reconcileTrainingRecord(
 export function correctTrainingRecord(
   repository: TrainingRecordRepository,
   scope: { clubId: string; eventId: string; studentId: string },
-  input: { expectedRevision: number; counted: boolean; reason: string; actorUserId: string; actorDisplayName?: string; initialOccurredAt?: string },
+  input: { expectedRevision: number; counted: boolean; reason: string; actorUserId: string; actorDisplayName?: string; initialOccurredAt?: string; action?: "leave" | "leave_revoke" },
   now = new Date().toISOString(),
 ): TrainingRecord {
   const current = repository.get(scope.clubId, scope.eventId, scope.studentId);
@@ -96,7 +90,7 @@ export function correctTrainingRecord(
   const revision = (current?.revision ?? 0) + 1;
   const record: TrainingRecord = {
     ...scope, occurredAt: current?.occurredAt ?? input.initialOccurredAt!, counted: input.counted, source: "correction", revision, updatedAt: now,
-    history: [...(current?.history ?? []), { revision, counted: input.counted, previousCounted: current?.counted ?? null, source: "correction", reason: input.reason.trim(), actorUserId: input.actorUserId, actorDisplayName: input.actorDisplayName, changedAt: now }],
+    history: [...(current?.history ?? []), { revision, ...(input.action ? { action: input.action } : {}), counted: input.counted, previousCounted: current?.counted ?? null, source: "correction", reason: input.reason.trim(), actorUserId: input.actorUserId, actorDisplayName: input.actorDisplayName, changedAt: now }],
   };
   if (!repository.compareAndSave(record, current?.revision ?? 0)) throw new TrainingRecordConflict(repository.get(scope.clubId, scope.eventId, scope.studentId));
   return record;
@@ -115,6 +109,7 @@ export function requestTrainingLeave(
   return correctTrainingRecord(repository, scope, {
     expectedRevision: input.expectedRevision,
     counted: false,
+    action: "leave",
     reason: input.reason?.trim() || "家长请假",
     actorUserId: input.actorUserId,
     actorDisplayName: input.actorDisplayName,
@@ -123,8 +118,8 @@ export function requestTrainingLeave(
 }
 
 /**
- * 撤回请假（已请假但实际参加 → 改回销课）。课前撤回删除请假产生的记录，恢复
- * “课程结束后自动记录”的默认流程；课后撤回是对既有记录的一次更正（计次、留痕）。
+ * 撤回请假始终追加历史和修订。课前恢复请假前的人工事实，或等待课后自动记录；
+ * 课后撤回计次。绝不删除旧事实或复用已出现过的修订号。
  */
 export function revokeTrainingLeave(
   repository: TrainingRecordRepository,
@@ -139,15 +134,24 @@ export function revokeTrainingLeave(
   const nowAt = Date.parse(now);
   if (!Number.isFinite(endsAt) || !Number.isFinite(nowAt)) throw new Error("Invalid training timestamp");
   if (nowAt < endsAt) {
-    if (current.revision !== input.expectedRevision
-      || !repository.remove(scope.clubId, scope.eventId, scope.studentId, current.revision)) {
-      throw new TrainingRecordConflict(repository.get(scope.clubId, scope.eventId, scope.studentId));
-    }
-    return null;
+    if (current.revision !== input.expectedRevision) throw new TrainingRecordConflict(current);
+    let previousIndex = current.history.length - 1;
+    while (previousIndex >= 0 && current.history[previousIndex]?.action === "leave") previousIndex -= 1;
+    const previous = current.history[previousIndex];
+    const revision = current.revision + 1;
+    const counted = previous?.counted ?? false;
+    const source = previous?.source ?? "automatic";
+    const record: TrainingRecord = { ...current, revision, counted, source, updatedAt: now,
+      history: [...current.history, { revision, counted, source, action: "leave_revoke", previousCounted: current.counted,
+        reason: input.reason?.trim() || "撤回请假，恢复课程记录流程", actorUserId: input.actorUserId,
+        actorDisplayName: input.actorDisplayName, changedAt: now }] };
+    if (!repository.compareAndSave(record, current.revision)) throw new TrainingRecordConflict(repository.get(scope.clubId, scope.eventId, scope.studentId));
+    return record;
   }
   return correctTrainingRecord(repository, scope, {
     expectedRevision: input.expectedRevision,
     counted: true,
+    action: "leave_revoke",
     reason: input.reason?.trim() || "撤回请假，改为销课",
     actorUserId: input.actorUserId,
     actorDisplayName: input.actorDisplayName,

@@ -103,9 +103,10 @@ export async function registerTrainingRecordRoutes(app: FastifyInstance, context
       }
       if (!onLeave) return context.sendError(reply, 409, "leave_not_active", "No active leave to withdraw");
       const current = context.store.trainingRecords.get(scopeKeys.clubId, scopeKeys.eventId, scopeKeys.studentId);
+      if ((current?.revision ?? 0) !== request.body.expectedRevision) throw new TrainingRecordConflict(current);
       let record: TrainingRecord | null = null;
-      // 记录已是销课（或尚无记录）时无需改动事实，仅恢复参与状态
-      if (!current || current.counted) record = current;
+      // 尚无记录时仅恢复参与状态；已有记录始终追加撤回历史。
+      if (!current) record = current;
       else record = revokeTrainingLeave(context.store.trainingRecords, scopeKeys, event, { expectedRevision: request.body.expectedRevision, reason: request.body.reason, ...actor });
       context.store.recordEventParticipants(scopeKeys.clubId, scopeKeys.eventId, [{ studentId: scopeKeys.studentId, status: "confirmed" }]);
       return { ...(record ? { record } : {}), participant: { studentId: scopeKeys.studentId, status: "confirmed" } };

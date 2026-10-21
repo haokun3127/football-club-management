@@ -135,7 +135,7 @@ Page({
       else await revokeTrainingLeave(leave.studentId, leave.eventId, input);
       // 请假/撤回改变了销课事实，返回成长页时定向重拉（F-06 同款失效标记）
       markGrowthStale();
-      wx.showToast({ title: action === "request" ? "请假已生效" : "已改回销课", icon: "success" });
+      wx.showToast({ title: action === "request" ? "请假已生效" : "请假已撤回", icon: "success" });
       await this.load(leave.eventId);
     } catch (error) {
       const failure = error as { message?: string; code?: string; errorType?: string; userMessage?: string };
@@ -353,7 +353,7 @@ function presentLeave(detail: ActivityDetail, eventId: string, studentId: string
     resultLabel: cancelled
       ? "取消课不销课"
       : record
-        ? record.counted ? "已销课" : "本课不销课（请假）"
+        ? record.counted ? "已销课" : onLeave ? "本课不销课（请假）" : record.source === "automatic" ? "课程结束后自动记录" : "本课不销课"
         : "课程结束后自动记录",
     historyLabels: (record?.history ?? []).map((item) =>
       `${formatDateTime(item.changedAt)} · ${item.counted ? "销课" : "不销课"} · ${item.reason}`),

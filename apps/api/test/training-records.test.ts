@@ -39,7 +39,7 @@ describe("independent training facts", () => {
     expect(reconcileTrainingRecord(repository, { ...pastEvent, status: "cancelled" }, participant, nextDay)?.counted).toBe(false);
   });
 
-  it("writes pre-class leave as an audited non-counted fact and removes it on pre-class withdrawal", () => {
+  it("writes pre-class leave as an audited non-counted fact and retains it on pre-class withdrawal", () => {
     const repository = new MemoryTrainingRecordRepository();
     const scope = { clubId: event.clubId, eventId: event.id, studentId: participant.studentId };
     const beforeClass = "2026-09-21T07:00:00Z";
@@ -48,13 +48,12 @@ describe("independent training facts", () => {
     expect(leave.history[0]).toMatchObject({ reason: "家长请假", actorUserId: "parent-1", previousCounted: null });
     // 课前请假不会被自动任务覆盖
     expect(reconcileTrainingRecord(repository, pastEvent, { ...participant, status: "leave_requested" }, nextDay)).toEqual(leave);
-    // 课前撤回：删除记录，恢复默认自动流程；过期版本撤回触发冲突
-    expect(revokeTrainingLeave(repository, scope, pastEvent, { expectedRevision: 1, actorUserId: "parent-1" }, beforeClass)).toBeNull();
-    expect(repository.get(scope.clubId, scope.eventId, scope.studentId)).toBeNull();
-    const reLeave = requestTrainingLeave(repository, scope, { expectedRevision: 0, actorUserId: "parent-1", initialOccurredAt: pastEvent.timeRange.startsAt }, beforeClass);
+    // 课前撤回保留历史，恢复默认自动流程；过期版本撤回触发冲突
+    expect(revokeTrainingLeave(repository, scope, pastEvent, { expectedRevision: 1, actorUserId: "parent-1" }, beforeClass)).toMatchObject({ revision: 2, source: "automatic", counted: false });
+    expect(repository.get(scope.clubId, scope.eventId, scope.studentId)?.history).toHaveLength(2);
+    const reLeave = requestTrainingLeave(repository, scope, { expectedRevision: 2, actorUserId: "parent-1", initialOccurredAt: pastEvent.timeRange.startsAt }, beforeClass);
     expect(() => revokeTrainingLeave(repository, scope, pastEvent, { expectedRevision: 0, actorUserId: "parent-1" }, beforeClass)).toThrow(TrainingRecordConflict);
     expect(repository.get(scope.clubId, scope.eventId, scope.studentId)).toEqual(reLeave);
-    expect(repository.remove(scope.clubId, scope.eventId, scope.studentId, 99)).toBe(false);
   });
 
   it("withdraws a post-class leave as a counted correction with history", () => {
@@ -78,6 +77,27 @@ describe("independent training facts", () => {
     expect(() => correctTrainingRecord(repository, first, { expectedRevision: 1, counted: true, actorUserId: "coach", reason: "stale edit" })).toThrow(TrainingRecordConflict);
     expect(repository.get(first.clubId, first.eventId, first.studentId)).toEqual(corrected);
     expect(repository.get("other-club", first.eventId, first.studentId)).toBeNull();
+  });
+
+  it("persists withdrawal actions and rejects stale revisions after SQLite reopen", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "withdrawal-facts-"));
+    const databasePath = join(directory, "test.sqlite");
+    const first = await createPlatformPersistence({ databasePath });
+    try {
+      const scope = { clubId: event.clubId, eventId: event.id, studentId: participant.studentId };
+      requestTrainingLeave(first.repositories.trainingRecords, scope, { expectedRevision: 0, actorUserId: "parent", initialOccurredAt: pastEvent.timeRange.startsAt }, "2026-09-21T07:00:00Z");
+      const withdrawn = revokeTrainingLeave(first.repositories.trainingRecords, scope, pastEvent, { expectedRevision: 1, actorUserId: "parent" }, "2026-09-21T07:10:00Z");
+      first.database.close();
+      const reopened = await createPlatformPersistence({ databasePath, seed: false });
+      try {
+        expect(reopened.repositories.trainingRecords.get(scope.clubId, scope.eventId, scope.studentId)).toEqual(withdrawn);
+        expect(withdrawn?.history.map(item => item.action)).toEqual(["leave", "leave_revoke"]);
+        expect(() => requestTrainingLeave(reopened.repositories.trainingRecords, scope, { expectedRevision: 0, actorUserId: "parent", initialOccurredAt: pastEvent.timeRange.startsAt })).toThrow(TrainingRecordConflict);
+      } finally { reopened.database.close(); }
+    } finally {
+      if (first.database.isOpen) first.database.close();
+      rmSync(directory, { recursive: true, force: true });
+    }
   });
 
   it("keeps correction/history across SQLite reopen and leaves the financial ledger unchanged", async () => {

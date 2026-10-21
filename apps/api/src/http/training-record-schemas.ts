@@ -8,7 +8,7 @@ const record = {
     title: { type: "string" }, teamId: { type: ["string", "null"] },
     history: { type: "array", items: {
       type: "object", additionalProperties: false, required: ["revision", "counted", "source", "reason", "changedAt"],
-      properties: { revision: { type: "integer" }, counted: { type: "boolean" }, previousCounted: { type: ["boolean", "null"] }, source: { enum: ["automatic", "correction"] }, reason: { type: "string" }, actorUserId: id, actorDisplayName: { type: "string" }, changedAt: id },
+      properties: { action: { enum: ["leave", "leave_revoke"] }, revision: { type: "integer" }, counted: { type: "boolean" }, previousCounted: { type: ["boolean", "null"] }, source: { enum: ["automatic", "correction"] }, reason: { type: "string" }, actorUserId: id, actorDisplayName: { type: "string" }, changedAt: id },
     } },
   },
 };
