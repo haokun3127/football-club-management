@@ -58,7 +58,9 @@ Page({
       const student = children.find((child) => child.id === session.currentStudentId) ?? children[0];
       if (!student) { this.setData({ state: "empty", message: "当前账号尚未绑定孩子，请联系俱乐部。", children, student: null }); return; }
       setCurrentStudentId(student.id);
-      const core = Promise.all([getTrainingRecords(student.id), getParentCalendar()]).then(([training, events]) => {
+      const core = Promise.all([getTrainingRecords(student.id), getParentCalendar()]).then((results) => {
+        const training = results[0];
+        const events = results[1];
         if (ticket !== generation) return;
         const nextEvent = events.filter((event) => event.type === "training" && event.status !== "cancelled"
           && Date.parse(event.startsAt) > Date.now() && event.childIds?.includes(student.id))
