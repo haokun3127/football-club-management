@@ -104,7 +104,7 @@ B6在最终源码上选择**一次**：
 
 - 最终后台类型/lint/构建通过；最新隔离Chromium确认app-role页签没有通用保存按钮，默认身份POST/PUT200、实际重读、并发编辑409后显式刷新均通过。API options严格枚举已补端点级回归25例，API最终typecheck/build通过。
 - 最终样式76文件PostCSS解析通过、git diff --check通过。TDesign禁用主按钮已用官方变量改中性灰和可读文字，原生诊断画面已查看。旧灰白空截图是热重载空帧，已剔除有效证据。
-- 证据：research/b3最终登录与后台保存/冲突；research/b4/*diagnostic.png为原生开发诊断（3轴持久API合成DTO；6/8轴仅UI合成布局，页头综合分来自原测试账号，不能当成合成雷达综合分）；research/b6为路由盘点、最终移动端组合图和日历。诊断不冒充正式MCP/Figma像素验收；官方截图通道另有已取得的实际画面。没有生产/正式手机验收结论。
+- 证据：research/b3最终登录与后台保存/冲突；research/b4/*diagnostic.png为原生开发诊断（3轴持久API合成DTO；6/8轴仅UI合成布局，页头综合分来自原测试账号，不能当成合成雷达综合分）；research/b6为路由盘点、最终移动端组合图和日历。诊断不冒充正式MCP/Figma像素验收；官方截图通道的有效最终画面为research/b5/workspace-final-official.png；另一个成绩页空帧也已剔除。没有生产/正式手机验收结论。
 - B2/B3/B4/B5源码后续批次和全页移动端收口已形成候选；测试/构建通过不等于新API已在develop可用。运行环境仍需配套部署，当前不上传微信。
 
 - 本地提交`b29d84e3`已形成；官方冻结后工作区画面再次读回为ready并直接查看，证据research/b5/workspace-final-official.png。已向用户申请一次develop配套部署授权，等待答复；未执行服务器部署。

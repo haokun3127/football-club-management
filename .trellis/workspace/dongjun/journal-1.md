@@ -1331,3 +1331,37 @@ Audited 40 commits; seven isolated fix commits; 964 tests plus 9 script tests an
 ### Next Steps
 
 - None - task complete
+
+
+## Session 37: v1.1 UI 后续批次与移动端收口
+
+**Date**: 2026-10-21
+**Task**: v1.1 UI 后续批次与移动端收口
+**Package**: miniprogram
+**Branch**: `feature/ui-batch-1-p01`
+
+### Summary
+
+完成自动身份/后台默认角色、ECharts多线雷达、球队工作区与全页移动端收口；整仓门禁及修正后定向检查通过。原生59路由开发走查、日历交互、3/6/8轴和后台并发409已检查；指定图片/真机/窄屏/正式包体与develop配套部署保留待验，任务不归档。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `b29d84e3` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
