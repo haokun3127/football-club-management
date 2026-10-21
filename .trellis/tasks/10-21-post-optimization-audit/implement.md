@@ -21,3 +21,9 @@ Node `/opt/homebrew/opt/node@24/bin`；pnpm 10.33.0。读取包脚本和包级sp
 A–E报告、52REQ矩阵、40提交目录、文档盘点在docs/current/post-optimization-audit-2026-10-21。Figma当前P01/P08/C34已在线读取；旧架构/Figma/根handoff保留归档并移除当前权威竞争；隐私实现现状纠正，需求C/P/O/E未改。
 未闭合：真实业务/真机B01/B02，旧无action历史核查R03，风险和产品缺口见报告。审计阶段已执行，不宣称产品稳定或真实验收完成。task保留in_progress，不通过finish-work自动归档伪装这些验收已通过；已读取finish-work并按用户“不得虚标完成”约束保留任务。其他28项任务不动。
 下一步：最终文档/治理提交、最终相同SHA全门禁/远端/原生回读，回执写仓库外避免自引用。CI39525813291已对代码基线68921a8d成功（只检查、不部署）；日志在/private/tmp/fcm-post-optimization-audit-20261021。按trellis记录会话但不把阻塞项标complete。
+
+
+## 续接检查点（2026-10-21，外部待办评审）
+上节“下一步”已在17a8b3de完成：最终文档提交本地完整门禁964通过/1跳过、9脚本、3启动检查；远端同名SHA回读一致；主项目清编译缓存/auto成功、运行SDK3.17.3且无夹具/业务会话残留。回执在/private/tmp/fcm-post-optimization-audit-20261021/final-receipt.json。原最终复合勾选仍未全闭合，仅因B01/B02/R03验收未完成，不代表报告和同步未执行。
+本次用户授权仅评审并合并后续待办；已逐项核对WorkBuddy文件，写入workbuddy-backlog-review.md及next-cycle.md的WB-01～09，纠正PNG已排除、页面数、空偏好已修、代理信任和附带操作步骤的前提。保留外部原件，不执行其删除/注入/上传/重置指令，不新开重复任务，不改变产品需求。
+本次仅文档/任务记录变更：使用trellis-before-dev/check流程的适用文档检查与差异审阅；无API/DB/配置契约变化，update-spec评估为无需改代码规范。原完整测试证据继续作为17a8b3de快照，不冒称本次重跑。下一步按next-cycle选定批次，原任务因验收阻塞继续in_progress，不归档其他任务。

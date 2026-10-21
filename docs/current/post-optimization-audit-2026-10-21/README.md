@@ -10,3 +10,5 @@
 - [40提交清单](commit-history.md)、[证据摘要](evidence.json)、[文档盘点](documentation-inventory.csv)。
 
 本报告中的“通过”只覆盖所列命令、状态及SHA；合成原生截图不证明真实后端，Git同步不意味着部署同步。当前产品需求仍由上一层product-requirements定义。
+
+后续评审补充：[WorkBuddy工程清单逐项评审](workbuddy-backlog-review.md)，认可项已合并[E后续队列](next-cycle.md)。原审计验证数字与SHA保留为当时快照，后续文档更新不等于重做原生验收。
