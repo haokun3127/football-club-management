@@ -107,7 +107,7 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
   if (options.idempotencyKey) {
     headers["Idempotency-Key"] = options.idempotencyKey;
   } else if (options.idempotent && options.method && options.method !== "GET") {
-    derivedIdempotencyKey = resolveIdempotencyKey(options.method, options.path, options.data);
+    derivedIdempotencyKey = resolveIdempotencyKey(options.method, options.path, options.data, `${RUNTIME_ENV}:${bearerToken ?? "anonymous"}`);
     headers["Idempotency-Key"] = derivedIdempotencyKey;
   }
 
@@ -143,7 +143,7 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
           return;
         }
         if (options.expectedStatus !== undefined && response.statusCode >= 200 && response.statusCode < 300) {
-          if (derivedIdempotencyKey) markIdempotencyOutcome(derivedIdempotencyKey, false);
+          if (derivedIdempotencyKey) markIdempotencyOutcome(derivedIdempotencyKey, true);
           reject({
             code: "unexpected_status",
             message: "Unexpected response status",
@@ -154,8 +154,8 @@ export function request<TResponse = unknown, TBody = unknown>(options: RequestOp
         if (response.statusCode === 401) {
           handleAuthFailure(sessionAtRequest, bearerToken, options.bearerToken !== undefined);
         }
-        if (derivedIdempotencyKey) markIdempotencyOutcome(derivedIdempotencyKey, false);
-        const payload = response.data as { error?: ApiError };
+        if (derivedIdempotencyKey) markIdempotencyOutcome(derivedIdempotencyKey, response.statusCode < 500);
+        const payload = (response.data && typeof response.data === "object" ? response.data : {}) as { error?: ApiError };
         const errorType = httpErrorType(response.statusCode);
         reject({
           ...(payload.error ?? { code: "http_error", message: `HTTP ${response.statusCode}` }),

@@ -75,3 +75,12 @@ During 2026-09-28 checks, passing fixture objects directly to Automator `mockWxM
 ### 2026-10-14 增强编译与实际布局检查
 
 本机稳定版2.02.2608080/基础库3.17.3的新增首页Promise.all解构触发生成模块arrayWithHoles缺失，原生Page只含__webviewId__，TS/控制器测试仍通过。此次以等价数组索引读取消除依赖并取得正常原生截图；这是本发布候选的已验证修补，不推断所有数组解构均不可用。先等官方整包编译完成再安装单一测试夹具，验证期间冻结源码；热重载会清空getApp临时备份。每次恢复request与会话并回登录，不让合成身份进入上传制品。检查实际四入口尺寸，按钮需flex:1/width:0/min-width:0，防平台默认宽度撑出视口。
+
+## Request operation identity (2026-10-21)
+1. **Scope:** all automatically derived idempotent write keys in `utils/request.ts`.
+2. **Signatures:** `resolveIdempotencyKey(method,path,body,scope?)`; `markIdempotencyOutcome(key,terminal)`.
+3. **Contract:** unresolved equivalent actions reuse a key for at most 30 minutes; definite HTTP outcomes consume it. New actions use a random nonce so restart/eviction cannot replay old successes. Scope includes environment/session identity in the digest; local storage contains hashes/keys, no bodies or bearer credentials; maximum 200 records.
+4. **Errors:** transport/5xx leaves uncertain retryable; 4xx consumes (the server may cache rejection); null error body still rejects the promise. Late duplicate failure cannot downgrade consumed state. Storage failure falls back to memory; unresolved actions beyond TTL/eviction cannot guarantee deduplication.
+5. **Cases:** lost response/restart reuses pending key; completed/restart generates new key; same payload after a 409 uses a fresh attempt after reread.
+6. **Tests:** `utils/idempotency.test.mjs` restart, eviction and late outcome; `utils/request.test.mjs` 409/502; full native compile because Node tests do not exercise WeChat transforms.
+7. **Wrong / correct:** deterministic digest+resettable counter can silently replay a prior success; a persisted unresolved operation key plus random new-operation identity avoids that collision.

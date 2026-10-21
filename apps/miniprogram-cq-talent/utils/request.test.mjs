@@ -144,6 +144,24 @@ describe("request idempotency keys", () => {
 });
 
 describe("request expected status", () => {
+  it("rotates a definitively rejected operation instead of replaying a cached 409 forever", async () => {
+    resetIdempotencyKeyStateForTesting();
+    const original = wx.request;
+    const keys = [];
+    wx.request = ({ header, success }) => { keys.push(header["Idempotency-Key"]); success({ statusCode: 409, data: { error: { code: "conflict" } } }); };
+    try {
+      const input = { path: "/retry", method: "PUT", data: {}, idempotent: true };
+      await expect(request(input)).rejects.toMatchObject({ statusCode: 409 });
+      await expect(request(input)).rejects.toMatchObject({ statusCode: 409 });
+      expect(keys[1]).not.toBe(keys[0]);
+    } finally { wx.request = original; }
+  });
+  it("rejects an empty error response without hanging the request", async () => {
+    const original = wx.request;
+    wx.request = ({ success }) => success({ statusCode: 502, data: null });
+    try { await expect(request({ path: "/empty-error" })).rejects.toMatchObject({ statusCode: 502, errorType: "server_error" }); }
+    finally { wx.request = original; }
+  });
   it("keeps the default 2xx behavior but rejects an unexpected successful status when explicitly required", async () => {
     await expect(request({ path: "/legacy" })).resolves.toEqual({ ok: true });
     await expect(request({ path: "/created", expectedStatus: 201 })).rejects.toMatchObject({

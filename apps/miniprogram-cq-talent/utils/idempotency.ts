@@ -1,79 +1,64 @@
-// Deterministic idempotency keys.
-//
-// Server-side semantics (apps/api/src/http/request-contracts.ts):
-// - Mutating requests carrying Idempotency-Key are deduplicated for 30 minutes.
-// - The server cache key includes the idempotency key, method, url, X-User-Id
-//   and Authorization header, so identical keys are scoped per user/token.
-// - The fingerprint covers method, url and body; the same key with a different
-//   body is rejected with 409 idempotency_conflict.
-// - Responses with status 200-499 are stored and replayed verbatim; 5xx (and
-//   requests that never reach the server) are not stored, so retrying them
-//   with the same key re-executes the request.
-//
-// Client strategy derived from that contract:
-// - Derive the key from method + path + a stable serialization of the body so
-//   a retry of the same business action reuses the same key. If the previous
-//   attempt actually succeeded, the server would otherwise replay the stored
-//   response and silently swallow a legitimate new submission with identical
-//   content (e.g. re-saving the same attendance roster). The key therefore
-//   rotates (attempt counter +1) once an attempt has succeeded.
-// - After a failure (transport error, timeout, 5xx or even a stored 4xx) the
-//   key is reused: 5xx/transport retries re-execute, and a request that the
-//   server processed before the client lost the response is answered from the
-//   idempotency store, which resolves the "outcome unknown" retry state.
-// - While an attempt is in flight the key is reused as well, so a duplicate
-//   concurrent submission of the same body replays instead of double-writing.
+import { RUNTIME_ENV } from "./config";
 
+// Equivalent unresolved requests reuse one operation key. Completed/rejected
+// operations rotate; random identity prevents replay after restart or eviction.
+// Persist only hashes/keys, never request bodies or credentials.
 export function createIdempotencyKey(prefix = "mp") {
-  const random = Math.random().toString(36).slice(2, 10);
-  return `${prefix}-${Date.now()}-${random}`;
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
 }
-
-export function createRequestId() {
-  const random = Math.random().toString(36).slice(2, 8);
-  return `req-${Date.now()}-${random}`;
-}
-
-const SERVER_IDEMPOTENCY_TTL_MS = 30 * 60 * 1000;
+export function createRequestId() { return createIdempotencyKey("req"); }
+const TTL_MS = 30 * 60 * 1000;
 const MAX_TRACKED_KEYS = 200;
+const STORAGE_KEY = `cqTalent:${RUNTIME_ENV}:request-attempts-v2`;
+type Attempt = { key: string; attempt: number; state: "inflight" | "retryable" | "consumed"; updatedAt: number };
+const records = new Map<string, Attempt>();
+let loaded = false;
 
-type AttemptState = "inflight" | "retryable" | "consumed";
-
-interface KeyAttemptRecord {
-  attempt: number;
-  state: AttemptState;
-  updatedAt: number;
+function loadRecords() {
+  if (loaded) return;
+  loaded = true;
+  try {
+    const saved: unknown = wx.getStorageSync(STORAGE_KEY);
+    if (!Array.isArray(saved)) return;
+    for (const entry of saved.slice(-MAX_TRACKED_KEYS)) {
+      if (!Array.isArray(entry) || typeof entry[0] !== "string") continue;
+      const item = entry[1] as Attempt | undefined;
+      if (item && typeof item.key === "string" && Number.isInteger(item.attempt)
+        && ["inflight", "retryable", "consumed"].includes(item.state)
+        && Number.isFinite(item.updatedAt) && Date.now() - item.updatedAt < TTL_MS) records.set(entry[0], item);
+    }
+  } catch { /* Storage unavailable: in-memory retries still work. */ }
 }
-
-const attemptRecords = new Map<string, KeyAttemptRecord>();
-
-export function resolveIdempotencyKey(method: string, path: string, body: unknown): string {
-  pruneExpiredRecords();
-  const digest = digestRequestAction(method, path, body);
-  const record = attemptRecords.get(digest);
-  if (record && (record.state === "inflight" || record.state === "retryable")) {
-    record.updatedAt = Date.now();
-    return `mp-${digest}-a${record.attempt}`;
-  }
+function persist() {
+  try { wx.setStorageSync(STORAGE_KEY, Array.from(records.entries())); } catch { /* Do not block a request on a full cache. */ }
+}
+export function resolveIdempotencyKey(method: string, path: string, body: unknown, scope = ""): string {
+  loadRecords();
+  const now = Date.now();
+  for (const [digest, item] of records) if (now - item.updatedAt >= TTL_MS) records.delete(digest);
+  const digest = digestRequestAction(method, `${scope} ${path}`, body);
+  const record = records.get(digest);
+  if (record && record.state !== "consumed") return record.key;
   const attempt = (record?.attempt ?? 0) + 1;
-  attemptRecords.set(digest, { attempt, state: "inflight", updatedAt: Date.now() });
-  return `mp-${digest}-a${attempt}`;
+  const key = `${createIdempotencyKey(`mp-${digest}`)}-a${attempt}`;
+  records.delete(digest);
+  records.set(digest, { key, attempt, state: "inflight", updatedAt: now });
+  while (records.size > MAX_TRACKED_KEYS) records.delete(records.keys().next().value!);
+  persist();
+  return key;
 }
-
-export function markIdempotencyOutcome(key: string, succeeded: boolean): void {
-  // Only keys derived by resolveIdempotencyKey are tracked here; explicit
-  // caller-supplied keys manage their own lifecycle.
-  const match = /^mp-(.+)-a(\d+)$/.exec(key);
-  if (!match || match[1] === undefined || match[2] === undefined) return;
-  const record = attemptRecords.get(match[1]);
-  if (!record || record.attempt !== Number(match[2])) return;
-  record.state = succeeded ? "consumed" : "retryable";
-  record.updatedAt = Date.now();
+// terminal=true includes a definite HTTP rejection. Only transport/5xx outcomes
+// remain uncertain. A late duplicate failure cannot downgrade a known success.
+export function markIdempotencyOutcome(key: string, terminal: boolean): void {
+  for (const record of records.values()) {
+    if (record.key !== key || record.state === "consumed") continue;
+    record.state = terminal ? "consumed" : "retryable";
+    persist();
+    return;
+  }
 }
-
-/** Test-only: clears derived-key attempt memory between assertions. */
 export function resetIdempotencyKeyStateForTesting(): void {
-  attemptRecords.clear();
+  records.clear(); loaded = true; persist();
 }
 
 function digestRequestAction(method: string, path: string, body: unknown): string {
@@ -110,16 +95,4 @@ function hash64(input: string): string {
     secondary = (Math.imul(secondary, 33) + code + index) >>> 0;
   }
   return `${primary.toString(36)}${secondary.toString(36).padStart(7, "0")}`;
-}
-
-function pruneExpiredRecords(): void {
-  const now = Date.now();
-  for (const [digest, record] of attemptRecords) {
-    if (now - record.updatedAt > SERVER_IDEMPOTENCY_TTL_MS) attemptRecords.delete(digest);
-  }
-  while (attemptRecords.size > MAX_TRACKED_KEYS) {
-    const oldest = attemptRecords.keys().next().value;
-    if (oldest === undefined) break;
-    attemptRecords.delete(oldest);
-  }
 }
