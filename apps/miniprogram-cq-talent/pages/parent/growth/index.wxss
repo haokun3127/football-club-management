@@ -36,8 +36,8 @@
 .p4-radar-preview__spoke { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 2rpx; background: var(--club-line); transform-origin: center; }
 .p4-radar-preview__shapeline { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 336rpx; background: var(--color-brand); transform: translate(-50%,-50%); }
 .p4-radar-preview__shapefill { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 336rpx; background: rgba(var(--color-brand-rgb), .32); transform: translate(-50%,-50%); }
-.p4-radar-preview__peerline { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 336rpx; background: var(--club-muted); transform: translate(-50%,-50%); }
-.p4-radar-preview__peerfill { position: absolute; top: 50%; left: 50%; width: 336rpx; height: 336rpx; background: rgba(var(--color-brand-rgb), .08); transform: translate(-50%,-50%); }
+
+
 .p4-radar-preview__label { position: absolute; color: var(--club-text); font-size: 18rpx; line-height: 24rpx; white-space: nowrap; transform: translate(-50%,-50%); }
 .p4-radar-preview__dot { position: absolute; top: 50%; left: 50%; width: 12rpx; height: 12rpx; border-radius: 50%; background: var(--color-card); box-shadow: 0 0 0 4rpx var(--color-brand); transform: translate(-50%,-50%); }
 

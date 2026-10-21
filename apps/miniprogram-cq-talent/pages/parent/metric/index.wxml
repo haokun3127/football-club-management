@@ -88,22 +88,6 @@
       </view>
     </view>
 
-    <!-- P6 同队参考（统计均值有真实数据时展示；仅为统计参考口径，REQ-PAR-004） -->
-    <view wx:if="{{detail && peerAverageLabel}}" class="metric-card">
-      <view class="section-title">同队参考值</view>
-      <view class="subtitle">同队测评记录的统计均值，仅供参考</view>
-      <view class="peer-row">
-        <view class="peer-row__label">我的孩子</view>
-        <view class="peer-row__bar"><view class="peer-row__fill peer-row__fill--mine" style="width:{{peerMinePercent}}%"></view></view>
-        <view class="peer-row__value">{{heroValue}}</view>
-      </view>
-      <view class="peer-row">
-        <view class="peer-row__label">同队统计均值</view>
-        <view class="peer-row__bar"><view class="peer-row__fill peer-row__fill--peer" style="width:{{peerAveragePercent}}%"></view></view>
-        <view class="peer-row__value">{{peerAverageLabel}}</view>
-      </view>
-    </view>
-
     <!-- 数据来源 -->
     <view wx:if="{{detail}}" class="metric-card">
       <view class="section-title">数据来源</view>

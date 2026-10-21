@@ -132,6 +132,7 @@ function radarForView(growth: GrowthSummary) {
 function presentRadar(points: RadarMetricPoint[]): RadarPointView[] {
   return points.filter((point) => typeof point.value === "number" && Number.isFinite(point.value)).map((point) => ({
     ...point,
+    peerAverage: undefined, // REQ-PAR-004: no peer baseline without an approved standard.
     percent: !point.maxValue ? 0 : Math.min(100, Math.round(((point.value ?? 0) / point.maxValue) * 100)),
   }));
 }

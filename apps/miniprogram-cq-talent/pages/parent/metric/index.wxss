@@ -39,13 +39,13 @@
 .chart-dot__label { position: absolute; bottom: 28rpx; left: 50%; transform: translateX(-50%); padding: 4rpx 12rpx; border-radius: 8rpx; background: #a80f1b; color: #ffffff; font-size: 20rpx; font-weight: 700; white-space: nowrap; }
 .chart-card__x { display: flex; justify-content: space-between; padding-left: 64rpx; }
 .chart-card__x-label { color: #667085; font-size: 20rpx; }
-.peer-row { display: flex; align-items: center; gap: 16rpx; margin-top: 20rpx; }
-.peer-row__label { flex: 0 0 120rpx; color: #667085; font-size: 24rpx; }
-.peer-row__bar { flex: 1; height: 16rpx; border-radius: 8rpx; background: #f2f4f7; overflow: hidden; }
-.peer-row__fill { height: 100%; border-radius: 8rpx; }
-.peer-row__fill--mine { background: #a80f1b; }
-.peer-row__fill--peer { background: #cbd5e1; }
-.peer-row__value { flex: 0 0 80rpx; color: #202124; font-size: 26rpx; font-weight: 700; text-align: right; }
+
+
+
+
+
+
+
 .comment-row { display: flex; gap: 20rpx; margin-top: 20rpx; }
 .comment-row__avatar { display: flex; flex: 0 0 72rpx; align-items: center; justify-content: center; width: 72rpx; height: 72rpx; border-radius: 50%; background: #a80f1b; color: #ffffff; font-size: 28rpx; font-weight: 700; }
 .comment-row__content { flex: 1; min-width: 0; }

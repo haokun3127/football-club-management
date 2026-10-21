@@ -64,7 +64,7 @@ describe("parent ability radar", () => {
   it("draws only three or more quantified dimensions and labels their real count", async () => {
     mocks.getParentGrowth.mockResolvedValue({
       radar: [
-        { metricId: "speed", label: "Speed", value: 8, maxValue: 10 },
+        { metricId: "speed", label: "Speed", value: 8, maxValue: 10, peerAverage: 9 },
         { metricId: "passing", label: "Passing", value: undefined, maxValue: 10 },
         { metricId: "control", label: "Control", value: 7, maxValue: 10 },
         { metricId: "defence", label: "Defence", value: 6, maxValue: 10 },
@@ -85,6 +85,7 @@ describe("parent ability radar", () => {
       compositeScore: "",
     });
     expect(page.data.radar.map((point) => point.metricId)).toEqual(["speed", "control", "defence"]);
+    expect(page.data.radar.every((point) => point.peerAverage === undefined)).toBe(true);
   });
 
   it("shows the model-defined overall score only when the server returns a real number", async () => {

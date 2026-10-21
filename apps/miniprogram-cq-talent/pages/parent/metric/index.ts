@@ -1,4 +1,4 @@
-import { getParentGrowth, getParentMetricDetail } from "../../../utils/api";
+import { getParentMetricDetail } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { activityTypeLabel, formatDateTime, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
@@ -66,9 +66,6 @@ Page({
     chartSegments: [] as ChartSegment[],
     chartAreaPath: "",
     yTicks: [] as string[],
-    peerMinePercent: 0,
-    peerAveragePercent: 0,
-    peerAverageLabel: "",
     coachCommentText: "",
     coachCommentDate: "",
   },
@@ -86,17 +83,10 @@ Page({
     }
     this.setData({ state: "loading", message: "正在读取指标详情" });
     try {
-      const detailPromise = getParentMetricDetail(this.data.studentId, this.data.metricId);
-      // 同队统计均值来自成长汇总（雷达点带 peerAverage），取不到时降级隐藏参考模块。
-      // REQ-PAR-004：该值是俱乐部指标记录的统计均值，不是经核定的年龄/队伍标准，不作达标判断。
-      const growthPromise = getParentGrowth(this.data.studentId).catch(() => undefined);
-      const detail = await detailPromise;
-      const growth = await growthPromise;
+      const detail = await getParentMetricDetail(this.data.studentId, this.data.metricId);
       const records = presentRecords(detail);
-      const peerPoint = growth?.radar.find((point) => point.metricId === detail.metricId);
       const latestValue = detail.latest?.value;
       const maxValue = detail.maxValue || 10;
-      const peerAverage = typeof peerPoint?.peerAverage === "number" ? peerPoint.peerAverage : undefined;
       const coachRecord = records.find((record) => record.note);
       this.setData({
         state: "ready",
@@ -117,7 +107,6 @@ Page({
         heroMaxLabel: latestValue === undefined ? "" : `/ ${maxValue}`,
         trendDelta: records[0]?.changeTone === "success" ? `+${records[0].changeLabel.replace(/[^0-9.]/g, "")}` : "",
         ...buildChart(detail, maxValue),
-        ...buildPeerReferenceView(latestValue, peerAverage, maxValue, detail.unit),
         coachCommentText: coachRecord?.note ?? "",
         coachCommentDate: coachRecord?.dateLabel ?? "",
       });
@@ -201,14 +190,4 @@ function trimTick(value: number) {
   return Number.isInteger(value) ? String(value) : value.toFixed(1);
 }
 
-// REQ-PAR-004 / DEC-19：统计均值只能作为统计参考口径呈现，不作培养标准解读，也不产生高/低徽标；
-// 页面当前没有经核定的年龄/队伍培养标准，个人历史才是详情主体。
-function buildPeerReferenceView(latestValue: number | undefined, peerAverage: number | undefined, maxValue: number, unit?: string) {
-  const empty = { peerMinePercent: 0, peerAveragePercent: 0, peerAverageLabel: "" };
-  if (latestValue === undefined || peerAverage === undefined) return empty;
-  return {
-    peerMinePercent: Math.min(100, Math.round((latestValue / maxValue) * 100)),
-    peerAveragePercent: Math.min(100, Math.round((peerAverage / maxValue) * 100)),
-    peerAverageLabel: `${peerAverage}${unit || ""}`,
-  };
-}
+// REQ-PAR-004: without an approved standard, show personal history only.

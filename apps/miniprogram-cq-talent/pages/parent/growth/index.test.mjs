@@ -72,8 +72,8 @@ describe("parent growth training history", () => {
   });
 
   it("labels the peer-average preview outline as a statistical reference, not a standard (REQ-PAR-004)", () => {
-    expect(template).toContain('wx:if="{{radarPreview.peerPath}}"');
-    expect(template).toContain("灰色轮廓为同队测评统计均值，仅供参考");
+    expect(template).not.toContain("radarPreview.peerPath");
+    expect(template).not.toContain("同队测评统计均值");
     expect(template).not.toContain("同龄标准");
   });
 
@@ -283,7 +283,7 @@ describe("parent growth training history", () => {
 
     expect(page.data.heroStats).toEqual([
       { value: "46", label: "训练记录" },
-      { value: "2", label: "已确认测评" },
+      { value: "—", label: "已确认测评" },
     ]);
     expect(page.data.trainingBars.map((bar) => bar.label)).toEqual(["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月"]);
     expect(Math.max(...page.data.trainingBars.map((bar) => bar.height))).toBe(80);

@@ -95,7 +95,7 @@ describe("parent metric detail", () => {
     expect(page.data.chartPoints).toEqual([]);
   });
 
-  it("shows the team average as a statistical reference without any standard badge", async () => {
+  it("shows only personal history when an unapproved peer average is returned", async () => {
     mocks.getParentGrowth.mockResolvedValue({
       radar: [{ metricId: "speed", label: "Speed", value: 80, maxValue: 100, peerAverage: 70 }],
     });
@@ -116,9 +116,6 @@ describe("parent metric detail", () => {
     await page.load();
 
     expect(page.data).toMatchObject({
-      peerMinePercent: 80,
-      peerAveragePercent: 70,
-      peerAverageLabel: "70分",
       coachCommentText: "传球视野开阔，继续保持。",
     });
     // REQ-PAR-004：不得基于统计均值生成高/低/达标徽标
@@ -139,12 +136,12 @@ describe("parent metric detail", () => {
 
     await page.load();
 
-    expect(page.data.peerAverageLabel).toBe("");
+    expect(page.data.peerAverageLabel).toBeUndefined();
     expect(page.data.coachCommentText).toBe("");
   });
 
   it("keeps WXML free of array helpers and gates optional cards on real fields", () => {
-    expect(template).toContain('wx:if="{{detail && peerAverageLabel}}"');
+    expect(template).not.toContain("peerAverageLabel");
     expect(template).toContain('wx:if="{{detail && coachCommentText}}"');
     expect(template).toContain("p6-nav__range");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
@@ -160,14 +157,9 @@ describe("parent metric detail", () => {
     expect(controller).not.toContain("peerBadge");
     expect(controller).not.toContain("buildPeerView");
     expect(stylesheet).not.toMatch(/\.mhero__badge--(success|warning|info)/);
-    // 均值必须以统计参考口径呈现
-    expect(template).toContain("同队参考值");
-    expect(template).toContain("统计均值");
-    expect(template).toContain("同队统计均值");
-    // 无经核定标准时个人历史为主体：趋势/变化记录排在统计参考之前
-    expect(template.indexOf("变化记录")).toBeGreaterThan(-1);
-    expect(template.indexOf("变化记录")).toBeLessThan(template.indexOf("同队参考值"));
-    expect(template.indexOf("能力趋势")).toBeLessThan(template.indexOf("同队参考值"));
+    expect(template).not.toContain("同队参考值");
+    expect(template).not.toContain("统计均值");
+    expect(template).toContain("变化记录");
   });
 
   it("anchors the title at the live Figma left origin", () => {

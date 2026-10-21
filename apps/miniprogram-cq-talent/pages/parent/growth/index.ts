@@ -193,8 +193,6 @@ type RadarPreview = {
   ringPath: string;
   valuePath: string;
   valuePathInner: string;
-  peerPath: string | null;
-  peerPathInner: string | null;
   labels: Array<{ text: string; x: number; y: number }>;
 };
 
@@ -248,10 +246,11 @@ function buildActivityView(timeline: GrowthTimelineItem[]) {
 // 概览统计（P08）：训练累计 + 已确认测评数量，仅展示可追溯事实，缺失留空
 function buildHeroStats(growth: GrowthSummary) {
   const total = growth.trainingStats?.totalTrainings;
-  const confirmed = Array.isArray(growth.evaluations) ? growth.evaluations.length : null;
+  // evaluations are per-team coach comments, not assessment publications.
+  // The aggregate API has no confirmed assessment count; leave it unavailable.
   return [
     { value: typeof total === "number" ? String(total) : "—", label: "训练记录" },
-    { value: confirmed === null ? "—" : String(confirmed), label: "已确认测评" },
+    { value: "—", label: "已确认测评" },
   ];
 }
 
@@ -267,7 +266,7 @@ function buildMonthlyBars(growth: GrowthSummary): TrainingBar[] | null {
   }));
 }
 
-function previewPolygon(points: RadarMetricPoint[], key: "value" | "peerAverage", inset: number) {
+function previewPolygon(points: RadarMetricPoint[], key: "value", inset: number) {
   const total = points.length;
   return `polygon(${points
     .map((point, index) => {
@@ -288,8 +287,6 @@ function buildRadarPreview(points: RadarMetricPoint[]): RadarPreview | null {
     gridLayers.push({ size, kind: "line" });
     gridLayers.push({ size: size - 4, kind: "cover" });
   });
-  // 与详情页一致：全部维度都有同伴均值时才画基准多边形
-  const hasPeer = points.every((point) => typeof point.peerAverage === "number");
   // 偶数轴时每条直线贯穿两条对轴，奇数轴时每轴一条半径线
   const spokeCount = total % 2 === 0 ? total / 2 : total;
   const spokes = Array.from({ length: spokeCount }, (_, index) => (180 / spokeCount) * index);
@@ -309,8 +306,6 @@ function buildRadarPreview(points: RadarMetricPoint[]): RadarPreview | null {
     ringPath,
     valuePath: previewPolygon(points, "value", 1),
     valuePathInner: previewPolygon(points, "value", 0.976),
-    peerPath: hasPeer ? previewPolygon(points, "peerAverage", 1) : null,
-    peerPathInner: hasPeer ? previewPolygon(points, "peerAverage", 0.95) : null,
     labels,
   };
 }
