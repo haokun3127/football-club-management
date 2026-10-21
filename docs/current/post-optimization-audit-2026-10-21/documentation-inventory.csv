@@ -71,12 +71,12 @@ docs/current/miniprogram-manual-acceptance-cq-talent.md,current,737b7ccaea3ee414
 docs/current/miniprogram-release-readiness-cq-talent.md,current,62d8d2a98ff53bbc83a9187be993d828decf9d5ceb38eece8af3553392603bdb,inventory/reference review; not sentence-by-sentence recertification
 docs/current/miniprogram-requirements-review-2026-09-17.md,current,74b55f6e0d270693731ceadd2280ae0166489641a2b14a5f889fc6251b77aa61,inventory/reference review; not sentence-by-sentence recertification
 docs/current/post-optimization-audit-2026-10-21/README.md,current,b45fb36cbeb14cb28b6d98999457cf80ad6e9f9db3f64766a15d7975c89d96cc,authority/targeted semantic review
-docs/current/post-optimization-audit-2026-10-21/audit-report.md,current,f10078b642aa596b9ea42b07744f07b6044ed33125ef952212c6ed8a0aa21d71,inventory/reference review; not sentence-by-sentence recertification
+docs/current/post-optimization-audit-2026-10-21/audit-report.md,current,5773660bee4398586cdc2f7df5de59cc232e14de7b12c7c3d494babeaf1f7fa3,inventory/reference review; not sentence-by-sentence recertification
 docs/current/post-optimization-audit-2026-10-21/commit-history.md,current,4aaad852c5e56c57f2802926a36223969b8b268fc31fdf0c50ab3fac9e683372,inventory/reference review; not sentence-by-sentence recertification
-docs/current/post-optimization-audit-2026-10-21/documentation-governance.md,current,7d83d88ad8c17b19847269976c2ce21f645340e832cb20d1f482f75fb46481bd,inventory/reference review; not sentence-by-sentence recertification
+docs/current/post-optimization-audit-2026-10-21/documentation-governance.md,current,a85495cfad874551ff92cc49d51bb79b447fe978b0eab613341e47d1be41350c,inventory/reference review; not sentence-by-sentence recertification
 docs/current/post-optimization-audit-2026-10-21/next-cycle.md,current,e7d184cfd4d5033f42e0db3e75a376f11c4829b48f5887524eb9b8fb567bf3ad,inventory/reference review; not sentence-by-sentence recertification
 docs/current/post-optimization-audit-2026-10-21/product-gap-matrix.md,current,9cf38c1e00738962cdd1bf78624c28a11e9e69f2eea5df27dddb7126eda8836a,inventory/reference review; not sentence-by-sentence recertification
-docs/current/post-optimization-audit-2026-10-21/version-consistency.md,current,afeb349746dd4bc2861ef15620fd244f13d317651097d77cce40dc909a8cc154,inventory/reference review; not sentence-by-sentence recertification
+docs/current/post-optimization-audit-2026-10-21/version-consistency.md,current,3a8b1591c40dc9a0bb73bcb1cc1a23860a56e160eb27c46810b61886b1b3fdd7,inventory/reference review; not sentence-by-sentence recertification
 docs/current/product-requirements/01-product-and-miniprogram.md,current,af5ae53bd58759cf113b3c395219ad427facc122163ee6b5abf986dedb8e03f4,authority/targeted semantic review
 docs/current/product-requirements/02-backoffice.md,current,59ac1bec8a04fe58a9cbbcfcebb9686a6d0769b7242b7f8b51476e616ca82bb0,authority/targeted semantic review
 docs/current/product-requirements/03-data-and-permissions.md,current,47359e61a9b20e410e2804549ed1b1689f725db2e1385f17c862b7946e232f03,authority/targeted semantic review
@@ -219,6 +219,6 @@ docs/reference/wechat-miniprogram/pages/subscribe-message.md,reference,5478875d8
 docs/reference/wechat-miniprogram/pages/update-mechanism.md,reference,e17cb73897479e199a268d16f07713ba764e617666c01efb43543a745b7e7bad,inventory/reference review; not sentence-by-sentence recertification
 AGENTS.md,root,dce4127dffe57ced423d86ea9df47db4a6b8a44cb8dff13da49c978c71d87671,authority/targeted semantic review
 HANDOFF-GITHUB-2026-09-08.md,root,bb104f44d6f53bc99a852d4a161bb7953369eb7fbb34ec15762abbaf62d9792f,authority/targeted semantic review
-PRODUCT.md,root,16dafd6b95735316b665fa2b0a2b3aff2c19685045ae287a37a7518d53febbb2,inventory/reference review; not sentence-by-sentence recertification
+PRODUCT.md,root,fc002279fb66f8f6a780c9d1caeb79ee9ba0de37a136dfffa8df0a09d0d5e3ca,authority/targeted semantic review
 README-WINDOWS-CODEX.md,root,2e9604822a6d09f961cb05b6115917322d40f7e5c33b6899af0d7d7de6830291,inventory/reference review; not sentence-by-sentence recertification
 README.md,root,35e0580c459476acfec89393234b9978a09306364b7e77d9e4ea04c8d810bd03,authority/targeted semantic review

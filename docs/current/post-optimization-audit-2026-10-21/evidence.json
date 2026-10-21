@@ -136,5 +136,10 @@
       "sha256": "3dc05d8f2cc87da6c3d4c5dd46ec9327046fb147296e4576ee755aa6f3c0b06b",
       "bytes": 4163
     }
-  ]
+  ],
+  "cloudCI": {
+    "url": "https://github.com/haokun3127/football-club-management/actions/runs/39525813291",
+    "headSha": "68921a8d759501a0a26456f25373c543b5d74b2e",
+    "conclusion": "success"
+  }
 }

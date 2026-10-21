@@ -11,6 +11,6 @@
 
 小程序Git子树：`ed5614228f5e1f70d7ca050d9e0b1f37197d2753`。最终回执应再次确认这个子树与源码工作区未变，记录最终HEAD、ls-remote、编译exit、项目路径和运行路由；三者均核对后才宣告源码版本对齐。微信IDE没有独立Git提交标识，证明链为**指定主目录→工作区与Git相等→清编译缓存→官方编译成功→运行新行为**，不虚构IDE返回了SHA。
 
-本轮不更新体验版或服务器部署；它们不属于这次“本地/GitHub/IDE”三端源码一致性的含义。历史9.7.5/939676f部署事实不能写成这次新代码已上线。GitHub当前工作流只自动监听dev/master及PR；本轮本地门禁通过不能伪称同SHA云CI通过，云CI实际结果以最终回执为准。
+本轮不更新体验版或服务器部署；它们不属于这次“本地/GitHub/IDE”三端源码一致性的含义。历史9.7.5/939676f部署事实不能写成这次新代码已上线。GitHub当前工作流只自动监听dev/master及PR；本轮本地门禁通过不能伪称同SHA云CI通过，代码基线的[云CI 39525813291](https://github.com/haokun3127/football-club-management/actions/runs/39525813291)已success；最终文档/日志提交会本地重跑门禁，云CI并非该元数据提交。
 
 复现步骤：Node24/pnpm10.33.0安装冻结锁→`pnpm check:delivery`→`pnpm check:miniprogram-policy`逐条解释→`git diff --check`→核对当前分支/远端→正常push→`git ls-remote`→指定主项目清编译缓存和官方CLI auto→检查控制台/目标页面。不得清登录存储或用旧临时副本代替主项目。

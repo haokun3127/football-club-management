@@ -63,3 +63,5 @@ G08多孩子抬头、G05设计差异与其余产品未实现/歧义详见[矩阵
 依赖结论来源：[Fastify异步校验公告](https://github.com/fastify/fastify/security/advisories/GHSA-667r-xxjv-c9mm)、[Fastify错误URL公告](https://github.com/fastify/fastify/security/advisories/GHSA-p68q-wchp-6fh7)、[UUID方法边界公告](https://github.com/uuidjs/uuid/security/advisories/GHSA-w5hq-g745-h8pq)。Fastify前两项分别依赖async schema/受保护not-found handler，未把包命中自动认定项目鉴权已被绕过。
 
 原生合成视图留证：[P08成长页](evidence/growth-synthetic.png)、[C34空时段](evidence/private-empty-synthetic.png)、[安装/页面断言/恢复回执](evidence/native-visual.json)。图片上的“审计样例”与24次训练均为夹具，不能解读为真实学员或环境数据。
+
+云端复验：[GitHub Actions 39525813291](https://github.com/haokun3127/football-club-management/actions/runs/39525813291) 已success，SHA为 `68921a8d759501a0a26456f25373c543b5d74b2e`，包括Ubuntu冻结锁安装、完整delivery门禁。最终文档/日志提交的本地重跑与SHA见独立最终回执，不把这次运行冒称最终元数据提交的云CI。

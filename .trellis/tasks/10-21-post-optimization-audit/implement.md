@@ -20,4 +20,4 @@ Node `/opt/homebrew/opt/node@24/bin`；pnpm 10.33.0。读取包脚本和包级sp
 完整门禁通过964例/1个Windows测试skip，额外9脚本和3启动检查；frozen-lockfile通过，生产audit从31告警降为1个UUID中危（ExcelJS只用不受影响v4）。没有独立lint命令。最后radar改动另跑mini674+typecheck通过。官方清编译缓存后cli auto成功；P08/C34原生合成渲染/字段断言通过，恢复函数/登录页，不改业务身份和数据。
 A–E报告、52REQ矩阵、40提交目录、文档盘点在docs/current/post-optimization-audit-2026-10-21。Figma当前P01/P08/C34已在线读取；旧架构/Figma/根handoff保留归档并移除当前权威竞争；隐私实现现状纠正，需求C/P/O/E未改。
 未闭合：真实业务/真机B01/B02，旧无action历史核查R03，风险和产品缺口见报告。审计阶段已执行，不宣称产品稳定或真实验收完成。task保留in_progress，不通过finish-work自动归档伪装这些验收已通过；已读取finish-work并按用户“不得虚标完成”约束保留任务。其他28项任务不动。
-下一步：最终文档/治理提交、最终相同SHA全门禁/远端/原生回读，回执写仓库外避免自引用。CI已对代码基线手动dispatch（只检查、不部署），待实际结果；日志在/private/tmp/fcm-post-optimization-audit-20261021。按trellis记录会话但不把阻塞项标complete。
+下一步：最终文档/治理提交、最终相同SHA全门禁/远端/原生回读，回执写仓库外避免自引用。CI39525813291已对代码基线68921a8d成功（只检查、不部署）；日志在/private/tmp/fcm-post-optimization-audit-20261021。按trellis记录会话但不把阻塞项标complete。
