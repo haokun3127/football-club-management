@@ -18,6 +18,7 @@ import { evaluationSchemas } from "./student-evaluation-schemas.js";
 import { errorResponse, schemas } from "./schemas.js";
 import { workflowSchemas } from "./assessment-workflow-schemas.js";
 import { trainingRecordSchemas } from "./training-record-schemas.js";
+import { trainingGameSchemas } from "./training-game-schemas.js";
 
 interface RouteSchema {
   params?: unknown;
@@ -65,10 +66,11 @@ function parameters(schema: RouteSchema) {
     required: true,
     schema: property,
   }));
+  const requiredQuery = objectSchemaRequired(schema.querystring);
   const query = objectSchemaProperties(schema.querystring).map(([name, property]) => ({
     name,
     in: "query",
-    required: false,
+    required: requiredQuery.has(name),
     schema: property,
   }));
   const requiredHeaders = objectSchemaRequired(schema.headers);
@@ -194,6 +196,20 @@ export function buildOpenApiDocument() {
       },
       "/clubs/{clubId}/app-clients/{clientId}/students/{studentId}/training-records/{eventId}/leave": {
         post: operation("POST", "training-record-leave", { params: trainingRecordSchemas.correctionParams, body: trainingRecordSchemas.leave, response: { 200: trainingRecordSchemas.leaveResponse } }),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/training-games": {
+        get: operation("GET", "training-games", trainingGameSchemas.list),
+        post: operation("POST", "training-game-create", trainingGameSchemas.create),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/events/{eventId}/training-games/{gameId}": {
+        get: operation("GET", "training-game-detail", trainingGameSchemas.detail),
+        patch: operation("PATCH", "training-game-update", trainingGameSchemas.update),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/coach/training-games": {
+        get: operation("GET", "team-training-games", trainingGameSchemas.directory),
+      },
+      "/clubs/{clubId}/app-clients/{clientId}/parent/events/{eventId}/training-games": {
+        get: operation("GET", "parent-training-games", trainingGameSchemas.parent),
       },
       "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/publications": { post: operation("POST", "assessment-publications", workflowSchemas.publish) },
       "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}/workflow": { get: operation("GET", "assessment-workflow", workflowSchemas.summary) },

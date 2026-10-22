@@ -23,6 +23,8 @@ Under `/clubs/:clubId/app-clients/:clientId`:
 
 `FCM_TRAINING_GAME_CLUBS` is an explicit comma-separated allowlist, default off. Disabled writes are rejected; existing authorized records remain readable. Clients must distinguish an unavailable endpoint from an empty collection. Never turn a 404 or failed read into “0 games”.
 
+The public OpenAPI registry in `http/openapi.ts` is separate from Fastify route registration. Register all four paths and six operations using the existing `trainingGameSchemas`; required `studentId`/`teamId` query parameters must follow the schema's `required` array. The OpenAPI regression in `test/server.test.ts` checks operation coverage, required scope/revision/request fields and nullable integer scores. Union member order is not semantic and may be normalized by schema compilation. A runtime route alone is not a complete documented contract.
+
 ## Invariants
 
 - New games require a current SessionPlan block whose drill has `recordingCapability: friendly_match`. Each game has its own ID; a block may contain multiple games. Store only block ID and necessary plan/drill/name/revision snapshot. Source replacement does not delete history.

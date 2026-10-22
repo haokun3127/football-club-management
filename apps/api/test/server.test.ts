@@ -156,6 +156,28 @@ describe("api server", () => {
     expect(response.statusCode).toBe(200);
     expect(body.openapi).toBe("3.1.0");
     expect(body.paths["/app-clients/resolve"]).toBeDefined();
+    const gamesBase = "/clubs/{clubId}/app-clients/{clientId}";
+    expect(body.paths[`${gamesBase}/coach/events/{eventId}/training-games`]).toMatchObject({
+      get: expect.objectContaining({ responses: expect.objectContaining({ "200": expect.any(Object) }) }),
+      post: expect.objectContaining({ requestBody: expect.any(Object) }),
+    });
+    expect(body.paths[`${gamesBase}/coach/events/{eventId}/training-games/{gameId}`]).toMatchObject({
+      get: expect.objectContaining({ responses: expect.any(Object) }),
+      patch: { requestBody: {
+        content: { "application/json": { schema: expect.objectContaining({
+          required: expect.arrayContaining(["expectedRevision", "requestId"]),
+          properties: expect.objectContaining({ scoreA: expect.objectContaining({ type: expect.arrayContaining(["integer", "null"]) }) }),
+        }) } },
+      } },
+    });
+    for (const [path, scope] of [
+      [`${gamesBase}/coach/training-games`, "teamId"],
+      [`${gamesBase}/parent/events/{eventId}/training-games`, "studentId"],
+    ]) {
+      expect(body.paths[path]).toMatchObject({ get: expect.objectContaining({
+        parameters: expect.arrayContaining([expect.objectContaining({ name: scope, in: "query", required: true })]),
+      }) });
+    }
     const workflowBase = "/clubs/{clubId}/app-clients/{clientId}/coach/assessment-tasks/{taskId}";
     for (const suffix of ["/workflow", "/students/{studentId}/entries", "/students/{studentId}/history", "/publications"]) {
       expect(body.paths[`${workflowBase}${suffix}`]).toBeDefined();
