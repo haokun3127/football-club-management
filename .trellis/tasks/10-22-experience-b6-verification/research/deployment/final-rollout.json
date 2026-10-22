@@ -1,0 +1,123 @@
+{
+  "date": "2026-10-23",
+  "scope": "develop only",
+  "moduleLoad": {
+    "passed": true,
+    "user": 1000,
+    "network": "none"
+  },
+  "trainingGamesEnabled": false,
+  "preparation": {
+    "backup": "/opt/cq-talent-nonproduction/backups/experience-a5c074ce6ba5-20261023/develop.sqlite",
+    "sha256": "61ddca6a23233a08eb8dfbcb2e66854ce4dda763604e254926bcffd1795ad65e",
+    "tables": 106,
+    "integrity": "ok",
+    "foreignKeyErrors": 0,
+    "composeFiles": "/opt/cq-talent-nonproduction/releases/783f74f9768c/deploy/environment-isolation/compose.nonproduction.yml,/opt/cq-talent-nonproduction/releases/783f74f9768c/develop.override.yml",
+    "oldImage": "cq-talent-api:develop-783f74f9768c",
+    "revision": "a5c074ce6ba5b5ac59af2d71551f4204c0e83848"
+  },
+  "migration": {
+    "applied": [],
+    "originalTablesVerified": 106,
+    "originalRowsPreserved": true,
+    "newTables": [
+      "training_games",
+      "training_game_participants",
+      "training_game_events",
+      "training_game_revisions"
+    ],
+    "newTrainingGameRows": 0,
+    "integrity": "ok",
+    "foreignKeyErrors": 0,
+    "image": "cq-talent-api:develop-a5c074ce6ba5"
+  },
+  "build": {
+    "tag": "cq-talent-api:develop-a5c074ce6ba5",
+    "imageId": "sha256:ed8c7f97f86d0bfb17b39e626f1bc0f82d41b221367b76ae0a7766480353084a",
+    "sourceCommit": "a5c074ce6ba5b5ac59af2d71551f4204c0e83848",
+    "archiveSha256": "95a7deafb53572ff4fb1ff3112ed10152d34ced8b633f6c441450b17b60bbf6f",
+    "platform": "linux/amd64",
+    "buildExitCode": 0
+  },
+  "switch": {
+    "sourceCommit": "a5c074ce6ba5b5ac59af2d71551f4204c0e83848",
+    "imageId": "sha256:ed8c7f97f86d0bfb17b39e626f1bc0f82d41b221367b76ae0a7766480353084a",
+    "freshBackupSha256": "61ddca6a23233a08eb8dfbcb2e66854ce4dda763604e254926bcffd1795ad65e",
+    "service": "develop",
+    "health": true
+  },
+  "verification": {
+    "revision": "a5c074ce6ba5b5ac59af2d71551f4204c0e83848",
+    "developContainerId": "53766337a5df004c34b640a2a495f1035ebea73cd35acf44c178762f8d76f8ae",
+    "imageId": "sha256:ed8c7f97f86d0bfb17b39e626f1bc0f82d41b221367b76ae0a7766480353084a",
+    "trialAndReleaseUnchanged": true,
+    "originalBusinessTablesUnchanged": true,
+    "originalTablesVerified": 106,
+    "newTables": [
+      "training_games",
+      "training_game_participants",
+      "training_game_events",
+      "training_game_revisions"
+    ],
+    "expectedMigrationChange": [],
+    "integrity": "ok",
+    "foreignKeyErrors": 0,
+    "http": [
+      {
+        "path": "/health",
+        "status": 200,
+        "bytes": 46
+      },
+      {
+        "path": "/backoffice",
+        "status": 403
+      },
+      {
+        "path": "/openapi.json",
+        "status": 200,
+        "bytes": 1070350
+      }
+    ]
+  },
+  "initialHistoryVerification": {
+    "revision": "a5c074ce6ba5b5ac59af2d71551f4204c0e83848",
+    "developContainerId": "53766337a5df004c34b640a2a495f1035ebea73cd35acf44c178762f8d76f8ae",
+    "imageId": "sha256:ed8c7f97f86d0bfb17b39e626f1bc0f82d41b221367b76ae0a7766480353084a",
+    "trialAndReleaseUnchanged": true,
+    "originalBusinessTablesUnchanged": true,
+    "originalTablesVerified": 102,
+    "newTables": [
+      "training_games",
+      "training_game_participants",
+      "training_game_events",
+      "training_game_revisions"
+    ],
+    "expectedMigrationChange": [
+      {
+        "table": "schema_migrations",
+        "beforeRows": 44,
+        "afterRows": 45
+      }
+    ],
+    "integrity": "ok",
+    "foreignKeyErrors": 0,
+    "http": [
+      {
+        "path": "/health",
+        "status": 200,
+        "bytes": 46
+      },
+      {
+        "path": "/backoffice",
+        "status": 403
+      },
+      {
+        "path": "/openapi.json",
+        "status": 200,
+        "bytes": 1070350
+      }
+    ]
+  },
+  "buildLogSha256": "7c1530d294764d8625c8922f48b446138e2434c35a185fa68c5ffae07cb0ad97"
+}

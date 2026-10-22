@@ -1,0 +1,54 @@
+{
+  "checks": [
+    {
+      "path": "/health",
+      "status": 200,
+      "environment": "develop"
+    },
+    {
+      "path": "/app-clients/resolve?clientKey=cq-talent-wechat-main",
+      "status": 200,
+      "environment": "develop"
+    },
+    {
+      "path": "/app-clients/resolve?clientKey=cq-talent-wechat-main",
+      "status": 403,
+      "environment": "develop"
+    },
+    {
+      "path": "/backoffice/api/session",
+      "status": 401,
+      "environment": "develop"
+    }
+  ],
+  "openapi": {
+    "status": 200,
+    "trainingGamePaths": 4,
+    "operations": 6,
+    "requiredScopes": true
+  },
+  "backoffice": {
+    "status": 200,
+    "cspPresent": true,
+    "assets": [
+      {
+        "path": "/__env/develop/backoffice/assets/preload_helper.8b8c427c.js",
+        "status": 200,
+        "bytes": 1097,
+        "sha256": "b650750e7b2811b8ff8fa5eee9b84a37ad16e2f79f2f796b3d488955ba232f86"
+      },
+      {
+        "path": "/__env/develop/backoffice/assets/umi.54ac5ccd.js",
+        "status": 200,
+        "bytes": 680854,
+        "sha256": "f33e3d80d854e11caa383920f033375f9559221b09af2125ab25f1b5a053d8b7"
+      },
+      {
+        "path": "/__env/develop/backoffice/assets/umi.e818329b.css",
+        "status": 200,
+        "bytes": 2295,
+        "sha256": "53528dafb799b8211fcf2b2e9e85b0e7b8c9c51a2bebfd1d6f6bfffeacb7a425"
+      }
+    ]
+  }
+}

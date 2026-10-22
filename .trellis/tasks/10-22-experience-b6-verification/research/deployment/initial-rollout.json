@@ -1,0 +1,85 @@
+{
+  "preparation": {
+    "backup": "/opt/cq-talent-nonproduction/backups/experience-783f74f9768c-20261023/develop.sqlite",
+    "sha256": "2ea1ae943b0f050c42ac65bff2f68a715e384202f06a264afbb1b83290c7aaa2",
+    "tables": 102,
+    "integrity": "ok",
+    "foreignKeyErrors": 0,
+    "composeFiles": "/opt/cq-talent-nonproduction/releases/939676f325b9/compose.nonproduction.yml,/opt/cq-talent-nonproduction/releases/b29d84e35b66/develop.override.yml",
+    "oldImage": "cq-talent-api:develop-b29d84e35b66",
+    "revision": "783f74f9768c3a2b48c3907d356905654708e051"
+  },
+  "migration": {
+    "applied": [
+      "0045_training_games.sql"
+    ],
+    "originalTablesVerified": 102,
+    "originalRowsPreserved": true,
+    "newTables": [
+      "training_games",
+      "training_game_participants",
+      "training_game_events",
+      "training_game_revisions"
+    ],
+    "newTrainingGameRows": 0,
+    "integrity": "ok",
+    "foreignKeyErrors": 0,
+    "image": "cq-talent-api:develop-783f74f9768c"
+  },
+  "build": {
+    "tag": "cq-talent-api:develop-783f74f9768c",
+    "imageId": "sha256:03429d671bf67b0df7d09958884f342e034aa9039d930914d40fe37b128492b2",
+    "sourceCommit": "783f74f9768c3a2b48c3907d356905654708e051",
+    "archiveSha256": "a860397af5919b92c6035430202e1cd7b4fe2e16e0238b87b1f5255d01fc1c6e",
+    "platform": "linux/amd64",
+    "buildExitCode": 0
+  },
+  "switch": {
+    "sourceCommit": "783f74f9768c3a2b48c3907d356905654708e051",
+    "imageId": "sha256:03429d671bf67b0df7d09958884f342e034aa9039d930914d40fe37b128492b2",
+    "freshBackupSha256": "2ea1ae943b0f050c42ac65bff2f68a715e384202f06a264afbb1b83290c7aaa2",
+    "service": "develop",
+    "health": true
+  },
+  "verification": {
+    "revision": "783f74f9768c3a2b48c3907d356905654708e051",
+    "developContainerId": "cc5d33269402e939ea1a3ddb386b069f2c30083535dbabd0ccc8999811d3bcd8",
+    "imageId": "sha256:03429d671bf67b0df7d09958884f342e034aa9039d930914d40fe37b128492b2",
+    "trialAndReleaseUnchanged": true,
+    "originalBusinessTablesUnchanged": true,
+    "originalTablesVerified": 102,
+    "newTables": [
+      "training_games",
+      "training_game_participants",
+      "training_game_events",
+      "training_game_revisions"
+    ],
+    "expectedMigrationChange": [
+      {
+        "table": "schema_migrations",
+        "beforeRows": 44,
+        "afterRows": 45
+      }
+    ],
+    "integrity": "ok",
+    "foreignKeyErrors": 0,
+    "http": [
+      {
+        "path": "/health",
+        "status": 200,
+        "bytes": 46
+      },
+      {
+        "path": "/backoffice",
+        "status": 403
+      },
+      {
+        "path": "/openapi.json",
+        "status": 200,
+        "bytes": 1040902
+      }
+    ],
+    "openapiTrainingGamesPresent": false,
+    "followUp": "OpenAPI catalog repair required; runtime registration exists"
+  }
+}

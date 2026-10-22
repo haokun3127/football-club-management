@@ -156,4 +156,6 @@ pnpm check:delivery
 
 - B5：[后台任务与对象体验](../archive/2026-10/10-22-experience-b5-backoffice/implement.md)，依赖B0，已完成本地独立验证。
 
-- B6：[跨端验收与工程交接](../10-22-experience-b6-verification/implement.md)，本地门禁通过，设备/部署验收待完成。
+- B6：[跨端验收与工程交接](../10-22-experience-b6-verification/implement.md)，本地门禁通过，develop已于2026-10-23部署a5c074ce；手机号绑定后完整业务联调和真机验收待完成。
+
+2026-10-23交付续接：用户授权后已推送GitHub dev并完成develop API/后台部署及0045增量迁移。最终a5c074ce远端1001通过/1跳过，历史业务数据保全、HTTPS/后台资源/OpenAPI/环境隔离通过；友谊赛白名单仍关闭，当前原生需手机号绑定。操作证据与未验边界仍统一由B6维护，父任务保持in_progress。

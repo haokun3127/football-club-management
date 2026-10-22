@@ -1,6 +1,16 @@
 # 重庆天才：当前交付状态与待办
 
-> 2026-10-22：v1.1后续批次源码`b29d84e3`已按用户授权部署develop（API、后台、0044增量迁移）。真实开发者工具已连通，新自动身份会话恢复、双端雷达历史读取及球队页ready；trial/release未变，未上传微信。完整进度和待验边界统一见[任务实施记录](../../.trellis/tasks/10-21-review-ui-unification-spec/implement.md)。
+> 2026-10-23：全产品体验升级已推送GitHub dev，并部署develop API/后台。最终业务源码`a5c074ce`，0045增量迁移与数据保全核查通过；trial/release未变，未上传微信。当前结果与待验边界见下方记录。
+
+## 2026-10-23 GitHub dev与develop环境已更新
+
+- **源码与CI**：`feature/ui-batch-1-p01`和GitHub `dev`已正常快进到业务源码`a5c074ce6ba5b5ac59af2d71551f4204c0e83848`；之后交付记录提交仅更新文档。该SHA的[GitHub CI](https://github.com/haokun3127/football-club-management/actions/runs/39818215142)通过完整交付门禁：1001项测试通过、1项既有跳过，另9项脚本测试、3项隔离启动检查通过。此前本地1004计数包含3条dist编译产物重复用例，本次已核准干净源码口径。
+- **实际运行版本**：`cq-talent-api:develop-a5c074ce6ba5`，镜像ID`sha256:ed8c7f97f86d0bfb17b39e626f1bc0f82d41b221367b76ae0a7766480353084a`。从已提交源码归档构建Linux amd64镜像，独立Compose仅重建develop。后台入口为[develop后台](https://cqtc.pomi.tech/__env/develop/backoffice/)。
+- **迁移与数据**：先备份并演练0045，再实际新增4张友谊赛表；原102张表的业务行逐值核对不变，迁移记录44→45。OpenAPI补齐后再次备份106张表、验证迁移为空并切换，全部106张表不变。SQLite完整性及外键检查通过，两次切换前均完成0600一致性备份，目录为`/opt/cq-talent-nonproduction/backups/experience-{783f74f9768c,a5c074ce6ba5}-20261023/`。
+- **线上验证**：HTTPS health/客户端登记200、错误环境403、正确后台环境下无会话401、后台HTML和3个入口资源200/CSP存在；公开OpenAPI已包含友谊赛4路径/6操作及必填球队/孩子参数。默认node用户、无网络/无业务卷模块加载通过；私有配置就绪检查通过。trial/release容器ID和镜像ID与操作前一致。
+- **修复与边界**：部署回读补齐了此前遗漏的OpenAPI目录及必填query标注，未改变业务处理、权限或数据模型。`FCM_TRAINING_GAME_CLUBS`仍为空，未开启线上友谊赛记录。当前原生`wx.login`返回`binding_required`，未触发手机号授权，未声称完成本轮真实双角色页面联调。
+
+回退保留旧镜像与受限备份；仅切回develop镜像，保留已新增表，不覆盖恢复业务库。完整证据、失败记录和后续设备验收见[B6交接](../../.trellis/tasks/10-22-experience-b6-verification/implement.md)及[最终部署回读](../../.trellis/tasks/10-22-experience-b6-verification/research/deployment/final-rollout.json)。真机、手机号绑定后双角色/双孩子完整业务链路、官方包体及微信上传仍未完成，B6和父任务保持in_progress。
 
 ## 2026-10-22 全产品体验提升：B0—B5本地完成，B6设备/部署验收待完成
 

@@ -1,0 +1,6 @@
+{
+  "login": {
+    "authenticated": false,
+    "status": "binding_required"
+  }
+}

@@ -56,6 +56,8 @@ Correct: `const runtimeConfig = readRuntimeConfig();` then `createPlatformPersis
 
 The legacy production process can be protected by `nginx-release-guard.conf` plus `nginx-release-location.conf` without migrating its database. The temporary-upstream verifier `scripts/verify-environment-proxy.py` proves fixed routing and no production fallback; it does not replace deployed HTTPS readback. Current deployment evidence is attached to the active task.
 
+When exporting a reduced build context from a committed Git tree, include root `scripts/` and `tsconfig.base.json` alongside Dockerfile, workspace manifests, lockfile, patches and the API/backoffice/domain packages. Package build commands resolve `../../scripts/clean.mjs`, and TypeScript extends the root config. Check archive entries before transfer; exporting only package directories can pass dependency installation but fail compilation. Keep the failed build log, verify that no immutable tag or active build exists, then rebuild the complete context from the same commit. No service switch is allowed until the candidate builds and passes the remaining delivery gates.
+
 ## Scenario: Explicit nonproduction client registration
 
 1. **Scope:** a migrated develop/trial database is reachable but `/app-clients/resolve` returns 404.

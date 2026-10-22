@@ -1,0 +1,45 @@
+{
+  "sourceCommit": "a5c074ce6ba5b5ac59af2d71551f4204c0e83848",
+  "apiTypecheck": true,
+  "apiSourceTests": {
+    "passed": 263,
+    "files": 44,
+    "workers": 2,
+    "seconds": 67.96
+  },
+  "remoteDelivery": {
+    "passed": 1001,
+    "skipped": 1,
+    "scriptTests": 9,
+    "startupChecks": 3,
+    "defaultConcurrency": true
+  },
+  "countCorrection": "Earlier local 1004 included three compiled copies of training-content-catalog tests; clean source CI has 1001 unique passing cases. Vitest list confirmed both source and dist copies.",
+  "logs": [
+    {
+      "path": "/tmp/cq-dev-openapi-check.log",
+      "sha256": "1b3fb259bcf1f5a0e9e7d0e46f09dd517480970aabbfdc8a4ed41bbbb0163938"
+    },
+    {
+      "path": "/tmp/cq-dev-openapi-check-fixed.log",
+      "sha256": "b79612811433b6b984692541ac1479c700acd9668be0448d04efb4ba92bd199c"
+    },
+    {
+      "path": "/tmp/cq-dev-openapi-final.log",
+      "sha256": "d2b83dbcae225b3621a6a4f958967dcfc58bc4585b5c166e5dcf5feb3e01c5ae"
+    },
+    {
+      "path": "/tmp/cq-dev-openapi-final-limited.log",
+      "sha256": "de95f948baf6950c1bec651cfe7d193ebd363daeca646134810e130cf7876153"
+    },
+    {
+      "path": "/tmp/cq-final-ci.log",
+      "sha256": "fd2213d3ed3c0b5475e1ca803e438ae0b79cb3b264c1adc146ceb8168bce4f41"
+    }
+  ],
+  "limits": [
+    "Current native wx.login returned binding_required; no phone authorization or authenticated dual-role page smoke completed this turn.",
+    "No physical device accessibility, weak-network or official WeChat package/upload verification.",
+    "Training game allowlist remains empty; no online record creation or feature rollout."
+  ]
+}

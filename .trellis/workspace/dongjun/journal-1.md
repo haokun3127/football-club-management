@@ -1472,3 +1472,38 @@ B2—B5本地实现完成；B6及父任务仍为 **in_progress**。
 ### Next Steps
 
 - 按B6记录完成真机与目标环境验收；本轮未部署、上传或推送。
+
+
+## Session 41: GitHub dev同步与develop体验升级部署
+
+**Date**: 2026-10-23
+**Task**: GitHub dev同步与develop体验升级部署
+**Package**: api
+**Branch**: `feature/ui-batch-1-p01`
+
+### Summary
+
+按用户授权推送dev并部署API/后台；修复OpenAPI目录，远端1001通过/1跳过；0045备份演练和历史数据保全、HTTPS/资源/隔离检查通过。B6保留手机号绑定后完整业务联调与真机验收。
+
+### Main Changes
+
+GitHub dev正常快进；仅部署develop固定镜像a5c074ce。0045增量迁移、102表历史保全和最终106表一致性均验证通过；OpenAPI复用业务schema补齐4路径6操作。详细证据统一在B6 research/deployment。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `a5c074ce` | (see git log) |
+
+### Testing
+
+- [OK] API源码263项通过；最终源码GitHub根交付1001通过/1既有跳过，9脚本/3启动通过。
+- [OK] 备份、迁移演练、最终HTTPS/资源/OpenAPI/环境隔离通过；trial/release未变。
+
+### Status
+
+[OK] **本次GitHub/dev部署完成；B6与父任务继续in_progress**
+
+### Next Steps
+
+- 真实微信手机号绑定后继续双角色/双孩子业务联调、真机与官方包体验收；友谊赛白名单仍关闭。
