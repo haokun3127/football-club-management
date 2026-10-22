@@ -560,6 +560,22 @@ function normalizeActivityDetail(raw: Record<string, unknown>): ActivityDetail {
   const matchEventsSource = Array.isArray(raw.matchEvents) ? raw.matchEvents as Array<Record<string, unknown>> : [];
   const other = asRecord(raw.other ?? eventSource.otherActivity);
   const participants = Array.isArray(eventSource.participants) ? eventSource.participants as Array<Record<string, unknown>> : [];
+  const sourcePresentation = asRecord(raw.presentation);
+  const sourceTraining = sourcePresentation ? asRecord(sourcePresentation.training) : training;
+  const trainingSummary = stringOrUndefined(sourceTraining?.summary ?? event.summary) ?? "";
+  const rawTags = sourceTraining?.abilityTags;
+  const presentation: ActivityDetail["presentation"] = {
+    startsAt: String(sourcePresentation?.startsAt ?? event.startsAt),
+    endsAt: stringOrUndefined(sourcePresentation?.endsAt ?? event.endsAt),
+    teamName: sourcePresentation ? stringOrUndefined(asRecord(sourcePresentation.team)?.name) : event.teamName,
+    venueName: sourcePresentation ? stringOrUndefined(asRecord(sourcePresentation.venue)?.name) : stringOrUndefined(eventSource.venue ?? eventSource.locationName),
+    coachName: sourcePresentation ? stringOrUndefined(asRecord(sourcePresentation.coach)?.name) : stringOrUndefined(eventSource.coachName),
+    training: event.type === "training" ? {
+      state: sourceTraining?.state === "not_arranged" ? "not_arranged" : sourceTraining?.state === "unavailable" ? "unavailable" : trainingSummary ? "planned" : "unavailable",
+      summary: trainingSummary,
+      abilityTags: Array.isArray(rawTags) ? rawTags.filter((tag): tag is string => typeof tag === "string" && !!tag.trim()) : [],
+    } : null,
+  };
   const participantStatus = participants.map((item) => statusLabel(item.status)).filter(Boolean).join("、") || "待更新";
   const fields = [
     { label: "活动类型", value: typeLabel(event.type) },
@@ -573,8 +589,8 @@ function normalizeActivityDetail(raw: Record<string, unknown>): ActivityDetail {
       {
         title: "本次训练",
         items: [
-          { label: "训练内容", value: String(training?.summary ?? event.summary ?? "教练尚未补充训练内容") },
-          { label: "关联能力", value: listText(training?.abilityTags ?? training?.metricIds, "保存训练内容后显示") },
+          { label: "训练内容", value: presentation.training?.summary || (presentation.training?.state === "not_arranged" ? "本次训练尚未安排内容" : "训练内容暂不可用，请稍后重试") },
+          { label: "关联能力", value: presentation.training?.abilityTags.join("、") || "暂无已配置的关联能力" },
         ],
       },
       {
@@ -629,6 +645,17 @@ function normalizeActivityDetail(raw: Record<string, unknown>): ActivityDetail {
     }];
   });
   return {
+    presentation,
+    match: event.type === "match" ? {
+      opponentName: stringOrUndefined(match?.opponentName),
+      homeScore: numberOrUndefined(match?.homeScore),
+      awayScore: numberOrUndefined(match?.awayScore),
+      comment: stringOrUndefined(match?.comment),
+    } : null,
+    other: event.type === "other" ? {
+      description: stringOrUndefined(other?.description ?? event.summary),
+      notice: stringOrUndefined(other?.notice),
+    } : null,
     id: event.id,
     type: event.type,
     title: event.title,

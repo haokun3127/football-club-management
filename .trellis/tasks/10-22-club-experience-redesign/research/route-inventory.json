@@ -1,0 +1,718 @@
+{
+  "baseline": "8c2555726c22973273e7d78b0d06f93a28227386",
+  "routes": [
+    {
+      "route": "pages/launch/index",
+      "role": "launch",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 101,
+      "links": [
+        "/pages/login/index"
+      ]
+    },
+    {
+      "route": "pages/login/index",
+      "role": "login",
+      "tabbar": false,
+      "sharedHeader": true,
+      "submitBar": false,
+      "lineCount": 182,
+      "links": [
+        "/pages/coach/",
+        "/pages/launch/",
+        "/pages/launch/index",
+        "/pages/login/",
+        "/pages/parent/"
+      ]
+    },
+    {
+      "route": "pages/parent/home/index",
+      "role": "parent",
+      "tabbar": true,
+      "sharedHeader": true,
+      "submitBar": false,
+      "lineCount": 169,
+      "links": [
+        "/pages/parent/article/index",
+        "/pages/parent/content/index",
+        "/pages/parent/event/index",
+        "/pages/parent/growth/index",
+        "/pages/parent/schedule/index"
+      ]
+    },
+    {
+      "route": "pages/parent/confirmed-results/index",
+      "role": "parent",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 2,
+      "links": []
+    },
+    {
+      "route": "pages/parent/schedule/index",
+      "role": "parent",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 323,
+      "links": [
+        "/pages/parent/article/index",
+        "/pages/parent/day/index",
+        "/pages/parent/event/index",
+        "/pages/parent/reminders/index"
+      ]
+    },
+    {
+      "route": "pages/parent/event/index",
+      "role": "parent",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 385,
+      "links": [
+        "/pages/parent/event/index",
+        "/pages/parent/schedule/index"
+      ]
+    },
+    {
+      "route": "pages/parent/growth/index",
+      "role": "parent",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 271,
+      "links": [
+        "/pages/parent/binding/index",
+        "/pages/parent/confirmed-results/index",
+        "/pages/parent/match-history/index",
+        "/pages/parent/metric/index",
+        "/pages/parent/milestones/index",
+        "/pages/parent/radar/index",
+        "/pages/parent/training-history/index",
+        "/pages/shared/student-evaluation/index"
+      ]
+    },
+    {
+      "route": "pages/parent/radar/index",
+      "role": "parent",
+      "tabbar": true,
+      "sharedHeader": true,
+      "submitBar": false,
+      "lineCount": 15,
+      "links": [
+        "/pages/parent/metric/index"
+      ]
+    },
+    {
+      "route": "pages/parent/metric/index",
+      "role": "parent",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 193,
+      "links": [
+        "/pages/parent/event/index"
+      ]
+    },
+    {
+      "route": "pages/parent/child/index",
+      "role": "parent",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 191,
+      "links": [
+        "/pages/parent/binding/index",
+        "/pages/parent/coaches/index",
+        "/pages/parent/content/index",
+        "/pages/parent/private/index",
+        "/pages/parent/radar/index",
+        "/pages/parent/schedule/index",
+        "/pages/parent/semester-report/index",
+        "/pages/parent/status/index"
+      ]
+    },
+    {
+      "route": "pages/parent/semester-report/index",
+      "role": "parent",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 226,
+      "links": [
+        "/pages/parent/growth/index"
+      ]
+    },
+    {
+      "route": "pages/parent/account/index",
+      "role": "parent",
+      "tabbar": false,
+      "sharedHeader": true,
+      "submitBar": false,
+      "lineCount": 79,
+      "links": [
+        "/pages/login/index"
+      ]
+    },
+    {
+      "route": "pages/parent/reminders/index",
+      "role": "parent",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 151,
+      "links": []
+    },
+    {
+      "route": "pages/parent/status/index",
+      "role": "parent",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 161,
+      "links": [
+        "/pages/parent/coaches/index"
+      ]
+    },
+    {
+      "route": "pages/parent/content/index",
+      "role": "parent",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 124,
+      "links": [
+        "/pages/parent/article/index",
+        "/pages/parent/coaches/index",
+        "/pages/parent/guide/index",
+        "/pages/parent/help/index",
+        "/pages/parent/venues/index"
+      ]
+    },
+    {
+      "route": "pages/parent/article/index",
+      "role": "parent",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 69,
+      "links": []
+    },
+    {
+      "route": "pages/parent/guide/index",
+      "role": "parent",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 65,
+      "links": [
+        "/pages/parent/article/index"
+      ]
+    },
+    {
+      "route": "pages/parent/milestones/index",
+      "role": "parent",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 102,
+      "links": [
+        "/pages/parent/ability-history/index",
+        "/pages/shared/student-evaluation/index"
+      ]
+    },
+    {
+      "route": "pages/parent/ability-history/index",
+      "role": "parent",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 126,
+      "links": [
+        "/pages/parent/event/index",
+        "/pages/parent/metric/index"
+      ]
+    },
+    {
+      "route": "pages/parent/training-history/index",
+      "role": "parent",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 79,
+      "links": []
+    },
+    {
+      "route": "pages/parent/match-history/index",
+      "role": "parent",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 114,
+      "links": [
+        "/pages/parent/event/index"
+      ]
+    },
+    {
+      "route": "pages/parent/help/index",
+      "role": "parent",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 155,
+      "links": []
+    },
+    {
+      "route": "pages/parent/coaches/index",
+      "role": "parent",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 149,
+      "links": []
+    },
+    {
+      "route": "pages/parent/venues/index",
+      "role": "parent",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 155,
+      "links": []
+    },
+    {
+      "route": "pages/parent/private/index",
+      "role": "parent",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 251,
+      "links": [
+        "/pages/parent/private-success/index"
+      ]
+    },
+    {
+      "route": "pages/parent/private-success/index",
+      "role": "parent",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 140,
+      "links": [
+        "/pages/parent/schedule/index"
+      ]
+    },
+    {
+      "route": "pages/parent/day/index",
+      "role": "parent",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 177,
+      "links": [
+        "/pages/parent/event/index"
+      ]
+    },
+    {
+      "route": "pages/parent/binding/index",
+      "role": "parent",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 128,
+      "links": [
+        "/pages/parent/account/index"
+      ]
+    },
+    {
+      "route": "pages/coach/schedule/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 282,
+      "links": [
+        "/pages/coach/assessment-projects/index",
+        "/pages/coach/attendance/index",
+        "/pages/coach/content-select/index",
+        "/pages/coach/event/index",
+        "/pages/coach/match/index",
+        "/pages/coach/me/index",
+        "/pages/coach/team-selector/index",
+        "/pages/coach/test-entry/index",
+        "/pages/coach/training/index"
+      ]
+    },
+    {
+      "route": "pages/coach/team-selector/index",
+      "role": "coach",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 63,
+      "links": [
+        "/pages/coach/training/index"
+      ]
+    },
+    {
+      "route": "pages/coach/event/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 448,
+      "links": [
+        "/pages/coach/",
+        "/pages/coach/assessment-projects/index",
+        "/pages/coach/attendance/index",
+        "/pages/coach/content-copy/index",
+        "/pages/coach/content-select/index",
+        "/pages/coach/event-change/index",
+        "/pages/coach/lesson/index",
+        "/pages/coach/match/index",
+        "/pages/coach/scout/index",
+        "/pages/coach/tactical-board/index",
+        "/pages/coach/test-task-create/index",
+        "/pages/coach/training-assessment/index"
+      ]
+    },
+    {
+      "route": "pages/coach/attendance/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": true,
+      "submitBar": false,
+      "lineCount": 275,
+      "links": [
+        "/pages/coach/attendance-success/index",
+        "/pages/coach/lesson/index"
+      ]
+    },
+    {
+      "route": "pages/coach/lesson/index",
+      "role": "coach",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 98,
+      "links": []
+    },
+    {
+      "route": "pages/coach/match/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": true,
+      "submitBar": false,
+      "lineCount": 317,
+      "links": [
+        "/pages/coach/match-edit/index",
+        "/pages/coach/match-event-add/index",
+        "/pages/coach/scout/index"
+      ]
+    },
+    {
+      "route": "pages/coach/match-edit/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": true,
+      "submitBar": false,
+      "lineCount": 258,
+      "links": []
+    },
+    {
+      "route": "pages/coach/tactical-board/index",
+      "role": "coach",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 212,
+      "links": []
+    },
+    {
+      "route": "pages/coach/team/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 191,
+      "links": [
+        "/pages/coach/match/index",
+        "/pages/coach/scout/index",
+        "/pages/coach/student-radar/index",
+        "/pages/coach/team-selector/index"
+      ]
+    },
+    {
+      "route": "pages/coach/scout/index",
+      "role": "coach",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 108,
+      "links": []
+    },
+    {
+      "route": "pages/coach/student-radar/index",
+      "role": "coach",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 114,
+      "links": [
+        "/pages/coach/event/index",
+        "/pages/coach/student-radar/index",
+        "/pages/coach/student-results/index",
+        "/pages/shared/student-evaluation/index"
+      ]
+    },
+    {
+      "route": "pages/coach/team-ability/index",
+      "role": "coach",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 67,
+      "links": [
+        "/pages/coach/student-radar/index"
+      ]
+    },
+    {
+      "route": "pages/coach/event-change/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": true,
+      "submitBar": false,
+      "lineCount": 313,
+      "links": []
+    },
+    {
+      "route": "pages/coach/content-select/index",
+      "role": "coach",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 669,
+      "links": []
+    },
+    {
+      "route": "pages/coach/content-copy/index",
+      "role": "coach",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 97,
+      "links": []
+    },
+    {
+      "route": "pages/coach/training-assessment/index",
+      "role": "coach",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 252,
+      "links": [
+        "/pages/coach/content-select/index"
+      ]
+    },
+    {
+      "route": "pages/coach/test-tasks/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 215,
+      "links": [
+        "/pages/coach/assessment-projects/index",
+        "/pages/coach/test-task-create/index"
+      ]
+    },
+    {
+      "route": "pages/coach/test-task-create/index",
+      "role": "coach",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 296,
+      "links": [
+        "/pages/coach/assessment-projects/index"
+      ]
+    },
+    {
+      "route": "pages/coach/assessment-projects/index",
+      "role": "coach",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 464,
+      "links": [
+        "/pages/coach/assessment-bulk-entry/index"
+      ]
+    },
+    {
+      "route": "pages/coach/assessment-bulk-entry/index",
+      "role": "coach",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 668,
+      "links": [
+        "/pages/coach/assessment-bulk-entry/index",
+        "/pages/coach/assessment-projects/index"
+      ]
+    },
+    {
+      "route": "pages/coach/assessment-submit/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 88,
+      "links": [
+        "/pages/coach/team-ability/index"
+      ]
+    },
+    {
+      "route": "pages/coach/attendance-success/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": true,
+      "submitBar": false,
+      "lineCount": 115,
+      "links": [
+        "/pages/coach/event/index",
+        "/pages/coach/schedule/index"
+      ]
+    },
+    {
+      "route": "pages/coach/lesson-history/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": true,
+      "submitBar": false,
+      "lineCount": 145,
+      "links": [
+        "/pages/coach/lesson-detail/index"
+      ]
+    },
+    {
+      "route": "pages/coach/lesson-detail/index",
+      "role": "coach",
+      "tabbar": false,
+      "sharedHeader": true,
+      "submitBar": false,
+      "lineCount": 9,
+      "links": [
+        "/pages/coach/lesson/index"
+      ]
+    },
+    {
+      "route": "pages/coach/match-event-add/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": true,
+      "submitBar": false,
+      "lineCount": 299,
+      "links": []
+    },
+    {
+      "route": "pages/coach/permissions/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 63,
+      "links": []
+    },
+    {
+      "route": "pages/coach/private-interest/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 182,
+      "links": []
+    },
+    {
+      "route": "pages/coach/account/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 132,
+      "links": [
+        "/pages/login/index"
+      ]
+    },
+    {
+      "route": "pages/coach/help/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 174,
+      "links": []
+    },
+    {
+      "route": "pages/coach/training/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": true,
+      "submitBar": false,
+      "lineCount": 44,
+      "links": [
+        "/pages/coach/event/index",
+        "/pages/coach/scout/index",
+        "/pages/coach/team-ability/index",
+        "/pages/coach/team-selector/index",
+        "/pages/coach/team/index",
+        "/pages/coach/test-tasks/index",
+        "/pages/coach/training/index"
+      ]
+    },
+    {
+      "route": "pages/coach/test-entry/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 658,
+      "links": []
+    },
+    {
+      "route": "pages/coach/me/index",
+      "role": "coach",
+      "tabbar": true,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 158,
+      "links": [
+        "/pages/coach/account/index",
+        "/pages/coach/help/index",
+        "/pages/coach/permissions/index",
+        "/pages/coach/private-interest/index",
+        "/pages/launch/index"
+      ]
+    },
+    {
+      "route": "pages/coach/student-results/index",
+      "role": "coach",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 2,
+      "links": []
+    },
+    {
+      "route": "pages/shared/student-evaluation/index",
+      "role": "shared",
+      "tabbar": false,
+      "sharedHeader": false,
+      "submitBar": false,
+      "lineCount": 64,
+      "links": []
+    }
+  ]
+}

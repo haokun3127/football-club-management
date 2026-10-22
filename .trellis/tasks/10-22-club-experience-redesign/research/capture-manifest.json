@@ -1,0 +1,678 @@
+{
+  "date": "2026-10-22",
+  "captureMethod": "Tencent wechatide 0.3.9 simulator_screenshot optimize=false",
+  "screenshots": [
+    {
+      "step": "01-schedule",
+      "requestedRoute": "current",
+      "runtime": {
+        "route": "pages/coach/schedule/index",
+        "query": {},
+        "state": "ready",
+        "message": "",
+        "keys": [
+          "navInset",
+          "topBarHeight",
+          "menuInset",
+          "state",
+          "message",
+          "home",
+          "clubName",
+          "teamOptions",
+          "selectedTeamIds",
+          "allTeamsSelected",
+          "hasTeamOptions",
+          "showTeamPicker",
+          "taskCount",
+          "date",
+          "viewMode",
+          "activeFilter",
+          "coachName",
+          "coachInitial",
+          "hasCoachInitial",
+          "eventViews",
+          "visibleEvents",
+          "hasVisibleEvents",
+          "taskCards",
+          "hasTaskCards",
+          "heroEvent",
+          "hasHeroEvent",
+          "heroDateLabel",
+          "heroKindLabel",
+          "heroPills",
+          "__webviewId__"
+        ]
+      },
+      "capture": {
+        "success": true,
+        "path": "/tmp/cq-experience-20261022/01-schedule.png",
+        "imageWidth": 628,
+        "imageHeight": 1362
+      },
+      "sha256": "700d0baf5753269b44f2f585f4bc43e7cab2142705838534b488179ce67c41f1"
+    },
+    {
+      "step": "02-event",
+      "requestedRoute": "/pages/coach/event/index?id=event-cq-talent-secure-test-1-customer-2026-10-22",
+      "runtime": {
+        "route": "pages/coach/event/index",
+        "query": {
+          "id": "event-cq-talent-secure-test-1-customer-2026-10-22"
+        },
+        "state": "ready",
+        "message": "",
+        "contentCount": 8,
+        "keys": [
+          "transferVisible",
+          "transferBusy",
+          "transferMode",
+          "transferMessage",
+          "templateTitle",
+          "templates",
+          "hasTemplates",
+          "transferSource",
+          "transferPreview",
+          "transferTargets",
+          "hasTransferTargets",
+          "transferResults",
+          "hasTransferResults",
+          "navInset",
+          "menuInset",
+          "state",
+          "message",
+          "eventId",
+          "eventTypeLabel",
+          "eventView",
+          "rosterRows",
+          "rosterCount",
+          "workflowRows",
+          "trainingRows",
+          "matchRows",
+          "pendingRows",
+          "actionCards",
+          "assessmentTemplateId",
+          "canWrite",
+          "canEditTraining",
+          "canManageRoster",
+          "contentSummary",
+          "contentGroups",
+          "contentExpanded",
+          "hiddenContentCount",
+          "contentMinutesLabel",
+          "contentCount",
+          "hasConfiguredContent",
+          "hasRoster",
+          "hasWorkflow",
+          "hasTraining",
+          "hasMatch",
+          "hasPendingRows",
+          "hasActionCards",
+          "hasAssessmentTemplate",
+          "trainingContentSummary",
+          "attendancePresent",
+          "attendanceTotal",
+          "joinedNames",
+          "attendanceSaving",
+          "attendanceNeedsRefresh",
+          "trainingFactsAvailable",
+          "isTraining",
+          "courseTasks",
+          "courseTaskMessage",
+          "attendanceError",
+          "__webviewId__"
+        ]
+      },
+      "capture": {
+        "success": true,
+        "path": "/tmp/cq-experience-20261022/02-event.png",
+        "imageWidth": 628,
+        "imageHeight": 1362
+      },
+      "sha256": "5d0f3d8bc1fc283d6e454f0b6dc16ebd36602694839fba2842f80ddd249bfe29"
+    },
+    {
+      "step": "03-training-records",
+      "requestedRoute": "/pages/coach/lesson/index?id=event-cq-talent-secure-test-1-history-training-5",
+      "runtime": {
+        "route": "pages/coach/lesson/index",
+        "query": {
+          "id": "event-cq-talent-secure-test-1-history-training-5"
+        },
+        "state": "ready",
+        "message": "",
+        "title": "小组对抗训练",
+        "rows": 19,
+        "keys": [
+          "navInset",
+          "menuInset",
+          "state",
+          "message",
+          "eventId",
+          "eventTitle",
+          "total",
+          "rows",
+          "visibleRows",
+          "filter",
+          "canEdit",
+          "expandedId",
+          "editing",
+          "draftCounted",
+          "reason",
+          "saving",
+          "saveError",
+          "conflict",
+          "__webviewId__"
+        ]
+      },
+      "capture": {
+        "success": true,
+        "path": "/tmp/cq-experience-20261022/03-training-records.png",
+        "imageWidth": 628,
+        "imageHeight": 1362
+      },
+      "sha256": "bac44c24a7ee49b2cc5b21d166bed3158a067cf295d199866d41022a932735be"
+    },
+    {
+      "step": "04-team-workspace",
+      "requestedRoute": "/pages/coach/training/index",
+      "runtime": {
+        "route": "pages/coach/training/index",
+        "query": {},
+        "state": "ready",
+        "message": "",
+        "teamId": "team-weekend-select",
+        "keys": [
+          "navInset",
+          "menuInset",
+          "state",
+          "message",
+          "teamId",
+          "teamName",
+          "season",
+          "section",
+          "trainingCards",
+          "entries",
+          "__webviewId__"
+        ]
+      },
+      "capture": {
+        "success": true,
+        "path": "/tmp/cq-experience-20261022/04-team-workspace.png",
+        "imageWidth": 628,
+        "imageHeight": 1362
+      },
+      "sha256": "d012d2e00c3035a974fa75e3da299733a18c6deb7de72cd5f99f53a581c7aff7"
+    },
+    {
+      "step": "05-team-roster",
+      "requestedRoute": "/pages/coach/team/index?section=roster&teamId=team-cq-talent-secure-test-1",
+      "runtime": {
+        "route": "pages/coach/team/index",
+        "query": {
+          "section": "roster",
+          "teamId": "team-cq-talent-secure-test-1"
+        },
+        "state": "ready",
+        "message": "",
+        "title": "队员名单",
+        "teamId": "team-cq-talent-secure-test-1",
+        "keys": [
+          "section",
+          "pageTitle",
+          "hasTeamOptions",
+          "hasMatches",
+          "teamId",
+          "teamOptions",
+          "matches",
+          "navInset",
+          "menuInset",
+          "state",
+          "message",
+          "retryLabel",
+          "hasTeam",
+          "hasMembers",
+          "teamName",
+          "season",
+          "heroStats",
+          "members",
+          "memberEmptyMessage",
+          "hasCoaches",
+          "coaches",
+          "coachEmptyMessage",
+          "__webviewId__"
+        ]
+      },
+      "capture": {
+        "success": true,
+        "path": "/tmp/cq-experience-20261022/05-team-roster.png",
+        "imageWidth": 628,
+        "imageHeight": 1362
+      },
+      "sha256": "a12c44521363b6e8b46c3b4a5a822d2aa3f639f8e51bfa2f341da3390c46d3ae"
+    },
+    {
+      "step": "06-team-matches",
+      "requestedRoute": "/pages/coach/team/index?section=matches&teamId=team-cq-talent-secure-test-1",
+      "runtime": {
+        "route": "pages/coach/team/index",
+        "query": {
+          "section": "matches",
+          "teamId": "team-cq-talent-secure-test-1"
+        },
+        "state": "ready",
+        "message": "",
+        "title": "比赛记录",
+        "teamId": "team-cq-talent-secure-test-1",
+        "keys": [
+          "section",
+          "pageTitle",
+          "hasTeamOptions",
+          "hasMatches",
+          "teamId",
+          "teamOptions",
+          "matches",
+          "navInset",
+          "menuInset",
+          "state",
+          "message",
+          "retryLabel",
+          "hasTeam",
+          "hasMembers",
+          "teamName",
+          "season",
+          "heroStats",
+          "members",
+          "memberEmptyMessage",
+          "hasCoaches",
+          "coaches",
+          "coachEmptyMessage",
+          "__webviewId__"
+        ]
+      },
+      "capture": {
+        "success": true,
+        "path": "/tmp/cq-experience-20261022/06-team-matches.png",
+        "imageWidth": 628,
+        "imageHeight": 1362
+      },
+      "sha256": "fd48d5be04902c1c15e07a259ab90d4b5676d0ac8a6abdd7246d871eae8fe8f0"
+    },
+    {
+      "step": "07-tasks",
+      "requestedRoute": "/pages/coach/test-tasks/index?teamId=team-cq-talent-secure-test-1",
+      "runtime": {
+        "route": "pages/coach/test-tasks/index",
+        "query": {
+          "teamId": "team-cq-talent-secure-test-1"
+        },
+        "state": "ready",
+        "message": "",
+        "teamId": "team-cq-talent-secure-test-1",
+        "keys": [
+          "teamId",
+          "navInset",
+          "menuInset",
+          "state",
+          "statusTitle",
+          "statusActionText",
+          "message",
+          "filters",
+          "activeFilter",
+          "tasks",
+          "visibleTasks",
+          "hasVisibleTasks",
+          "__webviewId__"
+        ]
+      },
+      "capture": {
+        "success": true,
+        "path": "/tmp/cq-experience-20261022/07-tasks.png",
+        "imageWidth": 628,
+        "imageHeight": 1362
+      },
+      "sha256": "6be9904f102726eb1d55f54bc828670325c8cf71bf9a39cbafe6db1b78da21bb"
+    },
+    {
+      "step": "08-assessment-projects",
+      "requestedRoute": "/pages/coach/assessment-projects/index?taskId=review-draft-20261021&templateId=assessment-template-cq-talent-elite&title=本周能力测评",
+      "runtime": {
+        "route": "pages/coach/assessment-projects/index",
+        "query": {
+          "taskId": "review-draft-20261021",
+          "templateId": "assessment-template-cq-talent-elite",
+          "title": "本周能力测评"
+        },
+        "state": "ready",
+        "message": "",
+        "title": "本周能力测评 · 待录入与核对",
+        "keys": [
+          "navInset",
+          "menuInset",
+          "state",
+          "message",
+          "taskTitle",
+          "taskId",
+          "templateId",
+          "teamContextLabel",
+          "progressLabel",
+          "projectProgressLabel",
+          "taskStatusLabel",
+          "taskStatusClass",
+          "projects",
+          "contentTree",
+          "primaryNodes",
+          "secondaryNodes",
+          "tertiaryGroups",
+          "activePrimaryId",
+          "activeSecondaryId",
+          "selectedIds",
+          "selectedCount",
+          "confirmLabel",
+          "confirmClass",
+          "isConfirmDisabled",
+          "managed",
+          "canPublish",
+          "publishing",
+          "publicationLabel",
+          "publicationMessage",
+          "reviewVisible",
+          "reviewLoading",
+          "reviewStudentId",
+          "reviewName",
+          "reviewRevision",
+          "reviewCanPublish",
+          "reviewMessage",
+          "reviewStudents",
+          "reviewRows",
+          "__webviewId__",
+          "hasContentTree",
+          "hasActionCards"
+        ]
+      },
+      "capture": {
+        "success": true,
+        "path": "/tmp/cq-experience-20261022/08-assessment-projects.png",
+        "imageWidth": 628,
+        "imageHeight": 1362
+      },
+      "sha256": "2d6d225652121a7fa9ac9a0e58a9594acd80b545f4b5887ac6374a6c4ef6475c"
+    },
+    {
+      "step": "09-bulk-entry",
+      "requestedRoute": "/pages/coach/assessment-bulk-entry/index?taskId=review-draft-20261021&templateId=assessment-template-cq-talent-elite&projectId=assessment-test-cq-talent-03&title=本周能力测评",
+      "runtime": {
+        "route": "pages/coach/assessment-bulk-entry/index",
+        "query": {
+          "taskId": "review-draft-20261021",
+          "templateId": "assessment-template-cq-talent-elite",
+          "projectId": "assessment-test-cq-talent-03",
+          "title": "本周能力测评"
+        },
+        "state": "ready",
+        "message": "",
+        "title": "本周能力测评 · 待录入与核对",
+        "rows": 19,
+        "keys": [
+          "navInset",
+          "menuInset",
+          "state",
+          "statusTitle",
+          "message",
+          "taskId",
+          "templateId",
+          "templateVersionId",
+          "projectId",
+          "projectTitle",
+          "taskTitle",
+          "teamName",
+          "termLabel",
+          "fields",
+          "rows",
+          "savedValuesByStudent",
+          "valuesByStudent",
+          "savedStudentIds",
+          "projectIds",
+          "projectIndex",
+          "filledLabel",
+          "lastSavedLabel",
+          "readOnly",
+          "submitting",
+          "managed",
+          "draftTaskKey",
+          "studentStates",
+          "correctionReason",
+          "saveError",
+          "historyTitle",
+          "historyLines",
+          "historyVisible",
+          "courseSelectionRequired",
+          "courses",
+          "courseIds",
+          "savedCourseIds",
+          "__webviewId__"
+        ]
+      },
+      "capture": {
+        "success": true,
+        "path": "/tmp/cq-experience-20261022/09-bulk-entry.png",
+        "imageWidth": 628,
+        "imageHeight": 1362
+      },
+      "sha256": "6f8d84dcd188fee0a6a8711f53529ec64e9b7249fd39664ecfe8ba25718b1cb5"
+    },
+    {
+      "step": "10-parent-home",
+      "requestedRoute": "current",
+      "runtime": {
+        "route": "pages/parent/home/index",
+        "query": {},
+        "state": "ready",
+        "message": "",
+        "keys": [
+          "state",
+          "message",
+          "children",
+          "student",
+          "showChildren",
+          "trainingTotal",
+          "playerSlide",
+          "milestoneDate",
+          "latestGrowthText",
+          "teamLabel",
+          "milestoneTitle",
+          "milestoneDescription",
+          "milestoneCount",
+          "news",
+          "nextEvent",
+          "nextEventTime",
+          "clubTitle",
+          "banner",
+          "shortcuts",
+          "shortcutOptions",
+          "editingShortcuts",
+          "shortcutDraft",
+          "shortcutSlots",
+          "shortcutMessage",
+          "contentMessage",
+          "activeShortcutSlot",
+          "growthState",
+          "growthMessage",
+          "newsState",
+          "newsMessage",
+          "presentationState",
+          "__webviewId__"
+        ]
+      },
+      "capture": {
+        "success": true,
+        "path": "/tmp/cq-experience-20261022/10-parent-home.png",
+        "imageWidth": 628,
+        "imageHeight": 1362
+      },
+      "sha256": "81cff2dae1327033bb95e422888ccbf6b2b05cc1b5cbd54304f4c9b50c73c1d2"
+    },
+    {
+      "step": "11-parent-schedule",
+      "requestedRoute": "/pages/parent/schedule/index",
+      "runtime": {
+        "route": "pages/parent/schedule/index",
+        "query": {},
+        "state": "ready",
+        "message": "",
+        "keys": [
+          "navInset",
+          "topBarHeight",
+          "menuInset",
+          "state",
+          "message",
+          "children",
+          "activeStudentId",
+          "activeStudentName",
+          "events",
+          "calendarEvents",
+          "visibleEvents",
+          "selectedDate",
+          "selectedDateLabel",
+          "isMonthPickerExpanded",
+          "selectedType",
+          "typeTabs",
+          "hasUnreadReminders",
+          "unreadCount",
+          "todayLabel",
+          "selectedCountLabel",
+          "todayCount",
+          "weekCount",
+          "weekHours",
+          "noticeBanner",
+          "__webviewId__"
+        ]
+      },
+      "capture": {
+        "success": true,
+        "path": "/tmp/cq-experience-20261022/11-parent-schedule.png",
+        "imageWidth": 628,
+        "imageHeight": 1362
+      },
+      "sha256": "024ce8fec67d159ddef2b9f879e614554921bc16dd8324d0d3708b9870cb227d"
+    },
+    {
+      "step": "12-parent-growth",
+      "requestedRoute": "/pages/parent/growth/index",
+      "runtime": {
+        "route": "pages/parent/growth/index",
+        "query": {},
+        "state": "ready",
+        "message": "",
+        "keys": [
+          "navInset",
+          "menuInset",
+          "state",
+          "message",
+          "children",
+          "activeStudentId",
+          "growth",
+          "viewIndex",
+          "radar",
+          "selectedMetricId",
+          "selectedMetric",
+          "selectedDetail",
+          "detailState",
+          "detailCache",
+          "canDrawRadar",
+          "updatedAtLabel",
+          "latestLabel",
+          "trendLabel",
+          "heroSurname",
+          "heroName",
+          "heroTeam",
+          "heroSummaryMessage",
+          "heroStats",
+          "evaluationCards",
+          "evaluationMessage",
+          "milestoneMessage",
+          "trainingHistoryMessage",
+          "matchHistoryMessage",
+          "milestones",
+          "trainingBars",
+          "__webviewId__"
+        ]
+      },
+      "capture": {
+        "success": true,
+        "path": "/tmp/cq-experience-20261022/12-parent-growth.png",
+        "imageWidth": 628,
+        "imageHeight": 1362
+      },
+      "sha256": "268a2c1f3b4ad8fce619d070787a093ae285b5a0e5103e1d362b8b43f0c41ff4"
+    },
+    {
+      "step": "13-parent-mine",
+      "requestedRoute": "/pages/parent/child/index",
+      "runtime": {
+        "route": "pages/parent/child/index",
+        "query": {},
+        "state": "ready",
+        "message": "",
+        "keys": [
+          "navInset",
+          "menuInset",
+          "state",
+          "message",
+          "children",
+          "activeStudentId",
+          "activeChild",
+          "studentHome",
+          "avatarLetter",
+          "teamLabel",
+          "heroStats",
+          "recentActivities",
+          "canSwitchToCoach",
+          "__webviewId__"
+        ]
+      },
+      "capture": {
+        "success": true,
+        "path": "/tmp/cq-experience-20261022/13-parent-mine.png",
+        "imageWidth": 628,
+        "imageHeight": 1362
+      },
+      "sha256": "e11394add8239c678d2d469eaf5420ed2fa9fb443ce652b0b619d2fbb2fac07a"
+    },
+    {
+      "step": "14-parent-event",
+      "requestedRoute": "/pages/parent/event/index?id=event-cq-talent-secure-test-1-customer-2026-10-22",
+      "runtime": {
+        "route": "pages/parent/event/index",
+        "query": {
+          "id": "event-cq-talent-secure-test-1-customer-2026-10-22"
+        },
+        "state": "ready",
+        "message": "",
+        "keys": [
+          "navInset",
+          "menuInset",
+          "navActionTop",
+          "state",
+          "message",
+          "eventId",
+          "detail",
+          "leave",
+          "__webviewId__"
+        ]
+      },
+      "capture": {
+        "success": true,
+        "path": "/tmp/cq-experience-20261022/14-parent-event.png",
+        "imageWidth": 628,
+        "imageHeight": 1362
+      },
+      "sha256": "900f4b15006d0a5fb51276752b3a802976dae70644cacb3c2a2d49d7b1608605"
+    }
+  ],
+  "limits": [
+    "当前模拟器只读页面走查；未提交成绩、请假、更正或比赛数据",
+    "原始PNG 628x1362，未作为375x812 Figma像素一致性证据",
+    "未覆盖真机、弱网、输入键盘和屏幕阅读器",
+    "后台IAB被符号链接沙箱初始化错误阻挡，后台为源码层研究"
+  ]
+}

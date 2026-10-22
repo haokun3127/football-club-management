@@ -1,7 +1,7 @@
 import { getParentActivityDetail } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { markGrowthStale } from "../../../utils/growth-invalidation";
-import { activityStatus, activityTypeLabel, formatDateTime, resolveMenuActionTop, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
+import { activityStatus, activityTypeLabel, formatCalendarDate, formatTimeRange, formatDateTime, resolveMenuActionTop, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import { getTrainingRecords, requestTrainingLeave, revokeTrainingLeave, type TrainingRecord } from "../../../utils/training-records";
 import type { ActivityDetail, LoadState } from "../../../utils/types";
 
@@ -59,6 +59,7 @@ type ActivityDetailView = Omit<ActivityDetail, "matchEvents"> & {
 // 请假与课时视图（F-01 / REQ-ATT-001）：请假直接生效、可撤回、双方可见历史
 type LeaveView = {
   visible: boolean;
+  available: boolean;
   eventId: string;
   studentId: string;
   studentName: string;
@@ -75,6 +76,8 @@ type LeaveView = {
 const NAV_TITLES = { training: "训练详情", match: "比赛详情", other: "活动详情" } as const;
 
 Page({
+  requestGeneration: 0,
+  requestedStudentId: "",
   data: {
     navInset: resolveNavInset(),
     menuInset: resolveMenuInset(),
@@ -82,16 +85,23 @@ Page({
     state: "loading" as LoadState,
     message: "正在读取活动详情",
     eventId: "",
+    selectedStudentId: "",
+    children: [] as Array<{ id: string; name: string }>,
     detail: null as ActivityDetailView | null,
     leave: null as LeaveView | null,
   },
   onLoad(query?: Record<string, string | undefined>) {
     requireRole("parent");
     const eventId = query?.id || "";
+    this.requestedStudentId = query?.studentId || "";
     this.setData({ eventId });
-    this.load(eventId);
+    this.load(eventId, this.requestedStudentId);
   },
-  async load(id: string) {
+  onUnload() { this.requestGeneration += 1; },
+  async load(id: string, requestedChildId?: string) {
+    const studentId = requestedChildId ?? (id === this.data.eventId ? this.data.selectedStudentId || this.requestedStudentId : "");
+    const generation = ++this.requestGeneration;
+    this.setData({ eventId: id, state: "loading", detail: null, leave: null, message: "正在读取活动详情" });
     if (!id) {
       this.setData({ state: "error", message: "这条活动信息暂时无法打开，请从日程重新进入。" });
       return;
@@ -100,22 +110,35 @@ Page({
     if (!session) return;
     try {
       const detail = await getParentActivityDetail(id);
-      const leave = detail.type === "training" ? await this.loadLeave(detail, id, session.currentStudentId) : null;
-      this.setData({ state: "ready", detail: presentDetail(detail), leave, message: "" });
+      if (generation !== this.requestGeneration) return;
+      const children = detail.participants.map(participant => ({ id: participant.studentId, name: participant.name }));
+      if (studentId && !children.some(child => child.id === studentId)) {
+        this.setData({ state: "error", message: "这个孩子不在本次活动中，请从日程重新选择。", children: [], selectedStudentId: "" });
+        return;
+      }
+      const preferred = studentId || (children.some(child => child.id === session.currentStudentId) ? session.currentStudentId : "");
+      const selectedStudentId = preferred || (children.length === 1 ? children[0]!.id : "");
+      const leave = detail.type === "training" && selectedStudentId ? await this.loadLeave(detail, id, selectedStudentId) : null;
+      if (generation !== this.requestGeneration) return;
+      this.setData({ state: "ready", detail: presentDetail(detail, selectedStudentId), leave, children, selectedStudentId, message: "" });
     } catch (error) {
-      this.setData({ state: "error", message: readableError(error) });
+      if (generation === this.requestGeneration) this.setData({ state: "error", message: readableError(error) });
     }
   },
-  // 读取请假参与状态与课时记录；课时读取失败不阻塞详情展示
-  async loadLeave(detail: ActivityDetail, eventId: string, currentStudentId?: string) {
-    const child = detail.participants.find((participant) => participant.studentId === currentStudentId) ?? detail.participants[0];
+  selectChild(event: WechatMiniprogram.CustomEvent<{ studentId: string }>) {
+    const studentId = event.detail.studentId;
+    if (this.data.leave?.submitting || !this.data.children.some((child: { id: string }) => child.id === studentId) || studentId === this.data.selectedStudentId) return;
+    return this.load(this.data.eventId, studentId);
+  },
+  async loadLeave(detail: ActivityDetail, eventId: string, studentId: string) {
+    const child = detail.participants.find(participant => participant.studentId === studentId);
     if (!child) return null;
-    let record: TrainingRecord | undefined;
     try {
       const result = await getTrainingRecords(child.studentId);
-      record = result.records.find((item) => item.eventId === eventId);
-    } catch { record = undefined; }
-    return presentLeave(detail, eventId, child.studentId, child.name, child.status, record);
+      return presentLeave(detail, eventId, child.studentId, child.name, child.status, result.records.find(item => item.eventId === eventId));
+    } catch {
+      return { ...presentLeave(detail, eventId, child.studentId, child.name, child.status), available: false, resultLabel: "计次记录暂不可用", message: "计次记录读取失败，请重新加载后再操作。" };
+    }
   },
   async submitLeave() {
     await this.writeLeave("request");
@@ -125,9 +148,10 @@ Page({
   },
   async writeLeave(action: "request" | "revoke") {
     const leave = this.data.leave;
-    if (!leave?.visible || leave.submitting || leave.cancelled) return;
+    if (!leave?.visible || !leave.available || leave.submitting || leave.cancelled) return;
     if (action === "request" && leave.onLeave) return;
     if (action === "revoke" && !leave.onLeave) return;
+    const generation = this.requestGeneration;
     this.setData({ leave: { ...leave, submitting: true, message: "" } });
     try {
       const input = { expectedRevision: leave.revision };
@@ -135,15 +159,17 @@ Page({
       else await revokeTrainingLeave(leave.studentId, leave.eventId, input);
       // 请假/撤回改变了销课事实，返回成长页时定向重拉（F-06 同款失效标记）
       markGrowthStale();
+      if (generation !== this.requestGeneration) return;
       wx.showToast({ title: action === "request" ? "请假已生效" : "请假已撤回", icon: "success" });
       await this.load(leave.eventId);
     } catch (error) {
+      if (generation !== this.requestGeneration) return;
       const failure = error as { message?: string; code?: string; errorType?: string; userMessage?: string };
       const conflict = failure.errorType === "conflict" || failure.code === "training_record_conflict";
       if (conflict) {
         // 冲突时先刷新到最新事实，再在最新视图上提示核对，避免提示被刷新覆盖
         await this.load(leave.eventId);
-        if (this.data.leave) {
+        if (this.data.eventId === leave.eventId && this.data.selectedStudentId === leave.studentId && this.data.leave) {
           this.setData({ leave: { ...this.data.leave, submitting: false, message: "这条记录刚被更新，请核对最新状态后重试。" } });
         }
         return;
@@ -164,7 +190,7 @@ Page({
     const detail = this.data.detail;
     return {
       title: detail ? `${detail.title} · 邀请你来看比赛` : "重庆天才足球俱乐部",
-      path: detail ? `/pages/parent/event/index?id=${this.data.eventId}` : "/pages/parent/schedule/index",
+      path: detail ? `/pages/parent/event/index?id=${encodeURIComponent(this.data.eventId)}` : "/pages/parent/schedule/index",
     };
   },
   retry() {
@@ -172,37 +198,22 @@ Page({
   },
 });
 
-function fieldValue(detail: ActivityDetail, keywords: string[]) {
-  const hit = detail.fields.find((field) => keywords.some((keyword) => field.label.includes(keyword)));
-  return hit?.value ?? "";
-}
-
-function sectionValue(detail: ActivityDetail, sectionKeywords: string[], itemKeywords: string[]) {
-  const section = detail.sections.find((item) => sectionKeywords.some((keyword) => item.title.includes(keyword)));
-  const hit = section?.items.find((item) => itemKeywords.some((keyword) => item.label.includes(keyword)));
-  return hit?.value ?? "";
-}
-
-function presentDetail(detail: ActivityDetail): ActivityDetailView {
+function presentDetail(detail: ActivityDetail, selectedStudentId: string): ActivityDetailView {
   const status = activityStatus(detail.status);
-  const child = detail.participants[0];
+  const child = detail.participants.find(participant => participant.studentId === selectedStudentId);
+  const facts = detail.presentation;
   const statusTone = status.label === "已确认" || status.label === "已结束" ? "success" : status.label === "待确认" ? "warning" : "muted";
-  const coachName = fieldValue(detail, ["教练"]) || "教练待同步";
-  const coachRole = fieldValue(detail, ["教练角色", "职务"]) || "教练信息待同步";
-  const otherDescription = sectionValue(detail, ["活动说明"], ["内容"]) || fieldValue(detail, ["活动描述", "描述"]) || "活动说明待同步";
-  const otherNotice = sectionValue(detail, ["活动说明"], ["通知", "注意"]) || "注意事项待同步";
-  const rawDateTime = fieldValue(detail, ["时间", "日期"]);
-  const dateTime = parseDateTimeParts(rawDateTime);
-  const rawScore = sectionValue(detail, ["比赛信息"], ["比分"]).trim();
-  // Attendance/participation is not a coach review. Only explicit comment fields
-  // may supply review text, and post-match content is hidden until completion.
-  const commentLabels = ["教练点评", "点评", "评语"];
-  const commentFields = [
-    ...detail.fields,
-    ...detail.sections.filter((section) => section.title === "比赛过程").flatMap((section) => section.items),
-  ];
-  const explicitComment = commentFields.find((field) => commentLabels.includes(field.label) && field.value.trim())?.value.trim() ?? "";
+  const coachName = facts.coachName || "教练暂未安排";
+  const coachRole = facts.coachName ? "本次活动教练" : "请联系俱乐部确认安排";
+  const otherDescription = detail.other?.description || "活动说明待同步";
+  const otherNotice = detail.other?.notice || "注意事项待同步";
+  const dateText = formatCalendarDate(facts.startsAt);
+  const timeText = formatTimeRange(facts.startsAt, facts.endsAt);
+  const rawScore = typeof detail.match?.homeScore === "number" && typeof detail.match?.awayScore === "number"
+    ? `${detail.match.homeScore}:${detail.match.awayScore}` : "";
+  const explicitComment = detail.match?.comment?.trim() || "";
   const showMatchComment = detail.type === "match" && detail.status === "completed";
+  const matchEvents = toMatchEvents((detail.matchEvents ?? []).filter(event => event.studentId === selectedStudentId));
   const childStatusLabel = child ? participantStatusLabel(child.status) : "出勤状态待同步";
   const trainingPill = detail.type === "training"
     ? childStatusLabel === "已到场"
@@ -222,14 +233,14 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
     coachName,
     coachInitial: coachName.slice(0, 1),
     coachRole,
-    dateText: dateTime.date ? `${dateTime.date} ${dateTime.start}`.trim() : rawDateTime || "日期待确认",
-    timeText: dateTime.range || dateTime.start || "时间待确认",
-    trainingDateText: dateTime.date ? `${dateTime.range || dateTime.start} · ${dateTime.date}` : rawDateTime || "日期待确认",
-    venueText: fieldValue(detail, ["地点", "场地", "场馆"]) || "地点待确认",
-    trainingSummary: sectionValue(detail, ["本次训练"], ["训练内容"]) || "训练内容待同步",
-    abilityChips: collectAbilityChips(detail),
-    homeTeam: displayValue(fieldValue(detail, ["主队", "队伍"]), "主队待确认"),
-    awayTeam: sectionValue(detail, ["比赛信息"], ["对手"]) || "对手待确认",
+    dateText: `${dateText} ${timeText}`,
+    timeText,
+    trainingDateText: `${dateText} · ${timeText}`,
+    venueText: facts.venueName || "地点待确认",
+    trainingSummary: facts.training?.summary || (facts.training?.state === "not_arranged" ? "本次训练尚未安排内容" : "训练内容暂不可用，请稍后重试"),
+    abilityChips: facts.training?.abilityTags.length ? facts.training.abilityTags.slice(0, 4) : ["暂无已配置的关联能力"],
+    homeTeam: facts.teamName || "主队待确认",
+    awayTeam: detail.match?.opponentName || "对手待确认",
     scoreText: /^\d+\s*[:：]\s*\d+$/.test(rawScore) ? rawScore : status.label === "待开始" ? "0:0" : "比分待确认",
     roster: detail.participants.slice(0, 3).map((participant, index) => rosterItem(participant, index)),
     otherDescription,
@@ -237,8 +248,8 @@ function presentDetail(detail: ActivityDetail): ActivityDetailView {
     childName: resolveChildName(detail, child),
     childInitial: resolveChildName(detail, child).slice(0, 1),
     childStatusLabel,
-    matchEvents: toMatchEvents(detail.matchEvents),
-    hasMatchEvents: toMatchEvents(detail.matchEvents).length > 0,
+    matchEvents,
+    hasMatchEvents: matchEvents.length > 0,
     matchResultLabel: matchResultLabel(rawScore, status.label),
     matchNote: showMatchComment ? explicitComment || "教练尚未点评" : "",
     hasMatchNote: showMatchComment,
@@ -271,7 +282,7 @@ function resolveChildName(detail: ActivityDetail, child: ActivityDetail["partici
   const participantName = child?.name?.trim();
   if (participantName && participantName !== "学员" && participantName !== "孩子") return participantName;
   const eventName = detail.matchEvents?.find((event) => event.studentId === child?.studentId)?.studentName?.trim();
-  return eventName || participantName || "孩子待同步";
+  return eventName || participantName || "请选择孩子";
 }
 
 function matchEventIcon(type: NonNullable<ActivityDetail["matchEvents"]>[number]["type"]) {
@@ -312,11 +323,6 @@ function matchEventTone(type: NonNullable<ActivityDetail["matchEvents"]>[number]
   return "neutral";
 }
 
-function displayValue(value: string, fallback: string) {
-  const trimmed = value.trim();
-  return trimmed && trimmed !== "待确认" && trimmed !== "待同步" ? trimmed : fallback;
-}
-
 function rosterItem(participant: ActivityDetail["participants"][number], index: number): RosterItem {
   const statusLabel = participantStatusLabel(participant.status);
   return {
@@ -344,6 +350,7 @@ function presentLeave(detail: ActivityDetail, eventId: string, studentId: string
   const onLeave = ["leave_requested", "excused"].includes(String(participantStatus ?? "").toLowerCase());
   return {
     visible: true,
+    available: true,
     eventId,
     studentId,
     studentName: studentName || "孩子",
@@ -361,22 +368,6 @@ function presentLeave(detail: ActivityDetail, eventId: string, studentId: string
     submitting: false,
     message: "",
   };
-}
-
-function collectAbilityChips(detail: ActivityDetail) {
-  const value = sectionValue(detail, ["本次训练"], ["关联能力"]);
-  const chips = value.split(/[、，,；;]/).map((item) => item.trim()).filter(Boolean);
-  return chips.length ? chips.slice(0, 4) : ["能力数据待同步"];
-}
-
-function parseDateTimeParts(value: string) {
-  // 形如 "7月4日 08:30 · 08:30~10:00"，拆出日期/开始时间/时间段
-  const [left = "", right = ""] = value.split(" · ");
-  const date = left.match(/\d{1,2}月\d{1,2}日/)?.[0] ?? value.match(/\d{1,2}月\d{1,2}日/)?.[0] ?? "";
-  const start = left.match(/\d{1,2}:\d{2}/)?.[0] ?? right.match(/\d{1,2}:\d{2}/)?.[0] ?? "";
-  const rangeMatch = right.match(/(\d{1,2}:\d{2})\s*[-–~]\s*(\d{1,2}:\d{2})/) ?? left.match(/(\d{1,2}:\d{2})\s*[-–~]\s*(\d{1,2}:\d{2})/);
-  const range = rangeMatch ? `${rangeMatch[1]}-${rangeMatch[2]}` : "";
-  return { date, start, range };
 }
 
 function readableError(error: unknown) {

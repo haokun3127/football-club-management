@@ -22,6 +22,8 @@ vi.mock("../../../utils/presentation", () => ({
   activityStatus: (status) => ({ label: status === "scheduled" ? "待开始" : status, tone: "brand" }),
   activityTypeLabel: (type) => type === "training" ? "训练" : type === "match" ? "比赛" : "活动",
   formatDateTime: (value) => String(value),
+  formatCalendarDate: (value) => value ? "10月22日 周四" : "日期待确认",
+  formatTimeRange: () => "09:00–10:30",
   resolveMenuActionTop: () => 24,
   resolveMenuInset: () => 16,
   resolveNavInset: () => 20,
@@ -61,7 +63,10 @@ function detail(overrides = {}) {
     type: "training",
     title: "真实训练",
     status: "scheduled",
-    participants: [],
+    participants: [{ studentId: "student-1", name: "小天", status: "invited" }],
+    presentation: { startsAt: "2026-10-22T09:00:00+08:00", endsAt: "2026-10-22T10:30:00+08:00", training: { state: "unavailable", summary: "", abilityTags: [] } },
+    match: null,
+    other: null,
     fields: [],
     sections: [],
     pending: [],
@@ -83,7 +88,7 @@ describe("parent activity detail", () => {
   it.each(["scheduled", "in_progress", "cancelled"])("hides post-match comments for %s matches", async (status) => {
     mocks.getParentActivityDetail.mockResolvedValueOnce(detail({
       type: "match", status,
-      fields: [{ label: "教练点评", value: "积极拼抢" }],
+      match: { comment: "积极拼抢" },
       sections: [{ title: "比赛过程", items: [{ label: "孩子表现", value: "已点评" }] }],
     }));
     const page = createPageInstance();
@@ -104,7 +109,7 @@ describe("parent activity detail", () => {
   it("preserves an explicit completed match comment", async () => {
     mocks.getParentActivityDetail.mockResolvedValueOnce(detail({
       type: "match", status: "completed",
-      fields: [{ label: "教练点评", value: "  积极拼抢，传球及时。  " }],
+      match: { comment: "  积极拼抢，传球及时。  " },
     }));
     const page = createPageInstance();
     await page.load("match-event");
@@ -355,5 +360,89 @@ describe("parent training leave flow (F-01)", () => {
     expect(page.data.leave).toMatchObject({ cancelled: true, statusLabel: "课程已取消", resultLabel: "取消课不销课" });
     expect(mocks.requestTrainingLeave).not.toHaveBeenCalled();
     expect(template).toContain("课程已取消，本课不销课，无需请假");
+  });
+});
+
+
+describe("typed activity facts and explicit child context", () => {
+  const siblings = [
+    { studentId: "student-1", name: "大宝", status: "confirmed" },
+    { studentId: "student-2", name: "小宝", status: "leave_requested" },
+  ];
+  it("uses typed facts regardless of translated display labels", async () => {
+    mocks.getParentActivityDetail.mockResolvedValue(detail({
+      presentation: { startsAt: "2026-10-22T09:00:00+08:00", teamName: "U10", venueName: "足球公园", coachName: "王教练", training: { state: "planned", summary: "射门、带球", abilityTags: ["技术"] } },
+      fields: [{ label: "地点", value: "错误的展示标签值" }],
+      sections: [{ title: "本次训练", items: [{ label: "训练内容", value: "过期文案" }] }],
+    }));
+    const page = createPageInstance();
+    await page.load("event-1");
+    expect(page.data.detail).toMatchObject({ venueText: "足球公园", coachName: "王教练", trainingSummary: "射门、带球", abilityChips: ["技术"] });
+    expect(page.data.detail.trainingDateText).toContain("10月22日");
+  });
+  it("requires a child choice for siblings without a valid saved preference", async () => {
+    mocks.getParentActivityDetail.mockResolvedValue(detail({ participants: siblings }));
+    const page = createPageInstance();
+    await page.load("event-1");
+    expect(page.data.selectedStudentId).toBe("");
+    expect(page.data.leave).toBeNull();
+    expect(mocks.getTrainingRecords).not.toHaveBeenCalled();
+    await page.selectChild({ detail: { studentId: "student-2" } });
+    expect(page.data.detail.childName).toBe("小宝");
+    expect(page.data.leave.studentId).toBe("student-2");
+  });
+  it("rejects an explicit unrelated child instead of silently picking the first", async () => {
+    mocks.getParentActivityDetail.mockResolvedValue(detail({ participants: siblings }));
+    const page = createPageInstance();
+    await page.load("event-1", "foreign-child");
+    expect(page.data.state).toBe("error");
+    expect(page.data.detail).toBeNull();
+    expect(mocks.getTrainingRecords).not.toHaveBeenCalled();
+  });
+  it("keeps the selected child's own match events separate", async () => {
+    mocks.requireRole.mockReturnValue({ role: "parent", currentStudentId: "student-2" });
+    mocks.getParentActivityDetail.mockResolvedValue(detail({ type: "match", participants: siblings, matchEvents: [
+      { id: "first", type: "goal", studentId: "student-1" },
+      { id: "second", type: "save", studentId: "student-2" },
+    ] }));
+    const page = createPageInstance();
+    await page.load("event-1");
+    expect(page.data.detail.childName).toBe("小宝");
+    expect(page.data.detail.matchEvents.map(item => item.id)).toEqual(["second"]);
+  });
+  it("retains event facts but blocks writes when training records fail to load", async () => {
+    mocks.getParentActivityDetail.mockResolvedValue(detail());
+    mocks.getTrainingRecords.mockRejectedValue(new Error("offline"));
+    const page = createPageInstance();
+    await page.load("event-1");
+    await page.submitLeave();
+    expect(page.data.state).toBe("ready");
+    expect(page.data.leave.available).toBe(false);
+    expect(page.data.leave.resultLabel).toBe("计次记录暂不可用");
+    expect(mocks.requestTrainingLeave).not.toHaveBeenCalled();
+  });
+  it("ignores an earlier detail response after another child is selected", async () => {
+    let resolveEarlier;
+    mocks.getParentActivityDetail.mockImplementationOnce(() => new Promise(resolve => { resolveEarlier = resolve; }))
+      .mockResolvedValueOnce(detail({ participants: siblings }));
+    const page = createPageInstance();
+    const earlier = page.load("event-1", "student-1");
+    await page.load("event-1", "student-2");
+    resolveEarlier(detail({ participants: siblings }));
+    await earlier;
+    expect(page.data.detail.childName).toBe("小宝");
+    expect(page.data.leave.studentId).toBe("student-2");
+  });
+  it("does not update a page after unloading during a record read", async () => {
+    let resolveRecords;
+    mocks.getParentActivityDetail.mockResolvedValue(detail());
+    mocks.getTrainingRecords.mockImplementation(() => new Promise(resolve => { resolveRecords = resolve; }));
+    const page = createPageInstance();
+    const pending = page.load("event-1");
+    await Promise.resolve();
+    page.onUnload();
+    resolveRecords({ records: [] });
+    await pending;
+    expect(page.data.detail).toBeNull();
   });
 });

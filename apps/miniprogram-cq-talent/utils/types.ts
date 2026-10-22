@@ -135,7 +135,23 @@ export interface CoachWeekStats {
   attendanceRate: number | null;
 }
 
+export interface ActivityPresentation {
+  startsAt: string;
+  endsAt?: string;
+  teamName?: string;
+  venueName?: string;
+  coachName?: string;
+  training: null | {
+    state: "planned" | "not_arranged" | "unavailable";
+    summary: string;
+    abilityTags: string[];
+  };
+}
+
 export interface ActivityDetail {
+  presentation: ActivityPresentation;
+  match: null | { opponentName?: string; homeScore?: number; awayScore?: number; comment?: string };
+  other: null | { description?: string; notice?: string };
   id: string;
   type: "training" | "match" | "other";
   title: string;

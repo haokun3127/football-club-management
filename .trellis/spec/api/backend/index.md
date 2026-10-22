@@ -58,3 +58,5 @@ The goal is to help AI assistants and new team members understand how YOUR proje
 - [Backoffice Integration](./backoffice-integration.md): versioned configuration, typed encrypted imports, snapshot BI, services/content and workbench.
 
 - [Public Presentation and Confirmed Child Results](./public-presentation-results.md): native configuration, scoped preferences and guardian-only raw/mapped confirmation readback.
+
+- [Event Presentation and Child Context](./event-presentation.md): authorized shared course facts, typed client projection and explicit child selection.

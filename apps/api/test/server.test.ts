@@ -430,6 +430,10 @@ describe("api server", () => {
     expect(parentEvent.statusCode).toBe(200);
     expect(eventBody).toEqual(expect.objectContaining({
       role: "parent",
+      presentation: expect.objectContaining({
+        team: expect.objectContaining({ name: "U10发展队" }),
+        training: expect.objectContaining({ state: expect.stringMatching(/^(planned|not_arranged|unavailable)$/) }),
+      }),
       event: expect.objectContaining({
         id: "event-training-1",
         participants: expect.arrayContaining([expect.objectContaining({ studentId: "student-1" })]),

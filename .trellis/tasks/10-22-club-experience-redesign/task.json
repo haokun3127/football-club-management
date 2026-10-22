@@ -1,0 +1,36 @@
+{
+  "id": "club-experience-redesign",
+  "name": "club-experience-redesign",
+  "title": "全产品体验提升：俱乐部对标、功能分布与流程统一",
+  "description": "已批准全产品体验提升；B0跨端事实已实现验证，按子任务继续教练课堂、测评、友谊赛、家长端与后台。",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": "miniprogram, api, domain, backoffice",
+  "package": "api",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-10-22",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "feature/ui-batch-1-p01",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [
+    "10-22-experience-b0-event-facts"
+  ],
+  "parent": null,
+  "relatedFiles": [
+    "prd.md",
+    "design.md",
+    "implement.md",
+    "review.md",
+    "research/benchmark.md",
+    "research/current-audit.md",
+    "research/route-map.md"
+  ],
+  "notes": "2026-10-22 用户批准完整方案实施；先B0跨端事实、B1课堂主流程再逐批推进。实际批次用子任务独立验证，父任务负责集成验收；无需重新审批已定范围。",
+  "meta": {}
+}

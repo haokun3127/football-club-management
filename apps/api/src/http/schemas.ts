@@ -1,3 +1,5 @@
+import { eventPresentationSchema } from "./event-presentation-schema.js";
+
 const auditFields = {
   createdAt: { type: "string" },
   updatedAt: { type: "string" },
@@ -945,14 +947,14 @@ export const schemas = {
   },
   appClientEventDetail: {
     response: {
-      200: flexibleObject,
+      200: { ...flexibleObject, required: ["presentation"], properties: { presentation: eventPresentationSchema } },
       403: errorResponse,
       404: errorResponse,
     },
   },
   appClientCoachEventWorkbench: {
     response: {
-      200: flexibleObject,
+      200: { ...flexibleObject, required: ["presentation"], properties: { presentation: eventPresentationSchema } },
       403: errorResponse,
       404: errorResponse,
     },

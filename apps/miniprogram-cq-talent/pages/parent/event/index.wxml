@@ -9,6 +9,9 @@
   <view class="p2-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '正在读取活动' : '暂时无法查看'}}" message="{{message}}" action-text="{{state === 'error' ? '重新加载' : ''}}" bindaction="retry" />
 
+    <student-switcher wx:if="{{state === 'ready' && children.length > 1}}" students="{{children}}" selected-id="{{selectedStudentId}}" show-all="{{false}}" bindchange="selectChild" />
+    <view wx:if="{{state === 'ready' && children.length > 1 && !selectedStudentId}}" class="leave-card__hint">请选择本次要查看的孩子，再进行请假或查看个人记录。</view>
+
     <block wx:if="{{detail && detail.type === 'training'}}">
       <view class="training-hero">
         <view class="training-hero__head"><view class="training-hero__type">训练</view><view class="training-hero__coach"><image src="/assets/icons/user-white.svg" mode="aspectFit" />{{detail.coachName}}</view></view>
@@ -30,9 +33,10 @@
         <view wx:if="{{leave.cancelled}}" class="leave-card__hint">课程已取消，本课不销课，无需请假。</view>
         <view wx:elif="{{leave.onLeave}}" class="leave-card__hint">请假已生效，本课不销课；如孩子实际参加，可撤销改回销课。</view>
         <view wx:else class="leave-card__hint">提交请假后立即生效、无需审批，本课不销课。</view>
-        <view wx:if="{{!leave.cancelled && !leave.onLeave}}" class="leave-card__action {{leave.submitting ? 'leave-card__action--disabled' : ''}}" bindtap="submitLeave">{{leave.submitting ? '提交中…' : '提交请假'}}</view>
-        <view wx:if="{{!leave.cancelled && leave.onLeave}}" class="leave-card__action leave-card__action--revoke {{leave.submitting ? 'leave-card__action--disabled' : ''}}" bindtap="revokeLeave">{{leave.submitting ? '提交中…' : '撤销请假，改回销课'}}</view>
+        <view wx:if="{{leave.available && !leave.cancelled && !leave.onLeave}}" class="leave-card__action {{leave.submitting ? 'leave-card__action--disabled' : ''}}" bindtap="submitLeave">{{leave.submitting ? '提交中…' : '提交请假'}}</view>
+        <view wx:if="{{leave.available && !leave.cancelled && leave.onLeave}}" class="leave-card__action leave-card__action--revoke {{leave.submitting ? 'leave-card__action--disabled' : ''}}" bindtap="revokeLeave">{{leave.submitting ? '提交中…' : '撤销请假，改回销课'}}</view>
         <view wx:if="{{leave.message}}" class="leave-card__message">{{leave.message}}</view>
+        <view wx:if="{{!leave.available}}" class="leave-card__action" bindtap="retry">重新加载计次记录</view>
       </view>
     </block>
 

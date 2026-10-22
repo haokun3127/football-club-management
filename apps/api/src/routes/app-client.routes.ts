@@ -1,3 +1,4 @@
+import { presentEvent } from "../application/event-presentation.js";
 import {radarComparison,RadarSourceError} from "../application/radar-comparison.js";
 import {radarComparisonSchema} from "../http/radar-comparison-schemas.js";
 import {automaticRoleScope,chooseAutomaticRole} from "../auth/auto-active-role.js";
@@ -1429,7 +1430,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         clubId: request.params.clubId,
         client: summarizeClient(client),
         studentId: request.params.studentId,
-        events: await withVenueNames(context, request.params.clubId, events),
+        events: await withEventDisplayNames(context, request.params.clubId, events),
       };
     },
   );
@@ -1605,7 +1606,8 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         clubId: request.params.clubId,
         client: summarizeClient(client),
         role: "coach",
-        event: (await withVenueNames(context, request.params.clubId, [event]))[0] ?? event,
+        presentation: await presentEvent(context.store, event, contentSummary),
+        event: (await withEventDisplayNames(context, request.params.clubId, [event]))[0] ?? event,
         trainingContentRevision: revisionEvent ? trainingContentRevision(revisionEvent, revisionSession, revisionSession?.sessionPlanId ? context.store.getSessionPlan(revisionSession.sessionPlanId) : null) : null,
         trainingRecords: event.type === "training" ? (event.participants ?? []).flatMap(participant => {
           const record = reconcileTrainingRecord(context.store.trainingRecords, event, { ...participant, clubId: event.clubId, eventId: event.id });
@@ -1835,20 +1837,25 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         visibleEvent = { ...event, participants: visibleParticipants };
       }
 
-      // 事件只存 primaryTeamId，详情展示需要队名——按 teams 表实时解析（真实数据）
-      const primaryTeamName = visibleEvent.primaryTeamId
-        ? context.store.listTeams(request.params.clubId).find((team) => team.id === visibleEvent.primaryTeamId)?.name
-        : undefined;
-      const enrichedEvent = !visibleEvent.teamName && primaryTeamName
-        ? { ...visibleEvent, teamName: primaryTeamName }
-        : visibleEvent;
-
+      if (role === "coach" && !await requireCoachEventAccess(context, request, reply, request.params.clubId, event.id)) {
+        return reply;
+      }
+      const presentation = await presentEvent(context.store, event);
+      const students = await context.store.listOperationalStudents(request.params.clubId);
+      const studentNames = new Map(students.map(student => [student.id, student.name]));
+      const enrichedEvent = {
+        ...visibleEvent,
+        teamName: presentation.team?.name,
+        venue: presentation.venue?.name,
+        participants: (visibleEvent.participants ?? []).map(participant => ({
+          ...participant,
+          studentName: studentNames.get(participant.studentId),
+        })),
+      };
       const matchDetail = event.type === "match"
         ? await context.store.getMatchDetailByEvent(request.params.clubId, request.params.eventId)
         : null;
-      const visibleStudentIds = new Set((visibleEvent.participants ?? []).map((participant) => participant.studentId));
-      const students = event.type === "match" ? await context.store.listOperationalStudents(request.params.clubId) : [];
-      const studentNames = new Map(students.map((student) => [student.id, student.name]));
+      const visibleStudentIds = new Set((visibleEvent.participants ?? []).map(participant => participant.studentId));
       const matchEvents = (matchDetail?.events ?? [])
         .filter((matchEvent) => role !== "parent" || visibleStudentIds.has(matchEvent.studentId))
         .map((matchEvent) => ({ ...matchEvent, studentName: studentNames.get(matchEvent.studentId) }));
@@ -1858,6 +1865,8 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         client: summarizeClient(client),
         role,
         event: enrichedEvent,
+        presentation,
+        training: presentation.training,
         match: matchDetail?.match ?? null,
         matchEvents,
       };
@@ -1940,7 +1949,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         client: summarizeClient(client),
         role: "parent",
         children: children.map(summarizeStudent),
-        events: await withVenueNames(context, request.params.clubId, sortEvents([...eventsById.values()])),
+        events: await withEventDisplayNames(context, request.params.clubId, sortEvents([...eventsById.values()])),
       };
     },
   );
@@ -2233,7 +2242,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
           coachId,
           coachName: coachProfile?.name ?? null,
           teams: teamNames,
-          events: await withVenueNames(context, request.params.clubId, events),
+          events: await withEventDisplayNames(context, request.params.clubId, events),
           tasks,
           summary: {
             total: events.length,
@@ -2303,7 +2312,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         ? context.store.listTeams(request.params.clubId)
           .find((candidate) => candidate.id === team.id)?.defaultCoachId
         : undefined;
-      const formalMatches = (await withVenueNames(context, request.params.clubId, (context.store.listCalendarEvents(request.params.clubId) as AppEventDetail[])
+      const formalMatches = (await withEventDisplayNames(context, request.params.clubId, (context.store.listCalendarEvents(request.params.clubId) as AppEventDetail[])
         .filter(event => event.type === "match" && event.primaryTeamId === team?.id && team !== null)))
         .filter(event => { const match = event.match as { matchType?: string } | null; return match && ["league", "cup"].includes(match.matchType || ""); })
         .map(event => ({ eventId: event.id, title: event.title, startsAt: event.timeRange.startsAt, venue: event.venue ?? null, match: event.match }))
@@ -3538,17 +3547,19 @@ function sortEvents(events: unknown[]): AppEventDetail[] {
     .sort((left, right) => Date.parse(left.timeRange.startsAt) - Date.parse(right.timeRange.startsAt));
 }
 
-async function withVenueNames(
+async function withEventDisplayNames(
   context: RouteContext,
   clubId: string,
   events: AppEventDetail[],
 ): Promise<Array<AppEventDetail & { venue?: string }>> {
   const venues = await context.store.listVenues(clubId);
   const venueNameById = new Map(venues.map((venue) => [venue.id, venue.name]));
+  const teamNameById = new Map(context.store.listTeams(clubId).map(team => [team.id, team.name]));
   return events.map((event) => {
     const locationId = typeof event.locationId === "string" ? event.locationId : "";
     const venue = venueNameById.get(locationId);
-    return venue ? { ...event, venue } : event;
+    const teamName = event.primaryTeamId ? teamNameById.get(event.primaryTeamId) : undefined;
+    return { ...event, ...(venue ? { venue } : {}), ...(teamName ? { teamName } : {}) };
   });
 }
 
@@ -3614,7 +3625,7 @@ async function buildStudentGrowthTimeline(
   studentId: string,
   metricCatalog: Awaited<ReturnType<RouteContext["store"]["listAbilityMetrics"]>>,
 ): Promise<GrowthTimelineItem[]> {
-  const events = (await withVenueNames(
+  const events = (await withEventDisplayNames(
     context,
     clubId,
     sortEvents(await context.store.getStudentTimeline(clubId, studentId))

@@ -573,3 +573,34 @@ describe("published score display transport", () => {
     } finally { wx.request = original; }
   });
 });
+
+
+describe("event presentation transport", () => {
+  it("normalizes typed facts and keeps a real zero score without depending on labels", async () => {
+    const original = wx.request;
+    wx.request = ({ success }) => success({ statusCode: 200, data: {
+      event: { id: "training", type: "training", title: "本次训练", participants: [{ studentId: "child", studentName: "小宝", status: "confirmed" }] },
+      presentation: {
+        startsAt: "2026-10-22T09:00:00+08:00", endsAt: "2026-10-22T10:30:00+08:00",
+        team: { id: "team", name: "U10" }, venue: { id: "venue", name: "足球公园" }, coach: { id: "coach", name: "王教练" },
+        training: { state: "planned", summary: "射门、带球", abilityTags: ["技术"] },
+      },
+    } });
+    try {
+      const result = await getParentActivityDetail("training");
+      expect(result.presentation).toMatchObject({ teamName: "U10", venueName: "足球公园", coachName: "王教练", training: { state: "planned", summary: "射门、带球", abilityTags: ["技术"] } });
+      expect(result.participants[0]).toMatchObject({ studentId: "child", name: "小宝" });
+      wx.request = ({ success }) => success({ statusCode: 200, data: { event: { id: "match", type: "match" }, match: { homeScore: 0, awayScore: 1 } } });
+      expect((await getParentActivityDetail("match")).match).toMatchObject({ homeScore: 0, awayScore: 1 });
+    } finally { wx.request = original; }
+  });
+  it("keeps legacy responses readable but does not describe unavailable content as unarranged", async () => {
+    const original = wx.request;
+    wx.request = ({ success }) => success({ statusCode: 200, data: { event: { id: "legacy", type: "training", venue: "既有场地", teamName: "既有球队", timeRange: { startsAt: "2026-10-22T09:00:00+08:00" } } } });
+    try {
+      const result = await getParentActivityDetail("legacy");
+      expect(result.presentation).toMatchObject({ venueName: "既有场地", teamName: "既有球队", training: { state: "unavailable", summary: "" } });
+      expect(JSON.stringify(result.sections)).not.toContain("教练尚未补充");
+    } finally { wx.request = original; }
+  });
+});
