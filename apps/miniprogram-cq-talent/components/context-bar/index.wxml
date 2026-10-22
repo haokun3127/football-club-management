@@ -1,0 +1,1 @@
+<view class="context-bar"><view class="context-bar__body"><view class="context-bar__title">{{title}}</view><view wx:if="{{subtitle}}" class="context-bar__subtitle">{{subtitle}}</view></view><t-button wx:if="{{actionText}}" theme="primary" variant="text" bindtap="handleAction">{{actionText}}</t-button></view>

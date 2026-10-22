@@ -6,6 +6,7 @@
     "status-view": "/components/status-view/index",
     "role-tabbar": "/components/role-tabbar/index",
     "t-button": "tdesign-miniprogram/button/button",
-    "t-input": "tdesign-miniprogram/input/input"
+    "t-input": "tdesign-miniprogram/input/input",
+    "submit-bar": "/components/submit-bar/index"
   }
 }

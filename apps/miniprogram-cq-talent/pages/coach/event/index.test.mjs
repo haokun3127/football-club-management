@@ -142,8 +142,8 @@ describe("coach activity workbench", () => {
       hasRoster: true,
       rosterCount: 2,
       rosterRows: [
-        { studentId: "student-1", name: "Athlete One", statusLabel: "未到" },
-        { studentId: "student-2", name: "Athlete Two", statusLabel: "未到" },
+        { studentId: "student-1", name: "Athlete One", statusLabel: "待生成" },
+        { studentId: "student-2", name: "Athlete Two", statusLabel: "待生成" },
       ],
       hasWorkflow: false,
       hasTraining: true,
@@ -161,20 +161,19 @@ describe("coach activity workbench", () => {
     expect(page.data).toMatchObject({ attendancePresent: 0, attendanceTotal: 2, joinedNames: "" });
   });
 
-  it("uses the shared fact instead of participant status, only mutates the tapped student, and waits for success", async () => {
+  it("routes training roster actions to explicit corrections without mutating facts", async () => {
     const record = { studentId: "student-1", eventId: "event-training-1", revision: 2, counted: false };
-    mocks.getCoachWorkbench.mockResolvedValue({ ...trainingWorkbench, trainingRecords: [record], roster: [{ studentId: "student-1", name: "甲", status: "present" }, { studentId: "student-2", name: "乙", status: "confirmed" }] });
+    mocks.getCoachWorkbench.mockResolvedValue({ ...trainingWorkbench, trainingRecords: [record] });
     const page = createPageInstance(); await page.load("event-training-1");
-    expect(page.data.rosterRows[0].present).toBe(false);
-    let resolve; mocks.correctTrainingRecord.mockImplementationOnce(() => new Promise(r => { resolve = r; }));
-    const saving = page.toggleAttendance({ currentTarget: { dataset: { index: "0" } } });
-    expect(page.data.rosterRows[0].present).toBe(false);
-    resolve({ record: { ...record, revision: 3, counted: true } }); await saving;
-    expect(mocks.correctTrainingRecord).toHaveBeenLastCalledWith("student-1", "event-training-1", { expectedRevision: 2, counted: true, reason: "教练快捷更正为已出勤" });
+    await page.toggleAttendance({ currentTarget: { dataset: { index: "0" } } });
+    expect(mocks.openPage).toHaveBeenLastCalledWith("/pages/coach/lesson/index?id=event-training-1&studentId=student-1");
+    expect(mocks.correctTrainingRecord).not.toHaveBeenCalled();
     expect(mocks.saveCoachAttendance).not.toHaveBeenCalled();
-    expect(page.data.rosterRows.map(row => row.present)).toEqual([true, false]);
+    expect(page.data.rosterRows[0].record).toEqual(record);
+    expect(page.data.exceptionRows.map(row => row.studentId)).toEqual(["student-1"]);
+    expect(page.data.pendingRecordCount).toBe(1);
   });
-  it("keeps a pending course-task read alive while saving one training fact", async () => {
+  it("keeps a pending course-task read alive while opening a record", async () => {
     let resolveTasks;
     mocks.getCoachAssessmentTasks.mockImplementationOnce(() => new Promise(resolve => { resolveTasks = resolve; }));
     mocks.getCoachWorkbench.mockResolvedValue(trainingWorkbench);
@@ -186,16 +185,11 @@ describe("coach activity workbench", () => {
     expect(page.data.courseTasks.map(task => task.id)).toEqual(["t1"]);
     expect(page.data.courseTaskMessage).toBe("");
   });
-  it("blocks blind retries after a conflict or unknown result and refreshes the server fact", async () => {
-    mocks.getCoachWorkbench.mockResolvedValue(trainingWorkbench);
+  it("does not navigate to records outside the authorized roster", async () => {
     const page = createPageInstance(); await page.load("event-training-1");
-    mocks.correctTrainingRecord.mockReset().mockRejectedValueOnce({ code: "training_record_conflict" });
-    await page.toggleAttendance({ currentTarget: { dataset: { index: "0" } } });
-    expect(page.data.attendanceNeedsRefresh).toBe(true);
-    expect(page.data.attendancePresent).toBe(0);
-    await page.toggleAttendance({ currentTarget: { dataset: { index: "0" } } });
-    expect(mocks.correctTrainingRecord).toHaveBeenCalledTimes(1);
-    await page.load("event-training-1"); expect(page.data.attendanceNeedsRefresh).toBe(false);
+    page.openRecord({ currentTarget: { dataset: { id: "other-child" } } });
+    expect(mocks.openPage).not.toHaveBeenCalled();
+    expect(mocks.correctTrainingRecord).not.toHaveBeenCalled();
   });
   it("does not enable training writes against an older BFF without shared records", async () => {
     mocks.getCoachWorkbench.mockResolvedValue({ ...trainingWorkbench, trainingRecords: undefined, canEditTraining: undefined });
@@ -336,7 +330,7 @@ describe("coach activity workbench", () => {
   });
 
   it("uses precomputed template fields and C2 in-progress affordances without unsafe WXML expressions", () => {
-    expect(template).toContain('wx:if="{{hasRoster}}"');
+    expect(template).toContain('wx:if="{{hasRoster && !isTraining}}"');
     expect(template).toContain('wx:if="{{hasActionCards && !isTraining}}"');
     expect(template).toContain('bindtap="openAction"');
     expect(template).not.toContain('bindtap="finishEvent"');
@@ -347,11 +341,12 @@ describe("coach activity workbench", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 
-  it("uses approved C03 compact course information and a fixed change action", () => {
+  it("makes classroom execution the primary action and course changes secondary", () => {
     expect(template).toContain('class="course-info workbench-card"');
     expect(template).toContain("{{eventView.title}}");
     expect(template).toContain("{{eventView.timeLabel}}");
-    expect(template).toContain("变更本次训练");
+    expect(template).toContain("变更课程");
+    expect(template).toContain('bindsubmit="primaryAction"');
     expect(template).toContain('bindtap="openCourseTask"');
     expect(stylesheet).toContain('background:var(--club-page)');
   });
@@ -397,22 +392,9 @@ describe("coach activity workbench", () => {
     expect(template.indexOf('class="training-card__summary"')).toBeLessThan(template.indexOf('class="action-grid"'));
   });
 
-  it("matches the live Figma C2 top navigation geometry", () => {
-    expect(template).toContain('class="c2-nav__back" src="/assets/icons/chevron-left.svg"');
-    expect(template).toContain('style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"');
-    expect(stylesheet).toMatch(/\.c2-nav__left\s*\{[^}]*gap:\s*0/s);
-    expect(stylesheet).toMatch(/\.c2-nav__back\s*\{[^}]*width:\s*48rpx[^}]*height:\s*48rpx/s);
-    expect(stylesheet).toMatch(/\.c2-nav__title\s*\{[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)[^}]*line-height:\s*1\.5/s);
-    expect(stylesheet).not.toContain(".c2-nav__finish");
-    expect(stylesheet).not.toContain(".progress-row");
-    expect(stylesheet).toMatch(/\.c2-nav\s*\{(?=[^}]*height:\s*44px)(?=[^}]*box-sizing:\s*content-box)/s);
-  });
 
-  it("keeps the live Figma C2 course-context label on the right side of the top navigation", () => {
-    expect(template).toContain('class="c2-nav__today"');
-    expect(template).toContain('>本次课程</view>');
-    expect(stylesheet).toMatch(/\.c2-nav__today\s*\{[^}]*color:\s*#a80f1b[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)/s);
-  });
+
+
 
   it("sends the loaded status snapshot as previousStatus on inline attendance saves for non-training events", async () => {
     mocks.getCoachWorkbench.mockResolvedValue({

@@ -1,19 +1,31 @@
 <view class="team-workspace">
   <app-header title="{{section === 'training' ? '训练安排' : '球队'}}" show-back="{{section === 'training'}}" />
   <view class="workspace-body">
-    <view class="team-context" wx:if="{{teamId}}"><view><view class="team-context__name">{{teamName}}</view><view class="team-context__season">{{season}}</view></view><t-button theme="primary" variant="text" bindtap="chooseTeam" custom-style="min-height:44px;font-size:14px;">切换球队</t-button></view>
+    <context-bar wx:if="{{teamId}}" title="{{teamName}}" subtitle="{{season}}" action-text="切换球队" bindaction="chooseTeam" />
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'empty' ? '选择球队' : '球队'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <t-button wx:if="{{state === 'empty'}}" theme="primary" bindtap="chooseTeam" block custom-style="min-height:48px;">选择球队</t-button>
     <block wx:if="{{state === 'ready'}}">
       <block wx:if="{{section === 'workspace'}}">
+        <view class="section-heading">接下来两周</view>
+        <view wx:if="{{overviewLoading}}" class="workspace-notice">正在读取课程与待办…</view>
+        <view wx:elif="{{courseError}}" class="workspace-notice">{{courseError}}<t-button variant="text" bindtap="retry">重试</t-button></view>
+        <t-cell-group wx:elif="{{upcomingCards.length}}" theme="card"><t-cell wx:for="{{upcomingCards}}" wx:key="id" title="{{item.title}}" description="{{item.timeLabel}}" note="{{item.venue || '场地待安排'}}" arrow data-id="{{item.id}}" bindtap="openTrainingEvent" hover /></t-cell-group>
+        <view wx:else class="workspace-notice">未来两周暂无训练安排</view>
+        <view class="section-heading">待完成测评 <text wx:if="{{!overviewLoading && !taskError}}">· {{pendingTasks.length}}</text></view>
+        <view wx:if="{{taskError}}" class="workspace-notice">{{taskError}}<t-button variant="text" bindtap="retry">重试</t-button></view>
+        <t-cell-group wx:elif="{{!overviewLoading && pendingTasks.length}}" theme="card"><t-cell wx:for="{{pendingTasks}}" wx:key="id" wx:if="{{index < 2}}" title="{{item.title}}" description="{{item.completedStudents}} / {{item.totalStudents}} 人完成 · 截止 {{item.dueOn}}" arrow data-id="{{item.id}}" bindtap="openTask" hover /></t-cell-group>
+        <view wx:elif="{{!overviewLoading}}" class="workspace-notice">暂无未完成测评</view>
+        <view class="section-heading">球队管理</view>
         <t-cell-group theme="card"><t-cell wx:for="{{entries}}" wx:key="id" title="{{item.name}}" note="{{item.note}}" arrow data-id="{{item.id}}" bindtap="openEntry" hover /></t-cell-group>
         <view class="secondary-title">球队支持</view>
         <t-cell-group theme="card"><t-cell title="教练组" arrow data-id="coaches" bindtap="openEntry" hover /><t-cell title="俱乐部球探库" arrow bindtap="openScouts" hover /></t-cell-group>
       </block>
       <block wx:else>
+        <view wx:if="{{overviewLoading}}" class="workspace-notice">正在读取课程…</view>
+        <view wx:elif="{{courseError}}" class="workspace-notice">{{courseError}}<t-button variant="text" bindtap="retry">重试</t-button></view>
         <view class="section-caption">本月已排课程 · {{trainingCards.length}}节</view>
         <t-cell-group theme="card" wx:if="{{trainingCards.length}}"><t-cell wx:for="{{trainingCards}}" wx:key="id" title="{{item.title}}" description="{{item.timeLabel}}" note="{{item.venue}}" arrow data-id="{{item.id}}" bindtap="openTrainingEvent" hover /></t-cell-group>
-        <view wx:else class="workspace-empty">本队本月暂无训练安排</view>
+        <view wx:elif="{{!overviewLoading && !courseError}}" class="workspace-empty">本队本月暂无训练安排</view>
       </block>
     </block>
   </view>

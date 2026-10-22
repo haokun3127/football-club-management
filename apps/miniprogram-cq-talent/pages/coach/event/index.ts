@@ -1,4 +1,4 @@
-import { correctTrainingRecord, type TrainingRecord } from "../../../utils/training-records";
+import { type TrainingRecord } from "../../../utils/training-records";
 import { attendanceLeaveConflictMessage, getCoachAssessmentTasks, getTrainingTemplates, saveTrainingTemplate, previewTrainingTransfer, applyTrainingTransfer, getCoachWorkbench, isAttendanceLeaveConflictError, resolveAttendanceLeaveConflicts, saveCoachAttendance } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
@@ -49,6 +49,8 @@ Page({
     eventView: null as EventView | null,
     rosterRows: [] as RosterRow[],
     rosterCount: 0,
+    exceptionRows: [] as RosterRow[],
+    pendingRecordCount: 0,
     workflowRows: [] as CoachWorkbench["workflow"],
     trainingRows: [] as CoachWorkbench["training"],
     matchRows: [] as CoachWorkbench["match"],
@@ -180,6 +182,8 @@ Page({
         trainingContentSummary,
         ...contentSummaryView(workbench.contentSummary??null,false),
         rosterRows,
+        exceptionRows: isTraining ? rosterRows.filter(row => row.record?.counted === false || row.status === "leave_requested") : [],
+        pendingRecordCount: isTraining ? rosterRows.filter(row => !row.record).length : 0,
         rosterCount: rosterRows.length,
         workflowRows,
         trainingRows,
@@ -192,7 +196,7 @@ Page({
         canManageRoster:canWrite&&workbench.canManageRoster===true,
         hasRoster: rosterRows.length > 0,
         hasWorkflow: workflowRows.length > 0,
-        hasTraining: trainingRows.length > 0,
+        hasTraining: isTraining,
         hasMatch: matchRows.length > 0,
         hasPendingRows: pendingRows.length > 0,
         hasActionCards: actionCards.length > 0,
@@ -259,6 +263,16 @@ Page({
     const route = routeForAction(action, id, this.data.assessmentTemplateId);
     if (route) openPage(route);
   },
+  openRecord(event: { currentTarget: { dataset: { id: string } } }) {
+    const studentId = event.currentTarget.dataset.id;
+    if (this.data.isTraining && this.data.rosterRows.some((row: RosterRow) => row.studentId === studentId)) {
+      openPage(`/pages/coach/lesson/index?id=${encodeURIComponent(this.data.eventId)}&studentId=${encodeURIComponent(studentId)}`);
+    }
+  },
+  primaryAction() {
+    const action = this.data.hasConfiguredContent ? "training-assessment" : this.data.canEditTraining ? "training" : "records";
+    this.openAction({ currentTarget: { dataset: { action } } });
+  },
   openAttendance() {
     if (this.data.eventId) openPage(`/pages/coach/${this.data.isTraining ? "lesson" : "attendance"}/index?id=${encodeURIComponent(this.data.eventId)}`);
   },
@@ -268,22 +282,7 @@ Page({
     const current = this.data.rosterRows[index];
     if (!Number.isInteger(index) || !current || !this.data.eventId) return;
     if (this.data.isTraining) {
-      if (!this.data.trainingFactsAvailable) { this.setData({ attendanceError: "训练记录暂不可用，请刷新后重试。", attendanceNeedsRefresh: true }); return; }
-      const ticket = (this as unknown as { _loadRequest?: number })._loadRequest ?? 0;
-      this.setData({ attendanceSaving: true, attendanceError: "" });
-      try {
-        const result = await correctTrainingRecord(current.studentId, this.data.eventId, {
-          expectedRevision: current.record?.revision ?? 0, counted: !current.present,
-          reason: current.present ? "教练快捷更正为未出勤" : "教练快捷更正为已出勤",
-        });
-        if (!currentLoadRequest(this, ticket)) return;
-        if (!result.record || result.record.studentId !== current.studentId || result.record.eventId !== this.data.eventId || result.record.counted !== !current.present || result.record.revision !== (current.record?.revision ?? 0) + 1) throw new Error("结果未确认");
-        const rosterRows = this.data.rosterRows.map((row: RosterRow) => row.studentId === current.studentId ? { ...row, record: result.record, present: result.record.counted, statusLabel: result.record.counted ? "已到" : "未到" } : row);
-        this.setData({ rosterRows, ...attendanceSummary(rosterRows), attendanceSaving: false });
-      } catch (error) {
-        if (!currentLoadRequest(this, ticket)) return;
-        this.setData({ attendanceSaving: false, attendanceNeedsRefresh: true, attendanceError: (error as { code?: string }).code === "training_record_conflict" ? "记录已被更新，请刷新核对后再操作。" : "保存结果未确认，请刷新核对后再操作。" });
-      }
+      this.openRecord({ currentTarget: { dataset: { id: current.studentId } } });
       return;
     }
     const previousRows = this.data.rosterRows;
@@ -422,7 +421,7 @@ function buildRosterRows(workbench: CoachWorkbench, isTraining: boolean, records
   return workbench.roster.map((item) => ({
     ...item,
     record: records.get(item.studentId),
-    statusLabel: (isTraining ? records.get(item.studentId)?.counted : isPresentStatus(item.status)) ? "已到" : "未到",
+    statusLabel: isTraining ? records.has(item.studentId) ? records.get(item.studentId)?.counted ? "已计课次" : "不计课次" : item.status === "leave_requested" ? "已请假 · 待生成" : "待生成" : isPresentStatus(item.status) ? "已到" : "未到",
     present: isTraining ? records.get(item.studentId)?.counted === true : isPresentStatus(item.status),
     initial: (item.name || "学").slice(0, 1),
     initialStatus: item.status,

@@ -51,14 +51,17 @@ function createFixture() {
   return root;
 }
 
-test("当前工作区报告模式 exit 0 且已修复配置与废弃 API 不回归", () => {
+test("当前工作区报告模式 exit 0 且自有源码已修复项不回归", () => {
   const run = spawnSync(process.execPath, [path.join(scriptDir, "check.mjs")], {
     cwd: repoRoot,
     encoding: "utf8"
   });
   assert.equal(run.status, 0, run.stderr || run.stdout);
   assert.doesNotMatch(run.stdout, /\[发现\] MP-CONF-002 /);
-  assert.doesNotMatch(run.stdout, /\[发现\] MP-PERF-001 /);
+  // Official npm builds contain vendor code. Keep its findings visible in the report,
+  // but do not turn a generated dependency into a regression of owned application code.
+  const ownedLines = run.stdout.split("\n").filter(line => !line.includes("/miniprogram_npm/"));
+  assert.doesNotMatch(ownedLines.join("\n"), /\[发现\] MP-PERF-001 /);
   assert.doesNotMatch(run.stdout, /\[发现\] MP-PKG-001 /);
   assert.match(run.stdout, /汇总：发现 \d+ 项；按规则：/);
 });
@@ -117,4 +120,15 @@ test("rules.json 与 spec 规则编号及自动化 ID 一致", () => {
     [...new Set(specAutomationIds)].sort(),
     rules.filter((rule) => rule.checker).map((rule) => rule.id).sort()
   );
+});
+
+test("生成依赖中的平台问题仍保留在报告中", (t) => {
+  const fixture = createFixture();
+  t.after(() => fs.rmSync(fixture, { recursive: true, force: true }));
+  const vendor = path.join(fixture, "miniprogram_npm/example/index.js");
+  fs.mkdirSync(path.dirname(vendor), { recursive: true });
+  fs.writeFileSync(vendor, "wx.getSystemInfoSync();\n");
+  const report = formatReport(runPolicyCheck({ repoRoot, projectRoot: fixture, rulesPath }));
+  assert.match(report, /MP-PERF-001 miniprogram_npm\/example\/index\.js:1/);
+  assert.match(report, /MP-PERF-001 pages\/demo\/index\.ts:3/);
 });

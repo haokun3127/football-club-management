@@ -1,10 +1,5 @@
 <view class="c1">
-  <view class="c1-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="c1-nav__title">{{clubName}}</view>
-    <view wx:if="{{hasCoachInitial}}" class="c1-nav__avatar" bindtap="openMe">{{coachInitial}}</view>
-  </view>
-  <view class="c1-top-spacer" style="height:{{topBarHeight}}px"></view>
-
+  <app-header title="日程" title-align="center" show-back="{{false}}" />
   <!-- V-03 C01 214:2144：授权队伍卡（更改展开选队，保留授权范围与选队状态） -->
   <view wx:if="{{hasTeamOptions}}" class="c1-team-card">
     <view class="c1-team-card__info">

@@ -1,3 +1,4 @@
+import { ROLE_TABS } from "../../utils/navigation";
 import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
@@ -26,13 +27,10 @@ const iconNames = ["calendar", "growth", "child", "discover", "training", "user"
 describe("role tabbar real-device icon contract", () => {
   it("keeps both role manifests, keys, and paths unchanged", () => {
     for (const [role, items] of Object.entries(expectedItems)) {
-      expect(controller).toContain(`${role}: [`);
-      for (const [key, path] of items) {
-        expect(controller).toContain(`key: "${key}"`);
-        expect(controller).toContain(`path: "${path}"`);
-      }
+      expect(ROLE_TABS[role].map(item => [item.key, item.path])).toEqual(items);
+
     }
-    expect(controller.indexOf('key: "discover"')).toBeLessThan(controller.indexOf('key: "child"'));
+
   });
 
   it("uses the official safe-area tabbar with stable icon slots", () => {
@@ -49,7 +47,7 @@ describe("role tabbar real-device icon contract", () => {
     let definition;
     const navigated = [];
     const js = ts.transpileModule(controller, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
-    vm.runInNewContext(js, { exports: {}, Component: (value) => { definition = value; }, wx: { reLaunch: ({url}) => navigated.push(url) } });
+    vm.runInNewContext(js, { exports: {}, require: () => ({ ROLE_TABS }), Component: (value) => { definition = value; }, wx: { reLaunch: ({url}) => navigated.push(url) } });
     const page = { data: { items: [{key: "schedule", path: "/pages/coach/schedule/index"}, {key: "training", path: "/pages/coach/training/index"}], active: "schedule" } };
     for (const value of ["schedule", "unknown", "training"]) definition.methods.handleChange.call(page, {detail:{value}});
     expect(navigated).toEqual(["/pages/coach/training/index"]);

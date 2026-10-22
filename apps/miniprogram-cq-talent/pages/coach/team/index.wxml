@@ -1,20 +1,12 @@
 <view class="team-page">
-  <view class="team-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="team-nav__left" bindtap="goBack">
-      <image class="team-nav__back" src="/assets/icons/chevron-left.svg" mode="aspectFit" />
-      <view class="team-nav__title">{{pageTitle}}</view>
-    </view>
-  </view>
-
+  <app-header title="{{pageTitle}}" title-align="left" show-back="{{true}}" />
   <view class="team-page__body">
     <t-button wx:if="{{state === 'empty'}}" theme="primary" bindtap="chooseTeam">选择球队</t-button>
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{pageTitle}}" message="{{message}}" action-text="{{retryLabel}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready' && hasTeam}}">
-      <scroll-view wx:if="{{hasTeamOptions}}" class="team-selector" scroll-x><view wx:for="{{teamOptions}}" wx:key="id" class="team-selector__item {{teamId === item.id ? 'is-active' : ''}}" data-id="{{item.id}}" bindtap="selectTeam">{{item.name}}</view></scroll-view>
+      <context-bar title="{{teamName}}" subtitle="{{season}}" action-text="切换球队" bindaction="chooseTeam" />
       <view class="hero">
-        <view class="hero__name">{{teamName}}</view>
-        <view wx:if="{{season}}" class="hero__season">{{season}}</view>
         <view class="hero__stats">
           <view wx:for="{{heroStats}}" wx:key="label" class="hero-stat">
             <view class="hero-stat__label">{{item.label}}</view>
@@ -24,15 +16,14 @@
       </view>
 
       <view class="matches-section" wx:if="{{section === 'all' || section === 'matches'}}"><view class="members-title">正式赛事</view><view class="members-empty">与日历共用赛事记录，友谊赛在训练内容中查看。</view><view wx:for="{{matches}}" wx:key="eventId" class="team-match" data-id="{{item.eventId}}" bindtap="openMatch"><view class="team-match__title">{{item.title}} ›</view><view class="team-match__subtitle">{{item.subtitle}}</view><view class="team-match__score">{{item.score}}</view></view><view wx:if="{{!hasMatches}}" class="members-empty">本队暂无正式赛事</view></view>
-      <block wx:if="{{section === 'all' || section === 'roster'}}"><view class="members-title">队员名单 · 点击查看详情</view>
-      <view wx:if="{{hasMembers}}" class="members-grid">
-        <view wx:for="{{members}}" wx:key="id" class="member" data-id="{{item.id}}" bindtap="openRadar">
-          <view class="member__avatar" style="background: {{item.avatarBg}}; color: {{item.avatarColor}}">{{item.initial}}</view>
-          <view class="member__name">{{item.name}}</view>
+      <block wx:if="{{section === 'all' || section === 'roster'}}">
+        <view class="members-title">队员名单 · {{members.length}} 人</view>
+        <t-input value="{{search}}" bindchange="searchMembers" placeholder="搜索队员姓名" aria-label="搜索队员姓名" clearable />
+        <view wx:if="{{hasMembers}}" class="member-list">
+          <view wx:for="{{visibleMembers}}" wx:key="id" class="member-row" data-id="{{item.id}}" bindtap="openRadar" role="button"><view class="member-row__avatar">{{item.initial}}</view><text class="member-row__name">{{item.name}}</text><text class="member-row__action">查看档案 ›</text></view>
+          <view wx:if="{{!visibleMembers.length}}" class="members-empty">未找到匹配队员，请调整姓名</view>
         </view>
-      </view>
-      <view wx:else class="members-empty">{{memberEmptyMessage}}</view>
-
+        <view wx:else class="members-empty">{{memberEmptyMessage}}</view>
       </block><view class="coaches-section" wx:if="{{section === 'all' || section === 'coaches'}}">
         <view class="coaches-title">教练组</view>
         <scroll-view wx:if="{{hasCoaches}}" class="coaches-scroll" scroll-x enable-flex show-scrollbar="{{false}}">
@@ -49,5 +40,5 @@
     </block>
   </view>
 
-  <role-tabbar role="coach" active="training" />
+
 </view>

@@ -39,6 +39,8 @@ interface PageData {
   season: string;
   heroStats: HeroStat[];
   members: MemberView[];
+  visibleMembers: MemberView[];
+  search: string;
   memberEmptyMessage: string;
   hasCoaches: boolean;
   coaches: CoachView[];
@@ -66,7 +68,6 @@ Page<PageData>({
   async load(teamId?: string) {
     if (!requireRole("coach")) return;
     const token = nextTeamRequest(this);
-    teamId = teamId || this.data.teamId;
     this.setData({...emptyPageData("loading", "正在读取队伍信息"),section:this.data.section,pageTitle:this.data.pageTitle});
     try {
       const context = await loadActiveTeam(teamId || this.requestedTeamId || undefined);
@@ -74,6 +75,7 @@ Page<PageData>({
       if(!currentTeamRequest(this,token))return;
       if(!detail){this.setData({state:"empty",message:context.options.length ? "请选择球队后查看" : "暂无授权球队",hasTeam:false});return;}
       if (!currentTeamRequest(this, token)) return;
+      this.requestedTeamId = "";
       const hasTeam = detail.team !== null;
       const members = hasTeam ? toMembers(detail) : [];
       const coaches = hasTeam ? toCoaches(detail) : [];
@@ -91,7 +93,7 @@ Page<PageData>({
         teamName: detail.team?.name ?? "",
         season: detail.team?.season ?? "",
         heroStats: hasTeam ? toHeroStats(detail) : emptyHeroStats(),
-        members,
+        members, visibleMembers: members, search: "",
         memberEmptyMessage: hasTeam && !members.length ? "本队暂无在队学员" : "",
         hasCoaches: coaches.length > 0,
         coaches,
@@ -99,9 +101,15 @@ Page<PageData>({
       });
     } catch {
       if (!currentTeamRequest(this, token)) return;
-      this.setData(emptyPageData("error", "队伍信息读取失败，请稍后重试。", "重新读取"));
+      this.setData({ ...emptyPageData("error", "队伍信息读取失败，请稍后重试。", "重新读取"), section: this.data.section, pageTitle: this.data.pageTitle });
     }
   },
+  searchMembers(event: { detail: { value: string } }) {
+    const search = event.detail.value;
+    const query = search.trim().toLocaleLowerCase();
+    this.setData({ search, visibleMembers: this.data.members.filter((member: MemberView) => member.name.toLocaleLowerCase().includes(query)) });
+  },
+  onShow() { if (this.data.state === "ready") return this.load(); },
   onUnload() { nextTeamRequest(this); },
   retry() {
     this.load();
@@ -115,7 +123,7 @@ Page<PageData>({
   },
   openRadar(event: { currentTarget?: { dataset?: { id?: string } } }) {
     const id = event.currentTarget?.dataset?.id;
-    if (id) openPage(`/pages/coach/student-radar/index?student=${encodeURIComponent(id)}&team=${encodeURIComponent(this.data.teamId)}`);
+    if (id && this.data.members.some((member: MemberView) => member.id === id)) openPage(`/pages/coach/student-radar/index?student=${encodeURIComponent(id)}&team=${encodeURIComponent(this.data.teamId)}`);
   },
 });
 
@@ -132,7 +140,7 @@ function emptyPageData(state: LoadState, message: string, retryLabel = ""): Page
     teamName: "",
     season: "",
     heroStats: emptyHeroStats(),
-    members: [],
+    members: [], visibleMembers: [], search: "",
     memberEmptyMessage: "",
     hasCoaches: false,
     coaches: [],

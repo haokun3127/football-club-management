@@ -31,3 +31,12 @@ Wrong：在每页散写按钮尺寸、缺测用0、未知球队回默认队。Co
 - 单队偏好按环境/club/user/coach隔离，丢弃无主旧键；显式无权teamId报错，不按队名或首队回退。异步读取只允许当前账号的最后发起请求更新偏好。多队日程筛选与单队工作区偏好分开。
 
 对比来源撤下或失效导致404时，错误态须提供“清除对比并重试”，清掉history/standard选择后读取当前来源；仅重复同一失效ID不是可恢复操作。主按钮禁用态统一使用TDesign的primary-disabled-bg/border/color变量，不能漏掉后保留默认蓝色。
+
+## 2026-10-22 课堂与球队工作区
+
+- `utils/navigation.ts`维护唯一的`ROLE_TABS`注册表，role-tabbar与openRoleTab共用；家长discover仅作旧深链兼容，不新增显示标签。点击只接受已登记key，不接受dataset任意path。
+- 日程、课堂详情、训练记录和球队详情复用app-header；编辑提交复用submit-bar。详情不叠放角色底栏。context-bar只展示title/subtitle并发送action，球队权限和选择仍由页面与coach-team-context处理。
+- 训练工作台先内容/执行，再测评与名单例外。训练头像或名单入口不得直接调用correctTrainingRecord；进入lesson显式更正当前/目标/原因/历史，保留expectedRevision与冲突核对。已计、不计、待生成分开；搜索只过滤视图。
+- 球队工作区在授权单队确定后读取近期课程与未完成测评；用teamId过滤，分区失败独立展示，不能把失败渲染为零任务。月份读取复用calendarDataRanges并按club日期过滤、按eventId去重，单请求不超过31天。返回球队选择器后刷新当前偏好，不用旧teamId覆盖新选择。
+- 原生TDesign按钮放在紧凑网格内时，用原生view限定列宽并显式block/width:100%/min-width:0，保持44px触控高度。只检查父容器bounding rect不足以证明内部按钮不溢出，必须查看实际截图。列表普通姓名/状态与两项动作各有明确列。
+- 验证：coach/event、lesson、training、team、schedule与navigation/role-tabbar测试；原生19人课程/记录/名单、搜索及更正表单。平台扫描继续报告生成依赖问题；源码回归断言区分自有源码与miniprogram_npm，不从报告中删掉依赖发现。

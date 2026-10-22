@@ -1,0 +1,4 @@
+.context-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:20px; }
+.context-bar__body { min-width:0; flex:1; }
+.context-bar__title { font-size:var(--font-size-display); line-height:1.5; font-weight:600; overflow-wrap:anywhere; }
+.context-bar__subtitle { font-size:var(--font-size-aux); line-height:1.5; color:var(--color-text-secondary); }

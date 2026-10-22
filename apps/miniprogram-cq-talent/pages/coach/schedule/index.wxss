@@ -1,24 +1,6 @@
 /* C01 214:2144：授权队伍卡、带边距日历、课程/任务卡、所选队伍入口 */
 .c1 { min-height: 100vh; background: var(--club-page); }
 
-.c1-nav {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 100;
-  box-sizing: content-box;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height:44px;
-  padding: 0 32rpx;
-  background: var(--club-nav);
-}
-.c1-top-spacer { width: 100%; }
-.c1-nav__title { color: var(--club-text); font-size: var(--font-size-display); font-weight: 700; line-height: 1.5; }
-.c1-nav__avatar { display: flex; align-items: center; justify-content: center; width: 72rpx; height: 72rpx; border-radius: 36rpx; background: var(--color-brand); color: var(--color-card); font-size: var(--font-size-body); font-weight: 700; }
-
 /* 授权队伍卡 */
 .c1-team-card { display: flex; align-items: center; justify-content: space-between; gap: 24rpx; margin: 24rpx 24rpx 0; padding: 28rpx 32rpx; border-radius: 28rpx; background:var(--color-card); color:var(--color-text); box-shadow:none; }
 .c1-team-card__title { font-size: var(--font-size-section); font-weight: 700; line-height: 1.5; }
@@ -60,5 +42,3 @@
 .c1-team-card__toggle { display:flex; align-items:center; min-height:44px; min-width:44px; color:var(--color-brand); }
 .acard { height:auto; min-height:96px; }
 .acard__title { white-space:normal; overflow-wrap:break-word; }
-
-.c1-nav__avatar {min-height:44px;min-width:44px;border-radius:50%;}

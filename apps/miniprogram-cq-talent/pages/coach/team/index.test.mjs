@@ -177,29 +177,24 @@ describe("coach team detail", () => {
     expect(page.data.message).not.toContain("raw upstream error");
   });
 
-  it("uses the local Figma navigation and renders the supported C9 coach section declaratively", () => {
-    expect(pageConfig).toContain('"role-tabbar"');
-    expect(pageConfig).toContain('"status-view"');
-    expect(pageConfig).not.toContain('"app-header"');
-    expect(template).toContain('class="team-nav"');
-    expect(template).toContain('wx:if="{{state !== \'ready\'}}"');
-    expect(template).toContain('active="training"');
+  it("keeps supported coach content and uses shared detail navigation", () => {
+    expect(pageConfig).toContain('"app-header"');
     expect(template).toContain('class="coaches-section"');
-    expect(template).toContain('class="coaches-scroll"');
     expect(template).toContain('wx:for="{{coaches}}"');
-    expect(template).toContain('scroll-x enable-flex show-scrollbar="{{false}}"');
-    expect(template).toContain('/assets/icons/chevron-left.svg');
     expect(template).not.toMatch(/凤凰山|U10精英队|林教练|主教练|王助教|李体能/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(stylesheet).toMatch(/\.team-nav\s*\{(?=[^}]*height:\s*44px)(?=[^}]*padding-left:\s*32rpx)(?=[^}]*box-sizing:\s*content-box)/s);
-    expect(stylesheet).toContain(".team-nav__left { display: flex; align-items: center; gap: 0;");
-    expect(stylesheet).toContain(".team-nav__title { color: #202124; font-size: var(--font-size-display); font-weight: 700; line-height: 1.5; }");
-    expect(stylesheet).toContain(".hero { display: flex; flex-direction: column; gap: 16rpx; padding: 32rpx; border-radius: 32rpx;");
-    expect(stylesheet).toContain(".hero-stat__value--positive { color: #10b981; }");
-    expect(stylesheet).toContain("gap: 24rpx;");
-    expect(stylesheet).toContain(".coach-card { width: 280rpx;");
-    expect(stylesheet).toMatch(/\.coach-card\s*\{(?=[^}]*height:\s*240rpx)(?=[^}]*overflow:\s*hidden)/s);
-    expect(stylesheet).toMatch(/\.coach-card__role\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*text-overflow:\s*ellipsis)(?=[^}]*white-space:\s*nowrap)/s);
-    expect(controller).not.toContain("app-header");
   });
+});
+
+it("searches visible members without losing roster identity or allowing foreign navigation", async () => {
+  const page = createPageInstance(); await page.load();
+  page.searchMembers({ detail: { value: "actual" } }); expect(page.data.visibleMembers.map(member => member.id)).toEqual(["student-1"]);
+  page.searchMembers({ detail: { value: "missing" } }); expect(page.data.visibleMembers).toEqual([]); expect(page.data.members).toHaveLength(1);
+  page.openRadar({ currentTarget: { dataset: { id: "foreign" } } }); expect(mocks.openPage).not.toHaveBeenCalled();
+});
+it("refreshes the active team after returning from the selector", async()=>{
+ const page=createPageInstance();await page.onLoad({teamId:"team-1",section:"roster"});
+ mocks.getCoachTeam.mockClear();await page.onShow();
+ expect(mocks.getCoachTeam).toHaveBeenCalledWith(undefined);
+ expect(page.data.section).toBe("roster");
 });

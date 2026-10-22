@@ -1,8 +1,10 @@
 .team-workspace { min-height:100vh; padding-bottom:calc(80px + env(safe-area-inset-bottom)); background:var(--color-page); }
 .workspace-body { padding:16px 12px; }
-.team-context { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0 4px 20px; }
-.team-context__name { font-size:20px; font-weight:600; line-height:1.5; overflow-wrap:break-word; }
-.team-context__season,.section-caption,.secondary-title { color:var(--color-text-secondary); font-size:14px; line-height:1.5; }
 .secondary-title { margin:28px 16px 8px; }
 .section-caption { margin:0 16px 12px; }
 .workspace-empty { padding:32px 16px; color:var(--color-text-secondary); text-align:center; }
+
+.section-heading { margin:24px 4px 12px; font-size:var(--font-size-section); font-weight:600; line-height:1.5; }
+.workspace-notice { padding:12px 16px; color:var(--color-text-secondary); font-size:var(--font-size-aux); line-height:1.6; }
+
+.section-caption,.secondary-title { color:var(--color-text-secondary); font-size:var(--font-size-aux); line-height:1.5; }

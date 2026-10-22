@@ -1,11 +1,5 @@
 .c2 { min-height: 100vh; background: #f6f7f9; }
 
-.c2-nav { position: sticky; top: 0; z-index: 100; box-sizing: content-box; display: flex; align-items: center; justify-content: space-between; height:44px; padding-left: 32rpx; padding-right: 24rpx; background: #ffffff; }
-.c2-nav__left { display: flex; align-items: center; gap: 0; min-width: 0; }
-.c2-nav__back { flex: 0 0 auto; width: 48rpx; height: 48rpx; }
-.c2-nav__title { overflow: hidden; color: #202124; font-size: var(--font-size-display); font-weight: 700; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
-.c2-nav__today { flex: 0 0 auto; color: #a80f1b; font-size: var(--font-size-aux); font-weight: 700; line-height: 1.5; }
-
 .c2-body { display: flex; flex-direction: column; gap: 24rpx; padding: 16rpx 44rpx calc(180rpx + env(safe-area-inset-bottom)); }
 .workbench-card { display: flex; flex-direction: column; gap: 24rpx; padding: 32rpx; border: 0; border-radius: 24rpx; background: #ffffff; box-shadow:none; }
 .workbench-card--pending { border-color: #fde68a; background: #fffbeb; }
@@ -59,19 +53,9 @@
 
 /* Approved Figma C03 · bright club V2. Match workbench keeps its existing flow. */
 .club-workbench { background:var(--club-page); }
-.club-workbench .c2-nav { background:var(--club-nav); }
-.club-workbench .c2-nav__title { color:var(--club-text);font-size: var(--font-size-display);font-weight:500; }
-.club-workbench .c2-nav__today { display:none; }
 .club-workbench .c2-body { gap:20rpx;padding:32rpx 32rpx calc(166rpx + env(safe-area-inset-bottom)); }
 .club-workbench .workbench-card { gap:10rpx;padding:24rpx;border:1rpx solid var(--club-line);border-radius:28rpx;box-shadow:none; }
 .club-workbench .section-title { color:var(--club-muted);font-size: var(--font-size-section);line-height: 1.5; }
-.club-workbench .roster-grid { margin-top:0;gap:14rpx; }
-.club-workbench .roster-person { align-items:flex-start; }
-.club-workbench .roster-avatar { width:68rpx;height:68rpx;box-sizing:border-box; }
-.club-workbench .roster-avatar--present { border:3rpx solid var(--color-success);background:var(--color-success-soft);color:var(--color-success); }
-.club-workbench .roster-avatar--absent { background:#f2efec;color:var(--club-muted); }
-.club-workbench .roster-avatar__check { width:44rpx;height:44rpx;color:var(--color-success);font-size: var(--font-size-body);line-height: 1.5;text-align:center; }
-.club-workbench .roster-name { min-width:0;margin-top:4rpx;text-align:left;font-size: var(--font-size-aux);line-height: 1.5; }
 .attendance-links { display:flex;gap:32rpx;font-size: var(--font-size-aux);color:var(--color-brand);line-height: 1.5; }
 .club-workbench .training-content-group { margin-top:8rpx; }
 .club-workbench .training-content-item { font-size: var(--font-size-aux);line-height: 1.5;padding:4rpx 0; }
@@ -79,13 +63,12 @@
 .club-workbench .training-tools button { font-size: var(--font-size-aux);padding:4rpx 10rpx;line-height: 1.5; }
 .club-workbench .course-assessment { background:var(--color-warning-soft);box-shadow:none; }
 .course-task { font-size: var(--font-size-aux);color:var(--color-text-secondary);line-height: 1.5;padding:4rpx 0; }
-.course-footer { position:fixed;bottom:0;left:0;right:0;padding:16rpx 32rpx calc(32rpx + env(safe-area-inset-bottom));background:var(--club-nav); }
-.course-footer .course-primary { width:100%;height:96rpx;padding:0;background:var(--color-brand);color:#fff;border-radius:16rpx;font-size: var(--font-size-body);line-height: 1.5; }
+/* 移动端触控下限。 */
+.roster-person, .action-tile, .course-task { min-height:44px; min-width:44px; box-sizing:border-box; }
 
-/* 移动端触控下限，业务内容与原事件保持一致。 */
-.action-tile,
-.c2-nav__left,
-.course-task,
-.roster-person,
-.training-card__edit,
-.transfer-item { min-height:44px; min-width:44px; box-sizing:border-box; }
+/* Classroom execution: content first; roster exceptions are read-only links. */
+.club-workbench .course-info .section-title { color:var(--color-text); font-size:var(--font-size-display); font-weight:600; }
+.club-workbench .section-title { color:var(--color-text); }
+.club-workbench .course-assessment { background:var(--color-card); }
+.exception-row { display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:44px; border-top:1px solid var(--color-line); font-size:var(--font-size-body); }
+.club-workbench .training-card__edit { min-height:44px; display:flex; align-items:center; }

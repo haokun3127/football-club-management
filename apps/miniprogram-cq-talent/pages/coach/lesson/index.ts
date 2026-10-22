@@ -4,12 +4,12 @@ import { formatDateTime, formatShortDate, resolveMenuInset, resolveNavInset } fr
 import { correctTrainingRecord, type TrainingRecord } from "../../../utils/training-records";
 import type { LoadState } from "../../../utils/types";
 
-type Row = { studentId: string; eventId: string; name: string; counted: boolean; revision: number; dateLabel: string; statusLabel: string; sourceLabel: string; historyLabels: string[] };
+type Row = { recorded: boolean; studentId: string; eventId: string; name: string; counted: boolean; revision: number; dateLabel: string; statusLabel: string; sourceLabel: string; historyLabels: string[] };
 Page({
   data: {
     navInset: resolveNavInset(), menuInset: resolveMenuInset(), state: "loading" as LoadState,
     message: "正在读取训练记录", eventId: "", eventTitle: "", total: 0, rows: [] as Row[], visibleRows: [] as Row[],
-    filter: "all", canEdit: false, expandedId: "", editing: null as Row | null, draftCounted: false, reason: "", saving: false,
+    filter: "all", search: "", canEdit: false, expandedId: "", editing: null as Row | null, draftCounted: false, reason: "", saving: false,
     saveError: "", conflict: false,
   },
   onLoad(query?: Record<string, string | undefined>) { this.setData({ eventId: query?.id || "", expandedId: query?.studentId || "" }); void this.load(); },
@@ -26,14 +26,18 @@ Page({
       const records = new Map(workbench.trainingRecords.map(record => [record.studentId, record]));
       const roster = [...new Map(workbench.roster.filter(student => Boolean(student.studentId)).map(student => [student.studentId, student])).values()];
       const rows = roster.map(student => presentRow(student.name, student.studentId, this.data.eventId, workbench.event.startsAt, records.get(student.studentId)));
-      this.setData({ state: rows.length ? "ready" : "empty", message: rows.length ? "" : "本课暂无学员。", eventTitle: workbench.event.title, canEdit: workbench.event.status !== "cancelled", rows, ...summarize(rows, this.data.filter) });
+      this.setData({ state: rows.length ? "ready" : "empty", message: rows.length ? "" : "本课暂无学员。", eventTitle: workbench.event.title, canEdit: workbench.event.status !== "cancelled", rows, ...summarize(rows, this.data.filter, this.data.search) });
     } catch (error) {
       if (currentRequest(this, ticket)) this.setData({ state: "error", message: (error as { message?: string }).message || "训练记录读取失败，请重试", canEdit: false });
     }
   },
   changeFilter(event: { currentTarget: { dataset: { filter: string } } }) {
     const filter = event.currentTarget.dataset.filter;
-    if (["all", "counted", "uncounted"].includes(filter)) this.setData({ filter, ...summarize(this.data.rows, filter) });
+    if (["all", "counted", "uncounted", "pending"].includes(filter)) this.setData({ filter, ...summarize(this.data.rows, filter, this.data.search) });
+  },
+  searchRows(event: { detail: { value: string } }) {
+    const search = event.detail.value;
+    this.setData({ search, ...summarize(this.data.rows, this.data.filter, search) });
   },
   toggleHistory(event: { currentTarget: { dataset: { id: string } } }) { this.setData({ expandedId: this.data.expandedId === event.currentTarget.dataset.id ? "" : event.currentTarget.dataset.id }); },
   edit(event: { currentTarget: { dataset: { id: string } } }) {
@@ -56,7 +60,7 @@ Page({
       if (!record || workbench.event.status === "cancelled" || !workbench.roster.some(row => row.studentId === editing.studentId)) throw new Error("该记录当前不可更正，请返回后重新读取。");
       const current = presentRow(editing.name, editing.studentId, editing.eventId, record.occurredAt, record);
       const rows = this.data.rows.map((row: Row) => row.studentId === editing.studentId ? current : row);
-      this.setData({ rows, ...summarize(rows, this.data.filter), editing: current, conflict: false, saveError: "已读到最新记录。请核对当前状态，再保存你的更正。" });
+      this.setData({ rows, ...summarize(rows, this.data.filter, this.data.search), editing: current, conflict: false, saveError: "已读到最新记录。请核对当前状态，再保存你的更正。" });
     } catch (error) { if (currentRequest(this, ticket)) this.setData({ saveError: (error as { message?: string }).message || "最新记录读取失败" }); }
     finally { if (currentRequest(this, ticket)) this.setData({ saving: false }); }
   },
@@ -73,7 +77,7 @@ Page({
       const record = response.record;
       if (!record || record.studentId !== editing.studentId || record.eventId !== editing.eventId || record.revision !== editing.revision + 1 || record.counted !== counted) throw new Error("保存结果未确认");
       const rows = this.data.rows.map((row: Row) => row.studentId === editing.studentId ? presentRow(row.name, row.studentId, row.eventId, record.occurredAt, record) : row);
-      this.setData({ rows, ...summarize(rows, this.data.filter), editing: null });
+      this.setData({ rows, ...summarize(rows, this.data.filter, this.data.search), editing: null });
       wx.showToast({ title: "更正已保存", icon: "success" });
     } catch (error) {
       if (!currentRequest(this, ticket)) return;
@@ -84,7 +88,7 @@ Page({
   retry() { void this.load(); },
 });
 function presentRow(name: string, studentId: string, eventId: string, occurredAt: string, record?: TrainingRecord): Row {
-  return { name, studentId, eventId, counted: record?.counted ?? false, revision: record?.revision ?? 0,
+  return { recorded: Boolean(record), name, studentId, eventId, counted: record?.counted ?? false, revision: record?.revision ?? 0,
     dateLabel: formatShortDate(occurredAt), statusLabel: record ? record.counted ? "已计课次" : "不计课次" : "待课程结束自动记录",
     sourceLabel: record ? record.source === "automatic" ? "系统记录" : "人工更正" : "尚未生成",
     historyLabels: (record?.history ?? []).map((item, index, history) => {
@@ -93,6 +97,13 @@ function presentRow(name: string, studentId: string, eventId: string, occurredAt
       return `${formatDateTime(item.changedAt)} · ${item.actorDisplayName || item.actorUserId || "系统"} · ${label(previous)} → ${label(item.counted)} · ${item.reason}`;
     }) };
 }
-function summarize(rows: Row[], filter: string) { return { total: rows.filter(row => row.counted).length, visibleRows: rows.filter(row => filter === "all" || (filter === "counted" ? row.counted : !row.counted)) }; }
+function summarize(rows: Row[], filter: string, search = "") {
+  const query = search.trim().toLocaleLowerCase();
+  return {
+    total: rows.filter(row => row.counted).length,
+    visibleRows: rows.filter(row => row.name.toLocaleLowerCase().includes(query) &&
+      (filter === "all" || (filter === "pending" ? !row.recorded : filter === "counted" ? row.counted : row.recorded && !row.counted))),
+  };
+}
 function nextRequest(page: unknown) { const p = page as { _request?: number }; return p._request = (p._request ?? 0) + 1; }
 function currentRequest(page: unknown, request: number) { return (page as { _request?: number })._request === request; }

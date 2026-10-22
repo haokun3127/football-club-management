@@ -1,0 +1,92 @@
+{
+  "scope": "official native simulator, authenticated existing backend reads; page-method search/edit without saves; no physical device or deployed B0 claim",
+  "states": [
+    {
+      "name": "01-schedule",
+      "state": "ready"
+    },
+    {
+      "name": "02-classroom",
+      "state": "ready",
+      "rosterCount": 19
+    },
+    {
+      "name": "03-records",
+      "state": "ready",
+      "recordCount": 19
+    },
+    {
+      "name": "04-team",
+      "state": "ready",
+      "courseCount": 10,
+      "taskCount": 2,
+      "courseError": "",
+      "taskError": ""
+    },
+    {
+      "name": "05-roster",
+      "state": "ready",
+      "rosterCount": 19
+    },
+    {
+      "name": "roster-search",
+      "matches": 1,
+      "total": 19
+    }
+  ],
+  "captures": [
+    {
+      "success": true,
+      "path": "/tmp/cq-b1-native-final/01-schedule.png",
+      "imageWidth": 620,
+      "imageHeight": 1344,
+      "sha256": "6238eebfd8039796b8527df0ed35395f699344108d21ea38170ad0475993109a"
+    },
+    {
+      "success": true,
+      "path": "/tmp/cq-b1-native-final/02-classroom.png",
+      "imageWidth": 620,
+      "imageHeight": 1344,
+      "sha256": "ca9eca774ac0774e79ca4220f46d9c9010eba7db7c043f4a29ff5e6edc93182f"
+    },
+    {
+      "success": true,
+      "path": "/tmp/cq-b1-native-final/03b-correction.png",
+      "imageWidth": 620,
+      "imageHeight": 1344,
+      "sha256": "ac8cebf2223e26cb70cbf5b1748e3da7cb83a55d7d23a974f5e864b3dd69ce2c"
+    },
+    {
+      "success": true,
+      "path": "/tmp/cq-b1-native-final/04-team.png",
+      "imageWidth": 620,
+      "imageHeight": 1344,
+      "sha256": "c9650672f49a9958f503ce32ed8be34b66bc12b7cc41fd7e263158fa3a66db5e"
+    },
+    {
+      "success": true,
+      "path": "/tmp/cq-b1-native-final/05-roster.png",
+      "imageWidth": 620,
+      "imageHeight": 1344,
+      "sha256": "2878ec23a11ae0e699b4ba8a5ccdf70888681e2c51e5f492bbd917b662c17a55"
+    },
+    {
+      "success": true,
+      "path": "/tmp/cq-b1-native-final/05b-search.png",
+      "imageWidth": 620,
+      "imageHeight": 1344,
+      "sha256": "3dd541b94f28efab2be188b8471d0c3287c41c30817c50d34d31885b557b4771"
+    },
+    {
+      "path": "/tmp/cq-b1-records-final.png",
+      "imageWidth": 620,
+      "imageHeight": 1344,
+      "note": "Final corrected list; supersedes earlier overflow capture.",
+      "sha256": "0d06e6e0b4ab50607f41110a6cb5c6bd9fa1634e3b185fe6ae6c89f7a9f20664"
+    }
+  ],
+  "limitations": [
+    "Business data read-only; local active-team preference used for test navigation.",
+    "Page-method interactions; physical-device and deployment checks remain B6."
+  ]
+}

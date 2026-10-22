@@ -48,7 +48,7 @@ describe("coach training facts and corrections", () => {
     const p = page(); await p.load();
     expect(p.data.rows[1]).toMatchObject({ revision: 0, counted: false, sourceLabel: "尚未生成" });
     expect(p.data.rows[0].historyLabels[1]).toContain("张教练 · 不计课次 → 已计课次");
-    p.changeFilter({ currentTarget: { dataset: { filter: "uncounted" } } });
+    p.changeFilter({ currentTarget: { dataset: { filter: "pending" } } });
     expect(p.data.visibleRows.map(row => row.studentId)).toEqual(["student-3"]);
   });
   it("blocks unknown mutation outcomes and ignores loads after unload", async () => {
@@ -60,4 +60,15 @@ describe("coach training facts and corrections", () => {
     expect(q.data.state).toBe("loading");
   });
 
+});
+
+it("combines name search with actual recorded status, keeping pending distinct", async () => {
+  mocks.workbench.mockResolvedValueOnce({ event: { type: "training", startsAt: record.occurredAt }, roster: [{ studentId: "student-2", name: "王乙" }, { studentId: "student-3", name: "王丙" }], trainingRecords: [{ ...record, counted: false }] });
+  const p = page(); await p.load();
+  p.searchRows({ detail: { value: " 王 " } });
+  p.changeFilter({ currentTarget: { dataset: { filter: "uncounted" } } });
+  expect(p.data.visibleRows.map(row => row.studentId)).toEqual(["student-2"]);
+  p.changeFilter({ currentTarget: { dataset: { filter: "pending" } } });
+  expect(p.data.visibleRows.map(row => row.studentId)).toEqual(["student-3"]);
+  p.searchRows({ detail: { value: "无此人" } }); expect(p.data.visibleRows).toEqual([]);
 });

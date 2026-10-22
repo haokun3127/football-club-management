@@ -249,7 +249,7 @@ describe("coach schedule home", () => {
   });
 
   it("matches the C01 card layout: nav rail, margined calendar, and 24rpx body rail", () => {
-    expect(stylesheet).toMatch(/\.c1-nav\s*\{[^}]*padding:\s*0\s+32rpx/s);
+    expect(template).toContain('<app-header title="日程"');
     expect(stylesheet).toMatch(/\.c1-body\s*\{[^}]*padding:\s*0\s+24rpx\s+24rpx/s);
     expect(stylesheet).toMatch(/\.c1-list\s*\{[^}]*margin-top:\s*24rpx/s);
   });
@@ -283,18 +283,9 @@ describe("coach schedule home", () => {
     expect(controller).not.toContain("DEV_TEST_DATE");
   });
 
-  it("keeps the coach avatar clear of the system menu capsule", () => {
-    const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
-    expect(controller).toContain("resolveMenuInset");
-    expect(template).toContain('padding-right:{{menuInset}}px');
-    expect(stylesheet).toMatch(/\.c1-nav\s*\{(?=[^}]*height:\s*44px)(?=[^}]*box-sizing:\s*content-box)/s);
-    expect(stylesheet).not.toMatch(/\.c1-nav\s*\{[^}]*height:\s*176rpx/s);
-  });
 
-  it("pins the C1 top bar and reserves exactly its safe-area height in document flow", () => {
-    expect(template).toContain('class="c1-top-spacer" style="height:{{topBarHeight}}px"');
-    expect(stylesheet).toMatch(/\.c1-nav\s*\{(?=[^}]*position:\s*fixed)(?=[^}]*top:\s*0)(?=[^}]*z-index:\s*100)/s);
-  });
+
+
 
   it("derives the C1 spacer from the shared device-width-aware top-bar helper", () => {
     const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
@@ -303,9 +294,7 @@ describe("coach schedule home", () => {
     expect(controller).not.toContain("resolveNavInset() + 44");
   });
 
-  it("uses the live C1 root-page title typography", () => {
-    expect(stylesheet).toMatch(/\.c1-nav__title\s*\{[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)[^}]*line-height:\s*1\.5/s);
-  });
+
 
 
 

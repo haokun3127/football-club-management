@@ -1,26 +1,20 @@
-.history-page { min-height:100vh;background:var(--club-page);color:var(--club-text); }
-.page-nav { position:sticky;top:0;z-index:100;height:44px;box-sizing:content-box;display:flex;align-items:center;padding-left:32rpx;background:var(--club-nav); }
-.page-nav__back { width:40rpx;font-size: var(--font-size-body); }
-.page-nav__title { font-size: var(--font-size-display);font-weight:500; }
-.history-page__body { padding:32rpx 32rpx calc(166rpx + env(safe-area-inset-bottom)); }
-.record-summary { color:var(--color-text-secondary);font-size: var(--font-size-aux);line-height: 1.5;margin-bottom:24rpx; }
-.record { box-sizing:border-box;min-height:0;margin-bottom:12px;padding:16px;border:1rpx solid var(--club-line);border-radius:28rpx;background:#fff;box-shadow:none; }
-.record-title { font-size: var(--font-size-section);font-weight:500;line-height: 1.5; }
-.record-state { margin-top:16rpx;color:var(--color-text-secondary);font-size: var(--font-size-body);line-height: 1.5; }
-.record-actions,.record-filters { display:flex;gap:24rpx; }
-.record-actions button,.record-filters button { width:auto;min-width:0;margin:0;padding:12rpx 0;background:transparent;color:var(--color-brand);font-size: var(--font-size-aux);line-height: 1.5; }
-.record-filters { margin-bottom:24rpx; }
-.record-filters button { color:var(--club-muted); }
-.record-filters button.selected { color:var(--color-brand);border-bottom:2rpx solid var(--color-brand); }
-.record-history { margin-top:24rpx;font-size: var(--font-size-aux);color:var(--color-text-secondary);line-height: 1.5;overflow-wrap:anywhere; }
-.record-field { margin-bottom:64rpx;font-size: var(--font-size-aux);color:var(--club-muted); }
-.record-input { box-sizing:border-box;margin-top:16rpx;padding:24rpx;min-height:96rpx;border:1rpx solid var(--color-line);border-radius:16rpx;background:#fff;font-size: var(--font-size-body);line-height: 1.5; }
-.record-toggle { display:flex;justify-content:space-between;align-items:center; }
-.record-reason { width:100%;height:112rpx; }
-.record-info { padding:24rpx;background:var(--color-info-soft);color:var(--color-info);font-size: var(--font-size-aux);line-height: 1.5;border-radius:16rpx; }
-.editor-error { color:var(--color-error);font-size: var(--font-size-aux);line-height: 1.5;margin:24rpx 0; }
-.record-footer { position:fixed;bottom:0;left:0;right:0;padding:16rpx 32rpx calc(32rpx + env(safe-area-inset-bottom));background:var(--club-nav); }
-.record-footer .record-primary { width:100%;height:96rpx;padding:0;background:var(--color-brand);color:#fff;border-radius:16rpx;font-size: var(--font-size-body);line-height: 1.5; }
-
-/* 移动端触控下限，业务内容与原事件保持一致。 */
-.page-nav__back { min-height:44px; min-width:44px; box-sizing:border-box; }
+ .history-page { min-height:100vh; background:var(--color-page); color:var(--color-text); }
+.history-page__body { padding:16px var(--spacing-page) calc(112px + env(safe-area-inset-bottom)); }
+.record-summary { margin-bottom:16px; font-size:var(--font-size-aux); color:var(--color-text-secondary); line-height:1.5; }
+.record-filters { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:0; margin:12px 0; }
+.record { display:grid; grid-template-columns:minmax(0,1fr) 112px; align-items:center; gap:8px; padding:12px; background:var(--color-card); border-bottom:1px solid var(--color-line); }
+.record:first-of-type { border-radius:var(--radius-card) var(--radius-card) 0 0; }
+.record-main { min-width:0; }
+.record-title { font-size:var(--font-size-body); font-weight:600; line-height:1.5; overflow-wrap:anywhere; }
+.record-state { margin-top:4px; color:var(--color-text-secondary); font-size:var(--font-size-aux); line-height:1.5; }
+.record-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:center; }
+.record-action { min-width:0; }
+.record-filter { min-width:0; }
+.record-history { grid-column:1 / -1; width:100%; margin-top:8px; font-size:var(--font-size-aux); color:var(--color-text-secondary); line-height:1.6; overflow-wrap:anywhere; }
+.record-history > view { padding:8px 0; }
+.record-field { margin-bottom:20px; font-size:var(--font-size-body); color:var(--color-text-secondary); }
+.record-input { box-sizing:border-box; margin-top:8px; padding:12px; min-height:48px; border:1px solid var(--color-line); border-radius:var(--radius-button); background:var(--color-card); color:var(--color-text); font-size:var(--font-size-body); line-height:1.5; }
+.record-toggle { display:flex; justify-content:space-between; align-items:center; }
+.record-reason { width:100%; }
+.record-info { padding:12px; background:var(--color-info-soft); color:var(--color-info); font-size:var(--font-size-aux); line-height:1.5; border-radius:var(--radius-button); }
+.editor-error { color:var(--color-error); font-size:var(--font-size-body); line-height:1.5; margin:12px 0; }

@@ -1,13 +1,19 @@
 <view class="history-page">
-  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="page-nav__back" bindtap="goBack" aria-label="返回">‹</view><view class="page-nav__title">{{editing ? '修正记录与历史' : '训练记录名单'}}</view></view>
+  <app-header title="{{editing ? '更正训练记录' : '训练记录'}}" title-align="left" show-back="{{!editing}}" />
   <view class="history-page__body">
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '加载训练记录' : state === 'empty' ? '暂无训练记录' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <block wx:if="{{state === 'ready' && !editing}}">
       <view class="record-summary">{{eventTitle}} · {{rows.length}}名学员 · {{total}}人已计课次</view>
-      <view class="record-filters"><t-button class="{{filter === 'all' ? 'selected' : ''}}" data-filter="all" bindtap="changeFilter" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="{{filter === 'all' ? 'selected' : ''}}" theme="primary" variant="text">全部</t-button><t-button class="{{filter === 'counted' ? 'selected' : ''}}" data-filter="counted" bindtap="changeFilter" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="{{filter === 'counted' ? 'selected' : ''}}" theme="primary" variant="text">已计课次</t-button><t-button class="{{filter === 'uncounted' ? 'selected' : ''}}" data-filter="uncounted" bindtap="changeFilter" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="{{filter === 'uncounted' ? 'selected' : ''}}" theme="primary" variant="text">未计课次</t-button></view>
+      <t-input value="{{search}}" bindchange="searchRows" placeholder="搜索学员姓名" clearable aria-label="搜索学员姓名" />
+      <view class="record-filters">
+        <view class="record-filter"><t-button block custom-style="width:100%;min-width:0;padding:4px;min-height:44px;font-size:var(--font-size-aux);" data-filter="all" bindtap="changeFilter" variant="text" theme="{{filter === 'all' ? 'primary' : 'default'}}">全部</t-button></view>
+        <view class="record-filter"><t-button block custom-style="width:100%;min-width:0;padding:4px;min-height:44px;font-size:var(--font-size-aux);" data-filter="counted" bindtap="changeFilter" variant="text" theme="{{filter === 'counted' ? 'primary' : 'default'}}">已计课次</t-button></view>
+        <view class="record-filter"><t-button block custom-style="width:100%;min-width:0;padding:4px;min-height:44px;font-size:var(--font-size-aux);" data-filter="uncounted" bindtap="changeFilter" variant="text" theme="{{filter === 'uncounted' ? 'primary' : 'default'}}">不计课次</t-button></view>
+        <view class="record-filter"><t-button block custom-style="width:100%;min-width:0;padding:4px;min-height:44px;font-size:var(--font-size-aux);" data-filter="pending" bindtap="changeFilter" variant="text" theme="{{filter === 'pending' ? 'primary' : 'default'}}">待生成</t-button></view>
+      </view>
       <view wx:for="{{visibleRows}}" wx:key="studentId" class="record">
-        <view class="record-title">{{item.name}}</view><view class="record-state">{{item.statusLabel}} · {{item.sourceLabel}}</view>
-        <view class="record-actions"><t-button wx:if="{{canEdit}}" data-id="{{item.studentId}}" bindtap="edit" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">修正</t-button><t-button data-id="{{item.studentId}}" bindtap="toggleHistory" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">{{expandedId === item.studentId ? '收起历史' : '修改历史'}}</t-button></view>
+        <view class="record-main"><view class="record-title">{{item.name}}</view><view class="record-state">{{item.statusLabel}} · {{item.sourceLabel}}</view></view>
+        <view class="record-actions"><view class="record-action"><t-button block wx:if="{{canEdit}}" data-id="{{item.studentId}}" bindtap="edit" custom-style="width:100%;min-width:0;min-height:44px;padding:4px;font-size:var(--font-size-aux);" theme="primary" variant="text">更正</t-button></view><view class="record-action"><t-button block data-id="{{item.studentId}}" bindtap="toggleHistory" custom-style="width:100%;min-width:0;min-height:44px;padding:4px;font-size:var(--font-size-aux);" theme="default" variant="text">{{expandedId === item.studentId ? '收起' : '历史'}}</t-button></view></view>
         <view wx:if="{{expandedId === item.studentId}}" class="record-history"><view wx:for="{{item.historyLabels}}" wx:for-item="entry" wx:key="index">{{entry}}</view><view wx:if="{{!item.historyLabels.length}}">尚无修改历史</view></view>
       </view>
       <view wx:if="{{!visibleRows.length}}" class="record-summary">当前筛选下暂无学员</view>
@@ -18,12 +24,12 @@
       <view class="record-field"><view>训练</view><view class="record-input">{{editing.dateLabel}} {{eventTitle}}</view></view>
       <view class="record-field"><view>当前结果</view><view class="record-input">{{editing.statusLabel}} · {{editing.sourceLabel}}</view></view>
       <view class="record-field"><view>修改为</view><view class="record-input record-toggle"><text>{{draftCounted ? '已计课次' : '不计课次'}}</text><t-switch value="{{draftCounted}}" disabled="{{saving}}" bindchange="changeCounted" /></view></view>
-      <view class="record-field"><view>说明</view><t-textarea class="record-input record-reason" value="{{reason}}" maxlength="500" placeholder="填写更正原因" disabled="{{saving}}" bindchange="changeReason"  t-class="record-input record-reason" /></view>
+      <view class="record-field"><view>更正原因（必填）</view><t-textarea class="record-input record-reason" value="{{reason}}" maxlength="500" placeholder="填写更正原因" disabled="{{saving}}" bindchange="changeReason"  t-class="record-input record-reason" /></view>
       <view class="record-info">保存直接生效，自动任务不覆盖人工修改。</view>
       <view wx:if="{{saveError}}" class="editor-error">{{saveError}}</view>
       <t-button wx:if="{{conflict}}" disabled="{{saving}}" bindtap="refreshConflict" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">核对最新记录</t-button>
       <view class="record-history"><view wx:for="{{editing.historyLabels}}" wx:key="index">{{item}}</view></view>
     </block>
   </view>
-  <view class="record-footer"><t-button wx:if="{{editing}}" class="record-primary" loading="{{saving}}" disabled="{{saving || conflict}}" bindtap="save" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="record-primary" theme="primary" variant="base">保存修改</t-button><t-button wx:else class="record-primary" bindtap="goBack" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="record-primary" theme="primary" variant="base">返回</t-button></view>
+  <submit-bar wx:if="{{editing}}" primary-text="保存更正" secondary-text="取消" loading="{{saving}}" disabled="{{saving || conflict}}" bindsubmit="save" bindsecondary="closeEditor" />
 </view>
