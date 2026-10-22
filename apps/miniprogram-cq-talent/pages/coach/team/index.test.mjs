@@ -3,12 +3,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   getCoachTeam: vi.fn(),
+  getTeamTrainingGames: vi.fn(),
   requireRole: vi.fn(),
   openPage: vi.fn(),
   navigateBack: vi.fn(),
 }));
 
-vi.mock("../../../utils/api", () => ({ getCoachTeam: mocks.getCoachTeam }));
+vi.mock("../../../utils/api", () => ({ getCoachTeam: mocks.getCoachTeam, getTeamTrainingGames:mocks.getTeamTrainingGames }));
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.requireRole }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.openPage }));
 vi.mock("../../../utils/presentation", () => ({ resolveMenuInset: () => 88, resolveNavInset: () => 0 }));
@@ -44,6 +45,7 @@ function createPageInstance(data = {}) {
 
 describe("coach team detail", () => {
   beforeEach(() => {
+    mocks.getTeamTrainingGames.mockReset().mockResolvedValue({enabled:true,games:[]});
     mocks.getCoachTeam.mockReset().mockResolvedValue(teamDetail);
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
     mocks.openPage.mockReset();
@@ -56,7 +58,7 @@ describe("coach team detail", () => {
       { eventId: "formal-2", title: "第二场", startsAt: "2026-09-21T00:00:00Z", venue: "测试场", match: { homeScore: 0, awayScore: 0 } },
     ] });
     const page = createPageInstance(); await page.load("team-1"); expect(mocks.getCoachTeam).toHaveBeenCalledWith("team-1");
-    expect(page.data.matches.map(item => item.score)).toEqual(["未记录比分", "0 : 0"]);
+    expect(Object.fromEntries(page.data.matches.map(item => [item.eventId,item.score]))).toEqual({"formal-1":"未记录比分","formal-2":"0 : 0"});
     page.openMatch({ currentTarget: { dataset: { id: "formal-1" } } }); expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/match/index?id=formal-1");
   });
 
@@ -197,4 +199,14 @@ it("refreshes the active team after returning from the selector", async()=>{
  mocks.getCoachTeam.mockClear();await page.onShow();
  expect(mocks.getCoachTeam).toHaveBeenCalledWith(undefined);
  expect(page.data.section).toBe("roster");
+});
+
+it("keeps two games in one training course distinct and links their stable IDs",async()=>{
+ mocks.requireRole.mockReturnValue({role:"coach"});mocks.getCoachTeam.mockResolvedValue(teamDetail);mocks.openPage.mockClear();
+ const rows=["g1","g2"].map(id=>({game:{id,eventId:"shared-course",sideAName:"红队",sideBName:"蓝队",scoreA:null,scoreB:null,state:"draft"},event:{id:"shared-course",title:"课堂",startsAt:"2026-10-22T08:00:00Z",status:"scheduled"}}));
+ mocks.getTeamTrainingGames.mockResolvedValue({enabled:true,games:rows});
+ const p=createPageInstance();await p.onLoad({teamId:"team-1",section:"matches"});await Promise.resolve();await Promise.resolve();
+ expect(p.data.visibleMatches.map(item=>item.key)).toEqual(["training_friendly:g1","training_friendly:g2"]);
+ p.openMatch({currentTarget:{dataset:{id:"training_friendly:g2"}}});expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/training-game/index?eventId=shared-course&gameId=g2");
+ p.selectMatchFilter({currentTarget:{dataset:{kind:"formal"}}});expect(p.data.visibleMatches).toEqual([]);
 });

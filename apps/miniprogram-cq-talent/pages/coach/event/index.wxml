@@ -30,6 +30,13 @@
       <view wx:if="{{canWrite}}" class="training-card__edit" bindtap="createAssessmentTask">＋发起随堂测评</view>
     </view>
     <view wx:if="{{isTraining}}" class="workbench-card">
+      <view class="section-title">训练内友谊赛</view>
+      <view class="subtitle">归属本次训练课，比分与个人事件分别记录。</view>
+      <view wx:if="{{gamesLoading}}" class="subtitle">正在读取记录…</view><view wx:if="{{gamesMessage}}" class="subtitle">{{gamesMessage}}</view>
+      <view wx:for="{{friendlyGames}}" wx:key="id" class="friendly-game" data-id="{{item.id}}" bindtap="openTrainingGame" role="button"><view>{{item.title}} · {{item.score}} ›</view><view class="subtitle">{{item.summary}}</view></view>
+      <t-button wx:for="{{gameSources}}" wx:key="contentBlockId" theme="default" variant="text" data-source="{{item.contentBlockId}}" bindtap="openTrainingGame">新增一场 · {{item.contentSnapshot.name}}</t-button>
+    </view>
+    <view wx:if="{{isTraining}}" class="workbench-card">
       <view class="row"><view class="section-title">名单与课次</view><t-button variant="text" theme="primary" bindtap="openAttendance">查看全部 {{rosterCount}} 人</t-button></view>
       <view wx:if="{{trainingFactsAvailable}}" class="subtitle">已计 {{attendancePresent}} 人 · 待生成 {{pendingRecordCount}} 人 · 例外 {{exceptionRows.length}} 人</view>
       <view wx:if="{{!trainingFactsAvailable}}" class="subtitle">训练记录暂不可用，请进入名单后重试。</view>

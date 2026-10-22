@@ -1,9 +1,12 @@
+import { getTeamTrainingGames } from "../../../utils/api";
+import { gameScore, gameReadMessage, GAME_STATE_LABELS } from "../../../utils/training-games";
 import { loadActiveTeam } from "../../../utils/coach-team-context";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { CoachTeamDetail, LoadState } from "../../../utils/types";
 
+type MatchRow = { key:string; kind:"formal"|"training_friendly"; eventId:string; gameId?:string; title:string; subtitle:string; score:string; startsAt:string };
 type HeroStat = { label: string; value: string; valueClass: string };
 
 type MemberView = {
@@ -27,7 +30,7 @@ interface PageData {
   section:string; pageTitle:string;
   hasTeamOptions: boolean; hasMatches: boolean;
   teamId: string; teamOptions: Array<{ id: string; name: string }>;
-  matches: Array<{ eventId: string; title: string; subtitle: string; score: string }>;
+  matches: MatchRow[]; visibleMatches: MatchRow[]; matchFilter:"all"|"formal"|"training_friendly"; gamesMessage:string; gamesLoading:boolean;
   navInset: number;
   menuInset: number;
   state: LoadState;
@@ -86,7 +89,7 @@ Page<PageData>({
         hasTeam,
         hasTeamOptions: (detail.teamOptions || []).length > 1, hasMatches: (detail.formalMatches || []).length > 0,
         teamId: detail.team?.id || "", teamOptions: detail.teamOptions || [],
-        matches: (detail.formalMatches || []).map(item => ({ eventId: item.eventId, title: item.title,
+        matches: (detail.formalMatches || []).map(item => ({ key:`formal:${item.eventId}`,kind:"formal" as const,startsAt:item.startsAt,eventId: item.eventId, title: item.title,
           subtitle: `${new Date(Date.parse(item.startsAt) + 8 * 3600000).toISOString().slice(0, 16).replace("T", " ")} · ${item.match.opponentName || "对手未配置"} · ${item.venue || "地点未配置"}`,
           score: typeof item.match.homeScore === "number" && typeof item.match.awayScore === "number" ? `${item.match.homeScore} : ${item.match.awayScore}` : "未记录比分" })),
         hasMembers: members.length > 0,
@@ -99,11 +102,24 @@ Page<PageData>({
         coaches,
         coachEmptyMessage: hasTeam && !coaches.length ? "暂未配置队伍教练" : "",
       });
+      this.filterMatches();
+      if(this.data.section==="matches"||this.data.section==="all")void this.loadFriendlyGames(this.data.teamId,token);
     } catch {
       if (!currentTeamRequest(this, token)) return;
       this.setData({ ...emptyPageData("error", "队伍信息读取失败，请稍后重试。", "重新读取"), section: this.data.section, pageTitle: this.data.pageTitle });
     }
   },
+  async loadFriendlyGames(teamId:string,token:number) {
+    this.setData({gamesLoading:true});
+    try {
+      const result=await getTeamTrainingGames(teamId);if(!currentTeamRequest(this,token))return;
+      const friendly:MatchRow[]=result.games.map(({game,event})=>({key:`training_friendly:${game.id}`,kind:"training_friendly",gameId:game.id,eventId:event.id,startsAt:event.startsAt,title:`${game.sideAName} · ${game.sideBName}`,subtitle:`训练内友谊赛 · ${GAME_STATE_LABELS[game.state]} · ${event.title}${event.status==='cancelled'?'（已取消）':''} · ${event.startsAt.slice(0,10)}`,score:gameScore(game)}));
+      this.setData({matches:[...this.data.matches.filter((item:MatchRow)=>item.kind==="formal"),...friendly].sort((a:MatchRow,b:MatchRow)=>b.startsAt.localeCompare(a.startsAt)),gamesMessage:result.enabled?"训练内结果仅覆盖已记录场次，草稿和作废状态单独标明。":"训练内友谊赛记录尚未启用"});this.filterMatches();
+    }catch(error){if(currentTeamRequest(this,token))this.setData({gamesMessage:gameReadMessage(error)});}
+    finally{if(currentTeamRequest(this,token))this.setData({gamesLoading:false});}
+  },
+  filterMatches(){this.setData({visibleMatches:this.data.matches.filter((item:MatchRow)=>this.data.matchFilter==="all"||item.kind===this.data.matchFilter),hasMatches:this.data.matches.length>0});},
+  selectMatchFilter(event:{currentTarget:{dataset:{kind:string}}}){const kind=event.currentTarget.dataset.kind;if(!["all","formal","training_friendly"].includes(kind))return;this.setData({matchFilter:kind});this.filterMatches();},
   searchMembers(event: { detail: { value: string } }) {
     const search = event.detail.value;
     const query = search.trim().toLocaleLowerCase();
@@ -119,7 +135,10 @@ Page<PageData>({
   },
   selectTeam(event: { currentTarget: { dataset: { id: string } } }) { return this.load(event.currentTarget.dataset.id); },
   openMatch(event: { currentTarget: { dataset: { id: string } } }) {
-    if (this.data.matches.some((match: PageData["matches"][number]) => match.eventId === event.currentTarget.dataset.id)) openPage(`/pages/coach/match/index?id=${encodeURIComponent(event.currentTarget.dataset.id)}`);
+    const id=event.currentTarget.dataset.id;
+    const item=this.data.matches.find((match:MatchRow)=>match.key===id||(match.kind==="formal"&&match.eventId===id));if(!item)return;
+    if(item.kind==="training_friendly"&&item.gameId)openPage(`/pages/coach/training-game/index?eventId=${encodeURIComponent(item.eventId)}&gameId=${encodeURIComponent(item.gameId)}`);
+    else openPage(`/pages/coach/match/index?id=${encodeURIComponent(item.eventId)}`);
   },
   openRadar(event: { currentTarget?: { dataset?: { id?: string } } }) {
     const id = event.currentTarget?.dataset?.id;
@@ -129,7 +148,7 @@ Page<PageData>({
 
 function emptyPageData(state: LoadState, message: string, retryLabel = ""): PageData {
   return {
-    section:"all",pageTitle:"球队详情",hasTeamOptions: false, hasMatches: false, teamId: "", teamOptions: [], matches: [],
+    section:"all",pageTitle:"球队详情",hasTeamOptions: false, hasMatches: false, teamId: "", teamOptions: [], matches: [], visibleMatches:[],matchFilter:"all",gamesMessage:"",gamesLoading:false,
     navInset: resolveNavInset(),
     menuInset: resolveMenuInset(),
     state,

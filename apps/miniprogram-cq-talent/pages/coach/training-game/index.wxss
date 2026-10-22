@@ -1,0 +1,14 @@
+.game-page { min-height:100vh; background:var(--color-page); color:var(--color-text); }
+.game-body { padding:24rpx var(--spacing-page) calc(160px + env(safe-area-inset-bottom)); }
+.game-title { font-size:var(--font-size-display); font-weight:600; line-height:1.5; }
+.game-muted { color:var(--color-text-secondary); font-size:var(--font-size-aux); line-height:1.6; overflow-wrap:anywhere; }
+.game-note { margin-top:16rpx; padding:20rpx; background:var(--color-brand-soft); color:var(--color-text-secondary); font-size:var(--font-size-aux); line-height:1.6; border-radius:var(--radius-button); }
+.game-section { margin-top:24rpx; padding:24rpx; border:1rpx solid var(--color-line); background:var(--color-card); border-radius:var(--radius-card); }
+.game-section__title { font-size:var(--font-size-section); font-weight:600; line-height:1.5; margin-bottom:16rpx; }
+.game-score-grid,.game-picker-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12rpx; }
+.game-player,.game-event { display:flex; align-items:center; justify-content:space-between; gap:16rpx; border-bottom:1rpx solid var(--color-line); padding:8rpx 0; font-size:var(--font-size-body); line-height:1.5; }
+.game-player > text,.game-event > view { min-width:0; flex:1; overflow-wrap:anywhere; }
+.game-choice { display:flex; align-items:center; min-height:44px; padding:8rpx; box-sizing:border-box; font-size:var(--font-size-body); line-height:1.5; color:var(--color-brand); overflow-wrap:anywhere; }
+.game-event-editor { margin-top:24rpx; border-top:1rpx solid var(--color-line); }
+.game-history { margin-top:16rpx; padding-bottom:16rpx; border-bottom:1rpx solid var(--color-line); font-size:var(--font-size-aux); line-height:1.6; }
+.game-error { margin:24rpx 0; color:var(--color-error); font-size:var(--font-size-body); line-height:1.6; }

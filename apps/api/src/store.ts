@@ -1,3 +1,4 @@
+import { MemoryTrainingGameRepository, type TrainingGameRepository } from "./application/training-game-repository.js";
 import {clubPresentation} from './application/backoffice-content.js';
 import {AssessmentMappingRepository} from "./persistence/assessment-mapping-repository.js";
 import type {AssessmentMappingVersion} from "@football-club/domain";
@@ -142,6 +143,7 @@ export interface ApiStore {
   readonly trainingTemplates: TrainingTemplateStore;
   getTrainingSessionByEvent(clubId: string, eventId: string): TrainingSession | null;
   applyTrainingContent(input: ApplyTrainingContent): Promise<boolean>;
+  readonly trainingGames: TrainingGameRepository;
   readonly trainingRecords: TrainingRecordRepository;
   readonly studentEvaluations: StudentEvaluationRepository;
   readonly scoutPlayers: ScoutPlayerRepository | null;
@@ -695,6 +697,7 @@ export abstract class SeedBackedStore implements ApiStore {
     return result;
   }
   readonly studentEvaluations: StudentEvaluationRepository = new MemoryStudentEvaluationRepository();
+  readonly trainingGames: TrainingGameRepository = new MemoryTrainingGameRepository();
   readonly trainingRecords: TrainingRecordRepository = new MemoryTrainingRecordRepository();
   readonly assessmentWorkflow: AssessmentWorkflowRepository = new MemoryAssessmentWorkflowRepository();
   protected readonly data: SeedData;
@@ -2547,6 +2550,7 @@ export class PersistentApiStore extends SeedBackedStore {
   override readonly scoutPlayers: ScoutPlayerRepository;
   override readonly temporaryRosters: TemporaryRosterRepository;
   override readonly studentEvaluations: StudentEvaluationRepository;
+  override readonly trainingGames: TrainingGameRepository;
   override readonly trainingRecords: TrainingRecordRepository;
   override readonly assessmentWorkflow: AssessmentWorkflowRepository;
   constructor(
@@ -2556,6 +2560,7 @@ export class PersistentApiStore extends SeedBackedStore {
     super(mergePersistedTrainingSessionData(repositories, mergePersistedSessionPlanData(repositories, mergePersistedPlatformData(repositories, mergePersistedMatchData(repositories, mergePersistedAssessmentData(repositories, data))))));
     this.assessmentWorkflow = repositories.assessmentWorkflow;
     for (const clubId of repositories.backofficeManagement.clubIds()) this.refreshBackofficeAssessmentCatalog(clubId);
+    this.trainingGames = repositories.trainingGames;
     this.trainingRecords = repositories.trainingRecords;
     this.studentEvaluations = repositories.studentEvaluations;
     this.scoutPlayers = repositories.scoutPlayers;

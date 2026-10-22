@@ -1,0 +1,45 @@
+{
+  "scope": "官方原生模拟器，合成双孩子/双队记录，写请求全部拒绝；不是部署或真机证明",
+  "images": [
+    {
+      "path": "/tmp/cq-b3-native/01-editor.png",
+      "sha256": "4caad2e7b84ff814f6ad34c86a8809ac79679dd740668051ba10d71e05e0e728"
+    },
+    {
+      "path": "/tmp/cq-b3-native/02-roster.png",
+      "sha256": "50436950bf151d929f93da1af857bbdac6305089d695ffa34acd90f3f6d13640"
+    },
+    {
+      "path": "/tmp/cq-b3-native/03-events.png",
+      "sha256": "b1220d4be4b90536212b650e2b0932020837748569ca73f080589aca4145ce45"
+    },
+    {
+      "path": "/tmp/cq-b3-native/04-classroom.png",
+      "sha256": "ffd473faa1e6544f5e39a56ed1ab65859d69bbacb0e1eb48305a113f35afc7ef"
+    },
+    {
+      "path": "/tmp/cq-b3-native/05-directory.png",
+      "sha256": "71fa5ba1c86a6d47aa18172bf93cafb8fb3d99899549179bf0bb7b7504d1f7fd"
+    },
+    {
+      "path": "/tmp/cq-b3-native/06-parent.png",
+      "sha256": "b7d8044431dfd82eaaa85bc7e55407df74f6d9ea87f892db2bd2cb032674dd48"
+    },
+    {
+      "path": "/tmp/cq-b3-native/07-parent-second.png",
+      "sha256": "fc406b37ba0d2dcdcd9eced843f7e7b59bc4f5e226ed31d28b6f2613ebff78d5"
+    }
+  ],
+  "checks": [
+    "编辑页比分/名单/事件/历史分区",
+    "名单展开搜索仅显示目标学员",
+    "事件备注自适应高度",
+    "课堂与球队目录同gameId，正式与训练内比赛区分",
+    "家长同场切换孩子，进球与扑救分别投影，内容卡自适应无重叠"
+  ],
+  "recoveredIssues": [
+    "家长验证脚本详情URL修正",
+    "新增家长比赛卡不继承训练卡固定高度"
+  ],
+  "cleanup": "请求mock、session、context和本次草稿恢复，返回启动页"
+}

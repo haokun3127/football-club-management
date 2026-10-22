@@ -1,3 +1,4 @@
+import { registerTrainingGameRoutes } from "./routes/training-game.routes.js";
 import { createHash } from "node:crypto";
 import { registerBackofficeManagementRoutes } from "./routes/backoffice-management.routes.js";
 import { registerScoutPlayerRoutes } from "./routes/scout-player.routes.js";
@@ -160,6 +161,7 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
   void app.register(registerCalendarRoutes, context);
   void app.register(registerTrainingRoutes, context);
   void app.register(registerTrainingRecordRoutes, context);
+  void app.register(registerTrainingGameRoutes, context);
   void app.register(registerStudentEvaluationRoutes, context);
   void app.register(registerScoutPlayerRoutes, context);
   void app.register(registerTemporaryRosterRoutes, context);

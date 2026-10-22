@@ -1,3 +1,4 @@
+import { SqliteTrainingGameRepository } from "./training-game-repository.js";
 import { BackofficeManagementRepository } from "./backoffice-management-repository.js";
 import { SqliteScoutPlayerRepository } from "./scout-player-repository.js";
 import { BackofficeAuthRepository } from "./backoffice-auth-repository.js";
@@ -43,6 +44,7 @@ export interface PlatformRepositories {
   scoutPlayers: SqliteScoutPlayerRepository;
   temporaryRosters: SqliteTemporaryRosterRepository;
   studentEvaluations: SqliteStudentEvaluationRepository;
+  trainingGames: SqliteTrainingGameRepository;
   trainingRecords: SqliteTrainingRecordRepository;
   assessmentWorkflow: SqliteAssessmentWorkflowRepository;
   appClientSessions: AppClientSessionRepository;
@@ -80,6 +82,7 @@ export function createPlatformRepositories(database: DatabaseSync, identityKeyri
     scoutPlayers: new SqliteScoutPlayerRepository(database, identityKeyring),
     temporaryRosters: new SqliteTemporaryRosterRepository(database),
     studentEvaluations: new SqliteStudentEvaluationRepository(database),
+    trainingGames: new SqliteTrainingGameRepository(database),
     trainingRecords: new SqliteTrainingRecordRepository(database),
     assessmentWorkflow: new SqliteAssessmentWorkflowRepository(database),
     appClientSessions: new AppClientSessionRepository(database),

@@ -1,3 +1,5 @@
+import { getTrainingGames } from "../../../utils/api";
+import { gameScore, gameReadMessage, GAME_STATE_LABELS, type GameContext } from "../../../utils/training-games";
 import { type TrainingRecord } from "../../../utils/training-records";
 import { attendanceLeaveConflictMessage, getCoachAssessmentTasks, getTrainingTemplates, saveTrainingTemplate, previewTrainingTransfer, applyTrainingTransfer, getCoachWorkbench, isAttendanceLeaveConflictError, resolveAttendanceLeaveConflicts, saveCoachAttendance } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
@@ -77,6 +79,7 @@ Page({
     attendanceNeedsRefresh: false,
     trainingFactsAvailable: false,
     isTraining: false,
+    gameSources:[] as GameContext["sources"], friendlyGames:[] as Array<{id:string;title:string;score:string;summary:string}>, gamesMessage:"", gamesLoading:false,
     courseTasks: [] as Array<{ id: string; title: string; templateId: string; summary: string }>,
     courseTaskMessage: "",
     attendanceError: "",
@@ -145,7 +148,7 @@ Page({
       this.setData({ state: "error", message: "缺少活动 ID" });
       return;
     }
-    this.setData({ state: "loading", message: "正在读取活动工作台", eventId: id });
+    this.setData({ state: "loading", message: "正在读取活动工作台", eventId: id,gameSources:[],friendlyGames:[],gamesMessage:"",gamesLoading:false });
     try {
       const workbench = await getCoachWorkbench(id);
       if (!currentLoadRequest(this, request)) return;
@@ -207,7 +210,7 @@ Page({
         attendanceSaving: false,
         attendanceError: "",
       });
-      if (isTraining) void this.loadCourseTasks(id, request);
+      if (isTraining) { void this.loadCourseTasks(id, request); void this.loadCourseGames(id, request); }
     } catch {
       if (!currentLoadRequest(this, request)) return;
       this.setData({
@@ -238,6 +241,19 @@ Page({
         attendanceError: "",
       });
     }
+  },
+  async loadCourseGames(eventId:string,ticket:number) {
+    this.setData({gamesLoading:true});
+    try {
+      const response=await getTrainingGames(eventId);if(!currentLoadRequest(this,ticket))return;
+      this.setData({gameSources:response.canEdit?response.sources:[],friendlyGames:response.games.map(game=>({id:game.id,title:`${game.sideAName} · ${game.sideBName}`,score:gameScore(game),summary:`${GAME_STATE_LABELS[game.state]} · 已记录 ${game.events.length} 条事件${game.sourceAdjusted?' · 原内容已调整':''}`})),gamesMessage:!response.enabled?"训练内友谊赛记录尚未启用":!response.sources.length&&!response.games.length?"本课尚未安排可记录的友谊赛内容":""});
+    }catch(error){if(currentLoadRequest(this,ticket))this.setData({gamesMessage:gameReadMessage(error)});}
+    finally{if(currentLoadRequest(this,ticket))this.setData({gamesLoading:false});}
+  },
+  openTrainingGame(event:{currentTarget:{dataset:{id?:string;source?:string}}}) {
+    const {id,source}=event.currentTarget.dataset;
+    if(id&&this.data.friendlyGames.some((game:{id:string})=>game.id===id))openPage(`/pages/coach/training-game/index?eventId=${encodeURIComponent(this.data.eventId)}&gameId=${encodeURIComponent(id)}`);
+    else if(source&&this.data.gameSources.some((item:GameContext["sources"][number])=>item.contentBlockId===source))openPage(`/pages/coach/training-game/index?eventId=${encodeURIComponent(this.data.eventId)}&contentBlockId=${encodeURIComponent(source)}`);
   },
   async loadCourseTasks(eventId: string, ticket: number) {
     this.setData({ courseTasks: [], courseTaskMessage: "正在读取本课测评" });

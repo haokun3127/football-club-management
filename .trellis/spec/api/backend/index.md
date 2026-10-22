@@ -60,3 +60,5 @@ The goal is to help AI assistants and new team members understand how YOUR proje
 - [Public Presentation and Confirmed Child Results](./public-presentation-results.md): native configuration, scoped preferences and guardian-only raw/mapped confirmation readback.
 
 - [Event Presentation and Child Context](./event-presentation.md): authorized shared course facts, typed client projection and explicit child selection.
+
+- [Training Games](./training-games.md): independent training-game records, partial events, guardian projection, atomic revisions and uncertain write recovery.

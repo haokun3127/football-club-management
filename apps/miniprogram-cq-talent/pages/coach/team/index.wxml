@@ -15,7 +15,13 @@
         </view>
       </view>
 
-      <view class="matches-section" wx:if="{{section === 'all' || section === 'matches'}}"><view class="members-title">正式赛事</view><view class="members-empty">与日历共用赛事记录，友谊赛在训练内容中查看。</view><view wx:for="{{matches}}" wx:key="eventId" class="team-match" data-id="{{item.eventId}}" bindtap="openMatch"><view class="team-match__title">{{item.title}} ›</view><view class="team-match__subtitle">{{item.subtitle}}</view><view class="team-match__score">{{item.score}}</view></view><view wx:if="{{!hasMatches}}" class="members-empty">本队暂无正式赛事</view></view>
+      <view wx:if="{{section === 'all' || section === 'matches'}}" class="matches-section">
+        <view class="members-title">比赛记录</view>
+        <view class="match-filters"><view class="match-filter {{matchFilter === 'all' ? 'match-filter--active' : ''}}" data-kind="all" bindtap="selectMatchFilter">全部</view><view class="match-filter {{matchFilter === 'formal' ? 'match-filter--active' : ''}}" data-kind="formal" bindtap="selectMatchFilter">正式赛事</view><view class="match-filter {{matchFilter === 'training_friendly' ? 'match-filter--active' : ''}}" data-kind="training_friendly" bindtap="selectMatchFilter">训练内友谊赛</view></view>
+        <view wx:if="{{gamesLoading}}" class="members-empty">正在读取训练内记录…</view><view wx:if="{{gamesMessage}}" class="members-empty">{{gamesMessage}}</view>
+        <view wx:for="{{visibleMatches}}" wx:key="key" class="team-match" data-id="{{item.key}}" bindtap="openMatch"><view class="team-match__title">{{item.title}} ›</view><view class="team-match__subtitle">{{item.subtitle}}</view><view class="team-match__score">{{item.score}}</view></view>
+        <view wx:if="{{!visibleMatches.length && !gamesLoading}}" class="members-empty">当前范围没有可展示的比赛记录</view>
+      </view>
       <block wx:if="{{section === 'all' || section === 'roster'}}">
         <view class="members-title">队员名单 · {{members.length}} 人</view>
         <t-input value="{{search}}" bindchange="searchMembers" placeholder="搜索队员姓名" aria-label="搜索队员姓名" clearable />

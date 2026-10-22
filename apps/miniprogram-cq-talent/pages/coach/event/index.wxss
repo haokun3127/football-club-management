@@ -72,3 +72,5 @@
 .club-workbench .course-assessment { background:var(--color-card); }
 .exception-row { display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:44px; border-top:1px solid var(--color-line); font-size:var(--font-size-body); }
 .club-workbench .training-card__edit { min-height:44px; display:flex; align-items:center; }
+
+.friendly-game { min-height:44px; padding:16rpx 0; border-bottom:1rpx solid var(--color-line); font-size:var(--font-size-body); line-height:1.6; }

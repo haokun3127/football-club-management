@@ -1723,3 +1723,29 @@ export async function getRadarComparison(studentId:string,role:"parent"|"coach",
  const context=requireContext();const query=[role==="coach" && teamId ? `teamId=${encodeURIComponent(teamId)}` : "",selection.historyResultId ? `historyResultId=${encodeURIComponent(selection.historyResultId)}` : "",selection.standardId ? `standardId=${encodeURIComponent(selection.standardId)}` : ""].filter(Boolean).join("&");
  return request<ComparisonData>({path:`/clubs/${context.clubId}/app-clients/${context.clientId}/${role}/students/${encodeURIComponent(studentId)}/radar-comparison${query ? `?${query}` : ""}`});
 }
+
+// Training-contained games use their own contract; formal match writes remain unchanged.
+export async function getTrainingGames(eventId: string) {
+  const context = requireContext();
+  return request<import("./training-games").GameContext>({ path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${encodeURIComponent(eventId)}/training-games` });
+}
+export async function getTrainingGame(eventId: string, gameId: string) {
+  const context = requireContext();
+  return request<{game:import("./training-games").TrainingGame;history:import("./training-games").GameHistory[]}>({ path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${encodeURIComponent(eventId)}/training-games/${encodeURIComponent(gameId)}` });
+}
+export async function createTrainingGame(eventId: string, input: {contentBlockId:string;sideAName:string;sideBName:string;requestId:string}) {
+  const context = requireContext();
+  return request<{game:import("./training-games").TrainingGame}>({ path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${encodeURIComponent(eventId)}/training-games`, method:"POST",data:input,idempotencyKey:input.requestId });
+}
+export async function saveTrainingGame(eventId: string, gameId: string, input: import("./training-games").GameWrite) {
+  const context = requireContext();
+  return request<{game:import("./training-games").TrainingGame}>({ path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${encodeURIComponent(eventId)}/training-games/${encodeURIComponent(gameId)}`,method:"PATCH",data:input,idempotencyKey:input.requestId });
+}
+export async function getTeamTrainingGames(teamId: string) {
+  const context = requireContext();
+  return request<{enabled:boolean;games:Array<{game:import("./training-games").TrainingGame;event:import("./training-games").GameContext["event"]}>}>({path:`/clubs/${context.clubId}/app-clients/${context.clientId}/coach/training-games?teamId=${encodeURIComponent(teamId)}`});
+}
+export async function getParentTrainingGames(eventId: string, studentId: string) {
+  const context = requireContext();
+  return request<{enabled:boolean;games:import("./training-games").ParentGame[]}>({path:`/clubs/${context.clubId}/app-clients/${context.clientId}/parent/events/${encodeURIComponent(eventId)}/training-games?studentId=${encodeURIComponent(studentId)}`});
+}

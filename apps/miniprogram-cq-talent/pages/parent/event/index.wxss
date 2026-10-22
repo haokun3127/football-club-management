@@ -32,3 +32,8 @@ button.p2-nav__action::after { border: none; }
 .leave-card__action,
 .leave-card__action--revoke,
 .p2-nav__back { min-height:44px; min-width:44px; box-sizing:border-box; }
+
+.parent-friendly-game { padding:16rpx 0; border-bottom:1rpx solid var(--color-line); font-size:var(--font-size-body); line-height:1.6; }
+
+.detail-card--games { padding:32rpx; height:auto; }
+.detail-card--games .detail-card__copy { display:block; overflow:visible; -webkit-line-clamp:unset; }

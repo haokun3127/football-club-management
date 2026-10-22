@@ -1,0 +1,11 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "app-header": "/components/app-header/index",
+    "status-view": "/components/status-view/index",
+    "submit-bar": "/components/submit-bar/index",
+    "t-input": "tdesign-miniprogram/input/input",
+    "t-textarea": "tdesign-miniprogram/textarea/textarea",
+    "t-button": "tdesign-miniprogram/button/button"
+  }
+}

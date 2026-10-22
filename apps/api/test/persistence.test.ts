@@ -674,6 +674,7 @@ describe("platform persistence", () => {
       "0042_backoffice_content.sql",
       "0043_backoffice_import_secrets.sql",
       "0044_app_client_role_preferences.sql",
+      "0045_training_games.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);

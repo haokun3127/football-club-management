@@ -1,4 +1,5 @@
-import { getParentActivityDetail } from "../../../utils/api";
+import { gameScore, gameReadMessage, GAME_EVENT_LABELS } from "../../../utils/training-games";
+import { getParentActivityDetail, getParentTrainingGames } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { markGrowthStale } from "../../../utils/growth-invalidation";
 import { activityStatus, activityTypeLabel, formatCalendarDate, formatTimeRange, formatDateTime, resolveMenuActionTop, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
@@ -86,6 +87,7 @@ Page({
     message: "正在读取活动详情",
     eventId: "",
     selectedStudentId: "",
+    friendlyGames:[] as Array<{id:string;title:string;score:string;events:string}>,gamesMessage:"",gamesLoading:false,
     children: [] as Array<{ id: string; name: string }>,
     detail: null as ActivityDetailView | null,
     leave: null as LeaveView | null,
@@ -101,7 +103,7 @@ Page({
   async load(id: string, requestedChildId?: string) {
     const studentId = requestedChildId ?? (id === this.data.eventId ? this.data.selectedStudentId || this.requestedStudentId : "");
     const generation = ++this.requestGeneration;
-    this.setData({ eventId: id, state: "loading", detail: null, leave: null, message: "正在读取活动详情" });
+    this.setData({ eventId: id, state: "loading", detail: null, leave: null, friendlyGames:[],gamesMessage:"",gamesLoading:false,message: "正在读取活动详情" });
     if (!id) {
       this.setData({ state: "error", message: "这条活动信息暂时无法打开，请从日程重新进入。" });
       return;
@@ -121,9 +123,18 @@ Page({
       const leave = detail.type === "training" && selectedStudentId ? await this.loadLeave(detail, id, selectedStudentId) : null;
       if (generation !== this.requestGeneration) return;
       this.setData({ state: "ready", detail: presentDetail(detail, selectedStudentId), leave, children, selectedStudentId, message: "" });
+      if(detail.type==="training"&&selectedStudentId)void this.loadFriendlyGames(id,selectedStudentId,generation);
     } catch (error) {
       if (generation === this.requestGeneration) this.setData({ state: "error", message: readableError(error) });
     }
+  },
+  async loadFriendlyGames(eventId:string,studentId:string,generation:number) {
+    this.setData({gamesLoading:true});
+    try {
+      const result=await getParentTrainingGames(eventId,studentId);if(generation!==this.requestGeneration)return;
+      this.setData({friendlyGames:result.games.map(game=>({id:game.id,title:`${game.sideAName} · ${game.sideBName}`,score:gameScore(game),events:game.events.length?`孩子的已记录事件：${game.events.map(item=>`${item.minute===null?'':`${item.minute}′ `}${GAME_EVENT_LABELS[item.type]}`).join('、')}`:"尚未记录孩子的个人事件"})),gamesMessage:result.games.length?"比分与个人事件分别记录，个人事件可能未完整录入。":result.enabled?"本课尚无已完成且关联该孩子的友谊赛记录":"训练内友谊赛记录尚未启用"});
+    }catch(error){if(generation===this.requestGeneration)this.setData({gamesMessage:gameReadMessage(error)});}
+    finally{if(generation===this.requestGeneration)this.setData({gamesLoading:false});}
   },
   selectChild(event: WechatMiniprogram.CustomEvent<{ studentId: string }>) {
     const studentId = event.detail.studentId;

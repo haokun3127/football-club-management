@@ -32,3 +32,7 @@
 .member-row__avatar { display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:50%; color:var(--color-brand); background:var(--color-brand-soft); font-size:var(--font-size-body); }
 .member-row__name { flex:1; min-width:0; overflow-wrap:anywhere; font-size:var(--font-size-body); line-height:1.5; }
 .member-row__action { color:var(--color-text-secondary); font-size:var(--font-size-aux); line-height:1.5; }
+
+.match-filters { display:grid; grid-template-columns:1fr 1fr 1.5fr; gap:8rpx; margin:16rpx 0; }
+.match-filter { display:flex; align-items:center; justify-content:center; min-height:44px; font-size:var(--font-size-aux); border:1rpx solid var(--color-line); border-radius:var(--radius-button); background:var(--color-card); }
+.match-filter--active { color:var(--color-brand); border-color:var(--color-brand); background:var(--color-brand-soft); }

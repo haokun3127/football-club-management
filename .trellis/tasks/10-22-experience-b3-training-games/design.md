@@ -1,0 +1,9 @@
+# B3 设计
+
+采用独立TrainingGame聚合，domain定义四种对象和纯验证；应用层负责授权后的来源/人员约束与状态转换；仓储负责事务、CAS及请求重放。增量0045迁移建root、participants、events、revisions四表。root记录必要来源快照，子对象按gameId/clubId约束；revision保存审计及请求hash/结果快照以重放已确认请求，不引入通用审计引擎。现有评价/训练记录审计均绑定自身对象，无法直接接纳本对象，因此使用聚焦修订表。
+
+新API置于既有app-client路径，复用membership/session、getCoachToday授权课程和guardian绑定；教练执行权限不提高为仅主教练编排权限。feature沿用assessment式俱乐部allowlist：FCM_TRAINING_GAME_CLUBS，默认关闭；旧服务/关闭时UI说明尚未启用，不显示虚假0场。正式Match routes不变。
+
+初建仅支持当前plan中friendly_match drill的稳定blockId；快照保留planId/blockId/drillId/名称/内容revision。后续块变化不删除历史；修改不能换源。取消课程只读历史，完成记录不计课、不发布测评分。完成后仅带理由维持完成或作废，作废终态。
+
+历史formal friendly/internal保留原表；迁移不UPDATE/搬迁旧表。使用持久化测试库在迁移前构造两类记录并验证迁移、重启后原样。当前没有读取部署数据库，因此不推断全量历史实际覆盖。

@@ -1,0 +1,49 @@
+<view class="game-page">
+  <app-header title="友谊赛记录" show-back="{{true}}" title-align="left" back-disabled="{{busy}}" />
+  <view class="game-body">
+    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '读取比赛记录' : '暂时无法打开'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <block wx:if="{{state === 'ready'}}">
+      <view class="game-title">{{sourceName}}</view>
+      <view class="game-muted">{{context.event.title}} · {{stateLabel}}</view>
+      <view class="game-note">记录属于本次训练课，不额外计次。比分由教练确认；个人事件可部分记录，不自动改写比分。</view>
+      <view wx:if="{{game.sourceAdjusted}}" class="game-note">原训练内容已调整，当前记录保留原内容快照。</view>
+      <view wx:if="{{!context.enabled}}" class="game-note">记录功能尚未启用，已有记录仅供查看。</view>
+      <view wx:if="{{context.event.status === 'cancelled'}}" class="game-note">课程已取消，仅供查看历史。</view>
+      <view class="game-section">
+        <view class="game-section__title">对阵与比分</view>
+        <t-input label="甲方" value="{{form.sideAName}}" maxlength="80" data-field="sideAName" bindchange="editField" disabled="{{readOnly || busy || uncertain || conflict}}" />
+        <t-input label="乙方" value="{{form.sideBName}}" maxlength="80" data-field="sideBName" bindchange="editField" disabled="{{readOnly || busy || uncertain || conflict}}" />
+        <view class="game-score-grid"><view><t-input label="甲方比分" type="number" value="{{form.scoreA}}" placeholder="未记录" maxlength="3" data-field="scoreA" bindchange="editField" disabled="{{readOnly || busy || uncertain || conflict}}" /></view><view><t-input label="乙方比分" type="number" value="{{form.scoreB}}" placeholder="未记录" maxlength="3" data-field="scoreB" bindchange="editField" disabled="{{readOnly || busy || uncertain || conflict}}" /></view></view>
+        <view class="game-muted">双方同时留空表示未记录；0 : 0 是有效比分。</view>
+      </view>
+      <view class="game-section">
+        <view class="game-section__title">实际参赛学员 · {{form.participants.length}} 人</view>
+        <view class="game-muted">{{selectedParticipantsLabel}}</view>
+        <t-button theme="default" variant="text" bindtap="toggleParticipants">{{participantsExpanded ? '收起名单' : readOnly ? '查看名单' : '选择或调整名单'}}</t-button>
+        <block wx:if="{{participantsExpanded}}"><t-input value="{{participantSearch}}" placeholder="搜索本课学员" bindchange="searchParticipants" clearable="{{true}}" />
+        <view wx:for="{{visibleRows}}" wx:key="studentId" class="game-player"><text>{{item.name}}</text><picker range="{{sideOptions}}" value="{{item.sideIndex}}" data-id="{{item.studentId}}" bindchange="selectParticipant" disabled="{{readOnly || busy || uncertain || conflict}}"><view class="game-choice">{{sideOptions[item.sideIndex]}} ›</view></picker></view></block>
+      </view>
+      <view class="game-section">
+        <view class="game-section__title">已记录事件 · {{form.events.length}} 条</view>
+        <view class="game-muted">无事件记录表示尚未记录，不能据此判断没有进球、助攻或扑救。</view>
+        <view wx:for="{{eventRows}}" wx:key="id" class="game-event"><view><view>{{item.label}}</view><view wx:if="{{item.note}}" class="game-muted">{{item.note}}</view></view><t-button wx:if="{{!readOnly}}" theme="default" variant="text" data-id="{{item.id}}" bindtap="removeEvent" disabled="{{busy || uncertain || conflict}}">移除</t-button></view>
+        <view wx:if="{{!readOnly}}" class="game-event-editor">
+          <view class="game-picker-grid"><picker range="{{eventTypes}}" value="{{eventTypeIndex}}" data-field="eventTypeIndex" bindchange="editEvent" disabled="{{busy || uncertain || conflict}}"><view class="game-choice">{{eventTypes[eventTypeIndex]}} ›</view></picker><picker range="{{[form.sideAName, form.sideBName]}}" value="{{eventSideIndex}}" data-field="eventSideIndex" bindchange="editEvent" disabled="{{busy || uncertain || conflict}}"><view class="game-choice">{{eventSideIndex === 0 ? form.sideAName : form.sideBName}} ›</view></picker></view>
+          <picker range="{{eventPlayers}}" range-key="name" value="{{eventStudentIndex}}" data-field="eventStudentIndex" bindchange="editEvent" disabled="{{busy || uncertain || conflict}}"><view class="game-choice">{{eventPlayers[eventStudentIndex].name}} ›</view></picker>
+          <t-input label="分钟" type="number" value="{{eventMinute}}" placeholder="可留空" maxlength="3" data-field="eventMinute" bindchange="editEvent" disabled="{{busy || uncertain || conflict}}" />
+          <t-textarea autosize="{{true}}" value="{{eventNote}}" placeholder="事件备注（选填）" maxlength="500" data-field="eventNote" bindchange="editEvent" disabled="{{busy || uncertain || conflict}}" />
+          <t-button theme="default" block="{{true}}" bindtap="addEvent" disabled="{{busy || uncertain || conflict}}">加入事件记录</t-button>
+        </view>
+      </view>
+      <view class="game-section" wx:if="{{game}}">
+        <view class="game-section__title">修订与历史</view>
+        <t-textarea autosize="{{true}}" wx:if="{{!readOnly}}" value="{{form.reason}}" placeholder="完成后修改或作废须填写原因" maxlength="500" data-field="reason" bindchange="editField" disabled="{{busy || uncertain || conflict}}" />
+        <view wx:for="{{history}}" wx:key="revision" class="game-history"><view>{{item.label}}</view><view class="game-muted">{{item.reason || '保存草稿'}} · {{item.changedAt}}</view></view>
+        <t-button wx:if="{{!readOnly}}" theme="danger" variant="text" bindtap="voidGame" disabled="{{busy || uncertain || conflict}}">作废这场记录</t-button>
+      </view>
+      <view wx:if="{{error}}" class="game-error">{{error}}</view>
+      <t-button wx:if="{{!readOnly}}" theme="default" variant="text" bindtap="reloadServer" disabled="{{busy}}">重新读取服务器记录</t-button>
+    </block>
+  </view>
+  <submit-bar wx:if="{{state === 'ready' && !readOnly}}" primary-text="{{uncertain ? '重试原提交' : primaryText}}" secondary-text="{{!uncertain && (!game || game.state === 'draft') ? '保存草稿' : ''}}" loading="{{busy}}" disabled="{{conflict}}" bindsubmit="complete" bindsecondary="saveDraft" hint="{{error || (conflict ? '本机修改已保留，请核对服务器记录' : changed ? '本机有未提交修改' : '完成后家长可见自己孩子的记录')}}" />
+</view>

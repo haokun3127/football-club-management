@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   getParentActivityDetail: vi.fn(),
+  getParentTrainingGames:vi.fn(),
   getTrainingRecords: vi.fn(),
   requestTrainingLeave: vi.fn(),
   revokeTrainingLeave: vi.fn(),
@@ -10,7 +11,7 @@ const mocks = vi.hoisted(() => ({
   requireRole: vi.fn(),
 }));
 
-vi.mock("../../../utils/api", () => ({ getParentActivityDetail: mocks.getParentActivityDetail }));
+vi.mock("../../../utils/api", () => ({ getParentActivityDetail: mocks.getParentActivityDetail, getParentTrainingGames:mocks.getParentTrainingGames }));
 vi.mock("../../../utils/training-records", () => ({
   getTrainingRecords: mocks.getTrainingRecords,
   requestTrainingLeave: mocks.requestTrainingLeave,
@@ -76,6 +77,7 @@ function detail(overrides = {}) {
 
 beforeEach(() => {
   mocks.getParentActivityDetail.mockReset();
+  mocks.getParentTrainingGames.mockReset().mockResolvedValue({enabled:true,games:[]});
   mocks.getTrainingRecords.mockReset().mockResolvedValue({ total: 0, records: [] });
   mocks.requestTrainingLeave.mockReset();
   mocks.revokeTrainingLeave.mockReset();
@@ -445,4 +447,12 @@ describe("typed activity facts and explicit child context", () => {
     await pending;
     expect(page.data.detail).toBeNull();
   });
+});
+
+it("ignores a late first-child game response after selecting the second child",async()=>{
+ mocks.getParentActivityDetail.mockResolvedValue(detail({participants:[{studentId:"student-1",name:"甲",status:"confirmed"},{studentId:"student-2",name:"乙",status:"confirmed"}]}));
+ let resolveFirst; mocks.getParentTrainingGames.mockImplementationOnce(()=>new Promise(resolve=>{resolveFirst=resolve;})).mockResolvedValueOnce({enabled:true,games:[{id:"second-game",sideAName:"红队",sideBName:"蓝队",scoreA:0,scoreB:0,events:[{type:"save",minute:0}]}]});
+ const p=createPageInstance();await p.load("event-1","student-1");await p.selectChild({detail:{studentId:"student-2"}});await Promise.resolve();
+ resolveFirst({enabled:true,games:[{id:"first-game",sideAName:"甲队",sideBName:"乙队",scoreA:9,scoreB:0,events:[]}]});await Promise.resolve();await Promise.resolve();
+ expect(mocks.getParentTrainingGames).toHaveBeenCalledWith("event-1","student-2");expect(p.data.friendlyGames.map(item=>item.id)).toEqual(["second-game"]);expect(p.data.friendlyGames[0].score).toBe("0 : 0");expect(p.data.friendlyGames[0].events).toContain("扑救");
 });
