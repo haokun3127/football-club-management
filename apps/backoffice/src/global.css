@@ -74,9 +74,6 @@ body {
   place-items: center;
   font-weight: 700;
 }
-.workspace-intro {
-  padding: 16px 0 30px;
-}
 @media (max-width: 800px) {
   .login-page {
     grid-template-columns: 1fr;
@@ -114,4 +111,59 @@ body {
   max-width: 560px;
 }
 
-.role-default-select { min-width:160px; }
+.role-default-select {
+  min-width: 160px;
+}
+
+.resource-summary {
+  margin-bottom: 20px;
+}
+.resource-summary h4.ant-typography {
+  margin: 0 0 8px;
+}
+.resource-fieldset {
+  border: 0;
+  padding: 0;
+  margin: 8px 0 24px;
+  min-width: 0;
+}
+.resource-fieldset legend {
+  color: inherit;
+  font-weight: 600;
+  font-size: 18px;
+  padding-bottom: 12px;
+}
+.resource-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 24px;
+}
+.resource-field-grid .ant-form-item {
+  min-width: 0;
+}
+.resource-field-wide {
+  grid-column: 1 / -1;
+}
+.resource-drawer .ant-drawer-footer {
+  padding: 12px 24px;
+  text-align: right;
+}
+.workbench .ant-list-item {
+  gap: 12px;
+  align-items: flex-start;
+}
+.workbench .ant-list-item-action {
+  margin-left: 0;
+  flex-shrink: 0;
+}
+.workbench-summary-title.ant-typography {
+  margin-top: 28px;
+}
+@media (max-width: 600px) {
+  .resource-field-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .resource-drawer .ant-drawer-body {
+    padding: 16px;
+  }
+}

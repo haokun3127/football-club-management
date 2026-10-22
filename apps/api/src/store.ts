@@ -3521,8 +3521,9 @@ export class PersistentApiStore extends SeedBackedStore {
   }
 
   private mergeCalendarEvents(clubId: EntityId): CalendarEvent[] {
-    const byId = new Map(this.repositories.calendar.listEvents(clubId).map((event) => [event.id, event]));
-    for (const event of this.data.events.filter((item) => item.clubId === clubId)) {
+    // Persisted edits are authoritative; the in-memory seed is only a fallback.
+    const byId = new Map(this.data.events.filter((event) => event.clubId === clubId).map((event) => [event.id, event]));
+    for (const event of this.repositories.calendar.listEvents(clubId)) {
       byId.set(event.id, event);
     }
     return [...byId.values()].sort((left, right) =>

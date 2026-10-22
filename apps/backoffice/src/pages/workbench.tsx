@@ -39,8 +39,11 @@ export default function Workbench() {
     pendingServices: number | null;
   }>();
   const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     const controller = new AbortController();
+    setError("");
+    setData(undefined);
     void api<NonNullable<typeof data>>("workbench", {
       signal: controller.signal,
     })
@@ -51,37 +54,38 @@ export default function Workbench() {
         if (!controller.signal.aborted) setError(errorText(reason));
       });
     return () => controller.abort();
-  }, []);
+  }, [attempt]);
   return (
     <PageContainer
       title="工作台"
-      subTitle="从人员与课程开始，连接教学过程和成长记录"
+      subTitle="跟进课堂、测评与服务，再查阅俱乐部资料"
+      className="workbench"
     >
-      <div className="workspace-intro">
-        <Typography.Title level={2}>俱乐部日常，一处管理。</Typography.Title>
-        <Typography.Paragraph>
-          查看业务资料，跟进课程和训练安排。
-        </Typography.Paragraph>
-      </div>
-      {error && <Alert message={error} type="error" />}
+      {error && (
+        <Alert
+          className="form-alert"
+          message={error}
+          type="error"
+          action={
+            <Button onClick={() => setAttempt((value) => value + 1)}>
+              重试
+            </Button>
+          }
+        />
+      )}
+      <Typography.Title level={3}>待办与近期日程</Typography.Title>
       <Row gutter={[20, 20]}>
-        {resources.map(([id, name]) => (
-          <Col key={id} xs={24} sm={12} xl={6}>
-            <ProCard bordered>
-              <Statistic title={name} value={data?.counts[id] ?? "—"} />
-              <Button type="link" onClick={() => history.push(`/data/${id}`)}>
-                查看资料
-              </Button>
-            </ProCard>
-          </Col>
-        ))}
-      </Row>
-      <Row gutter={[20, 20]} style={{ marginTop: 20 }}>
         <Col xs={24} lg={12}>
           <Card title="近期日程">
             <List
               dataSource={data?.upcoming ?? []}
-              locale={{ emptyText: data ? "暂无近期安排" : "正在读取" }}
+              locale={{
+                emptyText: data
+                  ? "暂无近期安排"
+                  : error
+                    ? "暂不可用，请重试"
+                    : "正在读取",
+              }}
               renderItem={(event) => (
                 <List.Item
                   actions={[
@@ -110,7 +114,13 @@ export default function Workbench() {
           <Card title="测评待办">
             <List
               dataSource={data?.pendingTasks ?? []}
-              locale={{ emptyText: data ? "暂无未处理任务" : "正在读取" }}
+              locale={{
+                emptyText: data
+                  ? "暂无未处理任务"
+                  : error
+                    ? "暂不可用，请重试"
+                    : "正在读取",
+              }}
               renderItem={(task) => (
                 <List.Item
                   actions={[
@@ -130,7 +140,7 @@ export default function Workbench() {
                   {task.title} ·{" "}
                   {task.pending === null
                     ? "定义需核对"
-                    : `${task.pending} 人待处理，${task.unpublished ?? 0} 人待确认`}
+                    : `${task.pending} 人待处理，${task.unpublished === null ? "确认进度暂不可用" : `${task.unpublished} 人待确认`}`}
                 </List.Item>
               )}
             />
@@ -140,7 +150,13 @@ export default function Workbench() {
           <Card title="导入问题">
             <List
               dataSource={data?.failedImports ?? []}
-              locale={{ emptyText: data ? "暂无失败行" : "正在读取" }}
+              locale={{
+                emptyText: data
+                  ? "暂无失败行"
+                  : error
+                    ? "暂不可用，请重试"
+                    : "正在读取",
+              }}
               renderItem={(batch) => (
                 <List.Item>
                   {batch.sourceName} · {batch.failed} 行失败
@@ -165,6 +181,21 @@ export default function Workbench() {
             </Space>
           </Card>
         </Col>
+      </Row>
+      <Typography.Title level={3} className="workbench-summary-title">
+        俱乐部资料
+      </Typography.Title>
+      <Row gutter={[20, 20]}>
+        {resources.map(([id, name]) => (
+          <Col key={id} xs={24} sm={12} xl={6}>
+            <ProCard bordered>
+              <Statistic title={name} value={data?.counts[id] ?? "—"} />
+              <Button type="link" onClick={() => history.push(`/data/${id}`)}>
+                查看资料
+              </Button>
+            </ProCard>
+          </Col>
+        ))}
       </Row>
     </PageContainer>
   );

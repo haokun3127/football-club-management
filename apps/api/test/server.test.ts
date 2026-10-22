@@ -585,6 +585,8 @@ describe("api server", () => {
     const seed = createSeedData();
     const scheduledMatch = seed.events.find((event) => event.id === "event-match-1")!;
     scheduledMatch.status = "scheduled";
+    // The fixture must update the authoritative persisted event too.
+    persistence.repositories.calendar.saveEvent(scheduledMatch);
     seed.events.push({ ...scheduledMatch, id: "event-match-readonly", status: "completed" });
     seed.participants.push(...seed.participants.filter((participant) => participant.eventId === "event-match-1").map((participant) => ({ ...participant, id: `${participant.id}-readonly`, eventId: "event-match-readonly" })));
     const app = buildServer(new PersistentApiStore(persistence.repositories, seed), {

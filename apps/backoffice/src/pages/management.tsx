@@ -1,3 +1,5 @@
+import ResourceFields from "../components/resource-fields";
+import type { Field, Option } from "../services/resource-fields";
 import MembershipAppRoles from "./membership-app-roles";
 import { useLocation, history } from "@umijs/max";
 import ResourceExport from "./resource-export";
@@ -11,38 +13,18 @@ import {
   Alert,
   App,
   Button,
-  DatePicker,
   Descriptions,
   Drawer,
   Form,
-  Input,
-  InputNumber,
-  Select,
   Space,
   Spin,
-  Switch,
   Tabs,
+  Tag,
   Typography,
 } from "antd";
 import dayjs from "dayjs";
 import { api, ApiError, errorText } from "../services/api";
-export interface Field {
-  key: string;
-  label: string;
-  kind: string;
-  required?: boolean;
-  options?: Option[];
-  reference?: string;
-  multiple?: boolean;
-  minimum?: number;
-  maximum?: number;
-  appliesTo?: string;
-  virtual?: boolean;
-}
-export interface Option {
-  value: string;
-  label: string;
-}
+export type { Field, Option } from "../services/resource-fields";
 export interface RecordRow {
   id: string;
   revision: string;
@@ -86,13 +68,13 @@ export const renderValue = (value: unknown, field?: Field) =>
         : (field?.options?.find((o) => o.value === value)?.label ??
           String(value));
 export default function Management({ resource }: { resource: string }) {
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const [form] = Form.useForm();
   const action = useRef<ActionType>();
   const [data, setData] = useState<ResourceList>();
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
-  const [activeTab,setActiveTab] = useState("edit");
+  const [activeTab, setActiveTab] = useState("edit");
   const [detail, setDetail] = useState<Detail>();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -100,10 +82,31 @@ export default function Management({ resource }: { resource: string }) {
   const [latest, setLatest] = useState<RecordRow>();
   const [choices, setChoices] = useState<Record<string, Option[]>>({});
   const editorGeneration = useRef(0);
+  const [dirty, setDirty] = useState(false);
+  const [editorReady, setEditorReady] = useState(false);
+  const editTarget = useRef<{ row?: Pick<RecordRow, "id">; copy: boolean }>({
+    copy: false,
+  });
+  function discardThen(action: () => void) {
+    if (saving) return;
+    if (!dirty) return action();
+    modal.confirm({
+      title: "放弃未保存的修改？",
+      content: "此页的修改尚未保存。继续后将丢弃这些输入。",
+      okText: "放弃修改",
+      cancelText: "继续编辑",
+      onOk: () => {
+        setDirty(false);
+        action();
+      },
+    });
+  }
   function closeEditor() {
     if (saving) return;
-    editorGeneration.current += 1;
-    setOpen(false);
+    discardThen(() => {
+      editorGeneration.current += 1;
+      setOpen(false);
+    });
   }
   const eventType = Form.useWatch("type", form);
   const pending = useRef<{ serialized: string; requestId: string }>();
@@ -117,6 +120,9 @@ export default function Management({ resource }: { resource: string }) {
   }, [resource]);
   async function edit(row?: Pick<RecordRow, "id">, copy = false) {
     const generation = ++editorGeneration.current;
+    editTarget.current = { row, copy };
+    setDirty(false);
+    setEditorReady(false);
     setActiveTab("edit");
     setOpen(true);
     setLoading(true);
@@ -162,6 +168,7 @@ export default function Management({ resource }: { resource: string }) {
           }),
         ),
       );
+      setEditorReady(true);
     } catch (e) {
       if (generation === editorGeneration.current) setSaveError(errorText(e));
     } finally {
@@ -169,7 +176,7 @@ export default function Management({ resource }: { resource: string }) {
     }
   }
   async function save() {
-    if (saving || loading || !data) return;
+    if (saving || loading || !editorReady || !data) return;
     let input: Record<string, unknown>;
     try {
       input = await form.validateFields();
@@ -209,6 +216,7 @@ export default function Management({ resource }: { resource: string }) {
         },
       );
       void message.success("已保存");
+      setDirty(false);
       setOpen(false);
       pending.current = undefined;
       await action.current?.reload();
@@ -261,13 +269,11 @@ export default function Management({ resource }: { resource: string }) {
         rowKey="id"
         headerTitle={data?.title ?? "管理资料"}
         columns={columns}
+        scroll={{ x: 720 }}
         search={false}
-        options={{ density: false }}
-        toolbar={{
-          search: {
-            placeholder: "搜索资料",
-            onSearch: () => void action.current?.reload(),
-          },
+        options={{
+          density: false,
+          search: { name: "keyword", placeholder: "搜索资料" },
         }}
         pagination={{ pageSize: 20, showSizeChanger: false }}
         request={async (params) => {
@@ -336,7 +342,10 @@ export default function Management({ resource }: { resource: string }) {
       <Drawer
         title={detail ? `${data?.title}详情` : `新增${data?.title ?? "资料"}`}
         open={open}
-        width={680}
+        width="min(760px, 100vw)"
+        rootClassName="resource-drawer"
+        keyboard={!saving}
+        closable={!saving}
         onClose={() => {
           closeEditor();
         }}
@@ -349,7 +358,9 @@ export default function Management({ resource }: { resource: string }) {
               data?.canCreate && (
                 <Button
                   disabled={saving || loading}
-                  onClick={() => void edit(detail.record, true)}
+                  onClick={() =>
+                    discardThen(() => void edit(detail.record, true))
+                  }
                 >
                   复制为新定义
                 </Button>
@@ -357,25 +368,50 @@ export default function Management({ resource }: { resource: string }) {
             <Button disabled={saving} onClick={closeEditor}>
               关闭
             </Button>
-            {data?.canWrite && activeTab !== "app-role" && !detail?.record.readOnly && (
-              <Button
-                type="primary"
-                disabled={loading || !!latest}
-                loading={saving}
-                onClick={() => void save()}
-              >
-                保存
-              </Button>
-            )}
+            {data?.canWrite &&
+              activeTab === "edit" &&
+              !detail?.record.readOnly && (
+                <Button
+                  type="primary"
+                  disabled={loading || !editorReady || !!latest}
+                  loading={saving}
+                  onClick={() => void save()}
+                >
+                  保存
+                </Button>
+              )}
           </Space>
         }
       >
+        {detail && (
+          <div className="resource-summary">
+            <Typography.Title level={4}>
+              {String(
+                detail.record.values.name ??
+                  detail.record.values.title ??
+                  data?.title ??
+                  "资料",
+              )}
+            </Typography.Title>
+            <Space wrap>
+              <Tag>
+                {data?.canWrite && !detail.record.readOnly ? "可编辑" : "只读"}
+              </Tag>
+              <Typography.Text type="secondary">
+                最近更新{" "}
+                {dayjs(detail.record.updatedAt).format("YYYY-MM-DD HH:mm")}
+              </Typography.Text>
+            </Space>
+          </div>
+        )}
         {detail && ["students", "teams"].includes(resource) && (
           <Space wrap>
             <Button
               onClick={() =>
-                history.push(
-                  `/bi/overview?${resource === "teams" ? "teamId" : "studentId"}=${encodeURIComponent(detail.record.id)}&topic=training`,
+                discardThen(() =>
+                  history.push(
+                    `/bi/overview?${resource === "teams" ? "teamId" : "studentId"}=${encodeURIComponent(detail.record.id)}&topic=training`,
+                  ),
                 )
               }
             >
@@ -383,8 +419,10 @@ export default function Management({ resource }: { resource: string }) {
             </Button>
             <Button
               onClick={() =>
-                history.push(
-                  `/bi/overview?${resource === "teams" ? "teamId" : "studentId"}=${encodeURIComponent(detail.record.id)}&topic=growth`,
+                discardThen(() =>
+                  history.push(
+                    `/bi/overview?${resource === "teams" ? "teamId" : "studentId"}=${encodeURIComponent(detail.record.id)}&topic=growth`,
+                  ),
                 )
               }
             >
@@ -392,8 +430,10 @@ export default function Management({ resource }: { resource: string }) {
             </Button>
             <Button
               onClick={() =>
-                history.push(
-                  `/bi/overview?${resource === "teams" ? "teamId" : "studentId"}=${encodeURIComponent(detail.record.id)}&topic=services`,
+                discardThen(() =>
+                  history.push(
+                    `/bi/overview?${resource === "teams" ? "teamId" : "studentId"}=${encodeURIComponent(detail.record.id)}&topic=services`,
+                  ),
                 )
               }
             >
@@ -402,7 +442,22 @@ export default function Management({ resource }: { resource: string }) {
           </Space>
         )}
         {saveError && (
-          <Alert className="form-alert" type="error" message={saveError} />
+          <Alert
+            className="form-alert"
+            type="error"
+            message={saveError}
+            action={
+              !editorReady && !loading ? (
+                <Button
+                  onClick={() =>
+                    void edit(editTarget.current.row, editTarget.current.copy)
+                  }
+                >
+                  重试
+                </Button>
+              ) : undefined
+            }
+          />
         )}
         {latest && (
           <Alert
@@ -449,80 +504,42 @@ export default function Management({ resource }: { resource: string }) {
                   <Form
                     form={form}
                     layout="vertical"
+                    onValuesChange={() => setDirty(true)}
+                    scrollToFirstError={{ block: "center" }}
                     disabled={
                       !data?.canWrite || detail?.record.readOnly || saving
                     }
                   >
-                    {fields
-                      .filter(
-                        (f) =>
-                          (!f.appliesTo || f.appliesTo === eventType) &&
-                          (!f.virtual || f.key !== "balanceAfter" || !!detail),
-                      )
-                      .map((f) => (
-                        <Form.Item
-                          key={f.key}
-                          name={f.key}
-                          label={f.label}
-                          valuePropName={
-                            f.kind === "boolean" ? "checked" : "value"
-                          }
-                          rules={
-                            f.required
-                              ? [
-                                  {
-                                    required: true,
-                                    message: `请填写${f.label}`,
-                                  },
-                                ]
-                              : []
-                          }
-                        >
-                          {f.kind === "date" || f.kind === "datetime" ? (
-                            <DatePicker
-                              showTime={f.kind === "datetime"}
-                              className="full-width"
-                            />
-                          ) : f.kind === "number" ? (
-                            <InputNumber
-                              min={f.minimum}
-                              max={f.maximum}
-                              className="full-width"
-                            />
-                          ) : f.kind === "boolean" ? (
-                            <Switch />
-                          ) : f.kind === "textarea" ? (
-                            <Input.TextArea rows={4} maxLength={5000} />
-                          ) : f.kind === "reference" ||
-                            f.options ||
-                            f.kind === "tags" ? (
-                            <Select
-                              allowClear={!f.required}
-                              showSearch
-                              optionFilterProp="label"
-                              mode={
-                                f.kind === "tags"
-                                  ? f.options
-                                    ? "multiple"
-                                    : "tags"
-                                  : f.multiple
-                                    ? "multiple"
-                                    : undefined
-                              }
-                              options={
-                                f.options ??
-                                (f.reference ? choices[f.reference] : [])
-                              }
-                            />
-                          ) : (
-                            <Input maxLength={500} />
-                          )}
-                        </Form.Item>
-                      ))}
+                    <ResourceFields
+                      resource={resource}
+                      fields={fields}
+                      choices={choices}
+                      eventType={eventType}
+                      hasDetail={!!detail}
+                    />
                   </Form>
                 ),
               },
-              ...(resource === "memberships" && detail ? [{key:"app-role",label:"小程序默认身份",children:<MembershipAppRoles key={detail.record.id} userId={String(detail.record.values.userId)} roles={Array.isArray(detail.record.values.roles) ? detail.record.values.roles as string[] : []} canWrite={!!data?.canWrite && !saving}/>}]:[]),
+              ...(resource === "memberships" && detail
+                ? [
+                    {
+                      key: "app-role",
+                      label: "小程序默认身份",
+                      children: (
+                        <MembershipAppRoles
+                          key={detail.record.id}
+                          userId={String(detail.record.values.userId)}
+                          roles={
+                            Array.isArray(detail.record.values.roles)
+                              ? (detail.record.values.roles as string[])
+                              : []
+                          }
+                          canWrite={!!data?.canWrite && !saving}
+                        />
+                      ),
+                    },
+                  ]
+                : []),
               {
                 key: "history",
                 label: "操作历史",

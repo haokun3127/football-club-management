@@ -1,0 +1,120 @@
+{
+  "date": "2026-10-22",
+  "scope": "Disposable localhost SQLite fixture, real browser cookie login; no deployed business writes. Isolated Playwright Chromium; CUA kernel unavailable due symlink writable root.",
+  "finalFlowResults": [
+    {
+      "conflict": 409,
+      "retainedInput": true,
+      "reconciledSave": true,
+      "searchQueries": [
+        "不存在的学员"
+      ],
+      "csp": []
+    },
+    {
+      "search": "李明",
+      "exportStatus": 200,
+      "exportSearch": "李明",
+      "exportFields": [
+        "name",
+        "birthDate",
+        "gender",
+        "dominantFoot",
+        "currentLevel",
+        "notes"
+      ],
+      "exportSnapshotPresent": true,
+      "keyboard": {
+        "insideDialog": true,
+        "tag": "BUTTON",
+        "text": "关闭"
+      },
+      "escapeClosed": true,
+      "workbenchErrorRetry": true,
+      "courseDeepLink": "http://127.0.0.1:61316/__env/develop/backoffice/#/data/events?recordId=event-training-1",
+      "csp": []
+    },
+    {
+      "readonly": true,
+      "writeStatus": 403,
+      "logoutReload": true,
+      "csp": []
+    },
+    {
+      "readonly": true,
+      "writeStatus": 403,
+      "logoutReload": true,
+      "csp": []
+    }
+  ],
+  "searchCaveat": "First-flow response listener sometimes captured the initial empty query. Actual search verified separately: non-matching term gave zero rows; 李明 query returned one and export used the same term.",
+  "checks": {
+    "delivery": "pnpm check:delivery exit0, /tmp/cq-experience-delivery-final3.log; 1004 passed + 1 existing skipped; 9 script tests; 3 startup entrypoints",
+    "lint": "backoffice lint exit0",
+    "readSourceRegression": "Before fix failed on old July date; after fix reschedule/cancel passed. Tactical fixture persists scheduled state, assertions unchanged."
+  },
+  "screenshots": [
+    {
+      "path": "/tmp/cq-b5-before-workbench.png",
+      "sha256": "98474b50baf558d87aeb310a5b2f4fd7f154a2a0c16c10d1bb51baf582a417cd"
+    },
+    {
+      "path": "/tmp/cq-b5-before-list.png",
+      "sha256": "ba10281280eafe8f1a92abd5830c9a841fef2978c2ea8a2ceb430d126ae5655d"
+    },
+    {
+      "path": "/tmp/cq-b5-before-editor.png",
+      "sha256": "d62843e0a1142d28200200492e3253837f4cab5b433a6d8f49004f3e9fff92f1"
+    },
+    {
+      "path": "/tmp/cq-b5-before-history.png",
+      "sha256": "b8e50bccab99b6c5838d6b35b2c8cb9ed2e61de2d670a48181b62dfb5c7166e0"
+    },
+    {
+      "path": "/tmp/cq-b5-after-menu.png",
+      "sha256": "4f9a9359c5d9a80633a247b3f911b1e49efa4719707a48367ae022c56a94f33e"
+    },
+    {
+      "path": "/tmp/cq-b5-after-editor-final.png",
+      "sha256": "ee704d42fc868dcc88dc88712281fd2e48fd3020ed44a0b3687f0bce2193c7a2"
+    },
+    {
+      "path": "/tmp/cq-b5-after-history.png",
+      "sha256": "74884e9f62d0b8742533d02578bb21a090069f3bb053a84a70bbc0cbffee53d0"
+    },
+    {
+      "path": "/tmp/cq-b5-conflict.png",
+      "sha256": "ecad5d8724a5e0ba26ecc7e59d2a42995dce728f4c14a0e7948801697885a074"
+    },
+    {
+      "path": "/tmp/cq-b5-list-1024.png",
+      "sha256": "c3c53ac031c72e744738c495050720d895f42a66461478e80e820e12841f8532"
+    },
+    {
+      "path": "/tmp/cq-b5-editor-1024.png",
+      "sha256": "1590bda4cab3c30cce7a73cd24189742eac056fecc7c297044b608af1155544a"
+    },
+    {
+      "path": "/tmp/cq-b5-workbench-error.png",
+      "sha256": "d90be9ea3839501a6f7662af1ea8cb97a67b6f4feeb6abb0ee89a8decd55710d"
+    },
+    {
+      "path": "/tmp/cq-b5-workbench-1024.png",
+      "sha256": "cd9380e65e84879bc423376ea55a79a06a3ea62f34cbadc30941870b949b2e17"
+    },
+    {
+      "path": "/tmp/cq-b5-workbench-1440.png",
+      "sha256": "2f67ceec1679774a519a4b092b56966a1d29bedd797816377adbc35354a6a6f8"
+    },
+    {
+      "path": "/tmp/cq-b5-course-editor.png",
+      "sha256": "afc822a90efbb3749d99dd7dc6ebd91b4f9748c6ebc82abf3676c303c6f777d3"
+    },
+    {
+      "path": "/tmp/cq-b5-readonly.png",
+      "sha256": "d165ccde2377be0ae2cc928516eb068a7516796f3b6780057086e2efc6ba30f3"
+    }
+  ],
+  "finalVisualChange": "Disabled text token changed to #667085; last readonly screenshot and 403/logout checks use that final build. Other screenshots preceding this color-only change retain valid structural evidence.",
+  "temporaryArtifacts": "Screenshots/logs are in /tmp; hashes persist here but are not copies of binaries. Fixture and isolated browser are cleaned up at completion."
+}

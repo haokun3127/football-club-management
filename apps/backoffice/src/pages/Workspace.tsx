@@ -1,3 +1,4 @@
+import { DATA_RESOURCE_GROUPS } from "../services/resource-presentation";
 import Bi from "./bi";
 import Imports from "./imports";
 import Tasks from "./tasks";
@@ -48,37 +49,15 @@ const routes = [
     path: "/data",
     name: "数据管理",
     icon: <DatabaseOutlined />,
-    routes: [
-      ["imports", "导入与批次"],
-      ["students", "学员档案"],
-      ["scouts", "球探人员"],
-      ["teams", "队伍"],
-      ["coaches", "教练"],
-      ["events", "课程与活动"],
-      ["members", "队伍成员"],
-      ["assignments", "教练任职"],
-      ["parents", "家长资料"],
-      ["guardians", "家长绑定"],
-      ["contacts", "学员联系人"],
-      ["operations", "学员运营资料"],
-      ["venues", "场地"],
-      ["terms", "学期"],
-      ["participants", "活动参训记录"],
-      ["training-records", "训练计次与更正"],
-      ["insurance", "保险资料"],
-      ["credits", "课包台账"],
-      ["articles", "公告与内容"],
-      ["branding", "队徽与展示主题"],
-      ["banners", "新闻 Banner"],
-      ["share-templates", "预制分享模板"],
-      ["evaluation-phrases", "评价用语"],
-      ["optional-features", "小程序可选功能目录"],
-      ["drills", "训练练习库"],
-      ["plans", "公共训练计划"],
-      ["metrics", "能力指标定义"],
-      ["testitems", "测评采集项目"],
-      ["memberships", "账号与角色"],
-    ].map(([id, name]) => ({ path: `/data/${id}`, name })),
+    routes: DATA_RESOURCE_GROUPS.map((group) => ({
+      path: `/data/group-${group.id}`,
+      key: group.id,
+      name: group.name,
+      routes: group.resources.map(([id, name]) => ({
+        path: `/data/${id}`,
+        name,
+      })),
+    })),
   },
   {
     path: "/assessment",
@@ -263,6 +242,7 @@ export default function Workspace() {
       }
       logo={`${config.path}/assets/favicon.svg`}
       layout="mix"
+      siderWidth={248}
       fixSiderbar
       fixedHeader
       route={{ routes }}

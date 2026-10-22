@@ -102,6 +102,24 @@ describe("browser backoffice management", () => {
     }finally{await f.close()}
   });
 
+  it("reads rescheduled and cancelled existing courses from persisted facts immediately", async () => {
+    const f = await fixture();
+    try {
+      const original = (await f.request("GET", "resources/events")).json().rows.find((row: {values: {type: string}}) => row.values.type === "training");
+      const startsAt = new Date(Date.now() + 86400000).toISOString();
+      const endsAt = new Date(Date.now() + 91800000).toISOString();
+      const changed = await f.request("PUT", `resources/events/${original.id}`, saveBody({...original.values, startsAt, endsAt, status: "scheduled"}, original.revision));
+      expect(changed.statusCode, changed.body).toBe(200);
+      expect(f.store.listCalendarEvents(clubId).find(event => event.id === original.id)?.timeRange).toMatchObject({startsAt, endsAt});
+      expect((await f.request("GET", "workbench")).json().upcoming).toEqual(expect.arrayContaining([expect.objectContaining({id: original.id, startsAt})]));
+      const latest = (await f.request("GET", `resources/events/${original.id}`)).json().record;
+      const cancelled = await f.request("PUT", `resources/events/${original.id}`, saveBody({...latest.values, status: "cancelled"}, latest.revision));
+      expect(cancelled.statusCode, cancelled.body).toBe(200);
+      expect(f.store.listCalendarEvents(clubId).find(event => event.id === original.id)?.status).toBe("cancelled");
+      expect((await f.request("GET", "workbench")).json().upcoming.some((event: {id: string}) => event.id === original.id)).toBe(false);
+    } finally { await f.close(); }
+  });
+
   it('retains distinct legacy source identities for identical payloads and replays stable raw ids',async()=>{
     const f=await fixture();try{
       const config=f.store.getDataCapabilityConfig(clubId),mapping=config.tableMappings[0]!;const input={connectionId:mapping.connectionId,tableMappingId:mapping.id,sourceName:'合成来源',records:[{rowNumber:2,rowHash:'same-payload',externalRecordId:'first',raw:{name:'same'}},{rowNumber:3,rowHash:'same-payload',externalRecordId:'second',raw:{name:'same'}}]};

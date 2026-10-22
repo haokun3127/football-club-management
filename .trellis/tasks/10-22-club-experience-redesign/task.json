@@ -2,7 +2,7 @@
   "id": "club-experience-redesign",
   "name": "club-experience-redesign",
   "title": "全产品体验提升：俱乐部对标、功能分布与流程统一",
-  "description": "全方案已批准；B0跨端事实、B1教练课堂已实现验证；下一批B2测评，后续B3友谊赛、B4家长端、B5后台、B6综合验收仍待实施。",
+  "description": "B0—B5本地实现并逐批验证完成；B6收拢交付检查、工程交接与设备/部署验收边界。",
   "status": "in_progress",
   "dev_type": null,
   "scope": "miniprogram, api, domain, backoffice",
@@ -23,7 +23,8 @@
     "10-22-experience-b1-coach-classroom",
     "10-22-experience-b2-assessment-flow",
     "10-22-experience-b3-training-games",
-    "10-22-experience-b4-parent-native"
+    "10-22-experience-b4-parent-native",
+    "10-22-experience-b5-backoffice"
   ],
   "parent": null,
   "relatedFiles": [

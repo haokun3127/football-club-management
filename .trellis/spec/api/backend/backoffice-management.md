@@ -46,3 +46,7 @@ Read [Backoffice Integration](./backoffice-integration.md) for configuration, im
 ## Default mini-program role (2026-10-21)
 
 The existing memberships drawer owns the app-role tab; the generic record Save is hidden there so only Save default role writes this setting. app-role-preferences is admin-only, unique club/client/user, immutable scope on update; defaultRole is nullable and must belong to authorized client/profile roles. lastActiveRole is not an admin-editable field. Reuse audit/revision/requestId receipts. The options service AND strict HTTP optionSchema must both register app-clients. Frontend saves read the direct RecordRow mutation response and detail.record on reread.409 preserves the desired input and requires explicit reread; unchanged uncertain retry retains its requestId. A real two-editor browser check supplements service tests.
+
+## Calendar read consistency (2026-10-22)
+
+`PersistentApiStore.mergeCalendarEvents` treats persisted calendar rows as authoritative, with seed/in-memory rows only filling missing IDs. A cached seed must never override a successful admin reschedule or cancellation. This changes read-source precedence, not counting, leave, tactical editability or financial rules. Regression: update an existing course, read date/status through list and workbench immediately, then cancel and confirm it disappears from upcoming. Tactical fixtures must persist scheduled status instead of depending on stale in-memory overrides; completed matches remain read-only.
