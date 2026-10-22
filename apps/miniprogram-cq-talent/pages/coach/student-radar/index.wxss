@@ -1,9 +1,4 @@
 .radar-page { min-height: 100vh; background: var(--color-page); padding-bottom: 48rpx; }
-.radar-nav { position: sticky; top: 0; z-index: 100; display: flex; height:44px; box-sizing: content-box; align-items: center; padding: 0 32rpx; background: #ffffff; }
-.radar-nav__back, .radar-nav__placeholder { width: 48rpx; height: 64rpx; flex: 0 0 48rpx; }
-.radar-nav__back { display: flex; align-items: center; justify-content: center; }
-.radar-nav__back-icon { width: 36rpx; height: 36rpx; }
-.radar-nav__title { flex: 1; min-width: 0; margin-left: 16rpx; overflow: hidden; text-align: left; text-overflow: ellipsis; white-space: nowrap; color: #202124; font-size: var(--font-size-display); font-weight: 700; line-height: 1.5; }
 .radar-page__body { padding: 16rpx var(--space-page) 180rpx; }
 .radar-context { margin-bottom: 16rpx; color: #667085; font-size: var(--font-size-aux); line-height: 1.5; }
 .radar-hero { position: relative; height: 688rpx; box-sizing: border-box; overflow: hidden; padding: 32rpx; border-radius: 28rpx; background: #ffffff; }
@@ -43,9 +38,6 @@
 
 /* C11 approved light club identity and summary cards; detail views reuse the same route. */
 .radar-page { background:var(--club-page);color:var(--club-text); }
-.radar-nav { background:var(--club-nav); }
-.radar-nav__title { margin-left:8rpx;font-size: var(--font-size-display);font-weight:500;color:var(--club-text); }
-.radar-nav__placeholder { display:none; }
 .radar-page__body { padding:32rpx 32rpx calc(48rpx + env(safe-area-inset-bottom)); }
 .profile-identity { display:flex;flex-direction:column;align-items:stretch;gap:24rpx;margin:0 0 32rpx;padding:40rpx;background:var(--color-brand);border-radius:32rpx;color:#fff; }
 .profile-identity__caption { font-size: var(--font-size-aux);line-height: 1.5; }

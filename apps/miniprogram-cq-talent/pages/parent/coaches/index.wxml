@@ -1,5 +1,5 @@
 <view class="coaches-page">
-  <view class="coaches-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="coaches-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="coaches-nav__title">教练团队</view><view class="coaches-nav__spacer"></view></view>
+  <app-header title="教练团队" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
   <view class="coaches-page__body">
     <status-view
       state="{{state}}"

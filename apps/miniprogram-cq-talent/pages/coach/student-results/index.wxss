@@ -1,5 +1,4 @@
 .results-page { min-height:100vh;background:var(--club-page);color:var(--club-text); }
-.results-nav { position:sticky;top:0;z-index:100;height:44px;display:flex;align-items:center;padding-left:32rpx;background:var(--club-nav);font-size: var(--font-size-body); }
 .results-back { width:40rpx;font-size: var(--font-size-body); }
 .results-body { display:flex;flex-direction:column;gap:32rpx;padding:32rpx 32rpx calc(166rpx + env(safe-area-inset-bottom)); }
 .results-card { display:flex;flex-direction:column;gap:24rpx;padding:32rpx;border:1rpx solid var(--club-line);border-radius:28rpx;background:#fff;box-shadow:none; }

@@ -1,10 +1,5 @@
 <view class="ability-page">
-  <view class="ability-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="ability-nav__back" bindtap="goBack">
-      <image class="ability-nav__back-icon" src="/assets/icons/c14-arrow-left.svg" mode="aspectFit" />
-    </view>
-    <view class="ability-nav__title">能力评估</view>
-  </view>
+  <app-header title="能力评估" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
 
   <view class="ability-page__body">
     <status-view

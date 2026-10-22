@@ -1,6 +1,4 @@
 .p7 { min-height: 100vh; background: #f6f7f9; }
-.p7-nav { position: sticky; top: 0; z-index: 100; display: flex; box-sizing: content-box; align-items: center; height:44px; padding: 0 200rpx 0 32rpx; background: #ffffff; }
-.p7-nav__title { color: #202124; font-size: var(--font-size-display); font-weight: 700; line-height: 1.5; }.p7-nav__signout { position: absolute; min-width: 56rpx; height: 56rpx; padding: 0 16rpx; color: #a80f1b; font-size: var(--font-size-aux); font-weight: 600; line-height: 1.5; text-align: center; }
 .p7-body { display: flex; flex-direction: column; gap: 32rpx; padding: 32rpx 32rpx calc(180rpx + env(safe-area-inset-bottom)); }
 .p7-content { display: flex; flex-direction: column; gap: 32rpx; }
 .p7-player { display: flex; box-sizing: border-box; align-items: center; gap: 32rpx; min-height: 208rpx; padding: 40rpx; border-radius: 32rpx; background:var(--color-card); }
@@ -25,3 +23,8 @@
 .p7-player,
 .p7-role-switch,
 .p7-stats { min-height:44px; min-width:44px; box-sizing:border-box; }
+
+.p7-services { background:var(--color-card); border-radius:var(--radius-card); padding:24rpx 32rpx; }
+.p7-section-title { font-size:var(--font-size-section); font-weight:600; color:var(--color-text); line-height:1.5; padding:24rpx 0 12rpx; }
+.p7-service { display:flex; justify-content:space-between; align-items:center; gap:16rpx; min-height:44px; box-sizing:border-box; padding:20rpx 0; font-size:var(--font-size-body); line-height:1.5; border-bottom:1rpx solid var(--color-line); }
+.p7-service text { color:var(--color-text-secondary); }

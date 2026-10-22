@@ -171,4 +171,14 @@ describe("parent profile hub", () => {
     expect(template).toContain("p7-card--pending");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
+  it("keeps the current child's profile when an earlier read finishes later",async()=>{
+    let oldResolve; mocks.getParentStudentHome.mockImplementationOnce(()=>new Promise(resolve=>{oldResolve=resolve;}));
+    const p=createPageInstance();const old=p.load();await vi.waitFor(()=>expect(oldResolve).toBeTypeOf("function"));
+    mocks.requireRole.mockReturnValue({role:"parent",currentStudentId:"student-2",availableRoles:["parent"]});
+    mocks.getParentChildren.mockResolvedValue([{id:"student-2",name:"乙",teams:[],coachNames:[]}]);
+    mocks.getParentStudentHome.mockResolvedValue({profile:[],lessonStatus:[],insuranceStatus:[]});
+    await p.load();oldResolve({profile:[],lessonStatus:[{label:"old",value:"99"}],insuranceStatus:[]});await old;
+    expect(p.data.activeStudentId).toBe("student-2");expect(p.data.heroStats).not.toContainEqual({label:"old",value:"99"});
+  });
+
 });

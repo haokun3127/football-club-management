@@ -3,6 +3,7 @@
   "usingComponents": {
     "status-view": "/components/status-view/index",
     "role-tabbar": "/components/role-tabbar/index",
-    "t-input": "tdesign-miniprogram/input/input"
+    "t-input": "tdesign-miniprogram/input/input",
+    "app-header": "/components/app-header/index"
   }
 }

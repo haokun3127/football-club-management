@@ -3,40 +3,6 @@
   background: #f6f7f9;
 }
 
-.c16-bar {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  height: 44px;
-  box-sizing: content-box;
-  align-items: center;
-  justify-content: space-between;
-  padding-right: 44rpx;
-  padding-left: 32rpx;
-  background: #fceeef;
-}
-
-.c16-bar__title {
-  color: #202124;
-  font-size: var(--font-size-section);
-  font-weight: 700;
-  line-height: 1.5;
-}
-
-.c16-bar__settings {
-  display: flex;
-  width: 48rpx;
-  height: 48rpx;
-  align-items: center;
-  justify-content: center;
-}
-
-.c16-bar__settings-icon {
-  width: 48rpx;
-  height: 48rpx;
-}
-
 .c16-body {
   padding: 32rpx 44rpx calc(148rpx + env(safe-area-inset-bottom));
 }

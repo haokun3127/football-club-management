@@ -1,10 +1,6 @@
 <view class="p6">
   <!-- P6 NavHeader -->
-  <view class="p6-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="p6-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
-    <view class="p6-nav__title">{{detail ? detail.label : ''}} 指标详情</view>
-    <view class="p6-nav__range">本赛季 ▾</view>
-  </view>
+  <app-header title="{{detail ? detail.label : ''}} 指标详情" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
 
   <view class="p6-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载指标详情' : '暂时无法查看'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />

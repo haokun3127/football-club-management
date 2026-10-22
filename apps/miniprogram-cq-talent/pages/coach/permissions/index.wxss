@@ -3,44 +3,6 @@
   background: #f6f7f9;
 }
 
-.c161-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  height:44px;
-  box-sizing: content-box;
-  display: flex;
-  align-items: center;
-  padding-right: 200rpx;
-  padding-left: 32rpx;
-  background: #fceeef;
-}
-
-.c161-nav__back {
-  width: 48rpx;
-  height: 48rpx;
-  flex: 0 0 48rpx;
-}
-
-.c161-nav__back {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.c161-nav__back-icon {
-  width: 48rpx;
-  height: 48rpx;
-}
-
-.c161-nav__title {
-  flex: 1;
-  color: #1f2937;
-  font-size: var(--font-size-display);
-  font-weight: 700;
-  text-align: left;
-}
-
 .c161-page__body {
   padding: 32rpx 44rpx 80rpx;
 }

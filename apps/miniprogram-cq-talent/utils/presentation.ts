@@ -30,10 +30,10 @@ export function activityStatus(status: string): StatusPresentation {
   return { label: "安排中", tone: "neutral" };
 }
 
-export function formatCalendarDate(value?: string) {
+export function formatCalendarDate(value?: string, includeYear = false) {
   const parts = dateParts(value);
   if (!parts) return "时间待确认";
-  return `${parts.month}月${parts.day}日 ${weekday(parts.year, parts.month, parts.day)}`;
+  return `${includeYear ? `${parts.year}年` : ""}${parts.month}月${parts.day}日 ${weekday(parts.year, parts.month, parts.day)}`;
 }
 
 export function formatShortDate(value?: string) {

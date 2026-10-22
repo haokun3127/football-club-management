@@ -1,7 +1,4 @@
 .status-page { min-height: 100vh; background: #f6f7f9; }
-.status-nav { position: sticky; top: 0; z-index: 100; display: flex; box-sizing: content-box; align-items: center; height:44px; padding: 0 200rpx 0 32rpx; background: #ffffff; }
-.status-nav__title { color: #202124; font-size: var(--font-size-display); font-weight: 700; line-height: 1.5; }
-.status-nav__back { display: flex; align-items: center; justify-content: center; width: 80rpx; height: 80rpx; }.status-nav__back image { width: 48rpx; height: 48rpx; }
 .status-page__body { display: flex; flex-direction: column; gap: 32rpx; padding: 32rpx 32rpx calc(160rpx + env(safe-area-inset-bottom)); }
 .lesson-card { box-sizing: border-box; width: 686rpx; height: 422rpx; padding: 48rpx; border-radius: 32rpx; background: #ffffff; box-shadow:none; }
 .lesson-card__title { color: #202124; font-size: var(--font-size-section); font-weight: 600; line-height: 1.5; }.lesson-card__count { margin-top: 40rpx; color: #07111f; font-size: 96rpx; font-weight: 700; line-height: 116rpx; }.lesson-card__caption { margin-top: 8rpx; color: #667085; font-size: var(--font-size-aux); line-height: 1.5; }

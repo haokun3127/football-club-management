@@ -1,8 +1,5 @@
 <view class="team-selector-page">
-  <view class="team-selector-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="team-selector-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
-    <view class="team-selector-nav__title">选择球队</view>
-  </view>
+  <app-header title="选择球队" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
   <view class="team-selector-page__body">
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="选择球队" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <block wx:if="{{state === 'ready' && hasTeams}}">

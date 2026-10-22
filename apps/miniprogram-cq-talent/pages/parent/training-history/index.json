@@ -4,7 +4,8 @@
     "status-view": "/components/status-view/index",
     "t-button": "tdesign-miniprogram/button/button",
     "t-textarea": "tdesign-miniprogram/textarea/textarea",
-    "t-switch": "tdesign-miniprogram/switch/switch"
+    "t-switch": "tdesign-miniprogram/switch/switch",
+    "app-header": "/components/app-header/index"
   },
   "navigationStyle": "custom"
 }

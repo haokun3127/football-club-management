@@ -62,9 +62,6 @@ describe("parent milestones active student", () => {
     expect(page.data.milestones[0]).toEqual(expect.objectContaining({ title: "第二位训练", state: "训练", detail: "完成 1 项训练内容" }));
   });
 
-  it("aligns the title with the Figma 44px title origin", () => {
-    expect(styles).toMatch(/\.page-nav__title\s*\{[^}]*margin-left:\s*8rpx/);
-  });
 
   it("renders detailed training and match facts from the child-scoped timeline", async () => {
     mocks.getParentChildren.mockResolvedValue([{ id: "student-1", name: "真实学员", teams: [] }]);

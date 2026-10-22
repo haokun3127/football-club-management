@@ -98,13 +98,7 @@ describe("C15.1 coach assessment submit", () => {
     expect(template).not.toContain("18名");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(pageConfig).toContain('"role-tabbar"');
-    expect(pageConfig).not.toContain('"app-header"');
-    expect(template).toContain('padding-top:{{navInset}}px');
-    expect(template).toContain('/assets/icons/chevron-left.svg');
-    expect(template).toContain('class="c151-nav__placeholder"');
-    expect(stylesheet).toMatch(/\.c151-nav\s*\{(?=[^}]*height:\s*44px)(?=[^}]*padding:\s*0\s+32rpx)(?=[^}]*box-sizing:\s*content-box)/s);
-    expect(stylesheet).toMatch(/\.c151-nav__back,\s*\.c151-nav__placeholder\s*\{(?=[^}]*width:\s*48rpx)(?=[^}]*height:\s*48rpx)/s);
-    expect(stylesheet).toMatch(/\.c151-nav__title\s*\{(?=[^}]*flex:\s*1)(?=[^}]*margin-left:\s*0)(?=[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\))(?=[^}]*line-height:\s*1\.5)/s);
+    expect(pageConfig).toContain('"app-header"');
     expect(stylesheet).toMatch(/\.c151-success\s*\{[^}]*gap:\s*0/s);
     expect(stylesheet).toMatch(/\.c151-success__title\s*\{[^}]*margin-top:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.c151-success__subtitle\s*\{(?=[^}]*margin-top:\s*16rpx)(?=[^}]*line-height:\s*1\.5)/s);

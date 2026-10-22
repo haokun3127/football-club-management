@@ -1,9 +1,5 @@
 <view class="semester-report-page">
-  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="page-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
-    <view class="page-nav__title">成长报告</view>
-    <view class="page-nav__spacer"></view>
-  </view>
+  <app-header title="成长报告" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
 
   <scroll-view class="semester-report-page__scroll" scroll-y enhanced show-scrollbar="{{false}}">
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载成长报告' : state === 'empty' ? '暂无成长记录' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />

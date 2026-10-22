@@ -258,7 +258,6 @@ describe("coach private interest", () => {
   it("uses the C34 four-section structure with club tokens and no hardcoded colors", () => {
     expect(existsSync(new URL("../../../assets/icons/c162-chevron-left.svg", import.meta.url))).toBe(true);
     expect(pageConfig).toContain('"role-tabbar"');
-    expect(template).toContain('class="c34-nav"');
     expect(template).toContain('<view class="c34-card__title">接课状态</view>');
     expect(template).toContain('<view class="c34-card__title">可用时段</view>');
     expect(template).toContain('<view class="c34-card__title">已分派咨询</view>');
@@ -271,7 +270,6 @@ describe("coach private interest", () => {
     expect(template).toContain("c34-slot--selected");
     expect(template).not.toMatch(/\{\{item\.(?:map|filter|slice|indexOf)/);
     expect(stylesheet).toMatch(/\.c34-page\s*\{[^}]*background:\s*var\(--club-page\)/s);
-    expect(stylesheet).toMatch(/\.c34-nav\s*\{[^}]*background:\s*var\(--club-nav\)/s);
     expect(stylesheet).toMatch(/\.c34-toggle--on\s*\{[^}]*background:\s*var\(--color-brand\)/s);
     expect(stylesheet).toMatch(/\.c34-slot--selected\s*\{[^}]*background:\s*var\(--color-brand\)/s);
     expect(stylesheet).toMatch(/\.c34-status__label--on\s*\{[^}]*color:\s*var\(--color-success\)/s);

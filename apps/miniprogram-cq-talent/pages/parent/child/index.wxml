@@ -1,18 +1,25 @@
 <view class="p7">
-  <view class="p7-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="p7-nav__title">我的孩子</view></view>
+  <app-header title="我的" title-align="left" />
   <view class="p7-body">
+    <student-switcher wx:if="{{children.length > 1 && state === 'ready'}}" students="{{children}}" selected-id="{{activeStudentId}}" show-all="{{false}}" bindchange="switchChild" />
+
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载孩子档案' : state === 'empty' ? '未绑定孩子' : '档案读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <view wx:if="{{canSwitchToCoach && !studentHome}}" class="p7-role-switch" bindtap="switchToCoach">
       <view class="p7-role-switch__identity"><view class="p7-role-switch__label">当前身份</view><view class="p7-role-switch__role">家长端</view></view>
-      <view class="p7-role-switch__action">切换 ›</view>
+      <view class="p7-role-switch__action">进入教练端 ›</view>
     </view>
     <view wx:if="{{studentHome}}" class="p7-content">
       <!-- Figma P7 Parent Profile Hub: Player Card -->
       <view class="p7-player" bindtap="openBinding"><view class="p7-player__avatar">{{avatarLetter}}</view><view><view class="p7-player__name">{{activeChild.name}}</view><view wx:if="{{teamLabel}}" class="p7-player__team">{{teamLabel}}</view></view></view>
       <view wx:if="{{canSwitchToCoach}}" class="p7-role-switch" bindtap="switchToCoach">
         <view class="p7-role-switch__identity"><view class="p7-role-switch__label">当前身份</view><view class="p7-role-switch__role">家长端</view></view>
-        <view class="p7-role-switch__action">切换 ›</view>
+        <view class="p7-role-switch__action">进入教练端 ›</view>
       </view>
+    </view>
+    <view class="p7-services"><view class="p7-section-title">账号与孩子</view><view class="p7-service" bindtap="openBinding">孩子与监护绑定 <text>›</text></view><view class="p7-service" bindtap="openAccount">账号设置 <text>›</text></view><view class="p7-section-title">俱乐部服务</view><view class="p7-service" bindtap="openCoach">教练团队与联系 <text>›</text></view><view class="p7-service" bindtap="openVenues">训练场地 <text>›</text></view><view class="p7-service" bindtap="openPrivate">专业服务咨询 <text>›</text></view><view class="p7-service" bindtap="openContent">俱乐部内容 <text>›</text></view><view class="p7-service" bindtap="openHelp">帮助中心 <text>›</text></view></view>
+    <view wx:if="{{studentHome}}" class="p7-content">
+      <view class="p7-section-title" bindtap="toggleRecords">训练与成长记录 {{showRecords ? '收起' : '展开'}} ›</view>
+      <block wx:if="{{showRecords}}">
       <!-- Figma P7 Parent Profile Hub: Stats Row -->
       <view wx:if="{{heroStats.length}}" class="p7-stats" bindtap="openStatus"><view wx:for="{{heroStats}}" wx:key="label" class="p7-stat"><view class="p7-stat__value {{index === 1 ? 'p7-stat__value--brand' : ''}}">{{item.value}}</view><view class="p7-stat__label">{{item.label}}</view></view></view>
       <view wx:else class="p7-card p7-card--pending" bindtap="openStatus"><view class="p7-card__title">训练与档案</view><view class="p7-pending">课时信息待同步</view></view>
@@ -20,7 +27,7 @@
       <view class="p7-actions">
         <view class="p7-action" bindtap="openSchedule"><view class="p7-action__icon p7-action__icon--calendar"><view></view></view><view>训练日程</view></view>
         <view class="p7-action" bindtap="openGrowth"><view class="p7-action__icon p7-action__icon--chart"><view></view></view><view>成长报告</view></view>
-        <view class="p7-action" bindtap="openRadar"><view class="p7-action__icon p7-action__icon--bolt"><view></view></view><view>体能数据</view></view>
+        <view class="p7-action" bindtap="openRadar"><view class="p7-action__icon p7-action__icon--bolt"><view></view></view><view>能力数据</view></view>
         <view class="p7-action" bindtap="openCoach"><view class="p7-action__icon p7-action__icon--message"><view></view></view><view>联系教练</view></view>
       </view>
       <!-- Figma P7 Parent Profile Hub: Recent Activity -->
@@ -28,6 +35,7 @@
         <view wx:for="{{recentActivities}}" wx:key="title" class="p7-activity"><view class="p7-activity__dot {{index === 1 ? 'p7-activity__dot--green' : index === 2 ? 'p7-activity__dot--blue' : ''}}"></view><view><view class="p7-activity__title">{{item.title}}</view><view class="p7-activity__date">{{item.date}}</view></view></view>
       </view>
       <view wx:else class="p7-card p7-card--pending"><view class="p7-card__title">最近动态</view><view class="p7-pending">训练动态待同步</view></view>
+      </block>
     </view>
   </view>
   <role-tabbar role="parent" active="child" />

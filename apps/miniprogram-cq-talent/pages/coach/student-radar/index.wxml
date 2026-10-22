@@ -1,8 +1,5 @@
 <view class="radar-page">
-  <view class="radar-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="radar-nav__back" bindtap="goBack"><image class="radar-nav__back-icon" src="/assets/icons/c13-arrow-left.svg" mode="aspectFit" /></view>
-    <view class="radar-nav__title">{{pageTitle}}</view><view class="radar-nav__placeholder"></view>
-  </view>
+  <app-header title="{{pageTitle}}" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
   <view class="radar-page__body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载学员档案' : state === 'empty' ? '暂无学员' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <block wx:if="{{state === 'ready'}}">

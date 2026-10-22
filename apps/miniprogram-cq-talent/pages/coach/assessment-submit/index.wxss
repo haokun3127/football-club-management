@@ -5,43 +5,6 @@
   background: var(--color-page);
 }
 
-.c151-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  box-sizing: content-box;
-  align-items: center;
-  width: 100%;
-  height:44px;
-  padding: 0 32rpx;
-  background: var(--color-brand-soft);
-}
-
-.c151-nav__back,
-.c151-nav__placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48rpx;
-  height: 48rpx;
-  flex: 0 0 48rpx;
-}
-
-.c151-nav__back-icon {
-  width: 48rpx;
-  height: 48rpx;
-}
-
-.c151-nav__title {
-  flex: 1;
-  margin-left: 0;
-  color: var(--color-text);
-  font-size: var(--font-size-display);
-  font-weight: 700;
-  line-height: 1.5;
-}
-
 .c151-page__body {
   display: flex;
   flex-direction: column;

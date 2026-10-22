@@ -1,8 +1,5 @@
 <view class="status-page">
-  <view class="status-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="status-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
-    <view class="status-nav__title">课时与保障</view>
-  </view>
+  <app-header title="课时与保障" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
 
   <view class="status-page__body">
     <status-view

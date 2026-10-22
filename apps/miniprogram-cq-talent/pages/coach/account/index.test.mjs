@@ -165,14 +165,10 @@ describe("coach account", () => {
     page.goBack();
 
     expect(mocks.navigateBack).toHaveBeenCalledTimes(1);
-    expect(existsSync(new URL("../../../assets/icons/c163-chevron-left.svg", import.meta.url))).toBe(true);
-    expect(pageConfig).not.toContain('"app-header"');
+    expect(pageConfig).toContain('"app-header"');
     expect(pageConfig).not.toContain('"status-view"');
     expect(pageConfig).toContain('"role-tabbar"');
-    expect(template).toContain('class="c163-nav"');
-    expect(template).toContain("/assets/icons/c163-chevron-left.svg");
-    expect([...template.matchAll(/\bbind(?:tap|longpress|change|input|submit|action)\s*=/g)]).toHaveLength(3);
-    expect(template).toMatch(/class="c163-nav__back"[^>]*bindtap="goBack"/);
+    expect([...template.matchAll(/\bbind(?:tap|longpress|change|input|submit|action|back)\s*=/g)]).toHaveLength(3);
     expect(template).not.toContain("修改密码");
     expect(template).not.toContain("设备管理");
     expect(template).toContain("清除缓存");
@@ -191,10 +187,6 @@ describe("coach account", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("home.coachName");
     expect(controller).toMatch(/clearDisposableLocalCache|clearSession|showToast|showModal|reLaunch/);
-    expect(template).toContain('class="c163-nav__placeholder"');
-    expect(stylesheet).toMatch(/\.c163-nav\s*\{(?=[^}]*height:\s*44px)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*padding-right:\s*200rpx)(?=[^}]*padding-left:\s*32rpx)(?=[^}]*background:\s*#fceeef)/s);
-    expect(stylesheet).toMatch(/\.c163-nav__title\s*\{(?=[^}]*flex:\s*1)(?=[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\))(?=[^}]*text-align:\s*left)/s);
-    expect(stylesheet).toMatch(/\.c163-nav__placeholder\s*\{(?=[^}]*width:\s*48rpx)(?=[^}]*height:\s*48rpx)/s);
     expect(stylesheet).toMatch(/\.c163-page__body\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+180rpx/s);
     expect(stylesheet).toMatch(/\.c163-content\s*\{[^}]*gap:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.c163-card\s*\{[^}]*border-radius:\s*24rpx/s);

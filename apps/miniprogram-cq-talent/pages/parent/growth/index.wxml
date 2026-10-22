@@ -1,10 +1,8 @@
 <view class="p4">
-  <view class="p4-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="p4-nav__title">成长</view>
-    <view class="p4-nav__settings" bindtap="openSettings"><image class="p4-nav__settings-icon" src="/assets/icons/settings-gear.svg" mode="aspectFit" /></view>
-  </view>
+  <app-header title="成长" title-align="left" action-text="孩子" bindaction="openSettings" />
 
   <view class="p4-body">
+    <student-switcher wx:if="{{state === 'ready' && children.length > 1}}" students="{{children}}" selected-id="{{activeStudentId}}" show-all="{{false}}" bindchange="switchChild" />
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载成长数据' : state === 'empty' ? '成长数据不足' : '成长数据读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
     <!-- V-02 P08 213:526：白底概览（训练累计）→ 能力组合区 → 当前评价 -->
@@ -18,15 +16,10 @@
         <view wx:if="{{heroStats.length}}" class="p4-overview__stats">
           <view wx:for="{{heroStats}}" wx:key="label" class="p4-overview__stat"><view class="p4-overview__stat-value">{{item.value}}</view><view class="p4-overview__stat-label">{{item.label}}</view></view>
         </view>
-        <view class="p4-overview__summary">{{heroSummaryMessage}}</view>
+        <view class="p4-overview__summary">{{heroSummaryMessage}}</view><view class="p4-card__summary">更新于 {{updatedAtLabel}}。测评结果以教练确认发布为准，教练评价单独记录。</view>
       </view>
 
-      <view class="p4-card p4-ability">
-        <view class="p4-card__head"><view class="p4-card__title">能力组合概览</view><view class="p4-card__link" bindtap="openRadar">进入详情 ›</view></view>
-        <radar-canvas wx:if="{{radar.length >= 3 && radar.length <= 8}}" metrics="{{radar}}" height="300px" />
-        <view wx:else class="p4-card__empty">{{radar.length > 8 ? '当前组指标较多，请进入详情选择雷达指标' : '少于3项指标，请进入详情查看数值'}} </view>
-        <view class="p4-ability__foot">点击能力查看明细 · 更新于 {{updatedAtLabel}}</view>
-      </view>
+
     </view>
 
     <view wx:if="{{activeStudentId && (state === 'ready' || state === 'empty')}}" class="p4-evaluations"><view class="p4-evaluation-card" bindtap="openConfirmedResults"><view class="p4-evaluation-title">已确认测评结果</view><view class="p4-evaluation-author">查看原始成绩、分值、等级与历史 ›</view></view>
@@ -35,6 +28,14 @@
     </view>
 
     <view wx:if="{{growth && state === 'ready'}}" class="p4-content">
+      <view class="p4-card p4-ability">
+        <view class="p4-card__head"><view class="p4-card__title">能力组合概览</view><view class="p4-card__link" bindtap="openRadar">进入详情 ›</view></view>
+        <view class="p4-card__summary">仅展示已确认测评形成的数值；缺失项不补零，不代表能力不足。</view>
+        <radar-canvas wx:if="{{radar.length >= 3 && radar.length <= 8}}" metrics="{{radar}}" height="300px" />
+        <view wx:else class="p4-card__empty">{{radar.length > 8 ? '当前组指标较多，请进入详情选择雷达指标' : '少于3项指标，请进入详情查看数值'}} </view>
+        <view class="p4-metric-list"><view wx:for="{{radarRows}}" wx:key="id" class="p4-metric-row" data-id="{{item.id}}" bindtap="openMetricRow"><view>{{item.label}} · {{item.value}}</view><view class="p4-card__summary">{{item.date}} ›</view></view></view>
+        <view class="p4-ability__foot">点击能力查看明细 · 更新于 {{updatedAtLabel}}</view>
+      </view>
       <!-- Figma P4 Milestones Card -->
       <view class="p4-card p4-milestones">
         <view class="p4-card__head"><view class="p4-card__title">成长足迹 🏆</view><view class="p4-card__link" bindtap="openMilestones">查看全部 ›</view></view>
@@ -55,10 +56,10 @@
       <!-- Figma P4 Training Chart Card -->
       <view class="p4-card p4-chart-card">
         <view class="p4-card__head"><view class="p4-card__title">训练历程 📊</view><view class="p4-card__link" bindtap="openTrainingHistory">查看›</view></view>
-        <view class="p4-bars">
+        <view wx:if="{{trainingBars.length}}" class="p4-bars">
           <view wx:for="{{trainingBars}}" wx:key="id" class="p4-bar" style="height: {{item.height}}rpx"></view>
         </view>
-        <view class="p4-months"><view wx:for="{{trainingBars}}" wx:key="id">{{item.label}}</view></view>
+        <view class="p4-months"><view wx:for="{{trainingBars}}" wx:key="id">{{item.label}}<view>{{item.count}} 次</view></view></view><view wx:if="{{!trainingBars.length}}" class="p4-card__summary">尚无按月统计，可进入训练记录查看已完成课程。</view>
       </view>
     </view>
   </view>

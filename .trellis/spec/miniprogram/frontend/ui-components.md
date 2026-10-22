@@ -47,3 +47,10 @@ Wrong：在每页散写按钮尺寸、缺测用0、未知球队回默认队。Co
 - `utils/assessment-input.ts` owns client validation and raw value display; preserve configured units, valid zero, and missing values. Raw times/counts are not standard scores. Never round or clamp invalid input to make it pass. Saved values may be edited through an intermediate blank; persist that local draft, explain that blank cannot delete a saved result, and block save/continue until corrected.
 - Bulk rows separate identity/status, metric input, and source course. TDesign 1.17 input emits **enter**, not confirm; bindenter drives the next field identity. A native component event must be checked in addition to calling the page method.
 - Save-and-continue waits for the existing save contract and stays on failure; 409 retains local values and the original revision, blocking stale retries until an explicit, confirmed server reload. Publication remains a separate reviewed action. Do not redirect legacy entry routes into a different publication contract.
+
+## 2026-10-22 全页面导航与家长解释
+
+- app-header 默认管理返回；原页面有未保存确认/自定义去向时必须传 customBack 并绑定原 handler，组件仅发事件，避免双返回或绕过确认。没有返回/右动作时不保留空白槽。启动恢复壳与全屏战术画布有明确专用结构，其余页面共用header。
+- 首页课程深链传当前studentId，完整年月日、孩子和地点相邻展示。成长先展示已确认结果/来源与评价，再图表；无月度统计不画装饰柱形，真实0保留0，图形有文本数值与日期。错误摘要不能显示假0。
+- 切孩子时清指标缓存；异步请求带generation与studentId检查。我的账号/绑定/服务入口不依赖档案请求成功，旧记录入口保留。
+- 原生验证冻结源码，避免热更新使mock失效；Automator自定义tag查询为空不能单独证明组件缺失，须检查实际路由、注册和原生画面。

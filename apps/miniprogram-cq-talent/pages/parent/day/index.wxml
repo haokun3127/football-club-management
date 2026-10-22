@@ -1,9 +1,5 @@
 <view class="p11">
-  <view class="p11-nav" style="padding-top:{{navInset}}px">
-    <view class="p11-nav__back" style="top:{{navActionTop}}px" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
-    <view class="p11-nav__title">{{dateLabel}}</view>
-    <view class="p11-nav__filter" style="right:{{menuInset}}px;top:{{navActionTop}}px" bindtap="openFilter"><image src="/assets/icons/filter.svg" mode="aspectFit" /></view>
-  </view>
+  <app-header title="{{dateLabel}}" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" action-text="筛选" bindaction="openFilter" />
 
   <view class="p11-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载当日活动' : state === 'empty' ? '暂无活动' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />

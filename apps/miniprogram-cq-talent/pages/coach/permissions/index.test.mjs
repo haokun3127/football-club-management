@@ -87,11 +87,8 @@ describe("coach permission scope", () => {
     for (const name of ["arrow-left", "info", "toggle-on", "toggle-off"]) {
       expect(existsSync(new URL(`../../../assets/icons/c161-${name}.svg`, import.meta.url))).toBe(true);
     }
-    expect(pageConfig).not.toContain('"app-header"');
+    expect(pageConfig).toContain('"app-header"');
     expect(pageConfig).toContain('"role-tabbar"');
-    expect(template).toContain('class="c161-nav"');
-    expect(template).not.toContain("c161-nav__placeholder");
-    expect(template).toContain("/assets/icons/c161-arrow-left.svg");
     expect(template).toContain("/assets/icons/c161-info.svg");
     expect(template).toContain("/assets/icons/c161-toggle-on.svg");
     expect(template).toContain("/assets/icons/c161-toggle-off.svg");
@@ -109,8 +106,6 @@ describe("coach permission scope", () => {
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toMatch(/showToast|setStorage|wx\.request/);
     expect(stylesheet).toMatch(/\.c161-page\s*\{[^}]*background:\s*#f6f7f9/s);
-    expect(stylesheet).toMatch(/\.c161-nav\s*\{(?=[^}]*height:\s*44px)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*padding-right:\s*200rpx)(?=[^}]*padding-left:\s*32rpx)(?=[^}]*background:\s*#fceeef)/s);
-    expect(stylesheet).toMatch(/\.c161-nav__title\s*\{(?=[^}]*flex:\s*1)(?=[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\))(?=[^}]*text-align:\s*left)/s);
     expect(stylesheet).toMatch(/\.c161-page__body\s*\{[^}]*padding:\s*32rpx\s+44rpx\s+80rpx/s);
     expect(stylesheet).toMatch(/\.c161-content\s*\{[^}]*gap:\s*32rpx/s);
     expect(stylesheet).toMatch(/\.c161-explain\s*\{(?=[^}]*gap:\s*24rpx)(?=[^}]*align-items:\s*flex-start)(?=[^}]*padding:\s*32rpx)(?=[^}]*border-radius:\s*24rpx)/s);

@@ -1,11 +1,5 @@
 <view class="c163-page">
-  <view class="c163-nav" style="padding-top:{{navInset}}px">
-    <view class="c163-nav__back" bindtap="goBack" aria-label="返回">
-      <image class="c163-nav__back-icon" src="/assets/icons/c163-chevron-left.svg" mode="aspectFit" />
-    </view>
-    <view class="c163-nav__title">账号设置</view>
-    <view class="c163-nav__placeholder" aria-hidden="true"></view>
-  </view>
+  <app-header title="账号设置" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
 
   <view class="c163-page__body">
     <view class="c163-content">

@@ -3,6 +3,7 @@
   "usingComponents": {
     "status-view": "/components/status-view/index",
     "t-textarea": "tdesign-miniprogram/textarea/textarea",
-    "t-button": "tdesign-miniprogram/button/button"
+    "t-button": "tdesign-miniprogram/button/button",
+    "app-header": "/components/app-header/index"
   }
 }

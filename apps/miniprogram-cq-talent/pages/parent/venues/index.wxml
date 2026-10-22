@@ -1,5 +1,5 @@
 <view class="venues-page">
-  <view class="venues-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="venues-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="venues-nav__title">场地信息</view><view class="venues-nav__action" bindtap="toggleSearch" aria-label="搜索场地"><image src="/assets/icons/search.svg" mode="aspectFit" /></view></view>
+  <app-header title="场地信息" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" action-text="搜索" bindaction="toggleSearch" />
   <view class="venues-page__body">
     <status-view
       state="{{state}}"

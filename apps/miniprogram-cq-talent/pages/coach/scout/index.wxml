@@ -1,5 +1,5 @@
 <view class="scout-page">
-  <view class="scout-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="scout-back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><text>{{pageTitle}}</text></view>
+  <app-header title="{{pageTitle}}" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
   <view class="scout-body">
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{pageTitle}}" message="{{message}}" action-text="返回人员库" bindaction="retry" />
     <block wx:if="{{state === 'ready'}}">

@@ -5,6 +5,7 @@
     "status-view": "/components/status-view/index",
     "schedule-calendar": "/components/schedule-calendar/index",
     "student-switcher": "/components/student-switcher/index",
-    "t-button": "tdesign-miniprogram/button/button"
+    "t-button": "tdesign-miniprogram/button/button",
+    "app-header": "/components/app-header/index"
   }
 }

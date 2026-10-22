@@ -1,9 +1,5 @@
 /* P08 213:526：白底概览（训练累计）→ 能力组合区 → 当前评价；旧深色身份卡/深色雷达结构已移除 */
 .p4 { min-height: 100vh; background: var(--club-page); }
-.p4-nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; box-sizing: content-box; height:44px; padding: 0 168rpx 0 32rpx; background: var(--club-nav); }
-.p4-nav__title { color: var(--club-text); font-size: 44rpx; font-weight: 700; }
-.p4-nav__settings { display: flex; align-items: center; justify-content: center; width: 64rpx; height: 64rpx; border-radius: 32rpx; background: var(--color-brand-soft); }
-.p4-nav__settings-icon { width: 36rpx; height: 36rpx; }
 
 .p4-body { padding: 32rpx 40rpx calc(180rpx + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 32rpx; }
 .p4-content { display: flex; flex-direction: column; gap: 32rpx; }
@@ -50,7 +46,7 @@
 .p4-milestone__state { padding: 4rpx 12rpx; border-radius: 8rpx; background: var(--color-error-soft); color: var(--color-brand); font-size: var(--font-size-aux); font-weight: 600; }.p4-milestone__state--green { background: var(--color-success-soft); color: var(--color-success); }.p4-milestone__state--blue { background: var(--color-info-soft); color: var(--color-info); }
 
 /* 训练历程 */
-.p4-chart-card { gap: 28rpx; }.p4-bars { display: flex; align-items: flex-end; width: 100%; height: 160rpx; gap: 8rpx; }.p4-bar { flex: 1; min-height: 8rpx; border-radius: 4rpx 4rpx 0 0; background: var(--color-brand); }.p4-months { display: flex; justify-content: space-between; width: 100%; color: var(--club-muted); font-size: var(--font-size-aux); }
+.p4-chart-card { gap: 28rpx; }.p4-bars { display: flex; align-items: flex-end; width: 100%; height: 160rpx; gap: 8rpx; }.p4-bar { flex: 1; min-height:0; border-radius: 4rpx 4rpx 0 0; background: var(--color-brand); }.p4-months { display: flex; justify-content: space-between; width: 100%; color: var(--club-muted); font-size: var(--font-size-aux); }
 
 /* 当前评价（P08 227:2126：per-team current evaluation; no fabricated coach copy） */
 .p4-evaluations{display:flex;flex-direction:column;gap:24rpx}.p4-evaluation-card{padding:32rpx;border:1rpx solid var(--club-line);border-radius:28rpx;background:var(--color-card);box-shadow:none;display:flex;flex-direction:column;gap:12rpx}.p4-evaluation-title{font-size: var(--font-size-section);line-height: 1.5;color:var(--club-text)}.p4-evaluation-text{font-size: var(--font-size-body);line-height: 1.5;color:var(--club-muted);white-space:pre-wrap}.p4-evaluation-author{font-size: var(--font-size-aux);line-height: 1.5;color:var(--color-brand)}
@@ -59,3 +55,11 @@
 .p4-card__link,
 .p4-evaluation-card,
 .p4-nav__settings { min-height:44px; min-width:44px; box-sizing:border-box; }
+
+.p4-card { padding:32rpx; border-radius:var(--radius-card); background:var(--color-card); display:flex; flex-direction:column; gap:16rpx; }
+.p4-card__head { display:flex; align-items:center; justify-content:space-between; gap:16rpx; }
+.p4-card__title { font-size:var(--font-size-section); font-weight:600; line-height:1.5; }
+.p4-card__link { display:flex; align-items:center; color:var(--color-brand); font-size:var(--font-size-aux); }
+.p4-card__summary,.p4-card__empty,.p4-ability__foot { color:var(--color-text-secondary); font-size:var(--font-size-aux); line-height:1.6; }
+.p4-metric-row { padding:16rpx 0; border-bottom:1rpx solid var(--color-line); min-height:44px; box-sizing:border-box; font-size:var(--font-size-body); line-height:1.6; }
+.p4-months > view { flex:1; text-align:center; }

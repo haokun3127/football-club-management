@@ -1,9 +1,4 @@
 .ability-history-page { min-height: 100vh; background: #f5f6f8; }
-.page-nav { position: sticky; top: 0; z-index: 100; box-sizing: content-box; display: flex; align-items: center; height:44px; padding-left: 32rpx; background: #ffffff; }
-.page-nav__back { display: flex; flex: 0 0 auto; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; }
-.page-nav__back image { width: 48rpx; height: 48rpx; }
-.page-nav__title { flex: 1; margin-left: 24rpx; overflow: hidden; color: #202124; font-size: var(--font-size-display); font-weight: 700; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
-.page-nav__spacer { flex: 0 0 auto; width: 48rpx; height: 48rpx; }
 .ability-history-page__body { padding: 16rpx 32rpx 64rpx; }
 .ability-history-page__intro { margin: 0 0 24rpx; color: #667085; font-size: var(--font-size-body); line-height: 1.5; }
 .history-summary { box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; min-height: 164rpx; margin-bottom: 36rpx; padding: 30rpx 32rpx; border-radius: 32rpx; background: #ffffff; }

@@ -1,5 +1,5 @@
 <view class="history-page">
-  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="page-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="page-nav__title">训练记录</view></view>
+  <app-header title="训练记录" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
   <view class="history-page__body">
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '加载训练记录' : state === 'empty' ? '期待下一次训练' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <block wx:if="{{state === 'ready'}}">

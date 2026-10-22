@@ -1,5 +1,5 @@
 <view class="evaluation-page">
-  <view class="evaluation-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="evaluation-back" bindtap="goBack"><image src="/assets/icons/c13-arrow-left.svg" mode="aspectFit" /></view><view>{{pageTitle}}</view></view>
+  <app-header title="{{pageTitle}}" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
   <view class="evaluation-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载评价' : state === 'empty' ? '暂无评价' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="reload" />
     <block wx:if="{{state === 'ready'}}">

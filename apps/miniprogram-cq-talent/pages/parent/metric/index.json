@@ -2,6 +2,7 @@
   "navigationStyle": "custom",
   "usingComponents": {
     "status-chip": "/components/status-chip/index",
-    "status-view": "/components/status-view/index"
+    "status-view": "/components/status-view/index",
+    "app-header": "/components/app-header/index"
   }
 }

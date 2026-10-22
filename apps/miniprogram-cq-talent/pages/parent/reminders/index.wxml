@@ -1,9 +1,5 @@
 <view class="reminders-page">
-  <view class="reminders-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="reminders-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
-    <view class="reminders-nav__title">提醒中心</view>
-    <view wx:if="{{unreadCount}}" class="reminders-nav__read" bindtap="markAllRead">全部已读</view>
-  </view>
+  <app-header title="提醒中心" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" action-text="{{unreadCount ? '全已读' : ''}}" bindaction="markAllRead" />
 
   <view class="reminders-page__body">
     <status-view state="{{state === 'empty' ? 'idle' : state}}" title="{{state === 'loading' ? '加载提醒' : '提醒读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />

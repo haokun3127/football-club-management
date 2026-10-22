@@ -1,5 +1,4 @@
 .copy-page { min-height:100vh; background:var(--club-page); color:var(--club-muted); }
-.copy-nav { position:sticky; top:0; z-index:10; display:flex; align-items:center; height:44px; background:var(--club-nav); color:var(--club-text); font-size: var(--font-size-body); gap:8rpx; padding-left:20rpx; }
 .copy-page .back { padding:0; margin:0; min-width:56rpx; width:56rpx; height:72rpx; line-height:68rpx; color:var(--club-text); background:transparent; font-size:48rpx; }
 .copy-body { padding:32rpx 32rpx calc(190rpx + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:16rpx; }
 .copy-card { padding:22rpx; display:flex; flex-direction:column; gap:10rpx; border:1rpx solid var(--club-line); border-radius:28rpx; background:#fff; box-shadow:none; font-size: var(--font-size-aux); line-height:1.5; overflow-wrap:anywhere; }

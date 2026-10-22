@@ -155,8 +155,4 @@ describe("parent venues", () => {
     expect(controller).not.toContain("GRADIENTS");
   });
 
-  it("starts the title directly after the 24px Figma back slot", () => {
-    expect(styles).not.toContain(".venues-nav__title { flex: 1; margin-left: 24rpx;");
-    expect(styles).toContain(".venues-nav__title { flex: 1; margin-left: 0;");
-  });
 });

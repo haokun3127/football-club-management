@@ -1,9 +1,4 @@
 .semester-report-page { min-height: 100vh; background: #f6f7f9; }
-.page-nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; box-sizing: content-box; height:44px; padding: 0 200rpx 0 32rpx; background: #ffffff; border-bottom: 1rpx solid #e7eaf0; }
-.page-nav__back { display: flex; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; flex: 0 0 auto; }
-.page-nav__back image { width: 40rpx; height: 40rpx; }
-.page-nav__title { flex: 1; margin-left: 24rpx; color: #202124; font-size: var(--font-size-display); font-weight: 700; line-height: 1.5; }
-.page-nav__spacer { width: 48rpx; height: 48rpx; }
 .semester-report-page__scroll { height: calc(100vh - 88rpx); box-sizing: border-box; padding-bottom: 180rpx; }
 .report-card { box-sizing: border-box; margin: 32rpx 32rpx 0; border-radius: 32rpx; }
 .report-card--period { position: relative; height: 208rpx; padding: 32rpx; background: #ffffff; }

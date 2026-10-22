@@ -1,10 +1,5 @@
 .match-history-page { min-height: 100vh; background: var(--color-bg); }
 .match-history-page__body { padding: 32rpx 32rpx 64rpx; }
-.page-nav { position: sticky; top: 0; z-index: 100; height:44px; box-sizing: content-box; display: flex; align-items: center; padding: 0 200rpx 0 32rpx; background: var(--color-card); }
-.page-nav__back { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; }
-.page-nav__back image { width: 48rpx; height: 48rpx; }
-.page-nav__title { flex: 1; margin-left: 24rpx; color: #202124; font-size: var(--font-size-display); font-weight: 700; }
-.page-nav__spacer { width: 48rpx; height: 48rpx; }
 .match-history-card { box-sizing: border-box; display: flex; align-items: center; gap: 24rpx; width: 686rpx; min-height: 128rpx; margin-bottom: 24rpx; padding: 20rpx 24rpx 20rpx 32rpx; border-radius: 24rpx; background: #ffffff; }
 .match-history-card__bar { flex: 0 0 auto; width: 8rpx; min-height: 72rpx; border-radius: 4rpx; background: #d1d5dd; }
 .match-history-card__bar--done { background: #a80f1b; }

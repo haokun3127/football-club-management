@@ -5,48 +5,6 @@
   background: var(--club-page);
 }
 
-.c34-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  height:44px;
-  box-sizing: content-box;
-  display: flex;
-  align-items: center;
-  padding-right: 200rpx;
-  padding-left: 32rpx;
-  background: var(--club-nav);
-  border-bottom: 1rpx solid var(--club-line);
-}
-
-.c34-nav__back {
-  display: flex;
-  width: 48rpx;
-  height: 48rpx;
-  flex: 0 0 48rpx;
-  align-items: center;
-  justify-content: center;
-}
-
-.c34-nav__back-icon {
-  width: 40rpx;
-  height: 40rpx;
-}
-
-.c34-nav__title {
-  flex: 1;
-  color: var(--club-text);
-  font-size: var(--font-size-display);
-  font-weight: 700;
-  text-align: left;
-}
-
-.c34-nav__placeholder {
-  width: 48rpx;
-  height: 48rpx;
-  flex: 0 0 48rpx;
-}
-
 .c34-body {
   display: flex;
   flex-direction: column;

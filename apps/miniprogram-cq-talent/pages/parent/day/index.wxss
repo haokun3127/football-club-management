@@ -1,10 +1,4 @@
 .p11 { min-height: 100vh; background: #f6f7f9; }
-.p11-nav { position: sticky; top: 0; z-index: 100; display: flex; box-sizing: content-box; align-items: center; justify-content: center; height:44px; padding: 0 32rpx; background: #ffffff; box-shadow:none; }
-.p11-nav__title { color: #202124; font-size: var(--font-size-display); font-weight: 700; line-height: 1.5; }
-.p11-nav__back, .p11-nav__filter { position: absolute; display: flex; align-items: center; justify-content: center; width: 64rpx; height: 64rpx; }
-.p11-nav__back { left: 32rpx; }
-.p11-nav__back image { width: 48rpx; height: 48rpx; }
-.p11-nav__filter image { width: 40rpx; height: 40rpx; }
 .p11-body { padding: 32rpx 32rpx calc(160rpx + env(safe-area-inset-bottom)); }
 .p11-list { display: flex; flex-direction: column; gap: 24rpx; }
 .p11-card { display: flex; box-sizing: border-box; width: 686rpx; height: 236rpx; padding: 32rpx; border-radius: 32rpx; background: #ffffff; box-shadow:none; }

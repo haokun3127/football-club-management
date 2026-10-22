@@ -159,7 +159,6 @@ describe("parent help center", () => {
     expect(template).toContain('src="/assets/icons/p82-chevron-right.svg"');
     expect(template).toContain('src="/assets/icons/p82-help-circle.svg"');
     expect(template).not.toContain('help-circle-brand.svg');
-    expect(readFileSync(new URL('./index.wxss', import.meta.url), 'utf8')).toContain('.page-nav__title { margin-left: 0;');
     expect(readFileSync(new URL('./index.wxss', import.meta.url), 'utf8')).toContain('padding: 24rpx 0;');
   });
 });

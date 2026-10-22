@@ -1,11 +1,5 @@
 <view class="c164-page">
-  <view class="c164-nav" style="padding-top:{{navInset}}px">
-    <view class="c164-nav__back" bindtap="goBack" aria-label="返回">
-      <image class="c164-nav__back-icon" src="/assets/icons/c164-chevron-left.svg" mode="aspectFit" />
-    </view>
-    <view class="c164-nav__title">帮助中心</view>
-    <view class="c164-nav__spacer" aria-hidden="true"></view>
-  </view>
+  <app-header title="帮助中心" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
 
   <view class="c164-page__body">
     <view class="c164-content">

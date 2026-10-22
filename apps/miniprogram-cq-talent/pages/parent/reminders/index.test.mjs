@@ -111,6 +111,6 @@ describe("parent reminders", () => {
 
   it("matches the live Figma top navigation without a visible back label", () => {
     expect(template).not.toContain('<view>返回</view>');
-    expect(template).toContain('<image src="/assets/icons/chevron-left.svg" mode="aspectFit" />');
+    expect(template).toContain('bindback="goBack"');
   });
 });

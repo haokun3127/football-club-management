@@ -1,11 +1,5 @@
 <view class="c12">
-  <view class="c12-nav" style="padding-top: {{navInset}}px; padding-right: {{menuInset}}px">
-    <view class="c12-nav__left" bindtap="goBack">
-      <image class="c12-nav__back" src="/assets/icons/c12-arrow-left.svg" mode="aspectFit" />
-      <text class="c12-nav__title">{{navTitle}}</text>
-    </view>
-    <text class="c12-nav__action" bindtap="submitAssessment">提交</text>
-  </view>
+  <app-header title="{{navTitle}}" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" action-text="提交" bindaction="submitAssessment" />
 
   <view class="c12-body">
     <status-view

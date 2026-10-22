@@ -143,7 +143,6 @@ describe("parent metric detail", () => {
   it("keeps WXML free of array helpers and gates optional cards on real fields", () => {
     expect(template).not.toContain("peerAverageLabel");
     expect(template).toContain('wx:if="{{detail && coachCommentText}}"');
-    expect(template).toContain("p6-nav__range");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(controller).not.toContain("switchRange");
   });
@@ -162,7 +161,4 @@ describe("parent metric detail", () => {
     expect(template).toContain("变化记录");
   });
 
-  it("anchors the title at the live Figma left origin", () => {
-    expect(stylesheet).toMatch(/\.p6-nav__title\s*\{[^}]*position:\s*absolute[^}]*left:\s*84rpx/s);
-  });
 });

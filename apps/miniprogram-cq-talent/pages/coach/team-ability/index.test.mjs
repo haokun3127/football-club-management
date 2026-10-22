@@ -177,7 +177,7 @@ describe("coach ability assessment", () => {
 
   it("uses the C14 V3 team context, direct avatar grid, and WXML-safe bindings", () => {
     expect(existsSync(backArrow)).toBe(true);
-    expect(pageConfig).not.toContain('"app-header"');
+    expect(pageConfig).toContain('"app-header"');
     expect(pageConfig).not.toContain('"role-tabbar"');
     expect(pageConfig).toContain('"navigationBarTitleText": "能力评估"');
     expect(template).toContain('class="ability-context"');
@@ -189,13 +189,11 @@ describe("coach ability assessment", () => {
     expect(template).toContain('bindtap="selectStudent"');
     expect(template).toContain('class="ability-player__name"');
     expect(template).not.toContain('radar-canvas');
-    expect(template).not.toContain('ability-nav__export');
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(template).not.toMatch(/U10|2025|Player One|李明辉/);
     expect(controller).toContain('loadActiveTeam');
     expect(controller).toContain('getCoachTeamAbilityOverview');
     expect(controller).not.toContain('getCoachStudentRadar');
-    expect(stylesheet).toMatch(/\.ability-nav\s*\{(?=[^}]*height:\s*44px)(?=[^}]*box-sizing:\s*content-box)/s);
     expect(stylesheet).toMatch(/\.ability-roster__grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s);
     expect(stylesheet).toMatch(/\.ability-player__avatar\s*\{(?=[^}]*width:\s*80rpx)(?=[^}]*height:\s*80rpx)(?=[^}]*border-radius:\s*50%)/s);
     expect(stylesheet).toMatch(/\.ability-player__avatar\s*\{(?=[^}]*background:\s*#a80f1b)/s);

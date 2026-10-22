@@ -1,11 +1,5 @@
 <view class="c34-page">
-  <view class="c34-nav" style="padding-top:{{navInset}}px">
-    <view class="c34-nav__back" bindtap="goBack" aria-label="返回">
-      <image class="c34-nav__back-icon" src="/assets/icons/c162-chevron-left.svg" mode="aspectFit" />
-    </view>
-    <view class="c34-nav__title">私教接课</view>
-    <view class="c34-nav__placeholder" aria-hidden="true"></view>
-  </view>
+  <app-header title="私教接课" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
 
   <view class="c34-body">
     <!-- 接课状态 -->

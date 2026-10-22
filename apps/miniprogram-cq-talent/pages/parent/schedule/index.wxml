@@ -1,19 +1,12 @@
 <view class="p1">
-  <view class="p1-nav" style="padding-top:{{navInset}}px">
-    <view class="p1-nav__title">日程</view>
-    <view class="p1-nav__bell" style="margin-right:{{menuInset}}px" bindtap="openReminders">
-      <image class="p1-nav__bell-icon" src="/assets/icons/bell.svg" mode="aspectFit" />
-      <view wx:if="{{hasUnreadReminders}}" class="p1-nav__bell-dot"></view>
-    </view>
-  </view>
-  <view class="p1-top-spacer" style="height:{{topBarHeight}}px"></view>
+  <app-header title="日程" title-align="left" action-text="{{hasUnreadReminders ? '提醒·未读' : '提醒'}}" bindaction="openReminders" />
 
   <view class="p1-body">
 
     <student-switcher students="{{children}}" selected-id="{{activeStudentId || 'all'}}" bindchange="onChildChange" />
     <schedule-calendar class="schedule-calendar-widget" date="{{selectedDate}}" events="{{calendarEvents}}" expanded="{{isMonthPickerExpanded}}" top-inset="{{topBarHeight}}" bindchange="onCalendarChange" bindviewchange="onCalendarViewChange" />
 
-    <view class="agenda-heading"><view><view class="agenda-heading__date">{{selectedDateLabel}}</view><view class="agenda-summary">{{state === 'loading' ? '正在更新日程…' : '本周' + weekCount + '项日程 · 安排时长' + weekHours + '小时'}}</view></view><t-button theme="primary" variant="text" bindtap="openDay" custom-style="min-height:44px;font-size:14px;">当日记录</t-button></view>
+    <view class="agenda-heading"><view><view class="agenda-heading__date">{{selectedDateLabel}}</view><view class="agenda-summary">{{state === 'loading' ? '正在更新日程…' : state === 'error' ? '日程统计暂不可用' : '本周' + weekCount + '项日程 · 安排时长' + weekHours + '小时'}}</view></view><t-button theme="primary" variant="text" bindtap="openDay" custom-style="min-height:44px;font-size:14px;">当日记录</t-button></view>
 
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '加载日程' : state === 'empty' ? '暂无活动' : '日程读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 

@@ -128,12 +128,9 @@ describe("parent account binding", () => {
 
   it("matches the live P10 navigation and family-member icon treatment", () => {
     const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
-    expect(template).toContain('src="/assets/icons/p10-chevron-left.svg"');
     expect(template).toContain('src="/assets/icons/p10-user.svg"');
     expect(template).toContain('src="/assets/icons/p10-plus.svg"');
     expect(template).not.toContain("content-users.svg");
-    expect(styles).toContain("margin-left: 48rpx;");
-    expect(styles).toContain("font-size: var(--font-size-display);");
     expect(styles).toContain("width: 48rpx; height: 48rpx; flex-shrink: 0;");
   });
 });

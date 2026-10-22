@@ -1,8 +1,5 @@
 <view class="content-page">
-  <view class="page-nav page-nav--plain" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="page-nav__title">内容中心</view>
-    <view class="page-nav__action" bindtap="toggleSearch" aria-label="搜索文章"><image class="page-nav__action-icon" src="/assets/icons/search.svg" mode="aspectFit" /></view>
-  </view>
+  <app-header title="内容中心" title-align="left" show-back="{{true}}" action-text="搜索" bindaction="toggleSearch" />
   <view class="content-page__body">
     <status-view
       state="{{state}}"

@@ -131,7 +131,7 @@ describe("parent growth training history", () => {
       expect.objectContaining({ id: "timeline-match", title: "友谊赛", state: "对阵渝北青训" }),
       expect.objectContaining({ id: "timeline-ability", title: "训练内容评测已记录", state: "传接球 91 分" }),
     ]);
-    expect(page.data.trainingBars).toHaveLength(8);
+    expect(page.data.trainingBars).toEqual([]);
   });
 
   it("refreshes growth on return after a training-record correction marked the facts stale", async () => {
@@ -283,7 +283,6 @@ describe("parent growth training history", () => {
 
     expect(page.data.heroStats).toEqual([
       { value: "46", label: "训练记录" },
-      { value: "—", label: "已确认测评" },
     ]);
     expect(page.data.trainingBars.map((bar) => bar.label)).toEqual(["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月"]);
     expect(Math.max(...page.data.trainingBars.map((bar) => bar.height))).toBe(80);
@@ -301,4 +300,15 @@ describe("parent growth training history", () => {
     expect(template).toContain("能力组合概览");
     expect(template).toContain('wx:if="{{activeStudentId && (state === \'ready\' || state === \'empty\')}}" class="p4-evaluations"');
   });
+  it("ignores stale metric responses after switching children, including cache and errors",async()=>{
+    let resolveOld; mocks.getParentMetricDetail.mockImplementationOnce(()=>new Promise(resolve=>{resolveOld=resolve;}));
+    const page=createPageInstance({activeStudentId:"student-1",selectedMetricId:"speed",detailCache:{}});
+    const old=page.loadMetricDetail("speed");
+    mocks.requireRole.mockReturnValue({role:"parent",currentStudentId:"student-2"});
+    mocks.getParentChildren.mockResolvedValue([{id:"student-2",name:"乙",teams:[]}]);
+    mocks.getParentGrowth.mockResolvedValue({radar:[],views:[],timeline:[],trainingStats:{totalTrainings:0,monthly:[]}});
+    await page.load();resolveOld({metricId:"speed",records:[{value:99}],sourceEvents:[]});await old;
+    expect(page.data.activeStudentId).toBe("student-2");expect(page.data.detailCache).toEqual({});expect(page.data.selectedDetail).toBeNull();expect(page.data.trainingBars).toEqual([]);
+  });
+
 });

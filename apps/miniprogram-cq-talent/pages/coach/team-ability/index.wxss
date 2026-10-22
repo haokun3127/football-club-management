@@ -1,8 +1,4 @@
 .ability-page { min-height: 100vh; padding-bottom: 48rpx; background: var(--color-page); }
-.ability-nav { position: sticky; top: 0; z-index: 100; display: flex; height:44px; box-sizing: content-box; align-items: center; padding: 0 32rpx; background: #fceeef; }
-.ability-nav__back { display: flex; flex: 0 0 48rpx; width: 48rpx; height: 64rpx; align-items: center; justify-content: center; }
-.ability-nav__back-icon { width: 36rpx; height: 36rpx; }
-.ability-nav__title { min-width: 0; flex: 1; margin-left: 16rpx; overflow: hidden; color: #202124; font-size: var(--font-size-display); font-weight: 700; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
 .ability-page__body { padding: 16rpx var(--space-page) 48rpx; }
 .ability-context { min-height: 108rpx; box-sizing: border-box; padding: 18rpx 28rpx; border-radius: 28rpx; background: #ffffff; }
 .ability-context__label { color: #667085; font-size: var(--font-size-aux); line-height: 1.5; }

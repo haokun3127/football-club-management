@@ -1,8 +1,4 @@
 .training-assessment-page { min-height: 100vh; background: #f6f7f9; }
-.assessment-nav { position: sticky; top: 0; z-index: 100; height:44px; box-sizing: content-box; display: flex; align-items: center; justify-content: space-between; padding-left: 32rpx; background: #ffffff; }
-.assessment-nav__left { display: flex; align-items: center; min-width: 0; color: #202124; font-size: var(--font-size-body); font-weight: 700; line-height: 1.5; }
-.assessment-nav__left image { width: 48rpx; height: 48rpx; margin-right: 2rpx; }
-.assessment-nav__save { color: #a80f1b; font-size: var(--font-size-body); font-weight: 600; line-height: 1.5; }
 .assessment-body { padding: 32rpx 32rpx 64rpx; }
 .assessment-hero { display: flex; flex-direction: column; gap: 8rpx; padding: 32rpx; border-radius: 24rpx; background:var(--color-card); }
 .assessment-hero__top { display: flex; justify-content: space-between; gap: 16rpx; color:var(--color-text-secondary); font-size: var(--font-size-aux); line-height: 1.5; }

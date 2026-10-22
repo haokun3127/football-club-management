@@ -318,26 +318,17 @@ describe("coach training content select", () => {
   it("uses the compact C10 Figma hierarchy without app headers, sample facts, or WXML helpers", () => {
     expect(pageConfig).not.toContain('"role-tabbar"');
     expect(pageConfig).toContain('"status-view"');
-    expect(pageConfig).not.toContain('"app-header"');
-    expect(template).toContain('class="select-nav"');
-    expect(template).toContain('/assets/icons/chevron-left.svg');
+    expect(pageConfig).toContain('"app-header"');
     expect(template).not.toMatch(/传球训练（初级）|射门训练（中级）|战术转换练习|体能循环训练|45分钟/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(template).toContain('padding-right:{{menuInset}}px');
     expect(template).toContain('class="{{item.selectClass}}"');
     expect(template).toContain('{{summaryLabel}}');
-    expect(stylesheet).toMatch(/\.select-nav\s*\{(?=[^}]*height:\s*44px)(?=[^}]*box-sizing:\s*content-box)(?=[^}]*background:\s*#fceeef)/s);
-    expect(stylesheet).toMatch(/\.select-nav__left\s*\{[^}]*gap:\s*24rpx/s);
-    expect(stylesheet).toMatch(/\.select-nav__title\s*\{[^}]*font-size:\s*44rpx[^}]*line-height:\s*54rpx/s);
     expect(stylesheet).toMatch(/\.project-card\s*\{[^}]*min-height:\s*128rpx/s);
     expect(controller).toContain("summaryLabel");
     expect(controller).not.toContain("openCoverage");
   });
 
   it("uses the online C10 navigation, search, and category geometry", () => {
-    expect(stylesheet).toMatch(/\.select-nav\s*\{[^}]*padding-left:\s*44rpx/s);
-    expect(stylesheet).toMatch(/\.select-nav__left\s*\{[^}]*gap:\s*24rpx/s);
-    expect(stylesheet).toMatch(/\.select-nav__title\s*\{[^}]*font-size:\s*44rpx[^}]*line-height:\s*54rpx/s);
     expect(stylesheet).toMatch(/\.search-bar__icon\s*\{[^}]*width:\s*40rpx[^}]*height:\s*40rpx[^}]*flex:\s*0 0 40rpx/s);
     expect(stylesheet).toMatch(/\.search-bar__input\s*\{[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)/s);
     expect(stylesheet).toMatch(/\.category-chip\s*\{[^}]*height:\s*64rpx[^}]*padding:\s*0 32rpx[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\)/s);

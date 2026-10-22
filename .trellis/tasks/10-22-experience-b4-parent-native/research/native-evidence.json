@@ -1,0 +1,296 @@
+{
+  "date": "2026-10-22",
+  "scope": "40 migrated routes opened in WeChat developer tools; representative native render inspected. Home/growth/mine use synthetic page state; parent course uses isolated read-response fixtures. No deployed API or physical-device acceptance.",
+  "routes": {
+    "scope": "Native compile of migrated headers; typed synthetic representative layouts; blocked HTTP; not live integration or physical device proof",
+    "proof": [
+      {
+        "path": "pages/parent/confirmed-results/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/schedule/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/event/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/growth/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/metric/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/child/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/semester-report/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/reminders/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/status/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/content/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/article/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/guide/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/milestones/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/ability-history/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/training-history/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/match-history/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/help/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/coaches/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/venues/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/private/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/private-success/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/day/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/parent/binding/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/coach/team-selector/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/coach/scout/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/coach/student-radar/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/coach/team-ability/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/coach/content-select/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/coach/content-copy/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/coach/training-assessment/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/coach/test-task-create/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/coach/assessment-submit/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/coach/permissions/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/coach/private-interest/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/coach/account/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/coach/help/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/coach/test-entry/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/coach/me/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/coach/student-results/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "path": "pages/shared/student-evaluation/index",
+        "headerFoundBySelector": false
+      },
+      {
+        "page": "home",
+        "kind": "typed synthetic page-state rendering",
+        "screenshot": "home.png"
+      },
+      {
+        "page": "growth",
+        "kind": "typed synthetic page-state rendering",
+        "screenshot": "growth.png"
+      },
+      {
+        "page": "growth-values",
+        "screenshot": "growth-values.png"
+      },
+      {
+        "page": "mine",
+        "kind": "typed synthetic page-state rendering",
+        "screenshot": "mine.png"
+      },
+      {
+        "page": "mine-expanded",
+        "screenshot": "mine-expanded.png"
+      },
+      {
+        "page": "schedule",
+        "kind": "error/empty state with shared header",
+        "screenshot": "schedule.png"
+      },
+      {
+        "page": "help",
+        "kind": "error/empty state with shared header",
+        "screenshot": "help.png"
+      },
+      {
+        "page": "content",
+        "kind": "error/empty state with shared header",
+        "screenshot": "content.png"
+      },
+      {
+        "page": "create",
+        "kind": "error/empty state with shared header",
+        "screenshot": "create.png"
+      },
+      {
+        "page": "copy",
+        "kind": "error/empty state with shared header",
+        "screenshot": "copy.png"
+      },
+      {
+        "page": "evaluation",
+        "kind": "error/empty state with shared header",
+        "screenshot": "evaluation.png"
+      },
+      {
+        "page": "coach-account",
+        "kind": "error/empty state with shared header",
+        "screenshot": "coach-account.png"
+      }
+    ]
+  },
+  "screenshots": [
+    {
+      "path": "/tmp/cq-b4-native/coach-account.png",
+      "sha256": "34ea6c367b8560284a63d9b1975d93eeaa1309c86adaf26ff8ba20babec62097"
+    },
+    {
+      "path": "/tmp/cq-b4-native/content.png",
+      "sha256": "ab65509046e8510c2353a8a929b0b38619e6b0b609ea505fe640d67bd305341f"
+    },
+    {
+      "path": "/tmp/cq-b4-native/copy.png",
+      "sha256": "a7a368087da19d2a96054a98411cae1f797d15c3940ca4e66051c6550881eace"
+    },
+    {
+      "path": "/tmp/cq-b4-native/create.png",
+      "sha256": "dd2e320e917dd6a80d255c3484cd9aae3324cc598e66031e887bb274a3c90539"
+    },
+    {
+      "path": "/tmp/cq-b4-native/evaluation.png",
+      "sha256": "0e4a5c0613f4449832d7fa5586a12bf8b1372f578e1c338a073095dc96b5664e"
+    },
+    {
+      "path": "/tmp/cq-b4-native/growth-values.png",
+      "sha256": "870abcf3f538677adee96e375547bf87f8a78cd9617a2cb6ba0cd02a6d247e0e"
+    },
+    {
+      "path": "/tmp/cq-b4-native/growth.png",
+      "sha256": "b9d6e0240c2e7522bbd0a367ce72378ec4ef4bd38b5f70132f3525ddf8bfa180"
+    },
+    {
+      "path": "/tmp/cq-b4-native/help.png",
+      "sha256": "5b7b3e727bb78d97036211c79c224deb04d6622a264bd250fb3f2ae1a8435e30"
+    },
+    {
+      "path": "/tmp/cq-b4-native/home.png",
+      "sha256": "1bd546ae491b74beac3ac34533fc24c6d4ed477fd3d0b68a91da64c1d0ae2cd7"
+    },
+    {
+      "path": "/tmp/cq-b4-native/mine-expanded.png",
+      "sha256": "77e5324f5251323ff86083a834d868aa6a3ef26c45dfa531d70d33c69809639a"
+    },
+    {
+      "path": "/tmp/cq-b4-native/mine.png",
+      "sha256": "bfd8a83750376457e06a013e330f030e9fdad040f1f85d99acbb37ddc1b24b2f"
+    },
+    {
+      "path": "/tmp/cq-b4-native/missing-header.png",
+      "sha256": "7c8c628ce0880e32b859f95f31323038c74b84fdf16c4dcb6bacb8f72f709792"
+    },
+    {
+      "path": "/tmp/cq-b4-native/schedule.png",
+      "sha256": "af814e4701f642dc7f41618950a5c05d7b23c16d881be5bd09c6e36b39571efc"
+    },
+    {
+      "path": "/tmp/cq-b3-native/06-parent.png",
+      "sha256": "60e8cd38a818a710a1dad81a822d8e7a4c832f3605d6d4995864a5aa85791187"
+    },
+    {
+      "path": "/tmp/cq-b3-native/07-parent-second.png",
+      "sha256": "c355b183ead39b9de884bf0c1a3e695c6806c0d68af920e0b5079c22f994d918"
+    }
+  ],
+  "selectorLimit": "Automator custom tag lookup returned false even when app-header rendered; actual route, screenshot and source registration are the evidence.",
+  "checks": {
+    "mini": "96 files, 687 passed / 1 existing skipped; types passed",
+    "scheduleAfterFinalTemplateFix": "7 passed",
+    "policy": "22 existing findings, raw budget 3.60 MiB; not official package size"
+  },
+  "cleanup": "Native request mocks, authenticated session and context restored by finally; no business writes."
+}

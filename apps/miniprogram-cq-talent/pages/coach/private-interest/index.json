@@ -2,6 +2,7 @@
   "navigationBarTitleText": "私教兴趣",
   "navigationStyle": "custom",
   "usingComponents": {
-    "role-tabbar": "/components/role-tabbar/index"
+    "role-tabbar": "/components/role-tabbar/index",
+    "app-header": "/components/app-header/index"
   }
 }

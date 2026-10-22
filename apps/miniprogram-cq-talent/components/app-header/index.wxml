@@ -2,14 +2,14 @@
   <view class="app-header__surface app-header--{{theme}}">
     <view style="height: {{statusBarHeight}}px"></view>
     <view class="app-header__content" style="height: {{contentHeight}}px; padding-right: {{actionInset}}px">
-      <view class="app-header__side app-header__side--left">
+      <view wx:if="{{showBack}}" class="app-header__side app-header__side--left">
         <t-button wx:if="{{showBack}}" disabled="{{backDisabled}}" class="app-header__back" variant="text" theme="default" icon="chevron-left" aria-label="返回" bindtap="handleBack" custom-style="width:44px;height:44px;padding:10px;" />
       </view>
       <view class="app-header__heading app-header__heading--{{titleAlign}}">
         <view class="app-header__title {{largeTitle ? 'app-header__title--large' : ''}}">{{title}}</view>
         <view wx:if="{{subtitle}}" class="app-header__subtitle">{{subtitle}}</view>
       </view>
-      <view class="app-header__side app-header__side--right">
+      <view wx:if="{{actionIcon || actionText}}" class="app-header__side app-header__side--right">
         <view wx:if="{{actionIcon}}" class="app-header__icon-action" role="button" bindtap="handleAction">
           <text class="app-header__icon-glyph">{{actionIcon}}</text>
           <view wx:if="{{actionDot}}" class="app-header__icon-dot"></view>

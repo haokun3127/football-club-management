@@ -6,7 +6,7 @@ vi.mock("../../../utils/training-records", () => ({ getTrainingRecords: mocks.re
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.session }));
 vi.mock("../../../utils/store", () => ({ setCurrentStudentId: mocks.select }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.open }));
-vi.mock("../../../utils/presentation", () => ({ formatTimeRange: () => "16:30–18:00" }));
+vi.mock("../../../utils/presentation", () => ({ formatCalendarDate: () => "2026年10月23日 周五", formatTimeRange: () => "16:30–18:00" }));
 vi.mock("../../../utils/club-presentation", () => ({
  getClubPresentation: mocks.presentation,
  defaultParentShortcuts: [{ key: "leave", label: "请假", path: "/pages/parent/schedule/index" }, { key: "records", label: "训练记录", path: "/pages/parent/training-history/index" }, { key: "results", label: "测评结果", path: "/pages/parent/ability-history/index" }, { key: "service", label: "私教咨询", path: "/pages/parent/private/index" }],
@@ -173,4 +173,10 @@ describe("P01 visual alignment (V-01/V-05)", () => {
     expect(template).toContain('class="club-banner-scrim"');
     expect(stylesheet).toMatch(/\.club-banner-scrim\s*\{[^}]*linear-gradient\(90deg,\s*var\(--color-card\)/s);
   });
+});
+
+it("opens the next training with its visible date and explicit selected child",async()=>{
+ const startsAt=new Date(Date.now()+86400000).toISOString();
+ mocks.calendar.mockResolvedValue([{id:"next-course",type:"training",status:"scheduled",title:"训练",startsAt,endsAt:startsAt,childIds:["b"],teamName:"U10",venue:"球场"}]);
+ const p=page();await p.load();expect(p.data.nextEventTime).toContain("2026年10月23日");p.openNextEvent();expect(mocks.open).toHaveBeenCalledWith("/pages/parent/event/index?id=next-course&studentId=b");
 });

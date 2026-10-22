@@ -2,6 +2,7 @@
   "navigationStyle": "custom",
   "usingComponents": {
     "status-view": "/components/status-view/index",
-    "t-input": "tdesign-miniprogram/input/input"
+    "t-input": "tdesign-miniprogram/input/input",
+    "app-header": "/components/app-header/index"
   }
 }

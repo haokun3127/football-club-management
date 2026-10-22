@@ -162,11 +162,9 @@ describe("parent private lesson result", () => {
 
   it("uses the live P9.1 success icon, compact top-nav title, and four-row summary", () => {
     const styles = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
-    expect(template).toContain('src="/assets/icons/p9-1-chevron-left.svg"');
     expect(template).toContain('src="/assets/icons/p9-1-check.svg"');
     expect(template).not.toContain('class="request-marker__check">✓');
     expect(template).not.toContain('summary-row__label">备注</view>');
-    expect(styles).toContain("font-size: var(--font-size-display);");
     expect(styles).toContain("width: 96rpx;");
     expect(styles).toContain("height: 96rpx;");
     expect(styles).toContain("padding: 44rpx 44rpx 176rpx;");

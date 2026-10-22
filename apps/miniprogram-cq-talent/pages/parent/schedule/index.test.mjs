@@ -42,40 +42,8 @@ describe("parent schedule", () => {
     expect(digest).toMatchObject({weekCount:2,weekHours:"1.5",todayCount:0});expect(digest).not.toHaveProperty("hero");
   });
 
-  it("aligns the schedule title with the right-side menu action baseline", () => {
-    const nav = styles.match(/\.p1-nav\s*\{([^}]*)\}/)?.[1] ?? "";
-    const title = styles.match(/\.p1-nav__title\s*\{([^}]*)\}/)?.[1] ?? "";
 
-    expect(template).toContain('<view class="p1-nav__title">日程</view>');
-    expect(template).toContain('<image class="p1-nav__bell-icon" src="/assets/icons/bell.svg" mode="aspectFit" />');
-    expect(nav).toContain("align-items: center");
-    expect(nav).toContain("justify-content: space-between");
-    expect(nav).not.toContain("padding-bottom");
-    expect(title).not.toContain("position: absolute");
-    expect(title).toContain("display: flex");
-    expect(title).toContain("align-items: center");
-    expect(title).toContain("font-size: var(--font-size-display)");
-    expect(title).toContain("line-height: 1.5");
-  });
 
-  it("keeps one 44px content-box custom navigation rule", () => {
-    const navRules = [...styles.matchAll(/(?:^|})\s*\.p1-nav\s*\{([^}]*)\}/g)].map((match) => match[1]);
-
-    expect(navRules).toHaveLength(1);
-    expect(navRules[0]).toMatch(/height:\s*44px/);
-    expect(navRules[0]).toContain("box-sizing: content-box");
-    expect(navRules[0]).not.toContain("height: 176rpx");
-    expect(navRules[0]).not.toContain("box-sizing: border-box");
-  });
-
-  it("pins the P1 top bar and reserves exactly its safe-area height in document flow", () => {
-    const nav = styles.match(/\.p1-nav\s*\{([^}]*)\}/)?.[1] ?? "";
-
-    expect(template).toContain('class="p1-top-spacer" style="height:{{topBarHeight}}px"');
-    expect(nav).toContain("position: fixed");
-    expect(nav).toContain("top: 0");
-    expect(nav).toContain("z-index: 100");
-  });
 
   it("derives the P1 spacer from the shared device-width-aware top-bar helper", () => {
     const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");

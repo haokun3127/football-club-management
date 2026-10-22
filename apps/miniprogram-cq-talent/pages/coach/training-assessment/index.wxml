@@ -1,8 +1,5 @@
 <view class="training-assessment-page">
-  <view class="assessment-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="assessment-nav__left" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /><text>课堂训练评测</text></view>
-    <text class="assessment-nav__save" bindtap="save">{{saving ? '保存中' : '保存'}}</text>
-  </view>
+  <app-header title="课堂表现" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" action-text="{{saving ? '保存中' : '保存'}}" bindaction="save" />
   <view class="assessment-body">
     <status-view state="{{state}}" title="{{statusTitle}}" message="{{message}}" action-text="{{statusActionText}}" bindaction="handleStatusAction" />
     <block wx:if="{{state === 'ready'}}">

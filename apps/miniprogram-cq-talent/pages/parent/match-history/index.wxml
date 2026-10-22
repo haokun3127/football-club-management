@@ -1,9 +1,5 @@
 <view class="match-history-page">
-  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="page-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
-    <view class="page-nav__title">比赛记录</view>
-    <view class="page-nav__spacer"></view>
-  </view>
+  <app-header title="比赛记录" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
 
   <view class="match-history-page__body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '加载比赛记录' : state === 'empty' ? '暂无比赛记录' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />

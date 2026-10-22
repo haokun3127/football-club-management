@@ -1,5 +1,5 @@
 <view class="article-page">
-  <view class="page-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="page-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="page-nav__title">文章详情</view><view class="page-nav__more"><image src="/assets/icons/more-horizontal.svg" mode="aspectFit" /></view></view>
+  <app-header title="文章详情" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
   <view class="article-page__body">
     <status-view
       state="{{state}}"

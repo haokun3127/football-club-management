@@ -252,14 +252,12 @@ describe("coach profile", () => {
   });
 
   it("uses the direct C16 assets and omits unsupported Figma samples", () => {
-    for (const name of ["settings", "shield", "heart", "user", "help-circle", "chevron-right"]) {
+    for (const name of ["shield", "heart", "user", "help-circle", "chevron-right"]) {
       expect(existsSync(new URL(`../../../assets/icons/c16-${name}.svg`, import.meta.url))).toBe(true);
       expect(template).toContain(`/assets/icons/c16-${name}.svg`);
     }
-    expect(pageConfig).not.toContain('"app-header"');
+    expect(pageConfig).toContain('"app-header"');
     expect(pageConfig).toContain('"role-tabbar"');
-    expect(template).toContain('class="c16-bar"');
-    expect(template).toContain('padding-right:{{menuInset}}px');
     expect(template).toContain('wx:for="{{profileStats}}"');
     expect(template).toContain('class="c16-profile"');
     expect(template).toContain('<view class="c16-logout" bindtap="logout">退出登录</view>');
@@ -271,9 +269,6 @@ describe("coach profile", () => {
     expect(controller).not.toContain("home.coachName");
     expect(controller).not.toContain("readableError");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(stylesheet).toMatch(/\.c16-bar\s*\{(?=[^}]*height:\s*44px)(?=[^}]*box-sizing:\s*content-box)/s);
-    expect(stylesheet).toMatch(/\.c16-bar\s*\{(?=[^}]*padding-left:\s*32rpx)/s);
-    expect(stylesheet).toMatch(/\.c16-bar__title\s*\{(?=[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\))(?=[^}]*line-height:\s*1\.5)/s);
     expect(stylesheet).toMatch(/\.c16-logout\s*\{(?=[^}]*display:\s*flex)(?=[^}]*box-sizing:\s*border-box)(?=[^}]*width:\s*100%)(?=[^}]*align-items:\s*center)(?=[^}]*justify-content:\s*center)/s);
   });
 });

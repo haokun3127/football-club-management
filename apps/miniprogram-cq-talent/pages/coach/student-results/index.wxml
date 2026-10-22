@@ -1,5 +1,5 @@
 <view class="results-page">
-  <view class="results-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view bindtap="goBack" class="results-back">‹</view><view>{{pageTitle}}</view></view>
+  <app-header title="{{pageTitle}}" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
   <view class="results-body">
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '加载成绩' : state === 'empty' ? '暂无已确认成绩' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <block wx:if="{{state === 'ready' && selected}}">

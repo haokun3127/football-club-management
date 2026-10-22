@@ -3,6 +3,7 @@ Component({
     title: { type: String, value: "" },
     subtitle: { type: String, value: "" },
     showBack: { type: Boolean, value: false },
+    customBack: { type: Boolean, value: false },
     backDisabled: { type: Boolean, value: false },
     actionText: { type: String, value: "" },
     actionIcon: { type: String, value: "" },
@@ -32,6 +33,7 @@ Component({
     handleBack(this: any) {
       if (this.data.backDisabled) return;
       this.triggerEvent("back", {});
+      if (this.data.customBack) return;
       wx.navigateBack({ delta: 1,fail:()=>wx.reLaunch({url:"/pages/launch/index"}) });
     },
     handleAction(this: any) {

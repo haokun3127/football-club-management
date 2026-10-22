@@ -1,10 +1,5 @@
 <view class="p2">
-  <view class="p2-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="p2-nav__back" bindtap="goBack"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
-    <view class="p2-nav__title">{{detail ? detail.navTitle : '活动详情'}}</view>
-    <view wx:if="{{detail && detail.type !== 'match'}}" class="p2-nav__status p2-nav__status--{{detail.statusTone}}">{{detail.statusLabel}}</view>
-    <view wx:else class="p2-nav__spacer"></view>
-  </view>
+  <app-header title="{{detail ? detail.navTitle : '活动详情'}}" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
 
   <view class="p2-body">
     <status-view state="{{state}}" title="{{state === 'loading' ? '正在读取活动' : '暂时无法查看'}}" message="{{message}}" action-text="{{state === 'error' ? '重新加载' : ''}}" bindaction="retry" />
@@ -18,9 +13,6 @@
         <view class="training-hero__title">{{detail.title}}</view>
         <view class="training-hero__meta"><view><image src="/assets/icons/calendar-white.svg" mode="aspectFit" />{{detail.trainingDateText}}</view><view><image src="/assets/icons/map-pin-white.svg" mode="aspectFit" />{{detail.venueText}}</view></view>
       </view>
-      <view class="detail-card detail-card--training"><view class="detail-card__head"><view class="detail-card__title">训练内容</view><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view><view class="detail-card__copy">{{detail.trainingSummary}}</view></view>
-      <view wx:if="{{selectedStudentId}}" class="detail-card detail-card--games"><view class="detail-card__title">训练内友谊赛</view><view wx:if="{{gamesLoading}}" class="detail-card__copy">正在读取记录…</view><view wx:if="{{gamesMessage}}" class="detail-card__copy">{{gamesMessage}}</view><view wx:for="{{friendlyGames}}" wx:key="id" class="parent-friendly-game"><view>{{item.title}} · {{item.score}}</view><view class="detail-card__copy">{{item.events}}</view></view></view>
-      <view class="detail-card detail-card--ability"><view class="detail-card__title">关联能力</view><view class="ability-tags"><view wx:for="{{detail.abilityChips}}" wx:key="*this" class="ability-tag">{{item}}</view></view></view>
       <view wx:if="{{leave && leave.visible}}" class="leave-card">
         <view class="leave-card__head"><view class="leave-card__title">请假与课时</view><view class="leave-card__status">{{leave.statusLabel}}</view></view>
         <view class="leave-card__rows">
@@ -39,6 +31,10 @@
         <view wx:if="{{leave.message}}" class="leave-card__message">{{leave.message}}</view>
         <view wx:if="{{!leave.available}}" class="leave-card__action" bindtap="retry">重新加载计次记录</view>
       </view>
+      <view class="detail-card detail-card--training"><view class="detail-card__head"><view class="detail-card__title">训练内容</view><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view><view class="detail-card__copy">{{detail.trainingSummary}}</view></view>
+      <view wx:if="{{selectedStudentId}}" class="detail-card detail-card--games"><view class="detail-card__title">训练内友谊赛</view><view wx:if="{{gamesLoading}}" class="detail-card__copy">正在读取记录…</view><view wx:if="{{gamesMessage}}" class="detail-card__copy">{{gamesMessage}}</view><view wx:for="{{friendlyGames}}" wx:key="id" class="parent-friendly-game"><view>{{item.title}} · {{item.score}}</view><view class="detail-card__copy">{{item.events}}</view></view></view>
+      <view class="detail-card detail-card--ability"><view class="detail-card__title">关联能力</view><view class="ability-tags"><view wx:for="{{detail.abilityChips}}" wx:key="*this" class="ability-tag">{{item}}</view></view></view>
+
     </block>
 
     <block wx:elif="{{detail && detail.type === 'match'}}">

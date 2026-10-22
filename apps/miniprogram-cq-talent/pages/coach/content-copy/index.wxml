@@ -1,5 +1,5 @@
 <view class="copy-page">
-  <view class="copy-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><t-button class="back" bindtap="goBack" disabled="{{saving}}" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="back" theme="primary" variant="text">‹</t-button><text>{{view === 'targets' ? '选择目标课程' : '复制课程内容'}}</text></view>
+  <app-header title="{{view === 'targets' ? '选择目标课程' : '复制课程内容'}}" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" back-disabled="{{saving}}" />
   <view class="copy-body">
     <view wx:if="{{loading}}" class="notice">正在读取课程内容…</view>
     <view wx:if="{{loadError}}" class="notice notice--error">{{loadError}}</view>

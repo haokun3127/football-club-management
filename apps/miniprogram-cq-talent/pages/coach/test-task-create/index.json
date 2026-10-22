@@ -4,6 +4,7 @@
   "usingComponents": {
     "t-button": "tdesign-miniprogram/button/button",
     "t-input": "tdesign-miniprogram/input/input",
-    "date-picker": "/components/date-picker/index"
+    "date-picker": "/components/date-picker/index",
+    "app-header": "/components/app-header/index"
   }
 }

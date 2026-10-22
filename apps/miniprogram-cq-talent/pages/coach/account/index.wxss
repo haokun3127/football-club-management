@@ -3,51 +3,6 @@
   background: #f6f7f9;
 }
 
-.c163-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  height:44px;
-  box-sizing: content-box;
-  display: flex;
-  align-items: center;
-  padding-right: 200rpx;
-  padding-left: 32rpx;
-  background: #fceeef;
-}
-
-.c163-nav__back {
-  width: 48rpx;
-  height: 48rpx;
-  flex: 0 0 48rpx;
-}
-
-.c163-nav__back {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.c163-nav__back-icon {
-  width: 40rpx;
-  height: 40rpx;
-}
-
-.c163-nav__title {
-  flex: 1;
-  color: #202124;
-  font-size: var(--font-size-display);
-  font-weight: 700;
-  line-height: 1.5;
-  text-align: left;
-}
-
-.c163-nav__placeholder {
-  width: 48rpx;
-  height: 48rpx;
-  flex: 0 0 48rpx;
-}
-
 .c163-page__body {
   padding: 32rpx 44rpx 180rpx;
 }

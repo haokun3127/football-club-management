@@ -1,10 +1,5 @@
 <view class="c16">
-  <view class="c16-bar" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="c16-bar__title">我的</view>
-    <view class="c16-bar__settings" bindtap="openAccount">
-      <image class="c16-bar__settings-icon" src="/assets/icons/c16-settings.svg" mode="aspectFit" />
-    </view>
-  </view>
+  <app-header title="我的" title-align="left" action-text="账号" bindaction="openAccount" />
 
   <view class="c16-body">
     <status-view

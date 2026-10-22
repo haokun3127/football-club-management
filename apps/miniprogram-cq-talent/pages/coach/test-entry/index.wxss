@@ -4,47 +4,6 @@
   color: #202124;
 }
 
-.c12-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-sizing: content-box;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height:44px;
-  padding-right: 44rpx;
-  padding-left: 32rpx;
-  background: #fceeef;
-}
-
-.c12-nav__left {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  min-width: 0;
-}
-
-.c12-nav__back {
-  width: 48rpx;
-  height: 48rpx;
-}
-
-.c12-nav__title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: var(--font-size-display);
-  font-weight: 700;
-  line-height: 1.5;
-}
-
-.c12-nav__action {
-  color: #a80f1b;
-  font-size: var(--font-size-body);
-  font-weight: 600;
-}
-
 .c12-body {
   box-sizing: border-box;
   padding: 32rpx 44rpx 320rpx;

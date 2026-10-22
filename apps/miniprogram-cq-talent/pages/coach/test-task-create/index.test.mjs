@@ -217,9 +217,6 @@ describe("coach test-task create", () => {
     expect(page.data.sourceEventId).toBe("course-b");
   });
 
-  it("keeps the title at the Figma top-nav offset", () => {
-    expect(styles).toMatch(/\.page-nav__title\s*\{[^}]*margin-left:\s*8rpx;/s);
-  });
   it("reuses the creation key after an uncertain response, but starts a new attempt after editing", async () => {
     mocks.createCoachAssessmentTask.mockRejectedValue(new Error("response lost"));
     const page=createPageInstance();await page.load("course-a");page.onTermLabelInput({detail:{value:"秋季"}});

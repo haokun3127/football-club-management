@@ -76,7 +76,7 @@ describe("parent day schedule", () => {
     const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
     const pageConfig = readFileSync(new URL("./index.json", import.meta.url), "utf8");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(template).toContain('bindtap="openFilter"');
+    expect(template).toContain('bindaction="openFilter"');
     expect(template).toContain('bindtap="openEvent"');
     expect(pageConfig).toContain('"navigationStyle": "custom"');
   });

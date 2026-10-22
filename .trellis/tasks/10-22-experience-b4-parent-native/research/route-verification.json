@@ -1,0 +1,870 @@
+{
+  "oldRoutes": 62,
+  "currentRoutes": 63,
+  "removedRoutes": [],
+  "scope": "静态注册/四件套/调用方与query核对；不是全部业务路径真机验收",
+  "routes": [
+    {
+      "route": "pages/launch/index",
+      "role": "launch",
+      "shell": "启动品牌壳",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/login/index.ts",
+        "pages/coach/me/index.ts",
+        "utils/auth.ts"
+      ],
+      "back": "启动恢复",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/login/index",
+      "role": "login",
+      "shell": "app-header",
+      "queryKeys": [
+        "code",
+        "redirect"
+      ],
+      "incomingFiles": [
+        "pages/launch/index.ts",
+        "pages/parent/account/index.ts",
+        "pages/coach/account/index.ts",
+        "utils/request.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/home/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "utils/navigation.ts",
+        "utils/auth.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/confirmed-results/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [
+        "student",
+        "team"
+      ],
+      "incomingFiles": [
+        "pages/parent/growth/index.ts",
+        "utils/club-presentation.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/schedule/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/parent/home/index.ts",
+        "pages/parent/private-success/index.ts",
+        "pages/parent/event/index.ts",
+        "pages/parent/child/index.ts",
+        "utils/navigation.ts",
+        "utils/club-presentation.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/event/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [
+        "id",
+        "studentId"
+      ],
+      "incomingFiles": [
+        "pages/parent/home/index.ts",
+        "pages/parent/schedule/index.ts",
+        "pages/parent/match-history/index.ts",
+        "pages/parent/ability-history/index.ts",
+        "pages/parent/day/index.ts",
+        "pages/parent/metric/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/growth/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/parent/home/index.ts",
+        "pages/parent/semester-report/index.ts",
+        "utils/navigation.ts",
+        "utils/club-presentation.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/radar/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/parent/growth/index.ts",
+        "pages/parent/child/index.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/metric/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [
+        "metricId",
+        "studentId"
+      ],
+      "incomingFiles": [
+        "pages/parent/ability-history/index.ts",
+        "pages/parent/growth/index.ts",
+        "pages/parent/radar/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/child/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "utils/navigation.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/semester-report/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/parent/child/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/account/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/parent/binding/index.ts",
+        "pages/parent/child/index.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/reminders/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/parent/schedule/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/status/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [
+        "student"
+      ],
+      "incomingFiles": [
+        "pages/parent/child/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/content/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/parent/home/index.ts",
+        "pages/parent/child/index.ts",
+        "utils/navigation.ts",
+        "utils/club-presentation.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/article/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [
+        "id"
+      ],
+      "incomingFiles": [
+        "pages/parent/guide/index.ts",
+        "pages/parent/home/index.ts",
+        "pages/parent/schedule/index.ts",
+        "pages/parent/content/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/guide/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/parent/content/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/milestones/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/parent/growth/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/ability-history/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/parent/milestones/index.ts",
+        "utils/club-presentation.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/training-history/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/parent/growth/index.ts",
+        "utils/club-presentation.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/match-history/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/parent/growth/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/help/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/parent/content/index.ts",
+        "pages/parent/child/index.ts",
+        "utils/club-presentation.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/coaches/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/parent/content/index.ts",
+        "pages/parent/status/index.ts",
+        "pages/parent/child/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/venues/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [
+        "trim"
+      ],
+      "incomingFiles": [
+        "pages/parent/content/index.ts",
+        "pages/parent/child/index.ts",
+        "utils/club-presentation.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/private/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [
+        "student"
+      ],
+      "incomingFiles": [
+        "pages/parent/child/index.ts",
+        "utils/club-presentation.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/private-success/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [
+        "request",
+        "student"
+      ],
+      "incomingFiles": [
+        "pages/parent/private/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/day/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [
+        "date"
+      ],
+      "incomingFiles": [
+        "pages/parent/schedule/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/parent/binding/index",
+      "role": "parent",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/parent/growth/index.ts",
+        "pages/parent/child/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/schedule/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/coach/attendance-success/index.ts",
+        "utils/navigation.ts",
+        "utils/auth.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/team-selector/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "destination"
+      ],
+      "incomingFiles": [
+        "pages/coach/schedule/index.ts",
+        "pages/coach/training/index.ts",
+        "pages/coach/team/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/event/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "id"
+      ],
+      "incomingFiles": [
+        "pages/coach/schedule/index.ts",
+        "pages/coach/training/index.ts",
+        "pages/coach/student-radar/index.ts",
+        "pages/coach/attendance-success/index.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/attendance/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "id"
+      ],
+      "incomingFiles": [
+        "pages/coach/schedule/index.ts",
+        "pages/coach/event/index.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/lesson/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "id",
+        "studentId"
+      ],
+      "incomingFiles": [
+        "pages/coach/attendance/index.ts",
+        "pages/coach/lesson-detail/index.ts",
+        "pages/coach/event/index.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/training-game/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "contentBlockId",
+        "eventId",
+        "gameId"
+      ],
+      "incomingFiles": [
+        "pages/coach/team/index.ts",
+        "pages/coach/event/index.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/match/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "id"
+      ],
+      "incomingFiles": [
+        "pages/coach/schedule/index.ts",
+        "pages/coach/team/index.ts",
+        "pages/coach/event/index.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/match-edit/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "eventId"
+      ],
+      "incomingFiles": [
+        "pages/coach/match/index.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/tactical-board/index",
+      "role": "coach",
+      "shell": "战术画布专用壳",
+      "queryKeys": [
+        "eventId"
+      ],
+      "incomingFiles": [
+        "pages/coach/event/index.ts"
+      ],
+      "back": "画布原返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/team/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "section",
+        "teamId"
+      ],
+      "incomingFiles": [
+        "pages/coach/training/index.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/scout/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "eventId",
+        "mode",
+        "student"
+      ],
+      "incomingFiles": [
+        "pages/coach/match/index.ts",
+        "pages/coach/training/index.ts",
+        "pages/coach/team/index.ts",
+        "pages/coach/event/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/student-radar/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "section",
+        "student",
+        "team"
+      ],
+      "incomingFiles": [
+        "pages/coach/team-ability/index.ts",
+        "pages/coach/team/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/team-ability/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "teamId"
+      ],
+      "incomingFiles": [
+        "pages/coach/training/index.ts",
+        "pages/coach/assessment-submit/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/event-change/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "id"
+      ],
+      "incomingFiles": [
+        "pages/coach/event/index.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/content-select/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "eventId"
+      ],
+      "incomingFiles": [
+        "pages/coach/schedule/index.ts",
+        "pages/coach/training-assessment/index.ts",
+        "pages/coach/event/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/content-copy/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "eventId"
+      ],
+      "incomingFiles": [
+        "pages/coach/event/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/training-assessment/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "eventId"
+      ],
+      "incomingFiles": [
+        "pages/coach/event/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/test-tasks/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "teamId"
+      ],
+      "incomingFiles": [
+        "pages/coach/training/index.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/test-task-create/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "eventId",
+        "teamId"
+      ],
+      "incomingFiles": [
+        "pages/coach/test-tasks/index.ts",
+        "pages/coach/event/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/assessment-projects/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "review",
+        "taskId",
+        "templateId",
+        "title"
+      ],
+      "incomingFiles": [
+        "pages/coach/schedule/index.ts",
+        "pages/coach/assessment-bulk-entry/index.ts",
+        "pages/coach/training/index.ts",
+        "pages/coach/test-tasks/index.ts",
+        "pages/coach/test-task-create/index.ts",
+        "pages/coach/event/index.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/assessment-bulk-entry/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "projectId",
+        "projectIds",
+        "taskId",
+        "templateId",
+        "title"
+      ],
+      "incomingFiles": [
+        "pages/coach/assessment-projects/index.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/assessment-submit/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "count",
+        "title"
+      ],
+      "incomingFiles": [],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/attendance-success/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "eventId"
+      ],
+      "incomingFiles": [
+        "pages/coach/attendance/index.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/lesson-history/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/lesson-detail/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "id"
+      ],
+      "incomingFiles": [
+        "pages/coach/lesson-history/index.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/match-event-add/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "eventId"
+      ],
+      "incomingFiles": [
+        "pages/coach/match/index.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/permissions/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/coach/me/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/private-interest/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/coach/me/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/account/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/coach/me/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/help/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/coach/me/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/training/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "section",
+        "teamId"
+      ],
+      "incomingFiles": [
+        "pages/coach/schedule/index.ts",
+        "pages/coach/team-selector/index.ts",
+        "utils/navigation.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/test-entry/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "eventId"
+      ],
+      "incomingFiles": [
+        "pages/coach/schedule/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/me/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [],
+      "incomingFiles": [
+        "pages/coach/schedule/index.ts",
+        "utils/navigation.ts"
+      ],
+      "back": "角色Tab/共享返回",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/coach/student-results/index",
+      "role": "coach",
+      "shell": "app-header",
+      "queryKeys": [
+        "student",
+        "team"
+      ],
+      "incomingFiles": [
+        "pages/coach/student-radar/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    },
+    {
+      "route": "pages/shared/student-evaluation/index",
+      "role": "shared",
+      "shell": "app-header",
+      "queryKeys": [
+        "mode",
+        "student",
+        "team"
+      ],
+      "incomingFiles": [
+        "pages/parent/growth/index.ts",
+        "pages/parent/milestones/index.ts",
+        "pages/coach/student-radar/index.ts"
+      ],
+      "back": "原页面处理器（保留确认/特殊返回）",
+      "fourFiles": true
+    }
+  ]
+}

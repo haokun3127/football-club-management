@@ -343,15 +343,10 @@ describe("coach project score entry", () => {
     expect(controller).not.toContain("return record?.message");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(pageConfig).toContain('"role-tabbar"');
-    expect(pageConfig).not.toContain('"app-header"');
+    expect(pageConfig).toContain('"app-header"');
     expect(pageConfig).not.toContain('"submit-bar"');
-    expect(template).toContain('/assets/icons/c12-arrow-left.svg');
     expect(stylesheet).toMatch(/\.c12-submit-wrap\s*\{[^}]*bottom:\s*140rpx/s);
     expect(template).toContain("{{navTitle}}");
-    expect(stylesheet).toMatch(/\.c12-nav\s*\{(?=[^}]*height:\s*44px)(?=[^}]*box-sizing:\s*content-box)/s);
-    expect(stylesheet).toMatch(/\.c12-nav\s*\{[^}]*padding-left:\s*32rpx/s);
-    expect(stylesheet).toMatch(/\.c12-nav__left\s*\{[^}]*gap:\s*0/s);
-    expect(stylesheet).toMatch(/\.c12-nav__title\s*\{(?=[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\))(?=[^}]*line-height:\s*1\.5)/s);
     expect(stylesheet).toMatch(/\.c12-body\s*\{[^}]*padding:\s*32rpx 44rpx 320rpx/s);
     expect(stylesheet).toMatch(/\.c12-students\s*\{[^}]*margin-top:\s*40rpx/s);
     expect(stylesheet).toMatch(/\.c12-task-header\s*\{(?=[^}]*height:\s*192rpx)(?=[^}]*overflow:\s*hidden)/s);
@@ -453,8 +448,4 @@ describe("coach project score entry", () => {
     expect(stylesheet).toMatch(/\.c121-modal\s*\{[^}]*width:\s*662rpx[^}]*border-radius:\s*32rpx/s);
   });
 
-  it("keeps the submit action clear of the system capsule", () => {
-    expect(template).toContain('padding-right: {{menuInset}}px');
-    expect(stylesheet).toMatch(/\.c12-nav__left\s*\{[^}]*min-width:\s*0/s);
-  });
 });

@@ -1,12 +1,5 @@
 <view class="select-page">
-  <view class="select-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="select-nav__left">
-      <view class="select-nav__back" bindtap="goBack" aria-label="返回">
-        <image src="/assets/icons/chevron-left.svg" mode="aspectFit" />
-      </view>
-      <view class="select-nav__title">选择训练内容</view>
-    </view>
-  </view>
+  <app-header title="选择训练内容" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" />
 
   <view class="select-page__body">
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{statusTitle}}" message="{{message}}" action-text="{{statusActionText}}" bindaction="retry" />

@@ -16,3 +16,8 @@ it("blocks header back while a save or publication is active",()=>{
  globalThis.wx={navigateBack:vi.fn()}; const header={data:{backDisabled:true},triggerEvent:vi.fn()};
  definition.methods.handleBack.call(header); expect(wx.navigateBack).not.toHaveBeenCalled(); expect(header.triggerEvent).not.toHaveBeenCalled();
 });
+
+it("delegates custom back without bypassing the page's unsaved-change confirmation",()=>{
+ globalThis.wx={navigateBack:vi.fn()};const header={data:{backDisabled:false,customBack:true},triggerEvent:vi.fn()};
+ definition.methods.handleBack.call(header);expect(header.triggerEvent).toHaveBeenCalledWith("back",{});expect(wx.navigateBack).not.toHaveBeenCalled();
+});
