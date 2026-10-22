@@ -1449,7 +1449,7 @@ Audited 40 commits; seven isolated fix commits; 964 tests plus 9 script tests an
 
 ### Main Changes
 
-(Add details)
+测评录入、训练内友谊赛、家长导航与后台体验按B2—B5独立提交。工程入口与逐项证据见 `.trellis/tasks/10-22-experience-b6-verification/implement.md`。
 
 ### Git Commits
 
@@ -1462,12 +1462,13 @@ Audited 40 commits; seven isolated fix commits; 964 tests plus 9 script tests an
 
 ### Testing
 
-- [OK] (Add test results)
+- `pnpm check:delivery`：1004通过/1既有跳过，9脚本/3启动通过；后台lint通过。
+- 原生19/40人及后台1440/1024验证完成；真机/375基准、键盘/读屏、部署环境未验。
 
 ### Status
 
-[OK] **Completed**
+B2—B5本地实现完成；B6及父任务仍为 **in_progress**。
 
 ### Next Steps
 
-- None - task complete
+- 按B6记录完成真机与目标环境验收；本轮未部署、上传或推送。
