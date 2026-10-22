@@ -1,0 +1,41 @@
+{
+  "sourceCommit": "65f0fcc4",
+  "date": "2026-10-22",
+  "logs": [
+    {
+      "path": "/tmp/cq-experience-delivery-final3.log",
+      "sha256": "215f8e6fe24a7fc8ec58c222a7bc0bf9417a659f9c920fcc7229487a7e569489"
+    },
+    {
+      "path": "/tmp/cq-experience-policy-final.log",
+      "sha256": "fbfc546080b1f2942c063105b4580bcff62d6cc547a6b8ba34646ae1edabd4ca"
+    },
+    {
+      "path": "/tmp/cq-b5-lint-final.log",
+      "sha256": "f668a85d5cb4a05599bc71f55e3fea8e8bd3f603e137652c2ac761483901fe4d"
+    },
+    {
+      "path": "/tmp/cq-b5-calendar-repro.log",
+      "sha256": "5e34b11dc608c72a344d92666a7aa0738e0e51889031cb2a80bdd52e1e06324b"
+    },
+    {
+      "path": "/tmp/cq-b5-calendar-fixed.log",
+      "sha256": "8ada06cf9f6b2c0b005cd5f4e59b4219f26cf5930d45ccd73cb41b9596a61e2f"
+    },
+    {
+      "path": "/tmp/cq-b5-tactical-fixture.log",
+      "sha256": "748308c3507b61c7c3ce66034a52d0627593cb0a72ab64ad1307503a0b5e4c6b"
+    }
+  ],
+  "gateExitCode": 0,
+  "passed": 1004,
+  "existingSkipped": 1,
+  "scriptTestsPassed": 9,
+  "startupChecksPassed": 3,
+  "cleanup": "Native state restored. Browser cq-b5 closed. Final disposable fixture directory verified absent.",
+  "limits": [
+    "physical devices, 375x812 baseline and keyboard/accessibility not verified",
+    "no deployment, no WeChat upload, no remote CI, no push",
+    "policy report retains 22 findings; raw budget is not official package size"
+  ]
+}

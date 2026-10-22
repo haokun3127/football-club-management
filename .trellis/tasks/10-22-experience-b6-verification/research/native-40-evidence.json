@@ -1,0 +1,23 @@
+{
+  "scope": "Synthetic API fixtures in official native simulator; all writes return 405; page-method navigation/search/child switch; no business writes or physical device claim",
+  "proof": [
+    {
+      "page": "classroom-40",
+      "state": "ready",
+      "rosterCount": 40,
+      "windowInfo": {
+        "windowWidth": 430,
+        "windowHeight": 932,
+        "pixelRatio": 3
+      },
+      "screenshot": {
+        "success": true,
+        "path": "/tmp/cq-b6-native/classroom-40.png",
+        "imageWidth": 620,
+        "imageHeight": 1344
+      }
+    }
+  ],
+  "screenshotSha256": "9d3f1d803b1591bbf65a2c8a0c64e228e3e04bf33c248576cf29b300ac9c8c4e",
+  "limit": "Actual simulator logical width430 height932; 375×812/physical devices not verified."
+}

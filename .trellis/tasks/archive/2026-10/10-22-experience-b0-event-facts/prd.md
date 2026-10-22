@@ -13,4 +13,4 @@
 - 双孩子同场、无效孩子、无内容、失效请求和无权限各有明确结果。
 - 相关API/原生控制器检查与类型检查通过；原生编译/画面单独记录，未部署不能称线上API已更新。
 
-完整约束见[父PRD](../10-22-club-experience-redesign/prd.md)。
+完整约束见[父PRD](../../../10-22-club-experience-redesign/prd.md)。

@@ -2,7 +2,7 @@
   "id": "club-experience-redesign",
   "name": "club-experience-redesign",
   "title": "全产品体验提升：俱乐部对标、功能分布与流程统一",
-  "description": "B0—B5本地实现并逐批验证完成；B6收拢交付检查、工程交接与设备/部署验收边界。",
+  "description": "B0—B5已提交并验证，B6本地check:delivery通过：1004通过/1跳过，9脚本/3启动；真机/375基准/软键盘/读屏与目标环境验收未完成，未部署上传。",
   "status": "in_progress",
   "dev_type": null,
   "scope": "miniprogram, api, domain, backoffice",
@@ -24,7 +24,8 @@
     "10-22-experience-b2-assessment-flow",
     "10-22-experience-b3-training-games",
     "10-22-experience-b4-parent-native",
-    "10-22-experience-b5-backoffice"
+    "10-22-experience-b5-backoffice",
+    "10-22-experience-b6-verification"
   ],
   "parent": null,
   "relatedFiles": [

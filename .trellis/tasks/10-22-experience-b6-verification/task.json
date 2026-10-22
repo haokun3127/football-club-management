@@ -1,8 +1,8 @@
 {
-  "id": "experience-b5-backoffice",
-  "name": "experience-b5-backoffice",
-  "title": "B5 管理后台任务与对象体验",
-  "description": "",
+  "id": "experience-b6-verification",
+  "name": "experience-b6-verification",
+  "title": "B6 跨端集成验证与工程交接",
+  "description": "本地集成1004通过/1跳过，原生40人/后台双视口验证与工程交接已完成；真机375/键盘/读屏及部署环境验收未完成，不自动部署。",
   "status": "in_progress",
   "dev_type": null,
   "scope": null,
