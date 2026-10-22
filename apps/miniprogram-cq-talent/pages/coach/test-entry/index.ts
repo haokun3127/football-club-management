@@ -1,3 +1,4 @@
+import { assessmentInputError } from "../../../utils/assessment-input";
 import { getAssessmentForm, getCoachWorkbench, submitCoachAssessment } from "../../../utils/api";
 import { clearAssessmentDraftStudents, draftProgress, loadAssessmentDraft, saveAssessmentDraftEntry, type AssessmentDraftMap } from "../../../utils/assessment-draft";
 import { requireRole } from "../../../utils/auth";
@@ -649,10 +650,5 @@ function buildMetricValue(kind: string, rawValue: string, unit?: string): Record
 }
 
 function validFieldValue(field: AssessmentField, rawValue: string) {
-  if (field.valueKind === "tag" || field.valueKind === "text") return Boolean(rawValue.trim());
-  const numeric = Number(rawValue);
-  if (!Number.isFinite(numeric)) return false;
-  if (field.minValue !== undefined && numeric < field.minValue) return false;
-  if (field.maxValue !== undefined && numeric > field.maxValue) return false;
-  return true;
+  return Boolean(rawValue.trim()) && assessmentInputError(field, rawValue) === null;
 }

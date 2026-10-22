@@ -1,55 +1,41 @@
 <view class="bulk-page">
-  <view class="bulk-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px">
-    <view class="bulk-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view>
-    <view class="bulk-nav__title">{{projectTitle}}</view>
-  </view>
-
+  <app-header title="测评录入" title-align="left" show-back="{{true}}" back-disabled="{{submitting}}" />
   <view class="bulk-body">
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{statusTitle}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <block wx:if="{{state === 'ready'}}">
+      <view class="bulk-title">{{projectTitle}}</view>
       <view class="bulk-context-line">{{taskTitle}} · {{teamName}}</view>
-      <view class="bulk-summary">
-        <view class="bulk-summary__count">{{filledLabel}}</view>
-        <view class="bulk-summary__rule">{{readOnly ? '只读' : (managed ? '草稿保存后需确认发布' : '保存后同步标准分')}}</view>
-      </view>
-
+      <view class="bulk-summary"><view class="bulk-summary__count">{{filledLabel}}</view><view class="bulk-summary__rule">{{readOnly ? '只读成绩' : managed ? '先保存草稿，核对后再确认发布' : '保存后同步成绩'}}</view></view>
       <view wx:if="{{managed && !readOnly}}" class="bulk-workflow">
-        <t-input value="{{correctionReason}}" maxlength="500" disabled="{{submitting}}" placeholder="更正已发布成绩时，请填写原因" bindchange="onReasonInput"  borderless />
-        <text bindtap="reloadServer">重新读取服务器成绩</text>
+        <t-input value="{{correctionReason}}" maxlength="500" disabled="{{submitting}}" label="更正原因" placeholder="修改已发布成绩时必填" bindchange="onReasonInput" borderless />
+        <t-button theme="default" variant="text" disabled="{{submitting}}" bindtap="reloadServer">重新读取服务器成绩</t-button>
       </view>
       <view wx:if="{{courseSelectionRequired}}" class="bulk-course-bar">
-        <picker wx:if="{{!readOnly && courses.length}}" range="{{courses}}" range-key="label" bindchange="selectCourse" disabled="{{submitting}}"><view>批量选择所属训练课</view></picker>
-        <text wx:if="{{!courses.length}}">周期内暂无可关联的有效训练课</text>
+        <picker wx:if="{{!readOnly && courses.length}}" range="{{courses}}" range-key="label" bindchange="selectCourse" disabled="{{submitting}}"><view class="bulk-course-choice">统一选择训练课 ›</view></picker>
+        <view wx:if="{{!courses.length}}">周期内暂无可关联的有效训练课</view>
+        <view wx:elif="{{!readOnly}}" class="bulk-course-hint">应用于该课可录入的学员；个别项目可在下方调整。</view>
       </view>
       <view wx:if="{{saveError}}" class="bulk-workflow__error">{{saveError}}</view>
       <view wx:for="{{rows}}" wx:key="studentId" class="bulk-row">
-        <view class="bulk-row__identity"><view class="bulk-row__avatar">{{item.initials}}</view><view class="bulk-row__name">{{item.name}}</view><text wx:if="{{managed}}" class="bulk-history-link" data-student-id="{{item.studentId}}" bindtap="showHistory">记录</text></view>
+        <view class="bulk-row__identity"><view class="bulk-row__name">{{index + 1}}. {{item.name}}</view><view class="bulk-row__status">{{item.statusLabel}}</view><t-button wx:if="{{managed}}" theme="default" variant="text" data-student-id="{{item.studentId}}" bindtap="showHistory">历史</t-button></view>
         <view class="bulk-row__metrics">
-          <view wx:for="{{item.metrics}}" wx:for-item="metric" wx:key="fieldId" class="bulk-metric {{readOnly ? 'bulk-metric--readonly' : ''}}">
-            <view wx:if="{{readOnly}}" class="bulk-metric__readonly"><text>{{metric.value}}</text><text wx:if="{{metric.unitLabel}}"> {{metric.unitLabel}}</text></view>
-            <t-input wx:else class="bulk-metric__input" disabled="{{submitting}}" type="{{metric.inputType}}" value="{{metric.value}}" placeholder="{{metric.placeholder}}" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" bindchange="onRawInput"  borderless t-class="bulk-metric__input" />
-            <text wx:if="{{!readOnly}}" class="bulk-metric__unit">{{metric.unitLabel}}</text>
-            <picker wx:if="{{courseSelectionRequired && !readOnly}}" range="{{item.courses}}" range-key="label" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" disabled="{{submitting || !item.courses.length}}" bindchange="selectCourse"><view class="bulk-metric__course">{{metric.courseLabel}}</view></picker>
-            <text wx:if="{{courseSelectionRequired && readOnly}}" class="bulk-metric__course">{{metric.courseLabel}}</text>
-            <text class="bulk-metric__score">{{readOnly ? '已保存' : item.statusLabel}}</text>
+          <view wx:for="{{item.metrics}}" wx:for-item="metric" wx:key="fieldId" class="bulk-metric">
+            <view class="bulk-metric__label">{{metric.label}}</view>
+            <view wx:if="{{readOnly}}" class="bulk-metric__readonly">{{metric.value === '' ? '未录入' : metric.value}}<text wx:if="{{metric.value !== '' && metric.unitLabel}}"> {{metric.unitLabel}}</text></view>
+            <t-input wx:else class="bulk-metric-input" disabled="{{submitting}}" type="{{metric.inputType}}" value="{{metric.value}}" suffix="{{metric.unitLabel}}" placeholder="{{metric.placeholder}}" aria-label="{{item.name}} {{metric.label}} {{metric.unitLabel}}" focus="{{focusKey === metric.inputKey}}" confirm-type="next" confirm-hold="{{true}}" hold-keyboard="{{true}}" cursor-spacing="160" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" bindchange="onRawInput" bindenter="advanceInput" />
+            <view wx:if="{{metric.errorText}}" class="bulk-metric__error">{{metric.errorText}}</view>
+            <picker wx:if="{{courseSelectionRequired && !readOnly}}" range="{{item.courses}}" range-key="label" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" disabled="{{submitting || !item.courses.length}}" bindchange="selectCourse"><view class="bulk-metric__course">训练课：{{metric.courseLabel}} ›</view></picker>
+            <view wx:if="{{courseSelectionRequired && readOnly}}" class="bulk-metric__course">训练课：{{metric.courseLabel}}</view>
           </view>
         </view>
       </view>
     </block>
   </view>
-
-  <view wx:if="{{state === 'ready'}}" class="bulk-actions" style="padding-bottom:calc(24rpx + env(safe-area-inset-bottom))">
-    <view class="bulk-actions__hint">{{readOnly ? '可查看已保存成绩与记录' : (managed ? '保存后请返回项目页确认发布' : '草稿按任务 + 项目保存，切换项目不丢失')}}</view>
-    <view class="bulk-actions__buttons">
-      <view class="bulk-actions__secondary {{readOnly ? 'bulk-actions__secondary--disabled' : ''}}" bindtap="saveProject">{{readOnly ? '只读' : (submitting ? '正在保存' : '保存本项目')}}</view>
-      <view class="bulk-actions__primary" bindtap="nextProject">{{readOnly ? '返回项目' : '下一项目'}}</view>
-    </view>
-  </view>
+  <submit-bar wx:if="{{state === 'ready' && !historyVisible}}" primary-text="{{nextActionLabel}}" secondary-text="{{readOnly ? '' : '仅保存'}}" loading="{{submitting}}" disabled="{{hasConflict}}" hint="{{lastSavedLabel || (managed ? '草稿保存后，仍需核对确认才对家长可见' : '逐项录入，空值不等于0')}}" bindsubmit="saveAndContinue" bindsecondary="saveProject" />
 </view>
-
 <view wx:if="{{historyVisible}}" class="bulk-history-mask">
   <view class="bulk-history-panel">
-    <view class="bulk-history-head"><text>{{historyTitle}}</text><t-button size="small" bindtap="closeHistory" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">关闭</t-button></view>
+    <view class="bulk-history-head"><text>{{historyTitle}}</text><t-button size="small" bindtap="closeHistory" theme="primary" variant="text">关闭</t-button></view>
     <scroll-view scroll-y class="bulk-history-scroll"><view wx:for="{{historyLines}}" wx:key="index" class="bulk-history-item">{{item}}</view></scroll-view>
   </view>
 </view>

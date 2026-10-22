@@ -7,7 +7,12 @@ describe("shared native app header",()=>{
   expect(header.data).toMatchObject({statusBarHeight:24,contentHeight:44,actionInset:92});
  });
  it("returns to launch when a deep link has no previous page",()=>{
-  globalThis.wx={navigateBack:vi.fn(({fail})=>fail()),reLaunch:vi.fn()};const header={triggerEvent:vi.fn()};definition.methods.handleBack.call(header);
+  globalThis.wx={navigateBack:vi.fn(({fail})=>fail()),reLaunch:vi.fn()};const header={data:{backDisabled:false},triggerEvent:vi.fn()};definition.methods.handleBack.call(header);
   expect(wx.navigateBack).toHaveBeenCalledWith(expect.objectContaining({delta:1}));expect(wx.reLaunch).toHaveBeenCalledWith({url:"/pages/launch/index"});
  });
+});
+
+it("blocks header back while a save or publication is active",()=>{
+ globalThis.wx={navigateBack:vi.fn()}; const header={data:{backDisabled:true},triggerEvent:vi.fn()};
+ definition.methods.handleBack.call(header); expect(wx.navigateBack).not.toHaveBeenCalled(); expect(header.triggerEvent).not.toHaveBeenCalled();
 });

@@ -3,7 +3,7 @@
     <view style="height: {{statusBarHeight}}px"></view>
     <view class="app-header__content" style="height: {{contentHeight}}px; padding-right: {{actionInset}}px">
       <view class="app-header__side app-header__side--left">
-        <t-button wx:if="{{showBack}}" class="app-header__back" variant="text" theme="default" icon="chevron-left" aria-label="返回" bindtap="handleBack" custom-style="width:44px;height:44px;padding:10px;" />
+        <t-button wx:if="{{showBack}}" disabled="{{backDisabled}}" class="app-header__back" variant="text" theme="default" icon="chevron-left" aria-label="返回" bindtap="handleBack" custom-style="width:44px;height:44px;padding:10px;" />
       </view>
       <view class="app-header__heading app-header__heading--{{titleAlign}}">
         <view class="app-header__title {{largeTitle ? 'app-header__title--large' : ''}}">{{title}}</view>

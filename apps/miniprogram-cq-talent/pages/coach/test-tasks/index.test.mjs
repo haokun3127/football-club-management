@@ -28,9 +28,7 @@ await import("./index.ts");
 
 const controller = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
 const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
-const stylesheet = readFileSync(new URL("./index.wxss", import.meta.url), "utf8");
 const pageConfig = readFileSync(new URL("./index.json", import.meta.url), "utf8");
-const plusIcon = readFileSync(new URL("../../../assets/icons/plus.svg", import.meta.url), "utf8");
 
 const realTasks = [
   {
@@ -102,7 +100,8 @@ describe("coach assessment task list", () => {
     await page.load();
 
     expect(page.data).toMatchObject({ state: "ready", hasVisibleTasks: true });
-    expect(page.data.visibleTasks).toHaveLength(3);
+    expect(page.data.visibleTasks).toHaveLength(2);
+    expect(page.data.activeFilter).toBe("unfinished");
     expect(page.data.tasks[0]).toMatchObject({
       statusLabel: "进行中",
       isEntryEnabled: true,
@@ -184,51 +183,15 @@ describe("coach assessment task list", () => {
     expect(page.data.state).toBe("ready");
   });
 
-  it("uses the standard 44px C11 topbar with safe-area padding and WXML-safe real-data layout", () => {
-    expect(pageConfig).toContain('"role-tabbar"');
-    expect(pageConfig).toContain('"status-view"');
-    expect(pageConfig).not.toContain('"app-header"');
-    expect(template).toContain('class="tasks-nav"');
-    expect(template).toContain('style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"');
-    expect(template).not.toContain('height:calc(176rpx - {{navInset}}px)');
-    expect(template).toContain('padding-right:{{menuInset}}px');
-    expect(template).toContain('class="tasks-nav__create"');
-    expect(template).toContain('class="tasks-fab"');
-    expect(template).toContain('bindtap="openCreate"');
-    expect(template).toContain('/assets/icons/c11-arrow-left.svg');
-    expect(template).toContain('<role-tabbar role="coach" active="training"');
-    expect(template).toContain('<image class="task-card__chevron"');
+  it("keeps supported task content with one shared-header creation entry", () => {
+    expect(pageConfig).toContain('"app-header"');
+    expect(template).toContain('bindaction="openCreate"');
+    expect(template).not.toContain('class="tasks-fab"');
     expect(template).toContain('class="task-card__context">{{item.teamContextLabel}}</view>');
-    expect(template).toContain('class="tasks-first-hint">进入任务后，先选择测评项目，再为全队连续录入</view>');
-    expect(template).not.toContain('wx:if="{{item.isEntryEnabled}}" class="task-card__chevron"');
-    expect(template).not.toMatch(/体能综合测评|速度耐力体测|控球精度评估|2025-07-01|12\/18名学员/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
-    expect(controller).not.toContain("createTask");
-    expect(controller).toContain("resolveMenuInset");
-    expect(stylesheet).toMatch(/\.tasks-nav\s*\{[^}]*height:\s*44px[^}]*box-sizing:\s*content-box/s);
-    expect(stylesheet).toMatch(/\.tasks-nav\s*\{[^}]*padding-left:\s*32rpx/s);
-    expect(stylesheet).toMatch(/\.tasks-nav__left\s*\{[^}]*gap:\s*0/s);
-    expect(stylesheet).toMatch(/\.tasks-nav__title\s*\{(?=[^}]*font-size:\s*var\(--font-size-(?:display|section|body|aux)\))(?=[^}]*line-height:\s*1\.5)/s);
-    expect(stylesheet).toMatch(/\.tasks-page__body\s*\{[^}]*padding:\s*64rpx\s+76rpx\s+316rpx/s);
-    expect(stylesheet).toMatch(/\.filter-row\s*\{[^}]*margin-bottom:\s*28rpx/s);
-    expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*width:\s*112rpx[^}]*height:\s*112rpx/s);
-    expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*z-index:\s*9998/s);
   });
 
-  it("keeps the FAB fully above the 140rpx role-tabbar without overlap (V-06)", () => {
-    // 底栏高 140rpx、z-index 9999：FAB bottom 必须 ≥ 140rpx + 间距，且保持低于底栏层级。
-    expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*bottom:\s*172rpx/s);
-    expect(stylesheet).toMatch(/\.tasks-fab\s*\{[^}]*background:\s*var\(--color-brand\)/s);
-    expect(stylesheet).not.toMatch(/\.tasks-fab\s*\{[^}]*bottom:\s*(?:[0-9]|1[0-3][0-9])rpx/s);
-  });
 
-  it("keeps the floating create icon visible on the red Figma FAB", () => {
-    expect(plusIcon).toContain('stroke="#FFFFFF"');
-  });
 
-  it("uses the V7 creation wording and keeps the action in both entry points", () => {
-    expect(template).toContain('class="tasks-nav__create" bindtap="openCreate"');
-    expect(template).toContain('>新建任务</view>');
-    expect(template).toContain('class="tasks-fab" bindtap="openCreate"');
-  });
+
 });

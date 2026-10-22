@@ -1,13 +1,13 @@
 <view class="projects-page">
-  <view class="projects-nav" style="padding-top:{{navInset}}px;padding-right:{{menuInset}}px"><view class="projects-nav__back" bindtap="goBack" aria-label="返回"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></view><view class="projects-nav__title">{{taskTitle}}</view><view class="projects-nav__spacer"></view></view>
+  <app-header title="测评项目" title-align="left" show-back="{{true}}" back-disabled="{{publishing}}" />
   <view class="projects-page__body">
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '加载测评项目' : state === 'empty' ? '暂无测评项目' : '读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <block wx:if="{{state === 'ready'}}">
-      <view class="projects-context">{{teamContextLabel}}</view>
-      <view class="projects-progress"><view class="projects-progress__head"><view class="projects-progress__title">请选择测评项目</view><view class="projects-progress__status {{taskStatusClass}}">{{taskStatusLabel}}</view></view><view class="projects-progress__meta">{{projectProgressLabel}}</view><view class="projects-progress__instruction">请选择本次需要测评的项目</view></view>
+      <view class="projects-task-title">{{taskTitle}}</view><view class="projects-context">{{teamContextLabel}}</view>
+      <view class="projects-progress"><view class="projects-progress__head"><view class="projects-progress__title">请选择测评项目</view><view class="projects-progress__status {{taskStatusClass}}">{{taskStatusLabel}}</view></view><view class="projects-progress__meta">{{projectProgressLabel}}</view><view class="projects-progress__meta">{{studentProgressLabel}}</view><view class="projects-progress__instruction">请选择本次需要测评的项目</view></view>
       <view wx:if="{{managed}}" class="projects-publication">
         <view>{{publicationLabel}}</view>
-        <t-button disabled="{{publishing}}" loading="{{publishing}}" bindtap="openReviewList" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">核对学员成绩并同步</t-button>
+        <t-button disabled="{{publishing}}" loading="{{publishing}}" bindtap="openReviewList" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">核对成绩并确认发布</t-button>
         <view wx:if="{{publicationMessage}}">{{publicationMessage}}</view>
       </view>
       <scroll-view wx:if="{{hasContentTree}}" scroll-x class="content-primary-strip" enhanced show-scrollbar="{{false}}">
@@ -72,10 +72,7 @@
       </view>
     </block>
   </view>
-  <view wx:if="{{state === 'ready'}}" class="projects-select-bar">
-    <view class="projects-select-bar__summary"><view class="projects-select-bar__title">测评项目</view><view class="projects-select-bar__count">{{selectedCount ? '已选 ' + selectedCount + ' 项' : '请选择测评项目'}}</view></view>
-    <view class="{{confirmClass}}" bindtap="confirmSelection" aria-disabled="{{isConfirmDisabled}}"><text>{{confirmLabel}}</text></view>
-  </view>
+  <submit-bar wx:if="{{state === 'ready' && !reviewVisible}}" primary-text="{{confirmLabel}}" disabled="{{isConfirmDisabled || publishing}}" bindsubmit="confirmSelection" hint="选择本次录入项目，保存后再核对确认" />
 </view>
 
 <view wx:if="{{reviewVisible}}" class="review-mask">
@@ -85,6 +82,6 @@
     <view class="review-name">{{reviewLoading ? '正在读取…' : reviewName}}</view>
     <scroll-view scroll-y class="review-results"><view wx:for="{{reviewRows}}" wx:key="id" class="review-result"><view>{{item.label}} <text>{{item.value}}</text></view><view class="review-result__source">{{item.course}}</view><view class="review-result__source">{{item.recorded}}</view></view></scroll-view>
     <view wx:if="{{reviewMessage}}" class="review-message">{{reviewMessage}}</view>
-    <t-button class="review-confirm" disabled="{{!reviewCanPublish || publishing || reviewLoading}}" loading="{{publishing}}" bindtap="confirmReviewedStudent" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="review-confirm" theme="primary" variant="base">确认并同步该学员</t-button>
+    <t-button class="review-confirm" disabled="{{!reviewCanPublish || publishing || reviewLoading}}" loading="{{publishing}}" bindtap="confirmReviewedStudent" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="review-confirm" theme="primary" variant="base">确认发布该学员</t-button>
   </view>
 </view>

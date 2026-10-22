@@ -80,7 +80,7 @@ describe("C12 assessment project selection", () => {
       state: "ready",
       taskTitle: "体能综合测评",
       teamContextLabel: "U10发展队 · 2026秋季学期",
-      projectProgressLabel: "可选 3 个项目 · 已录入 0 个项目 · 0/2 名学员",
+      projectProgressLabel: "测评项目 3 项 · 全员录完 0 项",
       taskStatusLabel: "进行中",
     });
     expect(page.data.primaryNodes.map((node) => node.label)).toEqual(["身体素质", "技术能力"]);
@@ -106,13 +106,23 @@ describe("C12 assessment project selection", () => {
 
     page.toggleProject({ currentTarget: { dataset: { id: "item-speed" } } });
     page.toggleProject({ currentTarget: { dataset: { id: "item-passing" } } });
-    expect(page.data).toMatchObject({ selectedIds: ["item-speed", "item-passing"], selectedCount: 2, confirmLabel: "选择 (2)" });
+    expect(page.data).toMatchObject({ selectedIds: ["item-speed", "item-passing"], selectedCount: 2, confirmLabel: "开始录入（2项）" });
     expect(page.data.projects[0]).toEqual(expect.objectContaining({ isSelected: true }));
     expect(page.data.projects[2]).toEqual(expect.objectContaining({ isSelected: true }));
     expect(mocks.openPage).not.toHaveBeenCalled();
 
     page.confirmSelection();
     expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/assessment-bulk-entry/index?taskId=task-real&templateId=template-real&projectId=item-speed&projectIds=item-speed%2Citem-passing&title=%E4%BD%93%E8%83%BD%E7%BB%BC%E5%90%88%E6%B5%8B%E8%AF%84");
+  });
+
+  it("shows a retryable error instead of zero progress when a project read fails", async () => {
+    mocks.getCoachAssessmentEntries.mockRejectedValueOnce(new Error("offline"));
+    const page = createPageInstance();
+    await page.onLoad({taskId:"task-real",templateId:"template-real"});
+    expect(page.data.state).toBe("error");
+    expect(page.data.projects).toEqual([]);
+    await page.load("task-real", "template-real", "测评");
+    expect(page.data.state).toBe("ready");
   });
 
   it("only exposes the task's selected project even when the template has more fields", async () => {
@@ -170,7 +180,7 @@ describe("C12 assessment project selection", () => {
     expect(template).not.toContain('class="project-card__count"');
     expect(template).toContain("请选择本次需要测评的项目");
     expect(template).toContain('bindtap="toggleProject"');
-    expect(template).toContain('bindtap="confirmSelection"');
+    expect(template).toContain('bindsubmit="confirmSelection"');
     expect(template).toContain("{{confirmLabel}}");
     expect(template).toContain("{{item.isSelected}}");
     expect(template).toContain("{{item.itemCountLabel}}");

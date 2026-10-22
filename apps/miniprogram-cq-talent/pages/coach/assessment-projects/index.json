@@ -1,6 +1,8 @@
 {
   "navigationStyle": "custom",
   "usingComponents": {
-    "t-button": "tdesign-miniprogram/button/button"
+    "t-button": "tdesign-miniprogram/button/button",
+    "app-header": "/components/app-header/index",
+    "submit-bar": "/components/submit-bar/index"
   }
 }

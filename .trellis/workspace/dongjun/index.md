@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 38
+- **Total Sessions**: 39
 - **Last Active**: 2026-10-22
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~1401 | Active |
+| `journal-1.md` | ~1436 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 39 | 2026-10-22 | 体验提升B0/B1：课程事实与教练课堂 | `3eacba21`, `530b943f` | `feature/ui-batch-1-p01` |
 | 38 | 2026-10-22 | Deploy approved UI API candidate to develop | `0528df93` | `feature/ui-batch-1-p01` |
 | 37 | 2026-10-21 | v1.1 UI 后续批次与移动端收口 | `b29d84e3` | `feature/ui-batch-1-p01` |
 | 36 | 2026-10-21 | 恢复 develop 审查账号业务样本 | `f90d79e6` | `feature/ui-batch-1-p01` |

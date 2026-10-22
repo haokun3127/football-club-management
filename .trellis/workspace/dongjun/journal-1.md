@@ -1399,3 +1399,38 @@ Audited 40 commits; seven isolated fix commits; 964 tests plus 9 script tests an
 ### Next Steps
 
 - None - task complete
+
+
+## Session 39: 体验提升B0/B1：课程事实与教练课堂
+
+**Date**: 2026-10-22
+**Task**: 体验提升B0/B1：课程事实与教练课堂
+**Package**: api
+**Branch**: `feature/ui-batch-1-p01`
+
+### Summary
+
+用户批准分批实施；B0共享课程投影与显式孩子，B1课堂内容优先、明确更正、球队近期/待办和名单搜索。B0根检查964通过1跳过，B1小程序667通过1跳过、类型检查和4项规则测试通过。原生代表页已查看；未部署上传，B2—B6仍待实施。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `3eacba21` | (see git log) |
+| `HEAD` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

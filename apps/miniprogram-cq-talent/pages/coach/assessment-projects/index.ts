@@ -1,3 +1,4 @@
+import { assessmentValueText } from "../../../utils/assessment-input";
 import { getAssessmentForm, getCoachAssessmentEntries, getCoachAssessmentTasks, getCoachTrainingProjectTree, getCoachAssessmentWorkflow, publishCoachAssessments, getCoachAssessmentHistory } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
@@ -25,7 +26,7 @@ type ProjectRow = {
 type NavigationNodeView = { id: string; label: string; className: string };
 type ProjectGroupView = { id: string; label: string; className: string; actionCount: number; cards: ProjectRow[] };
 
-const TASK_STATUS_LABELS: Record<string, string> = { in_progress: "进行中", completed: "已完成" };
+const TASK_STATUS_LABELS: Record<string, string> = { not_started: "未开始", in_progress: "进行中", completed: "已完成" };
 const PROJECT_ICONS = [
   "/assets/icons/c10-target-rose.svg",
   "/assets/icons/c10-target-amber.svg",
@@ -45,6 +46,7 @@ Page({
     teamContextLabel: "球队与学期待同步",
     progressLabel: "",
     projectProgressLabel: "",
+    studentProgressLabel: "",
     taskStatusLabel: "",
     taskStatusClass: "",
     projects: [] as ProjectRow[],
@@ -56,7 +58,7 @@ Page({
     activeSecondaryId: "",
     selectedIds: [] as string[],
     selectedCount: 0,
-    confirmLabel: "选择 (0)",
+    confirmLabel: "选择项目后开始录入",
     confirmClass: "projects-select-bar__confirm projects-select-bar__confirm--disabled",
     isConfirmDisabled: true,
     managed: false,
@@ -68,8 +70,9 @@ Page({
     reviewStudents:[] as Array<{studentId:string;name:string;revision:number;canPublish:boolean;completedFields:number;totalFields:number}>,
     reviewRows:[] as Array<{id:string;label:string;value:string;course:string;recorded:string}>,
   },
-  onLoad(query?: { taskId?: string; templateId?: string; title?: string }) {
-    return this.load(query?.taskId || "", query?.templateId || "", query?.title ? decodeURIComponent(query.title) : "能力评估");
+  async onLoad(query?: { taskId?: string; templateId?: string; title?: string; review?: string }) {
+    await this.load(query?.taskId || "", query?.templateId || "", query?.title ? decodeURIComponent(query.title) : "能力评估");
+    if (query?.review === "1" && this.data.state === "ready" && this.data.managed) await this.openReviewList();
   },
   async load(taskId: string, templateId: string, taskTitle: string) {
     const session = requireRole("coach");
@@ -98,18 +101,19 @@ Page({
         taskTitle: task.title,
         teamContextLabel: `${task.teamName?.trim() || "球队待同步"} · ${task.termLabel?.trim() || "学期待同步"}`,
         progressLabel: `${task.completedStudents}/${task.totalStudents}名学员已完成`,
-        projectProgressLabel: `可选 ${projects.length} 个项目 · 已录入 ${completedProjects} 个项目 · ${task.completedStudents}/${task.totalStudents} 名学员`,
+        projectProgressLabel: `测评项目 ${projects.length} 项 · 全员录完 ${completedProjects} 项`,
+        studentProgressLabel: `学员 ${task.totalStudents} 人 · 完成全部项目 ${task.completedStudents} 人`,
         taskStatusLabel: TASK_STATUS_LABELS[task.status] || "进行中",
         taskStatusClass: `projects-progress__status--${task.status}`,
         managed: Boolean(task.workflow),
         canPublish: Boolean(task.workflow?.canEdit && task.workflow.readyStudents > 0),
-        publicationLabel: task.workflow ? `已发布 ${task.workflow.publishedStudents}/${task.totalStudents} 人 · 待发布 ${task.workflow.readyStudents} 人` : "",
+        publicationLabel: task.workflow ? `已确认 ${task.workflow.publishedStudents}/${task.totalStudents} 人 · 待确认 ${task.workflow.readyStudents} 人` : "",
         projects,
         contentTree: trainingTree.contentTree,
         ...hierarchy,
         selectedIds: [],
         selectedCount: 0,
-        confirmLabel: "选择 (0)",
+        confirmLabel: "选择项目后开始录入",
         confirmClass: "projects-select-bar__confirm projects-select-bar__confirm--disabled",
         isConfirmDisabled: true,
       });
@@ -164,7 +168,7 @@ Page({
       if(!result?.success){this.setData({reviewMessage:result?.error?.message||"同步失败，当前核对内容已保留。"});return;}
       this.setData({reviewCanPublish:false,reviewMessage:"已同步该学员，可继续核对下一名。"});
       const workflow=await getCoachAssessmentWorkflow(this.data.taskId);
-      this.setData({reviewStudents:workflow.students,canPublish:workflow.readyStudents>0,publicationLabel:`已发布 ${workflow.publishedStudents}/${workflow.totalStudents} 人 · 待发布 ${workflow.readyStudents} 人`});
+      this.setData({reviewStudents:workflow.students,canPublish:workflow.readyStudents>0,publicationLabel:`已确认 ${workflow.publishedStudents}/${workflow.totalStudents} 人 · 待确认 ${workflow.readyStudents} 人`});
     }catch{this.setData({reviewMessage:"同步失败，当前核对内容已保留，请重试。"});}
     finally{this.setData({publishing:false});}
   },
@@ -180,7 +184,7 @@ Page({
     this.setData({
       selectedIds,
       selectedCount: selectedIds.length,
-      confirmLabel: `选择 (${selectedIds.length})`,
+      confirmLabel: selectedIds.length ? `开始录入（${selectedIds.length}项）` : "选择项目后开始录入",
       confirmClass: selectedIds.length ? "projects-select-bar__confirm" : "projects-select-bar__confirm projects-select-bar__confirm--disabled",
       isConfirmDisabled: selectedIds.length === 0,
       projects: presentProjects(this.data.projects, selectedIds),
@@ -422,7 +426,7 @@ function presentProject(project: ProjectRow, isSelected: boolean): ProjectRow {
 }
 
 async function hydrateProjectProgress(taskId: string, totalStudents: number, projects: ProjectRow[]): Promise<ProjectRow[]> {
-  const responses = await Promise.all(projects.map((project) => getCoachAssessmentEntries(taskId, project.id).catch(() => ({ savedValuesByStudent: {} }))));
+  const responses = await Promise.all(projects.map((project) => getCoachAssessmentEntries(taskId, project.id)));
   return projects.map((project, index) => {
     const completedStudents = Object.keys(responses[index]?.savedValuesByStudent || {}).length;
     return { ...project, completedStudents, statusLabel: completedStudents > 0 ? `已录 ${Math.min(completedStudents, totalStudents)}/${totalStudents}` : "待录入" };
@@ -432,7 +436,7 @@ async function hydrateProjectProgress(taskId: string, totalStudents: number, pro
 function projectDescription(field?: AssessmentForm["fields"][number]) {
   const unit = unitLabel(field);
   const manual = field?.valueKind === "score_0_100" || field?.valueKind === "rating_1_5";
-  return manual ? "无换算规则 · 手动评分" : `原始成绩：${unit} · 自动换算标准分`;
+  return manual ? "按项目评分标准录入" : `记录原始成绩 · 单位：${unit}`;
 }
 
 function unitLabel(field?: AssessmentForm["fields"][number]) {
@@ -459,6 +463,6 @@ function presentProjects(projects: ProjectRow[], selectedIds: string[]): Project
 function reviewDate(value:string){const date=new Date(Date.parse(value)+8*3600000);return Number.isFinite(date.getTime())?date.toISOString().slice(0,16).replace("T"," "):"时间未知";}
 function reviewValue(value:Record<string,unknown>|undefined,unit?:string){
   if(!value)return "未测";
-  const score=value.score??value.value??value.text;
-  return score===undefined?"未测":`${String(score)}${value.kind==="score_0_100"?" 分":unit||String(value.unit||"")}`;
+  const score=assessmentValueText(value);
+  return score===""?"未测":`${String(score)}${value.kind==="score_0_100"?" 分":unit||String(value.unit||"")}`;
 }

@@ -91,7 +91,7 @@ describe("C12.1 team batch assessment entry", () => {
     const page = createPageInstance();
     await page.onLoad({ taskId: "task-real", templateId: "template-real", projectId: "fitness", title: "体能综合测评" });
 
-    expect(page.data).toMatchObject({ state: "ready", projectTitle: "30米冲刺", teamName: "U10发展队", filledLabel: "已填写 0 人 · 未填写 2 人" });
+    expect(page.data).toMatchObject({ state: "ready", projectTitle: "30米冲刺", teamName: "U10发展队", filledLabel: "已填 0/2 项 · 0/2 人完整" });
     expect(page.data.rows).toHaveLength(2);
     page.onRawInput({ currentTarget: { dataset: { studentId: "student-1", fieldId: "speed" } }, detail: { value: "4.92" } });
     expect(page.data.rows[0]).toMatchObject({ studentId: "student-1", rawInputValue: "4.92", scoreLabel: "待提交" });
@@ -107,7 +107,7 @@ describe("C12.1 team batch assessment entry", () => {
     expect(mocks.submitCoachAssessment).toHaveBeenCalledWith(expect.objectContaining({ studentId: "student-1", assessmentTaskId: "task-real", templateId: "template-real", rawResults: [expect.objectContaining({ testItemId: "item-speed" })] }));
     expect(mocks.submitCoachAssessment).toHaveBeenCalledTimes(1);
     expect(page.data.rows[0]).toMatchObject({ studentId: "student-1", rawInputValue: "4.92", statusLabel: "已保存" });
-    expect(page.data.filledLabel).toBe("已填写 1 人 · 未填写 1 人");
+    expect(page.data.filledLabel).toBe("已填 1/2 项 · 1/2 人完整");
     expect(storage.has("cqTalent:develop:coach-assessment-bulk:task-real:fitness")).toBe(false);
     await page.saveProject();
     expect(mocks.submitCoachAssessment).toHaveBeenCalledTimes(1);
@@ -183,49 +183,32 @@ describe("C12.1 team batch assessment entry", () => {
     const page = createPageInstance();
     await page.onLoad({ taskId: "task-real", templateId: "template-real", projectId: "fitness", title: "体能综合测评" });
 
-    expect(page.data).toMatchObject({ state: "ready", readOnly: true, projectTitle: "30米冲刺", filledLabel: "全队 2 人已完成 · 成绩已保存", lastSavedLabel: "已恢复已保存成绩" });
+    expect(page.data).toMatchObject({ state: "ready", readOnly: true, projectTitle: "30米冲刺", filledLabel: "已填 2/2 项 · 2/2 人完整", lastSavedLabel: "已恢复已保存成绩" });
     expect(page.data.rows.map((row) => row.statusLabel)).toEqual(["已保存", "已保存"]);
-    expect(template).toContain("{{readOnly ? '已保存' : item.statusLabel}}");
+    expect(template).toContain("{{item.statusLabel}}");
     expect(template).toContain('class="bulk-metric__readonly"');
-    expect(template).toContain("class=\"bulk-metric {{readOnly ? 'bulk-metric--readonly' : ''}}\"");
+    expect(template).toContain('wx:if="{{readOnly}}" class="bulk-metric__readonly"');
     expect(template).not.toContain('{{metric.scoreLabel}}');
     page.onRawInput({ currentTarget: { dataset: { studentId: "student-1", fieldId: "speed" } }, detail: { value: "4.50" } });
     await page.saveProject();
     expect(page.data.rows[0]).toMatchObject({ rawInputValue: "4.92", statusLabel: "已保存" });
     expect(mocks.submitCoachAssessment).not.toHaveBeenCalled();
-    expect(template).toContain('wx:else class="bulk-metric__input"');
+    expect(template).toContain('disabled="{{submitting}}" type="{{metric.inputType}}"');
   });
 
-  it("keeps save and next actions in a full-screen WXML page without array methods", () => {
-    expect(template).toContain('bindtap="saveProject"');
-    expect(template).toContain('bindtap="nextProject"');
-    expect(template).toContain("草稿按任务 + 项目保存，切换项目不丢失");
-    expect(template).toContain('>{{projectTitle}}</view>');
+  it("separates saving from publication and exposes accessible inputs", () => {
+    expect(template).toContain('bindsecondary="saveProject"');
+    expect(template).toContain('bindsubmit="saveAndContinue"');
+    expect(template).toContain('bindenter="advanceInput"');
+    expect(template).toContain('aria-label="{{item.name}} {{metric.label}} {{metric.unitLabel}}"');
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
 
-  it("keeps V7 save before next and removes the extra top-right action", () => {
-    expect(template).not.toContain("保存草稿");
-    expect(template.indexOf('bindtap="saveProject"')).toBeLessThan(template.indexOf('bindtap="nextProject"'));
-  });
 
-  it("uses the V7 compact project summary and one-line student entry rows", () => {
-    expect(template).toContain('class="bulk-context-line"');
-    expect(template).toContain('class="bulk-summary"');
-    expect(template).toContain("保存后同步标准分");
-    expect(template).toContain('class="bulk-row__identity"');
-    expect(template).toContain('class="bulk-row__metrics"');
-    expect(template).not.toContain('class="bulk-row__head"');
-    expect(template).not.toContain('class="bulk-hint"');
-    expect(stylesheet).toMatch(/\.bulk-row\s*\{[^}]*display:\s*flex[^}]*align-items:\s*center/s);
-    expect(stylesheet).toMatch(/\.bulk-metric\s*\{[^}]*display:\s*flex[^}]*border-bottom:/s);
-    expect(stylesheet).toMatch(/\.bulk-metric--readonly\s*\{[^}]*border-bottom:\s*0/s);
-  });
 
-  it("keeps the completed project summary on one line at the native 375px layout", () => {
-    expect(stylesheet).toMatch(/\.bulk-summary__count\s*\{[^}]*min-width:\s*0[^}]*flex:\s*1[^}]*white-space:\s*nowrap/s);
-    expect(stylesheet).toMatch(/\.bulk-summary__rule\s*\{[^}]*margin-left:\s*22rpx/s);
-  });
+
+
+
 });
 
 
@@ -306,4 +289,51 @@ describe("revisioned project drafts", () => {
     expect(page.data.readOnly).toBe(true);
     expect(mocks.saveCoachAssessmentEntries).not.toHaveBeenCalled();
   });
+  it("supports configured raw times in the existing managed workflow", async () => {
+    mocks.getAssessmentForm.mockResolvedValueOnce({templateId:"template-real",templateVersionId:"version-pinned",fields:[{id:"score",testItemId:"item-score",groupId:"technical",label:"跑动时间",valueKind:"duration_seconds",inputType:"number",required:true,minValue:0,maxValue:600,unit:"s"}]});
+    const page=await load();input(page,"185.25");await page.saveProject();
+    expect(mocks.saveCoachAssessmentEntries).toHaveBeenCalledWith(task.id,"student-1",expect.objectContaining({entries:[expect.objectContaining({value:{kind:"duration_seconds",seconds:185.25}})]}));
+  });
+  it("saves before continuing and stays on the current project when a draft fails", async () => {
+    const page=await load();input(page,"70");mocks.openPage.mockClear();
+    mocks.saveCoachAssessmentEntries.mockRejectedValueOnce(new Error("网络暂时不可用"));await page.saveAndContinue();
+    expect(mocks.openPage).not.toHaveBeenCalled();expect(page.data.valuesByStudent["student-1"].score).toBe("70");
+    mocks.saveCoachAssessmentEntries.mockResolvedValueOnce({revision:1,publications:[]});await page.saveAndContinue();
+    expect(mocks.openPage).toHaveBeenLastCalledWith(expect.stringContaining("&review=1"));
+  });
+  it("retains a conflicting draft and blocks stale retries until explicit reload", async () => {
+    const page = await load(); input(page, "70"); mocks.openPage.mockClear();
+    mocks.saveCoachAssessmentEntries.mockRejectedValueOnce({code:"assessment_revision_conflict",statusCode:409,message:"revision changed"});
+    await page.saveAndContinue();
+    expect(page.data.hasConflict).toBe(true);
+    expect(page.data.valuesByStudent["student-1"].score).toBe("70");
+    expect(page.data.studentStates["student-1"].revision).toBe(0);
+    await page.saveAndContinue();
+    expect(mocks.saveCoachAssessmentEntries).toHaveBeenCalledTimes(1);
+    expect(mocks.openPage).not.toHaveBeenCalled();
+    wx.showModal = ({success}) => success({confirm:false}); await page.reloadServer();
+    expect(page.data.valuesByStudent["student-1"].score).toBe("70");
+    wx.showModal = ({success}) => success({confirm:true}); await page.reloadServer();
+    expect(page.data.hasConflict).toBe(false);
+    expect(page.data.valuesByStudent["student-1"]?.score || "").toBe("");
+  });
+  it("keeps an empty correction editable without deleting a saved result or navigating past it", async () => {
+    mocks.getCoachAssessmentEntries.mockResolvedValue({savedValuesByStudent:{"student-1":{"item-score":{score:70}}},studentStates:{"student-1":{revision:1,publishedRevision:null}}});
+    const page=await load(); input(page, ""); mocks.openPage.mockClear();
+    expect(page.data.rows[0]).toMatchObject({statusLabel:"待保存",rawInputValue:""});
+    await page.saveAndContinue();
+    expect(mocks.saveCoachAssessmentEntries).not.toHaveBeenCalled(); expect(mocks.openPage).not.toHaveBeenCalled();
+    expect(page.data.saveError).toContain("不能通过空值删除");
+    const restored=await load(); expect(restored.data.rows[0].rawInputValue).toBe("");
+    input(restored,"0"); await restored.saveProject();
+    expect(mocks.saveCoachAssessmentEntries).toHaveBeenCalledWith(task.id,"student-1",expect.objectContaining({entries:[expect.objectContaining({value:{kind:"score_0_100",score:0}})]}));
+  });
+  it("marks edited saved values as pending and moves keyboard focus by field identity", async () => {
+    mocks.getCoachTeam.mockResolvedValueOnce({team:{name:"U10"},members:[{id:"student-1",name:"甲"},{id:"student-2",name:"乙"}]});
+    mocks.getCoachAssessmentEntries.mockResolvedValueOnce({savedValuesByStudent:{"student-1":{"item-score":{score:70}}},studentStates:{"student-1":{revision:1,publishedRevision:null}}});
+    const page=await load();expect(page.data.rows[0].statusLabel).toBe("已保存");input(page,"71");expect(page.data.rows[0].statusLabel).toBe("待保存");
+    page.advanceInput({currentTarget:{dataset:{studentId:"student-1",fieldId:"score"}}});expect(page.data.focusKey).toBe("student-2/score");
+    page.onRawInput({currentTarget:{dataset:{studentId:"foreign",fieldId:"score"}},detail:{value:"90"}});expect(page.data.valuesByStudent.foreign).toBeUndefined();
+  });
+
 });

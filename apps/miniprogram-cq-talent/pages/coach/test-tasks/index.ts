@@ -59,8 +59,8 @@ Page<PageData>({
     statusTitle: "测评任务",
     statusActionText: "",
     message: "",
-    filters: presentFilters("all"),
-    activeFilter: "all",
+    filters: presentFilters("unfinished"),
+    activeFilter: "unfinished",
     tasks: [],
     visibleTasks: [],
     hasVisibleTasks: false,
@@ -102,7 +102,7 @@ Page<PageData>({
       const context=await loadActiveTeam(this.requestedTeamId || undefined);
       if(!context.id){this.setData({state:"empty",statusTitle:"选择球队",message:"请从球队工作区选择球队后查看测评任务",tasks:[],visibleTasks:[],hasVisibleTasks:false});return;}
       this.setData({teamId:context.id});
-      const tasks = (await getCoachAssessmentTasks({ forceRefresh: true,teamId:context.id })).filter(task=>task.teamId===context.id).map(presentTask);
+      const tasks = (await getCoachAssessmentTasks({ forceRefresh: true,teamId:context.id })).filter(task=>task.teamId===context.id).sort(compareTasks).map(presentTask);
       flags.assessmentTasksLoadedSuccessfully = true;
       const visibleTasks = filterTasks(tasks, this.data.activeFilter);
       this.setData({
@@ -159,7 +159,7 @@ Page<PageData>({
     const task = this.data.tasks.find((item: TaskCard) => item.id === id);
     if (!task) return;
 
-    if (task.status === "not_started") {
+    if (task.status === "not_started" && !task.workflow) {
       wx.showToast({ title: "任务尚未开始，暂不能录入。", icon: "none" });
       return;
     }
@@ -183,7 +183,7 @@ function presentTask(task: CoachAssessmentTask): TaskCard {
     progressLabel: `${task.completedStudents}/${task.totalStudents}名学员`,
     progressStyle: `width: ${progressPercent}%`,
     progressClass: task.status === "not_started" ? "task-card__bar--muted" : "",
-    isEntryEnabled: (task.status === "in_progress" || task.status === "completed") && Boolean(task.templateId),
+    isEntryEnabled: (task.status === "in_progress" || task.status === "completed" || Boolean(task.workflow)) && Boolean(task.templateId),
   };
 }
 
@@ -200,8 +200,8 @@ function filterTasks(tasks: TaskCard[], filter: FilterId) {
 
 function presentFilters(activeFilter: FilterId): FilterView[] {
   const filters: Array<Pick<FilterView, "id" | "label">> = [
-    { id: "all", label: "全部" },
     { id: "unfinished", label: "未完成" },
+    { id: "all", label: "全部" },
     { id: "completed", label: "已完成" },
   ];
   return filters.map((filter) => ({
@@ -212,4 +212,9 @@ function presentFilters(activeFilter: FilterId): FilterView[] {
 
 function isFilterId(value: string): value is FilterId {
   return value === "all" || value === "unfinished" || value === "completed";
+}
+
+function compareTasks(a: CoachAssessmentTask, b: CoachAssessmentTask) {
+  const priority = { in_progress: 0, not_started: 1, completed: 2 };
+  return priority[a.status] - priority[b.status] || a.dueOn.localeCompare(b.dueOn) || a.id.localeCompare(b.id);
 }

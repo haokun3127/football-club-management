@@ -1,0 +1,81 @@
+{
+  "scope": "Native simulator with existing backend reads; local zero/focus via page method; no score saves or publication; local draft keys restored",
+  "proof": [
+    {
+      "name": "tasks",
+      "route": "pages/coach/test-tasks/index",
+      "state": "ready",
+      "screenshot": {
+        "success": true,
+        "path": "/tmp/cq-b2-native/tasks.png",
+        "imageWidth": 620,
+        "imageHeight": 1344
+      },
+      "sha256": "aa57b0ac30c8cd8f54d3f9ced94e465dda7333673795e26406590cb9b740cf7e"
+    },
+    {
+      "name": "projects",
+      "route": "pages/coach/assessment-projects/index",
+      "state": "ready",
+      "projects": 62,
+      "screenshot": {
+        "success": true,
+        "path": "/tmp/cq-b2-native/projects.png",
+        "imageWidth": 620,
+        "imageHeight": 1344
+      },
+      "sha256": "6472ae99d75de3730f583f6039540f07d688037a49bbed77799cd56214decb0a"
+    },
+    {
+      "name": "review",
+      "students": 19,
+      "rows": 62,
+      "publishEnabled": false,
+      "screenshot": {
+        "success": true,
+        "path": "/tmp/cq-b2-native/review.png",
+        "imageWidth": 620,
+        "imageHeight": 1344
+      },
+      "sha256": "37f121d0815ece423e7ec12c27936a8f96b56547d7fc8012692b60cfc786f96f"
+    },
+    {
+      "name": "entry",
+      "route": "pages/coach/assessment-bulk-entry/index",
+      "state": "ready",
+      "rows": 19,
+      "count": "已填 1/19 项 · 1/19 人完整",
+      "readOnly": false,
+      "screenshot": {
+        "success": true,
+        "path": "/tmp/cq-b2-native/entry.png",
+        "imageWidth": 620,
+        "imageHeight": 1344
+      },
+      "sha256": "c0d72883d2793eb3a656e43bd4ef9d4fda25a9a304e7b937e398a852e46a8265"
+    },
+    {
+      "name": "local-input-only",
+      "value": "0",
+      "status": "待保存",
+      "focusKey": "student-cq-talent-secure-test-1-10/assessment-test-cq-talent-03",
+      "screenshot": {
+        "success": true,
+        "path": "/tmp/cq-b2-native/input-focus.png",
+        "imageWidth": 620,
+        "imageHeight": 1344
+      },
+      "sha256": "e908f25a0b5fb5766442fd248ae616781e554d7311dd6577930ce2b314c5774c"
+    }
+  ],
+  "keyboardEvent": {
+    "event": "TDesign enter",
+    "dataset": {
+      "fieldId": "assessment-test-cq-talent-03",
+      "studentId": "student-cq-talent-secure-test-1-1"
+    },
+    "focusKey": "student-cq-talent-secure-test-1-10/assessment-test-cq-talent-03",
+    "expected": "student-cq-talent-secure-test-1-10/assessment-test-cq-talent-03"
+  },
+  "limits": "Simulator screenshots and component event verified; physical-device keyboard occlusion remains unverified. No deployed B2 or real-business save/publication claim."
+}

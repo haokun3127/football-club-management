@@ -1,3 +1,4 @@
+import { assessmentInputError, assessmentUnit, assessmentValueText } from "../../../utils/assessment-input";
 import { environmentStorageKey } from "../../../utils/config";
 import { getAssessmentForm, getCoachAssessmentEntries, getCoachAssessmentTasks, getCoachTeam, submitCoachAssessment, saveCoachAssessmentEntries, getCoachAssessmentHistory, getCoachAssessmentCourses } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
@@ -12,6 +13,8 @@ type AssessedAtSnapshot = { assessedAt: string; signature: string };
 
 type MetricView = {
   fieldId: string;
+  inputKey: string;
+  errorText: string;
   label: string;
   inputType: "digit" | "text";
   value: string;
@@ -63,6 +66,8 @@ interface PageData {
   projectIds: string[];
   projectIndex: number;
   filledLabel: string;
+  focusKey: string;
+  nextActionLabel: string;
   lastSavedLabel: string;
   readOnly: boolean;
   submitting: boolean;
@@ -71,6 +76,7 @@ interface PageData {
   studentStates: NonNullable<CoachAssessmentEntries["studentStates"]>;
   correctionReason: string;
   saveError: string;
+  hasConflict: boolean;
   historyTitle: string;
   historyLines: string[];
   historyVisible: boolean;
@@ -105,6 +111,7 @@ Page<PageData>({
     projectIds: [],
     projectIndex: 0,
     filledLabel: "已填写 0 人 · 未填写 0 人",
+    focusKey: "", nextActionLabel: "保存并继续",
     lastSavedLabel: "",
     readOnly: false,
     submitting: false,
@@ -113,6 +120,7 @@ Page<PageData>({
     studentStates: {},
     correctionReason: "",
     saveError: "",
+    hasConflict: false,
     historyTitle: "",
     historyLines: [],
     historyVisible: false,
@@ -146,6 +154,7 @@ Page<PageData>({
       projectId,
       taskTitle,
       rows: [],
+      focusKey: "",
       fields: [],
       savedValuesByStudent: {},
       valuesByStudent: {},
@@ -237,13 +246,14 @@ Page<PageData>({
         teamName: team.team?.name?.trim() || "球队待同步",
         termLabel: task.termLabel?.trim() || "学期待同步",
         fields,
-        rows: buildRows(members, fields, valuesByStudent, savedStudentIds, courses, courseIds),
+        rows: buildRows(members, fields, valuesByStudent, savedStudentIds, courses, courseIds, savedValuesByStudent, savedCourseIds),
         savedValuesByStudent,
         valuesByStudent,
         savedStudentIds,
         projectIds,
         projectIndex,
-        filledLabel: readOnly ? buildCompletedLabel(members, valuesByStudent) : buildFilledLabel(members, valuesByStudent),
+        nextActionLabel: readOnly ? "返回项目" : projectIndex < projectIds.length - 1 ? "保存并下一项" : task.workflow ? "保存并核对" : "保存并返回项目",
+        filledLabel: buildFilledLabel(members, valuesByStudent, fields),
         lastSavedLabel: savedStudentIds.length ? "已恢复已保存成绩" : hasDraftValues(valuesByStudent) ? "已恢复本机草稿" : "",
         readOnly,
         managed: Boolean(task.workflow),
@@ -251,6 +261,7 @@ Page<PageData>({
         studentStates,
         correctionReason: "",
         saveError: "",
+        hasConflict: false,
         submitting: false,
       });
     } catch {
@@ -263,18 +274,16 @@ Page<PageData>({
     if (this.data.readOnly || this.data.submitting) return;
     const studentId = event.currentTarget.dataset.studentId;
     const fieldId = event.currentTarget.dataset.fieldId;
-    if (!studentId || !fieldId || !this.data.fields.some((field: AssessmentField) => field.id === fieldId)) return;
+    if (!studentId || !this.data.rows.some((row: BulkRow) => row.studentId === studentId) || !fieldId || !this.data.fields.some((field: AssessmentField) => field.id === fieldId)) return;
     const rawValue = String(event.detail.value ?? "");
     const valuesByStudent = { ...this.data.valuesByStudent, [studentId]: { ...(this.data.valuesByStudent[studentId] || {}) } };
-    if (rawValue.trim()) valuesByStudent[studentId][fieldId] = rawValue;
+    if (rawValue.trim() || this.data.savedValuesByStudent[studentId]?.[fieldId] !== undefined) valuesByStudent[studentId][fieldId] = rawValue;
     else {
       delete valuesByStudent[studentId][fieldId];
       if (!Object.keys(valuesByStudent[studentId]).length) delete valuesByStudent[studentId];
     }
-    const savedValue = this.data.savedValuesByStudent[studentId]?.[fieldId];
-    if (!rawValue.trim() && savedValue) valuesByStudent[studentId][fieldId] = savedValue;
     const members = this.data.rows.map((row: BulkRow) => ({ id: row.studentId, name: row.name }));
-    this.setData({ valuesByStudent, rows: buildRows(members, this.data.fields, valuesByStudent, this.data.savedStudentIds, this.data.courses, this.data.courseIds), filledLabel: buildFilledLabel(members, valuesByStudent) });
+    this.setData({ valuesByStudent, rows: buildRows(members, this.data.fields, valuesByStudent, this.data.savedStudentIds, this.data.courses, this.data.courseIds, this.data.savedValuesByStudent, this.data.savedCourseIds), filledLabel: buildFilledLabel(members, valuesByStudent, this.data.fields) });
     const draftValuesByStudent = pendingChanges(valuesByStudent, this.data.savedValuesByStudent, this.data.courseIds, this.data.savedCourseIds);
     if (hasDraftValues(draftValuesByStudent)) this.persistDraft(draftValuesByStudent);
     else wx.removeStorageSync(draftKey(this.data.draftTaskKey || this.data.taskId, this.data.projectId));
@@ -312,8 +321,18 @@ Page<PageData>({
         (courseIds[row.studentId] ??= {})[field.id]=course.id;
       }
     }
-    this.setData({courseIds,rows:buildRows(this.data.rows.map((row:BulkRow)=>({id:row.studentId,name:row.name})),this.data.fields,this.data.valuesByStudent,this.data.savedStudentIds,this.data.courses,courseIds)});
+    this.setData({courseIds,rows:buildRows(this.data.rows.map((row:BulkRow)=>({id:row.studentId,name:row.name})),this.data.fields,this.data.valuesByStudent,this.data.savedStudentIds,this.data.courses,courseIds,this.data.savedValuesByStudent,this.data.savedCourseIds)});
     this.persistDraft(pendingChanges(this.data.valuesByStudent,this.data.savedValuesByStudent,courseIds,this.data.savedCourseIds));
+  },
+  advanceInput(event: { currentTarget: { dataset: { studentId?: string; fieldId?: string } } }) {
+    if (this.data.readOnly || this.data.submitting) return;
+    const { studentId, fieldId } = event.currentTarget.dataset;
+    const inputs = this.data.rows.flatMap((row: BulkRow) => row.metrics.map(metric => ({ studentId: row.studentId, ...metric })));
+    const index = inputs.findIndex((metric: MetricView & { studentId: string }) => metric.studentId === studentId && metric.fieldId === fieldId);
+    if (index < 0) return;
+    const next = inputs[index + 1];
+    this.setData({ focusKey: next?.inputKey || "" });
+    if (!next) wx.hideKeyboard?.();
   },
   saveDraft() {
     this.persistDraft(this.data.valuesByStudent);
@@ -324,7 +343,12 @@ Page<PageData>({
       wx.showToast({ title: this.data.managed ? "当前任务仅支持查看" : "任务已完成，仅支持查看已保存成绩", icon: "none" });
       return;
     }
-    if (this.data.submitting) return;
+    if (this.data.submitting || this.data.hasConflict) return;
+    const clearedRow = this.data.rows.find((row: BulkRow) => row.metrics.some(metric => !metric.value.trim() && this.data.savedValuesByStudent[row.studentId]?.[metric.fieldId] !== undefined));
+    if (clearedRow) {
+      this.setData({ saveError: `${clearedRow.name}：已保存成绩不能通过空值删除，请填写更正值或重新读取服务器成绩。` });
+      return;
+    }
     const pendingValuesByStudent = pendingChanges(this.data.valuesByStudent, this.data.savedValuesByStudent, this.data.courseIds, this.data.savedCourseIds);
     const members = this.data.rows.filter((row: BulkRow) => hasStudentValues(pendingValuesByStudent[row.studentId]));
     if (!members.length) {
@@ -338,8 +362,9 @@ Page<PageData>({
     this.setData({ submitting: true, saveError: "" });
     const succeeded: string[] = [];
     for (const row of members) {
-      if (this.data.managed && !validStandardInputs(this.data.fields, pendingValuesByStudent[row.studentId] || {})) {
-        this.setData({ saveError: `${row.name}：请填写范围内的标准分（0–100），评级须为1–5整数。` });
+      const invalid = this.data.fields.map((field: AssessmentField) => ({ field, error: assessmentInputError(field, pendingValuesByStudent[row.studentId]?.[field.id] || "") })).find((item: { error: string | null }) => item.error);
+      if (invalid) {
+        this.setData({ saveError: `${row.name} · ${invalid.field.label}：${invalid.error}` });
         continue;
       }
       const rawResults = buildRawResults(this.data.fields, pendingValuesByStudent[row.studentId] || {}).map((entry)=>{
@@ -377,7 +402,12 @@ Page<PageData>({
         succeeded.push(row.studentId);
       } catch (error) {
         // 失败保留快照，重试复用同一 assessedAt，让确定性幂等键保持不变
-        this.setData({ saveError: error && typeof error === "object" && "message" in error ? String(error.message) : "保存失败，请稍后重试；本机草稿已保留。" });
+        const conflict = Boolean(error && typeof error === "object" &&
+          (("statusCode" in error && error.statusCode === 409) || ("code" in error && error.code === "assessment_revision_conflict")));
+        this.setData({
+          hasConflict: this.data.hasConflict || conflict,
+          saveError: this.data.hasConflict || conflict ? "服务器成绩已更新。本机修改已保留，请先核对，再点‘重新读取服务器成绩’。" : error && typeof error === "object" && "message" in error ? String(error.message) : "保存失败，请稍后重试；本机草稿已保留。",
+        });
         // Keep this student's draft so the coach can retry only the failed row.
       }
     }
@@ -398,14 +428,22 @@ Page<PageData>({
       savedValuesByStudent,
       savedStudentIds,
       valuesByStudent,
-      rows: buildRows(this.data.rows.map((row: BulkRow) => ({ id: row.studentId, name: row.name })), this.data.fields, valuesByStudent, savedStudentIds, this.data.courses, this.data.courseIds),
-      filledLabel: buildFilledLabel(this.data.rows.map((row: BulkRow) => ({ id: row.studentId })), valuesByStudent),
+      rows: buildRows(this.data.rows.map((row: BulkRow) => ({ id: row.studentId, name: row.name })), this.data.fields, valuesByStudent, savedStudentIds, this.data.courses, this.data.courseIds, savedValuesByStudent, savedCourseIds),
+      filledLabel: buildFilledLabel(this.data.rows.map((row: BulkRow) => ({ id: row.studentId })), valuesByStudent, this.data.fields),
       lastSavedLabel: succeeded.length ? `已保存${succeeded.length}名学员` : this.data.lastSavedLabel,
     });
     if (succeeded.length < members.length) wx.showToast({ title: "部分学员未保存，已保留草稿", icon: "none" });
     else wx.showToast({ title: `已保存${succeeded.length}名学员`, icon: "success" });
   },
 
+  async saveAndContinue() {
+    if (this.data.submitting) return;
+    if (!this.data.readOnly && hasDraftValues(pendingChanges(this.data.valuesByStudent, this.data.savedValuesByStudent, this.data.courseIds, this.data.savedCourseIds))) {
+      await this.saveProject();
+      if (hasDraftValues(pendingChanges(this.data.valuesByStudent, this.data.savedValuesByStudent, this.data.courseIds, this.data.savedCourseIds))) return;
+    }
+    this.nextProject();
+  },
   nextProject() {
     if (this.data.submitting) return;
     if (this.data.readOnly) {
@@ -414,7 +452,7 @@ Page<PageData>({
     }
     const nextProjectId = this.data.projectIds[this.data.projectIndex + 1];
     if (!nextProjectId) {
-      openPage(`/pages/coach/assessment-projects/index?taskId=${encodeURIComponent(this.data.taskId)}&templateId=${encodeURIComponent(this.data.templateId)}&title=${encodeURIComponent(this.data.taskTitle)}`);
+      openPage(`/pages/coach/assessment-projects/index?taskId=${encodeURIComponent(this.data.taskId)}&templateId=${encodeURIComponent(this.data.templateId)}&title=${encodeURIComponent(this.data.taskTitle)}${this.data.managed ? "&review=1" : ""}`);
       return;
     }
     openPage(`/pages/coach/assessment-bulk-entry/index?taskId=${encodeURIComponent(this.data.taskId)}&templateId=${encodeURIComponent(this.data.templateId)}&projectId=${encodeURIComponent(nextProjectId)}&projectIds=${encodeURIComponent(this.data.projectIds.join(","))}&title=${encodeURIComponent(this.data.taskTitle)}`);
@@ -476,33 +514,32 @@ function isUsableTask(task: CoachAssessmentTask | undefined, templateId: string)
   return Boolean(task && task.templateId === templateId && (task.status === "in_progress" || task.status === "completed" || (task.status === "not_started" && task.workflow)));
 }
 
-function buildRows(members: Array<{ id: string; name: string }>, fields: AssessmentField[], valuesByStudent: DraftValues, savedStudentIds: string[] = [], courses: Array<AssessmentCourse & {label:string}> = [], courseIds:DraftValues = {}): BulkRow[] {
-  return members.map((member) => {
+function buildRows(
+  members: Array<{ id: string; name: string }>, fields: AssessmentField[], valuesByStudent: DraftValues,
+  savedStudentIds: string[] = [], courses: Array<AssessmentCourse & { label: string }> = [], courseIds: DraftValues = {},
+  savedValues: DraftValues = {}, savedCourseIds: DraftValues = {},
+): BulkRow[] {
+  return members.map(member => {
     const values = valuesByStudent[member.id] || {};
-    const metrics = fields.map((field) => {
+    const metrics = fields.map(field => {
       const value = values[field.id] || "";
       return {
-        fieldId: field.id,
-        label: field.label,
+        fieldId: field.id, inputKey: `${member.id}/${field.id}`, label: field.label,
+        errorText: !value.trim() && savedValues[member.id]?.[field.id] !== undefined ? "请填写更正值；空值不会删除已保存成绩" : assessmentInputError(field, value) || "",
         inputType: field.inputType === "number" ? "digit" as const : "text" as const,
-        value,
-        unitLabel: displayUnit(field),
-        placeholder: field.required ? "录入" : "选填",
-        courseLabel: courses.find((course)=>course.id===courseIds[member.id]?.[field.id])?.label || (courseIds[member.id]?.[field.id] ? "原关联课程当前不可用，请核对" : "选择所属训练课"),
+        value, unitLabel: assessmentUnit(field), placeholder: field.required ? "未录入" : "选填",
+        courseLabel: courses.find(course => course.id === courseIds[member.id]?.[field.id])?.label || (courseIds[member.id]?.[field.id] ? "原关联课程当前不可用，请核对" : "选择所属训练课"),
         scoreLabel: value && field.valueKind === "score_0_100" ? `${value}分` : "待提交",
       };
     });
+    const dirty = fields.some(field => (Boolean(values[field.id]?.trim()) || savedValues[member.id]?.[field.id] !== undefined) && (values[field.id] !== savedValues[member.id]?.[field.id] || courseIds[member.id]?.[field.id] !== savedCourseIds[member.id]?.[field.id]));
+    const filled = metrics.filter(metric => Boolean(metric.value.trim())).length;
     const first = metrics[0];
-    const hasValues = Object.keys(values).length > 0;
     return {
-      studentId: member.id,
-      name: member.name.trim(),
-      initials: member.name.trim().slice(0, 1) || "学",
-      rawInputValue: first?.value || "",
-      scoreLabel: first?.scoreLabel || "待提交",
-      statusLabel: savedStudentIds.includes(member.id) ? "已保存" : hasValues ? "已填写" : "待录入",
-      courses:courses.filter((course)=>course.studentIds.includes(member.id)),
-      metrics,
+      studentId: member.id, name: member.name.trim(), initials: member.name.trim().slice(0, 1) || "学",
+      rawInputValue: first?.value || "", scoreLabel: first?.scoreLabel || "待提交",
+      statusLabel: dirty ? "待保存" : savedStudentIds.includes(member.id) ? "已保存" : filled ? "已填写" : "待录入",
+      courses: courses.filter(course => course.studentIds.includes(member.id)), metrics,
     };
   });
 }
@@ -526,11 +563,7 @@ function normalizeSavedValues(response: CoachAssessmentEntries, fields: Assessme
 
 function formatSavedValue(field: AssessmentField | undefined, value: Record<string, unknown>) {
   if (!field || !value || typeof value !== "object") return "";
-  const numeric = value.score ?? value.count ?? value.percentage ?? value.minutes ?? value.seconds ?? value.meters ?? value.value;
-  if (typeof numeric === "number" && Number.isFinite(numeric)) return String(numeric);
-  if (typeof value.text === "string") return value.text;
-  if (typeof value.tag === "string") return value.tag;
-  return "";
+  return assessmentValueText(value);
 }
 
 function mergeValues(base: DraftValues, override: DraftValues): DraftValues {
@@ -540,14 +573,10 @@ function mergeValues(base: DraftValues, override: DraftValues): DraftValues {
   return merged;
 }
 
-function buildFilledLabel(members: Array<{ id: string }>, valuesByStudent: DraftValues) {
-  const filled = members.reduce((count, member) => count + (hasStudentValues(valuesByStudent[member.id]) ? 1 : 0), 0);
-  return `已填写 ${filled} 人 · 未填写 ${Math.max(0, members.length - filled)} 人`;
-}
-
-function buildCompletedLabel(members: Array<{ id: string }>, valuesByStudent: DraftValues) {
-  const completed = members.reduce((count, member) => count + (hasStudentValues(valuesByStudent[member.id]) ? 1 : 0), 0);
-  return `全队 ${completed} 人已完成 · 成绩已保存`;
+function buildFilledLabel(members: Array<{ id: string }>, valuesByStudent: DraftValues, fields: AssessmentField[]) {
+  const filled = members.reduce((count, member) => count + fields.filter(field => Boolean(valuesByStudent[member.id]?.[field.id]?.trim())).length, 0);
+  const complete = members.filter(member => fields.every(field => Boolean(valuesByStudent[member.id]?.[field.id]?.trim()))).length;
+  return `已填 ${filled}/${members.length * fields.length} 项 · ${complete}/${members.length} 人完整`;
 }
 
 function createSignature(fields: AssessmentField[], members: Array<{ id: string }>) {
@@ -564,7 +593,7 @@ function restoreDraft(taskId: string, projectId: string, signature: string, fiel
     if (!stored) continue;
     const values: Record<string, string> = {};
     for (const [fieldId, value] of Object.entries(stored)) if (fieldIds.has(fieldId) && typeof value === "string") values[fieldId] = value;
-    if (hasStudentValues(values)) valuesByStudent[member.id] = values;
+    if (Object.keys(values).length) valuesByStudent[member.id] = values;
   }
   return valuesByStudent;
 }
@@ -587,7 +616,7 @@ function hasStudentValues(values: Record<string, string> | undefined) {
 }
 
 function hasDraftValues(valuesByStudent: DraftValues) {
-  return Object.values(valuesByStudent).some((values) => hasStudentValues(values));
+  return Object.values(valuesByStudent).some((values) => Object.keys(values).length > 0);
 }
 
 function withoutStudents(valuesByStudent: DraftValues, studentIds: string[]) {
@@ -602,17 +631,11 @@ function changedValues(valuesByStudent: DraftValues, savedValuesByStudent: Draft
     const saved = savedValuesByStudent[studentId] || {};
     const next: Record<string, string> = {};
     for (const [fieldId, value] of Object.entries(values)) {
-      if (value.trim() && saved[fieldId] !== value) next[fieldId] = value;
+      if ((value.trim() || saved[fieldId] !== undefined) && saved[fieldId] !== value) next[fieldId] = value;
     }
-    if (hasStudentValues(next)) changed[studentId] = next;
+    if (Object.keys(next).length) changed[studentId] = next;
   }
   return changed;
-}
-
-function displayUnit(field: AssessmentField) {
-  if (field.unit) return field.unit;
-  const labels: Record<string, string> = { duration_seconds: "秒", duration_minutes: "分钟", distance_meters: "米", count: "次", percentage: "%", score_0_100: "分", rating_1_5: "分" };
-  return labels[field.valueKind] || "";
 }
 
 function buildRawResults(fields: AssessmentField[], values: Record<string, string>) {
@@ -642,17 +665,8 @@ function buildMetricValue(kind: string, rawValue: string, unit?: string): Record
   return { kind: "measurement", value: numeric, unit: unit || "value" };
 }
 
-function validStandardInputs(fields: AssessmentField[], values: Record<string, string>): boolean {
-  return fields.every((field) => {
-    const text = values[field.id];
-    if (!text?.trim()) return true;
-    const score = Number(text);
-    return Number.isFinite(score) && (field.valueKind === "score_0_100" ? score >= 0 && score <= 100 : field.valueKind === "rating_1_5" && Number.isInteger(score) && score >= 1 && score <= 5);
-  });
-}
-
 function historyValue(value: Record<string, unknown> | null): string {
-  return value === null ? "未录入" : String(value.score ?? value.value ?? "—");
+  return assessmentValueText(value) || "未录入";
 }
 
 function courseDate(value:string) {

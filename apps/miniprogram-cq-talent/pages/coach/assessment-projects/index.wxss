@@ -1,10 +1,5 @@
 .projects-page { min-height: 100vh; background: #f6f7f9; }
-.projects-nav { position: sticky; top: 0; z-index: 100; display: flex; box-sizing: content-box; align-items: center; height:44px; padding-left: 32rpx; background: #ffffff; }
-.projects-nav__back { display: flex; flex: 0 0 auto; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; }
-.projects-nav__back image { width: 48rpx; height: 48rpx; }
-.projects-nav__title { min-width: 0; flex: 1; margin-left: 24rpx; overflow: hidden; color: #202124; font-size: var(--font-size-display); font-weight: 700; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
-.projects-nav__spacer { flex: 0 0 auto; width: 48rpx; height: 48rpx; }
-.projects-page__body { padding: 16rpx 32rpx 180rpx; }
+.projects-page__body { padding: 24rpx 32rpx calc(220rpx + env(safe-area-inset-bottom)); }
 .projects-context { color: #667085; font-size: var(--font-size-aux); line-height: 1.5; }
 .projects-progress { box-sizing: border-box; margin-top: 24rpx; padding: 28rpx 32rpx; border-radius: 32rpx; background: #ffffff; }
 .projects-progress__head { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; }
@@ -30,12 +25,6 @@
 .project-card__select { display: flex; flex: 0 0 40rpx; width: 40rpx; height: 40rpx; margin-left: auto; align-items: center; justify-content: center; box-sizing: border-box; border: 2rpx solid #d0d5dd; border-radius: 50%; background: #ffffff; }
 .project-card__select image { width: 40rpx; height: 40rpx; }
 .project-card__select--selected { border: 0; background: transparent; }
-.projects-select-bar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 25; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; min-height: 140rpx; padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom)); border-top: 1rpx solid #e7eaf0; background: rgba(255,255,255,.98); box-shadow:none; }
-.projects-select-bar__summary { display: flex; flex-direction: column; gap: 4rpx; }
-.projects-select-bar__title { color: #202124; font-size: var(--font-size-section); font-weight: 700; line-height: 1.5; }
-.projects-select-bar__count { color: #667085; font-size: var(--font-size-aux); line-height: 1.5; }
-.projects-select-bar__confirm { display: flex; min-width: 184rpx; height: 80rpx; align-items: center; justify-content: center; padding: 0 28rpx; border-radius: 16rpx; background: #a80f1b; color: #ffffff; font-size: var(--font-size-body); font-weight: 700; line-height: 1.5; text-align: center; }
-.projects-select-bar__confirm--disabled { background: #d0d5dd; color: #ffffff; }
 
 .content-primary-strip {
   margin: 24rpx -32rpx 20rpx;
@@ -275,4 +264,5 @@
 .review-confirm { width:100%;margin-top:20rpx;background:#a80f1b;color:#fff;font-size: var(--font-size-body); }
 
 /* 移动端触控下限，业务内容与原事件保持一致。 */
-.projects-nav__back { min-height:44px; min-width:44px; box-sizing:border-box; }
+
+.projects-task-title { font-size:var(--font-size-display); font-weight:600; line-height:1.5; margin-bottom:8px; }

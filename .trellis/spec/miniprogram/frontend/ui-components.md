@@ -40,3 +40,10 @@ Wrong：在每页散写按钮尺寸、缺测用0、未知球队回默认队。Co
 - 球队工作区在授权单队确定后读取近期课程与未完成测评；用teamId过滤，分区失败独立展示，不能把失败渲染为零任务。月份读取复用calendarDataRanges并按club日期过滤、按eventId去重，单请求不超过31天。返回球队选择器后刷新当前偏好，不用旧teamId覆盖新选择。
 - 原生TDesign按钮放在紧凑网格内时，用原生view限定列宽并显式block/width:100%/min-width:0，保持44px触控高度。只检查父容器bounding rect不足以证明内部按钮不溢出，必须查看实际截图。列表普通姓名/状态与两项动作各有明确列。
 - 验证：coach/event、lesson、training、team、schedule与navigation/role-tabbar测试；原生19人课程/记录/名单、搜索及更正表单。平台扫描继续报告生成依赖问题；源码回归断言区分自有源码与miniprogram_npm，不从报告中删掉依赖发现。
+
+## Assessment entry and review (2026-10-22)
+
+- Task lists default to unfinished work with one create action. Project counts and student counts are distinct. Failed project progress reads show a retryable error, never invented zero progress.
+- `utils/assessment-input.ts` owns client validation and raw value display; preserve configured units, valid zero, and missing values. Raw times/counts are not standard scores. Never round or clamp invalid input to make it pass. Saved values may be edited through an intermediate blank; persist that local draft, explain that blank cannot delete a saved result, and block save/continue until corrected.
+- Bulk rows separate identity/status, metric input, and source course. TDesign 1.17 input emits **enter**, not confirm; bindenter drives the next field identity. A native component event must be checked in addition to calling the page method.
+- Save-and-continue waits for the existing save contract and stays on failure; 409 retains local values and the original revision, blocking stale retries until an explicit, confirmed server reload. Publication remains a separate reviewed action. Do not redirect legacy entry routes into a different publication contract.
