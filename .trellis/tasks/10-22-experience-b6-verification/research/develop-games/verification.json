@@ -298,5 +298,33 @@
       "cq-game-focused-tests.log": "302f8521cab3520028f7aacfded8243cb1b1b68bdcb84dfb8274ad456cb4f668",
       "cq-game-miniprogram-all-tests.log": "ec8b7b881da6b581a67ea11a8bb3697184b7677d3b68ecb9002a7cb56c771bb6"
     }
+  },
+  "ci": {
+    "runId": 39875861075,
+    "sourceCommit": "06e0984f6c5b51e293fb6be78ece86e7a3165033",
+    "url": "https://github.com/haokun3127/football-club-management/actions/runs/39875861075",
+    "firstAttempt": {
+      "result": "failure",
+      "apiPassed": 262,
+      "apiFailed": 1,
+      "failure": "Existing backoffice-management model graph integration exceeded 5000ms",
+      "logSha256": "eb9c9dad5f94ec6f4da6a3a1023b97596a4e5bd1bb858dcc5b7568fe01287be8"
+    },
+    "focusedRecheck": {
+      "passed": 1,
+      "filteredOut": 25,
+      "testSeconds": 1.43,
+      "logSha256": "9b8fd7fc35ea08d1ea9b280d8d212a50bbe96bc7d342324fcae01e09f32d757b"
+    },
+    "backendAndTestConfigUnchanged": true,
+    "rerun": {
+      "result": "success",
+      "attempt": 2,
+      "passed": 1001,
+      "skipped": 1,
+      "scriptTests": 9,
+      "runtimeChecks": 3,
+      "logSha256": "ab518fc7ac957145befcbc73cd3d0b5562ed4d02965a7592a576e5bac22b3d3d"
+    }
   }
 }

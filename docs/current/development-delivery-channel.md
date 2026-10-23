@@ -9,6 +9,7 @@
 - 2个孩子、19人球队；草稿隐藏、空/0比分、部分事件、完成/修订、重放、409冲突、作废及角色/孩子/球队隔离均已验证。当前保留一场完成记录（2:1、revision5）与一场作废记录（revision5），明确标记为验收数据。
 - 23张核心业务表摘要不变，覆盖训练计次/考勤、课时账本、正式比赛、测评、监护和成员关系；重启前后106表一致，真实会话继续读取记录。备份在`/opt/cq-talent-nonproduction/backups/friendly-games-develop-20261023/`，不恢复旧库覆盖这些新记录。
 - 登录说明改用深色正文token，比分输入采用现有TDesign垂直标签；只改展示，不改授权、计次或数据结构。原生截图和相关回归通过。
+- 验证版本：展示修正`500c3b7b`，含日志的`06e0984f`已推送GitHub dev。[完整CI](https://github.com/haokun3127/football-club-management/actions/runs/39875861075)第2次通过1001项/1既有跳过、9脚本和3启动检查；首次既有后台模型用例5秒超时、定向复查1.43秒通过，证据保留，未改超时或断言。后续收尾提交仅更新文档。
 - 尚待物理设备375、软键盘、大字号/读屏、真实弱网、多设备切队及官方包体/微信上传。原生模拟器430×932与页面处理器联调不冒充这些结果，B6/父任务保持in_progress。
 
 当前证据见[B6验收记录](../../.trellis/tasks/10-22-experience-b6-verification/implement.md)和[脱敏验证结果](../../.trellis/tasks/10-22-experience-b6-verification/research/develop-games/verification.json)。下方为此前部署时点记录。
