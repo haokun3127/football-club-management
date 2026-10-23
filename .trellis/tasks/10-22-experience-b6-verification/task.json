@@ -2,7 +2,7 @@
   "id": "experience-b6-verification",
   "name": "experience-b6-verification",
   "title": "B6 跨端集成验证与工程交接",
-  "description": "GitHub dev与develop API/后台已更新至a5c074ce；干净远端1001通过/1跳过，0045备份演练及历史数据保全通过；真实手机号绑定、双角色完整联调与真机验收待完成。",
+  "description": "develop友谊赛已按单俱乐部开启；真实微信会话完成双角色/双孩子课程与友谊赛闭环、权限、冲突、重启及核心数据保全。登录灰字和比分布局已修正；物理设备与官方包体验收待完成。",
   "status": "in_progress",
   "dev_type": null,
   "scope": null,

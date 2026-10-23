@@ -7,16 +7,16 @@
 .login-hero__caption { margin-top:12px; font-size:14px; line-height:1.5; color:#fff; }
 .login-body { padding:28px 24px 0; }
 .login-title { font-size:20px; font-weight:600; line-height:1.5; color:var(--color-text); }
-.login-description { margin-top:8px; font-size:16px; line-height:1.6; color:var(--color-text-secondary); }
+.login-description { margin-top:8px; font-size:16px; line-height:1.6; color:var(--color-text); }
 .agreement-row { display:flex; align-items:center; gap:4px; margin:20px -10px 16px; }
 .agreement-check { flex:0 0 44px; width:44px; --td-checkbox-vertical-padding:12px; --td-checkbox-horizontal-padding:10px; }
-.agreement-copy { flex:1; min-width:0; font-size:14px; line-height:1.7; color:var(--color-text-secondary); }
+.agreement-copy { flex:1; min-width:0; font-size:14px; line-height:1.7; color:var(--color-text); }
 .agreement-copy text { display:inline; }
 .agreement-link { color:var(--color-brand); text-decoration:underline; text-underline-offset:3px; }
 .login-cta { display:flex; align-items:center; justify-content:center; width:100%; min-width:100%; max-width:100%; margin:0; height:auto; min-height:48px; padding:12px 16px; box-sizing:border-box; background:var(--color-brand); color:#fff; border-radius:var(--radius-button); font-size:16px; line-height:1.5; font-weight:600; }
 .login-cta--disabled { background:#e4e7ec !important; color:#667085 !important; }
-.login-caption { margin-top:16px; font-size:14px; line-height:1.6; color:var(--color-text-secondary); }
-.login-feedback { margin-top:16px; font-size:14px; line-height:1.6; color:var(--color-text-secondary); }
+.login-caption { margin-top:16px; font-size:14px; line-height:1.6; color:var(--color-text); }
+.login-feedback { margin-top:16px; font-size:14px; line-height:1.6; color:var(--color-text); }
 .login-feedback--error { color:var(--color-error); }
 .agreement-panel { padding:24px; }
 .agreement-document { height:45vh; margin:16px 0 24px; font-size:16px; line-height:1.7; color:var(--color-text); }

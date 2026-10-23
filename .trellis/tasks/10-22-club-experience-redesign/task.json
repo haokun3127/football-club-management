@@ -2,7 +2,7 @@
   "id": "club-experience-redesign",
   "name": "club-experience-redesign",
   "title": "全产品体验提升：俱乐部对标、功能分布与流程统一",
-  "description": "B0—B5已提交并验证，B6本地check:delivery通过：1004通过/1跳过，9脚本/3启动；真机/375基准/软键盘/读屏与目标环境验收未完成，未部署上传。",
+  "description": "B0—B5完成；develop已部署且友谊赛单俱乐部开启，真实双角色/双孩子联调通过。干净根CI1001通过/1跳过；B6保留物理设备与官方包体待验，详见B6记录。",
   "status": "in_progress",
   "dev_type": null,
   "scope": "miniprogram, api, domain, backoffice",

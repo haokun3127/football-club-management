@@ -159,3 +159,5 @@ pnpm check:delivery
 - B6：[跨端验收与工程交接](../10-22-experience-b6-verification/implement.md)，本地门禁通过，develop已于2026-10-23部署a5c074ce；手机号绑定后完整业务联调和真机验收待完成。
 
 2026-10-23交付续接：用户授权后已推送GitHub dev并完成develop API/后台部署及0045增量迁移。最终a5c074ce远端1001通过/1跳过，历史业务数据保全、HTTPS/后台资源/OpenAPI/环境隔离通过；友谊赛白名单仍关闭，当前原生需手机号绑定。操作证据与未验边界仍统一由B6维护，父任务保持in_progress。
+
+2026-10-23追加授权已执行：develop单俱乐部友谊赛开启，真实微信会话完成家长/教练、双孩子、正常写入/发布/修订/作废/冲突和重启验证；核心业务表保全。用户反馈的登录灰字及比分布局已修正。当前证据与设备待验仍统一见[B6](../10-22-experience-b6-verification/implement.md)，父任务保持in_progress。

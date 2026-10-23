@@ -1,0 +1,302 @@
+{
+  "enable": {
+    "environment": "develop",
+    "clubId": "club-chongqing-talent",
+    "enabled": true,
+    "privateConfigOnlyChangedKey": "FCM_TRAINING_GAME_CLUBS",
+    "imageUnchanged": true,
+    "image": "cq-talent-api:develop-a5c074ce6ba5",
+    "container": "e2ca01f99f3c5ef803fd7c108b50826a39a41e0af08ad02f2e49269c21b3a082",
+    "health": true,
+    "trialUnchanged": true,
+    "releaseUnchanged": true,
+    "integrity": "ok",
+    "foreignKeyErrors": 0,
+    "backupSha256": "61ddca6a23233a08eb8dfbcb2e66854ce4dda763604e254926bcffd1795ad65e"
+  },
+  "catalog": {
+    "environment": "develop",
+    "clubId": "club-chongqing-talent",
+    "drillId": "drills-bf2ad796-8346-45cc-bfa6-ab194978279c",
+    "name": "训练内友谊赛（dev验收）",
+    "normalBackofficeAuth": true,
+    "auditHistory": 1,
+    "recordingCapability": "friendly_match",
+    "existingDrillsUntouched": true
+  },
+  "persistence": {
+    "environment": "develop",
+    "health": true,
+    "allowlistedClub": "club-chongqing-talent",
+    "changedTables": {
+      "app_client_role_preferences": {
+        "before": 1,
+        "after": 1
+      },
+      "app_client_sessions": {
+        "before": 31,
+        "after": 40
+      },
+      "backoffice_audit": {
+        "before": 1,
+        "after": 2
+      },
+      "backoffice_login_attempts": {
+        "before": 2,
+        "after": 2
+      },
+      "backoffice_mutations": {
+        "before": 1,
+        "after": 2
+      },
+      "backoffice_sessions": {
+        "before": 3,
+        "after": 1
+      },
+      "http_idempotency_records": {
+        "before": 0,
+        "after": 15
+      },
+      "session_plans": {
+        "before": 9,
+        "after": 10
+      },
+      "training_drills": {
+        "before": 0,
+        "after": 1
+      },
+      "training_game_events": {
+        "before": 0,
+        "after": 3
+      },
+      "training_game_participants": {
+        "before": 0,
+        "after": 5
+      },
+      "training_game_revisions": {
+        "before": 0,
+        "after": 10
+      },
+      "training_games": {
+        "before": 0,
+        "after": 2
+      },
+      "training_sessions": {
+        "before": 21,
+        "after": 21
+      }
+    },
+    "protectedTablesUnchanged": [
+      "assessment_mapping_versions",
+      "assessment_metric_bindings",
+      "assessment_raw_results",
+      "assessment_scores",
+      "assessment_tasks",
+      "assessment_template_versions",
+      "assessment_templates",
+      "assessment_test_items",
+      "assessment_workflow_students",
+      "assessment_workflow_tasks",
+      "club_user_memberships",
+      "event_participants",
+      "lesson_credit_ledger",
+      "match_events",
+      "match_rosters",
+      "matches",
+      "player_assessments",
+      "private_lesson_requests",
+      "student_guardian_bindings",
+      "student_operational_profiles",
+      "temporary_event_participants",
+      "training_content_assessments",
+      "training_records"
+    ],
+    "tableCount": 106,
+    "restartAllTablesUnchanged": true,
+    "trialUnchanged": true,
+    "releaseUnchanged": true,
+    "integrity": "ok",
+    "foreignKeyErrors": 0,
+    "afterAcceptanceBackupSha256": "d1f8b994539830d6d65297d1bcceea7cc199e71049d443416d4da76b042d8a7e"
+  },
+  "course": {
+    "eventId": "event-cq-talent-secure-test-1-future-training",
+    "previousProjects": 8,
+    "projects": 9,
+    "preservedProjects": true,
+    "sourceId": "session-plan-block-app-client-event-cq-talent-secure-test-1-future-training-09",
+    "enabled": true,
+    "canEdit": true
+  },
+  "api": {
+    "environment": "develop",
+    "authenticatedBy": "user-completed-WeChat-phone-login",
+    "eventId": "event-cq-talent-secure-test-1-future-training",
+    "gameId": "e98e86cb-1d68-4d65-b0e8-e116dfc0c615",
+    "sourceId": "session-plan-block-app-client-event-cq-talent-secure-test-1-future-training-09",
+    "teamId": "team-cq-talent-secure-test-1",
+    "kidIds": [
+      "student-cq-talent-secure-test-1-1",
+      "student-cq-talent-secure-test-1-2"
+    ],
+    "report": {
+      "created": {
+        "state": "draft",
+        "revision": 1,
+        "scores": [
+          null,
+          null
+        ]
+      },
+      "createReplay": true,
+      "reusedKeyStatus": 409,
+      "zeroScore": true,
+      "draftHidden": true,
+      "nullScore": true,
+      "completed": {
+        "revision": 4,
+        "score": [
+          3,
+          2
+        ],
+        "events": 3
+      },
+      "children": [
+        {
+          "ownEvents": 1,
+          "type": "goal",
+          "privacy": true
+        },
+        {
+          "ownEvents": 1,
+          "type": "save",
+          "privacy": true
+        }
+      ],
+      "foreignChildStatus": 403,
+      "parentCoachStatus": 403,
+      "sharedFactsEqual": true,
+      "missingReasonStatus": 400,
+      "revised": {
+        "revision": 5,
+        "score": [
+          2,
+          1
+        ]
+      },
+      "staleRevisionStatus": 409,
+      "immutableReplay": true,
+      "foreignTeamStatus": 403,
+      "directory": true,
+      "history": 5
+    }
+  },
+  "nativeDraft": {
+    "eventId": "event-cq-talent-secure-test-1-future-training",
+    "gameId": "1875538b-51d3-4178-bee2-f2a61117b1aa",
+    "revision": 2,
+    "state": "draft",
+    "score": [
+      0,
+      0
+    ],
+    "participants": 2,
+    "pageInputHandlers": true,
+    "pagePickerHandlers": true,
+    "pageSaveDraftHandler": true,
+    "serverSave": true
+  },
+  "conflictAndVoid": {
+    "gameId": "1875538b-51d3-4178-bee2-f2a61117b1aa",
+    "nativeConflict": true,
+    "localDraftPreserved": true,
+    "serverNotOverwritten": true,
+    "completedZeroVisible": true,
+    "voidedHidden": true,
+    "terminalStatus": 400,
+    "revision": 5,
+    "history": 5,
+    "voidedPageReadOnly": true
+  },
+  "nativeReadback": {
+    "pages": {
+      "parent1": {
+        "ready": true,
+        "gameCount": 1,
+        "score": "2 : 1",
+        "ownEvent": "goal",
+        "voidedHidden": true
+      },
+      "parent2": {
+        "ready": true,
+        "gameCount": 1,
+        "score": "2 : 1",
+        "ownEvent": "save",
+        "voidedHidden": true
+      },
+      "coachCourse": {
+        "ready": true,
+        "games": 2,
+        "sources": 1
+      },
+      "editor": {
+        "ready": true,
+        "revision": 5,
+        "verticalScoreLabels": true
+      }
+    },
+    "login": {
+      "colors": {
+        ".login-description": "rgb(32, 33, 36)",
+        ".agreement-copy": "rgb(32, 33, 36)",
+        ".login-caption": "rgb(32, 33, 36)"
+      },
+      "uncheckedAndChecked": true,
+      "agreementOpens": true,
+      "phoneAuthorizationTriggered": false
+    },
+    "sessionAfterRestart": {
+      "authenticated": true,
+      "role": "coach",
+      "revision": 5,
+      "score": [
+        2,
+        1
+      ]
+    }
+  },
+  "limits": [
+    "Native simulator was 430x932, not a physical phone.",
+    "TDesign selectors were unavailable in this Automator runtime; editor input, participant and save handlers were exercised in the rendered page against real develop APIs. No injected session or network mock was used.",
+    "Phone login was completed manually by the user; unchanged agreement authorization callbacks were not replayed for visual checks.",
+    "Physical 375-width, keyboard, large text, screen reader, weak-network, multi-device team switching and official WeChat package/upload remain unverified."
+  ],
+  "attemptCorrections": [
+    "Automator callMethod does not await async handlers: subsequent polling confirmed the actual 409 conflict without repeating a write.",
+    "Voided-state changes are rejected with domain validation HTTP 400; 409 is the stale-revision contract. Initial harness expectation corrected after readback; business code unchanged."
+  ],
+  "screenshots": {
+    "login-readable.png": "0a2a3834ee8b078ab7e39b0ed82694dcdb8ebd55d6811c59eb8ec0a8304560dd",
+    "login-agreement.png": "5b9a11aa8e32283c6d7d6bfa3a68a86d1652c42aa248a4c1134a749e6603c0f0",
+    "score-layout.png": "7f22e0a122fa7d453d6ce18a96143abd5bfcd90350e3c171b35987d0929f201e",
+    "parent-child-one.png": "4ff786a3810a7981f9e0752169eff1cc74a546d47f07030aacc90e66cf8ed934",
+    "parent-child-two.png": "c2320b5076eb566274d1e243dee89ab9aee59077e1719004b4bfd7ac0e8284bd"
+  },
+  "checks": {
+    "miniTypecheck": true,
+    "focusedTests": {
+      "passed": 42,
+      "files": 5
+    },
+    "miniFullTests": {
+      "passed": 687,
+      "skipped": 1,
+      "files": 96
+    },
+    "logs": {
+      "cq-game-miniprogram-typecheck.log": "a0c23a8f2165de607d504e9b198196dc86cf552683069bd46bbe51c00f82e4b5",
+      "cq-game-focused-tests.log": "302f8521cab3520028f7aacfded8243cb1b1b68bdcb84dfb8274ad456cb4f668",
+      "cq-game-miniprogram-all-tests.log": "ec8b7b881da6b581a67ea11a8bb3697184b7677d3b68ecb9002a7cb56c771bb6"
+    }
+  }
+}

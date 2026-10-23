@@ -45,3 +45,7 @@ The native editor persists a draft scoped to environment/club/user/event/game or
 ## Verification
 
 `apps/api/test/training-games.test.ts` covers authorization, guardian projection, multiple games, old roster retention, source changes, cancel/feature-off, immutable replay, conflict, void, SQL failure rollback and file DB migration/reopen. Migration fixtures include existing friendly/internal Match records; they are left intact. This fixture is not an inventory of any deployed database. Native tests cover local draft recovery and delayed cross-child/team reads. Real device and deployment verification remain separate gates.
+
+## Rollout readiness
+
+The allowlist does not seed catalog data. Before declaring a club ready, read the authorized course context and require a source block whose persisted drill has `recordingCapability: friendly_match`. If the old deployment has no such drill, use the existing audited backoffice drill resource to create club-scoped content, then the normal revision-checked coach training-projects endpoint to add it to an authorized test course while retaining selected content. Do not enable startup seeding, relabel unrelated drills, overwrite a shared plan, or inject sessions to bypass real phone authorization. Verify source discovery, completed-only parent projection and unchanged attendance/credit/formal-match facts after restart. Voided-state validation returns 400; stale revisions and reused request keys return 409.

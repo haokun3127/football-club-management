@@ -13,7 +13,7 @@
         <view class="game-section__title">对阵与比分</view>
         <t-input label="甲方" value="{{form.sideAName}}" maxlength="80" data-field="sideAName" bindchange="editField" disabled="{{readOnly || busy || uncertain || conflict}}" />
         <t-input label="乙方" value="{{form.sideBName}}" maxlength="80" data-field="sideBName" bindchange="editField" disabled="{{readOnly || busy || uncertain || conflict}}" />
-        <view class="game-score-grid"><view><t-input label="甲方比分" type="number" value="{{form.scoreA}}" placeholder="未记录" maxlength="3" data-field="scoreA" bindchange="editField" disabled="{{readOnly || busy || uncertain || conflict}}" /></view><view><t-input label="乙方比分" type="number" value="{{form.scoreB}}" placeholder="未记录" maxlength="3" data-field="scoreB" bindchange="editField" disabled="{{readOnly || busy || uncertain || conflict}}" /></view></view>
+        <view class="game-score-grid"><view><t-input layout="vertical" label="甲方比分" type="number" value="{{form.scoreA}}" placeholder="未记录" maxlength="3" data-field="scoreA" bindchange="editField" disabled="{{readOnly || busy || uncertain || conflict}}" /></view><view><t-input layout="vertical" label="乙方比分" type="number" value="{{form.scoreB}}" placeholder="未记录" maxlength="3" data-field="scoreB" bindchange="editField" disabled="{{readOnly || busy || uncertain || conflict}}" /></view></view>
         <view class="game-muted">双方同时留空表示未记录；0 : 0 是有效比分。</view>
       </view>
       <view class="game-section">
