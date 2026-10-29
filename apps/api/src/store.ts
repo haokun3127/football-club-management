@@ -100,6 +100,8 @@ import type {
   EventChangeRequestInput,
   AssessmentTask,
   TrainingContentAssessment,
+  TrainingContentAssessmentSnapshot,
+  TrainingContentAssessmentBatchResult,
   ContentArticle,
   ContentFaq,
   VenueInfo,
@@ -209,7 +211,8 @@ export interface ApiStore {
   listPlayerAssessments(clubId: EntityId): PlayerAssessment[] | Promise<PlayerAssessment[]>;
   listAssessmentRawResults(clubId: EntityId): AssessmentRawResult[];
   listTrainingContentAssessments(clubId: EntityId, eventId: EntityId): TrainingContentAssessment[] | Promise<TrainingContentAssessment[]>;
-  saveTrainingContentAssessment(assessment: TrainingContentAssessment): TrainingContentAssessment | Promise<TrainingContentAssessment>;
+  getTrainingContentAssessmentSnapshot(clubId: EntityId, eventId: EntityId): TrainingContentAssessmentSnapshot | Promise<TrainingContentAssessmentSnapshot>;
+  saveTrainingContentAssessmentBatch(clubId: EntityId, eventId: EntityId, expectedRevision: number, assessments: TrainingContentAssessment[]): TrainingContentAssessmentBatchResult | Promise<TrainingContentAssessmentBatchResult>;
   listEvaluationPhrases(clubId: EntityId): Array<{ id: string; text: string }>;
   listContentArticles(clubId: EntityId): ContentArticle[] | Promise<ContentArticle[]>;
   listContentFaqs(clubId: EntityId): ContentFaq[] | Promise<ContentFaq[]>;
@@ -704,6 +707,7 @@ export abstract class SeedBackedStore implements ApiStore {
   private coachAssignments: CoachAssignment[]=[];
   private readonly counters = new Map<string, number>();
   private readonly httpIdempotencyRecords = new Map<string, HttpIdempotencyRecord>();
+  private readonly trainingAssessmentRevisions = new Map<string, number>();
   private readonly privacyAuditLogs: PrivacyAuditLog[] = [];
   private readonly privacyRequests: PrivacyRequest[] = [];
   private readonly tacticalBoards = new Map<string, TacticalBoard>();
@@ -1935,8 +1939,18 @@ export abstract class SeedBackedStore implements ApiStore {
       .sort((left, right) => left.studentId.localeCompare(right.studentId) || left.trainingProjectId.localeCompare(right.trainingProjectId));
   }
 
-  saveTrainingContentAssessment(assessment: TrainingContentAssessment): TrainingContentAssessment | Promise<TrainingContentAssessment> {
-    return upsertByTrainingContentAssessmentKey(this.data.trainingContentAssessments, assessment);
+  getTrainingContentAssessmentSnapshot(clubId: EntityId, eventId: EntityId): TrainingContentAssessmentSnapshot {
+    return { revision: this.trainingAssessmentRevisions.get(JSON.stringify([clubId, eventId])) ?? 0, assessments: this.listTrainingContentAssessments(clubId, eventId) as TrainingContentAssessment[] };
+  }
+
+  saveTrainingContentAssessmentBatch(clubId: EntityId, eventId: EntityId, expectedRevision: number, assessments: TrainingContentAssessment[]): TrainingContentAssessmentBatchResult | Promise<TrainingContentAssessmentBatchResult> {
+    const current = this.getTrainingContentAssessmentSnapshot(clubId, eventId);
+    if (current.revision !== expectedRevision) return { conflict: true, revision: current.revision };
+    const staged = [...this.data.trainingContentAssessments];
+    const saved = assessments.map(assessment => upsertByTrainingContentAssessmentKey(staged, assessment));
+    this.data.trainingContentAssessments = staged;
+    this.trainingAssessmentRevisions.set(JSON.stringify([clubId, eventId]), expectedRevision + 1);
+    return { conflict: false, revision: expectedRevision + 1, assessments: saved };
   }
 
   listEvaluationPhrases(_clubId: EntityId) { return evaluationPhrases.map(phrase => ({ ...phrase })); }
@@ -2670,10 +2684,14 @@ export class PersistentApiStore extends SeedBackedStore {
     return this.repositories.trainingContentAssessments.listByEvent(clubId, eventId);
   }
 
-  override async saveTrainingContentAssessment(assessment: TrainingContentAssessment): Promise<TrainingContentAssessment> {
-    const saved = this.repositories.trainingContentAssessments.save(assessment);
-    upsertByTrainingContentAssessmentKey(this.data.trainingContentAssessments, saved);
-    return saved;
+  override getTrainingContentAssessmentSnapshot(clubId: EntityId, eventId: EntityId): TrainingContentAssessmentSnapshot {
+    return this.repositories.trainingContentAssessments.snapshot(clubId, eventId);
+  }
+
+  override async saveTrainingContentAssessmentBatch(clubId: EntityId, eventId: EntityId, expectedRevision: number, assessments: TrainingContentAssessment[]): Promise<TrainingContentAssessmentBatchResult> {
+    const result = await this.repositories.trainingContentAssessments.compareAndSave(clubId, eventId, expectedRevision, assessments);
+    if (!result.conflict) for (const saved of result.assessments) upsertByTrainingContentAssessmentKey(this.data.trainingContentAssessments, saved);
+    return result;
   }
 
   override async recordMatchSummary(input: RecordMatchInput) {
@@ -3718,6 +3736,8 @@ function upsertByTrainingContentAssessmentKey(
   if (index < 0) {
     items.push(assessment);
   } else {
+    const previous = items[index]!;
+    assessment = { ...assessment, id: previous.id, createdAt: previous.createdAt };
     items[index] = assessment;
   }
   return assessment;

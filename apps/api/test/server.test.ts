@@ -1347,7 +1347,7 @@ describe("api server", () => {
       method: "PUT",
       url: `${base}/training-content-assessments`,
       headers: { "x-user-id": "user-coach-1" },
-      payload: {
+      payload: { expectedRevision: 0,
         assessments: [{
           studentId: "student-1",
           trainingProjectId: "drill-cq-talent-assessment-001",
@@ -4101,7 +4101,7 @@ describe("api server", () => {
       method: "PUT",
       url: `${base}/training-content-assessments`,
       headers,
-      payload: {
+      payload: { expectedRevision: 0,
         assessments: [{
           studentId: "student-1",
           trainingProjectId: "drill-cq-talent-assessment-001",
@@ -4130,7 +4130,7 @@ describe("api server", () => {
       method: "PUT",
       url: `${base}/training-content-assessments`,
       headers,
-      payload: { assessments: [{ studentId: "student-1", trainingProjectId: "drill-cq-talent-assessment-002", score: 80 }] },
+      payload: { expectedRevision: 1, assessments: [{ studentId: "student-1", trainingProjectId: "drill-cq-talent-assessment-002", score: 80 }] },
     });
     expect(missingProject.statusCode).toBe(400);
 
@@ -4138,7 +4138,7 @@ describe("api server", () => {
       method: "PUT",
       url: `${base}/training-content-assessments`,
       headers,
-      payload: { assessments: [{ studentId: "student-2", trainingProjectId: "drill-cq-talent-assessment-001", score: 80 }] },
+      payload: { expectedRevision: 1, assessments: [{ studentId: "student-2", trainingProjectId: "drill-cq-talent-assessment-001", score: 80 }] },
     });
     expect(absentStudent.statusCode).toBe(400);
 
@@ -4146,7 +4146,7 @@ describe("api server", () => {
       method: "PUT",
       url: "/clubs/club-chongqing-talent/app-clients/app-client-cq-talent-wechat-main/coach/events/event-match-1/training-content-assessments",
       headers,
-      payload: { assessments: [{ studentId: "student-1", trainingProjectId: "drill-cq-talent-assessment-001", score: 80 }] },
+      payload: { expectedRevision: 0, assessments: [{ studentId: "student-1", trainingProjectId: "drill-cq-talent-assessment-001", score: 80 }] },
     });
     expect(matchAttempt.statusCode).toBe(400);
 

@@ -654,6 +654,15 @@ export interface TrainingContentAssessment {
   updatedAt: string;
 }
 
+export interface TrainingContentAssessmentSnapshot {
+  revision: number;
+  assessments: TrainingContentAssessment[];
+}
+
+export type TrainingContentAssessmentBatchResult =
+  | { conflict: true; revision: number }
+  | ({ conflict: false } & TrainingContentAssessmentSnapshot);
+
 export interface ContentArticle {
   id: string;
   clubId: string;

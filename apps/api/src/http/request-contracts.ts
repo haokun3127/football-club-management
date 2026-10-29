@@ -10,6 +10,13 @@ export function registerHttpRequestContracts(app: FastifyInstance, store: ApiSto
   app.addHook("preHandler", async (request, reply) => {
     applyPrivateCacheHeaders(request, reply);
 
+    // Protect revisioned writes before idempotency replay/pruning. Old clients
+    // must explicitly upgrade; never fetch a fresh revision on their behalf.
+    if (request.routeOptions.config.requireExpectedRevision) {
+      const expected = (request.body as { expectedRevision?: unknown } | undefined)?.expectedRevision;
+      if (expected === undefined) return reply.code(428).send(apiError("precondition_required", "请更新小程序客户端并重新打开课堂表现，读取最新版本后再保存"));
+    }
+
     if (isBackofficePath(request.url) || !isMutatingMethod(request.method) || request.routeOptions.config.disableHttpIdempotency) {
       return;
     }
@@ -151,7 +158,7 @@ function headerValue(value: string | string[] | undefined): string | undefined {
 }
 
 declare module "fastify" {
-  interface FastifyContextConfig { disableHttpIdempotency?: boolean; }
+  interface FastifyContextConfig { disableHttpIdempotency?: boolean; requireExpectedRevision?: boolean; }
   interface FastifyRequest {
     idempotency?: {
       cacheKey: string;

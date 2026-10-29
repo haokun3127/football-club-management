@@ -1562,12 +1562,17 @@ export async function getCoachTrainingContentAssessments(eventId: string): Promi
 export async function saveCoachTrainingContentAssessments(
   eventId: string,
   assessments: Array<Pick<CoachTrainingContentAssessment, "studentId" | "trainingProjectId" | "score" | "note">>,
-): Promise<{ eventId: string; assessments: CoachTrainingContentAssessment[] }> {
+  expectedRevision?: number,
+): Promise<{ eventId: string; revision: number; assessments: CoachTrainingContentAssessment[] }> {
+  if (typeof expectedRevision !== "number" || !Number.isSafeInteger(expectedRevision) || expectedRevision < 0) {
+    const message = "请更新小程序客户端并重新打开课堂表现，读取最新版本后再保存";
+    throw { code: "precondition_required", message, userMessage: message, statusCode: 428, errorType: "precondition_required" };
+  }
   const context = requireContext();
-  return request<{ eventId: string; assessments: CoachTrainingContentAssessment[] }>({
+  return request<{ eventId: string; revision: number; assessments: CoachTrainingContentAssessment[] }>({
     method: "PUT",
     path: `/clubs/${context.clubId}/app-clients/${context.clientId}/coach/events/${eventId}/training-content-assessments`,
-    data: { assessments },
+    data: { expectedRevision, assessments },
     expectedStatus: 200,
     idempotent: true,
   });

@@ -1,11 +1,42 @@
 import type { EntityId } from "@football-club/domain";
-import type { TrainingContentAssessment } from "../data-capability/types.js";
+import type { TrainingContentAssessment, TrainingContentAssessmentSnapshot, TrainingContentAssessmentBatchResult } from "../data-capability/types.js";
 import type { DatabaseSync, SQLInputValue } from "node:sqlite";
+import { transaction } from "./transaction.js";
 
 type SqlRow = Record<string, unknown>;
 
 export class TrainingContentAssessmentRepository {
   constructor(private readonly database: DatabaseSync) {}
+
+  snapshot(clubId: EntityId, eventId: EntityId): TrainingContentAssessmentSnapshot {
+    // One SQLite statement: revision and rows must describe the same snapshot,
+    // including when another process commits between ordinary SELECT calls.
+    const rows = this.database.prepare(`
+      SELECT a.*, COALESCE(r.revision, 0) AS event_revision
+      FROM (SELECT ? AS club_id, ? AS event_id) scope
+      LEFT JOIN training_content_assessment_revisions r
+        ON r.club_id = scope.club_id AND r.event_id = scope.event_id
+      LEFT JOIN training_content_assessments a
+        ON a.club_id = scope.club_id AND a.event_id = scope.event_id
+      ORDER BY a.student_id, a.training_project_id
+    `).all(clubId, eventId) as SqlRow[];
+    return { revision: Number(rows[0]!.event_revision), assessments: rows.filter(row => typeof row.id === "string").map(mapTrainingContentAssessment) };
+  }
+
+  compareAndSave(clubId: EntityId, eventId: EntityId, expectedRevision: number, assessments: TrainingContentAssessment[]): Promise<TrainingContentAssessmentBatchResult> {
+    return transaction(this.database, async () => {
+      const current = this.snapshot(clubId, eventId);
+      if (current.revision !== expectedRevision) return { conflict: true, revision: current.revision };
+      const changed = this.database.prepare(`
+        INSERT INTO training_content_assessment_revisions (club_id, event_id, revision) VALUES (?, ?, 1)
+        ON CONFLICT(club_id, event_id) DO UPDATE SET revision = revision + 1 WHERE revision = ?
+        RETURNING revision
+      `).get(clubId, eventId, expectedRevision);
+      if (!changed) return { conflict: true, revision: this.snapshot(clubId, eventId).revision };
+      const saved = assessments.map(assessment => this.save(assessment));
+      return { conflict: false, revision: Number(changed.revision), assessments: saved };
+    });
+  }
 
   listByClub(clubId: EntityId): TrainingContentAssessment[] {
     const rows = this.database.prepare(`

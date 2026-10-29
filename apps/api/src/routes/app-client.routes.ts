@@ -441,13 +441,14 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       const scope = await resolveTrainingContentAssessmentScope(context, reply, request.params.clubId, request.params.eventId);
       if (!scope) return reply;
 
+      reply.header("Cache-Control", "no-store");
       return {
         clubId: request.params.clubId,
         client: summarizeClient(client),
         eventId: request.params.eventId,
         selectedProjectIds: [...scope.selectedProjectIds],
         presentStudentIds: [...scope.presentStudentIds],
-        assessments: await context.store.listTrainingContentAssessments(request.params.clubId, request.params.eventId),
+        ...await context.store.getTrainingContentAssessmentSnapshot(request.params.clubId, request.params.eventId),
       };
     },
   );
@@ -455,11 +456,13 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
   app.put<{
     Params: { clubId: string; clientId: string; eventId: string };
     Body: {
+      expectedRevision: number;
       assessments: Array<{ studentId: string; trainingProjectId: string; score: number; note?: string }>;
     };
   }>(
     "/clubs/:clubId/app-clients/:clientId/coach/events/:eventId/training-content-assessments",
     {
+      config: { requireExpectedRevision: true },
       schema: {
         ...schemas.appClientEventParams,
         ...schemas.appClientTrainingContentAssessmentsUpdate,
@@ -480,8 +483,8 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         .find((coach) => coach.userId === auth?.user.id)?.id
         ?? "coach-1";
       const now = new Date().toISOString();
-      const assessments = [];
 
+      // Validate the complete request before any row is written.
       for (const input of request.body.assessments) {
         if (!scope.selectedProjectIds.has(input.trainingProjectId)) {
           return context.sendError(reply, 400, "invalid_training_project", "Training content is not selected for this event");
@@ -489,7 +492,8 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         if (!scope.presentStudentIds.has(input.studentId)) {
           return context.sendError(reply, 400, "student_not_present", "Only present students can receive a training-content assessment");
         }
-        assessments.push(await context.store.saveTrainingContentAssessment({
+      }
+      const assessments = request.body.assessments.map(input => ({
           id: `training-content-assessment-${crypto.randomUUID()}`,
           clubId: request.params.clubId,
           eventId: request.params.eventId,
@@ -502,13 +506,15 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
           createdAt: now,
           updatedAt: now,
         }));
-      }
+      const result = await context.store.saveTrainingContentAssessmentBatch(request.params.clubId, request.params.eventId, request.body.expectedRevision, assessments);
+      if (result.conflict) return context.sendError(reply, 409, "training_assessment_revision_conflict", "课堂表现已被其他客户端更新，请保留输入并重新读取核对", [{ revision: result.revision }]);
 
       return {
         clubId: request.params.clubId,
         client: summarizeClient(client),
         eventId: request.params.eventId,
-        assessments,
+        revision: result.revision,
+        assessments: result.assessments,
       };
     },
   );

@@ -302,6 +302,8 @@ export interface CoachTrainingContentAssessment {
 
 export interface CoachTrainingContentAssessmentScope {
   eventId: string;
+  /** Absent only on an older service; writes must then stay disabled. */
+  revision?: number;
   selectedProjectIds: string[];
   presentStudentIds: string[];
   assessments: CoachTrainingContentAssessment[];

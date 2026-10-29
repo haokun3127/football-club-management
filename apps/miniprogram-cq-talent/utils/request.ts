@@ -12,7 +12,8 @@ export type ApiErrorType =
   | "server_error"
   | "http_error"
   | "unexpected_status"
-  | "runtime_not_configured";
+  | "runtime_not_configured"
+  | "precondition_required";
 
 export interface ApiError {
   code: string;
@@ -35,12 +36,14 @@ const USER_MESSAGES: Record<ApiErrorType, string> = {
   http_error: "请求失败，请重试",
   unexpected_status: "服务返回了意外的响应，请重试",
   runtime_not_configured: "当前环境尚未配置服务地址，请重新打开小程序",
+  precondition_required: "请更新小程序客户端并重新打开页面，读取最新版本后再保存",
 };
 
 function httpErrorType(statusCode: number): ApiErrorType {
   if (statusCode === 401) return "unauthorized";
   if (statusCode === 403) return "forbidden";
   if (statusCode === 409) return "conflict";
+  if (statusCode === 428) return "precondition_required";
   if (statusCode >= 500) return "server_error";
   return "http_error";
 }

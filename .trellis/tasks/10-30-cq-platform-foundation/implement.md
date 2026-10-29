@@ -57,3 +57,10 @@
 - 从真实保存/发布审计探针移植期望正确结果的回归，先失败：growth latest100而非60；内存同毫秒也取旧ID。
 - 仓储同occurred_at按created_at、SQLite追加rowid倒序；内存按同等发生/记录/追加顺序输出，getStudentMetrics复用canonical顺序，避免按无补零ID猜时间。没有改分、删除历史或改变草稿可见性。
 - Node24 `vitest run test/assessment-record-order.test.ts test/assessment-workflow.test.ts test/assessment-workflow-repository.test.ts`：3文件21通过，覆盖9901→10000、精确同毫秒、文件重开、100→60确认后真实家长GET、修订未确认仍旧值。API typecheck通过。
+
+### A03/A04 原子保存与并发合同
+- 先跑6项期望正确行为的测试全部失败，确认后行非法400/数据库故障500时前行已落库、两个快照静默覆盖、旧写仍200。
+- 新迁移0046保存事件级revision；GET单SQL快照/no-store；PUT全部行先校验，事务队列内CAS与全批写入，失败回滚。旧无版本请求在幂等hook前428，零存储改动。
+- 准确公共签名、升级例外和响应未知重试规则见classroom-client-contract.md。无新增业务requestId；沿用request生成的幂等key，原payload+expectedRevision重试；缓存过期仍由CAS阻止覆盖。
+- 定向API batch/persistence/server 3文件81项通过；最新batch再补真实第二教练身份，6项通过。公共API/request/课堂运输3文件48项通过；API与小程序类型通过。
+- 后续按总控新指令：CAS独立提交后，在现有后台账号入口提供安全版本信息，并新增小程序公共version-info折叠诊断组件。只显式展开/刷新读取服务版本，角色pages由各自owner注册，不新增路由。随后跑当前整包交付门禁和实际UI渲染。

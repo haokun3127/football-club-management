@@ -43,6 +43,26 @@ const flexibleObject = {
   additionalProperties: true,
 } as const;
 
+const trainingContentAssessmentResponse = {
+  clubId: { type: "string" },
+  client: flexibleObject,
+  eventId: { type: "string" },
+  revision: { type: "integer", minimum: 0 },
+  assessments: {
+    type: "array",
+    items: {
+      type: "object", additionalProperties: false,
+      required: ["id", "clubId", "eventId", "studentId", "trainingProjectId", "score", "assessedByCoachId", "assessedAt", "createdAt", "updatedAt"],
+      properties: {
+        id: { type: "string" }, clubId: { type: "string" }, eventId: { type: "string" },
+        studentId: { type: "string" }, trainingProjectId: { type: "string" },
+        score: { type: "integer", minimum: 0, maximum: 100 }, note: { type: "string" },
+        assessedByCoachId: { type: "string" }, assessedAt: { type: "string" }, ...auditFields,
+      },
+    },
+  },
+} as const;
+
 const appRole = {
   type: "string",
   enum: ["parent", "coach"],
@@ -1025,7 +1045,15 @@ export const schemas = {
   },
   appClientTrainingContentAssessments: {
     response: {
-      200: { type: "object", additionalProperties: true },
+      200: {
+        type: "object", additionalProperties: false,
+        required: ["clubId", "client", "eventId", "revision", "assessments", "selectedProjectIds", "presentStudentIds"],
+        properties: {
+          ...trainingContentAssessmentResponse,
+          selectedProjectIds: { type: "array", items: { type: "string" } },
+          presentStudentIds: { type: "array", items: { type: "string" } },
+        },
+      },
       400: errorResponse,
       403: errorResponse,
       404: errorResponse,
@@ -1037,6 +1065,8 @@ export const schemas = {
       additionalProperties: false,
       required: ["assessments"],
       properties: {
+        // Runtime precondition returns 428 for old clients, rather than AJV's generic 400.
+        expectedRevision: { type: "integer", minimum: 0, maximum: 9007199254740991, description: "Required write precondition from GET revision; omission returns 428 without writing" },
         assessments: {
           type: "array",
           minItems: 1,
@@ -1056,10 +1086,13 @@ export const schemas = {
       },
     },
     response: {
-      200: { type: "object", additionalProperties: true },
+      200: { type: "object", additionalProperties: false, required: ["clubId", "client", "eventId", "revision", "assessments"], properties: trainingContentAssessmentResponse },
       400: errorResponse,
       403: errorResponse,
       404: errorResponse,
+      409: errorResponse,
+      428: errorResponse,
+      500: errorResponse,
     },
   },
   appClientCoachHome: {

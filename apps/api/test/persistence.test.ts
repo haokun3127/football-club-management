@@ -48,6 +48,7 @@ describe("platform persistence", () => {
         url: `${base}/training-content-assessments`,
         headers,
         payload: {
+          expectedRevision: 0,
           assessments: [{
             studentId: "student-1",
             trainingProjectId: "drill-cq-talent-assessment-001",
@@ -74,6 +75,10 @@ describe("platform persistence", () => {
       );
       const reread = await reopenedApp.inject({ method: "GET", url: `${base}/training-content-assessments`, headers: { "x-user-id": "user-coach-1" } });
       expect(reread.statusCode).toBe(200);
+      expect(reread.json().revision).toBe(1);
+      const stale = await reopenedApp.inject({ method: "PUT", url: `${base}/training-content-assessments`, headers, payload: { expectedRevision: 0, assessments: [{ studentId: "student-1", trainingProjectId: "drill-cq-talent-assessment-001", score: 10 }] } });
+      expect(stale.statusCode).toBe(409);
+      expect((await reopenedApp.inject({ method: "GET", url: `${base}/training-content-assessments`, headers })).json()).toEqual(reread.json());
       expect((reread.json() as { assessments: Array<{ score: number; note?: string }> }).assessments).toEqual([
         expect.objectContaining({ score: 91, note: "重启验证" }),
       ]);
@@ -675,6 +680,7 @@ describe("platform persistence", () => {
       "0043_backoffice_import_secrets.sql",
       "0044_app_client_role_preferences.sql",
       "0045_training_games.sql",
+      "0046_training_content_assessment_revisions.sql",
     ]);
     expect(second.applied).toEqual([]);
     expect(second.skipped).toEqual(first.applied);
@@ -719,6 +725,7 @@ describe("platform persistence", () => {
           ,'training_sessions'
           ,'match_rosters'
           ,'training_content_assessments'
+          ,'training_content_assessment_revisions'
           ,'assessment_tasks'
         )
       ORDER BY name
@@ -759,6 +766,7 @@ describe("platform persistence", () => {
       "student_guardian_bindings",
       "student_operational_profiles",
       "tactical_boards",
+      "training_content_assessment_revisions",
       "training_content_assessments",
       "training_sessions",
     ]);
