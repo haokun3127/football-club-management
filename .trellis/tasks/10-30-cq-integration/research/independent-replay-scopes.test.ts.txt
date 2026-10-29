@@ -1,0 +1,97 @@
+import {it,expect} from 'vitest';
+import {createSeedData} from '../src/seed.js';
+import {createPlatformPersistence} from '../src/persistence/platform-persistence.js';
+import {PersistentApiStore} from '../src/store.js';
+import {HeaderMembershipResolver} from '../src/auth/context.js';
+import {buildServer} from '../src/server.js';
+const clubId='club-chongqing-talent';
+const headers={'x-user-id':'user-coach-1'};
+const base=`/clubs/${clubId}/app-clients/app-client-cq-talent-wechat-main/coach/training-content`;
+async function fixture(assistant=false){
+ const seed=createSeedData(),team=seed.teams.find(t=>t.id==='team-u10-dev')!,source=seed.events.find(e=>e.id==='event-training-1')!;
+ if(assistant){seed.users.push({...seed.users.find(u=>u.id==='user-coach-1')!,id:'audit-assistant-user'});seed.coaches.push({...seed.coaches.find(c=>c.id==='coach-1')!,id:'audit-assistant',userId:'audit-assistant-user'});seed.clubMemberships.push({...seed.clubMemberships.find(m=>m.userId==='user-coach-1'&&m.clubId===clubId)!,id:'audit-assistant-member',userId:'audit-assistant-user'});}
+ seed.teams.push({...team,id:'audit-target-team',name:'Audit target team',defaultCoachId:undefined});
+ seed.events.push({...source,id:'audit-target-course',title:'Audit private target',primaryTeamId:'audit-target-team',status:'scheduled',timeRange:{startsAt:'2099-10-01T09:00:00Z',endsAt:'2099-10-01T10:00:00Z'}});
+ const p=await createPlatformPersistence({databasePath:':memory:',seedData:seed});const store=new PersistentApiStore(p.repositories,seed);
+ store.saveCoachAssignment({id:'audit-target-assignment',clubId,coachId:'coach-1',teamId:'audit-target-team',role:'head_coach',createdAt:'2026-10-30T00:00:00Z',updatedAt:'2026-10-30T00:00:00Z'});
+ store.ensureTrainingSessionForEvent(clubId,'audit-target-course',{sessionPlanId:'session-plan-finishing'});
+ if(assistant)store.saveCoachAssignment({id:'audit-assistant-assignment',clubId,coachId:'audit-assistant',teamId:'team-u10-dev',role:'assistant_coach',createdAt:'2026-10-30T00:00:00Z',updatedAt:'2026-10-30T00:00:00Z'});
+ const app=buildServer(store,{logger:false,membershipResolver:new HeaderMembershipResolver(p.repositories.users,p.repositories.memberships)});
+ return {p,store,app};
+}
+it('audit never replays target details after target planning scope is removed from a template preview',async()=>{
+ const {p,store,app}=await fixture();
+ try{
+  const request={method:'POST' as const,url:base+'/preview',headers:{...headers,'idempotency-key':'audit-preview-target'},payload:{sourceEventId:'event-training-1'}};
+  const first=await app.inject(request);expect(first.statusCode).toBe(200);expect(first.json().targets.some((t:any)=>t.eventId==='audit-target-course')).toBe(true);
+  store.removeCoachAssignment(clubId,'audit-target-team','coach-1');
+  const current=await app.inject({...request,headers});expect(current.statusCode).toBe(200);expect(current.json().targets.some((t:any)=>t.eventId==='audit-target-course')).toBe(false);
+  const replay=await app.inject(request);
+  expect(replay.statusCode).toBe(403);
+ }finally{await app.close();p.database.close();}
+},15000);
+it('audit preserves authorized template apply replay before revision checks and rejects a revoked target',async()=>{
+ const {p,store,app}=await fixture();
+ try{
+  const preview=await app.inject({method:'POST',url:base+'/preview',headers,payload:{sourceEventId:'event-training-1'}});expect(preview.statusCode).toBe(200);
+  const target=preview.json().targets.find((t:any)=>t.eventId==='audit-target-course');
+  const request={method:'POST' as const,url:base+'/apply',headers:{...headers,'idempotency-key':'audit-apply-target'},payload:{sourceEventId:'event-training-1',sourceRevision:preview.json().source.revision,targets:[{eventId:target.eventId,expectedRevision:target.revision,action:'replace'}]}};
+  const first=await app.inject(request);expect(first.statusCode).toBe(200);expect(first.json().results[0].status).toBe('applied');
+  const after=store.getTrainingSessionByEvent(clubId,target.eventId);
+  const replay=await app.inject(request);expect(replay.statusCode).toBe(200);expect(replay.headers['idempotency-status']).toBe('replayed');expect(replay.json()).toEqual(first.json());expect(store.getTrainingSessionByEvent(clubId,target.eventId)).toEqual(after);
+  store.removeCoachAssignment(clubId,'audit-target-team','coach-1');
+  const denied=await app.inject(request);expect(denied.statusCode).toBe(403);expect(store.getTrainingSessionByEvent(clubId,target.eventId)).toEqual(after);
+ }finally{await app.close();p.database.close();}
+},15000);
+
+it('audit replays an authorized successful task creation after live roster changes without creating another task',async()=>{
+ const {vi}=await import('vitest');vi.stubEnv('FCM_ASSESSMENT_PUBLICATION_CLUBS',clubId);
+ const {p,store,app}=await fixture();
+ try{
+  const url=`/clubs/${clubId}/app-clients/app-client-cq-talent-wechat-main/coach/assessment-tasks`;
+  const request={method:'POST' as const,url,headers:{...headers,'idempotency-key':'audit-task-create-retry'},payload:{title:'Audit frozen roster retry',templateId:'assessment-template-technical',teamId:'team-u10-dev',termLabel:'2026',startsOn:'2020-01-01',dueOn:'2099-12-31',studentIds:['student-1']}};
+  const first=await app.inject(request);expect(first.statusCode).toBe(201);expect(first.json().task.studentIds).toEqual(['student-1']);
+  const count=(await store.listAssessmentTasks(clubId)).length;
+  const member=store.listTeamMembers(clubId).find(m=>m.teamId==='team-u10-dev'&&m.studentId==='student-1')!;
+  store.saveTeamMember({...member,status:'inactive'});
+  const existing=await app.inject({method:'GET',url:url+'/'+first.json().task.id+'/workflow',headers});
+  expect(existing.statusCode).toBe(200);expect(existing.json().students.some((s:any)=>s.studentId==='student-1')).toBe(true);
+  const replay=await app.inject(request);
+  expect(replay.statusCode).toBe(201);expect(replay.headers['idempotency-status']).toBe('replayed');expect(replay.json()).toEqual(first.json());
+  expect((await store.listAssessmentTasks(clubId)).length).toBe(count);
+  const fresh=await app.inject({...request,headers:{...headers,'idempotency-key':'audit-task-create-new-key'}});expect(fresh.statusCode).toBe(400);expect(fresh.json().error.code).toBe('invalid_task_students');expect((await store.listAssessmentTasks(clubId)).length).toBe(count);
+ }finally{await app.close();p.database.close();vi.unstubAllEnvs();}
+},15000);
+
+it('audit replays an authorized publication without replacing a later revision and rechecks current dynamic roster scope',async()=>{
+ const {vi}=await import('vitest');const {assessmentWorkflow}=await import('../src/application/assessment-workflow.js');vi.stubEnv('FCM_ASSESSMENT_PUBLICATION_CLUBS',clubId);
+ const {p,store,app}=await fixture();
+ try{
+  const item=store.listAssessmentTestItems(clubId).find(i=>i.id.startsWith('assessment-test-cq-talent-'))!;
+  const task={id:'audit-publication-replay',clubId,teamId:'team-u10-dev',templateId:'assessment-template-technical',testItemIds:[item.id],termLabel:'2026',title:'Audit publication',startsOn:'2020-01-01',dueOn:'2099-12-31'};
+  await store.saveAssessmentTask(task);const workflow=assessmentWorkflow(store);
+  const save=(revision:number,score:number,reason?:string)=>workflow.save(task,'student-1','coach-1',{expectedRevision:revision,reason,entries:[{testItemId:item.id,eventId:'event-training-1',value:{kind:'score_0_100',score}}]});
+  await save(0,70);
+  const request={method:'POST' as const,url:`/clubs/${clubId}/app-clients/app-client-cq-talent-wechat-main/coach/assessment-tasks/${task.id}/publications`,headers:{...headers,'idempotency-key':'audit-original-publication'},payload:{students:[{studentId:'student-1',expectedRevision:1}]}};
+  const first=await app.inject(request);expect(first.statusCode).toBe(200);expect(first.json().results[0].success).toBe(true);
+  await save(1,80,'核对更正');const next=await app.inject({...request,headers:{...headers,'idempotency-key':'audit-next-publication'},payload:{students:[{studentId:'student-1',expectedRevision:2}]}});expect(next.json().results[0].success).toBe(true);
+  const before=store.getStudentMetrics(clubId,'student-1');const count=(await store.listPlayerAssessments(clubId)).length;
+  const replay=await app.inject(request);expect(replay.statusCode).toBe(200);expect(replay.headers['idempotency-status']).toBe('replayed');expect(replay.json()).toEqual(first.json());expect(store.getStudentMetrics(clubId,'student-1')).toEqual(before);expect((await store.listPlayerAssessments(clubId)).length).toBe(count);expect(before.find(r=>r.metricId===item.metricId)?.value).toEqual({kind:'score_0_100',score:80});
+  const member=store.listTeamMembers(clubId).find(m=>m.teamId===task.teamId&&m.studentId==='student-1')!;store.saveTeamMember({...member,status:'inactive'});
+  expect((await app.inject(request)).statusCode).toBe(403);expect((await store.listPlayerAssessments(clubId)).length).toBe(count);
+ }finally{await app.close();p.database.close();vi.unstubAllEnvs();}
+},15000);
+
+it('audit rejects cached task creation after team authorization or bearer revocation',async()=>{
+ const {vi}=await import('vitest');const {SessionRegistry}=await import('../src/auth/session-registry.js');vi.stubEnv('FCM_ASSESSMENT_PUBLICATION_CLUBS',clubId);
+ const {p,store,app}=await fixture(true);
+ try{
+  const sessions=new SessionRegistry(p.repositories.appClientSessions);const token=await sessions.create({clubId,appClientId:'app-client-cq-talent-wechat-main',userId:'audit-assistant-user',membershipId:'audit-assistant-member',activeRole:'coach'});
+  const request={method:'POST' as const,url:`/clubs/${clubId}/app-clients/app-client-cq-talent-wechat-main/coach/assessment-tasks`,headers:{authorization:`Bearer ${token.token}`,'idempotency-key':'audit-task-authority'},payload:{title:'Audit authority retry',templateId:'assessment-template-technical',teamId:'team-u10-dev',termLabel:'2026',startsOn:'2020-01-01',dueOn:'2099-12-31',studentIds:['student-1']}};
+  const first=await app.inject(request);expect(first.statusCode).toBe(201);const count=store.listAssessmentTasks(clubId).length;
+  store.removeCoachAssignment(clubId,'team-u10-dev','audit-assistant');expect((await app.inject(request)).statusCode).toBe(403);
+  store.saveCoachAssignment({id:'audit-assistant-assignment',clubId,coachId:'audit-assistant',teamId:'team-u10-dev',role:'assistant_coach',createdAt:'2026-10-30T00:00:00Z',updatedAt:'2026-10-30T00:00:00Z'});
+  const allowed=await app.inject(request);expect(allowed.statusCode).toBe(201);expect(allowed.headers['idempotency-status']).toBe('replayed');
+  await sessions.revoke(token.token);expect((await app.inject(request)).statusCode).toBe(401);expect(store.listAssessmentTasks(clubId).length).toBe(count);
+ }finally{await app.close();p.database.close();vi.unstubAllEnvs();}
+},15000);

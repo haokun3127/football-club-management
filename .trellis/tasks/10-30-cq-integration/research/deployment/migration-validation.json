@@ -1,0 +1,19 @@
+{
+  "environment": "develop",
+  "sourceRevision": "03ef461d3c190c273acbbbbd61bdac921f4ea37c",
+  "imageId": "sha256:c8d431b74cfbd9020960afea05a16dd435fdd59064bb8e71df3a236e9f9daa48",
+  "backupDirectory": "/opt/cq-talent-nonproduction/backups/cq-03ef461d3c19-20261030",
+  "backupMethod": "SQLite online backup",
+  "cloneOnly": true,
+  "integrity": "ok",
+  "foreignKeyErrors": 0,
+  "migrationsBefore": 45,
+  "migrationsAfter": 46,
+  "unchangedExistingTables": 105,
+  "changedTables": [
+    "schema_migrations"
+  ],
+  "addedEmptyTables": [
+    "training_content_assessment_revisions"
+  ]
+}

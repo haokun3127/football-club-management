@@ -1,0 +1,31 @@
+{
+  "sourceRevision": "03ef461d3c190c273acbbbbd61bdac921f4ea37c",
+  "nativeDevTools": true,
+  "physicalDevice": false,
+  "actualRoleSwitchTap": true,
+  "route": "pages/coach/schedule/index",
+  "state": "ready",
+  "calendarState": "ready",
+  "eventCount": 1,
+  "taskCount": 2,
+  "classroom": {
+    "actualCardTap": true,
+    "route": "pages/coach/event/index",
+    "state": "ready",
+    "dataKeys": [
+      "eventId",
+      "eventTypeLabel",
+      "eventView",
+      "assessmentTemplateId",
+      "hasAssessmentTemplate",
+      "gameSources",
+      "friendlyGames",
+      "gamesMessage",
+      "gamesLoading",
+      "courseTasks",
+      "courseTodoCount",
+      "courseTaskMessage",
+      "courseTasksState"
+    ]
+  }
+}

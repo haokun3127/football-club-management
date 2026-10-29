@@ -1,0 +1,21 @@
+{
+  "sourceRevision": "03ef461d3c190c273acbbbbd61bdac921f4ea37c",
+  "runId": 40934617216,
+  "url": "https://github.com/haokun3127/football-club-management/actions/runs/40934617216",
+  "conclusion": "success",
+  "command": "pnpm check:delivery",
+  "tests": {
+    "domain": 47,
+    "api": 282,
+    "backoffice": 8,
+    "miniprogram": 836,
+    "skippedExisting": 1
+  },
+  "deliveryScripts": 14,
+  "isolatedEnvironmentStartup": [
+    "develop",
+    "trial",
+    "release"
+  ],
+  "note": "GitHub clean checkout counts; local API285 included3 generated duplicate tests."
+}

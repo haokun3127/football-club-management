@@ -1,0 +1,15 @@
+{
+  "sourceRevision": "03ef461d3c190c273acbbbbd61bdac921f4ea37c",
+  "nativeDevTools": true,
+  "physicalDevice": false,
+  "mode": "parent",
+  "route": "pages/parent/home/index",
+  "state": "ready",
+  "children": 2,
+  "calendarState": "ready",
+  "trainingState": "ready",
+  "growthState": "ready",
+  "presentationLoaded": true,
+  "nextEventType": "training",
+  "hasNextEvent": true
+}

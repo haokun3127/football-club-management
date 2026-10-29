@@ -1,0 +1,1 @@
+{"environment":"develop","comparison":"server-only, read-only, migrated backup versus live","tableCount":107,"unchangedTableCount":102,"changedTableNames":["app_client_role_preferences","app_client_sessions","backoffice_login_attempts","backoffice_sessions","schema_migrations"],"integrity":"ok","foreignKeyErrors":0,"rowDataExported":false,"rowHashesExported":false}

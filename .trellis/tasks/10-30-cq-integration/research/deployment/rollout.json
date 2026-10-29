@@ -1,0 +1,50 @@
+{
+  "sourceRevision": "03ef461d3c190c273acbbbbd61bdac921f4ea37c",
+  "imageId": "sha256:c8d431b74cfbd9020960afea05a16dd435fdd59064bb8e71df3a236e9f9daa48",
+  "health": {
+    "status": "ok",
+    "service": "@football-club/api",
+    "environment": "develop",
+    "build": {
+      "sourceRevision": "03ef461d3c190c273acbbbbd61bdac921f4ea37c",
+      "buildId": "develop-20261030-03ef461d3c19",
+      "builtAt": "2026-10-29T18:51:12.742Z"
+    }
+  },
+  "containers": [
+    {
+      "name": "/cq-talent-nonproduction-develop-1",
+      "id": "dc32120ca0e52c0afe2898c7d01f61363c3229b4a79348c15f45bf871f5d529d",
+      "imageId": "sha256:c8d431b74cfbd9020960afea05a16dd435fdd59064bb8e71df3a236e9f9daa48",
+      "running": true,
+      "unchanged": false
+    },
+    {
+      "name": "/cq-talent-nonproduction-trial-1",
+      "id": "b2e517305a9fc1015d309cecd873057e2a1055e7fde388b057fcbc6288acf952",
+      "imageId": "sha256:aed831fd6fa1b103ffb30534a5f72fe79f2569ed6ca405ba52b3dc248a56981a",
+      "running": true,
+      "unchanged": true
+    },
+    {
+      "name": "/cq-talent-api",
+      "id": "e9fde0292b285db1221e86027ea855fd1927f64276f7741ba6c723eeac1c579d",
+      "imageId": "sha256:cff8ce30dc02b427a91a813b0a900a3c5ba25b6d0101d60ef59e9e03184ed459",
+      "running": true,
+      "unchanged": true
+    }
+  ],
+  "migrationsApplied": [
+    "0046_training_content_assessment_revisions.sql"
+  ],
+  "unchangedExistingTables": 105,
+  "changedTables": [
+    "schema_migrations"
+  ],
+  "integrity": "ok",
+  "foreignKeyErrors": 0,
+  "backofficeHttpVerified": true,
+  "nativeParentCoachReadbackVerified": true,
+  "physicalDeviceVerified": false,
+  "wechatUploaded": false
+}

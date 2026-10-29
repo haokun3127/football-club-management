@@ -1,0 +1,22 @@
+{
+  "sourceRevision": "03ef461d3c190c273acbbbbd61bdac921f4ea37c",
+  "nativeDevTools": true,
+  "physicalDevice": false,
+  "actualCalendarDateTap": true,
+  "date": "2026-10-25",
+  "actualEventTap": true,
+  "route": "pages/coach/event/index",
+  "state": "ready",
+  "gameSources": 1,
+  "friendlyGames": 2,
+  "gamesMessage": "",
+  "game": {
+    "actualRecordTap": true,
+    "route": "pages/coach/training-game/index",
+    "state": "ready",
+    "gameState": "voided",
+    "revision": 5,
+    "primaryText": "完成记录",
+    "participantCount": 2
+  }
+}

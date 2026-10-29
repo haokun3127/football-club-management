@@ -1,0 +1,16 @@
+{
+  "sourceRevision": "03ef461d3c190c273acbbbbd61bdac921f4ea37c",
+  "nativeDevTools": true,
+  "physicalDevice": false,
+  "actualCalendarAndRecordTaps": true,
+  "route": "pages/coach/training-game/index",
+  "state": "ready",
+  "gameState": "completed",
+  "revision": 5,
+  "primaryText": "保存修订",
+  "readOnly": false,
+  "scoreA": 2,
+  "scoreB": 1,
+  "participantCount": 3,
+  "businessWrite": false
+}
