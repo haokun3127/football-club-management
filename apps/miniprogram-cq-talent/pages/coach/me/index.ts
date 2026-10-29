@@ -1,3 +1,4 @@
+import { MARKED_ATTENDANCE_LABEL, MARKED_ATTENDANCE_EXPLANATION } from "../participation-summary";
 import { getCoachHome, getCoachTeam, switchActiveRole } from "../../../utils/api";
 import { requireRole, routeHome } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
@@ -17,6 +18,7 @@ interface PageData {
   teamsText: string;
   hasTeams: boolean;
   profileStats: ProfileStat[];
+  profileStatsHint: string;
   canSwitchToParent: boolean;
 }
 
@@ -52,7 +54,8 @@ Page<PageData>({
         avatarLetter: displayName.slice(0, 1),
         teamsText: currentTeamName,
         hasTeams: Boolean(teamDetail.team),
-        profileStats: toProfileStats(home.summary, teamDetail.stats),
+        profileStatsHint: MARKED_ATTENDANCE_EXPLANATION,
+    profileStats: toProfileStats(home.summary, teamDetail.stats),
         canSwitchToParent: session.availableRoles.includes("parent"),
       });
     } catch {
@@ -114,6 +117,7 @@ function emptyPageData(state: LoadState, message: string): PageData {
     avatarLetter: "教",
     teamsText: "暂无负责球队",
     hasTeams: false,
+    profileStatsHint: MARKED_ATTENDANCE_EXPLANATION,
     profileStats: toProfileStats({ total: 0 }, { memberCount: 0, attendanceRate: null }),
     canSwitchToParent: false,
   };
@@ -143,7 +147,7 @@ function toProfileStats(
   return [
     { label: "近30天日程", value: String(summary.total) },
     { label: "在队学员", value: String(teamStats.memberCount) },
-    { label: "平均出勤", value: teamStats.attendanceRate === null ? "待同步" : `${teamStats.attendanceRate}%` },
+    { label: MARKED_ATTENDANCE_LABEL, value: teamStats.attendanceRate === null ? "暂无记录" : `${teamStats.attendanceRate}%` },
   ];
 }
 

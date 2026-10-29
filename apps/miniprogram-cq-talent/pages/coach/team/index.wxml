@@ -13,6 +13,7 @@
             <view class="hero-stat__value {{item.valueClass}}">{{item.value}}</view>
           </view>
         </view>
+        <view class="hero-stat-hint">{{heroStatsHint}}</view>
       </view>
 
       <view wx:if="{{section === 'all' || section === 'matches'}}" class="matches-section">

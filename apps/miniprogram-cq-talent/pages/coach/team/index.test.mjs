@@ -80,7 +80,7 @@ describe("coach team detail", () => {
       heroStats: [
         { label: "在队人数", value: "--", valueClass: "" },
         { label: "累计训练", value: "--", valueClass: "" },
-        { label: "出勤率", value: "--", valueClass: "" },
+        { label: "点名到场占比", value: "--", valueClass: "" },
       ],
     });
   });
@@ -104,7 +104,7 @@ describe("coach team detail", () => {
       heroStats: [
         { label: "在队人数", value: "0", valueClass: "" },
         { label: "累计训练", value: "3", valueClass: "" },
-        { label: "出勤率", value: "--", valueClass: "" },
+        { label: "点名到场占比", value: "--", valueClass: "" },
       ],
     });
   });
@@ -119,7 +119,7 @@ describe("coach team detail", () => {
     expect(page.data.heroStats).toEqual([
       { label: "在队人数", value: "1", valueClass: "" },
       { label: "累计训练", value: "3", valueClass: "" },
-      { label: "出勤率", value: "95%", valueClass: "hero-stat__value--positive" },
+      { label: "点名到场占比", value: "95%", valueClass: "hero-stat__value--positive" },
     ]);
     expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/student-radar/index?student=student-1&team=team-1");
     expect(mocks.openPage).toHaveBeenCalledTimes(1);
@@ -209,4 +209,8 @@ it("keeps two games in one training course distinct and links their stable IDs",
  expect(p.data.visibleMatches.map(item=>item.key)).toEqual(["training_friendly:g1","training_friendly:g2"]);
  p.openMatch({currentTarget:{dataset:{id:"training_friendly:g2"}}});expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/training-game/index?eventId=shared-course&gameId=g2");
  p.selectMatchFilter({currentTarget:{dataset:{kind:"formal"}}});expect(p.data.visibleMatches).toEqual([]);
+  it("preserves zero and team counts while identifying the attendance ratio as marked records", async () => {
+    const detail=await mocks.getCoachTeam();mocks.getCoachTeam.mockResolvedValue({...detail,stats:{...detail.stats,attendanceRate:0}});const p=createPageInstance();await p.load();expect(p.data.heroStats.find(stat=>stat.label==="点名到场占比").value).toBe("0%");expect(p.data.heroStatsHint).toContain("与训练计次分别统计");expect(p.data.heroStats).toHaveLength(3);
+  });
+
 });

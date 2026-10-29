@@ -27,6 +27,7 @@
             <view class="c16-profile__stat-value">{{item.value}}</view>
           </view>
         </view>
+        <view class="c16-profile__stat-hint">{{profileStatsHint}}</view>
       </view>
 
       <view wx:if="{{canSwitchToParent}}" class="c16-role-switch" bindtap="switchToParent">

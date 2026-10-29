@@ -1,3 +1,4 @@
+import { MARKED_ATTENDANCE_LABEL, MARKED_ATTENDANCE_EXPLANATION } from "../participation-summary";
 import { getTeamTrainingGames } from "../../../utils/api";
 import { gameScore, gameReadMessage, GAME_STATE_LABELS } from "../../../utils/training-games";
 import { loadActiveTeam } from "../../../utils/coach-team-context";
@@ -41,6 +42,7 @@ interface PageData {
   teamName: string;
   season: string;
   heroStats: HeroStat[];
+  heroStatsHint: string;
   members: MemberView[];
   visibleMembers: MemberView[];
   search: string;
@@ -159,6 +161,7 @@ function emptyPageData(state: LoadState, message: string, retryLabel = ""): Page
     teamName: "",
     season: "",
     heroStats: emptyHeroStats(),
+    heroStatsHint: MARKED_ATTENDANCE_EXPLANATION,
     members: [], visibleMembers: [], search: "",
     memberEmptyMessage: "",
     hasCoaches: false,
@@ -171,7 +174,7 @@ function emptyHeroStats(): HeroStat[] {
   return [
     { label: "在队人数", value: "--", valueClass: "" },
     { label: "累计训练", value: "--", valueClass: "" },
-    { label: "出勤率", value: "--", valueClass: "" },
+    { label: MARKED_ATTENDANCE_LABEL, value: "--", valueClass: "" },
   ];
 }
 
@@ -180,7 +183,7 @@ function toHeroStats(detail: CoachTeamDetail): HeroStat[] {
     { label: "在队人数", value: String(detail.stats.memberCount), valueClass: "" },
     { label: "累计训练", value: String(detail.stats.completedTrainingCount), valueClass: "" },
     {
-      label: "出勤率",
+      label: MARKED_ATTENDANCE_LABEL,
       value: detail.stats.attendanceRate === null ? "--" : `${detail.stats.attendanceRate}%`,
       valueClass: detail.stats.attendanceRate === null ? "" : "hero-stat__value--positive",
     },

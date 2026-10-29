@@ -103,7 +103,7 @@ describe("coach profile", () => {
       profileStats: [
         { label: "近30天日程", value: "0" },
         { label: "在队学员", value: "18" },
-        { label: "平均出勤", value: "89%" },
+        { label: "点名到场占比", value: "89%" },
       ],
     });
   });
@@ -128,7 +128,7 @@ describe("coach profile", () => {
       profileStats: [
         { label: "近30天日程", value: "0" },
         { label: "在队学员", value: "0" },
-        { label: "平均出勤", value: "待同步" },
+        { label: "点名到场占比", value: "暂无记录" },
       ],
     });
   });
@@ -264,11 +264,15 @@ describe("coach profile", () => {
     expect(template).not.toContain('<button class="c16-logout"');
     expect(controller).toContain('label: "近30天日程"');
     expect(controller).toContain('label: "在队学员"');
-    expect(controller).toContain('label: "平均出勤"');
+    expect(controller).toContain("MARKED_ATTENDANCE_LABEL");
     expect(template).not.toMatch(/主教练|本赛季执教/);
     expect(controller).not.toContain("home.coachName");
     expect(controller).not.toContain("readableError");
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
     expect(stylesheet).toMatch(/\.c16-logout\s*\{(?=[^}]*display:\s*flex)(?=[^}]*box-sizing:\s*border-box)(?=[^}]*width:\s*100%)(?=[^}]*align-items:\s*center)(?=[^}]*justify-content:\s*center)/s);
   });
+  it("retains a real zero for the marked-attendance statistic and explains its scope", async () => {
+    const detail=await mocks.getCoachTeam();mocks.getCoachTeam.mockResolvedValue({...detail,stats:{...detail.stats,attendanceRate:0}});const p=createPageInstance();await p.load();expect(p.data.profileStats.find(stat=>stat.label==="点名到场占比").value).toBe("0%");expect(p.data.profileStatsHint).toContain("未点名记录不计入");expect(p.data.profileStatsHint).toContain("与训练计次分别统计");expect(p.data.profileStats.some(stat=>stat.label==="平均出勤")).toBe(false);
+  });
+
 });

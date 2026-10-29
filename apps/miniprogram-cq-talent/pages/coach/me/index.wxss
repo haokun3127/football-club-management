@@ -197,3 +197,5 @@
 .c16-logout,
 .c16-menu__item,
 .c16-role-switch { min-height:44px; min-width:44px; box-sizing:border-box; }
+
+.c16-profile__stat-hint { color:var(--color-text-secondary); font-size:var(--font-size-aux); line-height:1.5; }
