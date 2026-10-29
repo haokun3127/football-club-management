@@ -10,6 +10,7 @@ import { registerStudentEvaluationRoutes } from "./routes/student-evaluation.rou
 import { registerCoachAssignmentRoutes } from "./routes/coach-assignment.routes.js";
 import { registerEnvironmentGuard } from "./http/environment-guard.js";
 import type { RuntimeConfig } from "./runtime/environment.js";
+import { normalizeBuildInfo, readBuildInfo, type BuildInfo } from "./runtime/build-info.js";
 import Fastify from "fastify";
 import rateLimit from "@fastify/rate-limit";
 import helmet from "@fastify/helmet";
@@ -49,6 +50,7 @@ const DEFAULT_RATE_LIMIT: RateLimitOptions = {
 };
 
 export interface ServerOptions {
+  buildInfo?: BuildInfo | null;
   runtimeConfig?: RuntimeConfig;
   logger?: boolean;
   membershipResolver?: MembershipResolver;
@@ -151,7 +153,11 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
 
   app.get("/openapi.json", async () => buildOpenApiDocument());
 
-  void app.register(registerPlatformRoutes, context);
+  void app.register(registerPlatformRoutes, {
+    ...context,
+    buildInfo: normalizeBuildInfo(options.buildInfo === undefined ? readBuildInfo() : options.buildInfo),
+    environment: options.runtimeConfig?.environment,
+  });
   void app.register(registerBackofficeRoutes, { auth: backofficeAuth });
   void app.register(registerBackofficeManagementRoutes, { auth: backofficeAuth, store });
   void app.register(registerBackofficeWebRoutes, { auth: backofficeAuth, store });

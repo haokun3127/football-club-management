@@ -1,9 +1,14 @@
 import type { FastifyInstance } from "fastify";
 import { schemas } from "../http/schemas.js";
 import type { RouteContext } from "./context.js";
+import type { BuildInfo } from "../runtime/build-info.js";
+import type { RuntimeEnvironment } from "../runtime/environment.js";
 
-export async function registerPlatformRoutes(app: FastifyInstance, context: RouteContext) {
-  app.get("/health", { schema: schemas.health }, async () => context.store.getHealth());
+export async function registerPlatformRoutes(app: FastifyInstance, context: RouteContext & { buildInfo: BuildInfo | null; environment?: RuntimeEnvironment }) {
+  app.get("/health", { schema: schemas.health }, async (_request, reply) => {
+    reply.header("Cache-Control", "no-store");
+    return { ...await context.store.getHealth(), build: context.buildInfo, ...(context.environment ? { environment: context.environment } : {}) };
+  });
 
   app.get("/clubs", { schema: schemas.clubsResponse }, async () => context.store.listClubs());
 

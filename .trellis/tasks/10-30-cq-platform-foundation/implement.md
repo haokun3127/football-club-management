@@ -27,3 +27,8 @@
 - start-environment.mjs 默认仅输出安全计划；--apply 才执行，先定向 run init，再 up --no-build --no-deps --pull never 单服务。启动不构建、不自动拉取、不读写别环境数据。
 - 2026-10-30 `PATH=/opt/homebrew/opt/node@24/bin:$PATH node --test scripts/delivery/start-environment.test.mjs`：2/2 通过；使用真实 Docker Compose v5.5.1 渲染但不启动容器，验证 develop 变更后 trial 配置完全一致、独立卷、digest 拒绝及定向命令。
 - Docker daemon 访问尚未验证；未部署。
+
+### 批次2：安全版本回读
+- GET /health 保留 status/service，增加 build: {sourceRevision,buildId,builtAt} | null；配置运行时另有 environment；no-store。只读镜像内 apps/api/build-metadata.json 的白名单，不输出凭证/路径/任意env。缺失或损坏元数据为null。OpenAPI复用同一响应schema，新增字段保持可选以描述旧合同。
+- 小程序 utils/version.ts 的 getClientVersion() 同步读取平台 version 与本包 stamped build；getServiceVersion() 显式读取health，旧服务字段缺失为null，显式环境不一致抛错。没有页面改动或额外初载请求。
+- 2026-10-30 Node24：API build-info/server/environment-isolation 3文件74项通过；小程序版本4项通过；已有 localhost smoke 在沙箱内EPERM，正以授权监听重跑。

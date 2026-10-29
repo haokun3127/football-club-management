@@ -103,6 +103,7 @@ describe("api server", () => {
     expect(response.json()).toEqual({
       status: "ok",
       service: "@football-club/api",
+      build: null,
     });
   });
 

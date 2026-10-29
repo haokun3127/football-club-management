@@ -402,6 +402,21 @@ export const schemas = {
         properties: {
           status: { type: "string", const: "ok" },
           service: { type: "string" },
+          environment: { type: "string", enum: ["develop", "trial", "release"] },
+          build: {
+            anyOf: [
+              { type: "null" },
+              {
+                type: "object", additionalProperties: false,
+                required: ["sourceRevision", "buildId", "builtAt"],
+                properties: {
+                  sourceRevision: { type: "string", pattern: "^[0-9a-f]{40}$" },
+                  buildId: { type: "string", pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$" },
+                  builtAt: { type: "string", format: "date-time" },
+                },
+              },
+            ],
+          },
         },
       },
     },
