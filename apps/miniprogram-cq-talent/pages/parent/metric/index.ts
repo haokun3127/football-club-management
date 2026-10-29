@@ -23,28 +23,9 @@ interface SourceEventView {
   startsAtLabel: string;
 }
 
-interface ChartPoint {
-  id: string;
-  left: number;
-  bottom: number;
-  valueLabel: string;
-  monthLabel: string;
-  current: boolean;
-}
-
-interface ChartSegment {
-  id: string;
-  left: number;
-  top: number;
-  width: number;
-  angle: number;
-}
-
-// 绘图区名义尺寸（rpx）：与 wxss .chart-card__plot 实际可用宽度一致，用于折线段角度/长度换算
-const PLOT_WIDTH_RPX = 558;
-const PLOT_HEIGHT_RPX = 320;
-
 Page({
+  requestGeneration: 0,
+  loadedKey: "",
   data: {
     navInset: resolveNavInset(),
     menuInset: resolveMenuInset(),
@@ -57,15 +38,11 @@ Page({
     sourceEvents: [] as SourceEventView[],
     latestLabel: "暂无数据",
     latestDateLabel: "暂无记录",
-    trendSummary: "等待更多记录",
-    trendTone: "neutral",
     heroValue: "–",
     heroMaxLabel: "",
-    trendDelta: "",
-    chartPoints: [] as ChartPoint[],
-    chartSegments: [] as ChartSegment[],
-    chartAreaPath: "",
-    yTicks: [] as string[],
+    refreshing: false,
+    refreshMessage: "",
+    comparabilityMessage: "这些历史记录缺少项目及映射版本信息，暂不合并绘图或判断进步。可在已确认成绩中查看同项目版本与单位的历史。",
     coachCommentText: "",
     coachCommentDate: "",
   },
@@ -76,21 +53,30 @@ Page({
     this.setData({ metricId, studentId });
     this.load();
   },
+  onUnload() { this.requestGeneration++; },
   async load() {
     if (!this.data.metricId || !this.data.studentId) {
       this.setData({ state: "error", message: "缺少指标或孩子信息。" });
       return;
     }
-    this.setData({ state: "loading", message: "正在读取指标详情" });
+    const generation = ++this.requestGeneration;
+    const studentId = this.data.studentId, metricId = this.data.metricId;
+    const key = JSON.stringify([studentId, metricId]);
+    const retaining = this.loadedKey === key && this.data.detail !== null;
+    this.loadedKey = key;
+    if (retaining) this.setData({refreshing:true,refreshMessage:""});
+    else this.setData({state:"loading",message:"正在读取指标详情",detail:null,records:[],sourceEvents:[],refreshing:false,refreshMessage:""});
     try {
-      const detail = await getParentMetricDetail(this.data.studentId, this.data.metricId);
+      const detail = await getParentMetricDetail(studentId, metricId);
+      if (generation !== this.requestGeneration) return;
       const records = presentRecords(detail);
       const latestValue = detail.latest?.value;
-      const maxValue = detail.maxValue || 10;
       const coachRecord = records.find((record) => record.note);
       this.setData({
         state: "ready",
         message: "",
+        refreshing: false,
+        refreshMessage: "",
         detail,
         records,
         sourceEvents: detail.sourceEvents.map((item) => ({
@@ -101,24 +87,24 @@ Page({
         })),
         latestLabel: records[0]?.valueLabel || "暂无数据",
         latestDateLabel: records[0]?.dateLabel || "暂无记录",
-        trendSummary: records[0]?.changeLabel || "等待更多记录",
-        trendTone: records[0]?.changeTone || "neutral",
         heroValue: latestValue === undefined ? "–" : String(latestValue),
-        heroMaxLabel: latestValue === undefined ? "" : `/ ${maxValue}`,
-        trendDelta: records[0]?.changeTone === "success" ? `+${records[0].changeLabel.replace(/[^0-9.]/g, "")}` : "",
-        ...buildChart(detail, maxValue),
+        heroMaxLabel: detail.unit || "单位未提供",
         coachCommentText: coachRecord?.note ?? "",
         coachCommentDate: coachRecord?.dateLabel ?? "",
       });
     } catch (error) {
+      if (generation !== this.requestGeneration) return;
       const record = error as { code?: string; message?: string };
-      this.setData({ state: "error", message: record.code === "forbidden" ? "当前账号无权查看该指标。" : record.message || "指标详情读取失败。" });
+      const message = record.code === "forbidden" ? "当前账号无权查看该指标。" : record.message || "指标详情读取失败。";
+      if (retaining) this.setData({refreshing:false,refreshMessage:`刷新失败，当前显示上次读取的记录。${message}`});
+      else this.setData({state:"error",message});
     }
   },
   openSourceEvent(event: { currentTarget: { dataset: { id?: string } } }) {
     const id = event.currentTarget.dataset.id;
-    if (id) openPage(`/pages/parent/event/index?id=${id}`);
+    if (id && this.data.sourceEvents.some((item: SourceEventView) => item.eventId === id)) openPage(`/pages/parent/event/index?id=${encodeURIComponent(id)}&studentId=${encodeURIComponent(this.data.studentId)}`);
   },
+  openConfirmedResults() { openPage(`/pages/parent/confirmed-results/index?student=${encodeURIComponent(this.data.studentId)}`); },
   goBack() {
     wx.navigateBack();
   },
@@ -129,65 +115,15 @@ Page({
 
 function presentRecords(detail: MetricDetail): MetricRecordView[] {
   const ordered = [...detail.records].sort((left, right) => right.occurredAt.localeCompare(left.occurredAt));
-  return ordered.map((item, index) => {
-    const next = ordered[index + 1];
-    const delta = item.value !== undefined && next?.value !== undefined ? Number((item.value - next.value).toFixed(1)) : undefined;
+  return ordered.map((item) => {
     return {
       id: item.id,
       valueLabel: item.value === undefined ? "未量化" : `${item.value}${detail.unit || ""}`,
       dateLabel: formatDateTime(item.occurredAt),
       source: item.source,
       note: item.note || "",
-      changeLabel: delta === undefined ? "首次记录" : delta > 0 ? `提升 ${delta}${detail.unit || ""}` : delta < 0 ? `变化 ${delta}${detail.unit || ""}` : "保持稳定",
-      changeTone: delta === undefined ? "neutral" : delta > 0 ? "success" : delta < 0 ? "warning" : "info",
+      changeLabel: "历史记录",
+      changeTone: "neutral",
     };
   });
 }
-
-// 绝对量纲定位（0..maxValue），Y 轴刻度与设计稿一致；月份标签相邻去重
-function buildChart(detail: MetricDetail, maxValue: number) {
-  const empty = { chartPoints: [] as ChartPoint[], chartSegments: [] as ChartSegment[], chartAreaPath: "", yTicks: [] as string[] };
-  const valued = [...detail.records]
-    .filter((record) => record.value !== undefined)
-    .sort((left, right) => left.occurredAt.localeCompare(right.occurredAt))
-    .slice(-6);
-  if (valued.length < 2) return empty;
-  const points: ChartPoint[] = valued.map((record, index) => {
-    const month = Number(record.occurredAt.slice(5, 7));
-    const prevMonth = index > 0 ? Number(valued[index - 1]?.occurredAt.slice(5, 7)) : undefined;
-    return {
-      id: record.id,
-      left: (index / (valued.length - 1)) * 100,
-      bottom: 8 + ((record.value ?? 0) / maxValue) * 84,
-      valueLabel: `${record.value}${detail.unit || ""}`,
-      monthLabel: month === prevMonth ? "" : `${month}月`,
-      current: index === valued.length - 1,
-    };
-  });
-  const segments: ChartSegment[] = [];
-  for (let index = 1; index < points.length; index += 1) {
-    const from = points[index - 1];
-    const to = points[index];
-    if (!from || !to) continue;
-    const dxRpx = ((to.left - from.left) / 100) * PLOT_WIDTH_RPX;
-    const dyRpx = ((to.bottom - from.bottom) / 100) * PLOT_HEIGHT_RPX;
-    segments.push({
-      id: `${from.id}-${to.id}`,
-      left: from.left,
-      top: 100 - from.bottom,
-      width: Math.min(140, (Math.hypot(dxRpx, dyRpx) / PLOT_WIDTH_RPX) * 100),
-      angle: Number((-Math.atan2(dyRpx, dxRpx) * 180 / Math.PI).toFixed(2)),
-    });
-  }
-  // 渐变面积：clip-path 多边形（折线顶点 + 底边两角）
-  const polygonPoints = points.map((point) => `${point.left}% ${100 - point.bottom}%`).join(", ");
-  const chartAreaPath = `polygon(0% 100%, ${polygonPoints}, 100% 100%)`;
-  const yTicks = [1, 0.75, 0.5, 0.25, 0].map((ratio) => trimTick(maxValue * ratio));
-  return { chartPoints: points, chartSegments: segments, chartAreaPath, yTicks };
-}
-
-function trimTick(value: number) {
-  return Number.isInteger(value) ? String(value) : value.toFixed(1);
-}
-
-// REQ-PAR-004: without an approved standard, show personal history only.

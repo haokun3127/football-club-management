@@ -9,7 +9,6 @@
     <view wx:if="{{detail}}" class="mhero">
       <view class="mhero__top">
         <view class="mhero__label">{{detail.label}}</view>
-        <view wx:if="{{trendDelta}}" class="mhero__trend">↗ {{trendDelta}}</view>
       </view>
       <view class="mhero__score-row">
         <text class="mhero__score">{{heroValue}}</text>
@@ -22,43 +21,13 @@
       </view>
     </view>
 
-    <!-- P6 TrendChart -->
-    <view wx:if="{{detail && chartPoints.length > 1}}" class="chart-card">
-      <view class="chart-card__head">
-        <view class="chart-card__title">能力趋势</view>
-        <view class="chart-card__range">近{{chartPoints.length}}次记录</view>
-      </view>
-      <view class="chart-card__body">
-        <view class="chart-card__y">
-          <text wx:for="{{yTicks}}" wx:key="*this" class="chart-card__y-label">{{item}}</text>
-        </view>
-        <view class="chart-card__plot">
-          <view class="chart-grid" wx:for="{{[1,2,3,4]}}" wx:key="*this"></view>
-          <view wx:if="{{chartAreaPath}}" class="chart-area" style="clip-path:{{chartAreaPath}}"></view>
-          <view
-            wx:for="{{chartSegments}}"
-            wx:key="id"
-            class="chart-segment"
-            style="left:{{item.left}}%;top:{{item.top}}%;width:{{item.width}}%;transform:rotate({{item.angle}}deg)"
-          ></view>
-          <view
-            wx:for="{{chartPoints}}"
-            wx:key="id"
-            class="chart-dot {{item.current ? 'chart-dot--current' : ''}}"
-            style="left:{{item.left}}%;bottom:{{item.bottom}}%"
-          >
-            <view wx:if="{{item.current}}" class="chart-dot__label">{{item.valueLabel}}</view>
-          </view>
-        </view>
-      </view>
-      <view class="chart-card__x">
-        <text wx:for="{{chartPoints}}" wx:key="id" class="chart-card__x-label">{{item.monthLabel}}</text>
-      </view>
-    </view>
+    <view wx:if="{{refreshing}}" class="subtitle">正在更新指标记录…</view>
+    <view wx:if="{{refreshMessage}}" class="metric-card"><view class="subtitle">{{refreshMessage}}</view><t-button bindtap="retry" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">重试</t-button></view>
+    <view wx:if="{{detail}}" class="metric-card"><view class="section-title">历史可比性</view><view class="subtitle">{{comparabilityMessage}}</view><t-button bindtap="openConfirmedResults" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">查看已确认原始成绩</t-button></view>
 
     <!-- P6 个人历史（无经核定标准时以个人历史为主体，REQ-PAR-004） -->
     <view wx:if="{{detail}}" class="metric-card">
-      <view class="section-heading"><view><view class="section-title">变化记录</view><view class="subtitle">按时间查看每次记录与变化</view></view><view class="record-count">{{records.length}} 次</view></view>
+      <view class="section-heading"><view><view class="section-title">变化记录</view><view class="subtitle">按时间查看每次记录、单位与来源</view></view><view class="record-count">{{records.length}} 次</view></view>
       <view wx:if="{{records.length}}" class="trend-list">
         <view wx:for="{{records}}" wx:key="id" class="trend-row">
           <view class="trend-row__axis"><view class="trend-row__dot"></view><view class="trend-row__line"></view></view>
@@ -69,16 +38,16 @@
           </view>
         </view>
       </view>
-      <view wx:else class="subtitle">暂无可展示的趋势记录。</view>
+      <view wx:else class="subtitle">暂无可展示的历史记录。</view>
     </view>
 
     <!-- P6 CoachComment（最新记录带评语时展示） -->
     <view wx:if="{{detail && coachCommentText}}" class="metric-card">
-      <view class="section-title">教练评语</view>
+      <view class="section-title">记录备注</view>
       <view class="comment-row">
-        <view class="comment-row__avatar">林</view>
+
         <view class="comment-row__content">
-          <view class="comment-row__name">林教练 <text class="comment-row__date">{{coachCommentDate}}</text></view>
+          <view class="comment-row__name">来源记录 <text class="comment-row__date">{{coachCommentDate}}</text></view>
           <view class="comment-row__text">{{coachCommentText}}</view>
         </view>
       </view>

@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   openPage: vi.fn(),
   getParentCalendar: vi.fn(),
   getParentChildren: vi.fn(),
+  getParentConfirmedResults: vi.fn(),
   getParentGrowth: vi.fn(),
   getParentMetricDetail: vi.fn(),
   requireRole: vi.fn(),
@@ -15,6 +16,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("../../../utils/api", () => ({
   getParentCalendar: mocks.getParentCalendar,
   getParentChildren: mocks.getParentChildren,
+  getParentConfirmedResults: mocks.getParentConfirmedResults,
   getParentGrowth: mocks.getParentGrowth,
   getParentMetricDetail: mocks.getParentMetricDetail,
 }));
@@ -56,6 +58,7 @@ describe("parent growth training history", () => {
     mocks.openPage.mockReset();
     mocks.getParentCalendar.mockReset().mockResolvedValue([]);
     mocks.getParentChildren.mockReset();
+    mocks.getParentConfirmedResults.mockReset().mockResolvedValue({confirmedResults:[]});
     mocks.getParentGrowth.mockReset();
     mocks.getParentMetricDetail.mockReset();
     mocks.requireRole.mockReset().mockReturnValue({ role: "parent", currentStudentId: "student-1" });
@@ -122,9 +125,9 @@ describe("parent growth training history", () => {
     expect(page.data).toMatchObject({
       activeStudentId: "student-2",
       heroName: "第二位学员",
-      heroSummaryMessage: "近30天完成 1 次训练、1 场比赛",
+      heroSummaryMessage: "近30天记录 1 次训练、1 场比赛",
       milestoneMessage: "最新足迹：训练复盘",
-      trainingHistoryMessage: "近30天已完成 1 次训练，点击查看完整历程",
+      trainingHistoryMessage: "近30天记录 1 次训练，点击查看完整历程",
     });
     expect(page.data.milestones).toEqual([
       expect.objectContaining({ id: "timeline-training", title: "训练复盘", state: "完成 2 项训练内容" }),
@@ -162,7 +165,7 @@ describe("parent growth training history", () => {
     expect(mocks.getParentGrowth).toHaveBeenLastCalledWith("student-1", expect.objectContaining({ name: "真实球员" }));
   });
 
-  it("does not issue a duplicate growth request when returning without any fact change", async () => {
+  it("refreshes externally changed facts when returning to the same child", async () => {
     mocks.getParentChildren.mockResolvedValue([
       { id: "student-1", name: "真实球员", teams: [], coachNames: [] },
     ]);
@@ -182,7 +185,7 @@ describe("parent growth training history", () => {
     await page.onShow();
 
     expect(mocks.consumeGrowthStale).toHaveBeenCalledTimes(1);
-    expect(mocks.getParentGrowth).toHaveBeenCalledTimes(1);
+    expect(mocks.getParentGrowth).toHaveBeenCalledTimes(2);
   });
 
   it("opens the milestones page from the footprint card", () => {
@@ -215,9 +218,9 @@ describe("parent growth training history", () => {
       state: "ready",
       heroName: "真实球员",
       heroTeam: "球队待同步",
-      heroSummaryMessage: "近30天暂无已完成活动",
+      heroSummaryMessage: "近30天暂无活动记录",
       milestoneMessage: "成长足迹正在积累",
-      trainingHistoryMessage: "近30天暂无完成训练",
+      trainingHistoryMessage: "近30天暂无训练记录",
       canDrawRadar: true,
     });
     expect(page.data.radar).toHaveLength(3);
@@ -311,4 +314,82 @@ describe("parent growth training history", () => {
     expect(page.data.activeStudentId).toBe("student-2");expect(page.data.detailCache).toEqual({});expect(page.data.selectedDetail).toBeNull();expect(page.data.trainingBars).toEqual([]);
   });
 
+});
+
+describe("CQ-20 confirmed facts and refresh states",()=>{
+ const child={id:"student-1",name:"甲",teams:["U10"],coachNames:[]};
+ const growth=()=>({radar:[{metricId:"m",label:"模型指标",value:0,maxValue:100,occurredAt:"2026-10-01T00:00:00Z"}],views:[],timeline:[],evaluations:[],trainingStats:{totalTrainings:0,monthly:[]}});
+ const result=(id="raw")=>({id,name:"短跑",value:{kind:"duration_seconds",seconds:0},unit:"秒",templateVersionId:"v1",eventId:"course",taskId:"task",occurredAt:"2026-10-01T00:00:00Z",mapping:null});
+ const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return{promise,resolve,reject};};
+ beforeEach(()=>{
+  vi.useRealTimers();vi.clearAllMocks();mocks.requireRole.mockReturnValue({role:"parent",currentStudentId:child.id,userId:"u",clubId:"club",clientId:"client"});
+  mocks.getParentChildren.mockResolvedValue([child]);mocks.getParentGrowth.mockResolvedValue(growth());mocks.getParentConfirmedResults.mockResolvedValue({confirmedResults:[result()]});
+ });
+ it("shows confirmed raw zero, unit, date, version, provenance and missing mapping before auxiliary charts",async()=>{
+  const p=createPageInstance();await p.load();
+  expect(p.data.confirmedRows[0]).toMatchObject({value:"0 秒",version:"项目版本 v1",mapping:"暂无完整分值/等级映射",eventId:"course",source:"已确认测评 · 关联活动",date:"2026-08-10 10:00"});
+  expect(template.indexOf("{{item.name}} · 原始成绩 {{item.value}}")).toBeLessThan(template.indexOf("<radar-canvas"));
+  expect(template.indexOf("当前教练评价")).toBeLessThan(template.indexOf("<radar-canvas"));
+  p.openResultSource({currentTarget:{dataset:{id:"raw"}}});expect(mocks.openPage).toHaveBeenCalledWith("/pages/parent/event/index?id=course&studentId=student-1");
+ });
+ it("keeps confirmed results usable when growth and chart data fail",async()=>{
+  mocks.getParentGrowth.mockRejectedValueOnce(new Error("汇总离线"));const p=createPageInstance();await p.load();
+  expect(p.data).toMatchObject({state:"ready",activeStudentId:child.id,growth:null,growthState:"error",resultsState:"ready",confirmedRows:[expect.objectContaining({id:"raw"})]});
+  expect(p.data.refreshMessage).toContain("汇总离线");p.openConfirmedResults();expect(mocks.openPage).toHaveBeenCalledWith("/pages/parent/confirmed-results/index?student=student-1");
+ });
+ it("retains same-child facts during pending refresh and after both module failures",async()=>{
+  const p=createPageInstance();await p.load();const a=deferred(),b=deferred();mocks.getParentGrowth.mockReturnValueOnce(a.promise);mocks.getParentConfirmedResults.mockReturnValueOnce(b.promise);
+  const refreshing=p.onShow();await vi.waitFor(()=>expect(p.data.resultsState).toBe("loading"));
+  expect(p.data).toMatchObject({state:"ready",heroName:"甲",growthState:"loading",confirmedRows:[expect.objectContaining({id:"raw"})],radarRows:[expect.objectContaining({value:"0 / 100"})]});
+  a.reject(new Error("汇总离线"));b.reject(new Error("成绩离线"));await refreshing;
+  expect(p.data).toMatchObject({state:"ready",resultsLoaded:true,resultsState:"error",confirmedRows:[expect.objectContaining({id:"raw"})],heroStats:[{value:"0",label:"训练记录"}]});
+  expect(p.data.resultsMessage).toContain("上次读取");await p.retryResults();expect(p.data.resultsState).toBe("ready");
+ });
+ it("keeps cached content when the same-child profile refresh fails",async()=>{
+  const p=createPageInstance();await p.load();mocks.getParentChildren.mockRejectedValueOnce(new Error("档案离线"));await p.load();
+  expect(p.data.state).toBe("ready");expect(p.data.confirmedRows[0].id).toBe("raw");expect(p.data.refreshMessage).toContain("上次读取");
+ });
+ it("clears all old child facts immediately and rejects delayed success and failure",async()=>{
+  const p=createPageInstance();await p.load();const old=deferred(),oldGrowth=deferred();mocks.getParentConfirmedResults.mockReturnValueOnce(old.promise);mocks.getParentGrowth.mockReturnValueOnce(oldGrowth.promise);const refresh=p.load();await vi.waitFor(()=>expect(p.data.resultsState).toBe("loading"));
+  mocks.requireRole.mockReturnValue({role:"parent",currentStudentId:"b",userId:"u",clubId:"club",clientId:"client"});mocks.getParentChildren.mockResolvedValueOnce([{...child,id:"b",name:"乙"}]);mocks.getParentConfirmedResults.mockResolvedValueOnce({confirmedResults:[result("b-result")]});const next=p.load();
+  expect(p.data).toMatchObject({state:"loading",growth:null,confirmedRows:[],radarRows:[],evaluationCards:[],activeStudentId:""});await next;
+  old.resolve({confirmedResults:[result("old")]});oldGrowth.reject(new Error("旧错误"));await refresh;
+  expect(p.data.activeStudentId).toBe("b");expect(p.data.confirmedRows[0].id).toBe("b-result");expect(p.data.refreshMessage).toBe("");
+ });
+ it("rejects same-child results from an old account and after unload",async()=>{
+  const p=createPageInstance();await p.load();const pending=deferred();mocks.getParentConfirmedResults.mockReturnValueOnce(pending.promise);const refresh=p.retryResults();
+  mocks.requireRole.mockReturnValue({role:"parent",currentStudentId:child.id,userId:"other"});await p.load();pending.resolve({confirmedResults:[result("old-account")]});await refresh;expect(p.data.confirmedRows[0].id).toBe("raw");
+  const late=deferred();mocks.getParentConfirmedResults.mockReturnValueOnce(late.promise);const read=p.retryResults();p.onUnload();late.resolve({confirmedResults:[result("unloaded")]});await read;expect(p.data.confirmedRows[0].id).toBe("raw");
+ });
+ it("keeps metric text independent of the canvas fallback and does not fabricate standards",async()=>{
+  const p=createPageInstance();await p.load();expect(p.data.radarRows[0]).toMatchObject({value:"0 / 100",date:"2026-08-10 10:00"});
+  expect(template.indexOf("p4-metric-list")).toBeGreaterThan(template.indexOf("</radar-canvas>") >= 0 ? template.indexOf("</radar-canvas>") : template.indexOf("<radar-canvas"));
+  expect(template).toContain("未提供标准时不判断达标");expect(readFileSync(new URL("../../../components/radar-canvas/index.wxml",import.meta.url),"utf8")).toContain("图形加载失败，请查看下方数值明细");
+ });
+});
+
+describe("CQ-20 latest request owns each module",()=>{
+ const child={id:"s",name:"孩子",teams:[]};
+ const summary=count=>({radar:[],views:[],timeline:[],evaluations:[],trainingStats:{totalTrainings:count,monthly:[]}});
+ const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return{promise,resolve,reject};};
+ beforeEach(()=>{vi.useRealTimers();vi.clearAllMocks();mocks.requireRole.mockReturnValue({role:"parent",currentStudentId:"s"});mocks.getParentChildren.mockResolvedValue([child]);mocks.getParentGrowth.mockResolvedValue(summary(0));mocks.getParentConfirmedResults.mockResolvedValue({confirmedResults:[]});});
+ it.each(["summary","results"].flatMap(module=>["success","failure"].map(outcome=>({module,outcome}))))("ignores older $module $outcome without invalidating the other module",async({module,outcome})=>{
+  const p=createPageInstance();await p.load();const generation=p.growthRequestId,old=deferred();
+  const result=id=>({confirmedResults:[{id,name:id,value:{kind:"count",count:0},unit:"次",occurredAt:"2026-10-01",templateVersionId:"v1",mapping:null}]});
+  const mock=module==="summary"?mocks.getParentGrowth:mocks.getParentConfirmedResults;
+  mock.mockReturnValueOnce(old.promise).mockResolvedValueOnce(module==="summary"?summary(2):result("new"));
+  const older=module==="summary"?p.loadGrowth(generation,child):p.loadConfirmed(generation,"s");
+  await(module==="summary"?p.loadGrowth(generation,child):p.loadConfirmed(generation,"s"));
+  if(outcome==="success")old.resolve(module==="summary"?summary(99):result("old"));else old.reject(new Error("older failure"));await older;
+  expect(p.growthRequestId).toBe(generation);
+  if(module==="summary"){expect(p.data.heroStats[0].value).toBe("2");expect(p.data.growthState).toBe("ready");expect(p.data.resultsState).toBe("ready");}
+  else{expect(p.data.confirmedRows[0].id).toBe("new");expect(p.data.resultsState).toBe("ready");expect(p.data.heroStats[0].value).toBe("0");}
+  expect(p.data.refreshMessage).toBe("");expect(p.data.resultsMessage).toBe("");
+ });
+ it("ignores an older metric detail read in the same generation including its cache",async()=>{
+  const p=createPageInstance({activeStudentId:"s",selectedMetricId:"m"});const old=deferred();
+  mocks.getParentMetricDetail.mockReturnValueOnce(old.promise).mockResolvedValueOnce({metricId:"m",latest:{value:2},records:[],sourceEvents:[]});
+  const first=p.loadMetricDetail("m");await p.loadMetricDetail("m");old.resolve({metricId:"m",latest:{value:99},records:[],sourceEvents:[]});await first;
+  expect(p.data.selectedDetail.latest.value).toBe(2);expect(p.data.detailCache.m.latest.value).toBe(2);
+ });
 });

@@ -17,6 +17,7 @@
         <view class="report-student__current">{{report.currentStudentLabel}}</view>
       </view>
 
+      <view class="report-card"><view class="report-note">原始成绩、单位与同版本历史请查看已确认结果，以下模型概览作为辅助。</view><t-button bindtap="openConfirmedResults" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">查看已确认成绩</t-button></view>
       <view class="report-section-title">能力表现</view>
 
       <view class="report-card report-card--ability">
@@ -25,7 +26,7 @@
         <view wx:if="{{report.dimensions.length}}" class="report-dimensions">
           <view wx:for="{{report.dimensions}}" wx:key="label" class="report-dimension">
             <view class="report-dimension__head"><view class="report-dimension__label">{{item.label}}</view><view class="report-dimension__value">{{item.valueLabel}}</view></view>
-            <view class="report-dimension__track"><view class="report-dimension__fill" style="width:{{item.percent}}%"></view></view>
+            <view wx:if="{{item.percent !== null}}" class="report-dimension__track"><view class="report-dimension__fill" style="width:{{item.percent}}%"></view></view>
           </view>
         </view>
         <view wx:else class="report-empty">{{report.metricsEmptyLabel}}</view>
@@ -33,14 +34,15 @@
 
       <view class="report-card report-card--summary">
         <view class="report-stats">
-          <view class="report-stat"><view class="report-stat__value">{{report.trainingSummary.value}}</view><view class="report-stat__label">已完成训练</view></view>
-          <view class="report-stat report-stat--accent"><view class="report-stat__value">{{report.matchSummary.value}}</view><view class="report-stat__label">已完成比赛</view></view>
-          <view class="report-stat"><view class="report-stat__value">{{report.attendanceSummary.value}}</view><view class="report-stat__label">出勤率</view></view>
+          <view class="report-stat"><view class="report-stat__value">{{report.trainingSummary.value}}</view><view class="report-stat__label">完成训练安排</view></view>
+          <view class="report-stat report-stat--accent"><view class="report-stat__value">{{report.matchSummary.value}}</view><view class="report-stat__label">完成比赛安排</view></view>
+          <view class="report-stat"><view class="report-stat__value">{{report.attendanceSummary.value}}</view><view class="report-stat__label">计次比例</view></view>
         </view>
       </view>
 
+      <view class="report-empty">计次比例为累计口径，按已结束且未取消训练计算；上方安排为最近180天。不代表实际出勤，不扣减费用或课包。</view>
       <view class="report-card report-card--note">
-        <view class="report-note__title">教练评语</view><view class="report-note">{{report.coachNoteLabel}}</view>
+        <view class="report-note__title">队伍评价</view><view class="report-note">{{report.coachNoteLabel}}</view><t-button bindtap="openGrowth" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">查看队伍评价</t-button>
       </view>
     </block>
   </scroll-view>

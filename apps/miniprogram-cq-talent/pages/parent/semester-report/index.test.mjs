@@ -94,7 +94,7 @@ describe("parent semester report", () => {
     expect(report.dimensions).toEqual([]);
     expect(report.metricsEmptyLabel).toBe("暂无能力数据");
     expect(report.activitiesEmptyLabel).toBe("暂无训练或比赛记录");
-    expect(report.coachNoteLabel).toBe("暂无教练评语");
+    expect(report.coachNoteLabel).toContain("队伍评价请在成长页按队查看");
   });
 
   it("precomputes localized dimension bars, period and update labels", () => {
@@ -121,16 +121,16 @@ describe("parent semester report", () => {
     expect(report.state).toBe("ready");
     expect(report.periodLabel).toBe("最近阶段");
     expect(report.updatedAtLabel).toBe("更新时间：2026-08-27T09:00:00.000Z");
-    expect(report.overallLabel).toBe("72 分");
-    expect(report.overallScore).toBe("72");
+    expect(report.overallLabel).toBe("暂无");
+    expect(report.overallScore).toBe("暂无");
     expect(report.freshnessLabel).toBe("数据已更新");
     expect(report.dimensions).toEqual([
-      { label: "速度", valueLabel: "82分", percent: 82 },
-      { label: "控球", valueLabel: "74分", percent: 74 },
-      { label: "传球", valueLabel: "68分", percent: 68 },
-      { label: "体能", valueLabel: "64分", percent: 64 },
+      { label: "速度", valueLabel: "82 / 100", percent: 82 },
+      { label: "控球", valueLabel: "74 / 100", percent: 74 },
+      { label: "传球", valueLabel: "68 / 100", percent: 68 },
+      { label: "体能", valueLabel: "64 / 100", percent: 64 },
     ]);
-    expect(report.coachNoteLabel).toBe("暂无教练评语");
+    expect(report.coachNoteLabel).toContain("队伍评价请在成长页按队查看");
   });
 
   it("counts only completed activities for completed summary labels", () => {
@@ -168,4 +168,12 @@ describe("parent semester report", () => {
     expect(styles).toMatch(/\.report-dimension__label\s*\{[^}]*white-space:\s*nowrap/s);
     expect(styles).toMatch(/\.report-card--ability\s*\{[^}]*margin-top:\s*8rpx/s);
   });
+});
+it("uses only the provided overall including real zero and keeps a missing scale unavailable",()=>{
+ const p=buildSemesterReportView({overall:0,radar:[{metricId:"m",label:"单项",value:0,maxValue:0}]},[],{id:"s",name:"孩子",teams:[]});
+ expect(p.overallScore).toBe("0");expect(p.overallScoreLabel).toBe("模型综合值");expect(p.dimensions[0]).toMatchObject({valueLabel:"0",percent:null});expect(p.trainingSummary.value).toBe("0 次");expect(p.matchSummary.value).toBe("0 场");expect(p.attendanceSummary.label).toBe("计次比例");
+});
+it("queries full club-date boundaries in chunks of at most 31 days",async()=>{
+ const p=createPageInstance();await p.load();const calls=mocks.getParentCalendar.mock.calls;
+ expect(calls).toHaveLength(6);for(const [from,to] of calls){expect(from).toContain("T00:00:00+08:00");expect(to).toContain("T23:59:59.999+08:00");expect(Date.parse(to)-Date.parse(from)).toBeLessThan(31*86400000);}
 });

@@ -5,6 +5,7 @@
     "status-view": "/components/status-view/index",
     "radar-canvas": "/components/radar-canvas/index",
     "app-header": "/components/app-header/index",
-    "student-switcher": "/components/student-switcher/index"
+    "student-switcher": "/components/student-switcher/index",
+    "t-button": "tdesign-miniprogram/button/button"
   }
 }

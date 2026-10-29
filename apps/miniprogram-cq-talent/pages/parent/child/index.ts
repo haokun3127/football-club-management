@@ -195,7 +195,7 @@ Page({
   },
 });
 
-// 训练统计行：课时总数/出勤率/在队时长（成长汇总 trainingStats 真实推导，取不到回退档案课时）
+// 自动计次与实际到场分开；未将计次比例作为出勤。
 function buildTrainingHeroStats(
   growth: GrowthSummary | undefined,
   active: StudentSummary,
@@ -203,9 +203,9 @@ function buildTrainingHeroStats(
   const stats = growth?.trainingStats;
   if (!stats) return undefined;
   return [
-    { label: "训练课时", value: String(stats.totalTrainings) },
+    { label: "训练计次", value: String(stats.totalTrainings) },
     {
-      label: "出勤率",
+      label: "计次比例",
       value: stats.attendanceRate === null ? "—" : `${stats.attendanceRate}%`,
     },
     { label: "在队时长", value: formatTenure(active.teamStartsAt, "") || "—" },

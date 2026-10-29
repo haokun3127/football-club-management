@@ -100,8 +100,8 @@ describe("parent profile hub", () => {
     await page.load();
 
     expect(page.data.heroStats).toEqual([
-      { label: "训练课时", value: "11" },
-      { label: "出勤率", value: "93%" },
+      { label: "训练计次", value: "11" },
+      { label: "计次比例", value: "93%" },
       { label: "在队时长", value: "1年7个月" },
     ]);
   });

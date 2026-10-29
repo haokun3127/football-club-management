@@ -53,7 +53,7 @@ describe("parent metric detail", () => {
     mocks.requireRole.mockReset().mockReturnValue({ role: "parent" });
   });
 
-  it("renders a trend only from at least two real metric records", async () => {
+  it("keeps two real history records without inventing version compatibility", async () => {
     mocks.getParentMetricDetail.mockResolvedValue({
       metricId: "speed",
       label: "Speed",
@@ -70,12 +70,10 @@ describe("parent metric detail", () => {
 
     await page.load();
 
-    expect(page.data).toMatchObject({ state: "ready", heroValue: "80", heroMaxLabel: "/ 100" });
-    expect(page.data.chartPoints).toHaveLength(2);
-    expect(page.data.chartSegments).toHaveLength(1);
-    expect(page.data.chartAreaPath).toContain("polygon(");
-    expect(page.data.yTicks).toEqual(["100", "75", "50", "25", "0"]);
-    expect(page.data.chartPoints.map((point) => point.monthLabel)).toEqual(["7月", "8月"]);
+    expect(page.data).toMatchObject({ state: "ready", heroValue: "80", heroMaxLabel: "pts" });
+    expect(page.data.chartPoints).toBeUndefined();
+    expect(page.data.records.every(row => row.changeTone === "neutral")).toBe(true);
+    expect(page.data.comparabilityMessage).toContain("版本");
     expect(page.data.records).toHaveLength(2);
   });
 
@@ -92,7 +90,7 @@ describe("parent metric detail", () => {
 
     await page.load();
 
-    expect(page.data.chartPoints).toEqual([]);
+    expect(page.data.chartPoints).toBeUndefined();
   });
 
   it("shows only personal history when an unapproved peer average is returned", async () => {
@@ -161,4 +159,18 @@ describe("parent metric detail", () => {
     expect(template).toContain("变化记录");
   });
 
+});
+
+it("preserves raw zero and unit without inventing a maximum, progress or author",async()=>{
+ mocks.getParentMetricDetail.mockResolvedValue({metricId:"run",label:"跑步",unit:"秒",latest:{value:0},records:[{id:"zero",value:0,occurredAt:"2026-10-01",source:"已确认测评",note:"原记录备注"},{id:"old",value:1,occurredAt:"2026-09-01",source:"课堂表现"}],sourceEvents:[]});
+ const p=createPageInstance({metricId:"run",studentId:"s"});await p.load();expect(p.data).toMatchObject({heroValue:"0",heroMaxLabel:"秒"});expect(p.data.records[0]).toMatchObject({valueLabel:"0秒",changeTone:"neutral",source:"已确认测评"});expect(template).not.toContain("林教练");expect(template).not.toContain("能力趋势");expect(p.data.chartPoints).toBeUndefined();
+});
+it("retains text after a refresh failure and ignores an older child response",async()=>{
+ const detail={metricId:"m",label:"指标",latest:{value:3},records:[{id:"r",value:3,occurredAt:"2026-10-01",source:"课堂表现"}],sourceEvents:[]};
+ mocks.getParentMetricDetail.mockResolvedValue(detail);const p=createPageInstance({metricId:"m",studentId:"a"});await p.load();mocks.getParentMetricDetail.mockRejectedValueOnce(new Error("离线"));await p.load();expect(p.data.state).toBe("ready");expect(p.data.heroValue).toBe("3");expect(p.data.refreshMessage).toContain("上次读取");
+ let finish;mocks.getParentMetricDetail.mockReturnValueOnce(new Promise(resolve=>{finish=resolve;}));const old=p.load();p.setData({studentId:"b"});await p.load();finish({...detail,latest:{value:99}});await old;expect(p.data.heroValue).toBe("3");
+});
+it("keeps the child when opening an authorized source and ignores responses after unload",async()=>{
+ mocks.getParentMetricDetail.mockResolvedValue({metricId:"m",label:"指标",records:[],sourceEvents:[{recordId:"r",eventId:"course",title:"课堂",type:"training"}]});const p=createPageInstance({metricId:"m",studentId:"s"});await p.load();p.openSourceEvent({currentTarget:{dataset:{id:"course"}}});expect(mocks.openPage).toHaveBeenCalledWith("/pages/parent/event/index?id=course&studentId=s");
+ let finish;mocks.getParentMetricDetail.mockReturnValueOnce(new Promise(resolve=>{finish=resolve;}));const read=p.load();p.onUnload();finish({metricId:"m",records:[],sourceEvents:[],latest:{value:99}});await read;expect(p.data.heroValue).toBe("–");
 });

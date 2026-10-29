@@ -57,21 +57,28 @@ describe("parent ability model history", () => {
     await page.load();
 
     expect(page.data.rows).toEqual([expect.objectContaining({
-      sourceLabel: "课堂训练",
+      sourceLabel: "课堂表现",
       metricLabel: "传球 78 → 82",
-      deltaLabel: "+4",
-      sourceUrl: "/pages/parent/event/index?id=event-training-1",
+      deltaLabel: "未比较",
+      sourceUrl: "/pages/parent/event/index?id=event-training-1&studentId=student-1",
     })]);
     expect(template).toContain("bindtap=\"openSource\"");
   });
 
-  it("uses the Figma summary label for the latest overall score", () => {
-    expect(template).toContain(">综合分</view>");
+  it("does not promote a single metric to an overall score", () => {
+    expect(template).not.toContain(">综合分</view>");
     expect(template).not.toContain(">最新分</view>");
   });
 });
 
-it("formats floating point score changes to one decimal without exposing binary precision",async()=>{
+it("does not calculate a trend without comparable versions and units",async()=>{
  mocks.getParentGrowth.mockResolvedValueOnce({timeline:[{id:"precision",kind:"ability_update",occurredAt:"2026-10-21T01:00:00Z",abilityUpdate:{source:"semester_assessment",metrics:[{metricId:"m",label:"精神",value:67.8,previousValue:75.9}]}}]});
- const page=createPageInstance();await page.load();expect(page.data.rows[0].deltaLabel).toBe("-8.1");
+ const page=createPageInstance();await page.load();expect(page.data.rows[0].deltaLabel).toBe("未比较");
+});
+it("does not call missing comparison data stable or invent an overall score",async()=>{
+ mocks.requireRole.mockReturnValue({role:"parent",currentStudentId:"s"});mocks.getParentChildren.mockResolvedValue([{id:"s",name:"孩子",teams:[]}]);mocks.getParentGrowth.mockResolvedValue({timeline:[{id:"one",kind:"ability_update",occurredAt:"2026-10-01",abilityUpdate:{source:"semester_assessment",metrics:[{metricId:"m",label:"单项",value:0,previousValue:null}]}}]});
+ const p=createPageInstance();await p.load();expect(p.data.rows[0]).toMatchObject({metricLabel:"单项 – → 0",deltaLabel:"未比较",deltaTone:"neutral",sourceLabel:"测评模型"});expect(p.data.scoreLabel).toBeUndefined();
+});
+it("ignores a delayed history read after unloading",async()=>{
+ let finish;mocks.getParentGrowth.mockReturnValueOnce(new Promise(resolve=>{finish=resolve;}));const p=createPageInstance();const read=p.load();await vi.waitFor(()=>expect(finish).toBeTypeOf("function"));p.onUnload();finish({timeline:[]});await read;expect(p.data.state).toBe("loading");
 });

@@ -6,7 +6,7 @@ import type { GrowthTimelineItem, LoadState } from "../../../utils/types";
 
 type AbilityHistoryRow = {
   id: string;
-  sourceLabel: "课堂训练" | "学期测评";
+  sourceLabel: "课堂表现" | "测评模型";
   sourceTone: "training" | "assessment";
   title: string;
   occurredAtLabel: string;
@@ -18,6 +18,7 @@ type AbilityHistoryRow = {
 };
 
 Page({
+  requestGeneration: 0,
   data: {
     navInset: resolveNavInset(),
     menuInset: resolveMenuInset(),
@@ -26,23 +27,26 @@ Page({
     rows: [] as AbilityHistoryRow[],
     updateCountLabel: "已更新 0 次",
     latestUpdateLabel: "暂无更新记录",
-    scoreLabel: "–",
   },
   onLoad() {
     void this.load();
   },
+  onUnload() { this.requestGeneration++; },
   async load() {
     const session = requireRole("parent");
     if (!session) return;
+    const generation = ++this.requestGeneration;
     this.setData({ state: "loading", message: "正在读取能力模型更新", rows: [] });
     try {
       const children = await getParentChildren();
+      if (generation !== this.requestGeneration) return;
       const active = children.find((child) => child.id === session.currentStudentId) ?? children[0];
       if (!active) {
         this.setData({ state: "empty", message: "暂无绑定学员", rows: [] });
         return;
       }
       const growth = await getParentGrowth(active.id, active);
+      if (generation !== this.requestGeneration) return;
       const rows = buildAbilityHistoryRows(growth.timeline ?? [], active.id);
       const latest = rows[0];
       this.setData({
@@ -51,9 +55,9 @@ Page({
         rows,
         updateCountLabel: `已更新 ${rows.length} 次`,
         latestUpdateLabel: latest ? `最近更新 ${shortDate(latest.occurredAtLabel)}` : "暂无更新记录",
-        scoreLabel: latest ? latest.metricLabel.split(" ")[2] ?? "–" : "–",
       });
     } catch {
+      if (generation !== this.requestGeneration) return;
       this.setData({ state: "error", message: "能力模型更新读取失败，请点击重试", rows: [] });
     }
   },
@@ -82,19 +86,18 @@ function presentAbilityHistoryRow(item: GrowthTimelineItem, studentId: string): 
   const firstMetric = update?.metrics[0];
   const previousValue = firstMetric?.previousValue;
   const value = firstMetric?.value;
-  const delta = typeof value === "number" && typeof previousValue === "number" ? value - previousValue : undefined;
   const sourceUrl = source === "training_content_assessment"
-    ? item.eventId ? `/pages/parent/event/index?id=${encodeURIComponent(item.eventId)}` : ""
+    ? item.eventId ? `/pages/parent/event/index?id=${encodeURIComponent(item.eventId)}&studentId=${encodeURIComponent(studentId)}` : ""
     : firstMetric?.metricId ? `/pages/parent/metric/index?metricId=${encodeURIComponent(firstMetric.metricId)}&studentId=${encodeURIComponent(studentId)}` : "";
   return {
     id: item.id,
-    sourceLabel: source === "training_content_assessment" ? "课堂训练" : "学期测评",
+    sourceLabel: source === "training_content_assessment" ? "课堂表现" : "测评模型",
     sourceTone: source === "training_content_assessment" ? "training" : "assessment",
     title: item.title || (source === "training_content_assessment" ? "课堂训练评测" : "学期能力测评"),
     occurredAtLabel: formatAbilityDate(item.occurredAt),
     metricLabel: metricLabel(firstMetric?.label, previousValue, value),
-    deltaLabel: deltaLabel(delta),
-    deltaTone: delta === undefined || delta === 0 ? "neutral" : delta > 0 ? "positive" : "negative",
+    deltaLabel: "未比较",
+    deltaTone: "neutral",
     sourceUrl,
     hasSourceUrl: Boolean(sourceUrl),
   };
@@ -105,13 +108,6 @@ function metricLabel(label: string | undefined, previousValue: number | null | u
   const previous = typeof previousValue === "number" ? String(previousValue) : "–";
   const current = typeof value === "number" ? String(value) : "–";
   return `${name} ${previous} → ${current}`;
-}
-
-function deltaLabel(delta: number | undefined) {
-  if (delta === undefined || !Number.isFinite(delta)) return "持平";
-  const rounded = Number(delta.toFixed(1));
-  if (rounded === 0) return "持平";
-  return rounded > 0 ? `+${rounded}` : String(rounded);
 }
 
 function shortDate(value: string) {

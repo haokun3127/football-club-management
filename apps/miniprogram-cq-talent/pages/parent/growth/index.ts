@@ -1,8 +1,10 @@
 import {
   getParentChildren,
+  getParentConfirmedResults,
   getParentGrowth,
   getParentMetricDetail,
 } from "../../../utils/api";
+import { assessmentValueText } from "../../../utils/assessment-input";
 import { requireRole } from "../../../utils/auth";
 import { consumeGrowthStale } from "../../../utils/growth-invalidation";
 import { openPage } from "../../../utils/navigation";
@@ -21,9 +23,14 @@ import type {
   StudentSummary,
 } from "../../../utils/types";
 
-let growthRequestId = 0;
 
 Page({
+  growthRequestId: 0,
+  resultsRequest: 0,
+  summaryRequest: 0,
+  metricRequest: 0,
+  loadedScope: "",
+  requestedStudentId: "",
   data: {
     navInset: resolveNavInset(),
     menuInset: resolveMenuInset(),
@@ -32,6 +39,13 @@ Page({
     children: [] as StudentSummary[],
     activeStudentId: "",
     growth: null as GrowthSummary | null,
+    growthState: "loading" as LoadState,
+    refreshing: false,
+    refreshMessage: "",
+    resultsState: "loading" as LoadState,
+    resultsLoaded: false,
+    resultsMessage: "",
+    confirmedRows: [] as Array<{id:string;name:string;value:string;mapping:string;date:string;source:string;eventId:string;version:string}>,
     viewIndex: 0,
     radar: [] as RadarMetricPoint[],
     selectedMetricId: "",
@@ -60,7 +74,7 @@ Page({
       text: string;
       author: string;
     }>,
-    evaluationMessage: "",
+    evaluationMessage: "队伍评价待读取，可进入详情查看",
     milestoneMessage: "",
     trainingHistoryMessage: "",
     matchHistoryMessage: "",
@@ -90,53 +104,58 @@ Page({
     this.load();
   },
   onUnload() {
-    growthRequestId += 1;
+    this.growthRequestId += 1;
   },
   onShow() {
     const session = requireRole("parent");
-    if (!session || !this.data.activeStudentId) return;
-    // 孩子未变时仅对相关事实变更（如训练记录更正打脏）做失效刷新，不做无差别全量加载（F-06）
-    if (session.currentStudentId !== this.data.activeStudentId)
-      return this.load();
-    if (consumeGrowthStale()) return this.load();
+    if (!session) return;
+    const scope = JSON.stringify([session.clubId, session.clientId, session.userId || session.token, session.role]);
+    if (this.data.state === "loading" && this.loadedScope === scope && this.requestedStudentId === (session.currentStudentId || "")) return;
+    consumeGrowthStale();
+    return this.load();
+  },
+  resetContent() {
+    this.setData({state:"loading",message:"正在读取成长数据",activeStudentId:"",children:[],growth:null,
+      growthState:"loading",refreshing:false,refreshMessage:"",resultsState:"loading",resultsLoaded:false,resultsMessage:"",confirmedRows:[],
+      radar:[],radarRows:[],evaluationCards:[],evaluationMessage:"队伍评价待读取，可进入详情查看",detailCache:{},selectedDetail:null,selectedMetric:null,selectedMetricId:"",detailState:"idle",
+      milestones:[],trainingBars:[],heroName:"",heroTeam:"",heroStats:[],canDrawRadar:false});
   },
   async load() {
-    const session = requireRole("parent");
-    if (!session) return;
-    const requestId = ++growthRequestId;
-    this.setData({
-      state: "loading",
-      message: "正在读取成长数据",
-      evaluationCards: [],
-      evaluationMessage: "",
-      detailCache: {},
-      selectedDetail: null,
-    });
+    const session = requireRole("parent"); if (!session) return;
+    let requestId = ++this.growthRequestId;
+    const scope = JSON.stringify([session.clubId, session.clientId, session.userId || session.token, session.role]);
+    const retaining = this.data.state === "ready" && this.loadedScope === scope && this.data.activeStudentId === session.currentStudentId;
+    if (retaining) this.setData({refreshing:true,refreshMessage:"",detailCache:{},selectedDetail:null});
+    else this.resetContent();
+    this.loadedScope = scope; this.requestedStudentId = session.currentStudentId || "";
     try {
-      const children = await getParentChildren();
-      if (requestId !== growthRequestId) return;
-      if (!children.length) {
-        this.setData({
-          state: "empty",
-          message: "当前账号没有绑定孩子，无法查看成长数据。",
-        });
-        return;
-      }
-      const active =
-        children.find((child) => child.id === session.currentStudentId) ??
-        children[0];
-      if (!active) return;
-      setCurrentStudentId(active.id);
+      const children = await getParentChildren(); if (requestId !== this.growthRequestId) return;
+      const active = children.find(child => child.id === session.currentStudentId) ?? children[0];
+      if (!active) { this.growthRequestId++; this.resetContent(); this.setData({state:"empty",message:"当前账号没有绑定孩子，无法查看成长数据。"}); return; }
+      if (retaining && active.id !== this.data.activeStudentId) { requestId = ++this.growthRequestId; this.resetContent(); }
+      setCurrentStudentId(active.id); this.requestedStudentId = active.id;
+      this.setData({state:"ready",message:"",refreshing:false,children,activeStudentId:active.id,heroName:active.name,heroSurname:active.name.slice(0,1),heroTeam:active.teams.find(Boolean) || "球队待同步"});
+      await Promise.all([this.loadGrowth(requestId,active),this.loadConfirmed(requestId,active.id)]);
+    } catch (error) {
+      if (requestId !== this.growthRequestId) return;
+      if (retaining) this.setData({refreshing:false,refreshMessage:`刷新失败，当前显示上次读取的内容。${readableError(error)}`});
+      else this.setData({state:"error",message:readableError(error)});
+    }
+  },
+  async loadGrowth(requestId: number, active: StudentSummary) {
+    const summaryRequest = ++this.summaryRequest;
+    this.setData({growthState:"loading",refreshMessage:""});
+    try {
       const growth = await getParentGrowth(active.id, active);
-      if (requestId !== growthRequestId) return;
+      if (requestId !== this.growthRequestId || summaryRequest !== this.summaryRequest) return;
       const radar = radarForView(growth, 0);
       const selectedMetric = radar[0] ?? null;
       const activityMessages = growthActivityMessages(growth.timeline ?? []);
       const activityView = buildActivityView(growth.timeline ?? []);
       this.setData({
         state: "ready",
+        growthState: "ready",
         message: "",
-        children,
         activeStudentId: active.id,
         growth,
         viewIndex: 0,
@@ -146,7 +165,7 @@ Page({
           label: point.label,
           value:
             point.value === undefined
-              ? "尚无已确认数值"
+              ? "数值未记录"
               : `${point.value} / ${point.maxValue}`,
           date: point.occurredAt
             ? formatDateTime(point.occurredAt)
@@ -156,7 +175,7 @@ Page({
         selectedMetric,
         selectedDetail: null,
         detailCache: {},
-        canDrawRadar: radar.length >= 3,
+        canDrawRadar: radar.length >= 3 && radar.length <= 8,
         updatedAtLabel: growth.updatedAt
           ? formatDateTime(growth.updatedAt)
           : "更新时间待同步",
@@ -195,11 +214,32 @@ Page({
         milestones: activityView.milestones,
         trainingBars: buildMonthlyBars(growth) ?? [],
       });
-      if (selectedMetric) await this.loadMetricDetail(selectedMetric.metricId);
+
     } catch (error) {
-      if (requestId === growthRequestId)
-        this.setData({ state: "error", message: readableError(error) });
+      if (requestId === this.growthRequestId && summaryRequest === this.summaryRequest) this.setData({growthState:"error",refreshMessage:`${this.data.growth ? "成长汇总刷新失败，当前显示上次读取的内容。" : "成长汇总读取失败。"}${readableError(error)}`});
     }
+  },
+  async loadConfirmed(requestId: number, studentId: string) {
+    const resultsRequest = ++this.resultsRequest;
+    this.setData({resultsState:"loading",resultsMessage:""});
+    try {
+      const response = await getParentConfirmedResults(studentId);
+      if (requestId !== this.growthRequestId || resultsRequest !== this.resultsRequest || studentId !== this.data.activeStudentId) return;
+      const rows = response.confirmedResults.slice(0,3).map(row => ({id:row.id,name:row.name,
+        value: `${assessmentValueText(row.value) || "原始值未记录"}${row.unit ? ` ${row.unit}` : "（单位未提供）"}`,
+        mapping: row.mapping ? `分值 ${row.mapping.integerScore} · 等级 ${row.mapping.grade}` : "暂无完整分值/等级映射",
+        date: formatDateTime(row.occurredAt), source: row.eventId ? "已确认测评 · 关联活动" : row.taskId ? "已确认测评 · 测评任务" : "已确认测评记录",
+        eventId: row.eventId || "", version:row.templateVersionId ? `项目版本 ${row.templateVersionId}` : "项目版本未提供，不合并比较"}));
+      this.setData({resultsState:"ready",resultsLoaded:true,confirmedRows:rows});
+    } catch(error) {
+      if (requestId !== this.growthRequestId || resultsRequest !== this.resultsRequest || studentId !== this.data.activeStudentId) return;
+      this.setData({resultsState:"error",resultsMessage:`${this.data.resultsLoaded ? "成绩刷新失败，当前显示上次读取的结果。" : ""}${readableError(error)}`});
+    }
+  },
+  retryResults() { if(this.data.activeStudentId) return this.loadConfirmed(this.growthRequestId,this.data.activeStudentId); },
+  openResultSource(event:{currentTarget:{dataset:{id?:string}}}) {
+    const row = this.data.confirmedRows.find((item: {id:string;eventId:string}) => item.id === event.currentTarget.dataset.id);
+    if(row?.eventId) openPage(`/pages/parent/event/index?id=${encodeURIComponent(row.eventId)}&studentId=${encodeURIComponent(this.data.activeStudentId)}`);
   },
   switchChild(event: { detail: { studentId: string } }) {
     const id = event.detail.studentId;
@@ -225,9 +265,6 @@ Page({
     openPage("/pages/parent/milestones/index");
   },
   openRadar() {
-    console.info("[growth] openRadar tapped", {
-      pageStackDepth: getCurrentPages().length,
-    });
     openPage("/pages/parent/radar/index");
   },
   onViewChange(event: { detail: { value: string | number } }) {
@@ -241,7 +278,7 @@ Page({
       selectedMetricId: selectedMetric?.metricId ?? "",
       selectedMetric,
       selectedDetail: null,
-      canDrawRadar: radar.length >= 3,
+      canDrawRadar: radar.length >= 3 && radar.length <= 8,
       latestLabel: "",
       trendLabel: "等待更多记录",
     });
@@ -261,8 +298,9 @@ Page({
     this.loadMetricDetail(metricId);
   },
   async loadMetricDetail(metricId: string) {
+    const metricRequest = ++this.metricRequest;
     const studentId = this.data.activeStudentId;
-    const requestId = growthRequestId;
+    const requestId = this.growthRequestId;
     const cached = this.data.detailCache[metricId];
     if (cached) {
       this.applyMetricDetail(cached);
@@ -272,7 +310,7 @@ Page({
     try {
       const detail = await getParentMetricDetail(studentId, metricId);
       if (
-        requestId !== growthRequestId ||
+        requestId !== this.growthRequestId || metricRequest !== this.metricRequest ||
         this.data.activeStudentId !== studentId
       )
         return;
@@ -285,7 +323,7 @@ Page({
       }
     } catch (_error) {
       if (
-        requestId !== growthRequestId ||
+        requestId !== this.growthRequestId || metricRequest !== this.metricRequest ||
         this.data.activeStudentId !== studentId ||
         this.data.selectedMetricId !== metricId
       )
@@ -323,7 +361,7 @@ function growthActivityMessages(timeline: GrowthTimelineItem[]) {
   const recent = timeline.filter(
     (item) =>
       (item.kind === "training" || item.kind === "match") &&
-      Date.parse(item.occurredAt) >= thirtyDaysAgo,
+      Date.parse(item.occurredAt) >= thirtyDaysAgo && Date.parse(item.occurredAt) <= Date.now(),
   );
   const trainingCount = recent.filter(
     (item) => item.kind === "training",
@@ -333,12 +371,12 @@ function growthActivityMessages(timeline: GrowthTimelineItem[]) {
 
   return {
     heroSummary: recent.length
-      ? `近30天完成 ${trainingCount} 次训练、${matchCount} 场比赛`
-      : "近30天暂无已完成活动",
+      ? `近30天记录 ${trainingCount} 次训练、${matchCount} 场比赛`
+      : "近30天暂无活动记录",
     milestone: latest ? `最新足迹：${latest.title}` : "成长足迹正在积累",
     trainingHistory: trainingCount
-      ? `近30天已完成 ${trainingCount} 次训练，点击查看完整历程`
-      : "近30天暂无完成训练",
+      ? `近30天记录 ${trainingCount} 次训练，点击查看完整历程`
+      : "近30天暂无训练记录",
     matchHistory: matchCount
       ? `近30天已完成 ${matchCount} 场比赛，点击查看比赛记录`
       : "近30天暂无完成比赛",
@@ -414,12 +452,6 @@ function readableError(error: unknown) {
   return record?.message || record?.code || "成长数据读取失败。";
 }
 
-function metricTrend(detail: MetricDetail) {
-  const current = detail.records[0]?.value;
-  const previous = detail.records[1]?.value;
-  if (current === undefined || previous === undefined) return "等待更多记录";
-  const delta = Number((current - previous).toFixed(1));
-  if (delta > 0) return `较上次提升 ${delta}${detail.unit || ""}`;
-  if (delta < 0) return `较上次变化 ${delta}${detail.unit || ""}`;
-  return "与上次持平";
+function metricTrend(_detail: MetricDetail) {
+  return "版本与单位信息不足，未计算趋势";
 }
