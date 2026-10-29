@@ -20,7 +20,7 @@ try {
     const imageId = command("docker", ["image", "inspect", values.tag, "--format", "{{.Id}}"]);
     const artifact = JSON.parse(command("docker", ["run", "--rm", "--network", "none", "--read-only", "--entrypoint", "cat", imageId, "/app/server-artifact.json"]));
     if (JSON.stringify(artifact.build) !== JSON.stringify(build)) throw new Error("Built image identity differs from requested commit");
-    writeFileSync(resolve(values.output), `${JSON.stringify({ schemaVersion: 1, imageId, imageDigest: null, artifact }, null, 2)}\n`, { flag: "wx" });
-    console.log(JSON.stringify({ imageId, build, imageDigest: null, note: "Local image ID is not a registry digest; no push or deployment performed" }));
+    writeFileSync(resolve(values.output), `${JSON.stringify({ schemaVersion: 1, imageId, repositoryDigest: null, artifact }, null, 2)}\n`, { flag: "wx" });
+    console.log(JSON.stringify({ imageId, build, repositoryDigest: null, note: "Local image ID is not a registry digest; no push or deployment performed" }));
   } finally { rmSync(directory, { recursive: true, force: true }); }
 } catch (error) { console.error(error.message); process.exitCode = 1; }

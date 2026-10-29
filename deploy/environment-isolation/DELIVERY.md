@@ -17,18 +17,18 @@ The server image contains `/app/apps/api/build-metadata.json` (public identity o
 
 The mini-program artifact contains a stamped `utils/build-metadata.ts` and a sibling `miniprogram-artifact.json` with a source inventory. This inventory includes source files that official `packOptions.ignore` later excludes; it is neither an official package-size report nor an upload receipt. The checkout's placeholder remains null. The coordinator must copy the approved generated metadata into the main project's common utility before official compilation/upload and retain the same commit/build identity; any other source change requires a new artifact. Never stamp a checkout with a SHA that does not describe its actual approved source.
 
-After a separately authorized image distribution, retain its real `repository@sha256:<64 hex>` reference. With that image available locally, generate the association record:
+Use the actual local Docker image ID (`sha256:<64 hex>`) directly; no registry or image distribution is required. If an existing authorized distribution supplies a real `repository@sha256:<64 hex>`, that optional reference is also supported. With the reviewed image available locally, generate the association record:
 
 ```sh
-node scripts/delivery/create-manifest.mjs --candidate /private/tmp/server-candidate.json --image <repository@sha256:digest> --client /private/tmp/cq-client-artifact/miniprogram-artifact.json --output /private/tmp/delivery-manifest.json
+node scripts/delivery/create-manifest.mjs --candidate /private/tmp/server-candidate.json --image <sha256:local-image-id> --client /private/tmp/cq-client-artifact/miniprogram-artifact.json --output /private/tmp/delivery-manifest.json
 ```
 
-This checks that the digest resolves locally to the candidate's image ID. Server and client commits may differ and are recorded independently. Without upload evidence, `reportedPlatformVersion` and `uploadReceipt` remain null. After an authorized official upload, supply both `--client-version <actual-version>` and `--upload-receipt <official-receipt-file>` to a new manifest. The reported version is operator supplied; the receipt is stored only as a hash, never as a secret-bearing raw payload. Preserve the actual receipt privately for audit. This tool does not contact WeChat, push an image, or imply the installed client has updated.
+This inspects the immutable reference and checks that it resolves locally to the candidate's image ID. The manifest records `imageReference`, `imageId` and a separate optional `repositoryDigest`; local IDs are never labeled as registry digests. Server and client commits may differ and are recorded independently. Without upload evidence, `reportedPlatformVersion` and `uploadReceipt` remain null. After an authorized official upload, supply both `--client-version <actual-version>` and `--upload-receipt <official-receipt-file>` to a new manifest. The reported version is operator supplied; the receipt is stored only as a hash, never as a secret-bearing raw payload. Preserve the actual receipt privately for audit. This tool does not contact WeChat, push an image, or imply the installed client has updated.
 
 ## Environment selection and startup
 
-- `FCM_DEVELOP_IMAGE`, `FCM_TRIAL_IMAGE`, `FCM_RELEASE_IMAGE` each select a reviewed **digest** independently. Do not use `latest` or mutable tags.
-- Nonproduction Compose requires both independent image values and dedicated `FCM_DEVELOP_ENV_FILE` / `FCM_TRIAL_ENV_FILE` because Compose interpolates the whole standalone document. Keep the sibling's existing value when changing develop.
+- `FCM_DEVELOP_IMAGE`, `FCM_TRIAL_IMAGE`, `FCM_RELEASE_IMAGE` each select a reviewed **local image ID or optional repository digest** independently. Do not use `latest` or mutable tags.
+- Nonproduction Compose requires both independent immutable image values and dedicated `FCM_DEVELOP_ENV_FILE` / `FCM_TRIAL_ENV_FILE` because Compose interpolates the whole standalone document. Keep the sibling's existing immutable value when changing develop.
 - Root release Compose uses `.env.runtime`. Never merge root and nonproduction Compose files or pass unrelated override files.
 - `develop-data-init` mounts only develop data; `trial-data-init` only trial data; release retains its own `data-init` and volume. Runtime services have no build configuration.
 
@@ -37,9 +37,9 @@ node scripts/delivery/start-environment.mjs develop          # render and print 
 node scripts/delivery/start-environment.mjs develop --apply  # requires separate deployment authorization
 ```
 
-The command validates the selected service's image digest, matching initialization image, one dedicated volume/database, no cross-environment dependencies and localhost port. It never prints rendered environment values. Applying runs exactly the selected init with `run --rm --no-deps --pull never`, then the selected API with `up -d --no-build --no-deps --pull never`. It does not stop/recreate siblings or pull/build images. Install/load the reviewed digest separately before applying. Never run unscoped `compose up` as a shortcut.
+The command validates the selected service's immutable image reference and actual inspected local ID, matching initialization image, one dedicated volume/database, no cross-environment dependencies and localhost port. It never prints rendered environment values. Applying runs exactly the selected init with `run --rm --no-deps --pull never`, then the selected API with `up -d --no-build --no-deps --pull never`. It does not stop/recreate siblings or pull/build images. Build/load the reviewed image ID separately before applying. Never run unscoped `compose up` as a shortcut.
 
-Existing operational entrypoints still migrate the owned database without seeding. If a one-shot migration is required, use the **same selected image/config/volume**, for example `docker compose -f deploy/environment-isolation/compose.nonproduction.yml run --rm --no-deps --pull never develop node apps/api/dist/migrate.js`; this also needs deployment authorization. Synthetic/business initialization retains its existing explicit safeguards. Application rollback selects the previous compatible image; never restore an old database over new business facts as an application rollback.
+Existing operational entrypoints still migrate the owned database without seeding. If a one-shot migration is required, use the **same selected image/config/volume**, for example `docker compose -f deploy/environment-isolation/compose.nonproduction.yml run --rm --no-deps --pull never develop node apps/api/dist/migrate.js`; this also needs deployment authorization. Synthetic/business initialization retains its existing explicit safeguards. Application rollback selects the previous compatible immutable image; never restore an old database over new business facts as an application rollback.
 
 ## Readback and client integration
 

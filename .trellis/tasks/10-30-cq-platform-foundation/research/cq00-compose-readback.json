@@ -1,0 +1,1 @@
+{"passed":true,"uid":1000,"network":"none","dataVolumes":0,"readOnly":true,"health":{"status":"ok","service":"@football-club/api","environment":"develop","build":{"sourceRevision":"b51bfbb3cb85e1bba2070de50235e7e4e78e11aa","buildId":"cq00-b51bfbb3","builtAt":"2026-10-29T17:18:25.997Z"}},"backofficeFiles":7,"migrations":45}

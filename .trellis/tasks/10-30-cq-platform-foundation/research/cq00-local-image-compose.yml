@@ -1,0 +1,11 @@
+name: cq00-local-image-verification
+services:
+  reader:
+    image: sha256:61e2b2002f8a7c716508a5aa2ef6537b653ea6350e87fd84a1a7b8d93b41c655
+    network_mode: none
+    read_only: true
+    user: node
+    working_dir: /app/apps/api
+    entrypoint: [node, --input-type=module]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]

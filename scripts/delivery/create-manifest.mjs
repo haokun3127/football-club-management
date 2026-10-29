@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
-import { assertDigest } from "./start-environment.mjs";
+import { assertImageReference } from "./start-environment.mjs";
 import { buildIdentity, command, sha256 } from "./artifacts.mjs";
 
 function validateInventory(value, { migrations = false } = {}) {
@@ -18,8 +18,9 @@ function validateInventory(value, { migrations = false } = {}) {
 }
 
 export function createManifest({ candidate, image, inspectedImageId, client, clientVersion = null, receipt = null }) {
-  assertDigest(image);
-  if (!/^sha256:[0-9a-f]{64}$/.test(candidate?.imageId ?? "") || candidate.imageId !== inspectedImageId) throw new Error("Registry digest must resolve to the candidate's local image ID");
+  assertImageReference(image);
+  if (!/^sha256:[0-9a-f]{64}$/.test(candidate?.imageId ?? "") || candidate.imageId !== inspectedImageId) throw new Error("Image reference must resolve to the candidate's local image ID");
+  if (image.startsWith("sha256:") && image !== inspectedImageId) throw new Error("Local image ID differs from inspected image");
   const server = candidate.artifact;
   if (server?.unit !== "server" || server.schemaVersion !== 1 || client?.unit !== "miniprogram" || client.schemaVersion !== 1) throw new Error("Expected the server and mini-program artifact records");
   const serverBuild = buildIdentity(server.build?.sourceRevision, server.build?.buildId, server.build?.builtAt);
@@ -29,7 +30,7 @@ export function createManifest({ candidate, image, inspectedImageId, client, cli
     || (clientVersion !== null && !/^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/.test(clientVersion))) throw new Error("An operator-reported platform version requires its nonempty upload receipt, and vice versa");
   return {
     schemaVersion: 1,
-    server: { build: serverBuild, image, imageId: candidate.imageId, backoffice: validateInventory(server.backoffice), migrations: validateInventory(server.migrations, { migrations: true }), lockfileSha256: server.lockfileSha256 },
+    server: { build: serverBuild, imageReference: image, imageId: candidate.imageId, repositoryDigest: image.startsWith("sha256:") ? null : image, backoffice: validateInventory(server.backoffice), migrations: validateInventory(server.migrations, { migrations: true }), lockfileSha256: server.lockfileSha256 },
     miniprogram: { build: clientBuild, sourceInventory: validateInventory(client.sourceInventory), reportedPlatformVersion: clientVersion, uploadReceipt: receipt === null ? null : { sha256: sha256(receipt) } },
   };
 }
@@ -37,9 +38,9 @@ export function createManifest({ candidate, image, inspectedImageId, client, cli
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   try {
     const { values } = parseArgs({ options: { candidate: { type: "string" }, image: { type: "string" }, client: { type: "string" }, "client-version": { type: "string" }, "upload-receipt": { type: "string" }, output: { type: "string" } } });
-    if (!values.candidate || !values.client || !values.output) throw new Error("Usage: create-manifest.mjs --candidate <json> --image <repository@sha256:digest> --client <miniprogram-artifact.json> --output <new-manifest.json> [--client-version <version> --upload-receipt <receipt-file>]");
-    assertDigest(values.image);
-    // Read local image identity only: never pull, push, run the API or touch a data volume.
+    if (!values.candidate || !values.client || !values.output) throw new Error("Usage: create-manifest.mjs --candidate <json> --image <sha256:image-id|repository@sha256:digest> --client <miniprogram-artifact.json> --output <new-manifest.json> [--client-version <version> --upload-receipt <receipt-file>]");
+    assertImageReference(values.image);
+    // Read the local content-addressed image identity only: never pull, push, run the API or touch a data volume.
     const inspectedImageId = command("docker", ["image", "inspect", values.image, "--format", "{{.Id}}"]);
     const manifest = createManifest({ candidate: JSON.parse(readFileSync(values.candidate, "utf8")), image: values.image, inspectedImageId, client: JSON.parse(readFileSync(values.client, "utf8")), clientVersion: values["client-version"] ?? null, receipt: values["upload-receipt"] ? readFileSync(values["upload-receipt"]) : null });
     writeFileSync(resolve(values.output), `${JSON.stringify(manifest, null, 2)}\n`, { flag: "wx" });

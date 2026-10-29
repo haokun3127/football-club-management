@@ -10,7 +10,7 @@ Server or mini-program packaging, environment startup selection, public build di
 
 - `node scripts/delivery/build-server.mjs --revision <commit> --build-id <id> --tag <unique-local-tag> --output <new-file>`.
 - `node scripts/delivery/prepare-miniprogram.mjs --revision <commit> --build-id <id> --output <new-directory>`.
-- `node scripts/delivery/create-manifest.mjs --candidate <json> --image <repo@sha256:digest> --client <artifact.json> --output <new-file> [--client-version <version> --upload-receipt <file>]`.
+- `node scripts/delivery/create-manifest.mjs --candidate <json> --image <sha256:local-id|repo@sha256:digest> --client <artifact.json> --output <new-file> [--client-version <version> --upload-receipt <file>]`.
 - `node scripts/delivery/start-environment.mjs <develop|trial|release> [--apply]`.
 - `GET /health`; `getClientVersion()` / `getServiceVersion()` in `utils/version.ts`.
 
@@ -18,8 +18,8 @@ Server or mini-program packaging, environment startup selection, public build di
 
 - Immutable commit export separates build from runtime. Docker build args are `FCM_SOURCE_REVISION` (40 lowercase hex), `FCM_BUILD_ID` (1–80 alphanumeric/dot/underscore/hyphen, starts alphanumeric), `FCM_BUILT_AT` (UTC ISO timestamp). They produce an image-baked file, never a runtime env dump.
 - Health preserves required status/service; adds optional build (whitelisted three fields or null) and environment. No cache. OpenAPI uses the same schema. Old response consumers ignore additive fields; new clients tolerate old missing fields.
-- `FCM_DEVELOP_IMAGE`, `FCM_TRIAL_IMAGE`, `FCM_RELEASE_IMAGE` select independent repository digests. Each init/runtime shares the selected digest and only its dedicated named volume, DB path and localhost port. Startup validates physical volume names too, then targets only the selected init/API with no dependency traversal/build/pull.
-- Server artifact lists actual backoffice/migration hashes and lockfile hash. Client artifact lists staged source hashes; official package/receipt evidence is independent. Manifest binds two separately versioned units to the actual locally inspected image ID/digest; optional reported platform version requires receipt bytes (stored as hash only). No automatic push/upload/deployment.
+- `FCM_DEVELOP_IMAGE`, `FCM_TRIAL_IMAGE`, `FCM_RELEASE_IMAGE` select independent local image IDs or optional repository digests. Each init/runtime shares the selected immutable image reference and only its dedicated named volume, DB path and localhost port. Startup validates physical volume names too, then targets only the selected init/API with no dependency traversal/build/pull.
+- Server artifact lists actual backoffice/migration hashes and lockfile hash. Client artifact lists staged source hashes; official package/receipt evidence is independent. Manifest binds two separately versioned units to the actual locally inspected image ID and optional repository digest; optional reported platform version requires receipt bytes (stored as hash only). No automatic push/upload/deployment.
 - Client version utility does no network work until an explicit service-version read. Platform version, client source and API source remain distinct facts. Page integration details: `deploy/environment-isolation/DELIVERY.md`.
 
 ## 4. Validation / Error Matrix
@@ -38,7 +38,7 @@ Server or mini-program packaging, environment startup selection, public build di
 
 ## 5. Good / Base / Bad Cases
 
-- Good: change only develop digest; trial rendered service/init stays identical; plan starts develop init and develop API only.
+- Good: change only develop image ID; trial rendered service/init stays identical; plan starts develop init and develop API only.
 - Base: unstamped local checkout or older service reports unknown metadata without blocking business flows.
 - Bad: infer client SHA from API SHA, call health on every page load, publish latest, run unscoped compose up, share init volumes, or claim source inventory is official WeChat compilation evidence.
 
@@ -53,4 +53,4 @@ Server or mini-program packaging, environment startup selection, public build di
 
 Wrong: `FCM_NONPROD_IMAGE=cq:latest docker compose up -d` with one init mounting both environments.
 
-Correct: preserve independently reviewed digest values; inspect `start-environment.mjs develop` plan, then execute that exact targeted plan only under deployment authorization. Read back both public artifact identities, compare siblings, preserve existing database facts during application rollback.
+Correct: preserve independently reviewed immutable image references; inspect `start-environment.mjs develop` plan, then execute that exact targeted plan only under deployment authorization. Read back both public artifact identities, compare siblings, preserve existing database facts during application rollback.

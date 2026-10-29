@@ -2,7 +2,7 @@
 name: cq-talent-nonproduction
 services:
   develop-data-init:
-    image: ${FCM_DEVELOP_IMAGE:?Set the reviewed develop image by digest}
+    image: ${FCM_DEVELOP_IMAGE:?Set the reviewed develop image by local ID or repository digest}
     user: "0:0"
     command: ["sh", "-c", "chown node:node /var/lib/cq-talent-develop"]
     volumes:
@@ -12,7 +12,7 @@ services:
     cap_add: [CHOWN]
     security_opt: ["no-new-privileges:true"]
   develop:
-    image: ${FCM_DEVELOP_IMAGE:?Set the reviewed develop image by digest}
+    image: ${FCM_DEVELOP_IMAGE:?Set the reviewed develop image by local ID or repository digest}
     env_file: ${FCM_DEVELOP_ENV_FILE:?Set a dedicated private develop env file}
     environment:
       NODE_ENV: production
@@ -30,7 +30,7 @@ services:
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
   trial-data-init:
-    image: ${FCM_TRIAL_IMAGE:?Set the reviewed trial image by digest}
+    image: ${FCM_TRIAL_IMAGE:?Set the reviewed trial image by local ID or repository digest}
     user: "0:0"
     command: ["sh", "-c", "chown node:node /var/lib/cq-talent-trial"]
     volumes: ["trial-data:/var/lib/cq-talent-trial"]
@@ -39,7 +39,7 @@ services:
     cap_add: [CHOWN]
     security_opt: ["no-new-privileges:true"]
   trial:
-    image: ${FCM_TRIAL_IMAGE:?Set the reviewed trial image by digest}
+    image: ${FCM_TRIAL_IMAGE:?Set the reviewed trial image by local ID or repository digest}
     env_file: ${FCM_TRIAL_ENV_FILE:?Set a dedicated private trial env file}
     environment:
       NODE_ENV: production

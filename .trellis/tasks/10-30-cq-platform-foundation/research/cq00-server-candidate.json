@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "imageId": "sha256:61e2b2002f8a7c716508a5aa2ef6537b653ea6350e87fd84a1a7b8d93b41c655",
+  "imageDigest": null,
+  "artifact": {
+    "schemaVersion": 1,
+    "unit": "server",
+    "build": {
+      "sourceRevision": "b51bfbb3cb85e1bba2070de50235e7e4e78e11aa",
+      "buildId": "cq00-b51bfbb3",
+      "builtAt": "2026-10-29T17:18:25.997Z"
+    },
+    "backoffice": {
+      "sha256": "41af601346f1e50d97793f5841699c48076572193a3ebdacd7706a263b99758a",
+      "files": [
+        {
+          "path": "214.83b271ca.async.js",
+          "sha256": "feb4192cdcc813203be0db25b40d644cd9a5b7c7a04d63dace72718918b91dba"
+        },
+        {
+          "path": "favicon.svg",
+          "sha256": "62d098ca0501bf8b4825de0fc5d2448a6e9efe9a75e0accfa01f6c61fd69a00f"
+        },
+        {
+          "path": "index.html",
+          "sha256": "11d1e210aab8c9153d4489d7b836d2be37b92245eec23dc022a20cc2b4753a6d"
+        },
+        {
+          "path": "p__Workspace.db4d5db2.async.js",
+          "sha256": "d728b339b7f9e33e7d7bdc1020a9fdc7da38564c5ef3e49049e82d22655f8751"
+        },
+        {
+          "path": "preload_helper.8b8c427c.js",
+          "sha256": "b650750e7b2811b8ff8fa5eee9b84a37ad16e2f79f2f796b3d488955ba232f86"
+        },
+        {
+          "path": "umi.54ac5ccd.js",
+          "sha256": "f33e3d80d854e11caa383920f033375f9559221b09af2125ab25f1b5a053d8b7"
+        },
+        {
+          "path": "umi.e818329b.css",
+          "sha256": "53528dafb799b8211fcf2b2e9e85b0e7b8c9c51a2bebfd1d6f6bfffeacb7a425"
+        }
+      ]
+    },
+    "migrations": {
+      "sha256": "4fd3ac633fc6346a87ba73f7939b208d202f6ad19c0d2b9260c2b1ca29598f83",
+      "files": [
+        {
+          "path": "0001_platform_foundation.sql",
+          "sha256": "3d81164878a316a7a8dbcf19c964436024b62b4610cae4d3004c97fa68e9deb2"
+        },
+        {
+          "path": "0002_data_capability_foundation.sql",
+          "sha256": "b54e38b712830d35137a624186bf1993c25908e90d554a0ac3460e5a5402520a"
+        },
+        {
+          "path": "0003_status_flow_audit_fields.sql",
+          "sha256": "2f5d2f55875f00c8fff3ba54b171e062bc3bc3d1bec74c9d6d78871e480fd0a0"
+        },
+        {
+          "path": "0004_http_idempotency_records.sql",
+          "sha256": "2925fa6d431956c8ab54fc0ca017cf791943c35185e69a189f2d5c575ff42f2f"
+        },
+        {
+          "path": "0005_privacy_foundation.sql",
+          "sha256": "988e6f4100461297ffea7fb6bfc85b111a020bc03edacf8a257ef565117de084"
+        },
+        {
+          "path": "0006_tactical_boards.sql",
+          "sha256": "fda3b27862c3c0306d4f7037ddac3b66c6f11e2798e753b34b5a3efa9d9f6dd9"
+        },
+        {
+          "path": "0007_request_collections.sql",
+          "sha256": "76d9926753cfc1993d140f7cd0cd6b409c204f32fb4925a66a8d9b70da406562"
+        },
+        {
+          "path": "0008_match_event_bundles.sql",
+          "sha256": "df2f8260fcc17c6acf0312b815f255e8d8bef7470491b43523bb5df32e0bdc8c"
+        },
+        {
+          "path": "0009_app_client_sessions.sql",
+          "sha256": "a80f2b79c6746d7e299d966a7b775b588e204365bd2626de03e8ba8612f278e5"
+        },
+        {
+          "path": "0010_student_guardian_bindings.sql",
+          "sha256": "b1ca0945eef022bc7fad84704b0d377d6a2882947e2d1b329c0a8d9e2ca27edf"
+        },
+        {
+          "path": "0011_event_change_notify.sql",
+          "sha256": "ed9ece28a78901fc1e826397e00409b3ef2bdc073f56603e98b27f99deaca2a7"
+        },
+        {
+          "path": "0012_assessment_tasks.sql",
+          "sha256": "c6d1b3873d7b22e790d1633c93c70d5bab80a76480bd626adf3afc8e5940532c"
+        },
+        {
+          "path": "0013_coach_preferences.sql",
+          "sha256": "4564bfe041f10fba3310c40445165e54f62b15eab767b1dc0d5f536d3c49d597"
+        },
+        {
+          "path": "0014_coach_wechat.sql",
+          "sha256": "92128400adfaf3e122bab2839aa658883157f13213f80665e74a8a786e11d32f"
+        },
+        {
+          "path": "0015_session_plans.sql",
+          "sha256": "62f4389c3b069c25ed4521bd80c2a44044c85537471d8e9d0959adffdc6d4f94"
+        },
+        {
+          "path": "0016_training_sessions.sql",
+          "sha256": "5a869b3e0ba051a71550f092e3071b898ed565bf09c1219bb955111d100d9bd4"
+        },
+        {
+          "path": "0017_match_rosters.sql",
+          "sha256": "e4a460b521ccb07efbd368e90e683d84dce889f95471b33adb4edaac0420b5a4"
+        },
+        {
+          "path": "0018_training_content_assessments.sql",
+          "sha256": "7f09ef8ddb090b6ed3b8c3d3c17bca283452b834995bef3780f21d02660f8482"
+        },
+        {
+          "path": "0019_assessment_task_scope.sql",
+          "sha256": "09ec23987b5496b28b050cb016ca7652a83d5b80c6984dde794c3ae56c9baa2e"
+        },
+        {
+          "path": "0020_assessment_workflow.sql",
+          "sha256": "c2fa68d0ae2e5dfdc928165f07e772a4a8d13ccc6594e25a96368eefee4a26fe"
+        },
+        {
+          "path": "0021_training_records.sql",
+          "sha256": "ce50c80a32c7bfca03d3fe15c599e7a6127ceb35410f4c8a27c8e58004de1e62"
+        },
+        {
+          "path": "0022_assessment_course_provenance.sql",
+          "sha256": "e2d4c6e55af4715ee01587bd11f539c2f4fe609934ef910c94c3b7ad64e87878"
+        },
+        {
+          "path": "0023_coach_assignments.sql",
+          "sha256": "0b3ad0da4c8ae431f1f7981b20f0ae05b022ebd9e4742c2598eed271de2b0cee"
+        },
+        {
+          "path": "0024_match_metadata.sql",
+          "sha256": "2249a5310e847db129fed2877c63befd01be66d590af0067a88a46d58081cc7f"
+        },
+        {
+          "path": "0025_training_templates.sql",
+          "sha256": "1f64b7465ad4eeaf7342377f59982b1fd7c7e2d5cc54858cdd367e0e907006e2"
+        },
+        {
+          "path": "0026_assessment_task_selection.sql",
+          "sha256": "bdd0aab3a36366ee2ff41f4bf023717c1eec7f2a044308875bf90514dd918c4c"
+        },
+        {
+          "path": "0027_student_evaluations.sql",
+          "sha256": "8dd34da4f14256bed1d859b47608c564be188ec8dc0e4ae11fe33916c4111603"
+        },
+        {
+          "path": "0028_scout_identities.sql",
+          "sha256": "524f6edf053c48b1591043d9321f4a1fa9cf0b56bc3f10cbb59780b65b70b2f6"
+        },
+        {
+          "path": "0029_temporary_rosters.sql",
+          "sha256": "ceaf3ffb4337c0814fc84bec1a9ffa2c956ffc14217c4505e479f88e738b3030"
+        },
+        {
+          "path": "0030_backoffice_sessions.sql",
+          "sha256": "7013d29b023f5251cf6244dff73365120f309d59240bbc2f1a3b5b3ad3358934"
+        },
+        {
+          "path": "0031_backoffice_management.sql",
+          "sha256": "ae8ed24f30abb89739b7bbf66b64b8dbbc8221f1612e9cb69956743ce90979cf"
+        },
+        {
+          "path": "0032_training_catalog_status.sql",
+          "sha256": "22b0fa7bcacaadcde6fe4ac509e73041b65bcf12cd5fb1150229721f0c1e33a0"
+        },
+        {
+          "path": "0033_assessment_mapping_versions.sql",
+          "sha256": "5ede4b05680afedb396495f96799e2531f52791efe3f6b351f14812be38e7ce1"
+        },
+        {
+          "path": "0034_assessment_project_metadata.sql",
+          "sha256": "e9844436c3084dc57429457b2e6a7e3740951590c139b979d8ca7ca87af5001a"
+        },
+        {
+          "path": "0035_assessment_mapping_lineage.sql",
+          "sha256": "1f4e859af8dd22a6edd2a8f6cda4bc00d389a16d6e14261cfa4d85d5273a2c1a"
+        },
+        {
+          "path": "0036_backoffice_model_definitions.sql",
+          "sha256": "dc138434225ea402a4b1e871fdeeab14165e4f385d9975d11899a16788fbeb7d"
+        },
+        {
+          "path": "0037_backoffice_standards.sql",
+          "sha256": "37b94d52ce33f58344534d480308c01ad61b80265552bddf58bca76d55160049"
+        },
+        {
+          "path": "0038_backoffice_teaching_authorization.sql",
+          "sha256": "6fd96a9ef4c2b8e61c9fe9d2f680b5021a5c5341a19b899deca6d9654d4a8496"
+        },
+        {
+          "path": "0039_backoffice_import_batches.sql",
+          "sha256": "af3fdfacd3681b6b49dc3210bcf76c3ca944c541d0664c94b1d31feeadc061dd"
+        },
+        {
+          "path": "0040_backoffice_bi_snapshots.sql",
+          "sha256": "f291e3996124a4b1f105fca7981c0fd5cff272974e8f8ba4290d88d0c8057c54"
+        },
+        {
+          "path": "0041_backoffice_services.sql",
+          "sha256": "5bda553151cc8d0ec42382535b78ed6953d34b4f5a8597233a1ed4b5aa312984"
+        },
+        {
+          "path": "0042_backoffice_content.sql",
+          "sha256": "e321bbc44921ff98408dcb2c60e5251212271a75a232d348d5a9a70a331d1379"
+        },
+        {
+          "path": "0043_backoffice_import_secrets.sql",
+          "sha256": "c29a28f765bbb4116e5c7f0ca0dc66593fa3f7b0e1fdaa8e137b90a2ed17b3c6"
+        },
+        {
+          "path": "0044_app_client_role_preferences.sql",
+          "sha256": "351100eb10804ff4f3b937659eb2248f57104389db68b358c82bcdab9624a84e"
+        },
+        {
+          "path": "0045_training_games.sql",
+          "sha256": "78712eb4e7361affa5063848bdd4a0a4aa6261c6cd5ccfd2cefd87f9b6962033"
+        }
+      ]
+    },
+    "lockfileSha256": "ff6cd0614e7888031929c1cf08a2459d44475af115ccfbdbf97763d88fb73ab6"
+  }
+}

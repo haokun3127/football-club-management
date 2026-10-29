@@ -1,6 +1,6 @@
 services:
   data-init:
-    image: ${FCM_RELEASE_IMAGE:?Set the reviewed release image by digest}
+    image: ${FCM_RELEASE_IMAGE:?Set the reviewed release image by local ID or repository digest}
     user: "0:0"
     command: ["sh", "-c", "mkdir -p /var/lib/cq-talent && find /var/lib/cq-talent -path /var/lib/cq-talent/secure-backups -prune -o -exec chown node:node {} +"]
     volumes:
@@ -16,7 +16,7 @@ services:
       - CHOWN
 
   api:
-    image: ${FCM_RELEASE_IMAGE:?Set the reviewed release image by digest}
+    image: ${FCM_RELEASE_IMAGE:?Set the reviewed release image by local ID or repository digest}
     container_name: cq-talent-api
     restart: unless-stopped
     depends_on:

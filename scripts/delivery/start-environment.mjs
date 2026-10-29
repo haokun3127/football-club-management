@@ -4,9 +4,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 
 export const root = fileURLToPath(new URL("../../", import.meta.url));
-export function assertDigest(image) {
-  if (typeof image !== "string" || !/^[a-zA-Z0-9][a-zA-Z0-9._:/-]*@sha256:[0-9a-f]{64}$/.test(image)) {
-    throw new Error("An immutable repository@sha256 image reference is required");
+export function assertImageReference(image) {
+  if (typeof image !== "string" || (!/^sha256:[0-9a-f]{64}$/.test(image) && !/^[a-zA-Z0-9][a-zA-Z0-9._:/-]*@sha256:[0-9a-f]{64}$/.test(image))) {
+    throw new Error("An immutable local sha256 image ID or repository@sha256 reference is required");
   }
   return image;
 }
@@ -26,7 +26,7 @@ export function startPlan(environment, config) {
   const volume = config.volumes?.[target.volume];
   const expectedName = environment === "release" ? "cq-talent-api-data" : `cq-talent-${environment}-data`;
   if (volume?.name !== expectedName || volume.external || volume.driver_opts) throw new Error("Dedicated volume name differs or uses an external mount");
-  assertDigest(service.image);
+  assertImageReference(service.image);
   if (init.image !== service.image || service.build || init.build) throw new Error("Runtime and initialization must use the same prebuilt image");
   for (const entry of [service, init]) {
     const volumes = entry.volumes ?? [];
@@ -40,7 +40,7 @@ export function startPlan(environment, config) {
   if (!service.ports?.length || service.ports.some(port => port.host_ip !== "127.0.0.1" || port.published !== target.port || port.target !== 3000)) throw new Error("Runtime must use its dedicated localhost port");
   const prefix = ["compose", "-f", resolve(root, target.file)];
   return {
-    environment, image: service.image,
+    environment, imageReference: service.image,
     // run --no-deps ignores an old init container's completion and never starts a sibling.
     commands: [
       [...prefix, "run", "--rm", "--no-deps", "--pull", "never", target.init],
@@ -57,6 +57,10 @@ export function main(args = process.argv.slice(2)) {
   // Rendered config contains credentials. Never print it or raw Compose diagnostics.
   if (rendered.status !== 0) throw new Error("Compose configuration failed; check dedicated image/env-file settings privately");
   const plan = startPlan(environment, JSON.parse(rendered.stdout));
+  const inspected = spawnSync("docker", ["image", "inspect", plan.imageReference, "--format", "{{.Id}}"], { encoding: "utf8" });
+  if (inspected.status !== 0 || !/^sha256:[0-9a-f]{64}$/.test(inspected.stdout.trim())
+    || (plan.imageReference.startsWith("sha256:") && inspected.stdout.trim() !== plan.imageReference)) throw new Error("The reviewed immutable image is not available locally or its identity differs");
+  plan.imageId = inspected.stdout.trim();
   console.log(JSON.stringify(plan, null, 2));
   if (flag !== "--apply") return;
   for (const command of plan.commands) {

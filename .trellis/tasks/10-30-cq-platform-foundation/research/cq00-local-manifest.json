@@ -1,0 +1,2630 @@
+{
+  "schemaVersion": 1,
+  "server": {
+    "build": {
+      "sourceRevision": "b51bfbb3cb85e1bba2070de50235e7e4e78e11aa",
+      "buildId": "cq00-b51bfbb3",
+      "builtAt": "2026-10-29T17:18:25.997Z"
+    },
+    "imageReference": "sha256:61e2b2002f8a7c716508a5aa2ef6537b653ea6350e87fd84a1a7b8d93b41c655",
+    "imageId": "sha256:61e2b2002f8a7c716508a5aa2ef6537b653ea6350e87fd84a1a7b8d93b41c655",
+    "repositoryDigest": null,
+    "backoffice": {
+      "sha256": "41af601346f1e50d97793f5841699c48076572193a3ebdacd7706a263b99758a",
+      "files": [
+        {
+          "path": "214.83b271ca.async.js",
+          "sha256": "feb4192cdcc813203be0db25b40d644cd9a5b7c7a04d63dace72718918b91dba"
+        },
+        {
+          "path": "favicon.svg",
+          "sha256": "62d098ca0501bf8b4825de0fc5d2448a6e9efe9a75e0accfa01f6c61fd69a00f"
+        },
+        {
+          "path": "index.html",
+          "sha256": "11d1e210aab8c9153d4489d7b836d2be37b92245eec23dc022a20cc2b4753a6d"
+        },
+        {
+          "path": "p__Workspace.db4d5db2.async.js",
+          "sha256": "d728b339b7f9e33e7d7bdc1020a9fdc7da38564c5ef3e49049e82d22655f8751"
+        },
+        {
+          "path": "preload_helper.8b8c427c.js",
+          "sha256": "b650750e7b2811b8ff8fa5eee9b84a37ad16e2f79f2f796b3d488955ba232f86"
+        },
+        {
+          "path": "umi.54ac5ccd.js",
+          "sha256": "f33e3d80d854e11caa383920f033375f9559221b09af2125ab25f1b5a053d8b7"
+        },
+        {
+          "path": "umi.e818329b.css",
+          "sha256": "53528dafb799b8211fcf2b2e9e85b0e7b8c9c51a2bebfd1d6f6bfffeacb7a425"
+        }
+      ]
+    },
+    "migrations": {
+      "sha256": "4fd3ac633fc6346a87ba73f7939b208d202f6ad19c0d2b9260c2b1ca29598f83",
+      "files": [
+        {
+          "path": "0001_platform_foundation.sql",
+          "sha256": "3d81164878a316a7a8dbcf19c964436024b62b4610cae4d3004c97fa68e9deb2"
+        },
+        {
+          "path": "0002_data_capability_foundation.sql",
+          "sha256": "b54e38b712830d35137a624186bf1993c25908e90d554a0ac3460e5a5402520a"
+        },
+        {
+          "path": "0003_status_flow_audit_fields.sql",
+          "sha256": "2f5d2f55875f00c8fff3ba54b171e062bc3bc3d1bec74c9d6d78871e480fd0a0"
+        },
+        {
+          "path": "0004_http_idempotency_records.sql",
+          "sha256": "2925fa6d431956c8ab54fc0ca017cf791943c35185e69a189f2d5c575ff42f2f"
+        },
+        {
+          "path": "0005_privacy_foundation.sql",
+          "sha256": "988e6f4100461297ffea7fb6bfc85b111a020bc03edacf8a257ef565117de084"
+        },
+        {
+          "path": "0006_tactical_boards.sql",
+          "sha256": "fda3b27862c3c0306d4f7037ddac3b66c6f11e2798e753b34b5a3efa9d9f6dd9"
+        },
+        {
+          "path": "0007_request_collections.sql",
+          "sha256": "76d9926753cfc1993d140f7cd0cd6b409c204f32fb4925a66a8d9b70da406562"
+        },
+        {
+          "path": "0008_match_event_bundles.sql",
+          "sha256": "df2f8260fcc17c6acf0312b815f255e8d8bef7470491b43523bb5df32e0bdc8c"
+        },
+        {
+          "path": "0009_app_client_sessions.sql",
+          "sha256": "a80f2b79c6746d7e299d966a7b775b588e204365bd2626de03e8ba8612f278e5"
+        },
+        {
+          "path": "0010_student_guardian_bindings.sql",
+          "sha256": "b1ca0945eef022bc7fad84704b0d377d6a2882947e2d1b329c0a8d9e2ca27edf"
+        },
+        {
+          "path": "0011_event_change_notify.sql",
+          "sha256": "ed9ece28a78901fc1e826397e00409b3ef2bdc073f56603e98b27f99deaca2a7"
+        },
+        {
+          "path": "0012_assessment_tasks.sql",
+          "sha256": "c6d1b3873d7b22e790d1633c93c70d5bab80a76480bd626adf3afc8e5940532c"
+        },
+        {
+          "path": "0013_coach_preferences.sql",
+          "sha256": "4564bfe041f10fba3310c40445165e54f62b15eab767b1dc0d5f536d3c49d597"
+        },
+        {
+          "path": "0014_coach_wechat.sql",
+          "sha256": "92128400adfaf3e122bab2839aa658883157f13213f80665e74a8a786e11d32f"
+        },
+        {
+          "path": "0015_session_plans.sql",
+          "sha256": "62f4389c3b069c25ed4521bd80c2a44044c85537471d8e9d0959adffdc6d4f94"
+        },
+        {
+          "path": "0016_training_sessions.sql",
+          "sha256": "5a869b3e0ba051a71550f092e3071b898ed565bf09c1219bb955111d100d9bd4"
+        },
+        {
+          "path": "0017_match_rosters.sql",
+          "sha256": "e4a460b521ccb07efbd368e90e683d84dce889f95471b33adb4edaac0420b5a4"
+        },
+        {
+          "path": "0018_training_content_assessments.sql",
+          "sha256": "7f09ef8ddb090b6ed3b8c3d3c17bca283452b834995bef3780f21d02660f8482"
+        },
+        {
+          "path": "0019_assessment_task_scope.sql",
+          "sha256": "09ec23987b5496b28b050cb016ca7652a83d5b80c6984dde794c3ae56c9baa2e"
+        },
+        {
+          "path": "0020_assessment_workflow.sql",
+          "sha256": "c2fa68d0ae2e5dfdc928165f07e772a4a8d13ccc6594e25a96368eefee4a26fe"
+        },
+        {
+          "path": "0021_training_records.sql",
+          "sha256": "ce50c80a32c7bfca03d3fe15c599e7a6127ceb35410f4c8a27c8e58004de1e62"
+        },
+        {
+          "path": "0022_assessment_course_provenance.sql",
+          "sha256": "e2d4c6e55af4715ee01587bd11f539c2f4fe609934ef910c94c3b7ad64e87878"
+        },
+        {
+          "path": "0023_coach_assignments.sql",
+          "sha256": "0b3ad0da4c8ae431f1f7981b20f0ae05b022ebd9e4742c2598eed271de2b0cee"
+        },
+        {
+          "path": "0024_match_metadata.sql",
+          "sha256": "2249a5310e847db129fed2877c63befd01be66d590af0067a88a46d58081cc7f"
+        },
+        {
+          "path": "0025_training_templates.sql",
+          "sha256": "1f64b7465ad4eeaf7342377f59982b1fd7c7e2d5cc54858cdd367e0e907006e2"
+        },
+        {
+          "path": "0026_assessment_task_selection.sql",
+          "sha256": "bdd0aab3a36366ee2ff41f4bf023717c1eec7f2a044308875bf90514dd918c4c"
+        },
+        {
+          "path": "0027_student_evaluations.sql",
+          "sha256": "8dd34da4f14256bed1d859b47608c564be188ec8dc0e4ae11fe33916c4111603"
+        },
+        {
+          "path": "0028_scout_identities.sql",
+          "sha256": "524f6edf053c48b1591043d9321f4a1fa9cf0b56bc3f10cbb59780b65b70b2f6"
+        },
+        {
+          "path": "0029_temporary_rosters.sql",
+          "sha256": "ceaf3ffb4337c0814fc84bec1a9ffa2c956ffc14217c4505e479f88e738b3030"
+        },
+        {
+          "path": "0030_backoffice_sessions.sql",
+          "sha256": "7013d29b023f5251cf6244dff73365120f309d59240bbc2f1a3b5b3ad3358934"
+        },
+        {
+          "path": "0031_backoffice_management.sql",
+          "sha256": "ae8ed24f30abb89739b7bbf66b64b8dbbc8221f1612e9cb69956743ce90979cf"
+        },
+        {
+          "path": "0032_training_catalog_status.sql",
+          "sha256": "22b0fa7bcacaadcde6fe4ac509e73041b65bcf12cd5fb1150229721f0c1e33a0"
+        },
+        {
+          "path": "0033_assessment_mapping_versions.sql",
+          "sha256": "5ede4b05680afedb396495f96799e2531f52791efe3f6b351f14812be38e7ce1"
+        },
+        {
+          "path": "0034_assessment_project_metadata.sql",
+          "sha256": "e9844436c3084dc57429457b2e6a7e3740951590c139b979d8ca7ca87af5001a"
+        },
+        {
+          "path": "0035_assessment_mapping_lineage.sql",
+          "sha256": "1f4e859af8dd22a6edd2a8f6cda4bc00d389a16d6e14261cfa4d85d5273a2c1a"
+        },
+        {
+          "path": "0036_backoffice_model_definitions.sql",
+          "sha256": "dc138434225ea402a4b1e871fdeeab14165e4f385d9975d11899a16788fbeb7d"
+        },
+        {
+          "path": "0037_backoffice_standards.sql",
+          "sha256": "37b94d52ce33f58344534d480308c01ad61b80265552bddf58bca76d55160049"
+        },
+        {
+          "path": "0038_backoffice_teaching_authorization.sql",
+          "sha256": "6fd96a9ef4c2b8e61c9fe9d2f680b5021a5c5341a19b899deca6d9654d4a8496"
+        },
+        {
+          "path": "0039_backoffice_import_batches.sql",
+          "sha256": "af3fdfacd3681b6b49dc3210bcf76c3ca944c541d0664c94b1d31feeadc061dd"
+        },
+        {
+          "path": "0040_backoffice_bi_snapshots.sql",
+          "sha256": "f291e3996124a4b1f105fca7981c0fd5cff272974e8f8ba4290d88d0c8057c54"
+        },
+        {
+          "path": "0041_backoffice_services.sql",
+          "sha256": "5bda553151cc8d0ec42382535b78ed6953d34b4f5a8597233a1ed4b5aa312984"
+        },
+        {
+          "path": "0042_backoffice_content.sql",
+          "sha256": "e321bbc44921ff98408dcb2c60e5251212271a75a232d348d5a9a70a331d1379"
+        },
+        {
+          "path": "0043_backoffice_import_secrets.sql",
+          "sha256": "c29a28f765bbb4116e5c7f0ca0dc66593fa3f7b0e1fdaa8e137b90a2ed17b3c6"
+        },
+        {
+          "path": "0044_app_client_role_preferences.sql",
+          "sha256": "351100eb10804ff4f3b937659eb2248f57104389db68b358c82bcdab9624a84e"
+        },
+        {
+          "path": "0045_training_games.sql",
+          "sha256": "78712eb4e7361affa5063848bdd4a0a4aa6261c6cd5ccfd2cefd87f9b6962033"
+        }
+      ]
+    },
+    "lockfileSha256": "ff6cd0614e7888031929c1cf08a2459d44475af115ccfbdbf97763d88fb73ab6"
+  },
+  "miniprogram": {
+    "build": {
+      "sourceRevision": "b51bfbb3cb85e1bba2070de50235e7e4e78e11aa",
+      "buildId": "cq00-client-b51bfbb3",
+      "builtAt": "2026-10-29T17:18:27.094Z"
+    },
+    "sourceInventory": {
+      "sha256": "37f648e9e72fcfb55287a3bff9c8d3dcf30035d5ae1c2048d724a101eadd904c",
+      "files": [
+        {
+          "path": ".gitignore",
+          "sha256": "afec7fa441442163a4bc59637e093fb8564b724121f4b793fbac296c25827025"
+        },
+        {
+          "path": "README.md",
+          "sha256": "09e0c266190ed502face7325743895cd4a5a331593f6d9270a9bcf922241e915"
+        },
+        {
+          "path": "\\var\\folders\\80\\xb71yvlx4kq6y47jl9rlt0440000gn\\T\\cq-talent-automator-6O0Bl4\\parent-window-capture.png",
+          "sha256": "89cb30296627c825587168cc69d3f84375b21853e6398999c02d9fddc03b5cfe"
+        },
+        {
+          "path": "\\var\\folders\\80\\xb71yvlx4kq6y47jl9rlt0440000gn\\T\\cq-talent-automator-6O0Bl4\\parent-window-capture.png.json",
+          "sha256": "74ea658d426460b12a3c99557c07d13ffca50300b50286b5d3dfd5ab81d7a886"
+        },
+        {
+          "path": "\\var\\folders\\80\\xb71yvlx4kq6y47jl9rlt0440000gn\\T\\cq-talent-automator-ZlIltv\\parent-high-density.png",
+          "sha256": "89cb30296627c825587168cc69d3f84375b21853e6398999c02d9fddc03b5cfe"
+        },
+        {
+          "path": "\\var\\folders\\80\\xb71yvlx4kq6y47jl9rlt0440000gn\\T\\cq-talent-automator-ZlIltv\\parent-high-density.png.json",
+          "sha256": "69c9faf84dd2710f81eae086c085889dcb7a2b67a52645beebde49b89254d0e3"
+        },
+        {
+          "path": "\\var\\folders\\80\\xb71yvlx4kq6y47jl9rlt0440000gn\\T\\cq-talent-automator-o9IFO0\\parent.png",
+          "sha256": "f3bb92deb9d984dfb65c74e0bb42aa25e8152ae2a6d0dbee98302033a6f6ea28"
+        },
+        {
+          "path": "\\var\\folders\\80\\xb71yvlx4kq6y47jl9rlt0440000gn\\T\\cq-talent-automator-o9IFO0\\parent.png.json",
+          "sha256": "600cbac4c630ab4447c153e94194a9b77569b97d711cdf8a268d9621dde99b86"
+        },
+        {
+          "path": "\\var\\folders\\80\\xb71yvlx4kq6y47jl9rlt0440000gn\\T\\cq-talent-automator-otI4gE\\parent.png",
+          "sha256": "f3bb92deb9d984dfb65c74e0bb42aa25e8152ae2a6d0dbee98302033a6f6ea28"
+        },
+        {
+          "path": "\\var\\folders\\80\\xb71yvlx4kq6y47jl9rlt0440000gn\\T\\cq-talent-automator-otI4gE\\parent.png.json",
+          "sha256": "dd785b0a84a697618a3e384111c2f29dea8399bc736522b5add53d2f388a3195"
+        },
+        {
+          "path": "app.json",
+          "sha256": "2b17e71f6a2ba560d9b04a6914b732244ae55430bc46d21603edf3c6a6416397"
+        },
+        {
+          "path": "app.routes.test.mjs",
+          "sha256": "6844c8f7506eb1624e092eb3410a67bb78876110c048dd15667c49b29569a002"
+        },
+        {
+          "path": "app.test.mjs",
+          "sha256": "09680870daf2d75bd9a0cd4d7b40598a52c5716dff28be8876be6346240e6316"
+        },
+        {
+          "path": "app.ts",
+          "sha256": "c3475c3aef2c77ba3b0d3df6ea9af488c237ec4d7c24a9bdd444eae8c78c6c06"
+        },
+        {
+          "path": "app.wxss",
+          "sha256": "778c839b6c66fdfb2b33a3fdb671a214ee7f4619298b1089eefa204794d5bc45"
+        },
+        {
+          "path": "assets/content/featured-venue.jpg",
+          "sha256": "2b5fd19ca8b4da6bb47fc1989ca531df8214bc3f5809ae6b30eb949a772725bc"
+        },
+        {
+          "path": "assets/content/football-editorial.jpg",
+          "sha256": "0a4fcdcb8f3e08d99b8d0c522b9bb020305fa8c159fbdcd22fa3a89d3a3625b7"
+        },
+        {
+          "path": "assets/icons/alert.svg",
+          "sha256": "a40eb55ffcc7112ad59c495bde755104cc1713f8eb9635ff122fbd297d295c3e"
+        },
+        {
+          "path": "assets/icons/bell-brand.svg",
+          "sha256": "5bf1606d8edf573d0e56a9e76a56691e4b3a64d5040a3ab1875398b54a0f9e3b"
+        },
+        {
+          "path": "assets/icons/bell.svg",
+          "sha256": "12c5fd3a52ffebd82fb09ad8279b84debb3b4868eb598cd0ee33cad9b6bead46"
+        },
+        {
+          "path": "assets/icons/c10-check-circle.svg",
+          "sha256": "11b71d901b5152f30802a3968e4d14be743d6ca7e6d07d5cb9efe4191f24da7e"
+        },
+        {
+          "path": "assets/icons/c10-target-amber.svg",
+          "sha256": "bf98d09c3de1057e64e1a7784bda4f334cfbf7f72f322f91c75884091c9b30a1"
+        },
+        {
+          "path": "assets/icons/c10-target-green.svg",
+          "sha256": "12b09048e5bdc0eb35d8f5d8cdfda8f64e815cc6ee630086073ebca2c02eea0b"
+        },
+        {
+          "path": "assets/icons/c10-target-rose.svg",
+          "sha256": "4617e1cfa14232248349c55b59fc984ce3af6ac576b3e0b8bbdfee2e15f3125e"
+        },
+        {
+          "path": "assets/icons/c10-target-violet.svg",
+          "sha256": "82bb036c15b6d4f2aaa07364df74f9c7ed41419b854e77ecc67ebeb60b0b67d4"
+        },
+        {
+          "path": "assets/icons/c11-arrow-left.svg",
+          "sha256": "694b4405316ed9f6f0a0e0622a621ca38763968a0ce134322ad5b46494266238"
+        },
+        {
+          "path": "assets/icons/c12-arrow-left.svg",
+          "sha256": "811135d38aab354c3323bbd6fe6cc9877132ef51ec9a02e14bae6bc7cc35db58"
+        },
+        {
+          "path": "assets/icons/c121-check.svg",
+          "sha256": "cb1e6f5a5a22f49bbf90bad7ad1b80378bfc8f13aaf23103bfc0093c28b55d74"
+        },
+        {
+          "path": "assets/icons/c13-arrow-left.svg",
+          "sha256": "67343396ba5a2aff738a12c1102cd3fd33b1a784babfee5330e3921996b17f4a"
+        },
+        {
+          "path": "assets/icons/c14-arrow-left.svg",
+          "sha256": "67343396ba5a2aff738a12c1102cd3fd33b1a784babfee5330e3921996b17f4a"
+        },
+        {
+          "path": "assets/icons/c14-trending-up.svg",
+          "sha256": "5ba08f39e2a29b720c7c5c7a5b21e66e47b79eb4dcd8144921c7833cc8609692"
+        },
+        {
+          "path": "assets/icons/c151-check.svg",
+          "sha256": "3bfda33de2a049928db330273d9b3fb12f3db8155545c0b723e597fee78f840d"
+        },
+        {
+          "path": "assets/icons/c16-chevron-right.svg",
+          "sha256": "1b0bd29fb849493e8dd111429deb146b290bf7bb1a53c8226803ab4068d4d1e7"
+        },
+        {
+          "path": "assets/icons/c16-heart.svg",
+          "sha256": "e0a26bf962d8bc9902616579d0c8d79a5aa4c361fdd7b8edec17cbcb50e5de93"
+        },
+        {
+          "path": "assets/icons/c16-help-circle.svg",
+          "sha256": "69df0a391c577ae7c1d35d439544d03a9a929da5b1882b29e5af41cb4a22b7c9"
+        },
+        {
+          "path": "assets/icons/c16-settings.svg",
+          "sha256": "3f8315123c77959067d98ff48ee593aaa78ee0f47723cf2f950f3c027b530abd"
+        },
+        {
+          "path": "assets/icons/c16-shield.svg",
+          "sha256": "9cab02d845bc55df09206b4d36d6e634dd3ecf564a9e3e8ea64d85234c0b700b"
+        },
+        {
+          "path": "assets/icons/c16-user.svg",
+          "sha256": "3ba1ee7279ce20049bbfe4efdc18e3bc69aca066193b6b1f76d42c764f54fb86"
+        },
+        {
+          "path": "assets/icons/c161-arrow-left.svg",
+          "sha256": "811135d38aab354c3323bbd6fe6cc9877132ef51ec9a02e14bae6bc7cc35db58"
+        },
+        {
+          "path": "assets/icons/c161-info.svg",
+          "sha256": "d7edce925af9705c466c162cea9510df1b4636c617f34c7167a4e20d80e54136"
+        },
+        {
+          "path": "assets/icons/c161-toggle-off.svg",
+          "sha256": "9d9aeaddf653fff81e4ee113c166d04b66a20f9fab6768bc32365f53992a16b8"
+        },
+        {
+          "path": "assets/icons/c161-toggle-on.svg",
+          "sha256": "2084c34847ad271e54f8a936e4f604abfed8c015dfced2b1532aaf6a8e100dbc"
+        },
+        {
+          "path": "assets/icons/c162-chevron-left.svg",
+          "sha256": "ded792ccfdb849c21a54a4046724d9b5a5685fbd95bac3fdf56a3ab7fe70fed9"
+        },
+        {
+          "path": "assets/icons/c163-chevron-left.svg",
+          "sha256": "ded792ccfdb849c21a54a4046724d9b5a5685fbd95bac3fdf56a3ab7fe70fed9"
+        },
+        {
+          "path": "assets/icons/c163-circle-x.svg",
+          "sha256": "ef27d44f72d2116066b40496a0fbc48c342014d366e6343476f6e5d52defc184"
+        },
+        {
+          "path": "assets/icons/c164-category-account.svg",
+          "sha256": "c16d58ff1058064da0e6969bbcf6b8dc61ade9df4693c72243e6ffecc17bb3f9"
+        },
+        {
+          "path": "assets/icons/c164-category-assessment.svg",
+          "sha256": "a4b824e3a9d277975a5bdaab491aa678035ea47a4252f3eb59f663370866be3f"
+        },
+        {
+          "path": "assets/icons/c164-category-attendance.svg",
+          "sha256": "3ab099efec1c7fa40e4bf70b715de3e133598d21e043b32b085386a03dfa7925"
+        },
+        {
+          "path": "assets/icons/c164-category-private.svg",
+          "sha256": "b1271cd38ea3c9a0c82ec65fd68570af370b9b4afccdd931cab9408d92972be5"
+        },
+        {
+          "path": "assets/icons/c164-category-support.svg",
+          "sha256": "dee9c865a0aefca4e34e25348360a433635fa3cbbd17826d4c130d999e397e11"
+        },
+        {
+          "path": "assets/icons/c164-category-training.svg",
+          "sha256": "bef27b26a0a4c11a14a96e0dc6847d603318f5a78d31f0cbf494c9d5c1dd35b1"
+        },
+        {
+          "path": "assets/icons/c164-chevron-left.svg",
+          "sha256": "ded792ccfdb849c21a54a4046724d9b5a5685fbd95bac3fdf56a3ab7fe70fed9"
+        },
+        {
+          "path": "assets/icons/c164-chevron-right.svg",
+          "sha256": "1b0bd29fb849493e8dd111429deb146b290bf7bb1a53c8226803ab4068d4d1e7"
+        },
+        {
+          "path": "assets/icons/c164-question.svg",
+          "sha256": "79e68a9b4cc6156e45a2fa7a20dadced18c2e5e1b0f0a48bb72ef349975319e6"
+        },
+        {
+          "path": "assets/icons/c164-search.svg",
+          "sha256": "a6e6c69cc03779bad8b1a31b6c9dc55f93a58cafe920e93bcfe036fa290f42a7"
+        },
+        {
+          "path": "assets/icons/c3-calendar.svg",
+          "sha256": "365abf0a49f56eb96f7908dc88d71fe2ce6857649c278fafc5b2e307ad1ba322"
+        },
+        {
+          "path": "assets/icons/c4-1-check.svg",
+          "sha256": "70378342a6dd6319d214c369907fd82a8cfdeaccf633e96cc78152e3b9a2b08d"
+        },
+        {
+          "path": "assets/icons/c4-2-alert-triangle.svg",
+          "sha256": "ac58b00db609342ea29378bc05df9ff49f11a9555816d817a9aa18bbe8057059"
+        },
+        {
+          "path": "assets/icons/c6-2-cloud-check.svg",
+          "sha256": "3fc77f44bfb0e1a6aa84e180dab533b677b6e98f2b643422d59727f3f549b752"
+        },
+        {
+          "path": "assets/icons/c7-edit.svg",
+          "sha256": "72487c6524761b1948d22c9047465855e7a9880841cd2235681d3f62bc479cbb"
+        },
+        {
+          "path": "assets/icons/c7-move.svg",
+          "sha256": "957328f996eb6b6dd5b1c4fde8a69ab35579548d546f87a057e8c63668d24146"
+        },
+        {
+          "path": "assets/icons/c7-share-muted.svg",
+          "sha256": "59d73164bae1de6211fe783940d9ca9d67536e84cb41608c2feb6188fc846afb"
+        },
+        {
+          "path": "assets/icons/c7-share.svg",
+          "sha256": "f7d8756fad5cc3a348e91f1cfe5e1f4cec8bc9d884d4f27ebfcc681b06b9fe9c"
+        },
+        {
+          "path": "assets/icons/c7-trash.svg",
+          "sha256": "9ea3b9a10a9829b1ec6064ada6c11087812199d76d8aeecb9517ec1f546755e6"
+        },
+        {
+          "path": "assets/icons/c7-undo.svg",
+          "sha256": "ade1b4b4659b46f6299c86bab9ca5e1c1945a3ded40f27521d348db7ebd89465"
+        },
+        {
+          "path": "assets/icons/c7-video.svg",
+          "sha256": "85f02c160637a006e19cfee59276b2143f15814051e9f33d3150eb1007e00146"
+        },
+        {
+          "path": "assets/icons/calendar-white.svg",
+          "sha256": "43744ec00b99e030be9c070796cfffa187fe2e0922742abc7e71d3a1542d11c6"
+        },
+        {
+          "path": "assets/icons/check-circle.svg",
+          "sha256": "d43845a01686a0d479aae7957bfbd6bafb5b00cbd4baa3a10cb6cd0ec474402e"
+        },
+        {
+          "path": "assets/icons/chevron-down-brand.svg",
+          "sha256": "119a0363b90dd4fa1cf558bd54f9a1cbc97a15c2bcd02c3e4e89ab42bc8754f8"
+        },
+        {
+          "path": "assets/icons/chevron-left.svg",
+          "sha256": "cb1007570ef7a461f7cbe82ccacd204f2bb253d461f0f5e23d22ba69e502177e"
+        },
+        {
+          "path": "assets/icons/chevron-right.svg",
+          "sha256": "9a247401837d3c43c18358930995b70a67edb3cc2cc7335da3984b8a116bf770"
+        },
+        {
+          "path": "assets/icons/clock-white.svg",
+          "sha256": "44f34ad00d18b922209dd1e4a3b06754c11fbbfe1959e30d49b839262f86ef48"
+        },
+        {
+          "path": "assets/icons/clock.svg",
+          "sha256": "7ebaa80b64ae180f8e203576ec439c9dd4d9c31021f97bc04f1118c15b3dae09"
+        },
+        {
+          "path": "assets/icons/content-book.svg",
+          "sha256": "f0cb53b6d206099c1360a74d07068fb7b24846f579f9a271c00201867f153e98"
+        },
+        {
+          "path": "assets/icons/content-help-circle.svg",
+          "sha256": "2fd8ae0d30a71120252d83adb1f5389fa3776651657207b11c7099a813c86899"
+        },
+        {
+          "path": "assets/icons/content-map-pin.svg",
+          "sha256": "1b51d00132bcd59e870e61f7318e579577ddccaf3ebd1e8a8ad9d95afa758b69"
+        },
+        {
+          "path": "assets/icons/content-users.svg",
+          "sha256": "477361fdd59f78431af06d663e5fddceaf9f7b028da569c110e7d19e7daa3102"
+        },
+        {
+          "path": "assets/icons/empty-reminders.svg",
+          "sha256": "b1a302594291526fc3c1d92146b3dd02e78ecdf61073e981f18ac0a8440198f1"
+        },
+        {
+          "path": "assets/icons/filter.svg",
+          "sha256": "916da3e7e2bc8e2636b2d81187813be684fd8bb01e366bcae26e9b8d3c5c0ca3"
+        },
+        {
+          "path": "assets/icons/help-circle-brand.svg",
+          "sha256": "3dcb3fa4774e683c7a408f678d31faad625f983d2307fd1e1baa821296c9452e"
+        },
+        {
+          "path": "assets/icons/info.svg",
+          "sha256": "c44acc4e97db4f13cc9530f93dc86153e60713e7fabec1c5c7db2f717323c383"
+        },
+        {
+          "path": "assets/icons/login-alert.svg",
+          "sha256": "805c74e25199e9dd4d16f7a772bee23d3b20535ce176afdc391967185309bcdf"
+        },
+        {
+          "path": "assets/icons/login-link.svg",
+          "sha256": "081b46ce89af3478d44fe29c95e40f368ee2e3b6d0887f2a37c3b564c17834ad"
+        },
+        {
+          "path": "assets/icons/login-shield.svg",
+          "sha256": "40813287a4eb5214ca7d1c07927588d062ce44d2c5a5d9563101fb6b0ca414e9"
+        },
+        {
+          "path": "assets/icons/login-wechat.svg",
+          "sha256": "2242bba1261c0d73fef826f3c279fffacde444f8b96cc83ff4e26e52c5b7d5f1"
+        },
+        {
+          "path": "assets/icons/map-pin-white.svg",
+          "sha256": "0e68cfa2ee18afc63b51056a691d7dfd66270ca6d89002968c6721c4b0a808e9"
+        },
+        {
+          "path": "assets/icons/map-pin.svg",
+          "sha256": "92a1a19369190ae5bc54467fb29291cd18027c4c04addf5eac928b55407866b0"
+        },
+        {
+          "path": "assets/icons/more-horizontal.svg",
+          "sha256": "b3c7c4e36abe23dd8f420cfd6a2165f1245a5b0575c845532c4323796876691b"
+        },
+        {
+          "path": "assets/icons/p10-check-circle.svg",
+          "sha256": "d0fc4569e0b131d66c01abcf7891165687a5e4687e5583dde50813389739185f"
+        },
+        {
+          "path": "assets/icons/p10-chevron-left.svg",
+          "sha256": "9ee58b6460ea2ba7cddb375490e4d83563f580975b9c32074a1aabde1ac143ff"
+        },
+        {
+          "path": "assets/icons/p10-plus.svg",
+          "sha256": "ce54cfb808b4b1b05cef74f440054756946737402f5a37c7df6289ce20a96394"
+        },
+        {
+          "path": "assets/icons/p10-smartphone.svg",
+          "sha256": "b091ca808392c61510fb90b07a47dc8620fb5e40fab2a7b8c379d61250e05722"
+        },
+        {
+          "path": "assets/icons/p10-user.svg",
+          "sha256": "a93bb233b897046059b6339ab8f160993ba0cf9f6b3d15ed574df369c3dab6b7"
+        },
+        {
+          "path": "assets/icons/p82-calendar.svg",
+          "sha256": "2945ccaf1ebb3323b563706c79fc0aa870f4d0264eead753f14f970b67bb4684"
+        },
+        {
+          "path": "assets/icons/p82-chart-bar.svg",
+          "sha256": "e9d068cd3977fb5acf37cf109a88e1ed3acdad27946c7bba5802f6796f607769"
+        },
+        {
+          "path": "assets/icons/p82-chevron-right.svg",
+          "sha256": "1b0bd29fb849493e8dd111429deb146b290bf7bb1a53c8226803ab4068d4d1e7"
+        },
+        {
+          "path": "assets/icons/p82-circle-x.svg",
+          "sha256": "73a24f2f769a7eb1da4892a20e025d9c984492271df65d6d23689403a1d4452c"
+        },
+        {
+          "path": "assets/icons/p82-help-circle.svg",
+          "sha256": "d6160148ec0cd574d87224dc85455d5acd6e2a8dfa4024c2a14b8a8c1258e263"
+        },
+        {
+          "path": "assets/icons/p82-message-circle.svg",
+          "sha256": "ea11c6eebad90f2f4a573647b92b5fa114a44a29bf807045ad3c19d274367234"
+        },
+        {
+          "path": "assets/icons/p82-more-horizontal.svg",
+          "sha256": "f81f6c8933a4e0a8aeee61382c88645b2e662ea339b38e0bb9c7056d3ed223b7"
+        },
+        {
+          "path": "assets/icons/p82-settings.svg",
+          "sha256": "1edba12de0d54c3cef2ca2e2c00d80a1127f468845eb5b3c3317882dc91d326b"
+        },
+        {
+          "path": "assets/icons/p9-1-check.svg",
+          "sha256": "0bf6b85a6de22bcd434fbfc20c00af3bd39a3e1c9ee8cf1eb60b3ac007ade7b8"
+        },
+        {
+          "path": "assets/icons/p9-1-chevron-left.svg",
+          "sha256": "9ee58b6460ea2ba7cddb375490e4d83563f580975b9c32074a1aabde1ac143ff"
+        },
+        {
+          "path": "assets/icons/p9-calendar.svg",
+          "sha256": "1422666c6049c8a358192125a4caed7d5f316b088501fcbdb70a1159d3a73cd4"
+        },
+        {
+          "path": "assets/icons/p9-chevron-left.svg",
+          "sha256": "9ee58b6460ea2ba7cddb375490e4d83563f580975b9c32074a1aabde1ac143ff"
+        },
+        {
+          "path": "assets/icons/p9-chevron-right.svg",
+          "sha256": "1b0bd29fb849493e8dd111429deb146b290bf7bb1a53c8226803ab4068d4d1e7"
+        },
+        {
+          "path": "assets/icons/plus.svg",
+          "sha256": "471344c799c403f8225b246298eb418e4af6ebe41c7d7e0382520719d701f127"
+        },
+        {
+          "path": "assets/icons/reminder-badge.svg",
+          "sha256": "4deb8511f6b7baf9c09d21d7f13aea255e91d4a9552678cfe9a8a0dd983db4dd"
+        },
+        {
+          "path": "assets/icons/reminder-note.svg",
+          "sha256": "a03e632e5ab40ff5b7c52d21f2caa5cffea01126e79fe76d0b5d1f4b39065869"
+        },
+        {
+          "path": "assets/icons/search.svg",
+          "sha256": "a6e6c69cc03779bad8b1a31b6c9dc55f93a58cafe920e93bcfe036fa290f42a7"
+        },
+        {
+          "path": "assets/icons/settings-gear.svg",
+          "sha256": "c008d7d88bcb95e49ba57bfbc3a8b37fe38713c958401ae08d5f12ad9e1260d6"
+        },
+        {
+          "path": "assets/icons/smartphone.svg",
+          "sha256": "e52567268749f1248256154c0a9253da64975cc2da862242ecd399c4b7ae2302"
+        },
+        {
+          "path": "assets/icons/tab-calendar-active.png",
+          "sha256": "29e9c110ff6b32d0de0daaf1268b3c6672c102efafca6519356408c52ea1abf1"
+        },
+        {
+          "path": "assets/icons/tab-calendar-inactive.png",
+          "sha256": "99bfae840f7c75c8b6d4b1e6b7da08e8988a233d86a86064fb92c6aa5335dc44"
+        },
+        {
+          "path": "assets/icons/tab-calendar.svg",
+          "sha256": "89670e9b177e4b56909fd43fcf22e4ffb73393c1a37c403c1d58061df4c98985"
+        },
+        {
+          "path": "assets/icons/tab-child-active.png",
+          "sha256": "2951148a203d45006ea9ef5a98ecaf34be673710950d64fd12e843a13c4bcf13"
+        },
+        {
+          "path": "assets/icons/tab-child-inactive.png",
+          "sha256": "5faebdfdd2ab4ce049eb171c92566b3afc935608549761949071c84daed518ba"
+        },
+        {
+          "path": "assets/icons/tab-child.svg",
+          "sha256": "940cea03727577a320be3c253d800a251d43129bf7a3dad883304c5a6274e41a"
+        },
+        {
+          "path": "assets/icons/tab-discover-active.png",
+          "sha256": "2143837b85883bc3488f6e719b5cd76d3483e42a40c479ba47e8982bba5d86d5"
+        },
+        {
+          "path": "assets/icons/tab-discover-inactive.png",
+          "sha256": "835103ef09c6b80674ddcd99c3d72ddc357b70ebc94cf66d7f240366dff09fa4"
+        },
+        {
+          "path": "assets/icons/tab-discover.svg",
+          "sha256": "1184522116a612ed18bdb602e846af41643169c175390ae457bbe9be54601f8b"
+        },
+        {
+          "path": "assets/icons/tab-growth-active.png",
+          "sha256": "7f003a2612f37e5def2d5b7922127f5b7b64882494734ad1003010bd68b2d270"
+        },
+        {
+          "path": "assets/icons/tab-growth-inactive.png",
+          "sha256": "b80660e2807ef428e445f6efe2280d77a63514e9c49efdcc46571ce98c63b7a8"
+        },
+        {
+          "path": "assets/icons/tab-growth.svg",
+          "sha256": "1297aa1c4305cd6c114dab7aab393df7bd18308105e40d22e2f258ba65399235"
+        },
+        {
+          "path": "assets/icons/tab-training-active.png",
+          "sha256": "ce103309a8813736e8f8ac602f39c31c19cd522343a7b188be95e208d9623384"
+        },
+        {
+          "path": "assets/icons/tab-training-inactive.png",
+          "sha256": "cb2e4e23de94bc02ff2a2fb0ea5497af2d60b18b41a08876df09294179fa949d"
+        },
+        {
+          "path": "assets/icons/tab-training.svg",
+          "sha256": "4717877427282b43ac43c8b065d73c0b080b80d20031c31567216f727fac2fa4"
+        },
+        {
+          "path": "assets/icons/tab-user-active.png",
+          "sha256": "fdeadc4b5d28a682e5cab147e8138ec3e8e21d94e5ae68e25e998d7f86260a50"
+        },
+        {
+          "path": "assets/icons/tab-user-inactive.png",
+          "sha256": "99f784710c06ea25d6b806ed0bfb7e2739f300a3e31210d93dcc19aac17f5fe0"
+        },
+        {
+          "path": "assets/icons/tab-user.svg",
+          "sha256": "85e7cfdfdcd9e32c2094310ab509d1354ebf6a9091668189aef14ee7787c5700"
+        },
+        {
+          "path": "assets/icons/user-white.svg",
+          "sha256": "961937a3ff1fd18afc3349363029b527a4d7b658be5666d953f5ad588dc0f467"
+        },
+        {
+          "path": "assets/icons/user.svg",
+          "sha256": "68626c93c69e2e7168a322de0522d4fbb17fa1a6e10f4dcb19f87110c681eef8"
+        },
+        {
+          "path": "assets/venues/venue-1-optimized.jpg",
+          "sha256": "9c08b34baf934161f118e017214d88e7f91288606fad919fac91472db26adceb"
+        },
+        {
+          "path": "assets/venues/venue-1.jpg",
+          "sha256": "96677ed65fdd3b66130921ba2556e62975e3bb190531b9e968600465b830f89b"
+        },
+        {
+          "path": "assets/venues/venue-1.png",
+          "sha256": "220ab7f530de93afb817d99c6c3ee5eae7d9c925945a93ce5c937707c71b9bb1"
+        },
+        {
+          "path": "assets/venues/venue-2-optimized.jpg",
+          "sha256": "1e8fb19c3b8d35f2aff80cfc1f707c1a363fc65b7a75ee5567f6e4e58b04977d"
+        },
+        {
+          "path": "assets/venues/venue-2.jpg",
+          "sha256": "53cd9948a65478d8acea7dfa1b26fe73a9c8a8ec0d0f0f10fa2bd8696c5b4f5a"
+        },
+        {
+          "path": "assets/venues/venue-2.png",
+          "sha256": "04bb8139e6d3bba639b495696974dc36615df560b9f28b75c80faa62131895dc"
+        },
+        {
+          "path": "assets/venues/venue-3-optimized.jpg",
+          "sha256": "45183671325c746aaf360d686bd562a41210df867e28526683f48df05907a5ee"
+        },
+        {
+          "path": "assets/venues/venue-3.jpg",
+          "sha256": "117956dc9bb49f2df8443bad086f49f726b67440b6013fc4880711f424010ede"
+        },
+        {
+          "path": "assets/venues/venue-3.png",
+          "sha256": "9bfaa544e7eb87d3d002302a12b551e10e23d12f2181eb0f84a4c2f91dc54bed"
+        },
+        {
+          "path": "components/activity-card/index.json",
+          "sha256": "06f41f1da1267bd7060a154e75b3e9b4bc833d6007f4328cbb647418964ae8ee"
+        },
+        {
+          "path": "components/activity-card/index.ts",
+          "sha256": "02c0b1cf65c34bae81268a606b711088aed98b3cfb668da497917ebb298f7269"
+        },
+        {
+          "path": "components/activity-card/index.wxml",
+          "sha256": "9fb98fea54bae2e5750fa731a2425cd6a11d076ceb34b5d6b8b482994470058d"
+        },
+        {
+          "path": "components/activity-card/index.wxss",
+          "sha256": "3c1998d0293a80b0df1a09d351052ae43cdabca5636cd61ee08bb63fae873629"
+        },
+        {
+          "path": "components/app-header/index.json",
+          "sha256": "0e5e74d92cc0193618f97df4639beb249d5a23c8ac7f3ccedc8f36a0daa398bd"
+        },
+        {
+          "path": "components/app-header/index.test.mjs",
+          "sha256": "84d0750cb5a415e3f9ab98b698dc0282a21bf76df0df79fead3eb6fa1c00ee3a"
+        },
+        {
+          "path": "components/app-header/index.ts",
+          "sha256": "5bede8fac32c0656882244b28741af607b86f91d112dc6b3ce6f9d2a9b319d86"
+        },
+        {
+          "path": "components/app-header/index.wxml",
+          "sha256": "c39dee57b9153e3eb6afee1c1d644bbdb741fce1bcaebbf876a7b2709c64a8b1"
+        },
+        {
+          "path": "components/app-header/index.wxss",
+          "sha256": "f6c8eaa7ed073adcbb05fe6d7a295ff472566fd81368f56ca28c7e90c527879e"
+        },
+        {
+          "path": "components/context-bar/index.json",
+          "sha256": "0e5e74d92cc0193618f97df4639beb249d5a23c8ac7f3ccedc8f36a0daa398bd"
+        },
+        {
+          "path": "components/context-bar/index.ts",
+          "sha256": "f86b17283eb5f783da8a4b24bb8f1e1c0c96e6d38917ce17e8a1b7f12fed75d6"
+        },
+        {
+          "path": "components/context-bar/index.wxml",
+          "sha256": "238a186e28f121845cabf05edb9512c70de77dde4ccf109a51e65c1ac98da903"
+        },
+        {
+          "path": "components/context-bar/index.wxss",
+          "sha256": "2a4144e658eb3b3b1642080ae4c7439eeede48a97b5175a2cee609bcdb1a2b36"
+        },
+        {
+          "path": "components/date-picker/index.json",
+          "sha256": "979234b0b8af65e8acf86e83361f14ef9a141bb7e164e76fba79b23e029aa5fe"
+        },
+        {
+          "path": "components/date-picker/index.test.mjs",
+          "sha256": "7582dfc77c3f5144ea2bca889243caab7b20efeb6b190e506a169b67761f3b76"
+        },
+        {
+          "path": "components/date-picker/index.ts",
+          "sha256": "5e4289f8a138f7ae3b01fd9aff0f77c6f9e0b6829e5698821201f989c594c857"
+        },
+        {
+          "path": "components/date-picker/index.wxml",
+          "sha256": "7dbd48640154d04a609c656cc39cabef25afff8b8b1dfb9b3f099d773b85072a"
+        },
+        {
+          "path": "components/date-picker/index.wxss",
+          "sha256": "bcfcf3c85a87fa88219f60fb9346bf7756dd7abacc2a913c92f8fbc57cfe971f"
+        },
+        {
+          "path": "components/privacy-authorize/index.json",
+          "sha256": "0e5e74d92cc0193618f97df4639beb249d5a23c8ac7f3ccedc8f36a0daa398bd"
+        },
+        {
+          "path": "components/privacy-authorize/index.test.mjs",
+          "sha256": "75d0400875238b51fe1a72481be5e879129e91e0bffb680dcbd6d5e1b1a696f9"
+        },
+        {
+          "path": "components/privacy-authorize/index.ts",
+          "sha256": "7df7aecd9cdad0072be3d15ade9d7973b2f1b7da3fa61fac2da3f9961a1bff37"
+        },
+        {
+          "path": "components/privacy-authorize/index.wxml",
+          "sha256": "c467cb8ff8cb3a1e062e9fb8bad717bc096459f0ece6a279dc3e2c224141e22b"
+        },
+        {
+          "path": "components/privacy-authorize/index.wxss",
+          "sha256": "eb25ae6af22164813ac5df0a60bac3ef12065970a73d0307db0404f44ef6645d"
+        },
+        {
+          "path": "components/radar-canvas/index.json",
+          "sha256": "64b5461572e0008356ad75900581b4b611949532fcc1226e5920b5d9b02b0e7f"
+        },
+        {
+          "path": "components/radar-canvas/index.test.mjs",
+          "sha256": "a4df5b0b195868d604029db4a8d4e4b6b9cf02a8c6a7f843336db702c21f5e85"
+        },
+        {
+          "path": "components/radar-canvas/index.ts",
+          "sha256": "fa4eb28740b9acb0f61e42e4db105a3fb0bddfefa0954fe3b186efafcbf39e1a"
+        },
+        {
+          "path": "components/radar-canvas/index.wxml",
+          "sha256": "f2560500695407033fb8d7f47e07be174a5a08b7cc26f71db108edffd109c1db"
+        },
+        {
+          "path": "components/radar-canvas/index.wxss",
+          "sha256": "7bf4370ec52b7571f3ff0d9c99f0c50dd9c1d03f0668da34eb2547febcd56a91"
+        },
+        {
+          "path": "components/radar-comparison/index.json",
+          "sha256": "8accc18daa6746e99715b1673150cdf313349def365b45c1425b6c03961bb1c4"
+        },
+        {
+          "path": "components/radar-comparison/index.test.mjs",
+          "sha256": "f0e326c610e0542e061fddced786cd02d2765501b099a0b934a6ad40f93d17f8"
+        },
+        {
+          "path": "components/radar-comparison/index.ts",
+          "sha256": "b471ee7e15bc74d3e718b800316a82398bc39e4d691d78318a10abe42c5a6fbc"
+        },
+        {
+          "path": "components/radar-comparison/index.wxml",
+          "sha256": "266716826f7e93f2c1b2cc2826a66130f4cde78f59d3c25a48095388e5fb0c32"
+        },
+        {
+          "path": "components/radar-comparison/index.wxss",
+          "sha256": "07c02a9b2ddbb774519442e73cd208b980fc864c02d2e70d02ce092e892f1583"
+        },
+        {
+          "path": "components/role-tabbar/index.json",
+          "sha256": "16eb24befba8187a937743e992447f6baca36e35f959d50ccb685627c37046b1"
+        },
+        {
+          "path": "components/role-tabbar/index.test.mjs",
+          "sha256": "2563e039b1a39930f90f685978901014409b3bc0556e1fa70456cd14986294ab"
+        },
+        {
+          "path": "components/role-tabbar/index.ts",
+          "sha256": "591982b07220bfebbb87aeef643ef22f82b221bf0a132084430e8af77569d341"
+        },
+        {
+          "path": "components/role-tabbar/index.wxml",
+          "sha256": "08d98cf8d7aa4aa063f9c0abd9ff9c158173a9201405eabc6784e7d2615bfae9"
+        },
+        {
+          "path": "components/role-tabbar/index.wxss",
+          "sha256": "2a6059e8e3140ad6c78be6ba7e536e75c0c4274005460c0f85141ca2208490ce"
+        },
+        {
+          "path": "components/schedule-calendar/index.json",
+          "sha256": "0108c85885ec64a2143b5d4466cf38823470c760ca3dad0e031ce9ef778dc1dd"
+        },
+        {
+          "path": "components/schedule-calendar/index.ts",
+          "sha256": "2f722e277152bc92c9c43d08c4f7833601c594bc89f4518b0645c108124fdc51"
+        },
+        {
+          "path": "components/schedule-calendar/index.wxml",
+          "sha256": "5686409a2bf5fb04dcd91a2ba2b1958abd2232fdfec78807b7805bcbaf1177f5"
+        },
+        {
+          "path": "components/schedule-calendar/index.wxss",
+          "sha256": "bae9ca8477f991a6e07db967645a025cbd0d5d9453782388d4f127c275644216"
+        },
+        {
+          "path": "components/status-chip/index.json",
+          "sha256": "2b821ab60cd92746a652d1d33ca40626ae994939834a58f0cd6c003a0bcc0109"
+        },
+        {
+          "path": "components/status-chip/index.ts",
+          "sha256": "90c3dfbf38317166467772854155fdf8f0650882930c4243a7b87322af281250"
+        },
+        {
+          "path": "components/status-chip/index.wxml",
+          "sha256": "2b8ab9ddec70bf07a22aced9a75b9248658af265f9e456d6ba8c1663cc615189"
+        },
+        {
+          "path": "components/status-chip/index.wxss",
+          "sha256": "52452e0efe419e1b8bda153d6c1b9248d61ee647a30241d1f4471e6b230e117e"
+        },
+        {
+          "path": "components/status-view/index.json",
+          "sha256": "cc647677dbed93ddbd1432b5ee214b961cde786bf335f948b1439e4db0df5ae9"
+        },
+        {
+          "path": "components/status-view/index.ts",
+          "sha256": "62f798821c8fed8b52063d88a5f28b8b2e19ddbcd2cb2e3b472ca561fdfa5125"
+        },
+        {
+          "path": "components/status-view/index.wxml",
+          "sha256": "a36603630152cbd3f5f4596be0a469709be918ccb9d82c33bcbba24335b27372"
+        },
+        {
+          "path": "components/status-view/index.wxss",
+          "sha256": "60b8c975ab2e2df029a2229429b6dd460378e2ced65f1512970a308a1994353f"
+        },
+        {
+          "path": "components/student-switcher/index.json",
+          "sha256": "6735117da0b58cd1c7fcd691934ad25c5322324f2b8f0ed86098b5d49c666feb"
+        },
+        {
+          "path": "components/student-switcher/index.ts",
+          "sha256": "c86f6c0e1981cde2401ae21ca3e105e37a2b092ceb330bd25adcfb47a3477a68"
+        },
+        {
+          "path": "components/student-switcher/index.wxml",
+          "sha256": "ef19b7da1dc759a6b4bd8cb7c9e2b234f470e12c948291740e198296fa295b92"
+        },
+        {
+          "path": "components/student-switcher/index.wxss",
+          "sha256": "def4b9151721fb7b400feb51eabd1507a322393180171c1cabfe0f67c20b92fa"
+        },
+        {
+          "path": "components/submit-bar/index.json",
+          "sha256": "0e5e74d92cc0193618f97df4639beb249d5a23c8ac7f3ccedc8f36a0daa398bd"
+        },
+        {
+          "path": "components/submit-bar/index.ts",
+          "sha256": "3c9131ba6177d3026630d46b787fc1cb84ce4334d648f1fd61ffef10711f8fe2"
+        },
+        {
+          "path": "components/submit-bar/index.wxml",
+          "sha256": "190ded2c6abf420104b340a9711c664875279cf358723f4b9c58547877721164"
+        },
+        {
+          "path": "components/submit-bar/index.wxss",
+          "sha256": "83c255b79ef8f35684e7caf2cc0ac28408225e584ec36366e4748b65cf09da24"
+        },
+        {
+          "path": "package.json",
+          "sha256": "b03d56c36a7efab09cb2ecdf2d87cfe7f9549ec23ba30ca32c1d287285ca9def"
+        },
+        {
+          "path": "pages/coach/account/index.json",
+          "sha256": "8e069cf5ea7fdac746485c0602c6a7aaff5b5178f01fac379f64c0a90ec35c58"
+        },
+        {
+          "path": "pages/coach/account/index.test.mjs",
+          "sha256": "6e5ea09163656f1484021bedd841bb1218134f7447a141f2c4dcece1ce257176"
+        },
+        {
+          "path": "pages/coach/account/index.ts",
+          "sha256": "a888ea07da2efe4978a988185753978ac45958fa8e6552c9bd9aa94961d7ddcc"
+        },
+        {
+          "path": "pages/coach/account/index.wxml",
+          "sha256": "a959b41ff9599f9400d696c42a9909eec2b62d1050c759f3af10f849e3f6de54"
+        },
+        {
+          "path": "pages/coach/account/index.wxss",
+          "sha256": "35de9b74ca8150c97e29304dc4e86befa3b9be23e171d14acc37c0053c22743d"
+        },
+        {
+          "path": "pages/coach/assessment-bulk-entry/index.json",
+          "sha256": "a1d5a5d141478f9edceb6432ca24b11ce6332a3f90f97c5f79d199ebfbf496ff"
+        },
+        {
+          "path": "pages/coach/assessment-bulk-entry/index.test.mjs",
+          "sha256": "d206d6b0d59e79f1893f3f3df452352b8e5353c957ccdbc22ae14f338382054b"
+        },
+        {
+          "path": "pages/coach/assessment-bulk-entry/index.ts",
+          "sha256": "f03497eef73706e614889f3b7f840d6f675594e9eeba0f685bffac8a7c64d210"
+        },
+        {
+          "path": "pages/coach/assessment-bulk-entry/index.wxml",
+          "sha256": "c40e4966676134cf1c19261ac3afe0cbdaea4e87b8d45626c0c3c0f7f8ed38a2"
+        },
+        {
+          "path": "pages/coach/assessment-bulk-entry/index.wxss",
+          "sha256": "79094f1305d17250bb5dee8e7253cc6edf64775ec25235554311ee302561c0fa"
+        },
+        {
+          "path": "pages/coach/assessment-projects/index.json",
+          "sha256": "7b03a9ef9a7451d690ec7aa82518e7a8ab3d00a0431aeeeb4a26cbc96bdfcaaa"
+        },
+        {
+          "path": "pages/coach/assessment-projects/index.test.mjs",
+          "sha256": "0ea7c8436afef48253163fd72911b4d4233d58c2bf2ae75e7fb58567d509acb6"
+        },
+        {
+          "path": "pages/coach/assessment-projects/index.ts",
+          "sha256": "d7d0a3175f28d471778ea56b8c37aa52ad92e58a9dbf7938f4089e8693897118"
+        },
+        {
+          "path": "pages/coach/assessment-projects/index.wxml",
+          "sha256": "90e857ca1eed2a6295f3a798ac3c46e80880ba1318c85ffd38f09337ca1b343b"
+        },
+        {
+          "path": "pages/coach/assessment-projects/index.wxss",
+          "sha256": "7c22cd860e2671aaa5e3db713979473613656afe838eb298280183c9ebb55b16"
+        },
+        {
+          "path": "pages/coach/assessment-submit/index.json",
+          "sha256": "66d393995fca602da86e2310b9853f2af2ef1cf625dc6cff95cc6d7dcffe9ac0"
+        },
+        {
+          "path": "pages/coach/assessment-submit/index.test.mjs",
+          "sha256": "584b774251376e72e12a3a49c9a35ceab3e86f7c260bc62bff9648b6bb87a774"
+        },
+        {
+          "path": "pages/coach/assessment-submit/index.ts",
+          "sha256": "f0f73d6cfa8ebaf9b226ec00563c708dba9c3b255ce567696932ee1717b0abd9"
+        },
+        {
+          "path": "pages/coach/assessment-submit/index.wxml",
+          "sha256": "e733fe1d29dd91189530e8582fa262e0bd0d25fb5146d0762fa90a8780e00547"
+        },
+        {
+          "path": "pages/coach/assessment-submit/index.wxss",
+          "sha256": "5c4c7a6d20448f6c3832b94388a68975b1a4b3b35ad49a7d273e506714897e5e"
+        },
+        {
+          "path": "pages/coach/attendance/index.json",
+          "sha256": "83115eeba1f606358b7b0c047dc1b06d2097138db9d9fdb4c752ed3c997287f9"
+        },
+        {
+          "path": "pages/coach/attendance/index.test.mjs",
+          "sha256": "d7a9dace7d2cfd4492ff74e84d3c2e4fc069f148eed6a0442f7b92bf2d3d1c2e"
+        },
+        {
+          "path": "pages/coach/attendance/index.ts",
+          "sha256": "a848629c7f3e8a1eeecf6ec68e8532257fe7db71e3c6df2b347f66a70b496ce7"
+        },
+        {
+          "path": "pages/coach/attendance/index.wxml",
+          "sha256": "39c4f47282cbd2a36c173480517b7e9389c486b0f70847f97db9f50750f481af"
+        },
+        {
+          "path": "pages/coach/attendance/index.wxss",
+          "sha256": "f512de2ddcbdbe9371e9c75ff37a3ecb09b44ff8918e9cb643f24805e3255e4f"
+        },
+        {
+          "path": "pages/coach/attendance-success/index.json",
+          "sha256": "cd5aed28491c4e7f8582c87e5e572f7c327da50c3deb0aa6c115e4e43ae25db3"
+        },
+        {
+          "path": "pages/coach/attendance-success/index.test.mjs",
+          "sha256": "75418b72f65b78b8f14b60efe21bcb580b68765c3385a247dc65c81b8beae125"
+        },
+        {
+          "path": "pages/coach/attendance-success/index.ts",
+          "sha256": "d0a3935ef17c595b11cbe080a70e0170a32d03bc3fbf0bb7c6c4c3a680b62065"
+        },
+        {
+          "path": "pages/coach/attendance-success/index.wxml",
+          "sha256": "cd52a9e6ca69d39d74414f618551c6d65db1b9a0a3496c6e93261d8afa44be13"
+        },
+        {
+          "path": "pages/coach/attendance-success/index.wxss",
+          "sha256": "c6f8eabc0e7279083c586e5c57185d5302d662757fbb60b5363a6d09d711e343"
+        },
+        {
+          "path": "pages/coach/content-copy/index.json",
+          "sha256": "bb0c4d17feaf4f623b643056c544c55df85299adf8996025111a5f9cd76ef470"
+        },
+        {
+          "path": "pages/coach/content-copy/index.test.mjs",
+          "sha256": "83ea9d63cdaa63903e7cfcab0f67d73c12d3fe14a1b11db91120abfb4d036bdf"
+        },
+        {
+          "path": "pages/coach/content-copy/index.ts",
+          "sha256": "9698d0c4ba6a4fc73808059e476f8aa1d5159e8871dd4f5b66e2722359b90c3e"
+        },
+        {
+          "path": "pages/coach/content-copy/index.wxml",
+          "sha256": "9aec400ca8b2e14fe0676c6a77cd4d8a4854eadea2385c4b10a0d38b36d04570"
+        },
+        {
+          "path": "pages/coach/content-copy/index.wxss",
+          "sha256": "086c0dd462cc7c4c5fe5d8aa70d68a4b375e8d96c2c74bfa64ce659cc58a8178"
+        },
+        {
+          "path": "pages/coach/content-select/index.json",
+          "sha256": "d652c445c3e6e4d8b3a8cfb1b8c2e036f90cb426da20e249d300794710232176"
+        },
+        {
+          "path": "pages/coach/content-select/index.test.mjs",
+          "sha256": "37f659409aa97326b328f778b0cbfda5d9616545544d50a572b393e6548e320f"
+        },
+        {
+          "path": "pages/coach/content-select/index.ts",
+          "sha256": "19e2cb0588a8fdd045e84aa5c663b33dddc726a826df8d0ecc3e0d45cd669838"
+        },
+        {
+          "path": "pages/coach/content-select/index.wxml",
+          "sha256": "0b5be331aa01808b493b853cc1bd5af054fe68dabf690f864613a3927d21bd07"
+        },
+        {
+          "path": "pages/coach/content-select/index.wxss",
+          "sha256": "d0d84e7b02b31653bb2dba0becaba2c7f01a042aab5ee81a1eeb80e94a66f346"
+        },
+        {
+          "path": "pages/coach/event/index.json",
+          "sha256": "a7692d97f8efd68163dc56371cdd2e02b4fb30703acef3f73fac8946a5ec420d"
+        },
+        {
+          "path": "pages/coach/event/index.test.mjs",
+          "sha256": "a68b14a241bf31c229b6db72c1ec4c186cded38ec3ec7fe42d282eb6470ddd86"
+        },
+        {
+          "path": "pages/coach/event/index.ts",
+          "sha256": "c213dfacc60f25d326d3b6f3af79b5705da4404e2625033bd367835efd5a883a"
+        },
+        {
+          "path": "pages/coach/event/index.wxml",
+          "sha256": "6bee8a7e2eda0e6c973fff1fe6112fb1f50c6690f30c7c131b705007061c10c9"
+        },
+        {
+          "path": "pages/coach/event/index.wxss",
+          "sha256": "f45ca9426ccc516365f3bb5a7a30fae0ae7ca29c06a86f615958e80ddd7895b9"
+        },
+        {
+          "path": "pages/coach/event-change/index.json",
+          "sha256": "d10e39b916f42af08f93b7f23812638606c7f39140c7a6b7facb1c30f0df8bd0"
+        },
+        {
+          "path": "pages/coach/event-change/index.test.mjs",
+          "sha256": "fef4c6f60c2aecdb91bef80da0ed85361d88b43a9c906e70e99a8836726c4278"
+        },
+        {
+          "path": "pages/coach/event-change/index.ts",
+          "sha256": "e6c29f5dcc17dc6e8afa8c6fa43497d7728dbaae8919445dc20a3dd40a6160c0"
+        },
+        {
+          "path": "pages/coach/event-change/index.wxml",
+          "sha256": "a5a9b426f65abf4960088e326f2d03e862b11cb13ab2a4b232f0a51ca2fc3971"
+        },
+        {
+          "path": "pages/coach/event-change/index.wxss",
+          "sha256": "a428dd521ab82ccc07caf308868e4bdb9e68dfc21c654182766360baea97231b"
+        },
+        {
+          "path": "pages/coach/help/index.json",
+          "sha256": "94edd4aa5f3eaaf6989e43fbab86b87adff6c06aebedf64ddd4526d93fb0c684"
+        },
+        {
+          "path": "pages/coach/help/index.test.mjs",
+          "sha256": "63b57ab43265cd95872c7c56439c36bade5afc1863cb5e22ffb2871cc6c5bbbf"
+        },
+        {
+          "path": "pages/coach/help/index.ts",
+          "sha256": "14c9d4b1700ae7542bf5bb928f293f6946d96ab564b8abfa0b1af46163838d85"
+        },
+        {
+          "path": "pages/coach/help/index.wxml",
+          "sha256": "3ccf129bb6c486c72216a5c86367c99b6f8876f52de6cbba893c2a84e54b33ca"
+        },
+        {
+          "path": "pages/coach/help/index.wxss",
+          "sha256": "0672e171f8798e671045ef0e5f231c46a200d06320090fa212ef210e0af0cc67"
+        },
+        {
+          "path": "pages/coach/lesson/index.json",
+          "sha256": "2f84f673feaac445185e28517d536e20fc2caf9e25e6f3f7672793fe311d9953"
+        },
+        {
+          "path": "pages/coach/lesson/index.test.mjs",
+          "sha256": "0da2fcb69a7326d79ee34fb4a9f9f2f463a76c25b8a09b36ac2d8439be95a9af"
+        },
+        {
+          "path": "pages/coach/lesson/index.ts",
+          "sha256": "d088680093d20a3f6ed4e25679813aac4f65808c5083df5c75fbe8d0cb7ebd9e"
+        },
+        {
+          "path": "pages/coach/lesson/index.wxml",
+          "sha256": "6e9ca312c01af852a30afd06b14a80dd77940d23a203f03c4f5e431b2a497450"
+        },
+        {
+          "path": "pages/coach/lesson/index.wxss",
+          "sha256": "b70187ea8da50d7b56a9396cc468779c83936b2038d5ec06d4ed7b7115cbe278"
+        },
+        {
+          "path": "pages/coach/lesson-detail/index.json",
+          "sha256": "d37e9b899f7d199ffc91ffb5aa216d48ed4cd0be6ba94ab839030513e90fff3b"
+        },
+        {
+          "path": "pages/coach/lesson-detail/index.test.mjs",
+          "sha256": "6697e5d87e0f829b6d206e14387cc8ad92851722446757d34c1fc69a9f123e0a"
+        },
+        {
+          "path": "pages/coach/lesson-detail/index.ts",
+          "sha256": "ae2d164ac28d3b6f5bf132b2ba8f2428e6818ffab47809b468e950551574a210"
+        },
+        {
+          "path": "pages/coach/lesson-detail/index.wxml",
+          "sha256": "94b952b172ffdaffbbf7ab9a2d230f6177472a5e243a4fbc72a1a280a4b7159d"
+        },
+        {
+          "path": "pages/coach/lesson-detail/index.wxss",
+          "sha256": "a17cfb988ab37fa7d25a098a38031776013ee4d488bbba613d63671f23c2637b"
+        },
+        {
+          "path": "pages/coach/lesson-history/index.json",
+          "sha256": "d37e9b899f7d199ffc91ffb5aa216d48ed4cd0be6ba94ab839030513e90fff3b"
+        },
+        {
+          "path": "pages/coach/lesson-history/index.test.mjs",
+          "sha256": "cca3f01855991a075691cfe219a24fe0987385ab3252c9e2ddc18133e1d0b34b"
+        },
+        {
+          "path": "pages/coach/lesson-history/index.ts",
+          "sha256": "a26227aced77f1c85cd0eb09c28e86956522ca8727c2378696ddf614a0e053cd"
+        },
+        {
+          "path": "pages/coach/lesson-history/index.wxml",
+          "sha256": "daeef2a059b274968a54043cdb51578191a0132eb7452ef054abc312000002d9"
+        },
+        {
+          "path": "pages/coach/lesson-history/index.wxss",
+          "sha256": "c6e32a00f7cfe10c657f62c03a62539108e5e1d26a21c524a2fc8dad29e79440"
+        },
+        {
+          "path": "pages/coach/match/index.json",
+          "sha256": "d37e9b899f7d199ffc91ffb5aa216d48ed4cd0be6ba94ab839030513e90fff3b"
+        },
+        {
+          "path": "pages/coach/match/index.test.mjs",
+          "sha256": "cd9e666b5f05b3a2fb9a366868ff4cf4fd76ae8e616e18af36ce13a9dcc270f8"
+        },
+        {
+          "path": "pages/coach/match/index.ts",
+          "sha256": "7283b9fe2c172966e5b47e5ac2e1c9bc749f5b37635e76a2c008e61f9549c9fa"
+        },
+        {
+          "path": "pages/coach/match/index.wxml",
+          "sha256": "83af4df11d51858f125279859ec6a567fd90a079e91baea1aa638c4f67e83c85"
+        },
+        {
+          "path": "pages/coach/match/index.wxss",
+          "sha256": "a52f79affe95b767010309ce0daed62ba3116def24eaf7151a623087ae769032"
+        },
+        {
+          "path": "pages/coach/match-edit/index.json",
+          "sha256": "3e595dca04a1462e23e6ebd14f02a4953e42d49c4d05c7024dc1d6f0a7ef2532"
+        },
+        {
+          "path": "pages/coach/match-edit/index.test.mjs",
+          "sha256": "d42b2e86414a13e24405d1262d9958b844480fa3ed439fa1f461d272540ff1bf"
+        },
+        {
+          "path": "pages/coach/match-edit/index.ts",
+          "sha256": "a0c63ca9fd25eea9ae1ea08c309119e4cd9a448452628322fe56cd12289c60d4"
+        },
+        {
+          "path": "pages/coach/match-edit/index.wxml",
+          "sha256": "40dc6bfdff661e3bd32f0e0f243e350de2d8bdad60528d21256e2043517891d6"
+        },
+        {
+          "path": "pages/coach/match-edit/index.wxss",
+          "sha256": "1047c8d2d70cc48cce91fe7df5ebc7041c8c375ae9ec8a5669b868fa037fcbb5"
+        },
+        {
+          "path": "pages/coach/match-event-add/index.json",
+          "sha256": "dcd80402b4dcc53156cdf73eb0e87f797ac3fccff05e461f67ccd9c6e758413b"
+        },
+        {
+          "path": "pages/coach/match-event-add/index.test.mjs",
+          "sha256": "98eca58e229e07f589f7b285382ebc3a5241536ffcbf869a71310e28e3fb790b"
+        },
+        {
+          "path": "pages/coach/match-event-add/index.ts",
+          "sha256": "8ade9860b6c8cffe40392f693d43b45a0f1a7c3b71f0fb229bfba684d8f92c5c"
+        },
+        {
+          "path": "pages/coach/match-event-add/index.wxml",
+          "sha256": "31c4989e0fd50910ccd047df21a3e1f37d64658f56b64bf9f6078aabe4df4ec9"
+        },
+        {
+          "path": "pages/coach/match-event-add/index.wxss",
+          "sha256": "233225e6974c52cc928f468e01111d1f567151ec5cbda00220f90d3212b31fb1"
+        },
+        {
+          "path": "pages/coach/me/index.json",
+          "sha256": "8e4ecf7b78da336522b973c5d46f38712220626a6927377fd2d9612bf3e360d5"
+        },
+        {
+          "path": "pages/coach/me/index.test.mjs",
+          "sha256": "e692ec3aa5eb2ca578584a69f23e118c23936d83940d7169032a838709f91baf"
+        },
+        {
+          "path": "pages/coach/me/index.ts",
+          "sha256": "cbf361b7a2076c3b967df653bde3d09401a0b45736841542fccefdd04eca5d35"
+        },
+        {
+          "path": "pages/coach/me/index.wxml",
+          "sha256": "11986952512a2fa143f9fd1417b434eb983b1fa0cbaf437d1e3e2b9bdebb486a"
+        },
+        {
+          "path": "pages/coach/me/index.wxss",
+          "sha256": "07530149790b5eb70bc1f7b75e27c19dad083a2bd10f78bf972292306a864547"
+        },
+        {
+          "path": "pages/coach/permissions/index.json",
+          "sha256": "bec7fa156764d08b4919da2471f3588069366ed5b5247926ddc8df561bd8472f"
+        },
+        {
+          "path": "pages/coach/permissions/index.test.mjs",
+          "sha256": "090b346497f8751f3676e9112a18099b9211347d94353e692157a10f1013ca09"
+        },
+        {
+          "path": "pages/coach/permissions/index.ts",
+          "sha256": "2d1cd8585641d388c089fb683973f3259505e6fc3e20e6f6833a5c36136b882d"
+        },
+        {
+          "path": "pages/coach/permissions/index.wxml",
+          "sha256": "a7f777d3d2131c2bf53541a0ac3435b91179dba0b48149e4d92e8eb58e7d543a"
+        },
+        {
+          "path": "pages/coach/permissions/index.wxss",
+          "sha256": "1eb176fcb1beb9e21c53ca4974027972a89780b575a77dd2ed3bba7adc1dba97"
+        },
+        {
+          "path": "pages/coach/private-interest/index.json",
+          "sha256": "a456515a30c8c1c746668e7820093506897819a5c5af6926a01d0eb7cc92ac09"
+        },
+        {
+          "path": "pages/coach/private-interest/index.test.mjs",
+          "sha256": "2068ce9e7e5645adedcf888b0fd42c134cec0822521ab62d8e906cd6f2d7731f"
+        },
+        {
+          "path": "pages/coach/private-interest/index.ts",
+          "sha256": "0fb3d839bc8383647da9e0de1b68f15e8eb837327179a0e1e7886951882cbc3b"
+        },
+        {
+          "path": "pages/coach/private-interest/index.wxml",
+          "sha256": "247d2b6994901e2543c722a48df54c66eeb7b293e92ddb19c4f7e5a095e831f0"
+        },
+        {
+          "path": "pages/coach/private-interest/index.wxss",
+          "sha256": "204f3828533c277b09ab198de6765816975f9ece8134245659cf0f8a5389d256"
+        },
+        {
+          "path": "pages/coach/schedule/index.json",
+          "sha256": "cee20978ce893b6c121baf3728f945af7108816aadac630d7ae374e6e0c5d04d"
+        },
+        {
+          "path": "pages/coach/schedule/index.test.mjs",
+          "sha256": "5c09cb7982548f54cbdb2a12ef0889455a9cdffbcad764e4e899b787d25958e0"
+        },
+        {
+          "path": "pages/coach/schedule/index.ts",
+          "sha256": "d9e9a23cf714bdee7a43ab3f05afc3d4dcfacf00b8d9b9c65c6f880322c7e63c"
+        },
+        {
+          "path": "pages/coach/schedule/index.wxml",
+          "sha256": "824f660f97b1952a20412020ab54d6dbb4cff7a162b57ed2ed703c84cc67a770"
+        },
+        {
+          "path": "pages/coach/schedule/index.wxss",
+          "sha256": "e144d9c2e675c3635da3364d723db92e121e9f2f29ad46a7ea66b09bc64a8120"
+        },
+        {
+          "path": "pages/coach/schedule/seven-day-strip.test.mjs",
+          "sha256": "2a064d9e66605971a5259926d98667291727e63ba61b2fbc22f85c03c9d18e18"
+        },
+        {
+          "path": "pages/coach/scout/index.json",
+          "sha256": "090298dabf6c3cae7d3679b67cda798a2368098a34c07516e32136ddcfbc79fe"
+        },
+        {
+          "path": "pages/coach/scout/index.test.mjs",
+          "sha256": "345b88ba3b77d8bd2d1e081928aad34e76077cc7e06e0ea14a7305e452f713d5"
+        },
+        {
+          "path": "pages/coach/scout/index.ts",
+          "sha256": "cba391cbd87ea0cf220c17d9ca1fb31cb527e811dccf6cd445af2b3d40055afa"
+        },
+        {
+          "path": "pages/coach/scout/index.wxml",
+          "sha256": "fc20dff481209794c1c36d96e395cc844ece215dcec7c5ba816eb5e615dcef94"
+        },
+        {
+          "path": "pages/coach/scout/index.wxss",
+          "sha256": "b4fbe0aca7924feed4870438cdffe10b32c03700d576717a691431d5b3c8f33d"
+        },
+        {
+          "path": "pages/coach/student-radar/index.json",
+          "sha256": "ee5ac633d74bd47f885049da912a951459b5ee44902db479bfe6b70fe4f655cc"
+        },
+        {
+          "path": "pages/coach/student-radar/index.test.mjs",
+          "sha256": "f0680348f5acf7153188a2cb774a16190b809a32263b2f90f6b3e3cec187e611"
+        },
+        {
+          "path": "pages/coach/student-radar/index.ts",
+          "sha256": "bc54ce9de2dc4c727c85faab8936350ef320f5aae73e9354d98a4c805dae5b19"
+        },
+        {
+          "path": "pages/coach/student-radar/index.wxml",
+          "sha256": "d97930f03af5a6779562220569778b88312fe357117e83da18d68a147da8fff9"
+        },
+        {
+          "path": "pages/coach/student-radar/index.wxss",
+          "sha256": "ed83010e01c950eec900268599e07ec265358643b450ca97742347e338f4378e"
+        },
+        {
+          "path": "pages/coach/student-results/index.json",
+          "sha256": "fdbadc8005e486788b8c949c6702de61c88cc1a67c09e101de8a61cb7fa8120f"
+        },
+        {
+          "path": "pages/coach/student-results/index.test.mjs",
+          "sha256": "d7c65434a11c012f97f68b9641a68623fd44ffbc50709b681158da908614bf5f"
+        },
+        {
+          "path": "pages/coach/student-results/index.ts",
+          "sha256": "0ff807cdbe44189e08c56e6d2b6787ae32b4770be587945333c3afbb4ba1b977"
+        },
+        {
+          "path": "pages/coach/student-results/index.wxml",
+          "sha256": "a714d920e221fa6a9acc3db5e062472abeedda6e0d1c8c8b0f244dd67a881978"
+        },
+        {
+          "path": "pages/coach/student-results/index.wxss",
+          "sha256": "94f96a8500d5c3fbf027ff661a449337b336a0d9ce8e859d3841d56af2cbdb8d"
+        },
+        {
+          "path": "pages/coach/tactical-board/index.json",
+          "sha256": "043783b0bc3ed43fc3d66e63619335f5346bf7859a7cc1e58f7cb5b5808e43be"
+        },
+        {
+          "path": "pages/coach/tactical-board/index.test.mjs",
+          "sha256": "9118167f9b3fa8f3eedd4e640c18a3b9fd057d55a0a23088d72771ba48126ccd"
+        },
+        {
+          "path": "pages/coach/tactical-board/index.ts",
+          "sha256": "bc58f2f70844c7604f1301a8ea16d4a0cf26f6b82154044908030bce2c122ff8"
+        },
+        {
+          "path": "pages/coach/tactical-board/index.wxml",
+          "sha256": "e029fcf9cd14c3bba3e2874e875f70b70068947288e4da2c56757873f39176eb"
+        },
+        {
+          "path": "pages/coach/tactical-board/index.wxss",
+          "sha256": "80c5ad0372eba947dc52956c342dd586850c77113b03c263ee2bc82941be128e"
+        },
+        {
+          "path": "pages/coach/team/index.json",
+          "sha256": "3126f6ccf37c66900635c2e88a6ce45fd389b5f6a0b2c4de9b6680b6c9708486"
+        },
+        {
+          "path": "pages/coach/team/index.test.mjs",
+          "sha256": "ecaf33b4d993dd4986bf2206c462653dd15641de5522400763a8ba435e861446"
+        },
+        {
+          "path": "pages/coach/team/index.ts",
+          "sha256": "eacbb57d70dfa5461b4fd2dcf2e03ce56e083bd8bebc755675837e4f16793b92"
+        },
+        {
+          "path": "pages/coach/team/index.wxml",
+          "sha256": "2edb2a533c6370c7508d7337868027f9cfb6e56a0c4f09cf9d065ec0be862a84"
+        },
+        {
+          "path": "pages/coach/team/index.wxss",
+          "sha256": "dda80069dabedd3e867b3ad57d8d51b32cfc7f4df13443d05820a8b59ea2303f"
+        },
+        {
+          "path": "pages/coach/team-ability/index.json",
+          "sha256": "62146cc5299b2027a32c7f74d6bcc6d561f9d0078fc0c0aea6653d0e3d9750ab"
+        },
+        {
+          "path": "pages/coach/team-ability/index.test.mjs",
+          "sha256": "54f145b720aa7a2dd5b0d7403aacf6f71879025320ea057dec905393bea76104"
+        },
+        {
+          "path": "pages/coach/team-ability/index.ts",
+          "sha256": "5523146f2105354dd219ec625f475f46eceef503846a9273c287064feba50b5e"
+        },
+        {
+          "path": "pages/coach/team-ability/index.wxml",
+          "sha256": "9e0e364a3bb017af2ae64a526e8f5f37fea6a7c5c7aae51f6eed21b7435ce1eb"
+        },
+        {
+          "path": "pages/coach/team-ability/index.wxss",
+          "sha256": "e058e7a65e833a29164aaabd6dff4a17d335dfaaa168eac30df0619556d4b993"
+        },
+        {
+          "path": "pages/coach/team-selector/index.json",
+          "sha256": "7507851b40d929ef13d891abccf8f9c0426d42699ec4e5dc93edeee3da35e7e9"
+        },
+        {
+          "path": "pages/coach/team-selector/index.test.mjs",
+          "sha256": "7e2669022456b00cc5fc8fb2ba9c815d45a2bb7e7462c848d56906a1f3886c1d"
+        },
+        {
+          "path": "pages/coach/team-selector/index.ts",
+          "sha256": "ba8865c7339ee4bfbb9ef96780a503f6add85c690774ff94aad8041e50ae681c"
+        },
+        {
+          "path": "pages/coach/team-selector/index.wxml",
+          "sha256": "f3ed8ea32a4be0d612a2903dfa9611fff9c4adaa5ef65b7e092a7362352c46b6"
+        },
+        {
+          "path": "pages/coach/team-selector/index.wxss",
+          "sha256": "f54c26e3706cd3c2ab513d462d98b6a2b035f0edec671e04752bbf9695c28f29"
+        },
+        {
+          "path": "pages/coach/test-entry/index.json",
+          "sha256": "7be740fa4fd2a41d8f2cfef171694d1f25043b8b5b67760c65fd504dee933e89"
+        },
+        {
+          "path": "pages/coach/test-entry/index.test.mjs",
+          "sha256": "55deaa3c681366aa6d16c80b0e4c22a7b5ecb0ec5193fbcab67716bd706882c8"
+        },
+        {
+          "path": "pages/coach/test-entry/index.ts",
+          "sha256": "06f343c36a33e9a16cb87f3da61caf07e1c5d13a2e45b4f5509783f869c87c9f"
+        },
+        {
+          "path": "pages/coach/test-entry/index.wxml",
+          "sha256": "9d332a3aa8434393da26fa5eb9754ceffac5bc22ea9a51b192ffa3c9b6bd1283"
+        },
+        {
+          "path": "pages/coach/test-entry/index.wxss",
+          "sha256": "256c0492b199a0ec35ee06e63249a4fdcf33c5d20a7d23118ff4022647176b2a"
+        },
+        {
+          "path": "pages/coach/test-task-create/index.json",
+          "sha256": "6286185d582177f6e3a0c9544b86d65017e00c0c8e54196ea6dc30af8d175698"
+        },
+        {
+          "path": "pages/coach/test-task-create/index.test.mjs",
+          "sha256": "7f4862c6094e12b22f1cdaa7419203c59451dd4082aab025abdea0cf103720f6"
+        },
+        {
+          "path": "pages/coach/test-task-create/index.ts",
+          "sha256": "1170ce79e07c6665a5880921adc71b27eace852a171b0801c4c57525da823733"
+        },
+        {
+          "path": "pages/coach/test-task-create/index.wxml",
+          "sha256": "81a7beffe7ad7cc83c72c5661baf916b4ea8625b411a8e942f72bafd46ff53b9"
+        },
+        {
+          "path": "pages/coach/test-task-create/index.wxss",
+          "sha256": "c0446b7e4b4f0a4d843eb27e0c5d8f4d2a45da46d6c5325076c2271491e9d548"
+        },
+        {
+          "path": "pages/coach/test-tasks/index.json",
+          "sha256": "91953665a7193a87b3fc5ddbacc0e85165c81fcba0319c992452739e4966a470"
+        },
+        {
+          "path": "pages/coach/test-tasks/index.test.mjs",
+          "sha256": "4a0d10e8e95a1860a9c7fc7ccb6881177e095646a76415d1f2361cb6e4d15c85"
+        },
+        {
+          "path": "pages/coach/test-tasks/index.ts",
+          "sha256": "f5d313a473d31ee26f1d9b79b52b3ac3b64a54b62289f2b8477fb60dbe6cf1cd"
+        },
+        {
+          "path": "pages/coach/test-tasks/index.wxml",
+          "sha256": "75da5c945c0865b08f83845dc6dc9215d47816e2316d4537cb5c05fdfc2977eb"
+        },
+        {
+          "path": "pages/coach/test-tasks/index.wxss",
+          "sha256": "c32b75620652184ffd9fb7a86966fb536d09248e9f621deebb5df4b6a89506fc"
+        },
+        {
+          "path": "pages/coach/training/index.json",
+          "sha256": "c106ecb6c0b2a9e0eca33917d790671fcc46fd11e0cbe1801a9692a44a0a5e76"
+        },
+        {
+          "path": "pages/coach/training/index.test.mjs",
+          "sha256": "6f822565216a979efcc01eb81100b8f2c2202012238adc59ab4aa60bf2762953"
+        },
+        {
+          "path": "pages/coach/training/index.ts",
+          "sha256": "076531fdb7a07860a90d841e89b4a8756f10a404d8a5d7ad496ca04dc25d2e30"
+        },
+        {
+          "path": "pages/coach/training/index.wxml",
+          "sha256": "4f73f8d4fa5a95a557fa530da4f240d7bd4004d5f6e3d61570b68a1db347ba82"
+        },
+        {
+          "path": "pages/coach/training/index.wxss",
+          "sha256": "508986da80b5753af4a84bddc8455931611d8a7201439ef1d8dbed125ed583c5"
+        },
+        {
+          "path": "pages/coach/training-assessment/index.json",
+          "sha256": "2e38af4bd6d866af1b64ab0c19567f33fff4372b404d26ec2bbed5b51935726d"
+        },
+        {
+          "path": "pages/coach/training-assessment/index.test.mjs",
+          "sha256": "a2d725bfedb843633b4386650d09322f7523cd91d2e2055c9d77ccc34867ffd4"
+        },
+        {
+          "path": "pages/coach/training-assessment/index.ts",
+          "sha256": "8224eb86bf5f00d61f6b1609e96a801376efee1e55dd1136f66284a913ee4978"
+        },
+        {
+          "path": "pages/coach/training-assessment/index.wxml",
+          "sha256": "77a24e4199b3e4b0350efdaf05529dd4d851680f1fe2bb7cedc16af01e980457"
+        },
+        {
+          "path": "pages/coach/training-assessment/index.wxss",
+          "sha256": "9ca97bb8ed3fc9e49e485bcd0c3f4252b3eca3739cc169436c4668dd93933642"
+        },
+        {
+          "path": "pages/coach/training-game/index.json",
+          "sha256": "c6b0c0370dcc92b5bbb90dd4efa1520e5f43b209a587a00277ed664979b80e6c"
+        },
+        {
+          "path": "pages/coach/training-game/index.test.mjs",
+          "sha256": "0b14d848021edef7902180353d72258e94200e666c03b24763f6672e56124007"
+        },
+        {
+          "path": "pages/coach/training-game/index.ts",
+          "sha256": "836a0f4f703bb8e55ec3482a525820457a8d16378b540b88ef812ab533c2daa6"
+        },
+        {
+          "path": "pages/coach/training-game/index.wxml",
+          "sha256": "a228e42dc132e30b10887b7eefee536e99ae65c5e4df31c712203e7eae2e0a52"
+        },
+        {
+          "path": "pages/coach/training-game/index.wxss",
+          "sha256": "f909f4bddac34e6c6652a3d9ddaa762689a2f5c8baab2a95bf7e30108065618a"
+        },
+        {
+          "path": "pages/launch/index.json",
+          "sha256": "91d3d8958dc0dbb618b1746865065c01afec831cbc120b017a9353849d12f8af"
+        },
+        {
+          "path": "pages/launch/index.test.mjs",
+          "sha256": "b3efc41822f603b7379b12947278f90c30934fc6526d973094638fadf83caadf"
+        },
+        {
+          "path": "pages/launch/index.ts",
+          "sha256": "7fb328cd13a9f9f1d5762902e1714c133bd8a341fdd380dae4051f400f798eb4"
+        },
+        {
+          "path": "pages/launch/index.wxml",
+          "sha256": "fd7536f611e401b66f7f6280a45d7dbcd7fd10fbbe976671f9fec71f63476afb"
+        },
+        {
+          "path": "pages/launch/index.wxss",
+          "sha256": "fe4e0e2add57c2bffc08a26266cf3a9e95d7d6273cbaaefb86ea50b30564e762"
+        },
+        {
+          "path": "pages/login/index.json",
+          "sha256": "aa294925751078d24ac5f3f6fdd9fc92ed8d756c4dfa75fca70e0b4654751f34"
+        },
+        {
+          "path": "pages/login/index.test.mjs",
+          "sha256": "7499fb06623df71820642aeae3fb2b56d8d1c7389582bfebb97e0c60b8936d4e"
+        },
+        {
+          "path": "pages/login/index.ts",
+          "sha256": "5ef41ad89bcd7e0765a160ea3b553330044eaa9c6eed2d39ac2f334a95faaa31"
+        },
+        {
+          "path": "pages/login/index.wxml",
+          "sha256": "426dda568958f69f67d48d4226d1719b0f623b3b72b491d446ffb04277980cbf"
+        },
+        {
+          "path": "pages/login/index.wxss",
+          "sha256": "ebacfce1c76d0bbb84f8126a0a1f121006d28cb9527dc134c944db23a96af8fd"
+        },
+        {
+          "path": "pages/parent/ability-history/index.json",
+          "sha256": "910b57707823ce1d48a7fa9084b70e51fd65310e373227e339588c09b36fa76b"
+        },
+        {
+          "path": "pages/parent/ability-history/index.test.mjs",
+          "sha256": "52a53253d05b66d8ca4d8585d424cbab0e37e0f5174a1199b33b5aa514bc156d"
+        },
+        {
+          "path": "pages/parent/ability-history/index.ts",
+          "sha256": "9907cc1539c106925600abec3d50d895df0433f23a6c15f1d6fad5157d0877db"
+        },
+        {
+          "path": "pages/parent/ability-history/index.wxml",
+          "sha256": "b4ffe76fb8e8ebc2c4b1c06acaa1ef003e225d58f82c3142b492bbd450d5cfbd"
+        },
+        {
+          "path": "pages/parent/ability-history/index.wxss",
+          "sha256": "ab348bf6e30bbb251d242b2a65d675c1deff458f34a8237d67a18e4205712cc3"
+        },
+        {
+          "path": "pages/parent/account/index.json",
+          "sha256": "f9e6f20db66232d52c26b421ddf6c1d14b20cbd75135a27acefeeda1b30e6b64"
+        },
+        {
+          "path": "pages/parent/account/index.test.mjs",
+          "sha256": "75e10a18f52eba706b8dde57f498fe7ac9e30bed1fbafe81b6ac4811961a16f4"
+        },
+        {
+          "path": "pages/parent/account/index.ts",
+          "sha256": "06666d3b3a7072106bb0b71aa2a1dcc955fb08de3dacdf08bf14b94537848b2f"
+        },
+        {
+          "path": "pages/parent/account/index.wxml",
+          "sha256": "dcaf30a080f2d7641cec8c12d027d03b77e8683933e5365499f02da9a4d114b6"
+        },
+        {
+          "path": "pages/parent/account/index.wxss",
+          "sha256": "b3da84ec728202e661f90946f765932f38f581c75d14c240980755845bb83ae0"
+        },
+        {
+          "path": "pages/parent/article/index.json",
+          "sha256": "e0601979d87d7d7b390839924213d333364bf3259031436d7ede8bed09506365"
+        },
+        {
+          "path": "pages/parent/article/index.test.mjs",
+          "sha256": "4b4611a08cd41ce4c1e390f38d7ea156dc7871a988b67d69b35939721e972e03"
+        },
+        {
+          "path": "pages/parent/article/index.ts",
+          "sha256": "8e7508cea3d2474e6e309f93e356ece5f4ac35906438759b454d571c7a84eff9"
+        },
+        {
+          "path": "pages/parent/article/index.wxml",
+          "sha256": "f424c76999e3d1298079e2ddf76ed998cbf065d00ea35819bf8c7124bd3c75d5"
+        },
+        {
+          "path": "pages/parent/article/index.wxss",
+          "sha256": "cd6ee11b21a8c95dca69fb6670a3d66aee4993ad0e02e44d69d9aa104d649e58"
+        },
+        {
+          "path": "pages/parent/binding/index.json",
+          "sha256": "8e4ecf7b78da336522b973c5d46f38712220626a6927377fd2d9612bf3e360d5"
+        },
+        {
+          "path": "pages/parent/binding/index.test.mjs",
+          "sha256": "2d5fdf8e35f2a3333fb6ad075b33758ab7a5ce41a35d5e8f3e0d81bd82b4bede"
+        },
+        {
+          "path": "pages/parent/binding/index.ts",
+          "sha256": "e0b70b8a1ddb3e9e83daa610397c59c16874c5abe58f6d972004028401f46695"
+        },
+        {
+          "path": "pages/parent/binding/index.wxml",
+          "sha256": "aa383e357a6aaecfac239e40be5ba273ca50b3c3637e75847cdecbf9b26ef9f4"
+        },
+        {
+          "path": "pages/parent/binding/index.wxss",
+          "sha256": "d40645e99db5d5cb13b4ed83a1b59d674eb8fdb0cf2823a145ab90992fec5712"
+        },
+        {
+          "path": "pages/parent/child/index.json",
+          "sha256": "6774e98be47b3d6df60b8731949bae4e5d1a496d28841ec0798b7a5b9cb7007c"
+        },
+        {
+          "path": "pages/parent/child/index.test.mjs",
+          "sha256": "fef03bb4e2a16bdafdd15d423c92fe31cba90cf7b73d654aea0cadd58feaec16"
+        },
+        {
+          "path": "pages/parent/child/index.ts",
+          "sha256": "6da4760fe796c081bfc659baaf352247df438d8a70ba0c98f3d78e4f9ab50132"
+        },
+        {
+          "path": "pages/parent/child/index.wxml",
+          "sha256": "763d3bdbf6f7ff164c50ca9bd3a3399a392afbcdd08c85f7d0db56aa6d0b99d7"
+        },
+        {
+          "path": "pages/parent/child/index.wxss",
+          "sha256": "4626b5e228b691307541f35ee71117d83b7550dda1f97946299ce0d1d939e9e1"
+        },
+        {
+          "path": "pages/parent/coaches/index.json",
+          "sha256": "ad5a35955e7ef4fb2b008ad9e6b6e72429cfc8bcbdca72887f75e894af79f64d"
+        },
+        {
+          "path": "pages/parent/coaches/index.test.mjs",
+          "sha256": "3317537fb05141795a32370a2fd388f04b67df2ed8b8ade8111c705f0161f654"
+        },
+        {
+          "path": "pages/parent/coaches/index.ts",
+          "sha256": "ce4620ea7b1f5cda18a88f58ce03c43c7725cd1559245ac47fbe91276ace61b9"
+        },
+        {
+          "path": "pages/parent/coaches/index.wxml",
+          "sha256": "fbedabc4048f84b434210909c8e29e5d6d6eaaf90a96d63b6370de9b382ee176"
+        },
+        {
+          "path": "pages/parent/coaches/index.wxss",
+          "sha256": "8ccaba0cc5007ab1f04d1cdfbb271dee747bf90c5152fc66af7f312e4a9e046d"
+        },
+        {
+          "path": "pages/parent/confirmed-results/index.json",
+          "sha256": "fdbadc8005e486788b8c949c6702de61c88cc1a67c09e101de8a61cb7fa8120f"
+        },
+        {
+          "path": "pages/parent/confirmed-results/index.test.mjs",
+          "sha256": "3fb3cfe6b0bd8abe08f2a07d41c786fc58b419d580a6cd1c5e3110700124a87e"
+        },
+        {
+          "path": "pages/parent/confirmed-results/index.ts",
+          "sha256": "f19a105e27360507ff425b50d6eef500bc5bdd3046cbc3b13293e09dc698625e"
+        },
+        {
+          "path": "pages/parent/confirmed-results/index.wxml",
+          "sha256": "a714d920e221fa6a9acc3db5e062472abeedda6e0d1c8c8b0f244dd67a881978"
+        },
+        {
+          "path": "pages/parent/confirmed-results/index.wxss",
+          "sha256": "aed834946302e3a6bf4a44ac438348a864b865bfdb71e041af7d0905123bf97f"
+        },
+        {
+          "path": "pages/parent/content/index.json",
+          "sha256": "a32a307d6adcb01f823bf7a66b54a07194da14a2b0b81a0f96842bfa6b7202ec"
+        },
+        {
+          "path": "pages/parent/content/index.test.mjs",
+          "sha256": "8e73eea54590b2f835749cf8f37720f78cb2397b2c982487b815f0df289bb994"
+        },
+        {
+          "path": "pages/parent/content/index.ts",
+          "sha256": "3cd0a26283d2ee301a579803940f04dabe3b30886e2b9d1f89962e63a2290bf1"
+        },
+        {
+          "path": "pages/parent/content/index.wxml",
+          "sha256": "2179a0ba89cfb4cc13acb4aa19d71e5c273b856e29654d4e8db84cac42eeaf34"
+        },
+        {
+          "path": "pages/parent/content/index.wxss",
+          "sha256": "7b0a17234de579ff9a74f89657d59a17b6da6396b313390253c8c7be5efa70eb"
+        },
+        {
+          "path": "pages/parent/day/index.json",
+          "sha256": "8e4ecf7b78da336522b973c5d46f38712220626a6927377fd2d9612bf3e360d5"
+        },
+        {
+          "path": "pages/parent/day/index.test.mjs",
+          "sha256": "a3cd52ec04d0934744a1e7c31f7f1965ed15af1be08e850a87850570df9018f2"
+        },
+        {
+          "path": "pages/parent/day/index.ts",
+          "sha256": "8f8c4669ee24149187a8b2ac0a384463a9e81271e434a52b27a297918276aa71"
+        },
+        {
+          "path": "pages/parent/day/index.wxml",
+          "sha256": "5018045ca458d03335dd66fcfc21e768bb4fb0445454d2359166cea805418c6b"
+        },
+        {
+          "path": "pages/parent/day/index.wxss",
+          "sha256": "d8345067d096f34b57f3d2e5e95221b1b85b5afb8034bd24220a062f565aca0a"
+        },
+        {
+          "path": "pages/parent/event/index.json",
+          "sha256": "2c15a5a3ca8dff1d23c3bc7c9fd27315c0bb9db176c3ff0f72056b6b2fb8fcdd"
+        },
+        {
+          "path": "pages/parent/event/index.test.mjs",
+          "sha256": "1fe171ce387f5eb0ec06159ca6da5e0b7fb35ecb1362288bedb8ad3edf85daaf"
+        },
+        {
+          "path": "pages/parent/event/index.ts",
+          "sha256": "564e9c9280666cd1f5480a87a79204518d5539d808f8dd1c729dcb6a8be13379"
+        },
+        {
+          "path": "pages/parent/event/index.wxml",
+          "sha256": "ae29cda51964c424fd89ea154b4e142403d78e8d83003180415c20a4517e8a1e"
+        },
+        {
+          "path": "pages/parent/event/index.wxss",
+          "sha256": "7abfae52f38952944e2cf00a205b6cd33062b5715d06ccb66b43560b36c87ac3"
+        },
+        {
+          "path": "pages/parent/growth/index.json",
+          "sha256": "b39afaac666e6b90af2a189643456c7791c8990e38f24838615cc0b098b9dba7"
+        },
+        {
+          "path": "pages/parent/growth/index.test.mjs",
+          "sha256": "5d380fbf2c8363162703807e18341e73b550c1815ac45cd4df65784e468e691b"
+        },
+        {
+          "path": "pages/parent/growth/index.ts",
+          "sha256": "7712492232098934853fd2076fd9d879012100909868716eef43624aac1dc4fb"
+        },
+        {
+          "path": "pages/parent/growth/index.wxml",
+          "sha256": "5a6f26fec40a3e94397b43fd8475755e66c24a41bef39afbd1a14eb52f8d4906"
+        },
+        {
+          "path": "pages/parent/growth/index.wxss",
+          "sha256": "016573591eda595ce6f79653b823ed7464cc5b661999950df7b1cb187cba81a6"
+        },
+        {
+          "path": "pages/parent/guide/index.json",
+          "sha256": "dbad5cac9fb9ce31a759987aae3baabc8a72b6cd656a3583ce4fba7f9d751360"
+        },
+        {
+          "path": "pages/parent/guide/index.test.mjs",
+          "sha256": "ce970b03dd1056987bf3fb27092b8e6a3ad4f31e8f27be21ac608683a5055bfe"
+        },
+        {
+          "path": "pages/parent/guide/index.ts",
+          "sha256": "0f80711e842e9004410b6b077d7940f8170102ca3ecad9515cedff5893fc27c9"
+        },
+        {
+          "path": "pages/parent/guide/index.wxml",
+          "sha256": "ff555bb5c02ba89be4079569e711a097a2c3b23168666ccb8141e6a1194aa1ad"
+        },
+        {
+          "path": "pages/parent/guide/index.wxss",
+          "sha256": "c1019943c14e1b380da7dbca61345eca6d6a7eb44ff3347172d06d0db47ac165"
+        },
+        {
+          "path": "pages/parent/help/index.json",
+          "sha256": "aedf935784547fbfeec7f8187061bdb9e791eddbf5ddb5f8793b7387873d7c17"
+        },
+        {
+          "path": "pages/parent/help/index.test.mjs",
+          "sha256": "92cecca119c6c7fa1e5fda5c089bf6e5f91a8eb5e111e8c9689cec4d37678e37"
+        },
+        {
+          "path": "pages/parent/help/index.ts",
+          "sha256": "fa4bf2fcef9398f7141f6fb7e9e586682946c3d4630c70dbdfdd1747eaed4786"
+        },
+        {
+          "path": "pages/parent/help/index.wxml",
+          "sha256": "816aa6c99e26a55ba019e03b8616e60ccfb47cd42883c727697e2832c1798cea"
+        },
+        {
+          "path": "pages/parent/help/index.wxss",
+          "sha256": "319a45a796a258bd264faf8625ef4ff2084ea664f341069c350351f5bef8a2eb"
+        },
+        {
+          "path": "pages/parent/home/index.json",
+          "sha256": "f212d812c446134e2dbcc76325c06afca534bb8da22ca8eb0c9684515a400fce"
+        },
+        {
+          "path": "pages/parent/home/index.test.mjs",
+          "sha256": "7e76235ef6c797ce0b9a2a0c64d1e5a5978dba5847d6012444b8afc22cac00f4"
+        },
+        {
+          "path": "pages/parent/home/index.ts",
+          "sha256": "9d0f065e014bbad64ef26cbbaeb0683e36fd5feeaa42789bdedce9507657917a"
+        },
+        {
+          "path": "pages/parent/home/index.wxml",
+          "sha256": "111dc286b7b79ae3aae29e14ef0c09c8281b9f17b1a2e8f3d0dca4e188a77109"
+        },
+        {
+          "path": "pages/parent/home/index.wxss",
+          "sha256": "3389b7d874ba23b38d6d89d2a3274d34e6a386341fc27c87836282a04579ed67"
+        },
+        {
+          "path": "pages/parent/match-history/index.json",
+          "sha256": "7507851b40d929ef13d891abccf8f9c0426d42699ec4e5dc93edeee3da35e7e9"
+        },
+        {
+          "path": "pages/parent/match-history/index.test.mjs",
+          "sha256": "6a43e4b2920e496c29c0825feadca0c3e79d5e55fc4330d873ede26c51321357"
+        },
+        {
+          "path": "pages/parent/match-history/index.ts",
+          "sha256": "e1f7de51e732dba69fc3d6e302c2fad7de818c7357f3e5d132e068a6c90d5432"
+        },
+        {
+          "path": "pages/parent/match-history/index.wxml",
+          "sha256": "48f3927bbdd5afd33ffcfc152f4bf9bf08e437ec56b46ca19f0d44f0d4f5a5b2"
+        },
+        {
+          "path": "pages/parent/match-history/index.wxss",
+          "sha256": "7a73e967b0835c296453b0013aaf8437979fbf2a706a632dda163dfd27a6e99a"
+        },
+        {
+          "path": "pages/parent/metric/index.json",
+          "sha256": "a8463385166b81309e6d03be9420124dcf2c3409bb83de3aea5f0adb257008fe"
+        },
+        {
+          "path": "pages/parent/metric/index.test.mjs",
+          "sha256": "4d811ded4edaf42bcad9fb9ae22f5d0fc4c0487fc5a3299246787d44df413fc1"
+        },
+        {
+          "path": "pages/parent/metric/index.ts",
+          "sha256": "48aedfb2a393aa6d77faea0bf734a79efbbe6ace1afaa7b37e1a2533ccf66359"
+        },
+        {
+          "path": "pages/parent/metric/index.wxml",
+          "sha256": "2db0ac8ec171d41c93d2d7533338909b7b6832504243117d504ebf769a78f440"
+        },
+        {
+          "path": "pages/parent/metric/index.wxss",
+          "sha256": "dd792cbe0d7c8fa17c113f7593a20574eda2df61237a58416c34a6baf90e516b"
+        },
+        {
+          "path": "pages/parent/milestones/index.json",
+          "sha256": "553f7aa61b55c9110540babe896134254c6cbbead2b6d8488fe95927e38adff9"
+        },
+        {
+          "path": "pages/parent/milestones/index.test.mjs",
+          "sha256": "15d6155b519badd0e969a836649f5ffd0f56e97d4f2376595ca17ab1dcf9d9ec"
+        },
+        {
+          "path": "pages/parent/milestones/index.ts",
+          "sha256": "41541b18e325b2dcedd613d05035ae99a258f5a9bc9841388a213682e382a8c4"
+        },
+        {
+          "path": "pages/parent/milestones/index.wxml",
+          "sha256": "e68383ff056f57f7e4539269966a27f4d3b83bf791cf7b780f79d4a1ea789e3f"
+        },
+        {
+          "path": "pages/parent/milestones/index.wxss",
+          "sha256": "4775453166943c19a51d4dbbd88899757b72dc210607293fba986211e1c1f7de"
+        },
+        {
+          "path": "pages/parent/private/index.json",
+          "sha256": "a836f49a335274ada14fe452493ae3112ad68d8e4ed114b955648570ba917869"
+        },
+        {
+          "path": "pages/parent/private/index.test.mjs",
+          "sha256": "c0ffe7115b76c57ce04800cd9ba0a7555b5b4dc45e0b4039d96b840652965351"
+        },
+        {
+          "path": "pages/parent/private/index.ts",
+          "sha256": "664e6a057bb44a037affc45b5d6290f2278b8e3fff5a0713d0615d0022638b16"
+        },
+        {
+          "path": "pages/parent/private/index.wxml",
+          "sha256": "2c365ec50d0f24c377fe4dc8ebae7f48cb0f86f4c752c02dd019645e672cf17f"
+        },
+        {
+          "path": "pages/parent/private/index.wxss",
+          "sha256": "d9d4014ea2c44cb300375f88ae47451acbe1a55cabc832581ec27797ef26528d"
+        },
+        {
+          "path": "pages/parent/private-success/index.json",
+          "sha256": "574818dac00d23de754dd23f71cc41de7fbf046b46d0b18ceae32ca667958908"
+        },
+        {
+          "path": "pages/parent/private-success/index.test.mjs",
+          "sha256": "8fa97c44593093becabe61a074547a401e50034bd17b0961b2d1ca89215a444d"
+        },
+        {
+          "path": "pages/parent/private-success/index.ts",
+          "sha256": "1c3e4bbe00caea72a8a5f13c099dfaa038aa4641b930af64318e08d2c690bbce"
+        },
+        {
+          "path": "pages/parent/private-success/index.wxml",
+          "sha256": "11597c8f95d4c00b1fd443d4c2f090ce96248dc91b9467869cb28e8f040e58bc"
+        },
+        {
+          "path": "pages/parent/private-success/index.wxss",
+          "sha256": "84a7ebcbfa3e657ef00d2484be17ca52e3cd9246d2cb400a4837d30630b6a56b"
+        },
+        {
+          "path": "pages/parent/radar/index.json",
+          "sha256": "f3bdb96026c67f77f623f407e81d4b9a68cdb76048a086235c286b116c2647e8"
+        },
+        {
+          "path": "pages/parent/radar/index.test.mjs",
+          "sha256": "6e74cd2146d9854f3d2e52b470d35158fa41a32e3e88ae1552d6223412f3672f"
+        },
+        {
+          "path": "pages/parent/radar/index.ts",
+          "sha256": "33c02fbb6c0da3a8c0d862db608fca290882ac5b22a198ef4ff7c70143e0bec6"
+        },
+        {
+          "path": "pages/parent/radar/index.wxml",
+          "sha256": "9b6b2161f93607b180f692359037801347878617e649bedda78faf05d1579c27"
+        },
+        {
+          "path": "pages/parent/radar/index.wxss",
+          "sha256": "d78879cd92be5d102aea0e46238ccbf74cdcaf631bc28ab1ae27e5724b48fbb0"
+        },
+        {
+          "path": "pages/parent/reminders/index.json",
+          "sha256": "8e4ecf7b78da336522b973c5d46f38712220626a6927377fd2d9612bf3e360d5"
+        },
+        {
+          "path": "pages/parent/reminders/index.test.mjs",
+          "sha256": "0aac137f38f391d0fe5aca334998fe8194c2b0c23f98a2b85bd29dc7b573f487"
+        },
+        {
+          "path": "pages/parent/reminders/index.ts",
+          "sha256": "c8547691546ccc6140979dee062c2d975153962c270649d505e53448ec76919b"
+        },
+        {
+          "path": "pages/parent/reminders/index.wxml",
+          "sha256": "f90e9d5d1fb0dcdc063c11a39baabfcdf0f9b0596f295c5f9bc3338f01e983e8"
+        },
+        {
+          "path": "pages/parent/reminders/index.wxss",
+          "sha256": "f713b4a7e499858c666484d8c4bf01200a598b6d2ca32f1cdf17f5e32a4f707d"
+        },
+        {
+          "path": "pages/parent/schedule/index.json",
+          "sha256": "7f3e5278777a8a4904f9950d947bebdddc956db4b3daa46afbb54620679eed96"
+        },
+        {
+          "path": "pages/parent/schedule/index.test.mjs",
+          "sha256": "d883e9738e0fbcd40bd1a0311800342da345093ff628b9fad7d1cd3fe3b8ed76"
+        },
+        {
+          "path": "pages/parent/schedule/index.ts",
+          "sha256": "e0c5a127a923bec9c70c04c7105cbe37134993d8ccc5569ae5aea4650c45cc7d"
+        },
+        {
+          "path": "pages/parent/schedule/index.wxml",
+          "sha256": "26436ec1f45900cf15805eba6ed0b0b9fcf8eb04ca8a7eab06708e40daca2f05"
+        },
+        {
+          "path": "pages/parent/schedule/index.wxss",
+          "sha256": "6aeaf6cb36c061d17ba09c806f2620ba1f7d6e1adc036e9e4db342111961da49"
+        },
+        {
+          "path": "pages/parent/schedule/month-v2.test.mjs",
+          "sha256": "41166fa72468253fde97804cac2675c5b750ed2faba1b113e98bc43d9b8b5b8f"
+        },
+        {
+          "path": "pages/parent/semester-report/index.json",
+          "sha256": "21649d8e2c7bfd0186b2ed34634852e53d2d49ff6d1d94da2b9cfc13c9ddf7a1"
+        },
+        {
+          "path": "pages/parent/semester-report/index.test.mjs",
+          "sha256": "14374f2113ffc437a38bd059d092c54ecc4db95c47e80e9aebd42efb3fb33046"
+        },
+        {
+          "path": "pages/parent/semester-report/index.ts",
+          "sha256": "501fd650eaa3b92db8f9e81c772d7eb52f139aefcb7fd8e344262d8eea3c497d"
+        },
+        {
+          "path": "pages/parent/semester-report/index.wxml",
+          "sha256": "a39f8d98782523a29e903b9d0ef17491ea7344d5af226c9e435785e85e474b88"
+        },
+        {
+          "path": "pages/parent/semester-report/index.wxss",
+          "sha256": "d98fe13503f5b8636e22e6fe06713237a6feab5cb9a90c883c4c2fb02cd809ab"
+        },
+        {
+          "path": "pages/parent/status/index.json",
+          "sha256": "8e4ecf7b78da336522b973c5d46f38712220626a6927377fd2d9612bf3e360d5"
+        },
+        {
+          "path": "pages/parent/status/index.test.mjs",
+          "sha256": "309b993755501bb463d89139fe146cf56ccacd99117f4a6e8e58b95e0e96501d"
+        },
+        {
+          "path": "pages/parent/status/index.ts",
+          "sha256": "8773de72f881d8bdc660a97a376f1bcc633137a64663d293e462a09528f48145"
+        },
+        {
+          "path": "pages/parent/status/index.wxml",
+          "sha256": "a6308558a2bc7b38f3c990f2e8658959a6093e56472fc08d6ec7b16909da2426"
+        },
+        {
+          "path": "pages/parent/status/index.wxss",
+          "sha256": "edfc9902e6b1d31e59921f412f94d7f3c99d418f71170321c19b7a540ab75344"
+        },
+        {
+          "path": "pages/parent/training-history/index.json",
+          "sha256": "a2ec788c706d5c8aaf01acfaaa959a64524f4e7ea1a59dc4eb45f3c41c1209b6"
+        },
+        {
+          "path": "pages/parent/training-history/index.test.mjs",
+          "sha256": "109fd67c42e35642ed37f055b1602efd7ab64fd794d7a3485f519afe0041cd85"
+        },
+        {
+          "path": "pages/parent/training-history/index.ts",
+          "sha256": "1d1dd49c485c41c6be991b2801dc3118b91b2e3c046b58d95301415752721f0c"
+        },
+        {
+          "path": "pages/parent/training-history/index.wxml",
+          "sha256": "b964a91a3d7143971929375e1be927a9c403d70165662aed1b65c8a2868d91e7"
+        },
+        {
+          "path": "pages/parent/training-history/index.wxss",
+          "sha256": "d50fffea0099e761f257faf06dde95dba3d8dbfffde5c9f80eae1fc4a9b4a47f"
+        },
+        {
+          "path": "pages/parent/venues/index.json",
+          "sha256": "9ec7ef67d89bd800ae1a37d410cd43abbeb899cada0c31bbbf0348638e786c65"
+        },
+        {
+          "path": "pages/parent/venues/index.test.mjs",
+          "sha256": "386451d16ea31920cfbb837ce0298b2050f9d634c327a7935e61ca1c27123c6f"
+        },
+        {
+          "path": "pages/parent/venues/index.ts",
+          "sha256": "0666b7136b706b8625ed1cf95f8e8d4a71542874727ad3a7ea506aded80faabd"
+        },
+        {
+          "path": "pages/parent/venues/index.wxml",
+          "sha256": "35a550f63ae05d9007c5d0bf35502f6daebd41ad961edf369080c413d833117a"
+        },
+        {
+          "path": "pages/parent/venues/index.wxss",
+          "sha256": "2bccf651668ea32240f65a531785d10e5337b8666b79531296fc889303b815ff"
+        },
+        {
+          "path": "pages/shared/student-evaluation/index.json",
+          "sha256": "18288c8303d6efe13add9ba752bc81075a483fd5459bc9e73588c2627d40afe4"
+        },
+        {
+          "path": "pages/shared/student-evaluation/index.test.mjs",
+          "sha256": "d8fa59bc22458d3a1891ad24843008256f9a0ef083ff2d5d44f65ead0769a0e7"
+        },
+        {
+          "path": "pages/shared/student-evaluation/index.ts",
+          "sha256": "82cfb761c03051545ebb77a79df3e4a73ad3841e422e3f6f4d74f0d9b4750c29"
+        },
+        {
+          "path": "pages/shared/student-evaluation/index.wxml",
+          "sha256": "2d575d81519af6f89b107dab3b2670b200f0852bffb36b613a2b6553fd250c15"
+        },
+        {
+          "path": "pages/shared/student-evaluation/index.wxss",
+          "sha256": "e9de2f5f09cfd9b094887b564081dd8bc3591b2118f42a2699291ce67259ed05"
+        },
+        {
+          "path": "pages/stale-component-registration.test.mjs",
+          "sha256": "b3a31383707c8eb8074a798234189aa4583d0f8534892c977d216eca6637b7af"
+        },
+        {
+          "path": "project.config.json",
+          "sha256": "d5fb07541c5b99002a2d0f3cd87189c2f3717bf074c999cbbd6dcd58f26f92ca"
+        },
+        {
+          "path": "scripts/build-radar.mjs",
+          "sha256": "67a28210c79b3f98ca05d4ed666fef91f4a1775e5be6cd42a8656f2469924634"
+        },
+        {
+          "path": "scripts/devtools-automator-open.mjs",
+          "sha256": "bbf17246e02b70ebf492aed69c5deb2838eedf56f77d5e93ae0e9669d5d8e1c5"
+        },
+        {
+          "path": "scripts/devtools-preview.mjs",
+          "sha256": "1c22682c73f5b1081a652236452967909c26e09fa1b954e62eee0316adad0e9d"
+        },
+        {
+          "path": "scripts/devtools-screenshot.mjs",
+          "sha256": "ef1d5ab1926ef542f4f7b800917414afce6c7edc3cd6ab4a660de6321907a84a"
+        },
+        {
+          "path": "scripts/devtools-screenshot.test.mjs",
+          "sha256": "62ebf3a6bf4ffa9a3fa19a0457e81cf719e95a2535ce077b80e2b57f2785937b"
+        },
+        {
+          "path": "scripts/devtools-simulator-capture.py",
+          "sha256": "a4f6d231ff5f39684f207808bad3d11c5694175f8f79ba22e8be8609c45fa807"
+        },
+        {
+          "path": "scripts/devtools-simulator-capture.test.py",
+          "sha256": "bb30eb145d35f424fba1204d09b2444d57505acdb21b3734daaf8a16757ba26a"
+        },
+        {
+          "path": "scripts/radar-entry.mjs",
+          "sha256": "d118b405827d42cdbc13343b85a3f6c9356a9d4c96c9a5f1a8c7a05d60d58ee1"
+        },
+        {
+          "path": "scripts/smoke-app-client.mjs",
+          "sha256": "fa9140d9b704fd5b33f45d31fdc84946f35b62adce34531109dae40051f70d08"
+        },
+        {
+          "path": "scripts/types-negative-guard/negative-cases.ts",
+          "sha256": "d4c29644d7ba75c383ca106d9533978fec9ac83f9cada5f456d9e5e5889c0a10"
+        },
+        {
+          "path": "scripts/types-negative-guard/tsconfig.json",
+          "sha256": "5bd76fb607f0f9582c2dfd6ade9db8c11ae84f1a490671a5cad5383c9a5da541"
+        },
+        {
+          "path": "scripts/types-negative-guard/types-negative-guard.test.mjs",
+          "sha256": "ddedb43eab38230047cc02d12720eed141a181c74348f84be6cb125815b3f7e7"
+        },
+        {
+          "path": "sitemap.json",
+          "sha256": "3552173b6e45a4127d0377edd9262bbbac300490f9af3dca75f22029f0b120be"
+        },
+        {
+          "path": "styles/tokens.wxss",
+          "sha256": "a9eaf954bfdc58c1675f8ba01ec1a7db143215d7ed43f8750d72df5444f4e363"
+        },
+        {
+          "path": "tsconfig.json",
+          "sha256": "f4492917cd44ed0ac6d577d44113ffe6e62359093b157f69302dceb64d617e22"
+        },
+        {
+          "path": "types/wechat.d.ts",
+          "sha256": "19084f1097c6256a6df0fbdef6480129599bebf115d906b23da0198cb362aeb9"
+        },
+        {
+          "path": "utils/api.test.mjs",
+          "sha256": "d4880eebdf863d50adbc5bea655252118d95a32a1930c7094924cdb987f5cb46"
+        },
+        {
+          "path": "utils/api.ts",
+          "sha256": "ea99622356727ea4961c6645b7c0b4dc732305755d440bc605b17fd308c7b30b"
+        },
+        {
+          "path": "utils/assessment-draft.ts",
+          "sha256": "cf18f686871a138015f15972186bf28b9db88b9cb9ce4b126c8adad1be76224f"
+        },
+        {
+          "path": "utils/assessment-input.test.mjs",
+          "sha256": "0ba59a79e6914e9f079e053163c41dfad8f78f8cc642d3dd40222e4259a3e177"
+        },
+        {
+          "path": "utils/assessment-input.ts",
+          "sha256": "16c77055d1cf702f90d0d133f8b049eacaf1d2a1884938bf8ac28644953c6ced"
+        },
+        {
+          "path": "utils/auth.ts",
+          "sha256": "ab095715365dbea5c3784a120d538eafb0c901a8d87238cf7c844aab9666df2c"
+        },
+        {
+          "path": "utils/build-metadata.ts",
+          "sha256": "1c1e26424577859f140a877ce7fdb1aae648d229a125503ad85500462b60273a"
+        },
+        {
+          "path": "utils/club-presentation.test.mjs",
+          "sha256": "5490e90ad30789a156447c7ca550f35cb1c865e62ce7cdabef7aaaf045c20afb"
+        },
+        {
+          "path": "utils/club-presentation.ts",
+          "sha256": "0b1ccde91630fb9ec1be9692093cd558ece092113a6708b3ad0155fc031a1552"
+        },
+        {
+          "path": "utils/coach-team-context.test.mjs",
+          "sha256": "5811dbeaa0ace92deccfe3b3c98cbba0bb1be5de404a40a7c2a4d0844ff776d9"
+        },
+        {
+          "path": "utils/coach-team-context.ts",
+          "sha256": "b206d6962ae57f76fbf0c80a70370fbd5a209a683728b3155e06ef42265187c5"
+        },
+        {
+          "path": "utils/config.ts",
+          "sha256": "6cb9c7c6c811391a31dd1902bab67b1a5a7287c276e403d28a65dee2a29c483c"
+        },
+        {
+          "path": "utils/date.test.mjs",
+          "sha256": "05d8b3fc82194cc882ba67ec038f152a1ca3b82528d820efb462ed04445a7a3d"
+        },
+        {
+          "path": "utils/date.ts",
+          "sha256": "f7639a4b6740adaed8fd9759d3706e17a3b7bd69d48280ff3dd607a5840f742a"
+        },
+        {
+          "path": "utils/environment-isolation.test.mjs",
+          "sha256": "cf59d29c48676537666846fc44cc44a26fddb06368166051ba639f47f986d43b"
+        },
+        {
+          "path": "utils/growth-invalidation.test.mjs",
+          "sha256": "589a96890aab806242b898406a3db82aadff3152c3dd6ad8f603dec01e09dfd8"
+        },
+        {
+          "path": "utils/growth-invalidation.ts",
+          "sha256": "22746a6441e0e037ec6119afc6b92b26030f5b9c651cc0b3f8531c08ab6314a6"
+        },
+        {
+          "path": "utils/idempotency.test.mjs",
+          "sha256": "fa53e8e9ff24f2ed85c22ce6d94d1896e27720151ac3fa206ce211c50ee6cfa0"
+        },
+        {
+          "path": "utils/idempotency.ts",
+          "sha256": "87ca1240861d83f8d7f585a683f670d7c15547947fe8ea210010c15f17b563ec"
+        },
+        {
+          "path": "utils/match-event-draft.test.mjs",
+          "sha256": "066f6c84b31878ff161d43705d9cc2419ed3c3f392e0d08f3cc370207ed08125"
+        },
+        {
+          "path": "utils/match-event-draft.ts",
+          "sha256": "0468fc0e91b96d1df6a88e6c8c68e84ec0b4b11247700a51f718f4be403ab4cf"
+        },
+        {
+          "path": "utils/mock.ts",
+          "sha256": "5a251a5c418d289000584a2fede1fefb93d2d55952ac096fc5559f476f76323a"
+        },
+        {
+          "path": "utils/navigation.test.mjs",
+          "sha256": "c1e94d3a9be88d277658134eae32e30fb88a2103df1fc55afb8379463a37093f"
+        },
+        {
+          "path": "utils/navigation.ts",
+          "sha256": "3c780a80ef4a3c29dec190229553b69e3e51cc3816377a6d527a6388680d9ee5"
+        },
+        {
+          "path": "utils/presentation-time.test.mjs",
+          "sha256": "513d4b919e10b64e22057096324937a94367526c7034fe64430eafa69e19d364"
+        },
+        {
+          "path": "utils/presentation.test.ts",
+          "sha256": "ed100d3c037a6bb30056971e4d736c47b6bfd8938b5a64f7b62455d278639cf0"
+        },
+        {
+          "path": "utils/presentation.ts",
+          "sha256": "43006b6592d1344cb7da75bd360427f5cea433e7ffd042f460abed2bd8e565e2"
+        },
+        {
+          "path": "utils/privacy.test.mjs",
+          "sha256": "d28461adb5a30ab3b19dc50a10cc43dc21c7700cf5ab722f36478b468db3c299"
+        },
+        {
+          "path": "utils/privacy.ts",
+          "sha256": "842e3f8e12af77754529b31f91ca2e17199d58fca22a03b60a95cc9d286d17d7"
+        },
+        {
+          "path": "utils/radar-comparison.test.mjs",
+          "sha256": "926893cd5728c01bb8f9838fd6c7cc0e88db3e969eeb73046b63745bd386ad76"
+        },
+        {
+          "path": "utils/radar-comparison.ts",
+          "sha256": "93eb5930af419910c6e0655c81c54260ff808e9c90201964d7f309e4c55daae5"
+        },
+        {
+          "path": "utils/radar-option.test.mjs",
+          "sha256": "60a036a9ea76c2f3afa4ef58a1affe5e5f601d2cd65740807de212d1cc3f6d3b"
+        },
+        {
+          "path": "utils/radar-option.ts",
+          "sha256": "31ed0513bc65078b0039ffd7fda6f0821e58097c7a6523acfc400ffb7df951a6"
+        },
+        {
+          "path": "utils/reminders.ts",
+          "sha256": "1be993ab33fc5ee2da26839437c9dcb999434534354e3b374badf8a531e228d2"
+        },
+        {
+          "path": "utils/request.test.mjs",
+          "sha256": "b94c40a0f44e9934ad816ca4ee6e270ea5d987ba36f2e844689b04e7ffc1bd43"
+        },
+        {
+          "path": "utils/request.ts",
+          "sha256": "1209696dba867ac90cf272be0522b38ac303a0fecd2d07f782c70d708d335fbc"
+        },
+        {
+          "path": "utils/schedule-calendar.test.mjs",
+          "sha256": "de2021a1e7030bb5ea7cb168912a328b239d50477939da3f9eaee2601720df3a"
+        },
+        {
+          "path": "utils/schedule-calendar.ts",
+          "sha256": "44f20fed8b669ee7bd7cae01bb52f2c799e85077a159b1723a80f3883a5fba57"
+        },
+        {
+          "path": "utils/scout-players.ts",
+          "sha256": "e46cc36424d97b33de0ca91343e49324357661fe4047c8b32f1180eb139e7a8a"
+        },
+        {
+          "path": "utils/store.test.mjs",
+          "sha256": "e1269606c2ce9e2fa4f741655ae892e7c060da57ca18a3deb4aa2817ff366367"
+        },
+        {
+          "path": "utils/store.ts",
+          "sha256": "8872e2184e69ccb6060c0e2512ef3b0f031b5fa4fa1e47c9b98f597d2f60ca2e"
+        },
+        {
+          "path": "utils/student-evaluations.ts",
+          "sha256": "ed3526921b3c65903e0d47dbb15faff3a59bb48e14ffb9896367e6201196fc31"
+        },
+        {
+          "path": "utils/student-results-page.ts",
+          "sha256": "3d77bab44e87553475737619ea96226fa5a64bb4577dfde7fe660a1a0fbdab2f"
+        },
+        {
+          "path": "utils/tactical-board.test.ts",
+          "sha256": "f54d6a14ee6283a02fe1d1fb0f193dcf4a523bf72089688cdc7686014504f9d7"
+        },
+        {
+          "path": "utils/tactical-board.ts",
+          "sha256": "7e66cf04f0f797b4363f31fc89121b79281fdc8635b503b9947c41100272d636"
+        },
+        {
+          "path": "utils/topbar-sticky-check.cjs",
+          "sha256": "83e9caa6fc7e99bafed7607b24100bde6714a97efbda806fd00007ca27488587"
+        },
+        {
+          "path": "utils/training-games.test.mjs",
+          "sha256": "eee935b7c015a7a46ba925aff06c1b03c46f37bc62e31cd26c453194ab851104"
+        },
+        {
+          "path": "utils/training-games.ts",
+          "sha256": "8993f1957bf5ee486d486978f09a393ea2f5927947b495f053d34f396986d9ee"
+        },
+        {
+          "path": "utils/training-records.ts",
+          "sha256": "7f3eb99bfb48e39b4b7c84303369c27bf2286264b3a2864de6d43d93092eee3b"
+        },
+        {
+          "path": "utils/types.ts",
+          "sha256": "c9345c7f8cbfc8316667df43fc4febd4555c54098de2cd9418c770d035c7f351"
+        },
+        {
+          "path": "utils/version.test.mjs",
+          "sha256": "7565a481a73fcd5c20259798abb18b58583b404a1e45bbd855f7d91e1bacbe85"
+        },
+        {
+          "path": "utils/version.ts",
+          "sha256": "7c92d78c32257913465c1e8980099b1d9f943ee2665266a8e0cc9308e40376dd"
+        },
+        {
+          "path": "vendor/ec-canvas/LICENSE",
+          "sha256": "7fdf029806a89db319a8f2a68b3cac9f36fc798b3207037152a38a2031fa4d05"
+        },
+        {
+          "path": "vendor/ec-canvas/README.md",
+          "sha256": "c9cf13eb8a53effca2a53b49e20fd62fb0fb7a3717bf133b0627f551dc8a8585"
+        },
+        {
+          "path": "vendor/ec-canvas/ec-canvas.js",
+          "sha256": "ee7763107d97ebcfcbbf1e9a74fd3fb044240477bff0cce869c7c0f1ea9907f5"
+        },
+        {
+          "path": "vendor/ec-canvas/ec-canvas.json",
+          "sha256": "6e72dadc3680e796aee6cd518838aed27738a42c14bf6b1e9a9067044115c815"
+        },
+        {
+          "path": "vendor/ec-canvas/ec-canvas.wxml",
+          "sha256": "4341c8872492ff5578eaa22352fe5da26b4f97e502cc61768ccfe806f7b23f16"
+        },
+        {
+          "path": "vendor/ec-canvas/ec-canvas.wxss",
+          "sha256": "9a210a3aec3e65a7dfbf3a327b1d50cf57bdb09b63fa02e2fb224593864eb914"
+        },
+        {
+          "path": "vendor/ec-canvas/echarts.d.ts",
+          "sha256": "7248d5e42c73e56a947cb7889715e76c3fe91609e5db19bbebe89e51f5edf929"
+        },
+        {
+          "path": "vendor/ec-canvas/echarts.js",
+          "sha256": "934a214097747afb7a6ae9a6c26c4a2b1454bd62cf1bbab32baa193093f800be"
+        },
+        {
+          "path": "vendor/ec-canvas/wx-canvas.js",
+          "sha256": "f93b797e469aa66de8379a64e935559e4fda9384249e44d84b829b4d4ea578b4"
+        }
+      ]
+    },
+    "reportedPlatformVersion": null,
+    "uploadReceipt": null
+  }
+}

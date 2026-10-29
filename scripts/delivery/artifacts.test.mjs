@@ -77,8 +77,13 @@ test("manifest associates two units with digest, asset/migration hashes and rece
   const pending = createManifest(input);
   assert.equal(pending.miniprogram.uploadReceipt, null);
   assert.equal(pending.miniprogram.reportedPlatformVersion, null);
-  assert.equal(pending.server.image, input.image);
+  assert.equal(pending.server.imageReference, input.image);
   assert.equal(pending.miniprogram.build.buildId, "client-1");
+  assert.equal(pending.server.repositoryDigest, input.image);
+  const local = createManifest({ ...input, image: imageId });
+  assert.equal(local.server.imageId, imageId);
+  assert.equal(local.server.repositoryDigest, null);
+  assert.throws(() => createManifest({ ...input, image: `sha256:${"e".repeat(64)}` }), /Local image ID/);
   const uploaded = createManifest({ ...input, receipt: Buffer.from("private official receipt"), clientVersion: "1.2.3" });
   assert.deepEqual(uploaded.miniprogram.uploadReceipt, { sha256: sha256("private official receipt") });
   assert.ok(!JSON.stringify(uploaded).includes("private official receipt"));
