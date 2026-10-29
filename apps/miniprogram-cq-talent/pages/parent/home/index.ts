@@ -49,6 +49,9 @@ Page({
   generation: 0,
   trainingRequest: 0,
   calendarRequest: 0,
+  growthRequest: 0,
+  newsRequest: 0,
+  presentationRequest: 0,
   loadedScope: "",
   requestedStudentId: "",
   data: {
@@ -207,10 +210,11 @@ Page({
     if (this.data.state === "ready" && this.data.student) void this.loadCalendar(this.generation, this.data.student);
   },
   async loadGrowth(ticket: number, student: StudentSummary) {
+    const request = ++this.growthRequest;
     this.setData({ growthState: "loading", growthMessage: "" });
     try {
       const growth = await getParentGrowth(student.id, student);
-      if (ticket !== this.generation) return;
+      if (ticket !== this.generation || request !== this.growthRequest) return;
       const milestone = growth.milestones[0];
       const milestoneTitle = milestone?.title || "成长正在发生";
       const milestoneDate = milestone?.date
@@ -231,7 +235,7 @@ Page({
           : milestoneTitle,
       });
     } catch (error) {
-      if (ticket !== this.generation) return;
+      if (ticket !== this.generation || request !== this.growthRequest) return;
       this.setData({
         growthState: "error",
         growthMessage:
@@ -241,10 +245,11 @@ Page({
     }
   },
   async loadNews(ticket: number) {
+    const request = ++this.newsRequest;
     this.setData({ newsState: "loading", newsMessage: "" });
     try {
       const articles = await getContentArticles();
-      if (ticket !== this.generation) return;
+      if (ticket !== this.generation || request !== this.newsRequest) return;
       this.setData({
         newsState: "ready",
         news:
@@ -253,7 +258,7 @@ Page({
           null,
       });
     } catch (error) {
-      if (ticket !== this.generation) return;
+      if (ticket !== this.generation || request !== this.newsRequest) return;
       this.setData({
         newsState: "error",
         newsMessage:
@@ -263,10 +268,11 @@ Page({
     }
   },
   async loadPresentation(ticket: number) {
+    const request = ++this.presentationRequest;
     this.setData({ presentationState: "loading", contentMessage: "" });
     try {
       const presentation = await getClubPresentation();
-      if (ticket !== this.generation) return;
+      if (ticket !== this.generation || request !== this.presentationRequest) return;
       const options = parentShortcutOptions(
         presentation ?? {
           branding: null,
@@ -285,7 +291,7 @@ Page({
         shortcutOptions: options,
       });
     } catch {
-      if (ticket !== this.generation) return;
+      if (ticket !== this.generation || request !== this.presentationRequest) return;
       this.setData({
         presentationState: "error",
         contentMessage: `${this.data.presentationLoaded ? "配置刷新失败，当前显示上次读取的内容。" : ""}俱乐部展示配置暂时无法读取，请稍后重试。`,

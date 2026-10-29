@@ -319,3 +319,21 @@ describe("CQ-12 same-context background refresh", () => {
     children.resolve([{id:"b",name:"旧账号孩子",teams:[]}]);await first;expect(p.data.student.id).toBe("a");
   });
 });
+
+describe("R2-01 same-generation module retry ordering",()=>{
+ const cases=[
+  {name:"growth",state:"growthState",message:"growthMessage",retry:"retryGrowth",mock:mocks.growth,payload:title=>({milestonesAvailable:true,milestones:[{title,date:"2026-10-01"}]}),current:p=>p.data.milestoneTitle},
+  {name:"news",state:"newsState",message:"newsMessage",retry:"retryNews",mock:mocks.news,payload:title=>[{id:title,title,category:"notice"}],current:p=>p.data.news?.title},
+  {name:"presentation",state:"presentationState",message:"contentMessage",retry:"retryContent",mock:mocks.presentation,payload:title=>({branding:{name:title},banners:[],optionalFeatures:[],shareTemplates:[]}),current:p=>p.data.clubTitle},
+ ];
+ it.each(cases.flatMap(test=>["success","failure"].map(outcome=>({...test,outcome}))))("keeps the latest $name after an older $outcome in the same generation",async test=>{
+  const p=page();await p.load();p.setData({[test.state]:"error",[test.message]:"重试该模块"});
+  const children=deferred(),older=deferred();mocks.children.mockReturnValueOnce(children.promise);test.mock.mockReturnValueOnce(older.promise).mockResolvedValueOnce(test.payload("newer"));
+  const refresh=p.load(),generation=p.generation;p[test.retry]();
+  children.resolve([{id:"b",name:"乙",teams:["U10"]}]);await refresh;await vi.waitFor(()=>expect(test.current(p)).toBe("newer"));
+  expect(p.generation).toBe(generation);
+  if(test.outcome==="success")older.resolve(test.payload("older"));else older.reject(new Error("older failure"));
+  await Promise.resolve();await Promise.resolve();expect(test.current(p)).toBe("newer");expect(p.data[test.state]).toBe("ready");expect(p.data[test.message]).toBe("");
+  expect(p.data).toMatchObject({trainingTotal:12,trainingState:"ready",calendarState:"ready"});
+ });
+});

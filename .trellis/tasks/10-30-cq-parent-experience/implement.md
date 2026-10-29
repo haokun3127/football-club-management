@@ -53,3 +53,16 @@
 - 实际检查：`PATH=/opt/homebrew/opt/node@24/bin:$PATH corepack pnpm --filter @football-club/miniprogram-cq-talent exec vitest run pages/parent/home/index.test.mjs`：34项通过；`... exec vitest run pages/parent`：28文件/215项通过；`... test`：97文件/721通过/1既有跳过，exit 0（本地监听所需权限下运行）；`... typecheck`及`git diff --check`通过。
 - trellis-check已对照本次需求审查diff。共享spec建议补充：保留同范围缓存事实与请求状态分开；上下文变化才丢弃缓存；缓存为空、未知、真实0各自独立。仍由总控统一维护共享spec。
 - 原生渲染、触控和返回现场仍待总控在主目录验证；本线程未导入worktree、未上传/部署。仅改home控制器/模板/测试与本记录，CQ-20未开始。
+
+### CQ-20 / CQ-22 执行批（已授权，进行中）
+
+- [ ] 成长入口独立读取已确认结果，事实/来源与队伍评价先于辅助图表；同孩子后台刷新保留，身份/孩子变化清旧、拒绝迟到响应。
+- [ ] 修正child/semester-report计次语义；报告只显示服务端overall，不制造综合分。
+- [ ] metric/ability-history不在版本/单位/方向不足时生成进步或综合分；保留来源、记录和已确认成绩入口。
+- [ ] 定向测试、typecheck、diff审查；记录已满足/剩余状态。原生画面由总控主目录验收；公共版本诊断等待后续提交。
+
+### R2-01 独立修复：首页同generation模块重试顺序
+
+2026-10-30读回`/private/tmp/cq-independent-audit-round2.md`：档案刷新等待期间手动重试A，随后自动读取B与A同generation，B先完成后A可回盖。首页成长/动态/展示配置各增加独立请求序号，成功及失败均校验“页面generation + 当前模块最后发起序号”；不通过推进页面generation使其他模块结果失效。原有累计/日历序号保留。
+
+回归按真实可达顺序交错children、手动重试、自动读取，覆盖3模块各自旧成功/旧失败6种情况；并验证累计及日历结果不受影响。首页40项通过；当前首页/成长/Canvas降级合计3文件67项通过，typecheck、diff检查通过。成长页新增汇总/已确认结果/指标详情读取同样使用各自序号，其代码随CQ-20批提交。此修复仅提交home控制器、测试与本记录，不提交尚待CQ-20归档的其它页面改动。
