@@ -18,12 +18,20 @@
 .assessment-row__score, .assessment-row__note { min-width: 0; height: 64rpx; box-sizing: border-box; padding: 0 16rpx; border: 1rpx solid #dde2ea; border-radius: 12rpx; background: #ffffff; color: #202124; font-size: var(--font-size-aux); line-height: 1.5; }
 .assessment-row__score { grid-area: score; background: #fff4f5; border-color: #ffe0e3; color: #a80f1b; font-weight: 700; text-align: center; }
 .assessment-row__note { grid-area: note; }
-.assessment-save { margin-top: 32rpx; border-radius: 16rpx; padding: 28rpx; background: #a80f1b; color: #ffffff; text-align: center; font-size: var(--font-size-body); font-weight: 700; line-height: 1.5; }
-.assessment-save--disabled { background: #c9a4a8; }
 
 /* 移动端触控下限，业务内容与原事件保持一致。 */
 .assessment-nav__left,
-.assessment-nav__save,
-.assessment-save { min-height:44px; min-width:44px; box-sizing:border-box; }
+.assessment-nav__save { min-height:44px; min-width:44px; box-sizing:border-box; }
 
 .assessment-save-error { margin: 16px 0; color: var(--color-error); font-size: var(--font-size-body); line-height: 1.5; overflow-wrap: anywhere; }
+
+.assessment-body { padding-bottom:calc(156px + env(safe-area-inset-bottom)); }
+.assessment-row__score,.assessment-row__note { min-height:44px; height:auto; }
+.assessment-row__student text { min-width:0; overflow-wrap:anywhere; }
+.assessment-review-mask { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,.4); padding:16px; display:flex; align-items:center; }
+.assessment-review-panel { width:100%; padding:16px; box-sizing:border-box; border-radius:var(--radius-card); background:var(--color-card); }
+.assessment-review-head { display:flex; align-items:center; justify-content:space-between; font-size:var(--font-size-section); }
+.assessment-review-note,.assessment-review-row { font-size:var(--font-size-aux); line-height:1.5; overflow-wrap:anywhere; }
+.assessment-review-note { margin:12px 0; color:var(--color-text-secondary); }
+.assessment-review-rows { height:45vh; }
+.assessment-review-row { padding:12px 0; border-bottom:1px solid var(--color-line); }

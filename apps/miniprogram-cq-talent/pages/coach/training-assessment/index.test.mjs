@@ -55,6 +55,7 @@ const workbench = {
 };
 
 const assessmentScope = {
+  revision:0,
   eventId: "event-training",
   selectedProjectIds: ["project-passing", "project-finishing"],
   presentStudentIds: ["student-1", "student-3"],
@@ -71,7 +72,7 @@ describe("coach training content assessment", () => {
   beforeEach(() => {
     mocks.getCoachWorkbench.mockReset().mockResolvedValue(workbench);
     mocks.getCoachTrainingContentAssessments.mockReset().mockResolvedValue(assessmentScope);
-    mocks.saveCoachTrainingContentAssessments.mockReset().mockResolvedValue({ assessments: [] });
+    mocks.saveCoachTrainingContentAssessments.mockReset().mockResolvedValue({ eventId:"event-training",revision:1,assessments: [] });
     mocks.requireRole.mockReset().mockReturnValue({ role: "coach" });
     mocks.openPage.mockReset();
     mocks.showToast.mockReset();
@@ -118,10 +119,9 @@ describe("coach training content assessment", () => {
     await page.save();
 
     expect(mocks.saveCoachTrainingContentAssessments).toHaveBeenCalledWith("event-training", expect.arrayContaining([
-      { studentId: "student-1", trainingProjectId: "project-passing", score: 84, note: "传球节奏稳定" },
       { studentId: "student-3", trainingProjectId: "project-passing", score: 91, note: "" },
       { studentId: "student-1", trainingProjectId: "project-finishing", score: 88, note: "射门果断" },
-    ]));
+    ]),0);
   });
 
   it("is honest when a training activity has no checked-in learner or no selected content", async () => {
@@ -152,7 +152,7 @@ describe("coach training content assessment", () => {
     expect(template).toContain('bindtap="selectProject"');
     expect(template).toContain('bindchange="onScoreInput"');
     expect(template).toContain('bindchange="onNoteInput"');
-    expect(template).toContain('bindtap="save"');
+    expect(template).toContain('bindsubmit="save"');
     expect(template).toContain('bindaction="handleStatusAction"');
     expect(pageConfig).toContain('"navigationStyle": "custom"');
     expect(pageConfig).not.toContain('"role-tabbar"');
@@ -165,18 +165,55 @@ describe("coach training content assessment", () => {
   it.each(["", "   "])("blocks clearing an existing score with %j and preserves the original until explicitly corrected", async (value) => {
     const page=createPageInstance();await page.load("event-training");page.onScoreInput({currentTarget:{dataset:{studentId:"student-1"}},detail:{value}});await page.save();
     expect(mocks.saveCoachTrainingContentAssessments).not.toHaveBeenCalled();expect(page.data.saveError).toContain("不能通过空值删除已保存分数");expect(page.data.rows.find(row=>row.studentId==="student-1").scoreInput).toBe(value);
-    page.onScoreInput({currentTarget:{dataset:{studentId:"student-1"}},detail:{value:"0"}});await page.save();expect(mocks.saveCoachTrainingContentAssessments).toHaveBeenCalledWith("event-training",[{studentId:"student-1",trainingProjectId:"project-passing",score:0,note:"传球节奏稳定"}]);
+    page.onScoreInput({currentTarget:{dataset:{studentId:"student-1"}},detail:{value:"0"}});await page.save();expect(mocks.saveCoachTrainingContentAssessments).toHaveBeenCalledWith("event-training",[{studentId:"student-1",trainingProjectId:"project-passing",score:0,note:"传球节奏稳定"}],0);
   });
   it("preserves valid zero and ignores a new untouched blank instead of sending a fake result", async () => {
     mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,assessments:[]});const page=createPageInstance();await page.load("event-training");
     page.onScoreInput({currentTarget:{dataset:{studentId:"student-3"}},detail:{value:""}});page.onScoreInput({currentTarget:{dataset:{studentId:"student-1"}},detail:{value:" 0 "}});await page.save();
-    expect(mocks.saveCoachTrainingContentAssessments).toHaveBeenCalledWith("event-training",[{studentId:"student-1",trainingProjectId:"project-passing",score:0,note:""}]);
+    expect(mocks.saveCoachTrainingContentAssessments).toHaveBeenCalledWith("event-training",[{studentId:"student-1",trainingProjectId:"project-passing",score:0,note:""}],0);
   });
   it("validates all inputs before any request instead of silently skipping an invalid score", async () => {
     const page=createPageInstance();await page.load("event-training");page.onScoreInput({currentTarget:{dataset:{studentId:"student-3"}},detail:{value:"101"}});await page.save();expect(mocks.saveCoachTrainingContentAssessments).not.toHaveBeenCalled();expect(page.data.saveError).toContain("0至100");expect(page.data.valuesByProject["project-passing"]["student-3"].scoreInput).toBe("101");
   });
   it("keeps the just-saved zero non-deletable by a later empty input", async () => {
     mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,assessments:[]});const page=createPageInstance();await page.load("event-training");page.onScoreInput({currentTarget:{dataset:{studentId:"student-1"}},detail:{value:"0"}});await page.save();mocks.saveCoachTrainingContentAssessments.mockClear();page.onScoreInput({currentTarget:{dataset:{studentId:"student-1"}},detail:{value:""}});await page.save();expect(mocks.saveCoachTrainingContentAssessments).not.toHaveBeenCalled();expect(page.data.saveError).toContain("不能通过空值删除");
+  });
+
+  it("uses the GET revision and saves only changed pairs, then uses the successful response revision", async () => {
+    const p=createPageInstance();await p.load("event-training");p.onScoreInput({currentTarget:{dataset:{studentId:"student-3"}},detail:{value:"0"}});await p.save();
+    expect(mocks.saveCoachTrainingContentAssessments).toHaveBeenLastCalledWith("event-training",[{studentId:"student-3",trainingProjectId:"project-passing",score:0,note:""}],0);expect(p.data.revision).toBe(1);
+    p.onScoreInput({currentTarget:{dataset:{studentId:"student-3"}},detail:{value:"1"}});await p.save();expect(mocks.saveCoachTrainingContentAssessments.mock.calls[1][2]).toBe(1);expect(mocks.saveCoachTrainingContentAssessments.mock.calls[1][1]).toHaveLength(1);
+  });
+  it("keeps an old service readable but refuses to save without a revision", async () => {
+    mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,revision:undefined});const p=createPageInstance();await p.load("event-training");expect(p.data.state).toBe("ready");p.onScoreInput({currentTarget:{dataset:{studentId:"student-1"}},detail:{value:"0"}});await p.save();expect(mocks.saveCoachTrainingContentAssessments).not.toHaveBeenCalled();expect(p.data.saveError).toContain("更新小程序");expect(p.data.rows[0].scoreInput).toBe("0");
+  });
+  it.each([409,428])("retains inputs and the original revision after HTTP %i without an automatic read or retry", async statusCode => {
+    const p=createPageInstance();await p.load("event-training");p.onScoreInput({currentTarget:{dataset:{studentId:"student-1"}},detail:{value:"75"}});mocks.saveCoachTrainingContentAssessments.mockRejectedValueOnce({statusCode,details:{revision:99}});await p.save();
+    expect(p.data.valuesByProject["project-passing"]["student-1"].scoreInput).toBe("75");expect(p.data.revision).toBe(0);expect(p.data.needsReload).toBe(true);expect(p.data.saveError).toContain(statusCode===409?"其他客户端更新":"更新小程序");await p.save();expect(mocks.saveCoachTrainingContentAssessments).toHaveBeenCalledTimes(1);expect(mocks.getCoachTrainingContentAssessments).toHaveBeenCalledTimes(1);
+  });
+  it("requires explicit comparison and merges only locally edited fields onto the reviewed server version", async () => {
+    const p=createPageInstance();await p.load("event-training");p.onScoreInput({currentTarget:{dataset:{studentId:"student-1"}},detail:{value:"85"}});mocks.saveCoachTrainingContentAssessments.mockRejectedValueOnce({statusCode:409});await p.save();
+    mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,revision:4,assessments:[{studentId:"student-1",trainingProjectId:"project-passing",score:95,note:"另一教练备注"},{studentId:"student-3",trainingProjectId:"project-passing",score:80,note:"另一个人"}]});await p.readServerForReview();
+    expect(p.data.valuesByProject["project-passing"]["student-1"].scoreInput).toBe("85");expect(p.data.revision).toBe(0);expect(p.data.reviewRows[0]).toMatchObject({local:expect.stringContaining("85"),server:expect.stringContaining("95")});expect(mocks.saveCoachTrainingContentAssessments).toHaveBeenCalledTimes(1);
+    p.keepLocalChanges();expect(p.data.revision).toBe(4);expect(p.data.valuesByProject["project-passing"]["student-1"]).toEqual({scoreInput:"85",noteInput:"另一教练备注"});expect(p.data.valuesByProject["project-passing"]["student-3"].scoreInput).toBe("80");expect(mocks.saveCoachTrainingContentAssessments).toHaveBeenCalledTimes(1);
+    await p.save();expect(mocks.saveCoachTrainingContentAssessments).toHaveBeenLastCalledWith("event-training",[{studentId:"student-1",trainingProjectId:"project-passing",score:85,note:"另一教练备注"}],4);
+  });
+  it("keeps local inputs on a failed explicit reread, and uses server values only after the user chooses them", async () => {
+    const p=createPageInstance();await p.load("event-training");p.onScoreInput({currentTarget:{dataset:{studentId:"student-1"}},detail:{value:"75"}});mocks.getCoachTrainingContentAssessments.mockRejectedValueOnce(new Error("offline"));await p.readServerForReview();expect(p.data.rows[0].scoreInput).toBe("75");expect(p.data.saveError).toContain("本机输入未改变");
+    mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,revision:2});await p.readServerForReview();p.closeReview();expect(p.data.rows[0].scoreInput).toBe("75");await p.readServerForReview();p.useServer();expect(p.data.rows[0].scoreInput).toBe("84");expect(p.data.revision).toBe(2);expect(mocks.saveCoachTrainingContentAssessments).not.toHaveBeenCalled();
+  });
+  it("retries an unknown outcome with the same rows and revision and blocks edits while it is unknown", async () => {
+    const p=createPageInstance();await p.load("event-training");p.onScoreInput({currentTarget:{dataset:{studentId:"student-3"}},detail:{value:"0"}});mocks.saveCoachTrainingContentAssessments.mockRejectedValueOnce(new Error("lost response"));await p.save();expect(p.data.uncertain).toBe(true);
+    p.onScoreInput({currentTarget:{dataset:{studentId:"student-3"}},detail:{value:"99"}});expect(p.data.rows[1].scoreInput).toBe("0");await p.save();expect(mocks.saveCoachTrainingContentAssessments.mock.calls[1]).toEqual(mocks.saveCoachTrainingContentAssessments.mock.calls[0]);expect(mocks.getCoachTrainingContentAssessments).toHaveBeenCalledTimes(1);
+  });
+  it("restores an unresolved operation for the same account even if a newer server revision now exists", async () => {
+    const storage=new Map();wx.getStorageSync=key=>storage.get(key);wx.setStorageSync=(key,value)=>storage.set(key,structuredClone(value));wx.removeStorageSync=key=>storage.delete(key);mocks.requireRole.mockReturnValue({role:"coach",clubId:"club-a",userId:"coach-a"});
+    const p=createPageInstance();await p.load("event-training");p.onScoreInput({currentTarget:{dataset:{studentId:"student-1"}},detail:{value:"75"}});mocks.saveCoachTrainingContentAssessments.mockRejectedValueOnce(new Error("response lost"));await p.save();p.onUnload();
+    mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,revision:2});const reopened=createPageInstance();await reopened.load("event-training");expect(reopened.data.uncertain).toBe(true);expect(reopened.data.revision).toBe(0);expect(reopened.data.rows[0].scoreInput).toBe("75");await reopened.save();expect(mocks.saveCoachTrainingContentAssessments.mock.calls[1]).toEqual(mocks.saveCoachTrainingContentAssessments.mock.calls[0]);
+    mocks.requireRole.mockReturnValue({role:"coach",clubId:"club-a",userId:"coach-b"});const other=createPageInstance();await other.load("event-training");expect(other.data.rows[0].scoreInput).toBe("84");
+  });
+  it("does not update an unloaded page when an in-flight save completes", async () => {
+    const p=createPageInstance();await p.load("event-training");p.onScoreInput({currentTarget:{dataset:{studentId:"student-1"}},detail:{value:"75"}});let resolve;mocks.saveCoachTrainingContentAssessments.mockImplementationOnce(()=>new Promise(r=>resolve=r));const saving=p.save();p.onUnload();const snapshot=structuredClone(p.data);resolve({eventId:"event-training",revision:1,assessments:[]});await saving;expect(p.data).toEqual(snapshot);
   });
 
 });

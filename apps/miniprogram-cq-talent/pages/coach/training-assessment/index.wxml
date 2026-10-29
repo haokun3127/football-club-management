@@ -1,5 +1,5 @@
 <view class="training-assessment-page">
-  <app-header title="课堂表现" title-align="left" show-back="{{true}}" custom-back="{{true}}" back-disabled="{{saving}}" bindback="goBack" action-text="{{saving ? '保存中' : '保存'}}" bindaction="save" />
+  <app-header title="课堂表现" title-align="left" show-back="{{true}}" custom-back="{{true}}" back-disabled="{{saving || uncertain || reviewVisible || reviewLoading}}" bindback="goBack" />
   <view class="assessment-body">
     <status-view state="{{state}}" title="{{statusTitle}}" message="{{message}}" action-text="{{statusActionText}}" bindaction="handleStatusAction" />
     <block wx:if="{{state === 'ready'}}">
@@ -17,12 +17,22 @@
         <view class="assessment-panel__head"><text>已到学员</text><text>分数（0-100）</text></view>
         <view wx:for="{{rows}}" wx:key="studentId" class="assessment-row">
           <view class="assessment-row__student"><view class="assessment-row__avatar">{{item.initial}}</view><text>{{item.name}}</text></view>
-          <t-input class="assessment-row__score" disabled="{{saving}}" type="number" value="{{item.scoreInput}}" placeholder="分数" data-student-id="{{item.studentId}}" bindchange="onScoreInput"  borderless t-class="assessment-row__score" />
-          <t-input class="assessment-row__note" disabled="{{saving}}" value="{{item.noteInput}}" placeholder="可选备注" maxlength="80" data-student-id="{{item.studentId}}" bindchange="onNoteInput"  borderless t-class="assessment-row__note" />
+          <t-input class="assessment-row__score" disabled="{{saving || uncertain || reviewVisible || reviewLoading}}" type="number" value="{{item.scoreInput}}" placeholder="分数" data-student-id="{{item.studentId}}" bindchange="onScoreInput"  borderless t-class="assessment-row__score" />
+          <t-input class="assessment-row__note" disabled="{{saving || uncertain || reviewVisible || reviewLoading}}" value="{{item.noteInput}}" placeholder="可选备注" maxlength="80" data-student-id="{{item.studentId}}" bindchange="onNoteInput"  borderless t-class="assessment-row__note" />
         </view>
       </view>
       <view wx:if="{{saveError}}" class="assessment-save-error">{{saveError}}</view>
-      <view class="assessment-save {{saving ? 'assessment-save--disabled' : ''}}" bindtap="save">{{saving ? '正在保存' : '保存本堂课堂评测'}}</view>
+
     </block>
+  </view>
+  <submit-bar wx:if="{{state === 'ready' && !reviewVisible}}" primary-text="{{uncertain ? '重试原保存' : '保存课堂表现'}}" secondary-text="{{needsReload || uncertain || saveError || revision === null ? '重新读取并核对' : ''}}" disabled="{{needsReload || revision === null || reviewLoading}}" loading="{{saving}}" hint="{{saveError || '只保存本机改动；空值不代表0分'}}" bindsubmit="save" bindsecondary="readServerForReview" />
+</view>
+<view wx:if="{{reviewVisible}}" class="assessment-review-mask">
+  <view class="assessment-review-panel">
+    <view class="assessment-review-head"><text>核对服务器记录</text><t-button theme="default" variant="text" bindtap="closeReview">关闭</t-button></view>
+    <view class="assessment-review-note">本机输入仍保留。核对后可采用服务器记录，或只保留自己改过的字段；不会自动提交。</view>
+    <scroll-view scroll-y class="assessment-review-rows"><view wx:for="{{reviewRows}}" wx:key="key" class="assessment-review-row"><view>{{item.label}}</view><view>本机：{{item.local}}</view><view>服务器：{{item.server}}</view></view></scroll-view>
+    <t-button theme="default" block bindtap="useServer">采用服务器记录</t-button>
+    <t-button theme="primary" block bindtap="keepLocalChanges">核对后保留本机改动</t-button>
   </view>
 </view>

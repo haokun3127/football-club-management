@@ -3,6 +3,8 @@
   "usingComponents": {
     "status-view": "/components/status-view/index",
     "t-input": "tdesign-miniprogram/input/input",
-    "app-header": "/components/app-header/index"
+    "app-header": "/components/app-header/index",
+    "submit-bar": "/components/submit-bar/index",
+    "t-button": "tdesign-miniprogram/button/button"
   }
 }
