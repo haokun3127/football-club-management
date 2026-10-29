@@ -199,6 +199,19 @@ describe("C12 assessment project selection", () => {
     expect(stylesheet).toContain(".content-action-card__select");
     expect(stylesheet).toContain("right: 24rpx;");
   });
+  it("keeps a first-entry 19-student, 62-project task focused on selection without an empty publication action",async()=>{
+    const fields=Array.from({length:62},(_,i)=>({id:`f-${i}`,testItemId:`item-${i}`,label:`项目${i}`,groupId:"all",valueKind:"score_0_100",inputType:"number",required:true}));
+    mocks.getAssessmentForm.mockResolvedValue({templateId:task.templateId,templateVersionId:"v1",fields});mocks.getCoachAssessmentEntries.mockResolvedValue({savedValuesByStudent:{}});
+    mocks.getCoachAssessmentTasks.mockResolvedValue([{...task,totalStudents:19,workflow:{canEdit:true,templateVersionId:"v1",readyStudents:0,publishedStudents:0,totalStudents:19,students:Array.from({length:19},(_,i)=>({studentId:`s-${i}`,revision:0,publishedRevision:null,completedFields:0,totalFields:62,canPublish:false}))}}]);
+    const p=createPageInstance();await p.onLoad({taskId:task.id,templateId:task.templateId});expect(p.data.canPublish).toBe(false);expect(p.data.showReviewEntry).toBe(false);expect(p.data.publicationLabel).toContain("先选择项目");expect(p.data.projects).toHaveLength(62);expect(template).toContain('wx:if="{{showReviewEntry}}"');
+  });
+  it.each([{ready:1,published:0,canEdit:true,expected:true},{ready:0,published:1,canEdit:false,expected:false}])("emphasizes only truly publishable students and keeps existing records reachable: %j",async({ready,published,canEdit,expected})=>{
+    mocks.getCoachAssessmentTasks.mockResolvedValue([{...task,workflow:{canEdit,templateVersionId:"v1",readyStudents:ready,publishedStudents:published,totalStudents:2,students:[{studentId:"a",revision:2,publishedRevision:published?2:null,completedFields:2,totalFields:2,canPublish:ready>0}]}}]);const p=createPageInstance();await p.onLoad({taskId:task.id,templateId:task.templateId});expect(p.data.canPublish).toBe(expected);expect(p.data.showReviewEntry).toBe(true);expect(p.data.reviewEntryLabel).toBe(expected?"核对 1 人的成绩":"查看已保存成绩");
+  });
+  it("keeps an older confirmation reachable even if no current revision is counted as confirmed",async()=>{
+    mocks.getCoachAssessmentTasks.mockResolvedValue([{...task,workflow:{canEdit:false,templateVersionId:"v1",readyStudents:0,publishedStudents:0,totalStudents:2,students:[{studentId:"a",revision:1,publishedRevision:0,completedFields:1,totalFields:2,canPublish:false}]}}]);const p=createPageInstance();await p.onLoad({taskId:task.id,templateId:task.templateId});expect(p.data.canPublish).toBe(false);expect(p.data.showReviewEntry).toBe(true);
+  });
+
 });
 
 

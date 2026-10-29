@@ -3,7 +3,7 @@ import { getAssessmentForm, getCoachAssessmentEntries, getCoachAssessmentTasks, 
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
-import type { AssessmentForm, LoadState, TrainingContentMetricNode, TrainingContentTree } from "../../../utils/types";
+import type { AssessmentForm, AssessmentWorkflowSummary, LoadState, TrainingContentMetricNode, TrainingContentTree } from "../../../utils/types";
 
 type ProjectRow = {
   id: string;
@@ -63,6 +63,7 @@ Page({
     isConfirmDisabled: true,
     managed: false,
     canPublish: false,
+    showReviewEntry:false, reviewEntryLabel:"", readyCount:0,
     publishing: false,
     publicationLabel: "",
     publicationMessage: "",
@@ -106,8 +107,7 @@ Page({
         taskStatusLabel: TASK_STATUS_LABELS[task.status] || "进行中",
         taskStatusClass: `projects-progress__status--${task.status}`,
         managed: Boolean(task.workflow),
-        canPublish: Boolean(task.workflow?.canEdit && task.workflow.readyStudents > 0),
-        publicationLabel: task.workflow ? `已确认 ${task.workflow.publishedStudents}/${task.totalStudents} 人 · 待确认 ${task.workflow.readyStudents} 人` : "",
+        ...publicationView(task.workflow,task.totalStudents),
         projects,
         contentTree: trainingTree.contentTree,
         ...hierarchy,
@@ -129,7 +129,7 @@ Page({
     this.setData({reviewVisible:true,reviewLoading:true,reviewMessage:"",reviewCanPublish:false,reviewRows:[]});
     try {
       const workflow=await getCoachAssessmentWorkflow(this.data.taskId);
-      this.setData({reviewStudents:workflow.students});
+      this.setData({reviewStudents:workflow.students,...publicationView(workflow,workflow.totalStudents)});
       const first=workflow.students.find(item=>item.canPublish)||workflow.students[0];
       if(first)await this.loadStudentReview(first.studentId,workflow.templateVersionId);
       else this.setData({reviewMessage:"暂无可核对学员"});
@@ -151,7 +151,7 @@ Page({
         const entry=history.entries?.[field.testItemId||field.id];
         return {id:field.id,label:field.label,value:reviewValue(entry?.value,field.unit),course:entry?.occurredAt ? `课程：${reviewDate(entry.occurredAt)}` : "课程：未关联",recorded:entry?.recordedAt ? `录入：${reviewDate(entry.recordedAt)}` : "录入时间未记录"};
       });
-      this.setData({reviewStudents:workflow.students,reviewName:student.name,reviewRows:rows,reviewRevision:history.revision,reviewCanPublish:Boolean(workflow.canEdit&&student.canPublish&&history.revision===student.revision),reviewMessage:history.revision!==student.revision?"成绩刚刚发生变化，请重新选择学员核对。":""});
+      this.setData({...publicationView(workflow,workflow.totalStudents),reviewStudents:workflow.students,reviewName:student.name,reviewRows:rows,reviewRevision:history.revision,reviewCanPublish:Boolean(workflow.canEdit&&student.canPublish&&history.revision===student.revision),reviewMessage:history.revision!==student.revision?"成绩刚刚发生变化，请重新选择学员核对。":""});
     }catch{this.setData({reviewMessage:"该学员成绩读取失败，请重新选择后重试"});}
     finally{this.setData({reviewLoading:false});}
   },
@@ -168,7 +168,7 @@ Page({
       if(!result?.success){this.setData({reviewMessage:result?.error?.message||"同步失败，当前核对内容已保留。"});return;}
       this.setData({reviewCanPublish:false,reviewMessage:"已同步该学员，可继续核对下一名。"});
       const workflow=await getCoachAssessmentWorkflow(this.data.taskId);
-      this.setData({reviewStudents:workflow.students,canPublish:workflow.readyStudents>0,publicationLabel:`已确认 ${workflow.publishedStudents}/${workflow.totalStudents} 人 · 待确认 ${workflow.readyStudents} 人`});
+      this.setData({reviewStudents:workflow.students,...publicationView(workflow,workflow.totalStudents)});
     }catch{this.setData({reviewMessage:"同步失败，当前核对内容已保留，请重试。"});}
     finally{this.setData({publishing:false});}
   },
@@ -465,4 +465,15 @@ function reviewValue(value:Record<string,unknown>|undefined,unit?:string){
   if(!value)return "未测";
   const score=assessmentValueText(value);
   return score===""?"未测":`${String(score)}${value.kind==="score_0_100"?" 分":unit||String(value.unit||"")}`;
+}
+
+function publicationView(workflow:AssessmentWorkflowSummary|undefined,total:number) {
+  const readyCount=workflow?.readyStudents || 0;
+  const published=workflow?.publishedStudents || 0;
+  const hasRecords=published>0 || (workflow?.students || []).some(student=>student.revision>0 || student.completedFields>0 || (student.publishedRevision ?? null)!==null);
+  const canPublish=Boolean(workflow?.canEdit && readyCount>0);
+  return {canPublish,readyCount,showReviewEntry:canPublish || hasRecords,
+    reviewEntryLabel:canPublish ? `核对 ${readyCount} 人的成绩` : "查看已保存成绩",
+    publicationLabel:!hasRecords && !readyCount ? "先选择项目并录入，保存后再逐人核对确认" : `已确认 ${published}/${total} 人 · 待确认 ${readyCount} 人`,
+  };
 }

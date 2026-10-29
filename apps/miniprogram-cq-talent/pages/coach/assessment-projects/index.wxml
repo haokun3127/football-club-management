@@ -5,9 +5,9 @@
     <block wx:if="{{state === 'ready'}}">
       <view class="projects-task-title">{{taskTitle}}</view><view class="projects-context">{{teamContextLabel}}</view>
       <view class="projects-progress"><view class="projects-progress__head"><view class="projects-progress__title">请选择测评项目</view><view class="projects-progress__status {{taskStatusClass}}">{{taskStatusLabel}}</view></view><view class="projects-progress__meta">{{projectProgressLabel}}</view><view class="projects-progress__meta">{{studentProgressLabel}}</view><view class="projects-progress__instruction">请选择本次需要测评的项目</view></view>
-      <view wx:if="{{managed}}" class="projects-publication">
-        <view>{{publicationLabel}}</view>
-        <t-button disabled="{{publishing}}" loading="{{publishing}}" bindtap="openReviewList" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">核对成绩并确认发布</t-button>
+      <view wx:if="{{managed}}" class="projects-publication {{canPublish ? 'projects-publication--ready' : ''}}">
+        <view class="projects-publication__status">{{publicationLabel}}</view>
+        <t-button wx:if="{{showReviewEntry}}" disabled="{{publishing}}" loading="{{publishing}}" bindtap="openReviewList" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="{{canPublish ? 'primary' : 'default'}}" variant="{{canPublish ? 'base' : 'text'}}">{{reviewEntryLabel}}</t-button>
         <view wx:if="{{publicationMessage}}">{{publicationMessage}}</view>
       </view>
       <scroll-view wx:if="{{hasContentTree}}" scroll-x class="content-primary-strip" enhanced show-scrollbar="{{false}}">

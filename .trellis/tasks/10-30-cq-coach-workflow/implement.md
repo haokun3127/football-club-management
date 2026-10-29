@@ -158,3 +158,10 @@ CAS依赖同版复验：API training-content-assessment-batch 6项通过，API t
 未来课0任务的合同核对：总控原生10月30日09:00课在香港时间01:55仍未开始；本线程读取clock为2026-10-29 17:55 UTC，实际查看/tmp/cq-coach-compact-classroom.png确认3项预览和次级变更按钮已呈现。AssessmentWorkflow.courses的既有过滤在assessment-workflow.ts:42明确排除Date.parse(event.timeRange.startsAt)>Date.now()；options仅授权任务/来源课程，日程周期待办不等于当前课可录入范围。
 
 永久合成证据：research/future-course-probe.mts及future-course-result.json。真实GET options(app.inject)+真实courses服务+内存SQLite、合成身份；同一授权周期任务在options中始终存在，课程开始在未来时eligible=false，将同一课程start移到过去后eligible=true。运行node --import tsx避免tsx CLI的沙箱IPC监听，不连接业务库。没有为显示任务开放未来课程。新增页面回归确认课程列表空时无任务和无写入；空态措辞改为“暂无可用于本课录入的测评任务”，不再把0可用条件说成没有任何周期任务。
+
+
+## CQ-11 最后原生反馈：项目页首次录入层级
+
+已用view_image实际查看总控/tmp/cq-assessment-projects.png：19人/62项目、0待确认时，单独发布卡和大块红色核对入口在选项目之前突出。当前修订以真实workflow状态渲染：首录无保存/确认记录时仅简洁状态说明，隐藏空核对按钮；有待确认且canEdit才突出“核对N人的成绩”；已有采集/确认历史则保留中性“查看已保存成绩”。状态在初载、显式核对读取和确认后更新，publishedRevision=0的历史也不丢入口。
+
+未改变62项目定义、项目选择与逐人齐项目确认规则；保存/确认仍由原面板与API门禁控制。账号version-info已独立提交7bc510c1，本批不重复挂载。定向项目/批量/账号52项通过、typecheck通过；新增19人62项目首录、真实ready突出、只读已有记录、旧确认历史可达。改后原生项目页仍待总控复验。
