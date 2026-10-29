@@ -14,24 +14,25 @@
         <view class="training-hero__meta"><view><image src="/assets/icons/calendar-white.svg" mode="aspectFit" />{{detail.trainingDateText}}</view><view><image src="/assets/icons/map-pin-white.svg" mode="aspectFit" />{{detail.venueText}}</view></view>
       </view>
       <view wx:if="{{leave && leave.visible}}" class="leave-card">
-        <view class="leave-card__head"><view class="leave-card__title">请假与课时</view><view class="leave-card__status">{{leave.statusLabel}}</view></view>
+        <view class="leave-card__head"><view class="leave-card__title">请假与训练记录</view><view class="leave-card__status">{{leave.statusLabel}}</view></view>
         <view class="leave-card__rows">
           <view class="leave-card__row"><view class="leave-card__label">孩子</view><view class="leave-card__value">{{leave.studentName}}</view></view>
-          <view class="leave-card__row"><view class="leave-card__label">课时结果</view><view class="leave-card__value">{{leave.resultLabel}}</view></view>
+          <view class="leave-card__row"><view class="leave-card__label">计次结果</view><view class="leave-card__value">{{leave.resultLabel}}</view></view>
         </view>
         <view wx:if="{{leave.historyLabels.length}}" class="leave-card__history">
           <view class="leave-card__history-title">变更历史</view>
           <view wx:for="{{leave.historyLabels}}" wx:key="*this" class="leave-card__history-item">{{item}}</view>
         </view>
-        <view wx:if="{{leave.cancelled}}" class="leave-card__hint">课程已取消，本课不销课，无需请假。</view>
-        <view wx:elif="{{leave.onLeave}}" class="leave-card__hint">请假已生效，本课不销课；如孩子实际参加，可撤销改回销课。</view>
-        <view wx:else class="leave-card__hint">提交请假后立即生效、无需审批，本课不销课。</view>
+        <view wx:if="{{leave.cancelled}}" class="leave-card__hint">课程已取消，本课不计次，无需请假。</view>
+        <view wx:elif="{{leave.onLeave}}" class="leave-card__hint">请假已生效，本课不计次。撤销后按实际记录显示待生成、已计次或不计次。</view>
+        <view wx:else class="leave-card__hint">提交请假后立即生效、无需审批，本课不计次。</view>
         <view wx:if="{{leave.available && !leave.cancelled && !leave.onLeave}}" class="leave-card__action {{leave.submitting ? 'leave-card__action--disabled' : ''}}" bindtap="submitLeave">{{leave.submitting ? '提交中…' : '提交请假'}}</view>
-        <view wx:if="{{leave.available && !leave.cancelled && leave.onLeave}}" class="leave-card__action leave-card__action--revoke {{leave.submitting ? 'leave-card__action--disabled' : ''}}" bindtap="revokeLeave">{{leave.submitting ? '提交中…' : '撤销请假，改回销课'}}</view>
+        <view wx:if="{{leave.available && !leave.cancelled && leave.onLeave}}" class="leave-card__action leave-card__action--revoke {{leave.submitting ? 'leave-card__action--disabled' : ''}}" bindtap="revokeLeave">{{leave.submitting ? '提交中…' : '撤销请假'}}</view>
+        <view class="leave-card__hint">训练计次不代表实际到场，也不扣减费用或课包余额。</view>
         <view wx:if="{{leave.message}}" class="leave-card__message">{{leave.message}}</view>
         <view wx:if="{{!leave.available}}" class="leave-card__action" bindtap="retry">重新加载计次记录</view>
       </view>
-      <view class="detail-card detail-card--training"><view class="detail-card__head"><view class="detail-card__title">训练内容</view><image src="/assets/icons/chevron-right.svg" mode="aspectFit" /></view><view class="detail-card__copy">{{detail.trainingSummary}}</view></view>
+      <view class="detail-card detail-card--training"><view class="detail-card__head"><view class="detail-card__title">训练内容</view></view><view class="detail-card__copy">{{detail.trainingSummary}}</view></view>
       <view wx:if="{{selectedStudentId}}" class="detail-card detail-card--games"><view class="detail-card__title">训练内友谊赛</view><view wx:if="{{gamesLoading}}" class="detail-card__copy">正在读取记录…</view><view wx:if="{{gamesMessage}}" class="detail-card__copy">{{gamesMessage}}</view><view wx:for="{{friendlyGames}}" wx:key="id" class="parent-friendly-game"><view>{{item.title}} · {{item.score}}</view><view class="detail-card__copy">{{item.events}}</view></view></view>
       <view class="detail-card detail-card--ability"><view class="detail-card__title">关联能力</view><view class="ability-tags"><view wx:for="{{detail.abilityChips}}" wx:key="*this" class="ability-tag">{{item}}</view></view></view>
 
@@ -62,12 +63,11 @@
     </block>
 
     <block wx:elif="{{detail}}">
-      <view class="other-hero"><view class="other-hero__head"><view class="other-hero__type">{{detail.typeLabel}}</view><view class="other-hero__status">{{detail.statusLabel}}</view></view><view class="other-hero__title">{{detail.title}}</view><view class="other-hero__meta">{{detail.timeText}}<image src="/assets/icons/map-pin.svg" mode="aspectFit" />{{detail.venueText}}</view></view>
+      <view class="other-hero"><view class="other-hero__head"><view class="other-hero__type">{{detail.typeLabel}}</view><view class="other-hero__status">{{detail.statusLabel}}</view></view><view class="other-hero__title">{{detail.title}}</view><view class="other-hero__meta"><view>{{detail.dateText}}</view><view><image src="/assets/icons/map-pin.svg" mode="aspectFit" />{{detail.venueText}}</view></view></view>
       <view class="other-info"><view class="other-info__row"><view>活动描述</view><view>{{detail.otherDescription}}</view></view><view class="other-info__line"></view><view class="other-info__row"><view>注意事项</view><view>{{detail.otherNotice}}</view></view></view>
       <view class="person-card"><view class="person-card__title">参与孩子</view><view class="person-row"><view class="person-row__avatar person-row__avatar--child">{{detail.childInitial}}</view><view class="person-row__main"><view>{{detail.childName}}</view><view class="person-row__badge">{{detail.childStatusLabel}}</view></view></view></view>
       <view class="coach-card"><view class="person-row"><view class="person-row__avatar">{{detail.coachInitial}}</view><view class="person-row__main"><view>{{detail.coachName}}</view><view class="person-row__sub">{{detail.coachRole}}</view></view></view></view>
       <view class="other-footer"><image src="/assets/icons/info.svg" mode="aspectFit" />{{detail.otherNotice}}</view>
     </block>
   </view>
-  <role-tabbar wx:if="{{!detail || detail.type !== 'match'}}" role="parent" active="schedule" />
 </view>

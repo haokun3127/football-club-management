@@ -104,6 +104,7 @@ Page<PageData>({
   },
   onShow() {
     this.refreshRemindersBadge();
+    if (this.data.state === "ready") void this.load();
   },
   async refreshRemindersBadge() {
     try {
@@ -206,7 +207,7 @@ Page<PageData>({
   },
   openEvent(event: { detail?: { eventId?: string }; currentTarget?: { dataset?: { id?: string } } }) {
     const id = event.detail?.eventId || event.currentTarget?.dataset?.id;
-    if (id) openPage(`/pages/parent/event/index?id=${id}`);
+    if (id) openPage(`/pages/parent/event/index?id=${encodeURIComponent(id)}${this.data.activeStudentId ? `&studentId=${encodeURIComponent(this.data.activeStudentId)}` : ""}`);
   },
   openReminders() {
     openPage("/pages/parent/reminders/index");

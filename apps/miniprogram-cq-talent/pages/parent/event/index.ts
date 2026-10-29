@@ -57,7 +57,7 @@ type ActivityDetailView = Omit<ActivityDetail, "matchEvents"> & {
   hasMatchNote: boolean;
 };
 
-// 请假与课时视图（F-01 / REQ-ATT-001）：请假直接生效、可撤回、双方可见历史
+// 请假与训练计次视图（F-01 / REQ-ATT-001）：请假直接生效、可撤回、双方可见历史
 type LeaveView = {
   visible: boolean;
   available: boolean;
@@ -168,18 +168,20 @@ Page({
       const input = { expectedRevision: leave.revision };
       if (action === "request") await requestTrainingLeave(leave.studentId, leave.eventId, input);
       else await revokeTrainingLeave(leave.studentId, leave.eventId, input);
-      // 请假/撤回改变了销课事实，返回成长页时定向重拉（F-06 同款失效标记）
+      // 请假/撤回改变了计次事实，返回成长页时定向重拉（F-06 同款失效标记）
       markGrowthStale();
       if (generation !== this.requestGeneration) return;
       wx.showToast({ title: action === "request" ? "请假已生效" : "请假已撤回", icon: "success" });
-      await this.load(leave.eventId);
+      await this.load(leave.eventId, leave.studentId);
     } catch (error) {
       if (generation !== this.requestGeneration) return;
       const failure = error as { message?: string; code?: string; errorType?: string; userMessage?: string };
       const conflict = failure.errorType === "conflict" || failure.code === "training_record_conflict";
       if (conflict) {
         // 冲突时先刷新到最新事实，再在最新视图上提示核对，避免提示被刷新覆盖
-        await this.load(leave.eventId);
+        const refreshGeneration = this.requestGeneration + 1;
+        await this.load(leave.eventId, leave.studentId);
+        if (this.requestGeneration !== refreshGeneration) return;
         if (this.data.eventId === leave.eventId && this.data.selectedStudentId === leave.studentId && this.data.leave) {
           this.setData({ leave: { ...this.data.leave, submitting: false, message: "这条记录刚被更新，请核对最新状态后重试。" } });
         }
@@ -218,7 +220,7 @@ function presentDetail(detail: ActivityDetail, selectedStudentId: string): Activ
   const coachRole = facts.coachName ? "本次活动教练" : "请联系俱乐部确认安排";
   const otherDescription = detail.other?.description || "活动说明待同步";
   const otherNotice = detail.other?.notice || "注意事项待同步";
-  const dateText = formatCalendarDate(facts.startsAt);
+  const dateText = formatCalendarDate(facts.startsAt, true);
   const timeText = formatTimeRange(facts.startsAt, facts.endsAt);
   const rawScore = typeof detail.match?.homeScore === "number" && typeof detail.match?.awayScore === "number"
     ? `${detail.match.homeScore}:${detail.match.awayScore}` : "";
@@ -227,13 +229,8 @@ function presentDetail(detail: ActivityDetail, selectedStudentId: string): Activ
   const matchEvents = toMatchEvents((detail.matchEvents ?? []).filter(event => event.studentId === selectedStudentId));
   const childStatusLabel = child ? participantStatusLabel(child.status) : "出勤状态待同步";
   const trainingPill = detail.type === "training"
-    ? childStatusLabel === "已到场"
-      ? { label: "已到场", tone: "success" as const }
-      : childStatusLabel === "已请假"
-        ? { label: "已请假", tone: "muted" as const }
-        : childStatusLabel === "未到场"
-          ? { label: "未到场", tone: "muted" as const }
-          : { label: "待确认", tone: "warning" as const }
+    ? { label: detail.status === "cancelled" ? "课程已取消" : childStatusLabel,
+        tone: childStatusLabel === "已到场" ? "success" as const : "muted" as const }
     : { label: status.label, tone: statusTone as "warning" | "success" | "muted" };
   return {
     ...detail,
@@ -348,17 +345,24 @@ function rosterItem(participant: ActivityDetail["participants"][number], index: 
 
 function participantStatusLabel(status?: string) {
   const value = String(status ?? "").toLowerCase();
-  if (["present", "confirmed", "completed", "accepted"].includes(value)) return "已到场";
+  if (value === "present") return "已到场";
+  if (["confirmed", "accepted"].includes(value)) return "已确认参与";
+  if (value === "completed") return "参与已结束";
   if (["leave_requested", "excused"].includes(value)) return "已请假";
   if (["absent", "cancelled"].includes(value)) return "未到场";
   if (value === "late") return "迟到";
   return value ? "状态待确认" : "状态待同步";
 }
 
-// 请假视图：statusLabel 表达参与事实，resultLabel 表达销课结果
+// 请假视图：statusLabel 表达参与事实，resultLabel 表达计次结果
 function presentLeave(detail: ActivityDetail, eventId: string, studentId: string, studentName: string, participantStatus: string, record?: TrainingRecord): LeaveView {
   const cancelled = detail.status === "cancelled";
   const onLeave = ["leave_requested", "excused"].includes(String(participantStatus ?? "").toLowerCase());
+  let resultLabel = "待生成（课程结束后自动记录）";
+  if (cancelled) resultLabel = "取消课不计次";
+  else if (record?.counted) resultLabel = "已计次";
+  else if (onLeave) resultLabel = "本课不计次（请假）";
+  else if (record && !(record.source === "automatic" && Date.parse(detail.presentation.endsAt || "") > Date.now())) resultLabel = "本课不计次";
   return {
     visible: true,
     available: true,
@@ -368,13 +372,9 @@ function presentLeave(detail: ActivityDetail, eventId: string, studentId: string
     onLeave,
     cancelled,
     statusLabel: cancelled ? "课程已取消" : participantStatusLabel(participantStatus),
-    resultLabel: cancelled
-      ? "取消课不销课"
-      : record
-        ? record.counted ? "已销课" : onLeave ? "本课不销课（请假）" : record.source === "automatic" ? "课程结束后自动记录" : "本课不销课"
-        : "课程结束后自动记录",
+    resultLabel,
     historyLabels: (record?.history ?? []).map((item) =>
-      `${formatDateTime(item.changedAt)} · ${item.counted ? "销课" : "不销课"} · ${item.reason}`),
+      `${formatDateTime(item.changedAt)} · ${item.counted ? "计次" : "不计次"} · ${item.reason}`),
     revision: record?.revision ?? 0,
     submitting: false,
     message: "",

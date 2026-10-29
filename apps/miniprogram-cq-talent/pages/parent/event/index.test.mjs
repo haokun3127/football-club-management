@@ -230,7 +230,7 @@ describe("parent activity detail", () => {
     expect(template).toContain("{{detail.matchResultLabel}}");
     expect(template).toContain("{{detail.childName}}的比赛数据");
     expect(template).toContain("match-note");
-    expect(template).toContain('wx:if="{{!detail || detail.type !== \'match\'}}"');
+    expect(template).not.toContain("role-tabbar");
     expect(styles).toContain(".match-summary");
     expect(styles).toContain(".match-note");
   });
@@ -256,7 +256,7 @@ describe("parent training leave flow (F-01)", () => {
     await page.load("event-1");
 
     expect(mocks.getTrainingRecords).toHaveBeenCalledWith("student-1");
-    expect(page.data.leave).toMatchObject({ visible: true, onLeave: false, cancelled: false, statusLabel: "状态待确认", resultLabel: "课程结束后自动记录", revision: 0 });
+    expect(page.data.leave).toMatchObject({ visible: true, onLeave: false, cancelled: false, statusLabel: "状态待确认", resultLabel: "待生成（课程结束后自动记录）", revision: 0 });
     expect(template).toContain("leave-card");
     expect(template).toContain("提交请假");
     expect(template).not.toContain("线下确认");
@@ -278,7 +278,7 @@ describe("parent training leave flow (F-01)", () => {
     expect(mocks.requestTrainingLeave).toHaveBeenCalledWith("student-1", "event-1", { expectedRevision: 0 });
     expect(mocks.markGrowthStale).toHaveBeenCalledTimes(1);
     expect(globalThis.wx.showToast).toHaveBeenCalledWith({ title: "请假已生效", icon: "success" });
-    expect(page.data.leave).toMatchObject({ onLeave: true, statusLabel: "已请假", resultLabel: "本课不销课（请假）", revision: 1 });
+    expect(page.data.leave).toMatchObject({ onLeave: true, statusLabel: "已请假", resultLabel: "本课不计次（请假）", revision: 1 });
     expect(page.data.leave.historyLabels[0]).toContain("家长请假");
     // 已请假时重复点击提交不再发起请求
     await page.submitLeave();
@@ -300,15 +300,15 @@ describe("parent training leave flow (F-01)", () => {
 
     expect(mocks.revokeTrainingLeave).toHaveBeenCalledWith("student-1", "event-1", { expectedRevision: 1 });
     expect(mocks.markGrowthStale).toHaveBeenCalledTimes(1);
-    expect(page.data.leave).toMatchObject({ onLeave: false, statusLabel: "已到场", resultLabel: "已销课", revision: 2 });
+    expect(page.data.leave).toMatchObject({ onLeave: false, statusLabel: "已确认参与", resultLabel: "已计次", revision: 2 });
   });
 
   it("shows a retained pre-class withdrawal as pending, not an active leave", async () => {
-    mocks.getParentActivityDetail.mockResolvedValue(trainingDetail({ participants: [{ studentId: "student-1", name: "小天", status: "confirmed" }] }));
+    mocks.getParentActivityDetail.mockResolvedValue(trainingDetail({ presentation: { startsAt: "2099-01-01T09:00:00+08:00", endsAt: "2099-01-01T10:30:00+08:00" }, participants: [{ studentId: "student-1", name: "小天", status: "confirmed" }] }));
     mocks.getTrainingRecords.mockResolvedValue({ total: 0, records: [{ ...leaveRecord, revision: 2, source: "automatic" }] });
     const page = createPageInstance();
     await page.load("event-1");
-    expect(page.data.leave).toMatchObject({ onLeave: false, resultLabel: "课程结束后自动记录", revision: 2 });
+    expect(page.data.leave).toMatchObject({ onLeave: false, statusLabel: "已确认参与", resultLabel: "待生成（课程结束后自动记录）", revision: 2 });
     expect(page.data.leave.historyLabels).toHaveLength(1);
   });
 
@@ -354,9 +354,9 @@ describe("parent training leave flow (F-01)", () => {
     await page.load("event-1");
     await page.submitLeave();
 
-    expect(page.data.leave).toMatchObject({ cancelled: true, statusLabel: "课程已取消", resultLabel: "取消课不销课" });
+    expect(page.data.leave).toMatchObject({ cancelled: true, statusLabel: "课程已取消", resultLabel: "取消课不计次" });
     expect(mocks.requestTrainingLeave).not.toHaveBeenCalled();
-    expect(template).toContain("课程已取消，本课不销课，无需请假");
+    expect(template).toContain("课程已取消，本课不计次，无需请假");
   });
 });
 
@@ -450,4 +450,56 @@ it("ignores a late first-child game response after selecting the second child",a
  const p=createPageInstance();await p.load("event-1","student-1");await p.selectChild({detail:{studentId:"student-2"}});await Promise.resolve();
  resolveFirst({enabled:true,games:[{id:"first-game",sideAName:"甲队",sideBName:"乙队",scoreA:9,scoreB:0,events:[]}]});await Promise.resolve();await Promise.resolve();
  expect(mocks.getParentTrainingGames).toHaveBeenCalledWith("event-1","student-2");expect(p.data.friendlyGames.map(item=>item.id)).toEqual(["second-game"]);expect(p.data.friendlyGames[0].score).toBe("0 : 0");expect(p.data.friendlyGames[0].events).toContain("扑救");
+});
+
+
+describe("CQ-12 participation and counting facts", () => {
+  it.each([["confirmed", "已确认参与"], ["present", "已到场"], ["late", "迟到"], ["accepted", "已确认参与"], ["completed", "参与已结束"]])("presents %s separately from counted training", async (status, label) => {
+    mocks.getParentActivityDetail.mockResolvedValue(detail({participants:[{studentId:"student-1",name:"小天",status}]}));
+    mocks.getTrainingRecords.mockResolvedValue({ total: 1, records: [{eventId:"event-1", counted:true, revision:1, source:"automatic",history:[]}] });
+    const p = createPageInstance(); await p.load("event-1");
+    expect(p.data.detail.childStatusLabel).toBe(label); expect(p.data.detail.statusLabel).toBe(label);
+    expect(p.data.leave).toMatchObject({statusLabel:label,resultLabel:"已计次"});
+  });
+  it("shows an ended automatic non-count as not counted, without promising a later count", async () => {
+    mocks.getParentActivityDetail.mockResolvedValue(detail({participants:[{studentId:"student-1",name:"小天",status:"absent"}]}));
+    mocks.getTrainingRecords.mockResolvedValue({ total:0, records:[{eventId:"event-1", counted:false, revision:1,source:"automatic",history:[]}] });
+    const p=createPageInstance(); await p.load("event-1");
+    expect(p.data.leave).toMatchObject({statusLabel:"未到场",resultLabel:"本课不计次"});
+  });
+  it.each(["match","other"])("never reads or offers training leave for %s", async type => {
+    mocks.getParentActivityDetail.mockResolvedValue(detail({type})); const p=createPageInstance(); await p.load("event-1"); await p.submitLeave();
+    expect(p.data.leave).toBeNull(); expect(mocks.getTrainingRecords).not.toHaveBeenCalled(); expect(mocks.requestTrainingLeave).not.toHaveBeenCalled();
+  });
+  it("keeps leave revision and selected child on return and distinguishes money from counting", async () => {
+    expect(template).toContain("训练计次不代表实际到场，也不扣减费用或课包余额");
+    expect(template).not.toContain("销课"); expect(template).not.toContain("改回计次");
+    const content = template.slice(template.indexOf('class="detail-card detail-card--training"'), template.indexOf('class="detail-card detail-card--games"'));
+    expect(content).not.toContain("chevron-right"); expect(template).not.toContain("role-tabbar");
+  });
+});
+
+it("revokes a pre-class leave without claiming attendance or a count", async () => {
+ const future={startsAt:"2099-01-01T09:00:00+08:00",endsAt:"2099-01-01T10:30:00+08:00"};
+ const before={eventId:"event-1",studentId:"student-2",counted:false,source:"correction",revision:1,history:[]};
+ const after={...before,source:"automatic",revision:2};
+ const siblings=status=>[{studentId:"student-1",name:"大宝",status:"present"},{studentId:"student-2",name:"小宝",status}];
+ mocks.getParentActivityDetail.mockResolvedValueOnce(detail({presentation:future,participants:siblings("leave_requested")})).mockResolvedValueOnce(detail({presentation:future,participants:siblings("confirmed")}));
+ mocks.getTrainingRecords.mockResolvedValueOnce({total:0,records:[before]}).mockResolvedValueOnce({total:0,records:[after]});
+ mocks.revokeTrainingLeave.mockResolvedValue({record:after,participant:{studentId:"student-2",status:"confirmed"}});
+ const p=createPageInstance();await p.load("event-1","student-2");await p.revokeLeave();
+ expect(mocks.revokeTrainingLeave).toHaveBeenCalledWith("student-2","event-1",{expectedRevision:1});
+ expect(p.data.selectedStudentId).toBe("student-2");expect(p.data.detail.childStatusLabel).toBe("已确认参与");
+ expect(p.data.leave).toMatchObject({studentId:"student-2",onLeave:false,statusLabel:"已确认参与",resultLabel:"待生成（课程结束后自动记录）",revision:2});
+});
+it("ignores a late write response after leaving the detail page", async () => {
+ mocks.getParentActivityDetail.mockResolvedValue(detail()); const p=createPageInstance();await p.load("event-1");
+ let finish; mocks.requestTrainingLeave.mockReturnValueOnce(new Promise(resolve=>{finish=resolve;})); const write=p.submitLeave();
+ p.onUnload();finish({participant:{studentId:"student-1",status:"leave_requested"}});await write;
+ expect(mocks.getParentActivityDetail).toHaveBeenCalledTimes(1);expect(globalThis.wx.showToast).not.toHaveBeenCalled();
+});
+it("keeps effective leave separate from a missing training record", async () => {
+ mocks.getParentActivityDetail.mockResolvedValue(detail({participants:[{studentId:"student-1",name:"小天",status:"leave_requested"}]}));
+ const p=createPageInstance();await p.load("event-1");
+ expect(p.data.leave).toMatchObject({statusLabel:"已请假",resultLabel:"本课不计次（请假）",revision:0});
 });
