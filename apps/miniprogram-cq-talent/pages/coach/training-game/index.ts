@@ -61,6 +61,8 @@ Page({
     stateLabel: "草稿",
     primaryText: "完成记录",
     participantsExpanded: false,
+    eventsExpanded: false,
+    completionHint: "完成后家长可见自己孩子的记录",
     participantSearch: "",
     selectedParticipantsLabel: "尚未选择参赛学员",
     visibleRows: [] as Array<{
@@ -153,6 +155,7 @@ Page({
         changed: !!draft,
         stateLabel: game ? GAME_STATE_LABELS[game.state] : "新建草稿",
         primaryText: game?.state === "completed" ? "保存修订" : "完成记录",
+        completionHint: game?.state === "completed" ? "保存修订会更新已有可见记录；不改变训练计次" : "完成后家长可见自己孩子的记录",
         history: (detail?.history || []).map((item) => ({
           ...item,
           changedAt: formatDateTime(item.changedAt),
@@ -165,6 +168,7 @@ Page({
             : "",
       });
       this.refreshViews();
+      return true;
     } catch (error) {
       if (generation === this.generation)
         this.setData({
@@ -235,6 +239,7 @@ Page({
       })),
     });
   },
+  toggleEvents() { this.setData({eventsExpanded: !this.data.eventsExpanded}); },
   toggleParticipants() {
     this.setData({ participantsExpanded: !this.data.participantsExpanded });
   },
@@ -395,6 +400,9 @@ Page({
   },
   async save(state: GameState) {
     if (this.data.readOnly || this.data.busy || this.data.conflict) return;
+    if (!this.data.uncertain && this.data.game?.state === "completed" && state === "draft") {
+      this.setData({error:"已完成记录请使用保存修订，不能改回草稿。"}); return;
+    }
     if (this.data.uncertain && this.pending) state = this.pending.state;
     this.setData({ busy: true });
     try {
@@ -415,11 +423,13 @@ Page({
       if (!this.data.uncertain && state !== "draft") {
         const answer = await new Promise<{ confirm: boolean }>((resolve) =>
           wx.showModal({
-            title: state === "voided" ? "作废记录" : "确认比赛记录",
+            title: state === "voided" ? "作废记录" : this.data.game?.state === "completed" ? "确认保存修订" : "确认比赛记录",
             content:
               state === "voided"
                 ? "记录将保留历史，并从家长结果中移除。"
-                : "完成后，家长可查看比分和自己孩子的已记录事件；不会改变训练计次。",
+                : this.data.game?.state === "completed"
+                  ? "保存修订会更新已有可见记录，家长可查看修订后的比分和自己孩子的已记录事件；不会改变训练计次。"
+                  : "完成后，家长可查看比分和自己孩子的已记录事件；不会改变训练计次。",
             success: resolve,
           }),
         );
@@ -497,10 +507,8 @@ Page({
       }),
     );
     if (!answer.confirm) return;
-    this.pending = null;
-    if (this.storageKey) wx.removeStorageSync(this.storageKey);
-    this.setData({ conflict: false, uncertain: false });
-    await this.load(false);
+    const loaded = await this.load(false);
+    if (loaded && this.storageKey) wx.removeStorageSync(this.storageKey);
   },
   retry() {
     return this.load(true);

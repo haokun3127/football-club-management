@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   getTrainingGames: vi.fn(),
@@ -17,6 +18,7 @@ globalThis.Page = (value) => {
   definition = value;
 };
 await import("./index.ts");
+const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
 const storage = new Map();
 let current;
 const draftGame = () => ({
@@ -276,4 +278,20 @@ describe("training game editor", () => {
     expect(closed.data.form.scoreA).toBe("");
     expect(closed.data.readOnly).toBe(true);
   });
+  it("keeps basic recording first and opens optional events without changing the score or form", async () => {
+    const p=await load();expect(p.data.eventsExpanded).toBe(false);const before=structuredClone(p.data.form);p.toggleEvents();expect(p.data.eventsExpanded).toBe(true);expect(p.data.form).toEqual(before);p.toggleEvents();expect(p.data.eventsExpanded).toBe(false);expect(template).toContain('wx:if="{{eventsExpanded}}"');
+  });
+  it("keeps completed revisions published, reasoned and retriable with the original revision/requestId", async () => {
+    current={...draftGame(),state:"completed",revision:7};const p=await load(current.id);expect(p.data.completionHint).toContain("保存修订会更新已有可见记录");
+    input(p,"reason","核对原始比分");await p.saveDraft();expect(mocks.saveTrainingGame).not.toHaveBeenCalled();expect(p.data.error).toContain("不能改回草稿");
+    input(p,"scoreA","2");input(p,"scoreB","1");mocks.saveTrainingGame.mockRejectedValueOnce({errorType:"timeout"});await p.complete();
+    const original=mocks.saveTrainingGame.mock.calls[0][2];expect(original).toMatchObject({state:"completed",expectedRevision:7,reason:"核对原始比分"});expect(original.requestId).toBeTruthy();expect(wx.showModal).toHaveBeenLastCalledWith(expect.objectContaining({title:"确认保存修订",content:expect.stringContaining("更新已有可见记录")}));
+    await p.complete();expect(mocks.saveTrainingGame.mock.calls[1][2]).toEqual(original);expect(current.state).toBe("completed");expect(current.revision).toBe(8);
+  });
+  it("keeps local draft and pending identity when an explicitly requested server reread fails", async () => {
+    current=draftGame();const p=await load(current.id);input(p,"scoreA","3");input(p,"scoreB","1");mocks.saveTrainingGame.mockRejectedValueOnce({statusCode:409});await p.saveDraft();
+    const stored=structuredClone([...storage.values()][0]);mocks.getTrainingGames.mockRejectedValueOnce(new Error("offline"));await p.reloadServer();expect(storage.size).toBe(1);expect([...storage.values()][0]).toEqual(stored);
+    await p.retry();expect(p.data.form.scoreA).toBe("3");expect(p.data.conflict).toBe(true);
+  });
+
 });
