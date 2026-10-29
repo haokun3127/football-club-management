@@ -2,6 +2,7 @@
   <app-header title="课堂表现" title-align="left" show-back="{{true}}" custom-back="{{true}}" back-disabled="{{saving || uncertain || reviewVisible || reviewLoading}}" bindback="goBack" />
   <view class="assessment-body">
     <status-view state="{{state}}" title="{{statusTitle}}" message="{{message}}" action-text="{{statusActionText}}" bindaction="handleStatusAction" />
+    <view wx:if="{{retainedNotice}}" class="assessment-save-error">{{retainedNotice}}</view>
     <block wx:if="{{state === 'ready'}}">
       <view class="assessment-hero">
         <view class="assessment-hero__top"><text>{{eventDateTeam}}</text><text>{{presentCountLabel}}</text></view>

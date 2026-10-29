@@ -217,3 +217,106 @@ describe("coach training content assessment", () => {
   });
 
 });
+
+describe('CAS semantic merge and retained-scope regressions',()=>{
+ let storage;
+ beforeEach(()=>{
+  storage=new Map();wx.getStorageSync=key=>storage.get(key);wx.setStorageSync=(key,value)=>storage.set(key,structuredClone(value));wx.removeStorageSync=key=>storage.delete(key);
+  mocks.getCoachWorkbench.mockReset().mockResolvedValue(workbench);
+  mocks.getCoachTrainingContentAssessments.mockReset().mockResolvedValue(assessmentScope);
+  mocks.saveCoachTrainingContentAssessments.mockReset().mockResolvedValue({eventId:'event-training',revision:1,assessments:[]});
+  mocks.requireRole.mockReset().mockReturnValue({role:'coach',clubId:'club-a',userId:'coach-a'});
+  mocks.showToast.mockClear();
+ });
+ const input=(p,studentId,value)=>p.onScoreInput({currentTarget:{dataset:{studentId}},detail:{value}});
+ it('preserves newer server fields when local score/note changes are only formatting-equivalent',async()=>{
+  const p=createPageInstance();await p.load('event-training');
+  input(p,'student-1','084');
+  p.onNoteInput({currentTarget:{dataset:{studentId:'student-1'}},detail:{value:' 传球节奏稳定 '}});
+  input(p,'student-3','75');
+  mocks.saveCoachTrainingContentAssessments.mockRejectedValueOnce({statusCode:409});await p.save();
+  expect(mocks.saveCoachTrainingContentAssessments.mock.calls[0][1]).toEqual([{studentId:'student-3',trainingProjectId:'project-passing',score:75,note:''}]);
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,revision:4,assessments:[{studentId:'student-1',trainingProjectId:'project-passing',score:95,note:'另一教练的新备注'}]});
+  await p.readServerForReview();p.keepLocalChanges();
+  const merged=structuredClone(p.data.valuesByProject['project-passing']['student-1']);
+  mocks.saveCoachTrainingContentAssessments.mockResolvedValue({eventId:'event-training',revision:5,assessments:[]});await p.save();
+  expect(merged).toEqual({scoreInput:'95',noteInput:'另一教练的新备注'});
+  expect(mocks.saveCoachTrainingContentAssessments.mock.calls[1][1]).toEqual([{studentId:'student-3',trainingProjectId:'project-passing',score:75,note:''}]);
+ });
+ it('retains an unsaved learner draft while that learner temporarily leaves the present-student scope',async()=>{
+  const first=createPageInstance();await first.load('event-training');input(first,'student-3','77');first.onUnload();expect(storage.size).toBe(1);
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,presentStudentIds:['student-1']});
+  const absent=createPageInstance();await absent.load('event-training');expect(absent.data.rows.map(r=>r.studentId)).toEqual(['student-1']);absent.onUnload();
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue(assessmentScope);
+  const restored=createPageInstance();await restored.load('event-training');
+  expect(restored.data.valuesByProject['project-passing']?.['student-3']?.scoreInput).toBe('77');
+ });
+ it('does not apply an old save response to a different course loaded on the same controller',async()=>{
+  const p=createPageInstance();await p.load('event-training');input(p,'student-1','75');
+  let resolve;mocks.saveCoachTrainingContentAssessments.mockImplementationOnce(()=>new Promise(r=>resolve=r));const pending=p.save();
+  mocks.getCoachWorkbench.mockResolvedValue({...workbench,event:{...workbench.event,id:'other-course',title:'另一课'}});
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,eventId:'other-course',revision:5,assessments:[{studentId:'student-1',trainingProjectId:'project-passing',score:92}]});
+  await p.load('other-course');const snapshot=structuredClone(p.data);const keys=[...storage.keys()];
+  resolve({eventId:'event-training',revision:1,assessments:[]});await pending;
+  expect(p.data).toEqual(snapshot);expect(p.data.eventId).toBe('other-course');expect(p.data.revision).toBe(5);expect([...storage.keys()]).toEqual(keys);
+ });
+ it('saves eligible edits without sending or deleting hidden drafts, then requires review on recovery',async()=>{
+  const first=createPageInstance();await first.load('event-training');input(first,'student-3','77');first.onUnload();
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,presentStudentIds:['student-1']});
+  const limited=createPageInstance();await limited.load('event-training');expect(limited.data.retainedNotice).toContain('暂不可提交');
+  input(limited,'student-1','86');await limited.save();limited.onUnload();
+  expect(mocks.saveCoachTrainingContentAssessments).toHaveBeenLastCalledWith('event-training',[{studentId:'student-1',trainingProjectId:'project-passing',score:86,note:'传球节奏稳定'}],0);
+  const stored=[...storage.values()][0];expect(stored.retainedCells[0]).toMatchObject({studentId:'student-3',value:{scoreInput:'77'},revision:0,scope:{eventId:'event-training',studentIds:['student-1','student-3']}});
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,revision:1,assessments:[...assessmentScope.assessments,{studentId:'student-3',trainingProjectId:'project-passing',score:65,note:'服务器备注'}]});
+  const recovered=createPageInstance();await recovered.load('event-training');expect(recovered.data.needsReload).toBe(true);expect(recovered.data.retainedNotice).toContain('已恢复');
+  await recovered.save();expect(mocks.saveCoachTrainingContentAssessments).toHaveBeenCalledTimes(1);
+  await recovered.readServerForReview();expect(recovered.data.reviewRows.find(row=>row.key==='project-passing/student-3')).toMatchObject({local:'77',server:'65 · 服务器备注'});
+  recovered.keepLocalChanges();await recovered.save();expect(mocks.saveCoachTrainingContentAssessments).toHaveBeenLastCalledWith('event-training',[{studentId:'student-3',trainingProjectId:'project-passing',score:77,note:'服务器备注'}],1);
+  expect(storage.size).toBe(0);
+ });
+ it.each(['no-students','no-projects'])('does not erase a draft when the whole scope is unavailable: %s',async kind=>{
+  const first=createPageInstance();await first.load('event-training');input(first,'student-3','77');first.onUnload();const original=structuredClone([...storage.values()][0]);
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,...(kind==='no-students'?{presentStudentIds:[]}:{selectedProjectIds:[]})});
+  const empty=createPageInstance();await empty.load('event-training');expect(empty.data.state).toBe('empty');expect(empty.data.retainedNotice).toContain('草稿已保留');await empty.save();empty.onHide();empty.onUnload();
+  expect([...storage.values()][0]).toEqual(original);expect(mocks.saveCoachTrainingContentAssessments).not.toHaveBeenCalled();
+ });
+ it.each(['useServer','keepLocalChanges'])('retains newly unavailable edits during explicit review: %s',async choice=>{
+  const p=createPageInstance();await p.load('event-training');input(p,'student-3','77');
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,revision:1,presentStudentIds:['student-1']});
+  await p.readServerForReview();p[choice]();p.onUnload();
+  expect([...storage.values()][0].retainedCells[0]).toMatchObject({studentId:'student-3',value:{scoreInput:'77'},revision:0});
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,revision:1});
+  const restored=createPageInstance();await restored.load('event-training');expect(restored.data.valuesByProject['project-passing']['student-3'].scoreInput).toBe('77');expect(restored.data.needsReload).toBe(true);
+ });
+ it('includes a recovered learner in explicit review when scope returns without reopening',async()=>{
+  const first=createPageInstance();await first.load('event-training');input(first,'student-3','77');first.onUnload();
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,presentStudentIds:['student-1']});
+  const p=createPageInstance();await p.load('event-training');
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,revision:2});
+  await p.readServerForReview();expect(p.data.reviewRows.find(row=>row.key==='project-passing/student-3').local).toBe('77');
+  p.keepLocalChanges();expect(p.data.valuesByProject['project-passing']['student-3'].scoreInput).toBe('77');expect(p.data.revision).toBe(2);await p.save();expect(mocks.saveCoachTrainingContentAssessments).toHaveBeenLastCalledWith('event-training',[{studentId:'student-3',trainingProjectId:'project-passing',score:77,note:''}],2);
+ });
+ it('holds an unknown operation intact while scope is limited and retries the original operation when restored',async()=>{
+  const first=createPageInstance();await first.load('event-training');input(first,'student-1','85');input(first,'student-3','77');
+  mocks.saveCoachTrainingContentAssessments.mockRejectedValueOnce(new Error('lost response'));await first.save();first.onUnload();const original=mocks.saveCoachTrainingContentAssessments.mock.calls[0];
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,revision:4,presentStudentIds:['student-1']});
+  const limited=createPageInstance();await limited.load('event-training');await limited.save();await limited.readServerForReview();limited.keepLocalChanges();await limited.save();limited.onUnload();
+  expect(mocks.saveCoachTrainingContentAssessments).toHaveBeenCalledTimes(1);expect([...storage.values()][0].heldOperation.pending).toEqual({eventId:original[0],assessments:original[1],revision:original[2]});
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,revision:5});
+  const restored=createPageInstance();await restored.load('event-training');expect(restored.data.uncertain).toBe(true);expect(restored.data.revision).toBe(0);await restored.save();expect(mocks.saveCoachTrainingContentAssessments.mock.calls[1]).toEqual(original);
+ });
+ it.each([{clubId:'club-a',userId:'coach-b'},{clubId:'club-b',userId:'coach-a'}])('isolates retained drafts from another identity: %j',async identity=>{
+  const first=createPageInstance();await first.load('event-training');input(first,'student-3','77');first.onUnload();
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,presentStudentIds:['student-1']});const limited=createPageInstance();await limited.load('event-training');limited.onUnload();
+  mocks.requireRole.mockReturnValue({role:'coach',...identity});mocks.getCoachTrainingContentAssessments.mockResolvedValue(assessmentScope);
+  const other=createPageInstance();await other.load('event-training');expect(other.data.valuesByProject['project-passing']['student-3']?.scoreInput || '').toBe('');expect(other.data.retainedNotice).toBe('');other.onUnload();expect(storage.size).toBe(1);
+ });
+ it('keeps a removed project draft and never sends its pairs while saving an allowed project',async()=>{
+  const first=createPageInstance();await first.load('event-training');first.selectProject({currentTarget:{dataset:{id:'project-finishing'}}});input(first,'student-3','71');first.onUnload();
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,selectedProjectIds:['project-passing']});
+  const limited=createPageInstance();await limited.load('event-training');input(limited,'student-1','86');await limited.save();limited.onUnload();
+  expect(mocks.saveCoachTrainingContentAssessments.mock.calls[0][1].every(row=>row.trainingProjectId==='project-passing')).toBe(true);
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,revision:1});const restored=createPageInstance();await restored.load('event-training');expect(restored.data.valuesByProject['project-finishing']['student-3'].scoreInput).toBe('71');expect(restored.data.needsReload).toBe(true);
+ });
+
+});
