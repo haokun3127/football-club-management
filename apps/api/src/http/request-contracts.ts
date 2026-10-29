@@ -74,7 +74,7 @@ export function registerHttpRequestContracts(app: FastifyInstance, store: ApiSto
 }
 
 /** Call only after all route action-authorization guards, before any mutation. */
-export async function replayAuthorizedMutation(store: ApiStore, request: FastifyRequest, reply: FastifyReply, authorizeCachedResponse?: () => boolean | Promise<boolean>): Promise<boolean> {
+export async function replayAuthorizedMutation(store: ApiStore, request: FastifyRequest, reply: FastifyReply, authorizeCachedResponse?: (payload: string) => boolean | Promise<boolean>): Promise<boolean> {
   const state = request.idempotency;
   if (reply.sent) return true;
   if (!state) return false;
@@ -83,7 +83,7 @@ export async function replayAuthorizedMutation(store: ApiStore, request: Fastify
   const existing = await store.getHttpIdempotencyRecord(state.cacheKey);
   if (!existing) return false;
   state.replayed = true;
-  if (authorizeCachedResponse && !await authorizeCachedResponse()) {
+  if (authorizeCachedResponse && !await authorizeCachedResponse(existing.payload)) {
     state.authorized = false;
     if (!reply.sent) reply.code(403).send(apiError("forbidden", "Current action scope does not permit this cached response"));
     return true;

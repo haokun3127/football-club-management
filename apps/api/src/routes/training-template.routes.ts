@@ -72,7 +72,14 @@ export async function registerTrainingTemplateRoutes(app: FastifyInstance, conte
     const who = await identity(request, reply); if (!who) return reply;
     try {
       const value = await source(request.params.clubId, request.body, who);
-      if (await context.replayAuthorizedMutation(request, reply)) return reply;
+      if (await context.replayAuthorizedMutation(request, reply, async payload => {
+        const cached = JSON.parse(payload) as { targets?: Array<{ eventId: string }> };
+        for (const target of cached.targets ?? []) {
+          const event = await context.store.getCalendarEvent(target.eventId);
+          if (!event || !who.canPlan(event)) return false;
+        }
+        return true;
+      })) return reply;
       const candidates = (context.store.listCalendarEvents(request.params.clubId) as CalendarEvent[]).filter(event => event.id !== request.body.sourceEventId && event.type === "training" && event.status === "scheduled" && Date.parse(event.timeRange.startsAt) > Date.now() && who.canPlan(event));
       const targets = await Promise.all(candidates.map(async event => {
         const actual = await context.store.getCalendarEvent(event.id); if (!actual) return null;

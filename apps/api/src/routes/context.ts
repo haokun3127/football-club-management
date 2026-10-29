@@ -22,7 +22,7 @@ export interface RouteContext {
   resolveClubAuth(request: FastifyRequest, reply: FastifyReply, clubId: string): Promise<AuthContext | null>;
   requireClubMembership(request: FastifyRequest, reply: FastifyReply, clubId: string): Promise<boolean>;
   sendError: typeof sendError;
-  replayAuthorizedMutation(request: FastifyRequest, reply: FastifyReply, authorizeCachedResponse?: () => boolean | Promise<boolean>): Promise<boolean>;
+  replayAuthorizedMutation(request: FastifyRequest, reply: FastifyReply, authorizeCachedResponse?: (payload: string) => boolean | Promise<boolean>): Promise<boolean>;
   requireClubRole(
     request: FastifyRequest,
     reply: FastifyReply,

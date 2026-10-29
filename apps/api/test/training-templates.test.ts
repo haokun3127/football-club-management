@@ -9,6 +9,28 @@ import { HeaderMembershipResolver } from "../src/auth/context.js";
 import { buildServer } from "../src/server.js";
 
 describe("reviewed training template/copy flow", () => {
+ it("rechecks cached preview target permissions even when source-course access remains", async () => {
+  const seed = createSeedData(), clubId = "club-chongqing-talent";
+  const source = seed.events.find(event => event.id === "event-training-1")!;
+  seed.teams.push({ ...seed.teams[0]!, id: "preview-target-team", defaultCoachId: undefined });
+  seed.events.push({ ...source, id: "preview-scope-target", primaryTeamId: "preview-target-team", timeRange: { startsAt: "2099-10-01T09:00:00Z", endsAt: "2099-10-01T10:00:00Z" } });
+  const persistence = await createPlatformPersistence({ databasePath: ":memory:", seedData: seed });
+  const store = new PersistentApiStore(persistence.repositories, seed);
+  store.saveCoachAssignment({ id: "preview-target-access", clubId, coachId: "coach-1", teamId: "preview-target-team", role: "head_coach", createdAt: source.createdAt, updatedAt: source.updatedAt });
+  const app = buildServer(store, { logger: false, membershipResolver: new HeaderMembershipResolver(persistence.repositories.users, persistence.repositories.memberships) });
+  const request = { method: "POST" as const, url: `/clubs/${clubId}/app-clients/app-client-cq-talent-wechat-main/coach/training-content/preview`, headers: { "x-user-id": "user-coach-1", "idempotency-key": "preview-response-loss" }, payload: { sourceEventId: source.id } };
+  try {
+   const first = await app.inject(request);
+   expect(first.statusCode).toBe(200);
+   expect(first.json().targets.some((target: { eventId: string }) => target.eventId === "preview-scope-target")).toBe(true);
+   expect((await app.inject(request)).headers["idempotency-status"]).toBe("replayed");
+   store.removeCoachAssignment(clubId, "preview-target-team", "coach-1");
+   expect((await app.inject(request)).statusCode).toBe(403);
+   const fresh = await app.inject({ ...request, headers: { "x-user-id": "user-coach-1" } });
+   expect(fresh.statusCode).toBe(200);
+   expect(fresh.json().targets.some((target: { eventId: string }) => target.eventId === "preview-scope-target")).toBe(false);
+  } finally { await app.close(); persistence.database.close(); }
+ });
  it.each(["merge", "replace"] as const)("previews and persists %s without copying friendly content or changing other course facts", async (action) => {
   const dir = mkdtempSync(join(tmpdir(), "cq-copy-outcome-"));
   const seed = createSeedData(), clubId = "club-chongqing-talent";

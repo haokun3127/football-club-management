@@ -90,3 +90,5 @@
 - API typecheck、diff check通过；定向6文件101项通过。新增非课堂课时账本对照：正常同key仅入账一次，撤销管理员角色后403且账本不变；原课堂旧版428零写、CAS/回滚、响应未知重试保留后续95分、环境与比赛重试测试均通过。
 - 用户明确禁止子代理，安全边界调查与候选绕过/兼容性审查在本chat分两遍自行完成。总控固定SHA独立审计仍是发布门禁。完整API测试运行中，随后补最终交付门禁与CQ23点击复验。
 - 保留证据由Codex Security工具写入 /Users/dongjun/.codex/state/plugins/codex-security/scans/football-club-management/artifacts-a14b4a62423579f8d115e7711b9cd487403a0b3764b6798568833d2f33ccea43/artifacts/ ：before.log、focused.log、route-inventory.mjs/txt、replay-review.md。无推送、部署或环境切换。
+- 补充候选：模板preview的缓存targets也逐项检查当前canPlan，防止来源仍可访问但目标授权已移除时泄露旧目标列表；定向2文件7项通过（新增目标范围撤销探针+正常重放对照），API typecheck通过。入口表见research/idempotency-entrypoints.md，包括登录/WPS等独立重试合同。
+- 第一次完整API运行279项通过、2项仅因沙盒listen EPERM失败；升级至允许本机端口后完整check:delivery通过（API281、domain47、后台8、小程序698通过1skip、全部类型/构建/14脚本/3环境）。因preview补测发生在该轮测试收集之后，最终候选再跑一次门禁。
