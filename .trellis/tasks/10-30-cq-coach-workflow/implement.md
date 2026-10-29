@@ -4,8 +4,8 @@
 
 - [x] 读回worktree/HEAD/脏状态，激活本任务；使用trellis-before-dev读取相关规范。
 - [x] 阅读评审 V01/V02/V06/V07/V08。先 CQ-10 独立提交，再 CQ-11 独立提交。旧入口复用 getCoachAssessmentTaskOptions(sourceEventId, teamId)，不得猜任务或删除后端门禁。主动作无任务时查看训练记录，课堂表现可选；不要把完成任意测评强制为结课。输入仅更新相关行，草稿落盘及隐藏/卸载/提交安全刷新必须保留。
-- [ ] 当天成功/范围失败；旧入口无/单/多任务；权限与普通课零额外操作；19/40人、0/空/小数、跨课、多项目、焦点、修订原因、保存不发布、409/响应未知保留。相关页面测试与小程序 typecheck。
-- [ ] 审查diff、记录实际证据与缺口，独立提交并报告SHA。
+- [x] 控制器与类型验证：当天成功/范围失败；旧入口无/单/多任务；权限与普通课零额外操作；19/40人、0/空/小数、跨课、多项目、焦点、修订原因、保存不发布、409/响应未知保留。相关页面测试与小程序 typecheck。
+- [x] 审查diff、记录实际证据与缺口，独立提交；SHA见本记录与最终交接。
 - [ ] 总控固定版本审计、集成及跨端/环境验证。
 
 不得自行push/deploy/微信上传。只更新本任务记录；父任务、B6、共享specs由总控负责。规范建议返回总控，不覆盖他人修改。
@@ -55,3 +55,24 @@ CQ-11独立提交：5ec89457。已按总控补充要求，将所有关联任务�
 验证：training-assessment 12项通过（其中新增空/空白/备注/0/非法值/刚保存0回归），小程序typecheck与diff检查通过。原先6条均保留。
 
 总控另授权移除日程误导性出席率：attendanceRate来自参与状态而非实际到场，教练日程不再展示该摘要；API字段保持兼容，只保留本周时长/安排。下一独立批执行，不接管主目录DevTools。
+
+
+## 最终工程检查与交接（2026-10-30）
+
+当前路径：/Users/dongjun/.codex/worktrees/7249/football-club-management；分支codex/cq-coach-workflow；冻结起点41f615d7。只改coach页面/页面测试与本任务记录，未修改公共utils/API/组件/specs/父任务/B6/docs/current。
+
+已提交：cc99d212（CQ-10首批）、5ec89457（CQ-11）、0392c04e（CQ-10主待办和旧入口复核）、f3314211（课堂表现空值P1）。本次最终批移除日程参与状态计算得出的“出席率”，保留API数据与本周时长/安排；未来课confirmed=10/10且API attendanceRate=100的回归确认不显示实际出席率。
+
+最终可执行证据：
+- Node24、pnpm10.33.0，frozen lockfile安装成功，锁文件未变。
+- pnpm --filter @football-club/miniprogram-cq-talent test：96文件，699通过，1跳过（700总）；测试需要本机隔离HTTP端口，按已批准权限运行。
+- pnpm --filter @football-club/miniprogram-cq-talent typecheck：通过。
+- pnpm --filter @football-club/api exec vitest run test/assessment-workflow.test.ts：16通过；先构建现有domain依赖，没有改domain/API源码。
+- node --test scripts/miniprogram-policy/check.test.mjs：4通过；报告检查仍有login静态路径4项与原始文件预算1项，均在本线程所有权以外，报告不等于官方包体结论。
+- git diff --check：通过。最终审阅涵盖当前所有变更、旧URL路由、前端校验与保存/发布分离。
+
+剩余/边界：
+- 用户指定的微信唯一主目录DevTools由总控使用，本线程未导入worktree、未做原生编译/截图/真机键盘、375/430/长姓名视觉、返回日期球队或真实后端跨角色端到端验收；19/40人证据为控制器与载荷，不能代称真机耗时。
+- 总控指出课堂表现整份回传并发覆盖与服务端逐行部分保存，平台线程在处理。当前只独立修复空值契约；公共并发/原子接口接入信息尚未收到，待总控提供后继续，不自行编辑公共utils/API。
+- 不push/deploy/微信上传；任务保留in_progress，不归档，等待总控固定版本集成与验收。
+- 规范建议集中在本记录交总控：日历标记不替代当天事实；本机修改恢复原expectedRevision；破坏性服务器重读成功后才清草稿；首录/采集/确认发布主动作按真实workflow区分；空分数先校验再转数值，不把参与确认当实际到场。

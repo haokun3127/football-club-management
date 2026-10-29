@@ -282,9 +282,7 @@ function buildHeroPills(home: CoachHome): HeroPillView[] {
   const stats = home.weekStats;
   if (!stats) return [];
   const pills: HeroPillView[] = [];
-  if (stats.attendanceRate !== null && stats.attendanceRate !== undefined) {
-    pills.push({ value: `${stats.attendanceRate}%`, label: "出席率", tone: "primary" });
-  }
+  // Participation confirmation is not evidence of physical attendance.
   pills.push({ value: `${stats.hours}h`, label: "本周安排时长", tone: "neutral" });
   pills.push({ value: `${stats.sessions}节`, label: "本周安排", tone: "neutral" });
   return pills;

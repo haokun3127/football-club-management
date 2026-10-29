@@ -126,21 +126,23 @@ describe("coach schedule home", () => {
     expect(page.data.heroPills).toEqual([{value:"4.5h",label:"本周安排时长",tone:"neutral"},{value:"3节",label:"本周安排",tone:"neutral"}]);
   });
 
-  it("shows the attendance capsule and weekly hero pills when the API provides them", async () => {
+  it("does not present future participation confirmations as an actual attendance rate", async () => {
     mocks.getCoachHome.mockResolvedValue({
       ...home,
-      summary: { total: 1, training: 1, matches: 0, pending: 1, attendance: { confirmed: 9, total: 10 } },
-      weekStats: { sessions: 3, hours: 4.5, attendanceRate: 90 },
+      events: [{...home.events[0], startsAt:"2099-08-13T09:00:00Z", endsAt:"2099-08-13T10:00:00Z", status:"scheduled"}],
+      summary: { total: 1, training: 1, matches: 0, pending: 1, attendance: { confirmed: 10, total: 10 } },
+      weekStats: { sessions: 3, hours: 4.5, attendanceRate: 100 },
     });
-    const page = createPageInstance();
+    const page = createPageInstance({date:"2099-08-13"});
 
     await page.load();
 
     expect(page.data.heroPills).toEqual([
-      { value: "90%", label: "出席率", tone: "primary" },
       { value: "4.5h", label: "本周安排时长", tone: "neutral" },
       { value: "3节", label: "本周安排", tone: "neutral" },
     ]);
+    expect(page.data.home.weekStats.attendanceRate).toBe(100);
+    expect(page.data.heroPills.some(pill=>pill.label === "出席率" || pill.value.includes("%"))).toBe(false);
   });
 
   it("loads the marker month and presents the selected day from API facts", async () => {
