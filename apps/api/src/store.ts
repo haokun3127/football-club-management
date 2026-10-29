@@ -1,4 +1,5 @@
 import { MemoryTrainingGameRepository, type TrainingGameRepository } from "./application/training-game-repository.js";
+import { compareMetricRecordTimes } from "./application/metric-record-order.js";
 import {clubPresentation} from './application/backoffice-content.js';
 import {AssessmentMappingRepository} from "./persistence/assessment-mapping-repository.js";
 import type {AssessmentMappingVersion} from "@football-club/domain";
@@ -1127,7 +1128,7 @@ export abstract class SeedBackedStore implements ApiStore {
     // Records are append-only facts. IDs are opaque; the latest confirmation at
     // one occurrence uses recorded time, then append order for same-ms writes.
     return this.data.metricRecords.filter((item) => item.clubId === clubId).reverse()
-      .sort((left, right) => Date.parse(right.occurredAt) - Date.parse(left.occurredAt) || Date.parse(right.createdAt) - Date.parse(left.createdAt));
+      .sort(compareMetricRecordTimes);
   }
 
   getDataCapabilityConfig(clubId: EntityId): DataCapabilityConfig {

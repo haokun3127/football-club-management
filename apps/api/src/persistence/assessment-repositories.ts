@@ -1,4 +1,5 @@
 import { transaction } from "./transaction.js";
+import { compareMetricRecordTimes } from "../application/metric-record-order.js";
 import type {
   AssessmentRawResult,
   AssessmentScore,
@@ -51,9 +52,11 @@ export class AssessmentRepository {
     const rows = this.database.prepare(`
       SELECT * FROM player_metric_records
       WHERE club_id = ? AND (? IS NULL OR student_id = ?)
-      ORDER BY occurred_at DESC, created_at DESC, rowid DESC
+      ORDER BY rowid DESC
     `).all(clubId, studentId ?? null, studentId ?? null) as SqlRow[];
-    return rows.map(mapPlayerMetricRecord);
+    // ISO offsets do not sort chronologically as text. Use the same instant
+    // parser as the in-memory store, retaining SQLite append order for ties.
+    return rows.map(mapPlayerMetricRecord).sort(compareMetricRecordTimes);
   }
 
   listMetricLineages(clubId: EntityId): MetricLineage[] {

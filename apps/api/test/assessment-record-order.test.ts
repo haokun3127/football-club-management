@@ -69,3 +69,39 @@ describe("same-course published correction ordering", () => {
     expect(store.listMetricRecords(record.clubId)[0]?.id).toBe("metric-record-10000");
   });
 });
+
+it('audit keeps latest chronological course when supported ISO timestamps use different offsets',async()=>{
+ vi.stubEnv('FCM_ASSESSMENT_PUBLICATION_CLUBS',clubId);
+ const directory=mkdtempSync(join(tmpdir(),'fcm-offset-order-'));
+ const databasePath=join(directory,'api.sqlite');
+ let p=await createPlatformPersistence({databasePath});
+ let store=new PersistentApiStore(p.repositories);
+ let app:ReturnType<typeof buildServer>|undefined;
+ try{
+  app=buildServer(store,{logger:false,membershipResolver:new HeaderMembershipResolver(p.repositories.users,p.repositories.memberships)});
+  const makeCourse=async(startsAt:string,endsAt:string)=>{const response=await app!.inject({method:'POST',url:`/clubs/${clubId}/admin/calendar/events`,headers:{'x-user-id':'user-coach-1'},payload:{type:'training',title:'Audit ISO course',startsAt,endsAt,primaryTeamId:'team-u10-dev',ownerCoachId:'coach-1',status:'completed',participants:[{studentId:'student-1',status:'present'}],trainingSession:{kind:'team'}}});expect(response.statusCode).toBe(200);return response.json();};
+  const older=await makeCourse('2026-10-01T10:00:00+08:00','2026-10-01T11:00:00+08:00');
+  const newer=await makeCourse('2026-10-01T03:00:00.000Z','2026-10-01T04:00:00.000Z');
+  expect(Date.parse(older.timeRange.startsAt)).toBeLessThan(Date.parse(newer.timeRange.startsAt));
+  const item=store.listAssessmentTestItems(clubId).find(i=>i.id.startsWith('assessment-test-cq-talent-'))!;
+  const task={id:'audit-iso-order',clubId,teamId:'team-u10-dev',templateId:'assessment-template-technical',testItemIds:[item.id],studentIds:['student-1'],termLabel:'2026',title:'ISO course ordering',startsOn:'2020-01-01',dueOn:'2099-12-31'};
+  await store.saveAssessmentTask(task);const flow=assessmentWorkflow(store);
+  await flow.save(task,'student-1','coach-1',{expectedRevision:0,entries:[{testItemId:item.id,eventId:older.id,value:{kind:'score_0_100',score:70}}]});
+  await flow.publish(task,'student-1','coach-1',1);
+  await flow.save(task,'student-1','coach-1',{expectedRevision:1,reason:'记录更新课程成绩',entries:[{testItemId:item.id,eventId:newer.id,value:{kind:'score_0_100',score:80}}]});
+  const latest=await flow.publish(task,'student-1','coach-1',2);
+  const raw=await confirmedStudentResults(store,clubId,'student-1',new Set([task.teamId]));
+  expect(raw.find(r=>r.testItemId===item.id)?.value).toEqual({kind:'score_0_100',score:80});
+  const response=await app!.inject({method:'GET',url:`/clubs/${clubId}/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/growth-summary`,headers:{'x-user-id':'user-parent-1'}});
+  expect(response.statusCode).toBe(200);
+  const record=response.json().latest.find((r:{metricId:string})=>r.metricId===item.metricId).record;
+  expect(record.assessmentId).toBe(latest.assessmentId);
+  expect(record.value).toEqual({kind:'score_0_100',score:80});
+  await app.close(); app=undefined; p.database.close();
+  p=await createPlatformPersistence({databasePath,seed:false}); store=new PersistentApiStore(p.repositories);
+  app=buildServer(store,{logger:false,membershipResolver:new HeaderMembershipResolver(p.repositories.users,p.repositories.memberships)});
+  const reopened=await app.inject({method:'GET',url:`/clubs/${clubId}/app-clients/app-client-cq-talent-wechat-main/parent/students/student-1/growth-summary`,headers:{'x-user-id':'user-parent-1'}});
+  expect(reopened.statusCode).toBe(200);
+  expect(reopened.json().latest.find((r:{metricId:string})=>r.metricId===item.metricId).record).toMatchObject({assessmentId:latest.assessmentId,value:{kind:'score_0_100',score:80}});
+ }finally{await app?.close();p.database.close();rmSync(directory,{recursive:true,force:true});vi.unstubAllEnvs();}
+},15000);

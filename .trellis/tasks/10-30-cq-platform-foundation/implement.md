@@ -78,3 +78,8 @@
 - 只在无detail的读取失败态为同一readTarget增加“重试读取任务”；不为保存/发布失败自动重读或重发。当前pnpm check:delivery已全部通过（API274/domain47/后台8/小程序698通过1skip，类型/构建/14脚本/三临时环境启动通过）。后台窄修实际重建后的按钮点击复验待安全优先项结束后继续；不得将此状态冒充全量CQ23体验验收。
 - 总控新增安全优先项：现有HTTP幂等回放早于认证与动作授权，撤销token后可能回放成功响应；需覆盖当前幂等写入范围、有效重试/环境/428/CAS不回归。另需修正offset/Z发生时间的SQLite排序。此两项优先，后续再完成CQ23浏览器复验。
 - 两次disposable fixture已停止，临时库/随机凭据随fixture清理；隔离浏览器当前仍开着，仅用于后续本地复验。
+
+### A02 offset时间修正
+- 第三轮正确断言在本分支先失败：10:00+08(02UTC)的70分排在03UTC新课80分前。
+- SQLite仅按rowid提供稳定追加顺序，再由与内存共用的Date.parse比较器按occurredAt/createdAt实际瞬间排序；不依赖ISO字符串或ID字典序，也不引入SQLite/JS解析器差异。
+- assessment-record-order/workflow/workflow-repository 3文件22项通过；覆盖offset混用、真实课程保存/确认/家长GET、offset库重开、同毫秒、十进制ID边界；API typecheck通过。
