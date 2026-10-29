@@ -35,6 +35,7 @@
           <image class="c163-row__arrow" src="/assets/icons/c16-chevron-right.svg" mode="aspectFit" />
         </view>
       </view>
+      <version-info />
     </view>
   </view>
 

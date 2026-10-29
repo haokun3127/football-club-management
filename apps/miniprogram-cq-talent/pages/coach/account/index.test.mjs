@@ -220,3 +220,8 @@ describe("coach account", () => {
     expect(mocks.reLaunch).toHaveBeenCalledWith({ url: "/pages/login/index?reauthorize=1" });
   });
 });
+
+it("mounts the shared collapsed version diagnostic without page-level fetching or props", () => {
+  expect(JSON.parse(pageConfig).usingComponents["version-info"]).toBe("/components/version-info/index");
+  expect(template.match(/<version-info\s*\/>/g)).toHaveLength(1);
+});

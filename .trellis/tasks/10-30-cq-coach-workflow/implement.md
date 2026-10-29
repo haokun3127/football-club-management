@@ -144,3 +144,7 @@ CQ-22统计语义来源核对：本worktree冻结API与只读核对的主目录2
 本机草稿按环境/俱乐部/用户/课程保存原值/原revision/原基线/pending操作；无修改开关页面不制造草稿。隐藏/卸载保留；同账号恢复未知操作时即使服务器已有更高版本仍可核对原操作结果；换账号隔离。离页后的保存/读取响应不更新旧页面。主动作改用现有submit-bar，输入/核对按钮沿现有token，完整姓名可换行。
 
 定向验证：课堂表现+公共helper共24项通过（含原12项空值/真实0校验），小程序typecheck通过；新增GET/PUT revision、只写改动行、428/409不自动GET/重发、显式字段合并、失败重读、未知原payload重试、同账号恢复/跨账号隔离、卸载迟到响应。原生核对面板、键盘/375/430/大字和服务端同版实际双教练任务仍待总控；本线程不导入微信worktree。
+
+CAS依赖同版复验：API training-content-assessment-batch 6项通过，API typecheck通过。
+
+账号版本标记：按总控指令读取67ffad96的version-diagnostics.md，仅在coach/account注册version-info并放置一个无props实例；不加页面网络、不复制公共组件、不cherry-pick整批平台依赖。组件默认折叠/显式展开才读取由公共实现负责；本worktree不含该组件实现，主目录已集成67ffad96，最终原生装配由总控验证。
