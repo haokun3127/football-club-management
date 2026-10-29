@@ -1,5 +1,5 @@
 <view class="training-assessment-page">
-  <app-header title="课堂表现" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" action-text="{{saving ? '保存中' : '保存'}}" bindaction="save" />
+  <app-header title="课堂表现" title-align="left" show-back="{{true}}" custom-back="{{true}}" back-disabled="{{saving}}" bindback="goBack" action-text="{{saving ? '保存中' : '保存'}}" bindaction="save" />
   <view class="assessment-body">
     <status-view state="{{state}}" title="{{statusTitle}}" message="{{message}}" action-text="{{statusActionText}}" bindaction="handleStatusAction" />
     <block wx:if="{{state === 'ready'}}">
@@ -17,10 +17,11 @@
         <view class="assessment-panel__head"><text>已到学员</text><text>分数（0-100）</text></view>
         <view wx:for="{{rows}}" wx:key="studentId" class="assessment-row">
           <view class="assessment-row__student"><view class="assessment-row__avatar">{{item.initial}}</view><text>{{item.name}}</text></view>
-          <t-input class="assessment-row__score" type="number" value="{{item.scoreInput}}" placeholder="分数" data-student-id="{{item.studentId}}" bindchange="onScoreInput"  borderless t-class="assessment-row__score" />
-          <t-input class="assessment-row__note" value="{{item.noteInput}}" placeholder="可选备注" maxlength="80" data-student-id="{{item.studentId}}" bindchange="onNoteInput"  borderless t-class="assessment-row__note" />
+          <t-input class="assessment-row__score" disabled="{{saving}}" type="number" value="{{item.scoreInput}}" placeholder="分数" data-student-id="{{item.studentId}}" bindchange="onScoreInput"  borderless t-class="assessment-row__score" />
+          <t-input class="assessment-row__note" disabled="{{saving}}" value="{{item.noteInput}}" placeholder="可选备注" maxlength="80" data-student-id="{{item.studentId}}" bindchange="onNoteInput"  borderless t-class="assessment-row__note" />
         </view>
       </view>
+      <view wx:if="{{saveError}}" class="assessment-save-error">{{saveError}}</view>
       <view class="assessment-save {{saving ? 'assessment-save--disabled' : ''}}" bindtap="save">{{saving ? '正在保存' : '保存本堂课堂评测'}}</view>
     </block>
   </view>

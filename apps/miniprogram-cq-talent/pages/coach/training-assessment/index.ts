@@ -40,6 +40,7 @@ interface PageData {
   rows: AssessmentRow[];
   valuesByProject: AssessmentValues;
   saving: boolean;
+  saveError: string;
 }
 
 Page<PageData>({
@@ -62,7 +63,10 @@ Page<PageData>({
     rows: [],
     valuesByProject: {},
     saving: false,
+    saveError: "",
   },
+
+  savedValuesByProject: undefined as AssessmentValues | undefined,
 
   onLoad(query: { eventId?: string }) {
     return this.load(query?.eventId || "");
@@ -74,7 +78,7 @@ Page<PageData>({
       this.setData({ state: "empty", statusTitle: "无法评测", statusActionText: "", statusAction: "", message: "缺少训练活动参数，请从训练工作台进入。" });
       return;
     }
-    this.setData({ state: "loading", statusTitle: "正在读取课堂评测", statusActionText: "", statusAction: "", message: "", eventId, saving: false });
+    this.setData({ state: "loading", statusTitle: "正在读取课堂评测", statusActionText: "", statusAction: "", message: "", eventId, saving: false, saveError: "" });
     try {
       const [workbench, scope] = await Promise.all([getCoachWorkbench(eventId), getCoachTrainingContentAssessments(eventId)]);
       if (!isTrainingAssessmentScope(workbench, scope, eventId)) {
@@ -92,6 +96,7 @@ Page<PageData>({
         return;
       }
       const valuesByProject = toAssessmentValues(scope, projects, presentRows);
+      this.savedValuesByProject = valuesByProject;
       const activeProjectId = projects[0]!.id;
       this.setData({
         state: "ready",
@@ -133,6 +138,7 @@ Page<PageData>({
   },
 
   goBack() {
+    if (this.data.saving) return;
     wx.navigateBack({ delta: 1 });
   },
 
@@ -155,6 +161,7 @@ Page<PageData>({
   },
 
   updateValue(studentId: string, patch: Partial<AssessmentValue>) {
+    if (this.data.saving) return;
     const projectId = this.data.activeProjectId;
     if (!projectId || !this.data.rows.some((row: AssessmentRow) => row.studentId === studentId)) return;
     const valuesByProject = {
@@ -167,19 +174,24 @@ Page<PageData>({
         },
       },
     };
-    this.setData({ valuesByProject, rows: rowsForProject(this.data.rows, valuesByProject, projectId) });
+    this.setData({ saveError: "", valuesByProject, rows: rowsForProject(this.data.rows, valuesByProject, projectId) });
   },
 
   async save() {
     if (this.data.saving || !this.data.eventId) return;
-    const assessments = toSavePayload(this.data.valuesByProject);
+    const result = toSavePayload(this.data.valuesByProject, this.savedValuesByProject || {}, this.data.projects, this.data.rows);
+    if (result.error) { this.setData({saveError: result.error}); return; }
+    const assessments = result.assessments;
     if (!assessments.length) {
       wx.showToast({ title: "请先录入有效分数", icon: "none" });
       return;
     }
-    this.setData({ saving: true });
+    this.setData({ saving: true, saveError: "" });
     try {
       await saveCoachTrainingContentAssessments(this.data.eventId, assessments);
+      const savedValues: AssessmentValues = {};
+      for (const assessment of assessments) (savedValues[assessment.trainingProjectId] ??= {})[assessment.studentId] = {scoreInput:String(assessment.score), noteInput:assessment.note};
+      this.savedValuesByProject = savedValues;
       this.setData({ saving: false });
       wx.showToast({ title: "课堂评测已保存", icon: "success" });
     } catch {
@@ -239,14 +251,22 @@ function rowsForProject(sourceRows: AssessmentRow[], valuesByProject: Assessment
   });
 }
 
-function toSavePayload(valuesByProject: AssessmentValues) {
+function toSavePayload(valuesByProject: AssessmentValues, saved: AssessmentValues, projects: ProjectView[], rows: AssessmentRow[]) {
   const assessments: Array<{ studentId: string; trainingProjectId: string; score: number; note: string }> = [];
   for (const [trainingProjectId, byStudent] of Object.entries(valuesByProject)) {
     for (const [studentId, value] of Object.entries(byStudent)) {
-      const score = Number(value.scoreInput.trim());
-      if (!Number.isInteger(score) || score < 0 || score > 100) continue;
-      assessments.push({ studentId, trainingProjectId, score, note: value.noteInput.trim() });
+      const rawScore = value.scoreInput.trim();
+      const note = value.noteInput.trim();
+      const context = `${rows.find(row => row.studentId === studentId)?.name || "学员"} · ${projects.find(project => project.id === trainingProjectId)?.label || "训练内容"}`;
+      if (!rawScore) {
+        if (saved[trainingProjectId]?.[studentId]?.scoreInput.trim()) return {assessments: [], error: `${context}：不能通过空值删除已保存分数，请填写更正分数或恢复原值。`};
+        if (note) return {assessments: [], error: `${context}：请先填写分数，备注不能单独保存；空值不代表0分。`};
+        continue;
+      }
+      const score = Number(rawScore);
+      if (!Number.isInteger(score) || score < 0 || score > 100) return {assessments: [], error: `${context}：请输入0至100的整数分数，已输入内容仍保留。`};
+      assessments.push({ studentId, trainingProjectId, score, note });
     }
   }
-  return assessments;
+  return {assessments, error: ""};
 }

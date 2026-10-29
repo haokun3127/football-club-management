@@ -158,4 +158,25 @@ describe("coach training content assessment", () => {
     expect(pageConfig).not.toContain('"role-tabbar"');
     expect(controller).not.toContain("eventId: \"event-");
   });
+  it("does not synthesize zero from a note-only entry, even alongside existing scores", async () => {
+    const page=createPageInstance();await page.load("event-training");page.onNoteInput({currentTarget:{dataset:{studentId:"student-3"}},detail:{value:"仅备注"}});await page.save();
+    expect(mocks.saveCoachTrainingContentAssessments).not.toHaveBeenCalled();expect(page.data.saveError).toContain("备注不能单独保存");expect(page.data.valuesByProject["project-passing"]["student-3"].scoreInput).toBe("");
+  });
+  it.each(["", "   "])("blocks clearing an existing score with %j and preserves the original until explicitly corrected", async (value) => {
+    const page=createPageInstance();await page.load("event-training");page.onScoreInput({currentTarget:{dataset:{studentId:"student-1"}},detail:{value}});await page.save();
+    expect(mocks.saveCoachTrainingContentAssessments).not.toHaveBeenCalled();expect(page.data.saveError).toContain("不能通过空值删除已保存分数");expect(page.data.rows.find(row=>row.studentId==="student-1").scoreInput).toBe(value);
+    page.onScoreInput({currentTarget:{dataset:{studentId:"student-1"}},detail:{value:"0"}});await page.save();expect(mocks.saveCoachTrainingContentAssessments).toHaveBeenCalledWith("event-training",[{studentId:"student-1",trainingProjectId:"project-passing",score:0,note:"传球节奏稳定"}]);
+  });
+  it("preserves valid zero and ignores a new untouched blank instead of sending a fake result", async () => {
+    mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,assessments:[]});const page=createPageInstance();await page.load("event-training");
+    page.onScoreInput({currentTarget:{dataset:{studentId:"student-3"}},detail:{value:""}});page.onScoreInput({currentTarget:{dataset:{studentId:"student-1"}},detail:{value:" 0 "}});await page.save();
+    expect(mocks.saveCoachTrainingContentAssessments).toHaveBeenCalledWith("event-training",[{studentId:"student-1",trainingProjectId:"project-passing",score:0,note:""}]);
+  });
+  it("validates all inputs before any request instead of silently skipping an invalid score", async () => {
+    const page=createPageInstance();await page.load("event-training");page.onScoreInput({currentTarget:{dataset:{studentId:"student-3"}},detail:{value:"101"}});await page.save();expect(mocks.saveCoachTrainingContentAssessments).not.toHaveBeenCalled();expect(page.data.saveError).toContain("0至100");expect(page.data.valuesByProject["project-passing"]["student-3"].scoreInput).toBe("101");
+  });
+  it("keeps the just-saved zero non-deletable by a later empty input", async () => {
+    mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,assessments:[]});const page=createPageInstance();await page.load("event-training");page.onScoreInput({currentTarget:{dataset:{studentId:"student-1"}},detail:{value:"0"}});await page.save();mocks.saveCoachTrainingContentAssessments.mockClear();page.onScoreInput({currentTarget:{dataset:{studentId:"student-1"}},detail:{value:""}});await page.save();expect(mocks.saveCoachTrainingContentAssessments).not.toHaveBeenCalled();expect(page.data.saveError).toContain("不能通过空值删除");
+  });
+
 });

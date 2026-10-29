@@ -25,3 +25,5 @@
 .assessment-nav__left,
 .assessment-nav__save,
 .assessment-save { min-height:44px; min-width:44px; box-sizing:border-box; }
+
+.assessment-save-error { margin: 16px 0; color: var(--color-error); font-size: var(--font-size-body); line-height: 1.5; overflow-wrap: anywhere; }
