@@ -28,6 +28,7 @@ import type {
   ContentArticle,
   LoadState,
   ScheduleEvent,
+  SessionState,
   StudentSummary,
 } from "../../../utils/types";
 
@@ -37,6 +38,10 @@ function formatMilestoneDate(value: string): string {
   return `${parsed.getMonth() + 1}月${parsed.getDate()}日`;
 }
 
+function homeScope(session: SessionState): string {
+  return JSON.stringify([session.clubId, session.clientId, session.userId || session.token, session.role]);
+}
+
 /** L-02：辅助模块独立三态，不阻塞主体呈现 */
 type ModuleState = "loading" | "ready" | "error";
 
@@ -44,12 +49,19 @@ Page({
   generation: 0,
   trainingRequest: 0,
   calendarRequest: 0,
+  loadedScope: "",
+  requestedStudentId: "",
   data: {
     state: "loading" as LoadState,
     message: "正在读取球员档案",
     children: [] as StudentSummary[],
     student: null as StudentSummary | null,
     showChildren: false,
+    refreshing: false,
+    refreshMessage: "",
+    calendarLoaded: false,
+    growthLoaded: false,
+    presentationLoaded: false,
     trainingTotal: null as number | null,
     trainingState: "loading" as ModuleState,
     trainingMessage: "",
@@ -88,7 +100,8 @@ Page({
   },
   onShow() {
     const session = requireRole("parent");
-    if (session && this.data.state !== "loading") void this.load();
+    if (session && (this.data.state !== "loading" || this.loadedScope !== homeScope(session)
+      || this.requestedStudentId !== (session.currentStudentId || ""))) void this.load();
   },
   onUnload() {
     this.generation++;
@@ -97,27 +110,31 @@ Page({
   async load() {
     const session = requireRole("parent");
     if (!session) return;
-    const ticket = ++this.generation;
-    this.setData({
-      state: "loading", message: "正在读取球员档案", student: null,
-      showChildren: false, editingShortcuts: false,
-      trainingTotal: null, trainingState: "loading", trainingMessage: "",
-      nextEvent: null, nextEventTime: "", nextEventType: "",
-      calendarState: "loading", calendarMessage: "", nextEventHeading: "下一项活动",
-      growthState: "loading", growthMessage: "", milestoneCount: "—",
-      newsState: "loading", newsMessage: "", news: null,
-      presentationState: "loading", contentMessage: "",
-    });
+    let ticket = ++this.generation;
+    const scope = homeScope(session);
+    const retaining = this.data.state === "ready" && this.loadedScope === scope
+      && this.data.student?.id === session.currentStudentId;
+    if (retaining) this.setData({ refreshing: true, refreshMessage: "" });
+    else this.resetContent();
+    this.loadedScope = scope;
+    this.requestedStudentId = session.currentStudentId || "";
     try {
       const children = await getParentChildren();
       if (ticket !== this.generation) return;
       const student = children.find((child) => child.id === session.currentStudentId) ?? children[0];
       if (!student) {
-        this.setData({ state: "empty", message: "当前账号尚未绑定孩子，请联系俱乐部。", children, student: null });
+        this.generation++;
+        this.resetContent();
+        this.setData({ state: "empty", message: "当前账号尚未绑定孩子，请联系俱乐部。", children, student: null, refreshing: false, nextEvent: null, trainingTotal: null });
         return;
       }
+      if (retaining && student.id !== this.data.student?.id) {
+        ticket = ++this.generation;
+        this.resetContent();
+      }
       setCurrentStudentId(student.id);
-      this.setData({ state: "ready", message: "", children, student,
+      this.requestedStudentId = student.id;
+      this.setData({ state: "ready", message: "", refreshing: false, children, student,
         teamLabel: student.teams.filter(Boolean).join(" · ") || "队伍待同步" });
       void this.loadGrowth(ticket, student);
       void this.loadNews(ticket);
@@ -125,24 +142,43 @@ Page({
       await Promise.all([this.loadTraining(ticket, student), this.loadCalendar(ticket, student)]);
     } catch (error) {
       if (ticket !== this.generation) return;
-      this.setData({ state: "error", message: (error as { message?: string }).message || "球员档案暂时无法读取，请重试。" });
+      const message = (error as { message?: string }).message || "球员档案暂时无法读取，请重试。";
+      if (retaining) this.setData({ refreshing: false, refreshMessage: `刷新失败，当前显示上次读取的内容。${message}` });
+      else this.setData({ state: "error", message });
     }
+  },
+  resetContent() {
+    this.setData({
+      state: "loading", message: "正在读取球员档案", student: null,
+      showChildren: false, editingShortcuts: false, refreshing: false, refreshMessage: "",
+      calendarLoaded: false, growthLoaded: false, presentationLoaded: false,
+      children: [], teamLabel: "", banner: null, clubTitle: "天才足球俱乐部",
+      shortcuts: defaultParentShortcuts, shortcutOptions: [],
+      trainingTotal: null, trainingState: "loading", trainingMessage: "",
+      nextEvent: null, nextEventTime: "", nextEventType: "",
+      calendarState: "loading", calendarMessage: "", nextEventHeading: "下一项活动",
+      growthState: "loading", growthMessage: "", milestoneCount: "—",
+      milestoneTitle: "成长正在发生", milestoneDescription: "完成训练和测评后，成长记录会在这里更新。",
+      milestoneDate: "", latestGrowthText: "成长正在发生",
+      newsState: "loading", newsMessage: "", news: null,
+      presentationState: "loading", contentMessage: "",
+    });
   },
   async loadTraining(ticket: number, student: StudentSummary) {
     const request = ++this.trainingRequest;
-    this.setData({ trainingState: "loading", trainingMessage: "", trainingTotal: null });
+    this.setData({ trainingState: "loading", trainingMessage: "" });
     try {
       const training = await getTrainingRecords(student.id);
       if (ticket !== this.generation || request !== this.trainingRequest || student.id !== this.data.student?.id) return;
       this.setData({ trainingState: "ready", trainingTotal: training.total });
     } catch (error) {
       if (ticket !== this.generation || request !== this.trainingRequest) return;
-      this.setData({ trainingState: "error", trainingMessage: (error as Error).message || "训练累计暂时无法读取，请重试。" });
+      this.setData({ trainingState: "error", trainingMessage: `${this.data.trainingTotal === null ? "" : "刷新失败，当前显示上次读取的累计。"}${(error as Error).message || "训练累计暂时无法读取，请重试。"}` });
     }
   },
   async loadCalendar(ticket: number, student: StudentSummary) {
     const request = ++this.calendarRequest;
-    this.setData({ calendarState: "loading", calendarMessage: "", nextEvent: null, nextEventTime: "" });
+    this.setData({ calendarState: "loading", calendarMessage: "" });
     try {
       const events = await getParentCalendar();
       if (ticket !== this.generation || request !== this.calendarRequest || student.id !== this.data.student?.id) return;
@@ -155,13 +191,13 @@ Page({
         const aStart = Date.parse(a.startsAt), bStart = Date.parse(b.startsAt);
         return Number(aStart > now) - Number(bStart > now) || aStart - bStart || a.id.localeCompare(b.id);
       })[0] ?? null;
-      this.setData({ calendarState: "ready", nextEvent,
+      this.setData({ calendarState: "ready", calendarLoaded: true, nextEvent,
         nextEventHeading: nextEvent && Date.parse(nextEvent.startsAt) <= now ? "进行中的活动" : "下一项活动",
         nextEventType: nextEvent ? activityTypeLabel(nextEvent.type) : "",
         nextEventTime: nextEvent ? `${formatCalendarDate(nextEvent.startsAt, true)} · ${formatTimeRange(nextEvent.startsAt, nextEvent.endsAt)}` : "" });
     } catch (error) {
       if (ticket !== this.generation || request !== this.calendarRequest) return;
-      this.setData({ calendarState: "error", calendarMessage: (error as Error).message || "活动安排暂时无法读取，请重试。" });
+      this.setData({ calendarState: "error", calendarMessage: `${this.data.calendarLoaded ? "刷新失败，当前显示上次读取的安排。" : ""}${(error as Error).message || "活动安排暂时无法读取，请重试。"}` });
     }
   },
   retryTraining() {
@@ -182,6 +218,7 @@ Page({
         : "";
       this.setData({
         growthState: "ready",
+        growthLoaded: true,
         milestoneCount: growth.milestonesAvailable
           ? String(growth.milestones.length)
           : "—",
@@ -240,6 +277,7 @@ Page({
       );
       this.setData({
         presentationState: "ready",
+        presentationLoaded: true,
         contentMessage: "",
         clubTitle: presentation?.branding?.name || "天才足球俱乐部",
         banner: presentation?.banners[0] ?? null,
@@ -250,7 +288,7 @@ Page({
       if (ticket !== this.generation) return;
       this.setData({
         presentationState: "error",
-        contentMessage: "俱乐部展示配置暂时无法读取，请稍后重试。",
+        contentMessage: `${this.data.presentationLoaded ? "配置刷新失败，当前显示上次读取的内容。" : ""}俱乐部展示配置暂时无法读取，请稍后重试。`,
       });
     }
   },
@@ -312,7 +350,7 @@ Page({
     );
   },
   editShortcuts() {
-    if (this.data.state !== "ready" || this.data.presentationState !== "ready")
+    if (this.data.state !== "ready" || !this.data.presentationLoaded)
       return;
     const draft = [...this.data.shortcuts];
     this.setData({

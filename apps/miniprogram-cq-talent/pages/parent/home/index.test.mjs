@@ -227,7 +227,7 @@ describe("CQ-12 current and next activity", () => {
     p.retryCalendar(); await vi.waitFor(() => expect(p.data.calendarState).toBe("ready"));
     expect(mocks.records).toHaveBeenCalledTimes(1); expect(mocks.children).toHaveBeenCalledTimes(1);
   });
-  it("clears old facts on refresh and ignores a late calendar response for the previous child", async () => {
+  it("ignores a late calendar refresh after selecting another child", async () => {
     const p = page(); await p.load(); const old = deferred(); mocks.calendar.mockReturnValueOnce(old.promise);
     const refresh = p.load(); await vi.waitFor(() => expect(p.data.calendarState).toBe("loading"));
     expect(p.data.nextEvent).toBeNull();
@@ -244,12 +244,78 @@ describe("CQ-12 current and next activity", () => {
     expect(p.data.nextEvent.id).toBe("latest");
     const pending = deferred(); mocks.records.mockReturnValueOnce(pending.promise); p.retryTraining(); p.onUnload();
     pending.resolve({ total: 99, records: [] }); await pending.promise;
-    expect(p.data.trainingTotal).toBeNull();
+    expect(p.data.trainingTotal).toBe(12);
   });
   it("binds separate retry and loading states and limits leave wording to training", () => {
     const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
     expect(template).toContain('bindtap="retryTraining"'); expect(template).toContain('bindtap="retryCalendar"');
-    expect(template).toContain("trainingState === 'ready' ? trainingTotal : '—'");
+    expect(template).toContain("trainingTotal !== null ? trainingTotal : '—'");
     expect(template).toContain("nextEvent.type === 'training' ? '查看训练与请假' : '查看活动详情'");
+  });
+});
+
+
+describe("CQ-12 same-context background refresh", () => {
+  it("keeps rendered facts on onShow while refreshing children and independent modules", async () => {
+    mocks.calendar.mockResolvedValue([activity("cached", "match", 10, 20)]);
+    const p = page(); await p.load();
+    const children = deferred(), records = deferred(), calendar = deferred();
+    mocks.children.mockReturnValueOnce(children.promise); mocks.records.mockReturnValueOnce(records.promise); mocks.calendar.mockReturnValueOnce(calendar.promise);
+    p.onShow();
+    expect(p.data).toMatchObject({ state:"ready", refreshing:true, student:{id:"b"}, trainingTotal:12, nextEvent:{id:"cached"},calendarLoaded:true,growthLoaded:true });
+    p.openNextEvent(); expect(mocks.open).toHaveBeenCalledWith("/pages/parent/event/index?id=cached&studentId=b");
+    children.resolve([{id:"b",name:"乙",teams:["U10"]}]);
+    await vi.waitFor(()=>expect(mocks.records).toHaveBeenCalledTimes(2));
+    expect(p.data).toMatchObject({state:"ready",trainingState:"loading",trainingTotal:12,calendarState:"loading",nextEvent:{id:"cached"}});
+    records.resolve({total:13,records:[]});calendar.resolve([activity("updated","other",5,20)]);
+    await vi.waitFor(()=>expect(p.data.nextEvent?.id).toBe("updated")); expect(p.data.trainingTotal).toBe(13);
+  });
+  it("preserves all cached content when profile refresh fails and supports a subsequent retry", async () => {
+    mocks.calendar.mockResolvedValue([activity("cached","training",10,20)]);
+    const p=page();await p.load();mocks.children.mockRejectedValueOnce(new Error("档案服务离线"));await p.load();
+    expect(p.data).toMatchObject({state:"ready",refreshing:false,student:{id:"b"},trainingTotal:12,nextEvent:{id:"cached"},calendarLoaded:true});
+    expect(p.data.refreshMessage).toContain("上次读取的内容");expect(p.data.refreshMessage).toContain("档案服务离线");
+    p.retry();await vi.waitFor(()=>expect(p.data.refreshMessage).toBe(""));await vi.waitFor(()=>expect(mocks.records).toHaveBeenCalledTimes(2));
+  });
+  it("preserves real zero totals and cached activity after module refresh failures", async () => {
+    mocks.records.mockResolvedValue({total:0,records:[]});mocks.calendar.mockResolvedValue([activity("cached","match",10,20)]);
+    mocks.growth.mockResolvedValue({milestonesAvailable:true,milestones:[{title:"已确认",date:"2026-10-01"}]});
+    mocks.news.mockResolvedValue([{id:"notice",title:"原有动态",category:"notice"}]);
+    const p=page();await p.load();
+    mocks.records.mockRejectedValueOnce(new Error("累计离线"));mocks.calendar.mockRejectedValueOnce(new Error("日历离线"));
+    mocks.growth.mockRejectedValueOnce(new Error("成长离线"));mocks.news.mockRejectedValueOnce(new Error("动态离线"));mocks.presentation.mockRejectedValueOnce(new Error("配置离线"));
+    await p.load();await vi.waitFor(()=>expect(p.data.presentationState).toBe("error"));
+    expect(p.data).toMatchObject({state:"ready",trainingState:"error",trainingTotal:0,calendarState:"error",calendarLoaded:true,nextEvent:{id:"cached"},growthLoaded:true,milestoneCount:"1",news:{id:"notice"},presentationLoaded:true});
+    expect(p.data.trainingMessage).toContain("上次读取的累计");expect(p.data.calendarMessage).toContain("上次读取的安排");
+    p.editShortcuts();expect(p.data.editingShortcuts).toBe(true);
+    p.retryCalendar();await vi.waitFor(()=>expect(p.data.calendarState).toBe("ready"));expect(p.data.calendarMessage).toBe("");
+  });
+  it("preserves a known empty calendar on refresh failure without inventing an activity",async()=>{
+    const p=page();await p.load();mocks.calendar.mockRejectedValueOnce(new Error("离线"));await p.load();
+    expect(p.data).toMatchObject({state:"ready",calendarLoaded:true,nextEvent:null,calendarState:"error"});expect(p.data.calendarMessage).toContain("上次读取的安排");
+  });
+  it("clears old child facts synchronously before waiting for the new profile",async()=>{
+    mocks.calendar.mockResolvedValue([activity("cached","training",10,20)]);
+    const p=page();await p.load();const children=deferred();mocks.children.mockReturnValueOnce(children.promise);
+    mocks.session.mockReturnValue({role:"parent",currentStudentId:"a"});const switched=p.load();
+    expect(p.data).toMatchObject({state:"loading",student:null,trainingTotal:null,nextEvent:null,calendarLoaded:false,growthLoaded:false});
+    children.resolve([{id:"a",name:"甲",teams:[]}]);await switched;expect(p.data.student.id).toBe("a");
+  });
+  it.each(["clubId","clientId","userId"])("clears cached content when %s changes even for the same child",async field=>{
+    const identity={role:"parent",currentStudentId:"b",clubId:"club-1",clientId:"client-1",userId:"user-1",token:"token-1"};mocks.session.mockReturnValue(identity);
+    const p=page();await p.load();const children=deferred();mocks.children.mockReturnValueOnce(children.promise);mocks.session.mockReturnValue({...identity,[field]:"new"});
+    const changed=p.load();expect(p.data).toMatchObject({state:"loading",student:null,trainingTotal:null,nextEvent:null,presentationLoaded:false});children.resolve([]);await changed;
+  });
+  it("ignores delayed refresh success and failure after a child switch",async()=>{
+    const p=page();await p.load();const records=deferred(),calendar=deferred();mocks.records.mockReturnValueOnce(records.promise);mocks.calendar.mockReturnValueOnce(calendar.promise);
+    const old=p.load();await vi.waitFor(()=>expect(mocks.calendar).toHaveBeenCalledTimes(2));
+    mocks.session.mockReturnValue({role:"parent",currentStudentId:"a"});mocks.records.mockResolvedValueOnce({total:3,records:[]});mocks.calendar.mockResolvedValueOnce([activity("new-child","match",10,20,{childIds:["a"]})]);await p.load();
+    records.resolve({total:99,records:[]});calendar.reject(new Error("旧孩子错误"));await old;
+    expect(p.data).toMatchObject({student:{id:"a"},trainingTotal:3,nextEvent:{id:"new-child"},trainingState:"ready",calendarState:"ready",calendarMessage:""});
+  });
+  it("does not duplicate first load on onShow, but invalidates it when identity changes",async()=>{
+    const children=deferred();mocks.children.mockReturnValueOnce(children.promise);const p=page();const first=p.load();p.onShow();expect(mocks.children).toHaveBeenCalledTimes(1);
+    mocks.session.mockReturnValue({role:"parent",currentStudentId:"a",userId:"new-user"});p.onShow();await vi.waitFor(()=>expect(p.data.student?.id).toBe("a"));
+    children.resolve([{id:"b",name:"旧账号孩子",teams:[]}]);await first;expect(p.data.student.id).toBe("a");
   });
 });

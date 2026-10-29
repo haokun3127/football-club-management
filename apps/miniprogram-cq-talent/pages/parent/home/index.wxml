@@ -3,23 +3,25 @@
   <view class="home-body">
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'empty' ? '等待开启成长旅程' : state === 'error' ? '暂时无法读取' : '读取球员档案'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
     <block wx:if="{{state === 'ready'}}">
+      <view wx:if="{{refreshing}}" class="configuration-message">正在更新首页…</view>
+      <view wx:if="{{refreshMessage}}" class="configuration-message"><text>{{refreshMessage}}</text><t-button bindtap="retry" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">重试刷新</t-button></view>
       <student-switcher wx:if="{{showChildren}}" students="{{children}}" selected-id="{{student.id}}" show-all="{{false}}" bindchange="switchChild" />
           <view class="player-card">
             <view class="player-heading"><text class="player-name">{{student.name}}</text><t-button class="child-button" bindtap="toggleChildren" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="child-button" theme="primary" variant="text">切换孩子</t-button></view>
             <view class="player-team">{{teamLabel}}</view>
             <view class="player-metrics">
-              <view><view class="metric-label">训练累计</view><view class="metric-value">{{trainingState === 'ready' ? trainingTotal : '—'}}<text wx:if="{{trainingState === 'ready'}}" class="metric-unit">次</text></view></view>
-              <view><view class="metric-label">成长里程碑</view><view class="metric-value">{{growthState === 'ready' ? milestoneCount : '—'}}</view></view>
+              <view><view class="metric-label">训练累计</view><view class="metric-value">{{trainingTotal !== null ? trainingTotal : '—'}}<text wx:if="{{trainingTotal !== null}}" class="metric-unit">次</text></view></view>
+              <view><view class="metric-label">成长里程碑</view><view class="metric-value">{{growthLoaded ? milestoneCount : '—'}}</view></view>
             </view>
           </view>
-      <view wx:if="{{trainingState === 'loading'}}" class="configuration-message">正在读取训练累计…</view>
+      <view wx:if="{{trainingState === 'loading'}}" class="configuration-message">{{trainingTotal === null ? '正在读取训练累计…' : '正在更新训练累计…'}}</view>
       <view wx:if="{{trainingState === 'error'}}" class="configuration-message"><text>{{trainingMessage}}</text><t-button bindtap="retryTraining" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">重试累计</t-button></view>
       <view class="section-heading"><view>{{nextEventHeading}}</view><t-button class="text-button" bindtap="openSchedule" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="text-button" theme="primary" variant="text">全部日程</t-button></view>
-      <view wx:if="{{calendarState === 'loading'}}" class="next-event"><view class="next-event-meta">正在读取活动安排…</view></view>
-      <view wx:elif="{{calendarState === 'error'}}" class="next-event"><view class="next-event-meta">{{calendarMessage}}</view><t-button bindtap="retryCalendar" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">重试安排</t-button></view>
-      <view wx:elif="{{nextEvent}}" class="next-event" bindtap="openNextEvent" role="button" aria-label="查看{{student.name}}的{{nextEventType}}详情"><view class="next-event-title">{{nextEventType}} · {{nextEvent.title}}</view><view class="next-event-time">{{nextEventTime}}</view><view class="next-event-meta">{{student.name}} · {{nextEvent.teamName || teamLabel}} · {{nextEvent.venue || '场地尚未安排'}}</view><view class="next-event-link">{{nextEvent.type === 'training' ? '查看训练与请假' : '查看活动详情'}} ›</view></view>
-      <view wx:else class="next-event"><view class="next-event-title">暂无进行中或接下来的活动</view><view class="next-event-meta">有新安排时，可在日程中查看。</view></view>
-      <view class="shortcut-heading"><text>常用功能</text><t-button class="text-button" bindtap="editShortcuts" disabled="{{presentationState !== 'ready'}}" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="text-button" theme="primary" variant="text">调整入口</t-button></view>
+      <view wx:if="{{calendarState === 'loading'}}" class="configuration-message"><view class="next-event-meta">{{calendarLoaded ? '正在更新活动安排…' : '正在读取活动安排…'}}</view></view>
+      <view wx:if="{{calendarState === 'error'}}" class="next-event"><view class="next-event-meta">{{calendarMessage}}</view><t-button bindtap="retryCalendar" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">重试安排</t-button></view>
+      <view wx:if="{{calendarLoaded && nextEvent}}" class="next-event" bindtap="openNextEvent" role="button" aria-label="查看{{student.name}}的{{nextEventType}}详情"><view class="next-event-title">{{nextEventType}} · {{nextEvent.title}}</view><view class="next-event-time">{{nextEventTime}}</view><view class="next-event-meta">{{student.name}} · {{nextEvent.teamName || teamLabel}} · {{nextEvent.venue || '场地尚未安排'}}</view><view class="next-event-link">{{nextEvent.type === 'training' ? '查看训练与请假' : '查看活动详情'}} ›</view></view>
+      <view wx:elif="{{calendarLoaded}}" class="next-event"><view class="next-event-title">暂无进行中或接下来的活动</view><view class="next-event-meta">有新安排时，可在日程中查看。</view></view>
+      <view class="shortcut-heading"><text>常用功能</text><t-button class="text-button" bindtap="editShortcuts" disabled="{{!presentationLoaded}}" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="text-button" theme="primary" variant="text">调整入口</t-button></view>
       <view wx:if="{{contentMessage}}" class="configuration-message"><text>{{contentMessage}}</text><t-button class="inline-retry" catchtap="retryContent" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="inline-retry" theme="primary" variant="text">重试</t-button></view>
       <view class="shortcuts"><t-button wx:for="{{shortcuts}}" wx:key="key" class="shortcut" data-key="{{item.key}}" bindtap="openShortcut" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="shortcut" theme="default" variant="text"><view class="shortcut-icon"><image src="/assets/icons/{{item.icon}}" mode="aspectFit" /></view><text class="shortcut-label">{{item.label}}</text></t-button></view>
       <view wx:if="{{editingShortcuts}}" class="shortcut-editor">
@@ -30,15 +32,17 @@
         <view class="editor-actions"><t-button bindtap="cancelShortcuts" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">取消</t-button><t-button class="editor-save" bindtap="saveShortcuts" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="editor-save" theme="primary" variant="base">保存入口</t-button></view>
       </view>
 
+      <view wx:if="{{newsState === 'error' && (news || banner)}}" class="configuration-message"><text>动态刷新失败，当前显示上次读取的内容。{{newsMessage}}</text><t-button catchtap="retryNews" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">重试动态</t-button></view>
+      <view wx:if="{{growthState === 'error'}}" class="configuration-message"><text>{{growthLoaded ? '成长统计刷新失败，当前显示上次读取的内容。' : ''}}{{growthMessage}}</text><t-button catchtap="retryGrowth" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">重试成长统计</t-button></view>
       <view class="club-banner" bindtap="openNews" role="button" aria-label="查看俱乐部动态">
         <image class="club-banner-image" src="{{banner ? banner.imageUrl : '/assets/content/football-editorial.jpg'}}" mode="aspectFill" />
         <view class="club-banner-scrim" aria-hidden="true"></view>
         <view class="club-banner-copy"><view class="eyebrow">俱乐部动态</view><view class="club-banner-title"><view>把热爱</view><view>留在球场</view></view>
-          <block wx:if="{{newsState === 'error' && !banner}}">
+          <block wx:if="{{newsState === 'error' && !banner && !news}}">
             <view class="club-banner-subtitle">{{newsMessage}}</view>
             <t-button class="module-retry" catchtap="retryNews" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="module-retry" theme="primary" variant="text">重试</t-button>
           </block>
-          <view wx:else class="club-banner-subtitle">{{banner ? banner.name : newsState === 'loading' ? '正在获取俱乐部动态…' : news ? news.title : '了解我们的俱乐部'}}</view>
+          <view wx:else class="club-banner-subtitle">{{banner ? banner.name : news ? news.title : newsState === 'loading' ? '正在获取俱乐部动态…' : '了解我们的俱乐部'}}</view>
         </view>
       </view>
 

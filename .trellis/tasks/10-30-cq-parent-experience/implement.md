@@ -16,7 +16,7 @@
 
 ### 批次1：首页安排与累计
 
-- 孩子档案读取后即可使用页面；训练累计和安排独立 loading/ready/error、独立重试。读取/刷新清旧累计和活动，未知显示“—”，真实0保留0。
+- 孩子档案读取后即可使用页面；训练累计和安排独立 loading/ready/error、独立重试。首次/身份或孩子变化清旧累计和活动，未知显示“—”，真实0保留0。同范围返回改为保留内容后台刷新（批次3修正初版每次清空的缺口）。
 - 进行中优先，随后按实际时间选择训练/正式比赛/其他；排除取消/完成/已结束及其他孩子。显示类型、完整年月日、孩子、地点；训练卡保留请假语义，其他活动进入普通详情。
 - 请求归页面实例，整页 generation + 累计/日历各自 request identity；拒绝旧孩子、旧重试和 unload 后响应。现有 Banner、四入口编辑、球员卡、里程碑统计和咨询入口保留。
 - `PATH=/opt/homebrew/opt/node@24/bin:$PATH corepack pnpm install --frozen-lockfile`：pnpm10.33.0成功，锁文件未变。初次沙箱网络受限，获批后完成锁定安装。
@@ -40,3 +40,16 @@
 - 最终家长页回归：`corepack pnpm --filter @football-club/miniprogram-cq-talent exec vitest run pages/parent`，28文件/205项通过；最终typecheck与diff空白检查通过。
 - trellis-check已按变更范围自查，无共享DTO/API/schema/公共组件变更。trellis-update-spec结论：共享规范由总控所有，建议已在本记录上段给出，不自行修改共享规范。
 - 下一步：总控读取本分支两个提交，固定版本审计/集成，在主目录官方整包编译及检查首页、训练/比赛/其他详情、双孩子与返回流程。CQ-20未开始；任务保持in_progress，不归档、不push/deploy/微信上传。
+
+
+### 批次3：同范围返回保留内容的独立修复
+
+2026-10-30，总控审阅指出批次1的`onShow → load`及模块读取无条件清值，未满足同范围后台刷新验收。本补丁基于`445d4ed5`，保持`onShow`刷新，不以停止读取掩盖问题。
+
+- 同俱乐部/client/用户/角色且同孩子：档案请求期间保持`state=ready`，保留球员、累计、安排、里程碑、动态及展示配置；模块读取也不清已知值。第一次成功读取的标志与请求loading/error分开，WXML在刷新和失败时仍展示缓存事实，包括真实0和已知空日历。
+- 档案刷新失败显示“当前显示上次读取的内容”并提供重试；累计/日历及辅助模块失败有各自提示，保留可用旧内容和独立重试。配置刷新失败仍可使用已有四入口配置能力。
+- 首次或身份/孩子变化同步清空旧事实，随后读新范围。初载`onShow`不重复发同范围请求；即便初载尚未完成，身份/孩子变化也会启动新请求，旧响应失效。授权孩子列表回读若删除原孩子或变空，同样清旧并使旧模块响应失效。
+- 回归包含：同孩子`onShow`保留与成功更新；档案失败/重试；累计真实0及安排/成长/动态/展示失败保留；已知空日历失败；换孩子立即清旧；club/client/user变化；旧刷新成功/失败不覆盖新孩子；初载身份变化。原迟到重试与unload保护保留。
+- 实际检查：`PATH=/opt/homebrew/opt/node@24/bin:$PATH corepack pnpm --filter @football-club/miniprogram-cq-talent exec vitest run pages/parent/home/index.test.mjs`：34项通过；`... exec vitest run pages/parent`：28文件/215项通过；`... test`：97文件/721通过/1既有跳过，exit 0（本地监听所需权限下运行）；`... typecheck`及`git diff --check`通过。
+- trellis-check已对照本次需求审查diff。共享spec建议补充：保留同范围缓存事实与请求状态分开；上下文变化才丢弃缓存；缓存为空、未知、真实0各自独立。仍由总控统一维护共享spec。
+- 原生渲染、触控和返回现场仍待总控在主目录验证；本线程未导入worktree、未上传/部署。仅改home控制器/模板/测试与本记录，CQ-20未开始。
