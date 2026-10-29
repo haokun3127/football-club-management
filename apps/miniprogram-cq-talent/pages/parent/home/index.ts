@@ -18,6 +18,7 @@ import type {
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import {
+  activityTypeLabel,
   formatCalendarDate,
   formatTimeRange,
 } from "../../../utils/presentation";
@@ -30,8 +31,6 @@ import type {
   StudentSummary,
 } from "../../../utils/types";
 
-let generation = 0;
-
 function formatMilestoneDate(value: string): string {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return "";
@@ -42,13 +41,22 @@ function formatMilestoneDate(value: string): string {
 type ModuleState = "loading" | "ready" | "error";
 
 Page({
+  generation: 0,
+  trainingRequest: 0,
+  calendarRequest: 0,
   data: {
     state: "loading" as LoadState,
     message: "正在读取球员档案",
     children: [] as StudentSummary[],
     student: null as StudentSummary | null,
     showChildren: false,
-    trainingTotal: 0,
+    trainingTotal: null as number | null,
+    trainingState: "loading" as ModuleState,
+    trainingMessage: "",
+    calendarState: "loading" as ModuleState,
+    calendarMessage: "",
+    nextEventHeading: "下一项活动",
+    nextEventType: "",
     playerSlide: 0,
     milestoneDate: "",
     latestGrowthText: "成长正在发生",
@@ -83,94 +91,90 @@ Page({
     if (session && this.data.state !== "loading") void this.load();
   },
   onUnload() {
-    generation++;
+    this.generation++;
   },
-  /**
-   * L-02 分块呈现：核心 = 孩子列表/球员卡（含训练累计）+ 下一次训练；核心就绪即渲染主体。
-   * 辅助 = 成长统计（growthState）、新闻/文章（newsState）、俱乐部展示（presentationState），
-   * 与核心请求同时并行发出（并发上限不变），各自独立呈现、独立重试，失败只影响本模块。
-   */
+  /** 孩子档案就绪即可操作；安排、累计、成长和展示各自读取与重试。 */
   async load() {
     const session = requireRole("parent");
     if (!session) return;
-    const ticket = ++generation;
+    const ticket = ++this.generation;
     this.setData({
-      state: "loading",
-      message: "正在读取球员档案",
-      showChildren: false,
-      editingShortcuts: false,
-      growthState: "loading",
-      growthMessage: "",
-      newsState: "loading",
-      newsMessage: "",
-      presentationState: "loading",
-      contentMessage: "",
+      state: "loading", message: "正在读取球员档案", student: null,
+      showChildren: false, editingShortcuts: false,
+      trainingTotal: null, trainingState: "loading", trainingMessage: "",
+      nextEvent: null, nextEventTime: "", nextEventType: "",
+      calendarState: "loading", calendarMessage: "", nextEventHeading: "下一项活动",
+      growthState: "loading", growthMessage: "", milestoneCount: "—",
+      newsState: "loading", newsMessage: "", news: null,
+      presentationState: "loading", contentMessage: "",
     });
     try {
       const children = await getParentChildren();
-      if (ticket !== generation) return;
-      const student =
-        children.find((child) => child.id === session.currentStudentId) ??
-        children[0];
+      if (ticket !== this.generation) return;
+      const student = children.find((child) => child.id === session.currentStudentId) ?? children[0];
       if (!student) {
-        this.setData({
-          state: "empty",
-          message: "当前账号尚未绑定孩子，请联系俱乐部。",
-          children,
-          student: null,
-        });
+        this.setData({ state: "empty", message: "当前账号尚未绑定孩子，请联系俱乐部。", children, student: null });
         return;
       }
       setCurrentStudentId(student.id);
-      const core = Promise.all([
-        getTrainingRecords(student.id),
-        getParentCalendar(),
-      ]).then((results) => {
-        const training = results[0];
-        const events = results[1];
-        if (ticket !== generation) return;
-        const nextEvent =
-          events
-            .filter(
-              (event) =>
-                event.type === "training" &&
-                event.status !== "cancelled" &&
-                Date.parse(event.startsAt) > Date.now() &&
-                event.childIds?.includes(student.id),
-            )
-            .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] ?? null;
-        this.setData({
-          state: "ready",
-          message: "",
-          children,
-          student,
-          teamLabel: student.teams.filter(Boolean).join(" · ") || "队伍待同步",
-          trainingTotal: training.total,
-          nextEvent,
-          nextEventTime: nextEvent
-            ? `${formatCalendarDate(nextEvent.startsAt, true)} · ${formatTimeRange(nextEvent.startsAt, nextEvent.endsAt)}`
-            : "",
-        });
-      });
+      this.setData({ state: "ready", message: "", children, student,
+        teamLabel: student.teams.filter(Boolean).join(" · ") || "队伍待同步" });
       void this.loadGrowth(ticket, student);
       void this.loadNews(ticket);
       void this.loadPresentation(ticket);
-      await core;
+      await Promise.all([this.loadTraining(ticket, student), this.loadCalendar(ticket, student)]);
     } catch (error) {
-      if (ticket !== generation) return;
-      this.setData({
-        state: "error",
-        message:
-          (error as { message?: string }).message ||
-          "球员档案暂时无法读取，请重试。",
-      });
+      if (ticket !== this.generation) return;
+      this.setData({ state: "error", message: (error as { message?: string }).message || "球员档案暂时无法读取，请重试。" });
     }
+  },
+  async loadTraining(ticket: number, student: StudentSummary) {
+    const request = ++this.trainingRequest;
+    this.setData({ trainingState: "loading", trainingMessage: "", trainingTotal: null });
+    try {
+      const training = await getTrainingRecords(student.id);
+      if (ticket !== this.generation || request !== this.trainingRequest || student.id !== this.data.student?.id) return;
+      this.setData({ trainingState: "ready", trainingTotal: training.total });
+    } catch (error) {
+      if (ticket !== this.generation || request !== this.trainingRequest) return;
+      this.setData({ trainingState: "error", trainingMessage: (error as Error).message || "训练累计暂时无法读取，请重试。" });
+    }
+  },
+  async loadCalendar(ticket: number, student: StudentSummary) {
+    const request = ++this.calendarRequest;
+    this.setData({ calendarState: "loading", calendarMessage: "", nextEvent: null, nextEventTime: "" });
+    try {
+      const events = await getParentCalendar();
+      if (ticket !== this.generation || request !== this.calendarRequest || student.id !== this.data.student?.id) return;
+      const now = Date.now();
+      const nextEvent = events.filter(event => {
+        const start = Date.parse(event.startsAt), end = Date.parse(event.endsAt || "");
+        return event.childIds?.includes(student.id) && event.status !== "cancelled" && event.status !== "completed"
+          && Number.isFinite(start) && (start > now || end > now || (!Number.isFinite(end) && event.status === "in_progress"));
+      }).sort((a, b) => {
+        const aStart = Date.parse(a.startsAt), bStart = Date.parse(b.startsAt);
+        return Number(aStart > now) - Number(bStart > now) || aStart - bStart || a.id.localeCompare(b.id);
+      })[0] ?? null;
+      this.setData({ calendarState: "ready", nextEvent,
+        nextEventHeading: nextEvent && Date.parse(nextEvent.startsAt) <= now ? "进行中的活动" : "下一项活动",
+        nextEventType: nextEvent ? activityTypeLabel(nextEvent.type) : "",
+        nextEventTime: nextEvent ? `${formatCalendarDate(nextEvent.startsAt, true)} · ${formatTimeRange(nextEvent.startsAt, nextEvent.endsAt)}` : "" });
+    } catch (error) {
+      if (ticket !== this.generation || request !== this.calendarRequest) return;
+      this.setData({ calendarState: "error", calendarMessage: (error as Error).message || "活动安排暂时无法读取，请重试。" });
+    }
+  },
+  retryTraining() {
+    if (this.data.state === "ready" && this.data.student) void this.loadTraining(this.generation, this.data.student);
+  },
+  retryCalendar() {
+    if (this.data.state === "ready" && this.data.student) void this.loadCalendar(this.generation, this.data.student);
   },
   async loadGrowth(ticket: number, student: StudentSummary) {
     this.setData({ growthState: "loading", growthMessage: "" });
     try {
       const growth = await getParentGrowth(student.id, student);
-      if (ticket !== generation) return;
+      if (ticket !== this.generation) return;
       const milestone = growth.milestones[0];
       const milestoneTitle = milestone?.title || "成长正在发生";
       const milestoneDate = milestone?.date
@@ -190,7 +194,7 @@ Page({
           : milestoneTitle,
       });
     } catch (error) {
-      if (ticket !== generation) return;
+      if (ticket !== this.generation) return;
       this.setData({
         growthState: "error",
         growthMessage:
@@ -203,7 +207,7 @@ Page({
     this.setData({ newsState: "loading", newsMessage: "" });
     try {
       const articles = await getContentArticles();
-      if (ticket !== generation) return;
+      if (ticket !== this.generation) return;
       this.setData({
         newsState: "ready",
         news:
@@ -212,7 +216,7 @@ Page({
           null,
       });
     } catch (error) {
-      if (ticket !== generation) return;
+      if (ticket !== this.generation) return;
       this.setData({
         newsState: "error",
         newsMessage:
@@ -225,7 +229,7 @@ Page({
     this.setData({ presentationState: "loading", contentMessage: "" });
     try {
       const presentation = await getClubPresentation();
-      if (ticket !== generation) return;
+      if (ticket !== this.generation) return;
       const options = parentShortcutOptions(
         presentation ?? {
           branding: null,
@@ -243,7 +247,7 @@ Page({
         shortcutOptions: options,
       });
     } catch {
-      if (ticket !== generation) return;
+      if (ticket !== this.generation) return;
       this.setData({
         presentationState: "error",
         contentMessage: "俱乐部展示配置暂时无法读取，请稍后重试。",
@@ -256,13 +260,13 @@ Page({
   retryGrowth() {
     const student = this.data.student;
     if (!student || this.data.state !== "ready") return;
-    void this.loadGrowth(generation, student);
+    void this.loadGrowth(this.generation, student);
   },
   retryNews() {
-    if (this.data.state === "ready") void this.loadNews(generation);
+    if (this.data.state === "ready") void this.loadNews(this.generation);
   },
   retryContent() {
-    if (this.data.state === "ready") void this.loadPresentation(generation);
+    if (this.data.state === "ready") void this.loadPresentation(this.generation);
   },
   onSlideChange(event: { detail: { current: number } }) {
     this.setData({ playerSlide: event.detail.current });

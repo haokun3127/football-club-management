@@ -6,7 +6,7 @@ vi.mock("../../../utils/training-records", () => ({ getTrainingRecords: mocks.re
 vi.mock("../../../utils/auth", () => ({ requireRole: mocks.session }));
 vi.mock("../../../utils/store", () => ({ setCurrentStudentId: mocks.select }));
 vi.mock("../../../utils/navigation", () => ({ openPage: mocks.open }));
-vi.mock("../../../utils/presentation", () => ({ formatCalendarDate: () => "2026年10月23日 周五", formatTimeRange: () => "16:30–18:00" }));
+vi.mock("../../../utils/presentation", () => ({ activityTypeLabel: type => ({training:"训练",match:"比赛",other:"俱乐部活动"})[type], formatCalendarDate: () => "2026年10月23日 周五", formatTimeRange: () => "16:30–18:00" }));
 vi.mock("../../../utils/club-presentation", () => ({
  getClubPresentation: mocks.presentation,
  defaultParentShortcuts: [{ key: "leave", label: "请假", path: "/pages/parent/schedule/index" }, { key: "records", label: "训练记录", path: "/pages/parent/training-history/index" }, { key: "results", label: "测评结果", path: "/pages/parent/ability-history/index" }, { key: "service", label: "私教咨询", path: "/pages/parent/private/index" }],
@@ -26,7 +26,7 @@ beforeEach(() => {
 describe("player homepage", () => {
   it("keeps the selected child's identity, real count, and empty milestones together", async () => {
     const p = page(); await p.load();
-    // L-02：load 现在只等待核心（孩子+训练累计+下一次训练）；快捷入口来自独立的俱乐部展示模块，需等其就绪
+    // 展示配置独立读取；等待该模块就绪后检查入口。
     await vi.waitFor(() => expect(p.data.presentationState).toBe("ready"));
     expect(p.data.student.id).toBe("b"); expect(p.data.teamLabel).toBe("U10"); expect(p.data.trainingTotal).toBe(12);
     expect(mocks.records).toHaveBeenCalledWith("b"); expect(p.data.milestoneCount).toBe("—");
@@ -51,10 +51,9 @@ describe("player homepage", () => {
     expect(p.data.milestoneDate).toBe("");
     expect(p.data.latestGrowthText).toBe("成长正在发生");
   });
-  it("fails the whole page only when a core request (training facts) fails", async () => {
-    // L-02：训练累计属于核心模块，核心失败仍整页错误；辅助模块失败不再拖垮整页（见下方分块用例）
+  it("keeps the page usable when training totals fail", async () => {
     mocks.records.mockRejectedValueOnce({ message: "无法读取训练记录" });
-    const p = page(); await p.load(); expect(p.data.state).toBe("error"); expect(p.data.message).toBe("无法读取训练记录");
+    const p = page(); await p.load(); expect(p.data.state).toBe("ready"); expect(p.data.trainingState).toBe("error"); expect(p.data.trainingTotal).toBeNull(); expect(p.data.trainingMessage).toBe("无法读取训练记录");
   });
   it("does not let a slower previous child overwrite the newly selected child", async () => {
     let finishOld;
@@ -179,4 +178,78 @@ it("opens the next training with its visible date and explicit selected child",a
  const startsAt=new Date(Date.now()+86400000).toISOString();
  mocks.calendar.mockResolvedValue([{id:"next-course",type:"training",status:"scheduled",title:"训练",startsAt,endsAt:startsAt,childIds:["b"],teamName:"U10",venue:"球场"}]);
  const p=page();await p.load();expect(p.data.nextEventTime).toContain("2026年10月23日");p.openNextEvent();expect(mocks.open).toHaveBeenCalledWith("/pages/parent/event/index?id=next-course&studentId=b");
+});
+
+function activity(id, type, startOffset, endOffset, extra = {}) {
+  const now = Date.now();
+  return { id, type, status: "scheduled", title: id, venue: "球场", childIds: ["b"],
+    startsAt: new Date(now + startOffset * 60000).toISOString(),
+    endsAt: new Date(now + endOffset * 60000).toISOString(), ...extra };
+}
+function deferred() { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no; }); return { promise, resolve, reject }; }
+
+describe("CQ-12 current and next activity", () => {
+  it("selects an earlier match before training and preserves child context", async () => {
+    mocks.calendar.mockResolvedValue([activity("training", "training", 120, 180), activity("match", "match", 60, 90)]);
+    const p = page(); await p.load();
+    expect(p.data.nextEvent.id).toBe("match"); expect(p.data.nextEventType).toBe("比赛");
+    expect(p.data.nextEventHeading).toBe("下一项活动");
+    p.openNextEvent(); expect(mocks.open).toHaveBeenCalledWith("/pages/parent/event/index?id=match&studentId=b");
+  });
+  it.each(["training", "match", "other"])("prefers an ongoing %s and excludes cancelled, completed and other children", async type => {
+    mocks.calendar.mockResolvedValue([
+      activity("cancelled", "training", -60, 60, { status: "cancelled" }),
+      activity("completed", "training", -50, 60, { status: "completed" }),
+      activity("sibling", "match", -40, 60, { childIds: ["a"] }),
+      activity("past", "other", -30, -10), activity("future", "training", 30, 60),
+      activity("ongoing", type, -20, 20),
+    ]);
+    const p = page(); await p.load();
+    expect(p.data.nextEvent.id).toBe("ongoing"); expect(p.data.nextEventHeading).toBe("进行中的活动");
+  });
+  it("keeps calendar ready while totals are pending, then retries only the failed totals", async () => {
+    const old = deferred(); mocks.records.mockReturnValueOnce(old.promise);
+    mocks.calendar.mockResolvedValue([activity("next", "other", 10, 20)]);
+    const p = page(), loading = p.load();
+    await vi.waitFor(() => expect(p.data.calendarState).toBe("ready"));
+    expect(p.data.state).toBe("ready"); expect(p.data.trainingState).toBe("loading"); expect(p.data.trainingTotal).toBeNull();
+    p.openNextEvent(); expect(mocks.open).toHaveBeenCalled();
+    old.reject(new Error("累计失败")); await loading;
+    expect(p.data.trainingState).toBe("error");
+    p.retryTraining(); await vi.waitFor(() => expect(p.data.trainingState).toBe("ready"));
+    expect(p.data.trainingTotal).toBe(12); expect(mocks.calendar).toHaveBeenCalledTimes(1); expect(mocks.children).toHaveBeenCalledTimes(1);
+  });
+  it("keeps real zero totals when calendar fails and retries only the calendar", async () => {
+    mocks.records.mockResolvedValue({ total: 0, records: [] }); mocks.calendar.mockRejectedValueOnce(new Error("日历失败"));
+    const p = page(); await p.load();
+    expect(p.data.trainingState).toBe("ready"); expect(p.data.trainingTotal).toBe(0);
+    expect(p.data.calendarState).toBe("error"); expect(p.data.nextEvent).toBeNull();
+    p.retryCalendar(); await vi.waitFor(() => expect(p.data.calendarState).toBe("ready"));
+    expect(mocks.records).toHaveBeenCalledTimes(1); expect(mocks.children).toHaveBeenCalledTimes(1);
+  });
+  it("clears old facts on refresh and ignores a late calendar response for the previous child", async () => {
+    const p = page(); await p.load(); const old = deferred(); mocks.calendar.mockReturnValueOnce(old.promise);
+    const refresh = p.load(); await vi.waitFor(() => expect(p.data.calendarState).toBe("loading"));
+    expect(p.data.nextEvent).toBeNull();
+    mocks.session.mockReturnValue({ role: "parent", currentStudentId: "a" });
+    mocks.calendar.mockResolvedValueOnce([activity("a-next", "match", 10, 20, { childIds: ["a"] })]);
+    await p.load(); old.resolve([activity("b-old", "training", -10, 20)]); await refresh;
+    expect(p.data.student.id).toBe("a"); expect(p.data.nextEvent.id).toBe("a-next");
+  });
+  it("discards older same-child retries and responses after unload", async () => {
+    const p = page(); await p.load(); const old = deferred(); mocks.calendar.mockReturnValueOnce(old.promise);
+    p.retryCalendar(); mocks.calendar.mockResolvedValueOnce([activity("latest", "other", 10, 20)]);
+    p.retryCalendar(); await vi.waitFor(() => expect(p.data.nextEvent?.id).toBe("latest"));
+    old.resolve([activity("old", "training", -10, 20)]); await old.promise;
+    expect(p.data.nextEvent.id).toBe("latest");
+    const pending = deferred(); mocks.records.mockReturnValueOnce(pending.promise); p.retryTraining(); p.onUnload();
+    pending.resolve({ total: 99, records: [] }); await pending.promise;
+    expect(p.data.trainingTotal).toBeNull();
+  });
+  it("binds separate retry and loading states and limits leave wording to training", () => {
+    const template = readFileSync(new URL("./index.wxml", import.meta.url), "utf8");
+    expect(template).toContain('bindtap="retryTraining"'); expect(template).toContain('bindtap="retryCalendar"');
+    expect(template).toContain("trainingState === 'ready' ? trainingTotal : '—'");
+    expect(template).toContain("nextEvent.type === 'training' ? '查看训练与请假' : '查看活动详情'");
+  });
 });

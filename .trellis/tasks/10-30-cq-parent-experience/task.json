@@ -3,7 +3,7 @@
   "name": "cq-parent-experience",
   "title": "CQ-12 家长安排与成长事实",
   "description": "",
-  "status": "planning",
+  "status": "in_progress",
   "dev_type": null,
   "scope": null,
   "package": "miniprogram",
@@ -12,9 +12,9 @@
   "assignee": "dongjun",
   "createdAt": "2026-10-30",
   "completedAt": null,
-  "branch": null,
+  "branch": "codex/cq-parent-experience",
   "base_branch": "feature/ui-batch-1-p01",
-  "worktree_path": null,
+  "worktree_path": "/Users/dongjun/.codex/worktrees/48af/football-club-management",
   "commit": null,
   "pr_url": null,
   "subtasks": [],
@@ -26,5 +26,7 @@
     "implement.md"
   ],
   "notes": "2026-10-30 user explicitly approved implementation, GPT-6.1-sol threads and independent worktrees; scope in prd/design/implement. Coordinator owns integration and develop delivery.",
-  "meta": {}
+  "meta": {
+    "frozen_baseline": "41f615d7"
+  }
 }
