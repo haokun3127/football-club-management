@@ -89,6 +89,7 @@ export async function registerMatchRoutes(app: FastifyInstance, context: RouteCo
           if (!coach || !(event.ownerCoachId === coach.id || event.primaryTeamId && coachTeamRole(context.store, request.params.clubId, coach.id, event.primaryTeamId))) return context.sendError(reply, 403, "forbidden", "Match is outside coach scope");
         }
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       if (["league", "cup"].includes(request.body.matchType) && (!event.title.trim() || !event.locationId)) return context.sendError(reply, 400, "invalid_match", "Formal match title and venue required");
       const existing = await context.store.getMatchDetailByEvent(request.params.clubId, event.id);
       if (request.body.matchId && request.body.matchId !== existing?.match?.id) return context.sendError(reply, 409, "match_conflict", "Match identity does not belong to this event");

@@ -57,6 +57,7 @@ export async function registerTrainingRecordRoutes(app: FastifyInstance, context
     if (!scope) return reply;
     const event = scope.events.find((item) => item.id === request.params.eventId);
     if (!event) return context.sendError(reply, 403, "forbidden", "Training event is not accessible");
+    if (await context.replayAuthorizedMutation(request, reply)) return reply;
     if (event.status === "cancelled" && request.body.counted) return context.sendError(reply, 409, "cancelled_training", "Cancelled training cannot be counted");
     const participant = event.participants.find((item) => item.studentId === request.params.studentId)!;
     const current = reconcileTrainingRecord(context.store.trainingRecords, event, participant);
@@ -83,6 +84,7 @@ export async function registerTrainingRecordRoutes(app: FastifyInstance, context
     }
     const event = scope.events.find((item) => item.id === request.params.eventId);
     if (!event) return context.sendError(reply, 403, "forbidden", "Training event is not accessible");
+    if (await context.replayAuthorizedMutation(request, reply)) return reply;
     if (event.status === "cancelled") return context.sendError(reply, 409, "cancelled_training", "Cancelled training does not count lessons; leave is not needed");
     const participant = event.participants.find((item) => item.studentId === request.params.studentId)!;
     const onLeave = ["leave_requested", "excused"].includes(participant.status ?? "");

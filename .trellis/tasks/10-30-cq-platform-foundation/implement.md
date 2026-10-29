@@ -83,3 +83,10 @@
 - 第三轮正确断言在本分支先失败：10:00+08(02UTC)的70分排在03UTC新课80分前。
 - SQLite仅按rowid提供稳定追加顺序，再由与内存共用的Date.parse比较器按occurredAt/createdAt实际瞬间排序；不依赖ISO字符串或ID字典序，也不引入SQLite/JS解析器差异。
 - assessment-record-order/workflow/workflow-repository 3文件22项通过；覆盖offset混用、真实课程保存/确认/家长GET、offset库重开、同毫秒、十进制ID边界；API typecheck通过。
+
+### HTTP幂等重放授权修复候选
+- 修复前两个独立探针均重现200越权缓存回放；修复后撤销Bearer为401，移除课程教练授权为403。全局preHandler仅准备指纹，缓存读/重放移至各handler现有身份、角色、对象授权之后；onSend仅记录已到授权检查点的响应。
+- AST枚举53个非后台变更路由注册：48个授权后检查点；4个明确opt-out（登录一次性证明、WPS签名nonce、既有scout自然身份、既有临时名单）；1个退役课时接口认证后410且不读写缓存。后台继续使用既有独立合同。批量发布重放重查当前可编辑/学员范围，模板应用重查所有目标课程计划权限。
+- API typecheck、diff check通过；定向6文件101项通过。新增非课堂课时账本对照：正常同key仅入账一次，撤销管理员角色后403且账本不变；原课堂旧版428零写、CAS/回滚、响应未知重试保留后续95分、环境与比赛重试测试均通过。
+- 用户明确禁止子代理，安全边界调查与候选绕过/兼容性审查在本chat分两遍自行完成。总控固定SHA独立审计仍是发布门禁。完整API测试运行中，随后补最终交付门禁与CQ23点击复验。
+- 保留证据由Codex Security工具写入 /Users/dongjun/.codex/state/plugins/codex-security/scans/football-club-management/artifacts-a14b4a62423579f8d115e7711b9cd487403a0b3764b6798568833d2f33ccea43/artifacts/ ：before.log、focused.log、route-inventory.mjs/txt、replay-review.md。无推送、部署或环境切换。

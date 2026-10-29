@@ -75,6 +75,7 @@ export async function registerTrainingRoutes(app: FastifyInstance, context: Rout
       }
 
       if(!await access(request,reply,request.params.clubId,request.body.eventId,true)||!validPlan(request.params.clubId,request.body.sessionPlanId,reply,request.body.eventId))return reply;
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       return context.store.createTrainingSession(request.params.clubId, request.body);
     },
   );
@@ -98,6 +99,7 @@ export async function registerTrainingRoutes(app: FastifyInstance, context: Rout
       }
 
       if(!await access(request,reply,request.params.clubId,request.body.eventId,true)||!validPlan(request.params.clubId,request.body.sessionPlanId,reply,request.body.eventId))return reply;
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       try {
         const session = await context.store.ensureTrainingSessionForEvent(
           request.params.clubId,
@@ -141,6 +143,7 @@ export async function registerTrainingRoutes(app: FastifyInstance, context: Rout
         if(!coach)return context.sendError(reply,403,"coach_profile_required","缺少教学身份");
         request.body.coachId=coach.id;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       return reply.code(201).send(context.store.recordTrainingObservation(
         request.params.clubId,
         request.params.trainingSessionId,

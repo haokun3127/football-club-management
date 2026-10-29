@@ -45,11 +45,13 @@ export async function registerAssessmentWorkflowRoutes(app: FastifyInstance, con
   app.put<{ Params: Params; Body: { expectedRevision: number; entries: AssessmentEntry[]; reason?: string } }>(`${base}/students/:studentId/entries`, { schema: workflowSchemas.save }, async (request, reply) => {
     const access = await scope(request, reply); if (!access) return reply;
     if (!access.coachId) return context.sendError(reply, 403, "coach_profile_required", "当前账号没有可记录的教练档案");
+    if (await context.replayAuthorizedMutation(request, reply, () => workflow.editable(access.task))) return reply;
     try { return await workflow.save(access.task, request.params.studentId, access.coachId, request.body); } catch (error) { return fail(reply, error); }
   });
   app.post<{ Params: Params; Body: { students: Array<{ studentId: string; expectedRevision: number }> } }>(`${base}/publications`, { schema: workflowSchemas.publish }, async (request, reply) => {
     const access = await scope(request, reply); if (!access) return reply;
     if (!access.coachId) return context.sendError(reply, 403, "coach_profile_required", "当前账号没有可记录的教练档案");
+    if (await context.replayAuthorizedMutation(request, reply, () => workflow.editable(access.task) && request.body.students.every(student => workflow.roster(access.task).includes(student.studentId)))) return reply;
     const results = [];
     for (const student of request.body.students) {
       try {

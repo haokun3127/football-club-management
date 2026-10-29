@@ -61,6 +61,7 @@ export async function registerTrainingTemplateRoutes(app: FastifyInstance, conte
     if (request.body.visibility === "club" && !who.admin) return context.sendError(reply, 403, "forbidden", "仅管理员可发布俱乐部模板");
     try {
       const value = await source(request.params.clubId, request.body, who);
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       if (!value.count || !request.body.title.trim()) return context.sendError(reply, 400, "empty_template", "排除友谊赛后没有可保存的训练内容");
       const now = new Date().toISOString();
       const template = context.store.trainingTemplates.save({ id: randomUUID(), clubId: request.params.clubId, ownerUserId: who.userId, title: request.body.title.trim(), visibility: request.body.visibility, blocks: value.blocks, createdAt: now, updatedAt: now });
@@ -71,6 +72,7 @@ export async function registerTrainingTemplateRoutes(app: FastifyInstance, conte
     const who = await identity(request, reply); if (!who) return reply;
     try {
       const value = await source(request.params.clubId, request.body, who);
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       const candidates = (context.store.listCalendarEvents(request.params.clubId) as CalendarEvent[]).filter(event => event.id !== request.body.sourceEventId && event.type === "training" && event.status === "scheduled" && Date.parse(event.timeRange.startsAt) > Date.now() && who.canPlan(event));
       const targets = await Promise.all(candidates.map(async event => {
         const actual = await context.store.getCalendarEvent(event.id); if (!actual) return null;
@@ -86,6 +88,14 @@ export async function registerTrainingTemplateRoutes(app: FastifyInstance, conte
     const who = await identity(request, reply); if (!who) return reply;
     let value;
     try { value = await source(request.params.clubId, request.body, who); } catch { return context.sendError(reply, 400, "invalid_source", "来源不可用"); }
+    if (await context.replayAuthorizedMutation(request, reply, async () => {
+      for (const target of request.body.targets) {
+        if (target.action === "skip") continue;
+        const event = await context.store.getCalendarEvent(target.eventId);
+        if (!event || !who.canPlan(event)) return false;
+      }
+      return true;
+    })) return reply;
     if (value.revision !== request.body.sourceRevision) return context.sendError(reply, 409, "source_changed", "来源内容已变化，请重新预览");
     if (!value.count) return context.sendError(reply, 400, "empty_content", "排除友谊赛后没有可复制内容");
     if (new Set(request.body.targets.map(target => target.eventId)).size !== request.body.targets.length) return context.sendError(reply, 400, "duplicate_target", "目标课程重复");

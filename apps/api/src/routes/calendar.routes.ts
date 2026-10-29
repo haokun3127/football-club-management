@@ -98,6 +98,7 @@ export async function registerCalendarRoutes(app: FastifyInstance, context: Rout
       if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       return context.store.createCalendarEvent(request.params.clubId, request.body);
     },
@@ -123,6 +124,7 @@ export async function registerCalendarRoutes(app: FastifyInstance, context: Rout
       if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       return context.store.recordEventParticipants(
         request.params.clubId,
@@ -149,6 +151,7 @@ export async function registerCalendarRoutes(app: FastifyInstance, context: Rout
       if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       return context.store.checkScheduleConflicts(request.params.clubId, request.body);
     },

@@ -26,33 +26,15 @@ export function registerHttpRequestContracts(app: FastifyInstance, store: ApiSto
       return;
     }
 
-    await store.pruneHttpIdempotencyRecords(new Date().toISOString());
     const cacheKey = buildIdempotencyCacheKey(request, idempotencyKey);
     const fingerprint = hashStable({
       method: request.method,
       url: request.url,
       body: request.body ?? null,
     });
-    const existing = await store.getHttpIdempotencyRecord(cacheKey);
-
-    if (!existing) {
-      request.idempotency = { cacheKey, fingerprint };
-      return;
-    }
-
-    if (existing.fingerprint !== fingerprint) {
-      reply
-        .code(409)
-        .header("Idempotency-Status", "conflict")
-        .send(apiError("idempotency_conflict", "Idempotency-Key was reused with a different request payload"));
-      return;
-    }
-
-    reply
-      .code(existing.statusCode)
-      .header("Idempotency-Status", "replayed")
-      .type(existing.contentType ?? "application/json")
-      .send(existing.payload);
+    // A fingerprint is not authorization. The route explicitly reaches the
+    // checkpoint after its current identity, role and object-scope guards.
+    request.idempotency = { cacheKey, fingerprint, authorized: false };
   });
 
   app.addHook("onSend", async (request, reply, payload) => {
@@ -68,6 +50,7 @@ export function registerHttpRequestContracts(app: FastifyInstance, store: ApiSto
 
     if (
       request.idempotency
+      && request.idempotency.authorized && !request.idempotency.replayed
       && isMutatingMethod(request.method)
       && reply.statusCode >= 200
       && reply.statusCode < 500
@@ -88,6 +71,31 @@ export function registerHttpRequestContracts(app: FastifyInstance, store: ApiSto
 
     return payload;
   });
+}
+
+/** Call only after all route action-authorization guards, before any mutation. */
+export async function replayAuthorizedMutation(store: ApiStore, request: FastifyRequest, reply: FastifyReply, authorizeCachedResponse?: () => boolean | Promise<boolean>): Promise<boolean> {
+  const state = request.idempotency;
+  if (reply.sent) return true;
+  if (!state) return false;
+  state.authorized = true;
+  await store.pruneHttpIdempotencyRecords(new Date().toISOString());
+  const existing = await store.getHttpIdempotencyRecord(state.cacheKey);
+  if (!existing) return false;
+  state.replayed = true;
+  if (authorizeCachedResponse && !await authorizeCachedResponse()) {
+    state.authorized = false;
+    if (!reply.sent) reply.code(403).send(apiError("forbidden", "Current action scope does not permit this cached response"));
+    return true;
+  }
+  if (existing.fingerprint !== state.fingerprint) {
+    reply.code(409).header("Idempotency-Status", "conflict")
+      .send(apiError("idempotency_conflict", "Idempotency-Key was reused with a different request payload"));
+    return true;
+  }
+  reply.code(existing.statusCode).header("Idempotency-Status", "replayed")
+    .type(existing.contentType ?? "application/json").send(existing.payload);
+  return true;
 }
 
 function applyPrivateCacheHeaders(request: FastifyRequest, reply: FastifyReply) {
@@ -163,6 +171,8 @@ declare module "fastify" {
     idempotency?: {
       cacheKey: string;
       fingerprint: string;
+      authorized: boolean;
+      replayed?: boolean;
     };
   }
 }

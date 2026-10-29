@@ -19,6 +19,7 @@ export async function registerCoachAssignmentRoutes(app:FastifyInstance,context:
     if(!await context.requireClubRole(request,reply,clubId,["admin"]))return reply;
     const team=context.store.listTeams(clubId).find(item=>item.id===teamId);
     if(!team||!context.store.listCoaches(clubId).some(item=>item.id===coachId))return context.sendError(reply,404,"not_found","队伍或教练不存在");
+    if (await context.replayAuthorizedMutation(request, reply)) return reply;
     if(team.defaultCoachId===coachId)return context.sendError(reply,409,"default_coach_assignment","默认主教练请在队伍资料中调整");
     const previous=context.store.listCoachAssignments(clubId).find(item=>item.teamId===teamId&&item.coachId===coachId);
     if((previous?.role??null)!==request.body.expectedRole)return context.sendError(reply,409,"assignment_conflict","教练授权已变化，请刷新后核对");

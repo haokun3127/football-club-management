@@ -3,6 +3,7 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { resolveAvailableAppRoles } from "../auth/app-roles.js";
 import type { AuthContext, MembershipResolver } from "../auth/context.js";
 import { sendError } from "../http/errors.js";
+import { replayAuthorizedMutation } from "../http/request-contracts.js";
 import type { ApiStore } from "../store.js";
 import { hasBearerAuthorization, parseBearerToken, type SessionRegistry } from "../auth/session-registry.js";
 import type { WechatIdentityConnector } from "../integrations/wechat-identity-connector.js";
@@ -21,6 +22,7 @@ export interface RouteContext {
   resolveClubAuth(request: FastifyRequest, reply: FastifyReply, clubId: string): Promise<AuthContext | null>;
   requireClubMembership(request: FastifyRequest, reply: FastifyReply, clubId: string): Promise<boolean>;
   sendError: typeof sendError;
+  replayAuthorizedMutation(request: FastifyRequest, reply: FastifyReply, authorizeCachedResponse?: () => boolean | Promise<boolean>): Promise<boolean>;
   requireClubRole(
     request: FastifyRequest,
     reply: FastifyReply,
@@ -87,6 +89,7 @@ export function createRouteContext(store: ApiStore, membershipResolver: Membersh
     wechatIdentityConnector,
     loginRateLimit,
     sendError,
+    replayAuthorizedMutation: (request, reply, authorizeCachedResponse) => replayAuthorizedMutation(store, request, reply, authorizeCachedResponse),
     resolveClubAuth: resolveAuth,
     async requireClubMembership(request, reply, clubId) {
       if (!membershipResolver) {

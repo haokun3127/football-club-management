@@ -76,6 +76,7 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       try {
         const result = await context.store.runDueExternalSyncPolicies(
@@ -107,6 +108,7 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       try {
         const policy = await context.store.createExternalSyncPolicy(request.params.clubId, request.body);
@@ -158,6 +160,9 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
   }>(
     "/clubs/:clubId/admin/integrations/wps/webhook",
     {
+      // The signed envelope/nonce is authenticated inside ingestWpsWebhook.
+      // Its own row-hash deduplication must not bypass that proof via HTTP cache.
+      config: { disableHttpIdempotency: true },
       schema: {
         ...schemas.clubParams,
         ...schemas.wpsWebhook,
@@ -199,6 +204,7 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       try {
         const policy = await context.store.updateExternalSyncPolicy(request.params.clubId, request.params.policyId, request.body);
@@ -231,6 +237,7 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       try {
         const result = await context.store.runExternalSyncPolicy(request.params.clubId, request.params.policyId);
@@ -385,6 +392,7 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       const preview = await context.store.previewPrivacyExport(request.params.clubId, request.body, "admin");
       if (!preview) {
@@ -419,6 +427,7 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       const auth = context.membershipResolver
         ? await context.resolveClubAuth(request, reply, request.params.clubId)
@@ -471,6 +480,7 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       const auth = context.membershipResolver
         ? await context.resolveClubAuth(request, reply, request.params.clubId)
@@ -560,6 +570,7 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       try {
         const ledger = await context.store.recordLessonAdjustment(request.params.clubId, request.params.studentId, request.body);
@@ -619,6 +630,7 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       try {
         const policies = await context.store.createInsurancePolicy(request.params.clubId, request.params.studentId, request.body);
@@ -670,6 +682,7 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       const records = await readExcelWorksheetRecords({
         buffer: Buffer.from(request.body.contentBase64, "base64"),
@@ -793,6 +806,7 @@ export async function registerDataCapabilityRoutes(app: FastifyInstance, context
       if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       let link;
 

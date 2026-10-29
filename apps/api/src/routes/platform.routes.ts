@@ -131,6 +131,7 @@ export async function registerPlatformRoutes(app: FastifyInstance, context: Rout
       if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       return context.store.createTeam({
         ...request.body,
@@ -157,6 +158,7 @@ export async function registerPlatformRoutes(app: FastifyInstance, context: Rout
       if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin"])) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       return context.store.joinTeam({
         ...request.body,

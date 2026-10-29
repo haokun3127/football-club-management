@@ -67,6 +67,7 @@ export async function registerMetricsRoutes(app: FastifyInstance, context: Route
       if (!await context.requireStudentAccess(request, reply, request.params.clubId, request.params.studentId, { write: true })) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       return context.store.computeAttackingContribution(request.params.clubId, request.params.studentId);
     },

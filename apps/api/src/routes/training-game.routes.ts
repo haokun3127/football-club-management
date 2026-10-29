@@ -183,6 +183,7 @@ export async function registerTrainingGameRoutes(
     async (request, reply) => {
       const scope = await coachScope(request, reply);
       if (!scope || !writable(reply, request.params.clubId)) return reply;
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       try {
         return {
           game: createTrainingGame(
@@ -203,6 +204,7 @@ export async function registerTrainingGameRoutes(
     async (request, reply) => {
       const scope = await coachScope(request, reply);
       if (!scope || !writable(reply, request.params.clubId)) return reply;
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       try {
         return {
           game: updateTrainingGame(

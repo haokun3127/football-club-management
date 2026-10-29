@@ -37,6 +37,7 @@ export async function registerStudentEvaluationRoutes(app: FastifyInstance, cont
   app.put<{ Params: Params; Body: { expectedRevision: number; phraseIds: string[]; note: string } }>(`${base}/:teamId`, { schema: { params: evaluationSchemas.saveParams, body: evaluationSchemas.body, response: { 200: evaluationSchemas.saved } } }, async (request, reply) => {
     const scope = await authorize(context, request, reply); if (!scope) return reply;
     if (scope.parent || !scope.teams.some(t => t.id === request.params.teamId)) return context.sendError(reply, 403, "forbidden", "Evaluation cannot be edited in this role or team");
+    if (await context.replayAuthorizedMutation(request, reply)) return reply;
     const catalog = context.store.listEvaluationPhrases(request.params.clubId);
     const previous = context.store.studentEvaluations.get(request.params.clubId, request.params.teamId!, request.params.studentId)?.history.at(-1);
     if (request.body.phraseIds.some(id => !catalog.some(p => p.id === id) && !previous?.phrases.some(p => p.id === id))) return context.sendError(reply, 400, "invalid_evaluation_phrase", "Unknown evaluation phrase");

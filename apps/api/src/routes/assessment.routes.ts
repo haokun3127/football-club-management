@@ -22,6 +22,7 @@ export async function registerAssessmentRoutes(app: FastifyInstance, context: Ro
       if (!await context.requireClubRole(request, reply, request.params.clubId, ["admin", "coach"])) {
         return reply;
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       const managed = (await context.store.listAssessmentTasks(request.params.clubId)).some((task) =>
         assessmentWorkflow(context.store).managed(task) && assessmentWorkflow(context.store).roster(task).includes(request.body.studentId));

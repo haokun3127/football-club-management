@@ -173,6 +173,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       const event = (await context.store.listCalendarEvents(request.params.clubId) as AppEventDetail[]).find((item) => item.id === request.params.eventId);
       if (!event) return context.sendError(reply, 404, "not_found", "Event not found");
       if (event.type !== "match") return context.sendError(reply, 400, "invalid_tactical_board_event", "Tactical board is only available for match events");
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       if (["completed", "cancelled", "canceled"].includes(event.status)) return context.sendError(reply, 409, "tactical_board_read_only", "Completed or cancelled matches are read only");
       const roster = await tacticalBoardRoster(context, request.params.clubId, event);
       const errors = validateTacticalBoardPlayers(request.body.players, roster.map((item) => item.studentId));
@@ -472,6 +473,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       const client = await requireActiveAppClient(context, reply, request.params.clubId, request.params.clientId, "coach");
       if (!client) return reply;
       if (!await requireCoachEventAccess(context, request, reply, request.params.clubId, request.params.eventId)) return reply;
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       const scope = await resolveTrainingContentAssessmentScope(context, reply, request.params.clubId, request.params.eventId);
       if (!scope) return reply;
 
@@ -744,6 +746,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       if (!availableRoles.includes(request.body.role)) {
         return context.sendError(reply, 403, "forbidden", "Requested role is not available for this app client");
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       const session = await context.sessionRegistry.rotate(
         parseBearerToken(request.headers.authorization),
         {
@@ -786,6 +789,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       ) {
         return context.sendError(reply, 401, "authentication_required", "Session is missing or expired");
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       const revoked = await context.sessionRegistry.revoke(bearer);
       return {
         clubId: request.params.clubId,
@@ -859,6 +863,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return context.sendError(reply, 400, "invalid_match_event_minute", "Match event minute must be a number");
       }
 
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       const idempotencyKey = firstHeaderValue(request.headers["idempotency-key"]);
       if (!idempotencyKey) {
         return context.sendError(reply, 400, "idempotency_key_required", "Idempotency-Key is required for match events");
@@ -935,6 +940,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return context.sendError(reply, 403, "forbidden", "Student is not a child of the authenticated guardian");
       }
 
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       const created = await context.store.createPrivateLessonRequest(request.params.clubId, request.body.studentId, {
         coachName: request.body.coachName,
         date: request.body.date,
@@ -969,7 +975,8 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         ...schemas.appClientParams,
         ...schemas.appClientWechatLogin,
       },
-      ...(context.loginRateLimit ? { config: { rateLimit: context.loginRateLimit } } : {}),
+      // A one-use login proof must be verified again; never cache issued credentials.
+      config: { disableHttpIdempotency: true, ...(context.loginRateLimit ? { rateLimit: context.loginRateLimit } : {}) },
     },
     async (request, reply) => {
       const client = await requireActiveAppClientAny(context, reply, request.params.clubId, request.params.clientId);
@@ -1155,6 +1162,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       const auth = context.membershipResolver
         ? await context.resolveClubAuth(request, reply, request.params.clubId)
         : null;
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       try {
         const privacyRequest = await context.store.createPrivacyRequest(request.params.clubId, {
           ...request.body,
@@ -1475,6 +1483,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       if (!event || event.clubId !== request.params.clubId) {
         return context.sendError(reply, 404, "not_found", "Event not found");
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       if (event.status !== "scheduled") {
         return context.sendError(reply, 409, "invalid_status", "Only scheduled events can be finished");
       }
@@ -1541,6 +1550,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       if (!existing) {
         return context.sendError(reply, 404, "not_found", "Coach profile not found");
       }
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       const preferences = await context.store.saveCoachPreferences(request.params.clubId, userId, {
         acceptsPrivateLessons: request.body.acceptsPrivateLessons,
         availabilitySlots: Array.isArray(request.body.availabilitySlots) ? request.body.availabilitySlots : existing.availabilitySlots,
@@ -2083,6 +2093,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
 
       if(event.status === "cancelled") return context.sendError(reply,409,"event_cancelled","已取消课程不能编辑训练内容");
       if (!request.body.expectedRevision) return context.sendError(reply, 428, "training_revision_required", "请重新读取课程后保存训练内容");
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       const drills = context.store.listTrainingDrills(request.params.clubId);
       const selectedDrills = request.body.projectIds.map((projectId) => drills.find((drill) => drill.id === projectId));
       const missingProjectId = request.body.projectIds.find((projectId, index) => !selectedDrills[index]);
@@ -2578,6 +2589,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       }
 
       if (!await requireCoachEventAccess(context,request,reply,request.params.clubId,request.params.eventId,"plan")) return reply;
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       const created = await context.store.createEventChangeRequest(request.params.clubId, request.params.eventId, {
         reason: request.body.reason,
         newStartsAt: request.body.newStartsAt,
@@ -2797,6 +2809,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       const studentIds = request.body.studentIds ?? eligible.filter(id=>roster.includes(id));
       if (!studentIds.length || studentIds.some((id) => !eligible.includes(id))) return context.sendError(reply, 400, "invalid_task_students", "请选择有权测评的球队学员，课程任务还须在有效参与名单内");
       if (request.body.testItemIds && !publicationEnabled(request.params.clubId)) return context.sendError(reply, 409, "assessment_workflow_disabled", "部分项目任务须启用核对发布流程");
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       const task = {
         studentIds,
         testItemIds: request.body.testItemIds,
@@ -2997,6 +3010,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return reply;
       }
 
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       // 覆盖保护：家长提交的请假（leave_requested/excused）不得被整名单点名静默覆盖
       //（10-18 审计 §3.2 / REQ-UX-001）。点名如需覆盖，必须携带 previousStatus 核对原状态。
       const storedParticipants = context.store.listEventParticipants(request.params.clubId)
@@ -3073,6 +3087,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return reply;
       }
 
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       try {
         const existing = await context.store.getMatchDetailByEvent(request.params.clubId, request.body.eventId);
         const event = await context.store.getCalendarEvent(request.body.eventId);
@@ -3151,6 +3166,7 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
         return context.sendError(reply, 403, "forbidden", "Student is outside the assessment task team scope");
       }
 
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       try {
         const result = await context.store.recordAssessment({
           ...request.body,
