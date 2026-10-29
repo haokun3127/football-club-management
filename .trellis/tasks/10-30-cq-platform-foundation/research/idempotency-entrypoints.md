@@ -13,7 +13,7 @@
 | POST C/coach/events/:eventId/finish | active coach client + coach/admin role + auth + club/event identity | scheduled业务状态前 |
 | PUT C/coach/preferences | active coach client + coach/admin role + 当前用户coach profile | saveCoachPreferences前 |
 | PUT C/coach/events/:eventId/training-projects；POST .../change-requests | requireCoachEventAccess(plan)，当前身份/client/课程检查 | 版本比较/创建申请前 |
-| POST C/coach/assessment-tasks | 当前coach管理team + eligible roster/student范围 + publication gate | 创建task前 |
+| POST C/coach/assessment-tasks | 当前身份/client/role + coach管理team + publication gate | 授权后、首次创建实时名单资格校验前；已创建task固定名单不随退籍缩减，新key仍校验实时名单 |
 | PUT C/coach/events/:eventId/attendance；POST C/coach/matches | 当前client/role + requireCoachEventAccess；matches使用body eventId | 名单业务冲突/比赛写入前 |
 | POST C/coach/assessments | 当前coach/admin + 当前task/team/student scope | recordAssessment前 |
 | PUT C/coach/assessment-tasks/:taskId/students/:studentId/entries；POST .../:taskId/publications | workflow scope：active client、role、active team、coach assignment、student roster；当前可编辑开关 | workflow.save/publish前；批量重放再检查body全部students |

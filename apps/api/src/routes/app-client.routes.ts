@@ -2792,6 +2792,10 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       if (!allowedTeam) {
         return context.sendError(reply, 403, "forbidden", "Team is not accessible for this coach membership");
       }
+      if (request.body.testItemIds && !publicationEnabled(request.params.clubId)) return context.sendError(reply, 409, "assessment_workflow_disabled", "部分项目任务须启用核对发布流程");
+      // Revalidate current action scope, then replay the already-created fixed
+      // selection before checking live roster eligibility for a new task.
+      if (await context.replayAuthorizedMutation(request, reply)) return reply;
 
       if (!request.body.title.trim()) return context.sendError(reply, 400, "invalid_title", "任务名称不能为空");
       const roster = context.store.listTeamMembers(request.params.clubId).filter((m) => m.teamId === allowedTeam.id && m.status === "active").map((m) => m.studentId);
@@ -2808,8 +2812,6 @@ export async function registerAppClientRoutes(app: FastifyInstance, context: Rou
       // Temporary players require explicit selection; omission retains the formal-team default.
       const studentIds = request.body.studentIds ?? eligible.filter(id=>roster.includes(id));
       if (!studentIds.length || studentIds.some((id) => !eligible.includes(id))) return context.sendError(reply, 400, "invalid_task_students", "请选择有权测评的球队学员，课程任务还须在有效参与名单内");
-      if (request.body.testItemIds && !publicationEnabled(request.params.clubId)) return context.sendError(reply, 409, "assessment_workflow_disabled", "部分项目任务须启用核对发布流程");
-      if (await context.replayAuthorizedMutation(request, reply)) return reply;
       const task = {
         studentIds,
         testItemIds: request.body.testItemIds,

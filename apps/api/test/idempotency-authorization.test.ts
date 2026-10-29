@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, expect, it } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { createPlatformPersistence } from "../src/persistence/platform-persistence.js";
 import { PersistentApiStore } from "../src/store.js";
 import { buildServer } from "../src/server.js";
@@ -77,4 +77,44 @@ it("replays a non-classroom ledger mutation once, but denies it after the admini
   expect(denied.statusCode).toBe(403);
   expect(denied.headers["idempotency-status"]).toBeUndefined();
   expect(await store.getLessonLedger(clubId, "student-1")).toEqual(ledger);
+});
+
+it.each([
+  { label: "explicit roster", selection: { studentIds: ["student-1"] } },
+  { label: "default roster", selection: {} },
+  { label: "source-course roster", selection: { studentIds: ["student-1"], sourceEventId: "event-training-1" } },
+])("replays a created task with its fixed $label after live roster changes, but rechecks coach authorization", async ({ selection }) => {
+  vi.stubEnv("FCM_ASSESSMENT_PUBLICATION_CLUBS", clubId);
+  const url = `/clubs/${clubId}/app-clients/app-client-cq-talent-wechat-main/coach/assessment-tasks`;
+  const request = {
+    method: "POST" as const,
+    url,
+    headers: { ...assistantHeaders, "idempotency-key": "task-creation-response-loss" },
+    payload: { title: "Fixed roster retry", templateId: "assessment-template-technical", teamId: "team-u10-dev", termLabel: "2026", startsOn: "2020-01-01", dueOn: "2099-12-31", ...selection },
+  };
+  try {
+    const first = await app.inject(request);
+    expect(first.statusCode).toBe(201);
+    expect(first.json().task.studentIds).toEqual(["student-1"]);
+    const count = (await store.listAssessmentTasks(clubId)).length;
+    const member = store.listTeamMembers(clubId).find(member => member.teamId === "team-u10-dev" && member.studentId === "student-1")!;
+    store.saveTeamMember({ ...member, status: "inactive" });
+    const existing = await app.inject({ method: "GET", url: `${url}/${first.json().task.id}/workflow`, headers: assistantHeaders });
+    expect(existing.statusCode).toBe(200);
+    expect(existing.json().students.map((student: { studentId: string }) => student.studentId)).toEqual(["student-1"]);
+    const replay = await app.inject(request);
+    expect(replay.statusCode).toBe(201);
+    expect(replay.headers["idempotency-status"]).toBe("replayed");
+    expect(replay.json()).toEqual(first.json());
+    expect((await store.listAssessmentTasks(clubId)).length).toBe(count);
+    // A new creation still validates the live roster rather than using the old task selection.
+    expect((await app.inject({ ...request, headers: { ...assistantHeaders, "idempotency-key": "another-creation" } })).statusCode).toBe(400);
+    store.removeCoachAssignment(clubId, "team-u10-dev", "assistant");
+    const denied = await app.inject(request);
+    expect(denied.statusCode).toBe(403);
+    expect(denied.headers["idempotency-status"]).toBeUndefined();
+    expect((await store.listAssessmentTasks(clubId)).length).toBe(count);
+  } finally {
+    vi.unstubAllEnvs();
+  }
 });

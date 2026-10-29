@@ -99,3 +99,8 @@
 - CQ23真实隔离Chromium/cookie/合成fixture验收完成：工作台“查看任务”→同taskId深链；仅浏览器模拟503→稳定可见“重试读取任务”；解除mock点击后只发同一taskId GET，恢复CQ23任务标题、U10队伍、周期、学员李明，错误动作消失，1024宽无document横向溢出。证据research/cq23-task-retry-error.png、cq23-task-retry-recovered.png，均直接看图核验。
 - 额外既有对象工作流：从工作台“查看资料”进入学员档案，身份/出生日期清楚；修改合成教学备注，关闭→继续编辑保留输入；模拟503保存仍保留输入，解除mock重试实际保存，重开同学员回读备注；操作历史显示王管理员与备注从空值到新值。research/cq23-profile-save-error.png（保留输入）、cq23-profile-history.png（回读历史）已看图。此流程无需产品代码调整。覆盖29资源映射及这两条真实路径，不冒称29项全量人工验收。
 - fixture进程已停止，临时数据库和随机凭据已清理；本任务隔离Chromium已关闭。没有push、真实服务写入、部署、环境切换或微信上传。原生小程序canvas仍由总控主目录验收。
+
+### 最终审计P2：固定任务名单创建重放
+- 总控明确授权冻结后一次最小修复：同key创建成功后学员退出现实时队籍，原任务固定名单仍可读，但重试被首次创建资格校验400拦截。原始探针/tmp/cq-audit-42d5ca75/apps/api/test/independent-replay-scopes.test.ts；本分支新增显式/默认/来源课程名单三种回归，改代码前均在重试201断言失败（实际400），日志/private/tmp/cq-task-replay-before.log。
+- 只移动创建测评任务的replay检查点：仍在当前身份/client/角色、active授权队伍和partial-project功能开关之后，移至首次创建的动态名单/来源课程资格校验之前。未改变固定名单、schema、缓存key/TTL及其他路由。新key创建仍按实时资格400，移除助教队伍授权后原key仍403且任务数不变。
+- API typecheck通过；idempotency-authorization/assessment-workflow/training-content-assessment-batch/training-templates定向4文件32项通过，日志/private/tmp/cq-task-replay-after.log。入口表已更新；完整API将单worker串行运行，避免多路全量争用。主目录最终交付门禁与镜像仍由总控负责；此前42镜像不作为本修复后制品。
