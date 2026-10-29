@@ -18,14 +18,15 @@
       </view>
       <view wx:if="{{!hasConfiguredContent}}" class="training-card__summary">本堂课尚未添加训练内容</view>
       <view wx:for="{{contentGroups}}" wx:key="id" class="training-content-group"><view class="training-content-group__title">{{item.label}}</view><view wx:for="{{item.items}}" wx:for-item="content" wx:key="id" class="training-content-item"><text>{{content.name}}</text><text class="training-content-item__minutes">{{content.minutesLabel}}</text></view></view>
-      <view wx:if="{{canEditTraining}}" class="training-tools"><t-button data-mode="templates" bindtap="openTransfer" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">套用模板</t-button><t-button data-mode="copy" bindtap="openTransfer" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">复制到其他课</t-button><t-button data-mode="save" bindtap="openTransfer" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">保存为模板</t-button></view>
+
 
       <view wx:if="{{contentMinutesLabel}}" class="training-content-total">{{contentMinutesLabel}}</view>
       <t-button wx:if="{{hiddenContentCount}}" size="small" class="training-content-expand" bindtap="toggleContent" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="training-content-expand" theme="primary" variant="text">{{contentExpanded ? '收起' : '展开全部'}}{{contentExpanded ? '' : ' · 另有 ' + hiddenContentCount + ' 项'}}</t-button>
     </view>
 
-    <view wx:if="{{isTraining}}" class="workbench-card course-assessment">
+    <view id="course-assessments" wx:if="{{isTraining}}" class="workbench-card course-assessment">
       <view class="section-title">本课测评</view><view wx:if="{{courseTaskMessage}}" class="subtitle">{{courseTaskMessage}}</view>
+      <t-button wx:if="{{courseTasksState === 'error'}}" theme="primary" variant="text" bindtap="retryCourseTasks">重试本课测评</t-button>
       <view wx:for="{{courseTasks}}" wx:key="id" class="course-task" data-id="{{item.id}}" bindtap="openCourseTask"><view>{{item.title}} · {{item.summary}}</view><view class="training-card__edit">查看项目与进度 →</view></view>
       <view wx:if="{{canWrite}}" class="training-card__edit" bindtap="createAssessmentTask">＋发起随堂测评</view>
     </view>
@@ -65,6 +66,13 @@
       <view wx:if="{{attendanceError}}" class="attendance-error">{{attendanceError}}</view><t-button wx:if="{{attendanceNeedsRefresh}}" size="small" bindtap="retry" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">刷新核对</t-button>
     </view>
 
+    <view wx:if="{{isTraining}}" class="workbench-card">
+      <view class="row"><view class="section-title">按需记录与备课</view><t-button wx:if="{{canEditTraining}}" theme="primary" variant="text" bindtap="togglePreparation">{{preparationExpanded ? '收起备课工具' : '展开备课工具'}}</t-button></view>
+      <t-button wx:if="{{canWrite}}" data-action="training-assessment" bindtap="openAction" theme="primary" variant="text">记录课堂表现（选填）</t-button>
+      <block wx:if="{{preparationExpanded}}">
+      <view wx:if="{{canEditTraining}}" class="training-tools"><t-button data-mode="templates" bindtap="openTransfer" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">套用模板</t-button><t-button data-mode="copy" bindtap="openTransfer" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">复制到其他课</t-button><t-button data-mode="save" bindtap="openTransfer" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">保存为模板</t-button></view>
+      </block>
+    </view>
     <view wx:if="{{hasActionCards && !isTraining}}" class="action-grid">
       <view wx:if="{{canWrite && hasTraining}}" class="action-tile" bindtap="createAssessmentTask"><view class="action-tile__label">创建测评任务</view></view>
       <view wx:for="{{actionCards}}" wx:key="id" class="action-tile" data-action="{{item.id}}" bindtap="openAction">
@@ -88,7 +96,7 @@
     </view>
     </block>
   </view>
-  <submit-bar wx:if="{{state === 'ready' && isTraining && !transferVisible && canWrite}}" primary-text="{{hasConfiguredContent ? '记录课堂表现' : canEditTraining ? '安排训练内容' : '查看训练记录'}}" bindsubmit="primaryAction" />
+  <submit-bar wx:if="{{state === 'ready' && isTraining && !transferVisible}}" primary-text="{{primaryLabel}}" bindsubmit="primaryAction" />
   <role-tabbar wx:if="{{!isTraining && !transferVisible}}" role="coach" active="schedule" />
   <view wx:if="{{transferVisible}}" class="transfer-mask"><view class="transfer-sheet"><view class="transfer-head"><text>{{transferMode === 'save' ? '保存个人模板' : transferMode === 'templates' ? '套用模板' : '复制课程内容'}}</text><t-button disabled="{{transferBusy}}" bindtap="closeTransfer" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">关闭</t-button></view>
     <scroll-view scroll-y class="transfer-scroll">

@@ -15,7 +15,9 @@
 
   <view class="schedule-calendar-wrap"><schedule-calendar class="schedule-calendar-widget" date="{{date}}" events="{{eventViews}}" expanded="{{viewMode === 'month'}}" top-inset="{{topBarHeight}}" bindchange="onCalendarChange" bindviewchange="onCalendarViewChange" /></view>
 
+  <view class="calendar-feedback" wx:if="{{calendarMessage}}"><text>{{calendarMessage}}</text><t-button wx:if="{{calendarState === 'error'}}" bindtap="retryCalendar" theme="primary" variant="text">重试日历标记</t-button></view>
   <view class="c1-body">
+    <view wx:if="{{dayError}}" class="calendar-feedback"><text>{{dayError}}</text><t-button bindtap="retry" theme="primary" variant="text">重试当天</t-button></view>
     <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '加载日程' : state === 'empty' ? '暂无日程或任务' : '日程读取失败'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
 
     <block wx:if="{{state === 'ready'}}">

@@ -10,6 +10,7 @@ import type { CoachHome, CoachTask, CoachTaskAction, LoadState, ScheduleEvent } 
 const initialDate = currentLocalDate();
 const loadVersions = new WeakMap<object, number>();
 const selectionOwners = new WeakMap<object, string>();
+const contentScopes = new WeakMap<object, string>();
 
 type Filter = "all" | "training" | "match" | "pending";
 type ViewMode = "day" | "month";
@@ -48,6 +49,9 @@ Page({
     topBarHeight: resolveTopBarHeight(),
     menuInset: resolveMenuInset(),
     state: "loading" as LoadState,
+    calendarState: "loading" as LoadState,
+    calendarMessage: "",
+    dayError: "",
     message: "正在读取教练日程",
     home: null as CoachHome | null,
     clubName: "俱乐部",
@@ -92,25 +96,25 @@ Page({
     let stored: unknown = [];
     try { stored = selectionKey ? wx.getStorageSync<string[]>(selectionKey) : []; } catch { /* Selection remains usable without local storage. */ }
     const selectedIds = this.data.selectedTeamIds.length ? this.data.selectedTeamIds : Array.isArray(stored) ? stored.filter((id) => typeof id === "string") : [];
-    this.setData({ state: "loading", message: "正在读取教练日程" });
+    const scope = JSON.stringify([selectionKey, this.data.date, selectedIds]);
+    const sameScope = contentScopes.get(this) === scope;
+    contentScopes.set(this, scope);
+    this.setData({ dayError: "", ...(sameScope && this.data.home ? {} : {state: "loading" as LoadState, message: "正在读取教练日程", home: null, eventViews: [], visibleEvents: [], taskCards: []}) });
+    const teamScope = selectedIds.length ? {teamIds:selectedIds} : {};
+    const dayLoad = getCoachHome({from:this.data.date,to:this.data.date,...teamScope});
+    const calendarLoad = this.loadCalendar(ranges, teamScope, version);
     try {
-      const teamScope = selectedIds.length ? {teamIds:selectedIds} : {};
-      // The month query supplies markers; the selected-day query retains the API's
-      // selected-week statistics instead of treating the first week as this week.
-      const [dayHome, calendarHomes] = await Promise.all([
-        getCoachHome({from:this.data.date,to:this.data.date,...teamScope}),
-        Promise.all(ranges.map(range=>getCoachHome({...range,...teamScope}))),
-      ]);
-      const home={...dayHome,events:[...new Map(calendarHomes.flatMap(item=>item.events).map(event=>[event.id,event])).values()]};
+      const home = await dayLoad;
       if (loadVersions.get(this) !== version) return;
       const selectedTeamIds = home.selectedTeamIds ?? [];
       if (selectionKey) { try { wx.setStorageSync(selectionKey, selectedTeamIds); } catch { /* Do not turn a cache failure into a schedule failure. */ } }
       const coachName = home.coachName?.trim() || "";
-      const eventViews = home.events.map((event) => toCoachEventView(event));
+      const dayEvents = home.events.map((event) => toCoachEventView(event));
+      const eventViews = mergeEvents(this.data.eventViews, dayEvents);
       const taskCards = home.tasks.map(toCoachTaskView);
-      const selectedDateEvents = eventViews.filter((event) => calendarDateKey(event.startsAt) === this.data.date);
+      const selectedDateEvents = dayEvents.filter((event) => calendarDateKey(event.startsAt) === this.data.date);
       const heroEvent = selectedDateEvents.find((event) => event.status === "in_progress") ?? selectedDateEvents[0] ?? null;
-      const hasWork = eventViews.length > 0 || taskCards.length > 0;
+      const hasWork = dayEvents.length > 0 || taskCards.length > 0;
       this.setData({
         state: hasWork ? "ready" : "empty",
         message: hasWork ? "" : "所选日期范围内没有日程或待处理任务",
@@ -135,15 +139,27 @@ Page({
       this.applyFilter();
     } catch {
       if (loadVersions.get(this) !== version) return;
-      this.setData({
-        state: "error",
-        message: "日程读取失败，请稍后重试",
-        visibleEvents: [],
-        hasVisibleEvents: false,
-        taskCards: [],
-        hasTaskCards: false,taskCount:0,
+      this.setData(this.data.home ? {dayError: "当天刷新失败，仍显示上次内容，请重试。"} : {
+        state: "error", message: "当天日程读取失败，请重试", visibleEvents: [], hasVisibleEvents: false, taskCards: [], hasTaskCards: false, taskCount: 0,
       });
     }
+    await calendarLoad;
+  },
+  async loadCalendar(ranges: Array<{from:string;to:string}>, teamScope: {teamIds?:string[]}, version: number) {
+    this.setData({calendarState: "loading", calendarMessage: "正在更新日历标记"});
+    try {
+      const homes = await Promise.all(ranges.map(range => getCoachHome({...range, ...teamScope})));
+      if (loadVersions.get(this) !== version) return;
+      const events = homes.flatMap(home => home.events).map(toCoachEventView);
+      this.setData({calendarState: "ready", calendarMessage: "", eventViews: mergeEvents(events, this.data.home?.events.map(toCoachEventView) ?? [])});
+      // Markers never replace the selected-day list or its weekly statistics.
+    } catch {
+      if (loadVersions.get(this) === version) this.setData({calendarState: "error", calendarMessage: "日历标记更新失败，当天内容仍可使用。"});
+    }
+  },
+  retryCalendar() {
+    const version = loadVersions.get(this) ?? 0;
+    return this.loadCalendar(calendarDataRanges(this.data.date, this.data.viewMode === "month", true), this.data.selectedTeamIds.length ? {teamIds:this.data.selectedTeamIds} : {}, version);
   },
   onUnload() { loadVersions.set(this, (loadVersions.get(this) ?? 0) + 1); },
   toggleTeamPicker() { this.setData({ showTeamPicker: !this.data.showTeamPicker }); },
@@ -187,7 +203,7 @@ Page({
   },
   applyFilter() {
     const activeFilter = this.data.activeFilter as Filter;
-    const visibleEvents = (this.data.eventViews as CoachEventView[]).filter((event) => {
+    const visibleEvents = (this.data.home?.events.map(toCoachEventView) ?? []).filter((event: CoachEventView) => {
       if (calendarDateKey(event.startsAt) !== this.data.date) return false;
       if (activeFilter === "pending") return event.hasNextAction;
       if (activeFilter === "training" || activeFilter === "match") return event.type === activeFilter;
@@ -279,4 +295,8 @@ function durationLabel(startsAt?: string, endsAt?: string): string {
   const end = Date.parse(endsAt ?? "");
   if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return "";
   return `${Math.round((end - start) / 60000)}分钟`;
+}
+
+function mergeEvents(markers: CoachEventView[], day: CoachEventView[]) {
+  return [...new Map([...markers, ...day].map(event => [event.id, event])).values()];
 }

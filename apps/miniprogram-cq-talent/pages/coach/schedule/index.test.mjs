@@ -187,7 +187,7 @@ describe("coach schedule home", () => {
 
     await failedPage.load();
 
-    expect(failedPage.data).toMatchObject({ state: "error", message: "日程读取失败，请稍后重试" });
+    expect(failedPage.data).toMatchObject({ state: "error", message: "当天日程读取失败，请重试" });
   });
 
   it("routes each supported next action without inventing an attendance summary", () => {
@@ -329,5 +329,21 @@ describe("coach schedule home", () => {
     expect(template).toContain('class="acard__type acard__type--{{item.typeTone}}"');
     expect(stylesheet).toContain(".acard__type--training");
     expect(stylesheet).toContain(".acard__type--match");
+  });
+});
+
+describe("CQ-10 independent selected day and calendar markers",()=>{
+  beforeEach(()=>{mocks.requireRole.mockReturnValue({role:"coach"});wx.getStorageSync.mockReturnValue([]);});
+  it("renders selected day before slow markers and retains it if markers fail",async()=>{
+    let rejectRange;mocks.getCoachHome.mockImplementation(range=>range.from===range.to?Promise.resolve(home):new Promise((_,reject)=>rejectRange=reject));
+    const p=createPageInstance({date:"2026-08-13"});const pending=p.load();await Promise.resolve();await Promise.resolve();
+    expect(p.data.state).toBe("ready");expect(p.data.visibleEvents[0].id).toBe("event-training-1");expect(p.data.calendarState).toBe("loading");
+    rejectRange(new Error("offline"));await pending;expect(p.data.state).toBe("ready");expect(p.data.calendarState).toBe("error");
+    mocks.getCoachHome.mockResolvedValue(home);await p.retryCalendar();expect(p.data.calendarState).toBe("ready");expect(p.data.visibleEvents).toHaveLength(1);
+  });
+  it("retains same-scope day content on refresh failure but clears it when date changes",async()=>{
+    mocks.getCoachHome.mockResolvedValue(home);const p=createPageInstance({date:"2026-08-13"});await p.load();
+    mocks.getCoachHome.mockRejectedValue(new Error("offline"));await p.load();expect(p.data.state).toBe("ready");expect(p.data.dayError).toContain("上次内容");
+    p.data.date="2026-08-14";await p.load();expect(p.data.state).toBe("error");expect(p.data.visibleEvents).toEqual([]);
   });
 });

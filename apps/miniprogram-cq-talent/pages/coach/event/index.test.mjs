@@ -183,7 +183,7 @@ describe("coach activity workbench", () => {
     resolveTasks([{ id: "t1", sourceEventId: "event-training-1", title: "本课测评", templateId: "tpl", completedStudents: 0, totalStudents: 2 }]);
     await Promise.resolve();
     expect(page.data.courseTasks.map(task => task.id)).toEqual(["t1"]);
-    expect(page.data.courseTaskMessage).toBe("");
+    expect(page.data.courseTaskMessage).toContain("逐人核对确认");
   });
   it("does not navigate to records outside the authorized roster", async () => {
     const page = createPageInstance(); await page.load("event-training-1");
@@ -439,5 +439,22 @@ describe("coach activity workbench", () => {
       expect.objectContaining({ studentId: "student-1", status: "present", previousStatus: "leave_requested" }),
     ]);
     expect(page.data.attendanceSaving).toBe(false);
+  });
+});
+
+describe("CQ-10 classroom primary work",()=>{
+  beforeEach(()=>{vi.clearAllMocks();mocks.requireRole.mockReturnValue({role:"coach"});mocks.getCoachWorkbench.mockResolvedValue(trainingWorkbench);mocks.getCoachAssessmentTasks.mockResolvedValue([]);wx.pageScrollTo=vi.fn();});
+  it("ordinary lesson adds no attendance, assessment or performance write",async()=>{
+    const p=createPageInstance();await p.load("event-training-1");await p.loadCourseTasks("event-training-1",p._loadRequest);
+    expect(p.data.primaryLabel).toBe("查看训练记录");p.primaryAction();expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/lesson/index?id=event-training-1");expect(mocks.saveCoachAttendance).not.toHaveBeenCalled();expect(p.data.preparationExpanded).toBe(false);
+  });
+  it("uses one task directly and offers explicit selection for multiple tasks",async()=>{
+    const p=createPageInstance();await p.load("event-training-1");const task={id:"real-task",title:"本课任务",templateId:"real-template",sourceEventId:"event-training-1",completedStudents:0,totalStudents:40};
+    mocks.getCoachAssessmentTasks.mockResolvedValue([task]);await p.loadCourseTasks("event-training-1",p._loadRequest);p.primaryAction();expect(mocks.openPage).toHaveBeenCalledWith(expect.stringContaining("taskId=real-task&templateId=real-template"));
+    mocks.getCoachAssessmentTasks.mockResolvedValue([task,{...task,id:"second"}]);await p.loadCourseTasks("event-training-1",p._loadRequest);p.primaryAction();expect(wx.pageScrollTo).toHaveBeenCalledWith(expect.objectContaining({selector:"#course-assessments"}));
+  });
+  it("task failure preserves classroom and retries locally",async()=>{
+    const p=createPageInstance();await p.load("event-training-1");mocks.getCoachAssessmentTasks.mockRejectedValue(new Error("offline"));await p.retryCourseTasks();expect(p.data.state).toBe("ready");expect(p.data.courseTasksState).toBe("error");expect(p.data.rosterRows).toHaveLength(2);
+    mocks.getCoachAssessmentTasks.mockResolvedValue([]);await p.retryCourseTasks();expect(p.data.courseTasksState).toBe("ready");
   });
 });

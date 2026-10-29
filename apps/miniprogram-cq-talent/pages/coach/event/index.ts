@@ -82,6 +82,9 @@ Page({
     gameSources:[] as GameContext["sources"], friendlyGames:[] as Array<{id:string;title:string;score:string;summary:string}>, gamesMessage:"", gamesLoading:false,
     courseTasks: [] as Array<{ id: string; title: string; templateId: string; summary: string }>,
     courseTaskMessage: "",
+    courseTasksState: "loading" as LoadState,
+    primaryLabel: "查看训练记录",
+    preparationExpanded: false,
     attendanceError: "",
   },
   onLoad(query?: Record<string, string | undefined>) {
@@ -209,6 +212,7 @@ Page({
         joinedNames,
         attendanceSaving: false,
         attendanceError: "",
+        courseTasks: [], courseTasksState: "loading", primaryLabel: "查看训练记录",
       });
       if (isTraining) { void this.loadCourseTasks(id, request); void this.loadCourseGames(id, request); }
     } catch {
@@ -256,14 +260,16 @@ Page({
     else if(source&&this.data.gameSources.some((item:GameContext["sources"][number])=>item.contentBlockId===source))openPage(`/pages/coach/training-game/index?eventId=${encodeURIComponent(this.data.eventId)}&contentBlockId=${encodeURIComponent(source)}`);
   },
   async loadCourseTasks(eventId: string, ticket: number) {
-    this.setData({ courseTasks: [], courseTaskMessage: "正在读取本课测评" });
+    this.setData({ courseTasksState: "loading", courseTaskMessage: "正在读取本课测评" });
     try {
       const tasks = await getCoachAssessmentTasks({ forceRefresh: true });
       if (!currentLoadRequest(this, ticket)) return;
-      const courseTasks = tasks.filter(task => task.sourceEventId === eventId).map(task => ({ id: task.id, title: task.title, templateId: task.templateId, summary: `${task.completedStudents}/${task.totalStudents} 人完成` }));
-      this.setData({ courseTasks, courseTaskMessage: courseTasks.length ? "" : "本课暂无测评任务" });
-    } catch { if (currentLoadRequest(this, ticket)) this.setData({ courseTaskMessage: "本课测评读取失败，请刷新重试" }); }
+      const courseTasks = tasks.filter(task => task.sourceEventId === eventId && Boolean(task.templateId)).map(task => ({ id: task.id, title: task.title, templateId: task.templateId, summary: `${task.completedStudents}/${task.totalStudents} 人采集完成` }));
+      this.setData({ courseTasks, courseTasksState: "ready", primaryLabel: !this.data.canWrite || !courseTasks.length ? "查看训练记录" : courseTasks.length === 1 ? "继续本课测评" : "选择本课测评", courseTaskMessage: courseTasks.length ? "保存采集后，仍需逐人核对确认。" : "本课暂无测评任务，课堂表现按需记录。" });
+    } catch { if (currentLoadRequest(this, ticket)) this.setData({ courseTasksState: "error", courseTaskMessage: "本课测评读取失败，训练内容与记录仍可使用。" }); }
   },
+  retryCourseTasks() { return this.loadCourseTasks(this.data.eventId, (this as { _loadRequest?: number })._loadRequest ?? 0); },
+  togglePreparation() { this.setData({preparationExpanded: !this.data.preparationExpanded}); },
   openCourseTask(event: { currentTarget: { dataset: { id: string } } }) {
     const task = this.data.courseTasks.find((item: { id: string }) => item.id === event.currentTarget.dataset.id);
     if (task) openPage(`/pages/coach/assessment-projects/index?taskId=${encodeURIComponent(task.id)}&templateId=${encodeURIComponent(task.templateId)}&title=${encodeURIComponent(task.title)}`);
@@ -286,8 +292,11 @@ Page({
     }
   },
   primaryAction() {
-    const action = this.data.hasConfiguredContent ? "training-assessment" : this.data.canEditTraining ? "training" : "records";
-    this.openAction({ currentTarget: { dataset: { action } } });
+    if (this.data.canWrite && this.data.courseTasks.length === 1) {
+      this.openCourseTask({currentTarget:{dataset:{id:this.data.courseTasks[0]!.id}}});
+    } else if (this.data.canWrite && this.data.courseTasks.length > 1) {
+      wx.pageScrollTo({selector: "#course-assessments", duration: 200});
+    } else this.openAttendance();
   },
   openAttendance() {
     if (this.data.eventId) openPage(`/pages/coach/${this.data.isTraining ? "lesson" : "attendance"}/index?id=${encodeURIComponent(this.data.eventId)}`);

@@ -1,92 +1,12 @@
-<view class="c12">
-  <app-header title="{{navTitle}}" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" action-text="提交" bindaction="submitAssessment" />
-
-  <view class="c12-body">
-    <status-view
-      state="{{state}}"
-      title="{{statusTitle}}"
-      message="{{message}}"
-      action-text="{{state === 'error' ? '重试' : ''}}"
-      bindaction="retry"
-    />
-
-    <block wx:if="{{hasForm}}">
-      <view class="c12-task-header">
-        <text class="c12-task-header__title">{{form.templateName}}</text>
-        <text class="c12-task-header__meta">{{eventTitle}}</text>
-        <view class="c12-task-header__chips">
-          <text class="c12-task-header__chip c12-task-header__chip--complete">{{progressLabel}}</text>
-          <text class="c12-task-header__chip c12-task-header__chip--version">{{form.versionName}}</text>
-        </view>
-      </view>
-
-      <view wx:if="{{hasCurrentField}}" class="c12-field-navigation">
-        <view class="c12-progress"><view class="c12-progress__value" style="{{progressStyle}}"></view></view>
-        <scroll-view scroll-x class="c12-groups" enhanced show-scrollbar="{{false}}">
-          <view class="c12-groups__row">
-            <view wx:for="{{groupOptions}}" wx:key="id" class="{{item.className}}" data-id="{{item.id}}" bindtap="switchGroup">{{item.label}}</view>
-          </view>
-        </scroll-view>
-        <view class="c12-field-window__bar">
-          <picker class="c12-field-window__picker" mode="selector" range="{{fieldsInGroup}}" range-key="label" value="{{fieldIndex}}" bindchange="onFieldChange">
-            <view class="c12-field-window__selection">
-              <text class="c12-field-window__label">{{currentField.label}}</text>
-              <text class="c12-field-window__unit">{{currentFieldUnitLabel}}</text>
-            </view>
-          </picker>
-          <view class="c12-field-window__steps">
-            <text class="c12-field-window__position">{{fieldPositionLabel}}</text>
-            <text class="c12-field-window__step" bindtap="previousField">上一项</text>
-            <text class="c12-field-window__step" bindtap="nextField">下一项</text>
-          </view>
-        </view>
-      </view>
-
-      <view wx:if="{{hasCurrentField}}" class="c12-students">
-        <text class="c12-students__title">待录入学员</text>
-        <view wx:for="{{draftRows}}" wx:key="studentId" class="c12-student-card">
-          <view class="c12-student-card__head">
-            <view class="c12-student-card__avatar">{{item.initials}}</view>
-            <text class="c12-student-card__name">{{item.name}}</text>
-          </view>
-          <view class="c12-student-card__metrics">
-            <view wx:for="{{item.metricCells}}" wx:for-item="cell" wx:key="testItemId" class="c12-metric-cell">
-              <text class="c12-metric-cell__label">{{cell.label}}</text>
-              <t-input wx:if="{{cell.showInput}}" class="c12-metric-cell__input" type="{{cell.inputType}}" placeholder="{{cell.placeholder}}" value="{{cell.rawValue}}" data-student-id="{{item.studentId}}" data-test-item-id="{{cell.testItemId}}" bindchange="onValueInput"  borderless t-class="c12-metric-cell__input" />
-              <text wx:else class="{{cell.statusClass}}">{{cell.statusLabel}}</text>
-            </view>
-          </view>
-          <view class="c12-student-card__actions">
-            <text wx:if="{{item.invalid}}" class="c12-student-card__invalid">{{item.invalidHint}}</text>
-            <text class="c12-student-card__missing" data-student-id="{{item.studentId}}" data-test-item-id="{{currentField.testItemId}}" bindtap="toggleMissing">{{item.missingActionLabel}}</text>
-          </view>
-          <t-input wx:if="{{item.showMissingReason}}" class="c12-student-card__reason" placeholder="缺测原因（选填）" value="{{item.missingReason}}" data-student-id="{{item.studentId}}" data-test-item-id="{{currentField.testItemId}}" bindchange="onMissingReasonInput"  borderless t-class="c12-student-card__reason" />
-        </view>
-      </view>
-
-
+<view class="task-resolver">
+  <app-header title="本课测评" title-align="left" show-back="{{true}}" />
+  <view class="task-resolver__body">
+    <status-view wx:if="{{state !== 'ready'}}" state="{{state}}" title="{{state === 'loading' ? '查找测评任务' : state === 'error' ? '暂时无法进入测评' : '暂无测评任务'}}" message="{{message}}" action-text="{{state === 'error' ? '重试' : ''}}" bindaction="retry" />
+    <block wx:if="{{state === 'ready'}}">
+      <view class="task-resolver__title">{{courseTitle}}</view>
+      <view class="task-resolver__hint">{{message}}</view>
+      <t-button wx:for="{{tasks}}" wx:key="id" class="task-resolver__task" data-id="{{item.id}}" bindtap="openTask" theme="primary" variant="outline">{{item.title}} · {{item.completedStudents}}/{{item.totalStudents}} 人采集完成</t-button>
     </block>
-  </view>
-
-  <view class="c12-submit-wrap">
-    <text class="c12-submit__hint">{{progressLabel}}</text>
-    <text wx:if="{{submitMessage}}" class="c12-submit__message">{{submitMessage}}</text>
-    <view class="{{submitClass}}" bindtap="submitAssessment">{{submitLabel}}</view>
-  </view>
-  <role-tabbar role="coach" active="training" />
-
-  <view wx:if="{{draftResumeVisible}}" class="c121-event-mask">
-    <view class="c121-modal">
-      <view class="c121-modal__content">
-        <view class="c121-modal__check-wrap"><image class="c121-modal__check" src="/assets/icons/c121-check.svg" mode="aspectFit" /></view>
-        <text class="c121-modal__title">评分已自动保存</text>
-        <text class="c121-modal__message">下次打开可继续录入</text>
-        <text class="c121-modal__updated-at">{{draftResumeUpdatedAtLabel}}</text>
-      </view>
-      <view class="c121-modal__actions">
-        <view class="c121-modal__continue" bindtap="continueDraft">继续录入</view>
-        <view class="c121-modal__exit" bindtap="exitDraft">退出</view>
-      </view>
-    </view>
+    <t-button wx:if="{{eventId && state !== 'loading'}}" bindtap="openCourse" theme="primary" variant="text">查看课堂与训练记录</t-button>
   </view>
 </view>

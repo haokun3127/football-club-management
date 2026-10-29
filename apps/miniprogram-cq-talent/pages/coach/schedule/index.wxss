@@ -42,3 +42,5 @@
 .c1-team-card__toggle { display:flex; align-items:center; min-height:44px; min-width:44px; color:var(--color-brand); }
 .acard { height:auto; min-height:96px; }
 .acard__title { white-space:normal; overflow-wrap:break-word; }
+
+.calendar-feedback { padding: 8px 16px; color: var(--color-text-secondary); font-size: var(--font-size-aux); line-height: 1.5; }
