@@ -1,0 +1,1 @@
+Probe is archived in the round2 report; preserve original /tmp fixture.

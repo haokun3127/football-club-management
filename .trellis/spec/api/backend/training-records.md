@@ -53,3 +53,14 @@ Parent growth total/monthly training counts use the same reconciled `trainingRec
 5. **Cases:** base leave→withdraw→course end produces revisions 1→2→3; good prior manual correction survives leave/withdraw; bad delete→revision0 allows stale editors and loses the audit trail.
 6. **Tests:** `training-leave-history.test.ts`, `training-records.test.ts` SQLite reopen/stale revision/ledger isolation, route leave tests and parent event pending label.
 7. **Wrong / correct:** `repository.remove(scope)` is wrong; compare-and-save the restored fact with the previous history plus one withdrawal entry is correct.
+
+
+## Classroom performance batches (CQ-00 correctness)
+
+1. **Scope:** classroom content scores, independent of standardized assessments, participation and training-count facts.
+2. **Signatures:** existing training-content-assessments GET returns a single snapshot with nonnegative `revision`; PUT accepts `{ expectedRevision, assessments }`. The mini helper takes `(eventId, rows, expectedRevision)`; no extra business API is introduced.
+3. **Contracts:** selected content and present-student scope are fully validated before writing. The repository transaction compares and increments the event revision, then writes the entire batch; rollback covers scores and revision. Migration0046 adds only the revision table; existing courses begin at revision0 without rewriting their scores. Snapshot rows and revision are read together. Preserve real zero; an empty input is never coerced to zero.
+4. **Errors:** invalid row400 and stale revision409 change nothing; missing revision428 changes nothing, including no idempotency pruning/replay. Permission boundaries remain403. Storage failures roll back the complete batch. Legacy reads remain compatible; unsafe unversioned writes require an updated client.
+5. **Cases:** on409 preserve local inputs and require explicit reread/reconciliation. On uncertain network outcome retry the identical payload and original revision with the pending idempotency key; never fetch a newer revision and silently overwrite. HTTP replay may return the original successful revision after another editor's save without reapplying it.
+6. **Checks:** `training-content-assessment-batch.test.ts` covers independent coach snapshots, concurrency, invalid later row, injected storage rollback, restart and replay; `utils/training-content-assessments.test.mjs` covers helper guards and uncertain retries. Native editing/reload remains a separate acceptance surface.
+7. **Wrong vs correct:** client-side locks alone cannot prevent two-coach loss; compare the persisted version atomically. The revision is a business concurrency fact in the training domain; SQLite transaction and HTTP idempotency are supporting mechanisms. Pending idempotency caches are bounded, not unlimited offline exactly-once guarantees.

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "verifiedAt": "2026-10-30",
-  "baselineSourceRevision": "41f615d7a969770d985e8644356362cae5b67703",
-  "method": "Apply the 45 repository SQL migrations to an isolated in-memory SQLite database, compare every resulting table with exactly one declared owner; source path existence checked. This is not a live environment inventory or proof every path is fully validated.",
-  "migrationTableCount": 104,
+  "baselineSourceRevision": "02baed1f4a1c7fd7e2cde83b022472a0bece346a",
+  "method": "Apply the 46 repository SQL migrations to an isolated in-memory SQLite database, compare every resulting table with exactly one declared owner; source path existence checked. This is not a live environment inventory or proof every path is fully validated.",
+  "migrationTableCount": 105,
   "groups": [
     {
       "id": "club-foundation",
@@ -105,7 +105,8 @@
         "apps/api/test/training-record-leave.test.ts",
         "apps/api/test/training-record-job.test.ts",
         "apps/api/test/temporary-rosters.test.ts",
-        "apps/api/test/event-presentation.test.ts"
+        "apps/api/test/event-presentation.test.ts",
+        "apps/api/test/training-content-assessment-batch.test.ts"
       ],
       "tables": [
         "calendar_events",
@@ -114,7 +115,8 @@
         "training_sessions",
         "training_records",
         "temporary_event_participants",
-        "training_content_assessments"
+        "training_content_assessments",
+        "training_content_assessment_revisions"
       ]
     },
     {
@@ -550,6 +552,10 @@
     {
       "path": "apps/api/db/migrations/0045_training_games.sql",
       "sha256": "78712eb4e7361affa5063848bdd4a0a4aa6261c6cd5ccfd2cefd87f9b6962033"
+    },
+    {
+      "path": "apps/api/db/migrations/0046_training_content_assessment_revisions.sql",
+      "sha256": "ccb7d764a891c2e97a636faeb9ed72522ec9e9467ba48f3e6c705a16a4b28e63"
     }
   ]
 }

@@ -1,6 +1,6 @@
 # 产品域与数据所有权
 
-2026-10-30核对；基线 `41f615d7`。用户批准的模块化单体目标，迁移后104张表全部有且仅有一个主要所有者，另列2张运行时元数据表。本页表格由同目录 `product-domain-map.json` 生成；修改所有权时先更新该清单并重验覆盖，不把目录/菜单当数据权限。
+2026-10-30核对；基线 `02baed1f`。用户批准的模块化单体目标，迁移后105张表全部有且仅有一个主要所有者，另列2张运行时元数据表。本页表格由同目录 `product-domain-map.json` 生成；修改所有权时先更新该清单并重验覆盖，不把目录/菜单当数据权限。
 
 ## 规则与实际边界
 
@@ -50,7 +50,7 @@
 
 ### 日程与训练运营（business）
 
-表：`calendar_events`、`event_change_requests`、`event_participants`、`training_sessions`、`training_records`、`temporary_event_participants`、`training_content_assessments`。
+表：`calendar_events`、`event_change_requests`、`event_participants`、`training_sessions`、`training_records`、`temporary_event_participants`、`training_content_assessments`、`training_content_assessment_revisions`。
 
 **写入入口：** `apps/api/src/application/services.ts`、`apps/api/src/application/training-records.ts`、`apps/api/src/application/temporary-rosters.ts`、`apps/api/src/routes/app-client.routes.ts`。
 
@@ -58,7 +58,7 @@
 
 **权限与约束：** 教练课程范围、家长绑定孩子；请假直接生效；自动计次与财务分离。
 
-**对应验证文件：** `apps/api/test/training-record-leave.test.ts`、`apps/api/test/training-record-job.test.ts`、`apps/api/test/temporary-rosters.test.ts`、`apps/api/test/event-presentation.test.ts`。
+**对应验证文件：** `apps/api/test/training-record-leave.test.ts`、`apps/api/test/training-record-job.test.ts`、`apps/api/test/temporary-rosters.test.ts`、`apps/api/test/event-presentation.test.ts`、`apps/api/test/training-content-assessment-batch.test.ts`。
 
 ### 测评（business）
 
