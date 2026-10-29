@@ -183,7 +183,7 @@ describe("coach activity workbench", () => {
     resolveTasks([{ id: "t1", sourceEventId: "event-training-1", title: "本课测评", templateId: "tpl", completedStudents: 0, totalStudents: 2 }]);
     await Promise.resolve();
     expect(page.data.courseTasks.map(task => task.id)).toEqual(["t1"]);
-    expect(page.data.courseTaskMessage).toContain("逐人核对确认");
+    expect(page.data.courseTaskMessage).toContain("关联任务 1 项");
   });
   it("does not navigate to records outside the authorized roster", async () => {
     const page = createPageInstance(); await page.load("event-training-1");
@@ -457,4 +457,22 @@ describe("CQ-10 classroom primary work",()=>{
     const p=createPageInstance();await p.load("event-training-1");mocks.getCoachAssessmentTasks.mockRejectedValue(new Error("offline"));await p.retryCourseTasks();expect(p.data.state).toBe("ready");expect(p.data.courseTasksState).toBe("error");expect(p.data.rosterRows).toHaveLength(2);
     mocks.getCoachAssessmentTasks.mockResolvedValue([]);await p.retryCourseTasks();expect(p.data.courseTasksState).toBe("ready");
   });
+  it("distinguishes collection, review, and already-confirmed tasks without suggesting repeated entry", async () => {
+    const p=createPageInstance();await p.load("event-training-1");
+    const base={id:"task-a",title:"本课测评",sourceEventId:"event-training-1",templateId:"template-a",status:"in_progress",totalStudents:19,completedStudents:0,workflow:{canEdit:true,totalStudents:19,completedStudents:0,publishedStudents:0,readyStudents:0}};
+    mocks.getCoachAssessmentTasks.mockResolvedValue([base]);await p.retryCourseTasks();expect(p.data.primaryLabel).toBe("继续采集测评");
+    mocks.getCoachAssessmentTasks.mockResolvedValue([{...base,workflow:{...base.workflow,readyStudents:1,completedStudents:1}}]);await p.retryCourseTasks();expect(p.data.primaryLabel).toBe("核对测评成绩");p.primaryAction();expect(mocks.openPage).toHaveBeenLastCalledWith(expect.stringContaining("&review=1"));
+    const done={...base,status:"completed",completedStudents:19,workflow:{...base.workflow,completedStudents:19,publishedStudents:19}};
+    mocks.getCoachAssessmentTasks.mockResolvedValue([done]);await p.retryCourseTasks();expect(p.data.courseTasks).toHaveLength(1);expect(p.data.courseTasks[0].actionLabel).toBe("查看已确认测评");expect(p.data.primaryTaskIds).toEqual([]);expect(p.data.primaryLabel).toBe("查看训练记录");p.primaryAction();expect(mocks.openPage).toHaveBeenLastCalledWith("/pages/coach/lesson/index?id=event-training-1");
+    p.openCourseTask({currentTarget:{dataset:{id:"task-a"}}});expect(mocks.openPage).toHaveBeenLastCalledWith(expect.stringContaining("taskId=task-a"));expect(mocks.openPage.mock.calls.at(-1)[0]).not.toContain("review=1");
+    mocks.getCoachAssessmentTasks.mockResolvedValue([done,{...base,id:"unfinished"}]);await p.retryCourseTasks();expect(p.data.courseTasks).toHaveLength(2);expect(p.data.primaryTaskIds).toEqual(["unfinished"]);p.primaryAction();expect(mocks.openPage).toHaveBeenLastCalledWith(expect.stringContaining("taskId=unfinished"));
+  });
+  it("keeps read-only, future legacy and completed legacy tasks in the associated list without making them pending", async () => {
+    const p=createPageInstance();await p.load("event-training-1");
+    const base={id:"readonly",title:"历史任务",sourceEventId:"event-training-1",templateId:"template-a",status:"in_progress",totalStudents:40,completedStudents:0};
+    mocks.getCoachAssessmentTasks.mockResolvedValue([{...base,workflow:{canEdit:false,totalStudents:40,completedStudents:0,publishedStudents:0,readyStudents:2}},{...base,id:"future",status:"not_started",startsOn:"2099-01-01"},{...base,id:"legacy-done",status:"completed",completedStudents:40}]);
+    await p.retryCourseTasks();expect(p.data.courseTasks).toHaveLength(3);expect(p.data.primaryTaskIds).toEqual([]);expect(p.data.primaryLabel).toBe("查看训练记录");expect(p.data.courseTasks.find(t=>t.id==="future").reason).toContain("2099-01-01");
+    mocks.openPage.mockClear();p.openCourseTask({currentTarget:{dataset:{id:"future"}}});expect(mocks.openPage).not.toHaveBeenCalled();p.openCourseTask({currentTarget:{dataset:{id:"legacy-done"}}});expect(mocks.openPage).toHaveBeenCalledWith(expect.stringContaining("taskId=legacy-done"));
+  });
+
 });

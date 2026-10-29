@@ -32,4 +32,17 @@ describe("legacy assessment URL resolves tasks before any editing",()=>{
     mocks.role.mockReturnValue(null);await page().onLoad({eventId:"course/a"});expect(mocks.options).not.toHaveBeenCalled();
     mocks.role.mockReturnValue({});const p=page();await p.onLoad({});expect(p.data.state).toBe("error");expect(mocks.options).not.toHaveBeenCalled();
   });
+  it("explains the existing future legacy task gate instead of silently dropping the task",async()=>{
+    mocks.options.mockResolvedValue({tasks:[{...task("future"),status:"not_started",startsOn:"2099-01-01"}]});const p=page();await p.onLoad({eventId:"course/a"});
+    expect(p.data.state).toBe("ready");expect(p.data.tasks).toHaveLength(1);expect(p.data.tasks[0]).toMatchObject({canOpen:false,actionLabel:"任务尚未开始"});expect(p.data.tasks[0].reason).toContain("2099-01-01");expect(mocks.open).not.toHaveBeenCalled();p.openTask({currentTarget:{dataset:{id:"future"}}});expect(mocks.open).not.toHaveBeenCalled();
+  });
+  it("preserves future managed read access and completed legacy viewing",async()=>{
+    mocks.options.mockResolvedValue({tasks:[{...task("managed"),status:"not_started",workflow:{canEdit:false,readyStudents:0}}]});const p=page();await p.onLoad({eventId:"course/a"});expect(p.data.tasks[0].intent).toBe("view");expect(mocks.open).toHaveBeenLastCalledWith(expect.stringContaining("taskId=managed"));
+    mocks.options.mockResolvedValue({tasks:[{...task("legacy-done"),status:"completed",completedStudents:19,totalStudents:19}]});await p.retry();expect(p.data.tasks[0].actionLabel).toBe("查看已完成测评");expect(mocks.open).toHaveBeenLastCalledWith(expect.stringContaining("taskId=legacy-done"));
+  });
+  it("keeps incomplete legacy editing and routes a real ready workflow to the original review panel",async()=>{
+    mocks.options.mockResolvedValue({tasks:[{...task("legacy"),completedStudents:0,totalStudents:40}]});const p=page();await p.onLoad({eventId:"course/a"});expect(p.data.tasks[0].intent).toBe("collect");expect(mocks.open).toHaveBeenLastCalledWith(expect.stringContaining("taskId=legacy"));
+    mocks.options.mockResolvedValue({tasks:[{...task("ready"),workflow:{canEdit:true,totalStudents:40,completedStudents:1,publishedStudents:0,readyStudents:1}}]});await p.retry();expect(p.data.tasks[0].intent).toBe("review");expect(mocks.open).toHaveBeenLastCalledWith(expect.stringContaining("&review=1"));
+  });
+
 });

@@ -1,3 +1,4 @@
+import { assessmentTaskFlow, assessmentTaskProjectRoute, type AssessmentTaskFlow } from "../assessment-task-flow";
 import { getTrainingGames } from "../../../utils/api";
 import { gameScore, gameReadMessage, GAME_STATE_LABELS, type GameContext } from "../../../utils/training-games";
 import { type TrainingRecord } from "../../../utils/training-records";
@@ -5,7 +6,7 @@ import { attendanceLeaveConflictMessage, getCoachAssessmentTasks, getTrainingTem
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { activityTypeLabel, formatCalendarDate, formatShortDate, formatTimeOnly, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
-import type { TrainingTemplateSummary, TrainingTransferSource, TrainingTransferPreview, CoachWorkbench, LoadState, TrainingContentSummary } from "../../../utils/types";
+import type { TrainingTemplateSummary, TrainingTransferSource, TrainingTransferPreview, CoachWorkbench, CoachAssessmentTask, LoadState, TrainingContentSummary } from "../../../utils/types";
 
 type TransferTarget = TrainingTransferPreview["targets"][number] & { action: "replace" | "skip"; existingLabel: string; dateLabel: string };
 
@@ -80,7 +81,9 @@ Page({
     trainingFactsAvailable: false,
     isTraining: false,
     gameSources:[] as GameContext["sources"], friendlyGames:[] as Array<{id:string;title:string;score:string;summary:string}>, gamesMessage:"", gamesLoading:false,
-    courseTasks: [] as Array<{ id: string; title: string; templateId: string; summary: string }>,
+    courseTasks: [] as Array<CoachAssessmentTask & AssessmentTaskFlow & {summary:string}>,
+    primaryTaskIds: [] as string[],
+    courseTodoCount: 0,
     courseTaskMessage: "",
     courseTasksState: "loading" as LoadState,
     primaryLabel: "查看训练记录",
@@ -212,7 +215,7 @@ Page({
         joinedNames,
         attendanceSaving: false,
         attendanceError: "",
-        courseTasks: [], courseTasksState: "loading", primaryLabel: "查看训练记录",
+        courseTasks: [], primaryTaskIds: [], courseTodoCount: 0, courseTasksState: "loading", primaryLabel: "查看训练记录",
       });
       if (isTraining) { void this.loadCourseTasks(id, request); void this.loadCourseGames(id, request); }
     } catch {
@@ -264,15 +267,18 @@ Page({
     try {
       const tasks = await getCoachAssessmentTasks({ forceRefresh: true });
       if (!currentLoadRequest(this, ticket)) return;
-      const courseTasks = tasks.filter(task => task.sourceEventId === eventId && Boolean(task.templateId)).map(task => ({ id: task.id, title: task.title, templateId: task.templateId, summary: `${task.completedStudents}/${task.totalStudents} 人采集完成` }));
-      this.setData({ courseTasks, courseTasksState: "ready", primaryLabel: !this.data.canWrite || !courseTasks.length ? "查看训练记录" : courseTasks.length === 1 ? "继续本课测评" : "选择本课测评", courseTaskMessage: courseTasks.length ? "保存采集后，仍需逐人核对确认。" : "本课暂无测评任务，课堂表现按需记录。" });
+      const courseTasks = tasks.filter(task => task.sourceEventId === eventId).map(task => ({...task, ...assessmentTaskFlow(task), summary: `${task.completedStudents}/${task.totalStudents} 人采集完成` }));
+      const pending = this.data.canWrite ? courseTasks.filter(task => task.actionable) : [];
+      this.setData({ courseTasks, primaryTaskIds: pending.map(task => task.id), courseTodoCount: pending.length, courseTasksState: "ready",
+        primaryLabel: !pending.length ? "查看训练记录" : pending.length === 1 ? pending[0]!.actionLabel : "选择本课待办",
+        courseTaskMessage: courseTasks.length ? `待处理 ${pending.length} 项 · 关联任务 ${courseTasks.length} 项，已确认任务仍可查看。` : "本课暂无测评任务，课堂表现按需记录。" });
     } catch { if (currentLoadRequest(this, ticket)) this.setData({ courseTasksState: "error", courseTaskMessage: "本课测评读取失败，训练内容与记录仍可使用。" }); }
   },
   retryCourseTasks() { return this.loadCourseTasks(this.data.eventId, (this as { _loadRequest?: number })._loadRequest ?? 0); },
   togglePreparation() { this.setData({preparationExpanded: !this.data.preparationExpanded}); },
   openCourseTask(event: { currentTarget: { dataset: { id: string } } }) {
     const task = this.data.courseTasks.find((item: { id: string }) => item.id === event.currentTarget.dataset.id);
-    if (task) openPage(`/pages/coach/assessment-projects/index?taskId=${encodeURIComponent(task.id)}&templateId=${encodeURIComponent(task.templateId)}&title=${encodeURIComponent(task.title)}`);
+    if (task) { const route = assessmentTaskProjectRoute(task, task.intent === "review"); if (route) openPage(route); }
   },
   openTemporaryPlayers() { if(this.data.canManageRoster) openPage(`/pages/coach/scout/index?eventId=${encodeURIComponent(this.data.eventId)}`); },
   createAssessmentTask() {if(this.data.canWrite && this.data.eventId) openPage(`/pages/coach/test-task-create/index?eventId=${encodeURIComponent(this.data.eventId)}`);},
@@ -292,9 +298,9 @@ Page({
     }
   },
   primaryAction() {
-    if (this.data.canWrite && this.data.courseTasks.length === 1) {
-      this.openCourseTask({currentTarget:{dataset:{id:this.data.courseTasks[0]!.id}}});
-    } else if (this.data.canWrite && this.data.courseTasks.length > 1) {
+    if (this.data.canWrite && this.data.primaryTaskIds.length === 1) {
+      this.openCourseTask({currentTarget:{dataset:{id:this.data.primaryTaskIds[0]!}}});
+    } else if (this.data.canWrite && this.data.primaryTaskIds.length > 1) {
       wx.pageScrollTo({selector: "#course-assessments", duration: 200});
     } else this.openAttendance();
   },

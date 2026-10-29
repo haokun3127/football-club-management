@@ -27,7 +27,7 @@
     <view id="course-assessments" wx:if="{{isTraining}}" class="workbench-card course-assessment">
       <view class="section-title">本课测评</view><view wx:if="{{courseTaskMessage}}" class="subtitle">{{courseTaskMessage}}</view>
       <t-button wx:if="{{courseTasksState === 'error'}}" theme="primary" variant="text" bindtap="retryCourseTasks">重试本课测评</t-button>
-      <view wx:for="{{courseTasks}}" wx:key="id" class="course-task" data-id="{{item.id}}" bindtap="openCourseTask"><view>{{item.title}} · {{item.summary}}</view><view class="training-card__edit">查看项目与进度 →</view></view>
+      <view wx:for="{{courseTasks}}" wx:key="id" class="course-task" data-id="{{item.id}}" bindtap="openCourseTask"><view>{{item.title}} · {{item.summary}}</view><view class="training-card__edit">{{item.actionLabel}}</view><view wx:if="{{item.reason}}" class="subtitle">{{item.reason}}</view></view>
       <view wx:if="{{canWrite}}" class="training-card__edit" bindtap="createAssessmentTask">＋发起随堂测评</view>
     </view>
     <view wx:if="{{isTraining}}" class="workbench-card">

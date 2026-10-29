@@ -1,3 +1,4 @@
+import { assessmentTaskFlow, assessmentTaskProjectRoute, type AssessmentTaskFlow } from "../assessment-task-flow";
 import { getCoachAssessmentTaskOptions } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
@@ -8,7 +9,7 @@ Page({
   data: {
     state: "loading" as LoadState,
     eventId: "", teamId: "", courseTitle: "", message: "正在查找本课测评任务",
-    tasks: [] as CoachAssessmentTask[],
+    tasks: [] as Array<CoachAssessmentTask & AssessmentTaskFlow>,
   },
   requestVersion: 0,
   onLoad(query?: {eventId?:string; teamId?:string}) {
@@ -24,18 +25,17 @@ Page({
     try {
       const options = await getCoachAssessmentTaskOptions(this.data.eventId, this.data.teamId || undefined);
       if (version !== this.requestVersion) return;
-      const tasks = options.tasks.filter(task => task.sourceEventId === this.data.eventId && Boolean(task.templateId)
-        && (task.status !== "not_started" || Boolean(task.workflow)));
+      const tasks = options.tasks.filter(task => task.sourceEventId === this.data.eventId).map(task => ({...task, ...assessmentTaskFlow(task)}));
       this.setData({tasks, courseTitle: options.sourceCourse?.title || "本课测评", state: tasks.length ? "ready" : "empty",
         message: tasks.length > 1 ? "本课有多个测评任务，请选择后进入项目与核对。" : tasks.length ? "已找到本课测评任务。" : "本课暂无可录入测评任务。可返回课堂查看训练记录或发起随堂测评。"});
-      if (tasks.length === 1) this.openTask({currentTarget:{dataset:{id:tasks[0]!.id}}});
+      if (tasks.length === 1 && tasks[0]!.canOpen) this.openTask({currentTarget:{dataset:{id:tasks[0]!.id}}});
     } catch {
       if (version === this.requestVersion) this.setData({state:"error", message:"任务读取失败，请重试。尚未进入成绩录入。"});
     }
   },
   openTask(event: {currentTarget:{dataset:{id?:string}}}) {
     const task = this.data.tasks.find((item: CoachAssessmentTask) => item.id === event.currentTarget.dataset.id);
-    if (task) openPage(`/pages/coach/assessment-projects/index?taskId=${encodeURIComponent(task.id)}&templateId=${encodeURIComponent(task.templateId)}&title=${encodeURIComponent(task.title)}`);
+    if (task) { const route = assessmentTaskProjectRoute(task, task.intent === "review"); if (route) openPage(route); }
   },
   openCourse() { if (this.data.eventId) openPage(`/pages/coach/event/index?id=${encodeURIComponent(this.data.eventId)}`); },
   retry() { return this.load(); },

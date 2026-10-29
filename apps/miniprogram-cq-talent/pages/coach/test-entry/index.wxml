@@ -5,7 +5,12 @@
     <block wx:if="{{state === 'ready'}}">
       <view class="task-resolver__title">{{courseTitle}}</view>
       <view class="task-resolver__hint">{{message}}</view>
-      <t-button wx:for="{{tasks}}" wx:key="id" class="task-resolver__task" data-id="{{item.id}}" bindtap="openTask" theme="primary" variant="outline">{{item.title}} · {{item.completedStudents}}/{{item.totalStudents}} 人采集完成</t-button>
+      <view wx:for="{{tasks}}" wx:key="id" class="task-resolver__task">
+        <view class="task-resolver__title">{{item.title}}</view>
+        <view class="task-resolver__hint">{{item.completedStudents}}/{{item.totalStudents}} 人采集完成</view>
+        <view wx:if="{{item.reason}}" class="task-resolver__hint">{{item.reason}}</view>
+        <t-button disabled="{{!item.canOpen}}" data-id="{{item.id}}" bindtap="openTask" theme="primary" variant="outline">{{item.actionLabel}}</t-button>
+      </view>
     </block>
     <t-button wx:if="{{eventId && state !== 'loading'}}" bindtap="openCourse" theme="primary" variant="text">查看课堂与训练记录</t-button>
   </view>
