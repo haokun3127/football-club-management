@@ -92,3 +92,10 @@
 - 保留证据由Codex Security工具写入 /Users/dongjun/.codex/state/plugins/codex-security/scans/football-club-management/artifacts-a14b4a62423579f8d115e7711b9cd487403a0b3764b6798568833d2f33ccea43/artifacts/ ：before.log、focused.log、route-inventory.mjs/txt、replay-review.md。无推送、部署或环境切换。
 - 补充候选：模板preview的缓存targets也逐项检查当前canPlan，防止来源仍可访问但目标授权已移除时泄露旧目标列表；定向2文件7项通过（新增目标范围撤销探针+正常重放对照），API typecheck通过。入口表见research/idempotency-entrypoints.md，包括登录/WPS等独立重试合同。
 - 第一次完整API运行279项通过、2项仅因沙盒listen EPERM失败；升级至允许本机端口后完整check:delivery通过（API281、domain47、后台8、小程序698通过1skip、全部类型/构建/14脚本/3环境）。因preview补测发生在该轮测试收集之后，最终候选再跑一次门禁。
+
+### 冻结交接与CQ23浏览器复验完成
+- 本轮运行时代码冻结SHA：2a7bf9a58e84ed8c7c5039f85d007857b4b10ee0（含8b50f7ed通用修复）；其后仅任务记录/截图，无未提交产品代码。时区修复8a7e7f95、CQ23窄修c35755b3已由总控集成。
+- 最终候选第二轮check:delivery：全部类型通过；domain47/后台8/小程序698通过1skip，API280通过、2项5秒超时（environment-isolation的valid session环境伪装探针、backoffice-management服务跨重开），无断言失败。未提高超时；与总控同时运行全量有本机争用线索，已结束并暂停全量复跑，交总控串行最终门禁。最终日志已由Security工具保留final-delivery-gate.log。此前完整门禁通过+最终preview范围定向7项/typecheck通过，不将本轮超时写成全绿。
+- CQ23真实隔离Chromium/cookie/合成fixture验收完成：工作台“查看任务”→同taskId深链；仅浏览器模拟503→稳定可见“重试读取任务”；解除mock点击后只发同一taskId GET，恢复CQ23任务标题、U10队伍、周期、学员李明，错误动作消失，1024宽无document横向溢出。证据research/cq23-task-retry-error.png、cq23-task-retry-recovered.png，均直接看图核验。
+- 额外既有对象工作流：从工作台“查看资料”进入学员档案，身份/出生日期清楚；修改合成教学备注，关闭→继续编辑保留输入；模拟503保存仍保留输入，解除mock重试实际保存，重开同学员回读备注；操作历史显示王管理员与备注从空值到新值。research/cq23-profile-save-error.png（保留输入）、cq23-profile-history.png（回读历史）已看图。此流程无需产品代码调整。覆盖29资源映射及这两条真实路径，不冒称29项全量人工验收。
+- fixture进程已停止，临时数据库和随机凭据已清理；本任务隔离Chromium已关闭。没有push、真实服务写入、部署、环境切换或微信上传。原生小程序canvas仍由总控主目录验收。
