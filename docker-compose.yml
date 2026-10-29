@@ -1,9 +1,6 @@
 services:
   data-init:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: cq-talent-api:latest
+    image: ${FCM_RELEASE_IMAGE:?Set the reviewed release image by digest}
     user: "0:0"
     command: ["sh", "-c", "mkdir -p /var/lib/cq-talent && find /var/lib/cq-talent -path /var/lib/cq-talent/secure-backups -prune -o -exec chown node:node {} +"]
     volumes:
@@ -19,10 +16,7 @@ services:
       - CHOWN
 
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: cq-talent-api:latest
+    image: ${FCM_RELEASE_IMAGE:?Set the reviewed release image by digest}
     container_name: cq-talent-api
     restart: unless-stopped
     depends_on:

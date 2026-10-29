@@ -1,19 +1,18 @@
 # Standalone file: never merge with the root production compose or its overrides.
 name: cq-talent-nonproduction
 services:
-  data-init:
-    image: ${FCM_NONPROD_IMAGE:?Set an immutable image tag built from the reviewed commit}
+  develop-data-init:
+    image: ${FCM_DEVELOP_IMAGE:?Set the reviewed develop image by digest}
     user: "0:0"
-    command: ["sh", "-c", "chown node:node /var/lib/cq-talent-develop /var/lib/cq-talent-trial"]
+    command: ["sh", "-c", "chown node:node /var/lib/cq-talent-develop"]
     volumes:
       - develop-data:/var/lib/cq-talent-develop
-      - trial-data:/var/lib/cq-talent-trial
     restart: "no"
     cap_drop: [ALL]
     cap_add: [CHOWN]
     security_opt: ["no-new-privileges:true"]
   develop:
-    image: ${FCM_NONPROD_IMAGE:?Set an immutable image tag built from the reviewed commit}
+    image: ${FCM_DEVELOP_IMAGE:?Set the reviewed develop image by digest}
     env_file: ${FCM_DEVELOP_ENV_FILE:?Set a dedicated private develop env file}
     environment:
       NODE_ENV: production
@@ -25,13 +24,22 @@ services:
     ports: ["127.0.0.1:3101:3000"]
     volumes: ["develop-data:/var/lib/cq-talent-develop"]
     depends_on:
-      data-init:
+      develop-data-init:
         condition: service_completed_successfully
     restart: unless-stopped
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
+  trial-data-init:
+    image: ${FCM_TRIAL_IMAGE:?Set the reviewed trial image by digest}
+    user: "0:0"
+    command: ["sh", "-c", "chown node:node /var/lib/cq-talent-trial"]
+    volumes: ["trial-data:/var/lib/cq-talent-trial"]
+    restart: "no"
+    cap_drop: [ALL]
+    cap_add: [CHOWN]
+    security_opt: ["no-new-privileges:true"]
   trial:
-    image: ${FCM_NONPROD_IMAGE:?Set an immutable image tag built from the reviewed commit}
+    image: ${FCM_TRIAL_IMAGE:?Set the reviewed trial image by digest}
     env_file: ${FCM_TRIAL_ENV_FILE:?Set a dedicated private trial env file}
     environment:
       NODE_ENV: production
@@ -43,7 +51,7 @@ services:
     ports: ["127.0.0.1:3102:3000"]
     volumes: ["trial-data:/var/lib/cq-talent-trial"]
     depends_on:
-      data-init:
+      trial-data-init:
         condition: service_completed_successfully
     restart: unless-stopped
     cap_drop: [ALL]

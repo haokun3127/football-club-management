@@ -3,7 +3,7 @@
   "name": "cq-platform-foundation",
   "title": "CQ-00 平台边界与部署制品",
   "description": "",
-  "status": "planning",
+  "status": "in_progress",
   "dev_type": null,
   "scope": null,
   "package": "api",
