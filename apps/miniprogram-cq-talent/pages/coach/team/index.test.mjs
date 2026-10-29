@@ -186,6 +186,9 @@ describe("coach team detail", () => {
     expect(template).not.toMatch(/凤凰山|U10精英队|林教练|主教练|王助教|李体能/);
     expect(template).not.toMatch(/\.(?:map|filter|slice|indexOf)\s*\(/);
   });
+  it("preserves zero and team counts while identifying the attendance ratio as marked records", async () => {
+    const detail=await mocks.getCoachTeam();mocks.getCoachTeam.mockResolvedValue({...detail,stats:{...detail.stats,attendanceRate:0}});const p=createPageInstance();await p.load();expect(p.data.heroStats.find(stat=>stat.label==="点名到场占比").value).toBe("0%");expect(p.data.heroStatsHint).toContain("与训练计次分别统计");expect(p.data.heroStats).toHaveLength(3);
+  });
 });
 
 it("searches visible members without losing roster identity or allowing foreign navigation", async () => {
@@ -209,8 +212,6 @@ it("keeps two games in one training course distinct and links their stable IDs",
  expect(p.data.visibleMatches.map(item=>item.key)).toEqual(["training_friendly:g1","training_friendly:g2"]);
  p.openMatch({currentTarget:{dataset:{id:"training_friendly:g2"}}});expect(mocks.openPage).toHaveBeenCalledWith("/pages/coach/training-game/index?eventId=shared-course&gameId=g2");
  p.selectMatchFilter({currentTarget:{dataset:{kind:"formal"}}});expect(p.data.visibleMatches).toEqual([]);
-  it("preserves zero and team counts while identifying the attendance ratio as marked records", async () => {
-    const detail=await mocks.getCoachTeam();mocks.getCoachTeam.mockResolvedValue({...detail,stats:{...detail.stats,attendanceRate:0}});const p=createPageInstance();await p.load();expect(p.data.heroStats.find(stat=>stat.label==="点名到场占比").value).toBe("0%");expect(p.data.heroStatsHint).toContain("与训练计次分别统计");expect(p.data.heroStats).toHaveLength(3);
-  });
+
 
 });
