@@ -1,0 +1,26 @@
+{
+  "sha": "02baed1f4a1c7fd7e2cde83b022472a0bece346a",
+  "migrationFiles": 46,
+  "actualTables": 105,
+  "declaredTableCount": 105,
+  "declared": 105,
+  "missing": [],
+  "extra": [],
+  "duplicates": [],
+  "missingPaths": [],
+  "hashMismatches": [],
+  "unlistedMigrations": [],
+  "runtimeMetadata": [
+    {
+      "table": "schema_migrations",
+      "owner": "migration runner",
+      "source": "apps/api/src/persistence/sqlite.ts"
+    },
+    {
+      "table": "runtime_environment",
+      "owner": "environment isolation",
+      "source": "apps/api/src/persistence/runtime-database.ts"
+    }
+  ],
+  "markdownMissing": []
+}

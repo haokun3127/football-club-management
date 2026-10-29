@@ -1,0 +1,53 @@
+import {it,expect,vi} from 'vitest';
+import {mkdtempSync,mkdirSync,copyFileSync,readdirSync,writeFileSync,rmSync} from 'node:fs';
+import {join} from 'node:path';
+import {tmpdir} from 'node:os';
+import {openSqliteDatabase,migrate} from '../src/persistence/sqlite.js';
+import {createPlatformPersistence,createPlatformRepositories,seedPlatformData} from '../src/persistence/platform-persistence.js';
+import {createSeedData} from '../src/seed.js';
+import {PersistentApiStore} from '../src/store.js';
+import {buildServer} from '../src/server.js';
+import {HeaderMembershipResolver} from '../src/auth/context.js';
+const clubId='club-chongqing-talent',eventId='event-training-1';
+it('audit upgrades a real 45-migration database without rewriting old scores and persists the first CAS revision',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'cq-round3-upgrade-'));mkdirSync(join(dir,'old-migrations'));
+ const migrationRoot='/tmp/cq-audit-7753a87a/apps/api/db/migrations';
+ for(const f of readdirSync(migrationRoot).filter(f=>f.endsWith('.sql')&&!f.startsWith('0046_')))copyFileSync(join(migrationRoot,f),join(dir,'old-migrations',f));
+ const databasePath=join(dir,'api.sqlite');let old=openSqliteDatabase(databasePath);
+ let p:Awaited<ReturnType<typeof createPlatformPersistence>>|undefined;
+ try{
+  expect(migrate(old,join(dir,'old-migrations')).applied).toHaveLength(45);
+  const repo=createPlatformRepositories(old);await seedPlatformData(repo,createSeedData());
+  const legacy={id:'legacy-classroom-id',clubId,eventId,studentId:'student-1',trainingProjectId:'drill-cq-talent-assessment-001',score:0,note:'legacy preserved zero',assessedByCoachId:'coach-1',assessedAt:'2026-07-01T10:00:00.000Z',createdAt:'2026-07-01T10:00:00.000Z',updatedAt:'2026-07-01T10:00:00.000Z'};
+  repo.trainingContentAssessments.save(legacy);
+  expect(old.prepare("SELECT name FROM sqlite_master WHERE name='training_content_assessment_revisions'").get()).toBeUndefined();
+  old.close();old=undefined as any;
+  p=await createPlatformPersistence({databasePath,seed:false});
+  const snap=p.repositories.trainingContentAssessments.snapshot(clubId,eventId);
+  expect(snap).toEqual({revision:0,assessments:[legacy]});
+  const result=await p.repositories.trainingContentAssessments.compareAndSave(clubId,eventId,0,[{...legacy,id:'attempt-replace-id',score:88,note:'new note',updatedAt:'2026-10-30T00:00:00.000Z'}]);
+  expect(result).toMatchObject({conflict:false,revision:1});
+  expect(p.repositories.trainingContentAssessments.snapshot(clubId,eventId).assessments[0]).toMatchObject({id:legacy.id,score:88,createdAt:legacy.createdAt});
+  p.database.close();p=await createPlatformPersistence({databasePath,seed:false});
+  expect(p.repositories.trainingContentAssessments.snapshot(clubId,eventId)).toMatchObject({revision:1,assessments:[{id:legacy.id,score:88,note:'new note'}]});
+  expect(await p.repositories.trainingContentAssessments.compareAndSave(clubId,eventId,0,[legacy])).toMatchObject({conflict:true,revision:1});
+ }finally{old?.close();p?.database.close();rmSync(dir,{recursive:true,force:true});}
+},30000);
+
+it('audit records live eligible periodic task options for the native resolver',async()=>{
+ vi.stubEnv('FCM_ASSESSMENT_PUBLICATION_CLUBS',clubId);
+ const p=await createPlatformPersistence({databasePath:':memory:'});const store=new PersistentApiStore(p.repositories);
+ const app=buildServer(store,{logger:false,membershipResolver:new HeaderMembershipResolver(p.repositories.users,p.repositories.memberships)});
+ try{
+  const task={id:'round3-periodic-task',clubId,teamId:'team-u10-dev',templateId:'assessment-template-technical',studentIds:['student-1'],termLabel:'2026',title:'Audit periodic',startsOn:'2020-01-01',dueOn:'2099-12-31'};
+  await store.saveAssessmentTask(task);
+  const base=`/clubs/${clubId}/app-clients/app-client-cq-talent-wechat-main/coach`;
+  const headers={'x-user-id':'user-coach-1'};
+  const options=await app.inject({method:'GET',url:base+`/assessment-tasks?sourceEventId=${eventId}&teamId=team-u10-dev`,headers});
+  expect(options.statusCode).toBe(200);expect(options.json().tasks.find((t:any)=>t.id===task.id).sourceEventId).toBeUndefined();
+  const courses:Record<string,unknown>={};
+  for(const candidate of options.json().tasks){const response=await app.inject({method:'GET',url:base+`/assessment-tasks/${candidate.id}/courses`,headers});if(response.statusCode===200)courses[candidate.id]=response.json();}
+  expect((courses[task.id] as any).courses.some((c:any)=>c.id===eventId)).toBe(true);
+  writeFileSync('/tmp/cq-round3-periodic-options.json',JSON.stringify({options:options.json(),courses}));
+ }finally{await app.close();p.database.close();vi.unstubAllEnvs();}
+},15000);

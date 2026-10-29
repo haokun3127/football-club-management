@@ -1,1 +1,13 @@
-Probe is archived in the round2 report; preserve original /tmp fixture.
+it("round2 audit: observes older same-generation growth retry replacing a newer automatic refresh",async()=>{
+  mocks.growth.mockRejectedValueOnce(new Error("initial growth unavailable"));
+  const p=page();await p.load();await vi.waitFor(()=>expect(p.data.growthState).toBe("error"));
+  const children=deferred();mocks.children.mockReturnValueOnce(children.promise);
+  const refreshing=p.load();expect(p.data.state).toBe("ready");
+  const older=deferred();mocks.growth.mockReturnValueOnce(older.promise);
+  p.retryGrowth();
+  mocks.growth.mockResolvedValueOnce({milestonesAvailable:true,milestones:[{title:"new confirmed result",date:"2026-10-30"}]});
+  children.resolve([{id:"b",name:"乙",teams:["U10"]}]);await refreshing;
+  await vi.waitFor(()=>expect(p.data.milestoneTitle).toBe("new confirmed result"));
+  older.resolve({milestonesAvailable:true,milestones:[{title:"older result",date:"2026-10-01"}]});
+  await vi.waitFor(()=>expect(p.data.milestoneTitle).toBe("older result"));
+});

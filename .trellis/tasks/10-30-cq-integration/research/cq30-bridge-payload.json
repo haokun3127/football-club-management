@@ -1,0 +1,49 @@
+{
+  "method": "Deterministic controller setData payload measurement; Node24 + identical Vitest fixture on this Mac; mock network; one duration field, 19/40 synthetic students including a long name; each receives 4 -> 4. -> 4.9 -> 4.92. Excludes initial load; UTF-8 JSON patch bytes, not runtime protocol bytes, device latency, network latency or P95.",
+  "beforeRevision": "91ae7bc0",
+  "afterRevision": "02baed1f",
+  "results": {
+    "19": {
+      "before": {
+        "count": 19,
+        "keystrokes": 76,
+        "patches": 152,
+        "fullRowsPatches": 76,
+        "bridgeBytes": 597318,
+        "finalValue": "4.92",
+        "draftEntries": 19
+      },
+      "after": {
+        "count": 19,
+        "keystrokes": 76,
+        "patches": 77,
+        "fullRowsPatches": 0,
+        "bridgeBytes": 37905,
+        "finalValue": "4.92",
+        "draftEntries": 19
+      },
+      "payloadReductionPercent": 93.65
+    },
+    "40": {
+      "before": {
+        "count": 40,
+        "keystrokes": 160,
+        "patches": 320,
+        "fullRowsPatches": 160,
+        "bridgeBytes": 2624952,
+        "finalValue": "4.92",
+        "draftEntries": 40
+      },
+      "after": {
+        "count": 40,
+        "keystrokes": 160,
+        "patches": 161,
+        "fullRowsPatches": 0,
+        "bridgeBytes": 79905,
+        "finalValue": "4.92",
+        "draftEntries": 40
+      },
+      "payloadReductionPercent": 96.96
+    }
+  }
+}

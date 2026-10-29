@@ -1,9 +1,9 @@
 # 当前实现架构
 
-复核：2026-10-30，优化起始基线 `41f615d7`（产品代码仍为 `91ae7bc0`）。本页描述实现，不改变 [产品需求](product-requirements/README.md)。旧实体设计和2026-07交接事实保存在[历史架构](../archive/architecture-before-2026-10-21.md)。
+复核：2026-10-30，优化起始基线 `41f615d7`（原产品 `91ae7bc0`），CQ集成代码见当前任务与交付记录。本页描述实现，不改变 [产品需求](product-requirements/README.md)。旧实体设计和2026-07交接事实保存在[历史架构](../archive/architecture-before-2026-10-21.md)。
 
 - `packages/domain`：类型、业务计算与校验；`apps/api`：Fastify 5、路由/应用服务/仓储；`apps/backoffice`：Umi/React 管理界面；`apps/miniprogram-cq-talent`：原生 TypeScript/WXML/WXSS 小程序。
-- API 使用 Node 24 的 `node:sqlite`，当前仓库有 45 个 SQL 迁移文件；内存重放生成104张表，另有迁移记录和环境归属2张运行时元数据表。运行入口/迁移和持久化实现分别见 `apps/api/src/index.ts`、`src/migrate.ts`、`src/persistence/`。数量是源码事实，不是线上库盘点。
+- API 使用 Node 24 的 `node:sqlite`，当前仓库有 46 个 SQL 迁移文件；内存重放生成105张表，另有迁移记录和环境归属2张运行时元数据表。运行入口/迁移和持久化实现分别见 `apps/api/src/index.ts`、`src/migrate.ts`、`src/persistence/`。数量是源码事实，不是线上库盘点。
 - 单实例 SQLite、短事务、版本冲突与留痕是当前工程边界。没有本轮实测的 DAU/吞吐 SLA；不以历史“500日活”说法作容量保证，也不启动数据库重构。
 - 小程序经 app-client BFF 使用真实微信手机号连接器与 Bearer 会话；服务器对 active role、guardian、教练队伍和具体动作授权。后台使用自己的认证与授权；客户端隐藏按钮不构成权限控制。
 - 训练事实在 `training-records`，系统按课程结束时刻对账；人工修正优先、取消课不计次、请假/撤回追加历史。课包账本独立，训练记录不会自动扣账。

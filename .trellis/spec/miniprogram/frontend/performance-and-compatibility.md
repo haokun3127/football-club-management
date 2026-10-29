@@ -84,3 +84,13 @@ During 2026-09-28 checks, passing fixture objects directly to Automator `mockWxM
 5. **Cases:** lost response/restart reuses pending key; completed/restart generates new key; same payload after a 409 uses a fresh attempt after reread.
 6. **Tests:** `utils/idempotency.test.mjs` restart, eviction and late outcome; `utils/request.test.mjs` 409/502; full native compile because Node tests do not exercise WeChat transforms.
 7. **Wrong / correct:** deterministic digest+resettable counter can silently replay a prior success; a persisted unresolved operation key plus random new-operation identity avoids that collision.
+
+
+## CQ input and request ownership (2026-10-30)
+
+- Continuous assessment input updates the changed row through a setData path; controller-only value maps stay outside bridge payloads. Synchronous scoped draft persistence is retained. Keep student name, unit, course and focus context stable; never optimize by delaying durable drafts without an explicit recovery contract.
+- Page generation protects identity/child/role changes; each independently retryable module also needs its own request sequence. A manual retry and automatic same-generation refresh can overlap. Both success and failure must check the module sequence before replacing state.
+- Same-scope background refresh may preserve prior content with a stale/retry message. Different environment/club/user/role/child clears prior content immediately. Saving and publication invalidate the relevant read scope.
+- Classroom performance keeps the original snapshot revision and pending payload across uncertain outcomes.409 preserves local values; only explicit reread and user reconciliation establish a new baseline.428 stays readable but disallows unversioned saving. Do not automatically reuse a server conflict-detail revision for old inputs.
+- Validate on actual native canvas after type/tests. Automator route changes may finish after an initial ready state from the previous page; require expected route and query state. An invoked page handler is not evidence of a real native component tap. If custom component selectors or computer-use transport are unavailable, label that gap and retain physical-device keyboard/Android/iOS/dynamic-type acceptance.
+- CQ30 deterministic19/40-student bridge byte measurements are in the integration task research. They establish payload reduction only, not device latency or P95. Official package reports, request timing and real input latency remain separate measurements.
