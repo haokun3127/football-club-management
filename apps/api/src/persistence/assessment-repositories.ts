@@ -51,7 +51,7 @@ export class AssessmentRepository {
     const rows = this.database.prepare(`
       SELECT * FROM player_metric_records
       WHERE club_id = ? AND (? IS NULL OR student_id = ?)
-      ORDER BY occurred_at DESC, id DESC
+      ORDER BY occurred_at DESC, created_at DESC, rowid DESC
     `).all(clubId, studentId ?? null, studentId ?? null) as SqlRow[];
     return rows.map(mapPlayerMetricRecord);
   }

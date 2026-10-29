@@ -52,3 +52,8 @@
 - 最终运行时制品来源b51bfbb3cb85e1bba2070de50235e7e4e78e11aa，buildId cq00-b51bfbb3 / cq00-client-b51bfbb3；源码后续变化目前只在交付工具的本地ID兼容与记录，不改该镜像API/后台运行时代码。
 - CQ-00代码完成，待总控集成和真实develop切换/角色流/微信构建验收；本任务不归档。未部署任何环境，trial/release真实服务未触碰。
 - 后续新指令：暂缓CQ-23，追加三个正确性修复，独立提交：同时间测评更正排序、课堂表现整批原子性、课堂表现revision并发与旧客户端安全拒绝。实施合同另见本任务correctness-design.md，保留CQ-00可独立集成。
+
+### A02独立修复
+- 从真实保存/发布审计探针移植期望正确结果的回归，先失败：growth latest100而非60；内存同毫秒也取旧ID。
+- 仓储同occurred_at按created_at、SQLite追加rowid倒序；内存按同等发生/记录/追加顺序输出，getStudentMetrics复用canonical顺序，避免按无补零ID猜时间。没有改分、删除历史或改变草稿可见性。
+- Node24 `vitest run test/assessment-record-order.test.ts test/assessment-workflow.test.ts test/assessment-workflow-repository.test.ts`：3文件21通过，覆盖9901→10000、精确同毫秒、文件重开、100→60确认后真实家长GET、修订未确认仍旧值。API typecheck通过。

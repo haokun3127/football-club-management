@@ -1120,7 +1120,10 @@ export abstract class SeedBackedStore implements ApiStore {
   }
 
   listMetricRecords(clubId: EntityId) {
-    return this.data.metricRecords.filter((item) => item.clubId === clubId);
+    // Records are append-only facts. IDs are opaque; the latest confirmation at
+    // one occurrence uses recorded time, then append order for same-ms writes.
+    return this.data.metricRecords.filter((item) => item.clubId === clubId).reverse()
+      .sort((left, right) => Date.parse(right.occurredAt) - Date.parse(left.occurredAt) || Date.parse(right.createdAt) - Date.parse(left.createdAt));
   }
 
   getDataCapabilityConfig(clubId: EntityId): DataCapabilityConfig {
@@ -2120,10 +2123,9 @@ export abstract class SeedBackedStore implements ApiStore {
   getStudentMetrics(clubId: EntityId, studentId: EntityId, source?: MetricSourceKind | MetricSourceKind[]) {
     const sources = source ? new Set(Array.isArray(source) ? source : [source]) : null;
 
-    return this.data.metricRecords
-      .filter((record) => record.clubId === clubId && record.studentId === studentId)
-      .filter((record) => (sources ? sources.has(record.source) : true))
-      .sort((left, right) => Date.parse(right.occurredAt) - Date.parse(left.occurredAt));
+    return this.listMetricRecords(clubId)
+      .filter((record) => record.studentId === studentId)
+      .filter((record) => (sources ? sources.has(record.source) : true));
   }
 
   getCoachToday(clubId: EntityId, input: { date: string; userId: EntityId; roles: string[] }) {
@@ -2753,8 +2755,7 @@ export class PersistentApiStore extends SeedBackedStore {
     const sources = source ? new Set(Array.isArray(source) ? source : [source]) : null;
     return this.repositories.assessments
       .listMetricRecords(clubId, studentId)
-      .filter((record) => (sources ? sources.has(record.source) : true))
-      .sort((left, right) => Date.parse(right.occurredAt) - Date.parse(left.occurredAt));
+      .filter((record) => (sources ? sources.has(record.source) : true));
   }
 
   override listMetricRecords(clubId: EntityId) {
