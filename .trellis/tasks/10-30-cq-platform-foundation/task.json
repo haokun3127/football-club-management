@@ -12,7 +12,7 @@
   "assignee": "dongjun",
   "createdAt": "2026-10-30",
   "completedAt": null,
-  "branch": null,
+  "branch": "codex/cq-platform-foundation",
   "base_branch": "feature/ui-batch-1-p01",
   "worktree_path": null,
   "commit": null,

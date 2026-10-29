@@ -32,3 +32,10 @@
 - GET /health 保留 status/service，增加 build: {sourceRevision,buildId,builtAt} | null；配置运行时另有 environment；no-store。只读镜像内 apps/api/build-metadata.json 的白名单，不输出凭证/路径/任意env。缺失或损坏元数据为null。OpenAPI复用同一响应schema，新增字段保持可选以描述旧合同。
 - 小程序 utils/version.ts 的 getClientVersion() 同步读取平台 version 与本包 stamped build；getServiceVersion() 显式读取health，旧服务字段缺失为null，显式环境不一致抛错。没有页面改动或额外初载请求。
 - 2026-10-30 Node24：API build-info/server/environment-isolation 3文件74项通过；小程序版本4项通过；已有 localhost smoke 在沙箱内EPERM，正以授权监听重跑。
+
+### 批次3：固定提交制品与清单
+- 新增固定 Git 提交导出、服务器独立构建、客户端暂存打包与双单元清单。Docker 镜像固化版本文件、后台及迁移文件哈希、锁文件哈希和 OCI 标签；不将 local image ID 误当 registry digest。候选元数据只由镜像回读。
+- 公共接入/操作合同见 deploy/environment-isolation/DELIVERY.md；共享spec七节建议见本任务 spec-handoff.md，交总控落地。
+- 2026-10-30 Node24/pnpm10.33.0 `pnpm check:delivery` 全门禁通过：domain47、后台4、小程序691通过/1既有skip、API266通过；所有包类型/构建通过；Node脚本14通过；三环境临时独立启动无seed、显式初始化及错误配置拒绝通过。原始日志 /private/tmp/cq-platform-check-delivery.log；精简结论持久保存在此任务。授权localhost重跑小程序version/environment14通过，API与小程序类型单独通过。
+- 脚本5项覆盖真实Compose、固定提交不带脏文件、写入实际文件哈希、双单元清单及坏输入。补充检查物理volume名，防止逻辑volume别名映射到其他环境卷。
+- 下一步：以本批提交构建本地候选镜像，网络禁用/无数据卷容器回读版本与模块加载。未push/deploy/微信上传，线上及真机仍待总控。

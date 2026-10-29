@@ -23,6 +23,9 @@ export function startPlan(environment, config) {
   const service = config.services?.[target.service];
   const init = config.services?.[target.init];
   if (!service || !init) throw new Error("Environment services are missing");
+  const volume = config.volumes?.[target.volume];
+  const expectedName = environment === "release" ? "cq-talent-api-data" : `cq-talent-${environment}-data`;
+  if (volume?.name !== expectedName || volume.external || volume.driver_opts) throw new Error("Dedicated volume name differs or uses an external mount");
   assertDigest(service.image);
   if (init.image !== service.image || service.build || init.build) throw new Error("Runtime and initialization must use the same prebuilt image");
   for (const entry of [service, init]) {

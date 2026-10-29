@@ -46,6 +46,9 @@ test("Compose keeps develop, trial and release images and init volumes independe
     const dependency = structuredClone(after);
     dependency.services.develop.depends_on.trial = { condition: "service_started" };
     assert.throws(() => startPlan("develop", dependency), /Cross-environment/);
+    const wrongVolume = structuredClone(after);
+    wrongVolume.volumes["develop-data"].name = "cq-talent-api-data";
+    assert.throws(() => startPlan("develop", wrongVolume), /Dedicated volume name/);
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
 

@@ -13,7 +13,7 @@
     "dev:api": "pnpm --filter @football-club/api dev",
     "test": "pnpm -r test",
     "typecheck": "pnpm --filter @football-club/domain build && pnpm -r typecheck",
-    "check:delivery": "node scripts/verify-delivery-config.mjs && pnpm check && pnpm build && node --test scripts/devtools/automation-session.test.cjs deploy/environment-isolation/bootstrap-client.test.mjs deploy/environment-isolation/bootstrap-identity.test.mjs && node scripts/verify-environment-startup.mjs",
+    "check:delivery": "node scripts/verify-delivery-config.mjs && pnpm check && pnpm build && node --test scripts/delivery/*.test.mjs scripts/devtools/automation-session.test.cjs deploy/environment-isolation/bootstrap-client.test.mjs deploy/environment-isolation/bootstrap-identity.test.mjs && node scripts/verify-environment-startup.mjs",
     "check:environments": "node scripts/verify-environment-readiness.mjs",
     "dev:backoffice": "pnpm --filter @football-club/backoffice dev"
   },
