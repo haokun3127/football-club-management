@@ -1,13 +1,15 @@
+import { assessmentTaskFlow, assessmentTaskProjectRoute, type AssessmentTaskFlow } from "../assessment-task-flow";
 import { getCoachAssessmentTasks, getCoachHome } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { loadActiveTeam } from "../../../utils/coach-team-context";
 import { calendarDateKey, currentLocalDate, shiftCalendarDate } from "../../../utils/date";
 import { calendarDataRanges } from "../../../utils/schedule-calendar";
 import { openPage } from "../../../utils/navigation";
-import { formatCalendarDate, formatTimeOnly } from "../../../utils/presentation";
+import { activityTypeLabel, formatCalendarDate, formatTimeOnly } from "../../../utils/presentation";
 import type { CoachAssessmentTask, LoadState, ScheduleEvent } from "../../../utils/types";
 
-type CourseCard = ScheduleEvent & { timeLabel: string };
+type CourseCard = ScheduleEvent & { timeLabel: string; typeLabel: string };
+type PendingTask = CoachAssessmentTask & AssessmentTaskFlow;
 const generations = new WeakMap<object, number>();
 const routes: Record<string, string> = {
   roster: "/pages/coach/team/index?section=roster", training: "/pages/coach/training/index?section=training",
@@ -17,7 +19,7 @@ const routes: Record<string, string> = {
 Page({
   data: {
     state: "loading" as LoadState, message: "正在读取球队", teamId: "", teamName: "", season: "", section: "workspace",
-    trainingCards: [] as CourseCard[], upcomingCards: [] as CourseCard[], pendingTasks: [] as CoachAssessmentTask[],
+    trainingCards: [] as CourseCard[], upcomingCards: [] as CourseCard[], pendingTasks: [] as PendingTask[], visiblePendingTasks: [] as PendingTask[],
     overviewLoading: false, courseError: "", taskError: "",
     entries: [
       { id: "roster", name: "队员名单", note: "在队学员" }, { id: "training", name: "训练安排", note: "课程与内容" },
@@ -37,7 +39,7 @@ Page({
     if (!requireRole("coach")) return;
     const version = (generations.get(this) ?? 0) + 1;
     generations.set(this, version);
-    this.setData({ state: "loading", message: "正在读取球队", trainingCards: [], upcomingCards: [], pendingTasks: [], courseError: "", taskError: "" });
+    this.setData({ state: "loading", message: "正在读取球队", trainingCards: [], upcomingCards: [], pendingTasks: [], visiblePendingTasks: [], courseError: "", taskError: "" });
     try {
       const context = await loadActiveTeam(this.requestedTeamId || undefined);
       if (generations.get(this) !== version) return;
@@ -61,14 +63,14 @@ Page({
       const cards = courses.status === "fulfilled" ? courses.value.events
         .filter(event => {
           const day = calendarDateKey(event.startsAt);
-          return event.type === "training" && event.teamIds?.includes(context.id) && day >= from && day <= to
+          return (!isMonth || event.type === "training") && event.teamIds?.includes(context.id) && (!isMonth || day >= from) && day <= to
             && (isMonth || (event.status !== "cancelled" && event.status !== "completed" && Date.parse(event.endsAt || event.startsAt) > Date.now()));
         })
         .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
-        .map(event => ({ ...event, timeLabel: `${formatCalendarDate(event.startsAt)} · ${formatTimeOnly(event.startsAt)}` })) : [];
-      const pendingTasks = tasks.status === "fulfilled" ? tasks.value.filter(task => task.teamId === context.id && task.status !== "completed")
+        .map(event => ({ ...event, typeLabel: activityTypeLabel(event.type), timeLabel: `${formatCalendarDate(event.startsAt)} · ${formatTimeOnly(event.startsAt)}` })) : [];
+      const pendingTasks = tasks.status === "fulfilled" ? tasks.value.filter(task => task.teamId === context.id).map(task => ({...task, ...assessmentTaskFlow(task)})).filter(task => task.actionable)
         .sort((a, b) => a.dueOn.localeCompare(b.dueOn)) : [];
-      this.setData({ trainingCards: cards, upcomingCards: cards.slice(0, 2), pendingTasks,
+      this.setData({ trainingCards: cards, upcomingCards: cards.slice(0, 1), pendingTasks, visiblePendingTasks: pendingTasks.slice(0,2),
         overviewLoading: false, courseError: courses.status === "rejected" ? "课程读取失败，请重试" : "", taskError: tasks.status === "rejected" ? "测评任务读取失败，请重试" : "" });
     } catch (error) {
       if (generations.get(this) === version) this.setData({ state: "error", teamId: "", teamName: "", overviewLoading: false, message: error instanceof Error ? error.message : "球队读取失败，请重试" });
@@ -83,7 +85,7 @@ Page({
   },
   openTask(event: { currentTarget: { dataset: { id?: string } } }) {
     const task = this.data.pendingTasks.find((item: CoachAssessmentTask) => item.id === event.currentTarget.dataset.id);
-    if (task) openPage(`/pages/coach/assessment-projects/index?taskId=${encodeURIComponent(task.id)}&templateId=${encodeURIComponent(task.templateId)}&title=${encodeURIComponent(task.title)}`);
+    if (task) { const route = assessmentTaskProjectRoute(task, task.intent === "review"); if (route) openPage(route); }
   },
   openTrainingEvent(event: { currentTarget: { dataset: { id?: string } } }) {
     const id = event.currentTarget.dataset.id;

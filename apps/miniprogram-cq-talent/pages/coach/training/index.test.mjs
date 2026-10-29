@@ -1,6 +1,6 @@
 import {beforeEach,describe,it,expect,vi} from "vitest";
 const m=vi.hoisted(()=>({getCoachHome:vi.fn(),getCoachAssessmentTasks:vi.fn(),requireRole:vi.fn(),loadActiveTeam:vi.fn(),openPage:vi.fn()}));
-vi.mock("../../../utils/api",()=>({getCoachHome:m.getCoachHome,getCoachAssessmentTasks:m.getCoachAssessmentTasks}));vi.mock("../../../utils/auth",()=>({requireRole:m.requireRole}));vi.mock("../../../utils/coach-team-context",()=>({loadActiveTeam:m.loadActiveTeam}));vi.mock("../../../utils/navigation",()=>({openPage:m.openPage}));vi.mock("../../../utils/presentation",()=>({resolveNavInset:()=>0,resolveMenuInset:()=>0,formatCalendarDate:v=>v.slice(0,10),formatTimeOnly:()=>"09:00"}));
+vi.mock("../../../utils/api",()=>({getCoachHome:m.getCoachHome,getCoachAssessmentTasks:m.getCoachAssessmentTasks}));vi.mock("../../../utils/auth",()=>({requireRole:m.requireRole}));vi.mock("../../../utils/coach-team-context",()=>({loadActiveTeam:m.loadActiveTeam}));vi.mock("../../../utils/navigation",()=>({openPage:m.openPage}));vi.mock("../../../utils/presentation",()=>({resolveNavInset:()=>0,resolveMenuInset:()=>0,activityTypeLabel:v=>({training:"训练",match:"比赛",other:"俱乐部活动"}[v]),formatCalendarDate:v=>v.slice(0,10),formatTimeOnly:()=>"09:00"}));
 let def;globalThis.Page=d=>def=d;await import("./index.ts");
 const page=()=>({...def,data:structuredClone(def.data),setData(p){Object.assign(this.data,p);}});
 const team={id:"b",name:"同名队",season:"本学期"};
@@ -27,5 +27,27 @@ it("uses club dates for the month boundary and excludes ended courses from upcom
   expect(m.getCoachHome.mock.calls.every(([range]) => (Date.parse(range.to)-Date.parse(range.from))/86400000 < 31)).toBe(true);expect(p.data.trainingCards.map(x=>x.id)).toEqual(["first"]);
   m.getCoachHome.mockResolvedValueOnce({events:[{...first,id:"ended",startsAt:"2026-10-21T23:00:00Z",endsAt:"2026-10-21T23:30:00Z"},{...first,id:"next",startsAt:"2026-10-22T01:00:00Z",endsAt:"2026-10-22T02:00:00Z"}]});
   const q=page();await q.load();expect(q.data.upcomingCards.map(x=>x.id)).toEqual(["next"]);
+ }finally{vi.useRealTimers();}
+});
+
+it("presents the next real activity across event types and keeps training-only month listings", async()=>{
+ vi.useFakeTimers();vi.setSystemTime(new Date("2026-10-22T00:00:00Z"));
+ try{
+  const event=(id,type,time,status="scheduled")=>({id,type,teamIds:["b"],startsAt:`2026-10-22T${time}:00Z`,endsAt:"2026-10-22T04:00:00Z",status,title:id});
+  m.getCoachHome.mockResolvedValue({events:[event("training","training","03:00"),event("match","match","01:00"),event("cancelled","other","00:15","cancelled"),{...event("foreign","match","00:10"),teamIds:["a"]}]});
+  const p=page();await p.load();expect(p.data.upcomingCards.map(card=>card.id)).toEqual(["match"]);expect(p.data.upcomingCards[0].typeLabel).toBe("比赛");p.openTrainingEvent({currentTarget:{dataset:{id:"match"}}});expect(m.openPage).toHaveBeenLastCalledWith(expect.stringContaining("id=match&teamId=b"));
+  const month=page();await month.onLoad({teamId:"b",section:"training"});expect(month.data.trainingCards.map(card=>card.id)).toEqual(["training"]);
+ }finally{vi.useRealTimers();}
+});
+it("shows at most two actionable tasks and sends ready students to the existing review flow", async()=>{
+ const base={teamId:"b",status:"in_progress",templateId:"tpl",title:"真实任务",dueOn:"2026-10-25",completedStudents:0,totalStudents:40};
+ m.getCoachAssessmentTasks.mockResolvedValue([{...base,id:"future",status:"not_started"},{...base,id:"readonly",workflow:{canEdit:false}},{...base,id:"done",status:"completed"},{...base,id:"review",dueOn:"2026-10-23",workflow:{canEdit:true,totalStudents:40,completedStudents:1,publishedStudents:0,readyStudents:1}},{...base,id:"entry-1"},{...base,id:"entry-2"}]);
+ const p=page();await p.load();expect(p.data.pendingTasks.map(task=>task.id)).toEqual(["review","entry-1","entry-2"]);expect(p.data.visiblePendingTasks.map(task=>task.id)).toEqual(["review","entry-1"]);p.openTask({currentTarget:{dataset:{id:"review"}}});expect(m.openPage).toHaveBeenLastCalledWith(expect.stringContaining("&review=1"));
+});
+
+it("keeps an activity spanning the club-date boundary while it is still in progress", async()=>{
+ vi.useFakeTimers();vi.setSystemTime(new Date("2026-10-21T16:30:00Z"));
+ try{
+  m.getCoachHome.mockResolvedValue({events:[{id:"ongoing",type:"other",teamIds:["b"],startsAt:"2026-10-21T15:30:00Z",endsAt:"2026-10-21T17:00:00Z",status:"in_progress"}]});const p=page();await p.load();expect(p.data.upcomingCards.map(card=>card.id)).toEqual(["ongoing"]);
  }finally{vi.useRealTimers();}
 });

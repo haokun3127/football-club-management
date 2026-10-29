@@ -6,15 +6,15 @@
     <t-button wx:if="{{state === 'empty'}}" theme="primary" bindtap="chooseTeam" block custom-style="min-height:48px;">选择球队</t-button>
     <block wx:if="{{state === 'ready'}}">
       <block wx:if="{{section === 'workspace'}}">
-        <view class="section-heading">接下来两周</view>
+        <view class="section-heading">下一活动</view>
         <view wx:if="{{overviewLoading}}" class="workspace-notice">正在读取课程与待办…</view>
         <view wx:elif="{{courseError}}" class="workspace-notice">{{courseError}}<t-button variant="text" bindtap="retry">重试</t-button></view>
-        <t-cell-group wx:elif="{{upcomingCards.length}}" theme="card"><t-cell wx:for="{{upcomingCards}}" wx:key="id" title="{{item.title}}" description="{{item.timeLabel}}" note="{{item.venue || '场地待安排'}}" arrow data-id="{{item.id}}" bindtap="openTrainingEvent" hover /></t-cell-group>
-        <view wx:else class="workspace-notice">未来两周暂无训练安排</view>
-        <view class="section-heading">待完成测评 <text wx:if="{{!overviewLoading && !taskError}}">· {{pendingTasks.length}}</text></view>
+        <t-cell-group wx:elif="{{upcomingCards.length}}" theme="card"><t-cell wx:for="{{upcomingCards}}" wx:key="id" title="{{item.title}}" description="{{item.typeLabel}} · {{item.timeLabel}}" note="{{item.venue || '场地待安排'}}" arrow data-id="{{item.id}}" bindtap="openTrainingEvent" hover /></t-cell-group>
+        <view wx:else class="workspace-notice">未来两周暂无活动安排</view>
+        <view class="section-heading">待办测评 <text wx:if="{{!overviewLoading && !taskError}}">· {{pendingTasks.length}}</text></view>
         <view wx:if="{{taskError}}" class="workspace-notice">{{taskError}}<t-button variant="text" bindtap="retry">重试</t-button></view>
-        <t-cell-group wx:elif="{{!overviewLoading && pendingTasks.length}}" theme="card"><t-cell wx:for="{{pendingTasks}}" wx:key="id" wx:if="{{index < 2}}" title="{{item.title}}" description="{{item.completedStudents}} / {{item.totalStudents}} 人完成 · 截止 {{item.dueOn}}" arrow data-id="{{item.id}}" bindtap="openTask" hover /></t-cell-group>
-        <view wx:elif="{{!overviewLoading}}" class="workspace-notice">暂无未完成测评</view>
+        <t-cell-group wx:elif="{{!overviewLoading && pendingTasks.length}}" theme="card"><t-cell wx:for="{{visiblePendingTasks}}" wx:key="id" title="{{item.title}}" description="{{item.actionLabel}} · {{item.completedStudents}} / {{item.totalStudents}} 人采集完成 · 截止 {{item.dueOn}}" arrow data-id="{{item.id}}" bindtap="openTask" hover /></t-cell-group>
+        <view wx:elif="{{!overviewLoading}}" class="workspace-notice">暂无可处理的测评待办</view>
         <view class="section-heading">球队管理</view>
         <t-cell-group theme="card"><t-cell wx:for="{{entries}}" wx:key="id" title="{{item.name}}" note="{{item.note}}" arrow data-id="{{item.id}}" bindtap="openEntry" hover /></t-cell-group>
         <view class="secondary-title">球队支持</view>
