@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-30",
+  "sourceRevision": "41f615d7a969770d985e8644356362cae5b67703",
+  "method": "Native WeChat DevTools Automator; main project only; current authenticated coach session; no business mutation",
+  "physicalDevice": false,
+  "screenshot": "baseline-coach-schedule.png",
+  "sha256": "12ca29023e1fc89363214eb915e44b0bf583187b0822d2cc8f7a700cc946cc0b",
+  "sourceSchema": {
+    "migrations": 45,
+    "migrationTables": 104,
+    "runtimeMetadataTables": 2
+  },
+  "liveImagesReadOnly": {
+    "develop": "cq-talent-api:develop-a5c074ce6ba5",
+    "trial": "cq-talent-api:trial-939676f325b9",
+    "release": "cq-talent-api:b050391"
+  },
+  "deployPerformed": false
+}

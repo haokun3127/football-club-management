@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-30",
+  "baselineRevision": "41f615d7a969770d985e8644356362cae5b67703",
+  "model": "gpt-6.1-sol",
+  "hostId": "local",
+  "threads": [
+    {
+      "role": "platform",
+      "title": "CQ 平台与部署制品",
+      "threadId": "01a1889e-0b31-7fd2-992f-47acbffe3f4f",
+      "branch": "codex/cq-platform-foundation",
+      "worktree": "/Users/dongjun/.codex/worktrees/0e3e/football-club-management",
+      "task": ".trellis/tasks/10-30-cq-platform-foundation"
+    },
+    {
+      "role": "coach",
+      "title": "CQ 教练课堂与测评",
+      "threadId": "01a1889e-13a2-7b92-b4c5-bacd212224bd",
+      "branch": "codex/cq-coach-workflow",
+      "worktree": "/Users/dongjun/.codex/worktrees/7249/football-club-management",
+      "task": ".trellis/tasks/10-30-cq-coach-workflow"
+    },
+    {
+      "role": "parent",
+      "title": "CQ 家长安排与成长",
+      "threadId": "01a1889e-1e19-7812-a02c-a3a8a7113d4f",
+      "branch": "codex/cq-parent-experience",
+      "worktree": "/Users/dongjun/.codex/worktrees/48af/football-club-management",
+      "task": ".trellis/tasks/10-30-cq-parent-experience"
+    },
+    {
+      "role": "audit",
+      "title": "CQ 独立审计",
+      "threadId": "01a188a0-ac3a-79f1-8e3b-3dbe28c72ca8",
+      "branch": "codex/cq-independent-audit",
+      "worktree": "/Users/dongjun/.codex/worktrees/050c/football-club-management",
+      "task": ".trellis/tasks/10-30-cq-integration"
+    }
+  ]
+}

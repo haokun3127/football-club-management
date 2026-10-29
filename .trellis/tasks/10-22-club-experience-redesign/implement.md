@@ -168,4 +168,3 @@ pnpm check:delivery
 # 2026-10-30 已批准优化实施
 
 用户已批准[域、基础设施、发布单元和并行优化方案](optimization-plan-2026-10-30.md)。四个新子任务分别承接平台、教练、家长及总控集成；GPT-6.1-sol 独立 worktree 开发，固定 SHA 审计，按 CQ-10→CQ-11→CQ-12 集成并推进后续批次。统一进展见 [CQ 集成记录](../10-30-cq-integration/implement.md)。旧 B6 的真机与官方包体缺口保留；不会因本轮开始而归档。
-
