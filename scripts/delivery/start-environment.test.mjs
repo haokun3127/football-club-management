@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { copyFileSync, mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -32,11 +32,21 @@ test("Compose keeps develop, trial and release images and init volumes independe
       assert.ok(plan.commands[1].includes("--no-build"));
       assert.ok(!JSON.stringify(plan).includes("must-not-be-printed"));
     }
-    // Root release uses its existing private env-file path; config --no-env-resolution
-    // renders the topology without reading or creating a production config file.
-    const release = spawnSync("docker", ["compose", "-f", "docker-compose.yml", "config", "--no-env-resolution", "--format", "json"], { cwd: root, env, encoding: "utf8" });
-    assert.equal(release.status, 0, "Release topology must render without a private env file");
-    assert.equal(startPlan("release", JSON.parse(release.stdout)).imageReference, digest("c"));
+    // Some Compose v2 releases check env_file existence even with
+    // --no-env-resolution. Render an unchanged copy with owned synthetic input,
+    // never reading or creating the checkout's private release env file.
+    const releaseFile = join(directory, "docker-compose.yml");
+    const releaseEnvFile = join(directory, ".env.runtime");
+    copyFileSync(join(root, "docker-compose.yml"), releaseFile);
+    writeFileSync(releaseEnvFile, "PRIVATE_TEST_SECRET=must-not-be-printed\n");
+    const release = render(releaseFile);
+    const releasePlan = startPlan("release", release);
+    assert.equal(releasePlan.imageReference, digest("c"));
+    assert.equal(release.services.api.environment.PRIVATE_TEST_SECRET, "must-not-be-printed");
+    assert.ok(!JSON.stringify(releasePlan).includes("must-not-be-printed"));
+    rmSync(releaseEnvFile);
+    const missingEnv = spawnSync("docker", ["compose", "-f", releaseFile, "config", "--format", "json"], { cwd: root, env, encoding: "utf8" });
+    assert.notEqual(missingEnv.status, 0, "Release topology must reject a missing required runtime env file");
     const contaminated = structuredClone(after);
     contaminated.services["develop-data-init"].volumes.push(after.services["trial-data-init"].volumes[0]);
     assert.throws(() => startPlan("develop", contaminated), /dedicated data volume/);
