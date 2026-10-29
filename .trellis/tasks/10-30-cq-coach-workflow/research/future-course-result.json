@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-10-29T17:58:42.709Z",
+  "method": "real options HTTP injection + real AssessmentWorkflow.courses; in-memory SQLite",
+  "sourceRevision": "b668ad9a6fcea38f6fc0c277d223a0f6e6deb9fc",
+  "apiDependency": "2eb8518cacbdeff47f63a7f69a4d13dcb5089713",
+  "futureStartsAt": "2026-10-29T18:58:42.709Z",
+  "optionsContainsTask": true,
+  "futureEligible": false,
+  "startedEligible": true,
+  "conclusion": "Authorized periodic tasks may be listed before a particular course has started. A not-yet-started course is not currently eligible for entry."
+}

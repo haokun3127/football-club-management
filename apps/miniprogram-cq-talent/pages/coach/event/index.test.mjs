@@ -505,4 +505,11 @@ describe("CQ-10 classroom primary work",()=>{
     resolve({sourceCourse:{id:"event-training-1",teamId:"team-a",date:"2026-08-13"},tasks:[]});await earlier;expect(p.data.courseTasksState).toBe("error");
   });
 
+  it("keeps a not-yet-started course unavailable for periodic entry when its legal course list is empty", async () => {
+    const p=createPageInstance();await p.load("event-training-1");
+    const task={id:"periodic",teamId:"team-a",title:"周期任务",startsOn:"2020-01-01",dueOn:"2099-12-31",templateId:"tpl",status:"in_progress",completedStudents:0,totalStudents:19,workflow:{canEdit:true,totalStudents:19,completedStudents:0,publishedStudents:0,readyStudents:0}};
+    mocks.getCoachAssessmentTaskOptions.mockResolvedValue({sourceCourse:{id:"event-training-1",teamId:"team-a",date:"2026-10-30",startsAt:"2026-10-30T01:00:00Z"},tasks:[task]});mocks.getCoachAssessmentCourses.mockResolvedValue({courses:[]});await p.retryCourseTasks();
+    expect(p.data.courseTasks).toEqual([]);expect(p.data.primaryLabel).toBe("查看训练记录");expect(p.data.courseTaskMessage).toContain("可用于本课录入");expect(mocks.saveCoachAttendance).not.toHaveBeenCalled();
+  });
+
 });

@@ -153,3 +153,8 @@ CAS依赖同版复验：API training-content-assessment-batch 6项通过，API t
 战术独立小批：现有自由坐标摆放、拖回名单、撤销、400ms串行自动保存、失败/离线草稿及离页安全刷新均有原回归，保留其API角色/坐标字段，不推导实际出场或计次。将手工导航改为已有app-header，返回仍先触发保存再pop原栈；仅无历史深链回退本eventId的比赛详情。增加明确“自由摆放仅记录战术布置，不代表实际出场或训练计次”，拖回文案从“下场”改为“名单”，不改领域状态。删除失去用途的手工导航样式/尺寸读取。
 
 验证：战术13项通过、typecheck/diff检查通过；包含原有自由拖动/自动保存/离页/只读测试、统一返回与无历史来源回退。原生头部与球场可用高度/拖放区域需总控同版复验，不以Node测试代称原生画布已验收。
+
+
+未来课0任务的合同核对：总控原生10月30日09:00课在香港时间01:55仍未开始；本线程读取clock为2026-10-29 17:55 UTC，实际查看/tmp/cq-coach-compact-classroom.png确认3项预览和次级变更按钮已呈现。AssessmentWorkflow.courses的既有过滤在assessment-workflow.ts:42明确排除Date.parse(event.timeRange.startsAt)>Date.now()；options仅授权任务/来源课程，日程周期待办不等于当前课可录入范围。
+
+永久合成证据：research/future-course-probe.mts及future-course-result.json。真实GET options(app.inject)+真实courses服务+内存SQLite、合成身份；同一授权周期任务在options中始终存在，课程开始在未来时eligible=false，将同一课程start移到过去后eligible=true。运行node --import tsx避免tsx CLI的沙箱IPC监听，不连接业务库。没有为显示任务开放未来课程。新增页面回归确认课程列表空时无任务和无写入；空态措辞改为“暂无可用于本课录入的测评任务”，不再把0可用条件说成没有任何周期任务。

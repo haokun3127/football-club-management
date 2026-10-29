@@ -280,7 +280,7 @@ Page({
       const pending = this.data.canWrite ? courseTasks.filter(task => task.actionable && task.sourceEventId === eventId) : [];
       this.setData({ courseTasks, primaryTaskIds: pending.map(task => task.id), courseTodoCount: pending.length, courseTasksState: "ready",
         primaryLabel: !pending.length ? "查看训练记录" : pending.length === 1 ? pending[0]!.actionLabel : "选择本课待办",
-        courseTaskMessage: courseTasks.length ? `本课继续 ${pending.length} 项 · 可用任务 ${courseTasks.length} 项，周期任务按需进入。` : "本课暂无测评任务，课堂表现按需记录。" });
+        courseTaskMessage: courseTasks.length ? `本课继续 ${pending.length} 项 · 可用任务 ${courseTasks.length} 项，周期任务按需进入。` : "暂无可用于本课录入的测评任务。课堂表现按需记录。" });
     } catch { if (currentLoadRequest(this, ticket) && courseTaskRequests.get(this) === version) this.setData({ courseTasksState: "error", courseTaskMessage: "本课测评读取失败，训练内容与记录仍可使用。" }); }
   },
   retryCourseTasks() { return this.loadCourseTasks(this.data.eventId, (this as { _loadRequest?: number })._loadRequest ?? 0); },
