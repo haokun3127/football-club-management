@@ -4,3 +4,5 @@
 .results-alternative,
 .results-back,
 .results-card { min-height:44px; min-width:44px; box-sizing:border-box; }
+
+.results-source-details { display:flex; flex-direction:column; gap:16rpx; color:var(--club-muted); font-size:var(--font-size-aux); line-height:1.5; word-break:break-all; }

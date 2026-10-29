@@ -4,7 +4,8 @@ import {
   getParentGrowth,
   getParentMetricDetail,
 } from "../../../utils/api";
-import { assessmentValueText } from "../../../utils/assessment-input";
+import { calendarDateKey } from "../../../utils/date";
+import { parentResultValue } from "../result-presentation";
 import { requireRole } from "../../../utils/auth";
 import { consumeGrowthStale } from "../../../utils/growth-invalidation";
 import { openPage } from "../../../utils/navigation";
@@ -45,7 +46,7 @@ Page({
     resultsState: "loading" as LoadState,
     resultsLoaded: false,
     resultsMessage: "",
-    confirmedRows: [] as Array<{id:string;name:string;value:string;mapping:string;date:string;source:string;eventId:string;version:string}>,
+    confirmedRows: [] as Array<{id:string;name:string;value:string;date:string;source:string;eventId:string}>,
     viewIndex: 0,
     radar: [] as RadarMetricPoint[],
     selectedMetricId: "",
@@ -226,10 +227,9 @@ Page({
       const response = await getParentConfirmedResults(studentId);
       if (requestId !== this.growthRequestId || resultsRequest !== this.resultsRequest || studentId !== this.data.activeStudentId) return;
       const rows = response.confirmedResults.slice(0,3).map(row => ({id:row.id,name:row.name,
-        value: `${assessmentValueText(row.value) || "原始值未记录"}${row.unit ? ` ${row.unit}` : "（单位未提供）"}`,
-        mapping: row.mapping ? `分值 ${row.mapping.integerScore} · 等级 ${row.mapping.grade}` : "暂无完整分值/等级映射",
-        date: formatDateTime(row.occurredAt), source: row.eventId ? "已确认测评 · 关联活动" : row.taskId ? "已确认测评 · 测评任务" : "已确认测评记录",
-        eventId: row.eventId || "", version:row.templateVersionId ? `项目版本 ${row.templateVersionId}` : "项目版本未提供，不合并比较"}));
+        value: parentResultValue(row),
+        date: calendarDateKey(row.occurredAt) || "日期待确认", source: row.eventId ? "来源活动" : row.taskId ? "测评任务" : "已确认测评记录",
+        eventId: row.eventId || ""}));
       this.setData({resultsState:"ready",resultsLoaded:true,confirmedRows:rows});
     } catch(error) {
       if (requestId !== this.growthRequestId || resultsRequest !== this.resultsRequest || studentId !== this.data.activeStudentId) return;

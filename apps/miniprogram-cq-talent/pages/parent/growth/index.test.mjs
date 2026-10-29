@@ -325,9 +325,9 @@ describe("CQ-20 confirmed facts and refresh states",()=>{
   vi.useRealTimers();vi.clearAllMocks();mocks.requireRole.mockReturnValue({role:"parent",currentStudentId:child.id,userId:"u",clubId:"club",clientId:"client"});
   mocks.getParentChildren.mockResolvedValue([child]);mocks.getParentGrowth.mockResolvedValue(growth());mocks.getParentConfirmedResults.mockResolvedValue({confirmedResults:[result()]});
  });
- it("shows confirmed raw zero, unit, date, version, provenance and missing mapping before auxiliary charts",async()=>{
+ it("shows confirmed raw zero, unit, date and provenance before auxiliary charts",async()=>{
   const p=createPageInstance();await p.load();
-  expect(p.data.confirmedRows[0]).toMatchObject({value:"0 秒",version:"项目版本 v1",mapping:"暂无完整分值/等级映射",eventId:"course",source:"已确认测评 · 关联活动",date:"2026-08-10 10:00"});
+  expect(p.data.confirmedRows[0]).toMatchObject({value:"0 秒",eventId:"course",source:"来源活动",date:"2026-10-01"});
   expect(template.indexOf("{{item.name}} · 原始成绩 {{item.value}}")).toBeLessThan(template.indexOf("<radar-canvas"));
   expect(template.indexOf("当前教练评价")).toBeLessThan(template.indexOf("<radar-canvas"));
   p.openResultSource({currentTarget:{dataset:{id:"raw"}}});expect(mocks.openPage).toHaveBeenCalledWith("/pages/parent/event/index?id=course&studentId=student-1");
@@ -392,4 +392,11 @@ describe("CQ-20 latest request owns each module",()=>{
   const first=p.loadMetricDetail("m");await p.loadMetricDetail("m");old.resolve({metricId:"m",latest:{value:99},records:[],sourceEvents:[]});await first;
   expect(p.data.selectedDetail.latest.value).toBe(2);expect(p.data.detailCache.m.latest.value).toBe(2);
  });
+});
+
+it("keeps internal versions out of growth cards and compresses the first-screen explanation",()=>{
+ expect(template).not.toContain("{{item.version}}");expect(template).not.toContain("templateVersionId");
+ expect(template).toContain('class="p4-result-source"');expect(template).toContain("训练计次不代表实际到场。");
+ expect(template).not.toContain("已确认原始成绩、队伍评价与课堂表现分别记录；");
+ expect(template).toContain("全部成绩与来源");
 });

@@ -63,3 +63,5 @@
 .p4-card__summary,.p4-card__empty,.p4-ability__foot { color:var(--color-text-secondary); font-size:var(--font-size-aux); line-height:1.6; }
 .p4-metric-row { padding:16rpx 0; border-bottom:1rpx solid var(--color-line); min-height:44px; box-sizing:border-box; font-size:var(--font-size-body); line-height:1.6; }
 .p4-months > view { flex:1; text-align:center; }
+
+.p4-result-source { color:var(--club-muted); font-size:var(--font-size-aux); line-height:1.5; }

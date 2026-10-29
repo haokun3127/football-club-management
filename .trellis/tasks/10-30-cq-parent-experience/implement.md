@@ -94,3 +94,15 @@
 ### 版本诊断入口：account只接入公共组件
 
 2026-10-30按总控后续指令读取`67ffad96`的`version-diagnostics.md`接入合同。只在现有parent/account页面JSON注册`version-info: /components/version-info/index`并在正文放置无props的`<version-info />`，保留默认折叠；页面控制器无版本请求/轮询，无新路由。组件文件已由总控在主目录集成，本worktree不cherry-pick公共依赖、不改公共组件。account控制器及标记回归通过；展开/折叠与服务读取等组件行为由公共组件测试和总控最终原生验证负责。
+
+### 原生截图反馈：成长首屏与结果来源信息打磨
+
+2026-10-30已用view_image实际查看`/tmp/cq-02ba-parent-growth.png`。截图确认：内部项目版本ID作为红色长正文占多行，`66 score`直出英文，概览说明过长且成绩标题另占一张卡，把真实结果推向首屏下方。本补丁在当前独立worktree处理，未导入微信工具。
+
+- 单位核对：原成长代码直接拼接DTO的`row.unit`，截图`score`来自该字段；`cq-talent-acceptance.ts::createMetricRecords`及测评模型种子也存在`measurement/unit:score`。域`score-mapping.ts`明确score/count/%/min/s/m单位约定，既有`utils/api.ts::userFacingMetricUnit`已使用score→分。仅按已声明单位和值类型显示，不因“1分钟颠球次数”名称猜测应为次数。`score`显示“分”；未知/缺失measurement单位显示“单位待确认”，原单位保留于来源信息；真实0/小数不补、不改、不舍入。
+- 家长范围内增加`pages/parent/result-presentation.ts`，供成长预览和家长详细结果复用单位标签。没有改公共utils、API、后端、教练页面或原始数据；原共享结果工厂的guardian读取、修订选择、项目/版本/单位分组和数字尺度保留。
+- 成长默认只展示项目/原始结果/来源日期和实际来源活动入口；项目内部版本ID、映射规则及适用解释下沉详细成绩。将概览解释压缩为“训练计次不代表实际到场。”；成绩入口改紧凑标题行，来源日期使用+08完整日期并采用中性色。
+- 详细结果页对selected/history/alternatives/chart标签统一中文单位。项目版本/分值规则/等级规则ID只在默认收起的“来源与规则信息”内展示，展开后使用中性文字且可换行/选择，追溯未丢。切成绩或重新读取时收起；未知单位仍保留文本、原单位可追溯，不合并绘图；原始数值及原单位分组键保持不变。来源活动链接携带当前孩子。
+- 回归：已知单位、项目名与DTO单位不同、缺单位、未知单位、真实0/小数、原始值/分组保留、默认收起/展开及切成绩收起、来源链接、ID条件渲染、成长首屏无内部版本；account仅挂载version-info标记。全小程序最终99文件/765通过/1既有跳过，exit 0；typecheck、git diff --check通过；详细结果4项补充断言通过。
+
+账号组件接入已独立提交`51e5c1ea`。本展示补丁另行提交。仍待总控将两批集成到主目录后官方编译，实际查看成长首屏、详细结果展开/收起、已知/未知单位及账号版本组件；测试不是对改后原生画面的证明。不push/deploy/上传，不归档。
