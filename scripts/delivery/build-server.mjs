@@ -15,7 +15,7 @@ try {
   const directory = mkdtempSync(join(tmpdir(), "fcm-server-build-"));
   try {
     const sourceRevision = exportRevision(root, values.revision, ["Dockerfile", ".dockerignore", "package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml", "tsconfig.base.json", "patches", "scripts", "apps/api", "apps/backoffice", "packages/domain"], directory);
-    const build = buildIdentity(sourceRevision, values["build-id"]);
+    const build = buildIdentity(sourceRevision, values["build-id"], new Date().toISOString());
     command("docker", ["build", "--tag", values.tag, ...Object.entries({ FCM_SOURCE_REVISION: sourceRevision, FCM_BUILD_ID: build.buildId, FCM_BUILT_AT: build.builtAt }).flatMap(([key, value]) => ["--build-arg", `${key}=${value}`]), directory], { stdio: "inherit" });
     const imageId = command("docker", ["image", "inspect", values.tag, "--format", "{{.Id}}"]);
     const artifact = JSON.parse(command("docker", ["run", "--rm", "--network", "none", "--read-only", "--entrypoint", "cat", imageId, "/app/server-artifact.json"]));

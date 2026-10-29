@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdirSync, writeFileSync, rmSync, existsSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
@@ -8,13 +8,14 @@ import { buildIdentity, exportRevision, inventory } from "./artifacts.mjs";
 
 export function prepareMiniprogram({ revision = "HEAD", buildId, output, sourceRoot = root }) {
   if (!output) throw new Error("A new artifact output directory is required");
-  buildIdentity("0".repeat(40), buildId); // Validate before creating anything.
+  buildIdentity("0".repeat(40), buildId, new Date().toISOString()); // Validate before creating anything.
   const destination = resolve(output);
   mkdirSync(destination); // Never overwrite an existing directory, including the development checkout.
   try {
     const sourceRevision = exportRevision(sourceRoot, revision, ["apps/miniprogram-cq-talent"], destination);
-    const build = buildIdentity(sourceRevision, buildId);
+    const build = buildIdentity(sourceRevision, buildId, new Date().toISOString());
     const project = join(destination, "apps/miniprogram-cq-talent");
+    if (!existsSync(join(project, "utils/build-metadata.ts"))) throw new Error("Selected client revision does not support stamped build metadata");
     writeFileSync(join(project, "utils/build-metadata.ts"), `// Generated in staged artifact only.\nexport const CLIENT_BUILD = ${JSON.stringify(build)};\n`);
     const artifact = { schemaVersion: 1, unit: "miniprogram", build, sourceInventory: inventory(project), uploadReceipt: null };
     writeFileSync(join(destination, "miniprogram-artifact.json"), `${JSON.stringify(artifact, null, 2)}\n`);

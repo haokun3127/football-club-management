@@ -39,3 +39,9 @@
 - 2026-10-30 Node24/pnpm10.33.0 `pnpm check:delivery` 全门禁通过：domain47、后台4、小程序691通过/1既有skip、API266通过；所有包类型/构建通过；Node脚本14通过；三环境临时独立启动无seed、显式初始化及错误配置拒绝通过。原始日志 /private/tmp/cq-platform-check-delivery.log；精简结论持久保存在此任务。授权localhost重跑小程序version/environment14通过，API与小程序类型单独通过。
 - 脚本5项覆盖真实Compose、固定提交不带脏文件、写入实际文件哈希、双单元清单及坏输入。补充检查物理volume名，防止逻辑volume别名映射到其他环境卷。
 - 下一步：以本批提交构建本地候选镜像，网络禁用/无数据卷容器回读版本与模块加载。未push/deploy/微信上传，线上及真机仍待总控。
+
+### 镜像与最终审查
+- d1805cfebbf127b3c445bf4d5459cc4030bef535 从固定Git导出实际构建成功；local image ID及本地RepoDigest为 sha256:9408b8e5805a3b6a9368f30743562465a99dc26977cd27b28aca654aed37dca6，tag cq-talent-api:cq00-d1805cfe；未推远端。镜像自带 buildId cq00-d1805cfe。
+- 禁网、只读、零数据卷、cwd /app/apps/api、UID1000 容器成功加载模块与注入 /health；版本吻合，7后台资源/45迁移逐文件hash及汇总hash吻合。
+- 实际prepare-miniprogram与create-manifest链路通过；client buildId cq00-client-d1805cfe。reportedPlatformVersion/uploadReceipt仍为null。
+- 最终审查发现manifest若传缺失builtAt会由工厂默认值补造时间；改为身份验证必须显式时间，仅构建/暂存时创建时间。另拒绝空回执及不支持元数据的旧客户端提交。新增附近坏输入断言，脚本5/5重跑通过。接下来以修正后的提交再次生成候选；API/客户端运行时代码未变，不重复无关全套门禁。

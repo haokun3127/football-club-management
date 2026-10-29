@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 export const sha256 = bytes => createHash("sha256").update(bytes).digest("hex");
-export function buildIdentity(sourceRevision, buildId, builtAt = new Date().toISOString()) {
+export function buildIdentity(sourceRevision, buildId, builtAt) {
   if (!/^[0-9a-f]{40}$/.test(sourceRevision ?? "") || !/^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/.test(buildId ?? "")
     || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(builtAt) || !Number.isFinite(Date.parse(builtAt))) throw new Error("Invalid public build identity");
   return { sourceRevision, buildId, builtAt };

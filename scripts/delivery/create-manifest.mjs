@@ -25,7 +25,8 @@ export function createManifest({ candidate, image, inspectedImageId, client, cli
   const serverBuild = buildIdentity(server.build?.sourceRevision, server.build?.buildId, server.build?.builtAt);
   const clientBuild = buildIdentity(client.build?.sourceRevision, client.build?.buildId, client.build?.builtAt);
   if (!/^[0-9a-f]{64}$/.test(server.lockfileSha256 ?? "")) throw new Error("Missing lockfile identity");
-  if ((receipt === null) !== (clientVersion === null) || (clientVersion !== null && !/^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/.test(clientVersion))) throw new Error("An operator-reported platform version requires its upload receipt, and vice versa");
+  if ((receipt === null) !== (clientVersion === null) || (receipt !== null && receipt.length === 0)
+    || (clientVersion !== null && !/^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/.test(clientVersion))) throw new Error("An operator-reported platform version requires its nonempty upload receipt, and vice versa");
   return {
     schemaVersion: 1,
     server: { build: serverBuild, image, imageId: candidate.imageId, backoffice: validateInventory(server.backoffice), migrations: validateInventory(server.migrations, { migrations: true }), lockfileSha256: server.lockfileSha256 },

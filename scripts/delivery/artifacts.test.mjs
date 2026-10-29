@@ -36,6 +36,11 @@ test("staged client uses only a fixed commit, stamps its identity and never edit
     assert.throws(() => prepareMiniprogram({ sourceRoot, revision, buildId: "again", output }), /EEXIST/);
     assert.throws(() => prepareMiniprogram({ sourceRoot, revision: "not-a-commit", buildId: "valid", output: join(directory, "failed") }));
     assert.equal(existsSync(join(directory, "failed")), false);
+    rmSync(metadata);
+    git(["add", "-u"]);
+    git(["-c", "user.name=Fixture", "-c", "user.email=fixture@example.test", "commit", "--quiet", "-m", "unstamped revision"]);
+    assert.throws(() => prepareMiniprogram({ sourceRoot, buildId: "valid", output: join(directory, "unsupported") }), /does not support/);
+    assert.equal(existsSync(join(directory, "unsupported")), false);
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
 
@@ -84,4 +89,8 @@ test("manifest associates two units with digest, asset/migration hashes and rece
   damaged.candidate.artifact.migrations.files[0].sha256 = "f".repeat(64);
   assert.throws(() => createManifest(damaged), /damaged/);
   assert.throws(() => createManifest({ ...input, client: { unit: "miniprogram", schemaVersion: 1 } }), /build identity/);
+  const missingTimestamp = structuredClone(input);
+  delete missingTimestamp.client.build.builtAt;
+  assert.throws(() => createManifest(missingTimestamp), /build identity/);
+  assert.throws(() => createManifest({ ...input, receipt: Buffer.from(""), clientVersion: "1.2.3" }), /nonempty/);
 });
