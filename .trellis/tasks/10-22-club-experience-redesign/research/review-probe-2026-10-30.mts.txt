@@ -1,0 +1,23 @@
+import { createPlatformPersistence } from '../../../../apps/api/src/persistence/platform-persistence.ts';
+import { PersistentApiStore } from '../../../../apps/api/src/store.ts';
+import { buildServer } from '../../../../apps/api/src/server.ts';
+import { HeaderMembershipResolver } from '../../../../apps/api/src/auth/context.ts';
+import { writeFileSync } from 'node:fs';
+const clubId = 'club-chongqing-talent';
+process.env.FCM_ASSESSMENT_PUBLICATION_CLUBS = clubId;
+const persistence = await createPlatformPersistence({databasePath: ':memory:'});
+const store = new PersistentApiStore(persistence.repositories);
+const app = buildServer(store, {logger:false,membershipResolver:new HeaderMembershipResolver(persistence.repositories.users,persistence.repositories.memberships)});
+try {
+ await store.saveAssessmentTask({id:'review-probe-task',clubId,teamId:'team-u10-dev',templateId:'assessment-template-technical',termLabel:'2026',title:'isolated-review-probe',startsOn:'2020-01-01',dueOn:'2099-12-31'});
+ const payload={studentId:'student-1',eventId:'event-training-1',templateId:'assessment-template-technical',templateVersionId:'assessment-template-version-technical-table-20260904',assessedAt:'2026-07-01T09:00:00.000Z',summary:'isolated review probe',rawResults:[{testItemId:'assessment-test-cq-talent-03',value:{kind:'score_0_100',score:75}}]};
+ const url=`/clubs/${clubId}/app-clients/app-client-cq-talent-wechat-main/coach/assessments`;
+ const before=(await store.listPlayerAssessments(clubId)).length;
+ const old=await app.inject({method:'POST',url,headers:{'x-user-id':'user-coach-1'},payload});
+ const guarded=await app.inject({method:'POST',url,headers:{'x-user-id':'user-coach-1'},payload:{...payload,assessmentTaskId:'review-probe-task'}});
+ const after=(await store.listPlayerAssessments(clubId)).length;
+ const result={date:'2026-10-30',sourceRevision:'91ae7bc00ea46faf2a49a68b79f2e2cd6bb8c65e',scope:'Isolated in-memory fixture, HTTP app.inject; no online writes or real identity',oldEventOnly:{status:old.statusCode,code:old.json().error?.code},taskWithPublicationEnabled:{status:guarded.statusCode,code:guarded.json().error?.code},assessmentCountUnchanged:before===after};
+ if(old.statusCode!==400||old.json().error?.code!=='assessment_task_required'||guarded.statusCode!==409||guarded.json().error?.code!=='assessment_publication_required'||before!==after)throw new Error('unexpected probe result');
+ writeFileSync('/tmp/cq-review-legacy-probe-20261030.json',JSON.stringify(result,null,2)+'\n');
+ console.log(JSON.stringify(result));
+} finally {await app.close();persistence.database.close();}

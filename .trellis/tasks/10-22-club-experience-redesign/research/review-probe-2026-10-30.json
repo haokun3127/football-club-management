@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-30",
+  "sourceRevision": "91ae7bc00ea46faf2a49a68b79f2e2cd6bb8c65e",
+  "scope": "Isolated in-memory fixture, HTTP app.inject; no online writes or real identity",
+  "oldEventOnly": {
+    "status": 400,
+    "code": "assessment_task_required"
+  },
+  "taskWithPublicationEnabled": {
+    "status": 409,
+    "code": "assessment_publication_required"
+  },
+  "assessmentCountUnchanged": true
+}

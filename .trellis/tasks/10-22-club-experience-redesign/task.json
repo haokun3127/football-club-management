@@ -25,7 +25,11 @@
     "10-22-experience-b3-training-games",
     "10-22-experience-b4-parent-native",
     "10-22-experience-b5-backoffice",
-    "10-22-experience-b6-verification"
+    "10-22-experience-b6-verification",
+    "10-30-cq-platform-foundation",
+    "10-30-cq-coach-workflow",
+    "10-30-cq-parent-experience",
+    "10-30-cq-integration"
   ],
   "parent": null,
   "relatedFiles": [

@@ -1,0 +1,16 @@
+{
+  "receivedDate": "2026-10-30",
+  "externalReviewDate": "2026-10-29",
+  "sourceFileName": "CQ_Talent_Review_20261029.md",
+  "sourceSha256": "98fdf79f1a7ff0eea322c1820db069f6beb1a819759cfb4bb895d4922ca81ecc",
+  "sourceRevision": "91ae7bc00ea46faf2a49a68b79f2e2cd6bb8c65e",
+  "status": "external-advice-reviewed-not-blanket-implementation-approval",
+  "response": "../review-response-2026-10-30.md",
+  "verification": {
+    "apiTestsPassed": 18,
+    "miniTestsPassed": 37,
+    "legacyEventOnlyHttp": 400,
+    "legacyTaskHttp": 409,
+    "runtimeOrDeviceRevalidation": false
+  }
+}

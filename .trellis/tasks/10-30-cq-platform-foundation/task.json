@@ -1,0 +1,30 @@
+{
+  "id": "cq-platform-foundation",
+  "name": "cq-platform-foundation",
+  "title": "CQ-00 平台边界与部署制品",
+  "description": "",
+  "status": "planning",
+  "dev_type": null,
+  "scope": null,
+  "package": "api",
+  "priority": "P2",
+  "creator": "dongjun",
+  "assignee": "dongjun",
+  "createdAt": "2026-10-30",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "feature/ui-batch-1-p01",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "10-22-club-experience-redesign",
+  "relatedFiles": [
+    "prd.md",
+    "design.md",
+    "implement.md"
+  ],
+  "notes": "2026-10-30 user explicitly approved implementation, GPT-6.1-sol threads and independent worktrees; scope in prd/design/implement. Coordinator owns integration and develop delivery.",
+  "meta": {}
+}
