@@ -157,6 +157,7 @@ export default function Tasks({ canCreate }: { canCreate: boolean }) {
   const [dirty, setDirty] = useState(false);
   const [reason, setReason] = useState("");
   const generation = useRef(0);
+  const readTarget = useRef<string>();
   const pending = useRef<{ hash: string; requestId: string }>();
   useEffect(() => {
     void api<Catalog>("task-catalog")
@@ -172,6 +173,7 @@ export default function Tasks({ canCreate }: { canCreate: boolean }) {
     if (id) void read(id);
   }, [location.search]);
   async function read(id: string) {
+    readTarget.current = id;
     const current = ++generation.current;
     setDetailOpen(true);
     setBusy(true);
@@ -538,7 +540,7 @@ export default function Tasks({ canCreate }: { canCreate: boolean }) {
         }}
         loading={busy && !detail}
       >
-        {error && <Alert type="error" message={error} />}{" "}
+        {error && <Alert type="error" message={error} action={!detail && readTarget.current ? <Button disabled={busy} onClick={() => { const id = readTarget.current; if (id) void read(id); }}>重试读取任务</Button> : undefined} />}{" "}
         {detail && (
           <>
             <Typography.Paragraph>

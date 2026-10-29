@@ -71,3 +71,10 @@
 - 当前完整pnpm check:delivery通过：API274、domain47、后台8、小程序698通过/1既有skip；所有类型/构建、14脚本及三临时环境启动通过。日志/private/tmp/cq-platform-final-check-delivery.log，持久证据摘要在此。
 - Playwright Chromium真实cookie登录disposable synthetic fixture；初载health=0，打开/503模拟/重试后health=3，CSP事件=[]。1440/1024截图已直接查看，document overflow=false；额外长79字符buildId/完整SHA在1024对话框无溢出。截图research/version-*.png；错误响应仅此本地浏览器mock，重试恢复实际本地health，未触碰真实服务。
 - 原生小程序画布未在worktree导入；控制器/模板8项通过不等于真机。后续总控主目录做原生接入。CQ-00 b51镜像不含正确性/版本UI，不是集成最终制品。
+
+### CQ-23窄修（独立提交，原生/最终浏览器复验待安全修复后续接）
+- 已生成29资源与既有权限映射cq23-resource-map.md，保留四业务模块及所有leaf keys。
+- 真实cookie fixture：建立一个合成任务，工作台显示1人待处理；从“查看任务”真实深链进入，模拟503后抽屉只有“请重试”而无动作（research/cq23-task-error-before.png）。任务列表/工作台入口及对象标题本已有，不改写。
+- 只在无detail的读取失败态为同一readTarget增加“重试读取任务”；不为保存/发布失败自动重读或重发。当前pnpm check:delivery已全部通过（API274/domain47/后台8/小程序698通过1skip，类型/构建/14脚本/三临时环境启动通过）。后台窄修实际重建后的按钮点击复验待安全优先项结束后继续；不得将此状态冒充全量CQ23体验验收。
+- 总控新增安全优先项：现有HTTP幂等回放早于认证与动作授权，撤销token后可能回放成功响应；需覆盖当前幂等写入范围、有效重试/环境/428/CAS不回归。另需修正offset/Z发生时间的SQLite排序。此两项优先，后续再完成CQ23浏览器复验。
+- 两次disposable fixture已停止，临时库/随机凭据随fixture清理；隔离浏览器当前仍开着，仅用于后续本地复验。
