@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   getTrainingTemplates: vi.fn(), saveTrainingTemplate: vi.fn(), previewTrainingTransfer: vi.fn(), applyTrainingTransfer: vi.fn(),
+  getCoachAssessmentTaskOptions: vi.fn(), getCoachAssessmentCourses: vi.fn(),
   getCoachWorkbench: vi.fn(), getCoachAssessmentTasks: vi.fn().mockResolvedValue([]),
   saveCoachAttendance: vi.fn(),
   correctTrainingRecord: vi.fn(),
@@ -16,6 +17,7 @@ vi.mock("../../../utils/api", async (importOriginal) => {
     ...actual,
     getTrainingTemplates: mocks.getTrainingTemplates, saveTrainingTemplate: mocks.saveTrainingTemplate, previewTrainingTransfer: mocks.previewTrainingTransfer, applyTrainingTransfer: mocks.applyTrainingTransfer,
     getCoachWorkbench: mocks.getCoachWorkbench, getCoachAssessmentTasks: mocks.getCoachAssessmentTasks,
+    getCoachAssessmentTaskOptions: mocks.getCoachAssessmentTaskOptions, getCoachAssessmentCourses: mocks.getCoachAssessmentCourses,
     saveCoachAttendance: mocks.saveCoachAttendance,
   };
 });
@@ -86,6 +88,11 @@ const trainingWorkbench = {
   assessmentTemplateId: "assessment-template-1",
   pending: [],
 };
+
+beforeEach(() => {
+  mocks.getCoachAssessmentTaskOptions.mockImplementation(async eventId => ({sourceCourse:{id:eventId,teamId:"team-a",date:"2026-08-13"},tasks:(await mocks.getCoachAssessmentTasks({forceRefresh:true})).map(task=>({...task,teamId:task.teamId || "team-a"}))}));
+  mocks.getCoachAssessmentCourses.mockReset().mockResolvedValue({courses:[]});
+});
 
 describe("reviewed course-copy controls", () => {
   beforeEach(() => { vi.clearAllMocks(); mocks.requireRole.mockReturnValue({ role: "coach" }); mocks.getTrainingTemplates.mockResolvedValue([]); mocks.getCoachWorkbench.mockResolvedValue(trainingWorkbench); });
@@ -181,9 +188,8 @@ describe("coach activity workbench", () => {
     mocks.correctTrainingRecord.mockResolvedValueOnce({ record: { studentId: page.data.rosterRows[0].studentId, eventId: "event-training-1", revision: 1, counted: true } });
     await page.toggleAttendance({ currentTarget: { dataset: { index: "0" } } });
     resolveTasks([{ id: "t1", sourceEventId: "event-training-1", title: "本课测评", templateId: "tpl", completedStudents: 0, totalStudents: 2 }]);
-    await Promise.resolve();
-    expect(page.data.courseTasks.map(task => task.id)).toEqual(["t1"]);
-    expect(page.data.courseTaskMessage).toContain("关联任务 1 项");
+    await vi.waitFor(()=>expect(page.data.courseTasks.map(task => task.id)).toEqual(["t1"]),{interval:1});
+    expect(page.data.courseTaskMessage).toContain("可用任务 1 项");
   });
   it("does not navigate to records outside the authorized roster", async () => {
     const page = createPageInstance(); await page.load("event-training-1");
@@ -473,6 +479,30 @@ describe("CQ-10 classroom primary work",()=>{
     mocks.getCoachAssessmentTasks.mockResolvedValue([{...base,workflow:{canEdit:false,totalStudents:40,completedStudents:0,publishedStudents:0,readyStudents:2}},{...base,id:"future",status:"not_started",startsOn:"2099-01-01"},{...base,id:"legacy-done",status:"completed",completedStudents:40}]);
     await p.retryCourseTasks();expect(p.data.courseTasks).toHaveLength(3);expect(p.data.primaryTaskIds).toEqual([]);expect(p.data.primaryLabel).toBe("查看训练记录");expect(p.data.courseTasks.find(t=>t.id==="future").reason).toContain("2099-01-01");
     mocks.openPage.mockClear();p.openCourseTask({currentTarget:{dataset:{id:"future"}}});expect(mocks.openPage).not.toHaveBeenCalled();p.openCourseTask({currentTarget:{dataset:{id:"legacy-done"}}});expect(mocks.openPage).toHaveBeenCalledWith(expect.stringContaining("taskId=legacy-done"));
+  });
+
+  it("lists legal periodic tasks as optional and keeps completed tasks viewable without a forced lesson action", async () => {
+    const p=createPageInstance();await p.load("event-training-1");
+    const periodic={id:"periodic",teamId:"team-a",title:"周期任务",startsOn:"2026-08-01",dueOn:"2026-08-31",templateId:"template-a",status:"in_progress",completedStudents:0,totalStudents:40,workflow:{canEdit:true,totalStudents:40,completedStudents:0,publishedStudents:0,readyStudents:0}};
+    mocks.getCoachAssessmentTaskOptions.mockResolvedValue({sourceCourse:{id:"event-training-1",teamId:"team-a",date:"2026-08-13"},tasks:[periodic,{...periodic,id:"done",status:"completed",completedStudents:40,workflow:{...periodic.workflow,completedStudents:40,publishedStudents:40}},{...periodic,id:"wrong-team",teamId:"team-b"},{...periodic,id:"expired",dueOn:"2026-08-12"}]});
+    mocks.getCoachAssessmentCourses.mockResolvedValue({courses:[{id:"event-training-1",studentIds:["student-1"]}]});await p.retryCourseTasks();
+    expect(p.data.courseTasks.map(task=>task.id)).toEqual(["periodic","done"]);expect(p.data.courseTasks[0].contextLabel).toBe("周期任务 · 按需进入");expect(p.data.primaryTaskIds).toEqual([]);expect(p.data.primaryLabel).toBe("查看训练记录");
+    p.openCourseTask({currentTarget:{dataset:{id:"done"}}});expect(mocks.openPage).toHaveBeenLastCalledWith(expect.stringContaining("taskId=done"));expect(mocks.openPage.mock.calls.at(-1)[0]).not.toContain("review=1");
+    expect(mocks.getCoachAssessmentCourses.mock.calls.map(call=>call[0])).toEqual(["periodic","done"]);
+  });
+  it("shows three content items across groups and keeps total duration and all content accessible", async () => {
+    const group=(id,n)=>({id,label:id,items:Array.from({length:n},(_,i)=>({id:`${id}-${i}`,name:`${id}内容${i}`,configuredMinutes:10}))});
+    mocks.getCoachWorkbench.mockResolvedValue({...trainingWorkbench,contentSummary:{count:8,configuredMinutes:80,groups:[group("first",2),group("second",6)]}});
+    const p=createPageInstance();await p.load("event-training-1");
+    expect(p.data.contentGroups.flatMap(group=>group.items)).toHaveLength(3);expect(p.data.hiddenContentCount).toBe(5);expect(p.data.contentCount).toBe(8);expect(p.data.contentMinutesLabel).toContain("80 分钟");
+    p.toggleContent();expect(p.data.contentGroups.flatMap(group=>group.items)).toHaveLength(8);p.toggleContent();expect(p.data.contentGroups.flatMap(group=>group.items)).toHaveLength(3);
+    expect(template).toContain('theme="default" t-class="course-change"');expect(stylesheet).toContain('--td-button-default-color: var(--color-text-secondary)');expect(stylesheet).toContain('min-height:44px');
+  });
+  it("keeps a later local task retry authoritative over an older pending read", async () => {
+    const p=createPageInstance();await p.load("event-training-1");let resolve;
+    mocks.getCoachAssessmentTaskOptions.mockImplementationOnce(()=>new Promise(r=>resolve=r)).mockRejectedValueOnce(new Error("newer failed"));
+    const earlier=p.retryCourseTasks();await p.retryCourseTasks();expect(p.data.courseTasksState).toBe("error");
+    resolve({sourceCourse:{id:"event-training-1",teamId:"team-a",date:"2026-08-13"},tasks:[]});await earlier;expect(p.data.courseTasksState).toBe("error");
   });
 
 });

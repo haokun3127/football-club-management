@@ -1,4 +1,4 @@
-import { assessmentTaskFlow, assessmentTaskProjectRoute, type AssessmentTaskFlow } from "../assessment-task-flow";
+import { assessmentTaskFlow, assessmentTaskProjectRoute, resolveCourseAssessmentTasks, type AssessmentTaskFlow } from "../assessment-task-flow";
 import { getCoachAssessmentTaskOptions, getCoachAssessmentCourses } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
@@ -25,20 +25,9 @@ Page({
     try {
       const options = await getCoachAssessmentTaskOptions(this.data.eventId, this.data.teamId || undefined);
       if (version !== this.requestVersion) return;
-      const course = options.sourceCourse;
-      if (!course || course.id !== this.data.eventId || (this.data.teamId && course.teamId !== this.data.teamId)) throw new Error("课程范围不可用");
-      // Options contain authorized tasks across the coach's teams. The source
-      // event is provenance, not the full set of courses a task can use.
-      const candidates = options.tasks.filter(task => task.teamId === course.teamId);
-      const applicable = await Promise.all(candidates.map(async task => {
-        if (task.sourceEventId === course.id) return task;
-        if (!task.startsOn || !task.dueOn || course.date < task.startsOn || course.date > task.dueOn) return null;
-        if (!task.workflow) return task; // Legacy tasks use the authorized team/date scope.
-        const response = await getCoachAssessmentCourses(task.id);
-        return response.courses.some(item => item.id === course.id) ? task : null;
-      }));
+      const resolved = await resolveCourseAssessmentTasks(options, this.data.eventId, this.data.teamId || undefined, getCoachAssessmentCourses);
       if (version !== this.requestVersion) return;
-      const tasks = applicable.filter((task): task is CoachAssessmentTask => task !== null).map(task => ({...task, ...assessmentTaskFlow(task)}));
+      const tasks = resolved.tasks.map(task => ({...task, ...assessmentTaskFlow(task)}));
       this.setData({tasks, courseTitle: options.sourceCourse?.title || "本课测评", state: tasks.length ? "ready" : "empty",
         message: tasks.length > 1 ? "本课有多个测评任务，请选择后进入项目与核对。" : tasks.length ? "已找到本课测评任务。" : "本课暂无可录入测评任务。可返回课堂查看训练记录或发起随堂测评。"});
       if (tasks.length === 1 && tasks[0]!.canOpen) this.openTask({currentTarget:{dataset:{id:tasks[0]!.id}}});

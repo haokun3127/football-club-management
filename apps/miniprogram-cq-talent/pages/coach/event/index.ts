@@ -1,12 +1,14 @@
-import { assessmentTaskFlow, assessmentTaskProjectRoute, type AssessmentTaskFlow } from "../assessment-task-flow";
+import { assessmentTaskFlow, assessmentTaskProjectRoute, resolveCourseAssessmentTasks, type AssessmentTaskFlow } from "../assessment-task-flow";
 import { getTrainingGames } from "../../../utils/api";
 import { gameScore, gameReadMessage, GAME_STATE_LABELS, type GameContext } from "../../../utils/training-games";
 import { type TrainingRecord } from "../../../utils/training-records";
-import { attendanceLeaveConflictMessage, getCoachAssessmentTasks, getTrainingTemplates, saveTrainingTemplate, previewTrainingTransfer, applyTrainingTransfer, getCoachWorkbench, isAttendanceLeaveConflictError, resolveAttendanceLeaveConflicts, saveCoachAttendance } from "../../../utils/api";
+import { attendanceLeaveConflictMessage, getCoachAssessmentTasks, getCoachAssessmentTaskOptions, getCoachAssessmentCourses, getTrainingTemplates, saveTrainingTemplate, previewTrainingTransfer, applyTrainingTransfer, getCoachWorkbench, isAttendanceLeaveConflictError, resolveAttendanceLeaveConflicts, saveCoachAttendance } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { openPage } from "../../../utils/navigation";
 import { activityTypeLabel, formatCalendarDate, formatShortDate, formatTimeOnly, formatTimeRange, resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { TrainingTemplateSummary, TrainingTransferSource, TrainingTransferPreview, CoachWorkbench, CoachAssessmentTask, LoadState, TrainingContentSummary } from "../../../utils/types";
+
+const courseTaskRequests = new WeakMap<object, number>();
 
 type TransferTarget = TrainingTransferPreview["targets"][number] & { action: "replace" | "skip"; existingLabel: string; dateLabel: string };
 
@@ -81,7 +83,7 @@ Page({
     trainingFactsAvailable: false,
     isTraining: false,
     gameSources:[] as GameContext["sources"], friendlyGames:[] as Array<{id:string;title:string;score:string;summary:string}>, gamesMessage:"", gamesLoading:false,
-    courseTasks: [] as Array<CoachAssessmentTask & AssessmentTaskFlow & {summary:string}>,
+    courseTasks: [] as Array<CoachAssessmentTask & AssessmentTaskFlow & {summary:string;contextLabel:string}>,
     primaryTaskIds: [] as string[],
     courseTodoCount: 0,
     courseTaskMessage: "",
@@ -263,16 +265,23 @@ Page({
     else if(source&&this.data.gameSources.some((item:GameContext["sources"][number])=>item.contentBlockId===source))openPage(`/pages/coach/training-game/index?eventId=${encodeURIComponent(this.data.eventId)}&contentBlockId=${encodeURIComponent(source)}`);
   },
   async loadCourseTasks(eventId: string, ticket: number) {
+    const version = (courseTaskRequests.get(this) ?? 0) + 1;
+    courseTaskRequests.set(this, version);
     this.setData({ courseTasksState: "loading", courseTaskMessage: "正在读取本课测评" });
     try {
-      const tasks = await getCoachAssessmentTasks({ forceRefresh: true });
-      if (!currentLoadRequest(this, ticket)) return;
-      const courseTasks = tasks.filter(task => task.sourceEventId === eventId).map(task => ({...task, ...assessmentTaskFlow(task), summary: `${task.completedStudents}/${task.totalStudents} 人采集完成` }));
-      const pending = this.data.canWrite ? courseTasks.filter(task => task.actionable) : [];
+      // Cancelled courses retain their explicitly linked tasks for viewing.
+      const tasks = this.data.canWrite
+        ? (await resolveCourseAssessmentTasks(await getCoachAssessmentTaskOptions(eventId), eventId, undefined, getCoachAssessmentCourses)).tasks
+        : (await getCoachAssessmentTasks({forceRefresh:true})).filter(task => task.sourceEventId === eventId);
+      if (!currentLoadRequest(this, ticket) || courseTaskRequests.get(this) !== version) return;
+      const courseTasks = tasks.map(task => ({...task, ...assessmentTaskFlow(task), contextLabel: task.sourceEventId === eventId ? "本课发起" : "周期任务 · 按需进入", summary: `${task.completedStudents}/${task.totalStudents} 人采集完成` }));
+      // Eligible periodic tasks are optional entry points, not mandatory lesson
+      // work. Only an explicit originating lesson supplies a primary task.
+      const pending = this.data.canWrite ? courseTasks.filter(task => task.actionable && task.sourceEventId === eventId) : [];
       this.setData({ courseTasks, primaryTaskIds: pending.map(task => task.id), courseTodoCount: pending.length, courseTasksState: "ready",
         primaryLabel: !pending.length ? "查看训练记录" : pending.length === 1 ? pending[0]!.actionLabel : "选择本课待办",
-        courseTaskMessage: courseTasks.length ? `待处理 ${pending.length} 项 · 关联任务 ${courseTasks.length} 项，已确认任务仍可查看。` : "本课暂无测评任务，课堂表现按需记录。" });
-    } catch { if (currentLoadRequest(this, ticket)) this.setData({ courseTasksState: "error", courseTaskMessage: "本课测评读取失败，训练内容与记录仍可使用。" }); }
+        courseTaskMessage: courseTasks.length ? `本课继续 ${pending.length} 项 · 可用任务 ${courseTasks.length} 项，周期任务按需进入。` : "本课暂无测评任务，课堂表现按需记录。" });
+    } catch { if (currentLoadRequest(this, ticket) && courseTaskRequests.get(this) === version) this.setData({ courseTasksState: "error", courseTaskMessage: "本课测评读取失败，训练内容与记录仍可使用。" }); }
   },
   retryCourseTasks() { return this.loadCourseTasks(this.data.eventId, (this as { _loadRequest?: number })._loadRequest ?? 0); },
   togglePreparation() { this.setData({preparationExpanded: !this.data.preparationExpanded}); },
@@ -466,9 +475,9 @@ function isPresentStatus(value: string) {
 }
 
 function contentSummaryView(summary:TrainingContentSummary|null,expanded:boolean) {
-  let remaining=expanded?Number.MAX_SAFE_INTEGER:6;
+  let remaining=expanded?Number.MAX_SAFE_INTEGER:3;
   const groups=(summary?.groups??[]).map(group=>{const items=group.items.slice(0,remaining);remaining=Math.max(0,remaining-items.length);return {...group,items:items.map(item=>({...item,minutesLabel:item.configuredMinutes===null?"时长未配置":`${item.configuredMinutes} 分钟`}))};}).filter(group=>group.items.length);
-  return {contentSummary:summary,contentExpanded:expanded,contentGroups:groups,contentCount:summary?.count??0,hasConfiguredContent:Boolean(summary?.count),hiddenContentCount:Math.max(0,(summary?.count??0)-6),contentMinutesLabel:summary?.configuredMinutes===null||summary?.configuredMinutes===undefined?"":`内容配置时长合计 ${summary.configuredMinutes} 分钟`};
+  return {contentSummary:summary,contentExpanded:expanded,contentGroups:groups,contentCount:summary?.count??0,hasConfiguredContent:Boolean(summary?.count),hiddenContentCount:Math.max(0,(summary?.count??0)-3),contentMinutesLabel:summary?.configuredMinutes===null||summary?.configuredMinutes===undefined?"":`内容配置时长合计 ${summary.configuredMinutes} 分钟`};
 }
 
 function nextTransferRequest(page: unknown) { const p=page as {_transferRequest?: number}; return p._transferRequest=(p._transferRequest||0)+1; }

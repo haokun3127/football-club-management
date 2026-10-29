@@ -8,7 +8,7 @@
         <view class="section-title">{{eventView.title}}</view>
         <view class="subtitle">{{eventView.timeLabel}} · {{eventView.venue}}</view>
         <view wx:if="{{!canWrite}}" class="subtitle">课程已取消，不计训练记录</view>
-        <view class="row"><view class="subtitle">{{eventView.teamName}}</view><t-button wx:if="{{canEditTraining}}" variant="text" theme="primary" data-action="change" bindtap="openAction">变更课程</t-button></view>
+        <view class="row"><view class="subtitle">{{eventView.teamName}}</view><t-button wx:if="{{canEditTraining}}" variant="text" theme="default" t-class="course-change" custom-style="min-height:44px;height:auto;font-size:var(--font-size-aux);line-height:1.5;" data-action="change" bindtap="openAction">变更课程</t-button></view>
       </view>
 
     <view wx:if="{{hasTraining}}" class="workbench-card">
@@ -27,7 +27,7 @@
     <view id="course-assessments" wx:if="{{isTraining}}" class="workbench-card course-assessment">
       <view class="section-title">本课测评</view><view wx:if="{{courseTaskMessage}}" class="subtitle">{{courseTaskMessage}}</view>
       <t-button wx:if="{{courseTasksState === 'error'}}" theme="primary" variant="text" bindtap="retryCourseTasks">重试本课测评</t-button>
-      <view wx:for="{{courseTasks}}" wx:key="id" class="course-task" data-id="{{item.id}}" bindtap="openCourseTask"><view>{{item.title}} · {{item.summary}}</view><view class="training-card__edit">{{item.actionLabel}}</view><view wx:if="{{item.reason}}" class="subtitle">{{item.reason}}</view></view>
+      <view wx:for="{{courseTasks}}" wx:key="id" class="course-task" data-id="{{item.id}}" bindtap="openCourseTask"><view>{{item.title}} · {{item.summary}}</view><view class="subtitle">{{item.contextLabel}}</view><view class="training-card__edit">{{item.actionLabel}}</view><view wx:if="{{item.reason}}" class="subtitle">{{item.reason}}</view></view>
       <view wx:if="{{canWrite}}" class="training-card__edit" bindtap="createAssessmentTask">＋发起随堂测评</view>
     </view>
     <view wx:if="{{isTraining}}" class="workbench-card">

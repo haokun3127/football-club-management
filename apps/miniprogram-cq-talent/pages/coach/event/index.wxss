@@ -74,3 +74,5 @@
 .club-workbench .training-card__edit { min-height:44px; display:flex; align-items:center; }
 
 .friendly-game { min-height:44px; padding:16rpx 0; border-bottom:1rpx solid var(--color-line); font-size:var(--font-size-body); line-height:1.6; }
+
+.course-change { --td-button-default-color: var(--color-text-secondary); color: var(--color-text-secondary); font-weight: 400; }

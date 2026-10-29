@@ -1,4 +1,5 @@
-import type { CoachAssessmentTask } from "../../utils/types";
+import type { AssessmentTaskOptions } from "../../utils/api";
+import type { AssessmentCourse, CoachAssessmentTask } from "../../utils/types";
 
 export type AssessmentTaskFlow = {
   intent: "collect" | "review" | "view" | "unavailable";
@@ -32,4 +33,26 @@ export function assessmentTaskFlow(task: CoachAssessmentTask): AssessmentTaskFlo
 export function assessmentTaskProjectRoute(task: CoachAssessmentTask, review = false): string {
   if (!assessmentTaskFlow(task).canOpen) return "";
   return `/pages/coach/assessment-projects/index?taskId=${encodeURIComponent(task.id)}&templateId=${encodeURIComponent(task.templateId)}&title=${encodeURIComponent(task.title)}${review ? "&review=1" : ""}`;
+}
+
+
+export async function resolveCourseAssessmentTasks(
+  options: AssessmentTaskOptions,
+  eventId: string,
+  teamId: string | undefined,
+  readCourses: (taskId: string) => Promise<{courses: AssessmentCourse[]}>,
+) {
+  const course = options.sourceCourse;
+  if (!course || course.id !== eventId || (teamId && course.teamId !== teamId)) throw new Error("课程范围不可用");
+  // Origin links are explicit associations. Periodic applicability uses the
+  // authorized course/team/date scope and the task's legal course contract.
+  const candidates = options.tasks.filter(task => task.teamId === course.teamId);
+  const applicable = await Promise.all(candidates.map(async task => {
+    if (task.sourceEventId === course.id) return task;
+    if (!task.startsOn || !task.dueOn || course.date < task.startsOn || course.date > task.dueOn) return null;
+    if (!task.workflow) return task;
+    const response = await readCourses(task.id);
+    return response.courses.some(item => item.id === course.id) ? task : null;
+  }));
+  return {course, tasks: applicable.filter((task): task is CoachAssessmentTask => task !== null)};
 }
