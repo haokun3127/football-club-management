@@ -1,0 +1,44 @@
+describe('independent page audit at 96e17408',()=>{
+ let storage;
+ beforeEach(()=>{
+  storage=new Map();wx.getStorageSync=key=>storage.get(key);wx.setStorageSync=(key,value)=>storage.set(key,structuredClone(value));wx.removeStorageSync=key=>storage.delete(key);
+  mocks.getCoachWorkbench.mockReset().mockResolvedValue(workbench);
+  mocks.getCoachTrainingContentAssessments.mockReset().mockResolvedValue(assessmentScope);
+  mocks.saveCoachTrainingContentAssessments.mockReset().mockResolvedValue({eventId:'event-training',revision:1,assessments:[]});
+  mocks.requireRole.mockReset().mockReturnValue({role:'coach',clubId:'club-a',userId:'coach-a'});
+  mocks.showToast.mockClear();
+ });
+ const input=(p,studentId,value)=>p.onScoreInput({currentTarget:{dataset:{studentId}},detail:{value}});
+ it('preserves newer server fields when local score/note changes are only formatting-equivalent',async()=>{
+  const p=createPageInstance();await p.load('event-training');
+  input(p,'student-1','084');
+  p.onNoteInput({currentTarget:{dataset:{studentId:'student-1'}},detail:{value:' 传球节奏稳定 '}});
+  input(p,'student-3','75');
+  mocks.saveCoachTrainingContentAssessments.mockRejectedValueOnce({statusCode:409});await p.save();
+  expect(mocks.saveCoachTrainingContentAssessments.mock.calls[0][1]).toEqual([{studentId:'student-3',trainingProjectId:'project-passing',score:75,note:''}]);
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,revision:4,assessments:[{studentId:'student-1',trainingProjectId:'project-passing',score:95,note:'另一教练的新备注'}]});
+  await p.readServerForReview();p.keepLocalChanges();
+  const merged=structuredClone(p.data.valuesByProject['project-passing']['student-1']);
+  mocks.saveCoachTrainingContentAssessments.mockResolvedValue({eventId:'event-training',revision:5,assessments:[]});await p.save();
+  writeFileSync('/tmp/cq-page96-merge-result.json',JSON.stringify({firstPayload:mocks.saveCoachTrainingContentAssessments.mock.calls[0][1],merged,afterReviewPayload:mocks.saveCoachTrainingContentAssessments.mock.calls[1][1]},null,2));
+  expect(merged).toEqual({scoreInput:'95',noteInput:'另一教练的新备注'});
+  expect(mocks.saveCoachTrainingContentAssessments.mock.calls[1][1]).toEqual([{studentId:'student-3',trainingProjectId:'project-passing',score:75,note:''}]);
+ });
+ it('retains an unsaved learner draft while that learner temporarily leaves the present-student scope',async()=>{
+  const first=createPageInstance();await first.load('event-training');input(first,'student-3','77');first.onUnload();expect(storage.size).toBe(1);
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,presentStudentIds:['student-1']});
+  const absent=createPageInstance();await absent.load('event-training');expect(absent.data.rows.map(r=>r.studentId)).toEqual(['student-1']);absent.onUnload();
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue(assessmentScope);
+  const restored=createPageInstance();await restored.load('event-training');
+  expect(restored.data.valuesByProject['project-passing']?.['student-3']?.scoreInput).toBe('77');
+ });
+ it('does not apply an old save response to a different course loaded on the same controller',async()=>{
+  const p=createPageInstance();await p.load('event-training');input(p,'student-1','75');
+  let resolve;mocks.saveCoachTrainingContentAssessments.mockImplementationOnce(()=>new Promise(r=>resolve=r));const pending=p.save();
+  mocks.getCoachWorkbench.mockResolvedValue({...workbench,event:{...workbench.event,id:'other-course',title:'另一课'}});
+  mocks.getCoachTrainingContentAssessments.mockResolvedValue({...assessmentScope,eventId:'other-course',revision:5,assessments:[{studentId:'student-1',trainingProjectId:'project-passing',score:92}]});
+  await p.load('other-course');const snapshot=structuredClone(p.data);const keys=[...storage.keys()];
+  resolve({eventId:'event-training',revision:1,assessments:[]});await pending;
+  expect(p.data).toEqual(snapshot);expect(p.data.eventId).toBe('other-course');expect(p.data.revision).toBe(5);expect([...storage.keys()]).toEqual(keys);
+ });
+});

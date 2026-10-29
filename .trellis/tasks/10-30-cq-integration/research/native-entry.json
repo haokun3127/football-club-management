@@ -1,0 +1,13 @@
+{
+  "source": "6b6ebd13",
+  "nativeDevTools": true,
+  "physicalDevice": false,
+  "route": "pages/coach/assessment-bulk-entry/index",
+  "rows": 19,
+  "firstEntryRevisionTools": false,
+  "actualProjectAndContinueTap": true,
+  "inputLocated": true,
+  "inputType": "input",
+  "realZeroAccepted": true,
+  "inputRestored": true
+}

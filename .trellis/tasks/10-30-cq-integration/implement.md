@@ -1,6 +1,6 @@
 # CQ 集成审计与 develop 交付执行
 
-更新时间：2026-10-30；主目录 /Users/dongjun/projects/football-club-management，feature/ui-batch-1-p01；共同开发基线41f615d7，当前产品集成02baed1f。
+更新时间：2026-10-30；主目录 /Users/dongjun/projects/football-club-management，feature/ui-batch-1-p01；共同开发基线41f615d7，当前产品集成6b6ebd13（工作区实际HEAD优先）。
 
 ## 已完成
 
@@ -8,7 +8,7 @@
 - CQ00独立环境不可变镜像、制品清单、安全health身份与公共版本读取；教练CQ10/11、家长CQ12/20及球队/友谊赛首批已按序集成。
 - 46份迁移在隔离SQLite执行后，105表唯一归属、2运行时元数据；所有路径和迁移哈希核验通过，见docs/current/product-domain-map.json。
 - 原生主项目Automator9420保留真实登录；日程实际点击进入课堂、教练切换到家长、首页显示下一活动已通过。不是物理设备或正式微信版本证据。
-- 独立审计两轮固定SHA报告与错误复现探针保留在research。A01空值、A02同课更正排序、C01周期任务归属、R2-01同generation迟到请求已修；A03/A04服务端版本CAS和整批事务已集成，教练页面接入待完成。
+- 独立审计两轮固定SHA报告与错误复现探针保留在research。A01空值、A02同课更正排序、C01周期任务归属、R2-01同generation迟到请求已修；A03/A04服务端版本CAS和整批事务及教练页面已集成，独立窄审计追加格式等价合并/名单暂离草稿两个P2，已交教练线程修复。
 
 ## 契约决定
 
@@ -23,9 +23,13 @@
 
 ## 剩余与下一步
 
-- 平台完成版本组件/后台实际交互、CQ23；教练完成课堂CAS和现有统计含义修正；两端account注册版本组件。
+- 版本组件/双角色account、CQ23同对象原位重试、教练CAS/统计语义、战术返回、成长单位及来源折叠均已集成。R3时区排序已修；平台当前处理幂等回放前实时会话/角色/对象权限。教练处理页面窄审计两个草稿P2。
 - 原生检查成长页/课堂/任务/录入/友谊赛/返回上下文，按同口径测量实际可测性能；物理设备键盘、大字、Android/iOS及官方包体仍保留B6待验。
 - 固定最终集成SHA后独立审计及总控pnpm check:delivery，审查差异，更新共享规范和交付记录。
 - GitHub dev正常快进提交、同版amd64镜像与清单、develop一致备份及迁移兼容检查、仅develop启动；健康/后台/真实双角色回读，并比较trial/release容器及镜像未变化。
 
 续接使用wait_threads和threads.json，不重复创建线程；集成前先查各分支父提交，公共依赖仅集成一次。审计错误行为探针通过仅表示复现，不是修复验收。
+
+## 最新实测
+
+89dd1508主目录完整check:delivery通过（domain47/API274/后台8/小程序800+1skip，14脚本、3环境启动），后续变更需最终复验。Native主目录真实角色切换、日程→课堂、待办→项目→开始录入19人名单、真实input输入0并恢复空值、账号版本按钮展开均已通过。SDK CSS不定位自定义组件时，公开getElementByXpath按可见文字成功；批量getElementsByXpath会报工具内部map错误，单元素可用。CUA因已知Documents符号链接root启动失败，没有改全局配置绕过；SDK足以继续。本轮未提交业务成绩。截图与明确实测方式在research/native-*。
