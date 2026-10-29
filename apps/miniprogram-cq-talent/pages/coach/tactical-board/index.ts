@@ -1,7 +1,6 @@
 import { getCoachTacticalBoard, saveCoachTacticalBoard } from "../../../utils/api";
 import { requireRole } from "../../../utils/auth";
 import { environmentStorageKey } from "../../../utils/config";
-import { resolveMenuInset, resolveNavInset } from "../../../utils/presentation";
 import type { LoadState, TacticalBoardPlayer, TacticalBoardState } from "../../../utils/types";
 
 const timers = globalThis as unknown as {
@@ -16,7 +15,7 @@ type Touch = { clientX: number; clientY: number };
 type Gesture = { currentTarget: { dataset: { id?: string } }; touches?: Touch[]; changedTouches?: Touch[] };
 type PlayerView = TacticalBoardPlayer & { left: number; top: number };
 interface BoardData {
-  navInset: number; menuInset: number; state: LoadState; stateTitle: string; message: string;
+  state: LoadState; stateTitle: string; message: string;
   eventId: string; eventTitle: string; players: TacticalBoardPlayer[]; starters: PlayerView[];
   rosterPlayers: PlayerView[]; readOnly: boolean; dirty: boolean; saving: boolean;
   saveLabel: string; saveError: string; canUndo: boolean; dragId: string; dragName: string;
@@ -39,14 +38,13 @@ const inside = (rect: Rect | undefined, x: number, y: number) => Boolean(rect &&
 
 Page<BoardData>({
   data: {
-    navInset: 20, menuInset: 16, state: "idle", stateTitle: "比赛战术板", message: "", eventId: "", eventTitle: "",
+    state: "idle", stateTitle: "比赛战术板", message: "", eventId: "", eventTitle: "",
     players: [], starters: [], rosterPlayers: [], readOnly: false, dirty: false, saving: false,
     saveLabel: "已保存", saveError: "", canUndo: false, dragId: "", dragName: "", dragAvatar: "", dragX: 0, dragY: 0, rosterTarget: false,
   },
   onLoad(query?: Record<string, string | undefined>) {
     const session = requireRole("coach");
     if (!session) return;
-    this.setData({ navInset: resolveNavInset(), menuInset: resolveMenuInset() });
     const eventId = (query?.eventId || "").trim();
     if (!eventId) { this.setData({ state: "empty", stateTitle: "未选择比赛", message: "请从比赛活动进入战术板。" }); return; }
     if (session.userId && session.clubId) runtime(this).draftKey = environmentStorageKey(`tactical-draft:${session.clubId}:${session.userId}:${eventId}`);
@@ -60,7 +58,10 @@ Page<BoardData>({
     const state = runtime(this); clearTimeout(state.saveTimer);
     void this.saveBoard(); state.alive = false;
   },
-  goBack() { void this.saveBoard(); wx.navigateBack({ delta: 1 }); },
+  goBack() { void this.saveBoard(); wx.navigateBack({ delta: 1, fail: () => {
+    if (this.data.eventId) wx.redirectTo({url:`/pages/coach/match/index?id=${encodeURIComponent(this.data.eventId)}`});
+    else wx.reLaunch({url:"/pages/coach/schedule/index"});
+  } }); },
   async load(eventId?: string) {
     const id = eventId || this.data.eventId;
     if (!id) return;

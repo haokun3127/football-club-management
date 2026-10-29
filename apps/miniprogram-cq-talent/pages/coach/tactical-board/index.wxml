@@ -1,14 +1,12 @@
-<view class="c7-page" style="padding-top:{{navInset}}px">
-  <view class="c7-header" style="padding-right:{{menuInset}}px">
-    <t-button class="c7-back" bindtap="goBack" aria-label="返回" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" t-class="c7-back" theme="primary" variant="text"><image src="/assets/icons/chevron-left.svg" mode="aspectFit" /></t-button>
-    <text class="c7-title">比赛战术板</text>
-  </view>
+<view class="c7-page">
+  <view class="c7-navigation"><app-header title="比赛战术板" title-align="left" show-back="{{true}}" custom-back="{{true}}" bindback="goBack" /></view>
   <view wx:if="{{state !== 'ready'}}" class="c7-feedback">
     <text>{{stateTitle}}</text><text class="c7-muted">{{message}}</text>
     <t-button wx:if="{{state === 'error'}}" bindtap="retry" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);" theme="primary" variant="text">重新加载</t-button>
   </view>
   <block wx:else>
     <view class="c7-toolbar"><text class="c7-event">{{eventTitle}}</text><text class="c7-status {{saveError ? 'c7-status--error' : ''}}">{{saveLabel}}</text></view>
+    <view class="c7-context">自由摆放仅记录战术布置，不代表实际出场或训练计次。</view>
     <view id="c7-pitch" class="c7-pitch">
       <view class="c7-boundary"></view><view class="c7-halfway"></view><view class="c7-center"></view>
       <view class="c7-box c7-box--top"></view><view class="c7-box c7-box--bottom"></view>
@@ -18,7 +16,7 @@
       </view>
     </view>
     <view id="c7-roster" class="c7-roster {{rosterTarget ? 'c7-roster--target' : ''}}">
-      <view class="c7-roster-heading"><text>可用球员 · {{rosterPlayers.length}}</text><text class="c7-muted">{{readOnly ? '比赛已结束，仅供查看' : '长按拖入 · 拖回下场'}}</text></view>
+      <view class="c7-roster-heading"><text>可用球员 · {{rosterPlayers.length}}</text><text class="c7-muted">{{readOnly ? '当前布置仅供查看' : '长按拖入 · 拖回名单'}}</text></view>
       <scroll-view class="c7-roster-scroll" scroll-y="{{!dragId}}">
         <view class="c7-roster-grid">
           <view wx:for="{{rosterPlayers}}" wx:key="studentId" class="c7-roster-player {{dragId === item.studentId ? 'c7-player--dragging' : ''}}" data-id="{{item.studentId}}" bindlongpress="startRosterDrag" bindtouchmove="movePlayer" bindtouchend="finishDrag" bindtouchcancel="cancelDrag">

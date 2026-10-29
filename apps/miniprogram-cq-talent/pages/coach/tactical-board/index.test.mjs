@@ -1,8 +1,8 @@
+import {readFileSync} from "node:fs";
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 const mocks=vi.hoisted(()=>({get:vi.fn(),save:vi.fn(),role:vi.fn()}));
 vi.mock('../../../utils/api',()=>({getCoachTacticalBoard:mocks.get,saveCoachTacticalBoard:mocks.save}));
 vi.mock('../../../utils/auth',()=>({requireRole:mocks.role}));
-vi.mock('../../../utils/presentation',()=>({resolveMenuInset:()=>90,resolveNavInset:()=>20}));
 let definition;
 globalThis.Page=d=>{definition=d;};
 const storage=new Map();
@@ -63,4 +63,14 @@ describe('reviewed free tactical board',()=>{
   mocks.get.mockResolvedValue({...response(),readOnly:true});const p=await loaded();p.clearBoard();p.startPlayerDrag(gesture('a',170,300));expect(p.data.dragId).toBe('');expect(p.data.dirty).toBe(false);
   let done;mocks.get.mockImplementationOnce(()=>new Promise(r=>{done=r;}));const q=page();const loading=q.onLoad({eventId:'event'});q.onUnload();done(response());await loading;expect(q.data.state).toBe('loading');
  });
+});
+
+it("uses the shared detail header, keeps free placement distinct from actual participation, and returns through the source stack",async()=>{
+ const template=readFileSync(new URL("./index.wxml",import.meta.url),"utf8");const config=JSON.parse(readFileSync(new URL("./index.json",import.meta.url),"utf8"));
+ expect(config.usingComponents["app-header"]).toBe("/components/app-header/index");expect(template).toContain('bindback="goBack"');expect(template).toContain("不代表实际出场或训练计次");
+ mocks.role.mockReturnValue({role:"coach"});mocks.get.mockResolvedValue(response());mocks.save.mockResolvedValue(response());wx.navigateBack.mockClear();const p=await loaded();p.goBack();expect(wx.navigateBack).toHaveBeenCalledWith(expect.objectContaining({delta:1}));expect(mocks.save).not.toHaveBeenCalled();
+});
+
+it("falls back to the source match only when a direct deep link has no back stack",async()=>{
+ mocks.role.mockReturnValue({role:"coach"});mocks.get.mockResolvedValue(response());const p=await loaded();wx.redirectTo=vi.fn();wx.navigateBack.mockImplementationOnce(({fail})=>fail({errMsg:"no history"}));p.goBack();expect(wx.redirectTo).toHaveBeenCalledWith({url:"/pages/coach/match/index?id=event"});
 });
