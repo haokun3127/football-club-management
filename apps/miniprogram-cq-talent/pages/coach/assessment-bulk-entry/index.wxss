@@ -22,3 +22,7 @@
 .bulk-history-head { display:flex; align-items:center; justify-content:space-between; font-size:var(--font-size-body); }
 .bulk-history-scroll { height:60vh; }
 .bulk-history-item { white-space:pre-wrap; font-size:var(--font-size-aux); line-height:1.7; padding:12px 0; border-bottom:1px solid var(--color-line); overflow-wrap:anywhere; }
+
+.bulk-row--active { border-color: var(--color-brand); }
+.bulk-focus { padding: 12px 0 0; font-size: var(--font-size-body); line-height: 1.5; color: var(--color-brand); overflow-wrap: anywhere; }
+.bulk-row__status { flex-shrink: 0; }

@@ -6,8 +6,9 @@
       <view class="bulk-title">{{projectTitle}}</view>
       <view class="bulk-context-line">{{taskTitle}} · {{teamName}}</view>
       <view class="bulk-summary"><view class="bulk-summary__count">{{filledLabel}}</view><view class="bulk-summary__rule">{{readOnly ? '只读成绩' : managed ? '先保存草稿，核对后再确认发布' : '保存后同步成绩'}}</view></view>
-      <view wx:if="{{managed && !readOnly}}" class="bulk-workflow">
-        <t-input value="{{correctionReason}}" maxlength="500" disabled="{{submitting}}" label="更正原因" placeholder="修改已发布成绩时必填" bindchange="onReasonInput" borderless />
+      <view wx:if="{{managed && !readOnly && (needsCorrection || hasConflict || saveError)}}" class="bulk-workflow">
+        <view wx:if="{{needsCorrection}}" class="bulk-summary__rule">本次修改涉及已发布成绩。保存后仍需重新核对确认，家长继续查看上一发布版本。</view>
+        <t-input wx:if="{{needsCorrection}}" value="{{correctionReason}}" maxlength="500" disabled="{{submitting}}" label="更正原因" placeholder="修改已发布成绩时必填" bindchange="onReasonInput" borderless />
         <t-button theme="default" variant="text" disabled="{{submitting}}" bindtap="reloadServer">重新读取服务器成绩</t-button>
       </view>
       <view wx:if="{{courseSelectionRequired}}" class="bulk-course-bar">
@@ -16,13 +17,14 @@
         <view wx:elif="{{!readOnly}}" class="bulk-course-hint">应用于该课可录入的学员；个别项目可在下方调整。</view>
       </view>
       <view wx:if="{{saveError}}" class="bulk-workflow__error">{{saveError}}</view>
-      <view wx:for="{{rows}}" wx:key="studentId" class="bulk-row">
-        <view class="bulk-row__identity"><view class="bulk-row__name">{{index + 1}}. {{item.name}}</view><view class="bulk-row__status">{{item.statusLabel}}</view><t-button wx:if="{{managed}}" theme="default" variant="text" data-student-id="{{item.studentId}}" bindtap="showHistory">历史</t-button></view>
+      <view wx:if="{{focusLabel}}" class="bulk-focus" aria-role="status">{{focusLabel}}</view>
+      <view wx:for="{{rows}}" wx:key="studentId" class="bulk-row {{focusStudentId === item.studentId ? 'bulk-row--active' : ''}}">
+        <view class="bulk-row__identity"><view class="bulk-row__name">{{index + 1}}. {{item.name}}</view><view class="bulk-row__status">{{item.statusLabel}}</view><t-button wx:if="{{managed && item.hasHistory}}" theme="default" variant="text" data-student-id="{{item.studentId}}" bindtap="showHistory">历史</t-button></view>
         <view class="bulk-row__metrics">
           <view wx:for="{{item.metrics}}" wx:for-item="metric" wx:key="fieldId" class="bulk-metric">
             <view class="bulk-metric__label">{{metric.label}}</view>
             <view wx:if="{{readOnly}}" class="bulk-metric__readonly">{{metric.value === '' ? '未录入' : metric.value}}<text wx:if="{{metric.value !== '' && metric.unitLabel}}"> {{metric.unitLabel}}</text></view>
-            <t-input wx:else class="bulk-metric-input" disabled="{{submitting}}" type="{{metric.inputType}}" value="{{metric.value}}" suffix="{{metric.unitLabel}}" placeholder="{{metric.placeholder}}" aria-label="{{item.name}} {{metric.label}} {{metric.unitLabel}}" focus="{{focusKey === metric.inputKey}}" confirm-type="next" confirm-hold="{{true}}" hold-keyboard="{{true}}" cursor-spacing="160" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" bindchange="onRawInput" bindenter="advanceInput" />
+            <t-input wx:else class="bulk-metric-input" disabled="{{submitting}}" type="{{metric.inputType}}" value="{{metric.value}}" suffix="{{metric.unitLabel}}" placeholder="{{metric.placeholder}}" aria-label="{{item.name}} {{metric.label}} {{metric.unitLabel}}" focus="{{focusKey === metric.inputKey}}" confirm-type="next" confirm-hold="{{true}}" hold-keyboard="{{true}}" cursor-spacing="160" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" bindchange="onRawInput" bindfocus="focusInput" bindblur="flushDraft" bindenter="advanceInput" />
             <view wx:if="{{metric.errorText}}" class="bulk-metric__error">{{metric.errorText}}</view>
             <picker wx:if="{{courseSelectionRequired && !readOnly}}" range="{{item.courses}}" range-key="label" data-student-id="{{item.studentId}}" data-field-id="{{metric.fieldId}}" disabled="{{submitting || !item.courses.length}}" bindchange="selectCourse"><view class="bulk-metric__course">训练课：{{metric.courseLabel}} ›</view></picker>
             <view wx:if="{{courseSelectionRequired && readOnly}}" class="bulk-metric__course">训练课：{{metric.courseLabel}}</view>

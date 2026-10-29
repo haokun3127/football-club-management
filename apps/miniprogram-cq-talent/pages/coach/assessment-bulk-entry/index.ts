@@ -32,11 +32,14 @@ type BulkRow = {
   scoreLabel: string;
   statusLabel: string;
   metrics: MetricView[];
+  hasHistory: boolean;
   courses: Array<AssessmentCourse & {label:string}>;
 };
 
 interface BulkDraft {
   signature: string;
+  correctionReason?: string;
+  hasConflict?: boolean;
   courseIds?: DraftValues;
   studentStates?: CoachAssessmentEntries["studentStates"];
   savedAt: string;
@@ -67,6 +70,9 @@ interface PageData {
   projectIndex: number;
   filledLabel: string;
   focusKey: string;
+  focusStudentId: string;
+  focusLabel: string;
+  needsCorrection: boolean;
   nextActionLabel: string;
   lastSavedLabel: string;
   readOnly: boolean;
@@ -85,8 +91,6 @@ interface PageData {
   courseIds: DraftValues;
   savedCourseIds: DraftValues;
 }
-
-let latestLoadToken = 0;
 
 Page<PageData>({
   data: {
@@ -111,7 +115,7 @@ Page<PageData>({
     projectIds: [],
     projectIndex: 0,
     filledLabel: "已填写 0 人 · 未填写 0 人",
-    focusKey: "", nextActionLabel: "保存并继续",
+    focusKey: "", focusStudentId: "", focusLabel: "", needsCorrection: false, nextActionLabel: "保存并继续",
     lastSavedLabel: "",
     readOnly: false,
     submitting: false,
@@ -129,6 +133,10 @@ Page<PageData>({
 
   // 非渲染实例状态：学员 → 待提交 assessedAt 快照（见 resolveAssessedAtSnapshot）
   assessmentAssessedAt: undefined as Record<string, AssessedAtSnapshot> | undefined,
+  loadVersion: 0,
+  historyVersion: 0,
+  onHide() { this.flushDraft(); },
+  onUnload() { this.flushDraft(); this.loadVersion += 1; this.historyVersion += 1; },
 
   onLoad(query?: { taskId?: string; templateId?: string; projectId?: string; projectIds?: string; title?: string }) {
     const title = query?.title ? decodeURIComponent(query.title) : "能力评估";
@@ -136,7 +144,9 @@ Page<PageData>({
     return this.load(query?.taskId || "", query?.templateId || "", query?.projectId || "", title, selectedProjectIds);
   },
 
-  async load(taskId: string, templateId: string, projectId: string, taskTitle: string, selectedProjectIds: string[] = []) {
+  async load(taskId: string, templateId: string, projectId: string, taskTitle: string, selectedProjectIds: string[] = [], discardLocal = false) {
+    this.flushDraft();
+    const loadToken = ++this.loadVersion;
     const session = requireRole("coach");
     if (!session) return;
     if (!taskId || !templateId || !projectId) {
@@ -144,7 +154,6 @@ Page<PageData>({
       return;
     }
 
-    const loadToken = ++latestLoadToken;
     this.setData({
       state: "loading",
       statusTitle: "正在读取全队名单",
@@ -154,7 +163,7 @@ Page<PageData>({
       projectId,
       taskTitle,
       rows: [],
-      focusKey: "",
+      focusKey: "", focusStudentId: "", focusLabel: "",
       fields: [],
       savedValuesByStudent: {},
       valuesByStudent: {},
@@ -165,7 +174,7 @@ Page<PageData>({
 
     try {
       const tasks = await getCoachAssessmentTasks({ forceRefresh: true });
-      if (loadToken !== latestLoadToken) return;
+      if (loadToken !== this.loadVersion) return;
       const task = tasks.find((item) => item.id === taskId);
       if (!isUsableTask(task, templateId)) {
         this.setData({ state: "empty", statusTitle: "无法录入", message: "当前测评任务不可录入，请返回任务列表后重试。" });
@@ -182,7 +191,7 @@ Page<PageData>({
         getCoachAssessmentEntries(task.id, projectId),
         task.workflow?.courseSelectionRequired ? getCoachAssessmentCourses(task.id) : Promise.resolve({courses:[]}),
       ]);
-      if (loadToken !== latestLoadToken) return;
+      if (loadToken !== this.loadVersion) return;
       const fields = form.fields.filter((field) =>
         (field.id === projectId || field.testItemId === projectId || field.groupId === projectId)
         && Boolean(field.id)
@@ -206,7 +215,7 @@ Page<PageData>({
         : taskId;
       const signature = createSignature(fields, members);
       const savedValuesByStudent = normalizeSavedValues(savedEntries, fields, members);
-      const draftValuesByStudent = (task.workflow ? !task.workflow.canEdit : task.status === "completed") ? {} : restoreDraft(draftTaskKey, projectId, signature, fields, members);
+      const draftValuesByStudent = discardLocal || (task.workflow ? !task.workflow.canEdit : task.status === "completed") ? {} : restoreDraft(draftTaskKey, projectId, signature, fields, members);
       const valuesByStudent = mergeValues(savedValuesByStudent, draftValuesByStudent);
       const savedStudentIds = Object.keys(savedValuesByStudent);
       const availableProjectIds = uniqueProjectIds(form.fields.filter((f) => !task.testItemIds || task.testItemIds.includes(f.testItemId || f.id)));
@@ -216,7 +225,7 @@ Page<PageData>({
       const projectIndex = Math.max(0, projectIds.indexOf(projectId));
       const readOnly = task.workflow ? !task.workflow.canEdit : task.status === "completed";
       const studentStates = { ...savedEntries.studentStates };
-      const localDraft = wx.getStorageSync<BulkDraft | "">(draftKey(draftTaskKey, projectId));
+      const localDraft = discardLocal ? undefined : readDraft(draftTaskKey, projectId);
       // Preserve the revision against which each restored edit was made.
       for (const studentId of Object.keys(draftValuesByStudent)) {
         if (localDraft && localDraft.studentStates?.[studentId]) studentStates[studentId] = localDraft.studentStates[studentId]!;
@@ -246,7 +255,7 @@ Page<PageData>({
         teamName: team.team?.name?.trim() || "球队待同步",
         termLabel: task.termLabel?.trim() || "学期待同步",
         fields,
-        rows: buildRows(members, fields, valuesByStudent, savedStudentIds, courses, courseIds, savedValuesByStudent, savedCourseIds),
+        rows: buildRows(members, fields, valuesByStudent, savedStudentIds, courses, courseIds, savedValuesByStudent, savedCourseIds, studentStates),
         savedValuesByStudent,
         valuesByStudent,
         savedStudentIds,
@@ -254,18 +263,20 @@ Page<PageData>({
         projectIndex,
         nextActionLabel: readOnly ? "返回项目" : projectIndex < projectIds.length - 1 ? "保存并下一项" : task.workflow ? "保存并核对" : "保存并返回项目",
         filledLabel: buildFilledLabel(members, valuesByStudent, fields),
-        lastSavedLabel: savedStudentIds.length ? "已恢复已保存成绩" : hasDraftValues(valuesByStudent) ? "已恢复本机草稿" : "",
+        lastSavedLabel: hasDraftValues(draftValuesByStudent) ? "已恢复本机草稿，请核对后保存" : savedStudentIds.length ? "已恢复已保存成绩" : "",
         readOnly,
         managed: Boolean(task.workflow),
         draftTaskKey,
         studentStates,
-        correctionReason: "",
-        saveError: "",
-        hasConflict: false,
+        correctionReason: localDraft?.signature === signature ? localDraft.correctionReason || "" : "",
+        needsCorrection: requiresCorrection(pendingChanges(valuesByStudent, savedValuesByStudent, courseIds, savedCourseIds), studentStates),
+        saveError: localDraft?.signature === signature && localDraft.hasConflict ? "服务器成绩已更新。本机修改已保留，请先核对后重新读取。" : "",
+        hasConflict: localDraft?.signature === signature && Boolean(localDraft.hasConflict),
         submitting: false,
       });
+      if (discardLocal) this.clearDraft();
     } catch {
-      if (loadToken !== latestLoadToken) return;
+      if (loadToken !== this.loadVersion) return;
       this.setData({ state: "error", statusTitle: "读取失败", message: "暂时无法读取全队测评信息，请稍后重试。", rows: [] });
     }
   },
@@ -282,30 +293,54 @@ Page<PageData>({
       delete valuesByStudent[studentId][fieldId];
       if (!Object.keys(valuesByStudent[studentId]).length) delete valuesByStudent[studentId];
     }
-    const members = this.data.rows.map((row: BulkRow) => ({ id: row.studentId, name: row.name }));
-    this.setData({ valuesByStudent, rows: buildRows(members, this.data.fields, valuesByStudent, this.data.savedStudentIds, this.data.courses, this.data.courseIds, this.data.savedValuesByStudent, this.data.savedCourseIds), filledLabel: buildFilledLabel(members, valuesByStudent, this.data.fields) });
-    const draftValuesByStudent = pendingChanges(valuesByStudent, this.data.savedValuesByStudent, this.data.courseIds, this.data.savedCourseIds);
-    if (hasDraftValues(draftValuesByStudent)) this.persistDraft(draftValuesByStudent);
-    else wx.removeStorageSync(draftKey(this.data.draftTaskKey || this.data.taskId, this.data.projectId));
+    // The value map is controller state; WXML only consumes rows. Keep the
+    // bridge patch scoped to one row so other students' inputs stay untouched.
+    this.data.valuesByStudent = valuesByStudent;
+    const rowIndex = this.data.rows.findIndex((row: BulkRow) => row.studentId === studentId);
+    const member = this.data.rows[rowIndex]!;
+    const row = buildRows([{id: studentId, name: member.name}], this.data.fields, valuesByStudent, this.data.savedStudentIds, this.data.courses, this.data.courseIds, this.data.savedValuesByStudent, this.data.savedCourseIds, this.data.studentStates)[0]!;
+    const pending = pendingChanges(valuesByStudent, this.data.savedValuesByStudent, this.data.courseIds, this.data.savedCourseIds);
+    this.setData({[`rows[${rowIndex}]`]: row,
+      filledLabel: buildFilledLabel(this.data.rows.map((item: BulkRow) => ({id:item.studentId})), valuesByStudent, this.data.fields),
+      needsCorrection: requiresCorrection(pending, this.data.studentStates),
+    });
+    // Keep synchronous durability: bridge optimization must not add a crash-loss
+    // window. Hiding, leaving, navigation and submission also refresh the draft.
+    if (hasDraftValues(pending)) this.persistDraft(pending);
+    else if (this.clearDraft()) this.setData({lastSavedLabel: this.data.savedStudentIds.length ? "与服务器成绩一致" : "尚未录入成绩"});
+  },
+
+  flushDraft() {
+    if (this.data.state !== "ready" || this.data.readOnly || this.data.submitting) return;
+    const pending = pendingChanges(this.data.valuesByStudent, this.data.savedValuesByStudent, this.data.courseIds, this.data.savedCourseIds);
+    if (hasDraftValues(pending)) this.persistDraft(pending);
+  },
+  clearDraft() {
+    try { wx.removeStorageSync(draftKey(this.data.draftTaskKey || this.data.taskId, this.data.projectId)); return true; }
+    catch { this.setData({lastSavedLabel:"本机草稿清理失败，重新进入后请核对服务器成绩"}); return false; }
   },
 
   persistDraft(valuesByStudent: DraftValues) {
     if (!this.data.taskId || !this.data.projectId || !this.data.fields.length) return;
-    this.writeDraft(valuesByStudent);
-    this.setData({ lastSavedLabel: "草稿已保存在本机" });
+    const persisted = this.writeDraft(valuesByStudent);
+    const label = persisted ? "草稿已保存在本机" : "本机草稿保存失败，请保持页面并尽快保存到服务器";
+    if (this.data.lastSavedLabel !== label) this.setData({ lastSavedLabel: label });
+    return persisted;
   },
 
   writeDraft(valuesByStudent: DraftValues) {
     if (!this.data.taskId || !this.data.projectId || !this.data.fields.length) return;
     const members = this.data.rows.map((row: BulkRow) => ({ id: row.studentId, name: row.name }));
-    wx.setStorageSync(draftKey(this.data.draftTaskKey || this.data.taskId, this.data.projectId), {
+    try { wx.setStorageSync(draftKey(this.data.draftTaskKey || this.data.taskId, this.data.projectId), {
       signature: createSignature(this.data.fields, members),
       savedAt: new Date().toISOString(),
       valuesByStudent,
       savedStudentIds: this.data.savedStudentIds,
       studentStates: this.data.studentStates,
       courseIds:this.data.courseIds,
-    } satisfies BulkDraft);
+      correctionReason:this.data.correctionReason, hasConflict:this.data.hasConflict,
+    } satisfies BulkDraft); return true; }
+    catch { return false; }
   },
 
   selectCourse(event: {currentTarget:{dataset:{studentId?:string;fieldId?:string}};detail:{value:string}}) {
@@ -321,8 +356,22 @@ Page<PageData>({
         (courseIds[row.studentId] ??= {})[field.id]=course.id;
       }
     }
-    this.setData({courseIds,rows:buildRows(this.data.rows.map((row:BulkRow)=>({id:row.studentId,name:row.name})),this.data.fields,this.data.valuesByStudent,this.data.savedStudentIds,this.data.courses,courseIds,this.data.savedValuesByStudent,this.data.savedCourseIds)});
-    this.persistDraft(pendingChanges(this.data.valuesByStudent,this.data.savedValuesByStudent,courseIds,this.data.savedCourseIds));
+    this.data.courseIds = courseIds;
+    const pending = pendingChanges(this.data.valuesByStudent, this.data.savedValuesByStudent, courseIds, this.data.savedCourseIds);
+    const patch: Record<string, unknown> = {needsCorrection: requiresCorrection(pending, this.data.studentStates)};
+    for (let index = 0; index < this.data.rows.length; index += 1) {
+      const row = this.data.rows[index]!;
+      if ((studentId && row.studentId !== studentId) || !course.studentIds.includes(row.studentId)) continue;
+      patch[`rows[${index}]`] = buildRows([{id:row.studentId, name:row.name}], this.data.fields, this.data.valuesByStudent, this.data.savedStudentIds, this.data.courses, courseIds, this.data.savedValuesByStudent, this.data.savedCourseIds, this.data.studentStates)[0]!;
+    }
+    this.setData(patch);
+    if (hasDraftValues(pending)) this.persistDraft(pending);
+  },
+  focusInput(event: {currentTarget:{dataset:{studentId?:string;fieldId?:string}}}) {
+    const {studentId, fieldId} = event.currentTarget.dataset;
+    const index = this.data.rows.findIndex((row: BulkRow) => row.studentId === studentId && row.metrics.some(metric => metric.fieldId === fieldId));
+    if (index < 0) return;
+    this.setData({focusKey:`${studentId}/${fieldId}`, focusStudentId:studentId, focusLabel:`正在录入 ${index + 1}/${this.data.rows.length} · ${this.data.rows[index]!.name}`});
   },
   advanceInput(event: { currentTarget: { dataset: { studentId?: string; fieldId?: string } } }) {
     if (this.data.readOnly || this.data.submitting) return;
@@ -331,11 +380,12 @@ Page<PageData>({
     const index = inputs.findIndex((metric: MetricView & { studentId: string }) => metric.studentId === studentId && metric.fieldId === fieldId);
     if (index < 0) return;
     const next = inputs[index + 1];
-    this.setData({ focusKey: next?.inputKey || "" });
+    if (next) this.focusInput({currentTarget:{dataset:next}});
+    else this.setData({ focusKey: "", focusStudentId: "", focusLabel: "本项名单已到末尾，可保存并继续" });
     if (!next) wx.hideKeyboard?.();
   },
   saveDraft() {
-    this.persistDraft(this.data.valuesByStudent);
+    this.flushDraft();
   },
 
   async saveProject() {
@@ -344,6 +394,8 @@ Page<PageData>({
       return;
     }
     if (this.data.submitting || this.data.hasConflict) return;
+    this.flushDraft();
+    const loadToken = this.loadVersion;
     const clearedRow = this.data.rows.find((row: BulkRow) => row.metrics.some(metric => !metric.value.trim() && this.data.savedValuesByStudent[row.studentId]?.[metric.fieldId] !== undefined));
     if (clearedRow) {
       this.setData({ saveError: `${clearedRow.name}：已保存成绩不能通过空值删除，请填写更正值或重新读取服务器成绩。` });
@@ -381,6 +433,7 @@ Page<PageData>({
           const saved = await saveCoachAssessmentEntries(this.data.taskId, row.studentId, {
             expectedRevision: revision, entries: rawResults, reason: this.data.correctionReason.trim() || undefined,
           });
+          if (loadToken !== this.loadVersion) return;
           this.setData({ studentStates: { ...this.data.studentStates, [row.studentId]: {
             revision: saved.revision, publishedRevision: saved.publications[saved.publications.length - 1]?.revision ?? null,
           } } });
@@ -396,17 +449,19 @@ Page<PageData>({
             assessedAt,
             rawResults,
           });
+          if (loadToken !== this.loadVersion) return;
           // 提交成功后清掉快照：后续对同一学员的重新提交属于新的业务事实
           delete assessedAtStore[snapshotKey];
         }
         succeeded.push(row.studentId);
       } catch (error) {
+        if (loadToken !== this.loadVersion) return;
         // 失败保留快照，重试复用同一 assessedAt，让确定性幂等键保持不变
         const conflict = Boolean(error && typeof error === "object" &&
           (("statusCode" in error && error.statusCode === 409) || ("code" in error && error.code === "assessment_revision_conflict")));
         this.setData({
           hasConflict: this.data.hasConflict || conflict,
-          saveError: this.data.hasConflict || conflict ? "服务器成绩已更新。本机修改已保留，请先核对，再点‘重新读取服务器成绩’。" : error && typeof error === "object" && "message" in error ? String(error.message) : "保存失败，请稍后重试；本机草稿已保留。",
+          saveError: this.data.hasConflict || conflict ? "服务器成绩已更新。本机修改已保留，请先核对，再点‘重新读取服务器成绩’。" : error && typeof error === "object" && "message" in error ? String(error.message) : "保存结果未确认，输入仍保留在本页，请重试或核对服务器成绩。",
         });
         // Keep this student's draft so the coach can retry only the failed row.
       }
@@ -415,8 +470,7 @@ Page<PageData>({
     for(const studentId of succeeded) savedCourseIds[studentId]={...(this.data.courseIds[studentId] || {})};
     this.setData({savedCourseIds});
     const draftValuesByStudent = withoutStudents(pendingValuesByStudent, succeeded);
-    if (hasDraftValues(draftValuesByStudent)) this.writeDraft(draftValuesByStudent);
-    else wx.removeStorageSync(draftKey(this.data.draftTaskKey || this.data.taskId, this.data.projectId));
+    const draftStored = hasDraftValues(draftValuesByStudent) ? this.persistDraft(draftValuesByStudent) : this.clearDraft();
     const savedValuesByStudent = { ...this.data.savedValuesByStudent };
     for (const studentId of succeeded) {
       savedValuesByStudent[studentId] = { ...(this.data.valuesByStudent[studentId] || {}) };
@@ -428,11 +482,12 @@ Page<PageData>({
       savedValuesByStudent,
       savedStudentIds,
       valuesByStudent,
-      rows: buildRows(this.data.rows.map((row: BulkRow) => ({ id: row.studentId, name: row.name })), this.data.fields, valuesByStudent, savedStudentIds, this.data.courses, this.data.courseIds, savedValuesByStudent, savedCourseIds),
+      rows: buildRows(this.data.rows.map((row: BulkRow) => ({ id: row.studentId, name: row.name })), this.data.fields, valuesByStudent, savedStudentIds, this.data.courses, this.data.courseIds, savedValuesByStudent, savedCourseIds, this.data.studentStates),
+      needsCorrection: requiresCorrection(draftValuesByStudent, this.data.studentStates),
       filledLabel: buildFilledLabel(this.data.rows.map((row: BulkRow) => ({ id: row.studentId })), valuesByStudent, this.data.fields),
-      lastSavedLabel: succeeded.length ? `已保存${succeeded.length}名学员` : this.data.lastSavedLabel,
+      lastSavedLabel: succeeded.length && !hasDraftValues(draftValuesByStudent) && draftStored ? `已保存${succeeded.length}名学员` : this.data.lastSavedLabel,
     });
-    if (succeeded.length < members.length) wx.showToast({ title: "部分学员未保存，已保留草稿", icon: "none" });
+    if (succeeded.length < members.length) wx.showToast({ title: "部分学员未保存，请核对本页输入", icon: "none" });
     else wx.showToast({ title: `已保存${succeeded.length}名学员`, icon: "success" });
   },
 
@@ -442,10 +497,11 @@ Page<PageData>({
       await this.saveProject();
       if (hasDraftValues(pendingChanges(this.data.valuesByStudent, this.data.savedValuesByStudent, this.data.courseIds, this.data.savedCourseIds))) return;
     }
-    this.nextProject();
+    if (!this.data.hasConflict) this.nextProject();
   },
   nextProject() {
-    if (this.data.submitting) return;
+    if (this.data.submitting || this.data.hasConflict) return;
+    this.flushDraft();
     if (this.data.readOnly) {
       openPage(`/pages/coach/assessment-projects/index?taskId=${encodeURIComponent(this.data.taskId)}&templateId=${encodeURIComponent(this.data.templateId)}&title=${encodeURIComponent(this.data.taskTitle)}`);
       return;
@@ -460,41 +516,44 @@ Page<PageData>({
 
   goBack() {
     if (this.data.submitting) return;
+    this.flushDraft();
     wx.navigateBack({ delta: 1 });
   },
 
   onReasonInput(event: { detail: { value: string } }) {
-    if (!this.data.submitting) this.setData({ correctionReason: event.detail.value });
+    if (!this.data.submitting) { this.setData({ correctionReason: event.detail.value }); this.flushDraft(); }
   },
 
   async reloadServer() {
     if (this.data.submitting) return;
     const answer = await new Promise<{ confirm: boolean }>((resolve) => wx.showModal({ success: resolve, title: "重新读取服务器成绩", content: "将放弃当前项目的本机未保存修改，读取服务器最新成绩。是否继续？" }));
     if (!answer.confirm) return;
-    wx.removeStorageSync(draftKey(this.data.draftTaskKey, this.data.projectId));
-    await this.load(this.data.taskId, this.data.templateId, this.data.projectId, this.data.taskTitle, this.data.projectIds);
+    await this.load(this.data.taskId, this.data.templateId, this.data.projectId, this.data.taskTitle, this.data.projectIds, true);
   },
 
   async showHistory(event: { currentTarget: { dataset: { studentId?: string } } }) {
     const studentId = event.currentTarget.dataset.studentId;
-    if (!studentId || !this.data.managed) return;
+    if (!studentId || !this.data.managed || !this.data.rows.some((row: BulkRow) => row.studentId === studentId && row.hasHistory)) return;
+    const token = ++this.historyVersion;
     this.setData({ historyVisible: true, historyTitle: "录入与发布记录", historyLines: ["正在读取记录…"] });
     try {
       const history = await getCoachAssessmentHistory(this.data.taskId, studentId);
+      if (token !== this.historyVersion) return;
       const labels = new Map(this.data.fields.map((field: AssessmentField) => [field.testItemId, field.label]));
       const changes = history.changes.flatMap((change) => change.entries.filter((entry) => labels.has(entry.testItemId)).map((entry) =>
         `修订 ${change.revision} · ${change.changedAt.replace("T", " ").slice(0, 19)} UTC · ${change.coachId}\n${labels.get(entry.testItemId)}：${historyValue(entry.before)} → ${historyValue(entry.after)}${change.reason ? `\n原因：${change.reason}` : ""}`));
       const publications = history.publications.map((publication) => `发布修订 ${publication.revision} · ${publication.publishedAt.replace("T", " ").slice(0, 19)} UTC · ${publication.coachId}`);
       this.setData({ historyLines: [...publications.reverse(), ...changes.reverse()].length ? [...publications, ...changes] : ["当前项目暂无记录"] });
     } catch {
+      if (token !== this.historyVersion) return;
       this.setData({ historyLines: ["记录读取失败，请关闭后重试。"] });
     }
   },
 
-  closeHistory() { this.setData({ historyVisible: false }); },
+  closeHistory() { this.historyVersion += 1; this.setData({ historyVisible: false }); },
 
   retry() {
-    void this.load(this.data.taskId, this.data.templateId, this.data.projectId, this.data.taskTitle);
+    return this.load(this.data.taskId, this.data.templateId, this.data.projectId, this.data.taskTitle, this.data.projectIds);
   },
 });
 
@@ -517,7 +576,7 @@ function isUsableTask(task: CoachAssessmentTask | undefined, templateId: string)
 function buildRows(
   members: Array<{ id: string; name: string }>, fields: AssessmentField[], valuesByStudent: DraftValues,
   savedStudentIds: string[] = [], courses: Array<AssessmentCourse & { label: string }> = [], courseIds: DraftValues = {},
-  savedValues: DraftValues = {}, savedCourseIds: DraftValues = {},
+  savedValues: DraftValues = {}, savedCourseIds: DraftValues = {}, states: PageData["studentStates"] = {},
 ): BulkRow[] {
   return members.map(member => {
     const values = valuesByStudent[member.id] || {};
@@ -536,6 +595,7 @@ function buildRows(
     const filled = metrics.filter(metric => Boolean(metric.value.trim())).length;
     const first = metrics[0];
     return {
+      hasHistory: savedStudentIds.includes(member.id) || (states[member.id]?.revision ?? 0) > 0 || (states[member.id]?.publishedRevision ?? null) !== null,
       studentId: member.id, name: member.name.trim(), initials: member.name.trim().slice(0, 1) || "学",
       rawInputValue: first?.value || "", scoreLabel: first?.scoreLabel || "待提交",
       statusLabel: dirty ? "待保存" : savedStudentIds.includes(member.id) ? "已保存" : filled ? "已填写" : "待录入",
@@ -584,7 +644,7 @@ function createSignature(fields: AssessmentField[], members: Array<{ id: string 
 }
 
 function restoreDraft(taskId: string, projectId: string, signature: string, fields: AssessmentField[], members: Array<{ id: string }>): DraftValues {
-  const draft = wx.getStorageSync<BulkDraft | "">(draftKey(taskId, projectId));
+  const draft = readDraft(taskId, projectId);
   if (!draft || draft.signature !== signature || !draft.valuesByStudent) return {};
   const fieldIds = new Set(fields.map((field) => field.id));
   const valuesByStudent: DraftValues = {};
@@ -679,4 +739,12 @@ function pendingChanges(values:DraftValues,saved:DraftValues,courses:DraftValues
     if (value.trim() && courses[studentId]?.[fieldId] !== savedCourses[studentId]?.[fieldId]) (result[studentId] ??= {})[fieldId]=value;
   }
   return result;
+}
+
+function readDraft(taskId: string, projectId: string): BulkDraft | undefined {
+  try { return wx.getStorageSync<BulkDraft | "">(draftKey(taskId, projectId)) || undefined; }
+  catch { return undefined; }
+}
+function requiresCorrection(pending: DraftValues, states: PageData["studentStates"]) {
+  return Object.keys(pending).some(studentId => (states[studentId]?.publishedRevision ?? null) !== null);
 }

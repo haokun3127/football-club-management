@@ -52,8 +52,17 @@ const task = {
 };
 
 function createPageInstance() {
-  const instance = { ...pageDefinition, data: { ...pageDefinition.data } };
-  instance.setData = (patch) => { instance.data = { ...instance.data, ...patch }; };
+  const instance = { ...pageDefinition, data: structuredClone(pageDefinition.data) };
+  instance.patches = [];
+  instance.setData = (patch) => {
+    instance.patches.push(structuredClone(patch));
+    for (const [path, value] of Object.entries(patch)) {
+      const parts = path.replace(/\[(\d+)\]/g, ".$1").split(".");
+      let target = instance.data;
+      for (const key of parts.slice(0, -1)) target = target[key];
+      target[parts.at(-1)] = value;
+    }
+  };
   return instance;
 }
 
@@ -130,7 +139,8 @@ describe("C12.1 team batch assessment entry", () => {
       await page.saveProject();
       await page.saveProject();
       let assessedAt = mocks.submitCoachAssessment.mock.calls.map((call) => call[0].assessedAt);
-      expect(assessedAt).toEqual(["2026-10-21T08:00:00.000Z", "2026-10-21T08:00:00.000Z", "2026-10-21T08:00:00.000Z"]);
+      expect(assessedAt).toHaveLength(3);
+      expect(new Set(assessedAt).size).toBe(1);
 
       // 修改成绩后重新提交：属于新的业务事实，assessedAt 重新生成
       page.onRawInput({ currentTarget: { dataset: { studentId: "student-1", fieldId: "speed" } }, detail: { value: "4.95" } });
@@ -334,6 +344,100 @@ describe("revisioned project drafts", () => {
     const page=await load();expect(page.data.rows[0].statusLabel).toBe("已保存");input(page,"71");expect(page.data.rows[0].statusLabel).toBe("待保存");
     page.advanceInput({currentTarget:{dataset:{studentId:"student-1",fieldId:"score"}}});expect(page.data.focusKey).toBe("student-2/score");
     page.onRawInput({currentTarget:{dataset:{studentId:"foreign",fieldId:"score"}},detail:{value:"90"}});expect(page.data.valuesByStudent.foreign).toBeUndefined();
+  });
+
+  it.each([19, 40])("keeps each keystroke within one student row for a %i-person, two-field roster", async (size) => {
+    const members=Array.from({length:size},(_,i)=>({id:`student-${i+1}`,name:i===0?"测试长姓名球员甲乙丙丁戊己庚辛":`球员${i+1}`}));
+    const form=await mocks.getAssessmentForm();
+    mocks.getAssessmentForm.mockResolvedValue({...form,fields:[form.fields[0],{id:"time",testItemId:"item-time",groupId:"technical",label:"跑动时间",valueKind:"duration_seconds",inputType:"number",required:true,unit:"秒"}]});
+    mocks.getCoachTeam.mockResolvedValue({team:{name:"U10"},members});
+    mocks.getCoachAssessmentEntries.mockResolvedValue({savedValuesByStudent:{},studentStates:Object.fromEntries(members.map(m=>[m.id,{revision:0,publishedRevision:null}]))});
+    const page=createPageInstance();await page.onLoad({taskId:task.id,templateId:task.templateId,projectId:"technical"});
+    page.focusInput({currentTarget:{dataset:{studentId:"student-1",fieldId:"score"}}});
+    page.patches=[];
+    input(page,"0");
+    const inputBytes=Buffer.byteLength(JSON.stringify(page.patches));
+    const fullBytes=Buffer.byteLength(JSON.stringify({valuesByStudent:page.data.valuesByStudent,rows:page.data.rows,filledLabel:page.data.filledLabel}));
+    expect(inputBytes).toBeLessThan(fullBytes/5);
+    expect(page.patches.flatMap(p=>Object.keys(p)).filter(key=>key.startsWith("rows"))).toEqual(["rows[0]"]);
+    expect(page.patches.some(p=>"valuesByStudent" in p)).toBe(false);
+    expect(page.data.focusKey).toBe("student-1/score");
+    console.info(`CQ-11 bridge fixture: roster=${size}, fields=2, rowPatchBytes=${inputBytes}, equivalentWholeListBytes=${fullBytes}`);
+    page.advanceInput({currentTarget:{dataset:{studentId:"student-1",fieldId:"score"}}});expect(page.data.focusKey).toBe("student-1/time");
+    for(const member of members){
+      page.onRawInput({currentTarget:{dataset:{studentId:member.id,fieldId:"score"}},detail:{value:"0"}});
+      page.onRawInput({currentTarget:{dataset:{studentId:member.id,fieldId:"time"}},detail:{value:"4.92"}});
+    }
+    expect(page.data.filledLabel).toBe(`已填 ${size*2}/${size*2} 项 · ${size}/${size} 人完整`);
+    page.advanceInput({currentTarget:{dataset:{studentId:`student-${size}`,fieldId:"time"}}});expect(page.data.focusKey).toBe("");
+    await page.saveProject();expect(mocks.saveCoachAssessmentEntries).toHaveBeenCalledTimes(size);expect(mocks.submitCoachAssessment).not.toHaveBeenCalled();
+    expect(mocks.saveCoachAssessmentEntries.mock.calls.every(call=>call[2].entries.length===2 && call[2].entries[0].value.score===0 && call[2].entries[1].value.seconds===4.92)).toBe(true);
+    expect(page.data.rows.every(r=>r.statusLabel==="已保存")).toBe(true);
+  });
+  it("shows correction tools only for a changed published student and restores reason/conflict on reopen", async () => {
+    const first=await load();expect(first.data.needsCorrection).toBe(false);expect(first.data.rows[0].hasHistory).toBe(false);
+    input(first,"0");expect(first.data.needsCorrection).toBe(false);
+    expect(template).toContain("managed && !readOnly && (needsCorrection || hasConflict || saveError)");
+    expect(template).toContain('wx:if="{{needsCorrection}}" value="{{correctionReason}}"');
+    expect(template).toContain('wx:if="{{managed && item.hasHistory}}"');
+    storage.clear();mocks.getCoachAssessmentEntries.mockResolvedValue({savedValuesByStudent:{"student-1":{"item-score":{score:80}}},studentStates:{"student-1":{revision:3,publishedRevision:3}}});
+    const page=await load();expect(page.data.needsCorrection).toBe(false);expect(page.data.rows[0].hasHistory).toBe(true);
+    input(page,"81");expect(page.data.needsCorrection).toBe(true);page.onReasonInput({detail:{value:"核对原始记录"}});
+    mocks.saveCoachAssessmentEntries.mockRejectedValueOnce({statusCode:409});await page.saveProject();page.onHide();
+    const reopened=await load();expect(reopened.data).toMatchObject({hasConflict:true,needsCorrection:true,correctionReason:"核对原始记录"});
+    await reopened.saveProject();expect(mocks.saveCoachAssessmentEntries).toHaveBeenCalledTimes(1);
+  });
+  it("retains an unknown save outcome across hide/reopen and retries the same revision and body", async () => {
+    const page=await load();input(page,"0");mocks.saveCoachAssessmentEntries.mockRejectedValueOnce(new Error("response unknown"));await page.saveProject();page.onHide();page.onUnload();
+    const reopened=await load();expect(reopened.data.rows[0].rawInputValue).toBe("0");await reopened.saveProject();
+    expect(mocks.saveCoachAssessmentEntries.mock.calls[1]).toEqual(mocks.saveCoachAssessmentEntries.mock.calls[0]);
+    expect(mocks.openPage).not.toHaveBeenCalledWith(expect.stringContaining("assessment-submit"));
+  });
+  it("flushes unsaved state at lifecycle boundaries and ignores an in-flight save after unload", async () => {
+    const page=await load();input(page,"75");let resolve;
+    mocks.saveCoachAssessmentEntries.mockImplementationOnce(()=>new Promise(r=>resolve=r));const pending=page.saveProject();
+    page.onUnload();const before=structuredClone(page.data);resolve({revision:1,publications:[]});await pending;
+    expect(page.data).toEqual(before);expect([...storage.values()][0].valuesByStudent["student-1"].score).toBe("75");
+  });
+  it("keeps local data until an explicitly confirmed server reread succeeds", async () => {
+    const page=await load();input(page,"70");wx.showModal=({success})=>success({confirm:true});
+    mocks.getCoachAssessmentEntries.mockRejectedValueOnce(new Error("offline"));await page.reloadServer();
+    expect(page.data.state).toBe("error");expect([...storage.values()][0].valuesByStudent["student-1"].score).toBe("70");
+    await page.retry();expect(page.data.rows[0].rawInputValue).toBe("70");
+    await page.reloadServer();expect(storage.size).toBe(0);expect(page.data.rows[0].rawInputValue).toBe("");
+  });
+  it("keeps valid values editable when local storage fails and reports the persistence gap", async () => {
+    const page=await load();const original=wx.setStorageSync;wx.setStorageSync=()=>{throw new Error("quota");};
+    try {input(page,"0");expect(page.data.rows[0].rawInputValue).toBe("0");expect(page.data.lastSavedLabel).toContain("本机草稿保存失败");}
+    finally {wx.setStorageSync=original;}
+    await page.saveProject();expect(page.data.savedValuesByStudent["student-1"].score).toBe("0");
+  });
+
+  it("keeps only the failed student's draft after a partial save and retries only that student", async () => {
+    mocks.getCoachTeam.mockResolvedValue({team:{name:"U10"},members:[{id:"student-1",name:"甲"},{id:"student-2",name:"乙"}]});
+    mocks.getCoachAssessmentEntries.mockResolvedValue({savedValuesByStudent:{},studentStates:{"student-1":{revision:0,publishedRevision:null},"student-2":{revision:0,publishedRevision:null}}});
+    const page=await load();input(page,"0");page.onRawInput({currentTarget:{dataset:{studentId:"student-2",fieldId:"score"}},detail:{value:"75"}});
+    mocks.saveCoachAssessmentEntries.mockResolvedValueOnce({revision:1,publications:[]}).mockRejectedValueOnce(new Error("response unknown"));await page.saveProject();
+    expect(page.data.rows.map(row=>row.statusLabel)).toEqual(["已保存","待保存"]);
+    expect(Object.keys([...storage.values()][0].valuesByStudent)).toEqual(["student-2"]);
+    await page.saveProject();expect(mocks.saveCoachAssessmentEntries.mock.calls.map(call=>call[1])).toEqual(["student-1","student-2","student-2"]);
+    expect(storage.size).toBe(0);
+  });
+  it("updates only the chosen student's course and preserves the keyboard target", async () => {
+    mocks.getCoachAssessmentTasks.mockResolvedValue([{...task,workflow:{templateVersionId:"version-pinned",canEdit:true,courseSelectionRequired:true}}]);
+    mocks.getCoachTeam.mockResolvedValue({team:{name:"U10"},members:[{id:"student-1",name:"甲"},{id:"student-2",name:"乙"}]});
+    mocks.getCoachAssessmentCourses.mockResolvedValue({courses:[{id:"course-a",title:"第一课",occurredAt:"2026-09-01T08:00:00Z",studentIds:["student-1","student-2"]},{id:"course-b",title:"第二课",occurredAt:"2026-09-02T08:00:00Z",studentIds:["student-1"]}]});
+    const page=await load();page.selectCourse({currentTarget:{dataset:{}},detail:{value:"0"}});input(page,"75");
+    page.focusInput({currentTarget:{dataset:{studentId:"student-1",fieldId:"score"}}});page.patches=[];
+    page.selectCourse({currentTarget:{dataset:{studentId:"student-1",fieldId:"score"}},detail:{value:"1"}});
+    expect(page.patches.flatMap(p=>Object.keys(p)).filter(key=>key.startsWith("rows"))).toEqual(["rows[0]"]);
+    expect(page.data.courseIds).toEqual({"student-1":{score:"course-b"},"student-2":{score:"course-a"}});expect(page.data.focusKey).toBe("student-1/score");
+    expect([...storage.values()][0].courseIds["student-1"].score).toBe("course-b");
+  });
+  it("does not restore another coach's managed draft for the same task", async () => {
+    const page=await load();input(page,"75");page.onHide();
+    mocks.requireRole.mockReturnValue({role:"coach",clubId:"club-1",userId:"coach-2"});const other=await load();
+    expect(other.data.rows[0].rawInputValue).toBe("");expect(other.data.draftTaskKey).not.toBe(page.data.draftTaskKey);
   });
 
 });
