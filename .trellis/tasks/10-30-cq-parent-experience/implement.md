@@ -90,3 +90,7 @@
 任务保持in_progress等待集成/最终审计，不归档、不push/deploy/上传。上述范围外的家长旧页面未声称获得完整原生状态审计。
 
 最终冻结检查（CQ-20 + R2-01）：`PATH=/opt/homebrew/opt/node@24/bin:$PATH corepack pnpm --filter @football-club/miniprogram-cq-talent test`，98文件/750通过/1既有跳过，exit 0；最终控制器/模板及组件注册源码已包含于该检查。`typecheck`、`git diff --check`通过。测试未访问真实业务写入、微信工具或部署环境。首页R2-01已在`24a4badc`；本批其它改动独立CQ-20提交后，停止开发等待总控审计。
+
+### 版本诊断入口：account只接入公共组件
+
+2026-10-30按总控后续指令读取`67ffad96`的`version-diagnostics.md`接入合同。只在现有parent/account页面JSON注册`version-info: /components/version-info/index`并在正文放置无props的`<version-info />`，保留默认折叠；页面控制器无版本请求/轮询，无新路由。组件文件已由总控在主目录集成，本worktree不cherry-pick公共依赖、不改公共组件。account控制器及标记回归通过；展开/折叠与服务读取等组件行为由公共组件测试和总控最终原生验证负责。

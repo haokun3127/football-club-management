@@ -100,3 +100,11 @@ describe("parent account role switch", () => {
     expect(mocks.switchActiveRole).not.toHaveBeenCalled();
   });
 });
+
+it("mounts the shared version information without props or account-owned requests",()=>{
+ const config=JSON.parse(readFileSync(new URL("./index.json",import.meta.url),"utf8"));
+ expect(config.usingComponents["version-info"]).toBe("/components/version-info/index");
+ expect(template).toContain("<version-info />");
+ const controller=readFileSync(new URL("./index.ts",import.meta.url),"utf8");
+ expect(controller).not.toMatch(/getServiceVersion|getClientVersion|setInterval/);
+});

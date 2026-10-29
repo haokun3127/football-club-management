@@ -26,5 +26,6 @@
         </view>
       </view>
     </block>
+    <version-info />
   </view>
 </view>
