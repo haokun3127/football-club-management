@@ -1,0 +1,14 @@
+<view class="version-info">
+  <t-button theme="default" variant="text" block bindtap="handleToggle" aria-label="{{expanded ? '收起版本信息' : '展开版本信息'}}" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);">
+    版本信息 · {{expanded ? '收起' : '展开'}}
+  </t-button>
+  <view wx:if="{{expanded}}" class="version-info__body">
+    <view class="version-info__heading">当前小程序</view>
+    <view wx:for="{{clientRows}}" wx:key="label" class="version-info__row"><view class="version-info__label">{{item.label}}</view><view class="version-info__value">{{item.value}}</view></view>
+    <view class="version-info__heading">服务端</view>
+    <t-loading wx:if="{{loading}}" theme="circular" size="20px" text="正在读取服务版本" />
+    <view wx:elif="{{failed}}" class="version-info__error" aria-role="alert">服务版本暂时不可用，请重试</view>
+    <block wx:else><view wx:for="{{serverRows}}" wx:key="label" class="version-info__row"><view class="version-info__label">{{item.label}}</view><view class="version-info__value">{{item.value}}</view></view></block>
+    <t-button theme="default" variant="outline" block loading="{{loading}}" disabled="{{loading}}" bindtap="handleRefresh" custom-style="min-height:var(--control-height);height:auto;font-size:var(--font-size-body);line-height:1.5;padding:var(--control-padding);">{{failed ? '重试读取版本' : '刷新服务版本'}}</t-button>
+  </view>
+</view>

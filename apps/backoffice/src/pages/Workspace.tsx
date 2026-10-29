@@ -42,6 +42,7 @@ import Plans from "./plans";
 import Management from "./management";
 import GrantsPage from "./grants";
 import Workbench from "./workbench";
+import VersionInfo from "../components/version-info";
 const names = { develop: "开发环境", trial: "体验环境", release: "正式环境" };
 const routes = [
   { path: "/", name: "工作台", icon: <DashboardOutlined /> },
@@ -266,6 +267,7 @@ export default function Workspace() {
         <Tag key="env">{names[config.environment]}</Tag>,
         <Space key="identity">
           <span>{session.user.name}</span>
+          <VersionInfo />
           <Button
             icon={<LogoutOutlined />}
             loading={submitting}

@@ -1,0 +1,7 @@
+.version-info { color:var(--color-text); background:var(--color-card); border:1px solid var(--color-line); border-radius:var(--radius-card); }
+.version-info__body { padding:0 var(--spacing-card) var(--spacing-card); }
+.version-info__heading { font-size:var(--font-size-body); line-height:1.5; font-weight:600; margin:12px 0; }
+.version-info__row { margin-bottom:12px; font-size:var(--font-size-aux); line-height:1.6; }
+.version-info__label { color:var(--color-text-secondary); }
+.version-info__value { overflow-wrap:anywhere; word-break:break-all; }
+.version-info__error { color:var(--color-error); font-size:var(--font-size-body); line-height:1.6; margin-bottom:12px; }

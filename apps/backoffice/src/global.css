@@ -114,6 +114,9 @@ body {
 .role-default-select {
   min-width: 160px;
 }
+.version-identity { overflow-wrap: anywhere; word-break: break-word; }
+.version-loading { min-height: 64px; }
+.version-refresh { margin-top: 16px; }
 
 .resource-summary {
   margin-bottom: 20px;

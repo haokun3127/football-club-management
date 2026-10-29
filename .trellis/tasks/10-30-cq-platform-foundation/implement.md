@@ -64,3 +64,10 @@
 - 准确公共签名、升级例外和响应未知重试规则见classroom-client-contract.md。无新增业务requestId；沿用request生成的幂等key，原payload+expectedRevision重试；缓存过期仍由CAS阻止覆盖。
 - 定向API batch/persistence/server 3文件81项通过；最新batch再补真实第二教练身份，6项通过。公共API/request/课堂运输3文件48项通过；API与小程序类型通过。
 - 后续按总控新指令：CAS独立提交后，在现有后台账号入口提供安全版本信息，并新增小程序公共version-info折叠诊断组件。只显式展开/刷新读取服务版本，角色pages由各自owner注册，不新增路由。随后跑当前整包交付门禁和实际UI渲染。
+
+### 共享版本诊断与后台入口
+- 小程序组件components/version-info/index已实现，无props/业务写入/新路由。默认折叠、仅展开刷新读取；安全未知/重试与关闭卸载generation保护。接入见version-diagnostics.md，角色pages由各自owner注册。
+- 后台账号区版本按钮/Modal已实现；区分本次HTML加载时bootstrap构建与显式health服务构建，白名单/no-store/不带cookie，不新增页面路由。沿既有AntD、TDesign和UI tokens。
+- 当前完整pnpm check:delivery通过：API274、domain47、后台8、小程序698通过/1既有skip；所有类型/构建、14脚本及三临时环境启动通过。日志/private/tmp/cq-platform-final-check-delivery.log，持久证据摘要在此。
+- Playwright Chromium真实cookie登录disposable synthetic fixture；初载health=0，打开/503模拟/重试后health=3，CSP事件=[]。1440/1024截图已直接查看，document overflow=false；额外长79字符buildId/完整SHA在1024对话框无溢出。截图research/version-*.png；错误响应仅此本地浏览器mock，重试恢复实际本地health，未触碰真实服务。
+- 原生小程序画布未在worktree导入；控制器/模板8项通过不等于真机。后续总控主目录做原生接入。CQ-00 b51镜像不含正确性/版本UI，不是集成最终制品。

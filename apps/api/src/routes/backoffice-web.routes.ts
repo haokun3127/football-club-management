@@ -9,8 +9,9 @@ import type { ApiStore } from "../store.js";
 import { backofficeCatalogSchema } from "../http/backoffice-schemas.js";
 import { sendError } from "../http/errors.js";
 import { registerBackofficeErrors } from "../http/backoffice-errors.js";
+import type { BuildInfo } from "../runtime/build-info.js";
 
-export async function registerBackofficeWebRoutes(app: FastifyInstance, options: { auth?: BackofficeAuth; store: ApiStore }) {
+export async function registerBackofficeWebRoutes(app: FastifyInstance, options: { auth?: BackofficeAuth; store: ApiStore; buildInfo?: BuildInfo | null }) {
   registerBackofficeErrors(app);
   const { auth, store } = options;
   if (!auth) return;
@@ -38,7 +39,7 @@ export async function registerBackofficeWebRoutes(app: FastifyInstance, options:
       const nonce = randomBytes(18).toString("base64");
       security(reply, nonce);
       const clubs = (await store.listClubs()).filter(club => club.status === "active").map(club => ({ id: club.id, name: club.name }));
-      const config = JSON.stringify({ environment: auth.config.environment, path: auth.config.path, nonce, clubs }).replaceAll("<", "\\u003c");
+      const config = JSON.stringify({ environment: auth.config.environment, path: auth.config.path, nonce, clubs, build: options.buildInfo ?? null }).replaceAll("<", "\\u003c");
       const bootstrap = `<script nonce="${nonce}">window.__FCM_CONFIG__=${config};window.publicPath=${JSON.stringify(`${auth.config.path}/assets/`)};window.__webpack_nonce__=${JSON.stringify(nonce)};</script>`;
       const html = readFileSync(join(builtDirectory, "index.html"), "utf8")
         .replaceAll("/__backoffice_assets__/", `${auth.config.path}/assets/`)

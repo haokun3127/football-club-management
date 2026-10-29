@@ -153,14 +153,15 @@ export function buildServer(store: ApiStore = new InMemoryStore(), options: Serv
 
   app.get("/openapi.json", async () => buildOpenApiDocument());
 
+  const buildInfo = normalizeBuildInfo(options.buildInfo === undefined ? readBuildInfo() : options.buildInfo);
   void app.register(registerPlatformRoutes, {
     ...context,
-    buildInfo: normalizeBuildInfo(options.buildInfo === undefined ? readBuildInfo() : options.buildInfo),
+    buildInfo,
     environment: options.runtimeConfig?.environment,
   });
   void app.register(registerBackofficeRoutes, { auth: backofficeAuth });
   void app.register(registerBackofficeManagementRoutes, { auth: backofficeAuth, store });
-  void app.register(registerBackofficeWebRoutes, { auth: backofficeAuth, store });
+  void app.register(registerBackofficeWebRoutes, { auth: backofficeAuth, store, buildInfo });
   void app.register(registerCoachAssignmentRoutes, context);
   void app.register(registerAppClientRoutes, context);
   void app.register(registerDataCapabilityRoutes, context);

@@ -70,7 +70,7 @@ await persistence.repositories.coachAssignments.save({
 });
 let app: ReturnType<typeof buildServer>;
 const listener = createServer((request, response) => {
-  if (!request.url?.startsWith("/__env/develop/backoffice")) {
+  if (!request.url?.startsWith("/__env/develop/backoffice") && request.url?.split("?")[0] !== "/__env/develop/health") {
     response.writeHead(404);
     response.end();
     return;
